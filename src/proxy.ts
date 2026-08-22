@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
+import { ROUTES } from '@/declarations/navigation'
 
-// Paths accessible without authentication
-const PUBLIC_PATHS = ['/', '/login']
+// Paths reachable without a session
+const PUBLIC_PATHS: string[] = [ROUTES.login]
 
 /**
  * Route authentication redirect
@@ -19,14 +20,14 @@ export function proxy(request: NextRequest) {
   // Redirect unauthenticated users
   if (!hasSession && !isPublicPath) {
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = ROUTES.login
     return NextResponse.redirect(url)
   }
 
-  // Redirect from login page
-  if (hasSession && pathname === '/login') {
+  // Redirect away from the sign-in screen
+  if (hasSession && isPublicPath) {
     const url = request.nextUrl.clone()
-    url.pathname = '/overview'
+    url.pathname = ROUTES.dashboard
     return NextResponse.redirect(url)
   }
 
@@ -34,7 +35,7 @@ export function proxy(request: NextRequest) {
   return NextResponse.next()
 }
 
-// Middleware route matcher
+// Proxy route matcher
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }

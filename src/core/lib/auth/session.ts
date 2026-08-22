@@ -1,32 +1,35 @@
-import type { SessionUser } from '@/types/auth'
-import { Permissions } from '@/utils/constants/permissions'
-
-export const SESSION_COOKIE = 'template_session'
-
-export interface AuthSession {
-  email: string
-}
+import { cookieName } from '@/utils/constants/cookies'
 
 /**
- * Map to session user
- * @param {AuthSession} session - Session
- * @return {SessionUser} - User
+ * Session cookie name
+ * @type {string}
  */
 
-export const toSessionUser = (session: AuthSession): SessionUser => ({
-  id: session.email,
-  email: session.email,
-  role: 'admin',
-  permissions: Object.values(Permissions),
-  mustChangePassword: false,
-})
+export const SESSION_COOKIE = cookieName('session')
 
 /**
- * Check demo credentials
- * @param {string} email - Email
- * @param {string} password - Password
- * @return {boolean} - Valid
+ * Discord identifier shape
+ * @type {RegExp}
  */
 
-export const isValidDemoCredentials = (email: string, password: string) =>
-  email === 'demo@example.com' && password === 'password'
+export const DISCORD_ID_PATTERN = /^\d{15,25}$/
+
+/**
+ * Check identifier shape
+ * @param {string} candidate - Raw identifier
+ * @return {boolean} - Well formed
+ */
+
+export const isDiscordId = (candidate: string): boolean =>
+  DISCORD_ID_PATTERN.test(candidate.trim())
+
+/**
+ * Strip an identifier
+ * @param {FormDataEntryValue | null} raw - Submitted value
+ * @return {string} - Clean identifier
+ */
+
+export const normaliseDiscordId = (raw: FormDataEntryValue | null): string =>
+  String(raw ?? '')
+    .trim()
+    .replace(/\D/g, '')

@@ -10,4 +10,12 @@ export const CookieKeys = {
 export type CookieKey = keyof typeof CookieKeys
 
 // Cookie name prefix
-export const CookiePrefix = 'template_'
+export const CookiePrefix = 'memora_'
+
+/**
+ * Build a namespaced cookie name
+ * @param {CookieKey} key - Cookie key
+ * @return {string} - Prefixed name
+ */
+
+export const cookieName = (key: CookieKey): string => `${CookiePrefix}${CookieKeys[key]}`

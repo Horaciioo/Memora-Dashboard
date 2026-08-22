@@ -13,12 +13,12 @@ import type { PermissionHelpers, SessionUser } from '@/types/auth'
  * @property {SessionUser | null} session - Authenticated user or null
  * @property {boolean} isLoading - Session loading state
  * @property {boolean} isAuthenticated - User logged in
- * @property {boolean} mustChangePassword - Password change required
  * @property {(permission: Permission) => boolean} can - Check single permission
  * @property {(permissions: Permission[]) => boolean} canAny - Check any permission
  * @property {(permissions: Permission[]) => boolean} canAll - Check all permissions
  * @property {boolean} isAdmin - User is administrator
- * @property {boolean} isReadOnly - User in read-only mode
+ * @property {boolean} isResponsable - User leads a team or above
+ * @property {boolean} isRoot - User is the root administrator
  * @property {ReturnType<typeof useAuth>} auth - Sign in, sign out, password mutations
  */
 
@@ -26,7 +26,6 @@ interface AuthContextValue extends PermissionHelpers {
   session: SessionUser | null
   isLoading: boolean
   isAuthenticated: boolean
-  mustChangePassword: boolean
   auth: ReturnType<typeof useAuth>
 }
 
@@ -64,7 +63,6 @@ export const AuthProvider = ({ children, initialSession }: AuthProviderProps) =>
       session,
       isLoading,
       isAuthenticated: session !== null,
-      mustChangePassword: session?.mustChangePassword ?? false,
       auth,
     }),
     [permissions, session, isLoading, auth]

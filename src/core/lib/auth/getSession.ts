@@ -1,13 +1,56 @@
+import 'server-only'
+
 import { cookies } from 'next/headers'
-import { SESSION_COOKIE, type AuthSession } from '@/core/lib/auth/session'
+
+import { prisma } from '@/core/lib/db'
+import { SESSION_COOKIE } from '@/core/lib/auth/session'
+import { resolveAccountPermissions } from '@/core/services/auth/GrantsService'
+import { isRootIdentity } from '@/declarations/access/identity'
+import { MemberStatuses } from '@/utils/constants/hierarchy'
+import type { SessionUser } from '@/types/auth'
+import type { Account } from '@prisma/client'
 
 /**
- * Get session
- * @return {Promise<AuthSession | null>} - Session
+ * Map an account row to its session shape
+ * @param {Account} account - Account row
+ * @return {Promise<SessionUser>} - Session user
  */
 
-export const getSession = async (): Promise<AuthSession | null> => {
+export const toSessionUser = async (account: Account): Promise<SessionUser> => {
+  const isRoot = isRootIdentity(account.discordId)
+
+  return {
+    id: account.id,
+    discordId: account.discordId,
+    displayName: account.displayName,
+    avatarUrl: account.avatarUrl,
+    role: account.role,
+    status: account.status,
+    academyPeriod: account.academyPeriod,
+    divisionId: account.divisionId,
+    youtuberId: account.youtuberId,
+    primaryFunctionId: account.primaryFunctionId,
+    secondaryFunctionId: account.secondaryFunctionId,
+    isRoot,
+    permissions: await resolveAccountPermissions(account, isRoot),
+  }
+}
+
+/**
+ * Read the signed-in member
+ * @return {Promise<SessionUser | null>} - Session user or null
+ */
+
+export const getSession = async (): Promise<SessionUser | null> => {
   const cookieStore = await cookies()
-  const email = cookieStore.get(SESSION_COOKIE)?.value
-  return email ? { email } : null
+  const token = cookieStore.get(SESSION_COOKIE)?.value
+  if (!token) return null
+
+  const session = await prisma.session.findUnique({ where: { token }, include: { account: true } })
+  if (!session || session.expiresAt < new Date()) return null
+
+  // A member who left keeps no access
+  if (session.account.status === MemberStatuses.Left) return null
+
+  return toSessionUser(session.account)
 }
