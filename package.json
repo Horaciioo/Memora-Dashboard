@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@logtail/node": "^0.5.8",
+    "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@sentry/nextjs": "^10.70.0",
     "bullmq": "^6.1.2",
