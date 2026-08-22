@@ -49,17 +49,35 @@ export const BADGE_STYLES = {
 
 export const DIALOG_STYLES = {
   overlay:
-    'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-ink)]/40 p-0 backdrop-blur-sm sm:items-center sm:p-6',
+    'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-ink)]/50 p-0 backdrop-blur-md sm:items-center sm:p-6',
   panel:
-    'surface-enter flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] sm:max-w-lg sm:rounded-[var(--radius-xl)]',
-  panelWide: 'sm:max-w-3xl',
-  header: 'flex items-start justify-between gap-4 border-b border-[var(--color-border)] px-5 py-4',
-  title: 'text-lg font-bold',
-  description: 'text-sm text-[var(--color-ink-subtle)]',
-  body: 'flex-1 overflow-y-auto px-5 py-4',
+    'surface-enter relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] sm:rounded-[var(--radius-xl)]',
+  grip: 'mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-[var(--color-border-strong)] sm:hidden',
+  header: 'flex items-start gap-3 px-5 pt-5 pb-4 sm:px-6',
+  badge: 'flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)]',
+  glyph: 'h-5 w-5',
+  heading: 'flex min-w-0 flex-1 flex-col gap-1',
+  title: 'text-lg leading-tight font-bold tracking-tight',
+  description: 'text-sm text-[var(--color-ink-rose)] italic',
+  close: '-mt-1 -mr-2 shrink-0',
+  body: 'flex-1 overflow-y-auto border-t border-[var(--color-border)] px-5 py-5 sm:px-6',
   footer:
-    'flex flex-wrap items-center justify-end gap-2 border-t border-[var(--color-border)] px-5 py-3',
+    'flex flex-wrap items-center justify-end gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface)]/60 px-5 py-4 sm:px-6',
 } as const
+
+/**
+ * Panel width per dialog size
+ * @type {Record<string, string>}
+ */
+
+export const DIALOG_SIZES = {
+  sm: 'sm:max-w-sm',
+  md: 'sm:max-w-lg',
+  lg: 'sm:max-w-3xl',
+  xl: 'sm:max-w-5xl',
+} as const
+
+export type DialogSize = keyof typeof DIALOG_SIZES
 
 /**
  * Drawer styles

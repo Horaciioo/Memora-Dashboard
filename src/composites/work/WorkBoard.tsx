@@ -256,7 +256,7 @@ export const WorkBoard = <T extends BoardItem>({
         fields={fields}
         issues={board.issues}
         isSaving={board.isSaving}
-        wide
+        size="lg"
         onSubmit={board.create}
         onClose={() => setCreating(false)}
       />
@@ -268,7 +268,7 @@ export const WorkBoard = <T extends BoardItem>({
         initialValues={editing ? valuesOf(editing) : undefined}
         issues={board.issues}
         isSaving={board.isSaving}
-        wide
+        size="lg"
         onSubmit={(values) => board.update(editing!.id, values)}
         onClose={() => setEditing(null)}
       />

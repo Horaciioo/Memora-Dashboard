@@ -45,7 +45,7 @@ export const Drawer = ({ open, onClose, title, description, footer, children }: 
         className={DRAWER_STYLES.panel}
       >
         <div className={DIALOG_STYLES.header}>
-          <div className="flex flex-col gap-1">
+          <div className={DIALOG_STYLES.heading}>
             <h2 className={DIALOG_STYLES.title}>{title}</h2>
             {description && <p className={DIALOG_STYLES.description}>{description}</p>}
           </div>
@@ -54,7 +54,7 @@ export const Drawer = ({ open, onClose, title, description, footer, children }: 
             icon="close"
             onClick={onClose}
             aria-label={ACTION_COPY.close}
-            className="-mt-1 -mr-2"
+            className={DIALOG_STYLES.close}
           />
         </div>
         <div className={DIALOG_STYLES.body}>{children}</div>
