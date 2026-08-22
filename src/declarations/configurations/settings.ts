@@ -1,9 +1,10 @@
 import absences from '@/configurations/system/absences.json'
+import files from '@/configurations/system/fichiers.json'
 import forms from '@/configurations/system/forms.json'
 import livecon from '@/configurations/system/livecon.json'
 import pagination from '@/configurations/system/pagination.json'
 import search from '@/configurations/system/search.json'
-import { readInteger } from '@/declarations/configurations/readers'
+import { readInteger, readStringList } from '@/declarations/configurations/readers'
 
 const maxPerPage = readInteger(pagination.maxPerPage, {
   path: 'system/pagination.maxPerPage',
@@ -176,5 +177,22 @@ export const LIVECON_SETTINGS = {
     fallback: 3,
     min: 1,
     max: maxLevel,
+  }),
+}
+
+/**
+ * Upload bounds of the file field
+ * @type {{ maxBytes: number, allowedTypes: string[] }}
+ */
+
+export const FILE_SETTINGS = {
+  maxBytes: readInteger(files.maxBytes, {
+    path: 'system/fichiers.maxBytes',
+    fallback: 2_097_152,
+    min: 1,
+  }),
+  allowedTypes: readStringList(files.allowedTypes, {
+    path: 'system/fichiers.allowedTypes',
+    fallback: ['image/png', 'image/jpeg', 'image/webp'],
   }),
 }

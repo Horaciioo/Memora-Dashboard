@@ -117,7 +117,7 @@ const youtubers: ReferenceResource = {
       span: 'half',
     },
     accentField,
-    { name: 'avatarUrl', kind: 'url', label: REFERENCE_FIELD_COPY.avatarUrl },
+    { name: 'avatarUrl', kind: 'image', label: REFERENCE_FIELD_COPY.avatarUrl, bucket: 'avatars' },
     { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
   ],
   list: async () => {

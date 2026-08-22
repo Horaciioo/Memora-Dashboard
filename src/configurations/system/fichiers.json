@@ -1,0 +1,4 @@
+{
+  "maxBytes": 2097152,
+  "allowedTypes": ["image/png", "image/jpeg", "image/webp", "image/gif"]
+}

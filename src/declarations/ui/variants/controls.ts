@@ -110,3 +110,19 @@ export const EDITOR_STYLES = {
   footer:
     'flex items-center justify-between border-t border-[var(--color-border)] px-3 py-1.5 text-xs text-[var(--color-ink-subtle)]',
 } as const
+
+/**
+ * Picture field styles
+ * @type {Record<string, string>}
+ */
+
+export const FILE_INPUT_STYLES = {
+  frame:
+    'flex flex-wrap items-center gap-4 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3',
+  invalid: 'border-[var(--color-danger)]',
+  preview:
+    'h-16 w-16 shrink-0 rounded-[var(--radius-md)] border border-[var(--color-border)] object-cover',
+  placeholder:
+    'h-16 w-16 shrink-0 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)]',
+  actions: 'flex flex-wrap items-center gap-2',
+} as const

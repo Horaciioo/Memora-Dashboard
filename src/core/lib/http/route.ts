@@ -227,3 +227,70 @@ export const createProtectedRoute = <T>(options: ProtectedRouteOptions<T>): Rout
 
   return handler
 }
+
+/**
+ * Payload a binary route answers with
+ * @typedef {Object} BinaryPayload
+ * @property {Uint8Array} data - Raw bytes
+ * @property {string} mimeType - Content type
+ * @property {number} [maxAgeSeconds] - Browser cache window
+ */
+
+export interface BinaryPayload {
+  data: Uint8Array
+  mimeType: string
+  maxAgeSeconds?: number
+}
+
+/**
+ * Binary route options
+ * @typedef {Object} BinaryRouteOptions
+ * @property {PermissionName | PermissionName[]} [permission] - Permission needed
+ * @property {(context: ProtectedRouteContext) => Promise<BinaryPayload>} handler - Route body
+ */
+
+interface BinaryRouteOptions extends RouteOptions {
+  permission?: PermissionName | PermissionName[]
+  handler: (context: ProtectedRouteContext) => Promise<BinaryPayload>
+}
+
+/**
+ * Build a protected route answering with bytes rather than the response envelope
+ * @param {BinaryRouteOptions} options - Route options
+ * @return {RouteHandler} - Route handler
+ */
+
+export const createBinaryRoute = (options: BinaryRouteOptions): RouteHandler => {
+  const handler: RouteHandler = async (request, context) => {
+    try {
+      const session = await getSession()
+      if (!session) throw notAuthenticated()
+
+      const access = resolvePermissions(session)
+      if (options.permission) {
+        const allowed = Array.isArray(options.permission)
+          ? access.canAny(options.permission)
+          : access.can(options.permission)
+
+        if (!allowed) throw forbidden()
+      }
+
+      const routeContext = await buildContext(request, context, options)
+      const payload = await options.handler({ ...routeContext, session, access })
+
+      return new Response(payload.data as BodyInit, {
+        headers: {
+          'content-type': payload.mimeType,
+          'content-length': String(payload.data.byteLength),
+          'cache-control': `private, max-age=${payload.maxAgeSeconds ?? 0}`,
+        },
+      })
+    } catch (error) {
+      return fail(error)
+    }
+  }
+
+  handler.descriptor = options.descriptor
+
+  return handler
+}
