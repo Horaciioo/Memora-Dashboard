@@ -1,0 +1,13 @@
+{
+  "enabled": false,
+  "prefix": "dashboard:queues",
+  "attempts": 3,
+  "concurrency": 4,
+  "stalledIntervalMs": 30000,
+  "removeOnComplete": 100,
+  "removeOnFail": 500,
+  "backoff": {
+    "type": "exponential",
+    "delayMs": 1000
+  }
+}

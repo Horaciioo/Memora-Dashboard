@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "level": "info",
+  "console": true,
+  "file": false,
+  "directory": "logs",
+  "telemetry": false,
+  "archive": {
+    "status": false,
+    "retentionDays": 14
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "files": {
+    "authorized": ["png", "jpeg", "webp", "gif", "pdf"]
+  }
+}

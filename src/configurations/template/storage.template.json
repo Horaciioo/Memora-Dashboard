@@ -1,0 +1,5 @@
+{
+  "enabled": "${STORAGE_ENABLED}",
+  "driver": "${STORAGE_DRIVER}",
+  "maxBytes": "${STORAGE_MAX_BYTES}"
+}

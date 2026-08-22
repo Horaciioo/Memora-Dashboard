@@ -1,0 +1,16 @@
+{
+  "enabled": false,
+  "algorithm": "aes-256-gcm",
+  "key": null,
+  "keySalt": "dashboard-key-salt",
+  "iv": null,
+  "ivSalt": "dashboard-iv-salt",
+  "keyLength": 32,
+  "ivLength": 12,
+  "iterations": 100000,
+  "shared": {
+    "saltLength": 16,
+    "iterations": 100000
+  },
+  "legacyKeys": []
+}
