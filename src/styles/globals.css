@@ -1,21 +1,59 @@
 @import 'tailwindcss';
 
 :root {
-  --color-background: #f7f8fa;
-  --color-ink: #12131a;
-  --color-ink-subtle: #5b5f6c;
-  --color-surface: #eef0f4;
+  --color-background: #faf7fb;
+  --color-surface: #f2ecf4;
   --color-surface-raised: #ffffff;
-  --color-border: #dfe2e8;
+  --color-surface-sunken: #ebe3ee;
+  --color-ink: #1a1220;
+  --color-ink-subtle: #6b5f76;
+  --color-border: #e2d8e6;
+  --color-border-strong: #cbbcd2;
 
-  /* Placeholder brand scale, swap per project */
-  --color-brand-100: #e4e9fb;
-  --color-brand-600: #3346b0;
+  --color-brand-50: #fdf4fa;
+  --color-brand-100: #fbe4f4;
+  --color-brand-200: #f6c7e7;
+  --color-brand-300: #ee9dd4;
+  --color-brand-400: #e26bbc;
+  --color-brand-500: #d243a2;
+  --color-brand-600: #b92d8c;
+  --color-brand-700: #a32478;
+  --color-brand-800: #841c60;
+  --color-brand-900: #6b1a4e;
+  --color-on-brand: #ffffff;
 
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
+  --color-success: #12784e;
+  --color-warning: #8a5300;
+  --color-danger: #be2436;
+  --color-info: #2a56be;
+  --color-neutral: #6b5f76;
 
+  --color-success-soft: #e0f5ea;
+  --color-warning-soft: #fbeed6;
+  --color-danger-soft: #fce6e8;
+  --color-info-soft: #e4ecfd;
+  --color-neutral-soft: #eee9f0;
+  --color-brand-soft: #fbe4f4;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --shadow-sm: 0 1px 2px rgb(26 18 32 / 0.06);
+  --shadow-md: 0 6px 20px -8px rgb(26 18 32 / 0.18);
+  --shadow-lg: 0 24px 60px -24px rgb(26 18 32 / 0.28);
+
+  --motion-duration-fast: 120ms;
   --motion-duration-moderate: 1400ms;
+  --motion-duration-panel: 220ms;
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --font-display:
+    var(--font-outfit), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono', monospace;
 }
 
 /*
@@ -25,15 +63,43 @@
  * fallback is needed here.
  */
 :root.dark {
-  --color-background: #0e0f13;
-  --color-ink: #f2f3f6;
-  --color-ink-subtle: #9297a6;
-  --color-surface: #191b22;
-  --color-surface-raised: #22242d;
-  --color-border: #2d303b;
+  --color-background: #0f0b13;
+  --color-surface: #1a151f;
+  --color-surface-raised: #221b28;
+  --color-surface-sunken: #15101a;
+  --color-ink: #f5eff7;
+  --color-ink-subtle: #a99cb2;
+  --color-border: #302738;
+  --color-border-strong: #453a4f;
 
-  --color-brand-100: #1c2440;
-  --color-brand-600: #6b83e8;
+  --color-brand-50: #1e1020;
+  --color-brand-100: #2c1730;
+  --color-brand-200: #46224a;
+  --color-brand-300: #6b2f6c;
+  --color-brand-400: #9c4292;
+  --color-brand-500: #c964ac;
+  --color-brand-600: #f0a0d6;
+  --color-brand-700: #f6bee2;
+  --color-brand-800: #fad6ed;
+  --color-brand-900: #fdeaf6;
+  --color-on-brand: #1a1220;
+
+  --color-success: #5cd39a;
+  --color-warning: #f0b45c;
+  --color-danger: #ff8e97;
+  --color-info: #8fb2f7;
+  --color-neutral: #a99cb2;
+
+  --color-success-soft: #12291f;
+  --color-warning-soft: #2c2113;
+  --color-danger-soft: #30171b;
+  --color-info-soft: #171f33;
+  --color-neutral-soft: #211b26;
+  --color-brand-soft: #2c1730;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 6px 20px -8px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 24px 60px -24px rgb(0 0 0 / 0.8);
 }
 
 /* Text size preference — set by AppearanceManager (src/managers/front-end/AppearanceManager.tsx) */
@@ -46,11 +112,45 @@
 }
 
 body {
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--color-brand-200);
+  color: var(--color-ink);
+}
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Scrollbars follow the surface tokens instead of the OS default */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
 }
 
 .skeleton-shimmer {
@@ -74,12 +174,6 @@ body {
   }
   to {
     transform: translateX(100%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skeleton-shimmer::after {
-    animation: none;
   }
 }
 
@@ -109,4 +203,174 @@ html[data-color-vision='tritanopia'] {
     opacity: 1;
     transform: translate(-50%, -100%);
   }
+}
+
+/* Overlay surfaces — dialog, drawer, context menu, command palette */
+.surface-enter {
+  animation: surface-enter var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+@keyframes surface-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.overlay-enter {
+  animation: overlay-enter var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+@keyframes overlay-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.drawer-enter {
+  animation: drawer-enter var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+@keyframes drawer-enter {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Drag and drop feedback — set by useDragAndDrop (src/core/hooks/interaction/useDragAndDrop.ts) */
+.is-dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+
+.is-drop-target {
+  outline: 2px dashed var(--color-brand-500);
+  outline-offset: -4px;
+  background: var(--color-brand-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after,
+  .floating-hint-bubble,
+  .surface-enter,
+  .overlay-enter,
+  .drawer-enter {
+    animation: none;
+  }
+}
+
+/* Rendered markdown of a project communication */
+.markdown-body {
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.markdown-body > * + * {
+  margin-top: 0.75em;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.markdown-body h1 {
+  font-size: 1.35em;
+}
+
+.markdown-body h2 {
+  font-size: 1.2em;
+}
+
+.markdown-body h3 {
+  font-size: 1.05em;
+}
+
+.markdown-body a {
+  color: var(--color-brand-600);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 1.4em;
+}
+
+.markdown-body ul {
+  list-style: disc;
+}
+
+.markdown-body ol {
+  list-style: decimal;
+}
+
+.markdown-body blockquote {
+  border-left: 3px solid var(--color-brand-400);
+  padding-left: 0.8em;
+  color: var(--color-ink-subtle);
+}
+
+.markdown-body code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--color-surface-sunken);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+}
+
+.markdown-body pre {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--color-surface-sunken);
+  padding: 0.8em 1em;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.markdown-body pre code {
+  background: none;
+  padding: 0;
+}
+
+.markdown-body hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid var(--color-border);
+  padding: 0.4em 0.6em;
+  text-align: left;
+}
+
+.markdown-body .spoiler {
+  background: var(--color-ink);
+  color: transparent;
+  border-radius: var(--radius-sm);
+  padding: 0 0.2em;
+  cursor: pointer;
+}
+
+.markdown-body .spoiler:hover,
+.markdown-body .spoiler:focus-visible {
+  color: var(--color-surface-raised);
 }
