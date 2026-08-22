@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
+import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FormDialog } from '@/components/structures/FormDialog'
@@ -103,18 +104,7 @@ export const TeamsBoard = ({ initialBoard, fields, canManage }: TeamsBoardProps)
 
   return (
     <>
-      <Section
-        title={TEAM_COPY.title}
-        description={TEAM_COPY.lead}
-        action={
-          canManage ? (
-            <Button variant="primary" icon="add" onClick={openCreate}>
-              {TEAM_COPY.add}
-            </Button>
-          ) : undefined
-        }
-        bare
-      >
+      <Section bare>
         <div className={BOARD_STYLES.scroller}>
           {board.teams.map((team) => (
             <section
@@ -193,6 +183,13 @@ export const TeamsBoard = ({ initialBoard, fields, canManage }: TeamsBoardProps)
               ))}
             </div>
           </section>
+          <AddRow
+            label={TEAM_COPY.add}
+            disabled={!canManage}
+            tile
+            onClick={openCreate}
+            className="w-72 shrink-0"
+          />
         </div>
       </Section>
 

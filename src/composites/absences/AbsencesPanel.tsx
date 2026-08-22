@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
+import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { DataTable, type DataTableColumn } from '@/components/structures/DataTable'
 import { FormDialog } from '@/components/structures/FormDialog'
@@ -201,18 +202,7 @@ export const AbsencesPanel = ({
 
   return (
     <>
-      <Section
-        title={ABSENCE_COPY.title}
-        description={ABSENCE_COPY.lead.replace('{threshold}', String(thresholdDays))}
-        action={
-          canCreate ? (
-            <Button variant="primary" icon="add" onClick={openCreate}>
-              {ABSENCE_COPY.add}
-            </Button>
-          ) : undefined
-        }
-        bare
-      >
+      <Section bare>
         {tabs.length > 1 && (
           <Tabs items={tabs} value={tab} onChange={setTab} label={ABSENCE_COPY.title} />
         )}
@@ -234,6 +224,9 @@ export const AbsencesPanel = ({
             ),
           }}
         />
+        {visible.length > 0 && canCreate && (
+          <AddRow label={ABSENCE_COPY.add} onClick={openCreate} />
+        )}
       </Section>
 
       <FormDialog
