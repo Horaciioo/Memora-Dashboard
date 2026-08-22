@@ -1,0 +1,8 @@
+{
+  "enabled": false,
+  "ttl": 300,
+  "synchronize": {
+    "status": false,
+    "event": "cache:mutation"
+  }
+}

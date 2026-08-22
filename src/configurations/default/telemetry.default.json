@@ -1,0 +1,16 @@
+{
+  "enabled": false,
+  "sourceKey": null,
+  "endpoint": null,
+  "levels": ["warn", "error"],
+  "batch": {
+    "size": 100,
+    "sizeKiB": 512,
+    "flushMs": 5000,
+    "maxQueue": 1000
+  },
+  "retry": {
+    "count": 3,
+    "backoffMs": 1000
+  }
+}

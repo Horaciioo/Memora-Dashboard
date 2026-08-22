@@ -1,0 +1,17 @@
+{
+  "enabled": false,
+  "driver": "database",
+  "maxBytes": 10485760,
+  "concurrency": 3,
+  "cache": {
+    "ttlMs": 60000
+  },
+  "retry": {
+    "attempts": 3,
+    "initialDelayMs": 500
+  },
+  "files": {
+    "authorized": [],
+    "blocked": ["exe", "bat", "sh", "cmd", "msi"]
+  }
+}

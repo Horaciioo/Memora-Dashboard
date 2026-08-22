@@ -1,0 +1,25 @@
+// Infrastructure only, a cloned project adds its own models
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Backing table of StorageManager, bucket comes from STORAGE_BUCKETS
+model StorageEntry {
+  id        String   @id @default(cuid())
+  bucket    String
+  key       String
+  mimeType  String
+  byteSize  Int
+  data      Bytes
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bucket, key])
+  @@index([bucket])
+}

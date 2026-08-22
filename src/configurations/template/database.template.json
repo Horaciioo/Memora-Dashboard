@@ -1,0 +1,8 @@
+{
+  "enabled": "${DATABASE_ENABLED}",
+  "ttl": "${DATABASE_CACHE_TTL}",
+  "synchronize": {
+    "status": "${DATABASE_SYNCHRONIZE}",
+    "event": "${DATABASE_SYNCHRONIZE_EVENT}"
+  }
+}
