@@ -1,10 +1,7 @@
-import type { FC, ReactNode } from 'react'
-import {
-  EmptyBoxIllustration,
-  NoResultsIllustration,
-  type EmptyStateIllustrationProps,
-} from '@/components/elements/feedback/EmptyStateIllustration'
+import type { ReactNode } from 'react'
+import { ILLUSTRATIONS, type IllustrationName } from '@/declarations/ui/illustrations'
 import { EMPTY_STATE_STYLES } from '@/declarations/ui/variants'
+import { EMPTY_COPY } from '@/declarations/ui/copy/empty'
 import { cn } from '@/utils/classnames'
 
 export type EmptyStateVariant = 'start' | 'filter'
@@ -12,8 +9,8 @@ export type EmptyStateVariant = 'start' | 'filter'
 export interface EmptyStateProps {
   // 'start' invites in, 'filter' invites to widen the search
   variant?: EmptyStateVariant
-  // Overrides the variant's default illustration
-  icon?: FC<EmptyStateIllustrationProps>
+  // Overrides the variant's default figure
+  figure?: IllustrationName
   // Falls back to generic copy on 'filter', required on 'start'
   title?: string
   description?: string
@@ -22,40 +19,35 @@ export interface EmptyStateProps {
   className?: string
 }
 
-const DEFAULT_ILLUSTRATIONS: Record<EmptyStateVariant, FC<EmptyStateIllustrationProps>> = {
-  start: EmptyBoxIllustration,
-  filter: NoResultsIllustration,
-}
-
-const FALLBACK_COPY = {
-  title: 'No matches',
-  description: 'Try widening or clearing the current filter.',
-}
-
 /**
- * Dashed placeholder shown in place of an empty table or list, its action is the only
- * way in — a cloned project wires it to "add" for 'start' and "clear filter" for 'filter'
- * @param {EmptyStateProps} props - Variant, illustration, copy and the required action
+ * Dashed placeholder shown in place of an empty table, list or board, its action being the
+ * only way in — 'start' wires to a creation gesture, 'filter' to clearing the filter
+ * @param {EmptyStateVariant} [variant] - Kind of emptiness, defaults to start
+ * @param {IllustrationName} [figure] - Drawn figure overriding the variant default
+ * @param {string} [title] - Headline, required on the start variant
+ * @param {string} [description] - Supporting line
+ * @param {ReactNode} action - Mandatory way out
+ * @param {string} [className] - Extra classes merged onto the frame
  * @return {JSX.Element}
  */
 
 export const EmptyState = ({
   variant = 'start',
-  icon,
+  figure,
   title,
   description,
   action,
   className,
 }: EmptyStateProps) => {
-  const Illustration = icon ?? DEFAULT_ILLUSTRATIONS[variant]
-  const resolvedTitle = title ?? (variant === 'filter' ? FALLBACK_COPY.title : '')
+  const Illustration = ILLUSTRATIONS[figure ?? variant]
+  const resolvedTitle = title ?? (variant === 'filter' ? EMPTY_COPY.filterTitle : '')
   const resolvedDescription =
-    description ?? (variant === 'filter' ? FALLBACK_COPY.description : undefined)
+    description ?? (variant === 'filter' ? EMPTY_COPY.filterDescription : undefined)
 
   return (
     <div className={cn(EMPTY_STATE_STYLES.frame, className)}>
       <Illustration className={EMPTY_STATE_STYLES[variant].illustration} />
-      <p className="font-medium">{resolvedTitle}</p>
+      <p className="text-base font-bold">{resolvedTitle}</p>
       {resolvedDescription && (
         <p className="max-w-sm text-sm text-[var(--color-ink-subtle)]">{resolvedDescription}</p>
       )}

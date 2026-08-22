@@ -1,11 +1,16 @@
 import type { ReactNode } from 'react'
 import { AppShell } from '@/layouts/AppShell'
+import { requireUser } from '@/core/wrappers/requireUser'
 
 /**
- * Minimal dashboard shell shared by every route in this group
- * @param {{ children: ReactNode }} props - Routed page content
- * @return {JSX.Element}
+ * Dashboard shell shared by every route in this group
+ * @param {Object} props - Layout props
+ * @param {ReactNode} props.children - Routed page content
+ * @return {Promise<JSX.Element>} - App shell
  */
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+  await requireUser()
+
   return <AppShell>{children}</AppShell>
 }

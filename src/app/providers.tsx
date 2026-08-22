@@ -6,8 +6,10 @@ import { AuthProvider } from '@/managers/infrastructure/Security/AuthManager'
 import { NotificationProvider } from '@/managers/infrastructure/Network/NotificationsManager'
 import {
   AppearanceManager,
+  BreadcrumbProvider,
   ColorVisionManager,
   HintsProvider,
+  MenuProvider,
   ThemeManager,
 } from '@/managers/front-end'
 import type { SessionUser } from '@/types/auth'
@@ -37,10 +39,14 @@ export const Providers = ({ initialSession, children }: ProvidersProps) => (
       <ThemeManager />
       <AppearanceManager />
       <ColorVisionManager />
-      <HintsProvider>
-        {children}
-        <NotificationsToaster />
-      </HintsProvider>
+      <BreadcrumbProvider>
+        <MenuProvider>
+          <HintsProvider>
+            {children}
+            <NotificationsToaster />
+          </HintsProvider>
+        </MenuProvider>
+      </BreadcrumbProvider>
     </AuthProvider>
   </NotificationProvider>
 )
