@@ -1,0 +1,6 @@
+{
+  "displayName": "Administrateur",
+  "role": "ADMIN",
+  "immutable": true,
+  "sessionDays": 14
+}

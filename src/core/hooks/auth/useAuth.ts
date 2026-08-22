@@ -2,7 +2,7 @@
 
 import { useCallback, useTransition } from 'react'
 
-import { logout } from '@/app/login/actions'
+import { logout } from '@/app/connexion/actions'
 
 /**
  * Auth actions

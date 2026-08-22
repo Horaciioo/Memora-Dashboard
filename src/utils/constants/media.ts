@@ -1,6 +1,7 @@
 export const MediaAssets = {
   Avatar: 'Avatar',
-  Icon: 'Icon',
+  Division: 'Division',
+  Youtuber: 'Youtuber',
 } as const
 
 export type MediaAsset = (typeof MediaAssets)[keyof typeof MediaAssets]
@@ -11,8 +12,9 @@ export type MediaAsset = (typeof MediaAssets)[keyof typeof MediaAssets]
  */
 
 export const MEDIA_PATTERNS: Record<MediaAsset, string> = {
-  [MediaAssets.Avatar]: '/media/avatars/{ownerId}/{hash}.png',
-  [MediaAssets.Icon]: '/media/icons/{ownerId}/{hash}.png',
+  [MediaAssets.Avatar]: 'https://cdn.discordapp.com/avatars/{ownerId}/{hash}.png',
+  [MediaAssets.Division]: '/divisions/{hash}.png',
+  [MediaAssets.Youtuber]: '/youtubers/{hash}.png',
 }
 
 // Content hash pattern
