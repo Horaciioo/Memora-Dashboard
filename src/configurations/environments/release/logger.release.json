@@ -1,0 +1,9 @@
+{
+  "level": "warn",
+  "console": false,
+  "file": true,
+  "telemetry": true,
+  "archive": {
+    "status": true
+  }
+}

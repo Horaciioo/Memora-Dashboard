@@ -1,0 +1,7 @@
+{
+  "file": true,
+  "telemetry": true,
+  "archive": {
+    "status": true
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "enabled": "${QUEUES_ENABLED}",
+  "prefix": "${QUEUES_PREFIX}",
+  "concurrency": "${QUEUES_CONCURRENCY}"
+}

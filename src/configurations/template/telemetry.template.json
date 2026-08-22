@@ -1,0 +1,5 @@
+{
+  "enabled": "${TELEMETRY_ENABLED}",
+  "sourceKey": "${TELEMETRY_SOURCE_KEY}",
+  "endpoint": "${TELEMETRY_ENDPOINT}"
+}
