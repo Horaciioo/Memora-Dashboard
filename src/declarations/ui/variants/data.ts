@@ -25,6 +25,8 @@ export const LIST_STYLES = {
   stack: 'flex flex-col gap-2',
   item: 'flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 transition-colors hover:border-[var(--color-border-strong)]',
   itemClickable: 'cursor-pointer hover:border-[var(--color-brand-400)]',
+  card: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 transition-colors',
+  cardClickable: 'cursor-pointer hover:border-[var(--color-brand-400)]',
   grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
 } as const
 

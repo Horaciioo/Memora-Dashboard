@@ -21,6 +21,8 @@ export const ROUTES = {
   absences: '/absences',
   livecon: '/livecon',
   academy: '/academy',
+  session: (id: string) => `/academy/${id}`,
+  junior: (sessionId: string, juniorId: string) => `/academy/${sessionId}/${juniorId}`,
   sanctions: '/moderation/sanctions',
   settings: '/configuration',
   settingsSection: (section: string) => `/configuration/${section}`,

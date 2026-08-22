@@ -36,3 +36,72 @@ export const AcademyPeriods = {
 } as const
 
 export type AcademyPeriodName = (typeof AcademyPeriods)[keyof typeof AcademyPeriods]
+
+/**
+ * Training programmes a session runs
+ * @type {Record<string, string>}
+ */
+
+export const AcademyPrograms = {
+  Twitch: 'PIMT',
+  Youtube: 'PIMY',
+  Discord: 'PIMD',
+  Polyvalent: 'PIMP',
+} as const
+
+export type AcademyProgramName = (typeof AcademyPrograms)[keyof typeof AcademyPrograms]
+
+/**
+ * Entry level of a junior
+ * @type {Record<string, string>}
+ */
+
+export const AcademyTracks = {
+  Entry: 'ENTREE',
+  Adaptation: 'ADAPTATION',
+} as const
+
+export type AcademyTrackName = (typeof AcademyTracks)[keyof typeof AcademyTracks]
+
+/**
+ * Lifecycle of a session
+ * @type {Record<string, string>}
+ */
+
+export const AcademySessionStatuses = {
+  Planned: 'PLANNED',
+  Running: 'RUNNING',
+  Closed: 'CLOSED',
+} as const
+
+export type AcademySessionStatusName =
+  (typeof AcademySessionStatuses)[keyof typeof AcademySessionStatuses]
+
+/**
+ * Outcome of a junior inside a session
+ * @type {Record<string, string>}
+ */
+
+export const AcademyJuniorStatuses = {
+  Active: 'ACTIVE',
+  Validated: 'VALIDATED',
+  Stopped: 'STOPPED',
+} as const
+
+export type AcademyJuniorStatusName =
+  (typeof AcademyJuniorStatuses)[keyof typeof AcademyJuniorStatuses]
+
+/**
+ * Kind of moment recorded on the session thread
+ * @type {Record<string, string>}
+ */
+
+export const AcademyEventKinds = {
+  Training: 'FORMATION',
+  VoiceReview: 'BILAN_VOCAL',
+  Interview: 'ENTREVUE',
+  LeadCheckIn: 'POINT_RESPONSABLE',
+  WorkSession: 'SESSION_TRAVAIL',
+} as const
+
+export type AcademyEventKindName = (typeof AcademyEventKinds)[keyof typeof AcademyEventKinds]

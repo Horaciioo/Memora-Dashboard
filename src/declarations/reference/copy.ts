@@ -24,6 +24,8 @@ export const REFERENCE_FIELD_COPY = {
   terminalBadge: 'Fin',
   weight: 'Poids',
   weightHint: 'Plus le poids est élevé, plus la priorité remonte.',
+  program: 'Programme',
+  programHint: 'Laisse vide si la formation vaut pour tous les programmes.',
   period: 'Période',
   jobFunction: 'Fonction',
   jobFunctionHint: 'Laisse vide si la formation concerne tout le monde.',
