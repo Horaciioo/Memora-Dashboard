@@ -26,10 +26,11 @@ const createToken = (): string => crypto.randomBytes(32).toString('base64url')
 export const ensureRootAccount = async (discordId: string): Promise<Account> =>
   prisma.account.upsert({
     where: { discordId },
+    // The stored name is never overwritten, the database owns it once seeded
     update: { role: MemberRoles.Admin, status: MemberStatuses.Active, leftAt: null },
     create: {
       discordId,
-      displayName: ROOT_IDENTITY.displayName,
+      displayName: ROOT_IDENTITY.seedName ?? discordId,
       role: MemberRoles.Admin,
       status: MemberStatuses.Active,
     },
