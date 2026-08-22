@@ -5,6 +5,17 @@ description: Vue d'ensemble du template dashboard — objectif, stack, philosoph
 
 # Template dashboard
 
+## Ce dépôt est un projet, plus un template
+
+Ce dépôt est **Memora**, le dashboard de Marsha, cloné depuis le template dashboard. Les conventions ci-dessous restent en vigueur, mais la règle « aucun terme métier » ne s'applique plus : le domaine réel (modérateurs, projets, tâches, réunions, absences, livecon, academy) vit ici.
+
+Deux décisions de projet à connaître avant d'écrire quoi que ce soit :
+
+- **Les textes affichés sont en français, au tutoiement**, et vivent tous dans `src/declarations/` — jamais une phrase littérale dans un composant. Les commentaires du code restent en anglais, voir `comments`.
+- **Les données de référence ne vivent pas dans le code.** YouTubeurs, divisions, fonctions, plateformes, états, priorités, réseaux, formations et niveaux de livecon se créent depuis `/configuration`. Le code ne porte que le catalogue de permissions, les rôles et les énumérés système de `src/utils/constants/`.
+
+Voir `README.md` pour la carte des espaces et le démarrage.
+
 ## Objectif
 
 Ce dépôt n'est pas une application. C'est un **point de départ** cloné au début de chaque nouveau projet de dashboard (admin, client, interne, peu importe le métier). Il porte des conventions de structure, de nomenclature et de style, et huit systèmes déjà fonctionnels : couche configurations, back-end serveur, skeleton loader, EmptyState, managers, thème clair/sombre, auth de démonstration + `proxy.ts`, layouts.
