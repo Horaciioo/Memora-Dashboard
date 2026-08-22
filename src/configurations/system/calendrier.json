@@ -1,0 +1,5 @@
+{
+  "dayStartHour": 7,
+  "dayEndHour": 23,
+  "maxEntriesPerDay": 3
+}

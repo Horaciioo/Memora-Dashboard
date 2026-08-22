@@ -139,8 +139,12 @@ export const ROLE_PRESETS: Record<MemberRoleName, PermissionName[]> = {
     Permissions.LiveconUpdate,
     Permissions.AcademyRead,
     Permissions.AcademyManage,
+    Permissions.AcademyReviewRead,
+    Permissions.AcademyReviewWrite,
     Permissions.TeamRead,
     Permissions.TeamManage,
+    Permissions.CalendarRead,
+    Permissions.CalendarManage,
     Permissions.ReferenceRead,
   ],
   [MemberRoles.Moderateur]: [
@@ -154,5 +158,6 @@ export const ROLE_PRESETS: Record<MemberRoleName, PermissionName[]> = {
     Permissions.LiveconRead,
     Permissions.AcademyRead,
     Permissions.TeamRead,
+    Permissions.CalendarRead,
   ],
 }

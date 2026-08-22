@@ -13,6 +13,7 @@ export const REFERENCE_KEYS = [
   'plateformes',
   'etats',
   'priorites',
+  'evenements',
   'formations',
   'livecon',
 ] as const
@@ -124,6 +125,17 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     reorderable: false,
     emptyTitle: 'Aucune priorité',
     emptyDescription: 'Ajoute tes niveaux d’urgence, du plus léger au plus lourd.',
+  },
+  {
+    key: 'evenements',
+    label: 'Types d’évènement',
+    singular: 'Type d’évènement',
+    description: 'Lives, réunions et rendez-vous que le calendrier accepte.',
+    icon: 'meetings',
+    figure: 'settings',
+    reorderable: true,
+    emptyTitle: 'Aucun type d’évènement',
+    emptyDescription: 'Déclare tes lives et tes réunions avant de remplir le calendrier.',
   },
   {
     key: 'formations',

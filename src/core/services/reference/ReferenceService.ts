@@ -8,6 +8,7 @@ import { FORM_SETTINGS, LIVECON_SETTINGS } from '@/declarations/configurations/s
 import { ACADEMY_PROGRAM_REGISTRY } from '@/declarations/academy/registries'
 import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
 import {
+  EVENT_VISIBILITY_REGISTRY,
   FUNCTION_KIND_REGISTRY,
   WORKFLOW_SCOPE_REGISTRY,
 } from '@/declarations/reference/registries'
@@ -15,10 +16,11 @@ import { REFERENCE_FIELD_COPY } from '@/declarations/reference/copy'
 import type { ReferenceKey } from '@/declarations/reference/sections'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { ReferenceRow } from '@/types/reference'
-import { FunctionKinds, WorkflowScopes } from '@/utils/constants/workflow'
+import { EventVisibilities, FunctionKinds, WorkflowScopes } from '@/utils/constants/workflow'
 import type {
   AcademyPeriodName,
   AcademyProgramName,
+  EventVisibilityName,
   FunctionKindName,
   WorkflowScopeName,
 } from '@/utils/constants'
@@ -599,6 +601,97 @@ const priorities: ReferenceResource = {
   reorder: noReorder,
 }
 
+const eventTypes: ReferenceResource = {
+  fields: async () => [
+    nameField,
+    {
+      name: 'visibility',
+      kind: 'select',
+      label: REFERENCE_FIELD_COPY.visibility,
+      hint: REFERENCE_FIELD_COPY.visibilityHint,
+      required: true,
+      options: toOptions(EVENT_VISIBILITY_REGISTRY),
+      span: 'half',
+    },
+    accentField,
+    {
+      name: 'summary',
+      kind: 'textarea',
+      label: REFERENCE_FIELD_COPY.summary,
+      maxLength: longTextMaxLength,
+    },
+    { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
+  ],
+  list: async () => {
+    const rows = await prisma.eventType.findMany({
+      orderBy: { position: 'asc' },
+      include: { _count: { select: { events: true } } },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      label: row.name,
+      hint: row.summary,
+      accent: row.accent,
+      badges: [
+        EVENT_VISIBILITY_REGISTRY.label(row.visibility),
+        ...(row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : []),
+      ],
+      position: row.position,
+      usage: row._count.events,
+      values: {
+        name: row.name,
+        visibility: row.visibility,
+        accent: row.accent,
+        summary: row.summary,
+        archived: row.archived,
+      },
+    }))
+  },
+  create: async (values) => {
+    const row = await prisma.eventType
+      .create({
+        data: {
+          name: readText(values, 'name') ?? '',
+          visibility: (readText(values, 'visibility') ??
+            EventVisibilities.Everyone) as EventVisibilityName,
+          accent: readText(values, 'accent'),
+          summary: readText(values, 'summary'),
+          archived: readFlag(values, 'archived'),
+          position: await nextPosition(prisma.eventType),
+        },
+      })
+      .catch(rethrow)
+
+    return eventTypes.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
+  },
+  update: async (id, values) => {
+    await prisma.eventType
+      .update({
+        where: { id },
+        data: {
+          name: readText(values, 'name') ?? undefined,
+          visibility: (readText(values, 'visibility') ??
+            EventVisibilities.Everyone) as EventVisibilityName,
+          accent: readText(values, 'accent'),
+          summary: readText(values, 'summary'),
+          archived: readFlag(values, 'archived'),
+        },
+      })
+      .catch(rethrow)
+
+    return eventTypes.list().then((rows) => rows.find((entry) => entry.id === id)!)
+  },
+  remove: async (id) => {
+    await prisma.eventType.delete({ where: { id } })
+  },
+  reorder: (ids) =>
+    applyOrder(
+      (id, position) => prisma.eventType.update({ where: { id }, data: { position } }),
+      ids
+    ),
+}
+
 const trainings: ReferenceResource = {
   fields: async () => {
     const functions = await prisma.jobFunction.findMany({
@@ -811,6 +904,7 @@ const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
   plateformes: platforms,
   etats: workflowStates,
   priorites: priorities,
+  evenements: eventTypes,
   formations: trainings,
   livecon: liveconLevels,
 }

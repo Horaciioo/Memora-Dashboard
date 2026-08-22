@@ -61,3 +61,16 @@ export const PermissionEffects = {
 } as const
 
 export type PermissionEffectName = (typeof PermissionEffects)[keyof typeof PermissionEffects]
+
+/**
+ * Who a calendar entry is shown to
+ * @type {Record<string, string>}
+ */
+
+export const EventVisibilities = {
+  Everyone: 'EVERYONE',
+  Responsables: 'RESPONSABLES',
+  Admins: 'ADMINS',
+} as const
+
+export type EventVisibilityName = (typeof EventVisibilities)[keyof typeof EventVisibilities]

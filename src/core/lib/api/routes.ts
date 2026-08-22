@@ -33,6 +33,10 @@ export const API_ROUTES = {
   absences: '/api/absences',
   absence: (id: string) => `/api/absences/${id}`,
   livecon: '/api/livecon',
+  calendar: (from: string, to: string) =>
+    `/api/calendrier?debut=${encodeURIComponent(from)}&fin=${encodeURIComponent(to)}`,
+  calendarEntries: '/api/calendrier',
+  calendarEntry: (id: string) => `/api/calendrier/${id}`,
   academy: '/api/academy',
   session: (id: string) => `/api/academy/${id}`,
   sessionJuniors: (id: string) => `/api/academy/${id}/juniors`,
@@ -65,6 +69,7 @@ export const CACHE_KEYS = {
   absences: () => 'absences',
   livecon: () => 'livecon',
   teams: () => 'teams',
+  calendar: (from: string, to: string) => `calendar:${from}:${to}`,
   sessions: () => 'academy:sessions',
   session: (id: string) => `academy:session:${id}`,
   junior: (id: string) => `academy:junior:${id}`,
