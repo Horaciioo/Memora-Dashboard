@@ -13,6 +13,7 @@ export const API_ROUTES = {
   memberPims: (id: string) => `/api/moderateurs/${id}/pims`,
   memberSocials: (id: string) => `/api/moderateurs/${id}/reseaux`,
   social: (id: string) => `/api/reseaux/${id}`,
+  files: '/api/fichiers',
   memberAccess: (id: string) => `/api/moderateurs/${id}/acces`,
   note: (id: string) => `/api/notes/${id}`,
   pim: (id: string) => `/api/pims/${id}`,

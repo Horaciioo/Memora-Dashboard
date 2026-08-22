@@ -43,3 +43,19 @@ export const EDITOR_COPY = {
   spoiler: 'Spoiler',
   counter: 'caractères',
 } as const
+
+/**
+ * File field labels and rejections
+ * @type {Record<string, string>}
+ */
+
+export const FILE_COPY = {
+  choose: 'Choisir une image',
+  replace: 'Remplacer l’image',
+  remove: 'Retirer l’image',
+  uploading: 'Envoi en cours…',
+  tooLarge: 'Ce fichier est trop lourd.',
+  wrongType: 'Ce format d’image n’est pas accepté.',
+  unknownBucket: 'Cette destination de fichier n’existe pas.',
+  missing: 'Aucun fichier reçu.',
+} as const

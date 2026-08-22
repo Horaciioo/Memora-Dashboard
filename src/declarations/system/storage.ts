@@ -19,6 +19,7 @@ interface StorageBucketOption {
 
 const STORAGE_BUCKET_MAP = {
   files: { label: 'Files', unique: false },
+  avatars: { label: 'Avatars', unique: false },
 } satisfies Record<string, StorageBucketOption>
 
 export const STORAGE_BUCKETS = createRegistry<keyof typeof STORAGE_BUCKET_MAP, StorageBucketOption>(

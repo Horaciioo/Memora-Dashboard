@@ -1,6 +1,7 @@
 'use client'
 
 import { Field } from '@/components/elements/forms/Field'
+import { FileInput } from '@/components/elements/forms/FileInput'
 import { Input } from '@/components/elements/forms/Input'
 import { MarkdownEditor } from '@/components/elements/forms/MarkdownEditor'
 import { MultiSelect } from '@/components/elements/forms/MultiSelect'
@@ -10,6 +11,7 @@ import { Textarea } from '@/components/elements/forms/Textarea'
 import { Toggle } from '@/components/elements/forms/Toggle'
 import { visibleFields } from '@/core/lib/forms'
 import { ACTION_COPY } from '@/declarations/ui/copy'
+import type { StorageBucket } from '@/types/storage'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 
@@ -132,6 +134,17 @@ export const FormRenderer = ({
               />
             )}
 
+            {field.kind === 'image' && (
+              <FileInput
+                id={id}
+                value={typeof raw === 'string' ? raw : null}
+                bucket={field.bucket ?? DEFAULT_BUCKET}
+                disabled={disabled || field.readOnly}
+                invalid={invalid}
+                onChange={(next) => onChange(field.name, next)}
+              />
+            )}
+
             {field.kind === 'markdown' && (
               <MarkdownEditor
                 id={id}
@@ -175,6 +188,9 @@ export const FormRenderer = ({
     </div>
   )
 }
+
+// Bucket an image field lands in when its declaration stays silent
+const DEFAULT_BUCKET: StorageBucket = 'files'
 
 /**
  * Field kinds rendered by a single native input

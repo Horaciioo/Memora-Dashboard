@@ -40,9 +40,12 @@ export class ApiClientError extends Error {
  */
 
 const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
+  // Form data carries its own multipart boundary, so no content type is forced
+  const isFormData = init?.body instanceof FormData
+
   const response = await fetch(path, {
     ...init,
-    headers: { 'content-type': 'application/json', ...init?.headers },
+    headers: isFormData ? init?.headers : { 'content-type': 'application/json', ...init?.headers },
   })
 
   const envelope = (await response.json()) as ApiEnvelope<T>
@@ -100,6 +103,16 @@ export const apiPut = <T>(path: string, body: unknown): Promise<T> =>
  */
 
 export const apiDelete = <T>(path: string): Promise<T> => request<T>(path, { method: 'DELETE' })
+
+/**
+ * Upload a file
+ * @param {string} path - API path
+ * @param {FormData} form - Multipart payload
+ * @return {Promise<T>} - Payload
+ */
+
+export const apiUpload = <T>(path: string, form: FormData): Promise<T> =>
+  request<T>(path, { method: 'POST', body: form })
 
 /**
  * Read the message of an unknown throw

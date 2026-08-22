@@ -1,3 +1,5 @@
+import type { StorageBucket } from '@/types/storage'
+
 /**
  * Value a form field can hold
  * @type {string | number | boolean | string[] | null}
@@ -26,6 +28,7 @@ export type FieldKind =
   | 'url'
   | 'discord'
   | 'colour'
+  | 'image'
 
 /**
  * Choice offered by a select field
@@ -76,6 +79,7 @@ export interface FieldCondition {
  * @property {number} [maxLength] - Longest text
  * @property {number} [maxItems] - Most entries
  * @property {'full' | 'half'} [span] - Grid width
+ * @property {StorageBucket} [bucket] - Destination bucket of an image field
  * @property {FieldCondition} [visibleWhen] - Display rule
  */
 
@@ -94,6 +98,7 @@ export interface FieldDefinition {
   maxLength?: number
   maxItems?: number
   span?: 'full' | 'half'
+  bucket?: StorageBucket
   visibleWhen?: FieldCondition
 }
 
