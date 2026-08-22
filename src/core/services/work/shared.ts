@@ -1,0 +1,186 @@
+import 'server-only'
+
+import { prisma } from '@/core/lib/db'
+import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import type { BoardColumn } from '@/components/structures/KanbanBoard'
+import type { FieldOption } from '@/types/forms'
+import type { WorkPerson, WorkTag } from '@/types/work'
+import { MemberStatuses } from '@/utils/constants/hierarchy'
+import type { WorkflowScopeName } from '@/utils/constants/workflow'
+
+/**
+ * Reference row shaped like a tag
+ * @typedef {Object} TagRow
+ * @property {string} id - Row identifier
+ * @property {string} name - Display name
+ * @property {string | null} accent - Colour token
+ */
+
+interface TagRow {
+  id: string
+  name: string
+  accent?: string | null
+}
+
+/**
+ * Map a reference row to a tag
+ * @param {TagRow | null} row - Reference row
+ * @return {WorkTag | null} - Tag or null
+ */
+
+export const toTag = (row: TagRow | null | undefined): WorkTag | null =>
+  row ? { id: row.id, label: row.name, accent: row.accent ?? null } : null
+
+/**
+ * Account row shaped like a person
+ * @typedef {Object} PersonRow
+ * @property {string} id - Account identifier
+ * @property {string} displayName - Display name
+ * @property {string | null} avatarUrl - Portrait
+ */
+
+interface PersonRow {
+  id: string
+  displayName: string
+  avatarUrl: string | null
+}
+
+/**
+ * Map an account row to a person
+ * @param {PersonRow | null} row - Account row
+ * @return {WorkPerson | null} - Person or null
+ */
+
+export const toPerson = (row: PersonRow | null | undefined): WorkPerson | null =>
+  row ? { id: row.id, name: row.displayName, src: row.avatarUrl } : null
+
+/**
+ * Read the columns of one board
+ * @param {WorkflowScopeName} scope - Board scope
+ * @return {Promise<BoardColumn[]>} - Columns in display order
+ */
+
+export const boardColumns = async (scope: WorkflowScopeName): Promise<BoardColumn[]> => {
+  const rows = await prisma.workflowState.findMany({
+    where: { scope },
+    orderBy: { position: 'asc' },
+  })
+
+  return rows.map((row) => ({ id: row.id, label: row.name, accent: row.accent }))
+}
+
+/**
+ * Read the default column of one board
+ * @param {WorkflowScopeName} scope - Board scope
+ * @return {Promise<string | null>} - State identifier
+ */
+
+export const defaultState = async (scope: WorkflowScopeName): Promise<string | null> => {
+  const state =
+    (await prisma.workflowState.findFirst({ where: { scope, isDefault: true } })) ??
+    (await prisma.workflowState.findFirst({ where: { scope }, orderBy: { position: 'asc' } }))
+
+  return state?.id ?? null
+}
+
+/**
+ * Read the state options of one board
+ * @param {WorkflowScopeName} scope - Board scope
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+export const stateOptions = async (scope: WorkflowScopeName): Promise<FieldOption[]> => {
+  const rows = await prisma.workflowState.findMany({
+    where: { scope },
+    orderBy: { position: 'asc' },
+  })
+
+  return rows.map((row) => ({ value: row.id, label: row.name, accent: row.accent ?? undefined }))
+}
+
+/**
+ * Read the moderators that can be assigned
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+export const memberOptions = async (): Promise<FieldOption[]> => {
+  const rows = await prisma.account.findMany({
+    where: { status: { not: MemberStatuses.Left } },
+    orderBy: { displayName: 'asc' },
+  })
+
+  return rows.map((row) => ({ value: row.id, label: row.displayName }))
+}
+
+/**
+ * Read the active YouTubers
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+export const youtuberOptions = async (): Promise<FieldOption[]> => {
+  const rows = await prisma.youtuber.findMany({
+    where: { archived: false },
+    orderBy: { position: 'asc' },
+  })
+
+  return rows.map((row) => ({ value: row.id, label: row.name, accent: row.accent ?? undefined }))
+}
+
+/**
+ * Read the active platforms
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+export const platformOptions = async (): Promise<FieldOption[]> => {
+  const rows = await prisma.platform.findMany({
+    where: { archived: false },
+    orderBy: { position: 'asc' },
+  })
+
+  return rows.map((row) => ({ value: row.id, label: row.name, accent: row.accent ?? undefined }))
+}
+
+/**
+ * Read the priorities
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+export const priorityOptions = async (): Promise<FieldOption[]> => {
+  const rows = await prisma.priority.findMany({ orderBy: { weight: 'desc' } })
+
+  return rows.map((row) => ({ value: row.id, label: row.name, accent: row.accent ?? undefined }))
+}
+
+/**
+ * Read the open projects
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+export const projectOptions = async (): Promise<FieldOption[]> => {
+  const rows = await prisma.project.findMany({
+    where: { archived: false },
+    orderBy: { title: 'asc' },
+  })
+
+  return rows.map((row) => ({ value: row.id, label: row.title }))
+}
+
+/**
+ * Compute the position of a card dropped inside a column
+ * @param {Array<{ id: string, position: number }>} cards - Cards already in the column
+ * @param {number} index - Drop index
+ * @return {number} - New position
+ */
+
+export const positionAt = (cards: { id: string; position: number }[], index: number): number => {
+  const step = FORM_SETTINGS.positionStep
+
+  // Dropped above the first card, or on an empty column
+  if (cards.length === 0) return step
+  if (index <= 0) return cards[0].position - step
+
+  // Dropped below the last card
+  if (index >= cards.length) return cards[cards.length - 1].position + step
+
+  return Math.floor((cards[index - 1].position + cards[index].position) / 2)
+}
