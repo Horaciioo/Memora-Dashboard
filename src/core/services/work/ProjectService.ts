@@ -189,11 +189,14 @@ export const createProject = async (values: FormValues): Promise<ProjectSummary>
   const stateId = data.stateId ?? (await defaultState(WorkflowScopes.Project))
   const assistantIds = readList(values, 'assistantIds')
 
+  // A new card lands at the bottom of its column
+  const last = await prisma.project.aggregate({ where: { stateId }, _max: { position: true } })
+
   const row = await prisma.project.create({
     data: {
       ...data,
       stateId,
-      position: Date.now(),
+      position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
       assistants: { create: assistantIds.map((accountId) => ({ accountId })) },
     },
     include: PROJECT_INCLUDE,
@@ -341,6 +344,12 @@ export const addCommunication = async (
   authorId: string,
   values: FormValues
 ): Promise<CommunicationEntry> => {
+  // Announcements keep their own order inside the project
+  const last = await prisma.communication.aggregate({
+    where: { projectId },
+    _max: { position: true },
+  })
+
   const row = await prisma.communication.create({
     data: {
       projectId,
@@ -349,7 +358,7 @@ export const addCommunication = async (
       body: readText(values, 'body') ?? '',
       platformId: readText(values, 'platformId'),
       publishedAt: readDate(values, 'publishedAt'),
-      position: Date.now(),
+      position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
     },
     include: { author: true, platform: true },
   })
@@ -436,7 +445,9 @@ export const readProject = async (id: string): Promise<ProjectDetail> => {
       state: toTag(task.state),
       priority: toTag(task.priority),
       youtuber: toTag(task.youtuber),
-      project: task.project ? { id: task.project.id, label: task.project.title, accent: null } : null,
+      project: task.project
+        ? { id: task.project.id, label: task.project.title, accent: null }
+        : null,
       owner: toPerson(task.owner),
       dueDate: task.dueDate?.toISOString() ?? null,
       position: task.position,

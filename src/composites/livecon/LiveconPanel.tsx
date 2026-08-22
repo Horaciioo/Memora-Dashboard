@@ -160,7 +160,11 @@ export const LiveconPanel = ({
         </div>
       </Section>
 
-      <Section title={LIVECON_COPY.historyTitle} bare={history.length === 0} padded={history.length > 0}>
+      <Section
+        title={LIVECON_COPY.historyTitle}
+        bare={history.length === 0}
+        padded={history.length > 0}
+      >
         {history.length === 0 ? (
           <EmptyState
             figure="notes"
@@ -178,10 +182,7 @@ export const LiveconPanel = ({
                   {index < history.length - 1 && (
                     <span className={TIMELINE_STYLES.rail} aria-hidden="true" />
                   )}
-                  <span
-                    className={cn(TIMELINE_STYLES.dot, TONES[tone].dot)}
-                    aria-hidden="true"
-                  />
+                  <span className={cn(TIMELINE_STYLES.dot, TONES[tone].dot)} aria-hidden="true" />
                   <div className={TIMELINE_STYLES.body}>
                     <span className="flex flex-wrap items-center gap-2">
                       <Badge label={`${entry.level} · ${entry.levelName}`} tone={tone} />

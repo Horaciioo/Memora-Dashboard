@@ -55,7 +55,8 @@ export const DIALOG_STYLES = {
   title: 'text-lg font-bold',
   description: 'text-sm text-[var(--color-ink-subtle)]',
   body: 'flex-1 overflow-y-auto px-5 py-4',
-  footer: 'flex flex-wrap items-center justify-end gap-2 border-t border-[var(--color-border)] px-5 py-3',
+  footer:
+    'flex flex-wrap items-center justify-end gap-2 border-t border-[var(--color-border)] px-5 py-3',
 } as const
 
 /**

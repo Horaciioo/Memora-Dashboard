@@ -1,7 +1,12 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { createTeam, moveMember, readTeamBoard, teamFields } from '@/core/services/teams/TeamService'
+import {
+  createTeam,
+  moveMember,
+  readTeamBoard,
+  teamFields,
+} from '@/core/services/teams/TeamService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 

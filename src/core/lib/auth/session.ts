@@ -20,8 +20,7 @@ export const DISCORD_ID_PATTERN = /^\d{15,25}$/
  * @return {boolean} - Well formed
  */
 
-export const isDiscordId = (candidate: string): boolean =>
-  DISCORD_ID_PATTERN.test(candidate.trim())
+export const isDiscordId = (candidate: string): boolean => DISCORD_ID_PATTERN.test(candidate.trim())
 
 /**
  * Strip an identifier

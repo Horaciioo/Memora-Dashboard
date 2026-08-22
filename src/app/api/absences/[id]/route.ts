@@ -1,6 +1,10 @@
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { REVIEW_FIELDS, removeAbsence, reviewAbsence } from '@/core/services/absences/AbsenceService'
+import {
+  REVIEW_FIELDS,
+  removeAbsence,
+  reviewAbsence,
+} from '@/core/services/absences/AbsenceService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
@@ -18,12 +22,7 @@ export const PATCH = createProtectedRoute({
       throw invalidInput([{ field: 'status', message: FORM_COPY.notAnOption }])
     }
 
-    const absence = await reviewAbsence(
-      params.id,
-      status as AbsenceStatusName,
-      session.id,
-      body
-    )
+    const absence = await reviewAbsence(params.id, status as AbsenceStatusName, session.id, body)
 
     await recordEvent({
       eventType: 'AbsenceReviewed',

@@ -1,5 +1,7 @@
 import { AppError, toAppError } from '@/core/lib/errors'
 import type { AppErrorIssue } from '@/core/lib/errors'
+import { logger } from '@/core/lib/logger'
+import { ErrorCodes } from '@/utils/constants/errors'
 
 /**
  * Successful envelope
@@ -54,6 +56,9 @@ export const succeed = <T>(data: T, status = 200): Response =>
 
 export const fail = (error: unknown): Response => {
   const appError: AppError = toAppError(error)
+
+  // Only an unexpected throw is worth a log line, an expected one is a return value
+  if (appError.code === ErrorCodes.SystemFailure) logger.error('[api]', error)
 
   return Response.json(
     {

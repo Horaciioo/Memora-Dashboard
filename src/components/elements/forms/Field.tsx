@@ -25,15 +25,7 @@ export interface FieldProps {
  * @return {JSX.Element}
  */
 
-export const Field = ({
-  id,
-  label,
-  hint,
-  error,
-  required,
-  className,
-  children,
-}: FieldProps) => {
+export const Field = ({ id, label, hint, error, required, className, children }: FieldProps) => {
   const AlertIcon = ICONS.danger
 
   return (

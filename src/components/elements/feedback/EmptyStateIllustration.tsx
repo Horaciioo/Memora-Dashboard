@@ -29,8 +29,16 @@ const FAINT = {
  * @return {JSX.Element}
  */
 
-const Figure = ({ className, children }: EmptyStateIllustrationProps & { children: React.ReactNode }) => (
-  <svg viewBox="0 0 96 96" className={className} aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+const Figure = ({
+  className,
+  children,
+}: EmptyStateIllustrationProps & { children: React.ReactNode }) => (
+  <svg
+    viewBox="0 0 96 96"
+    className={className}
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     {children}
   </svg>
 )

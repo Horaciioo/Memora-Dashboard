@@ -62,7 +62,8 @@ export const useMembers = (initialMembers: MemberSummary[]): MembersCollection =
         FEEDBACK_COPY.saved
       )
 
-      if (member) setMembers((current) => current.map((entry) => (entry.id === id ? member : entry)))
+      if (member)
+        setMembers((current) => current.map((entry) => (entry.id === id ? member : entry)))
 
       return member !== null
     },

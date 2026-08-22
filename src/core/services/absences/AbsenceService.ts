@@ -142,17 +142,17 @@ export const createAbsence = async (
     throw invalidInput([
       {
         field: 'endDate',
-        message: ABSENCE_COPY.tooShort.replace(
-          '{min}',
-          String(ABSENCE_SETTINGS.thresholdDays + 1)
-        ),
+        message: ABSENCE_COPY.tooShort.replace('{min}', String(ABSENCE_SETTINGS.thresholdDays + 1)),
       },
     ])
   }
 
   if (dayCount > ABSENCE_SETTINGS.maxDays) {
     throw invalidInput([
-      { field: 'endDate', message: ABSENCE_COPY.tooLong.replace('{max}', String(ABSENCE_SETTINGS.maxDays)) },
+      {
+        field: 'endDate',
+        message: ABSENCE_COPY.tooLong.replace('{max}', String(ABSENCE_SETTINGS.maxDays)),
+      },
     ])
   }
 

@@ -48,7 +48,8 @@ export const MEMBER_COPY = {
   absencesEmptyTitle: 'Aucune absence',
   absencesEmptyDescription: 'Rien de posé pour l’instant.',
   academyEmptyTitle: 'Aucune formation',
-  academyEmptyDescription: 'Déclare des formations dans la configuration pour suivre sa progression.',
+  academyEmptyDescription:
+    'Déclare des formations dans la configuration pour suivre sa progression.',
   logsEmptyTitle: 'Aucun log',
   logsEmptyDescription: 'Ses actions apparaîtront ici au fil de l’eau.',
   projects: 'projets',

@@ -56,9 +56,7 @@ export interface MemberStatusBadgeProps {
 
 export const MemberStatusBadge = ({ member }: MemberStatusBadgeProps) => {
   const status = MEMBER_STATUS_REGISTRY.get(member.status)
-  const period = member.academyPeriod
-    ? ACADEMY_PERIOD_REGISTRY.get(member.academyPeriod)
-    : null
+  const period = member.academyPeriod ? ACADEMY_PERIOD_REGISTRY.get(member.academyPeriod) : null
 
   return (
     <span className="inline-flex flex-wrap items-center gap-1.5">

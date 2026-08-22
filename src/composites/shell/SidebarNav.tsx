@@ -53,8 +53,7 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
               <p className={APP_SHELL.navGroupLabel}>{group.label}</p>
               {items.map((item) => {
                 const Icon = ICONS[item.icon]
-                const isActive =
-                  pathname === item.href || pathname.startsWith(`${item.href}/`)
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
                 return (
                   <Link

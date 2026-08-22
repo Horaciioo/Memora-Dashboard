@@ -1,7 +1,11 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { liveconFields, readCurrentState, switchLevel } from '@/core/services/livecon/LiveconService'
+import {
+  liveconFields,
+  readCurrentState,
+  switchLevel,
+} from '@/core/services/livecon/LiveconService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { Permissions } from '@/utils/constants/permissions'
 

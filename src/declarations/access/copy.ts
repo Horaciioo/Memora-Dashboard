@@ -13,7 +13,8 @@ export const ACCESS_COPY = {
   presetTitle: 'Remettre les permissions conseillées ?',
   presetDescription: 'Les permissions de ce rôle sont remplacées par celles du modèle.',
   functionsEmptyTitle: 'Aucune fonction',
-  functionsEmptyDescription: 'Crée des fonctions dans la configuration pour leur donner des permissions.',
+  functionsEmptyDescription:
+    'Crée des fonctions dans la configuration pour leur donner des permissions.',
   configure: 'Ouvrir la configuration',
   granted: 'permissions',
   grantedOne: 'permission',
