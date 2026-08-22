@@ -34,6 +34,7 @@ export type ReferenceKey = (typeof REFERENCE_KEYS)[number]
  * @property {IconName} icon - Icon key
  * @property {IllustrationName} figure - Empty state figure
  * @property {boolean} reorderable - Rows can be dragged into order
+ * @property {boolean} [openable] - Rows open a file of their own
  * @property {string} emptyTitle - Empty state headline
  * @property {string} emptyDescription - Empty state supporting line
  */
@@ -46,6 +47,7 @@ export interface ReferenceSection {
   icon: IconName
   figure: IllustrationName
   reorderable: boolean
+  openable?: boolean
   emptyTitle: string
   emptyDescription: string
 }
@@ -64,6 +66,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     icon: 'youtuber',
     figure: 'settings',
     reorderable: true,
+    openable: true,
     emptyTitle: 'Aucun YouTubeur',
     emptyDescription: 'Ajoute un premier créateur pour pouvoir y rattacher projets et modérateurs.',
   },

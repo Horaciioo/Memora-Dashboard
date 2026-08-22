@@ -24,6 +24,7 @@ export const ROUTES = {
   sanctions: '/moderation/sanctions',
   settings: '/configuration',
   settingsSection: (section: string) => `/configuration/${section}`,
+  settingsRecord: (section: string, id: string) => `/configuration/${section}/${id}`,
 } as const
 
 /**

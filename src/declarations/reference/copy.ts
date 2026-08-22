@@ -37,6 +37,20 @@ export const REFERENCE_FIELD_COPY = {
 } as const
 
 /**
+ * Copy of a creator file
+ * @type {Record<string, string>}
+ */
+
+export const YOUTUBER_COPY = {
+  teamsTitle: 'Équipes',
+  teamsLead: 'Les équipes qui interviennent pour ce créateur.',
+  moderators: 'modérateurs',
+  projects: 'projets',
+  teams: 'équipes',
+  noHandle: 'Aucune chaîne renseignée',
+} as const
+
+/**
  * Copy of the admin console
  * @type {Record<string, string>}
  */

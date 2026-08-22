@@ -24,6 +24,8 @@ export interface TeamsBoardProps {
   initialBoard: TeamBoardData
   fields: FieldDefinition[]
   canManage: boolean
+  // Creator the board belongs to, set when the board sits inside a creator file
+  youtuberId?: string
 }
 
 // Column holding everyone without a team
@@ -34,12 +36,15 @@ const UNASSIGNED = 'unassigned'
  * @param {TeamBoardData} initialBoard - Board resolved server-side
  * @param {FieldDefinition[]} fields - Declarations of the team form
  * @param {boolean} canManage - Member may create teams and move people
+ * @param {string} [youtuberId] - Creator the board belongs to
  * @return {JSX.Element}
  */
 
-export const TeamsBoard = ({ initialBoard, fields, canManage }: TeamsBoardProps) => {
-  const { board, isSaving, issues, clearIssues, create, update, remove, move } =
-    useTeams(initialBoard)
+export const TeamsBoard = ({ initialBoard, fields, canManage, youtuberId }: TeamsBoardProps) => {
+  const { board, isSaving, issues, clearIssues, create, update, remove, move } = useTeams(
+    initialBoard,
+    youtuberId
+  )
   const { contextMenu } = useMenu()
   const [isCreating, setCreating] = useState(false)
   const [editing, setEditing] = useState<TeamView | null>(null)
@@ -64,6 +69,13 @@ export const TeamsBoard = ({ initialBoard, fields, canManage }: TeamsBoardProps)
         clearIssues()
         setEditing(team)
       },
+    },
+    {
+      id: 'archive',
+      label: team.archived ? TEAM_COPY.unarchive : TEAM_COPY.archive,
+      icon: team.archived ? 'visible' : 'hidden',
+      disabled: !canManage,
+      onSelect: () => void update(team.id, { ...team.values, archived: !team.archived }),
     },
     {
       id: 'delete',
@@ -95,6 +107,7 @@ export const TeamsBoard = ({ initialBoard, fields, canManage }: TeamsBoardProps)
           fields={fields}
           issues={issues}
           isSaving={isSaving}
+          initialValues={youtuberId ? { youtuberId } : undefined}
           onSubmit={create}
           onClose={() => setCreating(false)}
         />
@@ -109,13 +122,16 @@ export const TeamsBoard = ({ initialBoard, fields, canManage }: TeamsBoardProps)
           {board.teams.map((team) => (
             <section
               key={team.id}
-              className={BOARD_STYLES.column}
+              className={cn(BOARD_STYLES.column, team.archived && BOARD_STYLES.columnArchived)}
               onContextMenu={contextMenu(teamMenu(team), team.name)}
             >
               <header className={BOARD_STYLES.columnHead}>
                 <span className="flex min-w-0 flex-col gap-1">
                   <span className="truncate font-bold">{team.name}</span>
                   <span className="flex flex-wrap items-center gap-1.5">
+                    {team.archived && (
+                      <Badge label={TEAM_COPY.archived} tone="neutral" icon="hidden" />
+                    )}
                     {team.youtuber && (
                       <Badge
                         label={team.youtuber.label}
@@ -196,7 +212,9 @@ export const TeamsBoard = ({ initialBoard, fields, canManage }: TeamsBoardProps)
       <FormDialog
         open={isCreating}
         title={TEAM_COPY.add}
+        icon="add"
         fields={fields}
+        initialValues={youtuberId ? { youtuberId } : undefined}
         issues={issues}
         isSaving={isSaving}
         onSubmit={create}

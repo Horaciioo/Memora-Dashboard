@@ -9,6 +9,10 @@ export const TEAM_COPY = {
   add: 'Créer une équipe',
   emptyTitle: 'Aucune équipe',
   emptyDescription: 'Crée une première équipe et rattache-lui des modérateurs.',
+  archive: 'Archiver',
+  unarchive: 'Désarchiver',
+  archived: 'Archivée',
+  showArchived: 'Voir les archivées',
   deleteTitle: 'Supprimer cette équipe ?',
   deleteDescription: 'Ses membres redeviennent non affectés.',
   unassigned: 'Sans équipe',
@@ -30,4 +34,5 @@ export const TEAM_FIELD_COPY = {
   summary: 'Description',
   lead: 'Responsable',
   youtuber: 'YouTubeur',
+  archived: 'Archiver cette équipe',
 } as const
