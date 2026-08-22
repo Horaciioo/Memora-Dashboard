@@ -1,0 +1,5 @@
+{
+  "thresholdDays": 5,
+  "maxDays": 180,
+  "noticeDays": 3
+}
