@@ -22,20 +22,20 @@ yarn dev
 
 ## Les espaces
 
-| Route                    | Contenu                                                                                   |
-| ------------------------ | ----------------------------------------------------------------------------------------- |
-| `/tableau-de-bord`       | Espace personnel — en cours de développement                                              |
-| `/moderateurs`           | Fiches : affectation, infos, notes privées, PIM, réseaux, absences, formations, logs      |
-| `/equipes`               | Équipes et affectation des modérateurs par glisser-déposer                                |
-| `/projets`               | Tableau kanban, puis par projet : aperçu, communication en markdown, tâches, réunions     |
-| `/taches`                | Tableau kanban des tâches                                                                 |
-| `/reunions`              | Planning des réunions et leurs participants                                               |
-| `/absences`              | Demandes d'absence et leur traitement                                                     |
-| `/livecon`               | Niveau de vigilance en cours, consignes et historique                                     |
-| `/academy`               | Juniors en formation, période par période                                                 |
-| `/moderation/sanctions`  | Panel de sanctions — en cours de développement                                            |
-| `/configuration`         | Tout ce que l'application affiche se crée ici                                             |
-| `/configuration/acces`   | Permissions par rôle et par fonction                                                      |
+| Route                   | Contenu                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| `/tableau-de-bord`      | Espace personnel — en cours de développement                                          |
+| `/moderateurs`          | Fiches : affectation, infos, notes privées, PIM, réseaux, absences, formations, logs  |
+| `/equipes`              | Équipes et affectation des modérateurs par glisser-déposer                            |
+| `/projets`              | Tableau kanban, puis par projet : aperçu, communication en markdown, tâches, réunions |
+| `/taches`               | Tableau kanban des tâches                                                             |
+| `/reunions`             | Planning des réunions et leurs participants                                           |
+| `/absences`             | Demandes d'absence et leur traitement                                                 |
+| `/livecon`              | Niveau de vigilance en cours, consignes et historique                                 |
+| `/academy`              | Juniors en formation, période par période                                             |
+| `/moderation/sanctions` | Panel de sanctions — en cours de développement                                        |
+| `/configuration`        | Tout ce que l'application affiche se crée ici                                         |
+| `/configuration/acces`  | Permissions par rôle et par fonction                                                  |
 
 `⌘K` ouvre la recherche globale depuis n'importe quelle page. Le clic droit ouvre un menu sur chaque ligne, carte et note.
 
@@ -66,17 +66,17 @@ Avant de considérer un changement terminé : `yarn db:generate && yarn validate
 
 ## Conventions
 
-| Skill            | Contenu                                                                        |
-| ---------------- | ------------------------------------------------------------------------------ |
-| `instructions`   | Vue d'ensemble et philosophie — à charger en premier                           |
-| `architecture`   | Carte des dossiers, abstractions, détail de chaque système                     |
-| `code-style`     | Syntaxe, imports, nomenclature, typage, interdiction du hardcoding             |
-| `comments`       | Format des commentaires, ultra-concision, blocs JSDoc                          |
-| `commits`        | Format des messages de commit                                                  |
-| `branches`       | Stratégie `dev` → `staging` → `release` → `main`                               |
-| `data-fetching`  | Où fetcher, comment brancher loading et états vides                            |
-| `error-handling` | Erreurs attendues, error boundaries, remontée par toast                        |
-| `accessibility`  | Clavier, lecteur d'écran, contraste                                            |
-| `optimization`   | Lazy loading, images, fonts, Core Web Vitals                                   |
+| Skill            | Contenu                                                            |
+| ---------------- | ------------------------------------------------------------------ |
+| `instructions`   | Vue d'ensemble et philosophie — à charger en premier               |
+| `architecture`   | Carte des dossiers, abstractions, détail de chaque système         |
+| `code-style`     | Syntaxe, imports, nomenclature, typage, interdiction du hardcoding |
+| `comments`       | Format des commentaires, ultra-concision, blocs JSDoc              |
+| `commits`        | Format des messages de commit                                      |
+| `branches`       | Stratégie `dev` → `staging` → `release` → `main`                   |
+| `data-fetching`  | Où fetcher, comment brancher loading et états vides                |
+| `error-handling` | Erreurs attendues, error boundaries, remontée par toast            |
+| `accessibility`  | Clavier, lecteur d'écran, contraste                                |
+| `optimization`   | Lazy loading, images, fonts, Core Web Vitals                       |
 
 Les textes affichés sont en **français**, au tutoiement, et vivent tous dans `src/declarations/`. Les commentaires du code restent en anglais.
