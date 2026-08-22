@@ -180,4 +180,5 @@ export const referenceSection = (key: string): ReferenceSection | undefined =>
  * @return {boolean} - Known collection
  */
 
-export const isReferenceKey = (key: string): key is ReferenceKey => SECTION_INDEX.has(key as ReferenceKey)
+export const isReferenceKey = (key: string): key is ReferenceKey =>
+  SECTION_INDEX.has(key as ReferenceKey)

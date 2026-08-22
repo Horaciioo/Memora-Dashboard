@@ -15,6 +15,7 @@ export const SKELETON_SHAPES = {
 export type SkeletonShape = keyof typeof SKELETON_SHAPES
 
 /** @type {string} */
+
 export const SKELETON_BASE = 'skeleton-shimmer rounded-[var(--radius-md)] bg-[var(--color-surface)]'
 
 /**
@@ -35,8 +36,10 @@ export const EMPTY_STATE_STYLES = {
  */
 
 export const TOAST_STYLES = {
-  stack: 'pointer-events-none fixed bottom-4 right-4 z-[60] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2',
+  stack:
+    'pointer-events-none fixed bottom-4 right-4 z-[60] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2',
   toast:
     'surface-enter pointer-events-auto flex items-start justify-between gap-3 rounded-[var(--radius-md)] border-l-4 border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm shadow-[var(--shadow-lg)]',
-  dismiss: 'shrink-0 text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  dismiss:
+    'shrink-0 text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
 } as const

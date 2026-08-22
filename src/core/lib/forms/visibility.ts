@@ -31,10 +31,8 @@ export const isFieldVisible = (field: FieldDefinition, values: FormValues): bool
  * @return {FieldDefinition[]} - Visible fields
  */
 
-export const visibleFields = (
-  fields: FieldDefinition[],
-  values: FormValues
-): FieldDefinition[] => fields.filter((field) => isFieldVisible(field, values))
+export const visibleFields = (fields: FieldDefinition[], values: FormValues): FieldDefinition[] =>
+  fields.filter((field) => isFieldVisible(field, values))
 
 /**
  * List unfilled required fields
@@ -43,10 +41,7 @@ export const visibleFields = (
  * @return {string[]} - Field names
  */
 
-export const collectMissingRequired = (
-  fields: FieldDefinition[],
-  values: FormValues
-): string[] =>
+export const collectMissingRequired = (fields: FieldDefinition[], values: FormValues): string[] =>
   visibleFields(fields, values)
     .filter((field) => field.required)
     .filter((field) => {

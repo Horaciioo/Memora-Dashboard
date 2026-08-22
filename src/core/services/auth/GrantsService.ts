@@ -169,8 +169,6 @@ export const readFunctionGrants = async (): Promise<FunctionGrants[]> => {
     id: row.id,
     name: row.name,
     kind: row.kind,
-    permissions: row.permissions
-      .map((grant) => grant.permission)
-      .filter(isPermissionName),
+    permissions: row.permissions.map((grant) => grant.permission).filter(isPermissionName),
   }))
 }

@@ -60,9 +60,10 @@ export const AbsencesPanel = ({
     useAbsences(initialAbsences)
   const [tab, setTab] = useState('mine')
   const [isCreating, setCreating] = useState(false)
-  const [reviewing, setReviewing] = useState<{ absence: MemberAbsence; status: AbsenceStatusName } | null>(
-    null
-  )
+  const [reviewing, setReviewing] = useState<{
+    absence: MemberAbsence
+    status: AbsenceStatusName
+  } | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<MemberAbsence | null>(null)
 
   const mine = useMemo(
@@ -84,10 +85,24 @@ export const AbsencesPanel = ({
   const tabs = [
     { value: 'mine', label: ABSENCE_COPY.tabMine, icon: 'absences' as const, count: mine.length },
     ...(canReadAll
-      ? [{ value: 'team', label: ABSENCE_COPY.tabTeam, icon: 'members' as const, count: absences.length }]
+      ? [
+          {
+            value: 'team',
+            label: ABSENCE_COPY.tabTeam,
+            icon: 'members' as const,
+            count: absences.length,
+          },
+        ]
       : []),
     ...(canReview
-      ? [{ value: 'pending', label: ABSENCE_COPY.tabPending, icon: 'clock' as const, count: pending.length }]
+      ? [
+          {
+            value: 'pending',
+            label: ABSENCE_COPY.tabPending,
+            icon: 'clock' as const,
+            count: pending.length,
+          },
+        ]
       : []),
   ]
 
@@ -211,9 +226,7 @@ export const AbsencesPanel = ({
             figure: 'absences',
             title: tab === 'pending' ? ABSENCE_COPY.noPendingTitle : ABSENCE_COPY.emptyTitle,
             description:
-              tab === 'pending'
-                ? ABSENCE_COPY.noPendingDescription
-                : ABSENCE_COPY.emptyDescription,
+              tab === 'pending' ? ABSENCE_COPY.noPendingDescription : ABSENCE_COPY.emptyDescription,
             action: (
               <Button variant="primary" icon="add" disabled={!canCreate} onClick={openCreate}>
                 {ABSENCE_COPY.add}
@@ -248,9 +261,7 @@ export const AbsencesPanel = ({
             ? ABSENCE_COPY.approve
             : ABSENCE_COPY.refuse
         }
-        onSubmit={(values: FormValues) =>
-          review(reviewing!.absence.id, reviewing!.status, values)
-        }
+        onSubmit={(values: FormValues) => review(reviewing!.absence.id, reviewing!.status, values)}
         onClose={() => setReviewing(null)}
       />
 

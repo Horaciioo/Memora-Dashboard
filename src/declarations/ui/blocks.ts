@@ -26,7 +26,8 @@ export const APP_SHELL = {
   brandCompany: 'text-[11px] tracking-wide text-[var(--color-ink-subtle)] uppercase',
   nav: 'flex flex-1 flex-col gap-5 overflow-y-auto px-3 py-4',
   navGroup: 'flex flex-col gap-1',
-  navGroupLabel: 'px-2 pb-1 text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  navGroupLabel:
+    'px-2 pb-1 text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   navLink:
     'group flex items-center gap-2.5 rounded-[var(--radius-md)] px-2.5 py-2 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   navLinkActive: 'bg-[var(--color-brand-soft)] text-[var(--color-brand-600)]',

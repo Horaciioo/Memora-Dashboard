@@ -14,14 +14,13 @@ import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import type { FieldDefinition, FormValues } from '@/types/forms'
-import type {
-  MemberAbsence,
-  MemberDetail,
-  MemberSummary,
-  MemberTraining,
-} from '@/types/members'
+import type { MemberAbsence, MemberDetail, MemberSummary, MemberTraining } from '@/types/members'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
-import type { AcademyPeriodName, MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
+import type {
+  AcademyPeriodName,
+  MemberRoleName,
+  MemberStatusName,
+} from '@/utils/constants/hierarchy'
 import type { Prisma } from '@prisma/client'
 
 // Relations every moderator row needs

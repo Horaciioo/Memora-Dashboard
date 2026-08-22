@@ -9,7 +9,8 @@ export const BUTTON_STYLES = {
     'bg-[var(--color-brand-600)] px-4 py-2 text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
   secondary:
     'border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface)]',
-  ghost: 'px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
+  ghost:
+    'px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   danger:
     'border border-[var(--color-danger)] px-3 py-2 text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
   icon: 'h-9 w-9 rounded-[var(--radius-md)] p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
@@ -70,12 +71,12 @@ export const TOGGLE_STYLES = {
   track:
     'relative h-5 w-9 shrink-0 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-surface)] transition-colors',
   trackOn: 'border-[var(--color-brand-600)] bg-[var(--color-brand-600)]',
-  knob:
-    'absolute top-0.5 left-0.5 h-3.5 w-3.5 rounded-full bg-[var(--color-ink-subtle)] transition-transform',
+  knob: 'absolute top-0.5 left-0.5 h-3.5 w-3.5 rounded-full bg-[var(--color-ink-subtle)] transition-transform',
   knobOn: 'translate-x-4 bg-[var(--color-on-brand)]',
   checkbox:
     'flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] border border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] transition-colors',
-  checkboxOn: 'border-[var(--color-brand-600)] bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
+  checkboxOn:
+    'border-[var(--color-brand-600)] bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
 } as const
 
 /**
@@ -97,7 +98,8 @@ export const TAGS_STYLES = {
  */
 
 export const EDITOR_STYLES = {
-  frame: 'flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
+  frame:
+    'flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
   toolbar:
     'flex flex-wrap items-center gap-0.5 border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1.5',
   tool: 'flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface-raised)] hover:text-[var(--color-ink)]',

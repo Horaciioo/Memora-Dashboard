@@ -183,9 +183,7 @@ export const ProjectFileTabs = ({
                 </span>
               </div>
             ) : (
-              <p className="text-sm text-[var(--color-ink-subtle)] italic">
-                {PROJECT_COPY.noLead}
-              </p>
+              <p className="text-sm text-[var(--color-ink-subtle)] italic">{PROJECT_COPY.noLead}</p>
             )}
           </Section>
         </div>
@@ -275,7 +273,9 @@ export const ProjectFileTabs = ({
                 <div key={task.id} className={LIST_STYLES.item}>
                   <span className="min-w-0 flex-1 truncate font-medium">{task.title}</span>
                   {task.owner && (
-                    <span className="text-xs text-[var(--color-ink-subtle)]">{task.owner.name}</span>
+                    <span className="text-xs text-[var(--color-ink-subtle)]">
+                      {task.owner.name}
+                    </span>
                   )}
                   {task.state && (
                     <Badge label={task.state.label} tone={toTone(task.state.accent)} dot />

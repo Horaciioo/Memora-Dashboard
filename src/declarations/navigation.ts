@@ -108,7 +108,12 @@ export const NAVIGATION: NavigationGroup[] = [
   {
     label: 'Modération',
     items: [
-      { href: ROUTES.livecon, label: 'Livecon', icon: 'livecon', permission: Permissions.LiveconRead },
+      {
+        href: ROUTES.livecon,
+        label: 'Livecon',
+        icon: 'livecon',
+        permission: Permissions.LiveconRead,
+      },
       { href: ROUTES.sanctions, label: 'Panel de sanctions', icon: 'sanctions', wip: true },
     ],
   },

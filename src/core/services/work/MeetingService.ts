@@ -237,12 +237,15 @@ export const createMeeting = async (values: FormValues): Promise<MeetingSummary>
   const data = toMeetingData(values)
   const stateId = data.stateId ?? (await defaultState(WorkflowScopes.Meeting))
 
+  // A new card lands at the bottom of its column
+  const last = await prisma.meeting.aggregate({ where: { stateId }, _max: { position: true } })
+
   const row = await prisma.meeting.create({
     data: {
       ...data,
       stateId,
       scheduledAt: readDate(values, 'scheduledAt') ?? new Date(),
-      position: Date.now(),
+      position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
       attendees: { create: toAttendees(values) },
     },
     include: MEETING_INCLUDE,

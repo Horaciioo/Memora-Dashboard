@@ -43,9 +43,7 @@ export const AccessMatrixPanel = ({ initialMatrix }: AccessMatrixPanelProps) => 
   )
 
   const toggle = (list: PermissionName[], permission: PermissionName) =>
-    list.includes(permission)
-      ? list.filter((entry) => entry !== permission)
-      : [...list, permission]
+    list.includes(permission) ? list.filter((entry) => entry !== permission) : [...list, permission]
 
   const tabs = [
     { value: 'roles', label: ACCESS_COPY.tabRoles, icon: 'shield' as const },
@@ -175,7 +173,10 @@ export const AccessMatrixPanel = ({ initialMatrix }: AccessMatrixPanelProps) => 
                           onChange={() =>
                             setFunctionDrafts((current) => ({
                               ...current,
-                              [jobFunction.id]: toggle(current[jobFunction.id] ?? [], permission.name),
+                              [jobFunction.id]: toggle(
+                                current[jobFunction.id] ?? [],
+                                permission.name
+                              ),
                             }))
                           }
                           label={permission.displayName}

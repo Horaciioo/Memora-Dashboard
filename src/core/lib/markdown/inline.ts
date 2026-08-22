@@ -56,7 +56,11 @@ const RULES: InlineRule[] = [
   },
   {
     pattern: /(https?:\/\/[^\s<]+)/,
-    build: (match) => ({ type: 'link', href: match[1], children: [{ type: 'text', value: match[1] }] }),
+    build: (match) => ({
+      type: 'link',
+      href: match[1],
+      children: [{ type: 'text', value: match[1] }],
+    }),
   },
 ]
 

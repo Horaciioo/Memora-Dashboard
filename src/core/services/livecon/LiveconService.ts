@@ -11,7 +11,9 @@ import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { LiveconHistoryEntry, LiveconLevelView, LiveconStateView } from '@/types/livecon'
 import type { Prisma } from '@prisma/client'
 
-type LevelRow = Prisma.LiveconLevelGetPayload<{ include: { _count: { select: { entries: true } } } }>
+type LevelRow = Prisma.LiveconLevelGetPayload<{
+  include: { _count: { select: { entries: true } } }
+}>
 
 /**
  * Map a level row to its display shape

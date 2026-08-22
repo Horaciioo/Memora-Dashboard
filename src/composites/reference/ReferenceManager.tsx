@@ -124,7 +124,10 @@ export const ReferenceManager = ({
           />
         ) : (
           <div
-            className={cn(LIST_STYLES.stack, over === CONTAINER && 'is-drop-target rounded-[var(--radius-lg)]')}
+            className={cn(
+              LIST_STYLES.stack,
+              over === CONTAINER && 'is-drop-target rounded-[var(--radius-lg)]'
+            )}
             {...(section.reorderable && canManage ? containerProps(CONTAINER) : {})}
           >
             {rows.map((row, index) => (
@@ -151,7 +154,9 @@ export const ReferenceManager = ({
                     ))}
                   </span>
                   {row.hint && (
-                    <span className="truncate text-xs text-[var(--color-ink-subtle)]">{row.hint}</span>
+                    <span className="truncate text-xs text-[var(--color-ink-subtle)]">
+                      {row.hint}
+                    </span>
                   )}
                 </div>
                 <span className="shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums">

@@ -4,7 +4,11 @@ import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { SESSION_COOKIE, isDiscordId, normaliseDiscordId } from '@/core/lib/auth/session'
-import { closeSession, openSession, resolveSignInAccount } from '@/core/services/auth/SessionService'
+import {
+  closeSession,
+  openSession,
+  resolveSignInAccount,
+} from '@/core/services/auth/SessionService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { ROUTES } from '@/declarations/navigation'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'

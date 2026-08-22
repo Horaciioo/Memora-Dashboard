@@ -100,12 +100,31 @@ export const MemberFileTabs = ({
   const tabs = [
     { value: 'identity', label: MEMBER_COPY.tabIdentity, icon: 'sheet' as const },
     ...(canReadNotes
-      ? [{ value: 'notes', label: MEMBER_COPY.tabNotes, icon: 'note' as const, count: file.notes.length }]
+      ? [
+          {
+            value: 'notes',
+            label: MEMBER_COPY.tabNotes,
+            icon: 'note' as const,
+            count: file.notes.length,
+          },
+        ]
       : []),
-    { value: 'absences', label: MEMBER_COPY.tabAbsences, icon: 'absences' as const, count: detail.absences.length },
-    { value: 'socials', label: MEMBER_COPY.tabSocials, icon: 'link' as const, count: file.socials.length },
+    {
+      value: 'absences',
+      label: MEMBER_COPY.tabAbsences,
+      icon: 'absences' as const,
+      count: detail.absences.length,
+    },
+    {
+      value: 'socials',
+      label: MEMBER_COPY.tabSocials,
+      icon: 'link' as const,
+      count: file.socials.length,
+    },
     { value: 'academy', label: MEMBER_COPY.tabAcademy, icon: 'academy' as const },
-    ...(canReadLogs ? [{ value: 'logs', label: MEMBER_COPY.tabLogs, icon: 'history' as const }] : []),
+    ...(canReadLogs
+      ? [{ value: 'logs', label: MEMBER_COPY.tabLogs, icon: 'history' as const }]
+      : []),
   ]
 
   const noteMenu = (noteId: string, pinned: boolean): MenuItem[] => [
@@ -218,7 +237,10 @@ export const MemberFileTabs = ({
                 { label: FIELD_COPY.mainFunction, value: summary.primaryFunction?.label },
                 { label: FIELD_COPY.secondFunction, value: summary.secondaryFunction?.label },
                 { label: FIELD_COPY.joinedAt, value: formatDay(summary.joinedAt) },
-                { label: FIELD_COPY.leftAt, value: detail.leftAt ? formatDay(detail.leftAt) : null },
+                {
+                  label: FIELD_COPY.leftAt,
+                  value: detail.leftAt ? formatDay(detail.leftAt) : null,
+                },
                 {
                   label: FIELD_COPY.team,
                   value: detail.teams.length > 0 ? detail.teams.join(', ') : null,
@@ -330,7 +352,9 @@ export const MemberFileTabs = ({
                   className="flex flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4"
                 >
                   <span className="flex flex-wrap items-center gap-2 text-xs text-[var(--color-ink-subtle)]">
-                    {note.pinned && <Badge label={MEMBER_COPY.notePin} tone="warning" icon="star" />}
+                    {note.pinned && (
+                      <Badge label={MEMBER_COPY.notePin} tone="warning" icon="star" />
+                    )}
                     {[note.authorName, formatDayTime(note.createdAt)].filter(Boolean).join(' · ')}
                   </span>
                   <p className="text-sm whitespace-pre-wrap">{note.body}</p>
@@ -459,7 +483,9 @@ export const MemberFileTabs = ({
                   </span>
                   {training.mandatory && <Badge label={MEMBER_COPY.tabAcademy} tone="brand" />}
                   <Badge
-                    label={training.completedAt ? formatDay(training.completedAt) : ACTION_COPY.none}
+                    label={
+                      training.completedAt ? formatDay(training.completedAt) : ACTION_COPY.none
+                    }
                     tone={training.completedAt ? 'success' : 'neutral'}
                     icon={training.completedAt ? 'success' : 'clock'}
                   />
@@ -471,7 +497,11 @@ export const MemberFileTabs = ({
       )}
 
       {tab === 'logs' && canReadLogs && (
-        <Section title={MEMBER_COPY.tabLogs} padded={activity.length > 0} bare={activity.length === 0}>
+        <Section
+          title={MEMBER_COPY.tabLogs}
+          padded={activity.length > 0}
+          bare={activity.length === 0}
+        >
           {activity.length === 0 ? (
             <EmptyState
               figure="notes"

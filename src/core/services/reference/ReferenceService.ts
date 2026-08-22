@@ -179,7 +179,10 @@ const youtubers: ReferenceResource = {
     await prisma.youtuber.delete({ where: { id } })
   },
   reorder: (ids) =>
-    applyOrder((id, position) => prisma.youtuber.update({ where: { id }, data: { position } }), ids),
+    applyOrder(
+      (id, position) => prisma.youtuber.update({ where: { id }, data: { position } }),
+      ids
+    ),
 }
 
 const divisions: ReferenceResource = {
@@ -203,8 +206,18 @@ const divisions: ReferenceResource = {
       hint: REFERENCE_FIELD_COPY.rankHint,
       span: 'half',
     },
-    { name: 'imagePath', kind: 'text', label: REFERENCE_FIELD_COPY.imagePath, maxLength: shortTextMaxLength },
-    { name: 'summary', kind: 'textarea', label: REFERENCE_FIELD_COPY.summary, maxLength: longTextMaxLength },
+    {
+      name: 'imagePath',
+      kind: 'text',
+      label: REFERENCE_FIELD_COPY.imagePath,
+      maxLength: shortTextMaxLength,
+    },
+    {
+      name: 'summary',
+      kind: 'textarea',
+      label: REFERENCE_FIELD_COPY.summary,
+      maxLength: longTextMaxLength,
+    },
   ],
   list: async () => {
     const rows = await prisma.division.findMany({
@@ -278,7 +291,12 @@ const jobFunctions: ReferenceResource = {
       span: 'half',
     },
     accentField,
-    { name: 'summary', kind: 'textarea', label: REFERENCE_FIELD_COPY.summary, maxLength: longTextMaxLength },
+    {
+      name: 'summary',
+      kind: 'textarea',
+      label: REFERENCE_FIELD_COPY.summary,
+      maxLength: longTextMaxLength,
+    },
     { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
   ],
   list: async () => {
@@ -404,7 +422,10 @@ const platforms: ReferenceResource = {
     await prisma.platform.delete({ where: { id } })
   },
   reorder: (ids) =>
-    applyOrder((id, position) => prisma.platform.update({ where: { id }, data: { position } }), ids),
+    applyOrder(
+      (id, position) => prisma.platform.update({ where: { id }, data: { position } }),
+      ids
+    ),
 }
 
 const workflowStates: ReferenceResource = {
@@ -663,7 +684,12 @@ const trainings: ReferenceResource = {
         hint: REFERENCE_FIELD_COPY.jobFunctionHint,
         span: 'half',
       },
-      { name: 'summary', kind: 'textarea', label: REFERENCE_FIELD_COPY.summary, maxLength: markdownMaxLength },
+      {
+        name: 'summary',
+        kind: 'textarea',
+        label: REFERENCE_FIELD_COPY.summary,
+        maxLength: markdownMaxLength,
+      },
       { name: 'mandatory', kind: 'toggle', label: REFERENCE_FIELD_COPY.mandatory },
     ]
   },
@@ -729,7 +755,10 @@ const trainings: ReferenceResource = {
     await prisma.training.delete({ where: { id } })
   },
   reorder: (ids) =>
-    applyOrder((id, position) => prisma.training.update({ where: { id }, data: { position } }), ids),
+    applyOrder(
+      (id, position) => prisma.training.update({ where: { id }, data: { position } }),
+      ids
+    ),
 }
 
 const liveconLevels: ReferenceResource = {
@@ -746,7 +775,12 @@ const liveconLevels: ReferenceResource = {
     },
     { ...nameField, span: 'half' },
     accentField,
-    { name: 'summary', kind: 'textarea', label: REFERENCE_FIELD_COPY.situation, maxLength: longTextMaxLength },
+    {
+      name: 'summary',
+      kind: 'textarea',
+      label: REFERENCE_FIELD_COPY.situation,
+      maxLength: longTextMaxLength,
+    },
     {
       name: 'guidelines',
       kind: 'markdown',

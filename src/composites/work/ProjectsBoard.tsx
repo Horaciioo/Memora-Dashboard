@@ -182,10 +182,9 @@ export const ProjectsBoard = ({
             )}
             <span className="ml-auto">
               <AvatarStack
-                people={[
-                  ...(project.lead ? [project.lead] : []),
-                  ...project.assistants,
-                ].map((person) => ({ id: person.id, name: person.name, src: person.src }))}
+                people={[...(project.lead ? [project.lead] : []), ...project.assistants].map(
+                  (person) => ({ id: person.id, name: person.name, src: person.src })
+                )}
               />
             </span>
           </div>

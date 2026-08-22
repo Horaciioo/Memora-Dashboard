@@ -91,7 +91,13 @@ export const taskFields = async (): Promise<FieldDefinition[]> => {
       options: members,
       span: 'half',
     },
-    { name: 'stateId', kind: 'select', label: TASK_FIELD_COPY.state, options: states, span: 'half' },
+    {
+      name: 'stateId',
+      kind: 'select',
+      label: TASK_FIELD_COPY.state,
+      options: states,
+      span: 'half',
+    },
     {
       name: 'priorityId',
       kind: 'select',
@@ -164,8 +170,11 @@ export const createTask = async (values: FormValues): Promise<TaskSummary> => {
   const data = toTaskData(values)
   const stateId = data.stateId ?? (await defaultState(WorkflowScopes.Task))
 
+  // A new card lands at the bottom of its column
+  const last = await prisma.task.aggregate({ where: { stateId }, _max: { position: true } })
+
   const row = await prisma.task.create({
-    data: { ...data, stateId, position: Date.now() },
+    data: { ...data, stateId, position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep },
     include: TASK_INCLUDE,
   })
 

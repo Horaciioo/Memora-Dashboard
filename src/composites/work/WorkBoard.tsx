@@ -148,7 +148,14 @@ export const WorkBoard = <T extends BoardItem>({
 
   const cardMenu = (card: T): MenuItem[] => [
     ...(onOpen
-      ? [{ id: 'open', label: ACTION_COPY.open, icon: 'forward' as const, onSelect: () => onOpen(card) }]
+      ? [
+          {
+            id: 'open',
+            label: ACTION_COPY.open,
+            icon: 'forward' as const,
+            onSelect: () => onOpen(card),
+          },
+        ]
       : []),
     {
       id: 'edit',
@@ -216,9 +223,7 @@ export const WorkBoard = <T extends BoardItem>({
           onSearch={setSearch}
           filters={filters}
           values={filterValues}
-          onFilter={(name, value) =>
-            setFilterValues((current) => ({ ...current, [name]: value }))
-          }
+          onFilter={(name, value) => setFilterValues((current) => ({ ...current, [name]: value }))}
           onReset={resetFilters}
           isFiltered={isFiltered}
           action={

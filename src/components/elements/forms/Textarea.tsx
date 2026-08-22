@@ -15,7 +15,12 @@ export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
 export const Textarea = ({ invalid, className, ...props }: TextareaProps) => (
   <textarea
     aria-invalid={invalid || undefined}
-    className={cn(FIELD_STYLES.control, FIELD_STYLES.textarea, invalid && FIELD_STYLES.invalid, className)}
+    className={cn(
+      FIELD_STYLES.control,
+      FIELD_STYLES.textarea,
+      invalid && FIELD_STYLES.invalid,
+      className
+    )}
     {...props}
   />
 )

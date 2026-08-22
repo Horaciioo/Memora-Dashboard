@@ -98,9 +98,15 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
           />
         </div>
         <div className={PALETTE_STYLES.results}>
-          {isTooShort && <p className="px-4 py-6 text-sm text-[var(--color-ink-subtle)]">{NAV_COPY.searchPrompt}</p>}
+          {isTooShort && (
+            <p className="px-4 py-6 text-sm text-[var(--color-ink-subtle)]">
+              {NAV_COPY.searchPrompt}
+            </p>
+          )}
           {!isTooShort && !isLoading && hits.length === 0 && (
-            <p className="px-4 py-6 text-sm text-[var(--color-ink-subtle)]">{NAV_COPY.searchEmpty}</p>
+            <p className="px-4 py-6 text-sm text-[var(--color-ink-subtle)]">
+              {NAV_COPY.searchEmpty}
+            </p>
           )}
           {sections.map((section) => (
             <div key={section.group}>

@@ -92,7 +92,9 @@ export const useDragAndDrop = (
 
         // Position is derived from the card the pointer landed on
         const target = (event.target as HTMLElement).closest('[data-drop-index]')
-        const index = target ? Number(target.getAttribute('data-drop-index')) : Number.MAX_SAFE_INTEGER
+        const index = target
+          ? Number(target.getAttribute('data-drop-index'))
+          : Number.MAX_SAFE_INTEGER
 
         onMove(item, container, index)
       },

@@ -21,7 +21,10 @@ const COLOUR_PATTERN = /^#[0-9a-fA-F]{6}$/
  */
 
 const isBlank = (value: unknown): boolean =>
-  value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)
+  value === null ||
+  value === undefined ||
+  value === '' ||
+  (Array.isArray(value) && value.length === 0)
 
 /**
  * Normalise raw text
@@ -29,7 +32,8 @@ const isBlank = (value: unknown): boolean =>
  * @return {string} - Trimmed text
  */
 
-const toText = (value: unknown): string => (typeof value === 'string' ? value.trim() : String(value ?? ''))
+const toText = (value: unknown): string =>
+  typeof value === 'string' ? value.trim() : String(value ?? '')
 
 /**
  * Normalise a string list
@@ -98,7 +102,8 @@ const parseField = (field: FieldDefinition, raw: unknown, issues: FieldIssue[]):
   }
 
   // Shape checks per text flavour
-  if (field.kind === 'discord' && !DISCORD_PATTERN.test(text)) return reject(FORM_COPY.notADiscordId)
+  if (field.kind === 'discord' && !DISCORD_PATTERN.test(text))
+    return reject(FORM_COPY.notADiscordId)
   if (field.kind === 'email' && !EMAIL_PATTERN.test(text)) return reject(FORM_COPY.notAnEmail)
   if (field.kind === 'colour' && !COLOUR_PATTERN.test(text)) return reject(FORM_COPY.notAColour)
   if (field.kind === 'url' && !URL.canParse(text)) return reject(FORM_COPY.notAUrl)
@@ -138,9 +143,12 @@ export const parseFormValues = (
     if (!isFieldVisible(field, draft)) continue
     if (!(field.name in raw) && !fillMissing) continue
 
+    // A field already rejected on its shape never reports "required" on top
+    const before = issues.length
     const parsed = parseField(field, raw[field.name], issues)
+    const wasRejected = issues.length > before
 
-    if (enforceRequired && field.required && isBlank(parsed) && parsed !== false) {
+    if (!wasRejected && enforceRequired && field.required && isBlank(parsed) && parsed !== false) {
       issues.push({ field: field.name, message: FORM_COPY.required })
     }
 
