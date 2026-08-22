@@ -1,0 +1,5 @@
+export { AppearanceManager } from './AppearanceManager'
+export { ColorVisionManager } from './ColorVisionManager'
+export { HintsProvider, useHints } from './HintsManager'
+export type { FloatingHint } from './HintsManager'
+export { ThemeManager } from './ThemeManager'
