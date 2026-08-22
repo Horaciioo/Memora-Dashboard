@@ -5,10 +5,10 @@ import { readBoolean, readInteger, readString } from '@/declarations/configurati
 import { MemberRoles, type MemberRoleName } from '@/utils/constants/hierarchy'
 
 /**
- * Root administrator profile
+ * Root administrator profile, its display name living in the database rather than here
  * @typedef {Object} RootIdentity
  * @property {string | null} discordId - Identifier from the environment
- * @property {string} displayName - Display name
+ * @property {string | null} seedName - Name written on the very first sign-in
  * @property {MemberRoleName} role - Hierarchy level
  * @property {boolean} immutable - Never editable nor deletable
  * @property {number} sessionDays - Session lifetime
@@ -16,14 +16,21 @@ import { MemberRoles, type MemberRoleName } from '@/utils/constants/hierarchy'
 
 export interface RootIdentity {
   discordId: string | null
-  displayName: string
+  seedName: string | null
   role: MemberRoleName
   immutable: boolean
   sessionDays: number
 }
 
-// Identifier never lives in the configuration file
+// Neither the identifier nor the name is ever written in a configuration file
 const discordId = process.env.ADMIN_DISCORD_ID?.trim() ?? ''
+
+const displayNameVariable = readString(adminIdentity.displayNameVariable, {
+  path: 'system/identifiant.admin.displayNameVariable',
+  fallback: 'ADMIN_DISPLAY_NAME',
+})
+
+const seedName = process.env[displayNameVariable]?.trim() ?? ''
 
 const role = readString(adminIdentity.role, {
   path: 'system/identifiant.admin.role',
@@ -37,10 +44,7 @@ const role = readString(adminIdentity.role, {
 
 export const ROOT_IDENTITY: RootIdentity = {
   discordId: discordId.length > 0 ? discordId : null,
-  displayName: readString(adminIdentity.displayName, {
-    path: 'system/identifiant.admin.displayName',
-    fallback: 'Administrateur',
-  }),
+  seedName: seedName.length > 0 ? seedName : null,
   role: role === MemberRoles.Admin ? MemberRoles.Admin : (role as MemberRoleName),
   immutable: readBoolean(adminIdentity.immutable, {
     path: 'system/identifiant.admin.immutable',

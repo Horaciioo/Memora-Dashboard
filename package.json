@@ -14,7 +14,8 @@
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate deploy",
-    "db:dev": "prisma migrate dev"
+    "db:dev": "prisma migrate dev",
+    "db:seed": "node prisma/seed.ts"
   },
   "dependencies": {
     "@logtail/node": "^0.5.8",

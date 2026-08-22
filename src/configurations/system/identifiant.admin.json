@@ -1,6 +1,7 @@
 {
-  "displayName": "Administrateur",
   "role": "ADMIN",
   "immutable": true,
-  "sessionDays": 14
+  "sessionDays": 14,
+  "displayNameSource": "database",
+  "displayNameVariable": "ADMIN_DISPLAY_NAME"
 }
