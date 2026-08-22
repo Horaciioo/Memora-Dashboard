@@ -497,31 +497,19 @@ model AccountNote {
 model SocialLink {
   id        String   @id @default(cuid())
   accountId String
-  networkId String
+  label     String
   handle    String
   url       String?
-  createdAt DateTime @default(now())
-
-  account Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  network SocialNetwork @relation(fields: [networkId], references: [id], onDelete: Cascade)
-
-  @@unique([accountId, networkId])
-  @@map("social_links")
-}
-
-// Platform a social link points to
-model SocialNetwork {
-  id        String   @id @default(cuid())
-  name      String   @unique
   accent    String?
-  urlPrefix String?
   position  Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  links SocialLink[]
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
-  @@map("social_networks")
+  @@unique([accountId, label])
+  @@index([accountId, position])
+  @@map("social_links")
 }
 
 // Individual review held with a member

@@ -5,8 +5,8 @@ import { MemberFileTabs } from '@/composites/members/MemberFileTabs'
 import {
   NOTE_FIELDS,
   PIM_FIELDS,
+  SOCIAL_FIELDS,
   readOverrides,
-  socialFields,
 } from '@/core/services/members/MemberFileService'
 import { memberFields, readMember } from '@/core/services/members/MemberService'
 import { readMemberActivity } from '@/core/services/system/ActivityService'
@@ -55,9 +55,8 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const canManageAccess = access.can(Permissions.AccessManage)
   const canReadLogs = access.can(Permissions.MemberLogRead)
 
-  const [fields, socials, activity, overrides] = await Promise.all([
+  const [fields, activity, overrides] = await Promise.all([
     memberFields(),
-    socialFields(),
     canReadLogs ? readMemberActivity(id) : Promise.resolve([]),
     canManageAccess ? readOverrides(id) : Promise.resolve([]),
   ])
@@ -70,7 +69,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
         memberFields={fields}
         noteFields={NOTE_FIELDS}
         pimFields={PIM_FIELDS}
-        socialFields={socials}
+        socialFields={SOCIAL_FIELDS}
         activity={activity}
         overrides={overrides}
         canUpdate={access.can(Permissions.MemberUpdate)}

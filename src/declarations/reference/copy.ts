@@ -24,8 +24,6 @@ export const REFERENCE_FIELD_COPY = {
   terminalBadge: 'Fin',
   weight: 'Poids',
   weightHint: 'Plus le poids est élevé, plus la priorité remonte.',
-  urlPrefix: 'Début du lien',
-  urlPrefixHint: 'Le pseudo est collé derrière, par exemple https://x.com/.',
   period: 'Période',
   jobFunction: 'Fonction',
   jobFunctionHint: 'Laisse vide si la formation concerne tout le monde.',

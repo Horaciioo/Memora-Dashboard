@@ -13,7 +13,6 @@ export const REFERENCE_KEYS = [
   'plateformes',
   'etats',
   'priorites',
-  'reseaux',
   'formations',
   'livecon',
 ] as const
@@ -122,17 +121,6 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     reorderable: false,
     emptyTitle: 'Aucune priorité',
     emptyDescription: 'Ajoute tes niveaux d’urgence, du plus léger au plus lourd.',
-  },
-  {
-    key: 'reseaux',
-    label: 'Réseaux sociaux',
-    singular: 'Réseau',
-    description: 'Plateformes proposées sur la fiche d’un modérateur.',
-    icon: 'link',
-    figure: 'settings',
-    reorderable: true,
-    emptyTitle: 'Aucun réseau',
-    emptyDescription: 'Ajoute les réseaux que les modérateurs pourront renseigner.',
   },
   {
     key: 'formations',

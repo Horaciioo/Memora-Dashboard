@@ -1,16 +1,17 @@
-import { invalidInput } from '@/core/lib/errors'
-import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { replaceSocials, socialFields } from '@/core/services/members/MemberFileService'
-import { Permissions } from '@/utils/constants/permissions'
+import {
+  SOCIAL_FIELDS,
+  addSocial,
+  assertSocialAccess,
+} from '@/core/services/members/MemberFileService'
 
-export const PUT = createProtectedRoute({
-  permission: Permissions.MemberUpdate,
-  descriptor: { summary: 'Replace the social profiles', tags: ['members'] },
-  handler: async ({ params, raw }) => {
-    const parsed = parseFormValues(await socialFields(), raw, { fillMissing: true })
-    if (!parsed.ok) throw invalidInput(parsed.issues)
+export const POST = createProtectedRoute({
+  status: 201,
+  fields: SOCIAL_FIELDS,
+  descriptor: { summary: 'Add a social profile', tags: ['members'] },
+  handler: async ({ params, body, session, access }) => {
+    assertSocialAccess(params.id, session.id, access)
 
-    return replaceSocials(params.id, parsed.values)
+    return addSocial(params.id, body)
   },
 })

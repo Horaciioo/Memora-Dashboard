@@ -107,23 +107,21 @@ export interface MemberPim {
 }
 
 /**
- * Social profile of a member
+ * Social profile of a member, declared by the member themselves
  * @typedef {Object} MemberSocial
  * @property {string} id - Link identifier
- * @property {string} networkId - Network identifier
- * @property {string} networkName - Network name
- * @property {string | null} accent - Colour token
+ * @property {string} label - Network name
  * @property {string} handle - Profile handle
- * @property {string | null} url - Resolved URL
+ * @property {string | null} url - Profile URL
+ * @property {string | null} accent - Colour token
  */
 
 export interface MemberSocial {
   id: string
-  networkId: string
-  networkName: string
-  accent: string | null
+  label: string
   handle: string
   url: string | null
+  accent: string | null
 }
 
 /**

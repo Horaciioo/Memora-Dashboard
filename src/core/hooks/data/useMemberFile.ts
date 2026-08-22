@@ -25,7 +25,9 @@ import type { MemberDetail, MemberNote, MemberPim, MemberSocial } from '@/types/
  * @property {(id: string) => Promise<void>} removeNote - Drop a remark
  * @property {(values: FormValues) => Promise<boolean>} addPim - Record a review
  * @property {(id: string) => Promise<void>} removePim - Drop a review
- * @property {(values: FormValues) => Promise<boolean>} saveSocials - Replace the profiles
+ * @property {(values: FormValues) => Promise<boolean>} addSocial - Add a profile
+ * @property {(id: string, values: FormValues) => Promise<boolean>} updateSocial - Edit a profile
+ * @property {(id: string) => Promise<void>} removeSocial - Drop a profile
  * @property {(next: MemberOverride[]) => Promise<boolean>} saveOverrides - Replace the overrides
  * @property {(values: FormValues) => Promise<boolean>} saveIdentity - Edit the file itself
  */
@@ -43,7 +45,9 @@ export interface MemberFile {
   removeNote: (id: string) => Promise<void>
   addPim: (values: FormValues) => Promise<boolean>
   removePim: (id: string) => Promise<void>
-  saveSocials: (values: FormValues) => Promise<boolean>
+  addSocial: (values: FormValues) => Promise<boolean>
+  updateSocial: (id: string, values: FormValues) => Promise<boolean>
+  removeSocial: (id: string) => Promise<void>
   saveOverrides: (next: MemberOverride[]) => Promise<boolean>
   saveIdentity: (values: FormValues) => Promise<boolean>
 }
@@ -130,18 +134,46 @@ export const useMemberFile = (
     [run]
   )
 
-  const saveSocials = useCallback(
+  const addSocial = useCallback(
     async (values: FormValues) => {
-      const next = await run(
-        () => apiPut<MemberSocial[]>(API_ROUTES.memberSocials(memberId), values),
+      const social = await run(
+        () => apiPost<MemberSocial>(API_ROUTES.memberSocials(memberId), values),
+        FEEDBACK_COPY.created
+      )
+
+      if (social) setSocials((current) => [...current, social])
+
+      return social !== null
+    },
+    [memberId, run]
+  )
+
+  const updateSocial = useCallback(
+    async (id: string, values: FormValues) => {
+      const social = await run(
+        () => apiPatch<MemberSocial>(API_ROUTES.social(id), values),
         FEEDBACK_COPY.saved
       )
 
-      if (next) setSocials(next)
+      if (social) {
+        setSocials((current) => current.map((entry) => (entry.id === id ? social : entry)))
+      }
 
-      return next !== null
+      return social !== null
     },
-    [memberId, run]
+    [run]
+  )
+
+  const removeSocial = useCallback(
+    async (id: string) => {
+      const done = await run(
+        () => apiDelete<{ id: string }>(API_ROUTES.social(id)),
+        FEEDBACK_COPY.deleted
+      )
+
+      if (done) setSocials((current) => current.filter((entry) => entry.id !== id))
+    },
+    [run]
   )
 
   const saveOverrides = useCallback(
@@ -183,7 +215,9 @@ export const useMemberFile = (
     removeNote,
     addPim,
     removePim,
-    saveSocials,
+    addSocial,
+    updateSocial,
+    removeSocial,
     saveOverrides,
     saveIdentity,
   }
