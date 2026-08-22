@@ -1,5 +1,5 @@
 {
-  "name": "template-dashboard",
+  "name": "memora-dashboard",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,9 @@
     "format:check": "prettier --check .",
     "validate": "yarn type-check && yarn lint && yarn build",
     "db:generate": "prisma generate",
-    "db:validate": "prisma validate"
+    "db:validate": "prisma validate",
+    "db:migrate": "prisma migrate deploy",
+    "db:dev": "prisma migrate dev"
   },
   "dependencies": {
     "@logtail/node": "^0.5.8",
