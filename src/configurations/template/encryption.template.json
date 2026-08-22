@@ -1,0 +1,8 @@
+{
+  "enabled": "${ENCRYPTION_ENABLED}",
+  "algorithm": "${ENCRYPTION_ALGORITHM}",
+  "key": "${ENCRYPTION_KEY}",
+  "keySalt": "${ENCRYPTION_KEY_SALT}",
+  "iv": "${ENCRYPTION_IV}",
+  "ivSalt": "${ENCRYPTION_IV_SALT}"
+}

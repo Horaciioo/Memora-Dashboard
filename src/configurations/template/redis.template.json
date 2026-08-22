@@ -1,0 +1,9 @@
+{
+  "enabled": "${REDIS_ENABLED}",
+  "prefix": "${REDIS_PREFIX}",
+  "url": "${REDIS_URL}",
+  "host": "${REDIS_HOST}",
+  "port": "${REDIS_PORT}",
+  "password": "${REDIS_PASSWORD}",
+  "db": "${REDIS_DB}"
+}

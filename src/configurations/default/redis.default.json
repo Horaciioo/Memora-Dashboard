@@ -1,0 +1,21 @@
+{
+  "enabled": false,
+  "prefix": "dashboard:",
+  "url": null,
+  "host": "localhost",
+  "port": 6379,
+  "password": null,
+  "db": 0,
+  "connection": {
+    "retryStrategy": "exponential",
+    "retryBackoffMs": 200,
+    "retryMaxDelayMs": 5000,
+    "maxRetries": 3,
+    "commandTimeoutMs": 5000,
+    "readyTimeoutMs": 10000,
+    "heartbeatMs": 30000
+  },
+  "scan": {
+    "count": 100
+  }
+}
