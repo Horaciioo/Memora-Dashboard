@@ -5,6 +5,7 @@ import { AvatarStack } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
+import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -193,13 +194,6 @@ export const ProjectFileTabs = ({
         <Section
           title={PROJECT_COPY.communicationTitle}
           description={PROJECT_COPY.communicationLead}
-          action={
-            communications.entries.length > 0 && canWriteCommunications ? (
-              <Button variant="primary" icon="add" onClick={openWrite}>
-                {PROJECT_COPY.communicationAdd}
-              </Button>
-            ) : undefined
-          }
           bare
         >
           {communications.entries.length === 0 ? (
@@ -253,6 +247,11 @@ export const ProjectFileTabs = ({
                   <Markdown source={entry.body} />
                 </article>
               ))}
+              <AddRow
+                label={PROJECT_COPY.communicationAdd}
+                disabled={!canWriteCommunications}
+                onClick={openWrite}
+              />
             </div>
           )}
         </Section>

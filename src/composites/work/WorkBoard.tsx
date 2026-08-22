@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/elements/actions/Button'
+import { AddRow } from '@/components/structures/AddRow'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
@@ -205,18 +206,7 @@ export const WorkBoard = <T extends BoardItem>({
 
   return (
     <>
-      <Section
-        title={copy.title}
-        description={copy.lead}
-        action={
-          board.cards.length > 0 && canCreate ? (
-            <Button variant="primary" icon="add" onClick={openCreate}>
-              {copy.add}
-            </Button>
-          ) : undefined
-        }
-        bare
-      >
+      <Section bare>
         <FilterBar
           searchLabel={BOARD_FILTER_COPY.search}
           search={search}
@@ -257,6 +247,7 @@ export const WorkBoard = <T extends BoardItem>({
             rowMenu={cardMenu}
           />
         )}
+        {visibleCards.length > 0 && canCreate && <AddRow label={copy.add} onClick={openCreate} />}
       </Section>
 
       <FormDialog

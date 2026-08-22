@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
+import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
@@ -99,18 +100,7 @@ export const ReferenceManager = ({
 
   return (
     <>
-      <Section
-        title={section.label}
-        description={section.description}
-        action={
-          rows.length > 0 && canManage ? (
-            <Button variant="primary" icon="add" onClick={openCreate}>
-              {ACTION_COPY.add}
-            </Button>
-          ) : undefined
-        }
-        bare
-      >
+      <Section bare>
         {rows.length === 0 ? (
           <EmptyState
             figure={section.figure}
@@ -174,6 +164,11 @@ export const ReferenceManager = ({
                 />
               </div>
             ))}
+            <AddRow
+              label={`${ACTION_COPY.add} ${section.singular.toLowerCase()}`}
+              disabled={!canManage}
+              onClick={openCreate}
+            />
           </div>
         )}
       </Section>

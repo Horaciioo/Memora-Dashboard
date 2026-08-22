@@ -7,6 +7,7 @@ import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
+import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -252,13 +253,6 @@ export const MemberFileTabs = ({
             <Section
               title={MEMBER_COPY.pimsTitle}
               description={MEMBER_COPY.pimsLead}
-              action={
-                file.pims.length > 0 && canWritePims ? (
-                  <Button icon="add" onClick={() => openDialog('pim')}>
-                    {MEMBER_COPY.pimAdd}
-                  </Button>
-                ) : undefined
-              }
               padded={file.pims.length > 0}
             >
               {file.pims.length === 0 ? (
@@ -300,6 +294,11 @@ export const MemberFileTabs = ({
                       {pim.sheet.trim().length > 0 && <Markdown source={pim.sheet} />}
                     </article>
                   ))}
+                  <AddRow
+                    label={MEMBER_COPY.pimAdd}
+                    disabled={!canWritePims}
+                    onClick={() => openDialog('pim')}
+                  />
                 </div>
               )}
             </Section>
@@ -315,18 +314,7 @@ export const MemberFileTabs = ({
       )}
 
       {tab === 'notes' && canReadNotes && (
-        <Section
-          title={MEMBER_COPY.notesTitle}
-          description={MEMBER_COPY.notesLead}
-          action={
-            file.notes.length > 0 && canWriteNotes ? (
-              <Button icon="add" onClick={() => openDialog('note')}>
-                {MEMBER_COPY.noteAdd}
-              </Button>
-            ) : undefined
-          }
-          bare
-        >
+        <Section title={MEMBER_COPY.notesTitle} description={MEMBER_COPY.notesLead} bare>
           {file.notes.length === 0 ? (
             <EmptyState
               figure="notes"
@@ -360,6 +348,11 @@ export const MemberFileTabs = ({
                   <p className="text-sm whitespace-pre-wrap">{note.body}</p>
                 </article>
               ))}
+              <AddRow
+                label={MEMBER_COPY.noteAdd}
+                disabled={!canWriteNotes}
+                onClick={() => openDialog('note')}
+              />
             </div>
           )}
         </Section>

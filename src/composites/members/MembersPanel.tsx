@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
+import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { DataTable, type DataTableColumn } from '@/components/structures/DataTable'
 import { FilterBar, type FilterDefinition } from '@/components/structures/FilterBar'
@@ -241,18 +242,7 @@ export const MembersPanel = ({
 
   return (
     <>
-      <Section
-        title={MEMBER_COPY.title}
-        description={MEMBER_COPY.lead}
-        action={
-          members.length > 0 && canCreate ? (
-            <Button variant="primary" icon="add" onClick={openCreate}>
-              {MEMBER_COPY.add}
-            </Button>
-          ) : undefined
-        }
-        bare
-      >
+      <Section bare>
         <FilterBar
           searchLabel={MEMBER_FILTER_COPY.search}
           search={search}
@@ -305,6 +295,9 @@ export const MembersPanel = ({
                 }
           }
         />
+        {visibleMembers.length > 0 && canCreate && (
+          <AddRow label={MEMBER_COPY.add} onClick={openCreate} />
+        )}
       </Section>
 
       <FormDialog
