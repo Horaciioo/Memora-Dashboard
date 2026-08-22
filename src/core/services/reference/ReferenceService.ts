@@ -593,73 +593,6 @@ const priorities: ReferenceResource = {
   reorder: noReorder,
 }
 
-const socialNetworks: ReferenceResource = {
-  fields: async () => [
-    nameField,
-    {
-      name: 'urlPrefix',
-      kind: 'text',
-      label: REFERENCE_FIELD_COPY.urlPrefix,
-      maxLength: shortTextMaxLength,
-      hint: REFERENCE_FIELD_COPY.urlPrefixHint,
-    },
-    accentField,
-  ],
-  list: async () => {
-    const rows = await prisma.socialNetwork.findMany({
-      orderBy: { position: 'asc' },
-      include: { _count: { select: { links: true } } },
-    })
-
-    return rows.map((row) => ({
-      id: row.id,
-      label: row.name,
-      hint: row.urlPrefix,
-      accent: row.accent,
-      badges: [],
-      position: row.position,
-      usage: row._count.links,
-      values: { name: row.name, urlPrefix: row.urlPrefix, accent: row.accent },
-    }))
-  },
-  create: async (values) => {
-    const row = await prisma.socialNetwork
-      .create({
-        data: {
-          name: readText(values, 'name') ?? '',
-          urlPrefix: readText(values, 'urlPrefix'),
-          accent: readText(values, 'accent'),
-          position: await nextPosition(prisma.socialNetwork),
-        },
-      })
-      .catch(rethrow)
-
-    return socialNetworks.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
-  },
-  update: async (id, values) => {
-    await prisma.socialNetwork
-      .update({
-        where: { id },
-        data: {
-          name: readText(values, 'name') ?? undefined,
-          urlPrefix: readText(values, 'urlPrefix'),
-          accent: readText(values, 'accent'),
-        },
-      })
-      .catch(rethrow)
-
-    return socialNetworks.list().then((rows) => rows.find((entry) => entry.id === id)!)
-  },
-  remove: async (id) => {
-    await prisma.socialNetwork.delete({ where: { id } })
-  },
-  reorder: (ids) =>
-    applyOrder(
-      (id, position) => prisma.socialNetwork.update({ where: { id }, data: { position } }),
-      ids
-    ),
-}
-
 const trainings: ReferenceResource = {
   fields: async () => {
     const functions = await prisma.jobFunction.findMany({
@@ -860,7 +793,6 @@ const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
   plateformes: platforms,
   etats: workflowStates,
   priorites: priorities,
-  reseaux: socialNetworks,
   formations: trainings,
   livecon: liveconLevels,
 }

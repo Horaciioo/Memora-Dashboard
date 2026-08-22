@@ -1,13 +1,17 @@
 import 'server-only'
 
+import type { SocialLink } from '@prisma/client'
+
 import { prisma } from '@/core/lib/db'
-import { notFound } from '@/core/lib/errors'
+import { forbidden, notFound } from '@/core/lib/errors'
+import { TONE_OPTIONS } from '@/core/lib/forms/options'
 import { readDate, readFlag, readText } from '@/core/lib/forms/values'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
+import type { PermissionHelpers } from '@/types/auth'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberNote, MemberPim, MemberSocial } from '@/types/members'
-import { isPermissionName } from '@/utils/constants/permissions'
+import { Permissions, isPermissionName } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { PermissionEffects } from '@/utils/constants/workflow'
 
@@ -174,69 +178,142 @@ export const removePim = async (pimId: string): Promise<void> => {
 }
 
 /**
- * Build the social profile form declarations
- * @return {Promise<FieldDefinition[]>} - One field per declared network
+ * Guard a social profile write, a member always owning their own rows
+ * @param {string} accountId - Owner identifier
+ * @param {string} sessionId - Signed-in member identifier
+ * @param {PermissionHelpers} access - Permission helpers
+ * @return {void} - Throws when neither owner nor manager
  */
 
-export const socialFields = async (): Promise<FieldDefinition[]> => {
-  const networks = await prisma.socialNetwork.findMany({ orderBy: { position: 'asc' } })
+export const assertSocialAccess = (
+  accountId: string,
+  sessionId: string,
+  access: PermissionHelpers
+): void => {
+  if (accountId === sessionId || access.can(Permissions.MemberUpdate)) return
 
-  return networks.map((network) => ({
-    name: network.id,
-    kind: 'text',
-    label: network.name,
-    placeholder: network.urlPrefix ?? undefined,
-    maxLength: FORM_SETTINGS.shortTextMaxLength,
-    span: 'half',
-  }))
+  throw forbidden()
 }
 
 /**
- * Replace every social profile of a member
- * @param {string} accountId - Account identifier
- * @param {FormValues} values - Parsed body, keyed by network identifier
- * @return {Promise<MemberSocial[]>} - Stored profiles
+ * Declarations of the social profile form, the member owning every row themselves
+ * @type {FieldDefinition[]}
  */
 
-export const replaceSocials = async (
-  accountId: string,
-  values: FormValues
-): Promise<MemberSocial[]> => {
-  const networks = await prisma.socialNetwork.findMany({ orderBy: { position: 'asc' } })
+export const SOCIAL_FIELDS: FieldDefinition[] = [
+  {
+    name: 'label',
+    kind: 'text',
+    label: MEMBER_COPY.socialLabel,
+    required: true,
+    maxLength: FORM_SETTINGS.shortTextMaxLength,
+    span: 'half',
+  },
+  {
+    name: 'handle',
+    kind: 'text',
+    label: MEMBER_COPY.socialHandle,
+    required: true,
+    maxLength: FORM_SETTINGS.shortTextMaxLength,
+    span: 'half',
+  },
+  { name: 'url', kind: 'url', label: MEMBER_COPY.socialUrl },
+  {
+    name: 'accent',
+    kind: 'select',
+    label: MEMBER_COPY.socialAccent,
+    options: TONE_OPTIONS,
+    span: 'half',
+  },
+]
 
-  // A blank handle removes the link rather than storing an empty row
-  const writes = networks.map((network) => {
-    const handle = readText(values, network.id)
+/**
+ * Shape one stored link
+ * @param {SocialLink} row - Stored row
+ * @return {MemberSocial} - Social profile
+ */
 
-    if (!handle) {
-      return prisma.socialLink.deleteMany({ where: { accountId, networkId: network.id } })
-    }
+const toSocial = (row: SocialLink): MemberSocial => ({
+  id: row.id,
+  label: row.label,
+  handle: row.handle,
+  url: row.url,
+  accent: row.accent,
+})
 
-    const url = network.urlPrefix ? `${network.urlPrefix}${handle}` : null
+/**
+ * Add a social profile to a member
+ * @param {string} accountId - Account identifier
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<MemberSocial>} - Created profile
+ */
 
-    return prisma.socialLink.upsert({
-      where: { accountId_networkId: { accountId, networkId: network.id } },
-      update: { handle, url },
-      create: { accountId, networkId: network.id, handle, url },
-    })
-  })
-
-  await prisma.$transaction(writes)
-
-  const links = await prisma.socialLink.findMany({
+export const addSocial = async (accountId: string, values: FormValues): Promise<MemberSocial> => {
+  const last = await prisma.socialLink.aggregate({
     where: { accountId },
-    include: { network: true },
-    orderBy: { network: { position: 'asc' } },
+    _max: { position: true },
   })
 
-  return links.map((link) => ({
-    id: link.id,
-    networkId: link.networkId,
-    networkName: link.network.name,
-    accent: link.network.accent,
-    handle: link.handle,
-    url: link.url,
-  }))
+  const row = await prisma.socialLink.create({
+    data: {
+      accountId,
+      label: readText(values, 'label') ?? '',
+      handle: readText(values, 'handle') ?? '',
+      url: readText(values, 'url'),
+      accent: readText(values, 'accent'),
+      position: (last._max.position ?? 0) + 1,
+    },
+  })
+
+  return toSocial(row)
+}
+
+/**
+ * Edit a social profile
+ * @param {string} linkId - Link identifier
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<MemberSocial>} - Updated profile
+ */
+
+export const updateSocial = async (linkId: string, values: FormValues): Promise<MemberSocial> => {
+  const row = await prisma.socialLink.update({
+    where: { id: linkId },
+    data: {
+      label: readText(values, 'label') ?? '',
+      handle: readText(values, 'handle') ?? '',
+      url: readText(values, 'url'),
+      accent: readText(values, 'accent'),
+    },
+  })
+
+  return toSocial(row)
+}
+
+/**
+ * Drop a social profile
+ * @param {string} linkId - Link identifier
+ * @return {Promise<void>} - Removed
+ */
+
+export const removeSocial = async (linkId: string): Promise<void> => {
+  await prisma.socialLink.delete({ where: { id: linkId } })
+}
+
+/**
+ * Read the account a social profile belongs to
+ * @param {string} linkId - Link identifier
+ * @return {Promise<string>} - Owner identifier
+ */
+
+export const socialOwner = async (linkId: string): Promise<string> => {
+  const row = await prisma.socialLink.findUnique({
+    where: { id: linkId },
+    select: { accountId: true },
+  })
+
+  if (!row) throw notFound()
+
+  return row.accountId
 }
 
 /**

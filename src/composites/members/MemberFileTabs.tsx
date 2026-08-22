@@ -15,6 +15,7 @@ import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
 import { Tabs } from '@/components/elements/navigation/Tabs'
 import { useMemberFile } from '@/core/hooks/data/useMemberFile'
+import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
@@ -28,7 +29,7 @@ import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { MemberOverride } from '@/core/services/members/MemberFileService'
 import type { FieldDefinition } from '@/types/forms'
-import type { MemberDetail } from '@/types/members'
+import type { MemberDetail, MemberSocial } from '@/types/members'
 import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
 
 export interface MemberFileTabsProps {
@@ -85,10 +86,13 @@ export const MemberFileTabs = ({
 }: MemberFileTabsProps) => {
   const router = useRouter()
   const file = useMemberFile(detail, overrides)
+  const { session } = useAuthContext()
   const { contextMenu } = useMenu()
   const [tab, setTab] = useState('identity')
   const [dialog, setDialog] = useState<'identity' | 'note' | 'pim' | 'socials' | null>(null)
   const [pendingNote, setPendingNote] = useState<string | null>(null)
+  const [editingSocial, setEditingSocial] = useState<MemberSocial | null>(null)
+  const [pendingSocial, setPendingSocial] = useState<MemberSocial | null>(null)
 
   const { summary } = detail
   const isLocked = summary.isRoot
@@ -96,6 +100,14 @@ export const MemberFileTabs = ({
   const openDialog = (next: typeof dialog) => {
     file.clearIssues()
     setDialog(next)
+  }
+
+  // A member always tends their own social rows, a manager tends anyone's
+  const canWriteSocials = canUpdate || session?.id === summary.id
+
+  const openSocial = (social: MemberSocial | null) => {
+    setEditingSocial(social)
+    openDialog('socials')
   }
 
   const tabs = [
@@ -394,35 +406,20 @@ export const MemberFileTabs = ({
       )}
 
       {tab === 'socials' && (
-        <Section
-          title={MEMBER_COPY.socialsTitle}
-          description={MEMBER_COPY.socialsLead}
-          action={
-            file.socials.length > 0 && canUpdate ? (
-              <Button icon="edit" onClick={() => openDialog('socials')}>
-                {MEMBER_COPY.socialsEdit}
-              </Button>
-            ) : undefined
-          }
-          bare
-        >
+        <Section title={MEMBER_COPY.socialsTitle} description={MEMBER_COPY.socialsLead} bare>
           {file.socials.length === 0 ? (
             <EmptyState
               figure="settings"
               title={MEMBER_COPY.socialsEmptyTitle}
-              description={
-                socialFields.length === 0
-                  ? MEMBER_COPY.socialsMissing
-                  : MEMBER_COPY.socialsEmptyDescription
-              }
+              description={MEMBER_COPY.socialsEmptyDescription}
               action={
                 <Button
                   variant="primary"
-                  icon="edit"
-                  disabled={!canUpdate || socialFields.length === 0}
-                  onClick={() => openDialog('socials')}
+                  icon="add"
+                  disabled={!canWriteSocials}
+                  onClick={() => openSocial(null)}
                 >
-                  {MEMBER_COPY.socialsEdit}
+                  {MEMBER_COPY.socialAdd}
                 </Button>
               }
             />
@@ -430,7 +427,7 @@ export const MemberFileTabs = ({
             <div className={LIST_STYLES.stack}>
               {file.socials.map((social) => (
                 <div key={social.id} className={LIST_STYLES.item}>
-                  <Badge label={social.networkName} tone={toTone(social.accent, 'brand')} />
+                  <Badge label={social.label} tone={toTone(social.accent, 'brand')} />
                   <span className="min-w-0 flex-1 truncate text-sm">{social.handle}</span>
                   {social.url && (
                     <a
@@ -442,8 +439,27 @@ export const MemberFileTabs = ({
                       {ACTION_COPY.open}
                     </a>
                   )}
+                  <Button
+                    variant="icon"
+                    icon="edit"
+                    aria-label={MEMBER_COPY.socialEdit}
+                    disabled={!canWriteSocials}
+                    onClick={() => openSocial(social)}
+                  />
+                  <Button
+                    variant="icon"
+                    icon="remove"
+                    aria-label={ACTION_COPY.delete}
+                    disabled={!canWriteSocials}
+                    onClick={() => setPendingSocial(social)}
+                  />
                 </div>
               ))}
+              <AddRow
+                label={MEMBER_COPY.socialAdd}
+                disabled={!canWriteSocials}
+                onClick={() => openSocial(null)}
+              />
             </div>
           )}
         </Section>
@@ -547,15 +563,36 @@ export const MemberFileTabs = ({
 
       <FormDialog
         open={dialog === 'socials'}
-        title={MEMBER_COPY.socialsEdit}
+        title={editingSocial ? MEMBER_COPY.socialEdit : MEMBER_COPY.socialAdd}
         fields={socialFields}
-        initialValues={Object.fromEntries(
-          file.socials.map((social) => [social.networkId, social.handle])
-        )}
+        initialValues={
+          editingSocial
+            ? {
+                label: editingSocial.label,
+                handle: editingSocial.handle,
+                url: editingSocial.url,
+                accent: editingSocial.accent,
+              }
+            : undefined
+        }
         issues={file.issues}
         isSaving={file.isSaving}
-        onSubmit={file.saveSocials}
+        onSubmit={(values) =>
+          editingSocial ? file.updateSocial(editingSocial.id, values) : file.addSocial(values)
+        }
         onClose={() => setDialog(null)}
+      />
+
+      <ConfirmDialog
+        open={pendingSocial !== null}
+        title={MEMBER_COPY.socialDeleteTitle}
+        description={MEMBER_COPY.socialDeleteDescription}
+        pending={file.isSaving}
+        onCancel={() => setPendingSocial(null)}
+        onConfirm={async () => {
+          await file.removeSocial(pendingSocial!.id)
+          setPendingSocial(null)
+        }}
       />
 
       <ConfirmDialog
