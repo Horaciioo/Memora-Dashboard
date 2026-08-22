@@ -1,3 +1,7 @@
+// Narrows a board route to one creator, the API reading it as a query parameter
+const withScope = (path: string, youtuberId?: string): string =>
+  youtuberId ? `${path}?youtubeur=${encodeURIComponent(youtuberId)}` : path
+
 /**
  * Single source of every API path
  * @type {Record<string, string | ((...parts: string[]) => string)>}
@@ -30,8 +34,8 @@ export const API_ROUTES = {
   absence: (id: string) => `/api/absences/${id}`,
   livecon: '/api/livecon',
   academy: '/api/academy',
-  teams: '/api/equipes',
-  team: (id: string) => `/api/equipes/${id}`,
+  teams: (youtuberId?: string) => withScope('/api/equipes', youtuberId),
+  team: (id: string, youtuberId?: string) => withScope(`/api/equipes/${id}`, youtuberId),
   access: '/api/acces',
   board: '/api/tableau',
   search: '/api/recherche',

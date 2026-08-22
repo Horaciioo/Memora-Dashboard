@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
@@ -10,6 +11,7 @@ import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useReference } from '@/core/hooks/data/useReference'
+import { ROUTES } from '@/declarations/navigation'
 import { REFERENCE_COPY } from '@/declarations/reference/copy'
 import type { ReferenceSection } from '@/declarations/reference/sections'
 import { ACTION_COPY } from '@/declarations/ui/copy'
@@ -51,6 +53,7 @@ export const ReferenceManager = ({
     section.key,
     initialRows
   )
+  const router = useRouter()
   const { contextMenu } = useMenu()
   const [editing, setEditing] = useState<ReferenceRow | null>(null)
   const [isCreating, setCreating] = useState(false)
@@ -74,7 +77,21 @@ export const ReferenceManager = ({
     setCreating(true)
   }
 
+  const openRow = (row: ReferenceRow) => {
+    if (section.openable) router.push(ROUTES.settingsRecord(section.key, row.id))
+  }
+
   const rowMenu = (row: ReferenceRow): MenuItem[] => [
+    ...(section.openable
+      ? [
+          {
+            id: 'open',
+            label: ACTION_COPY.open,
+            icon: 'forward' as const,
+            onSelect: () => openRow(row),
+          },
+        ]
+      : []),
     {
       id: 'edit',
       label: ACTION_COPY.edit,
@@ -125,7 +142,8 @@ export const ReferenceManager = ({
                 key={row.id}
                 data-drop-index={index}
                 onContextMenu={contextMenu(rowMenu(row), row.label)}
-                className={LIST_STYLES.item}
+                onClick={section.openable ? () => openRow(row) : undefined}
+                className={cn(LIST_STYLES.item, section.openable && LIST_STYLES.itemClickable)}
                 {...(section.reorderable && canManage
                   ? itemProps({ id: row.id, from: CONTAINER })
                   : {})}
@@ -157,7 +175,8 @@ export const ReferenceManager = ({
                   icon="edit"
                   aria-label={`${ACTION_COPY.edit} ${row.label}`}
                   disabled={!canManage}
-                  onClick={() => {
+                  onClick={(event) => {
+                    event.stopPropagation()
                     clearIssues()
                     setEditing(row)
                   }}

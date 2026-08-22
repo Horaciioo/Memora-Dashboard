@@ -24,6 +24,7 @@ export const TABLE_STYLES = {
 export const LIST_STYLES = {
   stack: 'flex flex-col gap-2',
   item: 'flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 transition-colors hover:border-[var(--color-border-strong)]',
+  itemClickable: 'cursor-pointer hover:border-[var(--color-brand-400)]',
   grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
 } as const
 
@@ -36,6 +37,7 @@ export const BOARD_STYLES = {
   scroller: 'flex gap-4 overflow-x-auto pb-2',
   column:
     'flex w-72 shrink-0 flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)]/60 p-2',
+  columnArchived: 'opacity-60',
   columnHead: 'flex items-center justify-between gap-2 px-2 py-1.5',
   columnTitle: 'flex items-center gap-2 text-sm font-semibold',
   count:
