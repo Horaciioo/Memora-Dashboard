@@ -23,7 +23,8 @@ const PERMISSION_GROUP_MAP: Record<PermissionGroup, PermissionGroupOption> = {
   [PermissionGroups.Livecon]: { label: 'Livecon', position: 5 },
   [PermissionGroups.Academy]: { label: 'Marsha Academy', position: 6 },
   [PermissionGroups.Teams]: { label: 'Équipes', position: 7 },
-  [PermissionGroups.Settings]: { label: 'Configuration', position: 8 },
+  [PermissionGroups.Calendar]: { label: 'Calendrier', position: 8 },
+  [PermissionGroups.Settings]: { label: 'Configuration', position: 9 },
 }
 
 export const PERMISSION_GROUP_REGISTRY = createRegistry(PERMISSION_GROUP_MAP)

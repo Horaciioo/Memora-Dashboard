@@ -34,6 +34,8 @@ export const REFERENCE_FIELD_COPY = {
   level: 'Niveau',
   levelHint: 'Plus le niveau est bas, plus la situation est tendue.',
   levelBadge: 'Livecon',
+  visibility: 'Visibilité',
+  visibilityHint: 'Qui voit ce type d’évènement sur le calendrier.',
   situation: 'Situation',
   guidelines: 'Consignes',
 } as const

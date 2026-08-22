@@ -1,5 +1,6 @@
 import absences from '@/configurations/system/absences.json'
 import academy from '@/configurations/system/academy.json'
+import calendar from '@/configurations/system/calendrier.json'
 import files from '@/configurations/system/fichiers.json'
 import forms from '@/configurations/system/forms.json'
 import livecon from '@/configurations/system/livecon.json'
@@ -226,5 +227,32 @@ export const ACADEMY_SETTINGS = {
     fallback: 4,
     min: 1,
     max: weeksMax,
+  }),
+}
+
+const dayEndHour = readInteger(calendar.dayEndHour, {
+  path: 'system/calendrier.dayEndHour',
+  fallback: 23,
+  min: 1,
+  max: 23,
+})
+
+/**
+ * Calendar bounds
+ * @type {{ dayStartHour: number, dayEndHour: number, maxEntriesPerDay: number }}
+ */
+
+export const CALENDAR_SETTINGS = {
+  dayEndHour,
+  dayStartHour: readInteger(calendar.dayStartHour, {
+    path: 'system/calendrier.dayStartHour',
+    fallback: 7,
+    min: 0,
+    max: dayEndHour,
+  }),
+  maxEntriesPerDay: readInteger(calendar.maxEntriesPerDay, {
+    path: 'system/calendrier.maxEntriesPerDay',
+    fallback: 3,
+    min: 1,
   }),
 }

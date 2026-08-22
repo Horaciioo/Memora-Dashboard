@@ -31,6 +31,8 @@ export const Permissions = {
   AcademyManage: 'academy:manage',
   AcademyReviewRead: 'academy:review:read',
   AcademyReviewWrite: 'academy:review:write',
+  CalendarRead: 'calendar:read',
+  CalendarManage: 'calendar:manage',
   TeamRead: 'team:read',
   TeamManage: 'team:manage',
   ReferenceRead: 'reference:read',
@@ -71,6 +73,7 @@ export const PermissionGroups = {
   Absences: 'absences',
   Livecon: 'livecon',
   Academy: 'academy',
+  Calendar: 'calendar',
   Teams: 'teams',
   Settings: 'settings',
 } as const
@@ -306,6 +309,20 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Tenir un bilan vocal',
     description: 'Écrire la trace d’un bilan et fixer les objectifs suivants.',
     important: true,
+  },
+  {
+    name: Permissions.CalendarRead,
+    group: PermissionGroups.Calendar,
+    displayName: 'Voir le calendrier',
+    description: 'Ouvrir le calendrier partagé, filtré sur ce qui est visible.',
+    important: false,
+  },
+  {
+    name: Permissions.CalendarManage,
+    group: PermissionGroups.Calendar,
+    displayName: 'Gérer le calendrier',
+    description: 'Poser, déplacer et supprimer une entrée du calendrier.',
+    important: false,
   },
   {
     name: Permissions.TeamRead,

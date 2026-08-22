@@ -20,6 +20,7 @@ export const ROUTES = {
   meetings: '/reunions',
   absences: '/absences',
   livecon: '/livecon',
+  calendar: '/calendrier',
   academy: '/academy',
   session: (id: string) => `/academy/${id}`,
   junior: (sessionId: string, juniorId: string) => `/academy/${sessionId}/${juniorId}`,
@@ -70,6 +71,12 @@ export const NAVIGATION: NavigationGroup[] = [
     items: [
       { href: ROUTES.dashboard, label: 'Mon tableau de bord', icon: 'dashboard', wip: true },
       { href: ROUTES.absences, label: 'Absences', icon: 'absences' },
+      {
+        href: ROUTES.calendar,
+        label: 'Calendrier',
+        icon: 'meetings',
+        permission: Permissions.CalendarRead,
+      },
     ],
   },
   {
@@ -159,6 +166,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   reunions: 'Réunions',
   absences: 'Absences',
   livecon: 'Livecon',
+  calendrier: 'Calendrier',
   academy: 'Marsha Academy',
   moderation: 'Modération',
   sanctions: 'Panel de sanctions',

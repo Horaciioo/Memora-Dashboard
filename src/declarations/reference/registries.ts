@@ -2,12 +2,14 @@ import { createRegistry } from '@/core/lib/registry'
 import {
   AbsenceStatuses,
   AttendeeKinds,
+  EventVisibilities,
   FunctionKinds,
   WorkflowScopes,
 } from '@/utils/constants/workflow'
 import type {
   AbsenceStatusName,
   AttendeeKindName,
+  EventVisibilityName,
   FunctionKindName,
   WorkflowScopeName,
 } from '@/utils/constants/workflow'
@@ -55,3 +57,11 @@ const ABSENCE_STATUS_MAP: Record<AbsenceStatusName, LabelledOption> = {
 }
 
 export const ABSENCE_STATUS_REGISTRY = createRegistry(ABSENCE_STATUS_MAP)
+
+const EVENT_VISIBILITY_MAP: Record<EventVisibilityName, LabelledOption> = {
+  [EventVisibilities.Everyone]: { label: 'Tout le monde', accent: 'success' },
+  [EventVisibilities.Responsables]: { label: 'Responsables et plus', accent: 'warning' },
+  [EventVisibilities.Admins]: { label: 'Administrateurs seuls', accent: 'danger' },
+}
+
+export const EVENT_VISIBILITY_REGISTRY = createRegistry(EVENT_VISIBILITY_MAP)

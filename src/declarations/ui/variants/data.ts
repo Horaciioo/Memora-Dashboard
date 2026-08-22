@@ -63,3 +63,33 @@ export const TIMELINE_STYLES = {
   body: 'flex min-w-0 flex-col gap-0.5 text-sm',
   meta: 'text-xs text-[var(--color-ink-subtle)]',
 } as const
+
+/**
+ * Calendar grid styles
+ * @type {Record<string, string>}
+ */
+
+export const CALENDAR_STYLES = {
+  frame:
+    'overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
+  toolbar: 'flex flex-wrap items-center gap-2 pb-3',
+  weekdays:
+    'border-b border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  weekdaysMonth: 'grid grid-cols-7',
+  weekdaysWeek: 'grid grid-cols-[4rem_repeat(7,minmax(0,1fr))]',
+  weekday: 'px-2 py-2 text-center',
+  month: 'grid grid-cols-7',
+  day: 'flex min-h-28 flex-col gap-1 border-r border-b border-[var(--color-border)] p-1.5 last:border-r-0',
+  dayOutside: 'bg-[var(--color-surface)]/50',
+  dayToday: 'bg-[var(--color-brand-soft)]/40',
+  dayNumber: 'text-xs font-semibold tabular-nums',
+  dayNumberOutside: 'text-[var(--color-ink-subtle)]',
+  entry:
+    'flex w-full cursor-grab items-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-opacity hover:opacity-80 active:cursor-grabbing',
+  entryTime: 'shrink-0 tabular-nums opacity-70',
+  entryTitle: 'truncate font-medium',
+  overflow: 'px-1.5 text-xs text-[var(--color-ink-subtle)]',
+  week: 'grid grid-cols-[4rem_repeat(7,minmax(0,1fr))]',
+  hour: 'border-r border-b border-[var(--color-border)] px-2 py-1 text-right text-xs text-[var(--color-ink-subtle)] tabular-nums',
+  slot: 'flex min-h-12 flex-col gap-1 border-r border-b border-[var(--color-border)] p-1 last:border-r-0',
+} as const
