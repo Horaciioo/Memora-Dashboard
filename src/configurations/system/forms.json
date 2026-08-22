@@ -1,0 +1,13 @@
+{
+  "shortTextMaxLength": 120,
+  "titleMaxLength": 160,
+  "longTextMaxLength": 2000,
+  "markdownMaxLength": 8000,
+  "noteMaxLength": 4000,
+  "tagMaxCount": 12,
+  "positionStep": 1000,
+  "meetingMinDuration": 5,
+  "meetingMaxDuration": 480,
+  "divisionMaxRank": 10,
+  "priorityMaxWeight": 100
+}

@@ -1,0 +1,5 @@
+{
+  "minLength": 2,
+  "maxResultsPerGroup": 5,
+  "debounceMs": 180
+}

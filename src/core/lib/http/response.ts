@@ -1,0 +1,67 @@
+import { AppError, toAppError } from '@/core/lib/errors'
+import type { AppErrorIssue } from '@/core/lib/errors'
+
+/**
+ * Successful envelope
+ * @typedef {Object} ApiSuccess
+ * @property {true} success - Always true
+ * @property {T} data - Payload
+ */
+
+export interface ApiSuccess<T> {
+  success: true
+  data: T
+}
+
+/**
+ * Failed envelope
+ * @typedef {Object} ApiFailure
+ * @property {false} success - Always false
+ * @property {string} code - Error code
+ * @property {string} error - Display message
+ * @property {AppErrorIssue[]} issues - Field failures
+ */
+
+export interface ApiFailure {
+  success: false
+  code: string
+  error: string
+  issues: AppErrorIssue[]
+}
+
+/**
+ * Either envelope
+ * @type {ApiSuccess<T> | ApiFailure}
+ */
+
+export type ApiEnvelope<T> = ApiSuccess<T> | ApiFailure
+
+/**
+ * Wrap a payload
+ * @param {T} data - Payload
+ * @param {number} [status] - HTTP status
+ * @return {Response} - JSON response
+ */
+
+export const succeed = <T>(data: T, status = 200): Response =>
+  Response.json({ success: true, data } satisfies ApiSuccess<T>, { status })
+
+/**
+ * Wrap a failure
+ * @param {unknown} error - Caught value
+ * @return {Response} - JSON response
+ */
+
+export const fail = (error: unknown): Response => {
+  const appError: AppError = toAppError(error)
+
+  return Response.json(
+    {
+      success: false,
+      code: appError.code,
+      error: appError.message,
+      issues: appError.issues,
+    } satisfies ApiFailure,
+    { status: appError.status }
+  )
+}
