@@ -37,9 +37,25 @@ export const EMPTY_STATE_STYLES = {
 
 export const TOAST_STYLES = {
   stack:
-    'pointer-events-none fixed bottom-4 right-4 z-[60] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2',
+    'pointer-events-none fixed top-4 right-4 z-[60] flex w-[min(23rem,calc(100vw-2rem))] flex-col gap-2',
   toast:
-    'surface-enter pointer-events-auto flex items-start justify-between gap-3 rounded-[var(--radius-md)] border-l-4 border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm shadow-[var(--shadow-lg)]',
+    'surface-enter pointer-events-auto flex items-start gap-3 rounded-[var(--radius-lg)] border border-l-4 border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm shadow-[var(--shadow-lg)]',
+  badge: 'flex h-7 w-7 shrink-0 items-center justify-center rounded-full',
+  glyph: 'h-4 w-4',
+  body: 'flex min-w-0 flex-1 flex-col gap-0.5',
+  title: 'font-semibold',
+  description: 'text-xs text-[var(--color-ink-subtle)]',
   dismiss:
     'shrink-0 text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+} as const
+
+/**
+ * Inline creation row styles
+ * @type {Record<string, string>}
+ */
+
+export const ADD_ROW_STYLES = {
+  base: 'flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] px-4 py-3 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-brand-400)] hover:bg-[var(--color-brand-soft)] hover:text-[var(--color-brand-600)] disabled:pointer-events-none disabled:opacity-50',
+  tile: 'min-h-24 flex-col',
+  icon: 'h-4 w-4',
 } as const
