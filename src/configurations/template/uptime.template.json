@@ -1,0 +1,5 @@
+{
+  "enabled": "${UPTIME_ENABLED}",
+  "intervalMs": "${UPTIME_INTERVAL_MS}",
+  "endpoint": "${UPTIME_ENDPOINT}"
+}
