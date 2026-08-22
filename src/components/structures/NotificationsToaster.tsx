@@ -2,6 +2,9 @@
 
 import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
 import { TONE_BORDER } from '@/declarations/ui/theme'
+import { TOAST_STYLES } from '@/declarations/ui/variants'
+import { ACTION_COPY } from '@/declarations/ui/copy'
+import { ICONS } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
 
 /**
@@ -11,20 +14,18 @@ import { cn } from '@/utils/classnames'
 
 export const NotificationsToaster = () => {
   const { notifications, dismiss, pause, resume } = useNotifications()
+  const CloseIcon = ICONS.close
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+    <div className={TOAST_STYLES.stack} aria-live="polite">
       {notifications.map((notification) => (
         <div
           key={notification.id}
           onMouseEnter={() => pause(notification.id)}
           onMouseLeave={() => resume(notification.id)}
-          className={cn(
-            'flex items-start justify-between gap-3 rounded-[var(--radius-md)] border bg-[var(--color-surface-raised)] px-4 py-2 text-sm shadow-lg',
-            TONE_BORDER[notification.tone]
-          )}
+          className={cn(TOAST_STYLES.toast, TONE_BORDER[notification.tone])}
         >
-          <div>
+          <div className="min-w-0">
             <p className="font-medium">{notification.title}</p>
             {notification.description && (
               <p className="text-[var(--color-ink-subtle)]">{notification.description}</p>
@@ -33,10 +34,10 @@ export const NotificationsToaster = () => {
           <button
             type="button"
             onClick={() => dismiss(notification.id)}
-            aria-label="Dismiss"
-            className="text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]"
+            aria-label={ACTION_COPY.close}
+            className={TOAST_STYLES.dismiss}
           >
-            ×
+            <CloseIcon className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       ))}

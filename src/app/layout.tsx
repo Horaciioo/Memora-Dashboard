@@ -1,30 +1,39 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
+import { Inter, Outfit } from 'next/font/google'
 import '@/styles/globals.css'
 import { ThemeScript } from '@/components/tools/ThemeScript'
 import { ColorVisionFilters } from '@/components/tools/ColorVisionFilters'
 import { Providers } from '@/app/providers'
 import { getSession } from '@/core/lib/auth/getSession'
-import { toSessionUser } from '@/core/lib/auth/session'
-import { APP_DESCRIPTION, APP_NAME } from '@/declarations/app'
+import { APP_COMPANY, APP_DESCRIPTION, APP_NAME } from '@/declarations/app'
+
+const bodyFont = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const displayFont = Outfit({ subsets: ['latin'], variable: '--font-outfit', display: 'swap' })
 
 export const metadata: Metadata = {
-  title: APP_NAME,
+  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
   description: APP_DESCRIPTION,
+  applicationName: APP_NAME,
+  authors: [{ name: APP_COMPANY }],
 }
 
 /**
  * Root layout
- * @param {{ children: ReactNode }} props - App tree
- * @return {Promise<JSX.Element>}
+ * @param {Object} props - App tree
+ * @param {ReactNode} props.children - Routed content
+ * @return {Promise<JSX.Element>} - Document shell
  */
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const session = await getSession()
-  const initialSession = session ? toSessionUser(session) : null
+  const initialSession = await getSession()
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="fr"
+      suppressHydrationWarning
+      className={`${bodyFont.variable} ${displayFont.variable}`}
+    >
       <head>
         <ThemeScript />
       </head>

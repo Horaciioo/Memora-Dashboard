@@ -1,5 +1,8 @@
 export { AppearanceManager } from './AppearanceManager'
+export { BreadcrumbProvider, useBreadcrumbLabel, useBreadcrumbOverrides } from './BreadcrumbManager'
 export { ColorVisionManager } from './ColorVisionManager'
 export { HintsProvider, useHints } from './HintsManager'
 export type { FloatingHint } from './HintsManager'
+export { MenuProvider, useMenu } from './MenuManager'
+export type { MenuItem } from './MenuManager'
 export { ThemeManager } from './ThemeManager'
