@@ -1,4 +1,5 @@
 import absences from '@/configurations/system/absences.json'
+import academy from '@/configurations/system/academy.json'
 import files from '@/configurations/system/fichiers.json'
 import forms from '@/configurations/system/forms.json'
 import livecon from '@/configurations/system/livecon.json'
@@ -194,5 +195,36 @@ export const FILE_SETTINGS = {
   allowedTypes: readStringList(files.allowedTypes, {
     path: 'system/fichiers.allowedTypes',
     fallback: ['image/png', 'image/jpeg', 'image/webp'],
+  }),
+}
+
+const weeksMax = readInteger(academy.weeksMax, {
+  path: 'system/academy.weeksMax',
+  fallback: 6,
+  min: 1,
+})
+
+/**
+ * Academy bounds
+ * @type {{ maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number }}
+ */
+
+export const ACADEMY_SETTINGS = {
+  weeksMax,
+  maxLives: readInteger(academy.maxLives, {
+    path: 'system/academy.maxLives',
+    fallback: 13,
+    min: 1,
+  }),
+  minObjectives: readInteger(academy.minObjectives, {
+    path: 'system/academy.minObjectives',
+    fallback: 2,
+    min: 1,
+  }),
+  weeksMin: readInteger(academy.weeksMin, {
+    path: 'system/academy.weeksMin',
+    fallback: 4,
+    min: 1,
+    max: weeksMax,
   }),
 }

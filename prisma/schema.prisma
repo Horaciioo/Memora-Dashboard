@@ -27,6 +27,43 @@ enum AcademyPeriod {
   PRACTICE
 }
 
+// Training programme a session runs
+enum AcademyProgram {
+  PIMT
+  PIMY
+  PIMD
+  PIMP
+}
+
+// Entry level of a junior, driving how fast the session moves
+enum AcademyTrack {
+  ENTREE
+  ADAPTATION
+}
+
+// Lifecycle of a session
+enum AcademySessionStatus {
+  PLANNED
+  RUNNING
+  CLOSED
+}
+
+// Outcome of a junior inside a session
+enum AcademyJuniorStatus {
+  ACTIVE
+  VALIDATED
+  STOPPED
+}
+
+// Kind of moment recorded on the session thread
+enum AcademyEventKind {
+  FORMATION
+  BILAN_VOCAL
+  ENTREVUE
+  POINT_RESPONSABLE
+  SESSION_TRAVAIL
+}
+
 // Surface a workflow state belongs to
 enum WorkflowScope {
   PROJECT
@@ -101,6 +138,11 @@ model Account {
   pimsWritten         Pim[]               @relation("PimAuthor")
   trainingRecords     TrainingRecord[]    @relation("TrainingLearner")
   trainingsValidated  TrainingRecord[]    @relation("TrainingValidator")
+  academyJuniors      AcademyJunior[]     @relation("AcademyJunior")
+  academyTrainees     AcademyJunior[]     @relation("AcademyJuniorTrainer")
+  academySeats        AcademySessionTrainer[] @relation("AcademyTrainer")
+  academyEvents       AcademyEvent[]      @relation("AcademyEventAuthor")
+  academyReviews      AcademyReview[]     @relation("AcademyReviewAuthor")
   ledTeams            Team[]              @relation("TeamLead")
   teamMemberships     TeamMember[]
   ledProjects         Project[]           @relation("ProjectLead")
@@ -533,11 +575,12 @@ model Pim {
 
 // Course a junior must clear during the academy
 model Training {
-  id          String         @id @default(cuid())
-  name        String         @unique
+  id          String          @id @default(cuid())
+  name        String          @unique
   summary     String?
   period      AcademyPeriod?
-  mandatory   Boolean        @default(false)
+  program     AcademyProgram?
+  mandatory   Boolean         @default(false)
   functionId  String?
   position    Int            @default(0)
   createdAt   DateTime       @default(now())
@@ -547,6 +590,7 @@ model Training {
   records     TrainingRecord[]
 
   @@index([period])
+  @@index([program])
   @@map("trainings")
 }
 
@@ -567,6 +611,111 @@ model TrainingRecord {
 
   @@unique([trainingId, accountId])
   @@map("training_records")
+}
+
+// Dated run of one training programme
+model AcademySession {
+  id        String               @id @default(cuid())
+  program   AcademyProgram
+  startsAt  DateTime
+  endsAt    DateTime?
+  status    AcademySessionStatus @default(PLANNED)
+  summary   String?
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  trainers AcademySessionTrainer[]
+  juniors  AcademyJunior[]
+  events   AcademyEvent[]
+
+  @@index([program, startsAt])
+  @@index([status])
+  @@map("academy_sessions")
+}
+
+// Moderator holding the trainer seat on a session
+model AcademySessionTrainer {
+  id        String   @id @default(cuid())
+  sessionId String
+  accountId String
+  createdAt DateTime @default(now())
+
+  session AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account        @relation("AcademyTrainer", fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@map("academy_session_trainers")
+}
+
+// Junior followed through one session, always an existing moderator
+model AcademyJunior {
+  id          String              @id @default(cuid())
+  sessionId   String
+  accountId   String
+  trainerId   String?
+  track       AcademyTrack        @default(ENTREE)
+  status      AcademyJuniorStatus @default(ACTIVE)
+  startedAt   DateTime            @default(now())
+  validatedAt DateTime?
+  liveCount   Int                 @default(0)
+  summary     String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  session AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account        @relation("AcademyJunior", fields: [accountId], references: [id], onDelete: Cascade)
+  trainer Account?       @relation("AcademyJuniorTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
+
+  events  AcademyEvent[]
+  reviews AcademyReview[]
+
+  @@unique([sessionId, accountId])
+  @@index([status])
+  @@map("academy_juniors")
+}
+
+// Moment planned or held on the session thread
+model AcademyEvent {
+  id          String           @id @default(cuid())
+  sessionId   String
+  juniorId    String?
+  authorId    String?
+  kind        AcademyEventKind
+  title       String
+  scheduledAt DateTime
+  doneAt      DateTime?
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  session AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  junior  AcademyJunior? @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  author  Account?       @relation("AcademyEventAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([sessionId, scheduledAt])
+  @@index([kind])
+  @@map("academy_events")
+}
+
+// Written trace of one voice check-in held with a junior
+model AcademyReview {
+  id         String   @id @default(cuid())
+  juniorId   String
+  authorId   String?
+  heldAt     DateTime
+  feeling    String?
+  axes       Json?
+  objectives String   @default("")
+  strategies String?
+  summary    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  junior AcademyJunior @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  author Account?      @relation("AcademyReviewAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([juniorId, heldAt])
+  @@map("academy_reviews")
 }
 
 // Alert tier, lower level means tighter moderation

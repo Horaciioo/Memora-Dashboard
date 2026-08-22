@@ -5,6 +5,7 @@ import { conflict, notFound } from '@/core/lib/errors'
 import { TONE_OPTIONS, rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import { FORM_SETTINGS, LIVECON_SETTINGS } from '@/declarations/configurations/settings'
+import { ACADEMY_PROGRAM_REGISTRY } from '@/declarations/academy/registries'
 import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
 import {
   FUNCTION_KIND_REGISTRY,
@@ -15,7 +16,12 @@ import type { ReferenceKey } from '@/declarations/reference/sections'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { ReferenceRow } from '@/types/reference'
 import { FunctionKinds, WorkflowScopes } from '@/utils/constants/workflow'
-import type { AcademyPeriodName, FunctionKindName, WorkflowScopeName } from '@/utils/constants'
+import type {
+  AcademyPeriodName,
+  AcademyProgramName,
+  FunctionKindName,
+  WorkflowScopeName,
+} from '@/utils/constants'
 
 /**
  * Operations backing one reference collection
@@ -603,6 +609,14 @@ const trainings: ReferenceResource = {
     return [
       nameField,
       {
+        name: 'program',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.program,
+        hint: REFERENCE_FIELD_COPY.programHint,
+        options: toOptions(ACADEMY_PROGRAM_REGISTRY),
+        span: 'half',
+      },
+      {
         name: 'period',
         kind: 'select',
         label: REFERENCE_FIELD_COPY.period,
@@ -638,6 +652,7 @@ const trainings: ReferenceResource = {
       hint: row.jobFunction?.name ?? null,
       accent: row.mandatory ? 'brand' : null,
       badges: [
+        ...(row.program ? [ACADEMY_PROGRAM_REGISTRY.label(row.program)] : []),
         ...(row.period ? [ACADEMY_PERIOD_REGISTRY.label(row.period)] : []),
         ...(row.mandatory ? [REFERENCE_FIELD_COPY.mandatoryBadge] : []),
       ],
@@ -645,6 +660,7 @@ const trainings: ReferenceResource = {
       usage: row._count.records,
       values: {
         name: row.name,
+        program: row.program,
         period: row.period,
         functionId: row.functionId,
         summary: row.summary,
@@ -657,6 +673,7 @@ const trainings: ReferenceResource = {
       .create({
         data: {
           name: readText(values, 'name') ?? '',
+          program: (readText(values, 'program') ?? null) as AcademyProgramName | null,
           period: (readText(values, 'period') ?? null) as AcademyPeriodName | null,
           functionId: readText(values, 'functionId'),
           summary: readText(values, 'summary'),
@@ -674,6 +691,7 @@ const trainings: ReferenceResource = {
         where: { id },
         data: {
           name: readText(values, 'name') ?? undefined,
+          program: (readText(values, 'program') ?? null) as AcademyProgramName | null,
           period: (readText(values, 'period') ?? null) as AcademyPeriodName | null,
           functionId: readText(values, 'functionId'),
           summary: readText(values, 'summary'),
