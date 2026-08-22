@@ -13,7 +13,7 @@ export const MEMBER_COPY = {
   filterDescription: 'Élargis ou retire les filtres en cours.',
   deleteTitle: 'Supprimer ce modérateur ?',
   deleteDescription: 'Sa fiche, ses notes et son accès disparaissent définitivement.',
-  rootLocked: 'Le compte administrateur ne peut être ni modifié ni supprimé.',
+  rootLocked: 'Ce compte ne peut pas être manipulé.',
   tabIdentity: 'Fiche',
   tabNotes: 'Notes privées',
   tabAbsences: 'Absences',
