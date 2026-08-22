@@ -306,7 +306,7 @@ export const MembersPanel = ({
         fields={fields}
         issues={issues}
         isSaving={isSaving}
-        wide
+        size="lg"
         onSubmit={create}
         onClose={() => setCreating(false)}
       />

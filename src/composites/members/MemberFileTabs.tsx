@@ -514,7 +514,7 @@ export const MemberFileTabs = ({
         initialValues={detail.values}
         issues={file.issues}
         isSaving={file.isSaving}
-        wide
+        size="lg"
         onSubmit={async (values) => {
           const saved = await file.saveIdentity(values)
           if (saved) router.refresh()
@@ -540,7 +540,7 @@ export const MemberFileTabs = ({
         fields={pimFields}
         issues={file.issues}
         isSaving={file.isSaving}
-        wide
+        size="lg"
         onSubmit={file.addPim}
         onClose={() => setDialog(null)}
       />

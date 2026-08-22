@@ -317,7 +317,7 @@ export const ProjectFileTabs = ({
         fields={communicationFields}
         issues={communications.issues}
         isSaving={communications.isSaving}
-        wide
+        size="lg"
         onSubmit={communications.create}
         onClose={() => setWriting(false)}
       />
@@ -329,7 +329,7 @@ export const ProjectFileTabs = ({
         initialValues={editing?.values}
         issues={communications.issues}
         isSaving={communications.isSaving}
-        wide
+        size="lg"
         onSubmit={(values) => communications.update(editing!.id, values)}
         onClose={() => setEditing(null)}
       />
