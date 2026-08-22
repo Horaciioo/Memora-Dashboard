@@ -1,11 +1,639 @@
-// Infrastructure only, a cloned project adds its own models
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// Hierarchy level, drives the permission matrix
+enum MemberRole {
+  ADMIN
+  RESPONSABLE
+  MODERATEUR
+}
+
+// Lifecycle of a member inside the organisation
+enum MemberStatus {
+  ACADEMY
+  ACTIVE
+  PAUSED
+  LEFT
+}
+
+// Academy progression, null once graduated
+enum AcademyPeriod {
+  DISCOVERY
+  PRACTICE
+}
+
+// Surface a workflow state belongs to
+enum WorkflowScope {
+  PROJECT
+  TASK
+  MEETING
+}
+
+// Role held inside a meeting
+enum AttendeeKind {
+  LEAD
+  ASSISTANT
+  PARTICIPANT
+}
+
+// Review outcome of an absence request
+enum AbsenceStatus {
+  PENDING
+  APPROVED
+  REFUSED
+  CANCELLED
+}
+
+// Whether a function is held as main or secondary
+enum FunctionKind {
+  PRIMARY
+  SECONDARY
+}
+
+// Whether an account permission is granted or taken away
+enum PermissionEffect {
+  ALLOW
+  DENY
+}
+
+// Signed-in member
+model Account {
+  id                  String        @id @default(cuid())
+  discordId           String        @unique
+  displayName         String
+  email               String?
+  phone               String?
+  birthday            DateTime?
+  celebrateBirthday   Boolean       @default(true)
+  joinedAt            DateTime      @default(now())
+  leftAt              DateTime?
+  languages           String[]      @default([])
+  timezone            String?
+  avatarUrl           String?
+  role                MemberRole    @default(MODERATEUR)
+  status              MemberStatus  @default(ACADEMY)
+  academyPeriod       AcademyPeriod?
+  divisionId          String?
+  youtuberId          String?
+  primaryFunctionId   String?
+  secondaryFunctionId String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  division          Division?     @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  youtuber          Youtuber?     @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+  primaryFunction   JobFunction?  @relation("PrimaryFunction", fields: [primaryFunctionId], references: [id], onDelete: SetNull)
+  secondaryFunction JobFunction?  @relation("SecondaryFunction", fields: [secondaryFunctionId], references: [id], onDelete: SetNull)
+
+  sessions            Session[]
+  permissions         AccountPermission[]
+  socialLinks         SocialLink[]
+  absences            Absence[]           @relation("AbsenceOwner")
+  reviewedAbsences    Absence[]           @relation("AbsenceReviewer")
+  notesReceived       AccountNote[]       @relation("NoteSubject")
+  notesWritten        AccountNote[]       @relation("NoteAuthor")
+  pims                Pim[]               @relation("PimSubject")
+  pimsWritten         Pim[]               @relation("PimAuthor")
+  trainingRecords     TrainingRecord[]    @relation("TrainingLearner")
+  trainingsValidated  TrainingRecord[]    @relation("TrainingValidator")
+  ledTeams            Team[]              @relation("TeamLead")
+  teamMemberships     TeamMember[]
+  ledProjects         Project[]           @relation("ProjectLead")
+  projectAssists      ProjectAssistant[]
+  ownedTasks          Task[]              @relation("TaskOwner")
+  meetingSeats        MeetingAttendee[]
+  communications      Communication[]
+  liveconChanges      LiveconEntry[]
+  activityAsSubject   ActivityLog[]       @relation("LogSubject")
+  activityAsActor     ActivityLog[]       @relation("LogActor")
+
+  @@index([role])
+  @@index([status])
+  @@index([divisionId])
+  @@index([youtuberId])
+  @@map("accounts")
+}
+
+// Signed cookie handle of an open session
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  accountId String
+  userAgent String?
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// Per-account override on top of role and function grants
+model AccountPermission {
+  id         String           @id @default(cuid())
+  accountId  String
+  permission String
+  effect     PermissionEffect @default(ALLOW)
+  createdAt  DateTime         @default(now())
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, permission])
+  @@map("account_permissions")
+}
+
+// Permissions attached to a hierarchy level
+model RolePermission {
+  id         String     @id @default(cuid())
+  role       MemberRole
+  permission String
+
+  @@unique([role, permission])
+  @@map("role_permissions")
+}
+
+// Extra permissions carried by a moderation function
+model FunctionPermission {
+  id         String @id @default(cuid())
+  functionId String
+  permission String
+
+  jobFunction JobFunction @relation(fields: [functionId], references: [id], onDelete: Cascade)
+
+  @@unique([functionId, permission])
+  @@map("function_permissions")
+}
+
+// Creator whose community the work is done for
+model Youtuber {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  handle    String?
+  accent    String?
+  avatarUrl String?
+  position  Int      @default(0)
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts       Account[]
+  teams          Team[]
+  projects       Project[]
+  tasks          Task[]
+  meetings       Meeting[]
+  liveconEntries LiveconEntry[]
+
+  @@index([archived])
+  @@map("youtubers")
+}
+
+// Gamification tier, Junior then the three squads
+model Division {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  glyph     String?
+  imagePath String?
+  summary   String?
+  rank      Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts Account[]
+
+  @@map("divisions")
+}
+
+// Moderation post held by a member
+model JobFunction {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  kind      FunctionKind @default(PRIMARY)
+  summary   String?
+  accent    String?
+  position  Int          @default(0)
+  archived  Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  primaryHolders   Account[]            @relation("PrimaryFunction")
+  secondaryHolders Account[]            @relation("SecondaryFunction")
+  permissions      FunctionPermission[]
+  trainings        Training[]
+
+  @@index([kind])
+  @@map("job_functions")
+}
+
+// Surface where the work actually happens
+model Platform {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  accent    String?
+  position  Int      @default(0)
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects       Project[]
+  communications Communication[]
+
+  @@map("platforms")
+}
+
+// Column of a board, scoped to one surface
+model WorkflowState {
+  id         String        @id @default(cuid())
+  scope      WorkflowScope
+  name       String
+  accent     String?
+  position   Int           @default(0)
+  isDefault  Boolean       @default(false)
+  isTerminal Boolean       @default(false)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  projects Project[]
+  tasks    Task[]
+  meetings Meeting[]
+
+  @@unique([scope, name])
+  @@index([scope, position])
+  @@map("workflow_states")
+}
+
+// Urgency level shared by projects and tasks
+model Priority {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  accent    String?
+  weight    Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects Project[]
+  tasks    Task[]
+
+  @@map("priorities")
+}
+
+// Group of moderators under one responsable
+model Team {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  summary    String?
+  leadId     String?
+  youtuberId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  lead     Account?     @relation("TeamLead", fields: [leadId], references: [id], onDelete: SetNull)
+  youtuber Youtuber?    @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+  members  TeamMember[]
+
+  @@index([leadId])
+  @@map("teams")
+}
+
+// Membership of an account inside a team
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  accountId String
+  createdAt DateTime @default(now())
+
+  team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, accountId])
+  @@map("team_members")
+}
+
+// Piece of work carried by a responsable
+model Project {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  youtuberId  String?
+  stateId     String?
+  priorityId  String?
+  platformId  String?
+  leadId      String?
+  deadline    DateTime?
+  position    Int       @default(0)
+  archived    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+  state    WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
+  priority Priority?      @relation(fields: [priorityId], references: [id], onDelete: SetNull)
+  platform Platform?      @relation(fields: [platformId], references: [id], onDelete: SetNull)
+  lead     Account?       @relation("ProjectLead", fields: [leadId], references: [id], onDelete: SetNull)
+
+  assistants     ProjectAssistant[]
+  communications Communication[]
+  tasks          Task[]
+  meetings       Meeting[]
+
+  @@index([stateId, position])
+  @@index([youtuberId])
+  @@index([archived])
+  @@map("projects")
+}
+
+// Helper attached to a project
+model ProjectAssistant {
+  id        String   @id @default(cuid())
+  projectId String
+  accountId String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, accountId])
+  @@map("project_assistants")
+}
+
+// Markdown announcement written for a project
+model Communication {
+  id          String    @id @default(cuid())
+  projectId   String
+  authorId    String?
+  platformId  String?
+  title       String
+  body        String    @default("")
+  publishedAt DateTime?
+  position    Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author   Account?  @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  platform Platform? @relation(fields: [platformId], references: [id], onDelete: SetNull)
+
+  @@index([projectId, position])
+  @@map("communications")
+}
+
+// Single action assigned to one member
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  dueDate     DateTime?
+  ownerId     String?
+  stateId     String?
+  priorityId  String?
+  youtuberId  String?
+  projectId   String?
+  position    Int       @default(0)
+  archived    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  owner    Account?       @relation("TaskOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  state    WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
+  priority Priority?      @relation(fields: [priorityId], references: [id], onDelete: SetNull)
+  youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+  project  Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([stateId, position])
+  @@index([ownerId])
+  @@index([projectId])
+  @@map("tasks")
+}
+
+// Scheduled gathering around a project
+model Meeting {
+  id          String    @id @default(cuid())
+  title       String
+  agenda      String?
+  minutes     String?
+  scheduledAt DateTime
+  durationMin Int?
+  stateId     String?
+  youtuberId  String?
+  projectId   String?
+  position    Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  state    WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
+  youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+  project  Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  attendees MeetingAttendee[]
+
+  @@index([scheduledAt])
+  @@index([stateId, position])
+  @@map("meetings")
+}
+
+// Seat held by a member in a meeting
+model MeetingAttendee {
+  id        String       @id @default(cuid())
+  meetingId String
+  accountId String
+  kind      AttendeeKind @default(PARTICIPANT)
+  createdAt DateTime     @default(now())
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, accountId])
+  @@index([kind])
+  @@map("meeting_attendees")
+}
+
+// Time off declared by a member
+model Absence {
+  id           String        @id @default(cuid())
+  accountId    String
+  startDate    DateTime
+  endDate      DateTime
+  dayCount     Int
+  reason       String?
+  status       AbsenceStatus @default(PENDING)
+  reviewerId   String?
+  reviewedAt   DateTime?
+  reviewNote   String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  account  Account  @relation("AbsenceOwner", fields: [accountId], references: [id], onDelete: Cascade)
+  reviewer Account? @relation("AbsenceReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([accountId, startDate])
+  @@index([status])
+  @@map("absences")
+}
+
+// Private remark a responsable leaves on a member
+model AccountNote {
+  id        String   @id @default(cuid())
+  accountId String
+  authorId  String?
+  body      String
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account Account  @relation("NoteSubject", fields: [accountId], references: [id], onDelete: Cascade)
+  author  Account? @relation("NoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([accountId, createdAt])
+  @@map("account_notes")
+}
+
+// Reachable profile of a member elsewhere
+model SocialLink {
+  id        String   @id @default(cuid())
+  accountId String
+  networkId String
+  handle    String
+  url       String?
+  createdAt DateTime @default(now())
+
+  account Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  network SocialNetwork @relation(fields: [networkId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, networkId])
+  @@map("social_links")
+}
+
+// Platform a social link points to
+model SocialNetwork {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  accent    String?
+  urlPrefix String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  links SocialLink[]
+
+  @@map("social_networks")
+}
+
+// Individual review held with a member
+model Pim {
+  id        String   @id @default(cuid())
+  accountId String
+  authorId  String?
+  heldAt    DateTime
+  sheet     String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account Account  @relation("PimSubject", fields: [accountId], references: [id], onDelete: Cascade)
+  author  Account? @relation("PimAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([accountId, heldAt])
+  @@map("pims")
+}
+
+// Course a junior must clear during the academy
+model Training {
+  id          String         @id @default(cuid())
+  name        String         @unique
+  summary     String?
+  period      AcademyPeriod?
+  mandatory   Boolean        @default(false)
+  functionId  String?
+  position    Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  jobFunction JobFunction? @relation(fields: [functionId], references: [id], onDelete: SetNull)
+  records     TrainingRecord[]
+
+  @@index([period])
+  @@map("trainings")
+}
+
+// Attendance of one member on one training
+model TrainingRecord {
+  id          String    @id @default(cuid())
+  trainingId  String
+  accountId   String
+  validatorId String?
+  completedAt DateTime?
+  note        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  training  Training @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+  account   Account  @relation("TrainingLearner", fields: [accountId], references: [id], onDelete: Cascade)
+  validator Account? @relation("TrainingValidator", fields: [validatorId], references: [id], onDelete: SetNull)
+
+  @@unique([trainingId, accountId])
+  @@map("training_records")
+}
+
+// Alert tier, lower level means tighter moderation
+model LiveconLevel {
+  id         String   @id @default(cuid())
+  level      Int      @unique
+  name       String
+  summary    String?
+  guidelines String?
+  accent     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  entries LiveconEntry[]
+
+  @@map("livecon_levels")
+}
+
+// Recorded switch to a livecon level
+model LiveconEntry {
+  id         String   @id @default(cuid())
+  levelId    String
+  youtuberId String?
+  actorId    String?
+  reason     String?
+  startedAt  DateTime @default(now())
+  endedAt    DateTime?
+
+  level    LiveconLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  youtuber Youtuber?    @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  actor    Account?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([youtuberId, startedAt])
+  @@index([endedAt])
+  @@map("livecon_entries")
+}
+
+// Trace of a fact worth keeping
+model ActivityLog {
+  id         String   @id @default(cuid())
+  eventType  Int
+  origin     Int      @default(0)
+  actorId    String?
+  subjectId  String?
+  targetType String?
+  targetId   String?
+  summary    String
+  payload    Json?
+  createdAt  DateTime @default(now())
+
+  actor   Account? @relation("LogActor", fields: [actorId], references: [id], onDelete: SetNull)
+  subject Account? @relation("LogSubject", fields: [subjectId], references: [id], onDelete: SetNull)
+
+  @@index([subjectId, createdAt])
+  @@index([targetType, targetId])
+  @@index([eventType])
+  @@map("activity_logs")
 }
 
 // Backing table of StorageManager, bucket comes from STORAGE_BUCKETS
@@ -22,4 +650,5 @@ model StorageEntry {
 
   @@unique([bucket, key])
   @@index([bucket])
+  @@map("storage_entries")
 }
