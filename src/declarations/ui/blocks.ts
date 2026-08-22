@@ -58,7 +58,7 @@ export const ACCOUNT_BLOCK = {
   trigger:
     'flex w-full items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-2 text-left transition-colors hover:bg-[var(--color-surface)]',
   name: 'truncate text-sm font-semibold',
-  meta: 'truncate text-xs text-[var(--color-ink-subtle)]',
+  meta: 'truncate font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-subtle)]',
 } as const
 
 /**

@@ -153,7 +153,6 @@ export const MemberFileTabs = ({
         <div className="flex flex-wrap items-start gap-4">
           <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
           <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <h2 className="text-xl font-extrabold tracking-tight">{summary.displayName}</h2>
             <span className="flex flex-wrap items-center gap-2">
               <RoleBadge member={summary} />
               <DivisionBadge division={summary.division} />

@@ -64,7 +64,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={detail.summary.displayName} lead={MEMBER_COPY.lead} />
+      <PageHeader eyebrow={detail.summary.discordId} title={detail.summary.displayName} />
       <MemberFileTabs
         detail={detail}
         memberFields={fields}

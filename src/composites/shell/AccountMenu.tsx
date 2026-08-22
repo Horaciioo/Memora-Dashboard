@@ -42,8 +42,8 @@ export const AccountMenu = () => {
           <div className="flex items-center gap-3">
             <Avatar name={session.displayName} src={session.avatarUrl} size="lg" />
             <div className="flex min-w-0 flex-col gap-1">
-              <p className={ACCOUNT_BLOCK.name}>{session.displayName}</p>
               <p className={ACCOUNT_BLOCK.meta}>{session.discordId}</p>
+              <p className={ACCOUNT_BLOCK.name}>{session.displayName}</p>
               <Badge label={role.label} tone="brand" dot />
             </div>
           </div>

@@ -23,6 +23,8 @@ export const SECTION_STYLES = {
 export const PAGE_STYLES = {
   wrapper: 'flex flex-col gap-8',
   header: 'flex flex-wrap items-start justify-between gap-4',
+  eyebrow:
+    'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-subtle)]',
   title: 'text-2xl font-extrabold tracking-tight sm:text-3xl',
   lead: 'max-w-2xl text-sm italic text-[var(--color-ink-rose)]',
   toolbar: 'flex flex-wrap items-center gap-2',
