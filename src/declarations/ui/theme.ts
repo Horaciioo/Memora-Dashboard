@@ -1,3 +1,5 @@
+import type { IconName } from '@/declarations/ui/icons'
+
 export type Tone = 'brand' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'
 
 /**
@@ -58,6 +60,20 @@ export const TONES: Record<Tone, ToneStyles> = {
     border: 'border-[var(--color-border-strong)]',
     dot: 'bg-[var(--color-ink-subtle)]',
   },
+}
+
+/**
+ * Icon per tone, read by the toaster and the overlay headers
+ * @type {Record<Tone, IconName>}
+ */
+
+export const TONE_ICON: Record<Tone, IconName> = {
+  brand: 'spark',
+  success: 'success',
+  warning: 'warning',
+  danger: 'failure',
+  info: 'info',
+  neutral: 'help',
 }
 
 /**

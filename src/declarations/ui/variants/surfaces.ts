@@ -8,7 +8,7 @@ export const SECTION_STYLES = {
   header: 'flex flex-wrap items-end justify-between gap-3',
   heading: 'flex flex-col gap-1',
   title: 'text-xl font-extrabold tracking-tight sm:text-2xl',
-  description: 'text-sm text-[var(--color-ink-subtle)]',
+  description: 'text-sm italic text-[var(--color-ink-rose)]',
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
   panel:
     'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
@@ -24,7 +24,7 @@ export const PAGE_STYLES = {
   wrapper: 'flex flex-col gap-8',
   header: 'flex flex-wrap items-start justify-between gap-4',
   title: 'text-2xl font-extrabold tracking-tight sm:text-3xl',
-  lead: 'max-w-2xl text-sm text-[var(--color-ink-subtle)]',
+  lead: 'max-w-2xl text-sm italic text-[var(--color-ink-rose)]',
   toolbar: 'flex flex-wrap items-center gap-2',
 } as const
 
