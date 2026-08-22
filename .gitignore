@@ -17,9 +17,8 @@ next-env.d.ts
 build
 dist
 
-# env
+# env, never tracked
 .env*
-!.env.example
 
 # misc
 .DS_Store
