@@ -1,0 +1,46 @@
+{
+  "name": "template-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate": "yarn type-check && yarn lint && yarn build",
+    "db:generate": "prisma generate",
+    "db:validate": "prisma validate"
+  },
+  "dependencies": {
+    "@logtail/node": "^0.5.8",
+    "@prisma/client": "^7.9.1",
+    "@sentry/nextjs": "^10.70.0",
+    "bullmq": "^6.1.2",
+    "clsx": "^2.1.1",
+    "ioredis": "^6.0.0",
+    "lucide-react": "^1.33.0",
+    "moment": "^2.30.1",
+    "next": "16.3.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1",
+    "winston": "^3.19.0",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.0",
+    "prettier": "^3.9.6",
+    "prisma": "^7.9.1",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "packageManager": "yarn@4.17.1"
+}

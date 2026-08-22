@@ -1,0 +1,8 @@
+{
+  "enabled": false,
+  "intervalMs": 60000,
+  "timeoutMs": 5000,
+  "degradedMs": 1000,
+  "endpoint": null,
+  "probes": []
+}
