@@ -1,0 +1,32 @@
+# dependencies
+node_modules
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# next.js
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+
+# build
+build
+dist
+
+# env
+.env*
+!.env.example
+
+# misc
+.DS_Store
+*.log
+
+# editor
+.idea
+
+# claude code, machine-local permissions
+.claude/settings.local.json

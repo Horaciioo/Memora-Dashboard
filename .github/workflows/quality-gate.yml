@@ -1,0 +1,65 @@
+name: Quality Gate
+
+# Guards the dev -> staging -> release -> main promotion circuit
+on:
+  workflow_dispatch:
+  push:
+    branches: [dev, staging, release, main]
+  pull_request:
+    branches: [staging, release, main]
+
+concurrency:
+  group: quality-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  quality:
+    name: Lint, types, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # Placeholder, satisfies the Prisma datasource
+      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder?schema=public
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      # Readers fall back silently, CI must not
+      - name: Validate configuration JSON
+        run: find src/configurations -name '*.json' -exec jq empty {} +
+
+      - name: Validate Prisma schema
+        run: yarn db:validate
+
+      # Type-check and build need the client
+      - name: Generate Prisma Client
+        run: yarn db:generate
+
+      - name: Check formatting
+        run: yarn format:check
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Type-check
+        run: yarn type-check
+
+      - name: Build application
+        run: yarn build

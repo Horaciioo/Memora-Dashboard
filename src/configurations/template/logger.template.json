@@ -1,0 +1,7 @@
+{
+  "level": "${LOGGER_LEVEL}",
+  "console": "${LOGGER_CONSOLE}",
+  "file": "${LOGGER_FILE}",
+  "directory": "${LOGGER_DIRECTORY}",
+  "telemetry": "${LOGGER_TELEMETRY}"
+}

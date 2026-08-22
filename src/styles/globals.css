@@ -1,0 +1,112 @@
+@import 'tailwindcss';
+
+:root {
+  --color-background: #f7f8fa;
+  --color-ink: #12131a;
+  --color-ink-subtle: #5b5f6c;
+  --color-surface: #eef0f4;
+  --color-surface-raised: #ffffff;
+  --color-border: #dfe2e8;
+
+  /* Placeholder brand scale, swap per project */
+  --color-brand-100: #e4e9fb;
+  --color-brand-600: #3346b0;
+
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  --motion-duration-moderate: 1400ms;
+}
+
+/*
+ * The .dark class on <html> is the single source of truth — set by ThemeManager
+ * (src/managers/front-end/ThemeManager.tsx) and, before paint, by ThemeScript. Both
+ * already resolve "system" via matchMedia, so no separate prefers-color-scheme
+ * fallback is needed here.
+ */
+:root.dark {
+  --color-background: #0e0f13;
+  --color-ink: #f2f3f6;
+  --color-ink-subtle: #9297a6;
+  --color-surface: #191b22;
+  --color-surface-raised: #22242d;
+  --color-border: #2d303b;
+
+  --color-brand-100: #1c2440;
+  --color-brand-600: #6b83e8;
+}
+
+/* Text size preference — set by AppearanceManager (src/managers/front-end/AppearanceManager.tsx) */
+:root[data-font-scale='sm'] {
+  font-size: 14px;
+}
+
+:root[data-font-scale='lg'] {
+  font-size: 18px;
+}
+
+body {
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--color-surface-raised), transparent);
+  /* functional: shimmer signals loading is still advancing */
+  animation: skeleton-shimmer-sweep var(--motion-duration-moderate) linear infinite;
+}
+
+@keyframes skeleton-shimmer-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after {
+    animation: none;
+  }
+}
+
+/* Color vision simulation — set by ColorVisionManager (src/managers/front-end/ColorVisionManager.tsx) */
+html[data-color-vision='protanopia'] {
+  filter: url(#protanopia-filter);
+}
+
+html[data-color-vision='deuteranopia'] {
+  filter: url(#deuteranopia-filter);
+}
+
+html[data-color-vision='tritanopia'] {
+  filter: url(#tritanopia-filter);
+}
+
+.floating-hint-bubble {
+  animation: floating-hint-rise 180ms ease-out;
+}
+
+@keyframes floating-hint-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -85%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
+}
