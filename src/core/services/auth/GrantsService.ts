@@ -137,3 +137,40 @@ export const readRoleGrants = async (): Promise<Record<MemberRoleName, Permissio
 
   return grants
 }
+
+/**
+ * Function paired with the permissions it carries
+ * @typedef {Object} FunctionGrants
+ * @property {string} id - Function identifier
+ * @property {string} name - Function name
+ * @property {string} kind - Primary or secondary
+ * @property {PermissionName[]} permissions - Permissions carried
+ */
+
+export interface FunctionGrants {
+  id: string
+  name: string
+  kind: string
+  permissions: PermissionName[]
+}
+
+/**
+ * Read the grants of every function
+ * @return {Promise<FunctionGrants[]>} - Grants per function
+ */
+
+export const readFunctionGrants = async (): Promise<FunctionGrants[]> => {
+  const rows = await prisma.jobFunction.findMany({
+    include: { permissions: true },
+    orderBy: [{ kind: 'asc' }, { position: 'asc' }],
+  })
+
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    kind: row.kind,
+    permissions: row.permissions
+      .map((grant) => grant.permission)
+      .filter(isPermissionName),
+  }))
+}
