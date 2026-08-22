@@ -155,4 +155,5 @@ export const SEGMENT_LABELS: Record<string, string> = {
   moderation: 'Modération',
   sanctions: 'Panel de sanctions',
   configuration: 'Configuration',
+  acces: 'Accès',
 }
