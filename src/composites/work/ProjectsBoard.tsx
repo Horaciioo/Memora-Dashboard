@@ -116,6 +116,7 @@ export const ProjectsBoard = ({
       initialCards={initialProjects}
       columns={columns}
       fields={fields}
+      columnField="stateId"
       copy={PROJECT_COPY}
       figure="projects"
       tableColumns={tableColumns}
@@ -125,18 +126,21 @@ export const ProjectsBoard = ({
           label: BOARD_FILTER_COPY.youtuber,
           allLabel: BOARD_FILTER_COPY.allYoutubers,
           options: youtubers,
+          mark: 'avatar',
         },
         {
           name: 'priority',
           label: BOARD_FILTER_COPY.priority,
           allLabel: BOARD_FILTER_COPY.allPriorities,
           options: priorities,
+          mark: 'priority',
         },
         {
           name: 'platform',
           label: BOARD_FILTER_COPY.platform,
           allLabel: BOARD_FILTER_COPY.allPlatforms,
           options: platforms,
+          mark: 'avatar',
         },
       ]}
       matches={(project, search, filters) => {

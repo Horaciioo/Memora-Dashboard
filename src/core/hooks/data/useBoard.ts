@@ -5,7 +5,8 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
-import { FEEDBACK_COPY } from '@/declarations/ui/copy'
+import { feedbackTitle } from '@/declarations/ui/copy'
+import { BOARD_ENTITY_COPY } from '@/declarations/work/copy'
 import type { BoardItem } from '@/components/structures/KanbanBoard'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { WorkflowScopeName } from '@/utils/constants/workflow'
@@ -51,49 +52,64 @@ export interface BoardCollection<T extends BoardItem> {
  * @param {WorkflowScopeName} scope - Board scope
  * @param {BoardEndpoints} endpoints - Paths of the resource
  * @param {T[]} initialCards - Cards resolved server-side
+ * @param {(card: T) => string} labelOf - Display label of a card
  * @return {BoardCollection<T>} - State and mutations
  */
 
 export const useBoard = <T extends BoardItem>(
   scope: WorkflowScopeName,
   endpoints: BoardEndpoints,
-  initialCards: T[]
+  initialCards: T[],
+  labelOf: (card: T) => string
 ): BoardCollection<T> => {
   const [cards, setCards] = useState(initialCards)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
+  // Toast entity label
+  const { label: entity, gender } = BOARD_ENTITY_COPY[scope]
+
   const create = useCallback(
     async (values: FormValues) => {
-      const card = await run(() => apiPost<T>(endpoints.collection, values), FEEDBACK_COPY.created)
+      const name = typeof values.title === 'string' ? values.title : undefined
+      const card = await run(
+        () => apiPost<T>(endpoints.collection, values),
+        feedbackTitle(entity, 'created', gender, name)
+      )
 
       if (card) setCards((current) => [...current, card])
 
       return card !== null
     },
-    [endpoints, run]
+    [endpoints, run, entity, gender]
   )
 
   const update = useCallback(
     async (id: string, values: FormValues) => {
-      const card = await run(() => apiPatch<T>(endpoints.item(id), values), FEEDBACK_COPY.saved)
+      const name = typeof values.title === 'string' ? values.title : undefined
+      const card = await run(
+        () => apiPatch<T>(endpoints.item(id), values),
+        feedbackTitle(entity, 'saved', gender, name)
+      )
 
       if (card) setCards((current) => current.map((entry) => (entry.id === id ? card : entry)))
 
       return card !== null
     },
-    [endpoints, run]
+    [endpoints, run, entity, gender]
   )
 
   const remove = useCallback(
     async (id: string) => {
+      const found = cards.find((card) => card.id === id)
+      const name = found ? labelOf(found) : undefined
       const done = await run(
         () => apiDelete<{ id: string }>(endpoints.item(id)),
-        FEEDBACK_COPY.deleted
+        feedbackTitle(entity, 'deleted', gender, name)
       )
 
       if (done) setCards((current) => current.filter((entry) => entry.id !== id))
     },
-    [endpoints, run]
+    [endpoints, run, entity, gender, cards, labelOf]
   )
 
   const move = useCallback(

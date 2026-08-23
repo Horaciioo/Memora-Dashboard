@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/elements/display/Badge'
+import { AddRow } from '@/components/structures/AddRow'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
 import { toTone } from '@/declarations/ui/theme'
@@ -14,12 +15,14 @@ import { cn } from '@/utils/classnames'
  * @property {string} id - Column identifier
  * @property {string} label - Column label
  * @property {string | null} accent - Colour token
+ * @property {boolean} isTerminal - Closes the flow, its cards no longer count as content
  */
 
 export interface BoardColumn {
   id: string
   label: string
   accent: string | null
+  isTerminal: boolean
 }
 
 /**
@@ -41,20 +44,24 @@ export interface KanbanBoardProps<T extends BoardItem> {
   onMove: (itemId: string, columnId: string, index: number) => void
   onOpen?: (item: T) => void
   cardMenu?: (item: T) => MenuItem[]
-  emptyColumn: string
+  addLabel: string
+  canCreate: boolean
+  onCreate: (columnId: string) => void
   canMove: boolean
 }
 
 /**
  * Column board whose cards move between columns by dragging, each card answering the
- * right click menu it was given
+ * right click menu it was given, each column closed by its own creation row
  * @param {BoardColumn[]} columns - Columns in display order
  * @param {T[]} items - Cards, grouped by their columnId
  * @param {(item: T) => ReactNode} renderCard - Card renderer
  * @param {(itemId: string, columnId: string, index: number) => void} onMove - Drop handler
  * @param {(item: T) => void} [onOpen] - Called on click and on Enter
  * @param {(item: T) => MenuItem[]} [cardMenu] - Entries of the right click menu
- * @param {string} emptyColumn - Line shown inside an empty column
+ * @param {string} addLabel - Label of the creation row
+ * @param {boolean} canCreate - Member may add a card
+ * @param {(columnId: string) => void} onCreate - Called with the column the row sits under
  * @param {boolean} canMove - Member may drag cards
  * @return {JSX.Element}
  */
@@ -66,7 +73,9 @@ export const KanbanBoard = <T extends BoardItem>({
   onMove,
   onOpen,
   cardMenu,
-  emptyColumn,
+  addLabel,
+  canCreate,
+  onCreate,
   canMove,
 }: KanbanBoardProps<T>) => {
   const { contextMenu } = useMenu()
@@ -92,11 +101,6 @@ export const KanbanBoard = <T extends BoardItem>({
               className={cn(BOARD_STYLES.body, over === column.id && 'is-drop-target')}
               {...(canMove ? containerProps(column.id) : {})}
             >
-              {cards.length === 0 && (
-                <p className="px-2 py-6 text-center text-xs text-[var(--color-ink-subtle)] italic">
-                  {emptyColumn}
-                </p>
-              )}
               {cards.map((item, index) => (
                 <article
                   key={item.id}
@@ -117,6 +121,7 @@ export const KanbanBoard = <T extends BoardItem>({
                   {renderCard(item)}
                 </article>
               ))}
+              {canCreate && <AddRow label={addLabel} onClick={() => onCreate(column.id)} />}
             </div>
           </section>
         )

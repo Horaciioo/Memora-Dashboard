@@ -1,11 +1,13 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { BoardColumn } from '@/components/structures/KanbanBoard'
 import type { FieldOption } from '@/types/forms'
 import type { WorkPerson, WorkTag } from '@/types/work'
-import { MemberStatuses } from '@/utils/constants/hierarchy'
+import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { WorkflowScopeName } from '@/utils/constants/workflow'
 
 /**
@@ -66,7 +68,12 @@ export const boardColumns = async (scope: WorkflowScopeName): Promise<BoardColum
     orderBy: { position: 'asc' },
   })
 
-  return rows.map((row) => ({ id: row.id, label: row.name, accent: row.accent }))
+  return rows.map((row) => ({
+    id: row.id,
+    label: row.name,
+    accent: row.accent,
+    isTerminal: row.isTerminal,
+  }))
 }
 
 /**
@@ -107,9 +114,37 @@ export const memberOptions = async (): Promise<FieldOption[]> => {
   const rows = await prisma.account.findMany({
     where: { status: { not: MemberStatuses.Left } },
     orderBy: { displayName: 'asc' },
+    include: { _count: { select: { absences: { where: activeAbsenceFilter() } } } },
   })
 
-  return rows.map((row) => ({ value: row.id, label: row.displayName }))
+  return rows.map((row) => {
+    const isAbsent = row._count.absences > 0
+
+    return {
+      value: row.id,
+      label: row.displayName,
+      image: row.avatarUrl,
+      disabled: isAbsent,
+      hint: isAbsent ? MEMBER_COPY.absentHint.replace('{name}', row.displayName) : undefined,
+    }
+  })
+}
+
+/**
+ * Read the moderators allowed to lead a team, responsables and admins only
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+export const leadOptions = async (): Promise<FieldOption[]> => {
+  const rows = await prisma.account.findMany({
+    where: {
+      status: { not: MemberStatuses.Left },
+      role: { in: [MemberRoles.Admin, MemberRoles.Responsable] },
+    },
+    orderBy: { displayName: 'asc' },
+  })
+
+  return rows.map((row) => ({ value: row.id, label: row.displayName, image: row.avatarUrl }))
 }
 
 /**
@@ -123,7 +158,12 @@ export const youtuberOptions = async (): Promise<FieldOption[]> => {
     orderBy: { position: 'asc' },
   })
 
-  return rows.map((row) => ({ value: row.id, label: row.name, accent: row.accent ?? undefined }))
+  return rows.map((row) => ({
+    value: row.id,
+    label: row.name,
+    accent: row.accent ?? undefined,
+    image: row.avatarUrl,
+  }))
 }
 
 /**
@@ -137,7 +177,12 @@ export const platformOptions = async (): Promise<FieldOption[]> => {
     orderBy: { position: 'asc' },
   })
 
-  return rows.map((row) => ({ value: row.id, label: row.name, accent: row.accent ?? undefined }))
+  return rows.map((row) => ({
+    value: row.id,
+    label: row.name,
+    accent: row.accent ?? undefined,
+    image: row.avatarUrl,
+  }))
 }
 
 /**

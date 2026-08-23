@@ -27,8 +27,7 @@ import type { WorkflowScopeName } from '@/utils/constants/workflow'
  * @property {string} lead - Section description
  * @property {string} add - Label of the creation gesture
  * @property {string} emptyTitle - Empty state headline
- * @property {string} emptyDescription - Empty state supporting line
- * @property {string} emptyColumn - Line shown inside an empty column
+ * @property {string} [emptyDescription] - Empty state supporting line
  * @property {string} filterTitle - Filtered empty headline
  * @property {string} filterDescription - Filtered empty supporting line
  * @property {string} deleteTitle - Confirmation headline
@@ -41,8 +40,7 @@ export interface BoardCopy {
   lead: string
   add: string
   emptyTitle: string
-  emptyDescription: string
-  emptyColumn: string
+  emptyDescription?: string
   filterTitle: string
   filterDescription: string
   deleteTitle: string
@@ -56,6 +54,7 @@ export interface WorkBoardProps<T extends BoardItem> {
   initialCards: T[]
   columns: BoardColumn[]
   fields: FieldDefinition[]
+  columnField: string
   copy: BoardCopy
   figure: IllustrationName
   renderCard: (card: T) => ReactNode
@@ -85,6 +84,7 @@ const VIEWS = [
  * @param {T[]} initialCards - Cards resolved server-side
  * @param {BoardColumn[]} columns - Columns in display order
  * @param {FieldDefinition[]} fields - Field declarations of the form
+ * @param {string} columnField - Field carrying the column on the form
  * @param {BoardCopy} copy - Copy of the surface
  * @param {IllustrationName} figure - Empty state figure
  * @param {(card: T) => ReactNode} renderCard - Card renderer
@@ -107,6 +107,7 @@ export const WorkBoard = <T extends BoardItem>({
   initialCards,
   columns,
   fields,
+  columnField,
   copy,
   figure,
   renderCard,
@@ -121,11 +122,12 @@ export const WorkBoard = <T extends BoardItem>({
   canUpdate,
   canDelete,
 }: WorkBoardProps<T>) => {
-  const board = useBoard<T>(scope, endpoints, initialCards)
+  const board = useBoard<T>(scope, endpoints, initialCards, labelOf)
   const [view, setView] = useState<'board' | 'list'>('board')
   const [search, setSearch] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
   const [isCreating, setCreating] = useState(false)
+  const [createColumn, setCreateColumn] = useState<string | null>(null)
   const [editing, setEditing] = useState<T | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<T | null>(null)
 
@@ -137,8 +139,16 @@ export const WorkBoard = <T extends BoardItem>({
     [board.cards, search, filterValues, matches]
   )
 
-  const openCreate = () => {
+  // A card resting in a terminal column is finished work, not content the board carries
+  const hasContent = useMemo(() => {
+    const terminal = new Set(columns.filter((column) => column.isTerminal).map(({ id }) => id))
+
+    return board.cards.some((card) => !terminal.has(card.columnId ?? ''))
+  }, [board.cards, columns])
+
+  const openCreate = (columnId?: string) => {
     board.clearIssues()
+    setCreateColumn(columnId ?? null)
     setCreating(true)
   }
 
@@ -180,6 +190,10 @@ export const WorkBoard = <T extends BoardItem>({
     },
   ]
 
+  // The drawn figure and the dashed creation rows are alternatives, never both at once
+  const showEmptyState =
+    columns.length === 0 || (isFiltered ? visibleCards.length === 0 : !hasContent)
+
   const emptyState = isFiltered
     ? {
         variant: 'filter' as const,
@@ -197,7 +211,7 @@ export const WorkBoard = <T extends BoardItem>({
             variant="primary"
             icon="add"
             disabled={!canCreate || columns.length === 0}
-            onClick={openCreate}
+            onClick={() => openCreate()}
           >
             {copy.add}
           </Button>
@@ -225,7 +239,7 @@ export const WorkBoard = <T extends BoardItem>({
             />
           }
         />
-        {visibleCards.length === 0 ? (
+        {showEmptyState ? (
           <EmptyState {...emptyState} />
         ) : view === 'board' ? (
           <KanbanBoard
@@ -235,7 +249,9 @@ export const WorkBoard = <T extends BoardItem>({
             onMove={board.move}
             onOpen={onOpen}
             cardMenu={cardMenu}
-            emptyColumn={copy.emptyColumn}
+            addLabel={copy.add}
+            canCreate={canCreate}
+            onCreate={openCreate}
             canMove={canUpdate}
           />
         ) : (
@@ -247,13 +263,17 @@ export const WorkBoard = <T extends BoardItem>({
             rowMenu={cardMenu}
           />
         )}
-        {visibleCards.length > 0 && canCreate && <AddRow label={copy.add} onClick={openCreate} />}
+        {view === 'list' && visibleCards.length > 0 && canCreate && (
+          <AddRow label={copy.add} onClick={() => openCreate()} />
+        )}
       </Section>
 
       <FormDialog
         open={isCreating}
         title={copy.add}
+        icon="add"
         fields={fields}
+        initialValues={createColumn ? { [columnField]: createColumn } : undefined}
         issues={board.issues}
         isSaving={board.isSaving}
         size="lg"

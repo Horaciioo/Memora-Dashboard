@@ -15,6 +15,7 @@ import {
   youtuberOptions,
 } from '@/core/services/work/shared'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { PROJECT_COPY, PROJECT_FIELD_COPY } from '@/declarations/work/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { CommunicationEntry, ProjectDetail, ProjectSummary } from '@/types/work'
@@ -92,49 +93,23 @@ export const projectFields = async (): Promise<FieldDefinition[]> => {
       label: PROJECT_FIELD_COPY.title,
       required: true,
       maxLength: FORM_SETTINGS.titleMaxLength,
-    },
-    {
-      name: 'youtuberId',
-      kind: 'select',
-      label: PROJECT_FIELD_COPY.youtuber,
-      options: youtubers,
-      span: 'half',
-    },
-    {
-      name: 'stateId',
-      kind: 'select',
-      label: PROJECT_FIELD_COPY.state,
-      options: states,
-      span: 'half',
-    },
-    {
-      name: 'priorityId',
-      kind: 'select',
-      label: PROJECT_FIELD_COPY.priority,
-      options: priorities,
-      span: 'half',
-    },
-    {
-      name: 'platformId',
-      kind: 'select',
-      label: PROJECT_FIELD_COPY.platform,
-      hint: PROJECT_FIELD_COPY.platformHint,
-      options: platforms,
-      span: 'half',
-    },
-    { name: 'deadline', kind: 'date', label: PROJECT_FIELD_COPY.deadline, span: 'half' },
-    {
-      name: 'leadId',
-      kind: 'select',
-      label: PROJECT_FIELD_COPY.lead,
-      options: members,
-      span: 'half',
+      group: FORM_GROUPS.essentials,
     },
     {
       name: 'description',
       kind: 'textarea',
       label: PROJECT_FIELD_COPY.description,
       maxLength: FORM_SETTINGS.longTextMaxLength,
+      group: FORM_GROUPS.essentials,
+    },
+    {
+      name: 'leadId',
+      kind: 'select',
+      label: PROJECT_FIELD_COPY.lead,
+      options: members,
+      mark: 'avatar',
+      span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'assistantIds',
@@ -142,6 +117,52 @@ export const projectFields = async (): Promise<FieldDefinition[]> => {
       label: PROJECT_FIELD_COPY.assistants,
       placeholder: PROJECT_FIELD_COPY.assistantsEmpty,
       options: members,
+      mark: 'avatar',
+      span: 'half',
+      group: FORM_GROUPS.assignment,
+    },
+    {
+      name: 'youtuberId',
+      kind: 'select',
+      label: PROJECT_FIELD_COPY.youtuber,
+      options: youtubers,
+      mark: 'avatar',
+      span: 'half',
+      group: FORM_GROUPS.assignment,
+    },
+    {
+      name: 'stateId',
+      kind: 'select',
+      label: PROJECT_FIELD_COPY.state,
+      options: states,
+      mark: 'dot',
+      span: 'half',
+      group: FORM_GROUPS.details,
+    },
+    {
+      name: 'priorityId',
+      kind: 'select',
+      label: PROJECT_FIELD_COPY.priority,
+      options: priorities,
+      mark: 'priority',
+      span: 'half',
+      group: FORM_GROUPS.details,
+    },
+    {
+      name: 'platformId',
+      kind: 'select',
+      label: PROJECT_FIELD_COPY.platform,
+      options: platforms,
+      mark: 'avatar',
+      span: 'half',
+      group: FORM_GROUPS.details,
+    },
+    {
+      name: 'deadline',
+      kind: 'date',
+      label: PROJECT_FIELD_COPY.deadline,
+      span: 'half',
+      group: FORM_GROUPS.details,
     },
   ]
 }

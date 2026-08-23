@@ -14,6 +14,7 @@ import {
   youtuberOptions,
 } from '@/core/services/work/shared'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { TASK_FIELD_COPY } from '@/declarations/work/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { TaskSummary } from '@/types/work'
@@ -82,35 +83,23 @@ export const taskFields = async (): Promise<FieldDefinition[]> => {
       label: TASK_FIELD_COPY.title,
       required: true,
       maxLength: FORM_SETTINGS.titleMaxLength,
+      group: FORM_GROUPS.essentials,
     },
-    { name: 'dueDate', kind: 'date', label: TASK_FIELD_COPY.dueDate, span: 'half' },
+    {
+      name: 'description',
+      kind: 'textarea',
+      label: TASK_FIELD_COPY.description,
+      maxLength: FORM_SETTINGS.longTextMaxLength,
+      group: FORM_GROUPS.essentials,
+    },
     {
       name: 'ownerId',
       kind: 'select',
       label: TASK_FIELD_COPY.owner,
       options: members,
+      mark: 'avatar',
       span: 'half',
-    },
-    {
-      name: 'stateId',
-      kind: 'select',
-      label: TASK_FIELD_COPY.state,
-      options: states,
-      span: 'half',
-    },
-    {
-      name: 'priorityId',
-      kind: 'select',
-      label: TASK_FIELD_COPY.priority,
-      options: priorities,
-      span: 'half',
-    },
-    {
-      name: 'youtuberId',
-      kind: 'select',
-      label: TASK_FIELD_COPY.youtuber,
-      options: youtubers,
-      span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'projectId',
@@ -118,12 +107,41 @@ export const taskFields = async (): Promise<FieldDefinition[]> => {
       label: TASK_FIELD_COPY.project,
       options: projects,
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
-      name: 'description',
-      kind: 'textarea',
-      label: TASK_FIELD_COPY.description,
-      maxLength: FORM_SETTINGS.longTextMaxLength,
+      name: 'youtuberId',
+      kind: 'select',
+      label: TASK_FIELD_COPY.youtuber,
+      options: youtubers,
+      mark: 'avatar',
+      span: 'half',
+      group: FORM_GROUPS.assignment,
+    },
+    {
+      name: 'stateId',
+      kind: 'select',
+      label: TASK_FIELD_COPY.state,
+      options: states,
+      mark: 'dot',
+      span: 'half',
+      group: FORM_GROUPS.details,
+    },
+    {
+      name: 'priorityId',
+      kind: 'select',
+      label: TASK_FIELD_COPY.priority,
+      options: priorities,
+      mark: 'priority',
+      span: 'half',
+      group: FORM_GROUPS.details,
+    },
+    {
+      name: 'dueDate',
+      kind: 'date',
+      label: TASK_FIELD_COPY.dueDate,
+      span: 'half',
+      group: FORM_GROUPS.details,
     },
   ]
 }
