@@ -23,6 +23,7 @@ export const ROUTES = {
   livecon: '/livecon',
   calendar: '/calendrier',
   academy: '/academy',
+  glossary: '/academy/lexique',
   session: (id: string) => `/academy/${id}`,
   junior: (sessionId: string, juniorId: string) => `/academy/${sessionId}/${juniorId}`,
   sanctions: '/moderation/sanctions',
@@ -148,6 +149,12 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'academy',
         permission: Permissions.AcademyRead,
       },
+      {
+        href: ROUTES.glossary,
+        label: 'Lexique',
+        icon: 'glossary',
+        permission: Permissions.AcademyRead,
+      },
     ],
   },
   {
@@ -203,6 +210,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   livecon: 'Livecon',
   calendrier: 'Calendrier',
   academy: 'Marsha Academy',
+  lexique: 'Lexique',
   moderation: 'Modération',
   sanctions: 'Panel de sanctions',
   parametres: 'Paramètres',
