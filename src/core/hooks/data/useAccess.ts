@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react'
 import { apiPut } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
-import { FEEDBACK_COPY } from '@/declarations/ui/copy'
+import { feedbackTitle } from '@/declarations/ui/copy'
 import type { AccessMatrix } from '@/types/access'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import type { PermissionName } from '@/utils/constants/permissions'
@@ -42,7 +42,7 @@ export const useAccess = (initialMatrix: AccessMatrix): AccessCollection => {
     async (payload: Record<string, unknown>) => {
       const next = await run(
         () => apiPut<AccessMatrix>(API_ROUTES.access, payload),
-        FEEDBACK_COPY.saved
+        feedbackTitle('Permissions', 'saved', 'feminine', undefined, true)
       )
 
       if (next) setMatrix(next)

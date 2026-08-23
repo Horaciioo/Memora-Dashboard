@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react'
 
 import { ApiClientError, messageOf } from '@/core/lib/api/client'
 import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
+import type { FeedbackTitle } from '@/declarations/ui/copy'
 import type { FieldIssue } from '@/types/forms'
 
 /**
@@ -12,14 +13,14 @@ import type { FieldIssue } from '@/types/forms'
  * @property {boolean} isSaving - Request in flight
  * @property {FieldIssue[]} issues - Field rejections of the last attempt
  * @property {() => void} clearIssues - Forget the rejections
- * @property {(action: () => Promise<T>, successTitle?: string) => Promise<T | null>} run - Run one mutation
+ * @property {(action: () => Promise<T>, successTitle?: string | FeedbackTitle) => Promise<T | null>} run - Run one mutation
  */
 
 export interface MutationState {
   isSaving: boolean
   issues: FieldIssue[]
   clearIssues: () => void
-  run: <T>(action: () => Promise<T>, successTitle?: string) => Promise<T | null>
+  run: <T>(action: () => Promise<T>, successTitle?: string | FeedbackTitle) => Promise<T | null>
 }
 
 /**
@@ -35,13 +36,22 @@ export const useMutation = (): MutationState => {
   const clearIssues = useCallback(() => setIssues([]), [])
 
   const run = useCallback(
-    async <T>(action: () => Promise<T>, successTitle?: string): Promise<T | null> => {
+    async <T>(
+      action: () => Promise<T>,
+      successTitle?: string | FeedbackTitle
+    ): Promise<T | null> => {
       setSaving(true)
       setIssues([])
 
       try {
         const result = await action()
-        if (successTitle) notify({ tone: 'success', title: successTitle })
+        if (successTitle) {
+          notify(
+            typeof successTitle === 'string'
+              ? { tone: 'success', title: successTitle }
+              : { tone: 'success', title: successTitle.title, emphasis: successTitle.emphasis }
+          )
+        }
 
         return result
       } catch (error) {

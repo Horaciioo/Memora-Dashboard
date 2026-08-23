@@ -8,6 +8,26 @@ import { ICONS } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
 
 /**
+ * Toast title, its emphasis substring rendered bold
+ * @param {string} title - Full sentence
+ * @param {string} [emphasis] - Substring rendered bold
+ * @return {JSX.Element}
+ */
+
+const ToastTitle = ({ title, emphasis }: { title: string; emphasis?: string }) => {
+  const index = emphasis ? title.indexOf(emphasis) : -1
+  if (!emphasis || index === -1) return <>{title}</>
+
+  return (
+    <>
+      {title.slice(0, index)}
+      <strong>{emphasis}</strong>
+      {title.slice(index + emphasis.length)}
+    </>
+  )
+}
+
+/**
  * Renders the active toast stack, top right, one tone glyph per notification
  * @return {JSX.Element}
  */
@@ -33,7 +53,9 @@ export const NotificationsToaster = () => {
               <ToneIcon className={TOAST_STYLES.glyph} aria-hidden="true" />
             </span>
             <div className={TOAST_STYLES.body}>
-              <p className={TOAST_STYLES.title}>{notification.title}</p>
+              <p className={TOAST_STYLES.title}>
+                <ToastTitle title={notification.title} emphasis={notification.emphasis} />
+              </p>
               {notification.description && (
                 <p className={TOAST_STYLES.description}>{notification.description}</p>
               )}
