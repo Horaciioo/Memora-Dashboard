@@ -16,13 +16,19 @@ export const PATCH = createProtectedRoute({
   fields: REVIEW_FIELDS,
   partial: true,
   descriptor: { summary: 'Settle an absence request', tags: ['absences'] },
-  handler: async ({ params, raw, body, session }) => {
+  handler: async ({ params, raw, body, session, access }) => {
     const status = String(raw.status ?? '')
     if (!ABSENCE_STATUS_REGISTRY.has(status)) {
       throw invalidInput([{ field: 'status', message: FORM_COPY.notAnOption }])
     }
 
-    const absence = await reviewAbsence(params.id, status as AbsenceStatusName, session.id, body)
+    const absence = await reviewAbsence(
+      params.id,
+      status as AbsenceStatusName,
+      session.id,
+      access.isAdmin,
+      body
+    )
 
     await recordEvent({
       eventType: 'AbsenceReviewed',
@@ -40,7 +46,12 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   descriptor: { summary: 'Withdraw an absence request', tags: ['absences'] },
   handler: async ({ params, session, access }) => {
-    await removeAbsence(params.id, session.id, access.can(Permissions.AbsenceReview))
+    await removeAbsence(
+      params.id,
+      session.id,
+      access.isAdmin,
+      access.can(Permissions.AbsenceReview)
+    )
 
     return { id: params.id }
   },

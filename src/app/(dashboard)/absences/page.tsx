@@ -4,8 +4,8 @@ import { AbsencesPanel } from '@/composites/absences/AbsencesPanel'
 import {
   ABSENCE_FIELDS,
   REVIEW_FIELDS,
-  listAbsences,
   listOwnAbsences,
+  listReviewQueue,
 } from '@/core/services/absences/AbsenceService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { ABSENCE_COPY } from '@/declarations/absences/copy'
@@ -22,24 +22,32 @@ export const metadata: Metadata = { title: ABSENCE_COPY.title }
 
 export default async function AbsencesPage() {
   const { session, access } = await requireUser()
-  const canReadAll = access.can(Permissions.AbsenceRead)
-  const absences = canReadAll ? await listAbsences() : await listOwnAbsences(session.id)
+  const canReview = access.can(Permissions.AbsenceReview)
+  const canReadQueue = access.can(Permissions.AbsenceRead)
+
+  const [mine, queue] = await Promise.all([
+    listOwnAbsences(session.id),
+    canReadQueue ? listReviewQueue(session.id, access.isAdmin) : Promise.resolve([]),
+  ])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader
         title={ABSENCE_COPY.title}
-        lead={ABSENCE_COPY.lead.replace('{threshold}', String(ABSENCE_SETTINGS.thresholdDays))}
+        lead={ABSENCE_COPY.underThresholdNotice.replace(
+          '{threshold}',
+          String(ABSENCE_SETTINGS.thresholdDays)
+        )}
       />
       <AbsencesPanel
-        initialAbsences={absences}
+        mine={mine}
+        queue={queue}
         fields={ABSENCE_FIELDS}
         reviewFields={REVIEW_FIELDS}
         currentAccountId={session.id}
         thresholdDays={ABSENCE_SETTINGS.thresholdDays}
         canCreate={access.can(Permissions.AbsenceCreate)}
-        canReadAll={canReadAll}
-        canReview={access.can(Permissions.AbsenceReview)}
+        canReview={canReview}
       />
     </div>
   )
