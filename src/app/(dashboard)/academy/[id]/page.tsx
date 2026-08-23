@@ -4,7 +4,7 @@ import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { SessionPanel } from '@/composites/academy/SessionPanel'
 import {
-  eventFields,
+  stepFields,
   juniorCandidates,
   juniorFields,
   readSession,
@@ -56,9 +56,9 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
   const detail = await readSession(id).catch(() => null)
   if (!detail) notFound()
 
-  const [juniors, events, candidates] = await Promise.all([
+  const [juniors, steps, candidates] = await Promise.all([
     juniorFields(id),
-    eventFields(id),
+    stepFields(id),
     juniorCandidates(id),
   ])
 
@@ -77,7 +77,7 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
       <SessionPanel
         detail={detail}
         juniorFields={juniors}
-        eventFields={events}
+        stepFields={steps}
         hasCandidates={candidates.length > 0}
         canManage={access.can(Permissions.AcademyManage)}
       />

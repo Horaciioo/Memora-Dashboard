@@ -55,8 +55,8 @@ enum AcademyJuniorStatus {
   STOPPED
 }
 
-// Kind of moment recorded on the session thread
-enum AcademyEventKind {
+// Kind of step recorded on the session timeline
+enum AcademyStepKind {
   FORMATION
   BILAN_VOCAL
   ENTREVUE
@@ -145,7 +145,7 @@ model Account {
   academyJuniors      AcademyJunior[]     @relation("AcademyJunior")
   academyTrainees     AcademyJunior[]     @relation("AcademyJuniorTrainer")
   academySeats        AcademySessionTrainer[] @relation("AcademyTrainer")
-  academyEvents       AcademyEvent[]      @relation("AcademyEventAuthor")
+  academySteps        AcademyStep[]      @relation("AcademyStepAuthor")
   academyReviews      AcademyReview[]     @relation("AcademyReviewAuthor")
   calendarEvents      CalendarEvent[]     @relation("CalendarOwner")
   ledTeams            Team[]              @relation("TeamLead")
@@ -617,7 +617,7 @@ model AcademySession {
 
   trainers AcademySessionTrainer[]
   juniors  AcademyJunior[]
-  events   AcademyEvent[]
+  steps    AcademyStep[]
   calendarEvents CalendarEvent[]
 
   @@index([program, startsAt])
@@ -658,7 +658,7 @@ model AcademyJunior {
   account Account        @relation("AcademyJunior", fields: [accountId], references: [id], onDelete: Cascade)
   trainer Account?       @relation("AcademyJuniorTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
 
-  events  AcademyEvent[]
+  steps   AcademyStep[]
   reviews AcademyReview[]
 
   @@unique([sessionId, accountId])
@@ -667,12 +667,12 @@ model AcademyJunior {
 }
 
 // Moment planned or held on the session thread
-model AcademyEvent {
+model AcademyStep {
   id          String           @id @default(cuid())
   sessionId   String
   juniorId    String?
   authorId    String?
-  kind        AcademyEventKind
+  kind        AcademyStepKind
   title       String
   scheduledAt DateTime
   doneAt      DateTime?
@@ -682,11 +682,11 @@ model AcademyEvent {
 
   session AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   junior  AcademyJunior? @relation(fields: [juniorId], references: [id], onDelete: Cascade)
-  author  Account?       @relation("AcademyEventAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  author  Account?       @relation("AcademyStepAuthor", fields: [authorId], references: [id], onDelete: SetNull)
 
   @@index([sessionId, scheduledAt])
   @@index([kind])
-  @@map("academy_events")
+  @@map("academy_steps")
 }
 
 // Written trace of one voice check-in held with a junior

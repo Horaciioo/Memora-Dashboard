@@ -96,7 +96,7 @@ export type AcademyJuniorStatusName =
  * @type {Record<string, string>}
  */
 
-export const AcademyEventKinds = {
+export const AcademyStepKinds = {
   Training: 'FORMATION',
   VoiceReview: 'BILAN_VOCAL',
   Interview: 'ENTREVUE',
@@ -104,4 +104,4 @@ export const AcademyEventKinds = {
   WorkSession: 'SESSION_TRAVAIL',
 } as const
 
-export type AcademyEventKindName = (typeof AcademyEventKinds)[keyof typeof AcademyEventKinds]
+export type AcademyStepKindName = (typeof AcademyStepKinds)[keyof typeof AcademyStepKinds]
