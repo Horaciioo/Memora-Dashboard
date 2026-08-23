@@ -205,6 +205,14 @@ model RolePermission {
   @@map("role_permissions")
 }
 
+// Permission batch already landed, keeping every later sync purely additive
+model GrantMigration {
+  key       String   @id
+  appliedAt DateTime @default(now())
+
+  @@map("grant_migrations")
+}
+
 // Extra permissions carried by a moderation function
 model FunctionPermission {
   id         String @id @default(cuid())

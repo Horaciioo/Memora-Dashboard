@@ -8,15 +8,17 @@ import { resolveAccountPermissions } from '@/core/services/auth/GrantsService'
 import { isRootIdentity } from '@/declarations/access/identity'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
 import type { SessionUser } from '@/types/auth'
-import type { Account } from '@prisma/client'
+import type { Account, Youtuber } from '@prisma/client'
 
 /**
  * Map an account row to its session shape
- * @param {Account} account - Account row
+ * @param {Account & { youtubers: Youtuber[] }} account - Account row
  * @return {Promise<SessionUser>} - Session user
  */
 
-export const toSessionUser = async (account: Account): Promise<SessionUser> => {
+export const toSessionUser = async (
+  account: Account & { youtubers: Youtuber[] }
+): Promise<SessionUser> => {
   const isRoot = isRootIdentity(account.discordId)
 
   return {
@@ -28,11 +30,11 @@ export const toSessionUser = async (account: Account): Promise<SessionUser> => {
     status: account.status,
     academyPeriod: account.academyPeriod,
     divisionId: account.divisionId,
-    youtuberId: account.youtuberId,
+    youtuberIds: account.youtubers.map((youtuber) => youtuber.id),
     primaryFunctionId: account.primaryFunctionId,
     secondaryFunctionId: account.secondaryFunctionId,
     isRoot,
-    permissions: await resolveAccountPermissions(account, isRoot),
+    permissions: await resolveAccountPermissions(account),
   }
 }
 
@@ -46,7 +48,10 @@ export const getSession = async (): Promise<SessionUser | null> => {
   const token = cookieStore.get(SESSION_COOKIE)?.value
   if (!token) return null
 
-  const session = await prisma.session.findUnique({ where: { token }, include: { account: true } })
+  const session = await prisma.session.findUnique({
+    where: { token },
+    include: { account: { include: { youtubers: true } } },
+  })
   if (!session || session.expiresAt < new Date()) return null
 
   // A member who left keeps no access
