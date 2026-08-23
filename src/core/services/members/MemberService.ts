@@ -381,26 +381,24 @@ export const removeMember = async (id: string): Promise<void> => {
 }
 
 /**
- * Read one moderator file
+ * Read one moderator file, the private remarks never leaving the server unasked
  * @param {string} id - Account identifier
+ * @param {boolean} canReadNotes - Member may read private remarks
  * @return {Promise<MemberDetail>} - Full file
  */
 
-export const readMember = async (id: string): Promise<MemberDetail> => {
+export const readMember = async (id: string, canReadNotes = false): Promise<MemberDetail> => {
   const row = await prisma.account.findUnique({
     where: { id },
     include: {
       ...SUMMARY_INCLUDE,
-      notesReceived: {
-        include: { author: true },
-        orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }],
-      },
       socialLinks: { orderBy: { position: 'asc' } },
       absences: { include: { reviewer: true }, orderBy: { startDate: 'desc' } },
       trainingRecords: { include: { training: true, validator: true } },
       teamMemberships: { include: { team: true } },
       _count: {
         select: {
+          notesReceived: true,
           projectAssists: true,
           ownedTasks: true,
           meetingSeats: true,
@@ -410,6 +408,15 @@ export const readMember = async (id: string): Promise<MemberDetail> => {
   })
 
   if (!row) throw notFound()
+
+  // Never queried at all when the reader may not open them
+  const notes = canReadNotes
+    ? await prisma.accountNote.findMany({
+        where: { accountId: id },
+        include: { author: true },
+        orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }],
+      })
+    : []
 
   // Declared trainings the member has not started yet still show as pending
   const trainings = await prisma.training.findMany({
@@ -452,7 +459,7 @@ export const readMember = async (id: string): Promise<MemberDetail> => {
   )
 
   return {
-    summary: toSummary(row, { notesCount: row.notesReceived.length, isAbsent }),
+    summary: toSummary(row, { notesCount: row._count.notesReceived, isAbsent }),
     values: {
       displayName: row.displayName,
       discordId: row.discordId,
@@ -479,7 +486,7 @@ export const readMember = async (id: string): Promise<MemberDetail> => {
     celebrateBirthday: row.celebrateBirthday,
     languages: row.languages,
     leftAt: row.leftAt?.toISOString() ?? null,
-    notes: row.notesReceived.map((note) => ({
+    notes: notes.map((note) => ({
       id: note.id,
       body: note.body,
       pinned: note.pinned,

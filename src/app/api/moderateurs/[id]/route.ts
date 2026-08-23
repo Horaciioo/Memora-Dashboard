@@ -13,7 +13,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.MemberRead,
   descriptor: { summary: 'Read a moderator file', tags: ['members'] },
-  handler: ({ params }) => readMember(params.id),
+  handler: ({ params, access }) => readMember(params.id, access.can(Permissions.MemberNoteRead)),
 })
 
 export const PATCH = createProtectedRoute({

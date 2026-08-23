@@ -44,11 +44,12 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const { id } = await params
   const { access } = await requirePermission(Permissions.MemberRead)
 
-  const detail = await readMember(id).catch(() => null)
-  if (!detail) notFound()
-
   const canManageAccess = access.can(Permissions.AccessManage)
   const canReadLogs = access.can(Permissions.MemberLogRead)
+  const canReadNotes = access.can(Permissions.MemberNoteRead)
+
+  const detail = await readMember(id, canReadNotes).catch(() => null)
+  if (!detail) notFound()
 
   const [fields, activity, overrides] = await Promise.all([
     memberFields(),
@@ -67,7 +68,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
         activity={activity}
         overrides={overrides}
         canUpdate={access.can(Permissions.MemberUpdate)}
-        canReadNotes={access.can(Permissions.MemberNoteRead)}
+        canReadNotes={canReadNotes}
         canWriteNotes={access.can(Permissions.MemberNoteWrite)}
         canReadLogs={canReadLogs}
         canManageAccess={canManageAccess}
