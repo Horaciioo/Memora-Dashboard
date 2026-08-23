@@ -18,6 +18,7 @@ export const FORM_COPY = {
   notAnOption: 'Cette valeur n’est pas proposée.',
   notAColour: 'Entre une couleur hexadécimale.',
   endBeforeStart: 'La fin arrive avant le début.',
+  categories: 'Catégories du formulaire',
 } as const
 
 /**
@@ -58,4 +59,44 @@ export const FILE_COPY = {
   wrongType: 'Ce format d’image n’est pas accepté.',
   unknownBucket: 'Cette destination de fichier n’existe pas.',
   missing: 'Aucun fichier reçu.',
+} as const
+
+/**
+ * Labels of the drawn select menu and date picker
+ * @type {Record<string, string>}
+ */
+
+export const PICKER_COPY = {
+  choose: 'Choisir…',
+  searchOption: 'Filtrer les options…',
+  noOption: 'Aucune option pour le moment.',
+  openMenu: 'Dérouler la liste',
+  chooseDay: 'Choisir une date',
+  previousMonth: 'Mois précédent',
+  nextMonth: 'Mois suivant',
+  today: 'Aujourd’hui',
+  clear: 'Effacer',
+  time: 'Heure',
+} as const
+
+/**
+ * Glyph drawn beside a priority option
+ * @type {string}
+ */
+
+export const PRIORITY_GLYPH = '!!'
+
+/**
+ * Category labels a form declaration groups its fields under
+ * @type {Record<string, string>}
+ */
+
+export const FORM_GROUPS = {
+  essentials: 'L’essentiel',
+  assignment: 'Attribution',
+  planning: 'Planification',
+  details: 'Détails',
+  identity: 'Identité',
+  contact: 'Contact',
+  visibility: 'Visibilité',
 } as const

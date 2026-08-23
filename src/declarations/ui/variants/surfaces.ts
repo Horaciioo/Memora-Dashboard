@@ -36,7 +36,7 @@ export const PAGE_STYLES = {
  */
 
 export const BADGE_STYLES = {
-  base: 'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium whitespace-nowrap',
+  base: 'inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-0.5 text-xs font-medium whitespace-nowrap',
   outline: 'border',
   dot: 'h-1.5 w-1.5 rounded-full',
   icon: 'h-3 w-3',
@@ -112,9 +112,11 @@ export const MENU_STYLES = {
  */
 
 export const TABS_STYLES = {
-  list: 'flex gap-1 overflow-x-auto border-b border-[var(--color-border)]',
-  tab: 'relative shrink-0 border-b-2 border-transparent px-3 py-2 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
-  active: 'border-[var(--color-brand-600)] text-[var(--color-ink)]',
+  list: 'relative flex gap-1 overflow-x-auto border-b border-[var(--color-border)]',
+  tab: 'shrink-0 px-3 py-2 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  active: 'text-[var(--color-brand-600)]',
+  indicator:
+    'tab-indicator pointer-events-none absolute bottom-0 left-0 h-0.5 bg-[var(--color-brand-600)]',
   panel: 'pt-4',
 } as const
 
@@ -143,7 +145,7 @@ export const PALETTE_STYLES = {
  */
 
 export const AVATAR_STYLES = {
-  base: 'inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-brand-soft)] font-semibold text-[var(--color-brand-600)] select-none',
+  base: 'inline-flex shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-sm)] bg-[var(--color-brand-soft)] font-semibold text-[var(--color-brand-600)] select-none',
   xs: 'h-6 w-6 text-[10px]',
   sm: 'h-8 w-8 text-xs',
   md: 'h-10 w-10 text-sm',
@@ -153,3 +155,33 @@ export const AVATAR_STYLES = {
 } as const
 
 export type AvatarSize = Extract<keyof typeof AVATAR_STYLES, 'xs' | 'sm' | 'md' | 'lg'>
+
+/**
+ * Corner ribbon styles, a folded band cutting across a card's corner
+ * @type {Record<string, string>}
+ */
+
+export const RIBBON_STYLES = {
+  wrap: 'pointer-events-none absolute top-0 right-0 h-28 w-28 overflow-hidden',
+  band: 'absolute top-6 -right-8 flex w-[150px] items-center justify-center gap-1 rotate-45 py-1.5 text-[11px] font-bold tracking-wide uppercase shadow-[var(--shadow-md)]',
+  sheen:
+    'pointer-events-none absolute inset-0 bg-gradient-to-b from-white/20 to-[var(--color-ink)]/10',
+  fold: 'absolute -bottom-1.5 h-0 w-0 border-[6px] border-transparent border-t-[var(--color-ink)]/30',
+  foldLeft: 'left-0',
+  foldRight: 'right-0',
+} as const
+
+/**
+ * Personal settings page styles
+ * @type {Record<string, string>}
+ */
+
+export const PREFERENCE_STYLES = {
+  stack: 'flex flex-col gap-6',
+  rows: 'flex flex-col divide-y divide-[var(--color-border)]',
+  row: 'flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0',
+  label: 'text-sm font-medium',
+  notice: 'pt-3 text-xs text-[var(--color-ink-subtle)] italic',
+  identity: 'flex items-center gap-4 pb-4',
+  footer: 'flex justify-end pt-4',
+} as const
