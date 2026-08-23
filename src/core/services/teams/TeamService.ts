@@ -2,7 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { readFlag, readText } from '@/core/lib/forms/values'
-import { memberOptions, toPerson, toTag, youtuberOptions } from '@/core/services/work/shared'
+import { leadOptions, toPerson, toTag, youtuberOptions } from '@/core/services/work/shared'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { TEAM_FIELD_COPY } from '@/declarations/teams/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -15,7 +15,7 @@ import { MemberStatuses } from '@/utils/constants/hierarchy'
  */
 
 export const teamFields = async (): Promise<FieldDefinition[]> => {
-  const [members, youtubers] = await Promise.all([memberOptions(), youtuberOptions()])
+  const [leads, youtubers] = await Promise.all([leadOptions(), youtuberOptions()])
 
   return [
     {
@@ -25,12 +25,20 @@ export const teamFields = async (): Promise<FieldDefinition[]> => {
       required: true,
       maxLength: FORM_SETTINGS.shortTextMaxLength,
     },
-    { name: 'leadId', kind: 'select', label: TEAM_FIELD_COPY.lead, options: members, span: 'half' },
+    {
+      name: 'leadId',
+      kind: 'select',
+      label: TEAM_FIELD_COPY.lead,
+      options: leads,
+      mark: 'avatar',
+      span: 'half',
+    },
     {
       name: 'youtuberId',
       kind: 'select',
       label: TEAM_FIELD_COPY.youtuber,
       options: youtubers,
+      mark: 'avatar',
       span: 'half',
     },
     {

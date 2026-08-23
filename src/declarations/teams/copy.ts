@@ -7,8 +7,6 @@ export const TEAM_COPY = {
   title: 'Équipes',
   lead: 'Glisse un modérateur d’une équipe à l’autre pour l’affecter.',
   add: 'Créer une équipe',
-  emptyTitle: 'Aucune équipe',
-  emptyDescription: 'Crée une première équipe et rattache-lui des modérateurs.',
   archive: 'Archiver',
   unarchive: 'Désarchiver',
   archived: 'Archivée',
@@ -16,12 +14,10 @@ export const TEAM_COPY = {
   deleteTitle: 'Supprimer cette équipe ?',
   deleteDescription: 'Ses membres redeviennent non affectés.',
   unassigned: 'Sans équipe',
-  unassignedHint: 'Glisse un modérateur ici pour le détacher.',
+  noYoutuber: 'Aucun YouTubeur',
   emptyColumn: 'Personne ici',
   members: 'membres',
   memberOne: 'membre',
-  leadLabel: 'Responsable',
-  noLead: 'Aucun responsable',
 } as const
 
 /**

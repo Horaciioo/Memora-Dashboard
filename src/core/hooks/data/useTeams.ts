@@ -5,9 +5,13 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
-import { FEEDBACK_COPY } from '@/declarations/ui/copy'
+import { FEEDBACK_COPY, feedbackTitle } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { TeamBoardData } from '@/types/teams'
+
+// Toast entity label
+const ENTITY = 'Équipe'
+const GENDER = 'feminine'
 
 /**
  * Team board state and mutations
@@ -46,9 +50,10 @@ export const useTeams = (initialBoard: TeamBoardData, scope?: string): TeamColle
 
   const create = useCallback(
     async (values: FormValues) => {
+      const name = typeof values.name === 'string' ? values.name : undefined
       const next = await run(
         () => apiPost<TeamBoardData>(API_ROUTES.teams(scope), values),
-        FEEDBACK_COPY.created
+        feedbackTitle(ENTITY, 'created', GENDER, name)
       )
 
       if (next) setBoard(next)
@@ -60,9 +65,10 @@ export const useTeams = (initialBoard: TeamBoardData, scope?: string): TeamColle
 
   const update = useCallback(
     async (id: string, values: FormValues) => {
+      const name = typeof values.name === 'string' ? values.name : undefined
       const next = await run(
         () => apiPatch<TeamBoardData>(API_ROUTES.team(id, scope), values),
-        FEEDBACK_COPY.saved
+        feedbackTitle(ENTITY, 'saved', GENDER, name)
       )
 
       if (next) setBoard(next)
@@ -74,14 +80,15 @@ export const useTeams = (initialBoard: TeamBoardData, scope?: string): TeamColle
 
   const remove = useCallback(
     async (id: string) => {
+      const name = board.teams.find((team) => team.id === id)?.name
       const next = await run(
         () => apiDelete<TeamBoardData>(API_ROUTES.team(id, scope)),
-        FEEDBACK_COPY.deleted
+        feedbackTitle(ENTITY, 'deleted', GENDER, name)
       )
 
       if (next) setBoard(next)
     },
-    [run, scope]
+    [run, scope, board.teams]
   )
 
   const move = useCallback(
