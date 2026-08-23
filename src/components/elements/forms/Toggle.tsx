@@ -46,6 +46,7 @@ export interface CheckboxProps {
   label: string
   hint?: string
   disabled?: boolean
+  className?: string
 }
 
 /**
@@ -56,10 +57,19 @@ export interface CheckboxProps {
  * @param {string} label - Visible label
  * @param {string} [hint] - Secondary line below the label
  * @param {boolean} [disabled] - Blocks interaction
+ * @param {string} [className] - Extra classes merged onto the row
  * @return {JSX.Element}
  */
 
-export const Checkbox = ({ id, checked, onChange, label, hint, disabled }: CheckboxProps) => {
+export const Checkbox = ({
+  id,
+  checked,
+  onChange,
+  label,
+  hint,
+  disabled,
+  className,
+}: CheckboxProps) => {
   const CheckIcon = ICONS.confirm
 
   return (
@@ -72,7 +82,8 @@ export const Checkbox = ({ id, checked, onChange, label, hint, disabled }: Check
       onClick={() => onChange(!checked)}
       className={cn(
         'flex w-full items-start gap-2.5 rounded-[var(--radius-md)] px-2 py-1.5 text-left transition-colors hover:bg-[var(--color-surface)]',
-        disabled && 'opacity-50'
+        disabled && 'opacity-50',
+        className
       )}
     >
       <span className={cn(TOGGLE_STYLES.checkbox, checked && TOGGLE_STYLES.checkboxOn, 'mt-0.5')}>

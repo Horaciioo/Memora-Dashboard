@@ -31,12 +31,21 @@ export type FieldKind =
   | 'image'
 
 /**
+ * Glyph drawn beside an option, telling colour and identity apart at a glance
+ * @type {string}
+ */
+
+export type OptionMark = 'dot' | 'avatar' | 'priority'
+
+/**
  * Choice offered by a select field
  * @typedef {Object} FieldOption
  * @property {string} value - Stored value
  * @property {string} label - Display label
  * @property {string} [hint] - Secondary line
  * @property {string} [accent] - Colour token
+ * @property {string} [image] - Portrait URL
+ * @property {boolean} [disabled] - Shown but not selectable
  */
 
 export interface FieldOption {
@@ -44,6 +53,8 @@ export interface FieldOption {
   label: string
   hint?: string
   accent?: string
+  image?: string | null
+  disabled?: boolean
 }
 
 /**
@@ -79,6 +90,8 @@ export interface FieldCondition {
  * @property {number} [maxLength] - Longest text
  * @property {number} [maxItems] - Most entries
  * @property {'full' | 'half'} [span] - Grid width
+ * @property {string} [group] - Category the field sits under
+ * @property {OptionMark} [mark] - Glyph drawn beside each option
  * @property {StorageBucket} [bucket] - Destination bucket of an image field
  * @property {FieldCondition} [visibleWhen] - Display rule
  */
@@ -98,6 +111,8 @@ export interface FieldDefinition {
   maxLength?: number
   maxItems?: number
   span?: 'full' | 'half'
+  group?: string
+  mark?: OptionMark
   bucket?: StorageBucket
   visibleWhen?: FieldCondition
 }

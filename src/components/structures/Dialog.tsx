@@ -22,6 +22,8 @@ export interface DialogProps {
   // Overrides the glyph the tone would pick
   icon?: IconName
   size?: DialogSize
+  // Line rendered under the title, inside the header
+  subheader?: ReactNode
   footer?: ReactNode
   children: ReactNode
 }
@@ -36,6 +38,7 @@ export interface DialogProps {
  * @param {Tone} [tone] - Tone of the header badge
  * @param {IconName} [icon] - Glyph overriding the tone default
  * @param {DialogSize} [size] - Panel width
+ * @param {ReactNode} [subheader] - Line rendered under the title
  * @param {ReactNode} [footer] - Controls pinned to the bottom
  * @param {ReactNode} children - Overlay content
  * @return {JSX.Element | null}
@@ -49,6 +52,7 @@ export const Dialog = ({
   tone,
   icon,
   size = 'md',
+  subheader,
   footer,
   children,
 }: DialogProps) => {
@@ -95,6 +99,7 @@ export const Dialog = ({
                 {description}
               </p>
             )}
+            {subheader}
           </div>
           <Button
             variant="icon"
