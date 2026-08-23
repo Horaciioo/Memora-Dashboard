@@ -6,7 +6,8 @@ import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { REFERENCE_COPY } from '@/declarations/reference/copy'
-import { FEEDBACK_COPY } from '@/declarations/ui/copy'
+import { referenceSection } from '@/declarations/reference/sections'
+import { feedbackTitle } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { ReferenceKey } from '@/declarations/reference/sections'
 import type { ReferenceRow } from '@/types/reference'
@@ -49,44 +50,52 @@ export const useReference = (
   const [rows, setRows] = useState(initialRows)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
+  // Toast entity label
+  const meta = referenceSection(section)
+  const entity = meta?.singular ?? section
+  const gender = meta?.gender ?? 'masculine'
+
   const create = useCallback(
     async (values: FormValues) => {
+      const name = typeof values.name === 'string' ? values.name : undefined
       const row = await run(
         () => apiPost<ReferenceRow>(API_ROUTES.reference(section), values),
-        FEEDBACK_COPY.created
+        feedbackTitle(entity, 'created', gender, name)
       )
 
       if (row) setRows((current) => [...current, row])
 
       return row !== null
     },
-    [section, run]
+    [section, run, entity, gender]
   )
 
   const update = useCallback(
     async (id: string, values: FormValues) => {
+      const name = typeof values.name === 'string' ? values.name : undefined
       const row = await run(
         () => apiPatch<ReferenceRow>(API_ROUTES.referenceItem(section, id), values),
-        FEEDBACK_COPY.saved
+        feedbackTitle(entity, 'saved', gender, name)
       )
 
       if (row) setRows((current) => current.map((entry) => (entry.id === id ? row : entry)))
 
       return row !== null
     },
-    [section, run]
+    [section, run, entity, gender]
   )
 
   const remove = useCallback(
     async (id: string) => {
+      const name = rows.find((row) => row.id === id)?.label
       const done = await run(
         () => apiDelete<{ id: string }>(API_ROUTES.referenceItem(section, id)),
-        FEEDBACK_COPY.deleted
+        feedbackTitle(entity, 'deleted', gender, name)
       )
 
       if (done) setRows((current) => current.filter((entry) => entry.id !== id))
     },
-    [section, run]
+    [section, run, entity, gender, rows]
   )
 
   const reorder = useCallback(

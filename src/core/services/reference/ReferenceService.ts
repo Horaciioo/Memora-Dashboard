@@ -62,6 +62,7 @@ const accentField: FieldDefinition = {
   kind: 'select',
   label: REFERENCE_FIELD_COPY.accent,
   options: TONE_OPTIONS,
+  mark: 'dot',
   span: 'half',
 }
 
@@ -139,6 +140,7 @@ const youtubers: ReferenceResource = {
       label: row.name,
       hint: row.handle,
       accent: row.accent,
+      image: row.avatarUrl,
       badges: row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : [],
       position: row.position,
       usage: row._count.accounts + row._count.projects,
@@ -201,7 +203,6 @@ const divisions: ReferenceResource = {
       kind: 'text',
       label: REFERENCE_FIELD_COPY.glyph,
       maxLength: shortTextMaxLength,
-      hint: REFERENCE_FIELD_COPY.glyphHint,
       span: 'half',
     },
     {
@@ -211,14 +212,13 @@ const divisions: ReferenceResource = {
       required: true,
       min: 0,
       max: FORM_SETTINGS.divisionMaxRank,
-      hint: REFERENCE_FIELD_COPY.rankHint,
       span: 'half',
     },
     {
       name: 'imagePath',
-      kind: 'text',
+      kind: 'image',
       label: REFERENCE_FIELD_COPY.imagePath,
-      maxLength: shortTextMaxLength,
+      bucket: 'avatars',
     },
     {
       name: 'summary',
@@ -238,6 +238,7 @@ const divisions: ReferenceResource = {
       label: row.name,
       hint: row.summary,
       accent: null,
+      image: row.imagePath,
       badges: row.glyph ? [row.glyph] : [],
       position: row.rank,
       usage: row._count.accounts,
@@ -296,6 +297,7 @@ const jobFunctions: ReferenceResource = {
       label: REFERENCE_FIELD_COPY.kind,
       required: true,
       options: toOptions(FUNCTION_KIND_REGISTRY),
+      mark: 'dot',
       span: 'half',
     },
     accentField,
@@ -379,6 +381,7 @@ const platforms: ReferenceResource = {
   fields: async () => [
     nameField,
     accentField,
+    { name: 'avatarUrl', kind: 'image', label: REFERENCE_FIELD_COPY.avatarUrl, bucket: 'avatars' },
     { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
   ],
   list: async () => {
@@ -392,10 +395,16 @@ const platforms: ReferenceResource = {
       label: row.name,
       hint: null,
       accent: row.accent,
+      image: row.avatarUrl,
       badges: row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : [],
       position: row.position,
       usage: row._count.projects,
-      values: { name: row.name, accent: row.accent, archived: row.archived },
+      values: {
+        name: row.name,
+        accent: row.accent,
+        avatarUrl: row.avatarUrl,
+        archived: row.archived,
+      },
     }))
   },
   create: async (values) => {
@@ -404,6 +413,7 @@ const platforms: ReferenceResource = {
         data: {
           name: readText(values, 'name') ?? '',
           accent: readText(values, 'accent'),
+          avatarUrl: readText(values, 'avatarUrl'),
           archived: readFlag(values, 'archived'),
           position: await nextPosition(prisma.platform),
         },
@@ -419,6 +429,7 @@ const platforms: ReferenceResource = {
         data: {
           name: readText(values, 'name') ?? undefined,
           accent: readText(values, 'accent'),
+          avatarUrl: readText(values, 'avatarUrl'),
           archived: readFlag(values, 'archived'),
         },
       })
@@ -444,6 +455,7 @@ const workflowStates: ReferenceResource = {
       label: REFERENCE_FIELD_COPY.scope,
       required: true,
       options: toOptions(WORKFLOW_SCOPE_REGISTRY),
+      mark: 'dot',
       span: 'half',
     },
     { ...nameField, span: 'half' },
@@ -546,7 +558,6 @@ const priorities: ReferenceResource = {
       required: true,
       min: 0,
       max: FORM_SETTINGS.priorityMaxWeight,
-      hint: REFERENCE_FIELD_COPY.weightHint,
       span: 'half',
     },
     accentField,
@@ -608,9 +619,9 @@ const eventTypes: ReferenceResource = {
       name: 'visibility',
       kind: 'select',
       label: REFERENCE_FIELD_COPY.visibility,
-      hint: REFERENCE_FIELD_COPY.visibilityHint,
       required: true,
       options: toOptions(EVENT_VISIBILITY_REGISTRY),
+      mark: 'dot',
       span: 'half',
     },
     accentField,
@@ -705,8 +716,8 @@ const trainings: ReferenceResource = {
         name: 'program',
         kind: 'select',
         label: REFERENCE_FIELD_COPY.program,
-        hint: REFERENCE_FIELD_COPY.programHint,
         options: toOptions(ACADEMY_PROGRAM_REGISTRY),
+        mark: 'dot',
         span: 'half',
       },
       {
@@ -714,6 +725,7 @@ const trainings: ReferenceResource = {
         kind: 'select',
         label: REFERENCE_FIELD_COPY.period,
         options: toOptions(ACADEMY_PERIOD_REGISTRY),
+        mark: 'dot',
         span: 'half',
       },
       {
@@ -721,7 +733,6 @@ const trainings: ReferenceResource = {
         kind: 'select',
         label: REFERENCE_FIELD_COPY.jobFunction,
         options: rowsToOptions(functions),
-        hint: REFERENCE_FIELD_COPY.jobFunctionHint,
         span: 'half',
       },
       {
@@ -814,7 +825,6 @@ const liveconLevels: ReferenceResource = {
       required: true,
       min: LIVECON_SETTINGS.minLevel,
       max: LIVECON_SETTINGS.maxLevel,
-      hint: REFERENCE_FIELD_COPY.levelHint,
       span: 'half',
     },
     { ...nameField, span: 'half' },
