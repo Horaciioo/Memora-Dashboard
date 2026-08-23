@@ -2,33 +2,34 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
-import { Markdown } from '@/components/elements/display/Markdown'
+import { StatusRibbon } from '@/components/elements/display/StatusRibbon'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { DetailGrid } from '@/components/structures/DetailGrid'
+import { EditableDetailGrid, type EditableEntry } from '@/components/structures/EditableDetailGrid'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
 import { Tabs } from '@/components/elements/navigation/Tabs'
 import { useMemberFile } from '@/core/hooks/data/useMemberFile'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
-import { MEMBER_COPY } from '@/declarations/members/copy'
+import { ACADEMY_PERIOD_REGISTRY, MEMBER_STATUS_REGISTRY } from '@/declarations/access/roles'
+import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
-import { DETAIL_BLOCK, METRIC_BLOCK } from '@/declarations/ui/blocks'
+import { DETAIL_BLOCK } from '@/declarations/ui/blocks'
 import { LIST_STYLES } from '@/declarations/ui/variants'
 import { toTone } from '@/declarations/ui/theme'
-import { DivisionBadge, MemberStatusBadge, RoleBadge } from '@/composites/members/MemberBadges'
+import { DivisionBadge, RoleBadge } from '@/composites/members/MemberBadges'
 import { MemberAccessPanel } from '@/composites/members/MemberAccessPanel'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { MemberOverride } from '@/core/services/members/MemberFileService'
-import type { FieldDefinition } from '@/types/forms'
+import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { MemberDetail, MemberSocial } from '@/types/members'
 import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
 
@@ -36,17 +37,57 @@ export interface MemberFileTabsProps {
   detail: MemberDetail
   memberFields: FieldDefinition[]
   noteFields: FieldDefinition[]
-  pimFields: FieldDefinition[]
   socialFields: FieldDefinition[]
   activity: ActivityEntry[]
   overrides: MemberOverride[]
   canUpdate: boolean
   canReadNotes: boolean
   canWriteNotes: boolean
-  canReadPims: boolean
-  canWritePims: boolean
   canReadLogs: boolean
   canManageAccess: boolean
+}
+
+// Contact fields edited in place, in the order they appear under the section
+const CONTACT_FIELD_NAMES = ['discordId', 'email', 'phone', 'birthday', 'languages']
+
+// Assignment fields edited in place, in the order they appear under the section
+const ASSIGNMENT_FIELD_NAMES = [
+  'youtuberIds',
+  'divisionId',
+  'primaryFunctionId',
+  'secondaryFunctionId',
+  'joinedAt',
+  'leftAt',
+]
+
+/**
+ * Label of a select value
+ * @param {FieldDefinition} field - Field carrying the options
+ * @param {FieldValue} value - Stored value
+ * @return {ReactNode} - Matching option label
+ */
+
+const optionLabel = (field: FieldDefinition, value: FieldValue): ReactNode => {
+  if (typeof value !== 'string' || value === '') return null
+
+  return field.options?.find((option) => option.value === value)?.label ?? null
+}
+
+/**
+ * Labels of every selected value of a multiselect field
+ * @param {FieldDefinition} field - Field carrying the options
+ * @param {FieldValue} value - Stored value
+ * @return {ReactNode} - Matching option labels, joined
+ */
+
+const optionLabels = (field: FieldDefinition, value: FieldValue): ReactNode => {
+  if (!Array.isArray(value) || value.length === 0) return null
+
+  const labels = value
+    .map((entry) => field.options?.find((option) => option.value === entry)?.label)
+    .filter((label): label is string => Boolean(label))
+
+  return labels.length > 0 ? labels.join(', ') : null
 }
 
 /**
@@ -54,15 +95,12 @@ export interface MemberFileTabsProps {
  * @param {MemberDetail} detail - File resolved server-side
  * @param {FieldDefinition[]} memberFields - Declarations of the file form
  * @param {FieldDefinition[]} noteFields - Declarations of the note form
- * @param {FieldDefinition[]} pimFields - Declarations of the review form
  * @param {FieldDefinition[]} socialFields - Declarations of the social form
  * @param {ActivityEntry[]} activity - Journal entries
  * @param {MemberOverride[]} overrides - Permission overrides
  * @param {boolean} canUpdate - Member may edit the file
  * @param {boolean} canReadNotes - Member may read private remarks
  * @param {boolean} canWriteNotes - Member may write private remarks
- * @param {boolean} canReadPims - Member may read reviews
- * @param {boolean} canWritePims - Member may record reviews
  * @param {boolean} canReadLogs - Member may read the journal
  * @param {boolean} canManageAccess - Member may change permissions
  * @return {JSX.Element}
@@ -72,15 +110,12 @@ export const MemberFileTabs = ({
   detail,
   memberFields,
   noteFields,
-  pimFields,
   socialFields,
   activity,
   overrides,
   canUpdate,
   canReadNotes,
   canWriteNotes,
-  canReadPims,
-  canWritePims,
   canReadLogs,
   canManageAccess,
 }: MemberFileTabsProps) => {
@@ -89,13 +124,23 @@ export const MemberFileTabs = ({
   const { session } = useAuthContext()
   const { contextMenu } = useMenu()
   const [tab, setTab] = useState('identity')
-  const [dialog, setDialog] = useState<'identity' | 'note' | 'pim' | 'socials' | null>(null)
+  const [dialog, setDialog] = useState<'identity' | 'note' | 'socials' | null>(null)
   const [pendingNote, setPendingNote] = useState<string | null>(null)
   const [editingSocial, setEditingSocial] = useState<MemberSocial | null>(null)
   const [pendingSocial, setPendingSocial] = useState<MemberSocial | null>(null)
+  // Kept in sync with every inline commit, always sent in full to the PATCH route
+  const [identityValues, setIdentityValues] = useState<FormValues>(detail.values)
 
   const { summary } = detail
   const isLocked = summary.isRoot
+  const canEdit = canUpdate && !isLocked
+
+  const fieldByName = new Map(memberFields.map((field) => [field.name, field]))
+  const fieldFor = (name: string): FieldDefinition => fieldByName.get(name)!
+
+  // Everything not already edited in place lands behind the portrait
+  const inlineNames = new Set([...CONTACT_FIELD_NAMES, ...ASSIGNMENT_FIELD_NAMES])
+  const restFields = memberFields.filter((field) => !inlineNames.has(field.name))
 
   const openDialog = (next: typeof dialog) => {
     file.clearIssues()
@@ -110,6 +155,110 @@ export const MemberFileTabs = ({
     openDialog('socials')
   }
 
+  // Every PATCH replaces the whole record, so a single field commit still ships the rest untouched
+  const saveField = async (name: string, value: FieldValue): Promise<boolean> => {
+    const next = { ...identityValues, [name]: value }
+    const saved = await file.saveIdentity(next)
+
+    if (saved) {
+      setIdentityValues(next)
+      router.refresh()
+    }
+
+    return saved
+  }
+
+  const contactEntries: EditableEntry[] = [
+    {
+      label: FIELD_COPY.discordId,
+      field: fieldFor('discordId'),
+      display: identityValues.discordId ? String(identityValues.discordId) : null,
+    },
+    {
+      label: FIELD_COPY.email,
+      field: fieldFor('email'),
+      display: identityValues.email ? String(identityValues.email) : null,
+    },
+    {
+      label: FIELD_COPY.phone,
+      field: fieldFor('phone'),
+      display: identityValues.phone ? String(identityValues.phone) : null,
+    },
+    {
+      label: FIELD_COPY.birthday,
+      field: fieldFor('birthday'),
+      display:
+        typeof identityValues.birthday === 'string' && identityValues.birthday ? (
+          <span className="flex flex-wrap items-center gap-2">
+            {formatDay(identityValues.birthday)}
+            <Badge
+              label={
+                identityValues.celebrateBirthday
+                  ? MEMBER_COPY.birthdayCelebrated
+                  : MEMBER_COPY.birthdayQuiet
+              }
+              tone={identityValues.celebrateBirthday ? 'success' : 'neutral'}
+              icon="birthday"
+            />
+          </span>
+        ) : null,
+    },
+    {
+      label: FIELD_COPY.languages,
+      field: fieldFor('languages'),
+      display: Array.isArray(identityValues.languages) && identityValues.languages.length > 0 && (
+        <span className="flex flex-wrap gap-1.5">
+          {identityValues.languages.map((language) => (
+            <Badge key={language} label={language} tone="neutral" />
+          ))}
+        </span>
+      ),
+    },
+  ]
+
+  const assignmentEntries: EditableEntry[] = [
+    {
+      label: MEMBER_FIELD_COPY.youtuber,
+      field: fieldFor('youtuberIds'),
+      display: optionLabels(fieldFor('youtuberIds'), identityValues.youtuberIds),
+    },
+    {
+      label: FIELD_COPY.division,
+      field: fieldFor('divisionId'),
+      display: optionLabel(fieldFor('divisionId'), identityValues.divisionId),
+    },
+    {
+      label: FIELD_COPY.mainFunction,
+      field: fieldFor('primaryFunctionId'),
+      display: optionLabel(fieldFor('primaryFunctionId'), identityValues.primaryFunctionId),
+    },
+    {
+      label: FIELD_COPY.secondFunction,
+      field: fieldFor('secondaryFunctionId'),
+      display: optionLabel(fieldFor('secondaryFunctionId'), identityValues.secondaryFunctionId),
+    },
+    {
+      label: FIELD_COPY.joinedAt,
+      field: fieldFor('joinedAt'),
+      display:
+        typeof identityValues.joinedAt === 'string' && identityValues.joinedAt
+          ? formatDay(identityValues.joinedAt)
+          : null,
+    },
+    {
+      label: FIELD_COPY.leftAt,
+      field: fieldFor('leftAt'),
+      display:
+        typeof identityValues.leftAt === 'string' && identityValues.leftAt
+          ? formatDay(identityValues.leftAt)
+          : null,
+    },
+    {
+      label: FIELD_COPY.team,
+      display: detail.teams.length > 0 ? detail.teams.join(', ') : null,
+    },
+  ]
+
   const tabs = [
     { value: 'identity', label: MEMBER_COPY.tabIdentity, icon: 'sheet' as const },
     ...(canReadNotes
@@ -118,7 +267,6 @@ export const MemberFileTabs = ({
             value: 'notes',
             label: MEMBER_COPY.tabNotes,
             icon: 'note' as const,
-            count: file.notes.length,
           },
         ]
       : []),
@@ -126,13 +274,11 @@ export const MemberFileTabs = ({
       value: 'absences',
       label: MEMBER_COPY.tabAbsences,
       icon: 'absences' as const,
-      count: detail.absences.length,
     },
     {
       value: 'socials',
       label: MEMBER_COPY.tabSocials,
       icon: 'link' as const,
-      count: file.socials.length,
     },
     { value: 'academy', label: MEMBER_COPY.tabAcademy, icon: 'academy' as const },
     ...(canReadLogs
@@ -162,40 +308,43 @@ export const MemberFileTabs = ({
   return (
     <div className="flex flex-col gap-8">
       <Section title={MEMBER_COPY.identity} padded>
-        <div className="flex flex-wrap items-start gap-4">
-          <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <span className="flex flex-wrap items-center gap-2">
-              <RoleBadge member={summary} />
-              <DivisionBadge division={summary.division} />
-              <MemberStatusBadge member={summary} />
-              {summary.youtuber && (
-                <Badge label={summary.youtuber.label} tone="info" icon="youtuber" />
-              )}
-            </span>
-            <span className={METRIC_BLOCK.row}>
-              <span className={METRIC_BLOCK.entry}>
-                <span className={METRIC_BLOCK.value}>{detail.projectCount}</span>
-                <span className={METRIC_BLOCK.label}>{MEMBER_COPY.projects}</span>
+        <div className="relative">
+          <StatusRibbon
+            label={MEMBER_STATUS_REGISTRY.get(summary.status).label}
+            tone={toTone(MEMBER_STATUS_REGISTRY.get(summary.status).accent)}
+            className="-top-4 -right-4 sm:-top-5 sm:-right-5"
+          />
+          <div className="flex flex-wrap items-start gap-4">
+            <div className="relative shrink-0">
+              <button
+                type="button"
+                disabled={!canEdit}
+                aria-label={ACTION_COPY.edit}
+                title={ACTION_COPY.edit}
+                onClick={() => openDialog('identity')}
+                className="rounded-[var(--radius-sm)] transition-opacity enabled:cursor-pointer enabled:hover:opacity-80 disabled:cursor-default"
+              >
+                <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
+              </button>
+              <span className="absolute right-1 bottom-1 rounded-[var(--radius-sm)] ring-2 ring-[var(--color-surface-raised)]">
+                <DivisionBadge division={summary.division} />
               </span>
-              <span className={METRIC_BLOCK.entry}>
-                <span className={METRIC_BLOCK.value}>{detail.taskCount}</span>
-                <span className={METRIC_BLOCK.label}>{MEMBER_COPY.tasks}</span>
+            </div>
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <span className="flex flex-wrap items-center gap-2 pr-16">
+                <RoleBadge member={summary} />
+                {summary.youtubers.map((youtuber) => (
+                  <Badge key={youtuber.id} label={youtuber.label} tone="info" icon="youtuber" />
+                ))}
+                {summary.academyPeriod && (
+                  <Badge
+                    label={ACADEMY_PERIOD_REGISTRY.get(summary.academyPeriod).label}
+                    tone="info"
+                  />
+                )}
               </span>
-              <span className={METRIC_BLOCK.entry}>
-                <span className={METRIC_BLOCK.value}>{detail.meetingCount}</span>
-                <span className={METRIC_BLOCK.label}>{MEMBER_COPY.meetings}</span>
-              </span>
-            </span>
+            </div>
           </div>
-          <Button
-            variant="primary"
-            icon="edit"
-            disabled={!canUpdate || isLocked}
-            onClick={() => openDialog('identity')}
-          >
-            {ACTION_COPY.edit}
-          </Button>
         </div>
         {isLocked && <p className={`${DETAIL_BLOCK.empty} pt-3`}>{MEMBER_COPY.rootLocked}</p>}
       </Section>
@@ -205,115 +354,23 @@ export const MemberFileTabs = ({
       {tab === 'identity' && (
         <div className="flex flex-col gap-8">
           <Section title={MEMBER_COPY.contact} padded>
-            <DetailGrid
-              entries={[
-                { label: FIELD_COPY.discordId, value: summary.discordId },
-                { label: FIELD_COPY.email, value: detail.email },
-                { label: FIELD_COPY.phone, value: detail.phone },
-                {
-                  label: FIELD_COPY.birthday,
-                  value: detail.birthday ? (
-                    <span className="flex flex-wrap items-center gap-2">
-                      {formatDay(detail.birthday)}
-                      <Badge
-                        label={
-                          detail.celebrateBirthday
-                            ? MEMBER_COPY.birthdayCelebrated
-                            : MEMBER_COPY.birthdayQuiet
-                        }
-                        tone={detail.celebrateBirthday ? 'success' : 'neutral'}
-                        icon="birthday"
-                      />
-                    </span>
-                  ) : null,
-                },
-                {
-                  label: FIELD_COPY.languages,
-                  value:
-                    detail.languages.length > 0 ? (
-                      <span className="flex flex-wrap gap-1.5">
-                        {detail.languages.map((language) => (
-                          <Badge key={language} label={language} tone="neutral" />
-                        ))}
-                      </span>
-                    ) : null,
-                },
-              ]}
+            <EditableDetailGrid
+              entries={contactEntries}
+              values={identityValues}
+              issues={file.issues}
+              disabled={!canEdit}
+              onCommit={saveField}
             />
           </Section>
           <Section title={MEMBER_COPY.assignment} padded>
-            <DetailGrid
-              entries={[
-                { label: FIELD_COPY.youtuber, value: summary.youtuber?.label },
-                { label: FIELD_COPY.division, value: summary.division?.label },
-                { label: FIELD_COPY.mainFunction, value: summary.primaryFunction?.label },
-                { label: FIELD_COPY.secondFunction, value: summary.secondaryFunction?.label },
-                { label: FIELD_COPY.joinedAt, value: formatDay(summary.joinedAt) },
-                {
-                  label: FIELD_COPY.leftAt,
-                  value: detail.leftAt ? formatDay(detail.leftAt) : null,
-                },
-                {
-                  label: FIELD_COPY.team,
-                  value: detail.teams.length > 0 ? detail.teams.join(', ') : null,
-                },
-              ]}
+            <EditableDetailGrid
+              entries={assignmentEntries}
+              values={identityValues}
+              issues={file.issues}
+              disabled={!canEdit}
+              onCommit={saveField}
             />
           </Section>
-          {canReadPims && (
-            <Section
-              title={MEMBER_COPY.pimsTitle}
-              description={MEMBER_COPY.pimsLead}
-              padded={file.pims.length > 0}
-            >
-              {file.pims.length === 0 ? (
-                <EmptyState
-                  figure="notes"
-                  title={MEMBER_COPY.pimsEmptyTitle}
-                  description={MEMBER_COPY.pimsEmptyDescription}
-                  action={
-                    <Button
-                      variant="primary"
-                      icon="add"
-                      disabled={!canWritePims}
-                      onClick={() => openDialog('pim')}
-                    >
-                      {MEMBER_COPY.pimAdd}
-                    </Button>
-                  }
-                />
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {file.pims.map((pim) => (
-                    <article key={pim.id} className="flex flex-col gap-2">
-                      <span className="flex flex-wrap items-center gap-2">
-                        <Badge label={formatDay(pim.heldAt)} tone="brand" icon="clock" />
-                        {pim.authorName && (
-                          <span className="text-xs text-[var(--color-ink-subtle)]">
-                            {pim.authorName}
-                          </span>
-                        )}
-                        <Button
-                          variant="icon"
-                          icon="remove"
-                          className="ml-auto"
-                          aria-label={ACTION_COPY.delete}
-                          disabled={!canWritePims}
-                          onClick={() => void file.removePim(pim.id)}
-                        />
-                      </span>
-                      {pim.sheet.trim().length > 0 && <Markdown source={pim.sheet} />}
-                    </article>
-                  ))}
-                  <AddRow
-                    label={MEMBER_COPY.pimAdd}
-                    disabled={!canWritePims}
-                    onClick={() => openDialog('pim')}
-                  />
-                </div>
-              )}
-            </Section>
-          )}
           {canManageAccess && (
             <MemberAccessPanel
               overrides={file.overrides}
@@ -526,14 +583,19 @@ export const MemberFileTabs = ({
       <FormDialog
         open={dialog === 'identity'}
         title={`${ACTION_COPY.edit} · ${summary.displayName}`}
-        fields={memberFields}
-        initialValues={detail.values}
+        fields={restFields}
+        initialValues={identityValues}
         issues={file.issues}
         isSaving={file.isSaving}
         size="lg"
         onSubmit={async (values) => {
-          const saved = await file.saveIdentity(values)
-          if (saved) router.refresh()
+          const next = { ...identityValues, ...values }
+          const saved = await file.saveIdentity(next)
+
+          if (saved) {
+            setIdentityValues(next)
+            router.refresh()
+          }
 
           return saved
         }}
@@ -547,17 +609,6 @@ export const MemberFileTabs = ({
         issues={file.issues}
         isSaving={file.isSaving}
         onSubmit={file.addNote}
-        onClose={() => setDialog(null)}
-      />
-
-      <FormDialog
-        open={dialog === 'pim'}
-        title={MEMBER_COPY.pimAdd}
-        fields={pimFields}
-        issues={file.issues}
-        isSaving={file.isSaving}
-        size="lg"
-        onSubmit={file.addPim}
         onClose={() => setDialog(null)}
       />
 

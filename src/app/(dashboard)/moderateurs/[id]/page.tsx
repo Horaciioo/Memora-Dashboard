@@ -2,12 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { MemberFileTabs } from '@/composites/members/MemberFileTabs'
-import {
-  NOTE_FIELDS,
-  PIM_FIELDS,
-  SOCIAL_FIELDS,
-  readOverrides,
-} from '@/core/services/members/MemberFileService'
+import { NOTE_FIELDS, SOCIAL_FIELDS, readOverrides } from '@/core/services/members/MemberFileService'
 import { memberFields, readMember } from '@/core/services/members/MemberService'
 import { readMemberActivity } from '@/core/services/system/ActivityService'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -68,15 +63,12 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
         detail={detail}
         memberFields={fields}
         noteFields={NOTE_FIELDS}
-        pimFields={PIM_FIELDS}
         socialFields={SOCIAL_FIELDS}
         activity={activity}
         overrides={overrides}
         canUpdate={access.can(Permissions.MemberUpdate)}
         canReadNotes={access.can(Permissions.MemberNoteRead)}
         canWriteNotes={access.can(Permissions.MemberNoteWrite)}
-        canReadPims={access.can(Permissions.MemberPimRead)}
-        canWritePims={access.can(Permissions.MemberPimWrite)}
         canReadLogs={canReadLogs}
         canManageAccess={canManageAccess}
       />

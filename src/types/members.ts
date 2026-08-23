@@ -49,11 +49,13 @@ export interface MemberDivision {
  * @property {MemberStatusName} status - Membership status
  * @property {AcademyPeriodName | null} academyPeriod - Academy progression
  * @property {MemberDivision | null} division - Division
- * @property {MemberTag | null} youtuber - Assigned YouTuber
+ * @property {MemberTag[]} youtubers - Assigned YouTubers
  * @property {MemberTag | null} primaryFunction - Main function
  * @property {MemberTag | null} secondaryFunction - Secondary function
  * @property {string} joinedAt - ISO arrival date
  * @property {boolean} isRoot - Root administrator
+ * @property {number} notesCount - Private remarks left on the account
+ * @property {boolean} isAbsent - Covered by an approved absence today
  */
 
 export interface MemberSummary {
@@ -65,11 +67,13 @@ export interface MemberSummary {
   status: MemberStatusName
   academyPeriod: AcademyPeriodName | null
   division: MemberDivision | null
-  youtuber: MemberTag | null
+  youtubers: MemberTag[]
   primaryFunction: MemberTag | null
   secondaryFunction: MemberTag | null
   joinedAt: string
   isRoot: boolean
+  notesCount: number
+  isAbsent: boolean
 }
 
 /**
@@ -88,22 +92,6 @@ export interface MemberNote {
   pinned: boolean
   authorName: string | null
   createdAt: string
-}
-
-/**
- * Individual review held with a member
- * @typedef {Object} MemberPim
- * @property {string} id - Review identifier
- * @property {string} heldAt - ISO date
- * @property {string} sheet - Markdown sheet
- * @property {string | null} authorName - Who held it
- */
-
-export interface MemberPim {
-  id: string
-  heldAt: string
-  sheet: string
-  authorName: string | null
 }
 
 /**
@@ -184,7 +172,6 @@ export interface MemberTraining {
  * @property {string[]} languages - Spoken languages
  * @property {string | null} leftAt - ISO departure date
  * @property {MemberNote[]} notes - Private remarks
- * @property {MemberPim[]} pims - Individual reviews
  * @property {MemberSocial[]} socials - Social profiles
  * @property {MemberAbsence[]} absences - Time off
  * @property {MemberTraining[]} trainings - Academy progression
@@ -204,7 +191,6 @@ export interface MemberDetail {
   languages: string[]
   leftAt: string | null
   notes: MemberNote[]
-  pims: MemberPim[]
   socials: MemberSocial[]
   absences: MemberAbsence[]
   trainings: MemberTraining[]

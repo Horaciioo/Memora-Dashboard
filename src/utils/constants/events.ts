@@ -14,7 +14,7 @@ export const EVENT_TYPES = createEnumeration({
   DivisionChanged: { id: 5, label: 'Division changée' },
   FunctionChanged: { id: 6, label: 'Fonction changée' },
   NoteAdded: { id: 7, label: 'Note privée ajoutée' },
-  PimHeld: { id: 8, label: 'PIM tenue' },
+  PimHeld: { id: 8, label: 'PIM tenue', deprecated: true },
   ProjectCreated: { id: 9, label: 'Projet créé' },
   ProjectUpdated: { id: 10, label: 'Projet modifié' },
   ProjectDeleted: { id: 11, label: 'Projet supprimé' },

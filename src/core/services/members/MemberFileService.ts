@@ -5,12 +5,12 @@ import type { SocialLink } from '@prisma/client'
 import { prisma } from '@/core/lib/db'
 import { forbidden, notFound } from '@/core/lib/errors'
 import { TONE_OPTIONS } from '@/core/lib/forms/options'
-import { readDate, readFlag, readText } from '@/core/lib/forms/values'
+import { readFlag, readText } from '@/core/lib/forms/values'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { PermissionHelpers } from '@/types/auth'
 import type { FieldDefinition, FormValues } from '@/types/forms'
-import type { MemberNote, MemberPim, MemberSocial } from '@/types/members'
+import type { MemberNote, MemberSocial } from '@/types/members'
 import { Permissions, isPermissionName } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { PermissionEffects } from '@/utils/constants/workflow'
@@ -29,21 +29,6 @@ export const NOTE_FIELDS: FieldDefinition[] = [
     maxLength: FORM_SETTINGS.noteMaxLength,
   },
   { name: 'pinned', kind: 'toggle', label: MEMBER_COPY.notePin },
-]
-
-/**
- * Declarations of the individual review form
- * @type {FieldDefinition[]}
- */
-
-export const PIM_FIELDS: FieldDefinition[] = [
-  { name: 'heldAt', kind: 'date', label: MEMBER_COPY.pimDate, required: true, span: 'half' },
-  {
-    name: 'sheet',
-    kind: 'markdown',
-    label: MEMBER_COPY.pimSheet,
-    maxLength: FORM_SETTINGS.markdownMaxLength,
-  },
 ]
 
 /**
@@ -109,72 +94,6 @@ export const pinNote = async (noteId: string, pinned: boolean): Promise<MemberNo
 
 export const removeNote = async (noteId: string): Promise<void> => {
   await prisma.accountNote.delete({ where: { id: noteId } })
-}
-
-/**
- * Record an individual review
- * @param {string} accountId - Account identifier
- * @param {string} authorId - Author identifier
- * @param {FormValues} values - Parsed body
- * @return {Promise<MemberPim>} - Created review
- */
-
-export const addPim = async (
-  accountId: string,
-  authorId: string,
-  values: FormValues
-): Promise<MemberPim> => {
-  const pim = await prisma.pim.create({
-    data: {
-      accountId,
-      authorId,
-      heldAt: readDate(values, 'heldAt') ?? new Date(),
-      sheet: readText(values, 'sheet') ?? '',
-    },
-    include: { author: true },
-  })
-
-  return {
-    id: pim.id,
-    heldAt: pim.heldAt.toISOString(),
-    sheet: pim.sheet,
-    authorName: pim.author?.displayName ?? null,
-  }
-}
-
-/**
- * Edit an individual review
- * @param {string} pimId - Review identifier
- * @param {FormValues} values - Parsed body
- * @return {Promise<MemberPim>} - Updated review
- */
-
-export const updatePim = async (pimId: string, values: FormValues): Promise<MemberPim> => {
-  const pim = await prisma.pim.update({
-    where: { id: pimId },
-    data: {
-      heldAt: readDate(values, 'heldAt') ?? undefined,
-      sheet: readText(values, 'sheet') ?? '',
-    },
-    include: { author: true },
-  })
-
-  return {
-    id: pim.id,
-    heldAt: pim.heldAt.toISOString(),
-    sheet: pim.sheet,
-    authorName: pim.author?.displayName ?? null,
-  }
-}
-
-/**
- * Drop an individual review
- * @param {string} pimId - Review identifier
- * @return {Promise<void>} - Removed
- */
-
-export const removePim = async (pimId: string): Promise<void> => {
-  await prisma.pim.delete({ where: { id: pimId } })
 }
 
 /**
