@@ -16,6 +16,8 @@ export interface EmptyStateProps {
   description?: string
   // Always rendered below the description — an EmptyState is never a dead end
   action: ReactNode
+  // Shrinks padding and illustration, for a box sitting among other content rather than alone
+  compact?: boolean
   className?: string
 }
 
@@ -27,6 +29,7 @@ export interface EmptyStateProps {
  * @param {string} [title] - Headline, required on the start variant
  * @param {string} [description] - Supporting line
  * @param {ReactNode} action - Mandatory way out
+ * @param {boolean} [compact] - Smaller frame and illustration
  * @param {string} [className] - Extra classes merged onto the frame
  * @return {JSX.Element}
  */
@@ -37,6 +40,7 @@ export const EmptyState = ({
   title,
   description,
   action,
+  compact,
   className,
 }: EmptyStateProps) => {
   const Illustration = ILLUSTRATIONS[figure ?? variant]
@@ -45,8 +49,19 @@ export const EmptyState = ({
     description ?? (variant === 'filter' ? EMPTY_COPY.filterDescription : undefined)
 
   return (
-    <div className={cn(EMPTY_STATE_STYLES.frame, className)}>
-      <Illustration className={EMPTY_STATE_STYLES[variant].illustration} />
+    <div
+      className={cn(
+        compact ? EMPTY_STATE_STYLES.frameCompact : EMPTY_STATE_STYLES.frame,
+        className
+      )}
+    >
+      <Illustration
+        className={
+          compact
+            ? EMPTY_STATE_STYLES.compact.illustration
+            : EMPTY_STATE_STYLES[variant].illustration
+        }
+      />
       <p className="text-base font-bold">{resolvedTitle}</p>
       {resolvedDescription && (
         <p className="max-w-sm text-sm text-[var(--color-ink-subtle)]">{resolvedDescription}</p>

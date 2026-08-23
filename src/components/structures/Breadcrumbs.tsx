@@ -18,7 +18,8 @@ export const Breadcrumbs = () => {
   const overrides = useBreadcrumbOverrides()
   const segments = pathname.split('/').filter((segment) => segment.length > 0)
 
-  if (segments.length === 0) return null
+  // A single segment is a classic list page, the trail only earns its place past it
+  if (segments.length <= 1) return null
 
   // Rebuild each ancestor path so every crumb stays clickable
   const crumbs = segments.map((segment, index) => {
