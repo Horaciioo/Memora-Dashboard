@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -154,6 +155,7 @@ export const ReferenceManager = ({
                     aria-hidden="true"
                   />
                 )}
+                {row.image !== undefined && <Avatar name={row.label} src={row.image} size="md" />}
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="flex flex-wrap items-center gap-2 font-medium">
                     {row.label}

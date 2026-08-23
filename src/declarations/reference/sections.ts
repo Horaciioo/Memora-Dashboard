@@ -31,6 +31,7 @@ export type ReferenceKey = (typeof REFERENCE_KEYS)[number]
  * @property {ReferenceKey} key - Collection key
  * @property {string} label - Plural label
  * @property {string} singular - Singular label
+ * @property {'masculine' | 'feminine'} gender - Grammatical gender of the singular label
  * @property {string} description - What the collection drives
  * @property {IconName} icon - Icon key
  * @property {IllustrationName} figure - Empty state figure
@@ -44,6 +45,7 @@ export interface ReferenceSection {
   key: ReferenceKey
   label: string
   singular: string
+  gender: 'masculine' | 'feminine'
   description: string
   icon: IconName
   figure: IllustrationName
@@ -63,6 +65,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     key: 'youtubeurs',
     label: 'YouTubeurs',
     singular: 'YouTubeur',
+    gender: 'masculine',
     description: 'Les créateurs sur lesquels l’équipe intervient.',
     icon: 'youtuber',
     figure: 'settings',
@@ -75,6 +78,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     key: 'divisions',
     label: 'Divisions',
     singular: 'Division',
+    gender: 'feminine',
     description: 'Junior puis les trois squads, du rang le plus bas au plus haut.',
     icon: 'division',
     figure: 'academy',
@@ -86,6 +90,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     key: 'fonctions',
     label: 'Fonctions',
     singular: 'Fonction',
+    gender: 'feminine',
     description: 'Postes de modération principaux et postes secondaires à responsabilité.',
     icon: 'shield',
     figure: 'moderation',
@@ -97,6 +102,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     key: 'plateformes',
     label: 'Plateformes',
     singular: 'Plateforme',
+    gender: 'feminine',
     description: 'Là où l’action initiale d’un projet se déroule.',
     icon: 'platform',
     figure: 'settings',
@@ -108,6 +114,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     key: 'etats',
     label: 'États',
     singular: 'État',
+    gender: 'masculine',
     description: 'Colonnes des tableaux de projets, tâches et réunions.',
     icon: 'tasks',
     figure: 'projects',
@@ -119,6 +126,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     key: 'priorites',
     label: 'Priorités',
     singular: 'Priorité',
+    gender: 'feminine',
     description: 'Niveaux d’urgence partagés par les projets et les tâches.',
     icon: 'alert',
     figure: 'settings',
@@ -130,6 +138,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     key: 'evenements',
     label: 'Types d’évènement',
     singular: 'Type d’évènement',
+    gender: 'masculine',
     description: 'Lives, réunions et rendez-vous que le calendrier accepte.',
     icon: 'meetings',
     figure: 'settings',
@@ -141,6 +150,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     key: 'formations',
     label: 'Formations',
     singular: 'Formation',
+    gender: 'feminine',
     description: 'Cours de la Marsha Academy, par période et par fonction.',
     icon: 'academy',
     figure: 'academy',
@@ -152,6 +162,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     key: 'livecon',
     label: 'Niveaux de livecon',
     singular: 'Niveau',
+    gender: 'masculine',
     description: 'Niveaux de vigilance et consignes associées.',
     icon: 'livecon',
     figure: 'livecon',

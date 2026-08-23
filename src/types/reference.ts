@@ -8,6 +8,7 @@ import type { ReferenceKey } from '@/declarations/reference/sections'
  * @property {string} label - Primary line
  * @property {string | null} hint - Secondary line
  * @property {string | null} accent - Colour token
+ * @property {string | null} [image] - Portrait shown beside the label
  * @property {string[]} badges - Short qualifiers
  * @property {number} position - Display order
  * @property {number} usage - Records pointing at the row
@@ -19,6 +20,7 @@ export interface ReferenceRow {
   label: string
   hint: string | null
   accent: string | null
+  image?: string | null
   badges: string[]
   position: number
   usage: number
