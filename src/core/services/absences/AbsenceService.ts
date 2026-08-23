@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { invalidInput, notFound } from '@/core/lib/errors'
+import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { readDate, readText } from '@/core/lib/forms/values'
 import { ABSENCE_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { ABSENCE_COPY, ABSENCE_FIELD_COPY } from '@/declarations/absences/copy'
@@ -20,6 +20,39 @@ const ABSENCE_INCLUDE = {
 } satisfies Prisma.AbsenceInclude
 
 type AbsenceRow = Prisma.AbsenceGetPayload<{ include: typeof ABSENCE_INCLUDE }>
+
+/**
+ * Filter matching an absence covering the current instant
+ * @return {Prisma.AbsenceWhereInput} - Where clause
+ */
+
+export const activeAbsenceFilter = (): Prisma.AbsenceWhereInput => {
+  const now = new Date()
+
+  return { status: AbsenceStatuses.Approved, startDate: { lte: now }, endDate: { gte: now } }
+}
+
+/**
+ * Check a reviewer may act on one account's absences
+ * @param {string} reviewerId - Reviewer account identifier
+ * @param {string} accountId - Absence owner identifier
+ * @param {boolean} isAdmin - Reviewer holds the admin level
+ * @return {Promise<boolean>} - Authorised
+ */
+
+const canReviewAbsence = async (
+  reviewerId: string,
+  accountId: string,
+  isAdmin: boolean
+): Promise<boolean> => {
+  if (isAdmin) return true
+
+  const membership = await prisma.teamMember.findFirst({
+    where: { accountId, team: { leadId: reviewerId } },
+  })
+
+  return membership !== null
+}
 
 /**
  * Map an absence row to its display shape
@@ -64,7 +97,6 @@ export const ABSENCE_FIELDS: FieldDefinition[] = [
     name: 'reason',
     kind: 'textarea',
     label: ABSENCE_FIELD_COPY.reason,
-    hint: ABSENCE_FIELD_COPY.reasonHint,
     maxLength: FORM_SETTINGS.longTextMaxLength,
   },
 ]
@@ -100,14 +132,26 @@ export const listOwnAbsences = async (accountId: string): Promise<MemberAbsence[
 }
 
 /**
- * Read every absence
- * @return {Promise<MemberAbsence[]>} - Absences
+ * Read the pending requests one reviewer may settle, every team led by them, or every
+ * request when they hold the admin level
+ * @param {string} reviewerId - Reviewer account identifier
+ * @param {boolean} isAdmin - Reviewer holds the admin level
+ * @return {Promise<MemberAbsence[]>} - Pending absences
  */
 
-export const listAbsences = async (): Promise<MemberAbsence[]> => {
+export const listReviewQueue = async (
+  reviewerId: string,
+  isAdmin: boolean
+): Promise<MemberAbsence[]> => {
   const rows = await prisma.absence.findMany({
+    where: {
+      status: AbsenceStatuses.Pending,
+      ...(isAdmin
+        ? {}
+        : { account: { teamMemberships: { some: { team: { leadId: reviewerId } } } } }),
+    },
     include: ABSENCE_INCLUDE,
-    orderBy: { startDate: 'desc' },
+    orderBy: { startDate: 'asc' },
   })
 
   return rows.map(toAbsence)
@@ -176,6 +220,7 @@ export const createAbsence = async (
  * @param {string} id - Absence identifier
  * @param {AbsenceStatusName} status - Review outcome
  * @param {string} reviewerId - Reviewer identifier
+ * @param {boolean} isAdmin - Reviewer holds the admin level
  * @param {FormValues} values - Parsed body
  * @return {Promise<MemberAbsence>} - Reviewed absence
  */
@@ -184,8 +229,14 @@ export const reviewAbsence = async (
   id: string,
   status: AbsenceStatusName,
   reviewerId: string,
+  isAdmin: boolean,
   values: FormValues
 ): Promise<MemberAbsence> => {
+  const current = await prisma.absence.findUnique({ where: { id } })
+  if (!current) throw notFound()
+
+  if (!(await canReviewAbsence(reviewerId, current.accountId, isAdmin))) throw forbidden()
+
   const row = await prisma.absence.update({
     where: { id },
     data: {
@@ -203,21 +254,31 @@ export const reviewAbsence = async (
 /**
  * Withdraw an absence request
  * @param {string} id - Absence identifier
- * @param {string} accountId - Account identifier
- * @param {boolean} canReview - Member may act on anyone
+ * @param {string} requesterId - Account identifier
+ * @param {boolean} isAdmin - Requester holds the admin level
+ * @param {boolean} hasReviewPermission - Requester holds the review permission
  * @return {Promise<void>} - Removed
  */
 
 export const removeAbsence = async (
   id: string,
-  accountId: string,
-  canReview: boolean
+  requesterId: string,
+  isAdmin: boolean,
+  hasReviewPermission: boolean
 ): Promise<void> => {
   const row = await prisma.absence.findUnique({ where: { id } })
   if (!row) throw notFound()
 
-  // A member only withdraws their own request
-  if (!canReview && row.accountId !== accountId) throw notFound()
+  // A member always withdraws their own request
+  if (row.accountId === requesterId) {
+    await prisma.absence.delete({ where: { id } })
+    return
+  }
+
+  // Anyone else needs the review permission, scoped to their own teams
+  if (!hasReviewPermission || !(await canReviewAbsence(requesterId, row.accountId, isAdmin))) {
+    throw notFound()
+  }
 
   await prisma.absence.delete({ where: { id } })
 }

@@ -5,10 +5,14 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
-import { FEEDBACK_COPY } from '@/declarations/ui/copy'
+import { feedbackTitle } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
 import type { AbsenceStatusName } from '@/utils/constants/workflow'
+
+// Toast entity label
+const ENTITY = 'Absence'
+const GENDER = 'feminine'
 
 /**
  * Absence state and mutations
@@ -46,7 +50,7 @@ export const useAbsences = (initialAbsences: MemberAbsence[]): AbsenceCollection
     async (values: FormValues) => {
       const absence = await run(
         () => apiPost<MemberAbsence>(API_ROUTES.absences, values),
-        FEEDBACK_COPY.created
+        feedbackTitle(ENTITY, 'created', GENDER)
       )
 
       if (absence) setAbsences((current) => [absence, ...current])
@@ -60,7 +64,7 @@ export const useAbsences = (initialAbsences: MemberAbsence[]): AbsenceCollection
     async (id: string, status: AbsenceStatusName, values: FormValues) => {
       const absence = await run(
         () => apiPatch<MemberAbsence>(API_ROUTES.absence(id), { ...values, status }),
-        FEEDBACK_COPY.saved
+        feedbackTitle(ENTITY, 'saved', GENDER)
       )
 
       if (absence) {
@@ -76,7 +80,7 @@ export const useAbsences = (initialAbsences: MemberAbsence[]): AbsenceCollection
     async (id: string) => {
       const done = await run(
         () => apiDelete<{ id: string }>(API_ROUTES.absence(id)),
-        FEEDBACK_COPY.deleted
+        feedbackTitle(ENTITY, 'deleted', GENDER)
       )
 
       if (done) setAbsences((current) => current.filter((entry) => entry.id !== id))

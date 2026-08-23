@@ -6,16 +6,16 @@ import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { DataTable, type DataTableColumn } from '@/components/structures/DataTable'
+import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
-import { Tabs } from '@/components/elements/navigation/Tabs'
+import { AbsenceTimeline } from '@/composites/absences/AbsenceTimeline'
 import { useAbsences } from '@/core/hooks/data/useAbsences'
 import { ABSENCE_COPY } from '@/declarations/absences/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
-import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
+import { ACTION_COPY } from '@/declarations/ui/copy'
+import { LIST_STYLES } from '@/declarations/ui/variants'
 import { toTone } from '@/declarations/ui/theme'
-import type { MenuItem } from '@/managers/front-end'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
@@ -23,43 +23,47 @@ import type { AbsenceStatusName } from '@/utils/constants/workflow'
 import { formatDayRange } from '@/utils/format/dates'
 
 export interface AbsencesPanelProps {
-  initialAbsences: MemberAbsence[]
+  mine: MemberAbsence[]
+  queue: MemberAbsence[]
   fields: FieldDefinition[]
   reviewFields: FieldDefinition[]
   currentAccountId: string
   thresholdDays: number
   canCreate: boolean
-  canReadAll: boolean
   canReview: boolean
 }
 
 /**
- * Absence requests, split between the member's own and everyone else's, with the review
- * gesture behind its own permission
- * @param {MemberAbsence[]} initialAbsences - Requests resolved server-side
+ * Absence surface, its own timeline first, the team's pending requests underneath — no table,
+ * no tabs, the timeline itself carries no authority over the absence
+ * @param {MemberAbsence[]} mine - Own requests resolved server-side
+ * @param {MemberAbsence[]} queue - Team requests awaiting review
  * @param {FieldDefinition[]} fields - Declarations of the request form
  * @param {FieldDefinition[]} reviewFields - Declarations of the review form
  * @param {string} currentAccountId - Signed-in member identifier
  * @param {number} thresholdDays - Days an absence must exceed
  * @param {boolean} canCreate - Member may declare an absence
- * @param {boolean} canReadAll - Member may see every request
  * @param {boolean} canReview - Member may settle a request
  * @return {JSX.Element}
  */
 
 export const AbsencesPanel = ({
-  initialAbsences,
+  mine,
+  queue,
   fields,
   reviewFields,
   currentAccountId,
   thresholdDays,
   canCreate,
-  canReadAll,
   canReview,
 }: AbsencesPanelProps) => {
-  const { absences, isSaving, issues, clearIssues, create, review, remove } =
-    useAbsences(initialAbsences)
-  const [tab, setTab] = useState('mine')
+  const initial = useMemo(() => {
+    const seen = new Set(mine.map((absence) => absence.id))
+
+    return [...mine, ...queue.filter((absence) => !seen.has(absence.id))]
+  }, [mine, queue])
+
+  const { absences, isSaving, issues, clearIssues, create, review, remove } = useAbsences(initial)
   const [isCreating, setCreating] = useState(false)
   const [reviewing, setReviewing] = useState<{
     absence: MemberAbsence
@@ -67,172 +71,162 @@ export const AbsencesPanel = ({
   } | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<MemberAbsence | null>(null)
 
-  const mine = useMemo(
-    () => absences.filter((absence) => absence.accountId === currentAccountId),
+  const myAbsences = useMemo(
+    () =>
+      absences
+        .filter((absence) => absence.accountId === currentAccountId)
+        .sort((a, b) => b.startDate.localeCompare(a.startDate)),
     [absences, currentAccountId]
   )
-  const pending = useMemo(
-    () => absences.filter((absence) => absence.status === AbsenceStatuses.Pending),
-    [absences]
+  const pendingQueue = useMemo(
+    () =>
+      absences
+        .filter(
+          (absence) =>
+            absence.accountId !== currentAccountId && absence.status === AbsenceStatuses.Pending
+        )
+        .sort((a, b) => a.startDate.localeCompare(b.startDate)),
+    [absences, currentAccountId]
   )
 
-  const visible = tab === 'mine' ? mine : tab === 'pending' ? pending : absences
+  const [current, ...history] = myAbsences
 
   const openCreate = () => {
     clearIssues()
     setCreating(true)
   }
 
-  const tabs = [
-    { value: 'mine', label: ABSENCE_COPY.tabMine, icon: 'absences' as const, count: mine.length },
-    ...(canReadAll
-      ? [
-          {
-            value: 'team',
-            label: ABSENCE_COPY.tabTeam,
-            icon: 'members' as const,
-            count: absences.length,
-          },
-        ]
-      : []),
-    ...(canReview
-      ? [
-          {
-            value: 'pending',
-            label: ABSENCE_COPY.tabPending,
-            icon: 'clock' as const,
-            count: pending.length,
-          },
-        ]
-      : []),
-  ]
-
-  const columns: DataTableColumn<MemberAbsence>[] = [
-    ...(tab === 'mine'
-      ? []
-      : [
-          {
-            key: 'member',
-            header: FIELD_COPY.name,
-            sortValue: (absence: MemberAbsence) => absence.memberName.toLowerCase(),
-            render: (absence: MemberAbsence) => (
-              <span className="flex items-center gap-2">
-                <Avatar name={absence.memberName} size="xs" />
-                {absence.memberName}
-              </span>
-            ),
-          },
-        ]),
-    {
-      key: 'range',
-      header: FIELD_COPY.date,
-      sortValue: (absence) => absence.startDate,
-      className: 'whitespace-nowrap',
-      render: (absence) => formatDayRange(absence.startDate, absence.endDate),
-    },
-    {
-      key: 'dayCount',
-      header: FIELD_COPY.duration,
-      sortValue: (absence) => absence.dayCount,
-      render: (absence) => (
-        <Badge
-          label={`${absence.dayCount} ${absence.dayCount === 1 ? ABSENCE_COPY.dayOne : ABSENCE_COPY.days}`}
-          tone="neutral"
-          icon="clock"
-        />
-      ),
-    },
-    {
-      key: 'reason',
-      header: FIELD_COPY.reason,
-      render: (absence) => (
-        <span className="text-[var(--color-ink-subtle)]">{absence.reason ?? ''}</span>
-      ),
-    },
-    {
-      key: 'status',
-      header: FIELD_COPY.status,
-      sortValue: (absence) => absence.status,
-      render: (absence) => {
-        const status = ABSENCE_STATUS_REGISTRY.get(absence.status)
-
-        return <Badge label={status.label} tone={toTone(status.accent)} dot />
-      },
-    },
-    {
-      key: 'reviewer',
-      header: FIELD_COPY.author,
-      render: (absence) => (
-        <span className="text-[var(--color-ink-subtle)]">{absence.reviewerName ?? ''}</span>
-      ),
-    },
-  ]
-
-  const rowMenu = (absence: MemberAbsence): MenuItem[] => [
-    {
-      id: 'approve',
-      label: ABSENCE_COPY.approve,
-      icon: 'success',
-      disabled: !canReview || absence.status === AbsenceStatuses.Approved,
-      onSelect: () => {
-        clearIssues()
-        setReviewing({ absence, status: AbsenceStatuses.Approved })
-      },
-    },
-    {
-      id: 'refuse',
-      label: ABSENCE_COPY.refuse,
-      icon: 'blocked',
-      disabled: !canReview || absence.status === AbsenceStatuses.Refused,
-      onSelect: () => {
-        clearIssues()
-        setReviewing({ absence, status: AbsenceStatuses.Refused })
-      },
-    },
-    {
-      id: 'delete',
-      label: ABSENCE_COPY.cancel,
-      icon: 'remove',
-      danger: true,
-      separatorBefore: true,
-      disabled: !canReview && absence.accountId !== currentAccountId,
-      onSelect: () => setPendingDeletion(absence),
-    },
-  ]
+  const openReview = (absence: MemberAbsence, status: AbsenceStatusName) => {
+    clearIssues()
+    setReviewing({ absence, status })
+  }
 
   return (
     <>
       <Section bare>
-        {tabs.length > 1 && (
-          <Tabs items={tabs} value={tab} onChange={setTab} label={ABSENCE_COPY.title} />
-        )}
-        <DataTable
-          columns={columns}
-          rows={visible}
-          getRowId={(absence) => absence.id}
-          rowMenu={rowMenu}
-          emptyState={{
-            variant: 'start',
-            figure: 'absences',
-            title: tab === 'pending' ? ABSENCE_COPY.noPendingTitle : ABSENCE_COPY.emptyTitle,
-            description:
-              tab === 'pending' ? ABSENCE_COPY.noPendingDescription : ABSENCE_COPY.emptyDescription,
-            action: (
+        {current ? (
+          <div className="flex flex-col gap-3">
+            <AbsenceTimeline absence={current} />
+            <p className="max-w-2xl text-xs text-[var(--color-ink-subtle)] italic">
+              {ABSENCE_COPY.timelineDisclaimer}
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              {canCreate && <AddRow label={ABSENCE_COPY.planAnother} onClick={openCreate} />}
+              <Button
+                variant="ghost"
+                icon="remove"
+                onClick={() => setPendingDeletion(current)}
+                className="shrink-0"
+              >
+                {ABSENCE_COPY.cancel}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <EmptyState
+            variant="start"
+            figure="absences"
+            title={ABSENCE_COPY.emptyTitle}
+            description={ABSENCE_COPY.emptyDescription}
+            action={
               <Button variant="primary" icon="add" disabled={!canCreate} onClick={openCreate}>
                 {ABSENCE_COPY.add}
               </Button>
-            ),
-          }}
-        />
-        {visible.length > 0 && canCreate && (
-          <AddRow label={ABSENCE_COPY.add} onClick={openCreate} />
+            }
+          />
+        )}
+
+        {history.length > 0 && (
+          <div className="flex flex-col gap-2 pt-2">
+            <p className="text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase">
+              {ABSENCE_COPY.historyTitle}
+            </p>
+            <div className={LIST_STYLES.stack}>
+              {history.map((absence) => {
+                const status = ABSENCE_STATUS_REGISTRY.get(absence.status)
+
+                return (
+                  <div key={absence.id} className={LIST_STYLES.item}>
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="font-medium">
+                        {formatDayRange(absence.startDate, absence.endDate)}
+                      </span>
+                      {absence.reason && (
+                        <span className="truncate text-xs text-[var(--color-ink-subtle)]">
+                          {absence.reason}
+                        </span>
+                      )}
+                    </span>
+                    <Badge label={status.label} tone={toTone(status.accent)} dot />
+                    <Button
+                      variant="icon"
+                      icon="remove"
+                      aria-label={ACTION_COPY.delete}
+                      onClick={() => setPendingDeletion(absence)}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         )}
       </Section>
+
+      {canReview && (
+        <Section title={ABSENCE_COPY.queueTitle} bare>
+          {pendingQueue.length === 0 ? (
+            <p className="text-sm text-[var(--color-ink-subtle)] italic">
+              {ABSENCE_COPY.noPendingDescription}
+            </p>
+          ) : (
+            <div className={LIST_STYLES.stack}>
+              {pendingQueue.map((absence) => (
+                <div key={absence.id} className={LIST_STYLES.item}>
+                  <Avatar name={absence.memberName} size="sm" />
+                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="font-medium">{absence.memberName}</span>
+                    <span className="truncate text-xs text-[var(--color-ink-subtle)]">
+                      {formatDayRange(absence.startDate, absence.endDate)}
+                      {absence.reason ? ` · ${absence.reason}` : ''}
+                    </span>
+                  </span>
+                  <Badge
+                    label={`${absence.dayCount} ${absence.dayCount === 1 ? ABSENCE_COPY.dayOne : ABSENCE_COPY.days}`}
+                    tone="neutral"
+                    icon="clock"
+                  />
+                  <Button
+                    variant="icon"
+                    icon="success"
+                    aria-label={ABSENCE_COPY.approve}
+                    onClick={() => openReview(absence, AbsenceStatuses.Approved)}
+                  />
+                  <Button
+                    variant="icon"
+                    icon="blocked"
+                    aria-label={ABSENCE_COPY.refuse}
+                    onClick={() => openReview(absence, AbsenceStatuses.Refused)}
+                  />
+                  <Button
+                    variant="icon"
+                    icon="remove"
+                    aria-label={ACTION_COPY.delete}
+                    onClick={() => setPendingDeletion(absence)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
+      )}
 
       <FormDialog
         open={isCreating}
         title={ABSENCE_COPY.add}
-        description={ABSENCE_COPY.lead.replace('{threshold}', String(thresholdDays))}
+        description={ABSENCE_COPY.underThresholdNotice.replace(
+          '{threshold}',
+          String(thresholdDays)
+        )}
         fields={fields}
         issues={issues}
         isSaving={isSaving}
@@ -244,7 +238,9 @@ export const AbsencesPanel = ({
         open={reviewing !== null}
         title={ABSENCE_COPY.reviewTitle}
         description={
-          reviewing ? formatDayRange(reviewing.absence.startDate, reviewing.absence.endDate) : ''
+          reviewing
+            ? `${reviewing.absence.memberName} · ${formatDayRange(reviewing.absence.startDate, reviewing.absence.endDate)}`
+            : ''
         }
         fields={reviewFields}
         issues={issues}
