@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { AVATAR_STYLES, type AvatarSize } from '@/declarations/ui/variants/surfaces'
 import { cn } from '@/utils/classnames'
 
@@ -16,7 +15,7 @@ const initialsOf = (name: string): string =>
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('')
 
-// Pixel size per token, needed by next/image
+// Pixel size per token, reserved so the row never jumps once the picture lands
 const PIXEL_SIZES: Record<AvatarSize, number> = { xs: 24, sm: 32, md: 40, lg: 64 }
 
 export interface AvatarProps {
@@ -38,11 +37,18 @@ export interface AvatarProps {
 export const Avatar = ({ name, src, size = 'sm', className }: AvatarProps) => (
   <span className={cn(AVATAR_STYLES.base, AVATAR_STYLES[size], className)} title={name}>
     {src ? (
-      <Image
+      /*
+       * A portrait is member supplied and usually served by the session guarded file
+       * route, which the image optimiser cannot authenticate against — so the browser
+       * fetches it directly, cookies and all.
+       */
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
         src={src}
-        alt={name}
+        alt=""
         width={PIXEL_SIZES[size]}
         height={PIXEL_SIZES[size]}
+        loading="lazy"
         className="h-full w-full object-cover"
       />
     ) : (

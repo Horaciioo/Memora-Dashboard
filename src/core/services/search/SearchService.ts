@@ -30,7 +30,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
   if (access.can(Permissions.MemberRead)) {
     const rows = await prisma.account.findMany({
       where: { OR: [{ displayName: contains }, { discordId: { contains: query } }] },
-      include: { division: true, youtuber: true },
+      include: { division: true, youtubers: true },
       take,
     })
 
@@ -41,7 +41,10 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         id: row.id,
         group: 'members',
         label: row.displayName,
-        hint: [row.division?.name, row.youtuber?.name].filter(Boolean).join(' · ') || undefined,
+        hint:
+          [row.division?.name, ...row.youtubers.map((youtuber) => youtuber.name)]
+            .filter(Boolean)
+            .join(' · ') || undefined,
         href: ROUTES.member(row.id),
       })),
     })
