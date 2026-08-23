@@ -37,8 +37,8 @@ export default async function MembersPage() {
         youtubers={rowsToOptions(youtubers)}
         functions={rowsToOptions(functions)}
         canCreate={access.can(Permissions.MemberCreate)}
-        canUpdate={access.can(Permissions.MemberUpdate)}
         canDelete={access.can(Permissions.MemberDelete)}
+        canReadNotes={access.can(Permissions.MemberNoteRead)}
       />
     </div>
   )

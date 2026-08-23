@@ -5,9 +5,13 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
-import { FEEDBACK_COPY } from '@/declarations/ui/copy'
+import { feedbackTitle } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { MemberSummary } from '@/types/members'
+
+// Toast entity label
+const ENTITY = 'Modérateur'
+const GENDER = 'masculine'
 
 /**
  * Moderator list state and mutations
@@ -43,9 +47,10 @@ export const useMembers = (initialMembers: MemberSummary[]): MembersCollection =
 
   const create = useCallback(
     async (values: FormValues) => {
+      const name = typeof values.displayName === 'string' ? values.displayName : undefined
       const member = await run(
         () => apiPost<MemberSummary>(API_ROUTES.members, values),
-        FEEDBACK_COPY.created
+        feedbackTitle(ENTITY, 'created', GENDER, name)
       )
 
       if (member) setMembers((current) => [...current, member])
@@ -57,9 +62,10 @@ export const useMembers = (initialMembers: MemberSummary[]): MembersCollection =
 
   const update = useCallback(
     async (id: string, values: FormValues) => {
+      const name = typeof values.displayName === 'string' ? values.displayName : undefined
       const member = await run(
         () => apiPatch<MemberSummary>(API_ROUTES.member(id), values),
-        FEEDBACK_COPY.saved
+        feedbackTitle(ENTITY, 'saved', GENDER, name)
       )
 
       if (member)
@@ -72,14 +78,15 @@ export const useMembers = (initialMembers: MemberSummary[]): MembersCollection =
 
   const remove = useCallback(
     async (id: string) => {
+      const name = members.find((member) => member.id === id)?.displayName
       const done = await run(
         () => apiDelete<{ id: string }>(API_ROUTES.member(id)),
-        FEEDBACK_COPY.deleted
+        feedbackTitle(ENTITY, 'deleted', GENDER, name)
       )
 
       if (done) setMembers((current) => current.filter((entry) => entry.id !== id))
     },
-    [run]
+    [run, members]
   )
 
   return { members, isSaving, issues, create, update, remove, clearIssues }

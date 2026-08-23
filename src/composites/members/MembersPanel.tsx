@@ -3,24 +3,25 @@
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { DataTable, type DataTableColumn } from '@/components/structures/DataTable'
+import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FilterBar, type FilterDefinition } from '@/components/structures/FilterBar'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
 import { useMembers } from '@/core/hooks/data/useMembers'
+import { toOptions } from '@/core/lib/forms/options'
 import { ROLE_REGISTRY, MEMBER_STATUS_REGISTRY } from '@/declarations/access/roles'
 import { MEMBER_COPY, MEMBER_FILTER_COPY } from '@/declarations/members/copy'
 import { ROUTES } from '@/declarations/navigation'
-import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
-import { DivisionBadge, MemberStatusBadge, RoleBadge } from '@/composites/members/MemberBadges'
-import type { MenuItem } from '@/managers/front-end'
+import { ACTION_COPY } from '@/declarations/ui/copy'
+import { ICONS } from '@/declarations/ui/icons'
+import { GROUP_STYLES, LIST_STYLES } from '@/declarations/ui/variants'
+import { MemberCard } from '@/composites/members/MemberCard'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { MemberSummary } from '@/types/members'
-import { formatDay } from '@/utils/format/dates'
+import { cn } from '@/utils/classnames'
 
 export interface MembersPanelProps {
   initialMembers: MemberSummary[]
@@ -29,20 +30,20 @@ export interface MembersPanelProps {
   youtubers: FieldOption[]
   functions: FieldOption[]
   canCreate: boolean
-  canUpdate: boolean
   canDelete: boolean
+  canReadNotes: boolean
 }
 
 /**
- * Moderator list with its filters, its creation dialog and a right click menu per row
+ * Moderator boxes, categorised by YouTuber, with their filters and a right click menu per box
  * @param {MemberSummary[]} initialMembers - Rows resolved server-side
  * @param {FieldDefinition[]} fields - Field declarations of the moderator form
  * @param {FieldOption[]} divisions - Division filter options
- * @param {FieldOption[]} youtubers - YouTuber filter options
+ * @param {FieldOption[]} youtubers - YouTuber filter options and group order
  * @param {FieldOption[]} functions - Function filter options
  * @param {boolean} canCreate - Member may add a moderator
- * @param {boolean} canUpdate - Member may edit a moderator
  * @param {boolean} canDelete - Member may drop a moderator
+ * @param {boolean} canReadNotes - Member may see the notes indicator
  * @return {JSX.Element}
  */
 
@@ -53,15 +54,28 @@ export const MembersPanel = ({
   youtubers,
   functions,
   canCreate,
-  canUpdate,
   canDelete,
+  canReadNotes,
 }: MembersPanelProps) => {
   const router = useRouter()
   const { members, isSaving, issues, create, remove, clearIssues } = useMembers(initialMembers)
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState<Record<string, string>>({})
   const [isCreating, setCreating] = useState(false)
+  const [createYoutuberId, setCreateYoutuberId] = useState<string | undefined>(undefined)
   const [pendingDeletion, setPendingDeletion] = useState<MemberSummary | null>(null)
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  const ChevronIcon = ICONS.expand
+
+  const toggleGroup = (key: string) => {
+    setCollapsed((current) => {
+      const next = new Set(current)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+
+      return next
+    })
+  }
 
   const isFiltered =
     search.trim().length > 0 || Object.values(filters).some((value) => value.length > 0)
@@ -82,7 +96,12 @@ export const MembersPanel = ({
       if (filters.role && member.role !== filters.role) return false
       if (filters.status && member.status !== filters.status) return false
       if (filters.division && member.division?.id !== filters.division) return false
-      if (filters.youtuber && member.youtuber?.id !== filters.youtuber) return false
+      if (
+        filters.youtuber &&
+        !member.youtubers.some((youtuber) => youtuber.id === filters.youtuber)
+      ) {
+        return false
+      }
       if (
         filters.jobFunction &&
         member.primaryFunction?.id !== filters.jobFunction &&
@@ -95,24 +114,60 @@ export const MembersPanel = ({
     })
   }, [members, search, filters])
 
+  // One bucket per YouTuber, in their configured order, a member with several YouTubers
+  // appears in each, moderators left unassigned trailing behind
+  const groups = useMemo(() => {
+    const buckets = new Map<string, MemberSummary[]>()
+
+    for (const member of visibleMembers) {
+      const keys =
+        member.youtubers.length > 0 ? member.youtubers.map((youtuber) => youtuber.id) : ['none']
+
+      for (const key of keys) {
+        if (!buckets.has(key)) buckets.set(key, [])
+        buckets.get(key)!.push(member)
+      }
+    }
+
+    // Unfiltered, every configured YouTuber keeps its box even with no moderator yet
+    const ordered = (
+      isFiltered ? youtubers.filter((option) => buckets.has(option.value)) : youtubers
+    ).map((option) => ({
+      label: option.label,
+      youtuberId: option.value as string | undefined,
+      image: option.image,
+      members: buckets.get(option.value) ?? [],
+    }))
+
+    const unassigned = buckets.get('none')
+
+    return unassigned
+      ? [
+          ...ordered,
+          {
+            label: MEMBER_COPY.noYoutuber,
+            youtuberId: undefined,
+            image: undefined,
+            members: unassigned,
+          },
+        ]
+      : ordered
+  }, [visibleMembers, youtubers, isFiltered])
+
   const filterDefinitions: FilterDefinition[] = [
     {
       name: 'role',
       label: MEMBER_FILTER_COPY.role,
       allLabel: MEMBER_FILTER_COPY.allRoles,
-      options: ROLE_REGISTRY.keys.map((key) => ({
-        value: key,
-        label: ROLE_REGISTRY.label(key),
-      })),
+      options: toOptions(ROLE_REGISTRY),
+      mark: 'dot',
     },
     {
       name: 'status',
       label: MEMBER_FILTER_COPY.status,
       allLabel: MEMBER_FILTER_COPY.allStatuses,
-      options: MEMBER_STATUS_REGISTRY.keys.map((key) => ({
-        value: key,
-        label: MEMBER_STATUS_REGISTRY.label(key),
-      })),
+      options: toOptions(MEMBER_STATUS_REGISTRY),
+      mark: 'dot',
     },
     {
       name: 'division',
@@ -125,119 +180,26 @@ export const MembersPanel = ({
       label: MEMBER_FILTER_COPY.youtuber,
       allLabel: MEMBER_FILTER_COPY.allYoutubers,
       options: youtubers,
+      mark: 'avatar',
     },
     {
       name: 'jobFunction',
       label: MEMBER_FILTER_COPY.jobFunction,
       allLabel: MEMBER_FILTER_COPY.allFunctions,
       options: functions,
+      mark: 'dot',
     },
   ]
 
-  const columns: DataTableColumn<MemberSummary>[] = [
-    {
-      key: 'displayName',
-      header: FIELD_COPY.name,
-      sortValue: (member) => member.displayName.toLowerCase(),
-      render: (member) => (
-        <span className="flex items-center gap-2.5">
-          <Avatar name={member.displayName} src={member.avatarUrl} />
-          <span className="flex min-w-0 flex-col">
-            <span className="truncate font-medium">{member.displayName}</span>
-            <span className="truncate text-xs text-[var(--color-ink-subtle)]">
-              {member.discordId}
-            </span>
-          </span>
-        </span>
-      ),
-    },
-    {
-      key: 'division',
-      header: FIELD_COPY.division,
-      sortValue: (member) => member.division?.rank ?? -1,
-      render: (member) => <DivisionBadge division={member.division} />,
-    },
-    {
-      key: 'role',
-      header: FIELD_COPY.role,
-      sortValue: (member) => ROLE_REGISTRY.get(member.role).rank,
-      render: (member) => <RoleBadge member={member} />,
-    },
-    {
-      key: 'youtuber',
-      header: FIELD_COPY.youtuber,
-      sortValue: (member) => member.youtuber?.label ?? '',
-      render: (member) =>
-        member.youtuber ? (
-          <Badge label={member.youtuber.label} tone="info" icon="youtuber" />
-        ) : (
-          <span className="text-xs text-[var(--color-ink-subtle)]">{MEMBER_COPY.noYoutuber}</span>
-        ),
-    },
-    {
-      key: 'functions',
-      header: FIELD_COPY.mainFunction,
-      render: (member) => (
-        <span className="flex flex-wrap gap-1.5">
-          {member.primaryFunction && <Badge label={member.primaryFunction.label} tone="brand" />}
-          {member.secondaryFunction && (
-            <Badge label={member.secondaryFunction.label} tone="neutral" />
-          )}
-          {!member.primaryFunction && !member.secondaryFunction && (
-            <span className="text-xs text-[var(--color-ink-subtle)]">{MEMBER_COPY.noFunction}</span>
-          )}
-        </span>
-      ),
-    },
-    {
-      key: 'status',
-      header: FIELD_COPY.status,
-      sortValue: (member) => member.status,
-      render: (member) => <MemberStatusBadge member={member} />,
-    },
-    {
-      key: 'joinedAt',
-      header: FIELD_COPY.joinedAt,
-      sortValue: (member) => member.joinedAt,
-      className: 'whitespace-nowrap',
-      render: (member) => formatDay(member.joinedAt),
-    },
-  ]
-
-  const rowMenu = (member: MemberSummary): MenuItem[] => [
-    {
-      id: 'open',
-      label: ACTION_COPY.open,
-      icon: 'forward',
-      onSelect: () => router.push(ROUTES.member(member.id)),
-    },
-    {
-      id: 'edit',
-      label: ACTION_COPY.edit,
-      icon: 'edit',
-      disabled: !canUpdate || member.isRoot,
-      onSelect: () => router.push(ROUTES.member(member.id)),
-    },
-    {
-      id: 'copy',
-      label: ACTION_COPY.copyLink,
-      icon: 'copy',
-      onSelect: () => void navigator.clipboard.writeText(member.discordId),
-    },
-    {
-      id: 'delete',
-      label: ACTION_COPY.delete,
-      icon: 'remove',
-      danger: true,
-      separatorBefore: true,
-      disabled: !canDelete || member.isRoot,
-      onSelect: () => setPendingDeletion(member),
-    },
-  ]
-
-  const openCreate = () => {
+  const openCreate = (youtuberId?: string) => {
     clearIssues()
+    setCreateYoutuberId(youtuberId)
     setCreating(true)
+  }
+
+  const resetFilters = () => {
+    setSearch('')
+    setFilters({})
   }
 
   return (
@@ -250,53 +212,82 @@ export const MembersPanel = ({
           filters={filterDefinitions}
           values={filters}
           onFilter={(name, value) => setFilters((current) => ({ ...current, [name]: value }))}
-          onReset={() => {
-            setSearch('')
-            setFilters({})
-          }}
+          onReset={resetFilters}
           isFiltered={isFiltered}
-          summary={`${visibleMembers.length} ${
-            visibleMembers.length === 1 ? MEMBER_FILTER_COPY.countOne : MEMBER_FILTER_COPY.count
-          }`}
         />
-        <DataTable
-          columns={columns}
-          rows={visibleMembers}
-          getRowId={(member) => member.id}
-          onRowOpen={(member) => router.push(ROUTES.member(member.id))}
-          rowMenu={rowMenu}
-          emptyState={
-            isFiltered
-              ? {
-                  variant: 'filter',
-                  title: MEMBER_COPY.filterTitle,
-                  description: MEMBER_COPY.filterDescription,
-                  action: (
-                    <Button
-                      onClick={() => {
-                        setSearch('')
-                        setFilters({})
-                      }}
-                    >
-                      {ACTION_COPY.clearFilter}
-                    </Button>
-                  ),
-                }
-              : {
-                  variant: 'start',
-                  figure: 'members',
-                  title: MEMBER_COPY.emptyTitle,
-                  description: MEMBER_COPY.emptyDescription,
-                  action: (
-                    <Button variant="primary" icon="add" onClick={openCreate} disabled={!canCreate}>
-                      {MEMBER_COPY.add}
-                    </Button>
-                  ),
-                }
-          }
-        />
-        {visibleMembers.length > 0 && canCreate && (
-          <AddRow label={MEMBER_COPY.add} onClick={openCreate} />
+
+        {isFiltered && visibleMembers.length === 0 ? (
+          <EmptyState
+            variant="filter"
+            title={MEMBER_COPY.filterTitle}
+            description={MEMBER_COPY.filterDescription}
+            action={<Button onClick={resetFilters}>{ACTION_COPY.clearFilter}</Button>}
+          />
+        ) : groups.length === 0 ? (
+          <EmptyState
+            figure="members"
+            title={MEMBER_COPY.emptyTitle}
+            description={MEMBER_COPY.emptyDescription}
+            action={
+              <Button
+                variant="primary"
+                icon="add"
+                onClick={() => openCreate()}
+                disabled={!canCreate}
+              >
+                {MEMBER_COPY.add}
+              </Button>
+            }
+          />
+        ) : (
+          <div className={GROUP_STYLES.stack}>
+            {groups.map((group, index) => {
+              const key = group.youtuberId ?? 'none'
+              const isOpen = !collapsed.has(key)
+
+              return (
+                <div
+                  key={key}
+                  className={cn(GROUP_STYLES.section, index > 0 && GROUP_STYLES.sectionDivided)}
+                >
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    onClick={() => toggleGroup(key)}
+                    className={GROUP_STYLES.heading}
+                  >
+                    {group.youtuberId && <Avatar name={group.label} src={group.image} size="sm" />}
+                    {group.label}
+                    <span className={GROUP_STYLES.count}>{group.members.length}</span>
+                    <ChevronIcon
+                      className={cn(GROUP_STYLES.chevron, isOpen && GROUP_STYLES.chevronOpen)}
+                      aria-hidden="true"
+                    />
+                  </button>
+                  {isOpen && (
+                    <div className={LIST_STYLES.grid}>
+                      {group.members.map((member) => (
+                        <MemberCard
+                          key={member.id}
+                          member={member}
+                          showNotesBubble={canReadNotes}
+                          canDelete={canDelete && !member.isRoot}
+                          onOpen={() => router.push(ROUTES.member(member.id))}
+                          onDelete={() => setPendingDeletion(member)}
+                        />
+                      ))}
+                      {canCreate && (
+                        <AddRow
+                          label={MEMBER_COPY.add}
+                          onClick={() => openCreate(group.youtuberId)}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         )}
       </Section>
 
@@ -304,6 +295,7 @@ export const MembersPanel = ({
         open={isCreating}
         title={MEMBER_COPY.add}
         fields={fields}
+        initialValues={createYoutuberId ? { youtuberIds: [createYoutuberId] } : undefined}
         issues={issues}
         isSaving={isSaving}
         size="lg"

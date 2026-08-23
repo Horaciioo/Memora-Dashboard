@@ -19,7 +19,7 @@ export type Permission = PermissionName
  * @property {MemberStatusName} status - Membership status
  * @property {AcademyPeriodName | null} academyPeriod - Academy progression
  * @property {string | null} divisionId - Division identifier
- * @property {string | null} youtuberId - Assigned YouTuber
+ * @property {string[]} youtuberIds - Assigned YouTubers
  * @property {string | null} primaryFunctionId - Main function
  * @property {string | null} secondaryFunctionId - Secondary function
  * @property {boolean} isRoot - Root administrator
@@ -35,7 +35,7 @@ export interface SessionUser {
   status: MemberStatusName
   academyPeriod: AcademyPeriodName | null
   divisionId: string | null
-  youtuberId: string | null
+  youtuberIds: string[]
   primaryFunctionId: string | null
   secondaryFunctionId: string | null
   isRoot: boolean
