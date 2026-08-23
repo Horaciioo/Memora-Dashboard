@@ -6,6 +6,8 @@
 export const ACADEMY_COPY = {
   title: 'Marsha Academy',
   lead: 'Chaque session accueille, forme, suit et valide ses juniors jusqu’à leur autonomie.',
+  glossaryTitle: 'Lexique de l’Academy',
+  glossaryLead: 'Les mots du domaine, définis une fois pour toutes.',
   sessionAdd: 'Ouvrir une session',
   emptyTitle: 'Aucune session',
   emptyDescription: 'Ouvre une première session pour accueillir des juniors.',
