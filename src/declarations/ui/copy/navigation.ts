@@ -15,6 +15,7 @@ export const NAV_COPY = {
   searchEmpty: 'Rien ne correspond à cette recherche.',
   searchPrompt: 'Tape pour chercher un modérateur, un projet, une tâche ou une réunion.',
   searchNavigate: '↑ ↓ pour naviguer, ↵ pour ouvrir',
+  preferences: 'Paramètres',
   theme: 'Thème',
   textSize: 'Taille du texte',
   colorVision: 'Vision des couleurs',

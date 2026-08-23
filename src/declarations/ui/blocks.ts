@@ -24,6 +24,11 @@ export const APP_SHELL = {
   brandMark: 'h-8 w-8 rounded-[var(--radius-md)]',
   brandName: 'text-base leading-none font-extrabold tracking-tight',
   brandCompany: 'text-[11px] tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  search: 'px-3 pt-3',
+  searchTrigger:
+    'flex w-full min-w-0 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-border-strong)]',
+  searchHint:
+    'ml-auto hidden rounded-[var(--radius-sm)] border border-[var(--color-border)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-[10px] sm:block',
   nav: 'flex flex-1 flex-col gap-5 overflow-y-auto px-3 py-4',
   navGroup: 'flex flex-col gap-1',
   navGroupLabel:
@@ -33,17 +38,17 @@ export const APP_SHELL = {
   navLinkActive: 'bg-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
   navIcon: 'h-4 w-4 shrink-0',
   navBadge:
-    'ml-auto rounded-full bg-[var(--color-surface)] px-1.5 py-0.5 text-[10px] text-[var(--color-ink-subtle)]',
+    'ml-auto rounded-[var(--radius-sm)] bg-[var(--color-warning-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-warning)]',
   sidebarFooter: 'border-t border-[var(--color-border)] p-3',
+  accountRow: 'flex items-center gap-2.5 px-1',
+  accountIdentity: 'flex min-w-0 flex-1 flex-col',
+  accountControls: 'flex shrink-0 items-center gap-1',
+  accountDivider: 'h-5 w-px shrink-0 bg-[var(--color-border)]',
   scrim: 'fixed inset-0 z-30 bg-[var(--color-ink)]/40 backdrop-blur-sm lg:hidden',
   main: 'flex min-w-0 flex-1 flex-col',
-  topbar:
-    'sticky top-0 z-20 flex items-center gap-3 border-b border-[var(--color-border)] bg-[var(--color-background)]/85 px-4 py-3 backdrop-blur sm:px-6',
-  searchTrigger:
-    'flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-sm text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-border-strong)] sm:max-w-sm',
-  searchHint:
-    'ml-auto hidden rounded-[var(--radius-sm)] border border-[var(--color-border)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-[10px] sm:block',
-  content: 'mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-6 sm:px-6 sm:py-8',
+  menuButton:
+    'fixed bottom-4 left-4 z-30 flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-ink)] shadow-[var(--shadow-md)] lg:hidden',
+  content: 'mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8',
   breadcrumbs: 'flex flex-wrap items-center gap-1 text-xs text-[var(--color-ink-subtle)]',
   crumbLink: 'transition-colors hover:text-[var(--color-ink)]',
   crumbCurrent: 'font-medium text-[var(--color-ink)]',

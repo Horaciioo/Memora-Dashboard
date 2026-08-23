@@ -14,6 +14,7 @@ export const ACTION_COPY = {
   confirm: 'Confirmer',
   search: 'Rechercher',
   filter: 'Filtrer',
+  filters: 'Filtres',
   clearFilter: 'Retirer le filtre',
   reset: 'Réinitialiser',
   open: 'Ouvrir',
@@ -22,6 +23,7 @@ export const ACTION_COPY = {
   duplicate: 'Dupliquer',
   archive: 'Archiver',
   copyLink: 'Copier le lien',
+  copyId: 'Copier l’identifiant',
   all: 'Tout',
   none: 'Aucun',
   optional: 'facultatif',
@@ -79,7 +81,9 @@ export const FIELD_COPY = {
  */
 
 export const WIP_COPY = {
-  badge: 'En cours de développement',
+  badge: 'Bêta',
   title: 'En cours de développement',
   description: 'Cette partie arrive bientôt, rien n’est encore branché dessus.',
+  beta: 'Bêta',
+  betaNotice: 'Cette partie n’est pas terminée, elle bouge encore.',
 } as const
