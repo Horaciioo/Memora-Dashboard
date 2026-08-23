@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { GRANT_ADDITIONS } from '@/declarations/access/grants'
 import { ROLE_PRESETS } from '@/declarations/access/roles'
 import { MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
@@ -9,35 +10,45 @@ import { isPermissionName } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 import type { Account } from '@prisma/client'
 
+// Applied once per process, every later call costing nothing
+let synced = false
+
 /**
- * Seed role grants on an empty table
- * @return {Promise<void>} - Seeded
+ * Land every grant batch the database has not seen yet, adding only — a permission
+ * an administrator removed after a batch applied never comes back
+ * @return {Promise<void>} - Synchronised
  */
 
-export const ensureRoleGrantsSeeded = async (): Promise<void> => {
-  const existing = await prisma.rolePermission.count()
-  if (existing > 0) return
+export const syncRoleGrants = async (): Promise<void> => {
+  if (synced) return
 
-  await prisma.rolePermission.createMany({
-    data: Object.entries(ROLE_PRESETS).flatMap(([role, permissions]) =>
-      permissions.map((permission) => ({ role: role as MemberRoleName, permission }))
-    ),
-    skipDuplicates: true,
-  })
+  const applied = await prisma.grantMigration.findMany({ select: { key: true } })
+  const known = new Set(applied.map((entry) => entry.key))
+  const pending = GRANT_ADDITIONS.filter((addition) => !known.has(addition.key))
+
+  // One transaction per batch, so a half-applied key is never recorded
+  for (const addition of pending) {
+    const rows = Object.entries(addition.grants).flatMap(([role, permissions]) =>
+      (permissions ?? []).map((permission) => ({ role: role as MemberRoleName, permission }))
+    )
+
+    await prisma.$transaction([
+      prisma.rolePermission.createMany({ data: rows, skipDuplicates: true }),
+      prisma.grantMigration.create({ data: { key: addition.key } }),
+    ])
+  }
+
+  synced = true
 }
 
 /**
- * Resolve every permission held by an account
+ * Resolve every permission held by an account, the root bypass living in resolvePermissions
  * @param {Account} account - Account row
- * @param {boolean} isRoot - Root administrator
  * @return {Promise<PermissionName[]>} - Granted permissions
  */
 
-export const resolveAccountPermissions = async (
-  account: Account,
-  isRoot: boolean
-): Promise<PermissionName[]> => {
-  await ensureRoleGrantsSeeded()
+export const resolveAccountPermissions = async (account: Account): Promise<PermissionName[]> => {
+  await syncRoleGrants()
 
   const functionIds = [account.primaryFunctionId, account.secondaryFunctionId].filter(
     (id): id is string => id !== null
@@ -61,8 +72,6 @@ export const resolveAccountPermissions = async (
     if (override.effect === PermissionEffects.Allow) granted.add(override.permission)
     else granted.delete(override.permission)
   }
-
-  if (isRoot) return [...granted].filter(isPermissionName)
 
   return [...granted].filter(isPermissionName)
 }
@@ -122,7 +131,7 @@ export const applyRolePreset = async (role: MemberRoleName): Promise<void> =>
  */
 
 export const readRoleGrants = async (): Promise<Record<MemberRoleName, PermissionName[]>> => {
-  await ensureRoleGrantsSeeded()
+  await syncRoleGrants()
 
   const rows = await prisma.rolePermission.findMany()
   const grants: Record<MemberRoleName, PermissionName[]> = {
