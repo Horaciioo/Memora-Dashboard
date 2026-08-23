@@ -32,8 +32,6 @@ export const LIVECON_COPY = {
 
 export const LIVECON_FIELD_COPY = {
   youtuber: 'YouTubeur',
-  youtuberHint: 'Laisse vide pour appliquer à toute l’équipe.',
   level: 'Niveau',
   reason: 'Motif',
-  reasonHint: 'Ce que l’équipe doit savoir sur la bascule.',
 } as const
