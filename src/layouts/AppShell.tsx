@@ -2,13 +2,11 @@
 
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { Button } from '@/components/elements/actions/Button'
 import { Breadcrumbs } from '@/components/structures/Breadcrumbs'
 import { SidebarNav } from '@/composites/shell/SidebarNav'
-import { AccountMenu } from '@/composites/shell/AccountMenu'
-import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { APP_SHELL } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
+import { ICONS } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
 
 export interface AppShellProps {
@@ -16,13 +14,15 @@ export interface AppShellProps {
 }
 
 /**
- * Chrome of the signed-in dashboard, a docked sidebar on desktop and a drawer below it
+ * Chrome of the signed-in dashboard — a docked sidebar carrying search, navigation and the
+ * account, and the routed page beside it with no bar above it
  * @param {ReactNode} children - Routed page content
  * @return {JSX.Element}
  */
 
 export const AppShell = ({ children }: AppShellProps) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false)
+  const MenuIcon = ICONS.dashboard
 
   return (
     <div className={APP_SHELL.frame}>
@@ -38,22 +38,20 @@ export const AppShell = ({ children }: AppShellProps) => {
         onNavigate={() => setSidebarOpen(false)}
       />
       <div className={APP_SHELL.main}>
-        <header className={APP_SHELL.topbar}>
-          <Button
-            variant="icon"
-            icon="dashboard"
-            aria-label={NAV_COPY.openSidebar}
-            className="lg:hidden"
-            onClick={() => setSidebarOpen((open) => !open)}
-          />
-          <div className="hidden min-w-0 flex-1 sm:block">
-            <Breadcrumbs />
-          </div>
-          <SearchLauncher />
-          <AccountMenu />
-        </header>
-        <main className={APP_SHELL.content}>{children}</main>
+        <main className={APP_SHELL.content}>
+          <Breadcrumbs />
+          {children}
+        </main>
       </div>
+      <button
+        type="button"
+        aria-label={isSidebarOpen ? NAV_COPY.closeSidebar : NAV_COPY.openSidebar}
+        aria-expanded={isSidebarOpen}
+        className={APP_SHELL.menuButton}
+        onClick={() => setSidebarOpen((open) => !open)}
+      >
+        <MenuIcon className="h-5 w-5" aria-hidden="true" />
+      </button>
     </div>
   )
 }
