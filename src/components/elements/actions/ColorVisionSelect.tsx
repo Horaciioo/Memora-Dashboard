@@ -1,7 +1,9 @@
 'use client'
 
-import { Select } from '@/components/elements/forms/Select'
+import { SelectMenu } from '@/components/elements/forms/SelectMenu'
+import { toOptions } from '@/core/lib/forms/options'
 import { COLOR_VISION_REGISTRY, type ColorVisionMode } from '@/declarations/access/preferences'
+import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { useColorVisionStore } from '@/core/store/colorVision'
 
 /**
@@ -14,17 +16,13 @@ export const ColorVisionSelect = () => {
   const setColorVisionMode = useColorVisionStore((state) => state.setColorVisionMode)
 
   return (
-    <Select
-      textSize="xs"
+    <SelectMenu
+      compact
+      label={NAV_COPY.colorVision}
+      options={toOptions(COLOR_VISION_REGISTRY)}
       value={colorVisionMode}
-      onChange={(event) => setColorVisionMode(event.target.value as ColorVisionMode)}
-      aria-label="Color vision mode"
-    >
-      {COLOR_VISION_REGISTRY.keys.map((key) => (
-        <option key={key} value={key}>
-          {COLOR_VISION_REGISTRY.get(key).label}
-        </option>
-      ))}
-    </Select>
+      className="w-auto min-w-44"
+      onChange={(value) => setColorVisionMode(value as ColorVisionMode)}
+    />
   )
 }

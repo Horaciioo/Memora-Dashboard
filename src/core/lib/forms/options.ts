@@ -8,18 +8,33 @@ import type { FieldOption } from '@/types/forms'
  * @return {FieldOption[]} - Select options
  */
 
-export const toOptions = <TKey extends string, TValue extends { label: string }>(
+export const toOptions = <
+  TKey extends string,
+  TValue extends { label: string; accent?: string | null },
+>(
   registry: Registry<TKey, TValue>
-): FieldOption[] => registry.keys.map((key) => ({ value: key, label: registry.label(key) }))
+): FieldOption[] =>
+  registry.keys.map((key) => ({
+    value: key,
+    label: registry.label(key),
+    accent: registry.get(key).accent ?? undefined,
+  }))
 
 /**
  * Turn database rows into select options
- * @param {Array<{ id: string, name: string }>} rows - Rows to map
+ * @param {Array<{ id: string, name: string, accent?: string, avatarUrl?: string }>} rows - Rows to map
  * @return {FieldOption[]} - Select options
  */
 
-export const rowsToOptions = (rows: { id: string; name: string }[]): FieldOption[] =>
-  rows.map((row) => ({ value: row.id, label: row.name }))
+export const rowsToOptions = (
+  rows: { id: string; name: string; accent?: string | null; avatarUrl?: string | null }[]
+): FieldOption[] =>
+  rows.map((row) => ({
+    value: row.id,
+    label: row.name,
+    accent: row.accent ?? undefined,
+    image: row.avatarUrl ?? undefined,
+  }))
 
 /**
  * Colour tones offered on a reference form
