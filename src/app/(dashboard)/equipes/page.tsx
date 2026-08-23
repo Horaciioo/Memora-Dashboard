@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { TeamsBoard } from '@/composites/teams/TeamsBoard'
+import { prisma } from '@/core/lib/db'
+import { rowsToOptions } from '@/core/lib/forms/options'
 import { readTeamBoard, teamFields } from '@/core/services/teams/TeamService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { TEAM_COPY } from '@/declarations/teams/copy'
@@ -16,7 +18,11 @@ export const metadata: Metadata = { title: TEAM_COPY.title }
 
 export default async function TeamsPage() {
   const { access } = await requirePermission(Permissions.TeamRead)
-  const [board, fields] = await Promise.all([readTeamBoard(), teamFields()])
+  const [board, fields, youtubers] = await Promise.all([
+    readTeamBoard(),
+    teamFields(),
+    prisma.youtuber.findMany({ orderBy: { position: 'asc' } }),
+  ])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
@@ -24,6 +30,7 @@ export default async function TeamsPage() {
       <TeamsBoard
         initialBoard={board}
         fields={fields}
+        youtubers={rowsToOptions(youtubers)}
         canManage={access.can(Permissions.TeamManage)}
       />
     </div>
