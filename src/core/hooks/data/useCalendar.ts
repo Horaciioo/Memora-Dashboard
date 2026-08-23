@@ -5,9 +5,13 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
-import { FEEDBACK_COPY } from '@/declarations/ui/copy'
+import { feedbackTitle } from '@/declarations/ui/copy'
 import type { CalendarEntry } from '@/types/calendar'
 import type { FieldIssue, FormValues } from '@/types/forms'
+
+// Toast entity label
+const ENTITY = 'Évènement'
+const GENDER = 'masculine'
 
 /**
  * Calendar state and mutations
@@ -55,9 +59,10 @@ export const useCalendar = (initialEntries: CalendarEntry[]): CalendarCollection
 
   const create = useCallback(
     async (values: FormValues) => {
+      const name = typeof values.title === 'string' ? values.title : undefined
       const entry = await run(
         () => apiPost<CalendarEntry>(API_ROUTES.calendarEntries, values),
-        FEEDBACK_COPY.created
+        feedbackTitle(ENTITY, 'created', GENDER, name)
       )
 
       if (entry) replace(entry)
@@ -69,9 +74,10 @@ export const useCalendar = (initialEntries: CalendarEntry[]): CalendarCollection
 
   const update = useCallback(
     async (id: string, values: FormValues) => {
+      const name = typeof values.title === 'string' ? values.title : undefined
       const entry = await run(
         () => apiPatch<CalendarEntry>(API_ROUTES.calendarEntry(id), values),
-        FEEDBACK_COPY.saved
+        feedbackTitle(ENTITY, 'saved', GENDER, name)
       )
 
       if (entry) replace(entry)
@@ -109,14 +115,15 @@ export const useCalendar = (initialEntries: CalendarEntry[]): CalendarCollection
 
   const remove = useCallback(
     async (id: string) => {
+      const name = entries.find((row) => row.id === id)?.title
       const done = await run(
         () => apiDelete<{ id: string }>(API_ROUTES.calendarEntry(id)),
-        FEEDBACK_COPY.deleted
+        feedbackTitle(ENTITY, 'deleted', GENDER, name)
       )
 
       if (done) setEntries((current) => current.filter((row) => row.id !== id))
     },
-    [run]
+    [run, entries]
   )
 
   return { entries, isSaving, issues, clearIssues, create, update, move, remove, load }

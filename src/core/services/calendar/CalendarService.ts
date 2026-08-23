@@ -8,6 +8,7 @@ import { projectOptions, youtuberOptions } from '@/core/services/work/shared'
 import { CALENDAR_FIELD_COPY } from '@/declarations/calendar/copy'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
+import { FORM_GROUPS } from '@/declarations/ui/copy'
 import type { PermissionHelpers } from '@/types/auth'
 import type { CalendarEntry } from '@/types/calendar'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -33,6 +34,14 @@ export const calendarFields = async (): Promise<FieldDefinition[]> => {
       label: CALENDAR_FIELD_COPY.title,
       required: true,
       maxLength: FORM_SETTINGS.titleMaxLength,
+      group: FORM_GROUPS.essentials,
+    },
+    {
+      name: 'description',
+      kind: 'textarea',
+      label: CALENDAR_FIELD_COPY.description,
+      maxLength: FORM_SETTINGS.longTextMaxLength,
+      group: FORM_GROUPS.essentials,
     },
     {
       name: 'typeId',
@@ -40,15 +49,18 @@ export const calendarFields = async (): Promise<FieldDefinition[]> => {
       label: CALENDAR_FIELD_COPY.type,
       required: true,
       options: rowsToOptions(types),
+      mark: 'dot',
       span: 'half',
+      group: FORM_GROUPS.essentials,
     },
     {
       name: 'visibility',
       kind: 'select',
       label: CALENDAR_FIELD_COPY.visibility,
-      hint: CALENDAR_FIELD_COPY.visibilityHint,
       options: toOptions(EVENT_VISIBILITY_REGISTRY),
+      mark: 'dot',
       span: 'half',
+      group: FORM_GROUPS.essentials,
     },
     {
       name: 'startsAt',
@@ -56,15 +68,29 @@ export const calendarFields = async (): Promise<FieldDefinition[]> => {
       label: CALENDAR_FIELD_COPY.startsAt,
       required: true,
       span: 'half',
+      group: FORM_GROUPS.planning,
     },
-    { name: 'endsAt', kind: 'datetime', label: CALENDAR_FIELD_COPY.endsAt, span: 'half' },
-    { name: 'allDay', kind: 'toggle', label: CALENDAR_FIELD_COPY.allDay },
+    {
+      name: 'endsAt',
+      kind: 'datetime',
+      label: CALENDAR_FIELD_COPY.endsAt,
+      span: 'half',
+      group: FORM_GROUPS.planning,
+    },
+    {
+      name: 'allDay',
+      kind: 'toggle',
+      label: CALENDAR_FIELD_COPY.allDay,
+      group: FORM_GROUPS.planning,
+    },
     {
       name: 'youtuberId',
       kind: 'select',
       label: CALENDAR_FIELD_COPY.youtuber,
       options: youtubers,
+      mark: 'avatar',
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'projectId',
@@ -72,12 +98,7 @@ export const calendarFields = async (): Promise<FieldDefinition[]> => {
       label: CALENDAR_FIELD_COPY.project,
       options: projects,
       span: 'half',
-    },
-    {
-      name: 'description',
-      kind: 'textarea',
-      label: CALENDAR_FIELD_COPY.description,
-      maxLength: FORM_SETTINGS.longTextMaxLength,
+      group: FORM_GROUPS.assignment,
     },
   ]
 }

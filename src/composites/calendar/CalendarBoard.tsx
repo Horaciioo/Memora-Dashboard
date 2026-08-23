@@ -6,7 +6,6 @@ import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { Dialog } from '@/components/structures/Dialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
@@ -19,6 +18,7 @@ import { CALENDAR_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'
+import { ICONS } from '@/declarations/ui/icons'
 import { TONES, toTone } from '@/declarations/ui/theme'
 import { CALENDAR_STYLES } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
@@ -52,6 +52,9 @@ const SLOT_SEPARATOR = '|'
 // Reference collection holding the declared event types
 const EVENT_TYPE_SECTION = 'evenements'
 
+// Day add glyph
+const DayAddIcon = ICONS.add
+
 /**
  * Shared calendar, month and week views, every card draggable onto another moment
  * @param {CalendarEntry[]} initialEntries - Entries resolved server-side
@@ -74,6 +77,7 @@ export const CalendarBoard = ({
   const [cursor, setCursor] = useState(anchor)
   const [dialog, setDialog] = useState<'form' | 'detail' | null>(null)
   const [editing, setEditing] = useState<CalendarEntry | null>(null)
+  const [draftStartsAt, setDraftStartsAt] = useState<string | null>(null)
   const [opened, setOpened] = useState<CalendarEntry | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<CalendarEntry | null>(null)
 
@@ -114,9 +118,15 @@ export const CalendarBoard = ({
     )
   })
 
-  const openForm = (entry: CalendarEntry | null) => {
+  const openForm = (entry: CalendarEntry | null, dayKey?: string) => {
     calendar.clearIssues()
     setEditing(entry)
+    // Prefill the day clicked, edits keep their own moment
+    setDraftStartsAt(
+      entry || !dayKey
+        ? null
+        : moveToSlot(dayKey, CALENDAR_SETTINGS.dayStartHour).toISOString().slice(0, 16)
+    )
     setDialog('form')
   }
 
@@ -246,6 +256,16 @@ export const CalendarBoard = ({
                     >
                       {day.dayOfMonth}
                     </span>
+                    {canManage && (
+                      <button
+                        type="button"
+                        aria-label={CALENDAR_COPY.add}
+                        className={CALENDAR_STYLES.dayAdd}
+                        onClick={() => openForm(null, day.key)}
+                      >
+                        <DayAddIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                      </button>
+                    )}
                     {shown.map((entry) => renderEntry(entry, day.key))}
                     {hidden > 0 && (
                       <span className={CALENDAR_STYLES.overflow}>
@@ -289,11 +309,10 @@ export const CalendarBoard = ({
           )}
         </div>
 
-        {calendar.entries.length === 0 ? (
+        {calendar.entries.length === 0 && (
           <EmptyState
             figure="settings"
             title={CALENDAR_COPY.emptyTitle}
-            description={CALENDAR_COPY.emptyDescription}
             action={
               <Button
                 variant="primary"
@@ -305,16 +324,15 @@ export const CalendarBoard = ({
               </Button>
             }
           />
-        ) : (
-          <AddRow label={CALENDAR_COPY.add} disabled={!canManage} onClick={() => openForm(null)} />
         )}
       </Section>
 
       <FormDialog
         open={dialog === 'form'}
         title={editing ? CALENDAR_COPY.edit : CALENDAR_COPY.add}
+        icon={editing ? 'edit' : 'add'}
         fields={fields}
-        initialValues={editing?.values}
+        initialValues={editing?.values ?? (draftStartsAt ? { startsAt: draftStartsAt } : undefined)}
         issues={calendar.issues}
         isSaving={calendar.isSaving}
         size="lg"
