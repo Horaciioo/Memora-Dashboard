@@ -1,16 +1,35 @@
+import { prisma } from '@/core/lib/db'
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { setTrainingRecord } from '@/core/services/academy/AcademyService'
+import { recordEvent } from '@/core/services/system/ActivityService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
   permission: Permissions.AcademyManage,
   descriptor: { summary: 'Validate or revoke a training', tags: ['academy'] },
-  handler: ({ params, raw, session }) => {
+  handler: async ({ params, raw, session }) => {
     const trainingId = String(raw.trainingId ?? '')
     if (!trainingId) throw invalidInput([{ field: 'trainingId', message: FORM_COPY.required }])
 
-    return setTrainingRecord(params.id, trainingId, raw.validated === true, session.id)
+    const validated = raw.validated === true
+    const juniors = await setTrainingRecord(params.id, trainingId, validated, session.id)
+
+    // Revoking is a correction, only a clearance is worth a journal line
+    if (validated) {
+      const training = await prisma.training.findUnique({ where: { id: trainingId } })
+
+      await recordEvent({
+        eventType: 'TrainingValidated',
+        actorId: session.id,
+        subjectId: juniors.find((entry) => entry.id === params.id)?.accountId,
+        targetType: 'training',
+        targetId: trainingId,
+        summary: training?.name ?? trainingId,
+      })
+    }
+
+    return juniors
   },
 })
