@@ -118,8 +118,6 @@ export const ROLE_PRESETS: Record<MemberRoleName, PermissionName[]> = {
     Permissions.MemberNoteRead,
     Permissions.MemberNoteWrite,
     Permissions.MemberLogRead,
-    Permissions.MemberPimRead,
-    Permissions.MemberPimWrite,
     Permissions.ProjectRead,
     Permissions.ProjectCreate,
     Permissions.ProjectUpdate,

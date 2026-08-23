@@ -4,6 +4,7 @@ import { prisma } from '@/core/lib/db'
 import { conflict, immutable, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
+import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
 import {
   ACADEMY_PERIOD_REGISTRY,
   MEMBER_STATUS_REGISTRY,
@@ -11,6 +12,7 @@ import {
 } from '@/declarations/access/roles'
 import { isRootIdentity } from '@/declarations/access/identity'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -21,12 +23,13 @@ import type {
   MemberRoleName,
   MemberStatusName,
 } from '@/utils/constants/hierarchy'
+import { AbsenceStatuses } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
 // Relations every moderator row needs
 const SUMMARY_INCLUDE = {
   division: true,
-  youtuber: true,
+  youtubers: true,
   primaryFunction: true,
   secondaryFunction: true,
 } satisfies Prisma.AccountInclude
@@ -34,12 +37,25 @@ const SUMMARY_INCLUDE = {
 type SummaryRow = Prisma.AccountGetPayload<{ include: typeof SUMMARY_INCLUDE }>
 
 /**
+ * Extra counters folded onto a list row
+ * @typedef {Object} SummaryExtras
+ * @property {number} notesCount - Private remarks left on the account
+ * @property {boolean} isAbsent - Covered by an approved absence today
+ */
+
+interface SummaryExtras {
+  notesCount: number
+  isAbsent: boolean
+}
+
+/**
  * Map an account row to its list shape
  * @param {SummaryRow} row - Account row with its references
+ * @param {SummaryExtras} extras - Counters resolved alongside the row
  * @return {MemberSummary} - List row
  */
 
-const toSummary = (row: SummaryRow): MemberSummary => ({
+const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
   id: row.id,
   displayName: row.displayName,
   discordId: row.discordId,
@@ -56,9 +72,11 @@ const toSummary = (row: SummaryRow): MemberSummary => ({
         rank: row.division.rank,
       }
     : null,
-  youtuber: row.youtuber
-    ? { id: row.youtuber.id, label: row.youtuber.name, accent: row.youtuber.accent }
-    : null,
+  youtubers: row.youtubers.map((youtuber) => ({
+    id: youtuber.id,
+    label: youtuber.name,
+    accent: youtuber.accent,
+  })),
   primaryFunction: row.primaryFunction
     ? {
         id: row.primaryFunction.id,
@@ -75,6 +93,8 @@ const toSummary = (row: SummaryRow): MemberSummary => ({
     : null,
   joinedAt: row.joinedAt.toISOString(),
   isRoot: isRootIdentity(row.discordId),
+  notesCount: extras.notesCount,
+  isAbsent: extras.isAbsent,
 })
 
 /**
@@ -99,14 +119,35 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
       required: true,
       maxLength: FORM_SETTINGS.shortTextMaxLength,
       span: 'half',
+      group: FORM_GROUPS.identity,
     },
     {
       name: 'discordId',
       kind: 'discord',
       label: MEMBER_FIELD_COPY.discordId,
       required: true,
-      hint: MEMBER_FIELD_COPY.discordIdHint,
       span: 'half',
+      group: FORM_GROUPS.identity,
+    },
+    {
+      name: 'avatarUrl',
+      kind: 'url',
+      label: MEMBER_FIELD_COPY.avatarUrl,
+      group: FORM_GROUPS.identity,
+    },
+    {
+      name: 'birthday',
+      kind: 'date',
+      label: MEMBER_FIELD_COPY.birthday,
+      span: 'half',
+      group: FORM_GROUPS.identity,
+    },
+    {
+      name: 'celebrateBirthday',
+      kind: 'toggle',
+      label: MEMBER_FIELD_COPY.celebrateBirthday,
+      span: 'half',
+      group: FORM_GROUPS.identity,
     },
     {
       name: 'role',
@@ -114,7 +155,9 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
       label: MEMBER_FIELD_COPY.role,
       required: true,
       options: toOptions(ROLE_REGISTRY),
+      mark: 'dot',
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'status',
@@ -122,15 +165,19 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
       label: MEMBER_FIELD_COPY.status,
       required: true,
       options: toOptions(MEMBER_STATUS_REGISTRY),
+      mark: 'dot',
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'academyPeriod',
       kind: 'select',
       label: MEMBER_FIELD_COPY.academyPeriod,
       options: toOptions(ACADEMY_PERIOD_REGISTRY),
+      mark: 'dot',
       visibleWhen: { field: 'status', equals: MemberStatuses.Academy },
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'divisionId',
@@ -138,38 +185,48 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
       label: MEMBER_FIELD_COPY.division,
       options: rowsToOptions(divisions),
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
-      name: 'youtuberId',
-      kind: 'select',
+      name: 'youtuberIds',
+      kind: 'multiselect',
       label: MEMBER_FIELD_COPY.youtuber,
       options: rowsToOptions(youtubers),
+      mark: 'avatar',
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'primaryFunctionId',
       kind: 'select',
       label: MEMBER_FIELD_COPY.primaryFunction,
       options: functionOptions,
+      mark: 'dot',
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'secondaryFunctionId',
       kind: 'select',
       label: MEMBER_FIELD_COPY.secondaryFunction,
       options: functionOptions,
+      mark: 'dot',
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
-    { name: 'email', kind: 'email', label: MEMBER_FIELD_COPY.email, span: 'half' },
-    { name: 'phone', kind: 'phone', label: MEMBER_FIELD_COPY.phone, span: 'half' },
-    { name: 'birthday', kind: 'date', label: MEMBER_FIELD_COPY.birthday, span: 'half' },
-    { name: 'joinedAt', kind: 'date', label: MEMBER_FIELD_COPY.joinedAt, span: 'half' },
     {
-      name: 'leftAt',
-      kind: 'date',
-      label: MEMBER_FIELD_COPY.leftAt,
-      visibleWhen: { field: 'status', equals: MemberStatuses.Left },
+      name: 'email',
+      kind: 'email',
+      label: MEMBER_FIELD_COPY.email,
       span: 'half',
+      group: FORM_GROUPS.contact,
+    },
+    {
+      name: 'phone',
+      kind: 'phone',
+      label: MEMBER_FIELD_COPY.phone,
+      span: 'half',
+      group: FORM_GROUPS.contact,
     },
     {
       name: 'timezone',
@@ -177,19 +234,29 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
       label: MEMBER_FIELD_COPY.timezone,
       maxLength: FORM_SETTINGS.shortTextMaxLength,
       span: 'half',
+      group: FORM_GROUPS.contact,
     },
     {
       name: 'languages',
       kind: 'tags',
       label: MEMBER_FIELD_COPY.languages,
-      hint: MEMBER_FIELD_COPY.languagesHint,
       maxItems: FORM_SETTINGS.tagMaxCount,
+      group: FORM_GROUPS.contact,
     },
-    { name: 'avatarUrl', kind: 'url', label: MEMBER_FIELD_COPY.avatarUrl },
     {
-      name: 'celebrateBirthday',
-      kind: 'toggle',
-      label: MEMBER_FIELD_COPY.celebrateBirthday,
+      name: 'joinedAt',
+      kind: 'date',
+      label: MEMBER_FIELD_COPY.joinedAt,
+      span: 'half',
+      group: FORM_GROUPS.planning,
+    },
+    {
+      name: 'leftAt',
+      kind: 'date',
+      label: MEMBER_FIELD_COPY.leftAt,
+      visibleWhen: { field: 'status', equals: MemberStatuses.Left },
+      span: 'half',
+      group: FORM_GROUPS.planning,
     },
   ]
 }
@@ -201,11 +268,16 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
 
 export const listMembers = async (): Promise<MemberSummary[]> => {
   const rows = await prisma.account.findMany({
-    include: SUMMARY_INCLUDE,
+    include: {
+      ...SUMMARY_INCLUDE,
+      _count: { select: { notesReceived: true, absences: { where: activeAbsenceFilter() } } },
+    },
     orderBy: [{ status: 'asc' }, { displayName: 'asc' }],
   })
 
-  return rows.map(toSummary)
+  return rows.map((row) =>
+    toSummary(row, { notesCount: row._count.notesReceived, isAbsent: row._count.absences > 0 })
+  )
 }
 
 /**
@@ -221,7 +293,6 @@ const toAccountData = (values: FormValues) => ({
   status: (readText(values, 'status') ?? MemberStatuses.Academy) as MemberStatusName,
   academyPeriod: (readText(values, 'academyPeriod') ?? null) as AcademyPeriodName | null,
   divisionId: readText(values, 'divisionId'),
-  youtuberId: readText(values, 'youtuberId'),
   primaryFunctionId: readText(values, 'primaryFunctionId'),
   secondaryFunctionId: readText(values, 'secondaryFunctionId'),
   email: readText(values, 'email'),
@@ -243,16 +314,22 @@ const toAccountData = (values: FormValues) => ({
 export const createMember = async (values: FormValues): Promise<MemberSummary> => {
   const data = toAccountData(values)
   const joinedAt = readDate(values, 'joinedAt')
+  const youtuberIds = readList(values, 'youtuberIds')
 
   const existing = await prisma.account.findUnique({ where: { discordId: data.discordId } })
   if (existing) throw conflict()
 
   const row = await prisma.account.create({
-    data: { ...data, joinedAt: joinedAt ?? new Date() },
+    data: {
+      ...data,
+      joinedAt: joinedAt ?? new Date(),
+      youtubers: { connect: youtuberIds.map((id) => ({ id })) },
+    },
     include: SUMMARY_INCLUDE,
   })
 
-  return toSummary(row)
+  // A brand new account never carries a note or a running absence yet
+  return toSummary(row, { notesCount: 0, isAbsent: false })
 }
 
 /**
@@ -271,14 +348,22 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
 
   const data = toAccountData(values)
   const joinedAt = readDate(values, 'joinedAt')
+  const youtuberIds = readList(values, 'youtuberIds')
 
   const row = await prisma.account.update({
     where: { id },
-    data: { ...data, joinedAt: joinedAt ?? current.joinedAt },
-    include: SUMMARY_INCLUDE,
+    data: {
+      ...data,
+      joinedAt: joinedAt ?? current.joinedAt,
+      youtubers: { set: youtuberIds.map((youtuberId) => ({ id: youtuberId })) },
+    },
+    include: {
+      ...SUMMARY_INCLUDE,
+      _count: { select: { notesReceived: true, absences: { where: activeAbsenceFilter() } } },
+    },
   })
 
-  return toSummary(row)
+  return toSummary(row, { notesCount: row._count.notesReceived, isAbsent: row._count.absences > 0 })
 }
 
 /**
@@ -310,12 +395,17 @@ export const readMember = async (id: string): Promise<MemberDetail> => {
         include: { author: true },
         orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }],
       },
-      pims: { include: { author: true }, orderBy: { heldAt: 'desc' } },
       socialLinks: { orderBy: { position: 'asc' } },
       absences: { include: { reviewer: true }, orderBy: { startDate: 'desc' } },
       trainingRecords: { include: { training: true, validator: true } },
       teamMemberships: { include: { team: true } },
-      _count: { select: { projectAssists: true, ownedTasks: true, meetingSeats: true } },
+      _count: {
+        select: {
+          projectAssists: true,
+          ownedTasks: true,
+          meetingSeats: true,
+        },
+      },
     },
   })
 
@@ -353,8 +443,16 @@ export const readMember = async (id: string): Promise<MemberDetail> => {
     reviewNote: absence.reviewNote,
   }))
 
+  const now = new Date()
+  const isAbsent = row.absences.some(
+    (absence) =>
+      absence.status === AbsenceStatuses.Approved &&
+      absence.startDate <= now &&
+      absence.endDate >= now
+  )
+
   return {
-    summary: toSummary(row),
+    summary: toSummary(row, { notesCount: row.notesReceived.length, isAbsent }),
     values: {
       displayName: row.displayName,
       discordId: row.discordId,
@@ -362,7 +460,7 @@ export const readMember = async (id: string): Promise<MemberDetail> => {
       status: row.status,
       academyPeriod: row.academyPeriod,
       divisionId: row.divisionId,
-      youtuberId: row.youtuberId,
+      youtuberIds: row.youtubers.map((youtuber) => youtuber.id),
       primaryFunctionId: row.primaryFunctionId,
       secondaryFunctionId: row.secondaryFunctionId,
       email: row.email,
@@ -387,12 +485,6 @@ export const readMember = async (id: string): Promise<MemberDetail> => {
       pinned: note.pinned,
       authorName: note.author?.displayName ?? null,
       createdAt: note.createdAt.toISOString(),
-    })),
-    pims: row.pims.map((pim) => ({
-      id: pim.id,
-      heldAt: pim.heldAt.toISOString(),
-      sheet: pim.sheet,
-      authorName: pim.author?.displayName ?? null,
     })),
     socials: row.socialLinks.map((link) => ({
       id: link.id,

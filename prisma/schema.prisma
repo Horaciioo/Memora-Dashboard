@@ -123,14 +123,13 @@ model Account {
   status              MemberStatus  @default(ACADEMY)
   academyPeriod       AcademyPeriod?
   divisionId          String?
-  youtuberId          String?
   primaryFunctionId   String?
   secondaryFunctionId String?
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
 
   division          Division?     @relation(fields: [divisionId], references: [id], onDelete: SetNull)
-  youtuber          Youtuber?     @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+  youtubers         Youtuber[]
   primaryFunction   JobFunction?  @relation("PrimaryFunction", fields: [primaryFunctionId], references: [id], onDelete: SetNull)
   secondaryFunction JobFunction?  @relation("SecondaryFunction", fields: [secondaryFunctionId], references: [id], onDelete: SetNull)
 
@@ -141,8 +140,6 @@ model Account {
   reviewedAbsences    Absence[]           @relation("AbsenceReviewer")
   notesReceived       AccountNote[]       @relation("NoteSubject")
   notesWritten        AccountNote[]       @relation("NoteAuthor")
-  pims                Pim[]               @relation("PimSubject")
-  pimsWritten         Pim[]               @relation("PimAuthor")
   trainingRecords     TrainingRecord[]    @relation("TrainingLearner")
   trainingsValidated  TrainingRecord[]    @relation("TrainingValidator")
   academyJuniors      AcademyJunior[]     @relation("AcademyJunior")
@@ -165,7 +162,6 @@ model Account {
   @@index([role])
   @@index([status])
   @@index([divisionId])
-  @@index([youtuberId])
   @@map("accounts")
 }
 
@@ -287,6 +283,7 @@ model Platform {
   id        String   @id @default(cuid())
   name      String   @unique
   accent    String?
+  avatarUrl String?
   position  Int      @default(0)
   archived  Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -337,7 +334,7 @@ model Priority {
 // Group of moderators under one responsable
 model Team {
   id         String   @id @default(cuid())
-  name       String   @unique
+  name       String
   summary    String?
   leadId     String?
   youtuberId String?
@@ -565,23 +562,6 @@ model SocialLink {
   @@unique([accountId, label])
   @@index([accountId, position])
   @@map("social_links")
-}
-
-// Individual review held with a member
-model Pim {
-  id        String   @id @default(cuid())
-  accountId String
-  authorId  String?
-  heldAt    DateTime
-  sheet     String   @default("")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  account Account  @relation("PimSubject", fields: [accountId], references: [id], onDelete: Cascade)
-  author  Account? @relation("PimAuthor", fields: [authorId], references: [id], onDelete: SetNull)
-
-  @@index([accountId, heldAt])
-  @@map("pims")
 }
 
 // Course a junior must clear during the academy

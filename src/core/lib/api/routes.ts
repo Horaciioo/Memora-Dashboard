@@ -14,13 +14,11 @@ export const API_ROUTES = {
   members: '/api/moderateurs',
   member: (id: string) => `/api/moderateurs/${id}`,
   memberNotes: (id: string) => `/api/moderateurs/${id}/notes`,
-  memberPims: (id: string) => `/api/moderateurs/${id}/pims`,
   memberSocials: (id: string) => `/api/moderateurs/${id}/reseaux`,
   social: (id: string) => `/api/reseaux/${id}`,
   files: '/api/fichiers',
   memberAccess: (id: string) => `/api/moderateurs/${id}/acces`,
   note: (id: string) => `/api/notes/${id}`,
-  pim: (id: string) => `/api/pims/${id}`,
   projects: '/api/projets',
   project: (id: string) => `/api/projets/${id}`,
   projectCommunications: (id: string) => `/api/projets/${id}/communications`,
@@ -49,6 +47,7 @@ export const API_ROUTES = {
   teams: (youtuberId?: string) => withScope('/api/equipes', youtuberId),
   team: (id: string, youtuberId?: string) => withScope(`/api/equipes/${id}`, youtuberId),
   access: '/api/acces',
+  profile: '/api/parametres',
   board: '/api/tableau',
   search: '/api/recherche',
 } as const
@@ -74,5 +73,6 @@ export const CACHE_KEYS = {
   session: (id: string) => `academy:session:${id}`,
   junior: (id: string) => `academy:junior:${id}`,
   access: () => 'access',
+  profile: () => 'profile',
   search: (term: string) => `search:${term}`,
 } as const
