@@ -13,6 +13,7 @@ import {
   youtuberOptions,
 } from '@/core/services/work/shared'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { MEETING_FIELD_COPY } from '@/declarations/work/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MeetingSummary, WorkPerson } from '@/types/work'
@@ -99,6 +100,7 @@ export const meetingFields = async (): Promise<FieldDefinition[]> => {
       label: MEETING_FIELD_COPY.title,
       required: true,
       maxLength: FORM_SETTINGS.titleMaxLength,
+      group: FORM_GROUPS.essentials,
     },
     {
       name: 'scheduledAt',
@@ -106,6 +108,7 @@ export const meetingFields = async (): Promise<FieldDefinition[]> => {
       label: MEETING_FIELD_COPY.scheduledAt,
       required: true,
       span: 'half',
+      group: FORM_GROUPS.essentials,
     },
     {
       name: 'durationMin',
@@ -114,27 +117,7 @@ export const meetingFields = async (): Promise<FieldDefinition[]> => {
       min: FORM_SETTINGS.meetingMinDuration,
       max: FORM_SETTINGS.meetingMaxDuration,
       span: 'half',
-    },
-    {
-      name: 'stateId',
-      kind: 'select',
-      label: MEETING_FIELD_COPY.state,
-      options: states,
-      span: 'half',
-    },
-    {
-      name: 'youtuberId',
-      kind: 'select',
-      label: MEETING_FIELD_COPY.youtuber,
-      options: youtubers,
-      span: 'half',
-    },
-    {
-      name: 'projectId',
-      kind: 'select',
-      label: MEETING_FIELD_COPY.project,
-      options: projects,
-      span: 'half',
+      group: FORM_GROUPS.essentials,
     },
     {
       name: 'leadIds',
@@ -142,7 +125,9 @@ export const meetingFields = async (): Promise<FieldDefinition[]> => {
       label: MEETING_FIELD_COPY.leads,
       placeholder: MEETING_FIELD_COPY.peopleEmpty,
       options: members,
+      mark: 'avatar',
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'assistantIds',
@@ -150,7 +135,9 @@ export const meetingFields = async (): Promise<FieldDefinition[]> => {
       label: MEETING_FIELD_COPY.assistants,
       placeholder: MEETING_FIELD_COPY.peopleEmpty,
       options: members,
+      mark: 'avatar',
       span: 'half',
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'participantIds',
@@ -158,18 +145,48 @@ export const meetingFields = async (): Promise<FieldDefinition[]> => {
       label: MEETING_FIELD_COPY.participants,
       placeholder: MEETING_FIELD_COPY.peopleEmpty,
       options: members,
+      mark: 'avatar',
+      group: FORM_GROUPS.assignment,
+    },
+    {
+      name: 'youtuberId',
+      kind: 'select',
+      label: MEETING_FIELD_COPY.youtuber,
+      options: youtubers,
+      mark: 'avatar',
+      span: 'half',
+      group: FORM_GROUPS.assignment,
+    },
+    {
+      name: 'projectId',
+      kind: 'select',
+      label: MEETING_FIELD_COPY.project,
+      options: projects,
+      span: 'half',
+      group: FORM_GROUPS.assignment,
+    },
+    {
+      name: 'stateId',
+      kind: 'select',
+      label: MEETING_FIELD_COPY.state,
+      options: states,
+      mark: 'dot',
+      span: 'half',
+      group: FORM_GROUPS.details,
     },
     {
       name: 'agenda',
       kind: 'markdown',
       label: MEETING_FIELD_COPY.agenda,
       maxLength: FORM_SETTINGS.markdownMaxLength,
+      group: FORM_GROUPS.details,
     },
     {
       name: 'minutes',
       kind: 'markdown',
       label: MEETING_FIELD_COPY.minutes,
       maxLength: FORM_SETTINGS.markdownMaxLength,
+      group: FORM_GROUPS.details,
     },
   ]
 }

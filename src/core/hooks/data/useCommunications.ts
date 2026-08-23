@@ -5,9 +5,13 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
-import { FEEDBACK_COPY } from '@/declarations/ui/copy'
+import { feedbackTitle } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { CommunicationEntry } from '@/types/work'
+
+// Toast entity label
+const ENTITY = 'Annonce'
+const GENDER = 'feminine'
 
 /**
  * Announcement state and mutations
@@ -47,9 +51,10 @@ export const useCommunications = (
 
   const create = useCallback(
     async (values: FormValues) => {
+      const name = typeof values.title === 'string' ? values.title : undefined
       const entry = await run(
         () => apiPost<CommunicationEntry>(API_ROUTES.projectCommunications(projectId), values),
-        FEEDBACK_COPY.created
+        feedbackTitle(ENTITY, 'created', GENDER, name)
       )
 
       if (entry) setEntries((current) => [entry, ...current])
@@ -61,9 +66,10 @@ export const useCommunications = (
 
   const update = useCallback(
     async (id: string, values: FormValues) => {
+      const name = typeof values.title === 'string' ? values.title : undefined
       const entry = await run(
         () => apiPatch<CommunicationEntry>(API_ROUTES.communication(id), values),
-        FEEDBACK_COPY.saved
+        feedbackTitle(ENTITY, 'saved', GENDER, name)
       )
 
       if (entry) setEntries((current) => current.map((row) => (row.id === id ? entry : row)))
@@ -75,14 +81,15 @@ export const useCommunications = (
 
   const remove = useCallback(
     async (id: string) => {
+      const name = entries.find((row) => row.id === id)?.title
       const done = await run(
         () => apiDelete<{ id: string }>(API_ROUTES.communication(id)),
-        FEEDBACK_COPY.deleted
+        feedbackTitle(ENTITY, 'deleted', GENDER, name)
       )
 
       if (done) setEntries((current) => current.filter((row) => row.id !== id))
     },
-    [run]
+    [run, entries]
   )
 
   return { entries, isSaving, issues, clearIssues, create, update, remove }

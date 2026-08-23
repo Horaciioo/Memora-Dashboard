@@ -106,6 +106,7 @@ export const MeetingsBoard = ({
       initialCards={initialMeetings}
       columns={columns}
       fields={fields}
+      columnField="stateId"
       copy={MEETING_COPY}
       figure="meetings"
       tableColumns={tableColumns}
@@ -115,6 +116,7 @@ export const MeetingsBoard = ({
           label: BOARD_FILTER_COPY.youtuber,
           allLabel: BOARD_FILTER_COPY.allYoutubers,
           options: youtubers,
+          mark: 'avatar',
         },
         {
           name: 'project',

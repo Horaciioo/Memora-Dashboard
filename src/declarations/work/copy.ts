@@ -1,3 +1,5 @@
+import type { WorkflowScopeName } from '@/utils/constants/workflow'
+
 /**
  * Copy of the project surfaces
  * @type {Record<string, string>}
@@ -7,9 +9,7 @@ export const PROJECT_COPY = {
   title: 'Projets',
   lead: 'Chaque projet porte son YouTubeur, son état, sa priorité, sa deadline et son équipe.',
   add: 'Créer un projet',
-  emptyTitle: 'Aucun projet',
-  emptyDescription: 'Ouvre un premier projet pour commencer à le suivre sur le tableau.',
-  emptyColumn: 'Rien ici',
+  emptyTitle: 'Aucun projet pour le moment.',
   filterTitle: 'Aucun projet ne correspond',
   filterDescription: 'Élargis ou retire les filtres en cours.',
   deleteTitle: 'Supprimer ce projet ?',
@@ -22,8 +22,7 @@ export const PROJECT_COPY = {
   communicationTitle: 'Communication',
   communicationLead: 'Rédige l’annonce ici, l’aperçu montre le rendu Discord en direct.',
   communicationAdd: 'Rédiger une annonce',
-  communicationEmptyTitle: 'Aucune annonce',
-  communicationEmptyDescription: 'Rédige la première annonce du projet.',
+  communicationEmptyTitle: 'Aucune annonce pour le moment.',
   communicationDeleteTitle: 'Supprimer cette annonce ?',
   communicationDeleteDescription: 'Le texte est perdu définitivement.',
   published: 'Publiée',
@@ -44,7 +43,6 @@ export const PROJECT_FIELD_COPY = {
   state: 'État',
   priority: 'Priorité',
   platform: 'Plateforme',
-  platformHint: 'Là où l’action initiale se déroule.',
   deadline: 'Deadline',
   lead: 'Responsable du projet',
   assistants: 'Assistants du projet',
@@ -64,9 +62,7 @@ export const TASK_COPY = {
   title: 'Tâches',
   lead: 'Une tâche, une date, un responsable, un état.',
   add: 'Créer une tâche',
-  emptyTitle: 'Aucune tâche',
-  emptyDescription: 'Ajoute une première tâche et attribue-la.',
-  emptyColumn: 'Rien ici',
+  emptyTitle: 'Aucune tâche pour le moment.',
   filterTitle: 'Aucune tâche ne correspond',
   filterDescription: 'Élargis ou retire les filtres en cours.',
   deleteTitle: 'Supprimer cette tâche ?',
@@ -102,9 +98,7 @@ export const MEETING_COPY = {
   title: 'Réunions',
   lead: 'Date, participants et projet concerné pour chaque réunion.',
   add: 'Planifier une réunion',
-  emptyTitle: 'Aucune réunion',
-  emptyDescription: 'Planifie la première réunion et convoque ton équipe.',
-  emptyColumn: 'Rien ici',
+  emptyTitle: 'Aucune réunion pour le moment.',
   filterTitle: 'Aucune réunion ne correspond',
   filterDescription: 'Élargis ou retire les filtres en cours.',
   deleteTitle: 'Supprimer cette réunion ?',
@@ -158,3 +152,17 @@ export const BOARD_FILTER_COPY = {
   board: 'Tableau',
   list: 'Liste',
 } as const
+
+/**
+ * Singular label and gender of each board scope, driving its toasts
+ * @type {Record<WorkflowScopeName, { label: string; gender: 'masculine' | 'feminine' }>}
+ */
+
+export const BOARD_ENTITY_COPY: Record<
+  WorkflowScopeName,
+  { label: string; gender: 'masculine' | 'feminine' }
+> = {
+  PROJECT: { label: 'Projet', gender: 'masculine' },
+  TASK: { label: 'Tâche', gender: 'feminine' },
+  MEETING: { label: 'Réunion', gender: 'feminine' },
+}

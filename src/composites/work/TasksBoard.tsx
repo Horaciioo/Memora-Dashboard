@@ -114,6 +114,7 @@ export const TasksBoard = ({
       initialCards={initialTasks}
       columns={columns}
       fields={fields}
+      columnField="stateId"
       copy={TASK_COPY}
       figure="tasks"
       tableColumns={tableColumns}
@@ -123,12 +124,14 @@ export const TasksBoard = ({
           label: BOARD_FILTER_COPY.owner,
           allLabel: BOARD_FILTER_COPY.allOwners,
           options: owners,
+          mark: 'avatar',
         },
         {
           name: 'youtuber',
           label: BOARD_FILTER_COPY.youtuber,
           allLabel: BOARD_FILTER_COPY.allYoutubers,
           options: youtubers,
+          mark: 'avatar',
         },
         {
           name: 'project',
