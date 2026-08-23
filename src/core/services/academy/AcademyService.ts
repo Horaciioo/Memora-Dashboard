@@ -1,5 +1,7 @@
 import 'server-only'
 
+import moment from 'moment'
+
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
 import { toOptions } from '@/core/lib/forms/options'
@@ -89,7 +91,13 @@ export const sessionFields = async (): Promise<FieldDefinition[]> => {
       required: true,
       span: 'half',
     },
-    { name: 'endsAt', kind: 'date', label: ACADEMY_FIELD_COPY.endsAt, span: 'half' },
+    {
+      name: 'endsAt',
+      kind: 'date',
+      label: ACADEMY_FIELD_COPY.endsAt,
+      hint: ACADEMY_FIELD_COPY.endsAtHint,
+      span: 'half',
+    },
     {
       name: 'trainerIds',
       kind: 'multiselect',
@@ -337,19 +345,33 @@ export const listSessions = async (): Promise<SessionSummary[]> => {
 }
 
 /**
+ * Shortest run a session may last, proposed when no end date is given
+ * @param {Date} startsAt - First day of the session
+ * @return {Date} - Proposed last day
+ */
+
+const proposedEnd = (startsAt: Date): Date =>
+  moment(startsAt).add(ACADEMY_SETTINGS.weeksMin, 'weeks').toDate()
+
+/**
  * Turn parsed values into a session payload
  * @param {FormValues} values - Parsed body
  * @return {object} - Database payload
  */
 
-const toSessionData = (values: FormValues) => ({
-  program: (readText(values, 'program') ?? AcademyPrograms.Polyvalent) as AcademyProgramName,
-  status: (readText(values, 'status') ??
-    AcademySessionStatuses.Planned) as AcademySessionStatusName,
-  startsAt: readDate(values, 'startsAt') ?? new Date(),
-  endsAt: readDate(values, 'endsAt'),
-  summary: readText(values, 'summary'),
-})
+const toSessionData = (values: FormValues) => {
+  const startsAt = readDate(values, 'startsAt') ?? new Date()
+
+  return {
+    program: (readText(values, 'program') ?? AcademyPrograms.Polyvalent) as AcademyProgramName,
+    status: (readText(values, 'status') ??
+      AcademySessionStatuses.Planned) as AcademySessionStatusName,
+    startsAt,
+    // An unset end date lands on the shortest run the settings allow
+    endsAt: readDate(values, 'endsAt') ?? proposedEnd(startsAt),
+    summary: readText(values, 'summary'),
+  }
+}
 
 /**
  * Open a session
