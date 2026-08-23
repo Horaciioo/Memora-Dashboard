@@ -1,4 +1,5 @@
 import type { IconName } from '@/declarations/ui/icons'
+import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 
@@ -25,10 +26,23 @@ export const ROUTES = {
   session: (id: string) => `/academy/${id}`,
   junior: (sessionId: string, juniorId: string) => `/academy/${sessionId}/${juniorId}`,
   sanctions: '/moderation/sanctions',
+  preferences: '/parametres',
   settings: '/configuration',
   settingsSection: (section: string) => `/configuration/${section}`,
   settingsRecord: (section: string, id: string) => `/configuration/${section}/${id}`,
 } as const
+
+/**
+ * Rule keeping an entry out of the rail, its vocabulary aligned on FieldCondition
+ * @typedef {Object} NavigationCondition
+ * @property {MemberStatusName[]} [statuses] - Statuses the entry is meant for
+ * @property {MemberRoleName[]} [roles] - Roles the entry is meant for
+ */
+
+export interface NavigationCondition {
+  statuses?: MemberStatusName[]
+  roles?: MemberRoleName[]
+}
 
 /**
  * Navigation entry
@@ -37,6 +51,7 @@ export const ROUTES = {
  * @property {string} label - Display label
  * @property {IconName} icon - Icon key
  * @property {PermissionName} [permission] - Permission needed
+ * @property {NavigationCondition} [visibleWhen] - Display rule
  * @property {boolean} [wip] - Marked as under construction
  */
 
@@ -45,7 +60,27 @@ export interface NavigationItem {
   label: string
   icon: IconName
   permission?: PermissionName
+  visibleWhen?: NavigationCondition
   wip?: boolean
+}
+
+/**
+ * Read a navigation rule against the signed-in member
+ * @param {NavigationCondition | undefined} condition - Rule carried by the entry
+ * @param {Object} member - Signed-in member
+ * @param {MemberStatusName} member.status - Membership status
+ * @param {MemberRoleName} member.role - Hierarchy level
+ * @return {boolean} - Entry belongs on the rail
+ */
+
+export const matchesNavigation = (
+  condition: NavigationCondition | undefined,
+  member: { status: MemberStatusName; role: MemberRoleName }
+): boolean => {
+  if (!condition) return true
+  if (condition.statuses && !condition.statuses.includes(member.status)) return false
+
+  return !condition.roles || condition.roles.includes(member.role)
 }
 
 /**
@@ -170,6 +205,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   academy: 'Marsha Academy',
   moderation: 'Modération',
   sanctions: 'Panel de sanctions',
+  parametres: 'Paramètres',
   configuration: 'Configuration',
   acces: 'Accès',
 }

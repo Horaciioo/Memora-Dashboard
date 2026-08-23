@@ -3,9 +3,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Avatar } from '@/components/elements/display/Avatar'
+import { Button } from '@/components/elements/actions/Button'
+import { LogoutButton } from '@/composites/auth/LogoutButton'
+import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { APP_ASSETS, APP_COMPANY, APP_NAME } from '@/declarations/app'
-import { NAVIGATION, ROUTES } from '@/declarations/navigation'
-import { APP_SHELL } from '@/declarations/ui/blocks'
+import { NAVIGATION, ROUTES, matchesNavigation } from '@/declarations/navigation'
+import { ROLE_REGISTRY } from '@/declarations/access/roles'
+import { ACCOUNT_BLOCK, APP_SHELL } from '@/declarations/ui/blocks'
 import { NAV_COPY, WIP_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
@@ -17,7 +22,8 @@ export interface SidebarNavProps {
 }
 
 /**
- * Navigation rail, every entry gated by the permission declared beside it
+ * Navigation rail — search above the groups, every entry gated by the permission declared
+ * beside it, and the signed-in member closing it at the bottom
  * @param {string} [className] - Extra classes merged onto the rail
  * @param {() => void} onNavigate - Called once a link is followed
  * @return {JSX.Element}
@@ -25,7 +31,7 @@ export interface SidebarNavProps {
 
 export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
   const pathname = usePathname()
-  const { can } = useAuthContext()
+  const { can, session } = useAuthContext()
 
   return (
     <aside className={cn(APP_SHELL.sidebar, className)} aria-label={NAV_COPY.sidebar}>
@@ -43,9 +49,18 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
           <span className={APP_SHELL.brandCompany}>{APP_COMPANY}</span>
         </span>
       </Link>
+
+      <div className={APP_SHELL.search}>
+        <SearchLauncher />
+      </div>
+
       <nav className={APP_SHELL.nav}>
         {NAVIGATION.map((group) => {
-          const items = group.items.filter((item) => !item.permission || can(item.permission))
+          const items = group.items.filter(
+            (item) =>
+              (!item.permission || can(item.permission)) &&
+              (!session || matchesNavigation(item.visibleWhen, session))
+          )
           if (items.length === 0) return null
 
           return (
@@ -73,6 +88,25 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
           )
         })}
       </nav>
+
+      {session && (
+        <div className={APP_SHELL.sidebarFooter}>
+          <div className={APP_SHELL.accountRow}>
+            <Avatar name={session.displayName} src={session.avatarUrl} />
+            <span className={APP_SHELL.accountIdentity}>
+              <span className={ACCOUNT_BLOCK.name}>{session.displayName}</span>
+              <span className={ACCOUNT_BLOCK.meta}>{ROLE_REGISTRY.label(session.role)}</span>
+            </span>
+            <div className={APP_SHELL.accountControls}>
+              <Link href={ROUTES.preferences} onClick={onNavigate}>
+                <Button variant="icon" icon="settings" aria-label={NAV_COPY.preferences} />
+              </Link>
+              <span className={APP_SHELL.accountDivider} aria-hidden="true" />
+              <LogoutButton iconOnly />
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   )
 }
