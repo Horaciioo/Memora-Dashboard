@@ -14,7 +14,7 @@ import { EditableDetailGrid, type EditableEntry } from '@/components/structures/
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
-import { Tabs } from '@/components/elements/navigation/Tabs'
+import { FileTabs } from '@/components/structures/FileTabs'
 import { useMemberFile } from '@/core/hooks/data/useMemberFile'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { ACADEMY_PERIOD_REGISTRY, MEMBER_STATUS_REGISTRY } from '@/declarations/access/roles'
@@ -123,7 +123,6 @@ export const MemberFileTabs = ({
   const file = useMemberFile(detail, overrides)
   const { session } = useAuthContext()
   const { contextMenu } = useMenu()
-  const [tab, setTab] = useState('identity')
   const [dialog, setDialog] = useState<'identity' | 'note' | 'socials' | null>(null)
   const [pendingNote, setPendingNote] = useState<string | null>(null)
   const [editingSocial, setEditingSocial] = useState<MemberSocial | null>(null)
@@ -259,33 +258,6 @@ export const MemberFileTabs = ({
     },
   ]
 
-  const tabs = [
-    { value: 'identity', label: MEMBER_COPY.tabIdentity, icon: 'sheet' as const },
-    ...(canReadNotes
-      ? [
-          {
-            value: 'notes',
-            label: MEMBER_COPY.tabNotes,
-            icon: 'note' as const,
-          },
-        ]
-      : []),
-    {
-      value: 'absences',
-      label: MEMBER_COPY.tabAbsences,
-      icon: 'absences' as const,
-    },
-    {
-      value: 'socials',
-      label: MEMBER_COPY.tabSocials,
-      icon: 'link' as const,
-    },
-    { value: 'academy', label: MEMBER_COPY.tabAcademy, icon: 'academy' as const },
-    ...(canReadLogs
-      ? [{ value: 'logs', label: MEMBER_COPY.tabLogs, icon: 'history' as const }]
-      : []),
-  ]
-
   const noteMenu = (noteId: string, pinned: boolean): MenuItem[] => [
     {
       id: 'pin',
@@ -305,280 +277,318 @@ export const MemberFileTabs = ({
     },
   ]
 
-  return (
-    <div className="flex flex-col gap-8">
-      <Section title={MEMBER_COPY.identity} padded>
-        <div className="relative">
-          <StatusRibbon
-            label={MEMBER_STATUS_REGISTRY.get(summary.status).label}
-            tone={toTone(MEMBER_STATUS_REGISTRY.get(summary.status).accent)}
-            className="-top-4 -right-4 sm:-top-5 sm:-right-5"
-          />
-          <div className="flex flex-wrap items-start gap-4">
-            <div className="relative shrink-0">
-              <button
-                type="button"
-                disabled={!canEdit}
-                aria-label={ACTION_COPY.edit}
-                title={ACTION_COPY.edit}
-                onClick={() => openDialog('identity')}
-                className="rounded-[var(--radius-sm)] transition-opacity enabled:cursor-pointer enabled:hover:opacity-80 disabled:cursor-default"
-              >
-                <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
-              </button>
-              <span className="absolute right-1 bottom-1 rounded-[var(--radius-sm)] ring-2 ring-[var(--color-surface-raised)]">
-                <DivisionBadge division={summary.division} />
-              </span>
-            </div>
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
-              <span className="flex flex-wrap items-center gap-2 pr-16">
-                <RoleBadge member={summary} />
-                {summary.youtubers.map((youtuber) => (
-                  <Badge key={youtuber.id} label={youtuber.label} tone="info" icon="youtuber" />
-                ))}
-                {summary.academyPeriod && (
-                  <Badge
-                    label={ACADEMY_PERIOD_REGISTRY.get(summary.academyPeriod).label}
-                    tone="info"
-                  />
-                )}
-              </span>
-            </div>
+  const header = (
+    <Section title={MEMBER_COPY.identity} padded>
+      <div className="relative">
+        <StatusRibbon
+          label={MEMBER_STATUS_REGISTRY.get(summary.status).label}
+          tone={toTone(MEMBER_STATUS_REGISTRY.get(summary.status).accent)}
+          className="-top-4 -right-4 sm:-top-5 sm:-right-5"
+        />
+        <div className="flex flex-wrap items-start gap-4">
+          <div className="relative shrink-0">
+            <button
+              type="button"
+              disabled={!canEdit}
+              aria-label={ACTION_COPY.edit}
+              title={ACTION_COPY.edit}
+              onClick={() => openDialog('identity')}
+              className="rounded-[var(--radius-sm)] transition-opacity enabled:cursor-pointer enabled:hover:opacity-80 disabled:cursor-default"
+            >
+              <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
+            </button>
+            <span className="absolute right-1 bottom-1 rounded-[var(--radius-sm)] ring-2 ring-[var(--color-surface-raised)]">
+              <DivisionBadge division={summary.division} />
+            </span>
+          </div>
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <span className="flex flex-wrap items-center gap-2 pr-16">
+              <RoleBadge member={summary} />
+              {summary.youtubers.map((youtuber) => (
+                <Badge key={youtuber.id} label={youtuber.label} tone="info" icon="youtuber" />
+              ))}
+              {summary.academyPeriod && (
+                <Badge
+                  label={ACADEMY_PERIOD_REGISTRY.get(summary.academyPeriod).label}
+                  tone="info"
+                />
+              )}
+            </span>
           </div>
         </div>
-        {isLocked && <p className={`${DETAIL_BLOCK.empty} pt-3`}>{MEMBER_COPY.rootLocked}</p>}
+      </div>
+      {isLocked && <p className={`${DETAIL_BLOCK.empty} pt-3`}>{MEMBER_COPY.rootLocked}</p>}
+    </Section>
+  )
+
+  const identityTab = () => (
+    <div className="flex flex-col gap-8">
+      <Section title={MEMBER_COPY.contact} padded>
+        <EditableDetailGrid
+          entries={contactEntries}
+          values={identityValues}
+          issues={file.issues}
+          disabled={!canEdit}
+          onCommit={saveField}
+        />
       </Section>
+      <Section title={MEMBER_COPY.assignment} padded>
+        <EditableDetailGrid
+          entries={assignmentEntries}
+          values={identityValues}
+          issues={file.issues}
+          disabled={!canEdit}
+          onCommit={saveField}
+        />
+      </Section>
+      {canManageAccess && (
+        <MemberAccessPanel
+          overrides={file.overrides}
+          isSaving={file.isSaving}
+          onSave={file.saveOverrides}
+        />
+      )}
+    </div>
+  )
 
-      <Tabs items={tabs} value={tab} onChange={setTab} label={MEMBER_COPY.title} />
-
-      {tab === 'identity' && (
-        <div className="flex flex-col gap-8">
-          <Section title={MEMBER_COPY.contact} padded>
-            <EditableDetailGrid
-              entries={contactEntries}
-              values={identityValues}
-              issues={file.issues}
-              disabled={!canEdit}
-              onCommit={saveField}
-            />
-          </Section>
-          <Section title={MEMBER_COPY.assignment} padded>
-            <EditableDetailGrid
-              entries={assignmentEntries}
-              values={identityValues}
-              issues={file.issues}
-              disabled={!canEdit}
-              onCommit={saveField}
-            />
-          </Section>
-          {canManageAccess && (
-            <MemberAccessPanel
-              overrides={file.overrides}
-              isSaving={file.isSaving}
-              onSave={file.saveOverrides}
-            />
-          )}
+  const notesTab = () => (
+    <Section title={MEMBER_COPY.notesTitle} description={MEMBER_COPY.notesLead} bare>
+      {file.notes.length === 0 ? (
+        <EmptyState
+          figure="notes"
+          title={MEMBER_COPY.notesEmptyTitle}
+          description={MEMBER_COPY.notesEmptyDescription}
+          action={
+            <Button
+              variant="primary"
+              icon="add"
+              disabled={!canWriteNotes}
+              onClick={() => openDialog('note')}
+            >
+              {MEMBER_COPY.noteAdd}
+            </Button>
+          }
+        />
+      ) : (
+        <div className={LIST_STYLES.stack}>
+          {file.notes.map((note) => (
+            <article
+              key={note.id}
+              onContextMenu={contextMenu(noteMenu(note.id, note.pinned))}
+              className="flex flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4"
+            >
+              <span className="flex flex-wrap items-center gap-2 text-xs text-[var(--color-ink-subtle)]">
+                {note.pinned && <Badge label={MEMBER_COPY.notePin} tone="warning" icon="star" />}
+                {[note.authorName, formatDayTime(note.createdAt)].filter(Boolean).join(' · ')}
+              </span>
+              <p className="text-sm whitespace-pre-wrap">{note.body}</p>
+            </article>
+          ))}
+          <AddRow
+            label={MEMBER_COPY.noteAdd}
+            disabled={!canWriteNotes}
+            onClick={() => openDialog('note')}
+          />
         </div>
       )}
+    </Section>
+  )
 
-      {tab === 'notes' && canReadNotes && (
-        <Section title={MEMBER_COPY.notesTitle} description={MEMBER_COPY.notesLead} bare>
-          {file.notes.length === 0 ? (
-            <EmptyState
-              figure="notes"
-              title={MEMBER_COPY.notesEmptyTitle}
-              description={MEMBER_COPY.notesEmptyDescription}
-              action={
-                <Button
-                  variant="primary"
-                  icon="add"
-                  disabled={!canWriteNotes}
-                  onClick={() => openDialog('note')}
-                >
-                  {MEMBER_COPY.noteAdd}
-                </Button>
-              }
-            />
-          ) : (
-            <div className={LIST_STYLES.stack}>
-              {file.notes.map((note) => (
-                <article
-                  key={note.id}
-                  onContextMenu={contextMenu(noteMenu(note.id, note.pinned))}
-                  className="flex flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4"
-                >
-                  <span className="flex flex-wrap items-center gap-2 text-xs text-[var(--color-ink-subtle)]">
-                    {note.pinned && (
-                      <Badge label={MEMBER_COPY.notePin} tone="warning" icon="star" />
-                    )}
-                    {[note.authorName, formatDayTime(note.createdAt)].filter(Boolean).join(' · ')}
+  const absencesTab = () => (
+    <Section title={MEMBER_COPY.tabAbsences} bare>
+      {detail.absences.length === 0 ? (
+        <EmptyState
+          figure="absences"
+          title={MEMBER_COPY.absencesEmptyTitle}
+          description={MEMBER_COPY.absencesEmptyDescription}
+          action={<Badge label={MEMBER_COPY.absencesEmptyTitle} tone="neutral" />}
+        />
+      ) : (
+        <div className={LIST_STYLES.stack}>
+          {detail.absences.map((absence) => {
+            const status = ABSENCE_STATUS_REGISTRY.get(absence.status)
+
+            return (
+              <div key={absence.id} className={LIST_STYLES.item}>
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="font-medium">
+                    {formatDayRange(absence.startDate, absence.endDate)}
                   </span>
-                  <p className="text-sm whitespace-pre-wrap">{note.body}</p>
-                </article>
-              ))}
-              <AddRow
-                label={MEMBER_COPY.noteAdd}
-                disabled={!canWriteNotes}
-                onClick={() => openDialog('note')}
-              />
-            </div>
-          )}
-        </Section>
-      )}
-
-      {tab === 'absences' && (
-        <Section title={MEMBER_COPY.tabAbsences} bare>
-          {detail.absences.length === 0 ? (
-            <EmptyState
-              figure="absences"
-              title={MEMBER_COPY.absencesEmptyTitle}
-              description={MEMBER_COPY.absencesEmptyDescription}
-              action={<Badge label={MEMBER_COPY.absencesEmptyTitle} tone="neutral" />}
-            />
-          ) : (
-            <div className={LIST_STYLES.stack}>
-              {detail.absences.map((absence) => {
-                const status = ABSENCE_STATUS_REGISTRY.get(absence.status)
-
-                return (
-                  <div key={absence.id} className={LIST_STYLES.item}>
-                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="font-medium">
-                        {formatDayRange(absence.startDate, absence.endDate)}
-                      </span>
-                      {absence.reason && (
-                        <span className="truncate text-xs text-[var(--color-ink-subtle)]">
-                          {absence.reason}
-                        </span>
-                      )}
+                  {absence.reason && (
+                    <span className="truncate text-xs text-[var(--color-ink-subtle)]">
+                      {absence.reason}
                     </span>
-                    <Badge label={`${absence.dayCount}`} tone="neutral" icon="clock" />
-                    <Badge label={status.label} tone={toTone(status.accent)} dot />
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </Section>
-      )}
-
-      {tab === 'socials' && (
-        <Section title={MEMBER_COPY.socialsTitle} description={MEMBER_COPY.socialsLead} bare>
-          {file.socials.length === 0 ? (
-            <EmptyState
-              figure="settings"
-              title={MEMBER_COPY.socialsEmptyTitle}
-              description={MEMBER_COPY.socialsEmptyDescription}
-              action={
-                <Button
-                  variant="primary"
-                  icon="add"
-                  disabled={!canWriteSocials}
-                  onClick={() => openSocial(null)}
-                >
-                  {MEMBER_COPY.socialAdd}
-                </Button>
-              }
-            />
-          ) : (
-            <div className={LIST_STYLES.stack}>
-              {file.socials.map((social) => (
-                <div key={social.id} className={LIST_STYLES.item}>
-                  <Badge label={social.label} tone={toTone(social.accent, 'brand')} />
-                  <span className="min-w-0 flex-1 truncate text-sm">{social.handle}</span>
-                  {social.url && (
-                    <a
-                      href={social.url}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="text-xs text-[var(--color-brand-600)] underline"
-                    >
-                      {ACTION_COPY.open}
-                    </a>
                   )}
-                  <Button
-                    variant="icon"
-                    icon="edit"
-                    aria-label={MEMBER_COPY.socialEdit}
-                    disabled={!canWriteSocials}
-                    onClick={() => openSocial(social)}
-                  />
-                  <Button
-                    variant="icon"
-                    icon="remove"
-                    aria-label={ACTION_COPY.delete}
-                    disabled={!canWriteSocials}
-                    onClick={() => setPendingSocial(social)}
-                  />
-                </div>
-              ))}
-              <AddRow
-                label={MEMBER_COPY.socialAdd}
+                </span>
+                <Badge label={`${absence.dayCount}`} tone="neutral" icon="clock" />
+                <Badge label={status.label} tone={toTone(status.accent)} dot />
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </Section>
+  )
+
+  const socialsTab = () => (
+    <Section title={MEMBER_COPY.socialsTitle} description={MEMBER_COPY.socialsLead} bare>
+      {file.socials.length === 0 ? (
+        <EmptyState
+          figure="settings"
+          title={MEMBER_COPY.socialsEmptyTitle}
+          description={MEMBER_COPY.socialsEmptyDescription}
+          action={
+            <Button
+              variant="primary"
+              icon="add"
+              disabled={!canWriteSocials}
+              onClick={() => openSocial(null)}
+            >
+              {MEMBER_COPY.socialAdd}
+            </Button>
+          }
+        />
+      ) : (
+        <div className={LIST_STYLES.stack}>
+          {file.socials.map((social) => (
+            <div key={social.id} className={LIST_STYLES.item}>
+              <Badge label={social.label} tone={toTone(social.accent, 'brand')} />
+              <span className="min-w-0 flex-1 truncate text-sm">{social.handle}</span>
+              {social.url && (
+                <a
+                  href={social.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-xs text-[var(--color-brand-600)] underline"
+                >
+                  {ACTION_COPY.open}
+                </a>
+              )}
+              <Button
+                variant="icon"
+                icon="edit"
+                aria-label={MEMBER_COPY.socialEdit}
                 disabled={!canWriteSocials}
-                onClick={() => openSocial(null)}
+                onClick={() => openSocial(social)}
+              />
+              <Button
+                variant="icon"
+                icon="remove"
+                aria-label={ACTION_COPY.delete}
+                disabled={!canWriteSocials}
+                onClick={() => setPendingSocial(social)}
               />
             </div>
-          )}
-        </Section>
+          ))}
+          <AddRow
+            label={MEMBER_COPY.socialAdd}
+            disabled={!canWriteSocials}
+            onClick={() => openSocial(null)}
+          />
+        </div>
       )}
+    </Section>
+  )
 
-      {tab === 'academy' && (
-        <Section title={MEMBER_COPY.tabAcademy} bare>
-          {detail.trainings.length === 0 ? (
-            <EmptyState
-              figure="academy"
-              title={MEMBER_COPY.academyEmptyTitle}
-              description={MEMBER_COPY.academyEmptyDescription}
-              action={<Badge label={MEMBER_COPY.academyEmptyTitle} tone="neutral" />}
-            />
-          ) : (
-            <div className={LIST_STYLES.stack}>
-              {detail.trainings.map((training) => (
-                <div key={training.id} className={LIST_STYLES.item}>
-                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className="font-medium">{training.name}</span>
-                    <span className="text-xs text-[var(--color-ink-subtle)]">
-                      {[
-                        training.period ? ACADEMY_PERIOD_REGISTRY.label(training.period) : null,
-                        training.validatorName,
-                      ]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </span>
-                  </span>
-                  {training.mandatory && <Badge label={MEMBER_COPY.tabAcademy} tone="brand" />}
-                  <Badge
-                    label={
-                      training.completedAt ? formatDay(training.completedAt) : ACTION_COPY.none
-                    }
-                    tone={training.completedAt ? 'success' : 'neutral'}
-                    icon={training.completedAt ? 'success' : 'clock'}
-                  />
-                </div>
-              ))}
+  const academyTab = () => (
+    <Section title={MEMBER_COPY.tabAcademy} bare>
+      {detail.trainings.length === 0 ? (
+        <EmptyState
+          figure="academy"
+          title={MEMBER_COPY.academyEmptyTitle}
+          description={MEMBER_COPY.academyEmptyDescription}
+          action={<Badge label={MEMBER_COPY.academyEmptyTitle} tone="neutral" />}
+        />
+      ) : (
+        <div className={LIST_STYLES.stack}>
+          {detail.trainings.map((training) => (
+            <div key={training.id} className={LIST_STYLES.item}>
+              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span className="font-medium">{training.name}</span>
+                <span className="text-xs text-[var(--color-ink-subtle)]">
+                  {[
+                    training.period ? ACADEMY_PERIOD_REGISTRY.label(training.period) : null,
+                    training.validatorName,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </span>
+              </span>
+              {training.mandatory && <Badge label={MEMBER_COPY.tabAcademy} tone="brand" />}
+              <Badge
+                label={training.completedAt ? formatDay(training.completedAt) : ACTION_COPY.none}
+                tone={training.completedAt ? 'success' : 'neutral'}
+                icon={training.completedAt ? 'success' : 'clock'}
+              />
             </div>
-          )}
-        </Section>
+          ))}
+        </div>
       )}
+    </Section>
+  )
 
-      {tab === 'logs' && canReadLogs && (
-        <Section
-          title={MEMBER_COPY.tabLogs}
-          padded={activity.length > 0}
-          bare={activity.length === 0}
-        >
-          {activity.length === 0 ? (
-            <EmptyState
-              figure="notes"
-              title={MEMBER_COPY.logsEmptyTitle}
-              description={MEMBER_COPY.logsEmptyDescription}
-              action={<Badge label={MEMBER_COPY.logsEmptyTitle} tone="neutral" />}
-            />
-          ) : (
-            <ActivityTimeline entries={activity} />
-          )}
-        </Section>
+  const logsTab = () => (
+    <Section title={MEMBER_COPY.tabLogs} padded={activity.length > 0} bare={activity.length === 0}>
+      {activity.length === 0 ? (
+        <EmptyState
+          figure="notes"
+          title={MEMBER_COPY.logsEmptyTitle}
+          description={MEMBER_COPY.logsEmptyDescription}
+          action={<Badge label={MEMBER_COPY.logsEmptyTitle} tone="neutral" />}
+        />
+      ) : (
+        <ActivityTimeline entries={activity} />
       )}
+    </Section>
+  )
+
+  return (
+    <div className="flex flex-col gap-8">
+      {header}
+
+      <FileTabs
+        label={MEMBER_COPY.title}
+        tabs={[
+          {
+            value: 'identity',
+            label: MEMBER_COPY.tabIdentity,
+            icon: 'sheet',
+            render: identityTab,
+          },
+          {
+            value: 'notes',
+            label: MEMBER_COPY.tabNotes,
+            icon: 'note',
+            visible: canReadNotes,
+            render: notesTab,
+          },
+          {
+            value: 'absences',
+            label: MEMBER_COPY.tabAbsences,
+            icon: 'absences',
+            render: absencesTab,
+          },
+          {
+            value: 'socials',
+            label: MEMBER_COPY.tabSocials,
+            icon: 'link',
+            render: socialsTab,
+          },
+          {
+            value: 'academy',
+            label: MEMBER_COPY.tabAcademy,
+            icon: 'academy',
+            render: academyTab,
+          },
+          {
+            value: 'logs',
+            label: MEMBER_COPY.tabLogs,
+            icon: 'history',
+            visible: canReadLogs,
+            render: logsTab,
+          },
+        ]}
+      />
 
       <FormDialog
         open={dialog === 'identity'}

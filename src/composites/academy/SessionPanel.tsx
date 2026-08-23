@@ -6,7 +6,7 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { Tabs } from '@/components/elements/navigation/Tabs'
+import { FileTabs } from '@/components/structures/FileTabs'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FormDialog } from '@/components/structures/FormDialog'
@@ -56,7 +56,6 @@ export const SessionPanel = ({
   const router = useRouter()
   const session = useSession(detail.summary.id, detail.juniors, detail.steps)
   const { contextMenu } = useMenu()
-  const [tab, setTab] = useState('juniors')
   const [dialog, setDialog] = useState<'junior' | 'step' | null>(null)
   const [editingJunior, setEditingJunior] = useState<JuniorView | null>(null)
   const [editingStep, setEditingStep] = useState<AcademyStepView | null>(null)
@@ -126,165 +125,160 @@ export const SessionPanel = ({
     },
   ]
 
-  const tabs = [
-    {
-      value: 'juniors',
-      label: ACADEMY_COPY.tabJuniors,
-      icon: 'members' as const,
-    },
-    {
-      value: 'thread',
-      label: ACADEMY_COPY.tabThread,
-      icon: 'history' as const,
-    },
-  ]
+  const juniorsTab = () => (
+    <Section description={ACADEMY_COPY.juniorsLead} bare>
+      {session.juniors.length === 0 ? (
+        <EmptyState
+          figure="academy"
+          title={hasCandidates ? ACADEMY_COPY.juniorEmptyTitle : ACADEMY_COPY.noMembersTitle}
+          description={
+            hasCandidates ? ACADEMY_COPY.juniorEmptyDescription : ACADEMY_COPY.noMembersDescription
+          }
+          action={
+            hasCandidates ? (
+              <Button
+                variant="primary"
+                icon="add"
+                disabled={!canManage}
+                onClick={() => openJunior(null)}
+              >
+                {ACADEMY_COPY.juniorAdd}
+              </Button>
+            ) : (
+              <Button variant="primary" icon="members" onClick={() => router.push(ROUTES.members)}>
+                {ACADEMY_COPY.openMembers}
+              </Button>
+            )
+          }
+        />
+      ) : (
+        <div className={LIST_STYLES.stack}>
+          {session.juniors.map((junior) => {
+            const status = ACADEMY_JUNIOR_STATUS_REGISTRY.get(junior.status)
+            const track = ACADEMY_TRACK_REGISTRY.get(junior.track)
+
+            return (
+              <div
+                key={junior.id}
+                onClick={() => router.push(ROUTES.junior(detail.summary.id, junior.id))}
+                onContextMenu={contextMenu(juniorMenu(junior), junior.displayName)}
+                className={cn(LIST_STYLES.item, LIST_STYLES.itemClickable)}
+              >
+                <Avatar name={junior.displayName} src={junior.avatarUrl} />
+                <span className="flex min-w-0 flex-1 flex-col gap-1">
+                  <span className="truncate font-medium">{junior.displayName}</span>
+                  <span className="flex flex-wrap items-center gap-1.5">
+                    <Badge label={track.label} tone={toTone(track.accent, 'info')} />
+                    <Badge label={status.label} tone={toTone(status.accent, 'neutral')} dot />
+                    <span className="text-xs text-[var(--color-ink-subtle)]">
+                      {junior.trainer?.name ?? ACADEMY_COPY.noTrainer}
+                    </span>
+                  </span>
+                </span>
+                <span className="shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums">
+                  {`${junior.completedCount} / ${junior.trainings.length} · ${junior.liveCount} ${ACADEMY_COPY.lives}`}
+                </span>
+              </div>
+            )
+          })}
+          <AddRow
+            label={ACADEMY_COPY.juniorAdd}
+            disabled={!canManage || !hasCandidates}
+            onClick={() => openJunior(null)}
+          />
+        </div>
+      )}
+    </Section>
+  )
+
+  const threadTab = () => (
+    <Section description={ACADEMY_COPY.threadLead} bare>
+      {session.steps.length === 0 ? (
+        <EmptyState
+          figure="notes"
+          title={ACADEMY_COPY.eventEmptyTitle}
+          description={ACADEMY_COPY.eventEmptyDescription}
+          action={
+            <Button
+              variant="primary"
+              icon="add"
+              disabled={!canManage}
+              onClick={() => openStep(null)}
+            >
+              {ACADEMY_COPY.eventAdd}
+            </Button>
+          }
+        />
+      ) : (
+        <div className={LIST_STYLES.stack}>
+          <ol className={TIMELINE_STYLES.list}>
+            {session.steps.map((step) => {
+              const kind = ACADEMY_STEP_KIND_REGISTRY.get(step.kind)
+              const tone = toTone(kind.accent, 'neutral')
+
+              return (
+                <li
+                  key={step.id}
+                  onContextMenu={contextMenu(stepMenu(step), step.title)}
+                  className={TIMELINE_STYLES.item}
+                >
+                  <span className={TIMELINE_STYLES.rail} aria-hidden="true" />
+                  <span
+                    className={cn(TIMELINE_STYLES.dot, step.doneAt ? 'bg-current' : '')}
+                    aria-hidden="true"
+                  />
+                  <span className={TIMELINE_STYLES.body}>
+                    <span className="flex flex-wrap items-center gap-2">
+                      <Badge label={kind.label} tone={tone} icon={kind.icon} />
+                      <span className="font-medium">{step.title}</span>
+                      <Badge
+                        label={step.doneAt ? ACADEMY_COPY.eventDone : ACADEMY_COPY.eventPlanned}
+                        tone={step.doneAt ? 'success' : 'warning'}
+                        dot
+                      />
+                    </span>
+                    <span className={TIMELINE_STYLES.meta}>
+                      {[formatDayTime(step.scheduledAt), step.juniorName, step.authorName]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
+                    {step.notes && (
+                      <span className="text-sm whitespace-pre-wrap">{step.notes}</span>
+                    )}
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+          <AddRow
+            label={ACADEMY_COPY.eventAdd}
+            disabled={!canManage}
+            onClick={() => openStep(null)}
+          />
+        </div>
+      )}
+    </Section>
+  )
 
   return (
     <>
-      <Tabs items={tabs} value={tab} onChange={setTab} label={ACADEMY_COPY.title} />
-
-      {tab === 'juniors' && (
-        <Section description={ACADEMY_COPY.juniorsLead} bare>
-          {session.juniors.length === 0 ? (
-            <EmptyState
-              figure="academy"
-              title={hasCandidates ? ACADEMY_COPY.juniorEmptyTitle : ACADEMY_COPY.noMembersTitle}
-              description={
-                hasCandidates
-                  ? ACADEMY_COPY.juniorEmptyDescription
-                  : ACADEMY_COPY.noMembersDescription
-              }
-              action={
-                hasCandidates ? (
-                  <Button
-                    variant="primary"
-                    icon="add"
-                    disabled={!canManage}
-                    onClick={() => openJunior(null)}
-                  >
-                    {ACADEMY_COPY.juniorAdd}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="primary"
-                    icon="members"
-                    onClick={() => router.push(ROUTES.members)}
-                  >
-                    {ACADEMY_COPY.openMembers}
-                  </Button>
-                )
-              }
-            />
-          ) : (
-            <div className={LIST_STYLES.stack}>
-              {session.juniors.map((junior) => {
-                const status = ACADEMY_JUNIOR_STATUS_REGISTRY.get(junior.status)
-                const track = ACADEMY_TRACK_REGISTRY.get(junior.track)
-
-                return (
-                  <div
-                    key={junior.id}
-                    onClick={() => router.push(ROUTES.junior(detail.summary.id, junior.id))}
-                    onContextMenu={contextMenu(juniorMenu(junior), junior.displayName)}
-                    className={cn(LIST_STYLES.item, LIST_STYLES.itemClickable)}
-                  >
-                    <Avatar name={junior.displayName} src={junior.avatarUrl} />
-                    <span className="flex min-w-0 flex-1 flex-col gap-1">
-                      <span className="truncate font-medium">{junior.displayName}</span>
-                      <span className="flex flex-wrap items-center gap-1.5">
-                        <Badge label={track.label} tone={toTone(track.accent, 'info')} />
-                        <Badge label={status.label} tone={toTone(status.accent, 'neutral')} dot />
-                        <span className="text-xs text-[var(--color-ink-subtle)]">
-                          {junior.trainer?.name ?? ACADEMY_COPY.noTrainer}
-                        </span>
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums">
-                      {`${junior.completedCount} / ${junior.trainings.length} · ${junior.liveCount} ${ACADEMY_COPY.lives}`}
-                    </span>
-                  </div>
-                )
-              })}
-              <AddRow
-                label={ACADEMY_COPY.juniorAdd}
-                disabled={!canManage || !hasCandidates}
-                onClick={() => openJunior(null)}
-              />
-            </div>
-          )}
-        </Section>
-      )}
-
-      {tab === 'thread' && (
-        <Section description={ACADEMY_COPY.threadLead} bare>
-          {session.steps.length === 0 ? (
-            <EmptyState
-              figure="notes"
-              title={ACADEMY_COPY.eventEmptyTitle}
-              description={ACADEMY_COPY.eventEmptyDescription}
-              action={
-                <Button
-                  variant="primary"
-                  icon="add"
-                  disabled={!canManage}
-                  onClick={() => openStep(null)}
-                >
-                  {ACADEMY_COPY.eventAdd}
-                </Button>
-              }
-            />
-          ) : (
-            <div className={LIST_STYLES.stack}>
-              <ol className={TIMELINE_STYLES.list}>
-                {session.steps.map((step) => {
-                  const kind = ACADEMY_STEP_KIND_REGISTRY.get(step.kind)
-                  const tone = toTone(kind.accent, 'neutral')
-
-                  return (
-                    <li
-                      key={step.id}
-                      onContextMenu={contextMenu(stepMenu(step), step.title)}
-                      className={TIMELINE_STYLES.item}
-                    >
-                      <span className={TIMELINE_STYLES.rail} aria-hidden="true" />
-                      <span
-                        className={cn(TIMELINE_STYLES.dot, step.doneAt ? 'bg-current' : '')}
-                        aria-hidden="true"
-                      />
-                      <span className={TIMELINE_STYLES.body}>
-                        <span className="flex flex-wrap items-center gap-2">
-                          <Badge label={kind.label} tone={tone} icon={kind.icon} />
-                          <span className="font-medium">{step.title}</span>
-                          <Badge
-                            label={
-                              step.doneAt ? ACADEMY_COPY.eventDone : ACADEMY_COPY.eventPlanned
-                            }
-                            tone={step.doneAt ? 'success' : 'warning'}
-                            dot
-                          />
-                        </span>
-                        <span className={TIMELINE_STYLES.meta}>
-                          {[formatDayTime(step.scheduledAt), step.juniorName, step.authorName]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </span>
-                        {step.notes && (
-                          <span className="text-sm whitespace-pre-wrap">{step.notes}</span>
-                        )}
-                      </span>
-                    </li>
-                  )
-                })}
-              </ol>
-              <AddRow
-                label={ACADEMY_COPY.eventAdd}
-                disabled={!canManage}
-                onClick={() => openStep(null)}
-              />
-            </div>
-          )}
-        </Section>
-      )}
+      <FileTabs
+        label={ACADEMY_COPY.title}
+        tabs={[
+          {
+            value: 'juniors',
+            label: ACADEMY_COPY.tabJuniors,
+            icon: 'members',
+            render: juniorsTab,
+          },
+          {
+            value: 'thread',
+            label: ACADEMY_COPY.tabThread,
+            icon: 'history',
+            render: threadTab,
+          },
+        ]}
+      />
 
       <FormDialog
         open={dialog === 'junior'}
