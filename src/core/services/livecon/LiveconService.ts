@@ -112,8 +112,8 @@ export const liveconFields = async (): Promise<FieldDefinition[]> => {
       name: 'youtuberId',
       kind: 'select',
       label: LIVECON_FIELD_COPY.youtuber,
-      hint: LIVECON_FIELD_COPY.youtuberHint,
       options: youtubers,
+      mark: 'avatar',
       span: 'half',
     },
     {
@@ -126,13 +126,13 @@ export const liveconFields = async (): Promise<FieldDefinition[]> => {
         label: `${level.level} · ${level.name}`,
         accent: level.accent ?? undefined,
       })),
+      mark: 'dot',
       span: 'half',
     },
     {
       name: 'reason',
       kind: 'textarea',
       label: LIVECON_FIELD_COPY.reason,
-      hint: LIVECON_FIELD_COPY.reasonHint,
       maxLength: FORM_SETTINGS.longTextMaxLength,
     },
   ]
