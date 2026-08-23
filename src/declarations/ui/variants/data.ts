@@ -27,7 +27,24 @@ export const LIST_STYLES = {
   itemClickable: 'cursor-pointer hover:border-[var(--color-brand-400)]',
   card: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 transition-colors',
   cardClickable: 'cursor-pointer hover:border-[var(--color-brand-400)]',
+  cardMuted: 'opacity-60',
   grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
+} as const
+
+/**
+ * Grouped card list styles, one heading per bucket
+ * @type {Record<string, string>}
+ */
+
+export const GROUP_STYLES = {
+  stack: 'flex flex-col',
+  section: 'flex flex-col gap-3',
+  sectionDivided: 'border-t border-[var(--color-border)] pt-6',
+  heading: 'flex w-full items-center gap-2 text-left text-sm font-semibold text-[var(--color-ink)]',
+  count: 'font-normal text-[var(--color-ink-subtle)]',
+  bubble: 'inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-brand-600)]',
+  chevron: 'ml-auto h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform',
+  chevronOpen: 'rotate-180',
 } as const
 
 /**
@@ -43,7 +60,7 @@ export const BOARD_STYLES = {
   columnHead: 'flex items-center justify-between gap-2 px-2 py-1.5',
   columnTitle: 'flex items-center gap-2 text-sm font-semibold',
   count:
-    'rounded-full bg-[var(--color-surface-raised)] px-2 py-0.5 text-xs text-[var(--color-ink-subtle)]',
+    'rounded-[var(--radius-sm)] bg-[var(--color-surface-raised)] px-2 py-0.5 text-xs text-[var(--color-ink-subtle)]',
   body: 'flex min-h-24 flex-col gap-2 rounded-[var(--radius-md)] p-1',
   card: 'group flex cursor-grab flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 shadow-[var(--shadow-sm)] transition-shadow hover:shadow-[var(--shadow-md)] active:cursor-grabbing',
   cardTitle: 'text-sm leading-snug font-medium',
@@ -65,6 +82,33 @@ export const TIMELINE_STYLES = {
 } as const
 
 /**
+ * Horizontal timeline styles, three steps connected by a rule
+ * @type {Record<string, string>}
+ */
+
+export const HORIZONTAL_TIMELINE_STYLES = {
+  row: 'flex items-start',
+  step: 'flex flex-1 flex-col items-center gap-2 text-center last:flex-none',
+  dot: 'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2',
+  dotDone:
+    'border-[var(--color-brand-600)] bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
+  dotCurrent:
+    'border-[var(--color-brand-600)] bg-[var(--color-surface-raised)] text-[var(--color-brand-600)]',
+  dotIdle:
+    'border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] text-[var(--color-ink-subtle)]',
+  dotLate: 'border-[var(--color-danger)] bg-[var(--color-danger-soft)] text-[var(--color-danger)]',
+  icon: 'h-4 w-4',
+  connector: 'mt-4 h-0.5 flex-1',
+  connectorDone: 'bg-[var(--color-brand-600)]',
+  connectorIdle: 'bg-[var(--color-border)]',
+  connectorLate: 'bg-[var(--color-danger)]',
+  labelDone: 'text-[var(--color-ink)]',
+  labelIdle: 'text-[var(--color-ink-subtle)]',
+  hint: 'max-w-24 text-[10px] text-[var(--color-ink-subtle)]',
+  label: 'max-w-24 text-xs font-medium',
+} as const
+
+/**
  * Calendar grid styles
  * @type {Record<string, string>}
  */
@@ -79,11 +123,13 @@ export const CALENDAR_STYLES = {
   weekdaysWeek: 'grid grid-cols-[4rem_repeat(7,minmax(0,1fr))]',
   weekday: 'px-2 py-2 text-center',
   month: 'grid grid-cols-7',
-  day: 'flex min-h-28 flex-col gap-1 border-r border-b border-[var(--color-border)] p-1.5 last:border-r-0',
+  day: 'group relative flex min-h-28 flex-col gap-1 border-r border-b border-[var(--color-border)] p-1.5 last:border-r-0',
   dayOutside: 'bg-[var(--color-surface)]/50',
   dayToday: 'bg-[var(--color-brand-soft)]/40',
   dayNumber: 'text-xs font-semibold tabular-nums',
   dayNumberOutside: 'text-[var(--color-ink-subtle)]',
+  dayAdd:
+    'absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:bg-[var(--color-brand-soft)] hover:text-[var(--color-brand-600)]',
   entry:
     'flex w-full cursor-grab items-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-opacity hover:opacity-80 active:cursor-grabbing',
   entryTime: 'shrink-0 tabular-nums opacity-70',
@@ -92,4 +138,28 @@ export const CALENDAR_STYLES = {
   week: 'grid grid-cols-[4rem_repeat(7,minmax(0,1fr))]',
   hour: 'border-r border-b border-[var(--color-border)] px-2 py-1 text-right text-xs text-[var(--color-ink-subtle)] tabular-nums',
   slot: 'flex min-h-12 flex-col gap-1 border-r border-b border-[var(--color-border)] p-1 last:border-r-0',
+} as const
+
+/**
+ * Filter bar styles — a filter icon opening the dropdown sheet, a search icon expanding its
+ * own field beside it
+ * @type {Record<string, string>}
+ */
+
+export const FILTER_STYLES = {
+  bar: 'flex flex-wrap items-center gap-2',
+  iconButton:
+    'relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-border-strong)] hover:text-[var(--color-ink)]',
+  iconButtonActive: 'border-[var(--color-brand-400)] text-[var(--color-brand-600)]',
+  glyph: 'h-4 w-4',
+  tally:
+    'absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-1 text-[10px] font-bold text-[var(--color-on-brand)] tabular-nums',
+  searchGroup: 'flex items-center gap-2',
+  searchInput:
+    'search-expand w-0 shrink-0 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 text-sm text-[var(--color-ink)] opacity-0 outline-none placeholder:text-[var(--color-ink-subtle)]',
+  searchInputOpen: 'w-48 px-3 opacity-100 sm:w-64',
+  trailing: 'ml-auto flex items-center gap-2',
+  panel: 'flex flex-col gap-3 border-t border-[var(--color-border)] pt-4',
+  options: 'flex flex-wrap items-start gap-3',
+  optionField: 'w-full sm:w-52',
 } as const
