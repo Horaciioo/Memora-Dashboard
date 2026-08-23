@@ -1,5 +1,5 @@
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { Badge } from '@/components/elements/display/Badge'
+import { BetaBanner } from '@/components/structures/BetaBanner'
 import { WIP_COPY } from '@/declarations/ui/copy'
 import type { IllustrationName } from '@/declarations/ui/illustrations'
 
@@ -20,6 +20,6 @@ export const WipNotice = ({ figure = 'start', description }: WipNoticeProps) => 
     figure={figure}
     title={WIP_COPY.title}
     description={description ?? WIP_COPY.description}
-    action={<Badge label={WIP_COPY.badge} tone="warning" icon="clock" />}
+    action={<BetaBanner />}
   />
 )
