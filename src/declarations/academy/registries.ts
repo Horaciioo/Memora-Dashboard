@@ -1,13 +1,13 @@
 import { createRegistry } from '@/core/lib/registry'
 import {
-  AcademyEventKinds,
+  AcademyStepKinds,
   AcademyJuniorStatuses,
   AcademyPrograms,
   AcademySessionStatuses,
   AcademyTracks,
 } from '@/utils/constants/hierarchy'
 import type {
-  AcademyEventKindName,
+  AcademyStepKindName,
   AcademyJuniorStatusName,
   AcademyProgramName,
   AcademySessionStatusName,
@@ -107,32 +107,32 @@ export const ACADEMY_JUNIOR_STATUS_REGISTRY = createRegistry(JUNIOR_STATUS_MAP)
 
 /**
  * Session thread moment metadata
- * @typedef {Object} EventKindOption
+ * @typedef {Object} StepKindOption
  * @property {string} label - Display label
  * @property {string} accent - Colour token
  * @property {IconName} icon - Glyph key
  */
 
-interface EventKindOption {
+interface StepKindOption {
   label: string
   accent: string
   icon: IconName
 }
 
-const EVENT_KIND_MAP: Record<AcademyEventKindName, EventKindOption> = {
-  [AcademyEventKinds.Training]: { label: 'Formation', accent: 'brand', icon: 'academy' },
-  [AcademyEventKinds.VoiceReview]: { label: 'Bilan vocal', accent: 'info', icon: 'note' },
-  [AcademyEventKinds.Interview]: { label: 'Entrevue', accent: 'success', icon: 'members' },
-  [AcademyEventKinds.LeadCheckIn]: {
+const STEP_KIND_MAP: Record<AcademyStepKindName, StepKindOption> = {
+  [AcademyStepKinds.Training]: { label: 'Formation', accent: 'brand', icon: 'academy' },
+  [AcademyStepKinds.VoiceReview]: { label: 'Bilan vocal', accent: 'info', icon: 'note' },
+  [AcademyStepKinds.Interview]: { label: 'Entrevue', accent: 'success', icon: 'members' },
+  [AcademyStepKinds.LeadCheckIn]: {
     label: 'Point responsable',
     accent: 'warning',
     icon: 'shield',
   },
-  [AcademyEventKinds.WorkSession]: {
+  [AcademyStepKinds.WorkSession]: {
     label: 'Session de travail',
     accent: 'neutral',
     icon: 'tasks',
   },
 }
 
-export const ACADEMY_EVENT_KIND_REGISTRY = createRegistry(EVENT_KIND_MAP)
+export const ACADEMY_STEP_KIND_REGISTRY = createRegistry(STEP_KIND_MAP)

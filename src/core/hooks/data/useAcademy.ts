@@ -5,8 +5,8 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
-import { FEEDBACK_COPY } from '@/declarations/ui/copy'
-import type { AcademyEventView, JuniorView, SessionSummary } from '@/types/academy'
+import { feedbackTitle } from '@/declarations/ui/copy'
+import type { AcademyStepView, JuniorView, SessionSummary } from '@/types/academy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 
 /**
@@ -45,7 +45,7 @@ export const useSessions = (initialSessions: SessionSummary[]): SessionCollectio
     async (values: FormValues) => {
       const next = await run(
         () => apiPost<SessionSummary[]>(API_ROUTES.academy, values),
-        FEEDBACK_COPY.created
+        feedbackTitle('Session', 'created', 'feminine')
       )
 
       if (next) setSessions(next)
@@ -59,7 +59,7 @@ export const useSessions = (initialSessions: SessionSummary[]): SessionCollectio
     async (id: string, values: FormValues) => {
       const next = await run(
         () => apiPatch<SessionSummary[]>(API_ROUTES.session(id), values),
-        FEEDBACK_COPY.saved
+        feedbackTitle('Session', 'saved', 'feminine')
       )
 
       if (next) setSessions(next)
@@ -73,7 +73,7 @@ export const useSessions = (initialSessions: SessionSummary[]): SessionCollectio
     async (id: string) => {
       const next = await run(
         () => apiDelete<SessionSummary[]>(API_ROUTES.session(id)),
-        FEEDBACK_COPY.deleted
+        feedbackTitle('Session', 'deleted', 'feminine')
       )
 
       if (next) setSessions(next)
@@ -88,56 +88,56 @@ export const useSessions = (initialSessions: SessionSummary[]): SessionCollectio
  * One session state and mutations
  * @typedef {Object} SessionState
  * @property {JuniorView[]} juniors - Juniors inside
- * @property {AcademyEventView[]} events - Session thread
+ * @property {AcademyStepView[]} steps - Session thread
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {() => void} clearIssues - Forget the rejections
  * @property {(values: FormValues) => Promise<boolean>} addJunior - Take a moderator in
  * @property {(id: string, values: FormValues) => Promise<boolean>} editJunior - Edit a junior
  * @property {(id: string) => Promise<void>} dropJunior - Take a junior out
- * @property {(values: FormValues) => Promise<boolean>} addEvent - Note a moment
- * @property {(id: string, values: FormValues) => Promise<boolean>} editEvent - Edit a moment
- * @property {(id: string, done: boolean) => Promise<void>} setEventDone - Flip a moment
- * @property {(id: string) => Promise<void>} dropEvent - Drop a moment
+ * @property {(values: FormValues) => Promise<boolean>} addStep - Note a moment
+ * @property {(id: string, values: FormValues) => Promise<boolean>} editStep - Edit a moment
+ * @property {(id: string, done: boolean) => Promise<void>} setStepDone - Flip a moment
+ * @property {(id: string) => Promise<void>} dropStep - Drop a moment
  */
 
 export interface SessionState {
   juniors: JuniorView[]
-  events: AcademyEventView[]
+  steps: AcademyStepView[]
   isSaving: boolean
   issues: FieldIssue[]
   clearIssues: () => void
   addJunior: (values: FormValues) => Promise<boolean>
   editJunior: (id: string, values: FormValues) => Promise<boolean>
   dropJunior: (id: string) => Promise<void>
-  addEvent: (values: FormValues) => Promise<boolean>
-  editEvent: (id: string, values: FormValues) => Promise<boolean>
-  setEventDone: (id: string, done: boolean) => Promise<void>
-  dropEvent: (id: string) => Promise<void>
+  addStep: (values: FormValues) => Promise<boolean>
+  editStep: (id: string, values: FormValues) => Promise<boolean>
+  setStepDone: (id: string, done: boolean) => Promise<void>
+  dropStep: (id: string) => Promise<void>
 }
 
 /**
  * Drive one academy session
  * @param {string} sessionId - Session identifier
  * @param {JuniorView[]} initialJuniors - Juniors resolved server-side
- * @param {AcademyEventView[]} initialEvents - Thread resolved server-side
+ * @param {AcademyStepView[]} initialSteps - Thread resolved server-side
  * @return {SessionState} - State and mutations
  */
 
 export const useSession = (
   sessionId: string,
   initialJuniors: JuniorView[],
-  initialEvents: AcademyEventView[]
+  initialSteps: AcademyStepView[]
 ): SessionState => {
   const [juniors, setJuniors] = useState(initialJuniors)
-  const [events, setEvents] = useState(initialEvents)
+  const [steps, setSteps] = useState(initialSteps)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   const addJunior = useCallback(
     async (values: FormValues) => {
       const next = await run(
         () => apiPost<JuniorView[]>(API_ROUTES.sessionJuniors(sessionId), values),
-        FEEDBACK_COPY.created
+        feedbackTitle('Junior', 'created', 'masculine')
       )
 
       if (next) setJuniors(next)
@@ -149,91 +149,96 @@ export const useSession = (
 
   const editJunior = useCallback(
     async (id: string, values: FormValues) => {
+      const name = juniors.find((junior) => junior.id === id)?.displayName
       const next = await run(
         () => apiPatch<JuniorView[]>(API_ROUTES.junior(id), values),
-        FEEDBACK_COPY.saved
+        feedbackTitle('Junior', 'saved', 'masculine', name)
       )
 
       if (next) setJuniors(next)
 
       return next !== null
     },
-    [run]
+    [run, juniors]
   )
 
   const dropJunior = useCallback(
     async (id: string) => {
+      const name = juniors.find((junior) => junior.id === id)?.displayName
       const next = await run(
         () => apiDelete<JuniorView[]>(API_ROUTES.junior(id)),
-        FEEDBACK_COPY.deleted
+        feedbackTitle('Junior', 'deleted', 'masculine', name)
       )
 
       if (next) setJuniors(next)
     },
-    [run]
+    [run, juniors]
   )
 
-  const addEvent = useCallback(
+  const addStep = useCallback(
     async (values: FormValues) => {
+      const name = typeof values.title === 'string' ? values.title : undefined
       const next = await run(
-        () => apiPost<AcademyEventView[]>(API_ROUTES.sessionMoments(sessionId), values),
-        FEEDBACK_COPY.created
+        () => apiPost<AcademyStepView[]>(API_ROUTES.sessionSteps(sessionId), values),
+        feedbackTitle('Moment', 'created', 'masculine', name)
       )
 
-      if (next) setEvents(next)
+      if (next) setSteps(next)
 
       return next !== null
     },
     [run, sessionId]
   )
 
-  const editEvent = useCallback(
+  const editStep = useCallback(
     async (id: string, values: FormValues) => {
+      const name = steps.find((step) => step.id === id)?.title
       const next = await run(
-        () => apiPatch<AcademyEventView[]>(API_ROUTES.moment(id), values),
-        FEEDBACK_COPY.saved
+        () => apiPatch<AcademyStepView[]>(API_ROUTES.step(id), values),
+        feedbackTitle('Moment', 'saved', 'masculine', name)
       )
 
-      if (next) setEvents(next)
+      if (next) setSteps(next)
 
       return next !== null
     },
-    [run]
+    [run, steps]
   )
 
-  const setEventDone = useCallback(
+  const setStepDone = useCallback(
     async (id: string, done: boolean) => {
-      const next = await run(() => apiPatch<AcademyEventView[]>(API_ROUTES.moment(id), { done }))
+      const next = await run(() => apiPatch<AcademyStepView[]>(API_ROUTES.step(id), { done }))
 
-      if (next) setEvents(next)
+      if (next) setSteps(next)
     },
     [run]
   )
 
-  const dropEvent = useCallback(
+  const dropStep = useCallback(
     async (id: string) => {
+      const name = steps.find((step) => step.id === id)?.title
       const next = await run(
-        () => apiDelete<AcademyEventView[]>(API_ROUTES.moment(id)),
-        FEEDBACK_COPY.deleted
+        () => apiDelete<AcademyStepView[]>(API_ROUTES.step(id)),
+        feedbackTitle('Moment', 'deleted', 'masculine', name)
       )
 
-      if (next) setEvents(next)
+      if (next) setSteps(next)
     },
-    [run]
+    [run, steps]
   )
 
   return {
     juniors,
-    events,
+    steps,
     isSaving,
     issues,
     clearIssues,
     addJunior,
     editJunior,
     dropJunior,
-    addEvent,
-    editEvent,
-    setEventDone,
-    dropEvent,
+    addStep,
+    editStep,
+    setStepDone,
+    dropStep,
   }
 }

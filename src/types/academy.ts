@@ -1,7 +1,7 @@
 import type { FormValues } from '@/types/forms'
 import type { WorkPerson } from '@/types/work'
 import type {
-  AcademyEventKindName,
+  AcademyStepKindName,
   AcademyJuniorStatusName,
   AcademyPeriodName,
   AcademyProgramName,
@@ -99,9 +99,9 @@ export interface JuniorView {
 
 /**
  * Moment recorded on the session thread
- * @typedef {Object} AcademyEventView
- * @property {string} id - Event identifier
- * @property {AcademyEventKindName} kind - Kind of moment
+ * @typedef {Object} AcademyStepView
+ * @property {string} id - Step identifier
+ * @property {AcademyStepKindName} kind - Kind of moment
  * @property {string} title - Intitulé
  * @property {string} scheduledAt - ISO planned date
  * @property {string | null} doneAt - ISO date it was actually held
@@ -112,9 +112,9 @@ export interface JuniorView {
  * @property {FormValues} values - Values feeding the edit form
  */
 
-export interface AcademyEventView {
+export interface AcademyStepView {
   id: string
-  kind: AcademyEventKindName
+  kind: AcademyStepKindName
   title: string
   scheduledAt: string
   doneAt: string | null
@@ -156,11 +156,11 @@ export interface AcademyReviewView {
  * @typedef {Object} SessionDetail
  * @property {SessionSummary} summary - Session header
  * @property {JuniorView[]} juniors - Juniors inside
- * @property {AcademyEventView[]} events - Session thread
+ * @property {AcademyStepView[]} steps - Session thread
  */
 
 export interface SessionDetail {
   summary: SessionSummary
   juniors: JuniorView[]
-  events: AcademyEventView[]
+  steps: AcademyStepView[]
 }

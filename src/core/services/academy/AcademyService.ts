@@ -7,7 +7,7 @@ import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/
 import { memberOptions, toPerson } from '@/core/services/work/shared'
 import { ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
 import {
-  ACADEMY_EVENT_KIND_REGISTRY,
+  ACADEMY_STEP_KIND_REGISTRY,
   ACADEMY_JUNIOR_STATUS_REGISTRY,
   ACADEMY_PROGRAM_REGISTRY,
   ACADEMY_SESSION_STATUS_REGISTRY,
@@ -15,7 +15,7 @@ import {
 } from '@/declarations/academy/registries'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import type {
-  AcademyEventView,
+  AcademyStepView,
   AcademyReviewView,
   JuniorTraining,
   JuniorView,
@@ -31,7 +31,7 @@ import {
   MemberStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
-  AcademyEventKindName,
+  AcademyStepKindName,
   AcademyJuniorStatusName,
   AcademyProgramName,
   AcademySessionStatusName,
@@ -70,6 +70,7 @@ export const sessionFields = async (): Promise<FieldDefinition[]> => {
       label: ACADEMY_FIELD_COPY.program,
       required: true,
       options: toOptions(ACADEMY_PROGRAM_REGISTRY),
+      mark: 'dot',
       span: 'half',
     },
     {
@@ -78,6 +79,7 @@ export const sessionFields = async (): Promise<FieldDefinition[]> => {
       label: ACADEMY_FIELD_COPY.status,
       required: true,
       options: toOptions(ACADEMY_SESSION_STATUS_REGISTRY),
+      mark: 'dot',
       span: 'half',
     },
     {
@@ -92,7 +94,6 @@ export const sessionFields = async (): Promise<FieldDefinition[]> => {
       name: 'trainerIds',
       kind: 'multiselect',
       label: ACADEMY_FIELD_COPY.trainers,
-      hint: ACADEMY_FIELD_COPY.trainersHint,
       options: members,
     },
     {
@@ -118,7 +119,6 @@ export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]
       name: 'accountId',
       kind: 'select',
       label: ACADEMY_FIELD_COPY.account,
-      hint: ACADEMY_FIELD_COPY.accountHint,
       required: true,
       options: candidates,
     },
@@ -135,6 +135,7 @@ export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]
       label: ACADEMY_FIELD_COPY.track,
       required: true,
       options: toOptions(ACADEMY_TRACK_REGISTRY),
+      mark: 'dot',
       span: 'half',
     },
     {
@@ -143,13 +144,13 @@ export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]
       label: ACADEMY_FIELD_COPY.juniorStatus,
       required: true,
       options: toOptions(ACADEMY_JUNIOR_STATUS_REGISTRY),
+      mark: 'dot',
       span: 'half',
     },
     {
       name: 'liveCount',
       kind: 'number',
       label: ACADEMY_FIELD_COPY.liveCount,
-      hint: ACADEMY_FIELD_COPY.liveCountHint,
       min: 0,
       max: ACADEMY_SETTINGS.maxLives,
       span: 'half',
@@ -169,7 +170,7 @@ export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const eventFields = async (sessionId: string): Promise<FieldDefinition[]> => {
+export const stepFields = async (sessionId: string): Promise<FieldDefinition[]> => {
   const juniors = await prisma.academyJunior.findMany({
     where: { sessionId },
     include: { account: true },
@@ -182,7 +183,8 @@ export const eventFields = async (sessionId: string): Promise<FieldDefinition[]>
       kind: 'select',
       label: ACADEMY_FIELD_COPY.kind,
       required: true,
-      options: toOptions(ACADEMY_EVENT_KIND_REGISTRY),
+      options: toOptions(ACADEMY_STEP_KIND_REGISTRY),
+      mark: 'dot',
       span: 'half',
     },
     {
@@ -203,7 +205,6 @@ export const eventFields = async (sessionId: string): Promise<FieldDefinition[]>
       name: 'juniorId',
       kind: 'select',
       label: ACADEMY_FIELD_COPY.junior,
-      hint: ACADEMY_FIELD_COPY.juniorHint,
       options: juniors.map((junior) => ({ value: junior.id, label: junior.account.displayName })),
     },
     {
@@ -232,7 +233,6 @@ export const REVIEW_FIELDS: FieldDefinition[] = [
     name: 'feeling',
     kind: 'textarea',
     label: ACADEMY_FIELD_COPY.feeling,
-    hint: ACADEMY_FIELD_COPY.feelingHint,
     required: true,
     maxLength: FORM_SETTINGS.noteMaxLength,
   },
@@ -247,7 +247,6 @@ export const REVIEW_FIELDS: FieldDefinition[] = [
     name: 'objectives',
     kind: 'textarea',
     label: ACADEMY_FIELD_COPY.objectives,
-    hint: ACADEMY_FIELD_COPY.objectivesHint,
     required: true,
     maxLength: FORM_SETTINGS.noteMaxLength,
   },
@@ -525,13 +524,13 @@ export const listJuniors = async (
 
 /**
  * Shape one thread moment
- * @param {object} row - Event row
- * @return {AcademyEventView} - Event view
+ * @param {object} row - Step row
+ * @return {AcademyStepView} - Step view
  */
 
-const toEvent = (row: {
+const toStep = (row: {
   id: string
-  kind: AcademyEventKindName
+  kind: AcademyStepKindName
   title: string
   scheduledAt: Date
   doneAt: Date | null
@@ -539,7 +538,7 @@ const toEvent = (row: {
   juniorId: string | null
   junior: { account: { displayName: string } } | null
   author: { displayName: string } | null
-}): AcademyEventView => ({
+}): AcademyStepView => ({
   id: row.id,
   kind: row.kind,
   title: row.title,
@@ -567,17 +566,17 @@ const EVENT_SHAPE = {
 /**
  * Read the thread of a session
  * @param {string} sessionId - Session identifier
- * @return {Promise<AcademyEventView[]>} - Moments, newest first
+ * @return {Promise<AcademyStepView[]>} - Moments, newest first
  */
 
-export const listEvents = async (sessionId: string): Promise<AcademyEventView[]> => {
-  const rows = await prisma.academyEvent.findMany({
+export const listSteps = async (sessionId: string): Promise<AcademyStepView[]> => {
+  const rows = await prisma.academyStep.findMany({
     where: { sessionId },
     include: EVENT_SHAPE,
     orderBy: { scheduledAt: 'desc' },
   })
 
-  return rows.map(toEvent)
+  return rows.map(toStep)
 }
 
 /**
@@ -590,9 +589,9 @@ export const readSession = async (id: string): Promise<SessionDetail> => {
   const row = await prisma.academySession.findUnique({ where: { id }, include: SESSION_SHAPE })
   if (!row) throw notFound()
 
-  const [juniors, events] = await Promise.all([listJuniors(id, row.program), listEvents(id)])
+  const [juniors, steps] = await Promise.all([listJuniors(id, row.program), listSteps(id)])
 
-  return { summary: toSummary(row), juniors, events }
+  return { summary: toSummary(row), juniors, steps }
 }
 
 /**
@@ -722,8 +721,8 @@ export const setTrainingRecord = async (
  * @return {object} - Database payload
  */
 
-const toEventData = (values: FormValues) => ({
-  kind: (readText(values, 'kind') ?? '') as AcademyEventKindName,
+const toStepData = (values: FormValues) => ({
+  kind: (readText(values, 'kind') ?? '') as AcademyStepKindName,
   title: readText(values, 'title') ?? '',
   scheduledAt: readDate(values, 'scheduledAt') ?? new Date(),
   juniorId: readText(values, 'juniorId'),
@@ -735,58 +734,58 @@ const toEventData = (values: FormValues) => ({
  * @param {string} sessionId - Session identifier
  * @param {string} authorId - Who records it
  * @param {FormValues} values - Parsed body
- * @return {Promise<AcademyEventView[]>} - Moments
+ * @return {Promise<AcademyStepView[]>} - Moments
  */
 
-export const createEvent = async (
+export const createStep = async (
   sessionId: string,
   authorId: string,
   values: FormValues
-): Promise<AcademyEventView[]> => {
-  await prisma.academyEvent.create({ data: { sessionId, authorId, ...toEventData(values) } })
+): Promise<AcademyStepView[]> => {
+  await prisma.academyStep.create({ data: { sessionId, authorId, ...toStepData(values) } })
 
-  return listEvents(sessionId)
+  return listSteps(sessionId)
 }
 
 /**
  * Edit a moment
- * @param {string} id - Event identifier
+ * @param {string} id - Step identifier
  * @param {FormValues} values - Parsed body
- * @return {Promise<AcademyEventView[]>} - Moments
+ * @return {Promise<AcademyStepView[]>} - Moments
  */
 
-export const updateEvent = async (id: string, values: FormValues): Promise<AcademyEventView[]> => {
-  const row = await prisma.academyEvent.update({ where: { id }, data: toEventData(values) })
+export const updateStep = async (id: string, values: FormValues): Promise<AcademyStepView[]> => {
+  const row = await prisma.academyStep.update({ where: { id }, data: toStepData(values) })
 
-  return listEvents(row.sessionId)
+  return listSteps(row.sessionId)
 }
 
 /**
  * Flip a moment between planned and held
- * @param {string} id - Event identifier
+ * @param {string} id - Step identifier
  * @param {boolean} done - Wanted state
- * @return {Promise<AcademyEventView[]>} - Moments
+ * @return {Promise<AcademyStepView[]>} - Moments
  */
 
-export const setEventDone = async (id: string, done: boolean): Promise<AcademyEventView[]> => {
-  const row = await prisma.academyEvent.update({
+export const setStepDone = async (id: string, done: boolean): Promise<AcademyStepView[]> => {
+  const row = await prisma.academyStep.update({
     where: { id },
     data: { doneAt: done ? new Date() : null },
   })
 
-  return listEvents(row.sessionId)
+  return listSteps(row.sessionId)
 }
 
 /**
  * Drop a moment
- * @param {string} id - Event identifier
- * @return {Promise<AcademyEventView[]>} - Moments
+ * @param {string} id - Step identifier
+ * @return {Promise<AcademyStepView[]>} - Moments
  */
 
-export const removeEvent = async (id: string): Promise<AcademyEventView[]> => {
-  const row = await prisma.academyEvent.delete({ where: { id } })
+export const removeStep = async (id: string): Promise<AcademyStepView[]> => {
+  const row = await prisma.academyStep.delete({ where: { id } })
 
-  return listEvents(row.sessionId)
+  return listSteps(row.sessionId)
 }
 
 /**
