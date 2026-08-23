@@ -13,6 +13,7 @@ import type { Tone } from '@/declarations/ui/theme'
  * @property {string} id - ID
  * @property {Tone} tone - Visual tone
  * @property {string} title - Title text
+ * @property {string} [emphasis] - Substring of the title rendered bold
  * @property {string} [description] - Description
  * @property {number} durationMs - Lifetime
  */
@@ -21,6 +22,7 @@ export interface Notification {
   id: string
   tone: Tone
   title: string
+  emphasis?: string
   description?: string
   durationMs: number
 }

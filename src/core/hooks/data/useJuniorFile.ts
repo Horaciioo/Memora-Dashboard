@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
-import { FEEDBACK_COPY } from '@/declarations/ui/copy'
+import { feedbackTitle } from '@/declarations/ui/copy'
 import type { AcademyReviewView, JuniorView } from '@/types/academy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 
@@ -75,19 +75,19 @@ export const useJuniorFile = (
     async (values: FormValues) => {
       const next = await run(
         () => apiPatch<JuniorView[]>(API_ROUTES.junior(junior.id), values),
-        FEEDBACK_COPY.saved
+        feedbackTitle('Fiche', 'saved', 'feminine', junior.displayName)
       )
 
       return pickSelf(next, junior.id)
     },
-    [junior.id, pickSelf, run]
+    [junior.id, junior.displayName, pickSelf, run]
   )
 
   const addReview = useCallback(
     async (values: FormValues) => {
       const next = await run(
         () => apiPost<AcademyReviewView[]>(API_ROUTES.juniorReviews(junior.id), values),
-        FEEDBACK_COPY.created
+        feedbackTitle('Bilan', 'created', 'masculine')
       )
 
       if (next) setReviews(next)
@@ -101,7 +101,7 @@ export const useJuniorFile = (
     async (id: string, values: FormValues) => {
       const next = await run(
         () => apiPatch<AcademyReviewView[]>(API_ROUTES.review(id), values),
-        FEEDBACK_COPY.saved
+        feedbackTitle('Bilan', 'saved', 'masculine')
       )
 
       if (next) setReviews(next)
@@ -115,7 +115,7 @@ export const useJuniorFile = (
     async (id: string) => {
       const next = await run(
         () => apiDelete<AcademyReviewView[]>(API_ROUTES.review(id)),
-        FEEDBACK_COPY.deleted
+        feedbackTitle('Bilan', 'deleted', 'masculine')
       )
 
       if (next) setReviews(next)
