@@ -47,7 +47,7 @@ export interface MemberDivision {
  * @property {string | null} avatarUrl - Portrait
  * @property {MemberRoleName} role - Hierarchy level
  * @property {MemberStatusName} status - Membership status
- * @property {AcademyPeriodName | null} academyPeriod - Academy progression
+ * @property {MemberTag | null} academyDispositif - Dispositif of the active FSI
  * @property {MemberDivision | null} division - Division
  * @property {MemberTag[]} youtubers - Assigned YouTubers
  * @property {MemberTag | null} primaryFunction - Main function
@@ -65,7 +65,7 @@ export interface MemberSummary {
   avatarUrl: string | null
   role: MemberRoleName
   status: MemberStatusName
-  academyPeriod: AcademyPeriodName | null
+  academyDispositif: MemberTag | null
   division: MemberDivision | null
   youtubers: MemberTag[]
   primaryFunction: MemberTag | null

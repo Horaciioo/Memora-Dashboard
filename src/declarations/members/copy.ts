@@ -73,7 +73,6 @@ export const MEMBER_FIELD_COPY = {
   discordId: 'Identifiant Discord',
   role: 'Rôle',
   status: 'Statut',
-  academyPeriod: 'Période',
   division: 'Division',
   youtuber: 'YouTubeurs',
   primaryFunction: 'Fonction principale',

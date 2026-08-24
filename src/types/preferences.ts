@@ -1,8 +1,4 @@
-import type {
-  AcademyPeriodName,
-  MemberRoleName,
-  MemberStatusName,
-} from '@/utils/constants/hierarchy'
+import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import type { FormValues } from '@/types/forms'
 
 /**
@@ -12,7 +8,7 @@ import type { FormValues } from '@/types/forms'
  * @property {string} discordId - Identifier used to sign in
  * @property {MemberRoleName} role - Hierarchy level
  * @property {MemberStatusName} status - Membership status
- * @property {AcademyPeriodName | null} academyPeriod - Academy progression
+ * @property {string | null} academyDispositif - Dispositif of the active FSI
  * @property {string | null} division - Division name
  * @property {string[]} youtubers - Assigned creators
  * @property {string | null} primaryFunction - Main function
@@ -26,7 +22,7 @@ export interface ProfileDetail {
   discordId: string
   role: MemberRoleName
   status: MemberStatusName
-  academyPeriod: AcademyPeriodName | null
+  academyDispositif: string | null
   division: string | null
   youtubers: string[]
   primaryFunction: string | null

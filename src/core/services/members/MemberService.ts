@@ -5,11 +5,7 @@ import { conflict, immutable, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
-import {
-  ACADEMY_PERIOD_REGISTRY,
-  MEMBER_STATUS_REGISTRY,
-  ROLE_REGISTRY,
-} from '@/declarations/access/roles'
+import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/roles'
 import { isRootIdentity } from '@/declarations/access/identity'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
@@ -17,12 +13,8 @@ import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence, MemberDetail, MemberSummary, MemberTraining } from '@/types/members'
-import { MemberStatuses } from '@/utils/constants/hierarchy'
-import type {
-  AcademyPeriodName,
-  MemberRoleName,
-  MemberStatusName,
-} from '@/utils/constants/hierarchy'
+import { AcademyJuniorStatuses, MemberStatuses } from '@/utils/constants/hierarchy'
+import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
@@ -32,6 +24,12 @@ const SUMMARY_INCLUDE = {
   youtubers: true,
   primaryFunction: true,
   secondaryFunction: true,
+  academyJuniors: {
+    where: { status: AcademyJuniorStatuses.Active },
+    orderBy: { startedAt: 'desc' },
+    take: 1,
+    include: { dispositif: true },
+  },
 } satisfies Prisma.AccountInclude
 
 type SummaryRow = Prisma.AccountGetPayload<{ include: typeof SUMMARY_INCLUDE }>
@@ -62,7 +60,13 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
   avatarUrl: row.avatarUrl,
   role: row.role,
   status: row.status,
-  academyPeriod: row.academyPeriod,
+  academyDispositif: row.academyJuniors[0]
+    ? {
+        id: row.academyJuniors[0].dispositif.id,
+        label: row.academyJuniors[0].dispositif.name,
+        accent: row.academyJuniors[0].dispositif.accent,
+      }
+    : null,
   division: row.division
     ? {
         id: row.division.id,
@@ -166,16 +170,6 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
       required: true,
       options: toOptions(MEMBER_STATUS_REGISTRY),
       mark: 'dot',
-      span: 'half',
-      group: FORM_GROUPS.assignment,
-    },
-    {
-      name: 'academyPeriod',
-      kind: 'select',
-      label: MEMBER_FIELD_COPY.academyPeriod,
-      options: toOptions(ACADEMY_PERIOD_REGISTRY),
-      mark: 'dot',
-      visibleWhen: { field: 'status', equals: MemberStatuses.Academy },
       span: 'half',
       group: FORM_GROUPS.assignment,
     },
@@ -291,7 +285,6 @@ const toAccountData = (values: FormValues) => ({
   discordId: (readText(values, 'discordId') ?? '').replace(/\D/g, ''),
   role: (readText(values, 'role') ?? 'MODERATEUR') as MemberRoleName,
   status: (readText(values, 'status') ?? MemberStatuses.Academy) as MemberStatusName,
-  academyPeriod: (readText(values, 'academyPeriod') ?? null) as AcademyPeriodName | null,
   divisionId: readText(values, 'divisionId'),
   primaryFunctionId: readText(values, 'primaryFunctionId'),
   secondaryFunctionId: readText(values, 'secondaryFunctionId'),
@@ -465,7 +458,6 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
       discordId: row.discordId,
       role: row.role,
       status: row.status,
-      academyPeriod: row.academyPeriod,
       divisionId: row.divisionId,
       youtuberIds: row.youtubers.map((youtuber) => youtuber.id),
       primaryFunctionId: row.primaryFunctionId,
