@@ -48,6 +48,8 @@ export interface MemberDivision {
  * @property {MemberRoleName} role - Hierarchy level
  * @property {MemberStatusName} status - Membership status
  * @property {MemberTag | null} academyDispositif - Dispositif of the active FSI
+ * @property {string | null} academyJuniorId - Junior identifier of the active FSI
+ * @property {string | null} academySessionId - Session identifier of the active FSI
  * @property {MemberDivision | null} division - Division
  * @property {MemberTag[]} youtubers - Assigned YouTubers
  * @property {MemberTag | null} primaryFunction - Main function
@@ -66,6 +68,8 @@ export interface MemberSummary {
   role: MemberRoleName
   status: MemberStatusName
   academyDispositif: MemberTag | null
+  academyJuniorId: string | null
+  academySessionId: string | null
   division: MemberDivision | null
   youtubers: MemberTag[]
   primaryFunction: MemberTag | null

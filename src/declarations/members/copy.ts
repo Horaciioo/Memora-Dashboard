@@ -49,6 +49,11 @@ export const MEMBER_COPY = {
   academyEmptyTitle: 'Aucune formation',
   academyEmptyDescription:
     'Déclare des formations dans la configuration pour suivre sa progression.',
+  academyFsiTitle: 'Fiche de suivi individuel',
+  academyFsiOpen: 'Ouvrir la FSI',
+  academyFsiNoneTitle: 'Aucune FSI associée',
+  academyFsiNoneDescription: 'Ce Modérateur n’a pas de FSI associée.',
+  academyPathTitle: 'Parcours',
   logsEmptyTitle: 'Aucun log',
   logsEmptyDescription: 'Ses actions apparaîtront ici au fil de l’eau.',
   accessTitle: 'Permissions',

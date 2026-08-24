@@ -15,9 +15,11 @@ import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
 import { FileTabs } from '@/components/structures/FileTabs'
+import { WipNotice } from '@/components/structures/WipNotice'
 import { useMemberFile } from '@/core/hooks/data/useMemberFile'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { ACADEMY_PERIOD_REGISTRY, MEMBER_STATUS_REGISTRY } from '@/declarations/access/roles'
+import { ROUTES } from '@/declarations/navigation'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
@@ -491,40 +493,67 @@ export const MemberFileTabs = ({
   )
 
   const academyTab = () => (
-    <Section title={MEMBER_COPY.tabAcademy} bare>
-      {detail.trainings.length === 0 ? (
-        <EmptyState
-          figure="academy"
-          title={MEMBER_COPY.academyEmptyTitle}
-          description={MEMBER_COPY.academyEmptyDescription}
-          action={<Badge label={MEMBER_COPY.academyEmptyTitle} tone="neutral" />}
-        />
-      ) : (
-        <div className={LIST_STYLES.stack}>
-          {detail.trainings.map((training) => (
-            <div key={training.id} className={LIST_STYLES.item}>
-              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="font-medium">{training.name}</span>
-                <span className="text-xs text-[var(--color-ink-subtle)]">
-                  {[
-                    training.period ? ACADEMY_PERIOD_REGISTRY.label(training.period) : null,
-                    training.validatorName,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
+    <div className="flex flex-col gap-8">
+      <Section title={MEMBER_COPY.academyFsiTitle} bare>
+        {summary.academyJuniorId && summary.academySessionId ? (
+          <Button
+            variant="primary"
+            icon="academy"
+            onClick={() =>
+              router.push(ROUTES.junior(summary.academySessionId!, summary.academyJuniorId!))
+            }
+          >
+            {MEMBER_COPY.academyFsiOpen}
+          </Button>
+        ) : (
+          <EmptyState
+            figure="academy"
+            title={MEMBER_COPY.academyFsiNoneTitle}
+            description={MEMBER_COPY.academyFsiNoneDescription}
+            action={<Badge label={MEMBER_COPY.academyFsiNoneTitle} tone="neutral" />}
+          />
+        )}
+      </Section>
+
+      <Section title={MEMBER_COPY.tabAcademy} bare>
+        {detail.trainings.length === 0 ? (
+          <EmptyState
+            figure="academy"
+            title={MEMBER_COPY.academyEmptyTitle}
+            description={MEMBER_COPY.academyEmptyDescription}
+            action={<Badge label={MEMBER_COPY.academyEmptyTitle} tone="neutral" />}
+          />
+        ) : (
+          <div className={LIST_STYLES.stack}>
+            {detail.trainings.map((training) => (
+              <div key={training.id} className={LIST_STYLES.item}>
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span className="font-medium">{training.name}</span>
+                  <span className="text-xs text-[var(--color-ink-subtle)]">
+                    {[
+                      training.period ? ACADEMY_PERIOD_REGISTRY.label(training.period) : null,
+                      training.validatorName,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </span>
                 </span>
-              </span>
-              {training.mandatory && <Badge label={MEMBER_COPY.tabAcademy} tone="brand" />}
-              <Badge
-                label={training.completedAt ? formatDay(training.completedAt) : ACTION_COPY.none}
-                tone={training.completedAt ? 'success' : 'neutral'}
-                icon={training.completedAt ? 'success' : 'clock'}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-    </Section>
+                {training.mandatory && <Badge label={MEMBER_COPY.tabAcademy} tone="brand" />}
+                <Badge
+                  label={training.completedAt ? formatDay(training.completedAt) : ACTION_COPY.none}
+                  tone={training.completedAt ? 'success' : 'neutral'}
+                  icon={training.completedAt ? 'success' : 'clock'}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </Section>
+
+      <Section title={MEMBER_COPY.academyPathTitle} bare>
+        <WipNotice figure="academy" />
+      </Section>
+    </div>
   )
 
   const logsTab = () => (
