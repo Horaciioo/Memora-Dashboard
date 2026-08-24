@@ -52,18 +52,6 @@ export const AcademyPrograms = {
 export type AcademyProgramName = (typeof AcademyPrograms)[keyof typeof AcademyPrograms]
 
 /**
- * Entry level of a junior
- * @type {Record<string, string>}
- */
-
-export const AcademyTracks = {
-  Entry: 'ENTREE',
-  Adaptation: 'ADAPTATION',
-} as const
-
-export type AcademyTrackName = (typeof AcademyTracks)[keyof typeof AcademyTracks]
-
-/**
  * Lifecycle of a session
  * @type {Record<string, string>}
  */
@@ -105,3 +93,45 @@ export const AcademyStepKinds = {
 } as const
 
 export type AcademyStepKindName = (typeof AcademyStepKinds)[keyof typeof AcademyStepKinds]
+
+/**
+ * Broad phase of a junior's PIM
+ * @type {Record<string, string>}
+ */
+
+export const AcademyStages = {
+  Preparation: 'PREPARATION',
+  Discovery: 'DISCOVERY',
+  ReviewOne: 'REVIEW_ONE',
+  Practice: 'PRACTICE',
+  ReviewFinal: 'REVIEW_FINAL',
+  Bonus: 'BONUS',
+} as const
+
+export type AcademyStageName = (typeof AcademyStages)[keyof typeof AcademyStages]
+
+/**
+ * How a timeline step's due date is computed
+ * @type {Record<string, string>}
+ */
+
+export const StepAnchors = {
+  Day: 'DAY',
+  Live: 'LIVE',
+} as const
+
+export type StepAnchorName = (typeof StepAnchors)[keyof typeof StepAnchors]
+
+/**
+ * Who is responsible for carrying out a timeline step
+ * @type {Record<string, string>}
+ */
+
+export const StepOwners = {
+  Responsable: 'RESPONSABLE',
+  Formateurs: 'FORMATEURS',
+  Both: 'BOTH',
+  Junior: 'JUNIOR',
+} as const
+
+export type StepOwnerName = (typeof StepOwners)[keyof typeof StepOwners]
