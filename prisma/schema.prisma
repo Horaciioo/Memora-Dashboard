@@ -21,25 +21,19 @@ enum MemberStatus {
   LEFT
 }
 
-// Academy progression, null once graduated
+// Academy period a training belongs to
 enum AcademyPeriod {
   DISCOVERY
   PRACTICE
 }
 
-// Training programme a session runs
-enum AcademyProgram {
-  PIMT
-  PIMY
-  PIMD
-  PIMP
-}
-
 // Lifecycle of a session
 enum AcademySessionStatus {
-  PLANNED
+  DRAFT
+  OPEN
   RUNNING
   CLOSED
+  ARCHIVED
 }
 
 // Outcome of a junior inside a session
@@ -139,7 +133,6 @@ model Account {
   avatarUrl           String?
   role                MemberRole    @default(MODERATEUR)
   status              MemberStatus  @default(ACADEMY)
-  academyPeriod       AcademyPeriod?
   divisionId          String?
   primaryFunctionId   String?
   secondaryFunctionId String?
@@ -301,6 +294,7 @@ model JobFunction {
   trainings        Training[]
   skills           Skill[]
   pimStepTemplates PimStepTemplate[]
+  academySessions  AcademySession[]
 
   @@index([kind])
   @@map("job_functions")
@@ -602,9 +596,10 @@ model Dispositif {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  skills  Skill[]
-  steps   PimStepTemplate[]
-  juniors AcademyJunior[]
+  skills    Skill[]
+  steps     PimStepTemplate[]
+  juniors   AcademyJunior[]
+  trainings Training[]
 
   @@map("dispositifs")
 }
@@ -670,22 +665,23 @@ model PimStepTemplate {
 
 // Course a junior must clear during the academy
 model Training {
-  id          String          @id @default(cuid())
-  name        String          @unique
-  summary     String?
-  period      AcademyPeriod?
-  program     AcademyProgram?
-  mandatory   Boolean         @default(false)
-  functionId  String?
-  position    Int            @default(0)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id           String          @id @default(cuid())
+  name         String          @unique
+  summary      String?
+  period       AcademyPeriod?
+  mandatory    Boolean         @default(false)
+  functionId   String?
+  dispositifId String?
+  position     Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
   jobFunction JobFunction? @relation(fields: [functionId], references: [id], onDelete: SetNull)
+  dispositif  Dispositif?  @relation(fields: [dispositifId], references: [id], onDelete: SetNull)
   records     TrainingRecord[]
 
   @@index([period])
-  @@index([program])
+  @@index([functionId, dispositifId])
   @@map("trainings")
 }
 
@@ -710,21 +706,23 @@ model TrainingRecord {
 
 // Dated run of one training programme
 model AcademySession {
-  id        String               @id @default(cuid())
-  program   AcademyProgram
-  startsAt  DateTime
-  endsAt    DateTime?
-  status    AcademySessionStatus @default(PLANNED)
-  summary   String?
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
+  id         String               @id @default(cuid())
+  functionId String
+  startsAt   DateTime
+  endsAt     DateTime?
+  status     AcademySessionStatus @default(DRAFT)
+  summary    String?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+
+  jobFunction JobFunction @relation(fields: [functionId], references: [id], onDelete: Restrict)
 
   trainers AcademySessionTrainer[]
   juniors  AcademyJunior[]
   steps    AcademyStep[]
   calendarEvents CalendarEvent[]
 
-  @@index([program, startsAt])
+  @@index([functionId, startsAt])
   @@index([status])
   @@map("academy_sessions")
 }
