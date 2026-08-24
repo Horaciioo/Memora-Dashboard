@@ -205,13 +205,20 @@ const weeksMax = readInteger(academy.weeksMax, {
   min: 1,
 })
 
+const stepOffsetMax = readInteger(academy.stepOffsetMax, {
+  path: 'system/academy.stepOffsetMax',
+  fallback: 60,
+  min: 1,
+})
+
 /**
  * Academy bounds
- * @type {{ maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number }}
+ * @type {{ maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number }}
  */
 
 export const ACADEMY_SETTINGS = {
   weeksMax,
+  stepOffsetMax,
   maxLives: readInteger(academy.maxLives, {
     path: 'system/academy.maxLives',
     fallback: 13,
@@ -227,6 +234,11 @@ export const ACADEMY_SETTINGS = {
     fallback: 4,
     min: 1,
     max: weeksMax,
+  }),
+  stepOffsetMin: readInteger(academy.stepOffsetMin, {
+    path: 'system/academy.stepOffsetMin',
+    fallback: -30,
+    max: stepOffsetMax,
   }),
 }
 
