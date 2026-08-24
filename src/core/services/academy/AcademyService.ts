@@ -6,6 +6,7 @@ import { prisma } from '@/core/lib/db'
 import { conflict, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
+import { resolveStepState } from '@/core/services/academy/timeline'
 import { memberOptions, toPerson } from '@/core/services/work/shared'
 import { ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
 import {
@@ -39,6 +40,7 @@ import {
   ObjectiveStatuses,
   ReviewAdvices,
   ReviewStatuses,
+  StepAnchors,
 } from '@/utils/constants/hierarchy'
 import type {
   AcademyStageName,
@@ -49,6 +51,8 @@ import type {
   ObjectiveStatusName,
   ReviewAdviceName,
   ReviewStatusName,
+  StepAnchorName,
+  StepOwnerName,
 } from '@/utils/constants/hierarchy'
 import type { Prisma } from '@prisma/client'
 
@@ -512,12 +516,14 @@ const sessionInScope = async (id: string, scope: Prisma.AcademySessionWhereInput
  */
 
 export const createSession = async (values: FormValues): Promise<SessionSummary[]> => {
-  await prisma.academySession.create({
+  const row = await prisma.academySession.create({
     data: {
       ...toSessionData(values),
       trainers: { create: readList(values, 'trainerIds').map((accountId) => ({ accountId })) },
     },
   })
+
+  await instantiateSessionSteps(row.id, row.functionId, row.startsAt)
 
   return listSessions({})
 }
@@ -702,60 +708,195 @@ export const listJuniors = async (sessionId: string, functionId: string): Promis
 }
 
 /**
- * Shape one thread moment
+ * Shape one free thread moment or timeline step
  * @param {object} row - Step row
  * @return {AcademyStepView} - Step view
  */
 
 const toStep = (row: {
   id: string
-  kind: AcademyStepKindName
+  kind: AcademyStepKindName | null
   title: string
-  scheduledAt: Date
+  scheduledAt: Date | null
   doneAt: Date | null
   notes: string | null
   juniorId: string | null
-  junior: { account: { displayName: string } } | null
+  templateId: string | null
+  stage: AcademyStageName | null
+  anchor: StepAnchorName | null
+  offset: number | null
+  owner: StepOwnerName | null
+  required: boolean
+  validatedAt: Date | null
+  junior: { accountId: string; liveCount: number; account: { displayName: string } } | null
   author: { displayName: string } | null
+  validator: { displayName: string } | null
 }): AcademyStepView => ({
   id: row.id,
   kind: row.kind,
   title: row.title,
-  scheduledAt: row.scheduledAt.toISOString(),
+  scheduledAt: row.scheduledAt?.toISOString() ?? null,
   doneAt: row.doneAt?.toISOString() ?? null,
   notes: row.notes,
   juniorId: row.juniorId,
+  accountId: row.junior?.accountId ?? null,
   juniorName: row.junior?.account.displayName ?? null,
   authorName: row.author?.displayName ?? null,
+  templateId: row.templateId,
+  stage: row.stage,
+  anchor: row.anchor,
+  offset: row.offset,
+  owner: row.owner,
+  required: row.required,
+  validatedAt: row.validatedAt?.toISOString() ?? null,
+  validatedByName: row.validator?.displayName ?? null,
+  state:
+    row.stage === null
+      ? null
+      : resolveStepState(
+          {
+            anchor: row.anchor,
+            scheduledAt: row.scheduledAt,
+            offset: row.offset,
+            validatedAt: row.validatedAt,
+          },
+          { liveCount: row.junior?.liveCount ?? 0 }
+        ),
   values: {
     kind: row.kind,
     title: row.title,
-    scheduledAt: row.scheduledAt.toISOString().slice(0, 16),
+    scheduledAt: row.scheduledAt ? row.scheduledAt.toISOString().slice(0, 16) : null,
     juniorId: row.juniorId,
     notes: row.notes,
   },
 })
 
-// Everything an event row needs to become a view
+// Everything a step row needs to become a view
 const EVENT_SHAPE = {
   junior: { include: { account: true } },
   author: true,
+  validator: true,
 } as const
 
 /**
- * Read the thread of a session
+ * Read the thread and the timeline of a session
  * @param {string} sessionId - Session identifier
- * @return {Promise<AcademyStepView[]>} - Moments, newest first
+ * @return {Promise<AcademyStepView[]>} - Steps, newest planned first
  */
 
 export const listSteps = async (sessionId: string): Promise<AcademyStepView[]> => {
   const rows = await prisma.academyStep.findMany({
     where: { sessionId },
     include: EVENT_SHAPE,
-    orderBy: { scheduledAt: 'desc' },
+    orderBy: [{ scheduledAt: { sort: 'desc', nulls: 'first' } }, { createdAt: 'desc' }],
   })
 
   return rows.map(toStep)
+}
+
+/**
+ * Compute the day a DAY-anchored template step falls on
+ * @param {Date} startsAt - Session start date
+ * @param {number} offsetDays - Signed day offset
+ * @return {Date} - Resolved day
+ */
+
+const dayOffset = (startsAt: Date, offsetDays: number): Date =>
+  moment(startsAt).add(offsetDays, 'days').toDate()
+
+/**
+ * Copy a batch of PIMT templates onto the timeline as steps
+ * @param {object[]} templates - Templates matched for this instantiation
+ * @param {Date} startsAt - Session start date
+ * @param {string} sessionId - Session identifier
+ * @param {string} [juniorId] - Junior identifier, omitted for session-wide steps
+ * @return {Promise<void>} - Instantiated
+ */
+
+const instantiateSteps = async (
+  templates: {
+    id: string
+    title: string
+    description: string | null
+    stage: AcademyStageName
+    anchor: StepAnchorName
+    offset: number
+    owner: StepOwnerName
+    required: boolean
+  }[],
+  startsAt: Date,
+  sessionId: string,
+  juniorId?: string
+): Promise<void> => {
+  if (templates.length === 0) return
+
+  await prisma.academyStep.createMany({
+    data: templates.map((template) => ({
+      sessionId,
+      juniorId,
+      templateId: template.id,
+      title: template.title,
+      notes: template.description,
+      stage: template.stage,
+      anchor: template.anchor,
+      offset: template.offset,
+      owner: template.owner,
+      required: template.required,
+      scheduledAt: template.anchor === StepAnchors.Day ? dayOffset(startsAt, template.offset) : null,
+    })),
+  })
+}
+
+/**
+ * Instantiate the session-wide preparation steps of a PIMT trame, ahead of any junior
+ * @param {string} sessionId - Session identifier
+ * @param {string} functionId - Function the session is scoped to
+ * @param {Date} startsAt - Session start date
+ * @return {Promise<void>} - Instantiated
+ */
+
+const instantiateSessionSteps = async (
+  sessionId: string,
+  functionId: string,
+  startsAt: Date
+): Promise<void> => {
+  const templates = await prisma.pimStepTemplate.findMany({
+    where: {
+      OR: [{ functionId: null }, { functionId }],
+      dispositifId: null,
+      stage: AcademyStages.Preparation,
+    },
+  })
+
+  await instantiateSteps(templates, startsAt, sessionId)
+}
+
+/**
+ * Instantiate the individual steps of a PIMT trame onto a junior's own timeline
+ * @param {string} juniorId - Junior identifier
+ * @param {string} sessionId - Session identifier
+ * @param {string} functionId - Function the session is scoped to
+ * @param {string} dispositifId - Junior's own dispositif
+ * @param {Date} startsAt - Session start date
+ * @return {Promise<void>} - Instantiated
+ */
+
+const instantiateJuniorSteps = async (
+  juniorId: string,
+  sessionId: string,
+  functionId: string,
+  dispositifId: string,
+  startsAt: Date
+): Promise<void> => {
+  const templates = await prisma.pimStepTemplate.findMany({
+    where: {
+      OR: [{ functionId: null }, { functionId }],
+      AND: [{ OR: [{ dispositifId: null }, { dispositifId }] }],
+      stage: { not: AcademyStages.Preparation },
+    },
+  })
+
+  await instantiateSteps(templates, startsAt, sessionId, juniorId)
 }
 
 /**
@@ -817,13 +958,21 @@ export const createJunior = async (
 ): Promise<JuniorView[]> => {
   const session = await sessionInScope(sessionId, scope)
 
-  await prisma.academyJunior.create({
+  const junior = await prisma.academyJunior.create({
     data: {
       sessionId,
       accountId: readText(values, 'accountId') ?? '',
       ...toJuniorData(values),
     },
   })
+
+  await instantiateJuniorSteps(
+    junior.id,
+    sessionId,
+    session.functionId,
+    junior.dispositifId,
+    session.startsAt
+  )
 
   return listJuniors(sessionId, session.functionId)
 }
@@ -1044,6 +1193,64 @@ export const setStepDone = async (
 }
 
 /**
+ * Clear or reopen a timeline step, refusing to skip an earlier late one
+ * @param {string} id - Step identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {boolean} validated - Wanted state
+ * @param {string} validatedById - Who clears it
+ * @return {Promise<AcademyStepView[]>} - Steps
+ */
+
+export const setStepValidated = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput,
+  validated: boolean,
+  validatedById: string
+): Promise<AcademyStepView[]> => {
+  const step = await prisma.academyStep.findFirst({
+    where: { id, session: scope },
+    include: { junior: true, template: true },
+  })
+  if (!step || step.juniorId === null || step.stage === null) throw notFound()
+
+  if (validated) {
+    const earlier = await prisma.academyStep.findMany({
+      where: {
+        juniorId: step.juniorId,
+        stage: step.stage,
+        id: { not: id },
+        template: { position: { lt: step.template?.position ?? 0 } },
+      },
+    })
+
+    const isBlocked = earlier.some(
+      (sibling) =>
+        resolveStepState(
+          {
+            anchor: sibling.anchor,
+            scheduledAt: sibling.scheduledAt,
+            offset: sibling.offset,
+            validatedAt: sibling.validatedAt,
+          },
+          { liveCount: step.junior?.liveCount ?? 0 }
+        ) === 'late'
+    )
+
+    if (isBlocked) throw conflict()
+  }
+
+  const row = await prisma.academyStep.update({
+    where: { id },
+    data: {
+      validatedAt: validated ? new Date() : null,
+      validatedById: validated ? validatedById : null,
+    },
+  })
+
+  return listSteps(row.sessionId)
+}
+
+/**
  * Drop a moment
  * @param {string} id - Step identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
@@ -1241,6 +1448,47 @@ export const submitReview = async (
 }
 
 /**
+ * Refuse a decision while a required step of its stage is still open
+ * @param {string} juniorId - Junior identifier
+ * @param {AcademyStageName} stage - Stage being closed
+ * @return {Promise<void>} - Throws when a step is still pending
+ */
+
+const ensureStepsCleared = async (juniorId: string, stage: AcademyStageName): Promise<void> => {
+  const pending = await prisma.academyStep.count({
+    where: { juniorId, stage, required: true, validatedAt: null },
+  })
+
+  if (pending > 0) throw conflict()
+}
+
+/**
+ * Refuse a decision while a mandatory training is still open
+ * @param {{ session: { functionId: string }, dispositifId: string, accountId: string }} junior - Junior being closed
+ * @return {Promise<void>} - Throws when a training is still pending
+ */
+
+const ensureTrainingsCleared = async (junior: {
+  session: { functionId: string }
+  dispositifId: string
+  accountId: string
+}): Promise<void> => {
+  const [trainings, records] = await Promise.all([
+    sessionTrainings(junior.session.functionId, junior.dispositifId),
+    prisma.trainingRecord.findMany({ where: { accountId: junior.accountId } }),
+  ])
+
+  const completed = new Set(
+    records.filter((record) => record.completedAt !== null).map((record) => record.trainingId)
+  )
+  const mandatoryPending = trainings.some(
+    (training) => training.mandatory && !completed.has(training.id)
+  )
+
+  if (mandatoryPending) throw conflict()
+}
+
+/**
  * Refuse a decision when the FSI is not ready for it yet
  * @param {{ juniorId: string, stage: AcademyStageName }} review - Review being decided
  * @return {Promise<void>} - Throws when a guard fails
@@ -1250,6 +1498,16 @@ const ensureReadyForDecision = async (review: {
   juniorId: string
   stage: AcademyStageName
 }): Promise<void> => {
+  const junior = await prisma.academyJunior.findUniqueOrThrow({
+    where: { id: review.juniorId },
+    include: { session: true },
+  })
+
+  await Promise.all([
+    ensureStepsCleared(review.juniorId, review.stage),
+    ensureTrainingsCleared(junior),
+  ])
+
   // Only the closing check-ins gate on the objectives written during practice
   if (review.stage !== AcademyStages.ReviewFinal && review.stage !== AcademyStages.Bonus) return
 

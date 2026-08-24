@@ -1,3 +1,4 @@
+import type { TimelineStepState } from '@/core/services/academy/timeline'
 import type { FormValues } from '@/types/forms'
 import type { WorkPerson } from '@/types/work'
 import type {
@@ -10,6 +11,8 @@ import type {
   ObjectiveStatusName,
   ReviewAdviceName,
   ReviewStatusName,
+  StepAnchorName,
+  StepOwnerName,
 } from '@/utils/constants/hierarchy'
 
 /**
@@ -207,30 +210,50 @@ export interface JuniorObjectiveView {
 }
 
 /**
- * Moment recorded on the session thread
+ * Free moment on the session thread, or a PIMT step instantiated onto a timeline
  * @typedef {Object} AcademyStepView
  * @property {string} id - Step identifier
- * @property {AcademyStepKindName} kind - Kind of moment
+ * @property {AcademyStepKindName | null} kind - Kind of moment, thread steps only
  * @property {string} title - Intitulé
- * @property {string} scheduledAt - ISO planned date
- * @property {string | null} doneAt - ISO date it was actually held
+ * @property {string | null} scheduledAt - ISO planned date, live-anchored steps have none yet
+ * @property {string | null} doneAt - ISO date it was actually held, thread steps only
  * @property {string | null} notes - Written trace
  * @property {string | null} juniorId - Junior it concerns
+ * @property {string | null} accountId - Account of the junior it concerns
  * @property {string | null} juniorName - Junior display name
  * @property {string | null} authorName - Who recorded it
+ * @property {string | null} templateId - PIMT template it was instantiated from
+ * @property {AcademyStageName | null} stage - Phase this step belongs to, timeline steps only
+ * @property {StepAnchorName | null} anchor - Day or live threshold, timeline steps only
+ * @property {number | null} offset - Day offset or live threshold, timeline steps only
+ * @property {StepOwnerName | null} owner - Who carries it, timeline steps only
+ * @property {boolean} required - Blocks the following steps of its stage while late
+ * @property {string | null} validatedAt - ISO date it was cleared, timeline steps only
+ * @property {string | null} validatedByName - Who cleared it
+ * @property {TimelineStepState | null} state - Resolved position, timeline steps only
  * @property {FormValues} values - Values feeding the edit form
  */
 
 export interface AcademyStepView {
   id: string
-  kind: AcademyStepKindName
+  kind: AcademyStepKindName | null
   title: string
-  scheduledAt: string
+  scheduledAt: string | null
   doneAt: string | null
   notes: string | null
   juniorId: string | null
+  accountId: string | null
   juniorName: string | null
   authorName: string | null
+  templateId: string | null
+  stage: AcademyStageName | null
+  anchor: StepAnchorName | null
+  offset: number | null
+  owner: StepOwnerName | null
+  required: boolean
+  validatedAt: string | null
+  validatedByName: string | null
+  state: TimelineStepState | null
   values: FormValues
 }
 
