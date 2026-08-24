@@ -1,5 +1,7 @@
 import { ROLE_PRESETS } from '@/declarations/access/roles'
+import { MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
+import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 
 /**
@@ -22,4 +24,17 @@ export interface GrantAddition {
 
 export const GRANT_ADDITIONS: readonly GrantAddition[] = [
   { key: 'initial-role-presets', grants: ROLE_PRESETS },
+  {
+    key: 'academy-fsi',
+    grants: {
+      [MemberRoles.Responsable]: [
+        Permissions.AcademySkillWrite,
+        Permissions.AcademyNoteRead,
+        Permissions.AcademyNoteWrite,
+        Permissions.AcademyObjectiveWrite,
+        Permissions.AcademyReviewValidate,
+      ],
+      [MemberRoles.Moderateur]: [Permissions.AcademySelfRead, Permissions.AcademyTrainingComplete],
+    },
+  },
 ]
