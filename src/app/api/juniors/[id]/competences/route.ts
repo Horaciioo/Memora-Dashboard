@@ -1,3 +1,4 @@
+import { prisma } from '@/core/lib/db'
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope, assertJuniorViewer } from '@/core/services/academy/AcademyScope'
@@ -6,6 +7,7 @@ import {
   listJuniorSkills,
   setJuniorSkill,
 } from '@/core/services/academy/AcademyService'
+import { recordEvent } from '@/core/services/system/ActivityService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -23,16 +25,26 @@ export const GET = createProtectedRoute({
 export const PATCH = createProtectedRoute({
   permission: Permissions.AcademySkillWrite,
   descriptor: { summary: 'Move the mastery of one competency', tags: ['academy'] },
-  handler: ({ params, raw, session, access }) => {
+  handler: async ({ params, raw, session, access }) => {
     const skillId = String(raw.skillId ?? '')
     if (!skillId) throw invalidInput([{ field: 'skillId', message: FORM_COPY.required }])
 
-    return setJuniorSkill(
-      params.id,
-      academyScope(session, access),
-      skillId,
-      Number(raw.percent ?? 0),
-      session.id
-    )
+    const scope = academyScope(session, access)
+    const [skill, account, skills] = await Promise.all([
+      prisma.skill.findUnique({ where: { id: skillId } }),
+      juniorAccount(params.id, scope),
+      setJuniorSkill(params.id, scope, skillId, Number(raw.percent ?? 0), session.id),
+    ])
+
+    await recordEvent({
+      eventType: 'SkillUpdated',
+      actorId: session.id,
+      subjectId: account.accountId,
+      targetType: 'skill',
+      targetId: skillId,
+      summary: skill?.name ?? skillId,
+    })
+
+    return skills
   },
 })

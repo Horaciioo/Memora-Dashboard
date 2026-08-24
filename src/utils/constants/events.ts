@@ -32,6 +32,10 @@ export const EVENT_TYPES = createEnumeration({
   AcademyAdvanced: { id: 23, label: 'Période franchie' },
   ReferenceChanged: { id: 24, label: 'Configuration modifiée' },
   PermissionChanged: { id: 25, label: 'Permission modifiée' },
+  SkillUpdated: { id: 26, label: 'Compétence évaluée' },
+  ReviewValidated: { id: 27, label: 'Bilan validé' },
+  StepValidated: { id: 28, label: 'Étape de PIM franchie' },
+  JuniorEnrolled: { id: 29, label: 'Junior admis' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids
