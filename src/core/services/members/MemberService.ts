@@ -67,6 +67,8 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
         accent: row.academyJuniors[0].dispositif.accent,
       }
     : null,
+  academyJuniorId: row.academyJuniors[0]?.id ?? null,
+  academySessionId: row.academyJuniors[0]?.sessionId ?? null,
   division: row.division
     ? {
         id: row.division.id,
