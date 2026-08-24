@@ -2,7 +2,6 @@ import { createRegistry } from '@/core/lib/registry'
 import {
   AcademyStepKinds,
   AcademyJuniorStatuses,
-  AcademyPrograms,
   AcademySessionStatuses,
   AcademyStages,
   StepAnchors,
@@ -11,58 +10,12 @@ import {
 import type {
   AcademyStepKindName,
   AcademyJuniorStatusName,
-  AcademyProgramName,
   AcademySessionStatusName,
   AcademyStageName,
   StepAnchorName,
   StepOwnerName,
 } from '@/utils/constants/hierarchy'
 import type { IconName } from '@/declarations/ui/icons'
-
-/**
- * Training programme metadata
- * @typedef {Object} ProgramOption
- * @property {string} label - Short code shown on a session
- * @property {string} summary - Surface the programme covers
- * @property {string} accent - Colour token
- * @property {IconName} icon - Glyph key
- */
-
-interface ProgramOption {
-  label: string
-  summary: string
-  accent: string
-  icon: IconName
-}
-
-const PROGRAM_MAP: Record<AcademyProgramName, ProgramOption> = {
-  [AcademyPrograms.Twitch]: {
-    label: 'PIMT',
-    summary: 'Parcours Twitch, jusqu’à 13 lives accompagnés.',
-    accent: 'brand',
-    icon: 'livecon',
-  },
-  [AcademyPrograms.Youtube]: {
-    label: 'PIMY',
-    summary: 'Parcours YouTube, jusqu’à 13 lives accompagnés.',
-    accent: 'danger',
-    icon: 'youtuber',
-  },
-  [AcademyPrograms.Discord]: {
-    label: 'PIMD',
-    summary: 'Parcours Discord, centré sur la modération écrite.',
-    accent: 'info',
-    icon: 'discord',
-  },
-  [AcademyPrograms.Polyvalent]: {
-    label: 'PIMP',
-    summary: 'Parcours polyvalent, toutes les surfaces à la fois.',
-    accent: 'success',
-    icon: 'spark',
-  },
-}
-
-export const ACADEMY_PROGRAM_REGISTRY = createRegistry(PROGRAM_MAP)
 
 /**
  * Labelled option carrying a colour token
@@ -79,9 +32,11 @@ interface AcademyOption {
 }
 
 const SESSION_STATUS_MAP: Record<AcademySessionStatusName, AcademyOption> = {
-  [AcademySessionStatuses.Planned]: { label: 'À venir', accent: 'neutral' },
+  [AcademySessionStatuses.Draft]: { label: 'Préparée', accent: 'neutral' },
+  [AcademySessionStatuses.Open]: { label: 'Admissions ouvertes', accent: 'warning' },
   [AcademySessionStatuses.Running]: { label: 'En cours', accent: 'success' },
   [AcademySessionStatuses.Closed]: { label: 'Clôturée', accent: 'info' },
+  [AcademySessionStatuses.Archived]: { label: 'Archivée', accent: 'neutral' },
 }
 
 export const ACADEMY_SESSION_STATUS_REGISTRY = createRegistry(SESSION_STATUS_MAP)

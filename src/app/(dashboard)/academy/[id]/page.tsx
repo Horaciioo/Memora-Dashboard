@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { SessionPanel } from '@/composites/academy/SessionPanel'
+import { academyScope } from '@/core/services/academy/AcademyScope'
 import {
   stepFields,
   juniorCandidates,
@@ -11,7 +12,6 @@ import {
 } from '@/core/services/academy/AcademyService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
-import { ACADEMY_PROGRAM_REGISTRY } from '@/declarations/academy/registries'
 import { toTone } from '@/declarations/ui/theme'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
@@ -30,13 +30,12 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
+  const { session, access } = await requirePermission(Permissions.AcademyRead)
 
   try {
-    const { summary } = await readSession(id)
+    const { summary } = await readSession(id, academyScope(session, access))
 
-    return {
-      title: `${ACADEMY_PROGRAM_REGISTRY.label(summary.program)} • ${formatDay(summary.startsAt)}`,
-    }
+    return { title: `${summary.function.name} • ${formatDay(summary.startsAt)}` }
   } catch {
     return { title: ACADEMY_COPY.title }
   }
@@ -51,9 +50,9 @@ export async function generateMetadata({
 
 export default async function SessionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { access } = await requirePermission(Permissions.AcademyRead)
+  const { session, access } = await requirePermission(Permissions.AcademyRead)
 
-  const detail = await readSession(id).catch(() => null)
+  const detail = await readSession(id, academyScope(session, access)).catch(() => null)
   if (!detail) notFound()
 
   const [juniors, steps, candidates] = await Promise.all([
@@ -62,17 +61,15 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
     juniorCandidates(id),
   ])
 
-  const program = ACADEMY_PROGRAM_REGISTRY.get(detail.summary.program)
+  const jobFunction = detail.summary.function
 
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader
         eyebrow={ACADEMY_COPY.confidential}
-        title={`${program.label} • ${formatDay(detail.summary.startsAt)}`}
-        lead={detail.summary.summary ?? program.summary}
-        actions={
-          <Badge label={program.label} tone={toTone(program.accent, 'brand')} icon={program.icon} />
-        }
+        title={`${jobFunction.name} • ${formatDay(detail.summary.startsAt)}`}
+        lead={detail.summary.summary ?? jobFunction.summary ?? undefined}
+        actions={<Badge label={jobFunction.name} tone={toTone(jobFunction.accent, 'brand')} dot />}
       />
       <SessionPanel
         detail={detail}

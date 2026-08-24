@@ -10,7 +10,6 @@ import {
   LIVECON_SETTINGS,
 } from '@/declarations/configurations/settings'
 import {
-  ACADEMY_PROGRAM_REGISTRY,
   ACADEMY_STAGE_REGISTRY,
   STEP_ANCHOR_REGISTRY,
   STEP_OWNER_REGISTRY,
@@ -29,7 +28,6 @@ import { AcademyStages, StepAnchors, StepOwners } from '@/utils/constants/hierar
 import { EventVisibilities, FunctionKinds, WorkflowScopes } from '@/utils/constants/workflow'
 import type {
   AcademyPeriodName,
-  AcademyProgramName,
   AcademyStageName,
   StepAnchorName,
   StepOwnerName,
@@ -718,21 +716,13 @@ const eventTypes: ReferenceResource = {
 
 const trainings: ReferenceResource = {
   fields: async () => {
-    const functions = await prisma.jobFunction.findMany({
-      where: { archived: false },
-      orderBy: { position: 'asc' },
-    })
+    const [functions, dispositifRows] = await Promise.all([
+      prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+      prisma.dispositif.findMany({ orderBy: { position: 'asc' } }),
+    ])
 
     return [
       nameField,
-      {
-        name: 'program',
-        kind: 'select',
-        label: REFERENCE_FIELD_COPY.program,
-        options: toOptions(ACADEMY_PROGRAM_REGISTRY),
-        mark: 'dot',
-        span: 'half',
-      },
       {
         name: 'period',
         kind: 'select',
@@ -749,6 +739,13 @@ const trainings: ReferenceResource = {
         span: 'half',
       },
       {
+        name: 'dispositifId',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.dispositif,
+        options: rowsToOptions(dispositifRows),
+        span: 'half',
+      },
+      {
         name: 'summary',
         kind: 'textarea',
         label: REFERENCE_FIELD_COPY.summary,
@@ -760,7 +757,7 @@ const trainings: ReferenceResource = {
   list: async () => {
     const rows = await prisma.training.findMany({
       orderBy: [{ period: 'asc' }, { position: 'asc' }],
-      include: { jobFunction: true, _count: { select: { records: true } } },
+      include: { jobFunction: true, dispositif: true, _count: { select: { records: true } } },
     })
 
     return rows.map((row) => ({
@@ -769,7 +766,7 @@ const trainings: ReferenceResource = {
       hint: row.jobFunction?.name ?? null,
       accent: row.mandatory ? 'brand' : null,
       badges: [
-        ...(row.program ? [ACADEMY_PROGRAM_REGISTRY.label(row.program)] : []),
+        ...(row.dispositif ? [row.dispositif.name] : []),
         ...(row.period ? [ACADEMY_PERIOD_REGISTRY.label(row.period)] : []),
         ...(row.mandatory ? [REFERENCE_FIELD_COPY.mandatoryBadge] : []),
       ],
@@ -777,9 +774,9 @@ const trainings: ReferenceResource = {
       usage: row._count.records,
       values: {
         name: row.name,
-        program: row.program,
         period: row.period,
         functionId: row.functionId,
+        dispositifId: row.dispositifId,
         summary: row.summary,
         mandatory: row.mandatory,
       },
@@ -790,9 +787,9 @@ const trainings: ReferenceResource = {
       .create({
         data: {
           name: readText(values, 'name') ?? '',
-          program: (readText(values, 'program') ?? null) as AcademyProgramName | null,
           period: (readText(values, 'period') ?? null) as AcademyPeriodName | null,
           functionId: readText(values, 'functionId'),
+          dispositifId: readText(values, 'dispositifId'),
           summary: readText(values, 'summary'),
           mandatory: readFlag(values, 'mandatory'),
           position: await nextPosition(prisma.training),
@@ -808,9 +805,9 @@ const trainings: ReferenceResource = {
         where: { id },
         data: {
           name: readText(values, 'name') ?? undefined,
-          program: (readText(values, 'program') ?? null) as AcademyProgramName | null,
           period: (readText(values, 'period') ?? null) as AcademyPeriodName | null,
           functionId: readText(values, 'functionId'),
+          dispositifId: readText(values, 'dispositifId'),
           summary: readText(values, 'summary'),
           mandatory: readFlag(values, 'mandatory'),
         },
