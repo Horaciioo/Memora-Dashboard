@@ -99,6 +99,7 @@ export const useSessions = (initialSessions: SessionSummary[]): SessionCollectio
  * @property {(id: string, values: FormValues) => Promise<boolean>} editStep - Edit a moment
  * @property {(id: string, done: boolean) => Promise<void>} setStepDone - Flip a moment
  * @property {(id: string) => Promise<void>} dropStep - Drop a moment
+ * @property {(id: string, validated: boolean) => Promise<void>} setStepValidated - Clear or reopen a timeline step
  */
 
 export interface SessionState {
@@ -114,6 +115,7 @@ export interface SessionState {
   editStep: (id: string, values: FormValues) => Promise<boolean>
   setStepDone: (id: string, done: boolean) => Promise<void>
   dropStep: (id: string) => Promise<void>
+  setStepValidated: (id: string, validated: boolean) => Promise<void>
 }
 
 /**
@@ -227,6 +229,15 @@ export const useSession = (
     [run, steps]
   )
 
+  const setStepValidated = useCallback(
+    async (id: string, validated: boolean) => {
+      const next = await run(() => apiPatch<AcademyStepView[]>(API_ROUTES.step(id), { validated }))
+
+      if (next) setSteps(next)
+    },
+    [run]
+  )
+
   return {
     juniors,
     steps,
@@ -240,5 +251,6 @@ export const useSession = (
     editStep,
     setStepDone,
     dropStep,
+    setStepValidated,
   }
 }

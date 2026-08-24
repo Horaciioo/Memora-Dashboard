@@ -842,7 +842,8 @@ const instantiateSteps = async (
       offset: template.offset,
       owner: template.owner,
       required: template.required,
-      scheduledAt: template.anchor === StepAnchors.Day ? dayOffset(startsAt, template.offset) : null,
+      scheduledAt:
+        template.anchor === StepAnchors.Day ? dayOffset(startsAt, template.offset) : null,
     })),
   })
 }
