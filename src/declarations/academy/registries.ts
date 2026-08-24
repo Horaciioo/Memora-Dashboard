@@ -4,14 +4,18 @@ import {
   AcademyJuniorStatuses,
   AcademyPrograms,
   AcademySessionStatuses,
-  AcademyTracks,
+  AcademyStages,
+  StepAnchors,
+  StepOwners,
 } from '@/utils/constants/hierarchy'
 import type {
   AcademyStepKindName,
   AcademyJuniorStatusName,
   AcademyProgramName,
   AcademySessionStatusName,
-  AcademyTrackName,
+  AcademyStageName,
+  StepAnchorName,
+  StepOwnerName,
 } from '@/utils/constants/hierarchy'
 import type { IconName } from '@/declarations/ui/icons'
 
@@ -74,21 +78,6 @@ interface AcademyOption {
   accent: string
 }
 
-const TRACK_MAP: Record<AcademyTrackName, AcademyOption> = {
-  [AcademyTracks.Entry]: {
-    label: 'Chemin d’entrée',
-    summary: 'Junior débutant, tout est à découvrir.',
-    accent: 'info',
-  },
-  [AcademyTracks.Adaptation]: {
-    label: 'Voie d’adaptation',
-    summary: 'Junior déjà à l’aise avec l’environnement.',
-    accent: 'success',
-  },
-}
-
-export const ACADEMY_TRACK_REGISTRY = createRegistry(TRACK_MAP)
-
 const SESSION_STATUS_MAP: Record<AcademySessionStatusName, AcademyOption> = {
   [AcademySessionStatuses.Planned]: { label: 'À venir', accent: 'neutral' },
   [AcademySessionStatuses.Running]: { label: 'En cours', accent: 'success' },
@@ -136,3 +125,30 @@ const STEP_KIND_MAP: Record<AcademyStepKindName, StepKindOption> = {
 }
 
 export const ACADEMY_STEP_KIND_REGISTRY = createRegistry(STEP_KIND_MAP)
+
+const STAGE_MAP: Record<AcademyStageName, AcademyOption> = {
+  [AcademyStages.Preparation]: { label: 'Préparation', accent: 'neutral' },
+  [AcademyStages.Discovery]: { label: 'Découverte', accent: 'info' },
+  [AcademyStages.ReviewOne]: { label: 'Bilan 1', accent: 'warning' },
+  [AcademyStages.Practice]: { label: 'Pratique', accent: 'brand' },
+  [AcademyStages.ReviewFinal]: { label: 'Bilan final', accent: 'warning' },
+  [AcademyStages.Bonus]: { label: 'Bonus', accent: 'success' },
+}
+
+export const ACADEMY_STAGE_REGISTRY = createRegistry(STAGE_MAP)
+
+const STEP_ANCHOR_MAP: Record<StepAnchorName, AcademyOption> = {
+  [StepAnchors.Day]: { label: 'Jour', accent: 'info' },
+  [StepAnchors.Live]: { label: 'Live', accent: 'brand' },
+}
+
+export const STEP_ANCHOR_REGISTRY = createRegistry(STEP_ANCHOR_MAP)
+
+const STEP_OWNER_MAP: Record<StepOwnerName, AcademyOption> = {
+  [StepOwners.Responsable]: { label: 'Responsable', accent: 'warning' },
+  [StepOwners.Formateurs]: { label: 'Formateurs', accent: 'brand' },
+  [StepOwners.Both]: { label: 'Responsable + Formateurs', accent: 'info' },
+  [StepOwners.Junior]: { label: 'Junior', accent: 'success' },
+}
+
+export const STEP_OWNER_REGISTRY = createRegistry(STEP_OWNER_MAP)
