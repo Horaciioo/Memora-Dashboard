@@ -4,5 +4,8 @@
   "weeksMin": 4,
   "weeksMax": 6,
   "stepOffsetMin": -30,
-  "stepOffsetMax": 60
+  "stepOffsetMax": 60,
+  "bonusMaxLives": 4,
+  "skillMaxPercent": 100,
+  "skillStep": 5
 }

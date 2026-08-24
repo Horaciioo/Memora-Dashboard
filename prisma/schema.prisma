@@ -76,6 +76,34 @@ enum StepOwner {
   JUNIOR
 }
 
+// Kind of trace kept on a junior's FSI
+enum NoteKind {
+  POSITIVE
+  NEGATIVE
+}
+
+// Outcome of a junior's personal objective
+enum ObjectiveStatus {
+  OPEN
+  REACHED
+  MISSED
+}
+
+// Outcome a Formateur proposes at the end of a voice check-in
+enum ReviewAdvice {
+  PASS
+  BONUS
+  STOP
+}
+
+// Lifecycle of a voice check-in
+enum ReviewStatus {
+  DRAFT
+  SUBMITTED
+  VALIDATED
+  REJECTED
+}
+
 // Surface a workflow state belongs to
 enum WorkflowScope {
   PROJECT
@@ -158,6 +186,10 @@ model Account {
   academySeats        AcademySessionTrainer[] @relation("AcademyTrainer")
   academySteps        AcademyStep[]      @relation("AcademyStepAuthor")
   academyReviews      AcademyReview[]     @relation("AcademyReviewAuthor")
+  academyReviewsDecided AcademyReview[]   @relation("AcademyReviewDecider")
+  juniorSkillsGraded  JuniorSkill[]       @relation("JuniorSkillValidator")
+  juniorNotesWritten  JuniorNote[]        @relation("JuniorNoteAuthor")
+  juniorObjectivesSet JuniorObjective[]   @relation("JuniorObjectiveAuthor")
   calendarEvents      CalendarEvent[]     @relation("CalendarOwner")
   ledTeams            Team[]              @relation("TeamLead")
   teamMemberships     TeamMember[]
@@ -634,6 +666,8 @@ model Skill {
   jobFunction JobFunction?  @relation(fields: [functionId], references: [id], onDelete: Cascade)
   dispositif  Dispositif?   @relation(fields: [dispositifId], references: [id], onDelete: Cascade)
 
+  juniorSkills JuniorSkill[]
+
   @@unique([name, functionId, dispositifId])
   @@index([functionId, dispositifId])
   @@map("skills")
@@ -749,9 +783,11 @@ model AcademyJunior {
   trainerId    String?
   dispositifId String
   status       AcademyJuniorStatus @default(ACTIVE)
+  stage        AcademyStage        @default(PREPARATION)
   startedAt    DateTime            @default(now())
   validatedAt  DateTime?
   liveCount    Int                 @default(0)
+  bonusLives   Int                 @default(0)
   summary      String?
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
@@ -761,12 +797,71 @@ model AcademyJunior {
   trainer    Account?       @relation("AcademyJuniorTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
   dispositif Dispositif     @relation(fields: [dispositifId], references: [id], onDelete: Restrict)
 
-  steps   AcademyStep[]
-  reviews AcademyReview[]
+  steps      AcademyStep[]
+  reviews    AcademyReview[]
+  skills     JuniorSkill[]
+  notes      JuniorNote[]
+  objectives JuniorObjective[]
 
   @@unique([sessionId, accountId])
   @@index([status])
   @@map("academy_juniors")
+}
+
+// Competency grade of one junior on one skill of their function/dispositif
+model JuniorSkill {
+  id          String   @id @default(cuid())
+  juniorId    String
+  skillId     String
+  percent     Int      @default(0)
+  validatorId String?
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  junior    AcademyJunior @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  skill     Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  validator Account?      @relation("JuniorSkillValidator", fields: [validatorId], references: [id], onDelete: SetNull)
+
+  @@unique([juniorId, skillId])
+  @@map("junior_skills")
+}
+
+// Positive or negative trace kept on a junior's FSI
+model JuniorNote {
+  id        String       @id @default(cuid())
+  juniorId  String
+  authorId  String?
+  stage     AcademyStage
+  kind      NoteKind
+  body      String
+  createdAt DateTime     @default(now())
+
+  junior AcademyJunior @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  author Account?      @relation("JuniorNoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([juniorId, createdAt])
+  @@map("junior_notes")
+}
+
+// Personal objective, unlocked once a junior reaches the practice stage
+model JuniorObjective {
+  id          String          @id @default(cuid())
+  juniorId    String
+  authorId    String?
+  title       String
+  description String?
+  dueAt       DateTime?
+  status      ObjectiveStatus @default(OPEN)
+  position    Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  junior AcademyJunior @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  author Account?      @relation("JuniorObjectiveAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([juniorId, position])
+  @@map("junior_objectives")
 }
 
 // Moment planned or held on the session thread
@@ -792,22 +887,28 @@ model AcademyStep {
   @@map("academy_steps")
 }
 
-// Written trace of one voice check-in held with a junior
+// Written trace of one voice check-in held with a junior, and the support of the decision
+// that authorises the following stage
 model AcademyReview {
-  id         String   @id @default(cuid())
-  juniorId   String
-  authorId   String?
-  heldAt     DateTime
-  feeling    String?
-  axes       Json?
-  objectives String   @default("")
-  strategies String?
-  summary    String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id              String       @id @default(cuid())
+  juniorId        String
+  authorId        String?
+  stage           AcademyStage
+  heldAt          DateTime
+  durationMinutes Int?
+  feeling         String?
+  summary         String       @default("")
+  advice          ReviewAdvice
+  status          ReviewStatus @default(DRAFT)
+  decidedById     String?
+  decidedAt       DateTime?
+  decisionNote    String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
-  junior AcademyJunior @relation(fields: [juniorId], references: [id], onDelete: Cascade)
-  author Account?      @relation("AcademyReviewAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  junior    AcademyJunior @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  author    Account?      @relation("AcademyReviewAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  decidedBy Account?      @relation("AcademyReviewDecider", fields: [decidedById], references: [id], onDelete: SetNull)
 
   @@index([juniorId, heldAt])
   @@map("academy_reviews")

@@ -123,3 +123,55 @@ export const StepOwners = {
 } as const
 
 export type StepOwnerName = (typeof StepOwners)[keyof typeof StepOwners]
+
+/**
+ * Kind of trace kept on a junior's FSI
+ * @type {Record<string, string>}
+ */
+
+export const NoteKinds = {
+  Positive: 'POSITIVE',
+  Negative: 'NEGATIVE',
+} as const
+
+export type NoteKindName = (typeof NoteKinds)[keyof typeof NoteKinds]
+
+/**
+ * Outcome of a junior's personal objective
+ * @type {Record<string, string>}
+ */
+
+export const ObjectiveStatuses = {
+  Open: 'OPEN',
+  Reached: 'REACHED',
+  Missed: 'MISSED',
+} as const
+
+export type ObjectiveStatusName = (typeof ObjectiveStatuses)[keyof typeof ObjectiveStatuses]
+
+/**
+ * Outcome proposed at the end of a voice check-in
+ * @type {Record<string, string>}
+ */
+
+export const ReviewAdvices = {
+  Pass: 'PASS',
+  Bonus: 'BONUS',
+  Stop: 'STOP',
+} as const
+
+export type ReviewAdviceName = (typeof ReviewAdvices)[keyof typeof ReviewAdvices]
+
+/**
+ * Lifecycle of a voice check-in
+ * @type {Record<string, string>}
+ */
+
+export const ReviewStatuses = {
+  Draft: 'DRAFT',
+  Submitted: 'SUBMITTED',
+  Validated: 'VALIDATED',
+  Rejected: 'REJECTED',
+} as const
+
+export type ReviewStatusName = (typeof ReviewStatuses)[keyof typeof ReviewStatuses]
