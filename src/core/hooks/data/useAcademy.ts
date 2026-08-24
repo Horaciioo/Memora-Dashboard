@@ -6,7 +6,13 @@ import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { feedbackTitle } from '@/declarations/ui/copy'
-import type { AcademyStepView, JuniorView, SessionSummary } from '@/types/academy'
+import type {
+  AcademyStepView,
+  JuniorView,
+  MyTrainingAction,
+  MyTrainingView,
+  SessionSummary,
+} from '@/types/academy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 
 /**
@@ -260,4 +266,44 @@ export const useSession = (
     dropStep,
     setStepValidated,
   }
+}
+
+/**
+ * Junior's own training progression state and mutations
+ * @typedef {Object} MyTrainingsState
+ * @property {MyTrainingView[]} trainings - Trainings open to the junior
+ * @property {boolean} isSaving - Mutation in flight
+ * @property {(id: string, action: MyTrainingAction) => Promise<void>} move - Apply a move
+ */
+
+export interface MyTrainingsState {
+  trainings: MyTrainingView[]
+  isSaving: boolean
+  move: (id: string, action: MyTrainingAction) => Promise<void>
+}
+
+/**
+ * Drive a junior's own training progression page
+ * @param {MyTrainingView[]} initialTrainings - Trainings resolved server-side
+ * @return {MyTrainingsState} - State and mutations
+ */
+
+export const useMyTrainings = (initialTrainings: MyTrainingView[]): MyTrainingsState => {
+  const [trainings, setTrainings] = useState(initialTrainings)
+  const { isSaving, run } = useMutation()
+
+  const move = useCallback(
+    async (id: string, action: MyTrainingAction) => {
+      const name = trainings.find((training) => training.id === id)?.name
+      const next = await run(
+        () => apiPatch<MyTrainingView[]>(API_ROUTES.myTrainingProgress(id), { action }),
+        action === 'complete' ? feedbackTitle('Formation', 'saved', 'feminine', name) : undefined
+      )
+
+      if (next) setTrainings(next)
+    },
+    [run, trainings]
+  )
+
+  return { trainings, isSaving, move }
 }

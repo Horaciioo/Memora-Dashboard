@@ -13,6 +13,7 @@ import type {
   ReviewStatusName,
   StepAnchorName,
   StepOwnerName,
+  TrainingStatusName,
 } from '@/utils/constants/hierarchy'
 
 /**
@@ -305,3 +306,38 @@ export interface SessionDetail {
   juniors: JuniorView[]
   steps: AcademyStepView[]
 }
+
+/**
+ * One training on a junior's own progression page
+ * @typedef {Object} MyTrainingView
+ * @property {string} id - Training identifier
+ * @property {string} name - Training name
+ * @property {string | null} summary - What the training covers
+ * @property {AcademyPeriodName | null} period - Academy period
+ * @property {boolean} mandatory - Required to progress
+ * @property {TrainingStatusName} status - Lifecycle state
+ * @property {number} attempts - Times restarted
+ * @property {string | null} startedAt - ISO date first started
+ * @property {string | null} completedAt - ISO date completed
+ * @property {string | null} abandonedAt - ISO date abandoned
+ */
+
+export interface MyTrainingView {
+  id: string
+  name: string
+  summary: string | null
+  period: AcademyPeriodName | null
+  mandatory: boolean
+  status: TrainingStatusName
+  attempts: number
+  startedAt: string | null
+  completedAt: string | null
+  abandonedAt: string | null
+}
+
+/**
+ * Move a junior may apply to their own progression on one training
+ * @typedef {'start' | 'resume' | 'restart' | 'abandon' | 'complete'} MyTrainingAction
+ */
+
+export type MyTrainingAction = 'start' | 'resume' | 'restart' | 'abandon' | 'complete'

@@ -53,6 +53,7 @@ export const API_ROUTES = {
   reviewDecision: (id: string) => `/api/bilans/${id}/decision`,
   juniorNote: (id: string) => `/api/notes-fsi/${id}`,
   objective: (id: string) => `/api/objectifs/${id}`,
+  myTrainingProgress: (id: string) => `/api/formations/${id}/progression`,
   teams: (youtuberId?: string) => withScope('/api/equipes', youtuberId),
   team: (id: string, youtuberId?: string) => withScope(`/api/equipes/${id}`, youtuberId),
   access: '/api/acces',

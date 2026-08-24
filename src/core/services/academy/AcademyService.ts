@@ -27,6 +27,8 @@ import type {
   JuniorSkillView,
   JuniorTraining,
   JuniorView,
+  MyTrainingAction,
+  MyTrainingView,
   SessionDetail,
   SessionSummary,
 } from '@/types/academy'
@@ -41,6 +43,8 @@ import {
   ReviewAdvices,
   ReviewStatuses,
   StepAnchors,
+  AcademyStepKinds,
+  TrainingStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
   AcademyStageName,
@@ -53,6 +57,7 @@ import type {
   ReviewStatusName,
   StepAnchorName,
   StepOwnerName,
+  TrainingStatusName,
 } from '@/utils/constants/hierarchy'
 import type { Prisma } from '@prisma/client'
 
@@ -1090,17 +1095,25 @@ export const setTrainingRecord = async (
 ): Promise<JuniorView[]> => {
   const junior = await juniorInScope(juniorId, scope)
 
+  // A clearance moves the record to done, a revoke is a correction back to in progress
+  const status = validated ? TrainingStatuses.Done : TrainingStatuses.InProgress
+
   await prisma.trainingRecord.upsert({
     where: { trainingId_accountId: { trainingId, accountId: junior.accountId } },
     update: {
+      status,
       completedAt: validated ? new Date() : null,
       validatorId: validated ? validatorId : null,
+      juniorId,
     },
     create: {
       trainingId,
       accountId: junior.accountId,
+      status,
+      startedAt: new Date(),
       completedAt: validated ? new Date() : null,
       validatorId: validated ? validatorId : null,
+      juniorId,
     },
   })
 
@@ -2028,4 +2041,171 @@ export const readJunior = async (
   const records = new Map(row.account.trainingRecords.map((record) => [record.trainingId, record]))
 
   return { junior: toJunior(row, trainings, records), session: toSummary(row.session) }
+}
+
+/**
+ * Resolve the FSI a signed-in junior acts on
+ * @param {string} accountId - Signed-in member identifier
+ * @return {Promise<{ id: string, sessionId: string, dispositifId: string, session: { functionId: string } } | null>} - Active FSI, or none
+ */
+
+export const resolveOwnJunior = async (
+  accountId: string
+): Promise<{
+  id: string
+  sessionId: string
+  dispositifId: string
+  session: { functionId: string }
+} | null> =>
+  prisma.academyJunior.findFirst({
+    where: { accountId, status: AcademyJuniorStatuses.Active },
+    include: { session: { select: { functionId: true } } },
+    orderBy: { startedAt: 'desc' },
+  })
+
+/**
+ * Shape one training on a junior's own progression page
+ * @param {object} training - Training row
+ * @param {object} [record] - Existing attendance, absent means never touched
+ * @return {MyTrainingView} - Training view
+ */
+
+const toMyTraining = (
+  training: {
+    id: string
+    name: string
+    summary: string | null
+    period: JuniorTraining['period']
+    mandatory: boolean
+  },
+  record?: {
+    status: TrainingStatusName
+    attempts: number
+    startedAt: Date | null
+    completedAt: Date | null
+    abandonedAt: Date | null
+  }
+): MyTrainingView => ({
+  id: training.id,
+  name: training.name,
+  summary: training.summary,
+  period: training.period,
+  mandatory: training.mandatory,
+  status: record?.status ?? TrainingStatuses.NotStarted,
+  attempts: record?.attempts ?? 0,
+  startedAt: record?.startedAt?.toISOString() ?? null,
+  completedAt: record?.completedAt?.toISOString() ?? null,
+  abandonedAt: record?.abandonedAt?.toISOString() ?? null,
+})
+
+/**
+ * Read the trainings open to a junior's own function and dispositif
+ * @param {string} accountId - Signed-in member identifier
+ * @param {string} functionId - Function identifier
+ * @param {string} dispositifId - Dispositif identifier
+ * @return {Promise<MyTrainingView[]>} - Trainings in display order
+ */
+
+export const myTrainings = async (
+  accountId: string,
+  functionId: string,
+  dispositifId: string
+): Promise<MyTrainingView[]> => {
+  const [trainings, records] = await Promise.all([
+    sessionTrainings(functionId, dispositifId),
+    prisma.trainingRecord.findMany({ where: { accountId } }),
+  ])
+
+  const recordByTraining = new Map(records.map((record) => [record.trainingId, record]))
+
+  return trainings.map((training) => toMyTraining(training, recordByTraining.get(training.id)))
+}
+
+/**
+ * Clear the nearest open training moment logged on a junior's thread
+ * @param {string} juniorId - Junior identifier
+ * @return {Promise<void>} - Applied, a no-op when nothing is open
+ */
+
+const clearOpenTrainingStep = async (juniorId: string): Promise<void> => {
+  const step = await prisma.academyStep.findFirst({
+    where: { juniorId, kind: AcademyStepKinds.Training, doneAt: null },
+    orderBy: { scheduledAt: 'asc' },
+  })
+  if (!step) return
+
+  await prisma.academyStep.update({ where: { id: step.id }, data: { doneAt: new Date() } })
+}
+
+/**
+ * Move a junior's own attendance on one training
+ * @param {string} trainingId - Training identifier
+ * @param {string} accountId - Signed-in member identifier
+ * @param {string} juniorId - FSI the move is stamped with
+ * @param {MyTrainingAction} action - Move applied
+ * @return {Promise<{ view: MyTrainingView, completed: boolean }>} - Updated training, and whether it just finished
+ */
+
+const applyMyTraining = async (
+  trainingId: string,
+  accountId: string,
+  juniorId: string,
+  action: MyTrainingAction
+): Promise<{ view: MyTrainingView; completed: boolean }> => {
+  const existing = await prisma.trainingRecord.findUnique({
+    where: { trainingId_accountId: { trainingId, accountId } },
+  })
+
+  const data =
+    action === 'start'
+      ? { status: TrainingStatuses.InProgress, startedAt: new Date(), juniorId }
+      : action === 'resume'
+        ? { status: TrainingStatuses.InProgress, abandonedAt: null, juniorId }
+        : action === 'restart'
+          ? {
+              status: TrainingStatuses.InProgress,
+              attempts: (existing?.attempts ?? 0) + 1,
+              startedAt: new Date(),
+              completedAt: null,
+              abandonedAt: null,
+              juniorId,
+            }
+          : action === 'abandon'
+            ? { status: TrainingStatuses.Abandoned, abandonedAt: new Date() }
+            : { status: TrainingStatuses.Done, completedAt: new Date() }
+
+  const row = await prisma.trainingRecord.upsert({
+    where: { trainingId_accountId: { trainingId, accountId } },
+    update: data,
+    create: { trainingId, accountId, startedAt: new Date(), ...data },
+  })
+
+  const training = await prisma.training.findUniqueOrThrow({ where: { id: trainingId } })
+
+  return { view: toMyTraining(training, row), completed: action === 'complete' }
+}
+
+/**
+ * Move a junior's own attendance on one training, refusing to touch anyone else's FSI
+ * @param {string} trainingId - Training identifier
+ * @param {string} accountId - Signed-in member identifier
+ * @param {MyTrainingAction} action - Move applied
+ * @return {Promise<MyTrainingView[]>} - Trainings open to the junior
+ */
+
+export const setMyTraining = async (
+  trainingId: string,
+  accountId: string,
+  action: MyTrainingAction
+): Promise<MyTrainingView[]> => {
+  const junior = await resolveOwnJunior(accountId)
+  if (!junior) throw notFound()
+
+  const open = await sessionTrainings(junior.session.functionId, junior.dispositifId)
+  if (!open.some((training) => training.id === trainingId)) throw notFound()
+
+  const { completed } = await applyMyTraining(trainingId, accountId, junior.id, action)
+  if (completed) await clearOpenTrainingStep(junior.id)
+
+  return myTrainings(accountId, junior.session.functionId, junior.dispositifId)
 }
