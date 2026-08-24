@@ -150,6 +150,20 @@ export const ObjectiveStatuses = {
 export type ObjectiveStatusName = (typeof ObjectiveStatuses)[keyof typeof ObjectiveStatuses]
 
 /**
+ * Lifecycle of a member's attendance on one training
+ * @type {Record<string, string>}
+ */
+
+export const TrainingStatuses = {
+  NotStarted: 'NOT_STARTED',
+  InProgress: 'IN_PROGRESS',
+  Done: 'DONE',
+  Abandoned: 'ABANDONED',
+} as const
+
+export type TrainingStatusName = (typeof TrainingStatuses)[keyof typeof TrainingStatuses]
+
+/**
  * Outcome proposed at the end of a voice check-in
  * @type {Record<string, string>}
  */

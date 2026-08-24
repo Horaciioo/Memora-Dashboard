@@ -89,6 +89,13 @@ enum ObjectiveStatus {
   MISSED
 }
 
+enum TrainingStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  DONE
+  ABANDONED
+}
+
 // Outcome a Formateur proposes at the end of a voice check-in
 enum ReviewAdvice {
   PASS
@@ -723,20 +730,27 @@ model Training {
 
 // Attendance of one member on one training
 model TrainingRecord {
-  id          String    @id @default(cuid())
+  id          String         @id @default(cuid())
   trainingId  String
   accountId   String
   validatorId String?
+  status      TrainingStatus @default(NOT_STARTED)
+  attempts    Int            @default(0)
+  startedAt   DateTime?
   completedAt DateTime?
+  abandonedAt DateTime?
+  juniorId    String?
   note        String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
-  training  Training @relation(fields: [trainingId], references: [id], onDelete: Cascade)
-  account   Account  @relation("TrainingLearner", fields: [accountId], references: [id], onDelete: Cascade)
-  validator Account? @relation("TrainingValidator", fields: [validatorId], references: [id], onDelete: SetNull)
+  training  Training       @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+  account   Account        @relation("TrainingLearner", fields: [accountId], references: [id], onDelete: Cascade)
+  validator Account?       @relation("TrainingValidator", fields: [validatorId], references: [id], onDelete: SetNull)
+  junior    AcademyJunior? @relation("TrainingJunior", fields: [juniorId], references: [id], onDelete: SetNull)
 
   @@unique([trainingId, accountId])
+  @@index([juniorId])
   @@map("training_records")
 }
 
@@ -799,11 +813,12 @@ model AcademyJunior {
   trainer    Account?       @relation("AcademyJuniorTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
   dispositif Dispositif     @relation(fields: [dispositifId], references: [id], onDelete: Restrict)
 
-  steps      AcademyStep[]
-  reviews    AcademyReview[]
-  skills     JuniorSkill[]
-  notes      JuniorNote[]
-  objectives JuniorObjective[]
+  steps           AcademyStep[]
+  reviews         AcademyReview[]
+  skills          JuniorSkill[]
+  notes           JuniorNote[]
+  objectives      JuniorObjective[]
+  trainingRecords TrainingRecord[] @relation("TrainingJunior")
 
   @@unique([sessionId, accountId])
   @@index([status])

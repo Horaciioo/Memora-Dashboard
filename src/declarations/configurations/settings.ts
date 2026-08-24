@@ -217,15 +217,28 @@ const skillMaxPercent = readInteger(academy.skillMaxPercent, {
   min: 1,
 })
 
+const trainingMaxMinutes = readInteger(academy.trainingMaxMinutes, {
+  path: 'system/academy.trainingMaxMinutes',
+  fallback: 50,
+  min: 1,
+})
+
 /**
  * Academy bounds
- * @type {{ maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number }}
+ * @type {{ maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number }}
  */
 
 export const ACADEMY_SETTINGS = {
   weeksMax,
   stepOffsetMax,
   skillMaxPercent,
+  trainingMaxMinutes,
+  trainingMinMinutes: readInteger(academy.trainingMinMinutes, {
+    path: 'system/academy.trainingMinMinutes',
+    fallback: 20,
+    min: 1,
+    max: trainingMaxMinutes,
+  }),
   maxLives: readInteger(academy.maxLives, {
     path: 'system/academy.maxLives',
     fallback: 13,
