@@ -35,12 +35,6 @@ enum AcademyProgram {
   PIMP
 }
 
-// Entry level of a junior, driving how fast the session moves
-enum AcademyTrack {
-  ENTREE
-  ADAPTATION
-}
-
 // Lifecycle of a session
 enum AcademySessionStatus {
   PLANNED
@@ -62,6 +56,30 @@ enum AcademyStepKind {
   ENTREVUE
   POINT_RESPONSABLE
   SESSION_TRAVAIL
+}
+
+// Broad phase of a junior's PIM, drives which timeline steps are open
+enum AcademyStage {
+  PREPARATION
+  DISCOVERY
+  REVIEW_ONE
+  PRACTICE
+  REVIEW_FINAL
+  BONUS
+}
+
+// How a timeline step's due date is computed
+enum StepAnchor {
+  DAY
+  LIVE
+}
+
+// Who is responsible for carrying out a timeline step
+enum StepOwner {
+  RESPONSABLE
+  FORMATEURS
+  BOTH
+  JUNIOR
 }
 
 // Surface a workflow state belongs to
@@ -281,6 +299,8 @@ model JobFunction {
   secondaryHolders Account[]            @relation("SecondaryFunction")
   permissions      FunctionPermission[]
   trainings        Training[]
+  skills           Skill[]
+  pimStepTemplates PimStepTemplate[]
 
   @@index([kind])
   @@map("job_functions")
@@ -572,6 +592,82 @@ model SocialLink {
   @@map("social_links")
 }
 
+// Entry programme a junior is placed into, ATRIA or PULSE
+model Dispositif {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  summary   String?
+  accent    String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  skills  Skill[]
+  steps   PimStepTemplate[]
+  juniors AcademyJunior[]
+
+  @@map("dispositifs")
+}
+
+// Grouping a skill sits under, Savoir-être, Technique, Rédaction...
+model SkillCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  accent    String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  skills Skill[]
+
+  @@map("skill_categories")
+}
+
+// One competency a junior is graded on, scoped by function and dispositif
+model Skill {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  position     Int      @default(0)
+  categoryId   String
+  functionId   String?
+  dispositifId String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  category    SkillCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  jobFunction JobFunction?  @relation(fields: [functionId], references: [id], onDelete: Cascade)
+  dispositif  Dispositif?   @relation(fields: [dispositifId], references: [id], onDelete: Cascade)
+
+  @@unique([name, functionId, dispositifId])
+  @@index([functionId, dispositifId])
+  @@map("skills")
+}
+
+// Timeline template step, instantiated onto a session at creation
+model PimStepTemplate {
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  position     Int          @default(0)
+  required     Boolean      @default(true)
+  functionId   String?
+  dispositifId String?
+  stage        AcademyStage
+  anchor       StepAnchor
+  offset       Int
+  owner        StepOwner
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  jobFunction JobFunction? @relation(fields: [functionId], references: [id], onDelete: Cascade)
+  dispositif  Dispositif?  @relation(fields: [dispositifId], references: [id], onDelete: Cascade)
+
+  @@unique([title, functionId, dispositifId])
+  @@index([functionId, dispositifId])
+  @@map("pim_step_templates")
+}
+
 // Course a junior must clear during the academy
 model Training {
   id          String          @id @default(cuid())
@@ -649,22 +745,23 @@ model AcademySessionTrainer {
 
 // Junior followed through one session, always an existing moderator
 model AcademyJunior {
-  id          String              @id @default(cuid())
-  sessionId   String
-  accountId   String
-  trainerId   String?
-  track       AcademyTrack        @default(ENTREE)
-  status      AcademyJuniorStatus @default(ACTIVE)
-  startedAt   DateTime            @default(now())
-  validatedAt DateTime?
-  liveCount   Int                 @default(0)
-  summary     String?
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  id           String              @id @default(cuid())
+  sessionId    String
+  accountId    String
+  trainerId    String?
+  dispositifId String
+  status       AcademyJuniorStatus @default(ACTIVE)
+  startedAt    DateTime            @default(now())
+  validatedAt  DateTime?
+  liveCount    Int                 @default(0)
+  summary      String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
 
-  session AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  account Account        @relation("AcademyJunior", fields: [accountId], references: [id], onDelete: Cascade)
-  trainer Account?       @relation("AcademyJuniorTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
+  session    AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account    Account        @relation("AcademyJunior", fields: [accountId], references: [id], onDelete: Cascade)
+  trainer    Account?       @relation("AcademyJuniorTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
+  dispositif Dispositif     @relation(fields: [dispositifId], references: [id], onDelete: Restrict)
 
   steps   AcademyStep[]
   reviews AcademyReview[]
