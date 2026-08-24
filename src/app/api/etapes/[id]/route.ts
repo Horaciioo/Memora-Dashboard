@@ -7,18 +7,40 @@ import {
   stepFields,
   removeStep,
   setStepDone,
+  setStepValidated,
   updateStep,
 } from '@/core/services/academy/AcademyService'
+import { recordEvent } from '@/core/services/system/ActivityService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
   permission: Permissions.AcademyManage,
-  descriptor: { summary: 'Edit a moment or flip it to held', tags: ['academy'] },
+  descriptor: { summary: 'Edit a moment or flip it to held or cleared', tags: ['academy'] },
   handler: async ({ params, raw, session, access }) => {
     const scope = academyScope(session, access)
 
-    // A lone done flag only toggles the moment, it never rewrites it
+    // A lone done flag only toggles a free moment, it never rewrites it
     if (typeof raw.done === 'boolean') return setStepDone(params.id, scope, raw.done)
+
+    // A lone validated flag only clears or reopens a timeline step
+    if (typeof raw.validated === 'boolean') {
+      const steps = await setStepValidated(params.id, scope, raw.validated, session.id)
+
+      if (raw.validated) {
+        const step = steps.find((entry) => entry.id === params.id)
+
+        await recordEvent({
+          eventType: 'StepValidated',
+          actorId: session.id,
+          subjectId: step?.accountId ?? undefined,
+          targetType: 'academy-step',
+          targetId: params.id,
+          summary: step?.title ?? params.id,
+        })
+      }
+
+      return steps
+    }
 
     const event = await prisma.academyStep.findUnique({ where: { id: params.id } })
     if (!event) throw notFound()
