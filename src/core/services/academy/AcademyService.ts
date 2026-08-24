@@ -3,20 +3,27 @@ import 'server-only'
 import moment from 'moment'
 
 import { prisma } from '@/core/lib/db'
-import { notFound } from '@/core/lib/errors'
+import { conflict, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import { memberOptions, toPerson } from '@/core/services/work/shared'
 import { ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
 import {
+  ACADEMY_STAGE_REGISTRY,
   ACADEMY_STEP_KIND_REGISTRY,
   ACADEMY_JUNIOR_STATUS_REGISTRY,
   ACADEMY_SESSION_STATUS_REGISTRY,
+  NOTE_KIND_REGISTRY,
+  OBJECTIVE_STATUS_REGISTRY,
+  REVIEW_ADVICE_REGISTRY,
 } from '@/declarations/academy/registries'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import type {
   AcademyStepView,
   AcademyReviewView,
+  JuniorNoteView,
+  JuniorObjectiveView,
+  JuniorSkillView,
   JuniorTraining,
   JuniorView,
   SessionDetail,
@@ -26,31 +33,36 @@ import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import {
   AcademyJuniorStatuses,
   AcademySessionStatuses,
+  AcademyStages,
   MemberStatuses,
+  NoteKinds,
+  ObjectiveStatuses,
+  ReviewAdvices,
+  ReviewStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
+  AcademyStageName,
   AcademyStepKindName,
   AcademyJuniorStatusName,
   AcademySessionStatusName,
+  NoteKindName,
+  ObjectiveStatusName,
+  ReviewAdviceName,
+  ReviewStatusName,
 } from '@/utils/constants/hierarchy'
 import type { Prisma } from '@prisma/client'
 
-// Axes every voice check-in walks through, in the order they are asked
-const REVIEW_AXES = [
-  { name: 'inclusion', label: ACADEMY_FIELD_COPY.inclusion },
-  { name: 'speaking', label: ACADEMY_FIELD_COPY.speaking },
-  { name: 'writing', label: ACADEMY_FIELD_COPY.writing },
-  { name: 'reachingOut', label: ACADEMY_FIELD_COPY.reachingOut },
-  { name: 'understanding', label: ACADEMY_FIELD_COPY.understanding },
-  { name: 'technical', label: ACADEMY_FIELD_COPY.technical },
+// Stages an actual voice check-in is written for, the others are timeline-driven
+const REVIEW_STAGES = [
+  AcademyStages.ReviewOne,
+  AcademyStages.ReviewFinal,
+  AcademyStages.Bonus,
 ] as const
 
-/**
- * Labels of the axes, read by the surfaces that render a stored review
- * @type {{ name: string, label: string }[]}
- */
-
-export const ACADEMY_REVIEW_AXES = REVIEW_AXES
+const REVIEW_STAGE_OPTIONS: FieldOption[] = REVIEW_STAGES.map((stage) => ({
+  value: stage,
+  label: ACADEMY_STAGE_REGISTRY.label(stage),
+}))
 
 /**
  * Build the session form declarations
@@ -165,6 +177,15 @@ export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]
       span: 'half',
     },
     {
+      name: 'bonusLives',
+      kind: 'number',
+      label: ACADEMY_FIELD_COPY.bonusLives,
+      hint: ACADEMY_FIELD_COPY.bonusLivesHint,
+      min: 0,
+      max: ACADEMY_SETTINGS.bonusMaxLives,
+      span: 'half',
+    },
+    {
       name: 'summary',
       kind: 'textarea',
       label: ACADEMY_FIELD_COPY.juniorSummary,
@@ -226,11 +247,20 @@ export const stepFields = async (sessionId: string): Promise<FieldDefinition[]> 
 }
 
 /**
- * Declarations of the voice check-in form, its axes coming from the procedure itself
+ * Declarations of the voice check-in form
  * @type {FieldDefinition[]}
  */
 
 export const REVIEW_FIELDS: FieldDefinition[] = [
+  {
+    name: 'stage',
+    kind: 'select',
+    label: ACADEMY_FIELD_COPY.reviewStage,
+    required: true,
+    options: REVIEW_STAGE_OPTIONS,
+    mark: 'dot',
+    span: 'half',
+  },
   {
     name: 'heldAt',
     kind: 'date',
@@ -239,37 +269,118 @@ export const REVIEW_FIELDS: FieldDefinition[] = [
     span: 'half',
   },
   {
+    name: 'durationMinutes',
+    kind: 'number',
+    label: ACADEMY_FIELD_COPY.durationMinutes,
+    required: true,
+    min: FORM_SETTINGS.meetingMinDuration,
+    max: FORM_SETTINGS.meetingMaxDuration,
+    span: 'half',
+  },
+  {
+    name: 'advice',
+    kind: 'select',
+    label: ACADEMY_FIELD_COPY.advice,
+    required: true,
+    options: toOptions(REVIEW_ADVICE_REGISTRY),
+    mark: 'dot',
+    span: 'half',
+  },
+  {
     name: 'feeling',
     kind: 'textarea',
     label: ACADEMY_FIELD_COPY.feeling,
-    required: true,
-    maxLength: FORM_SETTINGS.noteMaxLength,
-  },
-  ...REVIEW_AXES.map((axis): FieldDefinition => ({
-    name: axis.name,
-    kind: 'textarea',
-    label: axis.label,
-    maxLength: FORM_SETTINGS.longTextMaxLength,
-    span: 'half',
-  })),
-  {
-    name: 'objectives',
-    kind: 'textarea',
-    label: ACADEMY_FIELD_COPY.objectives,
-    required: true,
-    maxLength: FORM_SETTINGS.noteMaxLength,
-  },
-  {
-    name: 'strategies',
-    kind: 'textarea',
-    label: ACADEMY_FIELD_COPY.strategies,
     maxLength: FORM_SETTINGS.noteMaxLength,
   },
   {
     name: 'summary',
     kind: 'markdown',
     label: ACADEMY_FIELD_COPY.reviewSummary,
+    required: true,
     maxLength: FORM_SETTINGS.markdownMaxLength,
+  },
+]
+
+/**
+ * Declarations of the decision form
+ * @type {FieldDefinition[]}
+ */
+
+export const REVIEW_DECISION_FIELDS: FieldDefinition[] = [
+  {
+    name: 'decisionNote',
+    kind: 'textarea',
+    label: ACADEMY_FIELD_COPY.decisionNote,
+    maxLength: FORM_SETTINGS.noteMaxLength,
+  },
+]
+
+/**
+ * Declarations of the FSI note form
+ * @type {FieldDefinition[]}
+ */
+
+export const NOTE_FIELDS: FieldDefinition[] = [
+  {
+    name: 'stage',
+    kind: 'select',
+    label: ACADEMY_FIELD_COPY.noteStage,
+    required: true,
+    options: toOptions(ACADEMY_STAGE_REGISTRY),
+    mark: 'dot',
+    span: 'half',
+  },
+  {
+    name: 'kind',
+    kind: 'select',
+    label: ACADEMY_FIELD_COPY.noteKind,
+    required: true,
+    options: toOptions(NOTE_KIND_REGISTRY),
+    mark: 'dot',
+    span: 'half',
+  },
+  {
+    name: 'body',
+    kind: 'textarea',
+    label: ACADEMY_FIELD_COPY.noteBody,
+    required: true,
+    maxLength: FORM_SETTINGS.noteMaxLength,
+  },
+]
+
+/**
+ * Declarations of the personal objective form
+ * @type {FieldDefinition[]}
+ */
+
+export const OBJECTIVE_FIELDS: FieldDefinition[] = [
+  {
+    name: 'title',
+    kind: 'text',
+    label: ACADEMY_FIELD_COPY.objectiveTitle,
+    required: true,
+    maxLength: FORM_SETTINGS.titleMaxLength,
+  },
+  {
+    name: 'dueAt',
+    kind: 'date',
+    label: ACADEMY_FIELD_COPY.objectiveDueAt,
+    span: 'half',
+  },
+  {
+    name: 'status',
+    kind: 'select',
+    label: ACADEMY_FIELD_COPY.objectiveStatus,
+    required: true,
+    options: toOptions(OBJECTIVE_STATUS_REGISTRY),
+    mark: 'dot',
+    span: 'half',
+  },
+  {
+    name: 'description',
+    kind: 'textarea',
+    label: ACADEMY_FIELD_COPY.objectiveDescription,
+    maxLength: FORM_SETTINGS.longTextMaxLength,
   },
 ]
 
@@ -469,9 +580,11 @@ const toJunior = (
     accountId: string
     dispositifId: string
     status: AcademyJuniorStatusName
+    stage: AcademyStageName
     startedAt: Date
     validatedAt: Date | null
     liveCount: number
+    bonusLives: number
     summary: string | null
     trainerId: string | null
     account: { displayName: string; avatarUrl: string | null }
@@ -508,10 +621,12 @@ const toJunior = (
     avatarUrl: row.account.avatarUrl,
     dispositif: row.dispositif,
     status: row.status,
+    stage: row.stage,
     trainer: toPerson(row.trainer),
     startedAt: row.startedAt.toISOString(),
     validatedAt: row.validatedAt?.toISOString() ?? null,
     liveCount: row.liveCount,
+    bonusLives: row.bonusLives,
     summary: row.summary,
     trainings: progression,
     completedCount: progression.filter((training) => training.completedAt !== null).length,
@@ -525,6 +640,7 @@ const toJunior = (
       dispositifId: row.dispositifId,
       status: row.status,
       liveCount: row.liveCount,
+      bonusLives: row.bonusLives,
       summary: row.summary,
     },
   }
@@ -681,6 +797,7 @@ const toJuniorData = (values: FormValues) => {
     // Validation stamps its own date, so the file always says when it happened
     validatedAt: status === AcademyJuniorStatuses.Validated ? new Date() : null,
     liveCount: readNumberValue(values, 'liveCount') ?? 0,
+    bonusLives: readNumberValue(values, 'bonusLives') ?? 0,
     summary: readText(values, 'summary'),
   }
 }
@@ -722,6 +839,26 @@ const juniorInScope = async (id: string, scope: Prisma.AcademySessionWhereInput)
   const row = await prisma.academyJunior.findFirst({
     where: { id, session: scope },
     include: { session: true },
+  })
+  if (!row) throw notFound()
+
+  return row
+}
+
+/**
+ * Read only what a self-read authorisation check needs
+ * @param {string} id - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<{ accountId: string }>} - Owning account
+ */
+
+export const juniorAccount = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<{ accountId: string }> => {
+  const row = await prisma.academyJunior.findFirst({
+    where: { id, session: scope },
+    select: { accountId: true },
   })
   if (!row) throw notFound()
 
@@ -932,40 +1069,42 @@ export const removeStep = async (
 
 const toReview = (row: {
   id: string
+  stage: AcademyStageName
   heldAt: Date
+  durationMinutes: number | null
   feeling: string | null
-  axes: unknown
-  objectives: string
-  strategies: string | null
-  summary: string | null
+  summary: string
+  advice: ReviewAdviceName
+  status: ReviewStatusName
+  decidedAt: Date | null
+  decisionNote: string | null
   author: { displayName: string } | null
-}): AcademyReviewView => {
-  const stored = (row.axes ?? {}) as Record<string, unknown>
-  const axes = Object.fromEntries(
-    REVIEW_AXES.map((axis) => [axis.name, String(stored[axis.name] ?? '')]).filter(
-      ([, value]) => value.length > 0
-    )
-  )
-
-  return {
-    id: row.id,
-    heldAt: row.heldAt.toISOString(),
-    authorName: row.author?.displayName ?? null,
+  decidedBy: { displayName: string } | null
+}): AcademyReviewView => ({
+  id: row.id,
+  stage: row.stage,
+  heldAt: row.heldAt.toISOString(),
+  durationMinutes: row.durationMinutes,
+  authorName: row.author?.displayName ?? null,
+  feeling: row.feeling,
+  summary: row.summary,
+  advice: row.advice,
+  status: row.status,
+  decidedByName: row.decidedBy?.displayName ?? null,
+  decidedAt: row.decidedAt?.toISOString() ?? null,
+  decisionNote: row.decisionNote,
+  values: {
+    stage: row.stage,
+    heldAt: row.heldAt.toISOString().slice(0, 10),
+    durationMinutes: row.durationMinutes,
     feeling: row.feeling,
-    axes,
-    objectives: row.objectives,
-    strategies: row.strategies,
     summary: row.summary,
-    values: {
-      heldAt: row.heldAt.toISOString().slice(0, 10),
-      feeling: row.feeling,
-      objectives: row.objectives,
-      strategies: row.strategies,
-      summary: row.summary,
-      ...Object.fromEntries(REVIEW_AXES.map((axis) => [axis.name, axes[axis.name] ?? null])),
-    },
-  }
-}
+    advice: row.advice,
+  },
+})
+
+// Everything a review row needs to become a view
+const REVIEW_SHAPE = { author: true, decidedBy: true } as const
 
 /**
  * Read the voice check-ins of a junior within scope
@@ -982,7 +1121,7 @@ export const listReviews = async (
 
   const rows = await prisma.academyReview.findMany({
     where: { juniorId },
-    include: { author: true },
+    include: REVIEW_SHAPE,
     orderBy: { heldAt: 'desc' },
   })
 
@@ -996,16 +1135,12 @@ export const listReviews = async (
  */
 
 const toReviewData = (values: FormValues) => ({
+  stage: (readText(values, 'stage') ?? AcademyStages.ReviewOne) as AcademyStageName,
   heldAt: readDate(values, 'heldAt') ?? new Date(),
+  durationMinutes: readNumberValue(values, 'durationMinutes'),
   feeling: readText(values, 'feeling'),
-  axes: Object.fromEntries(
-    REVIEW_AXES.map((axis) => [axis.name, readText(values, axis.name) ?? '']).filter(
-      ([, value]) => value.length > 0
-    )
-  ),
-  objectives: readText(values, 'objectives') ?? '',
-  strategies: readText(values, 'strategies'),
-  summary: readText(values, 'summary'),
+  summary: readText(values, 'summary') ?? '',
+  advice: (readText(values, 'advice') ?? ReviewAdvices.Pass) as ReviewAdviceName,
 })
 
 /**
@@ -1033,7 +1168,7 @@ export const createReview = async (
  * Load a review inside scope or fail
  * @param {string} id - Review identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
- * @return {Promise<{ id: string, juniorId: string }>} - Review row
+ * @return {Promise<{ id: string, juniorId: string, status: ReviewStatusName, stage: AcademyStageName, advice: ReviewAdviceName }>} - Review row
  */
 
 const reviewInScope = async (id: string, scope: Prisma.AcademySessionWhereInput) => {
@@ -1044,7 +1179,7 @@ const reviewInScope = async (id: string, scope: Prisma.AcademySessionWhereInput)
 }
 
 /**
- * Edit the trace of a voice check-in
+ * Edit the trace of a voice check-in, only possible while still a draft
  * @param {string} id - Review identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {FormValues} values - Parsed body
@@ -1056,7 +1191,8 @@ export const updateReview = async (
   scope: Prisma.AcademySessionWhereInput,
   values: FormValues
 ): Promise<AcademyReviewView[]> => {
-  await reviewInScope(id, scope)
+  const existing = await reviewInScope(id, scope)
+  if (existing.status !== ReviewStatuses.Draft) throw conflict()
 
   const row = await prisma.academyReview.update({ where: { id }, data: toReviewData(values) })
 
@@ -1064,7 +1200,7 @@ export const updateReview = async (
 }
 
 /**
- * Drop the trace of a voice check-in
+ * Drop the trace of a voice check-in, a validated decision is kept for good
  * @param {string} id - Review identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<AcademyReviewView[]>} - Reviews
@@ -1074,11 +1210,533 @@ export const removeReview = async (
   id: string,
   scope: Prisma.AcademySessionWhereInput
 ): Promise<AcademyReviewView[]> => {
-  await reviewInScope(id, scope)
+  const existing = await reviewInScope(id, scope)
+  if (existing.status === ReviewStatuses.Validated) throw conflict()
 
   const row = await prisma.academyReview.delete({ where: { id } })
 
   return listReviews(row.juniorId, scope)
+}
+
+/**
+ * Submit a check-in for decision, only possible once from a draft
+ * @param {string} id - Review identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<AcademyReviewView[]>} - Reviews
+ */
+
+export const submitReview = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<AcademyReviewView[]> => {
+  const existing = await reviewInScope(id, scope)
+  if (existing.status !== ReviewStatuses.Draft) throw conflict()
+
+  const row = await prisma.academyReview.update({
+    where: { id },
+    data: { status: ReviewStatuses.Submitted },
+  })
+
+  return listReviews(row.juniorId, scope)
+}
+
+/**
+ * Refuse a decision when the FSI is not ready for it yet
+ * @param {{ juniorId: string, stage: AcademyStageName }} review - Review being decided
+ * @return {Promise<void>} - Throws when a guard fails
+ */
+
+const ensureReadyForDecision = async (review: {
+  juniorId: string
+  stage: AcademyStageName
+}): Promise<void> => {
+  // Only the closing check-ins gate on the objectives written during practice
+  if (review.stage !== AcademyStages.ReviewFinal && review.stage !== AcademyStages.Bonus) return
+
+  const count = await prisma.juniorObjective.count({ where: { juniorId: review.juniorId } })
+  if (count < ACADEMY_SETTINGS.minObjectives) throw conflict()
+}
+
+/**
+ * Move a junior forward once their check-in is validated
+ * @param {string} juniorId - Junior identifier
+ * @param {AcademyStageName} stage - Stage the check-in was held for
+ * @param {ReviewAdviceName} advice - Outcome proposed by the Formateur
+ * @return {Promise<void>} - Applied
+ */
+
+const advanceJunior = async (
+  juniorId: string,
+  stage: AcademyStageName,
+  advice: ReviewAdviceName
+): Promise<void> => {
+  if (advice === ReviewAdvices.Stop) {
+    await prisma.academyJunior.update({
+      where: { id: juniorId },
+      data: { status: AcademyJuniorStatuses.Stopped },
+    })
+    return
+  }
+
+  if (stage === AcademyStages.ReviewOne) {
+    await prisma.academyJunior.update({
+      where: { id: juniorId },
+      data: { stage: AcademyStages.Practice },
+    })
+    return
+  }
+
+  if (stage === AcademyStages.ReviewFinal && advice === ReviewAdvices.Bonus) {
+    await prisma.academyJunior.update({
+      where: { id: juniorId },
+      data: { stage: AcademyStages.Bonus },
+    })
+    return
+  }
+
+  // A passed final check-in, or a closing bonus period, both graduate the junior
+  const junior = await prisma.academyJunior.update({
+    where: { id: juniorId },
+    data: { status: AcademyJuniorStatuses.Validated, validatedAt: new Date() },
+  })
+
+  await prisma.account.update({
+    where: { id: junior.accountId },
+    data: { status: MemberStatuses.Active },
+  })
+}
+
+/**
+ * Decide a submitted check-in, the sole gesture that authorises the following stage
+ * @param {string} id - Review identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {string} decidedById - Who decided
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<AcademyReviewView[]>} - Reviews
+ */
+
+export const decideReview = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput,
+  decidedById: string,
+  values: FormValues
+): Promise<AcademyReviewView[]> => {
+  const existing = await reviewInScope(id, scope)
+  if (existing.status !== ReviewStatuses.Submitted) throw conflict()
+
+  const status = (
+    readText(values, 'status') === ReviewStatuses.Validated
+      ? ReviewStatuses.Validated
+      : ReviewStatuses.Rejected
+  ) as ReviewStatusName
+
+  if (status === ReviewStatuses.Validated) await ensureReadyForDecision(existing)
+
+  const row = await prisma.academyReview.update({
+    where: { id },
+    data: {
+      status,
+      decidedById,
+      decidedAt: new Date(),
+      decisionNote: readText(values, 'decisionNote'),
+    },
+  })
+
+  if (status === ReviewStatuses.Validated) await advanceJunior(row.juniorId, row.stage, row.advice)
+
+  return listReviews(row.juniorId, scope)
+}
+
+/**
+ * Shape one competency grade
+ * @param {object} skill - Skill row with its category
+ * @param {object} [grade] - Existing grade, absent means never touched
+ * @return {JuniorSkillView} - Skill view
+ */
+
+const toJuniorSkill = (
+  skill: {
+    id: string
+    name: string
+    description: string | null
+    categoryId: string
+    category: { name: string; accent: string | null }
+  },
+  grade?: { percent: number; updatedAt: Date; validator: { displayName: string } | null }
+): JuniorSkillView => ({
+  skillId: skill.id,
+  name: skill.name,
+  description: skill.description,
+  categoryId: skill.categoryId,
+  categoryName: skill.category.name,
+  categoryAccent: skill.category.accent,
+  percent: grade?.percent ?? 0,
+  validatorName: grade?.validator?.displayName ?? null,
+  updatedAt: grade?.updatedAt.toISOString() ?? null,
+})
+
+/**
+ * Read the competencies open to a junior's function and dispositif
+ * @param {string} juniorId - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<JuniorSkillView[]>} - Skills grouped by category order
+ */
+
+export const listJuniorSkills = async (
+  juniorId: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<JuniorSkillView[]> => {
+  const junior = await juniorInScope(juniorId, scope)
+
+  const [skills, grades] = await Promise.all([
+    prisma.skill.findMany({
+      where: {
+        OR: [{ functionId: null }, { functionId: junior.session.functionId }],
+        AND: [{ OR: [{ dispositifId: null }, { dispositifId: junior.dispositifId }] }],
+      },
+      include: { category: true },
+      orderBy: [{ category: { position: 'asc' } }, { position: 'asc' }],
+    }),
+    prisma.juniorSkill.findMany({ where: { juniorId }, include: { validator: true } }),
+  ])
+
+  const gradeBySkill = new Map(grades.map((grade) => [grade.skillId, grade]))
+
+  return skills.map((skill) => toJuniorSkill(skill, gradeBySkill.get(skill.id)))
+}
+
+/**
+ * Move the mastery of one competency
+ * @param {string} juniorId - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {string} skillId - Skill identifier
+ * @param {number} percent - Wanted mastery
+ * @param {string} validatorId - Who moved it
+ * @return {Promise<JuniorSkillView[]>} - Skills
+ */
+
+export const setJuniorSkill = async (
+  juniorId: string,
+  scope: Prisma.AcademySessionWhereInput,
+  skillId: string,
+  percent: number,
+  validatorId: string
+): Promise<JuniorSkillView[]> => {
+  await juniorInScope(juniorId, scope)
+
+  const bounded = Math.min(Math.max(percent, 0), ACADEMY_SETTINGS.skillMaxPercent)
+
+  await prisma.juniorSkill.upsert({
+    where: { juniorId_skillId: { juniorId, skillId } },
+    update: { percent: bounded, validatorId },
+    create: { juniorId, skillId, percent: bounded, validatorId },
+  })
+
+  return listJuniorSkills(juniorId, scope)
+}
+
+/**
+ * Shape one FSI note
+ * @param {object} row - Note row
+ * @return {JuniorNoteView} - Note view
+ */
+
+const toJuniorNote = (row: {
+  id: string
+  stage: AcademyStageName
+  kind: NoteKindName
+  body: string
+  createdAt: Date
+  author: { displayName: string } | null
+}): JuniorNoteView => ({
+  id: row.id,
+  stage: row.stage,
+  kind: row.kind,
+  body: row.body,
+  authorName: row.author?.displayName ?? null,
+  createdAt: row.createdAt.toISOString(),
+  values: { stage: row.stage, kind: row.kind, body: row.body },
+})
+
+/**
+ * Read the notes kept on a junior's FSI
+ * @param {string} juniorId - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<JuniorNoteView[]>} - Notes, newest first
+ */
+
+export const listJuniorNotes = async (
+  juniorId: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<JuniorNoteView[]> => {
+  await juniorInScope(juniorId, scope)
+
+  const rows = await prisma.juniorNote.findMany({
+    where: { juniorId },
+    include: { author: true },
+    orderBy: { createdAt: 'desc' },
+  })
+
+  return rows.map(toJuniorNote)
+}
+
+/**
+ * Turn parsed values into a note payload
+ * @param {FormValues} values - Parsed body
+ * @return {object} - Database payload
+ */
+
+const toJuniorNoteData = (values: FormValues) => ({
+  stage: (readText(values, 'stage') ?? AcademyStages.Preparation) as AcademyStageName,
+  kind: (readText(values, 'kind') ?? NoteKinds.Positive) as NoteKindName,
+  body: readText(values, 'body') ?? '',
+})
+
+/**
+ * Write a trace on a junior's FSI
+ * @param {string} juniorId - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {string} authorId - Who wrote it
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<JuniorNoteView[]>} - Notes
+ */
+
+export const createJuniorNote = async (
+  juniorId: string,
+  scope: Prisma.AcademySessionWhereInput,
+  authorId: string,
+  values: FormValues
+): Promise<JuniorNoteView[]> => {
+  await juniorInScope(juniorId, scope)
+  await prisma.juniorNote.create({ data: { juniorId, authorId, ...toJuniorNoteData(values) } })
+
+  return listJuniorNotes(juniorId, scope)
+}
+
+/**
+ * Load a note inside scope or fail
+ * @param {string} id - Note identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<{ id: string, juniorId: string }>} - Note row
+ */
+
+const noteInScope = async (id: string, scope: Prisma.AcademySessionWhereInput) => {
+  const row = await prisma.juniorNote.findFirst({ where: { id, junior: { session: scope } } })
+  if (!row) throw notFound()
+
+  return row
+}
+
+/**
+ * Edit a trace kept on a junior's FSI
+ * @param {string} id - Note identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<JuniorNoteView[]>} - Notes
+ */
+
+export const updateJuniorNote = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput,
+  values: FormValues
+): Promise<JuniorNoteView[]> => {
+  const existing = await noteInScope(id, scope)
+  await prisma.juniorNote.update({ where: { id }, data: toJuniorNoteData(values) })
+
+  return listJuniorNotes(existing.juniorId, scope)
+}
+
+/**
+ * Drop a trace kept on a junior's FSI
+ * @param {string} id - Note identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<JuniorNoteView[]>} - Notes
+ */
+
+export const removeJuniorNote = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<JuniorNoteView[]> => {
+  const row = await noteInScope(id, scope)
+  await prisma.juniorNote.delete({ where: { id } })
+
+  return listJuniorNotes(row.juniorId, scope)
+}
+
+/**
+ * Shape one personal objective
+ * @param {object} row - Objective row
+ * @return {JuniorObjectiveView} - Objective view
+ */
+
+const toJuniorObjective = (row: {
+  id: string
+  title: string
+  description: string | null
+  dueAt: Date | null
+  status: ObjectiveStatusName
+  position: number
+  author: { displayName: string } | null
+}): JuniorObjectiveView => ({
+  id: row.id,
+  title: row.title,
+  description: row.description,
+  dueAt: row.dueAt?.toISOString() ?? null,
+  status: row.status,
+  position: row.position,
+  authorName: row.author?.displayName ?? null,
+  values: {
+    title: row.title,
+    description: row.description,
+    dueAt: row.dueAt ? row.dueAt.toISOString().slice(0, 10) : null,
+    status: row.status,
+  },
+})
+
+/**
+ * Read the personal objectives of a junior
+ * @param {string} juniorId - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<JuniorObjectiveView[]>} - Objectives in display order
+ */
+
+export const listJuniorObjectives = async (
+  juniorId: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<JuniorObjectiveView[]> => {
+  await juniorInScope(juniorId, scope)
+
+  const rows = await prisma.juniorObjective.findMany({
+    where: { juniorId },
+    include: { author: true },
+    orderBy: { position: 'asc' },
+  })
+
+  return rows.map(toJuniorObjective)
+}
+
+/**
+ * Read the next free position of a junior's objectives
+ * @param {string} juniorId - Junior identifier
+ * @return {Promise<number>} - Next position
+ */
+
+const nextObjectivePosition = async (juniorId: string): Promise<number> => {
+  const result = await prisma.juniorObjective.aggregate({
+    where: { juniorId },
+    _max: { position: true },
+  })
+
+  return (result._max.position ?? -1) + 1
+}
+
+/**
+ * Turn parsed values into an objective payload
+ * @param {FormValues} values - Parsed body
+ * @return {object} - Database payload
+ */
+
+const toJuniorObjectiveData = (values: FormValues) => ({
+  title: readText(values, 'title') ?? '',
+  description: readText(values, 'description'),
+  dueAt: readDate(values, 'dueAt'),
+  status: (readText(values, 'status') ?? ObjectiveStatuses.Open) as ObjectiveStatusName,
+})
+
+/**
+ * Set a personal objective, unlocked once a junior reaches practice
+ * @param {string} juniorId - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {string} authorId - Who set it
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<JuniorObjectiveView[]>} - Objectives
+ */
+
+export const createJuniorObjective = async (
+  juniorId: string,
+  scope: Prisma.AcademySessionWhereInput,
+  authorId: string,
+  values: FormValues
+): Promise<JuniorObjectiveView[]> => {
+  await juniorInScope(juniorId, scope)
+  const position = await nextObjectivePosition(juniorId)
+
+  await prisma.juniorObjective.create({
+    data: { juniorId, authorId, position, ...toJuniorObjectiveData(values) },
+  })
+
+  return listJuniorObjectives(juniorId, scope)
+}
+
+/**
+ * Load an objective inside scope or fail
+ * @param {string} id - Objective identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<{ id: string, juniorId: string }>} - Objective row
+ */
+
+const objectiveInScope = async (id: string, scope: Prisma.AcademySessionWhereInput) => {
+  const row = await prisma.juniorObjective.findFirst({ where: { id, junior: { session: scope } } })
+  if (!row) throw notFound()
+
+  return row
+}
+
+/**
+ * Edit a personal objective
+ * @param {string} id - Objective identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<JuniorObjectiveView[]>} - Objectives
+ */
+
+export const updateJuniorObjective = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput,
+  values: FormValues
+): Promise<JuniorObjectiveView[]> => {
+  const existing = await objectiveInScope(id, scope)
+  await prisma.juniorObjective.update({ where: { id }, data: toJuniorObjectiveData(values) })
+
+  return listJuniorObjectives(existing.juniorId, scope)
+}
+
+/**
+ * Drop a personal objective
+ * @param {string} id - Objective identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<JuniorObjectiveView[]>} - Objectives
+ */
+
+export const removeJuniorObjective = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<JuniorObjectiveView[]> => {
+  const row = await objectiveInScope(id, scope)
+  await prisma.juniorObjective.delete({ where: { id } })
+
+  return listJuniorObjectives(row.juniorId, scope)
+}
+
+/**
+ * Apply a new order to a junior's objectives
+ * @param {string} juniorId - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {string[]} ids - Identifiers in their new order
+ * @return {Promise<JuniorObjectiveView[]>} - Objectives
+ */
+
+export const reorderJuniorObjectives = async (
+  juniorId: string,
+  scope: Prisma.AcademySessionWhereInput,
+  ids: string[]
+): Promise<JuniorObjectiveView[]> => {
+  await juniorInScope(juniorId, scope)
+  await Promise.all(
+    ids.map((id, position) => prisma.juniorObjective.update({ where: { id }, data: { position } }))
+  )
+
+  return listJuniorObjectives(juniorId, scope)
 }
 
 /**
