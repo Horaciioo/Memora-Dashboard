@@ -1,5 +1,6 @@
 import 'server-only'
 
+import crypto from 'crypto'
 import moment from 'moment'
 
 import { prisma } from '@/core/lib/db'
@@ -427,30 +428,41 @@ const toSummary = (row: {
   jobFunction: { id: string; name: string; summary: string | null; accent: string | null }
   trainers: { account: { id: string; displayName: string; avatarUrl: string | null } }[]
   _count: { juniors: number }
-}): SessionSummary => ({
-  id: row.id,
-  function: row.jobFunction,
-  startsAt: row.startsAt.toISOString(),
-  endsAt: row.endsAt?.toISOString() ?? null,
-  status: row.status,
-  summary: row.summary,
-  trainers: row.trainers.map((seat) => toPerson(seat.account)).filter((person) => person !== null),
-  juniorCount: row._count.juniors,
-  values: {
-    functionId: row.functionId,
+  invites: { token: string; expiresAt: Date; maxUses: number | null; uses: number }[]
+}): SessionSummary => {
+  const invite = row.invites[0]
+  const inviteUsable =
+    invite && invite.expiresAt > new Date() && invite.uses < (invite.maxUses ?? Infinity)
+
+  return {
+    id: row.id,
+    function: row.jobFunction,
+    startsAt: row.startsAt.toISOString(),
+    endsAt: row.endsAt?.toISOString() ?? null,
     status: row.status,
-    startsAt: row.startsAt.toISOString().slice(0, 10),
-    endsAt: row.endsAt ? row.endsAt.toISOString().slice(0, 10) : null,
-    trainerIds: row.trainers.map((seat) => seat.account.id),
     summary: row.summary,
-  },
-})
+    trainers: row.trainers
+      .map((seat) => toPerson(seat.account))
+      .filter((person) => person !== null),
+    juniorCount: row._count.juniors,
+    inviteToken: inviteUsable ? invite.token : null,
+    values: {
+      functionId: row.functionId,
+      status: row.status,
+      startsAt: row.startsAt.toISOString().slice(0, 10),
+      endsAt: row.endsAt ? row.endsAt.toISOString().slice(0, 10) : null,
+      trainerIds: row.trainers.map((seat) => seat.account.id),
+      summary: row.summary,
+    },
+  }
+}
 
 // Everything a session row needs to become a summary
 const SESSION_SHAPE = {
   jobFunction: true,
   trainers: { include: { account: true } },
   _count: { select: { juniors: true } },
+  invites: { orderBy: { createdAt: 'desc' as const }, take: 1 },
 } as const
 
 /**
@@ -515,6 +527,34 @@ const sessionInScope = async (id: string, scope: Prisma.AcademySessionWhereInput
 }
 
 /**
+ * Open the admission link of a session once it starts taking applications, idempotent
+ * @param {string} sessionId - Session identifier
+ * @param {AcademySessionStatusName} status - Status the session was just set to
+ * @return {Promise<void>} - Applied, a no-op outside OPEN or when a live link already exists
+ */
+
+const ensureSessionInvite = async (
+  sessionId: string,
+  status: AcademySessionStatusName
+): Promise<void> => {
+  if (status !== AcademySessionStatuses.Open) return
+
+  const existing = await prisma.sessionInvite.findFirst({
+    where: { sessionId, expiresAt: { gt: new Date() } },
+  })
+  if (existing) return
+
+  await prisma.sessionInvite.create({
+    data: {
+      sessionId,
+      token: crypto.randomBytes(24).toString('base64url'),
+      expiresAt: moment().add(ACADEMY_SETTINGS.inviteExpiryDays, 'days').toDate(),
+      maxUses: ACADEMY_SETTINGS.inviteMaxUses,
+    },
+  })
+}
+
+/**
  * Open a session
  * @param {FormValues} values - Parsed body
  * @return {Promise<SessionSummary[]>} - Sessions
@@ -528,7 +568,10 @@ export const createSession = async (values: FormValues): Promise<SessionSummary[
     },
   })
 
-  await instantiateSessionSteps(row.id, row.functionId, row.startsAt)
+  await Promise.all([
+    instantiateSessionSteps(row.id, row.functionId, row.startsAt),
+    ensureSessionInvite(row.id, row.status),
+  ])
 
   return listSessions({})
 }
@@ -547,15 +590,18 @@ export const updateSession = async (
   values: FormValues
 ): Promise<SessionSummary[]> => {
   await sessionInScope(id, scope)
+  const data = toSessionData(values)
 
   // The trainer seats are replaced wholesale, the form always sends the full list
   await prisma.$transaction([
-    prisma.academySession.update({ where: { id }, data: toSessionData(values) }),
+    prisma.academySession.update({ where: { id }, data }),
     prisma.academySessionTrainer.deleteMany({ where: { sessionId: id } }),
     prisma.academySessionTrainer.createMany({
       data: readList(values, 'trainerIds').map((accountId) => ({ sessionId: id, accountId })),
     }),
   ])
+
+  await ensureSessionInvite(id, data.status)
 
   return listSessions(scope)
 }
@@ -888,7 +934,7 @@ const instantiateSessionSteps = async (
  * @return {Promise<void>} - Instantiated
  */
 
-const instantiateJuniorSteps = async (
+export const instantiateJuniorSteps = async (
   juniorId: string,
   sessionId: string,
   functionId: string,

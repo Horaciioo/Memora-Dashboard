@@ -54,6 +54,7 @@ export const API_ROUTES = {
   juniorNote: (id: string) => `/api/notes-fsi/${id}`,
   objective: (id: string) => `/api/objectifs/${id}`,
   myTrainingProgress: (id: string) => `/api/formations/${id}/progression`,
+  admission: (token: string) => `/api/admission/${token}`,
   teams: (youtuberId?: string) => withScope('/api/equipes', youtuberId),
   team: (id: string, youtuberId?: string) => withScope(`/api/equipes/${id}`, youtuberId),
   access: '/api/acces',

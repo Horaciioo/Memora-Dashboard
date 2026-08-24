@@ -127,6 +127,8 @@ export const ACADEMY_COPY = {
   trainingDurationUnit: 'min',
   trainingContentTitle: 'Contenu',
   trainingContentLead: 'Le déroulé de chaque formation arrive avec le module de contenu.',
+  inviteCopyLink: 'Copier le lien d’admission',
+  inviteCopied: 'Lien copié',
 } as const
 
 /**
@@ -170,4 +172,32 @@ export const ACADEMY_FIELD_COPY = {
   objectiveDueAt: 'Échéance',
   objectiveStatus: 'Statut',
   skillPercent: 'Maîtrise',
+} as const
+
+/**
+ * Copy of the public admission form
+ * @type {Record<string, string>}
+ */
+
+export const ADMISSION_COPY = {
+  title: 'Admission Marsha Academy',
+  subtitle: 'Rejoins une session en cours de recrutement.',
+  submit: 'Envoyer ma candidature',
+  pending: 'Envoi…',
+  successTitle: 'Candidature envoyée',
+  successDescription: 'Un Formateur vérifie ton dossier, à très vite en vocal !',
+  invalidTitle: 'Lien invalide',
+  invalidDescription:
+    'Ce lien d’admission n’existe plus, a expiré ou a atteint son nombre d’utilisations.',
+  duplicateId: 'Cet identifiant Discord est déjà rattaché à un compte.',
+} as const
+
+/**
+ * Labels of the public admission form
+ * @type {Record<string, string>}
+ */
+
+export const ADMISSION_FIELD_COPY = {
+  displayName: 'Pseudo',
+  dispositif: 'Dispositif souhaité',
 } as const

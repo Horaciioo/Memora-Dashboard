@@ -9,5 +9,7 @@
   "skillMaxPercent": 100,
   "skillStep": 5,
   "trainingMinMinutes": 20,
-  "trainingMaxMinutes": 50
+  "trainingMaxMinutes": 50,
+  "inviteExpiryDays": 14,
+  "inviteMaxUses": 50
 }

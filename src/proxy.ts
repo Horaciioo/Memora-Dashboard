@@ -5,6 +5,9 @@ import { ROUTES } from '@/declarations/navigation'
 // Paths reachable without a session
 const PUBLIC_PATHS: string[] = [ROUTES.login]
 
+// Path prefixes reachable without a session, dynamic segments included
+const PUBLIC_PREFIXES: string[] = ['/admission']
+
 /**
  * Route authentication redirect
  * @param {NextRequest} request - Incoming request
@@ -15,17 +18,20 @@ export function proxy(request: NextRequest) {
   // Initialize session state
   const { pathname } = request.nextUrl
   const hasSession = request.cookies.has(SESSION_COOKIE)
-  const isPublicPath = PUBLIC_PATHS.includes(pathname)
+  const isSignInScreen = PUBLIC_PATHS.includes(pathname)
+  // A prefix stays reachable either way, a signed-in staff member may preview it too
+  const isOpenToEveryone =
+    isSignInScreen || PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(`${prefix}/`))
 
   // Redirect unauthenticated users
-  if (!hasSession && !isPublicPath) {
+  if (!hasSession && !isOpenToEveryone) {
     const url = request.nextUrl.clone()
     url.pathname = ROUTES.login
     return NextResponse.redirect(url)
   }
 
   // Redirect away from the sign-in screen
-  if (hasSession && isPublicPath) {
+  if (hasSession && isSignInScreen) {
     const url = request.nextUrl.clone()
     url.pathname = ROUTES.dashboard
     return NextResponse.redirect(url)

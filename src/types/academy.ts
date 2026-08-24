@@ -77,6 +77,7 @@ export interface JuniorTraining {
  * @property {string | null} summary - Description
  * @property {WorkPerson[]} trainers - Moderators holding the trainer seat
  * @property {number} juniorCount - Juniors inside
+ * @property {string | null} inviteToken - Token of the active admission link, if any
  * @property {FormValues} values - Values feeding the edit form
  */
 
@@ -89,6 +90,7 @@ export interface SessionSummary {
   summary: string | null
   trainers: WorkPerson[]
   juniorCount: number
+  inviteToken: string | null
   values: FormValues
 }
 

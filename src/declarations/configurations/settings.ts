@@ -225,7 +225,7 @@ const trainingMaxMinutes = readInteger(academy.trainingMaxMinutes, {
 
 /**
  * Academy bounds
- * @type {{ maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number }}
+ * @type {{ maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
  */
 
 export const ACADEMY_SETTINGS = {
@@ -238,6 +238,16 @@ export const ACADEMY_SETTINGS = {
     fallback: 20,
     min: 1,
     max: trainingMaxMinutes,
+  }),
+  inviteExpiryDays: readInteger(academy.inviteExpiryDays, {
+    path: 'system/academy.inviteExpiryDays',
+    fallback: 14,
+    min: 1,
+  }),
+  inviteMaxUses: readInteger(academy.inviteMaxUses, {
+    path: 'system/academy.inviteMaxUses',
+    fallback: 50,
+    min: 1,
   }),
   maxLives: readInteger(academy.maxLives, {
     path: 'system/academy.maxLives',
