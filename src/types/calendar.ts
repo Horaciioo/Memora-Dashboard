@@ -15,6 +15,7 @@ import type { EventVisibilityName } from '@/utils/constants/workflow'
  * @property {string | null} endsAt - ISO end
  * @property {boolean} allDay - Spans the whole day
  * @property {string | null} ownerName - Who posted it
+ * @property {boolean} readOnly - Projected from another domain, never edited here
  * @property {FormValues} values - Values feeding the edit form
  */
 
@@ -30,6 +31,7 @@ export interface CalendarEntry {
   endsAt: string | null
   allDay: boolean
   ownerName: string | null
+  readOnly: boolean
   values: FormValues
 }
 

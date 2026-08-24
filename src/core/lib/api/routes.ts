@@ -31,8 +31,9 @@ export const API_ROUTES = {
   absences: '/api/absences',
   absence: (id: string) => `/api/absences/${id}`,
   livecon: '/api/livecon',
-  calendar: (from: string, to: string) =>
-    `/api/calendrier?debut=${encodeURIComponent(from)}&fin=${encodeURIComponent(to)}`,
+  calendar: (from: string, to: string, sessionId?: string) =>
+    `/api/calendrier?debut=${encodeURIComponent(from)}&fin=${encodeURIComponent(to)}` +
+    (sessionId ? `&session=${encodeURIComponent(sessionId)}` : ''),
   calendarEntries: '/api/calendrier',
   calendarEntry: (id: string) => `/api/calendrier/${id}`,
   academy: '/api/academy',

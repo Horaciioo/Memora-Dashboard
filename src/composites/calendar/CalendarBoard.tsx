@@ -44,6 +44,7 @@ export interface CalendarBoardProps {
   anchor: string
   hasTypes: boolean
   canManage: boolean
+  sessionId?: string
 }
 
 // A week slot identifier pairs its day with its hour
@@ -62,6 +63,7 @@ const DayAddIcon = ICONS.add
  * @param {string} anchor - ISO day the grid opens on
  * @param {boolean} hasTypes - At least one event type is declared
  * @param {boolean} canManage - Member may post and move entries
+ * @param {string} [sessionId] - Bounds the board to one academy session
  * @return {JSX.Element}
  */
 
@@ -71,8 +73,9 @@ export const CalendarBoard = ({
   anchor,
   hasTypes,
   canManage,
+  sessionId,
 }: CalendarBoardProps) => {
-  const calendar = useCalendar(initialEntries)
+  const calendar = useCalendar(initialEntries, sessionId)
   const [unit, setUnit] = useState<'month' | 'week'>('month')
   const [cursor, setCursor] = useState(anchor)
   const [dialog, setDialog] = useState<'form' | 'detail' | null>(null)
@@ -155,7 +158,7 @@ export const CalendarBoard = ({
           setDialog('detail')
         }}
         className={cn(CALENDAR_STYLES.entry, tone.soft, tone.text)}
-        {...(canManage ? itemProps({ id: entry.id, from: container }) : {})}
+        {...(canManage && !entry.readOnly ? itemProps({ id: entry.id, from: container }) : {})}
       >
         {!entry.allDay && (
           <span className={CALENDAR_STYLES.entryTime}>{timeOf(entry.startsAt)}</span>
@@ -349,27 +352,29 @@ export const CalendarBoard = ({
         tone={toTone(opened?.accent, 'brand')}
         onClose={() => setDialog(null)}
         footer={
-          <>
-            <Button
-              variant="danger"
-              icon="remove"
-              disabled={!canManage}
-              onClick={() => {
-                setPendingDeletion(opened)
-                setDialog(null)
-              }}
-            >
-              {ACTION_COPY.delete}
-            </Button>
-            <Button
-              variant="primary"
-              icon="edit"
-              disabled={!canManage}
-              onClick={() => openForm(opened)}
-            >
-              {ACTION_COPY.edit}
-            </Button>
-          </>
+          opened && !opened.readOnly ? (
+            <>
+              <Button
+                variant="danger"
+                icon="remove"
+                disabled={!canManage}
+                onClick={() => {
+                  setPendingDeletion(opened)
+                  setDialog(null)
+                }}
+              >
+                {ACTION_COPY.delete}
+              </Button>
+              <Button
+                variant="primary"
+                icon="edit"
+                disabled={!canManage}
+                onClick={() => openForm(opened)}
+              >
+                {ACTION_COPY.edit}
+              </Button>
+            </>
+          ) : undefined
         }
       >
         {opened && (
