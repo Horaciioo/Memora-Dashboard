@@ -4,8 +4,17 @@ import { prisma } from '@/core/lib/db'
 import { conflict, notFound } from '@/core/lib/errors'
 import { TONE_OPTIONS, rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
-import { FORM_SETTINGS, LIVECON_SETTINGS } from '@/declarations/configurations/settings'
-import { ACADEMY_PROGRAM_REGISTRY } from '@/declarations/academy/registries'
+import {
+  ACADEMY_SETTINGS,
+  FORM_SETTINGS,
+  LIVECON_SETTINGS,
+} from '@/declarations/configurations/settings'
+import {
+  ACADEMY_PROGRAM_REGISTRY,
+  ACADEMY_STAGE_REGISTRY,
+  STEP_ANCHOR_REGISTRY,
+  STEP_OWNER_REGISTRY,
+} from '@/declarations/academy/registries'
 import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
 import {
   EVENT_VISIBILITY_REGISTRY,
@@ -16,10 +25,14 @@ import { REFERENCE_FIELD_COPY } from '@/declarations/reference/copy'
 import type { ReferenceKey } from '@/declarations/reference/sections'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { ReferenceRow } from '@/types/reference'
+import { AcademyStages, StepAnchors, StepOwners } from '@/utils/constants/hierarchy'
 import { EventVisibilities, FunctionKinds, WorkflowScopes } from '@/utils/constants/workflow'
 import type {
   AcademyPeriodName,
   AcademyProgramName,
+  AcademyStageName,
+  StepAnchorName,
+  StepOwnerName,
   EventVisibilityName,
   FunctionKindName,
   WorkflowScopeName,
@@ -902,6 +915,396 @@ const liveconLevels: ReferenceResource = {
   reorder: noReorder,
 }
 
+const dispositifs: ReferenceResource = {
+  fields: async () => [
+    nameField,
+    accentField,
+    {
+      name: 'summary',
+      kind: 'textarea',
+      label: REFERENCE_FIELD_COPY.summary,
+      maxLength: longTextMaxLength,
+    },
+  ],
+  list: async () => {
+    const rows = await prisma.dispositif.findMany({
+      orderBy: { position: 'asc' },
+      include: { _count: { select: { juniors: true } } },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      label: row.name,
+      hint: row.summary,
+      accent: row.accent,
+      badges: [],
+      position: row.position,
+      usage: row._count.juniors,
+      values: {
+        name: row.name,
+        accent: row.accent,
+        summary: row.summary,
+      },
+    }))
+  },
+  create: async (values) => {
+    const row = await prisma.dispositif
+      .create({
+        data: {
+          name: readText(values, 'name') ?? '',
+          accent: readText(values, 'accent'),
+          summary: readText(values, 'summary'),
+          position: await nextPosition(prisma.dispositif),
+        },
+      })
+      .catch(rethrow)
+
+    return dispositifs.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
+  },
+  update: async (id, values) => {
+    await prisma.dispositif
+      .update({
+        where: { id },
+        data: {
+          name: readText(values, 'name') ?? undefined,
+          accent: readText(values, 'accent'),
+          summary: readText(values, 'summary'),
+        },
+      })
+      .catch(rethrow)
+
+    return dispositifs.list().then((rows) => rows.find((entry) => entry.id === id)!)
+  },
+  remove: async (id) => {
+    await prisma.dispositif.delete({ where: { id } })
+  },
+  reorder: (ids) =>
+    applyOrder(
+      (id, position) => prisma.dispositif.update({ where: { id }, data: { position } }),
+      ids
+    ),
+}
+
+const skillCategories: ReferenceResource = {
+  fields: async () => [nameField, accentField],
+  list: async () => {
+    const rows = await prisma.skillCategory.findMany({
+      orderBy: { position: 'asc' },
+      include: { _count: { select: { skills: true } } },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      label: row.name,
+      hint: null,
+      accent: row.accent,
+      badges: [],
+      position: row.position,
+      usage: row._count.skills,
+      values: { name: row.name, accent: row.accent },
+    }))
+  },
+  create: async (values) => {
+    const row = await prisma.skillCategory
+      .create({
+        data: {
+          name: readText(values, 'name') ?? '',
+          accent: readText(values, 'accent'),
+          position: await nextPosition(prisma.skillCategory),
+        },
+      })
+      .catch(rethrow)
+
+    return skillCategories.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
+  },
+  update: async (id, values) => {
+    await prisma.skillCategory
+      .update({
+        where: { id },
+        data: {
+          name: readText(values, 'name') ?? undefined,
+          accent: readText(values, 'accent'),
+        },
+      })
+      .catch(rethrow)
+
+    return skillCategories.list().then((rows) => rows.find((entry) => entry.id === id)!)
+  },
+  remove: async (id) => {
+    await prisma.skillCategory.delete({ where: { id } })
+  },
+  reorder: (ids) =>
+    applyOrder(
+      (id, position) => prisma.skillCategory.update({ where: { id }, data: { position } }),
+      ids
+    ),
+}
+
+const skills: ReferenceResource = {
+  fields: async () => {
+    const [categories, functions, dispositifRows] = await Promise.all([
+      prisma.skillCategory.findMany({ orderBy: { position: 'asc' } }),
+      prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+      prisma.dispositif.findMany({ orderBy: { position: 'asc' } }),
+    ])
+
+    return [
+      nameField,
+      {
+        name: 'categoryId',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.category,
+        required: true,
+        options: rowsToOptions(categories),
+      },
+      {
+        name: 'functionId',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.jobFunction,
+        options: rowsToOptions(functions),
+        span: 'half',
+      },
+      {
+        name: 'dispositifId',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.dispositif,
+        options: rowsToOptions(dispositifRows),
+        span: 'half',
+      },
+      {
+        name: 'description',
+        kind: 'textarea',
+        label: REFERENCE_FIELD_COPY.summary,
+        maxLength: longTextMaxLength,
+      },
+    ]
+  },
+  list: async () => {
+    const rows = await prisma.skill.findMany({
+      orderBy: [{ category: { position: 'asc' } }, { position: 'asc' }],
+      include: { category: true, jobFunction: true, dispositif: true },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      label: row.name,
+      hint: row.description,
+      accent: row.category.accent,
+      badges: [
+        row.category.name,
+        ...(row.jobFunction ? [row.jobFunction.name] : []),
+        ...(row.dispositif ? [row.dispositif.name] : []),
+      ],
+      position: row.position,
+      // No consumer reads a skill yet, wired once the FSI lands
+      usage: 0,
+      values: {
+        name: row.name,
+        categoryId: row.categoryId,
+        functionId: row.functionId,
+        dispositifId: row.dispositifId,
+        description: row.description,
+      },
+    }))
+  },
+  create: async (values) => {
+    const row = await prisma.skill
+      .create({
+        data: {
+          name: readText(values, 'name') ?? '',
+          categoryId: readText(values, 'categoryId') ?? '',
+          functionId: readText(values, 'functionId'),
+          dispositifId: readText(values, 'dispositifId'),
+          description: readText(values, 'description'),
+          position: await nextPosition(prisma.skill),
+        },
+      })
+      .catch(rethrow)
+
+    return skills.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
+  },
+  update: async (id, values) => {
+    await prisma.skill
+      .update({
+        where: { id },
+        data: {
+          name: readText(values, 'name') ?? undefined,
+          categoryId: readText(values, 'categoryId') ?? undefined,
+          functionId: readText(values, 'functionId'),
+          dispositifId: readText(values, 'dispositifId'),
+          description: readText(values, 'description'),
+        },
+      })
+      .catch(rethrow)
+
+    return skills.list().then((rows) => rows.find((entry) => entry.id === id)!)
+  },
+  remove: async (id) => {
+    await prisma.skill.delete({ where: { id } })
+  },
+  reorder: (ids) =>
+    applyOrder((id, position) => prisma.skill.update({ where: { id }, data: { position } }), ids),
+}
+
+const pimStepTemplates: ReferenceResource = {
+  fields: async () => {
+    const [functions, dispositifRows] = await Promise.all([
+      prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+      prisma.dispositif.findMany({ orderBy: { position: 'asc' } }),
+    ])
+
+    return [
+      {
+        name: 'title',
+        kind: 'text',
+        label: REFERENCE_FIELD_COPY.title,
+        required: true,
+        maxLength: shortTextMaxLength,
+      },
+      {
+        name: 'stage',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.stage,
+        required: true,
+        options: toOptions(ACADEMY_STAGE_REGISTRY),
+        mark: 'dot',
+        span: 'half',
+      },
+      {
+        name: 'anchor',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.anchor,
+        required: true,
+        options: toOptions(STEP_ANCHOR_REGISTRY),
+        mark: 'dot',
+        span: 'half',
+      },
+      {
+        name: 'offset',
+        kind: 'number',
+        label: REFERENCE_FIELD_COPY.offset,
+        required: true,
+        min: ACADEMY_SETTINGS.stepOffsetMin,
+        max: ACADEMY_SETTINGS.stepOffsetMax,
+        span: 'half',
+      },
+      {
+        name: 'owner',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.owner,
+        required: true,
+        options: toOptions(STEP_OWNER_REGISTRY),
+        mark: 'dot',
+        span: 'half',
+      },
+      {
+        name: 'functionId',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.jobFunction,
+        options: rowsToOptions(functions),
+        span: 'half',
+      },
+      {
+        name: 'dispositifId',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.dispositif,
+        options: rowsToOptions(dispositifRows),
+        span: 'half',
+      },
+      {
+        name: 'description',
+        kind: 'textarea',
+        label: REFERENCE_FIELD_COPY.summary,
+        maxLength: longTextMaxLength,
+      },
+      { name: 'required', kind: 'toggle', label: REFERENCE_FIELD_COPY.mandatory },
+    ]
+  },
+  list: async () => {
+    const rows = await prisma.pimStepTemplate.findMany({
+      orderBy: [{ stage: 'asc' }, { offset: 'asc' }, { position: 'asc' }],
+      include: { jobFunction: true, dispositif: true },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      label: row.title,
+      hint: row.description,
+      accent: ACADEMY_STAGE_REGISTRY.get(row.stage).accent,
+      badges: [
+        ACADEMY_STAGE_REGISTRY.label(row.stage),
+        `${STEP_ANCHOR_REGISTRY.label(row.anchor)} ${row.offset >= 0 ? '+' : ''}${row.offset}`,
+        STEP_OWNER_REGISTRY.label(row.owner),
+        ...(row.jobFunction ? [row.jobFunction.name] : []),
+        ...(row.dispositif ? [row.dispositif.name] : []),
+        ...(row.required ? [REFERENCE_FIELD_COPY.mandatoryBadge] : []),
+      ],
+      position: row.position,
+      // No session instantiates a step from it yet, wired in the timeline phase
+      usage: 0,
+      values: {
+        title: row.title,
+        stage: row.stage,
+        anchor: row.anchor,
+        offset: row.offset,
+        owner: row.owner,
+        functionId: row.functionId,
+        dispositifId: row.dispositifId,
+        description: row.description,
+        required: row.required,
+      },
+    }))
+  },
+  create: async (values) => {
+    const row = await prisma.pimStepTemplate
+      .create({
+        data: {
+          title: readText(values, 'title') ?? '',
+          stage: (readText(values, 'stage') ?? AcademyStages.Preparation) as AcademyStageName,
+          anchor: (readText(values, 'anchor') ?? StepAnchors.Day) as StepAnchorName,
+          offset: readNumberValue(values, 'offset') ?? 0,
+          owner: (readText(values, 'owner') ?? StepOwners.Responsable) as StepOwnerName,
+          functionId: readText(values, 'functionId'),
+          dispositifId: readText(values, 'dispositifId'),
+          description: readText(values, 'description'),
+          required: readFlag(values, 'required'),
+          position: await nextPosition(prisma.pimStepTemplate),
+        },
+      })
+      .catch(rethrow)
+
+    return pimStepTemplates.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
+  },
+  update: async (id, values) => {
+    await prisma.pimStepTemplate
+      .update({
+        where: { id },
+        data: {
+          title: readText(values, 'title') ?? undefined,
+          stage: (readText(values, 'stage') ?? undefined) as AcademyStageName | undefined,
+          anchor: (readText(values, 'anchor') ?? undefined) as StepAnchorName | undefined,
+          offset: readNumberValue(values, 'offset') ?? undefined,
+          owner: (readText(values, 'owner') ?? undefined) as StepOwnerName | undefined,
+          functionId: readText(values, 'functionId'),
+          dispositifId: readText(values, 'dispositifId'),
+          description: readText(values, 'description'),
+          required: readFlag(values, 'required'),
+        },
+      })
+      .catch(rethrow)
+
+    return pimStepTemplates.list().then((rows) => rows.find((entry) => entry.id === id)!)
+  },
+  remove: async (id) => {
+    await prisma.pimStepTemplate.delete({ where: { id } })
+  },
+  reorder: (ids) =>
+    applyOrder(
+      (id, position) => prisma.pimStepTemplate.update({ where: { id }, data: { position } }),
+      ids
+    ),
+}
+
 /**
  * Reference collections by key
  * @type {Record<ReferenceKey, ReferenceResource>}
@@ -917,6 +1320,10 @@ const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
   evenements: eventTypes,
   formations: trainings,
   livecon: liveconLevels,
+  dispositifs,
+  'categories-competences': skillCategories,
+  competences: skills,
+  'etapes-pim': pimStepTemplates,
 }
 
 /**

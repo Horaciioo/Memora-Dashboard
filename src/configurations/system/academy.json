@@ -2,5 +2,7 @@
   "maxLives": 13,
   "minObjectives": 2,
   "weeksMin": 4,
-  "weeksMax": 6
+  "weeksMax": 6,
+  "stepOffsetMin": -30,
+  "stepOffsetMax": 60
 }

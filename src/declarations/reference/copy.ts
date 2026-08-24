@@ -31,6 +31,13 @@ export const REFERENCE_FIELD_COPY = {
   visibility: 'Visibilité',
   situation: 'Situation',
   guidelines: 'Consignes',
+  dispositif: 'Dispositif',
+  category: 'Catégorie',
+  title: 'Intitulé',
+  stage: 'Étape',
+  anchor: 'Ancrage',
+  offset: 'Décalage',
+  owner: 'Porteur',
 } as const
 
 /**
