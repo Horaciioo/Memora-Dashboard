@@ -32,10 +32,17 @@ export const syncRoleGrants = async (): Promise<void> => {
       (permissions ?? []).map((permission) => ({ role: role as MemberRoleName, permission }))
     )
 
-    await prisma.$transaction([
-      prisma.rolePermission.createMany({ data: rows, skipDuplicates: true }),
-      prisma.grantMigration.create({ data: { key: addition.key } }),
-    ])
+    try {
+      await prisma.$transaction([
+        prisma.rolePermission.createMany({ data: rows, skipDuplicates: true }),
+        prisma.grantMigration.create({ data: { key: addition.key } }),
+      ])
+    } catch (error) {
+      // A concurrent request already recorded this key, nothing left to apply
+      const isDuplicateKey =
+        typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002'
+      if (!isDuplicateKey) throw error
+    }
   }
 
   synced = true
