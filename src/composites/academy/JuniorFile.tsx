@@ -14,10 +14,7 @@ import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
 import { useJuniorFile } from '@/core/hooks/data/useJuniorFile'
 import { ACADEMY_COPY, ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
-import {
-  ACADEMY_JUNIOR_STATUS_REGISTRY,
-  ACADEMY_TRACK_REGISTRY,
-} from '@/declarations/academy/registries'
+import { ACADEMY_JUNIOR_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { toTone } from '@/declarations/ui/theme'
@@ -70,7 +67,6 @@ export const JuniorFile = ({
   const [pendingReview, setPendingReview] = useState<AcademyReviewView | null>(null)
 
   const { junior } = file
-  const track = ACADEMY_TRACK_REGISTRY.get(junior.track)
   const status = ACADEMY_JUNIOR_STATUS_REGISTRY.get(junior.status)
   const isReady = junior.mandatoryPending === 0
 
@@ -85,7 +81,7 @@ export const JuniorFile = ({
       <Section title={ACADEMY_COPY.fileTitle} description={ACADEMY_COPY.fileLead} padded>
         <div className="flex flex-col gap-4">
           <span className="flex flex-wrap items-center gap-2">
-            <Badge label={track.label} tone={toTone(track.accent, 'info')} />
+            <Badge label={junior.dispositif.name} tone={toTone(junior.dispositif.accent, 'info')} />
             <Badge label={status.label} tone={toTone(status.accent, 'neutral')} dot />
             <Badge
               label={isReady ? ACADEMY_COPY.ready : ACADEMY_COPY.blocked}

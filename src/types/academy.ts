@@ -6,8 +6,21 @@ import type {
   AcademyPeriodName,
   AcademyProgramName,
   AcademySessionStatusName,
-  AcademyTrackName,
 } from '@/utils/constants/hierarchy'
+
+/**
+ * Entry programme a junior is placed into
+ * @typedef {Object} JuniorDispositif
+ * @property {string} id - Dispositif identifier
+ * @property {string} name - Display name
+ * @property {string | null} accent - Colour token
+ */
+
+export interface JuniorDispositif {
+  id: string
+  name: string
+  accent: string | null
+}
 
 /**
  * Training status of one junior
@@ -63,7 +76,7 @@ export interface SessionSummary {
  * @property {string} accountId - Moderator identifier
  * @property {string} displayName - Display name
  * @property {string | null} avatarUrl - Portrait
- * @property {AcademyTrackName} track - Entry level
+ * @property {JuniorDispositif} dispositif - Entry programme
  * @property {AcademyJuniorStatusName} status - Outcome so far
  * @property {WorkPerson | null} trainer - Trainer in charge
  * @property {string} startedAt - ISO arrival date
@@ -83,7 +96,7 @@ export interface JuniorView {
   accountId: string
   displayName: string
   avatarUrl: string | null
-  track: AcademyTrackName
+  dispositif: JuniorDispositif
   status: AcademyJuniorStatusName
   trainer: WorkPerson | null
   startedAt: string
