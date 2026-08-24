@@ -10,6 +10,7 @@ import {
   ObjectiveStatuses,
   ReviewAdvices,
   ReviewStatuses,
+  TrainingStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
   AcademyStepKindName,
@@ -22,6 +23,7 @@ import type {
   ObjectiveStatusName,
   ReviewAdviceName,
   ReviewStatusName,
+  TrainingStatusName,
 } from '@/utils/constants/hierarchy'
 import type { IconName } from '@/declarations/ui/icons'
 
@@ -147,3 +149,12 @@ const REVIEW_STATUS_MAP: Record<ReviewStatusName, AcademyOption> = {
 }
 
 export const REVIEW_STATUS_REGISTRY = createRegistry(REVIEW_STATUS_MAP)
+
+const TRAINING_STATUS_MAP: Record<TrainingStatusName, AcademyOption> = {
+  [TrainingStatuses.NotStarted]: { label: 'Non commencée', accent: 'neutral' },
+  [TrainingStatuses.InProgress]: { label: 'En cours', accent: 'warning' },
+  [TrainingStatuses.Done]: { label: 'Terminée', accent: 'success' },
+  [TrainingStatuses.Abandoned]: { label: 'Abandonnée', accent: 'danger' },
+}
+
+export const TRAINING_STATUS_REGISTRY = createRegistry(TRAINING_STATUS_MAP)

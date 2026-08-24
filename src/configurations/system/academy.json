@@ -7,5 +7,7 @@
   "stepOffsetMax": 60,
   "bonusMaxLives": 4,
   "skillMaxPercent": 100,
-  "skillStep": 5
+  "skillStep": 5,
+  "trainingMinMinutes": 20,
+  "trainingMaxMinutes": 50
 }
