@@ -7,6 +7,7 @@ import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { PROFILE_FIELD_COPY } from '@/declarations/preferences/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { AccountSession, ProfileDetail } from '@/types/preferences'
+import { AcademyJuniorStatuses } from '@/utils/constants/hierarchy'
 import type { Prisma } from '@prisma/client'
 
 // Relations the read-only half of the page shows
@@ -15,6 +16,12 @@ const PROFILE_INCLUDE = {
   youtubers: true,
   primaryFunction: true,
   secondaryFunction: true,
+  academyJuniors: {
+    where: { status: AcademyJuniorStatuses.Active },
+    orderBy: { startedAt: 'desc' },
+    take: 1,
+    include: { dispositif: true },
+  },
 } satisfies Prisma.AccountInclude
 
 /**
@@ -66,7 +73,7 @@ export const readProfile = async (accountId: string): Promise<ProfileDetail> => 
     discordId: row.discordId,
     role: row.role,
     status: row.status,
-    academyPeriod: row.academyPeriod,
+    academyDispositif: row.academyJuniors[0]?.dispositif.name ?? null,
     division: row.division?.name ?? null,
     youtubers: row.youtubers.map((youtuber) => youtuber.name),
     primaryFunction: row.primaryFunction?.name ?? null,

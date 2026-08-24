@@ -13,7 +13,7 @@ export const PREFERENCES_COPY = {
   informationLead: 'Ce que tu peux corriger toi-même.',
   fileTitle: 'Ma fiche',
   fileLead: 'Ces champs sont tenus par les responsables.',
-  academyPeriod: 'Période Academy',
+  academyDispositif: 'Dispositif Academy',
   displayTitle: 'Affichage',
   displayLead: 'Ce que tu changes ici ne concerne que toi.',
   storageNotice: 'Ces réglages sont retenus par ton navigateur, pas par ton compte.',

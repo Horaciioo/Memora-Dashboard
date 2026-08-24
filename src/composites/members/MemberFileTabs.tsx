@@ -307,10 +307,10 @@ export const MemberFileTabs = ({
               {summary.youtubers.map((youtuber) => (
                 <Badge key={youtuber.id} label={youtuber.label} tone="info" icon="youtuber" />
               ))}
-              {summary.academyPeriod && (
+              {summary.academyDispositif && (
                 <Badge
-                  label={ACADEMY_PERIOD_REGISTRY.get(summary.academyPeriod).label}
-                  tone="info"
+                  label={summary.academyDispositif.label}
+                  tone={toTone(summary.academyDispositif.accent, 'info')}
                 />
               )}
             </span>

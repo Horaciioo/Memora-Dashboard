@@ -14,11 +14,7 @@ import { Section } from '@/components/structures/Section'
 import { LogoutButton } from '@/composites/auth/LogoutButton'
 import { useProfile } from '@/core/hooks/data/useProfile'
 import { dropOtherSessions } from '@/app/(dashboard)/parametres/actions'
-import {
-  ACADEMY_PERIOD_REGISTRY,
-  MEMBER_STATUS_REGISTRY,
-  ROLE_REGISTRY,
-} from '@/declarations/access/roles'
+import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/roles'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { ACCOUNT_BLOCK } from '@/declarations/ui/blocks'
 import { ACTION_COPY, FIELD_COPY, NAV_COPY } from '@/declarations/ui/copy'
@@ -115,10 +111,8 @@ export const PreferencesPanel = ({
                 value: formatDay(profile.joinedAt),
               },
               {
-                label: PREFERENCES_COPY.academyPeriod,
-                value: profile.academyPeriod
-                  ? ACADEMY_PERIOD_REGISTRY.label(profile.academyPeriod)
-                  : undefined,
+                label: PREFERENCES_COPY.academyDispositif,
+                value: profile.academyDispositif ?? undefined,
               },
             ]}
           />

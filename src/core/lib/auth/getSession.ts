@@ -28,7 +28,6 @@ export const toSessionUser = async (
     avatarUrl: account.avatarUrl,
     role: account.role,
     status: account.status,
-    academyPeriod: account.academyPeriod,
     divisionId: account.divisionId,
     youtuberIds: account.youtubers.map((youtuber) => youtuber.id),
     primaryFunctionId: account.primaryFunctionId,

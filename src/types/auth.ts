@@ -1,8 +1,4 @@
-import type {
-  AcademyPeriodName,
-  MemberRoleName,
-  MemberStatusName,
-} from '@/utils/constants/hierarchy'
+import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import type { PermissionName } from '@/utils/constants/permissions'
 
 // Permission identifier
@@ -17,7 +13,6 @@ export type Permission = PermissionName
  * @property {string | null} avatarUrl - Avatar URL
  * @property {MemberRoleName} role - Hierarchy level
  * @property {MemberStatusName} status - Membership status
- * @property {AcademyPeriodName | null} academyPeriod - Academy progression
  * @property {string | null} divisionId - Division identifier
  * @property {string[]} youtuberIds - Assigned YouTubers
  * @property {string | null} primaryFunctionId - Main function
@@ -33,7 +28,6 @@ export interface SessionUser {
   avatarUrl: string | null
   role: MemberRoleName
   status: MemberStatusName
-  academyPeriod: AcademyPeriodName | null
   divisionId: string | null
   youtuberIds: string[]
   primaryFunctionId: string | null
