@@ -4,7 +4,7 @@ import moment from 'moment'
 
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
-import { toOptions } from '@/core/lib/forms/options'
+import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import { memberOptions, toPerson } from '@/core/services/work/shared'
 import { ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
@@ -13,7 +13,6 @@ import {
   ACADEMY_JUNIOR_STATUS_REGISTRY,
   ACADEMY_PROGRAM_REGISTRY,
   ACADEMY_SESSION_STATUS_REGISTRY,
-  ACADEMY_TRACK_REGISTRY,
 } from '@/declarations/academy/registries'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import type {
@@ -29,7 +28,6 @@ import {
   AcademyJuniorStatuses,
   AcademyPrograms,
   AcademySessionStatuses,
-  AcademyTracks,
   MemberStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
@@ -37,7 +35,6 @@ import type {
   AcademyJuniorStatusName,
   AcademyProgramName,
   AcademySessionStatusName,
-  AcademyTrackName,
 } from '@/utils/constants/hierarchy'
 
 // Axes every voice check-in walks through, in the order they are asked
@@ -120,7 +117,11 @@ export const sessionFields = async (): Promise<FieldDefinition[]> => {
  */
 
 export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]> => {
-  const [candidates, trainers] = await Promise.all([juniorCandidates(sessionId), memberOptions()])
+  const [candidates, trainers, dispositifs] = await Promise.all([
+    juniorCandidates(sessionId),
+    memberOptions(),
+    prisma.dispositif.findMany({ orderBy: { position: 'asc' } }),
+  ])
 
   return [
     {
@@ -138,12 +139,11 @@ export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]
       span: 'half',
     },
     {
-      name: 'track',
+      name: 'dispositifId',
       kind: 'select',
-      label: ACADEMY_FIELD_COPY.track,
+      label: ACADEMY_FIELD_COPY.dispositif,
       required: true,
-      options: toOptions(ACADEMY_TRACK_REGISTRY),
-      mark: 'dot',
+      options: rowsToOptions(dispositifs),
       span: 'half',
     },
     {
@@ -434,7 +434,7 @@ const toJunior = (
     id: string
     sessionId: string
     accountId: string
-    track: AcademyTrackName
+    dispositifId: string
     status: AcademyJuniorStatusName
     startedAt: Date
     validatedAt: Date | null
@@ -443,6 +443,7 @@ const toJunior = (
     trainerId: string | null
     account: { displayName: string; avatarUrl: string | null }
     trainer: { id: string; displayName: string; avatarUrl: string | null } | null
+    dispositif: { id: string; name: string; accent: string | null }
     _count: { reviews: number }
   },
   trainings: {
@@ -472,7 +473,7 @@ const toJunior = (
     accountId: row.accountId,
     displayName: row.account.displayName,
     avatarUrl: row.account.avatarUrl,
-    track: row.track,
+    dispositif: row.dispositif,
     status: row.status,
     trainer: toPerson(row.trainer),
     startedAt: row.startedAt.toISOString(),
@@ -488,7 +489,7 @@ const toJunior = (
     values: {
       accountId: row.accountId,
       trainerId: row.trainerId,
-      track: row.track,
+      dispositifId: row.dispositifId,
       status: row.status,
       liveCount: row.liveCount,
       summary: row.summary,
@@ -500,6 +501,7 @@ const toJunior = (
 const JUNIOR_SHAPE = {
   account: { include: { trainingRecords: { include: { validator: true } } } },
   trainer: true,
+  dispositif: true,
   _count: { select: { reviews: true } },
 } as const
 
@@ -628,7 +630,7 @@ const toJuniorData = (values: FormValues) => {
 
   return {
     trainerId: readText(values, 'trainerId'),
-    track: (readText(values, 'track') ?? AcademyTracks.Entry) as AcademyTrackName,
+    dispositifId: readText(values, 'dispositifId') ?? '',
     status,
     // Validation stamps its own date, so the file always says when it happened
     validatedAt: status === AcademyJuniorStatuses.Validated ? new Date() : null,

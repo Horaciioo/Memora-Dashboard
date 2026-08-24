@@ -16,7 +16,6 @@ import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import {
   ACADEMY_STEP_KIND_REGISTRY,
   ACADEMY_JUNIOR_STATUS_REGISTRY,
-  ACADEMY_TRACK_REGISTRY,
 } from '@/declarations/academy/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
@@ -155,7 +154,6 @@ export const SessionPanel = ({
         <div className={LIST_STYLES.stack}>
           {session.juniors.map((junior) => {
             const status = ACADEMY_JUNIOR_STATUS_REGISTRY.get(junior.status)
-            const track = ACADEMY_TRACK_REGISTRY.get(junior.track)
 
             return (
               <div
@@ -168,7 +166,10 @@ export const SessionPanel = ({
                 <span className="flex min-w-0 flex-1 flex-col gap-1">
                   <span className="truncate font-medium">{junior.displayName}</span>
                   <span className="flex flex-wrap items-center gap-1.5">
-                    <Badge label={track.label} tone={toTone(track.accent, 'info')} />
+                    <Badge
+                      label={junior.dispositif.name}
+                      tone={toTone(junior.dispositif.accent, 'info')}
+                    />
                     <Badge label={status.label} tone={toTone(status.accent, 'neutral')} dot />
                     <span className="text-xs text-[var(--color-ink-subtle)]">
                       {junior.trainer?.name ?? ACADEMY_COPY.noTrainer}

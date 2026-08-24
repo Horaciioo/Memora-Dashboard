@@ -89,7 +89,7 @@ export const ACADEMY_FIELD_COPY = {
   trainers: 'Formateurs',
   account: 'Modérateur',
   trainer: 'Formateur référent',
-  track: 'Voie',
+  dispositif: 'Dispositif',
   juniorStatus: 'Suivi',
   liveCount: 'Lives accompagnés',
   juniorSummary: 'Remarques',
