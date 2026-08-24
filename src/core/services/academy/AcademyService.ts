@@ -833,8 +833,9 @@ const instantiateSteps = async (
   await prisma.academyStep.createMany({
     data: templates.map((template) => ({
       sessionId,
-      juniorId,
+      juniorId: juniorId ?? null,
       templateId: template.id,
+      kind: null,
       title: template.title,
       notes: template.description,
       stage: template.stage,
@@ -945,18 +946,18 @@ const toJuniorData = (values: FormValues) => {
 }
 
 /**
- * Take a moderator into a session
+ * Take a moderator into a session, instantiating their own slice of the timeline
  * @param {string} sessionId - Session identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {FormValues} values - Parsed body
- * @return {Promise<JuniorView[]>} - Juniors
+ * @return {Promise<{ juniors: JuniorView[], steps: AcademyStepView[] }>} - Juniors and the refreshed timeline
  */
 
 export const createJunior = async (
   sessionId: string,
   scope: Prisma.AcademySessionWhereInput,
   values: FormValues
-): Promise<JuniorView[]> => {
+): Promise<{ juniors: JuniorView[]; steps: AcademyStepView[] }> => {
   const session = await sessionInScope(sessionId, scope)
 
   const junior = await prisma.academyJunior.create({
@@ -975,7 +976,12 @@ export const createJunior = async (
     session.startsAt
   )
 
-  return listJuniors(sessionId, session.functionId)
+  const [juniors, steps] = await Promise.all([
+    listJuniors(sessionId, session.functionId),
+    listSteps(sessionId),
+  ])
+
+  return { juniors, steps }
 }
 
 /**
@@ -1212,11 +1218,13 @@ export const setStepValidated = async (
     where: { id, session: scope },
     include: { junior: true, template: true },
   })
-  if (!step || step.juniorId === null || step.stage === null) throw notFound()
+  if (!step || step.stage === null) throw notFound()
 
   if (validated) {
     const earlier = await prisma.academyStep.findMany({
       where: {
+        // A session-wide step (no junior yet) is only blocked by its own session-wide siblings
+        sessionId: step.sessionId,
         juniorId: step.juniorId,
         stage: step.stage,
         id: { not: id },

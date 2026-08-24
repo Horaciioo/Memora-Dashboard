@@ -138,11 +138,18 @@ export const useSession = (
   const addJunior = useCallback(
     async (values: FormValues) => {
       const next = await run(
-        () => apiPost<JuniorView[]>(API_ROUTES.sessionJuniors(sessionId), values),
+        () =>
+          apiPost<{ juniors: JuniorView[]; steps: AcademyStepView[] }>(
+            API_ROUTES.sessionJuniors(sessionId),
+            values
+          ),
         feedbackTitle('Junior', 'created', 'masculine')
       )
 
-      if (next) setJuniors(next)
+      if (next) {
+        setJuniors(next.juniors)
+        setSteps(next.steps)
+      }
 
       return next !== null
     },
