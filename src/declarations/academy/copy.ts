@@ -111,6 +111,22 @@ export const ACADEMY_COPY = {
   objectiveSeeReviews: 'Voir les bilans',
   objectiveDeleteTitle: 'Supprimer cet objectif ?',
   objectiveDeleteDescription: 'Il disparaît de la FSI.',
+  myTrainingsTitle: 'Mes formations',
+  myTrainingsLead: 'Les formations de ta fonction et de ton dispositif, à ton rythme.',
+  myTrainingsNoFsiTitle: 'Aucune FSI active',
+  myTrainingsNoFsiDescription: 'Les formations apparaissent une fois ton suivi commencé.',
+  myTrainingsEmptyTitle: 'Aucune formation',
+  myTrainingsEmptyDescription: 'Rien n’est encore déclaré pour ta fonction et ton dispositif.',
+  trainingStart: 'Démarrer',
+  trainingResume: 'Reprendre',
+  trainingRestart: 'Recommencer',
+  trainingAbandon: 'Abandonner',
+  trainingComplete: 'Terminer',
+  trainingAttempts: 'tentatives',
+  trainingAttemptsOne: 'tentative',
+  trainingDurationUnit: 'min',
+  trainingContentTitle: 'Contenu',
+  trainingContentLead: 'Le déroulé de chaque formation arrive avec le module de contenu.',
 } as const
 
 /**
