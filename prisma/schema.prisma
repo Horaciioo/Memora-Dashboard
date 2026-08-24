@@ -185,6 +185,7 @@ model Account {
   academyTrainees     AcademyJunior[]     @relation("AcademyJuniorTrainer")
   academySeats        AcademySessionTrainer[] @relation("AcademyTrainer")
   academySteps        AcademyStep[]      @relation("AcademyStepAuthor")
+  academyStepsValidated AcademyStep[]    @relation("AcademyStepValidator")
   academyReviews      AcademyReview[]     @relation("AcademyReviewAuthor")
   academyReviewsDecided AcademyReview[]   @relation("AcademyReviewDecider")
   juniorSkillsGraded  JuniorSkill[]       @relation("JuniorSkillValidator")
@@ -691,6 +692,7 @@ model PimStepTemplate {
 
   jobFunction JobFunction? @relation(fields: [functionId], references: [id], onDelete: Cascade)
   dispositif  Dispositif?  @relation(fields: [dispositifId], references: [id], onDelete: Cascade)
+  steps       AcademyStep[]
 
   @@unique([title, functionId, dispositifId])
   @@index([functionId, dispositifId])
@@ -864,26 +866,37 @@ model JuniorObjective {
   @@map("junior_objectives")
 }
 
-// Moment planned or held on the session thread
+// Free moment logged on the session thread, or a PIMT template instantiated onto a junior's timeline
 model AcademyStep {
-  id          String           @id @default(cuid())
-  sessionId   String
-  juniorId    String?
-  authorId    String?
-  kind        AcademyStepKind
-  title       String
-  scheduledAt DateTime
-  doneAt      DateTime?
-  notes       String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id            String           @id @default(cuid())
+  sessionId     String
+  juniorId      String?
+  authorId      String?
+  templateId    String?
+  kind          AcademyStepKind?
+  title         String
+  scheduledAt   DateTime?
+  doneAt        DateTime?
+  notes         String?
+  stage         AcademyStage?
+  anchor        StepAnchor?
+  offset        Int?
+  owner         StepOwner?
+  required      Boolean          @default(false)
+  validatedById String?
+  validatedAt   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
-  session AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  junior  AcademyJunior? @relation(fields: [juniorId], references: [id], onDelete: Cascade)
-  author  Account?       @relation("AcademyStepAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  session   AcademySession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  junior    AcademyJunior?   @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  author    Account?         @relation("AcademyStepAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  template  PimStepTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  validator Account?         @relation("AcademyStepValidator", fields: [validatedById], references: [id], onDelete: SetNull)
 
   @@index([sessionId, scheduledAt])
   @@index([kind])
+  @@index([juniorId, stage])
   @@map("academy_steps")
 }
 
