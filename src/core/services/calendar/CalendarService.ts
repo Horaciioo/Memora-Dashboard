@@ -5,6 +5,7 @@ import { forbidden, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readText } from '@/core/lib/forms/values'
 import { projectOptions, youtuberOptions } from '@/core/services/work/shared'
+import { ACADEMY_STAGE_REGISTRY } from '@/declarations/academy/registries'
 import { CALENDAR_FIELD_COPY } from '@/declarations/calendar/copy'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
@@ -12,6 +13,7 @@ import { FORM_GROUPS } from '@/declarations/ui/copy'
 import type { PermissionHelpers } from '@/types/auth'
 import type { CalendarEntry } from '@/types/calendar'
 import type { FieldDefinition, FormValues } from '@/types/forms'
+import type { AcademyStageName } from '@/utils/constants/hierarchy'
 import { EventVisibilities } from '@/utils/constants/workflow'
 import type { EventVisibilityName } from '@/utils/constants/workflow'
 
@@ -149,6 +151,7 @@ const toEntry = (row: {
   endsAt: row.endsAt?.toISOString() ?? null,
   allDay: row.allDay,
   ownerName: row.owner?.displayName ?? null,
+  readOnly: false,
   values: {
     title: row.title,
     typeId: row.typeId,
@@ -166,12 +169,46 @@ const toEntry = (row: {
 const ENTRY_SHAPE = { type: true, owner: true } as const
 
 /**
+ * Project a dated timeline step as a read-only calendar entry, never copied into CalendarEvent
+ * @param {object} row - Step row with its stage and junior
+ * @return {CalendarEntry} - Projected entry
+ */
+
+const toProjectedEntry = (row: {
+  id: string
+  title: string
+  notes: string | null
+  stage: AcademyStageName | null
+  scheduledAt: Date | null
+  junior: { account: { displayName: string } } | null
+}): CalendarEntry => {
+  const stage = row.stage ? ACADEMY_STAGE_REGISTRY.get(row.stage) : null
+
+  return {
+    id: `step:${row.id}`,
+    title: row.junior ? `${row.title} — ${row.junior.account.displayName}` : row.title,
+    description: row.notes,
+    typeId: null,
+    typeName: stage?.label ?? null,
+    accent: stage?.accent ?? null,
+    visibility: EventVisibilities.Everyone,
+    startsAt: (row.scheduledAt ?? new Date()).toISOString(),
+    endsAt: null,
+    allDay: true,
+    ownerName: null,
+    readOnly: true,
+    values: {},
+  }
+}
+
+/**
  * Read the entries of one window, filtered down to what the member may see
  * @param {Object} input - Read context
  * @param {Date} input.from - First moment shown
  * @param {Date} input.to - Last moment shown
  * @param {string} input.viewerId - Signed-in member identifier
  * @param {PermissionHelpers} input.access - Permission helpers
+ * @param {string} [input.sessionId] - Bounds the window to one academy session
  * @return {Promise<CalendarEntry[]>} - Visible entries
  */
 
@@ -180,17 +217,20 @@ export const listEntries = async ({
   to,
   viewerId,
   access,
+  sessionId,
 }: {
   from: Date
   to: Date
   viewerId: string
   access: PermissionHelpers
+  sessionId?: string
 }): Promise<CalendarEntry[]> => {
   const levels = allowedVisibilities(access)
 
   const rows = await prisma.calendarEvent.findMany({
     where: {
       startsAt: { gte: from, lte: to },
+      ...(sessionId ? { sessionId } : {}),
       OR: [
         // Someone always sees what they posted themselves
         { ownerId: viewerId },
@@ -203,7 +243,18 @@ export const listEntries = async ({
     orderBy: { startsAt: 'asc' },
   })
 
-  return rows.map(toEntry)
+  const entries = rows.map(toEntry)
+  if (!sessionId) return entries
+
+  const steps = await prisma.academyStep.findMany({
+    where: { sessionId, scheduledAt: { gte: from, lte: to } },
+    include: { junior: { include: { account: true } } },
+    orderBy: { scheduledAt: 'asc' },
+  })
+
+  return [...entries, ...steps.map(toProjectedEntry)].sort((a, b) =>
+    a.startsAt.localeCompare(b.startsAt)
+  )
 }
 
 /**

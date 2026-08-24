@@ -13,6 +13,7 @@ export const GET = createProtectedRoute({
       to: new Date(query.get('fin') ?? ''),
       viewerId: session.id,
       access,
+      sessionId: query.get('session') ?? undefined,
     }),
 })
 

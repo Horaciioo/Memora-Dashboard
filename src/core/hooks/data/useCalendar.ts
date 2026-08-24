@@ -40,12 +40,16 @@ export interface CalendarCollection {
 }
 
 /**
- * Drive the shared calendar
+ * Drive the shared calendar, or one session's own window
  * @param {CalendarEntry[]} initialEntries - Entries resolved server-side
+ * @param {string} [sessionId] - Bounds every window read to one academy session
  * @return {CalendarCollection} - State and mutations
  */
 
-export const useCalendar = (initialEntries: CalendarEntry[]): CalendarCollection => {
+export const useCalendar = (
+  initialEntries: CalendarEntry[],
+  sessionId?: string
+): CalendarCollection => {
   const [entries, setEntries] = useState(initialEntries)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
@@ -107,11 +111,16 @@ export const useCalendar = (initialEntries: CalendarEntry[]): CalendarCollection
     [entries, replace, run]
   )
 
-  const load = useCallback(async (from: string, to: string) => {
-    // A window read never raises a toast, the grid simply refills
-    const next = await apiGet<CalendarEntry[]>(API_ROUTES.calendar(from, to)).catch(() => null)
-    if (next) setEntries(next)
-  }, [])
+  const load = useCallback(
+    async (from: string, to: string) => {
+      // A window read never raises a toast, the grid simply refills
+      const next = await apiGet<CalendarEntry[]>(API_ROUTES.calendar(from, to, sessionId)).catch(
+        () => null
+      )
+      if (next) setEntries(next)
+    },
+    [sessionId]
+  )
 
   const remove = useCallback(
     async (id: string) => {
