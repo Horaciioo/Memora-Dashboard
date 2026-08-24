@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { JuniorFile } from '@/composites/academy/JuniorFile'
+import { academyScope } from '@/core/services/academy/AcademyScope'
 import {
   ACADEMY_REVIEW_AXES,
   REVIEW_FIELDS,
@@ -11,7 +12,6 @@ import {
 } from '@/core/services/academy/AcademyService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
-import { ACADEMY_PROGRAM_REGISTRY } from '@/declarations/academy/registries'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 import { formatDay } from '@/utils/format/dates'
@@ -29,9 +29,10 @@ export async function generateMetadata({
   params: Promise<{ juniorId: string }>
 }): Promise<Metadata> {
   const { juniorId } = await params
+  const { session, access } = await requirePermission(Permissions.AcademyRead)
 
   try {
-    const { junior } = await readJunior(juniorId)
+    const { junior } = await readJunior(juniorId, academyScope(session, access))
 
     return { title: junior.displayName }
   } catch {
@@ -48,24 +49,25 @@ export async function generateMetadata({
 
 export default async function JuniorPage({ params }: { params: Promise<{ juniorId: string }> }) {
   const { juniorId } = await params
-  const { access } = await requirePermission(Permissions.AcademyRead)
+  const { session, access } = await requirePermission(Permissions.AcademyRead)
+  const scope = academyScope(session, access)
 
-  const found = await readJunior(juniorId).catch(() => null)
+  const found = await readJunior(juniorId, scope).catch(() => null)
   if (!found) notFound()
 
   const canReadReviews = access.can(Permissions.AcademyReviewRead)
 
   const [fields, reviews] = await Promise.all([
     juniorFields(found.junior.sessionId),
-    canReadReviews ? listReviews(juniorId) : Promise.resolve([]),
+    canReadReviews ? listReviews(juniorId, scope) : Promise.resolve([]),
   ])
 
-  const program = ACADEMY_PROGRAM_REGISTRY.get(found.session.program)
+  const jobFunction = found.session.function
 
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader
-        eyebrow={`${program.label} • ${formatDay(found.session.startsAt)}`}
+        eyebrow={`${jobFunction.name} • ${formatDay(found.session.startsAt)}`}
         title={found.junior.displayName}
       />
       <JuniorFile

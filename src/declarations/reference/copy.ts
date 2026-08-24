@@ -21,7 +21,6 @@ export const REFERENCE_FIELD_COPY = {
   defaultBadge: 'Par défaut',
   terminalBadge: 'Fin',
   weight: 'Poids',
-  program: 'Programme',
   period: 'Période',
   jobFunction: 'Fonction',
   mandatory: 'Obligatoire',

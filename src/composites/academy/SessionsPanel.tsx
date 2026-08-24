@@ -12,10 +12,7 @@ import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
 import { useSessions } from '@/core/hooks/data/useAcademy'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
-import {
-  ACADEMY_PROGRAM_REGISTRY,
-  ACADEMY_SESSION_STATUS_REGISTRY,
-} from '@/declarations/academy/registries'
+import { ACADEMY_SESSION_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { toTone } from '@/declarations/ui/theme'
@@ -99,21 +96,21 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
         ) : (
           <div className={LIST_STYLES.grid}>
             {sessions.map((session) => {
-              const program = ACADEMY_PROGRAM_REGISTRY.get(session.program)
+              const jobFunction = session.function
               const status = ACADEMY_SESSION_STATUS_REGISTRY.get(session.status)
 
               return (
                 <article
                   key={session.id}
                   onClick={() => router.push(ROUTES.session(session.id))}
-                  onContextMenu={contextMenu(sessionMenu(session), program.label)}
+                  onContextMenu={contextMenu(sessionMenu(session), jobFunction.name)}
                   className={cn(LIST_STYLES.card, LIST_STYLES.cardClickable)}
                 >
                   <header className="flex flex-wrap items-center gap-2">
                     <Badge
-                      label={program.label}
-                      tone={toTone(program.accent, 'brand')}
-                      icon={program.icon}
+                      label={jobFunction.name}
+                      tone={toTone(jobFunction.accent, 'brand')}
+                      dot
                     />
                     <span className="text-sm font-bold">{formatDay(session.startsAt)}</span>
                     <Badge
@@ -123,7 +120,9 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
                       className="ml-auto"
                     />
                   </header>
-                  <p className="text-xs text-[var(--color-ink-subtle)]">{program.summary}</p>
+                  {jobFunction.summary && (
+                    <p className="text-xs text-[var(--color-ink-subtle)]">{jobFunction.summary}</p>
+                  )}
                   <footer className="flex items-center justify-between gap-2">
                     {session.trainers.length > 0 ? (
                       <AvatarStack people={session.trainers} />

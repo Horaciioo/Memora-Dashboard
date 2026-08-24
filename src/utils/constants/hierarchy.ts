@@ -38,28 +38,16 @@ export const AcademyPeriods = {
 export type AcademyPeriodName = (typeof AcademyPeriods)[keyof typeof AcademyPeriods]
 
 /**
- * Training programmes a session runs
- * @type {Record<string, string>}
- */
-
-export const AcademyPrograms = {
-  Twitch: 'PIMT',
-  Youtube: 'PIMY',
-  Discord: 'PIMD',
-  Polyvalent: 'PIMP',
-} as const
-
-export type AcademyProgramName = (typeof AcademyPrograms)[keyof typeof AcademyPrograms]
-
-/**
  * Lifecycle of a session
  * @type {Record<string, string>}
  */
 
 export const AcademySessionStatuses = {
-  Planned: 'PLANNED',
+  Draft: 'DRAFT',
+  Open: 'OPEN',
   Running: 'RUNNING',
   Closed: 'CLOSED',
+  Archived: 'ARCHIVED',
 } as const
 
 export type AcademySessionStatusName =

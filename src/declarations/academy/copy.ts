@@ -80,7 +80,7 @@ export const ACADEMY_COPY = {
  */
 
 export const ACADEMY_FIELD_COPY = {
-  program: 'Programme',
+  function: 'Fonction',
   startsAt: 'Date de début',
   endsAt: 'Date de fin',
   endsAtHint: 'Laissée vide, elle est posée sur la durée la plus courte prévue.',

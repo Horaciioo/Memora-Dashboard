@@ -11,7 +11,6 @@ import { ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
 import {
   ACADEMY_STEP_KIND_REGISTRY,
   ACADEMY_JUNIOR_STATUS_REGISTRY,
-  ACADEMY_PROGRAM_REGISTRY,
   ACADEMY_SESSION_STATUS_REGISTRY,
 } from '@/declarations/academy/registries'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
@@ -26,16 +25,15 @@ import type {
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import {
   AcademyJuniorStatuses,
-  AcademyPrograms,
   AcademySessionStatuses,
   MemberStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
   AcademyStepKindName,
   AcademyJuniorStatusName,
-  AcademyProgramName,
   AcademySessionStatusName,
 } from '@/utils/constants/hierarchy'
+import type { Prisma } from '@prisma/client'
 
 // Axes every voice check-in walks through, in the order they are asked
 const REVIEW_AXES = [
@@ -60,15 +58,18 @@ export const ACADEMY_REVIEW_AXES = REVIEW_AXES
  */
 
 export const sessionFields = async (): Promise<FieldDefinition[]> => {
-  const members = await memberOptions()
+  const [members, functions] = await Promise.all([
+    memberOptions(),
+    prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+  ])
 
   return [
     {
-      name: 'program',
+      name: 'functionId',
       kind: 'select',
-      label: ACADEMY_FIELD_COPY.program,
+      label: ACADEMY_FIELD_COPY.function,
       required: true,
-      options: toOptions(ACADEMY_PROGRAM_REGISTRY),
+      options: rowsToOptions(functions),
       mark: 'dot',
       span: 'half',
     },
@@ -298,16 +299,17 @@ export const juniorCandidates = async (sessionId: string): Promise<FieldOption[]
 
 const toSummary = (row: {
   id: string
-  program: AcademyProgramName
+  functionId: string
   startsAt: Date
   endsAt: Date | null
   status: AcademySessionStatusName
   summary: string | null
+  jobFunction: { id: string; name: string; summary: string | null; accent: string | null }
   trainers: { account: { id: string; displayName: string; avatarUrl: string | null } }[]
   _count: { juniors: number }
 }): SessionSummary => ({
   id: row.id,
-  program: row.program,
+  function: row.jobFunction,
   startsAt: row.startsAt.toISOString(),
   endsAt: row.endsAt?.toISOString() ?? null,
   status: row.status,
@@ -315,7 +317,7 @@ const toSummary = (row: {
   trainers: row.trainers.map((seat) => toPerson(seat.account)).filter((person) => person !== null),
   juniorCount: row._count.juniors,
   values: {
-    program: row.program,
+    functionId: row.functionId,
     status: row.status,
     startsAt: row.startsAt.toISOString().slice(0, 10),
     endsAt: row.endsAt ? row.endsAt.toISOString().slice(0, 10) : null,
@@ -326,17 +328,22 @@ const toSummary = (row: {
 
 // Everything a session row needs to become a summary
 const SESSION_SHAPE = {
+  jobFunction: true,
   trainers: { include: { account: true } },
   _count: { select: { juniors: true } },
 } as const
 
 /**
- * Read every session, newest first
+ * Read every session within scope, newest first, archived sessions left out
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<SessionSummary[]>} - Sessions
  */
 
-export const listSessions = async (): Promise<SessionSummary[]> => {
+export const listSessions = async (
+  scope: Prisma.AcademySessionWhereInput
+): Promise<SessionSummary[]> => {
   const rows = await prisma.academySession.findMany({
+    where: { ...scope, status: { not: AcademySessionStatuses.Archived } },
     include: SESSION_SHAPE,
     orderBy: { startsAt: 'desc' },
   })
@@ -363,14 +370,28 @@ const toSessionData = (values: FormValues) => {
   const startsAt = readDate(values, 'startsAt') ?? new Date()
 
   return {
-    program: (readText(values, 'program') ?? AcademyPrograms.Polyvalent) as AcademyProgramName,
+    functionId: readText(values, 'functionId') ?? '',
     status: (readText(values, 'status') ??
-      AcademySessionStatuses.Planned) as AcademySessionStatusName,
+      AcademySessionStatuses.Draft) as AcademySessionStatusName,
     startsAt,
     // An unset end date lands on the shortest run the settings allow
     endsAt: readDate(values, 'endsAt') ?? proposedEnd(startsAt),
     summary: readText(values, 'summary'),
   }
+}
+
+/**
+ * Load a session inside scope or fail
+ * @param {string} id - Session identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<{ id: string, functionId: string }>} - Session row
+ */
+
+const sessionInScope = async (id: string, scope: Prisma.AcademySessionWhereInput) => {
+  const row = await prisma.academySession.findFirst({ where: { id, ...scope } })
+  if (!row) throw notFound()
+
+  return row
 }
 
 /**
@@ -387,17 +408,24 @@ export const createSession = async (values: FormValues): Promise<SessionSummary[
     },
   })
 
-  return listSessions()
+  return listSessions({})
 }
 
 /**
  * Edit a session
  * @param {string} id - Session identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {FormValues} values - Parsed body
  * @return {Promise<SessionSummary[]>} - Sessions
  */
 
-export const updateSession = async (id: string, values: FormValues): Promise<SessionSummary[]> => {
+export const updateSession = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput,
+  values: FormValues
+): Promise<SessionSummary[]> => {
+  await sessionInScope(id, scope)
+
   // The trainer seats are replaced wholesale, the form always sends the full list
   await prisma.$transaction([
     prisma.academySession.update({ where: { id }, data: toSessionData(values) }),
@@ -407,19 +435,24 @@ export const updateSession = async (id: string, values: FormValues): Promise<Ses
     }),
   ])
 
-  return listSessions()
+  return listSessions(scope)
 }
 
 /**
  * Close and drop a session
  * @param {string} id - Session identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<SessionSummary[]>} - Sessions
  */
 
-export const removeSession = async (id: string): Promise<SessionSummary[]> => {
+export const removeSession = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<SessionSummary[]> => {
+  await sessionInScope(id, scope)
   await prisma.academySession.delete({ where: { id } })
 
-  return listSessions()
+  return listSessions(scope)
 }
 
 /**
@@ -506,41 +539,47 @@ const JUNIOR_SHAPE = {
 } as const
 
 /**
- * Read the trainings a programme covers, the shared ones always included
- * @param {AcademyProgramName} program - Training programme
+ * Read the trainings a function covers, the shared ones always included
+ * @param {string} functionId - Function identifier
+ * @param {string} [dispositifId] - Dispositif identifier, every dispositif when omitted
  * @return {Promise<object[]>} - Trainings in display order
  */
 
-const programTrainings = (program: AcademyProgramName) =>
+const sessionTrainings = (functionId: string, dispositifId?: string | null) =>
   prisma.training.findMany({
-    where: { OR: [{ program: null }, { program }] },
+    where: {
+      OR: [{ functionId: null }, { functionId }],
+      ...(dispositifId !== undefined
+        ? { AND: [{ OR: [{ dispositifId: null }, { dispositifId }] }] }
+        : {}),
+    },
     orderBy: [{ period: 'asc' }, { position: 'asc' }],
   })
 
 /**
  * Read every junior of a session
  * @param {string} sessionId - Session identifier
- * @param {AcademyProgramName} program - Training programme
+ * @param {string} functionId - Function identifier
  * @return {Promise<JuniorView[]>} - Juniors
  */
 
-export const listJuniors = async (
-  sessionId: string,
-  program: AcademyProgramName
-): Promise<JuniorView[]> => {
+export const listJuniors = async (sessionId: string, functionId: string): Promise<JuniorView[]> => {
   const [rows, trainings] = await Promise.all([
     prisma.academyJunior.findMany({
       where: { sessionId },
       include: JUNIOR_SHAPE,
       orderBy: [{ status: 'asc' }, { startedAt: 'asc' }],
     }),
-    programTrainings(program),
+    sessionTrainings(functionId),
   ])
 
   return rows.map((row) =>
     toJunior(
       row,
-      trainings,
+      // Each junior keeps only the trainings open to their own dispositif
+      trainings.filter(
+        (training) => training.dispositifId === null || training.dispositifId === row.dispositifId
+      ),
       new Map(row.account.trainingRecords.map((record) => [record.trainingId, record]))
     )
   )
@@ -604,16 +643,23 @@ export const listSteps = async (sessionId: string): Promise<AcademyStepView[]> =
 }
 
 /**
- * Read one whole session
+ * Read one whole session within scope
  * @param {string} id - Session identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<SessionDetail>} - Session detail
  */
 
-export const readSession = async (id: string): Promise<SessionDetail> => {
-  const row = await prisma.academySession.findUnique({ where: { id }, include: SESSION_SHAPE })
+export const readSession = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<SessionDetail> => {
+  const row = await prisma.academySession.findFirst({
+    where: { id, ...scope },
+    include: SESSION_SHAPE,
+  })
   if (!row) throw notFound()
 
-  const [juniors, steps] = await Promise.all([listJuniors(id, row.program), listSteps(id)])
+  const [juniors, steps] = await Promise.all([listJuniors(id, row.functionId), listSteps(id)])
 
   return { summary: toSummary(row), juniors, steps }
 }
@@ -642,16 +688,18 @@ const toJuniorData = (values: FormValues) => {
 /**
  * Take a moderator into a session
  * @param {string} sessionId - Session identifier
- * @param {AcademyProgramName} program - Training programme
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {FormValues} values - Parsed body
  * @return {Promise<JuniorView[]>} - Juniors
  */
 
 export const createJunior = async (
   sessionId: string,
-  program: AcademyProgramName,
+  scope: Prisma.AcademySessionWhereInput,
   values: FormValues
 ): Promise<JuniorView[]> => {
+  const session = await sessionInScope(sessionId, scope)
+
   await prisma.academyJunior.create({
     data: {
       sessionId,
@@ -660,17 +708,41 @@ export const createJunior = async (
     },
   })
 
-  return listJuniors(sessionId, program)
+  return listJuniors(sessionId, session.functionId)
+}
+
+/**
+ * Load a junior inside scope or fail
+ * @param {string} id - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<{ id: string, sessionId: string, accountId: string, session: { functionId: string } }>} - Junior row
+ */
+
+const juniorInScope = async (id: string, scope: Prisma.AcademySessionWhereInput) => {
+  const row = await prisma.academyJunior.findFirst({
+    where: { id, session: scope },
+    include: { session: true },
+  })
+  if (!row) throw notFound()
+
+  return row
 }
 
 /**
  * Edit the follow-up of a junior
  * @param {string} id - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {FormValues} values - Parsed body
  * @return {Promise<JuniorView[]>} - Juniors
  */
 
-export const updateJunior = async (id: string, values: FormValues): Promise<JuniorView[]> => {
+export const updateJunior = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput,
+  values: FormValues
+): Promise<JuniorView[]> => {
+  await juniorInScope(id, scope)
+
   const row = await prisma.academyJunior.update({
     where: { id },
     data: toJuniorData(values),
@@ -681,28 +753,35 @@ export const updateJunior = async (id: string, values: FormValues): Promise<Juni
   if (row.status === AcademyJuniorStatuses.Validated) {
     await prisma.account.update({
       where: { id: row.accountId },
-      data: { status: MemberStatuses.Active, academyPeriod: null },
+      data: { status: MemberStatuses.Active },
     })
   }
 
-  return listJuniors(row.sessionId, row.session.program)
+  return listJuniors(row.sessionId, row.session.functionId)
 }
 
 /**
  * Take a junior out of a session
  * @param {string} id - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<JuniorView[]>} - Juniors
  */
 
-export const removeJunior = async (id: string): Promise<JuniorView[]> => {
+export const removeJunior = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<JuniorView[]> => {
+  await juniorInScope(id, scope)
+
   const row = await prisma.academyJunior.delete({ where: { id }, include: { session: true } })
 
-  return listJuniors(row.sessionId, row.session.program)
+  return listJuniors(row.sessionId, row.session.functionId)
 }
 
 /**
  * Validate or revoke one training of a junior
  * @param {string} juniorId - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {string} trainingId - Training identifier
  * @param {boolean} validated - Wanted state
  * @param {string} validatorId - Who validated it
@@ -711,16 +790,12 @@ export const removeJunior = async (id: string): Promise<JuniorView[]> => {
 
 export const setTrainingRecord = async (
   juniorId: string,
+  scope: Prisma.AcademySessionWhereInput,
   trainingId: string,
   validated: boolean,
   validatorId: string
 ): Promise<JuniorView[]> => {
-  const junior = await prisma.academyJunior.findUnique({
-    where: { id: juniorId },
-    include: { session: true },
-  })
-
-  if (!junior) throw notFound()
+  const junior = await juniorInScope(juniorId, scope)
 
   await prisma.trainingRecord.upsert({
     where: { trainingId_accountId: { trainingId, accountId: junior.accountId } },
@@ -736,7 +811,7 @@ export const setTrainingRecord = async (
     },
   })
 
-  return listJuniors(junior.sessionId, junior.session.program)
+  return listJuniors(junior.sessionId, junior.session.functionId)
 }
 
 /**
@@ -754,8 +829,23 @@ const toStepData = (values: FormValues) => ({
 })
 
 /**
+ * Load a step inside scope or fail
+ * @param {string} id - Step identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<{ id: string, sessionId: string }>} - Step row
+ */
+
+const stepInScope = async (id: string, scope: Prisma.AcademySessionWhereInput) => {
+  const row = await prisma.academyStep.findFirst({ where: { id, session: scope } })
+  if (!row) throw notFound()
+
+  return row
+}
+
+/**
  * Note a moment on the session thread
  * @param {string} sessionId - Session identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {string} authorId - Who records it
  * @param {FormValues} values - Parsed body
  * @return {Promise<AcademyStepView[]>} - Moments
@@ -763,9 +853,11 @@ const toStepData = (values: FormValues) => ({
 
 export const createStep = async (
   sessionId: string,
+  scope: Prisma.AcademySessionWhereInput,
   authorId: string,
   values: FormValues
 ): Promise<AcademyStepView[]> => {
+  await sessionInScope(sessionId, scope)
   await prisma.academyStep.create({ data: { sessionId, authorId, ...toStepData(values) } })
 
   return listSteps(sessionId)
@@ -774,11 +866,18 @@ export const createStep = async (
 /**
  * Edit a moment
  * @param {string} id - Step identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {FormValues} values - Parsed body
  * @return {Promise<AcademyStepView[]>} - Moments
  */
 
-export const updateStep = async (id: string, values: FormValues): Promise<AcademyStepView[]> => {
+export const updateStep = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput,
+  values: FormValues
+): Promise<AcademyStepView[]> => {
+  await stepInScope(id, scope)
+
   const row = await prisma.academyStep.update({ where: { id }, data: toStepData(values) })
 
   return listSteps(row.sessionId)
@@ -787,11 +886,18 @@ export const updateStep = async (id: string, values: FormValues): Promise<Academ
 /**
  * Flip a moment between planned and held
  * @param {string} id - Step identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {boolean} done - Wanted state
  * @return {Promise<AcademyStepView[]>} - Moments
  */
 
-export const setStepDone = async (id: string, done: boolean): Promise<AcademyStepView[]> => {
+export const setStepDone = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput,
+  done: boolean
+): Promise<AcademyStepView[]> => {
+  await stepInScope(id, scope)
+
   const row = await prisma.academyStep.update({
     where: { id },
     data: { doneAt: done ? new Date() : null },
@@ -803,10 +909,16 @@ export const setStepDone = async (id: string, done: boolean): Promise<AcademySte
 /**
  * Drop a moment
  * @param {string} id - Step identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<AcademyStepView[]>} - Moments
  */
 
-export const removeStep = async (id: string): Promise<AcademyStepView[]> => {
+export const removeStep = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<AcademyStepView[]> => {
+  await stepInScope(id, scope)
+
   const row = await prisma.academyStep.delete({ where: { id } })
 
   return listSteps(row.sessionId)
@@ -856,12 +968,18 @@ const toReview = (row: {
 }
 
 /**
- * Read the voice check-ins of a junior
+ * Read the voice check-ins of a junior within scope
  * @param {string} juniorId - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<AcademyReviewView[]>} - Reviews, newest first
  */
 
-export const listReviews = async (juniorId: string): Promise<AcademyReviewView[]> => {
+export const listReviews = async (
+  juniorId: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<AcademyReviewView[]> => {
+  await juniorInScope(juniorId, scope)
+
   const rows = await prisma.academyReview.findMany({
     where: { juniorId },
     include: { author: true },
@@ -893,6 +1011,7 @@ const toReviewData = (values: FormValues) => ({
 /**
  * Write the trace of a voice check-in
  * @param {string} juniorId - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {string} authorId - Who held it
  * @param {FormValues} values - Parsed body
  * @return {Promise<AcademyReviewView[]>} - Reviews
@@ -900,59 +1019,87 @@ const toReviewData = (values: FormValues) => ({
 
 export const createReview = async (
   juniorId: string,
+  scope: Prisma.AcademySessionWhereInput,
   authorId: string,
   values: FormValues
 ): Promise<AcademyReviewView[]> => {
+  await juniorInScope(juniorId, scope)
   await prisma.academyReview.create({ data: { juniorId, authorId, ...toReviewData(values) } })
 
-  return listReviews(juniorId)
+  return listReviews(juniorId, scope)
+}
+
+/**
+ * Load a review inside scope or fail
+ * @param {string} id - Review identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<{ id: string, juniorId: string }>} - Review row
+ */
+
+const reviewInScope = async (id: string, scope: Prisma.AcademySessionWhereInput) => {
+  const row = await prisma.academyReview.findFirst({ where: { id, junior: { session: scope } } })
+  if (!row) throw notFound()
+
+  return row
 }
 
 /**
  * Edit the trace of a voice check-in
  * @param {string} id - Review identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {FormValues} values - Parsed body
  * @return {Promise<AcademyReviewView[]>} - Reviews
  */
 
 export const updateReview = async (
   id: string,
+  scope: Prisma.AcademySessionWhereInput,
   values: FormValues
 ): Promise<AcademyReviewView[]> => {
+  await reviewInScope(id, scope)
+
   const row = await prisma.academyReview.update({ where: { id }, data: toReviewData(values) })
 
-  return listReviews(row.juniorId)
+  return listReviews(row.juniorId, scope)
 }
 
 /**
  * Drop the trace of a voice check-in
  * @param {string} id - Review identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<AcademyReviewView[]>} - Reviews
  */
 
-export const removeReview = async (id: string): Promise<AcademyReviewView[]> => {
+export const removeReview = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<AcademyReviewView[]> => {
+  await reviewInScope(id, scope)
+
   const row = await prisma.academyReview.delete({ where: { id } })
 
-  return listReviews(row.juniorId)
+  return listReviews(row.juniorId, scope)
 }
 
 /**
  * Read one junior on their own, for the individual follow-up file
  * @param {string} id - Junior identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<{ junior: JuniorView, session: SessionSummary }>} - Junior and its session
  */
 
 export const readJunior = async (
-  id: string
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
 ): Promise<{ junior: JuniorView; session: SessionSummary }> => {
-  const row = await prisma.academyJunior.findUnique({
-    where: { id },
+  const row = await prisma.academyJunior.findFirst({
+    where: { id, session: scope },
     include: { ...JUNIOR_SHAPE, session: { include: SESSION_SHAPE } },
   })
 
   if (!row) throw notFound()
 
-  const trainings = await programTrainings(row.session.program)
+  const trainings = await sessionTrainings(row.session.functionId, row.dispositifId)
   const records = new Map(row.account.trainingRecords.map((record) => [record.trainingId, record]))
 
   return { junior: toJunior(row, trainings, records), session: toSummary(row.session) }

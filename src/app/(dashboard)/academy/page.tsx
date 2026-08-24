@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { SessionsPanel } from '@/composites/academy/SessionsPanel'
+import { academyScope } from '@/core/services/academy/AcademyScope'
 import { listSessions, sessionFields } from '@/core/services/academy/AcademyService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
@@ -15,8 +16,11 @@ export const metadata: Metadata = { title: ACADEMY_COPY.title }
  */
 
 export default async function AcademyPage() {
-  const { access } = await requirePermission(Permissions.AcademyRead)
-  const [sessions, fields] = await Promise.all([listSessions(), sessionFields()])
+  const { session, access } = await requirePermission(Permissions.AcademyRead)
+  const [sessions, fields] = await Promise.all([
+    listSessions(academyScope(session, access)),
+    sessionFields(),
+  ])
 
   return (
     <div className={PAGE_STYLES.wrapper}>

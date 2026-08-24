@@ -4,7 +4,6 @@ import type {
   AcademyStepKindName,
   AcademyJuniorStatusName,
   AcademyPeriodName,
-  AcademyProgramName,
   AcademySessionStatusName,
 } from '@/utils/constants/hierarchy'
 
@@ -19,6 +18,22 @@ import type {
 export interface JuniorDispositif {
   id: string
   name: string
+  accent: string | null
+}
+
+/**
+ * Function a session is scoped to
+ * @typedef {Object} SessionFunction
+ * @property {string} id - Function identifier
+ * @property {string} name - Display name
+ * @property {string | null} summary - Surface the function covers
+ * @property {string | null} accent - Colour token
+ */
+
+export interface SessionFunction {
+  id: string
+  name: string
+  summary: string | null
   accent: string | null
 }
 
@@ -46,7 +61,7 @@ export interface JuniorTraining {
  * Session listed on the academy board
  * @typedef {Object} SessionSummary
  * @property {string} id - Session identifier
- * @property {AcademyProgramName} program - Training programme
+ * @property {SessionFunction} function - Function the session is scoped to
  * @property {string} startsAt - ISO start date
  * @property {string | null} endsAt - ISO end date
  * @property {AcademySessionStatusName} status - Lifecycle state
@@ -58,7 +73,7 @@ export interface JuniorTraining {
 
 export interface SessionSummary {
   id: string
-  program: AcademyProgramName
+  function: SessionFunction
   startsAt: string
   endsAt: string | null
   status: AcademySessionStatusName
