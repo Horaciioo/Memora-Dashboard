@@ -6,6 +6,10 @@ import {
   AcademyStages,
   StepAnchors,
   StepOwners,
+  NoteKinds,
+  ObjectiveStatuses,
+  ReviewAdvices,
+  ReviewStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
   AcademyStepKindName,
@@ -14,6 +18,10 @@ import type {
   AcademyStageName,
   StepAnchorName,
   StepOwnerName,
+  NoteKindName,
+  ObjectiveStatusName,
+  ReviewAdviceName,
+  ReviewStatusName,
 } from '@/utils/constants/hierarchy'
 import type { IconName } from '@/declarations/ui/icons'
 
@@ -107,3 +115,35 @@ const STEP_OWNER_MAP: Record<StepOwnerName, AcademyOption> = {
 }
 
 export const STEP_OWNER_REGISTRY = createRegistry(STEP_OWNER_MAP)
+
+const NOTE_KIND_MAP: Record<NoteKindName, AcademyOption> = {
+  [NoteKinds.Positive]: { label: 'Positive', accent: 'success' },
+  [NoteKinds.Negative]: { label: 'Négative', accent: 'danger' },
+}
+
+export const NOTE_KIND_REGISTRY = createRegistry(NOTE_KIND_MAP)
+
+const OBJECTIVE_STATUS_MAP: Record<ObjectiveStatusName, AcademyOption> = {
+  [ObjectiveStatuses.Open]: { label: 'En cours', accent: 'warning' },
+  [ObjectiveStatuses.Reached]: { label: 'Atteint', accent: 'success' },
+  [ObjectiveStatuses.Missed]: { label: 'Manqué', accent: 'danger' },
+}
+
+export const OBJECTIVE_STATUS_REGISTRY = createRegistry(OBJECTIVE_STATUS_MAP)
+
+const REVIEW_ADVICE_MAP: Record<ReviewAdviceName, AcademyOption> = {
+  [ReviewAdvices.Pass]: { label: 'Passe à la suite', accent: 'success' },
+  [ReviewAdvices.Bonus]: { label: 'Période bonus', accent: 'info' },
+  [ReviewAdvices.Stop]: { label: 'Arrêt du suivi', accent: 'danger' },
+}
+
+export const REVIEW_ADVICE_REGISTRY = createRegistry(REVIEW_ADVICE_MAP)
+
+const REVIEW_STATUS_MAP: Record<ReviewStatusName, AcademyOption> = {
+  [ReviewStatuses.Draft]: { label: 'Brouillon', accent: 'neutral' },
+  [ReviewStatuses.Submitted]: { label: 'Soumis', accent: 'warning' },
+  [ReviewStatuses.Validated]: { label: 'Validé', accent: 'success' },
+  [ReviewStatuses.Rejected]: { label: 'Refusé', accent: 'danger' },
+}
+
+export const REVIEW_STATUS_REGISTRY = createRegistry(REVIEW_STATUS_MAP)

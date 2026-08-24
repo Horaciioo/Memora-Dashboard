@@ -211,14 +211,21 @@ const stepOffsetMax = readInteger(academy.stepOffsetMax, {
   min: 1,
 })
 
+const skillMaxPercent = readInteger(academy.skillMaxPercent, {
+  path: 'system/academy.skillMaxPercent',
+  fallback: 100,
+  min: 1,
+})
+
 /**
  * Academy bounds
- * @type {{ maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number }}
+ * @type {{ maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number }}
  */
 
 export const ACADEMY_SETTINGS = {
   weeksMax,
   stepOffsetMax,
+  skillMaxPercent,
   maxLives: readInteger(academy.maxLives, {
     path: 'system/academy.maxLives',
     fallback: 13,
@@ -239,6 +246,17 @@ export const ACADEMY_SETTINGS = {
     path: 'system/academy.stepOffsetMin',
     fallback: -30,
     max: stepOffsetMax,
+  }),
+  bonusMaxLives: readInteger(academy.bonusMaxLives, {
+    path: 'system/academy.bonusMaxLives',
+    fallback: 4,
+    min: 0,
+  }),
+  skillStep: readInteger(academy.skillStep, {
+    path: 'system/academy.skillStep',
+    fallback: 5,
+    min: 1,
+    max: skillMaxPercent,
   }),
 }
 

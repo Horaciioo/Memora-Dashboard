@@ -5,6 +5,11 @@ import type {
   AcademyJuniorStatusName,
   AcademyPeriodName,
   AcademySessionStatusName,
+  AcademyStageName,
+  NoteKindName,
+  ObjectiveStatusName,
+  ReviewAdviceName,
+  ReviewStatusName,
 } from '@/utils/constants/hierarchy'
 
 /**
@@ -93,10 +98,12 @@ export interface SessionSummary {
  * @property {string | null} avatarUrl - Portrait
  * @property {JuniorDispositif} dispositif - Entry programme
  * @property {AcademyJuniorStatusName} status - Outcome so far
+ * @property {AcademyStageName} stage - Current phase of the PIM
  * @property {WorkPerson | null} trainer - Trainer in charge
  * @property {string} startedAt - ISO arrival date
  * @property {string | null} validatedAt - ISO validation date
  * @property {number} liveCount - Lives already covered
+ * @property {number} bonusLives - Extra lives opened by a bonus decision
  * @property {string | null} summary - Remarks
  * @property {JuniorTraining[]} trainings - Training progression
  * @property {number} completedCount - Trainings validated
@@ -113,15 +120,89 @@ export interface JuniorView {
   avatarUrl: string | null
   dispositif: JuniorDispositif
   status: AcademyJuniorStatusName
+  stage: AcademyStageName
   trainer: WorkPerson | null
   startedAt: string
   validatedAt: string | null
   liveCount: number
+  bonusLives: number
   summary: string | null
   trainings: JuniorTraining[]
   completedCount: number
   mandatoryPending: number
   reviewCount: number
+  values: FormValues
+}
+
+/**
+ * Competency grade of one junior on one skill
+ * @typedef {Object} JuniorSkillView
+ * @property {string} skillId - Skill identifier
+ * @property {string} name - Skill name
+ * @property {string | null} description - What the skill covers
+ * @property {string} categoryId - Category identifier
+ * @property {string} categoryName - Category name
+ * @property {string | null} categoryAccent - Colour token
+ * @property {number} percent - Mastery reached
+ * @property {string | null} validatorName - Who last moved it
+ * @property {string | null} updatedAt - ISO date of the last change
+ */
+
+export interface JuniorSkillView {
+  skillId: string
+  name: string
+  description: string | null
+  categoryId: string
+  categoryName: string
+  categoryAccent: string | null
+  percent: number
+  validatorName: string | null
+  updatedAt: string | null
+}
+
+/**
+ * Trace kept on a junior's FSI
+ * @typedef {Object} JuniorNoteView
+ * @property {string} id - Note identifier
+ * @property {AcademyStageName} stage - Phase it was written at
+ * @property {NoteKindName} kind - Positive or negative
+ * @property {string} body - Written trace
+ * @property {string | null} authorName - Who wrote it
+ * @property {string} createdAt - ISO date
+ * @property {FormValues} values - Values feeding the edit form
+ */
+
+export interface JuniorNoteView {
+  id: string
+  stage: AcademyStageName
+  kind: NoteKindName
+  body: string
+  authorName: string | null
+  createdAt: string
+  values: FormValues
+}
+
+/**
+ * Personal objective of a junior
+ * @typedef {Object} JuniorObjectiveView
+ * @property {string} id - Objective identifier
+ * @property {string} title - Short intitulé
+ * @property {string | null} description - Detail
+ * @property {string | null} dueAt - ISO due date
+ * @property {ObjectiveStatusName} status - Outcome so far
+ * @property {number} position - Display order
+ * @property {string | null} authorName - Who set it
+ * @property {FormValues} values - Values feeding the edit form
+ */
+
+export interface JuniorObjectiveView {
+  id: string
+  title: string
+  description: string | null
+  dueAt: string | null
+  status: ObjectiveStatusName
+  position: number
+  authorName: string | null
   values: FormValues
 }
 
@@ -154,28 +235,37 @@ export interface AcademyStepView {
 }
 
 /**
- * Written trace of one voice check-in
+ * Written trace of one voice check-in, and the support of the decision that
+ * authorises the following stage
  * @typedef {Object} AcademyReviewView
  * @property {string} id - Review identifier
+ * @property {AcademyStageName} stage - Phase this check-in belongs to
  * @property {string} heldAt - ISO date
+ * @property {number | null} durationMinutes - How long the call lasted
  * @property {string | null} authorName - Who held it
  * @property {string | null} feeling - Overall feeling
- * @property {Record<string, string>} axes - Concrete axes explored
- * @property {string} objectives - Personal objectives
- * @property {string | null} strategies - How they get reached
- * @property {string | null} summary - What moves, what blocks, what is decided
+ * @property {string} summary - What moves, what blocks, what is decided
+ * @property {ReviewAdviceName} advice - Outcome proposed by the Formateur
+ * @property {ReviewStatusName} status - Lifecycle of the check-in
+ * @property {string | null} decidedByName - Who decided
+ * @property {string | null} decidedAt - ISO decision date
+ * @property {string | null} decisionNote - Note attached to the decision
  * @property {FormValues} values - Values feeding the edit form
  */
 
 export interface AcademyReviewView {
   id: string
+  stage: AcademyStageName
   heldAt: string
+  durationMinutes: number | null
   authorName: string | null
   feeling: string | null
-  axes: Record<string, string>
-  objectives: string
-  strategies: string | null
-  summary: string | null
+  summary: string
+  advice: ReviewAdviceName
+  status: ReviewStatusName
+  decidedByName: string | null
+  decidedAt: string | null
+  decisionNote: string | null
   values: FormValues
 }
 
