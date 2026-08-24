@@ -24,6 +24,9 @@ export interface FileTabsProps {
   label: string
   tabs: FileTab[]
   initial?: string
+  // Lets a parent drive the open tab, e.g. a locked panel linking to another one
+  value?: string
+  onChange?: (value: string) => void
 }
 
 /**
@@ -32,12 +35,16 @@ export interface FileTabsProps {
  * @param {string} label - Accessible name of the strip
  * @param {FileTab[]} tabs - Tabs in display order
  * @param {string} [initial] - Tab opened first, defaults to the first visible one
+ * @param {string} [value] - Open tab, makes the strip controlled by its parent
+ * @param {(value: string) => void} [onChange] - Called when the open tab changes
  * @return {JSX.Element}
  */
 
-export const FileTabs = ({ label, tabs, initial }: FileTabsProps) => {
+export const FileTabs = ({ label, tabs, initial, value, onChange }: FileTabsProps) => {
   const visible = tabs.filter((entry) => entry.visible !== false)
-  const [tab, setTab] = useState(initial ?? visible[0]?.value ?? '')
+  const [internalTab, setInternalTab] = useState(initial ?? visible[0]?.value ?? '')
+  const tab = value ?? internalTab
+  const setTab = onChange ?? setInternalTab
 
   // A tab losing its permission mid-session falls back rather than showing nothing
   const current = visible.find((entry) => entry.value === tab) ?? visible[0]
