@@ -11,6 +11,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
 export const ROUTES = {
   home: '/',
   login: '/connexion',
+  admission: (token: string) => `/admission/${token}`,
   dashboard: '/tableau-de-bord',
   members: '/moderateurs',
   member: (id: string) => `/moderateurs/${id}`,

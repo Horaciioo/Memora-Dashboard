@@ -193,6 +193,7 @@ model Account {
   academySeats        AcademySessionTrainer[] @relation("AcademyTrainer")
   academySteps        AcademyStep[]      @relation("AcademyStepAuthor")
   academyStepsValidated AcademyStep[]    @relation("AcademyStepValidator")
+  sessionInvitesCreated SessionInvite[]  @relation("SessionInviteCreatedBy")
   academyReviews      AcademyReview[]     @relation("AcademyReviewAuthor")
   academyReviewsDecided AcademyReview[]   @relation("AcademyReviewDecider")
   juniorSkillsGraded  JuniorSkill[]       @relation("JuniorSkillValidator")
@@ -640,6 +641,7 @@ model Dispositif {
   steps     PimStepTemplate[]
   juniors   AcademyJunior[]
   trainings Training[]
+  invites   SessionInvite[]
 
   @@map("dispositifs")
 }
@@ -771,10 +773,31 @@ model AcademySession {
   juniors  AcademyJunior[]
   steps    AcademyStep[]
   calendarEvents CalendarEvent[]
+  invites  SessionInvite[]
 
   @@index([functionId, startsAt])
   @@index([status])
   @@map("academy_sessions")
+}
+
+// Public admission link opened once a session takes applications
+model SessionInvite {
+  id           String    @id @default(cuid())
+  sessionId    String
+  token        String    @unique
+  expiresAt    DateTime
+  maxUses      Int?
+  uses         Int       @default(0)
+  dispositifId String?
+  createdById  String?
+  createdAt    DateTime  @default(now())
+
+  session    AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  dispositif Dispositif?    @relation(fields: [dispositifId], references: [id], onDelete: SetNull)
+  createdBy  Account?       @relation("SessionInviteCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([sessionId])
+  @@map("session_invites")
 }
 
 // Moderator holding the trainer seat on a session

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
+import { CopyInviteLink } from '@/composites/academy/CopyInviteLink'
 import { SessionPanel } from '@/composites/academy/SessionPanel'
 import { prisma } from '@/core/lib/db'
 import { academyScope } from '@/core/services/academy/AcademyScope'
@@ -84,7 +85,12 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
         eyebrow={ACADEMY_COPY.confidential}
         title={`${jobFunction.name} • ${formatDay(detail.summary.startsAt)}`}
         lead={detail.summary.summary ?? jobFunction.summary ?? undefined}
-        actions={<Badge label={jobFunction.name} tone={toTone(jobFunction.accent, 'brand')} dot />}
+        actions={
+          <span className="flex items-center gap-2">
+            {detail.summary.inviteToken && <CopyInviteLink token={detail.summary.inviteToken} />}
+            <Badge label={jobFunction.name} tone={toTone(jobFunction.accent, 'brand')} dot />
+          </span>
+        }
       />
       <SessionPanel
         detail={detail}
