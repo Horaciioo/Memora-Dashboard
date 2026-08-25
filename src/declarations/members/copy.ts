@@ -18,6 +18,7 @@ export const MEMBER_COPY = {
   tabNotes: 'Notes',
   tabAbsences: 'Absences',
   tabSocials: 'Réseaux',
+  tabAccess: 'Permissions',
   tabAcademy: 'Academy',
   tabLogs: 'Logs',
   identity: 'Identité',
