@@ -1,11 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { Progress } from '@/components/elements/feedback/Progress'
-import { Section } from '@/components/structures/Section'
-import { WipNotice } from '@/components/structures/WipNotice'
+import { TrainingContentViewer } from '@/composites/academy/TrainingContentViewer'
 import { useMyTrainings } from '@/core/hooks/data/useAcademy'
 import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
@@ -25,10 +25,12 @@ const TrainingRow = ({
   training,
   isSaving,
   onMove,
+  onViewContent,
 }: {
   training: MyTrainingView
   isSaving: boolean
   onMove: (id: string, action: 'start' | 'resume' | 'restart' | 'abandon' | 'complete') => void
+  onViewContent: (id: string) => void
 }) => {
   const status = TRAINING_STATUS_REGISTRY.get(training.status)
 
@@ -44,6 +46,9 @@ const TrainingRow = ({
         <span className="ml-auto text-xs text-[var(--color-ink-subtle)]">
           {`${ACADEMY_SETTINGS.trainingMinMinutes}-${ACADEMY_SETTINGS.trainingMaxMinutes} ${ACADEMY_COPY.trainingDurationUnit}`}
         </span>
+        <Button variant="ghost" icon="sheet" onClick={() => onViewContent(training.id)}>
+          {ACADEMY_COPY.viewContent}
+        </Button>
       </header>
       {training.summary && (
         <p className="text-sm text-[var(--color-ink-subtle)]">{training.summary}</p>
@@ -127,6 +132,7 @@ const TrainingRow = ({
 
 export const TrainingsPanel = ({ initialTrainings }: TrainingsPanelProps) => {
   const { trainings, isSaving, move } = useMyTrainings(initialTrainings)
+  const [viewingId, setViewingId] = useState<string | null>(null)
   const completedCount = trainings.filter(
     (training) => training.status === TrainingStatuses.Done
   ).length
@@ -148,17 +154,17 @@ export const TrainingsPanel = ({ initialTrainings }: TrainingsPanelProps) => {
 
       <div className={LIST_STYLES.stack}>
         {trainings.map((training) => (
-          <TrainingRow key={training.id} training={training} isSaving={isSaving} onMove={move} />
+          <TrainingRow
+            key={training.id}
+            training={training}
+            isSaving={isSaving}
+            onMove={move}
+            onViewContent={setViewingId}
+          />
         ))}
       </div>
 
-      <Section
-        title={ACADEMY_COPY.trainingContentTitle}
-        description={ACADEMY_COPY.trainingContentLead}
-        bare
-      >
-        <WipNotice figure="academy" />
-      </Section>
+      <TrainingContentViewer trainingId={viewingId} onClose={() => setViewingId(null)} />
     </div>
   )
 }

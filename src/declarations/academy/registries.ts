@@ -11,6 +11,7 @@ import {
   ReviewAdvices,
   ReviewStatuses,
   TrainingStatuses,
+  TrainingBlockKinds,
 } from '@/utils/constants/hierarchy'
 import type {
   AcademyStepKindName,
@@ -24,6 +25,7 @@ import type {
   ReviewAdviceName,
   ReviewStatusName,
   TrainingStatusName,
+  TrainingBlockKindName,
 } from '@/utils/constants/hierarchy'
 import type { IconName } from '@/declarations/ui/icons'
 
@@ -158,3 +160,10 @@ const TRAINING_STATUS_MAP: Record<TrainingStatusName, AcademyOption> = {
 }
 
 export const TRAINING_STATUS_REGISTRY = createRegistry(TRAINING_STATUS_MAP)
+
+const BLOCK_KIND_MAP: Record<TrainingBlockKindName, StepKindOption> = {
+  [TrainingBlockKinds.Text]: { label: 'Texte', accent: 'neutral', icon: 'note' },
+  [TrainingBlockKinds.Quiz]: { label: 'Quiz', accent: 'brand', icon: 'confirm' },
+}
+
+export const TRAINING_BLOCK_KIND_REGISTRY = createRegistry(BLOCK_KIND_MAP)

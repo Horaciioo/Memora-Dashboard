@@ -159,6 +159,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     icon: 'academy',
     figure: 'academy',
     reorderable: true,
+    openable: true,
     emptyTitle: 'Aucune formation',
     emptyDescription: 'Déclare les formations obligatoires de la 1ʳᵉ période pour commencer.',
   },

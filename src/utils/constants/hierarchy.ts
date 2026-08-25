@@ -164,6 +164,18 @@ export const TrainingStatuses = {
 export type TrainingStatusName = (typeof TrainingStatuses)[keyof typeof TrainingStatuses]
 
 /**
+ * Kind of one training content block
+ * @type {Record<string, string>}
+ */
+
+export const TrainingBlockKinds = {
+  Text: 'TEXT',
+  Quiz: 'QUIZ',
+} as const
+
+export type TrainingBlockKindName = (typeof TrainingBlockKinds)[keyof typeof TrainingBlockKinds]
+
+/**
  * Outcome proposed at the end of a voice check-in
  * @type {Record<string, string>}
  */
