@@ -44,6 +44,7 @@ export const APP_SHELL = {
   accountIdentity: 'flex min-w-0 flex-1 flex-col',
   accountControls: 'flex shrink-0 items-center gap-1',
   accountDivider: 'h-5 w-px shrink-0 bg-[var(--color-border)]',
+  viewToggleActive: 'bg-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
   scrim: 'fixed inset-0 z-30 bg-[var(--color-ink)]/40 backdrop-blur-sm lg:hidden',
   main: 'flex min-w-0 flex-1 flex-col',
   menuButton:

@@ -3,12 +3,15 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { LogoutButton } from '@/composites/auth/LogoutButton'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { APP_ASSETS, APP_COMPANY, APP_NAME } from '@/declarations/app'
-import { NAVIGATION, ROUTES, matchesNavigation } from '@/declarations/navigation'
+import { NAVIGATION, NavigationViews, ROUTES, matchesNavigation } from '@/declarations/navigation'
+import { NAVIGATION_VIEW_REGISTRY } from '@/declarations/access/views'
+import { useNavigationViewStore } from '@/core/store/navigationView'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { ACCOUNT_BLOCK, APP_SHELL } from '@/declarations/ui/blocks'
 import { NAV_COPY, WIP_COPY } from '@/declarations/ui/copy'
@@ -31,7 +34,20 @@ export interface SidebarNavProps {
 
 export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
   const pathname = usePathname()
-  const { can, session } = useAuthContext()
+  const { can, session, isResponsable } = useAuthContext()
+  const { view: stored, setView } = useNavigationViewStore()
+
+  // The store skips synchronous hydration, the rail being server-rendered
+  useEffect(() => {
+    void useNavigationViewStore.persist.rehydrate()
+  }, [])
+
+  // Only the encadrement switches, a moderator never leaves their own view
+  const view = isResponsable ? stored : NavigationViews.Moderation
+  const nextView =
+    view === NavigationViews.Administration
+      ? NavigationViews.Moderation
+      : NavigationViews.Administration
 
   return (
     <aside className={cn(APP_SHELL.sidebar, className)} aria-label={NAV_COPY.sidebar}>
@@ -55,7 +71,7 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
       </div>
 
       <nav className={APP_SHELL.nav}>
-        {NAVIGATION.map((group) => {
+        {NAVIGATION.filter((group) => group.views.includes(view)).map((group) => {
           const items = group.items.filter(
             (item) =>
               (!item.permission || can(item.permission)) &&
@@ -98,6 +114,24 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
               <span className={ACCOUNT_BLOCK.meta}>{ROLE_REGISTRY.label(session.role)}</span>
             </span>
             <div className={APP_SHELL.accountControls}>
+              {isResponsable && (
+                <>
+                  <Button
+                    variant="icon"
+                    icon="flash"
+                    aria-label={NAVIGATION_VIEW_REGISTRY.get(nextView).label}
+                    title={NAVIGATION_VIEW_REGISTRY.get(nextView).summary}
+                    aria-pressed={view === NavigationViews.Administration}
+                    onClick={() => setView(nextView)}
+                    className={
+                      view === NavigationViews.Administration
+                        ? APP_SHELL.viewToggleActive
+                        : undefined
+                    }
+                  />
+                  <span className={APP_SHELL.accountDivider} aria-hidden="true" />
+                </>
+              )}
               <Link href={ROUTES.preferences} onClick={onNavigate}>
                 <Button variant="icon" icon="settings" aria-label={NAV_COPY.preferences} />
               </Link>
