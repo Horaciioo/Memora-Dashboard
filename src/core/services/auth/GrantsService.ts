@@ -48,6 +48,29 @@ export const syncRoleGrants = async (): Promise<void> => {
   synced = true
 }
 
+// Role and function grants, overrides excluded
+const inheritedGrants = async (account: Account): Promise<Set<string>> => {
+  await syncRoleGrants()
+
+  const functionIds = [account.primaryFunctionId, account.secondaryFunctionId].filter(
+    (id): id is string => id !== null
+  )
+
+  // Role grants and function grants, overrides excluded
+  const [roleGrants, functionGrants] = await Promise.all([
+    prisma.rolePermission.findMany({ where: { role: account.role } }),
+    functionIds.length > 0
+      ? prisma.functionPermission.findMany({ where: { functionId: { in: functionIds } } })
+      : Promise.resolve([]),
+  ])
+
+  const granted = new Set<string>()
+  for (const grant of roleGrants) granted.add(grant.permission)
+  for (const grant of functionGrants) granted.add(grant.permission)
+
+  return granted
+}
+
 /**
  * Resolve every permission held by an account, the root bypass living in resolvePermissions
  * @param {Account} account - Account row
@@ -55,24 +78,8 @@ export const syncRoleGrants = async (): Promise<void> => {
  */
 
 export const resolveAccountPermissions = async (account: Account): Promise<PermissionName[]> => {
-  await syncRoleGrants()
-
-  const functionIds = [account.primaryFunctionId, account.secondaryFunctionId].filter(
-    (id): id is string => id !== null
-  )
-
-  // Role grants, function grants and per-account overrides
-  const [roleGrants, functionGrants, overrides] = await Promise.all([
-    prisma.rolePermission.findMany({ where: { role: account.role } }),
-    functionIds.length > 0
-      ? prisma.functionPermission.findMany({ where: { functionId: { in: functionIds } } })
-      : Promise.resolve([]),
-    prisma.accountPermission.findMany({ where: { accountId: account.id } }),
-  ])
-
-  const granted = new Set<string>()
-  for (const grant of roleGrants) granted.add(grant.permission)
-  for (const grant of functionGrants) granted.add(grant.permission)
+  const granted = await inheritedGrants(account)
+  const overrides = await prisma.accountPermission.findMany({ where: { accountId: account.id } })
 
   // Overrides run last so a deny always wins
   for (const override of overrides) {
@@ -81,6 +88,19 @@ export const resolveAccountPermissions = async (account: Account): Promise<Permi
   }
 
   return [...granted].filter(isPermissionName)
+}
+
+/**
+ * Read what inheritance alone grants an account
+ * @param {string} accountId - Account identifier
+ * @return {Promise<PermissionName[]>} - Inherited permissions
+ */
+
+export const readInheritedGrants = async (accountId: string): Promise<PermissionName[]> => {
+  const account = await prisma.account.findUnique({ where: { id: accountId } })
+  if (!account) return []
+
+  return [...(await inheritedGrants(account))].filter(isPermissionName)
 }
 
 /**

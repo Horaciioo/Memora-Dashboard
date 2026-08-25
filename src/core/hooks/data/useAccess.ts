@@ -15,17 +15,20 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @typedef {Object} AccessCollection
  * @property {AccessMatrix} matrix - Grants per role and per function
  * @property {boolean} isSaving - Mutation in flight
- * @property {(role: MemberRoleName, permissions: PermissionName[]) => Promise<void>} saveRole - Replace a role
- * @property {(functionId: string, permissions: PermissionName[]) => Promise<void>} saveFunction - Replace a function
- * @property {(role: MemberRoleName) => Promise<void>} applyPreset - Restore the declared preset
+ * @property {(role: MemberRoleName, permissions: PermissionName[]) => Promise<AccessMatrix | null>} saveRole - Replace a role
+ * @property {(functionId: string, permissions: PermissionName[]) => Promise<AccessMatrix | null>} saveFunction - Replace a function
+ * @property {(role: MemberRoleName) => Promise<AccessMatrix | null>} applyPreset - Restore the declared preset
  */
 
 export interface AccessCollection {
   matrix: AccessMatrix
   isSaving: boolean
-  saveRole: (role: MemberRoleName, permissions: PermissionName[]) => Promise<void>
-  saveFunction: (functionId: string, permissions: PermissionName[]) => Promise<void>
-  applyPreset: (role: MemberRoleName) => Promise<void>
+  saveRole: (role: MemberRoleName, permissions: PermissionName[]) => Promise<AccessMatrix | null>
+  saveFunction: (
+    functionId: string,
+    permissions: PermissionName[]
+  ) => Promise<AccessMatrix | null>
+  applyPreset: (role: MemberRoleName) => Promise<AccessMatrix | null>
 }
 
 /**
@@ -46,6 +49,8 @@ export const useAccess = (initialMatrix: AccessMatrix): AccessCollection => {
       )
 
       if (next) setMatrix(next)
+
+      return next
     },
     [run]
   )

@@ -7,6 +7,7 @@ import {
   SOCIAL_FIELDS,
   readOverrides,
 } from '@/core/services/members/MemberFileService'
+import { readInheritedGrants } from '@/core/services/auth/GrantsService'
 import { memberFields, readMember } from '@/core/services/members/MemberService'
 import { readMemberActivity } from '@/core/services/system/ActivityService'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -55,10 +56,11 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const detail = await readMember(id, canReadNotes).catch(() => null)
   if (!detail) notFound()
 
-  const [fields, activity, overrides] = await Promise.all([
+  const [fields, activity, overrides, inherited] = await Promise.all([
     memberFields(),
     canReadLogs ? readMemberActivity(id) : Promise.resolve([]),
     canManageAccess ? readOverrides(id) : Promise.resolve([]),
+    canManageAccess ? readInheritedGrants(id) : Promise.resolve([]),
   ])
 
   return (
@@ -71,6 +73,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
         socialFields={SOCIAL_FIELDS}
         activity={activity}
         overrides={overrides}
+        inherited={inherited}
         canUpdate={access.can(Permissions.MemberUpdate)}
         canReadNotes={canReadNotes}
         canWriteNotes={access.can(Permissions.MemberNoteWrite)}

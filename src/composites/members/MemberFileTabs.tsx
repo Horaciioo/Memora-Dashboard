@@ -33,6 +33,7 @@ import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { MemberOverride } from '@/core/services/members/MemberFileService'
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { MemberDetail, MemberSocial } from '@/types/members'
+import type { PermissionName } from '@/utils/constants/permissions'
 import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
 
 export interface MemberFileTabsProps {
@@ -42,6 +43,7 @@ export interface MemberFileTabsProps {
   socialFields: FieldDefinition[]
   activity: ActivityEntry[]
   overrides: MemberOverride[]
+  inherited: PermissionName[]
   canUpdate: boolean
   canReadNotes: boolean
   canWriteNotes: boolean
@@ -100,6 +102,7 @@ const optionLabels = (field: FieldDefinition, value: FieldValue): ReactNode => {
  * @param {FieldDefinition[]} socialFields - Declarations of the social form
  * @param {ActivityEntry[]} activity - Journal entries
  * @param {MemberOverride[]} overrides - Permission overrides
+ * @param {PermissionName[]} inherited - Permissions inheritance grants
  * @param {boolean} canUpdate - Member may edit the file
  * @param {boolean} canReadNotes - Member may read private remarks
  * @param {boolean} canWriteNotes - Member may write private remarks
@@ -115,6 +118,7 @@ export const MemberFileTabs = ({
   socialFields,
   activity,
   overrides,
+  inherited,
   canUpdate,
   canReadNotes,
   canWriteNotes,
@@ -343,14 +347,16 @@ export const MemberFileTabs = ({
           onCommit={saveField}
         />
       </Section>
-      {canManageAccess && (
-        <MemberAccessPanel
-          overrides={file.overrides}
-          isSaving={file.isSaving}
-          onSave={file.saveOverrides}
-        />
-      )}
     </div>
+  )
+
+  const accessTab = () => (
+    <MemberAccessPanel
+      overrides={file.overrides}
+      inherited={inherited}
+      isSaving={file.isSaving}
+      onSave={file.saveOverrides}
+    />
   )
 
   const notesTab = () => (
@@ -602,6 +608,13 @@ export const MemberFileTabs = ({
             label: MEMBER_COPY.tabSocials,
             icon: 'link',
             render: socialsTab,
+          },
+          {
+            value: 'access',
+            label: MEMBER_COPY.tabAccess,
+            icon: 'shield',
+            visible: canManageAccess,
+            render: accessTab,
           },
           {
             value: 'academy',

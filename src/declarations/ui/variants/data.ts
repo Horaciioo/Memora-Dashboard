@@ -163,3 +163,34 @@ export const FILTER_STYLES = {
   options: 'flex flex-wrap items-start gap-3',
   optionField: 'w-full sm:w-52',
 } as const
+
+/**
+ * Permission picker styles — a search header, then one collapsible block per group
+ * @type {Record<string, string>}
+ */
+
+export const PERMISSION_PICKER_STYLES = {
+  wrapper: 'flex flex-col gap-3',
+  header: 'flex flex-wrap items-center gap-2',
+  search: 'w-full sm:max-w-xs',
+  tally: 'text-xs text-[var(--color-ink-subtle)] tabular-nums',
+  dirty:
+    'rounded-[var(--radius-sm)] bg-[var(--color-brand-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-brand-600)] tabular-nums',
+  groups: 'flex flex-col gap-2',
+  group:
+    'overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
+  groupHead:
+    'flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-surface)]',
+  groupChevron: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform',
+  groupChevronOpen: 'rotate-90',
+  groupLabel: 'text-sm font-semibold',
+  groupTally: 'ml-auto shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums',
+  groupActions: 'flex shrink-0 items-center gap-1',
+  body: 'flex flex-col gap-1 border-t border-[var(--color-border)] p-2',
+  row: 'flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[var(--radius-md)] px-2 py-1.5',
+  identity: 'flex min-w-0 flex-1 flex-col gap-0.5',
+  name: 'flex flex-wrap items-center gap-2 text-sm',
+  description: 'text-xs text-[var(--color-ink-subtle)]',
+  control: 'shrink-0',
+  empty: 'px-2 py-6 text-center text-sm text-[var(--color-ink-subtle)]',
+} as const
