@@ -9,6 +9,12 @@ import {
   StepOwner,
 } from '@prisma/client'
 
+import { SANCTION_MEASURE_TEMPLATE } from '../src/declarations/sanctions/measures.ts'
+import { SANCTION_TEMPLATE } from '../src/declarations/sanctions/template.ts'
+
+// The seed runs on plain node, hence the relative paths and the repeated step
+const POSITION_STEP = 1000
+
 // Prisma 7 no longer loads .env on its own
 try {
   process.loadEnvFile()
@@ -486,6 +492,63 @@ const seed = async (): Promise<void> => {
     } else {
       await prisma.pimStepTemplate.create({
         data: { title: step.title, functionId: twitchFunctionId, ...data },
+      })
+    }
+  }
+
+  // Measures first, then the declared panel on every creator already in place
+  await prisma.sanctionMeasure.createMany({
+    data: SANCTION_MEASURE_TEMPLATE.map((measure, index) => ({
+      name: measure.name,
+      kind: measure.kind,
+      durationMinutes: measure.durationMinutes,
+      permanent: measure.permanent,
+      weight: measure.weight,
+      accent: measure.accent,
+      position: index * POSITION_STEP,
+    })),
+    skipDuplicates: true,
+  })
+
+  const [levels, measures, youtubers] = await Promise.all([
+    prisma.liveconLevel.findMany({ orderBy: { level: 'asc' } }),
+    prisma.sanctionMeasure.findMany({ select: { id: true, name: true } }),
+    prisma.youtuber.findMany({ select: { id: true } }),
+  ])
+
+  const measureIds = new Map(measures.map((measure) => [measure.name, measure.id]))
+
+  for (const youtuber of youtubers) {
+    const known = new Set(
+      (
+        await prisma.sanctionOffense.findMany({
+          where: { youtuberId: youtuber.id },
+          select: { name: true },
+        })
+      ).map((offense) => offense.name)
+    )
+
+    for (const [index, offense] of SANCTION_TEMPLATE.entries()) {
+      if (known.has(offense.name) || levels.length === 0) continue
+
+      const tiers = levels.flatMap((level) =>
+        (offense.ladder[level.level] ?? []).flatMap((name, step) => {
+          const measureId = measureIds.get(name)
+
+          return measureId ? [{ levelId: level.id, step, measureId }] : []
+        })
+      )
+
+      await prisma.sanctionOffense.create({
+        data: {
+          youtuberId: youtuber.id,
+          name: offense.name,
+          summary: offense.summary,
+          example: offense.example,
+          warningExample: offense.warningExample,
+          position: index * POSITION_STEP,
+          tiers: { create: tiers },
+        },
       })
     }
   }

@@ -20,6 +20,7 @@ export const REFERENCE_KEYS = [
   'categories-competences',
   'competences',
   'etapes-pim',
+  'sanctions',
 ] as const
 
 /**
@@ -174,6 +175,18 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     reorderable: false,
     emptyTitle: 'Aucun niveau',
     emptyDescription: 'Crée les trois niveaux de vigilance et leurs consignes.',
+  },
+  {
+    key: 'sanctions',
+    label: 'Mesures de sanction',
+    singular: 'Mesure',
+    gender: 'feminine',
+    description: 'Barème des sanctions applicables, de la suppression au bannissement.',
+    icon: 'sanctions',
+    figure: 'moderation',
+    reorderable: true,
+    emptyTitle: 'Aucune mesure',
+    emptyDescription: 'Déclare les mesures avant de bâtir un panel de sanctions.',
   },
   {
     key: 'dispositifs',
