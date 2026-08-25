@@ -70,6 +70,7 @@ import {
   Users,
   UsersRound,
   X,
+  Zap,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -93,6 +94,7 @@ export const ICONS = {
   objective: Flag,
   dispositif: Route,
   sanctions: Gavel,
+  flash: Zap,
   settings: Settings,
   search: Search,
   youtuber: MonitorPlay,

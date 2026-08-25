@@ -1,6 +1,6 @@
 import type { IconName } from '@/declarations/ui/icons'
 
-export type Tone = 'brand' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'
+export type Tone = 'brand' | 'success' | 'caution' | 'warning' | 'danger' | 'info' | 'neutral'
 
 /**
  * Tone class set
@@ -36,6 +36,12 @@ export const TONES: Record<Tone, ToneStyles> = {
     border: 'border-[var(--color-success)]',
     dot: 'bg-[var(--color-success)]',
   },
+  caution: {
+    text: 'text-[var(--color-caution)]',
+    soft: 'bg-[var(--color-caution-soft)]',
+    border: 'border-[var(--color-caution)]',
+    dot: 'bg-[var(--color-caution)]',
+  },
   warning: {
     text: 'text-[var(--color-warning)]',
     soft: 'bg-[var(--color-warning-soft)]',
@@ -70,6 +76,7 @@ export const TONES: Record<Tone, ToneStyles> = {
 export const TONE_ICON: Record<Tone, IconName> = {
   brand: 'spark',
   success: 'success',
+  caution: 'warning',
   warning: 'warning',
   danger: 'failure',
   info: 'info',
@@ -84,6 +91,7 @@ export const TONE_ICON: Record<Tone, IconName> = {
 export const TONE_BORDER: Record<Tone, string> = {
   brand: TONES.brand.border,
   success: TONES.success.border,
+  caution: TONES.caution.border,
   warning: TONES.warning.border,
   danger: TONES.danger.border,
   info: TONES.info.border,
@@ -115,6 +123,7 @@ export const TONE_KEYS = Object.keys(TONES) as Tone[]
 export const TONE_LABELS: Record<Tone, string> = {
   brand: 'Rose',
   success: 'Vert',
+  caution: 'Ambre',
   warning: 'Orange',
   danger: 'Rouge',
   info: 'Bleu',

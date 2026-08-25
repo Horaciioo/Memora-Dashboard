@@ -14,6 +14,7 @@ export const BUTTON_STYLES = {
   danger:
     'border border-[var(--color-danger)] px-3 py-2 text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
   icon: 'h-9 w-9 rounded-[var(--radius-md)] p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
+  link: 'p-0 text-[var(--color-brand-600)] underline-offset-2 hover:underline',
 } as const
 
 export type ButtonVariant = keyof Omit<typeof BUTTON_STYLES, 'base'>
