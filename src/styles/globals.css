@@ -24,12 +24,14 @@
   --color-on-brand: #ffffff;
 
   --color-success: #12784e;
+  --color-caution: #8a6a00;
   --color-warning: #8a5300;
   --color-danger: #be2436;
   --color-info: #2a56be;
   --color-neutral: #6b5f76;
 
   --color-success-soft: #e0f5ea;
+  --color-caution-soft: #faf3d3;
   --color-warning-soft: #fbeed6;
   --color-danger-soft: #fce6e8;
   --color-info-soft: #e4ecfd;
@@ -86,12 +88,14 @@
   --color-on-brand: #1a1220;
 
   --color-success: #5cd39a;
+  --color-caution: #e6cf5f;
   --color-warning: #f0b45c;
   --color-danger: #ff8e97;
   --color-info: #8fb2f7;
   --color-neutral: #a99cb2;
 
   --color-success-soft: #12291f;
+  --color-caution-soft: #2a2711;
   --color-warning-soft: #2c2113;
   --color-danger-soft: #30171b;
   --color-info-soft: #171f33;
