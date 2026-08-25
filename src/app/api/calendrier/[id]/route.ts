@@ -8,13 +8,16 @@ import {
   removeEntry,
   updateEntry,
 } from '@/core/services/calendar/CalendarService'
+import { assertRowInScope } from '@/core/services/auth/ScopeService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
   descriptor: { summary: 'Edit or move a calendar entry', tags: ['calendar'] },
-  handler: async ({ params, raw, session, access }) => {
+  handler: async ({ params, raw, session, access, scope }) => {
+    const perimeter = await scope()
     await assertEntryAccess(params.id, session.id, access.can(Permissions.CalendarManage))
+    await assertRowInScope('calendarEvent', params.id, perimeter)
 
     // A lone start only drags the entry, it never rewrites the rest
     if (typeof raw.startsAt === 'string' && Object.keys(raw).length === 1) {
@@ -26,7 +29,7 @@ export const PATCH = createProtectedRoute({
       return moveEntry(params.id, startsAt)
     }
 
-    const parsed = parseFormValues(await calendarFields(), raw, { fillMissing: true })
+    const parsed = parseFormValues(await calendarFields(perimeter), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     return updateEntry(params.id, parsed.values)
@@ -35,8 +38,9 @@ export const PATCH = createProtectedRoute({
 
 export const DELETE = createProtectedRoute({
   descriptor: { summary: 'Drop a calendar entry', tags: ['calendar'] },
-  handler: async ({ params, session, access }) => {
+  handler: async ({ params, session, access, scope }) => {
     await assertEntryAccess(params.id, session.id, access.can(Permissions.CalendarManage))
+    await assertRowInScope('calendarEvent', params.id, await scope())
     await removeEntry(params.id)
 
     return { id: params.id }

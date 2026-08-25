@@ -7,6 +7,8 @@ import { forbidden, invalidInput, notAuthenticated } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { fail, succeed } from '@/core/lib/http/response'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
+import { readScope } from '@/core/services/auth/ScopeService'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { PermissionName } from '@/utils/constants/permissions'
@@ -44,11 +46,13 @@ export interface RouteContext {
  * @typedef {Object} ProtectedRouteContext
  * @property {SessionUser} session - Signed-in member
  * @property {PermissionHelpers} access - Permission helpers
+ * @property {() => Promise<AccessScope>} scope - Creator perimeter, resolved on demand
  */
 
 export interface ProtectedRouteContext extends RouteContext {
   session: SessionUser
   access: PermissionHelpers
+  scope: () => Promise<AccessScope>
 }
 
 /**
@@ -215,7 +219,12 @@ export const createProtectedRoute = <T>(options: ProtectedRouteOptions<T>): Rout
       const routeContext = await buildContext(request, context, options)
 
       return succeed(
-        await options.handler({ ...routeContext, session, access }),
+        await options.handler({
+          ...routeContext,
+          session,
+          access,
+          scope: () => readScope(session, access),
+        }),
         options.status ?? 200
       )
     } catch (error) {
@@ -276,7 +285,12 @@ export const createBinaryRoute = (options: BinaryRouteOptions): RouteHandler => 
       }
 
       const routeContext = await buildContext(request, context, options)
-      const payload = await options.handler({ ...routeContext, session, access })
+      const payload = await options.handler({
+        ...routeContext,
+        session,
+        access,
+        scope: () => readScope(session, access),
+      })
 
       return new Response(payload.data as BodyInit, {
         headers: {

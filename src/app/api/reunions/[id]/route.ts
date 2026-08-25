@@ -8,11 +8,11 @@ import { Permissions } from '@/utils/constants/permissions'
 export const PATCH = createProtectedRoute({
   permission: Permissions.MeetingUpdate,
   descriptor: { summary: 'Edit a meeting', tags: ['meetings'] },
-  handler: async ({ params, raw, session }) => {
-    const parsed = parseFormValues(await meetingFields(), raw, { fillMissing: true })
+  handler: async ({ params, raw, session, scope }) => {
+    const parsed = parseFormValues(await meetingFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const meeting = await updateMeeting(params.id, parsed.values)
+    const meeting = await updateMeeting(params.id, parsed.values, await scope())
 
     await recordEvent({
       eventType: 'MeetingUpdated',
@@ -29,8 +29,8 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   permission: Permissions.MeetingDelete,
   descriptor: { summary: 'Drop a meeting', tags: ['meetings'] },
-  handler: async ({ params, session }) => {
-    await removeMeeting(params.id)
+  handler: async ({ params, session, scope }) => {
+    await removeMeeting(params.id, await scope())
 
     await recordEvent({
       eventType: 'MeetingDeleted',

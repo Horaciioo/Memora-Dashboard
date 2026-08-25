@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { scopedWhere } from '@/core/services/auth/ScopeService'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { forbidden, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readText } from '@/core/lib/forms/values'
@@ -19,13 +21,14 @@ import type { EventVisibilityName } from '@/utils/constants/workflow'
 
 /**
  * Build the calendar entry form declarations
+ * @param {AccessScope} [scope] - Creator perimeter
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const calendarFields = async (): Promise<FieldDefinition[]> => {
+export const calendarFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
   const [types, youtubers, projects] = await Promise.all([
     prisma.eventType.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
-    youtuberOptions(),
+    youtuberOptions(scope),
     projectOptions(),
   ])
 
@@ -208,6 +211,7 @@ const toProjectedEntry = (row: {
  * @param {Date} input.to - Last moment shown
  * @param {string} input.viewerId - Signed-in member identifier
  * @param {PermissionHelpers} input.access - Permission helpers
+ * @param {AccessScope} input.scope - Creator perimeter
  * @param {string} [input.sessionId] - Bounds the window to one academy session
  * @return {Promise<CalendarEntry[]>} - Visible entries
  */
@@ -217,18 +221,20 @@ export const listEntries = async ({
   to,
   viewerId,
   access,
+  scope,
   sessionId,
 }: {
   from: Date
   to: Date
   viewerId: string
   access: PermissionHelpers
+  scope: AccessScope
   sessionId?: string
 }): Promise<CalendarEntry[]> => {
   const levels = allowedVisibilities(access)
 
   const rows = await prisma.calendarEvent.findMany({
-    where: {
+    where: scopedWhere('calendarEvent', scope, {
       startsAt: { gte: from, lte: to },
       ...(sessionId ? { sessionId } : {}),
       OR: [
@@ -238,7 +244,7 @@ export const listEntries = async ({
         { visibility: null, type: { visibility: { in: levels } } },
         { visibility: null, typeId: null },
       ],
-    },
+    }),
     include: ENTRY_SHAPE,
     orderBy: { startsAt: 'asc' },
   })

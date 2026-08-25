@@ -8,18 +8,18 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.MeetingRead,
   descriptor: { summary: 'List meetings', tags: ['meetings'] },
-  handler: () => listMeetings(),
+  handler: async ({ scope }) => listMeetings(await scope()),
 })
 
 export const POST = createProtectedRoute({
   permission: Permissions.MeetingCreate,
   status: 201,
   descriptor: { summary: 'Plan a meeting', tags: ['meetings'] },
-  handler: async ({ raw, session }) => {
-    const parsed = parseFormValues(await meetingFields(), raw, { fillMissing: true })
+  handler: async ({ raw, session, scope }) => {
+    const parsed = parseFormValues(await meetingFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const meeting = await createMeeting(parsed.values)
+    const meeting = await createMeeting(parsed.values, await scope())
 
     await recordEvent({
       eventType: 'MeetingScheduled',

@@ -54,7 +54,7 @@ export async function generateMetadata({
 
 export default async function SessionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { session, access } = await requirePermission(Permissions.AcademyRead)
+  const { session, access, scope } = await requirePermission(Permissions.AcademyRead)
 
   const detail = await readSession(id, academyScope(session, access)).catch(() => null)
   if (!detail) notFound()
@@ -71,6 +71,7 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
       to: new Date(to),
       viewerId: session.id,
       access,
+      scope: await scope(),
       sessionId: id,
     }),
     calendarFields(),

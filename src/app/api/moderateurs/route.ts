@@ -8,7 +8,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.MemberRead,
   descriptor: { summary: 'List moderators', tags: ['members'] },
-  handler: () => listMembers(),
+  handler: async ({ scope }) => listMembers(await scope()),
 })
 
 export const POST = createProtectedRoute({

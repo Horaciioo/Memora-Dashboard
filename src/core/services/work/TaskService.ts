@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readDate, readText } from '@/core/lib/forms/values'
 import {
   defaultState,
@@ -64,14 +66,15 @@ const toSummary = (row: TaskRow): TaskSummary => ({
 
 /**
  * Build the task form declarations
+ * @param {AccessScope} [scope] - Creator perimeter
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const taskFields = async (): Promise<FieldDefinition[]> => {
+export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
   const [states, priorities, youtubers, projects, members] = await Promise.all([
     stateOptions(WorkflowScopes.Task),
     priorityOptions(),
-    youtuberOptions(),
+    youtuberOptions(scope),
     projectOptions(),
     memberOptions(),
   ])
@@ -151,9 +154,9 @@ export const taskFields = async (): Promise<FieldDefinition[]> => {
  * @return {Promise<TaskSummary[]>} - Board cards
  */
 
-export const listTasks = async (): Promise<TaskSummary[]> => {
+export const listTasks = async (scope: AccessScope): Promise<TaskSummary[]> => {
   const rows = await prisma.task.findMany({
-    where: { archived: false },
+    where: scopedWhere('task', scope, { archived: false }),
     include: TASK_INCLUDE,
     orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
   })
@@ -181,11 +184,17 @@ const toTaskData = (values: FormValues) => ({
 /**
  * Add a task
  * @param {FormValues} values - Parsed body
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<TaskSummary>} - Created card
  */
 
-export const createTask = async (values: FormValues): Promise<TaskSummary> => {
+export const createTask = async (
+  values: FormValues,
+  scope: AccessScope
+): Promise<TaskSummary> => {
   const data = toTaskData(values)
+  assertInScope(scope, data.youtuberId ?? null)
+
   const stateId = data.stateId ?? (await defaultState(WorkflowScopes.Task))
 
   // A new card lands at the bottom of its column
@@ -203,10 +212,17 @@ export const createTask = async (values: FormValues): Promise<TaskSummary> => {
  * Edit a task
  * @param {string} id - Task identifier
  * @param {FormValues} values - Parsed body
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<TaskSummary>} - Updated card
  */
 
-export const updateTask = async (id: string, values: FormValues): Promise<TaskSummary> => {
+export const updateTask = async (
+  id: string,
+  values: FormValues,
+  scope: AccessScope
+): Promise<TaskSummary> => {
+  await assertRowInScope('task', id, scope)
+
   const row = await prisma.task.update({
     where: { id },
     data: toTaskData(values),
@@ -219,10 +235,13 @@ export const updateTask = async (id: string, values: FormValues): Promise<TaskSu
 /**
  * Drop a task
  * @param {string} id - Task identifier
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<void>} - Removed
  */
 
-export const removeTask = async (id: string): Promise<void> => {
+export const removeTask = async (id: string, scope: AccessScope): Promise<void> => {
+  await assertRowInScope('task', id, scope)
+
   await prisma.task.delete({ where: { id } })
 }
 

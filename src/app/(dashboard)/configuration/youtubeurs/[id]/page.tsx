@@ -53,12 +53,12 @@ export async function generateMetadata({
 
 export default async function YoutuberPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { access } = await requirePermission(Permissions.ReferenceRead)
+  const { access, scope } = await requirePermission(Permissions.ReferenceRead)
 
   const youtuber = await readYoutuber(id)
   if (!youtuber) notFound()
 
-  const [board, fields] = await Promise.all([readTeamBoard(id), teamFields()])
+  const [board, fields] = await Promise.all([readTeamBoard(await scope(), id), teamFields()])
 
   return (
     <div className={PAGE_STYLES.wrapper}>

@@ -8,18 +8,18 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.TaskRead,
   descriptor: { summary: 'List tasks', tags: ['tasks'] },
-  handler: () => listTasks(),
+  handler: async ({ scope }) => listTasks(await scope()),
 })
 
 export const POST = createProtectedRoute({
   permission: Permissions.TaskCreate,
   status: 201,
   descriptor: { summary: 'Add a task', tags: ['tasks'] },
-  handler: async ({ raw, session }) => {
-    const parsed = parseFormValues(await taskFields(), raw, { fillMissing: true })
+  handler: async ({ raw, session, scope }) => {
+    const parsed = parseFormValues(await taskFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const task = await createTask(parsed.values)
+    const task = await createTask(parsed.values, await scope())
 
     await recordEvent({
       eventType: 'TaskCreated',

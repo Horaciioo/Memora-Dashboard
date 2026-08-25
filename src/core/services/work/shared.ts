@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
@@ -152,9 +153,12 @@ export const leadOptions = async (): Promise<FieldOption[]> => {
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-export const youtuberOptions = async (): Promise<FieldOption[]> => {
+export const youtuberOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
   const rows = await prisma.youtuber.findMany({
-    where: { archived: false },
+    where:
+      scope && !scope.isGlobal
+        ? { archived: false, id: { in: scope.youtuberIds } }
+        : { archived: false },
     orderBy: { position: 'asc' },
   })
 

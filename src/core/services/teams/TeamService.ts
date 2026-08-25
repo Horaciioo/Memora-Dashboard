@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readFlag, readText } from '@/core/lib/forms/values'
 import { leadOptions, toPerson, toTag, youtuberOptions } from '@/core/services/work/shared'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
@@ -11,11 +13,12 @@ import { MemberStatuses } from '@/utils/constants/hierarchy'
 
 /**
  * Build the team form declarations
+ * @param {AccessScope} [scope] - Creator perimeter
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const teamFields = async (): Promise<FieldDefinition[]> => {
-  const [leads, youtubers] = await Promise.all([leadOptions(), youtuberOptions()])
+export const teamFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
+  const [leads, youtubers] = await Promise.all([leadOptions(), youtuberOptions(scope)])
 
   return [
     {
@@ -53,14 +56,18 @@ export const teamFields = async (): Promise<FieldDefinition[]> => {
 
 /**
  * Read every team and everyone left outside, optionally narrowed to one creator
- * @param {string} [youtuberId] - Creator the board is scoped to
+ * @param {AccessScope} scope - Creator perimeter
+ * @param {string} [youtuberId] - Creator the board is narrowed to
  * @return {Promise<TeamBoardData>} - Board data
  */
 
-export const readTeamBoard = async (youtuberId?: string): Promise<TeamBoardData> => {
+export const readTeamBoard = async (
+  scope: AccessScope,
+  youtuberId?: string
+): Promise<TeamBoardData> => {
   const [rows, accounts] = await Promise.all([
     prisma.team.findMany({
-      where: youtuberId ? { youtuberId } : undefined,
+      where: scopedWhere('team', scope, youtuberId ? { youtuberId } : {}),
       include: {
         lead: true,
         youtuber: true,
@@ -114,64 +121,89 @@ const toTeamData = (values: FormValues) => ({
 /**
  * Create a team
  * @param {FormValues} values - Parsed body
- * @param {string} [scope] - Creator the board is scoped to
+ * @param {AccessScope} scope - Creator perimeter
+ * @param {string} [youtuberId] - Creator the board is narrowed to
  * @return {Promise<TeamBoardData>} - Board data
  */
 
-export const createTeam = async (values: FormValues, scope?: string): Promise<TeamBoardData> => {
-  await prisma.team.create({ data: toTeamData(values) })
+export const createTeam = async (
+  values: FormValues,
+  scope: AccessScope,
+  youtuberId?: string
+): Promise<TeamBoardData> => {
+  const data = toTeamData(values)
+  assertInScope(scope, data.youtuberId ?? null)
 
-  return readTeamBoard(scope)
+  await prisma.team.create({ data })
+
+  return readTeamBoard(scope, youtuberId)
 }
 
 /**
  * Edit a team
  * @param {string} id - Team identifier
  * @param {FormValues} values - Parsed body
- * @param {string} [scope] - Creator the board is scoped to
+ * @param {AccessScope} scope - Creator perimeter
+ * @param {string} [youtuberId] - Creator the board is narrowed to
  * @return {Promise<TeamBoardData>} - Board data
  */
 
 export const updateTeam = async (
   id: string,
   values: FormValues,
-  scope?: string
+  scope: AccessScope,
+  youtuberId?: string
 ): Promise<TeamBoardData> => {
-  await prisma.team.update({ where: { id }, data: toTeamData(values) })
+  await assertRowInScope('team', id, scope)
 
-  return readTeamBoard(scope)
+  const data = toTeamData(values)
+  assertInScope(scope, data.youtuberId ?? null)
+
+  await prisma.team.update({ where: { id }, data })
+
+  return readTeamBoard(scope, youtuberId)
 }
 
 /**
  * Drop a team
  * @param {string} id - Team identifier
- * @param {string} [scope] - Creator the board is scoped to
+ * @param {AccessScope} scope - Creator perimeter
+ * @param {string} [youtuberId] - Creator the board is narrowed to
  * @return {Promise<TeamBoardData>} - Board data
  */
 
-export const removeTeam = async (id: string, scope?: string): Promise<TeamBoardData> => {
+export const removeTeam = async (
+  id: string,
+  scope: AccessScope,
+  youtuberId?: string
+): Promise<TeamBoardData> => {
+  await assertRowInScope('team', id, scope)
   await prisma.team.delete({ where: { id } })
 
-  return readTeamBoard(scope)
+  return readTeamBoard(scope, youtuberId)
 }
 
 /**
  * Move a member between teams
  * @param {string} accountId - Account identifier
  * @param {string | null} teamId - Target team, null to detach
- * @param {string} [scope] - Creator the board is scoped to
+ * @param {AccessScope} scope - Creator perimeter
+ * @param {string} [youtuberId] - Creator the board is narrowed to
  * @return {Promise<TeamBoardData>} - Board data
  */
 
 export const moveMember = async (
   accountId: string,
   teamId: string | null,
-  scope?: string
+  scope: AccessScope,
+  youtuberId?: string
 ): Promise<TeamBoardData> => {
+  if (teamId) await assertRowInScope('team', teamId, scope)
+
   // A member holds one membership at a time
   await prisma.teamMember.deleteMany({ where: { accountId } })
 
   if (teamId) await prisma.teamMember.create({ data: { accountId, teamId } })
 
-  return readTeamBoard(scope)
+  return readTeamBoard(scope, youtuberId)
 }

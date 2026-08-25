@@ -8,11 +8,11 @@ import { Permissions } from '@/utils/constants/permissions'
 export const PATCH = createProtectedRoute({
   permission: Permissions.TaskUpdate,
   descriptor: { summary: 'Edit a task', tags: ['tasks'] },
-  handler: async ({ params, raw, session }) => {
-    const parsed = parseFormValues(await taskFields(), raw, { fillMissing: true })
+  handler: async ({ params, raw, session, scope }) => {
+    const parsed = parseFormValues(await taskFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const task = await updateTask(params.id, parsed.values)
+    const task = await updateTask(params.id, parsed.values, await scope())
 
     await recordEvent({
       eventType: 'TaskUpdated',
@@ -30,8 +30,8 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   permission: Permissions.TaskDelete,
   descriptor: { summary: 'Drop a task', tags: ['tasks'] },
-  handler: async ({ params, session }) => {
-    await removeTask(params.id)
+  handler: async ({ params, session, scope }) => {
+    await removeTask(params.id, await scope())
 
     await recordEvent({
       eventType: 'TaskDeleted',

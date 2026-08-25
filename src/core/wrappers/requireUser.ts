@@ -4,7 +4,9 @@ import { redirect } from 'next/navigation'
 
 import { getSession } from '@/core/lib/auth/getSession'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
+import { readScope } from '@/core/services/auth/ScopeService'
 import { ROUTES } from '@/declarations/navigation'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import type { PermissionHelpers, Permission, SessionUser } from '@/types/auth'
 import type { MemberStatusName } from '@/utils/constants/hierarchy'
 
@@ -13,11 +15,13 @@ import type { MemberStatusName } from '@/utils/constants/hierarchy'
  * @typedef {Object} GuardedSession
  * @property {SessionUser} session - Signed-in member
  * @property {PermissionHelpers} access - Permission helpers
+ * @property {() => Promise<AccessScope>} scope - Creator perimeter, resolved on demand
  */
 
 export interface GuardedSession {
   session: SessionUser
   access: PermissionHelpers
+  scope: () => Promise<AccessScope>
 }
 
 /**
@@ -29,7 +33,9 @@ export const requireUser = async (): Promise<GuardedSession> => {
   const session = await getSession()
   if (!session) redirect(ROUTES.login)
 
-  return { session, access: resolvePermissions(session) }
+  const access = resolvePermissions(session)
+
+  return { session, access, scope: () => readScope(session, access) }
 }
 
 /**

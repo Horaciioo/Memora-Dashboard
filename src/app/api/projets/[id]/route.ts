@@ -19,11 +19,11 @@ export const GET = createProtectedRoute({
 export const PATCH = createProtectedRoute({
   permission: Permissions.ProjectUpdate,
   descriptor: { summary: 'Edit a project', tags: ['projects'] },
-  handler: async ({ params, raw, session }) => {
-    const parsed = parseFormValues(await projectFields(), raw, { fillMissing: true })
+  handler: async ({ params, raw, session, scope }) => {
+    const parsed = parseFormValues(await projectFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const project = await updateProject(params.id, parsed.values)
+    const project = await updateProject(params.id, parsed.values, await scope())
 
     await recordEvent({
       eventType: 'ProjectUpdated',
@@ -40,9 +40,9 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   permission: Permissions.ProjectDelete,
   descriptor: { summary: 'Drop a project', tags: ['projects'] },
-  handler: async ({ params, session }) => {
+  handler: async ({ params, session, scope }) => {
     const project = await readProject(params.id)
-    await removeProject(params.id)
+    await removeProject(params.id, await scope())
 
     await recordEvent({
       eventType: 'ProjectDeleted',

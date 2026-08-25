@@ -5,8 +5,9 @@ import files from '@/configurations/system/fichiers.json'
 import forms from '@/configurations/system/forms.json'
 import livecon from '@/configurations/system/livecon.json'
 import pagination from '@/configurations/system/pagination.json'
+import perimeter from '@/configurations/system/perimetre.json'
 import search from '@/configurations/system/search.json'
-import { readInteger, readStringList } from '@/declarations/configurations/readers'
+import { readBoolean, readInteger, readStringList } from '@/declarations/configurations/readers'
 
 const maxPerPage = readInteger(pagination.maxPerPage, {
   path: 'system/pagination.maxPerPage',
@@ -179,6 +180,18 @@ export const LIVECON_SETTINGS = {
     fallback: 3,
     min: 1,
     max: maxLevel,
+  }),
+}
+
+/**
+ * Creator perimeter settings
+ * @type {{ includeUnassigned: boolean }}
+ */
+
+export const SCOPE_SETTINGS = {
+  includeUnassigned: readBoolean(perimeter.includeUnassigned, {
+    path: 'system/perimetre.includeUnassigned',
+    fallback: true,
   }),
 }
 

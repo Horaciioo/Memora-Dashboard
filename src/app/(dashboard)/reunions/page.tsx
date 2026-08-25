@@ -17,12 +17,13 @@ export const metadata: Metadata = { title: MEETING_COPY.title }
  */
 
 export default async function MeetingsPage() {
-  const { access } = await requirePermission(Permissions.MeetingRead)
+  const { access, scope } = await requirePermission(Permissions.MeetingRead)
+  const perimeter = await scope()
 
   const [meetings, columns, fields, youtubers, projects] = await Promise.all([
-    listMeetings(),
+    listMeetings(perimeter),
     boardColumns(WorkflowScopes.Meeting),
-    meetingFields(),
+    meetingFields(perimeter),
     youtuberOptions(),
     projectOptions(),
   ])

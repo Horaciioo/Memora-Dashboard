@@ -8,18 +8,18 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.ProjectRead,
   descriptor: { summary: 'List projects', tags: ['projects'] },
-  handler: () => listProjects(),
+  handler: async ({ scope }) => listProjects(await scope()),
 })
 
 export const POST = createProtectedRoute({
   permission: Permissions.ProjectCreate,
   status: 201,
   descriptor: { summary: 'Open a project', tags: ['projects'] },
-  handler: async ({ raw, session }) => {
-    const parsed = parseFormValues(await projectFields(), raw, { fillMissing: true })
+  handler: async ({ raw, session, scope }) => {
+    const parsed = parseFormValues(await projectFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const project = await createProject(parsed.values)
+    const project = await createProject(parsed.values, await scope())
 
     await recordEvent({
       eventType: 'ProjectCreated',
