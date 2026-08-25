@@ -20,7 +20,7 @@ const PERMISSION_GROUP_MAP: Record<PermissionGroup, PermissionGroupOption> = {
   [PermissionGroups.Tasks]: { label: 'Tâches', position: 2 },
   [PermissionGroups.Meetings]: { label: 'Réunions', position: 3 },
   [PermissionGroups.Absences]: { label: 'Absences', position: 4 },
-  [PermissionGroups.Livecon]: { label: 'Livecon', position: 5 },
+  [PermissionGroups.Moderation]: { label: 'Modération', position: 5 },
   [PermissionGroups.Academy]: { label: 'Marsha Academy', position: 6 },
   [PermissionGroups.Teams]: { label: 'Équipes', position: 7 },
   [PermissionGroups.Calendar]: { label: 'Calendrier', position: 8 },
