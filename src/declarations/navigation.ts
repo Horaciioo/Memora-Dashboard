@@ -87,14 +87,33 @@ export const matchesNavigation = (
 }
 
 /**
+ * The two faces of the rail, moderation work on one side, running the corp on the other
+ * @type {Record<string, string>}
+ */
+
+export const NavigationViews = {
+  Moderation: 'MODERATION',
+  Administration: 'ADMINISTRATION',
+} as const
+
+/**
+ * Rail view name
+ * @type {(typeof NavigationViews)[keyof typeof NavigationViews]}
+ */
+
+export type NavigationViewName = (typeof NavigationViews)[keyof typeof NavigationViews]
+
+/**
  * Navigation group
  * @typedef {Object} NavigationGroup
  * @property {string} label - Section label
+ * @property {NavigationViewName[]} views - Views the group belongs to
  * @property {NavigationItem[]} items - Entries
  */
 
 export interface NavigationGroup {
   label: string
+  views: NavigationViewName[]
   items: NavigationItem[]
 }
 
@@ -106,6 +125,7 @@ export interface NavigationGroup {
 export const NAVIGATION: NavigationGroup[] = [
   {
     label: 'Personnel',
+    views: [NavigationViews.Moderation, NavigationViews.Administration],
     items: [
       { href: ROUTES.dashboard, label: 'Mon tableau de bord', icon: 'dashboard', wip: true },
       { href: ROUTES.absences, label: 'Absences', icon: 'absences' },
@@ -126,6 +146,7 @@ export const NAVIGATION: NavigationGroup[] = [
   },
   {
     label: 'Pilotage',
+    views: [NavigationViews.Administration],
     items: [
       {
         href: ROUTES.projects,
@@ -144,6 +165,7 @@ export const NAVIGATION: NavigationGroup[] = [
   },
   {
     label: 'Équipe',
+    views: [NavigationViews.Administration],
     items: [
       {
         href: ROUTES.members,
@@ -168,6 +190,7 @@ export const NAVIGATION: NavigationGroup[] = [
   },
   {
     label: 'Modération',
+    views: [NavigationViews.Moderation],
     items: [
       {
         href: ROUTES.livecon,
@@ -180,6 +203,7 @@ export const NAVIGATION: NavigationGroup[] = [
   },
   {
     label: 'Administration',
+    views: [NavigationViews.Administration],
     items: [
       {
         href: ROUTES.settings,
