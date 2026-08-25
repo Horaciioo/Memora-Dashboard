@@ -17,10 +17,11 @@ export const metadata: Metadata = { title: TEAM_COPY.title }
  */
 
 export default async function TeamsPage() {
-  const { access } = await requirePermission(Permissions.TeamRead)
+  const { access, scope } = await requirePermission(Permissions.TeamRead)
+  const perimeter = await scope()
   const [board, fields, youtubers] = await Promise.all([
-    readTeamBoard(),
-    teamFields(),
+    readTeamBoard(perimeter),
+    teamFields(perimeter),
     prisma.youtuber.findMany({ orderBy: { position: 'asc' } }),
   ])
 

@@ -22,12 +22,13 @@ export const metadata: Metadata = { title: TASK_COPY.title }
  */
 
 export default async function TasksPage() {
-  const { access } = await requirePermission(Permissions.TaskRead)
+  const { access, scope } = await requirePermission(Permissions.TaskRead)
+  const perimeter = await scope()
 
   const [tasks, columns, fields, owners, youtubers, projects] = await Promise.all([
-    listTasks(),
+    listTasks(perimeter),
     boardColumns(WorkflowScopes.Task),
-    taskFields(),
+    taskFields(perimeter),
     memberOptions(),
     youtuberOptions(),
     projectOptions(),

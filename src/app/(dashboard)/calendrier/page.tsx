@@ -17,14 +17,21 @@ export const metadata: Metadata = { title: CALENDAR_COPY.title }
  */
 
 export default async function CalendarPage() {
-  const { session, access } = await requirePermission(Permissions.CalendarRead)
+  const { session, access, scope } = await requirePermission(Permissions.CalendarRead)
+  const perimeter = await scope()
 
   const anchor = toDayKey(new Date())
   const { from, to } = gridRange(monthGrid(anchor))
 
   const [entries, fields, typeCount] = await Promise.all([
-    listEntries({ from: new Date(from), to: new Date(to), viewerId: session.id, access }),
-    calendarFields(),
+    listEntries({
+      from: new Date(from),
+      to: new Date(to),
+      viewerId: session.id,
+      access,
+      scope: perimeter,
+    }),
+    calendarFields(perimeter),
     prisma.eventType.count({ where: { archived: false } }),
   ])
 

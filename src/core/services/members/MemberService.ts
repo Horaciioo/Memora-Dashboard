@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { scopedWhere } from '@/core/services/auth/ScopeService'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { conflict, immutable, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
@@ -262,8 +264,9 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
  * @return {Promise<MemberSummary[]>} - List rows
  */
 
-export const listMembers = async (): Promise<MemberSummary[]> => {
+export const listMembers = async (scope: AccessScope): Promise<MemberSummary[]> => {
   const rows = await prisma.account.findMany({
+    where: scopedWhere('account', scope, {}),
     include: {
       ...SUMMARY_INCLUDE,
       _count: { select: { notesReceived: true, absences: { where: activeAbsenceFilter() } } },

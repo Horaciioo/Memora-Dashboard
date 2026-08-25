@@ -17,10 +17,10 @@ export const metadata: Metadata = { title: MEMBER_COPY.title }
  */
 
 export default async function MembersPage() {
-  const { access } = await requirePermission(Permissions.MemberRead)
+  const { access, scope } = await requirePermission(Permissions.MemberRead)
 
   const [members, fields, divisions, youtubers, functions] = await Promise.all([
-    listMembers(),
+    listMembers(await scope()),
     memberFields(),
     prisma.division.findMany({ orderBy: { rank: 'asc' } }),
     prisma.youtuber.findMany({ orderBy: { position: 'asc' } }),

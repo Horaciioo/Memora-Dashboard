@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { assertInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { invalidInput } from '@/core/lib/errors'
 import { readText } from '@/core/lib/forms/values'
 import { toTag, youtuberOptions } from '@/core/services/work/shared'
@@ -47,12 +49,13 @@ export const listLevels = async (): Promise<LiveconLevelView[]> => {
 
 /**
  * Read the levels currently in force
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<LiveconStateView[]>} - Open entries
  */
 
-export const readCurrentState = async (): Promise<LiveconStateView[]> => {
+export const readCurrentState = async (scope: AccessScope): Promise<LiveconStateView[]> => {
   const rows = await prisma.liveconEntry.findMany({
-    where: { endedAt: null },
+    where: scopedWhere('liveconEntry', scope, { endedAt: null }),
     include: {
       level: { include: { _count: { select: { entries: true } } } },
       youtuber: true,
@@ -73,14 +76,17 @@ export const readCurrentState = async (): Promise<LiveconStateView[]> => {
 
 /**
  * Read the past switches
+ * @param {AccessScope} scope - Creator perimeter
  * @param {number} [take] - Entry count
  * @return {Promise<LiveconHistoryEntry[]>} - History entries
  */
 
 export const readHistory = async (
+  scope: AccessScope,
   take: number = PAGINATION_SETTINGS.defaultPerPage
 ): Promise<LiveconHistoryEntry[]> => {
   const rows = await prisma.liveconEntry.findMany({
+    where: scopedWhere('liveconEntry', scope, {}),
     include: { level: true, youtuber: true, actor: true },
     orderBy: { startedAt: 'desc' },
     take,
@@ -101,11 +107,12 @@ export const readHistory = async (
 
 /**
  * Build the livecon switch form declarations
+ * @param {AccessScope} [scope] - Creator perimeter
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const liveconFields = async (): Promise<FieldDefinition[]> => {
-  const [youtubers, levels] = await Promise.all([youtuberOptions(), listLevels()])
+export const liveconFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
+  const [youtubers, levels] = await Promise.all([youtuberOptions(scope), listLevels()])
 
   return [
     {
@@ -142,17 +149,20 @@ export const liveconFields = async (): Promise<FieldDefinition[]> => {
  * Switch the level of one scope
  * @param {FormValues} values - Parsed body
  * @param {string} actorId - Who switched it
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<LiveconStateView[]>} - Open entries
  */
 
 export const switchLevel = async (
   values: FormValues,
-  actorId: string
+  actorId: string,
+  scope: AccessScope
 ): Promise<LiveconStateView[]> => {
   const levelId = readText(values, 'levelId')
   if (!levelId) throw invalidInput([{ field: 'levelId', message: FORM_COPY.required }])
 
   const youtuberId = readText(values, 'youtuberId')
+  assertInScope(scope, youtuberId)
 
   // One open entry per scope, the previous one closes on the spot
   await prisma.liveconEntry.updateMany({
@@ -164,5 +174,5 @@ export const switchLevel = async (
     data: { levelId, youtuberId, actorId, reason: readText(values, 'reason') },
   })
 
-  return readCurrentState()
+  return readCurrentState(scope)
 }

@@ -20,13 +20,14 @@ export const metadata: Metadata = { title: LIVECON_COPY.title }
  */
 
 export default async function LiveconPage() {
-  const { access } = await requirePermission(Permissions.LiveconRead)
+  const { access, scope } = await requirePermission(Permissions.LiveconRead)
+  const perimeter = await scope()
 
   const [levels, state, history, fields] = await Promise.all([
     listLevels(),
-    readCurrentState(),
-    readHistory(),
-    liveconFields(),
+    readCurrentState(perimeter),
+    readHistory(perimeter),
+    liveconFields(perimeter),
   ])
 
   return (

@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { notFound } from '@/core/lib/errors'
 import { readDate, readList, readText } from '@/core/lib/forms/values'
 import {
@@ -74,15 +76,16 @@ const toSummary = (row: ProjectRow): ProjectSummary => ({
 
 /**
  * Build the project form declarations
+ * @param {AccessScope} [scope] - Creator perimeter
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const projectFields = async (): Promise<FieldDefinition[]> => {
+export const projectFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
   const [states, priorities, platforms, youtubers, members] = await Promise.all([
     stateOptions(WorkflowScopes.Project),
     priorityOptions(),
     platformOptions(),
-    youtuberOptions(),
+    youtuberOptions(scope),
     memberOptions(),
   ])
 
@@ -169,12 +172,13 @@ export const projectFields = async (): Promise<FieldDefinition[]> => {
 
 /**
  * Read every project
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<ProjectSummary[]>} - Board cards
  */
 
-export const listProjects = async (): Promise<ProjectSummary[]> => {
+export const listProjects = async (scope: AccessScope): Promise<ProjectSummary[]> => {
   const rows = await prisma.project.findMany({
-    where: { archived: false },
+    where: scopedWhere('project', scope, { archived: false }),
     include: PROJECT_INCLUDE,
     orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
   })
@@ -202,11 +206,16 @@ const toProjectData = (values: FormValues) => ({
 /**
  * Open a project
  * @param {FormValues} values - Parsed body
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<ProjectSummary>} - Created card
  */
 
-export const createProject = async (values: FormValues): Promise<ProjectSummary> => {
+export const createProject = async (
+  values: FormValues,
+  scope: AccessScope
+): Promise<ProjectSummary> => {
   const data = toProjectData(values)
+  assertInScope(scope, data.youtuberId ?? null)
   const stateId = data.stateId ?? (await defaultState(WorkflowScopes.Project))
   const assistantIds = readList(values, 'assistantIds')
 
@@ -230,10 +239,17 @@ export const createProject = async (values: FormValues): Promise<ProjectSummary>
  * Edit a project
  * @param {string} id - Project identifier
  * @param {FormValues} values - Parsed body
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<ProjectSummary>} - Updated card
  */
 
-export const updateProject = async (id: string, values: FormValues): Promise<ProjectSummary> => {
+export const updateProject = async (
+  id: string,
+  values: FormValues,
+  scope: AccessScope
+): Promise<ProjectSummary> => {
+  await assertRowInScope('project', id, scope)
+
   const assistantIds = readList(values, 'assistantIds')
 
   // Assistants are replaced wholesale, the form always sends the full list
@@ -255,10 +271,12 @@ export const updateProject = async (id: string, values: FormValues): Promise<Pro
 /**
  * Drop a project
  * @param {string} id - Project identifier
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<void>} - Removed
  */
 
-export const removeProject = async (id: string): Promise<void> => {
+export const removeProject = async (id: string, scope: AccessScope): Promise<void> => {
+  await assertRowInScope('project', id, scope)
   await prisma.project.delete({ where: { id } })
 }
 
@@ -357,6 +375,7 @@ export const communicationFields = async (): Promise<FieldDefinition[]> => {
  * @param {string} projectId - Project identifier
  * @param {string} authorId - Author identifier
  * @param {FormValues} values - Parsed body
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<CommunicationEntry>} - Created announcement
  */
 
@@ -391,6 +410,7 @@ export const addCommunication = async (
  * Edit an announcement
  * @param {string} id - Announcement identifier
  * @param {FormValues} values - Parsed body
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<CommunicationEntry>} - Updated announcement
  */
 

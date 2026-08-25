@@ -7,12 +7,13 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.CalendarRead,
   descriptor: { summary: 'Read the calendar window', tags: ['calendar'] },
-  handler: ({ query, session, access }) =>
+  handler: async ({ query, session, access, scope }) =>
     listEntries({
       from: new Date(query.get('debut') ?? ''),
       to: new Date(query.get('fin') ?? ''),
       viewerId: session.id,
       access,
+      scope: await scope(),
       sessionId: query.get('session') ?? undefined,
     }),
 })
@@ -21,8 +22,8 @@ export const POST = createProtectedRoute({
   permission: Permissions.CalendarManage,
   status: 201,
   descriptor: { summary: 'Post an entry on the calendar', tags: ['calendar'] },
-  handler: async ({ raw, session }) => {
-    const parsed = parseFormValues(await calendarFields(), raw, { fillMissing: true })
+  handler: async ({ raw, session, scope }) => {
+    const parsed = parseFormValues(await calendarFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     return createEntry(session.id, parsed.values)

@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import {
   defaultState,
@@ -82,13 +84,14 @@ const toSummary = (row: MeetingRow): MeetingSummary => ({
 
 /**
  * Build the meeting form declarations
+ * @param {AccessScope} [scope] - Creator perimeter
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const meetingFields = async (): Promise<FieldDefinition[]> => {
+export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
   const [states, youtubers, projects, members] = await Promise.all([
     stateOptions(WorkflowScopes.Meeting),
-    youtuberOptions(),
+    youtuberOptions(scope),
     projectOptions(),
     memberOptions(),
   ])
@@ -193,11 +196,13 @@ export const meetingFields = async (): Promise<FieldDefinition[]> => {
 
 /**
  * Read every meeting
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<MeetingSummary[]>} - Board cards
  */
 
-export const listMeetings = async (): Promise<MeetingSummary[]> => {
+export const listMeetings = async (scope: AccessScope): Promise<MeetingSummary[]> => {
   const rows = await prisma.meeting.findMany({
+    where: scopedWhere('meeting', scope, {}),
     include: MEETING_INCLUDE,
     orderBy: [{ scheduledAt: 'desc' }],
   })
@@ -247,11 +252,17 @@ const toMeetingData = (values: FormValues) => ({
 /**
  * Plan a meeting
  * @param {FormValues} values - Parsed body
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<MeetingSummary>} - Created card
  */
 
-export const createMeeting = async (values: FormValues): Promise<MeetingSummary> => {
+export const createMeeting = async (
+  values: FormValues,
+  scope: AccessScope
+): Promise<MeetingSummary> => {
   const data = toMeetingData(values)
+  assertInScope(scope, data.youtuberId ?? null)
+
   const stateId = data.stateId ?? (await defaultState(WorkflowScopes.Meeting))
 
   // A new card lands at the bottom of its column
@@ -275,10 +286,17 @@ export const createMeeting = async (values: FormValues): Promise<MeetingSummary>
  * Edit a meeting
  * @param {string} id - Meeting identifier
  * @param {FormValues} values - Parsed body
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<MeetingSummary>} - Updated card
  */
 
-export const updateMeeting = async (id: string, values: FormValues): Promise<MeetingSummary> => {
+export const updateMeeting = async (
+  id: string,
+  values: FormValues,
+  scope: AccessScope
+): Promise<MeetingSummary> => {
+  await assertRowInScope('meeting', id, scope)
+
   const scheduledAt = readDate(values, 'scheduledAt')
 
   // Attendees are replaced wholesale, the form always sends the full lists
@@ -298,10 +316,13 @@ export const updateMeeting = async (id: string, values: FormValues): Promise<Mee
 /**
  * Drop a meeting
  * @param {string} id - Meeting identifier
+ * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<void>} - Removed
  */
 
-export const removeMeeting = async (id: string): Promise<void> => {
+export const removeMeeting = async (id: string, scope: AccessScope): Promise<void> => {
+  await assertRowInScope('meeting', id, scope)
+
   await prisma.meeting.delete({ where: { id } })
 }
 
