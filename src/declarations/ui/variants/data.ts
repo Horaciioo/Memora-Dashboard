@@ -194,3 +194,28 @@ export const PERMISSION_PICKER_STYLES = {
   control: 'shrink-0',
   empty: 'px-2 py-6 text-center text-sm text-[var(--color-ink-subtle)]',
 } as const
+
+/**
+ * Sanction panel styles — a banner, a grid of title-only tiles, and the ladder table
+ * @type {Record<string, string>}
+ */
+
+export const SANCTION_STYLES = {
+  banner: 'flex flex-wrap items-start justify-between gap-4',
+  level: 'flex items-center gap-3',
+  levelNumber: 'text-4xl leading-none font-extrabold tabular-nums',
+  levelIdentity: 'flex min-w-0 flex-col gap-0.5',
+  levelName: 'truncate text-base font-bold',
+  bannerActions: 'flex flex-wrap items-center gap-2',
+  grid: 'grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
+  tile: 'flex min-h-16 items-center rounded-[var(--radius-lg)] border-2 px-3 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-[var(--color-surface)]',
+  block: 'flex flex-col gap-1.5',
+  blockLabel:
+    'text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  example: 'rounded-[var(--radius-md)] p-3 text-sm',
+  warning:
+    'rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 font-[family-name:var(--font-mono)] text-xs',
+  ladder: 'flex flex-col gap-1',
+  rung: 'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] px-2 py-1.5',
+  rungLabel: 'min-w-24 text-xs text-[var(--color-ink-subtle)]',
+} as const

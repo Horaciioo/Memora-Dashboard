@@ -193,12 +193,11 @@ export const NAVIGATION: NavigationGroup[] = [
     views: [NavigationViews.Moderation],
     items: [
       {
-        href: ROUTES.livecon,
-        label: 'Livecon',
-        icon: 'livecon',
-        permission: Permissions.LiveconRead,
+        href: ROUTES.sanctions,
+        label: 'Panel de sanctions',
+        icon: 'sanctions',
+        permission: Permissions.SanctionRead,
       },
-      { href: ROUTES.sanctions, label: 'Panel de sanctions', icon: 'sanctions', wip: true },
     ],
   },
   {

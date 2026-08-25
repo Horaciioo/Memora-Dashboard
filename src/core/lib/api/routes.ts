@@ -31,6 +31,10 @@ export const API_ROUTES = {
   absences: '/api/absences',
   absence: (id: string) => `/api/absences/${id}`,
   livecon: '/api/livecon',
+  sanctions: (youtuberId: string, levelId?: string) =>
+    `/api/sanctions?youtubeur=${youtuberId}${levelId ? `&niveau=${levelId}` : ''}`,
+  sanctionOffense: (id: string) => `/api/sanctions/${id}`,
+  sanctionLadder: (id: string) => `/api/sanctions/${id}/paliers`,
   calendar: (from: string, to: string, sessionId?: string) =>
     `/api/calendrier?debut=${encodeURIComponent(from)}&fin=${encodeURIComponent(to)}` +
     (sessionId ? `&session=${encodeURIComponent(sessionId)}` : ''),
@@ -92,6 +96,7 @@ export const CACHE_KEYS = {
   meetings: () => 'meetings',
   absences: () => 'absences',
   livecon: () => 'livecon',
+  sanctions: (youtuberId: string) => `sanctions:${youtuberId}`,
   teams: () => 'teams',
   calendar: (from: string, to: string) => `calendar:${from}:${to}`,
   sessions: () => 'academy:sessions',
