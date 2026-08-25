@@ -37,4 +37,12 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
       [MemberRoles.Moderateur]: [Permissions.AcademySelfRead, Permissions.AcademyTrainingComplete],
     },
   },
+  {
+    key: 'moderation-sanctions',
+    grants: {
+      [MemberRoles.Admin]: [Permissions.SanctionRead, Permissions.SanctionManage],
+      [MemberRoles.Responsable]: [Permissions.SanctionRead, Permissions.SanctionManage],
+      [MemberRoles.Moderateur]: [Permissions.SanctionRead],
+    },
+  },
 ]

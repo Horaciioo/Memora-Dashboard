@@ -36,6 +36,7 @@ export const EVENT_TYPES = createEnumeration({
   ReviewValidated: { id: 27, label: 'Bilan validé' },
   StepValidated: { id: 28, label: 'Étape de PIM franchie' },
   JuniorEnrolled: { id: 29, label: 'Junior admis' },
+  SanctionChanged: { id: 30, label: 'Sanction modifiée' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids
