@@ -36,7 +36,7 @@ export const ROUTES = {
 } as const
 
 /**
- * Rule keeping an entry out of the rail, its vocabulary aligned on FieldCondition
+ * Rule keeping an entry out of the rail
  * @typedef {Object} NavigationCondition
  * @property {MemberStatusName[]} [statuses] - Statuses the entry is meant for
  * @property {MemberRoleName[]} [roles] - Roles the entry is meant for

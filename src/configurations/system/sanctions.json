@@ -1,0 +1,5 @@
+{
+  "maxSteps": 6,
+  "defaultSteps": 3,
+  "maxTimeoutMinutes": 20160
+}

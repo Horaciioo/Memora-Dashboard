@@ -6,6 +6,7 @@ import forms from '@/configurations/system/forms.json'
 import livecon from '@/configurations/system/livecon.json'
 import pagination from '@/configurations/system/pagination.json'
 import perimeter from '@/configurations/system/perimetre.json'
+import sanctions from '@/configurations/system/sanctions.json'
 import search from '@/configurations/system/search.json'
 import { readBoolean, readInteger, readStringList } from '@/declarations/configurations/readers'
 
@@ -180,6 +181,32 @@ export const LIVECON_SETTINGS = {
     fallback: 3,
     min: 1,
     max: maxLevel,
+  }),
+}
+
+const maxSteps = readInteger(sanctions.maxSteps, {
+  path: 'system/sanctions.maxSteps',
+  fallback: 6,
+  min: 1,
+})
+
+/**
+ * Sanction ladder bounds
+ * @type {{ maxSteps: number, defaultSteps: number, maxTimeoutMinutes: number }}
+ */
+
+export const SANCTION_SETTINGS = {
+  maxSteps,
+  defaultSteps: readInteger(sanctions.defaultSteps, {
+    path: 'system/sanctions.defaultSteps',
+    fallback: 3,
+    min: 1,
+    max: maxSteps,
+  }),
+  maxTimeoutMinutes: readInteger(sanctions.maxTimeoutMinutes, {
+    path: 'system/sanctions.maxTimeoutMinutes',
+    fallback: 20160,
+    min: 1,
   }),
 }
 

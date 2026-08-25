@@ -2,10 +2,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { ROUTES } from '@/declarations/navigation'
 
-// Paths reachable without a session
+// Paths reachable
 const PUBLIC_PATHS: string[] = [ROUTES.login]
 
-// Path prefixes reachable without a session, dynamic segments included
+// Path prefixes
 const PUBLIC_PREFIXES: string[] = ['/admission']
 
 /**
@@ -19,7 +19,8 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hasSession = request.cookies.has(SESSION_COOKIE)
   const isSignInScreen = PUBLIC_PATHS.includes(pathname)
-  // A prefix stays reachable either way, a signed-in staff member may preview it too
+
+  // A prefix stays reachable either way
   const isOpenToEveryone =
     isSignInScreen || PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(`${prefix}/`))
 

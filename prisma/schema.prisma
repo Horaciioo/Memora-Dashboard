@@ -154,63 +154,63 @@ enum EventVisibility {
 
 // Signed-in member
 model Account {
-  id                  String        @id @default(cuid())
-  discordId           String        @unique
+  id                  String       @id @default(cuid())
+  discordId           String       @unique
   displayName         String
   email               String?
   phone               String?
   birthday            DateTime?
-  celebrateBirthday   Boolean       @default(true)
-  joinedAt            DateTime      @default(now())
+  celebrateBirthday   Boolean      @default(true)
+  joinedAt            DateTime     @default(now())
   leftAt              DateTime?
-  languages           String[]      @default([])
+  languages           String[]     @default([])
   timezone            String?
   avatarUrl           String?
-  role                MemberRole    @default(MODERATEUR)
-  status              MemberStatus  @default(ACADEMY)
+  role                MemberRole   @default(MODERATEUR)
+  status              MemberStatus @default(ACADEMY)
   divisionId          String?
   primaryFunctionId   String?
   secondaryFunctionId String?
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
 
-  division          Division?     @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  division          Division?    @relation(fields: [divisionId], references: [id], onDelete: SetNull)
   youtubers         Youtuber[]
-  primaryFunction   JobFunction?  @relation("PrimaryFunction", fields: [primaryFunctionId], references: [id], onDelete: SetNull)
-  secondaryFunction JobFunction?  @relation("SecondaryFunction", fields: [secondaryFunctionId], references: [id], onDelete: SetNull)
+  primaryFunction   JobFunction? @relation("PrimaryFunction", fields: [primaryFunctionId], references: [id], onDelete: SetNull)
+  secondaryFunction JobFunction? @relation("SecondaryFunction", fields: [secondaryFunctionId], references: [id], onDelete: SetNull)
 
-  sessions            Session[]
-  permissions         AccountPermission[]
-  socialLinks         SocialLink[]
-  absences            Absence[]           @relation("AbsenceOwner")
-  reviewedAbsences    Absence[]           @relation("AbsenceReviewer")
-  notesReceived       AccountNote[]       @relation("NoteSubject")
-  notesWritten        AccountNote[]       @relation("NoteAuthor")
-  trainingRecords     TrainingRecord[]    @relation("TrainingLearner")
-  trainingsValidated  TrainingRecord[]    @relation("TrainingValidator")
-  academyJuniors      AcademyJunior[]     @relation("AcademyJunior")
-  academyTrainees     AcademyJunior[]     @relation("AcademyJuniorTrainer")
-  academySeats        AcademySessionTrainer[] @relation("AcademyTrainer")
-  academySteps        AcademyStep[]      @relation("AcademyStepAuthor")
-  academyStepsValidated AcademyStep[]    @relation("AcademyStepValidator")
-  sessionInvitesCreated SessionInvite[]  @relation("SessionInviteCreatedBy")
+  sessions              Session[]
+  permissions           AccountPermission[]
+  socialLinks           SocialLink[]
+  absences              Absence[]               @relation("AbsenceOwner")
+  reviewedAbsences      Absence[]               @relation("AbsenceReviewer")
+  notesReceived         AccountNote[]           @relation("NoteSubject")
+  notesWritten          AccountNote[]           @relation("NoteAuthor")
+  trainingRecords       TrainingRecord[]        @relation("TrainingLearner")
+  trainingsValidated    TrainingRecord[]        @relation("TrainingValidator")
+  academyJuniors        AcademyJunior[]         @relation("AcademyJunior")
+  academyTrainees       AcademyJunior[]         @relation("AcademyJuniorTrainer")
+  academySeats          AcademySessionTrainer[] @relation("AcademyTrainer")
+  academySteps          AcademyStep[]           @relation("AcademyStepAuthor")
+  academyStepsValidated AcademyStep[]           @relation("AcademyStepValidator")
+  sessionInvitesCreated SessionInvite[]         @relation("SessionInviteCreatedBy")
   quizAnswers           JuniorAnswer[]
-  academyReviews      AcademyReview[]     @relation("AcademyReviewAuthor")
-  academyReviewsDecided AcademyReview[]   @relation("AcademyReviewDecider")
-  juniorSkillsGraded  JuniorSkill[]       @relation("JuniorSkillValidator")
-  juniorNotesWritten  JuniorNote[]        @relation("JuniorNoteAuthor")
-  juniorObjectivesSet JuniorObjective[]   @relation("JuniorObjectiveAuthor")
-  calendarEvents      CalendarEvent[]     @relation("CalendarOwner")
-  ledTeams            Team[]              @relation("TeamLead")
-  teamMemberships     TeamMember[]
-  ledProjects         Project[]           @relation("ProjectLead")
-  projectAssists      ProjectAssistant[]
-  ownedTasks          Task[]              @relation("TaskOwner")
-  meetingSeats        MeetingAttendee[]
-  communications      Communication[]
-  liveconChanges      LiveconEntry[]
-  activityAsSubject   ActivityLog[]       @relation("LogSubject")
-  activityAsActor     ActivityLog[]       @relation("LogActor")
+  academyReviews        AcademyReview[]         @relation("AcademyReviewAuthor")
+  academyReviewsDecided AcademyReview[]         @relation("AcademyReviewDecider")
+  juniorSkillsGraded    JuniorSkill[]           @relation("JuniorSkillValidator")
+  juniorNotesWritten    JuniorNote[]            @relation("JuniorNoteAuthor")
+  juniorObjectivesSet   JuniorObjective[]       @relation("JuniorObjectiveAuthor")
+  calendarEvents        CalendarEvent[]         @relation("CalendarOwner")
+  ledTeams              Team[]                  @relation("TeamLead")
+  teamMemberships       TeamMember[]
+  ledProjects           Project[]               @relation("ProjectLead")
+  projectAssists        ProjectAssistant[]
+  ownedTasks            Task[]                  @relation("TaskOwner")
+  meetingSeats          MeetingAttendee[]
+  communications        Communication[]
+  liveconChanges        LiveconEntry[]
+  activityAsSubject     ActivityLog[]           @relation("LogSubject")
+  activityAsActor       ActivityLog[]           @relation("LogActor")
 
   @@index([role])
   @@index([status])
@@ -290,13 +290,14 @@ model Youtuber {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  accounts       Account[]
-  teams          Team[]
-  projects       Project[]
-  tasks          Task[]
-  meetings       Meeting[]
-  liveconEntries LiveconEntry[]
-  calendarEvents CalendarEvent[]
+  accounts         Account[]
+  teams            Team[]
+  projects         Project[]
+  tasks            Task[]
+  meetings         Meeting[]
+  liveconEntries   LiveconEntry[]
+  calendarEvents   CalendarEvent[]
+  sanctionOffenses SanctionOffense[]
 
   @@index([archived])
   @@map("youtubers")
@@ -528,7 +529,7 @@ model Task {
 
 // Scheduled gathering around a project
 model Meeting {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
   agenda      String?
   minutes     String?
@@ -537,9 +538,9 @@ model Meeting {
   stateId     String?
   youtuberId  String?
   projectId   String?
-  position    Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   state    WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
   youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
@@ -571,18 +572,18 @@ model MeetingAttendee {
 
 // Time off declared by a member
 model Absence {
-  id           String        @id @default(cuid())
-  accountId    String
-  startDate    DateTime
-  endDate      DateTime
-  dayCount     Int
-  reason       String?
-  status       AbsenceStatus @default(PENDING)
-  reviewerId   String?
-  reviewedAt   DateTime?
-  reviewNote   String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id         String        @id @default(cuid())
+  accountId  String
+  startDate  DateTime
+  endDate    DateTime
+  dayCount   Int
+  reason     String?
+  status     AbsenceStatus @default(PENDING)
+  reviewerId String?
+  reviewedAt DateTime?
+  reviewNote String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 
   account  Account  @relation("AbsenceOwner", fields: [accountId], references: [id], onDelete: Cascade)
   reviewer Account? @relation("AbsenceReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
@@ -700,8 +701,8 @@ model PimStepTemplate {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  jobFunction JobFunction? @relation(fields: [functionId], references: [id], onDelete: Cascade)
-  dispositif  Dispositif?  @relation(fields: [dispositifId], references: [id], onDelete: Cascade)
+  jobFunction JobFunction?  @relation(fields: [functionId], references: [id], onDelete: Cascade)
+  dispositif  Dispositif?   @relation(fields: [dispositifId], references: [id], onDelete: Cascade)
   steps       AcademyStep[]
 
   @@unique([title, functionId, dispositifId])
@@ -711,19 +712,19 @@ model PimStepTemplate {
 
 // Course a junior must clear during the academy
 model Training {
-  id           String          @id @default(cuid())
-  name         String          @unique
+  id           String         @id @default(cuid())
+  name         String         @unique
   summary      String?
   period       AcademyPeriod?
-  mandatory    Boolean         @default(false)
+  mandatory    Boolean        @default(false)
   functionId   String?
   dispositifId String?
   position     Int            @default(0)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
-  jobFunction JobFunction? @relation(fields: [functionId], references: [id], onDelete: SetNull)
-  dispositif  Dispositif?  @relation(fields: [dispositifId], references: [id], onDelete: SetNull)
+  jobFunction JobFunction?      @relation(fields: [functionId], references: [id], onDelete: SetNull)
+  dispositif  Dispositif?       @relation(fields: [dispositifId], references: [id], onDelete: SetNull)
   records     TrainingRecord[]
   chapters    TrainingChapter[]
 
@@ -855,11 +856,11 @@ model AcademySession {
 
   jobFunction JobFunction @relation(fields: [functionId], references: [id], onDelete: Restrict)
 
-  trainers AcademySessionTrainer[]
-  juniors  AcademyJunior[]
-  steps    AcademyStep[]
+  trainers       AcademySessionTrainer[]
+  juniors        AcademyJunior[]
+  steps          AcademyStep[]
   calendarEvents CalendarEvent[]
-  invites  SessionInvite[]
+  invites        SessionInvite[]
 
   @@index([functionId, startsAt])
   @@index([status])
@@ -868,15 +869,15 @@ model AcademySession {
 
 // Public admission link opened once a session takes applications
 model SessionInvite {
-  id           String    @id @default(cuid())
+  id           String   @id @default(cuid())
   sessionId    String
-  token        String    @unique
+  token        String   @unique
   expiresAt    DateTime
   maxUses      Int?
-  uses         Int       @default(0)
+  uses         Int      @default(0)
   dispositifId String?
   createdById  String?
-  createdAt    DateTime  @default(now())
+  createdAt    DateTime @default(now())
 
   session    AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   dispositif Dispositif?    @relation(fields: [dispositifId], references: [id], onDelete: SetNull)
@@ -927,7 +928,7 @@ model AcademyJunior {
   skills          JuniorSkill[]
   notes           JuniorNote[]
   objectives      JuniorObjective[]
-  trainingRecords TrainingRecord[] @relation("TrainingJunior")
+  trainingRecords TrainingRecord[]  @relation("TrainingJunior")
 
   @@unique([sessionId, accountId])
   @@index([status])
@@ -1111,19 +1112,20 @@ model LiveconLevel {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  entries LiveconEntry[]
+  entries       LiveconEntry[]
+  sanctionTiers SanctionTier[]
 
   @@map("livecon_levels")
 }
 
 // Recorded switch to a livecon level
 model LiveconEntry {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   levelId    String
   youtuberId String?
   actorId    String?
   reason     String?
-  startedAt  DateTime @default(now())
+  startedAt  DateTime  @default(now())
   endedAt    DateTime?
 
   level    LiveconLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
@@ -1172,4 +1174,72 @@ model StorageEntry {
   @@unique([bucket, key])
   @@index([bucket])
   @@map("storage_entries")
+}
+
+// Nature of a sanction measure
+enum SanctionKind {
+  DELETE
+  WARN
+  TIMEOUT
+  BAN
+}
+
+// Measure applied at one offence tier
+model SanctionMeasure {
+  id              String       @id @default(cuid())
+  name            String       @unique
+  kind            SanctionKind @default(TIMEOUT)
+  durationMinutes Int?
+  permanent       Boolean      @default(false)
+  weight          Int          @default(0)
+  accent          String?
+  position        Int          @default(0)
+  archived        Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  tiers SanctionTier[]
+
+  @@index([weight])
+  @@map("sanction_measures")
+}
+
+// Offence listed on one creator panel
+model SanctionOffense {
+  id             String   @id @default(cuid())
+  youtuberId     String
+  name           String
+  summary        String?
+  example        String?
+  warningExample String?
+  accent         String?
+  position       Int      @default(0)
+  archived       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  youtuber Youtuber       @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  tiers    SanctionTier[]
+
+  @@unique([youtuberId, name])
+  @@index([youtuberId, position])
+  @@map("sanction_offenses")
+}
+
+// Graduated step of one offence inside one livecon panel
+model SanctionTier {
+  id        String  @id @default(cuid())
+  offenseId String
+  levelId   String
+  step      Int
+  measureId String
+  note      String?
+
+  offense SanctionOffense @relation(fields: [offenseId], references: [id], onDelete: Cascade)
+  level   LiveconLevel    @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  measure SanctionMeasure @relation(fields: [measureId], references: [id], onDelete: Restrict)
+
+  @@unique([offenseId, levelId, step])
+  @@index([levelId])
+  @@map("sanction_tiers")
 }
