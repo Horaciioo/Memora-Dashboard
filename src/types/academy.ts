@@ -14,6 +14,7 @@ import type {
   StepAnchorName,
   StepOwnerName,
   TrainingStatusName,
+  TrainingBlockKindName,
 } from '@/utils/constants/hierarchy'
 
 /**
@@ -343,3 +344,111 @@ export interface MyTrainingView {
  */
 
 export type MyTrainingAction = 'start' | 'resume' | 'restart' | 'abandon' | 'complete'
+
+/**
+ * One offered answer to a quiz question, editor view
+ * @typedef {Object} QuizChoiceView
+ * @property {string} id - Choice identifier
+ * @property {string} label - Display label
+ * @property {boolean} correct - Counts toward the score
+ * @property {number} position - Display order
+ * @property {FormValues} values - Values feeding the edit form
+ */
+
+export interface QuizChoiceView {
+  id: string
+  label: string
+  correct: boolean
+  position: number
+  values: FormValues
+}
+
+/**
+ * One question of a quiz block, editor view
+ * @typedef {Object} QuizQuestionView
+ * @property {string} id - Question identifier
+ * @property {string} prompt - Question text
+ * @property {boolean} multiple - More than one correct choice
+ * @property {number} position - Display order
+ * @property {QuizChoiceView[]} choices - Offered answers
+ * @property {FormValues} values - Values feeding the edit form
+ */
+
+export interface QuizQuestionView {
+  id: string
+  prompt: string
+  multiple: boolean
+  position: number
+  choices: QuizChoiceView[]
+  values: FormValues
+}
+
+/**
+ * One piece of a chapter, editor view
+ * @typedef {Object} TrainingBlockView
+ * @property {string} id - Block identifier
+ * @property {TrainingBlockKindName} kind - Written passage or quiz
+ * @property {string | null} body - Markdown body, text blocks only
+ * @property {number} position - Display order
+ * @property {QuizQuestionView[]} questions - Quiz questions, quiz blocks only
+ * @property {FormValues} values - Values feeding the edit form
+ */
+
+export interface TrainingBlockView {
+  id: string
+  kind: TrainingBlockKindName
+  body: string | null
+  position: number
+  questions: QuizQuestionView[]
+  values: FormValues
+}
+
+/**
+ * One section of a training's content, editor view
+ * @typedef {Object} TrainingChapterView
+ * @property {string} id - Chapter identifier
+ * @property {string} title - Display title
+ * @property {number} position - Display order
+ * @property {TrainingBlockView[]} blocks - Blocks under this chapter
+ * @property {FormValues} values - Values feeding the edit form
+ */
+
+export interface TrainingChapterView {
+  id: string
+  title: string
+  position: number
+  blocks: TrainingBlockView[]
+  values: FormValues
+}
+
+/**
+ * One block on a junior's read of a training's content, quiz internals left out
+ * @typedef {Object} ContentBlockView
+ * @property {string} id - Block identifier
+ * @property {TrainingBlockKindName} kind - Written passage or quiz
+ * @property {string | null} body - Markdown body, text blocks only
+ * @property {number} questionCount - Questions in the quiz, quiz blocks only
+ * @property {boolean} answered - Every question already has an answer on file
+ */
+
+export interface ContentBlockView {
+  id: string
+  kind: TrainingBlockKindName
+  body: string | null
+  questionCount: number
+  answered: boolean
+}
+
+/**
+ * One chapter on a junior's read of a training's content
+ * @typedef {Object} ContentChapterView
+ * @property {string} id - Chapter identifier
+ * @property {string} title - Display title
+ * @property {ContentBlockView[]} blocks - Blocks under this chapter
+ */
+
+export interface ContentChapterView {
+  id: string
+  title: string
+  blocks: ContentBlockView[]
+}

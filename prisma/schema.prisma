@@ -194,6 +194,7 @@ model Account {
   academySteps        AcademyStep[]      @relation("AcademyStepAuthor")
   academyStepsValidated AcademyStep[]    @relation("AcademyStepValidator")
   sessionInvitesCreated SessionInvite[]  @relation("SessionInviteCreatedBy")
+  quizAnswers           JuniorAnswer[]
   academyReviews      AcademyReview[]     @relation("AcademyReviewAuthor")
   academyReviewsDecided AcademyReview[]   @relation("AcademyReviewDecider")
   juniorSkillsGraded  JuniorSkill[]       @relation("JuniorSkillValidator")
@@ -724,10 +725,95 @@ model Training {
   jobFunction JobFunction? @relation(fields: [functionId], references: [id], onDelete: SetNull)
   dispositif  Dispositif?  @relation(fields: [dispositifId], references: [id], onDelete: SetNull)
   records     TrainingRecord[]
+  chapters    TrainingChapter[]
 
   @@index([period])
   @@index([functionId, dispositifId])
   @@map("trainings")
+}
+
+// Section a training's content is split into
+model TrainingChapter {
+  id         String   @id @default(cuid())
+  trainingId String
+  title      String
+  position   Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  training Training        @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+  blocks   TrainingBlock[]
+
+  @@index([trainingId, position])
+  @@map("training_chapters")
+}
+
+enum TrainingBlockKind {
+  TEXT
+  QUIZ
+}
+
+// One piece of a chapter, either a written passage or a quiz
+model TrainingBlock {
+  id        String            @id @default(cuid())
+  chapterId String
+  kind      TrainingBlockKind
+  body      String?
+  position  Int               @default(0)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  chapter   TrainingChapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+
+  @@index([chapterId, position])
+  @@map("training_blocks")
+}
+
+// One question of a quiz block
+model QuizQuestion {
+  id       String  @id @default(cuid())
+  blockId  String
+  prompt   String
+  multiple Boolean @default(false)
+  position Int     @default(0)
+
+  block   TrainingBlock  @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  choices QuizChoice[]
+  answers JuniorAnswer[]
+
+  @@index([blockId, position])
+  @@map("quiz_questions")
+}
+
+// One offered answer to a quiz question
+model QuizChoice {
+  id         String  @id @default(cuid())
+  questionId String
+  label      String
+  correct    Boolean @default(false)
+  position   Int     @default(0)
+
+  question QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId, position])
+  @@map("quiz_choices")
+}
+
+// A member's own answer to one quiz question, overwritten on retake
+model JuniorAnswer {
+  id         String   @id @default(cuid())
+  questionId String
+  accountId  String
+  choiceIds  String[] @default([])
+  correct    Boolean
+  answeredAt DateTime @default(now())
+
+  question QuizQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  account  Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, accountId])
+  @@map("junior_answers")
 }
 
 // Attendance of one member on one training

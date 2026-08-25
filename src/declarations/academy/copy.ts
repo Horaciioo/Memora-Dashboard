@@ -126,7 +126,16 @@ export const ACADEMY_COPY = {
   trainingAttemptsOne: 'tentative',
   trainingDurationUnit: 'min',
   trainingContentTitle: 'Contenu',
-  trainingContentLead: 'Le déroulé de chaque formation arrive avec le module de contenu.',
+  trainingContentLead: 'Le déroulé de la formation, chapitre par chapitre.',
+  viewContent: 'Voir le contenu',
+  noContentTitle: 'Contenu à venir',
+  noContentDescription: 'Rien n’est encore rédigé pour cette formation.',
+  takeQuiz: 'Faire le quiz',
+  quizSubmit: 'Valider mes réponses',
+  quizResultSuffix: 'bonnes réponses',
+  quizAnswered: 'Répondu',
+  quizQuestionCount: 'questions',
+  quizQuestionCountOne: 'question',
   inviteCopyLink: 'Copier le lien d’admission',
   inviteCopied: 'Lien copié',
 } as const
@@ -200,4 +209,51 @@ export const ADMISSION_COPY = {
 export const ADMISSION_FIELD_COPY = {
   displayName: 'Pseudo',
   dispositif: 'Dispositif souhaité',
+} as const
+
+/**
+ * Copy of the training content editor
+ * @type {Record<string, string>}
+ */
+
+export const TRAINING_CONTENT_COPY = {
+  title: 'Contenu de la formation',
+  lead: 'Le contenu se découpe en chapitres, chacun porté par un ou plusieurs blocs.',
+  questionLabel: 'Question',
+  chapterAdd: 'Ajouter un chapitre',
+  chapterEmptyTitle: 'Aucun chapitre',
+  chapterEmptyDescription: 'Ajoute un premier chapitre pour commencer le contenu.',
+  chapterDeleteTitle: 'Supprimer ce chapitre ?',
+  chapterDeleteDescription: 'Ses blocs et ses questions disparaissent avec lui.',
+  blockAdd: 'Ajouter un bloc',
+  blockEmptyTitle: 'Aucun bloc',
+  blockEmptyDescription: 'Ajoute un texte ou un quiz dans ce chapitre.',
+  blockDeleteTitle: 'Supprimer ce bloc ?',
+  blockDeleteDescription: 'Son contenu disparaît du chapitre.',
+  questionAdd: 'Ajouter une question',
+  questionEmptyTitle: 'Aucune question',
+  questionEmptyDescription: 'Ajoute une première question à ce quiz.',
+  questionDeleteTitle: 'Supprimer cette question ?',
+  questionDeleteDescription:
+    'Les réponses déjà données restent enregistrées, la question disparaît du quiz.',
+  choiceAdd: 'Ajouter une réponse',
+  choiceEmptyTitle: 'Aucune réponse',
+  choiceEmptyDescription: 'Ajoute au moins deux réponses, dont une correcte.',
+  choiceDeleteTitle: 'Supprimer cette réponse ?',
+  choiceDeleteDescription: 'Elle disparaît de la question.',
+} as const
+
+/**
+ * Labels of the training content forms
+ * @type {Record<string, string>}
+ */
+
+export const TRAINING_CONTENT_FIELD_COPY = {
+  chapterTitle: 'Titre',
+  blockKind: 'Type de bloc',
+  blockBody: 'Texte',
+  questionPrompt: 'Question',
+  questionMultiple: 'Plusieurs bonnes réponses',
+  choiceLabel: 'Réponse',
+  choiceCorrect: 'Bonne réponse',
 } as const
