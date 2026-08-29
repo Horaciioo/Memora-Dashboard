@@ -2,7 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { conflict, notFound } from '@/core/lib/errors'
-import { TONE_OPTIONS, rowsToOptions, toOptions } from '@/core/lib/forms/options'
+import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import {
   ACADEMY_SETTINGS,
@@ -21,18 +21,29 @@ import {
   FUNCTION_KIND_REGISTRY,
   WORKFLOW_SCOPE_REGISTRY,
 } from '@/declarations/reference/registries'
+import { CALENDAR_KIND_REGISTRY } from '@/declarations/calendar/registries'
 import { REFERENCE_FIELD_COPY } from '@/declarations/reference/copy'
+import { RECRUITMENT_FIELD_COPY, RECRUITMENT_FILTER_COPY } from '@/declarations/recruitment/copy'
+import { RECRUITMENT_OWNER_REGISTRY } from '@/declarations/recruitment/registries'
 import { instantiatePanel } from '@/core/services/sanctions/SanctionService'
 import { SANCTION_FIELD_COPY } from '@/declarations/sanctions/copy'
 import { SANCTION_KIND_REGISTRY } from '@/declarations/sanctions/registries'
 import { SanctionKinds } from '@/utils/constants/moderation'
 import type { SanctionKindName } from '@/utils/constants/moderation'
+import { RecruitmentOwners } from '@/utils/constants/recruitment'
+import type { RecruitmentOwnerName } from '@/utils/constants/recruitment'
 import type { ReferenceKey } from '@/declarations/reference/sections'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { ReferenceRow } from '@/types/reference'
 import { AcademyStages, StepAnchors, StepOwners } from '@/utils/constants/hierarchy'
-import { EventVisibilities, FunctionKinds, WorkflowScopes } from '@/utils/constants/workflow'
+import {
+  CalendarKinds,
+  EventVisibilities,
+  FunctionKinds,
+  WorkflowScopes,
+} from '@/utils/constants/workflow'
 import type {
+  CalendarKindName,
   AcademyPeriodName,
   AcademyStageName,
   StepAnchorName,
@@ -76,11 +87,8 @@ const nameField: FieldDefinition = {
 // Shared shape of the colour field of every collection
 const accentField: FieldDefinition = {
   name: 'accent',
-  kind: 'select',
+  kind: 'colour',
   label: REFERENCE_FIELD_COPY.accent,
-  options: TONE_OPTIONS,
-  mark: 'dot',
-  span: 'half',
 }
 
 /**
@@ -632,9 +640,18 @@ const priorities: ReferenceResource = {
   reorder: noReorder,
 }
 
-const eventTypes: ReferenceResource = {
+const eventTemplates: ReferenceResource = {
   fields: async () => [
     nameField,
+    {
+      name: 'kind',
+      kind: 'select',
+      label: REFERENCE_FIELD_COPY.calendarKind,
+      required: true,
+      options: toOptions(CALENDAR_KIND_REGISTRY),
+      mark: 'dot',
+      span: 'half',
+    },
     {
       name: 'visibility',
       kind: 'select',
@@ -651,11 +668,28 @@ const eventTypes: ReferenceResource = {
       label: REFERENCE_FIELD_COPY.summary,
       maxLength: longTextMaxLength,
     },
+    {
+      name: 'body',
+      kind: 'textarea',
+      label: REFERENCE_FIELD_COPY.templateBody,
+      hint: REFERENCE_FIELD_COPY.templateBodyHint,
+      maxLength: longTextMaxLength,
+    },
+    {
+      name: 'defaultMinutes',
+      kind: 'number',
+      label: REFERENCE_FIELD_COPY.defaultMinutes,
+      min: FORM_SETTINGS.meetingMinDuration,
+      max: FORM_SETTINGS.meetingMaxDuration,
+      span: 'half',
+      visibleWhen: { field: 'allDay', equals: false },
+    },
+    { name: 'allDay', kind: 'toggle', label: REFERENCE_FIELD_COPY.allDay },
     { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
   ],
   list: async () => {
-    const rows = await prisma.eventType.findMany({
-      orderBy: { position: 'asc' },
+    const rows = await prisma.eventTemplate.findMany({
+      orderBy: [{ kind: 'asc' }, { position: 'asc' }],
       include: { _count: { select: { events: true } } },
     })
 
@@ -665,6 +699,7 @@ const eventTypes: ReferenceResource = {
       hint: row.summary,
       accent: row.accent,
       badges: [
+        CALENDAR_KIND_REGISTRY.label(row.kind),
         EVENT_VISIBILITY_REGISTRY.label(row.visibility),
         ...(row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : []),
       ],
@@ -672,53 +707,65 @@ const eventTypes: ReferenceResource = {
       usage: row._count.events,
       values: {
         name: row.name,
+        kind: row.kind,
         visibility: row.visibility,
         accent: row.accent,
         summary: row.summary,
+        body: row.body,
+        defaultMinutes: row.defaultMinutes,
+        allDay: row.allDay,
         archived: row.archived,
       },
     }))
   },
   create: async (values) => {
-    const row = await prisma.eventType
+    const row = await prisma.eventTemplate
       .create({
         data: {
           name: readText(values, 'name') ?? '',
+          kind: (readText(values, 'kind') ?? CalendarKinds.Event) as CalendarKindName,
           visibility: (readText(values, 'visibility') ??
             EventVisibilities.Everyone) as EventVisibilityName,
           accent: readText(values, 'accent'),
           summary: readText(values, 'summary'),
+          body: readText(values, 'body'),
+          defaultMinutes: readNumberValue(values, 'defaultMinutes'),
+          allDay: readFlag(values, 'allDay'),
           archived: readFlag(values, 'archived'),
-          position: await nextPosition(prisma.eventType),
+          position: await nextPosition(prisma.eventTemplate),
         },
       })
       .catch(rethrow)
 
-    return eventTypes.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
+    return eventTemplates.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
   },
   update: async (id, values) => {
-    await prisma.eventType
+    await prisma.eventTemplate
       .update({
         where: { id },
         data: {
           name: readText(values, 'name') ?? undefined,
+          kind: (readText(values, 'kind') ?? CalendarKinds.Event) as CalendarKindName,
           visibility: (readText(values, 'visibility') ??
             EventVisibilities.Everyone) as EventVisibilityName,
           accent: readText(values, 'accent'),
           summary: readText(values, 'summary'),
+          body: readText(values, 'body'),
+          defaultMinutes: readNumberValue(values, 'defaultMinutes'),
+          allDay: readFlag(values, 'allDay'),
           archived: readFlag(values, 'archived'),
         },
       })
       .catch(rethrow)
 
-    return eventTypes.list().then((rows) => rows.find((entry) => entry.id === id)!)
+    return eventTemplates.list().then((rows) => rows.find((entry) => entry.id === id)!)
   },
   remove: async (id) => {
-    await prisma.eventType.delete({ where: { id } })
+    await prisma.eventTemplate.delete({ where: { id } })
   },
   reorder: (ids) =>
     applyOrder(
-      (id, position) => prisma.eventType.update({ where: { id }, data: { position } }),
+      (id, position) => prisma.eventTemplate.update({ where: { id }, data: { position } }),
       ids
     ),
 }
@@ -1416,6 +1463,365 @@ const sanctionMeasures: ReferenceResource = {
 }
 
 /**
+ * Leave one single default outcome standing
+ * @param {string} id - Outcome that keeps the flag
+ * @return {Promise<void>} - Applied
+ */
+
+const clearOtherDefaults = async (id: string): Promise<void> => {
+  await prisma.recruitmentOutcome.updateMany({
+    where: { id: { not: id } },
+    data: { isDefault: false },
+  })
+}
+
+const recruitmentQuestions: ReferenceResource = {
+  fields: async () => {
+    const [creators, functions] = await Promise.all([
+      prisma.youtuber.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+      prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+    ])
+
+    return [
+      {
+        name: 'prompt',
+        kind: 'text',
+        label: RECRUITMENT_FIELD_COPY.prompt,
+        required: true,
+        maxLength: longTextMaxLength,
+      },
+      {
+        name: 'hint',
+        kind: 'textarea',
+        label: RECRUITMENT_FIELD_COPY.hint,
+        maxLength: longTextMaxLength,
+      },
+      {
+        name: 'youtuberId',
+        kind: 'select',
+        label: RECRUITMENT_FIELD_COPY.youtuber,
+        options: rowsToOptions(creators),
+        mark: 'avatar',
+        span: 'half',
+      },
+      {
+        name: 'functionId',
+        kind: 'select',
+        label: RECRUITMENT_FIELD_COPY.jobFunction,
+        options: rowsToOptions(functions),
+        span: 'half',
+      },
+      { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
+    ]
+  },
+  list: async () => {
+    const rows = await prisma.recruitmentQuestion.findMany({
+      orderBy: { position: 'asc' },
+      include: { youtuber: true, jobFunction: true },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      label: row.prompt,
+      hint: row.hint,
+      accent: row.jobFunction?.accent ?? null,
+      badges: [
+        row.youtuber?.name ?? RECRUITMENT_FILTER_COPY.allYoutubers,
+        row.jobFunction?.name ?? RECRUITMENT_FILTER_COPY.allFunctions,
+        ...(row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : []),
+      ],
+      position: row.position,
+      usage: 0,
+      values: {
+        prompt: row.prompt,
+        hint: row.hint,
+        youtuberId: row.youtuberId,
+        functionId: row.functionId,
+        archived: row.archived,
+      },
+    }))
+  },
+  create: async (values) => {
+    const row = await prisma.recruitmentQuestion
+      .create({
+        data: {
+          prompt: readText(values, 'prompt') ?? '',
+          hint: readText(values, 'hint'),
+          youtuberId: readText(values, 'youtuberId'),
+          functionId: readText(values, 'functionId'),
+          archived: readFlag(values, 'archived'),
+          position: await nextPosition(prisma.recruitmentQuestion),
+        },
+      })
+      .catch(rethrow)
+
+    return recruitmentQuestions.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
+  },
+  update: async (id, values) => {
+    await prisma.recruitmentQuestion
+      .update({
+        where: { id },
+        data: {
+          prompt: readText(values, 'prompt') ?? undefined,
+          hint: readText(values, 'hint'),
+          youtuberId: readText(values, 'youtuberId'),
+          functionId: readText(values, 'functionId'),
+          archived: readFlag(values, 'archived'),
+        },
+      })
+      .catch(rethrow)
+
+    return recruitmentQuestions.list().then((rows) => rows.find((entry) => entry.id === id)!)
+  },
+  remove: async (id) => {
+    await prisma.recruitmentQuestion.delete({ where: { id } })
+  },
+  reorder: (ids) =>
+    applyOrder(
+      (id, position) => prisma.recruitmentQuestion.update({ where: { id }, data: { position } }),
+      ids
+    ),
+}
+
+const recruitmentStepTemplates: ReferenceResource = {
+  fields: async () => {
+    const [creators, functions] = await Promise.all([
+      prisma.youtuber.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+      prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+    ])
+
+    return [
+      {
+        name: 'title',
+        kind: 'text',
+        label: RECRUITMENT_FIELD_COPY.title,
+        required: true,
+        maxLength: shortTextMaxLength,
+      },
+      {
+        name: 'offset',
+        kind: 'number',
+        label: RECRUITMENT_FIELD_COPY.offset,
+        required: true,
+        min: ACADEMY_SETTINGS.stepOffsetMin,
+        max: ACADEMY_SETTINGS.stepOffsetMax,
+        span: 'half',
+      },
+      {
+        name: 'owner',
+        kind: 'select',
+        label: RECRUITMENT_FIELD_COPY.owner,
+        required: true,
+        options: toOptions(RECRUITMENT_OWNER_REGISTRY),
+        mark: 'dot',
+        span: 'half',
+      },
+      {
+        name: 'youtuberId',
+        kind: 'select',
+        label: RECRUITMENT_FIELD_COPY.youtuber,
+        options: rowsToOptions(creators),
+        mark: 'avatar',
+        span: 'half',
+      },
+      {
+        name: 'functionId',
+        kind: 'select',
+        label: RECRUITMENT_FIELD_COPY.jobFunction,
+        options: rowsToOptions(functions),
+        span: 'half',
+      },
+      {
+        name: 'description',
+        kind: 'textarea',
+        label: RECRUITMENT_FIELD_COPY.description,
+        maxLength: longTextMaxLength,
+      },
+      { name: 'required', kind: 'toggle', label: RECRUITMENT_FIELD_COPY.mandatory },
+      { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
+    ]
+  },
+  list: async () => {
+    const rows = await prisma.recruitmentStepTemplate.findMany({
+      orderBy: [{ offset: 'asc' }, { position: 'asc' }],
+      include: { youtuber: true, jobFunction: true },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      label: row.title,
+      hint: row.description,
+      accent: RECRUITMENT_OWNER_REGISTRY.get(row.owner).accent,
+      badges: [
+        `${REFERENCE_FIELD_COPY.offset} ${row.offset >= 0 ? '+' : ''}${row.offset}`,
+        RECRUITMENT_OWNER_REGISTRY.label(row.owner),
+        row.youtuber?.name ?? RECRUITMENT_FILTER_COPY.allYoutubers,
+        row.jobFunction?.name ?? RECRUITMENT_FILTER_COPY.allFunctions,
+        ...(row.required ? [REFERENCE_FIELD_COPY.mandatoryBadge] : []),
+        ...(row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : []),
+      ],
+      position: row.position,
+      usage: 0,
+      values: {
+        title: row.title,
+        offset: row.offset,
+        owner: row.owner,
+        youtuberId: row.youtuberId,
+        functionId: row.functionId,
+        description: row.description,
+        required: row.required,
+        archived: row.archived,
+      },
+    }))
+  },
+  create: async (values) => {
+    const row = await prisma.recruitmentStepTemplate
+      .create({
+        data: {
+          title: readText(values, 'title') ?? '',
+          offset: readNumberValue(values, 'offset') ?? 0,
+          owner: (readText(values, 'owner') ??
+            RecruitmentOwners.Responsable) as RecruitmentOwnerName,
+          youtuberId: readText(values, 'youtuberId'),
+          functionId: readText(values, 'functionId'),
+          description: readText(values, 'description'),
+          required: readFlag(values, 'required'),
+          archived: readFlag(values, 'archived'),
+          position: await nextPosition(prisma.recruitmentStepTemplate),
+        },
+      })
+      .catch(rethrow)
+
+    return recruitmentStepTemplates
+      .list()
+      .then((rows) => rows.find((entry) => entry.id === row.id)!)
+  },
+  update: async (id, values) => {
+    await prisma.recruitmentStepTemplate
+      .update({
+        where: { id },
+        data: {
+          title: readText(values, 'title') ?? undefined,
+          offset: readNumberValue(values, 'offset') ?? undefined,
+          owner: (readText(values, 'owner') ?? undefined) as RecruitmentOwnerName | undefined,
+          youtuberId: readText(values, 'youtuberId'),
+          functionId: readText(values, 'functionId'),
+          description: readText(values, 'description'),
+          required: readFlag(values, 'required'),
+          archived: readFlag(values, 'archived'),
+        },
+      })
+      .catch(rethrow)
+
+    return recruitmentStepTemplates.list().then((rows) => rows.find((entry) => entry.id === id)!)
+  },
+  remove: async (id) => {
+    await prisma.recruitmentStepTemplate.delete({ where: { id } })
+  },
+  reorder: (ids) =>
+    applyOrder(
+      (id, position) =>
+        prisma.recruitmentStepTemplate.update({ where: { id }, data: { position } }),
+      ids
+    ),
+}
+
+const recruitmentOutcomes: ReferenceResource = {
+  fields: async () => [
+    nameField,
+    accentField,
+    {
+      name: 'isDefault',
+      kind: 'toggle',
+      label: RECRUITMENT_FIELD_COPY.isDefault,
+      span: 'half',
+    },
+    {
+      name: 'isTerminal',
+      kind: 'toggle',
+      label: RECRUITMENT_FIELD_COPY.isTerminal,
+      span: 'half',
+    },
+    { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
+  ],
+  list: async () => {
+    const rows = await prisma.recruitmentOutcome.findMany({
+      orderBy: { position: 'asc' },
+      include: { _count: { select: { candidates: true } } },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      label: row.name,
+      hint: null,
+      accent: row.accent,
+      badges: [
+        ...(row.isDefault ? [RECRUITMENT_FIELD_COPY.isDefault] : []),
+        ...(row.isTerminal ? [RECRUITMENT_FIELD_COPY.isTerminal] : []),
+        ...(row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : []),
+      ],
+      position: row.position,
+      usage: row._count.candidates,
+      values: {
+        name: row.name,
+        accent: row.accent,
+        isDefault: row.isDefault,
+        isTerminal: row.isTerminal,
+        archived: row.archived,
+      },
+    }))
+  },
+  create: async (values) => {
+    const isDefault = readFlag(values, 'isDefault')
+
+    const row = await prisma.recruitmentOutcome
+      .create({
+        data: {
+          name: readText(values, 'name') ?? '',
+          accent: readText(values, 'accent'),
+          isDefault,
+          isTerminal: readFlag(values, 'isTerminal'),
+          archived: readFlag(values, 'archived'),
+          position: await nextPosition(prisma.recruitmentOutcome),
+        },
+      })
+      .catch(rethrow)
+
+    if (isDefault) await clearOtherDefaults(row.id)
+
+    return recruitmentOutcomes.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
+  },
+  update: async (id, values) => {
+    const isDefault = readFlag(values, 'isDefault')
+
+    await prisma.recruitmentOutcome
+      .update({
+        where: { id },
+        data: {
+          name: readText(values, 'name') ?? undefined,
+          accent: readText(values, 'accent'),
+          isDefault,
+          isTerminal: readFlag(values, 'isTerminal'),
+          archived: readFlag(values, 'archived'),
+        },
+      })
+      .catch(rethrow)
+
+    if (isDefault) await clearOtherDefaults(id)
+
+    return recruitmentOutcomes.list().then((rows) => rows.find((entry) => entry.id === id)!)
+  },
+  remove: async (id) => {
+    await prisma.recruitmentOutcome.delete({ where: { id } })
+  },
+  reorder: (ids) =>
+    applyOrder(
+      (id, position) => prisma.recruitmentOutcome.update({ where: { id }, data: { position } }),
+      ids
+    ),
+}
+
+/**
  * Reference collections by key
  * @type {Record<ReferenceKey, ReferenceResource>}
  */
@@ -1427,7 +1833,7 @@ const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
   plateformes: platforms,
   etats: workflowStates,
   priorites: priorities,
-  evenements: eventTypes,
+  evenements: eventTemplates,
   formations: trainings,
   livecon: liveconLevels,
   dispositifs,
@@ -1435,6 +1841,9 @@ const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
   competences: skills,
   'etapes-pim': pimStepTemplates,
   sanctions: sanctionMeasures,
+  'questions-recrutement': recruitmentQuestions,
+  'etapes-recrutement': recruitmentStepTemplates,
+  'issues-recrutement': recruitmentOutcomes,
 }
 
 /**

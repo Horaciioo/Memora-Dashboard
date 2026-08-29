@@ -37,6 +37,11 @@ export const REFERENCE_FIELD_COPY = {
   anchor: 'Ancrage',
   offset: 'Décalage',
   owner: 'Porteur',
+  calendarKind: 'Forme sur le calendrier',
+  templateBody: 'Description pré-remplie',
+  templateBodyHint: 'Recopiée dans l’évènement dès que le modèle est choisi.',
+  defaultMinutes: 'Durée par défaut (min)',
+  allDay: 'Toute la journée',
 } as const
 
 /**
