@@ -145,6 +145,13 @@ enum PermissionEffect {
   DENY
 }
 
+// Shape a calendar entry takes on the grid, never editable from the console
+enum CalendarKind {
+  ZONE
+  PERIOD
+  EVENT
+}
+
 // Who a calendar entry is shown to
 enum EventVisibility {
   EVERYONE
@@ -182,6 +189,7 @@ model Account {
   sessions              Session[]
   permissions           AccountPermission[]
   socialLinks           SocialLink[]
+  calendarEntries       CalendarEvent[]         @relation("CalendarSubject")
   absences              Absence[]               @relation("AbsenceOwner")
   reviewedAbsences      Absence[]               @relation("AbsenceReviewer")
   notesReceived         AccountNote[]           @relation("NoteSubject")
@@ -203,14 +211,23 @@ model Account {
   calendarEvents        CalendarEvent[]         @relation("CalendarOwner")
   ledTeams              Team[]                  @relation("TeamLead")
   teamMemberships       TeamMember[]
-  ledProjects           Project[]               @relation("ProjectLead")
+  projectLeads          ProjectLead[]
   projectAssists        ProjectAssistant[]
   ownedTasks            Task[]                  @relation("TaskOwner")
   meetingSeats          MeetingAttendee[]
+  projectsOpened        Project[]               @relation("ProjectAuthor")
+  projectsEdited        Project[]               @relation("ProjectEditor")
+  tasksOpened           Task[]                  @relation("TaskAuthor")
+  tasksEdited           Task[]                  @relation("TaskEditor")
+  meetingsPlanned       Meeting[]               @relation("MeetingAuthor")
+  meetingsEdited        Meeting[]               @relation("MeetingEditor")
   communications        Communication[]
   liveconChanges        LiveconEntry[]
   activityAsSubject     ActivityLog[]           @relation("LogSubject")
   activityAsActor       ActivityLog[]           @relation("LogActor")
+  recruitmentInterviews RecruitmentCandidate[]  @relation("RecruitmentRecruiter")
+  recruitmentSeats      RecruitmentSpectator[]  @relation("RecruitmentSpectator")
+  recruitmentComments   RecruitmentComment[]    @relation("RecruitmentCommentAuthor")
 
   @@index([role])
   @@index([status])
@@ -299,6 +316,10 @@ model Youtuber {
   calendarEvents   CalendarEvent[]
   sanctionOffenses SanctionOffense[]
 
+  recruitmentSessions      RecruitmentSession[]
+  recruitmentQuestions     RecruitmentQuestion[]
+  recruitmentStepTemplates RecruitmentStepTemplate[]
+
   @@index([archived])
   @@map("youtubers")
 }
@@ -338,6 +359,10 @@ model JobFunction {
   skills           Skill[]
   pimStepTemplates PimStepTemplate[]
   academySessions  AcademySession[]
+
+  recruitmentSessions      RecruitmentSession[]
+  recruitmentQuestions     RecruitmentQuestion[]
+  recruitmentStepTemplates RecruitmentStepTemplate[]
 
   @@index([kind])
   @@map("job_functions")
@@ -434,24 +459,29 @@ model TeamMember {
 model Project {
   id          String    @id @default(cuid())
   title       String
+  emoji       String?
   description String?
   youtuberId  String?
   stateId     String?
   priorityId  String?
   platformId  String?
-  leadId      String?
   deadline    DateTime?
+  createdById String?
+  updatedById String?
   position    Int       @default(0)
   archived    Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  createdBy Account? @relation("ProjectAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy Account? @relation("ProjectEditor", fields: [updatedById], references: [id], onDelete: SetNull)
+
   youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
   state    WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
   priority Priority?      @relation(fields: [priorityId], references: [id], onDelete: SetNull)
   platform Platform?      @relation(fields: [platformId], references: [id], onDelete: SetNull)
-  lead     Account?       @relation("ProjectLead", fields: [leadId], references: [id], onDelete: SetNull)
 
+  leads          ProjectLead[]
   assistants     ProjectAssistant[]
   communications Communication[]
   tasks          Task[]
@@ -462,6 +492,20 @@ model Project {
   @@index([youtuberId])
   @@index([archived])
   @@map("projects")
+}
+
+// Responsable in charge of a project
+model ProjectLead {
+  id        String   @id @default(cuid())
+  projectId String
+  accountId String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, accountId])
+  @@map("project_leads")
 }
 
 // Helper attached to a project
@@ -503,6 +547,7 @@ model Communication {
 model Task {
   id          String    @id @default(cuid())
   title       String
+  emoji       String?
   description String?
   dueDate     DateTime?
   ownerId     String?
@@ -510,10 +555,15 @@ model Task {
   priorityId  String?
   youtuberId  String?
   projectId   String?
+  createdById String?
+  updatedById String?
   position    Int       @default(0)
   archived    Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  createdBy Account? @relation("TaskAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy Account? @relation("TaskEditor", fields: [updatedById], references: [id], onDelete: SetNull)
 
   owner    Account?       @relation("TaskOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   state    WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
@@ -529,29 +579,54 @@ model Task {
 
 // Scheduled gathering around a project
 model Meeting {
-  id          String   @id @default(cuid())
-  title       String
-  agenda      String?
-  minutes     String?
-  scheduledAt DateTime
-  durationMin Int?
-  stateId     String?
-  youtuberId  String?
-  projectId   String?
-  position    Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  title        String
+  emoji        String?
+  introduction String?
+  outro        String?
+  minutes      String?
+  scheduledAt  DateTime
+  durationMin  Int?
+  stateId      String?
+  youtuberId   String?
+  projectId    String?
+  createdById  String?
+  updatedById  String?
+  position     Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  createdBy Account? @relation("MeetingAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy Account? @relation("MeetingEditor", fields: [updatedById], references: [id], onDelete: SetNull)
 
   state    WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
   youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
   project  Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   attendees      MeetingAttendee[]
+  topics         MeetingTopic[]
   calendarEvents CalendarEvent[]
 
   @@index([scheduledAt])
   @@index([stateId, position])
   @@map("meetings")
+}
+
+// Point covered during a meeting, its emoji drawn before its title
+model MeetingTopic {
+  id        String   @id @default(cuid())
+  meetingId String
+  emoji     String
+  title     String
+  body      String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId, position])
+  @@map("meeting_topics")
 }
 
 // Seat held by a member in a meeting
@@ -1052,31 +1127,40 @@ model AcademyReview {
   @@map("academy_reviews")
 }
 
-// Kind of entry the calendar accepts, declared from the admin console
-model EventType {
-  id         String          @id @default(cuid())
-  name       String          @unique
-  summary    String?
-  accent     String?
-  visibility EventVisibility @default(EVERYONE)
-  position   Int             @default(0)
-  archived   Boolean         @default(false)
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+// Pre-designed entry the calendar form starts from, declared from the admin console
+model EventTemplate {
+  id             String          @id @default(cuid())
+  name           String          @unique
+  kind           CalendarKind    @default(EVENT)
+  summary        String?
+  body           String?
+  accent         String?
+  visibility     EventVisibility @default(EVERYONE)
+  defaultMinutes Int?
+  allDay         Boolean         @default(false)
+  position       Int             @default(0)
+  archived       Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   events CalendarEvent[]
 
   @@index([archived])
-  @@map("event_types")
+  @@index([kind])
+  @@map("event_templates")
 }
 
 // Anything planned on the shared calendar
 model CalendarEvent {
   id          String           @id @default(cuid())
   title       String
+  emoji       String?
   description String?
-  typeId      String?
+  kind        CalendarKind     @default(EVENT)
+  templateId  String?
+  accent      String?
   ownerId     String?
+  accountId   String?
   youtuberId  String?
   projectId   String?
   meetingId   String?
@@ -1088,16 +1172,19 @@ model CalendarEvent {
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
-  type     EventType?      @relation(fields: [typeId], references: [id], onDelete: SetNull)
+  template EventTemplate?  @relation(fields: [templateId], references: [id], onDelete: SetNull)
   owner    Account?        @relation("CalendarOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  subject  Account?        @relation("CalendarSubject", fields: [accountId], references: [id], onDelete: Cascade)
   youtuber Youtuber?       @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
   project  Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
   meeting  Meeting?        @relation(fields: [meetingId], references: [id], onDelete: SetNull)
   session  AcademySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
 
   @@index([startsAt])
-  @@index([typeId])
+  @@index([kind, startsAt])
+  @@index([templateId])
   @@index([ownerId])
+  @@index([accountId])
   @@map("calendar_events")
 }
 
@@ -1242,4 +1329,185 @@ model SanctionTier {
   @@unique([offenseId, levelId, step])
   @@index([levelId])
   @@map("sanction_tiers")
+}
+
+// Phase a recruitment campaign sits in
+enum RecruitmentStatus {
+  DRAFT
+  ANNOUNCED
+  INTERVIEWS
+  CLOSED
+  ARCHIVED
+}
+
+// Who carries out a recruitment timeline step
+enum RecruitmentOwner {
+  RESPONSABLE
+  RECRUTEURS
+  BOTH
+}
+
+// Campaign opened for one creator and one function, announced outside then held on Discord
+model RecruitmentSession {
+  id           String            @id @default(cuid())
+  youtuberId   String
+  functionId   String
+  name         String
+  status       RecruitmentStatus @default(DRAFT)
+  summary      String?
+  instructions String            @default("")
+  opensAt      DateTime?
+  closesAt     DateTime?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  youtuber    Youtuber               @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  jobFunction JobFunction            @relation(fields: [functionId], references: [id], onDelete: Restrict)
+  candidates  RecruitmentCandidate[]
+  steps       RecruitmentStep[]
+
+  @@unique([youtuberId, functionId, name])
+  @@index([youtuberId, status])
+  @@index([functionId])
+  @@map("recruitment_sessions")
+}
+
+// Applicant of one campaign, held by their Discord identifier and never given an account
+model RecruitmentCandidate {
+  id          String    @id @default(cuid())
+  sessionId   String
+  discordId   String
+  formId      String?
+  recruiterId String?
+  outcomeId   String?
+  interviewAt DateTime?
+  attended    Boolean   @default(false)
+  review      String    @default("")
+  position    Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  session    RecruitmentSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  recruiter  Account?               @relation("RecruitmentRecruiter", fields: [recruiterId], references: [id], onDelete: SetNull)
+  outcome    RecruitmentOutcome?    @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
+  spectators RecruitmentSpectator[]
+  comments   RecruitmentComment[]
+
+  @@unique([sessionId, discordId])
+  @@index([discordId])
+  @@index([outcomeId, position])
+  @@map("recruitment_candidates")
+}
+
+// Moderator sitting in on one interview without leading it
+model RecruitmentSpectator {
+  candidateId String
+  accountId   String
+
+  candidate RecruitmentCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  account   Account              @relation("RecruitmentSpectator", fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@id([candidateId, accountId])
+  @@index([accountId])
+  @@map("recruitment_spectators")
+}
+
+// Remark left on a candidate while their application is being weighed
+model RecruitmentComment {
+  id          String   @id @default(cuid())
+  candidateId String
+  authorId    String?
+  body        String
+  createdAt   DateTime @default(now())
+
+  candidate RecruitmentCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  author    Account?             @relation("RecruitmentCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([candidateId, createdAt])
+  @@map("recruitment_comments")
+}
+
+// Column of the results board, declared from the admin console
+model RecruitmentOutcome {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  accent     String?
+  position   Int      @default(0)
+  isDefault  Boolean  @default(false)
+  isTerminal Boolean  @default(false)
+  archived   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  candidates RecruitmentCandidate[]
+
+  @@index([position])
+  @@map("recruitment_outcomes")
+}
+
+// Question of the interview script, narrowed to the creators and functions it fits
+model RecruitmentQuestion {
+  id         String   @id @default(cuid())
+  prompt     String
+  hint       String?
+  youtuberId String?
+  functionId String?
+  position   Int      @default(0)
+  archived   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  youtuber    Youtuber?    @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  jobFunction JobFunction? @relation(fields: [functionId], references: [id], onDelete: Cascade)
+
+  @@index([position])
+  @@index([youtuberId, functionId])
+  @@map("recruitment_questions")
+}
+
+// Trame of timeline steps a campaign instantiates when it is created
+model RecruitmentStepTemplate {
+  id          String           @id @default(cuid())
+  title       String
+  description String?
+  youtuberId  String?
+  functionId  String?
+  offset      Int              @default(0)
+  owner       RecruitmentOwner @default(RESPONSABLE)
+  required    Boolean          @default(false)
+  archived    Boolean          @default(false)
+  position    Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  youtuber    Youtuber?         @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  jobFunction JobFunction?      @relation(fields: [functionId], references: [id], onDelete: Cascade)
+  steps       RecruitmentStep[]
+
+  @@index([position])
+  @@index([youtuberId, functionId])
+  @@map("recruitment_step_templates")
+}
+
+// Moment of one campaign timeline, instantiated from the trame then tended by hand
+model RecruitmentStep {
+  id          String           @id @default(cuid())
+  sessionId   String
+  templateId  String?
+  title       String
+  notes       String?
+  owner       RecruitmentOwner @default(RESPONSABLE)
+  offset      Int              @default(0)
+  scheduledAt DateTime?
+  doneAt      DateTime?
+  required    Boolean          @default(false)
+  position    Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  session  RecruitmentSession       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  template RecruitmentStepTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@index([sessionId, position])
+  @@map("recruitment_steps")
 }
