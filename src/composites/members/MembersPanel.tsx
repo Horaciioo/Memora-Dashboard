@@ -35,7 +35,7 @@ export interface MembersPanelProps {
 }
 
 /**
- * Moderator boxes, categorised by YouTuber, with their filters and a right click menu per box
+ * Moderator boxes, categorised by YouTuber
  * @param {MemberSummary[]} initialMembers - Rows resolved server-side
  * @param {FieldDefinition[]} fields - Field declarations of the moderator form
  * @param {FieldOption[]} divisions - Division filter options

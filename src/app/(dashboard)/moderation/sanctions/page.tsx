@@ -7,11 +7,7 @@ import {
   readCurrentState,
   readHistory,
 } from '@/core/services/livecon/LiveconService'
-import {
-  listMeasures,
-  offenseFields,
-  readPanel,
-} from '@/core/services/sanctions/SanctionService'
+import { listMeasures, offenseFields, readPanel } from '@/core/services/sanctions/SanctionService'
 import { youtuberOptions } from '@/core/services/work/shared'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { SANCTION_COPY } from '@/declarations/sanctions/copy'

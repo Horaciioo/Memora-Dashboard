@@ -36,7 +36,7 @@ interface QuizScore {
 }
 
 /**
- * Quiz block taken through a form dialog, its questions paginated by FormSteps
+ * Quiz block taken through a form dialog, its questions grouped into tabs
  * @param {string | null} blockId - Block identifier, mounted only while set
  * @param {() => void} onClose - Dismiss handler
  * @param {() => void} onScored - Called once the quiz is graded, to refresh the outline

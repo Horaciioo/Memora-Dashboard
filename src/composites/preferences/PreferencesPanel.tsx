@@ -19,7 +19,7 @@ import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { ACCOUNT_BLOCK } from '@/declarations/ui/blocks'
 import { ACTION_COPY, FIELD_COPY, NAV_COPY } from '@/declarations/ui/copy'
 import { LIST_STYLES, PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
-import { toTone } from '@/declarations/ui/theme'
+
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { AccountSession, ProfileDetail } from '@/types/preferences'
 import { formatDay, formatDayTime } from '@/utils/format/dates'
@@ -92,8 +92,8 @@ export const PreferencesPanel = ({
               <p className={ACCOUNT_BLOCK.name}>{profile.displayName}</p>
               <p className={ACCOUNT_BLOCK.meta}>{profile.discordId}</p>
               <span className="flex flex-wrap gap-1.5">
-                <Badge label={role.label} tone={toTone(role.accent, 'brand')} dot />
-                <Badge label={status.label} tone={toTone(status.accent, 'neutral')} dot />
+                <Badge label={role.label} accent={role.accent} tone={'brand'} dot />
+                <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />
               </span>
             </div>
           </div>

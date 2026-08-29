@@ -29,7 +29,7 @@ import {
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { toTone } from '@/declarations/ui/theme'
+
 import { LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import type {
   AcademyReviewView,
@@ -189,9 +189,9 @@ export const JuniorFile = ({
     <Section title={ACADEMY_COPY.tabInformations} padded>
       <div className="flex flex-col gap-4">
         <span className="flex flex-wrap items-center gap-2">
-          <Badge label={junior.dispositif.name} tone={toTone(junior.dispositif.accent, 'info')} />
+          <Badge label={junior.dispositif.name} accent={junior.dispositif.accent} tone={'info'} />
           <Badge label={sessionFunctionName} tone="neutral" />
-          <Badge label={status.label} tone={toTone(status.accent, 'neutral')} dot />
+          <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />
           <Badge
             label={isReady ? ACADEMY_COPY.ready : ACADEMY_COPY.blocked}
             tone={isReady ? 'success' : 'warning'}
@@ -311,7 +311,7 @@ export const JuniorFile = ({
           ).map((group) => (
             <article key={group.name} className={LIST_STYLES.card}>
               <header className="flex items-center gap-2">
-                <Badge label={group.name} tone={toTone(group.accent, 'neutral')} />
+                <Badge label={group.name} accent={group.accent} tone={'neutral'} />
               </header>
               <div className="flex flex-col gap-4">
                 {group.items.map((skill) => (
@@ -410,7 +410,7 @@ export const JuniorFile = ({
             return (
               <article key={note.id} className={LIST_STYLES.card}>
                 <header className="flex flex-wrap items-center gap-2">
-                  <Badge label={kind.label} tone={toTone(kind.accent, 'neutral')} />
+                  <Badge label={kind.label} accent={kind.accent} tone={'neutral'} />
                   <Badge label={ACADEMY_STAGE_REGISTRY.label(note.stage)} tone="neutral" dot />
                   {note.authorName && (
                     <span className="text-xs text-[var(--color-ink-subtle)]">
@@ -515,7 +515,8 @@ export const JuniorFile = ({
                 </span>
                 <Badge
                   label={objectiveStatus.label}
-                  tone={toTone(objectiveStatus.accent, 'neutral')}
+                  accent={objectiveStatus.accent}
+                  tone={'neutral'}
                   dot
                 />
                 <Button
@@ -594,10 +595,11 @@ export const JuniorFile = ({
                   )}
                   <Badge
                     label={reviewStatus.label}
-                    tone={toTone(reviewStatus.accent, 'neutral')}
+                    accent={reviewStatus.accent}
+                    tone={'neutral'}
                     dot
                   />
-                  <Badge label={advice.label} tone={toTone(advice.accent, 'neutral')} />
+                  <Badge label={advice.label} accent={advice.accent} tone={'neutral'} />
                   <span className="ml-auto flex items-center gap-1">
                     {isDraft && canWriteReviews && (
                       <>

@@ -10,7 +10,7 @@ import { SANCTION_COPY, SANCTION_FIELD_COPY, stepLabel } from '@/declarations/sa
 import { SANCTION_SETTINGS } from '@/declarations/configurations/settings'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { SANCTION_STYLES } from '@/declarations/ui/variants'
-import { TONES, toTone } from '@/declarations/ui/theme'
+import { TONES } from '@/declarations/ui/theme'
 import type { FieldDefinition, FieldIssue, FormValues } from '@/types/forms'
 import type { LadderStepInput } from '@/core/services/sanctions/SanctionService'
 import type { SanctionMeasureView, SanctionOffenseDetail } from '@/types/sanctions'
@@ -85,7 +85,6 @@ export const SanctionOffenseDialog = ({
   if (!offense) return null
 
   const rungs = levelId ? (offense.ladders[levelId] ?? []) : []
-  const tone = toTone(offense.accent, 'neutral')
   const options = measures.map((measure) => ({
     value: measure.id,
     label: measure.name,
@@ -132,7 +131,9 @@ export const SanctionOffenseDialog = ({
       )}
 
       <section className={SANCTION_STYLES.block}>
-        <p className={SANCTION_STYLES.blockLabel}>{`${SANCTION_COPY.ladderTitle} · ${levelName}`}</p>
+        <p
+          className={SANCTION_STYLES.blockLabel}
+        >{`${SANCTION_COPY.ladderTitle} · ${levelName}`}</p>
         {rungs.length === 0 ? (
           <p className="text-sm text-[var(--color-ink-subtle)] italic">{SANCTION_COPY.noLadder}</p>
         ) : (
@@ -144,7 +145,8 @@ export const SanctionOffenseDialog = ({
                 </span>
                 <Badge
                   label={tier.measure.name}
-                  tone={toTone(tier.measure.accent, 'neutral')}
+                  accent={tier.measure.accent}
+                  tone={'neutral'}
                   dot
                 />
               </li>
@@ -174,7 +176,9 @@ export const SanctionOffenseDialog = ({
       />
 
       <section className={SANCTION_STYLES.block}>
-        <p className={SANCTION_STYLES.blockLabel}>{`${SANCTION_COPY.ladderTitle} · ${levelName}`}</p>
+        <p
+          className={SANCTION_STYLES.blockLabel}
+        >{`${SANCTION_COPY.ladderTitle} · ${levelName}`}</p>
         {ladder.map((rung, step) => (
           <div key={step} className={SANCTION_STYLES.rung}>
             <span className={SANCTION_STYLES.rungLabel}>{rung.note ?? stepLabel(step)}</span>
@@ -185,9 +189,7 @@ export const SanctionOffenseDialog = ({
               mark="dot"
               onChange={(measureId) =>
                 setLadder((current) =>
-                  current.map((entry, index) =>
-                    index === step ? { ...entry, measureId } : entry
-                  )
+                  current.map((entry, index) => (index === step ? { ...entry, measureId } : entry))
                 )
               }
             />
@@ -195,9 +197,7 @@ export const SanctionOffenseDialog = ({
               variant="ghost"
               icon="remove"
               aria-label={ACTION_COPY.delete}
-              onClick={() =>
-                setLadder((current) => current.filter((_, index) => index !== step))
-              }
+              onClick={() => setLadder((current) => current.filter((_, index) => index !== step))}
             />
           </div>
         ))}
@@ -221,19 +221,26 @@ export const SanctionOffenseDialog = ({
       onClose={close}
       title={offense.name}
       description={editing ? undefined : (offense.summary ?? undefined)}
-      tone={tone}
-      icon="sanctions"
       size="lg"
       footer={
         canManage ? (
           editing ? (
-            <Button variant="primary" icon="confirm" disabled={isSaving} onClick={() => void save()}>
-              {isSaving ? ACTION_COPY.saving : ACTION_COPY.save}
-            </Button>
+            <Button
+              variant="primary"
+              icon={isSaving ? 'pending' : 'confirm'}
+              aria-label={isSaving ? ACTION_COPY.saving : ACTION_COPY.save}
+              title={isSaving ? ACTION_COPY.saving : ACTION_COPY.save}
+              className={isSaving ? '[&>svg]:animate-spin' : undefined}
+              disabled={isSaving}
+              onClick={() => void save()}
+            />
           ) : (
-            <Button icon="edit" onClick={startEditing}>
-              {SANCTION_COPY.edit}
-            </Button>
+            <Button
+              icon="edit"
+              aria-label={SANCTION_COPY.edit}
+              title={SANCTION_COPY.edit}
+              onClick={startEditing}
+            />
           )
         ) : undefined
       }

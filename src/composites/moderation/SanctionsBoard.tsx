@@ -18,7 +18,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { SANCTION_COPY } from '@/declarations/sanctions/copy'
 import { LIVECON_COPY } from '@/declarations/livecon/copy'
 import { SANCTION_STYLES, TIMELINE_STYLES } from '@/declarations/ui/variants'
-import { TONES, toTone } from '@/declarations/ui/theme'
+import { accentPaint, accentVars } from '@/declarations/ui/theme'
 import type { FieldDefinition } from '@/types/forms'
 import type { LiveconHistoryEntry, LiveconLevelView, LiveconStateView } from '@/types/livecon'
 import type { SanctionMeasureView, SanctionPanelView } from '@/types/sanctions'
@@ -81,7 +81,6 @@ export const SanctionsBoard = ({
     livecon.state.find((entry) => entry.youtuber === null)
 
   const openLevel = levels.find((level) => level.id === levelId) ?? levels[0]
-  const openTone = toTone(openLevel?.accent, 'neutral')
 
   const select = async (nextCreatorId: string, nextLevelId: string) => {
     setCreatorId(nextCreatorId)
@@ -131,8 +130,9 @@ export const SanctionsBoard = ({
             <span
               className={cn(
                 SANCTION_STYLES.levelNumber,
-                TONES[toTone(inForce?.level.accent, 'brand')].text
+                accentPaint(inForce?.level.accent, 'brand').text
               )}
+              style={accentVars(inForce?.level.accent, 'brand')}
             >
               {inForce?.level.level ?? openLevel?.level}
             </span>
@@ -213,14 +213,15 @@ export const SanctionsBoard = ({
           ) : (
             <div className={SANCTION_STYLES.grid}>
               {sanctions.panel.offenses.map((offense) => {
-                const tone = toTone(offense.peakAccent ?? offense.accent, 'neutral')
+                const paint = accentPaint(offense.peakAccent ?? offense.accent, 'neutral')
 
                 return (
                   <button
                     key={offense.id}
                     type="button"
                     onClick={() => void sanctions.openOffense(offense.id)}
-                    className={cn(SANCTION_STYLES.tile, TONES[tone].border, TONES[tone].soft)}
+                    className={cn(SANCTION_STYLES.tile, paint.border, paint.soft)}
+                    style={paint.style}
                   >
                     {offense.name}
                   </button>
@@ -246,17 +247,21 @@ export const SanctionsBoard = ({
         ) : (
           <ol className={TIMELINE_STYLES.list}>
             {history.map((entry, index) => {
-              const tone = toTone(entry.accent, 'neutral')
+              const paint = accentPaint(entry.accent, 'neutral')
 
               return (
                 <li key={entry.id} className={TIMELINE_STYLES.item}>
                   {index < history.length - 1 && (
                     <span className={TIMELINE_STYLES.rail} aria-hidden="true" />
                   )}
-                  <span className={cn(TIMELINE_STYLES.dot, TONES[tone].dot)} aria-hidden="true" />
+                  <span
+                    className={cn(TIMELINE_STYLES.dot, paint.dot)}
+                    style={paint.style}
+                    aria-hidden="true"
+                  />
                   <div className={TIMELINE_STYLES.body}>
                     <span className="flex flex-wrap items-center gap-2">
-                      <Badge label={`${entry.level} · ${entry.levelName}`} tone={tone} />
+                      <Badge label={`${entry.level} · ${entry.levelName}`} accent={entry.accent} />
                       <span>{entry.scopeLabel}</span>
                     </span>
                     <span className={TIMELINE_STYLES.meta}>
@@ -277,8 +282,6 @@ export const SanctionsBoard = ({
         onClose={() => setAbout(false)}
         title={SANCTION_COPY.aboutTitle}
         description={SANCTION_COPY.aboutLead}
-        tone={openTone}
-        icon="livecon"
         size="lg"
       >
         <div className="flex flex-col gap-3">

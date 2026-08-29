@@ -6,14 +6,14 @@ import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
+import { ThemeSwitch } from '@/components/elements/actions/ThemeSwitch'
 import { LogoutButton } from '@/composites/auth/LogoutButton'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { APP_ASSETS, APP_COMPANY, APP_NAME } from '@/declarations/app'
 import { NAVIGATION, NavigationViews, ROUTES, matchesNavigation } from '@/declarations/navigation'
 import { NAVIGATION_VIEW_REGISTRY } from '@/declarations/access/views'
 import { useNavigationViewStore } from '@/core/store/navigationView'
-import { ROLE_REGISTRY } from '@/declarations/access/roles'
-import { ACCOUNT_BLOCK, APP_SHELL } from '@/declarations/ui/blocks'
+import { APP_SHELL } from '@/declarations/ui/blocks'
 import { NAV_COPY, WIP_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
@@ -25,8 +25,7 @@ export interface SidebarNavProps {
 }
 
 /**
- * Navigation rail — search above the groups, every entry gated by the permission declared
- * beside it, and the signed-in member closing it at the bottom
+ * Navigation rail
  * @param {string} [className] - Extra classes merged onto the rail
  * @param {() => void} onNavigate - Called once a link is followed
  * @return {JSX.Element}
@@ -37,7 +36,7 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
   const { can, session, isResponsable } = useAuthContext()
   const { view: stored, setView } = useNavigationViewStore()
 
-  // The store skips synchronous hydration, the rail being server-rendered
+  // The store skips synchronous hydration
   useEffect(() => {
     void useNavigationViewStore.persist.rehydrate()
   }, [])
@@ -53,17 +52,13 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
     <aside className={cn(APP_SHELL.sidebar, className)} aria-label={NAV_COPY.sidebar}>
       <Link href={ROUTES.dashboard} className={APP_SHELL.brand} onClick={onNavigate}>
         <Image
-          src={APP_ASSETS.mark}
-          alt={APP_NAME}
-          width={32}
-          height={32}
-          className={APP_SHELL.brandMark}
+          src={APP_ASSETS.wordmark}
+          alt={`${APP_COMPANY} ${APP_NAME}`}
+          width={168}
+          height={59}
+          className={APP_SHELL.brandLogo}
           priority
         />
-        <span className="flex flex-col gap-0.5">
-          <span className={APP_SHELL.brandName}>{APP_NAME}</span>
-          <span className={APP_SHELL.brandCompany}>{APP_COMPANY}</span>
-        </span>
       </Link>
 
       <div className={APP_SHELL.search}>
@@ -94,8 +89,13 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
                     aria-current={isActive ? 'page' : undefined}
                     className={cn(APP_SHELL.navLink, isActive && APP_SHELL.navLinkActive)}
                   >
-                    <Icon className={APP_SHELL.navIcon} aria-hidden="true" />
-                    {item.label}
+                    <Icon
+                      className={cn(APP_SHELL.navIcon, isActive && APP_SHELL.navIconActive)}
+                      aria-hidden="true"
+                    />
+                    <span className={cn(APP_SHELL.navLabel, isActive && APP_SHELL.navLabelActive)}>
+                      {item.label}
+                    </span>
                     {item.wip && <span className={APP_SHELL.navBadge}>{WIP_COPY.badge}</span>}
                   </Link>
                 )
@@ -108,12 +108,29 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
       {session && (
         <div className={APP_SHELL.sidebarFooter}>
           <div className={APP_SHELL.accountRow}>
-            <Avatar name={session.displayName} src={session.avatarUrl} />
-            <span className={APP_SHELL.accountIdentity}>
-              <span className={ACCOUNT_BLOCK.name}>{session.displayName}</span>
-              <span className={ACCOUNT_BLOCK.meta}>{ROLE_REGISTRY.label(session.role)}</span>
-            </span>
-            <div className={APP_SHELL.accountControls}>
+            <div className={cn(APP_SHELL.accountControls, APP_SHELL.accountControlsLeft)}>
+              <Link href={ROUTES.preferences} onClick={onNavigate}>
+                <Button
+                  variant="icon"
+                  icon="settings"
+                  aria-label={NAV_COPY.preferences}
+                  title={NAV_COPY.preferences}
+                />
+              </Link>
+              <span className={APP_SHELL.accountDivider} aria-hidden="true" />
+              <ThemeSwitch />
+            </div>
+
+            <Link
+              href={ROUTES.preferences}
+              onClick={onNavigate}
+              aria-label={NAV_COPY.account}
+              className={APP_SHELL.accountAvatar}
+            >
+              <Avatar name={session.displayName} src={session.avatarUrl} size="md" />
+            </Link>
+
+            <div className={cn(APP_SHELL.accountControls, APP_SHELL.accountControlsRight)}>
               {isResponsable && (
                 <>
                   <Button
@@ -132,10 +149,6 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
                   <span className={APP_SHELL.accountDivider} aria-hidden="true" />
                 </>
               )}
-              <Link href={ROUTES.preferences} onClick={onNavigate}>
-                <Button variant="icon" icon="settings" aria-label={NAV_COPY.preferences} />
-              </Link>
-              <span className={APP_SHELL.accountDivider} aria-hidden="true" />
               <LogoutButton iconOnly />
             </div>
           </div>

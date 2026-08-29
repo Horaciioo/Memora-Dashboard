@@ -19,7 +19,7 @@ import {
 import { TRAINING_CONTENT_COPY, TRAINING_CONTENT_FIELD_COPY } from '@/declarations/academy/copy'
 import { TRAINING_BLOCK_KIND_REGISTRY } from '@/declarations/academy/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { toTone } from '@/declarations/ui/theme'
+
 import { LIST_STYLES } from '@/declarations/ui/variants'
 import type {
   QuizChoiceView,
@@ -204,7 +204,7 @@ export const TrainingContentEditor = ({
     return (
       <article key={block.id} className={cn(LIST_STYLES.card, 'gap-3')}>
         <header className="flex flex-wrap items-center gap-2">
-          <Badge label={kind.label} tone={toTone(kind.accent, 'neutral')} icon={kind.icon} />
+          <Badge label={kind.label} accent={kind.accent} tone={'neutral'} icon={kind.icon} />
           <Button
             variant="icon"
             icon="edit"
