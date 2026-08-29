@@ -54,11 +54,12 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
 /**
  * Journal entry ready for display
  * @typedef {Object} ActivityEntry
+ * @property {EventTypeName | null} event - Event kind, unresolved on a retired id
  * @property {string} id - Entry identifier
- * @property {string} label - Event label
  * @property {string} origin - Origin label
  * @property {string} summary - One line description
  * @property {string | null} actorName - Who did it
+ * @property {string | null} actorAvatar - Portrait of who did it
  * @property {string} createdAt - ISO timestamp
  * @property {string | null} targetType - Target resource kind
  * @property {string | null} targetId - Target resource identifier
@@ -66,14 +67,38 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
 
 export interface ActivityEntry {
   id: string
-  label: string
+  event: EventTypeName | null
   origin: string
   summary: string
   actorName: string | null
+  actorAvatar: string | null
   createdAt: string
   targetType: string | null
   targetId: string | null
 }
+
+// Row shape every reader maps from, the actor carrying the portrait drawn on the rail
+type ActivityRow = Prisma.ActivityLogGetPayload<{
+  include: { actor: { select: { displayName: true; avatarUrl: true } } }
+}>
+
+/**
+ * Map a journal row to its display shape
+ * @param {ActivityRow} row - Journal row with its actor
+ * @return {ActivityEntry} - Journal entry
+ */
+
+const toEntry = (row: ActivityRow): ActivityEntry => ({
+  id: row.id,
+  event: EVENT_TYPES.byId(row.eventType)?.name ?? null,
+  origin: EVENT_ORIGINS.label(row.origin),
+  summary: row.summary,
+  actorName: row.actor?.displayName ?? null,
+  actorAvatar: row.actor?.avatarUrl ?? null,
+  createdAt: row.createdAt.toISOString(),
+  targetType: row.targetType,
+  targetId: row.targetId,
+})
 
 /**
  * Read the journal of one member
@@ -88,21 +113,35 @@ export const readMemberActivity = async (
 ): Promise<ActivityEntry[]> => {
   const rows = await prisma.activityLog.findMany({
     where: { OR: [{ subjectId: accountId }, { actorId: accountId }] },
-    include: { actor: { select: { displayName: true } } },
+    include: { actor: { select: { displayName: true, avatarUrl: true } } },
     orderBy: { createdAt: 'desc' },
     take,
   })
 
-  return rows.map((row) => ({
-    id: row.id,
-    label: EVENT_TYPES.label(row.eventType),
-    origin: EVENT_ORIGINS.label(row.origin),
-    summary: row.summary,
-    actorName: row.actor?.displayName ?? null,
-    createdAt: row.createdAt.toISOString(),
-    targetType: row.targetType,
-    targetId: row.targetId,
-  }))
+  return rows.map(toEntry)
+}
+
+/**
+ * Read the journal of one record
+ * @param {string} targetType - Target resource kind
+ * @param {string} targetId - Target resource identifier
+ * @param {number} [take] - Entry count
+ * @return {Promise<ActivityEntry[]>} - Journal entries
+ */
+
+export const readRecordActivity = async (
+  targetType: string,
+  targetId: string,
+  take: number = PAGINATION_SETTINGS.defaultPerPage
+): Promise<ActivityEntry[]> => {
+  const rows = await prisma.activityLog.findMany({
+    where: { targetType, targetId },
+    include: { actor: { select: { displayName: true, avatarUrl: true } } },
+    orderBy: { createdAt: 'desc' },
+    take,
+  })
+
+  return rows.map(toEntry)
 }
 
 /**
@@ -115,19 +154,10 @@ export const readRecentActivity = async (
   take: number = PAGINATION_SETTINGS.defaultPerPage
 ): Promise<ActivityEntry[]> => {
   const rows = await prisma.activityLog.findMany({
-    include: { actor: { select: { displayName: true } } },
+    include: { actor: { select: { displayName: true, avatarUrl: true } } },
     orderBy: { createdAt: 'desc' },
     take,
   })
 
-  return rows.map((row) => ({
-    id: row.id,
-    label: EVENT_TYPES.label(row.eventType),
-    origin: EVENT_ORIGINS.label(row.origin),
-    summary: row.summary,
-    actorName: row.actor?.displayName ?? null,
-    createdAt: row.createdAt.toISOString(),
-    targetType: row.targetType,
-    targetId: row.targetId,
-  }))
+  return rows.map(toEntry)
 }
