@@ -72,11 +72,49 @@ export const PICKER_COPY = {
   noOption: 'Aucune option pour le moment.',
   openMenu: 'Dérouler la liste',
   chooseDay: 'Choisir une date',
+  chooseRange: 'Choisir des dates',
+  rangeHint: 'Glisse pour couvrir plusieurs jours',
   previousMonth: 'Mois précédent',
   nextMonth: 'Mois suivant',
   today: 'Aujourd’hui',
   clear: 'Effacer',
   time: 'Heure',
+} as const
+
+/**
+ * Copy of the colour wheel
+ * @type {Record<string, string>}
+ */
+
+export const COLOUR_COPY = {
+  wheel: 'Roue des couleurs',
+  hue: 'Teinte',
+  brightness: 'Luminosité',
+  hex: 'Hexadécimal',
+  swatches: 'Couleurs suggérées',
+  preview: 'Aperçu de la couleur',
+  invalid: 'Code hexadécimal invalide.',
+  none: 'Aucune couleur',
+  pick: 'Choisir une couleur',
+} as const
+
+/**
+ * Copy of the emoji picker
+ * @type {Record<string, string>}
+ */
+
+export const EMOJI_COPY = {
+  choose: 'Choisir un émoji',
+  change: 'Changer d’émoji',
+  none: 'Aucun émoji',
+  clear: 'Retirer',
+  title: 'Émojis',
+  lead: 'Compatibles avec tous les systèmes',
+  search: 'Rechercher un émoji',
+  searchPlaceholder: 'Nom français ou anglais…',
+  results: 'Résultats',
+  noMatch: 'Aucun émoji ne porte ce nom.',
+  suggestions: 'Fréquents',
 } as const
 
 /**
@@ -92,10 +130,10 @@ export const PRIORITY_GLYPH = '!!'
  */
 
 export const FORM_GROUPS = {
-  essentials: 'L’essentiel',
+  essentials: 'Général',
   assignment: 'Attribution',
-  planning: 'Planification',
-  details: 'Détails',
+  planning: 'Dates',
+  details: 'Compléments',
   identity: 'Identité',
   contact: 'Contact',
   visibility: 'Visibilité',

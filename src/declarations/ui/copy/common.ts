@@ -66,8 +66,10 @@ export const FIELD_COPY = {
   joinedAt: 'Date d’arrivée',
   leftAt: 'Date de départ',
   team: 'Équipe',
-  updatedAt: 'Mis à jour',
+  createdBy: 'Créé par',
   createdAt: 'Créé le',
+  updatedBy: 'Modifié par',
+  updatedAt: 'Modifié le',
   duration: 'Durée',
   reason: 'Motif',
   author: 'Auteur',
@@ -76,14 +78,16 @@ export const FIELD_COPY = {
 } as const
 
 /**
- * Work in progress banner
+ * Work in progress surfaces
  * @type {Record<string, string>}
  */
 
 export const WIP_COPY = {
   badge: 'Bêta',
   title: 'En cours de développement',
-  description: 'Cette partie arrive bientôt, rien n’est encore branché dessus.',
-  beta: 'Bêta',
-  betaNotice: 'Cette partie n’est pas terminée, elle bouge encore.',
+  description: 'Cette partie n’est pas terminée, elle bouge encore.',
+  betaDialogTitle: 'Fonctionnalité en bêta',
+  betaDialogBody:
+    'Cette fonctionnalité est encore en cours de développement. Celle-ci peut rencontrer des erreurs, être instable, ou ne pas fonctionner.',
+  betaAck: 'J’ai compris !',
 } as const

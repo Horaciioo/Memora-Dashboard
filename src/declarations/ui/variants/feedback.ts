@@ -78,12 +78,10 @@ export const ADD_ROW_STYLES = {
 } as const
 
 /**
- * Beta banner styles, flagging a surface that is not finished yet
+ * Beta tag styles, an amber pill opening the explainer dialog
  * @type {Record<string, string>}
  */
 
 export const BETA_STYLES = {
-  frame:
-    'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-warning)]/40 bg-[var(--color-warning-soft)] px-3 py-2 text-xs text-[var(--color-warning)]',
-  tag: 'rounded-[var(--radius-sm)] bg-[var(--color-warning)] px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-[var(--color-warning-soft)] uppercase',
+  tag: 'inline-flex items-center rounded-[var(--radius-sm)] bg-[var(--color-warning)] px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-[var(--color-on-brand)] uppercase transition-opacity hover:opacity-90',
 } as const

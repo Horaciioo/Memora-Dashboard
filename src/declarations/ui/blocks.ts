@@ -20,10 +20,9 @@ export const APP_SHELL = {
   sidebar:
     'fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-[var(--color-border)] bg-[var(--color-surface-raised)] transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0',
   sidebarHidden: '-translate-x-full',
-  brand: 'flex items-center gap-2.5 border-b border-[var(--color-border)] px-4 py-4',
-  brandMark: 'h-8 w-8 rounded-[var(--radius-md)]',
-  brandName: 'text-base leading-none font-extrabold tracking-tight',
-  brandCompany: 'text-[11px] tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  brand:
+    'flex items-center justify-center border-b border-[var(--color-border)] bg-[var(--color-surface-sunken)] px-4 py-6',
+  brandLogo: 'h-auto w-40',
   search: 'px-3 pt-3',
   searchTrigger:
     'flex w-full min-w-0 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-border-strong)]',
@@ -34,17 +33,24 @@ export const APP_SHELL = {
   navGroupLabel:
     'px-2 pb-1 text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   navLink:
-    'group flex items-center gap-2.5 rounded-[var(--radius-md)] px-2.5 py-2 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
-  navLinkActive: 'bg-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
-  navIcon: 'h-4 w-4 shrink-0',
+    'group flex items-center gap-2.5 rounded-[var(--radius-md)] px-2.5 py-2 text-sm font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
+  navLinkActive: 'font-semibold text-[var(--color-brand-600)]',
+  navLabel: 'relative',
+  navLabelActive: 'nav-underline',
+  navIcon: 'h-4 w-4 shrink-0 transition-colors',
+  navIconActive: 'fill-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
   navBadge:
-    'ml-auto rounded-[var(--radius-sm)] bg-[var(--color-warning-soft)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-warning)]',
+    'ml-auto rounded-[var(--radius-sm)] bg-[var(--color-warning)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-on-brand)]',
   sidebarFooter: 'border-t border-[var(--color-border)] p-3',
-  accountRow: 'flex items-center gap-2.5 px-1',
-  accountIdentity: 'flex min-w-0 flex-1 flex-col',
-  accountControls: 'flex shrink-0 items-center gap-1',
+  accountRow: 'grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-1',
+  accountControls: 'flex shrink-0 items-center gap-1 [&_button]:h-8 [&_button]:w-8',
+  accountControlsLeft: 'justify-end',
+  accountControlsRight: 'justify-start',
+  accountAvatar:
+    'justify-self-center rounded-[var(--radius-sm)] transition-opacity hover:opacity-80',
   accountDivider: 'h-5 w-px shrink-0 bg-[var(--color-border)]',
-  viewToggleActive: 'bg-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
+  viewToggleActive:
+    'text-[var(--color-brand-600)] [&_svg]:fill-[var(--color-brand-600)] hover:!bg-transparent',
   scrim: 'fixed inset-0 z-30 bg-[var(--color-ink)]/40 backdrop-blur-sm lg:hidden',
   main: 'flex min-w-0 flex-1 flex-col',
   menuButton:
