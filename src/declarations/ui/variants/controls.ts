@@ -5,16 +5,16 @@
 
 export const BUTTON_STYLES = {
   base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] text-sm font-medium transition-[background-color,border-color,color,opacity] disabled:pointer-events-none disabled:opacity-50',
-  primary:
-    'bg-[var(--color-brand-600)] px-4 py-2 text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
+  primary: 'bg-[var(--color-brand-600)] px-4 py-2 text-[var(--color-on-brand)] hover:opacity-90',
   secondary:
-    'border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 hover:border-[var(--color-border-strong)] hover:bg-[var(--color-surface)]',
+    'border border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] px-3 py-2 hover:bg-[var(--color-surface-sunken)]',
   ghost:
-    'px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
-  danger:
-    'border border-[var(--color-danger)] px-3 py-2 text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
+    'px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface-sunken)] hover:text-[var(--color-ink)]',
+  danger: 'bg-[var(--color-danger)] px-4 py-2 text-[var(--color-on-brand)] hover:opacity-90',
   icon: 'h-9 w-9 rounded-[var(--radius-md)] p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   link: 'p-0 text-[var(--color-brand-600)] underline-offset-2 hover:underline',
+  // Square footprint for a label-less button, overriding a variant's padding
+  square: 'h-9 w-9 shrink-0 p-0',
 } as const
 
 export type ButtonVariant = keyof Omit<typeof BUTTON_STYLES, 'base'>
@@ -47,6 +47,11 @@ export const FIELD_STYLES = {
   error: 'flex items-center gap-1 text-xs text-[var(--color-danger)]',
   required: 'text-[var(--color-brand-600)]',
   textarea: 'min-h-28 resize-y leading-relaxed',
+  // Control sharing its line with the glyph picker
+  row: 'flex min-w-0 items-center gap-2',
+  rowControl: 'min-w-0 flex-1',
+  // Label and messages sit above the input, past the glyph
+  glyphField: '[&>label]:pl-11 [&>p]:pl-11',
 } as const
 
 /**
@@ -75,7 +80,7 @@ export const TOGGLE_STYLES = {
 export const TAGS_STYLES = {
   field:
     'flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2 py-1.5',
-  tag: 'inline-flex items-center gap-1 rounded-[var(--radius-sm)] bg-[var(--color-brand-soft)] px-2 py-0.5 text-xs text-[var(--color-brand-600)]',
+  tag: 'inline-flex items-center gap-1 rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-2 py-0.5 text-xs text-[var(--color-on-brand)]',
   input: 'min-w-24 flex-1 bg-transparent px-1 text-sm outline-none',
   remove: 'opacity-70 transition-opacity hover:opacity-100',
 } as const
@@ -136,7 +141,8 @@ export const SELECT_MENU_STYLES = {
   triggerBlock: 'w-full',
   triggerCompact: 'w-auto min-w-0 max-w-44 px-2.5 py-1.5 text-xs',
   invalid: 'border-[var(--color-danger)]',
-  value: 'flex min-w-0 flex-1 items-center gap-2 truncate',
+  // Chevron trails the text, not the edge
+  value: 'flex min-w-0 items-center gap-2 truncate',
   placeholder: 'truncate text-[var(--color-ink-subtle)]',
   chevron: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform',
   chevronOpen: 'rotate-180',
@@ -146,13 +152,18 @@ export const SELECT_MENU_STYLES = {
     'w-full border-b border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]',
   list: 'flex-1 overflow-y-auto py-1',
   option:
-    'flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-surface)]',
-  optionActive: 'bg-[var(--color-surface)]',
-  optionSelected: 'text-[var(--color-brand-600)]',
+    'flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-surface)] hover:opacity-100',
+  optionActive: 'bg-[var(--color-surface)] opacity-100',
+  optionSelected:
+    'bg-[var(--color-brand-soft)] font-medium text-[var(--color-brand-600)] opacity-100',
   optionLabel: 'min-w-0 flex-1 truncate',
   optionHint: 'truncate text-xs text-[var(--color-ink-subtle)]',
   check: 'h-3.5 w-3.5 shrink-0 text-[var(--color-brand-600)]',
   empty: 'px-3 py-4 text-center text-xs text-[var(--color-ink-subtle)] italic',
+  // Inset rule between the clearing entry and the real options
+  divider: 'mx-2 my-1 h-px bg-[var(--color-border)]',
+  // Selected entries on the trigger
+  tags: 'flex min-w-0 flex-wrap items-center gap-1',
 } as const
 
 /**
@@ -168,26 +179,89 @@ export const DATE_PICKER_STYLES = {
   step: 'flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   weekdays:
     'grid grid-cols-7 px-2 pt-2 text-center text-[10px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  grid: 'grid grid-cols-7 gap-0.5 p-2',
+  grid: 'grid grid-cols-7 gap-y-0.5 p-2',
   day: 'flex h-8 items-center justify-center rounded-[var(--radius-sm)] text-sm tabular-nums transition-colors hover:bg-[var(--color-surface)]',
   dayOutside: 'text-[var(--color-ink-subtle)]/60',
   dayToday: 'font-bold text-[var(--color-brand-600)]',
-  daySelected:
-    'bg-[var(--color-brand-600)] text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
+  daySelected: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)] hover:opacity-90',
+  // Days between the two range edges
+  dayInRange: 'rounded-none bg-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
+  dayRangeStart: 'rounded-r-none',
+  dayRangeEnd: 'rounded-l-none',
   footer: 'flex items-center gap-2 border-t border-[var(--color-border)] px-2 py-2',
   time: 'w-24 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm tabular-nums outline-none',
 } as const
 
 /**
- * Form category trail styles, one crumb per group of fields
+ * Emoji picker styles — a bare glyph opening the catalogue, never a framed box
  * @type {Record<string, string>}
  */
 
-export const FORM_STEPS_STYLES = {
-  trail: 'flex flex-wrap items-center gap-1',
-  crumb: 'rounded-[var(--radius-sm)] text-xs italic transition-colors',
-  idle: 'text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]',
-  current: 'font-semibold text-[var(--color-brand-600)]',
-  flagged: 'text-[var(--color-danger)]',
-  separator: 'h-2.5 w-2.5 shrink-0 text-[var(--color-ink-subtle)]/60',
+export const EMOJI_PICKER_STYLES = {
+  trigger:
+    'flex h-9 w-9 shrink-0 items-center justify-center bg-transparent transition-transform hover:scale-110 disabled:pointer-events-none disabled:opacity-50',
+  glyph: 'text-2xl leading-none',
+  icon: 'h-5 w-5 text-[var(--color-ink-subtle)]',
+  invalid: 'text-[var(--color-danger)]',
+} as const
+
+/**
+ * Emoji catalogue styles — bare glyphs on the surface, the search pinned below them
+ * @type {Record<string, string>}
+ */
+
+export const EMOJI_DIALOG_STYLES = {
+  body: 'flex flex-col gap-5',
+  family: 'flex flex-col gap-2',
+  familyName: 'text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  grid: 'grid grid-cols-8 gap-1 sm:grid-cols-10 lg:grid-cols-12',
+  cell: 'flex h-9 w-full items-center justify-center rounded-[var(--radius-sm)] bg-transparent text-xl leading-none transition-transform hover:scale-125',
+  cellSelected: 'scale-110 text-[var(--color-brand-600)]',
+  tally: 'text-xs text-[var(--color-ink-subtle)] tabular-nums',
+  empty: 'py-8 text-center text-sm text-[var(--color-ink-subtle)] italic',
+  footer: 'flex w-full min-w-0 items-center gap-2',
+  search: 'min-w-0 flex-1',
+} as const
+
+/**
+ * Collapsed colour field
+ * @type {Record<string, string>}
+ */
+
+export const COLOUR_FIELD_STYLES = {
+  trigger:
+    'flex w-full items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 text-left text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-border-strong)] disabled:pointer-events-none disabled:opacity-60',
+  swatch:
+    'h-5 w-5 shrink-0 rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)]',
+  code: 'font-mono uppercase',
+  placeholder: 'text-[var(--color-ink-subtle)]',
+  dialog: 'flex flex-col gap-3',
+} as const
+
+/**
+ * Colour wheel styles — a hue circle, a brightness slider, then the typed code
+ * @type {Record<string, string>}
+ */
+
+export const COLOUR_WHEEL_STYLES = {
+  wrapper:
+    'flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3',
+  board: 'flex flex-wrap items-center gap-4',
+  wheel:
+    'relative h-32 w-32 shrink-0 cursor-crosshair touch-none rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-600)]',
+  veil: 'pointer-events-none absolute inset-0 rounded-full',
+  shade: 'pointer-events-none absolute inset-0 rounded-full bg-black',
+  thumb:
+    'pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[var(--shadow-md)]',
+  controls: 'flex min-w-0 flex-1 flex-col gap-3',
+  row: 'flex items-center gap-2',
+  preview: 'h-9 w-9 shrink-0 rounded-[var(--radius-md)] border border-[var(--color-border-strong)]',
+  code: 'w-32 font-mono uppercase',
+  slider: 'h-2 w-full cursor-pointer appearance-none rounded-full',
+  swatches: 'flex flex-wrap gap-1.5',
+  swatch:
+    'h-6 w-6 rounded-[var(--radius-sm)] border border-[var(--color-border)] transition-transform hover:scale-110',
+  swatchSelected:
+    'ring-2 ring-[var(--color-brand-600)] ring-offset-1 ring-offset-[var(--color-surface-raised)]',
+  disabled: 'pointer-events-none opacity-60',
 } as const

@@ -1,111 +1,11 @@
 @import 'tailwindcss';
+@import './fonts.css';
+@import './theme.css';
 
-:root {
-  --color-background: #fdfaf4;
-  --color-surface: #f6f1e8;
-  --color-surface-raised: #fffdfa;
-  --color-surface-sunken: #efe8dc;
-  --color-ink: #1e1622;
-  --color-ink-subtle: #6f6377;
-  --color-ink-rose: #8d7186;
-  --color-border: #e8dfd4;
-  --color-border-strong: #d1c4b8;
-
-  --color-brand-50: #fdf4fa;
-  --color-brand-100: #fbe4f4;
-  --color-brand-200: #f6c7e7;
-  --color-brand-300: #ee9dd4;
-  --color-brand-400: #e26bbc;
-  --color-brand-500: #d243a2;
-  --color-brand-600: #b92d8c;
-  --color-brand-700: #a32478;
-  --color-brand-800: #841c60;
-  --color-brand-900: #6b1a4e;
-  --color-on-brand: #ffffff;
-
-  --color-success: #12784e;
-  --color-caution: #8a6a00;
-  --color-warning: #8a5300;
-  --color-danger: #be2436;
-  --color-info: #2a56be;
-  --color-neutral: #6b5f76;
-
-  --color-success-soft: #e0f5ea;
-  --color-caution-soft: #faf3d3;
-  --color-warning-soft: #fbeed6;
-  --color-danger-soft: #fce6e8;
-  --color-info-soft: #e4ecfd;
-  --color-neutral-soft: #eee9f0;
-  --color-brand-soft: #fbe4f4;
-
-  --radius-sm: 0.125rem;
-  --radius-md: 0.1875rem;
-  --radius-lg: 0.25rem;
-  --radius-xl: 0.375rem;
-
-  --shadow-sm: 0 1px 2px rgb(26 18 32 / 0.06);
-  --shadow-md: 0 6px 20px -8px rgb(26 18 32 / 0.18);
-  --shadow-lg: 0 24px 60px -24px rgb(26 18 32 / 0.28);
-
-  --motion-duration-fast: 120ms;
-  --motion-duration-moderate: 1400ms;
-  --motion-duration-panel: 220ms;
-  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-
-  --font-display:
-    var(--font-outfit), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-body: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono', monospace;
-}
-
-/*
- * The .dark class on <html> is the single source of truth — set by ThemeManager
- * (src/managers/front-end/ThemeManager.tsx) and, before paint, by ThemeScript. Both
- * already resolve "system" via matchMedia, so no separate prefers-color-scheme
- * fallback is needed here.
- */
-:root.dark {
-  --color-background: #0f0b13;
-  --color-surface: #1a151f;
-  --color-surface-raised: #221b28;
-  --color-surface-sunken: #15101a;
-  --color-ink: #f5eff7;
-  --color-ink-subtle: #a99cb2;
-  --color-ink-rose: #c3a8bd;
-  --color-border: #302738;
-  --color-border-strong: #453a4f;
-
-  --color-brand-50: #1e1020;
-  --color-brand-100: #2c1730;
-  --color-brand-200: #46224a;
-  --color-brand-300: #6b2f6c;
-  --color-brand-400: #9c4292;
-  --color-brand-500: #c964ac;
-  --color-brand-600: #f0a0d6;
-  --color-brand-700: #f6bee2;
-  --color-brand-800: #fad6ed;
-  --color-brand-900: #fdeaf6;
-  --color-on-brand: #1a1220;
-
-  --color-success: #5cd39a;
-  --color-caution: #e6cf5f;
-  --color-warning: #f0b45c;
-  --color-danger: #ff8e97;
-  --color-info: #8fb2f7;
-  --color-neutral: #a99cb2;
-
-  --color-success-soft: #12291f;
-  --color-caution-soft: #2a2711;
-  --color-warning-soft: #2c2113;
-  --color-danger-soft: #30171b;
-  --color-info-soft: #171f33;
-  --color-neutral-soft: #211b26;
-  --color-brand-soft: #2c1730;
-
-  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-md: 0 6px 20px -8px rgb(0 0 0 / 0.6);
-  --shadow-lg: 0 24px 60px -24px rgb(0 0 0 / 0.8);
-}
+/* Tone classes are built at runtime by tw() (src/declarations/ui/theme.ts), so the scanner never sees them — force-compiled here */
+@source inline("bg-[var(--color-{brand-600,brand-soft,success,success-soft,caution,caution-soft,warning,warning-soft,danger,danger-soft,info,info-soft,neutral,neutral-soft,ink-subtle})]");
+@source inline("text-[var(--color-{brand-600,success,caution,warning,danger,info,neutral,ink-subtle})]");
+@source inline("border-[var(--color-{brand-600,brand-400,success,caution,warning,danger,info,neutral,border-strong})]");
 
 /* Text size preference — set by AppearanceManager (src/managers/front-end/AppearanceManager.tsx) */
 :root[data-font-scale='sm'] {
@@ -126,11 +26,12 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
 }
 
 ::selection {
-  background: var(--color-brand-200);
+  background: var(--color-brand-soft);
   color: var(--color-ink);
 }
 
@@ -154,7 +55,7 @@ h4 {
 *::-webkit-scrollbar-thumb {
   background: var(--color-border-strong);
   border: 3px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   background-clip: content-box;
 }
 
@@ -282,6 +183,33 @@ html[data-color-vision='tritanopia'] {
     opacity var(--motion-duration-panel) var(--motion-ease-out);
 }
 
+/* Active sidebar link — a thin pink stroke settles in under the label, no filled box */
+.nav-underline::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -0.1875rem;
+  left: 0;
+  height: 0.125rem;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-600);
+  transform: scaleX(0.55);
+  transform-origin: left center;
+  opacity: 0;
+  animation: nav-underline-settle var(--motion-duration-fast) var(--motion-ease-out) forwards;
+}
+
+@keyframes nav-underline-settle {
+  from {
+    transform: scaleX(0.55);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
 /* Drag and drop feedback — set by useDragAndDrop (src/core/hooks/interaction/useDragAndDrop.ts) */
 .is-dragging {
   opacity: 0.45;
@@ -302,6 +230,12 @@ html[data-color-vision='tritanopia'] {
   .popover-enter,
   .drawer-enter {
     animation: none;
+  }
+
+  .nav-underline::after {
+    animation: none;
+    transform: scaleX(1);
+    opacity: 1;
   }
 
   .tab-indicator,
@@ -414,4 +348,61 @@ html[data-color-vision='tritanopia'] {
 .markdown-body .spoiler:hover,
 .markdown-body .spoiler:focus-visible {
   color: var(--color-surface-raised);
+}
+
+/*
+ * Accent classes — the hexadecimal counterpart of the tone classes. Every rule reads the
+ * --accent custom property posed by accentVars (src/declarations/ui/theme.ts), so an arbitrary
+ * colour picked in the wheel tints a surface exactly like a declared tone would.
+ */
+.accent-text {
+  color: color-mix(in srgb, var(--accent) 88%, var(--color-ink));
+}
+
+.accent-dot {
+  background-color: var(--accent);
+}
+
+.accent-tint {
+  background-color: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* Faintest wash, for a backdrop sitting under an already tinted surface */
+.accent-wash {
+  background-color: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+
+.accent-border {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* Solid fill of a picked accent — the tag treatment, white label on a full colour */
+.accent-solid {
+  background-color: var(--accent);
+}
+
+/* A stored colour is picked against the light theme, so it is lifted to stay readable on dark */
+:root.dark .accent-text {
+  color: color-mix(in srgb, var(--accent) 55%, #ffffff);
+}
+
+:root.dark .accent-tint {
+  background-color: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+:root.dark .accent-wash {
+  background-color: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+:root.dark .accent-border {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+/* Colour wheel — the hue circle and the saturation veil laid over it */
+.colour-wheel-hue {
+  background: conic-gradient(from 0deg, red, yellow, lime, cyan, blue, magenta, red);
+}
+
+.colour-wheel-tint {
+  background: radial-gradient(circle closest-side, white, transparent);
 }

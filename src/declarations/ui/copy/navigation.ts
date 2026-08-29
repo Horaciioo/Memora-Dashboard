@@ -17,6 +17,8 @@ export const NAV_COPY = {
   searchNavigate: '↑ ↓ pour naviguer, ↵ pour ouvrir',
   preferences: 'Paramètres',
   theme: 'Thème',
+  themeLight: 'Passer en thème clair',
+  themeDark: 'Passer en thème sombre',
   textSize: 'Taille du texte',
   colorVision: 'Vision des couleurs',
   wip: 'En développement',
