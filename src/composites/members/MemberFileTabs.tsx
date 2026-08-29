@@ -6,7 +6,6 @@ import type { ReactNode } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
-import { StatusRibbon } from '@/components/elements/display/StatusRibbon'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
@@ -15,18 +14,15 @@ import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
 import { FileTabs } from '@/components/structures/FileTabs'
-import { WipNotice } from '@/components/structures/WipNotice'
 import { useMemberFile } from '@/core/hooks/data/useMemberFile'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import { ACADEMY_PERIOD_REGISTRY, MEMBER_STATUS_REGISTRY } from '@/declarations/access/roles'
 import { ROUTES } from '@/declarations/navigation'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { DETAIL_BLOCK } from '@/declarations/ui/blocks'
 import { LIST_STYLES } from '@/declarations/ui/variants'
-import { toTone } from '@/declarations/ui/theme'
-import { DivisionBadge, RoleBadge } from '@/composites/members/MemberBadges'
+import { RoleBadge } from '@/composites/members/MemberBadges'
 import { MemberAccessPanel } from '@/composites/members/MemberAccessPanel'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
@@ -38,6 +34,7 @@ import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
 
 export interface MemberFileTabsProps {
   detail: MemberDetail
+  recruitmentSessionId: string | null
   memberFields: FieldDefinition[]
   noteFields: FieldDefinition[]
   socialFields: FieldDefinition[]
@@ -97,6 +94,7 @@ const optionLabels = (field: FieldDefinition, value: FieldValue): ReactNode => {
 /**
  * Tabs of one moderator file, each tab guarded by the permission that opens it
  * @param {MemberDetail} detail - File resolved server-side
+ * @param {string | null} recruitmentSessionId - Session holding their application, by Discord identifier
  * @param {FieldDefinition[]} memberFields - Declarations of the file form
  * @param {FieldDefinition[]} noteFields - Declarations of the note form
  * @param {FieldDefinition[]} socialFields - Declarations of the social form
@@ -113,6 +111,7 @@ const optionLabels = (field: FieldDefinition, value: FieldValue): ReactNode => {
 
 export const MemberFileTabs = ({
   detail,
+  recruitmentSessionId,
   memberFields,
   noteFields,
   socialFields,
@@ -285,42 +284,35 @@ export const MemberFileTabs = ({
 
   const header = (
     <Section title={MEMBER_COPY.identity} padded>
-      <div className="relative">
-        <StatusRibbon
-          label={MEMBER_STATUS_REGISTRY.get(summary.status).label}
-          tone={toTone(MEMBER_STATUS_REGISTRY.get(summary.status).accent)}
-          className="-top-4 -right-4 sm:-top-5 sm:-right-5"
-        />
-        <div className="flex flex-wrap items-start gap-4">
-          <div className="relative shrink-0">
-            <button
-              type="button"
-              disabled={!canEdit}
-              aria-label={ACTION_COPY.edit}
-              title={ACTION_COPY.edit}
-              onClick={() => openDialog('identity')}
-              className="rounded-[var(--radius-sm)] transition-opacity enabled:cursor-pointer enabled:hover:opacity-80 disabled:cursor-default"
-            >
-              <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
-            </button>
-            <span className="absolute right-1 bottom-1 rounded-[var(--radius-sm)] ring-2 ring-[var(--color-surface-raised)]">
-              <DivisionBadge division={summary.division} />
-            </span>
-          </div>
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <span className="flex flex-wrap items-center gap-2 pr-16">
-              <RoleBadge member={summary} />
-              {summary.youtubers.map((youtuber) => (
-                <Badge key={youtuber.id} label={youtuber.label} tone="info" icon="youtuber" />
-              ))}
-              {summary.academyDispositif && (
-                <Badge
-                  label={summary.academyDispositif.label}
-                  tone={toTone(summary.academyDispositif.accent, 'info')}
-                />
-              )}
-            </span>
-          </div>
+      <div className="flex flex-wrap items-start gap-4">
+        <button
+          type="button"
+          disabled={!canEdit}
+          aria-label={ACTION_COPY.edit}
+          title={ACTION_COPY.edit}
+          onClick={() => openDialog('identity')}
+          className="shrink-0 rounded-[var(--radius-sm)] transition-opacity enabled:cursor-pointer enabled:hover:opacity-80 disabled:cursor-default"
+        >
+          <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
+        </button>
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <span className="flex flex-wrap items-center gap-2">
+            <RoleBadge member={summary} />
+            <Badge
+              label={summary.division ? summary.division.label : MEMBER_COPY.noDivision}
+              tone="neutral"
+            />
+            {summary.youtubers.map((youtuber) => (
+              <Badge key={youtuber.id} label={youtuber.label} tone="info" icon="youtuber" />
+            ))}
+            {summary.academyDispositif && (
+              <Badge
+                label={summary.academyDispositif.label}
+                accent={summary.academyDispositif.accent}
+                tone={'info'}
+              />
+            )}
+          </span>
         </div>
       </div>
       {isLocked && <p className={`${DETAIL_BLOCK.empty} pt-3`}>{MEMBER_COPY.rootLocked}</p>}
@@ -429,7 +421,7 @@ export const MemberFileTabs = ({
                   )}
                 </span>
                 <Badge label={`${absence.dayCount}`} tone="neutral" icon="clock" />
-                <Badge label={status.label} tone={toTone(status.accent)} dot />
+                <Badge label={status.label} accent={status.accent} dot />
               </div>
             )
           })}
@@ -460,7 +452,7 @@ export const MemberFileTabs = ({
         <div className={LIST_STYLES.stack}>
           {file.socials.map((social) => (
             <div key={social.id} className={LIST_STYLES.item}>
-              <Badge label={social.label} tone={toTone(social.accent, 'brand')} />
+              <Badge label={social.label} accent={social.accent} tone={'brand'} />
               <span className="min-w-0 flex-1 truncate text-sm">{social.handle}</span>
               {social.url && (
                 <a
@@ -498,7 +490,7 @@ export const MemberFileTabs = ({
     </Section>
   )
 
-  const academyTab = () => (
+  const pathTab = () => (
     <div className="flex flex-col gap-8">
       <Section title={MEMBER_COPY.academyFsiTitle} bare>
         {summary.academyJuniorId && summary.academySessionId ? (
@@ -521,43 +513,23 @@ export const MemberFileTabs = ({
         )}
       </Section>
 
-      <Section title={MEMBER_COPY.tabAcademy} bare>
-        {detail.trainings.length === 0 ? (
-          <EmptyState
-            figure="academy"
-            title={MEMBER_COPY.academyEmptyTitle}
-            description={MEMBER_COPY.academyEmptyDescription}
-            action={<Badge label={MEMBER_COPY.academyEmptyTitle} tone="neutral" />}
-          />
+      <Section title={MEMBER_COPY.recruitmentTitle} bare>
+        {recruitmentSessionId ? (
+          <Button
+            variant="primary"
+            icon="recruitment"
+            onClick={() => router.push(ROUTES.recruitment(recruitmentSessionId))}
+          >
+            {MEMBER_COPY.recruitmentOpen}
+          </Button>
         ) : (
-          <div className={LIST_STYLES.stack}>
-            {detail.trainings.map((training) => (
-              <div key={training.id} className={LIST_STYLES.item}>
-                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="font-medium">{training.name}</span>
-                  <span className="text-xs text-[var(--color-ink-subtle)]">
-                    {[
-                      training.period ? ACADEMY_PERIOD_REGISTRY.label(training.period) : null,
-                      training.validatorName,
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </span>
-                </span>
-                {training.mandatory && <Badge label={MEMBER_COPY.tabAcademy} tone="brand" />}
-                <Badge
-                  label={training.completedAt ? formatDay(training.completedAt) : ACTION_COPY.none}
-                  tone={training.completedAt ? 'success' : 'neutral'}
-                  icon={training.completedAt ? 'success' : 'clock'}
-                />
-              </div>
-            ))}
-          </div>
+          <EmptyState
+            figure="members"
+            title={MEMBER_COPY.recruitmentNoneTitle}
+            description={MEMBER_COPY.recruitmentNoneDescription}
+            action={<Badge label={MEMBER_COPY.recruitmentNoneTitle} tone="neutral" />}
+          />
         )}
-      </Section>
-
-      <Section title={MEMBER_COPY.academyPathTitle} bare>
-        <WipNotice figure="academy" />
       </Section>
     </div>
   )
@@ -617,10 +589,10 @@ export const MemberFileTabs = ({
             render: accessTab,
           },
           {
-            value: 'academy',
-            label: MEMBER_COPY.tabAcademy,
-            icon: 'academy',
-            render: academyTab,
+            value: 'path',
+            label: MEMBER_COPY.tabPath,
+            icon: 'recruitment',
+            render: pathTab,
           },
           {
             value: 'logs',

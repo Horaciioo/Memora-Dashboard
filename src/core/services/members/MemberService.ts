@@ -14,7 +14,7 @@ import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import type { FieldDefinition, FormValues } from '@/types/forms'
-import type { MemberAbsence, MemberDetail, MemberSummary, MemberTraining } from '@/types/members'
+import type { MemberAbsence, MemberDetail, MemberSummary } from '@/types/members'
 import { AcademyJuniorStatuses, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
@@ -139,8 +139,9 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
     },
     {
       name: 'avatarUrl',
-      kind: 'url',
+      kind: 'image',
       label: MEMBER_FIELD_COPY.avatarUrl,
+      bucket: 'avatars',
       group: FORM_GROUPS.identity,
     },
     {
@@ -392,7 +393,6 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
       ...SUMMARY_INCLUDE,
       socialLinks: { orderBy: { position: 'asc' } },
       absences: { include: { reviewer: true }, orderBy: { startDate: 'desc' } },
-      trainingRecords: { include: { training: true, validator: true } },
       teamMemberships: { include: { team: true } },
       _count: {
         select: {
@@ -415,25 +415,6 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
         orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }],
       })
     : []
-
-  // Declared trainings the member has not started yet still show as pending
-  const trainings = await prisma.training.findMany({
-    orderBy: [{ period: 'asc' }, { position: 'asc' }],
-  })
-  const recordIndex = new Map(row.trainingRecords.map((record) => [record.trainingId, record]))
-
-  const progression: MemberTraining[] = trainings.map((training) => {
-    const record = recordIndex.get(training.id)
-
-    return {
-      id: training.id,
-      name: training.name,
-      period: training.period,
-      mandatory: training.mandatory,
-      completedAt: record?.completedAt?.toISOString() ?? null,
-      validatorName: record?.validator?.displayName ?? null,
-    }
-  })
 
   const absences: MemberAbsence[] = row.absences.map((absence) => ({
     id: absence.id,
@@ -498,7 +479,6 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
       accent: link.accent,
     })),
     absences,
-    trainings: progression,
     teams: row.teamMemberships.map((membership) => membership.team.name),
     projectCount: row._count.projectAssists,
     taskCount: row._count.ownedTasks,
