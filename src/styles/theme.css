@@ -1,0 +1,106 @@
+/*
+ * Token values of the theme format (src/utils/format/theme.ts). White ground,
+ * neutral grey structure, one soft rose. No gradient, no tinted structure.
+ * The .dark class on <html> is the single source of truth — set by ThemeManager
+ * and, before paint, by ThemeScript, both of which resolve "system" themselves.
+ * Font tokens live in fonts.css.
+ */
+
+:root {
+  --color-background: #ffffff;
+  --color-surface: #fafafa;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunken: #f4f4f5;
+  --color-ink: #18181b;
+  --color-ink-subtle: #71717a;
+  --color-ink-accent: #f581fc;
+  --color-border: #e4e4e7;
+  --color-border-strong: #d4d4d8;
+
+  /* One rose — soft, never dark magenta. The ramp collapses toward 600. */
+  --color-brand-50: #fdf2f8;
+  --color-brand-100: #fce7f3;
+  --color-brand-200: #fbcfe8;
+  --color-brand-300: #f9a8d4;
+  --color-brand-400: #f472b6;
+  --color-brand-500: #f581fc;
+  --color-brand-600: #f581fc;
+  --color-brand-700: #db2777;
+  --color-brand-800: #be185d;
+  --color-brand-900: #9d174d;
+  --color-on-brand: #ffffff;
+
+  /* Category tones — solid, never mixed with the rose */
+  --color-success: #15803d;
+  --color-caution: #a16207;
+  --color-warning: #c2410c;
+  --color-danger: #dc2626;
+  --color-info: #1d4ed8;
+  --color-neutral: #52525b;
+
+  --color-success-soft: #f0fdf4;
+  --color-caution-soft: #fefce8;
+  --color-warning-soft: #fff7ed;
+  --color-danger-soft: #fef2f2;
+  --color-info-soft: #eff6ff;
+  --color-neutral-soft: #f4f4f5;
+  --color-brand-soft: #fce7f3;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgb(24 24 27 / 0.06), 0 1px 3px rgb(24 24 27 / 0.08);
+  --shadow-md: 0 6px 20px -6px rgb(24 24 27 / 0.14);
+  --shadow-lg: 0 24px 60px -24px rgb(24 24 27 / 0.22);
+
+  --motion-duration-fast: 120ms;
+  --motion-duration-moderate: 1400ms;
+  --motion-duration-panel: 220ms;
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root.dark {
+  --color-background: #101012;
+  --color-surface: #18181b;
+  --color-surface-raised: #1f1f23;
+  --color-surface-sunken: #0b0b0d;
+  --color-ink: #fafafa;
+  --color-ink-subtle: #a1a1aa;
+  --color-ink-accent: #f9a8d4;
+  --color-border: #27272a;
+  --color-border-strong: #3f3f46;
+
+  --color-brand-50: #2a0a1c;
+  --color-brand-100: #3d1029;
+  --color-brand-200: #5b1540;
+  --color-brand-300: #8a2060;
+  --color-brand-400: #f581fc;
+  --color-brand-500: #f472b6;
+  --color-brand-600: #f472b6;
+  --color-brand-700: #f9a8d4;
+  --color-brand-800: #fbcfe8;
+  --color-brand-900: #fce7f3;
+  --color-on-brand: #4a0e2e;
+
+  --color-success: #4ade80;
+  --color-caution: #eab308;
+  --color-warning: #fb923c;
+  --color-danger: #f87171;
+  --color-info: #60a5fa;
+  --color-neutral: #a1a1aa;
+
+  --color-success-soft: #0f2c1c;
+  --color-caution-soft: #2c2408;
+  --color-warning-soft: #2c1c0f;
+  --color-danger-soft: #2c1414;
+  --color-info-soft: #121f33;
+  --color-neutral-soft: #232326;
+  --color-brand-soft: #3d1029;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 6px 20px -8px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 24px 60px -24px rgb(0 0 0 / 0.8);
+}
