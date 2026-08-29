@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { CalendarBoard } from '@/composites/calendar/CalendarBoard'
-import { prisma } from '@/core/lib/db'
-import { calendarFields, listEntries } from '@/core/services/calendar/CalendarService'
+import {
+  calendarFields,
+  countTemplates,
+  listEntries,
+} from '@/core/services/calendar/CalendarService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -23,7 +26,7 @@ export default async function CalendarPage() {
   const anchor = toDayKey(new Date())
   const { from, to } = gridRange(monthGrid(anchor))
 
-  const [entries, fields, typeCount] = await Promise.all([
+  const [entries, fields, templateCount] = await Promise.all([
     listEntries({
       from: new Date(from),
       to: new Date(to),
@@ -32,7 +35,7 @@ export default async function CalendarPage() {
       scope: perimeter,
     }),
     calendarFields(perimeter),
-    prisma.eventType.count({ where: { archived: false } }),
+    countTemplates(),
   ])
 
   return (
@@ -42,7 +45,7 @@ export default async function CalendarPage() {
         initialEntries={entries}
         fields={fields}
         anchor={anchor}
-        hasTypes={typeCount > 0}
+        hasTemplates={templateCount > 0}
         canManage={access.can(Permissions.CalendarManage)}
       />
     </div>
