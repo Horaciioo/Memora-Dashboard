@@ -2,7 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
-import { readDate, readText } from '@/core/lib/forms/values'
+import { readDateRange, readText } from '@/core/lib/forms/values'
 import { ABSENCE_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { ABSENCE_COPY, ABSENCE_FIELD_COPY } from '@/declarations/absences/copy'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
@@ -80,18 +80,10 @@ const toAbsence = (row: AbsenceRow): MemberAbsence => ({
 
 export const ABSENCE_FIELDS: FieldDefinition[] = [
   {
-    name: 'startDate',
-    kind: 'date',
-    label: ABSENCE_FIELD_COPY.startDate,
+    name: 'dates',
+    kind: 'daterange',
+    label: ABSENCE_FIELD_COPY.dates,
     required: true,
-    span: 'half',
-  },
-  {
-    name: 'endDate',
-    kind: 'date',
-    label: ABSENCE_FIELD_COPY.endDate,
-    required: true,
-    span: 'half',
   },
   {
     name: 'reason',
@@ -168,15 +160,16 @@ export const createAbsence = async (
   accountId: string,
   values: FormValues
 ): Promise<MemberAbsence> => {
-  const startDate = readDate(values, 'startDate')
-  const endDate = readDate(values, 'endDate')
+  const range = readDateRange(values, 'dates')
 
-  if (!startDate || !endDate) {
-    throw invalidInput([{ field: 'startDate', message: FORM_COPY.required }])
+  if (!range) {
+    throw invalidInput([{ field: 'dates', message: FORM_COPY.required }])
   }
 
+  const [startDate, endDate] = range
+
   if (endDate < startDate) {
-    throw invalidInput([{ field: 'endDate', message: FORM_COPY.endBeforeStart }])
+    throw invalidInput([{ field: 'dates', message: FORM_COPY.endBeforeStart }])
   }
 
   // Below the threshold there is nothing to declare, they just enjoy
@@ -185,7 +178,7 @@ export const createAbsence = async (
   if (dayCount <= ABSENCE_SETTINGS.thresholdDays) {
     throw invalidInput([
       {
-        field: 'endDate',
+        field: 'dates',
         message: ABSENCE_COPY.tooShort.replace('{min}', String(ABSENCE_SETTINGS.thresholdDays + 1)),
       },
     ])
@@ -194,7 +187,7 @@ export const createAbsence = async (
   if (dayCount > ABSENCE_SETTINGS.maxDays) {
     throw invalidInput([
       {
-        field: 'endDate',
+        field: 'dates',
         message: ABSENCE_COPY.tooLong.replace('{max}', String(ABSENCE_SETTINGS.maxDays)),
       },
     ])

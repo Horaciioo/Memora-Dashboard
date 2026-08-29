@@ -24,10 +24,7 @@ export interface AccessCollection {
   matrix: AccessMatrix
   isSaving: boolean
   saveRole: (role: MemberRoleName, permissions: PermissionName[]) => Promise<AccessMatrix | null>
-  saveFunction: (
-    functionId: string,
-    permissions: PermissionName[]
-  ) => Promise<AccessMatrix | null>
+  saveFunction: (functionId: string, permissions: PermissionName[]) => Promise<AccessMatrix | null>
   applyPreset: (role: MemberRoleName) => Promise<AccessMatrix | null>
 }
 

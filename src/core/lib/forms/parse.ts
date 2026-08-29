@@ -64,6 +64,19 @@ const parseField = (field: FieldDefinition, raw: unknown, issues: FieldIssue[]):
   // Booleans never carry an empty state
   if (field.kind === 'toggle') return Boolean(raw)
 
+  // A day range is two ordered ISO days
+  if (field.kind === 'daterange') {
+    const entries = toList(raw)
+    if (entries.length < 2) return null
+
+    const [start, end] = entries
+    if (Number.isNaN(new Date(start).getTime()) || Number.isNaN(new Date(end).getTime())) {
+      return reject(FORM_COPY.notADate)
+    }
+
+    return end < start ? reject(FORM_COPY.endBeforeStart) : [start, end]
+  }
+
   if (isBlank(raw)) return field.kind === 'multiselect' || field.kind === 'tags' ? [] : null
 
   // Multi-value fields

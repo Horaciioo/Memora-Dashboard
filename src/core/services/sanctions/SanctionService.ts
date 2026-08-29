@@ -2,7 +2,6 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
-import { TONE_OPTIONS } from '@/core/lib/forms/options'
 import { readText } from '@/core/lib/forms/values'
 import { assertInScope } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -101,11 +100,8 @@ export const offenseFields = (): FieldDefinition[] => [
   },
   {
     name: 'accent',
-    kind: 'select',
+    kind: 'colour',
     label: SANCTION_FIELD_COPY.accent,
-    options: TONE_OPTIONS,
-    mark: 'dot',
-    span: 'half',
   },
 ]
 
