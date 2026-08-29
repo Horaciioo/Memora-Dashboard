@@ -58,3 +58,19 @@ export const getSession = async (): Promise<SessionUser | null> => {
 
   return toSessionUser(session.account)
 }
+
+/**
+ * Check a session token against the database
+ * @param {string} token - Session cookie value
+ * @return {Promise<boolean>} - Token still opens a session
+ */
+
+export const isSessionTokenValid = async (token: string): Promise<boolean> => {
+  const session = await prisma.session.findUnique({
+    where: { token },
+    select: { expiresAt: true, account: { select: { status: true } } },
+  })
+  if (!session || session.expiresAt < new Date()) return false
+
+  return session.account.status !== MemberStatuses.Left
+}

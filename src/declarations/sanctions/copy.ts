@@ -59,8 +59,7 @@ export const SANCTION_STEPS: readonly string[] = [
  * @return {string} - Step label
  */
 
-export const stepLabel = (step: number): string =>
-  SANCTION_STEPS[step] ?? `${step + 1}ᵉ fois`
+export const stepLabel = (step: number): string => SANCTION_STEPS[step] ?? `${step + 1}ᵉ fois`
 
 /**
  * Copy of the sanction form fields

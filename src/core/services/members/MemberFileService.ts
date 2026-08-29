@@ -4,7 +4,6 @@ import type { SocialLink } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { forbidden, notFound } from '@/core/lib/errors'
-import { TONE_OPTIONS } from '@/core/lib/forms/options'
 import { readFlag, readText } from '@/core/lib/forms/values'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
@@ -137,13 +136,7 @@ export const SOCIAL_FIELDS: FieldDefinition[] = [
     span: 'half',
   },
   { name: 'url', kind: 'url', label: MEMBER_COPY.socialUrl },
-  {
-    name: 'accent',
-    kind: 'select',
-    label: MEMBER_COPY.socialAccent,
-    options: TONE_OPTIONS,
-    span: 'half',
-  },
+  { name: 'accent', kind: 'colour', label: MEMBER_COPY.socialAccent },
 ]
 
 /**

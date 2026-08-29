@@ -85,14 +85,14 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         group: 'tasks',
         label: row.title,
         hint: [row.owner?.displayName, row.state?.name].filter(Boolean).join(' · ') || undefined,
-        href: ROUTES.tasks,
+        href: ROUTES.task(row.id),
       })),
     })
   }
 
   if (access.can(Permissions.MeetingRead)) {
     const rows = await prisma.meeting.findMany({
-      where: { OR: [{ title: contains }, { agenda: contains }] },
+      where: { OR: [{ title: contains }, { introduction: contains }] },
       take,
     })
 
@@ -104,7 +104,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         group: 'meetings',
         label: row.title,
         hint: formatDay(row.scheduledAt),
-        href: ROUTES.meetings,
+        href: ROUTES.meeting(row.id),
       })),
     })
   }

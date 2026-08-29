@@ -42,8 +42,7 @@ export const ABSENCE_COPY = {
  */
 
 export const ABSENCE_FIELD_COPY = {
-  startDate: 'Premier jour',
-  endDate: 'Dernier jour',
+  dates: 'Dates de l’absence',
   reason: 'Motif',
   member: 'Modérateur',
   status: 'Statut',

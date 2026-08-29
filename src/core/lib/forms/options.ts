@@ -1,4 +1,3 @@
-import { TONE_KEYS, TONE_LABELS } from '@/declarations/ui/theme'
 import type { Registry } from '@/core/lib/registry'
 import type { FieldOption } from '@/types/forms'
 
@@ -35,14 +34,3 @@ export const rowsToOptions = (
     accent: row.accent ?? undefined,
     image: row.avatarUrl ?? undefined,
   }))
-
-/**
- * Colour tones offered on a reference form
- * @type {FieldOption[]}
- */
-
-export const TONE_OPTIONS: FieldOption[] = TONE_KEYS.map((tone) => ({
-  value: tone,
-  label: TONE_LABELS[tone],
-  accent: tone,
-}))

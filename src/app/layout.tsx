@@ -1,15 +1,11 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
-import { Inter, Outfit } from 'next/font/google'
 import '@/styles/globals.css'
 import { ThemeScript } from '@/components/tools/ThemeScript'
 import { ColorVisionFilters } from '@/components/tools/ColorVisionFilters'
 import { Providers } from '@/app/providers'
 import { getSession } from '@/core/lib/auth/getSession'
-import { APP_COMPANY, APP_DESCRIPTION, APP_NAME } from '@/declarations/app'
-
-const bodyFont = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
-const displayFont = Outfit({ subsets: ['latin'], variable: '--font-outfit', display: 'swap' })
+import { APP_COMPANY, APP_DESCRIPTION, APP_FONTS, APP_NAME } from '@/declarations/app'
 
 export const metadata: Metadata = {
   title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
@@ -29,12 +25,12 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const initialSession = await getSession()
 
   return (
-    <html
-      lang="fr"
-      suppressHydrationWarning
-      className={`${bodyFont.variable} ${displayFont.variable}`}
-    >
+    <html lang="fr" suppressHydrationWarning>
       <head>
+        {APP_FONTS.preconnect.map((href) => (
+          <link key={href} rel="preconnect" href={href} crossOrigin="anonymous" />
+        ))}
+        <link rel="stylesheet" href={APP_FONTS.stylesheet} />
         <ThemeScript />
       </head>
       <body className="bg-[var(--color-background)] text-[var(--color-ink)] antialiased">

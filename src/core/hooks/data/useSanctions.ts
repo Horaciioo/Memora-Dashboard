@@ -52,7 +52,9 @@ export const useSanctions = (initialPanel: SanctionPanelView): SanctionCollectio
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   const select = useCallback(async (youtuberId: string, levelId: string | null) => {
-    const next = await apiGet<SanctionPanelView>(API_ROUTES.sanctions(youtuberId, levelId ?? undefined))
+    const next = await apiGet<SanctionPanelView>(
+      API_ROUTES.sanctions(youtuberId, levelId ?? undefined)
+    )
     setPanel(next)
   }, [])
 

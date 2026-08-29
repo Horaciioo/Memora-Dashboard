@@ -119,3 +119,21 @@ export const readDate = (values: FormValues, name: string): Date | null => {
   const parsed = new Date(text)
   return Number.isNaN(parsed.getTime()) ? null : parsed
 }
+
+/**
+ * Read a day range value
+ * @param {FormValues} values - Form values
+ * @param {string} name - Field name
+ * @return {[Date, Date] | null} - Range or null
+ */
+
+export const readDateRange = (values: FormValues, name: string): [Date, Date] | null => {
+  const value = values[name]
+  if (!Array.isArray(value) || value.length !== 2) return null
+
+  const start = new Date(String(value[0]))
+  const end = new Date(String(value[1]))
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null
+
+  return [start, end]
+}

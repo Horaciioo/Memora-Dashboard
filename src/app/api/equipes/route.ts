@@ -16,7 +16,8 @@ const SCOPE_PARAM = 'youtubeur'
 export const GET = createProtectedRoute({
   permission: Permissions.TeamRead,
   descriptor: { summary: 'Read the team board', tags: ['teams'] },
-  handler: async ({ query, scope }) => readTeamBoard(await scope(), query.get(SCOPE_PARAM) ?? undefined),
+  handler: async ({ query, scope }) =>
+    readTeamBoard(await scope(), query.get(SCOPE_PARAM) ?? undefined),
 })
 
 export const POST = createProtectedRoute({

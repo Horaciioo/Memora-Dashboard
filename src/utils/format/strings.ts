@@ -46,3 +46,19 @@ export function extractQueryFromURL(url: string): Record<string, string> {
 
   return queryParams
 }
+
+/**
+ * Fold accents and case
+ * @param {string} text - Raw text
+ * @return {string} - Comparable text
+ */
+
+export function foldText(text: string): string {
+  // Strip diacritics, expand ligatures
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\u0153/g, 'oe')
+    .replace(/\u00e6/g, 'ae')
+}

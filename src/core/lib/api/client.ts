@@ -97,12 +97,17 @@ export const apiPut = <T>(path: string, body: unknown): Promise<T> =>
   request<T>(path, { method: 'PUT', body: JSON.stringify(body) })
 
 /**
- * Remove a resource
+ * Remove a resource, a body carrying the selection when several go at once
  * @param {string} path - API path
+ * @param {unknown} [body] - Payload to send
  * @return {Promise<T>} - Payload
  */
 
-export const apiDelete = <T>(path: string): Promise<T> => request<T>(path, { method: 'DELETE' })
+export const apiDelete = <T>(path: string, body?: unknown): Promise<T> =>
+  request<T>(path, {
+    method: 'DELETE',
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+  })
 
 /**
  * Upload a file

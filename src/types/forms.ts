@@ -19,6 +19,7 @@ export type FieldKind =
   | 'number'
   | 'date'
   | 'datetime'
+  | 'daterange'
   | 'select'
   | 'multiselect'
   | 'toggle'
@@ -28,6 +29,7 @@ export type FieldKind =
   | 'url'
   | 'discord'
   | 'colour'
+  | 'emoji'
   | 'image'
 
 /**
@@ -89,6 +91,7 @@ export interface FieldCondition {
  * @property {number} [step] - Number increment
  * @property {number} [maxLength] - Longest text
  * @property {number} [maxItems] - Most entries
+ * @property {string} [glyph] - Emoji field drawn beside this control
  * @property {'full' | 'half'} [span] - Grid width
  * @property {string} [group] - Category the field sits under
  * @property {OptionMark} [mark] - Glyph drawn beside each option
@@ -110,6 +113,7 @@ export interface FieldDefinition {
   step?: number
   maxLength?: number
   maxItems?: number
+  glyph?: string
   span?: 'full' | 'half'
   group?: string
   mark?: OptionMark

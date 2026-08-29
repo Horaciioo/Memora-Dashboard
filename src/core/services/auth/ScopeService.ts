@@ -136,3 +136,21 @@ export const assertRowInScope = async (
   const row = await SCOPE_LOOKUPS[target](id)
   assertInScope(scope, row?.youtuberId ?? null)
 }
+
+/**
+ * Guard a whole selection, every row of it passing the single-row guard
+ * @param {LookupTarget} target - Scopable model
+ * @param {string[]} ids - Row identifiers
+ * @param {AccessScope} scope - Perimeter
+ * @return {Promise<void>} - Throws on the first row out of perimeter
+ */
+
+export const assertRowsInScope = async (
+  target: LookupTarget,
+  ids: string[],
+  scope: AccessScope
+): Promise<void> => {
+  if (scope.isGlobal) return
+
+  await Promise.all(ids.map((id) => assertRowInScope(target, id, scope)))
+}

@@ -1,5 +1,9 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { offenseFields, readOffense, updateOffense } from '@/core/services/sanctions/SanctionService'
+import {
+  offenseFields,
+  readOffense,
+  updateOffense,
+} from '@/core/services/sanctions/SanctionService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { Permissions } from '@/utils/constants/permissions'
 

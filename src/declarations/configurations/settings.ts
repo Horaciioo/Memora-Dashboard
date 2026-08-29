@@ -1,14 +1,22 @@
 import absences from '@/configurations/system/absences.json'
 import academy from '@/configurations/system/academy.json'
 import calendar from '@/configurations/system/calendrier.json'
+import colours from '@/configurations/system/couleurs.json'
+import emojis from '@/configurations/system/emojis.json'
 import files from '@/configurations/system/fichiers.json'
 import forms from '@/configurations/system/forms.json'
 import livecon from '@/configurations/system/livecon.json'
 import pagination from '@/configurations/system/pagination.json'
 import perimeter from '@/configurations/system/perimetre.json'
+import projects from '@/configurations/system/projets.json'
 import sanctions from '@/configurations/system/sanctions.json'
 import search from '@/configurations/system/search.json'
-import { readBoolean, readInteger, readStringList } from '@/declarations/configurations/readers'
+import {
+  readBoolean,
+  readInteger,
+  readString,
+  readStringList,
+} from '@/declarations/configurations/readers'
 
 const maxPerPage = readInteger(pagination.maxPerPage, {
   path: 'system/pagination.maxPerPage',
@@ -347,5 +355,56 @@ export const CALENDAR_SETTINGS = {
     path: 'system/calendrier.maxEntriesPerDay',
     fallback: 3,
     min: 1,
+  }),
+}
+
+/**
+ * Project team bounds
+ * @type {{ leadMax: number }}
+ */
+
+export const PROJECT_SETTINGS = {
+  leadMax: readInteger(projects.leadMax, {
+    path: 'system/projets.leadMax',
+    fallback: 3,
+    min: 1,
+  }),
+}
+
+/**
+ * Glyphs offered by the emoji picker
+ * @type {{ maxLength: number, searchMax: number, suggestions: string[] }}
+ */
+
+export const EMOJI_SETTINGS = {
+  maxLength: readInteger(emojis.maxLength, {
+    path: 'system/emojis.maxLength',
+    fallback: 4,
+    min: 1,
+  }),
+  searchMax: readInteger(emojis.searchMax, {
+    path: 'system/emojis.searchMax',
+    fallback: 120,
+    min: 1,
+  }),
+  suggestions: readStringList(emojis.suggestions, {
+    path: 'system/emojis.suggestions',
+    fallback: [],
+  }),
+}
+
+/**
+ * Accent palette offered by the colour wheel
+ * @type {{ defaultAccent: string, swatches: string[] }}
+ */
+
+export const COLOUR_SETTINGS = {
+  defaultAccent: readString(colours.defaultAccent, {
+    path: 'system/couleurs.defaultAccent',
+    fallback: 'var(--color-brand-600)',
+  }),
+  swatches: readStringList(colours.swatches, {
+    path: 'system/couleurs.swatches',
+    fallback: [],
   }),
 }
