@@ -9,6 +9,8 @@ export interface TabItem {
   value: string
   label: string
   icon?: IconName
+  // Holds at least one rejection
+  flagged?: boolean
 }
 
 export interface TabsProps {
@@ -75,7 +77,11 @@ export const Tabs = ({ items, value, onChange, label }: TabsProps) => {
             role="tab"
             aria-selected={isActive}
             onClick={() => onChange(item.value)}
-            className={cn(TABS_STYLES.tab, isActive && TABS_STYLES.active)}
+            className={cn(
+              TABS_STYLES.tab,
+              isActive && TABS_STYLES.active,
+              item.flagged && !isActive && TABS_STYLES.flagged
+            )}
           >
             <span className="flex items-center gap-1.5">
               {Icon && <Icon className="h-4 w-4" aria-hidden="true" />}

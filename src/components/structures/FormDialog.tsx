@@ -2,12 +2,11 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
+import { Tabs } from '@/components/elements/navigation/Tabs'
 import { Dialog } from '@/components/structures/Dialog'
 import { FormRenderer } from '@/components/structures/FormRenderer'
-import { FormSteps, type FormStep } from '@/components/structures/FormSteps'
 import { emptyValues, groupFields } from '@/core/lib/forms'
 import { ACTION_COPY, FORM_COPY } from '@/declarations/ui/copy'
-import type { IconName } from '@/declarations/ui/icons'
 import type { DialogSize } from '@/declarations/ui/variants'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
 
@@ -15,12 +14,11 @@ export interface FormDialogProps {
   open: boolean
   title: string
   description?: string
-  // Glyph of the header badge, add or edit depending on initialValues by default
-  icon?: IconName
   fields: FieldDefinition[]
   initialValues?: FormValues
   issues: FieldIssue[]
   isSaving: boolean
+  // Accessible name of the confirming button while it stays label-less
   submitLabel?: string
   size?: DialogSize
   onSubmit: (values: FormValues) => Promise<boolean>
@@ -28,17 +26,16 @@ export interface FormDialogProps {
 }
 
 /**
- * Overlay wrapping the form engine, its declared categories running as a trail under the
- * title and one category of fields on screen at a time
+ * Overlay wrapping the form engine, its declared categories running as tabs under the title
+ * and one category of fields on screen at a time
  * @param {boolean} open - Overlay is mounted
  * @param {string} title - Overlay title
  * @param {string} [description] - Supporting line under the title
- * @param {IconName} [icon] - Glyph of the header badge
  * @param {FieldDefinition[]} fields - Field declarations
  * @param {FormValues} [initialValues] - Values of the edited record
  * @param {FieldIssue[]} issues - Rejections returned by the server
  * @param {boolean} isSaving - Submission in flight
- * @param {string} [submitLabel] - Label of the confirming button
+ * @param {string} [submitLabel] - Accessible name of the confirming button
  * @param {DialogSize} [size] - Panel width
  * @param {(values: FormValues) => Promise<boolean>} onSubmit - Submission handler
  * @param {() => void} onClose - Dismiss handler
@@ -49,7 +46,6 @@ export const FormDialog = ({
   open,
   title,
   description,
-  icon,
   fields,
   initialValues,
   issues,
@@ -76,8 +72,9 @@ export const FormDialog = ({
 
   const groups = groupFields(fields, values)
 
-  const steps: FormStep[] = groups.map((group) => ({
-    name: group.name,
+  const tabs = groups.map((group) => ({
+    value: group.name,
+    label: group.name,
     flagged: group.fields.some((field) => issues.some((issue) => issue.field === field.name)),
   }))
 
@@ -85,15 +82,17 @@ export const FormDialog = ({
 
   // Reopening starts on the first category, a rejection jumps to the flagged one
   if (trail.issues !== issues || trail.open !== open) {
-    const flagged = steps.find((step) => step.flagged)
+    const flagged = tabs.find((tab) => tab.flagged)
     setTrail({
       issues,
       open,
-      group: flagged?.name ?? (trail.open === open ? trail.group : (groups[0]?.name ?? '')),
+      group: flagged?.value ?? (trail.open === open ? trail.group : (groups[0]?.name ?? '')),
     })
   }
 
   const current = groups.find((group) => group.name === trail.group) ?? groups[0]
+
+  const confirmLabel = isSaving ? ACTION_COPY.saving : (submitLabel ?? ACTION_COPY.save)
 
   const submit = async () => {
     const accepted = await onSubmit(values)
@@ -107,11 +106,10 @@ export const FormDialog = ({
       title={title}
       description={description}
       size={size}
-      icon={icon ?? (initialValues ? 'edit' : 'add')}
       subheader={
         groups.length > 1 && (
-          <FormSteps
-            steps={steps}
+          <Tabs
+            items={tabs}
             value={current?.name ?? ''}
             label={FORM_COPY.categories}
             onChange={(group) => setTrail({ issues, open, group })}
@@ -120,12 +118,22 @@ export const FormDialog = ({
       }
       footer={
         <>
-          <Button onClick={onClose} disabled={isSaving}>
-            {ACTION_COPY.cancel}
-          </Button>
-          <Button variant="primary" icon="confirm" onClick={submit} disabled={isSaving}>
-            {isSaving ? ACTION_COPY.saving : (submitLabel ?? ACTION_COPY.save)}
-          </Button>
+          <Button
+            icon="close"
+            aria-label={ACTION_COPY.cancel}
+            title={ACTION_COPY.cancel}
+            onClick={onClose}
+            disabled={isSaving}
+          />
+          <Button
+            variant="primary"
+            icon={isSaving ? 'pending' : 'confirm'}
+            aria-label={confirmLabel}
+            title={confirmLabel}
+            className={isSaving ? '[&>svg]:animate-spin' : undefined}
+            onClick={submit}
+            disabled={isSaving}
+          />
         </>
       }
     >

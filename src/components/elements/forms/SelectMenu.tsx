@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
 import { OptionMark } from '@/components/elements/forms/OptionMark'
+import { useAnchoredPanel } from '@/core/hooks/interaction/useAnchoredPanel'
 import { PICKER_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { SELECT_MENU_STYLES } from '@/declarations/ui/variants'
@@ -27,12 +28,6 @@ export interface SelectMenuProps {
   describedBy?: string
   className?: string
 }
-
-// Room kept between the panel and the viewport edge
-const EDGE_MARGIN = 8
-
-// Gap between the trigger and its panel
-const PANEL_GAP = 4
 
 // Narrowest the panel ever gets, whatever the trigger measures
 const MIN_PANEL_WIDTH = 200
@@ -74,13 +69,15 @@ export const SelectMenu = ({
   describedBy,
   className,
 }: SelectMenuProps) => {
-  const [isOpen, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const listId = useId()
-  const triggerRef = useRef<HTMLButtonElement | null>(null)
-  const panelRef = useRef<HTMLDivElement | null>(null)
   const activeRef = useRef<HTMLButtonElement | null>(null)
+
+  const { isOpen, setOpen, close, triggerRef, panelRef } = useAnchoredPanel({
+    matchTriggerWidth: true,
+    minWidth: MIN_PANEL_WIDTH,
+  })
 
   const { showHint } = useHints()
 
@@ -112,11 +109,6 @@ export const SelectMenu = ({
     setOpen(true)
   }
 
-  const close = () => {
-    setOpen(false)
-    triggerRef.current?.focus()
-  }
-
   const choose = (next: string) => {
     onChange(next)
     close()
@@ -127,32 +119,12 @@ export const SelectMenu = ({
     if (entry.hint) showHint(entry.hint, origin, ICONS.blocked)
   }
 
-  // Anchor the panel under the trigger, flipping it above when it would overflow
-  useLayoutEffect(() => {
-    if (!isOpen) return
-
-    const trigger = triggerRef.current?.getBoundingClientRect()
-    const panel = panelRef.current
-    if (!trigger || !panel) return
-
-    panel.style.width = `${Math.max(trigger.width, MIN_PANEL_WIDTH)}px`
-
-    const height = panel.offsetHeight
-    const room = window.innerHeight - trigger.bottom - EDGE_MARGIN
-    const flip = height > room && trigger.top > room
-
-    panel.style.left = `${Math.max(EDGE_MARGIN, Math.min(trigger.left, window.innerWidth - panel.offsetWidth - EDGE_MARGIN))}px`
-    panel.style.top = flip
-      ? `${Math.max(EDGE_MARGIN, trigger.top - height - PANEL_GAP)}px`
-      : `${trigger.bottom + PANEL_GAP}px`
-  }, [isOpen, entries.length])
-
   // Keys are read on the panel, so it takes focus unless a filter field owns it
   useEffect(() => {
     if (!isOpen || hasSearch) return
 
     panelRef.current?.focus()
-  }, [isOpen, hasSearch])
+  }, [isOpen, hasSearch, panelRef])
 
   // Walking the list with the keyboard scrolls it along
   useEffect(() => {
@@ -160,43 +132,6 @@ export const SelectMenu = ({
 
     activeRef.current?.scrollIntoView({ block: 'nearest' })
   }, [isOpen, activeIndex])
-
-  // An overlay behind the menu listens for escape too, and must not answer it first
-  useEffect(() => {
-    if (!isOpen) return
-
-    const onEscape = (event: globalThis.KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-
-      event.stopPropagation()
-      setOpen(false)
-      triggerRef.current?.focus()
-    }
-
-    document.addEventListener('keydown', onEscape, true)
-
-    return () => document.removeEventListener('keydown', onEscape, true)
-  }, [isOpen])
-
-  // A scroll or a resize moves the trigger out from under its panel
-  useEffect(() => {
-    if (!isOpen) return
-
-    const dismiss = (event: Event) => {
-      // Scrolling the option list itself must not dismiss it
-      if (event.type === 'scroll' && panelRef.current?.contains(event.target as Node)) return
-
-      setOpen(false)
-    }
-
-    window.addEventListener('resize', dismiss)
-    window.addEventListener('scroll', dismiss, true)
-
-    return () => {
-      window.removeEventListener('resize', dismiss)
-      window.removeEventListener('scroll', dismiss, true)
-    }
-  }, [isOpen])
 
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Enter' && entries[activeIndex]) {
@@ -301,37 +236,42 @@ export const SelectMenu = ({
               )}
               {entries.map((entry, index) => {
                 const isSelected = entry.value === value
+                const isClearing = emptyLabel !== undefined && index === 0
 
                 return (
-                  <button
-                    key={entry.value}
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    aria-disabled={entry.disabled || undefined}
-                    ref={index === activeIndex ? activeRef : undefined}
-                    onMouseEnter={() => setActiveIndex(index)}
-                    onClick={(event: MouseEvent<HTMLButtonElement>) =>
-                      entry.disabled
-                        ? explainDisabled(entry, { x: event.clientX, y: event.clientY })
-                        : choose(entry.value)
-                    }
-                    className={cn(
-                      SELECT_MENU_STYLES.option,
-                      index === activeIndex && SELECT_MENU_STYLES.optionActive,
-                      isSelected && SELECT_MENU_STYLES.optionSelected,
-                      entry.disabled && 'cursor-not-allowed opacity-50'
+                  <Fragment key={entry.value}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      aria-disabled={entry.disabled || undefined}
+                      ref={index === activeIndex ? activeRef : undefined}
+                      onMouseEnter={() => setActiveIndex(index)}
+                      onClick={(event: MouseEvent<HTMLButtonElement>) =>
+                        entry.disabled
+                          ? explainDisabled(entry, { x: event.clientX, y: event.clientY })
+                          : choose(entry.value)
+                      }
+                      className={cn(
+                        SELECT_MENU_STYLES.option,
+                        index === activeIndex && SELECT_MENU_STYLES.optionActive,
+                        isSelected && SELECT_MENU_STYLES.optionSelected,
+                        entry.disabled && 'cursor-not-allowed opacity-50'
+                      )}
+                    >
+                      {mark && entry.value !== '' && <OptionMark mark={mark} option={entry} />}
+                      <span className={SELECT_MENU_STYLES.optionLabel}>{entry.label}</span>
+                      {entry.hint && (
+                        <span className={SELECT_MENU_STYLES.optionHint}>{entry.hint}</span>
+                      )}
+                      {isSelected && (
+                        <CheckIcon className={SELECT_MENU_STYLES.check} aria-hidden="true" />
+                      )}
+                    </button>
+                    {isClearing && entries.length > 1 && (
+                      <div className={SELECT_MENU_STYLES.divider} aria-hidden="true" />
                     )}
-                  >
-                    {mark && entry.value !== '' && <OptionMark mark={mark} option={entry} />}
-                    <span className={SELECT_MENU_STYLES.optionLabel}>{entry.label}</span>
-                    {entry.hint && (
-                      <span className={SELECT_MENU_STYLES.optionHint}>{entry.hint}</span>
-                    )}
-                    {isSelected && (
-                      <CheckIcon className={SELECT_MENU_STYLES.check} aria-hidden="true" />
-                    )}
-                  </button>
+                  </Fragment>
                 )
               })}
             </div>

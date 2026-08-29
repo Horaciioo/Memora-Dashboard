@@ -1,9 +1,10 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { PRIORITY_GLYPH } from '@/declarations/ui/copy'
-import { TONES, toTone } from '@/declarations/ui/theme'
+import { ACCENT_STYLES, TONES, accentVars, toTone } from '@/declarations/ui/theme'
 import { OPTION_MARK_STYLES } from '@/declarations/ui/variants'
 import type { FieldOption, OptionMark as OptionMarkKind } from '@/types/forms'
 import { cn } from '@/utils/classnames'
+import { isHexColour } from '@/utils/format/colour'
 
 export interface OptionMarkProps {
   mark: OptionMarkKind
@@ -23,15 +24,24 @@ export const OptionMark = ({ mark, option }: OptionMarkProps) => {
     return <Avatar name={option.label} src={option.image} size="xs" />
   }
 
-  const tone = TONES[toTone(option.accent, mark === 'priority' ? 'warning' : 'neutral')]
+  const fallback = mark === 'priority' ? 'warning' : 'neutral'
+  const picked = isHexColour(option.accent)
+  const styles = picked ? ACCENT_STYLES : TONES[toTone(option.accent, fallback)]
+  const style = picked ? accentVars(option.accent, fallback) : undefined
 
   if (mark === 'priority') {
     return (
-      <span className={cn(OPTION_MARK_STYLES.priority, tone.text)} aria-hidden="true">
+      <span
+        className={cn(OPTION_MARK_STYLES.priority, styles.text)}
+        style={style}
+        aria-hidden="true"
+      >
         {PRIORITY_GLYPH}
       </span>
     )
   }
 
-  return <span className={cn(OPTION_MARK_STYLES.dot, tone.dot)} aria-hidden="true" />
+  return (
+    <span className={cn(OPTION_MARK_STYLES.dot, styles.dot)} style={style} aria-hidden="true" />
+  )
 }

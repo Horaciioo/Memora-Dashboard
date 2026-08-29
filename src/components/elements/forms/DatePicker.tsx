@@ -1,31 +1,28 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useAnchoredPanel } from '@/core/hooks/interaction/useAnchoredPanel'
 import { PICKER_COPY } from '@/declarations/ui/copy'
 import { WEEKDAY_LABELS } from '@/declarations/calendar/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { DATE_PICKER_STYLES, SELECT_MENU_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { monthGrid, periodLabel, shiftAnchor, toDayKey } from '@/utils/format/calendar'
-import { formatDay, formatDayTime } from '@/utils/format/dates'
+import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
 
 export interface DatePickerProps {
   id?: string
-  // ISO day, or ISO minute once withTime is on
-  value: string
-  onChange: (value: string) => void
+  // ISO day (or ISO minute with withTime); a two-day tuple with range
+  value: string | string[]
+  onChange: (value: string | string[]) => void
   label: string
   withTime?: boolean
+  // Picks two ordered days, by drag or two clicks
+  range?: boolean
   disabled?: boolean
   invalid?: boolean
   describedBy?: string
 }
-
-// Room kept between the panel and the viewport edge
-const EDGE_MARGIN = 8
-
-// Gap between the trigger and its panel
-const PANEL_GAP = 4
 
 // Time of day a datetime lands on when the day is picked first
 const DEFAULT_TIME = '09:00'
@@ -43,12 +40,23 @@ const splitValue = (value: string): { day: string; time: string } => {
 }
 
 /**
+ * Order two ISO days
+ * @param {string} a - One day
+ * @param {string} b - Other day
+ * @return {[string, string]} - Earliest first
+ */
+
+const orderedRange = (a: string, b: string): [string, string] => (a <= b ? [a, b] : [b, a])
+
+/**
  * Drawn calendar replacing the native date input, gaining a time field on a datetime field
+ * or a two-day selection with range
  * @param {string} [id] - Identifier of the trigger
- * @param {string} value - ISO day, or ISO minute when withTime is on
- * @param {(value: string) => void} onChange - Value handler
+ * @param {string | string[]} value - ISO day, ISO minute, or a two-day tuple
+ * @param {(value: string | string[]) => void} onChange - Value handler
  * @param {string} label - Accessible name of the control
  * @param {boolean} [withTime] - Adds the time field under the grid
+ * @param {boolean} [range] - Picks a start and an end day
  * @param {boolean} [disabled] - Blocks the control
  * @param {boolean} [invalid] - Paints the rejection border
  * @param {string} [describedBy] - Identifier of the message describing the control
@@ -61,15 +69,19 @@ export const DatePicker = ({
   onChange,
   label,
   withTime,
+  range,
   disabled,
   invalid,
   describedBy,
 }: DatePickerProps) => {
-  const { day, time } = splitValue(value)
-  const [isOpen, setOpen] = useState(false)
-  const [cursor, setCursor] = useState(() => day || toDayKey(new Date()))
-  const triggerRef = useRef<HTMLButtonElement | null>(null)
-  const panelRef = useRef<HTMLDivElement | null>(null)
+  const single = typeof value === 'string' ? value : ''
+  const [rangeStart = '', rangeEnd = ''] = Array.isArray(value) ? value : []
+  const { day, time } = splitValue(single)
+
+  const { isOpen, setOpen, close, triggerRef, panelRef } = useAnchoredPanel()
+  const [cursor, setCursor] = useState(() => day || rangeStart || toDayKey(new Date()))
+  const [anchor, setAnchor] = useState<string | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
 
   const CalendarIcon = ICONS.meetings
   const PreviousIcon = ICONS.back
@@ -81,13 +93,10 @@ export const DatePicker = ({
   const open = () => {
     if (disabled) return
 
-    setCursor(day || toDayKey(new Date()))
+    setCursor(day || rangeStart || toDayKey(new Date()))
+    setAnchor(null)
+    setPreview(null)
     setOpen(true)
-  }
-
-  const close = () => {
-    setOpen(false)
-    triggerRef.current?.focus()
   }
 
   const pick = (nextDay: string) => {
@@ -101,49 +110,59 @@ export const DatePicker = ({
     onChange(`${nextDay}T${time || DEFAULT_TIME}`)
   }
 
-  // Anchor the panel under the trigger, flipping it above when it would overflow
-  useLayoutEffect(() => {
-    if (!isOpen) return
+  // Commit a range and dismiss the panel
+  const commitRange = useCallback(
+    (a: string, b: string) => {
+      onChange(orderedRange(a, b))
+      setAnchor(null)
+      setPreview(null)
+      close()
+    },
+    [onChange, close]
+  )
 
-    const trigger = triggerRef.current?.getBoundingClientRect()
-    const panel = panelRef.current
-    if (!trigger || !panel) return
+  // One step of a range: set the anchor, then close it on the next day
+  const stepRange = (nextDay: string) => {
+    if (anchor === null) {
+      setAnchor(nextDay)
+      setPreview(nextDay)
+      onChange([])
+      return
+    }
 
-    const height = panel.offsetHeight
-    const room = window.innerHeight - trigger.bottom - EDGE_MARGIN
-    const flip = height > room && trigger.top > room
+    commitRange(anchor, nextDay)
+  }
 
-    panel.style.left = `${Math.max(EDGE_MARGIN, Math.min(trigger.left, window.innerWidth - panel.offsetWidth - EDGE_MARGIN))}px`
-    panel.style.top = flip
-      ? `${Math.max(EDGE_MARGIN, trigger.top - height - PANEL_GAP)}px`
-      : `${trigger.bottom + PANEL_GAP}px`
-  }, [isOpen, cursor])
-
-  // A scroll or a resize moves the trigger out from under its panel
+  // A drag across days commits on release; a plain click waits for the second click
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen || !range) return
 
-    const dismiss = () => setOpen(false)
-
-    const onEscape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-
-      // An overlay behind the calendar listens for escape too
-      event.stopPropagation()
-      setOpen(false)
-      triggerRef.current?.focus()
+    const onUp = () => {
+      if (anchor !== null && preview !== null && preview !== anchor) commitRange(anchor, preview)
     }
 
-    window.addEventListener('resize', dismiss)
-    window.addEventListener('scroll', dismiss, true)
-    document.addEventListener('keydown', onEscape, true)
+    window.addEventListener('pointerup', onUp)
 
-    return () => {
-      window.removeEventListener('resize', dismiss)
-      window.removeEventListener('scroll', dismiss, true)
-      document.removeEventListener('keydown', onEscape, true)
-    }
-  }, [isOpen])
+    return () => window.removeEventListener('pointerup', onUp)
+  }, [isOpen, range, anchor, preview, commitRange])
+
+  // Highlighted span, the live drag winning over the committed pair
+  const activeRange =
+    range && anchor !== null && preview !== null
+      ? orderedRange(anchor, preview)
+      : range && rangeStart && rangeEnd
+        ? ([rangeStart, rangeEnd] as [string, string])
+        : null
+
+  const triggerLabel = range
+    ? rangeStart && rangeEnd
+      ? formatDayRange(rangeStart, rangeEnd)
+      : null
+    : day
+      ? withTime
+        ? formatDayTime(single)
+        : formatDay(day)
+      : null
 
   return (
     <>
@@ -165,12 +184,12 @@ export const DatePicker = ({
       >
         <CalendarIcon className={SELECT_MENU_STYLES.chevron} aria-hidden="true" />
         <span className={SELECT_MENU_STYLES.value}>
-          {day ? (
-            <span className={SELECT_MENU_STYLES.optionLabel}>
-              {withTime ? formatDayTime(value) : formatDay(day)}
-            </span>
+          {triggerLabel ? (
+            <span className={SELECT_MENU_STYLES.optionLabel}>{triggerLabel}</span>
           ) : (
-            <span className={SELECT_MENU_STYLES.placeholder}>{PICKER_COPY.chooseDay}</span>
+            <span className={SELECT_MENU_STYLES.placeholder}>
+              {range ? PICKER_COPY.chooseRange : PICKER_COPY.chooseDay}
+            </span>
           )}
         </span>
       </button>
@@ -205,27 +224,57 @@ export const DatePicker = ({
               ))}
             </div>
 
-            <div className={DATE_PICKER_STYLES.grid}>
-              {days.map((entry) => (
-                <button
-                  key={entry.key}
-                  type="button"
-                  aria-pressed={entry.key === day}
-                  className={cn(
-                    DATE_PICKER_STYLES.day,
-                    !entry.isCurrentMonth && DATE_PICKER_STYLES.dayOutside,
-                    entry.isToday && DATE_PICKER_STYLES.dayToday,
-                    entry.key === day && DATE_PICKER_STYLES.daySelected
-                  )}
-                  onClick={() => pick(entry.key)}
-                >
-                  {entry.dayOfMonth}
-                </button>
-              ))}
+            <div className={cn(DATE_PICKER_STYLES.grid, range && 'select-none')}>
+              {days.map((entry) => {
+                const within =
+                  activeRange !== null && entry.key >= activeRange[0] && entry.key <= activeRange[1]
+                const edgeStart = activeRange !== null && entry.key === activeRange[0]
+                const edgeEnd = activeRange !== null && entry.key === activeRange[1]
+
+                return (
+                  <button
+                    key={entry.key}
+                    type="button"
+                    aria-pressed={range ? within : entry.key === day}
+                    className={cn(
+                      DATE_PICKER_STYLES.day,
+                      !entry.isCurrentMonth && DATE_PICKER_STYLES.dayOutside,
+                      entry.isToday && DATE_PICKER_STYLES.dayToday,
+                      !range && entry.key === day && DATE_PICKER_STYLES.daySelected,
+                      within && !edgeStart && !edgeEnd && DATE_PICKER_STYLES.dayInRange,
+                      (edgeStart || edgeEnd) && DATE_PICKER_STYLES.daySelected,
+                      edgeStart && !edgeEnd && DATE_PICKER_STYLES.dayRangeStart,
+                      edgeEnd && !edgeStart && DATE_PICKER_STYLES.dayRangeEnd
+                    )}
+                    onClick={range ? undefined : () => pick(entry.key)}
+                    onPointerDown={range ? () => stepRange(entry.key) : undefined}
+                    onPointerEnter={
+                      range && anchor !== null ? () => setPreview(entry.key) : undefined
+                    }
+                    onKeyDown={
+                      range
+                        ? (event) => {
+                            if (event.key !== 'Enter' && event.key !== ' ') return
+
+                            event.preventDefault()
+                            stepRange(entry.key)
+                          }
+                        : undefined
+                    }
+                  >
+                    {entry.dayOfMonth}
+                  </button>
+                )
+              })}
             </div>
 
             <div className={DATE_PICKER_STYLES.footer}>
-              {withTime && (
+              {range && (
+                <span className="text-xs text-[var(--color-ink-subtle)]">
+                  {PICKER_COPY.rangeHint}
+                </span>
+              )}
+              {withTime && !range && (
                 <input
                   type="time"
                   value={time}
@@ -236,18 +285,22 @@ export const DatePicker = ({
                   }
                 />
               )}
+              {!range && (
+                <button
+                  type="button"
+                  className={cn(DATE_PICKER_STYLES.step, 'ml-auto w-auto px-2 text-xs')}
+                  onClick={() => pick(toDayKey(new Date()))}
+                >
+                  {PICKER_COPY.today}
+                </button>
+              )}
               <button
                 type="button"
-                className={cn(DATE_PICKER_STYLES.step, 'ml-auto w-auto px-2 text-xs')}
-                onClick={() => pick(toDayKey(new Date()))}
-              >
-                {PICKER_COPY.today}
-              </button>
-              <button
-                type="button"
-                className={cn(DATE_PICKER_STYLES.step, 'w-auto px-2 text-xs')}
+                className={cn(DATE_PICKER_STYLES.step, 'w-auto px-2 text-xs', range && 'ml-auto')}
                 onClick={() => {
-                  onChange('')
+                  onChange(range ? [] : '')
+                  setAnchor(null)
+                  setPreview(null)
                   close()
                 }}
               >

@@ -18,9 +18,8 @@ export interface StatusRibbonProps {
 
 export const StatusRibbon = ({ label, tone = 'neutral', className }: StatusRibbonProps) => (
   <span className={cn(RIBBON_STYLES.wrap, className)}>
-    <span className={cn(RIBBON_STYLES.band, TONES[tone].dot, 'text-[var(--color-on-brand)]')}>
+    <span className={cn(RIBBON_STYLES.band, TONES[tone].solid, 'text-[var(--color-on-brand)]')}>
       {label}
-      <span className={RIBBON_STYLES.sheen} aria-hidden="true" />
       <span className={cn(RIBBON_STYLES.fold, RIBBON_STYLES.foldLeft)} aria-hidden="true" />
       <span className={cn(RIBBON_STYLES.fold, RIBBON_STYLES.foldRight)} aria-hidden="true" />
     </span>

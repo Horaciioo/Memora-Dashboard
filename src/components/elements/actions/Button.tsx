@@ -10,7 +10,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Styled button, primary for the page's main call to action, secondary otherwise
+ * Styled button, primary for the page's main call to action, secondary otherwise. A glyph with
+ * no children collapses to a square footprint — pass aria-label so it keeps a name
  * @param {ButtonVariant} [variant] - Visual weight, defaults to secondary
  * @param {IconName} [icon] - Icon rendered before the label
  * @param {IconName} [iconAfter] - Icon rendered after the label
@@ -28,11 +29,17 @@ export const Button = ({
 }: ButtonProps) => {
   const Leading = icon ? ICONS[icon] : null
   const Trailing = iconAfter ? ICONS[iconAfter] : null
+  const labelless = (Leading || Trailing) && (children === undefined || children === null)
 
   return (
     <button
       type={type}
-      className={cn(BUTTON_STYLES.base, BUTTON_STYLES[variant], className)}
+      className={cn(
+        BUTTON_STYLES.base,
+        BUTTON_STYLES[variant],
+        labelless && variant !== 'icon' && BUTTON_STYLES.square,
+        className
+      )}
       {...props}
     >
       {Leading && <Leading className="h-4 w-4 shrink-0" aria-hidden="true" />}

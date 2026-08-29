@@ -4,8 +4,8 @@ import type { ReactNode } from 'react'
 import { Badge } from '@/components/elements/display/Badge'
 import { AddRow } from '@/components/structures/AddRow'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
+import { accentVars } from '@/declarations/ui/theme'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
-import { toTone } from '@/declarations/ui/theme'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import { cn } from '@/utils/classnames'
 
@@ -48,11 +48,12 @@ export interface KanbanBoardProps<T extends BoardItem> {
   canCreate: boolean
   onCreate: (columnId: string) => void
   canMove: boolean
+  // Washes each column and its cards in the column accent
+  tintByColumn?: boolean
 }
 
 /**
- * Column board whose cards move between columns by dragging, each card answering the
- * right click menu it was given, each column closed by its own creation row
+ * Column board whose cards move between columns by dragging
  * @param {BoardColumn[]} columns - Columns in display order
  * @param {T[]} items - Cards, grouped by their columnId
  * @param {(item: T) => ReactNode} renderCard - Card renderer
@@ -63,6 +64,7 @@ export interface KanbanBoardProps<T extends BoardItem> {
  * @param {boolean} canCreate - Member may add a card
  * @param {(columnId: string) => void} onCreate - Called with the column the row sits under
  * @param {boolean} canMove - Member may drag cards
+ * @param {boolean} [tintByColumn] - Washes columns and cards in the column accent
  * @return {JSX.Element}
  */
 
@@ -77,6 +79,7 @@ export const KanbanBoard = <T extends BoardItem>({
   canCreate,
   onCreate,
   canMove,
+  tintByColumn,
 }: KanbanBoardProps<T>) => {
   const { contextMenu } = useMenu()
   const { over, itemProps, containerProps } = useDragAndDrop((item, container, index) =>
@@ -87,13 +90,19 @@ export const KanbanBoard = <T extends BoardItem>({
     <div className={BOARD_STYLES.scroller}>
       {columns.map((column) => {
         const cards = items.filter((item) => item.columnId === column.id)
-        const tone = toTone(column.accent, 'neutral')
+
+        // Both surfaces read the same --accent, the card sitting a shade stronger
+        const accentStyle = tintByColumn ? accentVars(column.accent) : undefined
 
         return (
-          <section key={column.id} className={BOARD_STYLES.column}>
+          <section
+            key={column.id}
+            style={accentStyle}
+            className={cn(BOARD_STYLES.column, tintByColumn && 'accent-wash accent-border')}
+          >
             <header className={BOARD_STYLES.columnHead}>
               <span className={BOARD_STYLES.columnTitle}>
-                <Badge label={column.label} tone={tone} dot />
+                <Badge label={column.label} accent={column.accent} dot />
               </span>
               <span className={BOARD_STYLES.count}>{cards.length}</span>
             </header>
@@ -115,7 +124,8 @@ export const KanbanBoard = <T extends BoardItem>({
                       : undefined
                   }
                   onContextMenu={cardMenu ? contextMenu(cardMenu(item)) : undefined}
-                  className={BOARD_STYLES.card}
+                  style={accentStyle}
+                  className={cn(BOARD_STYLES.card, tintByColumn && 'accent-tint accent-border')}
                   {...(canMove ? itemProps({ id: item.id, from: column.id }) : {})}
                 >
                   {renderCard(item)}

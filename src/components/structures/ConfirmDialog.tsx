@@ -22,8 +22,8 @@ export interface ConfirmDialogProps {
  * @param {boolean} open - Overlay is mounted
  * @param {string} title - What is about to happen
  * @param {string} description - Consequence of confirming
- * @param {string} [confirmLabel] - Label of the confirming button
- * @param {Tone} [tone] - Tone of the header badge and of the confirming button
+ * @param {string} [confirmLabel] - Accessible name of the confirming button
+ * @param {Tone} [tone] - Weight of the gesture, danger tints the confirming button
  * @param {boolean} [pending] - Blocks both buttons while the action runs
  * @param {() => void} onConfirm - Confirm handler
  * @param {() => void} onCancel - Dismiss handler
@@ -42,30 +42,36 @@ export const ConfirmDialog = ({
 }: ConfirmDialogProps) => {
   const isDestructive = tone === 'danger'
 
+  const confirmName = pending
+    ? isDestructive
+      ? ACTION_COPY.deleting
+      : ACTION_COPY.saving
+    : (confirmLabel ?? ACTION_COPY.confirm)
+
   return (
     <Dialog
       open={open}
       onClose={onCancel}
       title={title}
-      tone={tone}
-      size="sm"
+      size="xs"
       footer={
         <>
-          <Button onClick={onCancel} disabled={pending}>
-            {ACTION_COPY.cancel}
-          </Button>
+          <Button
+            icon="close"
+            aria-label={ACTION_COPY.cancel}
+            title={ACTION_COPY.cancel}
+            onClick={onCancel}
+            disabled={pending}
+          />
           <Button
             variant={isDestructive ? 'danger' : 'primary'}
-            icon={isDestructive ? 'remove' : 'confirm'}
+            icon={pending ? 'pending' : isDestructive ? 'remove' : 'confirm'}
+            aria-label={confirmName}
+            title={confirmName}
+            className={pending ? '[&>svg]:animate-spin' : undefined}
             onClick={onConfirm}
             disabled={pending}
-          >
-            {pending
-              ? isDestructive
-                ? ACTION_COPY.deleting
-                : ACTION_COPY.saving
-              : (confirmLabel ?? ACTION_COPY.confirm)}
-          </Button>
+          />
         </>
       }
     >

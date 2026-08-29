@@ -1,6 +1,8 @@
 'use client'
 
+import { ColourField } from '@/components/elements/forms/ColourField'
 import { DatePicker } from '@/components/elements/forms/DatePicker'
+import { EmojiPicker } from '@/components/elements/forms/EmojiPicker'
 import { FileInput } from '@/components/elements/forms/FileInput'
 import { Input } from '@/components/elements/forms/Input'
 import { MarkdownEditor } from '@/components/elements/forms/MarkdownEditor'
@@ -37,7 +39,7 @@ const DATE_KINDS = ['date', 'datetime']
  * @type {string[]}
  */
 
-const SIMPLE_KINDS = ['text', 'number', 'email', 'phone', 'url', 'discord', 'colour']
+const SIMPLE_KINDS = ['text', 'number', 'email', 'phone', 'url', 'discord']
 
 /**
  * Native input type per field kind
@@ -51,7 +53,6 @@ const INPUT_TYPES: Record<string, string> = {
   phone: 'tel',
   url: 'url',
   discord: 'text',
-  colour: 'color',
 }
 
 /**
@@ -92,6 +93,21 @@ export const FieldControl = ({
     )
   }
 
+  if (field.kind === 'daterange') {
+    return (
+      <DatePicker
+        id={id}
+        range
+        label={field.label}
+        value={Array.isArray(value) ? value : []}
+        disabled={disabled || field.readOnly}
+        invalid={invalid}
+        describedBy={describedBy}
+        onChange={(next) => onChange(Array.isArray(next) && next.length === 2 ? next : null)}
+      />
+    )
+  }
+
   if (DATE_KINDS.includes(field.kind)) {
     return (
       <DatePicker
@@ -102,7 +118,7 @@ export const FieldControl = ({
         disabled={disabled || field.readOnly}
         invalid={invalid}
         describedBy={describedBy}
-        onChange={(next) => onChange(next === '' ? null : next)}
+        onChange={(next) => onChange(typeof next === 'string' && next !== '' ? next : null)}
       />
     )
   }
@@ -111,11 +127,15 @@ export const FieldControl = ({
     return (
       <MultiSelect
         id={id}
+        label={field.label}
         options={field.options ?? []}
         value={Array.isArray(value) ? value : []}
         maxItems={field.maxItems}
         mark={field.mark}
         emptyLabel={field.placeholder ?? ACTION_COPY.none}
+        disabled={disabled || field.readOnly}
+        invalid={invalid}
+        describedBy={describedBy}
         onChange={onChange}
       />
     )
@@ -145,6 +165,34 @@ export const FieldControl = ({
         invalid={invalid}
         aria-describedby={describedBy}
         onChange={(event) => onChange(event.target.value)}
+      />
+    )
+  }
+
+  if (field.kind === 'colour') {
+    return (
+      <ColourField
+        id={id}
+        label={field.label}
+        value={typeof value === 'string' ? value : ''}
+        disabled={disabled || field.readOnly}
+        invalid={invalid}
+        describedBy={describedBy}
+        onChange={onChange}
+      />
+    )
+  }
+
+  if (field.kind === 'emoji') {
+    return (
+      <EmojiPicker
+        id={id}
+        label={field.label}
+        value={typeof value === 'string' ? value : ''}
+        disabled={disabled || field.readOnly}
+        invalid={invalid}
+        describedBy={describedBy}
+        onChange={onChange}
       />
     )
   }

@@ -89,10 +89,14 @@ export const PermissionPicker = ({
     })).filter((section) => section.permissions.length > 0)
   }, [term])
 
-  const total = PERMISSION_SECTIONS.reduce((count, section) => count + section.permissions.length, 0)
+  const total = PERMISSION_SECTIONS.reduce(
+    (count, section) => count + section.permissions.length,
+    0
+  )
   const granted = PERMISSION_SECTIONS.reduce(
     (count, section) =>
-      count + section.permissions.filter((entry) => stateOf(value, entry.name) === 'allowed').length,
+      count +
+      section.permissions.filter((entry) => stateOf(value, entry.name) === 'allowed').length,
     0
   )
 
