@@ -11,6 +11,7 @@ export const SCOPE_TARGETS = {
   calendarEvent: 'direct',
   liveconEntry: 'direct',
   sanctionOffense: 'direct',
+  recruitmentSession: 'direct',
   account: 'relation',
 } as const
 
