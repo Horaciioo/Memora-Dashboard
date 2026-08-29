@@ -1,8 +1,14 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { PageHeader } from '@/components/structures/PageHeader'
 import { ProjectFileTabs } from '@/composites/work/ProjectFileTabs'
-import { communicationFields, readProject } from '@/core/services/work/ProjectService'
+import { readRecordActivity } from '@/core/services/system/ActivityService'
+import { meetingFields } from '@/core/services/work/MeetingService'
+import {
+  communicationFields,
+  projectFields,
+  readProject,
+} from '@/core/services/work/ProjectService'
+import { taskFields } from '@/core/services/work/TaskService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { PROJECT_COPY } from '@/declarations/work/copy'
@@ -40,22 +46,34 @@ export async function generateMetadata({
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { access } = await requirePermission(Permissions.ProjectRead)
+  const { access, scope } = await requirePermission(Permissions.ProjectRead)
+  const perimeter = await scope()
 
   const detail = await readProject(id).catch(() => null)
   if (!detail) notFound()
 
-  const fields = await communicationFields()
+  const [projectForm, taskForm, meetingForm, communicationForm, activity] = await Promise.all([
+    projectFields(perimeter),
+    taskFields(perimeter),
+    meetingFields(perimeter),
+    communicationFields(),
+    readRecordActivity('project', id),
+  ])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader
-        title={detail.summary.title}
-        lead={detail.summary.description ?? PROJECT_COPY.lead}
-      />
       <ProjectFileTabs
         detail={detail}
-        communicationFields={fields}
+        projectFields={projectForm}
+        taskFields={taskForm}
+        meetingFields={meetingForm}
+        communicationFields={communicationForm}
+        activity={activity}
+        canUpdate={access.can(Permissions.ProjectUpdate)}
+        canCreateTasks={access.can(Permissions.TaskCreate)}
+        canReadTasks={access.can(Permissions.TaskRead)}
+        canCreateMeetings={access.can(Permissions.MeetingCreate)}
+        canReadMeetings={access.can(Permissions.MeetingRead)}
         canReadCommunications={access.can(Permissions.CommunicationRead)}
         canWriteCommunications={access.can(Permissions.CommunicationWrite)}
       />

@@ -7,7 +7,7 @@ import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { BoardColumn } from '@/components/structures/KanbanBoard'
 import type { FieldOption } from '@/types/forms'
-import type { WorkPerson, WorkTag } from '@/types/work'
+import type { WorkAuthorship, WorkPerson, WorkTag } from '@/types/work'
 import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { WorkflowScopeName } from '@/utils/constants/workflow'
 
@@ -56,6 +56,38 @@ interface PersonRow {
 
 export const toPerson = (row: PersonRow | null | undefined): WorkPerson | null =>
   row ? { id: row.id, name: row.displayName, src: row.avatarUrl } : null
+
+// Relations naming who opened a work record and who touched it last
+export const AUTHORSHIP_INCLUDE = { createdBy: true, updatedBy: true } as const
+
+/**
+ * Work row carrying its authorship
+ * @typedef {Object} AuthoredRow
+ * @property {PersonRow | null} createdBy - Who opened it
+ * @property {PersonRow | null} updatedBy - Who last edited it
+ * @property {Date} createdAt - Creation moment
+ * @property {Date} updatedAt - Last edit moment
+ */
+
+interface AuthoredRow {
+  createdBy: PersonRow | null
+  updatedBy: PersonRow | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+/**
+ * Map the authorship of a work row
+ * @param {AuthoredRow} row - Row with its author and its editor
+ * @return {WorkAuthorship} - Who touched it and when
+ */
+
+export const toAuthorship = (row: AuthoredRow): WorkAuthorship => ({
+  createdBy: toPerson(row.createdBy),
+  createdAt: row.createdAt.toISOString(),
+  updatedBy: toPerson(row.updatedBy),
+  updatedAt: row.updatedAt.toISOString(),
+})
 
 /**
  * Read the columns of one board

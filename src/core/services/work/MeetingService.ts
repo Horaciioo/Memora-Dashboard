@@ -3,22 +3,25 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
+import { notFound } from '@/core/lib/errors'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import {
+  AUTHORSHIP_INCLUDE,
   defaultState,
   memberOptions,
   positionAt,
   projectOptions,
   stateOptions,
+  toAuthorship,
   toPerson,
   toTag,
   youtuberOptions,
 } from '@/core/services/work/shared'
-import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { EMOJI_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { MEETING_FIELD_COPY } from '@/declarations/work/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
-import type { MeetingSummary, WorkPerson } from '@/types/work'
+import type { MeetingDetail, MeetingSummary, MeetingTopicEntry, WorkPerson } from '@/types/work'
 import { AttendeeKinds, WorkflowScopes } from '@/utils/constants/workflow'
 import type { AttendeeKindName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
@@ -29,6 +32,7 @@ const MEETING_INCLUDE = {
   youtuber: true,
   project: true,
   attendees: { include: { account: true } },
+  ...AUTHORSHIP_INCLUDE,
 } satisfies Prisma.MeetingInclude
 
 type MeetingRow = Prisma.MeetingGetPayload<{ include: typeof MEETING_INCLUDE }>
@@ -53,9 +57,12 @@ const seats = (row: MeetingRow, kind: AttendeeKindName): WorkPerson[] =>
  */
 
 const toSummary = (row: MeetingRow): MeetingSummary => ({
+  ...toAuthorship(row),
   id: row.id,
   title: row.title,
-  agenda: row.agenda,
+  emoji: row.emoji,
+  introduction: row.introduction,
+  outro: row.outro,
   minutes: row.minutes,
   columnId: row.stateId,
   state: toTag(row.state),
@@ -69,6 +76,7 @@ const toSummary = (row: MeetingRow): MeetingSummary => ({
   position: row.position,
   values: {
     title: row.title,
+    emoji: row.emoji,
     scheduledAt: row.scheduledAt.toISOString().slice(0, 16),
     durationMin: row.durationMin,
     stateId: row.stateId,
@@ -77,7 +85,8 @@ const toSummary = (row: MeetingRow): MeetingSummary => ({
     leadIds: seats(row, AttendeeKinds.Lead).map((person) => person.id),
     assistantIds: seats(row, AttendeeKinds.Assistant).map((person) => person.id),
     participantIds: seats(row, AttendeeKinds.Participant).map((person) => person.id),
-    agenda: row.agenda,
+    introduction: row.introduction,
+    outro: row.outro,
     minutes: row.minutes,
   },
 })
@@ -98,10 +107,18 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
 
   return [
     {
+      name: 'emoji',
+      kind: 'emoji',
+      label: MEETING_FIELD_COPY.emoji,
+      maxLength: EMOJI_SETTINGS.maxLength,
+      group: FORM_GROUPS.essentials,
+    },
+    {
       name: 'title',
       kind: 'text',
       label: MEETING_FIELD_COPY.title,
       required: true,
+      glyph: 'emoji',
       maxLength: FORM_SETTINGS.titleMaxLength,
       group: FORM_GROUPS.essentials,
     },
@@ -178,9 +195,16 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
       group: FORM_GROUPS.details,
     },
     {
-      name: 'agenda',
+      name: 'introduction',
       kind: 'markdown',
-      label: MEETING_FIELD_COPY.agenda,
+      label: MEETING_FIELD_COPY.introduction,
+      maxLength: FORM_SETTINGS.markdownMaxLength,
+      group: FORM_GROUPS.details,
+    },
+    {
+      name: 'outro',
+      kind: 'markdown',
+      label: MEETING_FIELD_COPY.outro,
       maxLength: FORM_SETTINGS.markdownMaxLength,
       group: FORM_GROUPS.details,
     },
@@ -241,7 +265,9 @@ const toAttendees = (values: FormValues) => {
 
 const toMeetingData = (values: FormValues) => ({
   title: readText(values, 'title') ?? '',
-  agenda: readText(values, 'agenda'),
+  emoji: readText(values, 'emoji'),
+  introduction: readText(values, 'introduction'),
+  outro: readText(values, 'outro'),
   minutes: readText(values, 'minutes'),
   durationMin: readNumberValue(values, 'durationMin'),
   stateId: readText(values, 'stateId'),
@@ -253,12 +279,14 @@ const toMeetingData = (values: FormValues) => ({
  * Plan a meeting
  * @param {FormValues} values - Parsed body
  * @param {AccessScope} scope - Creator perimeter
+ * @param {string} actorId - Who planned it
  * @return {Promise<MeetingSummary>} - Created card
  */
 
 export const createMeeting = async (
   values: FormValues,
-  scope: AccessScope
+  scope: AccessScope,
+  actorId: string
 ): Promise<MeetingSummary> => {
   const data = toMeetingData(values)
   assertInScope(scope, data.youtuberId ?? null)
@@ -274,6 +302,8 @@ export const createMeeting = async (
       stateId,
       scheduledAt: readDate(values, 'scheduledAt') ?? new Date(),
       position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
+      createdById: actorId,
+      updatedById: actorId,
       attendees: { create: toAttendees(values) },
     },
     include: MEETING_INCLUDE,
@@ -287,13 +317,15 @@ export const createMeeting = async (
  * @param {string} id - Meeting identifier
  * @param {FormValues} values - Parsed body
  * @param {AccessScope} scope - Creator perimeter
+ * @param {string} actorId - Who edited it
  * @return {Promise<MeetingSummary>} - Updated card
  */
 
 export const updateMeeting = async (
   id: string,
   values: FormValues,
-  scope: AccessScope
+  scope: AccessScope,
+  actorId: string
 ): Promise<MeetingSummary> => {
   await assertRowInScope('meeting', id, scope)
 
@@ -305,6 +337,7 @@ export const updateMeeting = async (
     data: {
       ...toMeetingData(values),
       scheduledAt: scheduledAt ?? undefined,
+      updatedById: actorId,
       attendees: { deleteMany: {}, create: toAttendees(values) },
     },
     include: MEETING_INCLUDE,
@@ -327,17 +360,180 @@ export const removeMeeting = async (id: string, scope: AccessScope): Promise<voi
 }
 
 /**
+ * Map a topic row to its display shape
+ * @param {Prisma.MeetingTopicGetPayload<object>} row - Topic row
+ * @return {MeetingTopicEntry} - Point covered
+ */
+
+const toTopic = (row: Prisma.MeetingTopicGetPayload<object>): MeetingTopicEntry => ({
+  id: row.id,
+  emoji: row.emoji,
+  title: row.title,
+  body: row.body,
+  position: row.position,
+  values: { emoji: row.emoji, title: row.title, body: row.body },
+})
+
+/**
+ * Build the topic form declarations
+ * @return {FieldDefinition[]} - Field declarations
+ */
+
+export const topicFields = (): FieldDefinition[] => [
+  {
+    name: 'emoji',
+    kind: 'emoji',
+    label: MEETING_FIELD_COPY.topicEmoji,
+    required: true,
+    maxLength: EMOJI_SETTINGS.maxLength,
+  },
+  {
+    name: 'title',
+    kind: 'text',
+    label: MEETING_FIELD_COPY.topicTitle,
+    required: true,
+    glyph: 'emoji',
+    maxLength: FORM_SETTINGS.titleMaxLength,
+  },
+  {
+    name: 'body',
+    kind: 'markdown',
+    label: MEETING_FIELD_COPY.topicBody,
+    maxLength: FORM_SETTINGS.markdownMaxLength,
+  },
+]
+
+/**
+ * Read one meeting file
+ * @param {string} id - Meeting identifier
+ * @return {Promise<MeetingDetail>} - Full file
+ */
+
+export const readMeeting = async (id: string): Promise<MeetingDetail> => {
+  const row = await prisma.meeting.findUnique({ where: { id }, include: MEETING_INCLUDE })
+  if (!row) throw notFound()
+
+  const topics = await prisma.meetingTopic.findMany({
+    where: { meetingId: id },
+    orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
+  })
+
+  return { summary: toSummary(row), topics: topics.map(toTopic) }
+}
+
+/**
+ * Read the topics of one meeting
+ * @param {string} meetingId - Meeting identifier
+ * @return {Promise<MeetingTopicEntry[]>} - Points covered
+ */
+
+export const listTopics = async (meetingId: string): Promise<MeetingTopicEntry[]> => {
+  const rows = await prisma.meetingTopic.findMany({
+    where: { meetingId },
+    orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
+  })
+
+  return rows.map(toTopic)
+}
+
+/**
+ * Open a topic on a meeting
+ * @param {string} meetingId - Meeting identifier
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<MeetingTopicEntry>} - Created topic
+ */
+
+export const addTopic = async (
+  meetingId: string,
+  values: FormValues
+): Promise<MeetingTopicEntry> => {
+  // Topics keep their own order inside the meeting
+  const last = await prisma.meetingTopic.aggregate({
+    where: { meetingId },
+    _max: { position: true },
+  })
+
+  const row = await prisma.meetingTopic.create({
+    data: {
+      meetingId,
+      emoji: readText(values, 'emoji') ?? '',
+      title: readText(values, 'title') ?? '',
+      body: readText(values, 'body'),
+      position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
+    },
+  })
+
+  return toTopic(row)
+}
+
+/**
+ * Edit a topic
+ * @param {string} id - Topic identifier
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<MeetingTopicEntry>} - Updated topic
+ */
+
+export const updateTopic = async (id: string, values: FormValues): Promise<MeetingTopicEntry> => {
+  const row = await prisma.meetingTopic.update({
+    where: { id },
+    data: {
+      emoji: readText(values, 'emoji') ?? '',
+      title: readText(values, 'title') ?? '',
+      body: readText(values, 'body'),
+    },
+  })
+
+  return toTopic(row)
+}
+
+/**
+ * Drop a topic
+ * @param {string} id - Topic identifier
+ * @return {Promise<void>} - Removed
+ */
+
+export const removeTopic = async (id: string): Promise<void> => {
+  await prisma.meetingTopic.delete({ where: { id } })
+}
+
+/**
+ * Stamp a meeting as edited, its topics being part of its own content
+ * @param {string} id - Meeting identifier
+ * @param {string} actorId - Who edited it
+ * @return {Promise<void>} - Stamped
+ */
+
+export const touchMeeting = async (id: string, actorId: string): Promise<void> => {
+  await prisma.meeting.update({ where: { id }, data: { updatedById: actorId } })
+}
+
+/**
+ * Read the meeting a topic belongs to
+ * @param {string} id - Topic identifier
+ * @return {Promise<string>} - Meeting identifier
+ */
+
+export const topicMeetingId = async (id: string): Promise<string> => {
+  const row = await prisma.meetingTopic.findUnique({ where: { id }, select: { meetingId: true } })
+  if (!row) throw notFound()
+
+  return row.meetingId
+}
+
+/**
  * Move a meeting card
  * @param {string} id - Meeting identifier
  * @param {string} stateId - Target column
  * @param {number} index - Drop index
+ * @param {string} actorId - Who moved it
  * @return {Promise<MeetingSummary>} - Moved card
  */
 
 export const moveMeeting = async (
   id: string,
   stateId: string,
-  index: number
+  index: number,
+  actorId: string
 ): Promise<MeetingSummary> => {
   const cards = await prisma.meeting.findMany({
     where: { stateId, id: { not: id } },
@@ -347,7 +543,7 @@ export const moveMeeting = async (
 
   const row = await prisma.meeting.update({
     where: { id },
-    data: { stateId, position: positionAt(cards, index) },
+    data: { stateId, position: positionAt(cards, index), updatedById: actorId },
     include: MEETING_INCLUDE,
   })
 

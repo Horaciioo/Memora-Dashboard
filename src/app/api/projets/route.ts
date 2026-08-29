@@ -19,7 +19,7 @@ export const POST = createProtectedRoute({
     const parsed = parseFormValues(await projectFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const project = await createProject(parsed.values, await scope())
+    const project = await createProject(parsed.values, await scope(), session.id)
 
     await recordEvent({
       eventType: 'ProjectCreated',

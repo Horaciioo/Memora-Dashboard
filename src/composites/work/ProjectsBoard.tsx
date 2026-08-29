@@ -3,19 +3,20 @@
 import { useRouter } from 'next/navigation'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { Glyph } from '@/components/elements/display/Glyph'
 import { WorkBoard } from '@/composites/work/WorkBoard'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { ROUTES } from '@/declarations/navigation'
 import { FIELD_COPY } from '@/declarations/ui/copy'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
-import { toTone } from '@/declarations/ui/theme'
+
 import { PROJECT_COPY, BOARD_FILTER_COPY } from '@/declarations/work/copy'
 import type { BoardColumn } from '@/components/structures/KanbanBoard'
 import type { DataTableColumn } from '@/components/structures/DataTable'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { ProjectSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDay, formatRelativeDay, isOverdue } from '@/utils/format/dates'
+import { formatDay, isOverdue } from '@/utils/format/dates'
 
 export interface ProjectsBoardProps {
   initialProjects: ProjectSummary[]
@@ -30,7 +31,7 @@ export interface ProjectsBoardProps {
 }
 
 /**
- * Project board, its cards carrying the YouTuber, the priority and the deadline
+ * Project board
  * @param {ProjectSummary[]} initialProjects - Cards resolved server-side
  * @param {BoardColumn[]} columns - Columns in display order
  * @param {FieldDefinition[]} fields - Field declarations of the project form
@@ -61,14 +62,19 @@ export const ProjectsBoard = ({
       key: 'title',
       header: FIELD_COPY.title,
       sortValue: (project) => project.title.toLowerCase(),
-      render: (project) => <span className="font-medium">{project.title}</span>,
+      render: (project) => (
+        <span className="font-medium">
+          <Glyph value={project.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+          {project.title}
+        </span>
+      ),
     },
     {
       key: 'youtuber',
       header: FIELD_COPY.youtuber,
       render: (project) =>
         project.youtuber ? (
-          <Badge label={project.youtuber.label} tone={toTone(project.youtuber.accent, 'info')} />
+          <Badge label={project.youtuber.label} accent={project.youtuber.accent} tone={'info'} />
         ) : null,
     },
     {
@@ -77,7 +83,7 @@ export const ProjectsBoard = ({
       sortValue: (project) => project.state?.label ?? '',
       render: (project) =>
         project.state ? (
-          <Badge label={project.state.label} tone={toTone(project.state.accent)} dot />
+          <Badge label={project.state.label} accent={project.state.accent} dot />
         ) : null,
     },
     {
@@ -85,13 +91,13 @@ export const ProjectsBoard = ({
       header: FIELD_COPY.priority,
       render: (project) =>
         project.priority ? (
-          <Badge label={project.priority.label} tone={toTone(project.priority.accent, 'warning')} />
+          <Badge label={project.priority.label} accent={project.priority.accent} tone={'warning'} />
         ) : null,
     },
     {
-      key: 'lead',
+      key: 'leads',
       header: FIELD_COPY.lead,
-      render: (project) => project.lead?.name ?? null,
+      render: (project) => project.leads.map((person) => person.name).join(', ') || null,
     },
     {
       key: 'deadline',
@@ -157,40 +163,15 @@ export const ProjectsBoard = ({
       canCreate={canCreate}
       canUpdate={canUpdate}
       canDelete={canDelete}
+      tintByColumn
       renderCard={(project) => (
         <>
-          <p className={BOARD_STYLES.cardTitle}>{project.title}</p>
+          <p className={BOARD_STYLES.cardTitle}>
+            <Glyph value={project.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+            {project.title}
+          </p>
           <div className={BOARD_STYLES.cardMeta}>
-            {project.youtuber && (
-              <Badge
-                label={project.youtuber.label}
-                tone={toTone(project.youtuber.accent, 'info')}
-                icon="youtuber"
-              />
-            )}
-            {project.priority && (
-              <Badge
-                label={project.priority.label}
-                tone={toTone(project.priority.accent, 'warning')}
-              />
-            )}
-            {project.platform && <Badge label={project.platform.label} tone="neutral" />}
-          </div>
-          <div className={BOARD_STYLES.cardMeta}>
-            {project.deadline && (
-              <Badge
-                label={formatRelativeDay(project.deadline)}
-                tone={isOverdue(project.deadline) ? 'danger' : 'neutral'}
-                icon="deadline"
-              />
-            )}
-            <span className="ml-auto">
-              <AvatarStack
-                people={[...(project.lead ? [project.lead] : []), ...project.assistants].map(
-                  (person) => ({ id: person.id, name: person.name, src: person.src })
-                )}
-              />
-            </span>
+            <AvatarStack people={[...project.leads, ...project.assistants]} />
           </div>
         </>
       )}

@@ -1,12 +1,15 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { Glyph } from '@/components/elements/display/Glyph'
 import { WorkBoard } from '@/composites/work/WorkBoard'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { ROUTES } from '@/declarations/navigation'
 import { FIELD_COPY } from '@/declarations/ui/copy'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
-import { toTone } from '@/declarations/ui/theme'
+
 import { BOARD_FILTER_COPY, TASK_COPY } from '@/declarations/work/copy'
 import type { BoardColumn } from '@/components/structures/KanbanBoard'
 import type { DataTableColumn } from '@/components/structures/DataTable'
@@ -52,12 +55,19 @@ export const TasksBoard = ({
   canUpdate,
   canDelete,
 }: TasksBoardProps) => {
+  const router = useRouter()
+
   const tableColumns: DataTableColumn<TaskSummary>[] = [
     {
       key: 'title',
       header: FIELD_COPY.title,
       sortValue: (task) => task.title.toLowerCase(),
-      render: (task) => <span className="font-medium">{task.title}</span>,
+      render: (task) => (
+        <span className="font-medium">
+          <Glyph value={task.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+          {task.title}
+        </span>
+      ),
     },
     {
       key: 'owner',
@@ -76,7 +86,7 @@ export const TasksBoard = ({
       header: FIELD_COPY.state,
       sortValue: (task) => task.state?.label ?? '',
       render: (task) =>
-        task.state ? <Badge label={task.state.label} tone={toTone(task.state.accent)} dot /> : null,
+        task.state ? <Badge label={task.state.label} accent={task.state.accent} dot /> : null,
     },
     {
       key: 'project',
@@ -88,7 +98,7 @@ export const TasksBoard = ({
       header: FIELD_COPY.youtuber,
       render: (task) =>
         task.youtuber ? (
-          <Badge label={task.youtuber.label} tone={toTone(task.youtuber.accent, 'info')} />
+          <Badge label={task.youtuber.label} accent={task.youtuber.accent} tone={'info'} />
         ) : null,
     },
     {
@@ -150,16 +160,20 @@ export const TasksBoard = ({
       }}
       valuesOf={(task) => task.values}
       labelOf={(task) => task.title}
+      onOpen={(task) => router.push(ROUTES.task(task.id))}
       canCreate={canCreate}
       canUpdate={canUpdate}
       canDelete={canDelete}
       renderCard={(task) => (
         <>
-          <p className={BOARD_STYLES.cardTitle}>{task.title}</p>
+          <p className={BOARD_STYLES.cardTitle}>
+            <Glyph value={task.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+            {task.title}
+          </p>
           <div className={BOARD_STYLES.cardMeta}>
             {task.project && <Badge label={task.project.label} tone="brand" icon="projects" />}
             {task.priority && (
-              <Badge label={task.priority.label} tone={toTone(task.priority.accent, 'warning')} />
+              <Badge label={task.priority.label} accent={task.priority.accent} tone={'warning'} />
             )}
           </div>
           <div className={BOARD_STYLES.cardMeta}>

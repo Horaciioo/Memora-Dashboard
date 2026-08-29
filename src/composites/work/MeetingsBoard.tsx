@@ -1,12 +1,15 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { Glyph } from '@/components/elements/display/Glyph'
 import { WorkBoard } from '@/composites/work/WorkBoard'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { ROUTES } from '@/declarations/navigation'
 import { FIELD_COPY } from '@/declarations/ui/copy'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
-import { toTone } from '@/declarations/ui/theme'
+
 import { BOARD_FILTER_COPY, MEETING_COPY } from '@/declarations/work/copy'
 import type { BoardColumn } from '@/components/structures/KanbanBoard'
 import type { DataTableColumn } from '@/components/structures/DataTable'
@@ -49,6 +52,8 @@ export const MeetingsBoard = ({
   canUpdate,
   canDelete,
 }: MeetingsBoardProps) => {
+  const router = useRouter()
+
   const everyone = (meeting: MeetingSummary) => [
     ...meeting.leads,
     ...meeting.assistants,
@@ -60,7 +65,12 @@ export const MeetingsBoard = ({
       key: 'title',
       header: FIELD_COPY.title,
       sortValue: (meeting) => meeting.title.toLowerCase(),
-      render: (meeting) => <span className="font-medium">{meeting.title}</span>,
+      render: (meeting) => (
+        <span className="font-medium">
+          <Glyph value={meeting.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+          {meeting.title}
+        </span>
+      ),
     },
     {
       key: 'scheduledAt',
@@ -75,7 +85,7 @@ export const MeetingsBoard = ({
       sortValue: (meeting) => meeting.state?.label ?? '',
       render: (meeting) =>
         meeting.state ? (
-          <Badge label={meeting.state.label} tone={toTone(meeting.state.accent)} dot />
+          <Badge label={meeting.state.label} accent={meeting.state.accent} dot />
         ) : null,
     },
     {
@@ -89,7 +99,7 @@ export const MeetingsBoard = ({
       header: FIELD_COPY.youtuber,
       render: (meeting) =>
         meeting.youtuber ? (
-          <Badge label={meeting.youtuber.label} tone={toTone(meeting.youtuber.accent, 'info')} />
+          <Badge label={meeting.youtuber.label} accent={meeting.youtuber.accent} tone={'info'} />
         ) : null,
     },
     {
@@ -134,12 +144,16 @@ export const MeetingsBoard = ({
       }}
       valuesOf={(meeting) => meeting.values}
       labelOf={(meeting) => meeting.title}
+      onOpen={(meeting) => router.push(ROUTES.meeting(meeting.id))}
       canCreate={canCreate}
       canUpdate={canUpdate}
       canDelete={canDelete}
       renderCard={(meeting) => (
         <>
-          <p className={BOARD_STYLES.cardTitle}>{meeting.title}</p>
+          <p className={BOARD_STYLES.cardTitle}>
+            <Glyph value={meeting.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+            {meeting.title}
+          </p>
           <div className={BOARD_STYLES.cardMeta}>
             <Badge label={formatDayTime(meeting.scheduledAt)} tone="brand" icon="clock" />
             {meeting.durationMin && <Badge label={`${meeting.durationMin}`} tone="neutral" />}

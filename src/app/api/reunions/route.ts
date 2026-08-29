@@ -19,7 +19,7 @@ export const POST = createProtectedRoute({
     const parsed = parseFormValues(await meetingFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const meeting = await createMeeting(parsed.values, await scope())
+    const meeting = await createMeeting(parsed.values, await scope(), session.id)
 
     await recordEvent({
       eventType: 'MeetingScheduled',

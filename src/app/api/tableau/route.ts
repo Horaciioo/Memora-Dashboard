@@ -10,7 +10,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const PATCH = createProtectedRoute({
   permission: [Permissions.ProjectUpdate, Permissions.TaskUpdate, Permissions.MeetingUpdate],
   descriptor: { summary: 'Move a board card', tags: ['boards'] },
-  handler: async ({ raw, access }) => {
+  handler: async ({ raw, access, session }) => {
     const scope = String(raw.scope ?? '')
     const id = String(raw.id ?? '')
     const columnId = String(raw.columnId ?? '')
@@ -20,15 +20,15 @@ export const PATCH = createProtectedRoute({
 
     // Each board is gated by the permission that edits its own resource
     if (scope === WorkflowScopes.Project && access.can(Permissions.ProjectUpdate)) {
-      return moveProject(id, columnId, index)
+      return moveProject(id, columnId, index, session.id)
     }
 
     if (scope === WorkflowScopes.Task && access.can(Permissions.TaskUpdate)) {
-      return moveTask(id, columnId, index)
+      return moveTask(id, columnId, index, session.id)
     }
 
     if (scope === WorkflowScopes.Meeting && access.can(Permissions.MeetingUpdate)) {
-      return moveMeeting(id, columnId, index)
+      return moveMeeting(id, columnId, index, session.id)
     }
 
     throw invalidInput([{ field: 'scope', message: FORM_COPY.notAnOption }])
