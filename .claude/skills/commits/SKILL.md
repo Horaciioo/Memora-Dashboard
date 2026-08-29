@@ -41,6 +41,7 @@ Un message de commit tient sur **une seule ligne** :
 - **Détail sous forme de tirets** (`- Improved the files`, `- Refactored the logic`, ...). Le message ne fait jamais deux lignes.
 - **Préfixe de type conventionnel** (`Feat :`, `Fix :`, `Chore :`, ...). L'emoji porte déjà cette information.
 - **Terme compliqué ou jargon.** Un verbe simple et concret suffit.
+- Le "Co-Authored-By: Claude Sonnet 5 noreply@anthropic.com", il ne faut jamais le mettre.
 
 Si le message ne tient pas sur une phrase courte et directe, c'est que le commit est trop large : le découper plutôt que de résumer.
 
