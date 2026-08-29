@@ -45,4 +45,22 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
       [MemberRoles.Moderateur]: [Permissions.SanctionRead],
     },
   },
+  {
+    key: 'recruitment-sessions',
+    grants: {
+      [MemberRoles.Admin]: [
+        Permissions.RecruitmentRead,
+        Permissions.RecruitmentManage,
+        Permissions.RecruitmentCandidateWrite,
+        Permissions.RecruitmentInstructionWrite,
+      ],
+      [MemberRoles.Responsable]: [
+        Permissions.RecruitmentRead,
+        Permissions.RecruitmentManage,
+        Permissions.RecruitmentCandidateWrite,
+        Permissions.RecruitmentInstructionWrite,
+      ],
+      [MemberRoles.Moderateur]: [Permissions.RecruitmentRead],
+    },
+  },
 ]

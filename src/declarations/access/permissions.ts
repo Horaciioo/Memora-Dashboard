@@ -22,9 +22,10 @@ const PERMISSION_GROUP_MAP: Record<PermissionGroup, PermissionGroupOption> = {
   [PermissionGroups.Absences]: { label: 'Absences', position: 4 },
   [PermissionGroups.Moderation]: { label: 'Modération', position: 5 },
   [PermissionGroups.Academy]: { label: 'Marsha Academy', position: 6 },
-  [PermissionGroups.Teams]: { label: 'Équipes', position: 7 },
-  [PermissionGroups.Calendar]: { label: 'Calendrier', position: 8 },
-  [PermissionGroups.Settings]: { label: 'Configuration', position: 9 },
+  [PermissionGroups.Recruitment]: { label: 'Recrutements', position: 7 },
+  [PermissionGroups.Teams]: { label: 'Équipes', position: 8 },
+  [PermissionGroups.Calendar]: { label: 'Calendrier', position: 9 },
+  [PermissionGroups.Settings]: { label: 'Configuration', position: 10 },
 }
 
 export const PERMISSION_GROUP_REGISTRY = createRegistry(PERMISSION_GROUP_MAP)
