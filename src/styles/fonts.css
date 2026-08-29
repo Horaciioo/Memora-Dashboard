@@ -1,0 +1,13 @@
+/*
+ * Typography of the theme format (src/utils/format/theme.ts → THEME.font).
+ * Fraunces carries the display voice — heavy, optical, a calligraphic italic
+ * whose strokes almost join. Inter keeps running text plain; JetBrains Mono the
+ * code and eyebrows. The families are fetched by the <link> in app/layout.tsx;
+ * this file only names them and their fallbacks.
+ */
+
+:root {
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', ui-serif, Georgia, serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
+}
