@@ -92,7 +92,7 @@ export const AvatarStack = ({ people, size = 'xs', max = 4 }: AvatarStackProps) 
             AVATAR_STYLES.base,
             AVATAR_STYLES[size],
             AVATAR_STYLES.ring,
-            'bg-[var(--color-surface)] text-[var(--color-ink-subtle)]'
+            'bg-[var(--color-ink-subtle)] text-[var(--color-on-brand)]'
           )}
         >
           {`+${hidden}`}

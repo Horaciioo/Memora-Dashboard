@@ -149,7 +149,7 @@ export const FilterBar = ({
             })}
           </div>
 
-          <Button disabled={!isFiltered} onClick={onReset} className="self-start">
+          <Button disabled={!isFiltered} onClick={onReset} className={FILTER_STYLES.reset}>
             {ACTION_COPY.reset}
           </Button>
         </div>
