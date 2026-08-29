@@ -3,19 +3,22 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
+import { notFound } from '@/core/lib/errors'
 import { readDate, readText } from '@/core/lib/forms/values'
 import {
+  AUTHORSHIP_INCLUDE,
   defaultState,
   memberOptions,
   positionAt,
   priorityOptions,
   projectOptions,
   stateOptions,
+  toAuthorship,
   toPerson,
   toTag,
   youtuberOptions,
 } from '@/core/services/work/shared'
-import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { EMOJI_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { TASK_FIELD_COPY } from '@/declarations/work/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -30,6 +33,7 @@ const TASK_INCLUDE = {
   youtuber: true,
   project: true,
   owner: true,
+  ...AUTHORSHIP_INCLUDE,
 } satisfies Prisma.TaskInclude
 
 type TaskRow = Prisma.TaskGetPayload<{ include: typeof TASK_INCLUDE }>
@@ -41,8 +45,10 @@ type TaskRow = Prisma.TaskGetPayload<{ include: typeof TASK_INCLUDE }>
  */
 
 const toSummary = (row: TaskRow): TaskSummary => ({
+  ...toAuthorship(row),
   id: row.id,
   title: row.title,
+  emoji: row.emoji,
   description: row.description,
   columnId: row.stateId,
   state: toTag(row.state),
@@ -54,6 +60,7 @@ const toSummary = (row: TaskRow): TaskSummary => ({
   position: row.position,
   values: {
     title: row.title,
+    emoji: row.emoji,
     description: row.description,
     dueDate: row.dueDate ? row.dueDate.toISOString().slice(0, 10) : null,
     ownerId: row.ownerId,
@@ -81,10 +88,18 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
 
   return [
     {
+      name: 'emoji',
+      kind: 'emoji',
+      label: TASK_FIELD_COPY.emoji,
+      maxLength: EMOJI_SETTINGS.maxLength,
+      group: FORM_GROUPS.essentials,
+    },
+    {
       name: 'title',
       kind: 'text',
       label: TASK_FIELD_COPY.title,
       required: true,
+      glyph: 'emoji',
       maxLength: FORM_SETTINGS.titleMaxLength,
       group: FORM_GROUPS.essentials,
     },
@@ -165,6 +180,19 @@ export const listTasks = async (scope: AccessScope): Promise<TaskSummary[]> => {
 }
 
 /**
+ * Read one task file
+ * @param {string} id - Task identifier
+ * @return {Promise<TaskSummary>} - Full file
+ */
+
+export const readTask = async (id: string): Promise<TaskSummary> => {
+  const row = await prisma.task.findUnique({ where: { id }, include: TASK_INCLUDE })
+  if (!row) throw notFound()
+
+  return toSummary(row)
+}
+
+/**
  * Turn parsed values into a database payload
  * @param {FormValues} values - Parsed body
  * @return {Prisma.TaskUncheckedUpdateInput} - Database payload
@@ -172,6 +200,7 @@ export const listTasks = async (scope: AccessScope): Promise<TaskSummary[]> => {
 
 const toTaskData = (values: FormValues) => ({
   title: readText(values, 'title') ?? '',
+  emoji: readText(values, 'emoji'),
   description: readText(values, 'description'),
   dueDate: readDate(values, 'dueDate'),
   ownerId: readText(values, 'ownerId'),
@@ -185,12 +214,14 @@ const toTaskData = (values: FormValues) => ({
  * Add a task
  * @param {FormValues} values - Parsed body
  * @param {AccessScope} scope - Creator perimeter
+ * @param {string} actorId - Who opened it
  * @return {Promise<TaskSummary>} - Created card
  */
 
 export const createTask = async (
   values: FormValues,
-  scope: AccessScope
+  scope: AccessScope,
+  actorId: string
 ): Promise<TaskSummary> => {
   const data = toTaskData(values)
   assertInScope(scope, data.youtuberId ?? null)
@@ -201,7 +232,13 @@ export const createTask = async (
   const last = await prisma.task.aggregate({ where: { stateId }, _max: { position: true } })
 
   const row = await prisma.task.create({
-    data: { ...data, stateId, position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep },
+    data: {
+      ...data,
+      stateId,
+      position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
+      createdById: actorId,
+      updatedById: actorId,
+    },
     include: TASK_INCLUDE,
   })
 
@@ -213,19 +250,21 @@ export const createTask = async (
  * @param {string} id - Task identifier
  * @param {FormValues} values - Parsed body
  * @param {AccessScope} scope - Creator perimeter
+ * @param {string} actorId - Who edited it
  * @return {Promise<TaskSummary>} - Updated card
  */
 
 export const updateTask = async (
   id: string,
   values: FormValues,
-  scope: AccessScope
+  scope: AccessScope,
+  actorId: string
 ): Promise<TaskSummary> => {
   await assertRowInScope('task', id, scope)
 
   const row = await prisma.task.update({
     where: { id },
-    data: toTaskData(values),
+    data: { ...toTaskData(values), updatedById: actorId },
     include: TASK_INCLUDE,
   })
 
@@ -250,13 +289,15 @@ export const removeTask = async (id: string, scope: AccessScope): Promise<void> 
  * @param {string} id - Task identifier
  * @param {string} stateId - Target column
  * @param {number} index - Drop index
+ * @param {string} actorId - Who moved it
  * @return {Promise<TaskSummary>} - Moved card
  */
 
 export const moveTask = async (
   id: string,
   stateId: string,
-  index: number
+  index: number,
+  actorId: string
 ): Promise<TaskSummary> => {
   const cards = await prisma.task.findMany({
     where: { stateId, archived: false, id: { not: id } },
@@ -266,7 +307,7 @@ export const moveTask = async (
 
   const row = await prisma.task.update({
     where: { id },
-    data: { stateId, position: positionAt(cards, index) },
+    data: { stateId, position: positionAt(cards, index), updatedById: actorId },
     include: TASK_INCLUDE,
   })
 

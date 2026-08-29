@@ -12,7 +12,7 @@ export const PATCH = createProtectedRoute({
     const parsed = parseFormValues(await meetingFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const meeting = await updateMeeting(params.id, parsed.values, await scope())
+    const meeting = await updateMeeting(params.id, parsed.values, await scope(), session.id)
 
     await recordEvent({
       eventType: 'MeetingUpdated',

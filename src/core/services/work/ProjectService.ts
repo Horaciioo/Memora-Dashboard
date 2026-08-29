@@ -6,17 +6,24 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { notFound } from '@/core/lib/errors'
 import { readDate, readList, readText } from '@/core/lib/forms/values'
 import {
+  AUTHORSHIP_INCLUDE,
   defaultState,
+  leadOptions,
   memberOptions,
   platformOptions,
   positionAt,
   priorityOptions,
   stateOptions,
+  toAuthorship,
   toPerson,
   toTag,
   youtuberOptions,
 } from '@/core/services/work/shared'
-import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import {
+  EMOJI_SETTINGS,
+  FORM_SETTINGS,
+  PROJECT_SETTINGS,
+} from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { PROJECT_COPY, PROJECT_FIELD_COPY } from '@/declarations/work/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -30,9 +37,10 @@ const PROJECT_INCLUDE = {
   priority: true,
   platform: true,
   youtuber: true,
-  lead: true,
+  leads: { include: { account: true } },
   assistants: { include: { account: true } },
   _count: { select: { communications: true, tasks: true, meetings: true } },
+  ...AUTHORSHIP_INCLUDE,
 } satisfies Prisma.ProjectInclude
 
 type ProjectRow = Prisma.ProjectGetPayload<{ include: typeof PROJECT_INCLUDE }>
@@ -44,15 +52,17 @@ type ProjectRow = Prisma.ProjectGetPayload<{ include: typeof PROJECT_INCLUDE }>
  */
 
 const toSummary = (row: ProjectRow): ProjectSummary => ({
+  ...toAuthorship(row),
   id: row.id,
   title: row.title,
+  emoji: row.emoji,
   description: row.description,
   columnId: row.stateId,
   state: toTag(row.state),
   priority: toTag(row.priority),
   platform: toTag(row.platform),
   youtuber: toTag(row.youtuber),
-  lead: toPerson(row.lead),
+  leads: row.leads.map((lead) => toPerson(lead.account)).filter((person) => person !== null),
   assistants: row.assistants
     .map((assistant) => toPerson(assistant.account))
     .filter((person) => person !== null),
@@ -63,12 +73,13 @@ const toSummary = (row: ProjectRow): ProjectSummary => ({
   meetingCount: row._count.meetings,
   values: {
     title: row.title,
+    emoji: row.emoji,
     description: row.description,
     youtuberId: row.youtuberId,
     stateId: row.stateId,
     priorityId: row.priorityId,
     platformId: row.platformId,
-    leadId: row.leadId,
+    leadIds: row.leads.map((lead) => lead.accountId),
     assistantIds: row.assistants.map((assistant) => assistant.accountId),
     deadline: row.deadline ? row.deadline.toISOString().slice(0, 10) : null,
   },
@@ -81,20 +92,29 @@ const toSummary = (row: ProjectRow): ProjectSummary => ({
  */
 
 export const projectFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
-  const [states, priorities, platforms, youtubers, members] = await Promise.all([
+  const [states, priorities, platforms, youtubers, members, leads] = await Promise.all([
     stateOptions(WorkflowScopes.Project),
     priorityOptions(),
     platformOptions(),
     youtuberOptions(scope),
     memberOptions(),
+    leadOptions(),
   ])
 
   return [
+    {
+      name: 'emoji',
+      kind: 'emoji',
+      label: PROJECT_FIELD_COPY.emoji,
+      maxLength: EMOJI_SETTINGS.maxLength,
+      group: FORM_GROUPS.essentials,
+    },
     {
       name: 'title',
       kind: 'text',
       label: PROJECT_FIELD_COPY.title,
       required: true,
+      glyph: 'emoji',
       maxLength: FORM_SETTINGS.titleMaxLength,
       group: FORM_GROUPS.essentials,
     },
@@ -106,11 +126,13 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       group: FORM_GROUPS.essentials,
     },
     {
-      name: 'leadId',
-      kind: 'select',
-      label: PROJECT_FIELD_COPY.lead,
-      options: members,
+      name: 'leadIds',
+      kind: 'multiselect',
+      label: PROJECT_FIELD_COPY.leads,
+      placeholder: PROJECT_FIELD_COPY.leadsEmpty,
+      options: leads,
       mark: 'avatar',
+      maxItems: PROJECT_SETTINGS.leadMax,
       span: 'half',
       group: FORM_GROUPS.assignment,
     },
@@ -194,29 +216,41 @@ export const listProjects = async (scope: AccessScope): Promise<ProjectSummary[]
 
 const toProjectData = (values: FormValues) => ({
   title: readText(values, 'title') ?? '',
+  emoji: readText(values, 'emoji'),
   description: readText(values, 'description'),
   youtuberId: readText(values, 'youtuberId'),
   stateId: readText(values, 'stateId'),
   priorityId: readText(values, 'priorityId'),
   platformId: readText(values, 'platformId'),
-  leadId: readText(values, 'leadId'),
   deadline: readDate(values, 'deadline'),
 })
+
+/**
+ * Read the picked responsables, capped at the configured maximum
+ * @param {FormValues} values - Parsed body
+ * @return {string[]} - Account identifiers
+ */
+
+const readLeadIds = (values: FormValues): string[] =>
+  readList(values, 'leadIds').slice(0, PROJECT_SETTINGS.leadMax)
 
 /**
  * Open a project
  * @param {FormValues} values - Parsed body
  * @param {AccessScope} scope - Creator perimeter
+ * @param {string} actorId - Who opened it
  * @return {Promise<ProjectSummary>} - Created card
  */
 
 export const createProject = async (
   values: FormValues,
-  scope: AccessScope
+  scope: AccessScope,
+  actorId: string
 ): Promise<ProjectSummary> => {
   const data = toProjectData(values)
   assertInScope(scope, data.youtuberId ?? null)
   const stateId = data.stateId ?? (await defaultState(WorkflowScopes.Project))
+  const leadIds = readLeadIds(values)
   const assistantIds = readList(values, 'assistantIds')
 
   // A new card lands at the bottom of its column
@@ -227,6 +261,9 @@ export const createProject = async (
       ...data,
       stateId,
       position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
+      createdById: actorId,
+      updatedById: actorId,
+      leads: { create: leadIds.map((accountId) => ({ accountId })) },
       assistants: { create: assistantIds.map((accountId) => ({ accountId })) },
     },
     include: PROJECT_INCLUDE,
@@ -240,23 +277,31 @@ export const createProject = async (
  * @param {string} id - Project identifier
  * @param {FormValues} values - Parsed body
  * @param {AccessScope} scope - Creator perimeter
+ * @param {string} actorId - Who edited it
  * @return {Promise<ProjectSummary>} - Updated card
  */
 
 export const updateProject = async (
   id: string,
   values: FormValues,
-  scope: AccessScope
+  scope: AccessScope,
+  actorId: string
 ): Promise<ProjectSummary> => {
   await assertRowInScope('project', id, scope)
 
+  const leadIds = readLeadIds(values)
   const assistantIds = readList(values, 'assistantIds')
 
-  // Assistants are replaced wholesale, the form always sends the full list
+  // The team is replaced wholesale, the form always sends the full lists
   const row = await prisma.project.update({
     where: { id },
     data: {
       ...toProjectData(values),
+      updatedById: actorId,
+      leads: {
+        deleteMany: {},
+        create: leadIds.map((accountId) => ({ accountId })),
+      },
       assistants: {
         deleteMany: {},
         create: assistantIds.map((accountId) => ({ accountId })),
@@ -285,13 +330,15 @@ export const removeProject = async (id: string, scope: AccessScope): Promise<voi
  * @param {string} id - Project identifier
  * @param {string} stateId - Target column
  * @param {number} index - Drop index
+ * @param {string} actorId - Who moved it
  * @return {Promise<ProjectSummary>} - Moved card
  */
 
 export const moveProject = async (
   id: string,
   stateId: string,
-  index: number
+  index: number,
+  actorId: string
 ): Promise<ProjectSummary> => {
   const cards = await prisma.project.findMany({
     where: { stateId, archived: false, id: { not: id } },
@@ -301,7 +348,7 @@ export const moveProject = async (
 
   const row = await prisma.project.update({
     where: { id },
-    data: { stateId, position: positionAt(cards, index) },
+    data: { stateId, position: positionAt(cards, index), updatedById: actorId },
     include: PROJECT_INCLUDE,
   })
 
@@ -460,7 +507,14 @@ export const readProject = async (id: string): Promise<ProjectDetail> => {
     }),
     prisma.task.findMany({
       where: { projectId: id },
-      include: { state: true, priority: true, youtuber: true, owner: true, project: true },
+      include: {
+        state: true,
+        priority: true,
+        youtuber: true,
+        owner: true,
+        project: true,
+        ...AUTHORSHIP_INCLUDE,
+      },
       orderBy: [{ position: 'asc' }],
     }),
     prisma.meeting.findMany({
@@ -470,6 +524,7 @@ export const readProject = async (id: string): Promise<ProjectDetail> => {
         youtuber: true,
         project: true,
         attendees: { include: { account: true } },
+        ...AUTHORSHIP_INCLUDE,
       },
       orderBy: { scheduledAt: 'desc' },
     }),
@@ -479,8 +534,10 @@ export const readProject = async (id: string): Promise<ProjectDetail> => {
     summary: toSummary(row),
     communications: communications.map(toCommunication),
     tasks: tasks.map((task) => ({
+      ...toAuthorship(task),
       id: task.id,
       title: task.title,
+      emoji: task.emoji,
       description: task.description,
       columnId: task.stateId,
       state: toTag(task.state),
@@ -495,9 +552,12 @@ export const readProject = async (id: string): Promise<ProjectDetail> => {
       values: {},
     })),
     meetings: meetings.map((meeting) => ({
+      ...toAuthorship(meeting),
       id: meeting.id,
       title: meeting.title,
-      agenda: meeting.agenda,
+      emoji: meeting.emoji,
+      introduction: meeting.introduction,
+      outro: meeting.outro,
       minutes: meeting.minutes,
       columnId: meeting.stateId,
       state: toTag(meeting.state),

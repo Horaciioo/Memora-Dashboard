@@ -12,7 +12,7 @@ export const PATCH = createProtectedRoute({
     const parsed = parseFormValues(await taskFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const task = await updateTask(params.id, parsed.values, await scope())
+    const task = await updateTask(params.id, parsed.values, await scope(), session.id)
 
     await recordEvent({
       eventType: 'TaskUpdated',

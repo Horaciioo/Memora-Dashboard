@@ -27,8 +27,18 @@ export const PROJECT_COPY = {
   communicationDeleteDescription: 'Le texte est perdu définitivement.',
   published: 'Publiée',
   draft: 'Brouillon',
-  team: 'Équipe du projet',
-  noLead: 'Aucun responsable',
+  informations: 'Informations',
+  teamTitle: 'Équipes',
+  responsables: 'Responsables',
+  assistants: 'Assistants',
+  teamAdd: '+ Rajouter quelqu’un',
+  teamRemove: 'Retirer',
+  teamEmpty: 'Personne pour le moment.',
+  tabLogs: 'Journal',
+  logsEmptyTitle: 'Aucun évènement pour le moment.',
+  logsEmptyDescription: 'Les créations et modifications du projet apparaîtront ici.',
+  taskCreate: 'Créer une tâche',
+  meetingCreate: 'Planifier une réunion',
 } as const
 
 /**
@@ -38,15 +48,17 @@ export const PROJECT_COPY = {
 
 export const PROJECT_FIELD_COPY = {
   title: 'Titre',
+  emoji: 'Émoji',
   description: 'Description',
   youtuber: 'YouTubeur concerné',
   state: 'État',
   priority: 'Priorité',
   platform: 'Plateforme',
   deadline: 'Deadline',
-  lead: 'Responsable du projet',
+  leads: 'Responsables du projet',
+  leadsEmpty: 'Aucun',
   assistants: 'Assistants du projet',
-  assistantsEmpty: 'Ajoute d’abord des modérateurs.',
+  assistantsEmpty: 'Aucun',
   communicationTitle: 'Titre de l’annonce',
   communicationBody: 'Annonce',
   communicationPlatform: 'Plateforme',
@@ -71,6 +83,10 @@ export const TASK_COPY = {
   mine: 'Mes tâches',
   all: 'Toutes',
   overdue: 'En retard',
+  informations: 'Aperçu',
+  logsTitle: 'Journal',
+  logsEmptyTitle: 'Aucun évènement pour le moment.',
+  logsEmptyDescription: 'Les créations et modifications de la tâche apparaîtront ici.',
 } as const
 
 /**
@@ -80,6 +96,7 @@ export const TASK_COPY = {
 
 export const TASK_FIELD_COPY = {
   title: 'Titre',
+  emoji: 'Émoji',
   description: 'Description',
   dueDate: 'Date',
   owner: 'Responsable de la tâche',
@@ -108,6 +125,28 @@ export const MEETING_COPY = {
   upcoming: 'À venir',
   past: 'Passées',
   minutes: 'Compte rendu',
+  tabOverview: 'Aperçu',
+  tabContent: 'Contenu',
+  tabLogs: 'Journal',
+  informations: 'Informations',
+  attendeesTitle: 'Participants',
+  introductionTitle: 'Introduction',
+  introductionEmpty: 'Aucune introduction pour le moment.',
+  topicsTitle: 'Sujets',
+  topicsEmptyTitle: 'Aucun sujet pour le moment.',
+  topicsEmptyDescription: 'Ajoute les points à couvrir, chacun avec son émoji.',
+  topicAdd: 'Ajouter un sujet',
+  topicEdit: 'Modifier le sujet',
+  topicDeleteTitle: 'Supprimer ce sujet ?',
+  topicDeleteDescription: 'Son contenu est perdu définitivement.',
+  topicBodyEmpty: 'Aucune note pour ce sujet.',
+  outroTitle: 'Outro',
+  outroEmpty: 'Aucune conclusion pour le moment.',
+  minutesTitle: 'Compte rendu',
+  minutesEmpty: 'Aucun compte rendu pour le moment.',
+  contentEdit: 'Modifier',
+  logsEmptyTitle: 'Aucun évènement pour le moment.',
+  logsEmptyDescription: 'Les créations et modifications de la réunion apparaîtront ici.',
 } as const
 
 /**
@@ -117,6 +156,7 @@ export const MEETING_COPY = {
 
 export const MEETING_FIELD_COPY = {
   title: 'Titre',
+  emoji: 'Émoji',
   scheduledAt: 'Date et heure',
   durationMin: 'Durée en minutes',
   state: 'État',
@@ -125,9 +165,13 @@ export const MEETING_FIELD_COPY = {
   leads: 'Auditeurs principaux',
   assistants: 'Assistants',
   participants: 'Modérateurs participants',
-  agenda: 'Ordre du jour',
+  introduction: 'Introduction',
+  outro: 'Outro',
   minutes: 'Compte rendu',
-  peopleEmpty: 'Ajoute d’abord des modérateurs.',
+  peopleEmpty: 'Aucun',
+  topicEmoji: 'Émoji',
+  topicTitle: 'Titre du sujet',
+  topicBody: 'Notes du sujet',
 } as const
 
 /**
@@ -166,3 +210,10 @@ export const BOARD_ENTITY_COPY: Record<
   TASK: { label: 'Tâche', gender: 'feminine' },
   MEETING: { label: 'Réunion', gender: 'feminine' },
 }
+
+/**
+ * Singular label and gender of a meeting topic, driving its toasts
+ * @type {{ label: string, gender: 'masculine' | 'feminine' }}
+ */
+
+export const MEETING_TOPIC_ENTITY = { label: 'Sujet', gender: 'masculine' } as const

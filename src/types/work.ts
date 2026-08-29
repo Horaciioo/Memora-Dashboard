@@ -29,17 +29,34 @@ export interface WorkPerson {
 }
 
 /**
+ * Who touched a record and when, carried by every work item
+ * @typedef {Object} WorkAuthorship
+ * @property {WorkPerson | null} createdBy - Who opened it
+ * @property {string} createdAt - ISO creation
+ * @property {WorkPerson | null} updatedBy - Who last edited it
+ * @property {string} updatedAt - ISO last edit
+ */
+
+export interface WorkAuthorship {
+  createdBy: WorkPerson | null
+  createdAt: string
+  updatedBy: WorkPerson | null
+  updatedAt: string
+}
+
+/**
  * Card of the project board
  * @typedef {Object} ProjectSummary
  * @property {string} id - Project identifier
  * @property {string} title - Project title
+ * @property {string | null} emoji - Glyph drawn before the title
  * @property {string | null} description - Project description
  * @property {string | null} columnId - Workflow state identifier
  * @property {WorkTag | null} state - Workflow state
  * @property {WorkTag | null} priority - Priority
  * @property {WorkTag | null} platform - Platform
  * @property {WorkTag | null} youtuber - YouTuber concerned
- * @property {WorkPerson | null} lead - Project lead
+ * @property {WorkPerson[]} leads - Project responsables
  * @property {WorkPerson[]} assistants - Project assistants
  * @property {string | null} deadline - ISO deadline
  * @property {number} position - Order inside its column
@@ -49,16 +66,17 @@ export interface WorkPerson {
  * @property {FormValues} values - Values feeding the edit form
  */
 
-export interface ProjectSummary {
+export interface ProjectSummary extends WorkAuthorship {
   id: string
   title: string
+  emoji: string | null
   description: string | null
   columnId: string | null
   state: WorkTag | null
   priority: WorkTag | null
   platform: WorkTag | null
   youtuber: WorkTag | null
-  lead: WorkPerson | null
+  leads: WorkPerson[]
   assistants: WorkPerson[]
   deadline: string | null
   position: number
@@ -95,6 +113,7 @@ export interface CommunicationEntry {
  * @typedef {Object} TaskSummary
  * @property {string} id - Task identifier
  * @property {string} title - Task title
+ * @property {string | null} emoji - Glyph drawn before the title
  * @property {string | null} description - Task description
  * @property {string | null} columnId - Workflow state identifier
  * @property {WorkTag | null} state - Workflow state
@@ -107,9 +126,10 @@ export interface CommunicationEntry {
  * @property {FormValues} values - Values feeding the edit form
  */
 
-export interface TaskSummary {
+export interface TaskSummary extends WorkAuthorship {
   id: string
   title: string
+  emoji: string | null
   description: string | null
   columnId: string | null
   state: WorkTag | null
@@ -127,7 +147,9 @@ export interface TaskSummary {
  * @typedef {Object} MeetingSummary
  * @property {string} id - Meeting identifier
  * @property {string} title - Meeting title
- * @property {string | null} agenda - Meeting agenda
+ * @property {string | null} emoji - Glyph drawn before the title
+ * @property {string | null} introduction - Opening words
+ * @property {string | null} outro - Closing words
  * @property {string | null} minutes - Meeting minutes
  * @property {string | null} columnId - Workflow state identifier
  * @property {WorkTag | null} state - Workflow state
@@ -142,10 +164,12 @@ export interface TaskSummary {
  * @property {FormValues} values - Values feeding the edit form
  */
 
-export interface MeetingSummary {
+export interface MeetingSummary extends WorkAuthorship {
   id: string
   title: string
-  agenda: string | null
+  emoji: string | null
+  introduction: string | null
+  outro: string | null
   minutes: string | null
   columnId: string | null
   state: WorkTag | null
@@ -158,6 +182,38 @@ export interface MeetingSummary {
   participants: WorkPerson[]
   position: number
   values: FormValues
+}
+
+/**
+ * Point covered during a meeting
+ * @typedef {Object} MeetingTopicEntry
+ * @property {string} id - Topic identifier
+ * @property {string} emoji - Glyph drawn before the title
+ * @property {string} title - Topic title
+ * @property {string | null} body - Markdown notes
+ * @property {number} position - Order inside the meeting
+ * @property {FormValues} values - Values feeding the edit form
+ */
+
+export interface MeetingTopicEntry {
+  id: string
+  emoji: string
+  title: string
+  body: string | null
+  position: number
+  values: FormValues
+}
+
+/**
+ * Full meeting file
+ * @typedef {Object} MeetingDetail
+ * @property {MeetingSummary} summary - Board level fields
+ * @property {MeetingTopicEntry[]} topics - Points covered, in reading order
+ */
+
+export interface MeetingDetail {
+  summary: MeetingSummary
+  topics: MeetingTopicEntry[]
 }
 
 /**

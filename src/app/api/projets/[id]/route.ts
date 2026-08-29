@@ -23,7 +23,7 @@ export const PATCH = createProtectedRoute({
     const parsed = parseFormValues(await projectFields(await scope()), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const project = await updateProject(params.id, parsed.values, await scope())
+    const project = await updateProject(params.id, parsed.values, await scope(), session.id)
 
     await recordEvent({
       eventType: 'ProjectUpdated',

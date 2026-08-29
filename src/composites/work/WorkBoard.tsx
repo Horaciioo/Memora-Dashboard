@@ -68,6 +68,7 @@ export interface WorkBoardProps<T extends BoardItem> {
   canCreate: boolean
   canUpdate: boolean
   canDelete: boolean
+  tintByColumn?: boolean
 }
 
 // Two ways of reading the same cards
@@ -77,8 +78,7 @@ const VIEWS = [
 ] as const
 
 /**
- * Board surface shared by projects, tasks and meetings — filters, a draggable board, a
- * sortable list, and the dialogs that create, edit and drop a card
+ * Board surface shared by projects
  * @param {WorkflowScopeName} scope - Board scope
  * @param {BoardEndpoints} endpoints - Paths of the resource
  * @param {T[]} initialCards - Cards resolved server-side
@@ -98,6 +98,7 @@ const VIEWS = [
  * @param {boolean} canCreate - Member may add a card
  * @param {boolean} canUpdate - Member may edit a card
  * @param {boolean} canDelete - Member may drop a card
+ * @param {boolean} [tintByColumn] - Washes the board in the column accents
  * @return {JSX.Element}
  */
 
@@ -121,6 +122,7 @@ export const WorkBoard = <T extends BoardItem>({
   canCreate,
   canUpdate,
   canDelete,
+  tintByColumn,
 }: WorkBoardProps<T>) => {
   const board = useBoard<T>(scope, endpoints, initialCards, labelOf)
   const [view, setView] = useState<'board' | 'list'>('board')
@@ -253,6 +255,7 @@ export const WorkBoard = <T extends BoardItem>({
             canCreate={canCreate}
             onCreate={openCreate}
             canMove={canUpdate}
+            tintByColumn={tintByColumn}
           />
         ) : (
           <DataTable
@@ -271,7 +274,6 @@ export const WorkBoard = <T extends BoardItem>({
       <FormDialog
         open={isCreating}
         title={copy.add}
-        icon="add"
         fields={fields}
         initialValues={createColumn ? { [columnField]: createColumn } : undefined}
         issues={board.issues}
