@@ -24,6 +24,12 @@ dist
 .DS_Store
 *.log
 
+# loose notes at the root
+/*.md
+!/README.md
+!/AGENTS.md
+!/CLAUDE.md
+
 # editor
 .idea
 
