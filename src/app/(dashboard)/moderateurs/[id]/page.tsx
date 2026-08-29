@@ -9,6 +9,7 @@ import {
 } from '@/core/services/members/MemberFileService'
 import { readInheritedGrants } from '@/core/services/auth/GrantsService'
 import { memberFields, readMember } from '@/core/services/members/MemberService'
+import { findCandidateFile } from '@/core/services/recruitment/RecruitmentService'
 import { readMemberActivity } from '@/core/services/system/ActivityService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { MEMBER_COPY } from '@/declarations/members/copy'
@@ -47,7 +48,7 @@ export async function generateMetadata({
 
 export default async function MemberPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { access } = await requirePermission(Permissions.MemberRead)
+  const { access, scope } = await requirePermission(Permissions.MemberRead)
 
   const canManageAccess = access.can(Permissions.AccessManage)
   const canReadLogs = access.can(Permissions.MemberLogRead)
@@ -56,11 +57,15 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const detail = await readMember(id, canReadNotes).catch(() => null)
   if (!detail) notFound()
 
-  const [fields, activity, overrides, inherited] = await Promise.all([
+  // The Discord identifier is the only bridge to their application, no account was ever created for it
+  const [fields, activity, overrides, inherited, recruitment] = await Promise.all([
     memberFields(),
     canReadLogs ? readMemberActivity(id) : Promise.resolve([]),
     canManageAccess ? readOverrides(id) : Promise.resolve([]),
     canManageAccess ? readInheritedGrants(id) : Promise.resolve([]),
+    access.can(Permissions.RecruitmentRead)
+      ? findCandidateFile(detail.summary.discordId, await scope())
+      : Promise.resolve(null),
   ])
 
   return (
@@ -68,6 +73,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
       <PageHeader eyebrow={detail.summary.discordId} title={detail.summary.displayName} />
       <MemberFileTabs
         detail={detail}
+        recruitmentSessionId={recruitment?.sessionId ?? null}
         memberFields={fields}
         noteFields={NOTE_FIELDS}
         socialFields={SOCIAL_FIELDS}

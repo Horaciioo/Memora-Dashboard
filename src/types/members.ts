@@ -1,9 +1,5 @@
 import type { FormValues } from '@/types/forms'
-import type {
-  AcademyPeriodName,
-  MemberRoleName,
-  MemberStatusName,
-} from '@/utils/constants/hierarchy'
+import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import type { AbsenceStatusName } from '@/utils/constants/workflow'
 
 /**
@@ -145,26 +141,6 @@ export interface MemberAbsence {
 }
 
 /**
- * Training progression of a member
- * @typedef {Object} MemberTraining
- * @property {string} id - Training identifier
- * @property {string} name - Training name
- * @property {AcademyPeriodName | null} period - Academy period
- * @property {boolean} mandatory - Required to progress
- * @property {string | null} completedAt - ISO completion date
- * @property {string | null} validatorName - Who validated it
- */
-
-export interface MemberTraining {
-  id: string
-  name: string
-  period: AcademyPeriodName | null
-  mandatory: boolean
-  completedAt: string | null
-  validatorName: string | null
-}
-
-/**
  * Full moderator file
  * @typedef {Object} MemberDetail
  * @property {MemberSummary} summary - List level fields
@@ -178,7 +154,6 @@ export interface MemberTraining {
  * @property {MemberNote[]} notes - Private remarks
  * @property {MemberSocial[]} socials - Social profiles
  * @property {MemberAbsence[]} absences - Time off
- * @property {MemberTraining[]} trainings - Academy progression
  * @property {string[]} teams - Team names
  * @property {number} projectCount - Projects taken part in
  * @property {number} taskCount - Tasks owned
@@ -197,7 +172,6 @@ export interface MemberDetail {
   notes: MemberNote[]
   socials: MemberSocial[]
   absences: MemberAbsence[]
-  trainings: MemberTraining[]
   teams: string[]
   projectCount: number
   taskCount: number
