@@ -23,7 +23,10 @@ const GENDER = 'masculine'
  * @property {(values: FormValues) => Promise<boolean>} create - Post an entry
  * @property {(id: string, values: FormValues) => Promise<boolean>} update - Edit an entry
  * @property {(id: string, startsAt: Date) => Promise<void>} move - Drag an entry elsewhere
+ * @property {(id: string, endsAt: Date) => Promise<void>} resize - Stretch an entry
  * @property {(id: string) => Promise<void>} remove - Drop an entry
+ * @property {(ids: string[], values: FormValues) => Promise<boolean>} updateMany - Edit a selection
+ * @property {(ids: string[]) => Promise<void>} removeMany - Drop a selection
  * @property {(from: string, to: string) => Promise<void>} load - Pull another window
  */
 
@@ -35,7 +38,10 @@ export interface CalendarCollection {
   create: (values: FormValues) => Promise<boolean>
   update: (id: string, values: FormValues) => Promise<boolean>
   move: (id: string, startsAt: Date) => Promise<void>
+  resize: (id: string, endsAt: Date) => Promise<void>
   remove: (id: string) => Promise<void>
+  updateMany: (ids: string[], values: FormValues) => Promise<boolean>
+  removeMany: (ids: string[]) => Promise<void>
   load: (from: string, to: string) => Promise<void>
 }
 
@@ -111,6 +117,46 @@ export const useCalendar = (
     [entries, replace, run]
   )
 
+  const resize = useCallback(
+    async (id: string, endsAt: Date) => {
+      const entry = await run(() =>
+        apiPatch<CalendarEntry>(API_ROUTES.calendarEntry(id), { endsAt: endsAt.toISOString() })
+      )
+
+      if (entry) replace(entry)
+    },
+    [replace, run]
+  )
+
+  const updateMany = useCallback(
+    async (ids: string[], values: FormValues) => {
+      const updated = await run(
+        () => apiPatch<CalendarEntry[]>(API_ROUTES.calendarEntries, { ids, ...values }),
+        feedbackTitle(ENTITY, 'saved', GENDER)
+      )
+
+      if (updated) {
+        const byId = new Map(updated.map((entry) => [entry.id, entry]))
+        setEntries((current) => current.map((row) => byId.get(row.id) ?? row))
+      }
+
+      return updated !== null
+    },
+    [run]
+  )
+
+  const removeMany = useCallback(
+    async (ids: string[]) => {
+      const done = await run(
+        () => apiDelete<{ ids: string[] }>(API_ROUTES.calendarEntries, { ids }),
+        feedbackTitle(ENTITY, 'deleted', GENDER)
+      )
+
+      if (done) setEntries((current) => current.filter((row) => !ids.includes(row.id)))
+    },
+    [run]
+  )
+
   const load = useCallback(
     async (from: string, to: string) => {
       // A window read never raises a toast, the grid simply refills
@@ -135,5 +181,18 @@ export const useCalendar = (
     [run, entries]
   )
 
-  return { entries, isSaving, issues, clearIssues, create, update, move, remove, load }
+  return {
+    entries,
+    isSaving,
+    issues,
+    clearIssues,
+    create,
+    update,
+    move,
+    resize,
+    remove,
+    updateMany,
+    removeMany,
+    load,
+  }
 }

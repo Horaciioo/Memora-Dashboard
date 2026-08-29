@@ -153,3 +153,80 @@ export const hourOf = (date: string): number => moment(date).hour()
  */
 
 export const timeOf = (date: string): string => moment(date).format('HH:mm')
+
+/**
+ * Tell whether an entry is still running on one day
+ * @param {string} startsAt - ISO first moment
+ * @param {string | null} endsAt - ISO last moment
+ * @param {string} dayKey - ISO day
+ * @return {boolean} - Covers the day
+ */
+
+export const coversDay = (startsAt: string, endsAt: string | null, dayKey: string): boolean => {
+  const day = moment(dayKey)
+
+  return (
+    day.isSameOrAfter(moment(startsAt), 'day') &&
+    day.isSameOrBefore(moment(endsAt ?? startsAt), 'day')
+  )
+}
+
+/**
+ * Read the last day an entry runs on
+ * @param {string} startsAt - ISO first moment
+ * @param {string | null} endsAt - ISO last moment
+ * @return {string} - ISO day
+ */
+
+export const lastDayKey = (startsAt: string, endsAt: string | null): string =>
+  moment(endsAt ?? startsAt).format('YYYY-MM-DD')
+
+/**
+ * Read the moment one slot ends on
+ * @param {string} dayKey - ISO day
+ * @param {number} hour - Hour of the day
+ * @return {Date} - End of the slot
+ */
+
+export const slotEnd = (dayKey: string, hour: number): Date =>
+  moment(dayKey)
+    .hour(hour + 1)
+    .minute(0)
+    .second(0)
+    .millisecond(0)
+    .toDate()
+
+/**
+ * Read the whole day as a moment pair
+ * @param {string} dayKey - ISO day
+ * @param {number} startHour - First hour drawn
+ * @param {number} endHour - Last hour drawn
+ * @return {{ startsAt: Date, endsAt: Date }} - Day bounds
+ */
+
+export const dayBounds = (
+  dayKey: string,
+  startHour: number,
+  endHour: number
+): { startsAt: Date; endsAt: Date } => ({
+  startsAt: moment(dayKey).hour(startHour).startOf('hour').toDate(),
+  endsAt: moment(dayKey).hour(endHour).endOf('hour').toDate(),
+})
+
+/**
+ * Order two grid keys, a slide being just as valid backwards
+ * @param {string} first - Key the pointer went down on
+ * @param {string} second - Key the pointer stopped on
+ * @return {[string, string]} - Keys in reading order
+ */
+
+export const orderKeys = (first: string, second: string): [string, string] =>
+  first <= second ? [first, second] : [second, first]
+
+/**
+ * Turn a moment into the value a datetime field reads
+ * @param {Date} date - Moment to write
+ * @return {string} - Field value
+ */
+
+export const toFieldValue = (date: Date): string => moment(date).format('YYYY-MM-DDTHH:mm')

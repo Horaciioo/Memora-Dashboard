@@ -6,6 +6,7 @@ import {
   calendarFields,
   moveEntry,
   removeEntry,
+  resizeEntry,
   updateEntry,
 } from '@/core/services/calendar/CalendarService'
 import { assertRowInScope } from '@/core/services/auth/ScopeService'
@@ -27,6 +28,16 @@ export const PATCH = createProtectedRoute({
       }
 
       return moveEntry(params.id, startsAt)
+    }
+
+    // A lone end only stretches it
+    if (typeof raw.endsAt === 'string' && Object.keys(raw).length === 1) {
+      const endsAt = new Date(raw.endsAt)
+      if (Number.isNaN(endsAt.getTime())) {
+        throw invalidInput([{ field: 'endsAt', message: FORM_COPY.notADate }])
+      }
+
+      return resizeEntry(params.id, endsAt)
     }
 
     const parsed = parseFormValues(await calendarFields(perimeter), raw, { fillMissing: true })

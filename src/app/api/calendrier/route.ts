@@ -1,8 +1,32 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { calendarFields, createEntry, listEntries } from '@/core/services/calendar/CalendarService'
+import {
+  assertEntriesAccess,
+  calendarFields,
+  createEntry,
+  listEntries,
+  removeEntries,
+  updateEntries,
+} from '@/core/services/calendar/CalendarService'
+import { assertRowsInScope } from '@/core/services/auth/ScopeService'
+import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
+
+/**
+ * Read the selected identifiers off a bulk body
+ * @param {Record<string, unknown>} raw - Untouched body
+ * @return {string[]} - Selected identifiers
+ */
+
+const readIds = (raw: Record<string, unknown>): string[] => {
+  const ids = raw.ids
+  if (!Array.isArray(ids) || ids.some((id) => typeof id !== 'string') || ids.length === 0) {
+    throw invalidInput([{ field: 'ids', message: FORM_COPY.required }])
+  }
+
+  return ids as string[]
+}
 
 export const GET = createProtectedRoute({
   permission: Permissions.CalendarRead,
@@ -27,5 +51,37 @@ export const POST = createProtectedRoute({
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     return createEntry(session.id, parsed.values)
+  },
+})
+
+export const PATCH = createProtectedRoute({
+  descriptor: { summary: 'Edit a whole selection at once', tags: ['calendar'] },
+  handler: async ({ raw, session, access, scope }) => {
+    const perimeter = await scope()
+    const ids = readIds(raw)
+
+    await assertEntriesAccess(ids, session.id, access.can(Permissions.CalendarManage))
+    await assertRowsInScope('calendarEvent', ids, perimeter)
+
+    // Only the keys actually sent are validated, the rest of every entry stays put
+    const parsed = parseFormValues(await calendarFields(perimeter), raw, {
+      enforceRequired: false,
+    })
+    if (!parsed.ok) throw invalidInput(parsed.issues)
+
+    return updateEntries(ids, parsed.values)
+  },
+})
+
+export const DELETE = createProtectedRoute({
+  descriptor: { summary: 'Drop a whole selection at once', tags: ['calendar'] },
+  handler: async ({ raw, session, access, scope }) => {
+    const ids = readIds(raw)
+
+    await assertEntriesAccess(ids, session.id, access.can(Permissions.CalendarManage))
+    await assertRowsInScope('calendarEvent', ids, await scope())
+    await removeEntries(ids)
+
+    return { ids }
   },
 })
