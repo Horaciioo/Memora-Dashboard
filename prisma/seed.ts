@@ -7,8 +7,10 @@ import {
   PrismaClient,
   StepAnchor,
   StepOwner,
+  WorkflowScope,
 } from '@prisma/client'
 
+import { RECRUITMENT_OUTCOME_TEMPLATE } from '../src/declarations/recruitment/outcomes.ts'
 import { SANCTION_MEASURE_TEMPLATE } from '../src/declarations/sanctions/measures.ts'
 import { SANCTION_TEMPLATE } from '../src/declarations/sanctions/template.ts'
 
@@ -30,17 +32,84 @@ const MISSING_NAME = 'ADMIN_DISPLAY_NAME is required to seed the root account'
 
 // Category every seeded skill sits under, matched by name
 const SKILL_CATEGORIES = [
-  { name: 'Savoir-être', accent: 'info' },
-  { name: 'Technique', accent: 'brand' },
-  { name: 'Rédaction', accent: 'warning' },
+  { name: 'Savoir-être', accent: '#1d4ed8' },
+  { name: 'Technique', accent: '#f581fc' },
+  { name: 'Rédaction', accent: '#c2410c' },
+] as const
+
+// Board columns every scope needs before its creation gesture unlocks
+const DEFAULT_WORKFLOW_STATES = [
+  {
+    scope: WorkflowScope.PROJECT,
+    name: 'À faire',
+    accent: '#64748b',
+    isDefault: true,
+    isTerminal: false,
+  },
+  {
+    scope: WorkflowScope.PROJECT,
+    name: 'En cours',
+    accent: '#1d4ed8',
+    isDefault: false,
+    isTerminal: false,
+  },
+  {
+    scope: WorkflowScope.PROJECT,
+    name: 'Terminé',
+    accent: '#16a34a',
+    isDefault: false,
+    isTerminal: true,
+  },
+  {
+    scope: WorkflowScope.TASK,
+    name: 'À faire',
+    accent: '#64748b',
+    isDefault: true,
+    isTerminal: false,
+  },
+  {
+    scope: WorkflowScope.TASK,
+    name: 'En cours',
+    accent: '#1d4ed8',
+    isDefault: false,
+    isTerminal: false,
+  },
+  {
+    scope: WorkflowScope.TASK,
+    name: 'Terminée',
+    accent: '#16a34a',
+    isDefault: false,
+    isTerminal: true,
+  },
+  {
+    scope: WorkflowScope.MEETING,
+    name: 'À planifier',
+    accent: '#64748b',
+    isDefault: true,
+    isTerminal: false,
+  },
+  {
+    scope: WorkflowScope.MEETING,
+    name: 'Planifiée',
+    accent: '#1d4ed8',
+    isDefault: false,
+    isTerminal: false,
+  },
+  {
+    scope: WorkflowScope.MEETING,
+    name: 'Terminée',
+    accent: '#16a34a',
+    isDefault: false,
+    isTerminal: true,
+  },
 ] as const
 
 type SkillCategoryName = (typeof SKILL_CATEGORIES)[number]['name']
 
 // Platform a skill or step template is scoped to, matched by function name
 const SKILL_FUNCTIONS = [
-  { name: 'Twitch', accent: 'brand' },
-  { name: 'Discord', accent: 'info' },
+  { name: 'Twitch', accent: '#f581fc' },
+  { name: 'Discord', accent: '#1d4ed8' },
 ] as const
 
 type SkillFunctionName = (typeof SKILL_FUNCTIONS)[number]['name']
@@ -430,6 +499,27 @@ const seed = async (): Promise<void> => {
     },
   })
 
+  // No unique key on (scope, name), so each column is matched by hand
+  for (const [index, state] of DEFAULT_WORKFLOW_STATES.entries()) {
+    const existing = await prisma.workflowState.findFirst({
+      where: { scope: state.scope, name: state.name },
+    })
+    const data = {
+      accent: state.accent,
+      isDefault: state.isDefault,
+      isTerminal: state.isTerminal,
+      position: index * POSITION_STEP,
+    }
+
+    if (existing) {
+      await prisma.workflowState.update({ where: { id: existing.id }, data })
+    } else {
+      await prisma.workflowState.create({
+        data: { scope: state.scope, name: state.name, ...data },
+      })
+    }
+  }
+
   // Prerequisite functions scoping the academy skills and the PIMT trame
   const functionIds = new Map<SkillFunctionName, string>()
   for (const [index, fn] of SKILL_FUNCTIONS.entries()) {
@@ -552,6 +642,18 @@ const seed = async (): Promise<void> => {
       })
     }
   }
+
+  // The results board needs its columns before a candidate can be moved anywhere
+  await prisma.recruitmentOutcome.createMany({
+    data: RECRUITMENT_OUTCOME_TEMPLATE.map((outcome, index) => ({
+      name: outcome.name,
+      accent: outcome.accent,
+      isDefault: outcome.isDefault,
+      isTerminal: outcome.isTerminal,
+      position: index * POSITION_STEP,
+    })),
+    skipDuplicates: true,
+  })
 
   await prisma.$disconnect()
 }
