@@ -15,7 +15,7 @@ import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ACADEMY_SESSION_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { toTone } from '@/declarations/ui/theme'
+
 import { LIST_STYLES } from '@/declarations/ui/variants'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { SessionSummary } from '@/types/academy'
@@ -109,13 +109,15 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
                   <header className="flex flex-wrap items-center gap-2">
                     <Badge
                       label={jobFunction.name}
-                      tone={toTone(jobFunction.accent, 'brand')}
+                      accent={jobFunction.accent}
+                      tone={'brand'}
                       dot
                     />
                     <span className="text-sm font-bold">{formatDay(session.startsAt)}</span>
                     <Badge
                       label={status.label}
-                      tone={toTone(status.accent, 'neutral')}
+                      accent={status.accent}
+                      tone={'neutral'}
                       dot
                       className="ml-auto"
                     />

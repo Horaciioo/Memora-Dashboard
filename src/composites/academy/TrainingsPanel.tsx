@@ -11,7 +11,7 @@ import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { TRAINING_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
-import { toTone } from '@/declarations/ui/theme'
+
 import { LIST_STYLES } from '@/declarations/ui/variants'
 import type { MyTrainingView } from '@/types/academy'
 import { TrainingStatuses } from '@/utils/constants/hierarchy'
@@ -42,7 +42,7 @@ const TrainingRow = ({
           <Badge label={ACADEMY_PERIOD_REGISTRY.label(training.period)} tone="neutral" />
         )}
         {training.mandatory && <Badge label={ACADEMY_COPY.mandatory} tone="brand" />}
-        <Badge label={status.label} tone={toTone(status.accent, 'neutral')} dot />
+        <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />
         <span className="ml-auto text-xs text-[var(--color-ink-subtle)]">
           {`${ACADEMY_SETTINGS.trainingMinMinutes}-${ACADEMY_SETTINGS.trainingMaxMinutes} ${ACADEMY_COPY.trainingDurationUnit}`}
         </span>

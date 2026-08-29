@@ -15,7 +15,7 @@ import { ABSENCE_COPY } from '@/declarations/absences/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { LIST_STYLES } from '@/declarations/ui/variants'
-import { toTone } from '@/declarations/ui/theme'
+
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
@@ -157,7 +157,7 @@ export const AbsencesPanel = ({
                         </span>
                       )}
                     </span>
-                    <Badge label={status.label} tone={toTone(status.accent)} dot />
+                    <Badge label={status.label} accent={status.accent} dot />
                     <Button
                       variant="icon"
                       icon="remove"

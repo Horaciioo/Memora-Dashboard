@@ -10,7 +10,7 @@ import { readTeamBoard, teamFields } from '@/core/services/teams/TeamService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { REFERENCE_COPY, REFERENCE_FIELD_COPY, YOUTUBER_COPY } from '@/declarations/reference/copy'
 import { METRIC_BLOCK } from '@/declarations/ui/blocks'
-import { toTone } from '@/declarations/ui/theme'
+
 import { PAGE_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -89,7 +89,7 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
             </span>
           </span>
           {youtuber.accent && (
-            <Badge label={youtuber.name} tone={toTone(youtuber.accent, 'brand')} icon="youtuber" />
+            <Badge label={youtuber.name} accent={youtuber.accent} tone={'brand'} icon="youtuber" />
           )}
         </div>
       </Section>

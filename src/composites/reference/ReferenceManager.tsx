@@ -18,7 +18,7 @@ import type { ReferenceSection } from '@/declarations/reference/sections'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIST_STYLES } from '@/declarations/ui/variants'
-import { toTone } from '@/declarations/ui/theme'
+
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { FieldDefinition } from '@/types/forms'
 import type { ReferenceRow } from '@/types/reference'
@@ -35,8 +35,7 @@ export interface ReferenceManagerProps {
 const CONTAINER = 'reference'
 
 /**
- * Editor of one reference collection, rows reordered by dragging and edited from the
- * right click menu — the empty state carries the only way to create the first row
+ * Editor of one reference collection
  * @param {ReferenceSection} section - Collection metadata
  * @param {FieldDefinition[]} fields - Field declarations
  * @param {ReferenceRow[]} initialRows - Rows resolved server-side
@@ -65,7 +64,7 @@ export const ReferenceManager = ({
     const from = current.indexOf(item.id)
     if (from === -1) return
 
-    // Rebuild the identifier list with the row dropped at its new index
+    // Rebuild the identifier list
     const without = current.filter((id) => id !== item.id)
     const target = Math.min(index > from ? index - 1 : index, without.length)
     without.splice(Math.max(0, target), 0, item.id)
@@ -160,7 +159,7 @@ export const ReferenceManager = ({
                   <span className="flex flex-wrap items-center gap-2 font-medium">
                     {row.label}
                     {row.badges.map((badge) => (
-                      <Badge key={badge} label={badge} tone={toTone(row.accent, 'neutral')} />
+                      <Badge key={badge} label={badge} accent={row.accent} tone={'neutral'} />
                     ))}
                   </span>
                   {row.hint && (

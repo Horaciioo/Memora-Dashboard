@@ -3,7 +3,7 @@ import { StepTimeline, type TimelineStep } from '@/components/structures/StepTim
 import { ABSENCE_COPY } from '@/declarations/absences/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { SECTION_STYLES } from '@/declarations/ui/variants'
-import { toTone } from '@/declarations/ui/theme'
+
 import type { MemberAbsence } from '@/types/members'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import { cn } from '@/utils/classnames'
@@ -44,7 +44,7 @@ export const AbsenceTimeline = ({ absence }: AbsenceTimelineProps) => {
             <span className="text-sm text-[var(--color-ink-subtle)]">{absence.reason}</span>
           )}
         </span>
-        <Badge label={status.label} tone={toTone(status.accent)} dot />
+        <Badge label={status.label} accent={status.accent} dot />
       </div>
 
       <StepTimeline steps={steps} label={ABSENCE_COPY.timelineLabel} />

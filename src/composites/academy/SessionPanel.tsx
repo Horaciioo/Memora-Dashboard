@@ -110,7 +110,6 @@ export interface SessionPanelProps {
   calendarEntries: CalendarEntry[]
   calendarFields: FieldDefinition[]
   calendarAnchor: string
-  hasCalendarTypes: boolean
   canManageCalendar: boolean
 }
 
@@ -124,7 +123,6 @@ export interface SessionPanelProps {
  * @param {CalendarEntry[]} calendarEntries - Calendar window resolved server-side
  * @param {FieldDefinition[]} calendarFields - Declarations of the calendar entry form
  * @param {string} calendarAnchor - ISO day the calendar grid opens on
- * @param {boolean} hasCalendarTypes - At least one event type is declared
  * @param {boolean} canManageCalendar - Member may post and move calendar entries
  * @return {JSX.Element}
  */
@@ -138,7 +136,6 @@ export const SessionPanel = ({
   calendarEntries,
   calendarFields,
   calendarAnchor,
-  hasCalendarTypes,
   canManageCalendar,
 }: SessionPanelProps) => {
   const router = useRouter()
@@ -268,9 +265,10 @@ export const SessionPanel = ({
                   <span className="flex flex-wrap items-center gap-1.5">
                     <Badge
                       label={junior.dispositif.name}
-                      tone={toTone(junior.dispositif.accent, 'info')}
+                      accent={junior.dispositif.accent}
+                      tone={'info'}
                     />
-                    <Badge label={status.label} tone={toTone(status.accent, 'neutral')} dot />
+                    <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />
                     <span className="text-xs text-[var(--color-ink-subtle)]">
                       {junior.trainer?.name ?? ACADEMY_COPY.noTrainer}
                     </span>
@@ -438,7 +436,8 @@ export const SessionPanel = ({
                 <span className="font-medium">{group.junior.displayName}</span>
                 <Badge
                   label={group.junior.dispositif.name}
-                  tone={toTone(group.junior.dispositif.accent, 'info')}
+                  accent={group.junior.dispositif.accent}
+                  tone={'info'}
                 />
               </header>
               <ol className={TIMELINE_STYLES.list}>{group.steps.map(renderTimelineStep)}</ol>
@@ -456,7 +455,6 @@ export const SessionPanel = ({
       initialEntries={calendarEntries}
       fields={calendarFields}
       anchor={calendarAnchor}
-      hasTypes={hasCalendarTypes}
       canManage={canManageCalendar}
       sessionId={detail.summary.id}
     />

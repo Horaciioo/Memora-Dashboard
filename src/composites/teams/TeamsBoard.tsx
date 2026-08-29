@@ -290,7 +290,6 @@ export const TeamsBoard = ({
       <FormDialog
         open={isCreating}
         title={TEAM_COPY.add}
-        icon="add"
         fields={fields}
         initialValues={
           youtuberId

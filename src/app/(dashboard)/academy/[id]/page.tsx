@@ -4,7 +4,6 @@ import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { CopyInviteLink } from '@/composites/academy/CopyInviteLink'
 import { SessionPanel } from '@/composites/academy/SessionPanel'
-import { prisma } from '@/core/lib/db'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import {
   stepFields,
@@ -15,7 +14,7 @@ import {
 import { calendarFields, listEntries } from '@/core/services/calendar/CalendarService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
-import { toTone } from '@/declarations/ui/theme'
+
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 import { formatDay } from '@/utils/format/dates'
@@ -62,7 +61,7 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
   const anchor = toDayKey(new Date())
   const { from, to } = gridRange(monthGrid(anchor))
 
-  const [juniors, steps, candidates, entries, fields, typeCount] = await Promise.all([
+  const [juniors, steps, candidates, entries, fields] = await Promise.all([
     juniorFields(id),
     stepFields(id),
     juniorCandidates(id),
@@ -75,7 +74,6 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
       sessionId: id,
     }),
     calendarFields(),
-    prisma.eventType.count({ where: { archived: false } }),
   ])
 
   const jobFunction = detail.summary.function
@@ -89,7 +87,7 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
         actions={
           <span className="flex items-center gap-2">
             {detail.summary.inviteToken && <CopyInviteLink token={detail.summary.inviteToken} />}
-            <Badge label={jobFunction.name} tone={toTone(jobFunction.accent, 'brand')} dot />
+            <Badge label={jobFunction.name} accent={jobFunction.accent} tone={'brand'} dot />
           </span>
         }
       />
@@ -102,7 +100,6 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
         calendarEntries={entries}
         calendarFields={fields}
         calendarAnchor={anchor}
-        hasCalendarTypes={typeCount > 0}
         canManageCalendar={access.can(Permissions.CalendarManage)}
       />
     </div>

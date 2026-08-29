@@ -1,6 +1,6 @@
 import { Badge } from '@/components/elements/display/Badge'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
-import { toTone } from '@/declarations/ui/theme'
+
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { MemberDivision, MemberSummary } from '@/types/members'
 
@@ -22,7 +22,7 @@ export const DivisionBadge = ({ division }: DivisionBadgeProps) => {
   return (
     <span
       title={division.label}
-      className="flex h-6 w-6 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-brand-soft)] text-[var(--color-brand-600)]"
+      className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-brand-600)] text-[var(--color-on-brand)]"
     >
       {division.imagePath ? (
         // The path is declared in the configuration, so it skips the optimiser
@@ -59,7 +59,8 @@ export const RoleBadge = ({ member }: RoleBadgeProps) => {
   return (
     <Badge
       label={role.label}
-      tone={toTone(role.accent, 'neutral')}
+      accent={role.accent}
+      tone={'neutral'}
       icon={member.isRoot ? 'shield' : undefined}
     />
   )

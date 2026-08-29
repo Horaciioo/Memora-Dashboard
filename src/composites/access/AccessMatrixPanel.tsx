@@ -15,7 +15,7 @@ import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { FUNCTION_KIND_REGISTRY } from '@/declarations/reference/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { toTone } from '@/declarations/ui/theme'
+
 import type { PermissionDraft } from '@/components/structures/PermissionPicker'
 import type { AccessMatrix } from '@/types/access'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
@@ -163,7 +163,7 @@ export const AccessMatrixPanel = ({ initialMatrix }: AccessMatrixPanelProps) => 
               padded
             >
               <p className="pb-3">
-                <Badge label={kind.label} tone={toTone(kind.accent, 'neutral')} />
+                <Badge label={kind.label} accent={kind.accent} tone={'neutral'} />
               </p>
               <PermissionPicker
                 mode="binary"
