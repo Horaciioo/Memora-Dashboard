@@ -4,12 +4,14 @@ import { isDiscordId } from '@/core/lib/auth/session'
 import { prisma } from '@/core/lib/db'
 import { invalidInput, notFound } from '@/core/lib/errors'
 import { rowsToOptions } from '@/core/lib/forms/options'
-import { readText } from '@/core/lib/forms/values'
+import { readFlag, readText } from '@/core/lib/forms/values'
 import { instantiateJuniorSteps } from '@/core/services/academy/AcademyService'
 import { ADMISSION_COPY, ADMISSION_FIELD_COPY } from '@/declarations/academy/copy'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { HISTORY_CONSENT } from '@/declarations/system/privacy'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
+import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import { AcademyJuniorStatuses, MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 
@@ -19,6 +21,7 @@ import { AcademyJuniorStatuses, MemberRoles, MemberStatuses } from '@/utils/cons
  * @property {string} id - Invite identifier
  * @property {string} sessionId - Session it opens
  * @property {string | null} dispositifId - Pinned dispositif, or none
+ * @property {number | null} maxUses - Seats the invite opens
  * @property {{ functionId: string, startsAt: Date }} session - Session it opens
  */
 
@@ -26,6 +29,7 @@ export interface LiveInvite {
   id: string
   sessionId: string
   dispositifId: string | null
+  maxUses: number | null
   session: { functionId: string; startsAt: Date }
 }
 
@@ -88,7 +92,42 @@ export const admissionFields = async (invite: LiveInvite): Promise<FieldDefiniti
     })
   }
 
+  fields.push({
+    name: 'historyConsent',
+    kind: 'toggle',
+    label: ADMISSION_COPY.consentLabel,
+    hint: HISTORY_CONSENT.label,
+    required: true,
+  })
+
   return fields
+}
+
+/**
+ * Enrol a candidate through a still-usable invite
+ * @param {string} token - Invite token
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<{ accountId: string, displayName: string, sessionId: string }>} - Newly created account
+ */
+
+/**
+ * Take one seat of an invite, refusing once it is full or expired
+ * @param {LiveInvite} invite - Live invite
+ * @param {number | null} maxUses - Seats the invite opens
+ * @return {Promise<void>} - Throws when the seat is gone
+ */
+
+const claimInvite = async (invite: LiveInvite, maxUses: number | null): Promise<void> => {
+  const { count } = await prisma.sessionInvite.updateMany({
+    where: {
+      id: invite.id,
+      expiresAt: { gt: new Date() },
+      ...(maxUses === null ? {} : { uses: { lt: maxUses } }),
+    },
+    data: { uses: { increment: 1 } },
+  })
+
+  if (count === 0) throw notFound()
 }
 
 /**
@@ -104,17 +143,24 @@ export const submitAdmission = async (
 ): Promise<{ accountId: string; displayName: string; sessionId: string }> => {
   const invite = await resolveInvite(token)
 
+  if (!readFlag(values, 'historyConsent')) {
+    throw invalidInput([{ field: 'historyConsent', message: CONSENT_COPY.required }])
+  }
+
   const discordId = (readText(values, 'discordId') ?? '').trim()
   if (!isDiscordId(discordId)) {
     throw invalidInput([{ field: 'discordId', message: AUTH_COPY.malformedId }])
   }
 
+  // A distinct message here would tell a stranger which identifiers already hold an account
   const alreadyKnown = await prisma.account.findUnique({ where: { discordId } })
-  if (alreadyKnown)
-    throw invalidInput([{ field: 'discordId', message: ADMISSION_COPY.duplicateId }])
+  if (alreadyKnown) throw invalidInput([{ field: 'discordId', message: ADMISSION_COPY.rejected }])
 
   const dispositifId = invite.dispositifId ?? readText(values, 'dispositifId')
   if (!dispositifId) throw invalidInput([{ field: 'dispositifId', message: FORM_COPY.required }])
+
+  // The seat is taken before the account exists, so a lost race creates nothing
+  await claimInvite(invite, invite.maxUses)
 
   const account = await prisma.account.create({
     data: {
@@ -123,6 +169,8 @@ export const submitAdmission = async (
       status: MemberStatuses.Academy,
       role: MemberRoles.Moderateur,
       primaryFunctionId: invite.session.functionId,
+      historyConsentAt: new Date(),
+      historyConsentVersion: HISTORY_CONSENT.version,
     },
   })
 
@@ -135,16 +183,13 @@ export const submitAdmission = async (
     },
   })
 
-  await Promise.all([
-    instantiateJuniorSteps(
-      junior.id,
-      invite.sessionId,
-      invite.session.functionId,
-      dispositifId,
-      invite.session.startsAt
-    ),
-    prisma.sessionInvite.update({ where: { id: invite.id }, data: { uses: { increment: 1 } } }),
-  ])
+  await instantiateJuniorSteps(
+    junior.id,
+    invite.sessionId,
+    invite.session.functionId,
+    dispositifId,
+    invite.session.startsAt
+  )
 
   return { accountId: account.id, displayName: account.displayName, sessionId: invite.sessionId }
 }
