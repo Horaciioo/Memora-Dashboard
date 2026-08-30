@@ -1,11 +1,15 @@
 import absences from '@/configurations/system/absences.json'
 import academy from '@/configurations/system/academy.json'
+import authentication from '@/configurations/system/authentification.json'
 import calendar from '@/configurations/system/calendrier.json'
 import colours from '@/configurations/system/couleurs.json'
+import retention from '@/configurations/system/conservation.json'
 import emojis from '@/configurations/system/emojis.json'
 import files from '@/configurations/system/fichiers.json'
 import forms from '@/configurations/system/forms.json'
+import rateLimits from '@/configurations/system/limitation.json'
 import livecon from '@/configurations/system/livecon.json'
+import notifications from '@/configurations/system/notifications.json'
 import pagination from '@/configurations/system/pagination.json'
 import perimeter from '@/configurations/system/perimetre.json'
 import projects from '@/configurations/system/projets.json'
@@ -14,6 +18,7 @@ import search from '@/configurations/system/search.json'
 import {
   readBoolean,
   readInteger,
+  readNode,
   readString,
   readStringList,
 } from '@/declarations/configurations/readers'
@@ -161,6 +166,44 @@ export const SEARCH_SETTINGS = {
   debounceMs: readInteger(search.debounceMs, {
     path: 'system/search.debounceMs',
     fallback: 180,
+    min: 0,
+  }),
+}
+
+const pageSize = readInteger(notifications.pageSize, {
+  path: 'system/notifications.pageSize',
+  fallback: 40,
+  min: 1,
+  max: maxPerPage,
+})
+
+/**
+ * Personal notification bounds
+ * @type {{ panelSize: number, pageSize: number, maxActions: number, maxMentions: number, staleMs: number }}
+ */
+
+export const NOTIFICATION_SETTINGS = {
+  pageSize,
+  panelSize: readInteger(notifications.panelSize, {
+    path: 'system/notifications.panelSize',
+    fallback: 6,
+    min: 1,
+    max: pageSize,
+  }),
+  maxActions: readInteger(notifications.maxActions, {
+    path: 'system/notifications.maxActions',
+    fallback: 3,
+    min: 0,
+    max: pageSize,
+  }),
+  maxMentions: readInteger(notifications.maxMentions, {
+    path: 'system/notifications.maxMentions',
+    fallback: 10,
+    min: 1,
+  }),
+  staleMs: readInteger(notifications.staleMs, {
+    path: 'system/notifications.staleMs',
+    fallback: 60_000,
     min: 0,
   }),
 }
@@ -340,7 +383,7 @@ const dayEndHour = readInteger(calendar.dayEndHour, {
 
 /**
  * Calendar bounds
- * @type {{ dayStartHour: number, dayEndHour: number, maxEntriesPerDay: number }}
+ * @type {{ dayStartHour: number, dayEndHour: number, maxEntriesPerDay: number, rollCallReminderLeadDays: number, rollCallReminderHour: number, rollCallResponsesShared: boolean }}
  */
 
 export const CALENDAR_SETTINGS = {
@@ -355,6 +398,21 @@ export const CALENDAR_SETTINGS = {
     path: 'system/calendrier.maxEntriesPerDay',
     fallback: 3,
     min: 1,
+  }),
+  rollCallReminderLeadDays: readInteger(calendar.rollCallReminderLeadDays, {
+    path: 'system/calendrier.rollCallReminderLeadDays',
+    fallback: 1,
+    min: 0,
+  }),
+  rollCallReminderHour: readInteger(calendar.rollCallReminderHour, {
+    path: 'system/calendrier.rollCallReminderHour',
+    fallback: 18,
+    min: 0,
+    max: 23,
+  }),
+  rollCallResponsesShared: readBoolean(calendar.rollCallResponsesShared, {
+    path: 'system/calendrier.rollCallResponsesShared',
+    fallback: false,
   }),
 }
 
@@ -406,5 +464,107 @@ export const COLOUR_SETTINGS = {
   swatches: readStringList(colours.swatches, {
     path: 'system/couleurs.swatches',
     fallback: [],
+  }),
+}
+
+/**
+ * Sign-in and session bounds
+ * @type {{ sessionDays: number, stateTtlSeconds: number, avatarSize: number, maxConcurrentSessions: number }}
+ */
+
+export const AUTH_SETTINGS = {
+  sessionDays: readInteger(authentication.sessionDays, {
+    path: 'system/authentification.sessionDays',
+    fallback: 14,
+    min: 1,
+    max: 90,
+  }),
+  stateTtlSeconds: readInteger(authentication.stateTtlSeconds, {
+    path: 'system/authentification.stateTtlSeconds',
+    fallback: 600,
+    min: 60,
+    max: 3600,
+  }),
+  avatarSize: readInteger(authentication.avatarSize, {
+    path: 'system/authentification.avatarSize',
+    fallback: 128,
+    min: 16,
+    max: 4096,
+  }),
+  maxConcurrentSessions: readInteger(authentication.maxConcurrentSessions, {
+    path: 'system/authentification.maxConcurrentSessions',
+    fallback: 10,
+    min: 1,
+  }),
+}
+
+/**
+ * One rate limit window
+ * @typedef {Object} RateLimitWindow
+ * @property {number} windowSeconds - Window length
+ * @property {number} max - Attempts allowed
+ */
+
+export interface RateLimitWindow {
+  windowSeconds: number
+  max: number
+}
+
+/**
+ * Read one rate limit window
+ * @param {string} name - Policy name
+ * @param {RateLimitWindow} fallback - Default window
+ * @return {RateLimitWindow} - Bounded window
+ */
+
+export const readRateLimitWindow = (name: string, fallback: RateLimitWindow): RateLimitWindow => {
+  const path = `system/limitation.${name}`
+  const node = readNode((rateLimits as Record<string, unknown>)[name], path)
+
+  return {
+    windowSeconds: readInteger(node.windowSeconds, {
+      path: `${path}.windowSeconds`,
+      fallback: fallback.windowSeconds,
+      min: 1,
+    }),
+    max: readInteger(node.max, { path: `${path}.max`, fallback: fallback.max, min: 1 }),
+  }
+}
+
+/**
+ * How long each family of personal data is kept
+ * @type {{ expiredSessionDays: number, readNotificationDays: number, activityLogDays: number, rejectedCandidateDays: number, orphanFileHours: number, consentVersion: number }}
+ */
+
+export const RETENTION_SETTINGS = {
+  expiredSessionDays: readInteger(retention.expiredSessionDays, {
+    path: 'system/conservation.expiredSessionDays',
+    fallback: 7,
+    min: 1,
+  }),
+  readNotificationDays: readInteger(retention.readNotificationDays, {
+    path: 'system/conservation.readNotificationDays',
+    fallback: 90,
+    min: 1,
+  }),
+  activityLogDays: readInteger(retention.activityLogDays, {
+    path: 'system/conservation.activityLogDays',
+    fallback: 365,
+    min: 30,
+  }),
+  rejectedCandidateDays: readInteger(retention.rejectedCandidateDays, {
+    path: 'system/conservation.rejectedCandidateDays',
+    fallback: 180,
+    min: 1,
+  }),
+  orphanFileHours: readInteger(retention.orphanFileHours, {
+    path: 'system/conservation.orphanFileHours',
+    fallback: 24,
+    min: 1,
+  }),
+  consentVersion: readInteger(retention.consentVersion, {
+    path: 'system/conservation.consentVersion',
+    fallback: 1,
+    min: 1,
   }),
 }

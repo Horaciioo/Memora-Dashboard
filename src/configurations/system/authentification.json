@@ -1,0 +1,6 @@
+{
+  "sessionDays": 14,
+  "stateTtlSeconds": 600,
+  "avatarSize": 128,
+  "maxConcurrentSessions": 10
+}
