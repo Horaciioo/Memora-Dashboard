@@ -6,7 +6,7 @@ import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { PROFILE_FIELD_COPY } from '@/declarations/preferences/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
-import type { AccountSession, ProfileDetail } from '@/types/preferences'
+import type { ProfileDetail } from '@/types/preferences'
 import { AcademyJuniorStatuses } from '@/utils/constants/hierarchy'
 import type { Prisma } from '@prisma/client'
 
@@ -39,14 +39,16 @@ export const profileFields = (): FieldDefinition[] => [
     label: PROFILE_FIELD_COPY.timezone,
     maxLength: FORM_SETTINGS.shortTextMaxLength,
     span: 'half',
+    maturity: 'beta',
   },
   {
     name: 'languages',
     kind: 'tags',
     label: PROFILE_FIELD_COPY.languages,
     maxItems: FORM_SETTINGS.tagMaxCount,
+    maturity: 'beta',
   },
-  { name: 'avatarUrl', kind: 'url', label: PROFILE_FIELD_COPY.avatarUrl },
+  { name: 'avatarUrl', kind: 'image', label: PROFILE_FIELD_COPY.avatarUrl, bucket: 'avatars' },
   {
     name: 'celebrateBirthday',
     kind: 'toggle',
@@ -117,47 +119,4 @@ export const updateProfile = async (
   })
 
   return readProfile(accountId)
-}
-
-/**
- * Read the sessions currently open for one member
- * @param {string} accountId - Account identifier
- * @param {string} [currentToken] - Token of the session on screen
- * @return {Promise<AccountSession[]>} - Open sessions, newest first
- */
-
-export const listOpenSessions = async (
-  accountId: string,
-  currentToken?: string
-): Promise<AccountSession[]> => {
-  const rows = await prisma.session.findMany({
-    where: { accountId, expiresAt: { gt: new Date() } },
-    orderBy: { createdAt: 'desc' },
-  })
-
-  return rows.map((row) => ({
-    id: row.id,
-    userAgent: row.userAgent,
-    createdAt: row.createdAt.toISOString(),
-    expiresAt: row.expiresAt.toISOString(),
-    isCurrent: row.token === currentToken,
-  }))
-}
-
-/**
- * Close every session of one member but the one in use
- * @param {string} accountId - Account identifier
- * @param {string} [currentToken] - Token kept alive
- * @return {Promise<number>} - Closed count
- */
-
-export const closeOtherSessions = async (
-  accountId: string,
-  currentToken?: string
-): Promise<number> => {
-  const { count } = await prisma.session.deleteMany({
-    where: { accountId, token: currentToken ? { not: currentToken } : undefined },
-  })
-
-  return count
 }

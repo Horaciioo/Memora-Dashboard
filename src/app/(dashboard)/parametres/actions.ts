@@ -4,7 +4,7 @@ import { refresh } from 'next/cache'
 import { cookies } from 'next/headers'
 
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
-import { closeOtherSessions } from '@/core/services/preferences/ProfileService'
+import { revokeOtherSessions } from '@/core/services/auth/SessionService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
@@ -18,7 +18,7 @@ export async function dropOtherSessions(): Promise<void> {
   const { session } = await requireUser()
 
   const cookieStore = await cookies()
-  const closed = await closeOtherSessions(session.id, cookieStore.get(SESSION_COOKIE)?.value)
+  const closed = await revokeOtherSessions(session.id, cookieStore.get(SESSION_COOKIE)?.value ?? '')
 
   await recordEvent({
     eventType: 'SessionClosed',
