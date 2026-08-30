@@ -7,6 +7,7 @@ import { SECTION_STYLES } from '@/declarations/ui/variants'
 import type { MemberAbsence } from '@/types/members'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import { cn } from '@/utils/classnames'
+import { absenceReasonText } from '@/utils/format/absences'
 import { formatDayRange } from '@/utils/format/dates'
 
 export interface AbsenceTimelineProps {
@@ -32,6 +33,7 @@ export const AbsenceTimeline = ({ absence }: AbsenceTimelineProps) => {
       state: acknowledged ? 'done' : 'current',
     },
   ]
+  const reasonText = absenceReasonText(absence)
 
   return (
     <div className={cn(SECTION_STYLES.panel, SECTION_STYLES.panelPadded, 'flex flex-col gap-6')}>
@@ -40,8 +42,8 @@ export const AbsenceTimeline = ({ absence }: AbsenceTimelineProps) => {
           <span className="font-semibold">
             {formatDayRange(absence.startDate, absence.endDate)}
           </span>
-          {absence.reason && (
-            <span className="text-sm text-[var(--color-ink-subtle)]">{absence.reason}</span>
+          {reasonText && (
+            <span className="text-sm text-[var(--color-ink-subtle)]">{reasonText}</span>
           )}
         </span>
         <Badge label={status.label} accent={status.accent} dot />
