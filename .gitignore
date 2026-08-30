@@ -17,8 +17,17 @@ next-env.d.ts
 build
 dist
 
-# env, never tracked
+# env, never tracked — the documented template is the one exception
 .env*
+!.env.example
+
+# log files written by LoggerManager
+/logs
+
+# test suites and seeded datasets, kept out of the delivered repository
+/tests
+/prisma/fixtures
+vitest.config.mts
 
 # misc
 .DS_Store
