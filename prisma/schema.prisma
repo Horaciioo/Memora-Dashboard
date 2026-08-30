@@ -159,10 +159,20 @@ enum EventVisibility {
   ADMINS
 }
 
+// Where a member stands on a roll-call
+enum AttendanceStatus {
+  PENDING
+  PRESENT
+  ABSENT
+}
+
 // Signed-in member
 model Account {
   id                  String       @id @default(cuid())
   discordId           String       @unique
+  discordUsername     String?
+  discordAvatarHash   String?
+  discordSyncedAt     DateTime?
   displayName         String
   email               String?
   phone               String?
@@ -170,6 +180,9 @@ model Account {
   celebrateBirthday   Boolean      @default(true)
   joinedAt            DateTime     @default(now())
   leftAt              DateTime?
+  historyConsentAt      DateTime?
+  historyConsentVersion Int?
+  anonymisedAt          DateTime?
   languages           String[]     @default([])
   timezone            String?
   avatarUrl           String?
@@ -187,6 +200,7 @@ model Account {
   secondaryFunction JobFunction? @relation("SecondaryFunction", fields: [secondaryFunctionId], references: [id], onDelete: SetNull)
 
   sessions              Session[]
+  discordToken          DiscordToken?
   permissions           AccountPermission[]
   socialLinks           SocialLink[]
   calendarEntries       CalendarEvent[]         @relation("CalendarSubject")
@@ -209,6 +223,7 @@ model Account {
   juniorNotesWritten    JuniorNote[]            @relation("JuniorNoteAuthor")
   juniorObjectivesSet   JuniorObjective[]       @relation("JuniorObjectiveAuthor")
   calendarEvents        CalendarEvent[]         @relation("CalendarOwner")
+  eventAttendances      EventAttendance[]
   ledTeams              Team[]                  @relation("TeamLead")
   teamMemberships       TeamMember[]
   projectLeads          ProjectLead[]
@@ -225,8 +240,11 @@ model Account {
   liveconChanges        LiveconEntry[]
   activityAsSubject     ActivityLog[]           @relation("LogSubject")
   activityAsActor       ActivityLog[]           @relation("LogActor")
+  notificationsReceived Notification[]          @relation("NotificationRecipient")
+  notificationsCaused   Notification[]          @relation("NotificationActor")
   recruitmentInterviews RecruitmentCandidate[]  @relation("RecruitmentRecruiter")
   recruitmentSeats      RecruitmentSpectator[]  @relation("RecruitmentSpectator")
+  recruitmentLeads      RecruitmentResponsable[] @relation("RecruitmentResponsable")
   recruitmentComments   RecruitmentComment[]    @relation("RecruitmentCommentAuthor")
 
   @@index([role])
@@ -237,18 +255,37 @@ model Account {
 
 // Signed cookie handle of an open session
 model Session {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  accountId String
-  userAgent String?
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+  id         String   @id @default(cuid())
+  token      String   @unique
+  accountId  String
+  userAgent  String?
+  address    String?
+  createdAt  DateTime @default(now())
+  lastUsedAt DateTime @default(now())
+  expiresAt  DateTime
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@index([accountId])
   @@index([expiresAt])
   @@map("sessions")
+}
+
+// OAuth grant of one member, both token halves encrypted at rest
+model DiscordToken {
+  id           String   @id @default(cuid())
+  accountId    String   @unique
+  accessToken  String
+  refreshToken String
+  scope        String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@map("discord_tokens")
 }
 
 // Per-account override on top of role and function grants
@@ -652,6 +689,7 @@ model Absence {
   startDate  DateTime
   endDate    DateTime
   dayCount   Int
+  reasonCode Int?
   reason     String?
   status     AbsenceStatus @default(PENDING)
   reviewerId String?
@@ -1169,8 +1207,15 @@ model CalendarEvent {
   endsAt      DateTime?
   allDay      Boolean          @default(false)
   visibility  EventVisibility?
+  rollCall        Boolean      @default(false)
+  rosterShared    Boolean      @default(false)
+  rollCallTeamIds String[]     @default([])
+  remindAt        DateTime?
+  remindedAt      DateTime?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+
+  attendances EventAttendance[]
 
   template EventTemplate?  @relation(fields: [templateId], references: [id], onDelete: SetNull)
   owner    Account?        @relation("CalendarOwner", fields: [ownerId], references: [id], onDelete: SetNull)
@@ -1185,7 +1230,26 @@ model CalendarEvent {
   @@index([templateId])
   @@index([ownerId])
   @@index([accountId])
+  @@index([rollCall, remindAt, remindedAt])
   @@map("calendar_events")
+}
+
+// One member's answer to a roll-call event
+model EventAttendance {
+  id          String           @id @default(cuid())
+  eventId     String
+  accountId   String
+  status      AttendanceStatus @default(PENDING)
+  respondedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  event   CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  account Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, accountId])
+  @@index([accountId, status])
+  @@map("event_attendances")
 }
 
 // Alert tier, lower level means tighter moderation
@@ -1244,6 +1308,26 @@ model ActivityLog {
   @@index([targetType, targetId])
   @@index([eventType])
   @@map("activity_logs")
+}
+
+// Personal alert addressed to one member, kind comes from NOTIFICATION_KINDS
+model Notification {
+  id          String    @id @default(cuid())
+  recipientId String
+  actorId     String?
+  kind        Int
+  targetType  String?
+  targetId    String?
+  subject     String?
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  recipient Account  @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor     Account? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([recipientId, createdAt])
+  @@index([recipientId, readAt])
+  @@map("notifications")
 }
 
 // Backing table of StorageManager, bucket comes from STORAGE_BUCKETS
@@ -1361,15 +1445,31 @@ model RecruitmentSession {
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 
-  youtuber    Youtuber               @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
-  jobFunction JobFunction            @relation(fields: [functionId], references: [id], onDelete: Restrict)
-  candidates  RecruitmentCandidate[]
-  steps       RecruitmentStep[]
+  youtuber     Youtuber                 @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  jobFunction  JobFunction              @relation(fields: [functionId], references: [id], onDelete: Restrict)
+  candidates   RecruitmentCandidate[]
+  steps        RecruitmentStep[]
+  responsables RecruitmentResponsable[]
 
   @@unique([youtuberId, functionId, name])
   @@index([youtuberId, status])
   @@index([functionId])
   @@map("recruitment_sessions")
+}
+
+// Moderator carrying a recruitment session
+model RecruitmentResponsable {
+  id        String   @id @default(cuid())
+  sessionId String
+  accountId String
+  createdAt DateTime @default(now())
+
+  session RecruitmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account            @relation("RecruitmentResponsable", fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@index([accountId])
+  @@map("recruitment_responsables")
 }
 
 // Applicant of one campaign, held by their Discord identifier and never given an account
