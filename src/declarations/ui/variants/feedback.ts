@@ -78,10 +78,70 @@ export const ADD_ROW_STYLES = {
 } as const
 
 /**
- * Beta tag styles, an amber pill opening the explainer dialog
+ * Maturity tag styles, a toned pill pointing at the explainer page
  * @type {Record<string, string>}
  */
 
-export const BETA_STYLES = {
-  tag: 'inline-flex items-center rounded-[var(--radius-sm)] bg-[var(--color-warning)] px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-[var(--color-on-brand)] uppercase transition-opacity hover:opacity-90',
+export const MATURITY_STYLES = {
+  tag: 'inline-flex shrink-0 items-center rounded-[var(--radius-sm)] px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase',
+  link: 'transition-opacity hover:opacity-80',
+  row: 'flex items-start gap-3 text-sm',
+  meaning: 'text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Notification bell, its panel and its rows
+ * @type {Record<string, string>}
+ */
+
+export const NOTIFICATION_STYLES = {
+  // The pastille sits on the bell itself, so the trigger keeps its square footprint
+  trigger: 'relative',
+  pastille:
+    'pointer-events-none absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-danger)] px-1 text-[10px] font-bold tabular-nums text-[var(--color-on-brand)]',
+  scrim: 'fixed inset-0 z-[65]',
+  panel:
+    'surface-enter fixed z-[70] flex max-h-[min(28rem,70vh)] w-[min(21rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+  header:
+    'flex shrink-0 items-center justify-between gap-2 border-b border-[var(--color-border)] px-4 py-2.5',
+  title: 'text-sm font-bold',
+  body: 'flex-1 overflow-y-auto p-2',
+  footer: 'shrink-0 border-t border-[var(--color-border)]',
+  footerLink:
+    'flex w-full items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[var(--color-brand-600)] transition-colors hover:bg-[var(--color-surface)]',
+  footerIcon: 'h-3.5 w-3.5',
+  list: 'flex flex-col',
+  // Inset rule between two rows, never reaching either edge of the panel
+  divider: 'mx-4 block h-px bg-[var(--color-border)]',
+  row: 'flex gap-3 rounded-[var(--radius-md)] px-2 py-2.5 transition-colors',
+  rowUnread: 'bg-[var(--color-brand-soft)]/40',
+  portrait: 'relative shrink-0',
+  glyph:
+    'absolute -right-1 -bottom-1 flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-[var(--color-surface-raised)]',
+  glyphIcon: 'h-2.5 w-2.5',
+  content: 'flex min-w-0 flex-1 flex-col gap-0.5',
+  sentence: 'text-sm leading-snug text-[var(--color-ink)]',
+  verb: 'font-bold',
+  subject: 'truncate text-xs font-medium text-[var(--color-ink-subtle)]',
+  foot: 'flex items-center gap-2 pt-1',
+  moment: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
+  action:
+    'ml-auto inline-flex items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2 py-0.5 text-xs font-semibold transition-colors hover:border-[var(--color-brand-400)] hover:bg-[var(--color-brand-soft)] hover:text-[var(--color-brand-600)]',
+  actionIcon: 'h-3 w-3',
+} as const
+
+/**
+ * Last resort error screen styles, standing without the app shell
+ * @type {Record<string, string>}
+ */
+
+export const CRITICAL_ERROR_STYLES = {
+  body: 'bg-[var(--color-background)] text-[var(--color-ink)] antialiased',
+  frame:
+    'mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-3 px-6 text-center',
+  title: 'text-xl font-extrabold tracking-tight',
+  description: 'text-sm text-[var(--color-ink-subtle)]',
+  reference: 'font-mono text-xs text-[var(--color-ink-subtle)]',
+  action:
+    'mt-2 rounded-[var(--radius-md)] bg-[var(--color-brand-600)] px-4 py-2 text-sm font-semibold text-[var(--color-on-brand)]',
 } as const
