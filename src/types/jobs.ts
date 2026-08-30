@@ -13,14 +13,12 @@ export type JobName = keyof typeof JOB_REGISTRY.map
  * @property {number} [attempts] - Retry count
  * @property {number} [delayMs] - Start delay
  * @property {string} [jobId] - Idempotency key
- * @property {string} [repeatCron] - Cron pattern
  */
 
 export interface EnqueueJobOptions {
   attempts?: number
   delayMs?: number
   jobId?: string
-  repeatCron?: string
 }
 
 /**
