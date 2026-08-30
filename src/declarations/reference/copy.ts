@@ -65,7 +65,8 @@ export const YOUTUBER_COPY = {
 
 export const REFERENCE_COPY = {
   title: 'Configuration',
-  lead: 'Tout ce que Memora affiche se crée ici. Rien n’est écrit en dur dans le code.',
+  lead: 'Tout ce que Memora affiche se crée ici.',
+  administration: 'Administration',
   usage: 'utilisations',
   usageOne: 'utilisation',
   inUse: 'Impossible de supprimer : cet élément est encore utilisé.',

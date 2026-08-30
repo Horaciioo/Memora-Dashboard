@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { activeFunctions, activeYoutubers } from '@/core/services/reference/lookups'
 import { conflict, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
@@ -773,7 +774,7 @@ const eventTemplates: ReferenceResource = {
 const trainings: ReferenceResource = {
   fields: async () => {
     const [functions, dispositifRows] = await Promise.all([
-      prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+      activeFunctions(),
       prisma.dispositif.findMany({ orderBy: { position: 'asc' } }),
     ])
 
@@ -1097,7 +1098,7 @@ const skills: ReferenceResource = {
   fields: async () => {
     const [categories, functions, dispositifRows] = await Promise.all([
       prisma.skillCategory.findMany({ orderBy: { position: 'asc' } }),
-      prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+      activeFunctions(),
       prisma.dispositif.findMany({ orderBy: { position: 'asc' } }),
     ])
 
@@ -1202,7 +1203,7 @@ const skills: ReferenceResource = {
 const pimStepTemplates: ReferenceResource = {
   fields: async () => {
     const [functions, dispositifRows] = await Promise.all([
-      prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+      activeFunctions(),
       prisma.dispositif.findMany({ orderBy: { position: 'asc' } }),
     ])
 
@@ -1477,10 +1478,7 @@ const clearOtherDefaults = async (id: string): Promise<void> => {
 
 const recruitmentQuestions: ReferenceResource = {
   fields: async () => {
-    const [creators, functions] = await Promise.all([
-      prisma.youtuber.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
-      prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
-    ])
+    const [creators, functions] = await Promise.all([activeYoutubers(), activeFunctions()])
 
     return [
       {
@@ -1585,10 +1583,7 @@ const recruitmentQuestions: ReferenceResource = {
 
 const recruitmentStepTemplates: ReferenceResource = {
   fields: async () => {
-    const [creators, functions] = await Promise.all([
-      prisma.youtuber.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
-      prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
-    ])
+    const [creators, functions] = await Promise.all([activeYoutubers(), activeFunctions()])
 
     return [
       {
