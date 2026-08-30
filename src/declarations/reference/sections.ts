@@ -34,9 +34,55 @@ export const REFERENCE_KEYS = [
 export type ReferenceKey = (typeof REFERENCE_KEYS)[number]
 
 /**
+ * Console groups gathering related collections
+ * @type {readonly string[]}
+ */
+
+export const REFERENCE_GROUP_KEYS = [
+  'organisation',
+  'pilotage',
+  'moderation',
+  'academy',
+  'recrutement',
+] as const
+
+/**
+ * Console group key
+ * @type {(typeof REFERENCE_GROUP_KEYS)[number]}
+ */
+
+export type ReferenceGroupKey = (typeof REFERENCE_GROUP_KEYS)[number]
+
+/**
+ * Console group heading
+ * @typedef {Object} ReferenceGroup
+ * @property {ReferenceGroupKey} key - Group key
+ * @property {string} label - Section heading
+ */
+
+export interface ReferenceGroup {
+  key: ReferenceGroupKey
+  label: string
+}
+
+/**
+ * Console groups in display order
+ * @type {ReferenceGroup[]}
+ */
+
+export const REFERENCE_GROUPS: ReferenceGroup[] = [
+  { key: 'organisation', label: 'Structure & équipe' },
+  { key: 'pilotage', label: 'Projets & calendrier' },
+  { key: 'moderation', label: 'Modération' },
+  { key: 'academy', label: 'Marsha Academy' },
+  { key: 'recrutement', label: 'Recrutement' },
+]
+
+/**
  * Display metadata of a reference collection
  * @typedef {Object} ReferenceSection
  * @property {ReferenceKey} key - Collection key
+ * @property {ReferenceGroupKey} group - Console group
  * @property {string} label - Plural label
  * @property {string} singular - Singular label
  * @property {'masculine' | 'feminine'} gender - Grammatical gender of the singular label
@@ -51,6 +97,7 @@ export type ReferenceKey = (typeof REFERENCE_KEYS)[number]
 
 export interface ReferenceSection {
   key: ReferenceKey
+  group: ReferenceGroupKey
   label: string
   singular: string
   gender: 'masculine' | 'feminine'
@@ -71,6 +118,7 @@ export interface ReferenceSection {
 export const REFERENCE_SECTIONS: ReferenceSection[] = [
   {
     key: 'youtubeurs',
+    group: 'organisation',
     label: 'YouTubeurs',
     singular: 'YouTubeur',
     gender: 'masculine',
@@ -84,6 +132,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'divisions',
+    group: 'organisation',
     label: 'Divisions',
     singular: 'Division',
     gender: 'feminine',
@@ -96,6 +145,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'fonctions',
+    group: 'organisation',
     label: 'Fonctions',
     singular: 'Fonction',
     gender: 'feminine',
@@ -108,6 +158,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'plateformes',
+    group: 'pilotage',
     label: 'Plateformes',
     singular: 'Plateforme',
     gender: 'feminine',
@@ -120,6 +171,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'etats',
+    group: 'pilotage',
     label: 'États',
     singular: 'État',
     gender: 'masculine',
@@ -132,6 +184,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'priorites',
+    group: 'pilotage',
     label: 'Priorités',
     singular: 'Priorité',
     gender: 'feminine',
@@ -144,6 +197,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'evenements',
+    group: 'pilotage',
     label: 'Modèles d’évènement',
     singular: 'Modèle d’évènement',
     gender: 'masculine',
@@ -156,6 +210,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'formations',
+    group: 'academy',
     label: 'Formations',
     singular: 'Formation',
     gender: 'feminine',
@@ -169,6 +224,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'livecon',
+    group: 'moderation',
     label: 'Niveaux de livecon',
     singular: 'Niveau',
     gender: 'masculine',
@@ -181,6 +237,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'sanctions',
+    group: 'moderation',
     label: 'Mesures de sanction',
     singular: 'Mesure',
     gender: 'feminine',
@@ -193,6 +250,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'dispositifs',
+    group: 'academy',
     label: 'Dispositifs',
     singular: 'Dispositif',
     gender: 'masculine',
@@ -205,6 +263,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'categories-competences',
+    group: 'academy',
     label: 'Catégories de compétences',
     singular: 'Catégorie de compétence',
     gender: 'feminine',
@@ -217,6 +276,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'competences',
+    group: 'academy',
     label: 'Compétences',
     singular: 'Compétence',
     gender: 'feminine',
@@ -229,6 +289,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'etapes-pim',
+    group: 'academy',
     label: 'Étapes de PIM',
     singular: 'Étape de PIM',
     gender: 'feminine',
@@ -241,6 +302,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'questions-recrutement',
+    group: 'recrutement',
     label: 'Questions de recrutement',
     singular: 'Question de recrutement',
     gender: 'feminine',
@@ -253,6 +315,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'etapes-recrutement',
+    group: 'recrutement',
     label: 'Étapes de recrutement',
     singular: 'Étape de recrutement',
     gender: 'feminine',
@@ -265,6 +328,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
   },
   {
     key: 'issues-recrutement',
+    group: 'recrutement',
     label: 'Issues de recrutement',
     singular: 'Issue de recrutement',
     gender: 'feminine',
@@ -301,3 +365,12 @@ export const referenceSection = (key: string): ReferenceSection | undefined =>
 
 export const isReferenceKey = (key: string): key is ReferenceKey =>
   SECTION_INDEX.has(key as ReferenceKey)
+
+/**
+ * Collections of one console group
+ * @param {ReferenceGroupKey} key - Group key
+ * @return {ReferenceSection[]} - Sections in display order
+ */
+
+export const referenceSectionsOfGroup = (key: ReferenceGroupKey): ReferenceSection[] =>
+  REFERENCE_SECTIONS.filter((section) => section.group === key)
