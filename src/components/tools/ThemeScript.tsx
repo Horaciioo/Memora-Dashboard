@@ -9,9 +9,16 @@ const THEME_INIT_SCRIPT = `
 })()
 `
 
+export interface ThemeScriptProps {
+  nonce?: string
+}
+
 /**
- * Applies the persisted theme before paint
+ * Applies the persisted theme before paint, the nonce letting the policy admit it
+ * @param {string} [nonce] - Per-request nonce
  * @return {JSX.Element} - Script tag
  */
 
-export const ThemeScript = () => <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+export const ThemeScript = ({ nonce }: ThemeScriptProps) => (
+  <script nonce={nonce} dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+)

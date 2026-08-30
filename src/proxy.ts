@@ -1,13 +1,51 @@
+import crypto from 'crypto'
+
 import { NextResponse, type NextRequest } from 'next/server'
 import { isSessionTokenValid } from '@/core/lib/auth/getSession'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
+import { buildContentSecurityPolicy } from '@/declarations/system/contentSecurityPolicy'
+import { NONCE_HEADER } from '@/declarations/system/securityHeaders'
 import { ROUTES } from '@/declarations/navigation'
 
 // Paths reachable
-const PUBLIC_PATHS: string[] = [ROUTES.login]
+const PUBLIC_PATHS: string[] = [ROUTES.login, ROUTES.privacy]
 
 // Path prefixes
 const PUBLIC_PREFIXES: string[] = ['/admission']
+
+/**
+ * Build the per-request nonce and the policy carrying it
+ * @return {{ nonce: string, policy: string }} - Request nonce and policy
+ */
+
+const buildPolicy = (): { nonce: string; policy: string } => {
+  const nonce = crypto.randomBytes(16).toString('base64')
+
+  return {
+    nonce,
+    policy: buildContentSecurityPolicy(nonce, process.env.NODE_ENV !== 'production'),
+  }
+}
+
+/**
+ * Continue routing with the policy attached to both request and response
+ * @param {NextRequest} request - Incoming request
+ * @return {NextResponse} - Response carrying the policy
+ */
+
+const withPolicy = (request: NextRequest): NextResponse => {
+  const { nonce, policy } = buildPolicy()
+
+  // The document reads the nonce back off its own request headers
+  const headers = new Headers(request.headers)
+  headers.set(NONCE_HEADER, nonce)
+  headers.set('content-security-policy', policy)
+
+  const response = NextResponse.next({ request: { headers } })
+  response.headers.set('content-security-policy', policy)
+
+  return response
+}
 
 /**
  * Route authentication redirect
@@ -19,11 +57,12 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // Initialize session state
   const { pathname } = request.nextUrl
   const token = request.cookies.get(SESSION_COOKIE)?.value
-  const isSignInScreen = PUBLIC_PATHS.includes(pathname)
+  const isSignInScreen = pathname === ROUTES.login
 
   // A prefix stays reachable either way
   const isOpenToEveryone =
-    isSignInScreen || PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(`${prefix}/`))
+    PUBLIC_PATHS.includes(pathname) ||
+    PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(`${prefix}/`))
 
   // A stale token fails closed rather than crashing the proxy
   const hasSession = token ? await isSessionTokenValid(token).catch(() => false) : false
@@ -44,15 +83,12 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(url)
   }
 
-  // A dead token stops being resent even on open routes
-  if (!hasSession && token) {
-    const response = NextResponse.next()
-    response.cookies.delete(SESSION_COOKIE)
-    return response
-  }
+  const response = withPolicy(request)
 
-  // Continue routing
-  return NextResponse.next()
+  // A dead token stops being resent even on open routes
+  if (!hasSession && token) response.cookies.delete(SESSION_COOKIE)
+
+  return response
 }
 
 // Proxy route matcher
