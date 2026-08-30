@@ -6,7 +6,6 @@
 export const RECRUITMENT_COPY = {
   title: 'Recrutements',
   lead: 'Une session par créateur et par fonction. L’annonce part dehors, les entretiens se tiennent sur Discord, tout ce qui compte se garde ici.',
-  confidential: 'Confidentiel',
   add: 'Ouvrir une session',
   addTitle: 'Ouvrir une session de recrutement',
   editTitle: 'Modifier la session',
@@ -19,6 +18,10 @@ export const RECRUITMENT_COPY = {
   filterDescription: 'Élargis ou efface le filtre courant.',
   noYoutuber: 'Sans créateur',
   candidateCount: 'candidats',
+
+  informationsTitle: 'Informations',
+  infoStatus: 'Statut',
+  infoSessionId: 'ID de session',
 
   tabCandidates: 'Candidats',
   tabQuestions: 'Questionnaire',
@@ -98,6 +101,7 @@ export const RECRUITMENT_FIELD_COPY = {
   youtuber: 'YouTubeur',
   jobFunction: 'Fonction',
   status: 'État',
+  responsables: 'Responsables',
   summary: 'Résumé',
   opensAt: 'Ouverture',
   closesAt: 'Clôture',
