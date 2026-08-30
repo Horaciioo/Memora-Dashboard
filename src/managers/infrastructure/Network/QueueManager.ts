@@ -154,10 +154,38 @@ export default class QueueManager {
       attempts: options.attempts ?? meta.attempts ?? this.config.attempts,
       ...(options.delayMs ? { delay: options.delayMs } : {}),
       ...(options.jobId ? { jobId: options.jobId } : {}),
-      ...(options.repeatCron ? { repeat: { pattern: options.repeatCron } } : {}),
     })
 
     return job.id ?? null
+  }
+
+  /**
+   * Keep one recurring job on its cron. BullMQ 6 drives repeats through a job
+   * scheduler, a repeat flag on add() no longer registers anything
+   * @param {JobName} name - Queue name
+   * @param {string} pattern - Cron pattern
+   * @return {Promise<boolean>} - Schedule is in place
+   */
+
+  async schedule(name: JobName, pattern: string): Promise<boolean> {
+    const queue = this.get(name)
+
+    // Queue unavailable
+    if (!queue) {
+      this.logger.debug(`Queue ${name} unavailable, schedule ignored`)
+
+      return false
+    }
+
+    const meta = JOB_REGISTRY.get(name)
+
+    await queue.upsertJobScheduler(
+      name,
+      { pattern },
+      { opts: { attempts: meta.attempts ?? this.config.attempts } }
+    )
+
+    return true
   }
 
   /**
