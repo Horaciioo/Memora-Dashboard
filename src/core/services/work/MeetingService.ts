@@ -102,7 +102,7 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
     stateOptions(WorkflowScopes.Meeting),
     youtuberOptions(scope),
     projectOptions(),
-    memberOptions(),
+    memberOptions(scope),
   ])
 
   return [
@@ -518,6 +518,19 @@ export const topicMeetingId = async (id: string): Promise<string> => {
   if (!row) throw notFound()
 
   return row.meetingId
+}
+
+/**
+ * Read one meeting topic
+ * @param {string} id - Topic identifier
+ * @return {Promise<MeetingTopicEntry>} - Point covered
+ */
+
+export const readTopic = async (id: string): Promise<MeetingTopicEntry> => {
+  const row = await prisma.meetingTopic.findUnique({ where: { id } })
+  if (!row) throw notFound()
+
+  return toTopic(row)
 }
 
 /**

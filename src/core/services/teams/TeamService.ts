@@ -18,7 +18,7 @@ import { MemberStatuses } from '@/utils/constants/hierarchy'
  */
 
 export const teamFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
-  const [leads, youtubers] = await Promise.all([leadOptions(), youtuberOptions(scope)])
+  const [leads, youtubers] = await Promise.all([leadOptions(scope), youtuberOptions(scope)])
 
   return [
     {
