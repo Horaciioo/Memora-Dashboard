@@ -1,7 +1,8 @@
 import 'server-only'
 
-import type { SocialLink } from '@prisma/client'
+import type { Prisma, SocialLink } from '@prisma/client'
 
+import { decryptField, encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
 import { forbidden, notFound } from '@/core/lib/errors'
 import { readFlag, readText } from '@/core/lib/forms/values'
@@ -31,6 +32,27 @@ export const NOTE_FIELDS: FieldDefinition[] = [
 ]
 
 /**
+ * Row shape every note reader maps from
+ * @type {Prisma.AccountNoteGetPayload}
+ */
+
+type NoteRow = Prisma.AccountNoteGetPayload<{ include: { author: true } }>
+
+/**
+ * Map a note row to its display shape, the body coming back in clear
+ * @param {NoteRow} note - Note row with its author
+ * @return {MemberNote} - Display note
+ */
+
+export const toMemberNote = (note: NoteRow): MemberNote => ({
+  id: note.id,
+  body: decryptField(note.body) ?? '',
+  pinned: note.pinned,
+  authorName: note.author?.displayName ?? null,
+  createdAt: note.createdAt.toISOString(),
+})
+
+/**
  * Add a private note to a member
  * @param {string} accountId - Account identifier
  * @param {string} authorId - Author identifier
@@ -47,19 +69,13 @@ export const addNote = async (
     data: {
       accountId,
       authorId,
-      body: readText(values, 'body') ?? '',
+      body: encryptField(readText(values, 'body')) ?? '',
       pinned: readFlag(values, 'pinned'),
     },
     include: { author: true },
   })
 
-  return {
-    id: note.id,
-    body: note.body,
-    pinned: note.pinned,
-    authorName: note.author?.displayName ?? null,
-    createdAt: note.createdAt.toISOString(),
-  }
+  return toMemberNote(note)
 }
 
 /**
@@ -76,13 +92,7 @@ export const pinNote = async (noteId: string, pinned: boolean): Promise<MemberNo
     include: { author: true },
   })
 
-  return {
-    id: note.id,
-    body: note.body,
-    pinned: note.pinned,
-    authorName: note.author?.displayName ?? null,
-    createdAt: note.createdAt.toISOString(),
-  }
+  return toMemberNote(note)
 }
 
 /**

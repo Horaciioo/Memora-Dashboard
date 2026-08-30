@@ -134,6 +134,7 @@ export interface MemberAbsence {
   startDate: string
   endDate: string
   dayCount: number
+  reasonLabel: string | null
   reason: string | null
   status: AbsenceStatusName
   reviewerName: string | null

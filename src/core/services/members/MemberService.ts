@@ -1,15 +1,17 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { activeFunctions, activeYoutubers, allDivisions } from '@/core/services/reference/lookups'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { conflict, immutable, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
-import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
+import { activeAbsenceFilter, toAbsence } from '@/core/services/absences/AbsenceService'
+import { toMemberNote } from '@/core/services/members/MemberFileService'
 import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/roles'
 import { isRootIdentity } from '@/declarations/access/identity'
-import { FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { FORM_SETTINGS, PAGINATION_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
@@ -112,9 +114,9 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
 
 export const memberFields = async (): Promise<FieldDefinition[]> => {
   const [divisions, youtubers, functions] = await Promise.all([
-    prisma.division.findMany({ orderBy: { rank: 'asc' } }),
-    prisma.youtuber.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
-    prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+    allDivisions(),
+    activeYoutubers(),
+    activeFunctions(),
   ])
 
   const functionOptions = rowsToOptions(functions)
@@ -366,17 +368,50 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
 }
 
 /**
- * Drop a moderator
+ * Drop the details a member volunteered, keeping everything Discord already
+ * makes public. Notes of follow-up are not touched: they accompany, they do not judge
  * @param {string} id - Account identifier
- * @return {Promise<void>} - Removed
+ * @return {Promise<void>} - Cleared
  */
 
-export const removeMember = async (id: string): Promise<void> => {
+export const clearVolunteeredDetails = async (id: string): Promise<void> => {
+  await prisma.$transaction([
+    prisma.socialLink.deleteMany({ where: { accountId: id } }),
+    prisma.account.update({
+      where: { id },
+      data: { email: null, phone: null, birthday: null, celebrateBirthday: false },
+    }),
+  ])
+}
+
+/**
+ * Close a member's access and drop what they volunteered, the identity they
+ * already show on Discord staying attached to the work they did
+ * @param {string} id - Account identifier
+ * @return {Promise<void>} - Anonymised
+ */
+
+export const anonymiseMember = async (id: string): Promise<void> => {
   const current = await prisma.account.findUnique({ where: { id } })
   if (!current) throw notFound()
   if (isRootIdentity(current.discordId)) throw immutable(MEMBER_COPY.rootLocked)
 
-  await prisma.account.delete({ where: { id } })
+  await clearVolunteeredDetails(id)
+
+  // Credentials go with the access, they are never part of the history
+  await prisma.$transaction([
+    prisma.session.deleteMany({ where: { accountId: id } }),
+    prisma.discordToken.deleteMany({ where: { accountId: id } }),
+    prisma.account.update({
+      where: { id },
+      data: {
+        discordUsername: null,
+        status: MemberStatuses.Left,
+        leftAt: current.leftAt ?? new Date(),
+        anonymisedAt: new Date(),
+      },
+    }),
+  ])
 }
 
 /**
@@ -392,7 +427,11 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
     include: {
       ...SUMMARY_INCLUDE,
       socialLinks: { orderBy: { position: 'asc' } },
-      absences: { include: { reviewer: true }, orderBy: { startDate: 'desc' } },
+      absences: {
+        include: { reviewer: true },
+        orderBy: { startDate: 'desc' },
+        take: PAGINATION_SETTINGS.defaultPerPage,
+      },
       teamMemberships: { include: { team: true } },
       _count: {
         select: {
@@ -416,18 +455,9 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
       })
     : []
 
-  const absences: MemberAbsence[] = row.absences.map((absence) => ({
-    id: absence.id,
-    accountId: row.id,
-    memberName: row.displayName,
-    startDate: absence.startDate.toISOString(),
-    endDate: absence.endDate.toISOString(),
-    dayCount: absence.dayCount,
-    reason: absence.reason,
-    status: absence.status,
-    reviewerName: absence.reviewer?.displayName ?? null,
-    reviewNote: absence.reviewNote,
-  }))
+  const absences: MemberAbsence[] = row.absences.map((absence) =>
+    toAbsence(absence, row.displayName)
+  )
 
   const now = new Date()
   const isAbsent = row.absences.some(
@@ -464,13 +494,7 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
     celebrateBirthday: row.celebrateBirthday,
     languages: row.languages,
     leftAt: row.leftAt?.toISOString() ?? null,
-    notes: notes.map((note) => ({
-      id: note.id,
-      body: note.body,
-      pinned: note.pinned,
-      authorName: note.author?.displayName ?? null,
-      createdAt: note.createdAt.toISOString(),
-    })),
+    notes: notes.map(toMemberNote),
     socials: row.socialLinks.map((link) => ({
       id: link.id,
       label: link.label,

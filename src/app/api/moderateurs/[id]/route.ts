@@ -2,12 +2,13 @@ import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import {
+  anonymiseMember,
   memberFields,
   readMember,
-  removeMember,
   updateMember,
 } from '@/core/services/members/MemberService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { summariseChange } from '@/core/services/system/changes'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
@@ -20,9 +21,12 @@ export const PATCH = createProtectedRoute({
   permission: Permissions.MemberUpdate,
   descriptor: { summary: 'Edit a moderator', tags: ['members'] },
   handler: async ({ params, raw, session }) => {
-    const parsed = parseFormValues(await memberFields(), raw, { fillMissing: true })
+    const fields = await memberFields()
+
+    const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
+    const before = await readMember(params.id)
     const member = await updateMember(params.id, parsed.values)
 
     await recordEvent({
@@ -32,6 +36,7 @@ export const PATCH = createProtectedRoute({
       targetType: 'member',
       targetId: member.id,
       summary: member.displayName,
+      change: summariseChange(fields, before.values, parsed.values),
     })
 
     return member
@@ -40,10 +45,10 @@ export const PATCH = createProtectedRoute({
 
 export const DELETE = createProtectedRoute({
   permission: Permissions.MemberDelete,
-  descriptor: { summary: 'Drop a moderator', tags: ['members'] },
+  descriptor: { summary: 'Close a moderator access', tags: ['members'] },
   handler: async ({ params, session }) => {
     const member = await readMember(params.id)
-    await removeMember(params.id)
+    await anonymiseMember(params.id)
 
     await recordEvent({
       eventType: 'MemberDeleted',
