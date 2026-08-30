@@ -1,13 +1,8 @@
-import { createBinaryRoute } from '@/core/lib/http/route'
-import { readFile } from '@/core/services/system/FileService'
+import { createMediaRoute } from '@/core/lib/http/route'
+import { describeFile, readFileBytes } from '@/core/services/system/FileService'
 
-// A stored file never changes, so the browser may hold it for a day
-const CACHE_SECONDS = 86_400
-
-export const GET = createBinaryRoute({
+export const GET = createMediaRoute({
   descriptor: { summary: 'Serve a stored file', tags: ['files'] },
-  handler: async ({ params }) => ({
-    ...(await readFile(params.id)),
-    maxAgeSeconds: CACHE_SECONDS,
-  }),
+  describe: ({ id }) => describeFile(id),
+  read: ({ id }) => readFileBytes(id),
 })

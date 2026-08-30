@@ -3,23 +3,12 @@ import 'server-only'
 import crypto from 'crypto'
 
 import { prisma } from '@/core/lib/db'
+import { sniffMimeType } from '@/declarations/system/signatures'
 import { STORAGE_BUCKETS } from '@/declarations/system/storage'
 import type Sharding from '@/managers/infrastructure/Core/Sharding'
 import type LoggerManager from '@/managers/infrastructure/Core/LoggerManager'
 import type { StorageConfig, StorageDriver } from '@/types/infrastructure'
 import type { StorageInfo, StorageLocation, StorageObject, StorageWrite } from '@/types/storage'
-
-// File type signatures
-const SIGNATURES: { mime: string; bytes: number[]; offset: number }[] = [
-  { mime: 'image/png', bytes: [0x89, 0x50, 0x4e, 0x47], offset: 0 },
-  { mime: 'image/jpeg', bytes: [0xff, 0xd8, 0xff], offset: 0 },
-  { mime: 'image/gif', bytes: [0x47, 0x49, 0x46], offset: 0 },
-  { mime: 'image/webp', bytes: [0x57, 0x45, 0x42, 0x50], offset: 8 },
-  { mime: 'application/pdf', bytes: [0x25, 0x50, 0x44, 0x46], offset: 0 },
-]
-
-// Fallback type
-const BINARY = 'application/octet-stream'
 
 /**
  * Cache entry
@@ -133,11 +122,7 @@ export default class StorageManager {
    */
 
   getContentType(data: Uint8Array<ArrayBufferLike>): string {
-    const found = SIGNATURES.find((signature) =>
-      signature.bytes.every((byte, index) => data[signature.offset + index] === byte)
-    )
-
-    return found?.mime ?? BINARY
+    return sniffMimeType(data)
   }
 
   /**
