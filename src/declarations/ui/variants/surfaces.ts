@@ -220,3 +220,54 @@ export const PREFERENCE_STYLES = {
   identity: 'flex items-center gap-4 pb-4',
   footer: 'flex justify-end pt-4',
 } as const
+
+/**
+ * Sign-in screen styles
+ * @type {Record<string, string>}
+ */
+
+export const SIGN_IN_STYLES = {
+  stack: 'flex flex-col gap-5',
+  alert:
+    'rounded-[var(--radius-md)] border border-[var(--color-danger)] bg-[var(--color-surface)] px-3 py-2 text-xs text-[var(--color-danger)]',
+  divider: 'flex items-center gap-3 text-[11px] text-[var(--color-ink-subtle)] uppercase',
+  rule: 'h-px flex-1 bg-[var(--color-border)]',
+  notice: 'text-xs text-[var(--color-ink-subtle)] italic',
+  footer: 'pt-1 text-center text-xs',
+  link: 'text-[var(--color-ink-subtle)] underline underline-offset-2 hover:text-[var(--color-ink)]',
+} as const
+
+/**
+ * Privacy notice styles
+ * @type {Record<string, string>}
+ */
+
+export const PRIVACY_STYLES = {
+  page: 'mx-auto flex w-full max-w-3xl flex-col gap-8 px-6 py-12',
+  section: 'flex flex-col gap-3',
+  heading: 'text-lg font-bold tracking-tight',
+  lead: 'text-sm text-[var(--color-ink-subtle)]',
+  card: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 text-sm',
+  scroller: 'overflow-x-auto',
+  table: 'w-full min-w-[40rem] border-collapse text-left text-sm',
+  head: 'border-b border-[var(--color-border)] pb-2 text-xs font-semibold uppercase text-[var(--color-ink-subtle)]',
+  cell: 'border-b border-[var(--color-border)] py-3 pr-4 align-top',
+  footer: 'text-sm',
+} as const
+
+/**
+ * History consent screen styles
+ * @type {Record<string, string>}
+ */
+
+export const CONSENT_STYLES = {
+  stack: 'flex flex-col gap-4',
+  heading: 'text-base font-bold tracking-tight',
+  body: 'flex flex-col gap-3 text-sm text-[var(--color-ink-subtle)]',
+  choice: 'flex items-start gap-3 text-sm',
+  // Both answers sit centred on one column, the rule between them matching their width
+  actions: 'mx-auto flex w-full max-w-xs flex-col items-stretch gap-3 pt-2',
+  action: 'w-full justify-center',
+  divider: 'h-px w-full bg-[var(--color-border)]',
+  error: 'text-center text-xs text-[var(--color-danger)]',
+} as const

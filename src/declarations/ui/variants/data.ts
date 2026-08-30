@@ -42,6 +42,9 @@ export const GROUP_STYLES = {
   stack: 'flex flex-col',
   section: 'flex flex-col gap-3',
   sectionDivided: 'border-t border-[var(--color-border)] pt-6',
+  // Page-level buckets, a rule centred in the gap between each
+  ruledStack: 'flex flex-col divide-y divide-[var(--color-border)]',
+  ruledSection: 'flex flex-col gap-4 py-8 first:pt-0 last:pb-0',
   heading: 'flex w-full items-center gap-2 text-left text-sm font-semibold text-[var(--color-ink)]',
   count: 'font-normal text-[var(--color-ink-subtle)]',
   bubble: 'inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-brand-600)]',
@@ -183,6 +186,8 @@ export const CALENDAR_STYLES = {
     'relative flex w-full cursor-grab items-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-opacity hover:opacity-80 active:cursor-grabbing',
   entryTime: 'shrink-0 tabular-nums opacity-70',
   entryTitle: 'truncate font-medium',
+  // Full-colour fill, black label — pastel is kept for zones only
+  entrySolid: 'text-[var(--color-on-accent)]',
   entrySelected:
     'ring-2 ring-[var(--color-brand-600)] ring-offset-1 ring-offset-[var(--color-surface-raised)]',
   entryReadOnly: 'cursor-pointer border border-dashed',
@@ -209,6 +214,26 @@ export const CALENDAR_STYLES = {
   selectionBar:
     'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-brand-400)] bg-[var(--color-brand-soft)]/60 px-3 py-2 text-sm',
   selectionCount: 'font-semibold tabular-nums',
+  // Detail modal, meeting subjects and birthday note
+  detailList: 'flex list-disc flex-col gap-1 pl-5 text-sm',
+  detailNote: 'text-sm text-[var(--color-ink-subtle)]',
+  // Roll-call panel inside the detail modal
+  chipMark: 'h-3 w-3 shrink-0 opacity-80',
+  rollCall:
+    'flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3',
+  rollCallHead: 'flex items-center gap-2 text-sm font-semibold',
+  rollCallAnswer: 'flex flex-wrap gap-2',
+  rollCallCounts: 'flex flex-wrap gap-1.5',
+  rollCallLists: 'flex flex-col gap-3',
+  rollCallGroup: 'flex flex-col gap-1.5',
+  rollCallPeople: 'flex flex-col gap-1',
+  rollCallPerson: 'flex items-center gap-2 text-sm',
+  // Hover preview card, portalled above the chip
+  preview:
+    'fixed z-[70] flex w-72 flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 text-sm shadow-[var(--shadow-md)]',
+  previewHead: 'flex items-center gap-2 font-semibold',
+  previewTitle: 'truncate',
+  previewMeta: 'flex flex-col gap-1 text-xs text-[var(--color-ink-subtle)]',
 } as const
 
 /**

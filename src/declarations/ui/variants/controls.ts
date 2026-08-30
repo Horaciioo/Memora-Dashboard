@@ -10,6 +10,7 @@ export const BUTTON_STYLES = {
     'border border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] px-3 py-2 hover:bg-[var(--color-surface-sunken)]',
   ghost:
     'px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface-sunken)] hover:text-[var(--color-ink)]',
+  success: 'bg-[var(--color-success)] px-4 py-2 text-[var(--color-on-brand)] hover:opacity-90',
   danger: 'bg-[var(--color-danger)] px-4 py-2 text-[var(--color-on-brand)] hover:opacity-90',
   icon: 'h-9 w-9 rounded-[var(--radius-md)] p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   link: 'p-0 text-[var(--color-brand-600)] underline-offset-2 hover:underline',

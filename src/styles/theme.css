@@ -29,6 +29,8 @@
   --color-brand-800: #be185d;
   --color-brand-900: #9d174d;
   --color-on-brand: #ffffff;
+  /* Black label laid over a full-colour fill */
+  --color-on-accent: #18181b;
 
   /* Category tones — solid, never mixed with the rose */
   --color-success: #15803d;
