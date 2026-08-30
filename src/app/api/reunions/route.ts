@@ -3,6 +3,7 @@ import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { createMeeting, listMeetings, meetingFields } from '@/core/services/work/MeetingService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notify } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
@@ -27,6 +28,17 @@ export const POST = createProtectedRoute({
       targetType: 'meeting',
       targetId: meeting.id,
       summary: meeting.title,
+    })
+
+    await notify({
+      kind: 'MeetingInvited',
+      recipients: [...meeting.leads, ...meeting.assistants, ...meeting.participants].map(
+        (person) => person.id
+      ),
+      actorId: session.id,
+      target: 'meeting',
+      targetId: meeting.id,
+      subject: meeting.title,
     })
 
     return meeting

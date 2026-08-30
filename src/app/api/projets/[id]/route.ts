@@ -8,6 +8,8 @@ import {
   updateProject,
 } from '@/core/services/work/ProjectService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { summariseChange } from '@/core/services/system/changes'
+import { notify } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
@@ -20,10 +22,14 @@ export const PATCH = createProtectedRoute({
   permission: Permissions.ProjectUpdate,
   descriptor: { summary: 'Edit a project', tags: ['projects'] },
   handler: async ({ params, raw, session, scope }) => {
-    const parsed = parseFormValues(await projectFields(await scope()), raw, { fillMissing: true })
+    const perimeter = await scope()
+    const fields = await projectFields(perimeter)
+
+    const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const project = await updateProject(params.id, parsed.values, await scope(), session.id)
+    const before = await readProject(params.id)
+    const project = await updateProject(params.id, parsed.values, perimeter, session.id)
 
     await recordEvent({
       eventType: 'ProjectUpdated',
@@ -31,6 +37,17 @@ export const PATCH = createProtectedRoute({
       targetType: 'project',
       targetId: project.id,
       summary: project.title,
+      change: summariseChange(fields, before.summary.values, project.values),
+    })
+
+    await notify({
+      kind: 'ProjectAssigned',
+      recipients: [...project.leads, ...project.assistants].map((person) => person.id),
+      actorId: session.id,
+      target: 'project',
+      targetId: project.id,
+      subject: project.title,
+      once: true,
     })
 
     return project

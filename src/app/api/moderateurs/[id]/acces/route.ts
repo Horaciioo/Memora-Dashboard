@@ -2,6 +2,7 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { readOverrides, replaceOverrides } from '@/core/services/members/MemberFileService'
 import type { MemberOverride } from '@/core/services/members/MemberFileService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notify } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
@@ -24,6 +25,14 @@ export const PUT = createProtectedRoute({
       targetType: 'member',
       targetId: params.id,
       summary: String(stored.length),
+    })
+
+    await notify({
+      kind: 'AccessChanged',
+      recipients: [params.id],
+      actorId: session.id,
+      target: 'member',
+      targetId: params.id,
     })
 
     return stored

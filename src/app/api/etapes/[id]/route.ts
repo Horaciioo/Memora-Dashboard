@@ -11,6 +11,7 @@ import {
   updateStep,
 } from '@/core/services/academy/AcademyService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notify } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
@@ -36,6 +37,14 @@ export const PATCH = createProtectedRoute({
           targetType: 'academy-step',
           targetId: params.id,
           summary: step?.title ?? params.id,
+        })
+
+        await notify({
+          kind: 'StepValidated',
+          recipients: [step?.accountId],
+          actorId: session.id,
+          target: 'training',
+          subject: step?.title ?? null,
         })
       }
 

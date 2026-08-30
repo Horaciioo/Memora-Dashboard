@@ -3,6 +3,7 @@ import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { createProject, listProjects, projectFields } from '@/core/services/work/ProjectService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notify } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
@@ -27,6 +28,15 @@ export const POST = createProtectedRoute({
       targetType: 'project',
       targetId: project.id,
       summary: project.title,
+    })
+
+    await notify({
+      kind: 'ProjectAssigned',
+      recipients: [...project.leads, ...project.assistants].map((person) => person.id),
+      actorId: session.id,
+      target: 'project',
+      targetId: project.id,
+      subject: project.title,
     })
 
     return project

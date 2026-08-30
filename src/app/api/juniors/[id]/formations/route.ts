@@ -4,6 +4,7 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { setTrainingRecord } from '@/core/services/academy/AcademyService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notify } from '@/core/services/system/NotificationService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -26,14 +27,24 @@ export const PATCH = createProtectedRoute({
     // Revoking is a correction, only a clearance is worth a journal line
     if (validated) {
       const training = await prisma.training.findUnique({ where: { id: trainingId } })
+      const learner = juniors.find((entry) => entry.id === params.id)?.accountId
 
       await recordEvent({
         eventType: 'TrainingValidated',
         actorId: session.id,
-        subjectId: juniors.find((entry) => entry.id === params.id)?.accountId,
+        subjectId: learner,
         targetType: 'training',
         targetId: trainingId,
         summary: training?.name ?? trainingId,
+      })
+
+      await notify({
+        kind: 'TrainingValidated',
+        recipients: [learner],
+        actorId: session.id,
+        target: 'training',
+        targetId: trainingId,
+        subject: training?.name ?? null,
       })
     }
 

@@ -3,6 +3,7 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { decideReview } from '@/core/services/academy/AcademyService'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notify } from '@/core/services/system/NotificationService'
 import { ReviewAdvices, ReviewStatuses } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -30,6 +31,14 @@ export const POST = createProtectedRoute({
         targetType: 'academy-review',
         targetId: params.id,
         summary: decided.stage,
+      })
+
+      await notify({
+        kind: 'ReviewDecided',
+        recipients: [row?.junior.accountId],
+        actorId: session.id,
+        target: 'training',
+        subject: decided.stage,
       })
 
       // A stopped follow-up does not advance, every other outcome moves the junior forward

@@ -8,6 +8,7 @@ import {
   setJuniorSkill,
 } from '@/core/services/academy/AcademyService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notify } from '@/core/services/system/NotificationService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -43,6 +44,14 @@ export const PATCH = createProtectedRoute({
       targetType: 'skill',
       targetId: skillId,
       summary: skill?.name ?? skillId,
+    })
+
+    await notify({
+      kind: 'SkillGraded',
+      recipients: [account.accountId],
+      actorId: session.id,
+      target: 'training',
+      subject: skill?.name ?? null,
     })
 
     return skills
