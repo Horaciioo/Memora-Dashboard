@@ -1,6 +1,20 @@
-import moment from 'moment'
-
-import { DATE_LOCALE } from '@/declarations/ui/dates'
+import {
+  MONTH_GRID_DAYS,
+  WEEK_GRID_DAYS,
+  addDays,
+  addMonths,
+  atTime,
+  dayMonthLabel,
+  endOfDay,
+  formatDayKey,
+  isSameDay,
+  monthLabel,
+  parseDay,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+  timeLabel,
+} from '@/utils/format/days'
 
 /**
  * One day of a rendered grid
@@ -18,16 +32,28 @@ export interface CalendarDay {
   isToday: boolean
 }
 
-// Grids always start on Monday, matching the weekday labels
-const WEEK_START = 1
-
 /**
  * Read the ISO day of a moment
  * @param {Date | string} date - Moment to read
  * @return {string} - ISO day
  */
 
-export const toDayKey = (date: Date | string): string => moment(date).format('YYYY-MM-DD')
+export const toDayKey = (date: Date | string): string => formatDayKey(date)
+
+/**
+ * Build one day of a grid
+ * @param {Date} day - Day being drawn
+ * @param {number} currentMonth - Month on screen
+ * @param {Date} today - Current day
+ * @return {CalendarDay} - Grid day
+ */
+
+const toCalendarDay = (day: Date, currentMonth: number, today: Date): CalendarDay => ({
+  key: formatDayKey(day),
+  dayOfMonth: day.getDate(),
+  isCurrentMonth: day.getMonth() === currentMonth,
+  isToday: isSameDay(day, today),
+})
 
 /**
  * Build the six week grid of one month
@@ -36,20 +62,14 @@ export const toDayKey = (date: Date | string): string => moment(date).format('YY
  */
 
 export const monthGrid = (anchor: string): CalendarDay[] => {
-  const month = moment(anchor)
-  const cursor = month.clone().startOf('month').isoWeekday(WEEK_START)
+  const month = parseDay(anchor)
+  const cursor = startOfWeek(startOfMonth(month))
+  const today = new Date()
 
   // A month never spans more than six weeks, so the grid is always the same height
-  return Array.from({ length: 42 }, (_, index) => {
-    const day = cursor.clone().add(index, 'days')
-
-    return {
-      key: day.format('YYYY-MM-DD'),
-      dayOfMonth: day.date(),
-      isCurrentMonth: day.month() === month.month(),
-      isToday: day.isSame(moment(), 'day'),
-    }
-  })
+  return Array.from({ length: MONTH_GRID_DAYS }, (_, index) =>
+    toCalendarDay(addDays(cursor, index), month.getMonth(), today)
+  )
 }
 
 /**
@@ -59,17 +79,13 @@ export const monthGrid = (anchor: string): CalendarDay[] => {
  */
 
 export const weekGrid = (anchor: string): CalendarDay[] => {
-  const start = moment(anchor).isoWeekday(WEEK_START)
+  const start = startOfWeek(parseDay(anchor))
+  const today = new Date()
 
-  return Array.from({ length: 7 }, (_, index) => {
-    const day = start.clone().add(index, 'days')
+  return Array.from({ length: WEEK_GRID_DAYS }, (_, index) => {
+    const day = addDays(start, index)
 
-    return {
-      key: day.format('YYYY-MM-DD'),
-      dayOfMonth: day.date(),
-      isCurrentMonth: true,
-      isToday: day.isSame(moment(), 'day'),
-    }
+    return { ...toCalendarDay(day, day.getMonth(), today), isCurrentMonth: true }
   })
 }
 
@@ -80,10 +96,8 @@ export const weekGrid = (anchor: string): CalendarDay[] => {
  */
 
 export const gridRange = (days: CalendarDay[]): { from: string; to: string } => ({
-  from: moment(days[0].key).startOf('day').toISOString(),
-  to: moment(days[days.length - 1].key)
-    .endOf('day')
-    .toISOString(),
+  from: startOfDay(parseDay(days[0].key)).toISOString(),
+  to: endOfDay(parseDay(days[days.length - 1].key)).toISOString(),
 })
 
 /**
@@ -94,8 +108,13 @@ export const gridRange = (days: CalendarDay[]): { from: string; to: string } => 
  * @return {string} - New ISO day
  */
 
-export const shiftAnchor = (anchor: string, unit: 'month' | 'week', amount: number): string =>
-  moment(anchor).add(amount, unit).format('YYYY-MM-DD')
+export const shiftAnchor = (anchor: string, unit: 'month' | 'week', amount: number): string => {
+  const day = parseDay(anchor)
+
+  return formatDayKey(
+    unit === 'month' ? addMonths(day, amount) : addDays(day, amount * WEEK_GRID_DAYS)
+  )
+}
 
 /**
  * Title of the period on screen
@@ -105,13 +124,13 @@ export const shiftAnchor = (anchor: string, unit: 'month' | 'week', amount: numb
  */
 
 export const periodLabel = (anchor: string, unit: 'month' | 'week'): string => {
-  const day = moment(anchor).locale(DATE_LOCALE)
+  const day = parseDay(anchor)
 
-  if (unit === 'month') return day.format('MMMM YYYY')
+  if (unit === 'month') return monthLabel(day)
 
-  const start = day.clone().isoWeekday(WEEK_START)
+  const start = startOfWeek(day)
 
-  return `${start.format('D MMM')} – ${start.clone().add(6, 'days').format('D MMM YYYY')}`
+  return `${dayMonthLabel(start)} – ${dayMonthLabel(addDays(start, WEEK_GRID_DAYS - 1), true)}`
 }
 
 /**
@@ -122,10 +141,9 @@ export const periodLabel = (anchor: string, unit: 'month' | 'week'): string => {
  */
 
 export const moveToDay = (startsAt: string, dayKey: string): Date => {
-  const source = moment(startsAt)
-  const target = moment(dayKey)
+  const source = parseDay(startsAt)
 
-  return target.hour(source.hour()).minute(source.minute()).second(0).millisecond(0).toDate()
+  return atTime(parseDay(dayKey), source.getHours(), source.getMinutes())
 }
 
 /**
@@ -135,8 +153,7 @@ export const moveToDay = (startsAt: string, dayKey: string): Date => {
  * @return {Date} - New moment
  */
 
-export const moveToSlot = (dayKey: string, hour: number): Date =>
-  moment(dayKey).hour(hour).minute(0).second(0).millisecond(0).toDate()
+export const moveToSlot = (dayKey: string, hour: number): Date => atTime(parseDay(dayKey), hour)
 
 /**
  * Read the hour of a moment
@@ -144,7 +161,7 @@ export const moveToSlot = (dayKey: string, hour: number): Date =>
  * @return {number} - Hour of the day
  */
 
-export const hourOf = (date: string): number => moment(date).hour()
+export const hourOf = (date: string): number => parseDay(date).getHours()
 
 /**
  * Read the time of a moment
@@ -152,7 +169,7 @@ export const hourOf = (date: string): number => moment(date).hour()
  * @return {string} - Hours and minutes
  */
 
-export const timeOf = (date: string): string => moment(date).format('HH:mm')
+export const timeOf = (date: string): string => timeLabel(parseDay(date))
 
 /**
  * Tell whether an entry is still running on one day
@@ -163,11 +180,11 @@ export const timeOf = (date: string): string => moment(date).format('HH:mm')
  */
 
 export const coversDay = (startsAt: string, endsAt: string | null, dayKey: string): boolean => {
-  const day = moment(dayKey)
+  const day = startOfDay(parseDay(dayKey)).getTime()
 
   return (
-    day.isSameOrAfter(moment(startsAt), 'day') &&
-    day.isSameOrBefore(moment(endsAt ?? startsAt), 'day')
+    day >= startOfDay(parseDay(startsAt)).getTime() &&
+    day <= startOfDay(parseDay(endsAt ?? startsAt)).getTime()
   )
 }
 
@@ -179,7 +196,7 @@ export const coversDay = (startsAt: string, endsAt: string | null, dayKey: strin
  */
 
 export const lastDayKey = (startsAt: string, endsAt: string | null): string =>
-  moment(endsAt ?? startsAt).format('YYYY-MM-DD')
+  formatDayKey(endsAt ?? startsAt)
 
 /**
  * Read the moment one slot ends on
@@ -188,13 +205,7 @@ export const lastDayKey = (startsAt: string, endsAt: string | null): string =>
  * @return {Date} - End of the slot
  */
 
-export const slotEnd = (dayKey: string, hour: number): Date =>
-  moment(dayKey)
-    .hour(hour + 1)
-    .minute(0)
-    .second(0)
-    .millisecond(0)
-    .toDate()
+export const slotEnd = (dayKey: string, hour: number): Date => atTime(parseDay(dayKey), hour + 1)
 
 /**
  * Read the whole day as a moment pair
@@ -208,10 +219,14 @@ export const dayBounds = (
   dayKey: string,
   startHour: number,
   endHour: number
-): { startsAt: Date; endsAt: Date } => ({
-  startsAt: moment(dayKey).hour(startHour).startOf('hour').toDate(),
-  endsAt: moment(dayKey).hour(endHour).endOf('hour').toDate(),
-})
+): { startsAt: Date; endsAt: Date } => {
+  const day = parseDay(dayKey)
+
+  return {
+    startsAt: atTime(day, startHour),
+    endsAt: new Date(atTime(day, endHour).getTime() + 3_599_999),
+  }
+}
 
 /**
  * Order two grid keys, a slide being just as valid backwards
@@ -229,4 +244,4 @@ export const orderKeys = (first: string, second: string): [string, string] =>
  * @return {string} - Field value
  */
 
-export const toFieldValue = (date: Date): string => moment(date).format('YYYY-MM-DDTHH:mm')
+export const toFieldValue = (date: Date): string => `${formatDayKey(date)}T${timeLabel(date)}`

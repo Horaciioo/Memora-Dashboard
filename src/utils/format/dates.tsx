@@ -1,10 +1,14 @@
-import moment from 'moment'
 import React, { ReactNode } from 'react'
 
 import { DATE_COPY, DATE_LOCALE, MONTH_LABELS } from '@/declarations/ui/dates'
+import { timeLabel } from '@/utils/format/days'
 
 // Milliseconds in one day
 const DAY_MS = 86_400_000
+
+// Milliseconds in one minute and one hour, read by the elapsed wording
+const MINUTE_MS = 60_000
+const HOUR_MS = 3_600_000
 
 /**
  * Format custom date
@@ -57,11 +61,16 @@ export function formatDateToISO(dateString: string): string {
 
 export function formatDate(date: Date | string, utc: boolean = true): ReactNode {
   // Format date and time
-  const formattedDate = moment(date).format('DD/MM/YYYY')
-  const formattedHour = moment(date).format('HH:mm')
+  const parsed = new Date(date)
+  const formattedDate = parsed.toLocaleDateString(DATE_LOCALE, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
+  const formattedHour = timeLabel(parsed)
 
   // Get timezone offset
-  const timezoneOffset = moment(date).utcOffset() / 60
+  const timezoneOffset = -parsed.getTimezoneOffset() / 60
 
   return (
     <>
@@ -190,4 +199,25 @@ export function toDateTimeInput(date: Date | string | null | undefined): string 
   const offset = parsed.getTimezoneOffset() * 60_000
 
   return new Date(parsed.getTime() - offset).toISOString().slice(0, 16)
+}
+
+/**
+ * Describe how long ago a moment passed
+ * @param {Date | string} date - Past moment
+ * @return {string} - Elapsed wording
+ */
+
+export function formatSince(date: Date | string): string {
+  const elapsed = Date.now() - new Date(date).getTime()
+
+  // Anything under a minute reads as immediate
+  if (elapsed < MINUTE_MS) return DATE_COPY.justNow
+  if (elapsed < HOUR_MS) {
+    return DATE_COPY.minutesAgo.replace('{count}', String(Math.floor(elapsed / MINUTE_MS)))
+  }
+  if (elapsed < DAY_MS) {
+    return DATE_COPY.hoursAgo.replace('{count}', String(Math.floor(elapsed / HOUR_MS)))
+  }
+
+  return DATE_COPY.daysAgo.replace('{count}', String(Math.floor(elapsed / DAY_MS)))
 }
