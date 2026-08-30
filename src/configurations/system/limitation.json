@@ -1,0 +1,9 @@
+{
+  "signIn": { "windowSeconds": 300, "max": 10 },
+  "admission": { "windowSeconds": 3600, "max": 5 },
+  "mutation": { "windowSeconds": 60, "max": 60 },
+  "read": { "windowSeconds": 60, "max": 300 },
+  "upload": { "windowSeconds": 3600, "max": 40 },
+  "search": { "windowSeconds": 60, "max": 120 },
+  "export": { "windowSeconds": 86400, "max": 5 }
+}

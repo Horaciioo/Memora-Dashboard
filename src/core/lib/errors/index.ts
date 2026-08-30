@@ -25,13 +25,20 @@ export class AppError extends Error {
   readonly code: ErrorCode
   readonly status: number
   readonly issues: AppErrorIssue[]
+  readonly retryAfterSeconds?: number
 
-  constructor(code: ErrorCode, message?: string, issues: AppErrorIssue[] = []) {
+  constructor(
+    code: ErrorCode,
+    message?: string,
+    issues: AppErrorIssue[] = [],
+    retryAfterSeconds?: number
+  ) {
     super(message ?? ERROR_MESSAGES[code])
     this.name = 'AppError'
     this.code = code
     this.status = ERROR_STATUSES[code]
     this.issues = issues
+    this.retryAfterSeconds = retryAfterSeconds
   }
 }
 
@@ -98,6 +105,16 @@ export const invalidInput = (issues: AppErrorIssue[], message?: string): AppErro
 
 export const accountDisabled = (message?: string): AppError =>
   new AppError(ErrorCodes.AccountDisabled, message)
+
+/**
+ * Exhausted rate limit
+ * @param {number} retryAfterSeconds - Wait before retrying
+ * @param {string} [message] - Override message
+ * @return {AppError} - Error
+ */
+
+export const rateLimited = (retryAfterSeconds: number, message?: string): AppError =>
+  new AppError(ErrorCodes.RateLimited, message, [], retryAfterSeconds)
 
 /**
  * Normalise an unknown throw
