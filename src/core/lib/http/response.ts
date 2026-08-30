@@ -60,6 +60,12 @@ export const fail = (error: unknown): Response => {
   // Only an unexpected throw is worth a log line, an expected one is a return value
   if (appError.code === ErrorCodes.SystemFailure) logger.error('[api]', error)
 
+  // An exhausted limit tells the caller when to come back
+  const headers =
+    appError.retryAfterSeconds === undefined
+      ? undefined
+      : { 'retry-after': String(appError.retryAfterSeconds) }
+
   return Response.json(
     {
       success: false,
@@ -67,6 +73,6 @@ export const fail = (error: unknown): Response => {
       error: appError.message,
       issues: appError.issues,
     } satisfies ApiFailure,
-    { status: appError.status }
+    { status: appError.status, ...(headers ? { headers } : {}) }
   )
 }
