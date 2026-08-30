@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import type { ReactNode } from 'react'
 import '@/styles/globals.css'
 import { ThemeScript } from '@/components/tools/ThemeScript'
 import { ColorVisionFilters } from '@/components/tools/ColorVisionFilters'
 import { Providers } from '@/app/providers'
 import { getSession } from '@/core/lib/auth/getSession'
+import { NONCE_HEADER } from '@/declarations/system/securityHeaders'
 import { APP_COMPANY, APP_DESCRIPTION, APP_FONTS, APP_NAME } from '@/declarations/app'
 
 export const metadata: Metadata = {
@@ -22,7 +24,8 @@ export const metadata: Metadata = {
  */
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const initialSession = await getSession()
+  const [initialSession, headerStore] = await Promise.all([getSession(), headers()])
+  const nonce = headerStore.get(NONCE_HEADER) ?? undefined
 
   return (
     <html lang="fr" suppressHydrationWarning>
@@ -31,7 +34,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <link key={href} rel="preconnect" href={href} crossOrigin="anonymous" />
         ))}
         <link rel="stylesheet" href={APP_FONTS.stylesheet} />
-        <ThemeScript />
+        <ThemeScript nonce={nonce} />
       </head>
       <body className="bg-[var(--color-background)] text-[var(--color-ink)] antialiased">
         <ColorVisionFilters />

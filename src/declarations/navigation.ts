@@ -1,3 +1,4 @@
+import type { MaturityName } from '@/declarations/maturity/registries'
 import type { IconName } from '@/declarations/ui/icons'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
@@ -11,6 +12,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
 export const ROUTES = {
   home: '/',
   login: '/connexion',
+  privacy: '/confidentialite',
   admission: (token: string) => `/admission/${token}`,
   dashboard: '/tableau-de-bord',
   members: '/moderateurs',
@@ -25,6 +27,8 @@ export const ROUTES = {
   absences: '/absences',
   livecon: '/livecon',
   calendar: '/calendrier',
+  calendarEvent: (id: string) => `/calendrier?evenement=${id}`,
+  calendarLegend: '/calendrier/legende',
   trainings: '/formations',
   academy: '/academy',
   glossary: '/academy/lexique',
@@ -33,6 +37,8 @@ export const ROUTES = {
   recruitments: '/recrutements',
   recruitment: (id: string) => `/recrutements/${id}`,
   sanctions: '/moderation/sanctions',
+  notifications: '/notifications',
+  maturity: '/maturite',
   preferences: '/parametres',
   settings: '/configuration',
   settingsSection: (section: string) => `/configuration/${section}`,
@@ -59,7 +65,7 @@ export interface NavigationCondition {
  * @property {IconName} icon - Icon key
  * @property {PermissionName} [permission] - Permission needed
  * @property {NavigationCondition} [visibleWhen] - Display rule
- * @property {boolean} [wip] - Marked as under construction
+ * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
  */
 
 export interface NavigationItem {
@@ -68,7 +74,7 @@ export interface NavigationItem {
   icon: IconName
   permission?: PermissionName
   visibleWhen?: NavigationCondition
-  wip?: boolean
+  maturity?: MaturityName
 }
 
 /**
@@ -131,13 +137,19 @@ export const NAVIGATION: NavigationGroup[] = [
     label: 'Personnel',
     views: [NavigationViews.Moderation, NavigationViews.Administration],
     items: [
-      { href: ROUTES.dashboard, label: 'Mon tableau de bord', icon: 'dashboard', wip: true },
+      {
+        href: ROUTES.dashboard,
+        label: 'Mon tableau de bord',
+        icon: 'dashboard',
+        maturity: 'dev',
+      },
       { href: ROUTES.absences, label: 'Absences', icon: 'absences' },
       {
         href: ROUTES.calendar,
         label: 'Calendrier',
         icon: 'meetings',
         permission: Permissions.CalendarRead,
+        maturity: 'beta',
       },
       {
         href: ROUTES.trainings,
@@ -178,23 +190,25 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.MemberRead,
       },
       { href: ROUTES.teams, label: 'Équipes', icon: 'teams', permission: Permissions.TeamRead },
-      {
-        href: ROUTES.academy,
-        label: 'Marsha Academy',
-        icon: 'academy',
-        permission: Permissions.AcademyRead,
-      },
+    ],
+  },
+  {
+    label: 'Vivier',
+    views: [NavigationViews.Administration],
+    items: [
       {
         href: ROUTES.recruitments,
         label: 'Recrutements',
         icon: 'recruitment',
         permission: Permissions.RecruitmentRead,
+        maturity: 'beta',
       },
       {
-        href: ROUTES.glossary,
-        label: 'Lexique',
-        icon: 'glossary',
+        href: ROUTES.academy,
+        label: 'Marsha Academy',
+        icon: 'academy',
         permission: Permissions.AcademyRead,
+        maturity: 'alpha',
       },
     ],
   },
@@ -251,12 +265,15 @@ export const SEGMENT_LABELS: Record<string, string> = {
   absences: 'Absences',
   livecon: 'Livecon',
   calendrier: 'Calendrier',
+  legende: 'Légende',
   formations: 'Formations',
   academy: 'Marsha Academy',
   recrutements: 'Recrutements',
   lexique: 'Lexique',
   moderation: 'Modération',
   sanctions: 'Panel de sanctions',
+  notifications: 'Notifications',
+  maturite: 'Maturité',
   parametres: 'Paramètres',
   configuration: 'Configuration',
   acces: 'Accès',

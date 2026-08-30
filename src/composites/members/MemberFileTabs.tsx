@@ -5,6 +5,7 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { Button } from '@/components/elements/actions/Button'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
 import { AddRow } from '@/components/structures/AddRow'
@@ -30,6 +31,7 @@ import type { MemberOverride } from '@/core/services/members/MemberFileService'
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { MemberDetail, MemberSocial } from '@/types/members'
 import type { PermissionName } from '@/utils/constants/permissions'
+import { absenceReasonText } from '@/utils/format/absences'
 import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
 
 export interface MemberFileTabsProps {
@@ -414,9 +416,9 @@ export const MemberFileTabs = ({
                   <span className="font-medium">
                     {formatDayRange(absence.startDate, absence.endDate)}
                   </span>
-                  {absence.reason && (
+                  {absenceReasonText(absence) && (
                     <span className="truncate text-xs text-[var(--color-ink-subtle)]">
-                      {absence.reason}
+                      {absenceReasonText(absence)}
                     </span>
                   )}
                 </span>
@@ -492,6 +494,9 @@ export const MemberFileTabs = ({
 
   const pathTab = () => (
     <div className="flex flex-col gap-8">
+      <div className="flex justify-end">
+        <MaturityTag maturity="alpha" />
+      </div>
       <Section title={MEMBER_COPY.academyFsiTitle} bare>
         {summary.academyJuniorId && summary.academySessionId ? (
           <Button
