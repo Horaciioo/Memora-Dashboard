@@ -5,6 +5,7 @@
 
 export const CookieKeys = {
   session: 'session',
+  oauthState: 'oauth_state',
 } as const
 
 export type CookieKey = keyof typeof CookieKeys

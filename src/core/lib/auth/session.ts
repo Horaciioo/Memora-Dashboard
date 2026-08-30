@@ -8,6 +8,13 @@ import { cookieName } from '@/utils/constants/cookies'
 export const SESSION_COOKIE = cookieName('session')
 
 /**
+ * Handshake cookie name
+ * @type {string}
+ */
+
+export const OAUTH_STATE_COOKIE = cookieName('oauthState')
+
+/**
  * Discord identifier shape
  * @type {RegExp}
  */
