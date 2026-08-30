@@ -60,7 +60,6 @@ export default async function RecruitmentPage({ params }: { params: Promise<{ id
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader
-        eyebrow={RECRUITMENT_COPY.confidential}
         title={detail.summary.name}
         lead={detail.summary.summary ?? undefined}
         actions={

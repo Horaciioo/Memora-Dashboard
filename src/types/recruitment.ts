@@ -26,6 +26,7 @@ export interface RecruitmentRef {
  * @property {string | null} summary - Supporting line
  * @property {RecruitmentRef} youtuber - Creator recruited for
  * @property {RecruitmentRef} jobFunction - Post recruited for
+ * @property {RecruitmentRef[]} responsables - Moderators carrying the session
  * @property {string | null} opensAt - Announcement day
  * @property {string | null} closesAt - Closing day
  * @property {number} candidateCount - Applicants held
@@ -40,6 +41,7 @@ export interface RecruitmentSummary {
   summary: string | null
   youtuber: RecruitmentRef
   jobFunction: RecruitmentRef
+  responsables: RecruitmentRef[]
   opensAt: string | null
   closesAt: string | null
   candidateCount: number

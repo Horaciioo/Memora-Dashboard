@@ -1,6 +1,8 @@
 import 'server-only'
 
+import { decryptField, encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
+import { activeFunctions } from '@/core/services/reference/lookups'
 import { conflict, notFound } from '@/core/lib/errors'
 import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import { toOptions } from '@/core/lib/forms/options'
@@ -127,6 +129,7 @@ const toRef = (row: {
 const SUMMARY_INCLUDE = {
   youtuber: true,
   jobFunction: true,
+  responsables: { include: { account: true } },
   _count: { select: { candidates: true } },
 } as const
 
@@ -146,27 +149,38 @@ type SummaryRow = Awaited<
  * @return {RecruitmentSummary} - Session header
  */
 
-const toSummary = (row: SummaryRow, interviewedCount: number): RecruitmentSummary => ({
-  id: row.id,
-  name: row.name,
-  status: row.status,
-  summary: row.summary,
-  youtuber: toRef(row.youtuber),
-  jobFunction: toRef(row.jobFunction),
-  opensAt: row.opensAt?.toISOString() ?? null,
-  closesAt: row.closesAt?.toISOString() ?? null,
-  candidateCount: row._count.candidates,
-  interviewedCount,
-  values: {
+const toSummary = (row: SummaryRow, interviewedCount: number): RecruitmentSummary => {
+  const responsables = row.responsables.map(({ account }) => ({
+    id: account.id,
+    label: account.displayName,
+    accent: null,
+    image: account.avatarUrl,
+  }))
+
+  return {
+    id: row.id,
     name: row.name,
-    youtuberId: row.youtuberId,
-    functionId: row.functionId,
     status: row.status,
     summary: row.summary,
+    youtuber: toRef(row.youtuber),
+    jobFunction: toRef(row.jobFunction),
+    responsables,
     opensAt: row.opensAt?.toISOString() ?? null,
     closesAt: row.closesAt?.toISOString() ?? null,
-  },
-})
+    candidateCount: row._count.candidates,
+    interviewedCount,
+    values: {
+      name: row.name,
+      youtuberId: row.youtuberId,
+      functionId: row.functionId,
+      status: row.status,
+      summary: row.summary,
+      opensAt: row.opensAt?.toISOString() ?? null,
+      closesAt: row.closesAt?.toISOString() ?? null,
+      responsableIds: responsables.map((seat) => seat.id),
+    },
+  }
+}
 
 /**
  * Declarations of the session form
@@ -175,9 +189,10 @@ const toSummary = (row: SummaryRow, interviewedCount: number): RecruitmentSummar
  */
 
 export const sessionFields = async (scope: AccessScope): Promise<FieldDefinition[]> => {
-  const [creators, functions] = await Promise.all([
+  const [creators, functions, members] = await Promise.all([
     youtuberOptions(scope),
-    prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
+    activeFunctions(),
+    memberOptions(),
   ])
 
   return [
@@ -229,6 +244,13 @@ export const sessionFields = async (scope: AccessScope): Promise<FieldDefinition
       kind: 'date',
       label: RECRUITMENT_FIELD_COPY.closesAt,
       span: 'half',
+    },
+    {
+      name: 'responsableIds',
+      kind: 'multiselect',
+      label: RECRUITMENT_FIELD_COPY.responsables,
+      options: members,
+      mark: 'avatar',
     },
     {
       name: 'summary',
@@ -457,7 +479,7 @@ const toCandidate = (
   const comments: CandidateComment[] = row.comments.map((comment) => ({
     id: comment.id,
     authorName: comment.author?.displayName ?? null,
-    body: comment.body,
+    body: decryptField(comment.body) ?? '',
     createdAt: comment.createdAt.toISOString(),
   }))
 
@@ -596,6 +618,9 @@ export const createSession = async (
         summary: readText(values, 'summary'),
         opensAt,
         closesAt: readDate(values, 'closesAt'),
+        responsables: {
+          create: readList(values, 'responsableIds').map((accountId) => ({ accountId })),
+        },
         steps: {
           create: templates.map((template, index) => ({
             templateId: template.id,
@@ -632,18 +657,25 @@ export const updateSession = async (
 ): Promise<RecruitmentSummary> => {
   await reachableSession(id, scope)
 
-  const row = await prisma.recruitmentSession
-    .update({
-      where: { id },
-      data: {
-        name: readText(values, 'name') ?? undefined,
-        status: (readText(values, 'status') ?? undefined) as RecruitmentStatusName | undefined,
-        summary: readText(values, 'summary'),
-        opensAt: readDate(values, 'opensAt'),
-        closesAt: readDate(values, 'closesAt'),
-      },
-      include: SUMMARY_INCLUDE,
-    })
+  // The responsable seats are replaced wholesale, the form always sends the full list
+  const [, , , row] = await prisma
+    .$transaction([
+      prisma.recruitmentSession.update({
+        where: { id },
+        data: {
+          name: readText(values, 'name') ?? undefined,
+          status: (readText(values, 'status') ?? undefined) as RecruitmentStatusName | undefined,
+          summary: readText(values, 'summary'),
+          opensAt: readDate(values, 'opensAt'),
+          closesAt: readDate(values, 'closesAt'),
+        },
+      }),
+      prisma.recruitmentResponsable.deleteMany({ where: { sessionId: id } }),
+      prisma.recruitmentResponsable.createMany({
+        data: readList(values, 'responsableIds').map((accountId) => ({ sessionId: id, accountId })),
+      }),
+      prisma.recruitmentSession.findUniqueOrThrow({ where: { id }, include: SUMMARY_INCLUDE }),
+    ])
     .catch(rethrow)
 
   const attended = await prisma.recruitmentCandidate.count({
@@ -896,11 +928,21 @@ export const addComment = async (
   await reachableCandidate(candidateId, scope)
 
   await prisma.recruitmentComment.create({
-    data: { candidateId, authorId, body: readText(values, 'body') ?? '' },
+    data: { candidateId, authorId, body: encryptField(readText(values, 'body')) ?? '' },
   })
 
   return readCandidate(candidateId)
 }
+
+/**
+ * Read the session an application belongs to
+ * @param {string} candidateId - Candidate identifier
+ * @param {AccessScope} scope - Perimeter
+ * @return {Promise<string>} - Session identifier
+ */
+
+export const candidateSession = (candidateId: string, scope: AccessScope): Promise<string> =>
+  reachableCandidate(candidateId, scope)
 
 /**
  * Drop a remark

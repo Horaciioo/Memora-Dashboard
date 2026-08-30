@@ -9,16 +9,19 @@ import { Markdown } from '@/components/elements/display/Markdown'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
+import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { KanbanBoard, type BoardColumn } from '@/components/structures/KanbanBoard'
 import { Section } from '@/components/structures/Section'
 import { useRecruitmentFile } from '@/core/hooks/data/useRecruitmentFile'
 import { ROUTES } from '@/declarations/navigation'
-import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
-import { RECRUITMENT_OWNER_REGISTRY } from '@/declarations/recruitment/registries'
+import { RECRUITMENT_COPY, RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
+import {
+  RECRUITMENT_OWNER_REGISTRY,
+  RECRUITMENT_STATUS_REGISTRY,
+} from '@/declarations/recruitment/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { DETAIL_BLOCK } from '@/declarations/ui/blocks'
 import { LIST_STYLES } from '@/declarations/ui/variants'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import { CandidateDialog } from '@/composites/recruitment/CandidateDialog'
@@ -432,25 +435,29 @@ export const RecruitmentFile = ({
     </Section>
   )
 
+  const status = RECRUITMENT_STATUS_REGISTRY.get(detail.summary.status)
+  const responsables = detail.summary.responsables
+
   return (
     <div className="flex flex-col gap-8">
-      <Section title={RECRUITMENT_COPY.tabCandidates} padded>
-        <div className={DETAIL_BLOCK.grid}>
-          <span className={DETAIL_BLOCK.entry}>
-            <span className={DETAIL_BLOCK.label}>{RECRUITMENT_COPY.candidateCount}</span>
-            <span className={DETAIL_BLOCK.value}>{detail.summary.candidateCount}</span>
-          </span>
-          <span className={DETAIL_BLOCK.entry}>
-            <span className={DETAIL_BLOCK.label}>{RECRUITMENT_COPY.attended}</span>
-            <span className={DETAIL_BLOCK.value}>{detail.summary.interviewedCount}</span>
-          </span>
-          <span className={DETAIL_BLOCK.entry}>
-            <span className={DETAIL_BLOCK.label}>{RECRUITMENT_COPY.timelineTitle}</span>
-            <span className={DETAIL_BLOCK.value}>
-              {`${file.steps.filter((step) => step.doneAt !== null).length} / ${file.steps.length}`}
-            </span>
-          </span>
-        </div>
+      <Section title={RECRUITMENT_COPY.informationsTitle} padded>
+        <DetailGrid
+          entries={[
+            { label: RECRUITMENT_FIELD_COPY.youtuber, value: detail.summary.youtuber.label },
+            {
+              label: RECRUITMENT_COPY.infoStatus,
+              value: <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />,
+            },
+            { label: RECRUITMENT_FIELD_COPY.jobFunction, value: detail.summary.jobFunction.label },
+            {
+              label: RECRUITMENT_FIELD_COPY.responsables,
+              value: responsables.length
+                ? responsables.map((seat) => seat.label).join(' · ')
+                : undefined,
+            },
+            { label: RECRUITMENT_COPY.infoSessionId, value: detail.summary.id },
+          ]}
+        />
       </Section>
 
       <FileTabs
