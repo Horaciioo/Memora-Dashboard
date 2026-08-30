@@ -22,8 +22,24 @@ jobs:
     timeout-minutes: 20
 
     env:
-      # Placeholder, satisfies the Prisma datasource
-      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder?schema=public
+      # Real datasource, so a migration that breaks fails here rather than on deploy
+      DATABASE_URL: postgresql://memora:memora@localhost:5432/memora_ci?schema=public
+      APP_ENV: dev
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: memora
+          POSTGRES_PASSWORD: memora
+          POSTGRES_DB: memora_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout repository
@@ -51,6 +67,10 @@ jobs:
       # Type-check and build need the client
       - name: Generate Prisma Client
         run: yarn db:generate
+
+      # A migration that fails to apply never reaches a deployment
+      - name: Apply migrations
+        run: yarn db:migrate
 
       - name: Check formatting
         run: yarn format:check
