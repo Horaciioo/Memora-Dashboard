@@ -83,11 +83,6 @@ export const FIELD_COPY = {
  */
 
 export const WIP_COPY = {
-  badge: 'Bêta',
   title: 'En cours de développement',
   description: 'Cette partie n’est pas terminée, elle bouge encore.',
-  betaDialogTitle: 'Fonctionnalité en bêta',
-  betaDialogBody:
-    'Cette fonctionnalité est encore en cours de développement. Celle-ci peut rencontrer des erreurs, être instable, ou ne pas fonctionner.',
-  betaAck: 'J’ai compris !',
 } as const
