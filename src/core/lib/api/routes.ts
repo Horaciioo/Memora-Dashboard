@@ -8,6 +8,11 @@ const withScope = (path: string, youtuberId?: string): string =>
  */
 
 export const API_ROUTES = {
+  signInWithDiscord: '/api/connexion/discord',
+  discordCallback: '/api/connexion/discord/retour',
+  openSessions: '/api/parametres/sessions',
+  openSession: (id: string) => `/api/parametres/sessions/${id}`,
+  personalExport: '/api/parametres/export',
   reference: (section: string) => `/api/configuration/${section}`,
   referenceItem: (section: string, id: string) => `/api/configuration/${section}/${id}`,
   referenceOrder: (section: string) => `/api/configuration/${section}/ordre`,
@@ -42,6 +47,8 @@ export const API_ROUTES = {
     (sessionId ? `&session=${encodeURIComponent(sessionId)}` : ''),
   calendarEntries: '/api/calendrier',
   calendarEntry: (id: string) => `/api/calendrier/${id}`,
+  calendarEntryAttendance: (id: string) => `/api/calendrier/${id}/presence`,
+  calendarEntryReminder: (id: string) => `/api/calendrier/${id}/presence/rappel`,
   academy: '/api/academy',
   session: (id: string) => `/api/academy/${id}`,
   sessionJuniors: (id: string) => `/api/academy/${id}/juniors`,
@@ -89,6 +96,9 @@ export const API_ROUTES = {
   recruitmentStepStatus: (id: string) => `/api/etapes-recrutement/${id}/statut`,
   teams: (youtuberId?: string) => withScope('/api/equipes', youtuberId),
   team: (id: string, youtuberId?: string) => withScope(`/api/equipes/${id}`, youtuberId),
+  notifications: (size?: number) =>
+    size ? `/api/notifications?taille=${size}` : '/api/notifications',
+  notification: (id: string) => `/api/notifications/${id}`,
   access: '/api/acces',
   profile: '/api/parametres',
   board: '/api/tableau',
@@ -121,6 +131,7 @@ export const CACHE_KEYS = {
   session: (id: string) => `academy:session:${id}`,
   junior: (id: string) => `academy:junior:${id}`,
   access: () => 'access',
+  notifications: () => 'notifications',
   profile: () => 'profile',
   search: (term: string) => `search:${term}`,
 } as const

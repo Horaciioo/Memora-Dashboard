@@ -5,13 +5,14 @@ import { AppearanceToggle } from '@/components/elements/actions/AppearanceToggle
 import { Button } from '@/components/elements/actions/Button'
 import { ColorVisionSelect } from '@/components/elements/actions/ColorVisionSelect'
 import { ThemeToggle } from '@/components/elements/actions/ThemeToggle'
-import { Avatar } from '@/components/elements/display/Avatar'
+import { FieldControl } from '@/components/elements/forms/FieldControl'
 import { Badge } from '@/components/elements/display/Badge'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FileTabs } from '@/components/structures/FileTabs'
+import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FormRenderer } from '@/components/structures/FormRenderer'
 import { Section } from '@/components/structures/Section'
-import { LogoutButton } from '@/composites/auth/LogoutButton'
 import { useProfile } from '@/core/hooks/data/useProfile'
 import { dropOtherSessions } from '@/app/(dashboard)/parametres/actions'
 import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/roles'
@@ -28,26 +29,19 @@ export interface PreferencesPanelProps {
   initialProfile: ProfileDetail
   fields: FieldDefinition[]
   sessions: AccountSession[]
-  avatarUrl: string | null
 }
 
 /**
- * Personal settings — the file a member owns, the display they chose, and the sessions
- * currently signed in as them
+ * Personal settings
  * @param {ProfileDetail} initialProfile - File resolved server-side
  * @param {FieldDefinition[]} fields - Declarations of the editable fields
  * @param {AccountSession[]} sessions - Open sessions
- * @param {string | null} avatarUrl - Portrait of the signed-in member
  * @return {JSX.Element}
  */
 
-export const PreferencesPanel = ({
-  initialProfile,
-  fields,
-  sessions,
-  avatarUrl,
-}: PreferencesPanelProps) => {
-  const { profile, isSaving, issues, save } = useProfile(initialProfile)
+export const PreferencesPanel = ({ initialProfile, fields, sessions }: PreferencesPanelProps) => {
+  const { profile, isSaving, issues, save, eraseDetails, download } = useProfile(initialProfile)
+  const [isErasing, setErasing] = useState(false)
   const [draft, setDraft] = useState<FormValues>(initialProfile.values)
 
   const change = (name: string, value: FieldValue) =>
@@ -57,37 +51,30 @@ export const PreferencesPanel = ({
   const status = MEMBER_STATUS_REGISTRY.get(profile.status)
   const others = sessions.filter((entry) => !entry.isCurrent)
 
+  // The portrait travels on its own
+  const portraitField = fields.find((field) => field.name === 'avatarUrl')
+  const ownedFields = fields.filter((field) => field.name !== 'avatarUrl')
+
+  // A new portrait is written straight away
+  const changePortrait = (value: FieldValue) => {
+    change('avatarUrl', value)
+    void save({ ...draft, avatarUrl: value })
+  }
+
   const informationTab = () => (
     <div className={TABS_STYLES.panel}>
       <div className={PREFERENCE_STYLES.stack}>
-        <Section
-          title={PREFERENCES_COPY.informationTitle}
-          description={PREFERENCES_COPY.informationLead}
-          padded
-        >
-          <FormRenderer
-            fields={fields}
-            values={draft}
-            issues={issues}
-            onChange={change}
-            disabled={isSaving}
-            idPrefix="profile"
-          />
-          <div className={PREFERENCE_STYLES.footer}>
-            <Button
-              variant="primary"
-              icon="confirm"
-              disabled={isSaving}
-              onClick={() => void save(draft)}
-            >
-              {isSaving ? ACTION_COPY.saving : ACTION_COPY.save}
-            </Button>
-          </div>
-        </Section>
-
         <Section title={PREFERENCES_COPY.fileTitle} description={PREFERENCES_COPY.fileLead} padded>
           <div className={PREFERENCE_STYLES.identity}>
-            <Avatar name={profile.displayName} src={avatarUrl} size="lg" />
+            {portraitField && (
+              <FieldControl
+                id="profile-avatarUrl"
+                field={portraitField}
+                value={typeof draft.avatarUrl === 'string' ? draft.avatarUrl : null}
+                disabled={isSaving}
+                onChange={changePortrait}
+              />
+            )}
             <div className="flex min-w-0 flex-col gap-1">
               <p className={ACCOUNT_BLOCK.name}>{profile.displayName}</p>
               <p className={ACCOUNT_BLOCK.meta}>{profile.discordId}</p>
@@ -117,7 +104,79 @@ export const PreferencesPanel = ({
             ]}
           />
         </Section>
+
+        <Section
+          title={PREFERENCES_COPY.informationTitle}
+          description={PREFERENCES_COPY.informationLead}
+          padded
+        >
+          <FormRenderer
+            fields={ownedFields}
+            values={draft}
+            issues={issues}
+            onChange={change}
+            disabled={isSaving}
+            idPrefix="profile"
+          />
+          <div className={PREFERENCE_STYLES.footer}>
+            <Button
+              variant="primary"
+              icon="confirm"
+              disabled={isSaving}
+              onClick={() => void save(draft)}
+            >
+              {isSaving ? ACTION_COPY.saving : ACTION_COPY.save}
+            </Button>
+          </div>
+        </Section>
+
+        <Section
+          title={PREFERENCES_COPY.privacyTitle}
+          description={PREFERENCES_COPY.privacyLead}
+          padded
+        >
+          <div className={PREFERENCE_STYLES.footer}>
+            <Button
+              variant="danger"
+              icon="remove"
+              disabled={isSaving}
+              onClick={() => setErasing(true)}
+            >
+              {PREFERENCES_COPY.eraseDetails}
+            </Button>
+          </div>
+        </Section>
+
+        <Section
+          title={PREFERENCES_COPY.exportTitle}
+          description={PREFERENCES_COPY.exportLead}
+          padded
+        >
+          <div className={PREFERENCE_STYLES.footer}>
+            <Button
+              variant="secondary"
+              icon="sheet"
+              disabled={isSaving}
+              onClick={() => void download()}
+            >
+              {isSaving ? PREFERENCES_COPY.exportPending : PREFERENCES_COPY.exportAction}
+            </Button>
+          </div>
+        </Section>
       </div>
+
+      <ConfirmDialog
+        open={isErasing}
+        title={PREFERENCES_COPY.eraseConfirmTitle}
+        description={PREFERENCES_COPY.eraseConfirmDescription}
+        confirmLabel={PREFERENCES_COPY.eraseDetails}
+        tone="danger"
+        onCancel={() => setErasing(false)}
+        onConfirm={() => {
+          setErasing(false)
+          void eraseDetails()
+        }}
+      />
     </div>
   )
 
@@ -134,11 +193,17 @@ export const PreferencesPanel = ({
             <ThemeToggle />
           </div>
           <div className={PREFERENCE_STYLES.row}>
-            <span className={PREFERENCE_STYLES.label}>{NAV_COPY.textSize}</span>
+            <span className="flex flex-wrap items-center gap-2">
+              <span className={PREFERENCE_STYLES.label}>{NAV_COPY.textSize}</span>
+              <MaturityTag maturity="beta" />
+            </span>
             <AppearanceToggle />
           </div>
           <div className={PREFERENCE_STYLES.row}>
-            <span className={PREFERENCE_STYLES.label}>{NAV_COPY.colorVision}</span>
+            <span className="flex flex-wrap items-center gap-2">
+              <span className={PREFERENCE_STYLES.label}>{NAV_COPY.colorVision}</span>
+              <MaturityTag maturity="beta" />
+            </span>
             <ColorVisionSelect />
           </div>
         </div>
@@ -166,6 +231,7 @@ export const PreferencesPanel = ({
         <Section
           title={PREFERENCES_COPY.sessionsTitle}
           description={PREFERENCES_COPY.sessionsLead}
+          action={<MaturityTag maturity="beta" />}
           padded
         >
           <div className={LIST_STYLES.stack}>
@@ -175,7 +241,7 @@ export const PreferencesPanel = ({
                   {entry.userAgent ?? PREFERENCES_COPY.unknownDevice}
                 </span>
                 <span className={PREFERENCE_STYLES.notice}>
-                  {`${PREFERENCES_COPY.openedAt} ${formatDayTime(entry.createdAt)}`}
+                  {`${PREFERENCES_COPY.lastUsedAt} ${formatDayTime(entry.lastUsedAt)}`}
                 </span>
                 {entry.isCurrent && (
                   <Badge label={PREFERENCES_COPY.currentSession} tone="success" dot />
@@ -193,16 +259,6 @@ export const PreferencesPanel = ({
                 </Button>
               </form>
             )}
-          </div>
-        </Section>
-
-        <Section
-          title={PREFERENCES_COPY.leaveTitle}
-          description={PREFERENCES_COPY.leaveLead}
-          padded
-        >
-          <div className="flex justify-end">
-            <LogoutButton />
           </div>
         </Section>
       </div>

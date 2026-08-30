@@ -37,6 +37,7 @@ export interface ProfileDetail {
  * @property {string} id - Session identifier
  * @property {string | null} userAgent - Client that opened it
  * @property {string} createdAt - Opening moment
+ * @property {string} lastUsedAt - Last use
  * @property {string} expiresAt - Expiry moment
  * @property {boolean} isCurrent - Session answering this page
  */
@@ -45,6 +46,7 @@ export interface AccountSession {
   id: string
   userAgent: string | null
   createdAt: string
+  lastUsedAt: string
   expiresAt: string
   isCurrent: boolean
 }
