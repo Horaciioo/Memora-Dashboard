@@ -1,12 +1,15 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
+import { clearVolunteeredDetails } from '@/core/services/members/MemberService'
 import {
   profileFields,
   readProfile,
   updateProfile,
 } from '@/core/services/preferences/ProfileService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { summariseChange } from '@/core/services/system/changes'
+import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 
 export const GET = createProtectedRoute({
   descriptor: { summary: 'Read my own file', tags: ['preferences'] },
@@ -16,9 +19,12 @@ export const GET = createProtectedRoute({
 export const PATCH = createProtectedRoute({
   descriptor: { summary: 'Edit my own file', tags: ['preferences'] },
   handler: async ({ raw, session }) => {
-    const parsed = parseFormValues(profileFields(), raw, { fillMissing: true })
+    const fields = profileFields()
+
+    const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
+    const before = await readProfile(session.id)
     const profile = await updateProfile(session.id, parsed.values)
 
     await recordEvent({
@@ -28,8 +34,27 @@ export const PATCH = createProtectedRoute({
       targetType: 'member',
       targetId: session.id,
       summary: profile.displayName,
+      change: summariseChange(fields, before.values, profile.values),
     })
 
     return profile
+  },
+})
+
+export const DELETE = createProtectedRoute({
+  descriptor: { summary: 'Erase the details I volunteered', tags: ['preferences'] },
+  handler: async ({ session }) => {
+    await clearVolunteeredDetails(session.id)
+
+    await recordEvent({
+      eventType: 'MemberUpdated',
+      actorId: session.id,
+      subjectId: session.id,
+      targetType: 'member',
+      targetId: session.id,
+      summary: PREFERENCES_COPY.detailsErased,
+    })
+
+    return readProfile(session.id)
   },
 })
