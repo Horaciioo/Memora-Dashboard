@@ -5,9 +5,11 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
+import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { feedbackTitle } from '@/declarations/ui/copy'
-import type { CalendarEntry } from '@/types/calendar'
+import type { AttendanceRoster, CalendarEntry } from '@/types/calendar'
 import type { FieldIssue, FormValues } from '@/types/forms'
+import type { AttendanceStatusName } from '@/utils/constants/workflow'
 
 // Toast entity label
 const ENTITY = 'Évènement'
@@ -28,6 +30,8 @@ const GENDER = 'masculine'
  * @property {(ids: string[], values: FormValues) => Promise<boolean>} updateMany - Edit a selection
  * @property {(ids: string[]) => Promise<void>} removeMany - Drop a selection
  * @property {(from: string, to: string) => Promise<void>} load - Pull another window
+ * @property {(id: string, status: AttendanceStatusName) => Promise<void>} respond - Answer a roll-call
+ * @property {(id: string) => Promise<void>} remind - Ping the no-answers now
  */
 
 export interface CalendarCollection {
@@ -43,6 +47,8 @@ export interface CalendarCollection {
   updateMany: (ids: string[], values: FormValues) => Promise<boolean>
   removeMany: (ids: string[]) => Promise<void>
   load: (from: string, to: string) => Promise<void>
+  respond: (id: string, status: AttendanceStatusName) => Promise<void>
+  remind: (id: string) => Promise<void>
 }
 
 /**
@@ -181,6 +187,36 @@ export const useCalendar = (
     [run, entries]
   )
 
+  const setRoster = useCallback((id: string, roster: AttendanceRoster) => {
+    setEntries((current) =>
+      current.map((row) => (row.id === id ? { ...row, attendance: roster } : row))
+    )
+  }, [])
+
+  const respond = useCallback(
+    async (id: string, status: AttendanceStatusName) => {
+      const roster = await run(
+        () => apiPost<AttendanceRoster>(API_ROUTES.calendarEntryAttendance(id), { status }),
+        feedbackTitle(ENTITY, 'saved', GENDER)
+      )
+
+      if (roster) setRoster(id, roster)
+    },
+    [run, setRoster]
+  )
+
+  const remind = useCallback(
+    async (id: string) => {
+      const roster = await run(
+        () => apiPost<AttendanceRoster>(API_ROUTES.calendarEntryReminder(id), {}),
+        CALENDAR_COPY.reminderSent
+      )
+
+      if (roster) setRoster(id, roster)
+    },
+    [run, setRoster]
+  )
+
   return {
     entries,
     isSaving,
@@ -194,5 +230,7 @@ export const useCalendar = (
     updateMany,
     removeMany,
     load,
+    respond,
+    remind,
   }
 }
