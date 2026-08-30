@@ -33,12 +33,20 @@ export const ActivityTimeline = ({ entries }: ActivityTimelineProps) => (
                 <span className={JOURNAL_STYLES.tick} aria-hidden="true" />
                 <span className={JOURNAL_STYLES.moment}>{formatDayTime(entry.createdAt)}</span>
               </span>
-              {event && (
+              {entry.change ? (
                 <p className={JOURNAL_STYLES.sentence}>
                   {`${actor} ${ACTIVITY_COPY.did} `}
-                  <strong className={JOURNAL_STYLES.verb}>{event.verb}</strong>
-                  {` ${event.target}.`}
+                  <strong className={JOURNAL_STYLES.verb}>{entry.change.verb}</strong>
+                  {` ${entry.change.rest}.`}
                 </p>
+              ) : (
+                event && (
+                  <p className={JOURNAL_STYLES.sentence}>
+                    {`${actor} ${ACTIVITY_COPY.did} `}
+                    <strong className={JOURNAL_STYLES.verb}>{event.verb}</strong>
+                    {` ${event.target}.`}
+                  </p>
+                )
               )}
             </div>
           </div>
