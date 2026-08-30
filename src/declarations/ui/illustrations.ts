@@ -8,6 +8,7 @@ import {
   ModerationIllustration,
   NoResultsIllustration,
   NotesIllustration,
+  NotificationsIllustration,
   ProjectsIllustration,
   SettingsIllustration,
   TasksIllustration,
@@ -33,6 +34,7 @@ export const ILLUSTRATIONS = {
   livecon: LiveconIllustration,
   academy: AcademyIllustration,
   notes: NotesIllustration,
+  notifications: NotificationsIllustration,
   settings: SettingsIllustration,
   moderation: ModerationIllustration,
 } as const satisfies Record<string, FC<EmptyStateIllustrationProps>>

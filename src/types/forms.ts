@@ -1,3 +1,4 @@
+import type { MaturityName } from '@/declarations/maturity/registries'
 import type { StorageBucket } from '@/types/storage'
 
 /**
@@ -96,6 +97,7 @@ export interface FieldCondition {
  * @property {string} [group] - Category the field sits under
  * @property {OptionMark} [mark] - Glyph drawn beside each option
  * @property {StorageBucket} [bucket] - Destination bucket of an image field
+ * @property {MaturityName} [maturity] - Lifecycle tag drawn beside the label
  * @property {FieldCondition} [visibleWhen] - Display rule
  */
 
@@ -118,6 +120,7 @@ export interface FieldDefinition {
   group?: string
   mark?: OptionMark
   bucket?: StorageBucket
+  maturity?: MaturityName
   visibleWhen?: FieldCondition
 }
 
