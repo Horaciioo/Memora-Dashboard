@@ -10,17 +10,19 @@ import { ICONS } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
 
 export interface AppShellProps {
+  unreadCount: number
   children: ReactNode
 }
 
 /**
  * Chrome of the signed-in dashboard — a docked sidebar carrying search, navigation and the
  * account, and the routed page beside it with no bar above it
+ * @param {number} unreadCount - Unopened notifications resolved server-side
  * @param {ReactNode} children - Routed page content
  * @return {JSX.Element}
  */
 
-export const AppShell = ({ children }: AppShellProps) => {
+export const AppShell = ({ unreadCount, children }: AppShellProps) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false)
   const MenuIcon = ICONS.dashboard
 
@@ -35,6 +37,7 @@ export const AppShell = ({ children }: AppShellProps) => {
       )}
       <SidebarNav
         className={cn(!isSidebarOpen && APP_SHELL.sidebarHidden)}
+        unreadCount={unreadCount}
         onNavigate={() => setSidebarOpen(false)}
       />
       <div className={APP_SHELL.main}>

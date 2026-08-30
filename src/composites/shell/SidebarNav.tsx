@@ -6,32 +6,35 @@ import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
-import { ThemeSwitch } from '@/components/elements/actions/ThemeSwitch'
 import { LogoutButton } from '@/composites/auth/LogoutButton'
+import { NotificationsBell } from '@/composites/notifications/NotificationsBell'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { APP_ASSETS, APP_COMPANY, APP_NAME } from '@/declarations/app'
 import { NAVIGATION, NavigationViews, ROUTES, matchesNavigation } from '@/declarations/navigation'
 import { NAVIGATION_VIEW_REGISTRY } from '@/declarations/access/views'
 import { useNavigationViewStore } from '@/core/store/navigationView'
 import { APP_SHELL } from '@/declarations/ui/blocks'
-import { NAV_COPY, WIP_COPY } from '@/declarations/ui/copy'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
+import { NAV_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { cn } from '@/utils/classnames'
 
 export interface SidebarNavProps {
   className?: string
+  unreadCount: number
   onNavigate: () => void
 }
 
 /**
  * Navigation rail
  * @param {string} [className] - Extra classes merged onto the rail
+ * @param {number} unreadCount - Unopened notifications resolved server-side
  * @param {() => void} onNavigate - Called once a link is followed
  * @return {JSX.Element}
  */
 
-export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
+export const SidebarNav = ({ className, unreadCount, onNavigate }: SidebarNavProps) => {
   const pathname = usePathname()
   const { can, session, isResponsable } = useAuthContext()
   const { view: stored, setView } = useNavigationViewStore()
@@ -96,7 +99,13 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
                     <span className={cn(APP_SHELL.navLabel, isActive && APP_SHELL.navLabelActive)}>
                       {item.label}
                     </span>
-                    {item.wip && <span className={APP_SHELL.navBadge}>{WIP_COPY.badge}</span>}
+                    {item.maturity && (
+                      <MaturityTag
+                        maturity={item.maturity}
+                        interactive={false}
+                        className="ml-auto"
+                      />
+                    )}
                   </Link>
                 )
               })}
@@ -109,16 +118,20 @@ export const SidebarNav = ({ className, onNavigate }: SidebarNavProps) => {
         <div className={APP_SHELL.sidebarFooter}>
           <div className={APP_SHELL.accountRow}>
             <div className={cn(APP_SHELL.accountControls, APP_SHELL.accountControlsLeft)}>
-              <Link href={ROUTES.preferences} onClick={onNavigate}>
-                <Button
-                  variant="icon"
-                  icon="settings"
-                  aria-label={NAV_COPY.preferences}
-                  title={NAV_COPY.preferences}
-                />
-              </Link>
-              <span className={APP_SHELL.accountDivider} aria-hidden="true" />
-              <ThemeSwitch />
+              {isResponsable && (
+                <>
+                  <Link href={ROUTES.preferences} onClick={onNavigate}>
+                    <Button
+                      variant="icon"
+                      icon="settings"
+                      aria-label={NAV_COPY.preferences}
+                      title={NAV_COPY.preferences}
+                    />
+                  </Link>
+                  <span className={APP_SHELL.accountDivider} aria-hidden="true" />
+                </>
+              )}
+              <NotificationsBell initialUnread={unreadCount} />
             </div>
 
             <Link

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { PermissionPicker } from '@/components/structures/PermissionPicker'
 import { Section } from '@/components/structures/Section'
 import { MEMBER_COPY } from '@/declarations/members/copy'
@@ -62,14 +63,17 @@ export const MemberAccessPanel = ({
       title={MEMBER_COPY.accessTitle}
       description={MEMBER_COPY.accessLead}
       action={
-        <Button
-          variant="primary"
-          icon="confirm"
-          disabled={isSaving}
-          onClick={() => void onSave(fromDraft(draft))}
-        >
-          {isSaving ? ACTION_COPY.saving : MEMBER_COPY.accessSave}
-        </Button>
+        <>
+          <MaturityTag maturity="beta" />
+          <Button
+            variant="primary"
+            icon="confirm"
+            disabled={isSaving}
+            onClick={() => void onSave(fromDraft(draft))}
+          >
+            {isSaving ? ACTION_COPY.saving : MEMBER_COPY.accessSave}
+          </Button>
+        </>
       }
       padded
     >

@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { MembersPanel } from '@/composites/members/MembersPanel'
-import { prisma } from '@/core/lib/db'
 import { rowsToOptions } from '@/core/lib/forms/options'
 import { listMembers, memberFields } from '@/core/services/members/MemberService'
+import { activeFunctions, activeYoutubers, allDivisions } from '@/core/services/reference/lookups'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -19,12 +19,13 @@ export const metadata: Metadata = { title: MEMBER_COPY.title }
 export default async function MembersPage() {
   const { access, scope } = await requirePermission(Permissions.MemberRead)
 
+  // The three reference reads are memoised, so memberFields shares them
   const [members, fields, divisions, youtubers, functions] = await Promise.all([
     listMembers(await scope()),
     memberFields(),
-    prisma.division.findMany({ orderBy: { rank: 'asc' } }),
-    prisma.youtuber.findMany({ orderBy: { position: 'asc' } }),
-    prisma.jobFunction.findMany({ orderBy: { position: 'asc' } }),
+    allDivisions(),
+    activeYoutubers(),
+    activeFunctions(),
   ])
 
   return (
