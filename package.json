@@ -10,23 +10,26 @@
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "validate": "yarn type-check && yarn lint && yarn build",
+    "validate": "yarn type-check && yarn lint && yarn test && yarn build",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate deploy",
     "db:dev": "prisma migrate dev",
-    "db:seed": "node prisma/seed.ts"
+    "db:seed": "node prisma/seed.ts",
+    "db:fixtures": "node --import ./prisma/fixtures/loader.mjs prisma/fixtures/run.ts",
+    "db:fixtures:reset": "node --import ./prisma/fixtures/loader.mjs prisma/fixtures/run.ts --reset",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@logtail/node": "^0.5.8",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
-    "@sentry/nextjs": "^10.70.0",
+    "@sentry/nextjs": "^10",
     "bullmq": "^6.1.2",
     "clsx": "^2.1.1",
     "ioredis": "^6.0.0",
     "lucide-react": "^1.33.0",
-    "moment": "^2.30.1",
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
@@ -39,12 +42,15 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.11",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
     "prettier": "^3.9.6",
     "prisma": "^7.9.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
   },
   "packageManager": "yarn@4.17.1"
 }
