@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
@@ -271,6 +272,7 @@ export const ProjectFileTabs = ({
     <Section
       title={PROJECT_COPY.communicationTitle}
       description={PROJECT_COPY.communicationLead}
+      action={<MaturityTag maturity="beta" />}
       bare
     >
       {communications.entries.length === 0 ? (

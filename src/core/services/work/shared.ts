@@ -1,8 +1,10 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { allPriorities } from '@/core/services/reference/lookups'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
+import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { BoardColumn } from '@/components/structures/KanbanBoard'
@@ -10,6 +12,24 @@ import type { FieldOption } from '@/types/forms'
 import type { WorkAuthorship, WorkPerson, WorkTag } from '@/types/work'
 import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { WorkflowScopeName } from '@/utils/constants/workflow'
+import type { Prisma } from '@prisma/client'
+
+/**
+ * Narrow a people list to what a bounded viewer may pick — the encadrement always, plus
+ * whoever posts for a creator in their perimeter
+ * @param {AccessScope} [scope] - Viewer perimeter
+ * @return {Prisma.AccountWhereInput} - Clause, empty for a global viewer
+ */
+
+export const peopleInScope = (scope?: AccessScope): Prisma.AccountWhereInput =>
+  !scope || scope.isGlobal
+    ? {}
+    : {
+        OR: [
+          { role: { in: [MemberRoles.Admin, MemberRoles.Responsable] } },
+          { youtubers: { some: { id: { in: scope.youtuberIds } } } },
+        ],
+      }
 
 /**
  * Reference row shaped like a tag
@@ -140,14 +160,18 @@ export const stateOptions = async (scope: WorkflowScopeName): Promise<FieldOptio
 
 /**
  * Read the moderators that can be assigned
+ * @param {AccessScope} [scope] - Viewer perimeter, unbounded when absent
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-export const memberOptions = async (): Promise<FieldOption[]> => {
+export const memberOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
   const rows = await prisma.account.findMany({
-    where: { status: { not: MemberStatuses.Left } },
+    where: { status: { not: MemberStatuses.Left }, ...peopleInScope(scope) },
     orderBy: { displayName: 'asc' },
-    include: { _count: { select: { absences: { where: activeAbsenceFilter() } } } },
+    include: {
+      primaryFunction: { select: { name: true } },
+      _count: { select: { absences: { where: activeAbsenceFilter() } } },
+    },
   })
 
   return rows.map((row) => {
@@ -158,26 +182,37 @@ export const memberOptions = async (): Promise<FieldOption[]> => {
       label: row.displayName,
       image: row.avatarUrl,
       disabled: isAbsent,
-      hint: isAbsent ? MEMBER_COPY.absentHint.replace('{name}', row.displayName) : undefined,
+      // The hint tells homonyms apart, unless the member is out and it carries that instead
+      hint: isAbsent
+        ? MEMBER_COPY.absentHint.replace('{name}', row.displayName)
+        : (row.primaryFunction?.name ?? ROLE_REGISTRY.label(row.role)),
     }
   })
 }
 
 /**
  * Read the moderators allowed to lead a team, responsables and admins only
+ * @param {AccessScope} [scope] - Viewer perimeter, unbounded when absent
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-export const leadOptions = async (): Promise<FieldOption[]> => {
+export const leadOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
   const rows = await prisma.account.findMany({
     where: {
       status: { not: MemberStatuses.Left },
       role: { in: [MemberRoles.Admin, MemberRoles.Responsable] },
+      ...peopleInScope(scope),
     },
     orderBy: { displayName: 'asc' },
+    include: { primaryFunction: { select: { name: true } } },
   })
 
-  return rows.map((row) => ({ value: row.id, label: row.displayName, image: row.avatarUrl }))
+  return rows.map((row) => ({
+    value: row.id,
+    label: row.displayName,
+    image: row.avatarUrl,
+    hint: row.primaryFunction?.name ?? ROLE_REGISTRY.label(row.role),
+  }))
 }
 
 /**
@@ -227,7 +262,7 @@ export const platformOptions = async (): Promise<FieldOption[]> => {
  */
 
 export const priorityOptions = async (): Promise<FieldOption[]> => {
-  const rows = await prisma.priority.findMany({ orderBy: { weight: 'desc' } })
+  const rows = await allPriorities()
 
   return rows.map((row) => ({ value: row.id, label: row.name, accent: row.accent ?? undefined }))
 }

@@ -83,7 +83,7 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
     priorityOptions(),
     youtuberOptions(scope),
     projectOptions(),
-    memberOptions(),
+    memberOptions(scope),
   ])
 
   return [

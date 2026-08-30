@@ -97,8 +97,8 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
     priorityOptions(),
     platformOptions(),
     youtuberOptions(scope),
-    memberOptions(),
-    leadOptions(),
+    memberOptions(scope),
+    leadOptions(scope),
   ])
 
   return [
@@ -451,6 +451,21 @@ export const addCommunication = async (
   })
 
   return toCommunication(row)
+}
+
+/**
+ * Read who carries a project
+ * @param {string} projectId - Project identifier
+ * @return {Promise<string[]>} - Account identifiers
+ */
+
+export const projectTeam = async (projectId: string): Promise<string[]> => {
+  const [leads, assistants] = await Promise.all([
+    prisma.projectLead.findMany({ where: { projectId }, select: { accountId: true } }),
+    prisma.projectAssistant.findMany({ where: { projectId }, select: { accountId: true } }),
+  ])
+
+  return [...leads, ...assistants].map((seat) => seat.accountId)
 }
 
 /**
