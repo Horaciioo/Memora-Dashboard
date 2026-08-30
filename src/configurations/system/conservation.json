@@ -1,0 +1,8 @@
+{
+  "expiredSessionDays": 7,
+  "readNotificationDays": 90,
+  "activityLogDays": 365,
+  "rejectedCandidateDays": 180,
+  "orphanFileHours": 24,
+  "consentVersion": 1
+}
