@@ -1,0 +1,7 @@
+{
+  "panelSize": 6,
+  "pageSize": 40,
+  "maxActions": 3,
+  "maxMentions": 10,
+  "staleMs": 60000
+}

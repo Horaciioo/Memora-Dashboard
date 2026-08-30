@@ -39,6 +39,19 @@ export const AbsenceStatuses = {
 export type AbsenceStatusName = (typeof AbsenceStatuses)[keyof typeof AbsenceStatuses]
 
 /**
+ * Where a member stands on a roll-call
+ * @type {Record<string, string>}
+ */
+
+export const AttendanceStatuses = {
+  Pending: 'PENDING',
+  Present: 'PRESENT',
+  Absent: 'ABSENT',
+} as const
+
+export type AttendanceStatusName = (typeof AttendanceStatuses)[keyof typeof AttendanceStatuses]
+
+/**
  * Function holding kinds
  * @type {Record<string, string>}
  */

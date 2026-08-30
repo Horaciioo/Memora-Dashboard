@@ -1,5 +1,8 @@
 {
   "dayStartHour": 7,
   "dayEndHour": 23,
-  "maxEntriesPerDay": 3
+  "maxEntriesPerDay": 3,
+  "rollCallReminderLeadDays": 1,
+  "rollCallReminderHour": 18,
+  "rollCallResponsesShared": false
 }

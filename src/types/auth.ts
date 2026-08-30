@@ -18,6 +18,7 @@ export type Permission = PermissionName
  * @property {string | null} primaryFunctionId - Main function
  * @property {string | null} secondaryFunctionId - Secondary function
  * @property {boolean} isRoot - Root administrator
+ * @property {number | null} historyConsentVersion - Consent version agreed to
  * @property {Permission[]} permissions - Granted permissions
  */
 
@@ -33,6 +34,7 @@ export interface SessionUser {
   primaryFunctionId: string | null
   secondaryFunctionId: string | null
   isRoot: boolean
+  historyConsentVersion: number | null
   permissions: Permission[]
 }
 
