@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import type { ChangeSummary } from '@/core/services/system/changes'
 import { PAGINATION_SETTINGS } from '@/declarations/configurations/settings'
 import { EVENT_ORIGINS, EVENT_TYPES } from '@/utils/constants/events'
 import type { EventOriginName, EventTypeName } from '@/utils/constants/events'
@@ -16,6 +17,7 @@ import type { Prisma } from '@prisma/client'
  * @property {string} [targetType] - Target resource kind
  * @property {string} [targetId] - Target resource identifier
  * @property {string} summary - One line description
+ * @property {ChangeSummary | null} [change] - What an edit moved, one line
  * @property {Prisma.InputJsonValue} [payload] - Extra detail
  */
 
@@ -27,6 +29,7 @@ export interface EventInput {
   targetType?: string
   targetId?: string
   summary: string
+  change?: ChangeSummary | null
   payload?: Prisma.InputJsonValue
 }
 
@@ -46,7 +49,11 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
       targetType: input.targetType,
       targetId: input.targetId,
       summary: input.summary,
-      payload: input.payload,
+      payload:
+        input.payload ??
+        (input.change
+          ? { change: { verb: input.change.verb, rest: input.change.rest } }
+          : undefined),
     },
   })
 }
@@ -63,6 +70,7 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
  * @property {string} createdAt - ISO timestamp
  * @property {string | null} targetType - Target resource kind
  * @property {string | null} targetId - Target resource identifier
+ * @property {ChangeSummary | null} change - What the edit moved, one line
  */
 
 export interface ActivityEntry {
@@ -75,6 +83,24 @@ export interface ActivityEntry {
   createdAt: string
   targetType: string | null
   targetId: string | null
+  change: ChangeSummary | null
+}
+
+/**
+ * Read the one-line change description off a stored payload
+ * @param {Prisma.JsonValue} payload - Stored payload
+ * @return {ChangeSummary | null} - Change description
+ */
+
+const readChange = (payload: Prisma.JsonValue): ChangeSummary | null => {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null
+
+  const change = (payload as Record<string, unknown>).change
+  if (!change || typeof change !== 'object') return null
+
+  const { verb, rest } = change as Record<string, unknown>
+
+  return typeof verb === 'string' && typeof rest === 'string' ? { verb, rest } : null
 }
 
 // Row shape every reader maps from, the actor carrying the portrait drawn on the rail
@@ -98,6 +124,7 @@ const toEntry = (row: ActivityRow): ActivityEntry => ({
   createdAt: row.createdAt.toISOString(),
   targetType: row.targetType,
   targetId: row.targetId,
+  change: readChange(row.payload),
 })
 
 /**
