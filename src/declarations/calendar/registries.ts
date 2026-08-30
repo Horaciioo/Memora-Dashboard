@@ -1,7 +1,12 @@
 import { createRegistry } from '@/core/lib/registry'
+import type { Tone } from '@/declarations/ui/theme'
 import type { IconName } from '@/declarations/ui/icons'
-import { CalendarKinds, CalendarSources } from '@/utils/constants/workflow'
-import type { CalendarKindName, CalendarSourceName } from '@/utils/constants/workflow'
+import { AttendanceStatuses, CalendarKinds, CalendarSources } from '@/utils/constants/workflow'
+import type {
+  AttendanceStatusName,
+  CalendarKindName,
+  CalendarSourceName,
+} from '@/utils/constants/workflow'
 
 /**
  * Legend entry of the calendar
@@ -76,3 +81,25 @@ const CALENDAR_SOURCE_MAP: Record<CalendarSourceName, CalendarLegendOption> = {
 }
 
 export const CALENDAR_SOURCE_REGISTRY = createRegistry(CALENDAR_SOURCE_MAP)
+
+/**
+ * Roll-call answer as it reads on screen
+ * @typedef {Object} AttendanceStatusOption
+ * @property {string} label - Display label
+ * @property {Tone} tone - Badge colour
+ * @property {IconName} icon - Glyph drawn beside it
+ */
+
+interface AttendanceStatusOption {
+  label: string
+  tone: Tone
+  icon: IconName
+}
+
+const ATTENDANCE_STATUS_MAP: Record<AttendanceStatusName, AttendanceStatusOption> = {
+  [AttendanceStatuses.Present]: { label: 'Présent', tone: 'success', icon: 'confirm' },
+  [AttendanceStatuses.Absent]: { label: 'Absent', tone: 'danger', icon: 'close' },
+  [AttendanceStatuses.Pending]: { label: 'Sans réponse', tone: 'neutral', icon: 'clock' },
+}
+
+export const ATTENDANCE_STATUS_REGISTRY = createRegistry(ATTENDANCE_STATUS_MAP)

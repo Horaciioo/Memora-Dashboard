@@ -1,9 +1,44 @@
 import type { FormValues } from '@/types/forms'
 import type {
+  AttendanceStatusName,
   CalendarKindName,
   CalendarSourceName,
   EventVisibilityName,
 } from '@/utils/constants/workflow'
+
+/**
+ * Convened member on a roll-call roster
+ * @typedef {Object} AttendancePerson
+ * @property {string} name - Display name
+ * @property {string | null} avatar - Portrait
+ */
+
+export interface AttendancePerson {
+  name: string
+  avatar: string | null
+}
+
+/**
+ * Roll-call standings attached to an entry, resolved per viewer
+ * @typedef {Object} AttendanceRoster
+ * @property {AttendanceStatusName | null} mine - Viewer's own answer, null when not convened
+ * @property {boolean} canManage - Viewer runs this roll-call
+ * @property {boolean} visible - Viewer may see the name lists
+ * @property {{ present: number, absent: number, pending: number }} counts - Head count per answer
+ * @property {AttendancePerson[]} present - Filled only when visible
+ * @property {AttendancePerson[]} absent - Filled only when visible
+ * @property {AttendancePerson[]} pending - Filled only when visible
+ */
+
+export interface AttendanceRoster {
+  mine: AttendanceStatusName | null
+  canManage: boolean
+  visible: boolean
+  counts: { present: number; absent: number; pending: number }
+  present: AttendancePerson[]
+  absent: AttendancePerson[]
+  pending: AttendancePerson[]
+}
 
 /**
  * Entry shown on the shared calendar, whichever domain it was read from
@@ -26,7 +61,12 @@ import type {
  * @property {string | null} subjectName - Member the entry is about
  * @property {string | null} href - Page of the record it stands for
  * @property {string | null} body - Markdown content of that record
+ * @property {{ emoji: string | null, title: string }[]} [topics] - Meeting subject titles
+ * @property {string | null} [minutes] - Meeting write-up
  * @property {boolean} readOnly - Projected from another domain, never edited here
+ * @property {boolean} rollCall - Asks its convened members to confirm presence
+ * @property {boolean} rosterShared - Convened members may see the answers
+ * @property {AttendanceRoster | null} attendance - Roll-call standings, null when not a roll-call
  * @property {FormValues} values - Values feeding the edit form
  */
 
@@ -49,24 +89,13 @@ export interface CalendarEntry {
   subjectName: string | null
   href: string | null
   body: string | null
+  topics?: { emoji: string | null; title: string }[]
+  minutes?: string | null
   readOnly: boolean
+  rollCall: boolean
+  rosterShared: boolean
+  attendance: AttendanceRoster | null
   values: FormValues
-}
-
-/**
- * Colour a legend row stands for
- * @typedef {Object} CalendarLegendRow
- * @property {string} key - Row identifier
- * @property {string} label - Display label
- * @property {string} accent - Colour drawn beside the label
- * @property {number} count - Entries the row covers in the window on screen
- */
-
-export interface CalendarLegendRow {
-  key: string
-  label: string
-  accent: string
-  count: number
 }
 
 /**

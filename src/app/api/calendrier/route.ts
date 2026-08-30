@@ -47,10 +47,11 @@ export const POST = createProtectedRoute({
   status: 201,
   descriptor: { summary: 'Post an entry on the calendar', tags: ['calendar'] },
   handler: async ({ raw, session, scope }) => {
-    const parsed = parseFormValues(await calendarFields(await scope()), raw, { fillMissing: true })
+    const perimeter = await scope()
+    const parsed = parseFormValues(await calendarFields(perimeter), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    return createEntry(session.id, parsed.values)
+    return createEntry(session.id, parsed.values, perimeter)
   },
 })
 

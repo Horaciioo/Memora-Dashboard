@@ -23,10 +23,6 @@ export const CALENDAR_COPY = {
     'Glisse un évènement ailleurs, ou tire sur une colonne pour en créer un. Maj + clic pour en sélectionner plusieurs.',
   more: 'de plus',
   edit: 'Modifier l’évènement',
-  legend: 'Légende',
-  legendColours: 'Couleurs affichées',
-  legendSources: 'Origines',
-  legendEmpty: 'Rien à colorer sur cette période.',
   selected: 'sélectionné',
   selectedPlural: 'sélectionnés',
   clearSelection: 'Tout désélectionner',
@@ -35,8 +31,37 @@ export const CALENDAR_COPY = {
   deleteManyTitle: 'Supprimer ces évènements ?',
   deleteManyDescription: 'Ils disparaissent du calendrier de tout le monde.',
   readOnlyNotice: 'Cet élément vient d’un autre écran, il se modifie là-bas.',
-  bulkShift: 'Décaler la sélection',
-  filters: 'Filtrer les origines',
+  // Legend, its icon button and the page it opens
+  legendInfo: 'Comprendre les couleurs et les zones',
+  legendTitle: 'Légende du calendrier',
+  legendLead: 'À quoi correspondent les couleurs, les zones et les niveaux de visibilité.',
+  legendKindsTitle: 'Les trois formes',
+  legendSourcesTitle: 'Les origines et leurs couleurs',
+  legendZonesTitle: 'Zones et évènements',
+  legendZonesText:
+    'Une zone est un fond pastel posé sur une plage de jours. Les évènements et les périodes, eux, sont peints en couleur pleine avec un titre en noir pour rester lisibles par-dessus.',
+  legendVisibilityTitle: 'Qui voit quoi',
+  legendVisibilityText:
+    'Chaque évènement porte un niveau de visibilité. « Tout le monde » est visible par tous, « Responsables et plus » masque l’évènement aux modérateurs, « Administrateurs seuls » le réserve à l’encadrement.',
+  legendUnderstood: 'J’ai compris !',
+  // Detail modal, meetings and birthdays
+  meetingTopicsTitle: 'Sujets prévus',
+  meetingTopicsEmpty: 'Aucun sujet prévu.',
+  meetingMinutesTitle: 'Compte-rendu',
+  meetingMinutesEmpty: 'Pas encore de compte-rendu.',
+  birthdayMessage: 'N’hésite pas à lui souhaiter un merveilleux anniversaire !',
+  preview: 'Aperçu',
+  // Roll-call, its answer buttons and its roster
+  rollCallTitle: 'Appel de présence',
+  rollCallLead: 'Dis à ton Responsable si tu seras là.',
+  respondPresent: 'Je serai là',
+  respondAbsent: 'Je ne serai pas là',
+  yourAnswer: 'Ta réponse',
+  noAnswerYet: 'Tu n’as pas encore répondu.',
+  remindPending: 'Relancer les sans-réponse',
+  reminderSent: 'Rappel envoyé aux sans-réponse',
+  rosterHidden: 'Ton Responsable n’a pas ouvert le détail des réponses.',
+  noRoster: 'Personne n’est encore convoqué.',
 } as const
 
 /**
@@ -59,6 +84,13 @@ export const CALENDAR_FIELD_COPY = {
   youtuber: 'YouTubeur',
   project: 'Projet',
   description: 'Description',
+  rollCall: 'Demander la présence',
+  teams: 'Équipes convoquées',
+  members: 'Membres en plus',
+  rosterShared: 'Réponses visibles par l’équipe',
+  rosterSharedHint: 'Sinon, seuls les Responsables voient qui a répondu quoi.',
+  remindAt: 'Rappel aux sans-réponse',
+  remindAtHint: 'Laisse vide pour un rappel la veille en fin de journée.',
 } as const
 
 /**
