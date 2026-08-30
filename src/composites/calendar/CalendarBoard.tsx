@@ -11,8 +11,8 @@ import { Dialog } from '@/components/structures/Dialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
+import { AttendancePanel } from '@/composites/calendar/AttendancePanel'
 import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
-import { CalendarLegend } from '@/composites/calendar/CalendarLegend'
 import { useCalendar } from '@/core/hooks/data/useCalendar'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useSlotDraft } from '@/core/hooks/interaction/useSlotDraft'
@@ -31,8 +31,7 @@ import { CALENDAR_STYLES } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
-import { CalendarKinds } from '@/utils/constants/workflow'
-import type { CalendarSourceName } from '@/utils/constants/workflow'
+import { CalendarKinds, CalendarSources } from '@/utils/constants/workflow'
 import {
   coversDay,
   dayBounds,
@@ -59,6 +58,8 @@ export interface CalendarBoardProps {
   // At least one template is declared, so the board points at the configuration
   hasTemplates?: boolean
   sessionId?: string
+  // Opens straight on this entry's detail, for a deep link
+  focusEntryId?: string
 }
 
 // A week slot identifier pairs its day with its padded hour
@@ -74,14 +75,14 @@ const BULK_FIELD_NAMES = ['kind', 'templateId', 'accent', 'accountId', 'visibili
 const DayAddIcon = ICONS.add
 
 /**
- * Shared calendar — zones as a background, periods as bands, events as cards, every one of
- * them draggable, selectable and creatable straight from the grid
+ * Shared calendar
  * @param {CalendarEntry[]} initialEntries - Entries resolved server-side
  * @param {FieldDefinition[]} fields - Declarations of the entry form
  * @param {string} anchor - ISO day the grid opens on
  * @param {boolean} canManage - Member may post and move entries
  * @param {boolean} [hasTemplates] - At least one template is declared
  * @param {string} [sessionId] - Bounds the board to one academy session
+ * @param {string} [focusEntryId] - Entry the board opens straight onto
  * @return {JSX.Element}
  */
 
@@ -92,16 +93,22 @@ export const CalendarBoard = ({
   canManage,
   hasTemplates,
   sessionId,
+  focusEntryId,
 }: CalendarBoardProps) => {
   const calendar = useCalendar(initialEntries, sessionId)
+
+  // A deep link lands with its detail already open, the entry sitting in the first window
+  const linked = focusEntryId
+    ? (initialEntries.find((row) => row.id === focusEntryId) ?? null)
+    : null
+
   const [unit, setUnit] = useState<'month' | 'week'>('month')
   const [cursor, setCursor] = useState(anchor)
-  const [dialog, setDialog] = useState<'form' | 'detail' | 'bulk' | null>(null)
+  const [dialog, setDialog] = useState<'form' | 'detail' | 'bulk' | null>(linked ? 'detail' : null)
   const [editing, setEditing] = useState<CalendarEntry | null>(null)
   const [draft, setDraft] = useState<FormValues | null>(null)
-  const [opened, setOpened] = useState<CalendarEntry | null>(null)
+  const [opened, setOpened] = useState<CalendarEntry | null>(linked)
   const [selection, setSelection] = useState<string[]>([])
-  const [hidden, setHidden] = useState<CalendarSourceName[]>([])
   const [pendingDeletion, setPendingDeletion] = useState<CalendarEntry[] | null>(null)
 
   const days = useMemo(
@@ -117,12 +124,14 @@ export const CalendarBoard = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range.from, range.to])
 
-  const visible = useMemo(
-    () => calendar.entries.filter((entry) => !hidden.includes(entry.source)),
-    [calendar.entries, hidden]
-  )
+  const visible = calendar.entries
 
-  // Every entry lands in each of the days it runs across, so a band draws on all of them
+  // The open detail stays in step with roster updates
+  const openedEntry = opened
+    ? (calendar.entries.find((row) => row.id === opened.id) ?? opened)
+    : null
+
+  // Every entry lands in each of the days it runs across
   const byDay = useMemo(() => {
     const buckets = new Map<string, CalendarEntry[]>()
 
@@ -522,18 +531,6 @@ export const CalendarBoard = ({
           )}
         </div>
 
-        <CalendarLegend
-          entries={visible}
-          hidden={hidden}
-          onToggle={(source) =>
-            setHidden((current) =>
-              current.includes(source)
-                ? current.filter((key) => key !== source)
-                : [...current, source]
-            )
-          }
-        />
-
         {!hasTemplates && canManage && !sessionId && (
           <Link href={ROUTES.settingsSection(TEMPLATE_SECTION)}>
             <Button variant="link" icon="settings">
@@ -619,41 +616,95 @@ export const CalendarBoard = ({
           ) : undefined
         }
       >
-        {opened && (
-          <div className="flex flex-col gap-4">
-            <span className="flex flex-wrap items-center gap-2">
-              <Badge
-                label={CALENDAR_KIND_REGISTRY.label(opened.kind)}
-                accent={opened.accent}
-                tone="brand"
-                dot
+        {opened &&
+          (opened.source === CalendarSources.Birthday ? (
+            <p className={CALENDAR_STYLES.detailNote}>{CALENDAR_COPY.birthdayMessage}</p>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <span className="flex flex-wrap items-center gap-2">
+                <Badge
+                  label={CALENDAR_KIND_REGISTRY.label(opened.kind)}
+                  accent={opened.accent}
+                  tone="brand"
+                  dot
+                />
+                {opened.templateName && (
+                  <Badge label={opened.templateName} accent={opened.accent} tone="brand" />
+                )}
+                <Badge
+                  label={EVENT_VISIBILITY_REGISTRY.label(opened.visibility)}
+                  tone={toTone(EVENT_VISIBILITY_REGISTRY.get(opened.visibility).accent, 'neutral')}
+                  icon="visible"
+                />
+                {opened.rollCall && (
+                  <Badge label={CALENDAR_COPY.rollCallTitle} tone="info" icon="meetings" />
+                )}
+                {opened.readOnly && (
+                  <Badge label={CALENDAR_COPY.readOnlyNotice} tone="neutral" icon="info" />
+                )}
+              </span>
+              <DetailGrid
+                entries={[
+                  { label: CALENDAR_FIELD_COPY.startsAt, value: formatDayTime(opened.startsAt) },
+                  {
+                    label: CALENDAR_FIELD_COPY.endsAt,
+                    value: opened.endsAt ? formatDayTime(opened.endsAt) : undefined,
+                  },
+                  { label: CALENDAR_FIELD_COPY.subject, value: opened.subjectName },
+                  // A planned meeting never shows its description, only its subjects
+                  ...(opened.source === CalendarSources.Meeting
+                    ? []
+                    : [{ label: CALENDAR_FIELD_COPY.description, value: opened.description }]),
+                ]}
               />
-              {opened.templateName && (
-                <Badge label={opened.templateName} accent={opened.accent} tone="brand" />
+
+              {opened.source === CalendarSources.Meeting ? (
+                <>
+                  <div className="flex flex-col gap-1.5">
+                    <span className={CALENDAR_STYLES.legendTitle}>
+                      {CALENDAR_COPY.meetingTopicsTitle}
+                    </span>
+                    {opened.topics && opened.topics.length > 0 ? (
+                      <ul className={CALENDAR_STYLES.detailList}>
+                        {opened.topics.map((topic, index) => (
+                          <li key={index}>
+                            {[topic.emoji, topic.title].filter(Boolean).join(' ')}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className={CALENDAR_STYLES.detailNote}>
+                        {CALENDAR_COPY.meetingTopicsEmpty}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <span className={CALENDAR_STYLES.legendTitle}>
+                      {CALENDAR_COPY.meetingMinutesTitle}
+                    </span>
+                    {opened.minutes ? (
+                      <Markdown source={opened.minutes} />
+                    ) : (
+                      <p className={CALENDAR_STYLES.detailNote}>
+                        {CALENDAR_COPY.meetingMinutesEmpty}
+                      </p>
+                    )}
+                  </div>
+                </>
+              ) : (
+                opened.body && <Markdown source={opened.body} />
               )}
-              <Badge
-                label={EVENT_VISIBILITY_REGISTRY.label(opened.visibility)}
-                tone={toTone(EVENT_VISIBILITY_REGISTRY.get(opened.visibility).accent, 'neutral')}
-                icon="visible"
-              />
-              {opened.readOnly && (
-                <Badge label={CALENDAR_COPY.readOnlyNotice} tone="neutral" icon="info" />
+
+              {openedEntry?.rollCall && (
+                <AttendancePanel
+                  entry={openedEntry}
+                  pending={calendar.isSaving}
+                  onRespond={(status) => void calendar.respond(openedEntry.id, status)}
+                  onRemind={() => void calendar.remind(openedEntry.id)}
+                />
               )}
-            </span>
-            <DetailGrid
-              entries={[
-                { label: CALENDAR_FIELD_COPY.startsAt, value: formatDayTime(opened.startsAt) },
-                {
-                  label: CALENDAR_FIELD_COPY.endsAt,
-                  value: opened.endsAt ? formatDayTime(opened.endsAt) : undefined,
-                },
-                { label: CALENDAR_FIELD_COPY.subject, value: opened.subjectName },
-                { label: CALENDAR_FIELD_COPY.description, value: opened.description },
-              ]}
-            />
-            {opened.body && <Markdown source={opened.body} />}
-          </div>
-        )}
+            </div>
+          ))}
       </Dialog>
 
       <ConfirmDialog

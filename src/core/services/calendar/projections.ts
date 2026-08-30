@@ -1,15 +1,13 @@
 import 'server-only'
 
-import moment from 'moment'
-
 import { prisma } from '@/core/lib/db'
+import { endOfDay, startOfDay } from '@/utils/format/days'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { ACADEMY_STAGE_REGISTRY } from '@/declarations/academy/registries'
 import { CALENDAR_PROJECTION_COPY } from '@/declarations/calendar/copy'
 import { CALENDAR_SOURCE_REGISTRY } from '@/declarations/calendar/registries'
 import { ROUTES } from '@/declarations/navigation'
-import { MEETING_COPY } from '@/declarations/work/copy'
 import type { PermissionHelpers } from '@/types/auth'
 import type { CalendarEntry } from '@/types/calendar'
 import type { AcademyStageName } from '@/utils/constants/hierarchy'
@@ -39,7 +37,11 @@ export interface ProjectionContext {
   scope: AccessScope
 }
 
-// Functions carry the colour, so every projected member is read with both of theirs
+// Milliseconds in one day and one minute
+const DAY_MS = 86_400_000
+const MINUTE_MS = 60_000
+
+// Functions carry the colour
 const FUNCTION_SHAPE = {
   select: {
     displayName: true,
@@ -49,7 +51,7 @@ const FUNCTION_SHAPE = {
 } as const
 
 /**
- * Member a projected entry is about, the source of its colour
+ * Member a projected entry is about
  * @typedef {Object} ProjectedMember
  * @property {string} displayName - Member name
  * @property {{ accent: string | null } | null} primaryFunction - Main post
@@ -63,7 +65,7 @@ export interface ProjectedMember {
 }
 
 /**
- * Read the post lending its colour to an entry, the main one before the second
+ * Read the post lending its colour to an entry
  * @param {ProjectedMember | null | undefined} member - Member the entry is about
  * @return {{ name: string, accent: string } | null} - Post carrying a colour
  */
@@ -78,7 +80,7 @@ export const memberFunction = (
 }
 
 /**
- * Read the colour a member lends to an entry, their function always winning
+ * Read the colour a member lends to an entry
  * @param {ProjectedMember | null | undefined} member - Member the entry is about
  * @param {(string | null | undefined)[]} fallbacks - Colours tried when no function carries one
  * @return {string | null} - Colour to draw
@@ -108,6 +110,8 @@ export const memberAccent = (
  * @param {string} [input.legendLabel] - Legend row it belongs to
  * @param {string} [input.href] - Page of the record
  * @param {string} [input.body] - Markdown content of the record
+ * @param {{ emoji: string | null, title: string }[]} [input.topics] - Meeting subject titles
+ * @param {string | null} [input.minutes] - Meeting write-up
  * @return {CalendarEntry} - Projected entry
  */
 
@@ -125,6 +129,8 @@ const projected = ({
   legendLabel,
   href,
   body,
+  topics,
+  minutes,
 }: {
   source: CalendarSourceName
   id: string
@@ -139,6 +145,8 @@ const projected = ({
   legendLabel?: string
   href?: string
   body?: string
+  topics?: { emoji: string | null; title: string }[]
+  minutes?: string | null
 }): CalendarEntry => {
   const meta = CALENDAR_SOURCE_REGISTRY.get(source)
 
@@ -162,7 +170,12 @@ const projected = ({
     subjectName,
     href: href ?? null,
     body: body ?? null,
+    topics,
+    minutes,
     readOnly: true,
+    rollCall: false,
+    rosterShared: false,
+    attendance: null,
     values: {},
   }
 }
@@ -212,36 +225,6 @@ export const absenceEntries = async ({
 }
 
 /**
- * Lay a meeting's four content axes out as one markdown block
- * @param {Object} meeting - Meeting row with its topics
- * @param {string | null} meeting.introduction - Opening words
- * @param {string | null} meeting.outro - Closing words
- * @param {string | null} meeting.minutes - Meeting minutes
- * @param {Array<{ emoji: string, title: string, body: string | null }>} meeting.topics - Points covered
- * @return {string | undefined} - Markdown content, absent while every axis stays blank
- */
-
-const meetingBody = (meeting: {
-  introduction: string | null
-  outro: string | null
-  minutes: string | null
-  topics: { emoji: string; title: string; body: string | null }[]
-}): string | undefined => {
-  const topics = meeting.topics.map((topic) =>
-    [`### ${topic.emoji} ${topic.title}`, topic.body].filter(Boolean).join('\n\n')
-  )
-
-  const sections = [
-    meeting.introduction && `## ${MEETING_COPY.introductionTitle}\n\n${meeting.introduction}`,
-    topics.length > 0 && `## ${MEETING_COPY.topicsTitle}\n\n${topics.join('\n\n')}`,
-    meeting.outro && `## ${MEETING_COPY.outroTitle}\n\n${meeting.outro}`,
-    meeting.minutes && `## ${MEETING_COPY.minutesTitle}\n\n${meeting.minutes}`,
-  ].filter((section): section is string => Boolean(section))
-
-  return sections.length > 0 ? sections.join('\n\n') : undefined
-}
-
-/**
  * Project the meetings of the window that were not already posted by hand
  * @param {ProjectionContext} context - Window and permissions
  * @return {Promise<CalendarEntry[]>} - Projected meetings
@@ -282,15 +265,17 @@ export const meetingEntries = async ({
       emoji: row.emoji,
       startsAt: row.scheduledAt,
       endsAt: row.durationMin
-        ? moment(row.scheduledAt).add(row.durationMin, 'minutes').toDate()
+        ? new Date(row.scheduledAt.getTime() + row.durationMin * MINUTE_MS)
         : null,
       allDay: false,
       accent: memberAccent(lead),
-      description: row.introduction,
+      // A planned meeting shows nothing of its content, only its subject titles
+      description: null,
       subjectName: lead?.displayName ?? null,
       legendLabel: memberFunction(lead)?.name,
       href: ROUTES.meeting(row.id),
-      body: meetingBody(row),
+      topics: row.topics.map((topic) => ({ emoji: topic.emoji, title: topic.title })),
+      minutes: row.minutes,
     })
   })
 }
@@ -309,32 +294,57 @@ export const birthdayEntries = async ({
 }: ProjectionContext): Promise<CalendarEntry[]> => {
   if (!access.can(Permissions.MemberRead)) return []
 
+  /*
+   * Postgres narrows the candidates, Node keeps the last word. Comparing month
+   * and day as one integer avoids ever building a date that does not exist,
+   * which is what a 29 February birthday does in a non leap year
+   */
+  const windowStart = new Date(from)
+  const windowEnd = new Date(to)
+  const dayKey = (date: Date): number => (date.getMonth() + 1) * 100 + date.getDate()
+
+  // Widened by a day each side, so the filter below never loses a candidate
+  const fromKey = dayKey(new Date(windowStart.getTime() - DAY_MS))
+  const toKey = dayKey(new Date(windowEnd.getTime() + DAY_MS))
+
+  const candidates = await prisma.$queryRaw<{ id: string }[]>`
+    SELECT id FROM accounts
+    WHERE birthday IS NOT NULL
+      AND "celebrateBirthday" = true
+      AND "leftAt" IS NULL
+      AND CASE
+        WHEN ${fromKey} <= ${toKey}
+          THEN (EXTRACT(MONTH FROM birthday) * 100 + EXTRACT(DAY FROM birthday))
+               BETWEEN ${fromKey} AND ${toKey}
+        ELSE (EXTRACT(MONTH FROM birthday) * 100 + EXTRACT(DAY FROM birthday)) >= ${fromKey}
+          OR (EXTRACT(MONTH FROM birthday) * 100 + EXTRACT(DAY FROM birthday)) <= ${toKey}
+      END
+  `
+
+  if (candidates.length === 0) return []
+
   const rows = await prisma.account.findMany({
-    where: scopedWhere('account', scope, {
-      birthday: { not: null },
-      celebrateBirthday: true,
-      leftAt: null,
-    }),
+    where: scopedWhere('account', scope, { id: { in: candidates.map((row) => row.id) } }),
     select: { id: true, birthday: true, ...FUNCTION_SHAPE.select },
   })
 
-  const start = moment(from).startOf('day')
-  const end = moment(to).endOf('day')
+  const start = startOfDay(new Date(from))
+  const end = endOfDay(new Date(to))
 
   return rows.flatMap((row) => {
-    const birthday = moment(row.birthday!)
+    const birthday = row.birthday as Date
 
     // A window can straddle a new year, so both candidate years are tried
-    return [start.year(), end.year()]
+    return [start.getFullYear(), end.getFullYear()]
       .filter((year, index, years) => years.indexOf(year) === index)
-      .map((year) => birthday.clone().year(year))
-      .filter((day) => day.isBetween(start, end, 'day', '[]'))
+      .map((year) => new Date(year, birthday.getMonth(), birthday.getDate()))
+      .filter((day) => day >= start && day <= end)
       .map((day) =>
         projected({
           source: CalendarSources.Birthday,
-          id: `${row.id}:${day.year()}`,
+          id: `${row.id}:${day.getFullYear()}`,
           title: `${CALENDAR_PROJECTION_COPY.birthday} — ${row.displayName}`,
-          startsAt: day.startOf('day').toDate(),
+          startsAt: day,
           endsAt: null,
           allDay: true,
           accent: memberAccent(row),

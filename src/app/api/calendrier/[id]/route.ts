@@ -17,7 +17,8 @@ export const PATCH = createProtectedRoute({
   descriptor: { summary: 'Edit or move a calendar entry', tags: ['calendar'] },
   handler: async ({ params, raw, session, access, scope }) => {
     const perimeter = await scope()
-    await assertEntryAccess(params.id, session.id, access.can(Permissions.CalendarManage))
+    const canManage = access.can(Permissions.CalendarManage)
+    await assertEntryAccess(params.id, session.id, canManage)
     await assertRowInScope('calendarEvent', params.id, perimeter)
 
     // A lone start only drags the entry, it never rewrites the rest
@@ -43,7 +44,7 @@ export const PATCH = createProtectedRoute({
     const parsed = parseFormValues(await calendarFields(perimeter), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    return updateEntry(params.id, parsed.values)
+    return updateEntry(params.id, parsed.values, perimeter, session.id, canManage)
   },
 })
 
