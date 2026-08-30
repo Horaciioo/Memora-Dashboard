@@ -4,12 +4,14 @@ import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { SESSION_COOKIE, isDiscordId, normaliseDiscordId } from '@/core/lib/auth/session'
+import { consume, readAddress } from '@/core/lib/http/rateLimit'
 import {
   closeSession,
   openSession,
   resolveSignInAccount,
 } from '@/core/services/auth/SessionService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { isIdentifierSignInAllowed } from '@/declarations/access/signIn'
 import { ROUTES } from '@/declarations/navigation'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
@@ -25,13 +27,21 @@ export interface LoginState {
 }
 
 /**
- * Sign in with a Discord identifier
+ * Sign in with a Discord identifier, only while Discord itself is unavailable
  * @param {LoginState} _previousState - Previous form state, unused
  * @param {FormData} formData - Submitted identifier
  * @return {Promise<LoginState>} - Failure message or a redirect
  */
 
 export async function login(_previousState: LoginState, formData: FormData): Promise<LoginState> {
+  // The fallback is refused outright once Discord is wired, or on a deployed branch
+  if (!isIdentifierSignInAllowed()) return { error: AUTH_COPY.identifierDisabled }
+
+  const headerStore = await headers()
+
+  const verdict = await consume('signIn', readAddress(headerStore))
+  if (!verdict.allowed) return { error: AUTH_COPY.throttled }
+
   const discordId = normaliseDiscordId(formData.get('discordId'))
 
   if (!isDiscordId(discordId)) return { error: AUTH_COPY.malformedId }
@@ -41,18 +51,17 @@ export async function login(_previousState: LoginState, formData: FormData): Pro
   if (account.status === MemberStatuses.Left) return { error: AUTH_COPY.revokedAccess }
 
   // Session token lands in an httpOnly cookie
-  const headerStore = await headers()
-  const { token, expiresAt } = await openSession(
-    account.id,
-    headerStore.get('user-agent') ?? undefined
-  )
+  const { token, expiresAt } = await openSession(account.id, {
+    userAgent: headerStore.get('user-agent') ?? undefined,
+    address: readAddress(headerStore) || undefined,
+  })
 
   const cookieStore = await cookies()
   cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
-    path: '/',
+    path: ROUTES.home,
     expires: expiresAt,
   })
 

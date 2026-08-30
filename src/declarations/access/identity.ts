@@ -1,7 +1,7 @@
 import 'server-only'
 
 import adminIdentity from '@/configurations/system/identifiant.admin.json'
-import { readBoolean, readInteger, readString } from '@/declarations/configurations/readers'
+import { readBoolean, readString } from '@/declarations/configurations/readers'
 import { MemberRoles, type MemberRoleName } from '@/utils/constants/hierarchy'
 
 /**
@@ -11,7 +11,6 @@ import { MemberRoles, type MemberRoleName } from '@/utils/constants/hierarchy'
  * @property {string | null} seedName - Name written on the very first sign-in
  * @property {MemberRoleName} role - Hierarchy level
  * @property {boolean} immutable - Never editable nor deletable
- * @property {number} sessionDays - Session lifetime
  */
 
 export interface RootIdentity {
@@ -19,7 +18,6 @@ export interface RootIdentity {
   seedName: string | null
   role: MemberRoleName
   immutable: boolean
-  sessionDays: number
 }
 
 // Neither the identifier nor the name is ever written in a configuration file
@@ -49,12 +47,6 @@ export const ROOT_IDENTITY: RootIdentity = {
   immutable: readBoolean(adminIdentity.immutable, {
     path: 'system/identifiant.admin.immutable',
     fallback: true,
-  }),
-  sessionDays: readInteger(adminIdentity.sessionDays, {
-    path: 'system/identifiant.admin.sessionDays',
-    fallback: 14,
-    min: 1,
-    max: 90,
   }),
 }
 
