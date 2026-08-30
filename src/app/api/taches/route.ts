@@ -3,6 +3,7 @@ import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { createTask, listTasks, taskFields } from '@/core/services/work/TaskService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notify } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
@@ -28,6 +29,15 @@ export const POST = createProtectedRoute({
       targetType: 'task',
       targetId: task.id,
       summary: task.title,
+    })
+
+    await notify({
+      kind: 'TaskAssigned',
+      recipients: [task.owner?.id],
+      actorId: session.id,
+      target: 'task',
+      targetId: task.id,
+      subject: task.title,
     })
 
     return task

@@ -7,6 +7,7 @@ import {
   readTeamBoard,
   teamFields,
 } from '@/core/services/teams/TeamService'
+import { notify } from '@/core/services/system/NotificationService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -35,12 +36,30 @@ export const POST = createProtectedRoute({
 export const PATCH = createProtectedRoute({
   permission: Permissions.TeamManage,
   descriptor: { summary: 'Move a member between teams', tags: ['teams'] },
-  handler: async ({ raw, query, scope }) => {
+  handler: async ({ raw, query, session, scope }) => {
     const accountId = String(raw.accountId ?? '')
     if (!accountId) throw invalidInput([{ field: 'accountId', message: FORM_COPY.required }])
 
     const teamId = raw.teamId === null || raw.teamId === undefined ? null : String(raw.teamId)
+    const board = await moveMember(
+      accountId,
+      teamId,
+      await scope(),
+      query.get(SCOPE_PARAM) ?? undefined
+    )
 
-    return moveMember(accountId, teamId, await scope(), query.get(SCOPE_PARAM) ?? undefined)
+    // Leaving a team concerns nobody but the board, joining one concerns the moderator
+    if (teamId) {
+      await notify({
+        kind: 'TeamAssigned',
+        recipients: [accountId],
+        actorId: session.id,
+        target: 'team',
+        targetId: teamId,
+        once: true,
+      })
+    }
+
+    return board
   },
 })

@@ -6,6 +6,7 @@ import {
   reviewAbsence,
 } from '@/core/services/absences/AbsenceService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notify } from '@/core/services/system/NotificationService'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
@@ -37,6 +38,15 @@ export const PATCH = createProtectedRoute({
       targetType: 'absence',
       targetId: absence.id,
       summary: ABSENCE_STATUS_REGISTRY.label(status),
+    })
+
+    await notify({
+      kind: 'AbsenceReviewed',
+      recipients: [absence.accountId],
+      actorId: session.id,
+      target: 'absence',
+      targetId: absence.id,
+      subject: ABSENCE_STATUS_REGISTRY.label(status),
     })
 
     return absence

@@ -8,6 +8,7 @@ import {
   touchMeeting,
 } from '@/core/services/work/MeetingService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notifyMentions } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
@@ -33,6 +34,13 @@ export const POST = createProtectedRoute({
       targetType: 'meeting',
       targetId: params.id,
       summary: `${topic.emoji} ${topic.title}`,
+    })
+
+    await notifyMentions(topic.body, {
+      actorId: session.id,
+      target: 'meeting',
+      targetId: params.id,
+      subject: topic.title,
     })
 
     return topic

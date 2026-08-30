@@ -7,6 +7,7 @@ import {
   sessionFields,
 } from '@/core/services/recruitment/RecruitmentService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { notify } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
@@ -32,6 +33,15 @@ export const POST = createProtectedRoute({
       targetType: 'recruitment',
       targetId: created.id,
       summary: created.name,
+    })
+
+    await notify({
+      kind: 'RecruitmentAssigned',
+      recipients: created.responsables.map((person) => person.id),
+      actorId: session.id,
+      target: 'recruitment',
+      targetId: created.id,
+      subject: created.name,
     })
 
     return created

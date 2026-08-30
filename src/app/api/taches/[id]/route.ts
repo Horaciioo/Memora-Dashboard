@@ -1,18 +1,24 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { removeTask, taskFields, updateTask } from '@/core/services/work/TaskService'
+import { readTask, removeTask, taskFields, updateTask } from '@/core/services/work/TaskService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { summariseChange } from '@/core/services/system/changes'
+import { notify } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
   permission: Permissions.TaskUpdate,
   descriptor: { summary: 'Edit a task', tags: ['tasks'] },
   handler: async ({ params, raw, session, scope }) => {
-    const parsed = parseFormValues(await taskFields(await scope()), raw, { fillMissing: true })
+    const perimeter = await scope()
+    const fields = await taskFields(perimeter)
+
+    const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const task = await updateTask(params.id, parsed.values, await scope(), session.id)
+    const before = await readTask(params.id)
+    const task = await updateTask(params.id, parsed.values, perimeter, session.id)
 
     await recordEvent({
       eventType: 'TaskUpdated',
@@ -21,6 +27,17 @@ export const PATCH = createProtectedRoute({
       targetType: 'task',
       targetId: task.id,
       summary: task.title,
+      change: summariseChange(fields, before.values, task.values),
+    })
+
+    await notify({
+      kind: 'TaskAssigned',
+      recipients: [task.owner?.id],
+      actorId: session.id,
+      target: 'task',
+      targetId: task.id,
+      subject: task.title,
+      once: true,
     })
 
     return task
