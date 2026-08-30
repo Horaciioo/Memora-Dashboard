@@ -17,9 +17,8 @@ next-env.d.ts
 build
 dist
 
-# env, never tracked — the documented template is the one exception
+# env, never tracked, the documented template included
 .env*
-!.env.example
 
 # log files written by LoggerManager
 /logs
