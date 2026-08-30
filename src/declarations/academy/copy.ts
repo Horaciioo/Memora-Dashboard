@@ -8,6 +8,8 @@ export const ACADEMY_COPY = {
   lead: 'Chaque session accueille, forme, suit et valide ses juniors jusqu’à leur autonomie.',
   glossaryTitle: 'Lexique de l’Academy',
   glossaryLead: 'Les mots du domaine, définis une fois pour toutes.',
+  tabSessions: 'Sessions',
+  tabGlossary: 'Lexique',
   sessionAdd: 'Ouvrir une session',
   emptyTitle: 'Aucune session',
   emptyDescription: 'Ouvre une première session pour accueillir des juniors.',
@@ -198,7 +200,8 @@ export const ADMISSION_COPY = {
   invalidTitle: 'Lien invalide',
   invalidDescription:
     'Ce lien d’admission n’existe plus, a expiré ou a atteint son nombre d’utilisations.',
-  duplicateId: 'Cet identifiant Discord est déjà rattaché à un compte.',
+  rejected: 'Cette candidature n’a pas pu être enregistrée. Vérifie ton identifiant Discord.',
+  consentLabel: 'J’accepte la conservation de mes données',
 } as const
 
 /**

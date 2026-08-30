@@ -1,9 +1,11 @@
 import 'server-only'
 
 import crypto from 'crypto'
-import moment from 'moment'
 
+import { decryptField, encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
+import { WEEK_GRID_DAYS, addDays } from '@/utils/format/days'
+import { activeFunctions } from '@/core/services/reference/lookups'
 import { conflict, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
@@ -80,10 +82,7 @@ const REVIEW_STAGE_OPTIONS: FieldOption[] = REVIEW_STAGES.map((stage) => ({
  */
 
 export const sessionFields = async (): Promise<FieldDefinition[]> => {
-  const [members, functions] = await Promise.all([
-    memberOptions(),
-    prisma.jobFunction.findMany({ where: { archived: false }, orderBy: { position: 'asc' } }),
-  ])
+  const [members, functions] = await Promise.all([memberOptions(), activeFunctions()])
 
   return [
     {
@@ -490,7 +489,7 @@ export const listSessions = async (
  */
 
 const proposedEnd = (startsAt: Date): Date =>
-  moment(startsAt).add(ACADEMY_SETTINGS.weeksMin, 'weeks').toDate()
+  addDays(startsAt, ACADEMY_SETTINGS.weeksMin * WEEK_GRID_DAYS)
 
 /**
  * Turn parsed values into a session payload
@@ -548,7 +547,7 @@ const ensureSessionInvite = async (
     data: {
       sessionId,
       token: crypto.randomBytes(24).toString('base64url'),
-      expiresAt: moment().add(ACADEMY_SETTINGS.inviteExpiryDays, 'days').toDate(),
+      expiresAt: addDays(new Date(), ACADEMY_SETTINGS.inviteExpiryDays),
       maxUses: ACADEMY_SETTINGS.inviteMaxUses,
     },
   })
@@ -852,8 +851,7 @@ export const listSteps = async (sessionId: string): Promise<AcademyStepView[]> =
  * @return {Date} - Resolved day
  */
 
-const dayOffset = (startsAt: Date, offsetDays: number): Date =>
-  moment(startsAt).add(offsetDays, 'days').toDate()
+const dayOffset = (startsAt: Date, offsetDays: number): Date => addDays(startsAt, offsetDays)
 
 /**
  * Copy a batch of PIMT templates onto the timeline as steps
@@ -1778,7 +1776,7 @@ const toJuniorNote = (row: {
   id: row.id,
   stage: row.stage,
   kind: row.kind,
-  body: row.body,
+  body: decryptField(row.body) ?? '',
   authorName: row.author?.displayName ?? null,
   createdAt: row.createdAt.toISOString(),
   values: { stage: row.stage, kind: row.kind, body: row.body },
@@ -1815,7 +1813,7 @@ export const listJuniorNotes = async (
 const toJuniorNoteData = (values: FormValues) => ({
   stage: (readText(values, 'stage') ?? AcademyStages.Preparation) as AcademyStageName,
   kind: (readText(values, 'kind') ?? NoteKinds.Positive) as NoteKindName,
-  body: readText(values, 'body') ?? '',
+  body: encryptField(readText(values, 'body')) ?? '',
 })
 
 /**
