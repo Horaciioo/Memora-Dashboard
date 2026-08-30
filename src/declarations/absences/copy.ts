@@ -44,6 +44,9 @@ export const ABSENCE_COPY = {
 export const ABSENCE_FIELD_COPY = {
   dates: 'Dates de l’absence',
   reason: 'Motif',
+  reasonHint: 'Choisis la catégorie la plus proche.',
+  detail: 'Précision',
+  detailHint: 'Facultatif. N’écris jamais de détail médical ici.',
   member: 'Modérateur',
   status: 'Statut',
   reviewNote: 'Mot au modérateur',

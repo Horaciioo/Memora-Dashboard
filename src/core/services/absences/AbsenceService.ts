@@ -1,9 +1,15 @@
 import 'server-only'
 
+import { decryptField, encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
+import { ABSENCE_REASONS } from '@/utils/constants/absences'
 import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { readDateRange, readText } from '@/core/lib/forms/values'
-import { ABSENCE_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
+import {
+  ABSENCE_SETTINGS,
+  FORM_SETTINGS,
+  PAGINATION_SETTINGS,
+} from '@/declarations/configurations/settings'
 import { ABSENCE_COPY, ABSENCE_FIELD_COPY } from '@/declarations/absences/copy'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -55,23 +61,41 @@ const canReviewAbsence = async (
 }
 
 /**
- * Map an absence row to its display shape
- * @param {AbsenceRow} row - Absence row with its references
+ * Map an absence row to its display shape, the member name coming from the caller
+ * so a member file never re-reads the account it already holds
+ * @param {Omit<AbsenceRow, 'account'>} row - Absence row with its reviewer
+ * @param {string} memberName - Whose absence it is
  * @return {MemberAbsence} - List row
  */
 
-const toAbsence = (row: AbsenceRow): MemberAbsence => ({
+export const toAbsence = (row: Omit<AbsenceRow, 'account'>, memberName: string): MemberAbsence => ({
   id: row.id,
   accountId: row.accountId,
-  memberName: row.account.displayName,
+  memberName,
   startDate: row.startDate.toISOString(),
   endDate: row.endDate.toISOString(),
   dayCount: row.dayCount,
-  reason: row.reason,
+  reasonLabel: row.reasonCode === null ? null : ABSENCE_REASONS.label(row.reasonCode),
+  reason: decryptField(row.reason),
   status: row.status,
   reviewerName: row.reviewer?.displayName ?? null,
-  reviewNote: row.reviewNote,
+  reviewNote: decryptField(row.reviewNote),
 })
+
+/**
+ * Read the chosen category, refusing anything outside the closed list
+ * @param {FormValues} values - Parsed body
+ * @return {number} - Reason identifier
+ */
+
+const readReasonCode = (values: FormValues): number => {
+  const raw = Number(readText(values, 'reasonCode'))
+  if (!Number.isInteger(raw) || !ABSENCE_REASONS.has(raw)) {
+    throw invalidInput([{ field: 'reasonCode', message: FORM_COPY.notAnOption }])
+  }
+
+  return raw
+}
 
 /**
  * Declarations of the absence form
@@ -86,10 +110,23 @@ export const ABSENCE_FIELDS: FieldDefinition[] = [
     required: true,
   },
   {
-    name: 'reason',
-    kind: 'textarea',
+    name: 'reasonCode',
+    kind: 'select',
     label: ABSENCE_FIELD_COPY.reason,
-    maxLength: FORM_SETTINGS.longTextMaxLength,
+    hint: ABSENCE_FIELD_COPY.reasonHint,
+    required: true,
+    options: ABSENCE_REASONS.options.map((option) => ({
+      value: String(option.value),
+      label: option.label,
+    })),
+  },
+  // Free text is kept for logistics only, never for a medical detail
+  {
+    name: 'reason',
+    kind: 'text',
+    label: ABSENCE_FIELD_COPY.detail,
+    hint: ABSENCE_FIELD_COPY.detailHint,
+    maxLength: FORM_SETTINGS.shortTextMaxLength,
   },
 ]
 
@@ -108,19 +145,24 @@ export const REVIEW_FIELDS: FieldDefinition[] = [
 ]
 
 /**
- * Read the absences of one member
+ * Read the absences of one member, newest first
  * @param {string} accountId - Account identifier
+ * @param {number} [take] - Entry count
  * @return {Promise<MemberAbsence[]>} - Absences
  */
 
-export const listOwnAbsences = async (accountId: string): Promise<MemberAbsence[]> => {
+export const listOwnAbsences = async (
+  accountId: string,
+  take: number = PAGINATION_SETTINGS.defaultPerPage
+): Promise<MemberAbsence[]> => {
   const rows = await prisma.absence.findMany({
     where: { accountId },
     include: ABSENCE_INCLUDE,
     orderBy: { startDate: 'desc' },
+    take,
   })
 
-  return rows.map(toAbsence)
+  return rows.map((row) => toAbsence(row, row.account.displayName))
 }
 
 /**
@@ -146,7 +188,7 @@ export const listReviewQueue = async (
     orderBy: { startDate: 'asc' },
   })
 
-  return rows.map(toAbsence)
+  return rows.map((row) => toAbsence(row, row.account.displayName))
 }
 
 /**
@@ -199,13 +241,14 @@ export const createAbsence = async (
       startDate,
       endDate,
       dayCount,
-      reason: readText(values, 'reason'),
+      reasonCode: readReasonCode(values),
+      reason: encryptField(readText(values, 'reason')),
       status: AbsenceStatuses.Pending,
     },
     include: ABSENCE_INCLUDE,
   })
 
-  return toAbsence(row)
+  return toAbsence(row, row.account.displayName)
 }
 
 /**
@@ -236,12 +279,12 @@ export const reviewAbsence = async (
       status,
       reviewerId,
       reviewedAt: new Date(),
-      reviewNote: readText(values, 'reviewNote'),
+      reviewNote: encryptField(readText(values, 'reviewNote')),
     },
     include: ABSENCE_INCLUDE,
   })
 
-  return toAbsence(row)
+  return toAbsence(row, row.account.displayName)
 }
 
 /**

@@ -20,6 +20,7 @@ import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import type { AbsenceStatusName } from '@/utils/constants/workflow'
+import { absenceReasonText } from '@/utils/format/absences'
 import { formatDayRange } from '@/utils/format/dates'
 
 export interface AbsencesPanelProps {
@@ -151,9 +152,9 @@ export const AbsencesPanel = ({
                       <span className="font-medium">
                         {formatDayRange(absence.startDate, absence.endDate)}
                       </span>
-                      {absence.reason && (
+                      {absenceReasonText(absence) && (
                         <span className="truncate text-xs text-[var(--color-ink-subtle)]">
-                          {absence.reason}
+                          {absenceReasonText(absence)}
                         </span>
                       )}
                     </span>
@@ -187,7 +188,7 @@ export const AbsencesPanel = ({
                     <span className="font-medium">{absence.memberName}</span>
                     <span className="truncate text-xs text-[var(--color-ink-subtle)]">
                       {formatDayRange(absence.startDate, absence.endDate)}
-                      {absence.reason ? ` · ${absence.reason}` : ''}
+                      {absenceReasonText(absence) ? ` · ${absenceReasonText(absence)}` : ''}
                     </span>
                   </span>
                   <Badge
