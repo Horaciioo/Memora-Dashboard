@@ -197,6 +197,24 @@ export const NotesIllustration: FC<EmptyStateIllustrationProps> = ({ className }
 )
 
 /**
+ * Bell at rest on its ground line — figure for the notification surfaces
+ * @param {string} [className] - Extra classes merged onto the svg
+ * @return {JSX.Element}
+ */
+
+export const NotificationsIllustration: FC<EmptyStateIllustrationProps> = ({ className }) => (
+  <Figure className={className}>
+    <circle cx="48" cy="18" r="4" {...STROKE} />
+    <path d="M48 22v4" {...STROKE} />
+    <path d="M28 60c0-24 6-34 20-34s20 10 20 34" {...STROKE} />
+    <rect x="20" y="60" width="56" height="9" rx="4" {...STROKE} />
+    <path d="M41 69a7 7 0 0 0 14 0" {...STROKE} />
+    <path d="M37 58c0-17 3-26 8-29" {...FAINT} />
+    <path d="M16 80h64" {...FAINT} strokeDasharray="2 6" />
+  </Figure>
+)
+
+/**
  * Sliders panel — figure for configuration collections
  * @param {string} [className] - Extra classes merged onto the svg
  * @return {JSX.Element}

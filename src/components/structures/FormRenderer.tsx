@@ -92,6 +92,7 @@ export const FormRenderer = ({
                 hint={field.hint}
                 error={error}
                 required={field.required}
+                maturity={field.maturity}
                 className={cn(
                   field.span === 'half' ? '' : 'sm:col-span-2',
                   glyph && FIELD_STYLES.glyphField
