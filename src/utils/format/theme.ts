@@ -47,6 +47,11 @@ export const THEME_COLOUR = {
   dangerSoft: ref('color-danger-soft'),
   infoSoft: ref('color-info-soft'),
   neutralSoft: ref('color-neutral-soft'),
+  scanGround: ref('color-scan-ground'),
+  authorityAdmin: ref('color-authority-admin'),
+  authorityLead: ref('color-authority-lead'),
+  authorityAdminSoft: ref('color-authority-admin-soft'),
+  authorityLeadSoft: ref('color-authority-lead-soft'),
 } as const
 
 /**

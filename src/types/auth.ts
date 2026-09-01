@@ -1,3 +1,4 @@
+import type { ColorVisionMode, FontScale, ThemePreference } from '@/declarations/access/preferences'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import type { PermissionName } from '@/utils/constants/permissions'
 
@@ -18,6 +19,7 @@ export type Permission = PermissionName
  * @property {string | null} primaryFunctionId - Main function
  * @property {string | null} secondaryFunctionId - Secondary function
  * @property {boolean} isRoot - Root administrator
+ * @property {DisplayPreferences} display - Display preferences
  * @property {number | null} historyConsentVersion - Consent version agreed to
  * @property {Permission[]} permissions - Granted permissions
  */
@@ -35,7 +37,22 @@ export interface SessionUser {
   secondaryFunctionId: string | null
   isRoot: boolean
   historyConsentVersion: number | null
+  display: DisplayPreferences
   permissions: Permission[]
+}
+
+/**
+ * Display preferences a member set once and carries to every browser
+ * @typedef {Object} DisplayPreferences
+ * @property {ThemePreference | null} theme - Light, dark or the device's own
+ * @property {ColorVisionMode | null} colorVision - Colour vision correction
+ * @property {FontScale | null} fontScale - Text size
+ */
+
+export interface DisplayPreferences {
+  theme: ThemePreference | null
+  colorVision: ColorVisionMode | null
+  fontScale: FontScale | null
 }
 
 /**

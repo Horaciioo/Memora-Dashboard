@@ -4,13 +4,15 @@ import {
   SegmentedControl,
   type SegmentedOption,
 } from '@/components/elements/actions/SegmentedControl'
-import { useThemeStore, type ThemePreference } from '@/core/store/theme'
+import { THEME_REGISTRY, type ThemePreference } from '@/declarations/access/preferences'
+import { NAV_COPY } from '@/declarations/ui/copy/navigation'
+import { useThemeStore } from '@/core/store/theme'
 
-const OPTIONS: SegmentedOption<ThemePreference>[] = [
-  { value: 'LIGHT', label: 'Light' },
-  { value: 'DARK', label: 'Dark' },
-  { value: 'SYSTEM', label: 'Auto' },
-]
+// Compact captions, the rail has no room for the full labels
+const OPTIONS: SegmentedOption<ThemePreference>[] = THEME_REGISTRY.keys.map((key) => ({
+  value: key,
+  label: THEME_REGISTRY.get(key).short,
+}))
 
 /**
  * Three-way switch for the light/dark/system preference
@@ -21,5 +23,7 @@ export const ThemeToggle = () => {
   const theme = useThemeStore((state) => state.theme)
   const setTheme = useThemeStore((state) => state.setTheme)
 
-  return <SegmentedControl options={OPTIONS} value={theme} onChange={setTheme} label="Theme" />
+  return (
+    <SegmentedControl options={OPTIONS} value={theme} onChange={setTheme} label={NAV_COPY.theme} />
+  )
 }

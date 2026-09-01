@@ -16,7 +16,7 @@ export const PREFERENCES_COPY = {
   academyDispositif: 'Dispositif Academy',
   displayTitle: 'Affichage',
   displayLead: 'Ce que tu changes ici ne concerne que toi.',
-  storageNotice: 'Ces réglages sont retenus par ton navigateur, pas par ton compte.',
+  storageNotice: 'Ces réglages suivent ton compte, quel que soit le navigateur.',
   signInTitle: 'Connexion',
   signInLead: 'Memora te reconnaît à ton identifiant Discord, il n’y a pas de mot de passe.',
   sessionsTitle: 'Appareils connectés',
@@ -54,6 +54,5 @@ export const PROFILE_FIELD_COPY = {
   birthday: 'Date de naissance',
   timezone: 'Fuseau horaire',
   languages: 'Langues',
-  avatarUrl: 'Photo de profil',
   celebrateBirthday: 'Fêter mon anniversaire dans l’équipe',
 } as const
