@@ -5,7 +5,7 @@ import { Button } from '@/components/elements/actions/Button'
 import { Tabs } from '@/components/elements/navigation/Tabs'
 import { Dialog } from '@/components/structures/Dialog'
 import { FormRenderer } from '@/components/structures/FormRenderer'
-import { emptyValues, groupFields } from '@/core/lib/forms'
+import { FORM_GROUP_ICONS, emptyValues, groupFields } from '@/core/lib/forms'
 import { ACTION_COPY, FORM_COPY } from '@/declarations/ui/copy'
 import type { DialogSize } from '@/declarations/ui/variants'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
@@ -75,6 +75,7 @@ export const FormDialog = ({
   const tabs = groups.map((group) => ({
     value: group.name,
     label: group.name,
+    icon: FORM_GROUP_ICONS[group.name],
     flagged: group.fields.some((field) => issues.some((issue) => issue.field === field.name)),
   }))
 
@@ -112,6 +113,7 @@ export const FormDialog = ({
             items={tabs}
             value={current?.name ?? ''}
             label={FORM_COPY.categories}
+            collapse="always"
             onChange={(group) => setTrail({ issues, open, group })}
           />
         )

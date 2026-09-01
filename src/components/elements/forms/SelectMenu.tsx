@@ -6,7 +6,12 @@ import { OptionMark } from '@/components/elements/forms/OptionMark'
 import { useAnchoredPanel } from '@/core/hooks/interaction/useAnchoredPanel'
 import { PICKER_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { SELECT_MENU_STYLES } from '@/declarations/ui/variants'
+import {
+  SELECT_MENU_MARK_SIZES,
+  SELECT_MENU_SIZES,
+  SELECT_MENU_STYLES,
+} from '@/declarations/ui/variants'
+import type { SelectMenuSize } from '@/declarations/ui/variants'
 import { useHints } from '@/managers/front-end'
 import type { FieldOption, OptionMark as OptionMarkKind } from '@/types/forms'
 import { cn } from '@/utils/classnames'
@@ -22,7 +27,7 @@ export interface SelectMenuProps {
   emptyLabel?: string
   placeholder?: string
   mark?: OptionMarkKind
-  compact?: boolean
+  size?: SelectMenuSize
   disabled?: boolean
   invalid?: boolean
   describedBy?: string
@@ -46,7 +51,7 @@ const SEARCH_THRESHOLD = 8
  * @param {string} [emptyLabel] - Label of the clearing entry
  * @param {string} [placeholder] - Text shown while nothing is chosen
  * @param {OptionMarkKind} [mark] - Glyph drawn beside every option
- * @param {boolean} [compact] - Shrinks the trigger to toolbar height
+ * @param {SelectMenuSize} [size] - Size token, defaults to block
  * @param {boolean} [disabled] - Blocks the control
  * @param {boolean} [invalid] - Paints the rejection border
  * @param {string} [describedBy] - Identifier of the message describing the control
@@ -63,7 +68,7 @@ export const SelectMenu = ({
   emptyLabel,
   placeholder,
   mark,
-  compact,
+  size = 'block',
   disabled,
   invalid,
   describedBy,
@@ -81,6 +86,7 @@ export const SelectMenu = ({
 
   const { showHint } = useHints()
 
+  const markSize = SELECT_MENU_MARK_SIZES[size]
   const ChevronIcon = ICONS.expand
   const CheckIcon = ICONS.confirm
 
@@ -182,7 +188,7 @@ export const SelectMenu = ({
         }}
         className={cn(
           SELECT_MENU_STYLES.trigger,
-          compact ? SELECT_MENU_STYLES.triggerCompact : SELECT_MENU_STYLES.triggerBlock,
+          SELECT_MENU_SIZES[size].trigger,
           invalid && SELECT_MENU_STYLES.invalid,
           className
         )}
@@ -190,7 +196,7 @@ export const SelectMenu = ({
         <span className={SELECT_MENU_STYLES.value}>
           {selected ? (
             <>
-              {mark && <OptionMark mark={mark} option={selected} />}
+              {mark && <OptionMark mark={mark} option={selected} size={markSize} />}
               <span className={SELECT_MENU_STYLES.optionLabel}>{selected.label}</span>
             </>
           ) : (
@@ -207,7 +213,7 @@ export const SelectMenu = ({
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-[65]" role="presentation" onMouseDown={close} />
+          <div className={SELECT_MENU_STYLES.scrim} role="presentation" onMouseDown={close} />
           <div
             ref={panelRef}
             id={listId}
@@ -254,12 +260,15 @@ export const SelectMenu = ({
                       }
                       className={cn(
                         SELECT_MENU_STYLES.option,
+                        SELECT_MENU_SIZES[size].option,
                         index === activeIndex && SELECT_MENU_STYLES.optionActive,
                         isSelected && SELECT_MENU_STYLES.optionSelected,
-                        entry.disabled && 'cursor-not-allowed opacity-50'
+                        entry.disabled && SELECT_MENU_STYLES.optionDisabled
                       )}
                     >
-                      {mark && entry.value !== '' && <OptionMark mark={mark} option={entry} />}
+                      {mark && entry.value !== '' && (
+                        <OptionMark mark={mark} option={entry} size={markSize} />
+                      )}
                       <span className={SELECT_MENU_STYLES.optionLabel}>{entry.label}</span>
                       {entry.hint && (
                         <span className={SELECT_MENU_STYLES.optionHint}>{entry.hint}</span>

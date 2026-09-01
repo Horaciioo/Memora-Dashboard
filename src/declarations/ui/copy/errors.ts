@@ -4,10 +4,10 @@
  */
 
 export const ERROR_PAGE_COPY = {
-  title: 'Quelque chose a cassé',
-  description: 'L’erreur a été signalée. Réessaie, ou reviens au tableau de bord.',
+  title: 'Un pépin est survenu',
+  description: 'L’erreur a été signalée. Réessaie, ou reviens à l’accueil.',
   retry: 'Réessayer',
-  home: 'Retour au tableau de bord',
+  home: 'Retour à l’accueil',
   reference: 'Référence',
   notFoundTitle: 'Page introuvable',
   notFoundDescription: 'Ce lien ne mène nulle part, ou la page a été déplacée.',

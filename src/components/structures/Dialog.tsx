@@ -68,7 +68,6 @@ export const Dialog = ({
         aria-describedby={description ? descriptionId : undefined}
         className={cn(DIALOG_STYLES.panel, DIALOG_SIZES[size])}
       >
-        <span className={DIALOG_STYLES.grip} aria-hidden="true" />
         <div className={DIALOG_STYLES.header}>
           <div className={DIALOG_STYLES.heading}>
             <h2 id={titleId} className={DIALOG_STYLES.title}>

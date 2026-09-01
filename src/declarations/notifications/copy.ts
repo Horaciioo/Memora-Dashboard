@@ -13,6 +13,6 @@ export const NOTIFICATION_COPY = {
   seeAll: 'Tout voir',
   emptyTitle: 'Rien de neuf',
   emptyDescription: 'Tu es à jour.',
-  backHome: 'Revenir au tableau de bord',
+  backHome: 'Revenir à l’accueil',
   system: 'Le système',
 } as const

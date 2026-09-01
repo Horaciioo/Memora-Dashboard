@@ -1,4 +1,5 @@
-import type { Metadata } from 'next'
+import type { CSSProperties } from 'react'
+import type { Metadata, Viewport } from 'next'
 import { headers } from 'next/headers'
 import type { ReactNode } from 'react'
 import '@/styles/globals.css'
@@ -8,6 +9,7 @@ import { Providers } from '@/app/providers'
 import { getSession } from '@/core/lib/auth/getSession'
 import { NONCE_HEADER } from '@/declarations/system/securityHeaders'
 import { APP_COMPANY, APP_DESCRIPTION, APP_FONTS, APP_NAME } from '@/declarations/app'
+import { SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
 
 export const metadata: Metadata = {
   title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
@@ -15,6 +17,15 @@ export const metadata: Metadata = {
   applicationName: APP_NAME,
   authors: [{ name: APP_COMPANY }],
 }
+
+// Lets the floating mobile nav pill read env(safe-area-inset-*) under the notch/home indicator
+export const viewport: Viewport = { viewportFit: 'cover' }
+
+// Mobile chrome dimensions, on <body> so every fixed surface reads the same source
+const SHELL_VARS = {
+  '--shell-top-bar-h': `${SHELL_DIMENSIONS.topBar}px`,
+  '--shell-bottom-nav-h': `${SHELL_DIMENSIONS.bottomNav}px`,
+} as CSSProperties
 
 /**
  * Root layout
@@ -36,7 +47,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <link rel="stylesheet" href={APP_FONTS.stylesheet} />
         <ThemeScript nonce={nonce} />
       </head>
-      <body className="bg-[var(--color-background)] text-[var(--color-ink)] antialiased">
+      <body
+        style={SHELL_VARS}
+        className="bg-[var(--color-background)] text-[var(--color-ink)] antialiased"
+      >
         <ColorVisionFilters />
         <Providers initialSession={initialSession}>{children}</Providers>
       </body>

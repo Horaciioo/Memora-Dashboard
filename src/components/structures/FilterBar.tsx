@@ -9,6 +9,7 @@ import { SelectMenu } from '@/components/elements/forms/SelectMenu'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { FILTER_STYLES } from '@/declarations/ui/variants'
+import type { MaturityName } from '@/declarations/maturity/registries'
 import type { FieldOption, OptionMark } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 
@@ -20,6 +21,7 @@ import { cn } from '@/utils/classnames'
  * @property {string} allLabel - Label of the unfiltered option
  * @property {FieldOption[]} options - Selectable values
  * @property {OptionMark} [mark] - Glyph drawn beside every option
+ * @property {MaturityName} [maturity] - Lifecycle tag drawn beside the label
  */
 
 export interface FilterDefinition {
@@ -28,6 +30,7 @@ export interface FilterDefinition {
   allLabel: string
   options: FieldOption[]
   mark?: OptionMark
+  maturity?: MaturityName
 }
 
 export interface FilterBarProps {
@@ -133,6 +136,7 @@ export const FilterBar = ({
                   key={filter.name}
                   id={id}
                   label={filter.label}
+                  maturity={filter.maturity}
                   className={FILTER_STYLES.optionField}
                 >
                   <SelectMenu

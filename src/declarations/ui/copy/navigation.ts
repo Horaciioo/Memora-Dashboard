@@ -22,6 +22,8 @@ export const NAV_COPY = {
   textSize: 'Taille du texte',
   colorVision: 'Vision des couleurs',
   wip: 'En développement',
+  openMore: 'Voir plus de pages',
+  moreTitle: 'Plus de pages',
 } as const
 
 /**

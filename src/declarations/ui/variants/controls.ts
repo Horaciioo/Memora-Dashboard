@@ -1,3 +1,5 @@
+import type { AvatarSize } from '@/declarations/ui/variants/surfaces'
+
 /**
  * Button styles
  * @type {Record<string, string>}
@@ -12,10 +14,11 @@ export const BUTTON_STYLES = {
     'px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface-sunken)] hover:text-[var(--color-ink)]',
   success: 'bg-[var(--color-success)] px-4 py-2 text-[var(--color-on-brand)] hover:opacity-90',
   danger: 'bg-[var(--color-danger)] px-4 py-2 text-[var(--color-on-brand)] hover:opacity-90',
-  icon: 'h-9 w-9 rounded-[var(--radius-md)] p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
+  // 44px hit area on touch, back to 36px from md
+  icon: 'h-9 w-9 min-h-11 min-w-11 rounded-[var(--radius-md)] p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)] md:min-h-0 md:min-w-0',
   link: 'p-0 text-[var(--color-brand-600)] underline-offset-2 hover:underline',
   // Square footprint for a label-less button, overriding a variant's padding
-  square: 'h-9 w-9 shrink-0 p-0',
+  square: 'h-9 w-9 min-h-11 min-w-11 shrink-0 p-0 md:min-h-0 md:min-w-0',
 } as const
 
 export type ButtonVariant = keyof Omit<typeof BUTTON_STYLES, 'base'>
@@ -53,6 +56,13 @@ export const FIELD_STYLES = {
   rowControl: 'min-w-0 flex-1',
   // Label and messages sit above the input, past the glyph
   glyphField: '[&>label]:pl-11 [&>p]:pl-11',
+  // Static prefix welded to the left of a control, the handle alone being typed
+  prefixRow:
+    'flex min-w-0 items-stretch rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] transition-colors focus-within:border-[var(--color-border-strong)]',
+  prefixRowInvalid: 'border-[var(--color-danger)]',
+  prefix:
+    'flex shrink-0 items-center rounded-l-[var(--radius-md)] border-r border-[var(--color-border)] bg-[var(--color-surface-sunken)] px-3 font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
+  prefixControl: 'min-w-0 flex-1 rounded-none rounded-r-[var(--radius-md)] border-0 bg-transparent',
 } as const
 
 /**
@@ -139,8 +149,6 @@ export const OPTION_MARK_STYLES = {
 export const SELECT_MENU_STYLES = {
   trigger:
     'flex min-w-0 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 text-left text-sm text-[var(--color-ink)] transition-colors hover:border-[var(--color-border-strong)] disabled:pointer-events-none disabled:opacity-60',
-  triggerBlock: 'w-full',
-  triggerCompact: 'w-auto min-w-0 max-w-44 px-2.5 py-1.5 text-xs',
   invalid: 'border-[var(--color-danger)]',
   // Chevron trails the text, not the edge
   value: 'flex min-w-0 items-center gap-2 truncate',
@@ -153,8 +161,10 @@ export const SELECT_MENU_STYLES = {
     'w-full border-b border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]',
   list: 'flex-1 overflow-y-auto py-1',
   option:
-    'flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-surface)] hover:opacity-100',
+    'flex w-full items-center gap-2 px-3 text-left opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-surface)] hover:opacity-100',
   optionActive: 'bg-[var(--color-surface)] opacity-100',
+  optionDisabled: 'cursor-not-allowed opacity-50',
+  scrim: 'fixed inset-0 z-[65]',
   optionSelected:
     'bg-[var(--color-brand-soft)] font-medium text-[var(--color-brand-600)] opacity-100',
   optionLabel: 'min-w-0 flex-1 truncate',
@@ -166,6 +176,35 @@ export const SELECT_MENU_STYLES = {
   // Selected entries on the trigger
   tags: 'flex min-w-0 flex-wrap items-center gap-1',
 } as const
+
+/**
+ * Trigger and option classes per select size
+ * @type {Record<SelectMenuSize, { trigger: string, option: string }>}
+ */
+
+export const SELECT_MENU_SIZES = {
+  compact: { trigger: 'w-auto min-w-0 max-w-44 px-2.5 py-1.5 text-xs', option: 'py-1.5 text-sm' },
+  block: { trigger: 'w-full', option: 'py-1.5 text-sm' },
+  large: { trigger: 'w-full px-3 py-2.5 text-base', option: 'py-2.5 text-sm' },
+} as const
+
+/**
+ * Select size token
+ * @type {keyof typeof SELECT_MENU_SIZES}
+ */
+
+export type SelectMenuSize = keyof typeof SELECT_MENU_SIZES
+
+/**
+ * Portrait size drawn beside an option, per select size
+ * @type {Record<SelectMenuSize, AvatarSize>}
+ */
+
+export const SELECT_MENU_MARK_SIZES = {
+  compact: 'xs',
+  block: 'xs',
+  large: 'sm',
+} as const satisfies Record<SelectMenuSize, AvatarSize>
 
 /**
  * Date picker styles, the drawn calendar standing in for the native date input

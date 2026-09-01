@@ -94,8 +94,70 @@ export const DataTable = <T,>({
       current?.key === key ? { key, ascending: !current.ascending } : { key, ascending: true }
     )
 
+  // Every column past the first rides in a wrapped meta row on the mobile card
+  const metaOf = (row: T) =>
+    columns.slice(1).flatMap((column) => {
+      const node = column.render(row)
+
+      return node === null || node === undefined || node === false || node === ''
+        ? []
+        : [{ key: column.key, node }]
+    })
+
   return (
     <div className={cn(TABLE_STYLES.wrapper, className)}>
+      <div className={TABLE_STYLES.cards}>
+        {isLoading ? (
+          <SkeletonList rows={4} shape="row" />
+        ) : sortedRows.length === 0 && emptyState ? (
+          <EmptyState {...emptyState} />
+        ) : (
+          sortedRows.map((row) => {
+            const id = getRowId(row)
+            const head = columns[0]?.render(row)
+            const meta = metaOf(row)
+
+            const inner = (
+              <>
+                <div className={TABLE_STYLES.cardHead}>{head}</div>
+                {meta.length > 0 && (
+                  <div className={TABLE_STYLES.cardMeta}>
+                    {meta.map((entry) => (
+                      <span key={entry.key}>{entry.node}</span>
+                    ))}
+                  </div>
+                )}
+              </>
+            )
+
+            const cardClass = cn(
+              TABLE_STYLES.card,
+              onRowOpen && TABLE_STYLES.cardOpen,
+              id === activeRowId && TABLE_STYLES.cardActive
+            )
+
+            return onRowOpen ? (
+              <button
+                key={id}
+                type="button"
+                onClick={() => onRowOpen(row)}
+                onContextMenu={rowMenu ? contextMenu(rowMenu(row)) : undefined}
+                className={cardClass}
+              >
+                {inner}
+              </button>
+            ) : (
+              <div
+                key={id}
+                onContextMenu={rowMenu ? contextMenu(rowMenu(row)) : undefined}
+                className={cardClass}
+              >
+                {inner}
+              </div>
+            )
+          })
+        )}
+      </div>
       <table className={TABLE_STYLES.table}>
         <thead>
           <tr className={TABLE_STYLES.headRow}>
