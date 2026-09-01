@@ -66,13 +66,8 @@ export default async function CalendarLegendPage() {
 
             return (
               <li key={key} className={ROW}>
-                <span
-                  className={SWATCH}
-                  style={{ backgroundColor: accentColour(source.accent, 'neutral') }}
-                  aria-hidden="true"
-                />
                 <span className="flex flex-wrap items-center gap-1.5">
-                  <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                   <strong>{source.label}</strong> —{' '}
                   <span className={MEANING}>{source.summary}</span>
                 </span>
@@ -80,6 +75,10 @@ export default async function CalendarLegendPage() {
             )
           })}
         </ul>
+      </Section>
+
+      <Section title={CALENDAR_COPY.legendColoursTitle} padded>
+        <p className="text-sm">{CALENDAR_COPY.legendColoursText}</p>
       </Section>
 
       <Section title={CALENDAR_COPY.legendZonesTitle} padded>

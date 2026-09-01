@@ -19,7 +19,6 @@ import {
   academyStepEntries,
   birthdayEntries,
   meetingEntries,
-  memberAccent,
   memberFunction,
 } from '@/core/services/calendar/projections'
 import type { ProjectionContext } from '@/core/services/calendar/projections'
@@ -207,13 +206,6 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       group: FORM_GROUPS.assignment,
     },
     {
-      name: 'accent',
-      kind: 'colour',
-      label: CALENDAR_FIELD_COPY.accent,
-      hint: CALENDAR_FIELD_COPY.accentHint,
-      group: FORM_GROUPS.visibility,
-    },
-    {
       name: 'youtuberId',
       kind: 'select',
       label: CALENDAR_FIELD_COPY.youtuber,
@@ -291,6 +283,7 @@ const allowedVisibilities = (access: PermissionHelpers): EventVisibilityName[] =
 // Everything an entry row needs to become a view
 const ENTRY_SHAPE = {
   template: true,
+  youtuber: { select: { accent: true } },
   owner: { select: { displayName: true } },
   subject: {
     select: {
@@ -303,8 +296,8 @@ const ENTRY_SHAPE = {
 } as const
 
 /**
- * Shape one stored entry, the post of its member deciding the colour before anything else
- * @param {object} row - Entry row with its template, owner, member and roster
+ * Shape one stored entry, the creator it belongs to deciding the colour
+ * @param {object} row - Entry row with its template, owner, creator, member and roster
  * @param {AttendanceRoster | null} [roster] - Roll-call standings for the viewer
  * @return {CalendarEntry} - Calendar entry
  */
@@ -317,7 +310,6 @@ const toEntry = (
     description: string | null
     kind: CalendarKindName
     templateId: string | null
-    accent: string | null
     accountId: string | null
     visibility: EventVisibilityName | null
     startsAt: Date
@@ -331,6 +323,7 @@ const toEntry = (
     rollCallTeamIds: string[]
     remindAt: Date | null
     template: { name: string; accent: string | null; visibility: EventVisibilityName } | null
+    youtuber: { accent: string | null } | null
     owner: { displayName: string } | null
     subject: {
       displayName: string
@@ -341,8 +334,6 @@ const toEntry = (
   },
   roster: AttendanceRoster | null = null
 ): CalendarEntry => {
-  const post = memberFunction(row.subject)
-
   return {
     id: row.id,
     source: CalendarSources.Entry,
@@ -352,8 +343,8 @@ const toEntry = (
     description: row.description,
     templateId: row.templateId,
     templateName: row.template?.name ?? null,
-    accent: memberAccent(row.subject, row.accent, row.template?.accent),
-    legendLabel: post?.name ?? row.template?.name ?? CALENDAR_KIND_REGISTRY.label(row.kind),
+    accent: row.youtuber?.accent ?? null,
+    muted: false,
     // The entry may tighten what its template allows, never loosen it silently
     visibility: row.visibility ?? row.template?.visibility ?? EventVisibilities.Everyone,
     startsAt: row.startsAt.toISOString(),
@@ -373,7 +364,6 @@ const toEntry = (
       emoji: row.emoji,
       kind: row.kind,
       templateId: row.templateId,
-      accent: row.accent,
       accountId: row.accountId,
       visibility: row.visibility,
       startsAt: row.startsAt.toISOString().slice(0, 16),
@@ -515,7 +505,6 @@ const toEntryData = (values: FormValues) => ({
   description: readText(values, 'description'),
   kind: (readText(values, 'kind') ?? CalendarKinds.Event) as CalendarKindName,
   templateId: readText(values, 'templateId'),
-  accent: readText(values, 'accent'),
   accountId: readText(values, 'accountId'),
   visibility: (readText(values, 'visibility') ?? null) as EventVisibilityName | null,
   startsAt: readDate(values, 'startsAt') ?? new Date(),
@@ -570,7 +559,6 @@ const applyTemplate = async (data: ReturnType<typeof toEntryData>) => {
     // The template is a pre-designed thing, its shape comes with it
     kind: template.kind,
     description: data.description ?? template.body,
-    accent: data.accent ?? template.accent,
     visibility: data.visibility ?? template.visibility,
     allDay,
     endsAt:

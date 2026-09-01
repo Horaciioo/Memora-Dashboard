@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 
-import { Glyph } from '@/components/elements/display/Glyph'
 import { CalendarEntryPreview } from '@/composites/calendar/CalendarEntryPreview'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { ICONS } from '@/declarations/ui/icons'
@@ -53,7 +52,8 @@ export const CalendarEntryChip = ({
   onOpen,
   dragProps,
 }: CalendarEntryChipProps) => {
-  const paint = accentPaint(entry.accent, 'brand')
+  // An entry wears the colour of its creator, an absence stays grey
+  const paint = accentPaint(entry.accent, entry.muted ? 'neutral' : 'brand')
   const [anchor, setAnchor] = useState<DOMRect | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const RollCallIcon = ICONS.meetings
@@ -103,8 +103,9 @@ export const CalendarEntryChip = ({
           band ? CALENDAR_STYLES.bar : CALENDAR_STYLES.entry,
           band && (opensBand ? CALENDAR_STYLES.barStart : CALENDAR_STYLES.barRunsIn),
           band && (closesBand ? CALENDAR_STYLES.barEnd : CALENDAR_STYLES.barRunsOut),
-          paint.solid,
-          CALENDAR_STYLES.entrySolid,
+          entry.muted
+            ? cn(CALENDAR_STYLES.entryMuted, paint.soft, paint.text)
+            : cn(paint.solid, CALENDAR_STYLES.entrySolid),
           entry.readOnly && cn(CALENDAR_STYLES.entryReadOnly, paint.border),
           selected && CALENDAR_STYLES.entrySelected
         )}
@@ -116,7 +117,6 @@ export const CalendarEntryChip = ({
         {previewable && entry.rollCall && (
           <RollCallIcon className={CALENDAR_STYLES.chipMark} aria-hidden="true" />
         )}
-        {previewable && <Glyph value={entry.emoji} size="chip" />}
         <span className={CALENDAR_STYLES.entryTitle}>{band && !opensBand ? ' ' : entry.title}</span>
       </button>
       {anchor && <CalendarEntryPreview entry={entry} anchor={anchor} />}

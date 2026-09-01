@@ -12,6 +12,19 @@ export const WorkflowScopes = {
 export type WorkflowScopeName = (typeof WorkflowScopes)[keyof typeof WorkflowScopes]
 
 /**
+ * Lifecycle bucket of a workflow state
+ * @type {Record<string, string>}
+ */
+
+export const WorkflowPhases = {
+  Todo: 'TODO',
+  Doing: 'DOING',
+  Done: 'DONE',
+} as const
+
+export type WorkflowPhaseName = (typeof WorkflowPhases)[keyof typeof WorkflowPhases]
+
+/**
  * Meeting seat kinds
  * @type {Record<string, string>}
  */

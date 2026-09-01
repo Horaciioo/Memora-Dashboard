@@ -1,45 +1,36 @@
 import { Badge } from '@/components/elements/display/Badge'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
-
-import { MEMBER_COPY } from '@/declarations/members/copy'
+import { MEMBER_BLOCK } from '@/declarations/ui/blocks'
 import type { MemberDivision, MemberSummary } from '@/types/members'
 
-export interface DivisionBadgeProps {
+// Drawn pixels of the crest, matching the large portrait it faces
+const CREST_SIZE = 64
+
+export interface DivisionCrestProps {
   division: MemberDivision | null
 }
 
 /**
- * Division of a member, its visual when one is declared, its chevrons otherwise
+ * Visual of a division, standing opposite the portrait, absent until one is declared
  * @param {MemberDivision | null} division - Division to show
- * @return {JSX.Element}
+ * @return {JSX.Element | null}
  */
 
-export const DivisionBadge = ({ division }: DivisionBadgeProps) => {
-  if (!division) {
-    return <Badge label={MEMBER_COPY.noDivision} tone="neutral" />
-  }
+export const DivisionCrest = ({ division }: DivisionCrestProps) => {
+  // A division without a visual draws nothing, the row simply closes up
+  if (!division?.imagePath) return null
 
   return (
-    <span
+    // The path is declared in the configuration, so it skips the optimiser
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={division.imagePath}
+      alt={division.label}
       title={division.label}
-      className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-brand-600)] text-[var(--color-on-brand)]"
-    >
-      {division.imagePath ? (
-        // The path is declared in the configuration, so it skips the optimiser
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={division.imagePath}
-          alt={division.label}
-          width={18}
-          height={18}
-          className="h-[18px] w-[18px] rounded-full"
-        />
-      ) : (
-        <span className="text-xs font-bold" aria-hidden="true">
-          {division.glyph}
-        </span>
-      )}
-    </span>
+      width={CREST_SIZE}
+      height={CREST_SIZE}
+      className={MEMBER_BLOCK.crest}
+    />
   )
 }
 

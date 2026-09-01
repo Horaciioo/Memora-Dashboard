@@ -18,6 +18,7 @@ import { ACTION_COPY } from '@/declarations/ui/copy'
 import type { IllustrationName } from '@/declarations/ui/illustrations'
 import type { MenuItem } from '@/managers/front-end'
 import type { FieldDefinition, FormValues } from '@/types/forms'
+import { WorkflowPhases } from '@/utils/constants/workflow'
 import type { WorkflowScopeName } from '@/utils/constants/workflow'
 
 /**
@@ -76,6 +77,10 @@ const VIEWS = [
   { value: 'board', label: BOARD_FILTER_COPY.board },
   { value: 'list', label: BOARD_FILTER_COPY.list },
 ] as const
+
+// Filter revealing the finished work hidden by default
+const DONE_FILTER = 'done'
+const DONE_SHOWN = 'shown'
 
 /**
  * Board surface shared by projects
@@ -136,17 +141,53 @@ export const WorkBoard = <T extends BoardItem>({
   const isFiltered =
     search.trim().length > 0 || Object.values(filterValues).some((value) => value.length > 0)
 
-  const visibleCards = useMemo(
-    () => board.cards.filter((card) => matches(card, search.trim().toLowerCase(), filterValues)),
-    [board.cards, search, filterValues, matches]
+  // Finished work stays out until the filter asks for it
+  const showDone = filterValues[DONE_FILTER] === DONE_SHOWN
+
+  const doneColumnIds = useMemo(
+    () =>
+      new Set(columns.filter((column) => column.phase === WorkflowPhases.Done).map(({ id }) => id)),
+    [columns]
   )
 
-  // A card resting in a terminal column is finished work, not content the board carries
-  const hasContent = useMemo(() => {
-    const terminal = new Set(columns.filter((column) => column.isTerminal).map(({ id }) => id))
+  // Done columns fold away, the toggle brings them back
+  const visibleColumns = useMemo(
+    () => (showDone ? columns : columns.filter((column) => !doneColumnIds.has(column.id))),
+    [columns, doneColumnIds, showDone]
+  )
 
-    return board.cards.some((card) => !terminal.has(card.columnId ?? ''))
-  }, [board.cards, columns])
+  const visibleCards = useMemo(
+    () =>
+      board.cards.filter((card) => {
+        if (!showDone && doneColumnIds.has(card.columnId ?? '')) return false
+
+        return matches(card, search.trim().toLowerCase(), filterValues)
+      }),
+    [board.cards, doneColumnIds, showDone, search, filterValues, matches]
+  )
+
+  // A card resting in a done column is finished work, not content the board carries
+  const hasContent = useMemo(
+    () => board.cards.some((card) => showDone || !doneColumnIds.has(card.columnId ?? '')),
+    [board.cards, doneColumnIds, showDone]
+  )
+
+  // The reveal toggle rides beside the board filters when a done column exists
+  const barFilters = useMemo(
+    () =>
+      doneColumnIds.size === 0
+        ? filters
+        : [
+            ...filters,
+            {
+              name: DONE_FILTER,
+              label: BOARD_FILTER_COPY.doneFilter,
+              allLabel: BOARD_FILTER_COPY.doneHidden,
+              options: [{ value: DONE_SHOWN, label: BOARD_FILTER_COPY.doneShown }],
+            },
+          ],
+    [filters, doneColumnIds]
+  )
 
   const openCreate = (columnId?: string) => {
     board.clearIssues()
@@ -227,7 +268,7 @@ export const WorkBoard = <T extends BoardItem>({
           searchLabel={BOARD_FILTER_COPY.search}
           search={search}
           onSearch={setSearch}
-          filters={filters}
+          filters={barFilters}
           values={filterValues}
           onFilter={(name, value) => setFilterValues((current) => ({ ...current, [name]: value }))}
           onReset={resetFilters}
@@ -245,7 +286,7 @@ export const WorkBoard = <T extends BoardItem>({
           <EmptyState {...emptyState} />
         ) : view === 'board' ? (
           <KanbanBoard
-            columns={columns}
+            columns={visibleColumns}
             items={visibleCards}
             renderCard={renderCard}
             onMove={board.move}

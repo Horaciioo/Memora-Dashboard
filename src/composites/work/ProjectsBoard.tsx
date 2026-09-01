@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { AvatarStack } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { Glyph } from '@/components/elements/display/Glyph'
 import { WorkBoard } from '@/composites/work/WorkBoard'
@@ -165,15 +164,10 @@ export const ProjectsBoard = ({
       canDelete={canDelete}
       tintByColumn
       renderCard={(project) => (
-        <>
-          <p className={BOARD_STYLES.cardTitle}>
-            <Glyph value={project.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
-            {project.title}
-          </p>
-          <div className={BOARD_STYLES.cardMeta}>
-            <AvatarStack people={[...project.leads, ...project.assistants]} />
-          </div>
-        </>
+        <p className={BOARD_STYLES.cardTitle}>
+          <Glyph value={project.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+          {project.title}
+        </p>
       )}
     />
   )

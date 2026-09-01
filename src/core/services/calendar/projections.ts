@@ -19,7 +19,7 @@ import {
   CalendarSources,
   EventVisibilities,
 } from '@/utils/constants/workflow'
-import type { CalendarSourceName } from '@/utils/constants/workflow'
+import type { CalendarKindName, CalendarSourceName } from '@/utils/constants/workflow'
 
 /**
  * Window a projection is read for
@@ -41,37 +41,48 @@ export interface ProjectionContext {
 const DAY_MS = 86_400_000
 const MINUTE_MS = 60_000
 
-// Functions carry the colour
+// The creator a member works for carries the colour of everything they appear in
 const FUNCTION_SHAPE = {
   select: {
     displayName: true,
     primaryFunction: { select: { name: true, accent: true } },
     secondaryFunction: { select: { name: true, accent: true } },
+    youtubers: { select: { accent: true }, orderBy: { position: 'asc' }, take: 1 },
   },
 } as const
 
 /**
- * Member a projected entry is about
- * @typedef {Object} ProjectedMember
- * @property {string} displayName - Member name
+ * Posts a member holds, the pair every projection carries
+ * @typedef {Object} ProjectedPosts
  * @property {{ accent: string | null } | null} primaryFunction - Main post
  * @property {{ accent: string | null } | null} secondaryFunction - Second post
  */
 
-export interface ProjectedMember {
-  displayName: string
+export interface ProjectedPosts {
   primaryFunction: { name: string; accent: string | null } | null
   secondaryFunction: { name: string; accent: string | null } | null
 }
 
 /**
- * Read the post lending its colour to an entry
- * @param {ProjectedMember | null | undefined} member - Member the entry is about
+ * Member a projected entry is about
+ * @typedef {Object} ProjectedMember
+ * @property {string} displayName - Member name
+ * @property {{ accent: string | null }[]} youtubers - Creator lending the colour
+ */
+
+export interface ProjectedMember extends ProjectedPosts {
+  displayName: string
+  youtubers: { accent: string | null }[]
+}
+
+/**
+ * Read the post a member holds
+ * @param {ProjectedPosts | null | undefined} member - Member the entry is about
  * @return {{ name: string, accent: string } | null} - Post carrying a colour
  */
 
 export const memberFunction = (
-  member: ProjectedMember | null | undefined
+  member: ProjectedPosts | null | undefined
 ): { name: string; accent: string } | null => {
   const posts = [member?.primaryFunction, member?.secondaryFunction]
   const carrying = posts.find((post) => post?.accent)
@@ -80,19 +91,13 @@ export const memberFunction = (
 }
 
 /**
- * Read the colour a member lends to an entry
+ * Read the creator colour a member lends to an entry
  * @param {ProjectedMember | null | undefined} member - Member the entry is about
- * @param {(string | null | undefined)[]} fallbacks - Colours tried when no function carries one
  * @return {string | null} - Colour to draw
  */
 
-export const memberAccent = (
-  member: ProjectedMember | null | undefined,
-  ...fallbacks: (string | null | undefined)[]
-): string | null =>
-  memberFunction(member)?.accent ??
-  fallbacks.find((accent) => accent !== null && accent !== undefined) ??
-  null
+export const creatorAccent = (member: ProjectedMember | null | undefined): string | null =>
+  member?.youtubers[0]?.accent ?? null
 
 /**
  * Shape a projected entry, read-only by construction
@@ -107,7 +112,8 @@ export const memberAccent = (
  * @param {string | null} input.accent - Resolved colour
  * @param {string | null} input.description - Supporting text
  * @param {string | null} input.subjectName - Member it is about
- * @param {string} [input.legendLabel] - Legend row it belongs to
+ * @param {CalendarKindName} [input.kind] - Shape it draws as
+ * @param {boolean} [input.muted] - Drawn in retreat
  * @param {string} [input.href] - Page of the record
  * @param {string} [input.body] - Markdown content of the record
  * @param {{ emoji: string | null, title: string }[]} [input.topics] - Meeting subject titles
@@ -126,7 +132,8 @@ const projected = ({
   accent,
   description,
   subjectName,
-  legendLabel,
+  kind,
+  muted,
   href,
   body,
   topics,
@@ -142,7 +149,8 @@ const projected = ({
   accent: string | null
   description: string | null
   subjectName: string | null
-  legendLabel?: string
+  kind?: CalendarKindName
+  muted?: boolean
   href?: string
   body?: string
   topics?: { emoji: string | null; title: string }[]
@@ -154,14 +162,14 @@ const projected = ({
     id: `${source.toLowerCase()}:${id}`,
     source,
     // Anything spanning whole days reads as a band, a dated moment reads as a card
-    kind: allDay ? CalendarKinds.Period : CalendarKinds.Event,
+    kind: kind ?? (allDay ? CalendarKinds.Period : CalendarKinds.Event),
     title,
     emoji: emoji ?? null,
     description,
     templateId: null,
     templateName: meta.label,
-    accent: accent ?? meta.accent,
-    legendLabel: legendLabel ?? meta.label,
+    accent,
+    muted: muted ?? false,
     visibility: EventVisibilities.Everyone,
     startsAt: startsAt.toISOString(),
     endsAt: endsAt?.toISOString() ?? null,
@@ -216,10 +224,12 @@ export const absenceEntries = async ({
       startsAt: row.startDate,
       endsAt: row.endDate,
       allDay: true,
-      accent: memberAccent(row.account),
+      // An absence is background information, so it never wears a creator colour
+      kind: CalendarKinds.Event,
+      muted: true,
+      accent: null,
       description: row.reason,
       subjectName: row.account.displayName,
-      legendLabel: memberFunction(row.account)?.name,
     })
   )
 }
@@ -251,6 +261,7 @@ export const meetingEntries = async ({
         include: { account: FUNCTION_SHAPE },
       },
       topics: { orderBy: [{ position: 'asc' }, { createdAt: 'asc' }] },
+      youtuber: { select: { accent: true } },
     },
     orderBy: { scheduledAt: 'asc' },
   })
@@ -268,11 +279,10 @@ export const meetingEntries = async ({
         ? new Date(row.scheduledAt.getTime() + row.durationMin * MINUTE_MS)
         : null,
       allDay: false,
-      accent: memberAccent(lead),
+      accent: row.youtuber?.accent ?? creatorAccent(lead),
       // A planned meeting shows nothing of its content, only its subject titles
       description: null,
       subjectName: lead?.displayName ?? null,
-      legendLabel: memberFunction(lead)?.name,
       href: ROUTES.meeting(row.id),
       topics: row.topics.map((topic) => ({ emoji: topic.emoji, title: topic.title })),
       minutes: row.minutes,
@@ -347,10 +357,9 @@ export const birthdayEntries = async ({
           startsAt: day,
           endsAt: null,
           allDay: true,
-          accent: memberAccent(row),
+          accent: creatorAccent(row),
           description: null,
           subjectName: row.displayName,
-          legendLabel: memberFunction(row)?.name,
         })
       )
   })
@@ -386,10 +395,9 @@ export const academyStepEntries = async (
       startsAt: row.scheduledAt ?? new Date(),
       endsAt: null,
       allDay: true,
-      accent: memberAccent(junior, stage?.accent),
+      accent: creatorAccent(junior) ?? stage?.accent ?? null,
       description: row.notes,
       subjectName: junior?.displayName ?? null,
-      legendLabel: memberFunction(junior)?.name,
     })
   })
 }

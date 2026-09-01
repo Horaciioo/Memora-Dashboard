@@ -1,4 +1,5 @@
 import type { FormValues } from '@/types/forms'
+import type { WorkflowPhaseName } from '@/utils/constants/workflow'
 
 /**
  * Reference pointed at by a work item
@@ -6,12 +7,14 @@ import type { FormValues } from '@/types/forms'
  * @property {string} id - Row identifier
  * @property {string} label - Display label
  * @property {string | null} accent - Colour token
+ * @property {WorkflowPhaseName} [phase] - Lifecycle bucket of a workflow state
  */
 
 export interface WorkTag {
   id: string
   label: string
   accent: string | null
+  phase?: WorkflowPhaseName
 }
 
 /**

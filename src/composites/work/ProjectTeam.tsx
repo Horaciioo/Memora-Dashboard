@@ -75,7 +75,7 @@ const Roster = ({ title, people, options, disabled, full, onChange }: RosterProp
             label={PROJECT_COPY.teamAdd}
             placeholder={PROJECT_COPY.teamAdd}
             mark="avatar"
-            compact
+            size="compact"
             disabled={disabled}
             className="border-transparent bg-transparent px-1 hover:border-transparent hover:bg-transparent"
           />

@@ -9,6 +9,7 @@ import { SegmentedControl } from '@/components/elements/actions/SegmentedControl
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { Dialog } from '@/components/structures/Dialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
+import { FilterBar, type FilterDefinition } from '@/components/structures/FilterBar'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { Section } from '@/components/structures/Section'
 import { AttendancePanel } from '@/composites/calendar/AttendancePanel'
@@ -16,8 +17,10 @@ import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
 import { useCalendar } from '@/core/hooks/data/useCalendar'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useSlotDraft } from '@/core/hooks/interaction/useSlotDraft'
+import { toOptions } from '@/core/lib/forms/options'
 import { CALENDAR_COPY, CALENDAR_FIELD_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
 import {
+  ATTENDANCE_STATUS_REGISTRY,
   CALENDAR_KIND_REGISTRY,
   CALENDAR_SOURCE_REGISTRY,
 } from '@/declarations/calendar/registries'
@@ -32,13 +35,13 @@ import type { CalendarEntry } from '@/types/calendar'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import { CalendarKinds, CalendarSources } from '@/utils/constants/workflow'
+import type { CalendarUnit } from '@/utils/format/calendar'
 import {
   coversDay,
   dayBounds,
   gridRange,
   hourOf,
   lastDayKey,
-  monthGrid,
   moveToDay,
   moveToSlot,
   periodLabel,
@@ -46,7 +49,8 @@ import {
   slotEnd,
   toDayKey,
   toFieldValue,
-  weekGrid,
+  unitGrid,
+  weekdayOf,
 } from '@/utils/format/calendar'
 import { formatDayTime } from '@/utils/format/dates'
 
@@ -69,7 +73,17 @@ const SLOT_SEPARATOR = '|'
 const TEMPLATE_SECTION = 'evenements'
 
 // Fields a whole selection can be rewritten with at once
-const BULK_FIELD_NAMES = ['kind', 'templateId', 'accent', 'accountId', 'visibility', 'youtuberId']
+const BULK_FIELD_NAMES = ['kind', 'templateId', 'accountId', 'visibility', 'youtuberId']
+
+// The one value of the absence filter, its empty state being what hides them
+const ABSENCES_SHOWN = 'shown'
+
+// Spans the grid can be read at
+const UNITS: { value: CalendarUnit; label: string }[] = [
+  { value: 'day', label: CALENDAR_COPY.day },
+  { value: 'week', label: CALENDAR_COPY.week },
+  { value: 'month', label: CALENDAR_COPY.month },
+]
 
 // Day add glyph
 const DayAddIcon = ICONS.add
@@ -102,8 +116,10 @@ export const CalendarBoard = ({
     ? (initialEntries.find((row) => row.id === focusEntryId) ?? null)
     : null
 
-  const [unit, setUnit] = useState<'month' | 'week'>('month')
+  const [unit, setUnit] = useState<CalendarUnit>('month')
   const [cursor, setCursor] = useState(anchor)
+  const [search, setSearch] = useState('')
+  const [filterValues, setFilterValues] = useState<Record<string, string>>({})
   const [dialog, setDialog] = useState<'form' | 'detail' | 'bulk' | null>(linked ? 'detail' : null)
   const [editing, setEditing] = useState<CalendarEntry | null>(null)
   const [draft, setDraft] = useState<FormValues | null>(null)
@@ -111,10 +127,7 @@ export const CalendarBoard = ({
   const [selection, setSelection] = useState<string[]>([])
   const [pendingDeletion, setPendingDeletion] = useState<CalendarEntry[] | null>(null)
 
-  const days = useMemo(
-    () => (unit === 'month' ? monthGrid(cursor) : weekGrid(cursor)),
-    [cursor, unit]
-  )
+  const days = useMemo(() => unitGrid(cursor, unit), [cursor, unit])
 
   const range = useMemo(() => gridRange(days), [days])
 
@@ -124,7 +137,55 @@ export const CalendarBoard = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range.from, range.to])
 
-  const visible = calendar.entries
+  const filters: FilterDefinition[] = [
+    {
+      name: 'source',
+      label: CALENDAR_COPY.legendSourcesTitle,
+      allLabel: CALENDAR_COPY.allSources,
+      options: toOptions(CALENDAR_SOURCE_REGISTRY),
+    },
+    {
+      name: 'absences',
+      label: CALENDAR_COPY.filterAbsences,
+      allLabel: CALENDAR_COPY.absencesHidden,
+      options: [{ value: ABSENCES_SHOWN, label: CALENDAR_COPY.absencesShown }],
+    },
+    {
+      name: 'answer',
+      label: CALENDAR_COPY.filterAnswer,
+      allLabel: CALENDAR_COPY.allAnswers,
+      options: toOptions(ATTENDANCE_STATUS_REGISTRY),
+      maturity: 'beta',
+    },
+  ]
+
+  const isFiltered =
+    search.trim().length > 0 || Object.values(filterValues).some((value) => value.length > 0)
+
+  const resetFilters = () => {
+    setSearch('')
+    setFilterValues({})
+  }
+
+  // An absence stays out of the grid until the filter asks for it
+  const visible = useMemo(() => {
+    const term = search.trim().toLowerCase()
+
+    return calendar.entries.filter((entry) => {
+      if (
+        entry.source === CalendarSources.Absence &&
+        filterValues.absences !== ABSENCES_SHOWN &&
+        entry.id !== focusEntryId
+      ) {
+        return false
+      }
+
+      if (filterValues.source && entry.source !== filterValues.source) return false
+      if (filterValues.answer && entry.attendance?.mine !== filterValues.answer) return false
+
+      return term.length === 0 || entry.title.toLowerCase().includes(term)
+    })
+  }, [calendar.entries, filterValues, search, focusEntryId])
 
   // The open detail stays in step with roster updates
   const openedEntry = opened
@@ -149,8 +210,16 @@ export const CalendarBoard = ({
     (byDay.get(dayKey) ?? []).filter(
       (entry) =>
         entry.kind === kind &&
-        // A card belongs to the day it opens on, only bands and zones run across days
-        (kind !== CalendarKinds.Event || toDayKey(entry.startsAt) === dayKey)
+        // A card belongs to the day it opens on, unless it runs all day across several
+        (kind !== CalendarKinds.Event || entry.allDay || toDayKey(entry.startsAt) === dayKey)
+    )
+
+  const allDayCards = (dayKey: string) =>
+    entriesOf(dayKey, CalendarKinds.Event).filter((entry) => entry.allDay)
+
+  const timedCards = (dayKey: string, hour: number) =>
+    entriesOf(dayKey, CalendarKinds.Event).filter(
+      (entry) => !entry.allDay && hourOf(entry.startsAt) === hour
     )
 
   const { over, itemProps, containerProps } = useDragAndDrop((item, container) => {
@@ -238,6 +307,10 @@ export const CalendarBoard = ({
     [fields]
   )
 
+  // Both timed views share their markup, only the column count changes
+  const isTimed = unit !== 'month'
+  const columns = unit === 'day' ? CALENDAR_STYLES.columnsDay : CALENDAR_STYLES.columnsWeek
+
   /**
    * Draw the zones running under one day
    * @param {string} dayKey - ISO day
@@ -307,6 +380,24 @@ export const CalendarBoard = ({
       />
     ))
 
+  /**
+   * Draw one card of the grid
+   * @param {CalendarEntry} entry - Entry to draw
+   * @param {string} container - Drop container it is dragged from
+   * @return {JSX.Element}
+   */
+
+  const renderCard = (entry: CalendarEntry, container: string) => (
+    <CalendarEntryChip
+      key={`${container}:${entry.id}`}
+      entry={entry}
+      selected={selection.includes(entry.id)}
+      draggable={canManage && !entry.readOnly}
+      onOpen={openEntry}
+      dragProps={itemProps({ id: entry.id, from: container })}
+    />
+  )
+
   return (
     <>
       <Section description={CALENDAR_COPY.moveHint} bare>
@@ -333,15 +424,23 @@ export const CalendarBoard = ({
             </Button>
           )}
           <SegmentedControl
-            options={[
-              { value: 'month', label: CALENDAR_COPY.month },
-              { value: 'week', label: CALENDAR_COPY.week },
-            ]}
+            options={UNITS}
             value={unit}
             onChange={setUnit}
-            label={CALENDAR_COPY.title}
+            label={CALENDAR_COPY.unit}
           />
         </div>
+
+        <FilterBar
+          searchLabel={CALENDAR_COPY.search}
+          search={search}
+          onSearch={setSearch}
+          filters={filters}
+          values={filterValues}
+          onFilter={(name, value) => setFilterValues((current) => ({ ...current, [name]: value }))}
+          onReset={resetFilters}
+          isFiltered={isFiltered}
+        />
 
         {selected.length > 0 && (
           <div className={CALENDAR_STYLES.selectionBar}>
@@ -371,18 +470,18 @@ export const CalendarBoard = ({
           <div
             className={cn(
               CALENDAR_STYLES.weekdays,
-              unit === 'week' ? CALENDAR_STYLES.weekdaysWeek : CALENDAR_STYLES.weekdaysMonth
+              isTimed ? cn(CALENDAR_STYLES.weekdaysTimed, columns) : CALENDAR_STYLES.weekdaysMonth
             )}
           >
-            {unit === 'week' ? (
+            {isTimed ? (
               <>
                 <span className={CALENDAR_STYLES.weekday} />
-                {days.map((day, index) => (
+                {days.map((day) => (
                   <span
                     key={day.key}
                     className={cn(CALENDAR_STYLES.weekday, CALENDAR_STYLES.weekdayHead)}
                   >
-                    <span>{WEEKDAY_LABELS[index]}</span>
+                    <span>{WEEKDAY_LABELS[weekdayOf(day.key)]}</span>
                     <span
                       className={cn(
                         CALENDAR_STYLES.dayNumber,
@@ -403,7 +502,51 @@ export const CalendarBoard = ({
             )}
           </div>
 
-          {unit === 'month' ? (
+          {isTimed ? (
+            <>
+              <div className={cn(CALENDAR_STYLES.allDay, columns)}>
+                <span className={CALENDAR_STYLES.allDayLabel}>{CALENDAR_COPY.allDayRow}</span>
+                {days.map((day) => (
+                  <div key={day.key} className={CALENDAR_STYLES.allDayCell}>
+                    {renderZoneLabels(day.key)}
+                    {renderBands(day.key)}
+                    {allDayCards(day.key).map((entry) => renderCard(entry, day.key))}
+                  </div>
+                ))}
+              </div>
+
+              <div className={cn(CALENDAR_STYLES.week, columns)}>
+                {hours.map((hour) => (
+                  <Fragment key={hour}>
+                    <span className={CALENDAR_STYLES.hour}>
+                      {`${String(hour).padStart(2, '0')}:00`}
+                    </span>
+                    {days.map((day) => {
+                      const slot = `${day.key}${SLOT_SEPARATOR}${String(hour).padStart(2, '0')}`
+
+                      return (
+                        <div
+                          key={slot}
+                          className={cn(
+                            CALENDAR_STYLES.slot,
+                            covers(slot) &&
+                              slotDraft?.from.startsWith(day.key) &&
+                              CALENDAR_STYLES.dayDrafted,
+                            over === slot && 'is-drop-target'
+                          )}
+                          {...(canManage ? containerProps(slot) : {})}
+                          {...slotProps(slot)}
+                        >
+                          {renderZones(day.key)}
+                          {timedCards(day.key, hour).map((entry) => renderCard(entry, slot))}
+                        </div>
+                      )
+                    })}
+                  </Fragment>
+                ))}
+              </div>
+            </>
+          ) : (
             <div className={CALENDAR_STYLES.month}>
               {days.map((day) => {
                 const cards = entriesOf(day.key, CalendarKinds.Event)
@@ -454,16 +597,7 @@ export const CalendarBoard = ({
                     )}
                     {renderZoneLabels(day.key)}
                     {renderBands(day.key)}
-                    {shown.map((entry) => (
-                      <CalendarEntryChip
-                        key={entry.id}
-                        entry={entry}
-                        selected={selection.includes(entry.id)}
-                        draggable={canManage && !entry.readOnly}
-                        onOpen={openEntry}
-                        dragProps={itemProps({ id: entry.id, from: day.key })}
-                      />
-                    ))}
+                    {shown.map((entry) => renderCard(entry, day.key))}
                     {hiddenCount > 0 && (
                       <span className={CALENDAR_STYLES.overflow}>
                         {`+${hiddenCount} ${CALENDAR_COPY.more}`}
@@ -473,61 +607,6 @@ export const CalendarBoard = ({
                 )
               })}
             </div>
-          ) : (
-            <>
-              <div className={CALENDAR_STYLES.allDay}>
-                <span className={CALENDAR_STYLES.allDayLabel}>{CALENDAR_COPY.allDayRow}</span>
-                {days.map((day) => (
-                  <div key={day.key} className={CALENDAR_STYLES.allDayCell}>
-                    {renderZoneLabels(day.key)}
-                    {renderBands(day.key)}
-                  </div>
-                ))}
-              </div>
-
-              <div className={CALENDAR_STYLES.week}>
-                {hours.map((hour) => (
-                  <Fragment key={hour}>
-                    <span className={CALENDAR_STYLES.hour}>
-                      {`${String(hour).padStart(2, '0')}:00`}
-                    </span>
-                    {days.map((day) => {
-                      const slot = `${day.key}${SLOT_SEPARATOR}${String(hour).padStart(2, '0')}`
-                      const cards = entriesOf(day.key, CalendarKinds.Event).filter(
-                        (entry) => hourOf(entry.startsAt) === hour
-                      )
-
-                      return (
-                        <div
-                          key={slot}
-                          className={cn(
-                            CALENDAR_STYLES.slot,
-                            covers(slot) &&
-                              slotDraft?.from.startsWith(day.key) &&
-                              CALENDAR_STYLES.dayDrafted,
-                            over === slot && 'is-drop-target'
-                          )}
-                          {...(canManage ? containerProps(slot) : {})}
-                          {...slotProps(slot)}
-                        >
-                          {renderZones(day.key)}
-                          {cards.map((entry) => (
-                            <CalendarEntryChip
-                              key={entry.id}
-                              entry={entry}
-                              selected={selection.includes(entry.id)}
-                              draggable={canManage && !entry.readOnly}
-                              onOpen={openEntry}
-                              dragProps={itemProps({ id: entry.id, from: slot })}
-                            />
-                          ))}
-                        </div>
-                      )
-                    })}
-                  </Fragment>
-                ))}
-              </div>
-            </>
           )}
         </div>
 

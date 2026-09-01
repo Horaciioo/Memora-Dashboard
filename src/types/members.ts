@@ -21,17 +21,13 @@ export interface MemberTag {
  * @typedef {Object} MemberDivision
  * @property {string} id - Division identifier
  * @property {string} label - Division name
- * @property {string | null} glyph - Chevrons
- * @property {string | null} imagePath - Visual
- * @property {number} rank - Division rank
+ * @property {string | null} imagePath - Visual standing beside the portrait
  */
 
 export interface MemberDivision {
   id: string
   label: string
-  glyph: string | null
   imagePath: string | null
-  rank: number
 }
 
 /**
