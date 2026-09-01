@@ -112,6 +112,12 @@ const PROCESSING_MAP = {
     legalBasis: 'Nécessaire au fonctionnement du service',
     retention: inDays(RETENTION_POLICIES.expiredSessions),
   },
+  constraints: {
+    label: 'Tenir compte des contraintes déclarées',
+    categories: 'Contraintes pathologiques, maladies, contraintes privées',
+    legalBasis: 'Consentement explicite, chaque champ étant facultatif',
+    retention: 'Chiffré au repos, effacé au départ ou à tout moment par le membre',
+  },
   recruitment: {
     label: 'Instruire les candidatures',
     categories: 'Identifiant Discord, commentaires d’entretien, décision',

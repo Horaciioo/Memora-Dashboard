@@ -1,6 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
+import { readSealState, sealValues } from '@/core/services/auth/SealService'
 import { clearVolunteeredDetails } from '@/core/services/members/MemberService'
 import {
   profileFields,
@@ -24,7 +25,7 @@ export const PATCH = createProtectedRoute({
     const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const before = await readProfile(session.id)
+    const [before, { isUnsealed }] = await Promise.all([readProfile(session.id), readSealState()])
     const profile = await updateProfile(session.id, parsed.values)
 
     await recordEvent({
@@ -34,7 +35,11 @@ export const PATCH = createProtectedRoute({
       targetType: 'member',
       targetId: session.id,
       summary: profile.displayName,
-      change: summariseChange(fields, before.values, profile.values),
+      change: summariseChange(
+        fields,
+        sealValues(before.values, isUnsealed),
+        sealValues(profile.values, isUnsealed)
+      ),
     })
 
     return profile

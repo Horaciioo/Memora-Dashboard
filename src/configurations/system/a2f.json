@@ -1,0 +1,10 @@
+{
+  "digits": 6,
+  "periodSeconds": 30,
+  "driftSteps": 1,
+  "secretBytes": 20,
+  "recoveryCodeCount": 10,
+  "recoveryCodeBytes": 5,
+  "unlockMinutes": 15,
+  "enrolmentMinutes": 10
+}

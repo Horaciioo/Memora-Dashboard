@@ -8,6 +8,7 @@ import {
   readOverrides,
 } from '@/core/services/members/MemberFileService'
 import { readInheritedGrants } from '@/core/services/auth/GrantsService'
+import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
 import { memberFields, readMember } from '@/core/services/members/MemberService'
 import { findCandidateFile } from '@/core/services/recruitment/RecruitmentService'
 import { readMemberActivity } from '@/core/services/system/ActivityService'
@@ -58,23 +59,32 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   if (!detail) notFound()
 
   // The Discord identifier is the only bridge to their application, no account was ever created for it
-  const [fields, activity, overrides, inherited, recruitment] = await Promise.all([
-    memberFields(),
+  const [fields, activity, overrides, inherited, recruitment, seal] = await Promise.all([
+    memberFields(access.isAdmin),
     canReadLogs ? readMemberActivity(id) : Promise.resolve([]),
     canManageAccess ? readOverrides(id) : Promise.resolve([]),
     canManageAccess ? readInheritedGrants(id) : Promise.resolve([]),
     access.can(Permissions.RecruitmentRead)
       ? findCandidateFile(detail.summary.discordId, await scope())
       : Promise.resolve(null),
+    readSealState(),
   ])
+
+  // Sensitive values never leave the server while the window is shut
+  const sealed = {
+    ...detail,
+    values: sealValues(detail.values, seal.isUnsealed),
+    email: seal.isUnsealed ? detail.email : null,
+    phone: seal.isUnsealed ? detail.phone : null,
+  }
 
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader eyebrow={detail.summary.discordId} title={detail.summary.displayName} />
       <MemberFileTabs
-        detail={detail}
+        detail={sealed}
         recruitmentSessionId={recruitment?.sessionId ?? null}
-        memberFields={fields}
+        memberFields={sealFields(fields, seal.isUnsealed)}
         noteFields={NOTE_FIELDS}
         socialFields={SOCIAL_FIELDS}
         activity={activity}

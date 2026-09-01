@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { isSensitiveField } from '@/declarations/access/sensitive'
 import { CHANGE_COPY, FIELD_NOUNS } from '@/declarations/activity/changes'
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import { formatDay } from '@/utils/format/dates'
@@ -153,7 +154,7 @@ const describeField = (
     return { verb: CHANGE_COPY.verbCleared, rest: fill(CHANGE_COPY.restCleared, { noun }) }
 
   const value = clip(display(field, after))
-  const withValue = value !== '' && !LONG_KINDS.has(field.kind)
+  const withValue = value !== '' && !LONG_KINDS.has(field.kind) && !isSensitiveField(field.name)
 
   if (wasBlank)
     return {
