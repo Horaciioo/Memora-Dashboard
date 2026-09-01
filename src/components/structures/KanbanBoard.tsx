@@ -7,6 +7,7 @@ import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { accentVars } from '@/declarations/ui/theme'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
 import { useMenu, type MenuItem } from '@/managers/front-end'
+import type { WorkflowPhaseName } from '@/utils/constants/workflow'
 import { cn } from '@/utils/classnames'
 
 /**
@@ -15,14 +16,14 @@ import { cn } from '@/utils/classnames'
  * @property {string} id - Column identifier
  * @property {string} label - Column label
  * @property {string | null} accent - Colour token
- * @property {boolean} isTerminal - Closes the flow, its cards no longer count as content
+ * @property {WorkflowPhaseName} [phase] - Lifecycle bucket, set on workflow boards
  */
 
 export interface BoardColumn {
   id: string
   label: string
   accent: string | null
-  isTerminal: boolean
+  phase?: WorkflowPhaseName
 }
 
 /**

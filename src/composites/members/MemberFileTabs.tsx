@@ -21,11 +21,14 @@ import { ROUTES } from '@/declarations/navigation'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
-import { DETAIL_BLOCK } from '@/declarations/ui/blocks'
+import { DETAIL_BLOCK, MEMBER_BLOCK } from '@/declarations/ui/blocks'
 import { LIST_STYLES } from '@/declarations/ui/variants'
-import { RoleBadge } from '@/composites/members/MemberBadges'
+import { DivisionCrest, RoleBadge } from '@/composites/members/MemberBadges'
+import { sealedDisplay } from '@/components/structures/SealedValue'
+import { SensitiveFields } from '@/declarations/access/sensitive'
 import { MemberAccessPanel } from '@/composites/members/MemberAccessPanel'
 import { useMenu, type MenuItem } from '@/managers/front-end'
+import { useSeal } from '@/managers/infrastructure/Security/SealManager'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { MemberOverride } from '@/core/services/members/MemberFileService'
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
@@ -75,6 +78,16 @@ const optionLabel = (field: FieldDefinition, value: FieldValue): ReactNode => {
 
   return field.options?.find((option) => option.value === value)?.label ?? null
 }
+
+/**
+ * Label of one stored entry, falling back to the entry itself
+ * @param {FieldDefinition} field - Field carrying the options
+ * @param {string} value - Stored entry
+ * @return {string} - Matching option label
+ */
+
+const optionText = (field: FieldDefinition, value: string): string =>
+  field.options?.find((option) => option.value === value)?.label ?? value
 
 /**
  * Labels of every selected value of a multiselect field
@@ -130,6 +143,7 @@ export const MemberFileTabs = ({
   const file = useMemberFile(detail, overrides)
   const { session } = useAuthContext()
   const { contextMenu } = useMenu()
+  const { factor } = useSeal()
   const [dialog, setDialog] = useState<'identity' | 'note' | 'socials' | null>(null)
   const [pendingNote, setPendingNote] = useState<string | null>(null)
   const [editingSocial, setEditingSocial] = useState<MemberSocial | null>(null)
@@ -183,12 +197,20 @@ export const MemberFileTabs = ({
     {
       label: FIELD_COPY.email,
       field: fieldFor('email'),
-      display: identityValues.email ? String(identityValues.email) : null,
+      display: sealedDisplay(
+        SensitiveFields.Email,
+        identityValues.email ? String(identityValues.email) : null,
+        factor.seal.isUnsealed
+      ),
     },
     {
       label: FIELD_COPY.phone,
       field: fieldFor('phone'),
-      display: identityValues.phone ? String(identityValues.phone) : null,
+      display: sealedDisplay(
+        SensitiveFields.Phone,
+        identityValues.phone ? String(identityValues.phone) : null,
+        factor.seal.isUnsealed
+      ),
     },
     {
       label: FIELD_COPY.birthday,
@@ -215,7 +237,11 @@ export const MemberFileTabs = ({
       display: Array.isArray(identityValues.languages) && identityValues.languages.length > 0 && (
         <span className="flex flex-wrap gap-1.5">
           {identityValues.languages.map((language) => (
-            <Badge key={language} label={language} tone="neutral" />
+            <Badge
+              key={language}
+              label={optionText(fieldFor('languages'), language)}
+              tone="neutral"
+            />
           ))}
         </span>
       ),
@@ -286,24 +312,20 @@ export const MemberFileTabs = ({
 
   const header = (
     <Section title={MEMBER_COPY.identity} padded>
-      <div className="flex flex-wrap items-start gap-4">
+      <div className={MEMBER_BLOCK.header}>
         <button
           type="button"
           disabled={!canEdit}
           aria-label={ACTION_COPY.edit}
           title={ACTION_COPY.edit}
           onClick={() => openDialog('identity')}
-          className="shrink-0 rounded-[var(--radius-sm)] transition-opacity enabled:cursor-pointer enabled:hover:opacity-80 disabled:cursor-default"
+          className={MEMBER_BLOCK.portrait}
         >
           <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
         </button>
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <span className="flex flex-wrap items-center gap-2">
+        <div className={MEMBER_BLOCK.identity}>
+          <span className={MEMBER_BLOCK.tags}>
             <RoleBadge member={summary} />
-            <Badge
-              label={summary.division ? summary.division.label : MEMBER_COPY.noDivision}
-              tone="neutral"
-            />
             {summary.youtubers.map((youtuber) => (
               <Badge key={youtuber.id} label={youtuber.label} tone="info" icon="youtuber" />
             ))}
@@ -316,6 +338,7 @@ export const MemberFileTabs = ({
             )}
           </span>
         </div>
+        <DivisionCrest division={summary.division} />
       </div>
       {isLocked && <p className={`${DETAIL_BLOCK.empty} pt-3`}>{MEMBER_COPY.rootLocked}</p>}
     </Section>

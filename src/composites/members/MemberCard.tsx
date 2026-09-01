@@ -1,6 +1,5 @@
 'use client'
 
-import { Avatar } from '@/components/elements/display/Avatar'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { GROUP_STYLES, LIST_STYLES } from '@/declarations/ui/variants'
@@ -17,7 +16,7 @@ export interface MemberCardProps {
 }
 
 /**
- * Moderator box, name and identifier only, muted while an absence covers today
+ * Moderator box, name only
  * @param {MemberSummary} member - Row to show
  * @param {boolean} showNotesBubble - Reveal the notes indicator
  * @param {boolean} canDelete - Member may drop this moderator
@@ -68,20 +67,16 @@ export const MemberCard = ({
         member.isAbsent && LIST_STYLES.cardMuted
       )}
     >
-      <Avatar name={member.displayName} src={member.avatarUrl} />
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="flex items-center gap-1.5 truncate font-medium">
-          <span className="truncate">{member.displayName}</span>
-          {showNotesBubble && member.notesCount > 0 && (
-            <span
-              className={GROUP_STYLES.bubble}
-              role="img"
-              aria-label={MEMBER_COPY.notesTitle}
-              title={MEMBER_COPY.notesTitle}
-            />
-          )}
-        </span>
-        <span className="truncate text-xs text-[var(--color-ink-subtle)]">{member.discordId}</span>
+      <span className="flex min-w-0 flex-1 items-center gap-1.5 truncate font-medium">
+        <span className="truncate">{member.displayName}</span>
+        {showNotesBubble && member.notesCount > 0 && (
+          <span
+            className={GROUP_STYLES.bubble}
+            role="img"
+            aria-label={MEMBER_COPY.notesTitle}
+            title={MEMBER_COPY.notesTitle}
+          />
+        )}
       </span>
     </div>
   )

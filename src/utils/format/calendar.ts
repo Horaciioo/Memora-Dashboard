@@ -33,6 +33,13 @@ export interface CalendarDay {
 }
 
 /**
+ * Span the grid draws at once
+ * @type {'day' | 'week' | 'month'}
+ */
+
+export type CalendarUnit = 'day' | 'week' | 'month'
+
+/**
  * Read the ISO day of a moment
  * @param {Date | string} date - Moment to read
  * @return {string} - ISO day
@@ -90,6 +97,39 @@ export const weekGrid = (anchor: string): CalendarDay[] => {
 }
 
 /**
+ * Build the single day of a day grid
+ * @param {string} anchor - ISO day on screen
+ * @return {CalendarDay[]} - The one day
+ */
+
+export const dayGrid = (anchor: string): CalendarDay[] => {
+  const day = parseDay(anchor)
+
+  return [{ ...toCalendarDay(day, day.getMonth(), new Date()), isCurrentMonth: true }]
+}
+
+/**
+ * Build the grid of one span
+ * @param {string} anchor - ISO day on screen
+ * @param {CalendarUnit} unit - Span being browsed
+ * @return {CalendarDay[]} - Days in display order
+ */
+
+export const unitGrid = (anchor: string, unit: CalendarUnit): CalendarDay[] => {
+  if (unit === 'month') return monthGrid(anchor)
+
+  return unit === 'week' ? weekGrid(anchor) : dayGrid(anchor)
+}
+
+/**
+ * Read the weekday of a day, Monday first
+ * @param {string} dayKey - ISO day
+ * @return {number} - Index into the weekday labels
+ */
+
+export const weekdayOf = (dayKey: string): number => (parseDay(dayKey).getDay() + 6) % 7
+
+/**
  * Read the window a grid covers, so the server only sends what is shown
  * @param {CalendarDay[]} days - Rendered days
  * @return {{ from: string, to: string }} - ISO bounds
@@ -103,30 +143,30 @@ export const gridRange = (days: CalendarDay[]): { from: string; to: string } => 
 /**
  * Shift an anchor by one period
  * @param {string} anchor - ISO day on screen
- * @param {'month' | 'week'} unit - Period being browsed
+ * @param {CalendarUnit} unit - Period being browsed
  * @param {number} amount - Steps to move, negative goes back
  * @return {string} - New ISO day
  */
 
-export const shiftAnchor = (anchor: string, unit: 'month' | 'week', amount: number): string => {
+export const shiftAnchor = (anchor: string, unit: CalendarUnit, amount: number): string => {
   const day = parseDay(anchor)
+  if (unit === 'month') return formatDayKey(addMonths(day, amount))
 
-  return formatDayKey(
-    unit === 'month' ? addMonths(day, amount) : addDays(day, amount * WEEK_GRID_DAYS)
-  )
+  return formatDayKey(addDays(day, amount * (unit === 'week' ? WEEK_GRID_DAYS : 1)))
 }
 
 /**
  * Title of the period on screen
  * @param {string} anchor - ISO day on screen
- * @param {'month' | 'week'} unit - Period being browsed
+ * @param {CalendarUnit} unit - Period being browsed
  * @return {string} - Display title
  */
 
-export const periodLabel = (anchor: string, unit: 'month' | 'week'): string => {
+export const periodLabel = (anchor: string, unit: CalendarUnit): string => {
   const day = parseDay(anchor)
 
   if (unit === 'month') return monthLabel(day)
+  if (unit === 'day') return dayMonthLabel(day, true)
 
   const start = startOfWeek(day)
 

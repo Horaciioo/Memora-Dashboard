@@ -11,7 +11,7 @@ import type { BoardColumn } from '@/components/structures/KanbanBoard'
 import type { FieldOption } from '@/types/forms'
 import type { WorkAuthorship, WorkPerson, WorkTag } from '@/types/work'
 import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
-import type { WorkflowScopeName } from '@/utils/constants/workflow'
+import type { WorkflowPhaseName, WorkflowScopeName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
 /**
@@ -43,6 +43,7 @@ interface TagRow {
   id: string
   name: string
   accent?: string | null
+  phase?: WorkflowPhaseName | null
 }
 
 /**
@@ -52,7 +53,9 @@ interface TagRow {
  */
 
 export const toTag = (row: TagRow | null | undefined): WorkTag | null =>
-  row ? { id: row.id, label: row.name, accent: row.accent ?? null } : null
+  row
+    ? { id: row.id, label: row.name, accent: row.accent ?? null, phase: row.phase ?? undefined }
+    : null
 
 /**
  * Account row shaped like a person
@@ -125,7 +128,7 @@ export const boardColumns = async (scope: WorkflowScopeName): Promise<BoardColum
     id: row.id,
     label: row.name,
     accent: row.accent,
-    isTerminal: row.isTerminal,
+    phase: row.phase,
   }))
 }
 

@@ -66,7 +66,6 @@ export const MEMBER_COPY = {
   birthdayCelebrated: 'Anniversaire fêté',
   birthdayQuiet: 'Anniversaire discret',
   noYoutuber: 'Aucun YouTubeur',
-  noDivision: 'Aucune division',
   noFunction: 'Aucune fonction',
   absentHint: '{name} est actuellement en absence.',
 } as const
@@ -91,7 +90,6 @@ export const MEMBER_FIELD_COPY = {
   celebrateBirthday: 'Il veut que son anniversaire soit fêté',
   languages: 'Langues',
   timezone: 'Fuseau horaire',
-  avatarUrl: 'Photo',
   joinedAt: 'Date d’arrivée',
   leftAt: 'Date de départ',
 } as const

@@ -16,7 +16,7 @@ import type { DataTableColumn } from '@/components/structures/DataTable'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { TaskSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDay, formatRelativeDay, isOverdue } from '@/utils/format/dates'
+import { formatDay, isOverdue } from '@/utils/format/dates'
 
 export interface TasksBoardProps {
   initialTasks: TaskSummary[]
@@ -31,7 +31,7 @@ export interface TasksBoardProps {
 }
 
 /**
- * Task board, its cards carrying the owner, the due date and the project
+ * Task board, its cards carrying the owner
  * @param {TaskSummary[]} initialTasks - Cards resolved server-side
  * @param {BoardColumn[]} columns - Columns in display order
  * @param {FieldDefinition[]} fields - Field declarations of the task form
@@ -164,33 +164,12 @@ export const TasksBoard = ({
       canCreate={canCreate}
       canUpdate={canUpdate}
       canDelete={canDelete}
+      tintByColumn
       renderCard={(task) => (
-        <>
-          <p className={BOARD_STYLES.cardTitle}>
-            <Glyph value={task.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
-            {task.title}
-          </p>
-          <div className={BOARD_STYLES.cardMeta}>
-            {task.project && <Badge label={task.project.label} tone="brand" icon="projects" />}
-            {task.priority && (
-              <Badge label={task.priority.label} accent={task.priority.accent} tone={'warning'} />
-            )}
-          </div>
-          <div className={BOARD_STYLES.cardMeta}>
-            {task.dueDate && (
-              <Badge
-                label={formatRelativeDay(task.dueDate)}
-                tone={isOverdue(task.dueDate) ? 'danger' : 'neutral'}
-                icon="clock"
-              />
-            )}
-            {task.owner && (
-              <span className="ml-auto">
-                <Avatar name={task.owner.name} src={task.owner.src} size="xs" />
-              </span>
-            )}
-          </div>
-        </>
+        <p className={BOARD_STYLES.cardTitle}>
+          <Glyph value={task.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+          {task.title}
+        </p>
       )}
     />
   )

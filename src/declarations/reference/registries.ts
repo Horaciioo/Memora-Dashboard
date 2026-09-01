@@ -4,6 +4,7 @@ import {
   AttendeeKinds,
   EventVisibilities,
   FunctionKinds,
+  WorkflowPhases,
   WorkflowScopes,
 } from '@/utils/constants/workflow'
 import type {
@@ -11,6 +12,7 @@ import type {
   AttendeeKindName,
   EventVisibilityName,
   FunctionKindName,
+  WorkflowPhaseName,
   WorkflowScopeName,
 } from '@/utils/constants/workflow'
 
@@ -33,6 +35,15 @@ const WORKFLOW_SCOPE_MAP: Record<WorkflowScopeName, LabelledOption> = {
 }
 
 export const WORKFLOW_SCOPE_REGISTRY = createRegistry(WORKFLOW_SCOPE_MAP)
+
+// Declared in flow order, the done bucket driving what boards hide
+const WORKFLOW_PHASE_MAP: Record<WorkflowPhaseName, LabelledOption> = {
+  [WorkflowPhases.Todo]: { label: 'À faire', accent: 'neutral' },
+  [WorkflowPhases.Doing]: { label: 'En cours', accent: 'info' },
+  [WorkflowPhases.Done]: { label: 'Terminé', accent: 'success' },
+}
+
+export const WORKFLOW_PHASE_REGISTRY = createRegistry(WORKFLOW_PHASE_MAP)
 
 const FUNCTION_KIND_MAP: Record<FunctionKindName, LabelledOption> = {
   [FunctionKinds.Primary]: { label: 'Fonction principale', accent: 'brand' },

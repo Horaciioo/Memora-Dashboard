@@ -148,23 +148,12 @@ export const MeetingsBoard = ({
       canCreate={canCreate}
       canUpdate={canUpdate}
       canDelete={canDelete}
+      tintByColumn
       renderCard={(meeting) => (
-        <>
-          <p className={BOARD_STYLES.cardTitle}>
-            <Glyph value={meeting.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
-            {meeting.title}
-          </p>
-          <div className={BOARD_STYLES.cardMeta}>
-            <Badge label={formatDayTime(meeting.scheduledAt)} tone="brand" icon="clock" />
-            {meeting.durationMin && <Badge label={`${meeting.durationMin}`} tone="neutral" />}
-          </div>
-          <div className={BOARD_STYLES.cardMeta}>
-            {meeting.project && <Badge label={meeting.project.label} tone="info" icon="projects" />}
-            <span className="ml-auto">
-              <AvatarStack people={everyone(meeting)} />
-            </span>
-          </div>
-        </>
+        <p className={BOARD_STYLES.cardTitle}>
+          <Glyph value={meeting.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+          {meeting.title}
+        </p>
       )}
     />
   )
