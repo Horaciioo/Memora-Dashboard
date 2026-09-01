@@ -1,3 +1,4 @@
+import type { IntegrationLinkView } from '@/types/onboarding'
 import type { FormValues } from '@/types/forms'
 import type { RecruitmentOwnerName, RecruitmentStatusName } from '@/utils/constants/recruitment'
 
@@ -110,6 +111,7 @@ export interface CandidateView {
  * @property {string | null} scheduledAt - Resolved day
  * @property {string | null} doneAt - When it was cleared
  * @property {boolean} required - Cannot be skipped
+ * @property {boolean} emitsInvite - Hands out the integration form
  * @property {number} position - Display order
  */
 
@@ -122,6 +124,7 @@ export interface RecruitmentStepView {
   scheduledAt: string | null
   doneAt: string | null
   required: boolean
+  emitsInvite: boolean
   position: number
 }
 
@@ -164,6 +167,7 @@ export interface RecruitmentOutcomeView {
  * @property {RecruitmentStepView[]} steps - Timeline moments
  * @property {RecruitmentQuestionView[]} questions - Interview script in force
  * @property {RecruitmentOutcomeView[]} outcomes - Columns of the results board
+ * @property {IntegrationLinkView | null} link - Integration form handed out, if any
  */
 
 export interface RecruitmentDetail {
@@ -173,4 +177,5 @@ export interface RecruitmentDetail {
   steps: RecruitmentStepView[]
   questions: RecruitmentQuestionView[]
   outcomes: RecruitmentOutcomeView[]
+  link: IntegrationLinkView | null
 }

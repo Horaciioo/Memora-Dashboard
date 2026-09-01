@@ -11,6 +11,8 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { memberOptions, positionAt, toPerson, youtuberOptions } from '@/core/services/work/shared'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
+import { toLinkView } from '@/core/services/onboarding/IntegrationLinkService'
+import { INTEGRATION_STEP } from '@/declarations/recruitment/outcomes'
 import {
   RECRUITMENT_OWNER_REGISTRY,
   RECRUITMENT_STATUS_REGISTRY,
@@ -26,6 +28,7 @@ import type {
   RecruitmentStepView,
   RecruitmentSummary,
 } from '@/types/recruitment'
+import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
 import { RecruitmentOwners, RecruitmentStatuses } from '@/utils/constants/recruitment'
 import type { RecruitmentOwnerName, RecruitmentStatusName } from '@/utils/constants/recruitment'
 
@@ -60,13 +63,19 @@ const sessionScope = (scope: AccessScope) => scopedWhere('recruitmentSession', s
  * Read a session the viewer may reach, or throw
  * @param {string} id - Session identifier
  * @param {AccessScope} scope - Perimeter
- * @return {Promise<{ id: string, youtuberId: string, functionId: string, opensAt: Date | null }>} - Session anchors
+ * @return {Promise<{ id: string, youtuberId: string, functionId: string, academySessionId: string | null, opensAt: Date | null }>} - Session anchors
  */
 
-const reachableSession = async (id: string, scope: AccessScope) => {
+export const reachableSession = async (id: string, scope: AccessScope) => {
   const row = await prisma.recruitmentSession.findFirst({
     where: { AND: [{ id }, sessionScope(scope)] },
-    select: { id: true, youtuberId: true, functionId: true, opensAt: true },
+    select: {
+      id: true,
+      youtuberId: true,
+      functionId: true,
+      academySessionId: true,
+      opensAt: true,
+    },
   })
 
   if (!row) throw notFound()
@@ -520,6 +529,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     include: {
       ...SUMMARY_INCLUDE,
       steps: { orderBy: [{ offset: 'asc' }, { position: 'asc' }] },
+      invite: true,
       candidates: {
         orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
         include: {
@@ -560,6 +570,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     scheduledAt: step.scheduledAt?.toISOString() ?? null,
     doneAt: step.doneAt?.toISOString() ?? null,
     required: step.required,
+    emitsInvite: step.emitsInvite,
     position: step.position,
   }))
 
@@ -583,6 +594,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     steps,
     questions: questionViews,
     outcomes: outcomeViews,
+    link: row.invite ? toLinkView(row.invite) : null,
   }
 }
 
@@ -608,12 +620,25 @@ export const createSession = async (
     orderBy: [{ offset: 'asc' }, { position: 'asc' }],
   })
 
+  const closingOffset = templates.reduce((last, template) => Math.max(last, template.offset), 0)
+
+  // A campaign always feeds a promotion, so its academy session is opened alongside
+  const academySession = await prisma.academySession.create({
+    data: {
+      functionId,
+      startsAt: readDate(values, 'closesAt') ?? opensAt ?? new Date(),
+      status: AcademySessionStatuses.Draft,
+      summary: readText(values, 'name'),
+    },
+  })
+
   const row = await prisma.recruitmentSession
     .create({
       data: {
         name: readText(values, 'name') ?? '',
         youtuberId,
         functionId,
+        academySessionId: academySession.id,
         status: (readText(values, 'status') ?? RecruitmentStatuses.Draft) as RecruitmentStatusName,
         summary: readText(values, 'summary'),
         opensAt,
@@ -622,22 +647,42 @@ export const createSession = async (
           create: readList(values, 'responsableIds').map((accountId) => ({ accountId })),
         },
         steps: {
-          create: templates.map((template, index) => ({
-            templateId: template.id,
-            title: template.title,
-            notes: template.description,
-            owner: template.owner,
-            offset: template.offset,
-            // A step only lands on a day once the session knows when it opens
-            scheduledAt: opensAt ? new Date(opensAt.getTime() + template.offset * DAY_IN_MS) : null,
-            required: template.required,
-            position: index * FORM_SETTINGS.positionStep,
-          })),
+          create: [
+            ...templates.map((template, index) => ({
+              templateId: template.id,
+              title: template.title,
+              notes: template.description,
+              owner: template.owner,
+              offset: template.offset,
+              // A step only lands on a day once the session knows when it opens
+              scheduledAt: opensAt
+                ? new Date(opensAt.getTime() + template.offset * DAY_IN_MS)
+                : null,
+              required: template.required,
+              position: index * FORM_SETTINGS.positionStep,
+            })),
+            // The campaign always closes on handing out the integration form
+            {
+              title: INTEGRATION_STEP.title,
+              notes: INTEGRATION_STEP.description,
+              owner: INTEGRATION_STEP.owner,
+              offset: closingOffset,
+              scheduledAt: opensAt ? new Date(opensAt.getTime() + closingOffset * DAY_IN_MS) : null,
+              required: INTEGRATION_STEP.required,
+              emitsInvite: true,
+              position: templates.length * FORM_SETTINGS.positionStep,
+            },
+          ],
         },
       },
       include: SUMMARY_INCLUDE,
     })
-    .catch(rethrow)
+    .catch(async (error: unknown) => {
+      // A refused campaign never leaves its promotion behind
+      await prisma.academySession.delete({ where: { id: academySession.id } })
+
+      return rethrow(error)
+    })
 
   return toSummary(row, 0)
 }
@@ -979,6 +1024,7 @@ const toStep = (row: {
   scheduledAt: Date | null
   doneAt: Date | null
   required: boolean
+  emitsInvite: boolean
   position: number
 }): RecruitmentStepView => ({
   id: row.id,
@@ -989,6 +1035,7 @@ const toStep = (row: {
   scheduledAt: row.scheduledAt?.toISOString() ?? null,
   doneAt: row.doneAt?.toISOString() ?? null,
   required: row.required,
+  emitsInvite: row.emitsInvite,
   position: row.position,
 })
 

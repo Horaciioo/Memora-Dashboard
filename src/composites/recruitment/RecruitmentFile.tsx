@@ -11,6 +11,7 @@ import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FileTabs } from '@/components/structures/FileTabs'
+import { IntegrationLinkStep } from '@/composites/onboarding/IntegrationLinkStep'
 import { FormDialog } from '@/components/structures/FormDialog'
 import { KanbanBoard, type BoardColumn } from '@/components/structures/KanbanBoard'
 import { Section } from '@/components/structures/Section'
@@ -37,9 +38,11 @@ export interface RecruitmentFileProps {
   commentFields: FieldDefinition[]
   reviewFields: FieldDefinition[]
   instructionFields: FieldDefinition[]
+  linkFields: FieldDefinition[]
   canManage: boolean
   canWriteCandidates: boolean
   canWriteInstructions: boolean
+  canManageLinks: boolean
 }
 
 /**
@@ -63,9 +66,11 @@ export const RecruitmentFile = ({
   commentFields,
   reviewFields,
   instructionFields,
+  linkFields,
   canManage,
   canWriteCandidates,
   canWriteInstructions,
+  canManageLinks,
 }: RecruitmentFileProps) => {
   const router = useRouter()
   const file = useRecruitmentFile(detail)
@@ -337,6 +342,17 @@ export const RecruitmentFile = ({
                 </span>
                 {step.required && <Badge label={RECRUITMENT_COPY.mandatoryBadge} tone="warning" />}
                 <Badge label={owner.label} accent={owner.accent} dot />
+                {step.emitsInvite && (
+                  <IntegrationLinkStep
+                    link={file.link}
+                    fields={linkFields}
+                    issues={file.issues}
+                    isSaving={file.isSaving}
+                    canManage={canManageLinks}
+                    onEmit={file.emitLink}
+                    onRevoke={() => void file.revokeLink()}
+                  />
+                )}
               </div>
             )
           })}
@@ -354,7 +370,6 @@ export const RecruitmentFile = ({
     id: outcome.id,
     label: outcome.label,
     accent: outcome.accent,
-    isTerminal: outcome.isTerminal,
   }))
 
   const resultsTab = () => (
