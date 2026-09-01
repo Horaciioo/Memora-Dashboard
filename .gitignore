@@ -41,5 +41,6 @@ vitest.config.mts
 # editor
 .idea
 
-# claude code, machine-local permissions
+# claude code
 .claude/settings.local.json
+.claude/skills/
