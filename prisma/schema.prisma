@@ -15,10 +15,25 @@ enum MemberRole {
 
 // Lifecycle of a member inside the organisation
 enum MemberStatus {
+  PENDING
   ACADEMY
   ACTIVE
   PAUSED
   LEFT
+}
+
+// What an integration link does once its form is submitted
+enum IntegrationLinkKind {
+  ACCOUNT
+  PROFILE
+  ACADEMY
+}
+
+// Kind of personal constraint a member volunteers
+enum ConstraintKind {
+  MEDICAL
+  ILLNESS
+  PRIVATE
 }
 
 // Academy period a training belongs to
@@ -118,6 +133,13 @@ enum WorkflowScope {
   MEETING
 }
 
+// Lifecycle bucket of a workflow state
+enum WorkflowPhase {
+  TODO
+  DOING
+  DONE
+}
+
 // Role held inside a meeting
 enum AttendeeKind {
   LEAD
@@ -185,6 +207,9 @@ model Account {
   anonymisedAt          DateTime?
   languages           String[]     @default([])
   timezone            String?
+  theme               String?
+  colorVision         String?
+  fontScale           String?
   avatarUrl           String?
   role                MemberRole   @default(MODERATEUR)
   status              MemberStatus @default(ACADEMY)
@@ -201,8 +226,11 @@ model Account {
 
   sessions              Session[]
   discordToken          DiscordToken?
+  twoFactor             TwoFactorCredential?
+  ledYoutubers          YoutuberLead[]          @relation("YoutuberLead")
   permissions           AccountPermission[]
   socialLinks           SocialLink[]
+  constraints           AccountConstraint[]
   calendarEntries       CalendarEvent[]         @relation("CalendarSubject")
   absences              Absence[]               @relation("AbsenceOwner")
   reviewedAbsences      Absence[]               @relation("AbsenceReviewer")
@@ -215,7 +243,8 @@ model Account {
   academySeats          AcademySessionTrainer[] @relation("AcademyTrainer")
   academySteps          AcademyStep[]           @relation("AcademyStepAuthor")
   academyStepsValidated AcademyStep[]           @relation("AcademyStepValidator")
-  sessionInvitesCreated SessionInvite[]         @relation("SessionInviteCreatedBy")
+  integrationInvites    IntegrationInvite[]     @relation("IntegrationInviteCreatedBy")
+  integrationClaims     IntegrationClaim[]      @relation("IntegrationClaimAccount")
   quizAnswers           JuniorAnswer[]
   academyReviews        AcademyReview[]         @relation("AcademyReviewAuthor")
   academyReviewsDecided AcademyReview[]         @relation("AcademyReviewDecider")
@@ -263,12 +292,45 @@ model Session {
   createdAt  DateTime @default(now())
   lastUsedAt DateTime @default(now())
   expiresAt  DateTime
+  unsealedAt DateTime?
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@index([accountId])
   @@index([expiresAt])
   @@map("sessions")
+}
+
+
+// Second factor of one member, its secret encrypted at rest like every other stored secret
+model TwoFactorCredential {
+  id          String    @id @default(cuid())
+  accountId   String    @unique
+  secret      String
+  confirmedAt DateTime?
+  lastStep    BigInt?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  account       Account                 @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  recoveryCodes TwoFactorRecoveryCode[]
+
+  @@map("two_factor_credentials")
+}
+
+// Single-use fallback code, only ever stored as a digest
+model TwoFactorRecoveryCode {
+  id           String    @id @default(cuid())
+  credentialId String
+  digest       String
+  usedAt       DateTime?
+  createdAt    DateTime  @default(now())
+
+  credential TwoFactorCredential @relation(fields: [credentialId], references: [id], onDelete: Cascade)
+
+  @@unique([credentialId, digest])
+  @@index([credentialId])
+  @@map("two_factor_recovery_codes")
 }
 
 // OAuth grant of one member, both token halves encrypted at rest
@@ -339,12 +401,15 @@ model Youtuber {
   handle    String?
   accent    String?
   avatarUrl String?
+  bannerUrl String?
   position  Int      @default(0)
   archived  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   accounts         Account[]
+  leads            YoutuberLead[]
+  functions        YoutuberFunction[]
   teams            Team[]
   projects         Project[]
   tasks            Task[]
@@ -356,9 +421,46 @@ model Youtuber {
   recruitmentSessions      RecruitmentSession[]
   recruitmentQuestions     RecruitmentQuestion[]
   recruitmentStepTemplates RecruitmentStepTemplate[]
+  integrationInvites       IntegrationInvite[]
 
   @@index([archived])
   @@map("youtubers")
+}
+
+// Function one creator opens, the catalogue itself staying global
+model YoutuberFunction {
+  id         String   @id @default(cuid())
+  youtuberId String
+  functionId String
+  position   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  youtuber    Youtuber    @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  jobFunction JobFunction @relation(fields: [functionId], references: [id], onDelete: Cascade)
+
+  @@unique([youtuberId, functionId])
+  @@index([functionId])
+  @@map("youtuber_functions")
+}
+
+
+// Responsable anchored on one creator, optionally narrowed to one of its teams. Only an
+// administrator writes this row — it is what a responsable's whole perimeter is read from
+model YoutuberLead {
+  id         String   @id @default(cuid())
+  youtuberId String
+  accountId  String
+  teamId     String?
+  createdAt  DateTime @default(now())
+
+  youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  account  Account  @relation("YoutuberLead", fields: [accountId], references: [id], onDelete: Cascade)
+  team     Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  @@unique([youtuberId, accountId])
+  @@index([accountId])
+  @@index([teamId])
+  @@map("youtuber_leads")
 }
 
 // Gamification tier, Junior then the three squads
@@ -369,6 +471,8 @@ model Division {
   imagePath String?
   summary   String?
   rank      Int      @unique
+  // Cleared, only an administrator may put a member in this division
+  leadAssignable Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -396,10 +500,12 @@ model JobFunction {
   skills           Skill[]
   pimStepTemplates PimStepTemplate[]
   academySessions  AcademySession[]
+  youtubers        YoutuberFunction[]
 
   recruitmentSessions      RecruitmentSession[]
   recruitmentQuestions     RecruitmentQuestion[]
   recruitmentStepTemplates RecruitmentStepTemplate[]
+  integrationInvites       IntegrationInvite[]
 
   @@index([kind])
   @@map("job_functions")
@@ -424,15 +530,15 @@ model Platform {
 
 // Column of a board, scoped to one surface
 model WorkflowState {
-  id         String        @id @default(cuid())
-  scope      WorkflowScope
-  name       String
-  accent     String?
-  position   Int           @default(0)
-  isDefault  Boolean       @default(false)
-  isTerminal Boolean       @default(false)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  id        String        @id @default(cuid())
+  scope     WorkflowScope
+  name      String
+  accent    String?
+  position  Int           @default(0)
+  isDefault Boolean       @default(false)
+  phase     WorkflowPhase @default(TODO)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   projects Project[]
   tasks    Task[]
@@ -469,9 +575,10 @@ model Team {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  lead     Account?     @relation("TeamLead", fields: [leadId], references: [id], onDelete: SetNull)
-  youtuber Youtuber?    @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+  lead     Account?       @relation("TeamLead", fields: [leadId], references: [id], onDelete: SetNull)
+  youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
   members  TeamMember[]
+  anchors  YoutuberLead[]
 
   @@index([leadId])
   @@index([youtuberId, archived])
@@ -727,6 +834,7 @@ model AccountNote {
 model SocialLink {
   id        String   @id @default(cuid())
   accountId String
+  networkId String?
   label     String
   handle    String
   url       String?
@@ -735,11 +843,46 @@ model SocialLink {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  network SocialNetwork? @relation(fields: [networkId], references: [id], onDelete: SetNull)
 
   @@unique([accountId, label])
   @@index([accountId, position])
+  @@index([networkId])
   @@map("social_links")
+}
+
+// Declared network a member profile can live on, its prefix sparing the whole URL
+model SocialNetwork {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  urlPrefix String
+  accent    String?
+  avatarUrl String?
+  required  Boolean  @default(false)
+  position  Int      @default(0)
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  links SocialLink[]
+
+  @@map("social_networks")
+}
+
+// Health or private constraint a member volunteers, encrypted at rest and theirs to erase
+model AccountConstraint {
+  id        String         @id @default(cuid())
+  accountId String
+  kind      ConstraintKind
+  body      String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, kind])
+  @@map("account_constraints")
 }
 
 // Entry programme a junior is placed into, ATRIA or PULSE
@@ -756,7 +899,6 @@ model Dispositif {
   steps     PimStepTemplate[]
   juniors   AcademyJunior[]
   trainings Training[]
-  invites   SessionInvite[]
 
   @@map("dispositifs")
 }
@@ -973,31 +1115,60 @@ model AcademySession {
   juniors        AcademyJunior[]
   steps          AcademyStep[]
   calendarEvents CalendarEvent[]
-  invites        SessionInvite[]
+  invites        IntegrationInvite[]
+
+  recruitmentSession RecruitmentSession?
 
   @@index([functionId, startsAt])
   @@index([status])
   @@map("academy_sessions")
 }
 
-// Public admission link opened once a session takes applications
-model SessionInvite {
-  id           String   @id @default(cuid())
-  sessionId    String
-  token        String   @unique
-  expiresAt    DateTime
-  maxUses      Int?
-  uses         Int      @default(0)
-  dispositifId String?
-  createdById  String?
-  createdAt    DateTime @default(now())
+// Public link carrying the integration form, its kind deciding what a submission creates
+model IntegrationInvite {
+  id                   String              @id @default(cuid())
+  kind                 IntegrationLinkKind @default(ACCOUNT)
+  token                String              @unique
+  youtuberId           String?
+  functionId           String?
+  sessionId            String?
+  recruitmentSessionId String?             @unique
+  expiresAt            DateTime
+  maxUses              Int?
+  uses                 Int                 @default(0)
+  createdById          String?
+  createdAt            DateTime            @default(now())
 
-  session    AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  dispositif Dispositif?    @relation(fields: [dispositifId], references: [id], onDelete: SetNull)
-  createdBy  Account?       @relation("SessionInviteCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  youtuber           Youtuber?           @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+  jobFunction        JobFunction?        @relation(fields: [functionId], references: [id], onDelete: SetNull)
+  session            AcademySession?     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  recruitmentSession RecruitmentSession? @relation(fields: [recruitmentSessionId], references: [id], onDelete: Cascade)
+  createdBy          Account?            @relation("IntegrationInviteCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  claims IntegrationClaim[]
 
   @@index([sessionId])
-  @@map("session_invites")
+  @@index([youtuberId])
+  @@map("integration_invites")
+}
+
+// Discord identity resolved by the server for one link, never sent by the form
+model IntegrationClaim {
+  id                String    @id @default(cuid())
+  inviteId          String
+  discordId         String
+  discordUsername   String?
+  discordAvatarHash String?
+  claimedAt         DateTime  @default(now())
+  submittedAt       DateTime?
+  accountId         String?
+
+  invite  IntegrationInvite @relation(fields: [inviteId], references: [id], onDelete: Cascade)
+  account Account?          @relation("IntegrationClaimAccount", fields: [accountId], references: [id], onDelete: SetNull)
+
+  @@unique([inviteId, discordId])
+  @@index([discordId])
+  @@map("integration_claims")
 }
 
 // Moderator holding the trainer seat on a session
@@ -1433,23 +1604,26 @@ enum RecruitmentOwner {
 
 // Campaign opened for one creator and one function, announced outside then held on Discord
 model RecruitmentSession {
-  id           String            @id @default(cuid())
-  youtuberId   String
-  functionId   String
-  name         String
-  status       RecruitmentStatus @default(DRAFT)
-  summary      String?
-  instructions String            @default("")
-  opensAt      DateTime?
-  closesAt     DateTime?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  id               String            @id @default(cuid())
+  youtuberId       String
+  functionId       String
+  academySessionId String?           @unique
+  name             String
+  status           RecruitmentStatus @default(DRAFT)
+  summary          String?
+  instructions     String            @default("")
+  opensAt          DateTime?
+  closesAt         DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
-  youtuber     Youtuber                 @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
-  jobFunction  JobFunction              @relation(fields: [functionId], references: [id], onDelete: Restrict)
-  candidates   RecruitmentCandidate[]
-  steps        RecruitmentStep[]
-  responsables RecruitmentResponsable[]
+  youtuber       Youtuber                 @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  jobFunction    JobFunction              @relation(fields: [functionId], references: [id], onDelete: Restrict)
+  academySession AcademySession?          @relation(fields: [academySessionId], references: [id], onDelete: SetNull)
+  candidates     RecruitmentCandidate[]
+  steps          RecruitmentStep[]
+  responsables   RecruitmentResponsable[]
+  invite         IntegrationInvite?
 
   @@unique([youtuberId, functionId, name])
   @@index([youtuberId, status])
@@ -1601,6 +1775,7 @@ model RecruitmentStep {
   scheduledAt DateTime?
   doneAt      DateTime?
   required    Boolean          @default(false)
+  emitsInvite Boolean          @default(false)
   position    Int              @default(0)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt

@@ -7,6 +7,7 @@ import {
   PrismaClient,
   StepAnchor,
   StepOwner,
+  WorkflowPhase,
   WorkflowScope,
 } from '@prisma/client'
 
@@ -44,63 +45,63 @@ const DEFAULT_WORKFLOW_STATES = [
     name: 'À faire',
     accent: '#64748b',
     isDefault: true,
-    isTerminal: false,
+    phase: WorkflowPhase.TODO,
   },
   {
     scope: WorkflowScope.PROJECT,
     name: 'En cours',
     accent: '#1d4ed8',
     isDefault: false,
-    isTerminal: false,
+    phase: WorkflowPhase.DOING,
   },
   {
     scope: WorkflowScope.PROJECT,
     name: 'Terminé',
     accent: '#16a34a',
     isDefault: false,
-    isTerminal: true,
+    phase: WorkflowPhase.DONE,
   },
   {
     scope: WorkflowScope.TASK,
     name: 'À faire',
     accent: '#64748b',
     isDefault: true,
-    isTerminal: false,
+    phase: WorkflowPhase.TODO,
   },
   {
     scope: WorkflowScope.TASK,
     name: 'En cours',
     accent: '#1d4ed8',
     isDefault: false,
-    isTerminal: false,
+    phase: WorkflowPhase.DOING,
   },
   {
     scope: WorkflowScope.TASK,
     name: 'Terminée',
     accent: '#16a34a',
     isDefault: false,
-    isTerminal: true,
+    phase: WorkflowPhase.DONE,
   },
   {
     scope: WorkflowScope.MEETING,
     name: 'À planifier',
     accent: '#64748b',
     isDefault: true,
-    isTerminal: false,
+    phase: WorkflowPhase.TODO,
   },
   {
     scope: WorkflowScope.MEETING,
     name: 'Planifiée',
     accent: '#1d4ed8',
     isDefault: false,
-    isTerminal: false,
+    phase: WorkflowPhase.DOING,
   },
   {
     scope: WorkflowScope.MEETING,
     name: 'Terminée',
     accent: '#16a34a',
     isDefault: false,
-    isTerminal: true,
+    phase: WorkflowPhase.DONE,
   },
 ] as const
 
@@ -507,7 +508,7 @@ const seed = async (): Promise<void> => {
     const data = {
       accent: state.accent,
       isDefault: state.isDefault,
-      isTerminal: state.isTerminal,
+      phase: state.phase,
       position: index * POSITION_STEP,
     }
 
