@@ -1,10 +1,12 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { withoutSealedWrites } from '@/core/services/auth/SealService'
 import { notFound } from '@/core/lib/errors'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { PROFILE_FIELD_COPY } from '@/declarations/preferences/copy'
+import { LANGUAGE_OPTIONS, timezoneOptions } from '@/declarations/system/locales'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { ProfileDetail } from '@/types/preferences'
 import { AcademyJuniorStatuses } from '@/utils/constants/hierarchy'
@@ -35,20 +37,20 @@ export const profileFields = (): FieldDefinition[] => [
   { name: 'birthday', kind: 'date', label: PROFILE_FIELD_COPY.birthday, span: 'half' },
   {
     name: 'timezone',
-    kind: 'text',
+    kind: 'select',
     label: PROFILE_FIELD_COPY.timezone,
-    maxLength: FORM_SETTINGS.shortTextMaxLength,
+    options: timezoneOptions(),
     span: 'half',
     maturity: 'beta',
   },
   {
     name: 'languages',
-    kind: 'tags',
+    kind: 'multiselect',
     label: PROFILE_FIELD_COPY.languages,
+    options: LANGUAGE_OPTIONS,
     maxItems: FORM_SETTINGS.tagMaxCount,
     maturity: 'beta',
   },
-  { name: 'avatarUrl', kind: 'image', label: PROFILE_FIELD_COPY.avatarUrl, bucket: 'avatars' },
   {
     name: 'celebrateBirthday',
     kind: 'toggle',
@@ -73,6 +75,7 @@ export const readProfile = async (accountId: string): Promise<ProfileDetail> => 
   return {
     displayName: row.displayName,
     discordId: row.discordId,
+    avatarUrl: row.avatarUrl,
     role: row.role,
     status: row.status,
     academyDispositif: row.academyJuniors[0]?.dispositif.name ?? null,
@@ -87,7 +90,6 @@ export const readProfile = async (accountId: string): Promise<ProfileDetail> => 
       birthday: row.birthday ? row.birthday.toISOString().slice(0, 10) : null,
       timezone: row.timezone,
       languages: row.languages,
-      avatarUrl: row.avatarUrl,
       celebrateBirthday: row.celebrateBirthday,
     },
   }
@@ -107,15 +109,14 @@ export const updateProfile = async (
   // Only the declared fields are written, the rest of the file stays with the responsables
   await prisma.account.update({
     where: { id: accountId },
-    data: {
+    data: await withoutSealedWrites({
       email: readText(values, 'email'),
       phone: readText(values, 'phone'),
       birthday: readDate(values, 'birthday'),
       timezone: readText(values, 'timezone'),
       languages: readList(values, 'languages'),
-      avatarUrl: readText(values, 'avatarUrl'),
       celebrateBirthday: readFlag(values, 'celebrateBirthday'),
-    },
+    }),
   })
 
   return readProfile(accountId)

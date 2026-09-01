@@ -1,10 +1,11 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { withoutSealedWrites } from '@/core/services/auth/SealService'
 import { activeFunctions, activeYoutubers, allDivisions } from '@/core/services/reference/lookups'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { conflict, immutable, notFound } from '@/core/lib/errors'
+import { conflict, forbidden, immutable, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import { activeAbsenceFilter, toAbsence } from '@/core/services/absences/AbsenceService'
@@ -15,6 +16,7 @@ import { FORM_SETTINGS, PAGINATION_SETTINGS } from '@/declarations/configuration
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
+import { LANGUAGE_OPTIONS, timezoneOptions } from '@/declarations/system/locales'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence, MemberDetail, MemberSummary } from '@/types/members'
 import { AcademyJuniorStatuses, MemberStatuses } from '@/utils/constants/hierarchy'
@@ -77,9 +79,7 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
     ? {
         id: row.division.id,
         label: row.division.name,
-        glyph: row.division.glyph,
         imagePath: row.division.imagePath,
-        rank: row.division.rank,
       }
     : null,
   youtubers: row.youtubers.map((youtuber) => ({
@@ -108,11 +108,38 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
 })
 
 /**
+ * Reject a division move the viewer is not allowed to make
+ * @param {FormValues} values - Parsed body
+ * @param {boolean} isAdmin - Viewer sits at admin level
+ * @param {string | null} [current] - Division the member already sits in
+ * @return {Promise<void>} - Throws on a restricted division
+ */
+
+export const assertDivisionAssignable = async (
+  values: FormValues,
+  isAdmin: boolean,
+  current: string | null = null
+): Promise<void> => {
+  const divisionId = readText(values, 'divisionId')
+
+  // Leaving a member where they already are is never a move
+  if (isAdmin || !divisionId || divisionId === current) return
+
+  const division = await prisma.division.findUnique({
+    where: { id: divisionId },
+    select: { leadAssignable: true },
+  })
+
+  if (!division?.leadAssignable) throw forbidden()
+}
+
+/**
  * Build the moderator form declarations
+ * @param {boolean} [isAdmin] - Viewer sits at admin level, unlocking every division
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const memberFields = async (): Promise<FieldDefinition[]> => {
+export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> => {
   const [divisions, youtubers, functions] = await Promise.all([
     allDivisions(),
     activeYoutubers(),
@@ -120,6 +147,12 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
   ])
 
   const functionOptions = rowsToOptions(functions)
+
+  // A restricted division still shows, greyed, so its holders keep reading it
+  const divisionOptions = rowsToOptions(divisions).map((option, index) => ({
+    ...option,
+    disabled: !isAdmin && !divisions[index].leadAssignable,
+  }))
 
   return [
     {
@@ -137,13 +170,6 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
       label: MEMBER_FIELD_COPY.discordId,
       required: true,
       span: 'half',
-      group: FORM_GROUPS.identity,
-    },
-    {
-      name: 'avatarUrl',
-      kind: 'image',
-      label: MEMBER_FIELD_COPY.avatarUrl,
-      bucket: 'avatars',
       group: FORM_GROUPS.identity,
     },
     {
@@ -184,7 +210,7 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
       name: 'divisionId',
       kind: 'select',
       label: MEMBER_FIELD_COPY.division,
-      options: rowsToOptions(divisions),
+      options: divisionOptions,
       span: 'half',
       group: FORM_GROUPS.assignment,
     },
@@ -231,16 +257,17 @@ export const memberFields = async (): Promise<FieldDefinition[]> => {
     },
     {
       name: 'timezone',
-      kind: 'text',
+      kind: 'select',
       label: MEMBER_FIELD_COPY.timezone,
-      maxLength: FORM_SETTINGS.shortTextMaxLength,
+      options: timezoneOptions(),
       span: 'half',
       group: FORM_GROUPS.contact,
     },
     {
       name: 'languages',
-      kind: 'tags',
+      kind: 'multiselect',
       label: MEMBER_FIELD_COPY.languages,
+      options: LANGUAGE_OPTIONS,
       maxItems: FORM_SETTINGS.tagMaxCount,
       group: FORM_GROUPS.contact,
     },
@@ -299,7 +326,6 @@ const toAccountData = (values: FormValues) => ({
   email: readText(values, 'email'),
   phone: readText(values, 'phone'),
   timezone: readText(values, 'timezone'),
-  avatarUrl: readText(values, 'avatarUrl'),
   birthday: readDate(values, 'birthday'),
   leftAt: readDate(values, 'leftAt'),
   languages: readList(values, 'languages'),
@@ -347,7 +373,7 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
   // The root administrator keeps its identifier and its level
   if (isRootIdentity(current.discordId)) throw immutable(MEMBER_COPY.rootLocked)
 
-  const data = toAccountData(values)
+  const data = await withoutSealedWrites(toAccountData(values))
   const joinedAt = readDate(values, 'joinedAt')
   const youtuberIds = readList(values, 'youtuberIds')
 
@@ -377,6 +403,7 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
 export const clearVolunteeredDetails = async (id: string): Promise<void> => {
   await prisma.$transaction([
     prisma.socialLink.deleteMany({ where: { accountId: id } }),
+    prisma.accountConstraint.deleteMany({ where: { accountId: id } }),
     prisma.account.update({
       where: { id },
       data: { email: null, phone: null, birthday: null, celebrateBirthday: false },
@@ -481,7 +508,6 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
       email: row.email,
       phone: row.phone,
       timezone: row.timezone,
-      avatarUrl: row.avatarUrl,
       birthday: row.birthday ? row.birthday.toISOString().slice(0, 10) : null,
       joinedAt: row.joinedAt.toISOString().slice(0, 10),
       leftAt: row.leftAt ? row.leftAt.toISOString().slice(0, 10) : null,

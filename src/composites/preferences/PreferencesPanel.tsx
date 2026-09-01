@@ -5,7 +5,7 @@ import { AppearanceToggle } from '@/components/elements/actions/AppearanceToggle
 import { Button } from '@/components/elements/actions/Button'
 import { ColorVisionSelect } from '@/components/elements/actions/ColorVisionSelect'
 import { ThemeToggle } from '@/components/elements/actions/ThemeToggle'
-import { FieldControl } from '@/components/elements/forms/FieldControl'
+import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { DetailGrid } from '@/components/structures/DetailGrid'
@@ -13,11 +13,16 @@ import { FileTabs } from '@/components/structures/FileTabs'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FormRenderer } from '@/components/structures/FormRenderer'
 import { Section } from '@/components/structures/Section'
+import { SealedValue } from '@/components/structures/SealedValue'
+import { TwoFactorSection } from '@/composites/security/TwoFactorSection'
 import { useProfile } from '@/core/hooks/data/useProfile'
 import { dropOtherSessions } from '@/app/(dashboard)/parametres/actions'
 import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/roles'
+import { SENSITIVE_FIELD_REGISTRY, isSensitiveField } from '@/declarations/access/sensitive'
+import type { SensitiveFieldName } from '@/declarations/access/sensitive'
+import { useSeal } from '@/managers/infrastructure/Security/SealManager'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
-import { ACCOUNT_BLOCK } from '@/declarations/ui/blocks'
+import { ACCOUNT_BLOCK, DETAIL_BLOCK } from '@/declarations/ui/blocks'
 import { ACTION_COPY, FIELD_COPY, NAV_COPY } from '@/declarations/ui/copy'
 import { LIST_STYLES, PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
 
@@ -41,6 +46,7 @@ export interface PreferencesPanelProps {
 
 export const PreferencesPanel = ({ initialProfile, fields, sessions }: PreferencesPanelProps) => {
   const { profile, isSaving, issues, save, eraseDetails, download } = useProfile(initialProfile)
+  const { factor } = useSeal()
   const [isErasing, setErasing] = useState(false)
   const [draft, setDraft] = useState<FormValues>(initialProfile.values)
 
@@ -51,30 +57,21 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
   const status = MEMBER_STATUS_REGISTRY.get(profile.status)
   const others = sessions.filter((entry) => !entry.isCurrent)
 
-  // The portrait travels on its own
-  const portraitField = fields.find((field) => field.name === 'avatarUrl')
-  const ownedFields = fields.filter((field) => field.name !== 'avatarUrl')
-
-  // A new portrait is written straight away
-  const changePortrait = (value: FieldValue) => {
-    change('avatarUrl', value)
-    void save({ ...draft, avatarUrl: value })
-  }
+  // A sealed value never reaches the form engine
+  const isSealed = !factor.seal.isUnsealed
+  const ownedFields = fields.filter((field) => !(isSealed && isSensitiveField(field.name)))
+  const sealedNames = isSealed
+    ? fields
+        .map((field) => field.name)
+        .filter((name): name is SensitiveFieldName => isSensitiveField(name))
+    : []
 
   const informationTab = () => (
     <div className={TABS_STYLES.panel}>
       <div className={PREFERENCE_STYLES.stack}>
         <Section title={PREFERENCES_COPY.fileTitle} description={PREFERENCES_COPY.fileLead} padded>
           <div className={PREFERENCE_STYLES.identity}>
-            {portraitField && (
-              <FieldControl
-                id="profile-avatarUrl"
-                field={portraitField}
-                value={typeof draft.avatarUrl === 'string' ? draft.avatarUrl : null}
-                disabled={isSaving}
-                onChange={changePortrait}
-              />
-            )}
+            <Avatar name={profile.displayName} src={profile.avatarUrl} size="lg" />
             <div className="flex min-w-0 flex-col gap-1">
               <p className={ACCOUNT_BLOCK.name}>{profile.displayName}</p>
               <p className={ACCOUNT_BLOCK.meta}>{profile.discordId}</p>
@@ -110,6 +107,18 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
           description={PREFERENCES_COPY.informationLead}
           padded
         >
+          {sealedNames.length > 0 && (
+            <dl className={DETAIL_BLOCK.grid}>
+              {sealedNames.map((name) => (
+                <div key={name} className={DETAIL_BLOCK.entry}>
+                  <dt className={DETAIL_BLOCK.label}>{SENSITIVE_FIELD_REGISTRY.label(name)}</dt>
+                  <dd className={DETAIL_BLOCK.value}>
+                    <SealedValue field={name} />
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
           <FormRenderer
             fields={ownedFields}
             values={draft}
@@ -227,6 +236,8 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
             ]}
           />
         </Section>
+
+        <TwoFactorSection />
 
         <Section
           title={PREFERENCES_COPY.sessionsTitle}

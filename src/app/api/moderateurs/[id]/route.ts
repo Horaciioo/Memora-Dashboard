@@ -1,8 +1,10 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
+import { readSealState, sealValues } from '@/core/services/auth/SealService'
 import {
   anonymiseMember,
+  assertDivisionAssignable,
   memberFields,
   readMember,
   updateMember,
@@ -20,13 +22,20 @@ export const GET = createProtectedRoute({
 export const PATCH = createProtectedRoute({
   permission: Permissions.MemberUpdate,
   descriptor: { summary: 'Edit a moderator', tags: ['members'] },
-  handler: async ({ params, raw, session }) => {
-    const fields = await memberFields()
+  handler: async ({ params, raw, session, access }) => {
+    const fields = await memberFields(access.isAdmin)
 
     const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const before = await readMember(params.id)
+    const [before, { isUnsealed }] = await Promise.all([readMember(params.id), readSealState()])
+
+    await assertDivisionAssignable(
+      parsed.values,
+      access.isAdmin,
+      before.summary.division?.id ?? null
+    )
+
     const member = await updateMember(params.id, parsed.values)
 
     await recordEvent({
@@ -36,7 +45,11 @@ export const PATCH = createProtectedRoute({
       targetType: 'member',
       targetId: member.id,
       summary: member.displayName,
-      change: summariseChange(fields, before.values, parsed.values),
+      change: summariseChange(
+        fields,
+        sealValues(before.values, isUnsealed),
+        sealValues(parsed.values, isUnsealed)
+      ),
     })
 
     return member
