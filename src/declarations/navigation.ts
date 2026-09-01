@@ -13,7 +13,7 @@ export const ROUTES = {
   home: '/',
   login: '/connexion',
   privacy: '/confidentialite',
-  admission: (token: string) => `/admission/${token}`,
+  integration: (token: string) => `/integration/${token}`,
   dashboard: '/tableau-de-bord',
   members: '/moderateurs',
   member: (id: string) => `/moderateurs/${id}`,
@@ -38,6 +38,7 @@ export const ROUTES = {
   recruitment: (id: string) => `/recrutements/${id}`,
   sanctions: '/moderation/sanctions',
   notifications: '/notifications',
+  administration: '/administration',
   maturity: '/maturite',
   preferences: '/parametres',
   settings: '/configuration',
@@ -58,6 +59,18 @@ export interface NavigationCondition {
 }
 
 /**
+ * Placement of an entry on the floating mobile nav pill
+ * @typedef {Object} MobileNavSlot
+ * @property {'home' | 'primary'} slot - Home sits centred, primary either side of it
+ * @property {number} order - Rank among every primary entry, lowest shown first
+ */
+
+export interface MobileNavSlot {
+  slot: 'home' | 'primary'
+  order: number
+}
+
+/**
  * Navigation entry
  * @typedef {Object} NavigationItem
  * @property {string} href - Destination
@@ -66,6 +79,7 @@ export interface NavigationCondition {
  * @property {PermissionName} [permission] - Permission needed
  * @property {NavigationCondition} [visibleWhen] - Display rule
  * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
+ * @property {MobileNavSlot} [mobile] - Promotes the entry onto the mobile nav pill
  */
 
 export interface NavigationItem {
@@ -75,6 +89,7 @@ export interface NavigationItem {
   permission?: PermissionName
   visibleWhen?: NavigationCondition
   maturity?: MaturityName
+  mobile?: MobileNavSlot
 }
 
 /**
@@ -96,13 +111,10 @@ export const matchesNavigation = (
   return !condition.roles || condition.roles.includes(member.role)
 }
 
-/**
- * The two faces of the rail, moderation work on one side, running the corp on the other
- * @type {Record<string, string>}
- */
-
+// The three faces of the rail
 export const NavigationViews = {
   Moderation: 'MODERATION',
+  Lead: 'LEAD',
   Administration: 'ADMINISTRATION',
 } as const
 
@@ -114,18 +126,56 @@ export const NavigationViews = {
 export type NavigationViewName = (typeof NavigationViews)[keyof typeof NavigationViews]
 
 /**
+ * Views, narrowest first
+ * @type {NavigationViewName[]}
+ */
+
+export const NAVIGATION_VIEW_ORDER: NavigationViewName[] = [
+  NavigationViews.Moderation,
+  NavigationViews.Lead,
+  NavigationViews.Administration,
+]
+
+/**
+ * Depth of a view
+ * @param {NavigationViewName} view - Rail view
+ * @return {number} - Depth
+ */
+
+export const viewDepth = (view: NavigationViewName): number => NAVIGATION_VIEW_ORDER.indexOf(view)
+
+/**
+ * Check a raw view
+ * @param {string | undefined} candidate - Raw value
+ * @return {boolean} - Known view
+ */
+
+export const isNavigationView = (candidate: string | undefined): candidate is NavigationViewName =>
+  candidate !== undefined && NAVIGATION_VIEW_ORDER.includes(candidate as NavigationViewName)
+
+/**
  * Navigation group
  * @typedef {Object} NavigationGroup
  * @property {string} label - Section label
- * @property {NavigationViewName[]} views - Views the group belongs to
+ * @property {NavigationViewName} from - Narrowest view the group appears in
  * @property {NavigationItem[]} items - Entries
  */
 
 export interface NavigationGroup {
   label: string
-  views: NavigationViewName[]
+  from: NavigationViewName
   items: NavigationItem[]
 }
+
+/**
+ * Group belongs on the rail
+ * @param {NavigationGroup} group - Navigation group
+ * @param {NavigationViewName} view - Rail view on screen
+ * @return {boolean} - Group belongs on the rail
+ */
+
+export const groupInView = (group: NavigationGroup, view: NavigationViewName): boolean =>
+  viewDepth(view) >= viewDepth(group.from)
 
 /**
  * Sidebar navigation tree
@@ -135,13 +185,14 @@ export interface NavigationGroup {
 export const NAVIGATION: NavigationGroup[] = [
   {
     label: 'Personnel',
-    views: [NavigationViews.Moderation, NavigationViews.Administration],
+    from: NavigationViews.Moderation,
     items: [
       {
         href: ROUTES.dashboard,
-        label: 'Mon tableau de bord',
+        label: 'Accueil',
         icon: 'dashboard',
         maturity: 'dev',
+        mobile: { slot: 'home', order: 0 },
       },
       { href: ROUTES.absences, label: 'Absences', icon: 'absences' },
       {
@@ -150,6 +201,7 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'meetings',
         permission: Permissions.CalendarRead,
         maturity: 'beta',
+        mobile: { slot: 'primary', order: 7 },
       },
       {
         href: ROUTES.trainings,
@@ -162,39 +214,48 @@ export const NAVIGATION: NavigationGroup[] = [
   },
   {
     label: 'Pilotage',
-    views: [NavigationViews.Administration],
+    from: NavigationViews.Lead,
     items: [
       {
         href: ROUTES.projects,
         label: 'Projets',
         icon: 'projects',
         permission: Permissions.ProjectRead,
+        mobile: { slot: 'primary', order: 3 },
       },
-      { href: ROUTES.tasks, label: 'Tâches', icon: 'tasks', permission: Permissions.TaskRead },
+      {
+        href: ROUTES.tasks,
+        label: 'Tâches',
+        icon: 'tasks',
+        permission: Permissions.TaskRead,
+        mobile: { slot: 'primary', order: 4 },
+      },
       {
         href: ROUTES.meetings,
         label: 'Réunions',
         icon: 'meetings',
         permission: Permissions.MeetingRead,
+        mobile: { slot: 'primary', order: 5 },
       },
     ],
   },
   {
     label: 'Équipe',
-    views: [NavigationViews.Administration],
+    from: NavigationViews.Lead,
     items: [
       {
         href: ROUTES.members,
         label: 'Modérateurs',
         icon: 'members',
         permission: Permissions.MemberRead,
+        mobile: { slot: 'primary', order: 6 },
       },
       { href: ROUTES.teams, label: 'Équipes', icon: 'teams', permission: Permissions.TeamRead },
     ],
   },
   {
     label: 'Vivier',
-    views: [NavigationViews.Administration],
+    from: NavigationViews.Lead,
     items: [
       {
         href: ROUTES.recruitments,
@@ -214,25 +275,40 @@ export const NAVIGATION: NavigationGroup[] = [
   },
   {
     label: 'Modération',
-    views: [NavigationViews.Moderation],
+    from: NavigationViews.Moderation,
     items: [
       {
         href: ROUTES.sanctions,
         label: 'Panel de sanctions',
         icon: 'sanctions',
         permission: Permissions.SanctionRead,
+        mobile: { slot: 'primary', order: 8 },
       },
     ],
   },
   {
-    label: 'Administration',
-    views: [NavigationViews.Administration],
+    label: 'Configuration',
+    from: NavigationViews.Lead,
     items: [
       {
         href: ROUTES.settings,
         label: 'Configuration',
         icon: 'settings',
         permission: Permissions.ReferenceRead,
+        mobile: { slot: 'primary', order: 2 },
+      },
+    ],
+  },
+  {
+    label: 'Administration',
+    from: NavigationViews.Administration,
+    items: [
+      {
+        href: ROUTES.administration,
+        label: 'Console admin',
+        icon: 'console',
+        permission: Permissions.AccessManage,
+        mobile: { slot: 'primary', order: 1 },
       },
     ],
   },
@@ -256,7 +332,7 @@ export interface Crumb {
  */
 
 export const SEGMENT_LABELS: Record<string, string> = {
-  'tableau-de-bord': 'Mon tableau de bord',
+  'tableau-de-bord': 'Accueil',
   moderateurs: 'Modérateurs',
   equipes: 'Équipes',
   projets: 'Projets',
@@ -273,8 +349,78 @@ export const SEGMENT_LABELS: Record<string, string> = {
   moderation: 'Modération',
   sanctions: 'Panel de sanctions',
   notifications: 'Notifications',
+  administration: 'Console admin',
   maturite: 'Maturité',
   parametres: 'Paramètres',
   configuration: 'Configuration',
   acces: 'Accès',
+}
+
+/**
+ * Nav groups reachable in a view
+ * @param {NavigationViewName} view - Rail view on screen
+ * @param {Object} member - Signed-in member
+ * @param {MemberStatusName} member.status - Membership status
+ * @param {MemberRoleName} member.role - Hierarchy level
+ * @param {(permission: PermissionName) => boolean} can - Permission check
+ * @return {NavigationGroup[]} - Groups holding only their visible items
+ */
+
+export const visibleNavGroups = (
+  view: NavigationViewName,
+  member: { status: MemberStatusName; role: MemberRoleName } | null,
+  can: (permission: PermissionName) => boolean
+): NavigationGroup[] =>
+  NAVIGATION.filter((group) => groupInView(group, view))
+    .map((group) => ({
+      ...group,
+      items: group.items.filter(
+        (item) =>
+          (!item.permission || can(item.permission)) &&
+          (!member || matchesNavigation(item.visibleWhen, member))
+      ),
+    }))
+    .filter((group) => group.items.length > 0)
+
+/**
+ * Bar contents of the floating mobile nav
+ * @typedef {Object} MobileNavigation
+ * @property {NavigationItem | null} home - Centre destination
+ * @property {NavigationItem[]} primary - Destinations shown either side of home
+ */
+
+export interface MobileNavigation {
+  home: NavigationItem | null
+  primary: NavigationItem[]
+}
+
+/**
+ * Pick Accueil and its ranked neighbours for the nav pill — anything left out is still
+ * reachable through the more sheet, which reads the full visibleNavGroups on its own
+ * @param {NavigationViewName} view - Rail view on screen
+ * @param {Object} member - Signed-in member
+ * @param {MemberStatusName} member.status - Membership status
+ * @param {MemberRoleName} member.role - Hierarchy level
+ * @param {(permission: PermissionName) => boolean} can - Permission check
+ * @param {number} maxPrimary - Primary slots kept before overflowing
+ * @return {MobileNavigation} - Bar contents
+ */
+
+export const mobileNavigation = (
+  view: NavigationViewName,
+  member: { status: MemberStatusName; role: MemberRoleName } | null,
+  can: (permission: PermissionName) => boolean,
+  maxPrimary: number
+): MobileNavigation => {
+  const items = visibleNavGroups(view, member, can)
+    .flatMap((group) => group.items)
+    .filter((item): item is NavigationItem & { mobile: MobileNavSlot } => item.mobile !== undefined)
+
+  const home = items.find((item) => item.mobile.slot === 'home') ?? null
+  const primary = items
+    .filter((item) => item.mobile.slot === 'primary')
+    .sort((a, b) => a.mobile.order - b.mobile.order)
+    .slice(0, maxPrimary)
+
+  return { home, primary }
 }

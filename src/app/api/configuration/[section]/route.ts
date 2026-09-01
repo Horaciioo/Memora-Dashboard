@@ -1,5 +1,6 @@
 import { invalidInput, notFound } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
+import { stripRestricted } from '@/core/lib/forms/restrictions'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { referenceResource } from '@/core/services/reference/ReferenceService'
 import { recordEvent } from '@/core/services/system/ActivityService'
@@ -34,15 +35,16 @@ export const POST = createProtectedRoute({
   permission: Permissions.ReferenceManage,
   status: 201,
   descriptor: { summary: 'Add a reference row', tags: ['reference'] },
-  handler: async ({ params, raw, session }) => {
+  handler: async ({ params, raw, session, access }) => {
     const key = readSection(params)
     const resource = referenceResource(key as never)
 
     // Declarations are resolved per section, so parsing happens here
-    const parsed = parseFormValues(await resource.fields(), raw, { fillMissing: true })
+    const fields = await resource.fields()
+    const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const row = await resource.create(parsed.values)
+    const row = await resource.create(stripRestricted(fields, parsed.values, access.isAdmin))
 
     await recordEvent({
       eventType: 'ReferenceChanged',

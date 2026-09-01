@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { ReferenceManager } from '@/composites/reference/ReferenceManager'
+import { WorkflowStatesManager } from '@/composites/reference/WorkflowStatesManager'
+import { applyRestrictions } from '@/core/lib/forms/restrictions'
 import { referenceResource } from '@/core/services/reference/ReferenceService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { REFERENCE_COPY } from '@/declarations/reference/copy'
@@ -45,16 +47,22 @@ export default async function ReferenceSectionPage({
   const meta = referenceSection(section)!
   const resource = referenceResource(section)
   const [fields, rows] = await Promise.all([resource.fields(), resource.list()])
+  const canManage = access.can(Permissions.ReferenceManage)
+  const editableFields = applyRestrictions(fields, access.isAdmin)
 
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={meta.label} lead={meta.description} />
-      <ReferenceManager
-        section={meta}
-        fields={fields}
-        initialRows={rows}
-        canManage={access.can(Permissions.ReferenceManage)}
-      />
+      {section === 'etats' ? (
+        <WorkflowStatesManager fields={editableFields} initialRows={rows} canManage={canManage} />
+      ) : (
+        <ReferenceManager
+          section={meta}
+          fields={editableFields}
+          initialRows={rows}
+          canManage={canManage}
+        />
+      )}
     </div>
   )
 }

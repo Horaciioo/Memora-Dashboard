@@ -3,26 +3,30 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useTransition } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { LogoutButton } from '@/composites/auth/LogoutButton'
 import { NotificationsBell } from '@/composites/notifications/NotificationsBell'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
+import { CreatorSelect } from '@/composites/shell/CreatorSelect'
+import { switchView } from '@/app/(dashboard)/actions'
 import { APP_ASSETS, APP_COMPANY, APP_NAME } from '@/declarations/app'
-import { NAVIGATION, NavigationViews, ROUTES, matchesNavigation } from '@/declarations/navigation'
+import { ROUTES, visibleNavGroups } from '@/declarations/navigation'
 import { NAVIGATION_VIEW_REGISTRY } from '@/declarations/access/views'
-import { useNavigationViewStore } from '@/core/store/navigationView'
 import { APP_SHELL } from '@/declarations/ui/blocks'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { NAV_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
+import { TONE_VARS } from '@/declarations/ui/theme'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
+import type { ViewContext } from '@/types/access'
 import { cn } from '@/utils/classnames'
 
 export interface SidebarNavProps {
   className?: string
   unreadCount: number
+  viewContext: ViewContext
   onNavigate: () => void
 }
 
@@ -30,26 +34,29 @@ export interface SidebarNavProps {
  * Navigation rail
  * @param {string} [className] - Extra classes merged onto the rail
  * @param {number} unreadCount - Unopened notifications resolved server-side
+ * @param {ViewContext} viewContext - View resolved server-side
  * @param {() => void} onNavigate - Called once a link is followed
  * @return {JSX.Element}
  */
 
-export const SidebarNav = ({ className, unreadCount, onNavigate }: SidebarNavProps) => {
+export const SidebarNav = ({
+  className,
+  unreadCount,
+  viewContext,
+  onNavigate,
+}: SidebarNavProps) => {
   const pathname = usePathname()
   const { can, session, isResponsable } = useAuthContext()
-  const { view: stored, setView } = useNavigationViewStore()
+  const [isSwitching, startSwitching] = useTransition()
 
-  // The store skips synchronous hydration
-  useEffect(() => {
-    void useNavigationViewStore.persist.rehydrate()
-  }, [])
+  const { view, available } = viewContext
+  const meta = NAVIGATION_VIEW_REGISTRY.get(view)
+  const Flash = ICONS.flash
 
-  // Only the encadrement switches, a moderator never leaves their own view
-  const view = isResponsable ? stored : NavigationViews.Moderation
-  const nextView =
-    view === NavigationViews.Administration
-      ? NavigationViews.Moderation
-      : NavigationViews.Administration
+  // The lightning walks the reachable views in order, wrapping back to the base one
+  const nextView = available[(available.indexOf(view) + 1) % available.length]
+  const nextMeta = NAVIGATION_VIEW_REGISTRY.get(nextView)
+  const isWidened = available.indexOf(view) > 0
 
   return (
     <aside className={cn(APP_SHELL.sidebar, className)} aria-label={NAV_COPY.sidebar}>
@@ -68,50 +75,53 @@ export const SidebarNav = ({ className, unreadCount, onNavigate }: SidebarNavPro
         <SearchLauncher />
       </div>
 
+      {isWidened && (
+        <div
+          className={APP_SHELL.viewRibbon}
+          style={{ '--view': TONE_VARS[meta.tone] } as React.CSSProperties}
+        >
+          <span className={APP_SHELL.viewRibbonLabel}>{meta.label}</span>
+        </div>
+      )}
+
+      {isWidened && viewContext.creators.length > 0 && (
+        <CreatorSelect
+          creators={viewContext.creators}
+          activeYoutuberId={viewContext.activeYoutuberId}
+        />
+      )}
+
       <nav className={APP_SHELL.nav}>
-        {NAVIGATION.filter((group) => group.views.includes(view)).map((group) => {
-          const items = group.items.filter(
-            (item) =>
-              (!item.permission || can(item.permission)) &&
-              (!session || matchesNavigation(item.visibleWhen, session))
-          )
-          if (items.length === 0) return null
+        {visibleNavGroups(view, session, can).map((group) => (
+          <div key={group.label} className={APP_SHELL.navGroup}>
+            <p className={APP_SHELL.navGroupLabel}>{group.label}</p>
+            {group.items.map((item) => {
+              const Icon = ICONS[item.icon]
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
-          return (
-            <div key={group.label} className={APP_SHELL.navGroup}>
-              <p className={APP_SHELL.navGroupLabel}>{group.label}</p>
-              {items.map((item) => {
-                const Icon = ICONS[item.icon]
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
-
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={onNavigate}
-                    aria-current={isActive ? 'page' : undefined}
-                    className={cn(APP_SHELL.navLink, isActive && APP_SHELL.navLinkActive)}
-                  >
-                    <Icon
-                      className={cn(APP_SHELL.navIcon, isActive && APP_SHELL.navIconActive)}
-                      aria-hidden="true"
-                    />
-                    <span className={cn(APP_SHELL.navLabel, isActive && APP_SHELL.navLabelActive)}>
-                      {item.label}
-                    </span>
-                    {item.maturity && (
-                      <MaturityTag
-                        maturity={item.maturity}
-                        interactive={false}
-                        className="ml-auto"
-                      />
-                    )}
-                  </Link>
-                )
-              })}
-            </div>
-          )
-        })}
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onNavigate}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={cn(APP_SHELL.navLink, isActive && APP_SHELL.navLinkActive)}
+                >
+                  <Icon
+                    className={cn(APP_SHELL.navIcon, isActive && APP_SHELL.navIconActive)}
+                    aria-hidden="true"
+                  />
+                  <span className={cn(APP_SHELL.navLabel, isActive && APP_SHELL.navLabelActive)}>
+                    {item.label}
+                  </span>
+                  {item.maturity && (
+                    <MaturityTag maturity={item.maturity} interactive={false} className="ml-auto" />
+                  )}
+                </Link>
+              )
+            })}
+          </div>
+        ))}
       </nav>
 
       {session && (
@@ -144,21 +154,20 @@ export const SidebarNav = ({ className, unreadCount, onNavigate }: SidebarNavPro
             </Link>
 
             <div className={cn(APP_SHELL.accountControls, APP_SHELL.accountControlsRight)}>
-              {isResponsable && (
+              {available.length > 1 && (
                 <>
-                  <Button
-                    variant="icon"
-                    icon="flash"
-                    aria-label={NAVIGATION_VIEW_REGISTRY.get(nextView).label}
-                    title={NAVIGATION_VIEW_REGISTRY.get(nextView).summary}
-                    aria-pressed={view === NavigationViews.Administration}
-                    onClick={() => setView(nextView)}
-                    className={
-                      view === NavigationViews.Administration
-                        ? APP_SHELL.viewToggleActive
-                        : undefined
-                    }
-                  />
+                  <button
+                    type="button"
+                    disabled={isSwitching}
+                    aria-label={nextMeta.label}
+                    title={`${nextMeta.label} — ${nextMeta.summary}`}
+                    aria-pressed={isWidened}
+                    onClick={() => startSwitching(() => void switchView(nextView))}
+                    style={{ '--bolt': TONE_VARS[meta.tone] } as React.CSSProperties}
+                    className={APP_SHELL.viewToggle}
+                  >
+                    <Flash className={APP_SHELL.viewToggleIcon} aria-hidden="true" />
+                  </button>
                   <span className={APP_SHELL.accountDivider} aria-hidden="true" />
                 </>
               )}

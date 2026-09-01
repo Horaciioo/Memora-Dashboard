@@ -8,18 +8,17 @@ export const REFERENCE_FIELD_COPY = {
   handle: 'Chaîne',
   accent: 'Couleur',
   avatarUrl: 'Image',
+  bannerUrl: 'Bannière',
+  bannerUrlHint: 'Format horizontal, affichée sur le formulaire d’intégration.',
   archived: 'Archivé',
   archivedBadge: 'Archivé',
-  glyph: 'Chevrons',
-  rank: 'Rang',
   imagePath: 'Visuel',
   summary: 'Description',
   kind: 'Type',
   scope: 'Tableau',
+  phase: 'Catégorie',
   isDefault: 'État par défaut',
-  isTerminal: 'État de fin',
   defaultBadge: 'Par défaut',
-  terminalBadge: 'Fin',
   weight: 'Poids',
   period: 'Période',
   jobFunction: 'Fonction',
@@ -42,6 +41,29 @@ export const REFERENCE_FIELD_COPY = {
   templateBodyHint: 'Recopiée dans l’évènement dès que le modèle est choisi.',
   defaultMinutes: 'Durée par défaut (min)',
   allDay: 'Toute la journée',
+  leadAssignable: 'Modification',
+  leadAssignableHint:
+    'Coché, un responsable peut placer un modérateur dans cette division. Décoché, seul un administrateur le peut.',
+  adminOnlyBadge: 'Admins seuls',
+  functions: 'Fonctions ouvertes',
+  functionsHint: 'Les fonctions qu’un recrutement peut viser sur ce créateur.',
+  urlPrefix: 'Préfixe de l’URL',
+  urlPrefixHint: 'Ce qui précède le pseudo, par exemple https://twitch.tv/.',
+  socialRequired: 'Obligatoire à l’intégration',
+  leads: 'Responsables',
+  leadsHint:
+    'Ils voient tout ce qui touche ce créateur. Seul un admin peut les ajouter ou les retirer.',
+  leadsTitle: 'Responsables ancrés',
+  leadsLead: 'Qui pilote ce créateur, et sur quelle équipe chacun est resserré.',
+  leadsEmptyTitle: 'Aucun responsable ancré',
+  leadsEmptyDescription: 'Ancre un responsable pour lui ouvrir le périmètre de ce créateur.',
+  leadTeam: 'Équipe',
+  leadTeamAll: 'Toutes les équipes',
+  leadsLocked: 'Seul un administrateur modifie cet ancrage.',
+  leadsSaved: 'Ancrage enregistré.',
+  frozenLocked: 'Fonction figée, non modifiable',
+  encadrementRows: 'Encadrement',
+  editableRows: 'Fonctions modifiables',
 } as const
 
 /**
@@ -73,4 +95,16 @@ export const REFERENCE_COPY = {
   deleteTitle: 'Supprimer cet élément ?',
   deleteDescription: 'Il disparaîtra des formulaires et des filtres. Cette action est définitive.',
   reordered: 'Nouvel ordre enregistré.',
+} as const
+
+/**
+ * Copy of the workflow states editor
+ * @type {Record<string, string>}
+ */
+
+export const WORKFLOW_STATE_COPY = {
+  add: 'Ajouter un état',
+  defaultMark: 'Par défaut',
+  moveHint: 'Glisse un état d’une colonne à l’autre pour changer sa catégorie.',
+  emptyColumn: 'Aucun état ici.',
 } as const

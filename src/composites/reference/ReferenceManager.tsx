@@ -13,11 +13,12 @@ import { Section } from '@/components/structures/Section'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useReference } from '@/core/hooks/data/useReference'
 import { ROUTES } from '@/declarations/navigation'
-import { REFERENCE_COPY } from '@/declarations/reference/copy'
+import { REFERENCE_COPY, REFERENCE_FIELD_COPY } from '@/declarations/reference/copy'
+import { frozenRows } from '@/declarations/reference/frozen'
 import type { ReferenceSection } from '@/declarations/reference/sections'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { LIST_STYLES } from '@/declarations/ui/variants'
+import { GROUP_STYLES, LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { FieldDefinition } from '@/types/forms'
@@ -114,82 +115,116 @@ export const ReferenceManager = ({
   ]
 
   const DragIcon = ICONS.drag
+  const LockIcon = ICONS.lock
+  const frozen = frozenRows(section.key)
+
+  // Editable rows
+  const editable =
+    rows.length === 0 ? (
+      <EmptyState
+        figure={section.figure}
+        title={section.emptyTitle}
+        description={section.emptyDescription}
+        action={
+          <Button variant="primary" icon="add" onClick={openCreate} disabled={!canManage}>
+            {`${ACTION_COPY.add} ${section.singular.toLowerCase()}`}
+          </Button>
+        }
+      />
+    ) : (
+      <div
+        className={cn(
+          LIST_STYLES.stack,
+          over === CONTAINER && 'is-drop-target rounded-[var(--radius-lg)]'
+        )}
+        {...(section.reorderable && canManage ? containerProps(CONTAINER) : {})}
+      >
+        {rows.map((row, index) => (
+          <div
+            key={row.id}
+            data-drop-index={index}
+            onContextMenu={contextMenu(rowMenu(row), row.label)}
+            onClick={section.openable ? () => openRow(row) : undefined}
+            className={cn(LIST_STYLES.item, section.openable && LIST_STYLES.itemClickable)}
+            {...(section.reorderable && canManage
+              ? itemProps({ id: row.id, from: CONTAINER })
+              : {})}
+          >
+            {section.reorderable && canManage && (
+              <DragIcon
+                className="h-4 w-4 shrink-0 cursor-grab text-[var(--color-ink-subtle)]"
+                aria-hidden="true"
+              />
+            )}
+            {row.image !== undefined && <Avatar name={row.label} src={row.image} size="md" />}
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="flex flex-wrap items-center gap-2 font-medium">
+                {row.label}
+                {row.badges.map((badge) => (
+                  <Badge key={badge} label={badge} accent={row.accent} tone={'neutral'} />
+                ))}
+              </span>
+              {row.hint && (
+                <span className="truncate text-xs text-[var(--color-ink-subtle)]">{row.hint}</span>
+              )}
+            </div>
+            <span className="shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums">
+              {`${row.usage} ${row.usage === 1 ? REFERENCE_COPY.usageOne : REFERENCE_COPY.usage}`}
+            </span>
+            <Button
+              variant="icon"
+              icon="edit"
+              aria-label={`${ACTION_COPY.edit} ${row.label}`}
+              disabled={!canManage}
+              onClick={(event) => {
+                event.stopPropagation()
+                clearIssues()
+                setEditing(row)
+              }}
+            />
+          </div>
+        ))}
+        <AddRow
+          label={`${ACTION_COPY.add} ${section.singular.toLowerCase()}`}
+          disabled={!canManage}
+          onClick={openCreate}
+        />
+      </div>
+    )
 
   return (
     <>
       <Section bare>
-        {rows.length === 0 ? (
-          <EmptyState
-            figure={section.figure}
-            title={section.emptyTitle}
-            description={section.emptyDescription}
-            action={
-              <Button variant="primary" icon="add" onClick={openCreate} disabled={!canManage}>
-                {`${ACTION_COPY.add} ${section.singular.toLowerCase()}`}
-              </Button>
-            }
-          />
-        ) : (
-          <div
-            className={cn(
-              LIST_STYLES.stack,
-              over === CONTAINER && 'is-drop-target rounded-[var(--radius-lg)]'
-            )}
-            {...(section.reorderable && canManage ? containerProps(CONTAINER) : {})}
-          >
-            {rows.map((row, index) => (
-              <div
-                key={row.id}
-                data-drop-index={index}
-                onContextMenu={contextMenu(rowMenu(row), row.label)}
-                onClick={section.openable ? () => openRow(row) : undefined}
-                className={cn(LIST_STYLES.item, section.openable && LIST_STYLES.itemClickable)}
-                {...(section.reorderable && canManage
-                  ? itemProps({ id: row.id, from: CONTAINER })
-                  : {})}
-              >
-                {section.reorderable && canManage && (
-                  <DragIcon
-                    className="h-4 w-4 shrink-0 cursor-grab text-[var(--color-ink-subtle)]"
-                    aria-hidden="true"
-                  />
-                )}
-                {row.image !== undefined && <Avatar name={row.label} src={row.image} size="md" />}
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="flex flex-wrap items-center gap-2 font-medium">
-                    {row.label}
-                    {row.badges.map((badge) => (
-                      <Badge key={badge} label={badge} accent={row.accent} tone={'neutral'} />
-                    ))}
-                  </span>
-                  {row.hint && (
-                    <span className="truncate text-xs text-[var(--color-ink-subtle)]">
-                      {row.hint}
-                    </span>
-                  )}
-                </div>
-                <span className="shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums">
-                  {`${row.usage} ${row.usage === 1 ? REFERENCE_COPY.usageOne : REFERENCE_COPY.usage}`}
-                </span>
-                <Button
-                  variant="icon"
-                  icon="edit"
-                  aria-label={`${ACTION_COPY.edit} ${row.label}`}
-                  disabled={!canManage}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    clearIssues()
-                    setEditing(row)
-                  }}
-                />
+        {frozen.length > 0 ? (
+          <div className={GROUP_STYLES.ruledStack}>
+            <section className={GROUP_STYLES.ruledSection}>
+              <h2 className={SECTION_STYLES.title}>{REFERENCE_FIELD_COPY.encadrementRows}</h2>
+              <div className={LIST_STYLES.stack}>
+                {frozen.map((row) => (
+                  <div key={row.id} className={LIST_STYLES.item}>
+                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="font-medium">{row.label}</span>
+                      {row.hint && (
+                        <span className="truncate text-xs text-[var(--color-ink-subtle)]">
+                          {row.hint}
+                        </span>
+                      )}
+                    </div>
+                    <LockIcon
+                      className="h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]"
+                      aria-label={REFERENCE_FIELD_COPY.frozenLocked}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-            <AddRow
-              label={`${ACTION_COPY.add} ${section.singular.toLowerCase()}`}
-              disabled={!canManage}
-              onClick={openCreate}
-            />
+            </section>
+            <section className={GROUP_STYLES.ruledSection}>
+              <h2 className={SECTION_STYLES.title}>{REFERENCE_FIELD_COPY.editableRows}</h2>
+              {editable}
+            </section>
           </div>
+        ) : (
+          editable
         )}
       </Section>
 

@@ -8,6 +8,5 @@
   "positionStep": 1000,
   "meetingMinDuration": 5,
   "meetingMaxDuration": 480,
-  "divisionMaxRank": 10,
   "priorityMaxWeight": 100
 }

@@ -1,4 +1,6 @@
 import { createRegistry } from '@/core/lib/registry'
+import { NavigationViews } from '@/declarations/navigation'
+import type { NavigationViewName } from '@/declarations/navigation'
 import { MemberRoles, MemberStatuses, AcademyPeriods } from '@/utils/constants/hierarchy'
 import type {
   AcademyPeriodName,
@@ -15,6 +17,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @property {string} summary - Short description
  * @property {number} rank - Higher outranks lower
  * @property {string} accent - Token driving the badge colour
+ * @property {NavigationViewName} [view] - Rail view the level unlocks
  */
 
 interface RoleOption {
@@ -22,6 +25,7 @@ interface RoleOption {
   summary: string
   rank: number
   accent: string
+  view?: NavigationViewName
 }
 
 const ROLE_MAP: Record<MemberRoleName, RoleOption> = {
@@ -29,13 +33,15 @@ const ROLE_MAP: Record<MemberRoleName, RoleOption> = {
     label: 'Admin',
     summary: 'Pilote les responsables et fait la passerelle avec les YouTubeurs.',
     rank: 3,
-    accent: 'brand',
+    accent: 'authorityAdmin',
+    view: NavigationViews.Administration,
   },
   [MemberRoles.Responsable]: {
     label: 'Responsable',
     summary: 'Chef d’équipe, il a une ou plusieurs équipes à charge.',
     rank: 2,
-    accent: 'info',
+    accent: 'authorityLead',
+    view: NavigationViews.Lead,
   },
   [MemberRoles.Moderateur]: {
     label: 'Modérateur',
@@ -46,6 +52,23 @@ const ROLE_MAP: Record<MemberRoleName, RoleOption> = {
 }
 
 export const ROLE_REGISTRY = createRegistry(ROLE_MAP)
+
+/**
+ * Encadrement levels
+ * @type {MemberRoleName[]}
+ */
+
+export const ENCADREMENT_ROLES: MemberRoleName[] = ROLE_REGISTRY.keys
+  .filter((role) => ROLE_MAP[role].rank >= ROLE_MAP[MemberRoles.Responsable].rank)
+  .sort((left, right) => ROLE_MAP[left].rank - ROLE_MAP[right].rank)
+
+/**
+ * Check the encadrement
+ * @param {MemberRoleName} role - Hierarchy level
+ * @return {boolean} - Sits at responsable level or above
+ */
+
+export const isEncadrement = (role: MemberRoleName): boolean => ENCADREMENT_ROLES.includes(role)
 
 /**
  * Membership status metadata
@@ -60,6 +83,7 @@ interface MemberStatusOption {
 }
 
 const MEMBER_STATUS_MAP: Record<MemberStatusName, MemberStatusOption> = {
+  [MemberStatuses.Pending]: { label: 'En attente', accent: 'caution' },
   [MemberStatuses.Academy]: { label: 'Academy', accent: 'info' },
   [MemberStatuses.Active]: { label: 'Actif', accent: 'success' },
   [MemberStatuses.Paused]: { label: 'En pause', accent: 'warning' },

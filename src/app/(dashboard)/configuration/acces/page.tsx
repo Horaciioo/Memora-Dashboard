@@ -15,14 +15,17 @@ export const metadata: Metadata = { title: ACCESS_COPY.title }
  */
 
 export default async function AccessPage() {
-  await requirePermission(Permissions.AccessManage)
+  const { access } = await requirePermission(Permissions.AccessManage)
 
   const [roles, functions] = await Promise.all([readRoleGrants(), readFunctionGrants()])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={ACCESS_COPY.title} lead={ACCESS_COPY.lead} />
-      <AccessMatrixPanel initialMatrix={{ roles, functions }} />
+      <AccessMatrixPanel
+        initialMatrix={{ roles, functions }}
+        canManageEncadrement={access.isAdmin}
+      />
     </div>
   )
 }

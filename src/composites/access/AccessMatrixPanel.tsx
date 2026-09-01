@@ -11,10 +11,11 @@ import { Section } from '@/components/structures/Section'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { useAccess } from '@/core/hooks/data/useAccess'
 import { ACCESS_COPY } from '@/declarations/access/copy'
-import { ROLE_REGISTRY } from '@/declarations/access/roles'
+import { ENCADREMENT_ROLES, ROLE_REGISTRY } from '@/declarations/access/roles'
 import { FUNCTION_KIND_REGISTRY } from '@/declarations/reference/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
+import { ACCESS_BLOCK, DIVIDER_BLOCK } from '@/declarations/ui/blocks'
 
 import type { PermissionDraft } from '@/components/structures/PermissionPicker'
 import type { AccessMatrix } from '@/types/access'
@@ -24,6 +25,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
 
 export interface AccessMatrixPanelProps {
   initialMatrix: AccessMatrix
+  canManageEncadrement: boolean
 }
 
 /**
@@ -61,12 +63,16 @@ const countChanges = (draft: PermissionDraft, saved: PermissionName[]): number =
 }
 
 /**
- * Permission matrix, one editable column per hierarchy level and per moderation function
+ * Permission matrix
  * @param {AccessMatrix} initialMatrix - Matrix resolved server-side
+ * @param {boolean} canManageEncadrement - Viewer may write the encadrement levels
  * @return {JSX.Element}
  */
 
-export const AccessMatrixPanel = ({ initialMatrix }: AccessMatrixPanelProps) => {
+export const AccessMatrixPanel = ({
+  initialMatrix,
+  canManageEncadrement,
+}: AccessMatrixPanelProps) => {
   const access = useAccess(initialMatrix)
   const [presetRole, setPresetRole] = useState<MemberRoleName | null>(null)
 
@@ -82,50 +88,69 @@ export const AccessMatrixPanel = ({ initialMatrix }: AccessMatrixPanelProps) => 
     )
   )
 
-  const roleTab = () => (
-    <>
-      {ROLE_REGISTRY.keys.map((role) => {
-        const meta = ROLE_REGISTRY.get(role)
-        const draft = roleDrafts[role] ?? {}
-        const saved = access.matrix.roles[role] ?? []
-        const pending = countChanges(draft, saved)
+  // The encadrement reads top down, the widest level first
+  const encadrement = [...ENCADREMENT_ROLES].reverse()
 
-        return (
-          <Section
-            key={role}
-            title={meta.label}
-            description={meta.summary}
-            action={
-              <>
-                <Button icon="spark" disabled={access.isSaving} onClick={() => setPresetRole(role)}>
-                  {ACCESS_COPY.preset}
-                </Button>
-                <Button
-                  variant="primary"
-                  icon="confirm"
-                  disabled={access.isSaving || pending === 0}
-                  onClick={() => void access.saveRole(role, fromDraft(draft))}
-                >
-                  {access.isSaving ? ACTION_COPY.saving : ACCESS_COPY.save}
-                </Button>
-              </>
-            }
-            padded
-          >
-            <PermissionPicker
-              mode="binary"
-              value={draft}
-              pending={pending}
-              onChange={(next) => setRoleDrafts((current) => ({ ...current, [role]: next }))}
-            />
-          </Section>
-        )
-      })}
-    </>
+  const roleSection = (role: MemberRoleName, locked: boolean) => {
+    const meta = ROLE_REGISTRY.get(role)
+    const draft = roleDrafts[role] ?? {}
+    const saved = access.matrix.roles[role] ?? []
+    const pending = countChanges(draft, saved)
+
+    return (
+      <Section
+        key={role}
+        title={meta.label}
+        description={meta.summary}
+        action={
+          locked ? (
+            <span className={ACCESS_BLOCK.locked}>{ACCESS_COPY.encadrementLocked}</span>
+          ) : (
+            <>
+              <Button icon="spark" disabled={access.isSaving} onClick={() => setPresetRole(role)}>
+                {ACCESS_COPY.preset}
+              </Button>
+              <Button
+                variant="primary"
+                icon="confirm"
+                disabled={access.isSaving || pending === 0}
+                onClick={() => void access.saveRole(role, fromDraft(draft))}
+              >
+                {access.isSaving ? ACTION_COPY.saving : ACCESS_COPY.save}
+              </Button>
+            </>
+          )
+        }
+        padded
+      >
+        <p className={ACCESS_BLOCK.badgeRow}>
+          <Badge label={meta.label} accent={meta.accent} tone="neutral" icon="shield" />
+        </p>
+        <PermissionPicker
+          mode="binary"
+          value={draft}
+          pending={pending}
+          readOnly={locked}
+          onChange={(next) => setRoleDrafts((current) => ({ ...current, [role]: next }))}
+        />
+      </Section>
+    )
+  }
+
+  const roleTab = () => (
+    <>{ROLE_REGISTRY.keys.map((role) => roleSection(role, !canManageEncadrement))}</>
   )
 
   const functionTab = () => (
     <>
+      {encadrement.map((role) => roleSection(role, !canManageEncadrement))}
+
+      <div className={DIVIDER_BLOCK.row} role="separator">
+        <span className={DIVIDER_BLOCK.rule} aria-hidden="true" />
+        <span className={DIVIDER_BLOCK.label}>{ACCESS_COPY.createdFunctions}</span>
+        <span className={DIVIDER_BLOCK.rule} aria-hidden="true" />
+      </div>
+
       {access.matrix.functions.length === 0 ? (
         <EmptyState
           figure="moderation"
@@ -162,7 +187,7 @@ export const AccessMatrixPanel = ({ initialMatrix }: AccessMatrixPanelProps) => 
               }
               padded
             >
-              <p className="pb-3">
+              <p className={ACCESS_BLOCK.badgeRow}>
                 <Badge label={kind.label} accent={kind.accent} tone={'neutral'} />
               </p>
               <PermissionPicker

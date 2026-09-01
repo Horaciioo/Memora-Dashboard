@@ -22,7 +22,7 @@ export default async function MembersPage() {
   // The three reference reads are memoised, so memberFields shares them
   const [members, fields, divisions, youtubers, functions] = await Promise.all([
     listMembers(await scope()),
-    memberFields(),
+    memberFields(access.isAdmin),
     allDivisions(),
     activeYoutubers(),
     activeFunctions(),

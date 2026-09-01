@@ -66,6 +66,12 @@ const STORAGE_BUCKET_MAP = {
     visibility: MEDIA_VISIBILITIES.Public,
     maxBytes: FILE_SETTINGS.maxBytes,
   },
+  banners: {
+    label: 'Banners',
+    unique: false,
+    visibility: MEDIA_VISIBILITIES.Public,
+    maxBytes: FILE_SETTINGS.maxBytes,
+  },
 } satisfies Record<string, StorageBucketOption>
 
 export const STORAGE_BUCKETS = createRegistry<keyof typeof STORAGE_BUCKET_MAP, StorageBucketOption>(
