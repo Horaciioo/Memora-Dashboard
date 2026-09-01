@@ -3,13 +3,9 @@ import 'server-only'
 import { cache } from 'react'
 
 import { prisma } from '@/core/lib/db'
-import type { Division, JobFunction, Priority, Youtuber } from '@prisma/client'
-
-/**
- * Reference rows change once a month and are read several times per render,
- * so every reader here is memoised for the length of one render. Anything
- * narrowed by a perimeter or a filter stays with its own service
- */
+import { ENCADREMENT_ROLES } from '@/declarations/access/roles'
+import { MemberStatuses } from '@/utils/constants/hierarchy'
+import type { Account, Division, JobFunction, Priority, Youtuber } from '@prisma/client'
 
 /**
  * Read the functions a member can be given
@@ -27,6 +23,18 @@ export const activeFunctions = cache(async (): Promise<JobFunction[]> =>
 
 export const activeYoutubers = cache(async (): Promise<Youtuber[]> =>
   prisma.youtuber.findMany({ where: { archived: false }, orderBy: { position: 'asc' } })
+)
+
+/**
+ * Read encadrement accounts
+ * @return {Promise<Account[]>} - Responsables and admins, by name
+ */
+
+export const encadrementAccounts = cache(async (): Promise<Account[]> =>
+  prisma.account.findMany({
+    where: { role: { in: ENCADREMENT_ROLES }, status: { not: MemberStatuses.Left } },
+    orderBy: { displayName: 'asc' },
+  })
 )
 
 /**

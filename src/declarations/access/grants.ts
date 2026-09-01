@@ -63,4 +63,11 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
       [MemberRoles.Moderateur]: [Permissions.RecruitmentRead],
     },
   },
+  {
+    key: 'integration-links',
+    grants: {
+      [MemberRoles.Admin]: [Permissions.IntegrationManage],
+      [MemberRoles.Responsable]: [Permissions.IntegrationManage],
+    },
+  },
 ]

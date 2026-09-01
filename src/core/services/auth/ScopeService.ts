@@ -4,6 +4,8 @@ import { cache } from 'react'
 
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
+import { readActiveCreator } from '@/core/lib/auth/activeCreator'
+import { readLedCreatorIds } from '@/core/services/auth/LeadService'
 import { SCOPE_SETTINGS } from '@/declarations/configurations/settings'
 import { SCOPE_TARGETS } from '@/declarations/access/scope'
 import type { ScopeTarget } from '@/declarations/access/scope'
@@ -14,11 +16,13 @@ import type { PermissionHelpers, SessionUser } from '@/types/auth'
  * @typedef {Object} AccessScope
  * @property {boolean} isGlobal - Sees every creator
  * @property {string[]} youtuberIds - Creators in perimeter
+ * @property {string | null} activeYoutuberId - Creator the perimeter is narrowed to
  */
 
 export interface AccessScope {
   isGlobal: boolean
   youtuberIds: string[]
+  activeYoutuberId: string | null
 }
 
 // Teams a responsable leads widen their perimeter to the whole creator
@@ -42,12 +46,52 @@ export const readScope = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<AccessScope> => {
-  if (access.isAdmin) return { isGlobal: true, youtuberIds: [] }
-  if (!access.isResponsable) return { isGlobal: false, youtuberIds: viewer.youtuberIds }
+  const active = await readActiveCreator()
 
-  const led = await leadPerimeter(viewer.id)
+  // An administrator always stays global, so no picker ever blocks a write they may make.
+  // Their choice only narrows reads, through the active creator scopedWhere reads below
+  if (access.isAdmin) return { isGlobal: true, youtuberIds: [], activeYoutuberId: active }
 
-  return { isGlobal: false, youtuberIds: [...new Set([...viewer.youtuberIds, ...led])] }
+  if (!access.isResponsable) {
+    return { isGlobal: false, youtuberIds: viewer.youtuberIds, activeYoutuberId: null }
+  }
+
+  const [ledTeams, anchored] = await Promise.all([
+    leadPerimeter(viewer.id),
+    readLedCreatorIds(viewer.id),
+  ])
+
+  const perimeter = [...new Set([...viewer.youtuberIds, ...ledTeams, ...anchored])]
+
+  // Holding several creators, a responsable works on one at a time
+  const narrowed = active !== null && perimeter.includes(active)
+
+  return {
+    isGlobal: false,
+    youtuberIds: narrowed ? [active] : perimeter,
+    activeYoutuberId: narrowed ? active : null,
+  }
+}
+
+/**
+ * Whole perimeter
+ * @param {SessionUser} viewer - Signed-in member
+ * @param {PermissionHelpers} access - Permission helpers
+ * @return {Promise<string[]>} - Creators reachable at all
+ */
+
+export const readFullPerimeter = async (
+  viewer: SessionUser,
+  access: PermissionHelpers
+): Promise<string[]> => {
+  if (!access.isResponsable) return viewer.youtuberIds
+
+  const [ledTeams, anchored] = await Promise.all([
+    leadPerimeter(viewer.id),
+    readLedCreatorIds(viewer.id),
+  ])
+
+  return [...new Set([...viewer.youtuberIds, ...ledTeams, ...anchored])]
 }
 
 /**
@@ -64,9 +108,20 @@ export const scopedWhere = <T extends object>(
   where?: T
 ): T => {
   const base = where ?? ({} as T)
-  if (scope.isGlobal) return base
-
   const kind = SCOPE_TARGETS[target]
+
+  // A global perimeter reads everything, unless a creator was picked to look at
+  if (scope.isGlobal) {
+    if (scope.activeYoutuberId === null) return base
+
+    const pinned =
+      kind === 'relation'
+        ? { youtubers: { some: { id: scope.activeYoutuberId } } }
+        : { youtuberId: scope.activeYoutuberId }
+
+    return { AND: [base, pinned] } as unknown as T
+  }
+
   const ids = scope.youtuberIds
   const filter =
     kind === 'relation'

@@ -1,7 +1,13 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { activeFunctions, activeYoutubers } from '@/core/services/reference/lookups'
+import {
+  activeFunctions,
+  activeYoutubers,
+  encadrementAccounts,
+} from '@/core/services/reference/lookups'
+import { replaceAnchors } from '@/core/services/auth/LeadService'
+import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { conflict, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
@@ -20,9 +26,11 @@ import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
 import {
   EVENT_VISIBILITY_REGISTRY,
   FUNCTION_KIND_REGISTRY,
+  WORKFLOW_PHASE_REGISTRY,
   WORKFLOW_SCOPE_REGISTRY,
 } from '@/declarations/reference/registries'
 import { CALENDAR_KIND_REGISTRY } from '@/declarations/calendar/registries'
+import { FORM_GROUPS } from '@/declarations/ui/copy/forms'
 import { REFERENCE_FIELD_COPY } from '@/declarations/reference/copy'
 import { RECRUITMENT_FIELD_COPY, RECRUITMENT_FILTER_COPY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_OWNER_REGISTRY } from '@/declarations/recruitment/registries'
@@ -41,6 +49,7 @@ import {
   CalendarKinds,
   EventVisibilities,
   FunctionKinds,
+  WorkflowPhases,
   WorkflowScopes,
 } from '@/utils/constants/workflow'
 import type {
@@ -51,6 +60,7 @@ import type {
   StepOwnerName,
   EventVisibilityName,
   FunctionKindName,
+  WorkflowPhaseName,
   WorkflowScopeName,
 } from '@/utils/constants'
 
@@ -141,6 +151,30 @@ const applyOrder = async (
 
 const noReorder = async (): Promise<void> => {}
 
+/**
+ * Replace the functions one creator opens, keeping the picked order
+ * @param {string} youtuberId - Creator identifier
+ * @param {string[]} functionIds - Functions in their picked order
+ * @return {Promise<void>} - Applied
+ */
+
+const replaceOpenFunctions = async (youtuberId: string, functionIds: string[]): Promise<void> => {
+  const wanted = [...new Set(functionIds)]
+
+  await prisma.$transaction([
+    prisma.youtuberFunction.deleteMany({
+      where: { youtuberId, functionId: { notIn: wanted.length > 0 ? wanted : [''] } },
+    }),
+    ...wanted.map((functionId, position) =>
+      prisma.youtuberFunction.upsert({
+        where: { youtuberId_functionId: { youtuberId, functionId } },
+        update: { position },
+        create: { youtuberId, functionId, position },
+      })
+    ),
+  ])
+}
+
 const youtubers: ReferenceResource = {
   fields: async () => [
     nameField,
@@ -153,12 +187,46 @@ const youtubers: ReferenceResource = {
     },
     accentField,
     { name: 'avatarUrl', kind: 'image', label: REFERENCE_FIELD_COPY.avatarUrl, bucket: 'avatars' },
+    {
+      name: 'bannerUrl',
+      kind: 'image',
+      label: REFERENCE_FIELD_COPY.bannerUrl,
+      hint: REFERENCE_FIELD_COPY.bannerUrlHint,
+      bucket: 'banners',
+    },
+    {
+      name: 'functionIds',
+      kind: 'multiselect',
+      label: REFERENCE_FIELD_COPY.functions,
+      hint: REFERENCE_FIELD_COPY.functionsHint,
+      mark: 'dot',
+      options: rowsToOptions(await activeFunctions()),
+    },
     { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
+    {
+      name: 'leadIds',
+      kind: 'multiselect',
+      label: REFERENCE_FIELD_COPY.leads,
+      hint: REFERENCE_FIELD_COPY.leadsHint,
+      group: FORM_GROUPS.encadrement,
+      mark: 'avatar',
+      adminOnly: true,
+      options: (await encadrementAccounts()).map((account) => ({
+        value: account.id,
+        label: account.displayName,
+        hint: ROLE_REGISTRY.label(account.role),
+        image: account.avatarUrl,
+      })),
+    },
   ],
   list: async () => {
     const rows = await prisma.youtuber.findMany({
       orderBy: { position: 'asc' },
-      include: { _count: { select: { accounts: true, projects: true } } },
+      include: {
+        leads: { select: { accountId: true } },
+        functions: { select: { functionId: true }, orderBy: { position: 'asc' } },
+        _count: { select: { accounts: true, projects: true } },
+      },
     })
 
     return rows.map((row) => ({
@@ -175,7 +243,10 @@ const youtubers: ReferenceResource = {
         handle: row.handle,
         accent: row.accent,
         avatarUrl: row.avatarUrl,
+        bannerUrl: row.bannerUrl,
         archived: row.archived,
+        functionIds: row.functions.map((seat) => seat.functionId),
+        leadIds: row.leads.map((lead) => lead.accountId),
       },
     }))
   },
@@ -187,6 +258,7 @@ const youtubers: ReferenceResource = {
           handle: readText(values, 'handle'),
           accent: readText(values, 'accent'),
           avatarUrl: readText(values, 'avatarUrl'),
+          bannerUrl: readText(values, 'bannerUrl'),
           archived: readFlag(values, 'archived'),
           position: await nextPosition(prisma.youtuber),
         },
@@ -195,6 +267,8 @@ const youtubers: ReferenceResource = {
 
     // A creator starts with the declared sanction panel, editable right after
     await instantiatePanel(row.id)
+    await replaceOpenFunctions(row.id, readList(values, 'functionIds'))
+    await replaceAnchors(row.id, readList(values, 'leadIds'))
 
     return youtubers.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
   },
@@ -207,10 +281,17 @@ const youtubers: ReferenceResource = {
           handle: readText(values, 'handle'),
           accent: readText(values, 'accent'),
           avatarUrl: readText(values, 'avatarUrl'),
+          bannerUrl: readText(values, 'bannerUrl'),
           archived: readFlag(values, 'archived'),
         },
       })
       .catch(rethrow)
+
+    // Open functions are replaced wholesale, the form always sends the full list
+    if ('functionIds' in values) await replaceOpenFunctions(id, readList(values, 'functionIds'))
+
+    // Anchors travel with the row, only ever written by an administrator
+    if ('leadIds' in values) await replaceAnchors(id, readList(values, 'leadIds'))
 
     return youtubers.list().then((rows) => rows.find((entry) => entry.id === id)!)
   },
@@ -224,25 +305,21 @@ const youtubers: ReferenceResource = {
     ),
 }
 
+/**
+ * Read the next free rank of the divisions
+ * @return {Promise<number>} - Next rank
+ */
+
+const nextDivisionRank = async (): Promise<number> => {
+  const result = await prisma.division.aggregate({ _max: { rank: true } })
+
+  return (result._max.rank ?? -1) + 1
+}
+
 const divisions: ReferenceResource = {
+  // A division is a name, a visual and who may hand it out, nothing else
   fields: async () => [
     nameField,
-    {
-      name: 'glyph',
-      kind: 'text',
-      label: REFERENCE_FIELD_COPY.glyph,
-      maxLength: shortTextMaxLength,
-      span: 'half',
-    },
-    {
-      name: 'rank',
-      kind: 'number',
-      label: REFERENCE_FIELD_COPY.rank,
-      required: true,
-      min: 0,
-      max: FORM_SETTINGS.divisionMaxRank,
-      span: 'half',
-    },
     {
       name: 'imagePath',
       kind: 'image',
@@ -250,10 +327,11 @@ const divisions: ReferenceResource = {
       bucket: 'avatars',
     },
     {
-      name: 'summary',
-      kind: 'textarea',
-      label: REFERENCE_FIELD_COPY.summary,
-      maxLength: longTextMaxLength,
+      name: 'leadAssignable',
+      kind: 'toggle',
+      label: REFERENCE_FIELD_COPY.leadAssignable,
+      hint: REFERENCE_FIELD_COPY.leadAssignableHint,
+      adminOnly: true,
     },
   ],
   list: async () => {
@@ -268,15 +346,13 @@ const divisions: ReferenceResource = {
       hint: row.summary,
       accent: null,
       image: row.imagePath,
-      badges: row.glyph ? [row.glyph] : [],
+      badges: row.leadAssignable ? [] : [REFERENCE_FIELD_COPY.adminOnlyBadge],
       position: row.rank,
       usage: row._count.accounts,
       values: {
         name: row.name,
-        glyph: row.glyph,
-        rank: row.rank,
         imagePath: row.imagePath,
-        summary: row.summary,
+        leadAssignable: row.leadAssignable,
       },
     }))
   },
@@ -285,10 +361,9 @@ const divisions: ReferenceResource = {
       .create({
         data: {
           name: readText(values, 'name') ?? '',
-          glyph: readText(values, 'glyph'),
-          rank: readNumberValue(values, 'rank') ?? 0,
           imagePath: readText(values, 'imagePath'),
-          summary: readText(values, 'summary'),
+          leadAssignable: readFlag(values, 'leadAssignable'),
+          rank: await nextDivisionRank(),
         },
       })
       .catch(rethrow)
@@ -301,10 +376,11 @@ const divisions: ReferenceResource = {
         where: { id },
         data: {
           name: readText(values, 'name') ?? undefined,
-          glyph: readText(values, 'glyph'),
-          rank: readNumberValue(values, 'rank') ?? undefined,
           imagePath: readText(values, 'imagePath'),
-          summary: readText(values, 'summary'),
+          // Only an administrator ever reaches this key, the route strips it otherwise
+          ...('leadAssignable' in values
+            ? { leadAssignable: readFlag(values, 'leadAssignable') }
+            : {}),
         },
       })
       .catch(rethrow)
@@ -476,6 +552,91 @@ const platforms: ReferenceResource = {
     ),
 }
 
+const socialNetworks: ReferenceResource = {
+  fields: async () => [
+    nameField,
+    {
+      name: 'urlPrefix',
+      kind: 'text',
+      label: REFERENCE_FIELD_COPY.urlPrefix,
+      hint: REFERENCE_FIELD_COPY.urlPrefixHint,
+      required: true,
+      maxLength: shortTextMaxLength,
+    },
+    accentField,
+    { name: 'avatarUrl', kind: 'image', label: REFERENCE_FIELD_COPY.avatarUrl, bucket: 'avatars' },
+    { name: 'required', kind: 'toggle', label: REFERENCE_FIELD_COPY.socialRequired },
+    { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
+  ],
+  list: async () => {
+    const rows = await prisma.socialNetwork.findMany({
+      orderBy: { position: 'asc' },
+      include: { _count: { select: { links: true } } },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      label: row.name,
+      hint: row.urlPrefix,
+      accent: row.accent,
+      image: row.avatarUrl,
+      badges: row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : [],
+      position: row.position,
+      usage: row._count.links,
+      values: {
+        name: row.name,
+        urlPrefix: row.urlPrefix,
+        accent: row.accent,
+        avatarUrl: row.avatarUrl,
+        required: row.required,
+        archived: row.archived,
+      },
+    }))
+  },
+  create: async (values) => {
+    const row = await prisma.socialNetwork
+      .create({
+        data: {
+          name: readText(values, 'name') ?? '',
+          urlPrefix: readText(values, 'urlPrefix') ?? '',
+          accent: readText(values, 'accent'),
+          avatarUrl: readText(values, 'avatarUrl'),
+          required: readFlag(values, 'required'),
+          archived: readFlag(values, 'archived'),
+          position: await nextPosition(prisma.socialNetwork),
+        },
+      })
+      .catch(rethrow)
+
+    return socialNetworks.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
+  },
+  update: async (id, values) => {
+    await prisma.socialNetwork
+      .update({
+        where: { id },
+        data: {
+          name: readText(values, 'name') ?? undefined,
+          urlPrefix: readText(values, 'urlPrefix') ?? undefined,
+          accent: readText(values, 'accent'),
+          avatarUrl: readText(values, 'avatarUrl'),
+          required: readFlag(values, 'required'),
+          archived: readFlag(values, 'archived'),
+        },
+      })
+      .catch(rethrow)
+
+    return socialNetworks.list().then((rows) => rows.find((entry) => entry.id === id)!)
+  },
+  remove: async (id) => {
+    await prisma.socialNetwork.delete({ where: { id } })
+  },
+  reorder: (ids) =>
+    applyOrder(
+      (id, position) => prisma.socialNetwork.update({ where: { id }, data: { position } }),
+      ids
+    ),
+}
+
 const workflowStates: ReferenceResource = {
   fields: async () => [
     {
@@ -488,9 +649,17 @@ const workflowStates: ReferenceResource = {
       span: 'half',
     },
     { ...nameField, span: 'half' },
+    {
+      name: 'phase',
+      kind: 'select',
+      label: REFERENCE_FIELD_COPY.phase,
+      required: true,
+      options: toOptions(WORKFLOW_PHASE_REGISTRY),
+      mark: 'dot',
+      span: 'half',
+    },
     accentField,
     { name: 'isDefault', kind: 'toggle', label: REFERENCE_FIELD_COPY.isDefault },
-    { name: 'isTerminal', kind: 'toggle', label: REFERENCE_FIELD_COPY.isTerminal },
   ],
   list: async () => {
     const rows = await prisma.workflowState.findMany({
@@ -505,17 +674,17 @@ const workflowStates: ReferenceResource = {
       accent: row.accent,
       badges: [
         WORKFLOW_SCOPE_REGISTRY.label(row.scope),
+        WORKFLOW_PHASE_REGISTRY.label(row.phase),
         ...(row.isDefault ? [REFERENCE_FIELD_COPY.defaultBadge] : []),
-        ...(row.isTerminal ? [REFERENCE_FIELD_COPY.terminalBadge] : []),
       ],
       position: row.position,
       usage: row._count.projects + row._count.tasks + row._count.meetings,
       values: {
         scope: row.scope,
         name: row.name,
+        phase: row.phase,
         accent: row.accent,
         isDefault: row.isDefault,
-        isTerminal: row.isTerminal,
       },
     }))
   },
@@ -526,9 +695,9 @@ const workflowStates: ReferenceResource = {
         data: {
           scope,
           name: readText(values, 'name') ?? '',
+          phase: (readText(values, 'phase') ?? WorkflowPhases.Todo) as WorkflowPhaseName,
           accent: readText(values, 'accent'),
           isDefault: readFlag(values, 'isDefault'),
-          isTerminal: readFlag(values, 'isTerminal'),
           position: await nextPosition(prisma.workflowState),
         },
       })
@@ -551,9 +720,9 @@ const workflowStates: ReferenceResource = {
         data: {
           scope: (readText(values, 'scope') ?? undefined) as WorkflowScopeName | undefined,
           name: readText(values, 'name') ?? undefined,
+          phase: (readText(values, 'phase') ?? undefined) as WorkflowPhaseName | undefined,
           accent: readText(values, 'accent'),
           isDefault: readFlag(values, 'isDefault'),
-          isTerminal: readFlag(values, 'isTerminal'),
         },
       })
       .catch(rethrow)
@@ -1826,6 +1995,7 @@ const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
   divisions,
   fonctions: jobFunctions,
   plateformes: platforms,
+  'reseaux-sociaux': socialNetworks,
   etats: workflowStates,
   priorites: priorities,
   evenements: eventTemplates,

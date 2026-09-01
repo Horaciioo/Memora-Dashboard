@@ -4,8 +4,12 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { Section } from '@/components/structures/Section'
+import { CreatorLeadsPanel } from '@/composites/reference/CreatorLeadsPanel'
 import { TeamsBoard } from '@/composites/teams/TeamsBoard'
 import { prisma } from '@/core/lib/db'
+import { readAnchors } from '@/core/services/auth/LeadService'
+import { encadrementAccounts } from '@/core/services/reference/lookups'
+import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { readTeamBoard, teamFields } from '@/core/services/teams/TeamService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { REFERENCE_COPY, REFERENCE_FIELD_COPY, YOUTUBER_COPY } from '@/declarations/reference/copy'
@@ -58,7 +62,12 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
   const youtuber = await readYoutuber(id)
   if (!youtuber) notFound()
 
-  const [board, fields] = await Promise.all([readTeamBoard(await scope(), id), teamFields()])
+  const [board, fields, anchors, candidates] = await Promise.all([
+    readTeamBoard(await scope(), id),
+    teamFields(),
+    readAnchors(id),
+    encadrementAccounts(),
+  ])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
@@ -92,6 +101,24 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
             <Badge label={youtuber.name} accent={youtuber.accent} tone={'brand'} icon="youtuber" />
           )}
         </div>
+      </Section>
+      <Section
+        title={REFERENCE_FIELD_COPY.leadsTitle}
+        description={REFERENCE_FIELD_COPY.leadsLead}
+        padded
+      >
+        <CreatorLeadsPanel
+          youtuberId={id}
+          initialAnchors={anchors}
+          candidates={candidates.map((account) => ({
+            value: account.id,
+            label: account.displayName,
+            hint: ROLE_REGISTRY.label(account.role),
+            image: account.avatarUrl,
+          }))}
+          teams={board.teams.map((team) => ({ value: team.id, label: team.name }))}
+          canManage={access.isAdmin}
+        />
       </Section>
       <Section
         title={YOUTUBER_COPY.teamsTitle}

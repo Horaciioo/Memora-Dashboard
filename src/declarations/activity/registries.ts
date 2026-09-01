@@ -117,6 +117,18 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     verb: 'tranché',
     target: 'une candidature',
   },
+  SecurityChanged: {
+    label: 'Sécurité',
+    tone: 'info',
+    verb: 'modifié',
+    target: 'sa sécurité',
+  },
+  LeadsAnchored: {
+    label: 'Ancrage',
+    tone: 'info',
+    verb: 'ancré',
+    target: 'des responsables',
+  },
 }
 
 export const ACTIVITY_EVENT_REGISTRY = createRegistry(ACTIVITY_EVENT_MAP)

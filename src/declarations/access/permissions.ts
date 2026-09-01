@@ -1,6 +1,12 @@
 import { createRegistry } from '@/core/lib/registry'
+import { TWO_FACTOR_COPY } from '@/declarations/access/copy'
+import { TWO_FACTOR_SETTINGS } from '@/declarations/configurations/settings'
+import type { FieldDefinition } from '@/types/forms'
 import { PermissionGroups, PermissionsList } from '@/utils/constants/permissions'
 import type { PermissionGroup, PermissionMeta } from '@/utils/constants/permissions'
+
+// A fallback code is the longest thing the field ever takes, two hex chars per byte
+const RECOVERY_CODE_LENGTH = TWO_FACTOR_SETTINGS.recoveryCodeBytes * 2
 
 /**
  * Permission group metadata
@@ -60,3 +66,17 @@ export const PERMISSION_SECTIONS: PermissionSection[] = PERMISSION_GROUP_REGISTR
     label: PERMISSION_GROUP_REGISTRY.get(group).label,
     permissions: PermissionsList.filter((entry) => entry.group === group),
   }))
+
+/**
+ * Second factor code field
+ * @type {FieldDefinition}
+ */
+
+export const codeField: FieldDefinition = {
+  name: 'code',
+  kind: 'text',
+  label: TWO_FACTOR_COPY.codeLabel,
+  placeholder: TWO_FACTOR_COPY.codePlaceholder,
+  required: true,
+  maxLength: RECOVERY_CODE_LENGTH,
+}

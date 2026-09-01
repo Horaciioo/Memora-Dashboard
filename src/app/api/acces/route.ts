@@ -1,4 +1,4 @@
-import { invalidInput } from '@/core/lib/errors'
+import { forbidden, invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import {
   applyRolePreset,
@@ -9,7 +9,7 @@ import {
 } from '@/core/services/auth/GrantsService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
-import { ROLE_REGISTRY } from '@/declarations/access/roles'
+import { ENCADREMENT_ROLES, ROLE_REGISTRY } from '@/declarations/access/roles'
 import { isPermissionName } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
@@ -36,9 +36,14 @@ export const GET = createProtectedRoute({
 export const PUT = createProtectedRoute({
   permission: Permissions.AccessManage,
   descriptor: { summary: 'Replace the grants of a role or a function', tags: ['access'] },
-  handler: async ({ raw, session }) => {
+  handler: async ({ raw, session, access }) => {
     const role = raw.role === undefined ? null : String(raw.role)
     const functionId = raw.functionId === undefined ? null : String(raw.functionId)
+
+    // An encadrement level is what a whole perimeter hangs off, so only an admin writes one
+    if (role && ENCADREMENT_ROLES.includes(role as MemberRoleName) && !access.isAdmin) {
+      throw forbidden()
+    }
 
     // A preset request rewrites the role from the declared defaults
     if (role && ROLE_REGISTRY.has(role)) {

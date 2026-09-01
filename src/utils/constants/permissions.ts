@@ -31,6 +31,7 @@ export const Permissions = {
   RecruitmentManage: 'recruitment:manage',
   RecruitmentCandidateWrite: 'recruitment:candidate:write',
   RecruitmentInstructionWrite: 'recruitment:instruction:write',
+  IntegrationManage: 'integration:manage',
   AcademyRead: 'academy:read',
   AcademyManage: 'academy:manage',
   AcademyReviewRead: 'academy:review:read',
@@ -320,6 +321,13 @@ export const PermissionsList: PermissionMeta[] = [
     group: PermissionGroups.Recruitment,
     displayName: 'Écrire les consignes',
     description: 'Rédiger les consignes de recrutement d’une session.',
+    important: true,
+  },
+  {
+    name: Permissions.IntegrationManage,
+    group: PermissionGroups.Recruitment,
+    displayName: 'Gérer les liens d’intégration',
+    description: 'Émettre et révoquer les liens du formulaire d’intégration.',
     important: true,
   },
   {
