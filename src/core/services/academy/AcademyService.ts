@@ -62,6 +62,7 @@ import type {
   StepOwnerName,
   TrainingStatusName,
 } from '@/utils/constants/hierarchy'
+import { IntegrationLinkKinds } from '@/utils/constants/integration'
 import type { Prisma } from '@prisma/client'
 
 // Stages an actual voice check-in is written for, the others are timeline-driven
@@ -526,7 +527,7 @@ const sessionInScope = async (id: string, scope: Prisma.AcademySessionWhereInput
 }
 
 /**
- * Open the admission link of a session once it starts taking applications, idempotent
+ * Open the integration link of a session once it starts taking applications, idempotent
  * @param {string} sessionId - Session identifier
  * @param {AcademySessionStatusName} status - Status the session was just set to
  * @return {Promise<void>} - Applied, a no-op outside OPEN or when a live link already exists
@@ -538,14 +539,21 @@ const ensureSessionInvite = async (
 ): Promise<void> => {
   if (status !== AcademySessionStatuses.Open) return
 
-  const existing = await prisma.sessionInvite.findFirst({
+  const existing = await prisma.integrationInvite.findFirst({
     where: { sessionId, expiresAt: { gt: new Date() } },
   })
   if (existing) return
 
-  await prisma.sessionInvite.create({
+  const session = await prisma.academySession.findUniqueOrThrow({
+    where: { id: sessionId },
+    select: { functionId: true },
+  })
+
+  await prisma.integrationInvite.create({
     data: {
+      kind: IntegrationLinkKinds.Academy,
       sessionId,
+      functionId: session.functionId,
       token: crypto.randomBytes(24).toString('base64url'),
       expiresAt: addDays(new Date(), ACADEMY_SETTINGS.inviteExpiryDays),
       maxUses: ACADEMY_SETTINGS.inviteMaxUses,

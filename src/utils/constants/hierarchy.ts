@@ -17,6 +17,7 @@ export type MemberRoleName = (typeof MemberRoles)[keyof typeof MemberRoles]
  */
 
 export const MemberStatuses = {
+  Pending: 'PENDING',
   Academy: 'ACADEMY',
   Active: 'ACTIVE',
   Paused: 'PAUSED',

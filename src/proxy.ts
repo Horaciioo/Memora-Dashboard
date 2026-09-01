@@ -11,7 +11,7 @@ import { ROUTES } from '@/declarations/navigation'
 const PUBLIC_PATHS: string[] = [ROUTES.login, ROUTES.privacy]
 
 // Path prefixes
-const PUBLIC_PREFIXES: string[] = ['/admission']
+const PUBLIC_PREFIXES: string[] = ['/integration']
 
 /**
  * Build the per-request nonce and the policy carrying it

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
-import { CopyInviteLink } from '@/composites/academy/CopyInviteLink'
+import { CopyInviteLink } from '@/composites/onboarding/CopyInviteLink'
 import { SessionPanel } from '@/composites/academy/SessionPanel'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import {

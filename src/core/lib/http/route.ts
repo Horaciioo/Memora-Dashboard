@@ -311,14 +311,14 @@ export const createProtectedRoute = <T>(options: ProtectedRouteOptions<T>): Rout
  * Redirect route options
  * @typedef {Object} RedirectRouteOptions
  * @property {(context: RouteContext) => Promise<string>} handler - Resolves the destination
- * @property {(error: AppError) => string} onFailure - Destination of a refused attempt
+ * @property {(error: AppError, params: Record<string, string>) => string} onFailure - Destination of a refused attempt
  */
 
 interface RedirectRouteOptions {
   rateLimit?: RateLimitName | false
   descriptor?: RouteDescriptor
   handler: (context: RouteContext) => Promise<string>
-  onFailure: (error: AppError) => string
+  onFailure: (error: AppError, params: Record<string, string>) => string | Promise<string>
 }
 
 /**
@@ -343,7 +343,9 @@ export const createRedirectRoute = (options: RedirectRouteOptions): RouteHandler
       // A browser flow never reads an envelope, it only follows a location
       if (appError.code === ErrorCodes.SystemFailure) logger.error('[oauth]', error)
 
-      return Response.redirect(new URL(options.onFailure(appError), base), 303)
+      const destination = await options.onFailure(appError, await context.params)
+
+      return Response.redirect(new URL(destination, base), 303)
     }
   }
 

@@ -5,8 +5,10 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost, apiPut } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
+import { INTEGRATION_LINK_COPY } from '@/declarations/onboarding/copy'
 import { feedbackTitle } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
+import type { IntegrationLinkView } from '@/types/onboarding'
 import type { CandidateView, RecruitmentDetail, RecruitmentStepView } from '@/types/recruitment'
 
 // Toast entity labels
@@ -22,6 +24,7 @@ const INSTRUCTIONS = 'Consignes'
  * @property {string} instructions - Consignes in force
  * @property {CandidateView[]} candidates - Applicants held
  * @property {RecruitmentStepView[]} steps - Timeline moments
+ * @property {IntegrationLinkView | null} link - Integration form handed out, if any
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {() => void} clearIssues - Forget the rejections
@@ -37,12 +40,15 @@ const INSTRUCTIONS = 'Consignes'
  * @property {(id: string, done: boolean) => Promise<void>} setStepDone - Clear or reopen a moment
  * @property {(id: string) => Promise<void>} removeStep - Drop a timeline moment
  * @property {(instructions: string) => Promise<boolean>} saveInstructions - Write the consignes
+ * @property {(values: FormValues) => Promise<boolean>} emitLink - Hand out the integration form
+ * @property {() => Promise<void>} revokeLink - Close the integration form
  */
 
 export interface RecruitmentFile {
   instructions: string
   candidates: CandidateView[]
   steps: RecruitmentStepView[]
+  link: IntegrationLinkView | null
   isSaving: boolean
   issues: FieldIssue[]
   clearIssues: () => void
@@ -58,6 +64,8 @@ export interface RecruitmentFile {
   setStepDone: (id: string, done: boolean) => Promise<void>
   removeStep: (id: string) => Promise<void>
   saveInstructions: (instructions: string) => Promise<boolean>
+  emitLink: (values: FormValues) => Promise<boolean>
+  revokeLink: () => Promise<void>
 }
 
 /**
@@ -71,6 +79,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
   const [instructions, setInstructions] = useState(detail.instructions)
   const [candidates, setCandidates] = useState(detail.candidates)
   const [steps, setSteps] = useState(detail.steps)
+  const [link, setLink] = useState(detail.link)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   // Every candidate mutation answers with the whole card, so one merge covers them all
@@ -248,10 +257,39 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     [run, sessionId]
   )
 
+  // Handing out the form also clears the step that carries it, both land at once
+  const emitLink = useCallback(
+    async (values: FormValues) => {
+      const emitted = await run(
+        () => apiPost<IntegrationLinkView>(API_ROUTES.recruitmentLink(sessionId), values),
+        INTEGRATION_LINK_COPY.emitted
+      )
+
+      if (emitted) {
+        setLink(emitted)
+        setSteps((current) =>
+          current.map((step) =>
+            step.emitsInvite && !step.doneAt ? { ...step, doneAt: new Date().toISOString() } : step
+          )
+        )
+      }
+
+      return emitted !== null
+    },
+    [run, sessionId]
+  )
+
+  const revokeLink = useCallback(async () => {
+    const dropped = await run(() => apiDelete<null>(API_ROUTES.recruitmentLink(sessionId)))
+
+    if (dropped !== null) setLink(null)
+  }, [run, sessionId])
+
   return {
     instructions,
     candidates,
     steps,
+    link,
     isSaving,
     issues,
     clearIssues,
@@ -267,5 +305,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     setStepDone,
     removeStep,
     saveInstructions,
+    emitLink,
+    revokeLink,
   }
 }

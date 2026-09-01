@@ -10,6 +10,7 @@ import {
   readSession,
   stepFields,
 } from '@/core/services/recruitment/RecruitmentService'
+import { linkFields } from '@/core/services/onboarding/IntegrationLinkService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
@@ -87,9 +88,11 @@ export default async function RecruitmentPage({ params }: { params: Promise<{ id
         commentFields={commentFields()}
         reviewFields={proseFields('review')}
         instructionFields={proseFields('instructions')}
+        linkFields={linkFields()}
         canManage={access.can(Permissions.RecruitmentManage)}
         canWriteCandidates={access.can(Permissions.RecruitmentCandidateWrite)}
         canWriteInstructions={access.can(Permissions.RecruitmentInstructionWrite)}
+        canManageLinks={access.can(Permissions.IntegrationManage)}
       />
     </div>
   )
