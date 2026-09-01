@@ -1,3 +1,5 @@
+import { DATE_LOCALE } from '@/declarations/ui/dates'
+
 /**
  * Format number with commas
  * @param {number} num - Number
@@ -5,7 +7,7 @@
  */
 
 export function formatNumber(num: number): string {
-  return num.toLocaleString('en-US')
+  return num.toLocaleString(DATE_LOCALE)
 }
 
 /**

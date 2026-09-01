@@ -7,6 +7,7 @@ import { prisma } from '@/core/lib/db'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { resolveAccountPermissions } from '@/core/services/auth/GrantsService'
 import { touchSession } from '@/core/services/auth/SessionService'
+import { toDisplayPreferences } from '@/core/services/preferences/DisplayService'
 import { isRootIdentity } from '@/declarations/access/identity'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
 import type { SessionUser } from '@/types/auth'
@@ -38,6 +39,7 @@ export const toSessionUser = async (
     primaryFunctionId: account.primaryFunctionId,
     secondaryFunctionId: account.secondaryFunctionId,
     isRoot,
+    display: toDisplayPreferences(account),
     historyConsentVersion: account.historyConsentVersion,
     permissions: await resolveAccountPermissions(account),
   }

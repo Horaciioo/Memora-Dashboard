@@ -6,6 +6,7 @@ import type { FormValues } from '@/types/forms'
  * @typedef {Object} ProfileDetail
  * @property {string} displayName - Display name, owned by the responsables
  * @property {string} discordId - Identifier used to sign in
+ * @property {string | null} avatarUrl - Portrait, owned by Discord
  * @property {MemberRoleName} role - Hierarchy level
  * @property {MemberStatusName} status - Membership status
  * @property {string | null} academyDispositif - Dispositif of the active FSI
@@ -20,6 +21,7 @@ import type { FormValues } from '@/types/forms'
 export interface ProfileDetail {
   displayName: string
   discordId: string
+  avatarUrl: string | null
   role: MemberRoleName
   status: MemberStatusName
   academyDispositif: string | null

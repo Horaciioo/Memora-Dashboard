@@ -3,7 +3,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type ThemePreference = 'SYSTEM' | 'LIGHT' | 'DARK'
+import type { ThemePreference } from '@/declarations/access/preferences'
+
+export type { ThemePreference }
 
 /**
  * Theme store

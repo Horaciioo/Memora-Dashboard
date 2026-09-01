@@ -3,7 +3,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type FontScale = 'sm' | 'md' | 'lg'
+import type { FontScale } from '@/declarations/access/preferences'
+
+export type { FontScale }
 
 /**
  * Appearance store

@@ -17,7 +17,7 @@ export const ColorVisionSelect = () => {
 
   return (
     <SelectMenu
-      compact
+      size="compact"
       label={NAV_COPY.colorVision}
       options={toOptions(COLOR_VISION_REGISTRY)}
       value={colorVisionMode}

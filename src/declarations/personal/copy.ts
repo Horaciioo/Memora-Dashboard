@@ -4,7 +4,7 @@
  */
 
 export const PERSONAL_COPY = {
-  title: 'Mon tableau de bord',
+  title: 'Accueil',
   greeting: 'Salut {name}',
   lead: 'Ton espace personnel : tes tâches, tes réunions et tes absences au même endroit.',
   wip: 'On te prépare une vue avec tes tâches, tes réunions et tes absences. Elle arrive.',
