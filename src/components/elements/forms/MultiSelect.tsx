@@ -6,7 +6,12 @@ import { OptionMark } from '@/components/elements/forms/OptionMark'
 import { useAnchoredPanel } from '@/core/hooks/interaction/useAnchoredPanel'
 import { PICKER_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { SELECT_MENU_STYLES, TAGS_STYLES, TOGGLE_STYLES } from '@/declarations/ui/variants'
+import {
+  SELECT_MENU_SIZES,
+  SELECT_MENU_STYLES,
+  TAGS_STYLES,
+  TOGGLE_STYLES,
+} from '@/declarations/ui/variants'
 import { useHints } from '@/managers/front-end'
 import type { FieldOption, OptionMark as OptionMarkKind } from '@/types/forms'
 import { cn } from '@/utils/classnames'
@@ -129,7 +134,7 @@ export const MultiSelect = ({
         onClick={() => (isOpen ? setOpen(false) : openPanel())}
         className={cn(
           SELECT_MENU_STYLES.trigger,
-          SELECT_MENU_STYLES.triggerBlock,
+          SELECT_MENU_SIZES.block.trigger,
           invalid && SELECT_MENU_STYLES.invalid
         )}
       >

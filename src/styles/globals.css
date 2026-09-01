@@ -3,9 +3,9 @@
 @import './theme.css';
 
 /* Tone classes are built at runtime by tw() (src/declarations/ui/theme.ts), so the scanner never sees them — force-compiled here */
-@source inline("bg-[var(--color-{brand-600,brand-soft,success,success-soft,caution,caution-soft,warning,warning-soft,danger,danger-soft,info,info-soft,neutral,neutral-soft,ink-subtle})]");
-@source inline("text-[var(--color-{brand-600,success,caution,warning,danger,info,neutral,ink-subtle})]");
-@source inline("border-[var(--color-{brand-600,brand-400,success,caution,warning,danger,info,neutral,border-strong})]");
+@source inline("bg-[var(--color-{brand-600,brand-soft,success,success-soft,caution,caution-soft,warning,warning-soft,danger,danger-soft,info,info-soft,neutral,neutral-soft,ink-subtle,authority-admin,authority-admin-soft,authority-lead,authority-lead-soft,scan-ground})]");
+@source inline("text-[var(--color-{brand-600,success,caution,warning,danger,info,neutral,ink-subtle,authority-admin,authority-lead})]");
+@source inline("border-[var(--color-{brand-600,brand-400,success,caution,warning,danger,info,neutral,border-strong,authority-admin,authority-lead})]");
 
 /* Text size preference — set by AppearanceManager (src/managers/front-end/AppearanceManager.tsx) */
 :root[data-font-scale='sm'] {
@@ -14,6 +14,15 @@
 
 :root[data-font-scale='lg'] {
   font-size: 18px;
+}
+
+/* Below md, a control under 16px makes Safari iOS zoom in on focus */
+@media (width < 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 body {
@@ -220,6 +229,24 @@ html[data-color-vision='tritanopia'] {
   outline: 2px dashed var(--color-brand-500);
   outline-offset: -4px;
   background: var(--color-brand-soft);
+}
+
+/* Smallest comfortable tap area for a compact control */
+.touch-target {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+
+/* Clearance under the routed page for the floating mobile nav pill */
+.shell-page {
+  padding-bottom: calc(var(--shell-bottom-nav-h) + env(safe-area-inset-bottom) + 2rem);
+}
+
+/* md — mirrors breakpoints.md of src/configurations/system/responsive.json */
+@media (width >= 768px) {
+  .shell-page {
+    padding-bottom: 2rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

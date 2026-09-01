@@ -11,8 +11,10 @@ import { SelectMenu } from '@/components/elements/forms/SelectMenu'
 import { TagsInput } from '@/components/elements/forms/TagsInput'
 import { Textarea } from '@/components/elements/forms/Textarea'
 import { ACTION_COPY } from '@/declarations/ui/copy'
+import { FIELD_STYLES } from '@/declarations/ui/variants'
 import type { StorageBucket } from '@/types/storage'
 import type { FieldDefinition, FieldValue } from '@/types/forms'
+import { cn } from '@/utils/classnames'
 
 export interface FieldControlProps {
   id: string
@@ -225,7 +227,7 @@ export const FieldControl = ({
 
   if (!SIMPLE_KINDS.includes(field.kind)) return null
 
-  return (
+  const input = (
     <Input
       id={id}
       type={INPUT_TYPES[field.kind]}
@@ -236,7 +238,8 @@ export const FieldControl = ({
       maxLength={field.maxLength}
       placeholder={field.placeholder}
       disabled={disabled || field.readOnly}
-      invalid={invalid}
+      invalid={invalid && !field.prefix}
+      className={field.prefix ? FIELD_STYLES.prefixControl : undefined}
       aria-describedby={describedBy}
       onChange={(event) => {
         const next = event.target.value
@@ -250,5 +253,17 @@ export const FieldControl = ({
         onChange(next === '' ? null : next)
       }}
     />
+  )
+
+  if (!field.prefix) return input
+
+  // The prefix is drawn, never typed and never stored
+  return (
+    <div className={cn(FIELD_STYLES.prefixRow, invalid && FIELD_STYLES.prefixRowInvalid)}>
+      <span className={FIELD_STYLES.prefix} aria-hidden="true">
+        {field.prefix}
+      </span>
+      {input}
+    </div>
   )
 }

@@ -1,3 +1,4 @@
+import twoFactor from '@/configurations/system/a2f.json'
 import absences from '@/configurations/system/absences.json'
 import academy from '@/configurations/system/academy.json'
 import authentication from '@/configurations/system/authentification.json'
@@ -13,15 +14,20 @@ import notifications from '@/configurations/system/notifications.json'
 import pagination from '@/configurations/system/pagination.json'
 import perimeter from '@/configurations/system/perimetre.json'
 import projects from '@/configurations/system/projets.json'
+import responsive from '@/configurations/system/responsive.json'
 import sanctions from '@/configurations/system/sanctions.json'
 import search from '@/configurations/system/search.json'
 import {
   readBoolean,
+  readChoice,
   readInteger,
   readNode,
   readString,
   readStringList,
 } from '@/declarations/configurations/readers'
+
+// Breakpoint keys, narrowest first
+const BREAKPOINT_NAMES = ['sm', 'md', 'lg', 'xl'] as const
 
 const maxPerPage = readInteger(pagination.maxPerPage, {
   path: 'system/pagination.maxPerPage',
@@ -106,11 +112,6 @@ export const FORM_SETTINGS = {
     fallback: 5,
     min: 1,
     max: meetingMaxDuration,
-  }),
-  divisionMaxRank: readInteger(forms.divisionMaxRank, {
-    path: 'system/forms.divisionMaxRank',
-    fallback: 10,
-    min: 1,
   }),
   priorityMaxWeight: readInteger(forms.priorityMaxWeight, {
     path: 'system/forms.priorityMaxWeight',
@@ -429,6 +430,84 @@ export const PROJECT_SETTINGS = {
   }),
 }
 
+const smBreakpoint = readInteger((responsive.breakpoints as Record<string, unknown>).sm, {
+  path: 'system/responsive.breakpoints.sm',
+  fallback: 640,
+  min: 320,
+})
+
+const mdBreakpoint = readInteger((responsive.breakpoints as Record<string, unknown>).md, {
+  path: 'system/responsive.breakpoints.md',
+  fallback: 768,
+  min: smBreakpoint,
+})
+
+const lgBreakpoint = readInteger((responsive.breakpoints as Record<string, unknown>).lg, {
+  path: 'system/responsive.breakpoints.lg',
+  fallback: 1024,
+  min: mdBreakpoint,
+})
+
+const xlBreakpoint = readInteger((responsive.breakpoints as Record<string, unknown>).xl, {
+  path: 'system/responsive.breakpoints.xl',
+  fallback: 1280,
+  min: lgBreakpoint,
+})
+
+const responsiveShell = readNode(responsive.shell, 'system/responsive.shell')
+const responsiveBottomNav = readNode(responsive.bottomNav, 'system/responsive.bottomNav')
+const responsiveToast = readNode(responsive.toast, 'system/responsive.toast')
+const responsiveToastVisible = readNode(
+  responsiveToast.maxVisible,
+  'system/responsive.toast.maxVisible'
+)
+
+/**
+ * Breakpoint and mobile shell bounds
+ * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number }}
+ */
+
+export const RESPONSIVE_SETTINGS = {
+  breakpoints: { sm: smBreakpoint, md: mdBreakpoint, lg: lgBreakpoint, xl: xlBreakpoint },
+  mobileUntil: readChoice(responsive.mobileUntil, {
+    path: 'system/responsive.mobileUntil',
+    fallback: 'md',
+    allowed: BREAKPOINT_NAMES,
+  }),
+  topBarHeight: readInteger(responsiveShell.topBarHeight, {
+    path: 'system/responsive.shell.topBarHeight',
+    fallback: 52,
+    min: 32,
+  }),
+  bottomNavHeight: readInteger(responsiveShell.bottomNavHeight, {
+    path: 'system/responsive.shell.bottomNavHeight',
+    fallback: 64,
+    min: 40,
+  }),
+  maxPrimarySlots: readInteger(responsiveBottomNav.maxSlots, {
+    path: 'system/responsive.bottomNav.maxSlots',
+    fallback: 4,
+    min: 2,
+    max: 6,
+  }),
+  toastVisibleMobile: readInteger(responsiveToastVisible.mobile, {
+    path: 'system/responsive.toast.maxVisible.mobile',
+    fallback: 1,
+    min: 1,
+  }),
+  toastVisibleDesktop: readInteger(responsiveToastVisible.desktop, {
+    path: 'system/responsive.toast.maxVisible.desktop',
+    fallback: 3,
+    min: 1,
+  }),
+  touchTargetMin: readInteger(responsive.touchTargetMin, {
+    path: 'system/responsive.touchTargetMin',
+    fallback: 44,
+    min: 24,
+    max: 64,
+  }),
+} as const
+
 /**
  * Glyphs offered by the emoji picker
  * @type {{ maxLength: number, searchMax: number, suggestions: string[] }}
@@ -495,6 +574,62 @@ export const AUTH_SETTINGS = {
     path: 'system/authentification.maxConcurrentSessions',
     fallback: 10,
     min: 1,
+  }),
+}
+
+/**
+ * Second factor bounds
+ * @type {{ digits: number, periodSeconds: number, driftSteps: number, secretBytes: number, recoveryCodeCount: number, recoveryCodeBytes: number, unlockMinutes: number, enrolmentMinutes: number }}
+ */
+
+export const TWO_FACTOR_SETTINGS = {
+  digits: readInteger(twoFactor.digits, {
+    path: 'system/a2f.digits',
+    fallback: 6,
+    min: 6,
+    max: 8,
+  }),
+  periodSeconds: readInteger(twoFactor.periodSeconds, {
+    path: 'system/a2f.periodSeconds',
+    fallback: 30,
+    min: 15,
+    max: 120,
+  }),
+  driftSteps: readInteger(twoFactor.driftSteps, {
+    path: 'system/a2f.driftSteps',
+    fallback: 1,
+    min: 0,
+    max: 5,
+  }),
+  secretBytes: readInteger(twoFactor.secretBytes, {
+    path: 'system/a2f.secretBytes',
+    fallback: 20,
+    min: 16,
+    max: 64,
+  }),
+  recoveryCodeCount: readInteger(twoFactor.recoveryCodeCount, {
+    path: 'system/a2f.recoveryCodeCount',
+    fallback: 10,
+    min: 1,
+    max: 32,
+  }),
+  recoveryCodeBytes: readInteger(twoFactor.recoveryCodeBytes, {
+    path: 'system/a2f.recoveryCodeBytes',
+    fallback: 5,
+    min: 4,
+    max: 16,
+  }),
+  unlockMinutes: readInteger(twoFactor.unlockMinutes, {
+    path: 'system/a2f.unlockMinutes',
+    fallback: 15,
+    min: 1,
+    max: 720,
+  }),
+  enrolmentMinutes: readInteger(twoFactor.enrolmentMinutes, {
+    path: 'system/a2f.enrolmentMinutes',
+    fallback: 10,
+    min: 1,
+    max: 60,
   }),
 }
 

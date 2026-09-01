@@ -29,27 +29,42 @@ export const Breadcrumbs = () => {
   })
 
   const Separator = ICONS.next
+  const Back = ICONS.back
+  const parent = crumbs[crumbs.length - 2]
 
   return (
-    <nav aria-label={NAV_COPY.breadcrumbs} className={APP_SHELL.breadcrumbs}>
-      {crumbs.map((crumb, index) => {
-        const isLast = index === crumbs.length - 1
+    <>
+      {parent && (
+        <nav aria-label={NAV_COPY.breadcrumbs} className={APP_SHELL.breadcrumbsCompact}>
+          <Link href={parent.href} className={APP_SHELL.crumbLink}>
+            <span className="flex items-center gap-1">
+              <Back className="h-3 w-3" aria-hidden="true" />
+              {parent.label}
+            </span>
+          </Link>
+        </nav>
+      )}
 
-        return (
-          <span key={crumb.href} className="flex items-center gap-1">
-            {index > 0 && <Separator className="h-3 w-3 opacity-60" aria-hidden="true" />}
-            {isLast ? (
-              <span className={APP_SHELL.crumbCurrent} aria-current="page">
-                {crumb.label}
-              </span>
-            ) : (
-              <Link href={crumb.href} className={APP_SHELL.crumbLink}>
-                {crumb.label}
-              </Link>
-            )}
-          </span>
-        )
-      })}
-    </nav>
+      <nav aria-label={NAV_COPY.breadcrumbs} className={APP_SHELL.breadcrumbs}>
+        {crumbs.map((crumb, index) => {
+          const isLast = index === crumbs.length - 1
+
+          return (
+            <span key={crumb.href} className="flex items-center gap-1">
+              {index > 0 && <Separator className="h-3 w-3 opacity-60" aria-hidden="true" />}
+              {isLast ? (
+                <span className={APP_SHELL.crumbCurrent} aria-current="page">
+                  {crumb.label}
+                </span>
+              ) : (
+                <Link href={crumb.href} className={APP_SHELL.crumbLink}>
+                  {crumb.label}
+                </Link>
+              )}
+            </span>
+          )
+        })}
+      </nav>
+    </>
   )
 }

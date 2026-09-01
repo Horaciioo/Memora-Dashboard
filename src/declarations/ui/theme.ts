@@ -5,7 +5,19 @@ import type { IconName } from '@/declarations/ui/icons'
 import { isHexColour } from '@/utils/format/colour'
 import { THEME, tw, type TokenRef } from '@/utils/format/theme'
 
-export type Tone = 'brand' | 'success' | 'caution' | 'warning' | 'danger' | 'info' | 'neutral'
+// Tones of the interface. The two authority ones are reserved to the encadrement roles of
+// ROLE_REGISTRY: an administrator is red, a responsable is orange, and nothing else wears
+// either. A status or a tag reaching for red or orange takes danger or warning instead
+export type Tone =
+  | 'brand'
+  | 'success'
+  | 'caution'
+  | 'warning'
+  | 'danger'
+  | 'info'
+  | 'neutral'
+  | 'authorityAdmin'
+  | 'authorityLead'
 
 /**
  * Tone class set
@@ -75,6 +87,14 @@ export const TONES: Record<Tone, ToneStyles> = {
     text: THEME.colour.inkSubtle,
     border: THEME.colour.borderStrong,
   }),
+  authorityAdmin: drawTone({
+    fill: THEME.colour.authorityAdmin,
+    soft: THEME.colour.authorityAdminSoft,
+  }),
+  authorityLead: drawTone({
+    fill: THEME.colour.authorityLead,
+    soft: THEME.colour.authorityLeadSoft,
+  }),
 }
 
 /**
@@ -90,6 +110,8 @@ export const TONE_ICON: Record<Tone, IconName> = {
   danger: 'failure',
   info: 'info',
   neutral: 'help',
+  authorityAdmin: 'shield',
+  authorityLead: 'shield',
 }
 
 /**
@@ -105,6 +127,8 @@ export const TONE_BORDER: Record<Tone, string> = {
   danger: TONES.danger.border,
   info: TONES.info.border,
   neutral: TONES.neutral.border,
+  authorityAdmin: TONES.authorityAdmin.border,
+  authorityLead: TONES.authorityLead.border,
 }
 
 /**
@@ -130,6 +154,8 @@ export const TONE_VARS: Record<Tone, string> = {
   danger: THEME.colour.danger,
   info: THEME.colour.info,
   neutral: THEME.colour.neutral,
+  authorityAdmin: THEME.colour.authorityAdmin,
+  authorityLead: THEME.colour.authorityLead,
 }
 
 /**

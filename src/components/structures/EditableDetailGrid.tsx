@@ -102,6 +102,8 @@ export const EditableDetailGrid = ({
         const isEditing = editing === field.name
         const autoSaves = AUTO_SAVE_KINDS.includes(field.kind)
         const error = errorOf(field.name)
+        // A locked entry keeps its read rendering, so it never poses as a control
+        const isLocked = Boolean(disabled) || Boolean(field.readOnly)
 
         const onBlur = (event: FocusEvent<HTMLElement>) => {
           if (event.currentTarget.contains(event.relatedTarget as Node)) return
@@ -155,15 +157,15 @@ export const EditableDetailGrid = ({
               </dd>
             ) : (
               <dd
-                role="button"
-                tabIndex={disabled ? -1 : 0}
-                onClick={() => startEditing(field)}
+                role={isLocked ? undefined : 'button'}
+                tabIndex={isLocked ? undefined : 0}
+                onClick={isLocked ? undefined : () => startEditing(field)}
                 onKeyDown={(event) => {
-                  if (event.key === 'Enter') startEditing(field)
+                  if (!isLocked && event.key === 'Enter') startEditing(field)
                 }}
                 className={cn(
                   display ? DETAIL_BLOCK.value : DETAIL_BLOCK.empty,
-                  !disabled &&
+                  !isLocked &&
                     '-mx-1.5 -my-0.5 cursor-pointer rounded-[var(--radius-sm)] px-1.5 py-0.5 transition-colors hover:bg-[var(--color-surface)]'
                 )}
               >

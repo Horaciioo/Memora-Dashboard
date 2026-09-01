@@ -53,10 +53,11 @@ export const PROGRESS_STYLES = {
  */
 
 export const TOAST_STYLES = {
+  // Above the floating nav pill on mobile, pinned top-right from md
   stack:
-    'pointer-events-none fixed top-4 right-4 z-[60] flex w-[min(23rem,calc(100vw-2rem))] flex-col gap-2',
+    'pointer-events-none fixed inset-x-4 bottom-[calc(var(--shell-bottom-nav-h)_+_1.5rem_+_env(safe-area-inset-bottom))] z-[60] flex flex-col gap-2 md:inset-x-auto md:top-4 md:right-4 md:bottom-auto md:w-[min(23rem,calc(100vw-2rem))]',
   toast:
-    'surface-enter pointer-events-auto flex items-start gap-3 rounded-[var(--radius-lg)] border border-l-4 border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm shadow-[var(--shadow-lg)]',
+    'surface-enter pointer-events-auto flex touch-pan-y items-start gap-3 rounded-[var(--radius-lg)] border border-l-4 border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm shadow-[var(--shadow-lg)]',
   badge: 'flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)]',
   glyph: 'h-4 w-4',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',

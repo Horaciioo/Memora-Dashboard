@@ -5,7 +5,6 @@ import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { captureException } from '@/core/lib/sentry'
 import { ERROR_PAGE_COPY } from '@/declarations/ui/copy'
-import { PAGE_STYLES } from '@/declarations/ui/variants'
 
 export interface ErrorBoundaryScreenProps {
   error: Error & { digest?: string }
@@ -34,7 +33,7 @@ export const ErrorBoundaryScreen = ({
   }, [error])
 
   return (
-    <div className={PAGE_STYLES.wrapper}>
+    <div className="mx-auto flex min-h-[60dvh] w-full max-w-md flex-col items-center justify-center">
       <EmptyState
         figure="settings"
         title={title ?? ERROR_PAGE_COPY.title}

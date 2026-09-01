@@ -6,7 +6,8 @@
 export const TABLE_STYLES = {
   wrapper:
     'w-full overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
-  table: 'w-full min-w-full border-collapse text-sm',
+  // The grid is desktop only, a card list stands in for it below md
+  table: 'hidden w-full min-w-full border-collapse text-sm md:table',
   headRow:
     'border-b border-[var(--color-border)] text-left text-xs tracking-wide text-[var(--color-ink-subtle)] uppercase',
   headCell: 'px-4 py-3 font-semibold whitespace-nowrap',
@@ -14,6 +15,12 @@ export const TABLE_STYLES = {
   row: 'border-b border-[var(--color-border)] transition-colors last:border-0 hover:bg-[var(--color-surface)]',
   rowActive: 'bg-[var(--color-brand-soft)]',
   cell: 'px-4 py-3 align-middle',
+  cards: 'flex flex-col gap-2 p-2 md:hidden',
+  card: 'flex w-full flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 text-left transition-[border-color]',
+  cardOpen: 'cursor-pointer hover:border-[var(--color-brand-400)]',
+  cardActive: 'bg-[var(--color-brand-soft)]',
+  cardHead: 'text-sm font-medium',
+  cardMeta: 'flex flex-wrap items-center gap-2 text-xs',
 } as const
 
 /**
@@ -71,7 +78,6 @@ export const BOARD_STYLES = {
   cardTitle: 'text-sm leading-snug font-medium',
   // Glyph flowing before a title, spaced by text rather than framed
   cardGlyph: 'mr-1.5',
-  cardMeta: 'flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -160,7 +166,10 @@ export const CALENDAR_STYLES = {
   weekdays:
     'border-b border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   weekdaysMonth: 'grid grid-cols-7',
-  weekdaysWeek: 'grid grid-cols-[4rem_repeat(7,minmax(0,1fr))]',
+  weekdaysTimed: 'grid',
+  // Hour gutter, then one column per day on screen
+  columnsDay: 'grid-cols-[4rem_minmax(0,1fr)]',
+  columnsWeek: 'grid-cols-[4rem_repeat(7,minmax(0,1fr))]',
   weekday: 'px-2 py-2 text-center',
   weekdayHead: 'flex flex-col items-center gap-1',
   month: 'grid grid-cols-7',
@@ -183,22 +192,24 @@ export const CALENDAR_STYLES = {
   barRunsIn: '-ml-1.5',
   barRunsOut: '-mr-1.5',
   entry:
-    'relative flex w-full cursor-grab items-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-opacity hover:opacity-80 active:cursor-grabbing',
+    'relative flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-opacity hover:opacity-80 active:cursor-grabbing',
   entryTime: 'shrink-0 tabular-nums opacity-70',
-  entryTitle: 'truncate font-medium',
+  // A long title wraps onto the next line rather than losing its end
+  entryTitle: 'min-w-0 flex-1 font-medium break-words',
   // Full-colour fill, black label — pastel is kept for zones only
   entrySolid: 'text-[var(--color-on-accent)]',
+  // Absences sit behind everything else, grey and a shade back
+  entryMuted: 'border border-[var(--color-border)] opacity-75',
   entrySelected:
     'ring-2 ring-[var(--color-brand-600)] ring-offset-1 ring-offset-[var(--color-surface-raised)]',
   entryReadOnly: 'cursor-pointer border border-dashed',
   handle:
     'absolute inset-x-0 bottom-0 h-1.5 cursor-ns-resize rounded-b-[var(--radius-sm)] opacity-0 transition-opacity group-hover/entry:opacity-100',
   overflow: 'relative px-1.5 text-xs text-[var(--color-ink-subtle)]',
-  week: 'grid grid-cols-[4rem_repeat(7,minmax(0,1fr))]',
+  week: 'grid',
   hour: 'border-r border-b border-[var(--color-border)] px-2 py-1 text-right text-xs text-[var(--color-ink-subtle)] tabular-nums',
   slot: 'relative flex min-h-12 touch-none flex-col gap-1 border-r border-b border-[var(--color-border)] p-1 last:border-r-0',
-  allDay:
-    'grid grid-cols-[4rem_repeat(7,minmax(0,1fr))] border-b border-[var(--color-border)] bg-[var(--color-surface)]/60',
+  allDay: 'grid border-b border-[var(--color-border)] bg-[var(--color-surface)]/60',
   allDayLabel:
     'border-r border-[var(--color-border)] px-2 py-1 text-right text-xs text-[var(--color-ink-subtle)]',
   allDayCell:

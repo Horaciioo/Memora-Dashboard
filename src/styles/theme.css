@@ -17,17 +17,17 @@
   --color-border: #e4e4e7;
   --color-border-strong: #d4d4d8;
 
-  /* One rose — soft, never dark magenta. The ramp collapses toward 600. */
-  --color-brand-50: #fdf2f8;
-  --color-brand-100: #fce7f3;
-  --color-brand-200: #fbcfe8;
-  --color-brand-300: #f9a8d4;
-  --color-brand-400: #f472b6;
+  /* One orchid — every rung sits on the hue of 600, never the old pink ramp */
+  --color-brand-50: #fef2ff;
+  --color-brand-100: #fde1fe;
+  --color-brand-200: #fbc8fe;
+  --color-brand-300: #f8a5fd;
+  --color-brand-400: #f792fc;
   --color-brand-500: #f581fc;
   --color-brand-600: #f581fc;
-  --color-brand-700: #db2777;
-  --color-brand-800: #be185d;
-  --color-brand-900: #9d174d;
+  --color-brand-700: #db50e2;
+  --color-brand-800: #c12cc9;
+  --color-brand-900: #932999;
   --color-on-brand: #ffffff;
   /* Black label laid over a full-colour fill */
   --color-on-accent: #18181b;
@@ -46,7 +46,20 @@
   --color-danger-soft: #fef2f2;
   --color-info-soft: #eff6ff;
   --color-neutral-soft: #f4f4f5;
-  --color-brand-soft: #fce7f3;
+  --color-brand-soft: #fde1fe;
+
+  /* Fixed light ground a camera can read a code off, identical in both themes */
+  --color-scan-ground: #ffffff;
+
+  /* Floating mobile nav pill — constant dark surface, identical in both themes */
+  --color-nav-surface: #141417;
+  --color-nav-ink: #ffffff;
+
+  /* Authority — reserved to the two encadrement roles, never a category tone */
+  --color-authority-admin: #e11d1d;
+  --color-authority-lead: #f97316;
+  --color-authority-admin-soft: #fef2f2;
+  --color-authority-lead-soft: #fff7ed;
 
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
@@ -71,21 +84,21 @@
   --color-surface-sunken: #0b0b0d;
   --color-ink: #fafafa;
   --color-ink-subtle: #a1a1aa;
-  --color-ink-accent: #f9a8d4;
+  --color-ink-accent: #f8a5fd;
   --color-border: #27272a;
   --color-border-strong: #3f3f46;
 
-  --color-brand-50: #2a0a1c;
-  --color-brand-100: #3d1029;
-  --color-brand-200: #5b1540;
-  --color-brand-300: #8a2060;
-  --color-brand-400: #f581fc;
-  --color-brand-500: #f472b6;
-  --color-brand-600: #f472b6;
-  --color-brand-700: #f9a8d4;
-  --color-brand-800: #fbcfe8;
-  --color-brand-900: #fce7f3;
-  --color-on-brand: #4a0e2e;
+  --color-brand-50: #370e39;
+  --color-brand-100: #4f1353;
+  --color-brand-200: #711a75;
+  --color-brand-300: #a421ab;
+  --color-brand-400: #e13eea;
+  --color-brand-500: #ef64f7;
+  --color-brand-600: #f581fc;
+  --color-brand-700: #f8a5fd;
+  --color-brand-800: #fbc8fe;
+  --color-brand-900: #fde1fe;
+  --color-on-brand: #320934;
 
   --color-success: #4ade80;
   --color-caution: #eab308;
@@ -100,7 +113,12 @@
   --color-danger-soft: #2c1414;
   --color-info-soft: #121f33;
   --color-neutral-soft: #232326;
-  --color-brand-soft: #3d1029;
+  --color-brand-soft: #4f1353;
+
+  --color-authority-admin: #f75555;
+  --color-authority-lead: #fdba74;
+  --color-authority-admin-soft: #2c1414;
+  --color-authority-lead-soft: #2c1c0f;
 
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-md: 0 6px 20px -8px rgb(0 0 0 / 0.6);

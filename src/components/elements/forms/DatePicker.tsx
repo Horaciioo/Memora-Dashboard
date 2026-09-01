@@ -5,7 +5,11 @@ import { useAnchoredPanel } from '@/core/hooks/interaction/useAnchoredPanel'
 import { PICKER_COPY } from '@/declarations/ui/copy'
 import { WEEKDAY_LABELS } from '@/declarations/calendar/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { DATE_PICKER_STYLES, SELECT_MENU_STYLES } from '@/declarations/ui/variants'
+import {
+  DATE_PICKER_STYLES,
+  SELECT_MENU_SIZES,
+  SELECT_MENU_STYLES,
+} from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { monthGrid, periodLabel, shiftAnchor, toDayKey } from '@/utils/format/calendar'
 import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
@@ -178,7 +182,7 @@ export const DatePicker = ({
         onClick={() => (isOpen ? setOpen(false) : open())}
         className={cn(
           SELECT_MENU_STYLES.trigger,
-          SELECT_MENU_STYLES.triggerBlock,
+          SELECT_MENU_SIZES.block.trigger,
           invalid && SELECT_MENU_STYLES.invalid
         )}
       >

@@ -92,12 +92,14 @@ export interface FieldCondition {
  * @property {number} [step] - Number increment
  * @property {number} [maxLength] - Longest text
  * @property {number} [maxItems] - Most entries
+ * @property {string} [prefix] - Static text drawn before the control, never stored
  * @property {string} [glyph] - Emoji field drawn beside this control
  * @property {'full' | 'half'} [span] - Grid width
  * @property {string} [group] - Category the field sits under
  * @property {OptionMark} [mark] - Glyph drawn beside each option
  * @property {StorageBucket} [bucket] - Destination bucket of an image field
  * @property {MaturityName} [maturity] - Lifecycle tag drawn beside the label
+ * @property {boolean} [adminOnly] - Only an administrator may write it
  * @property {FieldCondition} [visibleWhen] - Display rule
  */
 
@@ -115,12 +117,14 @@ export interface FieldDefinition {
   step?: number
   maxLength?: number
   maxItems?: number
+  prefix?: string
   glyph?: string
   span?: 'full' | 'half'
   group?: string
   mark?: OptionMark
   bucket?: StorageBucket
   maturity?: MaturityName
+  adminOnly?: boolean
   visibleWhen?: FieldCondition
 }
 

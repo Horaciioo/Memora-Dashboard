@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
 /**
  * Hold a local draft that resets when its source changes
@@ -14,5 +14,8 @@ export const useSyncedState = <T>(source: T): [T, (value: T) => void] => {
   // Reset without an effect, React re-renders straight away
   if (state.source !== source) setState({ draft: source, source })
 
-  return [state.draft, (draft: T) => setState((current) => ({ ...current, draft }))]
+  // Stable across renders, so a caller may list it as a dependency
+  const setDraft = useCallback((draft: T) => setState((current) => ({ ...current, draft })), [])
+
+  return [state.draft, setDraft]
 }

@@ -71,10 +71,9 @@ export type GlyphSize = keyof Omit<typeof GLYPH_STYLES, 'base'>
 
 export const DIALOG_STYLES = {
   overlay:
-    'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-ink)]/50 p-0 backdrop-blur-md sm:items-center sm:p-6',
+    'overlay-enter fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-ink)]/50 p-4 backdrop-blur-md sm:p-6',
   panel:
-    'surface-enter relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] sm:rounded-[var(--radius-xl)]',
-  grip: 'mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-[var(--color-border-strong)] sm:hidden',
+    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
   header: 'flex items-start gap-3 px-5 pt-5 pb-4 sm:px-6',
   heading: 'flex min-w-0 flex-1 flex-col gap-1',
   title: 'text-lg leading-tight font-bold tracking-tight',
@@ -270,4 +269,74 @@ export const CONSENT_STYLES = {
   action: 'w-full justify-center',
   divider: 'h-px w-full bg-[var(--color-border)]',
   error: 'text-center text-xs text-[var(--color-danger)]',
+} as const
+
+/**
+ * Wizard styles — a progress header, one step on screen, a footer of two moves
+ * @type {Record<string, string>}
+ */
+
+export const WIZARD_STYLES = {
+  frame: 'flex flex-col gap-7',
+  header: 'flex flex-col gap-4',
+  heading: 'flex flex-col gap-1',
+  counter:
+    'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-[var(--color-ink-accent)] uppercase',
+  title: 'text-xl font-extrabold tracking-tight italic sm:text-2xl',
+  hint: 'text-sm text-[var(--color-ink-subtle)] italic',
+  body: 'flex min-h-64 flex-col gap-4',
+  footer: 'flex items-center justify-between gap-3 border-t border-[var(--color-border)] pt-6',
+  // The rail only fits on a wide viewport, the bar carries the progress on a narrow one
+  rail: 'hidden sm:block',
+} as const
+
+/**
+ * Public integration form styles — a standing creator banner, the form bare beside it
+ * @type {Record<string, string>}
+ */
+
+export const ONBOARDING_STYLES = {
+  // A gutter of its own, so the banner never welds itself to the window edge
+  page: 'grid min-h-screen grid-cols-1 gap-2 p-2 lg:grid-cols-[40fr_60fr]',
+  banner:
+    'relative isolate flex h-56 flex-col justify-between overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-surface-sunken)] p-6 sm:h-72 lg:sticky lg:top-2 lg:h-[calc(100vh-1rem)] lg:p-8',
+  bannerImage: 'absolute inset-0 -z-20 h-full w-full object-cover',
+  // The scrim is what makes the title legible whatever the picture underneath
+  bannerScrim: 'absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/45 to-black/20',
+  bannerMark: 'w-28 opacity-90 brightness-0 invert lg:w-32',
+  bannerFoot: 'flex flex-col gap-2',
+  bannerEyebrow:
+    'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-white/70 uppercase',
+  bannerTitle: 'text-2xl font-extrabold tracking-tight text-white italic sm:text-3xl lg:text-4xl',
+  bannerLead: 'max-w-sm text-sm text-white/75 italic',
+  // No frame, no card: the form stands on the page itself
+  panel: 'flex min-w-0 flex-col justify-center px-2 py-8 sm:px-6 lg:px-12 lg:py-14',
+  form: 'mx-auto flex w-full max-w-xl flex-col gap-8',
+  identity:
+    'flex items-center gap-4 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)]',
+  identityName: 'text-base font-semibold',
+  // The identifier sits under the name, smaller and quieter
+  identityHandle: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
+  notice:
+    'flex flex-col gap-1 rounded-[var(--radius-md)] border-l-2 border-[var(--color-brand-600)] bg-[var(--color-brand-soft)] px-4 py-3 text-xs text-[var(--color-ink-subtle)]',
+  noticeTitle: 'text-xs font-semibold text-[var(--color-ink)]',
+  lead: 'text-sm text-[var(--color-ink-subtle)]',
+  heading: 'font-medium',
+  body: 'flex flex-col gap-4',
+  intro: 'flex flex-col gap-1',
+  actions: 'flex flex-wrap items-center gap-3',
+  outcome: 'flex flex-col gap-2 text-center',
+  outcomeTitle: 'text-xl font-extrabold tracking-tight italic',
+} as const
+
+/**
+ * Controls of the timeline step that hands out the integration form
+ * @type {Record<string, string>}
+ */
+
+export const INTEGRATION_STEP_STYLES = {
+  frame:
+    'mt-2 flex w-full flex-col gap-3 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)] p-3',
+  row: 'flex flex-wrap items-center gap-2',
+  meta: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
 } as const

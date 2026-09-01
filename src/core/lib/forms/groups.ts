@@ -1,6 +1,23 @@
 import { visibleFields } from '@/core/lib/forms/visibility'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
+import type { IconName } from '@/declarations/ui/icons'
 import type { FieldDefinition, FormValues } from '@/types/forms'
+
+/**
+ * Icon of each form category, keyed on its label since that is all a group carries
+ * @type {Record<string, IconName>}
+ */
+
+export const FORM_GROUP_ICONS: Record<string, IconName> = {
+  [FORM_GROUPS.essentials]: 'sheet',
+  [FORM_GROUPS.assignment]: 'members',
+  [FORM_GROUPS.planning]: 'clock',
+  [FORM_GROUPS.details]: 'note',
+  [FORM_GROUPS.identity]: 'sheet',
+  [FORM_GROUPS.contact]: 'mail',
+  [FORM_GROUPS.visibility]: 'visible',
+  [FORM_GROUPS.encadrement]: 'shield',
+}
 
 /**
  * One category of a form declaration
