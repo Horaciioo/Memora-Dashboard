@@ -19,16 +19,18 @@ const NotificationsPanel = dynamic(
 
 export interface NotificationsBellProps {
   initialUnread: number
+  iconClassName?: string
 }
 
 /**
  * Bell of the rail, its pastille resolved server-side so the badge is right on first paint
  * and the page itself only travels once the window opens
  * @param {number} initialUnread - Unopened count resolved server-side
+ * @param {string} [iconClassName] - Classes overriding the standard glyph size
  * @return {JSX.Element}
  */
 
-export const NotificationsBell = ({ initialUnread }: NotificationsBellProps) => {
+export const NotificationsBell = ({ initialUnread, iconClassName }: NotificationsBellProps) => {
   const feed = useNotificationFeed(
     { entries: [], unread: initialUnread },
     NOTIFICATION_SETTINGS.panelSize
@@ -57,7 +59,7 @@ export const NotificationsBell = ({ initialUnread }: NotificationsBellProps) => 
         onClick={toggle}
         className={cn(BUTTON_STYLES.base, BUTTON_STYLES.icon, NOTIFICATION_STYLES.trigger)}
       >
-        <BellIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
+        <BellIcon className={iconClassName ?? 'h-4 w-4 shrink-0'} aria-hidden="true" />
         {feed.unread > 0 && <span className={NOTIFICATION_STYLES.pastille}>{feed.unread}</span>}
       </button>
 

@@ -77,6 +77,7 @@ export interface CreatorLead {
  * @typedef {Object} ViewContext
  * @property {NavigationViewName} view - View on screen
  * @property {NavigationViewName[]} available - Views the member may switch between
+ * @property {boolean} switchable - Lightning shows, encadrement only
  * @property {CreatorLead[]} creators - Creators the member may pick between
  * @property {string | null} activeYoutuberId - Creator the view is narrowed to
  */
@@ -84,6 +85,7 @@ export interface CreatorLead {
 export interface ViewContext {
   view: NavigationViewName
   available: NavigationViewName[]
+  switchable: boolean
   creators: CreatorLead[]
   activeYoutuberId: string | null
 }

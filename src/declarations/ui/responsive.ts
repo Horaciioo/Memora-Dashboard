@@ -29,13 +29,17 @@ export const MEDIA: Record<BreakpointName, string> = {
 export const MOBILE_SHELL_QUERY = `(width < ${BREAKPOINTS[RESPONSIVE_SETTINGS.mobileUntil]}px)`
 
 /**
- * Fixed chrome heights of the mobile shell, in pixels
- * @type {{ topBar: number, bottomNav: number }}
+ * Fixed chrome dimensions of the shell, in pixels
+ * @type {{ topBar: number, bottomNav: number, sidebar: number, sidebarCollapsed: number, rail: number, gutter: number }}
  */
 
 export const SHELL_DIMENSIONS = {
   topBar: RESPONSIVE_SETTINGS.topBarHeight,
   bottomNav: RESPONSIVE_SETTINGS.bottomNavHeight,
+  sidebar: RESPONSIVE_SETTINGS.sidebarWidth,
+  sidebarCollapsed: RESPONSIVE_SETTINGS.sidebarCollapsedWidth,
+  rail: RESPONSIVE_SETTINGS.railWidth,
+  gutter: RESPONSIVE_SETTINGS.gutter,
 } as const
 
 /**

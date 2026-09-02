@@ -1,5 +1,9 @@
+import { ROUTES } from '@/declarations/navigation'
+import { TEAM_COPY } from '@/declarations/teams/copy'
 import type { IconName } from '@/declarations/ui/icons'
 import type { IllustrationName } from '@/declarations/ui/illustrations'
+import { Permissions } from '@/utils/constants/permissions'
+import type { PermissionName } from '@/utils/constants/permissions'
 
 /**
  * Every reference collection managed from the admin console
@@ -388,3 +392,48 @@ export const isReferenceKey = (key: string): key is ReferenceKey =>
 
 export const referenceSectionsOfGroup = (key: ReferenceGroupKey): ReferenceSection[] =>
   REFERENCE_SECTIONS.filter((section) => section.group === key)
+
+/**
+ * Managed screen shown in the console beside the reference collections
+ * @typedef {Object} ReferenceScreen
+ * @property {ReferenceGroupKey} group - Console group
+ * @property {string} href - Destination
+ * @property {string} label - Card title
+ * @property {string} description - What the screen drives
+ * @property {IconName} icon - Icon key
+ * @property {PermissionName} permission - Permission needed
+ */
+
+export interface ReferenceScreen {
+  group: ReferenceGroupKey
+  href: string
+  label: string
+  description: string
+  icon: IconName
+  permission: PermissionName
+}
+
+/**
+ * Screens the console opens that are not reference collections
+ * @type {ReferenceScreen[]}
+ */
+
+export const REFERENCE_SCREENS: ReferenceScreen[] = [
+  {
+    group: 'organisation',
+    href: ROUTES.teams,
+    label: TEAM_COPY.title,
+    description: TEAM_COPY.lead,
+    icon: 'teams',
+    permission: Permissions.TeamRead,
+  },
+]
+
+/**
+ * Screens of one console group
+ * @param {ReferenceGroupKey} key - Group key
+ * @return {ReferenceScreen[]} - Screens in display order
+ */
+
+export const referenceScreensOfGroup = (key: ReferenceGroupKey): ReferenceScreen[] =>
+  REFERENCE_SCREENS.filter((screen) => screen.group === key)

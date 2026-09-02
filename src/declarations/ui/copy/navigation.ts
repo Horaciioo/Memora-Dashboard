@@ -6,8 +6,9 @@
 export const NAV_COPY = {
   breadcrumbs: 'Fil d’Ariane',
   sidebar: 'Navigation principale',
-  openSidebar: 'Ouvrir le menu',
-  closeSidebar: 'Fermer le menu',
+  rail: 'Compte et raccourcis',
+  expandSidebar: 'Déplier le menu',
+  collapseSidebar: 'Replier le menu',
   account: 'Mon compte',
   searchPlaceholder: 'Rechercher…',
   searchShortcut: '⌘K',

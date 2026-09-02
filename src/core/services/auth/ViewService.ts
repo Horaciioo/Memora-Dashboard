@@ -2,7 +2,7 @@ import 'server-only'
 
 import { readActiveCreator, readNavigationView } from '@/core/lib/auth/activeCreator'
 import { readLedCreators } from '@/core/services/auth/LeadService'
-import { ROLE_REGISTRY } from '@/declarations/access/roles'
+import { ROLE_REGISTRY, isEncadrement } from '@/declarations/access/roles'
 import { NAVIGATION_VIEW_ORDER, NavigationViews, viewDepth } from '@/declarations/navigation'
 import type { NavigationViewName } from '@/declarations/navigation'
 import { MemberRoles } from '@/utils/constants/hierarchy'
@@ -97,6 +97,8 @@ export const readViewContext = async (
   return {
     view,
     available,
+    // Lightning is a responsable-and-above affordance
+    switchable: available.length > 1 && (viewer.isRoot || isEncadrement(viewer.role)),
     creators,
     activeYoutuberId: known ? activeYoutuberId : null,
   }

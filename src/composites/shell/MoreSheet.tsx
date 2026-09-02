@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Dialog } from '@/components/structures/Dialog'
-import { CreatorSelect } from '@/composites/shell/CreatorSelect'
+import { CreatorPicker } from '@/composites/shell/CreatorPicker'
 import { visibleNavGroups } from '@/declarations/navigation'
 import { MOBILE_MORE } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
@@ -38,9 +38,10 @@ export const MoreSheet = ({ open, viewContext, shown, onClose }: MoreSheetProps)
     <Dialog open={open} onClose={onClose} title={NAV_COPY.moreTitle} size="sm">
       <div className={MOBILE_MORE.wrapper}>
         {viewContext.creators.length > 0 && (
-          <CreatorSelect
+          <CreatorPicker
             creators={viewContext.creators}
             activeYoutuberId={viewContext.activeYoutuberId}
+            labelled
           />
         )}
 
