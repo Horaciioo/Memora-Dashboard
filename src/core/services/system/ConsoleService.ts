@@ -46,6 +46,21 @@ export interface RuntimeReport {
 }
 
 /**
+ * Read one subject off a runtime report
+ * @param {RuntimeReport} report - Runtime report
+ * @param {ConfigSubject} subject - Subject key
+ * @return {SubjectState} - Subject state, off when the container never loaded
+ */
+
+export const subjectState = (report: RuntimeReport, subject: ConfigSubject): SubjectState =>
+  report.subjects.find((entry) => entry.subject === subject) ?? {
+    subject,
+    enabled: false,
+    required: false,
+    probe: null,
+  }
+
+/**
  * Data report
  * @typedef {Object} DataReport
  * @property {Record<string, number>} counts - One count per collection
@@ -131,5 +146,59 @@ export const readDataReport = async (scope: AccessScope): Promise<DataReport> =>
       logs,
       notifications,
     },
+  }
+}
+
+/**
+ * One bucket and what it holds
+ * @typedef {Object} BucketUsage
+ * @property {string} bucket - Bucket key as stored
+ * @property {number} entries - Objects kept
+ * @property {number} bytes - Bytes kept
+ */
+
+export interface BucketUsage {
+  bucket: string
+  entries: number
+  bytes: number
+}
+
+/**
+ * Storage report
+ * @typedef {Object} StorageReport
+ * @property {number} entries - Objects kept, every bucket together
+ * @property {number} bytes - Bytes kept, every bucket together
+ * @property {BucketUsage[]} buckets - One row per bucket holding something
+ */
+
+export interface StorageReport {
+  entries: number
+  bytes: number
+  buckets: BucketUsage[]
+}
+
+/**
+ * Measure what the store holds
+ * @return {Promise<StorageReport>} - Storage report
+ */
+
+export const readStorageReport = async (): Promise<StorageReport> => {
+  const rows = await prisma.storageEntry.groupBy({
+    by: ['bucket'],
+    _count: { _all: true },
+    _sum: { byteSize: true },
+    orderBy: { bucket: 'asc' },
+  })
+
+  const buckets = rows.map((row) => ({
+    bucket: row.bucket,
+    entries: row._count._all,
+    bytes: row._sum.byteSize ?? 0,
+  }))
+
+  return {
+    entries: buckets.reduce((total, entry) => total + entry.entries, 0),
+    bytes: buckets.reduce((total, entry) => total + entry.bytes, 0),
+    buckets,
   }
 }

@@ -1,4 +1,5 @@
 import type { MaturityName } from '@/declarations/maturity/registries'
+import { SYSTEM_SCREENS } from '@/declarations/system/screens'
 import type { IconName } from '@/declarations/ui/icons'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
@@ -17,7 +18,6 @@ export const ROUTES = {
   dashboard: '/tableau-de-bord',
   members: '/moderateurs',
   member: (id: string) => `/moderateurs/${id}`,
-  teams: '/equipes',
   projects: '/projets',
   project: (id: string) => `/projets/${id}`,
   tasks: '/taches',
@@ -42,74 +42,16 @@ export const ROUTES = {
   maturity: '/maturite',
   preferences: '/parametres',
   settings: '/configuration',
+  teams: '/configuration/equipes',
   settingsSection: (section: string) => `/configuration/${section}`,
   settingsRecord: (section: string, id: string) => `/configuration/${section}/${id}`,
+  system: '/systeme',
+  storage: '/systeme/stockage',
+  journal: '/systeme/journaux',
+  queues: '/systeme/files',
+  probes: '/systeme/sondes',
+  analytics: '/systeme/ga4',
 } as const
-
-/**
- * Rule keeping an entry out of the rail
- * @typedef {Object} NavigationCondition
- * @property {MemberStatusName[]} [statuses] - Statuses the entry is meant for
- * @property {MemberRoleName[]} [roles] - Roles the entry is meant for
- */
-
-export interface NavigationCondition {
-  statuses?: MemberStatusName[]
-  roles?: MemberRoleName[]
-}
-
-/**
- * Placement of an entry on the floating mobile nav pill
- * @typedef {Object} MobileNavSlot
- * @property {'home' | 'primary'} slot - Home sits centred, primary either side of it
- * @property {number} order - Rank among every primary entry, lowest shown first
- */
-
-export interface MobileNavSlot {
-  slot: 'home' | 'primary'
-  order: number
-}
-
-/**
- * Navigation entry
- * @typedef {Object} NavigationItem
- * @property {string} href - Destination
- * @property {string} label - Display label
- * @property {IconName} icon - Icon key
- * @property {PermissionName} [permission] - Permission needed
- * @property {NavigationCondition} [visibleWhen] - Display rule
- * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
- * @property {MobileNavSlot} [mobile] - Promotes the entry onto the mobile nav pill
- */
-
-export interface NavigationItem {
-  href: string
-  label: string
-  icon: IconName
-  permission?: PermissionName
-  visibleWhen?: NavigationCondition
-  maturity?: MaturityName
-  mobile?: MobileNavSlot
-}
-
-/**
- * Read a navigation rule against the signed-in member
- * @param {NavigationCondition | undefined} condition - Rule carried by the entry
- * @param {Object} member - Signed-in member
- * @param {MemberStatusName} member.status - Membership status
- * @param {MemberRoleName} member.role - Hierarchy level
- * @return {boolean} - Entry belongs on the rail
- */
-
-export const matchesNavigation = (
-  condition: NavigationCondition | undefined,
-  member: { status: MemberStatusName; role: MemberRoleName }
-): boolean => {
-  if (!condition) return true
-  if (condition.statuses && !condition.statuses.includes(member.status)) return false
-
-  return !condition.roles || condition.roles.includes(member.role)
-}
 
 // The three faces of the rail
 export const NavigationViews = {
@@ -154,28 +96,124 @@ export const isNavigationView = (candidate: string | undefined): candidate is Na
   candidate !== undefined && NAVIGATION_VIEW_ORDER.includes(candidate as NavigationViewName)
 
 /**
+ * Walk the reachable views in order, wrapping back to the narrowest one
+ * @param {NavigationViewName} view - View on screen
+ * @param {NavigationViewName[]} available - Views the member may switch between
+ * @return {NavigationViewName} - View the switch lands on
+ */
+
+export const nextNavigationView = (
+  view: NavigationViewName,
+  available: NavigationViewName[]
+): NavigationViewName =>
+  available.length === 0 ? view : available[(available.indexOf(view) + 1) % available.length]
+
+/**
+ * Rule keeping an entry out of the rail
+ * @typedef {Object} NavigationCondition
+ * @property {MemberStatusName[]} [statuses] - Statuses the entry is meant for
+ * @property {MemberRoleName[]} [roles] - Roles the entry is meant for
+ */
+
+export interface NavigationCondition {
+  statuses?: MemberStatusName[]
+  roles?: MemberRoleName[]
+}
+
+/**
+ * Placement of an entry on the floating mobile nav pill
+ * @typedef {Object} MobileNavSlot
+ * @property {'home' | 'primary'} slot - Home sits centred, primary either side of it
+ * @property {number} order - Rank among every primary entry, lowest shown first
+ */
+
+export interface MobileNavSlot {
+  slot: 'home' | 'primary'
+  order: number
+}
+
+/**
+ * Navigation entry
+ * @typedef {Object} NavigationItem
+ * @property {string} href - Destination
+ * @property {string} label - Display label
+ * @property {IconName} icon - Icon key
+ * @property {NavigationViewName} [from] - Narrowest view, defaults to the group's own
+ * @property {PermissionName} [permission] - Permission needed
+ * @property {NavigationCondition} [visibleWhen] - Display rule
+ * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
+ * @property {MobileNavSlot} [mobile] - Promotes the entry onto the mobile nav pill
+ */
+
+export interface NavigationItem {
+  href: string
+  label: string
+  icon: IconName
+  from?: NavigationViewName
+  permission?: PermissionName
+  visibleWhen?: NavigationCondition
+  maturity?: MaturityName
+  mobile?: MobileNavSlot
+}
+
+/**
  * Navigation group
  * @typedef {Object} NavigationGroup
  * @property {string} label - Section label
  * @property {NavigationViewName} from - Narrowest view the group appears in
+ * @property {NavigationViewName[]} [hiddenIn] - Views the group is pulled from
  * @property {NavigationItem[]} items - Entries
  */
 
 export interface NavigationGroup {
   label: string
   from: NavigationViewName
+  hiddenIn?: NavigationViewName[]
   items: NavigationItem[]
 }
 
 /**
- * Group belongs on the rail
+ * Read a navigation rule against the signed-in member
+ * @param {NavigationCondition | undefined} condition - Rule carried by the entry
+ * @param {Object} member - Signed-in member
+ * @param {MemberStatusName} member.status - Membership status
+ * @param {MemberRoleName} member.role - Hierarchy level
+ * @return {boolean} - Entry belongs on the rail
+ */
+
+export const matchesNavigation = (
+  condition: NavigationCondition | undefined,
+  member: { status: MemberStatusName; role: MemberRoleName }
+): boolean => {
+  if (!condition) return true
+  if (condition.statuses && !condition.statuses.includes(member.status)) return false
+
+  return !condition.roles || condition.roles.includes(member.role)
+}
+
+/**
+ * Group belongs on the rail, an explicit hide winning over the floor
  * @param {NavigationGroup} group - Navigation group
  * @param {NavigationViewName} view - Rail view on screen
  * @return {boolean} - Group belongs on the rail
  */
 
 export const groupInView = (group: NavigationGroup, view: NavigationViewName): boolean =>
-  viewDepth(view) >= viewDepth(group.from)
+  viewDepth(view) >= viewDepth(group.from) && !group.hiddenIn?.includes(view)
+
+/**
+ * Entry belongs on the rail, its own floor winning over the group's
+ * @param {NavigationItem} item - Navigation entry
+ * @param {NavigationGroup} group - Group holding it
+ * @param {NavigationViewName} view - Rail view on screen
+ * @return {boolean} - Entry belongs on the rail
+ */
+
+export const itemInView = (
+  item: NavigationItem,
+  group: NavigationGroup,
+  view: NavigationViewName
+): boolean => viewDepth(view) >= viewDepth(item.from ?? group.from)
 
 /**
  * Sidebar navigation tree
@@ -217,6 +255,13 @@ export const NAVIGATION: NavigationGroup[] = [
     from: NavigationViews.Lead,
     items: [
       {
+        href: ROUTES.members,
+        label: 'Modérateurs',
+        icon: 'members',
+        permission: Permissions.MemberRead,
+        mobile: { slot: 'primary', order: 6 },
+      },
+      {
         href: ROUTES.projects,
         label: 'Projets',
         icon: 'projects',
@@ -237,20 +282,6 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.MeetingRead,
         mobile: { slot: 'primary', order: 5 },
       },
-    ],
-  },
-  {
-    label: 'Équipe',
-    from: NavigationViews.Lead,
-    items: [
-      {
-        href: ROUTES.members,
-        label: 'Modérateurs',
-        icon: 'members',
-        permission: Permissions.MemberRead,
-        mobile: { slot: 'primary', order: 6 },
-      },
-      { href: ROUTES.teams, label: 'Équipes', icon: 'teams', permission: Permissions.TeamRead },
     ],
   },
   {
@@ -276,6 +307,8 @@ export const NAVIGATION: NavigationGroup[] = [
   {
     label: 'Modération',
     from: NavigationViews.Moderation,
+    // Off the responsable view, kept for the modération and admin ones
+    hiddenIn: [NavigationViews.Lead],
     items: [
       {
         href: ROUTES.sanctions,
@@ -287,7 +320,7 @@ export const NAVIGATION: NavigationGroup[] = [
     ],
   },
   {
-    label: 'Configuration',
+    label: 'Système',
     from: NavigationViews.Lead,
     items: [
       {
@@ -295,21 +328,25 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Configuration',
         icon: 'settings',
         permission: Permissions.ReferenceRead,
+        maturity: 'dev',
         mobile: { slot: 'primary', order: 2 },
       },
-    ],
-  },
-  {
-    label: 'Administration',
-    from: NavigationViews.Administration,
-    items: [
       {
         href: ROUTES.administration,
         label: 'Console admin',
         icon: 'console',
+        from: NavigationViews.Administration,
         permission: Permissions.AccessManage,
         mobile: { slot: 'primary', order: 1 },
       },
+      ...SYSTEM_SCREENS.map((screen) => ({
+        href: ROUTES[screen.route],
+        label: screen.label,
+        icon: screen.icon,
+        from: NavigationViews.Administration,
+        permission: Permissions.AccessManage,
+        maturity: screen.maturity,
+      })),
     ],
   },
 ]
@@ -354,6 +391,12 @@ export const SEGMENT_LABELS: Record<string, string> = {
   parametres: 'Paramètres',
   configuration: 'Configuration',
   acces: 'Accès',
+  systeme: 'Système',
+  stockage: 'Stockage',
+  journaux: 'Journaux',
+  files: 'Files de jobs',
+  sondes: 'Sondes',
+  ga4: 'GA4',
 }
 
 /**
@@ -376,6 +419,7 @@ export const visibleNavGroups = (
       ...group,
       items: group.items.filter(
         (item) =>
+          itemInView(item, group, view) &&
           (!item.permission || can(item.permission)) &&
           (!member || matchesNavigation(item.visibleWhen, member))
       ),

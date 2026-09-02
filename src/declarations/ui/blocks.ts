@@ -268,6 +268,10 @@ export const CONSOLE_BLOCK = {
   rowIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
   rowMeta: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
   rowStatus: 'flex flex-wrap items-center gap-2',
+  cardHead: 'flex flex-wrap items-center gap-2',
+  cardIcon: 'h-4 w-4 shrink-0 text-[var(--color-brand-600)]',
+  cardTitle: 'font-bold',
+  cardLead: 'text-sm text-[var(--color-ink-subtle)]',
   chooser: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3',
   choice:
     'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 text-left transition-colors hover:border-[var(--view)] hover:bg-[var(--color-surface)]',

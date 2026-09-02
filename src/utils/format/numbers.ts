@@ -41,3 +41,26 @@ export function formatNumberWithUnits(num: number): string {
 export function formatNumberReadable(num: number): string {
   return formatNumber(num)
 }
+
+// Byte unit ladder, each rung a thousandfold of the one below
+const BYTE_UNITS = ['o', 'ko', 'Mo', 'Go', 'To']
+
+const BYTE_STEP = 1000
+
+/**
+ * Format a byte count
+ * @param {number} bytes - Byte count
+ * @return {string} - Count and its unit
+ */
+
+export function formatBytes(bytes: number): string {
+  const rung =
+    bytes < BYTE_STEP
+      ? 0
+      : Math.min(Math.floor(Math.log(bytes) / Math.log(BYTE_STEP)), BYTE_UNITS.length - 1)
+
+  const value = bytes / BYTE_STEP ** rung
+  const digits = rung === 0 ? 0 : 1
+
+  return `${value.toLocaleString(DATE_LOCALE, { maximumFractionDigits: digits })} ${BYTE_UNITS[rung]}`
+}
