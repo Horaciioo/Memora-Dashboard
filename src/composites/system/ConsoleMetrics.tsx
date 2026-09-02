@@ -5,13 +5,13 @@ import { formatNumber } from '@/utils/format/numbers'
  * One counted figure
  * @typedef {Object} ConsoleMetric
  * @property {string} label - What is counted
- * @property {number} value - Count
+ * @property {number | string} value - Count, or a figure already carrying its unit
  * @property {string} [hint] - Supporting line
  */
 
 export interface ConsoleMetric {
   label: string
-  value: number
+  value: number | string
   hint?: string
 }
 
@@ -30,7 +30,9 @@ export const ConsoleMetrics = ({ metrics }: ConsoleMetricsProps) => (
     {metrics.map((metric) => (
       <div key={metric.label} className={CONSOLE_BLOCK.tile}>
         <span className={CONSOLE_BLOCK.tileLabel}>{metric.label}</span>
-        <span className={CONSOLE_BLOCK.tileValue}>{formatNumber(metric.value)}</span>
+        <span className={CONSOLE_BLOCK.tileValue}>
+          {typeof metric.value === 'number' ? formatNumber(metric.value) : metric.value}
+        </span>
         {metric.hint && <span className={CONSOLE_BLOCK.tileHint}>{metric.hint}</span>}
       </div>
     ))}
