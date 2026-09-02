@@ -71,7 +71,10 @@ export const BottomNav = ({ viewContext }: BottomNavProps) => {
 
   return (
     <>
-      <SearchLauncher iconOnly className={cn(MOBILE_NAV.fab, MOBILE_NAV.fabLeft)} />
+      <SearchLauncher
+        className={cn(MOBILE_NAV.fab, MOBILE_NAV.fabLeft)}
+        iconClassName={MOBILE_NAV.icon}
+      />
 
       <nav aria-label={NAV_COPY.sidebar} className={MOBILE_NAV.bar}>
         {ordered.map(renderLink)}

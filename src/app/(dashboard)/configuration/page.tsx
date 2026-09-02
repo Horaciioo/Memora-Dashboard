@@ -1,62 +1,60 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { PageHeader } from '@/components/structures/PageHeader'
+import { ConsoleCard } from '@/composites/system/ConsoleCard'
+import { CreatorPicker } from '@/composites/shell/CreatorPicker'
+import { readActiveCreator } from '@/core/lib/auth/activeCreator'
+import { pickableCreators } from '@/core/services/auth/ViewService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ACCESS_COPY } from '@/declarations/access/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { REFERENCE_COPY } from '@/declarations/reference/copy'
-import { REFERENCE_GROUPS, referenceSectionsOfGroup } from '@/declarations/reference/sections'
-import { ICONS } from '@/declarations/ui/icons'
-import type { IconName } from '@/declarations/ui/icons'
+import {
+  REFERENCE_GROUPS,
+  referenceScreensOfGroup,
+  referenceSectionsOfGroup,
+} from '@/declarations/reference/sections'
 import { GROUP_STYLES, LIST_STYLES, PAGE_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
-import { cn } from '@/utils/classnames'
 
 export const metadata: Metadata = { title: REFERENCE_COPY.title }
 
-// Console link card
-const ConsoleCard = ({
-  href,
-  icon,
-  label,
-  description,
-}: {
-  href: string
-  icon: IconName
-  label: string
-  description: string
-}) => {
-  const Icon = ICONS[icon]
-
-  return (
-    <Link href={href} className={cn(LIST_STYLES.card, LIST_STYLES.cardClickable)}>
-      <span className="flex items-center gap-2">
-        <Icon className="h-4 w-4 text-[var(--color-brand-600)]" aria-hidden="true" />
-        <span className="font-bold">{label}</span>
-      </span>
-      <span className="text-sm text-[var(--color-ink-subtle)]">{description}</span>
-    </Link>
-  )
-}
-
 /**
- * Admin console home, collections bucketed by group
+ * Admin console home
  * @return {Promise<JSX.Element>} - Configuration index
  */
 
 export default async function ConfigurationPage() {
-  const { access } = await requirePermission(Permissions.ReferenceRead)
+  const { session, access } = await requirePermission(Permissions.ReferenceRead)
 
   // Non-empty groups, in display order
   const groups = REFERENCE_GROUPS.map((group) => ({
     label: group.label,
     sections: referenceSectionsOfGroup(group.key),
-  })).filter((group) => group.sections.length > 0)
+    screens: referenceScreensOfGroup(group.key).filter((screen) => access.can(screen.permission)),
+  })).filter((group) => group.sections.length > 0 || group.screens.length > 0)
 
   const canManageAccess = access.can(Permissions.AccessManage)
 
+  // Creator scoping is a stub until the permission rebuild — see the note carried in memory
+  const [creators, storedCreatorId] = await Promise.all([
+    pickableCreators(session, access),
+    readActiveCreator(),
+  ])
+  const activeCreatorId = creators.some((creator) => creator.id === storedCreatorId)
+    ? storedCreatorId
+    : null
+
   return (
     <div className={PAGE_STYLES.wrapper}>
+      {creators.length > 1 && (
+        <CreatorPicker
+          creators={creators}
+          activeYoutuberId={activeCreatorId}
+          labelled
+          labelSlot={<MaturityTag maturity="dev" interactive={false} />}
+        />
+      )}
       <PageHeader title={REFERENCE_COPY.title} lead={REFERENCE_COPY.lead} />
       <div className={GROUP_STYLES.ruledStack}>
         {groups.map((group) => (
@@ -70,6 +68,15 @@ export default async function ConfigurationPage() {
                   icon={section.icon}
                   label={section.label}
                   description={section.description}
+                />
+              ))}
+              {group.screens.map((screen) => (
+                <ConsoleCard
+                  key={screen.href}
+                  href={screen.href}
+                  icon={screen.icon}
+                  label={screen.label}
+                  description={screen.description}
                 />
               ))}
             </div>

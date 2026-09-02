@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { AppShell } from '@/layouts/AppShell'
 import { AuthShell } from '@/layouts/AuthShell'
 import { HistoryConsentGate } from '@/composites/consent/HistoryConsentGate'
+import { readSidebarFold } from '@/core/lib/shell/readFold'
 import { countUnread } from '@/core/services/system/NotificationService'
 import { readSealState } from '@/core/services/auth/SealService'
 import { readTwoFactorState } from '@/core/services/auth/TwoFactorService'
@@ -44,15 +45,22 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     )
   }
 
-  const [unreadCount, viewContext, twoFactor, seal] = await Promise.all([
+  const [unreadCount, viewContext, twoFactor, seal, sidebarCollapsed] = await Promise.all([
     countUnread(session.id),
     readViewContext(session, access),
     readTwoFactorState(session.id),
     readSealState(),
+    readSidebarFold(),
   ])
 
   return (
-    <AppShell unreadCount={unreadCount} viewContext={viewContext} twoFactor={twoFactor} seal={seal}>
+    <AppShell
+      unreadCount={unreadCount}
+      viewContext={viewContext}
+      twoFactor={twoFactor}
+      seal={seal}
+      sidebarCollapsed={sidebarCollapsed}
+    >
       {children}
     </AppShell>
   )

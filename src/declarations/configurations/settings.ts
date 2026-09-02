@@ -463,8 +463,8 @@ const responsiveToastVisible = readNode(
 )
 
 /**
- * Breakpoint and mobile shell bounds
- * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number }}
+ * Breakpoint and shell chrome bounds
+ * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, sidebarWidth: number, sidebarCollapsedWidth: number, railWidth: number, gutter: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number }}
  */
 
 export const RESPONSIVE_SETTINGS = {
@@ -483,6 +483,27 @@ export const RESPONSIVE_SETTINGS = {
     path: 'system/responsive.shell.bottomNavHeight',
     fallback: 64,
     min: 40,
+  }),
+  sidebarWidth: readInteger(responsiveShell.sidebarWidth, {
+    path: 'system/responsive.shell.sidebarWidth',
+    fallback: 236,
+    min: 160,
+  }),
+  sidebarCollapsedWidth: readInteger(responsiveShell.sidebarCollapsedWidth, {
+    path: 'system/responsive.shell.sidebarCollapsedWidth',
+    fallback: 76,
+    min: 48,
+  }),
+  railWidth: readInteger(responsiveShell.railWidth, {
+    path: 'system/responsive.shell.railWidth',
+    fallback: 68,
+    min: 48,
+  }),
+  gutter: readInteger(responsiveShell.gutter, {
+    path: 'system/responsive.shell.gutter',
+    fallback: 12,
+    min: 0,
+    max: 48,
   }),
   maxPrimarySlots: readInteger(responsiveBottomNav.maxSlots, {
     path: 'system/responsive.bottomNav.maxSlots',

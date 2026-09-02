@@ -17,50 +17,78 @@ export const FLOATING_HINT = {
 
 export const APP_SHELL = {
   frame: 'flex min-h-dvh bg-[var(--color-background)]',
-  sidebar:
-    'hidden w-64 shrink-0 flex-col border-r border-[var(--color-border)] bg-[var(--color-surface-raised)] md:sticky md:top-0 md:flex md:h-dvh',
-  brand:
-    'flex items-center justify-center border-b border-[var(--color-border)] bg-[var(--color-surface-sunken)] px-4 py-6',
-  brandLogo: 'h-auto w-40',
-  search: 'px-3 pt-3',
-  searchTrigger:
-    'flex w-full min-w-0 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-border-strong)]',
-  searchHint:
-    'ml-auto hidden rounded-[var(--radius-sm)] border border-[var(--color-border)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-[10px] sm:block',
-  nav: 'flex flex-1 flex-col gap-5 overflow-y-auto px-3 py-4',
-  navGroup: 'flex flex-col gap-1',
-  navGroupLabel:
-    'px-2 pb-1 text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  navLink:
-    'group flex items-center gap-2.5 rounded-[var(--radius-md)] px-2.5 py-2 text-sm font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
-  navLinkActive: 'font-semibold text-[var(--color-brand-600)]',
-  navLabel: 'relative',
-  navLabelActive: 'nav-underline',
-  navIcon: 'h-4 w-4 shrink-0 transition-colors',
-  navIconActive: 'fill-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
-  navBadge:
-    'ml-auto rounded-[var(--radius-sm)] bg-[var(--color-warning)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-on-brand)]',
-  sidebarFooter: 'border-t border-[var(--color-border)] p-3',
-  accountRow: 'grid grid-cols-[1fr_auto_1fr] items-center gap-2 px-1',
-  accountControls: 'flex shrink-0 items-center gap-1 [&_button]:h-8 [&_button]:w-8',
-  accountControlsLeft: 'justify-end',
-  accountControlsRight: 'justify-start',
-  accountAvatar:
-    'justify-self-center rounded-[var(--radius-sm)] transition-opacity hover:opacity-80',
-  accountDivider: 'h-5 w-px shrink-0 bg-[var(--color-border)]',
-  viewToggle:
-    'flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--bolt)] transition-colors hover:bg-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-50',
-  viewToggleIcon: 'h-[18px] w-[18px] shrink-0 fill-current',
-  viewRibbon:
-    'mx-3 mt-3 flex items-baseline gap-2 rounded-[var(--radius-md)] border-l-2 border-[var(--view)] bg-[var(--view)]/8 px-2.5 py-1.5',
-  viewRibbonLabel: 'truncate text-[11px] font-semibold tracking-wide text-[var(--view)] uppercase',
   main: 'flex min-w-0 flex-1 flex-col',
-  content: 'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8',
+  // Gutters widen past md so a page never welds itself to either rail
+  content:
+    'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8',
   breadcrumbs: 'hidden flex-wrap items-center gap-1 text-xs text-[var(--color-ink-subtle)] sm:flex',
   // Below sm the trail folds to a single back link to the parent
   breadcrumbsCompact: 'flex items-center gap-1 text-xs text-[var(--color-ink-subtle)] sm:hidden',
   crumbLink: 'transition-colors hover:text-[var(--color-ink)]',
   crumbCurrent: 'font-medium text-[var(--color-ink)]',
+} as const
+
+/**
+ * Left sidebar classes, a frameless rail inset from the window and foldable to glyphs
+ * @type {Record<string, string>}
+ */
+
+export const LEFT_SIDEBAR = {
+  // Full-viewport sticky column that vertically centres the rail whatever its height
+  dock: 'hidden shrink-0 md:sticky md:top-0 md:flex md:h-dvh md:items-center md:py-[var(--shell-gutter)] md:pl-[var(--shell-gutter)]',
+  // Height tracks the tree, capped at the dock so a long one scrolls inside it
+  rail: 'group relative flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] py-4 transition-[width] duration-[var(--motion-duration-panel)] motion-reduce:transition-none md:max-h-full',
+  railExpanded: 'w-[var(--shell-sidebar-w)]',
+  railCollapsed: 'w-[var(--shell-sidebar-collapsed-w)]',
+  brand: 'flex shrink-0 items-center justify-center px-2',
+  brandLogo:
+    'h-auto transition-[width] duration-[var(--motion-duration-panel)] motion-reduce:transition-none',
+  brandLogoExpanded: 'w-32',
+  brandLogoCollapsed: 'w-10',
+  // Medium rule sitting under the wordmark
+  brandRule: 'mx-auto h-px w-2/3 shrink-0 bg-[var(--color-border)]',
+  // min-h-0 lets the tree scroll rather than push the rail past its cap
+  nav: 'flex min-h-0 w-full flex-col gap-5 overflow-y-auto px-2',
+  navGroup: 'flex flex-col gap-1',
+  navGroupLabel:
+    'px-2 pb-1 text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  // Folded, a short rule stands in for the heading, which stays readable to a screen reader
+  navGroupLabelFolded: 'sr-only',
+  navGroupRule: 'mx-auto mb-1 h-px w-6 bg-[var(--color-border)]',
+  navLink:
+    'group flex items-center gap-2.5 rounded-[var(--radius-md)] py-2 text-sm font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
+  navLinkExpanded: 'px-2.5',
+  navLinkCollapsed: 'justify-center px-0',
+  navLinkActive: 'font-semibold text-[var(--color-brand-600)]',
+  navLabel: 'relative',
+  navLabelFolded: 'sr-only',
+  navLabelActive: 'nav-underline',
+  navIcon: 'h-4 w-4 shrink-0 transition-colors',
+  navIconActive: 'fill-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
+  navMaturity: 'ml-auto',
+  // Straddles the right edge, surfacing only while the rail is hovered or the button focused
+  fold: 'absolute top-1/2 -right-3 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-ink-subtle)] opacity-0 shadow-[var(--shadow-sm)] transition-[opacity,color] duration-[var(--motion-duration-fast)] hover:text-[var(--color-ink)] focus-visible:opacity-100 group-hover:opacity-100 motion-reduce:transition-none',
+  foldIcon: 'h-3.5 w-3.5 shrink-0',
+} as const
+
+/**
+ * Right sidebar classes, glyphs only around a centred portrait, no frame of its own
+ * @type {Record<string, string>}
+ */
+
+export const RIGHT_SIDEBAR = {
+  rail: 'hidden w-[var(--shell-rail-w)] shrink-0 flex-col items-center py-[var(--shell-gutter)] pr-[var(--shell-gutter)] md:sticky md:top-0 md:flex md:h-dvh',
+  // Both halves share one basis, which is what lands the portrait on the middle of the rail
+  half: 'flex w-full flex-1 basis-0 flex-col items-center gap-2.5',
+  halfTop: 'justify-end pb-4',
+  halfBottom: 'justify-start pt-4',
+  avatar:
+    'shrink-0 rounded-full ring-2 ring-transparent transition-[opacity,box-shadow] hover:opacity-80 hover:ring-[var(--color-brand-400)]',
+  // Set on the glyph itself, never on the rail: a panel opened from here is a DOM descendant
+  glyphIcon: 'h-5 w-5 shrink-0',
+  // Sign-out draws through the Button primitive, which fixes its own glyph size
+  glyphHost: '[&_svg]:h-5 [&_svg]:w-5',
+  boltIcon: 'h-5 w-5 shrink-0 fill-current',
 } as const
 
 /**
@@ -291,13 +319,38 @@ export const ACCESS_BLOCK = {
 } as const
 
 /**
- * Creator picker classes
+ * Creator picker classes, portraits side by side and the active one lit by its accent
  * @type {Record<string, string>}
  */
 
-export const CREATOR_SELECT = {
-  wrapper: 'flex flex-col gap-1.5 px-3 pt-3',
+export const CREATOR_PICKER = {
+  wrapper: 'flex flex-col gap-2',
+  head: 'flex flex-wrap items-center gap-2',
   label: 'px-0.5 text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  list: 'flex flex-wrap items-center gap-1.5',
+  option:
+    'flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-2 transition-[opacity,box-shadow] hover:opacity-100 disabled:pointer-events-none disabled:opacity-40',
+  optionIdle: 'opacity-50 ring-transparent',
+  optionActive: 'opacity-100 ring-[var(--accent)]',
+  optionIcon: 'h-5 w-5 shrink-0 text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Creator switch classes, a trigger wearing the current pick and a strip unfurling
+ * leftward out of the rail
+ * @type {Record<string, string>}
+ */
+
+export const CREATOR_SWITCH = {
+  wrapper: 'relative flex shrink-0 items-center justify-center',
+  trigger:
+    'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
+  triggerIcon: 'h-5 w-5 shrink-0',
+  panel:
+    'absolute top-1/2 right-full z-50 mr-2 flex -translate-y-1/2 items-center rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1.5 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  panelOpen: 'visible translate-x-0 opacity-100',
+  // Kept mounted so the way out animates like the way in
+  panelShut: 'invisible translate-x-3 opacity-0',
 } as const
 
 /**

@@ -9,6 +9,7 @@ export const CookieKeys = {
   integrationClaim: 'integration_claim',
   navigationView: 'navigation_view',
   activeYoutuber: 'active_youtuber',
+  sidebarFold: 'sidebar_fold',
 } as const
 
 export type CookieKey = keyof typeof CookieKeys

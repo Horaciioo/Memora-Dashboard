@@ -1,17 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Button } from '@/components/elements/actions/Button'
 import { AccountSheet } from '@/composites/shell/AccountSheet'
-import { switchView } from '@/app/(dashboard)/actions'
+import { ViewToggle } from '@/composites/shell/ViewToggle'
 import { APP_NAME } from '@/declarations/app'
 import { ROUTES } from '@/declarations/navigation'
-import { NAVIGATION_VIEW_REGISTRY } from '@/declarations/access/views'
 import { TOP_BAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
-import { TONE_VARS } from '@/declarations/ui/theme'
 import type { ViewContext } from '@/types/access'
 import type { SessionUser } from '@/types/auth'
 
@@ -31,15 +28,9 @@ export interface MobileTopBarProps {
 
 export const MobileTopBar = ({ session, unreadCount, viewContext }: MobileTopBarProps) => {
   const [isAccountOpen, setAccountOpen] = useState(false)
-  const [isSwitching, startSwitching] = useTransition()
 
-  const { view, available, creators, activeYoutuberId } = viewContext
+  const { creators, activeYoutuberId } = viewContext
   const creator = creators.find((entry) => entry.id === activeYoutuberId) ?? null
-
-  const currentMeta = NAVIGATION_VIEW_REGISTRY.get(view)
-  // The lightning walks the reachable views in order, wrapping back to the base one
-  const nextView = available[(available.indexOf(view) + 1) % available.length]
-  const nextMeta = NAVIGATION_VIEW_REGISTRY.get(nextView)
 
   return (
     <header className={TOP_BAR.bar}>
@@ -55,17 +46,7 @@ export const MobileTopBar = ({ session, unreadCount, viewContext }: MobileTopBar
       </Link>
 
       <div className={TOP_BAR.actions}>
-        {available.length > 1 && (
-          <Button
-            variant="icon"
-            icon="flash"
-            aria-label={nextMeta.label}
-            title={nextMeta.summary}
-            disabled={isSwitching}
-            style={{ color: TONE_VARS[currentMeta.tone] }}
-            onClick={() => startSwitching(() => void switchView(nextView))}
-          />
-        )}
+        <ViewToggle viewContext={viewContext} />
         <button
           type="button"
           aria-label={NAV_COPY.account}
