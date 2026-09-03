@@ -10,6 +10,22 @@ import { APP_FONTS } from '@/declarations/app'
 const originOf = (url: string): string => new URL(url).origin
 
 /**
+ * Optional URL origin
+ * @param {string} [url] - Absolute URL
+ * @return {string[]} - Origin, or nothing
+ */
+
+const optionalOrigin = (url?: string): string[] => {
+  if (!url) return []
+
+  try {
+    return [new URL(url).origin]
+  } catch {
+    return []
+  }
+}
+
+/**
  * Every origin the browser may reach, derived from what the app already declares
  * @type {{ images: string[], fonts: string[], styles: string[], connect: string[] }}
  */
@@ -18,7 +34,8 @@ const ALLOWED_ORIGINS = {
   images: [originOf(DISCORD_ENDPOINTS.cdn)],
   fonts: [...APP_FONTS.preconnect],
   styles: [originOf(APP_FONTS.stylesheet)],
-  connect: [] as string[],
+  // The client SDK posts crash reports straight to the Sentry ingest host
+  connect: optionalOrigin(process.env.NEXT_PUBLIC_SENTRY_DSN),
 }
 
 /**
