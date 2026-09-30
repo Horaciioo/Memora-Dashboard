@@ -568,7 +568,6 @@ export interface CourseProgress {
  * @property {number} exercises - Exercises
  * @property {number} passed - Exercises cleared
  * @property {TrainingStatusName} status - Where the member stands
- * @property {boolean} locked - Opens with the second period
  */
 
 export interface CourseCard {
@@ -583,5 +582,4 @@ export interface CourseCard {
   exercises: number
   passed: number
   status: TrainingStatusName
-  locked: boolean
 }

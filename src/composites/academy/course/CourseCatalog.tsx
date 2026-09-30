@@ -81,7 +81,6 @@ const CourseTile = ({ course }: { course: CourseCard }) => {
   const tilt = useTilt()
   const surface = COURSE_SURFACE_REGISTRY.get(course.surface)
   const SurfaceIcon = ICONS[surface.icon]
-  const LockIcon = ICONS.lock
   const isDone = course.status === TrainingStatuses.Done
   const action = isDone
     ? COURSE_COPY.review
@@ -104,22 +103,15 @@ const CourseTile = ({ course }: { course: CourseCard }) => {
             <span>{COURSE_COPY.minutes(course.minutes)}</span>
             <span>{COURSE_COPY.exercises(course.exercises)}</span>
           </span>
-          {course.locked ? (
-            <span className={COURSE_CATALOG.lock}>
-              <LockIcon className="h-3.5 w-3.5" aria-hidden="true" />
-              {COURSE_COPY.locked}
-            </span>
-          ) : (
-            <span className="flex items-center gap-2">
-              <ProgressRing
-                value={course.passed}
-                max={course.exercises}
-                colour={surface.accent}
-                className="h-7 w-7"
-              />
-              <span className={COURSE_CATALOG.action}>{isDone ? COURSE_COPY.done : action}</span>
-            </span>
-          )}
+          <span className="flex items-center gap-2">
+            <ProgressRing
+              value={course.passed}
+              max={course.exercises}
+              colour={surface.accent}
+              className="h-7 w-7"
+            />
+            <span className={COURSE_CATALOG.action}>{isDone ? COURSE_COPY.done : action}</span>
+          </span>
         </div>
       </div>
     </>
@@ -127,15 +119,9 @@ const CourseTile = ({ course }: { course: CourseCard }) => {
 
   return (
     <div ref={tilt} className={COURSE_CATALOG.tilt}>
-      {course.locked ? (
-        <div className={cn(COURSE_CATALOG.card, COURSE_CATALOG.cardLocked)} aria-disabled="true">
-          {body}
-        </div>
-      ) : (
-        <Link href={ROUTES.training(course.id)} className={COURSE_CATALOG.card}>
-          {body}
-        </Link>
-      )}
+      <Link href={ROUTES.training(course.id)} className={COURSE_CATALOG.card}>
+        {body}
+      </Link>
     </div>
   )
 }

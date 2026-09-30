@@ -15,7 +15,6 @@ export const COURSE_CATALOG = {
   // The tilt lives on the wrapper, the card keeps its own hover
   tilt: 'block [transform-style:preserve-3d]',
   card: 'group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-left shadow-[var(--shadow-sm)] transition-shadow duration-[var(--motion-duration-moderate)] hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
-  cardLocked: 'cursor-not-allowed grayscale',
   body: 'flex flex-1 flex-col gap-3 p-5',
   surface: `flex items-center gap-2 ${PROPERTY_LABEL}`,
   name: 'text-lg leading-snug font-black tracking-tight text-balance',
@@ -23,7 +22,6 @@ export const COURSE_CATALOG = {
   foot: 'mt-auto flex items-center justify-between gap-3 pt-2 text-xs text-[var(--color-ink-subtle)]',
   meta: 'flex items-center gap-3 font-[family-name:var(--font-mono)] tabular-nums',
   action: 'text-sm font-bold text-[var(--color-brand-800)]',
-  lock: 'flex items-center gap-1.5 text-xs font-semibold text-[var(--color-ink-subtle)]',
   // Animated cover, chat lines drifting upward behind a glyph that floats above them
   cover:
     'relative flex h-36 items-center justify-center overflow-hidden [transform-style:preserve-3d]',

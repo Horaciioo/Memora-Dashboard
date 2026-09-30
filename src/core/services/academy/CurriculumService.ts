@@ -105,8 +105,8 @@ const concerns = (course: Course, trades: Set<string>, seesAll: boolean): boolea
   seesAll || course.functions.length === 0 || course.functions.some((name) => trades.has(name))
 
 /**
- * Read the catalogue a member follows: their trade's courses and the shared ones, secondary
- * courses opening once a junior reaches the second period
+ * Read the catalogue a member follows: the courses of the trade their session trains for and the
+ * shared ones, the secondary courses appearing only once a junior reaches the second period
  * @param {SessionUser} viewer - Signed-in member
  * @return {Promise<CourseCard[]>} - Courses, indispensable first
  */
@@ -135,6 +135,9 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
     const course = row.curriculumKey ? courseByKey(row.curriculumKey) : undefined
     if (!course || !concerns(course, trades, seesAll)) return []
 
+    // The first period shows the indispensable courses alone, the rest arrives with practice
+    if (course.track === 'secondary' && !inPractice && !seesAll) return []
+
     const record = row.records[0]
     const progress = readProgress(record?.progress)
     const exercises = exercisesOf(course)
@@ -152,7 +155,6 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
         exercises: exercises.length,
         passed: exercises.filter((block) => progress.blocks[block.key]?.passed).length,
         status: (record?.status ?? TrainingStatuses.NotStarted) as TrainingStatusName,
-        locked: course.track === 'secondary' && !inPractice,
       },
     ]
   })
@@ -162,13 +164,13 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
  * Address of a course when the member may open it
  * @param {SessionUser} viewer - Signed-in member
  * @param {string} key - Course key
- * @return {Promise<string | null>} - Reader address, none when not in their catalogue or locked
+ * @return {Promise<string | null>} - Reader address, none when not in their catalogue
  */
 
 export const courseHrefFor = async (viewer: SessionUser, key: string): Promise<string | null> => {
   const card = (await listCourses(viewer)).find((entry) => entry.key === key)
 
-  return card && !card.locked ? ROUTES.training(card.id) : null
+  return card ? ROUTES.training(card.id) : null
 }
 
 /**
@@ -184,7 +186,7 @@ export const readCourse = async (
 ): Promise<{ card: CourseCard; course: Course; progress: CourseProgress }> => {
   const card = (await listCourses(viewer)).find((entry) => entry.id === trainingId)
   const course = card ? courseByKey(card.key) : undefined
-  if (!card || !course || card.locked) throw notFound()
+  if (!card || !course) throw notFound()
 
   const record = await prisma.trainingRecord.findUnique({
     where: { trainingId_accountId: { trainingId, accountId: viewer.id } },
