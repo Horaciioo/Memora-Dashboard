@@ -159,6 +159,13 @@ export const MONTH_GRID_DAYS = MONTH_GRID_LENGTH
 export const WEEK_GRID_DAYS = WEEK_LENGTH
 
 /**
+ * Count the days the planning lists at once
+ * @type {number}
+ */
+
+export const AGENDA_GRID_DAYS = 28
+
+/**
  * Name the month and year of a date
  * @param {Date} date - Date to name
  * @return {string} - Month and year

@@ -1,4 +1,5 @@
 import {
+  AGENDA_GRID_DAYS,
   MONTH_GRID_DAYS,
   WEEK_GRID_DAYS,
   addDays,
@@ -34,10 +35,10 @@ export interface CalendarDay {
 
 /**
  * Span the grid draws at once
- * @type {'day' | 'week' | 'month'}
+ * @type {'day' | 'week' | 'month' | 'agenda'}
  */
 
-export type CalendarUnit = 'day' | 'week' | 'month'
+export type CalendarUnit = 'day' | 'week' | 'month' | 'agenda'
 
 /**
  * Read the ISO day of a moment
@@ -109,6 +110,23 @@ export const dayGrid = (anchor: string): CalendarDay[] => {
 }
 
 /**
+ * Build the run of days a planning lists, from the day on screen
+ * @param {string} anchor - ISO day the planning opens on
+ * @return {CalendarDay[]} - Days in display order
+ */
+
+export const agendaGrid = (anchor: string): CalendarDay[] => {
+  const start = parseDay(anchor)
+  const today = new Date()
+
+  return Array.from({ length: AGENDA_GRID_DAYS }, (_, index) => {
+    const day = addDays(start, index)
+
+    return { ...toCalendarDay(day, day.getMonth(), today), isCurrentMonth: true }
+  })
+}
+
+/**
  * Build the grid of one span
  * @param {string} anchor - ISO day on screen
  * @param {CalendarUnit} unit - Span being browsed
@@ -117,6 +135,7 @@ export const dayGrid = (anchor: string): CalendarDay[] => {
 
 export const unitGrid = (anchor: string, unit: CalendarUnit): CalendarDay[] => {
   if (unit === 'month') return monthGrid(anchor)
+  if (unit === 'agenda') return agendaGrid(anchor)
 
   return unit === 'week' ? weekGrid(anchor) : dayGrid(anchor)
 }
@@ -152,7 +171,9 @@ export const shiftAnchor = (anchor: string, unit: CalendarUnit, amount: number):
   const day = parseDay(anchor)
   if (unit === 'month') return formatDayKey(addMonths(day, amount))
 
-  return formatDayKey(addDays(day, amount * (unit === 'week' ? WEEK_GRID_DAYS : 1)))
+  const step = { day: 1, week: WEEK_GRID_DAYS, agenda: AGENDA_GRID_DAYS }[unit]
+
+  return formatDayKey(addDays(day, amount * step))
 }
 
 /**
@@ -168,9 +189,10 @@ export const periodLabel = (anchor: string, unit: CalendarUnit): string => {
   if (unit === 'month') return monthLabel(day)
   if (unit === 'day') return dayMonthLabel(day, true)
 
-  const start = startOfWeek(day)
+  const start = unit === 'agenda' ? day : startOfWeek(day)
+  const length = unit === 'agenda' ? AGENDA_GRID_DAYS : WEEK_GRID_DAYS
 
-  return `${dayMonthLabel(start)} – ${dayMonthLabel(addDays(start, WEEK_GRID_DAYS - 1), true)}`
+  return `${dayMonthLabel(start)} – ${dayMonthLabel(addDays(start, length - 1), true)}`
 }
 
 /**
