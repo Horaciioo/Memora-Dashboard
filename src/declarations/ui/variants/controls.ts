@@ -206,16 +206,17 @@ export const SELECT_MENU_STYLES = {
   placeholder: `truncate ${EMPTY_VALUE}`,
   // Category heading inside the list
   group:
-    'px-3 pt-2.5 pb-1 text-[10px] font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'px-2.5 pt-3 pb-1 text-[10px] font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   chevron: 'h-4 w-4 shrink-0 text-[var(--color-on-field-subtle)] transition-transform',
   chevronOpen: 'rotate-180',
   panel:
     'popover-enter fixed z-[70] flex max-h-72 flex-col overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
   search:
     'w-full border-b border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]',
-  list: 'flex-1 overflow-y-auto py-1',
+  // Rows breathe, none touching its neighbour
+  list: 'flex flex-1 flex-col gap-0.5 overflow-y-auto p-1.5',
   option:
-    'flex w-full items-center gap-2 px-3 text-left opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-surface)] hover:opacity-100',
+    'flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-2.5 text-left opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-surface)] hover:opacity-100',
   optionActive: 'bg-[var(--color-surface)] opacity-100',
   optionDisabled: 'cursor-not-allowed opacity-50',
   scrim: 'fixed inset-0 z-[65]',
@@ -223,20 +224,22 @@ export const SELECT_MENU_STYLES = {
   optionSelected:
     'bg-linear-to-r from-[var(--color-picker-wash-strong)] via-[var(--color-picker-wash)] to-transparent font-semibold text-[var(--color-ink)] opacity-100',
   optionLabel: 'min-w-0 flex-1 truncate',
-  optionHint: 'truncate text-xs text-[var(--color-ink-subtle)]',
-  check: 'h-4 w-4 shrink-0',
-  // Keeps labels aligned beside a check
-  checkSlot: 'h-4 w-4 shrink-0',
+  check: 'h-4 w-4 shrink-0 text-[var(--color-success)]',
+  // Cell holding the check or the mark, so labels always start at the same edge
+  lead: 'flex shrink-0 items-center justify-center',
+  leadGlyph: 'h-4 w-4',
+  leadPortrait: 'h-6 w-6',
+  leadPortraitLarge: 'h-8 w-8',
   empty: 'px-3 py-4 text-center text-xs text-[var(--color-ink-subtle)]',
   // Inset rule between the clearing entry and the real options
-  divider: 'mx-2 my-1 h-px shrink-0 bg-[var(--color-border)]',
+  divider: 'mx-1 my-1 h-px shrink-0 bg-[var(--color-border)]',
   // Pinned link above the options
   action:
     'flex shrink-0 items-center gap-2 px-3 py-2 text-sm font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
   actionIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
   // Selected entries on the trigger, never tags
-  tags: 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1',
-  entry: 'inline-flex min-w-0 items-center gap-1.5',
+  tags: 'flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1.5',
+  entry: 'inline-flex min-w-0 items-center gap-2',
 } as const
 
 /**

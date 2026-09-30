@@ -8,7 +8,7 @@ import {
 } from '@/core/services/reference/lookups'
 import { replaceAnchors } from '@/core/services/auth/LeadService'
 import { conflict, notFound } from '@/core/lib/errors'
-import { roleGroupedOptions, rowsToOptions, toOptions } from '@/core/lib/forms/options'
+import { roleGroupedOptions, functionOptions, rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import {
   ACADEMY_SETTINGS,
@@ -201,7 +201,7 @@ const youtubers: ReferenceResource = {
       label: REFERENCE_FIELD_COPY.functions,
       hint: REFERENCE_FIELD_COPY.functionsHint,
       mark: 'dot',
-      options: rowsToOptions(await activeFunctions()),
+      options: functionOptions(await activeFunctions()),
     },
     { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
     {
@@ -871,7 +871,7 @@ const trainings: ReferenceResource = {
         name: 'functionId',
         kind: 'select',
         label: REFERENCE_FIELD_COPY.jobFunction,
-        options: rowsToOptions(functions),
+        options: functionOptions(functions),
         span: 'half',
       },
       {
@@ -1194,7 +1194,7 @@ const skills: ReferenceResource = {
         name: 'functionId',
         kind: 'select',
         label: REFERENCE_FIELD_COPY.jobFunction,
-        options: rowsToOptions(functions),
+        options: functionOptions(functions),
         span: 'half',
       },
       {
@@ -1351,7 +1351,7 @@ const pimStepTemplates: ReferenceResource = {
         name: 'functionId',
         kind: 'select',
         label: REFERENCE_FIELD_COPY.jobFunction,
-        options: rowsToOptions(functions),
+        options: functionOptions(functions),
         span: 'half',
       },
       {
@@ -1751,7 +1751,7 @@ const recruitmentQuestions: ReferenceResource = {
         name: 'functionId',
         kind: 'select',
         label: RECRUITMENT_FIELD_COPY.jobFunction,
-        options: rowsToOptions(functions),
+        options: functionOptions(functions),
         span: 'half',
       },
       { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
@@ -1868,7 +1868,7 @@ const recruitmentStepTemplates: ReferenceResource = {
         name: 'functionId',
         kind: 'select',
         label: RECRUITMENT_FIELD_COPY.jobFunction,
-        options: rowsToOptions(functions),
+        options: functionOptions(functions),
         span: 'half',
       },
       {

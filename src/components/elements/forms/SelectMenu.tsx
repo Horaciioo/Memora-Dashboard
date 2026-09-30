@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
+import { OptionLead } from '@/components/elements/forms/OptionLead'
 import { OptionMark } from '@/components/elements/forms/OptionMark'
 import { useAnchoredPanel } from '@/core/hooks/interaction/useAnchoredPanel'
 import { PICKER_COPY } from '@/declarations/ui/copy'
@@ -93,7 +94,6 @@ export const SelectMenu = ({
 
   const markSize = SELECT_MENU_MARK_SIZES[size]
   const ChevronIcon = ICONS.expand
-  const CheckIcon = ICONS.picked
 
   const selected = options.find((option) => option.value === value) ?? null
   const hasSearch = options.length > SEARCH_THRESHOLD
@@ -293,16 +293,13 @@ export const SelectMenu = ({
                         entry.disabled && SELECT_MENU_STYLES.optionDisabled
                       )}
                     >
-                      {isSelected && (
-                        <CheckIcon className={SELECT_MENU_STYLES.check} aria-hidden="true" />
-                      )}
-                      {mark && entry.value !== '' && (
-                        <OptionMark mark={mark} option={entry} size={markSize} />
-                      )}
+                      <OptionLead
+                        option={entry}
+                        mark={mark}
+                        isSelected={isSelected}
+                        size={markSize}
+                      />
                       <span className={SELECT_MENU_STYLES.optionLabel}>{entry.label}</span>
-                      {entry.hint && (
-                        <span className={SELECT_MENU_STYLES.optionHint}>{entry.hint}</span>
-                      )}
                     </button>
                     {isClearing && entries.length > 1 && (
                       <div className={SELECT_MENU_STYLES.divider} aria-hidden="true" />

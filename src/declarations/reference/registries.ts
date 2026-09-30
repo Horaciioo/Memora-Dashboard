@@ -45,9 +45,17 @@ const WORKFLOW_PHASE_MAP: Record<WorkflowPhaseName, LabelledOption> = {
 
 export const WORKFLOW_PHASE_REGISTRY = createRegistry(WORKFLOW_PHASE_MAP)
 
-const FUNCTION_KIND_MAP: Record<FunctionKindName, LabelledOption> = {
-  [FunctionKinds.Primary]: { label: 'Fonction principale', accent: 'brand' },
-  [FunctionKinds.Secondary]: { label: 'Fonction secondaire', accent: 'info' },
+const FUNCTION_KIND_MAP: Record<FunctionKindName, LabelledOption & { plural: string }> = {
+  [FunctionKinds.Primary]: {
+    label: 'Fonction principale',
+    plural: 'Fonctions principales',
+    accent: 'brand',
+  },
+  [FunctionKinds.Secondary]: {
+    label: 'Fonction secondaire',
+    plural: 'Fonctions secondaires',
+    accent: 'info',
+  },
 }
 
 export const FUNCTION_KIND_REGISTRY = createRegistry(FUNCTION_KIND_MAP)

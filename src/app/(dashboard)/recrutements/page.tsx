@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { RecruitmentsPanel } from '@/composites/recruitment/RecruitmentsPanel'
 import { prisma } from '@/core/lib/db'
-import { rowsToOptions } from '@/core/lib/forms/options'
+import { functionOptions } from '@/core/lib/forms/options'
 import { listSessions, sessionFields } from '@/core/services/recruitment/RecruitmentService'
 import { youtuberOptions } from '@/core/services/work/shared'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -35,7 +35,7 @@ export default async function RecruitmentsPage() {
         initialSessions={sessions}
         fields={fields}
         youtubers={youtubers}
-        functions={rowsToOptions(functions)}
+        functions={functionOptions(functions)}
         canManage={access.can(Permissions.RecruitmentManage)}
       />
     </div>

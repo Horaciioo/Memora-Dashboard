@@ -2,6 +2,7 @@
 
 import { Fragment, useId, useMemo, useState } from 'react'
 import type { MouseEvent } from 'react'
+import { OptionLead } from '@/components/elements/forms/OptionLead'
 import { OptionMark } from '@/components/elements/forms/OptionMark'
 import { useAnchoredPanel } from '@/core/hooks/interaction/useAnchoredPanel'
 import { PICKER_COPY } from '@/declarations/ui/copy'
@@ -71,7 +72,6 @@ export const MultiSelect = ({
   })
   const { showHint } = useHints()
 
-  const CheckIcon = ICONS.picked
   const ChevronIcon = ICONS.expand
 
   const hasSearch = options.length > SEARCH_THRESHOLD
@@ -203,20 +203,13 @@ export const MultiSelect = ({
                       }
                       className={cn(
                         SELECT_MENU_STYLES.option,
+                        SELECT_MENU_SIZES.block.option,
                         isSelected && SELECT_MENU_STYLES.optionSelected,
                         blocked && 'cursor-not-allowed opacity-40'
                       )}
                     >
-                      {isSelected ? (
-                        <CheckIcon className={SELECT_MENU_STYLES.check} aria-hidden="true" />
-                      ) : (
-                        <span className={SELECT_MENU_STYLES.checkSlot} aria-hidden="true" />
-                      )}
-                      {mark && <OptionMark mark={mark} option={option} />}
+                      <OptionLead option={option} mark={mark} isSelected={isSelected} />
                       <span className={SELECT_MENU_STYLES.optionLabel}>{option.label}</span>
-                      {option.hint && (
-                        <span className={SELECT_MENU_STYLES.optionHint}>{option.hint}</span>
-                      )}
                     </button>
                   </Fragment>
                 )

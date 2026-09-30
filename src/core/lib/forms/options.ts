@@ -1,6 +1,8 @@
 import type { Registry } from '@/core/lib/registry'
 import { ROLE_REGISTRY, byRoleRank } from '@/declarations/access/roles'
+import { FUNCTION_KIND_REGISTRY } from '@/declarations/reference/registries'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
+import type { FunctionKindName } from '@/utils/constants/workflow'
 import type { FieldOption } from '@/types/forms'
 
 /**
@@ -43,6 +45,28 @@ export const rowsToOptions = (
     image: row.avatarUrl ?? undefined,
     icon: row.icon ?? undefined,
   }))
+
+/**
+ * Function options headed by kind, principal ones first
+ * @param {Array<{ id: string, name: string, kind: FunctionKindName }>} rows - Function rows
+ * @return {FieldOption[]} - Select options
+ */
+
+export const functionOptions = (
+  rows: {
+    id: string
+    name: string
+    kind: FunctionKindName
+    accent?: string | null
+    icon?: string | null
+  }[]
+): FieldOption[] =>
+  FUNCTION_KIND_REGISTRY.keys.flatMap((kind) =>
+    rowsToOptions(rows.filter((row) => row.kind === kind)).map((option) => ({
+      ...option,
+      group: FUNCTION_KIND_REGISTRY.get(kind).plural,
+    }))
+  )
 
 /**
  * Account row a people picker reads

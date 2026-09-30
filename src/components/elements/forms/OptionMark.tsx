@@ -37,13 +37,25 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
     ) : null
   }
 
-  // Small glyph of the option, nothing when it names none
-  if (mark === 'glyph') {
-    if (!option.icon || !isIconName(option.icon)) return null
-    const Glyph = ICONS[option.icon]
+  // A dot gives way to the glyph an option names, so every choice with a shape shows it
+  const glyphName = option.icon && isIconName(option.icon) ? option.icon : null
+  if (glyphName && (mark === 'glyph' || mark === 'dot')) {
+    const Glyph = ICONS[glyphName]
+    const paint = isHexColour(option.accent)
+      ? ACCENT_STYLES
+      : TONES[toTone(option.accent, 'neutral')]
 
-    return <Glyph className={OPTION_MARK_STYLES.glyph} aria-hidden="true" />
+    return (
+      <span
+        className={cn('inline-flex', paint.text)}
+        style={isHexColour(option.accent) ? accentVars(option.accent, 'neutral') : undefined}
+      >
+        <Glyph className={OPTION_MARK_STYLES.glyph} aria-hidden="true" />
+      </span>
+    )
   }
+
+  if (mark === 'glyph') return null
 
   const fallback = mark === 'priority' ? 'warning' : 'neutral'
   const picked = isHexColour(option.accent)
