@@ -1,0 +1,12 @@
+[
+  {
+    "name": "ATRIA",
+    "summary": "Parcours complet pour les juniors sans expérience.",
+    "accent": "#7c3aed"
+  },
+  {
+    "name": "PULSE",
+    "summary": "Parcours accéléré pour les profils déjà expérimentés.",
+    "accent": "#0ea5e9"
+  }
+]

@@ -5,9 +5,11 @@ import { cookies } from 'next/headers'
 
 import { prisma } from '@/core/lib/db'
 import { readActiveCreator } from '@/core/lib/auth/activeCreator'
+import { logger } from '@/core/lib/logger'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { resolveAccountPermissions } from '@/core/services/auth/GrantsService'
 import { touchSession } from '@/core/services/auth/SessionService'
+import { syncReferenceLibrary } from '@/core/services/reference/ReferenceSync'
 import { toDisplayPreferences } from '@/core/services/preferences/DisplayService'
 import { isRootIdentity } from '@/declarations/access/identity'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
@@ -68,6 +70,11 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
 
   // A member who left keeps no access
   if (session.account.status === MemberStatuses.Left) return null
+
+  // Collections fixed in code sit in the database before anything reads them
+  await syncReferenceLibrary().catch((error: unknown) =>
+    logger.error('[reference] library sync failed', error)
+  )
 
   // The stamp only moves once a day, so the hot path stays a single read
   if (session.lastUsedAt < new Date(Date.now() - STAMP_INTERVAL_MS)) {

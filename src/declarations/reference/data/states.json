@@ -1,0 +1,65 @@
+[
+  {
+    "scope": "PROJECT",
+    "name": "À faire",
+    "accent": "neutral",
+    "phase": "TODO",
+    "isDefault": true
+  },
+  {
+    "scope": "PROJECT",
+    "name": "En cours",
+    "accent": "info",
+    "phase": "DOING",
+    "isDefault": false
+  },
+  {
+    "scope": "PROJECT",
+    "name": "Terminé",
+    "accent": "success",
+    "phase": "DONE",
+    "isDefault": false
+  },
+  {
+    "scope": "TASK",
+    "name": "À faire",
+    "accent": "neutral",
+    "phase": "TODO",
+    "isDefault": true
+  },
+  {
+    "scope": "TASK",
+    "name": "En cours",
+    "accent": "info",
+    "phase": "DOING",
+    "isDefault": false
+  },
+  {
+    "scope": "TASK",
+    "name": "Terminé",
+    "accent": "success",
+    "phase": "DONE",
+    "isDefault": false
+  },
+  {
+    "scope": "MEETING",
+    "name": "À planifier",
+    "accent": "neutral",
+    "phase": "TODO",
+    "isDefault": true
+  },
+  {
+    "scope": "MEETING",
+    "name": "Programmé",
+    "accent": "info",
+    "phase": "DOING",
+    "isDefault": false
+  },
+  {
+    "scope": "MEETING",
+    "name": "Tenu",
+    "accent": "success",
+    "phase": "DONE",
+    "isDefault": false
+  }
+]

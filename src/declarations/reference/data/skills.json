@@ -1,0 +1,60 @@
+[
+  {
+    "name": "Savoir-être",
+    "accent": "#16a34a",
+    "skills": [
+      {
+        "name": "Calme sous pression",
+        "function": null,
+        "dispositif": null
+      },
+      {
+        "name": "Communication avec l’équipe",
+        "function": null,
+        "dispositif": null
+      },
+      {
+        "name": "Ponctualité",
+        "function": null,
+        "dispositif": null
+      }
+    ]
+  },
+  {
+    "name": "Technique",
+    "accent": "#2563eb",
+    "skills": [
+      {
+        "name": "Maîtrise des commandes",
+        "function": "Lives",
+        "dispositif": null
+      },
+      {
+        "name": "Lecture du chat",
+        "function": "Lives",
+        "dispositif": null
+      },
+      {
+        "name": "Gestion d’un raid",
+        "function": "Lives",
+        "dispositif": null
+      }
+    ]
+  },
+  {
+    "name": "Rédaction",
+    "accent": "#d97706",
+    "skills": [
+      {
+        "name": "Annonces claires",
+        "function": null,
+        "dispositif": null
+      },
+      {
+        "name": "Messages de sanction",
+        "function": null,
+        "dispositif": null
+      }
+    ]
+  }
+]

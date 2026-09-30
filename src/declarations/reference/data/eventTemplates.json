@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Live",
+    "kind": "EVENT",
+    "summary": "Live programmé du créateur.",
+    "accent": "#7c3aed",
+    "visibility": "EVERYONE",
+    "defaultMinutes": 180,
+    "allDay": false
+  },
+  {
+    "name": "Réunion d’équipe",
+    "kind": "EVENT",
+    "summary": "Réunion en vocal.",
+    "accent": "#0284c7",
+    "visibility": "EVERYONE",
+    "defaultMinutes": 60,
+    "allDay": false
+  },
+  {
+    "name": "Événement communautaire",
+    "kind": "PERIOD",
+    "summary": "Plusieurs jours d’événement.",
+    "accent": "#f59e0b",
+    "visibility": "EVERYONE",
+    "defaultMinutes": null,
+    "allDay": true
+  },
+  {
+    "name": "Période de recrutement",
+    "kind": "ZONE",
+    "summary": "Fenêtre de candidatures.",
+    "accent": "#0d9488",
+    "visibility": "RESPONSABLES",
+    "defaultMinutes": null,
+    "allDay": true
+  },
+  {
+    "name": "Point responsables",
+    "kind": "EVENT",
+    "summary": "Réservé aux responsables.",
+    "accent": "#ea580c",
+    "visibility": "RESPONSABLES",
+    "defaultMinutes": 45,
+    "allDay": false
+  },
+  {
+    "name": "Maintenance Discord",
+    "kind": "EVENT",
+    "summary": "Serveur en travaux.",
+    "accent": "#64748b",
+    "visibility": "ADMINS",
+    "defaultMinutes": 120,
+    "allDay": false
+  }
+]
