@@ -137,3 +137,71 @@ export const readDateRange = (values: FormValues, name: string): [Date, Date] | 
 
   return [start, end]
 }
+
+/**
+ * Context a blank form presets from
+ * @typedef {Object} PresetContext
+ * @property {string | null} actorId - Signed-in member
+ * @property {string} today - ISO day
+ * @property {string} now - Datetime field value
+ */
+
+export interface PresetContext {
+  actorId: string | null
+  today: string
+  now: string
+}
+
+/**
+ * Preset value of one field
+ * @param {FieldDefinition} field - Field declaration
+ * @param {PresetContext} context - Actor and clock
+ * @return {FieldValue | undefined} - Preset or nothing
+ */
+
+const presetOf = (field: FieldDefinition, context: PresetContext): FieldValue | undefined => {
+  // Clock presets
+  if (field.preset === 'today') {
+    if (field.kind === 'datetime') return context.now
+    if (field.kind === 'daterange') return [context.today, context.today]
+    return context.today
+  }
+
+  // Actor, only when offered
+  if (field.preset === 'actor') {
+    const offered = field.options?.some((option) => option.value === context.actorId)
+    if (!context.actorId || (field.options && !offered)) return undefined
+    return field.kind === 'multiselect' ? [context.actorId] : context.actorId
+  }
+
+  // Flagged option
+  if (field.preset === 'default') {
+    return field.options?.find((option) => option.isDefault && !option.disabled)?.value
+  }
+
+  return undefined
+}
+
+/**
+ * Blank values with presets, record values on top
+ * @param {FieldDefinition[]} fields - Field declarations
+ * @param {PresetContext} context - Actor and clock
+ * @param {FormValues} [seed] - Values already known
+ * @return {FormValues} - Starting values
+ */
+
+export const presetValues = (
+  fields: FieldDefinition[],
+  context: PresetContext,
+  seed: FormValues = {}
+): FormValues => {
+  const values = emptyValues(fields)
+
+  // Presets fill blanks only
+  for (const field of fields) {
+    const preset = presetOf(field, context)
+    if (preset !== undefined) values[field.name] = preset
+  }
+
+  return { ...values, ...seed }
+}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import { useMutation as useQueryMutation } from '@tanstack/react-query'
 
 import { ApiClientError, messageOf } from '@/core/lib/api/client'
 import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
@@ -24,7 +25,7 @@ export interface MutationState {
 }
 
 /**
- * Wrap a mutation with its loading, rejection and toast handling
+ * Wrap a mutation with its loading, rejection and toast handling, counted by the query client
  * @return {MutationState} - Mutation state and runner
  */
 
@@ -32,6 +33,10 @@ export const useMutation = (): MutationState => {
   const [isSaving, setSaving] = useState(false)
   const [issues, setIssues] = useState<FieldIssue[]>([])
   const { notify, notifyError } = useNotifications()
+  // Registers every write with the cache
+  const { mutateAsync } = useQueryMutation({
+    mutationFn: (action: () => Promise<unknown>) => action(),
+  })
 
   const clearIssues = useCallback(() => setIssues([]), [])
 
@@ -44,7 +49,7 @@ export const useMutation = (): MutationState => {
       setIssues([])
 
       try {
-        const result = await action()
+        const result = (await mutateAsync(action)) as T
         if (successTitle) {
           notify(
             typeof successTitle === 'string'
@@ -67,7 +72,7 @@ export const useMutation = (): MutationState => {
         setSaving(false)
       }
     },
-    [notify, notifyError]
+    [notify, notifyError, mutateAsync]
   )
 
   return { isSaving, issues, clearIssues, run }

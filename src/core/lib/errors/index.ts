@@ -43,6 +43,15 @@ export class AppError extends Error {
 }
 
 /**
+ * Unavailable system
+ * @param {string} [message] - Override message
+ * @return {AppError} - Error
+ */
+
+export const systemFailure = (message?: string): AppError =>
+  new AppError(ErrorCodes.SystemFailure, message)
+
+/**
  * Missing session
  * @param {string} [message] - Override message
  * @return {AppError} - Error

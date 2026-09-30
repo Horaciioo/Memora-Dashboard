@@ -41,6 +41,8 @@ export const EVENT_TYPES = createEnumeration({
   RecruitmentDecided: { id: 32, label: 'Candidature tranchée' },
   SecurityChanged: { id: 33, label: 'Sécurité modifiée' },
   LeadsAnchored: { id: 34, label: 'Responsables ancrés' },
+  ConsentAccepted: { id: 35, label: 'Accord accepté' },
+  LegacyChanged: { id: 36, label: 'Parcours Legacy modifié' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

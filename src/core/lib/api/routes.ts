@@ -1,3 +1,5 @@
+import { SANCTION_PARAMS } from '@/declarations/sanctions/params'
+
 // Narrows a board route to one creator, the API reading it as a query parameter
 const withScope = (path: string, youtuberId?: string): string =>
   youtuberId ? `${path}?youtubeur=${encodeURIComponent(youtuberId)}` : path
@@ -13,6 +15,8 @@ export const API_ROUTES = {
   openSessions: '/api/parametres/sessions',
   openSession: (id: string) => `/api/parametres/sessions/${id}`,
   personalExport: '/api/parametres/export',
+  seenRelease: '/api/parametres/nouveautes',
+  health: '/api/sante',
   twoFactor: '/api/a2f',
   twoFactorSeal: '/api/a2f/sceau',
   creatorLeads: (id: string) => `/api/configuration/youtubeurs/${id}/responsables`,
@@ -22,6 +26,9 @@ export const API_ROUTES = {
   members: '/api/moderateurs',
   member: (id: string) => `/api/moderateurs/${id}`,
   memberNotes: (id: string) => `/api/moderateurs/${id}/notes`,
+  memberAbsences: (id: string) => `/api/moderateurs/${id}/absences`,
+  handleLookup: (networkId: string, handle: string) =>
+    `/api/reseaux/verification?reseau=${encodeURIComponent(networkId)}&compte=${encodeURIComponent(handle)}`,
   memberSocials: (id: string) => `/api/moderateurs/${id}/reseaux`,
   social: (id: string) => `/api/reseaux/${id}`,
   files: '/api/fichiers',
@@ -41,8 +48,18 @@ export const API_ROUTES = {
   absences: '/api/absences',
   absence: (id: string) => `/api/absences/${id}`,
   livecon: '/api/livecon',
-  sanctions: (youtuberId: string, levelId?: string) =>
-    `/api/sanctions?youtubeur=${youtuberId}${levelId ? `&niveau=${levelId}` : ''}`,
+  sanctions: (youtuberId: string, panel: string, levelId?: string | null, replace = false) =>
+    `/api/sanctions?${new URLSearchParams({
+      [SANCTION_PARAMS.creator]: youtuberId,
+      [SANCTION_PARAMS.panel]: panel,
+      ...(levelId ? { [SANCTION_PARAMS.level]: levelId } : {}),
+      ...(replace ? { [SANCTION_PARAMS.replace]: SANCTION_PARAMS.yes } : {}),
+    }).toString()}`,
+  sanctionOffenses: (youtuberId: string, panel: string) =>
+    `/api/sanctions/infractions?${new URLSearchParams({
+      [SANCTION_PARAMS.creator]: youtuberId,
+      [SANCTION_PARAMS.panel]: panel,
+    })}`,
   sanctionOffense: (id: string) => `/api/sanctions/${id}`,
   sanctionLadder: (id: string) => `/api/sanctions/${id}/paliers`,
   calendar: (from: string, to: string, sessionId?: string) =>
@@ -56,10 +73,12 @@ export const API_ROUTES = {
   session: (id: string) => `/api/academy/${id}`,
   sessionJuniors: (id: string) => `/api/academy/${id}/juniors`,
   sessionSteps: (id: string) => `/api/academy/${id}/etapes`,
+  sessionLaunch: (id: string) => `/api/academy/${id}/lancement`,
   junior: (id: string) => `/api/juniors/${id}`,
   juniorTrainings: (id: string) => `/api/juniors/${id}/formations`,
   juniorReviews: (id: string) => `/api/juniors/${id}/bilans`,
   juniorSkills: (id: string) => `/api/juniors/${id}/competences`,
+  juniorTimeline: (id: string) => `/api/juniors/${id}/timeline`,
   juniorNotes: (id: string) => `/api/juniors/${id}/notes`,
   juniorObjectives: (id: string) => `/api/juniors/${id}/objectifs`,
   juniorObjectivesOrder: (id: string) => `/api/juniors/${id}/objectifs/ordre`,
@@ -71,6 +90,11 @@ export const API_ROUTES = {
   objective: (id: string) => `/api/objectifs/${id}`,
   myTrainingProgress: (id: string) => `/api/formations/${id}/progression`,
   myTrainingContent: (id: string) => `/api/formations/${id}/contenu`,
+  courseExercise: (id: string) => `/api/formations/${id}/exercices`,
+  legacyTracks: '/api/legacy',
+  legacyTrack: (id: string) => `/api/legacy/${id}`,
+  legacyGrade: (id: string, key: string) => `/api/legacy/${id}/modules/${key}`,
+  legacyExercise: (id: string, key: string) => `/api/legacy/${id}/modules/${key}/exercices`,
   integration: (token: string) => `/api/integration/${token}`,
   integrationDiscord: (token: string) => `/api/integration/${token}/discord`,
   recruitmentLink: (id: string) => `/api/recrutements/${id}/lien`,
@@ -105,6 +129,10 @@ export const API_ROUTES = {
     size ? `/api/notifications?taille=${size}` : '/api/notifications',
   notification: (id: string) => `/api/notifications/${id}`,
   access: '/api/acces',
+  accessFunctions: '/api/acces/fonctions',
+  accessFunction: (id: string) => `/api/acces/fonctions/${id}`,
+  accessMembers: '/api/acces/membres',
+  accessSimulation: '/api/acces/simulation',
   profile: '/api/parametres',
   displayPreferences: '/api/parametres/affichage',
   board: '/api/tableau',

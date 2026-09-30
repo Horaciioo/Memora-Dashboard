@@ -8,6 +8,7 @@ export const ErrorCodes = {
   ResourceConflict: 'ResourceConflict',
   ImmutableResource: 'ImmutableResource',
   SystemFailure: 'SystemFailure',
+  TimedOut: 'TimedOut',
 } as const
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes]
@@ -27,6 +28,7 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCodes.ResourceConflict]: 'Ce nom est déjà pris.',
   [ErrorCodes.ImmutableResource]: 'Cet élément ne peut pas être modifié.',
   [ErrorCodes.SystemFailure]: 'Quelque chose a cassé de notre côté.',
+  [ErrorCodes.TimedOut]: 'Le serveur met trop de temps à répondre, réessaie.',
 }
 
 /**
@@ -44,6 +46,7 @@ export const ERROR_STATUSES: Record<ErrorCode, number> = {
   [ErrorCodes.ResourceConflict]: 409,
   [ErrorCodes.ImmutableResource]: 409,
   [ErrorCodes.SystemFailure]: 500,
+  [ErrorCodes.TimedOut]: 504,
 }
 
 /**

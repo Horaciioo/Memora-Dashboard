@@ -38,6 +38,20 @@ export const AttendeeKinds = {
 export type AttendeeKindName = (typeof AttendeeKinds)[keyof typeof AttendeeKinds]
 
 /**
+ * Meeting audiences
+ * @type {Record<string, string>}
+ */
+
+export const MeetingAudiences = {
+  Everyone: 'EVERYONE',
+  Discord: 'DISCORD',
+  Twitch: 'TWITCH',
+  Custom: 'CUSTOM',
+} as const
+
+export type MeetingAudienceName = (typeof MeetingAudiences)[keyof typeof MeetingAudiences]
+
+/**
  * Absence review outcomes
  * @type {Record<string, string>}
  */

@@ -1,5 +1,7 @@
 import type { ApiEnvelope } from '@/core/lib/http/response'
+import { TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
 import { FEEDBACK_COPY } from '@/declarations/ui/copy/feedback'
+import { ERROR_MESSAGES, ErrorCodes } from '@/utils/constants/errors'
 
 /**
  * Field level failure sent back by the API
@@ -43,10 +45,26 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   // Form data carries its own multipart boundary, so no content type is forced
   const isFormData = init?.body instanceof FormData
 
-  const response = await fetch(path, {
-    ...init,
-    headers: isFormData ? init?.headers : { 'content-type': 'application/json', ...init?.headers },
-  })
+  // Reads give up sooner
+  const isRead = !init?.method || init.method === 'GET'
+  const limit = isRead ? TIMEOUT_SETTINGS.readMs : TIMEOUT_SETTINGS.writeMs
+
+  let response: Response
+  try {
+    response = await fetch(path, {
+      ...init,
+      signal: init?.signal ?? AbortSignal.timeout(limit),
+      headers: isFormData
+        ? init?.headers
+        : { 'content-type': 'application/json', ...init?.headers },
+    })
+  } catch (error) {
+    // Timeout becomes a readable error
+    if (error instanceof DOMException && error.name === 'TimeoutError') {
+      throw new ApiClientError(ERROR_MESSAGES[ErrorCodes.TimedOut], ErrorCodes.TimedOut)
+    }
+    throw error
+  }
 
   const envelope = (await response.json()) as ApiEnvelope<T>
 
@@ -61,10 +79,12 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
 /**
  * Read a resource
  * @param {string} path - API path
+ * @param {AbortSignal} [signal] - Cancels the read
  * @return {Promise<T>} - Payload
  */
 
-export const apiGet = <T>(path: string): Promise<T> => request<T>(path)
+export const apiGet = <T>(path: string, signal?: AbortSignal): Promise<T> =>
+  request<T>(path, signal ? { signal } : undefined)
 
 /**
  * Create a resource

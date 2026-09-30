@@ -1,3 +1,4 @@
+import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { isFieldVisible } from '@/core/lib/forms/visibility'
 import type {
@@ -93,11 +94,14 @@ const parseField = (field: FieldDefinition, raw: unknown, issues: FieldIssue[]):
   }
 
   // Numeric fields
-  if (field.kind === 'number') {
+  if (field.kind === 'number' || field.kind === 'scale') {
     const parsed = typeof raw === 'number' ? raw : Number(toText(raw))
     if (!Number.isFinite(parsed)) return reject(FORM_COPY.notANumber)
-    if (field.min !== undefined && parsed < field.min) return reject(FORM_COPY.tooSmall)
-    if (field.max !== undefined && parsed > field.max) return reject(FORM_COPY.tooLarge)
+    // A scale is always bounded
+    const min = field.min ?? (field.kind === 'scale' ? FORM_SETTINGS.scaleMin : undefined)
+    const max = field.max ?? (field.kind === 'scale' ? FORM_SETTINGS.scaleMax : undefined)
+    if (min !== undefined && parsed < min) return reject(FORM_COPY.tooSmall)
+    if (max !== undefined && parsed > max) return reject(FORM_COPY.tooLarge)
     return parsed
   }
 
