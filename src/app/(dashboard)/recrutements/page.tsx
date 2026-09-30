@@ -1,10 +1,7 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { RecruitmentsPanel } from '@/composites/recruitment/RecruitmentsPanel'
-import { prisma } from '@/core/lib/db'
-import { functionOptions } from '@/core/lib/forms/options'
 import { listSessions, sessionFields } from '@/core/services/recruitment/RecruitmentService'
-import { youtuberOptions } from '@/core/services/work/shared'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -21,12 +18,7 @@ export default async function RecruitmentsPage() {
   const { access, scope } = await requirePermission(Permissions.RecruitmentRead)
   const perimeter = await scope()
 
-  const [sessions, fields, youtubers, functions] = await Promise.all([
-    listSessions(perimeter),
-    sessionFields(perimeter),
-    youtuberOptions(perimeter),
-    prisma.jobFunction.findMany({ orderBy: { position: 'asc' } }),
-  ])
+  const [sessions, fields] = await Promise.all([listSessions(perimeter), sessionFields(perimeter)])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
@@ -34,8 +26,6 @@ export default async function RecruitmentsPage() {
       <RecruitmentsPanel
         initialSessions={sessions}
         fields={fields}
-        youtubers={youtubers}
-        functions={functionOptions(functions)}
         canManage={access.can(Permissions.RecruitmentManage)}
       />
     </div>

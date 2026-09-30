@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Avatar, AvatarStack } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { StatusText } from '@/components/elements/display/StatusText'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { Button } from '@/components/elements/actions/Button'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
@@ -26,7 +26,8 @@ import {
   RECRUITMENT_STATUS_REGISTRY,
 } from '@/declarations/recruitment/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { LIST_STYLES } from '@/declarations/ui/variants'
+import { ICONS } from '@/declarations/ui/icons'
+import { LIST_STYLES, RECORD_ROW } from '@/declarations/ui/variants'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import { CandidateDialog } from '@/composites/recruitment/CandidateDialog'
 import type { FieldDefinition } from '@/types/forms'
@@ -168,36 +169,54 @@ export const RecruitmentFile = ({
    */
 
   const candidateCard = (candidate: CandidateView) => (
-    <span className="flex min-w-0 flex-1 flex-col gap-1.5">
-      <span className="flex flex-wrap items-center gap-2">
-        <span className="min-w-0 truncate text-sm font-medium">
-          {candidate.name}
-        </span>
-        {candidate.memberId && <Badge label={RECRUITMENT_COPY.memberLinked} tone="info" />}
-        <Badge
-          label={candidate.attended ? RECRUITMENT_COPY.attended : RECRUITMENT_COPY.missed}
-          tone={candidate.attended ? 'success' : 'neutral'}
-          icon={candidate.attended ? 'success' : 'clock'}
-        />
+    <span className={RECORD_ROW.body}>
+      <span className={RECORD_ROW.title}>{candidate.name}</span>
+      <span className={RECORD_ROW.meta}>
+        {[
+          candidate.interviewAt
+            ? formatDayTime(candidate.interviewAt)
+            : RECRUITMENT_COPY.noInterview,
+          candidate.recruiter?.label ?? RECRUITMENT_COPY.noRecruiter,
+        ].join(' · ')}
       </span>
-      <span className="flex flex-wrap items-center gap-2 text-xs text-[var(--color-ink-subtle)]">
-        {candidate.interviewAt
-          ? formatDayTime(candidate.interviewAt)
-          : RECRUITMENT_COPY.noInterview}
-        {' · '}
-        {candidate.recruiter?.label ?? RECRUITMENT_COPY.noRecruiter}
-      </span>
-      {candidate.spectators.length > 0 && (
-        <AvatarStack
-          people={candidate.spectators.map((seat) => ({
-            id: seat.id,
-            name: seat.label,
-            src: seat.image,
-          }))}
-        />
-      )}
     </span>
   )
+
+  /**
+   * Quiet marks closing a candidate row, attendance then remarks
+   * @param {CandidateView} candidate - Applicant rendered
+   * @return {JSX.Element}
+   */
+
+  const candidateMarks = (candidate: CandidateView) => {
+    const AttendedIcon = ICONS[candidate.attended ? 'success' : 'clock']
+    const NoteIcon = ICONS.note
+
+    return (
+      <span className="flex shrink-0 items-center gap-4 text-[var(--color-ink-subtle)]">
+        {candidate.spectators.length > 0 && (
+          <AvatarStack
+            people={candidate.spectators.map((seat) => ({
+              id: seat.id,
+              name: seat.label,
+              src: seat.image,
+            }))}
+          />
+        )}
+        {candidate.comments.length > 0 && (
+          <span title={RECRUITMENT_COPY.commented}>
+            <NoteIcon className="h-4 w-4" aria-hidden="true" />
+          </span>
+        )}
+        <span
+          title={candidate.attended ? RECRUITMENT_COPY.attended : RECRUITMENT_COPY.missed}
+          className={candidate.attended ? 'text-[var(--color-success)]' : undefined}
+        >
+          <AttendedIcon className="h-5 w-5" aria-hidden="true" />
+        </span>
+      </span>
+    )
+  }
 
   const candidatesTab = () => (
     <Section
@@ -222,7 +241,7 @@ export const RecruitmentFile = ({
           }
         />
       ) : (
-        <div className={LIST_STYLES.stack}>
+        <div className={RECORD_ROW.stack}>
           {file.candidates.map((candidate) => (
             <div
               key={candidate.id}
@@ -233,13 +252,11 @@ export const RecruitmentFile = ({
                 if (event.key === 'Enter') setOpenedCandidateId(candidate.id)
               }}
               onContextMenu={contextMenu(candidateMenu(candidate), candidate.discordId)}
-              className={cn(LIST_STYLES.item, 'cursor-pointer')}
+              className={RECORD_ROW.root}
             >
-              <Avatar name={candidate.name} size="sm" />
+              <Avatar name={candidate.name} size="md" />
               {candidateCard(candidate)}
-              {candidate.comments.length > 0 && (
-                <Badge label={RECRUITMENT_COPY.commented} tone="neutral" icon="note" />
-              )}
+              {candidateMarks(candidate)}
             </div>
           ))}
           <AddRow
@@ -277,7 +294,9 @@ export const RecruitmentFile = ({
         <ol className={LIST_STYLES.stack}>
           {detail.questions.map((question, index) => (
             <li key={question.id} className={LIST_STYLES.item}>
-              <Badge label={`${index + 1}`} tone="brand" />
+              <span className="w-6 shrink-0 text-base font-extrabold text-[var(--color-ink-subtle)] tabular-nums">
+                {index + 1}
+              </span>
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="text-sm font-medium">{question.prompt}</span>
                 {question.hint && (
@@ -314,37 +333,43 @@ export const RecruitmentFile = ({
           }
         />
       ) : (
-        <div className={LIST_STYLES.stack}>
+        <div className={RECORD_ROW.stack}>
           {file.steps.map((step) => {
             const owner = RECRUITMENT_OWNER_REGISTRY.get(step.owner)
             // Informative only, a late step never blocks anything
             const late = step.doneAt === null && isOverdue(step.scheduledAt)
 
+            const StepIcon = ICONS[step.doneAt ? 'success' : 'clock']
+            const offset = `J${step.offset >= 0 ? '+' : ''}${step.offset}`
+
             return (
               <div
                 key={step.id}
                 onContextMenu={contextMenu(stepMenu(step), step.title)}
-                className={LIST_STYLES.item}
+                className={RECORD_ROW.static}
               >
-                <Badge
-                  label={
-                    step.doneAt
-                      ? RECRUITMENT_COPY.stepDoneBadge
-                      : `J${step.offset >= 0 ? '+' : ''}${step.offset}`
-                  }
-                  tone={step.doneAt ? 'success' : late ? 'danger' : 'neutral'}
-                  icon={step.doneAt ? 'success' : 'clock'}
+                <StepIcon
+                  className={cn(
+                    'h-5 w-5 shrink-0 text-[var(--color-ink-subtle)]',
+                    step.doneAt && 'text-[var(--color-success)]',
+                    late && 'text-[var(--color-danger)]'
+                  )}
+                  aria-hidden="true"
                 />
-                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="text-sm font-medium">{step.title}</span>
-                  <span className="text-xs text-[var(--color-ink-subtle)]">
-                    {[step.scheduledAt ? formatDay(step.scheduledAt) : null, step.notes]
+                <span className={RECORD_ROW.body}>
+                  <span className={RECORD_ROW.title}>{step.title}</span>
+                  <span className={RECORD_ROW.meta}>
+                    {[
+                      offset,
+                      step.scheduledAt ? formatDay(step.scheduledAt) : null,
+                      owner.label,
+                      step.required ? RECRUITMENT_COPY.mandatoryBadge : null,
+                      step.notes,
+                    ]
                       .filter(Boolean)
                       .join(' · ')}
                   </span>
                 </span>
-                {step.required && <Badge label={RECRUITMENT_COPY.mandatoryBadge} tone="warning" />}
-                <Badge label={owner.label} accent={owner.accent}  />
                 {step.emitsInvite && (
                   <IntegrationLinkStep
                     link={file.link}
@@ -464,7 +489,7 @@ export const RecruitmentFile = ({
             },
             {
               label: RECRUITMENT_COPY.infoStatus,
-              value: <Badge label={status.label} accent={status.accent} tone={'neutral'}  />,
+              value: <StatusText label={status.label} accent={status.accent} />,
             },
             { label: RECRUITMENT_FIELD_COPY.jobFunction, value: detail.summary.jobFunction.label },
             {

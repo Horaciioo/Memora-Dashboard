@@ -7,6 +7,8 @@ export const RECRUITMENT_COPY = {
   title: 'Recrutements',
   lead: 'Une session par créateur et par fonction. L’annonce part dehors, les entretiens se tiennent sur Discord, tout ce qui compte se garde ici.',
   add: 'Ouvrir une session',
+  groupOpen: 'En cours',
+  groupFinished: 'Terminées',
   addTitle: 'Ouvrir une session de recrutement',
   editTitle: 'Modifier la session',
   deleteTitle: 'Supprimer cette session ?',

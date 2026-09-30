@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { RecruitmentFile } from '@/composites/recruitment/RecruitmentFile'
 import {
@@ -13,7 +12,6 @@ import {
 import { linkFields } from '@/core/services/onboarding/IntegrationLinkService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
-import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -56,30 +54,10 @@ export default async function RecruitmentPage({ params }: { params: Promise<{ id
   if (!detail) notFound()
 
   const [candidates, steps] = await Promise.all([candidateFields(), stepFields()])
-  const status = RECRUITMENT_STATUS_REGISTRY.get(detail.summary.status)
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader
-        title={detail.summary.name}
-        lead={detail.summary.summary ?? undefined}
-        actions={
-          <span className="flex flex-wrap items-center gap-2">
-            <Badge
-              label={detail.summary.youtuber.label}
-              accent={detail.summary.youtuber.accent}
-              tone={'info'}
-              icon="youtuber"
-            />
-            <Badge
-              label={detail.summary.jobFunction.label}
-              accent={detail.summary.jobFunction.accent}
-              tone={'brand'}
-            />
-            <Badge label={status.label} accent={status.accent} tone={'neutral'}  />
-          </span>
-        }
-      />
+      <PageHeader title={detail.summary.name} lead={detail.summary.summary ?? undefined} />
       <RecruitmentFile
         detail={detail}
         candidateFields={candidates}

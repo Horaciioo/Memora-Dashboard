@@ -14,6 +14,16 @@ export const RecruitmentStatuses = {
 export type RecruitmentStatusName = (typeof RecruitmentStatuses)[keyof typeof RecruitmentStatuses]
 
 /**
+ * Phases past which a campaign no longer moves
+ * @type {RecruitmentStatusName[]}
+ */
+
+export const FINISHED_RECRUITMENT_STATUSES: RecruitmentStatusName[] = [
+  RecruitmentStatuses.Closed,
+  RecruitmentStatuses.Archived,
+]
+
+/**
  * Who carries out a recruitment timeline step
  * @type {Record<string, string>}
  */

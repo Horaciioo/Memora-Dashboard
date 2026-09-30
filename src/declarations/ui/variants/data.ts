@@ -41,12 +41,30 @@ export const LIST_STYLES = {
 } as const
 
 /**
+ * Roomy record row styles, a name over one quiet line
+ * @type {Record<string, string>}
+ */
+
+export const RECORD_ROW = {
+  stack: 'flex flex-col gap-3',
+  root: 'flex cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5 py-4 transition-[border-color,box-shadow] hover:border-[var(--color-brand-400)] hover:shadow-[var(--shadow-sm)]',
+  // Same row without the pointer, for what only reads
+  static:
+    'flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5 py-4',
+  body: 'flex min-w-0 flex-1 flex-col gap-1',
+  title: 'truncate text-base font-bold',
+  meta: 'truncate text-sm text-[var(--color-ink-subtle)]',
+} as const
+
+/**
  * Grouped card list styles, one heading per bucket
  * @type {Record<string, string>}
  */
 
 export const GROUP_STYLES = {
   stack: 'flex flex-col',
+  // Blocks of a page, breathing apart
+  spaced: 'flex flex-col gap-12',
   section: 'flex flex-col gap-3',
   sectionDivided: 'border-t border-[var(--color-border)] mt-6 pt-6',
   // Page-level buckets, a rule centred in the gap between each
