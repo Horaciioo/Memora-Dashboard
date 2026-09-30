@@ -60,6 +60,16 @@ const resolvePrefix = (
 }
 
 /**
+ * Columns a field takes, a single column form never opening a second one
+ * @param {FieldDefinition} field - Field declaration
+ * @param {boolean} [single] - One field per line
+ * @return {string} - Span class
+ */
+
+const spanOf = (field: FieldDefinition, single?: boolean): string =>
+  single || field.span === 'half' ? '' : 'sm:col-span-2'
+
+/**
  * Render field declarations into controls, one control shape per field kind
  * @param {FieldDefinition[]} fields - Field declarations
  * @param {FormValues} values - Current values
@@ -190,7 +200,7 @@ export const FormRenderer = ({
             // A toggle carries its own label, so it skips the field wrapper
             if (field.kind === 'toggle') {
               return (
-                <div key={field.name} className={cn(field.span === 'half' ? '' : 'sm:col-span-2')}>
+                <div key={field.name} className={cn(spanOf(field, single))}>
                   <Toggle
                     id={id}
                     checked={raw === true}
@@ -214,10 +224,7 @@ export const FormRenderer = ({
                 notice={busyNotice(raw, field.kind, field.busy, recordId)}
                 required={field.required}
                 maturity={field.maturity}
-                className={cn(
-                  field.span === 'half' ? '' : 'sm:col-span-2',
-                  glyph && FIELD_STYLES.glyphField
-                )}
+                className={cn(spanOf(field, single), glyph && FIELD_STYLES.glyphField)}
               >
                 {glyph ? (
                   <div className={FIELD_STYLES.row}>
