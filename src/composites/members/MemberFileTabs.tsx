@@ -5,8 +5,8 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { RevealMark } from '@/components/elements/display/RevealMark'
 import { OptionMark } from '@/components/elements/forms/OptionMark'
-import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { Button } from '@/components/elements/actions/Button'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
@@ -26,14 +26,8 @@ import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { DETAIL_BLOCK, MEMBER_BLOCK } from '@/declarations/ui/blocks'
-import { ICONS } from '@/declarations/ui/icons'
 import { LIST_STYLES } from '@/declarations/ui/variants'
-import {
-  DivisionCrest,
-  FunctionEmblems,
-  RoleBadge,
-  RoleEmblem,
-} from '@/composites/members/MemberBadges'
+import { RoleEmblem } from '@/composites/members/MemberBadges'
 import { sealedDisplay } from '@/components/structures/SealedValue'
 import { SensitiveFields } from '@/declarations/access/sensitive'
 import { MemberAccessPanel } from '@/composites/members/MemberAccessPanel'
@@ -70,10 +64,6 @@ export interface MemberFileTabsProps {
 }
 
 // Contact fields edited in place, in the order they appear under the section
-// Birthday celebration, a plain glyph rather than a worded badge
-const SuccessIcon = ICONS.success
-const FailureIcon = ICONS.failure
-
 const CONTACT_FIELD_NAMES = ['discordId', 'email', 'phone', 'birthday', 'languages']
 
 // Assignment fields edited in place, in the order they appear under the section
@@ -270,42 +260,29 @@ export const MemberFileTabs = ({
       field: fieldFor('birthday'),
       display:
         typeof identityValues.birthday === 'string' && identityValues.birthday ? (
-          <span className="flex flex-wrap items-center gap-2">
+          <span className="flex flex-wrap items-center gap-3">
             {formatDay(identityValues.birthday)}
-            {identityValues.celebrateBirthday ? (
-              <span title={MEMBER_COPY.birthdayCelebrated}>
-                <SuccessIcon
-                  className="h-4 w-4 shrink-0 text-[var(--color-success)]"
-                  aria-hidden="true"
-                />
-                <span className="sr-only">{MEMBER_COPY.birthdayCelebrated}</span>
-              </span>
-            ) : (
-              <span title={MEMBER_COPY.birthdayQuiet}>
-                <FailureIcon
-                  className="h-4 w-4 shrink-0 text-[var(--color-danger)]"
-                  aria-hidden="true"
-                />
-                <span className="sr-only">{MEMBER_COPY.birthdayQuiet}</span>
-              </span>
-            )}
+            <RevealMark
+              icon={identityValues.celebrateBirthday ? 'success' : 'failure'}
+              tone={identityValues.celebrateBirthday ? 'success' : 'danger'}
+              label={
+                identityValues.celebrateBirthday
+                  ? MEMBER_COPY.birthdayCelebrated
+                  : MEMBER_COPY.birthdayQuiet
+              }
+            />
           </span>
         ) : null,
     },
     {
       label: FIELD_COPY.languages,
       field: fieldFor('languages'),
-      display: Array.isArray(identityValues.languages) && identityValues.languages.length > 0 && (
-        <span className="flex flex-wrap gap-1.5">
-          {identityValues.languages.map((language) => (
-            <Badge
-              key={language}
-              label={optionText(fieldFor('languages'), language)}
-              tone="neutral"
-            />
-          ))}
-        </span>
-      ),
+      display:
+        Array.isArray(identityValues.languages) && identityValues.languages.length > 0
+          ? identityValues.languages
+              .map((language) => optionText(fieldFor('languages'), language))
+              .join(', ')
+          : null,
     },
   ]
 
@@ -319,6 +296,10 @@ export const MemberFileTabs = ({
       label: FIELD_COPY.division,
       field: fieldFor('divisionId'),
       display: optionLabel(fieldFor('divisionId'), identityValues.divisionId),
+    },
+    {
+      label: MEMBER_FIELD_COPY.dispositif,
+      display: summary.academyDispositif?.label ?? null,
     },
     {
       label: MEMBER_FIELD_COPY.primaryFunctions,
@@ -372,45 +353,22 @@ export const MemberFileTabs = ({
   ]
 
   const header = (
-    <Section title={MEMBER_COPY.identity} bare>
+    <div className={MEMBER_BLOCK.hero}>
       <div className={MEMBER_BLOCK.frame}>
-        <div className={MEMBER_BLOCK.header}>
-          <button
-            type="button"
-            disabled={!canEdit}
-            aria-label={ACTION_COPY.edit}
-            title={ACTION_COPY.edit}
-            onClick={() => openDialog('identity')}
-            className={MEMBER_BLOCK.portrait}
-          >
-            <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
-          </button>
-          <div className={MEMBER_BLOCK.identity}>
-            <span className={MEMBER_BLOCK.tags}>
-              <RoleBadge member={summary} />
-              {summary.youtubers.map((youtuber) => (
-                <CreatorLabel key={youtuber.id} name={youtuber.label} image={youtuber.image} />
-              ))}
-              {summary.academyDispositif && (
-                <Badge
-                  label={summary.academyDispositif.label}
-                  accent={summary.academyDispositif.accent}
-                  tone={'info'}
-                />
-              )}
-            </span>
-            {isLocked && <p className={DETAIL_BLOCK.empty}>{MEMBER_COPY.rootLocked}</p>}
-          </div>
-          <DivisionCrest division={summary.division} />
-          <FunctionEmblems
-            member={summary}
-            className={MEMBER_BLOCK.functions}
-            glyphClassName={MEMBER_BLOCK.function}
-          />
-          <RoleEmblem member={summary} className={MEMBER_BLOCK.glyph} />
-        </div>
+        <button
+          type="button"
+          disabled={!canEdit}
+          aria-label={ACTION_COPY.edit}
+          title={ACTION_COPY.edit}
+          onClick={() => openDialog('identity')}
+          className={MEMBER_BLOCK.portrait}
+        >
+          <Avatar name={summary.displayName} src={summary.avatarUrl} size="xl" />
+        </button>
+        <RoleEmblem member={summary} className={MEMBER_BLOCK.emblem} />
       </div>
-    </Section>
+      {isLocked && <p className={DETAIL_BLOCK.empty}>{MEMBER_COPY.rootLocked}</p>}
+    </div>
   )
 
   const identityTab = () => (

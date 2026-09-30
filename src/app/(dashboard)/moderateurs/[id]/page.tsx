@@ -106,7 +106,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader eyebrow={detail.summary.discordId} title={detail.summary.displayName} />
+      <PageHeader title={detail.summary.displayName} />
       <MemberFileTabs
         detail={sealed}
         recruitmentSessionId={recruitment?.sessionId ?? null}

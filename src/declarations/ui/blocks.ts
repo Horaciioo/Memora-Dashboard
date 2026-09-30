@@ -239,24 +239,17 @@ export const METRIC_BLOCK = {
  */
 
 export const MEMBER_BLOCK = {
-  // Diamond point around the glyph, tip at half the nominal height, border painted underneath
-  frame:
-    'rounded-l-[var(--radius-lg)] bg-[var(--color-border)] py-px pr-[1.4142px] pl-px [--tip:57px] [clip-path:polygon(0_0,calc(100%-var(--tip))_0,100%_var(--tip),100%_calc(100%-var(--tip)),calc(100%-var(--tip))_100%,0_100%)] sm:[--tip:77px]',
-  header:
-    'flex items-center gap-4 rounded-l-[calc(var(--radius-lg)-1px)] bg-[var(--color-surface-raised)] py-4 pr-[22.63px] pl-4 [clip-path:polygon(0_0,calc(100%-var(--tip)+1px)_0,100%_calc(var(--tip)-1px),100%_calc(100%-var(--tip)+1px),calc(100%-var(--tip)+1px)_100%,0_100%)] sm:py-5 sm:pr-[28.28px] sm:pl-5',
+  // Portrait alone, centred over the tabs
+  hero: 'flex flex-col items-center gap-3 py-2',
+  frame: 'relative',
   portrait:
-    'shrink-0 rounded-[var(--radius-sm)] transition-[filter] enabled:cursor-pointer enabled:hover:brightness-95 disabled:cursor-default',
-  identity: 'flex min-w-0 flex-1 flex-col gap-2',
-  tags: 'flex flex-wrap items-center gap-2',
-  crest: 'hidden h-16 w-16 shrink-0 object-contain sm:block',
-  // Nominal height, the tip derives from it
-  glyph: 'h-20 w-20 sm:h-28 sm:w-28',
-  // Functions line up beside the role, smaller, down the hierarchy
-  functions: 'gap-1.5 sm:gap-2',
-  function: 'h-8 w-8 sm:h-12 sm:w-12',
+    'block shrink-0 rounded-full transition-[filter] enabled:cursor-pointer enabled:hover:brightness-95 disabled:cursor-default',
+  // Role glyph pinned to the portrait's corner, ringed like a presence dot
+  emblem:
+    'absolute -right-1 -bottom-1 h-9 w-9 rounded-full bg-[var(--color-surface)] p-1 ring-2 ring-[var(--color-surface)]',
   // Read-only function list, each behind its small glyph
-  marks: 'flex flex-wrap items-center gap-x-3 gap-y-1',
-  mark: 'inline-flex items-center gap-1.5',
+  marks: 'flex flex-wrap items-center gap-x-4 gap-y-2',
+  mark: 'inline-flex items-center gap-2',
 } as const
 
 /**

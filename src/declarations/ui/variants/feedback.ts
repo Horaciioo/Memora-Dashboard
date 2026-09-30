@@ -195,3 +195,17 @@ export const QUERY_ERROR = {
   title: 'text-sm font-semibold text-[var(--color-danger)]',
   hint: 'text-xs text-[var(--color-ink-subtle)]',
 } as const
+
+/**
+ * Glyph unfolding into its words styles
+ * @type {Record<string, string>}
+ */
+
+export const REVEAL_MARK = {
+  root: 'group inline-flex items-center gap-1.5 rounded-full text-sm font-semibold outline-none',
+  glyph: 'h-4 w-4 shrink-0',
+  // Track grows from nothing, so the words uncover from the glyph rightwards
+  track:
+    'grid grid-cols-[0fr] transition-[grid-template-columns] duration-[var(--motion-duration-panel)] ease-out group-hover:grid-cols-[1fr] group-focus-visible:grid-cols-[1fr] motion-reduce:transition-none',
+  text: 'overflow-hidden whitespace-nowrap not-italic',
+} as const

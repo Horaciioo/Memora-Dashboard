@@ -16,7 +16,7 @@ const initialsOf = (name: string): string =>
     .join('')
 
 // Pixel size per token, reserved so the row never jumps once the picture lands
-const PIXEL_SIZES: Record<AvatarSize, number> = { xs: 24, sm: 32, md: 40, lg: 64 }
+const PIXEL_SIZES: Record<AvatarSize, number> = { xs: 24, sm: 32, md: 40, lg: 64, xl: 96 }
 
 export interface AvatarProps {
   name: string
