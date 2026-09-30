@@ -2,16 +2,14 @@
 
 import { createPortal } from 'react-dom'
 
-import { Badge } from '@/components/elements/display/Badge'
 import { Glyph } from '@/components/elements/display/Glyph'
-import { CALENDAR_FIELD_COPY } from '@/declarations/calendar/copy'
-import {
-  CALENDAR_KIND_REGISTRY,
-  CALENDAR_SOURCE_REGISTRY,
-} from '@/declarations/calendar/registries'
+import { CALENDAR_SOURCE_REGISTRY } from '@/declarations/calendar/registries'
+import { ICONS } from '@/declarations/ui/icons'
+import { accentPaint } from '@/declarations/ui/theme'
 import { CALENDAR_STYLES } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
-import { formatDayTime } from '@/utils/format/dates'
+import { cn } from '@/utils/classnames'
+import { entrySpan } from '@/utils/format/entrySpan'
 
 export interface CalendarEntryPreviewProps {
   entry: CalendarEntry
@@ -34,6 +32,13 @@ const OFFSET = 8
 export const CalendarEntryPreview = ({ entry, anchor }: CalendarEntryPreviewProps) => {
   if (typeof document === 'undefined') return null
 
+  const Bullet = ICONS.bullet
+  const ClockIcon = ICONS.clock
+  const PersonIcon = ICONS.members
+  const source = CALENDAR_SOURCE_REGISTRY.get(entry.source)
+  const SourceIcon = ICONS[source.icon]
+  const paint = accentPaint(entry.accent, entry.muted ? 'neutral' : 'brand')
+
   // Sit above the chip by default, clamped inside the viewport
   const left = Math.max(8, Math.min(anchor.left, window.innerWidth - CARD_WIDTH - 8))
   const above = anchor.top > 220
@@ -46,25 +51,27 @@ export const CalendarEntryPreview = ({ entry, anchor }: CalendarEntryPreviewProp
       style={{ left, top, transform: above ? 'translateY(-100%)' : undefined }}
     >
       <span className={CALENDAR_STYLES.previewHead}>
+        <span className={cn('inline-flex', paint.text)} style={paint.style}>
+          <Bullet className={CALENDAR_STYLES.previewBullet} aria-hidden="true" />
+        </span>
         <Glyph value={entry.emoji} size="chip" />
         <span className={CALENDAR_STYLES.previewTitle}>{entry.title}</span>
       </span>
-      <span className="flex flex-wrap gap-1.5">
-        <Badge
-          label={CALENDAR_KIND_REGISTRY.label(entry.kind)}
-          accent={entry.accent}
-          tone="brand"
-        />
-        <Badge label={CALENDAR_SOURCE_REGISTRY.get(entry.source).label} tone="neutral" />
-      </span>
       <div className={CALENDAR_STYLES.previewMeta}>
-        <span>{`${CALENDAR_FIELD_COPY.startsAt} · ${formatDayTime(entry.startsAt)}`}</span>
-        {entry.endsAt && (
-          <span>{`${CALENDAR_FIELD_COPY.endsAt} · ${formatDayTime(entry.endsAt)}`}</span>
-        )}
+        <span className={CALENDAR_STYLES.previewLine}>
+          <ClockIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
+          {entrySpan(entry.startsAt, entry.endsAt, entry.allDay)}
+        </span>
         {entry.subjectName && (
-          <span>{`${CALENDAR_FIELD_COPY.subject} · ${entry.subjectName}`}</span>
+          <span className={CALENDAR_STYLES.previewLine}>
+            <PersonIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
+            {entry.subjectName}
+          </span>
         )}
+        <span className={CALENDAR_STYLES.previewLine}>
+          <SourceIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
+          {source.label}
+        </span>
       </div>
     </div>,
     document.body

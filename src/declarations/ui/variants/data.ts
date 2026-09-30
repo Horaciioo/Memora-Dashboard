@@ -57,6 +57,37 @@ export const RECORD_ROW = {
 } as const
 
 /**
+ * Calendar side rail styles, the month in miniature then the switches
+ * @type {Record<string, string>}
+ */
+
+export const CALENDAR_SIDEBAR = {
+  layout: 'grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start',
+  rail: 'flex flex-col gap-8 lg:sticky lg:top-4',
+  mini: 'flex flex-col gap-2',
+  miniHead: 'flex items-center justify-between gap-2',
+  miniTitle: 'pl-2 text-sm font-extrabold first-letter:uppercase',
+  miniGrid: 'grid grid-cols-7 gap-y-0.5 text-center',
+  miniWeekday:
+    'py-1 text-[10px] font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  miniDay:
+    'mx-auto flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold tabular-nums transition-colors hover:bg-[var(--color-hover)]',
+  miniDayOutside: 'text-[var(--color-ink-subtle)]',
+  miniDayToday:
+    'bg-[var(--color-brand-600)] text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
+  miniDayPicked: 'ring-2 ring-[var(--color-brand-600)] ring-inset',
+  group: 'flex flex-col gap-1',
+  groupTitle: 'px-2 pb-1 text-xs font-black tracking-wide text-[var(--color-ink)] uppercase',
+  row: 'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)]',
+  rowLabel: 'min-w-0 flex-1 truncate',
+  box: 'flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border-2 transition-colors',
+  boxCheck: 'h-3 w-3 text-[var(--color-on-accent)]',
+  rowGlyph: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
+  search:
+    'w-full rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] px-3 py-2 text-sm text-[var(--color-on-field)] outline-none placeholder:text-[var(--color-on-field-subtle)] focus:border-[var(--color-field-border-strong)]',
+} as const
+
+/**
  * Own absence page styles
  * @type {Record<string, string>}
  */
@@ -191,7 +222,7 @@ export const CALENDAR_STYLES = {
   frame:
     'overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
   toolbar: 'flex flex-wrap items-center gap-2 pb-3',
-  period: 'text-base font-bold first-letter:uppercase',
+  period: 'text-xl font-extrabold tracking-tight first-letter:uppercase sm:text-2xl',
   weekdays:
     'border-b border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   weekdaysMonth: 'grid grid-cols-7',
@@ -222,6 +253,12 @@ export const CALENDAR_STYLES = {
   barRunsOut: '-mr-1.5',
   entry:
     'relative flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
+  // Month entry, a coloured bullet ahead of its words
+  line: 'relative flex w-full cursor-grab items-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-left text-xs transition-colors hover:bg-[var(--color-hover)] active:cursor-grabbing',
+  lineBullet: 'h-2.5 w-2.5 shrink-0',
+  lineTime: 'shrink-0 tabular-nums text-[var(--color-ink-subtle)]',
+  lineTitle: 'min-w-0 flex-1 truncate font-semibold',
+  lineMuted: 'text-[var(--color-ink-subtle)]',
   entryTime: 'shrink-0 tabular-nums opacity-70',
   // A long title wraps onto the next line rather than losing its end
   entryTitle: 'min-w-0 flex-1 font-medium break-words',
@@ -273,10 +310,14 @@ export const CALENDAR_STYLES = {
   rollCallPerson: 'flex items-center gap-2 text-sm',
   // Hover preview card, portalled above the chip
   preview:
-    'fixed z-[70] flex w-72 flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 text-sm shadow-[var(--shadow-md)]',
-  previewHead: 'flex items-center gap-2 font-semibold',
+    'fixed z-[70] flex w-72 flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 text-sm shadow-[var(--shadow-md)]',
+  previewHead: 'flex items-center gap-2 font-bold',
+  previewBullet: 'h-3 w-3 shrink-0',
+  previewLine: 'flex items-center gap-2',
+  detailMeta: 'flex flex-col gap-2 text-sm text-[var(--color-ink-subtle)]',
+  previewIcon: 'h-4 w-4 shrink-0',
   previewTitle: 'truncate',
-  previewMeta: 'flex flex-col gap-1 text-xs text-[var(--color-ink-subtle)]',
+  previewMeta: 'flex flex-col gap-2 text-sm text-[var(--color-ink-subtle)]',
 } as const
 
 /**

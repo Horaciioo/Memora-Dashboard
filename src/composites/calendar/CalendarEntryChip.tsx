@@ -28,6 +28,8 @@ export interface CalendarEntryChipProps {
   fill?: boolean
   // One line, short span
   compact?: boolean
+  // Bullet and words on one line, no fill
+  line?: boolean
   // Overrides the start time
   timeLabel?: string
 }
@@ -47,6 +49,7 @@ const HOVER_DELAY = 140
  * @param {Record<string, unknown>} [dragProps] - Drag handlers of the board
  * @param {boolean} [fill] - Fills its seat
  * @param {boolean} [compact] - Single line
+ * @param {boolean} [line] - Bullet line
  * @param {string} [timeLabel] - Shown time
  * @return {JSX.Element}
  */
@@ -62,6 +65,7 @@ export const CalendarEntryChip = ({
   dragProps,
   fill,
   compact,
+  line,
   timeLabel,
 }: CalendarEntryChipProps) => {
   // An entry wears the colour of its creator, an absence stays grey
@@ -69,6 +73,7 @@ export const CalendarEntryChip = ({
   const [anchor, setAnchor] = useState<DOMRect | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const RollCallIcon = ICONS.meetings
+  const Bullet = ICONS.bullet
 
   // Never leave a timer running once the chip is gone
   useEffect(
@@ -83,6 +88,9 @@ export const CalendarEntryChip = ({
 
   const openPreview = (element: HTMLElement) => {
     if (!previewable) return
+
+    // Hover then focus must not stack two timers
+    if (timer.current) clearTimeout(timer.current)
 
     const rect = element.getBoundingClientRect()
     timer.current = setTimeout(() => setAnchor(rect), HOVER_DELAY)
@@ -111,27 +119,56 @@ export const CalendarEntryChip = ({
         onFocus={(event) => openPreview(event.currentTarget)}
         onBlur={closePreview}
         style={paint.style}
-        className={cn(
-          band ? CALENDAR_STYLES.bar : CALENDAR_STYLES.entry,
-          band && (opensBand ? CALENDAR_STYLES.barStart : CALENDAR_STYLES.barRunsIn),
-          band && (closesBand ? CALENDAR_STYLES.barEnd : CALENDAR_STYLES.barRunsOut),
-          entry.muted
-            ? cn(CALENDAR_STYLES.entryMuted, paint.soft, paint.text)
-            : cn(paint.solid, CALENDAR_STYLES.entrySolid),
-          entry.readOnly && cn(CALENDAR_STYLES.entryReadOnly, paint.border),
-          selected && CALENDAR_STYLES.entrySelected,
-          fill && CALENDAR_STYLES.entryFill,
-          compact && CALENDAR_STYLES.entryCompact
-        )}
+        className={
+          line && !band
+            ? cn(
+                CALENDAR_STYLES.line,
+                entry.muted && CALENDAR_STYLES.lineMuted,
+                entry.readOnly && 'cursor-pointer',
+                selected && CALENDAR_STYLES.entrySelected
+              )
+            : cn(
+                band ? CALENDAR_STYLES.bar : CALENDAR_STYLES.entry,
+                band && (opensBand ? CALENDAR_STYLES.barStart : CALENDAR_STYLES.barRunsIn),
+                band && (closesBand ? CALENDAR_STYLES.barEnd : CALENDAR_STYLES.barRunsOut),
+                entry.muted
+                  ? cn(CALENDAR_STYLES.entryMuted, paint.soft, paint.text)
+                  : cn(paint.solid, CALENDAR_STYLES.entrySolid),
+                entry.readOnly && cn(CALENDAR_STYLES.entryReadOnly, paint.border),
+                selected && CALENDAR_STYLES.entrySelected,
+                fill && CALENDAR_STYLES.entryFill,
+                compact && CALENDAR_STYLES.entryCompact
+              )
+        }
         {...(draggable ? (dragProps ?? {}) : {})}
       >
-        {!entry.allDay && (
-          <span className={CALENDAR_STYLES.entryTime}>{timeLabel ?? timeOf(entry.startsAt)}</span>
+        {line && !band ? (
+          <>
+            <span className={cn('inline-flex', paint.text)} style={paint.style}>
+              <Bullet className={CALENDAR_STYLES.lineBullet} aria-hidden="true" />
+            </span>
+            {!entry.allDay && (
+              <span className={CALENDAR_STYLES.lineTime}>
+                {timeLabel ?? timeOf(entry.startsAt)}
+              </span>
+            )}
+            <span className={CALENDAR_STYLES.lineTitle}>{entry.title}</span>
+          </>
+        ) : (
+          <>
+            {!entry.allDay && (
+              <span className={CALENDAR_STYLES.entryTime}>
+                {timeLabel ?? timeOf(entry.startsAt)}
+              </span>
+            )}
+            {previewable && entry.rollCall && (
+              <RollCallIcon className={CALENDAR_STYLES.chipMark} aria-hidden="true" />
+            )}
+            <span className={CALENDAR_STYLES.entryTitle}>
+              {band && !opensBand ? ' ' : entry.title}
+            </span>
+          </>
         )}
-        {previewable && entry.rollCall && (
-          <RollCallIcon className={CALENDAR_STYLES.chipMark} aria-hidden="true" />
-        )}
-        <span className={CALENDAR_STYLES.entryTitle}>{band && !opensBand ? ' ' : entry.title}</span>
       </button>
       {anchor && <CalendarEntryPreview entry={entry} anchor={anchor} />}
     </>

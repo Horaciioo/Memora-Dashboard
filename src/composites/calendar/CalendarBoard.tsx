@@ -2,41 +2,41 @@
 
 import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useState } from 'react'
-import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { Dialog } from '@/components/structures/Dialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
-import { FilterBar, type FilterDefinition } from '@/components/structures/FilterBar'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { AttendancePanel } from '@/composites/calendar/AttendancePanel'
 import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
+import { CalendarSidebar } from '@/composites/calendar/CalendarSidebar'
 import { CalendarTimeGrid } from '@/composites/calendar/CalendarTimeGrid'
 import type { GridMode } from '@/composites/calendar/CalendarTimeGrid'
 import { useCalendar } from '@/core/hooks/data/useCalendar'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
-import { useListControls } from '@/core/hooks/interaction/useListControls'
 import { useSlotDraft } from '@/core/hooks/interaction/useSlotDraft'
-import { toOptions } from '@/core/lib/forms/options'
+import { useCalendarFiltersStore } from '@/core/store/calendarFilters'
+import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { CALENDAR_COPY, CALENDAR_FIELD_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
 import {
-  ATTENDANCE_STATUS_REGISTRY,
   CALENDAR_KIND_REGISTRY,
+  CALENDAR_LAYER_REGISTRY,
   CALENDAR_SOURCE_REGISTRY,
+  layerOfSource,
 } from '@/declarations/calendar/registries'
 import { CALENDAR_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { accentPaint, accentVars, toTone } from '@/declarations/ui/theme'
-import { CALENDAR_STYLES } from '@/declarations/ui/variants'
+import { accentPaint, accentVars } from '@/declarations/ui/theme'
+import { CALENDAR_SIDEBAR, CALENDAR_STYLES } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
-import type { FieldDefinition, FormValues } from '@/types/forms'
+import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import { GUIDE_BEACONS } from '@/declarations/academy/guides'
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
@@ -58,10 +58,12 @@ import {
   unitGrid,
   weekdayOf,
 } from '@/utils/format/calendar'
-import { formatDayTime } from '@/utils/format/dates'
+import { entrySpan } from '@/utils/format/entrySpan'
 
 export interface CalendarBoardProps {
   initialEntries: CalendarEntry[]
+  // Creators in perimeter, the sidebar switching them on and off
+  youtubers?: FieldOption[]
   fields: FieldDefinition[]
   anchor: string
   canManage: boolean
@@ -81,9 +83,6 @@ const TEMPLATE_SECTION = 'evenements'
 // Fields a whole selection can be rewritten with at once
 const BULK_FIELD_NAMES = ['kind', 'templateId', 'accountId', 'visibility', 'youtuberId']
 
-// The one value of the absence filter, its empty state being what hides them
-const ABSENCES_SHOWN = 'shown'
-
 // Spans the grid can be read at
 const UNITS: { value: CalendarUnit; label: string }[] = [
   { value: 'day', label: CALENDAR_COPY.day },
@@ -100,9 +99,16 @@ const GRID_MODES: { value: GridMode; label: string }[] = [
 // Day add glyph
 const DayAddIcon = ICONS.add
 
+// Glyphs of the detail lines
+const ClockIcon = ICONS.clock
+const VisibleIcon = ICONS.visible
+const RollCallIcon = ICONS.meetings
+const InfoIcon = ICONS.info
+
 /**
  * Shared calendar
  * @param {CalendarEntry[]} initialEntries - Entries resolved server-side
+ * @param {FieldOption[]} youtubers - Creators in perimeter
  * @param {FieldDefinition[]} fields - Declarations of the entry form
  * @param {string} anchor - ISO day the grid opens on
  * @param {boolean} canManage - Member may post and move entries
@@ -114,6 +120,7 @@ const DayAddIcon = ICONS.add
 
 export const CalendarBoard = ({
   initialEntries,
+  youtubers = [],
   fields,
   anchor,
   canManage,
@@ -131,7 +138,25 @@ export const CalendarBoard = ({
   const [unit, setUnit] = useState<CalendarUnit>('month')
   const [gridMode, setGridMode] = useState<GridMode>('draw')
   const [cursor, setCursor] = useState(anchor)
-  const { search, setSearch, filterValues, setFilter, isFiltered, reset } = useListControls()
+  const [search, setSearch] = useState('')
+  const { can } = useAuthContext()
+  const { hiddenLayers, hiddenCreators, toggleLayer, toggleCreator } = useCalendarFiltersStore()
+
+  // Stored choices are read once mounted
+  useEffect(() => {
+    void useCalendarFiltersStore.persist.rehydrate()
+  }, [])
+
+  // Calendars this viewer may read at all
+  const layers = useMemo(
+    () =>
+      CALENDAR_LAYER_REGISTRY.keys.filter((layer) => {
+        const permission = CALENDAR_LAYER_REGISTRY.get(layer).permission
+
+        return permission === null || can(permission)
+      }),
+    [can]
+  )
   const [dialog, setDialog] = useState<'form' | 'detail' | 'bulk' | null>(linked ? 'detail' : null)
   const [editing, setEditing] = useState<CalendarEntry | null>(null)
   const [draft, setDraft] = useState<FormValues | null>(null)
@@ -149,47 +174,22 @@ export const CalendarBoard = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [range.from, range.to])
 
-  const filters: FilterDefinition[] = [
-    {
-      name: 'source',
-      label: CALENDAR_COPY.legendSourcesTitle,
-      allLabel: CALENDAR_COPY.allSources,
-      options: toOptions(CALENDAR_SOURCE_REGISTRY),
-    },
-    {
-      name: 'absences',
-      label: CALENDAR_COPY.filterAbsences,
-      allLabel: CALENDAR_COPY.absencesHidden,
-      options: [{ value: ABSENCES_SHOWN, label: CALENDAR_COPY.absencesShown }],
-    },
-    {
-      name: 'answer',
-      label: CALENDAR_COPY.filterAnswer,
-      allLabel: CALENDAR_COPY.allAnswers,
-      options: toOptions(ATTENDANCE_STATUS_REGISTRY),
-      maturity: 'beta',
-    },
-  ]
-
-  // An absence stays out of the grid until the filter asks for it
+  // A switched off calendar or creator stays out of the grid
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase()
 
     return calendar.entries.filter((entry) => {
-      if (
-        entry.source === CalendarSources.Absence &&
-        filterValues.absences !== ABSENCES_SHOWN &&
-        entry.id !== focusEntryId
-      ) {
-        return false
-      }
-
-      if (filterValues.source && entry.source !== filterValues.source) return false
-      if (filterValues.answer && entry.attendance?.mine !== filterValues.answer) return false
+      if (entry.id === focusEntryId) return true
+      if (hiddenLayers.includes(layerOfSource(entry.source))) return false
+      if (entry.youtuberId && hiddenCreators.includes(entry.youtuberId)) return false
 
       return term.length === 0 || entry.title.toLowerCase().includes(term)
     })
-  }, [calendar.entries, filterValues, search, focusEntryId])
+  }, [calendar.entries, hiddenLayers, hiddenCreators, search, focusEntryId])
+
+  // Glyph of the origin of the open entry
+  const SourceIcon =
+    ICONS[CALENDAR_SOURCE_REGISTRY.get(opened?.source ?? CalendarSources.Entry).icon]
 
   // The open detail stays in step with roster updates
   const openedEntry = opened
@@ -209,6 +209,10 @@ export const CalendarBoard = ({
 
     return buckets
   }, [days, visible])
+
+  // Opens and closes on the same day
+  const isSingleDay = (entry: CalendarEntry) =>
+    toDayKey(entry.startsAt) === lastDayKey(entry.startsAt, entry.endsAt)
 
   const entriesOf = (dayKey: string, kind: string) =>
     (byDay.get(dayKey) ?? []).filter(
@@ -355,19 +359,24 @@ export const CalendarBoard = ({
    */
 
   const renderBands = (dayKey: string) =>
-    entriesOf(dayKey, CalendarKinds.Period).map((entry) => (
-      <CalendarEntryChip
-        key={entry.id}
-        entry={entry}
-        band
-        opensBand={toDayKey(entry.startsAt) === dayKey}
-        closesBand={lastDayKey(entry.startsAt, entry.endsAt) === dayKey}
-        selected={selection.includes(entry.id)}
-        draggable={canManage && !entry.readOnly}
-        onOpen={openEntry}
-        dragProps={itemProps({ id: entry.id, from: dayKey })}
-      />
-    ))
+    entriesOf(dayKey, CalendarKinds.Period).map((entry) => {
+      // A single day reads as a bullet line, the month drawing it beneath its own cell
+      if (isSingleDay(entry)) return unit === 'month' ? null : renderCard(entry, dayKey, true)
+
+      return (
+        <CalendarEntryChip
+          key={entry.id}
+          entry={entry}
+          band
+          opensBand={toDayKey(entry.startsAt) === dayKey}
+          closesBand={lastDayKey(entry.startsAt, entry.endsAt) === dayKey}
+          selected={selection.includes(entry.id)}
+          draggable={canManage && !entry.readOnly}
+          onOpen={openEntry}
+          dragProps={itemProps({ id: entry.id, from: dayKey })}
+        />
+      )
+    })
 
   /**
    * Draw one card of the grid
@@ -376,10 +385,11 @@ export const CalendarBoard = ({
    * @return {JSX.Element}
    */
 
-  const renderCard = (entry: CalendarEntry, container: string) => (
+  const renderCard = (entry: CalendarEntry, container: string, line?: boolean) => (
     <CalendarEntryChip
       key={`${container}:${entry.id}`}
       entry={entry}
+      line={line}
       selected={selection.includes(entry.id)}
       draggable={canManage && !entry.readOnly}
       onOpen={openEntry}
@@ -390,226 +400,241 @@ export const CalendarBoard = ({
   return (
     <>
       <Section description={CALENDAR_COPY.moveHint} bare>
-        <div className={CALENDAR_STYLES.toolbar}>
-          <Button
-            variant="icon"
-            icon="back"
-            aria-label={CALENDAR_COPY.previous}
-            onClick={() => setCursor(shiftAnchor(cursor, unit, -1))}
-          />
-          <Button
-            variant="icon"
-            icon="forward"
-            aria-label={CALENDAR_COPY.next}
-            onClick={() => setCursor(shiftAnchor(cursor, unit, 1))}
-          />
-          <span className={CALENDAR_STYLES.period}>{periodLabel(cursor, unit)}</span>
-          <Button className="ml-auto" onClick={() => setCursor(toDayKey(new Date()))}>
-            {CALENDAR_COPY.today}
-          </Button>
-          {canManage && (
-            <span {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.calendarAdd }}>
-              <Button variant="primary" icon="add" onClick={() => openForm(null)}>
-                {CALENDAR_COPY.add}
-              </Button>
-            </span>
-          )}
-          <SegmentedControl
-            options={UNITS}
-            value={unit}
-            onChange={setUnit}
-            label={CALENDAR_COPY.unit}
-          />
-          {canManage && unit !== 'month' && (
-            <SegmentedControl
-              options={GRID_MODES}
-              value={gridMode}
-              onChange={setGridMode}
-              label={CALENDAR_COPY.gridMode}
+        <div className={sessionId ? undefined : CALENDAR_SIDEBAR.layout}>
+          {!sessionId && (
+            <CalendarSidebar
+              cursor={cursor}
+              onPick={setCursor}
+              onCursor={setCursor}
+              search={search}
+              onSearch={setSearch}
+              layers={layers}
+              hiddenLayers={hiddenLayers}
+              onToggleLayer={toggleLayer}
+              youtubers={youtubers}
+              hiddenCreators={hiddenCreators}
+              onToggleCreator={toggleCreator}
             />
           )}
-        </div>
 
-        <FilterBar
-          searchLabel={CALENDAR_COPY.search}
-          search={search}
-          onSearch={setSearch}
-          filters={filters}
-          values={filterValues}
-          onFilter={setFilter}
-          onReset={reset}
-          isFiltered={isFiltered}
-        />
-
-        {selected.length > 0 && (
-          <div className={CALENDAR_STYLES.selectionBar}>
-            <span>
-              {selected.length > 1 ? CALENDAR_COPY.selectedPlural : CALENDAR_COPY.selected}
-            </span>
-            <Button className="ml-auto" onClick={() => setSelection([])}>
-              {CALENDAR_COPY.clearSelection}
-            </Button>
-            <Button
-              icon="edit"
-              onClick={() => {
-                calendar.clearIssues()
-                setDialog('bulk')
-              }}
-            >
-              {CALENDAR_COPY.editSelection}
-            </Button>
-            <Button variant="danger" icon="remove" onClick={() => setPendingDeletion(selected)}>
-              {CALENDAR_COPY.deleteSelection}
-            </Button>
-          </div>
-        )}
-
-        <div className={CALENDAR_STYLES.frame}>
-          <div
-            className={cn(
-              CALENDAR_STYLES.weekdays,
-              isTimed ? cn(CALENDAR_STYLES.weekdaysTimed, columns) : CALENDAR_STYLES.weekdaysMonth
-            )}
-          >
-            {isTimed ? (
-              <>
-                <span className={CALENDAR_STYLES.weekday} />
-                {days.map((day) => (
-                  <span
-                    key={day.key}
-                    className={cn(CALENDAR_STYLES.weekday, CALENDAR_STYLES.weekdayHead)}
-                  >
-                    <span>{WEEKDAY_LABELS[weekdayOf(day.key)]}</span>
-                    <span
-                      className={cn(
-                        CALENDAR_STYLES.dayNumber,
-                        day.isToday && CALENDAR_STYLES.dayNumberToday
-                      )}
-                    >
-                      {day.dayOfMonth}
-                    </span>
+          <div className="flex min-w-0 flex-col gap-4">
+            <div className={CALENDAR_STYLES.toolbar}>
+              <Button onClick={() => setCursor(toDayKey(new Date()))}>{CALENDAR_COPY.today}</Button>
+              <Button
+                variant="icon"
+                icon="back"
+                aria-label={CALENDAR_COPY.previous}
+                onClick={() => setCursor(shiftAnchor(cursor, unit, -1))}
+              />
+              <Button
+                variant="icon"
+                icon="forward"
+                aria-label={CALENDAR_COPY.next}
+                onClick={() => setCursor(shiftAnchor(cursor, unit, 1))}
+              />
+              <span className={CALENDAR_STYLES.period}>{periodLabel(cursor, unit)}</span>
+              <span className="ml-auto flex flex-wrap items-center gap-3">
+                {canManage && unit !== 'month' && (
+                  <SegmentedControl
+                    options={GRID_MODES}
+                    value={gridMode}
+                    onChange={setGridMode}
+                    label={CALENDAR_COPY.gridMode}
+                  />
+                )}
+                <SegmentedControl
+                  options={UNITS}
+                  value={unit}
+                  onChange={setUnit}
+                  label={CALENDAR_COPY.unit}
+                />
+                {canManage && (
+                  <span {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.calendarAdd }}>
+                    <Button variant="primary" icon="add" onClick={() => openForm(null)}>
+                      {CALENDAR_COPY.add}
+                    </Button>
                   </span>
-                ))}
-              </>
-            ) : (
-              WEEKDAY_LABELS.map((label) => (
-                <span key={label} className={CALENDAR_STYLES.weekday}>
-                  {label}
-                </span>
-              ))
-            )}
-          </div>
+                )}
+              </span>
+            </div>
 
-          {isTimed ? (
-            <>
-              <div className={cn(CALENDAR_STYLES.allDay, columns)}>
-                <span className={CALENDAR_STYLES.allDayLabel}>{CALENDAR_COPY.allDayRow}</span>
-                {days.map((day) => (
-                  <div key={day.key} className={CALENDAR_STYLES.allDayCell}>
-                    {renderZoneLabels(day.key)}
-                    {renderBands(day.key)}
-                    {allDayCards(day.key).map((entry) => renderCard(entry, day.key))}
-                  </div>
-                ))}
+            {selected.length > 0 && (
+              <div className={CALENDAR_STYLES.selectionBar}>
+                <span>
+                  {selected.length > 1 ? CALENDAR_COPY.selectedPlural : CALENDAR_COPY.selected}
+                </span>
+                <Button className="ml-auto" onClick={() => setSelection([])}>
+                  {CALENDAR_COPY.clearSelection}
+                </Button>
+                <Button
+                  icon="edit"
+                  onClick={() => {
+                    calendar.clearIssues()
+                    setDialog('bulk')
+                  }}
+                >
+                  {CALENDAR_COPY.editSelection}
+                </Button>
+                <Button variant="danger" icon="remove" onClick={() => setPendingDeletion(selected)}>
+                  {CALENDAR_COPY.deleteSelection}
+                </Button>
+              </div>
+            )}
+
+            <div className={CALENDAR_STYLES.frame}>
+              <div
+                className={cn(
+                  CALENDAR_STYLES.weekdays,
+                  isTimed
+                    ? cn(CALENDAR_STYLES.weekdaysTimed, columns)
+                    : CALENDAR_STYLES.weekdaysMonth
+                )}
+              >
+                {isTimed ? (
+                  <>
+                    <span className={CALENDAR_STYLES.weekday} />
+                    {days.map((day) => (
+                      <span
+                        key={day.key}
+                        className={cn(CALENDAR_STYLES.weekday, CALENDAR_STYLES.weekdayHead)}
+                      >
+                        <span>{WEEKDAY_LABELS[weekdayOf(day.key)]}</span>
+                        <span
+                          className={cn(
+                            CALENDAR_STYLES.dayNumber,
+                            day.isToday && CALENDAR_STYLES.dayNumberToday
+                          )}
+                        >
+                          {day.dayOfMonth}
+                        </span>
+                      </span>
+                    ))}
+                  </>
+                ) : (
+                  WEEKDAY_LABELS.map((label) => (
+                    <span key={label} className={CALENDAR_STYLES.weekday}>
+                      {label}
+                    </span>
+                  ))
+                )}
               </div>
 
-              <CalendarTimeGrid
-                days={days}
-                entries={visible.filter(
-                  (entry) => entry.kind === CalendarKinds.Event && !entry.allDay
-                )}
-                agendaExtras={allDayCards}
-                columns={columns}
-                canManage={canManage}
-                mode={gridMode}
-                selection={selection}
-                onDraw={(drawn) =>
-                  openForm(null, {
-                    kind: CalendarKinds.Event,
-                    allDay: false,
-                    startsAt: toFieldValue(atMinute(drawn.fromDay, drawn.startMinute)),
-                    endsAt: toFieldValue(atMinute(drawn.toDay, drawn.endMinute)),
-                  })
-                }
-                onSelectMany={setSelection}
-                onMove={(entry, dayKey, startMinute) =>
-                  void calendar.move(entry.id, atMinute(dayKey, startMinute))
-                }
-                onOpen={openEntry}
-                renderZones={renderZones}
-              />
-            </>
-          ) : (
-            <div className={CALENDAR_STYLES.month}>
-              {days.map((day) => {
-                const cards = entriesOf(day.key, CalendarKinds.Event)
-                const shown = cards.slice(0, CALENDAR_SETTINGS.maxEntriesPerDay)
-                const hiddenCount = cards.length - shown.length
-
-                return (
-                  <div
-                    key={day.key}
-                    className={cn(
-                      CALENDAR_STYLES.day,
-                      !day.isCurrentMonth && CALENDAR_STYLES.dayOutside,
-                      covers(day.key) && CALENDAR_STYLES.dayDrafted,
-                      over === day.key && 'is-drop-target'
-                    )}
-                    {...(canManage ? containerProps(day.key) : {})}
-                    {...slotProps(day.key)}
-                  >
-                    {renderZones(day.key)}
-                    <span
-                      className={cn(
-                        CALENDAR_STYLES.dayNumber,
-                        !day.isCurrentMonth && CALENDAR_STYLES.dayNumberOutside,
-                        day.isToday && CALENDAR_STYLES.dayNumberToday
-                      )}
-                    >
-                      {day.dayOfMonth}
-                    </span>
-                    {canManage && (
-                      <button
-                        type="button"
-                        aria-label={CALENDAR_COPY.add}
-                        className={CALENDAR_STYLES.dayAdd}
-                        onClick={() =>
-                          openForm(null, {
-                            startsAt: toFieldValue(
-                              dayBounds(
-                                day.key,
-                                CALENDAR_SETTINGS.dayStartHour,
-                                CALENDAR_SETTINGS.dayEndHour
-                              ).startsAt
-                            ),
-                          })
-                        }
-                      >
-                        <DayAddIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                      </button>
-                    )}
-                    {renderZoneLabels(day.key)}
-                    {renderBands(day.key)}
-                    {shown.map((entry) => renderCard(entry, day.key))}
-                    {hiddenCount > 0 && (
-                      <span className={CALENDAR_STYLES.overflow}>
-                        {`+${hiddenCount} ${CALENDAR_COPY.more}`}
-                      </span>
-                    )}
+              {isTimed ? (
+                <>
+                  <div className={cn(CALENDAR_STYLES.allDay, columns)}>
+                    <span className={CALENDAR_STYLES.allDayLabel}>{CALENDAR_COPY.allDayRow}</span>
+                    {days.map((day) => (
+                      <div key={day.key} className={CALENDAR_STYLES.allDayCell}>
+                        {renderZoneLabels(day.key)}
+                        {renderBands(day.key)}
+                        {allDayCards(day.key).map((entry) => renderCard(entry, day.key, true))}
+                      </div>
+                    ))}
                   </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
 
-        {!hasTemplates && canManage && !sessionId && (
-          <Link href={ROUTES.settingsSection(TEMPLATE_SECTION)}>
-            <Button variant="link" icon="settings">
-              {CALENDAR_COPY.noTemplatesTitle}
-            </Button>
-          </Link>
-        )}
+                  <CalendarTimeGrid
+                    days={days}
+                    entries={visible.filter(
+                      (entry) => entry.kind === CalendarKinds.Event && !entry.allDay
+                    )}
+                    agendaExtras={allDayCards}
+                    columns={columns}
+                    canManage={canManage}
+                    mode={gridMode}
+                    selection={selection}
+                    onDraw={(drawn) =>
+                      openForm(null, {
+                        kind: CalendarKinds.Event,
+                        allDay: false,
+                        startsAt: toFieldValue(atMinute(drawn.fromDay, drawn.startMinute)),
+                        endsAt: toFieldValue(atMinute(drawn.toDay, drawn.endMinute)),
+                      })
+                    }
+                    onSelectMany={setSelection}
+                    onMove={(entry, dayKey, startMinute) =>
+                      void calendar.move(entry.id, atMinute(dayKey, startMinute))
+                    }
+                    onOpen={openEntry}
+                    renderZones={renderZones}
+                  />
+                </>
+              ) : (
+                <div className={CALENDAR_STYLES.month}>
+                  {days.map((day) => {
+                    // Lines of the day, single day periods reading among the events by time
+                    const cards = [
+                      ...entriesOf(day.key, CalendarKinds.Period).filter(isSingleDay),
+                      ...entriesOf(day.key, CalendarKinds.Event),
+                    ].sort((left, right) => left.startsAt.localeCompare(right.startsAt))
+                    const shown = cards.slice(0, CALENDAR_SETTINGS.maxEntriesPerDay)
+                    const hiddenCount = cards.length - shown.length
+
+                    return (
+                      <div
+                        key={day.key}
+                        className={cn(
+                          CALENDAR_STYLES.day,
+                          !day.isCurrentMonth && CALENDAR_STYLES.dayOutside,
+                          covers(day.key) && CALENDAR_STYLES.dayDrafted,
+                          over === day.key && 'is-drop-target'
+                        )}
+                        {...(canManage ? containerProps(day.key) : {})}
+                        {...slotProps(day.key)}
+                      >
+                        {renderZones(day.key)}
+                        <span
+                          className={cn(
+                            CALENDAR_STYLES.dayNumber,
+                            !day.isCurrentMonth && CALENDAR_STYLES.dayNumberOutside,
+                            day.isToday && CALENDAR_STYLES.dayNumberToday
+                          )}
+                        >
+                          {day.dayOfMonth}
+                        </span>
+                        {canManage && (
+                          <button
+                            type="button"
+                            aria-label={CALENDAR_COPY.add}
+                            className={CALENDAR_STYLES.dayAdd}
+                            onClick={() =>
+                              openForm(null, {
+                                startsAt: toFieldValue(
+                                  dayBounds(
+                                    day.key,
+                                    CALENDAR_SETTINGS.dayStartHour,
+                                    CALENDAR_SETTINGS.dayEndHour
+                                  ).startsAt
+                                ),
+                              })
+                            }
+                          >
+                            <DayAddIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                          </button>
+                        )}
+                        {renderZoneLabels(day.key)}
+                        {renderBands(day.key)}
+                        {shown.map((entry) => renderCard(entry, day.key, true))}
+                        {hiddenCount > 0 && (
+                          <span className={CALENDAR_STYLES.overflow}>
+                            {`+${hiddenCount} ${CALENDAR_COPY.more}`}
+                          </span>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            {!hasTemplates && canManage && !sessionId && (
+              <Link href={ROUTES.settingsSection(TEMPLATE_SECTION)}>
+                <Button variant="link" icon="settings">
+                  {CALENDAR_COPY.noTemplatesTitle}
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
       </Section>
 
       <FormDrawer
@@ -693,34 +718,34 @@ export const CalendarBoard = ({
             <p className={CALENDAR_STYLES.detailNote}>{CALENDAR_COPY.birthdayMessage}</p>
           ) : (
             <div className="flex flex-col gap-4">
-              <span className="flex flex-wrap items-center gap-2">
-                <Badge
-                  label={CALENDAR_KIND_REGISTRY.label(opened.kind)}
-                  accent={opened.accent}
-                  tone="brand"
-                />
-                {opened.templateName && (
-                  <Badge label={opened.templateName} accent={opened.accent} tone="brand" />
-                )}
-                <Badge
-                  label={EVENT_VISIBILITY_REGISTRY.label(opened.visibility)}
-                  tone={toTone(EVENT_VISIBILITY_REGISTRY.get(opened.visibility).accent, 'neutral')}
-                  icon="visible"
-                />
+              <div className={CALENDAR_STYLES.detailMeta}>
+                <span className={CALENDAR_STYLES.previewLine}>
+                  <ClockIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
+                  {entrySpan(opened.startsAt, opened.endsAt, opened.allDay)}
+                </span>
+                <span className={CALENDAR_STYLES.previewLine}>
+                  <SourceIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
+                  {opened.templateName ?? CALENDAR_KIND_REGISTRY.label(opened.kind)}
+                </span>
+                <span className={CALENDAR_STYLES.previewLine}>
+                  <VisibleIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
+                  {EVENT_VISIBILITY_REGISTRY.label(opened.visibility)}
+                </span>
                 {opened.rollCall && (
-                  <Badge label={CALENDAR_COPY.rollCallTitle} tone="info" icon="meetings" />
+                  <span className={CALENDAR_STYLES.previewLine}>
+                    <RollCallIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
+                    {CALENDAR_COPY.rollCallTitle}
+                  </span>
                 )}
                 {opened.readOnly && (
-                  <Badge label={CALENDAR_COPY.readOnlyNotice} tone="neutral" icon="info" />
+                  <span className={CALENDAR_STYLES.previewLine}>
+                    <InfoIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
+                    {CALENDAR_COPY.readOnlyNotice}
+                  </span>
                 )}
-              </span>
+              </div>
               <DetailGrid
                 entries={[
-                  { label: CALENDAR_FIELD_COPY.startsAt, value: formatDayTime(opened.startsAt) },
-                  {
-                    label: CALENDAR_FIELD_COPY.endsAt,
-                    value: opened.endsAt ? formatDayTime(opened.endsAt) : undefined,
-                  },
                   { label: CALENDAR_FIELD_COPY.subject, value: opened.subjectName },
                   // A planned meeting never shows its description, only its subjects
                   ...(opened.source === CalendarSources.Meeting

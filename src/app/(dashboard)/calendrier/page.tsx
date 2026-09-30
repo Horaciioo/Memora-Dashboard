@@ -8,7 +8,9 @@ import {
   countTemplates,
   getEntry,
   listEntries,
+  readCalendarScope,
 } from '@/core/services/calendar/CalendarService'
+import { youtuberOptions } from '@/core/services/work/shared'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { ROUTES } from '@/declarations/navigation'
@@ -33,8 +35,8 @@ export default async function CalendarPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const { session, access, scope } = await requirePermission(Permissions.CalendarRead)
-  const perimeter = await scope()
+  const { session, access } = await requirePermission(Permissions.CalendarRead)
+  const perimeter = await readCalendarScope(session, access)
 
   const raw = (await searchParams)[FOCUS_PARAM]
   const focusEntryId = typeof raw === 'string' ? raw : undefined
@@ -47,7 +49,7 @@ export default async function CalendarPage({
   const anchor = toDayKey(focusEntry ? new Date(focusEntry.startsAt) : new Date())
   const { from, to } = gridRange(monthGrid(anchor))
 
-  const [window, fields, templateCount] = await Promise.all([
+  const [window, fields, templateCount, youtubers] = await Promise.all([
     listEntries({
       from: new Date(from),
       to: new Date(to),
@@ -57,6 +59,7 @@ export default async function CalendarPage({
     }),
     calendarFields(perimeter),
     countTemplates(),
+    youtuberOptions(perimeter),
   ])
 
   // The linked entry joins the window when the visibility filter left it out
@@ -78,6 +81,7 @@ export default async function CalendarPage({
       />
       <CalendarBoard
         initialEntries={entries}
+        youtubers={youtubers}
         fields={fields}
         anchor={anchor}
         hasTemplates={templateCount > 0}
