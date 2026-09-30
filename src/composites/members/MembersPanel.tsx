@@ -8,7 +8,8 @@ import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FilterBar, type FilterDefinition } from '@/components/structures/FilterBar'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { useMembers } from '@/core/hooks/data/useMembers'
 import { toOptions } from '@/core/lib/forms/options'
@@ -19,8 +20,10 @@ import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { GROUP_STYLES, LIST_STYLES } from '@/declarations/ui/variants'
 import { MemberCard } from '@/composites/members/MemberCard'
+import { RoleGlyph } from '@/composites/members/MemberBadges'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { MemberSummary } from '@/types/members'
+import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
 
 export interface MembersPanelProps {
@@ -29,18 +32,31 @@ export interface MembersPanelProps {
   divisions: FieldOption[]
   youtubers: FieldOption[]
   functions: FieldOption[]
+  // Creator the page is narrowed to, its members then grouped by role
+  creatorId: string | null
   canCreate: boolean
   canDelete: boolean
   canReadNotes: boolean
 }
 
+// One box of the list, a creator or, narrowed to one, a role
+interface MemberGroup {
+  key: string
+  label: string
+  youtuberId: string | undefined
+  image?: string | null
+  role?: MemberRoleName
+  members: MemberSummary[]
+}
+
 /**
- * Moderator boxes, categorised by YouTuber
+ * Moderator boxes, categorised by YouTuber, or by role once narrowed to one creator
  * @param {MemberSummary[]} initialMembers - Rows resolved server-side
  * @param {FieldDefinition[]} fields - Field declarations of the moderator form
  * @param {FieldOption[]} divisions - Division filter options
  * @param {FieldOption[]} youtubers - YouTuber filter options and group order
  * @param {FieldOption[]} functions - Function filter options
+ * @param {string | null} creatorId - Creator the page is narrowed to
  * @param {boolean} canCreate - Member may add a moderator
  * @param {boolean} canDelete - Member may drop a moderator
  * @param {boolean} canReadNotes - Member may see the notes indicator
@@ -53,6 +69,7 @@ export const MembersPanel = ({
   divisions,
   youtubers,
   functions,
+  creatorId,
   canCreate,
   canDelete,
   canReadNotes,
@@ -104,8 +121,7 @@ export const MembersPanel = ({
       }
       if (
         filters.jobFunction &&
-        member.primaryFunction?.id !== filters.jobFunction &&
-        member.secondaryFunction?.id !== filters.jobFunction
+        !member.functions.some((entry) => entry.id === filters.jobFunction)
       ) {
         return false
       }
@@ -116,7 +132,20 @@ export const MembersPanel = ({
 
   // One bucket per YouTuber, in their configured order, a member with several YouTubers
   // appears in each, moderators left unassigned trailing behind
-  const groups = useMemo(() => {
+  const groups = useMemo((): MemberGroup[] => {
+    // Narrowed to one creator, the boxes follow the hierarchy instead
+    if (creatorId) {
+      return toOptions(ROLE_REGISTRY)
+        .map((option) => ({
+          key: option.value,
+          label: option.label,
+          role: option.value as MemberRoleName,
+          youtuberId: creatorId,
+          members: visibleMembers.filter((member) => member.role === option.value),
+        }))
+        .filter((group) => group.members.length > 0)
+    }
+
     const buckets = new Map<string, MemberSummary[]>()
 
     for (const member of visibleMembers) {
@@ -133,6 +162,7 @@ export const MembersPanel = ({
     const ordered = (
       isFiltered ? youtubers.filter((option) => buckets.has(option.value)) : youtubers
     ).map((option) => ({
+      key: option.value,
       label: option.label,
       youtuberId: option.value as string | undefined,
       image: option.image,
@@ -145,6 +175,7 @@ export const MembersPanel = ({
       ? [
           ...ordered,
           {
+            key: 'none',
             label: MEMBER_COPY.noYoutuber,
             youtuberId: undefined,
             image: undefined,
@@ -152,7 +183,7 @@ export const MembersPanel = ({
           },
         ]
       : ordered
-  }, [visibleMembers, youtubers, isFiltered])
+  }, [visibleMembers, youtubers, isFiltered, creatorId])
 
   const filterDefinitions: FilterDefinition[] = [
     {
@@ -175,19 +206,24 @@ export const MembersPanel = ({
       allLabel: MEMBER_FILTER_COPY.allDivisions,
       options: divisions,
     },
-    {
-      name: 'youtuber',
-      label: MEMBER_FILTER_COPY.youtuber,
-      allLabel: MEMBER_FILTER_COPY.allYoutubers,
-      options: youtubers,
-      mark: 'avatar',
-    },
+    // Pointless once the page shows a single creator
+    ...(creatorId
+      ? []
+      : [
+          {
+            name: 'youtuber',
+            label: MEMBER_FILTER_COPY.youtuber,
+            allLabel: MEMBER_FILTER_COPY.allYoutubers,
+            options: youtubers,
+            mark: 'avatar' as const,
+          },
+        ]),
     {
       name: 'jobFunction',
       label: MEMBER_FILTER_COPY.jobFunction,
       allLabel: MEMBER_FILTER_COPY.allFunctions,
       options: functions,
-      mark: 'dot',
+      mark: 'glyph',
     },
   ]
 
@@ -242,7 +278,7 @@ export const MembersPanel = ({
         ) : (
           <div className={GROUP_STYLES.stack}>
             {groups.map((group, index) => {
-              const key = group.youtuberId ?? 'none'
+              const key = group.key
               const isOpen = !collapsed.has(key)
 
               return (
@@ -256,9 +292,12 @@ export const MembersPanel = ({
                     onClick={() => toggleGroup(key)}
                     className={GROUP_STYLES.heading}
                   >
-                    {group.youtuberId && <Avatar name={group.label} src={group.image} size="sm" />}
+                    {group.role ? (
+                      <RoleGlyph role={group.role} />
+                    ) : (
+                      group.youtuberId && <Avatar name={group.label} src={group.image} size="sm" />
+                    )}
                     {group.label}
-                    <span className={GROUP_STYLES.count}>{group.members.length}</span>
                     <ChevronIcon
                       className={cn(GROUP_STYLES.chevron, isOpen && GROUP_STYLES.chevronOpen)}
                       aria-hidden="true"
@@ -291,14 +330,14 @@ export const MembersPanel = ({
         )}
       </Section>
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.member}
         open={isCreating}
         title={MEMBER_COPY.add}
         fields={fields}
         initialValues={createYoutuberId ? { youtuberIds: [createYoutuberId] } : undefined}
         issues={issues}
         isSaving={isSaving}
-        size="lg"
         onSubmit={create}
         onClose={() => setCreating(false)}
       />

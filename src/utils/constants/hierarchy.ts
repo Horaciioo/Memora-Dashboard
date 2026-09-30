@@ -7,9 +7,24 @@ export const MemberRoles = {
   Admin: 'ADMIN',
   Responsable: 'RESPONSABLE',
   Moderateur: 'MODERATEUR',
+  Junior: 'JUNIOR',
 } as const
 
 export type MemberRoleName = (typeof MemberRoles)[keyof typeof MemberRoles]
+
+/**
+ * Access console categories
+ * @type {Record<string, string>}
+ */
+
+export const AccessCategories = {
+  Leader: 'LEADER',
+  Administration: 'ADMINISTRATION',
+  Responsabilite: 'RESPONSABILITE',
+  Moderation: 'MODERATION',
+} as const
+
+export type AccessCategoryName = (typeof AccessCategories)[keyof typeof AccessCategories]
 
 /**
  * Membership lifecycle
@@ -202,3 +217,17 @@ export const ReviewStatuses = {
 } as const
 
 export type ReviewStatusName = (typeof ReviewStatuses)[keyof typeof ReviewStatuses]
+
+/**
+ * Where a Legacy track stands
+ * @type {Record<string, string>}
+ */
+
+export const LegacyStatuses = {
+  Running: 'RUNNING',
+  Passed: 'PASSED',
+  Failed: 'FAILED',
+  Cancelled: 'CANCELLED',
+} as const
+
+export type LegacyStatusName = (typeof LegacyStatuses)[keyof typeof LegacyStatuses]

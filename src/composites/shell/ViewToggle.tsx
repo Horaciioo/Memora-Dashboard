@@ -41,7 +41,7 @@ export const ViewToggle = ({ viewContext, className, iconClassName }: ViewToggle
       type="button"
       disabled={isSwitching}
       aria-label={targetMeta.label}
-      title={`${targetMeta.label} — ${targetMeta.summary}`}
+      title={`${targetMeta.label} : ${targetMeta.summary}`}
       onClick={() => startSwitching(() => void switchView(target))}
       style={{ color: TONE_VARS[meta.tone] }}
       className={className ?? cn(BUTTON_STYLES.base, BUTTON_STYLES.icon)}

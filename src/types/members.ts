@@ -1,6 +1,10 @@
 import type { FormValues } from '@/types/forms'
-import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
-import type { AbsenceStatusName } from '@/utils/constants/workflow'
+import type {
+  LegacyStatusName,
+  MemberRoleName,
+  MemberStatusName,
+} from '@/utils/constants/hierarchy'
+import type { AbsenceStatusName, FunctionKindName } from '@/utils/constants/workflow'
 
 /**
  * Reference pointed at by a member
@@ -14,6 +18,24 @@ export interface MemberTag {
   id: string
   label: string
   accent: string | null
+  // Creator portrait
+  image?: string | null
+}
+
+/**
+ * Function held by a member
+ * @typedef {Object} MemberFunction
+ * @property {string} id - Function identifier
+ * @property {string} label - Function name
+ * @property {FunctionKindName} kind - Principal or secondary
+ * @property {string | null} icon - Glyph key
+ */
+
+export interface MemberFunction {
+  id: string
+  label: string
+  kind: FunctionKindName
+  icon: string | null
 }
 
 /**
@@ -42,10 +64,12 @@ export interface MemberDivision {
  * @property {MemberTag | null} academyDispositif - Dispositif of the active FSI
  * @property {string | null} academyJuniorId - Junior identifier of the active FSI
  * @property {string | null} academySessionId - Session identifier of the active FSI
+ * @property {string | null} legacyTrackId - Latest Legacy track
+ * @property {LegacyStatusName | null} legacyStatus - Where that track stands
+ * @property {string | null} legacyEndsAt - ISO end of that track
  * @property {MemberDivision | null} division - Division
  * @property {MemberTag[]} youtubers - Assigned YouTubers
- * @property {MemberTag | null} primaryFunction - Main function
- * @property {MemberTag | null} secondaryFunction - Secondary function
+ * @property {MemberFunction[]} functions - Functions held, principal ones first, by rank
  * @property {string} joinedAt - ISO arrival date
  * @property {boolean} isRoot - Root administrator
  * @property {number} notesCount - Private remarks left on the account
@@ -62,10 +86,12 @@ export interface MemberSummary {
   academyDispositif: MemberTag | null
   academyJuniorId: string | null
   academySessionId: string | null
+  legacyTrackId: string | null
+  legacyStatus: LegacyStatusName | null
+  legacyEndsAt: string | null
   division: MemberDivision | null
   youtubers: MemberTag[]
-  primaryFunction: MemberTag | null
-  secondaryFunction: MemberTag | null
+  functions: MemberFunction[]
   joinedAt: string
   isRoot: boolean
   notesCount: number
@@ -94,6 +120,7 @@ export interface MemberNote {
  * Social profile of a member, declared by the member themselves
  * @typedef {Object} MemberSocial
  * @property {string} id - Link identifier
+ * @property {string | null} networkId - Declared network
  * @property {string} label - Network name
  * @property {string} handle - Profile handle
  * @property {string | null} url - Profile URL
@@ -102,6 +129,7 @@ export interface MemberNote {
 
 export interface MemberSocial {
   id: string
+  networkId: string | null
   label: string
   handle: string
   url: string | null

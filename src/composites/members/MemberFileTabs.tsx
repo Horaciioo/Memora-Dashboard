@@ -5,6 +5,8 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { OptionMark } from '@/components/elements/forms/OptionMark'
+import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { Button } from '@/components/elements/actions/Button'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
@@ -12,26 +14,38 @@ import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { EditableDetailGrid, type EditableEntry } from '@/components/structures/EditableDetailGrid'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { useMemberFile } from '@/core/hooks/data/useMemberFile'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
+import { ACCESS_EDITABLE } from '@/declarations/access/editing'
 import { ROUTES } from '@/declarations/navigation'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { DETAIL_BLOCK, MEMBER_BLOCK } from '@/declarations/ui/blocks'
+import { ICONS } from '@/declarations/ui/icons'
 import { LIST_STYLES } from '@/declarations/ui/variants'
-import { DivisionCrest, RoleBadge } from '@/composites/members/MemberBadges'
+import {
+  DivisionCrest,
+  FunctionEmblems,
+  RoleBadge,
+  RoleEmblem,
+} from '@/composites/members/MemberBadges'
 import { sealedDisplay } from '@/components/structures/SealedValue'
 import { SensitiveFields } from '@/declarations/access/sensitive'
 import { MemberAccessPanel } from '@/composites/members/MemberAccessPanel'
+import { cn } from '@/utils/classnames'
+import { LEGACY_STATUS_REGISTRY } from '@/declarations/academy/registries'
+import { LegacyStatuses } from '@/utils/constants/hierarchy'
+import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
-import type { MemberOverride } from '@/core/services/members/MemberFileService'
-import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
+import type { PermissionLayers } from '@/core/lib/permissions'
+import type { FieldDefinition, FieldOption, FieldValue, FormValues } from '@/types/forms'
 import type { MemberDetail, MemberSocial } from '@/types/members'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { absenceReasonText } from '@/utils/format/absences'
@@ -43,25 +57,31 @@ export interface MemberFileTabsProps {
   memberFields: FieldDefinition[]
   noteFields: FieldDefinition[]
   socialFields: FieldDefinition[]
+  absenceFields: FieldDefinition[]
   activity: ActivityEntry[]
-  overrides: MemberOverride[]
-  inherited: PermissionName[]
+  overrides: PermissionLayers
+  inherited: Record<string, PermissionName[]>
   canUpdate: boolean
   canReadNotes: boolean
   canWriteNotes: boolean
   canReadLogs: boolean
   canManageAccess: boolean
+  canPostAbsence: boolean
 }
 
 // Contact fields edited in place, in the order they appear under the section
+// Birthday celebration, a plain glyph rather than a worded badge
+const SuccessIcon = ICONS.success
+const FailureIcon = ICONS.failure
+
 const CONTACT_FIELD_NAMES = ['discordId', 'email', 'phone', 'birthday', 'languages']
 
 // Assignment fields edited in place, in the order they appear under the section
 const ASSIGNMENT_FIELD_NAMES = [
   'youtuberIds',
   'divisionId',
-  'primaryFunctionId',
-  'secondaryFunctionId',
+  'primaryFunctionIds',
+  'secondaryFunctionIds',
   'joinedAt',
   'leftAt',
 ]
@@ -107,20 +127,50 @@ const optionLabels = (field: FieldDefinition, value: FieldValue): ReactNode => {
 }
 
 /**
+ * Every selected option of a multiselect field, each behind its small glyph
+ * @param {FieldDefinition} field - Field carrying the options
+ * @param {FieldValue} value - Stored value
+ * @return {ReactNode} - Marked labels, side by side
+ */
+
+const optionMarks = (field: FieldDefinition, value: FieldValue): ReactNode => {
+  if (!Array.isArray(value)) return null
+
+  const options = value
+    .map((entry) => field.options?.find((option) => option.value === entry))
+    .filter((option): option is FieldOption => option !== undefined)
+
+  if (options.length === 0) return null
+
+  return (
+    <span className={MEMBER_BLOCK.marks}>
+      {options.map((option) => (
+        <span key={option.value} className={MEMBER_BLOCK.mark}>
+          <OptionMark mark="glyph" option={option} />
+          {option.label}
+        </span>
+      ))}
+    </span>
+  )
+}
+
+/**
  * Tabs of one moderator file, each tab guarded by the permission that opens it
  * @param {MemberDetail} detail - File resolved server-side
  * @param {string | null} recruitmentSessionId - Session holding their application, by Discord identifier
  * @param {FieldDefinition[]} memberFields - Declarations of the file form
  * @param {FieldDefinition[]} noteFields - Declarations of the note form
  * @param {FieldDefinition[]} socialFields - Declarations of the social form
+ * @param {FieldDefinition[]} absenceFields - Declarations of the absence form
  * @param {ActivityEntry[]} activity - Journal entries
- * @param {MemberOverride[]} overrides - Permission overrides
- * @param {PermissionName[]} inherited - Permissions inheritance grants
+ * @param {PermissionLayers} overrides - Permission overwrites, per layer
+ * @param {Record<string, PermissionName[]>} inherited - Permissions inheritance grants, per layer
  * @param {boolean} canUpdate - Member may edit the file
  * @param {boolean} canReadNotes - Member may read private remarks
  * @param {boolean} canWriteNotes - Member may write private remarks
  * @param {boolean} canReadLogs - Member may read the journal
  * @param {boolean} canManageAccess - Member may change permissions
+ * @param {boolean} canPostAbsence - Viewer may post an absence for them
  * @return {JSX.Element}
  */
 
@@ -130,6 +180,7 @@ export const MemberFileTabs = ({
   memberFields,
   noteFields,
   socialFields,
+  absenceFields,
   activity,
   overrides,
   inherited,
@@ -138,13 +189,15 @@ export const MemberFileTabs = ({
   canWriteNotes,
   canReadLogs,
   canManageAccess,
+  canPostAbsence,
 }: MemberFileTabsProps) => {
   const router = useRouter()
   const file = useMemberFile(detail, overrides)
-  const { session } = useAuthContext()
+  const { session, isAdmin } = useAuthContext()
   const { contextMenu } = useMenu()
-  const { factor } = useSeal()
-  const [dialog, setDialog] = useState<'identity' | 'note' | 'socials' | null>(null)
+  const gestures = useEditGestures()
+  const { factor, promptUnlock } = useSeal()
+  const [dialog, setDialog] = useState<'identity' | 'note' | 'socials' | 'absence' | null>(null)
   const [pendingNote, setPendingNote] = useState<string | null>(null)
   const [editingSocial, setEditingSocial] = useState<MemberSocial | null>(null)
   const [pendingSocial, setPendingSocial] = useState<MemberSocial | null>(null)
@@ -219,15 +272,23 @@ export const MemberFileTabs = ({
         typeof identityValues.birthday === 'string' && identityValues.birthday ? (
           <span className="flex flex-wrap items-center gap-2">
             {formatDay(identityValues.birthday)}
-            <Badge
-              label={
-                identityValues.celebrateBirthday
-                  ? MEMBER_COPY.birthdayCelebrated
-                  : MEMBER_COPY.birthdayQuiet
-              }
-              tone={identityValues.celebrateBirthday ? 'success' : 'neutral'}
-              icon="birthday"
-            />
+            {identityValues.celebrateBirthday ? (
+              <span title={MEMBER_COPY.birthdayCelebrated}>
+                <SuccessIcon
+                  className="h-4 w-4 shrink-0 text-[var(--color-success)]"
+                  aria-hidden="true"
+                />
+                <span className="sr-only">{MEMBER_COPY.birthdayCelebrated}</span>
+              </span>
+            ) : (
+              <span title={MEMBER_COPY.birthdayQuiet}>
+                <FailureIcon
+                  className="h-4 w-4 shrink-0 text-[var(--color-danger)]"
+                  aria-hidden="true"
+                />
+                <span className="sr-only">{MEMBER_COPY.birthdayQuiet}</span>
+              </span>
+            )}
           </span>
         ) : null,
     },
@@ -260,14 +321,14 @@ export const MemberFileTabs = ({
       display: optionLabel(fieldFor('divisionId'), identityValues.divisionId),
     },
     {
-      label: FIELD_COPY.mainFunction,
-      field: fieldFor('primaryFunctionId'),
-      display: optionLabel(fieldFor('primaryFunctionId'), identityValues.primaryFunctionId),
+      label: MEMBER_FIELD_COPY.primaryFunctions,
+      field: fieldFor('primaryFunctionIds'),
+      display: optionMarks(fieldFor('primaryFunctionIds'), identityValues.primaryFunctionIds),
     },
     {
-      label: FIELD_COPY.secondFunction,
-      field: fieldFor('secondaryFunctionId'),
-      display: optionLabel(fieldFor('secondaryFunctionId'), identityValues.secondaryFunctionId),
+      label: MEMBER_FIELD_COPY.secondaryFunctions,
+      field: fieldFor('secondaryFunctionIds'),
+      display: optionMarks(fieldFor('secondaryFunctionIds'), identityValues.secondaryFunctionIds),
     },
     {
       label: FIELD_COPY.joinedAt,
@@ -311,36 +372,44 @@ export const MemberFileTabs = ({
   ]
 
   const header = (
-    <Section title={MEMBER_COPY.identity} padded>
-      <div className={MEMBER_BLOCK.header}>
-        <button
-          type="button"
-          disabled={!canEdit}
-          aria-label={ACTION_COPY.edit}
-          title={ACTION_COPY.edit}
-          onClick={() => openDialog('identity')}
-          className={MEMBER_BLOCK.portrait}
-        >
-          <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
-        </button>
-        <div className={MEMBER_BLOCK.identity}>
-          <span className={MEMBER_BLOCK.tags}>
-            <RoleBadge member={summary} />
-            {summary.youtubers.map((youtuber) => (
-              <Badge key={youtuber.id} label={youtuber.label} tone="info" icon="youtuber" />
-            ))}
-            {summary.academyDispositif && (
-              <Badge
-                label={summary.academyDispositif.label}
-                accent={summary.academyDispositif.accent}
-                tone={'info'}
-              />
-            )}
-          </span>
+    <Section title={MEMBER_COPY.identity} bare>
+      <div className={MEMBER_BLOCK.frame}>
+        <div className={MEMBER_BLOCK.header}>
+          <button
+            type="button"
+            disabled={!canEdit}
+            aria-label={ACTION_COPY.edit}
+            title={ACTION_COPY.edit}
+            onClick={() => openDialog('identity')}
+            className={MEMBER_BLOCK.portrait}
+          >
+            <Avatar name={summary.displayName} src={summary.avatarUrl} size="lg" />
+          </button>
+          <div className={MEMBER_BLOCK.identity}>
+            <span className={MEMBER_BLOCK.tags}>
+              <RoleBadge member={summary} />
+              {summary.youtubers.map((youtuber) => (
+                <CreatorLabel key={youtuber.id} name={youtuber.label} image={youtuber.image} />
+              ))}
+              {summary.academyDispositif && (
+                <Badge
+                  label={summary.academyDispositif.label}
+                  accent={summary.academyDispositif.accent}
+                  tone={'info'}
+                />
+              )}
+            </span>
+            {isLocked && <p className={DETAIL_BLOCK.empty}>{MEMBER_COPY.rootLocked}</p>}
+          </div>
+          <DivisionCrest division={summary.division} />
+          <FunctionEmblems
+            member={summary}
+            className={MEMBER_BLOCK.functions}
+            glyphClassName={MEMBER_BLOCK.function}
+          />
+          <RoleEmblem member={summary} className={MEMBER_BLOCK.glyph} />
         </div>
-        <DivisionCrest division={summary.division} />
       </div>
-      {isLocked && <p className={`${DETAIL_BLOCK.empty} pt-3`}>{MEMBER_COPY.rootLocked}</p>}
     </Section>
   )
 
@@ -371,8 +440,11 @@ export const MemberFileTabs = ({
     <MemberAccessPanel
       overrides={file.overrides}
       inherited={inherited}
+      youtubers={summary.youtubers}
+      sealed={!isAdmin && !factor.seal.isUnsealed}
       isSaving={file.isSaving}
       onSave={file.saveOverrides}
+      onSealed={promptUnlock}
     />
   )
 
@@ -421,16 +493,24 @@ export const MemberFileTabs = ({
 
   const absencesTab = () => (
     <Section title={MEMBER_COPY.tabAbsences} bare>
-      {detail.absences.length === 0 ? (
+      {file.absences.length === 0 ? (
         <EmptyState
           figure="absences"
           title={MEMBER_COPY.absencesEmptyTitle}
           description={MEMBER_COPY.absencesEmptyDescription}
-          action={<Badge label={MEMBER_COPY.absencesEmptyTitle} tone="neutral" />}
+          action={
+            canPostAbsence ? (
+              <Button variant="primary" icon="add" onClick={() => openDialog('absence')}>
+                {MEMBER_COPY.absenceAdd}
+              </Button>
+            ) : (
+              <Badge label={MEMBER_COPY.absencesEmptyTitle} tone="neutral" />
+            )
+          }
         />
       ) : (
         <div className={LIST_STYLES.stack}>
-          {detail.absences.map((absence) => {
+          {file.absences.map((absence) => {
             const status = ABSENCE_STATUS_REGISTRY.get(absence.status)
 
             return (
@@ -445,11 +525,13 @@ export const MemberFileTabs = ({
                     </span>
                   )}
                 </span>
-                <Badge label={`${absence.dayCount}`} tone="neutral" icon="clock" />
-                <Badge label={status.label} accent={status.accent} dot />
+                <Badge label={status.label} accent={status.accent} />
               </div>
             )
           })}
+          {canPostAbsence && (
+            <AddRow label={MEMBER_COPY.absenceAdd} onClick={() => openDialog('absence')} />
+          )}
         </div>
       )}
     </Section>
@@ -476,7 +558,16 @@ export const MemberFileTabs = ({
       ) : (
         <div className={LIST_STYLES.stack}>
           {file.socials.map((social) => (
-            <div key={social.id} className={LIST_STYLES.item}>
+            <div
+              key={social.id}
+              className={cn(LIST_STYLES.item, canWriteSocials && LIST_STYLES.itemClickable)}
+              {...gestures({
+                canEdit: canWriteSocials,
+                label: social.label,
+                onEdit: () => openSocial(social),
+                onRemove: () => setPendingSocial(social),
+              })}
+            >
               <Badge label={social.label} accent={social.accent} tone={'brand'} />
               <span className="min-w-0 flex-1 truncate text-sm">{social.handle}</span>
               {social.url && (
@@ -489,20 +580,6 @@ export const MemberFileTabs = ({
                   {ACTION_COPY.open}
                 </a>
               )}
-              <Button
-                variant="icon"
-                icon="edit"
-                aria-label={MEMBER_COPY.socialEdit}
-                disabled={!canWriteSocials}
-                onClick={() => openSocial(social)}
-              />
-              <Button
-                variant="icon"
-                icon="remove"
-                aria-label={ACTION_COPY.delete}
-                disabled={!canWriteSocials}
-                onClick={() => setPendingSocial(social)}
-              />
             </div>
           ))}
           <AddRow
@@ -537,6 +614,38 @@ export const MemberFileTabs = ({
             title={MEMBER_COPY.academyFsiNoneTitle}
             description={MEMBER_COPY.academyFsiNoneDescription}
             action={<Badge label={MEMBER_COPY.academyFsiNoneTitle} tone="neutral" />}
+          />
+        )}
+      </Section>
+
+      <Section title={MEMBER_COPY.legacyTitle} bare>
+        {summary.legacyTrackId ? (
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              variant="primary"
+              icon="crown"
+              onClick={() => router.push(ROUTES.legacyTrack(summary.legacyTrackId!))}
+            >
+              {MEMBER_COPY.legacyOpen}
+            </Button>
+            {summary.legacyStatus && (
+              <Badge
+                label={LEGACY_STATUS_REGISTRY.label(summary.legacyStatus)}
+                accent={LEGACY_STATUS_REGISTRY.get(summary.legacyStatus).accent}
+              />
+            )}
+            {summary.legacyStatus === LegacyStatuses.Running && summary.legacyEndsAt && (
+              <span className="text-sm text-[var(--color-ink-subtle)]">
+                {`${MEMBER_COPY.legacyExempt} ${formatDay(summary.legacyEndsAt)}`}
+              </span>
+            )}
+          </div>
+        ) : (
+          <EmptyState
+            figure="academy"
+            title={MEMBER_COPY.legacyNoneTitle}
+            description={MEMBER_COPY.legacyNoneDescription}
+            action={<Badge label={MEMBER_COPY.legacyNoneTitle} tone="neutral" />}
           />
         )}
       </Section>
@@ -613,7 +722,7 @@ export const MemberFileTabs = ({
             value: 'access',
             label: MEMBER_COPY.tabAccess,
             icon: 'shield',
-            visible: canManageAccess,
+            visible: canManageAccess && ACCESS_EDITABLE,
             render: accessTab,
           },
           {
@@ -632,14 +741,14 @@ export const MemberFileTabs = ({
         ]}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.member}
         open={dialog === 'identity'}
         title={`${ACTION_COPY.edit} · ${summary.displayName}`}
         fields={restFields}
         initialValues={identityValues}
         issues={file.issues}
         isSaving={file.isSaving}
-        size="lg"
         onSubmit={async (values) => {
           const next = { ...identityValues, ...values }
           const saved = await file.saveIdentity(next)
@@ -654,7 +763,8 @@ export const MemberFileTabs = ({
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.note}
         open={dialog === 'note'}
         title={MEMBER_COPY.noteAdd}
         fields={noteFields}
@@ -664,18 +774,25 @@ export const MemberFileTabs = ({
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.absence}
+        open={dialog === 'absence'}
+        title={MEMBER_COPY.absenceAdd}
+        fields={absenceFields}
+        issues={file.issues}
+        isSaving={file.isSaving}
+        onSubmit={file.addAbsence}
+        onClose={() => setDialog(null)}
+      />
+
+      <FormDrawer
+        subject={FORM_SUBJECTS.social}
         open={dialog === 'socials'}
         title={editingSocial ? MEMBER_COPY.socialEdit : MEMBER_COPY.socialAdd}
         fields={socialFields}
         initialValues={
           editingSocial
-            ? {
-                label: editingSocial.label,
-                handle: editingSocial.handle,
-                url: editingSocial.url,
-                accent: editingSocial.accent,
-              }
+            ? { networkId: editingSocial.networkId, handle: editingSocial.handle }
             : undefined
         }
         issues={file.issues}

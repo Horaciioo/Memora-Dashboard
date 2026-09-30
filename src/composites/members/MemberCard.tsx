@@ -1,5 +1,6 @@
 'use client'
 
+import { FunctionEmblems } from '@/composites/members/MemberBadges'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { GROUP_STYLES, LIST_STYLES } from '@/declarations/ui/variants'
@@ -78,6 +79,7 @@ export const MemberCard = ({
           />
         )}
       </span>
+      <FunctionEmblems member={member} className="gap-1" glyphClassName="h-5 w-5" />
     </div>
   )
 }

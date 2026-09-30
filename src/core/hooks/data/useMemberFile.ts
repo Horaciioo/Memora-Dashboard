@@ -6,16 +6,18 @@ import { apiDelete, apiPatch, apiPost, apiPut } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { feedbackTitle } from '@/declarations/ui/copy'
-import type { MemberOverride } from '@/core/services/members/MemberFileService'
+import type { PermissionLayers, PermissionOverwrite } from '@/core/lib/permissions'
 import type { FieldIssue, FormValues } from '@/types/forms'
-import type { MemberDetail, MemberNote, MemberSocial } from '@/types/members'
+import type { MemberAbsence, MemberDetail, MemberNote, MemberSocial } from '@/types/members'
 
 /**
  * Moderator file state and mutations
  * @typedef {Object} MemberFile
  * @property {MemberNote[]} notes - Private remarks
  * @property {MemberSocial[]} socials - Social profiles
- * @property {MemberOverride[]} overrides - Permission overrides
+ * @property {MemberAbsence[]} absences - Absences, newest first
+ * @property {(values: FormValues) => Promise<boolean>} addAbsence - Post an absence
+ * @property {PermissionLayers} overrides - Permission overwrites, per layer
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {() => void} clearIssues - Forget the rejections
@@ -25,14 +27,16 @@ import type { MemberDetail, MemberNote, MemberSocial } from '@/types/members'
  * @property {(values: FormValues) => Promise<boolean>} addSocial - Add a profile
  * @property {(id: string, values: FormValues) => Promise<boolean>} updateSocial - Edit a profile
  * @property {(id: string) => Promise<void>} removeSocial - Drop a profile
- * @property {(next: MemberOverride[]) => Promise<boolean>} saveOverrides - Replace the overrides
+ * @property {(next: PermissionOverwrite[], youtuberId: string | null) => Promise<boolean>} saveOverrides - Replace one layer
  * @property {(values: FormValues) => Promise<boolean>} saveIdentity - Edit the file itself
  */
 
 export interface MemberFile {
   notes: MemberNote[]
   socials: MemberSocial[]
-  overrides: MemberOverride[]
+  absences: MemberAbsence[]
+  addAbsence: (values: FormValues) => Promise<boolean>
+  overrides: PermissionLayers
   isSaving: boolean
   issues: FieldIssue[]
   clearIssues: () => void
@@ -42,24 +46,25 @@ export interface MemberFile {
   addSocial: (values: FormValues) => Promise<boolean>
   updateSocial: (id: string, values: FormValues) => Promise<boolean>
   removeSocial: (id: string) => Promise<void>
-  saveOverrides: (next: MemberOverride[]) => Promise<boolean>
+  saveOverrides: (next: PermissionOverwrite[], youtuberId: string | null) => Promise<boolean>
   saveIdentity: (values: FormValues) => Promise<boolean>
 }
 
 /**
  * Drive one moderator file
  * @param {MemberDetail} detail - File resolved server-side
- * @param {MemberOverride[]} initialOverrides - Permission overrides resolved server-side
+ * @param {PermissionLayers} initialOverrides - Permission overwrites resolved server-side
  * @return {MemberFile} - State and mutations
  */
 
 export const useMemberFile = (
   detail: MemberDetail,
-  initialOverrides: MemberOverride[]
+  initialOverrides: PermissionLayers
 ): MemberFile => {
   const memberId = detail.summary.id
   const [notes, setNotes] = useState(detail.notes)
   const [socials, setSocials] = useState(detail.socials)
+  const [absences, setAbsences] = useState(detail.absences)
   const [overrides, setOverrides] = useState(initialOverrides)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
@@ -99,6 +104,25 @@ export const useMemberFile = (
       if (done) setNotes((current) => current.filter((entry) => entry.id !== id))
     },
     [run]
+  )
+
+  const addAbsence = useCallback(
+    async (values: FormValues) => {
+      const absence = await run(
+        () => apiPost<MemberAbsence>(API_ROUTES.memberAbsences(memberId), values),
+        feedbackTitle('Absence', 'created', 'feminine')
+      )
+
+      // Newest first
+      if (absence) {
+        setAbsences((current) =>
+          [absence, ...current].sort((left, right) => right.startDate.localeCompare(left.startDate))
+        )
+      }
+
+      return absence !== null
+    },
+    [memberId, run]
   )
 
   const addSocial = useCallback(
@@ -147,9 +171,13 @@ export const useMemberFile = (
   )
 
   const saveOverrides = useCallback(
-    async (next: MemberOverride[]) => {
+    async (next: PermissionOverwrite[], youtuberId: string | null) => {
       const stored = await run(
-        () => apiPut<MemberOverride[]>(API_ROUTES.memberAccess(memberId), { overrides: next }),
+        () =>
+          apiPut<PermissionLayers>(API_ROUTES.memberAccess(memberId), {
+            overrides: next,
+            youtuberId,
+          }),
         feedbackTitle('Permissions', 'saved', 'feminine', undefined, true)
       )
 
@@ -175,6 +203,8 @@ export const useMemberFile = (
   return {
     notes,
     socials,
+    absences,
+    addAbsence,
     overrides,
     isSaving,
     issues,

@@ -3,6 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { withoutSealedWrites } from '@/core/services/auth/SealService'
 import { activeFunctions, activeYoutubers, allDivisions } from '@/core/services/reference/lookups'
+import { HELD_FUNCTIONS, toMemberFunctions } from '@/core/services/reference/functions'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { conflict, forbidden, immutable, notFound } from '@/core/lib/errors'
@@ -14,27 +15,33 @@ import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/rol
 import { isRootIdentity } from '@/declarations/access/identity'
 import { FORM_SETTINGS, PAGINATION_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
-import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
+import { MEMBER_COPY, MEMBER_FIELD_COPY, MEMBER_FIELD_INFO } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { LANGUAGE_OPTIONS, timezoneOptions } from '@/declarations/system/locales'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence, MemberDetail, MemberSummary } from '@/types/members'
 import { AcademyJuniorStatuses, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
-import { AbsenceStatuses } from '@/utils/constants/workflow'
+import { AbsenceStatuses, FunctionKinds } from '@/utils/constants/workflow'
+import type { FunctionKindName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
 // Relations every moderator row needs
 const SUMMARY_INCLUDE = {
   division: true,
   youtubers: true,
-  primaryFunction: true,
-  secondaryFunction: true,
+  ...HELD_FUNCTIONS,
   academyJuniors: {
     where: { status: AcademyJuniorStatuses.Active },
     orderBy: { startedAt: 'desc' },
     take: 1,
     include: { dispositif: true },
+  },
+  // The track in course, or the latest one
+  legacyTracks: {
+    orderBy: { startsAt: 'desc' },
+    take: 1,
+    select: { id: true, status: true, endsAt: true },
   },
 } satisfies Prisma.AccountInclude
 
@@ -66,7 +73,7 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
   avatarUrl: row.avatarUrl,
   role: row.role,
   status: row.status,
-  academyDispositif: row.academyJuniors[0]
+  academyDispositif: row.academyJuniors[0]?.dispositif
     ? {
         id: row.academyJuniors[0].dispositif.id,
         label: row.academyJuniors[0].dispositif.name,
@@ -75,6 +82,9 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
     : null,
   academyJuniorId: row.academyJuniors[0]?.id ?? null,
   academySessionId: row.academyJuniors[0]?.sessionId ?? null,
+  legacyTrackId: row.legacyTracks[0]?.id ?? null,
+  legacyStatus: row.legacyTracks[0]?.status ?? null,
+  legacyEndsAt: row.legacyTracks[0]?.endsAt.toISOString() ?? null,
   division: row.division
     ? {
         id: row.division.id,
@@ -86,21 +96,9 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
     id: youtuber.id,
     label: youtuber.name,
     accent: youtuber.accent,
+    image: youtuber.avatarUrl,
   })),
-  primaryFunction: row.primaryFunction
-    ? {
-        id: row.primaryFunction.id,
-        label: row.primaryFunction.name,
-        accent: row.primaryFunction.accent,
-      }
-    : null,
-  secondaryFunction: row.secondaryFunction
-    ? {
-        id: row.secondaryFunction.id,
-        label: row.secondaryFunction.name,
-        accent: row.secondaryFunction.accent,
-      }
-    : null,
+  functions: toMemberFunctions(row.functions),
   joinedAt: row.joinedAt.toISOString(),
   isRoot: isRootIdentity(row.discordId),
   notesCount: extras.notesCount,
@@ -146,7 +144,9 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
     activeFunctions(),
   ])
 
-  const functionOptions = rowsToOptions(functions)
+  // Each kind only offers its own functions
+  const optionsOf = (kind: FunctionKindName) =>
+    rowsToOptions(functions.filter((entry) => entry.kind === kind))
 
   // A restricted division still shows, greyed, so its holders keep reading it
   const divisionOptions = rowsToOptions(divisions).map((option, index) => ({
@@ -159,6 +159,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       name: 'displayName',
       kind: 'text',
       label: MEMBER_FIELD_COPY.displayName,
+      info: MEMBER_FIELD_INFO.displayName,
       required: true,
       maxLength: FORM_SETTINGS.shortTextMaxLength,
       span: 'half',
@@ -168,6 +169,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       name: 'discordId',
       kind: 'discord',
       label: MEMBER_FIELD_COPY.discordId,
+      info: MEMBER_FIELD_INFO.discordId,
       required: true,
       span: 'half',
       group: FORM_GROUPS.identity,
@@ -176,6 +178,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       name: 'birthday',
       kind: 'date',
       label: MEMBER_FIELD_COPY.birthday,
+      info: MEMBER_FIELD_INFO.birthday,
       span: 'half',
       group: FORM_GROUPS.identity,
     },
@@ -185,11 +188,13 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       label: MEMBER_FIELD_COPY.celebrateBirthday,
       span: 'half',
       group: FORM_GROUPS.identity,
+      binary: true,
     },
     {
       name: 'role',
       kind: 'select',
       label: MEMBER_FIELD_COPY.role,
+      info: MEMBER_FIELD_INFO.role,
       required: true,
       options: toOptions(ROLE_REGISTRY),
       mark: 'dot',
@@ -200,6 +205,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       name: 'status',
       kind: 'select',
       label: MEMBER_FIELD_COPY.status,
+      info: MEMBER_FIELD_INFO.status,
       required: true,
       options: toOptions(MEMBER_STATUS_REGISTRY),
       mark: 'dot',
@@ -210,6 +216,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       name: 'divisionId',
       kind: 'select',
       label: MEMBER_FIELD_COPY.division,
+      info: MEMBER_FIELD_INFO.division,
       options: divisionOptions,
       span: 'half',
       group: FORM_GROUPS.assignment,
@@ -218,26 +225,29 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       name: 'youtuberIds',
       kind: 'multiselect',
       label: MEMBER_FIELD_COPY.youtuber,
+      info: MEMBER_FIELD_INFO.youtuber,
       options: rowsToOptions(youtubers),
       mark: 'avatar',
       span: 'half',
       group: FORM_GROUPS.assignment,
     },
     {
-      name: 'primaryFunctionId',
-      kind: 'select',
-      label: MEMBER_FIELD_COPY.primaryFunction,
-      options: functionOptions,
-      mark: 'dot',
+      name: 'primaryFunctionIds',
+      kind: 'multiselect',
+      label: MEMBER_FIELD_COPY.primaryFunctions,
+      info: MEMBER_FIELD_INFO.primaryFunctions,
+      options: optionsOf(FunctionKinds.Primary),
+      mark: 'glyph',
       span: 'half',
       group: FORM_GROUPS.assignment,
     },
     {
-      name: 'secondaryFunctionId',
-      kind: 'select',
-      label: MEMBER_FIELD_COPY.secondaryFunction,
-      options: functionOptions,
-      mark: 'dot',
+      name: 'secondaryFunctionIds',
+      kind: 'multiselect',
+      label: MEMBER_FIELD_COPY.secondaryFunctions,
+      info: MEMBER_FIELD_INFO.secondaryFunctions,
+      options: optionsOf(FunctionKinds.Secondary),
+      mark: 'glyph',
       span: 'half',
       group: FORM_GROUPS.assignment,
     },
@@ -259,6 +269,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       name: 'timezone',
       kind: 'select',
       label: MEMBER_FIELD_COPY.timezone,
+      info: MEMBER_FIELD_INFO.timezone,
       options: timezoneOptions(),
       span: 'half',
       group: FORM_GROUPS.contact,
@@ -267,6 +278,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       name: 'languages',
       kind: 'multiselect',
       label: MEMBER_FIELD_COPY.languages,
+      info: MEMBER_FIELD_INFO.languages,
       options: LANGUAGE_OPTIONS,
       maxItems: FORM_SETTINGS.tagMaxCount,
       group: FORM_GROUPS.contact,
@@ -275,6 +287,8 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       name: 'joinedAt',
       kind: 'date',
       label: MEMBER_FIELD_COPY.joinedAt,
+      info: MEMBER_FIELD_INFO.joinedAt,
+      preset: 'today',
       span: 'half',
       group: FORM_GROUPS.planning,
     },
@@ -282,6 +296,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       name: 'leftAt',
       kind: 'date',
       label: MEMBER_FIELD_COPY.leftAt,
+      info: MEMBER_FIELD_INFO.leftAt,
       visibleWhen: { field: 'status', equals: MemberStatuses.Left },
       span: 'half',
       group: FORM_GROUPS.planning,
@@ -321,8 +336,6 @@ const toAccountData = (values: FormValues) => ({
   role: (readText(values, 'role') ?? 'MODERATEUR') as MemberRoleName,
   status: (readText(values, 'status') ?? MemberStatuses.Academy) as MemberStatusName,
   divisionId: readText(values, 'divisionId'),
-  primaryFunctionId: readText(values, 'primaryFunctionId'),
-  secondaryFunctionId: readText(values, 'secondaryFunctionId'),
   email: readText(values, 'email'),
   phone: readText(values, 'phone'),
   timezone: readText(values, 'timezone'),
@@ -331,6 +344,39 @@ const toAccountData = (values: FormValues) => ({
   languages: readList(values, 'languages'),
   celebrateBirthday: readFlag(values, 'celebrateBirthday'),
 })
+
+/**
+ * Read the functions a member should hold, each id kept only under the kind it was sent as
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<string[]>} - Function identifiers to hold
+ */
+
+const readHeldFunctionIds = async (values: FormValues): Promise<string[]> => {
+  const [primaries, secondaries] = await Promise.all([
+    readKindIds(readList(values, 'primaryFunctionIds'), FunctionKinds.Primary),
+    readKindIds(readList(values, 'secondaryFunctionIds'), FunctionKinds.Secondary),
+  ])
+
+  return [...primaries, ...secondaries]
+}
+
+/**
+ * Keep the ids that name an active function of one kind
+ * @param {string[]} ids - Submitted identifiers
+ * @param {FunctionKindName} kind - Principal or secondary
+ * @return {Promise<string[]>} - Known identifiers
+ */
+
+const readKindIds = async (ids: string[], kind: FunctionKindName): Promise<string[]> => {
+  if (ids.length === 0) return []
+
+  const rows = await prisma.jobFunction.findMany({
+    where: { id: { in: ids }, kind, archived: false },
+    select: { id: true },
+  })
+
+  return rows.map((row) => row.id)
+}
 
 /**
  * Add a moderator
@@ -342,6 +388,7 @@ export const createMember = async (values: FormValues): Promise<MemberSummary> =
   const data = toAccountData(values)
   const joinedAt = readDate(values, 'joinedAt')
   const youtuberIds = readList(values, 'youtuberIds')
+  const functionIds = await readHeldFunctionIds(values)
 
   const existing = await prisma.account.findUnique({ where: { discordId: data.discordId } })
   if (existing) throw conflict()
@@ -351,6 +398,7 @@ export const createMember = async (values: FormValues): Promise<MemberSummary> =
       ...data,
       joinedAt: joinedAt ?? new Date(),
       youtubers: { connect: youtuberIds.map((id) => ({ id })) },
+      functions: { create: functionIds.map((functionId) => ({ functionId })) },
     },
     include: SUMMARY_INCLUDE,
   })
@@ -376,6 +424,7 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
   const data = await withoutSealedWrites(toAccountData(values))
   const joinedAt = readDate(values, 'joinedAt')
   const youtuberIds = readList(values, 'youtuberIds')
+  const functionIds = await readHeldFunctionIds(values)
 
   const row = await prisma.account.update({
     where: { id },
@@ -383,6 +432,11 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
       ...data,
       joinedAt: joinedAt ?? current.joinedAt,
       youtubers: { set: youtuberIds.map((youtuberId) => ({ id: youtuberId })) },
+      // The whole set is sent every time, so it replaces what was held
+      functions: {
+        deleteMany: {},
+        create: functionIds.map((functionId) => ({ functionId })),
+      },
     },
     include: {
       ...SUMMARY_INCLUDE,
@@ -503,8 +557,12 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
       status: row.status,
       divisionId: row.divisionId,
       youtuberIds: row.youtubers.map((youtuber) => youtuber.id),
-      primaryFunctionId: row.primaryFunctionId,
-      secondaryFunctionId: row.secondaryFunctionId,
+      primaryFunctionIds: row.functions
+        .filter((held) => held.jobFunction.kind === FunctionKinds.Primary)
+        .map((held) => held.functionId),
+      secondaryFunctionIds: row.functions
+        .filter((held) => held.jobFunction.kind === FunctionKinds.Secondary)
+        .map((held) => held.functionId),
       email: row.email,
       phone: row.phone,
       timezone: row.timezone,
@@ -523,6 +581,7 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
     notes: notes.map(toMemberNote),
     socials: row.socialLinks.map((link) => ({
       id: link.id,
+      networkId: link.networkId,
       label: link.label,
       handle: link.handle,
       url: link.url,
