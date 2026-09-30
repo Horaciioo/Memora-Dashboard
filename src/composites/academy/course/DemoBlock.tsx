@@ -123,7 +123,6 @@ export const DemoBlock = ({ block }: { block: DemoData }) => {
           )}
           {isDiscord && step?.act === 'command' && (
             <div className={cn(COURSE_CHAT.head, COURSE_DEMO.composer)}>
-              <span aria-hidden="true">/</span>
               <span key={at} className={COURSE_DEMO.composerText}>
                 {step.detail}
               </span>
