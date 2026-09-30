@@ -12,6 +12,10 @@ node_modules
 out
 next-env.d.ts
 *.tsbuildinfo
+.turbopack-artifacts
+
+# generated
+/src/generated
 
 # build
 build
@@ -35,12 +39,9 @@ vitest.config.mts
 # loose notes at the root
 /*.md
 !/README.md
-!/AGENTS.md
-!/CLAUDE.md
 
 # editor
 .idea
 
-# claude code
-.claude/settings.local.json
-.claude/skills/
+# internal tooling notes, never public
+/.claude/
