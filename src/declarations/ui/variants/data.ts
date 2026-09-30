@@ -57,6 +57,18 @@ export const RECORD_ROW = {
 } as const
 
 /**
+ * Own absence page styles
+ * @type {Record<string, string>}
+ */
+
+export const ABSENCE_CARD = {
+  page: 'mx-auto flex w-full max-w-3xl flex-col gap-10',
+  card: 'flex flex-col items-center gap-5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-6 py-10 text-center',
+  dates: 'text-3xl font-extrabold tracking-tight sm:text-4xl',
+  reason: 'max-w-md text-base text-[var(--color-ink-subtle)]',
+} as const
+
+/**
  * Grouped card list styles, one heading per bucket
  * @type {Record<string, string>}
  */

@@ -1,11 +1,11 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Avatar } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { StatusText } from '@/components/elements/display/StatusText'
 import { Button } from '@/components/elements/actions/Button'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
+import { AddRow } from '@/components/structures/AddRow'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
@@ -14,204 +14,124 @@ import { useAbsences } from '@/core/hooks/data/useAbsences'
 import { ABSENCE_COPY } from '@/declarations/absences/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { LIST_STYLES } from '@/declarations/ui/variants'
-
-import type { FieldDefinition, FormValues } from '@/types/forms'
+import { ABSENCE_CARD, RECORD_ROW } from '@/declarations/ui/variants'
+import { useMenu, type MenuItem } from '@/managers/front-end'
+import type { FieldDefinition } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
-import { AbsenceStatuses } from '@/utils/constants/workflow'
-import type { AbsenceStatusName } from '@/utils/constants/workflow'
 import { absenceReasonText } from '@/utils/format/absences'
 import { formatDayRange } from '@/utils/format/dates'
 
 export interface AbsencesPanelProps {
   mine: MemberAbsence[]
-  queue: MemberAbsence[]
   fields: FieldDefinition[]
-  reviewFields: FieldDefinition[]
-  currentAccountId: string
   thresholdDays: number
   canCreate: boolean
-  canReview: boolean
 }
 
 /**
- * Absence surface, its own timeline first, the team's pending requests underneath — no table,
- * no tabs, the timeline itself carries no authority over the absence
+ * Own absences, the latest read as a card then the older ones as quiet rows. Requests waiting
+ * on the viewer are settled from the home page, never here
  * @param {MemberAbsence[]} mine - Own requests resolved server-side
- * @param {MemberAbsence[]} queue - Team requests awaiting review
  * @param {FieldDefinition[]} fields - Declarations of the request form
- * @param {FieldDefinition[]} reviewFields - Declarations of the review form
- * @param {string} currentAccountId - Signed-in member identifier
  * @param {number} thresholdDays - Days an absence must exceed
  * @param {boolean} canCreate - Member may declare an absence
- * @param {boolean} canReview - Member may settle a request
  * @return {JSX.Element}
  */
 
-export const AbsencesPanel = ({
-  mine,
-  queue,
-  fields,
-  reviewFields,
-  currentAccountId,
-  thresholdDays,
-  canCreate,
-  canReview,
-}: AbsencesPanelProps) => {
-  const initial = useMemo(() => {
-    const seen = new Set(mine.map((absence) => absence.id))
-
-    return [...mine, ...queue.filter((absence) => !seen.has(absence.id))]
-  }, [mine, queue])
-
-  const { absences, isSaving, issues, clearIssues, create, review, remove } = useAbsences(initial)
+export const AbsencesPanel = ({ mine, fields, thresholdDays, canCreate }: AbsencesPanelProps) => {
+  const { absences, isSaving, issues, clearIssues, create, remove } = useAbsences(mine)
+  const { contextMenu } = useMenu()
   const [isCreating, setCreating] = useState(false)
-  const [reviewing, setReviewing] = useState<{
-    absence: MemberAbsence
-    status: AbsenceStatusName
-  } | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<MemberAbsence | null>(null)
 
-  const myAbsences = useMemo(
-    () =>
-      absences
-        .filter((absence) => absence.accountId === currentAccountId)
-        .sort((a, b) => b.startDate.localeCompare(a.startDate)),
-    [absences, currentAccountId]
+  // Latest first, the newest one leading
+  const [current, ...history] = useMemo(
+    () => [...absences].sort((a, b) => b.startDate.localeCompare(a.startDate)),
+    [absences]
   )
-  const pendingQueue = useMemo(
-    () =>
-      absences
-        .filter(
-          (absence) =>
-            absence.accountId !== currentAccountId && absence.status === AbsenceStatuses.Pending
-        )
-        .sort((a, b) => a.startDate.localeCompare(b.startDate)),
-    [absences, currentAccountId]
-  )
-
-  const [current, ...history] = myAbsences
 
   const openCreate = () => {
     clearIssues()
     setCreating(true)
   }
 
-  const openReview = (absence: MemberAbsence, status: AbsenceStatusName) => {
-    clearIssues()
-    setReviewing({ absence, status })
-  }
+  const removalMenu = (absence: MemberAbsence): MenuItem[] => [
+    {
+      id: 'delete',
+      label: ACTION_COPY.delete,
+      icon: 'remove',
+      danger: true,
+      onSelect: () => setPendingDeletion(absence),
+    },
+  ]
+
+  const status = current ? ABSENCE_STATUS_REGISTRY.get(current.status) : null
+  const reason = current ? absenceReasonText(current) : null
 
   return (
-    <>
-      <Section bare>
-        {current ? (
-          <div className="flex flex-col gap-3">
+    <div className={ABSENCE_CARD.page}>
+      {current && status ? (
+        <Section bare>
+          <div className={ABSENCE_CARD.card} onContextMenu={contextMenu(removalMenu(current))}>
+            <StatusText label={status.label} accent={status.accent} />
+            <p className={ABSENCE_CARD.dates}>
+              {formatDayRange(current.startDate, current.endDate)}
+            </p>
+            {reason && <p className={ABSENCE_CARD.reason}>{reason}</p>}
             <AbsenceTimeline absence={current} />
             <Button
               variant="secondary"
               onClick={() => setPendingDeletion(current)}
-              className="self-start"
+              className="self-center"
             >
               {ABSENCE_COPY.cancel}
             </Button>
           </div>
-        ) : (
-          <EmptyState
-            variant="start"
-            figure="absences"
-            title={ABSENCE_COPY.emptyTitle}
-            description={ABSENCE_COPY.emptyDescription}
-            action={
-              <Button variant="primary" icon="add" disabled={!canCreate} onClick={openCreate}>
-                {ABSENCE_COPY.add}
-              </Button>
-            }
-          />
-        )}
-
-        {history.length > 0 && (
-          <div className="flex flex-col gap-2 pt-2">
-            <p className="text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase">
-              {ABSENCE_COPY.historyTitle}
-            </p>
-            <div className={LIST_STYLES.stack}>
-              {history.map((absence) => {
-                const status = ABSENCE_STATUS_REGISTRY.get(absence.status)
-
-                return (
-                  <div key={absence.id} className={LIST_STYLES.item}>
-                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <span className="font-medium">
-                        {formatDayRange(absence.startDate, absence.endDate)}
-                      </span>
-                      {absenceReasonText(absence) && (
-                        <span className="truncate text-xs text-[var(--color-ink-subtle)]">
-                          {absenceReasonText(absence)}
-                        </span>
-                      )}
-                    </span>
-                    <Badge label={status.label} accent={status.accent}  />
-                    <Button
-                      variant="icon"
-                      icon="remove"
-                      aria-label={ACTION_COPY.delete}
-                      onClick={() => setPendingDeletion(absence)}
-                    />
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-      </Section>
-
-      {canReview && (
-        <Section title={ABSENCE_COPY.queueTitle} bare>
-          {pendingQueue.length === 0 ? (
-            <p className="text-sm text-[var(--color-ink-subtle)]">
-              {ABSENCE_COPY.noPendingDescription}
-            </p>
-          ) : (
-            <div className={LIST_STYLES.stack}>
-              {pendingQueue.map((absence) => (
-                <div key={absence.id} className={LIST_STYLES.item}>
-                  <Avatar name={absence.memberName} size="sm" />
-                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className="font-medium">{absence.memberName}</span>
-                    <span className="truncate text-xs text-[var(--color-ink-subtle)]">
-                      {formatDayRange(absence.startDate, absence.endDate)}
-                      {absenceReasonText(absence) ? ` · ${absenceReasonText(absence)}` : ''}
-                    </span>
-                  </span>
-                  <Badge
-                    label={`${absence.dayCount} ${absence.dayCount === 1 ? ABSENCE_COPY.dayOne : ABSENCE_COPY.days}`}
-                    tone="neutral"
-                    icon="clock"
-                  />
-                  <Button
-                    variant="icon"
-                    icon="success"
-                    aria-label={ABSENCE_COPY.approve}
-                    onClick={() => openReview(absence, AbsenceStatuses.Approved)}
-                  />
-                  <Button
-                    variant="icon"
-                    icon="blocked"
-                    aria-label={ABSENCE_COPY.refuse}
-                    onClick={() => openReview(absence, AbsenceStatuses.Refused)}
-                  />
-                  <Button
-                    variant="icon"
-                    icon="remove"
-                    aria-label={ACTION_COPY.delete}
-                    onClick={() => setPendingDeletion(absence)}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
         </Section>
+      ) : (
+        <EmptyState
+          variant="start"
+          figure="absences"
+          title={ABSENCE_COPY.emptyTitle}
+          description={ABSENCE_COPY.emptyDescription}
+          action={
+            <Button variant="primary" icon="add" disabled={!canCreate} onClick={openCreate}>
+              {ABSENCE_COPY.add}
+            </Button>
+          }
+        />
+      )}
+
+      {history.length > 0 && (
+        <Section title={ABSENCE_COPY.historyTitle} bare>
+          <div className={RECORD_ROW.stack}>
+            {history.map((absence) => {
+              const past = ABSENCE_STATUS_REGISTRY.get(absence.status)
+
+              return (
+                <div
+                  key={absence.id}
+                  className={RECORD_ROW.static}
+                  onContextMenu={contextMenu(removalMenu(absence))}
+                >
+                  <span className={RECORD_ROW.body}>
+                    <span className={RECORD_ROW.title}>
+                      {formatDayRange(absence.startDate, absence.endDate)}
+                    </span>
+                    {absenceReasonText(absence) && (
+                      <span className={RECORD_ROW.meta}>{absenceReasonText(absence)}</span>
+                    )}
+                  </span>
+                  <StatusText label={past.label} accent={past.accent} />
+                </div>
+              )
+            })}
+          </div>
+        </Section>
+      )}
+
+      {current && (
+        <AddRow label={ABSENCE_COPY.planAnother} disabled={!canCreate} onClick={openCreate} />
       )}
 
       <FormDrawer
@@ -229,27 +149,6 @@ export const AbsencesPanel = ({
         onClose={() => setCreating(false)}
       />
 
-      <FormDrawer
-        subject={FORM_SUBJECTS.absence}
-        open={reviewing !== null}
-        title={ABSENCE_COPY.reviewTitle}
-        description={
-          reviewing
-            ? `${reviewing.absence.memberName} · ${formatDayRange(reviewing.absence.startDate, reviewing.absence.endDate)}`
-            : ''
-        }
-        fields={reviewFields}
-        issues={issues}
-        isSaving={isSaving}
-        submitVerb={
-          reviewing?.status === AbsenceStatuses.Approved
-            ? ABSENCE_COPY.approve
-            : ABSENCE_COPY.refuse
-        }
-        onSubmit={(values: FormValues) => review(reviewing!.absence.id, reviewing!.status, values)}
-        onClose={() => setReviewing(null)}
-      />
-
       <ConfirmDialog
         open={pendingDeletion !== null}
         title={ABSENCE_COPY.deleteTitle}
@@ -262,6 +161,6 @@ export const AbsencesPanel = ({
           setPendingDeletion(null)
         }}
       />
-    </>
+    </div>
   )
 }
