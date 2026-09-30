@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { Markdown } from '@/components/elements/display/Markdown'
 import { DiscordMessage } from '@/components/elements/display/DiscordMessage'
 import { ChatLineView } from '@/composites/academy/course/ChatFeed'
 import { COURSE_COPY } from '@/declarations/academy/copy'
@@ -155,12 +156,14 @@ export const DemoBlock = ({ block }: { block: DemoData }) => {
       </div>
 
       {step && (
-        <p key={at} className={cn(COURSE_DEMO.coach, 'course-pop')} role="status">
+        <div key={at} className={cn(COURSE_DEMO.coach, 'course-pop')} role="status">
           <span className={COURSE_DEMO.coachDisc}>
             <CoachIcon className="h-5 w-5" aria-hidden="true" />
           </span>
-          <span>{step.caption}</span>
-        </p>
+          <span className="min-w-0">
+            <Markdown source={step.caption} />
+          </span>
+        </div>
       )}
 
       <div className={COURSE_DEMO.controls}>
