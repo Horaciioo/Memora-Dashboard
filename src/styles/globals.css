@@ -173,6 +173,143 @@ html[data-color-vision='tritanopia'] {
   }
 }
 
+/* Course chapters slide in from the side they come from, the check and its line play once */
+.course-slide-forward {
+  animation: course-slide-forward 420ms var(--motion-ease-out) both;
+}
+
+.course-slide-back {
+  animation: course-slide-back 420ms var(--motion-ease-out) both;
+}
+
+@keyframes course-slide-forward {
+  from {
+    opacity: 0;
+    transform: translateX(3rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes course-slide-back {
+  from {
+    opacity: 0;
+    transform: translateX(-3rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.course-check {
+  animation: course-check 520ms var(--motion-ease-out) 200ms both;
+}
+
+@keyframes course-check {
+  from {
+    opacity: 0;
+    transform: rotate(-35deg) scale(0.3);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(6deg) scale(1.18);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.course-strike {
+  animation: course-strike 520ms var(--motion-ease-out) 700ms both;
+}
+
+@keyframes course-strike {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.course-bravo {
+  animation: course-rise 480ms var(--motion-ease-out) 1300ms both;
+}
+
+.course-bubble {
+  animation: course-rise 480ms var(--motion-ease-out) 2000ms both;
+}
+
+@keyframes course-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Key points and diagrams rise one after the other, the demonstration marks its lines */
+.course-pop {
+  animation: course-rise 420ms var(--motion-ease-out) calc(var(--i, 0) * 90ms) both;
+}
+
+.demo-focus {
+  outline: 2px solid var(--color-info);
+  outline-offset: -2px;
+  animation: demo-focus 1400ms ease-out both;
+}
+
+.demo-deleted {
+  opacity: 0.45;
+  text-decoration: line-through;
+  transition: opacity 300ms ease-out;
+}
+
+.demo-tag-in {
+  animation: course-check 420ms var(--motion-ease-out) both;
+}
+
+.demo-pulse {
+  animation: demo-pulse 1400ms ease-in-out infinite;
+}
+
+.demo-type {
+  display: inline-block;
+  max-width: 100%;
+  animation: demo-type 1400ms steps(28) both;
+}
+
+@keyframes demo-focus {
+  from {
+    background-color: color-mix(in srgb, var(--color-info) 45%, transparent);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+@keyframes demo-pulse {
+  50% {
+    box-shadow: 0 0 0 4px rgb(255 255 255 / 0.28);
+  }
+}
+
+@keyframes demo-type {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
 /* Drawer footprint, resolved on body where its dimensions live */
 body {
   --drawer-mobile-h: min(calc(100dvh - 2rem), max(var(--drawer-min-h), 70dvh));
@@ -596,6 +733,17 @@ body {
   .floating-hint-bubble,
   .surface-enter,
   .overlay-enter,
+  .course-pop,
+  .demo-focus,
+  .demo-tag-in,
+  .demo-pulse,
+  .demo-type,
+  .course-slide-forward,
+  .course-slide-back,
+  .course-check,
+  .course-strike,
+  .course-bravo,
+  .course-bubble,
   .popover-enter,
   .drawer-enter,
   .drawer-section-enter,
