@@ -1,15 +1,32 @@
 {
-  "breakpoints": { "sm": 640, "md": 768, "lg": 1024, "xl": 1280 },
+  "breakpoints": {
+    "sm": 640,
+    "md": 768,
+    "lg": 1024,
+    "xl": 1280
+  },
   "mobileUntil": "md",
   "shell": {
     "topBarHeight": 52,
     "bottomNavHeight": 64,
-    "sidebarWidth": 236,
-    "sidebarCollapsedWidth": 76,
-    "railWidth": 68,
-    "gutter": 12
+    "sidebarWidth": 270,
+    "titleTabHeight": 64,
+    "titleTabSlope": 120
   },
-  "bottomNav": { "maxSlots": 3 },
-  "toast": { "maxVisible": { "mobile": 1, "desktop": 3 } },
-  "touchTargetMin": 44
+  "bottomNav": {
+    "maxSlots": 3
+  },
+  "toast": {
+    "maxVisible": {
+      "mobile": 1,
+      "desktop": 3
+    }
+  },
+  "touchTargetMin": 44,
+  "drawer": {
+    "width": 600,
+    "heightShare": 0.8,
+    "minHeight": 600,
+    "gap": 0
+  }
 }

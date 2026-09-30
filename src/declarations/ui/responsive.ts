@@ -30,16 +30,27 @@ export const MOBILE_SHELL_QUERY = `(width < ${BREAKPOINTS[RESPONSIVE_SETTINGS.mo
 
 /**
  * Fixed chrome dimensions of the shell, in pixels
- * @type {{ topBar: number, bottomNav: number, sidebar: number, sidebarCollapsed: number, rail: number, gutter: number }}
+ * @type {{ topBar: number, bottomNav: number, sidebar: number, titleTab: number, titleSlope: number }}
  */
 
 export const SHELL_DIMENSIONS = {
   topBar: RESPONSIVE_SETTINGS.topBarHeight,
   bottomNav: RESPONSIVE_SETTINGS.bottomNavHeight,
   sidebar: RESPONSIVE_SETTINGS.sidebarWidth,
-  sidebarCollapsed: RESPONSIVE_SETTINGS.sidebarCollapsedWidth,
-  rail: RESPONSIVE_SETTINGS.railWidth,
-  gutter: RESPONSIVE_SETTINGS.gutter,
+  titleTab: RESPONSIVE_SETTINGS.titleTabHeight,
+  titleSlope: RESPONSIVE_SETTINGS.titleTabSlope,
+} as const
+
+/**
+ * Page drawer footprint
+ * @type {{ width: number, heightShare: number, minHeight: number, gap: number }}
+ */
+
+export const DRAWER_DIMENSIONS = {
+  width: RESPONSIVE_SETTINGS.drawerWidth,
+  heightShare: RESPONSIVE_SETTINGS.drawerHeightShare,
+  minHeight: RESPONSIVE_SETTINGS.drawerMinHeight,
+  gap: RESPONSIVE_SETTINGS.drawerGap,
 } as const
 
 /**

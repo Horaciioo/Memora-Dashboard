@@ -2,14 +2,16 @@
 
 import type { ReactNode } from 'react'
 import { Breadcrumbs } from '@/components/structures/Breadcrumbs'
+import { WindowFrame } from '@/components/structures/WindowFrame'
+import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { SealDialog } from '@/composites/security/SealDialog'
 import { BottomNav } from '@/composites/shell/BottomNav'
 import { LeftSidebar } from '@/composites/shell/LeftSidebar'
 import { MobileTopBar } from '@/composites/shell/MobileTopBar'
-import { RightSidebar } from '@/composites/shell/RightSidebar'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import { APP_SHELL } from '@/declarations/ui/blocks'
+import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
+import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
 import type { ViewContext } from '@/types/access'
 import type { SealState, TwoFactorState } from '@/types/security'
 
@@ -18,17 +20,15 @@ export interface AppShellProps {
   viewContext: ViewContext
   twoFactor: TwoFactorState
   seal: SealState
-  sidebarCollapsed: boolean
   children: ReactNode
 }
 
 /**
- * Chrome of the signed-in dashboard — destinations on the left, account on the right
+ * Chrome of the signed-in dashboard
  * @param {number} unreadCount - Unopened notifications resolved server-side
  * @param {ViewContext} viewContext - View resolved server-side
  * @param {TwoFactorState} twoFactor - Enrolment state resolved server-side
  * @param {SealState} seal - Unlock window resolved server-side
- * @param {boolean} sidebarCollapsed - Fold remembered by the browser
  * @param {ReactNode} children - Routed page content
  * @return {JSX.Element}
  */
@@ -38,15 +38,43 @@ export const AppShell = ({
   viewContext,
   twoFactor,
   seal,
-  sidebarCollapsed,
   children,
 }: AppShellProps) => {
+  return (
+    <RailSlotProvider>
+      <AppShellFrame
+        unreadCount={unreadCount}
+        viewContext={viewContext}
+        twoFactor={twoFactor}
+        seal={seal}
+      >
+        {children}
+      </AppShellFrame>
+    </RailSlotProvider>
+  )
+}
+
+/**
+ * Shell inside the rail slot
+ * @param {AppShellProps} props - Shell props
+ * @return {JSX.Element}
+ */
+
+const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: AppShellProps) => {
   const { session } = useAuthContext()
+  const { isClaimed, setSlot } = useRailSlot()
 
   return (
     <SealProvider initialState={twoFactor} initialSeal={seal}>
       <div className={APP_SHELL.frame}>
-        <LeftSidebar view={viewContext.view} initialCollapsed={sidebarCollapsed} />
+        {isClaimed ? (
+          <aside className={LEFT_SIDEBAR.rail}>
+            <div ref={setSlot} className={LEFT_SIDEBAR.slot} />
+          </aside>
+        ) : (
+          <LeftSidebar viewContext={viewContext} unreadCount={unreadCount} />
+        )}
+        <WindowFrame />
 
         <div className={APP_SHELL.main}>
           {session && (
@@ -58,10 +86,9 @@ export const AppShell = ({
           </main>
         </div>
 
-        <RightSidebar unreadCount={unreadCount} viewContext={viewContext} />
-
         {session && <BottomNav viewContext={viewContext} />}
         <SealDialog />
+        {session && <NudgeHost />}
       </div>
     </SealProvider>
   )

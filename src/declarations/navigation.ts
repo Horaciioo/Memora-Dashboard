@@ -30,19 +30,25 @@ export const ROUTES = {
   calendarEvent: (id: string) => `/calendrier?evenement=${id}`,
   calendarLegend: '/calendrier/legende',
   trainings: '/formations',
+  training: (id: string) => `/formations/${id}`,
   academy: '/academy',
   glossary: '/academy/lexique',
   session: (id: string) => `/academy/${id}`,
+  legacy: '/legacy',
+  legacyTrack: (id: string) => `/legacy/${id}`,
+  legacyModule: (id: string, key: string) => `/legacy/${id}/${key}`,
   junior: (sessionId: string, juniorId: string) => `/academy/${sessionId}/${juniorId}`,
   recruitments: '/recrutements',
   recruitment: (id: string) => `/recrutements/${id}`,
   sanctions: '/moderation/sanctions',
+  marsha: '/moderation/marsha',
   notifications: '/notifications',
   administration: '/administration',
   maturity: '/maturite',
+  changelog: '/nouveautes',
   preferences: '/parametres',
   settings: '/configuration',
-  teams: '/configuration/equipes',
+  teams: '/configuration/youtubeurs',
   settingsSection: (section: string) => `/configuration/${section}`,
   settingsRecord: (section: string, id: string) => `/configuration/${section}/${id}`,
   system: '/systeme',
@@ -109,7 +115,7 @@ export const nextNavigationView = (
   available.length === 0 ? view : available[(available.indexOf(view) + 1) % available.length]
 
 /**
- * Rule keeping an entry out of the rail
+ * Rule showing an entry, met by either list
  * @typedef {Object} NavigationCondition
  * @property {MemberStatusName[]} [statuses] - Statuses the entry is meant for
  * @property {MemberRoleName[]} [roles] - Roles the entry is meant for
@@ -186,9 +192,12 @@ export const matchesNavigation = (
   member: { status: MemberStatusName; role: MemberRoleName }
 ): boolean => {
   if (!condition) return true
-  if (condition.statuses && !condition.statuses.includes(member.status)) return false
 
-  return !condition.roles || condition.roles.includes(member.role)
+  // Either list opens the entry
+  return (
+    (condition.statuses?.includes(member.status) ?? false) ||
+    (condition.roles?.includes(member.role) ?? false)
+  )
 }
 
 /**
@@ -246,7 +255,15 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Formations',
         icon: 'academy',
         permission: Permissions.AcademyTrainingComplete,
-        visibleWhen: { statuses: ['ACADEMY'] },
+        // Juniors train, the encadrement previews
+        visibleWhen: { statuses: ['ACADEMY'], roles: ['ADMIN', 'RESPONSABLE'] },
+      },
+      {
+        href: ROUTES.legacy,
+        label: 'Mon Legacy',
+        icon: 'crown',
+        permission: Permissions.LegacySelf,
+        maturity: 'dev',
       },
     ],
   },
@@ -285,7 +302,7 @@ export const NAVIGATION: NavigationGroup[] = [
     ],
   },
   {
-    label: 'Vivier',
+    label: 'Programmes',
     from: NavigationViews.Lead,
     items: [
       {
@@ -297,10 +314,17 @@ export const NAVIGATION: NavigationGroup[] = [
       },
       {
         href: ROUTES.academy,
-        label: 'Marsha Academy',
+        label: 'Academy',
         icon: 'academy',
         permission: Permissions.AcademyRead,
         maturity: 'alpha',
+      },
+      {
+        href: ROUTES.legacy,
+        label: 'Legacy',
+        icon: 'crown',
+        permission: Permissions.LegacyRead,
+        maturity: 'dev',
       },
     ],
   },
@@ -312,11 +336,12 @@ export const NAVIGATION: NavigationGroup[] = [
     items: [
       {
         href: ROUTES.sanctions,
-        label: 'Panel de sanctions',
-        icon: 'sanctions',
+        label: 'Livecon & sanctions',
+        icon: 'liveconCrisis',
         permission: Permissions.SanctionRead,
         mobile: { slot: 'primary', order: 8 },
       },
+      { href: ROUTES.marsha, label: 'Marsha Bots', icon: 'discord' },
     ],
   },
   {
@@ -381,6 +406,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   legende: 'Légende',
   formations: 'Formations',
   academy: 'Marsha Academy',
+  legacy: 'Legacy',
   recrutements: 'Recrutements',
   lexique: 'Lexique',
   moderation: 'Modération',
@@ -388,6 +414,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   notifications: 'Notifications',
   administration: 'Console admin',
   maturite: 'Maturité',
+  nouveautes: 'Nouveautés',
   parametres: 'Paramètres',
   configuration: 'Configuration',
   acces: 'Accès',

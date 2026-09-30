@@ -1,9 +1,9 @@
 'use client'
 
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
-import type { LucideIcon } from 'lucide-react'
 
 import { FLOATING_HINT } from '@/declarations/ui/blocks'
+import type { LucideIcon } from '@/declarations/ui/icons'
 import { MOTION_TIMERS } from '@/declarations/ui/motion'
 import { cn } from '@/utils/classnames'
 

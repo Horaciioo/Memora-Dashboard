@@ -1,8 +1,8 @@
+import { Suspense } from 'react'
 import type { ReactNode } from 'react'
 import { AppShell } from '@/layouts/AppShell'
 import { AuthShell } from '@/layouts/AuthShell'
 import { HistoryConsentGate } from '@/composites/consent/HistoryConsentGate'
-import { readSidebarFold } from '@/core/lib/shell/readFold'
 import { countUnread } from '@/core/services/system/NotificationService'
 import { readSealState } from '@/core/services/auth/SealService'
 import { readTwoFactorState } from '@/core/services/auth/TwoFactorService'
@@ -10,6 +10,7 @@ import { readViewContext } from '@/core/services/auth/ViewService'
 import { needsHistoryConsent } from '@/core/services/preferences/ConsentService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { LogoutButton } from '@/composites/auth/LogoutButton'
+import { GuideHost } from '@/composites/shell/GuideHost'
 import { PENDING_ACCOUNT_COPY } from '@/declarations/onboarding/copy'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
@@ -45,23 +46,19 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     )
   }
 
-  const [unreadCount, viewContext, twoFactor, seal, sidebarCollapsed] = await Promise.all([
+  const [unreadCount, viewContext, twoFactor, seal] = await Promise.all([
     countUnread(session.id),
     readViewContext(session, access),
     readTwoFactorState(session.id),
     readSealState(),
-    readSidebarFold(),
   ])
 
   return (
-    <AppShell
-      unreadCount={unreadCount}
-      viewContext={viewContext}
-      twoFactor={twoFactor}
-      seal={seal}
-      sidebarCollapsed={sidebarCollapsed}
-    >
+    <AppShell unreadCount={unreadCount} viewContext={viewContext} twoFactor={twoFactor} seal={seal}>
       {children}
+      <Suspense fallback={null}>
+        <GuideHost />
+      </Suspense>
     </AppShell>
   )
 }

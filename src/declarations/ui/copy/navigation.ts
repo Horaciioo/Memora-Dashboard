@@ -6,9 +6,6 @@
 export const NAV_COPY = {
   breadcrumbs: 'Fil d’Ariane',
   sidebar: 'Navigation principale',
-  rail: 'Compte et raccourcis',
-  expandSidebar: 'Déplier le menu',
-  collapseSidebar: 'Replier le menu',
   account: 'Mon compte',
   searchPlaceholder: 'Rechercher…',
   searchShortcut: '⌘K',
@@ -41,3 +38,16 @@ export const SEARCH_GROUPS = {
 } as const
 
 export type SearchGroup = keyof typeof SEARCH_GROUPS
+
+/**
+ * Pagination copy
+ * @type {Record<string, string | ((...values: number[]) => string)>}
+ */
+
+export const PAGINATION_COPY = {
+  label: 'Pages',
+  previous: 'Précédent',
+  next: 'Suivant',
+  summary: (page: number, totalPages: number, total: number) =>
+    `Page ${page} sur ${totalPages}, ${total} résultat${total > 1 ? 's' : ''}`,
+} as const
