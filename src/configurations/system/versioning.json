@@ -1,0 +1,12 @@
+{
+  "workBranch": "dev",
+  "snapshotBranch": "staging",
+  "promotionFlow": ["dev", "staging", "release", "main"],
+  "stages": {
+    "dev": "snapshot",
+    "staging": "snapshot",
+    "release": "candidate",
+    "main": "release"
+  },
+  "notesFile": "src/declarations/changelog/releases.ts"
+}
