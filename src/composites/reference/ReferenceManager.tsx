@@ -8,7 +8,8 @@ import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { referenceSubject } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useReference } from '@/core/hooks/data/useReference'
@@ -20,6 +21,7 @@ import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { GROUP_STYLES, LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 
+import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { FieldDefinition } from '@/types/forms'
 import type { ReferenceRow } from '@/types/reference'
@@ -56,9 +58,13 @@ export const ReferenceManager = ({
   )
   const router = useRouter()
   const { contextMenu } = useMenu()
+  const gestures = useEditGestures()
   const [editing, setEditing] = useState<ReferenceRow | null>(null)
   const [isCreating, setCreating] = useState(false)
   const [pendingDeletion, setPendingDeletion] = useState<ReferenceRow | null>(null)
+
+  // A brand-new row has nothing to archive yet
+  const creationFields = fields.filter((field) => field.name !== 'archived')
 
   const { over, itemProps, containerProps } = useDragAndDrop((item, _container, index) => {
     const current = rows.map((row) => row.id)
@@ -143,9 +149,20 @@ export const ReferenceManager = ({
           <div
             key={row.id}
             data-drop-index={index}
+            className={cn(
+              LIST_STYLES.item,
+              (section.openable || canManage) && LIST_STYLES.itemClickable
+            )}
+            {...(section.openable
+              ? { onClick: () => openRow(row) }
+              : gestures({
+                  canEdit: canManage,
+                  onEdit: () => {
+                    clearIssues()
+                    setEditing(row)
+                  },
+                }))}
             onContextMenu={contextMenu(rowMenu(row), row.label)}
-            onClick={section.openable ? () => openRow(row) : undefined}
-            className={cn(LIST_STYLES.item, section.openable && LIST_STYLES.itemClickable)}
             {...(section.reorderable && canManage
               ? itemProps({ id: row.id, from: CONTAINER })
               : {})}
@@ -171,17 +188,6 @@ export const ReferenceManager = ({
             <span className="shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums">
               {`${row.usage} ${row.usage === 1 ? REFERENCE_COPY.usageOne : REFERENCE_COPY.usage}`}
             </span>
-            <Button
-              variant="icon"
-              icon="edit"
-              aria-label={`${ACTION_COPY.edit} ${row.label}`}
-              disabled={!canManage}
-              onClick={(event) => {
-                event.stopPropagation()
-                clearIssues()
-                setEditing(row)
-              }}
-            />
           </div>
         ))}
         <AddRow
@@ -228,17 +234,19 @@ export const ReferenceManager = ({
         )}
       </Section>
 
-      <FormDialog
+      <FormDrawer
+        subject={referenceSubject(section)}
         open={isCreating}
         title={`${ACTION_COPY.add} ${section.singular.toLowerCase()}`}
-        fields={fields}
+        fields={creationFields}
         issues={issues}
         isSaving={isSaving}
         onSubmit={create}
         onClose={() => setCreating(false)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={referenceSubject(section)}
         open={editing !== null}
         title={editing ? `${ACTION_COPY.edit} · ${editing.label}` : ACTION_COPY.edit}
         fields={fields}

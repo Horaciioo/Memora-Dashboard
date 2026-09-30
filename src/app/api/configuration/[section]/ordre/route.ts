@@ -1,7 +1,7 @@
-import { notFound } from '@/core/lib/errors'
+import { forbidden, notFound } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { referenceResource } from '@/core/services/reference/ReferenceService'
-import { isReferenceKey } from '@/declarations/reference/sections'
+import { isFixedReference, isReferenceKey } from '@/declarations/reference/sections'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
@@ -10,6 +10,9 @@ export const PATCH = createProtectedRoute({
   handler: async ({ params, raw }) => {
     const section = params.section
     if (!isReferenceKey(section)) throw notFound()
+
+    // Fixed in code
+    if (isFixedReference(section)) throw forbidden()
 
     // Identifiers arrive already ordered by the board
     const ids = Array.isArray(raw.ids) ? raw.ids.map(String) : []

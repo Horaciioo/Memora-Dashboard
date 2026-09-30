@@ -1,15 +1,19 @@
-import { conflict, invalidInput, notFound } from '@/core/lib/errors'
+import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { stripRestricted } from '@/core/lib/forms/restrictions'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { referenceResource } from '@/core/services/reference/ReferenceService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { REFERENCE_COPY } from '@/declarations/reference/copy'
-import { isReferenceKey, referenceSection } from '@/declarations/reference/sections'
+import {
+  isFixedReference,
+  isReferenceKey,
+  referenceSection,
+} from '@/declarations/reference/sections'
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
- * Read the section named by the route, or reject
+ * Read the writable section named by the route, or reject
  * @param {Record<string, string>} params - Dynamic segments
  * @return {string} - Collection key
  */
@@ -17,6 +21,9 @@ import { Permissions } from '@/utils/constants/permissions'
 const readSection = (params: Record<string, string>): string => {
   const section = params.section
   if (!isReferenceKey(section)) throw notFound()
+
+  // Fixed in code
+  if (isFixedReference(section)) throw forbidden()
 
   return section
 }

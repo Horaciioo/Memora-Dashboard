@@ -1,25 +1,24 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Avatar } from '@/components/elements/display/Avatar'
+import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { Section } from '@/components/structures/Section'
 import { CreatorLeadsPanel } from '@/composites/reference/CreatorLeadsPanel'
 import { TeamsBoard } from '@/composites/teams/TeamsBoard'
+import { roleGroupedOptions } from '@/core/lib/forms/options'
 import { prisma } from '@/core/lib/db'
 import { readAnchors } from '@/core/services/auth/LeadService'
 import { encadrementAccounts } from '@/core/services/reference/lookups'
-import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { readTeamBoard, teamFields } from '@/core/services/teams/TeamService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { REFERENCE_COPY, REFERENCE_FIELD_COPY, YOUTUBER_COPY } from '@/declarations/reference/copy'
-import { METRIC_BLOCK } from '@/declarations/ui/blocks'
 
 import { PAGE_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
- * Read one creator and everything counted against them
+ * Read one creator
  * @param {string} id - Creator identifier
  * @return {Promise<object | null>} - Creator row
  */
@@ -27,7 +26,6 @@ import { Permissions } from '@/utils/constants/permissions'
 const readYoutuber = (id: string) =>
   prisma.youtuber.findUnique({
     where: { id },
-    include: { _count: { select: { accounts: true, projects: true, teams: true } } },
   })
 
 /**
@@ -81,26 +79,7 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
         }
       />
       <Section padded>
-        <div className="flex flex-wrap items-center gap-4">
-          <Avatar name={youtuber.name} src={youtuber.avatarUrl} size="lg" />
-          <span className={METRIC_BLOCK.row}>
-            <span className={METRIC_BLOCK.entry}>
-              <span className={METRIC_BLOCK.value}>{youtuber._count.accounts}</span>
-              <span className={METRIC_BLOCK.label}>{YOUTUBER_COPY.moderators}</span>
-            </span>
-            <span className={METRIC_BLOCK.entry}>
-              <span className={METRIC_BLOCK.value}>{youtuber._count.projects}</span>
-              <span className={METRIC_BLOCK.label}>{YOUTUBER_COPY.projects}</span>
-            </span>
-            <span className={METRIC_BLOCK.entry}>
-              <span className={METRIC_BLOCK.value}>{youtuber._count.teams}</span>
-              <span className={METRIC_BLOCK.label}>{YOUTUBER_COPY.teams}</span>
-            </span>
-          </span>
-          {youtuber.accent && (
-            <Badge label={youtuber.name} accent={youtuber.accent} tone={'brand'} icon="youtuber" />
-          )}
-        </div>
+        <CreatorLabel name={youtuber.name} image={youtuber.avatarUrl} size="lg" />
       </Section>
       <Section
         title={REFERENCE_FIELD_COPY.leadsTitle}
@@ -110,12 +89,7 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
         <CreatorLeadsPanel
           youtuberId={id}
           initialAnchors={anchors}
-          candidates={candidates.map((account) => ({
-            value: account.id,
-            label: account.displayName,
-            hint: ROLE_REGISTRY.label(account.role),
-            image: account.avatarUrl,
-          }))}
+          candidates={roleGroupedOptions(candidates)}
           teams={board.teams.map((team) => ({ value: team.id, label: team.name }))}
           canManage={access.isAdmin}
         />

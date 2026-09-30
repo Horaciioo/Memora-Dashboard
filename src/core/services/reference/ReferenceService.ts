@@ -7,9 +7,8 @@ import {
   encadrementAccounts,
 } from '@/core/services/reference/lookups'
 import { replaceAnchors } from '@/core/services/auth/LeadService'
-import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { conflict, notFound } from '@/core/lib/errors'
-import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
+import { roleGroupedOptions, rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import {
   ACADEMY_SETTINGS,
@@ -25,20 +24,24 @@ import {
 import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
 import {
   EVENT_VISIBILITY_REGISTRY,
-  FUNCTION_KIND_REGISTRY,
   WORKFLOW_PHASE_REGISTRY,
   WORKFLOW_SCOPE_REGISTRY,
 } from '@/declarations/reference/registries'
 import { CALENDAR_KIND_REGISTRY } from '@/declarations/calendar/registries'
 import { FORM_GROUPS } from '@/declarations/ui/copy/forms'
 import { REFERENCE_FIELD_COPY } from '@/declarations/reference/copy'
+import { PIM_DESTINATION_REGISTRY, PIM_STEP_GLYPHS } from '@/declarations/academy/guides'
 import { RECRUITMENT_FIELD_COPY, RECRUITMENT_FILTER_COPY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_OWNER_REGISTRY } from '@/declarations/recruitment/registries'
 import { instantiatePanel } from '@/core/services/sanctions/SanctionService'
 import { SANCTION_FIELD_COPY } from '@/declarations/sanctions/copy'
-import { SANCTION_KIND_REGISTRY } from '@/declarations/sanctions/registries'
-import { SanctionKinds } from '@/utils/constants/moderation'
-import type { SanctionKindName } from '@/utils/constants/moderation'
+import {
+  SANCTION_KIND_REGISTRY,
+  SANCTION_PANEL_REGISTRY,
+} from '@/declarations/sanctions/registries'
+import { DiscordAnchorKinds, SanctionKinds } from '@/utils/constants/moderation'
+import type { DiscordAnchorKindName, SanctionKindName } from '@/utils/constants/moderation'
+import { DISCORD_ANCHOR_REGISTRY } from '@/declarations/discord/registries'
 import { RecruitmentOwners } from '@/utils/constants/recruitment'
 import type { RecruitmentOwnerName } from '@/utils/constants/recruitment'
 import type { ReferenceKey } from '@/declarations/reference/sections'
@@ -48,7 +51,6 @@ import { AcademyStages, StepAnchors, StepOwners } from '@/utils/constants/hierar
 import {
   CalendarKinds,
   EventVisibilities,
-  FunctionKinds,
   WorkflowPhases,
   WorkflowScopes,
 } from '@/utils/constants/workflow'
@@ -59,7 +61,6 @@ import type {
   StepAnchorName,
   StepOwnerName,
   EventVisibilityName,
-  FunctionKindName,
   WorkflowPhaseName,
   WorkflowScopeName,
 } from '@/utils/constants'
@@ -211,12 +212,7 @@ const youtubers: ReferenceResource = {
       group: FORM_GROUPS.encadrement,
       mark: 'avatar',
       adminOnly: true,
-      options: (await encadrementAccounts()).map((account) => ({
-        value: account.id,
-        label: account.displayName,
-        hint: ROLE_REGISTRY.label(account.role),
-        image: account.avatarUrl,
-      })),
+      options: roleGroupedOptions(await encadrementAccounts()),
     },
   ],
   list: async () => {
@@ -266,7 +262,10 @@ const youtubers: ReferenceResource = {
       .catch(rethrow)
 
     // A creator starts with the declared sanction panel, editable right after
-    await instantiatePanel(row.id)
+    // Every written surface starts from its reference panel
+    for (const panel of SANCTION_PANEL_REGISTRY.keys) {
+      if (SANCTION_PANEL_REGISTRY.get(panel).written) await instantiatePanel(row.id, panel)
+    }
     await replaceOpenFunctions(row.id, readList(values, 'functionIds'))
     await replaceAnchors(row.id, readList(values, 'leadIds'))
 
@@ -391,95 +390,6 @@ const divisions: ReferenceResource = {
     await prisma.division.delete({ where: { id } })
   },
   reorder: noReorder,
-}
-
-const jobFunctions: ReferenceResource = {
-  fields: async () => [
-    nameField,
-    {
-      name: 'kind',
-      kind: 'select',
-      label: REFERENCE_FIELD_COPY.kind,
-      required: true,
-      options: toOptions(FUNCTION_KIND_REGISTRY),
-      mark: 'dot',
-      span: 'half',
-    },
-    accentField,
-    {
-      name: 'summary',
-      kind: 'textarea',
-      label: REFERENCE_FIELD_COPY.summary,
-      maxLength: longTextMaxLength,
-    },
-    { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
-  ],
-  list: async () => {
-    const rows = await prisma.jobFunction.findMany({
-      orderBy: [{ kind: 'asc' }, { position: 'asc' }],
-      include: { _count: { select: { primaryHolders: true, secondaryHolders: true } } },
-    })
-
-    return rows.map((row) => ({
-      id: row.id,
-      label: row.name,
-      hint: row.summary,
-      accent: row.accent,
-      badges: [
-        FUNCTION_KIND_REGISTRY.label(row.kind),
-        ...(row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : []),
-      ],
-      position: row.position,
-      usage: row._count.primaryHolders + row._count.secondaryHolders,
-      values: {
-        name: row.name,
-        kind: row.kind,
-        accent: row.accent,
-        summary: row.summary,
-        archived: row.archived,
-      },
-    }))
-  },
-  create: async (values) => {
-    const row = await prisma.jobFunction
-      .create({
-        data: {
-          name: readText(values, 'name') ?? '',
-          kind: (readText(values, 'kind') ?? FunctionKinds.Primary) as FunctionKindName,
-          accent: readText(values, 'accent'),
-          summary: readText(values, 'summary'),
-          archived: readFlag(values, 'archived'),
-          position: await nextPosition(prisma.jobFunction),
-        },
-      })
-      .catch(rethrow)
-
-    return jobFunctions.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
-  },
-  update: async (id, values) => {
-    await prisma.jobFunction
-      .update({
-        where: { id },
-        data: {
-          name: readText(values, 'name') ?? undefined,
-          kind: (readText(values, 'kind') ?? undefined) as FunctionKindName | undefined,
-          accent: readText(values, 'accent'),
-          summary: readText(values, 'summary'),
-          archived: readFlag(values, 'archived'),
-        },
-      })
-      .catch(rethrow)
-
-    return jobFunctions.list().then((rows) => rows.find((entry) => entry.id === id)!)
-  },
-  remove: async (id) => {
-    await prisma.jobFunction.delete({ where: { id } })
-  },
-  reorder: (ids) =>
-    applyOrder(
-      (id, position) => prisma.jobFunction.update({ where: { id }, data: { position } }),
-      ids
-    ),
 }
 
 const platforms: ReferenceResource = {
@@ -1369,6 +1279,23 @@ const skills: ReferenceResource = {
     applyOrder((id, position) => prisma.skill.update({ where: { id }, data: { position } }), ids),
 }
 
+/**
+ * Read the walkthrough of a PIM step, never trusting an undeclared glyph or destination
+ * @param {FormValues} values - Parsed body
+ * @return {{ icon: string | null, destination: string | null, guide: string | null }} - Columns
+ */
+
+const readStepGuide = (values: FormValues) => {
+  const icon = readText(values, 'icon')
+  const destination = readText(values, 'destination')
+
+  return {
+    icon: icon && PIM_STEP_GLYPHS.some((glyph) => glyph.icon === icon) ? icon : null,
+    destination: destination && PIM_DESTINATION_REGISTRY.has(destination) ? destination : null,
+    guide: readText(values, 'guide'),
+  }
+}
+
 const pimStepTemplates: ReferenceResource = {
   fields: async () => {
     const [functions, dispositifRows] = await Promise.all([
@@ -1435,10 +1362,43 @@ const pimStepTemplates: ReferenceResource = {
         span: 'half',
       },
       {
+        name: 'icon',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.stepGlyph,
+        info: REFERENCE_FIELD_COPY.stepGlyphInfo,
+        options: PIM_STEP_GLYPHS.map((glyph) => ({
+          value: glyph.icon,
+          label: glyph.label,
+          icon: glyph.icon,
+        })),
+        mark: 'glyph',
+        span: 'half',
+      },
+      {
+        name: 'destination',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.stepDestination,
+        info: REFERENCE_FIELD_COPY.stepDestinationInfo,
+        options: PIM_DESTINATION_REGISTRY.keys.map((key) => ({
+          value: key,
+          label: PIM_DESTINATION_REGISTRY.label(key),
+          icon: PIM_DESTINATION_REGISTRY.get(key).icon,
+        })),
+        mark: 'glyph',
+        span: 'half',
+      },
+      {
         name: 'description',
         kind: 'textarea',
         label: REFERENCE_FIELD_COPY.summary,
         maxLength: longTextMaxLength,
+      },
+      {
+        name: 'guide',
+        kind: 'markdown',
+        label: REFERENCE_FIELD_COPY.stepGuide,
+        info: REFERENCE_FIELD_COPY.stepGuideInfo,
+        maxLength: FORM_SETTINGS.markdownMaxLength,
       },
       { name: 'required', kind: 'toggle', label: REFERENCE_FIELD_COPY.mandatory },
     ]
@@ -1474,6 +1434,9 @@ const pimStepTemplates: ReferenceResource = {
         functionId: row.functionId,
         dispositifId: row.dispositifId,
         description: row.description,
+        icon: row.icon,
+        destination: row.destination,
+        guide: row.guide,
         required: row.required,
       },
     }))
@@ -1490,6 +1453,7 @@ const pimStepTemplates: ReferenceResource = {
           functionId: readText(values, 'functionId'),
           dispositifId: readText(values, 'dispositifId'),
           description: readText(values, 'description'),
+          ...readStepGuide(values),
           required: readFlag(values, 'required'),
           position: await nextPosition(prisma.pimStepTemplate),
         },
@@ -1511,6 +1475,7 @@ const pimStepTemplates: ReferenceResource = {
           functionId: readText(values, 'functionId'),
           dispositifId: readText(values, 'dispositifId'),
           description: readText(values, 'description'),
+          ...readStepGuide(values),
           required: readFlag(values, 'required'),
         },
       })
@@ -1524,6 +1489,117 @@ const pimStepTemplates: ReferenceResource = {
   reorder: (ids) =>
     applyOrder(
       (id, position) => prisma.pimStepTemplate.update({ where: { id }, data: { position } }),
+      ids
+    ),
+}
+
+const discordAnchors: ReferenceResource = {
+  fields: async () => {
+    const creators = await prisma.youtuber.findMany({
+      where: { archived: false },
+      orderBy: { position: 'asc' },
+      select: { id: true, name: true, avatarUrl: true },
+    })
+
+    return [
+      nameField,
+      {
+        name: 'kind',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.anchorKind,
+        required: true,
+        options: toOptions(DISCORD_ANCHOR_REGISTRY),
+        span: 'half',
+      },
+      {
+        name: 'discordId',
+        kind: 'text',
+        label: REFERENCE_FIELD_COPY.anchorDiscordId,
+        hint: REFERENCE_FIELD_COPY.anchorDiscordIdHint,
+        required: true,
+        maxLength: shortTextMaxLength,
+        span: 'half',
+      },
+      {
+        name: 'youtuberId',
+        kind: 'select',
+        label: REFERENCE_FIELD_COPY.anchorYoutuber,
+        hint: REFERENCE_FIELD_COPY.anchorYoutuberHint,
+        options: rowsToOptions(creators),
+        mark: 'avatar',
+      },
+      accentField,
+      { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
+    ]
+  },
+  list: async () => {
+    const rows = await prisma.discordAnchor.findMany({
+      orderBy: [{ kind: 'asc' }, { position: 'asc' }],
+      include: { youtuber: { select: { name: true } } },
+    })
+
+    return rows.map((row) => ({
+      id: row.id,
+      label: `${DISCORD_ANCHOR_REGISTRY.get(row.kind).sigil}${row.name}`,
+      hint: row.discordId,
+      accent: row.accent,
+      badges: [
+        DISCORD_ANCHOR_REGISTRY.label(row.kind),
+        ...(row.youtuber ? [row.youtuber.name] : []),
+        ...(row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : []),
+      ],
+      position: row.position,
+      usage: 0,
+      values: {
+        name: row.name,
+        kind: row.kind,
+        discordId: row.discordId,
+        youtuberId: row.youtuberId,
+        accent: row.accent,
+        archived: row.archived,
+      },
+    }))
+  },
+  create: async (values) => {
+    const row = await prisma.discordAnchor
+      .create({
+        data: {
+          name: readText(values, 'name') ?? '',
+          kind: (readText(values, 'kind') ?? DiscordAnchorKinds.Role) as DiscordAnchorKindName,
+          discordId: readText(values, 'discordId') ?? '',
+          youtuberId: readText(values, 'youtuberId'),
+          accent: readText(values, 'accent'),
+          archived: readFlag(values, 'archived'),
+          position: await nextPosition(prisma.discordAnchor),
+        },
+      })
+      .catch(rethrow)
+
+    return discordAnchors.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
+  },
+  update: async (id, values) => {
+    await prisma.discordAnchor
+      .update({
+        where: { id },
+        data: {
+          name: readText(values, 'name') ?? undefined,
+          kind: (readText(values, 'kind') ?? undefined) as DiscordAnchorKindName | undefined,
+          discordId: readText(values, 'discordId') ?? undefined,
+          youtuberId: readText(values, 'youtuberId'),
+          accent: readText(values, 'accent'),
+          archived: readFlag(values, 'archived'),
+        },
+      })
+      .catch(rethrow)
+
+    return discordAnchors.list().then((rows) => rows.find((entry) => entry.id === id)!)
+  },
+  remove: async (id) => {
+    await prisma.discordAnchor.delete({ where: { id } })
+  },
+  reorder: (ids) =>
+    applyOrder(
+      (id, position) => prisma.discordAnchor.update({ where: { id }, data: { position } }),
       ids
     ),
 }
@@ -1993,7 +2069,6 @@ const recruitmentOutcomes: ReferenceResource = {
 const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
   youtubeurs: youtubers,
   divisions,
-  fonctions: jobFunctions,
   plateformes: platforms,
   'reseaux-sociaux': socialNetworks,
   etats: workflowStates,
@@ -2005,6 +2080,7 @@ const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
   'categories-competences': skillCategories,
   competences: skills,
   'etapes-pim': pimStepTemplates,
+  discord: discordAnchors,
   sanctions: sanctionMeasures,
   'questions-recrutement': recruitmentQuestions,
   'etapes-recrutement': recruitmentStepTemplates,

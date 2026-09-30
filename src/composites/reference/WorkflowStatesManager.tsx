@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { Badge } from '@/components/elements/display/Badge'
-import { Button } from '@/components/elements/actions/Button'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { emptyValues } from '@/core/lib/forms'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
@@ -18,6 +18,7 @@ import {
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { BOARD_STYLES, GROUP_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
+import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { FieldDefinition } from '@/types/forms'
 import type { ReferenceRow } from '@/types/reference'
@@ -50,6 +51,7 @@ export const WorkflowStatesManager = ({
     initialRows
   )
   const { contextMenu } = useMenu()
+  const gestures = useEditGestures()
   const [editing, setEditing] = useState<ReferenceRow | null>(null)
   const [creating, setCreating] = useState<{ scope: string; phase: string } | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<ReferenceRow | null>(null)
@@ -134,7 +136,7 @@ export const WorkflowStatesManager = ({
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h2 className={SECTION_STYLES.title}>{WORKFLOW_SCOPE_REGISTRY.label(scope)}</h2>
                 {canManage && (
-                  <p className="text-xs text-[var(--color-ink-subtle)] italic">
+                  <p className="text-xs text-[var(--color-ink-subtle)]">
                     {WORKFLOW_STATE_COPY.moveHint}
                   </p>
                 )}
@@ -160,10 +162,8 @@ export const WorkflowStatesManager = ({
                           <Badge
                             label={WORKFLOW_PHASE_REGISTRY.label(phase)}
                             accent={meta.accent}
-                            dot
                           />
                         </span>
-                        <span className={BOARD_STYLES.count}>{entries.length}</span>
                       </header>
 
                       <div className={BOARD_STYLES.body}>
@@ -171,8 +171,18 @@ export const WorkflowStatesManager = ({
                           <article
                             key={row.id}
                             data-drop-index={index}
+                            className={cn(
+                              BOARD_STYLES.card,
+                              canManage ? 'cursor-pointer' : 'cursor-default'
+                            )}
+                            {...gestures({
+                              canEdit: canManage,
+                              onEdit: () => {
+                                clearIssues()
+                                setEditing(row)
+                              },
+                            })}
                             onContextMenu={contextMenu(rowMenu(row), row.label)}
-                            className={cn(BOARD_STYLES.card, 'cursor-default')}
                             {...(canManage ? itemProps({ id: row.id, from: container }) : {})}
                           >
                             <div className="flex flex-wrap items-center gap-2">
@@ -182,7 +192,7 @@ export const WorkflowStatesManager = ({
                                   aria-hidden="true"
                                 />
                               )}
-                              <Badge label={row.label} accent={row.accent} dot />
+                              <Badge label={row.label} accent={row.accent} />
                               {row.values.isDefault === true && (
                                 <Badge
                                   label={WORKFLOW_STATE_COPY.defaultMark}
@@ -195,25 +205,6 @@ export const WorkflowStatesManager = ({
                             <div className="flex items-center justify-between gap-2 text-xs text-[var(--color-ink-subtle)]">
                               <span className="tabular-nums">
                                 {`${row.usage} ${row.usage === 1 ? REFERENCE_COPY.usageOne : REFERENCE_COPY.usage}`}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Button
-                                  variant="icon"
-                                  icon="edit"
-                                  aria-label={`${ACTION_COPY.edit} ${row.label}`}
-                                  disabled={!canManage}
-                                  onClick={() => {
-                                    clearIssues()
-                                    setEditing(row)
-                                  }}
-                                />
-                                <Button
-                                  variant="icon"
-                                  icon="remove"
-                                  aria-label={`${ACTION_COPY.delete} ${row.label}`}
-                                  disabled={!canManage || row.usage > 0}
-                                  onClick={() => setPendingDeletion(row)}
-                                />
                               </span>
                             </div>
                           </article>
@@ -238,7 +229,8 @@ export const WorkflowStatesManager = ({
         </div>
       </Section>
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.workflowState}
         open={creating !== null}
         title={WORKFLOW_STATE_COPY.add}
         fields={fields}
@@ -253,7 +245,8 @@ export const WorkflowStatesManager = ({
         onClose={() => setCreating(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.workflowState}
         open={editing !== null}
         title={editing ? `${ACTION_COPY.edit} · ${editing.label}` : ACTION_COPY.edit}
         fields={fields}

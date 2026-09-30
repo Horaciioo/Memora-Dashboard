@@ -1,12 +1,7 @@
 import type { Metadata } from 'next'
-import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { ConsoleCard } from '@/composites/system/ConsoleCard'
-import { CreatorPicker } from '@/composites/shell/CreatorPicker'
-import { readActiveCreator } from '@/core/lib/auth/activeCreator'
-import { pickableCreators } from '@/core/services/auth/ViewService'
 import { requirePermission } from '@/core/wrappers/requireUser'
-import { ACCESS_COPY } from '@/declarations/access/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { REFERENCE_COPY } from '@/declarations/reference/copy'
 import {
@@ -25,7 +20,7 @@ export const metadata: Metadata = { title: REFERENCE_COPY.title }
  */
 
 export default async function ConfigurationPage() {
-  const { session, access } = await requirePermission(Permissions.ReferenceRead)
+  const { access } = await requirePermission(Permissions.ReferenceRead)
 
   // Non-empty groups, in display order
   const groups = REFERENCE_GROUPS.map((group) => ({
@@ -34,27 +29,8 @@ export default async function ConfigurationPage() {
     screens: referenceScreensOfGroup(group.key).filter((screen) => access.can(screen.permission)),
   })).filter((group) => group.sections.length > 0 || group.screens.length > 0)
 
-  const canManageAccess = access.can(Permissions.AccessManage)
-
-  // Creator scoping is a stub until the permission rebuild — see the note carried in memory
-  const [creators, storedCreatorId] = await Promise.all([
-    pickableCreators(session, access),
-    readActiveCreator(),
-  ])
-  const activeCreatorId = creators.some((creator) => creator.id === storedCreatorId)
-    ? storedCreatorId
-    : null
-
   return (
     <div className={PAGE_STYLES.wrapper}>
-      {creators.length > 1 && (
-        <CreatorPicker
-          creators={creators}
-          activeYoutuberId={activeCreatorId}
-          labelled
-          labelSlot={<MaturityTag maturity="dev" interactive={false} />}
-        />
-      )}
       <PageHeader title={REFERENCE_COPY.title} lead={REFERENCE_COPY.lead} />
       <div className={GROUP_STYLES.ruledStack}>
         {groups.map((group) => (
@@ -82,20 +58,6 @@ export default async function ConfigurationPage() {
             </div>
           </section>
         ))}
-
-        {canManageAccess && (
-          <section className={GROUP_STYLES.ruledSection}>
-            <h2 className={SECTION_STYLES.title}>{REFERENCE_COPY.administration}</h2>
-            <div className={LIST_STYLES.grid}>
-              <ConsoleCard
-                href={ROUTES.settingsSection('acces')}
-                icon="shield"
-                label={ACCESS_COPY.title}
-                description={ACCESS_COPY.lead}
-              />
-            </div>
-          </section>
-        )}
       </div>
     </div>
   )

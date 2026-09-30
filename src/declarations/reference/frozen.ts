@@ -1,4 +1,3 @@
-import { ENCADREMENT_ROLES, ROLE_REGISTRY } from '@/declarations/access/roles'
 import type { ReferenceKey } from '@/declarations/reference/sections'
 
 /**
@@ -17,21 +16,12 @@ export interface FrozenRow {
   accent: string
 }
 
-// The encadrement reads top down, the widest level first
-const ENCADREMENT_ROWS: FrozenRow[] = [...ENCADREMENT_ROLES].reverse().map((role) => {
-  const meta = ROLE_REGISTRY.get(role)
-
-  return { id: role, label: meta.label, hint: meta.summary, accent: meta.accent }
-})
-
 /**
  * Rows a collection carries but never lets anyone write
  * @type {Partial<Record<ReferenceKey, FrozenRow[]>>}
  */
 
-export const FROZEN_REFERENCE_ROWS: Partial<Record<ReferenceKey, FrozenRow[]>> = {
-  fonctions: ENCADREMENT_ROWS,
-}
+export const FROZEN_REFERENCE_ROWS: Partial<Record<ReferenceKey, FrozenRow[]>> = {}
 
 /**
  * Read the frozen rows of a collection

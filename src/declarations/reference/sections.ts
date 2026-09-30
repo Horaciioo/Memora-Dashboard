@@ -1,8 +1,5 @@
-import { ROUTES } from '@/declarations/navigation'
-import { TEAM_COPY } from '@/declarations/teams/copy'
 import type { IconName } from '@/declarations/ui/icons'
 import type { IllustrationName } from '@/declarations/ui/illustrations'
-import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 
 /**
@@ -13,7 +10,6 @@ import type { PermissionName } from '@/utils/constants/permissions'
 export const REFERENCE_KEYS = [
   'youtubeurs',
   'divisions',
-  'fonctions',
   'plateformes',
   'reseaux-sociaux',
   'etats',
@@ -26,6 +22,7 @@ export const REFERENCE_KEYS = [
   'competences',
   'etapes-pim',
   'sanctions',
+  'discord',
   'questions-recrutement',
   'etapes-recrutement',
   'issues-recrutement',
@@ -96,6 +93,7 @@ export const REFERENCE_GROUPS: ReferenceGroup[] = [
  * @property {IllustrationName} figure - Empty state figure
  * @property {boolean} reorderable - Rows can be dragged into order
  * @property {boolean} [openable] - Rows open a file of their own
+ * @property {boolean} [fixed] - Declared in code, off the console, never written
  * @property {string} emptyTitle - Empty state headline
  * @property {string} emptyDescription - Empty state supporting line
  */
@@ -111,6 +109,7 @@ export interface ReferenceSection {
   figure: IllustrationName
   reorderable: boolean
   openable?: boolean
+  fixed?: boolean
   emptyTitle: string
   emptyDescription: string
 }
@@ -145,21 +144,9 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     icon: 'division',
     figure: 'academy',
     reorderable: false,
+    fixed: true,
     emptyTitle: 'Aucune division',
     emptyDescription: 'Crée Junior, puis les squads, en montant par rang.',
-  },
-  {
-    key: 'fonctions',
-    group: 'organisation',
-    label: 'Fonctions',
-    singular: 'Fonction',
-    gender: 'feminine',
-    description: 'Postes de modération principaux et postes secondaires à responsabilité.',
-    icon: 'shield',
-    figure: 'moderation',
-    reorderable: true,
-    emptyTitle: 'Aucune fonction',
-    emptyDescription: 'Ajoute les postes de modération avant d’affecter un modérateur.',
   },
   {
     key: 'plateformes',
@@ -210,6 +197,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     icon: 'alert',
     figure: 'settings',
     reorderable: false,
+    fixed: true,
     emptyTitle: 'Aucune priorité',
     emptyDescription: 'Ajoute tes niveaux d’urgence, du plus léger au plus lourd.',
   },
@@ -250,6 +238,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     icon: 'livecon',
     figure: 'livecon',
     reorderable: false,
+    fixed: true,
     emptyTitle: 'Aucun niveau',
     emptyDescription: 'Crée les trois niveaux de vigilance et leurs consignes.',
   },
@@ -265,6 +254,21 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     reorderable: true,
     emptyTitle: 'Aucune mesure',
     emptyDescription: 'Déclare les mesures avant de bâtir un panel de sanctions.',
+  },
+  {
+    key: 'discord',
+    group: 'moderation',
+    label: 'Rôles et salons Discord',
+    singular: 'Repère Discord',
+    gender: 'masculine',
+    description:
+      'Les rôles et salons qu’une annonce peut mentionner, avec leur identifiant Discord, par YouTubeur.',
+    icon: 'discord',
+    figure: 'moderation',
+    reorderable: true,
+    emptyTitle: 'Aucun rôle ni salon',
+    emptyDescription:
+      'Ajoute les rôles et salons à mentionner dans les annonces. Leur identifiant se copie depuis Discord en mode développeur.',
   },
   {
     key: 'dispositifs',
@@ -341,6 +345,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     icon: 'clock',
     figure: 'members',
     reorderable: true,
+    fixed: true,
     emptyTitle: 'Aucune étape',
     emptyDescription: 'Déclare la trame avant d’ouvrir une session de recrutement.',
   },
@@ -354,6 +359,7 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     icon: 'recruitment',
     figure: 'members',
     reorderable: true,
+    fixed: true,
     emptyTitle: 'Aucune issue',
     emptyDescription: 'Déclare les issues pour ouvrir le tableau de résultats.',
   },
@@ -385,13 +391,21 @@ export const isReferenceKey = (key: string): key is ReferenceKey =>
   SECTION_INDEX.has(key as ReferenceKey)
 
 /**
- * Collections of one console group
+ * Check a collection is fixed in code
+ * @param {string} key - Collection key
+ * @return {boolean} - Read only
+ */
+
+export const isFixedReference = (key: string): boolean => Boolean(referenceSection(key)?.fixed)
+
+/**
+ * Editable collections of one console group
  * @param {ReferenceGroupKey} key - Group key
  * @return {ReferenceSection[]} - Sections in display order
  */
 
 export const referenceSectionsOfGroup = (key: ReferenceGroupKey): ReferenceSection[] =>
-  REFERENCE_SECTIONS.filter((section) => section.group === key)
+  REFERENCE_SECTIONS.filter((section) => section.group === key && !section.fixed)
 
 /**
  * Managed screen shown in the console beside the reference collections
@@ -418,16 +432,7 @@ export interface ReferenceScreen {
  * @type {ReferenceScreen[]}
  */
 
-export const REFERENCE_SCREENS: ReferenceScreen[] = [
-  {
-    group: 'organisation',
-    href: ROUTES.teams,
-    label: TEAM_COPY.title,
-    description: TEAM_COPY.lead,
-    icon: 'teams',
-    permission: Permissions.TeamRead,
-  },
-]
+export const REFERENCE_SCREENS: ReferenceScreen[] = []
 
 /**
  * Screens of one console group

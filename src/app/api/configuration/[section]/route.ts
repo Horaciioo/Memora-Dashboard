@@ -1,21 +1,29 @@
-import { invalidInput, notFound } from '@/core/lib/errors'
+import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { stripRestricted } from '@/core/lib/forms/restrictions'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { referenceResource } from '@/core/services/reference/ReferenceService'
 import { recordEvent } from '@/core/services/system/ActivityService'
-import { isReferenceKey, referenceSection } from '@/declarations/reference/sections'
+import {
+  isFixedReference,
+  isReferenceKey,
+  referenceSection,
+} from '@/declarations/reference/sections'
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
  * Read the section named by the route, or reject
  * @param {Record<string, string>} params - Dynamic segments
+ * @param {boolean} [writing] - Refuses a fixed collection
  * @return {string} - Collection key
  */
 
-const readSection = (params: Record<string, string>): string => {
+const readSection = (params: Record<string, string>, writing = false): string => {
   const section = params.section
   if (!isReferenceKey(section)) throw notFound()
+
+  // Fixed in code
+  if (writing && isFixedReference(section)) throw forbidden()
 
   return section
 }
@@ -36,7 +44,7 @@ export const POST = createProtectedRoute({
   status: 201,
   descriptor: { summary: 'Add a reference row', tags: ['reference'] },
   handler: async ({ params, raw, session, access }) => {
-    const key = readSection(params)
+    const key = readSection(params, true)
     const resource = referenceResource(key as never)
 
     // Declarations are resolved per section, so parsing happens here

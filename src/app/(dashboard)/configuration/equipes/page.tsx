@@ -1,39 +1,11 @@
-import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
-import { TeamsBoard } from '@/composites/teams/TeamsBoard'
-import { prisma } from '@/core/lib/db'
-import { rowsToOptions } from '@/core/lib/forms/options'
-import { readTeamBoard, teamFields } from '@/core/services/teams/TeamService'
-import { requirePermission } from '@/core/wrappers/requireUser'
-import { TEAM_COPY } from '@/declarations/teams/copy'
-import { PAGE_STYLES } from '@/declarations/ui/variants'
-import { Permissions } from '@/utils/constants/permissions'
-
-export const metadata: Metadata = { title: TEAM_COPY.title }
+import { redirect } from 'next/navigation'
+import { ROUTES } from '@/declarations/navigation'
 
 /**
- * Team board
- * @return {Promise<JSX.Element>} - Team page
+ * Teams live in each creator file now
+ * @return {never} - Redirect
  */
 
-export default async function TeamsPage() {
-  const { access, scope } = await requirePermission(Permissions.TeamRead)
-  const perimeter = await scope()
-  const [board, fields, youtubers] = await Promise.all([
-    readTeamBoard(perimeter),
-    teamFields(perimeter),
-    prisma.youtuber.findMany({ orderBy: { position: 'asc' } }),
-  ])
-
-  return (
-    <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={TEAM_COPY.title} lead={TEAM_COPY.lead} />
-      <TeamsBoard
-        initialBoard={board}
-        fields={fields}
-        youtubers={rowsToOptions(youtubers)}
-        canManage={access.can(Permissions.TeamManage)}
-      />
-    </div>
-  )
+export default function TeamsPage() {
+  redirect(ROUTES.settingsSection('youtubeurs'))
 }

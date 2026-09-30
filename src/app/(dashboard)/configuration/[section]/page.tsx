@@ -7,7 +7,11 @@ import { applyRestrictions } from '@/core/lib/forms/restrictions'
 import { referenceResource } from '@/core/services/reference/ReferenceService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { REFERENCE_COPY } from '@/declarations/reference/copy'
-import { isReferenceKey, referenceSection } from '@/declarations/reference/sections'
+import {
+  isFixedReference,
+  isReferenceKey,
+  referenceSection,
+} from '@/declarations/reference/sections'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -41,7 +45,7 @@ export default async function ReferenceSectionPage({
   params: Promise<{ section: string }>
 }) {
   const { section } = await params
-  if (!isReferenceKey(section)) notFound()
+  if (!isReferenceKey(section) || isFixedReference(section)) notFound()
 
   const { access } = await requirePermission(Permissions.ReferenceRead)
   const meta = referenceSection(section)!
