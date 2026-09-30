@@ -1,13 +1,19 @@
 import twoFactor from '@/configurations/system/a2f.json'
 import absences from '@/configurations/system/absences.json'
+import agenda from '@/configurations/system/agenda.json'
+import home from '@/configurations/system/accueil.json'
+import legacy from '@/configurations/system/legacy.json'
 import academy from '@/configurations/system/academy.json'
 import authentication from '@/configurations/system/authentification.json'
+import cache from '@/configurations/system/cache.json'
 import calendar from '@/configurations/system/calendrier.json'
 import colours from '@/configurations/system/couleurs.json'
+import timeouts from '@/configurations/system/delais.json'
 import retention from '@/configurations/system/conservation.json'
 import emojis from '@/configurations/system/emojis.json'
 import files from '@/configurations/system/fichiers.json'
 import forms from '@/configurations/system/forms.json'
+import gestures from '@/configurations/system/gestes.json'
 import rateLimits from '@/configurations/system/limitation.json'
 import livecon from '@/configurations/system/livecon.json'
 import notifications from '@/configurations/system/notifications.json'
@@ -22,9 +28,20 @@ import {
   readChoice,
   readInteger,
   readNode,
+  readNumber as readBoundedNumber,
   readString,
   readStringList,
 } from '@/declarations/configurations/readers'
+
+/**
+ * Finite ratio or fallback
+ * @param {unknown} value - Raw value
+ * @param {number} fallback - Default
+ * @return {number} - Number read
+ */
+
+const readNumber = (value: unknown, fallback: number): number =>
+  typeof value === 'number' && Number.isFinite(value) ? value : fallback
 
 // Breakpoint keys, narrowest first
 const BREAKPOINT_NAMES = ['sm', 'md', 'lg', 'xl'] as const
@@ -82,6 +99,9 @@ const meetingMaxDuration = readInteger(forms.meetingMaxDuration, {
 
 export const FORM_SETTINGS = {
   shortTextMaxLength,
+  // Rating bounds
+  scaleMin: readInteger(forms.scaleMin, { path: 'system/forms.scaleMin', fallback: 1, min: 0 }),
+  scaleMax: readInteger(forms.scaleMax, { path: 'system/forms.scaleMax', fallback: 5, min: 1 }),
   longTextMaxLength,
   markdownMaxLength,
   titleMaxLength: readInteger(forms.titleMaxLength, {
@@ -317,7 +337,7 @@ const trainingMaxMinutes = readInteger(academy.trainingMaxMinutes, {
 
 /**
  * Academy bounds
- * @type {{ maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
+ * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
  */
 
 export const ACADEMY_SETTINGS = {
@@ -365,6 +385,22 @@ export const ACADEMY_SETTINGS = {
   bonusMaxLives: readInteger(academy.bonusMaxLives, {
     path: 'system/academy.bonusMaxLives',
     fallback: 4,
+    min: 0,
+  }),
+  exercisePassPercent: readInteger(academy.exercisePassPercent, {
+    path: 'system/academy.exercisePassPercent',
+    fallback: 80,
+    min: 1,
+    max: 100,
+  }),
+  chatLineDelayMs: readInteger(academy.chatLineDelayMs, {
+    path: 'system/academy.chatLineDelayMs',
+    fallback: 900,
+    min: 0,
+  }),
+  chatTypingMs: readInteger(academy.chatTypingMs, {
+    path: 'system/academy.chatTypingMs',
+    fallback: 700,
     min: 0,
   }),
   skillStep: readInteger(academy.skillStep, {
@@ -415,6 +451,26 @@ export const CALENDAR_SETTINGS = {
     path: 'system/calendrier.rollCallResponsesShared',
     fallback: false,
   }),
+  // Pointer snap
+  stepMinutes: readInteger(calendar.stepMinutes, {
+    path: 'system/calendrier.stepMinutes',
+    fallback: 15,
+    min: 5,
+    max: 60,
+  }),
+  // One grid row
+  rowMinutes: readInteger(calendar.rowMinutes, {
+    path: 'system/calendrier.rowMinutes',
+    fallback: 60,
+    min: 15,
+    max: 120,
+  }),
+  // Click-created length
+  defaultDurationMinutes: readInteger(calendar.defaultDurationMinutes, {
+    path: 'system/calendrier.defaultDurationMinutes',
+    fallback: 60,
+    min: 5,
+  }),
 }
 
 /**
@@ -457,6 +513,7 @@ const xlBreakpoint = readInteger((responsive.breakpoints as Record<string, unkno
 const responsiveShell = readNode(responsive.shell, 'system/responsive.shell')
 const responsiveBottomNav = readNode(responsive.bottomNav, 'system/responsive.bottomNav')
 const responsiveToast = readNode(responsive.toast, 'system/responsive.toast')
+const responsiveDrawer = readNode(responsive.drawer, 'system/responsive.drawer')
 const responsiveToastVisible = readNode(
   responsiveToast.maxVisible,
   'system/responsive.toast.maxVisible'
@@ -464,7 +521,7 @@ const responsiveToastVisible = readNode(
 
 /**
  * Breakpoint and shell chrome bounds
- * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, sidebarWidth: number, sidebarCollapsedWidth: number, railWidth: number, gutter: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number }}
+ * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, sidebarWidth: number, titleTabHeight: number, titleTabSlope: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
  */
 
 export const RESPONSIVE_SETTINGS = {
@@ -486,24 +543,18 @@ export const RESPONSIVE_SETTINGS = {
   }),
   sidebarWidth: readInteger(responsiveShell.sidebarWidth, {
     path: 'system/responsive.shell.sidebarWidth',
-    fallback: 236,
+    fallback: 264,
     min: 160,
   }),
-  sidebarCollapsedWidth: readInteger(responsiveShell.sidebarCollapsedWidth, {
-    path: 'system/responsive.shell.sidebarCollapsedWidth',
-    fallback: 76,
-    min: 48,
+  titleTabHeight: readInteger(responsiveShell.titleTabHeight, {
+    path: 'system/responsive.shell.titleTabHeight',
+    fallback: 44,
+    min: 32,
   }),
-  railWidth: readInteger(responsiveShell.railWidth, {
-    path: 'system/responsive.shell.railWidth',
-    fallback: 68,
-    min: 48,
-  }),
-  gutter: readInteger(responsiveShell.gutter, {
-    path: 'system/responsive.shell.gutter',
-    fallback: 12,
-    min: 0,
-    max: 48,
+  titleTabSlope: readInteger(responsiveShell.titleTabSlope, {
+    path: 'system/responsive.shell.titleTabSlope',
+    fallback: 36,
+    min: 12,
   }),
   maxPrimarySlots: readInteger(responsiveBottomNav.maxSlots, {
     path: 'system/responsive.bottomNav.maxSlots',
@@ -525,6 +576,29 @@ export const RESPONSIVE_SETTINGS = {
     path: 'system/responsive.touchTargetMin',
     fallback: 44,
     min: 24,
+    max: 64,
+  }),
+  drawerWidth: readInteger(responsiveDrawer.width, {
+    path: 'system/responsive.drawer.width',
+    fallback: 600,
+    min: 320,
+    max: 960,
+  }),
+  drawerHeightShare: readBoundedNumber(responsiveDrawer.heightShare, {
+    path: 'system/responsive.drawer.heightShare',
+    fallback: 0.8,
+    min: 0.3,
+    max: 1,
+  }),
+  drawerMinHeight: readInteger(responsiveDrawer.minHeight, {
+    path: 'system/responsive.drawer.minHeight',
+    fallback: 600,
+    min: 280,
+  }),
+  drawerGap: readInteger(responsiveDrawer.gap, {
+    path: 'system/responsive.drawer.gap',
+    fallback: 0,
+    min: 0,
     max: 64,
   }),
 } as const
@@ -721,6 +795,221 @@ export const RETENTION_SETTINGS = {
   consentVersion: readInteger(retention.consentVersion, {
     path: 'system/conservation.consentVersion',
     fallback: 1,
+    min: 1,
+  }),
+}
+
+/**
+ * Request time limits, in milliseconds
+ * @type {{ readMs: number, writeMs: number, externalMs: number }}
+ */
+
+export const TIMEOUT_SETTINGS = {
+  readMs: readInteger(timeouts.readMs, {
+    path: 'system/delais.readMs',
+    fallback: 20000,
+    min: 1000,
+  }),
+  writeMs: readInteger(timeouts.writeMs, {
+    path: 'system/delais.writeMs',
+    fallback: 60000,
+    min: 1000,
+  }),
+  externalMs: readInteger(timeouts.externalMs, {
+    path: 'system/delais.externalMs',
+    fallback: 10000,
+    min: 1000,
+  }),
+} as const
+
+/**
+ * Client query cache
+ * @type {{ staleMs: number, gcMs: number, readRetries: number }}
+ */
+
+export const CACHE_SETTINGS = {
+  staleMs: readInteger(cache.staleMs, { path: 'system/cache.staleMs', fallback: 30000, min: 0 }),
+  gcMs: readInteger(cache.gcMs, { path: 'system/cache.gcMs', fallback: 300000, min: 0 }),
+  readRetries: readInteger(cache.readRetries, {
+    path: 'system/cache.readRetries',
+    fallback: 1,
+    min: 0,
+    max: 5,
+  }),
+} as const
+
+/**
+ * Live notification bubbles
+ * @type {{ pollMs: number, holdMs: number, closeMs: number, delayMs: number, gapPx: number, edgePx: number }}
+ */
+
+export const NUDGE_SETTINGS = {
+  pollMs: readInteger(notifications.pollMs, {
+    path: 'system/notifications.pollMs',
+    fallback: 60000,
+    min: 10000,
+  }),
+  holdMs: readInteger(notifications.nudgeHoldMs, {
+    path: 'system/notifications.nudgeHoldMs',
+    fallback: 4000,
+    min: 1000,
+  }),
+  closeMs: readInteger(notifications.nudgeCloseMs, {
+    path: 'system/notifications.nudgeCloseMs',
+    fallback: 320,
+    min: 0,
+  }),
+  delayMs: readInteger(notifications.nudgeDelayMs, {
+    path: 'system/notifications.nudgeDelayMs',
+    fallback: 400,
+    min: 0,
+  }),
+  gapPx: readInteger(notifications.nudgeGapPx, {
+    path: 'system/notifications.nudgeGapPx',
+    fallback: 10,
+    min: 0,
+  }),
+  edgePx: readInteger(notifications.nudgeEdgePx, {
+    path: 'system/notifications.nudgeEdgePx',
+    fallback: 16,
+    min: 0,
+  }),
+} as const
+
+/**
+ * Gesture and scroll tuning
+ * @type {Record<string, number>}
+ */
+
+export const GESTURE_SETTINGS = {
+  swipeRatio: readNumber(gestures.swipeRatio, 0.18),
+  flingVelocity: readNumber(gestures.flingVelocity, 0.5),
+  startSlopPx: readInteger(gestures.startSlopPx, {
+    path: 'system/gestes.startSlopPx',
+    fallback: 8,
+    min: 0,
+  }),
+  barSolidAfterPx: readInteger(gestures.barSolidAfterPx, {
+    path: 'system/gestes.barSolidAfterPx',
+    fallback: 8,
+    min: 0,
+  }),
+  barHideAfterPx: readInteger(gestures.barHideAfterPx, {
+    path: 'system/gestes.barHideAfterPx',
+    fallback: 120,
+    min: 0,
+  }),
+  barDirectionDeltaPx: readInteger(gestures.barDirectionDeltaPx, {
+    path: 'system/gestes.barDirectionDeltaPx',
+    fallback: 6,
+    min: 0,
+  }),
+  countUpMs: readInteger(gestures.countUpMs, {
+    path: 'system/gestes.countUpMs',
+    fallback: 900,
+    min: 0,
+  }),
+  readingLineRatio: readNumber(gestures.readingLineRatio, 0.3),
+  tiltDegrees: readNumber(gestures.tiltDegrees, 7),
+  tiltPerspectivePx: readInteger(gestures.tiltPerspectivePx, {
+    path: 'system/gestes.tiltPerspectivePx',
+    fallback: 900,
+    min: 1,
+  }),
+} as const
+
+/**
+ * Legacy track: points, thresholds and length
+ * @type {{ modulePoints: number, modulesToPass: number, pointsToPass: number, modulePassPoints: number, evaluatorSharePercent: number, minWeeks: number, maxWeeks: number }}
+ */
+
+export const LEGACY_SETTINGS = {
+  modulePoints: readInteger(legacy.modulePoints, {
+    path: 'system/legacy.modulePoints',
+    fallback: 100,
+    min: 1,
+  }),
+  modulesToPass: readInteger(legacy.modulesToPass, {
+    path: 'system/legacy.modulesToPass',
+    fallback: 2,
+    min: 1,
+  }),
+  pointsToPass: readInteger(legacy.pointsToPass, {
+    path: 'system/legacy.pointsToPass',
+    fallback: 230,
+    min: 1,
+  }),
+  modulePassPoints: readInteger(legacy.modulePassPoints, {
+    path: 'system/legacy.modulePassPoints',
+    fallback: 70,
+    min: 1,
+  }),
+  // Share of a module total given by the evaluator, the exercises making up the rest
+  evaluatorSharePercent: readInteger(legacy.evaluatorSharePercent, {
+    path: 'system/legacy.evaluatorSharePercent',
+    fallback: 40,
+    min: 0,
+    max: 100,
+  }),
+  minWeeks: readInteger(legacy.minWeeks, {
+    path: 'system/legacy.minWeeks',
+    fallback: 3,
+    min: 1,
+  }),
+  maxWeeks: readInteger(legacy.maxWeeks, {
+    path: 'system/legacy.maxWeeks',
+    fallback: 9,
+    min: 1,
+  }),
+}
+
+/**
+ * Busy detection windows and caps
+ * @type {{ busyHorizonDays: number, busyDefaultMinutes: number, busyListMax: number }}
+ */
+
+export const AGENDA_SETTINGS = {
+  busyHorizonDays: readInteger(agenda.busyHorizonDays, {
+    path: 'system/agenda.busyHorizonDays',
+    fallback: 90,
+    min: 1,
+  }),
+  busyDefaultMinutes: readInteger(agenda.busyDefaultMinutes, {
+    path: 'system/agenda.busyDefaultMinutes',
+    fallback: 60,
+    min: 1,
+  }),
+  busyListMax: readInteger(agenda.busyListMax, {
+    path: 'system/agenda.busyListMax',
+    fallback: 3,
+    min: 1,
+  }),
+}
+
+/**
+ * Home windows and caps
+ * @type {{ birthdayWindowDays: number, birthdayMax: number, meetingWindowDays: number, meetingMax: number }}
+ */
+
+export const HOME_SETTINGS = {
+  birthdayWindowDays: readInteger(home.birthdayWindowDays, {
+    path: 'system/accueil.birthdayWindowDays',
+    fallback: 30,
+    min: 1,
+  }),
+  birthdayMax: readInteger(home.birthdayMax, {
+    path: 'system/accueil.birthdayMax',
+    fallback: 8,
+    min: 1,
+  }),
+  meetingWindowDays: readInteger(home.meetingWindowDays, {
+    path: 'system/accueil.meetingWindowDays',
+    fallback: 21,
+    min: 1,
+  }),
+  meetingMax: readInteger(home.meetingMax, {
+    path: 'system/accueil.meetingMax',
+    fallback: 6,
     min: 1,
   }),
 }

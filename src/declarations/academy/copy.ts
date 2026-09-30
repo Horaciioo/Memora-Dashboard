@@ -6,6 +6,37 @@
 export const ACADEMY_COPY = {
   title: 'Marsha Academy',
   lead: 'Chaque session accueille, forme, suit et valide ses juniors jusqu’à leur autonomie.',
+  awaitingConfirmation: 'Fiche à confirmer',
+  timelineTab: 'Timeline',
+  timelineAdvance: 'Passer à l’étape supérieure',
+  timelineAdvanced: 'Étape validée, la suivante est ouverte',
+  timelineCurrent: 'En cours',
+  timelineAdvanceTitle: 'Valider l’étape en cours ?',
+  timelineAdvanceDescription:
+    'L’étape passe en terminée à ton nom, la suivante se colore et sa tâche part chez la personne qui la porte.',
+  timelineFinished: 'Toutes les étapes de cette PIM sont passées.',
+  juniorTimelineEmptyTitle: 'Aucune étape sur cette timeline',
+  juniorTimelineEmptyDescription:
+    'La trame de PIM se déclare dans la configuration, elle se pose sur chaque junior à son arrivée.',
+  timelineOwner: 'Portée par',
+  timelineDue: 'Prévue le',
+  timelineDoneOn: 'Passée le',
+  timelineGuide: 'Marche à suivre',
+  timelineGo: 'Y aller, avec le guide',
+  timelineLocks: {
+    notStarted:
+      'La PIM n’est pas encore lancée. Elle démarre quand un Responsable passe la session En cours.',
+    awaitingReview:
+      'L’étape suivante s’ouvre avec la validation du bilan de fin de période, pas depuis la timeline.',
+    closed: 'Ce junior n’est plus en formation, sa timeline est figée.',
+  },
+  launch: 'Lancer la PIM',
+  launchTitle: 'Lancer la PIM maintenant ?',
+  launchDescription:
+    'La session passe En cours. La timeline de chaque junior démarre aujourd’hui et les premières tâches partent chez les Formateurs.',
+  launched: 'PIM lancée',
+  launchMissingTrainer:
+    'Un junior confirmé n’a pas encore de Formateur. Attribue-lui en un avant de passer la PIM En cours.',
   glossaryTitle: 'Lexique de l’Academy',
   glossaryLead: 'Les mots du domaine, définis une fois pour toutes.',
   tabSessions: 'Sessions',
@@ -259,4 +290,82 @@ export const TRAINING_CONTENT_FIELD_COPY = {
   questionMultiple: 'Plusieurs bonnes réponses',
   choiceLabel: 'Réponse',
   choiceCorrect: 'Bonne réponse',
+} as const
+
+/**
+ * Copy of the guided walkthrough
+ * @type {Record<string, string>}
+ */
+
+export const GUIDE_COPY = {
+  counter: 'Étape {index} sur {total}',
+  previous: 'Précédent',
+  next: 'Suivant',
+  finish: 'C’est compris',
+  close: 'Fermer le guide',
+} as const
+
+/**
+ * Copy of the interactive courses
+ * @type {Record<string, string | ((value: number) => string)>}
+ */
+
+export const COURSE_COPY = {
+  catalogTitle: 'Parcours',
+  catalogLead:
+    'Chaque formation se lit, se joue et se vérifie ici. Tout se valide par des exercices.',
+  indispensableTitle: 'Les indispensables',
+  indispensableLead: 'À terminer pendant la période de découverte.',
+  secondaryTitle: 'Pour aller plus loin',
+  secondaryLead: 'Elles s’ouvrent avec la période de pratique.',
+  consoleTitle: 'Autres formations',
+  locked: 'S’ouvre avec la période de pratique',
+  minutes: (value: number) => `${value} min`,
+  exercises: (value: number) => `${value} ${value > 1 ? 'exercices' : 'exercice'}`,
+  progress: (done: number, total: number) => `${done} sur ${total}`,
+  exercisesUnit: 'exercices réussis',
+  start: 'Commencer',
+  resume: 'Reprendre',
+  review: 'Revoir',
+  done: 'Terminée',
+  emptyTitle: 'Aucune formation pour ta fonction',
+  emptyDescription: 'Les formations de ta fonction arrivent, elles apparaîtront ici.',
+  chapters: 'Chapitres',
+  back: 'Toutes les formations',
+  check: 'Vérifier',
+  retry: 'Réessayer',
+  saving: 'Enregistrement…',
+  passed: 'Réussi',
+  failed: 'Pas encore',
+  partial: 'Presque',
+  replay: 'Rejouer',
+  next: 'Suivant',
+  pick: 'Choisis ton geste',
+  yourAnswer: 'Ta réponse',
+  expert: 'Réponse de l’expert',
+  showExpert: 'Voir la réponse de l’expert',
+  openPlaceholder: 'Écris ta réponse',
+  commandPlaceholder: '!commande',
+  hint: 'Indice',
+  showHint: 'Voir un indice',
+  bank: 'Mots proposés',
+  fillPick: 'Choisir',
+  sortHint: 'Glisse chaque élément dans sa colonne, ou touche-le puis touche la colonne.',
+  orderHint: 'Glisse les éléments dans le bon ordre, ou utilise les flèches.',
+  moveUp: 'Monter',
+  moveDown: 'Descendre',
+  unsorted: 'À classer',
+  tip: 'Astuce',
+  warning: 'Attention',
+  rule: 'Règle',
+  simulationStep: (current: number, total: number) => `Situation ${current} sur ${total}`,
+  simulationBegin: 'Lancer la simulation',
+  complete: 'Formation terminée',
+  completeLead: 'Tous les exercices sont réussis, ton Formateur est prévenu.',
+  completeCta: 'Voir les autres formations',
+  chatLive: 'En direct',
+  chatFlagged: 'Message à traiter',
+  chatEmpty: 'Le chat est calme.',
+  unlockedIn: 'Verrouillée',
+  attemptsWrong: 'À revoir',
 } as const

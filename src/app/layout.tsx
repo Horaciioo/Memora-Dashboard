@@ -9,7 +9,7 @@ import { Providers } from '@/app/providers'
 import { getSession } from '@/core/lib/auth/getSession'
 import { NONCE_HEADER } from '@/declarations/system/securityHeaders'
 import { APP_COMPANY, APP_DESCRIPTION, APP_FONTS, APP_NAME } from '@/declarations/app'
-import { SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
+import { DRAWER_DIMENSIONS, SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
 
 export const metadata: Metadata = {
   title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
@@ -26,9 +26,12 @@ const SHELL_VARS = {
   '--shell-top-bar-h': `${SHELL_DIMENSIONS.topBar}px`,
   '--shell-bottom-nav-h': `${SHELL_DIMENSIONS.bottomNav}px`,
   '--shell-sidebar-w': `${SHELL_DIMENSIONS.sidebar}px`,
-  '--shell-sidebar-collapsed-w': `${SHELL_DIMENSIONS.sidebarCollapsed}px`,
-  '--shell-rail-w': `${SHELL_DIMENSIONS.rail}px`,
-  '--shell-gutter': `${SHELL_DIMENSIONS.gutter}px`,
+  '--shell-title-tab-h': `${SHELL_DIMENSIONS.titleTab}px`,
+  '--shell-title-slope-w': `${SHELL_DIMENSIONS.titleSlope}px`,
+  '--drawer-w': `${DRAWER_DIMENSIONS.width}px`,
+  '--drawer-h-share': `${DRAWER_DIMENSIONS.heightShare}`,
+  '--drawer-min-h': `${DRAWER_DIMENSIONS.minHeight}px`,
+  '--drawer-gap': `${DRAWER_DIMENSIONS.gap}px`,
 } as CSSProperties
 
 /**

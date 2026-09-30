@@ -17,5 +17,5 @@ export default function ErrorPage({
   error: Error & { digest?: string }
   retry: () => void
 }) {
-  return <ErrorBoundaryScreen error={error} retry={retry} />
+  return <ErrorBoundaryScreen error={error} retry={retry} framed />
 }

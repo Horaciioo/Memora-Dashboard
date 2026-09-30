@@ -56,6 +56,7 @@ const RATE_LIMIT_MAP = {
   search: policy('search', 'Search', RATE_LIMIT_SCOPES.Account, 60, 120),
   export: policy('export', 'Export', RATE_LIMIT_SCOPES.Account, 86400, 5),
   twoFactor: policy('twoFactor', 'Second factor', RATE_LIMIT_SCOPES.Account, 300, 10),
+  lookup: policy('lookup', 'Account lookup', RATE_LIMIT_SCOPES.Address, 60, 30),
 } satisfies Record<string, RateLimitPolicy>
 
 /**

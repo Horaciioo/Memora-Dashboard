@@ -26,7 +26,7 @@ const optionalOrigin = (url?: string): string[] => {
 }
 
 /**
- * Every origin the browser may reach, derived from what the app already declares
+ * Every origin the browser may reach
  * @type {{ images: string[], fonts: string[], styles: string[], connect: string[] }}
  */
 

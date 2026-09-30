@@ -1,4 +1,6 @@
 import type { MaturityName } from '@/declarations/maturity/registries'
+import type { IconName } from '@/declarations/ui/icons'
+import type { PermissionName } from '@/utils/constants/permissions'
 import type { StorageBucket } from '@/types/storage'
 
 /**
@@ -32,13 +34,22 @@ export type FieldKind =
   | 'colour'
   | 'emoji'
   | 'image'
+  | 'scale'
+  | 'announcement'
 
 /**
  * Glyph drawn beside an option, telling colour and identity apart at a glance
  * @type {string}
  */
 
-export type OptionMark = 'dot' | 'avatar' | 'priority'
+export type OptionMark = 'dot' | 'avatar' | 'priority' | 'emoji' | 'glyph'
+
+/**
+ * Value a blank creation form starts from
+ * @type {'today' | 'actor' | 'default'}
+ */
+
+export type FieldPreset = 'today' | 'actor' | 'default'
 
 /**
  * Choice offered by a select field
@@ -48,6 +59,11 @@ export type OptionMark = 'dot' | 'avatar' | 'priority'
  * @property {string} [hint] - Secondary line
  * @property {string} [accent] - Colour token
  * @property {string} [image] - Portrait URL
+ * @property {string} [emoji] - Glyph drawn before the label
+ * @property {string | null} [icon] - Glyph key, drawn by the glyph mark
+ * @property {string} [prefix] - Link start it hands a handle field
+ * @property {string} [group] - Category heading
+ * @property {boolean} [isDefault] - Preset choice
  * @property {boolean} [disabled] - Shown but not selectable
  */
 
@@ -57,7 +73,28 @@ export interface FieldOption {
   hint?: string
   accent?: string
   image?: string | null
+  emoji?: string | null
+  icon?: string | null
+  prefix?: string
+  group?: string
+  isDefault?: boolean
   disabled?: boolean
+}
+
+/**
+ * Link pinned above a picker's options
+ * @typedef {Object} FieldAction
+ * @property {string} label - Link text
+ * @property {string} href - Destination
+ * @property {IconName} icon - Glyph
+ * @property {PermissionName} permission - Needed to see it
+ */
+
+export interface FieldAction {
+  label: string
+  href: string
+  icon: IconName
+  permission: PermissionName
 }
 
 /**
@@ -77,6 +114,24 @@ export interface FieldCondition {
 }
 
 /**
+ * Moment an existing event already holds, a date field warns when it lands inside
+ * @typedef {Object} BusySlot
+ * @property {string} refId - Record it belongs to, ignored while that record is edited
+ * @property {string} label - Event title
+ * @property {string} startsAt - ISO start
+ * @property {string | null} endsAt - ISO end
+ * @property {boolean} allDay - Spans the whole day
+ */
+
+export interface BusySlot {
+  refId: string
+  label: string
+  startsAt: string
+  endsAt: string | null
+  allDay: boolean
+}
+
+/**
  * Single declaration driving validation and rendering
  * @typedef {Object} FieldDefinition
  * @property {string} name - Value key
@@ -84,6 +139,9 @@ export interface FieldCondition {
  * @property {string} label - Display label
  * @property {string} [placeholder] - Placeholder text
  * @property {string} [hint] - Helper line
+ * @property {string} [info] - Explanation behind the info glyph
+ * @property {FieldPreset} [preset] - Blank form start value
+ * @property {FieldAction} [action] - Link above the options
  * @property {boolean} [required] - Must be filled
  * @property {boolean} [readOnly] - Rendered disabled
  * @property {FieldOption[]} [options] - Choices
@@ -93,6 +151,8 @@ export interface FieldCondition {
  * @property {number} [maxLength] - Longest text
  * @property {number} [maxItems] - Most entries
  * @property {string} [prefix] - Static text drawn before the control, never stored
+ * @property {string} [prefixFrom] - Select whose chosen option hands the prefix
+ * @property {string} [lookup] - Network a typed handle is checked against
  * @property {string} [glyph] - Emoji field drawn beside this control
  * @property {'full' | 'half'} [span] - Grid width
  * @property {string} [group] - Category the field sits under
@@ -101,6 +161,8 @@ export interface FieldCondition {
  * @property {MaturityName} [maturity] - Lifecycle tag drawn beside the label
  * @property {boolean} [adminOnly] - Only an administrator may write it
  * @property {FieldCondition} [visibleWhen] - Display rule
+ * @property {boolean} [binary] - A toggle drawn as a plain check/cross, no label
+ * @property {BusySlot[]} [busy] - Events a date field warns about
  */
 
 export interface FieldDefinition {
@@ -109,6 +171,9 @@ export interface FieldDefinition {
   label: string
   placeholder?: string
   hint?: string
+  info?: string
+  preset?: FieldPreset
+  action?: FieldAction
   required?: boolean
   readOnly?: boolean
   options?: FieldOption[]
@@ -118,6 +183,8 @@ export interface FieldDefinition {
   maxLength?: number
   maxItems?: number
   prefix?: string
+  prefixFrom?: string
+  lookup?: string
   glyph?: string
   span?: 'full' | 'half'
   group?: string
@@ -126,6 +193,8 @@ export interface FieldDefinition {
   maturity?: MaturityName
   adminOnly?: boolean
   visibleWhen?: FieldCondition
+  binary?: boolean
+  busy?: BusySlot[]
 }
 
 /**

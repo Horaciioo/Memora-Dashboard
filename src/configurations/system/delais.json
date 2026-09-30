@@ -1,0 +1,5 @@
+{
+  "readMs": 20000,
+  "writeMs": 60000,
+  "externalMs": 10000
+}

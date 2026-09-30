@@ -8,5 +8,7 @@
   "positionStep": 1000,
   "meetingMinDuration": 5,
   "meetingMaxDuration": 480,
-  "priorityMaxWeight": 100
+  "priorityMaxWeight": 100,
+  "scaleMin": 1,
+  "scaleMax": 5
 }

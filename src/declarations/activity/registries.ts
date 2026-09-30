@@ -129,6 +129,8 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     verb: 'ancré',
     target: 'des responsables',
   },
+  ConsentAccepted: { label: 'Accord', tone: 'success', verb: 'accepté', target: 'l’accord' },
+  LegacyChanged: { label: 'Legacy', tone: 'brand', verb: 'modifié', target: 'un parcours Legacy' },
 }
 
 export const ACTIVITY_EVENT_REGISTRY = createRegistry(ACTIVITY_EVENT_MAP)

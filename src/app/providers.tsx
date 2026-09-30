@@ -1,7 +1,11 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useState } from 'react'
 import type { ReactNode } from 'react'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { LoadingBar } from '@/components/tools/LoadingBar'
+import { createQueryClient } from '@/core/lib/query/client'
 import { AuthProvider } from '@/managers/infrastructure/Security/AuthManager'
 import { NotificationProvider } from '@/managers/infrastructure/Network/NotificationsManager'
 import {
@@ -34,21 +38,29 @@ export interface ProvidersProps {
  * @return {JSX.Element}
  */
 
-export const Providers = ({ initialSession, children }: ProvidersProps) => (
-  <NotificationProvider>
-    <AuthProvider initialSession={initialSession}>
-      <ThemeManager />
-      <AppearanceManager />
-      <ColorVisionManager />
-      <DisplayPreferencesManager preferences={initialSession?.display ?? null} />
-      <BreadcrumbProvider>
-        <MenuProvider>
-          <HintsProvider>
-            {children}
-            <NotificationsToaster />
-          </HintsProvider>
-        </MenuProvider>
-      </BreadcrumbProvider>
-    </AuthProvider>
-  </NotificationProvider>
-)
+export const Providers = ({ initialSession, children }: ProvidersProps) => {
+  // One client per browser tab
+  const [queryClient] = useState(createQueryClient)
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <NotificationProvider>
+        <AuthProvider initialSession={initialSession}>
+          <ThemeManager />
+          <AppearanceManager />
+          <ColorVisionManager />
+          <DisplayPreferencesManager preferences={initialSession?.display ?? null} />
+          <BreadcrumbProvider>
+            <MenuProvider>
+              <HintsProvider>
+                {children}
+                <NotificationsToaster />
+                <LoadingBar />
+              </HintsProvider>
+            </MenuProvider>
+          </BreadcrumbProvider>
+        </AuthProvider>
+      </NotificationProvider>
+    </QueryClientProvider>
+  )
+}

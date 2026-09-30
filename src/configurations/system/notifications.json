@@ -3,5 +3,11 @@
   "pageSize": 40,
   "maxActions": 3,
   "maxMentions": 10,
-  "staleMs": 60000
+  "staleMs": 60000,
+  "pollMs": 60000,
+  "nudgeHoldMs": 4000,
+  "nudgeCloseMs": 320,
+  "nudgeDelayMs": 400,
+  "nudgeGapPx": 10,
+  "nudgeEdgePx": 16
 }

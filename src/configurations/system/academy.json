@@ -11,5 +11,8 @@
   "trainingMinMinutes": 20,
   "trainingMaxMinutes": 50,
   "inviteExpiryDays": 14,
-  "inviteMaxUses": 50
+  "inviteMaxUses": 50,
+  "exercisePassPercent": 80,
+  "chatLineDelayMs": 900,
+  "chatTypingMs": 700
 }

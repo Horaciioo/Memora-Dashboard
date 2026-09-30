@@ -1,4 +1,7 @@
 import type { TimelineStepState } from '@/core/services/academy/timeline'
+import type { PimDestinationName } from '@/declarations/academy/guides'
+import type { CourseSurface, CourseTrack } from '@/declarations/academy/curriculum/types'
+import type { IconName } from '@/declarations/ui/icons'
 import type { FormValues } from '@/types/forms'
 import type { WorkPerson } from '@/types/work'
 import type {
@@ -56,6 +59,7 @@ export interface SessionFunction {
  * @property {boolean} mandatory - Required to progress
  * @property {string | null} completedAt - ISO completion date
  * @property {string | null} validatorName - Who validated it
+ * @property {{ passed: number, total: number } | null} exercises - Exercises cleared, only on an interactive course
  */
 
 export interface JuniorTraining {
@@ -65,6 +69,7 @@ export interface JuniorTraining {
   mandatory: boolean
   completedAt: string | null
   validatorName: string | null
+  exercises: { passed: number; total: number } | null
 }
 
 /**
@@ -103,7 +108,8 @@ export interface SessionSummary {
  * @property {string} accountId - Moderator identifier
  * @property {string} displayName - Display name
  * @property {string | null} avatarUrl - Portrait
- * @property {JuniorDispositif} dispositif - Entry programme
+ * @property {JuniorDispositif | null} dispositif - Entry programme, picked on the integration form
+ * @property {string | null} confirmedAt - ISO date the junior confirmed their file
  * @property {AcademyJuniorStatusName} status - Outcome so far
  * @property {AcademyStageName} stage - Current phase of the PIM
  * @property {WorkPerson | null} trainer - Trainer in charge
@@ -125,7 +131,8 @@ export interface JuniorView {
   accountId: string
   displayName: string
   avatarUrl: string | null
-  dispositif: JuniorDispositif
+  dispositif: JuniorDispositif | null
+  confirmedAt: string | null
   status: AcademyJuniorStatusName
   stage: AcademyStageName
   trainer: WorkPerson | null
@@ -451,4 +458,130 @@ export interface ContentChapterView {
   id: string
   title: string
   blocks: ContentBlockView[]
+}
+
+/**
+ * Why the step in course cannot move yet
+ * @typedef {'notStarted' | 'awaitingReview' | 'closed'} PimTimelineLock
+ */
+
+export type PimTimelineLock = 'notStarted' | 'awaitingReview' | 'closed'
+
+/**
+ * Place of a step against the one in course
+ * @typedef {'done' | 'current' | 'upcoming'} PimStepPosition
+ */
+
+export type PimStepPosition = 'done' | 'current' | 'upcoming'
+
+/**
+ * One step of a junior's vertical timeline
+ * @typedef {Object} PimTimelineStep
+ * @property {string} id - Step identifier
+ * @property {string} title - What the step is
+ * @property {string | null} description - What must happen
+ * @property {string | null} guide - Detailed walkthrough, markdown
+ * @property {IconName | null} icon - Glyph
+ * @property {PimDestinationName | null} destination - Where its owner acts
+ * @property {AcademyStageName} stage - Phase it belongs to
+ * @property {StepOwnerName | null} owner - Who carries it
+ * @property {boolean} required - Cannot be skipped
+ * @property {string | null} scheduledAt - ISO planned day
+ * @property {string | null} validatedAt - ISO day it was cleared
+ * @property {string | null} validatedByName - Who cleared it
+ * @property {PimStepPosition} position - Against the step in course
+ */
+
+export interface PimTimelineStep {
+  id: string
+  title: string
+  description: string | null
+  guide: string | null
+  icon: IconName | null
+  destination: PimDestinationName | null
+  stage: AcademyStageName
+  owner: StepOwnerName | null
+  required: boolean
+  scheduledAt: string | null
+  validatedAt: string | null
+  validatedByName: string | null
+  position: PimStepPosition
+}
+
+/**
+ * Vertical timeline of one junior
+ * @typedef {Object} PimTimeline
+ * @property {string} juniorId - Junior identifier
+ * @property {string} sessionId - Promotion identifier
+ * @property {AcademyStageName} stage - Stage the junior stands in
+ * @property {string | null} currentId - Step in course, none once finished
+ * @property {PimTimelineLock | null} lock - Why it cannot move
+ * @property {PimTimelineStep[]} steps - Steps, first to last
+ */
+
+export interface PimTimeline {
+  juniorId: string
+  sessionId: string
+  stage: AcademyStageName
+  currentId: string | null
+  lock: PimTimelineLock | null
+  steps: PimTimelineStep[]
+}
+
+/**
+ * Saved state of one exercise
+ * @typedef {Object} ExerciseProgress
+ * @property {boolean} passed - Cleared
+ * @property {number} score - Points earned on the last try
+ * @property {number} max - Points available
+ * @property {unknown} answer - Last answer sent
+ */
+
+export interface ExerciseProgress {
+  passed: boolean
+  score: number
+  max: number
+  answer: unknown
+}
+
+/**
+ * Saved state of one course
+ * @typedef {Object} CourseProgress
+ * @property {Record<string, ExerciseProgress>} blocks - State per exercise key
+ */
+
+export interface CourseProgress {
+  blocks: Record<string, ExerciseProgress>
+}
+
+/**
+ * One course of the catalogue, as the member sees it
+ * @typedef {Object} CourseCard
+ * @property {string} id - Training identifier
+ * @property {string} key - Course key
+ * @property {string} name - Title
+ * @property {string} summary - What it teaches
+ * @property {CourseTrack} track - Indispensable or secondary
+ * @property {CourseSurface} surface - What it is about
+ * @property {number} minutes - Expected length
+ * @property {number} chapters - Chapters
+ * @property {number} exercises - Exercises
+ * @property {number} passed - Exercises cleared
+ * @property {TrainingStatusName} status - Where the member stands
+ * @property {boolean} locked - Opens with the second period
+ */
+
+export interface CourseCard {
+  id: string
+  key: string
+  name: string
+  summary: string
+  track: CourseTrack
+  surface: CourseSurface
+  minutes: number
+  chapters: number
+  exercises: number
+  passed: number
+  status: TrainingStatusName
+  locked: boolean
 }

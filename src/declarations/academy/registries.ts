@@ -12,6 +12,7 @@ import {
   ReviewStatuses,
   TrainingStatuses,
   TrainingBlockKinds,
+  LegacyStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
   AcademyStepKindName,
@@ -26,7 +27,9 @@ import type {
   ReviewStatusName,
   TrainingStatusName,
   TrainingBlockKindName,
+  LegacyStatusName,
 } from '@/utils/constants/hierarchy'
+import type { CourseSurface, ExerciseBlock } from '@/declarations/academy/curriculum/types'
 import type { IconName } from '@/declarations/ui/icons'
 
 /**
@@ -44,7 +47,7 @@ interface AcademyOption {
 }
 
 const SESSION_STATUS_MAP: Record<AcademySessionStatusName, AcademyOption> = {
-  [AcademySessionStatuses.Draft]: { label: 'Préparée', accent: 'neutral' },
+  [AcademySessionStatuses.Draft]: { label: 'Planifiée', accent: 'neutral' },
   [AcademySessionStatuses.Open]: { label: 'Admissions ouvertes', accent: 'warning' },
   [AcademySessionStatuses.Running]: { label: 'En cours', accent: 'success' },
   [AcademySessionStatuses.Closed]: { label: 'Clôturée', accent: 'info' },
@@ -167,3 +170,65 @@ const BLOCK_KIND_MAP: Record<TrainingBlockKindName, StepKindOption> = {
 }
 
 export const TRAINING_BLOCK_KIND_REGISTRY = createRegistry(BLOCK_KIND_MAP)
+
+/**
+ * Surface metadata of a course
+ * @typedef {Object} CourseSurfaceOption
+ * @property {string} label - Display name
+ * @property {IconName} icon - Glyph
+ * @property {string} accent - CSS colour drawing its cover
+ */
+
+interface CourseSurfaceOption {
+  label: string
+  icon: IconName
+  accent: string
+}
+
+const COURSE_SURFACE_MAP: Record<CourseSurface, CourseSurfaceOption> = {
+  general: { label: 'Général', icon: 'academy', accent: 'var(--color-brand-600)' },
+  twitch: { label: 'Twitch', icon: 'functionLive', accent: 'var(--twitch-purple)' },
+  youtube: { label: 'YouTube', icon: 'youtuber', accent: 'var(--youtube-red)' },
+  lives: { label: 'Lives', icon: 'functionLive', accent: 'var(--color-brand-600)' },
+  discord: { label: 'Discord', icon: 'functionDiscord', accent: 'var(--discord-blurple)' },
+}
+
+export const COURSE_SURFACE_REGISTRY = createRegistry(COURSE_SURFACE_MAP)
+
+/**
+ * Metadata of one exercise kind
+ * @typedef {Object} CourseKindOption
+ * @property {string} label - Display name
+ * @property {IconName} icon - Glyph
+ */
+
+interface CourseKindOption {
+  label: string
+  icon: IconName
+}
+
+const COURSE_KIND_MAP: Record<ExerciseBlock['kind'], CourseKindOption> = {
+  quiz: { label: 'QCM', icon: 'help' },
+  fill: { label: 'Texte à trous', icon: 'paragraph' },
+  sort: { label: 'Classement', icon: 'filter' },
+  order: { label: 'Remise en ordre', icon: 'sort' },
+  simulation: { label: 'Simulation', icon: 'flash' },
+  case: { label: 'Étude de cas', icon: 'note' },
+  command: { label: 'Commande', icon: 'key' },
+}
+
+export const COURSE_KIND_REGISTRY = createRegistry(COURSE_KIND_MAP)
+
+/**
+ * Where a Legacy track stands
+ * @type {Record<LegacyStatusName, AcademyOption>}
+ */
+
+const LEGACY_STATUS_MAP: Record<LegacyStatusName, AcademyOption> = {
+  [LegacyStatuses.Running]: { label: 'En cours', accent: 'info' },
+  [LegacyStatuses.Passed]: { label: 'Réussi', accent: 'success' },
+  [LegacyStatuses.Failed]: { label: 'Sans succès', accent: 'danger' },
+  [LegacyStatuses.Cancelled]: { label: 'Annulé', accent: 'neutral' },
+}
+
+export const LEGACY_STATUS_REGISTRY = createRegistry(LEGACY_STATUS_MAP)

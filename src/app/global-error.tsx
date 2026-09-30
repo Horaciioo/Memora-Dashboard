@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import '@/styles/globals.css'
+import { SystemScreen } from '@/components/structures/SystemScreen'
 import { captureException } from '@/core/lib/sentry'
 import { ERROR_PAGE_COPY } from '@/declarations/ui/copy'
 import { CRITICAL_ERROR_STYLES } from '@/declarations/ui/variants'
@@ -28,18 +29,19 @@ export default function GlobalError({
   return (
     <html lang="fr">
       <body className={CRITICAL_ERROR_STYLES.body}>
-        <main className={CRITICAL_ERROR_STYLES.frame}>
-          <h1 className={CRITICAL_ERROR_STYLES.title}>{ERROR_PAGE_COPY.criticalTitle}</h1>
-          <p className={CRITICAL_ERROR_STYLES.description}>{ERROR_PAGE_COPY.criticalDescription}</p>
-          {error.digest && (
-            <p className={CRITICAL_ERROR_STYLES.reference}>
-              {ERROR_PAGE_COPY.reference} {error.digest}
-            </p>
-          )}
-          <button type="button" className={CRITICAL_ERROR_STYLES.action} onClick={() => retry()}>
-            {ERROR_PAGE_COPY.reload}
-          </button>
-        </main>
+        <SystemScreen
+          framed
+          word={ERROR_PAGE_COPY.errorWord}
+          stamped
+          title={ERROR_PAGE_COPY.criticalTitle}
+          description={ERROR_PAGE_COPY.criticalDescription}
+          reference={error.digest ? `${ERROR_PAGE_COPY.reference} ${error.digest}` : undefined}
+          action={
+            <button type="button" className={CRITICAL_ERROR_STYLES.action} onClick={() => retry()}>
+              {ERROR_PAGE_COPY.reload}
+            </button>
+          }
+        />
       </body>
     </html>
   )

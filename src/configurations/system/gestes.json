@@ -1,0 +1,12 @@
+{
+  "swipeRatio": 0.18,
+  "flingVelocity": 0.5,
+  "startSlopPx": 8,
+  "barSolidAfterPx": 8,
+  "barHideAfterPx": 120,
+  "barDirectionDeltaPx": 6,
+  "countUpMs": 900,
+  "readingLineRatio": 0.3,
+  "tiltDegrees": 7,
+  "tiltPerspectivePx": 900
+}

@@ -283,6 +283,7 @@ export default class EncryptionManager {
    * @return {string | object | null} - Decrypted
    * @throws When failed
    */
+
   decrypt(encrypted: string, options: DecryptOptions = {}): string | object | null {
     // Check initialized
     this._checkInitialization()
