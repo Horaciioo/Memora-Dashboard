@@ -25,12 +25,12 @@ export const SKELETON_BASE = 'skeleton-shimmer rounded-[var(--radius-md)] bg-[va
 
 export const EMPTY_STATE_STYLES = {
   frame:
-    'flex flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)] px-6 py-12 text-center',
+    'flex flex-col items-center justify-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-16 text-center',
   frameCompact:
-    'flex flex-col items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)] px-6 py-8 text-center',
-  start: { illustration: 'h-28 w-28' },
-  filter: { illustration: 'h-24 w-24' },
-  compact: { illustration: 'h-16 w-16' },
+    'flex flex-col items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-10 text-center',
+  start: { illustration: 'course-pop h-32 w-32' },
+  filter: { illustration: 'course-pop h-28 w-28' },
+  compact: { illustration: 'course-pop h-20 w-20' },
 } as const
 
 /**
