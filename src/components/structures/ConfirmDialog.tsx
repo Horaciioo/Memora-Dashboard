@@ -56,22 +56,16 @@ export const ConfirmDialog = ({
       size="xs"
       footer={
         <>
-          <Button
-            icon="close"
-            aria-label={ACTION_COPY.cancel}
-            title={ACTION_COPY.cancel}
-            onClick={onCancel}
-            disabled={pending}
-          />
+          <Button onClick={onCancel} disabled={pending}>
+            {ACTION_COPY.cancel}
+          </Button>
           <Button
             variant={isDestructive ? 'danger' : 'primary'}
-            icon={pending ? 'pending' : isDestructive ? 'remove' : 'confirm'}
-            aria-label={confirmName}
-            title={confirmName}
-            className={pending ? '[&>svg]:animate-spin' : undefined}
             onClick={onConfirm}
             disabled={pending}
-          />
+          >
+            {confirmName}
+          </Button>
         </>
       }
     >

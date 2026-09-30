@@ -8,6 +8,9 @@ import { DATE_COPY } from '@/declarations/ui/dates'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 
+// Kinds running edge to edge
+const WIDE_KINDS = ['textarea', 'markdown']
+
 /**
  * One value of a detail sheet, editable in place once it carries a field declaration
  * @typedef {Object} EditableEntry
@@ -20,6 +23,8 @@ export interface EditableEntry {
   label: string
   field?: FieldDefinition
   display?: ReactNode
+  // Runs edge to edge, long text does by default
+  wide?: boolean
 }
 
 export interface EditableDetailGridProps {
@@ -85,11 +90,16 @@ export const EditableDetailGrid = ({
 
   return (
     <dl className={DETAIL_BLOCK.grid}>
-      {entries.map(({ label, field, display }) => {
+      {entries.map(({ label, field, display, wide }) => {
+        const entryClass =
+          wide || (field && WIDE_KINDS.includes(field.kind))
+            ? DETAIL_BLOCK.entryWide
+            : DETAIL_BLOCK.entry
+
         // A static entry (no field) never leaves its read rendering
         if (!field) {
           return (
-            <div key={label} className={DETAIL_BLOCK.entry}>
+            <div key={label} className={entryClass}>
               <dt className={DETAIL_BLOCK.label}>{label}</dt>
               <dd className={display ? DETAIL_BLOCK.value : DETAIL_BLOCK.empty}>
                 {display ?? DATE_COPY.none}
@@ -127,7 +137,7 @@ export const EditableDetailGrid = ({
         }
 
         return (
-          <div key={field.name} className={DETAIL_BLOCK.entry}>
+          <div key={field.name} className={entryClass}>
             <dt className={DETAIL_BLOCK.label}>{label}</dt>
             {isEditing ? (
               <dd

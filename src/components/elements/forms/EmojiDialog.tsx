@@ -130,9 +130,7 @@ export const EmojiDialog = ({ open, value, onSelect, onClose }: EmojiDialogProps
         <div className={EMOJI_DIALOG_STYLES.body}>
           {searching ? (
             <section className={EMOJI_DIALOG_STYLES.family}>
-              <p className={EMOJI_DIALOG_STYLES.familyName}>
-                {EMOJI_COPY.results} · {matches.length}
-              </p>
+              <p className={EMOJI_DIALOG_STYLES.familyName}>{EMOJI_COPY.results}</p>
               {matches.length === 0 ? (
                 <p className={EMOJI_DIALOG_STYLES.empty}>{EMOJI_COPY.noMatch}</p>
               ) : (

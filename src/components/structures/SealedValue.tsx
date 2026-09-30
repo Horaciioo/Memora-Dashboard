@@ -1,11 +1,11 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { SealGlyph } from '@/components/elements/display/SealGlyph'
 import { TWO_FACTOR_COPY } from '@/declarations/access/copy'
 import { SENSITIVE_FIELD_REGISTRY } from '@/declarations/access/sensitive'
 import type { SensitiveFieldName } from '@/declarations/access/sensitive'
 import { SEAL_BLOCK } from '@/declarations/ui/blocks'
+import { ICONS } from '@/declarations/ui/icons'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'
 
 export interface SealedValueProps {
@@ -13,7 +13,7 @@ export interface SealedValueProps {
 }
 
 /**
- * Padlock standing in for a value
+ * Red A2F mark standing in for a value
  * @param {SensitiveFieldName} field - Value key
  * @return {JSX.Element}
  */
@@ -30,18 +30,18 @@ export const SealedValue = ({ field }: SealedValueProps) => {
       title={TWO_FACTOR_COPY.sealedHint}
       className={SEAL_BLOCK.trigger}
     >
-      <SealGlyph />
+      <ICONS.twoFactor className={SEAL_BLOCK.icon} />
       <span className={SEAL_BLOCK.hint}>{TWO_FACTOR_COPY.sealedHint}</span>
     </button>
   )
 }
 
 /**
- * Pick padlock or content
+ * Pick A2F mark or content
  * @param {SensitiveFieldName} field - Value key
  * @param {ReactNode} value - Content, shown once the window is open
  * @param {boolean} isUnsealed - Window still open
- * @return {ReactNode} - Padlock or content
+ * @return {ReactNode} - A2F mark or content
  */
 
 export const sealedDisplay = (

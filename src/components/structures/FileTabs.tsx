@@ -27,6 +27,8 @@ export interface FileTabsProps {
   // Lets a parent drive the open tab, e.g. a locked panel linking to another one
   value?: string
   onChange?: (value: string) => void
+  // Strip centred over its panel
+  centered?: boolean
 }
 
 /**
@@ -37,10 +39,11 @@ export interface FileTabsProps {
  * @param {string} [initial] - Tab opened first, defaults to the first visible one
  * @param {string} [value] - Open tab, makes the strip controlled by its parent
  * @param {(value: string) => void} [onChange] - Called when the open tab changes
+ * @param {boolean} [centered] - Centres the strip
  * @return {JSX.Element}
  */
 
-export const FileTabs = ({ label, tabs, initial, value, onChange }: FileTabsProps) => {
+export const FileTabs = ({ label, tabs, initial, value, onChange, centered }: FileTabsProps) => {
   const visible = tabs.filter((entry) => entry.visible !== false)
   const [internalTab, setInternalTab] = useState(initial ?? visible[0]?.value ?? '')
   const tab = value ?? internalTab
@@ -60,6 +63,7 @@ export const FileTabs = ({ label, tabs, initial, value, onChange }: FileTabsProp
         value={current?.value ?? ''}
         onChange={setTab}
         label={label}
+        centered={centered}
       />
       {current?.render()}
     </>

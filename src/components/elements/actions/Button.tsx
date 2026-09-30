@@ -10,11 +10,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Styled button, primary for the page's main call to action, secondary otherwise. A glyph with
- * no children collapses to a square footprint — pass aria-label so it keeps a name
- * @param {ButtonVariant} [variant] - Visual weight, defaults to secondary
- * @param {IconName} [icon] - Icon rendered before the label
- * @param {IconName} [iconAfter] - Icon rendered after the label
+ * Styled button
+ * @param {ButtonVariant} [variant] - Visual weight
+ * @param {IconName} [icon] - Icon rendered instead of a label
+ * @param {IconName} [iconAfter] - Icon rendered instead of a label
  * @return {JSX.Element}
  */
 
@@ -27,9 +26,10 @@ export const Button = ({
   children,
   ...props
 }: ButtonProps) => {
-  const Leading = icon ? ICONS[icon] : null
-  const Trailing = iconAfter ? ICONS[iconAfter] : null
-  const labelless = (Leading || Trailing) && (children === undefined || children === null)
+  const noLabel = children === undefined || children === null
+  const Leading = noLabel && icon ? ICONS[icon] : null
+  const Trailing = noLabel && iconAfter ? ICONS[iconAfter] : null
+  const isGlyphOnly = Boolean(Leading || Trailing)
 
   return (
     <button
@@ -37,7 +37,7 @@ export const Button = ({
       className={cn(
         BUTTON_STYLES.base,
         BUTTON_STYLES[variant],
-        labelless && variant !== 'icon' && BUTTON_STYLES.square,
+        isGlyphOnly && variant !== 'icon' && BUTTON_STYLES.square,
         className
       )}
       {...props}

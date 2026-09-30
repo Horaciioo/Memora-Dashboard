@@ -1,7 +1,10 @@
 'use client'
 
+import { ScaleInput } from '@/components/elements/forms/ScaleInput'
+import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { ColourField } from '@/components/elements/forms/ColourField'
 import { DatePicker } from '@/components/elements/forms/DatePicker'
+import { DiscordComposer } from '@/components/elements/forms/DiscordComposer'
 import { EmojiPicker } from '@/components/elements/forms/EmojiPicker'
 import { FileInput } from '@/components/elements/forms/FileInput'
 import { Input } from '@/components/elements/forms/Input'
@@ -12,6 +15,7 @@ import { TagsInput } from '@/components/elements/forms/TagsInput'
 import { Textarea } from '@/components/elements/forms/Textarea'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { FIELD_STYLES } from '@/declarations/ui/variants'
+import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { StorageBucket } from '@/types/storage'
 import type { FieldDefinition, FieldValue } from '@/types/forms'
 import { cn } from '@/utils/classnames'
@@ -78,6 +82,8 @@ export const FieldControl = ({
   invalid,
   describedBy,
 }: FieldControlProps) => {
+  const { can, session } = useAuthContext()
+
   if (field.kind === 'select') {
     return (
       <SelectMenu
@@ -87,10 +93,26 @@ export const FieldControl = ({
         value={typeof value === 'string' ? value : ''}
         emptyLabel={ACTION_COPY.none}
         mark={field.mark}
+        action={field.action && can(field.action.permission) ? field.action : undefined}
         disabled={disabled || field.readOnly}
         invalid={invalid}
         describedBy={describedBy}
         onChange={(next) => onChange(next === '' ? null : next)}
+      />
+    )
+  }
+
+  if (field.kind === 'scale') {
+    return (
+      <ScaleInput
+        id={id}
+        label={field.label}
+        value={typeof value === 'number' ? value : null}
+        min={field.min ?? FORM_SETTINGS.scaleMin}
+        max={field.max ?? FORM_SETTINGS.scaleMax}
+        step={field.step}
+        disabled={disabled || field.readOnly}
+        onChange={onChange}
       />
     )
   }
@@ -207,6 +229,20 @@ export const FieldControl = ({
         bucket={field.bucket ?? DEFAULT_BUCKET}
         disabled={disabled || field.readOnly}
         invalid={invalid}
+        onChange={onChange}
+      />
+    )
+  }
+
+  if (field.kind === 'announcement') {
+    return (
+      <DiscordComposer
+        id={id}
+        value={typeof value === 'string' ? value : ''}
+        options={field.options ?? []}
+        author={session?.displayName ?? ''}
+        maxLength={field.maxLength}
+        disabled={disabled || field.readOnly}
         onChange={onChange}
       />
     )

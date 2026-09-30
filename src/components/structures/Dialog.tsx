@@ -27,7 +27,7 @@ export interface DialogProps {
  * @param {boolean} open - Overlay is mounted
  * @param {() => void} onClose - Dismiss handler
  * @param {string} title - Overlay title
- * @param {string} [description] - Supporting line under the title
+ * @param {string} [description] - Screen reader only
  * @param {DialogSize} [size] - Panel width
  * @param {ReactNode} [subheader] - Line rendered under the title
  * @param {ReactNode} [footer] - Controls pinned to the bottom
@@ -74,7 +74,7 @@ export const Dialog = ({
               {title}
             </h2>
             {description && (
-              <p id={descriptionId} className={DIALOG_STYLES.description}>
+              <p id={descriptionId} className="sr-only">
                 {description}
               </p>
             )}

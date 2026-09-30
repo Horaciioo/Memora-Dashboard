@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
 import { OptionMark } from '@/components/elements/forms/OptionMark'
@@ -13,7 +14,7 @@ import {
 } from '@/declarations/ui/variants'
 import type { SelectMenuSize } from '@/declarations/ui/variants'
 import { useHints } from '@/managers/front-end'
-import type { FieldOption, OptionMark as OptionMarkKind } from '@/types/forms'
+import type { FieldAction, FieldOption, OptionMark as OptionMarkKind } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 
 export interface SelectMenuProps {
@@ -27,6 +28,8 @@ export interface SelectMenuProps {
   emptyLabel?: string
   placeholder?: string
   mark?: OptionMarkKind
+  // Link pinned above the options
+  action?: Omit<FieldAction, 'permission'>
   size?: SelectMenuSize
   disabled?: boolean
   invalid?: boolean
@@ -51,6 +54,7 @@ const SEARCH_THRESHOLD = 8
  * @param {string} [emptyLabel] - Label of the clearing entry
  * @param {string} [placeholder] - Text shown while nothing is chosen
  * @param {OptionMarkKind} [mark] - Glyph drawn beside every option
+ * @param {FieldAction} [action] - Link above the options
  * @param {SelectMenuSize} [size] - Size token, defaults to block
  * @param {boolean} [disabled] - Blocks the control
  * @param {boolean} [invalid] - Paints the rejection border
@@ -68,6 +72,7 @@ export const SelectMenu = ({
   emptyLabel,
   placeholder,
   mark,
+  action,
   size = 'block',
   disabled,
   invalid,
@@ -88,7 +93,7 @@ export const SelectMenu = ({
 
   const markSize = SELECT_MENU_MARK_SIZES[size]
   const ChevronIcon = ICONS.expand
-  const CheckIcon = ICONS.confirm
+  const CheckIcon = ICONS.picked
 
   const selected = options.find((option) => option.value === value) ?? null
   const hasSearch = options.length > SEARCH_THRESHOLD
@@ -165,51 +170,55 @@ export const SelectMenu = ({
     })
   }
 
+  const trigger = (
+    <button
+      id={id}
+      ref={triggerRef}
+      type="button"
+      role="combobox"
+      disabled={disabled}
+      aria-haspopup="listbox"
+      aria-controls={listId}
+      aria-expanded={isOpen}
+      aria-label={label}
+      aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
+      onClick={() => (isOpen ? setOpen(false) : open())}
+      onKeyDown={(event) => {
+        if (!isOpen && (event.key === 'ArrowDown' || event.key === 'Enter')) {
+          event.preventDefault()
+          open()
+        }
+      }}
+      className={cn(
+        SELECT_MENU_STYLES.trigger,
+        SELECT_MENU_SIZES[size].trigger,
+        invalid && SELECT_MENU_STYLES.invalid,
+        className
+      )}
+    >
+      <span className={SELECT_MENU_STYLES.value}>
+        {selected ? (
+          <>
+            {mark && <OptionMark mark={mark} option={selected} size={markSize} />}
+            <span className={SELECT_MENU_STYLES.optionLabel}>{selected.label}</span>
+          </>
+        ) : (
+          <span className={SELECT_MENU_STYLES.placeholder}>
+            {placeholder ?? emptyLabel ?? PICKER_COPY.choose}
+          </span>
+        )}
+      </span>
+      <ChevronIcon
+        className={cn(SELECT_MENU_STYLES.chevron, isOpen && SELECT_MENU_STYLES.chevronOpen)}
+        aria-hidden="true"
+      />
+    </button>
+  )
+
   return (
     <>
-      <button
-        id={id}
-        ref={triggerRef}
-        type="button"
-        role="combobox"
-        disabled={disabled}
-        aria-haspopup="listbox"
-        aria-controls={listId}
-        aria-expanded={isOpen}
-        aria-label={label}
-        aria-describedby={describedBy}
-        aria-invalid={invalid || undefined}
-        onClick={() => (isOpen ? setOpen(false) : open())}
-        onKeyDown={(event) => {
-          if (!isOpen && (event.key === 'ArrowDown' || event.key === 'Enter')) {
-            event.preventDefault()
-            open()
-          }
-        }}
-        className={cn(
-          SELECT_MENU_STYLES.trigger,
-          SELECT_MENU_SIZES[size].trigger,
-          invalid && SELECT_MENU_STYLES.invalid,
-          className
-        )}
-      >
-        <span className={SELECT_MENU_STYLES.value}>
-          {selected ? (
-            <>
-              {mark && <OptionMark mark={mark} option={selected} size={markSize} />}
-              <span className={SELECT_MENU_STYLES.optionLabel}>{selected.label}</span>
-            </>
-          ) : (
-            <span className={SELECT_MENU_STYLES.placeholder}>
-              {placeholder ?? emptyLabel ?? PICKER_COPY.choose}
-            </span>
-          )}
-        </span>
-        <ChevronIcon
-          className={cn(SELECT_MENU_STYLES.chevron, isOpen && SELECT_MENU_STYLES.chevronOpen)}
-          aria-hidden="true"
-        />
-      </button>
+      {trigger}
 
       {isOpen && (
         <>
@@ -236,6 +245,15 @@ export const SelectMenu = ({
                 }}
               />
             )}
+            {action && (
+              <>
+                <Link href={action.href} onClick={close} className={SELECT_MENU_STYLES.action}>
+                  <ActionIcon action={action} />
+                  {action.label}
+                </Link>
+                <div className={SELECT_MENU_STYLES.divider} aria-hidden="true" />
+              </>
+            )}
             <div className={SELECT_MENU_STYLES.list}>
               {entries.length === 0 && (
                 <p className={SELECT_MENU_STYLES.empty}>{PICKER_COPY.noOption}</p>
@@ -244,8 +262,17 @@ export const SelectMenu = ({
                 const isSelected = entry.value === value
                 const isClearing = emptyLabel !== undefined && index === 0
 
+                // Heading on each new category
+                const heading =
+                  entry.group && entry.group !== entries[index - 1]?.group ? entry.group : null
+
                 return (
                   <Fragment key={entry.value}>
+                    {heading && (
+                      <p className={SELECT_MENU_STYLES.group} role="presentation">
+                        {heading}
+                      </p>
+                    )}
                     <button
                       type="button"
                       role="option"
@@ -266,15 +293,15 @@ export const SelectMenu = ({
                         entry.disabled && SELECT_MENU_STYLES.optionDisabled
                       )}
                     >
+                      {isSelected && (
+                        <CheckIcon className={SELECT_MENU_STYLES.check} aria-hidden="true" />
+                      )}
                       {mark && entry.value !== '' && (
                         <OptionMark mark={mark} option={entry} size={markSize} />
                       )}
                       <span className={SELECT_MENU_STYLES.optionLabel}>{entry.label}</span>
                       {entry.hint && (
                         <span className={SELECT_MENU_STYLES.optionHint}>{entry.hint}</span>
-                      )}
-                      {isSelected && (
-                        <CheckIcon className={SELECT_MENU_STYLES.check} aria-hidden="true" />
                       )}
                     </button>
                     {isClearing && entries.length > 1 && (
@@ -289,4 +316,17 @@ export const SelectMenu = ({
       )}
     </>
   )
+}
+
+/**
+ * Glyph of the pinned link
+ * @param {Object} props - Link
+ * @param {Omit<FieldAction, 'permission'>} props.action - Pinned link
+ * @return {JSX.Element}
+ */
+
+const ActionIcon = ({ action }: { action: Omit<FieldAction, 'permission'> }) => {
+  const Icon = ICONS[action.icon]
+
+  return <Icon className={SELECT_MENU_STYLES.actionIcon} aria-hidden="true" />
 }

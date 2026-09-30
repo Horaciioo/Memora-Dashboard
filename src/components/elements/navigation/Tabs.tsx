@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { TABS_STYLES } from '@/declarations/ui/variants'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
+import { easeOut, panelDurationMs, prefersReducedMotion } from '@/utils/motion'
 
 export interface TabItem {
   value: string
@@ -24,20 +25,22 @@ export interface TabsProps {
   // Icon-only tabs revealing their label — on the open tab only ('mobile', the default,
   // widens to every tab from sm; 'always' never widens; 'never' keeps every label shown)
   collapse?: TabCollapse
+  // Strip centred over its panel
+  centered?: boolean
 }
 
 /**
  * Label visibility of one tab
  * @param {TabCollapse} collapse - Strip-wide collapse mode
  * @param {boolean} isActive - Tab is the open one
- * @return {string} - Classes sizing the label span
+ * @return {string} - Classes sizing the label track
  */
 
 const labelReveal = (collapse: TabCollapse, isActive: boolean): string => {
-  if (collapse === 'never' || isActive) return 'max-w-32 opacity-100'
-  if (collapse === 'always') return 'max-w-0 opacity-0'
+  if (collapse === 'never' || isActive) return TABS_STYLES.labelOpen
+  if (collapse === 'always') return TABS_STYLES.labelShut
 
-  return 'max-w-0 opacity-0 sm:max-w-32 sm:opacity-100'
+  return TABS_STYLES.labelShutMobile
 }
 
 /**
@@ -49,38 +52,84 @@ const labelReveal = (collapse: TabCollapse, isActive: boolean): string => {
  * @param {(value: string) => void} onChange - Selection handler
  * @param {string} label - Accessible name of the strip
  * @param {TabCollapse} [collapse] - Label visibility mode, defaults to 'mobile'
+ * @param {boolean} [centered] - Centres the strip
  * @return {JSX.Element}
  */
 
-export const Tabs = ({ items, value, onChange, label, collapse = 'mobile' }: TabsProps) => {
+export const Tabs = ({
+  items,
+  value,
+  onChange,
+  label,
+  collapse = 'mobile',
+  centered,
+}: TabsProps) => {
   const tabsRef = useRef(new Map<string, HTMLButtonElement>())
   const listRef = useRef<HTMLDivElement | null>(null)
-  const [rule, setRule] = useState({ left: 0, width: 0 })
+  const ruleRef = useRef<HTMLSpanElement | null>(null)
+  const drawn = useRef<{ left: number; width: number } | null>(null)
 
-  // The rule tracks the selected tab, and follows it when the strip is laid out again
+  // Written on the node, never through state
+  const draw = (left: number, width: number) => {
+    const rule = ruleRef.current
+    if (!rule) return
+
+    drawn.current = { left, width }
+    rule.style.width = `${width}px`
+    rule.style.transform = `translateX(${left}px)`
+  }
+
+  // The rule glides toward the open tab, re-reading it every frame while labels unfold
   useLayoutEffect(() => {
-    const measure = () => {
+    const target = () => {
       const tab = tabsRef.current.get(value)
-      if (!tab) return
-
-      // Same geometry keeps the same object, so measuring never re-renders
-      setRule((current) =>
-        current.left === tab.offsetLeft && current.width === tab.offsetWidth
-          ? current
-          : { left: tab.offsetLeft, width: tab.offsetWidth }
-      )
+      return tab ? { left: tab.offsetLeft, width: tab.offsetWidth } : null
     }
 
-    measure()
+    const from = drawn.current
+    const duration = panelDurationMs()
+    let frame = 0
+    let gliding = false
 
-    const list = listRef.current
-    window.addEventListener('resize', measure)
-    // The freshly opened tab's label is still widening at this point, catch its final width
-    list?.addEventListener('transitionend', measure)
+    // First paint or calm mode, no glide
+    if (!from || prefersReducedMotion()) {
+      const end = target()
+      if (end) draw(end.left, end.width)
+    } else {
+      const startedAt = performance.now()
+      gliding = true
+
+      const step = (now: number) => {
+        const end = target()
+        if (!end) return
+
+        const progress = Math.min((now - startedAt) / duration, 1)
+        const eased = easeOut(progress)
+        draw(
+          from.left + (end.left - from.left) * eased,
+          from.width + (end.width - from.width) * eased
+        )
+
+        if (progress < 1) frame = requestAnimationFrame(step)
+        else gliding = false
+      }
+
+      frame = requestAnimationFrame(step)
+    }
+
+    // Later layout changes snap the rule back on its tab
+    const observer = new ResizeObserver(() => {
+      if (gliding) return
+
+      const end = target()
+      if (end) draw(end.left, end.width)
+    })
+    if (listRef.current) observer.observe(listRef.current)
+    tabsRef.current.forEach((node) => observer.observe(node))
 
     return () => {
-      window.removeEventListener('resize', measure)
-      list?.removeEventListener('transitionend', measure)
+      cancelAnimationFrame(frame)
+      observer.disconnect()
     }
   }, [value, items.length])
 
@@ -90,7 +139,12 @@ export const Tabs = ({ items, value, onChange, label, collapse = 'mobile' }: Tab
   }, [value])
 
   return (
-    <div ref={listRef} className={TABS_STYLES.list} role="tablist" aria-label={label}>
+    <div
+      ref={listRef}
+      className={cn(TABS_STYLES.list, centered && TABS_STYLES.listCentered)}
+      role="tablist"
+      aria-label={label}
+    >
       {items.map((item) => {
         const Icon = item.icon ? ICONS[item.icon] : null
         const isActive = item.value === value
@@ -115,25 +169,18 @@ export const Tabs = ({ items, value, onChange, label, collapse = 'mobile' }: Tab
               item.flagged && !isActive && TABS_STYLES.flagged
             )}
           >
-            <span className="flex items-center gap-1.5">
-              {Icon && <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />}
-              <span
-                className={cn(
-                  'overflow-hidden whitespace-nowrap transition-[max-width,opacity] duration-[var(--motion-duration-panel)] motion-reduce:transition-none',
-                  labelReveal(reveal, isActive)
-                )}
-              >
-                {item.label}
+            <span className={TABS_STYLES.content}>
+              {Icon && <Icon className={TABS_STYLES.icon} aria-hidden="true" />}
+              <span className={cn(TABS_STYLES.labelTrack, labelReveal(reveal, isActive))}>
+                <span className={cn(TABS_STYLES.label, Icon && TABS_STYLES.labelBeside)}>
+                  {item.label}
+                </span>
               </span>
             </span>
           </button>
         )
       })}
-      <span
-        className={TABS_STYLES.indicator}
-        style={{ width: rule.width, transform: `translateX(${rule.left}px)` }}
-        aria-hidden="true"
-      />
+      <span ref={ruleRef} className={TABS_STYLES.indicator} aria-hidden="true" />
     </div>
   )
 }

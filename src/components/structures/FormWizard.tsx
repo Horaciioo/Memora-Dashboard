@@ -20,7 +20,6 @@ import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/type
  * @typedef {Object} WizardStep
  * @property {string} id - Step identifier
  * @property {string} label - Step caption
- * @property {string} [hint] - Supporting line under the caption
  * @property {FieldDefinition[]} [fields] - Declarations rendered by the form engine
  * @property {ReactNode} [render] - Body drawn by the caller
  * @property {ReactNode} [notice] - Standing message drawn under the body
@@ -30,7 +29,6 @@ import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/type
 export interface WizardStep {
   id: string
   label: string
-  hint?: string
   fields?: FieldDefinition[]
   render?: ReactNode
   notice?: ReactNode
@@ -47,7 +45,6 @@ export interface FormWizardProps {
   nextLabel: string
   previousLabel: string
   submitLabel: string
-  counter: (index: number, total: number) => string
   disabled?: boolean
   idPrefix?: string
 }
@@ -63,7 +60,6 @@ export interface FormWizardProps {
  * @param {string} nextLabel - Caption of the forward move
  * @param {string} previousLabel - Caption of the backward move
  * @param {string} submitLabel - Caption of the last move
- * @param {(index: number, total: number) => string} counter - Builds the step counter
  * @param {boolean} [disabled] - Blocks every control
  * @param {string} [idPrefix] - Namespace of the generated identifiers
  * @return {JSX.Element}
@@ -79,7 +75,6 @@ export const FormWizard = ({
   nextLabel,
   previousLabel,
   submitLabel,
-  counter,
   disabled,
   idPrefix = 'wizard',
 }: FormWizardProps) => {
@@ -109,7 +104,6 @@ export const FormWizard = ({
   const rail: TimelineStep[] = steps.map((entry, position) => ({
     id: entry.id,
     label: entry.label,
-    hint: entry.hint,
     state: stateOf(position),
     // Only a step already cleared is walkable backwards
     ...(position < current ? { onClick: () => setIndex(position) } : {}),
@@ -122,9 +116,7 @@ export const FormWizard = ({
         <StepTimeline steps={rail} label={label} className={WIZARD_STYLES.rail} />
 
         <div className={WIZARD_STYLES.heading}>
-          <span className={WIZARD_STYLES.counter}>{counter(current + 1, steps.length)}</span>
           <h2 className={WIZARD_STYLES.title}>{step.label}</h2>
-          {step.hint && <p className={WIZARD_STYLES.hint}>{step.hint}</p>}
         </div>
       </div>
 

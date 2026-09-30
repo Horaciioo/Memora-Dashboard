@@ -1,17 +1,12 @@
 'use client'
 
-import { useId, useMemo, useState } from 'react'
+import { Fragment, useId, useMemo, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { OptionMark } from '@/components/elements/forms/OptionMark'
 import { useAnchoredPanel } from '@/core/hooks/interaction/useAnchoredPanel'
 import { PICKER_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import {
-  SELECT_MENU_SIZES,
-  SELECT_MENU_STYLES,
-  TAGS_STYLES,
-  TOGGLE_STYLES,
-} from '@/declarations/ui/variants'
+import { EMPTY_VALUE, SELECT_MENU_SIZES, SELECT_MENU_STYLES } from '@/declarations/ui/variants'
 import { useHints } from '@/managers/front-end'
 import type { FieldOption, OptionMark as OptionMarkKind } from '@/types/forms'
 import { cn } from '@/utils/classnames'
@@ -76,7 +71,7 @@ export const MultiSelect = ({
   })
   const { showHint } = useHints()
 
-  const CheckIcon = ICONS.confirm
+  const CheckIcon = ICONS.picked
   const ChevronIcon = ICONS.expand
 
   const hasSearch = options.length > SEARCH_THRESHOLD
@@ -114,47 +109,51 @@ export const MultiSelect = ({
   }
 
   if (options.length === 0) {
-    return <p className="text-sm text-[var(--color-ink-subtle)] italic">{emptyLabel}</p>
+    return <p className={cn('text-sm', EMPTY_VALUE)}>{emptyLabel}</p>
   }
+
+  const trigger = (
+    <button
+      id={id}
+      ref={triggerRef}
+      type="button"
+      role="combobox"
+      disabled={disabled}
+      aria-haspopup="listbox"
+      aria-controls={listId}
+      aria-expanded={isOpen}
+      aria-label={label}
+      aria-describedby={describedBy}
+      aria-invalid={invalid || undefined}
+      onClick={() => (isOpen ? setOpen(false) : openPanel())}
+      className={cn(
+        SELECT_MENU_STYLES.trigger,
+        SELECT_MENU_SIZES.block.trigger,
+        invalid && SELECT_MENU_STYLES.invalid
+      )}
+    >
+      {selected.length > 0 ? (
+        <span className={SELECT_MENU_STYLES.tags}>
+          {selected.map((option) => (
+            <span key={option.value} className={SELECT_MENU_STYLES.entry}>
+              {mark && <OptionMark mark={mark} option={option} />}
+              {option.label}
+            </span>
+          ))}
+        </span>
+      ) : (
+        <span className={SELECT_MENU_STYLES.placeholder}>{emptyLabel}</span>
+      )}
+      <ChevronIcon
+        className={cn(SELECT_MENU_STYLES.chevron, isOpen && SELECT_MENU_STYLES.chevronOpen)}
+        aria-hidden="true"
+      />
+    </button>
+  )
 
   return (
     <>
-      <button
-        id={id}
-        ref={triggerRef}
-        type="button"
-        role="combobox"
-        disabled={disabled}
-        aria-haspopup="listbox"
-        aria-controls={listId}
-        aria-expanded={isOpen}
-        aria-label={label}
-        aria-describedby={describedBy}
-        aria-invalid={invalid || undefined}
-        onClick={() => (isOpen ? setOpen(false) : openPanel())}
-        className={cn(
-          SELECT_MENU_STYLES.trigger,
-          SELECT_MENU_SIZES.block.trigger,
-          invalid && SELECT_MENU_STYLES.invalid
-        )}
-      >
-        {selected.length > 0 ? (
-          <span className={SELECT_MENU_STYLES.tags}>
-            {selected.map((option) => (
-              <span key={option.value} className={TAGS_STYLES.tag}>
-                {mark && <OptionMark mark={mark} option={option} />}
-                {option.label}
-              </span>
-            ))}
-          </span>
-        ) : (
-          <span className={SELECT_MENU_STYLES.placeholder}>{emptyLabel}</span>
-        )}
-        <ChevronIcon
-          className={cn(SELECT_MENU_STYLES.chevron, isOpen && SELECT_MENU_STYLES.chevronOpen)}
-          aria-hidden="true"
-        />
-      </button>
+      {trigger}
 
       {isOpen && (
         <>
@@ -181,38 +180,45 @@ export const MultiSelect = ({
               {matching.length === 0 && (
                 <p className={SELECT_MENU_STYLES.empty}>{PICKER_COPY.noOption}</p>
               )}
-              {matching.map((option) => {
+              {matching.map((option, index) => {
                 const isSelected = value.includes(option.value)
                 const blocked = option.disabled || (atLimit && !isSelected)
+                const heading =
+                  option.group && option.group !== matching[index - 1]?.group ? option.group : null
 
                 return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    aria-disabled={blocked || undefined}
-                    onClick={(event: MouseEvent<HTMLButtonElement>) =>
-                      toggle(option, { x: event.clientX, y: event.clientY })
-                    }
-                    className={cn(
-                      SELECT_MENU_STYLES.option,
-                      isSelected && SELECT_MENU_STYLES.optionSelected,
-                      blocked && 'cursor-not-allowed opacity-40'
+                  <Fragment key={option.value}>
+                    {heading && (
+                      <p className={SELECT_MENU_STYLES.group} role="presentation">
+                        {heading}
+                      </p>
                     )}
-                  >
-                    <span
-                      className={cn(TOGGLE_STYLES.checkbox, isSelected && TOGGLE_STYLES.checkboxOn)}
-                      aria-hidden="true"
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      aria-disabled={blocked || undefined}
+                      onClick={(event: MouseEvent<HTMLButtonElement>) =>
+                        toggle(option, { x: event.clientX, y: event.clientY })
+                      }
+                      className={cn(
+                        SELECT_MENU_STYLES.option,
+                        isSelected && SELECT_MENU_STYLES.optionSelected,
+                        blocked && 'cursor-not-allowed opacity-40'
+                      )}
                     >
-                      {isSelected && <CheckIcon className="h-3 w-3" />}
-                    </span>
-                    {mark && <OptionMark mark={mark} option={option} />}
-                    <span className={SELECT_MENU_STYLES.optionLabel}>{option.label}</span>
-                    {option.hint && (
-                      <span className={SELECT_MENU_STYLES.optionHint}>{option.hint}</span>
-                    )}
-                  </button>
+                      {isSelected ? (
+                        <CheckIcon className={SELECT_MENU_STYLES.check} aria-hidden="true" />
+                      ) : (
+                        <span className={SELECT_MENU_STYLES.checkSlot} aria-hidden="true" />
+                      )}
+                      {mark && <OptionMark mark={mark} option={option} />}
+                      <span className={SELECT_MENU_STYLES.optionLabel}>{option.label}</span>
+                      {option.hint && (
+                        <span className={SELECT_MENU_STYLES.optionHint}>{option.hint}</span>
+                      )}
+                    </button>
+                  </Fragment>
                 )
               })}
             </div>

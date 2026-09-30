@@ -103,9 +103,8 @@ export const KanbanBoard = <T extends BoardItem>({
           >
             <header className={BOARD_STYLES.columnHead}>
               <span className={BOARD_STYLES.columnTitle}>
-                <Badge label={column.label} accent={column.accent} dot />
+                <Badge label={column.label} accent={column.accent}  />
               </span>
-              <span className={BOARD_STYLES.count}>{cards.length}</span>
             </header>
             <div
               className={cn(BOARD_STYLES.body, over === column.id && 'is-drop-target')}

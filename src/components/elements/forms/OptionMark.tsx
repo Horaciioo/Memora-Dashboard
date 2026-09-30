@@ -1,5 +1,6 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { PRIORITY_GLYPH } from '@/declarations/ui/copy'
+import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { ACCENT_STYLES, TONES, accentVars, toTone } from '@/declarations/ui/theme'
 import { OPTION_MARK_STYLES } from '@/declarations/ui/variants'
 import type { AvatarSize } from '@/declarations/ui/variants/surfaces'
@@ -18,13 +19,30 @@ export interface OptionMarkProps {
  * @param {OptionMarkKind} mark - Glyph shape to draw
  * @param {FieldOption} option - Option carrying the accent and the portrait
  * @param {AvatarSize} [size] - Portrait size, defaults to xs
- * @return {JSX.Element}
+ * @return {JSX.Element | null}
  */
 
 export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
   // A portrait carries its own colour, the other two borrow the option accent
   if (mark === 'avatar') {
     return <Avatar name={option.label} src={option.image} size={size} />
+  }
+
+  // Project glyph, nothing when unset
+  if (mark === 'emoji') {
+    return option.emoji ? (
+      <span className={OPTION_MARK_STYLES.emoji} aria-hidden="true">
+        {option.emoji}
+      </span>
+    ) : null
+  }
+
+  // Small glyph of the option, nothing when it names none
+  if (mark === 'glyph') {
+    if (!option.icon || !isIconName(option.icon)) return null
+    const Glyph = ICONS[option.icon]
+
+    return <Glyph className={OPTION_MARK_STYLES.glyph} aria-hidden="true" />
   }
 
   const fallback = mark === 'priority' ? 'warning' : 'neutral'

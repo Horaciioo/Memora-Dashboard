@@ -11,7 +11,6 @@ export type StepState = 'idle' | 'current' | 'done' | 'late'
  * @typedef {Object} TimelineStep
  * @property {string} id - Step identifier
  * @property {string} label - Step caption
- * @property {string} [hint] - Supporting line under the caption
  * @property {StepState} state - Where the step stands
  * @property {IconName} [icon] - Glyph overriding the state default
  * @property {() => void} [onClick] - Called when the step is picked
@@ -20,7 +19,6 @@ export type StepState = 'idle' | 'current' | 'done' | 'late'
 export interface TimelineStep {
   id: string
   label: string
-  hint?: string
   state: StepState
   icon?: IconName
   onClick?: () => void
@@ -100,7 +98,6 @@ export const StepTimeline = ({ steps, label, className }: StepTimelineProps) => 
             >
               {step.label}
             </span>
-            {step.hint && <span className={HORIZONTAL_TIMELINE_STYLES.hint}>{step.hint}</span>}
           </li>
           {next && (
             <span

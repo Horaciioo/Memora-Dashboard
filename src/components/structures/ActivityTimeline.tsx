@@ -29,7 +29,7 @@ export const ActivityTimeline = ({ entries }: ActivityTimelineProps) => (
             <Avatar name={actor} src={entry.actorAvatar} size="xs" />
             <div className={JOURNAL_STYLES.body}>
               <span className={JOURNAL_STYLES.head}>
-                <Badge label={event?.label ?? entry.origin} tone={event?.tone ?? 'neutral'} />
+                <Badge label={event?.label ?? entry.origin} tone={event?.tone ?? 'neutral'} muted />
                 <span className={JOURNAL_STYLES.tick} aria-hidden="true" />
                 <span className={JOURNAL_STYLES.moment}>{formatDayTime(entry.createdAt)}</span>
               </span>
