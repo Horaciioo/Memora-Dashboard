@@ -22,7 +22,8 @@
     "db:dev": "prisma migrate dev",
     "db:seed": "node prisma/seed.ts",
     "fixtures:seed": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./fixtures/loader.mjs fixtures/seed-demo.ts",
-    "fixtures:clear": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./fixtures/loader.mjs fixtures/teardown.ts",
+    "fixtures:qa": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./fixtures/loader.mjs fixtures/qa.ts",
+    "fixtures:clear":"node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./fixtures/loader.mjs fixtures/teardown.ts",
     "db:verify-backup": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file=.env scripts/verify-backup.ts",
     "test": "vitest run",
     "test:watch": "vitest"

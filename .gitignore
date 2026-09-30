@@ -9,6 +9,7 @@ node_modules
 
 # next.js
 .next
+.next-qa
 out
 next-env.d.ts
 *.tsbuildinfo

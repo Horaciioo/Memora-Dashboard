@@ -15,6 +15,8 @@ const { version } = JSON.parse(
 const deployedBranch = process.env.APP_ENV || process.env.VERCEL_GIT_COMMIT_REF || ''
 
 const nextConfig: NextConfig = {
+  // Second dev server, own cache
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   // Exposed to the browser
   env: { NEXT_PUBLIC_APP_VERSION: displayVersion(version, stageOfBranch(deployedBranch)) },
   // The content security policy carries a per-request nonce, so it lives in the proxy
