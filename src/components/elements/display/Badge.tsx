@@ -10,8 +10,8 @@ export interface BadgeProps {
   // Stored colour, a picked hexadecimal or a legacy tone key, winning over the tone
   accent?: string | null
   icon?: IconName
-  // Adds a coloured dot instead of an icon
-  dot?: boolean
+  // Same pill, calmer colour
+  muted?: boolean
   className?: string
 }
 
@@ -21,27 +21,34 @@ export interface BadgeProps {
  * @param {Tone} [tone] - Fallback tone, defaults to neutral
  * @param {string | null} [accent] - Stored colour taking over the tone
  * @param {IconName} [icon] - Icon rendered before the label
- * @param {boolean} [dot] - Renders a coloured dot before the label
+ * @param {boolean} [muted] - Desaturated fill
  * @param {string} [className] - Extra classes merged onto the pill
  * @return {JSX.Element}
  */
 
-export const Badge = ({ label, tone = 'neutral', accent, icon, dot, className }: BadgeProps) => {
+export const Badge = ({
+  label,
+  tone = 'neutral',
+  accent,
+  icon,
+  muted,
+  className,
+}: BadgeProps) => {
   const picked = isHexColour(accent)
   const styles = picked ? ACCENT_STYLES : TONES[toTone(accent, tone)]
   const Icon = icon ? ICONS[icon] : null
 
   return (
     <span
-      className={cn(BADGE_STYLES.base, styles.solid, 'text-[var(--color-on-brand)]', className)}
+      className={cn(
+        BADGE_STYLES.base,
+        styles.solid,
+        'text-[var(--color-on-brand)]',
+        muted && BADGE_STYLES.muted,
+        className
+      )}
       style={picked ? accentVars(accent, tone) : undefined}
     >
-      {dot && (
-        <span
-          className={cn(BADGE_STYLES.dot, 'bg-[var(--color-on-brand)]/70')}
-          aria-hidden="true"
-        />
-      )}
       {Icon && <Icon className={BADGE_STYLES.icon} aria-hidden="true" />}
       {label}
     </span>
