@@ -3,8 +3,9 @@ import Link from 'next/link'
 import { MATURITY_COPY } from '@/declarations/maturity/copy'
 import { MATURITY_REGISTRY } from '@/declarations/maturity/registries'
 import type { MaturityName } from '@/declarations/maturity/registries'
+import { stepsProgress } from '@/declarations/maturity/steps'
+import type { FeatureSteps } from '@/declarations/maturity/steps'
 import { ROUTES } from '@/declarations/navigation'
-import { TONES } from '@/declarations/ui/theme'
 import { MATURITY_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -12,23 +13,45 @@ export interface MaturityTagProps {
   maturity: MaturityName
   // Renders a plain badge instead of a link when the tag already sits inside a link or button
   interactive?: boolean
+  // Dev share source
+  steps?: FeatureSteps
   className?: string
 }
 
 /**
- * Toned pill telling how far along a feature is, its click opening the explainer page
+ * Lifecycle tag: mono label, the Dev share beside it
  * @param {MaturityName} maturity - Lifecycle stage of the feature
  * @param {boolean} [interactive] - Links to the explainer page, on by default
- * @param {string} [className] - Extra classes merged onto the pill
+ * @param {FeatureSteps} [steps] - Checked steps
+ * @param {string} [className] - Extra classes merged onto the tag
  * @return {JSX.Element}
  */
 
-export const MaturityTag = ({ maturity, interactive = true, className }: MaturityTagProps) => {
+export const MaturityTag = ({
+  maturity,
+  interactive = true,
+  steps,
+  className,
+}: MaturityTagProps) => {
   const level = MATURITY_REGISTRY.get(maturity)
-  const tone = TONES[level.tone]
-  const classes = cn(MATURITY_STYLES.tag, tone.soft, tone.text, className)
+  const progress = maturity === 'dev' ? stepsProgress(steps) : null
+  const classes = cn(MATURITY_STYLES.tag, className)
+  const body = (
+    <>
+      {level.label}
+      {progress !== null && (
+        <span className={MATURITY_STYLES.progress}>{MATURITY_COPY.progress(progress)}</span>
+      )}
+    </>
+  )
 
-  if (!interactive) return <span className={classes}>{level.label}</span>
+  if (!interactive) {
+    return (
+      <span className={classes} title={level.summary}>
+        {body}
+      </span>
+    )
+  }
 
   return (
     <Link
@@ -36,7 +59,7 @@ export const MaturityTag = ({ maturity, interactive = true, className }: Maturit
       title={MATURITY_COPY.tagHint}
       className={cn(classes, MATURITY_STYLES.link)}
     >
-      {level.label}
+      {body}
     </Link>
   )
 }

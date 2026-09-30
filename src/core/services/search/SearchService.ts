@@ -124,7 +124,8 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         group: 'teams',
         label: row.name,
         hint: row.lead?.displayName ?? undefined,
-        href: ROUTES.teams,
+        // Teams live in their creator's file
+        href: row.youtuberId ? ROUTES.settingsRecord('youtubeurs', row.youtuberId) : ROUTES.teams,
       })),
     })
   }

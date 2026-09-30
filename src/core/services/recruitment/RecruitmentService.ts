@@ -3,6 +3,7 @@ import 'server-only'
 import { decryptField, encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
 import { activeFunctions } from '@/core/services/reference/lookups'
+import { syncAdmission } from '@/core/services/academy/AdmissionService'
 import { conflict, notFound } from '@/core/lib/errors'
 import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import { toOptions } from '@/core/lib/forms/options'
@@ -300,6 +301,14 @@ export const candidateFields = async (): Promise<FieldDefinition[]> => {
       span: 'half',
     },
     {
+      name: 'displayName',
+      kind: 'text',
+      label: RECRUITMENT_FIELD_COPY.displayName,
+      info: RECRUITMENT_FIELD_COPY.displayNameInfo,
+      maxLength: shortTextMaxLength,
+      span: 'half',
+    },
+    {
       name: 'formId',
       kind: 'text',
       label: RECRUITMENT_FIELD_COPY.formId,
@@ -465,6 +474,7 @@ const toCandidate = (
   row: {
     id: string
     discordId: string
+    displayName: string | null
     formId: string | null
     interviewAt: Date | null
     attended: boolean
@@ -495,6 +505,9 @@ const toCandidate = (
   return {
     id: row.id,
     discordId: row.discordId,
+    displayName: row.displayName,
+    // The member file wins, then the pseudonym given, then the raw identifier
+    name: member?.displayName ?? row.displayName ?? row.discordId,
     formId: row.formId,
     recruiter: recruiter
       ? { id: recruiter.id, label: recruiter.name, accent: null, image: recruiter.src }
@@ -836,6 +849,7 @@ export const createCandidate = async (
       data: {
         sessionId,
         discordId: readText(values, 'discordId') ?? '',
+        displayName: readText(values, 'displayName'),
         formId: readText(values, 'formId'),
         recruiterId: readText(values, 'recruiterId'),
         outcomeId: readText(values, 'outcomeId') ?? (await defaultOutcome()),
@@ -846,6 +860,8 @@ export const createCandidate = async (
       },
     })
     .catch(rethrow)
+
+  await syncAdmission(row.id)
 
   return readCandidate(row.id)
 }
@@ -872,6 +888,7 @@ export const updateCandidate = async (
       where: { id },
       data: {
         discordId: readText(values, 'discordId') ?? undefined,
+        displayName: readText(values, 'displayName'),
         formId: readText(values, 'formId'),
         recruiterId: readText(values, 'recruiterId'),
         outcomeId: readText(values, 'outcomeId'),
@@ -885,6 +902,8 @@ export const updateCandidate = async (
       },
     })
     .catch(rethrow)
+
+  await syncAdmission(id)
 
   return readCandidate(id)
 }
@@ -939,6 +958,8 @@ export const moveCandidate = async (
     where: { id },
     data: { outcomeId, position: positionAt(column, index) },
   })
+
+  await syncAdmission(id)
 
   return readCandidate(id)
 }

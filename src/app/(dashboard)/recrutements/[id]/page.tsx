@@ -75,9 +75,8 @@ export default async function RecruitmentPage({ params }: { params: Promise<{ id
               label={detail.summary.jobFunction.label}
               accent={detail.summary.jobFunction.accent}
               tone={'brand'}
-              dot
             />
-            <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />
+            <Badge label={status.label} accent={status.accent} tone={'neutral'}  />
           </span>
         }
       />

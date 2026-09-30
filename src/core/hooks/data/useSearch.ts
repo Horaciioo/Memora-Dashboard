@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 
 import { apiGet } from '@/core/lib/api/client'
+import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { useDebouncedValue } from '@/core/hooks/interaction/useDebouncedValue'
 import { SEARCH_SETTINGS } from '@/declarations/configurations/settings'
 import type { SearchSection } from '@/types/search'
 
@@ -27,38 +29,22 @@ interface SearchResult {
 
 export const useSearch = (term: string): SearchResult => {
   const query = term.trim()
+  const settled = useDebouncedValue(query, SEARCH_SETTINGS.debounceMs)
   const isActive = query.length >= SEARCH_SETTINGS.minLength
-  const [result, setResult] = useState<{ term: string; sections: SearchSection[] }>({
-    term: '',
-    sections: [],
+
+  const { data, isFetching } = useQuery({
+    queryKey: QUERY_KEYS.search(settled),
+    queryFn: ({ signal }) =>
+      apiGet<SearchSection[]>(`${API_ROUTES.search}?q=${encodeURIComponent(settled)}`, signal),
+    enabled: settled.length >= SEARCH_SETTINGS.minLength,
+    placeholderData: keepPreviousData,
   })
 
-  useEffect(() => {
-    if (!isActive) return
-
-    // Abort the previous request as soon as the term moves on
-    const controller = new AbortController()
-    const timer = setTimeout(() => {
-      apiGet<SearchSection[]>(`${API_ROUTES.search}?q=${encodeURIComponent(query)}`)
-        .then((sections) => {
-          if (!controller.signal.aborted) setResult({ term: query, sections })
-        })
-        .catch(() => {
-          if (!controller.signal.aborted) setResult({ term: query, sections: [] })
-        })
-    }, SEARCH_SETTINGS.debounceMs)
-
-    return () => {
-      controller.abort()
-      clearTimeout(timer)
-    }
-  }, [query, isActive])
-
-  // Loading is derived from the gap between the asked term and the settled one
-  const isSettled = result.term === query
+  // Typing counts as loading
+  const isSettled = settled === query && !isFetching
 
   return {
-    sections: isActive && isSettled ? result.sections : [],
+    sections: isActive && isSettled ? (data ?? []) : [],
     isLoading: isActive && !isSettled,
   }
 }

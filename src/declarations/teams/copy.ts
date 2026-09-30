@@ -32,3 +32,15 @@ export const TEAM_FIELD_COPY = {
   youtuber: 'YouTubeur',
   archived: 'Archiver cette équipe',
 } as const
+
+/**
+ * Explanations behind each team field
+ * @type {Record<string, string>}
+ */
+
+export const TEAM_FIELD_INFO = {
+  name: 'Le nom de l’équipe, tel qu’il apparaît dans les listes.',
+  lead: 'Le responsable qui encadre l’équipe et valide ses absences.',
+  youtuber: 'Le créateur sur lequel l’équipe intervient.',
+  summary: 'Le rôle de l’équipe, en une phrase.',
+} as const

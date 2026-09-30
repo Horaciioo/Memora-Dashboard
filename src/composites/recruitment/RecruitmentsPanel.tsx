@@ -9,7 +9,8 @@ import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FilterBar, type FilterDefinition } from '@/components/structures/FilterBar'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { useRecruitments } from '@/core/hooks/data/useRecruitments'
 import { toOptions } from '@/core/lib/forms/options'
@@ -184,14 +185,13 @@ export const RecruitmentsPanel = ({
                   <header className="flex flex-wrap items-center gap-2">
                     <Avatar name={entry.youtuber.label} src={entry.youtuber.image} size="sm" />
                     <span className="min-w-0 flex-1 truncate text-sm font-bold">{entry.name}</span>
-                    <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />
+                    <Badge label={status.label} accent={status.accent} tone={'neutral'}  />
                   </header>
                   <span className="flex flex-wrap items-center gap-2">
                     <Badge
                       label={entry.jobFunction.label}
                       accent={entry.jobFunction.accent}
                       tone={'brand'}
-                      dot
                     />
                     {entry.opensAt && (
                       <span className="text-xs text-[var(--color-ink-subtle)]">
@@ -202,14 +202,6 @@ export const RecruitmentsPanel = ({
                   {entry.summary && (
                     <p className="text-xs text-[var(--color-ink-subtle)]">{entry.summary}</p>
                   )}
-                  <footer className="flex items-center justify-between gap-2 text-xs text-[var(--color-ink-subtle)] tabular-nums">
-                    <span>{`${entry.candidateCount} ${RECRUITMENT_COPY.candidateCount}`}</span>
-                    <Badge
-                      label={`${entry.interviewedCount}`}
-                      tone={entry.interviewedCount > 0 ? 'success' : 'neutral'}
-                      icon="confirm"
-                    />
-                  </footer>
                 </article>
               )
             })}
@@ -218,25 +210,25 @@ export const RecruitmentsPanel = ({
         )}
       </Section>
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.recruitment}
         open={isCreating}
         title={RECRUITMENT_COPY.addTitle}
         fields={fields}
         issues={issues}
         isSaving={isSaving}
-        size="lg"
         onSubmit={create}
         onClose={() => setCreating(false)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.recruitment}
         open={editing !== null}
         title={RECRUITMENT_COPY.editTitle}
         fields={fields}
         initialValues={editing?.values}
         issues={issues}
         isSaving={isSaving}
-        size="lg"
         onSubmit={(values) => update(editing!.id, values)}
         onClose={() => setEditing(null)}
       />

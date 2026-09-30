@@ -20,8 +20,15 @@ export default async function MembersPage() {
   const { access, scope } = await requirePermission(Permissions.MemberRead)
 
   // The three reference reads are memoised, so memberFields shares them
+  const perimeter = await scope()
+
+  // A picked creator, or the only one a perimeter holds, narrows the whole page
+  const creatorId =
+    perimeter.activeYoutuberId ??
+    (!perimeter.isGlobal && perimeter.youtuberIds.length === 1 ? perimeter.youtuberIds[0] : null)
+
   const [members, fields, divisions, youtubers, functions] = await Promise.all([
-    listMembers(await scope()),
+    listMembers(perimeter),
     memberFields(access.isAdmin),
     allDivisions(),
     activeYoutubers(),
@@ -37,6 +44,7 @@ export default async function MembersPage() {
         divisions={rowsToOptions(divisions)}
         youtubers={rowsToOptions(youtubers)}
         functions={rowsToOptions(functions)}
+        creatorId={creatorId}
         canCreate={access.can(Permissions.MemberCreate)}
         canDelete={access.can(Permissions.MemberDelete)}
         canReadNotes={access.can(Permissions.MemberNoteRead)}

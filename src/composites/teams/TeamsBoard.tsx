@@ -5,7 +5,8 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useTeams } from '@/core/hooks/data/useTeams'
@@ -67,6 +68,9 @@ export const TeamsBoard = ({
   const [pendingDeletion, setPendingDeletion] = useState<TeamView | null>(null)
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const ChevronIcon = ICONS.expand
+
+  // A brand-new team has nothing to archive yet
+  const creationFields = fields.filter((field) => field.name !== 'archived')
 
   const toggleGroup = (key: string) => {
     setCollapsed((current) => {
@@ -173,7 +177,6 @@ export const TeamsBoard = ({
                   >
                     {group.youtuberId && <Avatar name={group.label} src={group.image} size="sm" />}
                     {group.label}
-                    <span className={GROUP_STYLES.count}>{group.teams.length}</span>
                     <ChevronIcon
                       className={cn(GROUP_STYLES.chevron, isOpen && GROUP_STYLES.chevronOpen)}
                       aria-hidden="true"
@@ -200,14 +203,13 @@ export const TeamsBoard = ({
                               </span>
                             )}
                           </span>
-                          <span className={BOARD_STYLES.count}>{team.members.length}</span>
                         </header>
                         <div
                           className={cn(BOARD_STYLES.body, over === team.id && 'is-drop-target')}
                           {...(canManage ? containerProps(team.id) : {})}
                         >
                           {team.members.length === 0 && (
-                            <p className="px-2 py-6 text-center text-xs text-[var(--color-ink-subtle)] italic">
+                            <p className="px-2 py-6 text-center text-xs text-[var(--color-ink-subtle)]">
                               {TEAM_COPY.emptyColumn}
                             </p>
                           )}
@@ -248,7 +250,6 @@ export const TeamsBoard = ({
               className={GROUP_STYLES.heading}
             >
               {TEAM_COPY.unassigned}
-              <span className={GROUP_STYLES.count}>{board.unassigned.length}</span>
               <ChevronIcon
                 className={cn(
                   GROUP_STYLES.chevron,
@@ -265,7 +266,7 @@ export const TeamsBoard = ({
                     {...(canManage ? containerProps(UNASSIGNED) : {})}
                   >
                     {board.unassigned.length === 0 && (
-                      <p className="px-2 py-6 text-center text-xs text-[var(--color-ink-subtle)] italic">
+                      <p className="px-2 py-6 text-center text-xs text-[var(--color-ink-subtle)]">
                         {TEAM_COPY.emptyColumn}
                       </p>
                     )}
@@ -287,10 +288,11 @@ export const TeamsBoard = ({
         </div>
       </Section>
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.team}
         open={isCreating}
         title={TEAM_COPY.add}
-        fields={fields}
+        fields={creationFields}
         initialValues={
           youtuberId
             ? { youtuberId }
@@ -304,7 +306,8 @@ export const TeamsBoard = ({
         onClose={() => setCreating(false)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.team}
         open={editing !== null}
         title={editing ? `${ACTION_COPY.edit} · ${editing.name}` : ACTION_COPY.edit}
         fields={fields}

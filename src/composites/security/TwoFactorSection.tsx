@@ -1,15 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { Dialog } from '@/components/structures/Dialog'
 import { Section } from '@/components/structures/Section'
 import { TwoFactorPanel } from '@/composites/security/TwoFactorPanel'
 import { TWO_FACTOR_COPY } from '@/declarations/access/copy'
-import { SEAL_BLOCK, TWO_FACTOR_BLOCK } from '@/declarations/ui/blocks'
+import { SECURITY_LIST, TWO_FACTOR_BLOCK } from '@/declarations/ui/blocks'
+import { ICONS } from '@/declarations/ui/icons'
 import { PREFERENCE_STYLES } from '@/declarations/ui/variants'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'
+import { cn } from '@/utils/classnames'
 import { formatDayTime } from '@/utils/format/dates'
 
 /**
@@ -33,41 +34,58 @@ export const TwoFactorSection = () => {
     setPane(null)
   }
 
-  return (
-    <Section
-      title={TWO_FACTOR_COPY.title}
-      description={TWO_FACTOR_COPY.lead}
-      action={
-        <Badge
-          label={state.isEnrolled ? TWO_FACTOR_COPY.enrolled : TWO_FACTOR_COPY.notEnrolled}
-          tone={state.isEnrolled ? 'success' : 'neutral'}
-          icon={state.isEnrolled ? 'lock' : 'unlock'}
-        />
-      }
-      padded
-    >
-      <div className={PREFERENCE_STYLES.rows}>
-        {state.isEnrolled && (
-          <>
-            <div className={PREFERENCE_STYLES.row}>
-              <span className={PREFERENCE_STYLES.label}>{TWO_FACTOR_COPY.recoveryTitle}</span>
-              <span className={PREFERENCE_STYLES.notice}>{`${codesLeft} ${codesLabel}`}</span>
-            </div>
-            <div className={PREFERENCE_STYLES.row}>
-              <span className={PREFERENCE_STYLES.label}>{TWO_FACTOR_COPY.unlockTitle}</span>
-              {seal.isUnsealed && seal.closesAt ? (
-                <span className={SEAL_BLOCK.window}>
-                  {`${TWO_FACTOR_COPY.unlockedUntil} ${formatDayTime(seal.closesAt)}`}
-                </span>
-              ) : (
-                <span className={PREFERENCE_STYLES.notice}>{TWO_FACTOR_COPY.sealedHint}</span>
-              )}
-            </div>
-          </>
-        )}
-      </div>
+  const StatusGlyph = ICONS[state.isEnrolled ? 'shield' : 'twoFactor']
 
-      <div className={PREFERENCE_STYLES.footer}>
+  return (
+    <Section title={TWO_FACTOR_COPY.title} padded>
+      <ul className={SECURITY_LIST.list}>
+        <li className={SECURITY_LIST.row}>
+          <ICONS.twoFactor className={SECURITY_LIST.glyph} />
+          <div className={SECURITY_LIST.body}>
+            <p className={SECURITY_LIST.title}>{TWO_FACTOR_COPY.title}</p>
+            <p className={SECURITY_LIST.meta}>{TWO_FACTOR_COPY.lead}</p>
+          </div>
+          <span
+            className={cn(
+              SECURITY_LIST.status,
+              state.isEnrolled ? SECURITY_LIST.on : SECURITY_LIST.off
+            )}
+          >
+            <StatusGlyph className={SECURITY_LIST.statusGlyph} />
+            {state.isEnrolled ? TWO_FACTOR_COPY.enrolled : TWO_FACTOR_COPY.notEnrolled}
+          </span>
+        </li>
+
+        {state.isEnrolled && (
+          <li className={SECURITY_LIST.row}>
+            <ICONS.key className={SECURITY_LIST.glyph} />
+            <div className={SECURITY_LIST.body}>
+              <p className={SECURITY_LIST.title}>{TWO_FACTOR_COPY.recoveryTitle}</p>
+              <p className={SECURITY_LIST.meta}>{`${codesLeft} ${codesLabel}`}</p>
+            </div>
+          </li>
+        )}
+
+        {state.isEnrolled && (
+          <li className={SECURITY_LIST.row}>
+            {seal.isUnsealed ? (
+              <ICONS.unlock className={SECURITY_LIST.glyph} />
+            ) : (
+              <ICONS.lock className={SECURITY_LIST.glyph} />
+            )}
+            <div className={SECURITY_LIST.body}>
+              <p className={SECURITY_LIST.title}>{TWO_FACTOR_COPY.unlockTitle}</p>
+              <p className={SECURITY_LIST.meta}>
+                {seal.isUnsealed && seal.closesAt
+                  ? `${TWO_FACTOR_COPY.unlockedUntil} ${formatDayTime(seal.closesAt)}`
+                  : TWO_FACTOR_COPY.sealedHint}
+              </p>
+            </div>
+          </li>
+        )}
+      </ul>
+
+      <div className={SECURITY_LIST.footer}>
         {state.isEnrolled ? (
           <>
             {seal.isUnsealed && (

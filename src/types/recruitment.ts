@@ -71,6 +71,8 @@ export interface CandidateComment {
  * @typedef {Object} CandidateView
  * @property {string} id - Candidate identifier
  * @property {string} discordId - Discord identifier, the key to a later account
+ * @property {string | null} displayName - Pseudonym given at application
+ * @property {string} name - Best known name
  * @property {string | null} formId - Meltdown Forms identifier
  * @property {RecruitmentRef | null} recruiter - Moderator leading the interview
  * @property {RecruitmentRef[]} spectators - Moderators sitting in
@@ -87,6 +89,8 @@ export interface CandidateComment {
 export interface CandidateView {
   id: string
   discordId: string
+  displayName: string | null
+  name: string
   formId: string | null
   recruiter: RecruitmentRef | null
   spectators: RecruitmentRef[]

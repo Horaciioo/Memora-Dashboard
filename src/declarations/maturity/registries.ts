@@ -18,7 +18,7 @@ interface MaturityOption {
 // Declared from least to most mature, then the two lifecycle markers
 const MATURITY_MAP = {
   dev: {
-    label: 'En dev',
+    label: 'Dev',
     summary: 'En cours de création, pas encore utilisable ou incomplète.',
     tone: 'neutral',
   },
@@ -32,12 +32,12 @@ const MATURITY_MAP = {
     label: 'Bêta',
     summary:
       'Presque finalisée, ouverte aux utilisateurs pour recueillir des retours et corriger les derniers problèmes.',
-    tone: 'info',
+    tone: 'success',
   },
   new: {
     label: 'New',
     summary: 'Récemment ajoutée ou publiée.',
-    tone: 'success',
+    tone: 'caution',
   },
   deprecated: {
     label: 'Déprécié',

@@ -48,6 +48,7 @@ export const RECRUITMENT_COPY = {
 
   commentsTitle: 'Commentaires',
   commentAdd: 'Écrire un commentaire',
+  commented: 'Commenté',
   commentsEmptyTitle: 'Aucun commentaire',
   commentsEmptyDescription: 'Consigne ici ce que l’entretien a montré.',
   commentDeleteTitle: 'Supprimer ce commentaire ?',
@@ -80,7 +81,7 @@ export const RECRUITMENT_COPY = {
   reviewEdit: 'Écrire le bilan',
   outcomesEmptyTitle: 'Aucune issue déclarée',
   outcomesEmptyDescription:
-    'Déclare les issues de recrutement en configuration pour ouvrir le tableau.',
+    'Les issues sont fixées par l’équipe technique, elles arrivent au prochain déploiement.',
   noOutcome: 'Sans issue',
 
   instructionsTitle: 'Consignes de la session',
@@ -108,6 +109,9 @@ export const RECRUITMENT_FIELD_COPY = {
   instructions: 'Consignes',
 
   discordId: 'Identifiant Discord',
+  displayName: 'Pseudonyme',
+  displayNameInfo:
+    'Le nom sous lequel sa fiche est pré-remplie dans Modérateurs s’il est accepté. Il le confirme lui-même dans son formulaire d’intégration.',
   formId: 'Identifiant du formulaire',
   recruiter: 'Recruteur',
   spectators: 'Spectateurs',

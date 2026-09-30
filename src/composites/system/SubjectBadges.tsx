@@ -23,12 +23,11 @@ export const SubjectBadges = ({ state }: SubjectBadgesProps) => {
         <span className={CONSOLE_BLOCK.rowMeta}>{`${state.probe.latencyMs} ms`}</span>
       )}
       {probe ? (
-        <Badge label={probe.label} tone={probe.tone} dot />
+        <Badge label={probe.label} tone={probe.tone}  />
       ) : (
         <Badge
           label={state.enabled ? VIEW_COPY.probeMissing : VIEW_COPY.subjectOff}
           tone="neutral"
-          dot
         />
       )}
       <Badge

@@ -6,7 +6,7 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readFlag, readText } from '@/core/lib/forms/values'
 import { leadOptions, toPerson, toTag, youtuberOptions } from '@/core/services/work/shared'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
-import { TEAM_FIELD_COPY } from '@/declarations/teams/copy'
+import { TEAM_FIELD_COPY, TEAM_FIELD_INFO } from '@/declarations/teams/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { TeamBoardData } from '@/types/teams'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
@@ -25,6 +25,7 @@ export const teamFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'name',
       kind: 'text',
       label: TEAM_FIELD_COPY.name,
+      info: TEAM_FIELD_INFO.name,
       required: true,
       maxLength: FORM_SETTINGS.shortTextMaxLength,
     },
@@ -32,6 +33,7 @@ export const teamFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'leadId',
       kind: 'select',
       label: TEAM_FIELD_COPY.lead,
+      info: TEAM_FIELD_INFO.lead,
       options: leads,
       mark: 'avatar',
       span: 'half',
@@ -40,6 +42,7 @@ export const teamFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'youtuberId',
       kind: 'select',
       label: TEAM_FIELD_COPY.youtuber,
+      info: TEAM_FIELD_INFO.youtuber,
       options: youtubers,
       mark: 'avatar',
       span: 'half',
@@ -48,6 +51,7 @@ export const teamFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'summary',
       kind: 'textarea',
       label: TEAM_FIELD_COPY.summary,
+      info: TEAM_FIELD_INFO.summary,
       maxLength: FORM_SETTINGS.longTextMaxLength,
     },
     { name: 'archived', kind: 'toggle', label: TEAM_FIELD_COPY.archived },

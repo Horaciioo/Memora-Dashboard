@@ -8,6 +8,7 @@ import { requireUser } from '@/core/wrappers/requireUser'
 import { MATURITY_COPY } from '@/declarations/maturity/copy'
 import { MATURITY_REGISTRY } from '@/declarations/maturity/registries'
 import { MATURITY_STYLES, PAGE_STYLES } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 
 export const metadata: Metadata = { title: MATURITY_COPY.pageTitle }
 
@@ -20,7 +21,7 @@ export default async function MaturityPage() {
   await requireUser()
 
   return (
-    <div className={PAGE_STYLES.wrapper}>
+    <div className={cn(PAGE_STYLES.wrapper, 'max-w-xl')}>
       <PageHeader title={MATURITY_COPY.pageTitle} lead={MATURITY_COPY.pageLead} />
 
       <Section padded>

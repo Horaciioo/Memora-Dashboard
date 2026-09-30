@@ -8,7 +8,8 @@ import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { Dialog } from '@/components/structures/Dialog'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { RECRUITMENT_COPY, RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
@@ -85,7 +86,7 @@ export const CandidateDialog = ({
       <Dialog
         open
         onClose={onClose}
-        title={candidate.memberName ?? candidate.discordId}
+        title={candidate.name}
         size="lg"
         subheader={
           <span className="flex flex-wrap items-center gap-2">
@@ -203,7 +204,8 @@ export const CandidateDialog = ({
         </div>
       </Dialog>
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.comment}
         open={nested === 'comment'}
         title={RECRUITMENT_COPY.commentAdd}
         fields={commentFields}
@@ -213,14 +215,14 @@ export const CandidateDialog = ({
         onClose={() => setNested(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.review}
         open={nested === 'review'}
         title={RECRUITMENT_COPY.reviewEdit}
         fields={reviewFields}
         initialValues={{ review: candidate.review }}
         issues={issues}
         isSaving={isSaving}
-        size="lg"
         onSubmit={(values) =>
           onSaveReview(candidate.id, typeof values.review === 'string' ? values.review : '')
         }

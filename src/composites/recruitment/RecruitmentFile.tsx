@@ -4,7 +4,9 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Avatar, AvatarStack } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { Button } from '@/components/elements/actions/Button'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
@@ -12,7 +14,8 @@ import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { IntegrationLinkStep } from '@/composites/onboarding/IntegrationLinkStep'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { KanbanBoard, type BoardColumn } from '@/components/structures/KanbanBoard'
 import { Section } from '@/components/structures/Section'
 import { useRecruitmentFile } from '@/core/hooks/data/useRecruitmentFile'
@@ -168,7 +171,7 @@ export const RecruitmentFile = ({
     <span className="flex min-w-0 flex-1 flex-col gap-1.5">
       <span className="flex flex-wrap items-center gap-2">
         <span className="min-w-0 truncate text-sm font-medium">
-          {candidate.memberName ?? candidate.discordId}
+          {candidate.name}
         </span>
         {candidate.memberId && <Badge label={RECRUITMENT_COPY.memberLinked} tone="info" />}
         <Badge
@@ -232,10 +235,10 @@ export const RecruitmentFile = ({
               onContextMenu={contextMenu(candidateMenu(candidate), candidate.discordId)}
               className={cn(LIST_STYLES.item, 'cursor-pointer')}
             >
-              <Avatar name={candidate.memberName ?? candidate.discordId} size="sm" />
+              <Avatar name={candidate.name} size="sm" />
               {candidateCard(candidate)}
               {candidate.comments.length > 0 && (
-                <Badge label={`${candidate.comments.length}`} tone="neutral" icon="note" />
+                <Badge label={RECRUITMENT_COPY.commented} tone="neutral" icon="note" />
               )}
             </div>
           ))}
@@ -341,7 +344,7 @@ export const RecruitmentFile = ({
                   </span>
                 </span>
                 {step.required && <Badge label={RECRUITMENT_COPY.mandatoryBadge} tone="warning" />}
-                <Badge label={owner.label} accent={owner.accent} dot />
+                <Badge label={owner.label} accent={owner.accent}  />
                 {step.emitsInvite && (
                   <IntegrationLinkStep
                     link={file.link}
@@ -379,15 +382,7 @@ export const RecruitmentFile = ({
           figure="members"
           title={RECRUITMENT_COPY.outcomesEmptyTitle}
           description={RECRUITMENT_COPY.outcomesEmptyDescription}
-          action={
-            <Button
-              variant="primary"
-              icon="settings"
-              onClick={() => router.push(ROUTES.settingsSection('issues-recrutement'))}
-            >
-              {RECRUITMENT_COPY.questionsConfigure}
-            </Button>
-          }
+          action={<MaturityTag maturity="dev" interactive={false} />}
         />
       ) : (
         <KanbanBoard
@@ -458,10 +453,18 @@ export const RecruitmentFile = ({
       <Section title={RECRUITMENT_COPY.informationsTitle} padded>
         <DetailGrid
           entries={[
-            { label: RECRUITMENT_FIELD_COPY.youtuber, value: detail.summary.youtuber.label },
+            {
+              label: RECRUITMENT_FIELD_COPY.youtuber,
+              value: (
+                <CreatorLabel
+                  name={detail.summary.youtuber.label}
+                  image={detail.summary.youtuber.image}
+                />
+              ),
+            },
             {
               label: RECRUITMENT_COPY.infoStatus,
-              value: <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />,
+              value: <Badge label={status.label} accent={status.accent} tone={'neutral'}  />,
             },
             { label: RECRUITMENT_FIELD_COPY.jobFunction, value: detail.summary.jobFunction.label },
             {
@@ -526,7 +529,8 @@ export const RecruitmentFile = ({
         onClose={() => setOpenedCandidateId(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.candidate}
         open={dialog === 'candidate'}
         title={editingCandidate ? RECRUITMENT_COPY.candidateEdit : RECRUITMENT_COPY.candidateAdd}
         fields={candidateFields}
@@ -534,6 +538,7 @@ export const RecruitmentFile = ({
           editingCandidate
             ? {
                 discordId: editingCandidate.discordId,
+                displayName: editingCandidate.displayName,
                 formId: editingCandidate.formId,
                 recruiterId: editingCandidate.recruiter?.id ?? null,
                 interviewAt: editingCandidate.interviewAt,
@@ -545,7 +550,6 @@ export const RecruitmentFile = ({
         }
         issues={file.issues}
         isSaving={file.isSaving}
-        size="lg"
         onSubmit={(values) =>
           editingCandidate
             ? file.updateCandidate(editingCandidate.id, values)
@@ -554,7 +558,8 @@ export const RecruitmentFile = ({
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.recruitmentStep}
         open={dialog === 'step'}
         title={editingStep ? RECRUITMENT_COPY.stepEdit : RECRUITMENT_COPY.stepAdd}
         fields={stepFields}
@@ -572,21 +577,20 @@ export const RecruitmentFile = ({
         }
         issues={file.issues}
         isSaving={file.isSaving}
-        size="lg"
         onSubmit={(values) =>
           editingStep ? file.updateStep(editingStep.id, values) : file.addStep(values)
         }
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.instructions}
         open={dialog === 'instructions'}
         title={RECRUITMENT_COPY.instructionsEdit}
         fields={instructionFields}
         initialValues={{ instructions: file.instructions }}
         issues={file.issues}
         isSaving={file.isSaving}
-        size="lg"
         onSubmit={async (values) =>
           file.saveInstructions(typeof values.instructions === 'string' ? values.instructions : '')
         }
