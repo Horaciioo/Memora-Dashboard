@@ -128,6 +128,34 @@ interface PublicRouteOptions<T> extends RouteOptions {
 
 export type RouteHandler = ((request: NextRequest, context: RouteParams) => Promise<Response>) & {
   descriptor?: RouteDescriptor
+  meta?: RouteMeta
+}
+
+/**
+ * How a route answers
+ * @type {'public' | 'protected' | 'redirect' | 'media'}
+ */
+
+export type RouteAccess = 'public' | 'protected' | 'redirect' | 'media'
+
+/**
+ * Contract read by the OpenAPI collector
+ * @typedef {Object} RouteMeta
+ * @property {RouteAccess} access - Factory used
+ * @property {PermissionName | PermissionName[]} [permission] - Permission needed
+ * @property {FieldDefinition[]} [fields] - Body declarations
+ * @property {boolean} [partial] - Optional fields
+ * @property {number} [status] - Success status
+ * @property {RouteDescriptor} [descriptor] - Documentation
+ */
+
+export interface RouteMeta {
+  access: RouteAccess
+  permission?: PermissionName | PermissionName[]
+  fields?: FieldDefinition[]
+  partial?: boolean
+  status?: number
+  descriptor?: RouteDescriptor
 }
 
 /**
@@ -272,6 +300,13 @@ export const createPublicRoute = <T>(options: PublicRouteOptions<T>): RouteHandl
   }
 
   handler.descriptor = options.descriptor
+  handler.meta = {
+    access: 'public',
+    fields: options.fields,
+    partial: options.partial,
+    status: options.status,
+    descriptor: options.descriptor,
+  }
 
   return handler
 }
@@ -303,6 +338,14 @@ export const createProtectedRoute = <T>(options: ProtectedRouteOptions<T>): Rout
   }
 
   handler.descriptor = options.descriptor
+  handler.meta = {
+    access: 'protected',
+    permission: options.permission,
+    fields: options.fields,
+    partial: options.partial,
+    status: options.status,
+    descriptor: options.descriptor,
+  }
 
   return handler
 }
@@ -350,6 +393,7 @@ export const createRedirectRoute = (options: RedirectRouteOptions): RouteHandler
   }
 
   handler.descriptor = options.descriptor
+  handler.meta = { access: 'redirect', descriptor: options.descriptor }
 
   return handler
 }
@@ -437,6 +481,7 @@ export const createMediaRoute = (options: MediaRouteOptions): RouteHandler => {
   }
 
   handler.descriptor = options.descriptor
+  handler.meta = { access: 'media', descriptor: options.descriptor }
 
   return handler
 }
