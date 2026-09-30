@@ -11,6 +11,15 @@ enum MemberRole {
   ADMIN
   RESPONSABLE
   MODERATEUR
+  JUNIOR
+}
+
+// Rail section of the access console, grouping the roles and the functions under one heading
+enum AccessCategory {
+  LEADER
+  ADMINISTRATION
+  RESPONSABILITE
+  MODERATION
 }
 
 // Lifecycle of a member inside the organisation
@@ -147,6 +156,20 @@ enum AttendeeKind {
   PARTICIPANT
 }
 
+// Who a meeting is held for: the whole team, one trade's team, or a custom list of seats
+enum MeetingAudience {
+  EVERYONE
+  DISCORD
+  TWITCH
+  CUSTOM
+}
+
+// What a Discord anchor points at
+enum DiscordAnchorKind {
+  ROLE
+  CHANNEL
+}
+
 // Review outcome of an absence request
 enum AbsenceStatus {
   PENDING
@@ -190,91 +213,93 @@ enum AttendanceStatus {
 
 // Signed-in member
 model Account {
-  id                  String       @id @default(cuid())
-  discordId           String       @unique
-  discordUsername     String?
-  discordAvatarHash   String?
-  discordSyncedAt     DateTime?
-  displayName         String
-  email               String?
-  phone               String?
-  birthday            DateTime?
-  celebrateBirthday   Boolean      @default(true)
-  joinedAt            DateTime     @default(now())
-  leftAt              DateTime?
+  id                    String       @id @default(cuid())
+  discordId             String       @unique
+  discordUsername       String?
+  discordAvatarHash     String?
+  discordSyncedAt       DateTime?
+  displayName           String
+  email                 String?
+  phone                 String?
+  birthday              DateTime?
+  celebrateBirthday     Boolean      @default(true)
+  joinedAt              DateTime     @default(now())
+  leftAt                DateTime?
   historyConsentAt      DateTime?
   historyConsentVersion Int?
+  // Last release note read
+  seenReleaseVersion    String?
   anonymisedAt          DateTime?
-  languages           String[]     @default([])
-  timezone            String?
-  theme               String?
-  colorVision         String?
-  fontScale           String?
-  avatarUrl           String?
-  role                MemberRole   @default(MODERATEUR)
-  status              MemberStatus @default(ACADEMY)
-  divisionId          String?
-  primaryFunctionId   String?
-  secondaryFunctionId String?
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
+  languages             String[]     @default([])
+  timezone              String?
+  theme                 String?
+  colorVision           String?
+  fontScale             String?
+  avatarUrl             String?
+  role                  MemberRole   @default(MODERATEUR)
+  status                MemberStatus @default(ACADEMY)
+  divisionId            String?
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
 
-  division          Division?    @relation(fields: [divisionId], references: [id], onDelete: SetNull)
-  youtubers         Youtuber[]
-  primaryFunction   JobFunction? @relation("PrimaryFunction", fields: [primaryFunctionId], references: [id], onDelete: SetNull)
-  secondaryFunction JobFunction? @relation("SecondaryFunction", fields: [secondaryFunctionId], references: [id], onDelete: SetNull)
+  division  Division?         @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  youtubers Youtuber[]
+  functions AccountFunction[]
 
   sessions              Session[]
   discordToken          DiscordToken?
   twoFactor             TwoFactorCredential?
-  ledYoutubers          YoutuberLead[]          @relation("YoutuberLead")
+  ledYoutubers          YoutuberLead[]           @relation("YoutuberLead")
   permissions           AccountPermission[]
   socialLinks           SocialLink[]
   constraints           AccountConstraint[]
-  calendarEntries       CalendarEvent[]         @relation("CalendarSubject")
-  absences              Absence[]               @relation("AbsenceOwner")
-  reviewedAbsences      Absence[]               @relation("AbsenceReviewer")
-  notesReceived         AccountNote[]           @relation("NoteSubject")
-  notesWritten          AccountNote[]           @relation("NoteAuthor")
-  trainingRecords       TrainingRecord[]        @relation("TrainingLearner")
-  trainingsValidated    TrainingRecord[]        @relation("TrainingValidator")
-  academyJuniors        AcademyJunior[]         @relation("AcademyJunior")
-  academyTrainees       AcademyJunior[]         @relation("AcademyJuniorTrainer")
-  academySeats          AcademySessionTrainer[] @relation("AcademyTrainer")
-  academySteps          AcademyStep[]           @relation("AcademyStepAuthor")
-  academyStepsValidated AcademyStep[]           @relation("AcademyStepValidator")
-  integrationInvites    IntegrationInvite[]     @relation("IntegrationInviteCreatedBy")
-  integrationClaims     IntegrationClaim[]      @relation("IntegrationClaimAccount")
+  calendarEntries       CalendarEvent[]          @relation("CalendarSubject")
+  absences              Absence[]                @relation("AbsenceOwner")
+  reviewedAbsences      Absence[]                @relation("AbsenceReviewer")
+  notesReceived         AccountNote[]            @relation("NoteSubject")
+  notesWritten          AccountNote[]            @relation("NoteAuthor")
+  trainingRecords       TrainingRecord[]         @relation("TrainingLearner")
+  trainingsValidated    TrainingRecord[]         @relation("TrainingValidator")
+  academyJuniors        AcademyJunior[]          @relation("AcademyJunior")
+  legacyTracks          LegacyTrack[]            @relation("LegacyMember")
+  legacyDecisions       LegacyTrack[]            @relation("LegacyDecider")
+  legacyGrades          LegacyModuleResult[]     @relation("LegacyGrader")
+  academyTrainees       AcademyJunior[]          @relation("AcademyJuniorTrainer")
+  academySeats          AcademySessionTrainer[]  @relation("AcademyTrainer")
+  academySteps          AcademyStep[]            @relation("AcademyStepAuthor")
+  academyStepsValidated AcademyStep[]            @relation("AcademyStepValidator")
+  integrationInvites    IntegrationInvite[]      @relation("IntegrationInviteCreatedBy")
+  integrationClaims     IntegrationClaim[]       @relation("IntegrationClaimAccount")
   quizAnswers           JuniorAnswer[]
-  academyReviews        AcademyReview[]         @relation("AcademyReviewAuthor")
-  academyReviewsDecided AcademyReview[]         @relation("AcademyReviewDecider")
-  juniorSkillsGraded    JuniorSkill[]           @relation("JuniorSkillValidator")
-  juniorNotesWritten    JuniorNote[]            @relation("JuniorNoteAuthor")
-  juniorObjectivesSet   JuniorObjective[]       @relation("JuniorObjectiveAuthor")
-  calendarEvents        CalendarEvent[]         @relation("CalendarOwner")
+  academyReviews        AcademyReview[]          @relation("AcademyReviewAuthor")
+  academyReviewsDecided AcademyReview[]          @relation("AcademyReviewDecider")
+  juniorSkillsGraded    JuniorSkill[]            @relation("JuniorSkillValidator")
+  juniorNotesWritten    JuniorNote[]             @relation("JuniorNoteAuthor")
+  juniorObjectivesSet   JuniorObjective[]        @relation("JuniorObjectiveAuthor")
+  calendarEvents        CalendarEvent[]          @relation("CalendarOwner")
   eventAttendances      EventAttendance[]
-  ledTeams              Team[]                  @relation("TeamLead")
+  ledTeams              Team[]                   @relation("TeamLead")
   teamMemberships       TeamMember[]
   projectLeads          ProjectLead[]
   projectAssists        ProjectAssistant[]
-  ownedTasks            Task[]                  @relation("TaskOwner")
+  ownedTasks            Task[]                   @relation("TaskOwner")
   meetingSeats          MeetingAttendee[]
-  projectsOpened        Project[]               @relation("ProjectAuthor")
-  projectsEdited        Project[]               @relation("ProjectEditor")
-  tasksOpened           Task[]                  @relation("TaskAuthor")
-  tasksEdited           Task[]                  @relation("TaskEditor")
-  meetingsPlanned       Meeting[]               @relation("MeetingAuthor")
-  meetingsEdited        Meeting[]               @relation("MeetingEditor")
+  projectsOpened        Project[]                @relation("ProjectAuthor")
+  projectsEdited        Project[]                @relation("ProjectEditor")
+  tasksOpened           Task[]                   @relation("TaskAuthor")
+  tasksEdited           Task[]                   @relation("TaskEditor")
+  meetingsPlanned       Meeting[]                @relation("MeetingAuthor")
+  meetingsEdited        Meeting[]                @relation("MeetingEditor")
   communications        Communication[]
   liveconChanges        LiveconEntry[]
-  activityAsSubject     ActivityLog[]           @relation("LogSubject")
-  activityAsActor       ActivityLog[]           @relation("LogActor")
-  notificationsReceived Notification[]          @relation("NotificationRecipient")
-  notificationsCaused   Notification[]          @relation("NotificationActor")
-  recruitmentInterviews RecruitmentCandidate[]  @relation("RecruitmentRecruiter")
-  recruitmentSeats      RecruitmentSpectator[]  @relation("RecruitmentSpectator")
+  activityAsSubject     ActivityLog[]            @relation("LogSubject")
+  activityAsActor       ActivityLog[]            @relation("LogActor")
+  notificationsReceived Notification[]           @relation("NotificationRecipient")
+  notificationsCaused   Notification[]           @relation("NotificationActor")
+  recruitmentInterviews RecruitmentCandidate[]   @relation("RecruitmentRecruiter")
+  recruitmentSeats      RecruitmentSpectator[]   @relation("RecruitmentSpectator")
   recruitmentLeads      RecruitmentResponsable[] @relation("RecruitmentResponsable")
-  recruitmentComments   RecruitmentComment[]    @relation("RecruitmentCommentAuthor")
+  recruitmentComments   RecruitmentComment[]     @relation("RecruitmentCommentAuthor")
 
   @@index([role])
   @@index([status])
@@ -284,13 +309,13 @@ model Account {
 
 // Signed cookie handle of an open session
 model Session {
-  id         String   @id @default(cuid())
-  token      String   @unique
+  id         String    @id @default(cuid())
+  token      String    @unique
   accountId  String
   userAgent  String?
   address    String?
-  createdAt  DateTime @default(now())
-  lastUsedAt DateTime @default(now())
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime  @default(now())
   expiresAt  DateTime
   unsealedAt DateTime?
 
@@ -300,7 +325,6 @@ model Session {
   @@index([expiresAt])
   @@map("sessions")
 }
-
 
 // Second factor of one member, its secret encrypted at rest like every other stored secret
 model TwoFactorCredential {
@@ -356,21 +380,29 @@ model AccountPermission {
   accountId  String
   permission String
   effect     PermissionEffect @default(ALLOW)
+  youtuberId String?
   createdAt  DateTime         @default(now())
 
-  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account  Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  youtuber Youtuber? @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
 
-  @@unique([accountId, permission])
+  @@index([accountId, youtuberId])
+  @@index([youtuberId])
   @@map("account_permissions")
 }
 
 // Permissions attached to a hierarchy level
 model RolePermission {
-  id         String     @id @default(cuid())
+  id         String           @id @default(cuid())
   role       MemberRole
   permission String
+  effect     PermissionEffect @default(ALLOW)
+  youtuberId String?
 
-  @@unique([role, permission])
+  youtuber Youtuber? @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+
+  @@index([role, youtuberId])
+  @@index([youtuberId])
   @@map("role_permissions")
 }
 
@@ -382,15 +414,43 @@ model GrantMigration {
   @@map("grant_migrations")
 }
 
-// Extra permissions carried by a moderation function
-model FunctionPermission {
-  id         String @id @default(cuid())
-  functionId String
-  permission String
+// Colour and glyph override of a hierarchy level, edited from the access console
+model RoleAppearance {
+  role   MemberRole @id
+  accent String?
+  icon   String?
 
+  @@map("role_appearances")
+}
+
+// Extra permissions carried by a moderation function
+// Function held by an account, as many primary and secondary ones as it carries
+model AccountFunction {
+  id         String   @id @default(cuid())
+  accountId  String
+  functionId String
+  createdAt  DateTime @default(now())
+
+  account     Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
   jobFunction JobFunction @relation(fields: [functionId], references: [id], onDelete: Cascade)
 
-  @@unique([functionId, permission])
+  @@unique([accountId, functionId])
+  @@index([functionId])
+  @@map("account_functions")
+}
+
+model FunctionPermission {
+  id         String           @id @default(cuid())
+  functionId String
+  permission String
+  effect     PermissionEffect @default(ALLOW)
+  youtuberId String?
+
+  jobFunction JobFunction @relation(fields: [functionId], references: [id], onDelete: Cascade)
+  youtuber    Youtuber?   @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+
+  @@index([functionId, youtuberId])
+  @@index([youtuberId])
   @@map("function_permissions")
 }
 
@@ -407,21 +467,25 @@ model Youtuber {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  accounts         Account[]
-  leads            YoutuberLead[]
-  functions        YoutuberFunction[]
-  teams            Team[]
-  projects         Project[]
-  tasks            Task[]
-  meetings         Meeting[]
-  liveconEntries   LiveconEntry[]
-  calendarEvents   CalendarEvent[]
-  sanctionOffenses SanctionOffense[]
+  accounts            Account[]
+  leads               YoutuberLead[]
+  functions           YoutuberFunction[]
+  rolePermissions     RolePermission[]
+  functionPermissions FunctionPermission[]
+  accountPermissions  AccountPermission[]
+  teams               Team[]
+  projects            Project[]
+  tasks               Task[]
+  meetings            Meeting[]
+  liveconEntries      LiveconEntry[]
+  calendarEvents      CalendarEvent[]
+  sanctionOffenses    SanctionOffense[]
 
   recruitmentSessions      RecruitmentSession[]
   recruitmentQuestions     RecruitmentQuestion[]
   recruitmentStepTemplates RecruitmentStepTemplate[]
   integrationInvites       IntegrationInvite[]
+  discordAnchors           DiscordAnchor[]
 
   @@index([archived])
   @@map("youtubers")
@@ -442,7 +506,6 @@ model YoutuberFunction {
   @@index([functionId])
   @@map("youtuber_functions")
 }
-
 
 // Responsable anchored on one creator, optionally narrowed to one of its teams. Only an
 // administrator writes this row — it is what a responsable's whole perimeter is read from
@@ -465,16 +528,16 @@ model YoutuberLead {
 
 // Gamification tier, Junior then the three squads
 model Division {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  glyph     String?
-  imagePath String?
-  summary   String?
-  rank      Int      @unique
+  id             String   @id @default(cuid())
+  name           String   @unique
+  glyph          String?
+  imagePath      String?
+  summary        String?
+  rank           Int      @unique
   // Cleared, only an administrator may put a member in this division
-  leadAssignable Boolean @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  leadAssignable Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   accounts Account[]
 
@@ -483,18 +546,20 @@ model Division {
 
 // Moderation post held by a member
 model JobFunction {
-  id        String       @id @default(cuid())
-  name      String       @unique
-  kind      FunctionKind @default(PRIMARY)
+  id        String         @id @default(cuid())
+  name      String         @unique
+  kind      FunctionKind   @default(PRIMARY)
+  category  AccessCategory @default(MODERATION)
+  icon      String?
   summary   String?
   accent    String?
-  position  Int          @default(0)
-  archived  Boolean      @default(false)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  position  Int            @default(0)
+  archived  Boolean        @default(false)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
-  primaryHolders   Account[]            @relation("PrimaryFunction")
-  secondaryHolders Account[]            @relation("SecondaryFunction")
+  holders          AccountFunction[]
+  legacyTracks     LegacyTrack[]
   permissions      FunctionPermission[]
   trainings        Training[]
   skills           Skill[]
@@ -508,6 +573,7 @@ model JobFunction {
   integrationInvites       IntegrationInvite[]
 
   @@index([kind])
+  @@index([category])
   @@map("job_functions")
 }
 
@@ -723,7 +789,7 @@ model Task {
 
 // Scheduled gathering around a project
 model Meeting {
-  id           String   @id @default(cuid())
+  id           String          @id @default(cuid())
   title        String
   emoji        String?
   introduction String?
@@ -731,14 +797,15 @@ model Meeting {
   minutes      String?
   scheduledAt  DateTime
   durationMin  Int?
+  audience     MeetingAudience @default(CUSTOM)
   stateId      String?
   youtuberId   String?
   projectId    String?
   createdById  String?
   updatedById  String?
-  position     Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  position     Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 
   createdBy Account? @relation("MeetingAuthor", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy Account? @relation("MeetingEditor", fields: [updatedById], references: [id], onDelete: SetNull)
@@ -756,7 +823,7 @@ model Meeting {
   @@map("meetings")
 }
 
-// Point covered during a meeting, its emoji drawn before its title
+// Point covered during a meeting
 model MeetingTopic {
   id        String   @id @default(cuid())
   meetingId String
@@ -953,6 +1020,12 @@ model PimStepTemplate {
   anchor       StepAnchor
   offset       Int
   owner        StepOwner
+  // Glyph drawn on the timeline
+  icon         String?
+  // Walkthrough the owner follows, markdown
+  guide        String?
+  // Destination key declared in code, where the owner acts
+  destination  String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
@@ -967,16 +1040,18 @@ model PimStepTemplate {
 
 // Course a junior must clear during the academy
 model Training {
-  id           String         @id @default(cuid())
-  name         String         @unique
-  summary      String?
-  period       AcademyPeriod?
-  mandatory    Boolean        @default(false)
-  functionId   String?
-  dispositifId String?
-  position     Int            @default(0)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  id            String         @id @default(cuid())
+  name          String         @unique
+  // Interactive course written in code, empty for a course edited from the console
+  curriculumKey String?        @unique
+  summary       String?
+  period        AcademyPeriod?
+  mandatory     Boolean        @default(false)
+  functionId    String?
+  dispositifId  String?
+  position      Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   jobFunction JobFunction?      @relation(fields: [functionId], references: [id], onDelete: SetNull)
   dispositif  Dispositif?       @relation(fields: [dispositifId], references: [id], onDelete: SetNull)
@@ -1085,6 +1160,8 @@ model TrainingRecord {
   abandonedAt DateTime?
   juniorId    String?
   note        String?
+  // Answer and score of each exercise of an interactive course
+  progress    Json?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
@@ -1191,7 +1268,12 @@ model AcademyJunior {
   sessionId    String
   accountId    String
   trainerId    String?
-  dispositifId String
+  // Chosen by the junior on the integration form, empty until then
+  dispositifId String?
+  // Application this seat was admitted from
+  candidateId  String?             @unique
+  // Integration form answered, the pre-generated file confirmed
+  confirmedAt  DateTime?
   status       AcademyJuniorStatus @default(ACTIVE)
   stage        AcademyStage        @default(PREPARATION)
   startedAt    DateTime            @default(now())
@@ -1202,10 +1284,11 @@ model AcademyJunior {
   createdAt    DateTime            @default(now())
   updatedAt    DateTime            @updatedAt
 
-  session    AcademySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  account    Account        @relation("AcademyJunior", fields: [accountId], references: [id], onDelete: Cascade)
-  trainer    Account?       @relation("AcademyJuniorTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
-  dispositif Dispositif     @relation(fields: [dispositifId], references: [id], onDelete: Restrict)
+  session    AcademySession        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account    Account               @relation("AcademyJunior", fields: [accountId], references: [id], onDelete: Cascade)
+  trainer    Account?              @relation("AcademyJuniorTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
+  dispositif Dispositif?           @relation(fields: [dispositifId], references: [id], onDelete: Restrict)
+  candidate  RecruitmentCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
 
   steps           AcademyStep[]
   reviews         AcademyReview[]
@@ -1361,30 +1444,30 @@ model EventTemplate {
 
 // Anything planned on the shared calendar
 model CalendarEvent {
-  id          String           @id @default(cuid())
-  title       String
-  emoji       String?
-  description String?
-  kind        CalendarKind     @default(EVENT)
-  templateId  String?
-  accent      String?
-  ownerId     String?
-  accountId   String?
-  youtuberId  String?
-  projectId   String?
-  meetingId   String?
-  sessionId   String?
-  startsAt    DateTime
-  endsAt      DateTime?
-  allDay      Boolean          @default(false)
-  visibility  EventVisibility?
-  rollCall        Boolean      @default(false)
-  rosterShared    Boolean      @default(false)
-  rollCallTeamIds String[]     @default([])
+  id              String           @id @default(cuid())
+  title           String
+  emoji           String?
+  description     String?
+  kind            CalendarKind     @default(EVENT)
+  templateId      String?
+  accent          String?
+  ownerId         String?
+  accountId       String?
+  youtuberId      String?
+  projectId       String?
+  meetingId       String?
+  sessionId       String?
+  startsAt        DateTime
+  endsAt          DateTime?
+  allDay          Boolean          @default(false)
+  visibility      EventVisibility?
+  rollCall        Boolean          @default(false)
+  rosterShared    Boolean          @default(false)
+  rollCallTeamIds String[]         @default([])
   remindAt        DateTime?
   remindedAt      DateTime?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   attendances EventAttendance[]
 
@@ -1428,14 +1511,17 @@ model LiveconLevel {
   id         String   @id @default(cuid())
   level      Int      @unique
   name       String
+  // Glyph key drawn wherever the level shows
+  icon       String?
   summary    String?
   guidelines String?
   accent     String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  entries       LiveconEntry[]
-  sanctionTiers SanctionTier[]
+  entries           LiveconEntry[]
+  sanctionTiers     SanctionTier[]
+  sanctionGravities SanctionOffenseLevel[]
 
   @@map("livecon_levels")
 }
@@ -1524,6 +1610,23 @@ enum SanctionKind {
   WARN
   TIMEOUT
   BAN
+  NONE
+  COMMENT
+  REPORT
+}
+
+// Surface a panel moderates, each with its own tools and commands
+enum SanctionPanel {
+  TWITCH
+  YOUTUBE
+  DISCORD
+}
+
+// Weight of an offence inside one livecon level
+enum SanctionGravity {
+  LOW
+  MEDIUM
+  HIGH
 }
 
 // Measure applied at one offence tier
@@ -1540,7 +1643,7 @@ model SanctionMeasure {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
-  tiers SanctionTier[]
+  tiers SanctionTierMeasure[]
 
   @@index([weight])
   @@map("sanction_measures")
@@ -1548,42 +1651,76 @@ model SanctionMeasure {
 
 // Offence listed on one creator panel
 model SanctionOffense {
-  id             String   @id @default(cuid())
-  youtuberId     String
-  name           String
-  summary        String?
-  example        String?
-  warningExample String?
-  accent         String?
-  position       Int      @default(0)
-  archived       Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id               String        @id @default(cuid())
+  youtuberId       String
+  panel            SanctionPanel @default(TWITCH)
+  name             String
+  summary          String?
+  // One case per line
+  example          String?
+  // What looks close but is left alone, one case per line
+  toleratedExample String?
+  warningExample   String?
+  accent           String?
+  position         Int           @default(0)
+  archived         Boolean       @default(false)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
-  youtuber Youtuber       @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  youtuber Youtuber               @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
   tiers    SanctionTier[]
+  levels   SanctionOffenseLevel[]
 
-  @@unique([youtuberId, name])
-  @@index([youtuberId, position])
+  @@unique([youtuberId, panel, name])
+  @@index([youtuberId, panel, position])
   @@map("sanction_offenses")
 }
 
-// Graduated step of one offence inside one livecon panel
+// Gravity of one offence inside one livecon level
+model SanctionOffenseLevel {
+  id        String          @id @default(cuid())
+  offenseId String
+  levelId   String
+  gravity   SanctionGravity @default(LOW)
+
+  offense SanctionOffense @relation(fields: [offenseId], references: [id], onDelete: Cascade)
+  level   LiveconLevel    @relation(fields: [levelId], references: [id], onDelete: Cascade)
+
+  @@unique([offenseId, levelId])
+  @@index([levelId])
+  @@map("sanction_offense_levels")
+}
+
+// Graduated step of one offence inside one livecon panel, its condition naming when it applies
 model SanctionTier {
   id        String  @id @default(cuid())
   offenseId String
   levelId   String
   step      Int
-  measureId String
+  // Condition, « Dès constaté », « Si récidive »...
   note      String?
 
-  offense SanctionOffense @relation(fields: [offenseId], references: [id], onDelete: Cascade)
-  level   LiveconLevel    @relation(fields: [levelId], references: [id], onDelete: Cascade)
-  measure SanctionMeasure @relation(fields: [measureId], references: [id], onDelete: Restrict)
+  offense  SanctionOffense       @relation(fields: [offenseId], references: [id], onDelete: Cascade)
+  level    LiveconLevel          @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  measures SanctionTierMeasure[]
 
   @@unique([offenseId, levelId, step])
   @@index([levelId])
   @@map("sanction_tiers")
+}
+
+// Measure applied together with the others of one step
+model SanctionTierMeasure {
+  tierId    String
+  measureId String
+  position  Int    @default(0)
+
+  tier    SanctionTier    @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  measure SanctionMeasure @relation(fields: [measureId], references: [id], onDelete: Restrict)
+
+  @@id([tierId, measureId])
+  @@index([measureId])
+  @@map("sanction_tier_measures")
 }
 
 // Phase a recruitment campaign sits in
@@ -1651,6 +1788,8 @@ model RecruitmentCandidate {
   id          String    @id @default(cuid())
   sessionId   String
   discordId   String
+  // Pseudonym known at application time, seeds the pre-generated file
+  displayName String?
   formId      String?
   recruiterId String?
   outcomeId   String?
@@ -1666,6 +1805,7 @@ model RecruitmentCandidate {
   outcome    RecruitmentOutcome?    @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
   spectators RecruitmentSpectator[]
   comments   RecruitmentComment[]
+  admission  AcademyJunior?
 
   @@unique([sessionId, discordId])
   @@index([discordId])
@@ -1709,6 +1849,8 @@ model RecruitmentOutcome {
   position   Int      @default(0)
   isDefault  Boolean  @default(false)
   isTerminal Boolean  @default(false)
+  // Landing here admits the candidate into the promotion
+  admits     Boolean  @default(false)
   archived   Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -1785,4 +1927,80 @@ model RecruitmentStep {
 
   @@index([sessionId, position])
   @@map("recruitment_steps")
+}
+
+// Role or channel of a creator's Discord an announcement may mention
+model DiscordAnchor {
+  id         String            @id @default(cuid())
+  youtuberId String?
+  kind       DiscordAnchorKind
+  name       String
+  discordId  String
+  accent     String?
+  position   Int               @default(0)
+  archived   Boolean           @default(false)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  youtuber Youtuber? @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+
+  @@unique([youtuberId, kind, discordId])
+  @@index([youtuberId, kind])
+  @@map("discord_anchors")
+}
+
+// Where a Legacy track stands
+enum LegacyStatus {
+  RUNNING
+  PASSED
+  FAILED
+  CANCELLED
+}
+
+// Training of a moderator toward the Responsable role, led on the trade they already work
+model LegacyTrack {
+  id          String       @id @default(cuid())
+  accountId   String
+  // Trade the future Responsable will lead, deciding which modules they follow
+  functionId  String?
+  startsAt    DateTime
+  endsAt      DateTime
+  status      LegacyStatus @default(RUNNING)
+  decidedById String?
+  decidedAt   DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  account     Account      @relation("LegacyMember", fields: [accountId], references: [id], onDelete: Cascade)
+  jobFunction JobFunction? @relation(fields: [functionId], references: [id], onDelete: SetNull)
+  decidedBy   Account?     @relation("LegacyDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+
+  results LegacyModuleResult[]
+
+  @@index([accountId, status])
+  @@index([status, endsAt])
+  @@map("legacy_tracks")
+}
+
+// One module of a Legacy track: what the exercises earned, what the evaluator gave, the total
+model LegacyModuleResult {
+  id             String    @id @default(cuid())
+  trackId        String
+  moduleKey      String
+  // Saved exercises, same shape as an interactive course
+  progress       Json?
+  autoScore      Int       @default(0)
+  evaluatorScore Int?
+  total          Int       @default(0)
+  passed         Boolean   @default(false)
+  gradedById     String?
+  gradedAt       DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  track    LegacyTrack @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  gradedBy Account?    @relation("LegacyGrader", fields: [gradedById], references: [id], onDelete: SetNull)
+
+  @@unique([trackId, moduleKey])
+  @@map("legacy_module_results")
 }
