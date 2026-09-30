@@ -427,6 +427,23 @@ export const SEGMENT_LABELS: Record<string, string> = {
 }
 
 /**
+ * Stand-in for a record until its name loads, keyed by the segment above it
+ * @type {Record<string, string>}
+ */
+
+export const RECORD_LABELS: Record<string, string> = {
+  moderateurs: 'Fiche',
+  projets: 'Projet',
+  taches: 'Tâche',
+  reunions: 'Réunion',
+  academy: 'Session',
+  formations: 'Cours',
+  legacy: 'Parcours',
+  recrutements: 'Session',
+  youtubeurs: 'YouTubeur',
+}
+
+/**
  * Nav groups reachable in a view
  * @param {NavigationViewName} view - Rail view on screen
  * @param {Object} member - Signed-in member

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { TaskFile } from '@/composites/work/TaskFile'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
 import { readTask, taskFields } from '@/core/services/work/TaskService'
@@ -53,6 +54,7 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className={PAGE_STYLES.wrapper}>
+      <BreadcrumbLabel label={task.title} />
       <TaskFile
         task={task}
         fields={fields}

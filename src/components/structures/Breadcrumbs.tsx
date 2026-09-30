@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { APP_SHELL } from '@/declarations/ui/blocks'
-import { SEGMENT_LABELS } from '@/declarations/navigation'
+import { RECORD_LABELS, SEGMENT_LABELS } from '@/declarations/navigation'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { useBreadcrumbOverrides } from '@/managers/front-end'
 
@@ -25,7 +25,10 @@ export const Breadcrumbs = () => {
   const crumbs = segments.map((segment, index) => {
     const href = `/${segments.slice(0, index + 1).join('/')}`
 
-    return { href, label: overrides[href] ?? SEGMENT_LABELS[segment] ?? segment }
+    // A raw segment is a record identifier, never shown
+    const stand = RECORD_LABELS[segments[index - 1]] ?? NAV_COPY.crumbRecord
+
+    return { href, label: overrides[href] ?? SEGMENT_LABELS[segment] ?? stand }
   })
 
   const Separator = ICONS.next

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { ProjectFileTabs } from '@/composites/work/ProjectFileTabs'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
 import { meetingFields } from '@/core/services/work/MeetingService'
@@ -63,6 +64,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className={PAGE_STYLES.wrapper}>
+      <BreadcrumbLabel label={detail.summary.title} />
       <ProjectFileTabs
         detail={detail}
         projectFields={projectForm}

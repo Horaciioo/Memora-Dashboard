@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { InfoHint } from '@/components/elements/feedback/InfoHint'
+import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 
 export interface PageHeaderProps {
@@ -23,6 +24,7 @@ export interface PageHeaderProps {
 
 export const PageHeader = ({ eyebrow, title, lead, actions }: PageHeaderProps) => (
   <header className={PAGE_STYLES.header}>
+    <BreadcrumbLabel label={title} />
     <div className={PAGE_STYLES.titleRail}>
       <span className={PAGE_STYLES.titleSlopeStart} aria-hidden="true" />
       <h1 className={PAGE_STYLES.titleTab} title={title}>

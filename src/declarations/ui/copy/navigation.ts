@@ -5,6 +5,7 @@
 
 export const NAV_COPY = {
   breadcrumbs: 'Fil d’Ariane',
+  crumbRecord: 'Fiche',
   sidebar: 'Navigation principale',
   account: 'Mon compte',
   searchPlaceholder: 'Rechercher…',
