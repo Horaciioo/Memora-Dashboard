@@ -325,11 +325,7 @@ body {
   inset: -100vmax;
   border: 100vmax solid transparent;
   border-radius: calc(100vmax + var(--radius-xl));
-  background:
-    var(--pattern-frame-top) top / 36px 180px repeat-x border-box fixed,
-    var(--pattern-frame-bottom) bottom / 36px 180px repeat-x border-box fixed,
-    var(--pattern-frame) center / cover no-repeat border-box fixed,
-    var(--gradient-frame) border-box fixed;
+  background: var(--gradient-frame) border-box fixed;
   -webkit-mask:
     linear-gradient(#000 0 0) padding-box,
     linear-gradient(#000 0 0);
@@ -362,11 +358,7 @@ body {
   .title-tab-end,
   .title-tab-body {
     height: var(--shell-title-tab-h);
-    background:
-      var(--pattern-frame-top) top / 36px 180px repeat-x fixed,
-      var(--pattern-frame-bottom) bottom / 36px 180px repeat-x fixed,
-      var(--pattern-frame) center / cover no-repeat fixed,
-      var(--gradient-frame) fixed;
+    background: var(--gradient-frame) fixed;
   }
 
   .title-tab-start,
