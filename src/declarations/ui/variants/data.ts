@@ -65,6 +65,10 @@ export const RECORD_ROW = {
 export const CALENDAR_SIDEBAR = {
   layout: 'grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start',
   rail: 'flex flex-col gap-8 lg:sticky lg:top-4',
+  // Below lg the rail folds behind one button
+  railBody: 'flex-col gap-8 lg:flex',
+  toggle:
+    'flex w-full items-center justify-between rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-3 text-sm font-semibold lg:hidden',
   mini: 'flex flex-col gap-2',
   miniHead: 'flex items-center justify-between gap-2',
   miniTitle: 'pl-2 text-sm font-extrabold first-letter:uppercase',
@@ -255,10 +259,11 @@ export const CALENDAR_STYLES = {
   entry:
     'relative flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
   // Month entry, a coloured bullet ahead of its words
-  line: 'relative flex w-full cursor-grab items-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-left text-xs transition-colors hover:bg-[var(--color-hover)] active:cursor-grabbing',
+  line: 'relative flex w-full cursor-grab items-center justify-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-left sm:justify-start text-xs transition-colors hover:bg-[var(--color-hover)] active:cursor-grabbing',
   lineBullet: 'h-2.5 w-2.5 shrink-0',
-  lineTime: 'shrink-0 tabular-nums text-[var(--color-ink-subtle)]',
-  lineTitle: 'min-w-0 flex-1 truncate font-semibold',
+  // Phones keep the bullet alone, the words come back from sm
+  lineTime: 'hidden shrink-0 tabular-nums text-[var(--color-ink-subtle)] sm:inline',
+  lineTitle: 'hidden min-w-0 flex-1 truncate font-semibold sm:block',
   lineMuted: 'text-[var(--color-ink-subtle)]',
   entryTime: 'shrink-0 tabular-nums opacity-70',
   // A long title wraps onto the next line rather than losing its end

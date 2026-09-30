@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { CalendarMiniMonth } from '@/composites/calendar/CalendarMiniMonth'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
@@ -55,7 +56,35 @@ const TickBox = ({ accent, on }: { accent: string | undefined; on: boolean }) =>
  * @return {JSX.Element}
  */
 
-export const CalendarSidebar = ({
+export const CalendarSidebar = (props: CalendarSidebarProps) => {
+  const [isOpen, setOpen] = useState(false)
+  const Chevron = ICONS.expand
+
+  return (
+    <aside className={CALENDAR_SIDEBAR.rail}>
+      <button
+        type="button"
+        aria-expanded={isOpen}
+        onClick={() => setOpen(!isOpen)}
+        className={CALENDAR_SIDEBAR.toggle}
+      >
+        {CALENDAR_COPY.sidebarToggle}
+        <Chevron className={cn('h-4 w-4', isOpen && 'rotate-180')} aria-hidden="true" />
+      </button>
+      <div className={cn(CALENDAR_SIDEBAR.railBody, isOpen ? 'flex' : 'hidden')}>
+        <CalendarRail {...props} />
+      </div>
+    </aside>
+  )
+}
+
+/**
+ * Month in miniature then the switches, the body of the side rail
+ * @param {CalendarSidebarProps} props - Cursor, filters and their handlers
+ * @return {JSX.Element}
+ */
+
+const CalendarRail = ({
   cursor,
   onPick,
   onCursor,
@@ -68,7 +97,7 @@ export const CalendarSidebar = ({
   hiddenCreators,
   onToggleCreator,
 }: CalendarSidebarProps) => (
-  <aside className={CALENDAR_SIDEBAR.rail}>
+  <>
     <CalendarMiniMonth cursor={cursor} onPick={onPick} onCursor={onCursor} />
 
     <input
@@ -128,5 +157,5 @@ export const CalendarSidebar = ({
         })}
       </div>
     )}
-  </aside>
+  </>
 )

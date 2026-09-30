@@ -38,6 +38,7 @@ export const CALENDAR_COPY = {
   deleteManyDescription: 'Ils disparaissent du calendrier de tout le monde.',
   readOnlyNotice: 'Cet élément vient d’un autre écran, il se modifie là-bas.',
   // Sidebar
+  sidebarToggle: 'Calendriers et filtres',
   sidebarLayers: 'Calendriers',
   sidebarCreators: 'YouTubeurs',
   search: 'Chercher un évènement',
