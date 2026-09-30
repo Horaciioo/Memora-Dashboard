@@ -95,7 +95,7 @@ export const MEMBER_FIELD_COPY = {
   email: 'Mail',
   phone: 'Téléphone',
   birthday: 'Date d’anniversaire',
-  celebrateBirthday: 'Il veut que son anniversaire soit fêté',
+  celebrateBirthday: 'Souhaite être fêté',
   languages: 'Langues',
   timezone: 'Fuseau horaire',
   joinedAt: 'Date d’arrivée',
