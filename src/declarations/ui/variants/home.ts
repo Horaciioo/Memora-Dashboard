@@ -35,5 +35,6 @@ export const HOME_STYLES = {
   chipIcon: 'h-5 w-5',
   more: 'self-start rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   quiet: 'px-3 text-sm text-[var(--color-ink-subtle)]',
+  chevron: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
   actions: 'flex shrink-0 items-center gap-1',
 } as const

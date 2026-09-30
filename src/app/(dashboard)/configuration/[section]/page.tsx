@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { ReferenceManager } from '@/composites/reference/ReferenceManager'
-import { WorkflowStatesManager } from '@/composites/reference/WorkflowStatesManager'
 import { applyRestrictions } from '@/core/lib/forms/restrictions'
 import { referenceResource } from '@/core/services/reference/ReferenceService'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -57,16 +56,12 @@ export default async function ReferenceSectionPage({
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={meta.label} lead={meta.description} />
-      {section === 'etats' ? (
-        <WorkflowStatesManager fields={editableFields} initialRows={rows} canManage={canManage} />
-      ) : (
-        <ReferenceManager
-          section={meta}
-          fields={editableFields}
-          initialRows={rows}
-          canManage={canManage}
-        />
-      )}
+      <ReferenceManager
+        section={meta}
+        fields={editableFields}
+        initialRows={rows}
+        canManage={canManage}
+      />
     </div>
   )
 }

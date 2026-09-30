@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
-import { ConsoleCard } from '@/composites/system/ConsoleCard'
+import { Section } from '@/components/structures/Section'
+import { ConsoleRow } from '@/composites/system/ConsoleRow'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ROUTES } from '@/declarations/navigation'
 import { REFERENCE_COPY } from '@/declarations/reference/copy'
@@ -9,7 +10,8 @@ import {
   referenceScreensOfGroup,
   referenceSectionsOfGroup,
 } from '@/declarations/reference/sections'
-import { GROUP_STYLES, LIST_STYLES, PAGE_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
+import { GROUP_STYLES, HOME_STYLES, PAGE_STYLES } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: REFERENCE_COPY.title }
@@ -32,13 +34,12 @@ export default async function ConfigurationPage() {
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={REFERENCE_COPY.title} lead={REFERENCE_COPY.lead} />
-      <div className={GROUP_STYLES.ruledStack}>
+      <div className={cn(GROUP_STYLES.spaced, 'mx-auto w-full max-w-3xl')}>
         {groups.map((group) => (
-          <section key={group.label} className={GROUP_STYLES.ruledSection}>
-            <h2 className={SECTION_STYLES.title}>{group.label}</h2>
-            <div className={LIST_STYLES.grid}>
+          <Section key={group.label} title={group.label} bare>
+            <div className={HOME_STYLES.rows}>
               {group.sections.map((section) => (
-                <ConsoleCard
+                <ConsoleRow
                   key={section.key}
                   href={ROUTES.settingsSection(section.key)}
                   icon={section.icon}
@@ -47,7 +48,7 @@ export default async function ConfigurationPage() {
                 />
               ))}
               {group.screens.map((screen) => (
-                <ConsoleCard
+                <ConsoleRow
                   key={screen.href}
                   href={screen.href}
                   icon={screen.icon}
@@ -56,7 +57,7 @@ export default async function ConfigurationPage() {
                 />
               ))}
             </div>
-          </section>
+          </Section>
         ))}
       </div>
     </div>
