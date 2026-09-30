@@ -26,4 +26,14 @@ export const HOME_STYLES = {
   marker: `flex shrink-0 items-center gap-1.5 ${PROPERTY_LABEL}`,
   markerIcon: 'h-3.5 w-3.5',
   empty: 'px-4 py-6 text-sm text-[var(--color-ink-subtle)] italic',
+  // Rows without a frame, the list simply breathes
+  rows: 'flex flex-col gap-1',
+  line: 'flex w-full items-center gap-4 rounded-[var(--radius-lg)] px-3 py-3 text-left transition-colors',
+  lineLink:
+    'cursor-pointer hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
+  chip: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-100)] text-[var(--color-brand-700)]',
+  chipIcon: 'h-5 w-5',
+  more: 'self-start rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  quiet: 'px-3 text-sm text-[var(--color-ink-subtle)]',
+  actions: 'flex shrink-0 items-center gap-1',
 } as const

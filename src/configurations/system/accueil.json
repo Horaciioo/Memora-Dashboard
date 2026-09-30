@@ -2,5 +2,6 @@
   "birthdayWindowDays": 30,
   "birthdayMax": 8,
   "meetingWindowDays": 21,
-  "meetingMax": 6
+  "meetingMax": 6,
+  "taskMax": 5
 }

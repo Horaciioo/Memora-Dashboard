@@ -33,6 +33,8 @@ export const ABSENCE_COPY = {
   dayOne: 'jour',
   pendingCount: 'en attente',
   noPendingTitle: 'Rien à traiter',
+  showAll: 'Voir toutes les demandes',
+  showLess: 'Réduire',
   noPendingDescription: 'Toutes les demandes de tes équipes sont traitées.',
 } as const
 

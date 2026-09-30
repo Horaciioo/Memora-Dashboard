@@ -1012,4 +1012,9 @@ export const HOME_SETTINGS = {
     fallback: 6,
     min: 1,
   }),
+  taskMax: readInteger(home.taskMax, {
+    path: 'system/accueil.taskMax',
+    fallback: 5,
+    min: 1,
+  }),
 }

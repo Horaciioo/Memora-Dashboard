@@ -24,18 +24,18 @@ export const HomeBirthdays = ({ items }: HomeBirthdaysProps) => {
   const today = new Date()
 
   return (
-    <Section title={PERSONAL_COPY.birthdaysTitle}>
+    <Section title={PERSONAL_COPY.birthdaysTitle} bare>
       {items.length === 0 ? (
-        <p className={HOME_STYLES.empty}>{PERSONAL_COPY.birthdaysEmpty}</p>
+        <p className={HOME_STYLES.quiet}>{PERSONAL_COPY.birthdaysEmpty}</p>
       ) : (
-        <ul className={HOME_STYLES.list}>
+        <ul className={HOME_STYLES.rows}>
           {items.map((item) => {
             const isToday = isSameDay(parseDay(item.day), today)
 
             return (
               <li
                 key={`${item.accountId}:${item.day}`}
-                className={cn(HOME_STYLES.row, isToday && HOME_STYLES.rowToday)}
+                className={cn(HOME_STYLES.line, isToday && HOME_STYLES.rowToday)}
               >
                 <DayStamp date={item.day} />
                 <Avatar name={item.displayName} src={item.avatarUrl} size="sm" />

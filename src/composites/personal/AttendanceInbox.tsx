@@ -1,12 +1,14 @@
 import Link from 'next/link'
 
-import { Badge } from '@/components/elements/display/Badge'
+import { StatusText } from '@/components/elements/display/StatusText'
 import { Glyph } from '@/components/elements/display/Glyph'
 import { Section } from '@/components/structures/Section'
 import { ATTENDANCE_STATUS_REGISTRY } from '@/declarations/calendar/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import type { PendingRollCall } from '@/core/services/calendar/attendance'
+import { HOME_STYLES } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 import { formatDayTime } from '@/utils/format/dates'
 
 export interface AttendanceInboxProps {
@@ -21,8 +23,8 @@ export interface AttendanceInboxProps {
  */
 
 export const AttendanceInbox = ({ items }: AttendanceInboxProps) => (
-  <Section title={PERSONAL_COPY.attendanceTitle} description={PERSONAL_COPY.attendanceLead}>
-    <ul className="flex flex-col gap-2">
+  <Section title={PERSONAL_COPY.attendanceTitle} bare>
+    <ul className={HOME_STYLES.rows}>
       {items.map((item) => {
         const status = ATTENDANCE_STATUS_REGISTRY.get(item.status)
 
@@ -30,16 +32,16 @@ export const AttendanceInbox = ({ items }: AttendanceInboxProps) => (
           <li key={item.eventId}>
             <Link
               href={ROUTES.calendarEvent(item.eventId)}
-              className="flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] px-3 py-2 text-sm transition-colors hover:bg-[var(--color-surface)]"
+              className={cn(HOME_STYLES.line, HOME_STYLES.lineLink)}
             >
-              <Glyph value={item.emoji} size="chip" />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate font-medium">{item.title}</span>
-                <span className="text-xs text-[var(--color-ink-subtle)]">
-                  {formatDayTime(item.startsAt)}
-                </span>
+              <span className={HOME_STYLES.chip}>
+                <Glyph value={item.emoji} size="chip" />
               </span>
-              <Badge label={status.label} tone={status.tone} icon={status.icon} />
+              <span className={HOME_STYLES.rowBody}>
+                <span className={HOME_STYLES.rowTitle}>{item.title}</span>
+                <span className={HOME_STYLES.rowMeta}>{formatDayTime(item.startsAt)}</span>
+              </span>
+              <StatusText label={status.label} accent={status.tone} />
             </Link>
           </li>
         )

@@ -8,10 +8,12 @@ import { DetailGrid } from '@/components/structures/DetailGrid'
 import { Drawer } from '@/components/structures/Drawer'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Section } from '@/components/structures/Section'
+import { HOME_SETTINGS } from '@/declarations/configurations/settings'
 import { PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { HOME_STYLES, TASK_LIST } from '@/declarations/ui/variants'
 import type { HomeTask } from '@/types/personal'
+import { cn } from '@/utils/classnames'
 import { formatDay } from '@/utils/format/dates'
 
 export interface HomeTasksProps {
@@ -27,35 +29,54 @@ export interface HomeTasksProps {
 
 export const HomeTasks = ({ items }: HomeTasksProps) => {
   const [opened, setOpened] = useState<HomeTask | null>(null)
+  const [expanded, setExpanded] = useState(false)
+  const shown = expanded ? items : items.slice(0, HOME_SETTINGS.taskMax)
   const Chevron = ICONS.next
 
   return (
-    <Section title={PERSONAL_TASK_COPY.title}>
+    <Section title={PERSONAL_TASK_COPY.title} bare>
       {items.length === 0 ? (
-        <p className={HOME_STYLES.empty}>{PERSONAL_TASK_COPY.empty}</p>
+        <p className={HOME_STYLES.quiet}>{PERSONAL_TASK_COPY.empty}</p>
       ) : (
-        <ul className={HOME_STYLES.list}>
-          {items.map((task) => {
-            const Icon = ICONS[task.icon]
+        <>
+          <ul className={HOME_STYLES.rows}>
+            {shown.map((task) => {
+              const Icon = ICONS[task.icon]
 
-            return (
-              <li key={task.key}>
-                <button type="button" className={TASK_LIST.row} onClick={() => setOpened(task)}>
-                  <Icon className={TASK_LIST.mark} aria-hidden="true" />
-                  <span className={TASK_LIST.body}>
-                    <span className={TASK_LIST.title}>{task.title}</span>
-                    <span className={TASK_LIST.meta}>
-                      {[task.context, task.dueAt ? formatDay(task.dueAt) : null]
-                        .filter(Boolean)
-                        .join(' · ')}
+              return (
+                <li key={task.key}>
+                  <button
+                    type="button"
+                    className={cn(HOME_STYLES.line, HOME_STYLES.lineLink)}
+                    onClick={() => setOpened(task)}
+                  >
+                    <span className={HOME_STYLES.chip}>
+                      <Icon className={HOME_STYLES.chipIcon} aria-hidden="true" />
                     </span>
-                  </span>
-                  <Chevron className={TASK_LIST.chevron} aria-hidden="true" />
-                </button>
-              </li>
-            )
-          })}
-        </ul>
+                    <span className={TASK_LIST.body}>
+                      <span className={TASK_LIST.title}>{task.title}</span>
+                      <span className={TASK_LIST.meta}>
+                        {[task.context, task.dueAt ? formatDay(task.dueAt) : null]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </span>
+                    </span>
+                    <Chevron className={TASK_LIST.chevron} aria-hidden="true" />
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+          {items.length > HOME_SETTINGS.taskMax && (
+            <button
+              type="button"
+              className={HOME_STYLES.more}
+              onClick={() => setExpanded(!expanded)}
+            >
+              {expanded ? PERSONAL_TASK_COPY.showLess : PERSONAL_TASK_COPY.showAll}
+            </button>
+          )}
+        </>
       )}
 
       {opened && (

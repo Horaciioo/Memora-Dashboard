@@ -40,4 +40,6 @@ export const PERSONAL_TASK_COPY = {
   what: 'Ce qui doit se passer',
   where: 'Où agir',
   due: 'Prévue le',
+  showAll: 'Voir toutes les tâches',
+  showLess: 'Réduire',
 } as const
