@@ -52,6 +52,7 @@ export interface AttendanceRoster {
  * @property {string | null} templateId - Template it was started from
  * @property {string | null} templateName - Template label
  * @property {string | null} accent - Colour of the creator it belongs to
+ * @property {string | null} youtuberId - Creator it belongs to
  * @property {boolean} muted - Drawn in retreat, greyed behind everything else
  * @property {EventVisibilityName} visibility - Who the entry is shown to
  * @property {string} startsAt - ISO start
@@ -80,6 +81,7 @@ export interface CalendarEntry {
   templateId: string | null
   templateName: string | null
   accent: string | null
+  youtuberId: string | null
   muted: boolean
   visibility: EventVisibilityName
   startsAt: string

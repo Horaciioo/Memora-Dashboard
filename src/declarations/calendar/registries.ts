@@ -1,10 +1,18 @@
 import { createRegistry } from '@/core/lib/registry'
 import type { Tone } from '@/declarations/ui/theme'
 import type { IconName } from '@/declarations/ui/icons'
-import { AttendanceStatuses, CalendarKinds, CalendarSources } from '@/utils/constants/workflow'
+import { Permissions } from '@/utils/constants/permissions'
+import type { PermissionName } from '@/utils/constants/permissions'
+import {
+  AttendanceStatuses,
+  CalendarKinds,
+  CalendarLayers,
+  CalendarSources,
+} from '@/utils/constants/workflow'
 import type {
   AttendanceStatusName,
   CalendarKindName,
+  CalendarLayerName,
   CalendarSourceName,
 } from '@/utils/constants/workflow'
 
@@ -78,9 +86,104 @@ const CALENDAR_SOURCE_MAP: Record<CalendarSourceName, CalendarLegendOption> = {
     accent: 'success',
     icon: 'academy',
   },
+  [CalendarSources.AcademySession]: {
+    label: 'Session PIM',
+    summary: 'La durée d’une session de formation.',
+    accent: 'success',
+    icon: 'academy',
+  },
+  [CalendarSources.Recruitment]: {
+    label: 'Session de recrutement',
+    summary: 'La période où une campagne de recrutement est ouverte.',
+    accent: 'brand',
+    icon: 'recruitment',
+  },
+  [CalendarSources.RecruitmentInterview]: {
+    label: 'Entretien',
+    summary: 'Les entretiens posés avec les candidats.',
+    accent: 'brand',
+    icon: 'recruitment',
+  },
 }
 
 export const CALENDAR_SOURCE_REGISTRY = createRegistry(CALENDAR_SOURCE_MAP)
+
+/**
+ * Switchable calendar of the sidebar
+ * @typedef {Object} CalendarLayerOption
+ * @property {string} label - Display label
+ * @property {IconName} icon - Glyph drawn beside it
+ * @property {CalendarSourceName[]} sources - Sources it gathers
+ * @property {PermissionName | null} permission - Needed to see the calendar at all
+ */
+
+interface CalendarLayerOption {
+  label: string
+  icon: IconName
+  sources: CalendarSourceName[]
+  permission: PermissionName | null
+}
+
+const CALENDAR_LAYER_MAP: Record<CalendarLayerName, CalendarLayerOption> = {
+  [CalendarLayers.Events]: {
+    label: 'Évènements',
+    icon: 'spark',
+    sources: [CalendarSources.Entry],
+    permission: null,
+  },
+  [CalendarLayers.Meetings]: {
+    label: 'Réunions',
+    icon: 'meetings',
+    sources: [CalendarSources.Meeting],
+    permission: Permissions.MeetingRead,
+  },
+  [CalendarLayers.Absences]: {
+    label: 'Absences',
+    icon: 'absences',
+    sources: [CalendarSources.Absence],
+    permission: Permissions.AbsenceRead,
+  },
+  [CalendarLayers.Birthdays]: {
+    label: 'Anniversaires',
+    icon: 'birthday',
+    sources: [CalendarSources.Birthday],
+    permission: Permissions.MemberRead,
+  },
+  [CalendarLayers.Academy]: {
+    label: 'Marsha Academy',
+    icon: 'academy',
+    sources: [CalendarSources.AcademySession, CalendarSources.AcademyStep],
+    permission: Permissions.AcademyRead,
+  },
+  [CalendarLayers.Recruitment]: {
+    label: 'Recrutements',
+    icon: 'recruitment',
+    sources: [CalendarSources.Recruitment, CalendarSources.RecruitmentInterview],
+    permission: Permissions.RecruitmentRead,
+  },
+}
+
+export const CALENDAR_LAYER_REGISTRY = createRegistry(CALENDAR_LAYER_MAP)
+
+/**
+ * Colour a calendar wears in the sidebar, the one of its first source
+ * @param {CalendarLayerName} layer - Calendar
+ * @return {string} - Accent token
+ */
+
+export const layerAccent = (layer: CalendarLayerName): string =>
+  CALENDAR_SOURCE_REGISTRY.get(CALENDAR_LAYER_MAP[layer].sources[0]).accent
+
+/**
+ * Calendar an entry belongs to
+ * @param {CalendarSourceName} source - Source the entry was read from
+ * @return {CalendarLayerName} - Layer gathering that source
+ */
+
+export const layerOfSource = (source: CalendarSourceName): CalendarLayerName =>
+  CALENDAR_LAYER_REGISTRY.keys.find((layer) =>
+    CALENDAR_LAYER_MAP[layer].sources.includes(source)
+  ) as CalendarLayerName
 
 /**
  * Roll-call answer as it reads on screen

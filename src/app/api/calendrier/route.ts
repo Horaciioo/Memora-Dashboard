@@ -6,6 +6,7 @@ import {
   calendarFields,
   createEntry,
   listEntries,
+  readCalendarScope,
   removeEntries,
   updateEntries,
 } from '@/core/services/calendar/CalendarService'
@@ -37,7 +38,8 @@ export const GET = createProtectedRoute({
       to: new Date(query.get('fin') ?? ''),
       viewerId: session.id,
       access,
-      scope: await scope(),
+      // A session board keeps its own perimeter, the shared calendar reads every creator
+      scope: query.get('session') ? await scope() : await readCalendarScope(session, access),
       sessionId: query.get('session') ?? undefined,
     }),
 })

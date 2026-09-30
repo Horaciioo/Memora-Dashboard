@@ -37,8 +37,11 @@ export const CALENDAR_COPY = {
   deleteManyTitle: 'Supprimer ces évènements ?',
   deleteManyDescription: 'Ils disparaissent du calendrier de tout le monde.',
   readOnlyNotice: 'Cet élément vient d’un autre écran, il se modifie là-bas.',
-  // Filter bar, absences staying out of the way until they are asked for
+  // Sidebar
+  sidebarLayers: 'Calendriers',
+  sidebarCreators: 'YouTubeurs',
   search: 'Chercher un évènement',
+  // Legacy filter bar, absences staying out of the way until they are asked for
   allSources: 'Toutes les origines',
   filterAbsences: 'Absences',
   absencesHidden: 'Absences masquées',
@@ -141,6 +144,8 @@ export const CALENDAR_PROJECTION_COPY = {
   birthday: 'Anniversaire',
   meeting: 'Réunion',
   pendingAbsence: 'Absence en attente',
+  academySession: 'PIM',
+  interview: 'Entretien',
 } as const
 
 /**

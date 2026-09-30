@@ -2,7 +2,7 @@ import 'server-only'
 
 import { roleGroupedOptions } from '@/core/lib/forms/options'
 import { prisma } from '@/core/lib/db'
-import { scopedWhere } from '@/core/services/auth/ScopeService'
+import { readFullPerimeter, scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { forbidden, notFound } from '@/core/lib/errors'
 import { toOptions } from '@/core/lib/forms/options'
@@ -17,10 +17,12 @@ import {
 } from '@/core/services/calendar/attendance'
 import {
   absenceEntries,
+  academySessionEntries,
   academyStepEntries,
   birthdayEntries,
   meetingEntries,
   memberFunction,
+  recruitmentEntries,
 } from '@/core/services/calendar/projections'
 import type { ProjectedPosts, ProjectionContext } from '@/core/services/calendar/projections'
 import { peopleInScope, projectOptions, youtuberOptions } from '@/core/services/work/shared'
@@ -34,7 +36,7 @@ import {
 import { ROUTES } from '@/declarations/navigation'
 import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
-import type { PermissionHelpers } from '@/types/auth'
+import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { AttendanceRoster, CalendarEntry } from '@/types/calendar'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
@@ -367,6 +369,7 @@ const toEntry = (
     templateId: row.templateId,
     templateName: row.template?.name ?? null,
     accent: row.youtuber?.accent ?? null,
+    youtuberId: row.youtuberId,
     muted: false,
     // The entry may tighten what its template allows, never loosen it silently
     visibility: row.visibility ?? row.template?.visibility ?? EventVisibilities.Everyone,
@@ -508,6 +511,9 @@ export const listEntries = async ({
           absenceEntries(context),
           meetingEntries(context),
           birthdayEntries(context),
+          academySessionEntries(context),
+          academyStepEntries(context),
+          recruitmentEntries(context),
         ])
       ).flat()
 
@@ -515,6 +521,22 @@ export const listEntries = async ({
     (left, right) => left.startsAt.localeCompare(right.startsAt)
   )
 }
+
+/**
+ * Perimeter the calendar reads through, the sidebar choosing among every reachable creator
+ * instead of the one the rail is narrowed to
+ * @param {SessionUser} viewer - Signed-in member
+ * @param {PermissionHelpers} access - Permission helpers
+ * @return {Promise<AccessScope>} - Perimeter without the active creator
+ */
+
+export const readCalendarScope = async (
+  viewer: SessionUser,
+  access: PermissionHelpers
+): Promise<AccessScope> =>
+  access.isAdmin
+    ? { isGlobal: true, youtuberIds: [], activeYoutuberId: null }
+    : { isGlobal: false, youtuberIds: await readFullPerimeter(viewer, access), activeYoutuberId: null }
 
 /**
  * Turn parsed values into an entry payload

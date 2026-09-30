@@ -139,6 +139,25 @@ export const CalendarSources = {
   Meeting: 'MEETING',
   Birthday: 'BIRTHDAY',
   AcademyStep: 'ACADEMY_STEP',
+  AcademySession: 'ACADEMY_SESSION',
+  Recruitment: 'RECRUITMENT',
+  RecruitmentInterview: 'RECRUITMENT_INTERVIEW',
 } as const
 
 export type CalendarSourceName = (typeof CalendarSources)[keyof typeof CalendarSources]
+
+/**
+ * Calendars a viewer can switch on and off, each gathering the sources it draws from
+ * @type {Record<string, string>}
+ */
+
+export const CalendarLayers = {
+  Events: 'EVENTS',
+  Meetings: 'MEETINGS',
+  Absences: 'ABSENCES',
+  Birthdays: 'BIRTHDAYS',
+  Academy: 'ACADEMY',
+  Recruitment: 'RECRUITMENT',
+} as const
+
+export type CalendarLayerName = (typeof CalendarLayers)[keyof typeof CalendarLayers]

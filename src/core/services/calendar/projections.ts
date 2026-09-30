@@ -49,7 +49,7 @@ const FUNCTION_SHAPE = {
     functions: {
       select: { jobFunction: { select: { name: true, accent: true, kind: true, position: true } } },
     },
-    youtubers: { select: { accent: true }, orderBy: { position: 'asc' }, take: 1 },
+    youtubers: { select: { id: true, accent: true }, orderBy: { position: 'asc' }, take: 1 },
   },
 } as const
 
@@ -69,12 +69,12 @@ export interface ProjectedPosts {
  * Member a projected entry is about
  * @typedef {Object} ProjectedMember
  * @property {string} displayName - Member name
- * @property {{ accent: string | null }[]} youtubers - Creator lending the colour
+ * @property {{ id: string, accent: string | null }[]} youtubers - Creator lending the colour
  */
 
 export interface ProjectedMember extends ProjectedPosts {
   displayName: string
-  youtubers: { accent: string | null }[]
+  youtubers: { id: string; accent: string | null }[]
 }
 
 /**
@@ -103,6 +103,15 @@ export const creatorAccent = (member: ProjectedMember | null | undefined): strin
   member?.youtubers[0]?.accent ?? null
 
 /**
+ * Read the creator a member works for
+ * @param {ProjectedMember | null | undefined} member - Member the entry is about
+ * @return {string | null} - Creator identifier
+ */
+
+export const creatorId = (member: ProjectedMember | null | undefined): string | null =>
+  member?.youtubers[0]?.id ?? null
+
+/**
  * Shape a projected entry, read-only by construction
  * @param {Object} input - Projection input
  * @param {CalendarSourceName} input.source - Domain it came from
@@ -113,6 +122,7 @@ export const creatorAccent = (member: ProjectedMember | null | undefined): strin
  * @param {Date | null} input.endsAt - Last moment
  * @param {boolean} input.allDay - Spans whole days
  * @param {string | null} input.accent - Resolved colour
+ * @param {string | null} [input.youtuberId] - Creator it belongs to
  * @param {string | null} input.description - Supporting text
  * @param {string | null} input.subjectName - Member it is about
  * @param {CalendarKindName} [input.kind] - Shape it draws as
@@ -133,6 +143,7 @@ const projected = ({
   endsAt,
   allDay,
   accent,
+  youtuberId,
   description,
   subjectName,
   kind,
@@ -150,6 +161,7 @@ const projected = ({
   endsAt: Date | null
   allDay: boolean
   accent: string | null
+  youtuberId?: string | null
   description: string | null
   subjectName: string | null
   kind?: CalendarKindName
@@ -172,6 +184,7 @@ const projected = ({
     templateId: null,
     templateName: meta.label,
     accent,
+    youtuberId: youtuberId ?? null,
     muted: muted ?? false,
     visibility: EventVisibilities.Everyone,
     startsAt: startsAt.toISOString(),
@@ -231,6 +244,7 @@ export const absenceEntries = async ({
       kind: CalendarKinds.Event,
       muted: true,
       accent: null,
+      youtuberId: creatorId(row.account),
       description: row.reason,
       subjectName: row.account.displayName,
     })
@@ -283,6 +297,7 @@ export const meetingEntries = async ({
         : null,
       allDay: false,
       accent: row.youtuber?.accent ?? creatorAccent(lead),
+      youtuberId: row.youtuberId ?? creatorId(lead),
       // A planned meeting shows nothing of its content, only its subject titles
       description: null,
       subjectName: lead?.displayName ?? null,
@@ -301,6 +316,7 @@ export const meetingEntries = async ({
  * @property {string | null} avatarUrl - Member portrait
  * @property {Date} day - Day it falls on
  * @property {string | null} accent - Creator colour
+ * @property {string | null} youtuberId - Creator it belongs to
  */
 
 export interface BirthdayOccurrence {
@@ -309,6 +325,7 @@ export interface BirthdayOccurrence {
   avatarUrl: string | null
   day: Date
   accent: string | null
+  youtuberId: string | null
 }
 
 /**
@@ -375,6 +392,7 @@ export const birthdaysBetween = async (
           avatarUrl: row.avatarUrl,
           day,
           accent: creatorAccent(row),
+          youtuberId: creatorId(row),
         }))
     })
     .sort((left, right) => left.day.getTime() - right.day.getTime())
@@ -405,6 +423,7 @@ export const birthdayEntries = async ({
       endsAt: null,
       allDay: true,
       accent: occurrence.accent,
+      youtuberId: occurrence.youtuberId,
       description: null,
       subjectName: occurrence.displayName,
     })
@@ -412,20 +431,27 @@ export const birthdayEntries = async ({
 }
 
 /**
- * Project the dated steps of one academy session
+ * Project the dated steps of the academy, or of one session
  * @param {ProjectionContext} context - Window and permissions
- * @param {string} sessionId - Session the board is bound to
+ * @param {string} [sessionId] - Session the board is bound to
  * @return {Promise<CalendarEntry[]>} - Projected steps
  */
 
 export const academyStepEntries = async (
-  { from, to, access }: ProjectionContext,
-  sessionId: string
+  { from, to, access, scope }: ProjectionContext,
+  sessionId?: string
 ): Promise<CalendarEntry[]> => {
   if (!access.can(Permissions.AcademyRead)) return []
 
   const rows = await prisma.academyStep.findMany({
-    where: { sessionId, scheduledAt: { gte: from, lte: to } },
+    where: {
+      ...(sessionId ? { sessionId } : {}),
+      scheduledAt: { gte: from, lte: to },
+      // A creator's perimeter only reaches the juniors that work for it
+      ...(!sessionId && !scope.isGlobal
+        ? { junior: { account: { youtubers: { some: { id: { in: scope.youtuberIds } } } } } }
+        : {}),
+    },
     include: { junior: { include: { account: FUNCTION_SHAPE } } },
     orderBy: { scheduledAt: 'asc' },
   })
@@ -442,8 +468,119 @@ export const academyStepEntries = async (
       endsAt: null,
       allDay: true,
       accent: creatorAccent(junior) ?? stage?.accent ?? null,
+      youtuberId: creatorId(junior),
       description: row.notes,
       subjectName: junior?.displayName ?? null,
     })
   })
+}
+
+/**
+ * Project the running length of every academy session in the window
+ * @param {ProjectionContext} context - Window and permissions
+ * @return {Promise<CalendarEntry[]>} - Projected sessions
+ */
+
+export const academySessionEntries = async ({
+  from,
+  to,
+  access,
+}: ProjectionContext): Promise<CalendarEntry[]> => {
+  if (!access.can(Permissions.AcademyRead)) return []
+
+  const rows = await prisma.academySession.findMany({
+    where: {
+      startsAt: { lte: to },
+      OR: [{ endsAt: { gte: from } }, { endsAt: null, startsAt: { gte: from } }],
+    },
+    include: { jobFunction: { select: { name: true, accent: true } } },
+    orderBy: { startsAt: 'asc' },
+  })
+
+  return rows.map((row) =>
+    projected({
+      source: CalendarSources.AcademySession,
+      id: row.id,
+      title: `${CALENDAR_PROJECTION_COPY.academySession} · ${row.jobFunction.name}`,
+      startsAt: row.startsAt,
+      endsAt: row.endsAt ?? row.startsAt,
+      allDay: true,
+      kind: CalendarKinds.Period,
+      accent: row.jobFunction.accent,
+      description: row.summary,
+      subjectName: null,
+      href: ROUTES.session(row.id),
+    })
+  )
+}
+
+/**
+ * Project the recruitment campaigns open in the window, and the interviews they hold
+ * @param {ProjectionContext} context - Window and permissions
+ * @return {Promise<CalendarEntry[]>} - Projected sessions and interviews
+ */
+
+export const recruitmentEntries = async ({
+  from,
+  to,
+  access,
+  scope,
+}: ProjectionContext): Promise<CalendarEntry[]> => {
+  if (!access.can(Permissions.RecruitmentRead)) return []
+
+  const [sessions, candidates] = await Promise.all([
+    prisma.recruitmentSession.findMany({
+      where: scopedWhere('recruitmentSession', scope, {
+        opensAt: { not: null, lte: to },
+        OR: [{ closesAt: { gte: from } }, { closesAt: null, opensAt: { gte: from } }],
+      }),
+      include: { youtuber: { select: { accent: true } } },
+      orderBy: { opensAt: 'asc' },
+    }),
+    prisma.recruitmentCandidate.findMany({
+      where: {
+        interviewAt: { gte: from, lte: to },
+        session: scopedWhere('recruitmentSession', scope),
+      },
+      include: {
+        session: { select: { id: true, youtuberId: true, youtuber: { select: { accent: true } } } },
+      },
+      orderBy: { interviewAt: 'asc' },
+    }),
+  ])
+
+  const campaigns = sessions.map((row) =>
+    projected({
+      source: CalendarSources.Recruitment,
+      id: row.id,
+      title: row.name,
+      startsAt: row.opensAt as Date,
+      endsAt: row.closesAt ?? (row.opensAt as Date),
+      allDay: true,
+      kind: CalendarKinds.Period,
+      accent: row.youtuber.accent,
+      youtuberId: row.youtuberId,
+      description: row.summary,
+      subjectName: null,
+      href: ROUTES.recruitment(row.id),
+    })
+  )
+
+  const interviews = candidates.map((row) =>
+    projected({
+      source: CalendarSources.RecruitmentInterview,
+      id: row.id,
+      title: `${CALENDAR_PROJECTION_COPY.interview} · ${row.displayName ?? row.discordId}`,
+      startsAt: row.interviewAt as Date,
+      endsAt: null,
+      allDay: false,
+      accent: row.session.youtuber.accent,
+      youtuberId: row.session.youtuberId,
+      description: null,
+      subjectName: row.displayName,
+      href: ROUTES.recruitment(row.session.id),
+    })
+  )
+
+  return [...campaigns, ...interviews]
 }
