@@ -166,15 +166,6 @@ const CALENDAR_LAYER_MAP: Record<CalendarLayerName, CalendarLayerOption> = {
 export const CALENDAR_LAYER_REGISTRY = createRegistry(CALENDAR_LAYER_MAP)
 
 /**
- * Colour a calendar wears in the sidebar, the one of its first source
- * @param {CalendarLayerName} layer - Calendar
- * @return {string} - Accent token
- */
-
-export const layerAccent = (layer: CalendarLayerName): string =>
-  CALENDAR_SOURCE_REGISTRY.get(CALENDAR_LAYER_MAP[layer].sources[0]).accent
-
-/**
  * Calendar an entry belongs to
  * @param {CalendarSourceName} source - Source the entry was read from
  * @return {CalendarLayerName} - Layer gathering that source

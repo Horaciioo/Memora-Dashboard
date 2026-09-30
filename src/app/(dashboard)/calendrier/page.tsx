@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { Button } from '@/components/elements/actions/Button'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { CalendarBoard } from '@/composites/calendar/CalendarBoard'
 import {
@@ -12,7 +10,6 @@ import {
 import { youtuberOptions } from '@/core/services/work/shared'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
-import { ROUTES } from '@/declarations/navigation'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 import { gridRange, monthGrid, toDayKey } from '@/utils/format/calendar'
@@ -68,15 +65,7 @@ export default async function CalendarPage({
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader
-        title={CALENDAR_COPY.title}
-        lead={CALENDAR_COPY.lead}
-        actions={
-          <Link href={ROUTES.calendarLegend}>
-            <Button variant="icon" icon="info" aria-label={CALENDAR_COPY.legendInfo} />
-          </Link>
-        }
-      />
+      <PageHeader title={CALENDAR_COPY.title} lead={CALENDAR_COPY.lead} />
       <CalendarBoard
         initialEntries={entries}
         youtubers={youtubers}

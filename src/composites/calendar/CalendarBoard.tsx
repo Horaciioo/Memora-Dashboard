@@ -12,11 +12,15 @@ import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { AttendancePanel } from '@/composites/calendar/AttendancePanel'
+import { CalendarAgenda } from '@/composites/calendar/CalendarAgenda'
 import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
 import { CalendarSidebar } from '@/composites/calendar/CalendarSidebar'
+import type { CalendarSidebarProps } from '@/composites/calendar/CalendarSidebar'
 import { CalendarTimeGrid } from '@/composites/calendar/CalendarTimeGrid'
 import type { GridMode } from '@/composites/calendar/CalendarTimeGrid'
 import { useCalendar } from '@/core/hooks/data/useCalendar'
+import { publishCalendarRail } from '@/core/hooks/interaction/useCalendarRail'
+import { useCalendarShortcuts } from '@/core/hooks/interaction/useCalendarShortcuts'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useSlotDraft } from '@/core/hooks/interaction/useSlotDraft'
 import { useCalendarFiltersStore } from '@/core/store/calendarFilters'
@@ -33,7 +37,7 @@ import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { accentPaint, accentVars } from '@/declarations/ui/theme'
-import { CALENDAR_SIDEBAR, CALENDAR_STYLES } from '@/declarations/ui/variants'
+import { CALENDAR_STYLES } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
@@ -82,6 +86,7 @@ const UNITS: { value: CalendarUnit; label: string }[] = [
   { value: 'day', label: CALENDAR_COPY.day },
   { value: 'week', label: CALENDAR_COPY.week },
   { value: 'month', label: CALENDAR_COPY.month },
+  { value: 'agenda', label: CALENDAR_COPY.agenda },
 ]
 
 // Pointer modes of the timed views
@@ -127,12 +132,22 @@ export const CalendarBoard = ({
     ? (initialEntries.find((row) => row.id === focusEntryId) ?? null)
     : null
 
-  const [unit, setUnit] = useState<CalendarUnit>('month')
+  // The span left on is remembered, a session board keeping its own
+  const [localUnit, setLocalUnit] = useState<CalendarUnit>('month')
   const [gridMode, setGridMode] = useState<GridMode>('draw')
   const [cursor, setCursor] = useState(anchor)
   const [search, setSearch] = useState('')
   const { can } = useAuthContext()
-  const { hiddenLayers, hiddenCreators, toggleLayer, toggleCreator } = useCalendarFiltersStore()
+  const {
+    hiddenLayers,
+    hiddenCreators,
+    toggleLayer,
+    toggleCreator,
+    unit: storedUnit,
+    setUnit: storeUnit,
+  } = useCalendarFiltersStore()
+  const unit = sessionId ? localUnit : storedUnit
+  const setUnit = sessionId ? setLocalUnit : storeUnit
 
   // Stored choices are read once mounted
   useEffect(() => {
@@ -157,6 +172,35 @@ export const CalendarBoard = ({
   const [pendingDeletion, setPendingDeletion] = useState<CalendarEntry[] | null>(null)
 
   const days = useMemo(() => unitGrid(cursor, unit), [cursor, unit])
+
+  const railProps: CalendarSidebarProps = {
+    cursor,
+    unit,
+    onPick: setCursor,
+    onCursor: setCursor,
+    search,
+    onSearch: setSearch,
+    layers,
+    hiddenLayers,
+    onToggleLayer: toggleLayer,
+    youtubers,
+    hiddenCreators,
+    onToggleCreator: toggleCreator,
+  }
+
+  // The sidebar carries the month and the switches from md up
+  useEffect(() => {
+    if (!sessionId) publishCalendarRail(railProps)
+  })
+
+  useEffect(() => () => publishCalendarRail(null), [])
+
+  useCalendarShortcuts({
+    onToday: () => setCursor(toDayKey(new Date())),
+    onStep: (amount) => setCursor((current) => shiftAnchor(current, unit, amount)),
+    onUnit: setUnit,
+    onCreate: canManage ? () => openForm(null) : undefined,
+  })
 
   const range = useMemo(() => gridRange(days), [days])
 
@@ -229,6 +273,12 @@ export const CalendarBoard = ({
     )
   })
 
+  // A day number opens that day on its own
+  const openDay = (dayKey: string) => {
+    setCursor(dayKey)
+    setUnit('day')
+  }
+
   const openForm = (entry: CalendarEntry | null, prefill?: FormValues) => {
     calendar.clearIssues()
     setEditing(entry)
@@ -293,7 +343,7 @@ export const CalendarBoard = ({
   )
 
   // Both timed views share their markup, only the column count changes
-  const isTimed = unit !== 'month'
+  const isTimed = unit === 'day' || unit === 'week'
   const columns = unit === 'day' ? CALENDAR_STYLES.columnsDay : CALENDAR_STYLES.columnsWeek
 
   /**
@@ -362,6 +412,7 @@ export const CalendarBoard = ({
           band
           opensBand={toDayKey(entry.startsAt) === dayKey}
           closesBand={lastDayKey(entry.startsAt, entry.endsAt) === dayKey}
+          titled={weekdayOf(dayKey) === 0}
           selected={selection.includes(entry.id)}
           draggable={canManage && !entry.readOnly}
           onOpen={openEntry}
@@ -392,22 +443,8 @@ export const CalendarBoard = ({
   return (
     <>
       <Section description={CALENDAR_COPY.moveHint} bare>
-        <div className={sessionId ? undefined : CALENDAR_SIDEBAR.layout}>
-          {!sessionId && (
-            <CalendarSidebar
-              cursor={cursor}
-              onPick={setCursor}
-              onCursor={setCursor}
-              search={search}
-              onSearch={setSearch}
-              layers={layers}
-              hiddenLayers={hiddenLayers}
-              onToggleLayer={toggleLayer}
-              youtubers={youtubers}
-              hiddenCreators={hiddenCreators}
-              onToggleCreator={toggleCreator}
-            />
-          )}
+        <div className="flex flex-col gap-6">
+          {!sessionId && <CalendarSidebar {...railProps} />}
 
           <div className="flex min-w-0 flex-col gap-4">
             <div className={CALENDAR_STYLES.toolbar}>
@@ -426,7 +463,7 @@ export const CalendarBoard = ({
               />
               <span className={CALENDAR_STYLES.period}>{periodLabel(cursor, unit)}</span>
               <span className="ml-auto flex flex-wrap items-center gap-3">
-                {canManage && unit !== 'month' && (
+                {canManage && isTimed && (
                   <SegmentedControl
                     options={GRID_MODES}
                     value={gridMode}
@@ -473,150 +510,169 @@ export const CalendarBoard = ({
               </div>
             )}
 
-            <div className={CALENDAR_STYLES.frame}>
-              <div
-                className={cn(
-                  CALENDAR_STYLES.weekdays,
-                  isTimed
-                    ? cn(CALENDAR_STYLES.weekdaysTimed, columns)
-                    : CALENDAR_STYLES.weekdaysMonth
-                )}
-              >
-                {isTimed ? (
-                  <>
-                    <span className={CALENDAR_STYLES.weekday} />
-                    {days.map((day) => (
-                      <span
-                        key={day.key}
-                        className={cn(CALENDAR_STYLES.weekday, CALENDAR_STYLES.weekdayHead)}
-                      >
-                        <span>{WEEKDAY_LABELS[weekdayOf(day.key)]}</span>
+            {unit === 'agenda' ? (
+              <CalendarAgenda
+                days={days}
+                entries={visible}
+                selection={selection}
+                onOpen={openEntry}
+              />
+            ) : (
+              <div className={CALENDAR_STYLES.frame}>
+                <div
+                  className={cn(
+                    CALENDAR_STYLES.weekdays,
+                    isTimed
+                      ? cn(CALENDAR_STYLES.weekdaysTimed, columns)
+                      : CALENDAR_STYLES.weekdaysMonth
+                  )}
+                >
+                  {isTimed ? (
+                    <>
+                      <span className={CALENDAR_STYLES.weekday} />
+                      {days.map((day) => (
                         <span
-                          className={cn(
-                            CALENDAR_STYLES.dayNumber,
-                            day.isToday && CALENDAR_STYLES.dayNumberToday
-                          )}
+                          key={day.key}
+                          className={cn(CALENDAR_STYLES.weekday, CALENDAR_STYLES.weekdayHead)}
                         >
-                          {day.dayOfMonth}
-                        </span>
-                      </span>
-                    ))}
-                  </>
-                ) : (
-                  WEEKDAY_LABELS.map((label) => (
-                    <span key={label} className={CALENDAR_STYLES.weekday}>
-                      {label}
-                    </span>
-                  ))
-                )}
-              </div>
-
-              {isTimed ? (
-                <>
-                  <div className={cn(CALENDAR_STYLES.allDay, columns)}>
-                    <span className={CALENDAR_STYLES.allDayLabel}>{CALENDAR_COPY.allDayRow}</span>
-                    {days.map((day) => (
-                      <div key={day.key} className={CALENDAR_STYLES.allDayCell}>
-                        {renderZoneLabels(day.key)}
-                        {renderBands(day.key)}
-                        {allDayCards(day.key).map((entry) => renderCard(entry, day.key, true))}
-                      </div>
-                    ))}
-                  </div>
-
-                  <CalendarTimeGrid
-                    days={days}
-                    entries={visible.filter(
-                      (entry) => entry.kind === CalendarKinds.Event && !entry.allDay
-                    )}
-                    agendaExtras={allDayCards}
-                    columns={columns}
-                    canManage={canManage}
-                    mode={gridMode}
-                    selection={selection}
-                    onDraw={(drawn) =>
-                      openForm(null, {
-                        kind: CalendarKinds.Event,
-                        allDay: false,
-                        startsAt: toFieldValue(atMinute(drawn.fromDay, drawn.startMinute)),
-                        endsAt: toFieldValue(atMinute(drawn.toDay, drawn.endMinute)),
-                      })
-                    }
-                    onSelectMany={setSelection}
-                    onMove={(entry, dayKey, startMinute) =>
-                      void calendar.move(entry.id, atMinute(dayKey, startMinute))
-                    }
-                    onOpen={openEntry}
-                    renderZones={renderZones}
-                  />
-                </>
-              ) : (
-                <div className={CALENDAR_STYLES.month}>
-                  {days.map((day) => {
-                    // Lines of the day, single day periods reading among the events by time
-                    const cards = [
-                      ...entriesOf(day.key, CalendarKinds.Period).filter(isSingleDay),
-                      ...entriesOf(day.key, CalendarKinds.Event),
-                    ].sort((left, right) => left.startsAt.localeCompare(right.startsAt))
-                    const shown = cards.slice(0, CALENDAR_SETTINGS.maxEntriesPerDay)
-                    const hiddenCount = cards.length - shown.length
-
-                    return (
-                      <div
-                        key={day.key}
-                        className={cn(
-                          CALENDAR_STYLES.day,
-                          !day.isCurrentMonth && CALENDAR_STYLES.dayOutside,
-                          covers(day.key) && CALENDAR_STYLES.dayDrafted,
-                          over === day.key && 'is-drop-target'
-                        )}
-                        {...(canManage ? containerProps(day.key) : {})}
-                        {...slotProps(day.key)}
-                      >
-                        {renderZones(day.key)}
-                        <span
-                          className={cn(
-                            CALENDAR_STYLES.dayNumber,
-                            !day.isCurrentMonth && CALENDAR_STYLES.dayNumberOutside,
-                            day.isToday && CALENDAR_STYLES.dayNumberToday
-                          )}
-                        >
-                          {day.dayOfMonth}
-                        </span>
-                        {canManage && (
+                          <span>{WEEKDAY_LABELS[weekdayOf(day.key)]}</span>
                           <button
                             type="button"
-                            aria-label={CALENDAR_COPY.add}
-                            className={CALENDAR_STYLES.dayAdd}
-                            onClick={() =>
-                              openForm(null, {
-                                startsAt: toFieldValue(
-                                  dayBounds(
-                                    day.key,
-                                    CALENDAR_SETTINGS.dayStartHour,
-                                    CALENDAR_SETTINGS.dayEndHour
-                                  ).startsAt
-                                ),
-                              })
-                            }
+                            onClick={() => openDay(day.key)}
+                            className={cn(
+                              CALENDAR_STYLES.dayNumber,
+                              CALENDAR_STYLES.dayNumberButton,
+                              day.isToday && CALENDAR_STYLES.dayNumberToday
+                            )}
                           >
-                            <DayAddIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                            {day.dayOfMonth}
                           </button>
-                        )}
-                        {renderZoneLabels(day.key)}
-                        {renderBands(day.key)}
-                        {shown.map((entry) => renderCard(entry, day.key, true))}
-                        {hiddenCount > 0 && (
-                          <span className={CALENDAR_STYLES.overflow}>
-                            {`+${hiddenCount} ${CALENDAR_COPY.more}`}
-                          </span>
-                        )}
-                      </div>
-                    )
-                  })}
+                        </span>
+                      ))}
+                    </>
+                  ) : (
+                    WEEKDAY_LABELS.map((label) => (
+                      <span key={label} className={CALENDAR_STYLES.weekday}>
+                        {label}
+                      </span>
+                    ))
+                  )}
                 </div>
-              )}
-            </div>
+
+                {isTimed ? (
+                  <>
+                    <div className={cn(CALENDAR_STYLES.allDay, columns)}>
+                      <span className={CALENDAR_STYLES.allDayLabel}>{CALENDAR_COPY.allDayRow}</span>
+                      {days.map((day) => (
+                        <div key={day.key} className={CALENDAR_STYLES.allDayCell}>
+                          {renderZoneLabels(day.key)}
+                          {renderBands(day.key)}
+                          {allDayCards(day.key).map((entry) => renderCard(entry, day.key, true))}
+                        </div>
+                      ))}
+                    </div>
+
+                    <CalendarTimeGrid
+                      days={days}
+                      entries={visible.filter(
+                        (entry) => entry.kind === CalendarKinds.Event && !entry.allDay
+                      )}
+                      agendaExtras={allDayCards}
+                      columns={columns}
+                      canManage={canManage}
+                      mode={gridMode}
+                      selection={selection}
+                      onDraw={(drawn) =>
+                        openForm(null, {
+                          kind: CalendarKinds.Event,
+                          allDay: false,
+                          startsAt: toFieldValue(atMinute(drawn.fromDay, drawn.startMinute)),
+                          endsAt: toFieldValue(atMinute(drawn.toDay, drawn.endMinute)),
+                        })
+                      }
+                      onSelectMany={setSelection}
+                      onMove={(entry, dayKey, startMinute) =>
+                        void calendar.move(entry.id, atMinute(dayKey, startMinute))
+                      }
+                      onOpen={openEntry}
+                      renderZones={renderZones}
+                    />
+                  </>
+                ) : (
+                  <div className={CALENDAR_STYLES.month}>
+                    {days.map((day) => {
+                      // Lines of the day, single day periods reading among the events by time
+                      const cards = [
+                        ...entriesOf(day.key, CalendarKinds.Period).filter(isSingleDay),
+                        ...entriesOf(day.key, CalendarKinds.Event),
+                      ].sort((left, right) => left.startsAt.localeCompare(right.startsAt))
+                      const shown = cards.slice(0, CALENDAR_SETTINGS.maxEntriesPerDay)
+                      const hiddenCount = cards.length - shown.length
+
+                      return (
+                        <div
+                          key={day.key}
+                          className={cn(
+                            CALENDAR_STYLES.day,
+                            !day.isCurrentMonth && CALENDAR_STYLES.dayOutside,
+                            covers(day.key) && CALENDAR_STYLES.dayDrafted,
+                            over === day.key && 'is-drop-target'
+                          )}
+                          {...(canManage ? containerProps(day.key) : {})}
+                          {...slotProps(day.key)}
+                        >
+                          {renderZones(day.key)}
+                          <button
+                            type="button"
+                            onClick={() => openDay(day.key)}
+                            className={cn(
+                              CALENDAR_STYLES.dayNumber,
+                              CALENDAR_STYLES.dayNumberButton,
+                              !day.isCurrentMonth && CALENDAR_STYLES.dayNumberOutside,
+                              day.isToday && CALENDAR_STYLES.dayNumberToday
+                            )}
+                          >
+                            {day.dayOfMonth}
+                          </button>
+                          {canManage && (
+                            <button
+                              type="button"
+                              aria-label={CALENDAR_COPY.add}
+                              className={CALENDAR_STYLES.dayAdd}
+                              onClick={() =>
+                                openForm(null, {
+                                  startsAt: toFieldValue(
+                                    dayBounds(
+                                      day.key,
+                                      CALENDAR_SETTINGS.dayStartHour,
+                                      CALENDAR_SETTINGS.dayEndHour
+                                    ).startsAt
+                                  ),
+                                })
+                              }
+                            >
+                              <DayAddIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                            </button>
+                          )}
+                          {renderZoneLabels(day.key)}
+                          {renderBands(day.key)}
+                          {shown.map((entry) => renderCard(entry, day.key, true))}
+                          {hiddenCount > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => openDay(day.key)}
+                              className={CALENDAR_STYLES.overflow}
+                            >
+                              {`+${hiddenCount} ${CALENDAR_COPY.more}`}
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </Section>

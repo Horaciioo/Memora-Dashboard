@@ -20,6 +20,8 @@ export interface CalendarEntryChipProps {
   opensBand?: boolean
   // Band reaches its own end, so it gets a rounded right edge
   closesBand?: boolean
+  // Band repeats its title, as on the first day of a week row
+  titled?: boolean
   selected: boolean
   draggable: boolean
   onOpen: (entry: CalendarEntry, additive: boolean) => void
@@ -43,6 +45,7 @@ const HOVER_DELAY = 140
  * @param {boolean} [band] - Draws as a band
  * @param {boolean} [opensBand] - Band starts here
  * @param {boolean} [closesBand] - Band ends here
+ * @param {boolean} [titled] - Band shows its title
  * @param {boolean} selected - Entry sits in the current selection
  * @param {boolean} draggable - Entry may be moved
  * @param {(entry: CalendarEntry, additive: boolean) => void} onOpen - Open or select handler
@@ -59,6 +62,7 @@ export const CalendarEntryChip = ({
   band,
   opensBand,
   closesBand,
+  titled,
   selected,
   draggable,
   onOpen,
@@ -84,7 +88,8 @@ export const CalendarEntryChip = ({
   )
 
   // A trailing band segment carries no title, so it opens no preview
-  const previewable = !(band && !opensBand)
+  const showsTitle = !band || opensBand || titled
+  const previewable = showsTitle
 
   const openPreview = (element: HTMLElement) => {
     if (!previewable) return
@@ -165,7 +170,7 @@ export const CalendarEntryChip = ({
               <RollCallIcon className={CALENDAR_STYLES.chipMark} aria-hidden="true" />
             )}
             <span className={CALENDAR_STYLES.entryTitle}>
-              {band && !opensBand ? ' ' : entry.title}
+              {showsTitle ? entry.title : '\u00a0'}
             </span>
           </>
         )}

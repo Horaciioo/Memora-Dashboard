@@ -58,17 +58,44 @@ export const RECORD_ROW = {
 } as const
 
 /**
+ * Planning styles, one block per day that holds something
+ * @type {Record<string, string>}
+ */
+
+export const CALENDAR_AGENDA = {
+  list: 'flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5',
+  empty: 'py-16 text-center text-sm text-[var(--color-ink-subtle)]',
+  day: 'grid grid-cols-[6rem_minmax(0,1fr)] gap-4 py-5',
+  head: 'flex items-start gap-3',
+  number:
+    'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg font-extrabold tabular-nums',
+  numberToday: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
+  weekday:
+    'flex flex-col pt-0.5 text-[11px] leading-tight font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  month: 'font-semibold normal-case first-letter:uppercase',
+  rows: 'flex flex-col',
+  row: 'flex items-center gap-4 rounded-[var(--radius-md)] px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-hover)]',
+  rowSelected: 'ring-2 ring-[var(--color-brand-600)] ring-inset',
+  bullet: 'h-3 w-3 shrink-0',
+  time: 'w-24 shrink-0 text-sm text-[var(--color-ink-subtle)] tabular-nums',
+  title: 'min-w-0 flex-1 truncate text-sm font-semibold',
+  meta: 'hidden shrink-0 text-sm text-[var(--color-ink-subtle)] md:inline',
+} as const
+
+/**
  * Calendar side rail styles, the month in miniature then the switches
  * @type {Record<string, string>}
  */
 
 export const CALENDAR_SIDEBAR = {
-  layout: 'grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start',
-  rail: 'flex flex-col gap-8 lg:sticky lg:top-4',
-  // Below lg the rail folds behind one button
-  railBody: 'flex-col gap-8 lg:flex',
+  // Folded rail of the screens without a sidebar
+  rail: 'flex flex-col gap-4 md:hidden',
+  railBody: 'flex-col gap-6',
+  // Sidebar version, standing where the destinations stand
+  panel: 'flex min-h-0 w-full flex-1 flex-col gap-5 overflow-y-auto px-3',
+  back: 'flex items-center gap-2 rounded-[var(--radius-md)] px-2 py-2 text-sm font-semibold transition-colors hover:bg-[var(--color-hover)]',
   toggle:
-    'flex w-full items-center justify-between rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-3 text-sm font-semibold lg:hidden',
+    'flex w-full items-center justify-between rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-3 text-sm font-semibold',
   mini: 'flex flex-col gap-2',
   miniHead: 'flex items-center justify-between gap-2',
   miniTitle: 'pl-2 text-sm font-extrabold first-letter:uppercase',
@@ -76,18 +103,26 @@ export const CALENDAR_SIDEBAR = {
   miniWeekday:
     'py-1 text-[10px] font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   miniDay:
-    'mx-auto flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold tabular-nums transition-colors hover:bg-[var(--color-hover)]',
+    'mx-auto flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold tabular-nums transition-colors hover:bg-[var(--color-hover)]',
   miniDayOutside: 'text-[var(--color-ink-subtle)]',
   miniDayToday:
     'bg-[var(--color-brand-600)] text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
+  miniDayInRange: 'bg-[var(--color-brand-100)]',
   miniDayPicked: 'ring-2 ring-[var(--color-brand-600)] ring-inset',
   group: 'flex flex-col gap-1',
   groupTitle: 'px-2 pb-1 text-xs font-black tracking-wide text-[var(--color-ink)] uppercase',
-  row: 'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)]',
+  row: 'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-hover)]',
   rowLabel: 'min-w-0 flex-1 truncate',
-  box: 'flex h-5 w-5 shrink-0 items-center justify-center rounded-[6px] border-2 transition-colors',
-  boxCheck: 'h-3 w-3 text-[var(--color-on-accent)]',
+  box: 'flex h-5 w-5 shrink-0 items-center justify-center',
+  boxCheck: 'h-5 w-5',
+  // A switched off row reads in retreat, its check gone
+  rowOff: 'text-[var(--color-ink-subtle)]',
   rowGlyph: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
+  // Bar standing where the global search stands, same look
+  searchBar:
+    'flex w-full items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface-raised)] px-2.5 py-2 text-[var(--color-ink-subtle)] focus-within:text-[var(--color-ink)]',
+  searchInput:
+    'min-w-0 flex-1 bg-transparent text-[15px] text-[var(--color-ink)] outline-none placeholder:text-[var(--color-ink-subtle)]',
   search:
     'w-full rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] px-3 py-2 text-sm text-[var(--color-on-field)] outline-none placeholder:text-[var(--color-on-field-subtle)] focus:border-[var(--color-field-border-strong)]',
 } as const
@@ -243,6 +278,7 @@ export const CALENDAR_STYLES = {
   dayDrafted: 'ring-2 ring-[var(--color-brand-400)] ring-inset',
   dayNumber:
     'relative mx-auto flex h-6 w-6 items-center justify-center text-xs font-semibold tabular-nums',
+  dayNumberButton: 'cursor-pointer transition-colors hover:bg-[var(--color-hover)] rounded-full',
   dayNumberToday: 'rounded-full bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   dayNumberOutside: 'text-[var(--color-ink-subtle)]',
   dayAdd:
@@ -251,7 +287,7 @@ export const CALENDAR_STYLES = {
   zoneBand: 'flex-1',
   zoneLabel:
     'relative truncate rounded-[var(--radius-sm)] px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase',
-  bar: 'relative flex cursor-grab items-center gap-1.5 px-1.5 py-0.5 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
+  bar: 'relative flex min-h-6 cursor-grab items-center gap-1.5 px-1.5 py-0.5 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
   barStart: 'ml-0 rounded-l-[var(--radius-sm)]',
   barEnd: 'mr-0 rounded-r-[var(--radius-sm)]',
   barRunsIn: '-ml-1.5',
@@ -280,7 +316,8 @@ export const CALENDAR_STYLES = {
   entryReadOnly: 'cursor-pointer border border-dashed',
   handle:
     'absolute inset-x-0 bottom-0 h-1.5 cursor-ns-resize rounded-b-[var(--radius-sm)] opacity-0 transition-opacity group-hover/entry:opacity-100',
-  overflow: 'relative px-1.5 text-xs text-[var(--color-ink-subtle)]',
+  overflow:
+    'relative rounded-[var(--radius-sm)] px-1.5 text-left text-xs text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   week: 'grid',
   hour: 'border-r border-b border-[var(--color-border)] px-2 py-1 text-right text-xs text-[var(--color-ink-subtle)] tabular-nums',
   slot: 'relative flex min-h-12 touch-none flex-col gap-1 border-r border-b border-[var(--color-border)] p-1 last:border-r-0',

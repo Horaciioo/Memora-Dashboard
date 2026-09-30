@@ -5,11 +5,13 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { CourseRail } from '@/composites/academy/course/CourseRail'
+import { CalendarRailPanel, CalendarSearchBar } from '@/composites/calendar/CalendarSidebar'
 import { NotificationsBell } from '@/composites/notifications/NotificationsBell'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { CreatorAccountMenu } from '@/composites/shell/CreatorAccountMenu'
 import { CreatorSwitch } from '@/composites/shell/CreatorSwitch'
 import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
+import { useCalendarRail } from '@/core/hooks/interaction/useCalendarRail'
 import { useCourseRail } from '@/core/hooks/interaction/useCourseRail'
 import { APP_VERSION_LABEL } from '@/declarations/app'
 import { ROUTE_STEPS } from '@/declarations/maturity/steps'
@@ -39,6 +41,8 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const { can, session } = useAuthContext()
   // An open course puts its chapters where the destinations stand
   const courseRail = useCourseRail()
+  // The calendar puts its month and switches there too
+  const calendarRail = useCalendarRail()
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
 
   // A lone creator sits on top, several move to the footer box
@@ -68,11 +72,23 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
       )}
 
       <div className={LEFT_SIDEBAR.searchRow}>
-        <SearchLauncher expanded />
+        {calendarRail ? (
+          <>
+            <CalendarSearchBar value={calendarRail.search} onChange={calendarRail.onSearch} />
+            {/* Kept mounted so the palette shortcut still answers */}
+            <div className="hidden">
+              <SearchLauncher />
+            </div>
+          </>
+        ) : (
+          <SearchLauncher expanded />
+        )}
       </div>
 
       {courseRail ? (
         <CourseRail rail={courseRail} />
+      ) : calendarRail ? (
+        <CalendarRailPanel {...calendarRail} />
       ) : (
         <nav className={LEFT_SIDEBAR.nav}>
           {visibleNavGroups(viewContext.view, session, can).map((group) => {

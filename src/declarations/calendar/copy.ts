@@ -15,6 +15,8 @@ export const CALENDAR_COPY = {
   deleteDescription: 'Il disparaît du calendrier de tout le monde.',
   month: 'Mois',
   week: 'Semaine',
+  agenda: 'Planning',
+  agendaEmpty: 'Rien de prévu sur cette période.',
   day: 'Jour',
   unit: 'Période affichée',
   // Pointer mode
@@ -39,9 +41,10 @@ export const CALENDAR_COPY = {
   readOnlyNotice: 'Cet élément vient d’un autre écran, il se modifie là-bas.',
   // Sidebar
   sidebarToggle: 'Calendriers et filtres',
+  railBack: 'Accueil',
   sidebarLayers: 'Calendriers',
   sidebarCreators: 'YouTubeurs',
-  search: 'Chercher un évènement',
+  search: 'Rechercher un event…',
   // Legacy filter bar, absences staying out of the way until they are asked for
   allSources: 'Toutes les origines',
   filterAbsences: 'Absences',
@@ -49,22 +52,6 @@ export const CALENDAR_COPY = {
   absencesShown: 'Absences affichées',
   filterAnswer: 'Ta réponse',
   allAnswers: 'Toutes les réponses',
-  // Legend, its icon button and the page it opens
-  legendInfo: 'Comprendre les couleurs et les zones',
-  legendTitle: 'Légende du calendrier',
-  legendLead: 'À quoi correspondent les couleurs, les zones et les niveaux de visibilité.',
-  legendKindsTitle: 'Les trois formes',
-  legendSourcesTitle: 'Les origines',
-  legendColoursTitle: 'D’où viennent les couleurs',
-  legendColoursText:
-    'Un évènement porte la couleur du YouTubeur auquel il est rattaché, et rien d’autre. Sans YouTubeur, il reste dans la couleur de Memora. Les absences, elles, sont grisées et posées en retrait.',
-  legendZonesTitle: 'Zones et évènements',
-  legendZonesText:
-    'Une zone est un fond pastel posé sur une plage de jours. Les évènements et les périodes, eux, sont peints en couleur pleine avec un titre en noir pour rester lisibles par-dessus.',
-  legendVisibilityTitle: 'Qui voit quoi',
-  legendVisibilityText:
-    'Chaque évènement porte un niveau de visibilité. « Tout le monde » est visible par tous, « Responsables et plus » masque l’évènement aux modérateurs, « Administrateurs seuls » le réserve à l’encadrement.',
-  legendUnderstood: 'J’ai compris !',
   // Detail modal, meetings and birthdays
   meetingTopicsTitle: 'Sujets prévus',
   meetingTopicsEmpty: 'Aucun sujet prévu.',
