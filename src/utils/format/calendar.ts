@@ -285,3 +285,69 @@ export const orderKeys = (first: string, second: string): [string, string] =>
  */
 
 export const toFieldValue = (date: Date): string => `${formatDayKey(date)}T${timeLabel(date)}`
+
+/**
+ * Minute of the day
+ * @param {Date | string} date - Moment
+ * @return {number} - Minutes since midnight
+ */
+
+export const minuteOfDay = (date: Date | string): number => {
+  const parsed = parseDay(date)
+
+  return parsed.getHours() * 60 + parsed.getMinutes()
+}
+
+/**
+ * Moment on a day
+ * @param {string} dayKey - ISO day
+ * @param {number} minute - Minutes since midnight
+ * @return {Date} - Local moment
+ */
+
+export const atMinute = (dayKey: string, minute: number): Date =>
+  atTime(parseDay(dayKey), Math.floor(minute / 60), minute % 60)
+
+/**
+ * Minutes an entry covers on a day
+ * @param {string} startsAt - ISO start
+ * @param {string | null} endsAt - ISO end
+ * @param {string} dayKey - ISO day
+ * @param {number} fallbackMinutes - Length without end
+ * @return {{ startMinute: number, endMinute: number }} - Clipped to the day
+ */
+
+export const spanOnDay = (
+  startsAt: string,
+  endsAt: string | null,
+  dayKey: string,
+  fallbackMinutes: number
+): { startMinute: number; endMinute: number } => {
+  const startMinute = toDayKey(startsAt) < dayKey ? 0 : minuteOfDay(startsAt)
+  const endMinute = !endsAt
+    ? startMinute + fallbackMinutes
+    : toDayKey(endsAt) > dayKey
+      ? 24 * 60
+      : minuteOfDay(endsAt)
+
+  return { startMinute, endMinute: Math.max(endMinute, startMinute + 1) }
+}
+
+/**
+ * Hours label of a span
+ * @param {number} startMinute - Opening minute
+ * @param {number} endMinute - Closing minute
+ * @return {string} - HH:MM – HH:MM
+ */
+
+export const minutesLabel = (startMinute: number, endMinute: number): string =>
+  `${minuteLabel(startMinute)} – ${minuteLabel(endMinute)}`
+
+/**
+ * Clock label of a minute
+ * @param {number} minute - Minutes since midnight
+ * @return {string} - HH:MM
+ */
+
+export const minuteLabel = (minute: number): string =>
+  `${String(Math.floor(minute / 60)).padStart(2, '0')}:${String(minute % 60).padStart(2, '0')}`

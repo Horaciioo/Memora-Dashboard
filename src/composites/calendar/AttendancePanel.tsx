@@ -47,12 +47,6 @@ export const AttendancePanel = ({ entry, pending, onRespond, onRemind }: Attenda
     [AttendanceStatuses.Pending]: roster.pending,
   }
 
-  const count: Record<AttendanceStatusName, number> = {
-    [AttendanceStatuses.Present]: roster.counts.present,
-    [AttendanceStatuses.Absent]: roster.counts.absent,
-    [AttendanceStatuses.Pending]: roster.counts.pending,
-  }
-
   return (
     <section className={CALENDAR_STYLES.rollCall}>
       <span className={CALENDAR_STYLES.rollCallHead}>
@@ -85,7 +79,7 @@ export const AttendancePanel = ({ entry, pending, onRespond, onRemind }: Attenda
         {GROUPS.map((status) => (
           <Badge
             key={status}
-            label={`${ATTENDANCE_STATUS_REGISTRY.get(status).label} · ${count[status]}`}
+            label={ATTENDANCE_STATUS_REGISTRY.get(status).label}
             tone={ATTENDANCE_STATUS_REGISTRY.get(status).tone}
             icon={ATTENDANCE_STATUS_REGISTRY.get(status).icon}
           />

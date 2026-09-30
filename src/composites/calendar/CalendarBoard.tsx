@@ -10,12 +10,16 @@ import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { Dialog } from '@/components/structures/Dialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FilterBar, type FilterDefinition } from '@/components/structures/FilterBar'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { AttendancePanel } from '@/composites/calendar/AttendancePanel'
 import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
+import { CalendarTimeGrid } from '@/composites/calendar/CalendarTimeGrid'
+import type { GridMode } from '@/composites/calendar/CalendarTimeGrid'
 import { useCalendar } from '@/core/hooks/data/useCalendar'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
+import { useListControls } from '@/core/hooks/interaction/useListControls'
 import { useSlotDraft } from '@/core/hooks/interaction/useSlotDraft'
 import { toOptions } from '@/core/lib/forms/options'
 import { CALENDAR_COPY, CALENDAR_FIELD_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
@@ -34,13 +38,15 @@ import { CALENDAR_STYLES } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
+import { GUIDE_BEACONS } from '@/declarations/academy/guides'
+import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { CalendarKinds, CalendarSources } from '@/utils/constants/workflow'
 import type { CalendarUnit } from '@/utils/format/calendar'
 import {
+  atMinute,
   coversDay,
   dayBounds,
   gridRange,
-  hourOf,
   lastDayKey,
   moveToDay,
   moveToSlot,
@@ -85,6 +91,12 @@ const UNITS: { value: CalendarUnit; label: string }[] = [
   { value: 'month', label: CALENDAR_COPY.month },
 ]
 
+// Pointer modes of the timed views
+const GRID_MODES: { value: GridMode; label: string }[] = [
+  { value: 'draw', label: CALENDAR_COPY.modeDraw },
+  { value: 'select', label: CALENDAR_COPY.modeSelect },
+]
+
 // Day add glyph
 const DayAddIcon = ICONS.add
 
@@ -117,9 +129,9 @@ export const CalendarBoard = ({
     : null
 
   const [unit, setUnit] = useState<CalendarUnit>('month')
+  const [gridMode, setGridMode] = useState<GridMode>('draw')
   const [cursor, setCursor] = useState(anchor)
-  const [search, setSearch] = useState('')
-  const [filterValues, setFilterValues] = useState<Record<string, string>>({})
+  const { search, setSearch, filterValues, setFilter, isFiltered, reset } = useListControls()
   const [dialog, setDialog] = useState<'form' | 'detail' | 'bulk' | null>(linked ? 'detail' : null)
   const [editing, setEditing] = useState<CalendarEntry | null>(null)
   const [draft, setDraft] = useState<FormValues | null>(null)
@@ -158,14 +170,6 @@ export const CalendarBoard = ({
       maturity: 'beta',
     },
   ]
-
-  const isFiltered =
-    search.trim().length > 0 || Object.values(filterValues).some((value) => value.length > 0)
-
-  const resetFilters = () => {
-    setSearch('')
-    setFilterValues({})
-  }
 
   // An absence stays out of the grid until the filter asks for it
   const visible = useMemo(() => {
@@ -217,11 +221,6 @@ export const CalendarBoard = ({
   const allDayCards = (dayKey: string) =>
     entriesOf(dayKey, CalendarKinds.Event).filter((entry) => entry.allDay)
 
-  const timedCards = (dayKey: string, hour: number) =>
-    entriesOf(dayKey, CalendarKinds.Event).filter(
-      (entry) => !entry.allDay && hourOf(entry.startsAt) === hour
-    )
-
   const { over, itemProps, containerProps } = useDragAndDrop((item, container) => {
     const entry = calendar.entries.find((row) => row.id === item.id)
     if (!entry || entry.readOnly) return
@@ -241,11 +240,7 @@ export const CalendarBoard = ({
     setDialog('form')
   }
 
-  const {
-    draft: slotDraft,
-    covers,
-    slotProps,
-  } = useSlotDraft((from, to) => {
+  const { covers, slotProps } = useSlotDraft((from, to) => {
     const [fromDay, fromHour] = from.split(SLOT_SEPARATOR)
     const [toDay, toHour] = to.split(SLOT_SEPARATOR)
 
@@ -290,12 +285,6 @@ export const CalendarBoard = ({
     setOpened(entry)
     setDialog('detail')
   }
-
-  const hours = useMemo(() => {
-    const { dayStartHour, dayEndHour } = CALENDAR_SETTINGS
-
-    return Array.from({ length: dayEndHour - dayStartHour + 1 }, (_, index) => dayStartHour + index)
-  }, [])
 
   const selected = useMemo(
     () => calendar.entries.filter((entry) => selection.includes(entry.id)),
@@ -419,9 +408,11 @@ export const CalendarBoard = ({
             {CALENDAR_COPY.today}
           </Button>
           {canManage && (
-            <Button variant="primary" icon="add" onClick={() => openForm(null)}>
-              {CALENDAR_COPY.add}
-            </Button>
+            <span {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.calendarAdd }}>
+              <Button variant="primary" icon="add" onClick={() => openForm(null)}>
+                {CALENDAR_COPY.add}
+              </Button>
+            </span>
           )}
           <SegmentedControl
             options={UNITS}
@@ -429,6 +420,14 @@ export const CalendarBoard = ({
             onChange={setUnit}
             label={CALENDAR_COPY.unit}
           />
+          {canManage && unit !== 'month' && (
+            <SegmentedControl
+              options={GRID_MODES}
+              value={gridMode}
+              onChange={setGridMode}
+              label={CALENDAR_COPY.gridMode}
+            />
+          )}
         </div>
 
         <FilterBar
@@ -437,14 +436,13 @@ export const CalendarBoard = ({
           onSearch={setSearch}
           filters={filters}
           values={filterValues}
-          onFilter={(name, value) => setFilterValues((current) => ({ ...current, [name]: value }))}
-          onReset={resetFilters}
+          onFilter={setFilter}
+          onReset={reset}
           isFiltered={isFiltered}
         />
 
         {selected.length > 0 && (
           <div className={CALENDAR_STYLES.selectionBar}>
-            <span className={CALENDAR_STYLES.selectionCount}>{selected.length}</span>
             <span>
               {selected.length > 1 ? CALENDAR_COPY.selectedPlural : CALENDAR_COPY.selected}
             </span>
@@ -515,36 +513,31 @@ export const CalendarBoard = ({
                 ))}
               </div>
 
-              <div className={cn(CALENDAR_STYLES.week, columns)}>
-                {hours.map((hour) => (
-                  <Fragment key={hour}>
-                    <span className={CALENDAR_STYLES.hour}>
-                      {`${String(hour).padStart(2, '0')}:00`}
-                    </span>
-                    {days.map((day) => {
-                      const slot = `${day.key}${SLOT_SEPARATOR}${String(hour).padStart(2, '0')}`
-
-                      return (
-                        <div
-                          key={slot}
-                          className={cn(
-                            CALENDAR_STYLES.slot,
-                            covers(slot) &&
-                              slotDraft?.from.startsWith(day.key) &&
-                              CALENDAR_STYLES.dayDrafted,
-                            over === slot && 'is-drop-target'
-                          )}
-                          {...(canManage ? containerProps(slot) : {})}
-                          {...slotProps(slot)}
-                        >
-                          {renderZones(day.key)}
-                          {timedCards(day.key, hour).map((entry) => renderCard(entry, slot))}
-                        </div>
-                      )
-                    })}
-                  </Fragment>
-                ))}
-              </div>
+              <CalendarTimeGrid
+                days={days}
+                entries={visible.filter(
+                  (entry) => entry.kind === CalendarKinds.Event && !entry.allDay
+                )}
+                agendaExtras={allDayCards}
+                columns={columns}
+                canManage={canManage}
+                mode={gridMode}
+                selection={selection}
+                onDraw={(drawn) =>
+                  openForm(null, {
+                    kind: CalendarKinds.Event,
+                    allDay: false,
+                    startsAt: toFieldValue(atMinute(drawn.fromDay, drawn.startMinute)),
+                    endsAt: toFieldValue(atMinute(drawn.toDay, drawn.endMinute)),
+                  })
+                }
+                onSelectMany={setSelection}
+                onMove={(entry, dayKey, startMinute) =>
+                  void calendar.move(entry.id, atMinute(dayKey, startMinute))
+                }
+                onOpen={openEntry}
+                renderZones={renderZones}
+              />
             </>
           ) : (
             <div className={CALENDAR_STYLES.month}>
@@ -619,27 +612,27 @@ export const CalendarBoard = ({
         )}
       </Section>
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.event}
         open={dialog === 'form'}
         title={editing ? CALENDAR_COPY.edit : CALENDAR_COPY.add}
         fields={fields}
         initialValues={editing?.values ?? draft ?? undefined}
         issues={calendar.issues}
         isSaving={calendar.isSaving}
-        size="lg"
         onSubmit={(values) =>
           editing ? calendar.update(editing.id, values) : calendar.create(values)
         }
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.selection}
         open={dialog === 'bulk'}
         title={CALENDAR_COPY.editSelection}
         fields={bulkFields}
         issues={calendar.issues}
         isSaving={calendar.isSaving}
-        size="lg"
         onSubmit={async (values) => {
           // An untouched field must leave the whole selection alone
           const filled = Object.fromEntries(
@@ -705,7 +698,6 @@ export const CalendarBoard = ({
                   label={CALENDAR_KIND_REGISTRY.label(opened.kind)}
                   accent={opened.accent}
                   tone="brand"
-                  dot
                 />
                 {opened.templateName && (
                   <Badge label={opened.templateName} accent={opened.accent} tone="brand" />

@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { roleGroupedOptions } from '@/core/lib/forms/options'
 import { prisma } from '@/core/lib/db'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -21,9 +22,9 @@ import {
   meetingEntries,
   memberFunction,
 } from '@/core/services/calendar/projections'
-import type { ProjectionContext } from '@/core/services/calendar/projections'
+import type { ProjectedPosts, ProjectionContext } from '@/core/services/calendar/projections'
 import { peopleInScope, projectOptions, youtuberOptions } from '@/core/services/work/shared'
-import { CALENDAR_FIELD_COPY } from '@/declarations/calendar/copy'
+import { CALENDAR_FIELD_COPY, CALENDAR_FIELD_INFO } from '@/declarations/calendar/copy'
 import { CALENDAR_KIND_REGISTRY } from '@/declarations/calendar/registries'
 import {
   CALENDAR_SETTINGS,
@@ -55,15 +56,16 @@ const subjectOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
       id: true,
       displayName: true,
       avatarUrl: true,
-      primaryFunction: { select: { name: true, accent: true } },
-      secondaryFunction: { select: { name: true, accent: true } },
+      role: true,
+      functions: {
+        select: {
+          jobFunction: { select: { name: true, accent: true, kind: true, position: true } },
+        },
+      },
     },
   })
 
-  return rows.map((row) => ({
-    value: row.id,
-    label: row.displayName,
-    image: row.avatarUrl,
+  return roleGroupedOptions(rows, (row) => ({
     accent: memberFunction(row)?.accent,
     hint: memberFunction(row)?.name,
   }))
@@ -117,7 +119,7 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
     templateOptions(),
     subjectOptions(scope),
     youtuberOptions(scope),
-    projectOptions(),
+    projectOptions(scope),
     teamOptions(scope),
   ])
 
@@ -133,6 +135,7 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'title',
       kind: 'text',
       label: CALENDAR_FIELD_COPY.title,
+      info: CALENDAR_FIELD_INFO.title,
       required: true,
       glyph: 'emoji',
       maxLength: FORM_SETTINGS.titleMaxLength,
@@ -142,6 +145,7 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'kind',
       kind: 'select',
       label: CALENDAR_FIELD_COPY.kind,
+      info: CALENDAR_FIELD_INFO.kind,
       required: true,
       options: toOptions(CALENDAR_KIND_REGISTRY),
       mark: 'dot',
@@ -154,6 +158,13 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'templateId',
       kind: 'select',
       label: CALENDAR_FIELD_COPY.template,
+      info: CALENDAR_FIELD_INFO.template,
+      action: {
+        label: CALENDAR_FIELD_COPY.configureTemplate,
+        href: ROUTES.settingsSection('evenements'),
+        icon: 'settings',
+        permission: Permissions.ReferenceManage,
+      },
       options: templates,
       mark: 'dot',
       span: 'half',
@@ -163,6 +174,7 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'description',
       kind: 'textarea',
       label: CALENDAR_FIELD_COPY.description,
+      info: CALENDAR_FIELD_INFO.description,
       maxLength: FORM_SETTINGS.longTextMaxLength,
       group: FORM_GROUPS.essentials,
     },
@@ -170,6 +182,7 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'visibility',
       kind: 'select',
       label: CALENDAR_FIELD_COPY.visibility,
+      info: CALENDAR_FIELD_INFO.visibility,
       options: toOptions(EVENT_VISIBILITY_REGISTRY),
       mark: 'dot',
       span: 'half',
@@ -179,6 +192,8 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'startsAt',
       kind: 'datetime',
       label: CALENDAR_FIELD_COPY.startsAt,
+      info: CALENDAR_FIELD_INFO.startsAt,
+      preset: 'today',
       required: true,
       span: 'half',
       group: FORM_GROUPS.planning,
@@ -187,6 +202,7 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'endsAt',
       kind: 'datetime',
       label: CALENDAR_FIELD_COPY.endsAt,
+      info: CALENDAR_FIELD_INFO.endsAt,
       span: 'half',
       group: FORM_GROUPS.planning,
     },
@@ -200,6 +216,7 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'accountId',
       kind: 'select',
       label: CALENDAR_FIELD_COPY.subject,
+      info: CALENDAR_FIELD_INFO.subject,
       options: subjects,
       mark: 'avatar',
       span: 'half',
@@ -209,6 +226,7 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'youtuberId',
       kind: 'select',
       label: CALENDAR_FIELD_COPY.youtuber,
+      info: CALENDAR_FIELD_INFO.youtuber,
       options: youtubers,
       mark: 'avatar',
       span: 'half',
@@ -217,7 +235,9 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
     {
       name: 'projectId',
       kind: 'select',
+      mark: 'emoji',
       label: CALENDAR_FIELD_COPY.project,
+      info: CALENDAR_FIELD_INFO.project,
       options: projects,
       span: 'half',
       group: FORM_GROUPS.assignment,
@@ -226,12 +246,14 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'rollCall',
       kind: 'toggle',
       label: CALENDAR_FIELD_COPY.rollCall,
+      info: CALENDAR_FIELD_INFO.rollCall,
       group: FORM_GROUPS.essentials,
     },
     {
       name: 'teamIds',
       kind: 'multiselect',
       label: CALENDAR_FIELD_COPY.teams,
+      info: CALENDAR_FIELD_INFO.teams,
       options: teams,
       mark: 'dot',
       group: FORM_GROUPS.assignment,
@@ -241,6 +263,7 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'memberIds',
       kind: 'multiselect',
       label: CALENDAR_FIELD_COPY.members,
+      info: CALENDAR_FIELD_INFO.members,
       options: subjects,
       mark: 'avatar',
       group: FORM_GROUPS.assignment,
@@ -258,6 +281,7 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       name: 'remindAt',
       kind: 'datetime',
       label: CALENDAR_FIELD_COPY.remindAt,
+      info: CALENDAR_FIELD_INFO.remindAt,
       hint: CALENDAR_FIELD_COPY.remindAtHint,
       span: 'half',
       group: FORM_GROUPS.planning,
@@ -288,8 +312,11 @@ const ENTRY_SHAPE = {
   subject: {
     select: {
       displayName: true,
-      primaryFunction: { select: { name: true, accent: true } },
-      secondaryFunction: { select: { name: true, accent: true } },
+      functions: {
+        select: {
+          jobFunction: { select: { name: true, accent: true, kind: true, position: true } },
+        },
+      },
     },
   },
   attendances: { select: { accountId: true } },
@@ -325,11 +352,7 @@ const toEntry = (
     template: { name: string; accent: string | null; visibility: EventVisibilityName } | null
     youtuber: { accent: string | null } | null
     owner: { displayName: string } | null
-    subject: {
-      displayName: string
-      primaryFunction: { name: string; accent: string | null } | null
-      secondaryFunction: { name: string; accent: string | null } | null
-    } | null
+    subject: ({ displayName: string } & ProjectedPosts) | null
     attendances: { accountId: string }[]
   },
   roster: AttendanceRoster | null = null
@@ -595,7 +618,12 @@ export const createEntry = async (
   if (!data.rollCall) return toEntry(row)
 
   // Fan the roll-call out to its convened members
-  const memberIds = await expandRoster(data.rollCallTeamIds, readList(values, 'memberIds'), scope)
+  const memberIds = await expandRoster(
+    data.rollCallTeamIds,
+    readList(values, 'memberIds'),
+    scope,
+    data.startsAt
+  )
   await syncRoster(row.id, memberIds)
   await notifyConvened({ id: row.id, title: row.title, ownerId }, memberIds)
 
@@ -639,7 +667,12 @@ export const updateEntry = async (
 
   // Widen the roster, then ping only the members newly convened
   const known = new Set(row.attendances.map((seat) => seat.accountId))
-  const memberIds = await expandRoster(data.rollCallTeamIds, readList(values, 'memberIds'), scope)
+  const memberIds = await expandRoster(
+    data.rollCallTeamIds,
+    readList(values, 'memberIds'),
+    scope,
+    data.startsAt
+  )
   await syncRoster(id, memberIds)
   await notifyConvened(
     { id, title: row.title, ownerId: row.ownerId },

@@ -1,10 +1,6 @@
 import { DATE_LOCALE } from '@/declarations/ui/dates'
 
-/**
- * Day arithmetic the calendar runs on, built on the native Date so no date
- * library ships to the browser. Every helper works in local time, because a
- * grid day is what the member sees, never what UTC says
- */
+// Native local-time day arithmetic
 
 // Grids always start on Monday, matching the weekday labels
 const WEEK_START = 1
@@ -192,3 +188,12 @@ export const dayMonthLabel = (date: Date, withYear = false): string =>
  */
 
 export const timeLabel = (date: Date): string => `${pad(date.getHours())}:${pad(date.getMinutes())}`
+
+/**
+ * Short month name of a date
+ * @param {Date} date - Date to name
+ * @return {string} - Abbreviated month
+ */
+
+export const shortMonthLabel = (date: Date): string =>
+  date.toLocaleDateString(DATE_LOCALE, { month: 'short' }).replace('.', '')

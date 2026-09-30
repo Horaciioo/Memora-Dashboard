@@ -1,0 +1,5 @@
+{
+  "busyHorizonDays": 90,
+  "busyDefaultMinutes": 60,
+  "busyListMax": 3
+}

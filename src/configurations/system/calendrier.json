@@ -4,5 +4,8 @@
   "maxEntriesPerDay": 3,
   "rollCallReminderLeadDays": 1,
   "rollCallReminderHour": 18,
-  "rollCallResponsesShared": false
+  "rollCallResponsesShared": false,
+  "stepMinutes": 15,
+  "rowMinutes": 60,
+  "defaultDurationMinutes": 60
 }

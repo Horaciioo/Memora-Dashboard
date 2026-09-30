@@ -50,7 +50,7 @@ export default async function CalendarLegendPage() {
                   aria-hidden="true"
                 />
                 <span>
-                  <strong>{kind.label}</strong> — <span className={MEANING}>{kind.summary}</span>
+                  <strong>{kind.label}</strong> : <span className={MEANING}>{kind.summary}</span>
                 </span>
               </li>
             )
@@ -68,7 +68,7 @@ export default async function CalendarLegendPage() {
               <li key={key} className={ROW}>
                 <span className="flex flex-wrap items-center gap-1.5">
                   <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                  <strong>{source.label}</strong> —{' '}
+                  <strong>{source.label}</strong> :{' '}
                   <span className={MEANING}>{source.summary}</span>
                 </span>
               </li>
@@ -97,7 +97,6 @@ export default async function CalendarLegendPage() {
                   label={level.label}
                   tone={toTone(level.accent, 'neutral')}
                   icon="visible"
-                  dot
                 />
               )
             })}

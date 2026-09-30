@@ -54,7 +54,6 @@ export const CalendarEntryPreview = ({ entry, anchor }: CalendarEntryPreviewProp
           label={CALENDAR_KIND_REGISTRY.label(entry.kind)}
           accent={entry.accent}
           tone="brand"
-          dot
         />
         <Badge label={CALENDAR_SOURCE_REGISTRY.get(entry.source).label} tone="neutral" />
       </span>

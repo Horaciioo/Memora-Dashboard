@@ -17,6 +17,10 @@ export const CALENDAR_COPY = {
   week: 'Semaine',
   day: 'Jour',
   unit: 'Période affichée',
+  // Pointer mode
+  gridMode: 'Geste sur la grille',
+  modeDraw: 'Tracer',
+  modeSelect: 'Sélectionner',
   today: 'Aujourd’hui',
   previous: 'Période précédente',
   next: 'Période suivante',
@@ -25,8 +29,8 @@ export const CALENDAR_COPY = {
     'Glisse un évènement ailleurs, ou tire sur une colonne pour en créer un. Maj + clic pour en sélectionner plusieurs.',
   more: 'de plus',
   edit: 'Modifier l’évènement',
-  selected: 'sélectionné',
-  selectedPlural: 'sélectionnés',
+  selected: 'Évènement sélectionné',
+  selectedPlural: 'Évènements sélectionnés',
   clearSelection: 'Tout désélectionner',
   editSelection: 'Modifier la sélection',
   deleteSelection: 'Supprimer la sélection',
@@ -102,6 +106,29 @@ export const CALENDAR_FIELD_COPY = {
   rosterSharedHint: 'Sinon, seuls les Responsables voient qui a répondu quoi.',
   remindAt: 'Rappel aux sans-réponse',
   remindAtHint: 'Laisse vide pour un rappel la veille en fin de journée.',
+  configureTemplate: 'Configurer un modèle',
+} as const
+
+/**
+ * Explanations behind each calendar field
+ * @type {Record<string, string>}
+ */
+
+export const CALENDAR_FIELD_INFO = {
+  title: 'Le nom affiché sur la case du calendrier.',
+  kind: 'La nature de l’évènement, elle décide de sa couleur.',
+  template: 'Un évènement préparé à l’avance : il remplit le type, la couleur et la visibilité.',
+  subject: 'Le membre que l’évènement concerne directement, s’il y en a un.',
+  visibility: 'Qui voit l’évènement sur son calendrier.',
+  startsAt: 'Le moment où l’évènement commence.',
+  endsAt: 'Le moment où il se termine. Vide, il dure une heure.',
+  youtuber: 'Le créateur concerné par l’évènement.',
+  project: 'Le projet lié à l’évènement, s’il y en a un.',
+  description: 'Ce qu’il faut savoir avant d’y aller.',
+  rollCall: 'Chaque personne convoquée indique si elle sera là.',
+  teams: 'Les équipes dont tous les membres sont convoqués.',
+  members: 'Des personnes convoquées en plus des équipes.',
+  remindAt: 'Le moment où un rappel part à ceux qui n’ont pas répondu.',
 } as const
 
 /**

@@ -24,6 +24,12 @@ export interface CalendarEntryChipProps {
   draggable: boolean
   onOpen: (entry: CalendarEntry, additive: boolean) => void
   dragProps?: Record<string, unknown>
+  // Fills its grid seat
+  fill?: boolean
+  // One line, short span
+  compact?: boolean
+  // Overrides the start time
+  timeLabel?: string
 }
 
 // Pointer rest before the preview opens
@@ -39,6 +45,9 @@ const HOVER_DELAY = 140
  * @param {boolean} draggable - Entry may be moved
  * @param {(entry: CalendarEntry, additive: boolean) => void} onOpen - Open or select handler
  * @param {Record<string, unknown>} [dragProps] - Drag handlers of the board
+ * @param {boolean} [fill] - Fills its seat
+ * @param {boolean} [compact] - Single line
+ * @param {string} [timeLabel] - Shown time
  * @return {JSX.Element}
  */
 
@@ -51,6 +60,9 @@ export const CalendarEntryChip = ({
   draggable,
   onOpen,
   dragProps,
+  fill,
+  compact,
+  timeLabel,
 }: CalendarEntryChipProps) => {
   // An entry wears the colour of its creator, an absence stays grey
   const paint = accentPaint(entry.accent, entry.muted ? 'neutral' : 'brand')
@@ -107,12 +119,14 @@ export const CalendarEntryChip = ({
             ? cn(CALENDAR_STYLES.entryMuted, paint.soft, paint.text)
             : cn(paint.solid, CALENDAR_STYLES.entrySolid),
           entry.readOnly && cn(CALENDAR_STYLES.entryReadOnly, paint.border),
-          selected && CALENDAR_STYLES.entrySelected
+          selected && CALENDAR_STYLES.entrySelected,
+          fill && CALENDAR_STYLES.entryFill,
+          compact && CALENDAR_STYLES.entryCompact
         )}
         {...(draggable ? (dragProps ?? {}) : {})}
       >
         {!entry.allDay && (
-          <span className={CALENDAR_STYLES.entryTime}>{timeOf(entry.startsAt)}</span>
+          <span className={CALENDAR_STYLES.entryTime}>{timeLabel ?? timeOf(entry.startsAt)}</span>
         )}
         {previewable && entry.rollCall && (
           <RollCallIcon className={CALENDAR_STYLES.chipMark} aria-hidden="true" />

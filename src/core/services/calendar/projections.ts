@@ -19,6 +19,7 @@ import {
   CalendarSources,
   EventVisibilities,
 } from '@/utils/constants/workflow'
+import { byHierarchy } from '@/core/services/reference/functions'
 import type { CalendarKindName, CalendarSourceName } from '@/utils/constants/workflow'
 
 /**
@@ -45,22 +46,23 @@ const MINUTE_MS = 60_000
 const FUNCTION_SHAPE = {
   select: {
     displayName: true,
-    primaryFunction: { select: { name: true, accent: true } },
-    secondaryFunction: { select: { name: true, accent: true } },
+    functions: {
+      select: { jobFunction: { select: { name: true, accent: true, kind: true, position: true } } },
+    },
     youtubers: { select: { accent: true }, orderBy: { position: 'asc' }, take: 1 },
   },
 } as const
 
 /**
- * Posts a member holds, the pair every projection carries
+ * Posts a member holds, every projection carrying them
  * @typedef {Object} ProjectedPosts
- * @property {{ accent: string | null } | null} primaryFunction - Main post
- * @property {{ accent: string | null } | null} secondaryFunction - Second post
+ * @property {Array<Object>} functions - Held functions with their name, colour, kind and rank
  */
 
 export interface ProjectedPosts {
-  primaryFunction: { name: string; accent: string | null } | null
-  secondaryFunction: { name: string; accent: string | null } | null
+  functions: {
+    jobFunction: { name: string; accent: string | null; kind: string; position: number }
+  }[]
 }
 
 /**
@@ -84,8 +86,9 @@ export interface ProjectedMember extends ProjectedPosts {
 export const memberFunction = (
   member: ProjectedPosts | null | undefined
 ): { name: string; accent: string } | null => {
-  const posts = [member?.primaryFunction, member?.secondaryFunction]
-  const carrying = posts.find((post) => post?.accent)
+  // Down the hierarchy, principal posts first, then by rank
+  const posts = (member?.functions ?? []).map((held) => held.jobFunction).sort(byHierarchy)
+  const carrying = posts.find((post) => post.accent)
 
   return carrying?.accent ? { name: carrying.name, accent: carrying.accent } : null
 }
@@ -220,7 +223,7 @@ export const absenceEntries = async ({
         row.status === AbsenceStatuses.Pending
           ? CALENDAR_PROJECTION_COPY.pendingAbsence
           : CALENDAR_PROJECTION_COPY.absence
-      } — ${row.account.displayName}`,
+      } · ${row.account.displayName}`,
       startsAt: row.startDate,
       endsAt: row.endDate,
       allDay: true,
@@ -291,31 +294,47 @@ export const meetingEntries = async ({
 }
 
 /**
- * Project the birthdays falling inside the window, year after year
- * @param {ProjectionContext} context - Window and permissions
- * @return {Promise<CalendarEntry[]>} - Projected birthdays
+ * One celebrated birthday landing inside a window
+ * @typedef {Object} BirthdayOccurrence
+ * @property {string} accountId - Member identifier
+ * @property {string} displayName - Member name
+ * @property {string | null} avatarUrl - Member portrait
+ * @property {Date} day - Day it falls on
+ * @property {string | null} accent - Creator colour
  */
 
-export const birthdayEntries = async ({
-  from,
-  to,
-  access,
-  scope,
-}: ProjectionContext): Promise<CalendarEntry[]> => {
-  if (!access.can(Permissions.MemberRead)) return []
+export interface BirthdayOccurrence {
+  accountId: string
+  displayName: string
+  avatarUrl: string | null
+  day: Date
+  accent: string | null
+}
 
+/**
+ * Read the celebrated birthdays of a window, members who declined it never listed
+ * @param {Date} from - First moment
+ * @param {Date} to - Last moment
+ * @param {AccessScope} scope - Creator perimeter
+ * @return {Promise<BirthdayOccurrence[]>} - Occurrences, soonest first
+ */
+
+export const birthdaysBetween = async (
+  from: Date,
+  to: Date,
+  scope: AccessScope
+): Promise<BirthdayOccurrence[]> => {
   /*
    * Postgres narrows the candidates, Node keeps the last word. Comparing month
    * and day as one integer avoids ever building a date that does not exist,
    * which is what a 29 February birthday does in a non leap year
    */
-  const windowStart = new Date(from)
-  const windowEnd = new Date(to)
+
   const dayKey = (date: Date): number => (date.getMonth() + 1) * 100 + date.getDate()
 
   // Widened by a day each side, so the filter below never loses a candidate
-  const fromKey = dayKey(new Date(windowStart.getTime() - DAY_MS))
-  const toKey = dayKey(new Date(windowEnd.getTime() + DAY_MS))
+  const fromKey = dayKey(new Date(from.getTime() - DAY_MS))
+  const toKey = dayKey(new Date(to.getTime() + DAY_MS))
 
   const candidates = await prisma.$queryRaw<{ id: string }[]>`
     SELECT id FROM accounts
@@ -335,34 +354,61 @@ export const birthdayEntries = async ({
 
   const rows = await prisma.account.findMany({
     where: scopedWhere('account', scope, { id: { in: candidates.map((row) => row.id) } }),
-    select: { id: true, birthday: true, ...FUNCTION_SHAPE.select },
+    select: { id: true, birthday: true, avatarUrl: true, ...FUNCTION_SHAPE.select },
   })
 
   const start = startOfDay(new Date(from))
   const end = endOfDay(new Date(to))
 
-  return rows.flatMap((row) => {
-    const birthday = row.birthday as Date
+  return rows
+    .flatMap((row) => {
+      const birthday = row.birthday as Date
 
-    // A window can straddle a new year, so both candidate years are tried
-    return [start.getFullYear(), end.getFullYear()]
-      .filter((year, index, years) => years.indexOf(year) === index)
-      .map((year) => new Date(year, birthday.getMonth(), birthday.getDate()))
-      .filter((day) => day >= start && day <= end)
-      .map((day) =>
-        projected({
-          source: CalendarSources.Birthday,
-          id: `${row.id}:${day.getFullYear()}`,
-          title: `${CALENDAR_PROJECTION_COPY.birthday} — ${row.displayName}`,
-          startsAt: day,
-          endsAt: null,
-          allDay: true,
+      // A window can straddle a new year, so both candidate years are tried
+      return [start.getFullYear(), end.getFullYear()]
+        .filter((year, index, years) => years.indexOf(year) === index)
+        .map((year) => new Date(year, birthday.getMonth(), birthday.getDate()))
+        .filter((day) => day >= start && day <= end)
+        .map((day) => ({
+          accountId: row.id,
+          displayName: row.displayName,
+          avatarUrl: row.avatarUrl,
+          day,
           accent: creatorAccent(row),
-          description: null,
-          subjectName: row.displayName,
-        })
-      )
-  })
+        }))
+    })
+    .sort((left, right) => left.day.getTime() - right.day.getTime())
+}
+
+/**
+ * Project the birthdays falling inside the window, year after year
+ * @param {ProjectionContext} context - Window and permissions
+ * @return {Promise<CalendarEntry[]>} - Projected birthdays
+ */
+
+export const birthdayEntries = async ({
+  from,
+  to,
+  access,
+  scope,
+}: ProjectionContext): Promise<CalendarEntry[]> => {
+  if (!access.can(Permissions.MemberRead)) return []
+
+  const occurrences = await birthdaysBetween(from, to, scope)
+
+  return occurrences.map((occurrence) =>
+    projected({
+      source: CalendarSources.Birthday,
+      id: `${occurrence.accountId}:${occurrence.day.getFullYear()}`,
+      title: `${CALENDAR_PROJECTION_COPY.birthday} · ${occurrence.displayName}`,
+      startsAt: occurrence.day,
+      endsAt: null,
+      allDay: true,
+      accent: occurrence.accent,
+      description: null,
+      subjectName: occurrence.displayName,
+    })
+  )
 }
 
 /**
@@ -391,7 +437,7 @@ export const academyStepEntries = async (
     return projected({
       source: CalendarSources.AcademyStep,
       id: row.id,
-      title: junior ? `${row.title} — ${junior.displayName}` : row.title,
+      title: junior ? `${row.title} · ${junior.displayName}` : row.title,
       startsAt: row.scheduledAt ?? new Date(),
       endsAt: null,
       allDay: true,

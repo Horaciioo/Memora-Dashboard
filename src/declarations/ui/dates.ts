@@ -43,5 +43,5 @@ export const DATE_COPY = {
   overdue: 'en retard',
   day: 'jour',
   days: 'jours',
-  none: '—',
+  none: 'Non renseigné',
 } as const

@@ -1,9 +1,11 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
 
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { feedbackTitle } from '@/declarations/ui/copy'
@@ -63,6 +65,7 @@ export const useCalendar = (
   sessionId?: string
 ): CalendarCollection => {
   const [entries, setEntries] = useState(initialEntries)
+  const queryClient = useQueryClient()
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   const replace = useCallback((entry: CalendarEntry) => {
@@ -107,8 +110,16 @@ export const useCalendar = (
     async (id: string, startsAt: Date) => {
       // Optimistic, so the card follows the pointer instead of waiting on the round trip
       const previous = entries
+      // Length kept, as the server does
       setEntries((current) =>
-        current.map((row) => (row.id === id ? { ...row, startsAt: startsAt.toISOString() } : row))
+        current.map((row) => {
+          if (row.id !== id) return row
+
+          const shift = startsAt.getTime() - new Date(row.startsAt).getTime()
+          const endsAt = row.endsAt ? new Date(new Date(row.endsAt).getTime() + shift) : null
+
+          return { ...row, startsAt: startsAt.toISOString(), endsAt: endsAt?.toISOString() ?? null }
+        })
       )
 
       const entry = await run(() =>
@@ -166,12 +177,18 @@ export const useCalendar = (
   const load = useCallback(
     async (from: string, to: string) => {
       // A window read never raises a toast, the grid simply refills
-      const next = await apiGet<CalendarEntry[]>(API_ROUTES.calendar(from, to, sessionId)).catch(
-        () => null
-      )
+      const next = await queryClient
+        .fetchQuery({
+          queryKey: QUERY_KEYS.calendar(from, to, sessionId),
+          queryFn: ({ signal }) =>
+            apiGet<CalendarEntry[]>(API_ROUTES.calendar(from, to, sessionId), signal),
+          // Local writes outdate it
+          staleTime: 0,
+        })
+        .catch(() => null)
       if (next) setEntries(next)
     },
-    [sessionId]
+    [sessionId, queryClient]
   )
 
   const remove = useCallback(

@@ -1,3 +1,4 @@
+import { releasedFrom } from '@/core/services/academy/LegacyRelease'
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
@@ -28,13 +29,15 @@ type AttendanceRow = Prisma.EventAttendanceGetPayload<{
  * @param {string[]} teamIds - Convened teams
  * @param {string[]} memberIds - Members named on top of the teams
  * @param {AccessScope} scope - Creator perimeter
+ * @param {Date} startsAt - Start of the event, a member on a Legacy track over it being released
  * @return {Promise<string[]>} - Account identifiers
  */
 
 export const expandRoster = async (
   teamIds: string[],
   memberIds: string[],
-  scope: AccessScope
+  scope: AccessScope,
+  startsAt: Date
 ): Promise<string[]> => {
   // Team members joined to the named ones
   const fromTeams = teamIds.length
@@ -57,7 +60,13 @@ export const expandRoster = async (
     select: { id: true },
   })
 
-  return accounts.map((account) => account.id)
+  // A Junior Responsable in training is released from every event of their period
+  const released = await releasedFrom(
+    accounts.map((account) => account.id),
+    startsAt
+  )
+
+  return accounts.map((account) => account.id).filter((id) => !released.has(id))
 }
 
 /**
