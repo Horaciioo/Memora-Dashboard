@@ -1,12 +1,15 @@
+import { TWITCH_FUNDAMENTALS } from '@/declarations/academy/curriculum/twitchFundamentals'
 import type { Course, CourseBlock, ExerciseBlock } from '@/declarations/academy/curriculum/types'
-import { EXERCISE_KINDS } from '@/declarations/academy/curriculum/types'
 
 /**
  * Every interactive course, in catalogue order
  * @type {readonly Course[]}
  */
 
-export const COURSES: readonly Course[] = []
+export const COURSES: readonly Course[] = [
+  // Indispensable, first period
+  TWITCH_FUNDAMENTALS,
+]
 
 // Course lookup by key
 const BY_KEY = new Map(COURSES.map((course) => [course.key, course]))
