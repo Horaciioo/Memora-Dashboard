@@ -1,0 +1,218 @@
+{
+  "source": "Notion, Timeline de Session (recrutement standardisé)",
+  "phases": [
+    "Pré-Entretiens",
+    "In-Entretiens",
+    "Post-Entretiens"
+  ],
+  "kinds": {
+    "✍️": "écrit",
+    "🔊": "vocal",
+    "⚡️": "action"
+  },
+  "steps": [
+    {
+      "phase": "Pré-Entretiens",
+      "title": "Session de gestion des Candidatures écrites",
+      "kinds": [
+        "✍️"
+      ],
+      "markers": [
+        "🟠"
+      ]
+    },
+    {
+      "phase": "Pré-Entretiens",
+      "title": "Validation des candidats approuvés",
+      "kinds": [
+        "⚡️"
+      ],
+      "markers": [
+        "🔴"
+      ]
+    },
+    {
+      "phase": "Pré-Entretiens",
+      "title": "Conception des annonces Legacy",
+      "kinds": [
+        "✍️"
+      ],
+      "markers": [
+        "🟠",
+        "⚪️"
+      ]
+    },
+    {
+      "phase": "Pré-Entretiens",
+      "title": "Validation des annonces",
+      "kinds": [
+        "⚡️"
+      ],
+      "markers": [
+        "🔴"
+      ]
+    },
+    {
+      "phase": "Pré-Entretiens",
+      "title": "Conception des pré-requis, consignes & attentes",
+      "kinds": [
+        "🔊"
+      ],
+      "markers": [
+        "🔴",
+        "🟠",
+        "⚪️"
+      ]
+    },
+    {
+      "phase": "Pré-Entretiens",
+      "title": "Partage d’informations avec Talent",
+      "kinds": [
+        "🔊",
+        "✍️"
+      ],
+      "markers": [
+        "⚪️",
+        "🟣"
+      ]
+    },
+    {
+      "phase": "Pré-Entretiens",
+      "title": "Calendrier d’entretiens : Candice <> Talent",
+      "kinds": [
+        "🔊"
+      ],
+      "markers": [
+        "⚪️",
+        "🟣"
+      ]
+    },
+    {
+      "phase": "Pré-Entretiens",
+      "title": "#1 Annonce “Bienvenue”",
+      "kinds": [
+        "✍️"
+      ],
+      "markers": [
+        "🟠"
+      ]
+    },
+    {
+      "phase": "Pré-Entretiens",
+      "title": "#2 Annonce “Calendrier d’entretiens”",
+      "kinds": [
+        "✍️"
+      ],
+      "markers": [
+        "🟠",
+        "⚪️"
+      ]
+    },
+    {
+      "phase": "In-Entretiens",
+      "title": "Décision groupée : Legacy <> Talent",
+      "kinds": [
+        "🔊"
+      ],
+      "markers": [
+        "🟠",
+        "⚪️"
+      ]
+    },
+    {
+      "phase": "In-Entretiens",
+      "title": "Décision finale : Marsha <> Legacy",
+      "kinds": [
+        "🔊",
+        "⚡️"
+      ],
+      "markers": [
+        "🔴",
+        "🟠",
+        "⚪️"
+      ]
+    },
+    {
+      "phase": "In-Entretiens",
+      "title": "Annonce “Décision finale à Talent”",
+      "kinds": [
+        "✍️"
+      ],
+      "markers": [
+        "🟠"
+      ]
+    },
+    {
+      "phase": "In-Entretiens",
+      "title": "Annonce “Réunion d’infos w/ Momentum”",
+      "kinds": [
+        "✍️",
+        "🔊"
+      ],
+      "markers": [
+        "⚪️"
+      ]
+    },
+    {
+      "phase": "In-Entretiens",
+      "title": "Partage d’informations w/ Momentum",
+      "kinds": [
+        "🔊",
+        "✍️"
+      ],
+      "markers": [
+        "⚪️"
+      ]
+    },
+    {
+      "phase": "Post-Entretiens",
+      "title": "Dater le vocal des résultats",
+      "kinds": [
+        "🔊"
+      ],
+      "markers": [
+        "⚪️"
+      ]
+    },
+    {
+      "phase": "Post-Entretiens",
+      "title": "Réaliser le vocal des Résultats",
+      "kinds": [
+        "🔊"
+      ],
+      "markers": [
+        "🟠"
+      ]
+    },
+    {
+      "phase": "Post-Entretiens",
+      "title": "Annonce “Communiquer les Résultats”",
+      "kinds": [
+        "✍️"
+      ],
+      "markers": [
+        "🟠"
+      ]
+    },
+    {
+      "phase": "Post-Entretiens",
+      "title": "Réaliser la réunion d’informations d’entrée",
+      "kinds": [
+        "🔊"
+      ],
+      "markers": [
+        "⚪️"
+      ]
+    },
+    {
+      "phase": "Post-Entretiens",
+      "title": "Archive des Salons & Kick des retardataires",
+      "kinds": [
+        "✍️"
+      ],
+      "markers": [
+        "🔴"
+      ]
+    }
+  ]
+}

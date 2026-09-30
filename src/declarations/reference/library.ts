@@ -1,9 +1,9 @@
-import dispositifs from '@/declarations/reference/data/dispositifs.json'
-import eventTemplates from '@/declarations/reference/data/eventTemplates.json'
-import networks from '@/declarations/reference/data/networks.json'
-import pimSteps from '@/declarations/reference/data/pimSteps.json'
-import skills from '@/declarations/reference/data/skills.json'
-import states from '@/declarations/reference/data/states.json'
+import dispositifs from '@/configurations/reference/dispositifs.json'
+import eventTemplates from '@/configurations/reference/eventTemplates.json'
+import networks from '@/configurations/reference/networks.json'
+import pimSteps from '@/configurations/reference/pimSteps.json'
+import skills from '@/configurations/reference/skills.json'
+import states from '@/configurations/reference/states.json'
 import type { AcademyStageName, StepAnchorName, StepOwnerName } from '@/utils/constants/hierarchy'
 import type {
   CalendarKindName,
