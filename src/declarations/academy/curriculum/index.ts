@@ -1,4 +1,5 @@
 import { ANTI_RAID } from '@/declarations/academy/curriculum/antiRaid'
+import { COMMUNICATION_POSTURE } from '@/declarations/academy/curriculum/communication'
 import { MARSHA_BOT } from '@/declarations/academy/curriculum/marshaBot'
 import { TWITCH_FUNDAMENTALS } from '@/declarations/academy/curriculum/twitchFundamentals'
 import type { Course, CourseBlock, ExerciseBlock } from '@/declarations/academy/curriculum/types'
@@ -12,6 +13,7 @@ export const COURSES: readonly Course[] = [
   // Indispensable, first period
   TWITCH_FUNDAMENTALS,
   MARSHA_BOT,
+  COMMUNICATION_POSTURE,
   // Secondary, second period
   ANTI_RAID,
 ]
