@@ -1,4 +1,5 @@
 import { createRegistry } from '@/core/lib/registry'
+import type { IconName } from '@/declarations/ui/icons'
 
 export type ColorVisionMode = 'NONE' | 'PROTANOPIA' | 'DEUTERANOPIA' | 'TRITANOPIA'
 
@@ -11,11 +12,17 @@ export type FontScale = 'sm' | 'md' | 'lg'
  * @typedef {Object} PreferenceOption
  * @property {string} label - Full label
  * @property {string} short - Caption of the segmented control
+ * @property {IconName} [icon] - Glyph of its card
+ * @property {string} [description] - Line under its card label
+ * @property {string} [sample] - Text size of its card sample
  */
 
 interface PreferenceOption {
   label: string
   short: string
+  icon?: IconName
+  description?: string
+  sample?: string
 }
 
 /**
@@ -36,10 +43,25 @@ interface ColorVisionOption extends PreferenceOption {
  */
 
 const COLOR_VISION_MAP: Record<ColorVisionMode, ColorVisionOption> = {
-  NONE: { label: 'Aucune correction', short: 'Aucune' },
-  PROTANOPIA: { label: 'Protanopie', short: 'Protanopie', attribute: 'protanopia' },
-  DEUTERANOPIA: { label: 'Deutéranopie', short: 'Deutéranopie', attribute: 'deuteranopia' },
-  TRITANOPIA: { label: 'Tritanopie', short: 'Tritanopie', attribute: 'tritanopia' },
+  NONE: { label: 'Aucune correction', short: 'Aucune', description: 'Les couleurs d’origine.' },
+  PROTANOPIA: {
+    label: 'Protanopie',
+    short: 'Protanopie',
+    description: 'Le rouge se confond avec le vert.',
+    attribute: 'protanopia',
+  },
+  DEUTERANOPIA: {
+    label: 'Deutéranopie',
+    short: 'Deutéranopie',
+    description: 'Le vert se confond avec le rouge.',
+    attribute: 'deuteranopia',
+  },
+  TRITANOPIA: {
+    label: 'Tritanopie',
+    short: 'Tritanopie',
+    description: 'Le bleu se confond avec le jaune.',
+    attribute: 'tritanopia',
+  },
 }
 
 export const COLOR_VISION_REGISTRY = createRegistry(COLOR_VISION_MAP)
@@ -50,9 +72,9 @@ export const COLOR_VISION_REGISTRY = createRegistry(COLOR_VISION_MAP)
  */
 
 const THEME_MAP: Record<ThemePreference, PreferenceOption> = {
-  LIGHT: { label: 'Thème clair', short: 'Clair' },
-  DARK: { label: 'Thème sombre', short: 'Sombre' },
-  SYSTEM: { label: 'Comme mon appareil', short: 'Auto' },
+  LIGHT: { label: 'Thème clair', short: 'Clair', icon: 'light' },
+  DARK: { label: 'Thème sombre', short: 'Sombre', icon: 'dark' },
+  SYSTEM: { label: 'Comme mon appareil', short: 'Auto', icon: 'system' },
 }
 
 export const THEME_REGISTRY = createRegistry(THEME_MAP)
@@ -63,9 +85,9 @@ export const THEME_REGISTRY = createRegistry(THEME_MAP)
  */
 
 const FONT_SCALE_MAP: Record<FontScale, PreferenceOption> = {
-  sm: { label: 'Petite', short: 'A-' },
-  md: { label: 'Normale', short: 'A' },
-  lg: { label: 'Grande', short: 'A+' },
+  sm: { label: 'Petite', short: 'A-', sample: 'text-lg' },
+  md: { label: 'Normale', short: 'A', sample: 'text-2xl' },
+  lg: { label: 'Grande', short: 'A+', sample: 'text-[2rem]' },
 }
 
 export const FONT_SCALE_REGISTRY = createRegistry(FONT_SCALE_MAP)

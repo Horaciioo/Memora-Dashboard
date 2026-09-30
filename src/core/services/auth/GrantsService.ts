@@ -1,14 +1,21 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { resolveGrants } from '@/core/lib/permissions'
+import type { PermissionGroup, PermissionOverwrite } from '@/core/lib/permissions'
 import { GRANT_ADDITIONS } from '@/declarations/access/grants'
-import { ROLE_PRESETS } from '@/declarations/access/roles'
+import { ACCESS_CATEGORY_REGISTRY } from '@/declarations/access/categories'
+import { FLOOR_ROLE, ROLE_PRESETS } from '@/declarations/access/roles'
 import { MemberRoles } from '@/utils/constants/hierarchy'
-import type { MemberRoleName } from '@/utils/constants/hierarchy'
+import type { AccessCategoryName, MemberRoleName } from '@/utils/constants/hierarchy'
 import { PermissionEffects } from '@/utils/constants/workflow'
-import { isPermissionName } from '@/utils/constants/permissions'
+import type { FunctionKindName } from '@/utils/constants/workflow'
+import { isPermissionName, prunePermissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 import type { Account } from '@prisma/client'
+
+// Account row carrying the functions it holds
+export type HolderAccount = Account & { functions: { functionId: string }[] }
 
 // Applied once per process, every later call costing nothing
 let synced = false
@@ -48,163 +55,366 @@ export const syncRoleGrants = async (): Promise<void> => {
   synced = true
 }
 
-// Role and function grants, overrides excluded
-const inheritedGrants = async (account: Account): Promise<Set<string>> => {
+/**
+ * Keep the rows that carry a declared permission, in the overwrite shape the resolver folds
+ * @param {Array<{ permission: string, effect: string }>} rows - Stored grants
+ * @return {PermissionOverwrite[]} - Known overwrites
+ */
+
+const toOverwrites = (rows: { permission: string; effect: string }[]): PermissionOverwrite[] =>
+  rows
+    .filter((row) => isPermissionName(row.permission))
+    .map((row) => ({
+      permission: row.permission as PermissionName,
+      effect:
+        row.effect === PermissionEffects.Deny ? PermissionEffects.Deny : PermissionEffects.Allow,
+    }))
+
+/**
+ * Build the clause reading the global layer plus, when one is open, a creator's own
+ * @param {string | null} youtuberId - Creator the perimeter is narrowed to
+ * @return {{ OR: { youtuberId: string | null }[] }} - Scope clause
+ */
+
+const onLayers = (youtuberId: string | null) => ({
+  OR: youtuberId === null ? [{ youtuberId: null }] : [{ youtuberId: null }, { youtuberId }],
+})
+
+/**
+ * Read what the floor role grants every account, the base every overwrite sits on
+ * @return {Promise<PermissionName[]>} - Floor permissions
+ */
+
+const readFloor = async (): Promise<PermissionName[]> => {
   await syncRoleGrants()
 
-  const functionIds = [account.primaryFunctionId, account.secondaryFunctionId].filter(
-    (id): id is string => id !== null
-  )
+  const rows = await prisma.rolePermission.findMany({
+    where: { role: FLOOR_ROLE, youtuberId: null, effect: PermissionEffects.Allow },
+  })
 
-  // Role grants and function grants, overrides excluded
-  const [roleGrants, functionGrants] = await Promise.all([
-    prisma.rolePermission.findMany({ where: { role: account.role } }),
-    functionIds.length > 0
-      ? prisma.functionPermission.findMany({ where: { functionId: { in: functionIds } } })
-      : Promise.resolve([]),
-  ])
-
-  const granted = new Set<string>()
-  for (const grant of roleGrants) granted.add(grant.permission)
-  for (const grant of functionGrants) granted.add(grant.permission)
-
-  return granted
+  return rows.map((row) => row.permission).filter(isPermissionName)
 }
 
 /**
- * Resolve every permission held by an account, the root bypass living in resolvePermissions
- * @param {Account} account - Account row
+ * Resolve every permission an account holds on one creator, the root bypass living in
+ * resolvePermissions. Steps run widest first: the holders the account carries, then the
+ * overwrites narrowed to the creator, then the account's own, so the narrowest always wins
+ * @param {HolderAccount} account - Account row with the functions it holds
+ * @param {string | null} youtuberId - Creator the perimeter is narrowed to
  * @return {Promise<PermissionName[]>} - Granted permissions
  */
 
-export const resolveAccountPermissions = async (account: Account): Promise<PermissionName[]> => {
-  const granted = await inheritedGrants(account)
-  const overrides = await prisma.accountPermission.findMany({ where: { accountId: account.id } })
+export const resolveAccountPermissions = async (
+  account: HolderAccount,
+  youtuberId: string | null = null
+): Promise<PermissionName[]> => {
+  const functionIds = account.functions.map((held) => held.functionId)
 
-  // Overrides run last so a deny always wins
-  for (const override of overrides) {
-    if (override.effect === PermissionEffects.Allow) granted.add(override.permission)
-    else granted.delete(override.permission)
-  }
+  const layers = onLayers(youtuberId)
 
-  return [...granted].filter(isPermissionName)
+  const [floor, roleRows, functionRows, accountRows] = await Promise.all([
+    readFloor(),
+    prisma.rolePermission.findMany({ where: { role: account.role, ...layers } }),
+    functionIds.length > 0
+      ? prisma.functionPermission.findMany({
+          where: { functionId: { in: functionIds }, ...layers },
+        })
+      : Promise.resolve([]),
+    prisma.accountPermission.findMany({ where: { accountId: account.id, ...layers } }),
+  ])
+
+  const globalOf = <T extends { youtuberId: string | null }>(rows: T[]): T[] =>
+    rows.filter((row) => row.youtuberId === null)
+  const scopedOf = <T extends { youtuberId: string | null }>(rows: T[]): T[] =>
+    rows.filter((row) => row.youtuberId !== null)
+
+  // The floor role already stands in the base, so its own rows never replay as a step
+  const holderGlobal: PermissionGroup = [
+    account.role === FLOOR_ROLE ? [] : toOverwrites(globalOf(roleRows)),
+    toOverwrites(globalOf(functionRows)),
+  ]
+
+  const holderScoped: PermissionGroup = [
+    toOverwrites(scopedOf(roleRows)),
+    toOverwrites(scopedOf(functionRows)),
+  ]
+
+  return resolveGrants(floor, [
+    holderGlobal,
+    holderScoped,
+    [toOverwrites(globalOf(accountRows))],
+    [toOverwrites(scopedOf(accountRows))],
+  ])
 }
 
 /**
- * Read what inheritance alone grants an account
+ * Read what everything but an account's own overrides grants it, the baseline its
+ * tri-state picker greys out against
  * @param {string} accountId - Account identifier
+ * @param {string | null} youtuberId - Creator the perimeter is narrowed to
  * @return {Promise<PermissionName[]>} - Inherited permissions
  */
 
-export const readInheritedGrants = async (accountId: string): Promise<PermissionName[]> => {
-  const account = await prisma.account.findUnique({ where: { id: accountId } })
+export const readInheritedGrants = async (
+  accountId: string,
+  youtuberId: string | null = null
+): Promise<PermissionName[]> => {
+  const account = await prisma.account.findUnique({
+    where: { id: accountId },
+    include: { functions: { select: { functionId: true } } },
+  })
   if (!account) return []
 
-  return [...(await inheritedGrants(account))].filter(isPermissionName)
+  const functionIds = account.functions.map((held) => held.functionId)
+  const layers = onLayers(youtuberId)
+
+  const [floor, roleRows, functionRows] = await Promise.all([
+    readFloor(),
+    prisma.rolePermission.findMany({ where: { role: account.role, ...layers } }),
+    functionIds.length > 0
+      ? prisma.functionPermission.findMany({
+          where: { functionId: { in: functionIds }, ...layers },
+        })
+      : Promise.resolve([]),
+  ])
+
+  const holders: PermissionGroup = [
+    account.role === FLOOR_ROLE ? [] : toOverwrites(roleRows),
+    toOverwrites(functionRows),
+  ]
+
+  return resolveGrants(floor, [holders])
 }
 
 /**
- * Replace the grants of one role
+ * Read the baseline one role resolves against, the floor alone unless the role is the floor
  * @param {MemberRoleName} role - Hierarchy level
- * @param {PermissionName[]} permissions - Permissions to hold
+ * @return {Promise<PermissionName[]>} - Baseline permissions
+ */
+
+export const readRoleBaseline = async (role: MemberRoleName): Promise<PermissionName[]> =>
+  role === FLOOR_ROLE ? [] : readFloor()
+
+/**
+ * Read the baseline one function resolves against, the role of its category standing above the floor
+ * @param {AccessCategoryName} category - Rail section of the function
+ * @return {Promise<PermissionName[]>} - Baseline permissions
+ */
+
+export const readFunctionBaseline = async (
+  category: AccessCategoryName
+): Promise<PermissionName[]> => {
+  const tier = ACCESS_CATEGORY_REGISTRY.get(category).tier
+
+  const [floor, roleRows] = await Promise.all([
+    readFloor(),
+    tier === FLOOR_ROLE
+      ? Promise.resolve([])
+      : prisma.rolePermission.findMany({ where: { role: tier, youtuberId: null } }),
+  ])
+
+  return resolveGrants(floor, [[toOverwrites(roleRows)]])
+}
+
+/**
+ * Replace the overwrites of one role, on the global layer or on one creator
+ * @param {MemberRoleName} role - Hierarchy level
+ * @param {PermissionOverwrite[]} overwrites - Overwrites to hold
+ * @param {string | null} youtuberId - Creator the layer belongs to
  * @return {Promise<void>} - Replaced
  */
 
 export const replaceRoleGrants = async (
   role: MemberRoleName,
-  permissions: PermissionName[]
+  overwrites: PermissionOverwrite[],
+  youtuberId: string | null = null
 ): Promise<void> => {
   await prisma.$transaction([
-    prisma.rolePermission.deleteMany({ where: { role } }),
+    prisma.rolePermission.deleteMany({ where: { role, youtuberId } }),
     prisma.rolePermission.createMany({
-      data: permissions.map((permission) => ({ role, permission })),
+      data: overwrites.map((entry) => ({
+        role,
+        permission: entry.permission,
+        effect: entry.effect,
+        youtuberId,
+      })),
       skipDuplicates: true,
     }),
   ])
 }
 
 /**
- * Replace the grants of one function
+ * Replace the overwrites of one function, on the global layer or on one creator
  * @param {string} functionId - Function identifier
- * @param {PermissionName[]} permissions - Permissions to hold
+ * @param {PermissionOverwrite[]} overwrites - Overwrites to hold
+ * @param {string | null} youtuberId - Creator the layer belongs to
  * @return {Promise<void>} - Replaced
  */
 
 export const replaceFunctionGrants = async (
   functionId: string,
-  permissions: PermissionName[]
+  overwrites: PermissionOverwrite[],
+  youtuberId: string | null = null
 ): Promise<void> => {
   await prisma.$transaction([
-    prisma.functionPermission.deleteMany({ where: { functionId } }),
+    prisma.functionPermission.deleteMany({ where: { functionId, youtuberId } }),
     prisma.functionPermission.createMany({
-      data: permissions.map((permission) => ({ functionId, permission })),
+      data: overwrites.map((entry) => ({
+        functionId,
+        permission: entry.permission,
+        effect: entry.effect,
+        youtuberId,
+      })),
       skipDuplicates: true,
     }),
   ])
 }
 
 /**
- * Apply the declared preset to a role
+ * Apply the declared preset to a role, every entry landing as a plain allow
  * @param {MemberRoleName} role - Hierarchy level
  * @return {Promise<void>} - Applied
  */
 
 export const applyRolePreset = async (role: MemberRoleName): Promise<void> =>
-  replaceRoleGrants(role, ROLE_PRESETS[role])
+  replaceRoleGrants(
+    role,
+    ROLE_PRESETS[role].map((permission) => ({ permission, effect: PermissionEffects.Allow })),
+    null
+  )
 
 /**
- * Read the grants of every role
- * @return {Promise<Record<MemberRoleName, PermissionName[]>>} - Grants per role
+ * Read the overwrites of every role on one layer
+ * @param {string | null} youtuberId - Creator the layer belongs to
+ * @return {Promise<Record<MemberRoleName, PermissionOverwrite[]>>} - Overwrites per role
  */
 
-export const readRoleGrants = async (): Promise<Record<MemberRoleName, PermissionName[]>> => {
+export const readRoleGrants = async (
+  youtuberId: string | null = null
+): Promise<Record<MemberRoleName, PermissionOverwrite[]>> => {
   await syncRoleGrants()
 
-  const rows = await prisma.rolePermission.findMany()
-  const grants: Record<MemberRoleName, PermissionName[]> = {
+  const rows = await prisma.rolePermission.findMany({ where: { youtuberId } })
+  const grants: Record<MemberRoleName, PermissionOverwrite[]> = {
     [MemberRoles.Admin]: [],
     [MemberRoles.Responsable]: [],
     [MemberRoles.Moderateur]: [],
+    [MemberRoles.Junior]: [],
   }
 
   for (const row of rows) {
-    if (isPermissionName(row.permission)) grants[row.role].push(row.permission)
+    if (isPermissionName(row.permission)) {
+      grants[row.role].push({
+        permission: row.permission,
+        effect:
+          row.effect === PermissionEffects.Deny ? PermissionEffects.Deny : PermissionEffects.Allow,
+      })
+    }
   }
 
   return grants
 }
 
 /**
- * Function paired with the permissions it carries
+ * Function paired with the overwrites it carries
  * @typedef {Object} FunctionGrants
  * @property {string} id - Function identifier
  * @property {string} name - Function name
- * @property {string} kind - Primary or secondary
- * @property {PermissionName[]} permissions - Permissions carried
+ * @property {FunctionKindName} kind - Primary or secondary holder slot
+ * @property {AccessCategoryName} category - Rail section on the access console
+ * @property {string | null} accent - Stored colour
+ * @property {string | null} icon - Glyph key
+ * @property {string | null} summary - Short description
+ * @property {number} holders - Accounts assigned to it
+ * @property {PermissionOverwrite[]} permissions - Overwrites carried
  */
 
 export interface FunctionGrants {
   id: string
   name: string
-  kind: string
-  permissions: PermissionName[]
+  kind: FunctionKindName
+  category: AccessCategoryName
+  accent: string | null
+  icon: string | null
+  summary: string | null
+  holders: number
+  permissions: PermissionOverwrite[]
 }
 
 /**
- * Read the grants of every function
- * @return {Promise<FunctionGrants[]>} - Grants per function
+ * Read the overwrites of every function on one layer
+ * @param {string | null} youtuberId - Creator the layer belongs to
+ * @return {Promise<FunctionGrants[]>} - Overwrites per function
  */
 
-export const readFunctionGrants = async (): Promise<FunctionGrants[]> => {
+export const readFunctionGrants = async (
+  youtuberId: string | null = null
+): Promise<FunctionGrants[]> => {
   const rows = await prisma.jobFunction.findMany({
-    include: { permissions: true },
-    orderBy: [{ kind: 'asc' }, { position: 'asc' }],
+    include: {
+      permissions: { where: { youtuberId } },
+      _count: { select: { holders: true } },
+    },
+    orderBy: [{ category: 'asc' }, { position: 'asc' }],
   })
 
   return rows.map((row) => ({
     id: row.id,
     name: row.name,
     kind: row.kind,
-    permissions: row.permissions.map((grant) => grant.permission).filter(isPermissionName),
+    category: row.category,
+    accent: row.accent,
+    icon: row.icon,
+    summary: row.summary,
+    holders: row._count.holders,
+    permissions: toOverwrites(row.permissions),
   }))
+}
+
+/**
+ * Resolve what one role effectively grants, for the simulation preview
+ * @param {MemberRoleName} role - Hierarchy level
+ * @param {string | null} youtuberId - Creator the perimeter is narrowed to
+ * @return {Promise<PermissionName[]>} - Effective permissions
+ */
+
+export const simulateRoleGrants = async (
+  role: MemberRoleName,
+  youtuberId: string | null = null
+): Promise<PermissionName[]> => {
+  const [floor, rows] = await Promise.all([
+    readFloor(),
+    prisma.rolePermission.findMany({ where: { role, ...onLayers(youtuberId) } }),
+  ])
+
+  if (role === FLOOR_ROLE) return prunePermissions(floor)
+
+  return resolveGrants(floor, [
+    [toOverwrites(rows.filter((row) => row.youtuberId === null))],
+    [toOverwrites(rows.filter((row) => row.youtuberId !== null))],
+  ])
+}
+
+/**
+ * Resolve what one function effectively grants on top of its category, for the simulation preview
+ * @param {string} functionId - Function identifier
+ * @param {AccessCategoryName} category - Rail section of the function
+ * @param {string | null} youtuberId - Creator the perimeter is narrowed to
+ * @return {Promise<PermissionName[]>} - Effective permissions
+ */
+
+export const simulateFunctionGrants = async (
+  functionId: string,
+  category: AccessCategoryName,
+  youtuberId: string | null = null
+): Promise<PermissionName[]> => {
+  const [baseline, rows] = await Promise.all([
+    readFunctionBaseline(category),
+    prisma.functionPermission.findMany({ where: { functionId, ...onLayers(youtuberId) } }),
+  ])
+
+  return resolveGrants(baseline, [
+    [toOverwrites(rows.filter((row) => row.youtuberId === null))],
+    [toOverwrites(rows.filter((row) => row.youtuberId !== null))],
+  ])
 }

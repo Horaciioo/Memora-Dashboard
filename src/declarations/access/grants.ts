@@ -64,6 +64,13 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     },
   },
   {
+    key: 'legacy-track',
+    grants: {
+      [MemberRoles.Responsable]: [Permissions.LegacyRead, Permissions.LegacyManage],
+      [MemberRoles.Moderateur]: [Permissions.LegacySelf],
+    },
+  },
+  {
     key: 'integration-links',
     grants: {
       [MemberRoles.Admin]: [Permissions.IntegrationManage],

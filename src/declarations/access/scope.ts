@@ -1,6 +1,6 @@
 /**
  * How each scopable model reaches its creator
- * @type {Record<string, 'direct' | 'relation'>}
+ * @type {Record<string, 'direct' | 'required' | 'relation'>}
  */
 
 export const SCOPE_TARGETS = {
@@ -10,8 +10,9 @@ export const SCOPE_TARGETS = {
   team: 'direct',
   calendarEvent: 'direct',
   liveconEntry: 'direct',
-  sanctionOffense: 'direct',
-  recruitmentSession: 'direct',
+  // Never without a creator, so no unassigned branch
+  sanctionOffense: 'required',
+  recruitmentSession: 'required',
   account: 'relation',
 } as const
 

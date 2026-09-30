@@ -9,49 +9,85 @@ import type {
 } from '@/utils/constants/hierarchy'
 import { Permissions, PermissionsList } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
+import type { IconName } from '@/declarations/ui/icons'
 
 /**
  * Hierarchy level metadata
  * @typedef {Object} RoleOption
  * @property {string} label - Display name
+ * @property {string} plural - Category heading
  * @property {string} summary - Short description
  * @property {number} rank - Higher outranks lower
  * @property {string} accent - Token driving the badge colour
+ * @property {IconName} icon - Glyph replacing the label on compact badges
  * @property {NavigationViewName} [view] - Rail view the level unlocks
  */
 
 interface RoleOption {
   label: string
+  plural: string
   summary: string
   rank: number
   accent: string
+  icon: IconName
   view?: NavigationViewName
 }
 
 const ROLE_MAP: Record<MemberRoleName, RoleOption> = {
   [MemberRoles.Admin]: {
     label: 'Admin',
+    plural: 'Admins',
     summary: 'Pilote les responsables et fait la passerelle avec les YouTubeurs.',
     rank: 3,
     accent: 'authorityAdmin',
+    icon: 'crown',
     view: NavigationViews.Administration,
   },
   [MemberRoles.Responsable]: {
     label: 'Responsable',
+    plural: 'Responsables',
     summary: 'Chef d’équipe, il a une ou plusieurs équipes à charge.',
     rank: 2,
     accent: 'authorityLead',
+    icon: 'flame',
     view: NavigationViews.Lead,
   },
   [MemberRoles.Moderateur]: {
     label: 'Modérateur',
+    plural: 'Modérateurs',
     summary: 'Affecté à un YouTubeur et à une fonction de modération.',
     rank: 1,
-    accent: 'neutral',
+    accent: 'info',
+    icon: 'shieldOutline',
+  },
+  [MemberRoles.Junior]: {
+    label: 'Junior',
+    plural: 'Juniors',
+    summary: 'Admis par recrutement, il suit sa PIM avant de devenir Modérateur.',
+    rank: 0,
+    accent: 'caution',
+    icon: 'academy',
   },
 }
 
 export const ROLE_REGISTRY = createRegistry(ROLE_MAP)
+
+/**
+ * Highest role first
+ * @param {MemberRoleName} left - One role
+ * @param {MemberRoleName} right - Other role
+ * @return {number} - Sort order
+ */
+
+export const byRoleRank = (left: MemberRoleName, right: MemberRoleName): number =>
+  ROLE_MAP[right].rank - ROLE_MAP[left].rank
+
+/**
+ * Level every account stands on, its grants being the base every overwrite resolves against
+ * @type {MemberRoleName}
+ */
+
+export const FLOOR_ROLE: MemberRoleName = MemberRoles.Moderateur
 
 /**
  * Encadrement levels
@@ -170,6 +206,8 @@ export const ROLE_PRESETS: Record<MemberRoleName, PermissionName[]> = {
     Permissions.AcademyNoteWrite,
     Permissions.AcademyObjectiveWrite,
     Permissions.AcademyReviewValidate,
+    Permissions.LegacyRead,
+    Permissions.LegacyManage,
     Permissions.TeamRead,
     Permissions.TeamManage,
     Permissions.CalendarRead,
@@ -189,7 +227,10 @@ export const ROLE_PRESETS: Record<MemberRoleName, PermissionName[]> = {
     Permissions.AcademyRead,
     Permissions.AcademySelfRead,
     Permissions.AcademyTrainingComplete,
+    Permissions.LegacySelf,
     Permissions.TeamRead,
     Permissions.CalendarRead,
   ],
+  // Stands on the floor role, nothing added on top
+  [MemberRoles.Junior]: [],
 }

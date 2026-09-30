@@ -43,6 +43,9 @@ export const Permissions = {
   AcademyReviewValidate: 'academy:review:validate',
   AcademySelfRead: 'academy:self:read',
   AcademyTrainingComplete: 'academy:training:complete',
+  LegacyRead: 'legacy:read',
+  LegacyManage: 'legacy:manage',
+  LegacySelf: 'legacy:self',
   CalendarRead: 'calendar:read',
   CalendarManage: 'calendar:manage',
   TeamRead: 'team:read',
@@ -62,6 +65,7 @@ export type PermissionName = (typeof Permissions)[keyof typeof Permissions]
  * @property {string} displayName - Display name
  * @property {string} description - Display description
  * @property {boolean} important - Destructive or sensitive
+ * @property {PermissionName} [parent] - Page permission this one refines
  */
 
 export interface PermissionMeta {
@@ -70,10 +74,11 @@ export interface PermissionMeta {
   displayName: string
   description: string
   important: boolean
+  parent?: PermissionName
 }
 
 /**
- * Permission group keys
+ * Permission group keys, one per navigation page
  * @type {Record<string, string>}
  */
 
@@ -83,18 +88,21 @@ export const PermissionGroups = {
   Tasks: 'tasks',
   Meetings: 'meetings',
   Absences: 'absences',
-  Moderation: 'moderation',
-  Academy: 'academy',
-  Recruitment: 'recruitment',
   Calendar: 'calendar',
+  Livecon: 'livecon',
+  Sanctions: 'sanctions',
+  Recruitment: 'recruitment',
+  Academy: 'academy',
+  Legacy: 'legacy',
   Teams: 'teams',
-  Settings: 'settings',
+  Configuration: 'configuration',
+  Access: 'access',
 } as const
 
 export type PermissionGroup = (typeof PermissionGroups)[keyof typeof PermissionGroups]
 
 /**
- * Permission catalogue
+ * Permission catalogue — one root permission per page, its refinements carrying a parent
  * @type {PermissionMeta[]}
  */
 
@@ -112,6 +120,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Ajouter un modérateur',
     description: 'Créer une fiche et son accès au dashboard.',
     important: true,
+    parent: Permissions.MemberRead,
   },
   {
     name: Permissions.MemberUpdate,
@@ -119,6 +128,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Modifier un modérateur',
     description: 'Changer division, fonction, YouTubeur et informations.',
     important: false,
+    parent: Permissions.MemberRead,
   },
   {
     name: Permissions.MemberDelete,
@@ -126,6 +136,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Supprimer un modérateur',
     description: 'Retirer définitivement une fiche et son accès.',
     important: true,
+    parent: Permissions.MemberRead,
   },
   {
     name: Permissions.MemberNoteRead,
@@ -133,6 +144,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Lire les notes privées',
     description: 'Voir les notes posées sur un modérateur.',
     important: true,
+    parent: Permissions.MemberRead,
   },
   {
     name: Permissions.MemberNoteWrite,
@@ -140,6 +152,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Écrire une note privée',
     description: 'Poser ou retirer une note sur un modérateur.',
     important: true,
+    parent: Permissions.MemberRead,
   },
   {
     name: Permissions.MemberLogRead,
@@ -147,6 +160,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Lire les logs',
     description: 'Consulter le journal d’activité d’un modérateur.',
     important: false,
+    parent: Permissions.MemberRead,
   },
   {
     name: Permissions.ProjectRead,
@@ -161,6 +175,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Créer un projet',
     description: 'Ouvrir un nouveau projet.',
     important: false,
+    parent: Permissions.ProjectRead,
   },
   {
     name: Permissions.ProjectUpdate,
@@ -168,6 +183,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Modifier un projet',
     description: 'Changer état, priorité, deadline et équipe.',
     important: false,
+    parent: Permissions.ProjectRead,
   },
   {
     name: Permissions.ProjectDelete,
@@ -175,6 +191,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Supprimer un projet',
     description: 'Retirer définitivement un projet.',
     important: true,
+    parent: Permissions.ProjectRead,
   },
   {
     name: Permissions.CommunicationRead,
@@ -182,6 +199,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Voir les communications',
     description: 'Lire les annonces rédigées sur un projet.',
     important: false,
+    parent: Permissions.ProjectRead,
   },
   {
     name: Permissions.CommunicationWrite,
@@ -189,6 +207,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Rédiger une communication',
     description: 'Écrire et publier une annonce de projet.',
     important: false,
+    parent: Permissions.ProjectRead,
   },
   {
     name: Permissions.TaskRead,
@@ -203,6 +222,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Créer une tâche',
     description: 'Ajouter une tâche et l’attribuer.',
     important: false,
+    parent: Permissions.TaskRead,
   },
   {
     name: Permissions.TaskUpdate,
@@ -210,6 +230,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Modifier une tâche',
     description: 'Changer état, date et responsable.',
     important: false,
+    parent: Permissions.TaskRead,
   },
   {
     name: Permissions.TaskDelete,
@@ -217,6 +238,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Supprimer une tâche',
     description: 'Retirer définitivement une tâche.',
     important: true,
+    parent: Permissions.TaskRead,
   },
   {
     name: Permissions.MeetingRead,
@@ -231,6 +253,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Planifier une réunion',
     description: 'Créer une réunion et convoquer des participants.',
     important: false,
+    parent: Permissions.MeetingRead,
   },
   {
     name: Permissions.MeetingUpdate,
@@ -238,6 +261,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Modifier une réunion',
     description: 'Changer date, état et participants.',
     important: false,
+    parent: Permissions.MeetingRead,
   },
   {
     name: Permissions.MeetingDelete,
@@ -245,13 +269,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Supprimer une réunion',
     description: 'Retirer définitivement une réunion.',
     important: true,
-  },
-  {
-    name: Permissions.AbsenceRead,
-    group: PermissionGroups.Absences,
-    displayName: 'Voir toutes les absences',
-    description: 'Consulter les absences de toute l’équipe.',
-    important: false,
+    parent: Permissions.MeetingRead,
   },
   {
     name: Permissions.AbsenceCreate,
@@ -261,39 +279,64 @@ export const PermissionsList: PermissionMeta[] = [
     important: false,
   },
   {
+    name: Permissions.AbsenceRead,
+    group: PermissionGroups.Absences,
+    displayName: 'Voir toutes les absences',
+    description: 'Consulter les absences de toute l’équipe.',
+    important: false,
+  },
+  {
     name: Permissions.AbsenceReview,
     group: PermissionGroups.Absences,
     displayName: 'Traiter une absence',
     description: 'Valider ou refuser une demande.',
     important: true,
+    parent: Permissions.AbsenceRead,
+  },
+  {
+    name: Permissions.CalendarRead,
+    group: PermissionGroups.Calendar,
+    displayName: 'Voir le calendrier',
+    description: 'Ouvrir le calendrier partagé, filtré sur ce qui est visible.',
+    important: false,
+  },
+  {
+    name: Permissions.CalendarManage,
+    group: PermissionGroups.Calendar,
+    displayName: 'Gérer le calendrier',
+    description: 'Poser, déplacer et supprimer une entrée du calendrier.',
+    important: false,
+    parent: Permissions.CalendarRead,
   },
   {
     name: Permissions.LiveconRead,
-    group: PermissionGroups.Moderation,
+    group: PermissionGroups.Livecon,
     displayName: 'Voir le livecon',
     description: 'Consulter le niveau de vigilance courant.',
     important: false,
   },
   {
     name: Permissions.LiveconUpdate,
-    group: PermissionGroups.Moderation,
+    group: PermissionGroups.Livecon,
     displayName: 'Changer le livecon',
     description: 'Basculer le niveau de vigilance d’un YouTubeur.',
     important: true,
+    parent: Permissions.LiveconRead,
   },
   {
     name: Permissions.SanctionRead,
-    group: PermissionGroups.Moderation,
+    group: PermissionGroups.Sanctions,
     displayName: 'Voir le panel de sanctions',
     description: 'Consulter le barème des sanctions d’un YouTubeur.',
     important: false,
   },
   {
     name: Permissions.SanctionManage,
-    group: PermissionGroups.Moderation,
+    group: PermissionGroups.Sanctions,
     displayName: 'Gérer le panel de sanctions',
     description: 'Modifier les infractions, leurs exemples et leur barème.',
     important: true,
+    parent: Permissions.SanctionRead,
   },
   {
     name: Permissions.RecruitmentRead,
@@ -308,6 +351,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Gérer les recrutements',
     description: 'Ouvrir une session, tenir sa timeline et déplacer les candidats.',
     important: true,
+    parent: Permissions.RecruitmentRead,
   },
   {
     name: Permissions.RecruitmentCandidateWrite,
@@ -315,6 +359,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Traiter un candidat',
     description: 'Poser un entretien, écrire un bilan et commenter une candidature.',
     important: false,
+    parent: Permissions.RecruitmentRead,
   },
   {
     name: Permissions.RecruitmentInstructionWrite,
@@ -322,6 +367,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Écrire les consignes',
     description: 'Rédiger les consignes de recrutement d’une session.',
     important: true,
+    parent: Permissions.RecruitmentRead,
   },
   {
     name: Permissions.IntegrationManage,
@@ -329,6 +375,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Gérer les liens d’intégration',
     description: 'Émettre et révoquer les liens du formulaire d’intégration.',
     important: true,
+    parent: Permissions.RecruitmentRead,
   },
   {
     name: Permissions.AcademyRead,
@@ -343,6 +390,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Piloter la Marsha Academy',
     description: 'Ouvrir une session, y placer des juniors et les valider.',
     important: true,
+    parent: Permissions.AcademyRead,
   },
   {
     name: Permissions.AcademyReviewRead,
@@ -350,6 +398,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Lire les bilans vocaux',
     description: 'Ouvrir les traces écrites des bilans tenus avec un junior.',
     important: true,
+    parent: Permissions.AcademyRead,
   },
   {
     name: Permissions.AcademyReviewWrite,
@@ -357,6 +406,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Tenir un bilan vocal',
     description: 'Écrire la trace d’un bilan et fixer les objectifs suivants.',
     important: true,
+    parent: Permissions.AcademyRead,
   },
   {
     name: Permissions.AcademySkillWrite,
@@ -364,6 +414,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Noter les compétences',
     description: 'Faire évoluer le pourcentage de maîtrise d’une compétence.',
     important: false,
+    parent: Permissions.AcademyRead,
   },
   {
     name: Permissions.AcademyNoteRead,
@@ -371,6 +422,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Lire les notes de FSI',
     description: 'Ouvrir les remarques posées sur le suivi d’un junior.',
     important: true,
+    parent: Permissions.AcademyRead,
   },
   {
     name: Permissions.AcademyNoteWrite,
@@ -378,6 +430,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Écrire une note de FSI',
     description: 'Poser ou retirer une remarque sur le suivi d’un junior.',
     important: true,
+    parent: Permissions.AcademyRead,
   },
   {
     name: Permissions.AcademyObjectiveWrite,
@@ -385,6 +438,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Fixer les objectifs',
     description: 'Créer, modifier et réordonner les objectifs personnels.',
     important: false,
+    parent: Permissions.AcademyRead,
   },
   {
     name: Permissions.AcademyReviewValidate,
@@ -392,6 +446,7 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Décider d’un bilan',
     description: 'Valider ou refuser un bilan soumis, ce qui fait avancer la FSI.',
     important: true,
+    parent: Permissions.AcademyRead,
   },
   {
     name: Permissions.AcademySelfRead,
@@ -408,17 +463,25 @@ export const PermissionsList: PermissionMeta[] = [
     important: false,
   },
   {
-    name: Permissions.CalendarRead,
-    group: PermissionGroups.Calendar,
-    displayName: 'Voir le calendrier',
-    description: 'Ouvrir le calendrier partagé, filtré sur ce qui est visible.',
+    name: Permissions.LegacyRead,
+    group: PermissionGroups.Legacy,
+    displayName: 'Voir les parcours Legacy',
+    description: 'Suivre les parcours de formation des futurs Responsables.',
     important: false,
   },
   {
-    name: Permissions.CalendarManage,
-    group: PermissionGroups.Calendar,
-    displayName: 'Gérer le calendrier',
-    description: 'Poser, déplacer et supprimer une entrée du calendrier.',
+    name: Permissions.LegacyManage,
+    group: PermissionGroups.Legacy,
+    displayName: 'Piloter les parcours Legacy',
+    description: 'Ouvrir un parcours, noter chaque module et suivre la progression.',
+    important: true,
+    parent: Permissions.LegacyRead,
+  },
+  {
+    name: Permissions.LegacySelf,
+    group: PermissionGroups.Legacy,
+    displayName: 'Suivre son parcours Legacy',
+    description: 'Ouvrir ses modules et répondre à leurs exercices.',
     important: false,
   },
   {
@@ -434,26 +497,28 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Gérer les équipes',
     description: 'Créer une équipe et déplacer ses membres.',
     important: true,
+    parent: Permissions.TeamRead,
   },
   {
     name: Permissions.ReferenceRead,
-    group: PermissionGroups.Settings,
+    group: PermissionGroups.Configuration,
     displayName: 'Voir la configuration',
     description: 'Consulter divisions, fonctions, YouTubeurs et états.',
     important: false,
   },
   {
     name: Permissions.ReferenceManage,
-    group: PermissionGroups.Settings,
+    group: PermissionGroups.Configuration,
     displayName: 'Gérer la configuration',
     description: 'Créer et modifier les données de référence.',
     important: true,
+    parent: Permissions.ReferenceRead,
   },
   {
     name: Permissions.AccessManage,
-    group: PermissionGroups.Settings,
-    displayName: 'Gérer les accès',
-    description: 'Attribuer les permissions par rôle et par fonction.',
+    group: PermissionGroups.Access,
+    displayName: 'Gérer les accès et la console',
+    description: 'Attribuer les permissions par rôle et par fonction, ouvrir la console admin.',
     important: true,
   },
 ]
@@ -464,6 +529,20 @@ export const PermissionsList: PermissionMeta[] = [
  */
 
 const PERMISSION_INDEX = new Map(PermissionsList.map((entry) => [entry.name, entry]))
+
+/**
+ * Children of a page permission, in catalogue order
+ * @type {Map<PermissionName, PermissionName[]>}
+ */
+
+export const PERMISSION_CHILDREN: Map<PermissionName, PermissionName[]> = PermissionsList.reduce(
+  (map, entry) => {
+    if (entry.parent) map.set(entry.parent, [...(map.get(entry.parent) ?? []), entry.name])
+
+    return map
+  },
+  new Map<PermissionName, PermissionName[]>()
+)
 
 /**
  * Read permission metadata
@@ -482,6 +561,23 @@ export const permissionMeta = (name: PermissionName): PermissionMeta | undefined
 
 export const isPermissionName = (candidate: string): candidate is PermissionName =>
   PERMISSION_INDEX.has(candidate as PermissionName)
+
+/**
+ * Drop every refinement whose page permission is missing
+ * @param {Iterable<PermissionName>} granted - Permissions held
+ * @return {PermissionName[]} - Permissions with an inert refinement removed
+ */
+
+export const prunePermissions = (granted: Iterable<PermissionName>): PermissionName[] => {
+  const held = new Set(granted)
+
+  // A refinement carries no weight without the page it refines
+  for (const entry of PermissionsList) {
+    if (entry.parent && held.has(entry.name) && !held.has(entry.parent)) held.delete(entry.name)
+  }
+
+  return [...held]
+}
 
 /**
  * Check any permission

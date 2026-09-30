@@ -4,6 +4,7 @@ import { cache } from 'react'
 import { cookies } from 'next/headers'
 
 import { prisma } from '@/core/lib/db'
+import { readActiveCreator } from '@/core/lib/auth/activeCreator'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { resolveAccountPermissions } from '@/core/services/auth/GrantsService'
 import { touchSession } from '@/core/services/auth/SessionService'
@@ -11,21 +12,25 @@ import { toDisplayPreferences } from '@/core/services/preferences/DisplayService
 import { isRootIdentity } from '@/declarations/access/identity'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
 import type { SessionUser } from '@/types/auth'
-import type { Account, Youtuber } from '@prisma/client'
+import type { Account, AccountFunction, Youtuber } from '@prisma/client'
+
+// Account row a session is built from
+type SessionAccount = Account & { youtubers: Youtuber[]; functions: AccountFunction[] }
 
 // A session records its use at most once a day
 const STAMP_INTERVAL_MS = 86_400_000
 
 /**
  * Map an account row to its session shape
- * @param {Account & { youtubers: Youtuber[] }} account - Account row
+ * @param {SessionAccount} account - Account row with its creators and functions
  * @return {Promise<SessionUser>} - Session user
  */
 
-export const toSessionUser = async (
-  account: Account & { youtubers: Youtuber[] }
-): Promise<SessionUser> => {
+export const toSessionUser = async (account: SessionAccount): Promise<SessionUser> => {
   const isRoot = isRootIdentity(account.discordId)
+
+  // Overwrites narrowed to a creator only land while that creator is the one being worked on
+  const activeYoutuberId = await readActiveCreator()
 
   return {
     id: account.id,
@@ -36,12 +41,12 @@ export const toSessionUser = async (
     status: account.status,
     divisionId: account.divisionId,
     youtuberIds: account.youtubers.map((youtuber) => youtuber.id),
-    primaryFunctionId: account.primaryFunctionId,
-    secondaryFunctionId: account.secondaryFunctionId,
+    functionIds: account.functions.map((held) => held.functionId),
     isRoot,
     display: toDisplayPreferences(account),
     historyConsentVersion: account.historyConsentVersion,
-    permissions: await resolveAccountPermissions(account),
+    seenReleaseVersion: account.seenReleaseVersion,
+    permissions: await resolveAccountPermissions(account, activeYoutuberId),
   }
 }
 
@@ -57,7 +62,7 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
 
   const session = await prisma.session.findUnique({
     where: { token },
-    include: { account: { include: { youtubers: true } } },
+    include: { account: { include: { youtubers: true, functions: true } } },
   })
   if (!session || session.expiresAt < new Date()) return null
 

@@ -20,38 +20,56 @@ interface PermissionGroupOption {
   position: number
 }
 
+// One entry per navigation page, listed in rail order
 const PERMISSION_GROUP_MAP: Record<PermissionGroup, PermissionGroupOption> = {
   [PermissionGroups.Members]: { label: 'Modérateurs', position: 0 },
   [PermissionGroups.Projects]: { label: 'Projets', position: 1 },
   [PermissionGroups.Tasks]: { label: 'Tâches', position: 2 },
   [PermissionGroups.Meetings]: { label: 'Réunions', position: 3 },
   [PermissionGroups.Absences]: { label: 'Absences', position: 4 },
-  [PermissionGroups.Moderation]: { label: 'Modération', position: 5 },
-  [PermissionGroups.Academy]: { label: 'Marsha Academy', position: 6 },
-  [PermissionGroups.Recruitment]: { label: 'Recrutements', position: 7 },
-  [PermissionGroups.Teams]: { label: 'Équipes', position: 8 },
-  [PermissionGroups.Calendar]: { label: 'Calendrier', position: 9 },
-  [PermissionGroups.Settings]: { label: 'Configuration', position: 10 },
+  [PermissionGroups.Calendar]: { label: 'Calendrier', position: 5 },
+  [PermissionGroups.Livecon]: { label: 'Livecon', position: 6 },
+  [PermissionGroups.Sanctions]: { label: 'Panel de sanctions', position: 7 },
+  [PermissionGroups.Recruitment]: { label: 'Recrutements', position: 8 },
+  [PermissionGroups.Academy]: { label: 'Marsha Academy', position: 9 },
+  [PermissionGroups.Legacy]: { label: 'Legacy', position: 10 },
+  [PermissionGroups.Teams]: { label: 'Équipes', position: 11 },
+  [PermissionGroups.Configuration]: { label: 'Configuration', position: 12 },
+  [PermissionGroups.Access]: { label: 'Accès & console', position: 13 },
 }
 
 export const PERMISSION_GROUP_REGISTRY = createRegistry(PERMISSION_GROUP_MAP)
+
+/**
+ * Page permission and its refinements
+ * @typedef {Object} PermissionRoot
+ * @property {PermissionMeta} meta - Page permission
+ * @property {PermissionMeta[]} children - Refinements nested under it
+ */
+
+export interface PermissionRoot {
+  meta: PermissionMeta
+  children: PermissionMeta[]
+}
 
 /**
  * Grouped permission section
  * @typedef {Object} PermissionSection
  * @property {PermissionGroup} group - Group key
  * @property {string} label - Group label
- * @property {PermissionMeta[]} permissions - Permissions inside the group
+ * @property {PermissionMeta[]} permissions - Every permission of the page, flat
+ * @property {PermissionRoot[]} roots - Page permissions with their refinements
  */
 
 export interface PermissionSection {
   group: PermissionGroup
   label: string
   permissions: PermissionMeta[]
+  roots: PermissionRoot[]
 }
 
 /**
- * Permission catalogue by group
+ * Permission catalogue by page
  * @type {PermissionSection[]}
  */
 
@@ -61,11 +79,19 @@ export const PERMISSION_SECTIONS: PermissionSection[] = PERMISSION_GROUP_REGISTR
     (left, right) =>
       PERMISSION_GROUP_REGISTRY.get(left).position - PERMISSION_GROUP_REGISTRY.get(right).position
   )
-  .map((group) => ({
-    group,
-    label: PERMISSION_GROUP_REGISTRY.get(group).label,
-    permissions: PermissionsList.filter((entry) => entry.group === group),
-  }))
+  .map((group) => {
+    const permissions = PermissionsList.filter((entry) => entry.group === group)
+
+    // Rootless entries carry the page, the rest hang off their parent
+    const roots = permissions
+      .filter((entry) => !entry.parent)
+      .map((meta) => ({
+        meta,
+        children: permissions.filter((entry) => entry.parent === meta.name),
+      }))
+
+    return { group, label: PERMISSION_GROUP_REGISTRY.get(group).label, permissions, roots }
+  })
 
 /**
  * Second factor code field

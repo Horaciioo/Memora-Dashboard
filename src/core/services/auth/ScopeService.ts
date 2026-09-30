@@ -126,7 +126,7 @@ export const scopedWhere = <T extends object>(
   const filter =
     kind === 'relation'
       ? { youtubers: { some: { id: { in: ids } } } }
-      : SCOPE_SETTINGS.includeUnassigned
+      : SCOPE_SETTINGS.includeUnassigned && kind === 'direct'
         ? { OR: [{ youtuberId: null }, { youtuberId: { in: ids } }] }
         : { youtuberId: { in: ids } }
 

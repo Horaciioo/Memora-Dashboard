@@ -3,60 +3,66 @@
 import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
-import { PermissionPicker } from '@/components/structures/PermissionPicker'
+import { Field } from '@/components/elements/forms/Field'
+import { SelectMenu } from '@/components/elements/forms/SelectMenu'
+import { PermissionBoard } from '@/components/structures/PermissionBoard'
 import { Section } from '@/components/structures/Section'
+import { countChanges, fromDraft, toDraft } from '@/core/lib/permissions'
+import { ACCESS_COPY } from '@/declarations/access/copy'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import type { PermissionDraft } from '@/components/structures/PermissionPicker'
-import type { MemberOverride } from '@/core/services/members/MemberFileService'
+import { layerKey } from '@/core/lib/permissions'
+import type { PermissionDraft, PermissionLayers, PermissionOverwrite } from '@/core/lib/permissions'
+import type { MemberTag } from '@/types/members'
 import type { PermissionName } from '@/utils/constants/permissions'
 
 export interface MemberAccessPanelProps {
-  overrides: MemberOverride[]
-  inherited: PermissionName[]
+  overrides: PermissionLayers
+  inherited: Record<string, PermissionName[]>
+  youtubers: MemberTag[]
+  sealed: boolean
   isSaving: boolean
-  onSave: (next: MemberOverride[]) => Promise<boolean>
+  onSave: (next: PermissionOverwrite[], youtuberId: string | null) => Promise<boolean>
+  onSealed: () => void
 }
 
 /**
- * Turn stored overrides into a picker draft
- * @param {MemberOverride[]} overrides - Stored overrides
- * @return {PermissionDraft} - Draft
- */
-
-const toDraft = (overrides: MemberOverride[]): PermissionDraft =>
-  Object.fromEntries(
-    overrides.map((entry) => [entry.permission, entry.allowed ? 'allowed' : 'denied'])
-  )
-
-/**
- * Read the overrides back out of a draft, inheritance leaving no row behind
- * @param {PermissionDraft} draft - Current draft
- * @return {MemberOverride[]} - Overrides to persist
- */
-
-const fromDraft = (draft: PermissionDraft): MemberOverride[] =>
-  (Object.keys(draft) as PermissionName[])
-    .filter((permission) => draft[permission] !== 'inherited')
-    .map((permission) => ({ permission, allowed: draft[permission] === 'allowed' }))
-
-/**
- * Per-account permission overrides, on top of what the role and the functions already grant
- * @param {MemberOverride[]} overrides - Stored overrides
- * @param {PermissionName[]} inherited - Permissions the role and functions already grant
+ * Per-account overwrites, on top of what the role and the functions already grant. A layer
+ * is picked first: the global one, or one of the creators the member is actually attached to
+ * @param {PermissionLayers} overrides - Stored overwrites, per layer
+ * @param {Record<string, PermissionName[]>} inherited - What inheritance grants, per layer
+ * @param {MemberTag[]} youtubers - Creators the member is attached to
+ * @param {boolean} sealed - The second factor still has to be opened before writing
  * @param {boolean} isSaving - Mutation in flight
- * @param {(next: MemberOverride[]) => Promise<boolean>} onSave - Save handler
+ * @param {(next: PermissionOverwrite[], youtuberId: string | null) => Promise<boolean>} onSave - Save handler
+ * @param {() => void} onSealed - Asks for the code rather than attempting the write
  * @return {JSX.Element}
  */
 
 export const MemberAccessPanel = ({
   overrides,
   inherited,
+  youtubers,
+  sealed,
   isSaving,
   onSave,
+  onSealed,
 }: MemberAccessPanelProps) => {
-  const [draft, setDraft] = useState<PermissionDraft>(() => toDraft(overrides))
-  const pending = fromDraft(draft).length
+  const [layer, setLayer] = useState('')
+  const saved = toDraft(overrides[layer] ?? [])
+  const [drafts, setDrafts] = useState<Record<string, PermissionDraft>>({})
+
+  const draft = drafts[layer] ?? saved
+  const pending = countChanges(draft, saved)
+
+  const options = [
+    { value: '', label: ACCESS_COPY.layerGlobal },
+    ...youtubers.map((creator) => ({
+      value: creator.id,
+      label: creator.label,
+      accent: creator.accent ?? undefined,
+    })),
+  ]
 
   return (
     <Section
@@ -68,8 +74,10 @@ export const MemberAccessPanel = ({
           <Button
             variant="primary"
             icon="confirm"
-            disabled={isSaving}
-            onClick={() => void onSave(fromDraft(draft))}
+            disabled={isSaving || pending === 0}
+            onClick={() =>
+              sealed ? onSealed() : void onSave(fromDraft(draft), layer === '' ? null : layer)
+            }
           >
             {isSaving ? ACTION_COPY.saving : MEMBER_COPY.accessSave}
           </Button>
@@ -77,13 +85,31 @@ export const MemberAccessPanel = ({
       }
       padded
     >
-      <PermissionPicker
-        mode="tristate"
-        value={draft}
-        baseline={inherited}
-        pending={pending}
-        onChange={setDraft}
-      />
+      <div className="flex flex-col gap-4">
+        {youtubers.length > 0 && (
+          <Field
+            id="access-layer"
+            label={ACCESS_COPY.layerLabel}
+            hint={layer === '' ? undefined : ACCESS_COPY.layerLead}
+          >
+            <SelectMenu
+              id="access-layer"
+              label={ACCESS_COPY.layerLabel}
+              options={options}
+              value={layer}
+              mark="dot"
+              onChange={setLayer}
+            />
+          </Field>
+        )}
+
+        <PermissionBoard
+          value={draft}
+          baseline={inherited[layerKey(layer === '' ? null : layer)] ?? []}
+          pending={pending}
+          onChange={(next) => setDrafts((current) => ({ ...current, [layer]: next }))}
+        />
+      </div>
     </Section>
   )
 }
