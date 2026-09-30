@@ -1,5 +1,7 @@
 node_modules
 .next
+.next-qa
+.next-build
 out
 yarn.lock
 public
