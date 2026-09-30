@@ -6,6 +6,7 @@ import { parseFormValues } from '@/core/lib/forms'
 import { createPublicRoute } from '@/core/lib/http/route'
 import {
   integrationFields,
+  readClaim,
   resolveInvite,
   submitIntegration,
 } from '@/core/services/onboarding/IntegrationService'
@@ -23,7 +24,9 @@ export const POST = createPublicRoute({
     if (!ticket || ticket.token !== params.token) throw notFound()
 
     const invite = await resolveInvite(params.token)
-    const parsed = parseFormValues(await integrationFields(invite), raw, { fillMissing: true })
+    const claim = await readClaim(invite, ticket.claimId)
+    const fields = await integrationFields(invite, Boolean(claim?.admission))
+    const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     const outcome = await submitIntegration(params.token, ticket.claimId, parsed.values)

@@ -26,11 +26,13 @@ export const integrationFailure = async (
   // Without a token there is no form to send anyone back to
   if (!token) return ROUTES.login
 
-  // A known account is the one refusal worth naming, everything else reads the same
+  // A known account and an unadmitted identity are the refusals worth naming
   const reason =
     error.code === ErrorCodes.ResourceConflict
       ? INTEGRATION_ERRORS.Taken
-      : INTEGRATION_ERRORS.Refused
+      : error.code === ErrorCodes.InsufficientPermissions
+        ? INTEGRATION_ERRORS.NotAdmitted
+        : INTEGRATION_ERRORS.Refused
 
   return `${ROUTES.integration(token)}?${INTEGRATION_ERROR_PARAM}=${reason}`
 }

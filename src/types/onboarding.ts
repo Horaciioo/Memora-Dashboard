@@ -1,3 +1,4 @@
+import type { FormValues } from '@/types/forms'
 import type { IntegrationLinkKindName } from '@/utils/constants/integration'
 
 /**
@@ -27,6 +28,7 @@ export interface IntegrationCreator {
  * @property {string | null} functionId - Function the member takes
  * @property {number | null} maxUses - Seats the link opens
  * @property {Date} createdAt - Day the link was sent, kept as the arrival date
+ * @property {string | null} recruitmentSessionId - Campaign that handed it out
  * @property {IntegrationCreator | null} youtuber - Creator the banner comes from
  * @property {{ id: string, functionId: string, startsAt: Date } | null} session - Academy session
  */
@@ -38,8 +40,27 @@ export interface LiveInvite {
   functionId: string | null
   maxUses: number | null
   createdAt: Date
+  recruitmentSessionId: string | null
   youtuber: IntegrationCreator | null
   session: { id: string; functionId: string; startsAt: Date } | null
+}
+
+/**
+ * Promotion seat waiting for an admitted candidate
+ * @typedef {Object} IntegrationAdmission
+ * @property {string} juniorId - Junior seat
+ * @property {string} accountId - Pre-generated account
+ * @property {string} sessionName - Promotion name
+ * @property {string} functionName - Function trained for
+ * @property {FormValues} prefill - What the file already knows
+ */
+
+export interface IntegrationAdmission {
+  juniorId: string
+  accountId: string
+  sessionName: string
+  functionName: string
+  prefill: FormValues
 }
 
 /**
@@ -50,6 +71,7 @@ export interface LiveInvite {
  * @property {string | null} displayName - Discord handle
  * @property {string | null} avatarUrl - Discord portrait
  * @property {string | null} avatarHash - Stored portrait hash
+ * @property {IntegrationAdmission | null} admission - Seat this identity was admitted to
  */
 
 export interface IntegrationClaimView {
@@ -58,6 +80,7 @@ export interface IntegrationClaimView {
   displayName: string | null
   avatarUrl: string | null
   avatarHash: string | null
+  admission: IntegrationAdmission | null
 }
 
 /**

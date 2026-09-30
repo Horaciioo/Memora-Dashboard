@@ -5,7 +5,8 @@ import { useState } from 'react'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { CopyInviteLink } from '@/composites/onboarding/CopyInviteLink'
 import { INTEGRATION_LINK_COPY } from '@/declarations/onboarding/copy'
 import { INTEGRATION_LINK_KIND_REGISTRY } from '@/declarations/onboarding/registries'
@@ -58,7 +59,6 @@ export const IntegrationLinkStep = ({
             <Badge
               label={INTEGRATION_LINK_KIND_REGISTRY.label(link.kind)}
               accent={INTEGRATION_LINK_KIND_REGISTRY.get(link.kind).accent}
-              dot
             />
             <span className={INTEGRATION_STEP_STYLES.meta}>
               {`${seats} ${INTEGRATION_LINK_COPY.usesLabel} · ${formatDay(link.expiresAt)}`}
@@ -103,14 +103,14 @@ export const IntegrationLinkStep = ({
         </div>
       )}
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.integrationLink}
         open={isEmitting}
         title={INTEGRATION_LINK_COPY.emitTitle}
         description={INTEGRATION_LINK_COPY.emitDescription}
         fields={fields}
         issues={issues}
         isSaving={isSaving}
-        submitLabel={INTEGRATION_LINK_COPY.emit}
         onSubmit={onEmit}
         onClose={() => setEmitting(false)}
       />

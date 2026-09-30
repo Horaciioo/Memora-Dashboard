@@ -62,10 +62,8 @@ export default async function IntegrationPage({
   const cookieStore = await cookies()
   const ticket = unpackTicket(cookieStore.get(INTEGRATION_TICKET_COOKIE)?.value)
 
-  const [fields, claim] = await Promise.all([
-    integrationFields(invite),
-    ticket?.token === token ? readClaim(invite.id, ticket.claimId) : Promise.resolve(null),
-  ])
+  const claim = ticket?.token === token ? await readClaim(invite, ticket.claimId) : null
+  const fields = await integrationFields(invite, Boolean(claim?.admission))
 
   return (
     <OnboardingShell

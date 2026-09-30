@@ -8,6 +8,22 @@ import { INTEGRATION_ERRORS, type IntegrationErrorName } from '@/declarations/on
 import { ONBOARDING_STYLES } from '@/declarations/ui/variants'
 import type { IntegrationClaimView } from '@/types/onboarding'
 
+// Heading and body of each refusal
+const FAILURE_COPY: Record<IntegrationErrorName, { title: string; body: string }> = {
+  [INTEGRATION_ERRORS.Refused]: {
+    title: ONBOARDING_DISCORD_COPY.failureTitle,
+    body: ONBOARDING_DISCORD_COPY.failureBody,
+  },
+  [INTEGRATION_ERRORS.Taken]: {
+    title: ONBOARDING_DISCORD_COPY.takenTitle,
+    body: ONBOARDING_DISCORD_COPY.takenBody,
+  },
+  [INTEGRATION_ERRORS.NotAdmitted]: {
+    title: ONBOARDING_DISCORD_COPY.notAdmittedTitle,
+    body: ONBOARDING_DISCORD_COPY.notAdmittedBody,
+  },
+}
+
 export interface DiscordIdentityStepProps {
   token: string
   claim: IntegrationClaimView | null
@@ -44,17 +60,13 @@ export const DiscordIdentityStep = ({
 
   // A refused round trip owes the person a reason and a way back in
   if (failure) {
-    const taken = failure === INTEGRATION_ERRORS.Taken
+    const reason = FAILURE_COPY[failure]
 
     return (
       <div className={ONBOARDING_STYLES.body}>
         <div className={ONBOARDING_STYLES.intro}>
-          <p className={ONBOARDING_STYLES.heading}>
-            {taken ? ONBOARDING_DISCORD_COPY.takenTitle : ONBOARDING_DISCORD_COPY.failureTitle}
-          </p>
-          <p className={ONBOARDING_STYLES.lead}>
-            {taken ? ONBOARDING_DISCORD_COPY.takenBody : ONBOARDING_DISCORD_COPY.failureBody}
-          </p>
+          <p className={ONBOARDING_STYLES.heading}>{reason.title}</p>
+          <p className={ONBOARDING_STYLES.lead}>{reason.body}</p>
         </div>
         {warning}
         <div className={ONBOARDING_STYLES.actions}>
@@ -84,6 +96,25 @@ export const DiscordIdentityStep = ({
 
   return (
     <div className={ONBOARDING_STYLES.body}>
+      {claim.admission && (
+        <div className={ONBOARDING_STYLES.admission}>
+          <span className={ONBOARDING_STYLES.admissionEyebrow}>
+            {ONBOARDING_DISCORD_COPY.admittedEyebrow}
+          </span>
+          <p className={ONBOARDING_STYLES.heading}>
+            {ONBOARDING_DISCORD_COPY.admittedTitle.replace(
+              '{session}',
+              claim.admission.sessionName
+            )}
+          </p>
+          <p className={ONBOARDING_STYLES.lead}>
+            {ONBOARDING_DISCORD_COPY.admittedBody.replace(
+              '{function}',
+              claim.admission.functionName
+            )}
+          </p>
+        </div>
+      )}
       <div className={ONBOARDING_STYLES.identity}>
         <Avatar name={name} src={claim.avatarUrl} size="lg" />
         <div className="flex min-w-0 flex-col">

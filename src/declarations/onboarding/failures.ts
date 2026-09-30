@@ -13,6 +13,7 @@ export const INTEGRATION_ERROR_PARAM = 'erreur'
 export const INTEGRATION_ERRORS = {
   Refused: 'refused',
   Taken: 'taken',
+  NotAdmitted: 'non-admis',
 } as const
 
 export type IntegrationErrorName = (typeof INTEGRATION_ERRORS)[keyof typeof INTEGRATION_ERRORS]

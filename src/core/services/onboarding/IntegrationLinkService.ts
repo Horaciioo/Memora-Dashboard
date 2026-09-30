@@ -70,11 +70,14 @@ export const linkFields = (): FieldDefinition[] => [
     kind: 'select',
     label: INTEGRATION_LINK_FIELD_COPY.kind,
     required: true,
+    // A campaign feeds a promotion, so the academy mode leads
+    preset: 'default',
     options: INTEGRATION_LINK_KIND_REGISTRY.keys.map((key) => ({
       value: key,
       label: INTEGRATION_LINK_KIND_REGISTRY.label(key),
       hint: INTEGRATION_LINK_KIND_REGISTRY.get(key).hint,
       accent: INTEGRATION_LINK_KIND_REGISTRY.get(key).accent,
+      isDefault: key === IntegrationLinkKinds.Academy,
     })),
     mark: 'dot',
   },
@@ -123,9 +126,8 @@ export const emitLink = async (
     kind,
     youtuberId: session.youtuberId,
     functionId: session.functionId,
-    sessionId: INTEGRATION_LINK_KIND_REGISTRY.get(kind).enrolsAcademy
-      ? session.academySessionId
-      : null,
+    // Always the promotion, so an admitted candidate is recognised whatever the mode
+    sessionId: session.academySessionId,
     expiresAt,
     maxUses: readNumberValue(values, 'maxUses'),
     createdById: actorId,

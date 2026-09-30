@@ -4,7 +4,7 @@ import type { Prisma } from '@prisma/client'
 
 import { encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
-import { conflict, invalidInput, notFound } from '@/core/lib/errors'
+import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import { discordAvatarUrl } from '@/declarations/access/discord'
@@ -21,10 +21,14 @@ import { HISTORY_CONSENT } from '@/declarations/system/privacy'
 import { LANGUAGE_OPTIONS } from '@/declarations/system/locales'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
-import { instantiateJuniorSteps } from '@/core/services/academy/AcademyService'
+import {
+  instantiateDispositifSteps,
+  instantiateJuniorSteps,
+} from '@/core/services/academy/timelineSteps'
+import { findAdmission } from '@/core/services/academy/AdmissionService'
 import type { DiscordIdentity } from '@/core/services/auth/DiscordService'
 import type { FieldDefinition, FormValues } from '@/types/forms'
-import type { IntegrationClaimView, LiveInvite } from '@/types/onboarding'
+import type { IntegrationAdmission, IntegrationClaimView, LiveInvite } from '@/types/onboarding'
 import { AcademyJuniorStatuses, MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import { ConstraintKinds } from '@/utils/constants/integration'
 import type { ConstraintKindName } from '@/utils/constants/integration'
@@ -68,8 +72,14 @@ export const claimIdentity = async (token: string, identity: DiscordIdentity): P
   const invite = await resolveInvite(token)
   const mode = INTEGRATION_LINK_KIND_REGISTRY.get(invite.kind)
 
-  // A mode that opens an account refuses an identity that already holds one
-  if (mode.createsAccount) {
+  // An admitted candidate is expected, their file already waiting for them
+  const admission = invite.session ? await findAdmission(invite.session.id, identity.id) : null
+
+  if (mode.createsAccount && !admission) {
+    // A campaign link only opens its promotion to the candidates it admitted
+    if (invite.recruitmentSessionId && mode.enrolsAcademy) throw forbidden()
+
+    // A mode that opens an account refuses an identity that already holds one
     const known = await prisma.account.findUnique({ where: { discordId: identity.id } })
     if (known) throw conflict()
   }
@@ -93,20 +103,62 @@ export const claimIdentity = async (token: string, identity: DiscordIdentity): P
 }
 
 /**
+ * Read what an admitted file already knows, the form opening on it
+ * @param {string} accountId - Pre-generated account
+ * @return {Promise<FormValues>} - Starting values
+ */
+
+const admissionPrefill = async (accountId: string): Promise<FormValues> => {
+  const row = await prisma.account.findUniqueOrThrow({
+    where: { id: accountId },
+    select: {
+      displayName: true,
+      email: true,
+      phone: true,
+      birthday: true,
+      languages: true,
+      theme: true,
+      fontScale: true,
+    },
+  })
+
+  return {
+    displayName: row.displayName,
+    email: row.email,
+    phone: row.phone,
+    birthday: row.birthday ? row.birthday.toISOString().slice(0, 10) : null,
+    languages: row.languages,
+    theme: row.theme,
+    fontScale: row.fontScale,
+  }
+}
+
+/**
  * Read back an identity already claimed on a link, refusing a spent one
- * @param {string} inviteId - Link identifier
+ * @param {LiveInvite} invite - Live link
  * @param {string | undefined} claimId - Claim identifier held by the ticket
  * @return {Promise<IntegrationClaimView | null>} - Claimed identity
  */
 
 export const readClaim = async (
-  inviteId: string,
+  invite: LiveInvite,
   claimId: string | undefined
 ): Promise<IntegrationClaimView | null> => {
   if (!claimId) return null
 
   const claim = await prisma.integrationClaim.findUnique({ where: { id: claimId } })
-  if (!claim || claim.inviteId !== inviteId || claim.submittedAt) return null
+  if (!claim || claim.inviteId !== invite.id || claim.submittedAt) return null
+
+  const seat = invite.session ? await findAdmission(invite.session.id, claim.discordId) : null
+  const admission: IntegrationAdmission | null = seat
+    ? {
+        juniorId: seat.juniorId,
+        accountId: seat.accountId,
+        sessionName: seat.sessionName,
+        functionName: seat.functionName,
+        prefill: await admissionPrefill(seat.accountId),
+      }
+    : null
 
   return {
     id: claim.id,
@@ -114,6 +166,7 @@ export const readClaim = async (
     displayName: claim.discordUsername,
     avatarUrl: discordAvatarUrl(claim.discordId, claim.discordAvatarHash),
     avatarHash: claim.discordAvatarHash,
+    admission,
   }
 }
 
@@ -155,6 +208,7 @@ const socialFields = async (): Promise<FieldDefinition[]> => {
     kind: 'text',
     label: network.name,
     prefix: network.urlPrefix,
+    lookup: network.id,
     required: network.required,
     maxLength: FORM_SETTINGS.shortTextMaxLength,
     group: ONBOARDING_STEP_COPY.socials,
@@ -164,10 +218,14 @@ const socialFields = async (): Promise<FieldDefinition[]> => {
 /**
  * Build the public integration form declarations
  * @param {LiveInvite} invite - Live link the form answers to
+ * @param {boolean} [admitted] - Identity admitted to the promotion
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const integrationFields = async (invite: LiveInvite): Promise<FieldDefinition[]> => {
+export const integrationFields = async (
+  invite: LiveInvite,
+  admitted = false
+): Promise<FieldDefinition[]> => {
   const mode = INTEGRATION_LINK_KIND_REGISTRY.get(invite.kind)
 
   const fields: FieldDefinition[] = [
@@ -262,7 +320,7 @@ export const integrationFields = async (invite: LiveInvite): Promise<FieldDefini
   )
 
   // A dispositif is never imposed by the link, the junior always picks their own
-  if (mode.enrolsAcademy) {
+  if (mode.enrolsAcademy || admitted) {
     const dispositifs = await prisma.dispositif.findMany({ orderBy: { position: 'asc' } })
 
     fields.push({
@@ -386,6 +444,87 @@ export interface IntegrationOutcome {
 }
 
 /**
+ * Confirm an admitted file: the answers land on the pre-generated account, the junior seat is
+ * confirmed and its dispositif steps are laid
+ * @param {IntegrationClaimView} claim - Identity resolved by Discord
+ * @param {IntegrationAdmission} admission - Seat waiting for this identity
+ * @param {{ id: string, functionId: string, startsAt: Date }} session - Promotion
+ * @param {string} dispositifId - Dispositif picked
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<IntegrationOutcome>} - What the submission confirmed
+ */
+
+const confirmAdmission = async (
+  claim: IntegrationClaimView,
+  admission: IntegrationAdmission,
+  session: { id: string; functionId: string; startsAt: Date },
+  dispositifId: string,
+  values: FormValues
+): Promise<IntegrationOutcome> => {
+  const displayName = readText(values, 'displayName') ?? ''
+  const [socialLinks, constraints, known] = await Promise.all([
+    buildSocialLinks(values),
+    Promise.resolve(buildConstraints(values)),
+    prisma.account.findUniqueOrThrow({
+      where: { id: admission.accountId },
+      select: { status: true, _count: { select: { socialLinks: true, constraints: true } } },
+    }),
+  ])
+
+  await prisma.account.update({
+    where: { id: admission.accountId },
+    data: {
+      discordUsername: claim.displayName,
+      discordAvatarHash: claim.avatarHash,
+      discordSyncedAt: new Date(),
+      avatarUrl: claim.avatarUrl,
+      displayName,
+      email: readText(values, 'email'),
+      phone: readText(values, 'phone'),
+      birthday: readDate(values, 'birthday'),
+      languages: readList(values, 'languages'),
+      theme: readPreference(values, 'theme', THEME_REGISTRY),
+      fontScale: readPreference(values, 'fontScale', FONT_SCALE_REGISTRY),
+      colorVision: readFlag(values, 'hasColorVision')
+        ? readPreference(values, 'colorVision', COLOR_VISION_REGISTRY)
+        : null,
+      // A pre-generated file opens, a member changing trade keeps their standing
+      status: known.status === MemberStatuses.Pending ? MemberStatuses.Academy : undefined,
+      historyConsentAt: new Date(),
+      historyConsentVersion: HISTORY_CONSENT.version,
+      // Existing traces are never duplicated, only a blank file takes the answers
+      ...(known._count.socialLinks === 0 && socialLinks.length > 0
+        ? { socialLinks: { create: socialLinks } }
+        : {}),
+      ...(known._count.constraints === 0 && constraints.length > 0
+        ? { constraints: { create: constraints } }
+        : {}),
+    },
+  })
+
+  await prisma.$transaction([
+    prisma.academyJunior.update({
+      where: { id: admission.juniorId },
+      data: { dispositifId, confirmedAt: new Date() },
+    }),
+    prisma.integrationClaim.update({
+      where: { id: claim.id },
+      data: { submittedAt: new Date(), accountId: admission.accountId },
+    }),
+  ])
+
+  await instantiateDispositifSteps(
+    admission.juniorId,
+    session.id,
+    session.functionId,
+    dispositifId,
+    session.startsAt
+  )
+
+  return { accountId: admission.accountId, displayName, awaitsApproval: false }
+}
+
+/**
  * Answer a link, opening the account its mode calls for
  * @param {string} token - Link token
  * @param {string | undefined} claimId - Claim identifier held by the ticket
@@ -401,7 +540,7 @@ export const submitIntegration = async (
   const invite = await resolveInvite(token)
   const mode = INTEGRATION_LINK_KIND_REGISTRY.get(invite.kind)
 
-  const claim = await readClaim(invite.id, claimId)
+  const claim = await readClaim(invite, claimId)
   if (!claim) throw notFound()
 
   if (!readFlag(values, 'historyConsent')) {
@@ -410,12 +549,17 @@ export const submitIntegration = async (
 
   const displayName = readText(values, 'displayName') ?? ''
   const dispositifId = readText(values, 'dispositifId')
-  if (mode.enrolsAcademy && !dispositifId) {
+  if ((mode.enrolsAcademy || claim.admission) && !dispositifId) {
     throw invalidInput([{ field: 'dispositifId', message: FORM_COPY.required }])
   }
 
   // The seat is taken before anything is written, so a lost race creates nothing
   await claimSeat(invite)
+
+  // An admitted candidate confirms the file the recruitment pre-generated
+  if (claim.admission && invite.session && dispositifId) {
+    return confirmAdmission(claim, claim.admission, invite.session, dispositifId, values)
+  }
 
   // A mode that opens no account keeps the answers on the claim alone
   if (!mode.createsAccount) {
@@ -453,7 +597,7 @@ export const submitIntegration = async (
       joinedAt: invite.createdAt,
       role: MemberRoles.Moderateur,
       status: mode.awaitsApproval ? MemberStatuses.Pending : MemberStatuses.Academy,
-      primaryFunctionId: invite.functionId,
+      ...(invite.functionId ? { functions: { create: { functionId: invite.functionId } } } : {}),
       historyConsentAt: new Date(),
       historyConsentVersion: HISTORY_CONSENT.version,
       ...(invite.youtuberId ? { youtubers: { connect: { id: invite.youtuberId } } } : {}),

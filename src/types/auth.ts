@@ -16,11 +16,11 @@ export type Permission = PermissionName
  * @property {MemberStatusName} status - Membership status
  * @property {string | null} divisionId - Division identifier
  * @property {string[]} youtuberIds - Assigned YouTubers
- * @property {string | null} primaryFunctionId - Main function
- * @property {string | null} secondaryFunctionId - Secondary function
+ * @property {string[]} functionIds - Functions held
  * @property {boolean} isRoot - Root administrator
  * @property {DisplayPreferences} display - Display preferences
  * @property {number | null} historyConsentVersion - Consent version agreed to
+ * @property {string | null} seenReleaseVersion - Last note read
  * @property {Permission[]} permissions - Granted permissions
  */
 
@@ -33,10 +33,10 @@ export interface SessionUser {
   status: MemberStatusName
   divisionId: string | null
   youtuberIds: string[]
-  primaryFunctionId: string | null
-  secondaryFunctionId: string | null
+  functionIds: string[]
   isRoot: boolean
   historyConsentVersion: number | null
+  seenReleaseVersion: string | null
   display: DisplayPreferences
   permissions: Permission[]
 }

@@ -49,19 +49,6 @@ const STEP_NOTICES: Record<string, string> = {
 }
 
 /**
- * Supporting line of each step, keyed on its group name
- * @type {Record<string, string>}
- */
-
-const STEP_HINTS: Record<string, string> = {
-  [ONBOARDING_STEP_COPY.informations]: ONBOARDING_STEP_COPY.informationsHint,
-  [ONBOARDING_STEP_COPY.socials]: ONBOARDING_STEP_COPY.socialsHint,
-  [ONBOARDING_STEP_COPY.constraints]: ONBOARDING_STEP_COPY.constraintsHint,
-  [ONBOARDING_STEP_COPY.preferences]: ONBOARDING_STEP_COPY.preferencesHint,
-  [ONBOARDING_STEP_COPY.confirmation]: ONBOARDING_STEP_COPY.confirmationHint,
-}
-
-/**
  * Public integration form, the identity gate first then the declared groups
  * @param {string} token - Link token
  * @param {FieldDefinition[]} fields - Declarations of the integration form
@@ -71,7 +58,8 @@ const STEP_HINTS: Record<string, string> = {
  */
 
 export const OnboardingWizard = ({ token, fields, claim, failure }: OnboardingWizardProps) => {
-  const [values, setValues] = useState<FormValues>({})
+  // An admitted file opens on what the recruitment already knows
+  const [values, setValues] = useState<FormValues>(claim?.admission?.prefill ?? {})
   const [confirmed, setConfirmed] = useState(false)
   const [outcome, setOutcome] = useState<SubmitOutcome | null>(null)
   const { isSaving, issues, run } = useMutation()
@@ -84,7 +72,6 @@ export const OnboardingWizard = ({ token, fields, claim, failure }: OnboardingWi
     const identity: WizardStep = {
       id: 'identity',
       label: ONBOARDING_STEP_COPY.identity,
-      hint: ONBOARDING_STEP_COPY.identityHint,
       blocked: !claim || !confirmed,
       render: (
         <DiscordIdentityStep
@@ -100,7 +87,6 @@ export const OnboardingWizard = ({ token, fields, claim, failure }: OnboardingWi
     const declared = groupFields(fields, values).map((group) => ({
       id: group.name,
       label: group.name,
-      hint: STEP_HINTS[group.name],
       fields: group.fields,
       notice: STEP_NOTICES[group.name] ? (
         <p className={ONBOARDING_STYLES.notice}>{STEP_NOTICES[group.name]}</p>
@@ -119,9 +105,11 @@ export const OnboardingWizard = ({ token, fields, claim, failure }: OnboardingWi
   if (outcome) {
     const description = !outcome.accountId
       ? ONBOARDING_COPY.successProfileDescription
-      : outcome.awaitsApproval
-        ? ONBOARDING_COPY.successPendingDescription
-        : ONBOARDING_COPY.successDescription
+      : claim?.admission
+        ? ONBOARDING_COPY.successAdmittedDescription
+        : outcome.awaitsApproval
+          ? ONBOARDING_COPY.successPendingDescription
+          : ONBOARDING_COPY.successDescription
 
     return (
       <div className={ONBOARDING_STYLES.outcome}>
@@ -142,7 +130,6 @@ export const OnboardingWizard = ({ token, fields, claim, failure }: OnboardingWi
       nextLabel={ONBOARDING_COPY.next}
       previousLabel={ONBOARDING_COPY.previous}
       submitLabel={isSaving ? ONBOARDING_COPY.pending : ONBOARDING_COPY.submit}
-      counter={(position, total) => `${position} / ${total}`}
       disabled={isSaving}
       idPrefix="integration"
     />

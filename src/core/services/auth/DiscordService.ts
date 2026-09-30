@@ -12,6 +12,7 @@ import {
   DISCORD_SCOPES,
 } from '@/declarations/access/discord'
 import { SIGN_IN_ERRORS } from '@/declarations/access/signIn'
+import { TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
 
 /**
  * Grant returned by the token endpoint
@@ -133,6 +134,7 @@ export const exchangeCode = async (code: string, codeVerifier: string): Promise<
 
   const response = await fetch(DISCORD_ENDPOINTS.token, {
     method: 'POST',
+    signal: AbortSignal.timeout(TIMEOUT_SETTINGS.externalMs),
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       client_id: clientId,
@@ -158,6 +160,7 @@ export const refreshGrant = async (refreshToken: string): Promise<DiscordGrant> 
 
   const response = await fetch(DISCORD_ENDPOINTS.token, {
     method: 'POST',
+    signal: AbortSignal.timeout(TIMEOUT_SETTINGS.externalMs),
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       client_id: clientId,
@@ -178,6 +181,7 @@ export const refreshGrant = async (refreshToken: string): Promise<DiscordGrant> 
 
 export const readDiscordUser = async (accessToken: string): Promise<DiscordIdentity> => {
   const response = await fetch(DISCORD_ENDPOINTS.user, {
+    signal: AbortSignal.timeout(TIMEOUT_SETTINGS.externalMs),
     headers: { authorization: `Bearer ${accessToken}` },
   })
 

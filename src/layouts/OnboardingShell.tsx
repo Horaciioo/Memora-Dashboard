@@ -7,6 +7,7 @@ import type { IntegrationCreator } from '@/types/onboarding'
 
 export interface OnboardingShellProps {
   title: string
+  // No longer rendered
   subtitle?: string
   creator: IntegrationCreator | null
   children: ReactNode
@@ -16,13 +17,12 @@ export interface OnboardingShellProps {
  * Public integration chrome — the creator's banner standing the full height on the left,
  * carrying the heading, the form itself sitting bare on the page beside it
  * @param {string} title - Page title
- * @param {string} [subtitle] - Supporting line under the title
  * @param {IntegrationCreator | null} creator - Creator the banner comes from
  * @param {ReactNode} children - Form content
  * @return {JSX.Element}
  */
 
-export const OnboardingShell = ({ title, subtitle, creator, children }: OnboardingShellProps) => (
+export const OnboardingShell = ({ title, creator, children }: OnboardingShellProps) => (
   <main className={ONBOARDING_STYLES.page}>
     <aside className={ONBOARDING_STYLES.banner}>
       {creator?.bannerUrl && (
@@ -43,7 +43,6 @@ export const OnboardingShell = ({ title, subtitle, creator, children }: Onboardi
       <div className={ONBOARDING_STYLES.bannerFoot}>
         {creator && <p className={ONBOARDING_STYLES.bannerEyebrow}>{creator.name}</p>}
         <h1 className={ONBOARDING_STYLES.bannerTitle}>{title}</h1>
-        {subtitle && <p className={ONBOARDING_STYLES.bannerLead}>{subtitle}</p>}
       </div>
     </aside>
 

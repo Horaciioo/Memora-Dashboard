@@ -15,6 +15,8 @@ export const ONBOARDING_COPY = {
   submit: 'Valider mon intégration',
   pending: 'Envoi…',
   successTitle: 'C’est enregistré',
+  successAdmittedDescription:
+    'Ta fiche est confirmée. Un Formateur va t’être attribué, et ta PIM démarre dès que ton Responsable la lance.',
   successDescription: 'Ton compte est ouvert, tu peux te connecter au dashboard avec Discord.',
   successPendingDescription:
     'Ton dossier part à ton Responsable, il ouvre ton accès dès qu’il l’a validé.',
@@ -58,6 +60,13 @@ export const ONBOARDING_DISCORD_COPY = {
   failureTitle: 'La connexion n’a pas abouti',
   failureBody:
     'Contacte ton Responsable pour qu’il vérifie ton lien, puis relance la connexion Discord.',
+  notAdmittedTitle: 'Ton identifiant n’est pas dans la liste des admis',
+  notAdmittedBody:
+    'Ce formulaire est réservé aux candidats acceptés de ce recrutement. Si tu as bien reçu une réponse positive, vérifie que tu te connectes avec le compte Discord donné à ta candidature, sinon rapproche-toi de ton Responsable.',
+  admittedEyebrow: 'Candidature acceptée',
+  admittedTitle: 'Tu es admis dans la session PIM « {session} »',
+  admittedBody:
+    'Ta fiche a été préparée à partir de ta candidature. Vérifie chaque information, complète ce qui manque, puis confirme : tu rejoins l’équipe {function} en tant que Junior.',
   takenTitle: 'Ce compte a déjà une fiche',
   takenBody:
     'Un accès existe déjà pour ce compte Discord. Rapproche-toi de ton Responsable plutôt que de recommencer.',
