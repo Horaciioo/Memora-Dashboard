@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Badge } from '@/components/elements/display/Badge'
+import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -90,11 +90,6 @@ export const CandidateDialog = ({
         size="lg"
         subheader={
           <span className="flex flex-wrap items-center gap-2">
-            <Badge
-              label={candidate.attended ? RECRUITMENT_COPY.attended : RECRUITMENT_COPY.missed}
-              tone={candidate.attended ? 'success' : 'neutral'}
-              icon={candidate.attended ? 'success' : 'clock'}
-            />
             {candidate.memberId && (
               <Button
                 variant="ghost"
@@ -111,7 +106,7 @@ export const CandidateDialog = ({
         }
       >
         <div className="flex flex-col gap-8">
-          <Section title={RECRUITMENT_COPY.tabCandidates} padded>
+          <Section title={RECRUITMENT_COPY.informationsTitle} padded>
             <div className={DETAIL_BLOCK.grid}>
               {entries.map((entry) => (
                 <span key={entry.label} className={DETAIL_BLOCK.entry}>
@@ -128,9 +123,12 @@ export const CandidateDialog = ({
             {candidate.spectators.length === 0 ? (
               <p className={DETAIL_BLOCK.empty}>{RECRUITMENT_COPY.noSpectator}</p>
             ) : (
-              <span className="flex flex-wrap gap-1.5">
+              <span className="flex flex-wrap gap-x-6 gap-y-3">
                 {candidate.spectators.map((seat) => (
-                  <Badge key={seat.id} label={seat.label} tone="neutral" icon="members" />
+                  <span key={seat.id} className="inline-flex items-center gap-2 text-sm">
+                    <Avatar name={seat.label} src={seat.image} size="sm" />
+                    {seat.label}
+                  </span>
                 ))}
               </span>
             )}
