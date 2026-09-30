@@ -54,6 +54,7 @@ export const RECORD_ROW = {
   body: 'flex min-w-0 flex-1 flex-col gap-1',
   title: 'truncate text-base font-bold',
   meta: 'truncate text-sm text-[var(--color-ink-subtle)]',
+  link: 'shrink-0 rounded-full p-2 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
 } as const
 
 /**

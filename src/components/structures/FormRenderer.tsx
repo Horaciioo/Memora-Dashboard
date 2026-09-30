@@ -27,7 +27,16 @@ export interface FormRendererProps {
 }
 
 // Kinds kept whole in rows
-const BLOCK_KINDS = ['textarea', 'markdown', 'announcement', 'multiselect', 'tags', 'image', 'daterange', 'scale']
+const BLOCK_KINDS = [
+  'textarea',
+  'markdown',
+  'announcement',
+  'multiselect',
+  'tags',
+  'image',
+  'daterange',
+  'scale',
+]
 
 /**
  * Field with the prefix and network its chosen option hands down
@@ -226,7 +235,11 @@ export const FormRenderer = ({
                   control
                 )}
                 {field.lookup && typeof raw === 'string' && (
-                  <HandleLookup network={field.lookup} handle={raw} />
+                  <HandleLookup
+                    network={field.lookup}
+                    handle={raw}
+                    onPick={(picked) => onChange(field.name, picked)}
+                  />
                 )}
               </Field>
             )

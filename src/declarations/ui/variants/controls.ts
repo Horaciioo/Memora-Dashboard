@@ -101,11 +101,11 @@ export const FIELD_STYLES = {
   prefixRow:
     'flex min-w-0 items-stretch rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] transition-colors focus-within:border-[var(--color-field-border-strong)]',
   prefixRowInvalid: 'border-[var(--color-danger)]',
-  // Locked link start, dimmed so the handle leads
+  // Locked link start, a greyed block the handle leads from
   prefix:
-    'flex shrink-0 items-center rounded-l-[var(--radius-md)] pl-3 font-[family-name:var(--font-mono)] text-xs text-[var(--color-on-field-subtle)] opacity-70 select-none',
+    'flex shrink-0 items-center rounded-l-[calc(var(--radius-md)-1px)] border-r border-[var(--color-field-border)] bg-[var(--color-surface-sunken)] px-3 font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)] select-none',
   prefixControl:
-    'min-w-0 flex-1 rounded-none rounded-r-[var(--radius-md)] border-0 bg-transparent pl-0.5 text-[var(--color-on-field)]',
+    'min-w-0 flex-1 rounded-none rounded-r-[var(--radius-md)] border-0 bg-transparent pl-3 text-[var(--color-on-field)]',
 } as const
 
 /**
@@ -416,6 +416,14 @@ export const HANDLE_LOOKUP_STYLES = {
   found: 'text-[var(--color-success)]',
   missing: 'text-[var(--color-danger)]',
   unknown: 'text-[var(--color-ink-subtle)]',
+  // Accounts to pick from, one click each
+  list: 'flex flex-col gap-1',
+  match:
+    'flex w-full items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 text-left transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
+  matchBody: 'flex min-w-0 flex-col',
+  matchName: 'truncate text-sm font-semibold',
+  matchHandle:
+    'truncate font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
 } as const
 
 /**

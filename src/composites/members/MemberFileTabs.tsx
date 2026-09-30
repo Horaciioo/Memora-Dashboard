@@ -26,7 +26,8 @@ import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { DETAIL_BLOCK, MEMBER_BLOCK } from '@/declarations/ui/blocks'
-import { LIST_STYLES } from '@/declarations/ui/variants'
+import { ICONS } from '@/declarations/ui/icons'
+import { LIST_STYLES, RECORD_ROW } from '@/declarations/ui/variants'
 import { RoleEmblem } from '@/composites/members/MemberBadges'
 import { sealedDisplay } from '@/components/structures/SealedValue'
 import { SensitiveFields } from '@/declarations/access/sensitive'
@@ -64,6 +65,9 @@ export interface MemberFileTabsProps {
 }
 
 // Contact fields edited in place, in the order they appear under the section
+// Glyph of an outside link
+const ExternalIcon = ICONS.forward
+
 const CONTACT_FIELD_NAMES = ['discordId', 'email', 'phone', 'birthday', 'languages']
 
 // Assignment fields edited in place, in the order they appear under the section
@@ -514,11 +518,11 @@ export const MemberFileTabs = ({
           }
         />
       ) : (
-        <div className={LIST_STYLES.stack}>
+        <div className={RECORD_ROW.stack}>
           {file.socials.map((social) => (
             <div
               key={social.id}
-              className={cn(LIST_STYLES.item, canWriteSocials && LIST_STYLES.itemClickable)}
+              className={cn(RECORD_ROW.static, canWriteSocials && 'cursor-pointer')}
               {...gestures({
                 canEdit: canWriteSocials,
                 label: social.label,
@@ -526,16 +530,21 @@ export const MemberFileTabs = ({
                 onRemove: () => setPendingSocial(social),
               })}
             >
-              <Badge label={social.label} accent={social.accent} tone={'brand'} />
-              <span className="min-w-0 flex-1 truncate text-sm">{social.handle}</span>
+              <Avatar name={social.label} size="md" />
+              <span className={RECORD_ROW.body}>
+                <span className={RECORD_ROW.title}>{social.label}</span>
+                <span className={RECORD_ROW.meta}>{social.handle}</span>
+              </span>
               {social.url && (
                 <a
                   href={social.url}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="text-xs text-[var(--color-brand-600)] underline"
+                  aria-label={ACTION_COPY.open}
+                  title={ACTION_COPY.open}
+                  className={RECORD_ROW.link}
                 >
-                  {ACTION_COPY.open}
+                  <ExternalIcon className="h-5 w-5" aria-hidden="true" />
                 </a>
               )}
             </div>

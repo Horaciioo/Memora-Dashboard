@@ -3,7 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
 import { FORM_SETTINGS, TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
-import type { HandleVerdict } from '@/types/social'
+import type { HandleLookupResult } from '@/types/social'
 
 // Characters a handle may hold, so it never reaches another host or path
 const HANDLE_PATTERN = /^[A-Za-z0-9._-]+$/
@@ -39,25 +39,53 @@ const headText = (html: string): string => {
     .toLowerCase()
 }
 
+// Title the page gives itself, its own social card first
+const PAGE_TITLE =
+  /<meta[^>]+property="og:title"[^>]+content="([^"]*)"|<title[^>]*>([^<]*)<\/title>/i
+
+// Where a title stops naming the profile and starts naming the site
+const TITLE_SEPARATORS = /\s[-|·•]\s/
+
+/**
+ * Name a profile page goes by, falling back on the handle
+ * @param {string} html - Page source
+ * @param {string} handle - Typed handle
+ * @return {string} - Display name
+ */
+
+const profileLabel = (html: string, handle: string): string => {
+  const match = html
+    .slice(0, html.toLowerCase().indexOf(HEAD_END) + 1 || undefined)
+    .match(PAGE_TITLE)
+  const title = (match?.[1] ?? match?.[2] ?? '').split(TITLE_SEPARATORS)[0]?.trim() ?? ''
+
+  return title.length > 0 && title.length <= FORM_SETTINGS.shortTextMaxLength ? title : handle
+}
+
 /**
  * Probe whether an account exists on a declared network
  * @param {string} networkId - Network identifier
  * @param {string} handle - Typed handle
- * @return {Promise<HandleVerdict>} - Found, missing or unknown
+ * @return {Promise<HandleLookupResult>} - Verdict and the accounts to pick from
  */
 
-export const lookupHandle = async (networkId: string, handle: string): Promise<HandleVerdict> => {
+export const lookupHandle = async (
+  networkId: string,
+  handle: string
+): Promise<HandleLookupResult> => {
   const network = await prisma.socialNetwork.findFirst({
     where: { id: networkId, archived: false },
   })
   if (!network) throw notFound()
 
-  if (!isProbeable(handle)) return 'missing'
+  if (!isProbeable(handle)) return { verdict: 'missing', matches: [] }
 
   // The probe never leaves the network's own host
   const base = new URL(network.urlPrefix)
   const target = new URL(`${network.urlPrefix}${handle}`)
-  if (target.host !== base.host || target.protocol !== 'https:') return 'unknown'
+  if (target.host !== base.host || target.protocol !== 'https:') {
+    return { verdict: 'unknown', matches: [] }
+  }
 
   try {
     const response = await fetch(target, {
@@ -67,12 +95,16 @@ export const lookupHandle = async (networkId: string, handle: string): Promise<H
     })
 
     // Plain answers first
-    if (response.status === 404 || response.status === 410) return 'missing'
-    if (response.status !== 200) return 'unknown'
+    if (response.status === 404 || response.status === 410)
+      return { verdict: 'missing', matches: [] }
+    if (response.status !== 200) return { verdict: 'unknown', matches: [] }
 
     // A page naming the handle is theirs
-    return headText(await response.text()).includes(handle.toLowerCase()) ? 'found' : 'unknown'
+    const html = await response.text()
+    if (!headText(html).includes(handle.toLowerCase())) return { verdict: 'unknown', matches: [] }
+
+    return { verdict: 'found', matches: [{ handle, label: profileLabel(html, handle) }] }
   } catch {
-    return 'unknown'
+    return { verdict: 'unknown', matches: [] }
   }
 }
