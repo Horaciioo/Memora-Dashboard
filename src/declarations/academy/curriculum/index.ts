@@ -3,6 +3,7 @@ import { COMMUNICATION_POSTURE } from '@/declarations/academy/curriculum/communi
 import { MARSHA_BOT } from '@/declarations/academy/curriculum/marshaBot'
 import { TWITCH_FUNDAMENTALS } from '@/declarations/academy/curriculum/twitchFundamentals'
 import type { Course, CourseBlock, ExerciseBlock } from '@/declarations/academy/curriculum/types'
+import { EXERCISE_KINDS } from '@/declarations/academy/curriculum/types'
 
 /**
  * Every interactive course, in catalogue order
