@@ -12,8 +12,8 @@ import type { FormValues } from '@/types/forms'
  * @property {string | null} academyDispositif - Dispositif of the active FSI
  * @property {string | null} division - Division name
  * @property {string[]} youtubers - Assigned creators
- * @property {string | null} primaryFunction - Main function
- * @property {string | null} secondaryFunction - Secondary function
+ * @property {string | null} primaryFunctions - Principal functions, joined
+ * @property {string | null} secondaryFunctions - Secondary functions, joined
  * @property {string} joinedAt - Day the member arrived
  * @property {FormValues} values - Values feeding the editable form
  */
@@ -27,8 +27,8 @@ export interface ProfileDetail {
   academyDispositif: string | null
   division: string | null
   youtubers: string[]
-  primaryFunction: string | null
-  secondaryFunction: string | null
+  primaryFunctions: string | null
+  secondaryFunctions: string | null
   joinedAt: string
   values: FormValues
 }

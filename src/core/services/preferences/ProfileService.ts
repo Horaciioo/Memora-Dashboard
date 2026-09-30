@@ -10,14 +10,19 @@ import { LANGUAGE_OPTIONS, timezoneOptions } from '@/declarations/system/locales
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { ProfileDetail } from '@/types/preferences'
 import { AcademyJuniorStatuses } from '@/utils/constants/hierarchy'
+import { FunctionKinds } from '@/utils/constants/workflow'
+import {
+  HELD_FUNCTIONS,
+  joinFunctionNames,
+  toMemberFunctions,
+} from '@/core/services/reference/functions'
 import type { Prisma } from '@prisma/client'
 
 // Relations the read-only half of the page shows
 const PROFILE_INCLUDE = {
   division: true,
   youtubers: true,
-  primaryFunction: true,
-  secondaryFunction: true,
+  ...HELD_FUNCTIONS,
   academyJuniors: {
     where: { status: AcademyJuniorStatuses.Active },
     orderBy: { startedAt: 'desc' },
@@ -55,6 +60,7 @@ export const profileFields = (): FieldDefinition[] => [
     name: 'celebrateBirthday',
     kind: 'toggle',
     label: PROFILE_FIELD_COPY.celebrateBirthday,
+    binary: true,
   },
 ]
 
@@ -78,11 +84,14 @@ export const readProfile = async (accountId: string): Promise<ProfileDetail> => 
     avatarUrl: row.avatarUrl,
     role: row.role,
     status: row.status,
-    academyDispositif: row.academyJuniors[0]?.dispositif.name ?? null,
+    academyDispositif: row.academyJuniors[0]?.dispositif?.name ?? null,
     division: row.division?.name ?? null,
     youtubers: row.youtubers.map((youtuber) => youtuber.name),
-    primaryFunction: row.primaryFunction?.name ?? null,
-    secondaryFunction: row.secondaryFunction?.name ?? null,
+    primaryFunctions: joinFunctionNames(toMemberFunctions(row.functions), FunctionKinds.Primary),
+    secondaryFunctions: joinFunctionNames(
+      toMemberFunctions(row.functions),
+      FunctionKinds.Secondary
+    ),
     joinedAt: row.joinedAt.toISOString(),
     values: {
       email: row.email,

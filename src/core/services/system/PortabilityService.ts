@@ -2,6 +2,7 @@ import 'server-only'
 
 import { decryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
+import { HELD_FUNCTIONS } from '@/core/services/reference/functions'
 import { notFound } from '@/core/lib/errors'
 import { isEncryptedField } from '@/declarations/system/encryption'
 import { DATA_CONTROLLER, PROCESSING_REGISTRY } from '@/declarations/system/privacy'
@@ -101,7 +102,7 @@ const retentionSummary = (): Record<string, string> =>
 export const buildPersonalExport = async (accountId: string): Promise<PersonalExport> => {
   const account = await prisma.account.findUnique({
     where: { id: accountId },
-    include: { division: true, youtubers: true, primaryFunction: true, secondaryFunction: true },
+    include: { division: true, youtubers: true, ...HELD_FUNCTIONS },
   })
 
   if (!account) throw notFound()

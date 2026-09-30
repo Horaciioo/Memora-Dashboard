@@ -19,7 +19,7 @@ export const PRIVACY_COPY = {
     'Memora ne recrute pas en dessous de {minimum} ans. Au-dessus de {threshold} ans, chacun consent pour soi : aucun accord parental n’est requis, et aucune donnée de mineur de moins de {threshold} ans n’est collectée.',
   publicTitle: 'Ce qui reste attaché à ton travail',
   publicLead:
-    'Ton identifiant Discord, ton pseudo et ton portrait sont conservés : ils sont déjà publics sur Discord, et ce sont eux qui rendent l’historique d’équipe lisible. Les notes de suivi écrites pendant ton parcours restent également — ce ne sont pas des jugements, mais des repères d’accompagnement.',
+    'Ton identifiant Discord, ton pseudo et ton portrait sont conservés : ils sont déjà publics sur Discord, et ce sont eux qui rendent l’historique d’équipe lisible. Les notes de suivi écrites pendant ton parcours restent également. Ce ne sont pas des jugements, mais des repères d’accompagnement.',
   exportTitle: 'Récupérer mes données',
   exportLead: 'Depuis tes paramètres, tu télécharges l’intégralité de ton dossier en un fichier.',
   columnPurpose: 'Finalité',
@@ -41,4 +41,6 @@ export const CONSENT_COPY = {
   pending: 'Enregistrement…',
   refuse: 'Je refuse et je me déconnecte',
   required: 'Coche la case pour continuer.',
+  // Audit line
+  recorded: (version: number) => `A accepté l’accord sur l’historique, édition ${version}`,
 } as const

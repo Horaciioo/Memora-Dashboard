@@ -1,34 +1,33 @@
 'use client'
 
 import { useState } from 'react'
-import { AppearanceToggle } from '@/components/elements/actions/AppearanceToggle'
 import { Button } from '@/components/elements/actions/Button'
-import { ColorVisionSelect } from '@/components/elements/actions/ColorVisionSelect'
-import { ThemeToggle } from '@/components/elements/actions/ThemeToggle'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
+import { RoleGlyph } from '@/composites/members/MemberBadges'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FormRenderer } from '@/components/structures/FormRenderer'
 import { Section } from '@/components/structures/Section'
 import { SealedValue } from '@/components/structures/SealedValue'
+import { DisplayPreferences } from '@/composites/preferences/DisplayPreferences'
 import { TwoFactorSection } from '@/composites/security/TwoFactorSection'
 import { useProfile } from '@/core/hooks/data/useProfile'
 import { dropOtherSessions } from '@/app/(dashboard)/parametres/actions'
-import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/roles'
 import { SENSITIVE_FIELD_REGISTRY, isSensitiveField } from '@/declarations/access/sensitive'
 import type { SensitiveFieldName } from '@/declarations/access/sensitive'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
-import { ACCOUNT_BLOCK, DETAIL_BLOCK } from '@/declarations/ui/blocks'
-import { ACTION_COPY, FIELD_COPY, NAV_COPY } from '@/declarations/ui/copy'
-import { LIST_STYLES, PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
+import { ACCOUNT_BLOCK, DETAIL_BLOCK, SECURITY_LIST } from '@/declarations/ui/blocks'
+import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
+import { ICONS } from '@/declarations/ui/icons'
+import { PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
 
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { AccountSession, ProfileDetail } from '@/types/preferences'
 import { formatDay, formatDayTime } from '@/utils/format/dates'
+import { readDevice } from '@/utils/format/device'
 
 export interface PreferencesPanelProps {
   initialProfile: ProfileDetail
@@ -53,8 +52,6 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
   const change = (name: string, value: FieldValue) =>
     setDraft((current) => ({ ...current, [name]: value }))
 
-  const role = ROLE_REGISTRY.get(profile.role)
-  const status = MEMBER_STATUS_REGISTRY.get(profile.status)
   const others = sessions.filter((entry) => !entry.isCurrent)
 
   // A sealed value never reaches the form engine
@@ -70,17 +67,6 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
     <div className={TABS_STYLES.panel}>
       <div className={PREFERENCE_STYLES.stack}>
         <Section title={PREFERENCES_COPY.fileTitle} description={PREFERENCES_COPY.fileLead} padded>
-          <div className={PREFERENCE_STYLES.identity}>
-            <Avatar name={profile.displayName} src={profile.avatarUrl} size="lg" />
-            <div className="flex min-w-0 flex-col gap-1">
-              <p className={ACCOUNT_BLOCK.name}>{profile.displayName}</p>
-              <p className={ACCOUNT_BLOCK.meta}>{profile.discordId}</p>
-              <span className="flex flex-wrap gap-1.5">
-                <Badge label={role.label} accent={role.accent} tone={'brand'} dot />
-                <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />
-              </span>
-            </div>
-          </div>
           <DetailGrid
             entries={[
               { label: FIELD_COPY.division, value: profile.division },
@@ -88,8 +74,8 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
                 label: FIELD_COPY.youtuber,
                 value: profile.youtubers.length > 0 ? profile.youtubers.join(', ') : null,
               },
-              { label: FIELD_COPY.mainFunction, value: profile.primaryFunction },
-              { label: FIELD_COPY.secondFunction, value: profile.secondaryFunction },
+              { label: FIELD_COPY.mainFunction, value: profile.primaryFunctions },
+              { label: FIELD_COPY.secondFunction, value: profile.secondaryFunctions },
               {
                 label: FIELD_COPY.joinedAt,
                 value: formatDay(profile.joinedAt),
@@ -191,33 +177,7 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
 
   const displayTab = () => (
     <div className={TABS_STYLES.panel}>
-      <Section
-        title={PREFERENCES_COPY.displayTitle}
-        description={PREFERENCES_COPY.displayLead}
-        padded
-      >
-        <div className={PREFERENCE_STYLES.rows}>
-          <div className={PREFERENCE_STYLES.row}>
-            <span className={PREFERENCE_STYLES.label}>{NAV_COPY.theme}</span>
-            <ThemeToggle />
-          </div>
-          <div className={PREFERENCE_STYLES.row}>
-            <span className="flex flex-wrap items-center gap-2">
-              <span className={PREFERENCE_STYLES.label}>{NAV_COPY.textSize}</span>
-              <MaturityTag maturity="beta" />
-            </span>
-            <AppearanceToggle />
-          </div>
-          <div className={PREFERENCE_STYLES.row}>
-            <span className="flex flex-wrap items-center gap-2">
-              <span className={PREFERENCE_STYLES.label}>{NAV_COPY.colorVision}</span>
-              <MaturityTag maturity="beta" />
-            </span>
-            <ColorVisionSelect />
-          </div>
-        </div>
-        <p className={PREFERENCE_STYLES.notice}>{PREFERENCES_COPY.storageNotice}</p>
-      </Section>
+      <DisplayPreferences />
     </div>
   )
 
@@ -232,7 +192,7 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
           <DetailGrid
             entries={[
               { label: FIELD_COPY.discordId, value: profile.discordId },
-              { label: FIELD_COPY.role, value: role.label },
+              { label: FIELD_COPY.role, value: <RoleGlyph role={profile.role} /> },
             ]}
           />
         </Section>
@@ -245,22 +205,37 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
           action={<MaturityTag maturity="beta" />}
           padded
         >
-          <div className={LIST_STYLES.stack}>
-            {sessions.map((entry) => (
-              <div key={entry.id} className={LIST_STYLES.item}>
-                <span className="min-w-0 flex-1 truncate text-sm">
-                  {entry.userAgent ?? PREFERENCES_COPY.unknownDevice}
-                </span>
-                <span className={PREFERENCE_STYLES.notice}>
-                  {`${PREFERENCES_COPY.lastUsedAt} ${formatDayTime(entry.lastUsedAt)}`}
-                </span>
-                {entry.isCurrent && (
-                  <Badge label={PREFERENCES_COPY.currentSession} tone="success" dot />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className={PREFERENCE_STYLES.footer}>
+          <ul className={SECURITY_LIST.list}>
+            {sessions.map((entry) => {
+              const device = readDevice(entry.userAgent)
+              const Glyph = ICONS[device.icon]
+              const kind = device.isMobile
+                ? PREFERENCES_COPY.mobileDevice
+                : PREFERENCES_COPY.desktopDevice
+
+              return (
+                <li key={entry.id} className={SECURITY_LIST.row}>
+                  <Glyph className={SECURITY_LIST.glyph} />
+                  <div className={SECURITY_LIST.body}>
+                    <p className={SECURITY_LIST.title}>
+                      {device.browser ?? PREFERENCES_COPY.unknownDevice}
+                      {entry.isCurrent && (
+                        <span className={SECURITY_LIST.current}>
+                          {PREFERENCES_COPY.currentSession}
+                        </span>
+                      )}
+                    </p>
+                    <p className={SECURITY_LIST.meta}>
+                      <span>{device.system ?? kind}</span>
+                      <span>· {kind}</span>
+                    </p>
+                  </div>
+                  <span className={SECURITY_LIST.time}>{formatDayTime(entry.lastUsedAt)}</span>
+                </li>
+              )
+            })}
+          </ul>
+          <div className={SECURITY_LIST.footer}>
             {others.length === 0 ? (
               <p className={PREFERENCE_STYLES.notice}>{PREFERENCES_COPY.onlySession}</p>
             ) : (
@@ -277,8 +252,17 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
   )
 
   return (
-    <div className={PREFERENCE_STYLES.stack}>
+    <div className={PREFERENCE_STYLES.column}>
+      <div className={PREFERENCE_STYLES.hero}>
+        <Avatar name={profile.displayName} src={profile.avatarUrl} size="lg" />
+        <div className={PREFERENCE_STYLES.heroMeta}>
+          <p className={PREFERENCE_STYLES.heroName}>{profile.displayName}</p>
+          <p className={ACCOUNT_BLOCK.meta}>{profile.discordId}</p>
+          <RoleGlyph role={profile.role} />
+        </div>
+      </div>
       <FileTabs
+        centered
         label={PREFERENCES_COPY.title}
         tabs={[
           {

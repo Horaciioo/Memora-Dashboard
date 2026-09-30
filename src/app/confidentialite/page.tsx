@@ -23,7 +23,7 @@ export default function PrivacyPage() {
       <section className={PRIVACY_STYLES.section}>
         <h2 className={PRIVACY_STYLES.heading}>{PRIVACY_COPY.controllerTitle}</h2>
         <p className={PRIVACY_STYLES.card}>
-          {DATA_CONTROLLER.name} — {DATA_CONTROLLER.contact}
+          {DATA_CONTROLLER.name} · {DATA_CONTROLLER.contact}
         </p>
       </section>
 
