@@ -29,7 +29,6 @@ import {
   layerOfSource,
 } from '@/declarations/calendar/registries'
 import { CALENDAR_SETTINGS } from '@/declarations/configurations/settings'
-import { ROUTES } from '@/declarations/navigation'
 import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
@@ -67,8 +66,6 @@ export interface CalendarBoardProps {
   fields: FieldDefinition[]
   anchor: string
   canManage: boolean
-  // At least one template is declared, so the board points at the configuration
-  hasTemplates?: boolean
   sessionId?: string
   // Opens straight on this entry's detail, for a deep link
   focusEntryId?: string
@@ -76,9 +73,6 @@ export interface CalendarBoardProps {
 
 // A week slot identifier pairs its day with its padded hour
 const SLOT_SEPARATOR = '|'
-
-// Reference collection holding the declared templates
-const TEMPLATE_SECTION = 'evenements'
 
 // Fields a whole selection can be rewritten with at once
 const BULK_FIELD_NAMES = ['kind', 'templateId', 'accountId', 'visibility', 'youtuberId']
@@ -112,7 +106,6 @@ const InfoIcon = ICONS.info
  * @param {FieldDefinition[]} fields - Declarations of the entry form
  * @param {string} anchor - ISO day the grid opens on
  * @param {boolean} canManage - Member may post and move entries
- * @param {boolean} [hasTemplates] - At least one template is declared
  * @param {string} [sessionId] - Bounds the board to one academy session
  * @param {string} [focusEntryId] - Entry the board opens straight onto
  * @return {JSX.Element}
@@ -124,7 +117,6 @@ export const CalendarBoard = ({
   fields,
   anchor,
   canManage,
-  hasTemplates,
   sessionId,
   focusEntryId,
 }: CalendarBoardProps) => {
@@ -625,14 +617,6 @@ export const CalendarBoard = ({
                 </div>
               )}
             </div>
-
-            {!hasTemplates && canManage && !sessionId && (
-              <Link href={ROUTES.settingsSection(TEMPLATE_SECTION)}>
-                <Button variant="link" icon="settings">
-                  {CALENDAR_COPY.noTemplatesTitle}
-                </Button>
-              </Link>
-            )}
           </div>
         </div>
       </Section>

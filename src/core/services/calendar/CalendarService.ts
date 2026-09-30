@@ -161,12 +161,6 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       kind: 'select',
       label: CALENDAR_FIELD_COPY.template,
       info: CALENDAR_FIELD_INFO.template,
-      action: {
-        label: CALENDAR_FIELD_COPY.configureTemplate,
-        href: ROUTES.settingsSection('evenements'),
-        icon: 'settings',
-        permission: Permissions.ReferenceManage,
-      },
       options: templates,
       mark: 'dot',
       span: 'half',

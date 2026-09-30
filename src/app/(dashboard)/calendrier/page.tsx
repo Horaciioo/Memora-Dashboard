@@ -5,7 +5,6 @@ import { PageHeader } from '@/components/structures/PageHeader'
 import { CalendarBoard } from '@/composites/calendar/CalendarBoard'
 import {
   calendarFields,
-  countTemplates,
   getEntry,
   listEntries,
   readCalendarScope,
@@ -49,7 +48,7 @@ export default async function CalendarPage({
   const anchor = toDayKey(focusEntry ? new Date(focusEntry.startsAt) : new Date())
   const { from, to } = gridRange(monthGrid(anchor))
 
-  const [window, fields, templateCount, youtubers] = await Promise.all([
+  const [window, fields, youtubers] = await Promise.all([
     listEntries({
       from: new Date(from),
       to: new Date(to),
@@ -58,7 +57,6 @@ export default async function CalendarPage({
       scope: perimeter,
     }),
     calendarFields(perimeter),
-    countTemplates(),
     youtuberOptions(perimeter),
   ])
 
@@ -84,7 +82,6 @@ export default async function CalendarPage({
         youtubers={youtubers}
         fields={fields}
         anchor={anchor}
-        hasTemplates={templateCount > 0}
         canManage={access.can(Permissions.CalendarManage)}
         focusEntryId={focusEntry ? focusEntryId : undefined}
       />

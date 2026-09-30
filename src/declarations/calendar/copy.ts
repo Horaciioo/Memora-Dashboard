@@ -109,7 +109,6 @@ export const CALENDAR_FIELD_COPY = {
   rosterSharedHint: 'Sinon, seuls les Responsables voient qui a répondu quoi.',
   remindAt: 'Rappel aux sans-réponse',
   remindAtHint: 'Laisse vide pour un rappel la veille en fin de journée.',
-  configureTemplate: 'Configurer un modèle',
 } as const
 
 /**

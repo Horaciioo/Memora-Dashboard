@@ -96,6 +96,8 @@ export const ACADEMY_COPY = {
   noTrainingsTitle: 'Aucune formation',
   noTrainingsDescription: 'Déclare les formations du programme dans la configuration.',
   configure: 'Ouvrir la configuration',
+  openCatalogue: 'Ouvrir le catalogue',
+  openSessions: 'Ouvrir les sessions',
   mandatory: 'Obligatoire',
   progress: 'formations validées',
   blocked: 'Formations obligatoires en attente',
