@@ -8,6 +8,7 @@ import { NOTIFICATION_KINDS } from '@/utils/constants/notifications'
 import type { NotificationKindName } from '@/utils/constants/notifications'
 import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
 import type { Prisma } from '@prisma/client'
+import { readMentions } from '@/utils/format/mentions'
 
 /**
  * Alert worth reaching one member
@@ -80,29 +81,6 @@ export const notify = async (input: NotificationInput): Promise<void> => {
   })
 }
 
-// Handle written as an at sign followed by one or two words of a display name
-const MENTION_PATTERN = /@([\p{L}\p{N}._-]+(?:\s+[\p{L}\p{N}._-]+)?)/gu
-
-/**
- * Collect the handles written in a body
- * @param {string} body - Written text
- * @return {string[]} - Candidate display names
- */
-
-const readHandles = (body: string): string[] => {
-  const handles = new Set<string>()
-
-  for (const [, handle] of body.matchAll(MENTION_PATTERN)) {
-    handles.add(handle)
-
-    // A two word handle also stands for the first word alone
-    const [first] = handle.split(/\s+/)
-    if (first !== handle) handles.add(first)
-  }
-
-  return [...handles].slice(0, NOTIFICATION_SETTINGS.maxMentions)
-}
-
 /**
  * Raise a mention for every member named in a body
  * @param {string | null | undefined} body - Written text
@@ -117,12 +95,17 @@ export const notifyMentions = async (
   // No at sign, no lookup — the common case never reaches the database
   if (!body?.includes('@')) return
 
-  const handles = readHandles(body)
-  if (handles.length === 0) return
+  const { handles, discordIds } = readMentions(body, NOTIFICATION_SETTINGS.maxMentions)
+  if (handles.length === 0 && discordIds.length === 0) return
 
   const accounts = await prisma.account.findMany({
     where: {
-      OR: handles.map((handle) => ({ displayName: { equals: handle, mode: 'insensitive' } })),
+      OR: [
+        ...handles.map((handle) => ({
+          displayName: { equals: handle, mode: 'insensitive' as const },
+        })),
+        ...(discordIds.length > 0 ? [{ discordId: { in: discordIds } }] : []),
+      ],
     },
     select: { id: true },
   })
