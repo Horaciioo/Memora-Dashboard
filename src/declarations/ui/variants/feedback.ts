@@ -209,3 +209,13 @@ export const REVEAL_MARK = {
     'grid grid-cols-[0fr] transition-[grid-template-columns] duration-[var(--motion-duration-panel)] ease-out group-hover:grid-cols-[1fr] group-focus-visible:grid-cols-[1fr] motion-reduce:transition-none',
   text: 'overflow-hidden whitespace-nowrap not-italic',
 } as const
+
+/**
+ * Status read as words behind a coloured bullet styles
+ * @type {Record<string, string>}
+ */
+
+export const STATUS_TEXT = {
+  root: 'inline-flex items-center gap-2 text-sm text-[var(--color-ink-subtle)]',
+  bullet: 'h-2.5 w-2.5 shrink-0',
+} as const

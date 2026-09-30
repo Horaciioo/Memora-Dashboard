@@ -558,3 +558,33 @@ export const RuleGlyph = ({ className }: GlyphProps) => (
     <path d="M8 7h8M8 17h8" strokeOpacity="0.4" />
   </Stroke>
 )
+
+/**
+ * Bullet, a solid disc
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const BulletGlyph = ({ className }: GlyphProps) => (
+  <svg
+    viewBox="0 0 24 24"
+    className={className}
+    fill="currentColor"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="12" cy="12" r="8" />
+  </svg>
+)
+
+/**
+ * Hollow bullet, a ring
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const BulletRingGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={3}>
+    <circle cx="12" cy="12" r="7" />
+  </Stroke>
+)
