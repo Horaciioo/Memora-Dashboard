@@ -17,10 +17,12 @@ import {
   toPerson,
   toTag,
   youtuberOptions,
+  toCreatorTag,
+  toProjectTag,
 } from '@/core/services/work/shared'
 import { EMOJI_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
-import { TASK_FIELD_COPY } from '@/declarations/work/copy'
+import { TASK_FIELD_COPY, TASK_FIELD_INFO } from '@/declarations/work/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { TaskSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
@@ -53,8 +55,8 @@ const toSummary = (row: TaskRow): TaskSummary => ({
   columnId: row.stateId,
   state: toTag(row.state),
   priority: toTag(row.priority),
-  youtuber: toTag(row.youtuber),
-  project: row.project ? { id: row.project.id, label: row.project.title, accent: null } : null,
+  youtuber: toCreatorTag(row.youtuber),
+  project: toProjectTag(row.project),
   owner: toPerson(row.owner),
   dueDate: row.dueDate?.toISOString() ?? null,
   position: row.position,
@@ -82,7 +84,7 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
     stateOptions(WorkflowScopes.Task),
     priorityOptions(),
     youtuberOptions(scope),
-    projectOptions(),
+    projectOptions(scope),
     memberOptions(scope),
   ])
 
@@ -98,6 +100,7 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'title',
       kind: 'text',
       label: TASK_FIELD_COPY.title,
+      info: TASK_FIELD_INFO.title,
       required: true,
       glyph: 'emoji',
       maxLength: FORM_SETTINGS.titleMaxLength,
@@ -107,6 +110,7 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'description',
       kind: 'textarea',
       label: TASK_FIELD_COPY.description,
+      info: TASK_FIELD_INFO.description,
       maxLength: FORM_SETTINGS.longTextMaxLength,
       group: FORM_GROUPS.essentials,
     },
@@ -114,6 +118,8 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'ownerId',
       kind: 'select',
       label: TASK_FIELD_COPY.owner,
+      info: TASK_FIELD_INFO.owner,
+      preset: 'actor',
       options: members,
       mark: 'avatar',
       span: 'half',
@@ -122,7 +128,9 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
     {
       name: 'projectId',
       kind: 'select',
+      mark: 'emoji',
       label: TASK_FIELD_COPY.project,
+      info: TASK_FIELD_INFO.project,
       options: projects,
       span: 'half',
       group: FORM_GROUPS.assignment,
@@ -131,6 +139,7 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'youtuberId',
       kind: 'select',
       label: TASK_FIELD_COPY.youtuber,
+      info: TASK_FIELD_INFO.youtuber,
       options: youtubers,
       mark: 'avatar',
       span: 'half',
@@ -140,6 +149,8 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'stateId',
       kind: 'select',
       label: TASK_FIELD_COPY.state,
+      info: TASK_FIELD_INFO.state,
+      preset: 'default',
       options: states,
       mark: 'dot',
       span: 'half',
@@ -149,6 +160,8 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'priorityId',
       kind: 'select',
       label: TASK_FIELD_COPY.priority,
+      info: TASK_FIELD_INFO.priority,
+      preset: 'default',
       options: priorities,
       mark: 'priority',
       span: 'half',
@@ -158,6 +171,8 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       name: 'dueDate',
       kind: 'date',
       label: TASK_FIELD_COPY.dueDate,
+      info: TASK_FIELD_INFO.dueDate,
+      preset: 'today',
       span: 'half',
       group: FORM_GROUPS.details,
     },

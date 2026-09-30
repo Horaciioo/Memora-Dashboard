@@ -1,16 +1,21 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { HELD_FUNCTIONS, toMemberFunctions } from '@/core/services/reference/functions'
 import { allPriorities } from '@/core/services/reference/lookups'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
+import { roleGroupedOptions } from '@/core/lib/forms/options'
+import { FIXED_PRIORITIES } from '@/declarations/reference/fixed'
+import { scopedWhere } from '@/core/services/auth/ScopeService'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { BoardColumn } from '@/components/structures/KanbanBoard'
 import type { FieldOption } from '@/types/forms'
 import type { WorkAuthorship, WorkPerson, WorkTag } from '@/types/work'
 import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
+import { WorkflowPhases } from '@/utils/constants/workflow'
 import type { WorkflowPhaseName, WorkflowScopeName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
@@ -56,6 +61,27 @@ export const toTag = (row: TagRow | null | undefined): WorkTag | null =>
   row
     ? { id: row.id, label: row.name, accent: row.accent ?? null, phase: row.phase ?? undefined }
     : null
+
+/**
+ * Creator row shaped like a tag, portrait included
+ * @param {{ id: string, name: string, accent: string | null, avatarUrl: string | null } | null} row - Creator row
+ * @return {WorkTag | null} - Tag or null
+ */
+
+export const toCreatorTag = (
+  row: { id: string; name: string; accent: string | null; avatarUrl: string | null } | null
+): WorkTag | null =>
+  row ? { id: row.id, label: row.name, accent: row.accent, image: row.avatarUrl } : null
+
+/**
+ * Project row shaped like a tag, glyph included
+ * @param {{ id: string, title: string, emoji: string | null } | null} row - Project row
+ * @return {WorkTag | null} - Tag or null
+ */
+
+export const toProjectTag = (
+  row: { id: string; title: string; emoji: string | null } | null
+): WorkTag | null => (row ? { id: row.id, label: row.title, accent: null, emoji: row.emoji } : null)
 
 /**
  * Account row shaped like a person
@@ -158,7 +184,12 @@ export const stateOptions = async (scope: WorkflowScopeName): Promise<FieldOptio
     orderBy: { position: 'asc' },
   })
 
-  return rows.map((row) => ({ value: row.id, label: row.name, accent: row.accent ?? undefined }))
+  return rows.map((row) => ({
+    value: row.id,
+    label: row.name,
+    accent: row.accent ?? undefined,
+    isDefault: row.isDefault,
+  }))
 }
 
 /**
@@ -172,23 +203,20 @@ export const memberOptions = async (scope?: AccessScope): Promise<FieldOption[]>
     where: { status: { not: MemberStatuses.Left }, ...peopleInScope(scope) },
     orderBy: { displayName: 'asc' },
     include: {
-      primaryFunction: { select: { name: true } },
+      ...HELD_FUNCTIONS,
       _count: { select: { absences: { where: activeAbsenceFilter() } } },
     },
   })
 
-  return rows.map((row) => {
+  return roleGroupedOptions(rows, (row) => {
     const isAbsent = row._count.absences > 0
 
     return {
-      value: row.id,
-      label: row.displayName,
-      image: row.avatarUrl,
       disabled: isAbsent,
       // The hint tells homonyms apart, unless the member is out and it carries that instead
       hint: isAbsent
         ? MEMBER_COPY.absentHint.replace('{name}', row.displayName)
-        : (row.primaryFunction?.name ?? ROLE_REGISTRY.label(row.role)),
+        : (toMemberFunctions(row.functions)[0]?.label ?? ROLE_REGISTRY.label(row.role)),
     }
   })
 }
@@ -207,14 +235,11 @@ export const leadOptions = async (scope?: AccessScope): Promise<FieldOption[]> =
       ...peopleInScope(scope),
     },
     orderBy: { displayName: 'asc' },
-    include: { primaryFunction: { select: { name: true } } },
+    include: HELD_FUNCTIONS,
   })
 
-  return rows.map((row) => ({
-    value: row.id,
-    label: row.displayName,
-    image: row.avatarUrl,
-    hint: row.primaryFunction?.name ?? ROLE_REGISTRY.label(row.role),
+  return roleGroupedOptions(rows, (row) => ({
+    hint: toMemberFunctions(row.functions)[0]?.label ?? ROLE_REGISTRY.label(row.role),
   }))
 }
 
@@ -266,22 +291,35 @@ export const platformOptions = async (): Promise<FieldOption[]> => {
 
 export const priorityOptions = async (): Promise<FieldOption[]> => {
   const rows = await allPriorities()
+  const preset = FIXED_PRIORITIES.find((priority) => priority.isDefault)?.name
 
-  return rows.map((row) => ({ value: row.id, label: row.name, accent: row.accent ?? undefined }))
+  return rows.map((row) => ({
+    value: row.id,
+    label: row.name,
+    accent: row.accent ?? undefined,
+    isDefault: row.name === preset,
+  }))
 }
 
 /**
- * Read the open projects
+ * Read the ongoing or planned projects of a perimeter
+ * @param {AccessScope} [scope] - Viewer perimeter, unbounded when absent
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-export const projectOptions = async (): Promise<FieldOption[]> => {
+export const projectOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
+  // Finished projects drop out
+  const live: Prisma.ProjectWhereInput = {
+    archived: false,
+    OR: [{ stateId: null }, { state: { phase: { not: WorkflowPhases.Done } } }],
+  }
+
   const rows = await prisma.project.findMany({
-    where: { archived: false },
+    where: scope ? scopedWhere('project', scope, live) : live,
     orderBy: { title: 'asc' },
   })
 
-  return rows.map((row) => ({ value: row.id, label: row.title }))
+  return rows.map((row) => ({ value: row.id, label: row.title, emoji: row.emoji }))
 }
 
 /**

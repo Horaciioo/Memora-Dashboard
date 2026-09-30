@@ -18,6 +18,8 @@ import {
   toPerson,
   toTag,
   youtuberOptions,
+  toCreatorTag,
+  toProjectTag,
 } from '@/core/services/work/shared'
 import {
   EMOJI_SETTINGS,
@@ -25,8 +27,8 @@ import {
   PROJECT_SETTINGS,
 } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
-import { PROJECT_COPY, PROJECT_FIELD_COPY } from '@/declarations/work/copy'
-import type { FieldDefinition, FormValues } from '@/types/forms'
+import { PROJECT_COPY, PROJECT_FIELD_COPY, PROJECT_FIELD_INFO } from '@/declarations/work/copy'
+import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import type { CommunicationEntry, ProjectDetail, ProjectSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
@@ -61,7 +63,7 @@ const toSummary = (row: ProjectRow): ProjectSummary => ({
   state: toTag(row.state),
   priority: toTag(row.priority),
   platform: toTag(row.platform),
-  youtuber: toTag(row.youtuber),
+  youtuber: toCreatorTag(row.youtuber),
   leads: row.leads.map((lead) => toPerson(lead.account)).filter((person) => person !== null),
   assistants: row.assistants
     .map((assistant) => toPerson(assistant.account))
@@ -113,6 +115,7 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'title',
       kind: 'text',
       label: PROJECT_FIELD_COPY.title,
+      info: PROJECT_FIELD_INFO.title,
       required: true,
       glyph: 'emoji',
       maxLength: FORM_SETTINGS.titleMaxLength,
@@ -122,6 +125,7 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'description',
       kind: 'textarea',
       label: PROJECT_FIELD_COPY.description,
+      info: PROJECT_FIELD_INFO.description,
       maxLength: FORM_SETTINGS.longTextMaxLength,
       group: FORM_GROUPS.essentials,
     },
@@ -129,6 +133,8 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'leadIds',
       kind: 'multiselect',
       label: PROJECT_FIELD_COPY.leads,
+      info: PROJECT_FIELD_INFO.leads,
+      preset: 'actor',
       placeholder: PROJECT_FIELD_COPY.leadsEmpty,
       options: leads,
       mark: 'avatar',
@@ -140,6 +146,7 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'assistantIds',
       kind: 'multiselect',
       label: PROJECT_FIELD_COPY.assistants,
+      info: PROJECT_FIELD_INFO.assistants,
       placeholder: PROJECT_FIELD_COPY.assistantsEmpty,
       options: members,
       mark: 'avatar',
@@ -150,6 +157,7 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'youtuberId',
       kind: 'select',
       label: PROJECT_FIELD_COPY.youtuber,
+      info: PROJECT_FIELD_INFO.youtuber,
       options: youtubers,
       mark: 'avatar',
       span: 'half',
@@ -159,6 +167,8 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'stateId',
       kind: 'select',
       label: PROJECT_FIELD_COPY.state,
+      info: PROJECT_FIELD_INFO.state,
+      preset: 'default',
       options: states,
       mark: 'dot',
       span: 'half',
@@ -168,6 +178,8 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'priorityId',
       kind: 'select',
       label: PROJECT_FIELD_COPY.priority,
+      info: PROJECT_FIELD_INFO.priority,
+      preset: 'default',
       options: priorities,
       mark: 'priority',
       span: 'half',
@@ -177,6 +189,7 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'platformId',
       kind: 'select',
       label: PROJECT_FIELD_COPY.platform,
+      info: PROJECT_FIELD_INFO.platform,
       options: platforms,
       mark: 'avatar',
       span: 'half',
@@ -186,6 +199,8 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'deadline',
       kind: 'date',
       label: PROJECT_FIELD_COPY.deadline,
+      info: PROJECT_FIELD_INFO.deadline,
+      preset: 'today',
       span: 'half',
       group: FORM_GROUPS.details,
     },
@@ -380,10 +395,13 @@ const toCommunication = (
 
 /**
  * Build the announcement form declarations
+ * @param {FieldOption[]} [mentions] - Members, roles and channels the body may mention
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const communicationFields = async (): Promise<FieldDefinition[]> => {
+export const communicationFields = async (
+  mentions: FieldOption[] = []
+): Promise<FieldDefinition[]> => {
   const platforms = await platformOptions()
 
   return [
@@ -410,8 +428,9 @@ export const communicationFields = async (): Promise<FieldDefinition[]> => {
     },
     {
       name: 'body',
-      kind: 'markdown',
+      kind: 'announcement',
       label: PROJECT_FIELD_COPY.communicationBody,
+      options: mentions,
       maxLength: FORM_SETTINGS.markdownMaxLength,
     },
   ]
@@ -557,10 +576,8 @@ export const readProject = async (id: string): Promise<ProjectDetail> => {
       columnId: task.stateId,
       state: toTag(task.state),
       priority: toTag(task.priority),
-      youtuber: toTag(task.youtuber),
-      project: task.project
-        ? { id: task.project.id, label: task.project.title, accent: null }
-        : null,
+      youtuber: toCreatorTag(task.youtuber),
+      project: toProjectTag(task.project),
       owner: toPerson(task.owner),
       dueDate: task.dueDate?.toISOString() ?? null,
       position: task.position,
@@ -576,12 +593,11 @@ export const readProject = async (id: string): Promise<ProjectDetail> => {
       minutes: meeting.minutes,
       columnId: meeting.stateId,
       state: toTag(meeting.state),
-      youtuber: toTag(meeting.youtuber),
-      project: meeting.project
-        ? { id: meeting.project.id, label: meeting.project.title, accent: null }
-        : null,
+      youtuber: toCreatorTag(meeting.youtuber),
+      project: toProjectTag(meeting.project),
       scheduledAt: meeting.scheduledAt.toISOString(),
       durationMin: meeting.durationMin,
+      audience: meeting.audience,
       leads: [],
       assistants: [],
       participants: meeting.attendees

@@ -2,6 +2,7 @@
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
 import { EditableDetailGrid, type EditableEntry } from '@/components/structures/EditableDetailGrid'
@@ -70,9 +71,7 @@ export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) =
     {
       label: TASK_FIELD_COPY.state,
       field: fieldFor('stateId'),
-      display: stateOption ? (
-        <Badge label={stateOption.label} accent={stateOption.accent} dot />
-      ) : null,
+      display: stateOption ? <Badge label={stateOption.label} accent={stateOption.accent} /> : null,
     },
     {
       label: TASK_FIELD_COPY.priority,
@@ -95,19 +94,14 @@ export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) =
       label: TASK_FIELD_COPY.project,
       field: fieldFor('projectId'),
       display: projectOption ? (
-        <Badge label={projectOption.label} tone="brand" icon="projects" />
+        <ProjectLabel title={projectOption.label} emoji={projectOption.emoji} />
       ) : null,
     },
     {
       label: TASK_FIELD_COPY.youtuber,
       field: fieldFor('youtuberId'),
       display: youtuberOption ? (
-        <Badge
-          label={youtuberOption.label}
-          accent={youtuberOption.accent}
-          tone="info"
-          icon="youtuber"
-        />
+        <CreatorLabel name={youtuberOption.label} image={youtuberOption.image} />
       ) : null,
     },
     {

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { MeetingsBoard } from '@/composites/work/MeetingsBoard'
+import { busySlots, withBusy } from '@/core/services/calendar/BusyService'
 import { listMeetings, meetingFields } from '@/core/services/work/MeetingService'
 import { boardColumns, projectOptions, youtuberOptions } from '@/core/services/work/shared'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -17,16 +18,19 @@ export const metadata: Metadata = { title: MEETING_COPY.title }
  */
 
 export default async function MeetingsPage() {
-  const { access, scope } = await requirePermission(Permissions.MeetingRead)
+  const { session, access, scope } = await requirePermission(Permissions.MeetingRead)
   const perimeter = await scope()
 
-  const [meetings, columns, fields, youtubers, projects] = await Promise.all([
+  const [meetings, columns, baseFields, slots, youtubers, projects] = await Promise.all([
     listMeetings(perimeter),
     boardColumns(WorkflowScopes.Meeting),
     meetingFields(perimeter),
+    busySlots({ viewerId: session.id, access, scope: perimeter }),
     youtuberOptions(),
     projectOptions(),
   ])
+
+  const fields = withBusy(baseFields, ['scheduledAt'], slots)
 
   return (
     <div className={PAGE_STYLES.wrapper}>

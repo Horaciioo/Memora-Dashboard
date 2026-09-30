@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { Glyph } from '@/components/elements/display/Glyph'
 import { WorkBoard } from '@/composites/work/WorkBoard'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -86,19 +87,22 @@ export const TasksBoard = ({
       header: FIELD_COPY.state,
       sortValue: (task) => task.state?.label ?? '',
       render: (task) =>
-        task.state ? <Badge label={task.state.label} accent={task.state.accent} dot /> : null,
+        task.state ? <Badge label={task.state.label} accent={task.state.accent} /> : null,
     },
     {
       key: 'project',
       header: FIELD_COPY.project,
-      render: (task) => (task.project ? <Badge label={task.project.label} tone="brand" /> : null),
+      render: (task) =>
+        task.project ? (
+          <ProjectLabel title={task.project.label} emoji={task.project.emoji} />
+        ) : null,
     },
     {
       key: 'youtuber',
       header: FIELD_COPY.youtuber,
       render: (task) =>
         task.youtuber ? (
-          <Badge label={task.youtuber.label} accent={task.youtuber.accent} tone={'info'} />
+          <CreatorLabel name={task.youtuber.label} image={task.youtuber.image} />
         ) : null,
     },
     {

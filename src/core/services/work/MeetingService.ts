@@ -16,14 +16,18 @@ import {
   toPerson,
   toTag,
   youtuberOptions,
+  toCreatorTag,
+  toProjectTag,
 } from '@/core/services/work/shared'
 import { EMOJI_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
-import { MEETING_FIELD_COPY } from '@/declarations/work/copy'
+import { MEETING_FIELD_COPY, MEETING_FIELD_INFO } from '@/declarations/work/copy'
+import { MEETING_AUDIENCE_REGISTRY } from '@/declarations/work/registries'
+import { toOptions } from '@/core/lib/forms/options'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MeetingDetail, MeetingSummary, MeetingTopicEntry, WorkPerson } from '@/types/work'
-import { AttendeeKinds, WorkflowScopes } from '@/utils/constants/workflow'
-import type { AttendeeKindName } from '@/utils/constants/workflow'
+import { AttendeeKinds, MeetingAudiences, WorkflowScopes } from '@/utils/constants/workflow'
+import type { AttendeeKindName, MeetingAudienceName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
 // Relations every meeting card needs
@@ -66,10 +70,11 @@ const toSummary = (row: MeetingRow): MeetingSummary => ({
   minutes: row.minutes,
   columnId: row.stateId,
   state: toTag(row.state),
-  youtuber: toTag(row.youtuber),
-  project: row.project ? { id: row.project.id, label: row.project.title, accent: null } : null,
+  youtuber: toCreatorTag(row.youtuber),
+  project: toProjectTag(row.project),
   scheduledAt: row.scheduledAt.toISOString(),
   durationMin: row.durationMin,
+  audience: row.audience,
   leads: seats(row, AttendeeKinds.Lead),
   assistants: seats(row, AttendeeKinds.Assistant),
   participants: seats(row, AttendeeKinds.Participant),
@@ -79,6 +84,7 @@ const toSummary = (row: MeetingRow): MeetingSummary => ({
     emoji: row.emoji,
     scheduledAt: row.scheduledAt.toISOString().slice(0, 16),
     durationMin: row.durationMin,
+    audience: row.audience,
     stateId: row.stateId,
     youtuberId: row.youtuberId,
     projectId: row.projectId,
@@ -101,7 +107,7 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
   const [states, youtubers, projects, members] = await Promise.all([
     stateOptions(WorkflowScopes.Meeting),
     youtuberOptions(scope),
-    projectOptions(),
+    projectOptions(scope),
     memberOptions(scope),
   ])
 
@@ -117,15 +123,32 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'title',
       kind: 'text',
       label: MEETING_FIELD_COPY.title,
+      info: MEETING_FIELD_INFO.title,
       required: true,
       glyph: 'emoji',
       maxLength: FORM_SETTINGS.titleMaxLength,
       group: FORM_GROUPS.essentials,
     },
     {
+      name: 'youtuberId',
+      kind: 'select',
+      label: MEETING_FIELD_COPY.youtuber,
+      info: MEETING_FIELD_INFO.youtuber,
+      preset: 'default',
+      // The creator the member is viewing leads
+      options: youtubers.map((option) => ({
+        ...option,
+        isDefault: option.value === scope?.activeYoutuberId,
+      })),
+      mark: 'avatar',
+      group: FORM_GROUPS.essentials,
+    },
+    {
       name: 'scheduledAt',
       kind: 'datetime',
       label: MEETING_FIELD_COPY.scheduledAt,
+      info: MEETING_FIELD_INFO.scheduledAt,
+      preset: 'today',
       required: true,
       span: 'half',
       group: FORM_GROUPS.essentials,
@@ -134,15 +157,31 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'durationMin',
       kind: 'number',
       label: MEETING_FIELD_COPY.durationMin,
+      info: MEETING_FIELD_INFO.durationMin,
       min: FORM_SETTINGS.meetingMinDuration,
       max: FORM_SETTINGS.meetingMaxDuration,
       span: 'half',
       group: FORM_GROUPS.essentials,
     },
     {
+      name: 'audience',
+      kind: 'select',
+      label: MEETING_FIELD_COPY.audience,
+      info: MEETING_FIELD_INFO.audience,
+      required: true,
+      preset: 'default',
+      options: toOptions(MEETING_AUDIENCE_REGISTRY).map((option) => ({
+        ...option,
+        isDefault: option.value === MeetingAudiences.Custom,
+      })),
+      group: FORM_GROUPS.assignment,
+    },
+    {
       name: 'leadIds',
       kind: 'multiselect',
+      preset: 'actor',
       label: MEETING_FIELD_COPY.leads,
+      info: MEETING_FIELD_INFO.leads,
       placeholder: MEETING_FIELD_COPY.peopleEmpty,
       options: members,
       mark: 'avatar',
@@ -153,6 +192,7 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'assistantIds',
       kind: 'multiselect',
       label: MEETING_FIELD_COPY.assistants,
+      info: MEETING_FIELD_INFO.assistants,
       placeholder: MEETING_FIELD_COPY.peopleEmpty,
       options: members,
       mark: 'avatar',
@@ -163,32 +203,27 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'participantIds',
       kind: 'multiselect',
       label: MEETING_FIELD_COPY.participants,
+      info: MEETING_FIELD_INFO.participants,
       placeholder: MEETING_FIELD_COPY.peopleEmpty,
       options: members,
       mark: 'avatar',
       group: FORM_GROUPS.assignment,
     },
     {
-      name: 'youtuberId',
-      kind: 'select',
-      label: MEETING_FIELD_COPY.youtuber,
-      options: youtubers,
-      mark: 'avatar',
-      span: 'half',
-      group: FORM_GROUPS.assignment,
-    },
-    {
       name: 'projectId',
       kind: 'select',
+      mark: 'emoji',
       label: MEETING_FIELD_COPY.project,
+      info: MEETING_FIELD_INFO.project,
       options: projects,
-      span: 'half',
       group: FORM_GROUPS.assignment,
     },
     {
       name: 'stateId',
       kind: 'select',
       label: MEETING_FIELD_COPY.state,
+      info: MEETING_FIELD_INFO.state,
+      preset: 'default',
       options: states,
       mark: 'dot',
       span: 'half',
@@ -198,6 +233,7 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'introduction',
       kind: 'markdown',
       label: MEETING_FIELD_COPY.introduction,
+      info: MEETING_FIELD_INFO.introduction,
       maxLength: FORM_SETTINGS.markdownMaxLength,
       group: FORM_GROUPS.details,
     },
@@ -205,6 +241,7 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'outro',
       kind: 'markdown',
       label: MEETING_FIELD_COPY.outro,
+      info: MEETING_FIELD_INFO.outro,
       maxLength: FORM_SETTINGS.markdownMaxLength,
       group: FORM_GROUPS.details,
     },
@@ -212,6 +249,7 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
       name: 'minutes',
       kind: 'markdown',
       label: MEETING_FIELD_COPY.minutes,
+      info: MEETING_FIELD_INFO.minutes,
       maxLength: FORM_SETTINGS.markdownMaxLength,
       group: FORM_GROUPS.details,
     },
@@ -258,6 +296,20 @@ const toAttendees = (values: FormValues) => {
 }
 
 /**
+ * Read the audience, never trusting an undeclared one
+ * @param {FormValues} values - Parsed body
+ * @return {MeetingAudienceName} - Audience
+ */
+
+const readAudience = (values: FormValues): MeetingAudienceName => {
+  const picked = readText(values, 'audience')
+
+  return picked && MEETING_AUDIENCE_REGISTRY.has(picked)
+    ? (picked as MeetingAudienceName)
+    : MeetingAudiences.Custom
+}
+
+/**
  * Turn parsed values into a database payload
  * @param {FormValues} values - Parsed body
  * @return {Prisma.MeetingUncheckedUpdateInput} - Database payload
@@ -270,6 +322,7 @@ const toMeetingData = (values: FormValues) => ({
   outro: readText(values, 'outro'),
   minutes: readText(values, 'minutes'),
   durationMin: readNumberValue(values, 'durationMin'),
+  audience: readAudience(values),
   stateId: readText(values, 'stateId'),
   youtuberId: readText(values, 'youtuberId'),
   projectId: readText(values, 'projectId'),

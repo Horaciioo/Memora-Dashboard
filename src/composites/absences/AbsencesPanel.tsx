@@ -4,10 +4,10 @@ import { useMemo, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
-import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { AbsenceTimeline } from '@/composites/absences/AbsenceTimeline'
 import { useAbsences } from '@/core/hooks/data/useAbsences'
@@ -108,20 +108,13 @@ export const AbsencesPanel = ({
         {current ? (
           <div className="flex flex-col gap-3">
             <AbsenceTimeline absence={current} />
-            <p className="max-w-2xl text-xs text-[var(--color-ink-subtle)] italic">
-              {ABSENCE_COPY.timelineDisclaimer}
-            </p>
-            <div className="flex flex-wrap items-center gap-2">
-              {canCreate && <AddRow label={ABSENCE_COPY.planAnother} onClick={openCreate} />}
-              <Button
-                variant="ghost"
-                icon="remove"
-                onClick={() => setPendingDeletion(current)}
-                className="shrink-0"
-              >
-                {ABSENCE_COPY.cancel}
-              </Button>
-            </div>
+            <Button
+              variant="secondary"
+              onClick={() => setPendingDeletion(current)}
+              className="self-start"
+            >
+              {ABSENCE_COPY.cancel}
+            </Button>
           </div>
         ) : (
           <EmptyState
@@ -158,7 +151,7 @@ export const AbsencesPanel = ({
                         </span>
                       )}
                     </span>
-                    <Badge label={status.label} accent={status.accent} dot />
+                    <Badge label={status.label} accent={status.accent}  />
                     <Button
                       variant="icon"
                       icon="remove"
@@ -176,7 +169,7 @@ export const AbsencesPanel = ({
       {canReview && (
         <Section title={ABSENCE_COPY.queueTitle} bare>
           {pendingQueue.length === 0 ? (
-            <p className="text-sm text-[var(--color-ink-subtle)] italic">
+            <p className="text-sm text-[var(--color-ink-subtle)]">
               {ABSENCE_COPY.noPendingDescription}
             </p>
           ) : (
@@ -221,7 +214,8 @@ export const AbsencesPanel = ({
         </Section>
       )}
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.absence}
         open={isCreating}
         title={ABSENCE_COPY.add}
         description={ABSENCE_COPY.underThresholdNotice.replace(
@@ -235,7 +229,8 @@ export const AbsencesPanel = ({
         onClose={() => setCreating(false)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.absence}
         open={reviewing !== null}
         title={ABSENCE_COPY.reviewTitle}
         description={
@@ -246,7 +241,7 @@ export const AbsencesPanel = ({
         fields={reviewFields}
         issues={issues}
         isSaving={isSaving}
-        submitLabel={
+        submitVerb={
           reviewing?.status === AbsenceStatuses.Approved
             ? ABSENCE_COPY.approve
             : ABSENCE_COPY.refuse

@@ -10,7 +10,7 @@ import {
   FORM_SETTINGS,
   PAGINATION_SETTINGS,
 } from '@/declarations/configurations/settings'
-import { ABSENCE_COPY, ABSENCE_FIELD_COPY } from '@/declarations/absences/copy'
+import { ABSENCE_COPY, ABSENCE_FIELD_COPY, ABSENCE_FIELD_INFO } from '@/declarations/absences/copy'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
@@ -46,7 +46,7 @@ export const activeAbsenceFilter = (): Prisma.AbsenceWhereInput => {
  * @return {Promise<boolean>} - Authorised
  */
 
-const canReviewAbsence = async (
+export const canReviewAbsence = async (
   reviewerId: string,
   accountId: string,
   isAdmin: boolean
@@ -107,12 +107,14 @@ export const ABSENCE_FIELDS: FieldDefinition[] = [
     name: 'dates',
     kind: 'daterange',
     label: ABSENCE_FIELD_COPY.dates,
+    info: ABSENCE_FIELD_INFO.dates,
     required: true,
   },
   {
     name: 'reasonCode',
     kind: 'select',
     label: ABSENCE_FIELD_COPY.reason,
+    info: ABSENCE_FIELD_INFO.reason,
     hint: ABSENCE_FIELD_COPY.reasonHint,
     required: true,
     options: ABSENCE_REASONS.options.map((option) => ({
@@ -140,6 +142,7 @@ export const REVIEW_FIELDS: FieldDefinition[] = [
     name: 'reviewNote',
     kind: 'textarea',
     label: ABSENCE_FIELD_COPY.reviewNote,
+    info: ABSENCE_FIELD_INFO.reviewNote,
     maxLength: FORM_SETTINGS.longTextMaxLength,
   },
 ]
@@ -192,16 +195,35 @@ export const listReviewQueue = async (
 }
 
 /**
- * Declare an absence
+ * Responsable posting on someone's behalf
+ * @typedef {Object} AbsenceApproval
+ * @property {string} reviewerId - Responsable identifier
+ * @property {boolean} isAdmin - Holds the admin level
+ */
+
+export interface AbsenceApproval {
+  reviewerId: string
+  isAdmin: boolean
+}
+
+/**
+ * Declare an absence, approved at once when a responsable posts it
  * @param {string} accountId - Account identifier
  * @param {FormValues} values - Parsed body
+ * @param {AbsenceApproval} [approval] - Posting responsable
  * @return {Promise<MemberAbsence>} - Created absence
  */
 
 export const createAbsence = async (
   accountId: string,
-  values: FormValues
+  values: FormValues,
+  approval?: AbsenceApproval
 ): Promise<MemberAbsence> => {
+  // Only for someone they lead
+  if (approval && !(await canReviewAbsence(approval.reviewerId, accountId, approval.isAdmin))) {
+    throw forbidden()
+  }
+
   const range = readDateRange(values, 'dates')
 
   if (!range) {
@@ -243,7 +265,13 @@ export const createAbsence = async (
       dayCount,
       reasonCode: readReasonCode(values),
       reason: encryptField(readText(values, 'reason')),
-      status: AbsenceStatuses.Pending,
+      ...(approval
+        ? {
+            status: AbsenceStatuses.Approved,
+            reviewerId: approval.reviewerId,
+            reviewedAt: new Date(),
+          }
+        : { status: AbsenceStatuses.Pending }),
     },
     include: ABSENCE_INCLUDE,
   })

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { Button } from '@/components/elements/actions/Button'
 import { EmojiPicker } from '@/components/elements/forms/EmojiPicker'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -12,7 +13,8 @@ import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { EditableDetailGrid, type EditableEntry } from '@/components/structures/EditableDetailGrid'
 import { EditableHeading } from '@/components/structures/EditableHeading'
 import { FileTabs } from '@/components/structures/FileTabs'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { InlineMarkdown } from '@/components/structures/InlineMarkdown'
 import { InlineText } from '@/components/structures/InlineText'
 import { Section } from '@/components/structures/Section'
@@ -131,27 +133,20 @@ export const MeetingFile = ({
     {
       label: MEETING_FIELD_COPY.state,
       field: fieldFor('stateId'),
-      display: stateOption ? (
-        <Badge label={stateOption.label} accent={stateOption.accent} dot />
-      ) : null,
+      display: stateOption ? <Badge label={stateOption.label} accent={stateOption.accent} /> : null,
     },
     {
       label: MEETING_FIELD_COPY.project,
       field: fieldFor('projectId'),
       display: projectOption ? (
-        <Badge label={projectOption.label} tone="brand" icon="projects" />
+        <ProjectLabel title={projectOption.label} emoji={projectOption.emoji} />
       ) : null,
     },
     {
       label: MEETING_FIELD_COPY.youtuber,
       field: fieldFor('youtuberId'),
       display: youtuberOption ? (
-        <Badge
-          label={youtuberOption.label}
-          accent={youtuberOption.accent}
-          tone="info"
-          icon="youtuber"
-        />
+        <CreatorLabel name={youtuberOption.label} image={youtuberOption.image} />
       ) : null,
     },
   ]
@@ -353,13 +348,13 @@ export const MeetingFile = ({
         ]}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.topic}
         open={writingTopic}
         title={MEETING_COPY.topicAdd}
         fields={topicFields}
         issues={topics.issues}
         isSaving={topics.isSaving}
-        size="lg"
         onSubmit={topics.create}
         onClose={() => setWritingTopic(false)}
       />

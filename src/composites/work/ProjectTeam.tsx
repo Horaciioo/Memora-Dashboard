@@ -63,9 +63,7 @@ const Roster = ({ title, people, options, disabled, full, onChange }: RosterProp
           </span>
         ))}
         {people.length === 0 && (
-          <span className="text-sm text-[var(--color-ink-subtle)] italic">
-            {PROJECT_COPY.teamEmpty}
-          </span>
+          <span className="text-sm text-[var(--color-ink-subtle)]">{PROJECT_COPY.teamEmpty}</span>
         )}
         {!full && (
           <SelectMenu

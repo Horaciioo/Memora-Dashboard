@@ -9,6 +9,7 @@ import {
   readProject,
 } from '@/core/services/work/ProjectService'
 import { taskFields } from '@/core/services/work/TaskService'
+import { mentionOptions } from '@/core/services/work/DiscordDirectory'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { PROJECT_COPY } from '@/declarations/work/copy'
@@ -56,7 +57,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     projectFields(perimeter),
     taskFields(perimeter),
     meetingFields(perimeter),
-    communicationFields(),
+    mentionOptions(detail.summary.youtuber?.id ?? null).then(communicationFields),
     readRecordActivity('project', id),
   ])
 

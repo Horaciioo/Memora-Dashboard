@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/elements/display/Badge'
+import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { Glyph } from '@/components/elements/display/Glyph'
 import { WorkBoard } from '@/composites/work/WorkBoard'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -73,7 +74,7 @@ export const ProjectsBoard = ({
       header: FIELD_COPY.youtuber,
       render: (project) =>
         project.youtuber ? (
-          <Badge label={project.youtuber.label} accent={project.youtuber.accent} tone={'info'} />
+          <CreatorLabel name={project.youtuber.label} image={project.youtuber.image} />
         ) : null,
     },
     {
@@ -81,9 +82,7 @@ export const ProjectsBoard = ({
       header: FIELD_COPY.state,
       sortValue: (project) => project.state?.label ?? '',
       render: (project) =>
-        project.state ? (
-          <Badge label={project.state.label} accent={project.state.accent} dot />
-        ) : null,
+        project.state ? <Badge label={project.state.label} accent={project.state.accent} /> : null,
     },
     {
       key: 'priority',

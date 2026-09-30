@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { Glyph } from '@/components/elements/display/Glyph'
 import { WorkBoard } from '@/composites/work/WorkBoard'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -84,22 +85,22 @@ export const MeetingsBoard = ({
       header: FIELD_COPY.state,
       sortValue: (meeting) => meeting.state?.label ?? '',
       render: (meeting) =>
-        meeting.state ? (
-          <Badge label={meeting.state.label} accent={meeting.state.accent} dot />
-        ) : null,
+        meeting.state ? <Badge label={meeting.state.label} accent={meeting.state.accent} /> : null,
     },
     {
       key: 'project',
       header: FIELD_COPY.project,
       render: (meeting) =>
-        meeting.project ? <Badge label={meeting.project.label} tone="brand" /> : null,
+        meeting.project ? (
+          <ProjectLabel title={meeting.project.label} emoji={meeting.project.emoji} />
+        ) : null,
     },
     {
       key: 'youtuber',
       header: FIELD_COPY.youtuber,
       render: (meeting) =>
         meeting.youtuber ? (
-          <Badge label={meeting.youtuber.label} accent={meeting.youtuber.accent} tone={'info'} />
+          <CreatorLabel name={meeting.youtuber.label} image={meeting.youtuber.image} />
         ) : null,
     },
     {

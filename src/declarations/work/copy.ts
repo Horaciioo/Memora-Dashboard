@@ -66,6 +66,23 @@ export const PROJECT_FIELD_COPY = {
 } as const
 
 /**
+ * Explanations behind each project field
+ * @type {Record<string, string>}
+ */
+
+export const PROJECT_FIELD_INFO = {
+  title: 'Le nom court qui identifie le projet sur les tableaux.',
+  description: 'Le contexte, l’objectif, et ce qu’on attend à la fin.',
+  leads: 'Les personnes qui pilotent le projet et en répondent. Par défaut, toi.',
+  assistants: 'Les modérateurs qui prêtent main-forte sans piloter.',
+  youtuber: 'Le créateur pour qui le projet est mené.',
+  state: 'L’étape où en est le projet, elle décide de sa colonne sur le tableau.',
+  priority: 'L’urgence du projet par rapport aux autres.',
+  platform: 'La plateforme où se déroule l’action principale du projet.',
+  deadline: 'Le jour où le projet doit être livré.',
+} as const
+
+/**
  * Copy of the task surfaces
  * @type {Record<string, string>}
  */
@@ -104,6 +121,22 @@ export const TASK_FIELD_COPY = {
   priority: 'Priorité',
   youtuber: 'YouTubeur concerné',
   project: 'Projet concerné',
+} as const
+
+/**
+ * Explanations behind each task field
+ * @type {Record<string, string>}
+ */
+
+export const TASK_FIELD_INFO = {
+  title: 'Ce qu’il y a à faire, en quelques mots.',
+  description: 'Les détails utiles pour s’y mettre sans poser de question.',
+  dueDate: 'Le jour où la tâche doit être faite.',
+  owner: 'La personne qui s’occupe de la tâche. Par défaut, toi.',
+  state: 'L’étape où en est la tâche, elle décide de sa colonne sur le tableau.',
+  priority: 'L’urgence de la tâche par rapport aux autres.',
+  youtuber: 'Le créateur concerné par la tâche.',
+  project: 'Le projet dont la tâche fait partie, s’il y en a un.',
 } as const
 
 /**
@@ -159,6 +192,7 @@ export const MEETING_FIELD_COPY = {
   emoji: 'Émoji',
   scheduledAt: 'Date et heure',
   durationMin: 'Durée en minutes',
+  audience: 'Public attendu',
   state: 'État',
   youtuber: 'YouTubeur concerné',
   project: 'Projet concerné',
@@ -172,6 +206,28 @@ export const MEETING_FIELD_COPY = {
   topicEmoji: 'Émoji',
   topicTitle: 'Titre du sujet',
   topicBody: 'Notes du sujet',
+} as const
+
+/**
+ * Explanations behind each meeting field
+ * @type {Record<string, string>}
+ */
+
+export const MEETING_FIELD_INFO = {
+  title: 'Le sujet de la réunion, tel qu’il apparaîtra au planning.',
+  scheduledAt: 'Le jour et l’heure où la réunion commence.',
+  durationMin: 'Le temps prévu, en minutes.',
+  audience:
+    'Toute l’équipe ou une équipe (Discord, Twitch) : la réunion s’affiche sur l’Accueil de chacun de ses membres. Personnalisé : seulement chez les personnes nommées.',
+  state: 'L’étape où en est la réunion, elle décide de sa colonne sur le tableau.',
+  youtuber: 'Le créateur concerné par la réunion.',
+  project: 'Le projet dont on parle, s’il y en a un.',
+  leads: 'Les personnes prévues pour prendre la parole majoritairement.',
+  assistants: 'Les personnes qui épaulent les intervenants : notes, partage d’écran, minutage.',
+  participants: 'Les modérateurs assistant à cette réunion.',
+  introduction: 'Ce qui sera dit en ouverture : le cadre et l’ordre du jour.',
+  outro: 'Ce qui sera dit en clôture : les décisions et la suite.',
+  minutes: 'Le compte rendu, rédigé après la réunion.',
 } as const
 
 /**
@@ -220,3 +276,25 @@ export const BOARD_ENTITY_COPY: Record<
  */
 
 export const MEETING_TOPIC_ENTITY = { label: 'Sujet', gender: 'masculine' } as const
+
+/**
+ * Copy of the Discord announcement composer
+ * @type {Record<string, string>}
+ */
+
+export const WORK_DISCORD_COPY = {
+  membersGroup: 'Membres',
+  broadcastGroup: 'Tout le serveur',
+  preview: 'Aperçu Discord',
+  placeholder: 'Envoyer un message dans #annonces',
+  author: 'Annonce',
+  today: 'Aujourd’hui',
+  copy: 'Copier mon annonce',
+  copied: 'Annonce copiée, prête à coller dans Discord',
+  unknownUser: 'utilisateur-inconnu',
+  unknownRole: 'rôle-inconnu',
+  unknownChannel: 'salon-inconnu',
+  spoiler: 'Spoiler',
+  mentionHint: 'Tape @ pour mentionner un membre ou un rôle, # pour un salon.',
+  noMatch: 'Aucune correspondance',
+} as const

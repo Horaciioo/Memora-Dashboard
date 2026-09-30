@@ -51,3 +51,14 @@ export const ABSENCE_FIELD_COPY = {
   status: 'Statut',
   reviewNote: 'Mot au modérateur',
 } as const
+
+/**
+ * Explanations behind each absence field
+ * @type {Record<string, string>}
+ */
+
+export const ABSENCE_FIELD_INFO = {
+  dates: 'Le premier et le dernier jour où tu ne seras pas disponible.',
+  reason: 'La catégorie qui résume l’absence, sans entrer dans le détail.',
+  reviewNote: 'Un mot que le modérateur lira avec la réponse.',
+} as const

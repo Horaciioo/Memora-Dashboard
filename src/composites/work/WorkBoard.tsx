@@ -9,7 +9,8 @@ import { SegmentedControl } from '@/components/elements/actions/SegmentedControl
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { DataTable, type DataTableColumn } from '@/components/structures/DataTable'
 import { FilterBar, type FilterDefinition } from '@/components/structures/FilterBar'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { WORK_SUBJECTS } from '@/declarations/ui/subjects'
 import { KanbanBoard, type BoardColumn, type BoardItem } from '@/components/structures/KanbanBoard'
 import { Section } from '@/components/structures/Section'
 import { useBoard, type BoardEndpoints } from '@/core/hooks/data/useBoard'
@@ -312,26 +313,27 @@ export const WorkBoard = <T extends BoardItem>({
         )}
       </Section>
 
-      <FormDialog
+      <FormDrawer
+        subject={WORK_SUBJECTS[scope]}
         open={isCreating}
         title={copy.add}
         fields={fields}
         initialValues={createColumn ? { [columnField]: createColumn } : undefined}
         issues={board.issues}
         isSaving={board.isSaving}
-        size="lg"
         onSubmit={board.create}
         onClose={() => setCreating(false)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={WORK_SUBJECTS[scope]}
         open={editing !== null}
         title={editing ? `${ACTION_COPY.edit} · ${labelOf(editing)}` : ACTION_COPY.edit}
         fields={fields}
         initialValues={editing ? valuesOf(editing) : undefined}
+        recordId={editing?.id}
         issues={board.issues}
         isSaving={board.isSaving}
-        size="lg"
         onSubmit={(values) => board.update(editing!.id, values)}
         onClose={() => setEditing(null)}
       />

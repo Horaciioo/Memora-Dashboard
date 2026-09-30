@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
+import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { Button } from '@/components/elements/actions/Button'
-import { Markdown } from '@/components/elements/display/Markdown'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
@@ -14,7 +14,8 @@ import { EditableDetailGrid, type EditableEntry } from '@/components/structures/
 import { Glyph } from '@/components/elements/display/Glyph'
 import { EditableHeading } from '@/components/structures/EditableHeading'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { ProjectTeam } from '@/composites/work/ProjectTeam'
@@ -22,6 +23,11 @@ import { AuthorshipStrip } from '@/composites/work/authorship'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useCommunications } from '@/core/hooks/data/useCommunications'
+import { useCopy } from '@/core/hooks/interaction/useCopy'
+import { DiscordMessage } from '@/components/elements/display/DiscordMessage'
+import { mentionChoices } from '@/components/elements/forms/DiscordComposer'
+import { WORK_DISCORD_COPY } from '@/declarations/work/copy'
+import { DISCORD_MESSAGE } from '@/declarations/ui/variants'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { useRecordFile } from '@/core/hooks/data/useRecordFile'
 import { ROUTES } from '@/declarations/navigation'
@@ -36,6 +42,7 @@ import {
   PROJECT_FIELD_COPY,
   TASK_COPY,
 } from '@/declarations/work/copy'
+import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -101,8 +108,10 @@ export const ProjectFileTabs = ({
     initialValues: summary.values,
   })
   const communications = useCommunications(summary.id, detail.communications)
+  const copyAnnouncement = useCopy(WORK_DISCORD_COPY.copied)
   const workItem = useMutation()
   const { contextMenu } = useMenu()
+  const gestures = useEditGestures()
   const [isWriting, setWriting] = useState(false)
   const [editing, setEditing] = useState<CommunicationEntry | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<CommunicationEntry | null>(null)
@@ -159,9 +168,7 @@ export const ProjectFileTabs = ({
     {
       label: PROJECT_FIELD_COPY.state,
       field: fieldFor('stateId'),
-      display: stateOption ? (
-        <Badge label={stateOption.label} accent={stateOption.accent} dot />
-      ) : null,
+      display: stateOption ? <Badge label={stateOption.label} accent={stateOption.accent} /> : null,
     },
     {
       label: PROJECT_FIELD_COPY.priority,
@@ -179,12 +186,7 @@ export const ProjectFileTabs = ({
       label: PROJECT_FIELD_COPY.youtuber,
       field: fieldFor('youtuberId'),
       display: youtuberOption ? (
-        <Badge
-          label={youtuberOption.label}
-          accent={youtuberOption.accent}
-          tone="info"
-          icon="youtuber"
-        />
+        <CreatorLabel name={youtuberOption.label} image={youtuberOption.image} />
       ) : null,
     },
     {
@@ -268,6 +270,11 @@ export const ProjectFileTabs = ({
     </div>
   )
 
+  // Mentions an announcement may carry, read off the announcement field
+  const mentions = mentionChoices(
+    communicationFields.find((field) => field.kind === 'announcement')?.options ?? []
+  )
+
   const communicationTab = () => (
     <Section
       title={PROJECT_COPY.communicationTitle}
@@ -295,8 +302,15 @@ export const ProjectFileTabs = ({
           {communications.entries.map((entry) => (
             <article
               key={entry.id}
+              className={cn(LIST_STYLES.card, canWriteCommunications && LIST_STYLES.cardClickable)}
+              {...gestures({
+                canEdit: canWriteCommunications,
+                onEdit: () => {
+                  communications.clearIssues()
+                  setEditing(entry)
+                },
+              })}
               onContextMenu={contextMenu(entryMenu(entry), entry.title)}
-              className="flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4"
             >
               <header className="flex flex-wrap items-center gap-2">
                 <h3 className="text-base font-bold">{entry.title}</h3>
@@ -304,25 +318,30 @@ export const ProjectFileTabs = ({
                 <Badge
                   label={entry.publishedAt ? PROJECT_COPY.published : PROJECT_COPY.draft}
                   tone={entry.publishedAt ? 'success' : 'neutral'}
-                  dot
                 />
                 <span className="ml-auto text-xs text-[var(--color-ink-subtle)]">
                   {[entry.authorName, entry.publishedAt ? formatDay(entry.publishedAt) : null]
                     .filter(Boolean)
                     .join(' · ')}
                 </span>
-                <Button
-                  variant="icon"
-                  icon="edit"
-                  aria-label={ACTION_COPY.edit}
-                  disabled={!canWriteCommunications}
-                  onClick={() => {
-                    communications.clearIssues()
-                    setEditing(entry)
-                  }}
-                />
               </header>
-              <Markdown source={entry.body} />
+              <div className={DISCORD_MESSAGE.frame}>
+                <DiscordMessage
+                  source={entry.body}
+                  mentions={mentions}
+                  author={entry.authorName ?? WORK_DISCORD_COPY.author}
+                  time={entry.publishedAt ? formatDay(entry.publishedAt) : undefined}
+                />
+              </div>
+              <div className={DISCORD_MESSAGE.footer}>
+                <Button
+                  variant="primary"
+                  icon="copy"
+                  onClick={() => void copyAnnouncement(entry.body)}
+                >
+                  {WORK_DISCORD_COPY.copy}
+                </Button>
+              </div>
             </article>
           ))}
           <AddRow
@@ -343,7 +362,7 @@ export const ProjectFileTabs = ({
       {task.owner && (
         <span className="text-xs text-[var(--color-ink-subtle)]">{task.owner.name}</span>
       )}
-      {task.state && <Badge label={task.state.label} accent={task.state.accent} dot />}
+      {task.state && <Badge label={task.state.label} accent={task.state.accent} />}
     </>
   )
 
@@ -506,51 +525,51 @@ export const ProjectFileTabs = ({
         ]}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.task}
         open={dialog === 'task'}
         title={PROJECT_COPY.taskCreate}
         fields={taskFields}
         initialValues={workItemDefaults}
         issues={workItem.issues}
         isSaving={workItem.isSaving}
-        size="lg"
         onSubmit={(values) => createWorkItem(API_ROUTES.tasks, BOARD_ENTITY_COPY.TASK, values)}
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.meeting}
         open={dialog === 'meeting'}
         title={PROJECT_COPY.meetingCreate}
         fields={meetingFields}
         initialValues={workItemDefaults}
         issues={workItem.issues}
         isSaving={workItem.isSaving}
-        size="lg"
         onSubmit={(values) =>
           createWorkItem(API_ROUTES.meetings, BOARD_ENTITY_COPY.MEETING, values)
         }
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.communication}
         open={isWriting}
         title={PROJECT_COPY.communicationAdd}
         fields={communicationFields}
         issues={communications.issues}
         isSaving={communications.isSaving}
-        size="lg"
         onSubmit={communications.create}
         onClose={() => setWriting(false)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.project}
         open={editing !== null}
         title={editing ? `${ACTION_COPY.edit} · ${editing.title}` : ACTION_COPY.edit}
         fields={communicationFields}
         initialValues={editing?.values}
         issues={communications.issues}
         isSaving={communications.isSaving}
-        size="lg"
         onSubmit={(values) => communications.update(editing!.id, values)}
         onClose={() => setEditing(null)}
       />

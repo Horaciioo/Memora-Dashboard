@@ -1,5 +1,5 @@
 import type { FormValues } from '@/types/forms'
-import type { WorkflowPhaseName } from '@/utils/constants/workflow'
+import type { MeetingAudienceName, WorkflowPhaseName } from '@/utils/constants/workflow'
 
 /**
  * Reference pointed at by a work item
@@ -15,6 +15,10 @@ export interface WorkTag {
   label: string
   accent: string | null
   phase?: WorkflowPhaseName
+  // Creator portrait
+  image?: string | null
+  // Project glyph
+  emoji?: string | null
 }
 
 /**
@@ -160,6 +164,7 @@ export interface TaskSummary extends WorkAuthorship {
  * @property {WorkTag | null} project - Project it belongs to
  * @property {string} scheduledAt - ISO date and time
  * @property {number | null} durationMin - Length in minutes
+ * @property {MeetingAudienceName} audience - Who is expected
  * @property {WorkPerson[]} leads - Main attendees
  * @property {WorkPerson[]} assistants - Assisting attendees
  * @property {WorkPerson[]} participants - Attending moderators
@@ -180,6 +185,7 @@ export interface MeetingSummary extends WorkAuthorship {
   project: WorkTag | null
   scheduledAt: string
   durationMin: number | null
+  audience: MeetingAudienceName
   leads: WorkPerson[]
   assistants: WorkPerson[]
   participants: WorkPerson[]
