@@ -7,7 +7,9 @@ import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
+import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useTrainingContent } from '@/core/hooks/data/useTrainingContent'
 import {
@@ -67,6 +69,7 @@ export const TrainingContentEditor = ({
   canManage,
 }: TrainingContentEditorProps) => {
   const content = useTrainingContent(trainingId, initialChapters)
+  const gestures = useEditGestures()
   const [dialog, setDialog] = useState<DialogState>(null)
   const [pending, setPending] = useState<PendingDelete>(null)
 
@@ -123,49 +126,39 @@ export const TrainingContentEditor = ({
   }
 
   const renderChoice = (question: QuizQuestionView, choice: QuizChoiceView) => (
-    <div key={choice.id} className={LIST_STYLES.item}>
+    <div
+      key={choice.id}
+      className={cn(LIST_STYLES.item, canManage && LIST_STYLES.itemClickable)}
+      {...gestures({
+        canEdit: canManage,
+        label: choice.label,
+        onEdit: () => openDialog({ kind: 'choice', questionId: question.id, editing: choice }),
+        onRemove: () => setPending({ kind: 'choice', row: choice }),
+      })}
+    >
       <span className="min-w-0 flex-1 truncate text-sm">{choice.label}</span>
       {choice.correct && (
         <Badge label={TRAINING_CONTENT_FIELD_COPY.choiceCorrect} tone="success" icon="confirm" />
       )}
-      <Button
-        variant="icon"
-        icon="edit"
-        aria-label={ACTION_COPY.edit}
-        disabled={!canManage}
-        onClick={() => openDialog({ kind: 'choice', questionId: question.id, editing: choice })}
-      />
-      <Button
-        variant="icon"
-        icon="remove"
-        aria-label={ACTION_COPY.delete}
-        disabled={!canManage}
-        onClick={() => setPending({ kind: 'choice', row: choice })}
-      />
     </div>
   )
 
   const renderQuestion = (block: TrainingBlockView, question: QuizQuestionView) => (
-    <article key={question.id} className={cn(LIST_STYLES.card, 'gap-2')}>
+    <article
+      key={question.id}
+      className={cn(LIST_STYLES.card, 'gap-2', canManage && LIST_STYLES.cardClickable)}
+      {...gestures({
+        canEdit: canManage,
+        label: question.prompt,
+        onEdit: () => openDialog({ kind: 'question', blockId: block.id, editing: question }),
+        onRemove: () => setPending({ kind: 'question', row: question }),
+      })}
+    >
       <header className="flex flex-wrap items-center gap-2">
         <span className="min-w-0 flex-1 font-medium">{question.prompt}</span>
         {question.multiple && (
           <Badge label={TRAINING_CONTENT_FIELD_COPY.questionMultiple} tone="info" />
         )}
-        <Button
-          variant="icon"
-          icon="edit"
-          aria-label={ACTION_COPY.edit}
-          disabled={!canManage}
-          onClick={() => openDialog({ kind: 'question', blockId: block.id, editing: question })}
-        />
-        <Button
-          variant="icon"
-          icon="remove"
-          aria-label={ACTION_COPY.delete}
-          disabled={!canManage}
-          onClick={() => setPending({ kind: 'question', row: question })}
-        />
       </header>
       <div className={LIST_STYLES.stack}>
         {question.choices.length === 0 ? (
@@ -202,24 +195,18 @@ export const TrainingContentEditor = ({
     const kind = TRAINING_BLOCK_KIND_REGISTRY.get(block.kind)
 
     return (
-      <article key={block.id} className={cn(LIST_STYLES.card, 'gap-3')}>
+      <article
+        key={block.id}
+        className={cn(LIST_STYLES.card, 'gap-3', canManage && LIST_STYLES.cardClickable)}
+        {...gestures({
+          canEdit: canManage,
+          label: kind.label,
+          onEdit: () => openDialog({ kind: 'block', chapterId: chapter.id, editing: block }),
+          onRemove: () => setPending({ kind: 'block', row: block }),
+        })}
+      >
         <header className="flex flex-wrap items-center gap-2">
           <Badge label={kind.label} accent={kind.accent} tone={'neutral'} icon={kind.icon} />
-          <Button
-            variant="icon"
-            icon="edit"
-            className="ml-auto"
-            aria-label={ACTION_COPY.edit}
-            disabled={!canManage}
-            onClick={() => openDialog({ kind: 'block', chapterId: chapter.id, editing: block })}
-          />
-          <Button
-            variant="icon"
-            icon="remove"
-            aria-label={ACTION_COPY.delete}
-            disabled={!canManage}
-            onClick={() => setPending({ kind: 'block', row: block })}
-          />
         </header>
         {block.kind === TrainingBlockKinds.Text ? (
           block.body && <Markdown source={block.body} />
@@ -263,23 +250,15 @@ export const TrainingContentEditor = ({
       data-drop-index={index}
       {...(canManage ? itemProps({ id: chapter.id, from: CHAPTERS_CONTAINER }) : {})}
       className={cn(LIST_STYLES.card, 'gap-3', canManage && 'cursor-grab')}
+      {...gestures({
+        canEdit: canManage,
+        label: chapter.title,
+        onEdit: () => openDialog({ kind: 'chapter', editing: chapter }),
+        onRemove: () => setPending({ kind: 'chapter', row: chapter }),
+      })}
     >
       <header className="flex flex-wrap items-center gap-2">
         <span className="min-w-0 flex-1 text-lg font-bold">{chapter.title}</span>
-        <Button
-          variant="icon"
-          icon="edit"
-          aria-label={ACTION_COPY.edit}
-          disabled={!canManage}
-          onClick={() => openDialog({ kind: 'chapter', editing: chapter })}
-        />
-        <Button
-          variant="icon"
-          icon="remove"
-          aria-label={ACTION_COPY.delete}
-          disabled={!canManage}
-          onClick={() => setPending({ kind: 'chapter', row: chapter })}
-        />
       </header>
       <div className="flex flex-col gap-3 pl-4">
         {chapter.blocks.length === 0 ? (
@@ -377,7 +356,8 @@ export const TrainingContentEditor = ({
         </div>
       )}
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS[dialog?.kind ?? 'chapter']}
         open={dialog !== null}
         title={
           dialog?.editing

@@ -1,5 +1,6 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Badge } from '@/components/elements/display/Badge'
 import { Markdown } from '@/components/elements/display/Markdown'
@@ -7,8 +8,10 @@ import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { SkeletonList } from '@/components/elements/feedback/Skeleton'
 import { Dialog } from '@/components/structures/Dialog'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { apiGet, apiPost } from '@/core/lib/api/client'
+import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
@@ -52,31 +55,16 @@ const QuizDialog = ({
   onClose: () => void
   onScored: () => void
 }) => {
-  const [track, setTrack] = useState<{ blockId: string | null; fields: FieldDefinition[] | null }>({
-    blockId,
-    fields: null,
-  })
   const { isSaving, issues, run } = useMutation()
   const { notify } = useNotifications()
 
-  // A new block starts loaded-blank during this render, the effect below fills it in
-  if (track.blockId !== blockId) setTrack({ blockId, fields: null })
-
-  useEffect(() => {
-    if (!blockId) return
-
-    let cancelled = false
-    void apiGet<FieldDefinition[]>(API_ROUTES.blockQuiz(blockId)).then((next) => {
-      if (!cancelled)
-        setTrack((current) => (current.blockId === blockId ? { blockId, fields: next } : current))
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [blockId])
-
-  const fields = track.blockId === blockId ? track.fields : null
+  // Quiz of the open block
+  const { data } = useQuery({
+    queryKey: QUERY_KEYS.blockQuiz(blockId ?? ''),
+    queryFn: ({ signal }) => apiGet<FieldDefinition[]>(API_ROUTES.blockQuiz(blockId ?? ''), signal),
+    enabled: Boolean(blockId),
+  })
+  const fields = blockId ? (data ?? null) : null
 
   const submit = async (values: FormValues) => {
     if (!blockId) return false
@@ -94,14 +82,13 @@ const QuizDialog = ({
   }
 
   return (
-    <FormDialog
+    <FormDrawer
+      subject={FORM_SUBJECTS.quiz}
       open={blockId !== null && fields !== null}
       title={ACADEMY_COPY.takeQuiz}
       fields={fields ?? []}
       issues={issues}
       isSaving={isSaving}
-      submitLabel={ACADEMY_COPY.quizSubmit}
-      size="lg"
       onSubmit={submit}
       onClose={onClose}
     />

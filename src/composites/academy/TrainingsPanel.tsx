@@ -42,7 +42,7 @@ const TrainingRow = ({
           <Badge label={ACADEMY_PERIOD_REGISTRY.label(training.period)} tone="neutral" />
         )}
         {training.mandatory && <Badge label={ACADEMY_COPY.mandatory} tone="brand" />}
-        <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />
+        <Badge label={status.label} accent={status.accent} tone={'neutral'} />
         <span className="ml-auto text-xs text-[var(--color-ink-subtle)]">
           {`${ACADEMY_SETTINGS.trainingMinMinutes}-${ACADEMY_SETTINGS.trainingMaxMinutes} ${ACADEMY_COPY.trainingDurationUnit}`}
         </span>
