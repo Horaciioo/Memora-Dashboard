@@ -103,8 +103,8 @@ export const CompareBlock = ({ block }: { block: Extract_<'compare'> }) => {
     Icon: typeof Good
   ) => (
     <div className={cn(COURSE_FIGURE.compareSide, tone)}>
-      <p className={cn(COURSE_FIGURE.compareHead, text)}>
-        <Icon className="h-5 w-5" aria-hidden="true" />
+      <p className={COURSE_FIGURE.compareHead}>
+        <Icon className={cn('h-5 w-5', text)} aria-hidden="true" />
         {data.title}
       </p>
       <ul className={COURSE_FIGURE.compareList}>
