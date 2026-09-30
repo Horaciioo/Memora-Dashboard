@@ -1,9 +1,11 @@
 /*
  * Typography of the theme format (src/utils/format/theme.ts → THEME.font).
- * Fraunces carries the display voice — heavy, optical, a calligraphic italic
- * whose strokes almost join. Inter keeps running text plain; JetBrains Mono the
- * code and eyebrows. The families are fetched by the <link> in app/layout.tsx;
- * this file only names them and their fallbacks.
+ * Inter carries both running text and headings — box and page titles lean on
+ * its heaviest weight rather than a separate display face. Fraunces is kept
+ * only for the statistic tile's numeral (src/declarations/ui/blocks.ts,
+ * tileValue); JetBrains Mono the code and eyebrows. The families are fetched
+ * by the <link> in app/layout.tsx; this file only names them and their
+ * fallbacks.
  */
 
 :root {

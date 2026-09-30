@@ -1,3 +1,6 @@
+import type { IconName } from '@/declarations/ui/icons'
+import type { NounGender } from '@/utils/format/grammar'
+
 /**
  * Field validation messages
  * @type {Record<string, string>}
@@ -18,7 +21,35 @@ export const FORM_COPY = {
   notAnOption: 'Cette valeur n’est pas proposée.',
   notAColour: 'Entre une couleur hexadécimale.',
   endBeforeStart: 'La fin arrive avant le début.',
-  categories: 'Catégories du formulaire',
+  categories: 'Sections du formulaire',
+  // Something already holds the moment picked
+  busyNow: 'Déjà en cours : {events}.',
+  busyDay: 'Déjà prévu ce jour-là : {events}.',
+  busyMore: '+ {count}',
+} as const
+
+/**
+ * Record a drawer form writes, naming its glyph and its gestures
+ * @typedef {Object} FormSubject
+ * @property {string} label - Singular noun
+ * @property {NounGender} gender - Noun gender
+ * @property {IconName} icon - Glyph beside the action
+ */
+
+export interface FormSubject {
+  label: string
+  gender: NounGender
+  icon: IconName
+}
+
+/**
+ * Gestures of the form drawer
+ * @type {Record<string, string>}
+ */
+
+export const DRAWER_COPY = {
+  save: 'Enregistrer',
+  cancel: 'Annuler',
 } as const
 
 /**
@@ -27,9 +58,6 @@ export const FORM_COPY = {
  */
 
 export const EDITOR_COPY = {
-  write: 'Rédaction',
-  preview: 'Aperçu',
-  empty: 'Rien à prévisualiser pour l’instant.',
   bold: 'Gras',
   italic: 'Italique',
   underline: 'Souligné',
@@ -40,9 +68,26 @@ export const EDITOR_COPY = {
   orderedList: 'Liste numérotée',
   code: 'Code',
   codeBlock: 'Bloc de code',
-  link: 'Lien',
-  spoiler: 'Spoiler',
   counter: 'caractères',
+  // Block editor
+  placeholder: 'Écris, ou tape / pour choisir un bloc',
+  slashEmpty: 'Aucun bloc ne correspond',
+  slashLabel: 'Blocs',
+  formatLabel: 'Mise en forme',
+  paragraph: 'Texte',
+  paragraphHint: 'Un paragraphe simple.',
+  heading1: 'Grand titre',
+  heading1Hint: 'Le titre d’une partie.',
+  heading2: 'Titre moyen',
+  heading2Hint: 'Le titre d’une sous-partie.',
+  heading3: 'Petit titre',
+  heading3Hint: 'Un intertitre discret.',
+  listHint: 'Une liste à puces.',
+  orderedListHint: 'Une liste d’étapes.',
+  quoteHint: 'Une phrase mise en retrait.',
+  codeBlockHint: 'Du code, tel quel.',
+  rule: 'Séparateur',
+  ruleHint: 'Une ligne entre deux parties.',
 } as const
 
 /**

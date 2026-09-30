@@ -1,10 +1,4 @@
-/**
- * Theme format — the closed vocabulary the visual identity is built from. Every
- * colour, font, radius, shadow and motion step used anywhere resolves to one of
- * these custom properties, whose values live in `src/styles/theme.css` and
- * `src/styles/fonts.css`. The art direction confines itself to this map: a value
- * that is not here is not a legal design token.
- */
+// Closed design token vocabulary
 
 export type TokenRef = `var(--${string})`
 
@@ -31,6 +25,7 @@ export const THEME_COLOUR = {
   inkAccent: ref('color-ink-accent'),
   border: ref('color-border'),
   borderStrong: ref('color-border-strong'),
+  hover: ref('color-hover'),
   brand: ref('color-brand-600'),
   brandEdge: ref('color-brand-400'),
   brandSoft: ref('color-brand-soft'),

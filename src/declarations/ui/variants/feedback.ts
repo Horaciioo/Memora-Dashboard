@@ -25,9 +25,9 @@ export const SKELETON_BASE = 'skeleton-shimmer rounded-[var(--radius-md)] bg-[va
 
 export const EMPTY_STATE_STYLES = {
   frame:
-    'flex flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)]/40 px-6 py-12 text-center',
+    'flex flex-col items-center justify-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)] px-6 py-12 text-center',
   frameCompact:
-    'flex flex-col items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)]/40 px-6 py-8 text-center',
+    'flex flex-col items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)] px-6 py-8 text-center',
   start: { illustration: 'h-28 w-28' },
   filter: { illustration: 'h-24 w-24' },
   compact: { illustration: 'h-16 w-16' },
@@ -53,11 +53,17 @@ export const PROGRESS_STYLES = {
  */
 
 export const TOAST_STYLES = {
-  // Above the floating nav pill on mobile, pinned top-right from md
+  // Above the nav pill on mobile, top-right from md; the pile sets its own height
   stack:
-    'pointer-events-none fixed inset-x-4 bottom-[calc(var(--shell-bottom-nav-h)_+_1.5rem_+_env(safe-area-inset-bottom))] z-[60] flex flex-col gap-2 md:inset-x-auto md:top-4 md:right-4 md:bottom-auto md:w-[min(23rem,calc(100vw-2rem))]',
+    'toast-pile pointer-events-auto fixed inset-x-4 bottom-[calc(var(--shell-bottom-nav-h)_+_1.5rem_+_env(safe-area-inset-bottom))] z-[60] md:inset-x-auto md:top-4 md:right-4 md:bottom-auto md:w-[min(23rem,calc(100vw-2rem))]',
+  stackSpread: 'toast-pile-spread',
+  // Placed by .toast-pile
+  item: 'absolute inset-x-0',
+  // Space once spread
+  gapPx: 8,
   toast:
-    'surface-enter pointer-events-auto flex touch-pan-y items-start gap-3 rounded-[var(--radius-lg)] border border-l-4 border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm shadow-[var(--shadow-lg)]',
+    'toast-enter relative flex touch-pan-y items-start gap-3 overflow-hidden rounded-[var(--radius-lg)] border border-l-4 border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm shadow-[var(--shadow-lg)]',
+  settle: 'transition-[transform,opacity] motion-reduce:transition-none',
   badge: 'flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)]',
   glyph: 'h-4 w-4',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
@@ -65,6 +71,9 @@ export const TOAST_STYLES = {
   description: 'text-xs text-[var(--color-ink-subtle)]',
   dismiss:
     'shrink-0 text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  // Duration set inline
+  countdown: 'toast-countdown absolute inset-x-0 bottom-0 h-0.5 origin-left',
+  countdownPaused: '[animation-play-state:paused]',
 } as const
 
 /**
@@ -73,36 +82,39 @@ export const TOAST_STYLES = {
  */
 
 export const ADD_ROW_STYLES = {
-  base: 'flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] px-4 py-3 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-brand-400)] hover:bg-[var(--color-brand-soft)] hover:text-[var(--color-brand-600)] disabled:pointer-events-none disabled:opacity-50',
+  base: 'flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] px-4 py-3 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-brand-400)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] disabled:pointer-events-none disabled:opacity-50',
   tile: 'min-h-24 flex-col',
   icon: 'h-4 w-4',
 } as const
 
 /**
- * Maturity tag styles, a toned pill pointing at the explainer page
+ * Maturity tag styles
  * @type {Record<string, string>}
  */
 
 export const MATURITY_STYLES = {
-  tag: 'inline-flex shrink-0 items-center rounded-[var(--radius-sm)] px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase',
-  link: 'transition-opacity hover:opacity-80',
+  // Outlined, never filled
+  tag: 'inline-flex shrink-0 items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-[10px] leading-none font-medium tracking-wide text-[var(--color-ink)] uppercase',
+  progress: 'text-[var(--color-ink-subtle)]',
+  link: 'transition-colors hover:border-[var(--color-ink)]',
   row: 'flex items-start gap-3 text-sm',
   meaning: 'text-[var(--color-ink-subtle)]',
 } as const
 
 /**
- * Notification bell, its panel and its rows
+ * Notification bell
  * @type {Record<string, string>}
  */
 
 export const NOTIFICATION_STYLES = {
-  // The pastille sits on the bell itself, so the trigger keeps its square footprint
+  // The pastille sits on the bell itself
   trigger: 'relative',
+  // Unread dot, never a number
   pastille:
-    'pointer-events-none absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-danger)] px-1 text-[10px] font-bold tabular-nums text-[var(--color-on-brand)]',
+    'pointer-events-none absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-surface-raised)]',
   scrim: 'fixed inset-0 z-[65]',
   panel:
-    'surface-enter fixed z-[70] flex max-h-[min(28rem,70vh)] w-[min(21rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+    'rail-reset surface-enter fixed z-[70] flex max-h-[min(28rem,70vh)] w-[min(21rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
   header:
     'flex shrink-0 items-center justify-between gap-2 border-b border-[var(--color-border)] px-4 py-2.5',
   title: 'text-sm font-bold',
@@ -127,7 +139,7 @@ export const NOTIFICATION_STYLES = {
   foot: 'flex items-center gap-2 pt-1',
   moment: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
   action:
-    'ml-auto inline-flex items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2 py-0.5 text-xs font-semibold transition-colors hover:border-[var(--color-brand-400)] hover:bg-[var(--color-brand-soft)] hover:text-[var(--color-brand-600)]',
+    'ml-auto inline-flex items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2 py-0.5 text-xs font-semibold transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   actionIcon: 'h-3 w-3',
 } as const
 
@@ -138,11 +150,48 @@ export const NOTIFICATION_STYLES = {
 
 export const CRITICAL_ERROR_STYLES = {
   body: 'bg-[var(--color-background)] text-[var(--color-ink)] antialiased',
-  frame:
-    'mx-auto flex min-h-screen max-w-md flex-col items-center justify-center gap-3 px-6 text-center',
-  title: 'text-xl font-extrabold tracking-tight',
-  description: 'text-sm text-[var(--color-ink-subtle)]',
-  reference: 'font-mono text-xs text-[var(--color-ink-subtle)]',
   action:
-    'mt-2 rounded-[var(--radius-md)] bg-[var(--color-brand-600)] px-4 py-2 text-sm font-semibold text-[var(--color-on-brand)]',
+    'rounded-[var(--radius-md)] bg-[var(--color-brand-600)] px-4 py-2 text-sm font-semibold text-[var(--color-on-brand)] transition-colors hover:bg-[var(--color-brand-700)]',
+} as const
+
+/**
+ * Info hint styles
+ * @type {Record<string, string>}
+ */
+
+export const INFO_HINT = {
+  wrapper: 'group/info relative inline-flex shrink-0',
+  trigger:
+    'inline-flex items-center justify-center rounded-full transition-colors duration-[var(--motion-duration-fast)]',
+  triggerTone:
+    'text-[var(--color-ink-subtle)] hover:text-[var(--color-brand-600)] focus-visible:text-[var(--color-brand-600)]',
+  icon: 'h-4 w-4',
+  // Shown on hover or focus
+  pop: 'invisible absolute top-[calc(100%+0.5rem)] z-[60] w-max max-w-64 translate-y-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2.5 py-1.5 text-left text-xs leading-snug font-normal tracking-normal text-[var(--color-ink)] normal-case opacity-0 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-[var(--motion-duration-fast)] group-focus-within/info:visible group-focus-within/info:translate-y-0 group-focus-within/info:opacity-100 group-hover/info:visible group-hover/info:translate-y-0 group-hover/info:opacity-100 motion-reduce:transition-none',
+  // Exclusive anchors
+  popCenter: 'left-1/2 -translate-x-1/2',
+  popStart: '-left-2',
+} as const
+
+/**
+ * Change mark styles
+ * @type {Record<string, string>}
+ */
+
+export const DELTA_MARK = {
+  wrap: 'inline-flex items-center gap-0.5 text-xs font-semibold tabular-nums',
+  glyph: 'h-3.5 w-3.5',
+} as const
+
+/**
+ * Failed load styles
+ * @type {Record<string, string>}
+ */
+
+export const QUERY_ERROR = {
+  frame:
+    'flex flex-wrap items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-danger)]/30 bg-[var(--color-danger-soft)] px-4 py-3',
+  body: 'flex min-w-0 flex-1 flex-col gap-0.5',
+  title: 'text-sm font-semibold text-[var(--color-danger)]',
+  hint: 'text-xs text-[var(--color-ink-subtle)]',
 } as const

@@ -7,8 +7,7 @@ export const SECTION_STYLES = {
   wrapper: 'flex flex-col gap-3',
   header: 'flex flex-wrap items-end justify-between gap-3',
   heading: 'flex flex-col gap-1',
-  title: 'text-xl font-bold tracking-tight italic sm:text-2xl',
-  description: 'text-sm italic text-[var(--color-ink-subtle)]',
+  title: 'text-xl font-extrabold tracking-tight sm:text-2xl',
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
   panel:
     'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
@@ -21,11 +20,27 @@ export const SECTION_STYLES = {
  */
 
 export const PAGE_STYLES = {
-  wrapper: 'flex flex-col gap-8',
-  header: 'flex flex-wrap items-start justify-between gap-4',
+  wrapper: 'mx-auto flex w-full flex-col gap-8',
+  header: 'flex flex-col gap-4',
+  // Centred inline, a tab hanging from the frame past md
+  titleRail:
+    // Tucked under the rim, hides its shadow
+    'flex justify-center md:pointer-events-none md:fixed md:top-[calc(0.75rem-3px)] md:right-3 md:left-[var(--shell-sidebar-w)] md:z-[36] md:items-start',
+  titleTab:
+    'title-tab-body flex min-w-0 items-start justify-center text-center text-2xl font-black tracking-[0.06em] uppercase md:pointer-events-auto md:max-w-[min(44rem,64%)] md:items-center md:px-4 md:pb-1 md:text-[1.375rem] md:tracking-[0.16em] md:text-[var(--color-on-frame)]',
+  titleTabText: 'min-w-0 text-balance md:truncate',
+  // Superscript, a small gap off the title
+  titleInfo: 'ml-1.5 self-start pt-1 md:ml-2 md:pt-3',
+  titleInfoTrigger:
+    'text-[var(--color-ink-subtle)] hover:text-[var(--color-brand-600)] md:text-[var(--color-on-frame-subtle)] md:hover:text-[var(--color-on-frame)]',
+  // Sloped shoulders, drawn in globals.css
+  titleSlopeStart: 'title-tab-start',
+  titleSlopeEnd: 'title-tab-end',
+  // Eyebrow left, actions right
+  headerRow: 'flex flex-wrap items-center justify-between gap-4',
   eyebrow:
     'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-accent)] uppercase',
-  title: 'text-2xl font-extrabold tracking-tight italic sm:text-3xl',
+  title: 'text-2xl font-black tracking-tight sm:text-3xl',
   // Title and its glyph sharing one line
   heading: 'flex min-w-0 items-center gap-2',
   headingTitle: 'min-w-0 flex-1',
@@ -33,7 +48,6 @@ export const PAGE_STYLES = {
     '-mx-1 cursor-pointer rounded-[var(--radius-sm)] px-1 transition-colors hover:bg-[var(--color-surface)]',
   titleInput:
     'rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-brand-600)]',
-  lead: 'max-w-2xl text-sm italic text-[var(--color-ink-subtle)]',
   toolbar: 'flex flex-wrap items-center gap-2',
 } as const
 
@@ -45,8 +59,20 @@ export const PAGE_STYLES = {
 export const BADGE_STYLES = {
   base: 'inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-0.5 text-xs font-medium whitespace-nowrap',
   outline: 'border',
-  dot: 'h-1.5 w-1.5 rounded-full',
   icon: 'h-3 w-3',
+  // Log tags, calmer but still solid
+  muted: 'saturate-[0.45] brightness-[0.92] dark:brightness-[0.8]',
+} as const
+
+/**
+ * Creator and project labels, never tags
+ * @type {Record<string, string>}
+ */
+
+export const RECORD_LABEL = {
+  row: 'inline-flex min-w-0 items-center gap-2 align-middle',
+  name: 'truncate',
+  emoji: 'shrink-0 text-base leading-none',
 } as const
 
 /**
@@ -77,7 +103,6 @@ export const DIALOG_STYLES = {
   header: 'flex items-start gap-3 px-5 pt-5 pb-4 sm:px-6',
   heading: 'flex min-w-0 flex-1 flex-col gap-1',
   title: 'text-lg leading-tight font-bold tracking-tight',
-  description: 'line-clamp-1 text-sm text-[var(--color-ink-subtle)] italic',
   close: '-mt-1 -mr-2 shrink-0',
   body: 'flex-1 overflow-y-auto border-t border-[var(--color-border)] px-5 py-5 sm:px-6',
   // Tabs already rule the top, drop the body border
@@ -106,9 +131,47 @@ export type DialogSize = keyof typeof DIALOG_SIZES
  */
 
 export const DRAWER_STYLES = {
-  overlay: 'overlay-enter fixed inset-0 z-50 bg-[var(--color-ink)]/40 backdrop-blur-sm',
+  // Dims the page window only, the rail stays lit
+  overlay:
+    'overlay-enter fixed inset-0 z-[45] bg-[var(--color-ink)]/25 md:inset-y-3 md:right-3 md:left-[var(--shell-sidebar-w)] md:rounded-[var(--radius-xl)]',
+  // Margin-centred, never transformed
   panel:
-    'drawer-enter fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+    'drawer-enter fixed inset-x-3 inset-y-0 z-50 my-auto flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:right-[var(--drawer-page-right)] md:left-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-r-none md:border-r-0',
+  header: 'flex shrink-0 items-center gap-3 px-5 pt-4 pb-3',
+  // Bare glyph, no plate
+  glyph: 'flex shrink-0 items-center text-[var(--color-brand-700)]',
+  glyphIcon: 'h-5 w-5',
+  title: 'min-w-0 flex-1 truncate text-base leading-tight font-bold tracking-tight',
+  close: '-mr-2 shrink-0',
+  // Section tabs under the header
+  sections: 'shrink-0 px-5',
+  body: 'min-h-0 flex-1 overflow-y-auto border-t border-[var(--color-border)] px-5 py-5',
+  // Fields of the section on screen
+  section: 'drawer-section-enter',
+  footer: 'shrink-0 border-t border-[var(--color-border)] px-2 py-2',
+} as const
+
+/**
+ * Form drawer footer, one full-width line per gesture
+ * @type {Record<string, string>}
+ */
+
+export const DRAWER_ACTIONS = {
+  stack: 'flex flex-col gap-2 p-1',
+  // Previous at the far left, next at the far right, each name against its chevron
+  steps: 'flex items-center justify-between gap-2',
+  step: 'group flex min-w-0 items-center gap-1 rounded-[var(--radius-md)] px-2 py-2.5 text-sm font-bold transition-colors hover:bg-[var(--color-hover)]',
+  stepBack: 'mr-auto',
+  stepNext: 'ml-auto',
+  stepLabel: 'min-w-0 truncate',
+  stepIcon: 'h-4 w-4 shrink-0 text-[var(--color-brand-700)]',
+  // Filled gestures, hover deepens
+  line: 'flex w-full items-center justify-center gap-2.5 rounded-[var(--radius-md)] px-4 py-3 text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60',
+  save: 'bg-[var(--color-success)]',
+  cancel: 'bg-[var(--color-danger)]',
+  icon: 'h-4.5 w-4.5 shrink-0',
+  divider: 'mx-1 h-px bg-[var(--color-border)]',
+  note: 'mb-4 text-sm text-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -134,12 +197,25 @@ export const MENU_STYLES = {
 
 export const TABS_STYLES = {
   list: 'relative flex gap-1 overflow-x-auto border-b border-[var(--color-border)]',
+  // Strip centred over its panel from sm, the rule sliding on measured offsets
+  listCentered: 'sm:justify-center',
   tab: 'shrink-0 px-3 py-2 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
   active: 'text-[var(--color-brand-600)]',
   flagged: 'text-[var(--color-danger)]',
   indicator:
     'tab-indicator pointer-events-none absolute bottom-0 left-0 h-0.5 bg-[var(--color-brand-600)]',
   panel: 'pt-4',
+  content: 'flex items-center',
+  icon: 'h-4 w-4 shrink-0',
+  // Track sized on the real label width, opening and closing alike
+  labelTrack:
+    'grid transition-[grid-template-columns,opacity] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  labelOpen: 'grid-cols-[1fr] opacity-100',
+  labelShut: 'grid-cols-[0fr] opacity-0',
+  labelShutMobile: 'grid-cols-[0fr] opacity-0 sm:grid-cols-[1fr] sm:opacity-100',
+  label: 'min-w-0 overflow-hidden whitespace-nowrap',
+  // Gap folds away with the label
+  labelBeside: 'pl-1.5',
 } as const
 
 /**
@@ -202,7 +278,12 @@ export const INLINE_EDIT_STYLES = {
   text: '-mx-1 cursor-text rounded-[var(--radius-sm)] px-1 transition-colors hover:bg-[var(--color-surface)]',
   input:
     'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-brand-600)]',
-  placeholder: 'text-sm text-[var(--color-ink-subtle)]',
+  area: 'block min-h-20 resize-y rounded-[var(--radius-md)] px-3 py-2 leading-relaxed',
+  // Dashed field standing in for a creation row
+  create:
+    'w-full rounded-[var(--radius-md)] border border-dashed border-[var(--color-brand-400)] bg-[var(--color-surface)] px-4 py-3 text-sm outline-none focus:border-solid focus:ring-2 focus:ring-[var(--color-brand-600)]',
+  createTile: 'min-h-24 text-center',
+  placeholder: 'text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 
 /**
@@ -211,13 +292,17 @@ export const INLINE_EDIT_STYLES = {
  */
 
 export const PREFERENCE_STYLES = {
+  column: 'mx-auto flex w-full max-w-3xl flex-col gap-8',
+  // Who is signed in, centred over the tabs
+  hero: 'flex flex-col items-center gap-3 text-center',
+  heroName: 'text-3xl font-black tracking-tight',
+  heroMeta: 'flex flex-col items-center gap-2',
   stack: 'flex flex-col gap-6',
   rows: 'flex flex-col divide-y divide-[var(--color-border)]',
   row: 'flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0',
   label: 'text-sm font-medium',
-  notice: 'pt-3 text-xs text-[var(--color-ink-subtle)] italic',
-  identity: 'flex items-center gap-4 pb-4',
-  footer: 'flex justify-end pt-4',
+  notice: 'pt-3 text-xs text-[var(--color-ink-subtle)]',
+  footer: 'flex justify-center pt-5',
 } as const
 
 /**
@@ -231,7 +316,7 @@ export const SIGN_IN_STYLES = {
     'rounded-[var(--radius-md)] border border-[var(--color-danger)] bg-[var(--color-surface)] px-3 py-2 text-xs text-[var(--color-danger)]',
   divider: 'flex items-center gap-3 text-[11px] text-[var(--color-ink-subtle)] uppercase',
   rule: 'h-px flex-1 bg-[var(--color-border)]',
-  notice: 'text-xs text-[var(--color-ink-subtle)] italic',
+  notice: 'text-xs text-[var(--color-ink-subtle)]',
   footer: 'pt-1 text-center text-xs',
   link: 'text-[var(--color-ink-subtle)] underline underline-offset-2 hover:text-[var(--color-ink)]',
 } as const
@@ -282,8 +367,7 @@ export const WIZARD_STYLES = {
   heading: 'flex flex-col gap-1',
   counter:
     'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-[var(--color-ink-accent)] uppercase',
-  title: 'text-xl font-extrabold tracking-tight italic sm:text-2xl',
-  hint: 'text-sm text-[var(--color-ink-subtle)] italic',
+  title: 'text-xl font-extrabold tracking-tight sm:text-2xl',
   body: 'flex min-h-64 flex-col gap-4',
   footer: 'flex items-center justify-between gap-3 border-t border-[var(--color-border)] pt-6',
   // The rail only fits on a wide viewport, the bar carries the progress on a narrow one
@@ -307,8 +391,7 @@ export const ONBOARDING_STYLES = {
   bannerFoot: 'flex flex-col gap-2',
   bannerEyebrow:
     'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-white/70 uppercase',
-  bannerTitle: 'text-2xl font-extrabold tracking-tight text-white italic sm:text-3xl lg:text-4xl',
-  bannerLead: 'max-w-sm text-sm text-white/75 italic',
+  bannerTitle: 'text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl',
   // No frame, no card: the form stands on the page itself
   panel: 'flex min-w-0 flex-col justify-center px-2 py-8 sm:px-6 lg:px-12 lg:py-14',
   form: 'mx-auto flex w-full max-w-xl flex-col gap-8',
@@ -326,7 +409,11 @@ export const ONBOARDING_STYLES = {
   intro: 'flex flex-col gap-1',
   actions: 'flex flex-wrap items-center gap-3',
   outcome: 'flex flex-col gap-2 text-center',
-  outcomeTitle: 'text-xl font-extrabold tracking-tight italic',
+  outcomeTitle: 'text-xl font-extrabold tracking-tight',
+  // Admitted candidate, a green rule down the side rather than a card
+  admission: 'flex flex-col gap-1 border-l-4 border-[var(--color-success)] py-1 pl-4',
+  admissionEyebrow:
+    'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-[var(--color-success)] uppercase',
 } as const
 
 /**
@@ -339,4 +426,25 @@ export const INTEGRATION_STEP_STYLES = {
     'mt-2 flex w-full flex-col gap-3 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)] p-3',
   row: 'flex flex-wrap items-center gap-2',
   meta: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Folding panel styles
+ * @type {Record<string, string>}
+ */
+
+export const COLLAPSIBLE_PANEL = {
+  frame: 'flex flex-col',
+  head: 'flex items-center gap-2',
+  toggle:
+    'flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-md)] py-1.5 text-left transition-colors hover:text-[var(--color-ink)]',
+  icon: 'h-4 w-4 shrink-0',
+  title: 'truncate text-sm font-bold tracking-wide uppercase',
+  // Mono marker, never a filled pill
+  count: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)] tabular-nums',
+  chevron: 'ml-auto h-4 w-4 shrink-0 transition-transform motion-reduce:transition-none',
+  chevronOpen: 'rotate-0',
+  chevronShut: '-rotate-90',
+  actions: 'flex shrink-0 items-center gap-1',
+  body: 'pt-3',
 } as const

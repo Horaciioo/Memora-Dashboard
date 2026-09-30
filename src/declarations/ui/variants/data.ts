@@ -48,14 +48,14 @@ export const LIST_STYLES = {
 export const GROUP_STYLES = {
   stack: 'flex flex-col',
   section: 'flex flex-col gap-3',
-  sectionDivided: 'border-t border-[var(--color-border)] pt-6',
+  sectionDivided: 'border-t border-[var(--color-border)] mt-6 pt-6',
   // Page-level buckets, a rule centred in the gap between each
   ruledStack: 'flex flex-col divide-y divide-[var(--color-border)]',
   ruledSection: 'flex flex-col gap-4 py-8 first:pt-0 last:pb-0',
   heading: 'flex w-full items-center gap-2 text-left text-sm font-semibold text-[var(--color-ink)]',
-  count: 'font-normal text-[var(--color-ink-subtle)]',
+  count: 'ml-auto font-normal text-[var(--color-ink-subtle)]',
   bubble: 'inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-brand-600)]',
-  chevron: 'ml-auto h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform',
+  chevron: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform',
   chevronOpen: 'rotate-180',
 } as const
 
@@ -149,7 +149,6 @@ export const HORIZONTAL_TIMELINE_STYLES = {
   connectorLate: 'bg-[var(--color-danger)]',
   labelDone: 'text-[var(--color-ink)]',
   labelIdle: 'text-[var(--color-ink-subtle)]',
-  hint: 'max-w-24 text-[10px] text-[var(--color-ink-subtle)]',
   label: 'max-w-24 text-xs font-medium',
 } as const
 
@@ -181,18 +180,18 @@ export const CALENDAR_STYLES = {
   dayNumberToday: 'rounded-full bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   dayNumberOutside: 'text-[var(--color-ink-subtle)]',
   dayAdd:
-    'absolute top-1 right-1 z-20 flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:bg-[var(--color-brand-soft)] hover:text-[var(--color-brand-600)]',
+    'absolute top-1 right-1 z-20 flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   zoneLayer: 'pointer-events-none absolute inset-0 flex flex-col',
   zoneBand: 'flex-1',
   zoneLabel:
     'relative truncate rounded-[var(--radius-sm)] px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase',
-  bar: 'relative flex cursor-grab items-center gap-1.5 px-1.5 py-0.5 text-left text-xs transition-opacity hover:opacity-80 active:cursor-grabbing',
+  bar: 'relative flex cursor-grab items-center gap-1.5 px-1.5 py-0.5 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
   barStart: 'ml-0 rounded-l-[var(--radius-sm)]',
   barEnd: 'mr-0 rounded-r-[var(--radius-sm)]',
   barRunsIn: '-ml-1.5',
   barRunsOut: '-mr-1.5',
   entry:
-    'relative flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-opacity hover:opacity-80 active:cursor-grabbing',
+    'relative flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
   entryTime: 'shrink-0 tabular-nums opacity-70',
   // A long title wraps onto the next line rather than losing its end
   entryTitle: 'min-w-0 flex-1 font-medium break-words',
@@ -202,6 +201,9 @@ export const CALENDAR_STYLES = {
   entryMuted: 'border border-[var(--color-border)] opacity-75',
   entrySelected:
     'ring-2 ring-[var(--color-brand-600)] ring-offset-1 ring-offset-[var(--color-surface-raised)]',
+  // Seat of the minute grid
+  entryFill: 'h-full overflow-hidden',
+  entryCompact: 'items-center py-0',
   entryReadOnly: 'cursor-pointer border border-dashed',
   handle:
     'absolute inset-x-0 bottom-0 h-1.5 cursor-ns-resize rounded-b-[var(--radius-sm)] opacity-0 transition-opacity group-hover/entry:opacity-100',
@@ -248,6 +250,49 @@ export const CALENDAR_STYLES = {
 } as const
 
 /**
+ * Minute grid styles, day and week views
+ * @type {Record<string, string>}
+ */
+
+export const CALENDAR_GRID_STYLES = {
+  // Phone reads the agenda
+  board: 'relative hidden md:grid',
+  painting: 'select-none',
+  hourColumn: 'border-r border-[var(--color-border)]',
+  hourCell: 'flex justify-end border-b border-[var(--color-border)] px-2 pt-0.5',
+  hourLabel: 'text-xs text-[var(--color-ink-subtle)] tabular-nums',
+  dayColumn: 'relative touch-none border-r border-[var(--color-border)] last:border-r-0',
+  dayColumnToday: 'bg-[var(--color-brand-soft)]/25',
+  rowLine: 'group/cell relative border-b border-[var(--color-border)]',
+  rowHeight: 'h-14',
+  past: 'pointer-events-none absolute inset-x-0 z-0 bg-[var(--color-surface-sunken)]/60',
+  entryLayer: 'pointer-events-none absolute inset-0 z-10',
+  entrySeat: 'pointer-events-auto absolute px-0.5 py-px',
+  entryDragging: 'opacity-40',
+  painted:
+    'pointer-events-none absolute inset-x-0.5 z-20 rounded-[var(--radius-sm)] border-2 border-dashed border-[var(--color-brand-600)] bg-[var(--color-brand-soft)]/60',
+  paintedLabel:
+    'absolute inset-x-0 top-1 text-center text-[11px] font-bold text-[var(--color-brand-800)] tabular-nums',
+  dropTarget: 'ring-2 ring-[var(--color-brand-400)] ring-inset',
+  nowLine: 'pointer-events-none absolute inset-x-0 z-30 h-0.5 bg-[var(--color-danger)]',
+  nowLabel:
+    'absolute left-1 -translate-y-1/2 rounded-full bg-[var(--color-danger)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--color-on-brand)] tabular-nums',
+  cellAdd:
+    'absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover/cell:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-brand-600)] focus-visible:opacity-100',
+  cellAddIcon: 'h-4 w-4',
+  // Phone fallback
+  agenda: 'flex flex-col divide-y divide-[var(--color-border)] p-3 md:hidden',
+  agendaDay: 'flex flex-col gap-2 py-4 first:pt-0 last:pb-0',
+  agendaDayEmpty: 'py-2',
+  agendaHead: 'flex min-h-9 items-center gap-2 px-1',
+  agendaDayName: 'text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  agendaToday:
+    'inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--color-brand-600)] px-1.5 text-[11px] font-bold text-[var(--color-on-brand)]',
+  agendaAdd:
+    'touch-target ml-auto flex items-center justify-center rounded-full text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)]',
+} as const
+
+/**
  * Filter bar styles — a filter icon opening the dropdown sheet, a search icon expanding its
  * own field beside it
  * @type {Record<string, string>}
@@ -274,56 +319,55 @@ export const FILTER_STYLES = {
 } as const
 
 /**
- * Permission picker styles — a search header, then one collapsible block per group
+ * Permission toggle board styles — a page title, its permission, then indented refinements
  * @type {Record<string, string>}
  */
 
-export const PERMISSION_PICKER_STYLES = {
-  wrapper: 'flex flex-col gap-3',
-  header: 'flex flex-wrap items-center gap-2',
+export const PERMISSION_TOGGLE_STYLES = {
+  wrapper: 'flex flex-col gap-6',
+  head: 'flex flex-wrap items-center gap-2',
   search: 'w-full sm:max-w-xs',
   tally: 'text-xs text-[var(--color-ink-subtle)] tabular-nums',
   dirty:
     'rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-on-brand)] tabular-nums',
-  groups: 'flex flex-col gap-2',
-  group:
-    'overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
-  groupHead:
-    'flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-surface)]',
-  groupChevron: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform',
-  groupChevronOpen: 'rotate-90',
-  groupLabel: 'text-sm font-semibold',
-  groupTally: 'ml-auto shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums',
-  groupActions: 'flex shrink-0 items-center gap-1',
-  body: 'flex flex-col gap-1 border-t border-[var(--color-border)] p-2',
-  row: 'flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[var(--radius-md)] px-2 py-1.5',
+  section: 'flex flex-col gap-2',
+  sectionTitle: 'text-sm font-bold',
+  rows: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3',
+  row: 'flex items-center gap-4 py-3',
+  rowChild: 'pl-4',
+  rootRow: 'flex flex-wrap items-center gap-x-3',
+  rootActions: 'flex shrink-0 items-center gap-1',
+  divider: 'h-px bg-[var(--color-border-strong)]',
   identity: 'flex min-w-0 flex-1 flex-col gap-0.5',
-  name: 'flex flex-wrap items-center gap-2 text-sm',
+  name: 'flex flex-wrap items-center gap-2 text-sm font-medium',
+  nameChild: 'font-normal',
   description: 'text-xs text-[var(--color-ink-subtle)]',
   control: 'shrink-0',
-  empty: 'px-2 py-6 text-center text-sm text-[var(--color-ink-subtle)]',
+  empty: 'px-2 py-8 text-center text-sm text-[var(--color-ink-subtle)]',
 } as const
 
 /**
- * Sanction panel styles — a banner, a grid of title-only tiles, and the ladder table
+ * Figure rule styles
  * @type {Record<string, string>}
  */
 
-export const SANCTION_STYLES = {
-  banner: 'flex flex-wrap items-start justify-between gap-4',
-  level: 'flex items-center gap-3',
-  levelNumber: 'text-4xl leading-none font-extrabold tabular-nums',
-  levelIdentity: 'flex min-w-0 flex-col gap-0.5',
-  levelName: 'truncate text-base font-bold',
-  bannerActions: 'flex flex-wrap items-center gap-2',
-  grid: 'grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
-  tile: 'flex min-h-16 items-center rounded-[var(--radius-lg)] border-2 px-3 py-2.5 text-left text-sm font-semibold transition-colors hover:bg-[var(--color-surface)]',
-  block: 'flex flex-col gap-1.5',
-  blockLabel: 'text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  example: 'rounded-[var(--radius-md)] p-3 text-sm',
-  warning:
-    'rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 font-[family-name:var(--font-mono)] text-xs',
-  ladder: 'flex flex-col gap-1',
-  rung: 'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] px-2 py-1.5',
-  rungLabel: 'min-w-24 text-xs text-[var(--color-ink-subtle)]',
+export const SUMMARY_BAR = {
+  bar: 'grid grid-cols-2 gap-x-6 gap-y-4 border-y border-[var(--color-border)] py-4 sm:flex sm:flex-wrap sm:divide-x sm:divide-[var(--color-border)] sm:gap-0',
+  item: 'flex min-w-0 flex-col gap-1 sm:flex-1 sm:px-5 sm:first:pl-0 sm:last:pr-0',
+  label:
+    'font-[family-name:var(--font-mono)] text-[11px] tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  value: 'flex items-baseline gap-2',
+  figure: 'text-2xl font-black tracking-tight tabular-nums',
+  hint: 'text-xs text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Pagination styles
+ * @type {Record<string, string>}
+ */
+
+export const PAGINATION_STYLES = {
+  bar: 'flex flex-wrap items-center justify-between gap-3 pt-2',
+  meta: 'text-xs text-[var(--color-ink-subtle)] tabular-nums',
+  actions: 'flex gap-2',
 } as const
