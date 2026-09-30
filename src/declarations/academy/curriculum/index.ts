@@ -1,3 +1,4 @@
+import { MARSHA_BOT } from '@/declarations/academy/curriculum/marshaBot'
 import { TWITCH_FUNDAMENTALS } from '@/declarations/academy/curriculum/twitchFundamentals'
 import type { Course, CourseBlock, ExerciseBlock } from '@/declarations/academy/curriculum/types'
 
@@ -9,6 +10,7 @@ import type { Course, CourseBlock, ExerciseBlock } from '@/declarations/academy/
 export const COURSES: readonly Course[] = [
   // Indispensable, first period
   TWITCH_FUNDAMENTALS,
+  MARSHA_BOT,
 ]
 
 // Course lookup by key
