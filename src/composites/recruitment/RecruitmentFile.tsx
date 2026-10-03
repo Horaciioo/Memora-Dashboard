@@ -2,16 +2,15 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Avatar, AvatarStack } from '@/components/elements/display/Avatar'
+import { Avatar } from '@/components/elements/display/Avatar'
 import { StatusText } from '@/components/elements/display/StatusText'
-import { CreatorLabel } from '@/components/elements/display/RecordLabel'
+import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { IntegrationLinkStep } from '@/composites/onboarding/IntegrationLinkStep'
 import { FormDrawer } from '@/components/structures/FormDrawer'
@@ -20,15 +19,14 @@ import { KanbanBoard, type BoardColumn } from '@/components/structures/KanbanBoa
 import { Section } from '@/components/structures/Section'
 import { useRecruitmentFile } from '@/core/hooks/data/useRecruitmentFile'
 import { ROUTES } from '@/declarations/navigation'
-import { RECRUITMENT_COPY, RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
-import {
-  RECRUITMENT_OWNER_REGISTRY,
-  RECRUITMENT_STATUS_REGISTRY,
-} from '@/declarations/recruitment/registries'
+import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
+import { RECRUITMENT_OWNER_REGISTRY } from '@/declarations/recruitment/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { LIST_STYLES, RECORD_ROW } from '@/declarations/ui/variants'
+import { CANDIDATE_CARD, HOME_STYLES } from '@/declarations/ui/variants'
+import { STAGE_LIST } from '@/declarations/ui/blocks'
 import { useMenu, type MenuItem } from '@/managers/front-end'
+import { RecruitmentHero } from '@/composites/recruitment/RecruitmentHero'
 import { CandidateDialog } from '@/composites/recruitment/CandidateDialog'
 import type { FieldDefinition } from '@/types/forms'
 import type { CandidateView, RecruitmentDetail, RecruitmentStepView } from '@/types/recruitment'
@@ -163,67 +161,22 @@ export const RecruitmentFile = ({
   ]
 
   /**
-   * One candidate row, shared by the list and the results board
+   * One candidate in the results board: a name, when they meet, who leads
    * @param {CandidateView} candidate - Applicant rendered
    * @return {JSX.Element}
    */
 
   const candidateCard = (candidate: CandidateView) => (
-    <span className={RECORD_ROW.body}>
-      <span className={RECORD_ROW.title}>{candidate.name}</span>
-      <span className={RECORD_ROW.meta}>
-        {[
-          candidate.interviewAt
-            ? formatDayTime(candidate.interviewAt)
-            : RECRUITMENT_COPY.noInterview,
-          candidate.recruiter?.label ?? RECRUITMENT_COPY.noRecruiter,
-        ].join(' · ')}
+    <span className={CANDIDATE_CARD.body}>
+      <span className={CANDIDATE_CARD.name}>{candidate.name}</span>
+      <span className={candidate.interviewAt ? CANDIDATE_CARD.meta : CANDIDATE_CARD.metaEmpty}>
+        {candidate.interviewAt ? formatDayTime(candidate.interviewAt) : RECRUITMENT_COPY.toSchedule}
       </span>
     </span>
   )
 
-  /**
-   * Quiet marks closing a candidate row, attendance then remarks
-   * @param {CandidateView} candidate - Applicant rendered
-   * @return {JSX.Element}
-   */
-
-  const candidateMarks = (candidate: CandidateView) => {
-    const AttendedIcon = ICONS[candidate.attended ? 'success' : 'clock']
-    const NoteIcon = ICONS.note
-
-    return (
-      <span className="flex shrink-0 items-center gap-4 text-[var(--color-ink-subtle)]">
-        {candidate.spectators.length > 0 && (
-          <AvatarStack
-            people={candidate.spectators.map((seat) => ({
-              id: seat.id,
-              name: seat.label,
-              src: seat.image,
-            }))}
-          />
-        )}
-        {candidate.comments.length > 0 && (
-          <span title={RECRUITMENT_COPY.commented}>
-            <NoteIcon className="h-4 w-4" aria-hidden="true" />
-          </span>
-        )}
-        <span
-          title={candidate.attended ? RECRUITMENT_COPY.attended : RECRUITMENT_COPY.missed}
-          className={candidate.attended ? 'text-[var(--color-success)]' : undefined}
-        >
-          <AttendedIcon className="h-5 w-5" aria-hidden="true" />
-        </span>
-      </span>
-    )
-  }
-
   const candidatesTab = () => (
-    <Section
-      title={RECRUITMENT_COPY.tabCandidates}
-      description={RECRUITMENT_COPY.candidatesLead}
-      bare
-    >
+    <Section title={RECRUITMENT_COPY.tabCandidates} bare>
       {file.candidates.length === 0 ? (
         <EmptyState
           figure="members"
@@ -241,25 +194,39 @@ export const RecruitmentFile = ({
           }
         />
       ) : (
-        <div className={RECORD_ROW.stack}>
-          {file.candidates.map((candidate) => (
-            <div
-              key={candidate.id}
-              role="button"
-              tabIndex={0}
-              onClick={() => setOpenedCandidateId(candidate.id)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') setOpenedCandidateId(candidate.id)
-              }}
-              onContextMenu={contextMenu(candidateMenu(candidate), candidate.discordId)}
-              className={RECORD_ROW.root}
-            >
-              <Avatar name={candidate.name} size="md" />
-              {candidateCard(candidate)}
-              {candidateMarks(candidate)}
-            </div>
-          ))}
+        <div className={CANDIDATE_CARD.grid}>
+          {file.candidates.map((candidate) => {
+            const outcome = detail.outcomes.find((entry) => entry.id === candidate.outcomeId)
+
+            return (
+              <div
+                key={candidate.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => setOpenedCandidateId(candidate.id)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') setOpenedCandidateId(candidate.id)
+                }}
+                onContextMenu={contextMenu(candidateMenu(candidate), candidate.discordId)}
+                className={CANDIDATE_CARD.card}
+              >
+                <Avatar name={candidate.name} size="md" />
+                {candidateCard(candidate)}
+                <span className={CANDIDATE_CARD.aside}>
+                  {candidate.recruiter && (
+                    <Avatar
+                      name={candidate.recruiter.label}
+                      src={candidate.recruiter.image}
+                      size="xs"
+                    />
+                  )}
+                  {outcome && <StatusText label={outcome.label} accent={outcome.accent} />}
+                </span>
+              </div>
+            )
+          })}
           <AddRow
+            tile
             label={RECRUITMENT_COPY.candidateAdd}
             disabled={!canManage}
             onClick={() => openCandidateForm(null)}
@@ -272,8 +239,8 @@ export const RecruitmentFile = ({
   const questionsTab = () => (
     <Section
       title={RECRUITMENT_COPY.questionsTitle}
-      description={RECRUITMENT_COPY.questionsLead}
-      bare
+      raised={detail.questions.length > 0}
+      bare={detail.questions.length === 0}
     >
       {detail.questions.length === 0 ? (
         <EmptyState
@@ -291,17 +258,15 @@ export const RecruitmentFile = ({
           }
         />
       ) : (
-        <ol className={LIST_STYLES.stack}>
+        <ol className={HOME_STYLES.rows}>
           {detail.questions.map((question, index) => (
-            <li key={question.id} className={LIST_STYLES.item}>
-              <span className="w-6 shrink-0 text-base font-extrabold text-[var(--color-ink-subtle)] tabular-nums">
-                {index + 1}
+            <li key={question.id} className={cn(HOME_STYLES.line, HOME_STYLES.item, 'items-start')}>
+              <span className={HOME_STYLES.stamp}>
+                <span className={HOME_STYLES.stampDay}>{index + 1}</span>
               </span>
-              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="text-sm font-medium">{question.prompt}</span>
-                {question.hint && (
-                  <span className="text-xs text-[var(--color-ink-subtle)]">{question.hint}</span>
-                )}
+              <span className={HOME_STYLES.rowBody}>
+                <span className="text-sm font-semibold">{question.prompt}</span>
+                {question.hint && <span className={HOME_STYLES.rowMeta}>{question.hint}</span>}
               </span>
             </li>
           ))}
@@ -313,8 +278,8 @@ export const RecruitmentFile = ({
   const timelineTab = () => (
     <Section
       title={RECRUITMENT_COPY.timelineTitle}
-      description={RECRUITMENT_COPY.timelineLead}
-      bare
+      raised={file.steps.length > 0}
+      bare={file.steps.length === 0}
     >
       {file.steps.length === 0 ? (
         <EmptyState
@@ -333,63 +298,68 @@ export const RecruitmentFile = ({
           }
         />
       ) : (
-        <div className={RECORD_ROW.stack}>
-          {file.steps.map((step) => {
-            const owner = RECRUITMENT_OWNER_REGISTRY.get(step.owner)
-            // Informative only, a late step never blocks anything
-            const late = step.doneAt === null && isOverdue(step.scheduledAt)
+        <>
+          <ol>
+            {file.steps.map((step, index) => {
+              const owner = RECRUITMENT_OWNER_REGISTRY.get(step.owner)
+              // Informative only, a late step never blocks anything
+              const late = step.doneAt === null && isOverdue(step.scheduledAt)
+              const StepIcon = ICONS[step.doneAt ? 'success' : 'clock']
+              const offset = `J${step.offset >= 0 ? '+' : ''}${step.offset}`
 
-            const StepIcon = ICONS[step.doneAt ? 'success' : 'clock']
-            const offset = `J${step.offset >= 0 ? '+' : ''}${step.offset}`
-
-            return (
-              <div
-                key={step.id}
-                onContextMenu={contextMenu(stepMenu(step), step.title)}
-                className={RECORD_ROW.static}
-              >
-                <StepIcon
-                  className={cn(
-                    'h-5 w-5 shrink-0 text-[var(--color-ink-subtle)]',
-                    step.doneAt && 'text-[var(--color-success)]',
-                    late && 'text-[var(--color-danger)]'
+              return (
+                <li
+                  key={step.id}
+                  onContextMenu={contextMenu(stepMenu(step), step.title)}
+                  className={STAGE_LIST.stage}
+                >
+                  {index < file.steps.length - 1 && (
+                    <span className={STAGE_LIST.stageRail} aria-hidden="true" />
                   )}
-                  aria-hidden="true"
-                />
-                <span className={RECORD_ROW.body}>
-                  <span className={RECORD_ROW.title}>{step.title}</span>
-                  <span className={RECORD_ROW.meta}>
-                    {[
-                      offset,
-                      step.scheduledAt ? formatDay(step.scheduledAt) : null,
-                      owner.label,
-                      step.required ? RECRUITMENT_COPY.mandatoryBadge : null,
-                      step.notes,
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
+                  <span
+                    className={
+                      step.doneAt
+                        ? STAGE_LIST.stageChipDone
+                        : late
+                          ? STAGE_LIST.stageChipLate
+                          : STAGE_LIST.stageChip
+                    }
+                  >
+                    <StepIcon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                </span>
-                {step.emitsInvite && (
-                  <IntegrationLinkStep
-                    link={file.link}
-                    fields={linkFields}
-                    issues={file.issues}
-                    isSaving={file.isSaving}
-                    canManage={canManageLinks}
-                    onEmit={file.emitLink}
-                    onRevoke={() => void file.revokeLink()}
-                  />
-                )}
-              </div>
-            )
-          })}
+                  <div className={STAGE_LIST.stageBody}>
+                    <span className={STAGE_LIST.stageHead}>
+                      <Badge label={offset} tone="neutral" />
+                      <span className={STAGE_LIST.stageTitle}>{step.title}</span>
+                    </span>
+                    <span className={STAGE_LIST.stageLead}>
+                      {[step.scheduledAt ? formatDay(step.scheduledAt) : null, owner.label]
+                        .filter(Boolean)
+                        .join(', ')}
+                    </span>
+                    {step.notes && <span className={STAGE_LIST.stageLead}>{step.notes}</span>}
+                    {step.emitsInvite && (
+                      <IntegrationLinkStep
+                        link={file.link}
+                        fields={linkFields}
+                        issues={file.issues}
+                        isSaving={file.isSaving}
+                        canManage={canManageLinks}
+                        onEmit={file.emitLink}
+                        onRevoke={() => void file.revokeLink()}
+                      />
+                    )}
+                  </div>
+                </li>
+              )
+            })}
+          </ol>
           <AddRow
             label={RECRUITMENT_COPY.stepAdd}
             disabled={!canManage}
             onClick={() => openStepForm(null)}
           />
-        </div>
+        </>
       )}
     </Section>
   )
@@ -441,7 +411,7 @@ export const RecruitmentFile = ({
           </Button>
         ) : undefined
       }
-      padded={file.instructions.length > 0}
+      raised={file.instructions.length > 0}
       bare={file.instructions.length === 0}
     >
       {file.instructions.length === 0 ? (
@@ -470,38 +440,13 @@ export const RecruitmentFile = ({
     </Section>
   )
 
-  const status = RECRUITMENT_STATUS_REGISTRY.get(detail.summary.status)
-  const responsables = detail.summary.responsables
-
   return (
     <div className="flex flex-col gap-8">
-      <Section title={RECRUITMENT_COPY.informationsTitle} padded>
-        <DetailGrid
-          entries={[
-            {
-              label: RECRUITMENT_FIELD_COPY.youtuber,
-              value: (
-                <CreatorLabel
-                  name={detail.summary.youtuber.label}
-                  image={detail.summary.youtuber.image}
-                />
-              ),
-            },
-            {
-              label: RECRUITMENT_COPY.infoStatus,
-              value: <StatusText label={status.label} accent={status.accent} />,
-            },
-            { label: RECRUITMENT_FIELD_COPY.jobFunction, value: detail.summary.jobFunction.label },
-            {
-              label: RECRUITMENT_FIELD_COPY.responsables,
-              value: responsables.length
-                ? responsables.map((seat) => seat.label).join(' · ')
-                : undefined,
-            },
-            { label: RECRUITMENT_COPY.infoSessionId, value: detail.summary.id },
-          ]}
-        />
-      </Section>
+      <RecruitmentHero
+        summary={detail.summary}
+        candidates={file.candidates}
+        outcomes={detail.outcomes}
+      />
 
       <FileTabs
         label={RECRUITMENT_COPY.title}

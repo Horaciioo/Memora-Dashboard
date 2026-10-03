@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
-import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { Dialog } from '@/components/structures/Dialog'
@@ -73,7 +72,6 @@ export const CandidateDialog = ({
 
   const entries = [
     { label: RECRUITMENT_FIELD_COPY.discordId, value: candidate.discordId },
-    { label: RECRUITMENT_FIELD_COPY.formId, value: candidate.formId },
     { label: RECRUITMENT_FIELD_COPY.recruiter, value: candidate.recruiter?.label ?? null },
     {
       label: RECRUITMENT_FIELD_COPY.interviewAt,
@@ -106,7 +104,7 @@ export const CandidateDialog = ({
         }
       >
         <div className="flex flex-col gap-8">
-          <Section title={RECRUITMENT_COPY.informationsTitle} padded>
+          <Section title={RECRUITMENT_COPY.informationsTitle} raised>
             <div className={DETAIL_BLOCK.grid}>
               {entries.map((entry) => (
                 <span key={entry.label} className={DETAIL_BLOCK.entry}>
@@ -116,22 +114,20 @@ export const CandidateDialog = ({
                   </span>
                 </span>
               ))}
-            </div>
-          </Section>
-
-          <Section title={RECRUITMENT_COPY.spectatorsTitle} bare>
-            {candidate.spectators.length === 0 ? (
-              <p className={DETAIL_BLOCK.empty}>{RECRUITMENT_COPY.noSpectator}</p>
-            ) : (
-              <span className="flex flex-wrap gap-x-6 gap-y-3">
-                {candidate.spectators.map((seat) => (
-                  <span key={seat.id} className="inline-flex items-center gap-2 text-sm">
-                    <Avatar name={seat.label} src={seat.image} size="sm" />
-                    {seat.label}
+              {candidate.spectators.length > 0 && (
+                <span className={DETAIL_BLOCK.entryWide}>
+                  <span className={DETAIL_BLOCK.label}>{RECRUITMENT_COPY.spectatorsTitle}</span>
+                  <span className="flex flex-wrap gap-x-6 gap-y-3">
+                    {candidate.spectators.map((seat) => (
+                      <span key={seat.id} className="inline-flex items-center gap-2 text-sm">
+                        <Avatar name={seat.label} src={seat.image} size="sm" />
+                        {seat.label}
+                      </span>
+                    ))}
                   </span>
-                ))}
-              </span>
-            )}
+                </span>
+              )}
+            </div>
           </Section>
 
           <Section
@@ -141,8 +137,7 @@ export const CandidateDialog = ({
                 {RECRUITMENT_COPY.reviewEdit}
               </Button>
             }
-            padded={candidate.review.length > 0}
-            bare={candidate.review.length === 0}
+            raised
           >
             {candidate.review.length === 0 ? (
               <p className={DETAIL_BLOCK.empty}>{RECRUITMENT_COPY.reviewEmpty}</p>
@@ -152,52 +147,34 @@ export const CandidateDialog = ({
           </Section>
 
           <Section title={RECRUITMENT_COPY.commentsTitle} bare>
-            {candidate.comments.length === 0 ? (
-              <EmptyState
-                figure="notes"
-                title={RECRUITMENT_COPY.commentsEmptyTitle}
-                description={RECRUITMENT_COPY.commentsEmptyDescription}
-                action={
-                  <Button
-                    variant="primary"
-                    icon="add"
-                    disabled={!canWrite}
-                    onClick={() => setNested('comment')}
-                  >
-                    {RECRUITMENT_COPY.commentAdd}
-                  </Button>
-                }
+            <div className={LIST_STYLES.stack}>
+              {candidate.comments.map((comment) => (
+                <article
+                  key={comment.id}
+                  className="glass-surface flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-4 shadow-[var(--shadow-sm)]"
+                >
+                  <span className="flex items-center gap-2 text-xs text-[var(--color-ink-subtle)]">
+                    {[comment.authorName, formatDayTime(comment.createdAt)]
+                      .filter(Boolean)
+                      .join(' · ')}
+                    <Button
+                      variant="icon"
+                      icon="remove"
+                      aria-label={ACTION_COPY.delete}
+                      disabled={!canWrite}
+                      className="ml-auto"
+                      onClick={() => setPendingComment(comment.id)}
+                    />
+                  </span>
+                  <p className="text-sm whitespace-pre-wrap">{comment.body}</p>
+                </article>
+              ))}
+              <AddRow
+                label={RECRUITMENT_COPY.commentAdd}
+                disabled={!canWrite}
+                onClick={() => setNested('comment')}
               />
-            ) : (
-              <div className={LIST_STYLES.stack}>
-                {candidate.comments.map((comment) => (
-                  <article
-                    key={comment.id}
-                    className="flex flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4"
-                  >
-                    <span className="flex items-center gap-2 text-xs text-[var(--color-ink-subtle)]">
-                      {[comment.authorName, formatDayTime(comment.createdAt)]
-                        .filter(Boolean)
-                        .join(' · ')}
-                      <Button
-                        variant="icon"
-                        icon="remove"
-                        aria-label={ACTION_COPY.delete}
-                        disabled={!canWrite}
-                        className="ml-auto"
-                        onClick={() => setPendingComment(comment.id)}
-                      />
-                    </span>
-                    <p className="text-sm whitespace-pre-wrap">{comment.body}</p>
-                  </article>
-                ))}
-                <AddRow
-                  label={RECRUITMENT_COPY.commentAdd}
-                  disabled={!canWrite}
-                  onClick={() => setNested('comment')}
-                />
-              </div>
-            )}
+            </div>
           </Section>
         </div>
       </Dialog>

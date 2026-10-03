@@ -8,6 +8,7 @@ import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
+import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
@@ -15,13 +16,13 @@ import { useRecruitments } from '@/core/hooks/data/useRecruitments'
 import { ROUTES } from '@/declarations/navigation'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
-import { ACTION_COPY } from '@/declarations/ui/copy'
-import { GROUP_STYLES, RECORD_ROW } from '@/declarations/ui/variants'
+import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
+import { GROUP_STYLES, SESSION_CARD } from '@/declarations/ui/variants'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { FieldDefinition } from '@/types/forms'
 import type { RecruitmentSummary } from '@/types/recruitment'
+import { cn } from '@/utils/classnames'
 import { FINISHED_RECRUITMENT_STATUSES } from '@/utils/constants/recruitment'
-import { formatDay } from '@/utils/format/dates'
 
 export interface RecruitmentsPanelProps {
   initialSessions: RecruitmentSummary[]
@@ -47,6 +48,7 @@ export const RecruitmentsPanel = ({
     useRecruitments(initialSessions)
   const { contextMenu } = useMenu()
   const [isCreating, setCreating] = useState(false)
+  const [showFinished, setShowFinished] = useState(false)
   const [editing, setEditing] = useState<RecruitmentSummary | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<RecruitmentSummary | null>(null)
 
@@ -58,6 +60,18 @@ export const RecruitmentsPanel = ({
     ],
     [sessions]
   )
+
+  const pageOptions: PageOption[] =
+    finished.length > 0
+      ? [
+          {
+            id: 'finished',
+            label: PAGE_OPTIONS_COPY.showFinished,
+            checked: showFinished,
+            onChange: setShowFinished,
+          },
+        ]
+      : []
 
   const openCreate = () => {
     clearIssues()
@@ -92,26 +106,47 @@ export const RecruitmentsPanel = ({
     },
   ]
 
-  const row = (entry: RecruitmentSummary) => {
+  const card = (entry: RecruitmentSummary) => {
     const status = RECRUITMENT_STATUS_REGISTRY.get(entry.status)
+    const isFinished = FINISHED_RECRUITMENT_STATUSES.includes(entry.status)
+    const progress =
+      entry.candidateCount > 0 ? (entry.interviewedCount / entry.candidateCount) * 100 : null
 
     return (
       <article
         key={entry.id}
+        role="button"
+        tabIndex={0}
         onClick={() => router.push(ROUTES.recruitment(entry.id))}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') router.push(ROUTES.recruitment(entry.id))
+        }}
         onContextMenu={contextMenu(sessionMenu(entry), entry.name)}
-        className={RECORD_ROW.root}
+        className={cn(SESSION_CARD.card, isFinished && SESSION_CARD.muted)}
       >
-        <Avatar name={entry.youtuber.label} src={entry.youtuber.image} size="md" />
-        <span className={RECORD_ROW.body}>
-          <span className={RECORD_ROW.title}>{entry.name}</span>
-          <span className={RECORD_ROW.meta}>
-            {[entry.jobFunction.label, entry.opensAt ? formatDay(entry.opensAt) : null]
-              .filter(Boolean)
-              .join(' · ')}
-          </span>
-        </span>
-        <StatusText label={status.label} accent={status.accent} />
+        <div className={SESSION_CARD.head}>
+          <Avatar name={entry.youtuber.label} src={entry.youtuber.image} size="lg" />
+          <div className={SESSION_CARD.body}>
+            <span className={SESSION_CARD.title}>{entry.name}</span>
+            <span className={SESSION_CARD.meta}>
+              {[entry.youtuber.label, entry.jobFunction.label].join(', ')}
+            </span>
+            <StatusText label={status.label} accent={status.accent} className="mt-1" />
+          </div>
+        </div>
+
+        {progress !== null && (
+          <div
+            className={SESSION_CARD.track}
+            role="progressbar"
+            aria-label={RECRUITMENT_COPY.interviewsProgress}
+            aria-valuemin={0}
+            aria-valuemax={entry.candidateCount}
+            aria-valuenow={entry.interviewedCount}
+          >
+            <div className={SESSION_CARD.fill} style={{ width: `${progress}%` }} />
+          </div>
+        )}
       </article>
     )
   }
@@ -175,17 +210,18 @@ export const RecruitmentsPanel = ({
 
   return (
     <>
+      <PageOptions options={pageOptions} />
       <div className={GROUP_STYLES.spaced}>
         <Section title={RECRUITMENT_COPY.groupOpen} bare>
-          <div className={RECORD_ROW.stack}>
-            {running.map(row)}
-            <AddRow label={RECRUITMENT_COPY.add} disabled={!canManage} onClick={openCreate} />
+          <div className={SESSION_CARD.grid}>
+            {running.map(card)}
+            <AddRow tile label={RECRUITMENT_COPY.add} disabled={!canManage} onClick={openCreate} />
           </div>
         </Section>
 
-        {finished.length > 0 && (
+        {showFinished && finished.length > 0 && (
           <Section title={RECRUITMENT_COPY.groupFinished} bare>
-            <div className={RECORD_ROW.stack}>{finished.map(row)}</div>
+            <div className={SESSION_CARD.grid}>{finished.map(card)}</div>
           </Section>
         )}
       </div>
