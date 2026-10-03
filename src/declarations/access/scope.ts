@@ -10,6 +10,7 @@ export const SCOPE_TARGETS = {
   team: 'direct',
   calendarEvent: 'direct',
   liveconEntry: 'direct',
+  live: 'required',
   // Never without a creator, so no unassigned branch
   sanctionOffense: 'required',
   recruitmentSession: 'required',

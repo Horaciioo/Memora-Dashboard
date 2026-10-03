@@ -1,5 +1,5 @@
 import { PageSkeleton } from '@/components/structures/PageSkeleton'
 
 export default function Loading() {
-  return <PageSkeleton layout="hero" />
+  return <PageSkeleton layout="list" />
 }

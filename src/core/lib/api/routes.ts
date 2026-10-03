@@ -48,6 +48,8 @@ export const API_ROUTES = {
   absences: '/api/absences',
   absence: (id: string) => `/api/absences/${id}`,
   livecon: '/api/livecon',
+  lives: '/api/lives',
+  live: (id: string) => `/api/lives/${id}`,
   sanctions: (youtuberId: string, panel: string, levelId?: string | null, replace = false) =>
     `/api/sanctions?${new URLSearchParams({
       [SANCTION_PARAMS.creator]: youtuberId,
@@ -156,6 +158,7 @@ export const CACHE_KEYS = {
   meeting: (id: string) => `meeting:${id}`,
   absences: () => 'absences',
   livecon: () => 'livecon',
+  lives: () => 'lives',
   sanctions: (youtuberId: string) => `sanctions:${youtuberId}`,
   teams: () => 'teams',
   calendar: (from: string, to: string) => `calendar:${from}:${to}`,

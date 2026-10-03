@@ -73,6 +73,8 @@
   --color-danger: #dc2626;
   --color-info: #1d4ed8;
   --color-neutral: #52525b;
+  --color-twitch: #7c3aed;
+  --color-youtube: #e11d1d;
 
   --color-success-soft: #f0fdf4;
   --color-caution-soft: #fefce8;
@@ -130,6 +132,7 @@
   --motion-duration-fast: 120ms;
   --motion-duration-moderate: 1400ms;
   --motion-duration-panel: 220ms;
+  --motion-duration-pulse: 1600ms;
   --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Frosted glass of the floating surfaces: translucent fill, light rim, blur behind */
@@ -189,6 +192,8 @@
   --color-danger: #f87171;
   --color-info: #60a5fa;
   --color-neutral: #a1a1aa;
+  --color-twitch: #a78bfa;
+  --color-youtube: #f87171;
 
   --color-success-soft: #0f2c1c;
   --color-caution-soft: #2c2408;

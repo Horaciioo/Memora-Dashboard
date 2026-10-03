@@ -1156,3 +1156,27 @@ body {
   --color-brand-600: var(--color-danger);
   --color-brand-800: color-mix(in oklab, var(--color-danger) 80%, var(--color-ink));
 }
+
+/* Live dot breathing while a live runs */
+@keyframes live-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.82);
+    opacity: 0.65;
+  }
+}
+
+.live-pulse {
+  animation: live-pulse var(--motion-duration-pulse) ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-pulse {
+    animation: none;
+  }
+}

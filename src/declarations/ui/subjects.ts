@@ -40,6 +40,7 @@ export const FORM_SUBJECTS = {
   integrationLink: { label: 'Lien', gender: 'masculine', icon: 'link' },
   livecon: { label: 'Niveau', gender: 'masculine', icon: 'livecon' },
   sanction: { label: 'Fiche', gender: 'feminine', icon: 'sanctions' },
+  live: { label: 'Live', gender: 'masculine', icon: 'liveDot' },
 } as const satisfies Record<string, FormSubject>
 
 /**
