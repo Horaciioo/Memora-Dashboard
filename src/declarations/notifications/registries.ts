@@ -113,6 +113,15 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     verb: 'annulé',
     trail: 'le live',
   },
+  LiveReportReady: {
+    label: 'Bilan',
+    tone: 'info',
+    icon: 'modActions',
+    lead: 'Le bilan du live {subject} est',
+    verb: 'prêt',
+    trail: '',
+    addressed: true,
+  },
   AccessChanged: {
     label: 'Accès',
     tone: 'warning',

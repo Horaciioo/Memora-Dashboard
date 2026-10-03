@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { readAnchors } from '@/core/services/auth/LeadService'
+import { closeLivePresences } from '@/core/services/lives/PresenceService'
 import { conflict, invalidInput, notFound } from '@/core/lib/errors'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import { releasedFrom } from '@/core/services/academy/LegacyRelease'
@@ -368,6 +370,31 @@ export const listOpenLives = async (
 }
 
 /**
+ * Read the lives already over, the latest first
+ * @param {AccessScope} scope - Creator perimeter
+ * @param {string} viewerId - Signed-in member
+ * @param {PermissionName[]} held - Permissions held
+ * @param {number} limit - Lives read
+ * @return {Promise<LiveView[]>} - Past lives
+ */
+
+export const listPastLives = async (
+  scope: AccessScope,
+  viewerId: string,
+  held: PermissionName[],
+  limit: number
+): Promise<LiveView[]> => {
+  const rows = await prisma.live.findMany({
+    where: scopedWhere('live', scope, { status: LiveStatuses.Ended }),
+    include: LIVE_SHAPE,
+    orderBy: { endedAt: 'desc' },
+    take: limit,
+  })
+
+  return rows.map((row) => toView(row, viewerId, held))
+}
+
+/**
  * Read one live
  * @param {string} id - Live identifier
  * @param {AccessScope} scope - Creator perimeter
@@ -449,6 +476,7 @@ const applyLiveStatus = async (
     youtuberId: string
     title: string
     status: LiveStatusName
+    coordinatorId: string | null
     members: { accountId: string }[]
   },
   next: LiveStatusName,
@@ -480,6 +508,25 @@ const applyLiveStatus = async (
     youtuberId: live.youtuberId,
     status: next,
   })
+
+  // The end closes every Mod View presence, a table not migrated yet aside
+  if (next === LiveStatuses.Ended) {
+    await closeLivePresences(live.id).catch(() => null)
+
+    // The creator's responsables and the coordinator get the report
+    const anchors = await readAnchors(live.youtuberId)
+    await notify({
+      kind: 'LiveReportReady',
+      recipients: [
+        ...anchors.map((anchor) => anchor.accountId),
+        ...(live.coordinatorId ? [live.coordinatorId] : []),
+      ],
+      actorId,
+      target: 'liveReport',
+      targetId: live.id,
+      subject: live.title,
+    })
+  }
 
   // Team told of the start or the cancel
   const recipients = live.members.map((seat) => seat.accountId)

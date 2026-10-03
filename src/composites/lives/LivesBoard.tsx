@@ -9,6 +9,7 @@ import { Badge } from '@/components/elements/display/Badge'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { useLives } from '@/core/hooks/data/useLives'
+import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { LIVE_COPY } from '@/declarations/lives/copy'
 import { LIVE_COORDINATOR, LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
 import { ROUTES } from '@/declarations/navigation'
@@ -227,6 +228,15 @@ const LiveStrip = ({ live, canMove, isSaving, onMove }: LiveStripProps) => {
           <Button variant="secondary" disabled title={LIVE_COPY.modViewLocked}>
             {LIVE_COPY.openModView}
           </Button>
+        )}
+
+        {isLive && live.permissions.includes(Permissions.LiveLogRead) && (
+          <Link
+            href={ROUTES.liveReport(live.id)}
+            className={cn(BUTTON_STYLES.base, BUTTON_STYLES.ghost)}
+          >
+            {LIVE_REPORT_COPY.logTitle}
+          </Link>
         )}
 
         {canMove && !isLive && (

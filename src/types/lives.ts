@@ -1,3 +1,4 @@
+import type { ModerationKind, ModerationOrigin, ModerationStatus } from '@prisma/client'
 import type { IconName } from '@/declarations/ui/icons'
 import type { LivePlatformName, LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
@@ -49,4 +50,53 @@ export interface LiveView {
 export interface LiveBeacon {
   status: LiveStatusName
   lives: { id: string; creator: string; status: LiveStatusName; plannedStartAt: string }[]
+}
+
+/**
+ * One log line as the report page shows it
+ * @typedef {Object} LiveLogLine
+ */
+
+export interface LiveLogLine {
+  id: string
+  kind: ModerationKind
+  actorKey: string
+  actorName: string
+  isMember: boolean
+  targetLogin: string | null
+  durationSeconds: number | null
+  reason: string | null
+  excerpt: string | null
+  origin: ModerationOrigin
+  status: ModerationStatus
+  liveconLevel: number | null
+  occurredAt: string
+}
+
+/**
+ * One live a member moderated, as their file shows it
+ * @typedef {Object} MemberLiveSummary
+ */
+
+export interface MemberLiveSummary {
+  liveId: string
+  creator: string
+  platform: LivePlatformName
+  startedAt: string
+  activeSeconds: number
+  visibleSeconds: number
+  kinds: { kind: ModerationKind; count: number }[]
+  lines: LiveLogLine[]
+}
+
+/**
+ * Moderation side of a member's file
+ * @typedef {Object} MemberModerationView
+ * @property {number} windowSeconds - Time spent in the Mod View over the window
+ * @property {MemberLiveSummary[]} lives - Latest lives, newest first
+ */
+
+export interface MemberModerationView {
+  windowSeconds: number
+  lives: MemberLiveSummary[]
 }

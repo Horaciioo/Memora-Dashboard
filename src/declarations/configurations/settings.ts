@@ -259,7 +259,7 @@ export const LIVECON_SETTINGS = {
 
 /**
  * Announced lives and their Mod View
- * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, eventsubKeepaliveSeconds: number, recentEvents: number, idempotencyMinutes: number, watchLeadMinutes: number }}
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, eventsubKeepaliveSeconds: number, recentEvents: number, idempotencyMinutes: number, watchLeadMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number }}
  */
 
 export const LIVE_SETTINGS = {
@@ -323,6 +323,31 @@ export const LIVE_SETTINGS = {
     path: 'system/lives.watchLeadMinutes',
     fallback: 90,
     min: 0,
+  }),
+  reportBucketMinutes: readInteger(lives.reportBucketMinutes, {
+    path: 'system/lives.reportBucketMinutes',
+    fallback: 5,
+    min: 1,
+  }),
+  logLines: readInteger(lives.logLines, {
+    path: 'system/lives.logLines',
+    fallback: 500,
+    min: 50,
+  }),
+  pastLives: readInteger(lives.pastLives, {
+    path: 'system/lives.pastLives',
+    fallback: 20,
+    min: 1,
+  }),
+  hoursWindowDays: readInteger(lives.hoursWindowDays, {
+    path: 'system/lives.hoursWindowDays',
+    fallback: 30,
+    min: 1,
+  }),
+  memberLives: readInteger(lives.memberLives, {
+    path: 'system/lives.memberLives',
+    fallback: 20,
+    min: 1,
   }),
 }
 
@@ -898,7 +923,7 @@ export const readRateLimitWindow = (name: string, fallback: RateLimitWindow): Ra
 
 /**
  * How long each family of personal data is kept
- * @type {{ expiredSessionDays: number, readNotificationDays: number, activityLogDays: number, rejectedCandidateDays: number, orphanFileHours: number, consentVersion: number }}
+ * @type {{ expiredSessionDays: number, readNotificationDays: number, activityLogDays: number, moderationLogDays: number, rejectedCandidateDays: number, orphanFileHours: number, consentVersion: number }}
  */
 
 export const RETENTION_SETTINGS = {
@@ -916,6 +941,11 @@ export const RETENTION_SETTINGS = {
     path: 'system/conservation.activityLogDays',
     fallback: 365,
     min: 30,
+  }),
+  moderationLogDays: readInteger(retention.moderationLogDays, {
+    path: 'system/conservation.moderationLogDays',
+    fallback: 180,
+    min: 7,
   }),
   rejectedCandidateDays: readInteger(retention.rejectedCandidateDays, {
     path: 'system/conservation.rejectedCandidateDays',

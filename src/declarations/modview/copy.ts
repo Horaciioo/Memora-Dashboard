@@ -126,3 +126,14 @@ export const MODVIEW_DURATION_COPY = {
   hours: '{count} h',
   days: '{count} j',
 } as const
+
+/**
+ * Spent times, as reports say them
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_SPAN_COPY = {
+  hours: '{hours} h {minutes}',
+  minutes: '{minutes} min',
+  seconds: '{seconds} s',
+} as const

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { MemberFileTabs } from '@/composites/members/MemberFileTabs'
+import { readMemberModeration } from '@/core/services/lives/MemberModerationService'
 import {
   NOTE_FIELDS,
   socialFormFields,
@@ -80,21 +81,34 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   if (!detail) notFound()
 
   // The Discord identifier is the only bridge to their application, no account was ever created for it
-  const [fields, activity, overrides, inherited, recruitment, seal, canPostAbsence, socialFields] =
-    await Promise.all([
-      memberFields(access.isAdmin),
-      canReadLogs ? readMemberActivity(id) : Promise.resolve([]),
-      canManageAccess ? readOverrides(id) : Promise.resolve({}),
-      canManageAccess ? readMemberBaselines(id, detail.summary.youtubers) : Promise.resolve({}),
-      access.can(Permissions.RecruitmentRead)
-        ? findCandidateFile(detail.summary.discordId, await scope())
-        : Promise.resolve(null),
-      readSealState(),
-      access.can(Permissions.AbsenceReview) && session.id !== id
-        ? canReviewAbsence(session.id, id, access.isAdmin)
-        : Promise.resolve(false),
-      socialFormFields(),
-    ])
+  // Own moderation, or the perimeter's for whoever reads live logs
+  const canReadModeration = session.id === id || access.can(Permissions.LiveLogRead)
+
+  const [
+    fields,
+    activity,
+    overrides,
+    inherited,
+    recruitment,
+    seal,
+    canPostAbsence,
+    socialFields,
+    moderation,
+  ] = await Promise.all([
+    memberFields(access.isAdmin),
+    canReadLogs ? readMemberActivity(id) : Promise.resolve([]),
+    canManageAccess ? readOverrides(id) : Promise.resolve({}),
+    canManageAccess ? readMemberBaselines(id, detail.summary.youtubers) : Promise.resolve({}),
+    access.can(Permissions.RecruitmentRead)
+      ? findCandidateFile(detail.summary.discordId, await scope())
+      : Promise.resolve(null),
+    readSealState(),
+    access.can(Permissions.AbsenceReview) && session.id !== id
+      ? canReviewAbsence(session.id, id, access.isAdmin)
+      : Promise.resolve(false),
+    socialFormFields(),
+    canReadModeration ? readMemberModeration(id) : Promise.resolve(undefined),
+  ])
 
   // Sensitive values never leave the server while the window is shut
   const sealed = {
@@ -123,6 +137,8 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
         canReadLogs={canReadLogs}
         canManageAccess={canManageAccess}
         canPostAbsence={canPostAbsence}
+        moderation={moderation}
+        canOpenReports={access.can(Permissions.LiveLogRead)}
       />
     </div>
   )

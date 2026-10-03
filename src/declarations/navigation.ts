@@ -26,6 +26,8 @@ export const ROUTES = {
   absences: '/absences',
   lives: '/lives',
   live: (id: string) => `/lives/${id}`,
+  liveReport: (id: string) => `/lives/${id}/bilan`,
+  liveCreatorReport: (id: string) => `/lives/${id}/bilan-createur`,
   calendar: '/calendrier',
   calendarEvent: (id: string) => `/calendrier?evenement=${id}`,
   trainings: '/formations',

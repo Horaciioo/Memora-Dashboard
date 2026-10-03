@@ -18,6 +18,7 @@ export type NotificationTargetName =
   | 'calendar'
   | 'legacy'
   | 'live'
+  | 'liveReport'
 
 /**
  * Where one notification leads
@@ -50,6 +51,7 @@ const NOTIFICATION_TARGET_MAP: Record<NotificationTargetName, NotificationTarget
     route: (id) => (id ? ROUTES.legacyTrack(id) : ROUTES.legacy),
   },
   live: { label: 'le live', route: (id) => (id ? ROUTES.live(id) : ROUTES.lives) },
+  liveReport: { label: 'le bilan', route: (id) => (id ? ROUTES.liveReport(id) : ROUTES.lives) },
   calendar: {
     label: 'le calendrier',
     route: (id) => (id ? ROUTES.calendarEvent(id) : ROUTES.calendar),

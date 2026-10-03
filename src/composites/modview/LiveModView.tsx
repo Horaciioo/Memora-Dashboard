@@ -2,6 +2,7 @@
 
 import { ModView } from '@/composites/modview/ModView'
 import { useLiveModView } from '@/core/hooks/data/useLiveModView'
+import { useModViewPresence } from '@/core/hooks/interaction/useModViewPresence'
 import type { LiveView } from '@/types/lives'
 import type { SanctionPanelView } from '@/types/sanctions'
 
@@ -19,6 +20,7 @@ export interface LiveModViewProps {
 
 export const LiveModView = ({ live, panel }: LiveModViewProps) => {
   const driver = useLiveModView(live)
+  useModViewPresence(live.id)
 
   return (
     <ModView

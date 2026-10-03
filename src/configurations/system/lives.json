@@ -10,5 +10,10 @@
   "eventsubKeepaliveSeconds": 30,
   "recentEvents": 300,
   "idempotencyMinutes": 10,
-  "watchLeadMinutes": 90
+  "watchLeadMinutes": 90,
+  "reportBucketMinutes": 5,
+  "logLines": 500,
+  "pastLives": 20,
+  "hoursWindowDays": 30,
+  "memberLives": 20
 }

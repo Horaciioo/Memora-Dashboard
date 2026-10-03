@@ -62,3 +62,96 @@ export const LIVE_URGENT = {
   text: 'min-w-0 flex-1 truncate font-bold tracking-tight',
   go: 'shrink-0 text-sm font-black text-[var(--color-danger)]',
 } as const
+
+/**
+ * Report of a live: figures, timeline, moderators, log
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_REPORT = {
+  wrapper: 'mx-auto flex w-full max-w-5xl flex-col gap-10',
+  toolbar: 'flex flex-wrap items-center justify-center gap-3 print:hidden',
+  notice:
+    'rounded-[var(--radius-lg)] border-l-4 border-[var(--color-caution)] bg-[var(--color-caution-soft)] px-4 py-3 text-sm',
+  figures: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-4',
+  figure:
+    'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5 py-4',
+  figureLabel: PROPERTY_LABEL,
+  figureValue: 'text-3xl font-black tracking-tight tabular-nums',
+  // Timeline, one bar per slice, rounded end on the data side
+  chart: 'flex h-40 items-end gap-0.5',
+  bar: 'group relative flex h-full flex-1 items-end',
+  barFill:
+    'w-full rounded-t-[4px] bg-[var(--color-brand-600)] transition-colors group-hover:bg-[var(--color-brand-800)]',
+  barEmpty: 'h-px w-full bg-[var(--color-border)]',
+  barTip:
+    'pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 rounded-[var(--radius-sm)] bg-[var(--color-ink)] px-2 py-1 text-xs whitespace-nowrap text-[var(--color-surface)] group-hover:block',
+  axis: 'mt-2 flex justify-between text-xs text-[var(--color-ink-subtle)] tabular-nums',
+  peak: 'mt-3 text-sm font-semibold',
+  // Livecon frise under the timeline
+  frise: 'mt-4 flex h-3 overflow-hidden rounded-full bg-[var(--color-border)]',
+  friseSlice: 'h-full border-r-2 border-[var(--color-surface)] last:border-r-0',
+  friseLegend: 'mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-ink-subtle)]',
+  friseKey: 'inline-flex items-center gap-1.5',
+  friseDot: 'h-2.5 w-2.5 rounded-full',
+  // Moderators
+  rows: 'flex flex-col',
+  row: 'grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)_auto] items-center gap-4 border-t border-[var(--color-border)] py-3 first:border-t-0',
+  rowName: 'truncate font-semibold',
+  rowNameMuted: 'truncate font-semibold text-[var(--color-ink-subtle)]',
+  rowTrack: 'h-2.5 overflow-hidden rounded-full bg-[var(--color-border)]',
+  rowFill: 'block h-full rounded-full bg-[var(--color-brand-600)]',
+  rowValue: 'text-right text-sm tabular-nums',
+  rowMeta: 'block text-xs text-[var(--color-ink-subtle)]',
+  kinds: 'grid gap-2 sm:grid-cols-2',
+  kind: 'flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2',
+  kindIcon: 'h-6 w-6 shrink-0',
+  kindLabel: 'flex-1 text-sm',
+  kindCount: 'text-sm font-bold tabular-nums',
+  // Log
+  logHead: 'flex flex-wrap items-center justify-between gap-3',
+  log: 'flex flex-col',
+  line: 'grid grid-cols-[3.5rem_minmax(0,9rem)_minmax(0,1fr)] items-start gap-3 border-t border-[var(--color-border)] py-2.5 text-sm first:border-t-0',
+  lineTime: 'text-xs text-[var(--color-ink-subtle)] tabular-nums pt-0.5',
+  lineActor: 'truncate font-semibold',
+  lineBody: 'flex min-w-0 flex-col gap-0.5',
+  lineWhat: 'flex flex-wrap items-center gap-x-2',
+  lineIcon: 'h-4 w-4 shrink-0',
+  lineDetail: 'truncate text-xs text-[var(--color-ink-subtle)]',
+  lineFailed: 'text-xs font-semibold text-[var(--color-danger)]',
+  empty: 'text-sm text-[var(--color-ink-subtle)] italic',
+  // Past lives on the lives page
+  pastWrap: 'mx-auto w-full max-w-5xl',
+  past: 'flex flex-col',
+  pastRow:
+    'flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] py-3 first:border-t-0',
+  pastName: 'font-semibold',
+  pastMeta: 'text-sm text-[var(--color-ink-subtle)]',
+  pastLinks: 'flex flex-wrap gap-2',
+  // Creator report reads like a letter
+  letter: 'mx-auto flex w-full max-w-3xl flex-col gap-8',
+  sentence: 'text-lg leading-relaxed',
+} as const
+
+/**
+ * Moderation view of a member's file
+ * @type {Record<string, string>}
+ */
+
+export const MEMBER_MODERATION = {
+  stack: 'flex flex-col gap-6',
+  switch: 'flex justify-center',
+  hours: 'flex items-baseline gap-3',
+  hoursLabel: PROPERTY_LABEL,
+  hoursValue: 'text-2xl font-black tracking-tight tabular-nums',
+  list: 'flex flex-col',
+  item: 'border-t border-[var(--color-border)] first:border-t-0',
+  row: 'flex w-full flex-wrap items-center gap-x-4 gap-y-1 rounded-[var(--radius-md)] px-2 py-3 text-left transition-colors hover:bg-[var(--color-hover)]',
+  rowIcon: 'h-6 w-6 shrink-0',
+  rowMain: 'flex min-w-0 flex-1 flex-col',
+  rowTitle: 'font-semibold',
+  rowMeta: 'text-sm text-[var(--color-ink-subtle)]',
+  rowTime: 'text-sm tabular-nums',
+  details: 'course-erase-in flex flex-col gap-3 px-2 pb-4',
+  detailsLink: 'self-start text-sm font-semibold text-[var(--color-brand-600)] hover:underline',
+} as const

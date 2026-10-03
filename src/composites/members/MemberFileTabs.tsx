@@ -2,6 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
+import { MemberModerationView } from '@/composites/lives/MemberModerationView'
+import { MEMBER_MODERATION_COPY } from '@/declarations/lives/moderation'
+import { MEMBER_MODERATION } from '@/declarations/ui/variants'
+import type { MemberModerationView as MemberModerationViewData } from '@/types/lives'
 import type { ReactNode } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/NetworkLogo'
@@ -62,6 +67,9 @@ export interface MemberFileTabsProps {
   canReadLogs: boolean
   canManageAccess: boolean
   canPostAbsence: boolean
+  // Moderation history, undefined when the viewer may not read it
+  moderation?: MemberModerationViewData | null
+  canOpenReports: boolean
 }
 
 // Contact fields edited in place, in the order they appear under the section
@@ -185,6 +193,8 @@ export const MemberFileTabs = ({
   canReadLogs,
   canManageAccess,
   canPostAbsence,
+  moderation,
+  canOpenReports,
 }: MemberFileTabsProps) => {
   const router = useRouter()
   const file = useMemberFile(detail, overrides)
@@ -193,6 +203,7 @@ export const MemberFileTabs = ({
   const gestures = useEditGestures()
   const { factor, promptUnlock } = useSeal()
   const [tab, setTab] = useState('overview')
+  const [logView, setLogView] = useState<'activity' | 'moderation'>('moderation')
   const [dialog, setDialog] = useState<'identity' | 'note' | 'socials' | 'absence' | null>(null)
   const [pendingNote, setPendingNote] = useState<string | null>(null)
   const [editingSocial, setEditingSocial] = useState<MemberSocial | null>(null)
@@ -615,7 +626,7 @@ export const MemberFileTabs = ({
     />
   )
 
-  const logsTab = () => (
+  const activityLog = () => (
     <Section title={MEMBER_COPY.tabLogs} raised={activity.length > 0} bare={activity.length === 0}>
       {activity.length === 0 ? (
         <EmptyState
@@ -629,6 +640,33 @@ export const MemberFileTabs = ({
       )}
     </Section>
   )
+
+  // Activity and moderation are two views of the same tab
+  const logsTab = () =>
+    moderation === undefined ? (
+      activityLog()
+    ) : (
+      <div className={MEMBER_MODERATION.stack}>
+        {canReadLogs && (
+          <div className={MEMBER_MODERATION.switch}>
+            <SegmentedControl
+              label={MEMBER_MODERATION_COPY.views}
+              value={logView}
+              onChange={setLogView}
+              options={[
+                { value: 'activity', label: MEMBER_MODERATION_COPY.viewActivity },
+                { value: 'moderation', label: MEMBER_MODERATION_COPY.viewModeration },
+              ]}
+            />
+          </div>
+        )}
+        {canReadLogs && logView === 'activity' ? (
+          activityLog()
+        ) : (
+          <MemberModerationView view={moderation} canOpenReports={canOpenReports} />
+        )}
+      </div>
+    )
 
   return (
     <div className={MEMBER_FILE.layout}>
@@ -688,7 +726,7 @@ export const MemberFileTabs = ({
               value: 'logs',
               label: MEMBER_COPY.tabLogs,
               icon: 'history',
-              visible: canReadLogs,
+              visible: canReadLogs || moderation !== undefined,
               render: logsTab,
             },
           ]}

@@ -28,6 +28,7 @@ export const NOTIFICATION_KINDS = createEnumeration({
   LiveAnnounced: { id: 19, label: 'Live annoncé' },
   LiveStarted: { id: 20, label: 'Live lancé' },
   LiveCancelled: { id: 21, label: 'Live annulé' },
+  LiveReportReady: { id: 22, label: 'Bilan de live prêt' },
 })
 
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids

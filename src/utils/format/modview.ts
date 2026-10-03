@@ -1,4 +1,4 @@
-import { MODVIEW_DURATION_COPY } from '@/declarations/modview/copy'
+import { MODVIEW_DURATION_COPY, MODVIEW_SPAN_COPY } from '@/declarations/modview/copy'
 import { DATE_LOCALE } from '@/declarations/ui/dates'
 
 const MINUTE = 60
@@ -33,3 +33,23 @@ export const formatDuration = (seconds: number): string => {
 
 export const formatClock = (iso: string): string =>
   new Date(iso).toLocaleTimeString(DATE_LOCALE, { hour: '2-digit', minute: '2-digit' })
+
+/**
+ * Say a spent time, hours and minutes
+ * @param {number} seconds - Time spent
+ * @return {string} - Spoken time
+ */
+
+export const formatSpan = (seconds: number): string => {
+  const hours = Math.floor(seconds / HOUR)
+  const minutes = Math.floor((seconds % HOUR) / MINUTE)
+
+  if (hours > 0) {
+    return MODVIEW_SPAN_COPY.hours
+      .replace('{hours}', String(hours))
+      .replace('{minutes}', String(minutes).padStart(2, '0'))
+  }
+  if (minutes > 0) return MODVIEW_SPAN_COPY.minutes.replace('{minutes}', String(minutes))
+
+  return MODVIEW_SPAN_COPY.seconds.replace('{seconds}', String(Math.max(0, Math.round(seconds))))
+}

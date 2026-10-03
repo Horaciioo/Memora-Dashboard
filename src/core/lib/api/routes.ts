@@ -56,6 +56,7 @@ export const API_ROUTES = {
   live: (id: string) => `/api/lives/${id}`,
   liveModView: (id: string) => `/api/lives/${id}/modview`,
   liveFeed: (id: string) => `/api/lives/${id}/flux`,
+  livePresence: (id: string) => `/api/lives/${id}/presence`,
   sanctions: (youtuberId: string, panel: string, levelId?: string | null, replace = false) =>
     `/api/sanctions?${new URLSearchParams({
       [SANCTION_PARAMS.creator]: youtuberId,
