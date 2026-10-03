@@ -25,6 +25,9 @@ export const NOTIFICATION_KINDS = createEnumeration({
   LegacyOpened: { id: 16, label: 'Parcours Legacy ouvert' },
   LegacyDecided: { id: 17, label: 'Parcours Legacy tranché' },
   AbsenceAcknowledged: { id: 18, label: 'Absence prise en compte' },
+  LiveAnnounced: { id: 19, label: 'Live annoncé' },
+  LiveStarted: { id: 20, label: 'Live lancé' },
+  LiveCancelled: { id: 21, label: 'Live annulé' },
 })
 
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids
