@@ -1,5 +1,6 @@
 'use client'
 
+import { FloatingLayer } from '@/components/structures/FloatingLayer'
 import Link from 'next/link'
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
@@ -221,7 +222,7 @@ export const SelectMenu = ({
       {trigger}
 
       {isOpen && (
-        <>
+        <FloatingLayer>
           <div className={SELECT_MENU_STYLES.scrim} role="presentation" onMouseDown={close} />
           <div
             ref={panelRef}
@@ -309,7 +310,7 @@ export const SelectMenu = ({
               })}
             </div>
           </div>
-        </>
+        </FloatingLayer>
       )}
     </>
   )

@@ -1,5 +1,6 @@
 'use client'
 
+import { FloatingLayer } from '@/components/structures/FloatingLayer'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAnchoredPanel } from '@/core/hooks/interaction/useAnchoredPanel'
 import { PICKER_COPY } from '@/declarations/ui/copy'
@@ -199,7 +200,7 @@ export const DatePicker = ({
       </button>
 
       {isOpen && (
-        <>
+        <FloatingLayer>
           <div className="fixed inset-0 z-[65]" role="presentation" onMouseDown={close} />
           <div ref={panelRef} role="dialog" aria-label={label} className={DATE_PICKER_STYLES.panel}>
             <div className={DATE_PICKER_STYLES.head}>
@@ -312,7 +313,7 @@ export const DatePicker = ({
               </button>
             </div>
           </div>
-        </>
+        </FloatingLayer>
       )}
     </>
   )

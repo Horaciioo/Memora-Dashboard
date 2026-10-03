@@ -1,5 +1,6 @@
 'use client'
 
+import { FloatingLayer } from '@/components/structures/FloatingLayer'
 import { Fragment, useId, useMemo, useState } from 'react'
 import type { MouseEvent } from 'react'
 import { OptionLead } from '@/components/elements/forms/OptionLead'
@@ -156,7 +157,7 @@ export const MultiSelect = ({
       {trigger}
 
       {isOpen && (
-        <>
+        <FloatingLayer>
           <div className="fixed inset-0 z-[65]" role="presentation" onMouseDown={close} />
           <div
             ref={panelRef}
@@ -216,7 +217,7 @@ export const MultiSelect = ({
               })}
             </div>
           </div>
-        </>
+        </FloatingLayer>
       )}
     </>
   )
