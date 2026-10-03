@@ -27,11 +27,7 @@ export default async function LegacyPage() {
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={LEGACY_COPY.title} />
-      <LegacyBoard
-        tracks={tracks}
-        fields={fields}
-        canManage={access.isAdmin}
-      />
+      <LegacyBoard tracks={tracks} fields={fields} canManage={access.isAdmin} />
     </div>
   )
 }

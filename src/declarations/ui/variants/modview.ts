@@ -180,7 +180,8 @@ export const MODVIEW_COMMUNITY = {
   search: 'flex items-center gap-2 p-3',
   input:
     'w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-brand-600)]',
-  group: 'mx-2 mb-2 flex flex-col gap-1 rounded-[var(--radius-lg)] px-2 pb-2 transition-[background-color,box-shadow]',
+  group:
+    'mx-2 mb-2 flex flex-col gap-1 rounded-[var(--radius-lg)] px-2 pb-2 transition-[background-color,box-shadow]',
   groupLit: 'bg-[var(--color-brand-100)] ring-2 ring-[var(--color-brand-600)]',
   groupHead: 'flex items-center gap-2 py-1 text-sm font-black',
   groupIcon: 'h-5 w-5 shrink-0',

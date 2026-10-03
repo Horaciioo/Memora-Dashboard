@@ -396,7 +396,8 @@ export const COURSE_COPY = {
   endTitle: 'FIN.',
   endBody: 'Tu as terminé ta formation.',
   endReplay: 'Tu peux bien évidemment la rejouer autant de fois que nécessaire.',
-  endNotified: 'Ton Formateur, ainsi que les Responsables ont été prévenus de ton acquis de formation.',
+  endNotified:
+    'Ton Formateur, ainsi que les Responsables ont été prévenus de ton acquis de formation.',
   feedbackTitle: 'Qu’en as-tu pensé ?',
   feedbackLead: 'Merci de noter le contenu, et la fluidité de la formation sur 10.',
   feedbackHonest: 'Sois honnête : nos formations évoluent en permanence.',

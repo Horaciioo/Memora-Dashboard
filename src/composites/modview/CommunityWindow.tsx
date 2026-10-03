@@ -29,12 +29,16 @@ export const CommunityWindow = ({ community, spotlight, onPick }: CommunityWindo
   const needle = search.trim().toLowerCase()
 
   return (
-    <ModWindow title={MODVIEW_COPY.community} isLit={
+    <ModWindow
+      title={MODVIEW_COPY.community}
+      isLit={
         spotlight === 'community' ||
         spotlight === 'broadcaster' ||
         spotlight === 'moderators' ||
         spotlight === 'vips'
-      } grow>
+      }
+      grow
+    >
       <div className={MODVIEW_COMMUNITY.search}>
         <input
           className={MODVIEW_COMMUNITY.input}

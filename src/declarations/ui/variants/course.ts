@@ -417,4 +417,3 @@ export const COURSE_DEMO = {
   dot: 'h-1.5 w-6 rounded-full bg-[var(--color-border-strong)] transition-colors duration-[var(--motion-duration-panel)]',
   dotOn: 'bg-[var(--color-info)]',
 } as const
-
