@@ -583,3 +583,28 @@ export interface CourseCard {
   passed: number
   status: TrainingStatusName
 }
+
+/**
+ * What a course reads from the database around its declared content
+ * @typedef {Object} CourseContext
+ * @property {{ admins: string[], responsables: string[] }} ladder - Names of the decision ladder
+ * @property {CourseLiveconLevel[]} livecon - Levels with a few panel offences each
+ */
+
+export interface CourseContext {
+  ladder: { admins: string[]; responsables: string[] }
+  livecon: CourseLiveconLevel[]
+}
+
+/**
+ * One livecon level as a course shows it
+ * @typedef {Object} CourseLiveconLevel
+ */
+
+export interface CourseLiveconLevel {
+  level: number
+  name: string
+  icon: string | null
+  accent: string | null
+  samples: { offense: string; measures: string[] }[]
+}

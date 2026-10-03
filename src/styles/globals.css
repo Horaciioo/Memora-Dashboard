@@ -1186,3 +1186,139 @@ body {
   max-width: none;
   padding-top: 1rem;
 }
+
+/* A course content swapped for the next: the old one wipes away, the new one settles */
+@keyframes course-erase-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+.course-erase-in {
+  animation: course-erase-in var(--motion-duration-panel) ease-out both;
+}
+
+/* Rungs of the ladder land one after the other */
+@keyframes course-rung-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.course-rung-in {
+  animation: course-rung-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: var(--rung-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .course-erase-in,
+  .course-rung-in {
+    animation: none;
+  }
+}
+
+/* Course done: the stamp slams, confetti bursts, the stamp flies to its card */
+@keyframes stamp-slam {
+  0% {
+    opacity: 0;
+    transform: scale(3) rotate(-18deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.92) rotate(-8deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-8deg);
+  }
+}
+
+.stamp-slam {
+  animation: stamp-slam 520ms cubic-bezier(0.2, 0.9, 0.25, 1.1) both;
+}
+
+@keyframes confetti-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--confetti-x), var(--confetti-y)) rotate(var(--confetti-r));
+  }
+}
+
+.confetti-piece {
+  animation: confetti-burst 1300ms cubic-bezier(0.1, 0.7, 0.3, 1) both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise-in {
+  animation: rise-in 420ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp-slam,
+  .confetti-piece,
+  .rise-in {
+    animation: none;
+  }
+
+  .confetti-piece {
+    display: none;
+  }
+}
+
+/* Steps of a finished card filling one after the other */
+@keyframes step-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.step-fill {
+  transform-origin: left;
+  animation: step-fill 260ms ease-out both;
+  animation-delay: calc(var(--step-index, 0) * 90ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-fill {
+    animation: none;
+  }
+}
+
+/* A course block showing the Mod View breaks out of the reading column */
+@media (width >= 1024px) {
+  .course-wide {
+    position: relative;
+    left: 50%;
+    width: min(calc(100vw - var(--shell-sidebar-w) - 6rem), 96rem);
+    transform: translateX(-50%);
+  }
+}

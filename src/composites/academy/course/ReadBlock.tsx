@@ -4,6 +4,10 @@ import { DiscordMessage } from '@/components/elements/display/DiscordMessage'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { ChatFeed } from '@/composites/academy/course/ChatFeed'
 import { DemoBlock } from '@/composites/academy/course/DemoBlock'
+import { FocusBlock } from '@/composites/academy/course/FocusBlock'
+import { LadderBlock } from '@/composites/academy/course/LadderBlock'
+import { LiveconBlock } from '@/composites/academy/course/LiveconBlock'
+import { TourBlock } from '@/composites/academy/course/TourBlock'
 import {
   CompareBlock,
   DiagramBlock,
@@ -118,6 +122,18 @@ export const ReadBlock = ({ block }: ReadBlockProps) => {
 
     case 'demo':
       return <DemoBlock block={block} />
+
+    case 'tour':
+      return <TourBlock block={block} />
+
+    case 'focus':
+      return <FocusBlock block={block} />
+
+    case 'hierarchy':
+      return <LadderBlock block={block} />
+
+    case 'livecon':
+      return <LiveconBlock block={block} />
 
     case 'discord':
       return (

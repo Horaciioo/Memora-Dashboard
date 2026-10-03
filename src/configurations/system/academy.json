@@ -15,5 +15,15 @@
   "exercisePassPercent": 80,
   "chatLineDelayMs": 900,
   "chatTypingMs": 700,
-  "plungeLineDelayMs": 2400
+  "courseSampleOffenses": 3,
+  "tourStepMs": 5200,
+  "tourBuildMs": 1400,
+  "liveconCycleMs": 3800,
+  "ladderRungDelayMs": 420,
+  "feedbackScale": 10,
+  "ceremonyFillMs": 900,
+  "ceremonySlamMs": 1600,
+  "ceremonyFlyMs": 900,
+  "ceremonyConfetti": 40,
+  "ceremonyBurstPx": 340
 }

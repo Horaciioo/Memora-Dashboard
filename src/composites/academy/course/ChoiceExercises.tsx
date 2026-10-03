@@ -20,7 +20,7 @@ import { cn } from '@/utils/classnames'
  * @return {string[]} - Picked keys
  */
 
-const picksOf = (value: string | string[] | undefined): string[] =>
+export const picksOf = (value: string | string[] | undefined): string[] =>
   Array.isArray(value) ? value : typeof value === 'string' && value ? [value] : []
 
 /**
@@ -30,7 +30,7 @@ const picksOf = (value: string | string[] | undefined): string[] =>
  * @return {JSX.Element}
  */
 
-const ChoiceQuestion = ({
+export const ChoiceQuestion = ({
   question,
   picks,
   verdict,

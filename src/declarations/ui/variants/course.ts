@@ -52,7 +52,9 @@ export const COURSE_PLAYER = {
   chapterHead: 'flex flex-col gap-2',
   chapterCount: PROPERTY_LABEL,
   chapterTitle: 'text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl',
-  blocks: 'flex max-w-3xl flex-col gap-8',
+  blocks: 'flex flex-col gap-8',
+  // Reading column of an ordinary block, a Mod View one spreading past it
+  column: 'w-full max-w-3xl',
   // Thin rule that stops short of both edges
   foot: 'flex flex-col items-center gap-4 pb-6',
   rule: 'h-px w-[calc(100%-4rem)] bg-[var(--color-border)]',
@@ -416,56 +418,3 @@ export const COURSE_DEMO = {
   dotOn: 'bg-[var(--color-info)]',
 } as const
 
-/**
- * Opening scene: a live that arrives message by message, gauges over it, the debrief after
- * @type {Record<string, string>}
- */
-
-export const COURSE_PLUNGE = {
-  stage: 'flex flex-col gap-4',
-  gauges: 'grid grid-cols-2 gap-4',
-  gauge: 'flex flex-col gap-1.5',
-  gaugeHead: 'flex items-baseline justify-between gap-2',
-  gaugeLabel: PROPERTY_LABEL,
-  gaugeFigure: 'text-sm font-black tabular-nums',
-  gaugeTrack: 'h-2.5 overflow-hidden rounded-full bg-[var(--color-border)]',
-  gaugeFill:
-    'h-full rounded-full transition-[width] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)]',
-  warmth: 'bg-[var(--color-caution)]',
-  tension: 'bg-[var(--color-danger)]',
-  chat: 'flex max-h-[26rem] min-h-72 flex-col gap-0.5 overflow-y-auto p-2',
-  message:
-    'block w-full rounded-[var(--radius-sm)] text-left transition-colors focus-visible:outline-2 focus-visible:outline-white',
-  messageOpen: 'cursor-pointer hover:bg-white/5',
-  messageSelected: 'bg-white/10',
-  actions: 'flex flex-wrap gap-2 px-2 pt-1 pb-2',
-  action:
-    'inline-flex items-center gap-1.5 rounded-[var(--radius-md)] border border-white/20 px-3 py-2 text-sm font-semibold text-[var(--twitch-text)] transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-white',
-  actionUndo: 'border-white/40 bg-white/10',
-  actionIcon: 'h-4 w-4 shrink-0',
-  hint: 'text-sm text-[var(--color-ink-subtle)]',
-  bet: 'course-pop flex flex-col gap-4 rounded-[var(--radius-xl)] border-2 border-[var(--color-brand-600)] bg-[var(--color-surface)] p-5',
-  betTitle: 'text-lg font-black tracking-tight text-balance',
-  betLead: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
-  betChoices: 'grid gap-2 sm:grid-cols-2',
-  reveal: 'flex flex-col gap-6',
-  revealTitle: 'text-xl font-black tracking-tight',
-  rows: 'flex flex-col gap-3',
-  row: 'flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3',
-  rowFit: 'border-[var(--color-success)]',
-  rowMiss: 'border-[var(--color-danger)]',
-  rowSplit: 'border-[var(--color-caution)]',
-  rowLine:
-    'overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)] text-[var(--twitch-text)]',
-  rowCalls: 'grid grid-cols-2 gap-3 text-sm',
-  rowCall: 'flex flex-col gap-0.5',
-  rowCallLabel: PROPERTY_LABEL,
-  rowCallValue: 'font-bold',
-  rowOutcome: 'text-xs font-black tracking-wide uppercase',
-  rowWhy: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
-  fits: 'flex flex-col gap-3',
-  fitsSummary:
-    'cursor-pointer text-sm font-bold text-[var(--color-ink-subtle)] select-none hover:text-[var(--color-ink)]',
-  sectionTitle: 'text-lg font-bold tracking-tight',
-  note: 'rounded-[var(--radius-md)] bg-[var(--color-info-soft)] px-4 py-3 text-sm font-semibold leading-relaxed text-[var(--color-info)]',
-} as const

@@ -381,7 +381,7 @@ const trainingMaxMinutes = readInteger(academy.trainingMaxMinutes, {
 
 /**
  * Academy bounds
- * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, plungeLineDelayMs: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
+ * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, courseSampleOffenses: number, tourStepMs: number, tourBuildMs: number, liveconCycleMs: number, ladderRungDelayMs: number, feedbackScale: number, ceremonyFillMs: number, ceremonySlamMs: number, ceremonyFlyMs: number, ceremonyConfetti: number, ceremonyBurstPx: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
  */
 
 export const ACADEMY_SETTINGS = {
@@ -447,9 +447,59 @@ export const ACADEMY_SETTINGS = {
     fallback: 700,
     min: 0,
   }),
-  plungeLineDelayMs: readInteger(academy.plungeLineDelayMs, {
-    path: 'system/academy.plungeLineDelayMs',
-    fallback: 2400,
+  courseSampleOffenses: readInteger(academy.courseSampleOffenses, {
+    path: 'system/academy.courseSampleOffenses',
+    fallback: 3,
+    min: 1,
+  }),
+  tourStepMs: readInteger(academy.tourStepMs, {
+    path: 'system/academy.tourStepMs',
+    fallback: 5200,
+    min: 1000,
+  }),
+  tourBuildMs: readInteger(academy.tourBuildMs, {
+    path: 'system/academy.tourBuildMs',
+    fallback: 1400,
+    min: 0,
+  }),
+  liveconCycleMs: readInteger(academy.liveconCycleMs, {
+    path: 'system/academy.liveconCycleMs',
+    fallback: 3800,
+    min: 1000,
+  }),
+  ladderRungDelayMs: readInteger(academy.ladderRungDelayMs, {
+    path: 'system/academy.ladderRungDelayMs',
+    fallback: 420,
+    min: 0,
+  }),
+  feedbackScale: readInteger(academy.feedbackScale, {
+    path: 'system/academy.feedbackScale',
+    fallback: 10,
+    min: 2,
+  }),
+  ceremonyFillMs: readInteger(academy.ceremonyFillMs, {
+    path: 'system/academy.ceremonyFillMs',
+    fallback: 900,
+    min: 0,
+  }),
+  ceremonySlamMs: readInteger(academy.ceremonySlamMs, {
+    path: 'system/academy.ceremonySlamMs',
+    fallback: 1600,
+    min: 0,
+  }),
+  ceremonyFlyMs: readInteger(academy.ceremonyFlyMs, {
+    path: 'system/academy.ceremonyFlyMs',
+    fallback: 900,
+    min: 0,
+  }),
+  ceremonyConfetti: readInteger(academy.ceremonyConfetti, {
+    path: 'system/academy.ceremonyConfetti',
+    fallback: 40,
+    min: 0,
+  }),
+  ceremonyBurstPx: readInteger(academy.ceremonyBurstPx, {
+    path: 'system/academy.ceremonyBurstPx',
+    fallback: 340,
     min: 0,
   }),
   skillStep: readInteger(academy.skillStep, {

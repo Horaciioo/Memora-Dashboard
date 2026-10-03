@@ -1,5 +1,7 @@
 // Read by the seed on plain node, so type declarations only
+import type { ModViewScene } from '@/core/lib/modview/scene'
 import type { IconName } from '@/declarations/ui/icons'
+import type { ModViewTarget, ModViewWindow } from '@/types/modview'
 
 /**
  * Track a course belongs to: indispensable during the first period, secondary from the second,
@@ -102,6 +104,68 @@ export interface DemoStep {
 }
 
 /**
+ * One stop of a guided tour of the Mod View
+ * @typedef {Object} TourStop
+ * @property {ModViewTarget} target - Part lit
+ * @property {string} label - Name in the side list
+ * @property {string} body - What the bubble says
+ */
+
+export interface TourStop {
+  target: ModViewTarget
+  label: string
+  body: string
+}
+
+/**
+ * One part of the Mod View opened on its own
+ * @typedef {Object} FocusItem
+ * @property {string} key - Stable key
+ * @property {string} label - Button label
+ * @property {ModViewWindow[]} windows - Windows played on the right
+ * @property {ModViewTarget} [spotlight] - Part lit in them
+ * @property {ModViewScene} scene - Animation played
+ * @property {string[]} points - What is said on the left, one line each
+ */
+
+export interface FocusItem {
+  key: string
+  label: string
+  windows: ModViewWindow[]
+  spotlight?: ModViewTarget
+  scene: ModViewScene
+  points: string[]
+}
+
+/**
+ * One rung of the decision ladder, names read from the accounts
+ * @typedef {Object} HierarchyRung
+ * @property {'admins' | 'responsables' | 'coordinator'} source - Who stands there
+ * @property {string} label - Rung name
+ * @property {CourseTone} tone - Colour
+ */
+
+export interface HierarchyRung {
+  source: 'admins' | 'responsables' | 'coordinator'
+  label: string
+  tone: CourseTone
+}
+
+/**
+ * One livecon level as the course tells it
+ * @typedef {Object} LiveconStop
+ * @property {number} level - Level number
+ * @property {string} text - What it means
+ * @property {string[]} [notes] - Lines under it
+ */
+
+export interface LiveconStop {
+  level: number
+  text: string
+  notes?: string[]
+}
+
+/**
  * Read-only blocks
  * @typedef {Object} ReadBlock
  */
@@ -130,6 +194,10 @@ export type ReadBlock =
       lines: ChatLine[]
       steps: DemoStep[]
     }
+  | { kind: 'tour'; key: string; intro: string; scene: ModViewScene; stops: TourStop[] }
+  | { kind: 'focus'; key: string; prompt: string; items: FocusItem[] }
+  | { kind: 'hierarchy'; key: string; rungs: HierarchyRung[] }
+  | { kind: 'livecon'; key: string; stops: LiveconStop[] }
 
 /**
  * One multiple-choice question
@@ -171,39 +239,6 @@ export interface SimulationStepSeed {
 export type CaseQuestionSeed =
   | (QuizQuestionSeed & { type: 'choice' })
   | { type: 'open'; key: string; prompt: string; expert: string }
-
-/**
- * Gesture a moderator can play on a message
- * @typedef {'leave' | 'delete' | 'timeout' | 'ban'} PlungeGesture
- */
-
-export type PlungeGesture = 'leave' | 'delete' | 'timeout' | 'ban'
-
-/**
- * What the team makes of a message: nothing to do, a gesture owed, or a call that splits them
- * @typedef {'leave' | 'act' | 'split'} PlungeVerdict
- */
-
-export type PlungeVerdict = 'leave' | 'act' | 'split'
-
-/**
- * One message of the opening scene, with what the team makes of it
- * @typedef {Object} PlungeMessage
- * @property {string} key - Stable key
- * @property {ChatLine} line - What arrives in the chat
- * @property {PlungeVerdict} verdict - The team call
- * @property {string} why - Reasoning shown once the scene is over
- * @property {{ after: string, acted: ChatLine, left: ChatLine }} [reaction] - Line whose text
- *   depends on how the message it follows was handled
- */
-
-export interface PlungeMessage {
-  key: string
-  line: ChatLine
-  verdict: PlungeVerdict
-  why: string
-  reaction?: { after: string; acted: ChatLine; left: ChatLine }
-}
 
 /**
  * Exercise blocks, each scored
@@ -265,15 +300,14 @@ export type ExerciseBlock =
       explanation: string
     }
   | {
-      kind: 'plunge'
+      kind: 'scene'
       key: string
       title: string
-      // Said before the scene, nothing more
+      // Said before the scene plays
       context: string
-      streamer: string
-      messages: PlungeMessage[]
-      // Drawn after the scene, once the learner has failed in their own way
-      lessons: KeyPoint[]
+      scene: ModViewScene
+      // Asked once it has played
+      questions: QuizQuestionSeed[]
     }
 
 /**
@@ -318,7 +352,26 @@ export interface Course {
   surface: CourseSurface
   functions: string[]
   minutes: number
+  intro?: CourseIntro
   chapters: CourseChapter[]
+}
+
+/**
+ * Opening page of a course, its chapter list generated
+ * @typedef {Object} CourseIntro
+ * @property {string} objective - What the learner will know
+ * @property {string} outline - Said under the chapter list
+ * @property {{ title: string, body: string }} [caseStudy] - Case followed through the course
+ * @property {string} feedback - Said about the final review
+ * @property {string} start - Question before the first chapter
+ */
+
+export interface CourseIntro {
+  objective: string
+  outline: string
+  caseStudy?: { title: string; body: string }
+  feedback: string
+  start: string
 }
 
 /**
@@ -334,5 +387,5 @@ export const EXERCISE_KINDS: readonly string[] = [
   'simulation',
   'case',
   'command',
-  'plunge',
+  'scene',
 ]

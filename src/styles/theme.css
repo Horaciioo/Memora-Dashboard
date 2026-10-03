@@ -75,6 +75,9 @@
   --color-neutral: #52525b;
   --color-twitch: #7c3aed;
   --color-youtube: #e11d1d;
+  --color-apple-red: #ff3b30;
+  --color-apple-orange: #ff9500;
+  --color-apple-green: #34c759;
 
   --color-success-soft: #f0fdf4;
   --color-caution-soft: #fefce8;
@@ -123,6 +126,8 @@
   --radius-xl: 0.75rem;
   --radius-full: 999px;
 
+  /* Shadow of the course animations, a soft pink halo */
+  --shadow-scene: 0 18px 40px -12px rgb(209 47 120 / 0.28), 0 4px 12px rgb(24 24 27 / 0.08);
   --shadow-sm: 0 1px 2px rgb(24 24 27 / 0.06), 0 1px 3px rgb(24 24 27 / 0.08);
   --shadow-md: 0 6px 20px -6px rgb(24 24 27 / 0.14);
   --shadow-lg: 0 24px 60px -24px rgb(24 24 27 / 0.22);
@@ -194,6 +199,9 @@
   --color-neutral: #a1a1aa;
   --color-twitch: #a78bfa;
   --color-youtube: #f87171;
+  --color-apple-red: #ff453a;
+  --color-apple-orange: #ff9f0a;
+  --color-apple-green: #30d158;
 
   --color-success-soft: #0f2c1c;
   --color-caution-soft: #2c2408;
