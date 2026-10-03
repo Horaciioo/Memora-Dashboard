@@ -146,6 +146,7 @@ export const TASK_FIELD_INFO = {
 
 export const MEETING_COPY = {
   title: 'Réunions',
+  minuteUnit: 'min',
   lead: 'Date, participants et projet concerné pour chaque réunion.',
   add: 'Planifier une réunion',
   emptyTitle: 'Aucune réunion pour le moment.',
@@ -249,9 +250,6 @@ export const BOARD_FILTER_COPY = {
   allPlatforms: 'Toutes les plateformes',
   allProjects: 'Tous les projets',
   allOwners: 'Tous les responsables',
-  doneFilter: 'Éléments terminés',
-  doneHidden: 'Masqués',
-  doneShown: 'Affichés',
   board: 'Tableau',
   list: 'Liste',
 } as const

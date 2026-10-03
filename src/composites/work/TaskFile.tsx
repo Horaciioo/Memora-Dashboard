@@ -9,7 +9,6 @@ import { EditableDetailGrid, type EditableEntry } from '@/components/structures/
 import { EditableHeading } from '@/components/structures/EditableHeading'
 import { Section } from '@/components/structures/Section'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { AuthorshipStrip } from '@/composites/work/authorship'
 import { useRecordFile } from '@/core/hooks/data/useRecordFile'
 import { SECTION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -126,7 +125,7 @@ export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) =
 
   // Neutral box, state colour on its badges
   const boxClass =
-    'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 sm:p-5'
+    'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 sm:p-5'
 
   return (
     <div className="flex flex-col gap-8">
@@ -153,7 +152,6 @@ export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) =
 
       <Section title={TASK_COPY.logsTitle} bare>
         <div className="flex flex-col gap-4">
-          <AuthorshipStrip record={task} />
           {activity.length === 0 ? (
             <EmptyState
               figure="notes"

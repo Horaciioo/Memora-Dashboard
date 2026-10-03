@@ -19,7 +19,6 @@ import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { ProjectTeam } from '@/composites/work/ProjectTeam'
-import { AuthorshipStrip } from '@/composites/work/authorship'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useCommunications } from '@/core/hooks/data/useCommunications'
@@ -237,7 +236,7 @@ export const ProjectFileTabs = ({
 
   // Neutral box, state colour on its badge
   const boxClass =
-    'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 sm:p-5'
+    'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 sm:p-5'
 
   const overviewTab = () => (
     <div className="flex flex-col gap-8">
@@ -314,7 +313,6 @@ export const ProjectFileTabs = ({
             >
               <header className="flex flex-wrap items-center gap-2">
                 <h3 className="text-base font-bold">{entry.title}</h3>
-                {entry.platform && <Badge label={entry.platform.label} tone="info" />}
                 <Badge
                   label={entry.publishedAt ? PROJECT_COPY.published : PROJECT_COPY.draft}
                   tone={entry.publishedAt ? 'success' : 'neutral'}
@@ -322,25 +320,24 @@ export const ProjectFileTabs = ({
                 <span className="ml-auto text-xs text-[var(--color-ink-subtle)]">
                   {[entry.authorName, entry.publishedAt ? formatDay(entry.publishedAt) : null]
                     .filter(Boolean)
-                    .join(' · ')}
+                    .join(', ')}
                 </span>
               </header>
               <div className={DISCORD_MESSAGE.frame}>
+                <Button
+                  variant="icon"
+                  icon="copy"
+                  aria-label={WORK_DISCORD_COPY.copy}
+                  title={WORK_DISCORD_COPY.copy}
+                  className={DISCORD_MESSAGE.copyCorner}
+                  onClick={() => void copyAnnouncement(entry.body)}
+                />
                 <DiscordMessage
                   source={entry.body}
                   mentions={mentions}
                   author={entry.authorName ?? WORK_DISCORD_COPY.author}
                   time={entry.publishedAt ? formatDay(entry.publishedAt) : undefined}
                 />
-              </div>
-              <div className={DISCORD_MESSAGE.footer}>
-                <Button
-                  variant="primary"
-                  icon="copy"
-                  onClick={() => void copyAnnouncement(entry.body)}
-                >
-                  {WORK_DISCORD_COPY.copy}
-                </Button>
               </div>
             </article>
           ))}
@@ -471,7 +468,6 @@ export const ProjectFileTabs = ({
   const logsTab = () => (
     <Section title={PROJECT_COPY.tabLogs} bare>
       <div className="flex flex-col gap-4">
-        <AuthorshipStrip record={summary} />
         {activity.length === 0 ? (
           <EmptyState
             figure="notes"

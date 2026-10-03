@@ -5,17 +5,17 @@ import type { ReactNode } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { AddRow } from '@/components/structures/AddRow'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { DataTable, type DataTableColumn } from '@/components/structures/DataTable'
 import { FilterBar, type FilterDefinition } from '@/components/structures/FilterBar'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { WORK_SUBJECTS } from '@/declarations/ui/subjects'
 import { KanbanBoard, type BoardColumn, type BoardItem } from '@/components/structures/KanbanBoard'
+import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
 import { Section } from '@/components/structures/Section'
 import { useBoard, type BoardEndpoints } from '@/core/hooks/data/useBoard'
 import { BOARD_FILTER_COPY } from '@/declarations/work/copy'
-import { ACTION_COPY } from '@/declarations/ui/copy'
+import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import type { IllustrationName } from '@/declarations/ui/illustrations'
 import type { MenuItem } from '@/managers/front-end'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -79,10 +79,6 @@ const VIEWS = [
   { value: 'list', label: BOARD_FILTER_COPY.list },
 ] as const
 
-// Filter revealing the finished work hidden by default
-const DONE_FILTER = 'done'
-const DONE_SHOWN = 'shown'
-
 /**
  * Board surface shared by projects
  * @param {WorkflowScopeName} scope - Board scope
@@ -142,8 +138,8 @@ export const WorkBoard = <T extends BoardItem>({
   const isFiltered =
     search.trim().length > 0 || Object.values(filterValues).some((value) => value.length > 0)
 
-  // Finished work stays out until the filter asks for it
-  const showDone = filterValues[DONE_FILTER] === DONE_SHOWN
+  // Finished work stays out until the page options ask for it
+  const [showDone, setShowDone] = useState(false)
 
   const doneColumnIds = useMemo(
     () =>
@@ -173,22 +169,25 @@ export const WorkBoard = <T extends BoardItem>({
     [board.cards, doneColumnIds, showDone]
   )
 
-  // The reveal toggle rides beside the board filters when a done column exists
-  const barFilters = useMemo(
-    () =>
-      doneColumnIds.size === 0
-        ? filters
-        : [
-            ...filters,
-            {
-              name: DONE_FILTER,
-              label: BOARD_FILTER_COPY.doneFilter,
-              allLabel: BOARD_FILTER_COPY.doneHidden,
-              options: [{ value: DONE_SHOWN, label: BOARD_FILTER_COPY.doneShown }],
-            },
-          ],
-    [filters, doneColumnIds]
-  )
+  const pageOptions: PageOption[] = [
+    {
+      id: 'view',
+      label: PAGE_OPTIONS_COPY.view,
+      value: view,
+      choices: [...VIEWS],
+      onChange: (value: string) => setView(value === 'list' ? 'list' : 'board'),
+    },
+    ...(doneColumnIds.size === 0
+      ? []
+      : [
+          {
+            id: 'done',
+            label: PAGE_OPTIONS_COPY.showFinished,
+            checked: showDone,
+            onChange: setShowDone,
+          },
+        ]),
+  ]
 
   const openCreate = (columnId?: string) => {
     board.clearIssues()
@@ -264,24 +263,17 @@ export const WorkBoard = <T extends BoardItem>({
 
   return (
     <>
+      <PageOptions options={pageOptions} />
       <Section bare>
         <FilterBar
           searchLabel={BOARD_FILTER_COPY.search}
           search={search}
           onSearch={setSearch}
-          filters={barFilters}
+          filters={filters}
           values={filterValues}
           onFilter={(name, value) => setFilterValues((current) => ({ ...current, [name]: value }))}
           onReset={resetFilters}
           isFiltered={isFiltered}
-          action={
-            <SegmentedControl
-              options={[...VIEWS]}
-              value={view}
-              onChange={setView}
-              label={BOARD_FILTER_COPY.board}
-            />
-          }
         />
         {showEmptyState ? (
           <EmptyState {...emptyState} />

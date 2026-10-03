@@ -18,7 +18,6 @@ import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { InlineMarkdown } from '@/components/structures/InlineMarkdown'
 import { InlineText } from '@/components/structures/InlineText'
 import { Section } from '@/components/structures/Section'
-import { AuthorshipStrip } from '@/composites/work/authorship'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMeetingTopics } from '@/core/hooks/data/useMeetingTopics'
 import { useRecordFile } from '@/core/hooks/data/useRecordFile'
@@ -126,9 +125,7 @@ export const MeetingFile = ({
     { label: MEETING_FIELD_COPY.scheduledAt, display: formatDayTime(summary.scheduledAt) },
     {
       label: MEETING_FIELD_COPY.durationMin,
-      display: summary.durationMin ? (
-        <Badge label={`${summary.durationMin}`} tone="neutral" icon="clock" />
-      ) : null,
+      display: summary.durationMin ? `${summary.durationMin} ${MEETING_COPY.minuteUnit}` : null,
     },
     {
       label: MEETING_FIELD_COPY.state,
@@ -172,7 +169,7 @@ export const MeetingFile = ({
 
   // Neutral box, state colour on its badges
   const boxClass =
-    'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 sm:p-5'
+    'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 sm:p-5'
 
   const overviewTab = () => (
     <div className="flex flex-col gap-8">
@@ -307,7 +304,6 @@ export const MeetingFile = ({
   const logsTab = () => (
     <Section title={MEETING_COPY.tabLogs} bare>
       <div className="flex flex-col gap-4">
-        <AuthorshipStrip record={summary} />
         {activity.length === 0 ? (
           <EmptyState
             figure="notes"
