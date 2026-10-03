@@ -8,6 +8,9 @@ import { logger } from '@/core/lib/logger'
 import { EventSubSession } from '@/core/lib/platforms/twitch/session'
 import type { TwitchSignal } from '@/core/lib/platforms/twitch/eventsub'
 import { moveLiveFromPlatform } from '@/core/services/lives/LiveService'
+import { liveconLevelOf, logPlatformGesture } from '@/core/services/lives/ModerationLogService'
+import { logEntryOf } from '@/core/lib/platforms/twitch/logEntry'
+import { sweepStalePresences } from '@/core/services/lives/PresenceService'
 import { readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_STREAM_EVENTS, LIVE_TOPICS } from '@/declarations/lives/topics'
@@ -98,6 +101,7 @@ const handleSignal = async (liveId: string, signal: TwitchSignal): Promise<void>
 
 const watch = async (live: {
   id: string
+  youtuberId: string
   coordinatorId: string | null
   announcedById: string | null
   members: { accountId: string }[]
@@ -152,6 +156,21 @@ const watch = async (live: {
         logger.warn('[watcher] signal not handled', error instanceof Error ? error.message : '')
       )
     },
+    onNotification: (type, event, meta) => {
+      const entry = logEntryOf(type, event, meta)
+      if (!entry) return
+
+      void liveconLevelOf(live.youtuberId)
+        .then((liveconLevel) =>
+          logPlatformGesture({
+            liveId: live.id,
+            platform: LivePlatforms.Twitch,
+            entry,
+            liveconLevel,
+          })
+        )
+        .catch(() => null)
+    },
     onState: (state) => {
       void announceConnection(live.id, {
         state,
@@ -178,6 +197,7 @@ export const syncLiveWatches = async (): Promise<void> => {
     },
     select: {
       id: true,
+      youtuberId: true,
       coordinatorId: true,
       announcedById: true,
       members: { select: { accountId: true } },
@@ -215,10 +235,13 @@ export const startLiveWatcher = (): void => {
   // A build never holds platform sessions
   if (process.env.NEXT_PHASE === 'phase-production-build') return
 
-  const tick = () =>
+  const tick = () => {
     void syncLiveWatches().catch((error: unknown) =>
       logger.warn('[watcher] sync failed', error instanceof Error ? error.message : '')
     )
+    // Silent tabs closed at their last beat
+    void sweepStalePresences().catch(() => null)
+  }
 
   tick()
   watcher.timer = setInterval(tick, LIVE_SETTINGS.watchSyncSeconds * 1000)

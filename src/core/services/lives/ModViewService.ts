@@ -21,6 +21,7 @@ import {
 import type { TwitchSeat } from '@/core/lib/platforms/twitch/helix'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readLive } from '@/core/services/lives/LiveService'
+import { logMemoraGesture, settleGesture } from '@/core/services/lives/ModerationLogService'
 import { markTwitchRevoked, readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
@@ -87,13 +88,15 @@ const channelOf = (youtuberId: string) =>
  * The viewer's seat on the live's channel, or the notice saying why not
  * @param {string} viewerId - Member
  * @param {string} youtuberId - Creator
- * @return {Promise<{ seat: TwitchSeat, login: string } | { notice: string }>} - Seat or notice
+ * @return {Promise<{ seat: TwitchSeat, login: string | null, memberLogin: string } | { notice: string }>} - Seat or notice
  */
 
 const seatOf = async (
   viewerId: string,
   youtuberId: string
-): Promise<{ seat: TwitchSeat; login: string | null } | { notice: string }> => {
+): Promise<
+  { seat: TwitchSeat; login: string | null; memberLogin: string } | { notice: string }
+> => {
   const channel = await channelOf(youtuberId)
   if (!channel) return { notice: PLATFORM_NOTICE_COPY.noChannel }
 
@@ -107,6 +110,7 @@ const seatOf = async (
       broadcasterId: channel.externalId,
     },
     login: channel.login,
+    memberLogin: lookup.login,
   }
 }
 
@@ -248,18 +252,37 @@ export const actOnLive = async (input: {
   if (!(await claimGestureKey(`${input.liveId}:${input.viewerId}:${input.key}`)))
     return { done: false }
 
+  // Written before the call, so a failure is logged too
+  const logId = await logMemoraGesture({
+    liveId: input.liveId,
+    platform: live.platform,
+    actorAccountId: input.viewerId,
+    actorPlatformUserId: found.seat.moderatorId,
+    actorLogin: found.memberLogin,
+    intent: input.intent,
+    idempotencyKey: `${input.viewerId}:${input.key}`,
+    liveconLevel: live.liveconLevel?.level ?? null,
+  })
+
   try {
     await performOnTwitch(input.intent, found.seat)
   } catch (error) {
+    await settleGesture(
+      logId,
+      false,
+      error instanceof PlatformError ? String(error.status) : 'error'
+    )
     throw await translateRefusal(error, input.viewerId)
   }
+  await settleGesture(logId, true)
 
+  // The audit line points at the log line, the business and the trace meet there
   await recordEvent({
     eventType: 'ModerationActed',
     actorId: input.viewerId,
     targetType: 'live',
     targetId: input.liveId,
-    summary: input.intent.kind,
+    summary: logId ? `${input.intent.kind} · ${logId}` : input.intent.kind,
   })
 
   return { done: true }

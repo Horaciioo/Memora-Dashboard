@@ -23,6 +23,7 @@ export type SessionState = 'connecting' | 'connected' | 'disconnected'
  * @property {string} broadcasterId - Channel watched
  * @property {number} keepaliveSeconds - Asked keepalive window
  * @property {(signal: TwitchSignal) => void} onSignal - Called per translated signal
+ * @property {(type: string, event: Record<string, unknown>, meta: { id: string, at: string }) => void} [onNotification] - Called per raw notification
  * @property {(state: SessionState) => void} onState - Called on each state change
  */
 
@@ -31,6 +32,11 @@ export interface EventSubOptions {
   broadcasterId: string
   keepaliveSeconds: number
   onSignal: (signal: TwitchSignal) => void
+  onNotification?: (
+    type: string,
+    event: Record<string, unknown>,
+    meta: { id: string; at: string }
+  ) => void
   onState: (state: SessionState) => void
 }
 
@@ -181,12 +187,15 @@ export class EventSubSession {
         if (!id || this.seen.has(id)) return
         this.remember(id)
 
-        const signals = translateTwitchEvent(
-          frame.metadata?.subscription_type ?? frame.payload?.subscription?.type ?? '',
-          frame.payload?.event ?? {},
-          { id, at: frame.metadata?.message_timestamp ?? new Date().toISOString() }
+        const subscriptionType =
+          frame.metadata?.subscription_type ?? frame.payload?.subscription?.type ?? ''
+        const event = frame.payload?.event ?? {}
+        const meta = { id, at: frame.metadata?.message_timestamp ?? new Date().toISOString() }
+
+        translateTwitchEvent(subscriptionType, event, meta).forEach((signal) =>
+          this.options.onSignal(signal)
         )
-        signals.forEach((signal) => this.options.onSignal(signal))
+        this.options.onNotification?.(subscriptionType, event, meta)
         return
       }
       case 'revocation':

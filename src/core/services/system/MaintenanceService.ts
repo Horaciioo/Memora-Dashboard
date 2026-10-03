@@ -3,6 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { logger } from '@/core/lib/logger'
 import { pruneSessions } from '@/core/services/auth/SessionService'
+import { purgeModerationLog } from '@/core/services/lives/ModerationLogService'
 import { pruneOrphanFiles } from '@/core/services/system/FileService'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 import { RETENTION_POLICIES } from '@/declarations/system/privacy'
@@ -25,6 +26,7 @@ export interface MaintenanceReport {
   sessions: number
   notifications: number
   activityLogs: number
+  moderationLogs: number
   candidates: number
   files: number
   storedBytes: number
@@ -103,18 +105,22 @@ const storedBytes = async (): Promise<number> => {
  */
 
 export const runMaintenance = async (): Promise<MaintenanceReport> => {
-  const [sessions, notifications, activityLogs, candidates, files] = await Promise.all([
-    pruneSessions(RETENTION_POLICIES.expiredSessions),
-    pruneNotifications(),
-    pruneActivityLogs(),
-    pruneRejectedCandidates(),
-    pruneOrphanFiles(RETENTION_SETTINGS.orphanFileHours),
-  ])
+  const [sessions, notifications, activityLogs, moderationLogs, candidates, files] =
+    await Promise.all([
+      pruneSessions(RETENTION_POLICIES.expiredSessions),
+      pruneNotifications(),
+      pruneActivityLogs(),
+      // A table not migrated yet keeps nothing to purge
+      purgeModerationLog().catch(() => 0),
+      pruneRejectedCandidates(),
+      pruneOrphanFiles(RETENTION_SETTINGS.orphanFileHours),
+    ])
 
   const report: MaintenanceReport = {
     sessions,
     notifications,
     activityLogs,
+    moderationLogs,
     candidates,
     files,
     // Weighed after the sweep, so the number reflects what is actually kept
