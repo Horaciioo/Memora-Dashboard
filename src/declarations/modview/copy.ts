@@ -13,7 +13,7 @@ export const MODVIEW_COPY = {
   unbanRequests: 'Demandes de débannissement',
   sanctions: 'Panel de sanctions',
   windows: 'Fenêtres',
-  back: 'Livecon',
+  back: 'Live en cours',
   sanctionsOpen: 'Ouvrir le panel de sanctions',
   sanctionsClose: 'Replier le panel de sanctions',
   sanctionsEmpty: 'Aucun panel de sanctions pour ce YouTubeur et cette plateforme.',

@@ -11,10 +11,10 @@ export const metadata: Metadata = { title: LIVE_COPY.title }
 
 /**
  * Lives announced or running in the member's perimeter
- * @return {Promise<JSX.Element>} - Livecon page
+ * @return {Promise<JSX.Element>} - Live en cours page
  */
 
-export default async function LiveconPage() {
+export default async function LivesPage() {
   const { session, access, scope } = await requirePermission(Permissions.LiveRead)
   const perimeter = await scope()
   const canAnnounce = access.can(Permissions.LiveAnnounce)

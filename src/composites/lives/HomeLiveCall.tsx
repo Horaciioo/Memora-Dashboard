@@ -40,7 +40,7 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
           return (
             <li key={live.id}>
               <Link
-                href={isLive ? ROUTES.live(live.id) : ROUTES.livecon}
+                href={isLive ? ROUTES.live(live.id) : ROUTES.lives}
                 className={cn(
                   LIVE_URGENT.row,
                   isLive ? LIVE_URGENT.rowLive : LIVE_URGENT.rowAnnounced

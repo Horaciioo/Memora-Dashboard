@@ -341,7 +341,7 @@ export const PermissionsList: PermissionMeta[] = [
     name: Permissions.LiveRead,
     group: PermissionGroups.Live,
     displayName: 'Voir les lives',
-    description: 'Ouvrir la page Livecon d’un live annoncé ou en cours, et sa Mod View.',
+    description: 'Ouvrir la page Live en cours d’un live annoncé ou en cours, et sa Mod View.',
     important: false,
   },
   {

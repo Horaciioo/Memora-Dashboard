@@ -55,7 +55,7 @@ export const ModViewRail = ({ state, levelName, windows, hidden, onToggle }: Mod
 
   return createPortal(
     <div className={MODVIEW_RAIL.root}>
-      <Link href={ROUTES.livecon} className={MODVIEW_RAIL.back}>
+      <Link href={ROUTES.lives} className={MODVIEW_RAIL.back}>
         <BackIcon className={MODVIEW_RAIL.backIcon} aria-hidden="true" />
         {MODVIEW_COPY.back}
       </Link>

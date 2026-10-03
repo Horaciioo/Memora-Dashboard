@@ -4,8 +4,8 @@
  */
 
 export const LIVE_COPY = {
-  title: 'Livecon',
-  navLabel: 'Livecon',
+  title: 'Live en cours',
+  navLabel: 'Live en cours',
   announce: 'Annoncer un live',
   announceTitle: 'Annoncer un live',
   announceVerb: 'Annoncer',
@@ -18,7 +18,7 @@ export const LIVE_COPY = {
   openModView: 'Ouvrir la Mod View',
   modViewLocked: 'La Mod View s’ouvre au lancement du live.',
   emptyTitle: 'Aucun live prévu',
-  emptyDescription: 'Un live annoncé apparaît ici, et la page Livecon s’allume pour l’équipe.',
+  emptyDescription: 'Un live annoncé apparaît ici, et la page Live en cours s’allume pour l’équipe.',
   startsAt: 'Début prévu',
   endsAt: 'Fin prévue',
   startedAt: 'Lancé à',
