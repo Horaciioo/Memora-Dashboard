@@ -3,12 +3,12 @@ import type { ReactNode } from 'react'
 import { GLYPH_TINTS } from '@/declarations/members/tints'
 
 // GlyphProps
-interface GlyphProps {
+export interface GlyphProps {
   className?: string
 }
 
 // Tone ramp per shape
-type Paints = { fill: string; lift: string; deep: string; cut: string }
+export type Paints = { fill: string; lift: string; deep: string; cut: string }
 
 // Stops of each ramp, brand by default, green for a thing done
 const FRAME_RAMPS = {
@@ -62,7 +62,7 @@ export type FrameTone = keyof typeof FRAME_RAMPS
  * @return {JSX.Element}
  */
 
-const Frame = ({
+export const Frame = ({
   className,
   tone = 'brand',
   render,

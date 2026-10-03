@@ -91,4 +91,34 @@ export const GLYPH_TINTS = {
     deepTo: '#991b1b',
     cut: '#fef2f2',
   },
+  // Twitch, its own violet
+  TWITCH: {
+    fillFrom: '#b38cff',
+    fillTo: '#7c3aed',
+    liftFrom: '#efe6ff',
+    liftTo: '#cbb2ff',
+    deepFrom: '#6d28d9',
+    deepTo: '#3b1680',
+    cut: '#f8f4ff',
+  },
+  // YouTube, its own red
+  YOUTUBE: {
+    fillFrom: '#ff7a7a',
+    fillTo: '#e11d1d',
+    liftFrom: '#ffe3e3',
+    liftTo: '#ffacac',
+    deepFrom: '#c81414',
+    deepTo: '#7f0d0d',
+    cut: '#fff5f5',
+  },
+  // Live coordinator, a warm amber
+  COORDINATOR: {
+    fillFrom: '#fcd34d',
+    fillTo: '#d97706',
+    liftFrom: '#fef3c7',
+    liftTo: '#fde68a',
+    deepFrom: '#b45309',
+    deepTo: '#78350f',
+    cut: '#fffbeb',
+  },
 } satisfies Record<string, GlyphTint>
