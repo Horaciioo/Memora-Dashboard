@@ -1,5 +1,6 @@
 import { DISCORD_ENDPOINTS } from '@/declarations/access/discord'
 import { APP_FONTS } from '@/declarations/app'
+import { TWITCH_ENDPOINTS } from '@/declarations/platforms/twitch'
 
 /**
  * Read the origin of one declared URL
@@ -27,11 +28,13 @@ const optionalOrigin = (url?: string): string[] => {
 
 /**
  * Every origin the browser may reach
- * @type {{ images: string[], fonts: string[], styles: string[], connect: string[] }}
+ * @type {{ images: string[], frames: string[], fonts: string[], styles: string[], connect: string[] }}
  */
 
 const ALLOWED_ORIGINS = {
-  images: [originOf(DISCORD_ENDPOINTS.cdn)],
+  images: [originOf(DISCORD_ENDPOINTS.cdn), originOf(TWITCH_ENDPOINTS.images)],
+  // The Twitch player of a live's Mod View
+  frames: [originOf(TWITCH_ENDPOINTS.player)],
   fonts: [...APP_FONTS.preconnect],
   styles: [originOf(APP_FONTS.stylesheet)],
   // The client SDK posts crash reports straight to the Sentry ingest host
@@ -61,6 +64,7 @@ export const buildContentSecurityPolicy = (nonce: string, isDevelopment: boolean
     ['img-src', "'self'", 'data:', 'blob:', ...ALLOWED_ORIGINS.images],
     ['font-src', "'self'", 'data:', ...ALLOWED_ORIGINS.fonts],
     ['connect-src', "'self'", ...ALLOWED_ORIGINS.connect],
+    ['frame-src', ...ALLOWED_ORIGINS.frames],
     ['frame-ancestors', "'none'"],
     ['base-uri', "'self'"],
     ['form-action', "'self'"],
