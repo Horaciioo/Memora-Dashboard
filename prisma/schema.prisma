@@ -243,6 +243,8 @@ model Account {
   historyConsentVersion Int?
   // Last release note read
   seenReleaseVersion    String?
+  // One-time guides already shown, by key
+  seenGuides            String[]     @default([])
   anonymisedAt          DateTime?
   languages             String[]     @default([])
   timezone              String?
@@ -285,6 +287,7 @@ model Account {
   integrationInvites    IntegrationInvite[]      @relation("IntegrationInviteCreatedBy")
   integrationClaims     IntegrationClaim[]       @relation("IntegrationClaimAccount")
   quizAnswers           JuniorAnswer[]
+  trainingFeedbacks     TrainingFeedback[]
   academyReviews        AcademyReview[]          @relation("AcademyReviewAuthor")
   academyReviewsDecided AcademyReview[]          @relation("AcademyReviewDecider")
   juniorSkillsGraded    JuniorSkill[]            @relation("JuniorSkillValidator")
@@ -1073,10 +1076,11 @@ model Training {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
-  jobFunction JobFunction?      @relation(fields: [functionId], references: [id], onDelete: SetNull)
-  dispositif  Dispositif?       @relation(fields: [dispositifId], references: [id], onDelete: SetNull)
+  jobFunction JobFunction?       @relation(fields: [functionId], references: [id], onDelete: SetNull)
+  dispositif  Dispositif?        @relation(fields: [dispositifId], references: [id], onDelete: SetNull)
   records     TrainingRecord[]
   chapters    TrainingChapter[]
+  feedbacks   TrainingFeedback[]
 
   @@index([period])
   @@index([functionId, dispositifId])
@@ -1193,6 +1197,25 @@ model TrainingRecord {
   @@unique([trainingId, accountId])
   @@index([juniorId])
   @@map("training_records")
+}
+
+// What a learner thought of a course, read by the administration and the responsables only
+model TrainingFeedback {
+  id         String   @id @default(cuid())
+  trainingId String
+  accountId  String
+  // Scales from 1 to 10
+  content    Int
+  fluency    Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  training Training @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+  account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([trainingId, createdAt])
+  @@index([accountId])
+  @@map("training_feedbacks")
 }
 
 // Dated run of one training programme
