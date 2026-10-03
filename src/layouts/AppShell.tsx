@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { WindowFrame } from '@/components/structures/WindowFrame'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
+import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
 import { BottomNav } from '@/composites/shell/BottomNav'
 import { LeftSidebar } from '@/composites/shell/LeftSidebar'
@@ -14,6 +15,7 @@ import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
 import type { ViewContext } from '@/types/access'
 import type { SealState, TwoFactorState } from '@/types/security'
+import { Permissions } from '@/utils/constants/permissions'
 
 export interface AppShellProps {
   unreadCount: number
@@ -61,7 +63,7 @@ export const AppShell = ({
  */
 
 const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: AppShellProps) => {
-  const { session } = useAuthContext()
+  const { session, can } = useAuthContext()
   const { isClaimed, setSlot } = useRailSlot()
 
   return (
@@ -86,6 +88,7 @@ const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: 
         {session && <BottomNav viewContext={viewContext} />}
         <SealDialog />
         {session && <NudgeHost />}
+        {session && can(Permissions.LiveRead) && <LiveSignalListener />}
       </div>
     </SealProvider>
   )

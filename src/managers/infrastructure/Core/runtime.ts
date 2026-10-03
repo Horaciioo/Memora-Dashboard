@@ -3,6 +3,9 @@ import 'server-only'
 import { bindSecretCipher } from '@/core/lib/crypto'
 import { bindRateLimitStore } from '@/core/lib/http/rateLimit'
 import { logger } from '@/core/lib/logger'
+import { bindLiveTransport, deliverLive } from '@/core/lib/lives/bus'
+import type { LiveEnvelope } from '@/core/lib/lives/bus'
+import { LIVE_TOPICS } from '@/declarations/lives/topics'
 import { markRemindersScheduled, runReminderSweep } from '@/core/services/calendar/attendance'
 import { runMaintenance } from '@/core/services/system/MaintenanceService'
 import { JOB_REGISTRY } from '@/declarations/system/jobs'
@@ -39,6 +42,38 @@ const wireRateLimiter = (container: Sharding): void => {
   })
 
   logger.info('[runtime] rate limiting is shared through Redis')
+}
+
+/**
+ * Carry live signals through Redis so every instance hears them
+ * @param {Sharding} container - Infrastructure container
+ * @return {Promise<void>} - Wired
+ */
+
+const wireLiveBus = async (container: Sharding): Promise<void> => {
+  if (!container.redis.isReady()) return
+
+  const channel = `${container.redis.prefix}${LIVE_TOPICS.channel}`
+
+  // Every message of the channel lands on the local bus
+  container.redis.on('message', (heard: string, message: string) => {
+    if (heard !== channel) return
+
+    try {
+      deliverLive(JSON.parse(message) as LiveEnvelope)
+    } catch (error) {
+      logger.warn('[runtime] unreadable live signal dropped', error)
+    }
+  })
+  await container.redis.subscribe(channel)
+
+  bindLiveTransport({
+    publish: async (envelope) => {
+      await container.redis.publish(channel, envelope)
+    },
+  })
+
+  logger.info('[runtime] live signals are shared through Redis')
 }
 
 /**
@@ -123,6 +158,7 @@ export const startRuntime = async (): Promise<Sharding> => {
     .then(async () => {
       wireCipher(container)
       wireRateLimiter(container)
+      await wireLiveBus(container)
       await scheduleJobs(container)
 
       return container

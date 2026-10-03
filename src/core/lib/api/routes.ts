@@ -49,6 +49,7 @@ export const API_ROUTES = {
   absence: (id: string) => `/api/absences/${id}`,
   livecon: '/api/livecon',
   lives: '/api/lives',
+  livesStream: '/api/lives/flux',
   live: (id: string) => `/api/lives/${id}`,
   sanctions: (youtuberId: string, panel: string, levelId?: string | null, replace = false) =>
     `/api/sanctions?${new URLSearchParams({

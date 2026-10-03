@@ -9,7 +9,9 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { syncRoster } from '@/core/services/calendar/attendance'
 import { notify } from '@/core/services/system/NotificationService'
 import { memberOptions, peopleInScope, youtuberOptions } from '@/core/services/work/shared'
+import { publishLive } from '@/core/lib/lives/bus'
 import { livePermissions } from '@/core/lib/lives/permissions'
+import { LIVE_TOPICS } from '@/declarations/lives/topics'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_FIELD_COPY } from '@/declarations/lives/copy'
 import { LIVE_FUNCTIONS, LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
@@ -324,6 +326,12 @@ export const announceLive = async (
     },
   })
 
+  await publishLive(LIVE_TOPICS.lives, {
+    liveId: live.id,
+    youtuberId,
+    status: LiveStatuses.Announced,
+  })
+
   await notify({
     kind: 'LiveAnnounced',
     recipients: memberIds,
@@ -465,6 +473,8 @@ export const moveLive = async (
       endedAt: next === LiveStatuses.Ended || next === LiveStatuses.Cancelled ? now : undefined,
     },
   })
+
+  await publishLive(LIVE_TOPICS.lives, { liveId: id, youtuberId: live.youtuberId, status: next })
 
   // Team told of the start or the cancel
   const recipients = live.members.map((seat) => seat.accountId)
