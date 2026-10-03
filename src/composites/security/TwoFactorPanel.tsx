@@ -51,7 +51,7 @@ export const TwoFactorPanel = ({ mode, onDone }: TwoFactorPanelProps) => {
           <Button
             variant="primary"
             icon="key"
-            disabled={factor.isSaving}
+            isLoading={factor.isSaving}
             onClick={() => void factor.enrol()}
           >
             {factor.isSaving ? ACTION_COPY.saving : TWO_FACTOR_COPY.enrol}
@@ -125,7 +125,8 @@ export const TwoFactorPanel = ({ mode, onDone }: TwoFactorPanelProps) => {
         <Button
           variant="primary"
           icon="unlock"
-          disabled={factor.isSaving || code.length === 0}
+          disabled={code.length === 0}
+          isLoading={factor.isSaving}
           onClick={() => void submit()}
         >
           {factor.isSaving

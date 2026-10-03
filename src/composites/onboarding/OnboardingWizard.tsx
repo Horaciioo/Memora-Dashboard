@@ -131,6 +131,7 @@ export const OnboardingWizard = ({ token, fields, claim, failure }: OnboardingWi
       previousLabel={ONBOARDING_COPY.previous}
       submitLabel={isSaving ? ONBOARDING_COPY.pending : ONBOARDING_COPY.submit}
       disabled={isSaving}
+      isLoading={isSaving}
       idPrefix="integration"
     />
   )

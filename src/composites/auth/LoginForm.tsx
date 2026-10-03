@@ -37,7 +37,7 @@ export const LoginForm = () => {
           placeholder={AUTH_COPY.placeholder}
         />
       </Field>
-      <Button type="submit" variant="primary" iconAfter="forward" disabled={isPending}>
+      <Button type="submit" variant="primary" iconAfter="forward" isLoading={isPending}>
         {isPending ? AUTH_COPY.pending : AUTH_COPY.submit}
       </Button>
     </form>

@@ -42,7 +42,7 @@ export const HistoryConsentGate = () => {
           form="consent"
           variant="success"
           className={CONSENT_STYLES.action}
-          disabled={isPending}
+          isLoading={isPending}
         >
           {isPending ? CONSENT_COPY.pending : CONSENT_COPY.accept}
         </Button>

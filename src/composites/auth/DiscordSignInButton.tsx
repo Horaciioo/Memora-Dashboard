@@ -17,7 +17,7 @@ export const DiscordSignInButton = () => {
     <Button
       variant="primary"
       icon="discord"
-      disabled={isLeaving}
+      isLoading={isLeaving}
       onClick={() => {
         setLeaving(true)
         window.location.assign(API_ROUTES.signInWithDiscord)

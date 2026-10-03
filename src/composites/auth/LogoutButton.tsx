@@ -1,4 +1,4 @@
-import { Button } from '@/components/elements/actions/Button'
+import { SubmitButton } from '@/components/elements/actions/SubmitButton'
 import { logout } from '@/app/connexion/actions'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
 import type { ButtonVariant } from '@/declarations/ui/variants'
@@ -24,17 +24,16 @@ export interface LogoutButtonProps {
 export const LogoutButton = ({ variant = 'danger', className, iconOnly }: LogoutButtonProps) => (
   <form action={logout}>
     {iconOnly ? (
-      <Button
-        type="submit"
+      <SubmitButton
         variant="icon"
         icon="signOut"
         aria-label={AUTH_COPY.signOut}
         className={className}
       />
     ) : (
-      <Button type="submit" variant={variant} className={cn('w-full', className)}>
+      <SubmitButton variant={variant} className={cn('w-full', className)}>
         {AUTH_COPY.signOut}
-      </Button>
+      </SubmitButton>
     )}
   </form>
 )

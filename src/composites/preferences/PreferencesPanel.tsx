@@ -19,7 +19,7 @@ import { SENSITIVE_FIELD_REGISTRY, isSensitiveField } from '@/declarations/acces
 import type { SensitiveFieldName } from '@/declarations/access/sensitive'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
-import { ACCOUNT_BLOCK, DETAIL_BLOCK, SECURITY_LIST } from '@/declarations/ui/blocks'
+import { DETAIL_BLOCK, SECURITY_LIST } from '@/declarations/ui/blocks'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
@@ -257,7 +257,6 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
         <Avatar name={profile.displayName} src={profile.avatarUrl} size="lg" />
         <div className={PREFERENCE_STYLES.heroMeta}>
           <p className={PREFERENCE_STYLES.heroName}>{profile.displayName}</p>
-          <p className={ACCOUNT_BLOCK.meta}>{profile.discordId}</p>
           <RoleGlyph role={profile.role} />
         </div>
       </div>

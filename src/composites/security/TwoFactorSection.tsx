@@ -124,7 +124,8 @@ export const TwoFactorSection = () => {
           <Button
             variant="danger"
             icon="remove"
-            disabled={factor.isSaving || code.length === 0}
+            disabled={code.length === 0}
+            isLoading={factor.isSaving}
             onClick={async () => {
               if (await factor.drop(code)) close()
             }}
