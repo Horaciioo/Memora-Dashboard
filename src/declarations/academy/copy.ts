@@ -439,3 +439,18 @@ export const COURSE_COPY = {
   unlockedIn: 'Verrouillée',
   attemptsWrong: 'À revoir',
 } as const
+
+/**
+ * Copy of the training reviews
+ * @type {Record<string, string>}
+ */
+
+export const TRAINING_FEEDBACK_COPY = {
+  title: 'Avis des modérateurs',
+  lead: 'Ce qu’ils ont pensé de la formation en la terminant. Visible de l’Administration et des Responsables.',
+  content: 'Qualité du contenu',
+  fluency: 'Fluidité',
+  outOfTen: '{value} / 10',
+  empty: 'Aucun avis pour l’instant.',
+  noComments: 'Aucun commentaire écrit.',
+} as const

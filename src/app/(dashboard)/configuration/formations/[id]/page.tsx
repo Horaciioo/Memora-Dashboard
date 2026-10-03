@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation'
 import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { TrainingContentEditor } from '@/composites/academy/TrainingContentEditor'
+import { TrainingFeedbackPanel } from '@/composites/academy/TrainingFeedbackPanel'
 import { prisma } from '@/core/lib/db'
+import { readFeedbackSummary } from '@/core/services/academy/FeedbackService'
 import { readTrainingContent } from '@/core/services/academy/TrainingContentService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
@@ -55,7 +57,11 @@ export default async function TrainingContentPage({ params }: { params: Promise<
   const training = await readTraining(id)
   if (!training) notFound()
 
-  const chapters = await readTrainingContent(id)
+  // Reviews stay with the Administration and the Responsables
+  const [chapters, feedback] = await Promise.all([
+    readTrainingContent(id),
+    access.isResponsable ? readFeedbackSummary(id) : null,
+  ])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
@@ -73,6 +79,7 @@ export default async function TrainingContentPage({ params }: { params: Promise<
         initialChapters={chapters}
         canManage={access.can(Permissions.ReferenceManage)}
       />
+      {feedback && <TrainingFeedbackPanel summary={feedback} />}
     </div>
   )
 }

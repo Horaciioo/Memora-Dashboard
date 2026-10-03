@@ -608,3 +608,41 @@ export interface CourseLiveconLevel {
   accent: string | null
   samples: { offense: string; measures: string[] }[]
 }
+
+/**
+ * One written review
+ * @typedef {Object} TrainingFeedbackComment
+ * @property {string} id - Review identifier
+ * @property {string} memberName - Author
+ * @property {string | null} avatarUrl - Author portrait
+ * @property {number} content - Content mark
+ * @property {number} fluency - Fluency mark
+ * @property {string} comment - Written comment
+ * @property {string} createdAt - ISO date
+ */
+
+export interface TrainingFeedbackComment {
+  id: string
+  memberName: string
+  avatarUrl: string | null
+  content: number
+  fluency: number
+  comment: string
+  createdAt: string
+}
+
+/**
+ * Reviews of one training
+ * @typedef {Object} TrainingFeedbackSummary
+ * @property {number} reviews - Reviews received
+ * @property {number | null} content - Average content mark
+ * @property {number | null} fluency - Average fluency mark
+ * @property {TrainingFeedbackComment[]} comments - Latest comments
+ */
+
+export interface TrainingFeedbackSummary {
+  reviews: number
+  content: number | null
+  fluency: number | null
+  comments: TrainingFeedbackComment[]
+}

@@ -417,3 +417,23 @@ export const COURSE_DEMO = {
   dot: 'h-1.5 w-6 rounded-full bg-[var(--color-border-strong)] transition-colors duration-[var(--motion-duration-panel)]',
   dotOn: 'bg-[var(--color-info)]',
 } as const
+
+/**
+ * Reviews of a training
+ * @type {Record<string, string>}
+ */
+
+export const TRAINING_FEEDBACK = {
+  stack: 'flex flex-col gap-6',
+  marks: 'grid gap-4 sm:grid-cols-2',
+  mark: 'flex flex-col gap-1',
+  markLabel: 'text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  markValue: 'text-3xl font-bold tracking-tight tabular-nums',
+  list: 'flex flex-col',
+  row: 'grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 border-t border-[var(--color-border)] py-4 first:border-t-0',
+  head: 'flex flex-wrap items-baseline gap-x-3 text-sm',
+  name: 'font-bold',
+  meta: 'text-[var(--color-ink-subtle)] tabular-nums',
+  comment: 'col-start-2 text-sm whitespace-pre-line',
+  empty: 'text-sm text-[var(--color-ink-subtle)] italic',
+} as const
