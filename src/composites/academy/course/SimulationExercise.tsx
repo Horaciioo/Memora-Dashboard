@@ -174,7 +174,7 @@ export const SimulationExercise = ({
 
           {lastDone && (
             <div>
-              <Button variant="primary" icon="confirm" disabled={isSaving} onClick={finish}>
+              <Button variant="primary" icon="confirm" isLoading={isSaving} onClick={finish}>
                 {isSaving ? COURSE_COPY.saving : COURSE_COPY.simulationFinish}
               </Button>
             </div>

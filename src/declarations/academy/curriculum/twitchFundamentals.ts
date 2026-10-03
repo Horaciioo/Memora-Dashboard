@@ -1,3 +1,4 @@
+import { TWITCH_PLUNGE } from '@/declarations/academy/curriculum/twitchPlunge'
 import type { Course } from '@/declarations/academy/curriculum/types'
 
 /**
@@ -15,6 +16,18 @@ export const TWITCH_FUNDAMENTALS: Course = {
   functions: ['Lives'],
   minutes: 35,
   chapters: [
+    {
+      key: 'plongee',
+      title: 'Plonge dans un live',
+      blocks: [
+        {
+          kind: 'text',
+          key: 'plongee-text',
+          body: 'On ne commence pas par un cours. On commence par un live : **tu vas te tromper**, et c’est voulu. Personne ne te note, ce qui compte, c’est ce que tu feras de l’écart avec l’équipe. Je reste avec toi jusqu’au bout.',
+        },
+        TWITCH_PLUNGE,
+      ],
+    },
     {
       key: 'role',
       title: 'Ce que fait un modérateur',

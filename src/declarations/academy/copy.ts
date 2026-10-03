@@ -4,6 +4,10 @@
  */
 
 export const ACADEMY_COPY = {
+  railProgramme: 'Dispositif',
+  railTrainer: 'Formateur',
+  sessionOf: 'Session du {date}',
+  untilDate: 'Jusqu’au {date}',
   title: 'Marsha Academy',
   lead: 'Chaque session accueille, forme, suit et valide ses juniors jusqu’à leur autonomie.',
   awaitingConfirmation: 'Fiche à confirmer',
@@ -38,6 +42,8 @@ export const ACADEMY_COPY = {
   launchMissingTrainer:
     'Un junior confirmé n’a pas encore de Formateur. Attribue-lui en un avant de passer la PIM En cours.',
   glossaryTitle: 'Lexique de l’Academy',
+  glossarySearch: 'Chercher un mot',
+  glossaryEmpty: 'Aucun mot ne correspond.',
   glossaryLead: 'Les mots du domaine, définis une fois pour toutes.',
   tabSessions: 'Sessions',
   tabGlossary: 'Lexique',
@@ -96,6 +102,8 @@ export const ACADEMY_COPY = {
   noTrainingsTitle: 'Aucune formation',
   noTrainingsDescription: 'Déclare les formations du programme dans la configuration.',
   configure: 'Ouvrir la configuration',
+  groupRunning: 'En cours',
+  groupFinished: 'Terminées',
   openCatalogue: 'Ouvrir le catalogue',
   openSessions: 'Ouvrir les sessions',
   mandatory: 'Obligatoire',
@@ -386,6 +394,48 @@ export const COURSE_COPY = {
   demoTagWarn: 'Avertissement',
   demoTagBan: 'Banni',
   demoTagTimeout: (duration: string) => `Timeout ${duration}`,
+  plungeBegin: 'Entrer dans le live',
+  plungeReview: 'Revoir la plongée',
+  plungeLive: (streamer: string) => `Live de ${streamer}`,
+  plungeTap: 'Touche un message pour agir dessus.',
+  plungeUndo: 'Annuler',
+  plungeWarmth: 'Chaleur du chat',
+  plungeTension: 'Tension',
+  plungeBetTitle: 'Tu es sûr de toi ?',
+  plungeBetLead:
+    'Avant de voir ce qu’en pense l’équipe. Réponds sans réfléchir, personne ne te juge.',
+  plungeSure: 'Plutôt sûr de mes choix',
+  plungeUnsure: 'Pas vraiment sûr',
+  plungeRevealTitle: 'Ce qui s’est passé',
+  plungeYou: 'Toi',
+  plungeTeam: 'L’équipe',
+  plungeDone: 'C’est compris, on continue',
+  plungeLessonsTitle: 'Ce que ça nous dit',
+  plungeVerdict: {
+    leave: 'Laisser passer',
+    act: 'Agir',
+    split: 'L’équipe hésite',
+  },
+  plungeOutcome: {
+    fit: 'Dans le mille',
+    'too-much': 'Un geste de trop',
+    'too-little': 'Il fallait agir',
+    defensible: 'Défendable',
+  },
+  plungeScore: (misses: number) =>
+    misses === 0
+      ? 'Aucun écart avec l’équipe sur cette scène.'
+      : 'Certains de tes appels sont à revoir, et c’est normal : c’est justement ce qu’on va apprendre.',
+  plungeGapsTitle: 'À regarder de près',
+  plungeFitsTitle: 'Là où tu étais juste',
+  plungeCalibration: {
+    sureMissed:
+      'Tu étais plutôt sûr de toi, et certains appels étaient à côté. Ce sont ceux qui restent le mieux en tête : regarde-les de près.',
+    sureRight: 'Tu étais sûr de toi et tu avais raison : ton instinct est déjà bien réglé.',
+    unsureMissed:
+      'Tu doutais, et tu avais raison de douter. Tu sais déjà quand ton instinct n’est pas fiable, c’est précieux.',
+    unsureRight: 'Tu doutais, mais ton instinct était juste. Fais-toi un peu plus confiance.',
+  },
   chatLive: 'En direct',
   chatFlagged: 'Message à traiter',
   chatEmpty: 'Le chat est calme.',

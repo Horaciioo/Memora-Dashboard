@@ -1,5 +1,6 @@
 'use client'
 
+import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { Badge } from '@/components/elements/display/Badge'
@@ -147,7 +148,10 @@ export const TrainingContentViewer = ({ trainingId, onClose }: TrainingContentVi
         size="lg"
       >
         {chapters === null ? (
-          <SkeletonList shape="row" rows={3} />
+          <div className="flex flex-col gap-4">
+            <BrandLoader variant="block" />
+            <SkeletonList shape="row" rows={2} />
+          </div>
         ) : chapters.length === 0 ? (
           <EmptyState
             figure="academy"

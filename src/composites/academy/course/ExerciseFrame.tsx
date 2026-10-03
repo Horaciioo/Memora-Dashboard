@@ -77,7 +77,7 @@ export const ExerciseFrame = ({
             >
               <VerdictIcon className={COURSE_EXERCISE.resultIcon} aria-hidden="true" />
               {result.passed ? COURSE_COPY.passed : COURSE_COPY.failed}
-              {` · ${COURSE_COPY.progress(result.score, result.max)}`}
+              {`, ${COURSE_COPY.progress(result.score, result.max)}`}
             </p>
             {!result.passed && (
               <Button icon="refresh" onClick={onRetry}>
@@ -90,7 +90,8 @@ export const ExerciseFrame = ({
             <Button
               variant="primary"
               icon="confirm"
-              disabled={!canCheck || isSaving}
+              disabled={!canCheck}
+              isLoading={isSaving}
               onClick={onCheck}
             >
               {isSaving ? COURSE_COPY.saving : COURSE_COPY.check}

@@ -7,7 +7,6 @@ import { useSyncExternalStore } from 'react'
  * @typedef {Object} CourseRailState
  * @property {string} courseName - Course title
  * @property {string} surfaceLabel - Surface it is about
- * @property {string} accent - Colour of the surface
  * @property {string} backHref - Where the way back leads
  * @property {string} backLabel - Words of the way back
  * @property {{ key: string, title: string }[]} chapters - Chapters, in order
@@ -19,7 +18,6 @@ import { useSyncExternalStore } from 'react'
 export interface CourseRailState {
   courseName: string
   surfaceLabel: string
-  accent: string
   backHref: string
   backLabel: string
   chapters: { key: string; title: string }[]

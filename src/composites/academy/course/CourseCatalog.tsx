@@ -1,133 +1,80 @@
-'use client'
-
 import Link from 'next/link'
 
-import { ProgressRing } from '@/components/elements/feedback/ProgressRing'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { useTilt } from '@/core/hooks/interaction/useTilt'
+import { CoursePoster } from '@/composites/academy/course/CoursePoster'
 import { COURSE_COPY } from '@/declarations/academy/copy'
 import { COURSE_SURFACE_REGISTRY } from '@/declarations/academy/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { COURSE_CATALOG } from '@/declarations/ui/variants'
 import type { CourseCard } from '@/types/academy'
-import { TrainingStatuses } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
-
-// Bar widths of the cover, a stand-in for chat lines going by
-const COVER_BARS = ['62%', '38%', '80%', '48%', '70%', '30%', '56%', '84%']
+import { TrainingStatuses } from '@/utils/constants/hierarchy'
 
 export interface CourseCatalogProps {
   courses: CourseCard[]
 }
 
 /**
- * Cover of a course: lines drifting upward behind a glyph that floats above them, like a chat
- * going by
- * @param {Object} props - Course key, accent and glyph
- * @return {JSX.Element}
- */
-
-const Cover = ({
-  seed,
-  accent,
-  icon,
-}: {
-  seed: string
-  accent: string
-  icon: keyof typeof ICONS
-}) => {
-  const Icon = ICONS[icon]
-  const offset = [...seed].reduce((sum, char) => sum + char.charCodeAt(0), 0)
-
-  return (
-    <div
-      className={COURSE_CATALOG.cover}
-      style={{
-        background: `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 55%, black))`,
-      }}
-    >
-      <div className={COURSE_CATALOG.coverLines} aria-hidden="true">
-        {[0, 1, 2].map((column) => (
-          <div
-            key={column}
-            className={cn(COURSE_CATALOG.coverColumn, 'cover-column')}
-            style={{ ['--cover-speed' as string]: `${8 + ((offset + column * 3) % 5) * 2}s` }}
-          >
-            {[...COVER_BARS, ...COVER_BARS].map((width, index) => (
-              <span
-                key={index}
-                className={COURSE_CATALOG.coverBar}
-                style={{
-                  width: COVER_BARS[(index + offset + column * 2) % COVER_BARS.length] ?? width,
-                }}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      <Icon className={COURSE_CATALOG.coverIcon} aria-hidden="true" />
-    </div>
-  )
-}
-
-/**
- * One course as a card leaning toward the pointer, opening its reader
+ * One course as a poster card: its scene, the place and name, a segment per exercise filled as
+ * they are cleared, and the way in
  * @param {Object} props - Course
  * @return {JSX.Element}
  */
 
 const CourseTile = ({ course }: { course: CourseCard }) => {
-  const tilt = useTilt()
   const surface = COURSE_SURFACE_REGISTRY.get(course.surface)
   const SurfaceIcon = ICONS[surface.icon]
+  const Forward = ICONS.forward
+  const Done = ICONS.success
   const isDone = course.status === TrainingStatuses.Done
   const action = isDone
-    ? COURSE_COPY.review
+    ? COURSE_COPY.done
     : course.passed > 0
       ? COURSE_COPY.resume
       : COURSE_COPY.start
 
-  const body = (
-    <>
-      <Cover seed={course.key} accent={surface.accent} icon={surface.icon} />
+  return (
+    <Link href={ROUTES.training(course.id)} className={COURSE_CATALOG.card}>
+      <CoursePoster surface={course.surface} />
       <div className={COURSE_CATALOG.body}>
         <span className={COURSE_CATALOG.surface}>
-          <SurfaceIcon className="h-4 w-4" aria-hidden="true" />
+          <SurfaceIcon className={COURSE_CATALOG.surfaceIcon} aria-hidden="true" />
           {surface.label}
         </span>
         <h3 className={COURSE_CATALOG.name}>{course.name}</h3>
         <p className={COURSE_CATALOG.summary}>{course.summary}</p>
         <div className={COURSE_CATALOG.foot}>
-          <span className={COURSE_CATALOG.meta}>
-            <span>{COURSE_COPY.minutes(course.minutes)}</span>
-            <span>{COURSE_COPY.exercises(course.exercises)}</span>
-          </span>
-          <span className="flex items-center gap-2">
-            <ProgressRing
-              value={course.passed}
-              max={course.exercises}
-              colour={surface.accent}
-              className="h-7 w-7"
-            />
-            <span className={COURSE_CATALOG.action}>{isDone ? COURSE_COPY.done : action}</span>
-          </span>
+          <div className={COURSE_CATALOG.steps} aria-hidden="true">
+            {Array.from({ length: course.exercises }, (_, step) => (
+              <span
+                key={step}
+                className={cn(
+                  COURSE_CATALOG.step,
+                  (isDone || step < course.passed) && COURSE_CATALOG.stepDone
+                )}
+              />
+            ))}
+          </div>
+          <div className={COURSE_CATALOG.footRow}>
+            <span className={COURSE_CATALOG.meta}>{COURSE_COPY.minutes(course.minutes)}</span>
+            <span className={cn(COURSE_CATALOG.action, isDone && COURSE_CATALOG.done)}>
+              {action}
+              {isDone ? (
+                <Done className={COURSE_CATALOG.actionIcon} aria-hidden="true" />
+              ) : (
+                <Forward className={COURSE_CATALOG.actionIcon} aria-hidden="true" />
+              )}
+            </span>
+          </div>
         </div>
       </div>
-    </>
-  )
-
-  return (
-    <div ref={tilt} className={COURSE_CATALOG.tilt}>
-      <Link href={ROUTES.training(course.id)} className={COURSE_CATALOG.card}>
-        {body}
-      </Link>
-    </div>
+    </Link>
   )
 }
 
 /**
- * Catalogue of the interactive courses, the indispensable ones first, then those opening with
+ * Catalogue of the interactive courses: the indispensable ones first, then those opening with
  * the practice period
  * @param {CourseCatalogProps} props - Courses of the member
  * @return {JSX.Element}

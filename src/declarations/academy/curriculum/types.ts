@@ -173,6 +173,39 @@ export type CaseQuestionSeed =
   | { type: 'open'; key: string; prompt: string; expert: string }
 
 /**
+ * Gesture a moderator can play on a message
+ * @typedef {'leave' | 'delete' | 'timeout' | 'ban'} PlungeGesture
+ */
+
+export type PlungeGesture = 'leave' | 'delete' | 'timeout' | 'ban'
+
+/**
+ * What the team makes of a message: nothing to do, a gesture owed, or a call that splits them
+ * @typedef {'leave' | 'act' | 'split'} PlungeVerdict
+ */
+
+export type PlungeVerdict = 'leave' | 'act' | 'split'
+
+/**
+ * One message of the opening scene, with what the team makes of it
+ * @typedef {Object} PlungeMessage
+ * @property {string} key - Stable key
+ * @property {ChatLine} line - What arrives in the chat
+ * @property {PlungeVerdict} verdict - The team call
+ * @property {string} why - Reasoning shown once the scene is over
+ * @property {{ after: string, acted: ChatLine, left: ChatLine }} [reaction] - Line whose text
+ *   depends on how the message it follows was handled
+ */
+
+export interface PlungeMessage {
+  key: string
+  line: ChatLine
+  verdict: PlungeVerdict
+  why: string
+  reaction?: { after: string; acted: ChatLine; left: ChatLine }
+}
+
+/**
  * Exercise blocks, each scored
  * @typedef {Object} ExerciseBlock
  */
@@ -230,6 +263,17 @@ export type ExerciseBlock =
       accepted: string[]
       hint: string
       explanation: string
+    }
+  | {
+      kind: 'plunge'
+      key: string
+      title: string
+      // Said before the scene, nothing more
+      context: string
+      streamer: string
+      messages: PlungeMessage[]
+      // Drawn after the scene, once the learner has failed in their own way
+      lessons: KeyPoint[]
     }
 
 /**
@@ -290,4 +334,5 @@ export const EXERCISE_KINDS: readonly string[] = [
   'simulation',
   'case',
   'command',
+  'plunge',
 ]

@@ -31,7 +31,7 @@ export const PIM_TIMELINE = {
   titleCurrent: 'text-lg font-extrabold text-[var(--color-brand-800)]',
   meta: 'text-xs text-[var(--color-ink-subtle)]',
   description: 'text-sm',
-  card: 'mt-2 flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-brand-200)] bg-[var(--color-surface-raised)] p-4',
+  card: 'mt-2 flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-brand-200)] glass-surface p-4',
   guideTitle: PROPERTY_LABEL,
   actions: 'flex flex-wrap items-center gap-2',
 } as const
@@ -63,7 +63,7 @@ export const GUIDE_TOUR = {
   // Dims the page around the control
   ring: 'pointer-events-none fixed z-[70] rounded-[var(--radius-md)] ring-2 ring-[var(--color-brand-600)] shadow-[0_0_0_9999px_rgb(0_0_0/0.35)] transition-[top,left,width,height] duration-200',
   bubble:
-    'fixed z-[71] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 shadow-[var(--shadow-md)]',
+    'fixed z-[71] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel p-4 shadow-[var(--shadow-md)]',
   counter:
     'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-subtle)] uppercase',
   title: 'text-base font-extrabold',

@@ -11,6 +11,7 @@ import { CourseComplete } from '@/composites/academy/course/CourseComplete'
 import { CourseTimeline } from '@/composites/academy/course/CourseTimeline'
 import { FillExercise } from '@/composites/academy/course/FillExercise'
 import { OrderExercise, SortExercise } from '@/composites/academy/course/OrderingExercises'
+import { PlungeExercise } from '@/composites/academy/course/PlungeExercise'
 import { ReadBlock } from '@/composites/academy/course/ReadBlock'
 import { SimulationExercise } from '@/composites/academy/course/SimulationExercise'
 import type { ExerciseViewProps } from '@/composites/academy/course/types'
@@ -59,6 +60,8 @@ const ExerciseView = (props: ExerciseViewProps) => {
       return <CaseExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
     case 'command':
       return <CommandExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
+    case 'plunge':
+      return <PlungeExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
   }
 }
 
@@ -122,7 +125,6 @@ export const CoursePlayer = ({
     publishCourseRail({
       courseName: course.name,
       surfaceLabel: surface.label,
-      accent: surface.accent,
       backHref,
       backLabel,
       chapters,
@@ -132,27 +134,13 @@ export const CoursePlayer = ({
         if (index < current) goTo(index)
       },
     })
-  }, [
-    backHref,
-    backLabel,
-    chapters,
-    course.name,
-    current,
-    goTo,
-    run.finished,
-    surface.accent,
-    surface.label,
-  ])
+  }, [backHref, backLabel, chapters, course.name, current, goTo, run.finished, surface.label])
 
   useEffect(() => () => publishCourseRail(null), [])
 
   return (
     <>
-      <PageHeader
-        title={course.name}
-        lead={course.summary}
-        eyebrow={`${surface.label} · ${COURSE_COPY.minutes(course.minutes)} · ${COURSE_COPY.exercises(run.total)}`}
-      />
+      <PageHeader title={course.name} />
       <div className={COURSE_PLAYER.page}>
         <Link href={backHref} className={COURSE_PLAYER.back}>
           <BackIcon className="h-4 w-4" aria-hidden="true" />

@@ -8,29 +8,27 @@ import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 export const COURSE_CATALOG = {
   page: 'mx-auto flex w-full max-w-6xl flex-col gap-14',
   group: 'flex flex-col gap-6',
-  head: 'flex flex-col gap-1',
-  title: 'text-2xl font-black tracking-tight sm:text-3xl',
+  head: 'flex flex-wrap items-baseline gap-x-4 gap-y-1',
+  title: 'text-2xl font-bold tracking-tight sm:text-3xl',
   lead: 'text-sm text-[var(--color-ink-subtle)]',
-  grid: 'grid gap-8 sm:grid-cols-2 xl:grid-cols-3',
-  // The tilt lives on the wrapper, the card keeps its own hover
-  tilt: 'block [transform-style:preserve-3d]',
-  card: 'group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-left shadow-[var(--shadow-sm)] transition-shadow duration-[var(--motion-duration-moderate)] hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
-  body: 'flex flex-1 flex-col gap-3 p-5',
+  grid: 'grid gap-7 sm:grid-cols-2 xl:grid-cols-3',
+  card: 'group flex h-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface transition-[border-color,transform] duration-[var(--motion-duration-panel)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
+  poster: 'block aspect-[17/10] w-full',
+  body: 'flex flex-1 flex-col gap-3 p-6',
   surface: `flex items-center gap-2 ${PROPERTY_LABEL}`,
-  name: 'text-lg leading-snug font-black tracking-tight text-balance',
-  summary: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
-  foot: 'mt-auto flex items-center justify-between gap-3 pt-2 text-xs text-[var(--color-ink-subtle)]',
-  meta: 'flex items-center gap-3 font-[family-name:var(--font-mono)] tabular-nums',
-  action: 'text-sm font-bold text-[var(--color-brand-800)]',
-  // Animated cover, chat lines drifting upward behind a glyph that floats above them
-  cover:
-    'relative flex h-36 items-center justify-center overflow-hidden [transform-style:preserve-3d]',
-  coverLines: 'absolute inset-0 flex justify-center gap-6 px-6 opacity-90',
-  coverColumn: 'flex flex-col gap-3 pt-3',
-  coverBar: 'h-2.5 rounded-full bg-white/55',
-  coverIcon:
-    'relative h-16 w-16 text-white drop-shadow-[0_10px_14px_rgb(0_0_0/0.35)] transition-transform duration-[var(--motion-duration-moderate)] [transform:translateZ(44px)] group-hover:[transform:translateZ(60px)_rotate(-6deg)_scale(1.08)]',
-  ring: 'absolute right-4 bottom-4 h-12 w-12',
+  surfaceIcon: 'h-4 w-4',
+  name: 'text-xl leading-tight font-bold tracking-tight text-balance',
+  summary: 'text-[15px] leading-relaxed text-[var(--color-ink-subtle)]',
+  foot: 'mt-auto flex flex-col gap-3.5 pt-3',
+  steps: 'flex gap-1',
+  step: 'h-1.5 flex-1 rounded-full bg-[var(--color-border-strong)]',
+  stepDone: 'bg-[var(--color-brand-600)]',
+  footRow: 'flex items-center justify-between gap-3',
+  meta: 'text-sm text-[var(--color-ink-subtle)]',
+  action:
+    'inline-flex items-center gap-1.5 text-[15px] font-bold whitespace-nowrap text-[var(--color-brand-700)]',
+  actionIcon: 'h-4 w-4 transition-transform group-hover:translate-x-0.5',
+  done: 'text-[var(--color-success)]',
 } as const
 
 /**
@@ -125,7 +123,7 @@ export const COURSE_CHAT = {
 
 export const COURSE_EXERCISE = {
   frame:
-    'flex flex-col gap-5 rounded-[var(--radius-xl)] border-2 border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 shadow-[var(--shadow-sm)] transition-colors sm:p-7',
+    'flex flex-col gap-5 rounded-[var(--radius-xl)] border-2 border-[var(--color-border)] glass-surface p-5 shadow-[var(--shadow-sm)] transition-colors sm:p-7',
   framePassed: 'border-[var(--color-success)]',
   frameFailed: 'border-[var(--color-danger)]',
   head: 'flex items-center gap-3',
@@ -145,7 +143,7 @@ export const COURSE_EXERCISE = {
   question: 'flex flex-col gap-3',
   choices: 'flex flex-col gap-2',
   choice:
-    'flex w-full items-start gap-3 rounded-[var(--radius-md)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-left text-sm font-medium transition-[border-color,transform,background-color] hover:-translate-y-px hover:border-[var(--color-brand-400)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)] disabled:pointer-events-none',
+    'flex w-full items-start gap-3 rounded-[var(--radius-md)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-left text-sm font-medium transition-[border-color,transform,background-color] hover:-translate-y-px hover:border-[var(--color-border-strong)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)] disabled:pointer-events-none',
   choicePicked: 'border-[var(--color-brand-600)] bg-[var(--color-brand-50)]',
   choiceRight: 'border-[var(--color-success)] bg-[var(--color-success-soft)]',
   choiceWrong: 'border-[var(--color-danger)] bg-[var(--color-danger-soft)]',
@@ -199,7 +197,7 @@ export const COURSE_EXERCISE = {
 export const COURSE_COMPLETE = {
   wrap: 'flex flex-col items-center gap-8 py-10 text-center',
   // The name of the course, its check drawn in front then a line struck through
-  card: 'relative flex max-w-full items-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-6 py-5 shadow-[var(--shadow-md)]',
+  card: 'relative flex max-w-full items-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface px-6 py-5 shadow-[var(--shadow-md)]',
   mark: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-success)] text-white',
   markIcon: 'h-6 w-6',
   name: 'relative text-lg font-bold tracking-tight text-balance sm:text-2xl',
@@ -218,60 +216,68 @@ export const COURSE_COMPLETE = {
  */
 
 export const LEGACY_BOARD = {
-  page: 'mx-auto flex w-full max-w-6xl flex-col gap-10',
-  grid: 'grid gap-8 sm:grid-cols-2 xl:grid-cols-3',
-  tilt: 'block [transform-style:preserve-3d]',
-  card: 'group relative flex h-full flex-col gap-5 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6 text-left shadow-[var(--shadow-sm)] transition-shadow duration-[var(--motion-duration-moderate)] hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
-  cardHead: 'flex items-center gap-4',
-  person: 'flex min-w-0 flex-1 flex-col gap-0.5',
-  name: 'truncate text-lg font-black tracking-tight',
-  meta: 'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  ring: 'relative flex h-16 w-16 shrink-0 items-center justify-center',
-  ringLabel: 'absolute text-sm font-black tabular-nums',
-  bars: 'flex flex-col gap-2',
-  bar: 'flex items-center gap-3 text-xs text-[var(--color-ink-subtle)]',
-  barTrack: 'h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--color-border)]',
-  barFill: 'h-full rounded-full bg-[var(--color-brand-600)]',
-  barLabel: 'w-28 shrink-0 truncate',
-  foot: 'mt-auto flex items-center justify-between gap-3 text-xs',
+  page: 'mx-auto flex w-full max-w-5xl flex-col gap-8',
+  list: 'flex flex-col',
+  empty: 'px-1 text-[var(--color-ink-subtle)] italic',
+  row: 'group grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-[var(--radius-lg)] border-t border-[var(--color-border)] px-3 py-4 transition-colors first:border-t-0 hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)] md:grid-cols-[auto_minmax(0,1fr)_16rem_9rem]',
+  person: 'flex min-w-0 flex-col',
+  name: 'truncate text-lg font-bold tracking-tight',
+  meta: 'truncate text-sm text-[var(--color-ink-subtle)]',
+  score: 'col-span-2 flex items-center gap-3 md:col-span-1',
+  scoreTrack: 'relative h-2.5 flex-1 rounded-full bg-[var(--color-border)]',
+  scoreFill: 'absolute inset-y-0 left-0 rounded-full bg-[var(--color-brand-600)]',
+  scoreFillDone: 'bg-[var(--color-success)]',
+  scoreMark: 'absolute -inset-y-1 border-l-2 border-[var(--color-ink)]',
+  scoreFigure: 'w-14 shrink-0 text-right text-sm font-bold tabular-nums',
+  status: 'col-span-2 text-sm font-semibold md:col-span-1 md:text-right',
 } as const
 
 /**
- * One track opened
+ * One track opened: a gauge of the points beside the modules
  * @type {Record<string, string>}
  */
 
 export const LEGACY_TRACK = {
-  page: 'mx-auto flex w-full max-w-5xl flex-col gap-12',
-  hero: 'flex flex-col items-center gap-4 text-center',
-  heroName: 'text-4xl font-black tracking-tight text-balance sm:text-5xl',
-  heroMeta:
-    'flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  exempt: 'text-sm font-semibold text-[var(--color-brand-800)]',
-  modules: 'grid gap-8 md:grid-cols-3',
-  tilt: 'block [transform-style:preserve-3d]',
+  page: 'mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[27.5rem_minmax(0,1fr)] lg:items-start',
+  summary:
+    'flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-7 lg:sticky lg:top-4',
+  person: 'flex items-center gap-4',
+  name: 'text-2xl leading-tight font-bold tracking-tight',
+  trade: 'text-sm text-[var(--color-ink-subtle)]',
+  statusClosed: 'text-sm font-semibold',
+  gauge: 'w-full',
+  gaugeTrack: 'stroke-[var(--color-border)]',
+  gaugeFill:
+    'stroke-[var(--color-brand-600)] transition-[stroke-dasharray] duration-[1100ms] ease-out',
+  gaugeFillDone: 'stroke-[var(--color-success)]',
+  gaugeMark: 'stroke-[var(--color-ink)]',
+  gaugeFigure: 'fill-[var(--color-ink)] text-[84px] font-bold tracking-tighter',
+  gaugeUnit: 'fill-[var(--color-ink-subtle)] text-[15px] font-semibold',
+  gaugeNumber: 'fill-[var(--color-ink-subtle)] text-xs font-bold',
+  gaugeThreshold: 'fill-[var(--color-ink)] text-[13px] font-extrabold',
+  facts: 'flex flex-col border-t border-[var(--color-border)]',
+  fact: 'flex items-center gap-3 border-b border-[var(--color-border)] py-3.5 text-[15px] last:border-b-0',
+  factIcon: 'h-[18px] w-[18px] shrink-0 text-[var(--color-brand-600)]',
+  factLabel: 'flex-1 text-[var(--color-ink-subtle)]',
+  factValue: 'font-bold tabular-nums',
+  actions: 'flex flex-col gap-2.5',
+  modules: 'flex flex-col gap-5',
   module:
-    'relative flex h-full flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6 shadow-[var(--shadow-md)]',
-  moduleName: 'text-xl leading-snug font-black tracking-tight text-balance',
-  moduleSummary: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
-  score: 'flex items-baseline gap-2',
-  scoreFigure:
-    'font-[family-name:var(--font-display)] text-6xl leading-none font-black tabular-nums',
-  scoreMax: 'text-sm font-bold text-[var(--color-ink-subtle)]',
-  rows: 'flex flex-col divide-y divide-[var(--color-border)] text-sm',
-  row: 'flex items-center justify-between gap-3 py-2',
-  rowLabel: 'text-[var(--color-ink-subtle)]',
-  rowValue: 'font-bold tabular-nums',
-  verdict:
-    'flex flex-col gap-6 rounded-[var(--radius-xl)] border-2 border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6 sm:p-8',
-  verdictReady: 'border-[var(--color-success)]',
-  verdictTitle: 'text-2xl font-black tracking-tight',
-  meters: 'grid gap-6 sm:grid-cols-2',
-  meter: 'flex flex-col gap-2',
-  meterHead: 'flex items-baseline justify-between gap-3',
-  meterLabel: PROPERTY_LABEL,
-  meterFigure: 'text-2xl font-black tabular-nums',
-  actions: 'flex flex-wrap items-center justify-center gap-3',
+    'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-6',
+  moduleHead: 'flex min-w-0 items-center gap-2.5',
+  moduleName: 'text-xl leading-tight font-bold tracking-tight',
+  moduleCheck: 'h-5 w-5 shrink-0 text-[var(--color-success)]',
+  moduleScore: 'flex items-baseline gap-1.5 justify-self-end',
+  scoreFigure: 'text-4xl leading-none font-bold tabular-nums',
+  scoreMax: 'text-[13px] font-bold text-[var(--color-ink-subtle)]',
+  bar: 'relative col-span-2 mt-2 mb-5 h-2.5 rounded-full bg-[var(--color-border)]',
+  barFill: 'absolute inset-y-0 left-0 rounded-full bg-[var(--color-brand-600)]',
+  barDone: 'bg-[var(--color-success)]',
+  barMark: 'absolute -inset-y-1 border-l-2 border-[var(--color-ink)]',
+  barMarkLabel:
+    'absolute top-5 -translate-x-1/2 text-[10px] font-black tracking-wide whitespace-nowrap text-[var(--color-ink-subtle)] uppercase',
+  moduleMeta: 'text-sm text-[var(--color-ink-subtle)]',
+  moduleAction: 'justify-self-end',
 } as const
 
 /**
@@ -344,7 +350,7 @@ export const COURSE_FIGURE = {
   keypointsTitle: 'text-lg font-bold tracking-tight',
   keypointsGrid: 'grid gap-4 sm:grid-cols-3',
   keypoint:
-    'course-pop flex flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 shadow-[var(--shadow-sm)]',
+    'course-pop flex flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-5 shadow-[var(--shadow-sm)]',
   disc: 'flex h-12 w-12 shrink-0 items-center justify-center rounded-full',
   discIcon: 'h-6 w-6',
   keypointTitle: 'text-base font-bold tracking-tight',
@@ -408,4 +414,58 @@ export const COURSE_DEMO = {
   dots: 'flex flex-1 items-center gap-1.5',
   dot: 'h-1.5 w-6 rounded-full bg-[var(--color-border-strong)] transition-colors duration-[var(--motion-duration-panel)]',
   dotOn: 'bg-[var(--color-info)]',
+} as const
+
+/**
+ * Opening scene: a live that arrives message by message, gauges over it, the debrief after
+ * @type {Record<string, string>}
+ */
+
+export const COURSE_PLUNGE = {
+  stage: 'flex flex-col gap-4',
+  gauges: 'grid grid-cols-2 gap-4',
+  gauge: 'flex flex-col gap-1.5',
+  gaugeHead: 'flex items-baseline justify-between gap-2',
+  gaugeLabel: PROPERTY_LABEL,
+  gaugeFigure: 'text-sm font-black tabular-nums',
+  gaugeTrack: 'h-2.5 overflow-hidden rounded-full bg-[var(--color-border)]',
+  gaugeFill:
+    'h-full rounded-full transition-[width] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)]',
+  warmth: 'bg-[var(--color-caution)]',
+  tension: 'bg-[var(--color-danger)]',
+  chat: 'flex max-h-[26rem] min-h-72 flex-col gap-0.5 overflow-y-auto p-2',
+  message:
+    'block w-full rounded-[var(--radius-sm)] text-left transition-colors focus-visible:outline-2 focus-visible:outline-white',
+  messageOpen: 'cursor-pointer hover:bg-white/5',
+  messageSelected: 'bg-white/10',
+  actions: 'flex flex-wrap gap-2 px-2 pt-1 pb-2',
+  action:
+    'inline-flex items-center gap-1.5 rounded-[var(--radius-md)] border border-white/20 px-3 py-2 text-sm font-semibold text-[var(--twitch-text)] transition-colors hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-white',
+  actionUndo: 'border-white/40 bg-white/10',
+  actionIcon: 'h-4 w-4 shrink-0',
+  hint: 'text-sm text-[var(--color-ink-subtle)]',
+  bet: 'course-pop flex flex-col gap-4 rounded-[var(--radius-xl)] border-2 border-[var(--color-brand-600)] bg-[var(--color-surface)] p-5',
+  betTitle: 'text-lg font-black tracking-tight text-balance',
+  betLead: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
+  betChoices: 'grid gap-2 sm:grid-cols-2',
+  reveal: 'flex flex-col gap-6',
+  revealTitle: 'text-xl font-black tracking-tight',
+  rows: 'flex flex-col gap-3',
+  row: 'flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3',
+  rowFit: 'border-[var(--color-success)]',
+  rowMiss: 'border-[var(--color-danger)]',
+  rowSplit: 'border-[var(--color-caution)]',
+  rowLine:
+    'overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)] text-[var(--twitch-text)]',
+  rowCalls: 'grid grid-cols-2 gap-3 text-sm',
+  rowCall: 'flex flex-col gap-0.5',
+  rowCallLabel: PROPERTY_LABEL,
+  rowCallValue: 'font-bold',
+  rowOutcome: 'text-xs font-black tracking-wide uppercase',
+  rowWhy: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
+  fits: 'flex flex-col gap-3',
+  fitsSummary:
+    'cursor-pointer text-sm font-bold text-[var(--color-ink-subtle)] select-none hover:text-[var(--color-ink)]',
+  sectionTitle: 'text-lg font-bold tracking-tight',
+  note: 'rounded-[var(--radius-md)] bg-[var(--color-info-soft)] px-4 py-3 text-sm font-semibold leading-relaxed text-[var(--color-info)]',
 } as const

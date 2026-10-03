@@ -24,7 +24,10 @@ export const readProgress = (value: unknown): CourseProgress => {
  * @return {{ passed: number, total: number }} - Cleared and total
  */
 
-export const countCleared = (course: Course, stored: unknown): { passed: number; total: number } => {
+export const countCleared = (
+  course: Course,
+  stored: unknown
+): { passed: number; total: number } => {
   const progress = readProgress(stored)
   const exercises = exercisesOf(course)
 

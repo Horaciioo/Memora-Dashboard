@@ -112,7 +112,9 @@ export const useCourse = (
 
   const retry = useCallback(
     (key: string) =>
-      setResults((current) => Object.fromEntries(Object.entries(current).filter(([id]) => id !== key))),
+      setResults((current) =>
+        Object.fromEntries(Object.entries(current).filter(([id]) => id !== key))
+      ),
     []
   )
 

@@ -180,6 +180,16 @@ export const scoreExercise = (
         passPercent
       )
 
+    // Not graded: it counts once every message got a call and the bet is placed
+    case 'plunge':
+      return toResult(
+        {
+          played: block.messages.every((message) => typeof record[message.key] === 'string'),
+          bet: typeof record.bet === 'string' && record.bet.length > 0,
+        },
+        100
+      )
+
     case 'command': {
       const given = normalise(typeof answer === 'string' ? answer : '')
 
