@@ -39,9 +39,26 @@ export const syncRoleGrants = async (): Promise<void> => {
       (permissions ?? []).map((permission) => ({ role: role as MemberRoleName, permission }))
     )
 
+    // Function grants resolved by name, an unseeded function skipped
+    const functionNames = Object.keys(addition.functions ?? {})
+    const holders =
+      functionNames.length > 0
+        ? await prisma.jobFunction.findMany({
+            where: { name: { in: functionNames } },
+            select: { id: true, name: true },
+          })
+        : []
+    const functionRows = holders.flatMap((holder) =>
+      (addition.functions?.[holder.name] ?? []).map((permission) => ({
+        functionId: holder.id,
+        permission,
+      }))
+    )
+
     try {
       await prisma.$transaction([
         prisma.rolePermission.createMany({ data: rows, skipDuplicates: true }),
+        prisma.functionPermission.createMany({ data: functionRows }),
         prisma.grantMigration.create({ data: { key: addition.key } }),
       ])
     } catch (error) {

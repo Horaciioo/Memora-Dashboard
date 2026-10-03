@@ -29,13 +29,14 @@ const PERMISSION_GROUP_MAP: Record<PermissionGroup, PermissionGroupOption> = {
   [PermissionGroups.Absences]: { label: 'Absences', position: 4 },
   [PermissionGroups.Calendar]: { label: 'Calendrier', position: 5 },
   [PermissionGroups.Livecon]: { label: 'Livecon', position: 6 },
-  [PermissionGroups.Sanctions]: { label: 'Panel de sanctions', position: 7 },
-  [PermissionGroups.Recruitment]: { label: 'Recrutements', position: 8 },
-  [PermissionGroups.Academy]: { label: 'Marsha Academy', position: 9 },
-  [PermissionGroups.Legacy]: { label: 'Legacy', position: 10 },
-  [PermissionGroups.Teams]: { label: 'Équipes', position: 11 },
-  [PermissionGroups.Configuration]: { label: 'Configuration', position: 12 },
-  [PermissionGroups.Access]: { label: 'Accès & console', position: 13 },
+  [PermissionGroups.Live]: { label: 'Lives & Mod View', position: 7 },
+  [PermissionGroups.Sanctions]: { label: 'Panel de sanctions', position: 8 },
+  [PermissionGroups.Recruitment]: { label: 'Recrutements', position: 9 },
+  [PermissionGroups.Academy]: { label: 'Marsha Academy', position: 10 },
+  [PermissionGroups.Legacy]: { label: 'Legacy', position: 11 },
+  [PermissionGroups.Teams]: { label: 'Équipes', position: 12 },
+  [PermissionGroups.Configuration]: { label: 'Configuration', position: 13 },
+  [PermissionGroups.Access]: { label: 'Accès & console', position: 14 },
 }
 
 export const PERMISSION_GROUP_REGISTRY = createRegistry(PERMISSION_GROUP_MAP)

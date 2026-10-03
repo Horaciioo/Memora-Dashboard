@@ -9,11 +9,13 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @typedef {Object} GrantAddition
  * @property {string} key - Stable identifier, never reused
  * @property {Partial<Record<MemberRoleName, PermissionName[]>>} grants - Permissions per role
+ * @property {Record<string, PermissionName[]>} [functions] - Permissions per function name
  */
 
 export interface GrantAddition {
   key: string
   grants: Partial<Record<MemberRoleName, PermissionName[]>>
+  functions?: Record<string, PermissionName[]>
 }
 
 /**
@@ -76,5 +78,34 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
       [MemberRoles.Admin]: [Permissions.IntegrationManage],
       [MemberRoles.Responsable]: [Permissions.IntegrationManage],
     },
+  },
+  {
+    key: 'live-modview',
+    grants: {
+      [MemberRoles.Admin]: [
+        Permissions.LiveAnnounce,
+        Permissions.LiveUnbanRequest,
+        Permissions.LiveModeShield,
+        Permissions.LiveModeSubscribers,
+        Permissions.LiveModeFollowers,
+        Permissions.LiveModeEmotes,
+        Permissions.LiveModeSlow,
+        Permissions.LiveTerms,
+        Permissions.LiveCrisisChat,
+        Permissions.LiveLogRead,
+        Permissions.LiveCreatorReport,
+      ],
+      [MemberRoles.Responsable]: [
+        Permissions.LiveAnnounce,
+        Permissions.LiveUnbanRequest,
+        Permissions.LiveModeEmotes,
+        Permissions.LiveModeSlow,
+        Permissions.LiveTerms,
+        Permissions.LiveLogRead,
+      ],
+      // Floor role, so every member down to a junior
+      [MemberRoles.Moderateur]: [Permissions.LiveRead, Permissions.LiveModerate],
+    },
+    functions: { Formateurs: [Permissions.LiveLogRead] },
   },
 ]
