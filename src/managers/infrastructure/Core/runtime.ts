@@ -8,6 +8,8 @@ import type { LiveEnvelope } from '@/core/lib/lives/bus'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
 import { markRemindersScheduled, runReminderSweep } from '@/core/services/calendar/attendance'
 import { runMaintenance } from '@/core/services/system/MaintenanceService'
+import { startLiveWatcher } from '@/core/services/lives/LiveWatcher'
+import { LIVE_WORKER_MODES, liveWorkerMode } from '@/declarations/lives/worker'
 import { JOB_REGISTRY } from '@/declarations/system/jobs'
 import Sharding from '@/managers/infrastructure/Core/Sharding'
 
@@ -160,6 +162,9 @@ export const startRuntime = async (): Promise<Sharding> => {
       wireRateLimiter(container)
       await wireLiveBus(container)
       await scheduleJobs(container)
+
+      // Platform sessions live here unless a separate worker keeps them
+      if (liveWorkerMode() === LIVE_WORKER_MODES.inline) startLiveWatcher()
 
       return container
     })

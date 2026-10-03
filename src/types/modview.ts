@@ -171,6 +171,10 @@ export interface ModViewState {
   liveconLevel: number | null
   // Scene-driven chat menu
   chatScript?: ChatScript
+  // Why the platform is out of reach, said in the rail
+  notice?: string | null
+  // Seen but not moderated from here
+  readOnly?: boolean
 }
 
 /**

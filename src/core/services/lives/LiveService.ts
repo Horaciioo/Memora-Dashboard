@@ -435,11 +435,82 @@ export const readBeacon = async (
 }
 
 /**
- * Move a live to its next status
+ * Move a live to its next status, telling the team
+ * @param {Object} live - Live row
+ * @param {LiveStatusName} next - Next status
+ * @param {string | null} actorId - Who moves it, none for the platform
+ * @param {string} [streamExternalId] - Platform stream, once detected
+ * @return {Promise<void>} - Moved
+ */
+
+const applyLiveStatus = async (
+  live: {
+    id: string
+    youtuberId: string
+    title: string
+    status: LiveStatusName
+    members: { accountId: string }[]
+  },
+  next: LiveStatusName,
+  actorId: string | null,
+  streamExternalId?: string
+): Promise<void> => {
+  // Allowed moves only, a closed live staying closed
+  const allowed: Record<LiveStatusName, LiveStatusName[]> = {
+    [LiveStatuses.Announced]: [LiveStatuses.Live, LiveStatuses.Cancelled],
+    [LiveStatuses.Live]: [LiveStatuses.Ended],
+    [LiveStatuses.Ended]: [],
+    [LiveStatuses.Cancelled]: [],
+  }
+  if (!allowed[live.status].includes(next)) throw conflict()
+
+  const now = new Date()
+  await prisma.live.update({
+    where: { id: live.id },
+    data: {
+      status: next,
+      startedAt: next === LiveStatuses.Live ? now : undefined,
+      endedAt: next === LiveStatuses.Ended || next === LiveStatuses.Cancelled ? now : undefined,
+      ...(streamExternalId ? { streamExternalId } : {}),
+    },
+  })
+
+  await publishLive(LIVE_TOPICS.lives, {
+    liveId: live.id,
+    youtuberId: live.youtuberId,
+    status: next,
+  })
+
+  // Team told of the start or the cancel
+  const recipients = live.members.map((seat) => seat.accountId)
+  if (next === LiveStatuses.Live) {
+    await notify({
+      kind: 'LiveStarted',
+      recipients,
+      actorId,
+      target: 'live',
+      targetId: live.id,
+      subject: live.title,
+    })
+  }
+  if (next === LiveStatuses.Cancelled) {
+    await notify({
+      kind: 'LiveCancelled',
+      recipients,
+      actorId,
+      target: 'live',
+      targetId: live.id,
+      subject: live.title,
+    })
+  }
+}
+
+/**
+ * Move a live within the actor's perimeter
  * @param {string} id - Live identifier
- * @param {LiveStatusName} next - Target status
- * @param {string} actorId - Who moved it
- * @param {AccessScope} scope - Creator perimeter
+ * @param {LiveStatusName} next - Next status
+ * @param {string} actorId - Who moves it
+ * @param {AccessScope} scope - Actor's perimeter
  * @return {Promise<void>} - Moved
  */
 
@@ -455,47 +526,34 @@ export const moveLive = async (
   })
   if (!live) throw notFound()
 
-  // Allowed moves only, a closed live staying closed
-  const allowed: Record<LiveStatusName, LiveStatusName[]> = {
-    [LiveStatuses.Announced]: [LiveStatuses.Live, LiveStatuses.Cancelled],
-    [LiveStatuses.Live]: [LiveStatuses.Ended],
-    [LiveStatuses.Ended]: [],
-    [LiveStatuses.Cancelled]: [],
-  }
-  if (!allowed[live.status].includes(next)) throw conflict()
+  await applyLiveStatus(live, next, actorId)
+}
 
-  const now = new Date()
-  await prisma.live.update({
+/**
+ * Move a live because the platform said so: online starts it, offline ends it
+ * @param {string} id - Live identifier
+ * @param {LiveStatusName} next - Next status
+ * @param {string} [streamExternalId] - Platform stream
+ * @return {Promise<boolean>} - Moved, false when already there
+ */
+
+export const moveLiveFromPlatform = async (
+  id: string,
+  next: LiveStatusName,
+  streamExternalId?: string
+): Promise<boolean> => {
+  const live = await prisma.live.findUnique({
     where: { id },
-    data: {
-      status: next,
-      startedAt: next === LiveStatuses.Live ? now : undefined,
-      endedAt: next === LiveStatuses.Ended || next === LiveStatuses.Cancelled ? now : undefined,
-    },
+    include: { members: { select: { accountId: true } } },
   })
+  if (!live || live.status === next) return false
 
-  await publishLive(LIVE_TOPICS.lives, { liveId: id, youtuberId: live.youtuberId, status: next })
+  try {
+    await applyLiveStatus(live, next, null, streamExternalId)
 
-  // Team told of the start or the cancel
-  const recipients = live.members.map((seat) => seat.accountId)
-  if (next === LiveStatuses.Live) {
-    await notify({
-      kind: 'LiveStarted',
-      recipients,
-      actorId,
-      target: 'live',
-      targetId: id,
-      subject: live.title,
-    })
-  }
-  if (next === LiveStatuses.Cancelled) {
-    await notify({
-      kind: 'LiveCancelled',
-      recipients,
-      actorId,
-      target: 'live',
-      targetId: id,
-      subject: live.title,
-    })
+    return true
+  } catch {
+    // A live closed by hand meanwhile stays closed
+    return false
   }
 }

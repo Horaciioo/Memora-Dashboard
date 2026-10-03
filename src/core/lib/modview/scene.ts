@@ -8,6 +8,7 @@ import type {
   ModViewIntent,
   ModViewState,
   ModViewTarget,
+  UnbanRequest,
 } from '@/types/modview'
 
 /**
@@ -26,6 +27,11 @@ export type SceneEvent =
   | { kind: 'livecon'; level: number | null }
   | { kind: 'spotlight'; target: ModViewTarget | null }
   | { kind: 'chatMenu'; menu: ChatScript['menu'] }
+  | { kind: 'strike'; by: string; messageIds?: string[]; chatterId?: string }
+  | { kind: 'terms'; list: 'blocked' | 'allowed'; add: string[]; remove: string[] }
+  | { kind: 'unbanRequest'; request: UnbanRequest }
+  | { kind: 'unbanResolved'; requestId: string }
+  | { kind: 'stream'; title?: string; category?: string | null }
   | { kind: 'chatOption'; option: ChatOptionName; enabled: boolean }
 
 /**
@@ -157,6 +163,58 @@ export const applySceneEvent = (
       return { ...state, view: { ...view, liveconLevel: event.level } }
     case 'spotlight':
       return { ...state, spotlight: event.target }
+    case 'strike':
+      return {
+        ...state,
+        view: {
+          ...view,
+          messages: strike(
+            view.messages,
+            (line) =>
+              (event.messageIds?.includes(line.id) ?? false) ||
+              (event.chatterId !== undefined && line.author.id === event.chatterId),
+            event.by
+          ),
+        },
+      }
+    case 'terms': {
+      const key = event.list === 'blocked' ? 'blockedTerms' : 'allowedTerms'
+      const removed = new Set(event.remove.map((term) => term.toLowerCase()))
+      const kept = view[key].filter((term) => !removed.has(term.toLowerCase()))
+
+      return { ...state, view: { ...view, [key]: [...new Set([...kept, ...event.add])] } }
+    }
+    case 'unbanRequest':
+      return {
+        ...state,
+        view: {
+          ...view,
+          unbanRequests: [
+            event.request,
+            ...view.unbanRequests.filter((request) => request.id !== event.request.id),
+          ],
+        },
+      }
+    case 'unbanResolved':
+      return {
+        ...state,
+        view: {
+          ...view,
+          unbanRequests: view.unbanRequests.filter((request) => request.id !== event.requestId),
+        },
+      }
+    case 'stream':
+      return {
+        ...state,
+        view: {
+          ...view,
+          title: event.title ?? view.title,
+          channel:
+            event.category === undefined
+              ? view.channel
+              : { ...view.channel, category: event.category },
+        },
+      }
     case 'chatMenu':
       return {
         ...state,

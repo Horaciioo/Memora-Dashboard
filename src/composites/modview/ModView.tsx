@@ -61,9 +61,20 @@ export const ModView = ({
         permissions,
         platform: state.platform,
         liveconLevel: state.liveconLevel,
-        offline: state.connection === 'disconnected' || state.connection === 'connecting',
+        offline:
+          state.connection === 'disconnected' ||
+          state.connection === 'connecting' ||
+          state.readOnly === true,
+        offlineReason: state.notice,
       }),
-    [permissions, state.platform, state.liveconLevel, state.connection]
+    [
+      permissions,
+      state.platform,
+      state.liveconLevel,
+      state.connection,
+      state.readOnly,
+      state.notice,
+    ]
   )
 
   // A refused gesture never reaches the driver

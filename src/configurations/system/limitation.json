@@ -34,5 +34,9 @@
   "lookup": {
     "windowSeconds": 60,
     "max": 30
+  },
+  "moderation": {
+    "windowSeconds": 60,
+    "max": 240
   }
 }

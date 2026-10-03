@@ -82,6 +82,7 @@ const exposedOn = (intent: ModViewIntent, platform: LivePlatformName): boolean =
  * @param {LivePlatformName} context.platform - Live platform
  * @param {number | null} context.liveconLevel - Level in force
  * @param {boolean} [context.offline] - Platform not reached
+ * @param {string | null} [context.offlineReason] - Why, said instead of the default
  * @return {IntentGate} - Gate
  */
 
@@ -92,9 +93,12 @@ export const gateIntent = (
     platform: LivePlatformName
     liveconLevel: number | null
     offline?: boolean
+    offlineReason?: string | null
   }
 ): IntentGate => {
-  if (context.offline) return { allowed: false, reason: MODVIEW_LOCK_COPY.offline }
+  if (context.offline) {
+    return { allowed: false, reason: context.offlineReason ?? MODVIEW_LOCK_COPY.offline }
+  }
 
   if (!exposedOn(intent, context.platform)) {
     return { allowed: false, reason: MODVIEW_LOCK_COPY.platform }

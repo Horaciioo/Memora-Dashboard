@@ -270,6 +270,7 @@ export const MODVIEW_RAIL = {
   identityText: 'flex min-w-0 flex-col',
   channel: 'truncate text-xl font-black tracking-tight',
   status: 'flex items-center gap-1.5 text-xs font-black tracking-wide uppercase',
+  notice: 'mt-1 text-xs leading-snug text-[var(--color-ink-subtle)]',
   dot: 'h-2.5 w-2.5 shrink-0 rounded-full',
   dotConnected: 'bg-[var(--color-success)]',
   dotConnecting: 'bg-[var(--color-caution)]',

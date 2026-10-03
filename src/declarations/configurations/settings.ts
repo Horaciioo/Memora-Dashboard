@@ -259,7 +259,7 @@ export const LIVECON_SETTINGS = {
 
 /**
  * Announced lives and their Mod View
- * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number }}
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, eventsubKeepaliveSeconds: number, recentEvents: number, idempotencyMinutes: number, watchLeadMinutes: number }}
  */
 
 export const LIVE_SETTINGS = {
@@ -297,6 +297,32 @@ export const LIVE_SETTINGS = {
     path: 'system/lives.maxOpenLives',
     fallback: 12,
     min: 1,
+  }),
+  watchSyncSeconds: readInteger(lives.watchSyncSeconds, {
+    path: 'system/lives.watchSyncSeconds',
+    fallback: 30,
+    min: 5,
+  }),
+  eventsubKeepaliveSeconds: readInteger(lives.eventsubKeepaliveSeconds, {
+    path: 'system/lives.eventsubKeepaliveSeconds',
+    fallback: 30,
+    min: 10,
+    max: 600,
+  }),
+  recentEvents: readInteger(lives.recentEvents, {
+    path: 'system/lives.recentEvents',
+    fallback: 300,
+    min: 20,
+  }),
+  idempotencyMinutes: readInteger(lives.idempotencyMinutes, {
+    path: 'system/lives.idempotencyMinutes',
+    fallback: 10,
+    min: 1,
+  }),
+  watchLeadMinutes: readInteger(lives.watchLeadMinutes, {
+    path: 'system/lives.watchLeadMinutes',
+    fallback: 90,
+    min: 0,
   }),
 }
 

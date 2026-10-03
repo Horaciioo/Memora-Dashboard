@@ -68,6 +68,7 @@ export const ModViewRail = ({ state, levelName, windows, hidden, onToggle }: Mod
             <span className={cn(MODVIEW_RAIL.dot, STATUS_DOT[state.connection])} />
             {MODVIEW_COPY[state.connection]}
           </p>
+          {state.notice && <p className={MODVIEW_RAIL.notice}>{state.notice}</p>}
         </div>
       </div>
 

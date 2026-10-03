@@ -5,5 +5,10 @@
   "heartbeatSeconds": 15,
   "idleSeconds": 120,
   "staleSeconds": 60,
-  "maxOpenLives": 12
+  "maxOpenLives": 12,
+  "watchSyncSeconds": 30,
+  "eventsubKeepaliveSeconds": 30,
+  "recentEvents": 300,
+  "idempotencyMinutes": 10,
+  "watchLeadMinutes": 90
 }
