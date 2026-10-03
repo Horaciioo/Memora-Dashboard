@@ -211,6 +211,20 @@ enum AttendanceStatus {
   ABSENT
 }
 
+// Streaming platform a live runs on
+enum LivePlatform {
+  TWITCH
+  YOUTUBE
+}
+
+// Lifecycle of an announced live
+enum LiveStatus {
+  ANNOUNCED
+  LIVE
+  ENDED
+  CANCELLED
+}
+
 // Signed-in member
 model Account {
   id                    String       @id @default(cuid())
@@ -292,6 +306,10 @@ model Account {
   meetingsEdited        Meeting[]                @relation("MeetingEditor")
   communications        Communication[]
   liveconChanges        LiveconEntry[]
+  platformAccounts      PlatformAccount[]
+  livesAnnounced        Live[]                   @relation("LiveAnnouncer")
+  livesCoordinated      Live[]                   @relation("LiveCoordinator")
+  liveSeats             LiveMember[]
   activityAsSubject     ActivityLog[]            @relation("LogSubject")
   activityAsActor       ActivityLog[]            @relation("LogActor")
   notificationsReceived Notification[]           @relation("NotificationRecipient")
@@ -479,6 +497,8 @@ model Youtuber {
   meetings            Meeting[]
   liveconEntries      LiveconEntry[]
   calendarEvents      CalendarEvent[]
+  channels            YoutuberChannel[]
+  lives               Live[]
   sanctionOffenses    SanctionOffense[]
 
   recruitmentSessions      RecruitmentSession[]
@@ -1470,6 +1490,7 @@ model CalendarEvent {
   updatedAt       DateTime         @updatedAt
 
   attendances EventAttendance[]
+  live        Live?
 
   template EventTemplate?  @relation(fields: [templateId], references: [id], onDelete: SetNull)
   owner    Account?        @relation("CalendarOwner", fields: [ownerId], references: [id], onDelete: SetNull)
@@ -1531,6 +1552,8 @@ model LiveconEntry {
   id         String    @id @default(cuid())
   levelId    String
   youtuberId String?
+  // Live the level was in force on
+  liveId     String?
   actorId    String?
   reason     String?
   startedAt  DateTime  @default(now())
@@ -1539,10 +1562,105 @@ model LiveconEntry {
   level    LiveconLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
   youtuber Youtuber?    @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
   actor    Account?     @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  live     Live?        @relation(fields: [liveId], references: [id], onDelete: SetNull)
 
   @@index([youtuberId, startedAt])
   @@index([endedAt])
+  @@index([liveId])
   @@map("livecon_entries")
+}
+
+// Channel a creator streams on, one per platform
+model YoutuberChannel {
+  id          String       @id @default(cuid())
+  youtuberId  String
+  platform    LivePlatform
+  // Platform user or channel identifier
+  externalId  String
+  login       String?
+  displayName String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+
+  @@unique([youtuberId, platform])
+  @@unique([platform, externalId])
+  @@map("youtuber_channels")
+}
+
+// One live on one platform, announced by a responsable
+model Live {
+  id               String       @id @default(cuid())
+  youtuberId       String
+  platform         LivePlatform
+  title            String
+  status           LiveStatus   @default(ANNOUNCED)
+  plannedStartAt   DateTime
+  plannedEndAt     DateTime?
+  startedAt        DateTime?
+  endedAt          DateTime?
+  announcedById    String?
+  // Holds the coordinator rights while the live is not over
+  coordinatorId    String?
+  streamExternalId String?
+  // YouTube chat handle
+  liveChatId       String?
+  calendarEventId  String?      @unique
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  youtuber       Youtuber       @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  announcedBy    Account?       @relation("LiveAnnouncer", fields: [announcedById], references: [id], onDelete: SetNull)
+  coordinator    Account?       @relation("LiveCoordinator", fields: [coordinatorId], references: [id], onDelete: SetNull)
+  calendarEvent  CalendarEvent? @relation(fields: [calendarEventId], references: [id], onDelete: SetNull)
+  members        LiveMember[]
+  liveconEntries LiveconEntry[]
+
+  @@unique([platform, streamExternalId])
+  @@index([status])
+  @@index([youtuberId, plannedStartAt])
+  @@index([coordinatorId])
+  @@map("lives")
+}
+
+// Member called on one live
+model LiveMember {
+  liveId     String
+  accountId  String
+  convokedAt DateTime @default(now())
+
+  live    Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@id([liveId, accountId])
+  @@index([accountId])
+  @@map("live_members")
+}
+
+// Platform grant of one member, both tokens encrypted at rest
+model PlatformAccount {
+  id             String       @id @default(cuid())
+  accountId      String
+  platform       LivePlatform
+  externalUserId String
+  login          String
+  displayName    String?
+  scopes         String[]     @default([])
+  accessToken    String
+  refreshToken   String
+  expiresAt      DateTime
+  // Set once the platform refuses the refresh
+  revokedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, platform])
+  @@unique([platform, externalUserId])
+  @@index([expiresAt])
+  @@map("platform_accounts")
 }
 
 // Trace of a fact worth keeping
