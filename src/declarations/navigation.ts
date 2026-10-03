@@ -25,6 +25,7 @@ export const ROUTES = {
   meeting: (id: string) => `/reunions/${id}`,
   absences: '/absences',
   livecon: '/livecon',
+  live: (id: string) => `/livecon/${id}`,
   calendar: '/calendrier',
   calendarEvent: (id: string) => `/calendrier?evenement=${id}`,
   trainings: '/formations',
@@ -148,6 +149,7 @@ export interface MobileNavSlot {
  * @property {NavigationCondition} [visibleWhen] - Display rule
  * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
  * @property {MobileNavSlot} [mobile] - Promotes the entry onto the mobile nav pill
+ * @property {boolean} [onlyLive] - Shown while a live is open
  */
 
 export interface NavigationItem {
@@ -159,6 +161,7 @@ export interface NavigationItem {
   visibleWhen?: NavigationCondition
   maturity?: MaturityName
   mobile?: MobileNavSlot
+  onlyLive?: boolean
 }
 
 /**
@@ -233,6 +236,14 @@ export const NAVIGATION: NavigationGroup[] = [
     label: 'Personnel',
     from: NavigationViews.Moderation,
     items: [
+      {
+        href: ROUTES.livecon,
+        label: 'Livecon',
+        icon: 'liveDot',
+        permission: Permissions.LiveRead,
+        onlyLive: true,
+        mobile: { slot: 'primary', order: 0 },
+      },
       {
         href: ROUTES.dashboard,
         label: 'Accueil',
@@ -441,13 +452,15 @@ export const RECORD_LABELS: Record<string, string> = {
  * @param {MemberStatusName} member.status - Membership status
  * @param {MemberRoleName} member.role - Hierarchy level
  * @param {(permission: PermissionName) => boolean} can - Permission check
+ * @param {boolean} [hasLive] - A live is open
  * @return {NavigationGroup[]} - Groups holding only their visible items
  */
 
 export const visibleNavGroups = (
   view: NavigationViewName,
   member: { status: MemberStatusName; role: MemberRoleName } | null,
-  can: (permission: PermissionName) => boolean
+  can: (permission: PermissionName) => boolean,
+  hasLive: boolean = false
 ): NavigationGroup[] =>
   NAVIGATION.filter((group) => groupInView(group, view))
     .map((group) => ({
@@ -455,6 +468,7 @@ export const visibleNavGroups = (
       items: group.items.filter(
         (item) =>
           itemInView(item, group, view) &&
+          (!item.onlyLive || hasLive) &&
           (!item.permission || can(item.permission)) &&
           (!member || matchesNavigation(item.visibleWhen, member))
       ),
@@ -482,6 +496,7 @@ export interface MobileNavigation {
  * @param {MemberRoleName} member.role - Hierarchy level
  * @param {(permission: PermissionName) => boolean} can - Permission check
  * @param {number} maxPrimary - Primary slots kept before overflowing
+ * @param {boolean} [hasLive] - A live is open
  * @return {MobileNavigation} - Bar contents
  */
 
@@ -489,9 +504,10 @@ export const mobileNavigation = (
   view: NavigationViewName,
   member: { status: MemberStatusName; role: MemberRoleName } | null,
   can: (permission: PermissionName) => boolean,
-  maxPrimary: number
+  maxPrimary: number,
+  hasLive: boolean = false
 ): MobileNavigation => {
-  const items = visibleNavGroups(view, member, can)
+  const items = visibleNavGroups(view, member, can, hasLive)
     .flatMap((group) => group.items)
     .filter((item): item is NavigationItem & { mobile: MobileNavSlot } => item.mobile !== undefined)
 

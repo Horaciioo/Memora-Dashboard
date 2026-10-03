@@ -10,6 +10,9 @@ import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import type { CreatorLead, ViewContext } from '@/types/access'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import { prisma } from '@/core/lib/db'
+import { readScope } from '@/core/services/auth/ScopeService'
+import { readBeacon } from '@/core/services/lives/LiveService'
+import { Permissions } from '@/utils/constants/permissions'
 
 /**
  * Widest reachable view
@@ -87,9 +90,16 @@ export const readViewContext = async (
   // A view a member no longer reaches falls back to the base one
   const view = available.includes(stored) ? stored : NavigationViews.Moderation
 
-  const [creators, activeYoutuberId] = await Promise.all([
+  // Lives light the Livecon entry, announcers seeing every one
+  const readLive = async () =>
+    access.can(Permissions.LiveRead)
+      ? readBeacon(await readScope(viewer, access), viewer.id, access.can(Permissions.LiveAnnounce))
+      : null
+
+  const [creators, activeYoutuberId, live] = await Promise.all([
     view === NavigationViews.Moderation ? Promise.resolve([]) : pickableCreators(viewer, access),
     readActiveCreator(),
+    readLive(),
   ])
 
   const known = creators.some((creator) => creator.id === activeYoutuberId)
@@ -101,6 +111,7 @@ export const readViewContext = async (
     switchable: available.length > 1 && (viewer.isRoot || isEncadrement(viewer.role)),
     creators,
     activeYoutuberId: known ? activeYoutuberId : null,
+    live,
   }
 }
 

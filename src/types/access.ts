@@ -1,3 +1,4 @@
+import type { LiveBeacon } from '@/types/lives'
 import type { PermissionOverwrite } from '@/core/lib/permissions'
 import type { NavigationViewName } from '@/declarations/navigation'
 import type { AccessCategoryName, MemberRoleName } from '@/utils/constants/hierarchy'
@@ -190,4 +191,6 @@ export interface ViewContext {
   switchable: boolean
   creators: CreatorLead[]
   activeYoutuberId: string | null
+  // Open lives lighting the Livecon entry
+  live: LiveBeacon | null
 }

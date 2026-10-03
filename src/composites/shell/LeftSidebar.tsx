@@ -16,11 +16,13 @@ import { APP_VERSION_LABEL } from '@/declarations/app'
 import { ROUTES, visibleNavGroups } from '@/declarations/navigation'
 import { BEACON_ATTRIBUTE, routeBeacon } from '@/declarations/ui/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
+import { LIVE_NAV } from '@/declarations/ui/variants'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'
 import { cn } from '@/utils/classnames'
+import { LiveStatuses } from '@/utils/constants/lives'
 
 export interface LeftSidebarProps {
   viewContext: ViewContext
@@ -89,61 +91,71 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
         <CalendarRailPanel {...calendarRail} />
       ) : (
         <nav className={LEFT_SIDEBAR.nav}>
-          {visibleNavGroups(viewContext.view, session, can).map((group) => {
-            const isGroupCollapsed = collapsedGroups.has(group.label)
+          {visibleNavGroups(viewContext.view, session, can, viewContext.live !== null).map(
+            (group) => {
+              const isGroupCollapsed = collapsedGroups.has(group.label)
 
-            return (
-              <div key={group.label} className={LEFT_SIDEBAR.navGroup}>
-                <button
-                  type="button"
-                  onClick={() => toggleGroup(group.label)}
-                  aria-expanded={!isGroupCollapsed}
-                  className={LEFT_SIDEBAR.navGroupLabel}
-                >
-                  {group.label}
-                  <ChevronIcon
-                    className={cn(
-                      LEFT_SIDEBAR.navGroupChevron,
-                      isGroupCollapsed && LEFT_SIDEBAR.navGroupChevronCollapsed
-                    )}
-                    aria-hidden="true"
-                  />
-                </button>
+              return (
+                <div key={group.label} className={LEFT_SIDEBAR.navGroup}>
+                  <button
+                    type="button"
+                    onClick={() => toggleGroup(group.label)}
+                    aria-expanded={!isGroupCollapsed}
+                    className={LEFT_SIDEBAR.navGroupLabel}
+                  >
+                    {group.label}
+                    <ChevronIcon
+                      className={cn(
+                        LEFT_SIDEBAR.navGroupChevron,
+                        isGroupCollapsed && LEFT_SIDEBAR.navGroupChevronCollapsed
+                      )}
+                      aria-hidden="true"
+                    />
+                  </button>
 
-                <div className="fold" data-open={!isGroupCollapsed} inert={isGroupCollapsed}>
-                  <div className={LEFT_SIDEBAR.navGroupItems}>
-                    {group.items.map((item) => {
-                      const Icon = ICONS[item.icon]
-                      const isActive =
-                        pathname === item.href || pathname.startsWith(`${item.href}/`)
+                  <div className="fold" data-open={!isGroupCollapsed} inert={isGroupCollapsed}>
+                    <div className={LEFT_SIDEBAR.navGroupItems}>
+                      {group.items.map((item) => {
+                        const Icon = ICONS[item.icon]
+                        const isActive =
+                          pathname === item.href || pathname.startsWith(`${item.href}/`)
+                        // The live entry breathes while a live runs
+                        const isOnAir =
+                          item.onlyLive && viewContext.live?.status === LiveStatuses.Live
 
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          aria-current={isActive ? 'page' : undefined}
-                          {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
-                          className={cn(
-                            LEFT_SIDEBAR.navLink,
-                            isActive && LEFT_SIDEBAR.navLinkActive
-                          )}
-                        >
-                          <Icon
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            aria-current={isActive ? 'page' : undefined}
+                            {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
                             className={cn(
-                              LEFT_SIDEBAR.navIcon,
-                              isActive && LEFT_SIDEBAR.navIconActive
+                              LEFT_SIDEBAR.navLink,
+                              isActive && LEFT_SIDEBAR.navLinkActive
                             )}
-                            aria-hidden="true"
-                          />
-                          <span className={LEFT_SIDEBAR.navLabel}>{item.label}</span>
-                        </Link>
-                      )
-                    })}
+                          >
+                            <Icon
+                              className={cn(
+                                LEFT_SIDEBAR.navIcon,
+                                isActive && LEFT_SIDEBAR.navIconActive,
+                                isOnAir && LIVE_NAV.dotPulse
+                              )}
+                              aria-hidden="true"
+                            />
+                            <span
+                              className={cn(LEFT_SIDEBAR.navLabel, isOnAir && LIVE_NAV.labelLive)}
+                            >
+                              {item.label}
+                            </span>
+                          </Link>
+                        )
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            }
+          )}
         </nav>
       )}
 

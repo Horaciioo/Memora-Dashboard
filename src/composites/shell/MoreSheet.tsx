@@ -30,7 +30,7 @@ export interface MoreSheetProps {
 export const MoreSheet = ({ open, viewContext, shown, onClose }: MoreSheetProps) => {
   const { can, session } = useAuthContext()
 
-  const groups = visibleNavGroups(viewContext.view, session, can)
+  const groups = visibleNavGroups(viewContext.view, session, can, viewContext.live !== null)
     .map((group) => ({ ...group, items: group.items.filter((item) => !shown.has(item.href)) }))
     .filter((group) => group.items.length > 0)
 
