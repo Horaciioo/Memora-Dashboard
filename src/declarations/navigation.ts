@@ -157,6 +157,7 @@ export const TRAININGS_DONE_PARAM = 'achevee'
  * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
  * @property {MobileNavSlot} [mobile] - Promotes the entry onto the mobile nav pill
  * @property {boolean} [onlyLive] - Shown while a live is open
+ * @property {PermissionName} [alwaysFor] - Shown regardless to whoever holds it
  */
 
 export interface NavigationItem {
@@ -169,6 +170,7 @@ export interface NavigationItem {
   maturity?: MaturityName
   mobile?: MobileNavSlot
   onlyLive?: boolean
+  alwaysFor?: PermissionName
 }
 
 /**
@@ -249,6 +251,8 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'liveDot',
         permission: Permissions.LiveRead,
         onlyLive: true,
+        // Announcers reach it to announce the first live
+        alwaysFor: Permissions.LiveAnnounce,
         mobile: { slot: 'primary', order: 0 },
       },
       {
@@ -475,7 +479,7 @@ export const visibleNavGroups = (
       items: group.items.filter(
         (item) =>
           itemInView(item, group, view) &&
-          (!item.onlyLive || hasLive) &&
+          (!item.onlyLive || hasLive || (item.alwaysFor !== undefined && can(item.alwaysFor))) &&
           (!item.permission || can(item.permission)) &&
           (!member || matchesNavigation(item.visibleWhen, member))
       ),
