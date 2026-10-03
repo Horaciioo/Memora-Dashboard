@@ -5,6 +5,7 @@ import { cookies } from 'next/headers'
 
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { revokeOtherSessions } from '@/core/services/auth/SessionService'
+import { resetGuides } from '@/core/services/preferences/GuideService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
@@ -25,6 +26,19 @@ export async function dropOtherSessions(): Promise<void> {
     actorId: session.id,
     summary: `${PREFERENCES_COPY.closeOthers} · ${closed}`,
   })
+
+  refresh()
+}
+
+/**
+ * Show the one-time guides again
+ * @return {Promise<void>} - Guides reset
+ */
+
+export async function replayGuides(): Promise<void> {
+  const { session } = await requireUser()
+
+  await resetGuides(session.id)
 
   refresh()
 }

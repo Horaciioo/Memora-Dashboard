@@ -31,3 +31,13 @@ export const markGuideSeen = async (accountId: string, key: GuideKey): Promise<v
 
   await prisma.account.update({ where: { id: accountId }, data: { seenGuides: { push: key } } })
 }
+
+/**
+ * Show every one-time guide again
+ * @param {string} accountId - Account identifier
+ * @return {Promise<void>} - Reset
+ */
+
+export const resetGuides = async (accountId: string): Promise<void> => {
+  await prisma.account.update({ where: { id: accountId }, data: { seenGuides: { set: [] } } })
+}

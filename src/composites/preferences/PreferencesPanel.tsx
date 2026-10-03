@@ -14,7 +14,7 @@ import { SealedValue } from '@/components/structures/SealedValue'
 import { DisplayPreferences } from '@/composites/preferences/DisplayPreferences'
 import { TwoFactorSection } from '@/composites/security/TwoFactorSection'
 import { useProfile } from '@/core/hooks/data/useProfile'
-import { dropOtherSessions } from '@/app/(dashboard)/parametres/actions'
+import { dropOtherSessions, replayGuides } from '@/app/(dashboard)/parametres/actions'
 import { SENSITIVE_FIELD_REGISTRY, isSensitiveField } from '@/declarations/access/sensitive'
 import type { SensitiveFieldName } from '@/declarations/access/sensitive'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'
@@ -177,7 +177,20 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
 
   const displayTab = () => (
     <div className={TABS_STYLES.panel}>
-      <DisplayPreferences />
+      <div className={PREFERENCE_STYLES.stack}>
+        <DisplayPreferences />
+        <Section
+          title={PREFERENCES_COPY.guidesTitle}
+          description={PREFERENCES_COPY.guidesLead}
+          padded
+        >
+          <form action={replayGuides} className={PREFERENCE_STYLES.footer}>
+            <Button type="submit" variant="secondary" icon="refresh">
+              {PREFERENCES_COPY.guidesAction}
+            </Button>
+          </form>
+        </Section>
+      </div>
     </div>
   )
 

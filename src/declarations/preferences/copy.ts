@@ -47,6 +47,9 @@ export const PREFERENCES_COPY = {
   exportAction: 'Télécharger mes données',
   exportPending: 'Préparation…',
   exportFileName: 'memora-mes-donnees.json',
+  guidesTitle: 'Accueils',
+  guidesLead: 'Les bulles d’accueil ne s’affichent qu’une fois. Tu peux les revoir à ta prochaine visite.',
+  guidesAction: 'Revoir les accueils',
 } as const
 
 /**
