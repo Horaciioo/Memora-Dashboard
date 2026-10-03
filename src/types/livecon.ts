@@ -1,3 +1,4 @@
+import type { IconName } from '@/declarations/ui/icons'
 import type { WorkTag } from '@/types/work'
 
 /**
@@ -6,6 +7,7 @@ import type { WorkTag } from '@/types/work'
  * @property {string} id - Level identifier
  * @property {number} level - Numeric level
  * @property {string} name - Level name
+ * @property {IconName | null} icon - Glyph
  * @property {string | null} summary - Situation it covers
  * @property {string | null} guidelines - Markdown guidelines
  * @property {string | null} accent - Colour token
@@ -16,6 +18,7 @@ export interface LiveconLevelView {
   id: string
   level: number
   name: string
+  icon: IconName | null
   summary: string | null
   guidelines: string | null
   accent: string | null
@@ -49,6 +52,7 @@ export interface LiveconStateView {
  * @property {string} scopeLabel - Scope label
  * @property {string} levelName - Level name
  * @property {number} level - Numeric level
+ * @property {IconName | null} icon - Glyph
  * @property {string | null} accent - Colour token
  * @property {string} startedAt - ISO start
  * @property {string | null} endedAt - ISO end
@@ -61,6 +65,7 @@ export interface LiveconHistoryEntry {
   scopeLabel: string
   levelName: string
   level: number
+  icon: IconName | null
   accent: string | null
   startedAt: string
   endedAt: string | null

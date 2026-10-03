@@ -1,65 +1,65 @@
 /**
- * Copy of the moderation panel
- * @type {Record<string, string | string[]>}
+ * Copy of the moderation board
+ * @type {Record<string, string>}
  */
 
 export const SANCTION_COPY = {
-  title: 'Panel de sanctions',
-  lead: 'Le niveau de livecon en cours choisit le barème appliqué. Plus le chiffre est bas, plus la sanction est dure.',
-  moreInfo: 'En savoir plus…',
-  aboutTitle: 'Comprendre le livecon',
-  aboutLead:
-    'Le livecon fixe la tension du moment. Chaque niveau ouvre son propre barème de sanctions.',
-  currentBadge: 'En cours',
-  panel: 'Panel',
-  change: 'Changer le niveau',
-  changeTitle: 'Changer le niveau de livecon',
-  noGuidelines: 'Aucune consigne écrite pour ce niveau.',
-  creator: 'Créateur',
+  title: 'Livecon & sanctions',
+  lead: 'Le livecon en vigueur choisit le barème. Chaque panel a ses propres règles, l’Administration change le livecon selon les besoins.',
+  panelTitle: 'Panel {panel}',
+  search: 'Chercher une infraction',
+  opening: 'Ouverture de la fiche…',
+  searchEmpty: 'Aucune infraction ne correspond à ta recherche.',
+  onSight: 'Dès constaté',
+  steps: '{count} paliers',
   descriptionTitle: 'Description',
-  exampleTitle: 'Exemple',
-  ladderTitle: 'Barème',
-  warningTitle: 'Exemple de raison',
-  stepColumn: 'Palier',
-  measureColumn: 'Sanction',
-  noLadder: 'Aucun palier défini pour ce panel.',
-  edit: 'Modifier',
-  copy: 'Copier la raison',
-  copied: 'Raison copiée',
-  historyTitle: 'Historique du livecon',
-  historyEmptyTitle: 'Aucun changement',
-  historyEmptyDescription: 'Le premier basculement de niveau apparaîtra ici.',
+  moderateTitle: 'À modérer',
+  tolerateTitle: 'À laisser passer',
+  ladderTitle: 'Barème au {level}',
+  warningTitle: 'Raison de sanction suggérée',
+  copy: 'Copier',
+  copied: 'Copié dans le presse-papier',
+  commandTitle: 'Commande',
+  howTitle: 'À la main',
+  noLadder: 'Aucun palier à ce niveau : on n’intervient pas.',
+  saveLadder: 'Enregistrer le barème',
+  cancel: 'Annuler',
+  addRung: 'Ajouter un palier',
+  removeRung: 'Retirer ce palier',
+  conditionPlaceholder: 'Dès constaté, Si récidive…',
+  gravity: 'Gravité à ce niveau',
+  measures: 'Mesures appliquées',
+  ladderSaved: 'Barème enregistré',
+  offenseSaved: 'Fiche enregistrée',
+  generate: 'Générer le panel de référence',
+  generated: 'Panel généré',
+  offenseCreated: 'Infraction ajoutée',
+  offenseRemoved: 'Infraction supprimée',
+  newOffense: 'Nouvelle infraction',
+  newExample: 'Ajouter un exemple',
+  descriptionEmpty: 'Ajouter une description',
+  warningEmpty: 'Ajouter une raison de sanction suggérée',
+  open: 'Ouvrir',
+  rename: 'Renommer',
+  remove: 'Supprimer',
+  removeTitle: 'Supprimer cette infraction ?',
+  removeDescription: 'La fiche disparaît de ce panel, avec ses barèmes à chaque livecon.',
+  ladderEmpty: 'Définir le barème',
+  changeGravity: 'Changer la gravité',
   emptyTitle: 'Aucun panel pour ce créateur',
-  emptyDescription: 'Génère le panel modèle pour commencer, puis ajuste-le.',
-  generate: 'Générer le panel',
-  levelsEmptyTitle: 'Aucun niveau de livecon',
-  levelsEmptyDescription: 'Déclare les niveaux avant de bâtir un panel de sanctions.',
-  configure: 'Ouvrir la configuration',
+  emptyDescription: 'Génère le panel de référence, puis ajuste-le à ce créateur.',
+  unwrittenTitle: 'Panel {panel} en cours d’écriture',
+  unwrittenDescription:
+    'Les règles de cette surface ne sont pas encore rédigées. En attendant, applique le bon sens du panel Twitch et remonte chaque cas limite à ton Responsable.',
+  marshaLink: 'Voir les commandes de Marsha Bot',
   creatorsEmptyTitle: 'Aucun créateur',
   creatorsEmptyDescription: 'Un panel de sanctions appartient à un créateur.',
+  levelsEmptyTitle: 'Aucun niveau de livecon',
+  levelsEmptyDescription:
+    'Les trois niveaux sont fixés en code, ils arrivent au prochain déploiement.',
+  noFunctionTitle: 'Aucun panel pour ta fonction',
+  noFunctionDescription: 'Les panels couvrent les fonctions Lives et Discord.',
 } as const
-
-/**
- * Labels of the ladder steps, the first one covering what is punished on sight
- * @type {readonly string[]}
- */
-
-export const SANCTION_STEPS: readonly string[] = [
-  'Dès constaté',
-  '1ʳᵉ fois',
-  '2ᵉ fois',
-  '3ᵉ fois',
-  '4ᵉ fois',
-  '5ᵉ fois',
-]
-
-/**
- * Read the label of one ladder step
- * @param {number} step - Zero-based rung
- * @return {string} - Step label
- */
-
-export const stepLabel = (step: number): string => SANCTION_STEPS[step] ?? `${step + 1}ᵉ fois`
 
 /**
  * Copy of the sanction form fields
@@ -69,12 +69,14 @@ export const stepLabel = (step: number): string => SANCTION_STEPS[step] ?? `${st
 export const SANCTION_FIELD_COPY = {
   name: 'Titre',
   summary: 'Description',
-  example: 'Exemple',
-  warningExample: 'Exemple de raison d’avertissement',
+  example: 'Exemples à modérer',
+  toleratedExample: 'Exemples à laisser passer',
+  linesHint: 'Un exemple par ligne.',
+  warningExample: 'Raison de sanction suggérée',
   accent: 'Couleur',
   archived: 'Archivée',
   measure: 'Sanction',
-  note: 'Libellé du palier',
+  note: 'Condition',
   kind: 'Nature',
   duration: 'Durée en minutes',
   permanent: 'Définitive',

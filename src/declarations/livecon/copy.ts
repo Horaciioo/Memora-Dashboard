@@ -5,24 +5,13 @@
 
 export const LIVECON_COPY = {
   title: 'Livecon',
-  lead: 'Le niveau de vigilance en cours, YouTubeur par YouTubeur. Plus le niveau est bas, plus la situation est tendue.',
-  currentTitle: 'Niveaux en cours',
-  levelsTitle: 'Les niveaux',
-  historyTitle: 'Historique',
-  change: 'Changer le niveau',
+  gaugeLabel: 'Niveau de livecon',
+  switchTo: 'Passer au {level}',
   changeTitle: 'Changer le livecon',
+  historyTitle: 'Historique du livecon',
+  historyEmpty: 'Aucun changement pour le moment.',
   global: 'Toute l’équipe',
-  since: 'depuis',
-  by: 'par',
-  emptyTitle: 'Aucun niveau déclaré',
-  emptyDescription: 'Crée les niveaux de vigilance dans la configuration pour activer le livecon.',
-  emptyStateTitle: 'Aucun niveau en cours',
-  emptyStateDescription: 'Choisis un niveau pour ouvrir la surveillance.',
-  historyEmptyTitle: 'Aucun changement',
-  historyEmptyDescription: 'Les bascules de niveau s’enregistrent ici.',
   guidelines: 'Consignes',
-  noGuidelines: 'Aucune consigne écrite pour ce niveau.',
-  configure: 'Ouvrir la configuration',
 } as const
 
 /**

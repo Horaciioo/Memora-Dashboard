@@ -6,214 +6,187 @@ import { useMemo, useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Input } from '@/components/elements/forms/Input'
+import { MarshaDetail } from '@/composites/moderation/MarshaDetail'
 import { useCopy } from '@/core/hooks/interaction/useCopy'
+import {
+  MARSHA_CATEGORIES,
+  MARSHA_RESOURCES,
+  MARSHA_RULES,
+  type MarshaCommand,
+} from '@/declarations/marsha/commands'
 import { MARSHA_COPY } from '@/declarations/marsha/copy'
-import { MARSHA_CATEGORIES, MARSHA_RESOURCES, MARSHA_RULES } from '@/declarations/marsha/commands'
-import type { MarshaCommand } from '@/declarations/marsha/commands'
 import { ICONS } from '@/declarations/ui/icons'
 import { MARSHA_GUIDE } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 import { foldText } from '@/utils/format/strings'
 
-/**
- * Written form of a command, required arguments in angles and optional ones in brackets
- * @param {MarshaCommand} command - Command
- * @return {string} - Syntax
- */
-
-const syntaxOf = (command: MarshaCommand): string =>
-  [
-    command.name,
-    ...command.args.map((arg) => (arg.required ? `<${arg.name}>` : `[${arg.name}]`)),
-  ].join(' ')
-
-/**
- * One command card
- * @param {Object} props - Command and copier
- * @return {JSX.Element}
- */
-
-const CommandCard = ({
-  command,
-  onCopy,
-}: {
-  command: MarshaCommand
-  onCopy: (text: string) => void
-}) => {
-  const syntax = syntaxOf(command)
-
-  return (
-    <article id={command.key} className={MARSHA_GUIDE.command}>
-      <header className={MARSHA_GUIDE.commandHead}>
-        <span className={MARSHA_GUIDE.commandName}>{command.name}</span>
-        {command.presence && <span className={MARSHA_GUIDE.presence}>{MARSHA_COPY.presence}</span>}
-      </header>
-      <p className={MARSHA_GUIDE.commandSummary}>{command.summary}</p>
-
-      <span className={MARSHA_GUIDE.syntax}>
-        <code>{syntax}</code>
-        <Button
-          variant="icon"
-          icon="copy"
-          aria-label={MARSHA_COPY.copy}
-          onClick={() => onCopy(syntax)}
-        />
-      </span>
-
-      {command.args.length > 0 && (
-        <div className="flex flex-col gap-1.5">
-          <span className={MARSHA_GUIDE.label}>{MARSHA_COPY.args}</span>
-          <dl className={MARSHA_GUIDE.args}>
-            {command.args.map((arg) => (
-              <div key={arg.name} className="contents">
-                <dt className={MARSHA_GUIDE.argName}>
-                  {`${arg.name} · ${arg.required ? MARSHA_COPY.required : MARSHA_COPY.optional}`}
-                </dt>
-                <dd className={MARSHA_GUIDE.argText}>{arg.description}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      )}
-
-      {command.examples.length > 0 && (
-        <div className="flex flex-col gap-1.5">
-          <span className={MARSHA_GUIDE.label}>{MARSHA_COPY.examples}</span>
-          <div className={MARSHA_GUIDE.examples}>
-            {command.examples.map((example) => (
-              <span key={example} className={MARSHA_GUIDE.syntax}>
-                <code className="min-w-0 truncate">{example}</code>
-                <Button
-                  variant="icon"
-                  icon="copy"
-                  aria-label={MARSHA_COPY.copy}
-                  onClick={() => onCopy(example)}
-                />
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {command.notes.length > 0 && (
-        <div className="flex flex-col gap-1.5">
-          <span className={MARSHA_GUIDE.label}>{MARSHA_COPY.notes}</span>
-          <ul className={MARSHA_GUIDE.notes}>
-            {command.notes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </article>
-  )
-}
+// Section holding the rules of talking to the bot
+const START = 'start'
 
 export interface MarshaGuideProps {
   trainingHref: string | null
 }
 
 /**
- * Marsha Bots handbook: how to talk to the bot, then every command by family, searchable
+ * Marsha Bot handbook in three columns: the families, the commands of the one open, and the
+ * detail of the one picked. A search looks across every family, the rules of talking to the bot
+ * take the place of the commands under "Bien démarrer"
  * @param {string | null} trainingHref - The Marsha training, when it exists
  * @return {JSX.Element}
  */
 
 export const MarshaGuide = ({ trainingHref }: MarshaGuideProps) => {
+  const [section, setSection] = useState<string>(MARSHA_CATEGORIES[0]!.key)
+  const [picked, setPicked] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const copy = useCopy(MARSHA_COPY.copied)
   const needle = foldText(search.trim())
+  const isStart = section === START && !needle
 
-  // Families narrowed to the commands under the search
-  const categories = useMemo(
+  const category = MARSHA_CATEGORIES.find((entry) => entry.key === section)
+
+  // A search lists matches grouped by family, otherwise the commands of the open family
+  const groups = useMemo(
     () =>
-      MARSHA_CATEGORIES.map((category) => ({
-        ...category,
-        commands: category.commands.filter(
-          (command) => !needle || foldText(`${command.name} ${command.summary}`).includes(needle)
-        ),
-      })).filter((category) => category.commands.length > 0),
-    [needle]
+      MARSHA_CATEGORIES.filter((entry) => needle || entry.key === section)
+        .map((entry) => ({
+          ...entry,
+          commands: entry.commands.filter(
+            (command) => !needle || foldText(`${command.name} ${command.summary}`).includes(needle)
+          ),
+        }))
+        .filter((entry) => entry.commands.length > 0),
+    [needle, section]
   )
 
-  return (
-    <div className={MARSHA_GUIDE.layout}>
-      <nav className={MARSHA_GUIDE.index} aria-label={MARSHA_COPY.indexTitle}>
-        <span className={MARSHA_GUIDE.label}>{MARSHA_COPY.indexTitle}</span>
-        <a href="#regles" className={MARSHA_GUIDE.indexLink}>
-          {MARSHA_COPY.rulesTitle}
-        </a>
-        {MARSHA_CATEGORIES.map((category) => {
-          const Icon = ICONS[category.icon]
+  const commands: MarshaCommand[] = groups.flatMap((group) => group.commands)
+  const command = commands.find((entry) => entry.key === picked) ?? commands[0] ?? null
+  const rule = MARSHA_RULES.find((entry) => entry.title === picked) ?? MARSHA_RULES[0]!
 
-          return (
-            <a key={category.key} href={`#${category.key}`} className={MARSHA_GUIDE.indexLink}>
-              <Icon className={MARSHA_GUIDE.indexIcon} aria-hidden="true" />
-              {category.label}
-            </a>
-          )
-        })}
+  const open = (key: string) => {
+    setSection(key)
+    setPicked(null)
+    setSearch('')
+  }
+
+  const Training = ICONS.academy
+
+  return (
+    <div className={MARSHA_GUIDE.page}>
+      <nav className={MARSHA_GUIDE.nav} aria-label={MARSHA_COPY.indexTitle}>
+        <Input
+          type="search"
+          value={search}
+          placeholder={MARSHA_COPY.search}
+          aria-label={MARSHA_COPY.search}
+          className={MARSHA_GUIDE.search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+
+        <div className={MARSHA_GUIDE.navList}>
+          {MARSHA_CATEGORIES.map((entry) => {
+            const Icon = ICONS[entry.icon]
+            const isOn = !needle && section === entry.key
+
+            return (
+              <button
+                key={entry.key}
+                type="button"
+                aria-current={isOn ? 'true' : undefined}
+                className={cn(MARSHA_GUIDE.navItem, isOn && MARSHA_GUIDE.navItemOn)}
+                onClick={() => open(entry.key)}
+              >
+                <Icon
+                  className={cn(MARSHA_GUIDE.navIcon, isOn && MARSHA_GUIDE.navIconOn)}
+                  aria-hidden="true"
+                />
+                {entry.label}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className={MARSHA_GUIDE.navFoot}>
+          <button
+            type="button"
+            aria-current={isStart ? 'true' : undefined}
+            className={cn(MARSHA_GUIDE.navItem, isStart && MARSHA_GUIDE.navItemOn)}
+            onClick={() => open(START)}
+          >
+            <Training
+              className={cn(MARSHA_GUIDE.navIcon, isStart && MARSHA_GUIDE.navIconOn)}
+              aria-hidden="true"
+            />
+            {MARSHA_COPY.startTitle}
+          </button>
+          {trainingHref && (
+            <Link href={trainingHref}>
+              <Button icon="academy">{MARSHA_COPY.training}</Button>
+            </Link>
+          )}
+        </div>
       </nav>
 
-      <div className={MARSHA_GUIDE.main}>
-        <section id="regles" className={MARSHA_GUIDE.category}>
-          <h2 className={MARSHA_GUIDE.categoryTitle}>{MARSHA_COPY.rulesTitle}</h2>
-          <div className={MARSHA_GUIDE.rules}>
-            {MARSHA_RULES.map((rule) => (
-              <div key={rule.title} className={MARSHA_GUIDE.rule}>
-                <span className={MARSHA_GUIDE.ruleTitle}>{rule.title}</span>
-                <Markdown source={rule.body} />
+      <div className={MARSHA_GUIDE.column}>
+        {isStart ? (
+          <>
+            <p className={MARSHA_GUIDE.lead}>{MARSHA_COPY.startLead}</p>
+            {MARSHA_RULES.map((entry) => (
+              <button
+                key={entry.title}
+                type="button"
+                className={cn(MARSHA_GUIDE.item, rule.title === entry.title && MARSHA_GUIDE.itemOn)}
+                onClick={() => setPicked(entry.title)}
+              >
+                <span className={MARSHA_GUIDE.itemText}>{entry.title}</span>
+              </button>
+            ))}
+          </>
+        ) : (
+          <>
+            {!needle && category && <p className={MARSHA_GUIDE.lead}>{category.lead}</p>}
+            {commands.length === 0 && (
+              <p className={MARSHA_GUIDE.empty}>{MARSHA_COPY.searchEmpty}</p>
+            )}
+            {groups.map((group) => (
+              <div key={group.key} className="flex flex-col gap-0.5">
+                {needle && <span className={MARSHA_GUIDE.group}>{group.label}</span>}
+                {group.commands.map((entry) => (
+                  <button
+                    key={entry.key}
+                    type="button"
+                    aria-current={command?.key === entry.key ? 'true' : undefined}
+                    className={cn(
+                      MARSHA_GUIDE.item,
+                      command?.key === entry.key && MARSHA_GUIDE.itemOn
+                    )}
+                    onClick={() => setPicked(entry.key)}
+                  >
+                    <span className={MARSHA_GUIDE.itemName}>{entry.name}</span>
+                    <span className={MARSHA_GUIDE.itemText}>{entry.summary}</span>
+                  </button>
+                ))}
               </div>
             ))}
-          </div>
+          </>
+        )}
+      </div>
+
+      {isStart ? (
+        <article key={rule.title} className={MARSHA_GUIDE.detail}>
+          <h2 className={MARSHA_GUIDE.detailTitle}>{rule.title}</h2>
+          <Markdown source={rule.body} />
           <div className={MARSHA_GUIDE.resources}>
-            {trainingHref && (
-              <Link href={trainingHref}>
-                <Button variant="primary" icon="academy">
-                  {MARSHA_COPY.training}
-                </Button>
-              </Link>
-            )}
             {MARSHA_RESOURCES.map((resource) => (
               <a key={resource.href} href={resource.href} target="_blank" rel="noreferrer noopener">
                 <Button icon="link">{resource.label}</Button>
               </a>
             ))}
           </div>
-        </section>
-
-        <Input
-          type="search"
-          value={search}
-          placeholder={MARSHA_COPY.search}
-          aria-label={MARSHA_COPY.search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
-
-        {categories.length === 0 && (
-          <p className={MARSHA_GUIDE.categoryLead}>{MARSHA_COPY.searchEmpty}</p>
-        )}
-
-        {categories.map((category) => {
-          const Icon = ICONS[category.icon]
-
-          return (
-            <section key={category.key} id={category.key} className={MARSHA_GUIDE.category}>
-              <div className={MARSHA_GUIDE.categoryHead}>
-                <Icon className={MARSHA_GUIDE.categoryIcon} aria-hidden="true" />
-                <h2 className={MARSHA_GUIDE.categoryTitle}>{category.label}</h2>
-              </div>
-              <p className={MARSHA_GUIDE.categoryLead}>{category.lead}</p>
-              {category.commands.map((command) => (
-                <CommandCard
-                  key={command.key}
-                  command={command}
-                  onCopy={(text) => void copy(text)}
-                />
-              ))}
-            </section>
-          )
-        })}
-      </div>
+        </article>
+      ) : (
+        command && <MarshaDetail command={command} onCopy={(text) => void copy(text)} />
+      )}
     </div>
   )
 }

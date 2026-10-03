@@ -27,6 +27,22 @@ export interface SanctionMeasureSeed {
 
 export const SANCTION_MEASURE_TEMPLATE: readonly SanctionMeasureSeed[] = [
   {
+    name: 'Aucune action',
+    kind: 'NONE',
+    durationMinutes: null,
+    permanent: false,
+    weight: 0,
+    accent: 'neutral',
+  },
+  {
+    name: 'Commentaire',
+    kind: 'COMMENT',
+    durationMinutes: null,
+    permanent: false,
+    weight: 5,
+    accent: 'neutral',
+  },
+  {
     name: 'Suppression',
     kind: 'DELETE',
     durationMinutes: null,
@@ -43,11 +59,27 @@ export const SANCTION_MEASURE_TEMPLATE: readonly SanctionMeasureSeed[] = [
     accent: 'success',
   },
   {
+    name: 'TO : 5 minutes',
+    kind: 'TIMEOUT',
+    durationMinutes: 5,
+    permanent: false,
+    weight: 25,
+    accent: 'caution',
+  },
+  {
     name: 'TO : 10 minutes',
     kind: 'TIMEOUT',
     durationMinutes: 10,
     permanent: false,
     weight: 30,
+    accent: 'caution',
+  },
+  {
+    name: 'TO : 30 minutes',
+    kind: 'TIMEOUT',
+    durationMinutes: 30,
+    permanent: false,
+    weight: 35,
     accent: 'caution',
   },
   {
@@ -113,6 +145,14 @@ export const SANCTION_MEASURE_TEMPLATE: readonly SanctionMeasureSeed[] = [
     permanent: true,
     weight: 100,
     accent: 'danger',
+  },
+  {
+    name: 'Signalement',
+    kind: 'REPORT',
+    durationMinutes: null,
+    permanent: false,
+    weight: 101,
+    accent: 'info',
   },
 ]
 

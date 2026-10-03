@@ -1,63 +1,80 @@
 import type { Metadata } from 'next'
+import { EmptyState } from '@/components/elements/feedback/EmptyState'
+import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
-import { SanctionsBoard } from '@/composites/moderation/SanctionsBoard'
-import {
-  liveconFields,
-  listLevels,
-  readCurrentState,
-  readHistory,
-} from '@/core/services/livecon/LiveconService'
-import { listMeasures, offenseFields, readPanel } from '@/core/services/sanctions/SanctionService'
+import { ModerationBoard } from '@/composites/moderation/ModerationBoard'
+import { liveconFields, listLevels, readCurrentState } from '@/core/services/livecon/LiveconService'
+import { listMeasures, panelsFor, readPanel } from '@/core/services/sanctions/SanctionService'
 import { youtuberOptions } from '@/core/services/work/shared'
 import { requirePermission } from '@/core/wrappers/requireUser'
+import { levelOfCreator } from '@/declarations/livecon/levels'
 import { SANCTION_COPY } from '@/declarations/sanctions/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
-import type { SanctionPanelView } from '@/types/sanctions'
 
 export const metadata: Metadata = { title: SANCTION_COPY.title }
 
 /**
- * Moderation board — the livecon in force and the sanction panel it opens
- * @return {Promise<JSX.Element>} - Sanctions page
+ * Livecon and sanction panel of the creator the member works for
+ * @return {Promise<JSX.Element>} - Moderation page
  */
 
 export default async function SanctionsPage() {
-  const { access, scope } = await requirePermission(Permissions.SanctionRead)
+  const { session, access, scope } = await requirePermission(Permissions.SanctionRead)
   const perimeter = await scope()
 
-  const [levels, state, history, creators, measures, switchFields] = await Promise.all([
+  const [levels, state, creators, panels] = await Promise.all([
     listLevels(),
     readCurrentState(perimeter),
-    readHistory(perimeter),
     youtuberOptions(perimeter),
+    panelsFor(session),
+  ])
+
+  // Only the creator in perimeter is ever shown, the active one first
+  const creatorId = perimeter.activeYoutuberId ?? creators[0]?.value ?? null
+
+  const empty = (title: string, description: string) => (
+    <div className={PAGE_STYLES.wrapper}>
+      <PageHeader title={SANCTION_COPY.title} />
+      <EmptyState
+        figure="moderation"
+        title={title}
+        description={description}
+        action={<Badge label={title} tone="neutral" />}
+      />
+    </div>
+  )
+
+  if (levels.length === 0) {
+    return empty(SANCTION_COPY.levelsEmptyTitle, SANCTION_COPY.levelsEmptyDescription)
+  }
+  if (!creatorId) {
+    return empty(SANCTION_COPY.creatorsEmptyTitle, SANCTION_COPY.creatorsEmptyDescription)
+  }
+  if (panels.length === 0) {
+    return empty(SANCTION_COPY.noFunctionTitle, SANCTION_COPY.noFunctionDescription)
+  }
+
+  // The panel opens on the level in force
+  const inForce = levelOfCreator(state, creatorId)?.level.id ?? levels[0]?.id ?? null
+
+  const [panel, measures, switchFields] = await Promise.all([
+    readPanel(perimeter, creatorId, panels[0]!, inForce),
     listMeasures(),
     liveconFields(perimeter),
   ])
 
-  // The panel opens on the level in force, the tightest one when several apply
-  const creatorId = creators[0]?.value ?? ''
-  const inForce =
-    state.find((entry) => entry.youtuber?.id === creatorId) ??
-    state.find((entry) => entry.youtuber === null)
-  const activeLevelId = inForce?.level.id ?? levels[levels.length - 1]?.id ?? null
-
-  const panel: SanctionPanelView = creatorId
-    ? await readPanel(perimeter, creatorId, activeLevelId)
-    : { youtuberId: '', activeLevelId, offenses: [] }
-
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={SANCTION_COPY.title} lead={SANCTION_COPY.lead} />
-      <SanctionsBoard
+      <PageHeader title={SANCTION_COPY.title} />
+      <ModerationBoard
+        creatorId={creatorId}
         levels={levels}
         initialState={state}
-        history={history}
-        creators={creators}
-        measures={measures}
+        panels={panels}
         initialPanel={panel}
+        measures={measures}
         liveconFields={switchFields}
-        offenseFields={offenseFields()}
         canUpdateLivecon={access.can(Permissions.LiveconUpdate)}
         canManageSanctions={access.can(Permissions.SanctionManage)}
       />

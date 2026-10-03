@@ -11,6 +11,7 @@ import { LIVECON_COPY, LIVECON_FIELD_COPY } from '@/declarations/livecon/copy'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { LiveconHistoryEntry, LiveconLevelView, LiveconStateView } from '@/types/livecon'
+import { isIconName } from '@/declarations/ui/icons'
 import type { Prisma } from '@prisma/client'
 
 type LevelRow = Prisma.LiveconLevelGetPayload<{
@@ -27,6 +28,7 @@ const toLevel = (row: LevelRow): LiveconLevelView => ({
   id: row.id,
   level: row.level,
   name: row.name,
+  icon: row.icon && isIconName(row.icon) ? row.icon : null,
   summary: row.summary,
   guidelines: row.guidelines,
   accent: row.accent,
@@ -78,15 +80,21 @@ export const readCurrentState = async (scope: AccessScope): Promise<LiveconState
  * Read the past switches
  * @param {AccessScope} scope - Creator perimeter
  * @param {number} [take] - Entry count
+ * @param {string} [youtuberId] - Narrows to one creator and the team-wide switches
  * @return {Promise<LiveconHistoryEntry[]>} - History entries
  */
 
 export const readHistory = async (
   scope: AccessScope,
-  take: number = PAGINATION_SETTINGS.defaultPerPage
+  take: number = PAGINATION_SETTINGS.defaultPerPage,
+  youtuberId?: string
 ): Promise<LiveconHistoryEntry[]> => {
   const rows = await prisma.liveconEntry.findMany({
-    where: scopedWhere('liveconEntry', scope, {}),
+    where: scopedWhere(
+      'liveconEntry',
+      scope,
+      youtuberId ? { OR: [{ youtuberId }, { youtuberId: null }] } : {}
+    ),
     include: { level: true, youtuber: true, actor: true },
     orderBy: { startedAt: 'desc' },
     take,
@@ -97,6 +105,7 @@ export const readHistory = async (
     scopeLabel: row.youtuber?.name ?? LIVECON_COPY.global,
     levelName: row.level.name,
     level: row.level.level,
+    icon: row.level.icon && isIconName(row.level.icon) ? row.level.icon : null,
     accent: row.level.accent,
     startedAt: row.startedAt.toISOString(),
     endedAt: row.endedAt?.toISOString() ?? null,

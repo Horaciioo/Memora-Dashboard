@@ -2,6 +2,7 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import {
   offenseFields,
   readOffense,
+  removeOffense,
   updateOffense,
 } from '@/core/services/sanctions/SanctionService'
 import { recordEvent } from '@/core/services/system/ActivityService'
@@ -30,5 +31,23 @@ export const PATCH = createProtectedRoute({
     })
 
     return offense
+  },
+})
+
+export const DELETE = createProtectedRoute({
+  permission: Permissions.SanctionManage,
+  descriptor: { summary: 'Drop an offence', tags: ['sanctions'] },
+  handler: async ({ params, session, scope }) => {
+    const name = await removeOffense(await scope(), params.id)
+
+    await recordEvent({
+      eventType: 'SanctionChanged',
+      actorId: session.id,
+      targetType: 'sanctions',
+      targetId: params.id,
+      summary: name,
+    })
+
+    return { id: params.id }
   },
 })

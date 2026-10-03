@@ -73,7 +73,7 @@ const DURATION: MarshaArgument = {
 }
 
 /**
- * Every command of Marsha Bots, the prefix form the team types
+ * Every command of Marsha Bot, the prefix form the team types
  * @type {readonly MarshaCategory[]}
  */
 

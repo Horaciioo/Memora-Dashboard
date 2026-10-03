@@ -9,7 +9,7 @@ import { PAGE_STYLES } from '@/declarations/ui/variants'
 export const metadata: Metadata = { title: MARSHA_COPY.title }
 
 /**
- * Marsha Bots handbook, open to every member
+ * Marsha Bot handbook, open to every member
  * @return {Promise<JSX.Element>} - Handbook page
  */
 
@@ -18,7 +18,7 @@ export default async function MarshaPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={MARSHA_COPY.title} lead={MARSHA_COPY.lead} />
+      <PageHeader title={MARSHA_COPY.title} />
       <MarshaGuide trainingHref={await courseHrefFor(session, 'marsha-bot')} />
     </div>
   )

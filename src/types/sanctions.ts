@@ -1,83 +1,115 @@
+import type {
+  SanctionGravityName,
+  SanctionKindName,
+  SanctionPanelName,
+} from '@/utils/constants/moderation'
+
 /**
- * One measure of the ladder as the panel renders it
+ * One measure a ladder step may apply
  * @typedef {Object} SanctionMeasureView
  * @property {string} id - Measure identifier
  * @property {string} name - Display name
- * @property {string | null} accent - Tone token
+ * @property {SanctionKindName} kind - Nature
+ * @property {number | null} durationMinutes - Timeout length
+ * @property {boolean} permanent - Never lifts on its own
+ * @property {string | null} accent - Tone
  * @property {number} weight - Position on the severity scale
  */
 
 export interface SanctionMeasureView {
   id: string
   name: string
+  kind: SanctionKindName
+  durationMinutes: number | null
+  permanent: boolean
   accent: string | null
   weight: number
 }
 
 /**
- * One rung of one offence inside one panel
- * @typedef {Object} SanctionTierView
- * @property {string} id - Tier identifier
- * @property {number} step - Zero-based rung
- * @property {string | null} note - Label overriding the declared step
- * @property {SanctionMeasureView} measure - Measure applied
+ * One step of a ladder, a condition and the measures applied together
+ * @typedef {Object} SanctionRungView
+ * @property {string} id - Step identifier
+ * @property {number} step - Zero-based position
+ * @property {string | null} condition - When it applies
+ * @property {SanctionMeasureView[]} measures - Measures applied together
  */
 
-export interface SanctionTierView {
+export interface SanctionRungView {
   id: string
   step: number
-  note: string | null
-  measure: SanctionMeasureView
+  condition: string | null
+  measures: SanctionMeasureView[]
 }
 
 /**
- * One offence as the grid renders it, titles only
+ * Tile of one offence on a panel, read at one level
  * @typedef {Object} SanctionOffenseCard
  * @property {string} id - Offence identifier
  * @property {string} name - Display name
- * @property {string | null} accent - Tone token
- * @property {string | null} peakAccent - Tone of the harshest rung of the open panel
+ * @property {SanctionGravityName} gravity - Weight at the level on screen
+ * @property {SanctionRungView | null} firstRung - What applies on sight
+ * @property {number} rungCount - Steps of the ladder
  */
 
 export interface SanctionOffenseCard {
   id: string
   name: string
-  accent: string | null
-  peakAccent: string | null
+  gravity: SanctionGravityName
+  firstRung: SanctionRungView | null
+  rungCount: number
 }
 
 /**
- * One offence opened in full
+ * One offence in full, every level included
  * @typedef {Object} SanctionOffenseDetail
  * @property {string} id - Offence identifier
+ * @property {SanctionPanelName} panel - Surface
  * @property {string} name - Display name
- * @property {string | null} summary - What the offence covers
- * @property {string | null} example - Concrete case
+ * @property {string | null} summary - What it covers, markdown
+ * @property {string[]} examples - Messages to moderate
+ * @property {string[]} tolerated - Close messages left alone
  * @property {string | null} warningExample - Reason a moderator can paste
- * @property {string | null} accent - Tone token
- * @property {Record<string, SanctionTierView[]>} ladders - Rungs per livecon level
+ * @property {Record<string, SanctionGravityName>} gravities - Weight per level identifier
+ * @property {Record<string, SanctionRungView[]>} ladders - Steps per level identifier
  */
 
 export interface SanctionOffenseDetail {
   id: string
+  panel: SanctionPanelName
   name: string
   summary: string | null
-  example: string | null
+  examples: string[]
+  tolerated: string[]
   warningExample: string | null
-  accent: string | null
-  ladders: Record<string, SanctionTierView[]>
+  gravities: Record<string, SanctionGravityName>
+  ladders: Record<string, SanctionRungView[]>
 }
 
 /**
- * The whole panel of one creator
+ * Panel of one creator on one surface, read at one level
  * @typedef {Object} SanctionPanelView
- * @property {string} youtuberId - Creator the panel belongs to
- * @property {string | null} activeLevelId - Level in force, the panel opened by default
- * @property {SanctionOffenseCard[]} offenses - Offence tiles
+ * @property {string} youtuberId - Creator
+ * @property {SanctionPanelName} panel - Surface
+ * @property {string | null} levelId - Level read
+ * @property {SanctionOffenseCard[]} offenses - Tiles
  */
 
 export interface SanctionPanelView {
   youtuberId: string
-  activeLevelId: string | null
+  panel: SanctionPanelName
+  levelId: string | null
   offenses: SanctionOffenseCard[]
+}
+
+/**
+ * One step a manager wants to persist
+ * @typedef {Object} SanctionRungInput
+ * @property {string | null} condition - When it applies
+ * @property {string[]} measureIds - Measures applied together
+ */
+
+export interface SanctionRungInput {
+  condition: string | null
+  measureIds: string[]
 }
