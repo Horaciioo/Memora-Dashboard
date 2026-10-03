@@ -3,6 +3,8 @@ import { PageHeader } from '@/components/structures/PageHeader'
 import { HomeAgenda } from '@/composites/personal/HomeAgenda'
 import { HomeLives } from '@/composites/personal/HomeLives'
 import { HomeQueue } from '@/composites/personal/HomeQueue'
+import { HomeLiveCall } from '@/composites/lives/HomeLiveCall'
+import { readBeacon } from '@/core/services/lives/LiveService'
 import { REVIEW_FIELDS, listReviewQueue } from '@/core/services/absences/AbsenceService'
 import { myRollCalls } from '@/core/services/calendar/attendance'
 import { readCurrentState } from '@/core/services/livecon/LiveconService'
@@ -27,13 +29,16 @@ export default async function DashboardPage() {
 
   const canReview = access.can(Permissions.AbsenceReview)
 
-  const [tasks, rollCalls, meetings, birthdays, requests, livecon] = await Promise.all([
+  const [tasks, rollCalls, meetings, birthdays, requests, livecon, beacon] = await Promise.all([
     myTasks(session, access),
     myRollCalls(session.id),
     myMeetings(session.id, perimeter),
     upcomingBirthdays(perimeter),
     canReview ? listReviewQueue(session.id, access.isAdmin) : Promise.resolve([]),
     access.can(Permissions.LiveconRead) ? readCurrentState(perimeter) : Promise.resolve([]),
+    access.can(Permissions.LiveRead)
+      ? readBeacon(perimeter, session.id, access.can(Permissions.LiveAnnounce))
+      : Promise.resolve(null),
   ])
 
   // Pending requests are the only ones that wait on the member
@@ -42,6 +47,7 @@ export default async function DashboardPage() {
   return (
     <div className={HOME_FLOW.page}>
       <PageHeader title={PERSONAL_COPY.greeting.replace('{name}', session.displayName)} />
+      <HomeLiveCall beacon={beacon} />
       <HomeLives items={livecon} />
       <div className={HOME_FLOW.grid}>
         <HomeQueue
