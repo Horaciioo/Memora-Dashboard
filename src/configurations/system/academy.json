@@ -14,5 +14,6 @@
   "inviteMaxUses": 50,
   "exercisePassPercent": 80,
   "chatLineDelayMs": 900,
-  "chatTypingMs": 700
+  "chatTypingMs": 700,
+  "plungeLineDelayMs": 2400
 }

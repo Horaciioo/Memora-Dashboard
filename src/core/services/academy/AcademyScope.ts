@@ -18,11 +18,13 @@ export const academyScope = (
 ): Prisma.AcademySessionWhereInput => {
   if (access.isAdmin || access.isResponsable) return {}
 
-  const functionIds = [viewer.primaryFunctionId, viewer.secondaryFunctionId].filter(
-    (id): id is string => id !== null
-  )
-
-  return { functionId: { in: functionIds } }
+  // A junior trains under a junior function, their own seat still opens the session
+  return {
+    OR: [
+      { functionId: { in: viewer.functionIds } },
+      { juniors: { some: { accountId: viewer.id } } },
+    ],
+  }
 }
 
 /**

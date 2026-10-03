@@ -176,21 +176,19 @@ export const TRAINING_BLOCK_KIND_REGISTRY = createRegistry(BLOCK_KIND_MAP)
  * @typedef {Object} CourseSurfaceOption
  * @property {string} label - Display name
  * @property {IconName} icon - Glyph
- * @property {string} accent - CSS colour drawing its cover
  */
 
 interface CourseSurfaceOption {
   label: string
   icon: IconName
-  accent: string
 }
 
 const COURSE_SURFACE_MAP: Record<CourseSurface, CourseSurfaceOption> = {
-  general: { label: 'Général', icon: 'academy', accent: 'var(--color-brand-600)' },
-  twitch: { label: 'Twitch', icon: 'functionLive', accent: 'var(--twitch-purple)' },
-  youtube: { label: 'YouTube', icon: 'youtuber', accent: 'var(--youtube-red)' },
-  lives: { label: 'Lives', icon: 'functionLive', accent: 'var(--color-brand-600)' },
-  discord: { label: 'Discord', icon: 'functionDiscord', accent: 'var(--discord-blurple)' },
+  general: { label: 'Général', icon: 'academy' },
+  twitch: { label: 'Twitch', icon: 'functionLive' },
+  youtube: { label: 'YouTube', icon: 'youtuber' },
+  lives: { label: 'Lives', icon: 'functionLive' },
+  discord: { label: 'Discord', icon: 'functionDiscord' },
 }
 
 export const COURSE_SURFACE_REGISTRY = createRegistry(COURSE_SURFACE_MAP)
@@ -215,6 +213,7 @@ const COURSE_KIND_MAP: Record<ExerciseBlock['kind'], CourseKindOption> = {
   simulation: { label: 'Simulation', icon: 'flash' },
   case: { label: 'Étude de cas', icon: 'note' },
   command: { label: 'Commande', icon: 'key' },
+  plunge: { label: 'Plongée', icon: 'flame' },
 }
 
 export const COURSE_KIND_REGISTRY = createRegistry(COURSE_KIND_MAP)

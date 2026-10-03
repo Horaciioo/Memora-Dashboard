@@ -4,13 +4,14 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { StatusText } from '@/components/elements/display/StatusText'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { WipNotice } from '@/components/structures/WipNotice'
 import { CalendarBoard } from '@/composites/calendar/CalendarBoard'
@@ -21,35 +22,35 @@ import {
   ACADEMY_STAGE_REGISTRY,
   ACADEMY_STEP_KIND_REGISTRY,
   ACADEMY_JUNIOR_STATUS_REGISTRY,
+  ACADEMY_SESSION_STATUS_REGISTRY,
   STEP_OWNER_REGISTRY,
 } from '@/declarations/academy/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { toTone, type Tone } from '@/declarations/ui/theme'
-import { LIST_STYLES, TIMELINE_STYLES } from '@/declarations/ui/variants'
+import { ICONS } from '@/declarations/ui/icons'
+import { HOME_STYLES, RECORD_ROW, SESSION_CARD, SESSION_HERO } from '@/declarations/ui/variants'
+import { STAGE_LIST } from '@/declarations/ui/blocks'
+import { AcademyJuniorStatuses, AcademySessionStatuses } from '@/utils/constants/hierarchy'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { AcademyStageName } from '@/utils/constants/hierarchy'
 import type { AcademyStepView, JuniorView, SessionDetail } from '@/types/academy'
 import type { CalendarEntry } from '@/types/calendar'
 import type { FieldDefinition } from '@/types/forms'
 import { cn } from '@/utils/classnames'
+import { GUIDE_BEACONS } from '@/declarations/academy/guides'
+import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { formatDay, formatDayTime } from '@/utils/format/dates'
 
-// Tone carried by each resolved timeline state
-const STATE_TONES: Record<TimelineStepState, Tone> = {
-  done: 'success',
-  late: 'danger',
-  current: 'warning',
-  idle: 'neutral',
+// Chip carried by each resolved timeline state
+const STEP_CHIPS: Record<TimelineStepState, string> = {
+  done: STAGE_LIST.stageChipDone,
+  late: STAGE_LIST.stageChipLate,
+  current: STAGE_LIST.stageChip,
+  idle: STAGE_LIST.stageChipOff,
 }
 
-// Copy carried by each resolved timeline state
-const STATE_LABELS: Record<TimelineStepState, string> = {
-  done: ACADEMY_COPY.stateDone,
-  late: ACADEMY_COPY.stateLate,
-  current: ACADEMY_COPY.stateCurrent,
-  idle: ACADEMY_COPY.stateIdle,
-}
+// Box holding one group of steps
+const TIMELINE_BOX = SESSION_CARD.group
 
 // A thread moment always carries a kind, a timeline step never does
 const isThreadStep = (
@@ -222,76 +223,107 @@ export const SessionPanel = ({
   ]
 
   const juniorsTab = () => (
-    <Section description={ACADEMY_COPY.juniorsLead} bare>
-      {session.juniors.length === 0 ? (
-        <EmptyState
-          figure="academy"
-          title={hasCandidates ? ACADEMY_COPY.juniorEmptyTitle : ACADEMY_COPY.noMembersTitle}
-          description={
-            hasCandidates ? ACADEMY_COPY.juniorEmptyDescription : ACADEMY_COPY.noMembersDescription
-          }
-          action={
-            hasCandidates ? (
-              <Button
-                variant="primary"
-                icon="add"
-                disabled={!canManage}
-                onClick={() => openJunior(null)}
-              >
-                {ACADEMY_COPY.juniorAdd}
-              </Button>
-            ) : (
-              <Button variant="primary" icon="members" onClick={() => router.push(ROUTES.members)}>
-                {ACADEMY_COPY.openMembers}
-              </Button>
-            )
-          }
-        />
-      ) : (
-        <div className={LIST_STYLES.stack}>
-          {session.juniors.map((junior) => {
-            const status = ACADEMY_JUNIOR_STATUS_REGISTRY.get(junior.status)
+    <div {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.sessionJuniors }}>
+      <Section bare>
+        {session.juniors.length === 0 ? (
+          <EmptyState
+            figure="academy"
+            title={hasCandidates ? ACADEMY_COPY.juniorEmptyTitle : ACADEMY_COPY.noMembersTitle}
+            description={
+              hasCandidates
+                ? ACADEMY_COPY.juniorEmptyDescription
+                : ACADEMY_COPY.noMembersDescription
+            }
+            action={
+              hasCandidates ? (
+                <Button
+                  variant="primary"
+                  icon="add"
+                  disabled={!canManage}
+                  onClick={() => openJunior(null)}
+                >
+                  {ACADEMY_COPY.juniorAdd}
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  icon="members"
+                  onClick={() => router.push(ROUTES.members)}
+                >
+                  {ACADEMY_COPY.openMembers}
+                </Button>
+              )
+            }
+          />
+        ) : (
+          <div className={SESSION_CARD.grid}>
+            {session.juniors.map((junior) => {
+              const status = ACADEMY_JUNIOR_STATUS_REGISTRY.get(junior.status)
+              const isActive = junior.status === AcademyJuniorStatuses.Active
+              const progress =
+                junior.trainings.length > 0
+                  ? (junior.completedCount / junior.trainings.length) * 100
+                  : null
 
-            return (
-              <div
-                key={junior.id}
-                onClick={() => router.push(ROUTES.junior(detail.summary.id, junior.id))}
-                onContextMenu={contextMenu(juniorMenu(junior), junior.displayName)}
-                className={cn(LIST_STYLES.item, LIST_STYLES.itemClickable)}
-              >
-                <Avatar name={junior.displayName} src={junior.avatarUrl} />
-                <span className="flex min-w-0 flex-1 flex-col gap-1">
-                  <span className="truncate font-medium">{junior.displayName}</span>
-                  <span className="flex flex-wrap items-center gap-1.5">
-                    <Badge
-                      label={junior.dispositif.name}
-                      accent={junior.dispositif.accent}
-                      tone={'info'}
-                    />
-                    <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />
-                    <span className="text-xs text-[var(--color-ink-subtle)]">
+              return (
+                <article
+                  key={junior.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => router.push(ROUTES.junior(detail.summary.id, junior.id))}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter')
+                      router.push(ROUTES.junior(detail.summary.id, junior.id))
+                  }}
+                  onContextMenu={contextMenu(juniorMenu(junior), junior.displayName)}
+                  className={SESSION_CARD.card}
+                >
+                  <div className={SESSION_CARD.head}>
+                    <Avatar name={junior.displayName} src={junior.avatarUrl} size="lg" />
+                    <div className={SESSION_CARD.body}>
+                      <span className={SESSION_CARD.title}>{junior.displayName}</span>
+                      <span
+                        className={junior.dispositif ? SESSION_CARD.meta : SESSION_CARD.metaPending}
+                      >
+                        {junior.dispositif?.name ?? ACADEMY_COPY.awaitingConfirmation}
+                      </span>
+                      {!isActive && (
+                        <StatusText label={status.label} accent={status.accent} className="mt-1" />
+                      )}
+                    </div>
+                  </div>
+
+                  {progress !== null && (
+                    <div className={SESSION_CARD.track} aria-hidden="true">
+                      <div className={SESSION_CARD.fill} style={{ width: `${progress}%` }} />
+                    </div>
+                  )}
+
+                  <div className={SESSION_CARD.foot}>
+                    <span className={SESSION_CARD.date}>
                       {junior.trainer?.name ?? ACADEMY_COPY.noTrainer}
                     </span>
-                  </span>
-                </span>
-                <span className="shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums">
-                  {`${junior.completedCount} / ${junior.trainings.length} · ${junior.liveCount} ${ACADEMY_COPY.lives}`}
-                </span>
-              </div>
-            )
-          })}
-          <AddRow
-            label={ACADEMY_COPY.juniorAdd}
-            disabled={!canManage || !hasCandidates}
-            onClick={() => openJunior(null)}
-          />
-        </div>
-      )}
-    </Section>
+                    <span className={SESSION_CARD.date}>
+                      {ACADEMY_STAGE_REGISTRY.label(junior.stage)}
+                    </span>
+                  </div>
+                </article>
+              )
+            })}
+            <AddRow
+              tile
+              label={ACADEMY_COPY.juniorAdd}
+              disabled={!canManage || !hasCandidates}
+              onClick={() => openJunior(null)}
+            />
+          </div>
+        )}
+      </Section>
+    </div>
   )
 
   const threadTab = () => (
-    <Section description={ACADEMY_COPY.threadLead} bare>
+    <Section raised={threadSteps.length > 0} bare={threadSteps.length === 0}>
       {threadSteps.length === 0 ? (
         <EmptyState
           figure="notes"
@@ -309,46 +341,38 @@ export const SessionPanel = ({
           }
         />
       ) : (
-        <div className={LIST_STYLES.stack}>
-          <ol className={TIMELINE_STYLES.list}>
-            {threadSteps.map((step) => {
-              const kind = ACADEMY_STEP_KIND_REGISTRY.get(step.kind)
-              const tone = toTone(kind.accent, 'neutral')
+        <div className={HOME_STYLES.rows}>
+          {threadSteps.map((step) => {
+            const kind = ACADEMY_STEP_KIND_REGISTRY.get(step.kind)
+            const KindIcon = ICONS[kind.icon]
 
-              return (
-                <li
-                  key={step.id}
-                  onContextMenu={contextMenu(stepMenu(step), step.title)}
-                  className={TIMELINE_STYLES.item}
-                >
-                  <span className={TIMELINE_STYLES.rail} aria-hidden="true" />
-                  <span
-                    className={cn(TIMELINE_STYLES.dot, step.doneAt ? 'bg-current' : '')}
-                    aria-hidden="true"
-                  />
-                  <span className={TIMELINE_STYLES.body}>
-                    <span className="flex flex-wrap items-center gap-2">
-                      <Badge label={kind.label} tone={tone} icon={kind.icon} />
-                      <span className="font-medium">{step.title}</span>
-                      <Badge
-                        label={step.doneAt ? ACADEMY_COPY.eventDone : ACADEMY_COPY.eventPlanned}
-                        tone={step.doneAt ? 'success' : 'warning'}
-                        dot
-                      />
-                    </span>
-                    <span className={TIMELINE_STYLES.meta}>
-                      {[formatDayTime(step.scheduledAt), step.juniorName, step.authorName]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </span>
-                    {step.notes && (
-                      <span className="text-sm whitespace-pre-wrap">{step.notes}</span>
-                    )}
+            return (
+              <div
+                key={step.id}
+                onContextMenu={contextMenu(stepMenu(step), step.title)}
+                className={cn(HOME_STYLES.line, HOME_STYLES.item, 'items-start')}
+              >
+                <span className={HOME_STYLES.chip}>
+                  <KindIcon className={HOME_STYLES.chipIcon} aria-hidden="true" />
+                </span>
+                <span className={RECORD_ROW.body}>
+                  <span className={RECORD_ROW.title}>{step.title}</span>
+                  <span className={RECORD_ROW.meta}>
+                    {[formatDayTime(step.scheduledAt), step.juniorName, step.authorName]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </span>
-                </li>
-              )
-            })}
-          </ol>
+                  {step.notes && (
+                    <span className="pt-1 text-sm whitespace-pre-wrap">{step.notes}</span>
+                  )}
+                </span>
+                <StatusText
+                  label={step.doneAt ? ACADEMY_COPY.eventDone : ACADEMY_COPY.eventPlanned}
+                  accent={step.doneAt ? 'success' : 'warning'}
+                />
+              </div>
+            )
+          })}
           <AddRow
             label={ACADEMY_COPY.eventAdd}
             disabled={!canManage}
@@ -359,35 +383,38 @@ export const SessionPanel = ({
     </Section>
   )
 
-  const renderTimelineStep = (step: AcademyStepView & { stage: AcademyStageName }) => {
+  const renderTimelineStep = (
+    step: AcademyStepView & { stage: AcademyStageName },
+    index: number,
+    all: (AcademyStepView & { stage: AcademyStageName })[]
+  ) => {
     const state = step.state ?? 'idle'
     const isValidated = step.validatedAt !== null
+    const Glyph = ICONS[state === 'done' ? 'success' : state === 'late' ? 'warning' : 'clock']
 
     return (
-      <li key={step.id} className={TIMELINE_STYLES.item}>
-        <span className={TIMELINE_STYLES.rail} aria-hidden="true" />
-        <span
-          className={cn(TIMELINE_STYLES.dot, isValidated ? 'bg-current' : '')}
-          aria-hidden="true"
-        />
-        <span className={TIMELINE_STYLES.body}>
-          <span className="flex flex-wrap items-center gap-2">
-            <span className="font-medium">{step.title}</span>
-            <Badge label={ACADEMY_STAGE_REGISTRY.label(step.stage)} tone="neutral" dot />
-            <Badge label={STATE_LABELS[state]} tone={STATE_TONES[state]} />
+      <li key={step.id} className={STAGE_LIST.stage}>
+        {index < all.length - 1 && <span className={STAGE_LIST.stageRail} aria-hidden="true" />}
+        <span className={STEP_CHIPS[state]}>
+          <Glyph className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <div className={STAGE_LIST.stageBody}>
+          <span className="flex items-start gap-2">
+            <span className={STAGE_LIST.stageTitle}>{step.title}</span>
             {canManage && (
               <Button
                 variant="icon"
                 icon={isValidated ? 'close' : 'confirm'}
                 aria-label={isValidated ? ACADEMY_COPY.stepReopen : ACADEMY_COPY.stepValidate}
-                className="ml-auto"
+                className="-mt-1 ml-auto"
                 disabled={!isValidated && blocked.has(step.id)}
                 onClick={() => void session.setStepValidated(step.id, !isValidated)}
               />
             )}
           </span>
-          <span className={TIMELINE_STYLES.meta}>
+          <span className={STAGE_LIST.stageLead}>
             {[
+              ACADEMY_STAGE_REGISTRY.label(step.stage),
               step.scheduledAt ? formatDay(step.scheduledAt) : null,
               step.owner ? STEP_OWNER_REGISTRY.label(step.owner) : null,
               step.validatedByName,
@@ -396,52 +423,45 @@ export const SessionPanel = ({
               .join(' · ')}
           </span>
           {step.notes && <span className="text-sm whitespace-pre-wrap">{step.notes}</span>}
-        </span>
+        </div>
       </li>
     )
   }
 
   const timelineTab = () => (
-    <Section description={ACADEMY_COPY.timelineLead} bare>
+    <Section bare>
       {timelineSteps.length === 0 ? (
         <EmptyState
           figure="academy"
           title={ACADEMY_COPY.timelineEmptyTitle}
           description={ACADEMY_COPY.timelineEmptyDescription}
           action={
-            <Link href={ROUTES.settingsSection('etapes-pim')}>
-              <Button variant="primary" icon="settings">
-                {ACADEMY_COPY.configure}
+            <Link href={ROUTES.academy}>
+              <Button variant="primary" icon="academy">
+                {ACADEMY_COPY.openSessions}
               </Button>
             </Link>
           }
         />
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           {sessionWideSteps.length > 0 && (
-            <article className={LIST_STYLES.card}>
-              <header className="flex items-center gap-2">
-                <span className="font-medium">{ACADEMY_COPY.timelineSessionWide}</span>
-              </header>
-              <ol className={TIMELINE_STYLES.list}>{sessionWideSteps.map(renderTimelineStep)}</ol>
-            </article>
+            <section className={TIMELINE_BOX}>
+              <h3 className={SESSION_CARD.groupTitle}>{ACADEMY_COPY.timelineSessionWide}</h3>
+              <ol>{sessionWideSteps.map(renderTimelineStep)}</ol>
+            </section>
           )}
           {juniorGroups.map((group) => (
-            <article key={group.junior.id} className={LIST_STYLES.card}>
+            <section key={group.junior.id} className={TIMELINE_BOX}>
               <header
-                className="flex cursor-pointer items-center gap-2"
+                className={SESSION_CARD.groupHead}
                 onClick={() => router.push(ROUTES.junior(detail.summary.id, group.junior.id))}
               >
                 <Avatar name={group.junior.displayName} src={group.junior.avatarUrl} />
-                <span className="font-medium">{group.junior.displayName}</span>
-                <Badge
-                  label={group.junior.dispositif.name}
-                  accent={group.junior.dispositif.accent}
-                  tone={'info'}
-                />
+                <h3 className={SESSION_CARD.groupTitle}>{group.junior.displayName}</h3>
               </header>
-              <ol className={TIMELINE_STYLES.list}>{group.steps.map(renderTimelineStep)}</ol>
-            </article>
+              <ol>{group.steps.map(renderTimelineStep)}</ol>
+            </section>
           ))}
         </div>
       )}
@@ -460,8 +480,26 @@ export const SessionPanel = ({
     />
   )
 
+  const sessionStatus = ACADEMY_SESSION_STATUS_REGISTRY.get(detail.summary.status)
+
   return (
     <>
+      <div className={SESSION_HERO.card}>
+        <div>
+          <div className={SESSION_HERO.body}>
+            <div className={SESSION_HERO.facts}>
+              <h2 className={SESSION_HERO.title}>{detail.summary.function.name}</h2>
+              <div className={SESSION_HERO.meta}>
+                {detail.summary.status !== AcademySessionStatuses.Running && (
+                  <StatusText label={sessionStatus.label} accent={sessionStatus.accent} />
+                )}
+                <span>{formatDay(detail.summary.startsAt)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <FileTabs
         label={ACADEMY_COPY.title}
         tabs={[
@@ -498,7 +536,8 @@ export const SessionPanel = ({
         ]}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.junior}
         open={dialog === 'junior'}
         title={editingJunior ? editingJunior.displayName : ACADEMY_COPY.juniorAdd}
         description={formatDay(detail.summary.startsAt)}
@@ -506,21 +545,20 @@ export const SessionPanel = ({
         initialValues={editingJunior?.values}
         issues={session.issues}
         isSaving={session.isSaving}
-        size="lg"
         onSubmit={(values) =>
           editingJunior ? session.editJunior(editingJunior.id, values) : session.addJunior(values)
         }
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.academyStep}
         open={dialog === 'step'}
         title={editingStep ? editingStep.title : ACADEMY_COPY.eventAdd}
         fields={stepFields}
         initialValues={editingStep?.values}
         issues={session.issues}
         isSaving={session.isSaving}
-        size="lg"
         onSubmit={(values) =>
           editingStep ? session.editStep(editingStep.id, values) : session.addStep(values)
         }

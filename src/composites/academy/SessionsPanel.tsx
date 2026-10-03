@@ -2,25 +2,30 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { AvatarStack } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { StatusText } from '@/components/elements/display/StatusText'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { useSessions } from '@/core/hooks/data/useAcademy'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ACADEMY_SESSION_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { ROUTES } from '@/declarations/navigation'
-import { ACTION_COPY } from '@/declarations/ui/copy'
+import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 
-import { LIST_STYLES } from '@/declarations/ui/variants'
+import { GROUP_STYLES, SESSION_CARD } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { SessionSummary } from '@/types/academy'
 import type { FieldDefinition } from '@/types/forms'
-import { cn } from '@/utils/classnames'
+import {
+  AcademySessionStatuses,
+  FINISHED_ACADEMY_SESSION_STATUSES,
+} from '@/utils/constants/hierarchy'
 import { formatDay } from '@/utils/format/dates'
 
 export interface SessionsPanelProps {
@@ -29,8 +34,10 @@ export interface SessionsPanelProps {
   canManage: boolean
 }
 
+// Glyph of a session
+
 /**
- * Academy board, one card per session, each opening its own follow-up screen
+ * Academy board, one row per session, each opening its own follow-up screen
  * @param {SessionSummary[]} initialSessions - Sessions resolved server-side
  * @param {FieldDefinition[]} fields - Declarations of the session form
  * @param {boolean} canManage - Member may open and close sessions
@@ -43,6 +50,9 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
     useSessions(initialSessions)
   const { contextMenu } = useMenu()
   const [isCreating, setCreating] = useState(false)
+  const [showFinished, setShowFinished] = useState(false)
+  // Read once, a progress bar needs no ticking clock
+  const [now] = useState(() => Date.now())
   const [editing, setEditing] = useState<SessionSummary | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<SessionSummary | null>(null)
 
@@ -79,100 +89,124 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
     },
   ]
 
-  return (
-    <>
-      <Section bare>
-        {sessions.length === 0 ? (
-          <EmptyState
-            figure="academy"
-            title={ACADEMY_COPY.emptyTitle}
-            description={ACADEMY_COPY.emptyDescription}
-            action={
-              <Button variant="primary" icon="add" disabled={!canManage} onClick={openCreate}>
-                {ACADEMY_COPY.sessionAdd}
-              </Button>
-            }
-          />
-        ) : (
-          <div className={LIST_STYLES.grid}>
-            {sessions.map((session) => {
-              const jobFunction = session.function
-              const status = ACADEMY_SESSION_STATUS_REGISTRY.get(session.status)
+  // Running sessions first, the finished ones below
+  const [running, finished] = [
+    sessions.filter((entry) => !FINISHED_ACADEMY_SESSION_STATUSES.includes(entry.status)),
+    sessions.filter((entry) => FINISHED_ACADEMY_SESSION_STATUSES.includes(entry.status)),
+  ]
 
-              return (
-                <article
-                  key={session.id}
-                  onClick={() => router.push(ROUTES.session(session.id))}
-                  onContextMenu={contextMenu(sessionMenu(session), jobFunction.name)}
-                  className={cn(LIST_STYLES.card, LIST_STYLES.cardClickable)}
-                >
-                  <header className="flex flex-wrap items-center gap-2">
-                    <Badge
-                      label={jobFunction.name}
-                      accent={jobFunction.accent}
-                      tone={'brand'}
-                      dot
-                    />
-                    <span className="text-sm font-bold">{formatDay(session.startsAt)}</span>
-                    <Badge
-                      label={status.label}
-                      accent={status.accent}
-                      tone={'neutral'}
-                      dot
-                      className="ml-auto"
-                    />
-                  </header>
-                  {jobFunction.summary && (
-                    <p className="text-xs text-[var(--color-ink-subtle)]">{jobFunction.summary}</p>
-                  )}
-                  <footer className="flex items-center justify-between gap-2">
-                    {session.trainers.length > 0 ? (
-                      <AvatarStack people={session.trainers} />
-                    ) : (
-                      <span className="text-xs text-[var(--color-ink-subtle)] italic">
-                        {ACADEMY_COPY.noTrainer}
-                      </span>
-                    )}
-                    <span className="text-xs text-[var(--color-ink-subtle)] tabular-nums">
-                      {`${session.juniorCount} ${
-                        session.juniorCount === 1
-                          ? ACADEMY_COPY.sessionCountOne
-                          : ACADEMY_COPY.sessionCount
-                      }`}
-                    </span>
-                  </footer>
-                </article>
-              )
-            })}
-            <AddRow
-              label={ACADEMY_COPY.sessionAdd}
-              disabled={!canManage}
-              tile
-              onClick={openCreate}
-            />
+  const card = (session: SessionSummary) => {
+    const status = ACADEMY_SESSION_STATUS_REGISTRY.get(session.status)
+    const isFinished = FINISHED_ACADEMY_SESSION_STATUSES.includes(session.status)
+    // Inside the running group every card says so, only the others need their state
+    const isRunning = session.status === AcademySessionStatuses.Running
+
+    // How far the session went between its two dates
+    const startsAt = new Date(session.startsAt).getTime()
+    const endsAt = session.endsAt ? new Date(session.endsAt).getTime() : null
+    const progress =
+      endsAt && endsAt > startsAt && !isFinished
+        ? Math.min(Math.max(((now - startsAt) / (endsAt - startsAt)) * 100, 0), 100)
+        : null
+
+    return (
+      <article
+        key={session.id}
+        role="button"
+        tabIndex={0}
+        onClick={() => router.push(ROUTES.session(session.id))}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') router.push(ROUTES.session(session.id))
+        }}
+        onContextMenu={contextMenu(sessionMenu(session), session.function.name)}
+        className={cn(SESSION_CARD.card, isFinished && SESSION_CARD.muted)}
+      >
+        <div className={SESSION_CARD.head}>
+          <div className={SESSION_CARD.body}>
+            <span className={SESSION_CARD.title}>{session.function.name}</span>
+            <span className={SESSION_CARD.meta}>{formatDay(session.startsAt)}</span>
+            {!isRunning && (
+              <StatusText label={status.label} accent={status.accent} className="mt-1" />
+            )}
+          </div>
+        </div>
+
+        {progress !== null && (
+          <div className={SESSION_CARD.track} aria-hidden="true">
+            <div className={SESSION_CARD.fill} style={{ width: `${progress}%` }} />
           </div>
         )}
-      </Section>
+      </article>
+    )
+  }
 
-      <FormDialog
+  const pageOptions: PageOption[] =
+    finished.length > 0
+      ? [
+          {
+            id: 'finished',
+            label: PAGE_OPTIONS_COPY.showFinished,
+            checked: showFinished,
+            onChange: setShowFinished,
+          },
+        ]
+      : []
+
+  return (
+    <>
+      {sessions.length === 0 ? (
+        <EmptyState
+          figure="academy"
+          title={ACADEMY_COPY.emptyTitle}
+          description={ACADEMY_COPY.emptyDescription}
+          action={
+            <Button variant="primary" icon="add" disabled={!canManage} onClick={openCreate}>
+              {ACADEMY_COPY.sessionAdd}
+            </Button>
+          }
+        />
+      ) : (
+        <div className={GROUP_STYLES.spaced}>
+          <PageOptions options={pageOptions} />
+          <Section title={ACADEMY_COPY.groupRunning} bare>
+            <div className={SESSION_CARD.grid}>
+              {running.map(card)}
+              <AddRow
+                tile
+                label={ACADEMY_COPY.sessionAdd}
+                disabled={!canManage}
+                onClick={openCreate}
+              />
+            </div>
+          </Section>
+
+          {showFinished && finished.length > 0 && (
+            <Section title={ACADEMY_COPY.groupFinished} bare>
+              <div className={SESSION_CARD.grid}>{finished.map(card)}</div>
+            </Section>
+          )}
+        </div>
+      )}
+
+      <FormDrawer
+        subject={FORM_SUBJECTS.session}
         open={isCreating}
         title={ACADEMY_COPY.sessionAdd}
         fields={fields}
         issues={issues}
         isSaving={isSaving}
-        size="lg"
         onSubmit={create}
         onClose={() => setCreating(false)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.session}
         open={editing !== null}
         title={ACTION_COPY.edit}
         fields={fields}
         initialValues={editing?.values}
         issues={issues}
         isSaving={isSaving}
-        size="lg"
         onSubmit={(values) => update(editing!.id, values)}
         onClose={() => setEditing(null)}
       />

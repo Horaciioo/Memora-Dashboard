@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Badge } from '@/components/elements/display/Badge'
+import { StatusText } from '@/components/elements/display/StatusText'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Button } from '@/components/elements/actions/Button'
 import { Progress } from '@/components/elements/feedback/Progress'
@@ -12,14 +12,20 @@ import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FileTabs } from '@/components/structures/FileTabs'
-import { FormDialog } from '@/components/structures/FormDialog'
+import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
 import { StepTimeline, type TimelineStep } from '@/components/structures/StepTimeline'
+import { JuniorRail } from '@/composites/academy/JuniorRail'
+import { MEMBER_FILE } from '@/declarations/ui/blocks'
+import { PimTimelineBoard } from '@/composites/academy/PimTimelineBoard'
+import { FSI_TABS, GUIDE_BEACONS } from '@/declarations/academy/guides'
+import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
+import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
 import { useJuniorFile } from '@/core/hooks/data/useJuniorFile'
-import { ACADEMY_COPY, ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
+import { COURSE_COPY, ACADEMY_COPY, ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
 import {
-  ACADEMY_JUNIOR_STATUS_REGISTRY,
   ACADEMY_STAGE_REGISTRY,
   NOTE_KIND_REGISTRY,
   OBJECTIVE_STATUS_REGISTRY,
@@ -30,9 +36,10 @@ import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 
-import { LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
+import { LIST_STYLES, SECTION_STYLES, SESSION_CARD } from '@/declarations/ui/variants'
 import type {
   AcademyReviewView,
+  PimTimeline,
   JuniorNoteView,
   JuniorObjectiveView,
   JuniorSkillView,
@@ -44,7 +51,6 @@ import { cn } from '@/utils/classnames'
 import { formatDay } from '@/utils/format/dates'
 
 // Reference collection holding the training modules
-const TRAINING_SECTION = 'formations'
 
 // Single drop container, objectives only reorder within their own list
 const CONTAINER = 'objectives'
@@ -55,6 +61,8 @@ export interface JuniorFileProps {
   initialNotes: JuniorNoteView[]
   initialObjectives: JuniorObjectiveView[]
   initialReviews: AcademyReviewView[]
+  initialTimeline: PimTimeline
+  initialTab?: string
   sessionFunctionName: string
   juniorFields: FieldDefinition[]
   noteFields: FieldDefinition[]
@@ -77,6 +85,8 @@ export interface JuniorFileProps {
  * @param {JuniorNoteView[]} initialNotes - Notes resolved server-side
  * @param {JuniorObjectiveView[]} initialObjectives - Objectives resolved server-side
  * @param {AcademyReviewView[]} initialReviews - Check-ins resolved server-side
+ * @param {PimTimeline} initialTimeline - Vertical timeline resolved server-side
+ * @param {string} [initialTab] - Tab a walkthrough opens on
  * @param {string} sessionFunctionName - Function the session is scoped to
  * @param {FieldDefinition[]} juniorFields - Declarations of the junior form
  * @param {FieldDefinition[]} noteFields - Declarations of the note form
@@ -99,6 +109,8 @@ export const JuniorFile = ({
   initialNotes,
   initialObjectives,
   initialReviews,
+  initialTimeline,
+  initialTab,
   sessionFunctionName,
   juniorFields,
   noteFields,
@@ -120,7 +132,8 @@ export const JuniorFile = ({
     initialObjectives,
     initialReviews
   )
-  const [tab, setTab] = useState('informations')
+  const gestures = useEditGestures()
+  const [tab, setTab] = useState(initialTab ?? FSI_TABS.timeline)
   const [dialog, setDialog] = useState<'junior' | 'note' | 'objective' | 'review' | null>(null)
   const [editingNote, setEditingNote] = useState<JuniorNoteView | null>(null)
   const [editingObjective, setEditingObjective] = useState<JuniorObjectiveView | null>(null)
@@ -134,7 +147,6 @@ export const JuniorFile = ({
   } | null>(null)
 
   const { junior } = file
-  const status = ACADEMY_JUNIOR_STATUS_REGISTRY.get(junior.status)
   const isReady = junior.mandatoryPending === 0
 
   const stageKeys = ACADEMY_STAGE_REGISTRY.keys
@@ -185,21 +197,22 @@ export const JuniorFile = ({
     void file.reorderObjectives(without)
   })
 
+  // Walkthrough anchor
+  const beacon = (name: string) => ({ [BEACON_ATTRIBUTE]: name })
+
+  const timelineTab = () => (
+    <Section title={ACADEMY_COPY.timelineTab} raised>
+      <PimTimelineBoard initialTimeline={initialTimeline} canAdvance={canManage} />
+    </Section>
+  )
+
   const informationsTab = () => (
-    <Section title={ACADEMY_COPY.tabInformations} padded>
+    <Section title={ACADEMY_COPY.tabInformations} raised>
       <div className="flex flex-col gap-4">
-        <span className="flex flex-wrap items-center gap-2">
-          <Badge label={junior.dispositif.name} accent={junior.dispositif.accent} tone={'info'} />
-          <Badge label={sessionFunctionName} tone="neutral" />
-          <Badge label={status.label} accent={status.accent} tone={'neutral'} dot />
-          <Badge
-            label={isReady ? ACADEMY_COPY.ready : ACADEMY_COPY.blocked}
-            tone={isReady ? 'success' : 'warning'}
-          />
+        <span className="flex justify-end" {...beacon(GUIDE_BEACONS.fsiEdit)}>
           <Button
             variant="primary"
             icon="edit"
-            className="ml-auto"
             disabled={!canManage}
             onClick={() => {
               file.clearIssues()
@@ -225,493 +238,516 @@ export const JuniorFile = ({
             { label: ACADEMY_FIELD_COPY.juniorSummary, value: junior.summary },
           ]}
         />
-        <Progress
-          value={junior.completedCount}
-          max={Math.max(junior.trainings.length, 1)}
-          label={ACADEMY_COPY.progression}
-        />
-        <Progress value={skillAverage} label={ACADEMY_COPY.tabCompetences} />
       </div>
     </Section>
   )
 
   const trainingsTab = () => (
-    <Section title={ACADEMY_COPY.progression} description={ACADEMY_COPY.progressionLead} bare>
-      {junior.trainings.length === 0 ? (
-        <EmptyState
-          figure="academy"
-          title={ACADEMY_COPY.noTrainingsTitle}
-          description={ACADEMY_COPY.noTrainingsDescription}
-          action={
-            <Link href={ROUTES.settingsSection(TRAINING_SECTION)}>
-              <Button variant="primary" icon="settings">
-                {ACADEMY_COPY.configure}
-              </Button>
-            </Link>
-          }
-        />
-      ) : (
-        <div
-          className={cn(SECTION_STYLES.panel, SECTION_STYLES.panelPadded, 'flex flex-col gap-0.5')}
-        >
-          {junior.trainings.map((training) => (
-            <Checkbox
-              key={training.id}
-              checked={training.completedAt !== null}
-              disabled={!canManage || file.isSaving}
-              onChange={(checked) => void file.setTraining(training.id, checked)}
-              label={training.name}
-              hint={
-                training.completedAt
-                  ? [formatDay(training.completedAt), training.validatorName]
-                      .filter(Boolean)
-                      .join(' · ')
-                  : training.mandatory
-                    ? ACADEMY_COPY.mandatory
-                    : undefined
-              }
-            />
-          ))}
-        </div>
-      )}
-    </Section>
+    <div {...beacon(GUIDE_BEACONS.fsiTrainings)}>
+      <Section title={ACADEMY_COPY.progression} description={ACADEMY_COPY.progressionLead} bare>
+        {junior.trainings.length === 0 ? (
+          <EmptyState
+            figure="academy"
+            title={ACADEMY_COPY.noTrainingsTitle}
+            description={ACADEMY_COPY.noTrainingsDescription}
+            action={
+              <Link href={ROUTES.trainings}>
+                <Button variant="primary" icon="academy">
+                  {ACADEMY_COPY.openCatalogue}
+                </Button>
+              </Link>
+            }
+          />
+        ) : (
+          <div
+            className={cn(
+              SECTION_STYLES.panel,
+              SECTION_STYLES.panelPadded,
+              'flex flex-col gap-0.5'
+            )}
+          >
+            {junior.trainings.map((training) => (
+              <Checkbox
+                key={training.id}
+                checked={training.completedAt !== null}
+                // An interactive course closes by its own exercises
+                disabled={!canManage || file.isSaving || training.exercises !== null}
+                onChange={(checked) => void file.setTraining(training.id, checked)}
+                label={training.name}
+                hint={
+                  [
+                    training.exercises
+                      ? COURSE_COPY.progress(training.exercises.passed, training.exercises.total) +
+                        ` ${COURSE_COPY.exercisesUnit}`
+                      : null,
+                    training.completedAt ? formatDay(training.completedAt) : null,
+                    training.completedAt ? training.validatorName : null,
+                    !training.completedAt && training.mandatory ? ACADEMY_COPY.mandatory : null,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ') || undefined
+                }
+              />
+            ))}
+          </div>
+        )}
+      </Section>
+    </div>
   )
 
   const skillsTab = () => (
-    <Section title={ACADEMY_COPY.tabCompetences} description={ACADEMY_COPY.skillsLead} bare>
-      {file.skills.length === 0 ? (
-        <EmptyState
-          figure="academy"
-          title={ACADEMY_COPY.noTrainingsTitle}
-          description={ACADEMY_COPY.noTrainingsDescription}
-          action={
-            <Link href={ROUTES.settingsSection('competences')}>
-              <Button variant="primary" icon="settings">
-                {ACADEMY_COPY.configure}
-              </Button>
-            </Link>
-          }
-        />
-      ) : (
-        <div className="flex flex-col gap-4">
-          {Object.values(
-            file.skills.reduce<
-              Record<string, { name: string; accent: string | null; items: typeof file.skills }>
-            >((groups, skill) => {
-              const group = groups[skill.categoryId] ?? {
-                name: skill.categoryName,
-                accent: skill.categoryAccent,
-                items: [],
-              }
-              group.items.push(skill)
-              groups[skill.categoryId] = group
+    <div {...beacon(GUIDE_BEACONS.fsiSkills)}>
+      <Section title={ACADEMY_COPY.tabCompetences} description={ACADEMY_COPY.skillsLead} bare>
+        {file.skills.length === 0 ? (
+          <EmptyState
+            figure="academy"
+            title={ACADEMY_COPY.noTrainingsTitle}
+            description={ACADEMY_COPY.noTrainingsDescription}
+            action={
+              <Link href={ROUTES.academy}>
+                <Button variant="primary" icon="academy">
+                  {ACADEMY_COPY.openSessions}
+                </Button>
+              </Link>
+            }
+          />
+        ) : (
+          <div className="flex flex-col gap-4">
+            {Object.values(
+              file.skills.reduce<
+                Record<string, { name: string; accent: string | null; items: typeof file.skills }>
+              >((groups, skill) => {
+                const group = groups[skill.categoryId] ?? {
+                  name: skill.categoryName,
+                  accent: skill.categoryAccent,
+                  items: [],
+                }
+                group.items.push(skill)
+                groups[skill.categoryId] = group
 
-              return groups
-            }, {})
-          ).map((group) => (
-            <article key={group.name} className={LIST_STYLES.card}>
-              <header className="flex items-center gap-2">
-                <Badge label={group.name} accent={group.accent} tone={'neutral'} />
-              </header>
-              <div className="flex flex-col gap-4">
-                {group.items.map((skill) => (
-                  <div key={skill.skillId} className="flex flex-col gap-1.5">
-                    <span className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium">{skill.name}</span>
-                      <span className="ml-auto flex items-center gap-1">
-                        <Button
-                          variant="icon"
-                          icon="remove"
-                          aria-label={`${ACTION_COPY.edit} -`}
-                          disabled={!canWriteSkills || file.isSaving || skill.percent <= 0}
-                          onClick={() =>
-                            void file.setSkill(
-                              skill.skillId,
-                              skill.percent - ACADEMY_SETTINGS.skillStep
-                            )
-                          }
-                        />
-                        <span className="w-10 text-center text-xs tabular-nums">{`${skill.percent}%`}</span>
-                        <Button
-                          variant="icon"
-                          icon="add"
-                          aria-label={`${ACTION_COPY.edit} +`}
-                          disabled={
-                            !canWriteSkills ||
-                            file.isSaving ||
-                            skill.percent >= ACADEMY_SETTINGS.skillMaxPercent
-                          }
-                          onClick={() =>
-                            void file.setSkill(
-                              skill.skillId,
-                              skill.percent + ACADEMY_SETTINGS.skillStep
-                            )
-                          }
-                        />
+                return groups
+              }, {})
+            ).map((group) => (
+              <article key={group.name} className={SESSION_CARD.group}>
+                <header className="flex items-center gap-2">
+                  <StatusText label={group.name} accent={group.accent} />
+                </header>
+                <div className="flex flex-col gap-4">
+                  {group.items.map((skill) => (
+                    <div key={skill.skillId} className="flex flex-col gap-1.5">
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium">{skill.name}</span>
+                        <span className="ml-auto flex items-center gap-1">
+                          <Button
+                            variant="icon"
+                            icon="remove"
+                            aria-label={`${ACTION_COPY.edit} -`}
+                            disabled={!canWriteSkills || file.isSaving || skill.percent <= 0}
+                            onClick={() =>
+                              void file.setSkill(
+                                skill.skillId,
+                                skill.percent - ACADEMY_SETTINGS.skillStep
+                              )
+                            }
+                          />
+                          <span className="w-10 text-center text-xs tabular-nums">{`${skill.percent}%`}</span>
+                          <Button
+                            variant="icon"
+                            icon="add"
+                            aria-label={`${ACTION_COPY.edit} +`}
+                            disabled={
+                              !canWriteSkills ||
+                              file.isSaving ||
+                              skill.percent >= ACADEMY_SETTINGS.skillMaxPercent
+                            }
+                            onClick={() =>
+                              void file.setSkill(
+                                skill.skillId,
+                                skill.percent + ACADEMY_SETTINGS.skillStep
+                              )
+                            }
+                          />
+                        </span>
                       </span>
-                    </span>
-                    {skill.description && (
-                      <span className="text-xs text-[var(--color-ink-subtle)]">
-                        {skill.description}
-                      </span>
-                    )}
-                    <Progress value={skill.percent} compact />
-                    {skill.updatedAt && (
-                      <span className="text-xs text-[var(--color-ink-subtle)]">
-                        {[formatDay(skill.updatedAt), skill.validatorName]
-                          .filter(Boolean)
-                          .join(' · ')}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
-    </Section>
+                      {skill.description && (
+                        <span className="text-xs text-[var(--color-ink-subtle)]">
+                          {skill.description}
+                        </span>
+                      )}
+                      <Progress value={skill.percent} compact />
+                      {skill.updatedAt && (
+                        <span className="text-xs text-[var(--color-ink-subtle)]">
+                          {[formatDay(skill.updatedAt), skill.validatorName]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </Section>
+    </div>
   )
 
   const notesTab = () => (
-    <Section title={ACADEMY_COPY.tabNotes} bare>
-      {!canReadNotes ? (
-        <EmptyState
-          figure="notes"
-          title={ACADEMY_COPY.confidential}
-          description={ACADEMY_COPY.noteLocked}
-          action={
-            <Button icon="blocked" disabled>
-              {ACADEMY_COPY.confidential}
-            </Button>
-          }
-        />
-      ) : file.notes.length === 0 ? (
-        <EmptyState
-          figure="notes"
-          title={ACADEMY_COPY.noteEmptyTitle}
-          description={ACADEMY_COPY.noteEmptyDescription}
-          action={
-            <Button
-              variant="primary"
-              icon="add"
+    <div {...beacon(GUIDE_BEACONS.fsiNoteAdd)}>
+      <Section title={ACADEMY_COPY.tabNotes} bare>
+        {!canReadNotes ? (
+          <EmptyState
+            figure="notes"
+            title={ACADEMY_COPY.confidential}
+            description={ACADEMY_COPY.noteLocked}
+            action={
+              <Button icon="blocked" disabled>
+                {ACADEMY_COPY.confidential}
+              </Button>
+            }
+          />
+        ) : file.notes.length === 0 ? (
+          <EmptyState
+            figure="notes"
+            title={ACADEMY_COPY.noteEmptyTitle}
+            description={ACADEMY_COPY.noteEmptyDescription}
+            action={
+              <Button
+                variant="primary"
+                icon="add"
+                disabled={!canWriteNotes}
+                onClick={() => openNote(null)}
+              >
+                {ACADEMY_COPY.noteAdd}
+              </Button>
+            }
+          />
+        ) : (
+          <div className="flex flex-col gap-4">
+            {file.notes.map((note) => {
+              const kind = NOTE_KIND_REGISTRY.get(note.kind)
+
+              return (
+                <article
+                  key={note.id}
+                  className={cn(
+                    MEMBER_FILE.note,
+                    canWriteNotes &&
+                      'cursor-pointer transition-shadow hover:shadow-[var(--shadow-md)]'
+                  )}
+                  {...gestures({
+                    canEdit: canWriteNotes,
+                    label: kind.label,
+                    onEdit: () => openNote(note),
+                    onRemove: () => setPendingNote(note),
+                  })}
+                >
+                  <header className="flex flex-wrap items-center gap-2">
+                    <StatusText label={kind.label} accent={kind.accent} />
+                    <span className="text-xs text-[var(--color-ink-subtle)]">
+                      {[
+                        ACADEMY_STAGE_REGISTRY.label(note.stage),
+                        note.authorName,
+                        formatDay(note.createdAt),
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
+                  </header>
+                  <p className="text-sm whitespace-pre-wrap">{note.body}</p>
+                </article>
+              )
+            })}
+            <AddRow
+              label={ACADEMY_COPY.noteAdd}
               disabled={!canWriteNotes}
               onClick={() => openNote(null)}
-            >
-              {ACADEMY_COPY.noteAdd}
-            </Button>
-          }
-        />
-      ) : (
-        <div className="flex flex-col gap-4">
-          {file.notes.map((note) => {
-            const kind = NOTE_KIND_REGISTRY.get(note.kind)
-
-            return (
-              <article key={note.id} className={LIST_STYLES.card}>
-                <header className="flex flex-wrap items-center gap-2">
-                  <Badge label={kind.label} accent={kind.accent} tone={'neutral'} />
-                  <Badge label={ACADEMY_STAGE_REGISTRY.label(note.stage)} tone="neutral" dot />
-                  {note.authorName && (
-                    <span className="text-xs text-[var(--color-ink-subtle)]">
-                      {note.authorName}
-                    </span>
-                  )}
-                  <span className="text-xs text-[var(--color-ink-subtle)]">
-                    {formatDay(note.createdAt)}
-                  </span>
-                  <Button
-                    variant="icon"
-                    icon="edit"
-                    aria-label={ACTION_COPY.edit}
-                    className="ml-auto"
-                    disabled={!canWriteNotes}
-                    onClick={() => openNote(note)}
-                  />
-                  <Button
-                    variant="icon"
-                    icon="remove"
-                    aria-label={ACTION_COPY.delete}
-                    disabled={!canWriteNotes}
-                    onClick={() => setPendingNote(note)}
-                  />
-                </header>
-                <p className="text-sm whitespace-pre-wrap">{note.body}</p>
-              </article>
-            )
-          })}
-          <AddRow
-            label={ACADEMY_COPY.noteAdd}
-            disabled={!canWriteNotes}
-            onClick={() => openNote(null)}
-          />
-        </div>
-      )}
-    </Section>
+            />
+          </div>
+        )}
+      </Section>
+    </div>
   )
 
   const objectivesTab = () => (
-    <Section title={ACADEMY_COPY.tabObjectives} bare>
-      {!objectivesUnlocked ? (
-        <EmptyState
-          figure="start"
-          title={ACADEMY_COPY.objectiveLockedTitle}
-          description={ACADEMY_COPY.objectiveLockedDescription}
-          action={
-            <Button variant="primary" icon="history" onClick={() => setTab('reviews')}>
-              {ACADEMY_COPY.objectiveSeeReviews}
-            </Button>
-          }
-        />
-      ) : file.objectives.length === 0 ? (
-        <EmptyState
-          figure="start"
-          title={ACADEMY_COPY.objectiveEmptyTitle}
-          description={ACADEMY_COPY.objectiveEmptyDescription}
-          action={
-            <Button
-              variant="primary"
-              icon="add"
+    <div {...beacon(GUIDE_BEACONS.fsiObjectiveAdd)}>
+      <Section title={ACADEMY_COPY.tabObjectives} bare>
+        {!objectivesUnlocked ? (
+          <EmptyState
+            figure="start"
+            title={ACADEMY_COPY.objectiveLockedTitle}
+            description={ACADEMY_COPY.objectiveLockedDescription}
+            action={
+              <Button variant="primary" icon="history" onClick={() => setTab('reviews')}>
+                {ACADEMY_COPY.objectiveSeeReviews}
+              </Button>
+            }
+          />
+        ) : file.objectives.length === 0 ? (
+          <EmptyState
+            figure="start"
+            title={ACADEMY_COPY.objectiveEmptyTitle}
+            description={ACADEMY_COPY.objectiveEmptyDescription}
+            action={
+              <Button
+                variant="primary"
+                icon="add"
+                disabled={!canWriteObjectives}
+                onClick={() => openObjective(null)}
+              >
+                {ACADEMY_COPY.objectiveAdd}
+              </Button>
+            }
+          />
+        ) : (
+          <div
+            className={cn(
+              LIST_STYLES.stack,
+              over === CONTAINER && 'is-drop-target rounded-[var(--radius-lg)]'
+            )}
+            {...(canWriteObjectives ? containerProps(CONTAINER) : {})}
+          >
+            {file.objectives.map((objective, index) => {
+              const objectiveStatus = OBJECTIVE_STATUS_REGISTRY.get(objective.status)
+
+              return (
+                <div
+                  key={objective.id}
+                  data-drop-index={index}
+                  className={cn(LIST_STYLES.item, canWriteObjectives && LIST_STYLES.itemClickable)}
+                  {...(canWriteObjectives ? itemProps({ id: objective.id, from: CONTAINER }) : {})}
+                  {...gestures({
+                    canEdit: canWriteObjectives,
+                    label: objective.title,
+                    onEdit: () => openObjective(objective),
+                    onRemove: () => setPendingObjective(objective),
+                  })}
+                >
+                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="font-medium">{objective.title}</span>
+                    {objective.description && (
+                      <span className="text-xs text-[var(--color-ink-subtle)]">
+                        {objective.description}
+                      </span>
+                    )}
+                    <span className="text-xs text-[var(--color-ink-subtle)]">
+                      {[objective.dueAt ? formatDay(objective.dueAt) : null, objective.authorName]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
+                  </span>
+                  <StatusText label={objectiveStatus.label} accent={objectiveStatus.accent} />
+                </div>
+              )
+            })}
+            <AddRow
+              label={ACADEMY_COPY.objectiveAdd}
               disabled={!canWriteObjectives}
               onClick={() => openObjective(null)}
-            >
-              {ACADEMY_COPY.objectiveAdd}
-            </Button>
-          }
-        />
-      ) : (
-        <div
-          className={cn(
-            LIST_STYLES.stack,
-            over === CONTAINER && 'is-drop-target rounded-[var(--radius-lg)]'
-          )}
-          {...(canWriteObjectives ? containerProps(CONTAINER) : {})}
-        >
-          <span className="text-xs text-[var(--color-ink-subtle)]">
-            {`${file.objectives.length} / ${ACADEMY_SETTINGS.minObjectives} ${ACADEMY_FIELD_COPY.objectiveStatus.toLowerCase()}`}
-          </span>
-          {file.objectives.map((objective, index) => {
-            const objectiveStatus = OBJECTIVE_STATUS_REGISTRY.get(objective.status)
-
-            return (
-              <div
-                key={objective.id}
-                data-drop-index={index}
-                className={LIST_STYLES.item}
-                {...(canWriteObjectives ? itemProps({ id: objective.id, from: CONTAINER }) : {})}
-              >
-                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="font-medium">{objective.title}</span>
-                  {objective.description && (
-                    <span className="text-xs text-[var(--color-ink-subtle)]">
-                      {objective.description}
-                    </span>
-                  )}
-                  <span className="text-xs text-[var(--color-ink-subtle)]">
-                    {[objective.dueAt ? formatDay(objective.dueAt) : null, objective.authorName]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </span>
-                </span>
-                <Badge
-                  label={objectiveStatus.label}
-                  accent={objectiveStatus.accent}
-                  tone={'neutral'}
-                  dot
-                />
-                <Button
-                  variant="icon"
-                  icon="edit"
-                  aria-label={ACTION_COPY.edit}
-                  disabled={!canWriteObjectives}
-                  onClick={() => openObjective(objective)}
-                />
-                <Button
-                  variant="icon"
-                  icon="remove"
-                  aria-label={ACTION_COPY.delete}
-                  disabled={!canWriteObjectives}
-                  onClick={() => setPendingObjective(objective)}
-                />
-              </div>
-            )
-          })}
-          <AddRow
-            label={ACADEMY_COPY.objectiveAdd}
-            disabled={!canWriteObjectives}
-            onClick={() => openObjective(null)}
-          />
-        </div>
-      )}
-    </Section>
+            />
+          </div>
+        )}
+      </Section>
+    </div>
   )
 
   const reviewsTab = () => (
-    <Section title={ACADEMY_COPY.tabReviews} description={ACADEMY_COPY.reviewsLead} bare>
-      {!canReadReviews ? (
-        <EmptyState
-          figure="notes"
-          title={ACADEMY_COPY.confidential}
-          description={ACADEMY_COPY.reviewLocked}
-          action={
-            <Button icon="blocked" disabled>
-              {ACADEMY_COPY.confidential}
-            </Button>
-          }
-        />
-      ) : file.reviews.length === 0 ? (
-        <EmptyState
-          figure="notes"
-          title={ACADEMY_COPY.reviewEmptyTitle}
-          description={ACADEMY_COPY.reviewEmptyDescription}
-          action={
-            <Button
-              variant="primary"
-              icon="add"
+    <div {...beacon(GUIDE_BEACONS.fsiReviewAdd)}>
+      <Section title={ACADEMY_COPY.tabReviews} description={ACADEMY_COPY.reviewsLead} bare>
+        {!canReadReviews ? (
+          <EmptyState
+            figure="notes"
+            title={ACADEMY_COPY.confidential}
+            description={ACADEMY_COPY.reviewLocked}
+            action={
+              <Button icon="blocked" disabled>
+                {ACADEMY_COPY.confidential}
+              </Button>
+            }
+          />
+        ) : file.reviews.length === 0 ? (
+          <EmptyState
+            figure="notes"
+            title={ACADEMY_COPY.reviewEmptyTitle}
+            description={ACADEMY_COPY.reviewEmptyDescription}
+            action={
+              <Button
+                variant="primary"
+                icon="add"
+                disabled={!canWriteReviews}
+                onClick={() => openReview(null)}
+              >
+                {ACADEMY_COPY.reviewAdd}
+              </Button>
+            }
+          />
+        ) : (
+          <div className="flex flex-col gap-4">
+            {file.reviews.map((review) => {
+              const reviewStatus = REVIEW_STATUS_REGISTRY.get(review.status)
+              const advice = REVIEW_ADVICE_REGISTRY.get(review.advice)
+              const isDraft = review.status === ReviewStatuses.Draft
+              const isSubmitted = review.status === ReviewStatuses.Submitted
+
+              return (
+                <article
+                  key={review.id}
+                  className={cn(
+                    MEMBER_FILE.note,
+                    isDraft &&
+                      canWriteReviews &&
+                      'cursor-pointer transition-shadow hover:shadow-[var(--shadow-md)]'
+                  )}
+                  {...gestures({
+                    canEdit: isDraft && canWriteReviews,
+                    label: formatDay(review.heldAt),
+                    onEdit: () => openReview(review),
+                    onRemove: () => setPendingReview(review),
+                  })}
+                >
+                  <header className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold">{formatDay(review.heldAt)}</span>
+                    <span className="text-xs text-[var(--color-ink-subtle)]">
+                      {[ACADEMY_STAGE_REGISTRY.label(review.stage), review.authorName]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
+                    <StatusText label={reviewStatus.label} accent={reviewStatus.accent} />
+                    <StatusText label={advice.label} accent={advice.accent} />
+                    <span className="ml-auto flex items-center gap-1">
+                      {isDraft && canWriteReviews && (
+                        <>
+                          <Button
+                            variant="primary"
+                            icon="forward"
+                            onClick={() => void file.submitReview(review.id)}
+                          >
+                            {ACADEMY_COPY.reviewSubmit}
+                          </Button>
+                        </>
+                      )}
+                      {isSubmitted && canValidateReviews && (
+                        <>
+                          <Button
+                            variant="danger"
+                            icon="close"
+                            onClick={() => setDecidingReview({ review, accept: false })}
+                          >
+                            {ACADEMY_COPY.reviewReject}
+                          </Button>
+                          <Button
+                            variant="primary"
+                            icon="confirm"
+                            onClick={() => setDecidingReview({ review, accept: true })}
+                          >
+                            {ACADEMY_COPY.reviewValidate}
+                          </Button>
+                        </>
+                      )}
+                    </span>
+                  </header>
+                  <DetailGrid
+                    entries={[
+                      {
+                        label: ACADEMY_FIELD_COPY.durationMinutes,
+                        value: review.durationMinutes ? String(review.durationMinutes) : undefined,
+                      },
+                      { label: ACADEMY_FIELD_COPY.feeling, value: review.feeling },
+                      { label: ACADEMY_FIELD_COPY.decisionNote, value: review.decisionNote },
+                    ]}
+                  />
+                  {review.summary && <Markdown source={review.summary} />}
+                </article>
+              )
+            })}
+            <AddRow
+              label={ACADEMY_COPY.reviewAdd}
               disabled={!canWriteReviews}
               onClick={() => openReview(null)}
-            >
-              {ACADEMY_COPY.reviewAdd}
-            </Button>
-          }
-        />
-      ) : (
-        <div className="flex flex-col gap-4">
-          {file.reviews.map((review) => {
-            const reviewStatus = REVIEW_STATUS_REGISTRY.get(review.status)
-            const advice = REVIEW_ADVICE_REGISTRY.get(review.advice)
-            const isDraft = review.status === ReviewStatuses.Draft
-            const isSubmitted = review.status === ReviewStatuses.Submitted
-
-            return (
-              <article key={review.id} className={LIST_STYLES.card}>
-                <header className="flex flex-wrap items-center gap-2">
-                  <Badge label={ACADEMY_STAGE_REGISTRY.label(review.stage)} tone="neutral" dot />
-                  <span className="font-bold">{formatDay(review.heldAt)}</span>
-                  {review.authorName && (
-                    <span className="text-xs text-[var(--color-ink-subtle)]">
-                      {review.authorName}
-                    </span>
-                  )}
-                  <Badge
-                    label={reviewStatus.label}
-                    accent={reviewStatus.accent}
-                    tone={'neutral'}
-                    dot
-                  />
-                  <Badge label={advice.label} accent={advice.accent} tone={'neutral'} />
-                  <span className="ml-auto flex items-center gap-1">
-                    {isDraft && canWriteReviews && (
-                      <>
-                        <Button
-                          variant="icon"
-                          icon="edit"
-                          aria-label={ACTION_COPY.edit}
-                          onClick={() => openReview(review)}
-                        />
-                        <Button
-                          variant="icon"
-                          icon="remove"
-                          aria-label={ACTION_COPY.delete}
-                          onClick={() => setPendingReview(review)}
-                        />
-                        <Button
-                          variant="primary"
-                          icon="forward"
-                          onClick={() => void file.submitReview(review.id)}
-                        >
-                          {ACADEMY_COPY.reviewSubmit}
-                        </Button>
-                      </>
-                    )}
-                    {isSubmitted && canValidateReviews && (
-                      <>
-                        <Button
-                          variant="danger"
-                          icon="close"
-                          onClick={() => setDecidingReview({ review, accept: false })}
-                        >
-                          {ACADEMY_COPY.reviewReject}
-                        </Button>
-                        <Button
-                          variant="primary"
-                          icon="confirm"
-                          onClick={() => setDecidingReview({ review, accept: true })}
-                        >
-                          {ACADEMY_COPY.reviewValidate}
-                        </Button>
-                      </>
-                    )}
-                  </span>
-                </header>
-                <DetailGrid
-                  entries={[
-                    {
-                      label: ACADEMY_FIELD_COPY.durationMinutes,
-                      value: review.durationMinutes ? String(review.durationMinutes) : undefined,
-                    },
-                    { label: ACADEMY_FIELD_COPY.feeling, value: review.feeling },
-                    { label: ACADEMY_FIELD_COPY.decisionNote, value: review.decisionNote },
-                  ]}
-                />
-                {review.summary && <Markdown source={review.summary} />}
-              </article>
-            )
-          })}
-          <AddRow
-            label={ACADEMY_COPY.reviewAdd}
-            disabled={!canWriteReviews}
-            onClick={() => openReview(null)}
-          />
-        </div>
-      )}
-    </Section>
+            />
+          </div>
+        )}
+      </Section>
+    </div>
   )
 
   return (
-    <div className="flex flex-col gap-8">
-      <FileTabs
-        label={ACADEMY_COPY.fileTitle}
-        value={tab}
-        onChange={setTab}
-        tabs={[
-          {
-            value: 'informations',
-            label: ACADEMY_COPY.tabInformations,
-            icon: 'sheet',
-            render: informationsTab,
-          },
-          {
-            value: 'trainings',
-            label: ACADEMY_COPY.progression,
-            icon: 'academy',
-            render: trainingsTab,
-          },
-          { value: 'skills', label: ACADEMY_COPY.tabCompetences, icon: 'skill', render: skillsTab },
-          { value: 'notes', label: ACADEMY_COPY.tabNotes, icon: 'note', render: notesTab },
-          {
-            value: 'objectives',
-            label: ACADEMY_COPY.tabObjectives,
-            icon: 'objective',
-            render: objectivesTab,
-          },
-          { value: 'reviews', label: ACADEMY_COPY.tabReviews, icon: 'confirm', render: reviewsTab },
-        ]}
-      />
+    <div className="flex flex-col gap-8" {...beacon(GUIDE_BEACONS.fsiTabs)}>
+      <div className={MEMBER_FILE.layout}>
+        <JuniorRail
+          junior={junior}
+          functionName={sessionFunctionName}
+          skillAverage={skillAverage}
+          isReady={isReady}
+          canEdit={canManage}
+          onEdit={() => {
+            file.clearIssues()
+            setDialog('junior')
+          }}
+        />
+        <div className={MEMBER_FILE.main}>
+          <FileTabs
+            label={ACADEMY_COPY.fileTitle}
+            value={tab}
+            onChange={setTab}
+            tabs={[
+              {
+                value: FSI_TABS.timeline,
+                label: ACADEMY_COPY.timelineTab,
+                icon: 'clock',
+                render: timelineTab,
+              },
+              {
+                value: 'informations',
+                label: ACADEMY_COPY.tabInformations,
+                icon: 'sheet',
+                render: informationsTab,
+              },
+              {
+                value: 'trainings',
+                label: ACADEMY_COPY.progression,
+                icon: 'academy',
+                render: trainingsTab,
+              },
+              {
+                value: 'skills',
+                label: ACADEMY_COPY.tabCompetences,
+                icon: 'skill',
+                render: skillsTab,
+              },
+              { value: 'notes', label: ACADEMY_COPY.tabNotes, icon: 'note', render: notesTab },
+              {
+                value: 'objectives',
+                label: ACADEMY_COPY.tabObjectives,
+                icon: 'objective',
+                render: objectivesTab,
+              },
+              {
+                value: 'reviews',
+                label: ACADEMY_COPY.tabReviews,
+                icon: 'confirm',
+                render: reviewsTab,
+              },
+            ]}
+          />
+        </div>
+      </div>
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.junior}
         open={dialog === 'junior'}
         title={junior.displayName}
         fields={juniorFields}
         initialValues={junior.values}
         issues={file.issues}
         isSaving={file.isSaving}
-        size="lg"
         onSubmit={file.save}
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.note}
         open={dialog === 'note'}
         title={editingNote ? ACTION_COPY.edit : ACADEMY_COPY.noteAdd}
         fields={noteFields}
@@ -724,7 +760,8 @@ export const JuniorFile = ({
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.objective}
         open={dialog === 'objective'}
         title={editingObjective ? ACTION_COPY.edit : ACADEMY_COPY.objectiveAdd}
         fields={objectiveFields}
@@ -739,7 +776,8 @@ export const JuniorFile = ({
         onClose={() => setDialog(null)}
       />
 
-      <FormDialog
+      <FormDrawer
+        subject={FORM_SUBJECTS.review}
         open={dialog === 'review'}
         title={editingReview ? ACTION_COPY.edit : ACADEMY_COPY.reviewAdd}
         description={ACADEMY_COPY.reviewsLead}
@@ -747,7 +785,6 @@ export const JuniorFile = ({
         initialValues={editingReview?.values}
         issues={file.issues}
         isSaving={file.isSaving}
-        size="lg"
         onSubmit={(values) =>
           editingReview ? file.editReview(editingReview.id, values) : file.addReview(values)
         }

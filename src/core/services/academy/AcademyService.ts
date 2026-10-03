@@ -4,14 +4,22 @@ import crypto from 'crypto'
 
 import { decryptField, encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
-import { WEEK_GRID_DAYS, addDays } from '@/utils/format/days'
+import { WEEK_GRID_DAYS, addDays, startOfDay } from '@/utils/format/days'
 import { activeFunctions } from '@/core/services/reference/lookups'
 import { conflict, notFound } from '@/core/lib/errors'
-import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
+import { functionOptions, rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import { resolveStepState } from '@/core/services/academy/timeline'
+import {
+  instantiateJuniorSteps,
+  instantiateSessionSteps,
+  rescheduleSteps,
+} from '@/core/services/academy/timelineSteps'
+import { graduateAccount } from '@/core/services/academy/AdmissionService'
 import { memberOptions, toPerson } from '@/core/services/work/shared'
-import { ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
+import { countCleared } from '@/core/lib/curriculum/progress'
+import { ACADEMY_COPY, ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
+import { courseByKey } from '@/declarations/academy/curriculum'
 import {
   ACADEMY_STAGE_REGISTRY,
   ACADEMY_STEP_KIND_REGISTRY,
@@ -45,7 +53,6 @@ import {
   ObjectiveStatuses,
   ReviewAdvices,
   ReviewStatuses,
-  StepAnchors,
   AcademyStepKinds,
   TrainingStatuses,
 } from '@/utils/constants/hierarchy'
@@ -91,7 +98,7 @@ export const sessionFields = async (): Promise<FieldDefinition[]> => {
       kind: 'select',
       label: ACADEMY_FIELD_COPY.function,
       required: true,
-      options: rowsToOptions(functions),
+      options: functionOptions(functions),
       mark: 'dot',
       span: 'half',
     },
@@ -123,12 +130,6 @@ export const sessionFields = async (): Promise<FieldDefinition[]> => {
       kind: 'multiselect',
       label: ACADEMY_FIELD_COPY.trainers,
       options: members,
-    },
-    {
-      name: 'summary',
-      kind: 'textarea',
-      label: ACADEMY_FIELD_COPY.summary,
-      maxLength: FORM_SETTINGS.longTextMaxLength,
     },
   ]
 }
@@ -596,8 +597,13 @@ export const updateSession = async (
   scope: Prisma.AcademySessionWhereInput,
   values: FormValues
 ): Promise<SessionSummary[]> => {
-  await sessionInScope(id, scope)
+  const previous = await sessionInScope(id, scope)
   const data = toSessionData(values)
+  const launching =
+    data.status === AcademySessionStatuses.Running &&
+    previous.status !== AcademySessionStatuses.Running
+
+  if (launching) await ensureLaunchable(id)
 
   // The trainer seats are replaced wholesale, the form always sends the full list
   await prisma.$transaction([
@@ -609,8 +615,71 @@ export const updateSession = async (
   ])
 
   await ensureSessionInvite(id, data.status)
+  if (launching) await launchSession(id)
 
   return listSessions(scope)
+}
+
+/**
+ * Launch a planned promotion from its own page
+ * @param {string} id - Session identifier
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<void>} - Launched
+ */
+
+export const startSession = async (
+  id: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<void> => {
+  const session = await sessionInScope(id, scope)
+  if (session.status === AcademySessionStatuses.Running) throw conflict()
+
+  await ensureLaunchable(id)
+  await prisma.academySession.update({
+    where: { id },
+    data: { status: AcademySessionStatuses.Running },
+  })
+  await launchSession(id)
+}
+
+/**
+ * Refuse to launch a promotion while a confirmed junior still has no Formateur
+ * @param {string} id - Session identifier
+ * @return {Promise<void>} - Throws when a trainer is missing
+ */
+
+const ensureLaunchable = async (id: string): Promise<void> => {
+  const orphans = await prisma.academyJunior.count({
+    where: {
+      sessionId: id,
+      status: AcademyJuniorStatuses.Active,
+      confirmedAt: { not: null },
+      trainerId: null,
+    },
+  })
+
+  if (orphans > 0) throw conflict(ACADEMY_COPY.launchMissingTrainer)
+}
+
+/**
+ * Start a promotion for real: its day starts now, the timeline re-anchors on it and every
+ * junior leaves preparation
+ * @param {string} id - Session identifier
+ * @return {Promise<void>} - Launched
+ */
+
+const launchSession = async (id: string): Promise<void> => {
+  const startsAt = startOfDay(new Date())
+
+  await prisma.$transaction([
+    prisma.academySession.update({ where: { id }, data: { startsAt } }),
+    prisma.academyJunior.updateMany({
+      where: { sessionId: id, stage: AcademyStages.Preparation },
+      data: { stage: AcademyStages.Discovery, startedAt: startsAt },
+    }),
+  ])
+
+  await rescheduleSteps(id, startsAt)
 }
 
 /**
@@ -642,7 +711,8 @@ const toJunior = (
     id: string
     sessionId: string
     accountId: string
-    dispositifId: string
+    dispositifId: string | null
+    confirmedAt: Date | null
     status: AcademyJuniorStatusName
     stage: AcademyStageName
     startedAt: Date
@@ -653,7 +723,7 @@ const toJunior = (
     trainerId: string | null
     account: { displayName: string; avatarUrl: string | null }
     trainer: { id: string; displayName: string; avatarUrl: string | null } | null
-    dispositif: { id: string; name: string; accent: string | null }
+    dispositif: { id: string; name: string; accent: string | null } | null
     _count: { reviews: number }
   },
   trainings: {
@@ -661,11 +731,16 @@ const toJunior = (
     name: string
     period: JuniorTraining['period']
     mandatory: boolean
+    curriculumKey: string | null
   }[],
-  records: Map<string, { completedAt: Date | null; validator: { displayName: string } | null }>
+  records: Map<
+    string,
+    { completedAt: Date | null; validator: { displayName: string } | null; progress: unknown }
+  >
 ): JuniorView => {
   const progression: JuniorTraining[] = trainings.map((training) => {
     const record = records.get(training.id)
+    const course = training.curriculumKey ? courseByKey(training.curriculumKey) : undefined
 
     return {
       id: training.id,
@@ -674,6 +749,7 @@ const toJunior = (
       mandatory: training.mandatory,
       completedAt: record?.completedAt?.toISOString() ?? null,
       validatorName: record?.validator?.displayName ?? null,
+      exercises: course ? countCleared(course, record?.progress) : null,
     }
   })
 
@@ -684,6 +760,7 @@ const toJunior = (
     displayName: row.account.displayName,
     avatarUrl: row.account.avatarUrl,
     dispositif: row.dispositif,
+    confirmedAt: row.confirmedAt?.toISOString() ?? null,
     status: row.status,
     stage: row.stage,
     trainer: toPerson(row.trainer),
@@ -853,112 +930,6 @@ export const listSteps = async (sessionId: string): Promise<AcademyStepView[]> =
 }
 
 /**
- * Compute the day a DAY-anchored template step falls on
- * @param {Date} startsAt - Session start date
- * @param {number} offsetDays - Signed day offset
- * @return {Date} - Resolved day
- */
-
-const dayOffset = (startsAt: Date, offsetDays: number): Date => addDays(startsAt, offsetDays)
-
-/**
- * Copy a batch of PIMT templates onto the timeline as steps
- * @param {object[]} templates - Templates matched for this instantiation
- * @param {Date} startsAt - Session start date
- * @param {string} sessionId - Session identifier
- * @param {string} [juniorId] - Junior identifier, omitted for session-wide steps
- * @return {Promise<void>} - Instantiated
- */
-
-const instantiateSteps = async (
-  templates: {
-    id: string
-    title: string
-    description: string | null
-    stage: AcademyStageName
-    anchor: StepAnchorName
-    offset: number
-    owner: StepOwnerName
-    required: boolean
-  }[],
-  startsAt: Date,
-  sessionId: string,
-  juniorId?: string
-): Promise<void> => {
-  if (templates.length === 0) return
-
-  await prisma.academyStep.createMany({
-    data: templates.map((template) => ({
-      sessionId,
-      juniorId: juniorId ?? null,
-      templateId: template.id,
-      kind: null,
-      title: template.title,
-      notes: template.description,
-      stage: template.stage,
-      anchor: template.anchor,
-      offset: template.offset,
-      owner: template.owner,
-      required: template.required,
-      scheduledAt:
-        template.anchor === StepAnchors.Day ? dayOffset(startsAt, template.offset) : null,
-    })),
-  })
-}
-
-/**
- * Instantiate the session-wide preparation steps of a PIMT trame, ahead of any junior
- * @param {string} sessionId - Session identifier
- * @param {string} functionId - Function the session is scoped to
- * @param {Date} startsAt - Session start date
- * @return {Promise<void>} - Instantiated
- */
-
-const instantiateSessionSteps = async (
-  sessionId: string,
-  functionId: string,
-  startsAt: Date
-): Promise<void> => {
-  const templates = await prisma.pimStepTemplate.findMany({
-    where: {
-      OR: [{ functionId: null }, { functionId }],
-      dispositifId: null,
-      stage: AcademyStages.Preparation,
-    },
-  })
-
-  await instantiateSteps(templates, startsAt, sessionId)
-}
-
-/**
- * Instantiate the individual steps of a PIMT trame onto a junior's own timeline
- * @param {string} juniorId - Junior identifier
- * @param {string} sessionId - Session identifier
- * @param {string} functionId - Function the session is scoped to
- * @param {string} dispositifId - Junior's own dispositif
- * @param {Date} startsAt - Session start date
- * @return {Promise<void>} - Instantiated
- */
-
-export const instantiateJuniorSteps = async (
-  juniorId: string,
-  sessionId: string,
-  functionId: string,
-  dispositifId: string,
-  startsAt: Date
-): Promise<void> => {
-  const templates = await prisma.pimStepTemplate.findMany({
-    where: {
-      OR: [{ functionId: null }, { functionId }],
-      AND: [{ OR: [{ dispositifId: null }, { dispositifId }] }],
-      stage: { not: AcademyStages.Preparation },
-    },
-  })
-
-  await instantiateSteps(templates, startsAt, sessionId, juniorId)
-}
-
-/**
  * Read one whole session within scope
  * @param {string} id - Session identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
@@ -992,7 +963,7 @@ const toJuniorData = (values: FormValues) => {
 
   return {
     trainerId: readText(values, 'trainerId'),
-    dispositifId: readText(values, 'dispositifId') ?? '',
+    dispositifId: readText(values, 'dispositifId'),
     status,
     // Validation stamps its own date, so the file always says when it happened
     validatedAt: status === AcademyJuniorStatuses.Validated ? new Date() : null,
@@ -1099,12 +1070,9 @@ export const updateJunior = async (
     include: { session: true },
   })
 
-  // A validated junior leaves the academy status behind on their own file
+  // A validated junior leaves the academy behind, role and function included
   if (row.status === AcademyJuniorStatuses.Validated) {
-    await prisma.account.update({
-      where: { id: row.accountId },
-      data: { status: MemberStatuses.Active },
-    })
+    await graduateAccount(row.accountId, row.session.functionId)
   }
 
   return listJuniors(row.sessionId, row.session.functionId)
@@ -1544,7 +1512,7 @@ const ensureStepsCleared = async (juniorId: string, stage: AcademyStageName): Pr
 
 const ensureTrainingsCleared = async (junior: {
   session: { functionId: string }
-  dispositifId: string
+  dispositifId: string | null
   accountId: string
 }): Promise<void> => {
   const [trainings, records] = await Promise.all([
@@ -1630,12 +1598,10 @@ const advanceJunior = async (
   const junior = await prisma.academyJunior.update({
     where: { id: juniorId },
     data: { status: AcademyJuniorStatuses.Validated, validatedAt: new Date() },
+    include: { session: { select: { functionId: true } } },
   })
 
-  await prisma.account.update({
-    where: { id: junior.accountId },
-    data: { status: MemberStatuses.Active },
-  })
+  await graduateAccount(junior.accountId, junior.session.functionId)
 }
 
 /**
@@ -2106,7 +2072,7 @@ export const resolveOwnJunior = async (
 ): Promise<{
   id: string
   sessionId: string
-  dispositifId: string
+  dispositifId: string | null
   session: { functionId: string }
 } | null> =>
   prisma.academyJunior.findFirst({
@@ -2154,14 +2120,14 @@ const toMyTraining = (
  * Read the trainings open to a junior's own function and dispositif
  * @param {string} accountId - Signed-in member identifier
  * @param {string} functionId - Function identifier
- * @param {string} dispositifId - Dispositif identifier
+ * @param {string | null} dispositifId - Dispositif identifier, none picked yet
  * @return {Promise<MyTrainingView[]>} - Trainings in display order
  */
 
 export const myTrainings = async (
   accountId: string,
   functionId: string,
-  dispositifId: string
+  dispositifId: string | null
 ): Promise<MyTrainingView[]> => {
   const [trainings, records] = await Promise.all([
     sessionTrainings(functionId, dispositifId),
@@ -2179,7 +2145,7 @@ export const myTrainings = async (
  * @return {Promise<void>} - Applied, a no-op when nothing is open
  */
 
-const clearOpenTrainingStep = async (juniorId: string): Promise<void> => {
+export const clearOpenTrainingStep = async (juniorId: string): Promise<void> => {
   const step = await prisma.academyStep.findFirst({
     where: { juniorId, kind: AcademyStepKinds.Training, doneAt: null },
     orderBy: { scheduledAt: 'asc' },
