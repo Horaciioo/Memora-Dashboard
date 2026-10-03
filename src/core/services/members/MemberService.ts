@@ -218,6 +218,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       label: MEMBER_FIELD_COPY.division,
       info: MEMBER_FIELD_INFO.division,
       options: divisionOptions,
+      mark: 'division',
       span: 'half',
       group: FORM_GROUPS.assignment,
     },

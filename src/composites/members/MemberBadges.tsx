@@ -1,7 +1,6 @@
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { ROLE_EMBLEMS, functionGlyph, roleTone } from '@/declarations/members/profiles'
 import { ICONS } from '@/declarations/ui/icons'
-import { TONES, toTone } from '@/declarations/ui/theme'
 import type { MemberSummary } from '@/types/members'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
@@ -23,13 +22,12 @@ export interface RoleGlyphProps {
 
 export const RoleGlyph = ({ role: roleName, isRoot, className }: RoleGlyphProps) => {
   const role = ROLE_REGISTRY.get(roleName)
-  const tone = TONES[toTone(role.accent, 'neutral')]
-  const Icon = ICONS[role.icon]
+  const Glyph = ROLE_EMBLEMS[roleName].glyph
   const RootIcon = ICONS.shield
 
   return (
     <span className={cn('inline-flex items-center gap-1.5', className)} title={role.label}>
-      <Icon className={cn('h-4 w-4 shrink-0', tone.text)} aria-hidden="true" />
+      <Glyph className="h-6 w-6 shrink-0" />
       <span className="sr-only">{role.label}</span>
       {isRoot && <RootIcon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />}
     </span>

@@ -26,24 +26,25 @@ export interface GlyphTint {
  */
 
 export const GLYPH_TINTS = {
-  // Discord blurple
+  // Discord, a clear blue
   DISCORD: {
-    fillFrom: '#7983f5',
-    fillTo: '#5865f2',
-    liftFrom: '#e0e3ff',
-    liftTo: '#a5acf8',
-    deepFrom: '#4752c4',
-    deepTo: '#2c3285',
-    cut: '#f3f4ff',
+    fillFrom: '#8cc2ff',
+    fillTo: '#2f7df0',
+    liftFrom: '#e6f2ff',
+    liftTo: '#b3d6ff',
+    deepFrom: '#2563d6',
+    deepTo: '#173f94',
+    cut: '#f4f9ff',
   },
+  // Live, a clear sky cyan
   LIVE: {
-    fillFrom: '#a78bfa',
-    fillTo: '#7c3aed',
-    liftFrom: '#ede9fe',
-    liftTo: '#c4b5fd',
-    deepFrom: '#7c3aed',
-    deepTo: '#4c1d95',
-    cut: '#f5f3ff',
+    fillFrom: '#7dd8f5',
+    fillTo: '#0aa0d6',
+    liftFrom: '#e0f6fd',
+    liftTo: '#a5e4f8',
+    deepFrom: '#0786b8',
+    deepTo: '#0a4e6e',
+    cut: '#f1fbfe',
   },
   ANIMATOR: {
     fillFrom: '#f5c451',

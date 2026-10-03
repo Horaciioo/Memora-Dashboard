@@ -136,7 +136,7 @@ export const SOCIAL_FIELDS: FieldDefinition[] = [
     kind: 'select',
     label: MEMBER_COPY.socialNetwork,
     info: MEMBER_COPY.socialNetworkInfo,
-    mark: 'avatar',
+    mark: 'network',
     required: true,
   },
   {

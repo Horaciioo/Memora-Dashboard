@@ -205,6 +205,7 @@ export const MembersPanel = ({
       label: MEMBER_FILTER_COPY.division,
       allLabel: MEMBER_FILTER_COPY.allDivisions,
       options: divisions,
+      mark: 'division',
     },
     // Pointless once the page shows a single creator
     ...(creatorId

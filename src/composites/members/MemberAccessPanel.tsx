@@ -74,7 +74,8 @@ export const MemberAccessPanel = ({
           <Button
             variant="primary"
             icon="confirm"
-            disabled={isSaving || pending === 0}
+            disabled={pending === 0}
+            isLoading={isSaving}
             onClick={() =>
               sealed ? onSealed() : void onSave(fromDraft(draft), layer === '' ? null : layer)
             }

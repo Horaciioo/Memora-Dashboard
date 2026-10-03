@@ -3,7 +3,8 @@
 import { FunctionEmblems } from '@/composites/members/MemberBadges'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { GROUP_STYLES, LIST_STYLES } from '@/declarations/ui/variants'
+import { ICONS } from '@/declarations/ui/icons'
+import { LIST_STYLES } from '@/declarations/ui/variants'
 import { useMenu } from '@/managers/front-end'
 import type { MemberSummary } from '@/types/members'
 import { cn } from '@/utils/classnames'
@@ -34,6 +35,8 @@ export const MemberCard = ({
   onDelete,
 }: MemberCardProps) => {
   const { contextMenu } = useMenu()
+  const AbsentIcon = ICONS.absences
+  const NotesIcon = ICONS.note
 
   return (
     <div
@@ -65,21 +68,36 @@ export const MemberCard = ({
         LIST_STYLES.card,
         LIST_STYLES.cardClickable,
         'flex-row items-center py-3',
-        member.isAbsent && LIST_STYLES.cardMuted
+        member.isAbsent && LIST_STYLES.cardAbsent
       )}
     >
-      <span className="flex min-w-0 flex-1 items-center gap-1.5 truncate font-medium">
-        <span className="truncate">{member.displayName}</span>
-        {showNotesBubble && member.notesCount > 0 && (
-          <span
-            className={GROUP_STYLES.bubble}
-            role="img"
-            aria-label={MEMBER_COPY.notesTitle}
-            title={MEMBER_COPY.notesTitle}
-          />
+      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span
+          className={cn(
+            'flex min-w-0 items-center gap-1.5 truncate font-medium',
+            member.isAbsent && LIST_STYLES.cardAbsentName
+          )}
+        >
+          <span className="truncate">{member.displayName}</span>
+          {showNotesBubble && member.notesCount > 0 && (
+            <span title={MEMBER_COPY.notesTitle} className="inline-flex">
+              <NotesIcon className={LIST_STYLES.cardNotes} />
+              <span className="sr-only">{MEMBER_COPY.notesTitle}</span>
+            </span>
+          )}
+        </span>
+        {member.isAbsent && (
+          <span className={LIST_STYLES.cardAbsentNote}>
+            <AbsentIcon className={LIST_STYLES.cardAbsentGlyph} aria-hidden="true" />
+            {MEMBER_COPY.absent}
+          </span>
         )}
       </span>
-      <FunctionEmblems member={member} className="gap-1" glyphClassName="h-5 w-5" />
+      <FunctionEmblems
+        member={member}
+        className={cn('gap-1', member.isAbsent && LIST_STYLES.cardAbsentEmblems)}
+        glyphClassName="h-5 w-5"
+      />
     </div>
   )
 }
