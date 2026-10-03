@@ -4,6 +4,7 @@ import { DiscordMessage } from '@/components/elements/display/DiscordMessage'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { ChatFeed } from '@/composites/academy/course/ChatFeed'
 import { DemoBlock } from '@/composites/academy/course/DemoBlock'
+import { DiscordExampleBlock } from '@/composites/academy/course/DiscordExampleBlock'
 import { FocusBlock } from '@/composites/academy/course/FocusBlock'
 import { LadderBlock } from '@/composites/academy/course/LadderBlock'
 import { LiveconBlock } from '@/composites/academy/course/LiveconBlock'
@@ -17,7 +18,7 @@ import { COURSE_COPY } from '@/declarations/academy/copy'
 import type { ReadBlock as ReadBlockData } from '@/declarations/academy/curriculum/types'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
-import { COURSE_READ, DISCORD_MESSAGE } from '@/declarations/ui/variants'
+import { COURSE_READ, DISCLOSURE, DISCORD_MESSAGE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 // Look of each callout, its glyph and the colours of its box
@@ -144,5 +145,26 @@ export const ReadBlock = ({ block }: ReadBlockProps) => {
           </div>
         </figure>
       )
+
+    case 'discordExample':
+      return <DiscordExampleBlock block={block} />
+
+    case 'disclosure': {
+      const Chevron = ICONS.forward
+
+      return (
+        <details className={DISCLOSURE.root}>
+          <summary className={DISCLOSURE.summary}>
+            <Chevron className={DISCLOSURE.chevron} aria-hidden="true" />
+            {block.title}
+          </summary>
+          <div className={DISCLOSURE.body}>
+            {block.blocks.map((child) => (
+              <ReadBlock key={child.key} block={child} />
+            ))}
+          </div>
+        </details>
+      )
+    }
   }
 }

@@ -5,8 +5,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { PageHeader } from '@/components/structures/PageHeader'
+import { BranchingExercise } from '@/composites/academy/course/BranchingExercise'
 import { CaseExercise, QuizExercise } from '@/composites/academy/course/ChoiceExercises'
 import { CommandExercise } from '@/composites/academy/course/CommandExercise'
+import { CompareRunsExercise } from '@/composites/academy/course/CompareRunsExercise'
 import { CourseComplete } from '@/composites/academy/course/CourseComplete'
 import { CourseContextProvider } from '@/composites/academy/course/CourseContextProvider'
 import { CourseIntro } from '@/composites/academy/course/CourseIntro'
@@ -43,7 +45,7 @@ export interface CoursePlayerProps {
 }
 
 // Blocks showing the Mod View, spread past the reading column
-const WIDE_KINDS = new Set<string>(['tour', 'focus', 'scene'])
+const WIDE_KINDS = new Set<string>(['tour', 'focus', 'scene', 'compareRuns', 'branching'])
 
 // Context of a course read without the database
 const EMPTY_CONTEXT: CourseContext = { ladder: { admins: [], responsables: [] }, livecon: [] }
@@ -74,6 +76,10 @@ const ExerciseView = (props: ExerciseViewProps) => {
       return <CommandExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
     case 'scene':
       return <SceneExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
+    case 'compareRuns':
+      return <CompareRunsExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
+    case 'branching':
+      return <BranchingExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
   }
 }
 
@@ -175,7 +181,15 @@ export const CoursePlayer = ({
         <CourseTimeline chapters={chapters} current={current} fill={fill} finished={run.finished} />
 
         {page === 'intro' && course.intro && (
-          <CourseIntro course={course} intro={course.intro} onStart={() => open('chapters')} />
+          <CourseIntro
+            course={course}
+            intro={course.intro}
+            onStart={() => {
+              // The opening button always leads to chapter 1
+              setCurrent(0)
+              open('chapters')
+            }}
+          />
         )}
 
         {page === 'outro' && trainingId && <CourseOutro trainingId={trainingId} />}

@@ -214,6 +214,8 @@ const COURSE_KIND_MAP: Record<ExerciseBlock['kind'], CourseKindOption> = {
   case: { label: 'Étude de cas', icon: 'note' },
   command: { label: 'Commande', icon: 'key' },
   scene: { label: 'Cas d’étude', icon: 'stream' },
+  compareRuns: { label: 'Simulation', icon: 'ticket' },
+  branching: { label: 'Jeu de choix', icon: 'ticket' },
 }
 
 export const COURSE_KIND_REGISTRY = createRegistry(COURSE_KIND_MAP)

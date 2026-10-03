@@ -2,6 +2,7 @@
 import type { ModViewScene } from '@/core/lib/modview/scene'
 import type { IconName } from '@/declarations/ui/icons'
 import type { ModViewTarget, ModViewWindow } from '@/types/modview'
+import type { DiscordAuthor, DiscordScene, DiscordSceneStep } from '@/types/replicas'
 
 /**
  * Track a course belongs to: indispensable during the first period, secondary from the second,
@@ -166,6 +167,64 @@ export interface LiveconStop {
 }
 
 /**
+ * One example message drawn in the Discord replica
+ * @typedef {Object} DiscordExampleLine
+ * @property {DiscordAuthor} author - Who writes
+ * @property {string} text - Message
+ */
+
+export interface DiscordExampleLine {
+  author: DiscordAuthor
+  text: string
+}
+
+/**
+ * One step of the support guide shown beside a simulation
+ * @typedef {Object} GuideStep
+ * @property {string} title - Step name
+ * @property {string[]} tips - Its advice
+ */
+
+export interface GuideStep {
+  title: string
+  tips: string[]
+}
+
+/**
+ * One played run of a comparison
+ * @typedef {Object} ReplicaRun
+ * @property {string} key - Stable key
+ * @property {DiscordScene} scene - Run played
+ * @property {boolean} correct - The run to pick
+ * @property {string} feedback - Why, once picked
+ */
+
+export interface ReplicaRun {
+  key: string
+  scene: DiscordScene
+  correct: boolean
+  feedback: string
+}
+
+/**
+ * One node of a choice game
+ * @typedef {Object} BranchNode
+ * @property {string} key - Stable key
+ * @property {DiscordSceneStep[]} steps - Beats played on reaching it, timed from zero
+ * @property {string} [prompt] - Question asked once played
+ * @property {{ key: string, label: string, next: string }[]} [options] - Choices and where they lead
+ * @property {{ good: boolean, title: string, body: string }} [ending] - Verdict of a leaf
+ */
+
+export interface BranchNode {
+  key: string
+  steps: DiscordSceneStep[]
+  prompt?: string
+  options?: { key: string; label: string; next: string }[]
+  ending?: { good: boolean; title: string; body: string }
+}
+
+/**
  * Read-only blocks
  * @typedef {Object} ReadBlock
  */
@@ -198,6 +257,14 @@ export type ReadBlock =
   | { kind: 'focus'; key: string; prompt: string; items: FocusItem[] }
   | { kind: 'hierarchy'; key: string; rungs: HierarchyRung[] }
   | { kind: 'livecon'; key: string; stops: LiveconStop[] }
+  | {
+      kind: 'discordExample'
+      key: string
+      verdict: 'good' | 'bad' | 'neutral'
+      caption?: string
+      lines: DiscordExampleLine[]
+    }
+  | { kind: 'disclosure'; key: string; title: string; blocks: ReadBlock[] }
 
 /**
  * One multiple-choice question
@@ -309,6 +376,31 @@ export type ExerciseBlock =
       // Asked once it has played
       questions: QuizQuestionSeed[]
     }
+  | {
+      kind: 'compareRuns'
+      key: string
+      title: string
+      context: string
+      // Button the runs wait for
+      startLabel?: string
+      guide?: GuideStep[]
+      // Played in order, then labelled Cas 1, Cas 2...
+      runs: ReplicaRun[]
+      question: string
+    }
+  | {
+      kind: 'branching'
+      key: string
+      title: string
+      context: string
+      // Button the game waits for
+      startLabel?: string
+      guide?: GuideStep[]
+      // Decor and first beats, before the first node
+      opening: DiscordScene
+      root: string
+      nodes: BranchNode[]
+    }
 
 /**
  * Any block of a chapter
@@ -388,4 +480,6 @@ export const EXERCISE_KINDS: readonly string[] = [
   'case',
   'command',
   'scene',
+  'compareRuns',
+  'branching',
 ]

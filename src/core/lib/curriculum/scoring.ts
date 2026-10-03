@@ -1,3 +1,4 @@
+import { walkBranches } from '@/core/lib/curriculum/branching'
 import type { ExerciseBlock } from '@/declarations/academy/curriculum/types'
 import { foldText } from '@/utils/format/strings'
 
@@ -193,6 +194,19 @@ export const scoreExercise = (
         ),
         passPercent
       )
+
+    case 'compareRuns':
+      return toResult(
+        {
+          pick: block.runs.some(
+            (run) => run.correct && run.key === (typeof answer === 'string' ? answer : '')
+          ),
+        },
+        100
+      )
+
+    case 'branching':
+      return toResult({ ending: walkBranches(block, record).ending?.ending?.good === true }, 100)
 
     case 'command': {
       const given = normalise(typeof answer === 'string' ? answer : '')
