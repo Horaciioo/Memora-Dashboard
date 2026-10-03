@@ -21,6 +21,7 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { DEFAULT_METHOD_POLICIES } from '@/declarations/system/rateLimits'
 import type { RateLimitName } from '@/declarations/system/rateLimits'
 import { MEDIA_HEADERS, MEDIA_VISIBILITIES } from '@/declarations/system/storage'
+import { STREAM_HEADERS } from '@/declarations/system/streams'
 import type { MediaVisibility } from '@/declarations/system/storage'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -136,7 +137,7 @@ export type RouteHandler = ((request: NextRequest, context: RouteParams) => Prom
  * @type {'public' | 'protected' | 'redirect' | 'media'}
  */
 
-export type RouteAccess = 'public' | 'protected' | 'redirect' | 'media'
+export type RouteAccess = 'public' | 'protected' | 'redirect' | 'media' | 'stream'
 
 /**
  * Contract read by the OpenAPI collector
@@ -482,6 +483,55 @@ export const createMediaRoute = (options: MediaRouteOptions): RouteHandler => {
 
   handler.descriptor = options.descriptor
   handler.meta = { access: 'media', descriptor: options.descriptor }
+
+  return handler
+}
+
+/**
+ * Stream route options
+ * @typedef {Object} StreamRouteOptions
+ * @property {PermissionName | PermissionName[]} [permission] - Permission needed
+ * @property {(context: ProtectedRouteContext) => Promise<ReadableStream<Uint8Array>>} open - Event stream
+ */
+
+interface StreamRouteOptions {
+  permission?: PermissionName | PermissionName[]
+  rateLimit?: RateLimitName | false
+  descriptor?: RouteDescriptor
+  open: (context: ProtectedRouteContext) => Promise<ReadableStream<Uint8Array>>
+}
+
+/**
+ * Build a guarded route answering with server-sent events
+ * @param {StreamRouteOptions} options - Route options
+ * @return {RouteHandler} - Route handler
+ */
+
+export const createStreamRoute = (options: StreamRouteOptions): RouteHandler => {
+  const handler: RouteHandler = async (request, context) => {
+    try {
+      const { session, access } = await authenticate(request, options, options.permission)
+      const routeContext = await buildContext(request, context, {})
+
+      const stream = await options.open({
+        ...routeContext,
+        session,
+        access,
+        scope: () => readScope(session, access),
+      })
+
+      return new Response(stream, { headers: STREAM_HEADERS })
+    } catch (error) {
+      return fail(error)
+    }
+  }
+
+  handler.descriptor = options.descriptor
+  handler.meta = {
+    access: 'stream',
+    permission: options.permission,
+    descriptor: options.descriptor,
+  }
 
   return handler
 }

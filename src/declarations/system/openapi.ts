@@ -20,6 +20,7 @@ export const OPENAPI_RESPONSES = {
   success: 'Réussite, enveloppe { success, data }',
   redirect: 'Redirection',
   media: 'Fichier',
+  stream: 'Flux d’évènements (text/event-stream)',
   unauthenticated: 'Session absente ou expirée',
   forbidden: 'Permission manquante',
   invalid: 'Champs refusés',

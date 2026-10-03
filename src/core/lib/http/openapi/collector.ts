@@ -56,6 +56,7 @@ const operationOf = (method: string, path: string, handler: RouteHandler): JsonS
   // Success shape per factory
   if (meta?.access === 'redirect') responses['307'] = { description: OPENAPI_RESPONSES.redirect }
   else if (meta?.access === 'media') responses['200'] = { description: OPENAPI_RESPONSES.media }
+  else if (meta?.access === 'stream') responses['200'] = { description: OPENAPI_RESPONSES.stream }
   else {
     responses[String(meta?.status ?? 200)] = {
       description: OPENAPI_RESPONSES.success,
@@ -64,7 +65,7 @@ const operationOf = (method: string, path: string, handler: RouteHandler): JsonS
   }
 
   // Guard chain outcomes
-  if (meta?.access === 'protected') {
+  if (meta?.access === 'protected' || meta?.access === 'stream') {
     responses['401'] = failure(OPENAPI_RESPONSES.unauthenticated)
     if (meta.permission) responses['403'] = failure(OPENAPI_RESPONSES.forbidden)
   }
