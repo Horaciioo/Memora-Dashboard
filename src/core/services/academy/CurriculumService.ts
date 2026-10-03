@@ -13,7 +13,7 @@ import type { Course } from '@/declarations/academy/curriculum/types'
 import { isEncadrement } from '@/declarations/access/roles'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
-import { JUNIOR_FUNCTION_OF } from '@/declarations/reference/fixed'
+import { tradeOfFunction } from '@/declarations/reference/fixed'
 import type { SessionUser } from '@/types/auth'
 import type { CourseCard, CourseProgress } from '@/types/academy'
 import {
@@ -84,13 +84,7 @@ const tradesOf = async (functionIds: string[]): Promise<Set<string>> => {
     select: { name: true },
   })
 
-  return new Set(
-    rows.map(
-      (row) =>
-        Object.entries(JUNIOR_FUNCTION_OF).find(([, junior]) => junior === row.name)?.[0] ??
-        row.name
-    )
-  )
+  return new Set(rows.map((row) => tradeOfFunction(row.name)))
 }
 
 /**

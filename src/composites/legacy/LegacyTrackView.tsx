@@ -14,6 +14,7 @@ import { accentPaint } from '@/declarations/ui/theme'
 import { ICONS } from '@/declarations/ui/icons'
 import { LEGACY_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
+import { LEGACY_FUNCTION_OF } from '@/declarations/reference/fixed'
 import { INLINE_EDIT_STYLES, LEGACY_TRACK } from '@/declarations/ui/variants'
 import type { LegacyModuleView, LegacyTrackDetail } from '@/types/legacy'
 import { LegacyStatuses } from '@/utils/constants/hierarchy'
@@ -220,7 +221,14 @@ export const LegacyTrackView = ({ detail, canGrade, canDecide, isOwner }: Legacy
           <Avatar name={summary.memberName} src={summary.avatarUrl} size="md" />
           <div>
             <h2 className={LEGACY_TRACK.name}>{summary.memberName}</h2>
-            <p className={LEGACY_TRACK.trade}>{summary.functionName ?? LEGACY_COPY.trade}</p>
+            <p className={LEGACY_TRACK.trade}>
+              {/* The title worn while the track runs */}
+              {(isRunning && summary.functionName
+                ? LEGACY_FUNCTION_OF[summary.functionName]
+                : null) ??
+                summary.functionName ??
+                LEGACY_COPY.trade}
+            </p>
             {!isRunning && (
               <p className={cn(LEGACY_TRACK.statusClosed, paint.text)} style={paint.style}>
                 {status.label}

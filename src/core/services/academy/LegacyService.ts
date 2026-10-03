@@ -14,6 +14,7 @@ import type { Course } from '@/declarations/academy/curriculum/types'
 import { LEGACY_COPY, LEGACY_FIELD_COPY } from '@/declarations/academy/legacy/copy'
 import { LEGACY_TRADES, modulesForTrade } from '@/declarations/academy/legacy'
 import { ACADEMY_SETTINGS, LEGACY_SETTINGS } from '@/declarations/configurations/settings'
+import { LEGACY_FUNCTION_OF } from '@/declarations/reference/fixed'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { SessionUser } from '@/types/auth'
 import type { CourseProgress } from '@/types/academy'
@@ -87,6 +88,21 @@ const toDetail = (row: TrackRow): LegacyTrackDetail => {
     },
     modules,
   }
+}
+
+/**
+ * Read the function a track holder wears while it runs
+ * @param {string | null} trade - Trade the future Responsable leads
+ * @return {Promise<string | null>} - Function identifier, none for an unknown trade
+ */
+
+const legacyFunctionId = async (trade: string | null): Promise<string | null> => {
+  const name = trade ? LEGACY_FUNCTION_OF[trade] : undefined
+  if (!name) return null
+
+  const row = await prisma.jobFunction.findUnique({ where: { name }, select: { id: true } })
+
+  return row?.id ?? null
 }
 
 /**
@@ -266,6 +282,16 @@ export const openTrack = async (
     include: TRACK_INCLUDE,
   })
 
+  // Worn for as long as the track runs
+  const juniorId = await legacyFunctionId(trade.name)
+  if (juniorId) {
+    await prisma.accountFunction.upsert({
+      where: { accountId_functionId: { accountId, functionId: juniorId } },
+      update: {},
+      create: { accountId, functionId: juniorId },
+    })
+  }
+
   await recordEvent({
     eventType: 'LegacyChanged',
     actorId,
@@ -391,11 +417,21 @@ export const decideTrack = async (
     throw invalidInput([{ field: 'decision', message: LEGACY_COPY.outcomeMissing }])
   }
 
+  const juniorId = await legacyFunctionId(track.jobFunction?.name ?? null)
+
   await prisma.$transaction([
     prisma.legacyTrack.update({
       where: { id: trackId },
       data: { status: decision, decidedById: actorId, decidedAt: new Date() },
     }),
+    // Whatever the verdict, the track no longer runs
+    ...(juniorId
+      ? [
+          prisma.accountFunction.deleteMany({
+            where: { accountId: track.accountId, functionId: juniorId },
+          }),
+        ]
+      : []),
     ...(decision === LegacyStatuses.Passed
       ? [
           prisma.account.update({

@@ -158,6 +158,33 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     category: 'MODERATION',
     summary: 'Forme les juniors de l’Academy.',
   },
+  {
+    name: 'Junior Responsable Discord',
+    kind: 'SECONDARY',
+    position: 9,
+    icon: 'functionDiscord',
+    accent: '#3c45a5',
+    category: 'MODERATION',
+    summary: 'Se prépare à diriger la modération Discord pendant son Legacy.',
+  },
+  {
+    name: 'Junior Responsable Lives',
+    kind: 'SECONDARY',
+    position: 10,
+    icon: 'functionLive',
+    accent: '#5b21b6',
+    category: 'MODERATION',
+    summary: 'Se prépare à diriger la modération des lives pendant son Legacy.',
+  },
+  {
+    name: 'Junior Responsable Animateurs',
+    kind: 'SECONDARY',
+    position: 11,
+    icon: 'functionAnimator',
+    accent: '#9a6812',
+    category: 'MODERATION',
+    summary: 'Se prépare à diriger les animateurs pendant son Legacy.',
+  },
 ]
 
 /**
@@ -172,13 +199,26 @@ export const JUNIOR_FUNCTION_OF: Readonly<Record<string, string>> = {
 }
 
 /**
+ * Function held during a Legacy track, keyed by the trade the future Responsable leads
+ * @type {Readonly<Record<string, string>>}
+ */
+
+export const LEGACY_FUNCTION_OF: Readonly<Record<string, string>> = {
+  Discord: 'Junior Responsable Discord',
+  Lives: 'Junior Responsable Lives',
+  Animateurs: 'Junior Responsable Animateurs',
+}
+
+/**
  * Trade a function stands for, a junior one reading as the trade it trains for
  * @param {string} name - Function name
  * @return {string} - Trade name
  */
 
 export const tradeOfFunction = (name: string): string =>
-  Object.entries(JUNIOR_FUNCTION_OF).find(([, junior]) => junior === name)?.[0] ?? name
+  [...Object.entries(JUNIOR_FUNCTION_OF), ...Object.entries(LEGACY_FUNCTION_OF)].find(
+    ([, junior]) => junior === name
+  )?.[0] ?? name
 
 /**
  * Urgency level shared by projects and tasks
