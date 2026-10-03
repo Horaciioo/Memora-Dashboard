@@ -16,6 +16,7 @@ import forms from '@/configurations/system/forms.json'
 import gestures from '@/configurations/system/gestes.json'
 import rateLimits from '@/configurations/system/limitation.json'
 import livecon from '@/configurations/system/livecon.json'
+import lives from '@/configurations/system/lives.json'
 import notifications from '@/configurations/system/notifications.json'
 import pagination from '@/configurations/system/pagination.json'
 import perimeter from '@/configurations/system/perimetre.json'
@@ -253,6 +254,49 @@ export const LIVECON_SETTINGS = {
     fallback: 3,
     min: 1,
     max: maxLevel,
+  }),
+}
+
+/**
+ * Announced lives and their Mod View
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number }}
+ */
+
+export const LIVE_SETTINGS = {
+  defaultDurationMinutes: readInteger(lives.defaultDurationMinutes, {
+    path: 'system/lives.defaultDurationMinutes',
+    fallback: 180,
+    min: 15,
+  }),
+  endGraceMinutes: readInteger(lives.endGraceMinutes, {
+    path: 'system/lives.endGraceMinutes',
+    fallback: 5,
+    min: 0,
+  }),
+  streamKeepAliveSeconds: readInteger(lives.streamKeepAliveSeconds, {
+    path: 'system/lives.streamKeepAliveSeconds',
+    fallback: 25,
+    min: 5,
+  }),
+  heartbeatSeconds: readInteger(lives.heartbeatSeconds, {
+    path: 'system/lives.heartbeatSeconds',
+    fallback: 15,
+    min: 5,
+  }),
+  idleSeconds: readInteger(lives.idleSeconds, {
+    path: 'system/lives.idleSeconds',
+    fallback: 120,
+    min: 10,
+  }),
+  staleSeconds: readInteger(lives.staleSeconds, {
+    path: 'system/lives.staleSeconds',
+    fallback: 60,
+    min: 10,
+  }),
+  maxOpenLives: readInteger(lives.maxOpenLives, {
+    path: 'system/lives.maxOpenLives',
+    fallback: 12,
+    min: 1,
   }),
 }
 

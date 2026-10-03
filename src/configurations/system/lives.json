@@ -1,0 +1,9 @@
+{
+  "defaultDurationMinutes": 180,
+  "endGraceMinutes": 5,
+  "streamKeepAliveSeconds": 25,
+  "heartbeatSeconds": 15,
+  "idleSeconds": 120,
+  "staleSeconds": 60,
+  "maxOpenLives": 12
+}
