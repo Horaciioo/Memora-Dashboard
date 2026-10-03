@@ -1322,3 +1322,164 @@ body {
     transform: translateX(-50%);
   }
 }
+
+/* Discord replica: a ticket opens, messages land, someone types */
+@keyframes replica-channel-in {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.replica-channel-in {
+  animation: replica-channel-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes replica-lit {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-brand-500) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 14px 2px color-mix(in oklab, var(--color-brand-500) 55%, transparent);
+  }
+}
+
+.replica-lit {
+  animation: replica-lit 2400ms ease-in-out infinite;
+}
+
+/* The channel scrolls in as the ticket opens */
+@keyframes replica-scroll-in {
+  from {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.replica-scroll-in {
+  animation: replica-scroll-in 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes replica-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.replica-message-in {
+  animation: replica-message-in 320ms ease-out both;
+}
+
+@keyframes replica-typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: none;
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+.replica-typing-dot {
+  animation: replica-typing-dot 1200ms ease-in-out infinite;
+}
+
+.replica-typing-dot:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.replica-typing-dot:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes replica-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.replica-caret {
+  animation: replica-caret 1s steps(1) infinite;
+}
+
+/* Support guide slides out of its notch */
+@keyframes guide-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.guide-slide-in {
+  animation: guide-slide-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes guide-dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-apple-orange) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-apple-orange) 0%, transparent);
+  }
+}
+
+.guide-dot-pulse {
+  animation: guide-dot-pulse 1600ms ease-in-out infinite;
+}
+
+/* A played case slides up to full size */
+@keyframes run-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.run-slide-in {
+  animation: run-slide-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .replica-channel-in,
+  .replica-lit,
+  .replica-scroll-in,
+  .replica-message-in,
+  .replica-typing-dot,
+  .replica-caret,
+  .guide-slide-in,
+  .guide-dot-pulse,
+  .run-slide-in {
+    animation: none;
+  }
+}
+
+/* Skeletons of the Discord replica shimmer in the client's own greys */
+.replica-shimmer {
+  --color-surface-raised: var(--discord-skeleton-sweep);
+}

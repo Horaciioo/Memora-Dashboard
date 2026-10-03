@@ -253,6 +253,19 @@
   --discord-mention-hover: #5865f2;
   --discord-mention-text: #c9cdfb;
   --discord-blurple: #5865f2;
+  /* Replica of the full client: sidebars, embeds, buttons */
+  --discord-sidebar: #2b2d31;
+  --discord-rail: #1e1f22;
+  --discord-divider: #3f4147;
+  --discord-channel: #80848e;
+  --discord-channel-active: #404249;
+  --discord-embed: #2b2d31;
+  --discord-button-danger: #da373c;
+  --discord-button-secondary: #4e5058;
+  --discord-button-success: #248046;
+  --discord-online: #23a55a;
+  --discord-skeleton: #3a3c42;
+  --discord-skeleton-sweep: #4a4c53;
 }
 
 /* Twitch and YouTube chats of the lessons, drawn the way each site shows them in both themes */
