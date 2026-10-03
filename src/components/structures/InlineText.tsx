@@ -11,6 +11,8 @@ export interface InlineTextProps {
   maxLength?: number
   // Shared by the text and its input
   className?: string
+  // Shown greyed while the value is empty
+  placeholder?: string
   onCommit: (value: string) => Promise<boolean>
 }
 
@@ -21,6 +23,7 @@ export interface InlineTextProps {
  * @param {boolean} [disabled] - Blocks editing
  * @param {number} [maxLength] - Longest accepted text
  * @param {string} [className] - Classes shared by the text and the input
+ * @param {string} [placeholder] - Greyed text while empty
  * @param {(value: string) => Promise<boolean>} onCommit - Persists the new text
  * @return {JSX.Element}
  */
@@ -31,6 +34,7 @@ export const InlineText = ({
   disabled,
   maxLength,
   className,
+  placeholder,
   onCommit,
 }: InlineTextProps) => {
   const [editing, setEditing] = useState(false)
@@ -74,9 +78,13 @@ export const InlineText = ({
       onKeyDown={(event) => {
         if (event.key === 'Enter') start()
       }}
-      className={cn(className, !disabled && INLINE_EDIT_STYLES.text)}
+      className={cn(
+        className,
+        !disabled && INLINE_EDIT_STYLES.text,
+        !value && placeholder && INLINE_EDIT_STYLES.placeholder
+      )}
     >
-      {value}
+      {value || placeholder}
     </span>
   )
 }

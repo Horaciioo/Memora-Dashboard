@@ -4,14 +4,17 @@ import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { Section } from '@/components/structures/Section'
+import { CreatorChannelsPanel } from '@/composites/reference/CreatorChannelsPanel'
 import { CreatorLeadsPanel } from '@/composites/reference/CreatorLeadsPanel'
 import { TeamsBoard } from '@/composites/teams/TeamsBoard'
 import { roleGroupedOptions } from '@/core/lib/forms/options'
 import { prisma } from '@/core/lib/db'
 import { readAnchors } from '@/core/services/auth/LeadService'
+import { readTwitchChannel } from '@/core/services/platforms/ChannelService'
 import { encadrementAccounts } from '@/core/services/reference/lookups'
 import { readTeamBoard, teamFields } from '@/core/services/teams/TeamService'
 import { requirePermission } from '@/core/wrappers/requireUser'
+import { CHANNEL_COPY } from '@/declarations/platforms/copy'
 import { REFERENCE_COPY, REFERENCE_FIELD_COPY, YOUTUBER_COPY } from '@/declarations/reference/copy'
 
 import { PAGE_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
@@ -60,11 +63,12 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
   const youtuber = await readYoutuber(id)
   if (!youtuber) notFound()
 
-  const [board, fields, anchors, candidates] = await Promise.all([
+  const [board, fields, anchors, candidates, twitch] = await Promise.all([
     readTeamBoard(await scope(), id),
     teamFields(),
     readAnchors(id),
     encadrementAccounts(),
+    readTwitchChannel(id),
   ])
 
   return (
@@ -80,6 +84,9 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
       />
       <Section padded>
         <CreatorLabel name={youtuber.name} image={youtuber.avatarUrl} size="lg" />
+      </Section>
+      <Section title={CHANNEL_COPY.title} description={CHANNEL_COPY.lead} padded>
+        <CreatorChannelsPanel youtuberId={id} initialTwitch={twitch} canManage={access.isAdmin} />
       </Section>
       <Section
         title={REFERENCE_FIELD_COPY.leadsTitle}
