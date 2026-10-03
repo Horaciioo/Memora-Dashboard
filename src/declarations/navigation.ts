@@ -1,5 +1,4 @@
 import type { MaturityName } from '@/declarations/maturity/registries'
-import { SYSTEM_SCREENS } from '@/declarations/system/screens'
 import type { IconName } from '@/declarations/ui/icons'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
@@ -33,6 +32,7 @@ export const ROUTES = {
   academy: '/academy',
   glossary: '/academy/lexique',
   session: (id: string) => `/academy/${id}`,
+  myLegacy: '/mon-legacy',
   legacy: '/legacy',
   legacyTrack: (id: string) => `/legacy/${id}`,
   legacyModule: (id: string, key: string) => `/legacy/${id}/${key}`,
@@ -258,7 +258,7 @@ export const NAVIGATION: NavigationGroup[] = [
         visibleWhen: { statuses: ['ACADEMY'], roles: ['ADMIN', 'RESPONSABLE'] },
       },
       {
-        href: ROUTES.legacy,
+        href: ROUTES.myLegacy,
         label: 'Mon Legacy',
         icon: 'crown',
         permission: Permissions.LegacySelf,
@@ -340,11 +340,11 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.SanctionRead,
         mobile: { slot: 'primary', order: 8 },
       },
-      { href: ROUTES.marsha, label: 'Marsha Bots', icon: 'discord' },
+      { href: ROUTES.marsha, label: 'Marsha Bot', icon: 'discord' },
     ],
   },
   {
-    label: 'Système',
+    label: 'Administration',
     from: NavigationViews.Lead,
     items: [
       {
@@ -356,21 +356,13 @@ export const NAVIGATION: NavigationGroup[] = [
         mobile: { slot: 'primary', order: 2 },
       },
       {
-        href: ROUTES.administration,
-        label: 'Console admin',
-        icon: 'console',
+        href: ROUTES.system,
+        label: 'Système',
+        icon: 'system',
         from: NavigationViews.Administration,
         permission: Permissions.AccessManage,
         mobile: { slot: 'primary', order: 1 },
       },
-      ...SYSTEM_SCREENS.map((screen) => ({
-        href: ROUTES[screen.route],
-        label: screen.label,
-        icon: screen.icon,
-        from: NavigationViews.Administration,
-        permission: Permissions.AccessManage,
-        maturity: screen.maturity,
-      })),
     ],
   },
 ]
@@ -405,6 +397,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   formations: 'Formations',
   academy: 'Marsha Academy',
   legacy: 'Legacy',
+  'mon-legacy': 'Mon Legacy',
   recrutements: 'Recrutements',
   lexique: 'Lexique',
   moderation: 'Modération',

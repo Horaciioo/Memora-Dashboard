@@ -29,7 +29,7 @@ export const AuthShell = ({ title, children }: AuthShellProps) => (
           priority
         />
       </div>
-      <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6 shadow-[var(--shadow-md)] sm:p-8">
+      <div className="glass-surface rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 shadow-[var(--shadow-md)] sm:p-8">
         <h1 className="mb-6 text-xl font-black tracking-tight">{title}</h1>
         {children}
       </div>

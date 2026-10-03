@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { CourseRail } from '@/composites/academy/course/CourseRail'
 import { CalendarRailPanel, CalendarSearchBar } from '@/composites/calendar/CalendarSidebar'
 import { NotificationsBell } from '@/composites/notifications/NotificationsBell'
@@ -14,7 +13,6 @@ import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
 import { useCalendarRail } from '@/core/hooks/interaction/useCalendarRail'
 import { useCourseRail } from '@/core/hooks/interaction/useCourseRail'
 import { APP_VERSION_LABEL } from '@/declarations/app'
-import { ROUTE_STEPS } from '@/declarations/maturity/steps'
 import { ROUTES, visibleNavGroups } from '@/declarations/navigation'
 import { BEACON_ATTRIBUTE, routeBeacon } from '@/declarations/ui/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
@@ -138,14 +136,6 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
                             aria-hidden="true"
                           />
                           <span className={LEFT_SIDEBAR.navLabel}>{item.label}</span>
-                          {item.maturity && (
-                            <MaturityTag
-                              maturity={item.maturity}
-                              steps={ROUTE_STEPS[item.href]}
-                              interactive={false}
-                              className={LEFT_SIDEBAR.navMaturity}
-                            />
-                          )}
                         </Link>
                       )
                     })}

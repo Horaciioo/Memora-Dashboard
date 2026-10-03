@@ -1,7 +1,6 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Breadcrumbs } from '@/components/structures/Breadcrumbs'
 import { WindowFrame } from '@/components/structures/WindowFrame'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { SealDialog } from '@/composites/security/SealDialog'
@@ -10,6 +9,7 @@ import { LeftSidebar } from '@/composites/shell/LeftSidebar'
 import { MobileTopBar } from '@/composites/shell/MobileTopBar'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
+import { frameToneOf } from '@/declarations/access/views'
 import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
 import type { ViewContext } from '@/types/access'
@@ -66,7 +66,7 @@ const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: 
 
   return (
     <SealProvider initialState={twoFactor} initialSeal={seal}>
-      <div className={APP_SHELL.frame}>
+      <div className={APP_SHELL.frame} data-tone={frameToneOf(viewContext.view, session?.role)}>
         {isClaimed ? (
           <aside className={LEFT_SIDEBAR.rail}>
             <div ref={setSlot} className={LEFT_SIDEBAR.slot} />
@@ -80,10 +80,7 @@ const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: 
           {session && (
             <MobileTopBar session={session} unreadCount={unreadCount} viewContext={viewContext} />
           )}
-          <main className={APP_SHELL.content}>
-            <Breadcrumbs />
-            {children}
-          </main>
+          <main className={APP_SHELL.content}>{children}</main>
         </div>
 
         {session && <BottomNav viewContext={viewContext} />}
