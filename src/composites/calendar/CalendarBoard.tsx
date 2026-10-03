@@ -2,9 +2,11 @@
 
 import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useState } from 'react'
+import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
+import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { Dialog } from '@/components/structures/Dialog'
 import { DetailGrid } from '@/components/structures/DetailGrid'
@@ -34,7 +36,7 @@ import {
 } from '@/declarations/calendar/registries'
 import { CALENDAR_SETTINGS } from '@/declarations/configurations/settings'
 import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
-import { ACTION_COPY } from '@/declarations/ui/copy'
+import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { accentPaint, accentVars } from '@/declarations/ui/theme'
 import { CALENDAR_STYLES } from '@/declarations/ui/variants'
@@ -440,8 +442,22 @@ export const CalendarBoard = ({
     />
   )
 
+  const pageOptions: PageOption[] = [
+    {
+      id: 'unit',
+      label: PAGE_OPTIONS_COPY.view,
+      value: unit,
+      choices: UNITS,
+      onChange: (value: string) => {
+        const next = UNITS.find((entry) => entry.value === value)
+        if (next) setUnit(next.value)
+      },
+    },
+  ]
+
   return (
     <>
+      <PageOptions options={pageOptions} />
       <Section description={CALENDAR_COPY.moveHint} bare>
         <div className="flex flex-col gap-6">
           {!sessionId && <CalendarSidebar {...railProps} />}
@@ -449,6 +465,7 @@ export const CalendarBoard = ({
           <div className="flex min-w-0 flex-col gap-4">
             <div className={CALENDAR_STYLES.toolbar}>
               <Button onClick={() => setCursor(toDayKey(new Date()))}>{CALENDAR_COPY.today}</Button>
+              {calendar.isLoading && <BrandLoader variant="ink" />}
               <Button
                 variant="icon"
                 icon="back"
@@ -471,12 +488,6 @@ export const CalendarBoard = ({
                     label={CALENDAR_COPY.gridMode}
                   />
                 )}
-                <SegmentedControl
-                  options={UNITS}
-                  value={unit}
-                  onChange={setUnit}
-                  label={CALENDAR_COPY.unit}
-                />
                 {canManage && (
                   <span {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.calendarAdd }}>
                     <Button variant="primary" icon="add" onClick={() => openForm(null)}>

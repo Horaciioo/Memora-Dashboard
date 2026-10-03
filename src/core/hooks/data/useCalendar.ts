@@ -22,6 +22,7 @@ const GENDER = 'masculine'
  * @typedef {Object} CalendarCollection
  * @property {CalendarEntry[]} entries - Entries of the current window
  * @property {boolean} isSaving - Mutation in flight
+ * @property {boolean} isLoading - Window being pulled
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {() => void} clearIssues - Forget the rejections
  * @property {(values: FormValues) => Promise<boolean>} create - Post an entry
@@ -39,6 +40,7 @@ const GENDER = 'masculine'
 export interface CalendarCollection {
   entries: CalendarEntry[]
   isSaving: boolean
+  isLoading: boolean
   issues: FieldIssue[]
   clearIssues: () => void
   create: (values: FormValues) => Promise<boolean>
@@ -67,6 +69,7 @@ export const useCalendar = (
   const [entries, setEntries] = useState(initialEntries)
   const queryClient = useQueryClient()
   const { isSaving, issues, clearIssues, run } = useMutation()
+  const [isLoading, setLoading] = useState(false)
 
   const replace = useCallback((entry: CalendarEntry) => {
     setEntries((current) => {
@@ -177,6 +180,7 @@ export const useCalendar = (
   const load = useCallback(
     async (from: string, to: string) => {
       // A window read never raises a toast, the grid simply refills
+      setLoading(true)
       const next = await queryClient
         .fetchQuery({
           queryKey: QUERY_KEYS.calendar(from, to, sessionId),
@@ -186,6 +190,7 @@ export const useCalendar = (
           staleTime: 0,
         })
         .catch(() => null)
+      setLoading(false)
       if (next) setEntries(next)
     },
     [sessionId, queryClient]
@@ -237,6 +242,7 @@ export const useCalendar = (
   return {
     entries,
     isSaving,
+    isLoading,
     issues,
     clearIssues,
     create,

@@ -18,7 +18,6 @@ export const CALENDAR_COPY = {
   agenda: 'Planning',
   agendaEmpty: 'Rien de prévu sur cette période.',
   day: 'Jour',
-  unit: 'Période affichée',
   // Pointer mode
   gridMode: 'Geste sur la grille',
   modeDraw: 'Tracer',

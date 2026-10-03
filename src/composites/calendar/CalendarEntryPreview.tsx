@@ -32,7 +32,6 @@ const OFFSET = 8
 export const CalendarEntryPreview = ({ entry, anchor }: CalendarEntryPreviewProps) => {
   if (typeof document === 'undefined') return null
 
-  const Bullet = ICONS.bullet
   const ClockIcon = ICONS.clock
   const PersonIcon = ICONS.members
   const source = CALENDAR_SOURCE_REGISTRY.get(entry.source)
@@ -52,7 +51,7 @@ export const CalendarEntryPreview = ({ entry, anchor }: CalendarEntryPreviewProp
     >
       <span className={CALENDAR_STYLES.previewHead}>
         <span className={cn('inline-flex', paint.text)} style={paint.style}>
-          <Bullet className={CALENDAR_STYLES.previewBullet} aria-hidden="true" />
+          <span className={CALENDAR_STYLES.previewBullet} aria-hidden="true" />
         </span>
         <Glyph value={entry.emoji} size="chip" />
         <span className={CALENDAR_STYLES.previewTitle}>{entry.title}</span>

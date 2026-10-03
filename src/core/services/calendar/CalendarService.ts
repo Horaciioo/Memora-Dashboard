@@ -530,7 +530,11 @@ export const readCalendarScope = async (
 ): Promise<AccessScope> =>
   access.isAdmin
     ? { isGlobal: true, youtuberIds: [], activeYoutuberId: null }
-    : { isGlobal: false, youtuberIds: await readFullPerimeter(viewer, access), activeYoutuberId: null }
+    : {
+        isGlobal: false,
+        youtuberIds: await readFullPerimeter(viewer, access),
+        activeYoutuberId: null,
+      }
 
 /**
  * Turn parsed values into an entry payload

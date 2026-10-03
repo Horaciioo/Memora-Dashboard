@@ -3,7 +3,6 @@
 import { Glyph } from '@/components/elements/display/Glyph'
 import { CALENDAR_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
 import { CALENDAR_SOURCE_REGISTRY } from '@/declarations/calendar/registries'
-import { ICONS } from '@/declarations/ui/icons'
 import { accentPaint } from '@/declarations/ui/theme'
 import { CALENDAR_AGENDA } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
@@ -29,8 +28,6 @@ export interface CalendarAgendaProps {
  */
 
 export const CalendarAgenda = ({ days, entries, selection, onOpen }: CalendarAgendaProps) => {
-  const Bullet = ICONS.bullet
-
   const filled = days
     .map((day) => ({
       day,
@@ -82,7 +79,7 @@ export const CalendarAgenda = ({ days, entries, selection, onOpen }: CalendarAge
                   )}
                 >
                   <span className={cn('inline-flex', paint.text)} style={paint.style}>
-                    <Bullet className={CALENDAR_AGENDA.bullet} aria-hidden="true" />
+                    <span className={CALENDAR_AGENDA.bullet} aria-hidden="true" />
                   </span>
                   <span className={CALENDAR_AGENDA.time}>
                     {entry.allDay ? CALENDAR_COPY.allDayRow : timeOf(entry.startsAt)}

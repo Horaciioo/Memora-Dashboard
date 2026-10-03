@@ -77,7 +77,6 @@ export const CalendarEntryChip = ({
   const [anchor, setAnchor] = useState<DOMRect | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const RollCallIcon = ICONS.meetings
-  const Bullet = ICONS.bullet
 
   // Never leave a timer running once the chip is gone
   useEffect(
@@ -150,7 +149,7 @@ export const CalendarEntryChip = ({
         {line && !band ? (
           <>
             <span className={cn('inline-flex', paint.text)} style={paint.style}>
-              <Bullet className={CALENDAR_STYLES.lineBullet} aria-hidden="true" />
+              <span className={CALENDAR_STYLES.lineBullet} aria-hidden="true" />
             </span>
             {!entry.allDay && (
               <span className={CALENDAR_STYLES.lineTime}>
