@@ -1180,3 +1180,9 @@ body {
     animation: none;
   }
 }
+
+/* A page holding the Mod View drops the banner room and the width cap */
+.shell-page:has(.modview-bleed) {
+  max-width: none;
+  padding-top: 1rem;
+}
