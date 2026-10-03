@@ -6,7 +6,7 @@ import { ModWindow } from '@/composites/modview/ModWindow'
 import { MODVIEW_COMMUNITY_GROUPS } from '@/declarations/modview/registries'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { MODVIEW_COMMUNITY, MODVIEW_WINDOW } from '@/declarations/ui/variants'
+import { MODVIEW_COMMUNITY } from '@/declarations/ui/variants'
 import type { Chatter, ModViewState, ModViewTarget } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 
@@ -29,7 +29,12 @@ export const CommunityWindow = ({ community, spotlight, onPick }: CommunityWindo
   const needle = search.trim().toLowerCase()
 
   return (
-    <ModWindow title={MODVIEW_COPY.community} isLit={spotlight === 'community'} grow>
+    <ModWindow title={MODVIEW_COPY.community} isLit={
+        spotlight === 'community' ||
+        spotlight === 'broadcaster' ||
+        spotlight === 'moderators' ||
+        spotlight === 'vips'
+      } grow>
       <div className={MODVIEW_COMMUNITY.search}>
         <input
           className={MODVIEW_COMMUNITY.input}
@@ -49,7 +54,7 @@ export const CommunityWindow = ({ community, spotlight, onPick }: CommunityWindo
             key={key}
             className={cn(
               MODVIEW_COMMUNITY.group,
-              group.target !== null && spotlight === group.target && MODVIEW_WINDOW.lit
+              group.target !== null && spotlight === group.target && MODVIEW_COMMUNITY.groupLit
             )}
           >
             <p className={MODVIEW_COMMUNITY.groupHead}>

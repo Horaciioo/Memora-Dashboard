@@ -23,6 +23,10 @@ export interface ModViewProps {
   permissions: PermissionName[]
   panel: SanctionPanelView | null
   levelName: string | null
+  // Inside a course: no rail taken, no page bleed, sanctions folded away
+  embedded?: boolean
+  // Windows kept, in a single row
+  only?: ModViewWindow[]
 }
 
 /**
@@ -31,10 +35,19 @@ export interface ModViewProps {
  * @param {PermissionName[]} permissions - Held on this live
  * @param {SanctionPanelView | null} panel - Creator panel at the level in force
  * @param {string | null} levelName - Livecon level in force
+ * @param {boolean} [embedded] - Played inside a course
+ * @param {ModViewWindow[]} [only] - Windows kept
  * @return {JSX.Element}
  */
 
-export const ModView = ({ driver, permissions, panel, levelName }: ModViewProps) => {
+export const ModView = ({
+  driver,
+  permissions,
+  panel,
+  levelName,
+  embedded = false,
+  only,
+}: ModViewProps) => {
   const { state, spotlight } = driver
   const [hidden, setHidden] = useState<Set<ModViewWindow>>(new Set())
   const [picked, setPicked] = useState<Chatter | null>(null)
@@ -61,7 +74,8 @@ export const ModView = ({ driver, permissions, panel, levelName }: ModViewProps)
     [driver, gate]
   )
 
-  const shows = (window: ModViewWindow) => available.includes(window) && !hidden.has(window)
+  const shows = (window: ModViewWindow) =>
+    available.includes(window) && !hidden.has(window) && (!only || only.includes(window))
   const lit = (target: string) => spotlight === target
 
   const toggleWindow = (window: ModViewWindow) =>
@@ -82,25 +96,29 @@ export const ModView = ({ driver, permissions, panel, levelName }: ModViewProps)
     : []
 
   return (
-    <div className={cn(MODVIEW_FRAME.root, MODVIEW_FRAME.bleed)}>
-      <ModViewRail
-        state={state}
-        levelName={levelName}
-        windows={available}
-        hidden={hidden}
-        onToggle={toggleWindow}
-      />
+    <div
+      className={cn(MODVIEW_FRAME.root, embedded ? MODVIEW_FRAME.embedded : MODVIEW_FRAME.bleed)}
+    >
+      {!embedded && (
+        <ModViewRail
+          state={state}
+          levelName={levelName}
+          windows={available}
+          hidden={hidden}
+          onToggle={toggleWindow}
+        />
+      )}
 
       <div className={MODVIEW_FRAME.body}>
         <div className={MODVIEW_SPOTLIGHT.stage}>
           {spotlight && <div className={MODVIEW_SPOTLIGHT.veil} aria-hidden="true" />}
 
-          <div className={MODVIEW_FRAME.grid}>
-            <div className={MODVIEW_FRAME.column}>
+          <div className={only ? MODVIEW_FRAME.focus : MODVIEW_FRAME.grid}>
+            <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.column}>
               {shows('stream') && (
                 <StreamWindow state={state} isLit={lit('stream')} isTitleLit={lit('title')} />
               )}
-              <div className={MODVIEW_FRAME.pair}>
+              <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.pair}>
                 {shows('modActions') && (
                   <ModActionsWindow
                     acts={state.acts}
@@ -114,7 +132,7 @@ export const ModView = ({ driver, permissions, panel, levelName }: ModViewProps)
               </div>
             </div>
 
-            <div className={MODVIEW_FRAME.column}>
+            <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.column}>
               {shows('chat') && (
                 <ChatWindow
                   state={state}
@@ -126,7 +144,7 @@ export const ModView = ({ driver, permissions, panel, levelName }: ModViewProps)
               )}
             </div>
 
-            <div className={MODVIEW_FRAME.column}>
+            <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.column}>
               {shows('community') && (
                 <CommunityWindow
                   community={state.community}
@@ -156,16 +174,18 @@ export const ModView = ({ driver, permissions, panel, levelName }: ModViewProps)
           )}
         </div>
 
-        <SanctionsDrawer
-          panel={panel}
-          levelName={levelName}
-          isOpen={isPanelOpen}
-          onToggle={() => setPanelOpen((open) => !open)}
-          target={picked}
-          targetLines={pickedLines}
-          gate={gate}
-          onAct={act}
-        />
+        {!embedded && (
+          <SanctionsDrawer
+            panel={panel}
+            levelName={levelName}
+            isOpen={isPanelOpen}
+            onToggle={() => setPanelOpen((open) => !open)}
+            target={picked}
+            targetLines={pickedLines}
+            gate={gate}
+            onAct={act}
+          />
+        )}
       </div>
     </div>
   )

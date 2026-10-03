@@ -87,7 +87,7 @@ export const ChatWindow = ({ state, spotlight, gate, onAct, onPick }: ChatWindow
   return (
     <ModWindow
       title={MODVIEW_COPY.chat}
-      isLit={spotlight === 'chat'}
+      isLit={spotlight === 'chat' || spotlight === 'modes' || spotlight === 'chatOptions'}
       grow
       flush
       className={MODVIEW_CHAT.root}

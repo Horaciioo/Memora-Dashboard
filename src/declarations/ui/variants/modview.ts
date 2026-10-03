@@ -9,6 +9,7 @@ export const MODVIEW_FRAME = {
   root: 'flex h-[calc(100dvh-3rem)] min-h-[36rem] w-full flex-col gap-3',
   // Hook read by the page shell to drop banner room and width cap
   bleed: 'modview-bleed',
+  embedded: 'h-[40rem] min-h-0 lg:h-[44rem]',
   bar: 'flex flex-wrap items-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 shadow-[var(--shadow-sm)]',
   channel: 'flex items-center gap-2 font-bold',
   platform: 'h-6 w-6 shrink-0',
@@ -29,6 +30,10 @@ export const MODVIEW_FRAME = {
   railIcon: 'h-5 w-5',
   grid: 'grid min-h-0 flex-1 gap-3 overflow-y-auto lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.7fr)] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden',
   column: 'flex min-h-0 flex-col gap-3',
+  // Wrapper dropped in focus mode
+  flat: 'contents',
+  // Windows of a course focus, side by side
+  focus: 'grid min-h-0 flex-1 auto-cols-fr gap-3 lg:grid-flow-col lg:grid-rows-[minmax(0,1fr)]',
   pair: 'grid min-h-0 flex-1 gap-3 sm:grid-cols-2',
 } as const
 
@@ -175,7 +180,8 @@ export const MODVIEW_COMMUNITY = {
   search: 'flex items-center gap-2 p-3',
   input:
     'w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-brand-600)]',
-  group: 'flex flex-col gap-1 px-3 pb-3',
+  group: 'mx-2 mb-2 flex flex-col gap-1 rounded-[var(--radius-lg)] px-2 pb-2 transition-[background-color,box-shadow]',
+  groupLit: 'bg-[var(--color-brand-100)] ring-2 ring-[var(--color-brand-600)]',
   groupHead: 'flex items-center gap-2 py-1 text-sm font-black',
   groupIcon: 'h-5 w-5 shrink-0',
   member: 'w-fit cursor-pointer text-sm font-semibold hover:underline',
