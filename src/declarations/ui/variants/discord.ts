@@ -5,7 +5,10 @@
 
 export const DISCORD_MESSAGE = {
   frame:
-    'flex flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--discord-background)] text-[0.9375rem] leading-[1.375rem] text-[var(--discord-text)]',
+    'relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--discord-background)] text-[0.9375rem] leading-[1.375rem] text-[var(--discord-text)]',
+  // Small copy control in the top right corner of the announcement
+  copyCorner:
+    'absolute top-2 right-2 z-10 text-[var(--discord-muted)] hover:text-[var(--discord-heading)]',
   message: 'flex gap-4 px-4 py-3',
   avatar: 'h-10 w-10 shrink-0 rounded-full bg-[var(--discord-blurple)]',
   body: 'flex min-w-0 flex-1 flex-col',
@@ -18,7 +21,8 @@ export const DISCORD_MESSAGE = {
   h2: 'mt-2 mb-1 text-xl leading-[1.375em] font-bold text-[var(--discord-heading)]',
   h3: 'mt-2 mb-1 text-base leading-[1.375em] font-bold text-[var(--discord-heading)]',
   subtext: 'text-xs text-[var(--discord-muted)]',
-  quote: 'flex gap-3 py-0.5 before:w-1 before:shrink-0 before:rounded-full before:bg-[var(--discord-quote)]',
+  quote:
+    'flex gap-3 py-0.5 before:w-1 before:shrink-0 before:rounded-full before:bg-[var(--discord-quote)]',
   list: 'my-1 flex list-disc flex-col pl-6',
   ordered: 'my-1 flex list-decimal flex-col pl-6',
   codeBlock:
@@ -36,7 +40,8 @@ export const DISCORD_MESSAGE = {
   hint: 'px-4 pt-1 text-xs text-[var(--discord-muted)]',
   popover:
     'absolute right-4 bottom-full left-4 mb-2 max-h-72 overflow-y-auto rounded-[var(--radius-md)] bg-[var(--discord-popover)] p-2 shadow-[var(--shadow-md)]',
-  popoverGroup: 'px-2 pt-2 pb-1 text-xs font-bold tracking-wide text-[var(--discord-muted)] uppercase',
+  popoverGroup:
+    'px-2 pt-2 pb-1 text-xs font-bold tracking-wide text-[var(--discord-muted)] uppercase',
   popoverItem:
     'flex w-full items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 text-left text-sm text-[var(--discord-text)]',
   popoverItemActive: 'bg-[var(--discord-hover)] text-[var(--discord-heading)]',
