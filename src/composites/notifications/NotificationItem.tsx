@@ -8,6 +8,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { TONES } from '@/declarations/ui/theme'
 import { NOTIFICATION_STYLES } from '@/declarations/ui/variants'
 import { formatSince } from '@/utils/format/dates'
+import { notificationSentence } from '@/utils/format/notifications'
 import { cn } from '@/utils/classnames'
 import type { NotificationEntry } from '@/types/notifications'
 
@@ -31,6 +32,7 @@ export const NotificationItem = ({ entry, withAction, onOpen }: NotificationItem
   const target = entry.target ? NOTIFICATION_TARGETS.get(entry.target) : null
   const href = target?.route(entry.targetId) ?? null
   const actor = entry.actorName ?? NOTIFICATION_COPY.system
+  const sentence = kind ? notificationSentence(kind, actor, entry.subject) : null
   const tone = TONES[kind?.tone ?? 'neutral']
   const Glyph = ICONS[kind?.icon ?? 'bell']
   const ActionIcon = ICONS.forward
@@ -45,14 +47,16 @@ export const NotificationItem = ({ entry, withAction, onOpen }: NotificationItem
       </span>
 
       <div className={NOTIFICATION_STYLES.content}>
-        {kind && (
+        {sentence && (
           <p className={NOTIFICATION_STYLES.sentence}>
-            {`${actor} ${kind.lead} `}
-            <strong className={NOTIFICATION_STYLES.verb}>{kind.verb}</strong>
-            {kind.trail ? ` ${kind.trail}.` : '.'}
+            {sentence.before}
+            <strong className={NOTIFICATION_STYLES.verb}>{sentence.verb}</strong>
+            {sentence.after}
           </p>
         )}
-        {entry.subject && <p className={NOTIFICATION_STYLES.subject}>{entry.subject}</p>}
+        {entry.subject && !kind?.addressed && (
+          <p className={NOTIFICATION_STYLES.subject}>{entry.subject}</p>
+        )}
 
         <div className={NOTIFICATION_STYLES.foot}>
           <span className={NOTIFICATION_STYLES.moment} suppressHydrationWarning>

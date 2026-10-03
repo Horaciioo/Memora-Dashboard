@@ -1,16 +1,11 @@
 'use client'
 
-import Link from 'next/link'
-
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { Section } from '@/components/structures/Section'
 import { NotificationsList } from '@/composites/notifications/NotificationsList'
 import { useNotificationFeed } from '@/core/hooks/data/useNotificationFeed'
-import { ROUTES } from '@/declarations/navigation'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
-import { BUTTON_STYLES } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
 import type { NotificationFeed } from '@/types/notifications'
 
 export interface NotificationsBoardProps {
@@ -43,14 +38,7 @@ export const NotificationsBoard = ({ feed }: NotificationsBoardProps) => {
           figure="notifications"
           title={NOTIFICATION_COPY.emptyTitle}
           description={NOTIFICATION_COPY.emptyDescription}
-          action={
-            <Link
-              href={ROUTES.dashboard}
-              className={cn(BUTTON_STYLES.base, BUTTON_STYLES.secondary)}
-            >
-              {NOTIFICATION_COPY.backHome}
-            </Link>
-          }
+          action={<span />}
         />
       ) : (
         <NotificationsList entries={entries} onOpen={open} />

@@ -12,15 +12,17 @@ import type { NotificationKindName } from '@/utils/constants/notifications'
  * @property {string} lead - Words between the actor and the verb
  * @property {string} verb - Past participle, emphasised in the sentence
  * @property {string} trail - What the act landed on, its determiner included
+ * @property {boolean} [addressed] - Reads to the member alone, no actor, the subject filling {subject}
  */
 
-interface NotificationKindOption {
+export interface NotificationKindOption {
   label: string
   tone: Tone
   icon: IconName
   lead: string
   verb: string
   trail: string
+  addressed?: boolean
 }
 
 /*
@@ -77,6 +79,15 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     verb: 'traité',
     trail: 'ton absence',
   },
+  AbsenceAcknowledged: {
+    label: 'Absence',
+    tone: 'success',
+    icon: 'absences',
+    lead: 'Ton absence {subject} a bien été',
+    verb: 'prise en compte',
+    trail: '',
+    addressed: true,
+  },
   AccessChanged: {
     label: 'Accès',
     tone: 'warning',
@@ -124,6 +135,30 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     lead: 'a',
     verb: 'validé',
     trail: 'ta formation',
+  },
+  TrainingFinished: {
+    label: 'Formation',
+    tone: 'success',
+    icon: 'academy',
+    lead: 'a',
+    verb: 'terminé',
+    trail: 'une formation',
+  },
+  LegacyOpened: {
+    label: 'Legacy',
+    tone: 'brand',
+    icon: 'crown',
+    lead: 'a',
+    verb: 'ouvert',
+    trail: 'ton parcours Legacy',
+  },
+  LegacyDecided: {
+    label: 'Legacy',
+    tone: 'brand',
+    icon: 'crown',
+    lead: 'a',
+    verb: 'tranché',
+    trail: 'ton parcours Legacy',
   },
   CandidateAssigned: {
     label: 'Candidature',

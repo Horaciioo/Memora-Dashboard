@@ -1,21 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import type { RefObject } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
+import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { SkeletonList } from '@/components/elements/feedback/Skeleton'
 import { NotificationsList } from '@/composites/notifications/NotificationsList'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
+import { RAIL_POPOVER } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 import { NOTIFICATION_STYLES } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 import type { NotificationEntry } from '@/types/notifications'
 
 export interface NotificationsPanelProps {
-  panelRef: RefObject<HTMLDivElement | null>
   entries: NotificationEntry[]
   unread: number
   isLoading: boolean
@@ -25,8 +26,7 @@ export interface NotificationsPanelProps {
 }
 
 /**
- * Vertical window raised by the bell — the page loads on opening, never on a timer
- * @param {RefObject<HTMLDivElement | null>} panelRef - Anchoring ref
+ * Box raised by the bell beside the rail, the page loading on opening, never on a timer
  * @param {NotificationEntry[]} entries - Notifications, newest first
  * @param {number} unread - Unopened count
  * @param {boolean} isLoading - First page still in flight
@@ -37,7 +37,6 @@ export interface NotificationsPanelProps {
  */
 
 export const NotificationsPanel = ({
-  panelRef,
   entries,
   unread,
   isLoading,
@@ -46,6 +45,7 @@ export const NotificationsPanel = ({
   onLeave,
 }: NotificationsPanelProps) => {
   const SeeAllIcon = ICONS.forward
+  const BellIcon = ICONS.bell
 
   const seeAll = (
     <Link href={ROUTES.notifications} onClick={onLeave} className={NOTIFICATION_STYLES.footerLink}>
@@ -56,13 +56,16 @@ export const NotificationsPanel = ({
 
   return (
     <div
-      ref={panelRef}
       role="dialog"
       aria-label={NOTIFICATION_COPY.title}
-      className={NOTIFICATION_STYLES.panel}
+      className={cn(RAIL_POPOVER.panel, RAIL_POPOVER.bell)}
     >
-      <div className={NOTIFICATION_STYLES.header}>
-        <span className={NOTIFICATION_STYLES.title}>{NOTIFICATION_COPY.title}</span>
+      <div className={RAIL_POPOVER.head}>
+        <BellIcon className={RAIL_POPOVER.headGlyph} aria-hidden="true" />
+        <p className={RAIL_POPOVER.headTitle}>{NOTIFICATION_COPY.title}</p>
+        <p className={RAIL_POPOVER.headMeta}>
+          {unread > 0 ? NOTIFICATION_COPY.metaUnread : NOTIFICATION_COPY.metaRead}
+        </p>
         {unread > 0 && (
           <Button
             variant="icon"
@@ -70,12 +73,20 @@ export const NotificationsPanel = ({
             aria-label={NOTIFICATION_COPY.markAll}
             title={NOTIFICATION_COPY.markAll}
             onClick={onReadAll}
+            className={RAIL_POPOVER.headAction}
           />
         )}
       </div>
 
-      <div className={NOTIFICATION_STYLES.body}>
-        {isLoading && <SkeletonList shape="row" rows={NOTIFICATION_SETTINGS.panelSize} />}
+      <div className={RAIL_POPOVER.body}>
+        {isLoading && (
+          <>
+            <div className="flex justify-center py-2">
+              <BrandLoader variant="ink" />
+            </div>
+            <SkeletonList shape="row" rows={NOTIFICATION_SETTINGS.panelSize} />
+          </>
+        )}
         {!isLoading && entries.length === 0 && (
           <EmptyState
             compact

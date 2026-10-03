@@ -21,6 +21,10 @@ export const NOTIFICATION_KINDS = createEnumeration({
   CandidateAssigned: { id: 12, label: 'Candidature confiée' },
   RecruitmentAssigned: { id: 13, label: 'Recrutement confié' },
   AttendanceRequested: { id: 14, label: 'Appel de présence' },
+  TrainingFinished: { id: 15, label: 'Formation terminée' },
+  LegacyOpened: { id: 16, label: 'Parcours Legacy ouvert' },
+  LegacyDecided: { id: 17, label: 'Parcours Legacy tranché' },
+  AbsenceAcknowledged: { id: 18, label: 'Absence prise en compte' },
 })
 
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids
