@@ -2,7 +2,6 @@ import 'server-only'
 
 import { decryptField, encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
-import { ABSENCE_REASONS } from '@/utils/constants/absences'
 import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { readDateRange, readText } from '@/core/lib/forms/values'
 import {
@@ -75,27 +74,11 @@ export const toAbsence = (row: Omit<AbsenceRow, 'account'>, memberName: string):
   startDate: row.startDate.toISOString(),
   endDate: row.endDate.toISOString(),
   dayCount: row.dayCount,
-  reasonLabel: row.reasonCode === null ? null : ABSENCE_REASONS.label(row.reasonCode),
   reason: decryptField(row.reason),
   status: row.status,
   reviewerName: row.reviewer?.displayName ?? null,
   reviewNote: decryptField(row.reviewNote),
 })
-
-/**
- * Read the chosen category, refusing anything outside the closed list
- * @param {FormValues} values - Parsed body
- * @return {number} - Reason identifier
- */
-
-const readReasonCode = (values: FormValues): number => {
-  const raw = Number(readText(values, 'reasonCode'))
-  if (!Number.isInteger(raw) || !ABSENCE_REASONS.has(raw)) {
-    throw invalidInput([{ field: 'reasonCode', message: FORM_COPY.notAnOption }])
-  }
-
-  return raw
-}
 
 /**
  * Declarations of the absence form
@@ -110,24 +93,13 @@ export const ABSENCE_FIELDS: FieldDefinition[] = [
     info: ABSENCE_FIELD_INFO.dates,
     required: true,
   },
-  {
-    name: 'reasonCode',
-    kind: 'select',
-    label: ABSENCE_FIELD_COPY.reason,
-    info: ABSENCE_FIELD_INFO.reason,
-    hint: ABSENCE_FIELD_COPY.reasonHint,
-    required: true,
-    options: ABSENCE_REASONS.options.map((option) => ({
-      value: String(option.value),
-      label: option.label,
-    })),
-  },
   // Free text is kept for logistics only, never for a medical detail
   {
     name: 'reason',
-    kind: 'text',
-    label: ABSENCE_FIELD_COPY.detail,
-    hint: ABSENCE_FIELD_COPY.detailHint,
+    kind: 'textarea',
+    label: ABSENCE_FIELD_COPY.reason,
+    info: ABSENCE_FIELD_INFO.reason,
+    hint: ABSENCE_FIELD_COPY.reasonHint,
     maxLength: FORM_SETTINGS.shortTextMaxLength,
   },
 ]
@@ -263,7 +235,6 @@ export const createAbsence = async (
       startDate,
       endDate,
       dayCount,
-      reasonCode: readReasonCode(values),
       reason: encryptField(readText(values, 'reason')),
       ...(approval
         ? {

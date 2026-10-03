@@ -10,7 +10,8 @@ import { notify } from '@/core/services/system/NotificationService'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
-import type { AbsenceStatusName } from '@/utils/constants/workflow'
+import { AbsenceStatuses, type AbsenceStatusName } from '@/utils/constants/workflow'
+import { absenceSentence } from '@/utils/format/absences'
 
 export const PATCH = createProtectedRoute({
   permission: Permissions.AbsenceReview,
@@ -40,13 +41,18 @@ export const PATCH = createProtectedRoute({
       summary: ABSENCE_STATUS_REGISTRY.label(status),
     })
 
+    // Taken into account reads as a sentence of its own, the dates in it
+    const isApproved = status === AbsenceStatuses.Approved
+
     await notify({
-      kind: 'AbsenceReviewed',
+      kind: isApproved ? 'AbsenceAcknowledged' : 'AbsenceReviewed',
       recipients: [absence.accountId],
       actorId: session.id,
       target: 'absence',
       targetId: absence.id,
-      subject: ABSENCE_STATUS_REGISTRY.label(status),
+      subject: isApproved
+        ? `du ${absenceSentence(absence.startDate, absence.endDate)}`
+        : ABSENCE_STATUS_REGISTRY.label(status),
     })
 
     return absence
