@@ -8,6 +8,7 @@ export const LIVE_COPY = {
   navLabel: 'Livecon',
   announce: 'Annoncer un live',
   announceTitle: 'Annoncer un live',
+  announceVerb: 'Annoncer',
   announceLead: 'L’équipe convoquée est prévenue, sauf les membres en absence.',
   start: 'Lancer le live',
   end: 'Clore le live',

@@ -100,7 +100,7 @@ export const LivesBoard = ({ initialLives, fields, canAnnounce, viewerId }: Live
         fields={fields}
         issues={issues}
         isSaving={isSaving}
-        submitVerb={LIVE_COPY.announce}
+        submitVerb={LIVE_COPY.announceVerb}
         onSubmit={async (values) => {
           const saved = await announce(values)
           if (saved) setAnnouncing(false)
