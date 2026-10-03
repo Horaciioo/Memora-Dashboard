@@ -193,7 +193,10 @@ const trainingTasks = async (accountId: string): Promise<HomeTask[]> => {
  * @return {Promise<HomeTask[]>} - Tasks, most pressing first
  */
 
-export const myTasks = async (viewer: SessionUser, access: PermissionHelpers): Promise<HomeTask[]> => {
+export const myTasks = async (
+  viewer: SessionUser,
+  access: PermissionHelpers
+): Promise<HomeTask[]> => {
   const manages = access.can(Permissions.AcademyManage)
 
   const [trained, managed, own, preparation, trainings] = await Promise.all([

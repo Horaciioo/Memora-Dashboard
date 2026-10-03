@@ -73,3 +73,45 @@ export interface HomeTask {
   destinationLabel: string | null
   dueAt: string | null
 }
+
+/**
+ * One line of the home queue, whatever it comes from
+ * @typedef {Object} HomeEntry
+ * @property {string} key - Stable identifier
+ * @property {IconName | null} icon - Glyph when no emoji
+ * @property {string | null} emoji - Emoji standing for the entry
+ * @property {string} title - What is asked
+ * @property {string | null} meta - Who or what it concerns
+ * @property {string | null} note - Words the requester left
+ * @property {string | null} due - Relative wording of its day
+ * @property {HomeAction[]} actions - What the member can do, the first one leading
+ */
+
+export interface HomeEntry {
+  key: string
+  icon: IconName | null
+  emoji: string | null
+  title: string
+  meta: string | null
+  note: string | null
+  due: string | null
+  actions: HomeAction[]
+}
+
+/**
+ * Button of a home entry, a link or a handler
+ * @typedef {Object} HomeAction
+ * @property {string} id - Stable identifier
+ * @property {string} label - Button text
+ * @property {'primary' | 'secondary'} variant - Visual weight
+ * @property {string} [href] - Destination when it navigates
+ * @property {() => void} [onSelect] - Handler when it acts in place
+ */
+
+export interface HomeAction {
+  id: string
+  label: string
+  variant: 'primary' | 'secondary'
+  href?: string
+  onSelect?: () => void
+}

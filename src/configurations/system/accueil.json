@@ -1,7 +1,7 @@
 {
   "birthdayWindowDays": 30,
-  "birthdayMax": 8,
+  "birthdayMax": 4,
   "meetingWindowDays": 21,
-  "meetingMax": 6,
-  "taskMax": 5
+  "meetingMax": 4,
+  "taskMax": 4
 }
