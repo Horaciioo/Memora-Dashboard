@@ -133,6 +133,18 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
   LegacyChanged: { label: 'Legacy', tone: 'brand', verb: 'modifié', target: 'un parcours Legacy' },
   LiveAnnounced: { label: 'Live', tone: 'danger', verb: 'annoncé', target: 'un live' },
   LiveMoved: { label: 'Live', tone: 'danger', verb: 'changé', target: 'le statut d’un live' },
+  PlatformLinked: {
+    label: 'Plateforme',
+    tone: 'info',
+    verb: 'lié',
+    target: 'un compte de plateforme',
+  },
+  ModerationActed: {
+    label: 'Mod View',
+    tone: 'danger',
+    verb: 'fait',
+    target: 'un geste de modération',
+  },
 }
 
 export const ACTIVITY_EVENT_REGISTRY = createRegistry(ACTIVITY_EVENT_MAP)

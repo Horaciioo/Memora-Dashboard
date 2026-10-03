@@ -45,6 +45,8 @@ export const EVENT_TYPES = createEnumeration({
   LegacyChanged: { id: 36, label: 'Parcours Legacy modifié' },
   LiveAnnounced: { id: 37, label: 'Live annoncé' },
   LiveMoved: { id: 38, label: 'Live changé de statut' },
+  PlatformLinked: { id: 39, label: 'Compte de plateforme lié' },
+  ModerationActed: { id: 40, label: 'Geste de modération' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

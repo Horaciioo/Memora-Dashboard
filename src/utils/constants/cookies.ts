@@ -6,6 +6,7 @@
 export const CookieKeys = {
   session: 'session',
   oauthState: 'oauth_state',
+  twitchState: 'twitch_state',
   integrationClaim: 'integration_claim',
   navigationView: 'navigation_view',
   activeYoutuber: 'active_youtuber',

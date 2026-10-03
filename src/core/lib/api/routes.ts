@@ -17,10 +17,12 @@ export const API_ROUTES = {
   personalExport: '/api/parametres/export',
   seenRelease: '/api/parametres/nouveautes',
   seenGuide: '/api/parametres/guides',
+  twitchLink: '/api/connexion/twitch',
   health: '/api/sante',
   twoFactor: '/api/a2f',
   twoFactorSeal: '/api/a2f/sceau',
   creatorLeads: (id: string) => `/api/configuration/youtubeurs/${id}/responsables`,
+  creatorChannel: (id: string) => `/api/configuration/youtubeurs/${id}/chaine`,
   reference: (section: string) => `/api/configuration/${section}`,
   referenceItem: (section: string, id: string) => `/api/configuration/${section}/${id}`,
   referenceOrder: (section: string) => `/api/configuration/${section}/ordre`,
@@ -52,6 +54,8 @@ export const API_ROUTES = {
   lives: '/api/lives',
   livesStream: '/api/lives/flux',
   live: (id: string) => `/api/lives/${id}`,
+  liveModView: (id: string) => `/api/lives/${id}/modview`,
+  liveFeed: (id: string) => `/api/lives/${id}/flux`,
   sanctions: (youtuberId: string, panel: string, levelId?: string | null, replace = false) =>
     `/api/sanctions?${new URLSearchParams({
       [SANCTION_PARAMS.creator]: youtuberId,

@@ -5,8 +5,10 @@ import { PreferencesPanel } from '@/composites/preferences/PreferencesPanel'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
 import { readSessions } from '@/core/services/auth/SessionService'
+import { listPlatformLinks } from '@/core/services/platforms/PlatformAccountService'
 import { profileFields, readProfile } from '@/core/services/preferences/ProfileService'
 import { requireUser } from '@/core/wrappers/requireUser'
+import { isTwitchConfigured } from '@/declarations/platforms/twitch'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 
@@ -21,10 +23,11 @@ export default async function PreferencesPage() {
   const { session } = await requireUser()
   const cookieStore = await cookies()
 
-  const [profile, sessions, seal] = await Promise.all([
+  const [profile, sessions, seal, platformLinks] = await Promise.all([
     readProfile(session.id),
     readSessions(session.id, cookieStore.get(SESSION_COOKIE)?.value),
     readSealState(),
+    listPlatformLinks(session.id),
   ])
 
   // A member's own contact details are sealed just like anyone else's
@@ -37,6 +40,8 @@ export default async function PreferencesPage() {
         initialProfile={sealed}
         fields={sealFields(profileFields(), seal.isUnsealed)}
         sessions={sessions}
+        platformLinks={platformLinks}
+        twitchAvailable={isTwitchConfigured()}
       />
     </div>
   )

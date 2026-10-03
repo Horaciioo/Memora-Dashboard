@@ -14,6 +14,9 @@ export const SESSION_COOKIE = cookieName('session')
 
 export const OAUTH_STATE_COOKIE = cookieName('oauthState')
 
+// Anti-forgery token of a Twitch link
+export const TWITCH_STATE_COOKIE = cookieName('twitchState')
+
 /**
  * Discord identifier shape
  * @type {RegExp}

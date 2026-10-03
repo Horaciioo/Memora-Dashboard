@@ -12,6 +12,7 @@ import { FormRenderer } from '@/components/structures/FormRenderer'
 import { Section } from '@/components/structures/Section'
 import { SealedValue } from '@/components/structures/SealedValue'
 import { DisplayPreferences } from '@/composites/preferences/DisplayPreferences'
+import { PlatformLinksSection } from '@/composites/preferences/PlatformLinksSection'
 import { TwoFactorSection } from '@/composites/security/TwoFactorSection'
 import { useProfile } from '@/core/hooks/data/useProfile'
 import { dropOtherSessions, replayGuides } from '@/app/(dashboard)/parametres/actions'
@@ -26,6 +27,7 @@ import { PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
 
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { AccountSession, ProfileDetail } from '@/types/preferences'
+import type { PlatformLinkView } from '@/types/platforms'
 import { formatDay, formatDayTime } from '@/utils/format/dates'
 import { readDevice } from '@/utils/format/device'
 
@@ -33,6 +35,8 @@ export interface PreferencesPanelProps {
   initialProfile: ProfileDetail
   fields: FieldDefinition[]
   sessions: AccountSession[]
+  platformLinks: PlatformLinkView[]
+  twitchAvailable: boolean
 }
 
 /**
@@ -40,10 +44,18 @@ export interface PreferencesPanelProps {
  * @param {ProfileDetail} initialProfile - File resolved server-side
  * @param {FieldDefinition[]} fields - Declarations of the editable fields
  * @param {AccountSession[]} sessions - Open sessions
+ * @param {PlatformLinkView[]} platformLinks - Linked platform accounts
+ * @param {boolean} twitchAvailable - Twitch link offered
  * @return {JSX.Element}
  */
 
-export const PreferencesPanel = ({ initialProfile, fields, sessions }: PreferencesPanelProps) => {
+export const PreferencesPanel = ({
+  initialProfile,
+  fields,
+  sessions,
+  platformLinks,
+  twitchAvailable,
+}: PreferencesPanelProps) => {
   const { profile, isSaving, issues, save, eraseDetails, download } = useProfile(initialProfile)
   const { factor } = useSeal()
   const [isErasing, setErasing] = useState(false)
@@ -211,6 +223,8 @@ export const PreferencesPanel = ({ initialProfile, fields, sessions }: Preferenc
         </Section>
 
         <TwoFactorSection />
+
+        <PlatformLinksSection links={platformLinks} twitchAvailable={twitchAvailable} />
 
         <Section
           title={PREFERENCES_COPY.sessionsTitle}
