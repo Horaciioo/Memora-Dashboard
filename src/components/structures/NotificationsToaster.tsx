@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import { useIsMobileShell } from '@/core/hooks/interaction/useBreakpoint'
 import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
 import type { Notification } from '@/managers/infrastructure/Network/NotificationsManager'
@@ -16,7 +16,7 @@ import { cn } from '@/utils/classnames'
 const SWIPE_DISMISS_PX = 80
 
 /**
- * Toast title, its emphasis substring rendered bold
+ * Toast title
  * @param {string} title - Full sentence
  * @param {string} [emphasis] - Substring rendered bold
  * @return {JSX.Element}
@@ -37,22 +37,33 @@ const ToastTitle = ({ title, emphasis }: { title: string; emphasis?: string }) =
 
 interface ToastProps {
   notification: Notification
+  // Rank from the newest
+  depth: number
+  // Offset once spread, px
+  lift: number
+  isSpread: boolean
+  // Replays the countdown
+  generation: number
   onDismiss: () => void
-  onPause: () => void
-  onResume: () => void
+  onMeasure: (id: string, height: number) => void
 }
 
 /**
- * One toast, draggable horizontally to dismiss — a tap of any kind pauses its timer,
- * releasing short of the threshold resumes it
- * @param {Notification} notification - Toast to render
- * @param {() => void} onDismiss - Called past the swipe threshold
- * @param {() => void} onPause - Called on press
- * @param {() => void} onResume - Called on release short of the threshold
+ * One toast of the pile
+ * @param {ToastProps} props - Content, place and handlers
  * @return {JSX.Element}
  */
 
-const Toast = ({ notification, onDismiss, onPause, onResume }: ToastProps) => {
+const Toast = ({
+  notification,
+  depth,
+  lift,
+  isSpread,
+  generation,
+  onDismiss,
+  onMeasure,
+}: ToastProps) => {
+  const ref = useRef<HTMLDivElement>(null)
   const [dragX, setDragX] = useState(0)
   const [isDragging, setDragging] = useState(false)
   const startXRef = useRef(0)
@@ -60,98 +71,164 @@ const Toast = ({ notification, onDismiss, onPause, onResume }: ToastProps) => {
   const ToneIcon = ICONS[TONE_ICON[notification.tone]]
   const CloseIcon = ICONS.close
 
+  // Height drives the spread
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+
+    const observer = new ResizeObserver(() => onMeasure(notification.id, node.offsetHeight))
+    observer.observe(node)
+
+    return () => observer.disconnect()
+  }, [notification.id, onMeasure])
+
   const startDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
     startXRef.current = event.clientX
     setDragging(true)
-    onPause()
     event.currentTarget.setPointerCapture(event.pointerId)
   }
 
   const trackDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!isDragging) return
-
-    setDragX(event.clientX - startXRef.current)
+    if (isDragging) setDragX(event.clientX - startXRef.current)
   }
 
   const endDrag = () => {
     setDragging(false)
-
-    if (Math.abs(dragX) > SWIPE_DISMISS_PX) {
-      onDismiss()
-      return
-    }
+    if (Math.abs(dragX) > SWIPE_DISMISS_PX) return onDismiss()
 
     setDragX(0)
-    onResume()
   }
 
   return (
     <div
-      onMouseEnter={onPause}
-      onMouseLeave={onResume}
-      onPointerDown={startDrag}
-      onPointerMove={trackDrag}
-      onPointerUp={endDrag}
-      onPointerCancel={endDrag}
-      style={{
-        transform: dragX ? `translateX(${dragX}px)` : undefined,
-        opacity: isDragging ? Math.max(1 - Math.abs(dragX) / (SWIPE_DISMISS_PX * 2), 0.3) : 1,
-      }}
-      className={cn(
-        TOAST_STYLES.toast,
-        TONE_BORDER[notification.tone],
-        !isDragging && 'transition-[transform,opacity] motion-reduce:transition-none'
-      )}
+      ref={ref}
+      data-toast
+      data-front={depth === 0 || undefined}
+      aria-hidden={!isSpread && depth > 0 ? true : undefined}
+      className={TOAST_STYLES.item}
+      style={{ '--toast-depth': depth, '--toast-lift': `${lift}px` } as CSSProperties}
     >
-      <span className={cn(TOAST_STYLES.badge, tone.soft, tone.text)}>
-        <ToneIcon className={TOAST_STYLES.glyph} aria-hidden="true" />
-      </span>
-      <div className={TOAST_STYLES.body}>
-        <p className={TOAST_STYLES.title}>
-          <ToastTitle title={notification.title} emphasis={notification.emphasis} />
-        </p>
-        {notification.description && (
-          <p className={TOAST_STYLES.description}>{notification.description}</p>
+      <div
+        onPointerDown={startDrag}
+        onPointerMove={trackDrag}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        style={{
+          transform: dragX ? `translateX(${dragX}px)` : undefined,
+          opacity: isDragging ? Math.max(1 - Math.abs(dragX) / (SWIPE_DISMISS_PX * 2), 0.3) : 1,
+        }}
+        className={cn(
+          TOAST_STYLES.toast,
+          TONE_BORDER[notification.tone],
+          !isDragging && TOAST_STYLES.settle
         )}
-      </div>
-      <button
-        type="button"
-        onClick={onDismiss}
-        aria-label={ACTION_COPY.close}
-        className={TOAST_STYLES.dismiss}
       >
-        <CloseIcon className={TOAST_STYLES.glyph} aria-hidden="true" />
-      </button>
+        <span className={cn(TOAST_STYLES.badge, tone.soft, tone.text)}>
+          <ToneIcon className={TOAST_STYLES.glyph} aria-hidden="true" />
+        </span>
+        <div className={TOAST_STYLES.body}>
+          <p className={TOAST_STYLES.title}>
+            <ToastTitle title={notification.title} emphasis={notification.emphasis} />
+          </p>
+          {notification.description && (
+            <p className={TOAST_STYLES.description}>{notification.description}</p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label={ACTION_COPY.close}
+          className={TOAST_STYLES.dismiss}
+        >
+          <CloseIcon className={TOAST_STYLES.glyph} aria-hidden="true" />
+        </button>
+        <span
+          key={generation}
+          className={cn(
+            TOAST_STYLES.countdown,
+            tone.solid,
+            isSpread && TOAST_STYLES.countdownPaused
+          )}
+          style={{ animationDuration: `${notification.durationMs}ms` }}
+          aria-hidden="true"
+        />
+      </div>
     </div>
   )
 }
 
 /**
- * Renders the active toast stack, one at a time on mobile above the nav pill, several
- * top right from md
- * @return {JSX.Element}
+ * Toast pile: newest in front, spreads on hover
+ * @return {JSX.Element | null}
  */
 
 export const NotificationsToaster = () => {
   const { notifications, dismiss, pause, resume } = useNotifications()
   const isMobileShell = useIsMobileShell()
+  const [heights, setHeights] = useState<Record<string, number>>({})
+  const [isSpread, setSpread] = useState(false)
+  const [generation, setGeneration] = useState(0)
 
-  const visible = notifications.slice(
-    0,
-    isMobileShell ? TOAST_VISIBLE.mobile : TOAST_VISIBLE.desktop
+  const measure = useCallback((id: string, height: number) => {
+    setHeights((current) => (current[id] === height ? current : { ...current, [id]: height }))
+  }, [])
+
+  if (notifications.length === 0) return null
+
+  // Newest first
+  const pile = [...notifications].reverse()
+  const lifts = pile.map((_, index) =>
+    pile
+      .slice(0, index)
+      .reduce((sum, entry) => sum + (heights[entry.id] ?? 0) + TOAST_STYLES.gapPx, 0)
   )
+  const front = heights[pile[0]?.id ?? ''] ?? 0
+  const last = pile.at(-1)
+  const spreadHeight = (lifts[pile.length - 1] ?? 0) + (heights[last?.id ?? ''] ?? 0)
+  const layers = isMobileShell ? TOAST_VISIBLE.mobile : TOAST_VISIBLE.desktop
+
+  // Every timer waits
+  const spread = () => {
+    setSpread(true)
+    notifications.forEach((notification) => pause(notification.id))
+  }
+
+  // Every timer restarts
+  const gather = () => {
+    setSpread(false)
+    setGeneration((current) => current + 1)
+    notifications.forEach((notification) => resume(notification.id))
+  }
 
   return (
-    <div className={TOAST_STYLES.stack} aria-live="polite">
-      {visible.map((notification) => (
+    <section
+      aria-live="polite"
+      className={cn(TOAST_STYLES.stack, isSpread && TOAST_STYLES.stackSpread)}
+      style={
+        {
+          '--toast-front': `${front}px`,
+          '--toast-count': Math.min(pile.length, layers),
+          '--toast-layers': layers,
+          height: isSpread ? spreadHeight : undefined,
+        } as CSSProperties
+      }
+      onMouseEnter={spread}
+      onMouseLeave={gather}
+      onFocus={spread}
+      onBlur={gather}
+    >
+      {pile.map((notification, index) => (
         <Toast
           key={notification.id}
           notification={notification}
+          depth={index}
+          lift={lifts[index] ?? 0}
+          isSpread={isSpread}
+          generation={generation}
           onDismiss={() => dismiss(notification.id)}
-          onPause={() => pause(notification.id)}
-          onResume={() => resume(notification.id)}
+          onMeasure={measure}
         />
       ))}
-    </div>
+    </section>
   )
 }

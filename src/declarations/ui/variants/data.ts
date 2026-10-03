@@ -5,7 +5,7 @@
 
 export const TABLE_STYLES = {
   wrapper:
-    'w-full overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
+    'w-full overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface',
   // The grid is desktop only, a card list stands in for it below md
   table: 'hidden w-full min-w-full border-collapse text-sm md:table',
   headRow:
@@ -17,7 +17,7 @@ export const TABLE_STYLES = {
   cell: 'px-4 py-3 align-middle',
   cards: 'flex flex-col gap-2 p-2 md:hidden',
   card: 'flex w-full flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 text-left transition-[border-color]',
-  cardOpen: 'cursor-pointer hover:border-[var(--color-brand-400)]',
+  cardOpen: 'cursor-pointer hover:border-[var(--color-border-strong)]',
   cardActive: 'bg-[var(--color-brand-soft)]',
   cardHead: 'text-sm font-medium',
   cardMeta: 'flex flex-wrap items-center gap-2 text-xs',
@@ -29,14 +29,23 @@ export const TABLE_STYLES = {
  */
 
 export const LIST_STYLES = {
+  // Glyph flagging a member who has private notes
+  cardNotes: 'h-4 w-4 shrink-0 text-[var(--color-brand-600)]',
   stack: 'flex flex-col gap-2',
   item: 'flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 transition-[border-color,box-shadow] hover:border-[var(--color-border-strong)]',
   itemClickable:
-    'cursor-pointer hover:border-[var(--color-brand-400)] hover:shadow-[var(--shadow-sm)]',
-  card: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 transition-[border-color,box-shadow]',
+    'cursor-pointer hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-sm)]',
+  card: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 transition-[border-color,box-shadow]',
   cardClickable:
-    'cursor-pointer hover:border-[var(--color-brand-400)] hover:shadow-[var(--shadow-md)]',
+    'cursor-pointer hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)]',
   cardMuted: 'opacity-60',
+  // Absent member, sunken and quiet but still legible
+  cardAbsent: 'border-transparent bg-[var(--color-surface-sunken)] shadow-none',
+  cardAbsentName: 'text-[var(--color-ink-subtle)]',
+  cardAbsentNote:
+    'flex items-center gap-1 text-xs font-medium text-[var(--color-ink-subtle)] italic',
+  cardAbsentGlyph: 'h-3.5 w-3.5 shrink-0',
+  cardAbsentEmblems: 'opacity-50 grayscale',
   grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
 } as const
 
@@ -47,10 +56,10 @@ export const LIST_STYLES = {
 
 export const RECORD_ROW = {
   stack: 'flex flex-col gap-3',
-  root: 'flex cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5 py-4 transition-[border-color,box-shadow] hover:border-[var(--color-brand-400)] hover:shadow-[var(--shadow-sm)]',
+  root: 'flex cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-5 py-4 transition-[border-color,box-shadow] hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-sm)]',
   // Same row without the pointer, for what only reads
   static:
-    'flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5 py-4',
+    'flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-5 py-4',
   body: 'flex min-w-0 flex-1 flex-col gap-1',
   title: 'truncate text-base font-bold',
   meta: 'truncate text-sm text-[var(--color-ink-subtle)]',
@@ -63,7 +72,7 @@ export const RECORD_ROW = {
  */
 
 export const CALENDAR_AGENDA = {
-  list: 'flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5',
+  list: 'flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-5',
   empty: 'py-16 text-center text-sm text-[var(--color-ink-subtle)]',
   day: 'grid grid-cols-[6rem_minmax(0,1fr)] gap-4 py-5',
   head: 'flex items-start gap-3',
@@ -76,7 +85,7 @@ export const CALENDAR_AGENDA = {
   rows: 'flex flex-col',
   row: 'flex items-center gap-4 rounded-[var(--radius-md)] px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-hover)]',
   rowSelected: 'ring-2 ring-[var(--color-brand-600)] ring-inset',
-  bullet: 'h-3 w-3 shrink-0',
+  bullet: 'h-3.5 w-[3px] shrink-0 rounded-full bg-current',
   time: 'w-24 shrink-0 text-sm text-[var(--color-ink-subtle)] tabular-nums',
   title: 'min-w-0 flex-1 truncate text-sm font-semibold',
   meta: 'hidden shrink-0 text-sm text-[var(--color-ink-subtle)] md:inline',
@@ -128,15 +137,46 @@ export const CALENDAR_SIDEBAR = {
 } as const
 
 /**
- * Own absence page styles
+ * Own absence page: a composer on top, the list of what was declared underneath
  * @type {Record<string, string>}
  */
 
-export const ABSENCE_CARD = {
-  page: 'mx-auto flex w-full max-w-3xl flex-col gap-10',
-  card: 'flex flex-col items-center gap-5 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-6 py-10 text-center',
-  dates: 'text-3xl font-extrabold tracking-tight sm:text-4xl',
-  reason: 'max-w-md text-base text-[var(--color-ink-subtle)]',
+export const ABSENCE_PAGE = {
+  page: 'mx-auto flex w-full max-w-5xl flex-col gap-14',
+  months: 'flex flex-col',
+  month: 'flex flex-col gap-3',
+  monthHead: 'flex h-8 items-center justify-between',
+  monthName: 'text-base font-bold capitalize',
+  monthNav:
+    'flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
+  grid: 'grid grid-cols-7 gap-y-0.5',
+  weekday:
+    'pb-2 text-center text-[11px] font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  day: 'relative flex h-14 w-full items-center justify-center text-xl font-bold tabular-nums transition-colors',
+  dayFree: 'cursor-pointer rounded-[var(--radius-md)] hover:bg-[var(--color-hover)]',
+  dayPast: 'cursor-not-allowed text-[var(--color-ink-subtle)]/50',
+  dayToday: 'rounded-[var(--radius-md)] ring-2 ring-[var(--color-ink)] ring-inset',
+  dayBooked:
+    'cursor-not-allowed text-[var(--color-ink-subtle)] bg-[repeating-linear-gradient(135deg,transparent_0_5px,var(--color-border)_5px_6px)]',
+  dayRange: 'bg-[var(--color-brand-100)] text-[var(--color-ink)]',
+  dayPreview: 'bg-[var(--color-brand-50)]',
+  dayEdge:
+    'cursor-pointer rounded-[var(--radius-md)] bg-[var(--color-brand-300)] text-[var(--color-ink)] hover:bg-[var(--color-brand-400)]',
+  list: 'flex flex-col',
+  listTitle: 'mb-2 text-[11px] font-black tracking-wide uppercase',
+  row: 'grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 border-t border-[var(--color-border)] px-1 py-4 md:grid-cols-[13rem_5.5rem_minmax(0,1fr)_11rem]',
+  rowDates: 'text-base font-bold',
+  rowDuration: 'text-sm text-[var(--color-ink-subtle)]',
+  rowReason: 'col-span-2 min-w-0 text-sm md:col-span-1',
+  rowReasonEmpty: 'text-[var(--color-ink-subtle)] italic',
+  rowStatus:
+    'col-start-2 row-start-1 flex items-center justify-end gap-2 text-sm font-semibold md:col-start-auto md:row-start-auto',
+  statusIcon: 'h-4 w-4',
+  statusDone: 'text-[var(--color-success)]',
+  statusClosed: 'text-[var(--color-danger)]',
+  statusWaiting: 'text-[var(--color-warning)]',
+  cancel:
+    'whitespace-nowrap text-sm font-semibold text-[var(--color-ink-subtle)] underline-offset-4 transition-colors hover:text-[var(--color-ink)] hover:underline',
 } as const
 
 /**
@@ -155,7 +195,6 @@ export const GROUP_STYLES = {
   ruledSection: 'flex flex-col gap-4 py-8 first:pt-0 last:pb-0',
   heading: 'flex w-full items-center gap-2 text-left text-sm font-semibold text-[var(--color-ink)]',
   count: 'ml-auto font-normal text-[var(--color-ink-subtle)]',
-  bubble: 'inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-brand-600)]',
   chevron: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform',
   chevronOpen: 'rotate-180',
 } as const
@@ -168,30 +207,20 @@ export const GROUP_STYLES = {
 export const BOARD_STYLES = {
   scroller: 'flex gap-4 overflow-x-auto pb-2',
   column:
-    'flex w-72 shrink-0 flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)]/60 p-2',
+    'flex w-72 shrink-0 flex-col gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-2.5',
   columnArchived: 'opacity-60',
   columnHead: 'flex items-center justify-between gap-2 px-2 py-1.5',
-  columnTitle: 'flex items-center gap-2 text-sm font-semibold',
+  columnTitle: 'flex items-center gap-2 text-sm font-bold',
   count:
     'rounded-[var(--radius-sm)] bg-[var(--color-surface-raised)] px-2 py-0.5 text-xs text-[var(--color-ink-subtle)]',
   body: 'flex min-h-24 flex-col gap-2 rounded-[var(--radius-md)] p-1',
-  card: 'group flex cursor-grab flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3 transition-shadow hover:shadow-[var(--shadow-md)] active:cursor-grabbing',
-  cardTitle: 'text-sm leading-snug font-medium',
+  card: 'group flex cursor-grab flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3.5 shadow-[var(--shadow-sm)] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] active:cursor-grabbing motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+  // Card sits lighter than its column so the two glass layers do not muddy, a tinted one blurs too
+  cardGlass: 'bg-[var(--color-surface-raised)]/70 backdrop-blur-md',
+  cardTint: 'accent-tint accent-border backdrop-blur-md',
+  cardTitle: 'text-[15px] leading-snug font-bold',
   // Glyph flowing before a title, spaced by text rather than framed
   cardGlyph: 'mr-1.5',
-} as const
-
-/**
- * Authorship strip styles, the stamps of a record sitting above its journal
- * @type {Record<string, string>}
- */
-
-export const AUTHORSHIP_STYLES = {
-  strip: 'flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-[var(--color-ink-subtle)]',
-  stamp: 'flex items-center gap-1.5',
-  label: 'font-semibold tracking-wide uppercase',
-  // Sidebar-style hairline, never a middot
-  separator: 'h-3 w-px shrink-0 bg-[var(--color-border)]',
 } as const
 
 /**
@@ -260,7 +289,7 @@ export const HORIZONTAL_TIMELINE_STYLES = {
 
 export const CALENDAR_STYLES = {
   frame:
-    'overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
+    'overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface',
   toolbar: 'flex flex-wrap items-center gap-2 pb-3',
   period: 'text-xl font-extrabold tracking-tight first-letter:uppercase sm:text-2xl',
   weekdays:
@@ -296,7 +325,7 @@ export const CALENDAR_STYLES = {
     'relative flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
   // Month entry, a coloured bullet ahead of its words
   line: 'relative flex w-full cursor-grab items-center justify-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-left sm:justify-start text-xs transition-colors hover:bg-[var(--color-hover)] active:cursor-grabbing',
-  lineBullet: 'h-2.5 w-2.5 shrink-0',
+  lineBullet: 'h-3.5 w-[3px] shrink-0 rounded-full bg-current',
   // Phones keep the bullet alone, the words come back from sm
   lineTime: 'hidden shrink-0 tabular-nums text-[var(--color-ink-subtle)] sm:inline',
   lineTitle: 'hidden min-w-0 flex-1 truncate font-semibold sm:block',
@@ -332,7 +361,7 @@ export const CALENDAR_STYLES = {
   legendRow:
     'flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2 py-1 text-xs transition-colors',
   legendRowMuted: 'opacity-40',
-  legendDot: 'h-2.5 w-2.5 shrink-0 rounded-full',
+  legendDot: 'h-3.5 w-[3px] shrink-0 rounded-full',
   legendCount: 'tabular-nums opacity-60',
   selectionBar:
     'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-brand-400)] bg-[var(--color-brand-soft)]/60 px-3 py-2 text-sm',
@@ -353,9 +382,9 @@ export const CALENDAR_STYLES = {
   rollCallPerson: 'flex items-center gap-2 text-sm',
   // Hover preview card, portalled above the chip
   preview:
-    'fixed z-[70] flex w-72 flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 text-sm shadow-[var(--shadow-md)]',
+    'fixed z-[70] flex w-72 flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel p-4 text-sm shadow-[var(--shadow-md)]',
   previewHead: 'flex items-center gap-2 font-bold',
-  previewBullet: 'h-3 w-3 shrink-0',
+  previewBullet: 'h-3.5 w-[3px] shrink-0 rounded-full bg-current',
   previewLine: 'flex items-center gap-2',
   detailMeta: 'flex flex-col gap-2 text-sm text-[var(--color-ink-subtle)]',
   previewIcon: 'h-4 w-4 shrink-0',
@@ -446,7 +475,7 @@ export const PERMISSION_TOGGLE_STYLES = {
     'rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-on-brand)] tabular-nums',
   section: 'flex flex-col gap-2',
   sectionTitle: 'text-sm font-bold',
-  rows: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3',
+  rows: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-3',
   row: 'flex items-center gap-4 py-3',
   rowChild: 'pl-4',
   rootRow: 'flex flex-wrap items-center gap-x-3',
@@ -484,4 +513,48 @@ export const PAGINATION_STYLES = {
   bar: 'flex flex-wrap items-center justify-between gap-3 pt-2',
   meta: 'text-xs text-[var(--color-ink-subtle)] tabular-nums',
   actions: 'flex gap-2',
+} as const
+
+/**
+ * Absence declaration styles: a vertical timeline on the left, the step on the right
+ * @type {Record<string, string>}
+ */
+
+export const ABSENCE_WIZARD = {
+  root: 'surface-enter grid gap-5 md:grid-cols-[2rem_minmax(0,1fr)] md:gap-7',
+  // Bare chips and dashed runs, they sit top, middle and bottom of the box beside them
+  timeline: 'relative flex items-start justify-between gap-2 md:block',
+  step: 'relative flex items-center md:absolute md:top-[var(--step-top)] md:left-0 md:-translate-y-1/2',
+  // Dashed run between two chips, drawn on a wide screen only
+  rail: 'absolute left-4 hidden w-0 -translate-x-1/2 border-l-2 border-dashed border-[var(--color-border-strong)] transition-colors md:block',
+  railDone: 'border-[var(--color-success)]',
+  chip: 'z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-black tabular-nums transition-colors',
+  chipCurrent: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
+  // The check glyph paints itself in the success tones, it needs a pale ground
+  chipDone: 'bg-[var(--color-success-soft)] ring-2 ring-[var(--color-success)] ring-inset',
+  chipTodo:
+    'border border-dashed border-[var(--color-border-strong)] text-[var(--color-ink-subtle)]',
+  chipGlyph: 'h-5 w-5',
+  // Box of the step, its tail points at the one in force
+  stageBox:
+    'relative flex min-h-[42rem] flex-col justify-center rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-6 sm:p-8',
+  tail: 'bubble-tail hidden md:block',
+  stage: 'course-pop flex min-w-0 flex-col gap-6',
+  stageTitle: 'text-2xl font-black tracking-tight sm:text-3xl',
+  hint: 'mt-1.5 text-[15px] text-[var(--color-ink-subtle)]',
+  // Divider under the calendar, the chosen period centred beneath it
+  summary: 'min-h-24 border-t border-[var(--color-border)] pt-6 text-center',
+  sentence: 'text-xl font-bold tracking-tight text-balance',
+  duration: 'mt-1 text-[var(--color-ink-subtle)]',
+  warning: 'mt-1 text-sm font-semibold text-[var(--color-warning)]',
+  placeholder: 'placeholder:italic placeholder:opacity-70',
+  actions: 'flex flex-wrap items-center justify-center gap-3 pt-2',
+  success: 'flex flex-col items-center gap-4 py-4 text-center',
+  successGlyph: 'course-check h-20 w-20 text-[var(--color-success)]',
+  thanks: 'text-2xl font-black tracking-tight sm:text-3xl',
+  reasonBlock: 'flex w-full max-w-md flex-col gap-2 text-left',
+  reasonLabel: 'text-[11px] font-black tracking-wide uppercase',
+  reasonBox:
+    'rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[15px] leading-relaxed break-words whitespace-pre-wrap',
+  header: 'flex justify-end',
 } as const

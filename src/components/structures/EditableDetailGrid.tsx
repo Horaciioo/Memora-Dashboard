@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { FocusEvent, KeyboardEvent, ReactNode } from 'react'
+import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { FieldControl } from '@/components/elements/forms/FieldControl'
 import { DETAIL_BLOCK } from '@/declarations/ui/blocks'
 import { DATE_COPY } from '@/declarations/ui/dates'
@@ -32,6 +33,8 @@ export interface EditableDetailGridProps {
   values: FormValues
   issues: FieldIssue[]
   disabled?: boolean
+  // One column, for a narrow rail
+  stacked?: boolean
   onCommit: (name: string, value: FieldValue) => Promise<boolean>
 }
 
@@ -48,6 +51,7 @@ const STAY_OPEN_KINDS = ['multiselect', 'tags']
  * @param {FormValues} values - Current values
  * @param {FieldIssue[]} issues - Rejections returned by the server
  * @param {boolean} [disabled] - Blocks every entry
+ * @param {boolean} [stacked] - One column layout
  * @param {(name: string, value: FieldValue) => Promise<boolean>} onCommit - Persists one field
  * @return {JSX.Element}
  */
@@ -57,6 +61,7 @@ export const EditableDetailGrid = ({
   values,
   issues,
   disabled,
+  stacked,
   onCommit,
 }: EditableDetailGridProps) => {
   const [editing, setEditing] = useState<string | null>(null)
@@ -89,7 +94,7 @@ export const EditableDetailGrid = ({
   }
 
   return (
-    <dl className={DETAIL_BLOCK.grid}>
+    <dl className={stacked ? DETAIL_BLOCK.stack : DETAIL_BLOCK.grid}>
       {entries.map(({ label, field, display, wide }) => {
         const entryClass =
           wide || (field && WIDE_KINDS.includes(field.kind))
@@ -159,6 +164,7 @@ export const EditableDetailGrid = ({
                       void commit(field.name, next, !STAY_OPEN_KINDS.includes(field.kind))
                   }}
                 />
+                {pending && <BrandLoader variant="ink" />}
                 {error && (
                   <p id={`${id}-error`} className="text-xs text-[var(--color-danger)]">
                     {error}

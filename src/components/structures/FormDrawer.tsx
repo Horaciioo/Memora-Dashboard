@@ -1,5 +1,6 @@
 'use client'
 
+import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { useState } from 'react'
 import { Tabs } from '@/components/elements/navigation/Tabs'
 import { Drawer } from '@/components/structures/Drawer'
@@ -232,7 +233,11 @@ export const FormDrawer = ({
                 disabled={isSaving}
                 className={cn(DRAWER_ACTIONS.line, DRAWER_ACTIONS.save)}
               >
-                <SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
+                {isSaving ? (
+                  <BrandLoader variant="inline" />
+                ) : (
+                  <SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
+                )}
                 {isSaving
                   ? ACTION_COPY.saving
                   : aimedPhrase(submitVerb, subject.label, subject.gender)}

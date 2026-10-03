@@ -337,7 +337,7 @@ const trainingMaxMinutes = readInteger(academy.trainingMaxMinutes, {
 
 /**
  * Academy bounds
- * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
+ * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, plungeLineDelayMs: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
  */
 
 export const ACADEMY_SETTINGS = {
@@ -401,6 +401,11 @@ export const ACADEMY_SETTINGS = {
   chatTypingMs: readInteger(academy.chatTypingMs, {
     path: 'system/academy.chatTypingMs',
     fallback: 700,
+    min: 0,
+  }),
+  plungeLineDelayMs: readInteger(academy.plungeLineDelayMs, {
+    path: 'system/academy.plungeLineDelayMs',
+    fallback: 2400,
     min: 0,
   }),
   skillStep: readInteger(academy.skillStep, {
@@ -521,7 +526,7 @@ const responsiveToastVisible = readNode(
 
 /**
  * Breakpoint and shell chrome bounds
- * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, sidebarWidth: number, titleTabHeight: number, titleTabSlope: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
+ * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, sidebarWidth: number, bannerHeight: number, bannerHeightMobile: number, notchHeight: number, notchSlope: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
  */
 
 export const RESPONSIVE_SETTINGS = {
@@ -546,13 +551,23 @@ export const RESPONSIVE_SETTINGS = {
     fallback: 264,
     min: 160,
   }),
-  titleTabHeight: readInteger(responsiveShell.titleTabHeight, {
-    path: 'system/responsive.shell.titleTabHeight',
-    fallback: 44,
+  bannerHeight: readInteger(responsiveShell.bannerHeight, {
+    path: 'system/responsive.shell.bannerHeight',
+    fallback: 184,
+    min: 96,
+  }),
+  bannerHeightMobile: readInteger(responsiveShell.bannerHeightMobile, {
+    path: 'system/responsive.shell.bannerHeightMobile',
+    fallback: 144,
+    min: 96,
+  }),
+  notchHeight: readInteger(responsiveShell.notchHeight, {
+    path: 'system/responsive.shell.notchHeight',
+    fallback: 52,
     min: 32,
   }),
-  titleTabSlope: readInteger(responsiveShell.titleTabSlope, {
-    path: 'system/responsive.shell.titleTabSlope',
+  notchSlope: readInteger(responsiveShell.notchSlope, {
+    path: 'system/responsive.shell.notchSlope',
     fallback: 36,
     min: 12,
   }),
@@ -999,7 +1014,7 @@ export const HOME_SETTINGS = {
   }),
   birthdayMax: readInteger(home.birthdayMax, {
     path: 'system/accueil.birthdayMax',
-    fallback: 8,
+    fallback: 4,
     min: 1,
   }),
   meetingWindowDays: readInteger(home.meetingWindowDays, {
@@ -1009,12 +1024,12 @@ export const HOME_SETTINGS = {
   }),
   meetingMax: readInteger(home.meetingMax, {
     path: 'system/accueil.meetingMax',
-    fallback: 6,
+    fallback: 4,
     min: 1,
   }),
   taskMax: readInteger(home.taskMax, {
     path: 'system/accueil.taskMax',
-    fallback: 5,
+    fallback: 4,
     min: 1,
   }),
 }

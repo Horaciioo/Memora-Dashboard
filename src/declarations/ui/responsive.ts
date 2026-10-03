@@ -30,15 +30,17 @@ export const MOBILE_SHELL_QUERY = `(width < ${BREAKPOINTS[RESPONSIVE_SETTINGS.mo
 
 /**
  * Fixed chrome dimensions of the shell, in pixels
- * @type {{ topBar: number, bottomNav: number, sidebar: number, titleTab: number, titleSlope: number }}
+ * @type {{ topBar: number, bottomNav: number, sidebar: number, banner: number, bannerMobile: number, notch: number, notchSlope: number }}
  */
 
 export const SHELL_DIMENSIONS = {
   topBar: RESPONSIVE_SETTINGS.topBarHeight,
   bottomNav: RESPONSIVE_SETTINGS.bottomNavHeight,
   sidebar: RESPONSIVE_SETTINGS.sidebarWidth,
-  titleTab: RESPONSIVE_SETTINGS.titleTabHeight,
-  titleSlope: RESPONSIVE_SETTINGS.titleTabSlope,
+  banner: RESPONSIVE_SETTINGS.bannerHeight,
+  bannerMobile: RESPONSIVE_SETTINGS.bannerHeightMobile,
+  notch: RESPONSIVE_SETTINGS.notchHeight,
+  notchSlope: RESPONSIVE_SETTINGS.notchSlope,
 } as const
 
 /**

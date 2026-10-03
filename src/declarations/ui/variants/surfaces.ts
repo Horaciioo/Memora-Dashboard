@@ -7,11 +7,12 @@ export const SECTION_STYLES = {
   wrapper: 'flex flex-col gap-3',
   header: 'flex flex-wrap items-end justify-between gap-3',
   heading: 'flex flex-col gap-1',
-  title: 'text-xl font-extrabold tracking-tight sm:text-2xl',
+  title: 'text-xl font-black tracking-tight sm:text-2xl',
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
-  panel:
-    'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]',
+  panel: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface',
   panelPadded: 'p-4 sm:p-5',
+  // Visible box, a soft shadow lifting it off the page
+  panelRaised: 'p-4 shadow-[var(--shadow-sm)] sm:p-5',
 } as const
 
 /**
@@ -22,20 +23,20 @@ export const SECTION_STYLES = {
 export const PAGE_STYLES = {
   wrapper: 'mx-auto flex w-full flex-col gap-8',
   header: 'flex flex-col gap-4',
-  // Centred inline, a tab hanging from the frame past md
-  titleRail:
-    // Tucked under the rim, hides its shadow
-    'flex justify-center md:pointer-events-none md:fixed md:top-[calc(0.75rem-3px)] md:right-3 md:left-[var(--shell-sidebar-w)] md:z-[36] md:items-start',
-  titleTab:
-    'title-tab-body flex min-w-0 items-start justify-center text-center text-2xl font-black tracking-[0.06em] uppercase md:pointer-events-auto md:max-w-[min(44rem,64%)] md:items-center md:px-4 md:pb-1 md:text-[1.375rem] md:tracking-[0.16em] md:text-[var(--color-on-frame)]',
-  titleTabText: 'min-w-0 text-balance md:truncate',
-  // Superscript, a small gap off the title
-  titleInfo: 'ml-1.5 self-start pt-1 md:ml-2 md:pt-3',
-  titleInfoTrigger:
-    'text-[var(--color-ink-subtle)] hover:text-[var(--color-brand-600)] md:text-[var(--color-on-frame-subtle)] md:hover:text-[var(--color-on-frame)]',
-  // Sloped shoulders, drawn in globals.css
-  titleSlopeStart: 'title-tab-start',
-  titleSlopeEnd: 'title-tab-end',
+  // Banner across the top of the page: in the flow on a phone, laid over the column from md
+  banner:
+    'relative -mx-4 -mt-6 h-[var(--banner-h)] sm:-mx-6 sm:-mt-8 md:absolute md:inset-x-0 md:top-0 md:m-0',
+  // Corner of the banner the page options sit in, filled by PageOptions
+  bannerOptions: 'absolute top-3 right-3 z-10 sm:top-4 sm:right-4',
+  // Title sitting in the notch cut into the bottom edge of the banner
+  notch: 'absolute bottom-0 left-1/2 flex -translate-x-1/2 items-end',
+  notchBody:
+    'banner-notch-body flex min-w-0 max-w-[min(44rem,70vw)] items-center justify-center px-3 text-center',
+  notchTitle: 'min-w-0 text-xl font-black tracking-[0.12em] uppercase md:text-[1.75rem]',
+  notchTitleText: 'min-w-0 text-balance md:truncate',
+  // Shoulders of the notch, drawn in globals.css
+  notchSlopeStart: 'banner-slope banner-slope-start',
+  notchSlopeEnd: 'banner-slope banner-slope-end',
   // Eyebrow left, actions right
   headerRow: 'flex flex-wrap items-center justify-between gap-4',
   eyebrow:
@@ -49,6 +50,16 @@ export const PAGE_STYLES = {
   titleInput:
     'rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-brand-600)]',
   toolbar: 'flex flex-wrap items-center gap-2',
+} as const
+
+/**
+ * Art of the page banner
+ * @type {Record<string, string>}
+ */
+
+export const PAGE_BANNER = {
+  art: 'absolute inset-0 overflow-hidden bg-[var(--color-surface-sunken)]',
+  image: 'h-full w-full object-cover dark:brightness-[0.82]',
 } as const
 
 /**
@@ -99,7 +110,7 @@ export const DIALOG_STYLES = {
   overlay:
     'overlay-enter fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-ink)]/50 p-4 backdrop-blur-md sm:p-6',
   panel:
-    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   header: 'flex items-start gap-3 px-5 pt-5 pb-4 sm:px-6',
   heading: 'flex min-w-0 flex-1 flex-col gap-1',
   title: 'text-lg leading-tight font-bold tracking-tight',
@@ -136,7 +147,7 @@ export const DRAWER_STYLES = {
     'overlay-enter fixed inset-0 z-[45] bg-[var(--color-ink)]/25 md:inset-y-3 md:right-3 md:left-[var(--shell-sidebar-w)] md:rounded-[var(--radius-xl)]',
   // Margin-centred, never transformed
   panel:
-    'drawer-enter fixed inset-x-3 inset-y-0 z-50 my-auto flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:right-[var(--drawer-page-right)] md:left-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-r-none md:border-r-0',
+    'drawer-enter fixed inset-x-3 inset-y-0 z-50 my-auto flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)] md:right-[var(--drawer-page-right)] md:left-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-r-none md:border-r-0',
   header: 'flex shrink-0 items-center gap-3 px-5 pt-4 pb-3',
   // Bare glyph, no plate
   glyph: 'flex shrink-0 items-center text-[var(--color-brand-700)]',
@@ -181,7 +192,7 @@ export const DRAWER_ACTIONS = {
 
 export const MENU_STYLES = {
   panel:
-    'surface-enter fixed z-[70] min-w-52 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-1 shadow-[var(--shadow-lg)]',
+    'surface-enter fixed z-[70] min-w-52 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel py-1 shadow-[var(--shadow-lg)]',
   item: 'flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-40',
   danger: 'text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
   icon: 'h-4 w-4 shrink-0 opacity-70',
@@ -196,14 +207,17 @@ export const MENU_STYLES = {
  */
 
 export const TABS_STYLES = {
-  list: 'relative flex gap-1 overflow-x-auto border-b border-[var(--color-border)]',
-  // Strip centred over its panel from sm, the rule sliding on measured offsets
+  list: 'relative flex gap-1 overflow-x-auto border-b border-[var(--color-border)] pb-2',
+  // Strip centred over its panel from sm, the wash sliding on measured offsets
   listCentered: 'sm:justify-center',
-  tab: 'shrink-0 px-3 py-2 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
-  active: 'text-[var(--color-brand-600)]',
+  tab: 'relative z-10 shrink-0 rounded-[var(--radius-md)] px-3.5 py-2 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  // Open tab leaves the hover wash to the pink behind it
+  active:
+    'font-bold text-[var(--color-brand-800)] hover:bg-transparent hover:text-[var(--color-brand-800)]',
   flagged: 'text-[var(--color-danger)]',
+  // Pink wash lifted off the strip
   indicator:
-    'tab-indicator pointer-events-none absolute bottom-0 left-0 h-0.5 bg-[var(--color-brand-600)]',
+    'tab-indicator pointer-events-none absolute top-0 bottom-2 left-0 rounded-[var(--radius-md)] border border-[var(--color-brand-200)] bg-[var(--color-brand-100)] shadow-[var(--shadow-sm)]',
   panel: 'pt-4',
   content: 'flex items-center',
   icon: 'h-4 w-4 shrink-0',
@@ -227,7 +241,7 @@ export const PALETTE_STYLES = {
   overlay:
     'overlay-enter fixed inset-0 z-[80] flex items-start justify-center bg-[var(--color-ink)]/50 p-4 pt-[12vh] backdrop-blur-sm',
   panel:
-    'surface-enter flex max-h-[70vh] w-full max-w-xl flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+    'surface-enter flex max-h-[70vh] w-full max-w-xl flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   field: 'flex items-center gap-3 border-b border-[var(--color-border)] px-4 py-3',
   input: 'w-full bg-transparent text-base outline-none placeholder:text-[var(--color-ink-subtle)]',
   results: 'flex-1 overflow-y-auto py-2',
@@ -332,7 +346,7 @@ export const PRIVACY_STYLES = {
   section: 'flex flex-col gap-3',
   heading: 'text-lg font-bold tracking-tight',
   lead: 'text-sm text-[var(--color-ink-subtle)]',
-  card: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 text-sm',
+  card: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 text-sm',
   scroller: 'overflow-x-auto',
   table: 'w-full min-w-[40rem] border-collapse text-left text-sm',
   head: 'border-b border-[var(--color-border)] pb-2 text-xs font-semibold uppercase text-[var(--color-ink-subtle)]',
@@ -368,7 +382,7 @@ export const WIZARD_STYLES = {
   heading: 'flex flex-col gap-1',
   counter:
     'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-[var(--color-ink-accent)] uppercase',
-  title: 'text-xl font-extrabold tracking-tight sm:text-2xl',
+  title: 'text-xl font-black tracking-tight sm:text-2xl',
   body: 'flex min-h-64 flex-col gap-4',
   footer: 'flex items-center justify-between gap-3 border-t border-[var(--color-border)] pt-6',
   // The rail only fits on a wide viewport, the bar carries the progress on a narrow one
@@ -448,4 +462,24 @@ export const COLLAPSIBLE_PANEL = {
   chevronShut: '-rotate-90',
   actions: 'flex shrink-0 items-center gap-1',
   body: 'pt-3',
+} as const
+
+/**
+ * Page options styles, the glass button of a banner and its panel of switches
+ * @type {Record<string, string>}
+ */
+
+export const PAGE_OPTIONS = {
+  host: 'relative',
+  button:
+    'glass-panel flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink)] transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand-600)] motion-reduce:transition-none',
+  buttonOpen: 'scale-105',
+  icon: 'h-5 w-5',
+  panel:
+    'popover-enter glass-panel absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex w-72 flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
+  title:
+    'px-2.5 pt-1.5 pb-1 text-[11px] font-black tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  row: 'flex items-center justify-between gap-4 rounded-[var(--radius-md)] px-2.5 py-2 font-semibold',
+  // Many choices take the line under their label
+  rowStacked: 'flex-col items-stretch gap-2',
 } as const

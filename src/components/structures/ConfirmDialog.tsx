@@ -62,7 +62,7 @@ export const ConfirmDialog = ({
           <Button
             variant={isDestructive ? 'danger' : 'primary'}
             onClick={onConfirm}
-            disabled={pending}
+            isLoading={pending}
           >
             {confirmName}
           </Button>

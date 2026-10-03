@@ -40,8 +40,8 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-body);
-  letter-spacing: -0.015em;
+  font-family: var(--font-system);
+  letter-spacing: -0.02em;
 }
 
 ::selection {
@@ -86,6 +86,16 @@ h4 {
   background: linear-gradient(90deg, transparent, var(--color-surface-raised), transparent);
   /* functional: shimmer signals loading is still advancing */
   animation: skeleton-shimmer-sweep var(--motion-duration-moderate) linear infinite;
+}
+
+/* White animated mark: left as is over a brand fill, inked on a light surface */
+.loader-gif {
+  filter: brightness(0);
+}
+
+.loader-gif-brand,
+:root.dark .loader-gif {
+  filter: none;
 }
 
 @keyframes skeleton-shimmer-sweep {
@@ -438,6 +448,162 @@ body {
   --page-brand-800: var(--color-brand-800);
 }
 
+/*
+ * Colour of the frame around the page follows the level in force (src/layouts/AppShell.tsx sets
+ * data-tone). Every colour it is made of is registered as a <color> so a change is interpolated
+ * rather than swapped, and the gradient is rebuilt here from the animated values: declared on
+ * :root it would be resolved once and never follow.
+ */
+@property --color-frame-spark {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ffd3e6;
+}
+
+@property --color-frame-rose {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ffbbd8;
+}
+
+@property --color-frame-berry {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ffcfe3;
+}
+
+@property --color-frame-wine {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ffe3ef;
+}
+
+@property --color-frame-plum {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fff5f9;
+}
+
+@property --color-frame {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ffc9de;
+}
+
+@property --color-on-frame {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #4a1030;
+}
+
+@property --color-on-frame-subtle {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(74 16 48 / 0.78);
+}
+
+@property --color-on-frame-line {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(74 16 48 / 0.12);
+}
+
+@property --color-on-frame-line-strong {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(74 16 48 / 0.22);
+}
+
+@property --color-on-frame-tint {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #c23378;
+}
+
+@property --color-on-frame-blush {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #a32663;
+}
+
+@property --color-on-frame-deep {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #7a1b4a;
+}
+
+.app-tone {
+  --gradient-frame: linear-gradient(
+    135deg,
+    var(--color-frame-rose) 0%,
+    var(--color-frame-spark) 28%,
+    var(--color-frame-berry) 52%,
+    var(--color-frame-wine) 78%,
+    var(--color-frame-plum) 100%
+  );
+  transition-property:
+    --color-frame-spark, --color-frame-rose, --color-frame-berry, --color-frame-wine,
+    --color-frame-plum, --color-frame, --color-on-frame, --color-on-frame-subtle,
+    --color-on-frame-line, --color-on-frame-line-strong, --color-on-frame-tint,
+    --color-on-frame-blush, --color-on-frame-deep;
+  transition-duration: 1100ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-tone {
+    transition-duration: 0ms;
+  }
+}
+
+.app-tone[data-tone='lead'] {
+  --color-frame-rose: #ff9a3d;
+  --color-frame-spark: #ffae5c;
+  --color-frame-berry: #ffc488;
+  --color-frame-wine: #ffdfb8;
+  --color-frame-plum: #fff2e2;
+  --color-frame: #ffae5c;
+  --color-on-frame: rgb(74 35 8);
+  --color-on-frame-subtle: rgb(74 35 8 / 0.78);
+  --color-on-frame-line: rgb(74 35 8 / 0.12);
+  --color-on-frame-line-strong: rgb(74 35 8 / 0.22);
+  --color-on-frame-tint: #d9701a;
+  --color-on-frame-blush: #b85a10;
+  --color-on-frame-deep: #7a3a08;
+}
+
+.app-tone[data-tone='admin'] {
+  --color-frame-rose: #f26666;
+  --color-frame-spark: #f68080;
+  --color-frame-berry: #f9a3a3;
+  --color-frame-wine: #fccbcb;
+  --color-frame-plum: #fff0f0;
+  --color-frame: #f68080;
+  --color-on-frame: rgb(66 12 12);
+  --color-on-frame-subtle: rgb(66 12 12 / 0.78);
+  --color-on-frame-line: rgb(66 12 12 / 0.12);
+  --color-on-frame-line-strong: rgb(66 12 12 / 0.22);
+  --color-on-frame-tint: #c42c2c;
+  --color-on-frame-blush: #a01e1e;
+  --color-on-frame-deep: #6e1212;
+}
+
+.app-tone[data-tone='junior'] {
+  --color-frame-rose: #c6a5fc;
+  --color-frame-spark: #d3bafd;
+  --color-frame-berry: #e0d0fe;
+  --color-frame-wine: #eee6ff;
+  --color-frame-plum: #f9f5ff;
+  --color-frame: #d3bafd;
+  --color-on-frame: rgb(44 26 82);
+  --color-on-frame-subtle: rgb(44 26 82 / 0.78);
+  --color-on-frame-line: rgb(44 26 82 / 0.12);
+  --color-on-frame-line-strong: rgb(44 26 82 / 0.22);
+  --color-on-frame-tint: #7a4fd6;
+  --color-on-frame-blush: #6339b8;
+  --color-on-frame-deep: #3f2078;
+}
+
 /* Rounded window the page shows through (src/components/structures/WindowFrame.tsx) */
 .app-frame {
   border-radius: var(--radius-xl);
@@ -483,40 +649,43 @@ body {
   }
 }
 
-/* Page title tab hanging from the frame (src/components/structures/PageHeader.tsx): its shoulders
-   leave the rim tangent and land flat, a slope rather than a step */
-.title-tab-start,
-.title-tab-end {
-  display: none;
+/* Page banner (src/components/structures/PageHeader.tsx): its height, and the notch cut into its
+   bottom edge. The notch is the page colour, its shoulders leave the banner tangent and land flat
+   on the tab, a slope rather than a step */
+body {
+  --banner-h: var(--shell-banner-h-mobile);
 }
 
+/* md — mirrors breakpoints.md of src/configurations/system/responsive.json */
 @media (width >= 768px) {
-  .title-tab-start,
-  .title-tab-end,
-  .title-tab-body {
-    height: var(--shell-title-tab-h);
-    background: var(--gradient-frame) fixed;
+  body {
+    --banner-h: var(--shell-banner-h);
   }
+}
 
-  .title-tab-start,
-  .title-tab-end {
-    display: block;
-    flex: none;
-    width: var(--shell-title-slope-w);
-    mask-repeat: no-repeat;
-    mask-size: 100% 100%;
-  }
+.banner-notch-body {
+  height: var(--shell-notch-h);
+  background: var(--color-background);
+}
 
-  /* One pixel over the body hides the seam */
-  .title-tab-start {
-    margin-right: -1px;
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44' preserveAspectRatio='none'%3E%3Cpath d='M0 0C18 0 18 44 36 44V0Z'/%3E%3C/svg%3E");
-  }
+.banner-slope {
+  flex: none;
+  width: var(--shell-notch-slope);
+  height: var(--shell-notch-h);
+  background: var(--color-background);
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}
 
-  .title-tab-end {
-    margin-left: -1px;
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44' preserveAspectRatio='none'%3E%3Cpath d='M0 0V44C18 44 18 0 36 0Z'/%3E%3C/svg%3E");
-  }
+/* One pixel over the body hides the seam */
+.banner-slope-start {
+  margin-right: -1px;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44' preserveAspectRatio='none'%3E%3Cpath d='M0 44C18 44 18 0 36 0V44Z'/%3E%3C/svg%3E");
+}
+
+.banner-slope-end {
+  margin-left: -1px;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44' preserveAspectRatio='none'%3E%3Cpath d='M36 44C18 44 18 0 0 0V44Z'/%3E%3C/svg%3E");
 }
 
 /* Rail standing on the frame: white ink, white washes, glyphs warm into blush */
@@ -560,14 +729,74 @@ body {
   color: var(--color-ink);
 }
 
-/* The open page on the rail, as Arc marks its tab: a plain plate, its words in deep rose */
+/* Frosted glass, as Arc lays its panels over the space colour: the fill is translucent, the
+   backdrop blurred and lifted in saturation, a light rim and an inner highlight edge it */
+.glass-panel {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  border-color: var(--glass-line);
+  box-shadow: var(--glass-shadow);
+}
+
+/* Boxes of a page as panes of the same glass, lighter, the sheen carried by the box itself. In a
+   layer so a hover or a tint written on the box still wins over the fill */
+@layer components {
+  .glass-surface {
+    background: linear-gradient(135deg, var(--glass-box-sheen), var(--glass-box-fill) 60%);
+    -webkit-backdrop-filter: blur(var(--glass-box-blur)) saturate(1.5);
+    backdrop-filter: blur(var(--glass-box-blur)) saturate(1.5);
+    box-shadow: var(--glass-box-edge);
+  }
+}
+
+/* Tail of a box pointing left, as a speech bubble's: a border-coloured triangle, the box's glass
+   laid over it a hair smaller and a hair into the box so its edge is cut where the tail starts.
+   It slides along the box edge, the box itself keeps its size */
+.bubble-tail {
+  position: absolute;
+  left: 0;
+  width: 13px;
+  height: 24px;
+  transform: translate(-100%, -50%);
+  transition: top 380ms var(--motion-ease-out);
+  pointer-events: none;
+}
+
+.bubble-tail::before,
+.bubble-tail::after {
+  content: '';
+  position: absolute;
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+
+.bubble-tail::before {
+  inset: 0;
+  background: var(--color-border);
+}
+
+.bubble-tail::after {
+  top: 1.5px;
+  bottom: 1.5px;
+  left: 2px;
+  right: -1.5px;
+  background: var(--glass-box-fill);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble-tail {
+    transition: none;
+  }
+}
+
+/* The open page on the rail, as Arc marks its tab: a pane of glass, its words in deep rose */
 .rail-ground [aria-current='page'] {
   --color-brand-600: var(--page-brand-800);
   color: var(--page-brand-800);
-  background: var(--page-surface-raised);
-  box-shadow:
-    0 1px 2px rgb(24 24 27 / 0.16),
-    0 4px 12px -6px rgb(24 24 27 / 0.32);
+  background: var(--glass-fill-strong);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6);
+  box-shadow: var(--glass-shadow);
 }
 
 /* Toast pile (src/components/structures/NotificationsToaster.tsx). Each toast knows its depth from

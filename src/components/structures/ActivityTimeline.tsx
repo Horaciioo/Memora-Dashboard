@@ -1,5 +1,4 @@
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
 import { ACTIVITY_COPY } from '@/declarations/activity/copy'
 import { ACTIVITY_EVENT_REGISTRY } from '@/declarations/activity/registries'
 import { JOURNAL_STYLES } from '@/declarations/ui/variants'
@@ -12,7 +11,7 @@ export interface ActivityTimelineProps {
 
 /**
  * Vertical journal of recorded events, newest first — the portrait of whoever acted opens
- * each row, its tag carrying the nature of the act in colour
+ * each row, the sentence saying what was done
  * @param {ActivityEntry[]} entries - Journal entries
  * @return {JSX.Element}
  */
@@ -29,8 +28,6 @@ export const ActivityTimeline = ({ entries }: ActivityTimelineProps) => (
             <Avatar name={actor} src={entry.actorAvatar} size="xs" />
             <div className={JOURNAL_STYLES.body}>
               <span className={JOURNAL_STYLES.head}>
-                <Badge label={event?.label ?? entry.origin} tone={event?.tone ?? 'neutral'} muted />
-                <span className={JOURNAL_STYLES.tick} aria-hidden="true" />
                 <span className={JOURNAL_STYLES.moment}>{formatDayTime(entry.createdAt)}</span>
               </span>
               {entry.change ? (
@@ -39,14 +36,14 @@ export const ActivityTimeline = ({ entries }: ActivityTimelineProps) => (
                   <strong className={JOURNAL_STYLES.verb}>{entry.change.verb}</strong>
                   {` ${entry.change.rest}.`}
                 </p>
+              ) : event ? (
+                <p className={JOURNAL_STYLES.sentence}>
+                  {`${actor} ${ACTIVITY_COPY.did} `}
+                  <strong className={JOURNAL_STYLES.verb}>{event.verb}</strong>
+                  {` ${event.target}.`}
+                </p>
               ) : (
-                event && (
-                  <p className={JOURNAL_STYLES.sentence}>
-                    {`${actor} ${ACTIVITY_COPY.did} `}
-                    <strong className={JOURNAL_STYLES.verb}>{event.verb}</strong>
-                    {` ${event.target}.`}
-                  </p>
-                )
+                <p className={JOURNAL_STYLES.sentence}>{`${actor}, ${entry.origin}.`}</p>
               )}
             </div>
           </div>

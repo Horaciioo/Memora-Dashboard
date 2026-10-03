@@ -86,3 +86,16 @@ export const WIP_COPY = {
   title: 'En cours de développement',
   description: 'Cette partie n’est pas terminée, elle bouge encore.',
 } as const
+
+/**
+ * Page options menu, the toggles of a banner
+ * @type {Record<string, string>}
+ */
+
+export const PAGE_OPTIONS_COPY = {
+  label: 'Options de la page',
+  title: 'Affichage',
+  showFinished: 'Afficher les terminées',
+  view: 'Vue',
+  showHistory: 'Afficher l’historique',
+} as const

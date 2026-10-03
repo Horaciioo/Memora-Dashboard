@@ -186,7 +186,7 @@ export const FILE_INPUT_STYLES = {
  */
 
 export const OPTION_MARK_STYLES = {
-  dot: 'h-2 w-2 shrink-0 rounded-full',
+  dot: 'h-3.5 w-[3px] shrink-0 rounded-full',
   priority: 'shrink-0 text-sm leading-none font-extrabold tracking-tighter',
   emoji: 'shrink-0 text-base leading-none',
   glyph: 'h-4 w-4 shrink-0',
@@ -210,7 +210,7 @@ export const SELECT_MENU_STYLES = {
   chevron: 'h-4 w-4 shrink-0 text-[var(--color-on-field-subtle)] transition-transform',
   chevronOpen: 'rotate-180',
   panel:
-    'popover-enter fixed z-[70] flex max-h-72 flex-col overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+    'popover-enter fixed z-[70] flex max-h-72 flex-col overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   search:
     'w-full border-b border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]',
   // Rows breathe, none touching its neighbour
@@ -278,7 +278,7 @@ export const SELECT_MENU_MARK_SIZES = {
 
 export const DATE_PICKER_STYLES = {
   panel:
-    'popover-enter fixed z-[70] w-72 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+    'popover-enter fixed z-[70] w-72 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   head: 'flex items-center justify-between gap-2 border-b border-[var(--color-border)] px-2 py-2',
   month: 'flex-1 text-center text-sm font-bold first-letter:uppercase',
   step: 'flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
@@ -496,7 +496,7 @@ export const BLOCK_EDITOR = {
   menuGapPx: 8,
   formatBarHeightPx: 48,
   slashPanel:
-    'fixed z-[80] flex max-h-80 w-72 flex-col gap-0.5 overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1.5 shadow-[var(--shadow-lg)]',
+    'fixed z-[80] flex max-h-80 w-72 flex-col gap-0.5 overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel p-1.5 shadow-[var(--shadow-lg)]',
   slashEmpty: 'px-3 py-2 text-sm text-[var(--color-ink-subtle)]',
   slashItem: 'flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-1.5 text-left',
   slashItemIdle: 'hover:bg-[var(--color-hover)]',
@@ -508,7 +508,7 @@ export const BLOCK_EDITOR = {
   slashLabelText: 'text-sm font-medium',
   slashHint: 'truncate text-xs text-[var(--color-ink-subtle)]',
   formatBar:
-    'fixed z-[80] flex -translate-x-1/2 items-center gap-0.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1 shadow-[var(--shadow-md)]',
+    'fixed z-[80] flex -translate-x-1/2 items-center gap-0.5 rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel p-1 shadow-[var(--shadow-md)]',
   formatButton:
     'flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   formatGlyph: 'h-4 w-4',

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
+import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { SkeletonList } from '@/components/elements/feedback/Skeleton'
 import { Input } from '@/components/elements/forms/Input'
 import { Dialog } from '@/components/structures/Dialog'
@@ -125,7 +126,12 @@ export const EmojiDialog = ({ open, value, onSelect, onClose }: EmojiDialogProps
       }
     >
       {catalogue === null ? (
-        <SkeletonList shape="row" rows={4} />
+        <div className="flex flex-col gap-3">
+          <div className="flex justify-center">
+            <BrandLoader variant="ink" />
+          </div>
+          <SkeletonList shape="row" rows={4} />
+        </div>
       ) : (
         <div className={EMOJI_DIALOG_STYLES.body}>
           {searching ? (

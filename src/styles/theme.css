@@ -1,67 +1,67 @@
 /*
  * Token values of the theme format (src/utils/format/theme.ts). White ground,
- * neutral grey structure, one soft rose. The only gradient is the frame around the page.
+ * neutral grey structure, one clear pink fading into white, cotton-candy light. The only gradient is the frame around the page.
  * The .dark class on <html> is the single source of truth — set by ThemeManager
  * and, before paint, by ThemeScript, both of which resolve "system" themselves.
  * Font tokens live in fonts.css.
  */
 
 :root {
-  --color-background: #fffbfc;
-  --color-surface: #fdf8fa;
+  --color-background: #fffcfd;
+  --color-surface: #fff9fb;
   --color-surface-raised: #ffffff;
-  --color-surface-sunken: #f8eff3;
+  --color-surface-sunken: #fcf3f7;
   --color-ink: #18181b;
-  --color-ink-subtle: #71717a;
-  --color-ink-accent: #cf7089;
+  --color-ink-subtle: #6a6a73;
+  --color-ink-accent: #b52a69;
   --color-border: #e4e4e7;
   --color-border-strong: #d4d4d8;
 
   /* Barely-there rose-grey wash under a hovered control, never a colour fill */
-  --color-hover: #f4eef0;
+  --color-hover: #f6f1f3;
 
-  /* Cotton-candy frame, as Arc tints its window: pink sliding into peach and lilac */
-  --color-frame-spark: #fcd6e6;
-  --color-frame-rose: #f9b9d5;
-  --color-frame-berry: #f5aad0;
-  --color-frame-wine: #ebadde;
-  --color-frame-plum: #d6b7f0;
+  /* Cotton-candy frame: clear pink melting into white, no lilac */
+  --color-frame-spark: #ffd3e6;
+  --color-frame-rose: #ffbbd8;
+  --color-frame-berry: #ffcfe3;
+  --color-frame-wine: #ffe3ef;
+  --color-frame-plum: #fff5f9;
   --gradient-frame: linear-gradient(
     135deg,
-    var(--color-frame-spark) 0%,
-    var(--color-frame-rose) 30%,
-    var(--color-frame-berry) 55%,
+    var(--color-frame-rose) 0%,
+    var(--color-frame-spark) 28%,
+    var(--color-frame-berry) 52%,
     var(--color-frame-wine) 78%,
     var(--color-frame-plum) 100%
   );
   /* Solid stand-in, what a cut into a rail glyph shows */
-  --color-frame: #f5aad0;
+  --color-frame: #ffc9de;
   /* Hairline where the page meets its frame */
   --color-frame-edge: rgb(24 24 27 / 0.08);
 
   /* Ink and washes of the rail standing on the frame: deep plum on the pastel */
-  --color-on-frame: #3d1230;
-  --color-on-frame-subtle: rgb(61 18 48 / 0.78);
+  --color-on-frame: #4a1030;
+  --color-on-frame-subtle: rgb(74 16 48 / 0.78);
   --color-on-frame-wash: rgb(255 255 255 / 0.4);
   --color-on-frame-raised: rgb(255 255 255 / 0.55);
-  --color-on-frame-line: rgb(61 18 48 / 0.12);
-  --color-on-frame-line-strong: rgb(61 18 48 / 0.22);
+  --color-on-frame-line: rgb(74 16 48 / 0.12);
+  --color-on-frame-line-strong: rgb(74 16 48 / 0.22);
   /* Glyph ramp on the frame, plum deepening into candy */
-  --color-on-frame-tint: #a8336f;
-  --color-on-frame-blush: #8c2560;
-  --color-on-frame-deep: #6b1a4a;
+  --color-on-frame-tint: #c23378;
+  --color-on-frame-blush: #a32663;
+  --color-on-frame-deep: #7a1b4a;
 
-  /* One rose quartz — every rung sits on the hue of 600, softened from the old orchid */
-  --color-brand-50: #fdf5f6;
-  --color-brand-100: #fbe9eb;
-  --color-brand-200: #f6d3d7;
-  --color-brand-300: #eeb2ba;
-  --color-brand-400: #e295a1;
-  --color-brand-500: #d97e90;
-  --color-brand-600: #cf7089;
-  --color-brand-700: #b25c76;
-  --color-brand-800: #8f4a61;
-  --color-brand-900: #6d3a4c;
+  /* One pink, hue steady from the palest wash to the deepest ink */
+  --color-brand-50: #fff6fa;
+  --color-brand-100: #ffe8f1;
+  --color-brand-200: #ffcfe3;
+  --color-brand-300: #ffa8cc;
+  --color-brand-400: #fb7fb0;
+  --color-brand-500: #ee5a96;
+  --color-brand-600: #d12f78;
+  --color-brand-700: #b72568;
+  --color-brand-800: #9b2557;
+  --color-brand-900: #701a3f;
   --color-on-brand: #ffffff;
   /* Black label laid over a full-colour fill */
   --color-on-accent: #18181b;
@@ -80,7 +80,7 @@
   --color-danger-soft: #fef2f2;
   --color-info-soft: #eff6ff;
   --color-neutral-soft: #f4f4f5;
-  --color-brand-soft: #fbe9eb;
+  --color-brand-soft: #ffe8f1;
 
   /* Fixed light ground a camera can read a code off, identical in both themes */
   --color-scan-ground: #ffffff;
@@ -131,6 +131,20 @@
   --motion-duration-moderate: 1400ms;
   --motion-duration-panel: 220ms;
   --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Frosted glass of the floating surfaces: translucent fill, light rim, blur behind */
+  --glass-fill: rgb(255 255 255 / 0.62);
+  --glass-fill-strong: rgb(255 255 255 / 0.74);
+  --glass-line: rgb(255 255 255 / 0.72);
+  --glass-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.85), 0 18px 48px -14px rgb(122 27 74 / 0.3),
+    0 2px 6px rgb(24 24 27 / 0.06);
+  --glass-blur: 22px;
+  /* Boxes of a page: lighter than a floating panel, the blur stays soft */
+  --glass-box-fill: rgb(228 222 213 / 0.6);
+  --glass-box-blur: 14px;
+  --glass-box-edge: inset 0 1px 0 rgb(255 255 255 / 0.7);
+  --glass-box-sheen: rgb(242 238 231 / 0.78);
 }
 
 :root.dark {
@@ -140,11 +154,11 @@
   --color-surface-sunken: #0b0b0d;
   --color-ink: #fafafa;
   --color-ink-subtle: #a1a1aa;
-  --color-ink-accent: #e59aa8;
+  --color-ink-accent: #f59bc2;
   --color-border: #27272a;
   --color-border-strong: #3f3f46;
 
-  --color-hover: #211d1e;
+  --color-hover: #221e20;
 
   --color-frame-edge: rgb(255 255 255 / 0.07);
 
@@ -157,17 +171,17 @@
   --color-picker-wash: rgb(255 255 255 / 0.07);
   --color-picker-wash-strong: rgb(255 255 255 / 0.11);
 
-  --color-brand-50: #2a1519;
-  --color-brand-100: #3d1c23;
-  --color-brand-200: #5a2a34;
-  --color-brand-300: #84424f;
-  --color-brand-400: #c06678;
-  --color-brand-500: #d1808f;
-  --color-brand-600: #dd93a1;
-  --color-brand-700: #e7abb6;
-  --color-brand-800: #f0c8ce;
-  --color-brand-900: #f8e5e9;
-  --color-on-brand: #3d1c23;
+  --color-brand-50: #2b1320;
+  --color-brand-100: #401a30;
+  --color-brand-200: #5f2547;
+  --color-brand-300: #8c3366;
+  --color-brand-400: #d4568f;
+  --color-brand-500: #e8719f;
+  --color-brand-600: #f08cb5;
+  --color-brand-700: #f5a6c8;
+  --color-brand-800: #f9c4dc;
+  --color-brand-900: #fde3ee;
+  --color-on-brand: #3f1230;
 
   --color-success: #4ade80;
   --color-caution: #eab308;
@@ -182,7 +196,7 @@
   --color-danger-soft: #2c1414;
   --color-info-soft: #121f33;
   --color-neutral-soft: #232326;
-  --color-brand-soft: #3d1c23;
+  --color-brand-soft: #401a30;
 
   --color-authority-admin: #f75555;
   --color-authority-lead: #fdba74;
@@ -193,6 +207,15 @@
   --shadow-md: 0 6px 20px -8px rgb(0 0 0 / 0.6);
   --shadow-lg: 0 24px 60px -24px rgb(0 0 0 / 0.8);
   --shadow-page: 0 1px 3px rgb(0 0 0 / 0.4), 0 14px 36px -14px rgb(0 0 0 / 0.7);
+  --glass-fill: rgb(34 28 32 / 0.62);
+  --glass-fill-strong: rgb(34 28 32 / 0.74);
+  --glass-line: rgb(255 255 255 / 0.12);
+  --glass-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08), 0 18px 48px -14px rgb(0 0 0 / 0.65),
+    0 2px 6px rgb(0 0 0 / 0.3);
+  --glass-box-fill: rgb(52 48 44 / 0.55);
+  --glass-box-edge: inset 0 1px 0 rgb(255 255 255 / 0.07);
+  --glass-box-sheen: rgb(86 80 74 / 0.5);
 }
 
 /*

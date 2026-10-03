@@ -99,11 +99,11 @@ export const KanbanBoard = <T extends BoardItem>({
           <section
             key={column.id}
             style={accentStyle}
-            className={cn(BOARD_STYLES.column, tintByColumn && 'accent-wash accent-border')}
+            className={cn(BOARD_STYLES.column, tintByColumn && 'accent-border')}
           >
             <header className={BOARD_STYLES.columnHead}>
               <span className={BOARD_STYLES.columnTitle}>
-                <Badge label={column.label} accent={column.accent}  />
+                <Badge label={column.label} accent={column.accent} />
               </span>
             </header>
             <div
@@ -125,7 +125,10 @@ export const KanbanBoard = <T extends BoardItem>({
                   }
                   onContextMenu={cardMenu ? contextMenu(cardMenu(item)) : undefined}
                   style={accentStyle}
-                  className={cn(BOARD_STYLES.card, tintByColumn && 'accent-tint accent-border')}
+                  className={cn(
+                    BOARD_STYLES.card,
+                    tintByColumn ? BOARD_STYLES.cardTint : BOARD_STYLES.cardGlass
+                  )}
                   {...(canMove ? itemProps({ id: item.id, from: column.id }) : {})}
                 >
                   {renderCard(item)}

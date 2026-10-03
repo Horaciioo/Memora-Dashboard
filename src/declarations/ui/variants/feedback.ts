@@ -14,6 +14,52 @@ export const SKELETON_SHAPES = {
 
 export type SkeletonShape = keyof typeof SKELETON_SHAPES
 
+/**
+ * Animated brand loader, white strokes so it lives on a pink ground or inked on a light one
+ * @type {Record<string, string>}
+ */
+
+export const BRAND_LOADER = {
+  // Pink tile holding the mark, sits beside a title
+  tile: 'inline-flex shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-brand-600)] px-3 py-2 shadow-[var(--shadow-sm)]',
+  tileMark: 'loader-gif-brand h-10 w-auto',
+  // Centred in a panel waiting on its data
+  block:
+    'flex min-h-48 w-full flex-col items-center justify-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] py-10',
+  blockTile:
+    'inline-flex items-center justify-center rounded-[var(--radius-xl)] bg-[var(--color-brand-600)] px-6 py-4 shadow-[var(--shadow-md)]',
+  blockMark: 'loader-gif-brand h-16 w-auto',
+  // Inside a pink button
+  inline: 'loader-gif-brand h-4 w-auto shrink-0',
+  // On a light surface, inked
+  ink: 'loader-gif h-6 w-auto shrink-0',
+  caption: 'text-sm text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Route skeleton layouts, each echoing the page it stands in for
+ * @type {Record<string, string>}
+ */
+
+export const PAGE_SKELETON = {
+  page: 'flex flex-col gap-8',
+  head: 'flex items-center justify-between gap-4',
+  title: 'flex flex-col gap-2',
+  stack: 'flex flex-col gap-3',
+  // Raised box like the real sections
+  box: 'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-5 shadow-[var(--shadow-sm)]',
+  grid: 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3',
+  gridWide: 'grid gap-4 sm:grid-cols-2 xl:grid-cols-4',
+  group: 'flex flex-col gap-4',
+  groupHead: 'flex items-center gap-3',
+  columns: 'grid gap-4 md:grid-cols-3',
+  column: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3',
+  split: 'grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]',
+  file: 'grid gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] lg:items-start',
+  tabs: 'flex gap-2',
+  hero: 'flex items-center gap-4',
+} as const
+
 /** @type {string} */
 
 export const SKELETON_BASE = 'skeleton-shimmer rounded-[var(--radius-md)] bg-[var(--color-surface)]'
@@ -62,7 +108,7 @@ export const TOAST_STYLES = {
   // Space once spread
   gapPx: 8,
   toast:
-    'toast-enter relative flex touch-pan-y items-start gap-3 overflow-hidden rounded-[var(--radius-lg)] border border-l-4 border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm shadow-[var(--shadow-lg)]',
+    'toast-enter relative flex touch-pan-y items-start gap-3 overflow-hidden rounded-[var(--radius-lg)] border border-l-4 border-[var(--color-border)] glass-panel px-4 py-3 text-sm shadow-[var(--shadow-lg)]',
   settle: 'transition-[transform,opacity] motion-reduce:transition-none',
   badge: 'flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)]',
   glyph: 'h-4 w-4',
@@ -82,7 +128,7 @@ export const TOAST_STYLES = {
  */
 
 export const ADD_ROW_STYLES = {
-  base: 'flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] px-4 py-3 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-brand-400)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] disabled:pointer-events-none disabled:opacity-50',
+  base: 'flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] px-4 py-3 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] disabled:pointer-events-none disabled:opacity-50',
   tile: 'min-h-24 flex-col',
   icon: 'h-4 w-4',
 } as const
@@ -114,7 +160,7 @@ export const NOTIFICATION_STYLES = {
     'pointer-events-none absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-surface-raised)]',
   scrim: 'fixed inset-0 z-[65]',
   panel:
-    'rail-reset surface-enter fixed z-[70] flex max-h-[min(28rem,70vh)] w-[min(21rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+    'rail-reset surface-enter fixed z-[70] flex max-h-[min(28rem,70vh)] w-[min(21rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   header:
     'flex shrink-0 items-center justify-between gap-2 border-b border-[var(--color-border)] px-4 py-2.5',
   title: 'text-sm font-bold',
@@ -167,7 +213,7 @@ export const INFO_HINT = {
     'text-[var(--color-ink-subtle)] hover:text-[var(--color-brand-600)] focus-visible:text-[var(--color-brand-600)]',
   icon: 'h-4 w-4',
   // Shown on hover or focus
-  pop: 'invisible absolute top-[calc(100%+0.5rem)] z-[60] w-max max-w-64 translate-y-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2.5 py-1.5 text-left text-xs leading-snug font-normal tracking-normal text-[var(--color-ink)] normal-case opacity-0 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-[var(--motion-duration-fast)] group-focus-within/info:visible group-focus-within/info:translate-y-0 group-focus-within/info:opacity-100 group-hover/info:visible group-hover/info:translate-y-0 group-hover/info:opacity-100 motion-reduce:transition-none',
+  pop: 'invisible absolute top-[calc(100%+0.5rem)] z-[60] w-max max-w-64 translate-y-1 rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel px-2.5 py-1.5 text-left text-xs leading-snug font-normal tracking-normal text-[var(--color-ink)] normal-case opacity-0 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-[var(--motion-duration-fast)] group-focus-within/info:visible group-focus-within/info:translate-y-0 group-focus-within/info:opacity-100 group-hover/info:visible group-hover/info:translate-y-0 group-hover/info:opacity-100 motion-reduce:transition-none',
   // Exclusive anchors
   popCenter: 'left-1/2 -translate-x-1/2',
   popStart: '-left-2',
@@ -216,6 +262,5 @@ export const REVEAL_MARK = {
  */
 
 export const STATUS_TEXT = {
-  root: 'inline-flex items-center gap-2 text-sm text-[var(--color-ink-subtle)]',
-  bullet: 'h-2.5 w-2.5 shrink-0',
+  root: 'inline-flex items-center text-sm font-semibold',
 } as const

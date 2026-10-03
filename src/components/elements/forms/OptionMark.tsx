@@ -1,4 +1,6 @@
 import { Avatar } from '@/components/elements/display/Avatar'
+import { DivisionLogo } from '@/components/elements/display/DivisionLogo'
+import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/NetworkLogo'
 import { PRIORITY_GLYPH } from '@/declarations/ui/copy'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { ACCENT_STYLES, TONES, accentVars, toTone } from '@/declarations/ui/theme'
@@ -26,6 +28,20 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
   // A portrait carries its own colour, the other two borrow the option accent
   if (mark === 'avatar') {
     return <Avatar name={option.label} src={option.image} size={size} />
+  }
+
+  // Official logo of a division, nothing for the entry level
+  if (mark === 'division') {
+    return <DivisionLogo label={option.label} src={option.image} className="h-5 w-5" />
+  }
+
+  // Official logo of a network, its portrait when it has none
+  if (mark === 'network') {
+    return hasNetworkLogo(option.label) ? (
+      <NetworkLogo network={option.label} className="h-5 w-5" />
+    ) : (
+      <Avatar name={option.label} src={option.image} size={size} />
+    )
   }
 
   // Project glyph, nothing when unset

@@ -42,7 +42,7 @@ export type FieldKind =
  * @type {string}
  */
 
-export type OptionMark = 'dot' | 'avatar' | 'priority' | 'emoji' | 'glyph'
+export type OptionMark = 'dot' | 'avatar' | 'priority' | 'emoji' | 'glyph' | 'network' | 'division'
 
 /**
  * Value a blank creation form starts from

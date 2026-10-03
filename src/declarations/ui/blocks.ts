@@ -13,7 +13,7 @@ import {
 export const FLOATING_HINT = {
   layer: 'pointer-events-none fixed inset-0 z-[75]',
   bubble:
-    'floating-hint-bubble pointer-events-none absolute flex -translate-x-1/2 -translate-y-full items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-xs shadow-[var(--shadow-md)]',
+    'floating-hint-bubble pointer-events-none absolute flex -translate-x-1/2 -translate-y-full items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel px-3 py-1.5 text-xs shadow-[var(--shadow-md)]',
   icon: 'h-3.5 w-3.5',
 } as const
 
@@ -24,7 +24,7 @@ export const FLOATING_HINT = {
 
 export const APP_SHELL = {
   // Room right of the page for the rim
-  frame: 'flex min-h-dvh bg-[var(--color-background)] md:pr-3',
+  frame: 'app-tone flex min-h-dvh bg-[var(--color-background)] md:pr-3',
   // Window the page shows through, the frame covers the rest
   window:
     'app-frame pointer-events-none fixed inset-y-3 right-3 left-[var(--shell-sidebar-w)] z-[35] hidden md:block',
@@ -35,10 +35,11 @@ export const APP_SHELL = {
     'group/track pointer-events-auto absolute top-[var(--radius-xl)] right-1 bottom-[var(--radius-xl)] w-2.5 cursor-pointer',
   windowThumb:
     'absolute inset-x-0.5 top-0 cursor-grab rounded-full bg-[var(--color-ink)]/25 transition-[background-color,left,right] duration-150 group-hover/track:inset-x-0 group-hover/track:bg-[var(--color-ink)]/40 active:cursor-grabbing active:bg-[var(--color-ink)]/50',
-  main: 'flex min-w-0 flex-1 flex-col',
+  // Positioned so the page banner can span the whole column
+  main: 'relative flex min-w-0 flex-1 flex-col',
   // Gutters widen past md so a page never welds itself to either rail
   content:
-    'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--shell-title-tab-h)+2.5rem)]',
+    'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--banner-h)+2.5rem)]',
   breadcrumbs: 'hidden flex-wrap items-center gap-1 text-xs text-[var(--color-ink-subtle)] sm:flex',
   // Below sm the trail folds to a single back link to the parent
   breadcrumbsCompact: 'flex items-center gap-1 text-xs text-[var(--color-ink-subtle)] sm:hidden',
@@ -54,7 +55,7 @@ export const APP_SHELL = {
 export const RAIL_POPOVER = {
   scrim: 'fixed inset-0 z-[65]',
   panel:
-    'rail-reset surface-enter fixed bottom-6 left-[calc(var(--shell-sidebar-w)+1.5rem)] z-[70] flex max-h-[calc(100dvh-3rem)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+    'rail-reset surface-enter fixed bottom-6 left-[calc(var(--shell-sidebar-w)+1.5rem)] z-[70] flex max-h-[calc(100dvh-3rem)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   bell: 'w-[26rem] max-w-[calc(100vw-var(--shell-sidebar-w)-3rem)]',
   account: 'w-80',
   // Glyph above the title, one head for both boxes
@@ -73,7 +74,7 @@ export const RAIL_POPOVER = {
 
 export const LEFT_SIDEBAR = {
   // Rail standing on the frame
-  rail: 'rail-ground relative z-40 hidden w-[var(--shell-sidebar-w)] shrink-0 flex-col py-3 md:sticky md:top-0 md:flex md:h-dvh',
+  rail: 'rail-ground relative z-40 font-[family-name:var(--font-system)] hidden w-[var(--shell-sidebar-w)] shrink-0 flex-col py-3 md:sticky md:top-0 md:flex md:h-dvh',
   // Page panel in the rail
   slot: 'flex min-h-0 flex-1 flex-col px-3',
   // Creator switch
@@ -81,27 +82,26 @@ export const LEFT_SIDEBAR = {
   // Search bar
   searchRow: 'flex shrink-0 px-3',
   // Pins footer down
-  nav: 'flex min-h-0 w-full flex-1 flex-col gap-5 overflow-y-auto px-3',
+  nav: 'flex min-h-0 w-full flex-1 flex-col gap-5 overflow-y-auto px-3 pt-7',
   navGroup: 'flex flex-col gap-1.5',
   navGroupLabel:
-    'group flex w-full items-center gap-1 px-2.5 pb-1 text-[11px] font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:text-[var(--color-ink)]',
+    'group flex w-full items-center gap-1 px-2.5 pb-1 text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:text-[var(--color-ink)]',
   navGroupChevron:
     'h-3.5 w-3.5 shrink-0 opacity-0 transition-[transform,opacity] group-hover:opacity-100 group-focus-visible:opacity-100',
   navGroupChevronCollapsed: '-rotate-90',
   navGroupItems: 'flex flex-col gap-0.5',
   navLink:
-    'group flex items-center gap-3 rounded-[var(--radius-md)] py-1.5 pr-2.5 pl-4 text-[15px] font-normal text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)]',
-  navLinkActive: 'font-semibold text-[var(--color-brand-600)]',
+    'group flex items-center gap-3 rounded-[var(--radius-md)] py-1.5 pr-2.5 pl-4 text-[17px] font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)]',
+  navLinkActive: 'font-bold text-[var(--color-brand-600)]',
   navLabel: 'relative',
-  navIcon: 'h-4 w-4 shrink-0 transition-colors',
+  navIcon: 'h-[18px] w-[18px] shrink-0 transition-colors',
   navIconActive: 'fill-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
-  navMaturity: 'ml-auto',
   // Account footer
   footer:
     'flex shrink-0 items-center justify-between gap-1 border-t border-[var(--color-border)] px-3 pt-3',
   footerAccount:
     'flex min-w-0 flex-1 items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-2 text-left transition-colors hover:bg-[var(--color-hover)]',
-  footerName: 'min-w-0 flex-1 truncate text-[15px] font-medium',
+  footerName: 'min-w-0 flex-1 truncate text-base font-semibold',
   footerActions: 'flex shrink-0 items-center gap-0.5',
   footerIcon: 'h-4 w-4 shrink-0',
   // Version under the nav
@@ -118,7 +118,7 @@ export const LEFT_SIDEBAR = {
  */
 
 export const SEARCH_LAUNCHER = {
-  bar: 'flex w-full items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface-raised)] px-2.5 py-2 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  bar: 'glass-panel flex w-full items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-2 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
   barLabel: 'flex-1 truncate text-[15px]',
   barShortcut:
     'shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-[10px] font-medium text-[var(--color-ink-subtle)]',
@@ -214,6 +214,7 @@ export const ACCOUNT_BLOCK = {
 export const DETAIL_BLOCK = {
   grid: `grid grid-cols-1 sm:grid-cols-2 ${PROPERTY_SPACING.rows} ${PROPERTY_SPACING.columns}`,
   entry: `flex min-w-0 flex-col ${PROPERTY_SPACING.within}`,
+  stack: `flex flex-col ${PROPERTY_SPACING.rows}`,
   // Long text runs edge to edge
   entryWide: `flex min-w-0 flex-col sm:col-span-2 ${PROPERTY_SPACING.within}`,
   label: PROPERTY_LABEL,
@@ -239,17 +240,83 @@ export const METRIC_BLOCK = {
  */
 
 export const MEMBER_BLOCK = {
-  // Portrait alone, centred over the tabs
-  hero: 'flex flex-col items-center gap-3 py-2',
   frame: 'relative',
+  // Official logo on the portrait's corner, lifted off it
+  divisionLogo: 'absolute -right-3 -bottom-3 h-14 w-14 drop-shadow-md',
+  // Division stamped on the portrait's corner, ringed like a presence dot
+  division:
+    'absolute -right-1 -bottom-1 flex h-10 min-w-10 items-center justify-center rounded-full bg-[var(--color-brand-600)] px-1.5 text-sm font-black text-[var(--color-on-brand)] ring-4 ring-[var(--color-surface-raised)]',
   portrait:
-    'block shrink-0 rounded-full transition-[filter] enabled:cursor-pointer enabled:hover:brightness-95 disabled:cursor-default',
+    'block shrink-0 rounded-full ring-4 ring-[var(--color-surface-raised)] transition-[filter] enabled:cursor-pointer enabled:hover:brightness-95 disabled:cursor-default',
   // Role glyph pinned to the portrait's corner, ringed like a presence dot
   emblem:
     'absolute -right-1 -bottom-1 h-9 w-9 rounded-full bg-[var(--color-surface)] p-1 ring-2 ring-[var(--color-surface)]',
   // Read-only function list, each behind its small glyph
   marks: 'flex flex-wrap items-center gap-x-4 gap-y-2',
   mark: 'inline-flex items-center gap-2',
+} as const
+
+/**
+ * Moderator file layout: an identity rail that stays put, the tabs beside it
+ * @type {Record<string, string>}
+ */
+
+export const MEMBER_FILE = {
+  layout: 'grid gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] lg:items-start',
+  main: 'flex min-w-0 flex-col gap-6',
+  // Rail follows the scroll on wide screens only
+  rail: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface shadow-[var(--shadow-sm)] lg:sticky lg:top-6',
+  head: 'flex flex-col items-center gap-2 px-5 pt-7 text-center',
+  name: 'text-xl font-black tracking-tight break-words',
+  role: 'text-xs font-black tracking-wide text-[var(--color-brand-800)] uppercase',
+  status:
+    'inline-flex items-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-2.5 py-1 text-xs font-semibold text-[var(--color-ink-subtle)]',
+  statusGlyph: 'h-4 w-4 shrink-0',
+  functions: 'flex items-center justify-center gap-2',
+  body: 'mt-5 border-t border-[var(--color-border)] p-5',
+  groupTitle: 'text-[11px] font-black tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  lock: 'px-5 pt-3 text-center',
+  // Property list of a rail
+  railList: 'flex flex-col gap-5',
+  railItem: 'flex flex-col gap-1.5',
+  factValue: 'text-sm font-medium',
+  factEmpty: 'text-sm text-[var(--color-ink-subtle)] italic',
+  // Note card, pinned ones washed pink
+  note: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 shadow-[var(--shadow-sm)]',
+  notePinned: 'border-[var(--color-brand-200)] bg-[var(--color-brand-50)]',
+  noteHead: 'flex items-center gap-2 text-xs text-[var(--color-ink-subtle)]',
+  noteBody: 'text-sm leading-relaxed whitespace-pre-wrap',
+  notesGrid: 'grid gap-4 sm:grid-cols-2',
+  // Social tile
+  social:
+    'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-3 transition-colors hover:bg-[var(--color-hover)]',
+  socialLogo:
+    'flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)]',
+  socialsGrid: 'grid gap-3 sm:grid-cols-2',
+  more: 'self-start text-sm font-semibold text-[var(--color-brand-800)] underline-offset-4 hover:underline',
+} as const
+
+/**
+ * Vertical list of stages joined by a rail, a journey or a timeline
+ * @type {Record<string, string>}
+ */
+
+export const STAGE_LIST = {
+  stage: 'relative flex gap-4 pb-6 last:pb-0',
+  stageRail: 'absolute top-12 bottom-0 left-[1.375rem] w-0.5 bg-[var(--color-border)]',
+  stageChip:
+    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-100)] text-[var(--color-brand-700)]',
+  stageChipDone:
+    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-success-soft)] text-[var(--color-success)]',
+  stageChipLate:
+    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-danger-soft)] text-[var(--color-danger)]',
+  stageChipOff:
+    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--color-border-strong)] text-[var(--color-ink-subtle)]',
+  stageBody: 'flex min-w-0 flex-1 flex-col gap-1.5 pt-1',
+  stageHead: 'flex min-w-0 flex-wrap items-center gap-2.5',
+  stageTitle: 'text-base font-black tracking-tight',
+  stageLead: 'text-sm text-[var(--color-ink-subtle)]',
+  stageActions: 'flex flex-wrap items-center gap-3',
 } as const
 
 /**
@@ -329,7 +396,7 @@ export const CONSOLE_BLOCK = {
   bannerTitle: 'text-sm font-semibold text-[var(--color-ink)]',
   bannerLead: 'text-xs text-[var(--color-ink-subtle)]',
   grid: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-4',
-  tile: 'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4',
+  tile: 'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4',
   tileLabel: 'text-xs font-medium tracking-wide text-[var(--color-ink-subtle)] uppercase',
   tileValue: 'font-[family-name:var(--font-display)] text-2xl leading-none',
   tileHint: 'text-xs text-[var(--color-ink-subtle)]',
@@ -345,7 +412,7 @@ export const CONSOLE_BLOCK = {
   cardLead: 'text-sm text-[var(--color-ink-subtle)]',
   chooser: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3',
   choice:
-    'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 text-left transition-colors hover:border-[var(--view)] hover:bg-[var(--color-surface)]',
+    'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 text-left transition-colors hover:border-[var(--view)] hover:bg-[var(--color-surface)]',
   choiceActive: 'border-[var(--view)] bg-[var(--view)]/8',
   choiceName: 'truncate text-sm font-semibold',
   choiceMeta: 'truncate text-xs text-[var(--color-ink-subtle)]',
@@ -366,11 +433,11 @@ export const ACCESS_CONSOLE = {
   row: 'group flex w-full items-center gap-2.5 rounded-[var(--radius-md)] px-2.5 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)]',
   rowActive: 'bg-[var(--color-hover)] font-medium',
   rowLocked: 'opacity-60',
-  dot: 'h-2.5 w-2.5 shrink-0 rounded-full',
+  dot: 'h-3.5 w-[3px] shrink-0 rounded-full',
   rowIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
   rowLabel: 'min-w-0 flex-1 truncate',
   rowCount: 'shrink-0 text-xs tabular-nums text-[var(--color-ink-subtle)]',
-  add: 'mt-1 flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-brand-400)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  add: 'mt-1 flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] px-2.5 py-1.5 text-xs font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   addIcon: 'h-3.5 w-3.5',
   detail: 'min-w-0 flex-1',
   back: 'mb-3 inline-flex items-center gap-1 text-sm text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] lg:hidden',
@@ -399,7 +466,7 @@ export const ACCESS_CONSOLE = {
   memberRole: 'shrink-0 text-xs text-[var(--color-ink-subtle)]',
   perimeter: 'flex flex-col gap-3',
   creator:
-    'flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4',
+    'flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4',
   creatorHead: 'flex items-center gap-3',
   creatorName: 'min-w-0 flex-1 truncate text-sm font-semibold',
   creatorMeta: 'shrink-0 text-xs tabular-nums text-[var(--color-ink-subtle)]',
@@ -433,7 +500,7 @@ export const CREATOR_SWITCH = {
     'flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   triggerIcon: 'h-5 w-5 shrink-0',
   panel:
-    'rail-reset absolute top-1/2 left-full z-50 ml-2 flex -translate-y-1/2 items-center rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1.5 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+    'rail-reset absolute top-1/2 left-full z-50 ml-2 flex -translate-y-1/2 items-center rounded-[var(--radius-full)] border border-[var(--color-border)] glass-panel p-1.5 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
   panelOpen: 'visible translate-x-0 opacity-100',
   // Kept mounted so the way out animates like the way in
   panelShut: 'invisible -translate-x-3 opacity-0',
@@ -460,9 +527,8 @@ export const DIVIDER_BLOCK = {
 
 export const CHANGELOG_BOARD = {
   page: 'max-w-4xl',
-  // Version pressed out of a soft brand glow
+  // Version pressed out
   hero: 'relative flex flex-col items-center gap-5 px-4 pt-6 pb-4 text-center',
-  glow: 'pointer-events-none absolute inset-x-0 -top-10 -z-10 h-72 bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--color-brand-600)_16%,transparent),transparent)]',
   stage: 'flex flex-col items-center gap-1 [transform-style:preserve-3d]',
   eyebrow:
     'font-[family-name:var(--font-mono)] text-xs font-medium tracking-[0.3em] text-[var(--color-ink-subtle)] uppercase',
@@ -473,7 +539,7 @@ export const CHANGELOG_BOARD = {
   // Three figures doubling as the way into each category
   counts: 'mt-2 flex flex-wrap items-stretch justify-center gap-3',
   count:
-    'group flex min-w-36 flex-col items-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-6 py-4 shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-1 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
+    'group flex min-w-36 flex-col items-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-6 py-4 shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-1 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
   countFigure: 'text-4xl leading-none font-black tabular-nums',
   countLabel: 'text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   blocks: 'flex flex-col gap-16',
@@ -638,9 +704,9 @@ export const PICKER_BLOCK = {
   three: 'grid grid-cols-3 gap-2',
   two: 'grid grid-cols-2 gap-2',
   option:
-    'flex flex-col items-center justify-end gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 transition-[border-color,transform] hover:-translate-y-px hover:border-[var(--color-brand-400)]',
+    'flex flex-col items-center justify-end gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 transition-[border-color,transform] hover:-translate-y-px hover:border-[var(--color-border-strong)]',
   optionWide:
-    'flex flex-col items-start gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-left transition-[border-color,transform] hover:-translate-y-px hover:border-[var(--color-brand-400)]',
+    'flex flex-col items-start gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-left transition-[border-color,transform] hover:-translate-y-px hover:border-[var(--color-border-strong)]',
   active:
     'border-[var(--color-brand-600)] bg-[var(--color-brand-50)] ring-2 ring-[var(--color-brand-600)]/20',
   glyph: 'h-9 w-9',

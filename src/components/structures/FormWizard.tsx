@@ -46,6 +46,8 @@ export interface FormWizardProps {
   previousLabel: string
   submitLabel: string
   disabled?: boolean
+  // The last move is under way
+  isLoading?: boolean
   idPrefix?: string
 }
 
@@ -61,6 +63,7 @@ export interface FormWizardProps {
  * @param {string} previousLabel - Caption of the backward move
  * @param {string} submitLabel - Caption of the last move
  * @param {boolean} [disabled] - Blocks every control
+ * @param {boolean} [isLoading] - Shows the loader on the last move
  * @param {string} [idPrefix] - Namespace of the generated identifiers
  * @return {JSX.Element}
  */
@@ -76,6 +79,7 @@ export const FormWizard = ({
   previousLabel,
   submitLabel,
   disabled,
+  isLoading,
   idPrefix = 'wizard',
 }: FormWizardProps) => {
   const [index, setIndex] = useState(0)
@@ -149,6 +153,7 @@ export const FormWizard = ({
           variant="primary"
           iconAfter={isLast ? undefined : 'forward'}
           disabled={disabled || held}
+          isLoading={isLast && isLoading}
           onClick={() => (isLast ? onSubmit() : setIndex(current + 1))}
         >
           {isLast ? submitLabel : nextLabel}

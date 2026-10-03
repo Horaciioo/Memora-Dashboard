@@ -26,14 +26,7 @@ export interface BadgeProps {
  * @return {JSX.Element}
  */
 
-export const Badge = ({
-  label,
-  tone = 'neutral',
-  accent,
-  icon,
-  muted,
-  className,
-}: BadgeProps) => {
+export const Badge = ({ label, tone = 'neutral', accent, icon, muted, className }: BadgeProps) => {
   const picked = isHexColour(accent)
   const styles = picked ? ACCENT_STYLES : TONES[toTone(accent, tone)]
   const Icon = icon ? ICONS[icon] : null

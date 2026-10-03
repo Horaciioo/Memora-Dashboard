@@ -11,6 +11,8 @@ export interface SectionProps {
   // Drops the framed panel and renders children bare
   bare?: boolean
   padded?: boolean
+  // Padded box with a shadow
+  raised?: boolean
   className?: string
   children: ReactNode
 }
@@ -21,12 +23,21 @@ export interface SectionProps {
  * @param {ReactNode} [action] - Control aligned to the right of the heading
  * @param {boolean} [bare] - Renders children without the framed panel
  * @param {boolean} [padded] - Adds inner padding to the panel
+ * @param {boolean} [raised] - Padded panel lifted by a shadow
  * @param {string} [className] - Extra classes merged onto the wrapper
  * @param {ReactNode} children - Block content
  * @return {JSX.Element}
  */
 
-export const Section = ({ title, action, bare, padded, className, children }: SectionProps) => (
+export const Section = ({
+  title,
+  action,
+  bare,
+  padded,
+  raised,
+  className,
+  children,
+}: SectionProps) => (
   <section className={cn(SECTION_STYLES.wrapper, className)}>
     {(title || action) && (
       <div className={SECTION_STYLES.header}>
@@ -39,7 +50,13 @@ export const Section = ({ title, action, bare, padded, className, children }: Se
     {bare ? (
       children
     ) : (
-      <div className={cn(SECTION_STYLES.panel, padded && SECTION_STYLES.panelPadded)}>
+      <div
+        className={cn(
+          SECTION_STYLES.panel,
+          padded && SECTION_STYLES.panelPadded,
+          raised && SECTION_STYLES.panelRaised
+        )}
+      >
         {children}
       </div>
     )}

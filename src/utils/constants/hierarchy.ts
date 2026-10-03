@@ -70,6 +70,16 @@ export type AcademySessionStatusName =
   (typeof AcademySessionStatuses)[keyof typeof AcademySessionStatuses]
 
 /**
+ * Phases past which a session no longer moves
+ * @type {AcademySessionStatusName[]}
+ */
+
+export const FINISHED_ACADEMY_SESSION_STATUSES: AcademySessionStatusName[] = [
+  AcademySessionStatuses.Closed,
+  AcademySessionStatuses.Archived,
+]
+
+/**
  * Outcome of a junior inside a session
  * @type {Record<string, string>}
  */
