@@ -6,14 +6,14 @@ import type { Instrumentation } from 'next'
  */
 
 export const register = async (): Promise<void> => {
-  // Each runtime loads its own Sentry entry, both delegating to the same init
+  // Each runtime loads its own Sentry entry
   if (process.env.NEXT_RUNTIME === 'edge') {
     await import('../sentry.edge.config')
 
     return
   }
 
-  // Only the Node.js runtime carries the managers, the edge one never loads them
+  // Only the Node.js runtime carries the managers
   if (process.env.NEXT_RUNTIME !== 'nodejs') return
 
   await import('../sentry.server.config')

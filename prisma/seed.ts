@@ -41,6 +41,7 @@ const syncFixedReferences = async (prisma: PrismaClient): Promise<void> => {
         rank: division.rank,
         summary: division.summary,
         leadAssignable: division.leadAssignable,
+        imagePath: division.imagePath,
       },
       create: division,
     })
