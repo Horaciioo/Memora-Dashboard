@@ -1,3 +1,4 @@
+import type { ChatOptionName } from '@/declarations/modview/registries'
 import type { LivePlatformName } from '@/utils/constants/lives'
 
 /**
@@ -168,6 +169,22 @@ export interface ModViewState {
   }
   // Livecon level in force, 1 forbids public talk
   liveconLevel: number | null
+  // Scene-driven chat menu
+  chatScript?: ChatScript
+}
+
+/**
+ * Chat menu a scene drives
+ * @typedef {Object} ChatScript
+ * @property {'modes' | 'options' | null} menu - Open menu
+ * @property {Partial<Record<ChatOptionName, boolean>>} options - Forced options
+ * @property {ChatOptionName | null} lit - Option being set
+ */
+
+export interface ChatScript {
+  menu: 'modes' | 'options' | null
+  options: Partial<Record<ChatOptionName, boolean>>
+  lit: ChatOptionName | null
 }
 
 /**

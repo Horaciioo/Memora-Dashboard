@@ -59,6 +59,11 @@ export const ChatWindow = ({ state, spotlight, gate, onAct, onPick }: ChatWindow
   })
   const listRef = useRef<HTMLDivElement>(null)
 
+  // A scene drives the menu over the reader
+  const script = state.chatScript
+  const openMenu = script ? script.menu : menu
+  const shown = { ...options, ...script?.options }
+
   // Follow the newest line unless the reader went up
   useEffect(() => {
     const list = listRef.current
@@ -96,7 +101,7 @@ export const ChatWindow = ({ state, spotlight, gate, onAct, onPick }: ChatWindow
           <button
             type="button"
             className={cn(MODVIEW_MODES.trigger, spotlight === 'modes' && MODVIEW_CHAT.triggerLit)}
-            aria-expanded={menu === 'modes'}
+            aria-expanded={openMenu === 'modes'}
             onClick={() => setMenu(menu === 'modes' ? null : 'modes')}
           >
             <ModesIcon className={MODVIEW_MODES.triggerIcon} aria-hidden="true" />
@@ -109,7 +114,7 @@ export const ChatWindow = ({ state, spotlight, gate, onAct, onPick }: ChatWindow
               spotlight === 'chatOptions' && MODVIEW_CHAT.triggerLit
             )}
             aria-label={MODVIEW_COPY.chatOptions}
-            aria-expanded={menu === 'options'}
+            aria-expanded={openMenu === 'options'}
             onClick={() => setMenu(menu === 'options' ? null : 'options')}
           >
             <OptionsIcon className={MODVIEW_MODES.triggerIcon} aria-hidden="true" />
@@ -117,26 +122,26 @@ export const ChatWindow = ({ state, spotlight, gate, onAct, onPick }: ChatWindow
         </>
       }
     >
-      {menu === 'modes' && <ChatModesMenu state={state} gate={gate} onAct={onAct} />}
-      {menu === 'options' && (
+      {openMenu === 'modes' && <ChatModesMenu state={state} gate={gate} onAct={onAct} />}
+      {openMenu === 'options' && (
         <div className={MODVIEW_MODES.panel} role="menu" aria-label={MODVIEW_COPY.chatOptions}>
           {CHAT_OPTIONS.keys.map((key) => (
             <button
               key={key}
               type="button"
               role="menuitemcheckbox"
-              aria-checked={options[key]}
-              className={MODVIEW_MODES.row}
+              aria-checked={shown[key]}
+              className={cn(MODVIEW_MODES.row, script?.lit === key && MODVIEW_MODES.rowLit)}
               onClick={() => setOptions((current) => ({ ...current, [key]: !current[key] }))}
             >
               <span className={MODVIEW_MODES.rowLabel}>{CHAT_OPTIONS.label(key)}</span>
               <span
                 className={cn(
                   MODVIEW_MODES.rowState,
-                  options[key] ? MODVIEW_MODES.on : MODVIEW_MODES.off
+                  shown[key] ? MODVIEW_MODES.on : MODVIEW_MODES.off
                 )}
               >
-                {options[key] ? MODVIEW_COPY.modeOn : MODVIEW_COPY.modeOff}
+                {shown[key] ? MODVIEW_COPY.modeOn : MODVIEW_COPY.modeOff}
               </span>
             </button>
           ))}
@@ -152,7 +157,7 @@ export const ChatWindow = ({ state, spotlight, gate, onAct, onPick }: ChatWindow
             <ChatLine
               key={message.id}
               message={message}
-              options={options}
+              options={shown}
               gate={gate}
               onAct={onAct}
               onPick={onPick}

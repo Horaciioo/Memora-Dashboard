@@ -1,5 +1,7 @@
+import type { ChatOptionName } from '@/declarations/modview/registries'
 import type {
   ChatMessage,
+  ChatScript,
   Chatter,
   HeldMessage,
   ModAct,
@@ -23,6 +25,8 @@ export type SceneEvent =
   | { kind: 'modes'; modes: Partial<ModViewState['modes']> }
   | { kind: 'livecon'; level: number | null }
   | { kind: 'spotlight'; target: ModViewTarget | null }
+  | { kind: 'chatMenu'; menu: ChatScript['menu'] }
+  | { kind: 'chatOption'; option: ChatOptionName; enabled: boolean }
 
 /**
  * One timed beat of a scene
@@ -81,6 +85,10 @@ const strike = (
   messages.map((message) =>
     match(message) && !message.deletedBy ? { ...message, deletedBy: moderator } : message
   )
+
+// Chat menu, closed by default
+const scriptOf = (view: ModViewState): ChatScript =>
+  view.chatScript ?? { menu: null, options: {}, lit: null }
 
 /**
  * Apply one scene event
@@ -149,6 +157,26 @@ export const applySceneEvent = (
       return { ...state, view: { ...view, liveconLevel: event.level } }
     case 'spotlight':
       return { ...state, spotlight: event.target }
+    case 'chatMenu':
+      return {
+        ...state,
+        view: { ...view, chatScript: { ...scriptOf(view), menu: event.menu, lit: null } },
+      }
+    case 'chatOption': {
+      const script = scriptOf(view)
+
+      return {
+        ...state,
+        view: {
+          ...view,
+          chatScript: {
+            ...script,
+            options: { ...script.options, [event.option]: event.enabled },
+            lit: event.option,
+          },
+        },
+      }
+    }
   }
 }
 

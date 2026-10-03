@@ -158,6 +158,8 @@ export const MODVIEW_MODES = {
   panel:
     'absolute top-11 right-2 z-30 flex w-72 flex-col gap-1 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-2 shadow-[var(--shadow-md)]',
   row: 'flex items-center gap-3 rounded-[var(--radius-lg)] px-2 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent',
+  // Option a scene is setting
+  rowLit: 'bg-[var(--color-brand-soft)] ring-2 ring-[var(--color-brand-600)]',
   rowIcon: 'h-5 w-5 shrink-0',
   rowLabel: 'min-w-0 flex-1 font-semibold',
   rowState: 'text-xs font-black tracking-wide uppercase',

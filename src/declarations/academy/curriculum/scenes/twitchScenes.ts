@@ -250,12 +250,41 @@ export const MODES_SCENE: ModViewScene = scene(
  */
 
 export const OPTIONS_SCENE: ModViewScene = scene(
-  twitchStage({ community: COMMUNITY }),
-  beats(300, 1800, [
-    { kind: 'spotlight', target: 'chatOptions' },
-    { kind: 'message', message: line('opt-1', CAST.calm, 'Bonsoir !') },
-    { kind: 'message', message: line('opt-2', CAST.fan, 'Coucou Lumi') },
-  ])
+  twitchStage({
+    community: COMMUNITY,
+    // Everything hidden, the scene turns each option on
+    chatScript: {
+      menu: null,
+      options: { timestamps: false, badges: false, deleted: false, firstMessages: false },
+      lit: null,
+    },
+    messages: [
+      line('opt-1', CAST.calm, 'Bonsoir !'),
+      line('opt-2', CAST.fan, 'Coucou Lumi'),
+      line('opt-3', CAST.spammer, 'GRATUIT abonnements offerts ici', {
+        deletedBy: CAST.modo.name,
+      }),
+      line('opt-4', CAST.modo, 'Bienvenue à tous, bon live !'),
+      line('opt-5', CAST.newcomer, 'Coucou, première fois ici', { isFirst: true }),
+    ],
+  }),
+  [
+    ...beats(300, 900, [
+      { kind: 'spotlight', target: 'chatOptions' },
+      { kind: 'chatMenu', menu: 'options' },
+    ]),
+    ...beats(2200, 1500, [
+      { kind: 'chatOption', option: 'timestamps', enabled: true },
+      { kind: 'chatOption', option: 'badges', enabled: true },
+      { kind: 'chatOption', option: 'deleted', enabled: true },
+      { kind: 'chatOption', option: 'firstMessages', enabled: true },
+      { kind: 'chatMenu', menu: null },
+    ]),
+    ...beats(10000, 1600, [
+      { kind: 'message', message: line('opt-6', CAST.vip, 'Tout est bien plus lisible') },
+      { kind: 'message', message: line('opt-7', CAST.calm, 'Le projet a l’air trop bien') },
+    ]),
+  ]
 )
 
 /**
