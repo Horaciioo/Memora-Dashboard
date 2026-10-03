@@ -217,6 +217,43 @@ enum LivePlatform {
   YOUTUBE
 }
 
+// Gesture of a moderation log line
+enum ModerationKind {
+  DELETE
+  TIMEOUT
+  BAN
+  UNBAN
+  WARN
+  AUTOMOD_APPROVE
+  AUTOMOD_DENY
+  TERM_ADD
+  TERM_REMOVE
+  MODE_CHANGE
+  UNBAN_REQUEST_APPROVE
+  UNBAN_REQUEST_DENY
+  MESSAGE_SEND
+}
+
+// Where a moderation gesture was made
+enum ModerationOrigin {
+  MEMORA
+  PLATFORM
+}
+
+// Outcome of a gesture sent from Memora
+enum ModerationStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+// Why a Mod View presence closed
+enum PresenceCloseReason {
+  CLOSED
+  TIMEOUT
+  LIVE_ENDED
+}
+
 // Lifecycle of an announced live
 enum LiveStatus {
   ANNOUNCED
@@ -288,6 +325,8 @@ model Account {
   integrationClaims     IntegrationClaim[]       @relation("IntegrationClaimAccount")
   quizAnswers           JuniorAnswer[]
   trainingFeedbacks     TrainingFeedback[]
+  moderationActions     ModerationAction[]
+  modViewPresences      ModViewPresence[]
   academyReviews        AcademyReview[]          @relation("AcademyReviewAuthor")
   academyReviewsDecided AcademyReview[]          @relation("AcademyReviewDecider")
   juniorSkillsGraded    JuniorSkill[]            @relation("JuniorSkillValidator")
@@ -1633,12 +1672,14 @@ model Live {
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 
-  youtuber       Youtuber       @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
-  announcedBy    Account?       @relation("LiveAnnouncer", fields: [announcedById], references: [id], onDelete: SetNull)
-  coordinator    Account?       @relation("LiveCoordinator", fields: [coordinatorId], references: [id], onDelete: SetNull)
-  calendarEvent  CalendarEvent? @relation(fields: [calendarEventId], references: [id], onDelete: SetNull)
+  youtuber       Youtuber           @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  announcedBy    Account?           @relation("LiveAnnouncer", fields: [announcedById], references: [id], onDelete: SetNull)
+  coordinator    Account?           @relation("LiveCoordinator", fields: [coordinatorId], references: [id], onDelete: SetNull)
+  calendarEvent  CalendarEvent?     @relation(fields: [calendarEventId], references: [id], onDelete: SetNull)
   members        LiveMember[]
   liveconEntries LiveconEntry[]
+  actions        ModerationAction[]
+  presences      ModViewPresence[]
 
   @@unique([platform, streamExternalId])
   @@index([status])
@@ -1659,6 +1700,61 @@ model LiveMember {
   @@id([liveId, accountId])
   @@index([accountId])
   @@map("live_members")
+}
+
+// One moderation gesture on a live, from Memora or straight on the platform
+model ModerationAction {
+  id                   String           @id @default(cuid())
+  liveId               String
+  platform             LivePlatform
+  // Memora member, none when the gesture came from an unlinked account
+  actorAccountId       String?
+  actorPlatformUserId  String?
+  actorLogin           String?
+  targetPlatformUserId String?
+  targetLogin          String?
+  kind                 ModerationKind
+  durationSeconds      Int?
+  reason               String?
+  // Livecon level in force at the time
+  liveconLevel         Int?
+  messageExcerpt       String?
+  origin               ModerationOrigin
+  status               ModerationStatus @default(PENDING)
+  errorCode            String?
+  idempotencyKey       String?          @unique
+  externalEventId      String?
+  occurredAt           DateTime         @default(now())
+  createdAt            DateTime         @default(now())
+
+  live  Live     @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  actor Account? @relation(fields: [actorAccountId], references: [id], onDelete: SetNull)
+
+  @@unique([platform, externalEventId])
+  @@index([actorAccountId, occurredAt])
+  @@index([liveId, occurredAt])
+  @@index([kind])
+  @@map("moderation_actions")
+}
+
+// Time a member spent in the Mod View of a live, counted from heartbeats
+model ModViewPresence {
+  id             String               @id @default(cuid())
+  accountId      String
+  liveId         String
+  openedAt       DateTime             @default(now())
+  lastBeatAt     DateTime             @default(now())
+  closedAt       DateTime?
+  visibleSeconds Int                  @default(0)
+  activeSeconds  Int                  @default(0)
+  closeReason    PresenceCloseReason?
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  live    Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
+
+  @@index([liveId, accountId])
+  @@index([accountId, openedAt])
+  @@map("modview_presences")
 }
 
 // Platform grant of one member, both tokens encrypted at rest
