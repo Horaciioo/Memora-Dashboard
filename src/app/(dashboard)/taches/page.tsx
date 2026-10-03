@@ -40,7 +40,7 @@ export default async function TasksPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={TASK_COPY.title} lead={TASK_COPY.lead} />
+      <PageHeader title={TASK_COPY.title} />
       <TasksBoard
         initialTasks={tasks}
         columns={columns}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { PageBanner } from '@/components/structures/PageBanner'
 import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { MeetingFile } from '@/composites/work/MeetingFile'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
@@ -54,6 +55,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className={PAGE_STYLES.wrapper}>
+      <PageBanner title={MEETING_COPY.title} isLabel />
       <BreadcrumbLabel label={detail.summary.title} />
       <MeetingFile
         detail={detail}

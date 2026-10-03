@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Badge } from '@/components/elements/display/Badge'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { CopyInviteLink } from '@/composites/onboarding/CopyInviteLink'
+import { LaunchPimButton } from '@/composites/academy/LaunchPimButton'
 import { SessionPanel } from '@/composites/academy/SessionPanel'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import {
@@ -16,6 +16,7 @@ import { requirePermission } from '@/core/wrappers/requireUser'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 
 import { PAGE_STYLES } from '@/declarations/ui/variants'
+import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
 import { formatDay } from '@/utils/format/dates'
 import { gridRange, monthGrid, toDayKey } from '@/utils/format/calendar'
@@ -76,18 +77,18 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
     calendarFields(),
   ])
 
-  const jobFunction = detail.summary.function
+  const canManage = access.can(Permissions.AcademyManage)
 
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader
-        eyebrow={ACADEMY_COPY.confidential}
-        title={`${jobFunction.name} • ${formatDay(detail.summary.startsAt)}`}
-        lead={detail.summary.summary ?? jobFunction.summary ?? undefined}
+        title={ACADEMY_COPY.sessionOf.replace('{date}', formatDay(detail.summary.startsAt))}
         actions={
           <span className="flex items-center gap-2">
             {detail.summary.inviteToken && <CopyInviteLink token={detail.summary.inviteToken} />}
-            <Badge label={jobFunction.name} accent={jobFunction.accent} tone={'brand'} dot />
+            {canManage && detail.summary.status !== AcademySessionStatuses.Running && (
+              <LaunchPimButton sessionId={detail.summary.id} />
+            )}
           </span>
         }
       />
@@ -96,7 +97,7 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
         juniorFields={juniors}
         stepFields={steps}
         hasCandidates={candidates.length > 0}
-        canManage={access.can(Permissions.AcademyManage)}
+        canManage={canManage}
         calendarEntries={entries}
         calendarFields={fields}
         calendarAnchor={anchor}

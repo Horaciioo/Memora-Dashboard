@@ -40,7 +40,7 @@ export default async function TrainingsPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={ACADEMY_COPY.myTrainingsTitle} lead={COURSE_COPY.catalogLead} />
+      <PageHeader title={ACADEMY_COPY.myTrainingsTitle} />
       <CourseCatalog courses={courses} />
       {trainings.length > 0 && (
         <section className={COURSE_CATALOG.group}>

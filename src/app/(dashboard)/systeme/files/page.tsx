@@ -26,7 +26,7 @@ export default async function QueuesPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={SYSTEM_COPY.queuesTitle} lead={SYSTEM_COPY.queuesLead} />
+      <PageHeader title={SYSTEM_COPY.queuesTitle} />
 
       <Section
         title={SYSTEM_COPY.queuesDeclared}

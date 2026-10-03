@@ -28,7 +28,7 @@ export default async function AccessPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={ACCESS_COPY.title} lead={ACCESS_COPY.lead} />
+      <PageHeader title={ACCESS_COPY.title} />
       <AccessConsole initial={data} canManageEncadrement={access.isAdmin} />
     </div>
   )

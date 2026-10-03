@@ -14,7 +14,9 @@ import {
   listReviews,
   readJunior,
 } from '@/core/services/academy/AcademyService'
+import { readTimeline } from '@/core/services/academy/PimTimelineService'
 import { requireUser } from '@/core/wrappers/requireUser'
+import { GUIDE_PARAMS } from '@/declarations/academy/guides'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -50,11 +52,19 @@ export async function generateMetadata({
  * Individual follow-up file of one junior
  * @param {Object} context - Route context
  * @param {Promise<{ juniorId: string }>} context.params - Dynamic segments
+ * @param {Promise<Record<string, string | string[] | undefined>>} context.searchParams - Query
  * @return {Promise<JSX.Element>} - Follow-up file
  */
 
-export default async function JuniorPage({ params }: { params: Promise<{ juniorId: string }> }) {
-  const { juniorId } = await params
+export default async function JuniorPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ juniorId: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const [{ juniorId }, query] = await Promise.all([params, searchParams])
+  const requestedTab = query[GUIDE_PARAMS.tab]
   const { session, access } = await requireUser()
 
   const canReadAny = access.can(Permissions.AcademyRead)
@@ -71,12 +81,13 @@ export default async function JuniorPage({ params }: { params: Promise<{ juniorI
   const canReadReviews = access.can(Permissions.AcademyReviewRead)
   const canReadNotes = access.can(Permissions.AcademyNoteRead)
 
-  const [fields, skills, notes, objectives, reviews] = await Promise.all([
+  const [fields, skills, notes, objectives, reviews, timeline] = await Promise.all([
     juniorFields(found.junior.sessionId),
     listJuniorSkills(juniorId, scope),
     canReadNotes ? listJuniorNotes(juniorId, scope) : Promise.resolve([]),
     listJuniorObjectives(juniorId, scope),
     canReadReviews ? listReviews(juniorId, scope) : Promise.resolve([]),
+    readTimeline(juniorId, scope),
   ])
 
   const jobFunction = found.session.function
@@ -93,6 +104,8 @@ export default async function JuniorPage({ params }: { params: Promise<{ juniorI
         initialNotes={notes}
         initialObjectives={objectives}
         initialReviews={reviews}
+        initialTimeline={timeline}
+        initialTab={typeof requestedTab === 'string' ? requestedTab : undefined}
         sessionFunctionName={jobFunction.name}
         juniorFields={fields}
         noteFields={NOTE_FIELDS}

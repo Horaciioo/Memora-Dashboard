@@ -29,12 +29,12 @@ export default async function AdministrationPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={VIEW_COPY.adminTitle} lead={VIEW_COPY.adminLead} />
+      <PageHeader title={VIEW_COPY.adminTitle} />
 
       <ConsoleBanner
         view={NavigationViews.Administration}
-        title={`${VIEW_COPY.environment} · ${runtime.label}`}
-        lead={runtime.started ? VIEW_COPY.adminRuntimeLead : VIEW_COPY.runtimeDownLead}
+        title={`${VIEW_COPY.environment} : ${runtime.label}`}
+        lead={runtime.started ? undefined : VIEW_COPY.runtimeDownLead}
         aside={
           <Badge
             label={runtime.encrypted ? VIEW_COPY.subjectOn : VIEW_COPY.subjectOff}

@@ -27,7 +27,7 @@ export default async function JournalPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={SYSTEM_COPY.journalTitle} lead={SYSTEM_COPY.journalLead} />
+      <PageHeader title={SYSTEM_COPY.journalTitle} />
 
       <ConsoleMetrics
         metrics={[

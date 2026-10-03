@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { PageBanner } from '@/components/structures/PageBanner'
 import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { TaskFile } from '@/composites/work/TaskFile'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
@@ -54,6 +55,7 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className={PAGE_STYLES.wrapper}>
+      <PageBanner title={TASK_COPY.title} isLabel />
       <BreadcrumbLabel label={task.title} />
       <TaskFile
         task={task}

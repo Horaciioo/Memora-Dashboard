@@ -33,7 +33,7 @@ export default async function ConfigurationPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={REFERENCE_COPY.title} lead={REFERENCE_COPY.lead} />
+      <PageHeader title={REFERENCE_COPY.title} />
       <div className={cn(GROUP_STYLES.spaced, 'mx-auto w-full max-w-3xl')}>
         {groups.map((group) => (
           <Section key={group.label} title={group.label} bare>
@@ -44,7 +44,6 @@ export default async function ConfigurationPage() {
                   href={ROUTES.settingsSection(section.key)}
                   icon={section.icon}
                   label={section.label}
-                  description={section.description}
                 />
               ))}
               {group.screens.map((screen) => (
@@ -53,7 +52,6 @@ export default async function ConfigurationPage() {
                   href={screen.href}
                   icon={screen.icon}
                   label={screen.label}
-                  description={screen.description}
                 />
               ))}
             </div>

@@ -1,17 +1,16 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
-import { HomeAbsenceRequests } from '@/composites/personal/HomeAbsenceRequests'
-import { AttendanceInbox } from '@/composites/personal/AttendanceInbox'
-import { HomeBirthdays } from '@/composites/personal/HomeBirthdays'
-import { HomeMeetings } from '@/composites/personal/HomeMeetings'
-import { HomeTasks } from '@/composites/personal/HomeTasks'
+import { HomeAgenda } from '@/composites/personal/HomeAgenda'
+import { HomeLives } from '@/composites/personal/HomeLives'
+import { HomeQueue } from '@/composites/personal/HomeQueue'
 import { REVIEW_FIELDS, listReviewQueue } from '@/core/services/absences/AbsenceService'
 import { myRollCalls } from '@/core/services/calendar/attendance'
+import { readCurrentState } from '@/core/services/livecon/LiveconService'
 import { myMeetings, upcomingBirthdays } from '@/core/services/personal/HomeService'
 import { myTasks } from '@/core/services/personal/TaskInboxService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
-import { HOME_STYLES, PAGE_STYLES } from '@/declarations/ui/variants'
+import { HOME_FLOW } from '@/declarations/ui/variants'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -28,33 +27,37 @@ export default async function DashboardPage() {
 
   const canReview = access.can(Permissions.AbsenceReview)
 
-  const [tasks, rollCalls, meetings, birthdays, requests] = await Promise.all([
+  const [tasks, rollCalls, meetings, birthdays, requests, livecon] = await Promise.all([
     myTasks(session, access),
     myRollCalls(session.id),
     myMeetings(session.id, perimeter),
     upcomingBirthdays(perimeter),
     canReview ? listReviewQueue(session.id, access.isAdmin) : Promise.resolve([]),
+    access.can(Permissions.LiveconRead) ? readCurrentState(perimeter) : Promise.resolve([]),
   ])
 
+  // Pending requests are the only ones that wait on the member
+  const pending = requests.filter((absence) => absence.status === AbsenceStatuses.Pending)
+
   return (
-    <div className={PAGE_STYLES.wrapper}>
-      <PageHeader
-        title={PERSONAL_COPY.greeting.replace('{name}', session.displayName)}
-        lead={PERSONAL_COPY.lead}
-      />
-      <div className={HOME_STYLES.grid}>
-        <div className={HOME_STYLES.column}>
-          <HomeAbsenceRequests
-            initial={requests.filter((absence) => absence.status === AbsenceStatuses.Pending)}
-            reviewFields={REVIEW_FIELDS}
+    <div className={HOME_FLOW.page}>
+      <PageHeader title={PERSONAL_COPY.greeting.replace('{name}', session.displayName)} />
+      <HomeLives items={livecon} />
+      <div className={HOME_FLOW.grid}>
+        <HomeQueue
+          absences={pending}
+          reviewFields={REVIEW_FIELDS}
+          tasks={tasks}
+          rollCalls={rollCalls}
+        />
+        <section className={HOME_FLOW.column}>
+          <h2 className={HOME_FLOW.label}>{PERSONAL_COPY.aheadTitle}</h2>
+          <HomeAgenda
+            meetings={meetings}
+            birthdays={birthdays}
+            canOpenMeeting={access.can(Permissions.MeetingRead)}
           />
-          <HomeTasks items={tasks} />
-          {rollCalls.length > 0 && <AttendanceInbox items={rollCalls} />}
-        </div>
-        <div className={HOME_STYLES.column}>
-          <HomeMeetings items={meetings} canOpen={access.can(Permissions.MeetingRead)} />
-          <HomeBirthdays items={birthdays} />
-        </div>
+        </section>
       </div>
     </div>
   )

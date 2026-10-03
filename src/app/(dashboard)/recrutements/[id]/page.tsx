@@ -57,7 +57,7 @@ export default async function RecruitmentPage({ params }: { params: Promise<{ id
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={detail.summary.name} lead={detail.summary.summary ?? undefined} />
+      <PageHeader title={detail.summary.name} />
       <RecruitmentFile
         detail={detail}
         candidateFields={candidates}

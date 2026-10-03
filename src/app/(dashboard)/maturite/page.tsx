@@ -22,7 +22,7 @@ export default async function MaturityPage() {
 
   return (
     <div className={cn(PAGE_STYLES.wrapper, 'max-w-xl')}>
-      <PageHeader title={MATURITY_COPY.pageTitle} lead={MATURITY_COPY.pageLead} />
+      <PageHeader title={MATURITY_COPY.pageTitle} />
 
       <Section padded>
         <ul className="flex flex-col gap-4">

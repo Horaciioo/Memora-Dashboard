@@ -37,7 +37,7 @@ export default async function MembersPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={MEMBER_COPY.title} lead={MEMBER_COPY.lead} />
+      <PageHeader title={MEMBER_COPY.title} />
       <MembersPanel
         initialMembers={members}
         fields={fields}

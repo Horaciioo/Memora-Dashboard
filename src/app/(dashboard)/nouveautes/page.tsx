@@ -29,10 +29,7 @@ export default async function ChangelogPage({ searchParams }: ChangelogPageProps
 
   return (
     <div className={cn(PAGE_STYLES.wrapper, CHANGELOG_BOARD.page)}>
-      <PageHeader
-        eyebrow={CHANGELOG_COPY.pageTitle}
-        title={release?.title ?? CHANGELOG_COPY.emptyTitle}
-      />
+      <PageHeader title={release?.title ?? CHANGELOG_COPY.emptyTitle} />
       <ChangelogBoard version={release?.version} />
     </div>
   )

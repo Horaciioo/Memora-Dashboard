@@ -18,7 +18,7 @@ export default async function AnalyticsPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={SYSTEM_COPY.analyticsTitle} lead={SYSTEM_COPY.analyticsLead} />
+      <PageHeader title={SYSTEM_COPY.analyticsTitle} />
       <WipNotice figure="settings" description={SYSTEM_COPY.analyticsWip} />
     </div>
   )

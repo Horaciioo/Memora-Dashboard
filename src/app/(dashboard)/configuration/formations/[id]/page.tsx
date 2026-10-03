@@ -62,7 +62,6 @@ export default async function TrainingContentPage({ params }: { params: Promise<
       <PageHeader
         eyebrow={TRAINING_CONTENT_COPY.title}
         title={training.name}
-        lead={training.summary ?? undefined}
         actions={
           training.period ? (
             <Badge label={ACADEMY_PERIOD_REGISTRY.label(training.period)} tone="neutral" />

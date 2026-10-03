@@ -21,13 +21,7 @@ export default async function AbsencesPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader
-        title={ABSENCE_COPY.title}
-        lead={ABSENCE_COPY.underThresholdNotice.replace(
-          '{threshold}',
-          String(ABSENCE_SETTINGS.thresholdDays)
-        )}
-      />
+      <PageHeader title={ABSENCE_COPY.title} />
       <AbsencesPanel
         mine={mine}
         fields={ABSENCE_FIELDS}

@@ -30,7 +30,7 @@ export default async function StoragePage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={SYSTEM_COPY.storageTitle} lead={SYSTEM_COPY.storageLead} />
+      <PageHeader title={SYSTEM_COPY.storageTitle} />
 
       <Section title={SYSTEM_COPY.storageUsage} description={SYSTEM_COPY.storageUsageLead} bare>
         <ConsoleMetrics

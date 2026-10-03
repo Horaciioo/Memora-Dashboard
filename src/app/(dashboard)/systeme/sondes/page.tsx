@@ -26,10 +26,9 @@ export default async function ProbesPage() {
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader
         title={SYSTEM_COPY.probesTitle}
-        lead={SYSTEM_COPY.probesLead}
         actions={
           <Badge
-            label={`${VIEW_COPY.environment} · ${runtime.label}`}
+            label={`${VIEW_COPY.environment} : ${runtime.label}`}
             tone={runtime.started ? 'success' : 'neutral'}
             icon="console"
           />

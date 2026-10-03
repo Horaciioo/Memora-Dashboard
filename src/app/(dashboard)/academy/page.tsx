@@ -25,7 +25,7 @@ export default async function AcademyPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={ACADEMY_COPY.title} lead={ACADEMY_COPY.lead} />
+      <PageHeader title={ACADEMY_COPY.title} />
       <AcademyTabs />
       <SessionsPanel
         initialSessions={sessions}

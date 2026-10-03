@@ -55,7 +55,7 @@ export default async function ReferenceSectionPage({
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={meta.label} lead={meta.description} />
+      <PageHeader title={meta.label} />
       <ReferenceManager
         section={meta}
         fields={editableFields}

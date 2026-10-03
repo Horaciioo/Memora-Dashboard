@@ -22,7 +22,7 @@ export default async function RecruitmentsPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={RECRUITMENT_COPY.title} lead={RECRUITMENT_COPY.lead} />
+      <PageHeader title={RECRUITMENT_COPY.title} />
       <RecruitmentsPanel
         initialSessions={sessions}
         fields={fields}

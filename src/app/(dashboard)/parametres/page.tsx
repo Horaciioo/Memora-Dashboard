@@ -32,7 +32,7 @@ export default async function PreferencesPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={PREFERENCES_COPY.title} lead={PREFERENCES_COPY.lead} />
+      <PageHeader title={PREFERENCES_COPY.title} />
       <PreferencesPanel
         initialProfile={sealed}
         fields={sealFields(profileFields(), seal.isUnsealed)}

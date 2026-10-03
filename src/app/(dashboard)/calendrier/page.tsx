@@ -65,7 +65,7 @@ export default async function CalendarPage({
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={CALENDAR_COPY.title} lead={CALENDAR_COPY.lead} />
+      <PageHeader title={CALENDAR_COPY.title} />
       <CalendarBoard
         initialEntries={entries}
         youtubers={youtubers}

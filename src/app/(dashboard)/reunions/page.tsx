@@ -34,7 +34,7 @@ export default async function MeetingsPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={MEETING_COPY.title} lead={MEETING_COPY.lead} />
+      <PageHeader title={MEETING_COPY.title} />
       <MeetingsBoard
         initialMeetings={meetings}
         columns={columns}
