@@ -41,7 +41,10 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
             <li key={live.id}>
               <Link
                 href={isLive ? ROUTES.live(live.id) : ROUTES.livecon}
-                className={cn(LIVE_URGENT.row, !isLive && LIVE_URGENT.rowAnnounced)}
+                className={cn(
+                  LIVE_URGENT.row,
+                  isLive ? LIVE_URGENT.rowLive : LIVE_URGENT.rowAnnounced
+                )}
               >
                 <DotIcon className={cn(LIVE_URGENT.dot, isLive && LIVE_NAV.dotPulse)} />
                 <span className={LIVE_URGENT.text}>{text}</span>
