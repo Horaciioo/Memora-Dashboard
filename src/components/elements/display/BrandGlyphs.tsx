@@ -12,14 +12,15 @@ type Paints = { fill: string; lift: string; deep: string; cut: string }
 
 // Stops of each ramp, brand by default, green for a thing done
 const FRAME_RAMPS = {
+  // Pink melting into white
   brand: {
-    fillFrom: 'var(--color-brand-400)',
-    fillTo: 'var(--color-brand-600)',
-    liftFrom: 'var(--color-brand-200)',
-    liftTo: 'var(--color-brand-400)',
-    deepFrom: 'var(--color-brand-600)',
-    deepTo: 'var(--color-brand-800)',
-    cut: 'var(--color-brand-50)',
+    fillFrom: 'var(--color-brand-200)',
+    fillTo: 'var(--color-brand-500)',
+    liftFrom: 'color-mix(in oklab, var(--color-brand-50) 70%, white)',
+    liftTo: 'var(--color-brand-200)',
+    deepFrom: 'var(--color-brand-400)',
+    deepTo: 'var(--color-brand-700)',
+    cut: 'color-mix(in oklab, var(--color-brand-50) 40%, white)',
   },
   success: {
     fillFrom: 'color-mix(in oklab, var(--color-success) 70%, white)',
