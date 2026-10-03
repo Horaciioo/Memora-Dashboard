@@ -1,5 +1,6 @@
 'use client'
 
+import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -102,6 +103,11 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
             <p className="px-4 py-6 text-sm text-[var(--color-ink-subtle)]">
               {NAV_COPY.searchPrompt}
             </p>
+          )}
+          {!isTooShort && isLoading && (
+            <div className="flex justify-center py-6">
+              <BrandLoader variant="ink" />
+            </div>
           )}
           {!isTooShort && !isLoading && hits.length === 0 && (
             <p className="px-4 py-6 text-sm text-[var(--color-ink-subtle)]">

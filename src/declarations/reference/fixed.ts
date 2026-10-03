@@ -11,6 +11,7 @@ import type { FunctionKindName } from '@/utils/constants/workflow'
  * @property {number} rank - Unique rank
  * @property {string} summary - Supporting line
  * @property {boolean} leadAssignable - A responsable may assign it
+ * @property {string | null} imagePath - Official logo under public, none for the entry level
  */
 
 export interface FixedDivision {
@@ -18,6 +19,7 @@ export interface FixedDivision {
   rank: number
   summary: string
   leadAssignable: boolean
+  imagePath: string | null
 }
 
 /**
@@ -26,10 +28,34 @@ export interface FixedDivision {
  */
 
 export const FIXED_DIVISIONS: readonly FixedDivision[] = [
-  { name: 'Junior', rank: 0, summary: 'Modérateurs en intégration.', leadAssignable: true },
-  { name: 'Squad I', rank: 1, summary: 'Première squad.', leadAssignable: true },
-  { name: 'Squad II', rank: 2, summary: 'Deuxième squad.', leadAssignable: true },
-  { name: 'Squad III', rank: 3, summary: 'Troisième squad.', leadAssignable: false },
+  {
+    name: 'Junior',
+    rank: 0,
+    summary: 'Modérateurs en intégration.',
+    leadAssignable: true,
+    imagePath: null,
+  },
+  {
+    name: 'Squad I',
+    rank: 1,
+    summary: 'Première squad.',
+    leadAssignable: true,
+    imagePath: '/divisions/marshaSquad1.png',
+  },
+  {
+    name: 'Squad II',
+    rank: 2,
+    summary: 'Deuxième squad.',
+    leadAssignable: true,
+    imagePath: '/divisions/marshaSquad2.png',
+  },
+  {
+    name: 'Squad III',
+    rank: 3,
+    summary: 'Troisième squad.',
+    leadAssignable: false,
+    imagePath: '/divisions/marshaSquad3.png',
+  },
 ]
 
 /**

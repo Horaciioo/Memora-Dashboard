@@ -6,7 +6,8 @@
 export const REFERENCE_FIELD_COPY = {
   anchorKind: 'Type',
   anchorDiscordId: 'Identifiant Discord',
-  anchorDiscordIdHint: 'Clic droit sur le rôle ou le salon, Copier l’identifiant (mode développeur activé).',
+  anchorDiscordIdHint:
+    'Clic droit sur le rôle ou le salon, Copier l’identifiant (mode développeur activé).',
   anchorYoutuber: 'YouTubeur',
   anchorYoutuberHint: 'Vide : disponible dans les annonces de tous les YouTubeurs.',
   stepGlyph: 'Glyph',

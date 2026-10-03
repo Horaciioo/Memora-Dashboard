@@ -128,7 +128,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Added,
         page: ROUTES.absences,
-        text: 'Déclare une absence en quelques clics, elle est validée par ton encadrement.',
+        text: 'Déclare une absence en quelques clics, elle est validée par l’Administration.',
       },
       {
         tag: ChangelogTags.Added,

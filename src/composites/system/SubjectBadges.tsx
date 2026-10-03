@@ -9,7 +9,7 @@ export interface SubjectBadgesProps {
 }
 
 /**
- * Latency, probe verdict and activation of one infrastructure subject
+ * One infrastructure subject: the verdict of its probe with the latency, or only whether it is on
  * @param {SubjectState} state - Subject state resolved server-side
  * @return {JSX.Element}
  */
@@ -23,17 +23,13 @@ export const SubjectBadges = ({ state }: SubjectBadgesProps) => {
         <span className={CONSOLE_BLOCK.rowMeta}>{`${state.probe.latencyMs} ms`}</span>
       )}
       {probe ? (
-        <Badge label={probe.label} tone={probe.tone}  />
+        <Badge label={probe.label} tone={probe.tone} />
       ) : (
         <Badge
-          label={state.enabled ? VIEW_COPY.probeMissing : VIEW_COPY.subjectOff}
-          tone="neutral"
+          label={state.enabled ? VIEW_COPY.subjectOn : VIEW_COPY.subjectOff}
+          tone={state.enabled ? 'success' : 'neutral'}
         />
       )}
-      <Badge
-        label={state.enabled ? VIEW_COPY.subjectOn : VIEW_COPY.subjectOff}
-        tone={state.enabled ? 'success' : 'neutral'}
-      />
     </span>
   )
 }

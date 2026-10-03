@@ -38,7 +38,6 @@ const CategoryBlock = ({ tag, items, comments }: ChangelogCategory) => {
           className={cn(CHANGELOG_BOARD.categoryRule, TONES[meta.tone].solid)}
           aria-hidden="true"
         />
-        <span className={CHANGELOG_BOARD.categoryCount}>{items.length}</span>
       </header>
 
       <div className={CHANGELOG_BOARD.groups}>
@@ -111,7 +110,7 @@ export const ChangelogBoard = ({ version }: ChangelogBoardProps) => {
 
   return (
     <>
-      <ReleaseHero release={release} categories={categories} />
+      <ReleaseHero release={release} />
 
       <div className={CHANGELOG_BOARD.blocks}>
         {categories.map((category) => (

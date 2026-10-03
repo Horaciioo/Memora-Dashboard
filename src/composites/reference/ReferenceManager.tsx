@@ -3,6 +3,9 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
+import { DivisionLogo } from '@/components/elements/display/DivisionLogo'
+import { divisionLogo } from '@/declarations/members/profiles'
+import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/NetworkLogo'
 import { Badge } from '@/components/elements/display/Badge'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -173,7 +176,14 @@ export const ReferenceManager = ({
                 aria-hidden="true"
               />
             )}
-            {row.image !== undefined && <Avatar name={row.label} src={row.image} size="md" />}
+            {row.image !== undefined &&
+              (section.key === 'reseaux-sociaux' && hasNetworkLogo(row.label) ? (
+                <NetworkLogo network={row.label} className="h-8 w-8" />
+              ) : section.key === 'divisions' && divisionLogo(row.label, row.image) ? (
+                <DivisionLogo label={row.label} src={row.image} className="h-9 w-9" />
+              ) : (
+                <Avatar name={row.label} src={row.image} size="md" />
+              ))}
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="flex flex-wrap items-center gap-2 font-medium">
                 {row.label}

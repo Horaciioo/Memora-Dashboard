@@ -8,7 +8,12 @@ import {
 } from '@/core/services/reference/lookups'
 import { replaceAnchors } from '@/core/services/auth/LeadService'
 import { conflict, notFound } from '@/core/lib/errors'
-import { roleGroupedOptions, functionOptions, rowsToOptions, toOptions } from '@/core/lib/forms/options'
+import {
+  roleGroupedOptions,
+  functionOptions,
+  rowsToOptions,
+  toOptions,
+} from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import {
   ACADEMY_SETTINGS,

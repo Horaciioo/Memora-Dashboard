@@ -8,7 +8,7 @@ import type { CSSProperties, ReactNode } from 'react'
 export interface ConsoleBannerProps {
   view: NavigationViewName
   title: string
-  lead: string
+  lead?: string
   aside?: ReactNode
 }
 
@@ -16,7 +16,7 @@ export interface ConsoleBannerProps {
  * View banner
  * @param {NavigationViewName} view - View the console belongs to
  * @param {string} title - Banner title
- * @param {string} lead - Supporting line
+ * @param {string} [lead] - Supporting line
  * @param {ReactNode} [aside] - Controls pinned to the right
  * @return {JSX.Element}
  */
@@ -35,7 +35,7 @@ export const ConsoleBanner = ({ view, title, lead, aside }: ConsoleBannerProps) 
       </span>
       <span className={CONSOLE_BLOCK.bannerBody}>
         <span className={CONSOLE_BLOCK.bannerTitle}>{title}</span>
-        <span className={CONSOLE_BLOCK.bannerLead}>{lead}</span>
+        {lead && <span className={CONSOLE_BLOCK.bannerLead}>{lead}</span>}
       </span>
       {aside}
     </div>
