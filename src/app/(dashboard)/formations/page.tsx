@@ -2,13 +2,17 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { CourseCatalog } from '@/composites/academy/course/CourseCatalog'
+import { TrainingsWelcome } from '@/composites/academy/course/TrainingsWelcome'
+import { hasSeenGuide } from '@/core/services/preferences/GuideService'
+import { COURSE_SURFACE_REGISTRY } from '@/declarations/academy/registries'
+import { GUIDE_KEYS } from '@/declarations/academy/welcome'
 import { TrainingsPanel } from '@/composites/academy/TrainingsPanel'
 import { myTrainings, resolveOwnJunior } from '@/core/services/academy/AcademyService'
 import { listCourses } from '@/core/services/academy/CurriculumService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { ACADEMY_COPY, COURSE_COPY } from '@/declarations/academy/copy'
 import { isEncadrement } from '@/declarations/access/roles'
-import { ROUTES } from '@/declarations/navigation'
+import { ROUTES, TRAININGS_DONE_PARAM } from '@/declarations/navigation'
 import { COURSE_CATALOG, PAGE_STYLES } from '@/declarations/ui/variants'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
 
@@ -20,15 +24,30 @@ export const metadata: Metadata = { title: ACADEMY_COPY.myTrainingsTitle }
  * @return {Promise<JSX.Element>} - Trainings page
  */
 
-export default async function TrainingsPage() {
+export default async function TrainingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
   const { session } = await requireUser()
+  const query = await searchParams
+  const celebrate = query[TRAININGS_DONE_PARAM]
 
   // Juniors train here, the encadrement previews
   if (session.status !== MemberStatuses.Academy && !isEncadrement(session.role)) {
     redirect(ROUTES.home)
   }
 
-  const [junior, courses] = await Promise.all([resolveOwnJunior(session.id), listCourses(session)])
+  const [junior, courses, seen] = await Promise.all([
+    resolveOwnJunior(session.id),
+    listCourses(session),
+    hasSeenGuide(session.id, GUIDE_KEYS.trainingsWelcome),
+  ])
+
+  // First visit opens the welcome, sized on the mandatory courses
+  const mandatory = courses.filter((course) => course.track === 'indispensable')
+  const showWelcome = !seen
+  const trade = COURSE_SURFACE_REGISTRY.get(mandatory[0]?.surface ?? 'twitch').label
 
   // A course already sits in the catalogue above, only the hand made ones stay below
   const courseIds = new Set(courses.map((course) => course.id))
@@ -41,7 +60,11 @@ export default async function TrainingsPage() {
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={ACADEMY_COPY.myTrainingsTitle} />
-      <CourseCatalog courses={courses} />
+      {showWelcome && <TrainingsWelcome mandatory={mandatory.length} trade={trade} />}
+      <CourseCatalog
+        courses={courses}
+        celebrate={typeof celebrate === 'string' ? celebrate : null}
+      />
       {trainings.length > 0 && (
         <section className={COURSE_CATALOG.group}>
           <h2 className={COURSE_CATALOG.title}>{COURSE_COPY.consoleTitle}</h2>

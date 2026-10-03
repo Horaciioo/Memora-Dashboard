@@ -1,18 +1,26 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import type { CSSProperties } from 'react'
+import { useCallback, useState } from 'react'
 
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
+import { CourseCeremony } from '@/composites/academy/course/CourseCeremony'
 import { CoursePoster } from '@/composites/academy/course/CoursePoster'
 import { COURSE_COPY } from '@/declarations/academy/copy'
 import { COURSE_SURFACE_REGISTRY } from '@/declarations/academy/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
-import { COURSE_CATALOG } from '@/declarations/ui/variants'
+import { COURSE_CATALOG, COURSE_STAMP } from '@/declarations/ui/variants'
 import type { CourseCard } from '@/types/academy'
 import { cn } from '@/utils/classnames'
 import { TrainingStatuses } from '@/utils/constants/hierarchy'
 
 export interface CourseCatalogProps {
   courses: CourseCard[]
+  // Course just finished, its stamp played once
+  celebrate?: string | null
 }
 
 /**
@@ -22,12 +30,13 @@ export interface CourseCatalogProps {
  * @return {JSX.Element}
  */
 
-const CourseTile = ({ course }: { course: CourseCard }) => {
+const CourseTile = ({ course, isPending }: { course: CourseCard; isPending: boolean }) => {
   const surface = COURSE_SURFACE_REGISTRY.get(course.surface)
   const SurfaceIcon = ICONS[surface.icon]
   const Forward = ICONS.forward
   const Done = ICONS.success
-  const isDone = course.status === TrainingStatuses.Done
+  // A card waiting for its ceremony keeps its colours until the stamp lands
+  const isDone = course.status === TrainingStatuses.Done && !isPending
   const action = isDone
     ? COURSE_COPY.done
     : course.passed > 0
@@ -36,7 +45,12 @@ const CourseTile = ({ course }: { course: CourseCard }) => {
 
   return (
     <Link href={ROUTES.training(course.id)} className={COURSE_CATALOG.card}>
-      <CoursePoster surface={course.surface} />
+      <span data-course-poster={course.id} className={COURSE_STAMP.posterWrap}>
+        <span className={cn(isDone && COURSE_STAMP.posterDone)}>
+          <CoursePoster surface={course.surface} />
+        </span>
+        {isDone && <span className={COURSE_STAMP.cardStamp}>{COURSE_COPY.stamp}</span>}
+      </span>
       <div className={COURSE_CATALOG.body}>
         <span className={COURSE_CATALOG.surface}>
           <SurfaceIcon className={COURSE_CATALOG.surfaceIcon} aria-hidden="true" />
@@ -51,8 +65,10 @@ const CourseTile = ({ course }: { course: CourseCard }) => {
                 key={step}
                 className={cn(
                   COURSE_CATALOG.step,
-                  (isDone || step < course.passed) && COURSE_CATALOG.stepDone
+                  (isDone || step < course.passed) && COURSE_CATALOG.stepDone,
+                  isPending && COURSE_STAMP.stepFill
                 )}
+                style={isPending ? ({ '--step-index': step } as CSSProperties) : undefined}
               />
             ))}
           </div>
@@ -80,7 +96,19 @@ const CourseTile = ({ course }: { course: CourseCard }) => {
  * @return {JSX.Element}
  */
 
-export const CourseCatalog = ({ courses }: CourseCatalogProps) => {
+export const CourseCatalog = ({ courses, celebrate }: CourseCatalogProps) => {
+  const router = useRouter()
+  const pathname = usePathname()
+  const [pending, setPending] = useState(
+    celebrate && courses.some((course) => course.id === celebrate) ? celebrate : null
+  )
+
+  // Once landed, the flag leaves the address
+  const land = useCallback(() => {
+    setPending(null)
+    router.replace(pathname)
+  }, [pathname, router])
+
   if (courses.length === 0) {
     return (
       <EmptyState
@@ -109,6 +137,7 @@ export const CourseCatalog = ({ courses }: CourseCatalogProps) => {
 
   return (
     <div className={COURSE_CATALOG.page}>
+      {pending && <CourseCeremony courseId={pending} onDone={land} />}
       {groups.map((group) => (
         <section key={group.key} className={COURSE_CATALOG.group}>
           <header className={COURSE_CATALOG.head}>
@@ -117,7 +146,7 @@ export const CourseCatalog = ({ courses }: CourseCatalogProps) => {
           </header>
           <div className={COURSE_CATALOG.grid}>
             {group.courses.map((course) => (
-              <CourseTile key={course.id} course={course} />
+              <CourseTile key={course.id} course={course} isPending={course.id === pending} />
             ))}
           </div>
         </section>
