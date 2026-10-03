@@ -139,6 +139,13 @@ export interface MobileNavSlot {
 }
 
 /**
+ * Query flag naming the course just finished, read by the catalogue
+ * @type {string}
+ */
+
+export const TRAININGS_DONE_PARAM = 'achevee'
+
+/**
  * Navigation entry
  * @typedef {Object} NavigationItem
  * @property {string} href - Destination

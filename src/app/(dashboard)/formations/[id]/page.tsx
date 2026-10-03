@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { CoursePlayer } from '@/composites/academy/course/CoursePlayer'
 import { readCourse } from '@/core/services/academy/CurriculumService'
+import { readCourseContext } from '@/core/services/academy/CourseContextService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { ACADEMY_COPY, COURSE_COPY } from '@/declarations/academy/copy'
@@ -24,7 +25,7 @@ export const metadata: Metadata = { title: ACADEMY_COPY.myTrainingsTitle }
 
 export default async function CoursePage({ params }: CoursePageProps) {
   const { id } = await params
-  const { session } = await requireUser()
+  const { session, scope } = await requireUser()
 
   if (session.status !== MemberStatuses.Academy && !isEncadrement(session.role)) {
     redirect(ROUTES.home)
@@ -35,6 +36,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   if (!found) redirect(ROUTES.trainings)
 
   const { course, progress } = found
+  const context = await readCourseContext(await scope())
 
   return (
     <div className={PAGE_STYLES.wrapper}>
@@ -44,6 +46,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
         initialProgress={progress}
         backHref={ROUTES.trainings}
         backLabel={COURSE_COPY.back}
+        trainingId={id}
+        context={context}
       />
     </div>
   )

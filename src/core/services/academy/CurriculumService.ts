@@ -213,10 +213,21 @@ const announceFinish = async (accountId: string, courseName: string): Promise<vo
 
   await clearOpenTrainingStep(junior.id)
 
-  if (junior.trainerId) {
+  // Responsables of the junior's creators hear of it too
+  const creators = await prisma.account.findUnique({
+    where: { id: accountId },
+    select: { youtubers: { select: { id: true } } },
+  })
+  const leads = await prisma.youtuberLead.findMany({
+    where: { youtuberId: { in: creators?.youtubers.map((creator) => creator.id) ?? [] } },
+    select: { accountId: true },
+  })
+  const recipients = [junior.trainerId, ...leads.map((lead) => lead.accountId)]
+
+  if (recipients.some(Boolean)) {
     await notify({
       kind: 'TrainingFinished',
-      recipients: [junior.trainerId],
+      recipients,
       actorId: accountId,
       target: 'member',
       targetId: accountId,
@@ -300,4 +311,25 @@ export const submitExercise = async (
   }
 
   return { result, progress: next, finished }
+}
+
+/**
+ * Keep what a learner thought of a course
+ * @param {string} trainingId - Training identifier
+ * @param {SessionUser} viewer - Signed-in member
+ * @param {{ content: number, fluency: number, comment: string | null }} review - Marks out of 10
+ * @return {Promise<void>} - Saved
+ */
+
+export const saveFeedback = async (
+  trainingId: string,
+  viewer: SessionUser,
+  review: { content: number; fluency: number; comment: string | null }
+): Promise<void> => {
+  // Only a course the learner can open takes a review
+  await readCourse(trainingId, viewer)
+
+  await prisma.trainingFeedback.create({
+    data: { trainingId, accountId: viewer.id, ...review },
+  })
 }

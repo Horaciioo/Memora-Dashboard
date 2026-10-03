@@ -8,10 +8,13 @@ import { PageHeader } from '@/components/structures/PageHeader'
 import { CaseExercise, QuizExercise } from '@/composites/academy/course/ChoiceExercises'
 import { CommandExercise } from '@/composites/academy/course/CommandExercise'
 import { CourseComplete } from '@/composites/academy/course/CourseComplete'
+import { CourseContextProvider } from '@/composites/academy/course/CourseContextProvider'
+import { CourseIntro } from '@/composites/academy/course/CourseIntro'
+import { CourseOutro } from '@/composites/academy/course/CourseOutro'
 import { CourseTimeline } from '@/composites/academy/course/CourseTimeline'
 import { FillExercise } from '@/composites/academy/course/FillExercise'
 import { OrderExercise, SortExercise } from '@/composites/academy/course/OrderingExercises'
-import { PlungeExercise } from '@/composites/academy/course/PlungeExercise'
+import { SceneExercise } from '@/composites/academy/course/SceneExercise'
 import { ReadBlock } from '@/composites/academy/course/ReadBlock'
 import { SimulationExercise } from '@/composites/academy/course/SimulationExercise'
 import type { ExerciseViewProps } from '@/composites/academy/course/types'
@@ -24,7 +27,7 @@ import type { Course, ExerciseBlock } from '@/declarations/academy/curriculum/ty
 import { COURSE_SURFACE_REGISTRY } from '@/declarations/academy/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import { COURSE_PLAYER } from '@/declarations/ui/variants'
-import type { CourseProgress } from '@/types/academy'
+import type { CourseContext, CourseProgress } from '@/types/academy'
 import { cn } from '@/utils/classnames'
 
 export interface CoursePlayerProps {
@@ -34,7 +37,16 @@ export interface CoursePlayerProps {
   initialProgress: CourseProgress
   backHref: string
   backLabel: string
+  // Training reviewed at the end, the old closing kept without it
+  trainingId?: string
+  context?: CourseContext
 }
+
+// Blocks showing the Mod View, spread past the reading column
+const WIDE_KINDS = new Set<string>(['tour', 'focus', 'scene'])
+
+// Context of a course read without the database
+const EMPTY_CONTEXT: CourseContext = { ladder: { admins: [], responsables: [] }, livecon: [] }
 
 /**
  * Exercise view of a block
@@ -60,8 +72,8 @@ const ExerciseView = (props: ExerciseViewProps) => {
       return <CaseExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
     case 'command':
       return <CommandExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-    case 'plunge':
-      return <PlungeExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
+    case 'scene':
+      return <SceneExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
   }
 }
 
@@ -79,6 +91,8 @@ export const CoursePlayer = ({
   initialProgress,
   backHref,
   backLabel,
+  trainingId,
+  context,
 }: CoursePlayerProps) => {
   const run = useCourse(submitPath, course, initialProgress)
   const surface = COURSE_SURFACE_REGISTRY.get(course.surface)
@@ -100,6 +114,10 @@ export const CoursePlayer = ({
     return open === -1 ? course.chapters.length - 1 : open
   })
   const [slide, setSlide] = useState<'forward' | 'back'>('forward')
+  // Opening page until the first chapter, closing page once the last is cleared
+  const [page, setPage] = useState<'intro' | 'chapters' | 'outro'>(() =>
+    course.intro && Object.keys(initialProgress.blocks).length === 0 ? 'intro' : 'chapters'
+  )
 
   const chapter = course.chapters[current]!
   const isLast = current === course.chapters.length - 1
@@ -138,8 +156,15 @@ export const CoursePlayer = ({
 
   useEffect(() => () => publishCourseRail(null), [])
 
+  const reviewed = Boolean(trainingId)
+
+  const open = (next: 'intro' | 'chapters' | 'outro') => {
+    setPage(next)
+    window.scrollTo({ top: 0 })
+  }
+
   return (
-    <>
+    <CourseContextProvider value={context ?? EMPTY_CONTEXT}>
       <PageHeader title={course.name} />
       <div className={COURSE_PLAYER.page}>
         <Link href={backHref} className={COURSE_PLAYER.back}>
@@ -149,58 +174,71 @@ export const CoursePlayer = ({
 
         <CourseTimeline chapters={chapters} current={current} fill={fill} finished={run.finished} />
 
-        <section
-          key={chapter.key}
-          ref={chapterRef}
-          className={cn(
-            COURSE_PLAYER.stage,
-            slide === 'forward' ? COURSE_PLAYER.slideForward : COURSE_PLAYER.slideBack
-          )}
-        >
-          <header className={COURSE_PLAYER.chapterHead}>
-            <span className={COURSE_PLAYER.chapterCount}>
-              {COURSE_COPY.chapterCount(current + 1, course.chapters.length)}
-            </span>
-            <h2 className={COURSE_PLAYER.chapterTitle}>{chapter.title}</h2>
-          </header>
+        {page === 'intro' && course.intro && (
+          <CourseIntro course={course} intro={course.intro} onStart={() => open('chapters')} />
+        )}
 
-          <div className={COURSE_PLAYER.blocks}>
-            {chapter.blocks.map((block) =>
-              isExercise(block) ? (
-                <ExerciseView
-                  key={block.key}
-                  block={block as ExerciseBlock}
-                  answer={run.answers[block.key]}
-                  result={run.results[block.key]}
-                  isSaving={run.isSaving}
-                  onAnswer={(answer) => run.answer(block.key, answer)}
-                  onCheck={(answer) => void run.check(block, answer)}
-                  onRetry={() => run.retry(block.key)}
-                />
-              ) : (
-                <ReadBlock key={block.key} block={block} />
-              )
+        {page === 'outro' && trainingId && <CourseOutro trainingId={trainingId} />}
+
+        {page === 'chapters' && (
+          <section
+            key={chapter.key}
+            ref={chapterRef}
+            className={cn(
+              COURSE_PLAYER.stage,
+              slide === 'forward' ? COURSE_PLAYER.slideForward : COURSE_PLAYER.slideBack
             )}
-          </div>
+          >
+            <header className={COURSE_PLAYER.chapterHead}>
+              <span className={COURSE_PLAYER.chapterCount}>
+                {COURSE_COPY.chapterCount(current + 1, course.chapters.length)}
+              </span>
+              <h2 className={COURSE_PLAYER.chapterTitle}>{chapter.title}</h2>
+            </header>
 
-          {!isLast && (
-            <footer className={COURSE_PLAYER.foot}>
-              <span className={COURSE_PLAYER.rule} aria-hidden="true" />
-              <Button
-                variant="primary"
-                icon="forward"
-                disabled={!canAdvance}
-                onClick={() => goTo(current + 1)}
-              >
-                {COURSE_COPY.nextChapter}
-              </Button>
-              {!canAdvance && <p className={COURSE_PLAYER.footHint}>{COURSE_COPY.nextLocked}</p>}
-            </footer>
-          )}
-        </section>
+            <div className={COURSE_PLAYER.blocks}>
+              {chapter.blocks.map((block) => (
+                <div
+                  key={block.key}
+                  className={cn(!WIDE_KINDS.has(block.kind) && COURSE_PLAYER.column)}
+                >
+                  {isExercise(block) ? (
+                    <ExerciseView
+                      block={block as ExerciseBlock}
+                      answer={run.answers[block.key]}
+                      result={run.results[block.key]}
+                      isSaving={run.isSaving}
+                      onAnswer={(answer) => run.answer(block.key, answer)}
+                      onCheck={(answer) => void run.check(block, answer)}
+                      onRetry={() => run.retry(block.key)}
+                    />
+                  ) : (
+                    <ReadBlock block={block} />
+                  )}
+                </div>
+              ))}
+            </div>
 
-        {isLast && run.finished && <CourseComplete name={course.name} />}
+            {(!isLast || reviewed) && (
+              <footer className={COURSE_PLAYER.foot}>
+                <span className={COURSE_PLAYER.rule} aria-hidden="true" />
+                <Button
+                  variant="primary"
+                  disabled={!canAdvance}
+                  onClick={() => (isLast ? open('outro') : goTo(current + 1))}
+                >
+                  {isLast
+                    ? COURSE_COPY.nextPage
+                    : COURSE_COPY.nextChapterTo(current + 2, course.chapters[current + 1]!.title)}
+                </Button>
+                {!canAdvance && <p className={COURSE_PLAYER.footHint}>{COURSE_COPY.nextLocked}</p>}
+              </footer>
+            )}
+          </section>
+        )}
+
+        {!reviewed && isLast && run.finished && <CourseComplete name={course.name} />}
       </div>
-    </>
+    </CourseContextProvider>
   )
 }
