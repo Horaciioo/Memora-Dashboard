@@ -1,0 +1,9 @@
+{
+  "modulePoints": 100,
+  "modulesToPass": 2,
+  "pointsToPass": 230,
+  "modulePassPoints": 70,
+  "evaluatorSharePercent": 40,
+  "minWeeks": 3,
+  "maxWeeks": 9
+}
