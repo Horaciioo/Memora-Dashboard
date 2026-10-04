@@ -29,6 +29,8 @@ enum MemberStatus {
   ACTIVE
   PAUSED
   LEFT
+  DISMISSED
+  RESIGNED
 }
 
 // What an integration link does once its form is submitted
@@ -65,6 +67,13 @@ enum AcademyJuniorStatus {
   ACTIVE
   VALIDATED
   STOPPED
+  RESIGNED
+}
+
+// Why a member left during their PIM
+enum DepartureKind {
+  DISMISSAL
+  RESIGNATION
 }
 
 // Kind of step recorded on the session timeline
@@ -348,6 +357,8 @@ model Account {
   meetingsEdited        Meeting[]                @relation("MeetingEditor")
   communications        Communication[]
   liveconChanges        LiveconEntry[]
+  departureNotices      DepartureNotice[]        @relation("DepartureSubject")
+  departuresPublished   DepartureNotice[]        @relation("DeparturePublisher")
   platformAccounts      PlatformAccount[]
   livesAnnounced        Live[]                   @relation("LiveAnnouncer")
   livesCoordinated      Live[]                   @relation("LiveCoordinator")
@@ -365,6 +376,24 @@ model Account {
   @@index([status])
   @@index([divisionId])
   @@map("accounts")
+}
+
+// Departure announcement drafted for the responsables, a task until published
+model DepartureNotice {
+  id            String        @id @default(cuid())
+  accountId     String
+  kind          DepartureKind
+  functionName  String
+  body          String
+  publishedAt   DateTime?
+  publishedById String?
+  createdAt     DateTime      @default(now())
+
+  account     Account  @relation("DepartureSubject", fields: [accountId], references: [id], onDelete: Cascade)
+  publishedBy Account? @relation("DeparturePublisher", fields: [publishedById], references: [id], onDelete: SetNull)
+
+  @@index([publishedAt])
+  @@map("departure_notices")
 }
 
 // Signed cookie handle of an open session
@@ -1259,14 +1288,16 @@ model TrainingFeedback {
 
 // Dated run of one training programme
 model AcademySession {
-  id         String               @id @default(cuid())
-  functionId String
-  startsAt   DateTime
-  endsAt     DateTime?
-  status     AcademySessionStatus @default(DRAFT)
-  summary    String?
-  createdAt  DateTime             @default(now())
-  updatedAt  DateTime             @updatedAt
+  id             String               @id @default(cuid())
+  functionId     String
+  startsAt       DateTime
+  endsAt         DateTime?
+  status         AcademySessionStatus @default(DRAFT)
+  summary        String?
+  // Second period opened for the whole promotion
+  secondPeriodAt DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
 
   jobFunction JobFunction @relation(fields: [functionId], references: [id], onDelete: Restrict)
 
@@ -1356,6 +1387,11 @@ model AcademyJunior {
   candidateId  String?             @unique
   // Integration form answered, the pre-generated file confirmed
   confirmedAt  DateTime?
+  // PIM start declared by a responsable, opens the integration form
+  kickoffAt    DateTime?
+  // End of the third period, set by the responsable
+  deadlineAt   DateTime?
+  leftAt       DateTime?
   status       AcademyJuniorStatus @default(ACTIVE)
   stage        AcademyStage        @default(PREPARATION)
   startedAt    DateTime            @default(now())
@@ -1477,21 +1513,23 @@ model AcademyStep {
 // Written trace of one voice check-in held with a junior, and the support of the decision
 // that authorises the following stage
 model AcademyReview {
-  id              String       @id @default(cuid())
+  id              String        @id @default(cuid())
   juniorId        String
   authorId        String?
   stage           AcademyStage
   heldAt          DateTime
   durationMinutes Int?
   feeling         String?
-  summary         String       @default("")
+  summary         String        @default("")
   advice          ReviewAdvice
-  status          ReviewStatus @default(DRAFT)
+  // Outcome the responsable kept, the trainer's advice followed or not
+  decision        ReviewAdvice?
+  status          ReviewStatus  @default(DRAFT)
   decidedById     String?
   decidedAt       DateTime?
   decisionNote    String?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   junior    AcademyJunior @relation(fields: [juniorId], references: [id], onDelete: Cascade)
   author    Account?      @relation("AcademyReviewAuthor", fields: [authorId], references: [id], onDelete: SetNull)
