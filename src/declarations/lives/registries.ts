@@ -64,7 +64,12 @@ export const LIVE_COORDINATOR = {
   label: 'Coordinateur du Live',
   icon: 'coordinator' as IconName,
   tint: 'COORDINATOR',
-  grants: [Permissions.LiveModeEmotes, Permissions.LiveModeSlow, Permissions.LiveTerms],
+  grants: [
+    Permissions.LiveModeEmotes,
+    Permissions.LiveModeSlow,
+    Permissions.LiveTerms,
+    Permissions.LiveRoster,
+  ],
 } as const
 
 /**
@@ -73,3 +78,10 @@ export const LIVE_COORDINATOR = {
  */
 
 export const LIVE_FUNCTIONS: readonly string[] = ['Lives', 'Junior Lives']
+
+/**
+ * Calendar template every announced live is filed under
+ * @type {string}
+ */
+
+export const LIVE_EVENT_TEMPLATE = 'Live'

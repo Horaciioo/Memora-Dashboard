@@ -145,6 +145,12 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     verb: 'fait',
     target: 'un geste de modération',
   },
+  LiveRosterMoved: {
+    label: 'Appel',
+    tone: 'info',
+    verb: 'a corrigé',
+    target: 'l’appel d’un live',
+  },
 }
 
 export const ACTIVITY_EVENT_REGISTRY = createRegistry(ACTIVITY_EVENT_MAP)

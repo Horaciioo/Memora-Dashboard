@@ -5,6 +5,7 @@ import { prisma } from '@/core/lib/db'
 import { forbidden } from '@/core/lib/errors'
 import { logger } from '@/core/lib/logger'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
+import { syncJuniorLives } from '@/core/services/academy/LiveCountService'
 import { notify } from '@/core/services/system/NotificationService'
 import { peopleInScope } from '@/core/services/work/shared'
 import type { AttendancePerson, AttendanceRoster } from '@/types/calendar'
@@ -196,6 +197,9 @@ export const respondToRollCall = async (
     where: { id: row.id },
     data: { status, respondedAt: new Date() },
   })
+
+  // An answer on a past live moves a junior's count
+  await syncJuniorLives([accountId])
 
   return readRosterFor(eventId, accountId, canManage)
 }

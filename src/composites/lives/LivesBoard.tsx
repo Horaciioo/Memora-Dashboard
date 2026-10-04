@@ -8,9 +8,10 @@ import { AvatarStack } from '@/components/elements/display/Avatar'
 import { Badge } from '@/components/elements/display/Badge'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FormDrawer } from '@/components/structures/FormDrawer'
+import { LiveRosterBoard } from '@/composites/lives/LiveRosterBoard'
 import { useLives } from '@/core/hooks/data/useLives'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
-import { LIVE_COPY } from '@/declarations/lives/copy'
+import { LIVE_COPY, LIVE_ROSTER_COPY } from '@/declarations/lives/copy'
 import { LIVE_COORDINATOR, LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
@@ -133,6 +134,7 @@ interface LiveStripProps {
 const LiveStrip = ({ live, canMove, isSaving, onMove }: LiveStripProps) => {
   // Status waiting on a second click
   const [confirming, setConfirming] = useState<LiveStatusName | null>(null)
+  const [isRosterOpen, setRosterOpen] = useState(false)
 
   const platform = LIVE_PLATFORM_REGISTRY.get(live.platform)
   const PlatformIcon = ICONS[platform.icon]
@@ -255,12 +257,22 @@ const LiveStrip = ({ live, canMove, isSaving, onMove }: LiveStripProps) => {
           </Button>
         )}
 
+        <Button
+          variant="ghost"
+          aria-expanded={isRosterOpen}
+          onClick={() => setRosterOpen((open) => !open)}
+        >
+          {isRosterOpen ? LIVE_ROSTER_COPY.close : LIVE_ROSTER_COPY.open}
+        </Button>
+
         {confirming && (
           <p className={LIVE_BOARD.confirm}>
             {confirming === LiveStatuses.Ended ? LIVE_COPY.confirmEnd : LIVE_COPY.confirmCancel}
           </p>
         )}
       </div>
+
+      {isRosterOpen && <LiveRosterBoard liveId={live.id} />}
     </article>
   )
 }

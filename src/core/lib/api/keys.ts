@@ -14,4 +14,5 @@ export const QUERY_KEYS = {
     ['sanctions', youtuberId, levelId] as const,
   sanctionOffense: (id: string) => ['sanctions', 'offense', id] as const,
   blockQuiz: (blockId: string) => ['academy', 'quiz', blockId] as const,
+  liveRoster: (liveId: string) => ['lives', 'roster', liveId] as const,
 } as const

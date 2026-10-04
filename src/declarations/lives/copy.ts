@@ -18,7 +18,8 @@ export const LIVE_COPY = {
   openModView: 'Ouvrir la Mod View',
   modViewLocked: 'La Mod View s’ouvre au lancement du live.',
   emptyTitle: 'Aucun live prévu',
-  emptyDescription: 'Un live annoncé apparaît ici, et la page Live en cours s’allume pour l’équipe.',
+  emptyDescription:
+    'Un live annoncé apparaît ici, et la page Live en cours s’allume pour l’équipe.',
   startsAt: 'Début prévu',
   endsAt: 'Fin prévue',
   startedAt: 'Lancé à',
@@ -49,4 +50,21 @@ export const LIVE_FIELD_COPY = {
   coordinatorHint: 'Il garde ses droits jusqu’à la fin du live, puis les perd tout seul.',
   members: 'Modérateurs convoqués',
   membersHint: 'Vide : toute l’équipe Lives du YouTubeur. Les absents ne sont jamais convoqués.',
+} as const
+
+/**
+ * Copy of a live's roll-call board
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_ROSTER_COPY = {
+  title: 'Appel',
+  open: 'Voir l’appel',
+  close: 'Replier l’appel',
+  lead: 'Seuls les lives où un Junior est présent comptent pour sa PIM.',
+  leadManage: 'Glisse un pseudo d’une colonne à l’autre, ou clic droit dessus.',
+  empty: 'Personne ici',
+  moveTo: 'Passer en « {status} »',
+  junior: 'Junior',
+  loading: 'Chargement de l’appel',
 } as const

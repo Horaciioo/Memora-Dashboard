@@ -6,6 +6,7 @@ import { closeLivePresences } from '@/core/services/lives/PresenceService'
 import { conflict, invalidInput, notFound } from '@/core/lib/errors'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import { releasedFrom } from '@/core/services/academy/LegacyRelease'
+import { syncJuniorLives } from '@/core/services/academy/LiveCountService'
 import { assertInScope, scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { syncRoster } from '@/core/services/calendar/attendance'
@@ -16,7 +17,11 @@ import { livePermissions } from '@/core/lib/lives/permissions'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_FIELD_COPY } from '@/declarations/lives/copy'
-import { LIVE_FUNCTIONS, LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
+import {
+  LIVE_EVENT_TEMPLATE,
+  LIVE_FUNCTIONS,
+  LIVE_PLATFORM_REGISTRY,
+} from '@/declarations/lives/registries'
 import { isIconName } from '@/declarations/ui/icons'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -301,10 +306,16 @@ export const announceLive = async (
   })
   const memberIds = [...new Set([coordinatorId, ...convened])]
 
-  // Calendar entry carries the roll-call
+  // Calendar entry carries the roll-call, filed under the live template
+  const template = await prisma.eventTemplate.findUnique({
+    where: { name: LIVE_EVENT_TEMPLATE },
+    select: { id: true },
+  })
   const event = await prisma.calendarEvent.create({
     data: {
       title,
+      templateId: template?.id ?? null,
+      rosterShared: true,
       ownerId: actorId,
       youtuberId,
       startsAt,
@@ -528,8 +539,13 @@ const applyLiveStatus = async (
     })
   }
 
-  // Team told of the start or the cancel
+  // A closed live moves the PIM count of the juniors present
   const recipients = live.members.map((seat) => seat.accountId)
+  if (next === LiveStatuses.Ended || next === LiveStatuses.Cancelled) {
+    await syncJuniorLives(recipients)
+  }
+
+  // Team told of the start or the cancel
   if (next === LiveStatuses.Live) {
     await notify({
       kind: 'LiveStarted',

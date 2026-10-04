@@ -180,14 +180,6 @@ export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]
       span: 'half',
     },
     {
-      name: 'liveCount',
-      kind: 'number',
-      label: ACADEMY_FIELD_COPY.liveCount,
-      min: 0,
-      max: ACADEMY_SETTINGS.maxLives,
-      span: 'half',
-    },
-    {
       name: 'bonusLives',
       kind: 'number',
       label: ACADEMY_FIELD_COPY.bonusLives,
@@ -967,7 +959,6 @@ const toJuniorData = (values: FormValues) => {
     status,
     // Validation stamps its own date, so the file always says when it happened
     validatedAt: status === AcademyJuniorStatuses.Validated ? new Date() : null,
-    liveCount: readNumberValue(values, 'liveCount') ?? 0,
     bonusLives: readNumberValue(values, 'bonusLives') ?? 0,
     summary: readText(values, 'summary'),
   }

@@ -2,6 +2,7 @@ import type { ModerationKind, ModerationOrigin, ModerationStatus } from '@prisma
 import type { IconName } from '@/declarations/ui/icons'
 import type { LivePlatformName, LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
+import type { AttendanceStatusName } from '@/utils/constants/workflow'
 
 /**
  * One member seated on a live
@@ -99,4 +100,36 @@ export interface MemberLiveSummary {
 export interface MemberModerationView {
   windowSeconds: number
   lives: MemberLiveSummary[]
+}
+
+/**
+ * One member on a live's roll-call
+ * @typedef {Object} LiveRosterPerson
+ * @property {string} id - Account identifier
+ * @property {string} name - Display name
+ * @property {string | null} avatar - Avatar address
+ * @property {AttendanceStatusName} status - Answer in force
+ * @property {boolean} isJunior - Counted for a PIM
+ */
+
+export interface LiveRosterPerson {
+  id: string
+  name: string
+  avatar: string | null
+  status: AttendanceStatusName
+  isJunior: boolean
+}
+
+/**
+ * Roll-call of one live
+ * @typedef {Object} LiveRoster
+ * @property {string} liveId - Live identifier
+ * @property {boolean} canManage - Viewer may move people
+ * @property {LiveRosterPerson[]} people - Convened members
+ */
+
+export interface LiveRoster {
+  liveId: string
+  canManage: boolean
+  people: LiveRosterPerson[]
 }

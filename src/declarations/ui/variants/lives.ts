@@ -11,7 +11,7 @@ export const LIVE_BOARD = {
   list: 'flex flex-col gap-6',
   // Raised strip, the platform colour a rule down the left edge
   strip:
-    'relative flex flex-col gap-6 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6 pl-8 shadow-[var(--shadow-sm)] sm:flex-row sm:items-center',
+    'relative flex flex-col gap-6 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6 pl-8 shadow-[var(--shadow-sm)] sm:flex-row sm:flex-wrap sm:items-center',
   stripLive: 'border-[var(--color-danger)] shadow-[var(--shadow-md)]',
   rule: 'absolute inset-y-0 left-0 w-1.5',
   ruleTwitch: 'bg-[var(--color-twitch)]',
@@ -154,4 +154,30 @@ export const MEMBER_MODERATION = {
   rowTime: 'text-sm tabular-nums',
   details: 'course-erase-in flex flex-col gap-3 px-2 pb-4',
   detailsLink: 'self-start text-sm font-semibold text-[var(--color-brand-600)] hover:underline',
+} as const
+
+/**
+ * Roll-call board of a live: three columns, names dragged between them
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_ROSTER = {
+  root: 'flex w-full flex-col gap-4 border-t border-[var(--color-border)] pt-5',
+  head: 'flex flex-wrap items-baseline justify-between gap-2',
+  title: PROPERTY_LABEL,
+  lead: 'text-xs text-[var(--color-ink-subtle)]',
+  columns: 'grid gap-3 sm:grid-cols-3',
+  column:
+    'flex min-h-28 flex-col gap-2 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] p-3 transition-colors',
+  columnOver: 'border-[var(--color-brand-600)] bg-[var(--color-brand-100)]',
+  columnHead: 'flex items-center gap-2 text-xs font-black tracking-wide uppercase',
+  columnGlyph: 'h-4 w-4 shrink-0',
+  columnEmpty: 'text-xs text-[var(--color-ink-subtle)] italic',
+  person:
+    'flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2 py-1.5 text-sm font-semibold',
+  personMovable: 'cursor-grab active:cursor-grabbing',
+  personDragged: 'opacity-40',
+  junior:
+    'ml-auto text-[0.65rem] font-black tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  toggle: 'self-start',
 } as const
