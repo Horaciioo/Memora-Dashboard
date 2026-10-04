@@ -26,7 +26,7 @@ import { isIconName } from '@/declarations/ui/icons'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { LiveBeacon, LivePerson, LiveView } from '@/types/lives'
-import { MemberStatuses } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 import { LivePlatforms, LiveStatuses, OPEN_LIVE_STATUSES } from '@/utils/constants/lives'
 import type { LivePlatformName, LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
@@ -161,7 +161,7 @@ const convene = async ({
         }
 
   const accounts = await prisma.account.findMany({
-    where: { AND: [where, { status: { not: MemberStatuses.Left } }, peopleInScope(scope)] },
+    where: { AND: [where, { status: { notIn: GONE_MEMBER_STATUSES } }, peopleInScope(scope)] },
     select: { id: true },
   })
   const ids = accounts.map((account) => account.id)

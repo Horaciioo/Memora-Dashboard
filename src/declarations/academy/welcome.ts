@@ -7,6 +7,7 @@ import type { IconName } from '@/declarations/ui/icons'
 
 export const GUIDE_KEYS = {
   trainingsWelcome: 'formations-welcome',
+  specialisations: 'specialisations-ouvertes',
 } as const
 
 export type GuideKey = (typeof GUIDE_KEYS)[keyof typeof GUIDE_KEYS]

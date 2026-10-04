@@ -14,7 +14,7 @@ import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { BoardColumn } from '@/components/structures/KanbanBoard'
 import type { FieldOption } from '@/types/forms'
 import type { WorkAuthorship, WorkPerson, WorkTag } from '@/types/work'
-import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
 import { WorkflowPhases } from '@/utils/constants/workflow'
 import type { WorkflowPhaseName, WorkflowScopeName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
@@ -200,7 +200,7 @@ export const stateOptions = async (scope: WorkflowScopeName): Promise<FieldOptio
 
 export const memberOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
   const rows = await prisma.account.findMany({
-    where: { status: { not: MemberStatuses.Left }, ...peopleInScope(scope) },
+    where: { status: { notIn: GONE_MEMBER_STATUSES }, ...peopleInScope(scope) },
     orderBy: { displayName: 'asc' },
     include: {
       ...HELD_FUNCTIONS,
@@ -230,7 +230,7 @@ export const memberOptions = async (scope?: AccessScope): Promise<FieldOption[]>
 export const leadOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
   const rows = await prisma.account.findMany({
     where: {
-      status: { not: MemberStatuses.Left },
+      status: { notIn: GONE_MEMBER_STATUSES },
       role: { in: [MemberRoles.Admin, MemberRoles.Responsable] },
       ...peopleInScope(scope),
     },

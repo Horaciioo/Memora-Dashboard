@@ -25,5 +25,10 @@
   "ceremonySlamMs": 1600,
   "ceremonyFlyMs": 900,
   "ceremonyConfetti": 40,
-  "ceremonyBurstPx": 340
+  "ceremonyBurstPx": 340,
+  "firstPeriodLives": 7,
+  "secondPeriodLives": 6,
+  "maxObjectives": 2,
+  "thirdPeriodMinDays": 3,
+  "thirdPeriodMaxDays": 30
 }

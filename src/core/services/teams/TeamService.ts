@@ -9,7 +9,7 @@ import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { TEAM_FIELD_COPY, TEAM_FIELD_INFO } from '@/declarations/teams/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { TeamBoardData } from '@/types/teams'
-import { MemberStatuses } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 
 /**
  * Build the team form declarations
@@ -80,7 +80,7 @@ export const readTeamBoard = async (
       orderBy: [{ archived: 'asc' }, { name: 'asc' }],
     }),
     prisma.account.findMany({
-      where: { status: { not: MemberStatuses.Left }, teamMemberships: { none: {} } },
+      where: { status: { notIn: GONE_MEMBER_STATUSES }, teamMemberships: { none: {} } },
       orderBy: { displayName: 'asc' },
     }),
   ])

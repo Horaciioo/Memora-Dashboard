@@ -2,6 +2,7 @@ import 'server-only'
 
 import { countAccompaniedLives } from '@/core/lib/academy/lives'
 import { prisma } from '@/core/lib/db'
+import { syncStages } from '@/core/services/academy/ParkourService'
 import { AcademyJuniorStatuses, AcademySessionStatuses } from '@/utils/constants/hierarchy'
 import type { LiveStatusName } from '@/utils/constants/lives'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
@@ -54,6 +55,9 @@ export const syncJuniorLives = async (accountIds: string[]): Promise<string[]> =
     await prisma.academyJunior.update({ where: { id: junior.id }, data: { liveCount: count } })
     changed.push(junior.id)
   }
+
+  // A threshold reached brings the check-in due
+  await syncStages(changed)
 
   return changed
 }

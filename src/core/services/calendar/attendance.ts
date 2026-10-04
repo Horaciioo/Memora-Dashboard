@@ -9,7 +9,7 @@ import { syncJuniorLives } from '@/core/services/academy/LiveCountService'
 import { notify } from '@/core/services/system/NotificationService'
 import { peopleInScope } from '@/core/services/work/shared'
 import type { AttendancePerson, AttendanceRoster } from '@/types/calendar'
-import { MemberStatuses } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
@@ -55,7 +55,7 @@ export const expandRoster = async (
   const accounts = await prisma.account.findMany({
     where: {
       id: { in: candidates },
-      status: { not: MemberStatuses.Left },
+      status: { notIn: GONE_MEMBER_STATUSES },
       ...peopleInScope(scope),
     },
     select: { id: true },

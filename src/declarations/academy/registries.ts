@@ -59,7 +59,8 @@ export const ACADEMY_SESSION_STATUS_REGISTRY = createRegistry(SESSION_STATUS_MAP
 const JUNIOR_STATUS_MAP: Record<AcademyJuniorStatusName, AcademyOption> = {
   [AcademyJuniorStatuses.Active]: { label: 'En formation', accent: 'warning' },
   [AcademyJuniorStatuses.Validated]: { label: 'Validé', accent: 'success' },
-  [AcademyJuniorStatuses.Stopped]: { label: 'Arrêté', accent: 'neutral' },
+  [AcademyJuniorStatuses.Stopped]: { label: 'Destitué', accent: 'danger' },
+  [AcademyJuniorStatuses.Resigned]: { label: 'Démissionnaire', accent: 'neutral' },
 }
 
 export const ACADEMY_JUNIOR_STATUS_REGISTRY = createRegistry(JUNIOR_STATUS_MAP)
@@ -98,11 +99,11 @@ export const ACADEMY_STEP_KIND_REGISTRY = createRegistry(STEP_KIND_MAP)
 
 const STAGE_MAP: Record<AcademyStageName, AcademyOption> = {
   [AcademyStages.Preparation]: { label: 'Préparation', accent: 'neutral' },
-  [AcademyStages.Discovery]: { label: 'Découverte', accent: 'info' },
-  [AcademyStages.ReviewOne]: { label: 'Bilan 1', accent: 'warning' },
-  [AcademyStages.Practice]: { label: 'Pratique', accent: 'brand' },
-  [AcademyStages.ReviewFinal]: { label: 'Bilan final', accent: 'warning' },
-  [AcademyStages.Bonus]: { label: 'Bonus', accent: 'success' },
+  [AcademyStages.Discovery]: { label: 'Période 1', accent: 'info' },
+  [AcademyStages.ReviewOne]: { label: 'Bilan de 1ère phase', accent: 'warning' },
+  [AcademyStages.Practice]: { label: 'Période 2', accent: 'brand' },
+  [AcademyStages.ReviewFinal]: { label: 'Bilan de 2e phase', accent: 'warning' },
+  [AcademyStages.Bonus]: { label: 'Période 3', accent: 'caution' },
 }
 
 export const ACADEMY_STAGE_REGISTRY = createRegistry(STAGE_MAP)
@@ -139,9 +140,9 @@ const OBJECTIVE_STATUS_MAP: Record<ObjectiveStatusName, AcademyOption> = {
 export const OBJECTIVE_STATUS_REGISTRY = createRegistry(OBJECTIVE_STATUS_MAP)
 
 const REVIEW_ADVICE_MAP: Record<ReviewAdviceName, AcademyOption> = {
-  [ReviewAdvices.Pass]: { label: 'Passe à la suite', accent: 'success' },
-  [ReviewAdvices.Bonus]: { label: 'Période bonus', accent: 'info' },
-  [ReviewAdvices.Stop]: { label: 'Arrêt du suivi', accent: 'danger' },
+  [ReviewAdvices.Pass]: { label: 'Pour son officialisation', accent: 'success' },
+  [ReviewAdvices.Bonus]: { label: 'Préconise une 3e période', accent: 'info' },
+  [ReviewAdvices.Stop]: { label: 'Contre son officialisation', accent: 'danger' },
 }
 
 export const REVIEW_ADVICE_REGISTRY = createRegistry(REVIEW_ADVICE_MAP)

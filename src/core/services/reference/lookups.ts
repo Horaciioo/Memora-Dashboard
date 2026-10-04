@@ -4,7 +4,7 @@ import { cache } from 'react'
 
 import { prisma } from '@/core/lib/db'
 import { ENCADREMENT_ROLES } from '@/declarations/access/roles'
-import { MemberStatuses } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 import type { Account, Division, JobFunction, Priority, Youtuber } from '@prisma/client'
 
 /**
@@ -32,7 +32,7 @@ export const activeYoutubers = cache(async (): Promise<Youtuber[]> =>
 
 export const encadrementAccounts = cache(async (): Promise<Account[]> =>
   prisma.account.findMany({
-    where: { role: { in: ENCADREMENT_ROLES }, status: { not: MemberStatuses.Left } },
+    where: { role: { in: ENCADREMENT_ROLES }, status: { notIn: GONE_MEMBER_STATUSES } },
     orderBy: { displayName: 'asc' },
   })
 )

@@ -41,10 +41,19 @@ export interface HomeMeeting {
 
 /**
  * Where a home task comes from
- * @typedef {'pimStep' | 'assignTrainer' | 'launchPim' | 'training'} HomeTaskKind
+ * @typedef {string} HomeTaskKind
  */
 
-export type HomeTaskKind = 'pimStep' | 'assignTrainer' | 'launchPim' | 'training'
+export type HomeTaskKind =
+  | 'pimStep'
+  | 'assignTrainer'
+  | 'launchPim'
+  | 'training'
+  | 'declareKickoff'
+  | 'pimReview'
+  | 'pimDecision'
+  | 'secondPeriod'
+  | 'departure'
 
 /**
  * One thing the member has to do, computed and never stored
@@ -59,6 +68,7 @@ export type HomeTaskKind = 'pimStep' | 'assignTrainer' | 'launchPim' | 'training
  * @property {string | null} guide - Detailed walkthrough, markdown
  * @property {string | null} destinationLabel - Name of the place it opens
  * @property {string | null} dueAt - ISO planned day
+ * @property {{ id: string, body: string } | null} [announcement] - Text to copy then mark published
  */
 
 export interface HomeTask {
@@ -72,6 +82,7 @@ export interface HomeTask {
   guide: string | null
   destinationLabel: string | null
   dueAt: string | null
+  announcement?: { id: string; body: string } | null
 }
 
 /**

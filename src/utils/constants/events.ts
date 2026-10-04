@@ -48,6 +48,7 @@ export const EVENT_TYPES = createEnumeration({
   PlatformLinked: { id: 39, label: 'Compte de plateforme lié' },
   ModerationActed: { id: 40, label: 'Geste de modération' },
   LiveRosterMoved: { id: 41, label: 'Appel d’un live corrigé' },
+  ParkourMoved: { id: 42, label: 'AcademicParkour' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

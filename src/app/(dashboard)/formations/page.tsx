@@ -2,13 +2,14 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { CourseCatalog } from '@/composites/academy/course/CourseCatalog'
+import { SpecialisationsBubble } from '@/composites/academy/course/SpecialisationsBubble'
 import { TrainingsWelcome } from '@/composites/academy/course/TrainingsWelcome'
 import { hasSeenGuide } from '@/core/services/preferences/GuideService'
 import { COURSE_SURFACE_REGISTRY } from '@/declarations/academy/registries'
 import { GUIDE_KEYS } from '@/declarations/academy/welcome'
 import { TrainingsPanel } from '@/composites/academy/TrainingsPanel'
 import { myTrainings, resolveOwnJunior } from '@/core/services/academy/AcademyService'
-import { listCourses } from '@/core/services/academy/CurriculumService'
+import { listCourses, PRACTICE_STAGES } from '@/core/services/academy/CurriculumService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { ACADEMY_COPY, COURSE_COPY } from '@/declarations/academy/copy'
 import { isEncadrement } from '@/declarations/access/roles'
@@ -38,11 +39,16 @@ export default async function TrainingsPage({
     redirect(ROUTES.home)
   }
 
-  const [junior, courses, seen] = await Promise.all([
+  const [junior, courses, seen, seenSpecialisations] = await Promise.all([
     resolveOwnJunior(session.id),
     listCourses(session),
     hasSeenGuide(session.id, GUIDE_KEYS.trainingsWelcome),
+    hasSeenGuide(session.id, GUIDE_KEYS.specialisations),
   ])
+
+  // Second period reached: the specialisations open, said once
+  const showSpecialisations =
+    !seenSpecialisations && junior !== null && PRACTICE_STAGES.includes(junior.stage)
 
   // First visit opens the welcome, sized on the mandatory courses
   const mandatory = courses.filter((course) => course.track === 'indispensable')
@@ -61,6 +67,7 @@ export default async function TrainingsPage({
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={ACADEMY_COPY.myTrainingsTitle} />
       {showWelcome && <TrainingsWelcome mandatory={mandatory.length} trade={trade} />}
+      {!showWelcome && showSpecialisations && <SpecialisationsBubble />}
       <CourseCatalog
         courses={courses}
         celebrate={typeof celebrate === 'string' ? celebrate : null}

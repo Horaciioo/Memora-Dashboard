@@ -202,8 +202,9 @@ export const findAdmission = async (
   sessionId: string,
   discordId: string
 ): Promise<PendingAdmission | null> => {
+  // A seat opens to its form once a responsable declared the PIM start
   const row = await prisma.academyJunior.findFirst({
-    where: { sessionId, account: { discordId }, confirmedAt: null },
+    where: { sessionId, account: { discordId }, confirmedAt: null, kickoffAt: { not: null } },
     select: {
       id: true,
       accountId: true,

@@ -19,7 +19,7 @@ import { integrationFailure } from '@/core/services/onboarding/redirects'
 import { AUTH_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
-import { MemberStatuses } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 
 export const GET = createRedirectRoute({
   rateLimit: 'signIn',
@@ -66,7 +66,8 @@ export const GET = createRedirectRoute({
     // Discord proves who they are, the dashboard decides whether they may enter
     const account = await resolveDiscordAccount(identity)
     if (!account) throw notAuthenticated(SIGN_IN_ERRORS.Unknown)
-    if (account.status === MemberStatuses.Left) throw notAuthenticated(SIGN_IN_ERRORS.Revoked)
+    if (GONE_MEMBER_STATUSES.includes(account.status))
+      throw notAuthenticated(SIGN_IN_ERRORS.Revoked)
 
     const { token, expiresAt } = await openSession(account.id, {
       userAgent: request.headers.get('user-agent') ?? undefined,

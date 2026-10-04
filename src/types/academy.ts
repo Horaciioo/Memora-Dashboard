@@ -1,3 +1,4 @@
+import type { ParkourPhase } from '@/core/lib/academy/parkour'
 import type { TimelineStepState } from '@/core/services/academy/timeline'
 import type { PimDestinationName } from '@/declarations/academy/guides'
 import type { CourseSurface, CourseTrack } from '@/declarations/academy/curriculum/types'
@@ -296,6 +297,8 @@ export interface AcademyReviewView {
   feeling: string | null
   summary: string
   advice: ReviewAdviceName
+  // Outcome the responsable kept
+  decision: ReviewAdviceName | null
   status: ReviewStatusName
   decidedByName: string | null
   decidedAt: string | null
@@ -462,10 +465,11 @@ export interface ContentChapterView {
 
 /**
  * Why the step in course cannot move yet
- * @typedef {'notStarted' | 'awaitingReview' | 'closed'} PimTimelineLock
+ * @typedef {'notStarted' | 'awaitingReview' | 'awaitingDecision' | 'standby' | 'closed'} PimTimelineLock
  */
 
-export type PimTimelineLock = 'notStarted' | 'awaitingReview' | 'closed'
+export type PimTimelineLock =
+  'notStarted' | 'awaitingReview' | 'awaitingDecision' | 'standby' | 'closed'
 
 /**
  * Place of a step against the one in course
@@ -645,4 +649,30 @@ export interface TrainingFeedbackSummary {
   content: number | null
   fluency: number | null
   comments: TrainingFeedbackComment[]
+}
+
+/**
+ * Where one junior stands on the AcademicParkour, with the gestures open
+ * @typedef {Object} ParkourView
+ * @property {string} juniorId - Junior identifier
+ * @property {string} sessionId - Promotion
+ * @property {ParkourPhase} phase - Phase
+ * @property {number} liveCount - Lives where they were present
+ * @property {number | null} livesNeeded - Lives before the next check-in
+ * @property {string | null} deadlineAt - Third period deadline
+ * @property {string | null} integrationPath - Integration link, while awaited
+ * @property {boolean} canLaunchAnyway - Promotion launchable by hand
+ * @property {boolean} canOpenSecondPeriod - Second period openable by hand
+ */
+
+export interface ParkourView {
+  juniorId: string
+  sessionId: string
+  phase: ParkourPhase
+  liveCount: number
+  livesNeeded: number | null
+  deadlineAt: string | null
+  integrationPath: string | null
+  canLaunchAnyway: boolean
+  canOpenSecondPeriod: boolean
 }

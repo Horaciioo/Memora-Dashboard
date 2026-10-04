@@ -124,6 +124,8 @@ const MEMBER_STATUS_MAP: Record<MemberStatusName, MemberStatusOption> = {
   [MemberStatuses.Active]: { label: 'Actif', accent: 'success' },
   [MemberStatuses.Paused]: { label: 'En pause', accent: 'warning' },
   [MemberStatuses.Left]: { label: 'Parti', accent: 'neutral' },
+  [MemberStatuses.Dismissed]: { label: 'Destitué', accent: 'danger' },
+  [MemberStatuses.Resigned]: { label: 'Démissionnaire', accent: 'neutral' },
 }
 
 export const MEMBER_STATUS_REGISTRY = createRegistry(MEMBER_STATUS_MAP)

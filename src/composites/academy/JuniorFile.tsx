@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { StatusText } from '@/components/elements/display/StatusText'
 import { Markdown } from '@/components/elements/display/Markdown'
@@ -18,13 +19,20 @@ import { Section } from '@/components/structures/Section'
 import { StepTimeline, type TimelineStep } from '@/components/structures/StepTimeline'
 import { JuniorRail } from '@/composites/academy/JuniorRail'
 import { MEMBER_FILE } from '@/declarations/ui/blocks'
+import { ParkourPanel } from '@/composites/academy/ParkourPanel'
 import { PimTimelineBoard } from '@/composites/academy/PimTimelineBoard'
 import { FSI_TABS, GUIDE_BEACONS } from '@/declarations/academy/guides'
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
 import { useJuniorFile } from '@/core/hooks/data/useJuniorFile'
+import { advicesFor, decisionsFor } from '@/core/lib/academy/parkour'
 import { COURSE_COPY, ACADEMY_COPY, ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
+import {
+  PARKOUR_COPY,
+  PARKOUR_DECISION_CONFIRM,
+  PARKOUR_DECISIONS,
+} from '@/declarations/academy/parkour'
 import {
   ACADEMY_STAGE_REGISTRY,
   NOTE_KIND_REGISTRY,
@@ -32,7 +40,7 @@ import {
   REVIEW_ADVICE_REGISTRY,
   REVIEW_STATUS_REGISTRY,
 } from '@/declarations/academy/registries'
-import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
+import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 
@@ -44,16 +52,38 @@ import type {
   JuniorObjectiveView,
   JuniorSkillView,
   JuniorView,
+  ParkourView,
 } from '@/types/academy'
 import type { FieldDefinition } from '@/types/forms'
-import { AcademyJuniorStatuses, AcademyStages, ReviewStatuses } from '@/utils/constants/hierarchy'
+import {
+  AcademyJuniorStatuses,
+  AcademyStages,
+  ReviewAdvices,
+  ReviewStatuses,
+} from '@/utils/constants/hierarchy'
+import type { ReviewAdviceName } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
 import { formatDay } from '@/utils/format/dates'
 
-// Reference collection holding the training modules
-
 // Single drop container, objectives only reorder within their own list
 const CONTAINER = 'objectives'
+
+// Third period decision, its deadline then a note
+const THIRD_PERIOD_FIELDS: FieldDefinition[] = [
+  {
+    name: 'deadlineAt',
+    kind: 'date',
+    label: PARKOUR_COPY.deadline,
+    hint: PARKOUR_COPY.deadlineHint,
+    required: true,
+  },
+  {
+    name: 'decisionNote',
+    kind: 'textarea',
+    label: ACADEMY_FIELD_COPY.decisionNote,
+    maxLength: FORM_SETTINGS.noteMaxLength,
+  },
+]
 
 export interface JuniorFileProps {
   initialJunior: JuniorView
@@ -62,6 +92,7 @@ export interface JuniorFileProps {
   initialObjectives: JuniorObjectiveView[]
   initialReviews: AcademyReviewView[]
   initialTimeline: PimTimeline
+  parkour: ParkourView | null
   initialTab?: string
   sessionFunctionName: string
   juniorFields: FieldDefinition[]
@@ -72,6 +103,7 @@ export interface JuniorFileProps {
   canWriteSkills: boolean
   canReadNotes: boolean
   canWriteNotes: boolean
+  canReadObjectives: boolean
   canWriteObjectives: boolean
   canReadReviews: boolean
   canWriteReviews: boolean
@@ -86,6 +118,7 @@ export interface JuniorFileProps {
  * @param {JuniorObjectiveView[]} initialObjectives - Objectives resolved server-side
  * @param {AcademyReviewView[]} initialReviews - Check-ins resolved server-side
  * @param {PimTimeline} initialTimeline - Vertical timeline resolved server-side
+ * @param {ParkourView | null} parkour - AcademicParkour standing, none for the junior
  * @param {string} [initialTab] - Tab a walkthrough opens on
  * @param {string} sessionFunctionName - Function the session is scoped to
  * @param {FieldDefinition[]} juniorFields - Declarations of the junior form
@@ -96,6 +129,7 @@ export interface JuniorFileProps {
  * @param {boolean} canWriteSkills - Member may move a competency
  * @param {boolean} canReadNotes - Member may read the notes
  * @param {boolean} canWriteNotes - Member may write a note
+ * @param {boolean} canReadObjectives - Member may read the objectives, never the junior
  * @param {boolean} canWriteObjectives - Member may set objectives
  * @param {boolean} canReadReviews - Member may read the check-ins
  * @param {boolean} canWriteReviews - Member may write a check-in
@@ -110,6 +144,7 @@ export const JuniorFile = ({
   initialObjectives,
   initialReviews,
   initialTimeline,
+  parkour,
   initialTab,
   sessionFunctionName,
   juniorFields,
@@ -120,6 +155,7 @@ export const JuniorFile = ({
   canWriteSkills,
   canReadNotes,
   canWriteNotes,
+  canReadObjectives,
   canWriteObjectives,
   canReadReviews,
   canWriteReviews,
@@ -141,10 +177,32 @@ export const JuniorFile = ({
   const [pendingNote, setPendingNote] = useState<JuniorNoteView | null>(null)
   const [pendingObjective, setPendingObjective] = useState<JuniorObjectiveView | null>(null)
   const [pendingReview, setPendingReview] = useState<AcademyReviewView | null>(null)
+  const router = useRouter()
   const [decidingReview, setDecidingReview] = useState<{
     review: AcademyReviewView
-    accept: boolean
+    decision: ReviewAdviceName | null
   } | null>(null)
+
+  // Third period asks for its deadline in a drawer, every other outcome a confirmation
+  const opensThirdPeriod =
+    decidingReview?.decision === ReviewAdvices.Bonus &&
+    decidingReview.review.stage === AcademyStages.ReviewFinal
+
+  const decide = async (values?: { deadlineAt?: string; decisionNote?: string }) => {
+    if (!decidingReview) return false
+
+    const done = await file.decideReview(decidingReview.review.id, {
+      decision: decidingReview.decision ?? undefined,
+      bounce: decidingReview.decision === null,
+      ...values,
+    })
+    if (done) {
+      setDecidingReview(null)
+      router.refresh()
+    }
+
+    return done
+  }
 
   const { junior } = file
   const isReady = junior.mandatoryPending === 0
@@ -202,7 +260,10 @@ export const JuniorFile = ({
 
   const timelineTab = () => (
     <Section title={ACADEMY_COPY.timelineTab} raised>
-      <PimTimelineBoard initialTimeline={initialTimeline} canAdvance={canManage} />
+      <div className="flex flex-col gap-6">
+        {parkour && <ParkourPanel parkour={parkour} canManage={canManage} />}
+        <PimTimelineBoard initialTimeline={initialTimeline} canAdvance={canManage} />
+      </div>
     </Section>
   )
 
@@ -228,7 +289,7 @@ export const JuniorFile = ({
             { label: ACADEMY_FIELD_COPY.trainer, value: junior.trainer?.name },
             {
               label: ACADEMY_FIELD_COPY.liveCount,
-              value: `${junior.liveCount} / ${ACADEMY_SETTINGS.maxLives + junior.bonusLives}`,
+              value: String(junior.liveCount),
             },
             { label: ACADEMY_FIELD_COPY.startsAt, value: formatDay(junior.startedAt) },
             {
@@ -586,7 +647,9 @@ export const JuniorFile = ({
           <div className="flex flex-col gap-4">
             {file.reviews.map((review) => {
               const reviewStatus = REVIEW_STATUS_REGISTRY.get(review.status)
-              const advice = REVIEW_ADVICE_REGISTRY.get(review.advice)
+              const advises = advicesFor(review.stage).includes(review.advice)
+              const decisions = decisionsFor(review.stage)
+              const labels = PARKOUR_DECISIONS[review.stage] ?? {}
               const isDraft = review.status === ReviewStatuses.Draft
               const isSubmitted = review.status === ReviewStatuses.Submitted
 
@@ -614,7 +677,18 @@ export const JuniorFile = ({
                         .join(' · ')}
                     </span>
                     <StatusText label={reviewStatus.label} accent={reviewStatus.accent} />
-                    <StatusText label={advice.label} accent={advice.accent} />
+                    {advises && (
+                      <StatusText
+                        label={REVIEW_ADVICE_REGISTRY.label(review.advice)}
+                        accent={REVIEW_ADVICE_REGISTRY.get(review.advice).accent}
+                      />
+                    )}
+                    {review.decision && labels[review.decision] && (
+                      <StatusText
+                        label={labels[review.decision] ?? ''}
+                        accent={review.decision === ReviewAdvices.Stop ? 'danger' : 'success'}
+                      />
+                    )}
                     <span className="ml-auto flex items-center gap-1">
                       {isDraft && canWriteReviews && (
                         <>
@@ -623,26 +697,37 @@ export const JuniorFile = ({
                             icon="forward"
                             onClick={() => void file.submitReview(review.id)}
                           >
-                            {ACADEMY_COPY.reviewSubmit}
+                            {review.stage === AcademyStages.ReviewOne
+                              ? PARKOUR_COPY.submitFirst
+                              : PARKOUR_COPY.submit}
                           </Button>
                         </>
                       )}
                       {isSubmitted && canValidateReviews && (
                         <>
                           <Button
-                            variant="danger"
-                            icon="close"
-                            onClick={() => setDecidingReview({ review, accept: false })}
+                            variant="ghost"
+                            icon="back"
+                            onClick={() => setDecidingReview({ review, decision: null })}
                           >
-                            {ACADEMY_COPY.reviewReject}
+                            {PARKOUR_COPY.bounce}
                           </Button>
-                          <Button
-                            variant="primary"
-                            icon="confirm"
-                            onClick={() => setDecidingReview({ review, accept: true })}
-                          >
-                            {ACADEMY_COPY.reviewValidate}
-                          </Button>
+                          {decisions.map((decision) => (
+                            <Button
+                              key={decision}
+                              variant={
+                                decision === ReviewAdvices.Stop
+                                  ? 'danger'
+                                  : decision === ReviewAdvices.Pass
+                                    ? 'primary'
+                                    : 'secondary'
+                              }
+                              icon={decision === ReviewAdvices.Stop ? 'close' : 'confirm'}
+                              onClick={() => setDecidingReview({ review, decision })}
+                            >
+                              {labels[decision]}
+                            </Button>
+                          ))}
                         </>
                       )}
                     </span>
@@ -717,12 +802,16 @@ export const JuniorFile = ({
                 render: skillsTab,
               },
               { value: 'notes', label: ACADEMY_COPY.tabNotes, icon: 'note', render: notesTab },
-              {
-                value: 'objectives',
-                label: ACADEMY_COPY.tabObjectives,
-                icon: 'objective',
-                render: objectivesTab,
-              },
+              ...(canReadObjectives
+                ? [
+                    {
+                      value: 'objectives',
+                      label: ACADEMY_COPY.tabObjectives,
+                      icon: 'objective' as const,
+                      render: objectivesTab,
+                    },
+                  ]
+                : []),
               {
                 value: 'reviews',
                 label: ACADEMY_COPY.tabReviews,
@@ -828,25 +917,40 @@ export const JuniorFile = ({
       />
 
       <ConfirmDialog
-        open={decidingReview !== null}
+        open={decidingReview !== null && !opensThirdPeriod}
         title={
-          decidingReview?.accept ? ACADEMY_COPY.reviewValidateTitle : ACADEMY_COPY.reviewRejectTitle
+          decidingReview?.decision
+            ? (PARKOUR_DECISIONS[decidingReview.review.stage]?.[decidingReview.decision] ?? '')
+            : PARKOUR_COPY.bounce
         }
         description={
-          decidingReview?.accept
-            ? ACADEMY_COPY.reviewValidateDescription
+          decidingReview?.decision
+            ? PARKOUR_DECISION_CONFIRM[decidingReview.decision]
             : ACADEMY_COPY.reviewRejectDescription
         }
-        tone={decidingReview?.accept ? 'success' : 'danger'}
+        tone={decidingReview?.decision === ReviewAdvices.Stop ? 'danger' : 'success'}
         pending={file.isSaving}
         onCancel={() => setDecidingReview(null)}
         onConfirm={async () => {
-          await file.decideReview(
-            decidingReview!.review.id,
-            decidingReview!.accept ? 'VALIDATED' : 'REJECTED'
-          )
-          setDecidingReview(null)
+          await decide()
         }}
+      />
+
+      <FormDrawer
+        subject={FORM_SUBJECTS.review}
+        open={opensThirdPeriod}
+        title={PARKOUR_DECISIONS[AcademyStages.ReviewFinal]?.[ReviewAdvices.Bonus] ?? ''}
+        description={PARKOUR_DECISION_CONFIRM[ReviewAdvices.Bonus]}
+        fields={THIRD_PERIOD_FIELDS}
+        issues={file.issues}
+        isSaving={file.isSaving}
+        onSubmit={(values) =>
+          decide({
+            deadlineAt: typeof values.deadlineAt === 'string' ? values.deadlineAt : undefined,
+            decisionNote: typeof values.decisionNote === 'string' ? values.decisionNote : undefined,
+          })
+        }
+        onClose={() => setDecidingReview(null)}
       />
     </div>
   )

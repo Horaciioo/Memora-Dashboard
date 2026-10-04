@@ -4,7 +4,7 @@ import { prisma } from '@/core/lib/db'
 import { conflict, notFound } from '@/core/lib/errors'
 import { FLOOR_ROLE } from '@/declarations/access/roles'
 import { isIconName } from '@/declarations/ui/icons'
-import { MemberStatuses } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 import type { AccessCategoryName, MemberRoleName } from '@/utils/constants/hierarchy'
 import { FunctionKinds } from '@/utils/constants/workflow'
 import type { FunctionKindName } from '@/utils/constants/workflow'
@@ -209,7 +209,7 @@ export const deleteJobFunction = async (id: string): Promise<void> => {
 
 export const readAccessRoster = async (): Promise<AccessMember[]> => {
   const rows = await prisma.account.findMany({
-    where: { status: { not: MemberStatuses.Left } },
+    where: { status: { notIn: GONE_MEMBER_STATUSES } },
     orderBy: { displayName: 'asc' },
     select: {
       id: true,

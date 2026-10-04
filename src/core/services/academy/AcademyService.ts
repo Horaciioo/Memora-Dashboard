@@ -3,10 +3,11 @@ import 'server-only'
 import crypto from 'crypto'
 
 import { decryptField, encryptField } from '@/core/lib/crypto'
+import { decisionEffect, decisionsFor } from '@/core/lib/academy/parkour'
 import { prisma } from '@/core/lib/db'
 import { WEEK_GRID_DAYS, addDays, startOfDay } from '@/utils/format/days'
 import { activeFunctions } from '@/core/services/reference/lookups'
-import { conflict, notFound } from '@/core/lib/errors'
+import { conflict, invalidInput, notFound } from '@/core/lib/errors'
 import { functionOptions, rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import { resolveStepState } from '@/core/services/academy/timeline'
@@ -15,21 +16,22 @@ import {
   instantiateSessionSteps,
   rescheduleSteps,
 } from '@/core/services/academy/timelineSteps'
-import { graduateAccount } from '@/core/services/academy/AdmissionService'
 import { memberOptions, toPerson } from '@/core/services/work/shared'
 import { countCleared } from '@/core/lib/curriculum/progress'
 import { ACADEMY_COPY, ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
+import { PARKOUR_COPY } from '@/declarations/academy/parkour'
+import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { courseByKey } from '@/declarations/academy/curriculum'
 import {
   ACADEMY_STAGE_REGISTRY,
   ACADEMY_STEP_KIND_REGISTRY,
-  ACADEMY_JUNIOR_STATUS_REGISTRY,
   ACADEMY_SESSION_STATUS_REGISTRY,
   NOTE_KIND_REGISTRY,
   OBJECTIVE_STATUS_REGISTRY,
   REVIEW_ADVICE_REGISTRY,
 } from '@/declarations/academy/registries'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { LIBRARY_SKILL_NAMES } from '@/declarations/reference/library'
 import type {
   AcademyStepView,
   AcademyReviewView,
@@ -45,15 +47,15 @@ import type {
 } from '@/types/academy'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import {
+  GONE_MEMBER_STATUSES,
   AcademyJuniorStatuses,
   AcademySessionStatuses,
   AcademyStages,
-  MemberStatuses,
+  AcademyStepKinds,
   NoteKinds,
   ObjectiveStatuses,
   ReviewAdvices,
   ReviewStatuses,
-  AcademyStepKinds,
   TrainingStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
@@ -171,24 +173,6 @@ export const juniorFields = async (sessionId: string): Promise<FieldDefinition[]
       span: 'half',
     },
     {
-      name: 'status',
-      kind: 'select',
-      label: ACADEMY_FIELD_COPY.juniorStatus,
-      required: true,
-      options: toOptions(ACADEMY_JUNIOR_STATUS_REGISTRY),
-      mark: 'dot',
-      span: 'half',
-    },
-    {
-      name: 'bonusLives',
-      kind: 'number',
-      label: ACADEMY_FIELD_COPY.bonusLives,
-      hint: ACADEMY_FIELD_COPY.bonusLivesHint,
-      min: 0,
-      max: ACADEMY_SETTINGS.bonusMaxLives,
-      span: 'half',
-    },
-    {
       name: 'summary',
       kind: 'textarea',
       label: ACADEMY_FIELD_COPY.juniorSummary,
@@ -288,6 +272,8 @@ export const REVIEW_FIELDS: FieldDefinition[] = [
     options: toOptions(REVIEW_ADVICE_REGISTRY),
     mark: 'dot',
     span: 'half',
+    // The first check-in carries no advice, the responsable alone decides
+    visibleWhen: { field: 'stage', oneOf: [AcademyStages.ReviewFinal, AcademyStages.Bonus] },
   },
   {
     name: 'feeling',
@@ -396,7 +382,7 @@ export const OBJECTIVE_FIELDS: FieldDefinition[] = [
 export const juniorCandidates = async (sessionId: string): Promise<FieldOption[]> => {
   const accounts = await prisma.account.findMany({
     where: {
-      status: { not: MemberStatuses.Left },
+      status: { notIn: GONE_MEMBER_STATUSES },
       academyJuniors: { none: { sessionId } },
     },
     orderBy: { displayName: 'asc' },
@@ -627,6 +613,16 @@ export const startSession = async (
   if (session.status === AcademySessionStatuses.Running) throw conflict()
 
   await ensureLaunchable(id)
+  await launchPromotion(id)
+}
+
+/**
+ * Start a promotion, its confirmed juniors leaving preparation together
+ * @param {string} id - Session identifier
+ * @return {Promise<void>} - Launched
+ */
+
+export const launchPromotion = async (id: string): Promise<void> => {
   await prisma.academySession.update({
     where: { id },
     data: { status: AcademySessionStatuses.Running },
@@ -651,6 +647,12 @@ const ensureLaunchable = async (id: string): Promise<void> => {
   })
 
   if (orphans > 0) throw conflict(ACADEMY_COPY.launchMissingTrainer)
+
+  // Nobody ready means nothing to launch
+  const ready = await prisma.academyJunior.count({
+    where: { sessionId: id, status: AcademyJuniorStatuses.Active, confirmedAt: { not: null } },
+  })
+  if (ready === 0) throw conflict(PARKOUR_COPY.launchNobodyReady)
 }
 
 /**
@@ -665,8 +667,14 @@ const launchSession = async (id: string): Promise<void> => {
 
   await prisma.$transaction([
     prisma.academySession.update({ where: { id }, data: { startsAt } }),
+    // Only the seats whose form came back leave, the others follow once done
     prisma.academyJunior.updateMany({
-      where: { sessionId: id, stage: AcademyStages.Preparation },
+      where: {
+        sessionId: id,
+        stage: AcademyStages.Preparation,
+        status: AcademyJuniorStatuses.Active,
+        confirmedAt: { not: null },
+      },
       data: { stage: AcademyStages.Discovery, startedAt: startsAt },
     }),
   ])
@@ -944,25 +952,16 @@ export const readSession = async (
 }
 
 /**
- * Turn parsed values into a junior payload
+ * Turn parsed values into a junior payload, ends going through the parkour
  * @param {FormValues} values - Parsed body
  * @return {object} - Database payload
  */
 
-const toJuniorData = (values: FormValues) => {
-  const status = (readText(values, 'status') ??
-    AcademyJuniorStatuses.Active) as AcademyJuniorStatusName
-
-  return {
-    trainerId: readText(values, 'trainerId'),
-    dispositifId: readText(values, 'dispositifId'),
-    status,
-    // Validation stamps its own date, so the file always says when it happened
-    validatedAt: status === AcademyJuniorStatuses.Validated ? new Date() : null,
-    bonusLives: readNumberValue(values, 'bonusLives') ?? 0,
-    summary: readText(values, 'summary'),
-  }
-}
+const toJuniorData = (values: FormValues) => ({
+  trainerId: readText(values, 'trainerId'),
+  dispositifId: readText(values, 'dispositifId'),
+  summary: readText(values, 'summary'),
+})
 
 /**
  * Take a moderator into a session, instantiating their own slice of the timeline
@@ -1060,11 +1059,6 @@ export const updateJunior = async (
     data: toJuniorData(values),
     include: { session: true },
   })
-
-  // A validated junior leaves the academy behind, role and function included
-  if (row.status === AcademyJuniorStatuses.Validated) {
-    await graduateAccount(row.accountId, row.session.functionId)
-  }
 
   return listJuniors(row.sessionId, row.session.functionId)
 }
@@ -1315,6 +1309,7 @@ const toReview = (row: {
   feeling: string | null
   summary: string
   advice: ReviewAdviceName
+  decision: ReviewAdviceName | null
   status: ReviewStatusName
   decidedAt: Date | null
   decisionNote: string | null
@@ -1329,6 +1324,7 @@ const toReview = (row: {
   feeling: row.feeling,
   summary: row.summary,
   advice: row.advice,
+  decision: row.decision,
   status: row.status,
   decidedByName: row.decidedBy?.displayName ?? null,
   decidedAt: row.decidedAt?.toISOString() ?? null,
@@ -1481,22 +1477,7 @@ export const submitReview = async (
 }
 
 /**
- * Refuse a decision while a required step of its stage is still open
- * @param {string} juniorId - Junior identifier
- * @param {AcademyStageName} stage - Stage being closed
- * @return {Promise<void>} - Throws when a step is still pending
- */
-
-const ensureStepsCleared = async (juniorId: string, stage: AcademyStageName): Promise<void> => {
-  const pending = await prisma.academyStep.count({
-    where: { juniorId, stage, required: true, validatedAt: null },
-  })
-
-  if (pending > 0) throw conflict()
-}
-
-/**
- * Refuse a decision while a mandatory training is still open
+ * Refuse a graduation while a mandatory training is still open
  * @param {{ session: { functionId: string }, dispositifId: string, accountId: string }} junior - Junior being closed
  * @return {Promise<void>} - Throws when a training is still pending
  */
@@ -1518,85 +1499,11 @@ const ensureTrainingsCleared = async (junior: {
     (training) => training.mandatory && !completed.has(training.id)
   )
 
-  if (mandatoryPending) throw conflict()
+  if (mandatoryPending) throw conflict(ACADEMY_COPY.mandatoryPending)
 }
 
 /**
- * Refuse a decision when the FSI is not ready for it yet
- * @param {{ juniorId: string, stage: AcademyStageName }} review - Review being decided
- * @return {Promise<void>} - Throws when a guard fails
- */
-
-const ensureReadyForDecision = async (review: {
-  juniorId: string
-  stage: AcademyStageName
-}): Promise<void> => {
-  const junior = await prisma.academyJunior.findUniqueOrThrow({
-    where: { id: review.juniorId },
-    include: { session: true },
-  })
-
-  await Promise.all([
-    ensureStepsCleared(review.juniorId, review.stage),
-    ensureTrainingsCleared(junior),
-  ])
-
-  // Only the closing check-ins gate on the objectives written during practice
-  if (review.stage !== AcademyStages.ReviewFinal && review.stage !== AcademyStages.Bonus) return
-
-  const count = await prisma.juniorObjective.count({ where: { juniorId: review.juniorId } })
-  if (count < ACADEMY_SETTINGS.minObjectives) throw conflict()
-}
-
-/**
- * Move a junior forward once their check-in is validated
- * @param {string} juniorId - Junior identifier
- * @param {AcademyStageName} stage - Stage the check-in was held for
- * @param {ReviewAdviceName} advice - Outcome proposed by the Formateur
- * @return {Promise<void>} - Applied
- */
-
-const advanceJunior = async (
-  juniorId: string,
-  stage: AcademyStageName,
-  advice: ReviewAdviceName
-): Promise<void> => {
-  if (advice === ReviewAdvices.Stop) {
-    await prisma.academyJunior.update({
-      where: { id: juniorId },
-      data: { status: AcademyJuniorStatuses.Stopped },
-    })
-    return
-  }
-
-  if (stage === AcademyStages.ReviewOne) {
-    await prisma.academyJunior.update({
-      where: { id: juniorId },
-      data: { stage: AcademyStages.Practice },
-    })
-    return
-  }
-
-  if (stage === AcademyStages.ReviewFinal && advice === ReviewAdvices.Bonus) {
-    await prisma.academyJunior.update({
-      where: { id: juniorId },
-      data: { stage: AcademyStages.Bonus },
-    })
-    return
-  }
-
-  // A passed final check-in, or a closing bonus period, both graduate the junior
-  const junior = await prisma.academyJunior.update({
-    where: { id: juniorId },
-    data: { status: AcademyJuniorStatuses.Validated, validatedAt: new Date() },
-    include: { session: { select: { functionId: true } } },
-  })
-
-  await graduateAccount(junior.accountId, junior.session.functionId)
-}
-
-/**
- * Decide a submitted check-in, the sole gesture that authorises the following stage
+ * Decide a submitted check-in: the responsable keeps an outcome, or sends it back
  * @param {string} id - Review identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {string} decidedById - Who decided
@@ -1613,27 +1520,45 @@ export const decideReview = async (
   const existing = await reviewInScope(id, scope)
   if (existing.status !== ReviewStatuses.Submitted) throw conflict()
 
-  const status = (
-    readText(values, 'status') === ReviewStatuses.Validated
-      ? ReviewStatuses.Validated
-      : ReviewStatuses.Rejected
-  ) as ReviewStatusName
+  // Sent back to the trainer, back to a draft they can rework
+  if (readText(values, 'status') === ReviewStatuses.Rejected) {
+    await prisma.academyReview.update({
+      where: { id },
+      data: {
+        status: ReviewStatuses.Draft,
+        decisionNote: readText(values, 'decisionNote'),
+      },
+    })
 
-  if (status === ReviewStatuses.Validated) await ensureReadyForDecision(existing)
+    return listReviews(existing.juniorId, scope)
+  }
 
-  const row = await prisma.academyReview.update({
+  const decision = readText(values, 'decision') as ReviewAdviceName | null
+  if (!decision || !decisionsFor(existing.stage).includes(decision)) {
+    throw invalidInput([{ field: 'decision', message: FORM_COPY.notAnOption }])
+  }
+
+  // Graduating asks for every mandatory training done
+  if (decisionEffect(existing.stage, decision) === 'graduate') {
+    const junior = await prisma.academyJunior.findUniqueOrThrow({
+      where: { id: existing.juniorId },
+      include: { session: true },
+    })
+    await ensureTrainingsCleared(junior)
+  }
+
+  await prisma.academyReview.update({
     where: { id },
     data: {
-      status,
+      status: ReviewStatuses.Validated,
+      decision,
       decidedById,
       decidedAt: new Date(),
       decisionNote: readText(values, 'decisionNote'),
     },
   })
 
-  if (status === ReviewStatuses.Validated) await advanceJunior(row.juniorId, row.stage, row.advice)
-
-  return listReviews(row.juniorId, scope)
+  return listReviews(existing.juniorId, scope)
 }
 
 /**
@@ -1680,6 +1605,8 @@ export const listJuniorSkills = async (
   const [skills, grades] = await Promise.all([
     prisma.skill.findMany({
       where: {
+        // Only the skills declared in code, retired rows left untouched
+        name: { in: [...LIBRARY_SKILL_NAMES] },
         OR: [{ functionId: null }, { functionId: junior.session.functionId }],
         AND: [{ OR: [{ dispositifId: null }, { dispositifId: junior.dispositifId }] }],
       },
@@ -2064,6 +1991,7 @@ export const resolveOwnJunior = async (
   id: string
   sessionId: string
   dispositifId: string | null
+  stage: AcademyStageName
   session: { functionId: string }
 } | null> =>
   prisma.academyJunior.findFirst({

@@ -29,6 +29,11 @@ export const NOTIFICATION_KINDS = createEnumeration({
   LiveStarted: { id: 20, label: 'Live lancé' },
   LiveCancelled: { id: 21, label: 'Live annulé' },
   LiveReportReady: { id: 22, label: 'Bilan de live prêt' },
+  PimReviewDue: { id: 23, label: 'Bilan de PIM à faire' },
+  PimReviewSubmitted: { id: 24, label: 'Bilan de PIM déposé' },
+  PimLaunched: { id: 25, label: 'PIM lancée' },
+  PimSecondPeriod: { id: 26, label: 'Période 2 lancée' },
+  PimDeparture: { id: 27, label: 'Départ à annoncer' },
 })
 
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids

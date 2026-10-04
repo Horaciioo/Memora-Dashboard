@@ -26,6 +26,8 @@ import {
   instantiateJuniorSteps,
 } from '@/core/services/academy/timelineSteps'
 import { findAdmission } from '@/core/services/academy/AdmissionService'
+import { afterIntegration } from '@/core/services/academy/ParkourService'
+import { PARKOUR_COPY } from '@/declarations/academy/parkour'
 import type { DiscordIdentity } from '@/core/services/auth/DiscordService'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { IntegrationAdmission, IntegrationClaimView, LiveInvite } from '@/types/onboarding'
@@ -75,6 +77,19 @@ export const claimIdentity = async (token: string, identity: DiscordIdentity): P
   // An admitted candidate is expected, their file already waiting for them
   const admission = invite.session ? await findAdmission(invite.session.id, identity.id) : null
 
+  // An admitted seat whose PIM start is not declared yet waits
+  if (!admission && invite.session) {
+    const waiting = await prisma.academyJunior.count({
+      where: {
+        sessionId: invite.session.id,
+        account: { discordId: identity.id },
+        confirmedAt: null,
+        kickoffAt: null,
+      },
+    })
+    if (waiting > 0) throw conflict(PARKOUR_COPY.kickoffPending)
+  }
+
   if (mode.createsAccount && !admission) {
     // A campaign link only opens its promotion to the candidates it admitted
     if (invite.recruitmentSessionId && mode.enrolsAcademy) throw forbidden()
@@ -116,6 +131,7 @@ const admissionPrefill = async (accountId: string): Promise<FormValues> => {
       email: true,
       phone: true,
       birthday: true,
+      celebrateBirthday: true,
       languages: true,
       theme: true,
       fontScale: true,
@@ -127,6 +143,7 @@ const admissionPrefill = async (accountId: string): Promise<FormValues> => {
     email: row.email,
     phone: row.phone,
     birthday: row.birthday ? row.birthday.toISOString().slice(0, 10) : null,
+    celebrateBirthday: row.celebrateBirthday,
     languages: row.languages,
     theme: row.theme,
     fontScale: row.fontScale,
@@ -258,6 +275,13 @@ export const integrationFields = async (
       kind: 'date',
       label: ONBOARDING_FIELD_COPY.birthday,
       required: true,
+      span: 'half',
+      group: ONBOARDING_STEP_COPY.informations,
+    },
+    {
+      name: 'celebrateBirthday',
+      kind: 'toggle',
+      label: ONBOARDING_FIELD_COPY.celebrateBirthday,
       span: 'half',
       group: ONBOARDING_STEP_COPY.informations,
     },
@@ -482,6 +506,7 @@ const confirmAdmission = async (
       email: readText(values, 'email'),
       phone: readText(values, 'phone'),
       birthday: readDate(values, 'birthday'),
+      celebrateBirthday: readFlag(values, 'celebrateBirthday'),
       languages: readList(values, 'languages'),
       theme: readPreference(values, 'theme', THEME_REGISTRY),
       fontScale: readPreference(values, 'fontScale', FONT_SCALE_REGISTRY),
@@ -520,6 +545,9 @@ const confirmAdmission = async (
     dispositifId,
     session.startsAt
   )
+
+  // The last form back launches the promotion, a late one joins it
+  await afterIntegration(admission.juniorId)
 
   return { accountId: admission.accountId, displayName, awaitsApproval: false }
 }
@@ -587,6 +615,7 @@ export const submitIntegration = async (
       email: readText(values, 'email'),
       phone: readText(values, 'phone'),
       birthday: readDate(values, 'birthday'),
+      celebrateBirthday: readFlag(values, 'celebrateBirthday'),
       languages: readList(values, 'languages'),
       theme: readPreference(values, 'theme', THEME_REGISTRY),
       fontScale: readPreference(values, 'fontScale', FONT_SCALE_REGISTRY),

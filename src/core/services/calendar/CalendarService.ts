@@ -39,7 +39,7 @@ import { FORM_GROUPS } from '@/declarations/ui/copy'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { AttendanceRoster, CalendarEntry } from '@/types/calendar'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
-import { MemberStatuses } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
 import { CalendarKinds, CalendarSources, EventVisibilities } from '@/utils/constants/workflow'
 import type { CalendarKindName, EventVisibilityName } from '@/utils/constants/workflow'
@@ -52,7 +52,7 @@ import type { CalendarKindName, EventVisibilityName } from '@/utils/constants/wo
 
 const subjectOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
   const rows = await prisma.account.findMany({
-    where: { status: { not: MemberStatuses.Left }, ...peopleInScope(scope) },
+    where: { status: { notIn: GONE_MEMBER_STATUSES }, ...peopleInScope(scope) },
     orderBy: { displayName: 'asc' },
     select: {
       id: true,

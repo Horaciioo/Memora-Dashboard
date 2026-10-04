@@ -32,6 +32,10 @@ export const ACADEMY_COPY = {
       'La PIM n’est pas encore lancée. Elle démarre quand un Responsable passe la session En cours.',
     awaitingReview:
       'L’étape suivante s’ouvre avec la validation du bilan de fin de période, pas depuis la timeline.',
+    awaitingDecision:
+      'Le bilan est déposé : la timeline est en pause jusqu’à la décision du Responsable.',
+    standby:
+      'Période 1 achevée. La période 2 démarre pour toute la promotion en même temps, rien n’est bloqué en attendant.',
     closed: 'Ce junior n’est plus en formation, sa timeline est figée.',
   },
   launch: 'Lancer la PIM',
@@ -181,6 +185,7 @@ export const ACADEMY_COPY = {
   quizQuestionCountOne: 'question',
   inviteCopyLink: 'Copier le lien d’admission',
   inviteCopied: 'Lien copié',
+  mandatoryPending: 'Une formation obligatoire n’est pas encore terminée.',
 } as const
 
 /**

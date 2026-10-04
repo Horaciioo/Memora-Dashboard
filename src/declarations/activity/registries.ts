@@ -151,6 +151,12 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     verb: 'a corrigé',
     target: 'l’appel d’un live',
   },
+  ParkourMoved: {
+    label: 'PIM',
+    tone: 'brand',
+    verb: 'a fait avancer',
+    target: 'un parcours de PIM',
+  },
 }
 
 export const ACTIVITY_EVENT_REGISTRY = createRegistry(ACTIVITY_EVENT_MAP)

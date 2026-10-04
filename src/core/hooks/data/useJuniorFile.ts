@@ -14,7 +14,24 @@ import type {
   JuniorView,
 } from '@/types/academy'
 import type { FieldIssue, FormValues } from '@/types/forms'
-import type { ReviewStatusName } from '@/utils/constants/hierarchy'
+import { ReviewStatuses } from '@/utils/constants/hierarchy'
+import type { ReviewAdviceName } from '@/utils/constants/hierarchy'
+
+/**
+ * What a responsable sends on a check-in
+ * @typedef {Object} ReviewDecisionInput
+ * @property {ReviewAdviceName} [decision] - Outcome kept
+ * @property {boolean} [bounce] - Sent back to the trainer
+ * @property {string} [deadlineAt] - Third period deadline
+ * @property {string} [decisionNote] - Note
+ */
+
+export interface ReviewDecisionInput {
+  decision?: ReviewAdviceName
+  bounce?: boolean
+  deadlineAt?: string
+  decisionNote?: string
+}
 
 /**
  * Individual follow-up file state and mutations
@@ -41,7 +58,7 @@ import type { ReviewStatusName } from '@/utils/constants/hierarchy'
  * @property {(id: string, values: FormValues) => Promise<boolean>} editReview - Edit a check-in
  * @property {(id: string) => Promise<void>} dropReview - Drop a check-in
  * @property {(id: string) => Promise<void>} submitReview - Submit a check-in for decision
- * @property {(id: string, status: ReviewStatusName, decisionNote?: string) => Promise<void>} decideReview - Decide a check-in
+ * @property {(id: string, input: ReviewDecisionInput) => Promise<boolean>} decideReview - Decide a check-in
  */
 
 export interface JuniorFileState {
@@ -67,7 +84,7 @@ export interface JuniorFileState {
   editReview: (id: string, values: FormValues) => Promise<boolean>
   dropReview: (id: string) => Promise<void>
   submitReview: (id: string) => Promise<void>
-  decideReview: (id: string, status: ReviewStatusName, decisionNote?: string) => Promise<void>
+  decideReview: (id: string, input: ReviewDecisionInput) => Promise<boolean>
 }
 
 /**
@@ -280,13 +297,21 @@ export const useJuniorFile = (
   )
 
   const decideReview = useCallback(
-    async (id: string, status: ReviewStatusName, decisionNote?: string) => {
+    async (id: string, input: ReviewDecisionInput) => {
       const next = await run(
-        () => apiPost<AcademyReviewView[]>(API_ROUTES.reviewDecision(id), { status, decisionNote }),
+        () =>
+          apiPost<AcademyReviewView[]>(API_ROUTES.reviewDecision(id), {
+            status: input.bounce ? ReviewStatuses.Rejected : ReviewStatuses.Validated,
+            decision: input.decision,
+            deadlineAt: input.deadlineAt,
+            decisionNote: input.decisionNote,
+          }),
         feedbackTitle('Bilan', 'saved', 'masculine')
       )
 
       if (next) setReviews(next)
+
+      return next !== null
     },
     [run]
   )

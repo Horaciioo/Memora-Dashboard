@@ -12,6 +12,7 @@ import {
   AcademyJuniorStatuses,
   AcademySessionStatuses,
   AcademyStages,
+  ReviewStatuses,
 } from '@/utils/constants/hierarchy'
 import type { AcademyStageName } from '@/utils/constants/hierarchy'
 import type { Prisma } from '@prisma/client'
@@ -61,7 +62,8 @@ const readJuniorState = async (juniorId: string, scope: Prisma.AcademySessionWhe
       stage: true,
       status: true,
       sessionId: true,
-      session: { select: { status: true } },
+      session: { select: { status: true, secondPeriodAt: true } },
+      reviews: { select: { stage: true, status: true } },
     },
   })
   if (!junior) throw notFound()
@@ -77,11 +79,31 @@ const readJuniorState = async (juniorId: string, scope: Prisma.AcademySessionWhe
  */
 
 const lockOf = (
-  junior: { stage: AcademyStageName; status: string; session: { status: string } },
+  junior: {
+    stage: AcademyStageName
+    status: string
+    session: { status: string; secondPeriodAt: Date | null }
+    reviews: { stage: string; status: string }[]
+  },
   current: StepRow | undefined
 ): PimTimelineLock | null => {
   if (junior.status !== AcademyJuniorStatuses.Active) return 'closed'
   if (junior.session.status !== AcademySessionStatuses.Running) return 'notStarted'
+
+  // A deposited check-in pauses the timeline until the decision
+  if (junior.reviews.some((review) => review.status === ReviewStatuses.Submitted)) {
+    return 'awaitingDecision'
+  }
+
+  // Passage granted, the promotion not yet in period 2
+  const granted = junior.reviews.some(
+    (review) =>
+      review.stage === AcademyStages.ReviewOne && review.status === ReviewStatuses.Validated
+  )
+  if (junior.stage === AcademyStages.ReviewOne && granted && !junior.session.secondPeriodAt) {
+    return 'standby'
+  }
+
   if (!current?.stage) return null
 
   // A check-in decision alone crosses into practice or bonus

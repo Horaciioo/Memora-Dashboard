@@ -37,9 +37,34 @@ export const MemberStatuses = {
   Active: 'ACTIVE',
   Paused: 'PAUSED',
   Left: 'LEFT',
+  Dismissed: 'DISMISSED',
+  Resigned: 'RESIGNED',
 } as const
 
 export type MemberStatusName = (typeof MemberStatuses)[keyof typeof MemberStatuses]
+
+/**
+ * Statuses of a member who is gone, access closed
+ * @type {MemberStatusName[]}
+ */
+
+export const GONE_MEMBER_STATUSES: MemberStatusName[] = [
+  MemberStatuses.Left,
+  MemberStatuses.Dismissed,
+  MemberStatuses.Resigned,
+]
+
+/**
+ * Why a member left during their PIM
+ * @type {Record<string, string>}
+ */
+
+export const DepartureKinds = {
+  Dismissal: 'DISMISSAL',
+  Resignation: 'RESIGNATION',
+} as const
+
+export type DepartureKindName = (typeof DepartureKinds)[keyof typeof DepartureKinds]
 
 /**
  * Academy periods
@@ -88,6 +113,7 @@ export const AcademyJuniorStatuses = {
   Active: 'ACTIVE',
   Validated: 'VALIDATED',
   Stopped: 'STOPPED',
+  Resigned: 'RESIGNED',
 } as const
 
 export type AcademyJuniorStatusName =

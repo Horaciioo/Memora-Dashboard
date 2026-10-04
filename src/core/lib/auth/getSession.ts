@@ -12,7 +12,7 @@ import { touchSession } from '@/core/services/auth/SessionService'
 import { syncReferenceLibrary } from '@/core/services/reference/ReferenceSync'
 import { toDisplayPreferences } from '@/core/services/preferences/DisplayService'
 import { isRootIdentity } from '@/declarations/access/identity'
-import { MemberStatuses } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 import type { SessionUser } from '@/types/auth'
 import type { Account, AccountFunction, Youtuber } from '@prisma/client'
 
@@ -69,7 +69,7 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
   if (!session || session.expiresAt < new Date()) return null
 
   // A member who left keeps no access
-  if (session.account.status === MemberStatuses.Left) return null
+  if (GONE_MEMBER_STATUSES.includes(session.account.status)) return null
 
   // Collections fixed in code sit in the database before anything reads them
   await syncReferenceLibrary().catch((error: unknown) =>
@@ -97,5 +97,5 @@ export const isSessionTokenValid = cache(async (token: string): Promise<boolean>
   })
   if (!session || session.expiresAt < new Date()) return false
 
-  return session.account.status !== MemberStatuses.Left
+  return !GONE_MEMBER_STATUSES.includes(session.account.status)
 })

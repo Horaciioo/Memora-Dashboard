@@ -14,6 +14,7 @@ import {
   listReviews,
   readJunior,
 } from '@/core/services/academy/AcademyService'
+import { readParkour } from '@/core/services/academy/ParkourService'
 import { readTimeline } from '@/core/services/academy/PimTimelineService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { GUIDE_PARAMS } from '@/declarations/academy/guides'
@@ -81,13 +82,17 @@ export default async function JuniorPage({
   const canReadReviews = access.can(Permissions.AcademyReviewRead)
   const canReadNotes = access.can(Permissions.AcademyNoteRead)
 
-  const [fields, skills, notes, objectives, reviews, timeline] = await Promise.all([
+  // A junior never reads their own objectives nor the parkour behind them
+  const isOwnFile = found.junior.accountId === session.id
+  const canReadObjectives = canReadAny && !isOwnFile
+  const [fields, skills, notes, objectives, reviews, timeline, parkour] = await Promise.all([
     juniorFields(found.junior.sessionId),
     listJuniorSkills(juniorId, scope),
     canReadNotes ? listJuniorNotes(juniorId, scope) : Promise.resolve([]),
-    listJuniorObjectives(juniorId, scope),
+    canReadObjectives ? listJuniorObjectives(juniorId, scope) : Promise.resolve([]),
     canReadReviews ? listReviews(juniorId, scope) : Promise.resolve([]),
     readTimeline(juniorId, scope),
+    canReadObjectives ? readParkour(juniorId, scope) : Promise.resolve(null),
   ])
 
   const jobFunction = found.session.function
@@ -105,6 +110,7 @@ export default async function JuniorPage({
         initialObjectives={objectives}
         initialReviews={reviews}
         initialTimeline={timeline}
+        parkour={parkour}
         initialTab={typeof requestedTab === 'string' ? requestedTab : undefined}
         sessionFunctionName={jobFunction.name}
         juniorFields={fields}
@@ -115,6 +121,7 @@ export default async function JuniorPage({
         canWriteSkills={access.can(Permissions.AcademySkillWrite)}
         canReadNotes={canReadNotes}
         canWriteNotes={access.can(Permissions.AcademyNoteWrite)}
+        canReadObjectives={canReadObjectives}
         canWriteObjectives={access.can(Permissions.AcademyObjectiveWrite)}
         canReadReviews={canReadReviews}
         canWriteReviews={access.can(Permissions.AcademyReviewWrite)}

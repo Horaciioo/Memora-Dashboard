@@ -7,7 +7,7 @@ import { syncJuniorLives } from '@/core/services/academy/LiveCountService'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import type { LiveRoster } from '@/types/lives'
-import { MemberRoles } from '@/utils/constants/hierarchy'
+import { AcademyJuniorStatuses, MemberRoles } from '@/utils/constants/hierarchy'
 import { LiveStatuses } from '@/utils/constants/lives'
 import type { LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
@@ -58,7 +58,18 @@ export const readLiveRoster = async (
         where: { eventId: live.calendarEventId },
         select: {
           status: true,
-          account: { select: { id: true, displayName: true, avatarUrl: true, role: true } },
+          account: {
+            select: {
+              id: true,
+              displayName: true,
+              avatarUrl: true,
+              role: true,
+              academyJuniors: {
+                where: { status: AcademyJuniorStatuses.Active },
+                select: { id: true },
+              },
+            },
+          },
         },
         orderBy: { account: { displayName: 'asc' } },
       })
@@ -74,7 +85,8 @@ export const readLiveRoster = async (
       name: row.account.displayName,
       avatar: row.account.avatarUrl,
       status: row.status as AttendanceStatusName,
-      isJunior: row.account.role === MemberRoles.Junior,
+      // A member changing trade counts for their PIM too
+      isJunior: row.account.role === MemberRoles.Junior || row.account.academyJuniors.length > 0,
     })),
   }
 }

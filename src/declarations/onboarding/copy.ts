@@ -83,6 +83,7 @@ export const ONBOARDING_FIELD_COPY = {
   email: 'Adresse e-mail',
   phone: 'Numéro de téléphone',
   birthday: 'Date de naissance',
+  celebrateBirthday: 'Je souhaite que mon anniversaire soit fêté',
   languages: 'Langues maîtrisées',
   discord: 'Compte Discord',
   medical: 'Contraintes pathologiques',

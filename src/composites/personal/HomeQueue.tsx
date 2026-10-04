@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
@@ -10,14 +11,19 @@ import { DetailGrid } from '@/components/structures/DetailGrid'
 import { Drawer } from '@/components/structures/Drawer'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { useAbsences } from '@/core/hooks/data/useAbsences'
+import { useMutation } from '@/core/hooks/data/useMutation'
+import { useCopy } from '@/core/hooks/interaction/useCopy'
+import { apiPost } from '@/core/lib/api/client'
+import { API_ROUTES } from '@/core/lib/api/routes'
 import type { PendingRollCall } from '@/core/services/calendar/attendance'
 import { ABSENCE_COPY } from '@/declarations/absences/copy'
+import { DEPARTURE_COPY } from '@/declarations/academy/parkour'
 import { HOME_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { PERSONAL_COPY, PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { HOME_FLOW, TASK_LIST } from '@/declarations/ui/variants'
+import { DEPARTURE_TASK, HOME_FLOW, TASK_LIST } from '@/declarations/ui/variants'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
 import type { HomeAction, HomeEntry, HomeTask } from '@/types/personal'
@@ -50,6 +56,18 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
     status: AbsenceStatusName
   } | null>(null)
   const [opened, setOpened] = useState<HomeTask | null>(null)
+  const router = useRouter()
+  const copy = useCopy(DEPARTURE_COPY.copied)
+  const { isSaving: isPublishing, run } = useMutation()
+
+  // A published announcement leaves the queue
+  const publish = async (id: string) => {
+    const done = await run(() => apiPost(API_ROUTES.departure(id), {}), DEPARTURE_COPY.published)
+    if (!done) return
+
+    setOpened(null)
+    router.refresh()
+  }
   const [picked, setPicked] = useState<string | null>(null)
   const [isExpanded, setExpanded] = useState(false)
 
@@ -252,24 +270,52 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
           icon={opened.icon}
           subheader={opened.context}
           footer={
-            <Link href={opened.href}>
-              <Button variant="primary" icon="forward">
-                {opened.destinationLabel ? PERSONAL_TASK_COPY.go : PERSONAL_TASK_COPY.goPlain}
-              </Button>
-            </Link>
+            opened.announcement ? (
+              <div className={DEPARTURE_TASK.actions}>
+                <Button
+                  variant="secondary"
+                  icon="copy"
+                  onClick={() => void copy(opened.announcement?.body ?? '')}
+                >
+                  {DEPARTURE_COPY.copy}
+                </Button>
+                <Button
+                  variant="primary"
+                  icon="confirm"
+                  isLoading={isPublishing}
+                  onClick={() => void publish(opened.announcement?.id ?? '')}
+                >
+                  {DEPARTURE_COPY.publish}
+                </Button>
+              </div>
+            ) : (
+              <Link href={opened.href}>
+                <Button variant="primary" icon="forward">
+                  {opened.destinationLabel ? PERSONAL_TASK_COPY.go : PERSONAL_TASK_COPY.goPlain}
+                </Button>
+              </Link>
+            )
           }
         >
           <div className={TASK_LIST.drawer}>
             <DetailGrid
               entries={[
                 { label: PERSONAL_TASK_COPY.what, value: opened.description },
-                { label: PERSONAL_TASK_COPY.where, value: opened.destinationLabel },
-                {
-                  label: PERSONAL_TASK_COPY.due,
-                  value: opened.dueAt ? formatDay(opened.dueAt) : undefined,
-                },
+                // An announcement is done here, no place nor day to show
+                ...(opened.announcement
+                  ? []
+                  : [
+                      { label: PERSONAL_TASK_COPY.where, value: opened.destinationLabel },
+                      {
+                        label: PERSONAL_TASK_COPY.due,
+                        value: opened.dueAt ? formatDay(opened.dueAt) : undefined,
+                      },
+                    ]),
               ]}
             />
+            {opened.announcement && (
+              <pre className={DEPARTURE_TASK.body}>{opened.announcement.body}</pre>
+            )}
             {opened.guide && (
               <div className="flex flex-col gap-2">
                 <span className={TASK_LIST.group}>{PERSONAL_TASK_COPY.guideTitle}</span>

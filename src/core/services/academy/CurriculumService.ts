@@ -25,8 +25,12 @@ import {
 import type { AcademyStageName, TrainingStatusName } from '@/utils/constants/hierarchy'
 import type { Prisma } from '@prisma/client'
 
-// Stages from which the secondary courses open
-const PRACTICE_STAGES: AcademyStageName[] = [
+/**
+ * Stages from which the secondary courses open
+ * @type {AcademyStageName[]}
+ */
+
+export const PRACTICE_STAGES: AcademyStageName[] = [
   AcademyStages.Practice,
   AcademyStages.ReviewFinal,
   AcademyStages.Bonus,

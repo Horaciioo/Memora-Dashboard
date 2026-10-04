@@ -19,6 +19,8 @@ export type NotificationTargetName =
   | 'legacy'
   | 'live'
   | 'liveReport'
+  | 'junior'
+  | 'home'
 
 /**
  * Where one notification leads
@@ -52,6 +54,12 @@ const NOTIFICATION_TARGET_MAP: Record<NotificationTargetName, NotificationTarget
   },
   live: { label: 'le live', route: (id) => (id ? ROUTES.live(id) : ROUTES.lives) },
   liveReport: { label: 'le bilan', route: (id) => (id ? ROUTES.liveReport(id) : ROUTES.lives) },
+  // Junior target identifier is "sessionId/juniorId"
+  junior: {
+    label: 'la fiche du Junior',
+    route: (id) => (id ? ROUTES.session(id) : ROUTES.academy),
+  },
+  home: { label: 'tes tâches', route: () => ROUTES.home },
   calendar: {
     label: 'le calendrier',
     route: (id) => (id ? ROUTES.calendarEvent(id) : ROUTES.calendar),
@@ -59,3 +67,13 @@ const NOTIFICATION_TARGET_MAP: Record<NotificationTargetName, NotificationTarget
 }
 
 export const NOTIFICATION_TARGETS = createRegistry(NOTIFICATION_TARGET_MAP)
+
+/**
+ * Target identifier of a junior file
+ * @param {string} sessionId - Promotion
+ * @param {string} juniorId - Junior seat
+ * @return {string} - Identifier the junior target reads back
+ */
+
+export const juniorTargetId = (sessionId: string, juniorId: string): string =>
+  `${sessionId}/${juniorId}`

@@ -461,6 +461,31 @@ export const ACADEMY_SETTINGS = {
     fallback: 13,
     min: 1,
   }),
+  firstPeriodLives: readInteger(academy.firstPeriodLives, {
+    path: 'system/academy.firstPeriodLives',
+    fallback: 7,
+    min: 1,
+  }),
+  secondPeriodLives: readInteger(academy.secondPeriodLives, {
+    path: 'system/academy.secondPeriodLives',
+    fallback: 6,
+    min: 1,
+  }),
+  maxObjectives: readInteger(academy.maxObjectives, {
+    path: 'system/academy.maxObjectives',
+    fallback: 2,
+    min: 0,
+  }),
+  thirdPeriodMinDays: readInteger(academy.thirdPeriodMinDays, {
+    path: 'system/academy.thirdPeriodMinDays',
+    fallback: 3,
+    min: 1,
+  }),
+  thirdPeriodMaxDays: readInteger(academy.thirdPeriodMaxDays, {
+    path: 'system/academy.thirdPeriodMaxDays',
+    fallback: 30,
+    min: 1,
+  }),
   minObjectives: readInteger(academy.minObjectives, {
     path: 'system/academy.minObjectives',
     fallback: 2,

@@ -7,7 +7,7 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_FUNCTIONS } from '@/declarations/lives/registries'
 import type { CourseContext, CourseLiveconLevel } from '@/types/academy'
-import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
 import { SanctionPanels } from '@/utils/constants/moderation'
 
 /**
@@ -16,7 +16,7 @@ import { SanctionPanels } from '@/utils/constants/moderation'
  */
 
 const readLadder = async (): Promise<CourseContext['ladder']> => {
-  const active = { status: { not: MemberStatuses.Left } }
+  const active = { status: { notIn: GONE_MEMBER_STATUSES } }
 
   const [admins, leads] = await Promise.all([
     prisma.account.findMany({
