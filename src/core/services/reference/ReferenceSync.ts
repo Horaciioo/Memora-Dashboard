@@ -124,10 +124,12 @@ const writeLibrary = async (): Promise<void> => {
       if (existing) {
         await prisma.skill.update({
           where: { id: existing.id },
-          data: { categoryId: row.id, position },
+          data: { categoryId: row.id, position, description: skill.description },
         })
       } else {
-        await prisma.skill.create({ data: { ...key, categoryId: row.id, position } })
+        await prisma.skill.create({
+          data: { ...key, categoryId: row.id, position, description: skill.description },
+        })
       }
     }
   }

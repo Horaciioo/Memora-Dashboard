@@ -85,12 +85,14 @@ export interface LibraryDispositif {
  * Skill of a junior, held by its family
  * @typedef {Object} LibrarySkill
  * @property {string} name - Display name
+ * @property {string} description - What it covers
  * @property {string | null} function - Function it belongs to, none for every one
  * @property {string | null} dispositif - Track it belongs to, none for every one
  */
 
 export interface LibrarySkill {
   name: string
+  description: string
   function: string | null
   dispositif: string | null
 }
@@ -180,3 +182,12 @@ export const LIBRARY_SKILL_CATEGORIES = skills as readonly LibrarySkillCategory[
  */
 
 export const LIBRARY_PIM_STEPS = pimSteps as readonly LibraryPimStep[]
+
+/**
+ * Names of the skills declared in code, the only ones graded
+ * @type {readonly string[]}
+ */
+
+export const LIBRARY_SKILL_NAMES: readonly string[] = LIBRARY_SKILL_CATEGORIES.flatMap((category) =>
+  category.skills.map((skill) => skill.name)
+)

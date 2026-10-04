@@ -1,20 +1,53 @@
 [
   {
-    "name": "Savoir-être",
+    "name": "Sociale",
     "accent": "#16a34a",
     "skills": [
       {
-        "name": "Calme sous pression",
+        "name": "Travail en équipe",
+        "description": "Le travail en équipe est essentiel pour une modération efficace et harmonieuse. Un Junior doit collaborer, partager les informations et coordonner ses actions avec les autres modérateurs. Un modérateur isolé ou autocentré risque de manquer des signaux importants et de nuire à la cohérence du chat, tandis qu’une communication fluide et une entraide active permettent de gérer rapidement les situations critiques et renforcent la cohésion de l’équipe.",
         "function": null,
         "dispositif": null
       },
       {
-        "name": "Communication avec l’équipe",
+        "name": "Communication",
+        "description": "La communication est au cœur du rôle de modérateur. S’exprimer de manière claire, précise et respectueuse permet de donner des consignes, signaler des comportements et expliquer des décisions aux modérateurs comme aux spectateurs. Une communication confuse ou agressive peut créer des malentendus ou des tensions, tandis qu’une communication ferme mais respectueuse assure que chacun comprend les règles et agit de manière cohérente.",
+        "function": null,
+        "dispositif": null
+      }
+    ]
+  },
+  {
+    "name": "Professionnelle",
+    "accent": "#7c3aed",
+    "skills": [
+      {
+        "name": "Veille & Anticipation",
+        "description": "Rester vigilant et anticiper les comportements à risque permet d’agir avant que les problèmes ne s’aggravent. Un modérateur expérimenté repère les signaux avant qu’ils ne dégénèrent, notamment lors des sujets sensibles abordés en live.",
         "function": null,
         "dispositif": null
       },
       {
-        "name": "Ponctualité",
+        "name": "Respect de la hiérarchie et des consignes",
+        "description": "Un Junior doit connaître ses limites et appliquer les directives sans improviser. Cela signifie écouter avant d’agir, poser des questions si quelque chose n’est pas clair, et accepter les retours comme une opportunité d’apprendre. Les responsabilités s’acquièrent progressivement, inutile de se précipiter.",
+        "function": null,
+        "dispositif": null
+      },
+      {
+        "name": "Assiduité et présence",
+        "description": "Un Junior doit avoir acquis le réflexe de communiquer ses présences et d’honorer ses rendez-vous et créneaux bloqués lorsque c’est nécessaire, notamment en réunion.",
+        "function": null,
+        "dispositif": null
+      },
+      {
+        "name": "Maîtrise de la politique & méthodologie de sanctions",
+        "description": "Un Junior doit être capable de prendre les bonnes décisions, sans forcément s’appuyer à la lettre sur le panel de sanctions, mais en restant dans la vibe qui est imposée, et ainsi savoir jauger efficacement une infraction.",
+        "function": null,
+        "dispositif": null
+      },
+      {
+        "name": "Gestion des Conflits",
+        "description": "Face à une situation tendue, le modérateur doit rester calme, neutre et ne jamais réagir impulsivement. Il identifie rapidement les conflits, intervient de façon mesurée et coordonne avec ses collègues si nécessaire. Sa manière de gérer les imprévus reflète directement son niveau de maturité et de professionnalisme.",
         "function": null,
         "dispositif": null
       }
@@ -25,33 +58,26 @@
     "accent": "#2563eb",
     "skills": [
       {
-        "name": "Maîtrise des commandes",
-        "function": "Lives",
-        "dispositif": null
-      },
-      {
-        "name": "Lecture du chat",
-        "function": "Lives",
-        "dispositif": null
-      },
-      {
-        "name": "Gestion d’un raid",
-        "function": "Lives",
-        "dispositif": null
-      }
-    ]
-  },
-  {
-    "name": "Rédaction",
-    "accent": "#d97706",
-    "skills": [
-      {
-        "name": "Annonces claires",
+        "name": "Maîtrise de Twitch",
+        "description": "Un Junior doit maîtriser les fonctionnalités essentielles de Twitch pour modérer efficacement, même dans un contexte rapide et intense. Le Formateur s’assure qu’il est à l’aise avec ces outils avant de poursuivre son évolution.",
         "function": null,
         "dispositif": null
       },
       {
-        "name": "Messages de sanction",
+        "name": "Maîtrise de Discord",
+        "description": "Un Junior doit savoir prendre de manière efficace des Tickets, répondre aux questions et s’en sortir sur Discord pour suivre le flux d’informations.",
+        "function": null,
+        "dispositif": null
+      },
+      {
+        "name": "Capacité rédactionnelle",
+        "description": "Bien rédiger, c’est choisir ses mots avec soin, éviter les fautes et structurer ses messages de façon claire et professionnelle. Un message bien rédigé reflète le sérieux du modérateur et facilite la compréhension et la bonne entente avec la communauté.",
+        "function": null,
+        "dispositif": null
+      },
+      {
+        "name": "Rapidité de Modération",
+        "description": "La vitesse de modération mesure la capacité du Junior à intervenir régulièrement et de manière adaptée pendant un live. Elle reflète son niveau de concentration, d’expérience et d’implication.",
         "function": null,
         "dispositif": null
       }
