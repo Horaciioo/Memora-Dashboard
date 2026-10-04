@@ -108,4 +108,17 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     },
     functions: { Formateurs: [Permissions.LiveLogRead] },
   },
+  {
+    key: 'live-roster-focus',
+    grants: {
+      [MemberRoles.Admin]: [Permissions.LiveRoster, Permissions.LiveInspect, Permissions.LiveFocus],
+      [MemberRoles.Responsable]: [
+        Permissions.LiveRoster,
+        Permissions.LiveInspect,
+        Permissions.LiveFocus,
+      ],
+    },
+    // Trainers follow their juniors only, checked on the server
+    functions: { Formateurs: [Permissions.LiveFocus] },
+  },
 ]
