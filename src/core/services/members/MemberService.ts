@@ -579,6 +579,7 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
     celebrateBirthday: row.celebrateBirthday,
     languages: row.languages,
     leftAt: row.leftAt?.toISOString() ?? null,
+    erased: row.anonymisedAt !== null,
     notes: notes.map(toMemberNote),
     socials: row.socialLinks.map((link) => ({
       id: link.id,

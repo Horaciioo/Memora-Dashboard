@@ -3,13 +3,18 @@ import type { ReactNode } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { DivisionLogo } from '@/components/elements/display/DivisionLogo'
 import { FunctionEmblems } from '@/composites/members/MemberBadges'
-import { ROLE_REGISTRY } from '@/declarations/access/roles'
+import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/roles'
+import { ERASED_COPY } from '@/declarations/academy/parkour'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { divisionLogo, divisionMark } from '@/declarations/members/profiles'
 import { MEMBER_BLOCK, MEMBER_FILE } from '@/declarations/ui/blocks'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import type { MemberSummary } from '@/types/members'
+import { MemberStatuses } from '@/utils/constants/hierarchy'
+
+// Ends of a PIM, their data erased
+const ERASED_STATUSES: string[] = [MemberStatuses.Dismissed, MemberStatuses.Resigned]
 
 export interface MemberRailProps {
   summary: MemberSummary
@@ -75,6 +80,11 @@ export const MemberRail = ({
           className={MEMBER_FILE.functions}
           glyphClassName="h-6 w-6"
         />
+        {ERASED_STATUSES.includes(summary.status) && (
+          <span className={MEMBER_FILE.departed} title={ERASED_COPY.notice}>
+            {MEMBER_STATUS_REGISTRY.label(summary.status)}
+          </span>
+        )}
         {summary.isAbsent && (
           <span className={MEMBER_FILE.status}>
             <AbsentIcon className={MEMBER_FILE.statusGlyph} aria-hidden="true" />

@@ -46,6 +46,7 @@ import { useSeal } from '@/managers/infrastructure/Security/SealManager'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { PermissionLayers } from '@/core/lib/permissions'
 import type { FieldDefinition, FieldOption, FieldValue, FormValues } from '@/types/forms'
+import { ErasedValue } from '@/composites/members/ErasedValue'
 import type { MemberDetail, MemberSocial } from '@/types/members'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { absenceReasonText } from '@/utils/format/absences'
@@ -371,12 +372,20 @@ export const MemberFileTabs = ({
 
   // Contact kept beside the portrait, the other fields live under the file tab
   const RAIL_FIELDS = ['discordId', 'email', 'birthday']
-  const railEntries = contactEntries.filter(
-    (entry) => entry.field && RAIL_FIELDS.includes(entry.field.name)
-  )
-  const fileContactEntries = contactEntries.filter(
-    (entry) => !entry.field || !RAIL_FIELDS.includes(entry.field.name)
-  )
+
+  // Erased personal data never comes back, nothing left to edit in its place
+  const ERASED_FIELDS = ['email', 'phone', 'birthday', 'languages']
+  const sealErased = (entry: EditableEntry): EditableEntry =>
+    detail.erased && entry.field && ERASED_FIELDS.includes(entry.field.name)
+      ? { label: entry.label, display: <ErasedValue /> }
+      : entry
+
+  const railEntries = contactEntries
+    .filter((entry) => entry.field && RAIL_FIELDS.includes(entry.field.name))
+    .map(sealErased)
+  const fileContactEntries = contactEntries
+    .filter((entry) => !entry.field || !RAIL_FIELDS.includes(entry.field.name))
+    .map(sealErased)
 
   const identityTab = () => (
     <div className={MEMBER_FILE.main}>

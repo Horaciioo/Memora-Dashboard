@@ -271,6 +271,8 @@ export const MEMBER_FILE = {
   role: 'text-xs font-black tracking-wide text-[var(--color-brand-800)] uppercase',
   status:
     'inline-flex items-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-2.5 py-1 text-xs font-semibold text-[var(--color-ink-subtle)]',
+  // Dismissed or resigned, data erased
+  departed: 'cursor-help text-xs font-black tracking-wide text-[var(--color-danger)] uppercase',
   statusGlyph: 'h-4 w-4 shrink-0',
   functions: 'flex items-center justify-center gap-2',
   body: 'mt-5 border-t border-[var(--color-border)] p-5',

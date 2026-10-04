@@ -175,6 +175,7 @@ export interface MemberAbsence {
  * @property {boolean} celebrateBirthday - Wants it celebrated
  * @property {string[]} languages - Spoken languages
  * @property {string | null} leftAt - ISO departure date
+ * @property {boolean} erased - Personal data erased for good
  * @property {MemberNote[]} notes - Private remarks
  * @property {MemberSocial[]} socials - Social profiles
  * @property {MemberAbsence[]} absences - Time off
@@ -193,6 +194,7 @@ export interface MemberDetail {
   celebrateBirthday: boolean
   languages: string[]
   leftAt: string | null
+  erased: boolean
   notes: MemberNote[]
   socials: MemberSocial[]
   absences: MemberAbsence[]
