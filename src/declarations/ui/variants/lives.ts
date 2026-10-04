@@ -181,3 +181,42 @@ export const LIVE_ROSTER = {
     'ml-auto text-[0.65rem] font-black tracking-wide text-[var(--color-ink-subtle)] uppercase',
   toggle: 'self-start',
 } as const
+
+/**
+ * Instructions screen read before the Mod View
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_GATE = {
+  root: 'mx-auto flex w-full max-w-3xl flex-col gap-6',
+  card: 'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6 shadow-[var(--shadow-sm)]',
+  title: 'text-2xl font-black tracking-tight',
+  lead: 'text-sm text-[var(--color-ink-subtle)]',
+  actions: 'flex flex-wrap items-center justify-center gap-3',
+  reread: 'self-end',
+} as const
+
+/**
+ * Bubble telling a live just started, shown once
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_STARTED_BUBBLE = {
+  root: 'surface-enter mx-2 mt-2 flex flex-col gap-2 rounded-[var(--radius-lg)] border-2 border-[var(--color-danger)] bg-[var(--color-surface-raised)] p-3 shadow-[var(--shadow-md)]',
+  title: 'flex items-center gap-2 text-sm font-black text-[var(--color-danger)]',
+  glyph: 'live-pulse h-4 w-4',
+  body: 'text-xs text-[var(--color-ink-subtle)]',
+  actions: 'flex items-center gap-2',
+} as const
+
+/**
+ * Lives page with no live open, the Mod View shown alone
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_PRESENTATION = {
+  root: 'flex w-full flex-col gap-4',
+  head: 'flex flex-col items-center gap-1 text-center',
+  title: 'text-xl font-black tracking-tight',
+  lead: 'max-w-2xl text-sm text-[var(--color-ink-subtle)]',
+} as const

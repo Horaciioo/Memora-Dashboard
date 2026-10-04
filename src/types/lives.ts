@@ -35,6 +35,8 @@ export interface LiveView {
   endedAt: string | null
   announcedBy: LivePerson | null
   coordinator: LivePerson | null
+  // Instructions of the responsables, markdown
+  instructions: string
   members: LivePerson[]
   liveconLevel: { level: number; name: string; icon: IconName | null; accent: string | null } | null
   // Permissions the viewer holds on this live, coordinator rights folded in
@@ -51,6 +53,8 @@ export interface LiveView {
 export interface LiveBeacon {
   status: LiveStatusName
   lives: { id: string; creator: string; status: LiveStatusName; plannedStartAt: string }[]
+  // Live on air the viewer was not told about yet
+  unseenStart: { id: string; creator: string } | null
 }
 
 /**
@@ -132,4 +136,81 @@ export interface LiveRoster {
   liveId: string
   canManage: boolean
   people: LiveRosterPerson[]
+}
+
+/**
+ * One Focus open on a live
+ * @typedef {Object} LiveFocusView
+ * @property {string} id - Focus identifier
+ * @property {string} watcherId - Follower
+ * @property {string} watcherName - Follower name
+ * @property {string} targetId - Member followed
+ * @property {string} targetName - Their name
+ * @property {string | null} targetLogin - Their platform login
+ * @property {string} startedAt - ISO start
+ */
+
+export interface LiveFocusView {
+  id: string
+  watcherId: string
+  watcherName: string
+  targetId: string
+  targetName: string
+  targetLogin: string | null
+  startedAt: string
+}
+
+/**
+ * One past sanction of a viewer, on the creator's channel
+ * @typedef {Object} ViewerSanction
+ * @property {string} id - Log line
+ * @property {ModerationKind} kind - Gesture
+ * @property {number | null} durationSeconds - Timeout length
+ * @property {string | null} reason - Reason
+ * @property {string} actorName - Who did it
+ * @property {string} liveTitle - Live it happened on
+ * @property {boolean} fromPanel - Applied from the panel
+ * @property {string} occurredAt - ISO moment
+ */
+
+export interface ViewerSanction {
+  id: string
+  kind: ModerationKind
+  durationSeconds: number | null
+  reason: string | null
+  actorName: string
+  liveTitle: string
+  fromPanel: boolean
+  occurredAt: string
+}
+
+/**
+ * Activity of one moderator on a live, as Inspect Mod reads it
+ * @typedef {Object} ModeratorInspect
+ * @property {string} accountId - Moderator
+ * @property {string} name - Display name
+ * @property {string | null} avatar - Avatar address
+ * @property {AttendanceStatusName | null} attendance - Roll-call answer
+ * @property {boolean} isAbsent - On approved leave now
+ * @property {number} activeSeconds - Time active in the Mod View
+ * @property {{ id: string, kind: ModerationKind, targetLogin: string | null, durationSeconds: number | null, reason: string | null, fromPanel: boolean, onBehalfOf: string | null, occurredAt: string }[]} gestures - Latest gestures
+ */
+
+export interface ModeratorInspect {
+  accountId: string
+  name: string
+  avatar: string | null
+  attendance: AttendanceStatusName | null
+  isAbsent: boolean
+  activeSeconds: number
+  gestures: {
+    id: string
+    kind: ModerationKind
+    targetLogin: string | null
+    durationSeconds: number | null
+    reason: string | null
+    fromPanel: boolean
+    onBehalfOf: string | null
+    occurredAt: string
+  }[]
 }

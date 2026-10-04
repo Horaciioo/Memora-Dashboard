@@ -3,7 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { readAnchors } from '@/core/services/auth/LeadService'
 import { closeLivePresences } from '@/core/services/lives/PresenceService'
-import { conflict, invalidInput, notFound } from '@/core/lib/errors'
+import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
 import { releasedFrom } from '@/core/services/academy/LegacyRelease'
 import { syncJuniorLives } from '@/core/services/academy/LiveCountService'
@@ -14,9 +14,10 @@ import { notify } from '@/core/services/system/NotificationService'
 import { memberOptions, peopleInScope, youtuberOptions } from '@/core/services/work/shared'
 import { publishLive } from '@/core/lib/lives/bus'
 import { livePermissions } from '@/core/lib/lives/permissions'
+import { liveStartedKey } from '@/declarations/academy/welcome'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
-import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
-import { LIVE_FIELD_COPY } from '@/declarations/lives/copy'
+import { FORM_SETTINGS, LIVE_SETTINGS } from '@/declarations/configurations/settings'
+import { LIVE_FIELD_COPY, LIVE_INSTRUCTIONS_DEFAULT } from '@/declarations/lives/copy'
 import {
   LIVE_EVENT_TEMPLATE,
   LIVE_FUNCTIONS,
@@ -30,6 +31,7 @@ import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 import { LivePlatforms, LiveStatuses, OPEN_LIVE_STATUSES } from '@/utils/constants/lives'
 import type { LivePlatformName, LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
+import { Permissions } from '@/utils/constants/permissions'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
@@ -88,6 +90,7 @@ const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): LiveVie
     endedAt: row.endedAt?.toISOString() ?? null,
     announcedBy: toPerson(row.announcedBy),
     coordinator: toPerson(row.coordinator),
+    instructions: row.instructions,
     members: row.members
       .map((seat) => toPerson(seat.account))
       .filter((person): person is LivePerson => person !== null),
@@ -244,6 +247,13 @@ export const liveFields = async (scope: AccessScope): Promise<FieldDefinition[]>
       options: members,
       mark: 'avatar',
     },
+    {
+      name: 'instructions',
+      kind: 'markdown',
+      label: LIVE_FIELD_COPY.instructions,
+      hint: LIVE_FIELD_COPY.instructionsHint,
+      maxLength: FORM_SETTINGS.markdownMaxLength,
+    },
   ]
 }
 
@@ -335,6 +345,7 @@ export const announceLive = async (
       announcedById: actorId,
       coordinatorId,
       calendarEventId: event.id,
+      instructions: readText(values, 'instructions') ?? LIVE_INSTRUCTIONS_DEFAULT,
       members: { create: memberIds.map((accountId) => ({ accountId })) },
     },
   })
@@ -459,7 +470,18 @@ export const readBeacon = async (
 
   if (rows.length === 0) return null
 
+  // The bubble tells each live once
+  const account = await prisma.account.findUnique({
+    where: { id: viewerId },
+    select: { seenGuides: true },
+  })
+  const unseen = rows.find(
+    (row) =>
+      row.status === LiveStatuses.Live && !account?.seenGuides.includes(liveStartedKey(row.id))
+  )
+
   return {
+    unseenStart: unseen ? { id: unseen.id, creator: unseen.youtuber.name } : null,
     status: rows.some((row) => row.status === LiveStatuses.Live)
       ? LiveStatuses.Live
       : LiveStatuses.Announced,
@@ -619,4 +641,40 @@ export const moveLiveFromPlatform = async (
     // A live closed by hand meanwhile stays closed
     return false
   }
+}
+
+/**
+ * Rewrite the instructions of a live, its announcers and coordinator only
+ * @param {Object} input - Edit
+ * @param {string} input.id - Live identifier
+ * @param {string} input.instructions - Markdown
+ * @param {AccessScope} input.scope - Editor perimeter
+ * @param {string} input.viewerId - Editor
+ * @param {PermissionName[]} input.held - Permissions held
+ * @return {Promise<LiveView>} - Live after the edit
+ */
+
+export const saveInstructions = async ({
+  id,
+  instructions,
+  scope,
+  viewerId,
+  held,
+}: {
+  id: string
+  instructions: string
+  scope: AccessScope
+  viewerId: string
+  held: PermissionName[]
+}): Promise<LiveView> => {
+  const live = await readLive(id, scope, viewerId, held)
+  const isCoordinator = live.coordinator?.id === viewerId
+  if (!held.includes(Permissions.LiveAnnounce) && !isCoordinator) throw forbidden()
+
+  await prisma.live.update({
+    where: { id },
+    data: { instructions: instructions.slice(0, FORM_SETTINGS.markdownMaxLength) },
+  })
+
+  return readLive(id, scope, viewerId, held)
 }

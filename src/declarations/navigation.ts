@@ -253,8 +253,8 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'liveDot',
         permission: Permissions.LiveRead,
         onlyLive: true,
-        // Announcers reach it to announce the first live
-        alwaysFor: Permissions.LiveAnnounce,
+        // Always there, it shows the Mod View until a live opens
+        alwaysFor: Permissions.LiveRead,
         mobile: { slot: 'primary', order: 0 },
       },
       {

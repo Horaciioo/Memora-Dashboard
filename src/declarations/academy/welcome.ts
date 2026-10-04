@@ -10,7 +10,15 @@ export const GUIDE_KEYS = {
   specialisations: 'specialisations-ouvertes',
 } as const
 
-export type GuideKey = (typeof GUIDE_KEYS)[keyof typeof GUIDE_KEYS]
+export type GuideKey = (typeof GUIDE_KEYS)[keyof typeof GUIDE_KEYS] | `live-started:${string}`
+
+/**
+ * One-time bubble key of a live that started
+ * @param {string} liveId - Live
+ * @return {GuideKey} - Guide key
+ */
+
+export const liveStartedKey = (liveId: string): GuideKey => `live-started:${liveId}`
 
 /**
  * One page of the trainings welcome

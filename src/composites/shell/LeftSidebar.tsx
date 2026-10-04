@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { CourseRail } from '@/composites/academy/course/CourseRail'
+import { LiveStartedBubble } from '@/composites/lives/LiveStartedBubble'
 import { CalendarRailPanel, CalendarSearchBar } from '@/composites/calendar/CalendarSidebar'
 import { NotificationsBell } from '@/composites/notifications/NotificationsBell'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
@@ -123,31 +124,40 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
                         const isOnAir =
                           item.onlyLive && viewContext.live?.status === LiveStatuses.Live
 
+                        const startedLive = item.onlyLive ? viewContext.live?.unseenStart : null
+
                         return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            aria-current={isActive ? 'page' : undefined}
-                            {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
-                            className={cn(
-                              LEFT_SIDEBAR.navLink,
-                              isActive && LEFT_SIDEBAR.navLinkActive
-                            )}
-                          >
-                            <Icon
+                          <Fragment key={item.href}>
+                            <Link
+                              href={item.href}
+                              aria-current={isActive ? 'page' : undefined}
+                              {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
                               className={cn(
-                                LEFT_SIDEBAR.navIcon,
-                                isActive && LEFT_SIDEBAR.navIconActive,
-                                isOnAir && LIVE_NAV.dotPulse
+                                LEFT_SIDEBAR.navLink,
+                                isActive && LEFT_SIDEBAR.navLinkActive
                               )}
-                              aria-hidden="true"
-                            />
-                            <span
-                              className={cn(LEFT_SIDEBAR.navLabel, isOnAir && LIVE_NAV.labelLive)}
                             >
-                              {item.label}
-                            </span>
-                          </Link>
+                              <Icon
+                                className={cn(
+                                  LEFT_SIDEBAR.navIcon,
+                                  isActive && LEFT_SIDEBAR.navIconActive,
+                                  isOnAir && LIVE_NAV.dotPulse
+                                )}
+                                aria-hidden="true"
+                              />
+                              <span
+                                className={cn(LEFT_SIDEBAR.navLabel, isOnAir && LIVE_NAV.labelLive)}
+                              >
+                                {item.label}
+                              </span>
+                            </Link>
+                            {startedLive && (
+                              <LiveStartedBubble
+                                liveId={startedLive.id}
+                                creator={startedLive.creator}
+                              />
+                            )}
+                          </Fragment>
                         )
                       })}
                     </div>

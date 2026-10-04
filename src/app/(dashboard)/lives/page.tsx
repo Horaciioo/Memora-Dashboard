@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
+import { LivePresentation } from '@/composites/lives/LivePresentation'
 import { LivesBoard } from '@/composites/lives/LivesBoard'
+import { readDemoPanel } from '@/core/services/lives/PreviewService'
 import Link from 'next/link'
 
 import { Section } from '@/components/structures/Section'
@@ -9,7 +11,7 @@ import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { ROUTES } from '@/declarations/navigation'
 import { requirePermission } from '@/core/wrappers/requireUser'
-import { LIVE_COPY } from '@/declarations/lives/copy'
+import { DEMO_LEVEL, LIVE_COPY } from '@/declarations/lives/copy'
 import { BUTTON_STYLES, LIVE_REPORT, PAGE_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { formatDay } from '@/utils/format/dates'
@@ -37,9 +39,19 @@ export default async function LivesPage() {
       : Promise.resolve([]),
   ])
 
+  // No live open: the page shows the Mod View alone
+  const demo = lives.length === 0 ? await readDemoPanel(perimeter) : null
+
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={LIVE_COPY.title} />
+      {demo && (
+        <LivePresentation
+          panel={demo.panel}
+          levelName={demo.levelNames[String(DEMO_LEVEL)] ?? null}
+          actorName={session.displayName}
+        />
+      )}
       <LivesBoard
         initialLives={lives}
         fields={fields}
