@@ -225,15 +225,31 @@ export type ModViewTarget =
   ModViewWindow | 'title' | 'modes' | 'chatOptions' | 'broadcaster' | 'moderators' | 'vips'
 
 /**
+ * What a gesture carries beyond itself
+ * @typedef {Object} ActContext
+ * @property {string} [offenseId] - Panel offence applied
+ * @property {number} [rung] - Panel rung applied
+ * @property {string} [onBehalfOfId] - Member followed in Focus mode
+ * @property {string} [targetLogin] - Viewer login, kept for the log
+ */
+
+export interface ActContext {
+  offenseId?: string
+  rung?: number
+  onBehalfOfId?: string
+  targetLogin?: string
+}
+
+/**
  * Source feeding the Mod View
  * @typedef {Object} ModViewDriver
  * @property {ModViewState} state - Current state
- * @property {(intent: ModViewIntent) => Promise<void>} act - Carry out a gesture
+ * @property {(intent: ModViewIntent, context?: ActContext) => Promise<void>} act - Carry out a gesture
  * @property {ModViewTarget | null} spotlight - Part lit by a scene
  */
 
 export interface ModViewDriver {
   state: ModViewState
-  act: (intent: ModViewIntent) => Promise<void>
+  act: (intent: ModViewIntent, context?: ActContext) => Promise<void>
   spotlight: ModViewTarget | null
 }

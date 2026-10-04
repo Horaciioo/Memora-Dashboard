@@ -15,4 +15,7 @@ export const QUERY_KEYS = {
   sanctionOffense: (id: string) => ['sanctions', 'offense', id] as const,
   blockQuiz: (blockId: string) => ['academy', 'quiz', blockId] as const,
   liveRoster: (liveId: string) => ['lives', 'roster', liveId] as const,
+  liveInspect: (liveId: string, accountId: string) =>
+    ['lives', 'inspect', liveId, accountId] as const,
+  liveFocus: (liveId: string) => ['lives', 'focus', liveId] as const,
 } as const

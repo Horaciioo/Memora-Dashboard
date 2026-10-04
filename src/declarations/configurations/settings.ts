@@ -268,6 +268,21 @@ export const LIVE_SETTINGS = {
     fallback: 180,
     min: 15,
   }),
+  viewerHistorySize: readInteger(lives.viewerHistorySize, {
+    path: 'system/lives.viewerHistorySize',
+    fallback: 10,
+    min: 1,
+  }),
+  inspectSize: readInteger(lives.inspectSize, {
+    path: 'system/lives.inspectSize',
+    fallback: 30,
+    min: 1,
+  }),
+  focusPollSeconds: readInteger(lives.focusPollSeconds, {
+    path: 'system/lives.focusPollSeconds',
+    fallback: 10,
+    min: 2,
+  }),
   endGraceMinutes: readInteger(lives.endGraceMinutes, {
     path: 'system/lives.endGraceMinutes',
     fallback: 5,

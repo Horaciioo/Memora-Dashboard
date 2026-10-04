@@ -58,6 +58,10 @@ export const API_ROUTES = {
   liveFeed: (id: string) => `/api/lives/${id}/flux`,
   livePresence: (id: string) => `/api/lives/${id}/presence`,
   liveRoster: (id: string) => `/api/lives/${id}/appel`,
+  liveInstructions: (id: string) => `/api/lives/${id}/consignes`,
+  liveViewer: (id: string, viewerId: string) => `/api/lives/${id}/spectateurs/${viewerId}`,
+  liveInspect: (id: string, accountId: string) => `/api/lives/${id}/moderateurs/${accountId}`,
+  liveFocus: (id: string) => `/api/lives/${id}/focus`,
   sanctions: (youtuberId: string, panel: string, levelId?: string | null, replace = false) =>
     `/api/sanctions?${new URLSearchParams({
       [SANCTION_PARAMS.creator]: youtuberId,

@@ -15,6 +15,8 @@ export interface ModActionsWindowProps {
   acts: ModAct[]
   isLit: boolean
   onPickTarget: (name: string) => void
+  // Moderator followed in Focus mode, their lines lit
+  focusLogin?: string | null
 }
 
 /**
@@ -22,10 +24,16 @@ export interface ModActionsWindowProps {
  * @param {ModAct[]} acts - Acts
  * @param {boolean} isLit - Lit by a scene
  * @param {(name: string) => void} onPickTarget - Open a viewer card
+ * @param {string | null} [focusLogin] - Moderator followed
  * @return {JSX.Element}
  */
 
-export const ModActionsWindow = ({ acts, isLit, onPickTarget }: ModActionsWindowProps) => (
+export const ModActionsWindow = ({
+  acts,
+  isLit,
+  onPickTarget,
+  focusLogin,
+}: ModActionsWindowProps) => (
   <ModWindow title={MODVIEW_COPY.modActions} isLit={isLit} grow>
     {acts.length === 0 ? (
       <WindowEmpty
@@ -41,7 +49,13 @@ export const ModActionsWindow = ({ acts, isLit, onPickTarget }: ModActionsWindow
           return (
             <li
               key={act.id}
-              className={cn(MODVIEW_FEED.item, act.pending && MODVIEW_FEED.itemPending)}
+              className={cn(
+                MODVIEW_FEED.item,
+                act.pending && MODVIEW_FEED.itemPending,
+                focusLogin &&
+                  act.moderator.toLowerCase() === focusLogin.toLowerCase() &&
+                  MODVIEW_FEED.itemFocus
+              )}
             >
               <Icon className={MODVIEW_FEED.icon} aria-hidden="true" />
               <div className={MODVIEW_FEED.main}>

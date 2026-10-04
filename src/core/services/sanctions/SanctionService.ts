@@ -171,6 +171,8 @@ export const readPanel = async (
       gravity: row.levels?.[0]?.gravity ?? SanctionGravities.Low,
       firstRung: tiers[0] ? toRung(tiers[0]) : null,
       rungCount: tiers.length,
+      rungs: tiers.map(toRung),
+      examples: toLines(row.example),
     }
   })
 

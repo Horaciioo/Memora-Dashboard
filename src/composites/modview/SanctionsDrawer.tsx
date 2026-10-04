@@ -1,68 +1,87 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import type { ActRunner, GateCheck } from '@/composites/modview/types'
-import { MODVIEW_COPY, MODVIEW_USER_COPY } from '@/declarations/modview/copy'
+import { nextRung, thirdRung } from '@/core/lib/modview/commands'
+import type { PanelMemory } from '@/core/lib/modview/commands'
+import { MODVIEW_COPY, MODVIEW_PANEL_COPY } from '@/declarations/modview/copy'
 import { SANCTION_GRAVITY_REGISTRY } from '@/declarations/sanctions/registries'
 import { ICONS } from '@/declarations/ui/icons'
-import { accentPaint, accentVars } from '@/declarations/ui/theme'
+import type { IconName } from '@/declarations/ui/icons'
+import { accentVars } from '@/declarations/ui/theme'
 import { MODVIEW_SANCTIONS } from '@/declarations/ui/variants'
-import type { ChatMessage, Chatter, ModViewIntent } from '@/types/modview'
-import type { SanctionMeasureView, SanctionOffenseCard, SanctionPanelView } from '@/types/sanctions'
+import type { Chatter } from '@/types/modview'
+import type { SanctionOffenseCard, SanctionPanelView, SanctionRungView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
-import { SanctionKinds } from '@/utils/constants/moderation'
 
-export interface SanctionsDrawerProps {
-  panel: SanctionPanelView | null
-  levelName: string | null
-  isOpen: boolean
-  onToggle: () => void
-  target: Chatter | null
-  targetLines: ChatMessage[]
-  gate: GateCheck
-  onAct: ActRunner
-}
+// Favourites kept per browser, a reading convenience
+const FAVORITES_KEY = 'memora:modview:favorites'
+
+// Glyph tabs, no written title
+type PanelTab = 'favorites' | 'recents' | 'all'
+const TABS: { key: PanelTab; icon: IconName; label: string }[] = [
+  { key: 'favorites', icon: 'star', label: MODVIEW_PANEL_COPY.favorites },
+  { key: 'recents', icon: 'history', label: MODVIEW_PANEL_COPY.recents },
+  { key: 'all', icon: 'sanctionsPanel', label: MODVIEW_PANEL_COPY.all },
+]
 
 /**
- * Turn one measure into the gesture it stands for
- * @param {SanctionMeasureView} measure - Panel measure
- * @param {Chatter} target - Viewer
- * @param {ChatMessage | undefined} lastLine - Their last visible line
- * @param {string} reason - Offence name kept as reason
- * @return {ModViewIntent | null} - Gesture, none for a note only
+ * Read the pinned offences, an empty list when storage is out of reach
+ * @return {string[]} - Offence identifiers
  */
 
-const intentOf = (
-  measure: SanctionMeasureView,
-  target: Chatter,
-  lastLine: ChatMessage | undefined,
-  reason: string
-): ModViewIntent | null => {
-  switch (measure.kind) {
-    case SanctionKinds.Delete:
-      return lastLine ? { kind: 'delete', messageId: lastLine.id, chatterId: target.id } : null
-    case SanctionKinds.Warn:
-      return { kind: 'warn', chatterId: target.id, reason }
-    case SanctionKinds.Timeout:
-      return measure.permanent
-        ? { kind: 'ban', chatterId: target.id, reason }
-        : {
-            kind: 'timeout',
-            chatterId: target.id,
-            seconds: (measure.durationMinutes ?? 0) * 60,
-            reason,
-          }
-    case SanctionKinds.Ban:
-      return { kind: 'ban', chatterId: target.id, reason }
-    default:
-      return null
+const readFavorites = (): string[] => {
+  try {
+    const raw = window.localStorage.getItem(FAVORITES_KEY)
+    const parsed: unknown = raw ? JSON.parse(raw) : []
+
+    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : []
+  } catch {
+    return []
   }
 }
 
 /**
- * Sanctions panel at hand, folded against the right edge
+ * Keep the pinned offences, silently when storage is out of reach
+ * @param {string[]} ids - Offence identifiers
+ * @return {void}
+ */
+
+const writeFavorites = (ids: string[]): void => {
+  try {
+    window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids))
+  } catch {
+    // Pins simply last for the visit
+  }
+}
+
+/**
+ * One rung read as text
+ * @param {SanctionRungView} rung - Rung
+ * @return {string} - Measures then condition
+ */
+
+const rungText = (rung: SanctionRungView): string =>
+  [rung.measures.map((measure) => measure.name).join(' + '), rung.condition]
+    .filter(Boolean)
+    .join(' · ')
+
+export interface SanctionsDrawerProps {
+  panel: SanctionPanelView | null
+  levelName: string | null
+  levelIcon: IconName | null
+  isOpen: boolean
+  onToggle: () => void
+  target: Chatter | null
+  memory: PanelMemory
+  recentIds: string[]
+  onPrefill: (offense: SanctionOffenseCard, rung: number) => void
+}
+
+/**
+ * Sanctions panel at hand: the level in force, a search, three glyph tabs and the offences as
+ * text boxes, the rungs already applied to the picked viewer struck through
  * @param {SanctionsDrawerProps} props - Drawer props
  * @return {JSX.Element}
  */
@@ -70,36 +89,60 @@ const intentOf = (
 export const SanctionsDrawer = ({
   panel,
   levelName,
+  levelIcon,
   isOpen,
   onToggle,
   target,
-  targetLines,
-  gate,
-  onAct,
+  memory,
+  recentIds,
+  onPrefill,
 }: SanctionsDrawerProps) => {
-  const [openedId, setOpenedId] = useState<string | null>(null)
+  const [tab, setTab] = useState<PanelTab>('all')
+  const [search, setSearch] = useState('')
+  const [favorites, setFavorites] = useState<string[]>([])
+
+  // Pins live in this browser, read once mounted
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFavorites(readFavorites())
+  }, [])
   const ToggleIcon = ICONS.sanctionsPanel
-  const lastLine = [...targetLines].reverse().find((line) => !line.deletedBy)
+  const LevelIcon = levelIcon ? ICONS[levelIcon] : null
+  const StarIcon = ICONS.star
 
-  // Offences grouped by gravity, heaviest first
-  const groups = SANCTION_GRAVITY_REGISTRY.keys
-    .slice()
-    .sort((a, b) => SANCTION_GRAVITY_REGISTRY.get(b).rank - SANCTION_GRAVITY_REGISTRY.get(a).rank)
-    .map((gravity) => ({
-      gravity,
-      offenses: (panel?.offenses ?? []).filter((offense) => offense.gravity === gravity),
-    }))
-    .filter((group) => group.offenses.length > 0)
-
-  const apply = (offense: SanctionOffenseCard) => {
-    if (!target || !offense.firstRung) return
-
-    // Every measure of the rung, in panel order
-    for (const measure of offense.firstRung.measures) {
-      const intent = intentOf(measure, target, lastLine, offense.name)
-      if (intent && gate(intent).allowed) onAct(intent)
-    }
+  const toggleFavorite = (id: string) => {
+    const next = favorites.includes(id)
+      ? favorites.filter((entry) => entry !== id)
+      : [...favorites, id]
+    setFavorites(next)
+    writeFavorites(next)
   }
+
+  // Tab, then search on the name and the examples
+  const needle = search.trim().toLowerCase()
+  const offenses = (panel?.offenses ?? [])
+    .filter((offense) =>
+      tab === 'favorites'
+        ? favorites.includes(offense.id)
+        : tab === 'recents'
+          ? recentIds.includes(offense.id)
+          : true
+    )
+    .filter(
+      (offense) =>
+        !needle ||
+        offense.name.toLowerCase().includes(needle) ||
+        offense.examples.some((example) => example.toLowerCase().includes(needle))
+    )
+
+  const empty =
+    tab === 'favorites'
+      ? MODVIEW_PANEL_COPY.emptyFavorites
+      : tab === 'recents'
+        ? MODVIEW_PANEL_COPY.emptyRecents
+        : needle
+          ? MODVIEW_PANEL_COPY.emptySearch
+          : MODVIEW_COPY.sanctionsEmpty
 
   return (
     <aside
@@ -122,81 +165,112 @@ export const SanctionsDrawer = ({
 
       {isOpen && (
         <div className={MODVIEW_SANCTIONS.body}>
-          {levelName && <p className={MODVIEW_SANCTIONS.level}>{levelName}</p>}
-          {!target && groups.length > 0 && (
-            <p className={MODVIEW_SANCTIONS.hint}>{MODVIEW_USER_COPY.pickTarget}</p>
-          )}
-          {groups.length === 0 && (
-            <p className={MODVIEW_SANCTIONS.empty}>{MODVIEW_COPY.sanctionsEmpty}</p>
-          )}
+          <div className={MODVIEW_SANCTIONS.head}>
+            {LevelIcon && <LevelIcon className={MODVIEW_SANCTIONS.headGlyph} aria-hidden="true" />}
+            {levelName && <p className={MODVIEW_SANCTIONS.headName}>{levelName}</p>}
+          </div>
 
-          {groups.map(({ gravity, offenses }) => (
-            <section
-              key={gravity}
-              className={MODVIEW_SANCTIONS.group}
-              style={accentVars(SANCTION_GRAVITY_REGISTRY.get(gravity).accent)}
-            >
-              <h4 className={MODVIEW_SANCTIONS.groupTitle}>
-                {SANCTION_GRAVITY_REGISTRY.label(gravity)}
-              </h4>
-              {offenses.map((offense) => {
-                const isOpened = openedId === offense.id
+          <input
+            className={MODVIEW_SANCTIONS.search}
+            placeholder={MODVIEW_PANEL_COPY.search}
+            aria-label={MODVIEW_PANEL_COPY.search}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
 
-                return (
-                  <div key={offense.id}>
+          <div className={MODVIEW_SANCTIONS.tabs} role="tablist">
+            {TABS.map((entry) => {
+              const Glyph = ICONS[entry.icon]
+
+              return (
+                <button
+                  key={entry.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === entry.key}
+                  aria-label={entry.label}
+                  title={entry.label}
+                  className={cn(
+                    MODVIEW_SANCTIONS.tab,
+                    tab === entry.key && MODVIEW_SANCTIONS.tabOn
+                  )}
+                  onClick={() => setTab(entry.key)}
+                >
+                  <Glyph className={MODVIEW_SANCTIONS.tabGlyph} aria-hidden="true" />
+                </button>
+              )
+            })}
+          </div>
+
+          <div className={MODVIEW_SANCTIONS.divider} />
+
+          {!target && offenses.length > 0 && (
+            <p className={MODVIEW_SANCTIONS.hint}>{MODVIEW_PANEL_COPY.pickTarget}</p>
+          )}
+          {offenses.length === 0 && <p className={MODVIEW_SANCTIONS.empty}>{empty}</p>}
+
+          <div className={MODVIEW_SANCTIONS.list}>
+            {offenses.map((offense) => {
+              const applied = target ? (memory[target.id]?.[offense.id] ?? []) : []
+              const next = nextRung(applied, offense.rungs.length)
+              const third = thirdRung(offense.rungs.length)
+              const isFavorite = favorites.includes(offense.id)
+
+              return (
+                <article
+                  key={offense.id}
+                  className={MODVIEW_SANCTIONS.box}
+                  style={accentVars(SANCTION_GRAVITY_REGISTRY.get(offense.gravity).accent)}
+                >
+                  <span className={MODVIEW_SANCTIONS.offenseRule} aria-hidden="true" />
+                  <div className={MODVIEW_SANCTIONS.boxHead}>
+                    <span className={MODVIEW_SANCTIONS.offenseName}>{offense.name}</span>
                     <button
                       type="button"
-                      aria-expanded={isOpened}
-                      className={cn(
-                        MODVIEW_SANCTIONS.offense,
-                        isOpened && MODVIEW_SANCTIONS.offenseOpen
-                      )}
-                      onClick={() => setOpenedId(isOpened ? null : offense.id)}
+                      className={cn(MODVIEW_SANCTIONS.star, isFavorite && MODVIEW_SANCTIONS.starOn)}
+                      aria-pressed={isFavorite}
+                      title={
+                        isFavorite ? MODVIEW_PANEL_COPY.unfavorite : MODVIEW_PANEL_COPY.favorite
+                      }
+                      onClick={() => toggleFavorite(offense.id)}
                     >
-                      <span className={MODVIEW_SANCTIONS.offenseRule} aria-hidden="true" />
-                      <span className={MODVIEW_SANCTIONS.offenseName}>{offense.name}</span>
-                      {offense.firstRung && (
-                        <span className={MODVIEW_SANCTIONS.measures}>
-                          {offense.firstRung.measures.map((measure) => {
-                            const paint = accentPaint(measure.accent)
-
-                            return (
-                              <span
-                                key={measure.id}
-                                className={cn(MODVIEW_SANCTIONS.measure, paint.soft)}
-                                style={paint.style}
-                              >
-                                {measure.name}
-                              </span>
-                            )
-                          })}
-                        </span>
-                      )}
+                      <StarIcon className={MODVIEW_SANCTIONS.starGlyph} aria-hidden="true" />
                     </button>
-                    {isOpened && (
-                      <div className={MODVIEW_SANCTIONS.detail}>
-                        {offense.firstRung?.condition && (
-                          <p className={MODVIEW_SANCTIONS.condition}>
-                            {offense.firstRung.condition}
-                          </p>
-                        )}
-                        <Button
-                          variant="primary"
-                          className={MODVIEW_SANCTIONS.apply}
-                          disabled={!target || !offense.firstRung}
-                          onClick={() => apply(offense)}
-                        >
-                          {target
-                            ? MODVIEW_USER_COPY.apply.replace('{name}', target.name)
-                            : MODVIEW_USER_COPY.pickTarget}
-                        </Button>
-                      </div>
-                    )}
                   </div>
-                )
-              })}
-            </section>
-          ))}
+
+                  {offense.rungs.map((rung, index) => (
+                    <p
+                      key={rung.id}
+                      className={
+                        applied.includes(index)
+                          ? MODVIEW_SANCTIONS.rungDone
+                          : target && index === next
+                            ? MODVIEW_SANCTIONS.rungNext
+                            : MODVIEW_SANCTIONS.rung
+                      }
+                    >
+                      {`${MODVIEW_PANEL_COPY.rung.replace('{n}', String(index + 1))} : ${rungText(rung)}`}
+                    </p>
+                  ))}
+
+                  {target && next !== null && (
+                    <div className={MODVIEW_SANCTIONS.actions}>
+                      <Button variant="primary" onClick={() => onPrefill(offense, next)}>
+                        {applied.length === 0
+                          ? MODVIEW_PANEL_COPY.prefill.replace('{name}', target.name)
+                          : MODVIEW_PANEL_COPY.next}
+                      </Button>
+                      {third !== null && third !== next && (
+                        <Button variant="secondary" onClick={() => onPrefill(offense, third)}>
+                          {MODVIEW_PANEL_COPY.third}
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </article>
+              )
+            })}
+          </div>
         </div>
       )}
     </aside>

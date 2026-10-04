@@ -23,9 +23,24 @@ export const POST = createProtectedRoute({
     const key = typeof raw.key === 'string' ? raw.key.slice(0, 64) : ''
     if (!intent || !key) throw invalidInput([{ field: 'intent', message: FORM_COPY.notAnOption }])
 
+    // Panel rung and Focus target, both checked again on the server
+    const rawContext =
+      typeof raw.context === 'object' && raw.context ? (raw.context as Record<string, unknown>) : {}
+    const context = {
+      offenseId: typeof rawContext.offenseId === 'string' ? rawContext.offenseId : undefined,
+      rung: typeof rawContext.rung === 'number' ? rawContext.rung : undefined,
+      onBehalfOfId:
+        typeof rawContext.onBehalfOfId === 'string' ? rawContext.onBehalfOfId : undefined,
+      targetLogin:
+        typeof rawContext.targetLogin === 'string'
+          ? rawContext.targetLogin.slice(0, 64)
+          : undefined,
+    }
+
     return actOnLive({
       liveId: params.id,
       intent,
+      context,
       key,
       scope: await scope(),
       viewerId: session.id,

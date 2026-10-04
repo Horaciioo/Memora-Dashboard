@@ -4,6 +4,7 @@ import { conflict, forbidden, notFound, rateLimited, systemFailure } from '@/cor
 import type { AppError } from '@/core/lib/errors'
 import { prisma } from '@/core/lib/db'
 import { claimGestureKey } from '@/core/lib/lives/idempotency'
+import { isFollowing } from '@/core/services/lives/FocusService'
 import { readConnection, readRecentEvents } from '@/core/lib/lives/recent'
 import { logger } from '@/core/lib/logger'
 import { gateIntent } from '@/core/lib/modview/gate'
@@ -26,7 +27,7 @@ import { markTwitchRevoked, readTwitchSeat } from '@/core/services/platforms/Pla
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
 import type { LiveView } from '@/types/lives'
-import type { ModViewIntent, ModViewState } from '@/types/modview'
+import type { ActContext, ModViewIntent, ModViewState } from '@/types/modview'
 import { LivePlatforms, LiveStatuses } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
 
@@ -219,6 +220,7 @@ export const openModView = async (
  * @param {Object} input - Gesture
  * @param {string} input.liveId - Live
  * @param {ModViewIntent} input.intent - Gesture
+ * @param {ActContext} input.context - Panel rung, Focus target
  * @param {string} input.key - Idempotency key from the browser
  * @param {AccessScope} input.scope - Viewer's perimeter
  * @param {string} input.viewerId - Member who clicked
@@ -229,6 +231,7 @@ export const openModView = async (
 export const actOnLive = async (input: {
   liveId: string
   intent: ModViewIntent
+  context: ActContext
   key: string
   scope: AccessScope
   viewerId: string
@@ -248,6 +251,12 @@ export const actOnLive = async (input: {
   const found = await seatOf(input.viewerId, live.youtuber.id)
   if ('notice' in found) throw forbidden(found.notice)
 
+  // Acting in someone's place needs a Focus open on them
+  const onBehalfOfId = input.context.onBehalfOfId
+  if (onBehalfOfId && !(await isFollowing(input.liveId, input.viewerId, onBehalfOfId))) {
+    throw forbidden()
+  }
+
   // A double click lands once
   if (!(await claimGestureKey(`${input.liveId}:${input.viewerId}:${input.key}`)))
     return { done: false }
@@ -262,6 +271,10 @@ export const actOnLive = async (input: {
     intent: input.intent,
     idempotencyKey: `${input.viewerId}:${input.key}`,
     liveconLevel: live.liveconLevel?.level ?? null,
+    offenseId: input.context.offenseId ?? null,
+    rung: input.context.rung ?? null,
+    onBehalfOfId: onBehalfOfId ?? null,
+    targetLogin: input.context.targetLogin ?? null,
   })
 
   try {

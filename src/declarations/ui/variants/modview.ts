@@ -91,6 +91,9 @@ export const MODVIEW_STREAM = {
  */
 
 export const MODVIEW_FEED = {
+  // Line of the moderator followed in Focus mode
+  itemFocus:
+    'rounded-[var(--radius-md)] bg-[var(--color-brand-100)] ring-2 ring-[var(--color-brand-600)]',
   count: 'px-3 pt-2 text-xs font-bold text-[var(--color-ink-subtle)]',
   list: 'flex flex-col divide-y divide-[var(--color-border)]',
   item: 'flex gap-2.5 px-3 py-2.5',
@@ -114,6 +117,7 @@ export const MODVIEW_FEED = {
  */
 
 export const MODVIEW_CHAT = {
+  hint: 'px-3 pt-2 text-xs font-semibold text-[var(--color-danger)]',
   root: 'lg:h-full',
   scroller: 'min-h-0 flex-1 overflow-y-auto',
   time: 'mr-1.5 font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-ink-subtle)]',
@@ -244,6 +248,27 @@ export const MODVIEW_SANCTIONS = {
   apply: 'w-full',
   hint: 'text-xs text-[var(--color-ink-subtle)] italic',
   empty: 'text-sm text-[var(--color-ink-subtle)] italic',
+  // Second version: centred level, search, glyph tabs, then text boxes
+  head: 'flex flex-col items-center gap-1 pb-3 text-center',
+  headGlyph: 'h-8 w-8',
+  headName: 'text-sm font-black tracking-wide uppercase',
+  search:
+    'w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-brand-600)]',
+  tabs: 'flex items-center justify-center gap-2 py-3',
+  tab: 'flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)]',
+  tabOn: 'bg-[var(--color-brand-100)] text-[var(--color-brand-700)]',
+  tabGlyph: 'h-5 w-5',
+  divider: 'mb-3 border-t border-[var(--color-border)]',
+  list: 'flex flex-col gap-2',
+  box: 'relative flex flex-col gap-1.5 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] px-3 py-2 pl-4 text-sm',
+  boxHead: 'flex items-start gap-2',
+  star: 'ml-auto shrink-0 text-[var(--color-ink-subtle)] hover:text-[var(--color-caution)]',
+  starOn: 'text-[var(--color-caution)]',
+  starGlyph: 'h-4 w-4',
+  rung: 'text-xs text-[var(--color-ink-subtle)]',
+  rungDone: 'text-xs text-[var(--color-ink-subtle)] line-through opacity-60',
+  rungNext: 'text-xs font-bold text-[var(--color-ink)]',
+  actions: 'flex flex-wrap gap-1.5 pt-1',
 } as const
 
 /**
@@ -290,4 +315,53 @@ export const MODVIEW_RAIL = {
 export const MODVIEW_PAGE = {
   // Named for screen readers, the rail already says it
   title: 'sr-only',
+} as const
+
+/**
+ * History view standing where the connected list was
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_HISTORY = {
+  section: 'flex flex-col gap-2 pb-3',
+  label: PROPERTY_LABEL,
+  empty: 'text-xs text-[var(--color-ink-subtle)] italic',
+  viewer:
+    'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] px-3 py-2',
+  viewerHead: 'flex flex-wrap items-center gap-2',
+  name: 'text-sm font-black hover:underline',
+  line: 'text-xs text-[var(--color-ink-subtle)]',
+  propose: 'self-start',
+  past: 'flex flex-col gap-0.5 border-t border-[var(--color-border)] pt-1.5',
+  tag: 'text-[0.65rem] font-black tracking-wide uppercase',
+  tagPanel: 'text-[var(--color-success)]',
+  tagOff: 'text-[var(--color-caution)]',
+  member: 'flex flex-wrap items-center gap-x-2 gap-y-1 text-sm',
+  memberName: 'min-w-0 flex-1 truncate font-semibold',
+  focus: 'text-xs font-semibold text-[var(--color-brand-700)]',
+  connected: 'border-t border-[var(--color-border)] pt-2',
+  connectedSummary: `${PROPERTY_LABEL} cursor-pointer`,
+} as const
+
+/**
+ * Inspect Mod card and Focus banner
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_INSPECT = {
+  card: 'surface-enter absolute top-3 right-3 z-20 flex max-h-[80%] w-80 flex-col gap-3 overflow-y-auto rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 shadow-[var(--shadow-lg)]',
+  head: 'flex items-center gap-3',
+  name: 'min-w-0 flex-1 truncate text-base font-black',
+  facts: 'grid grid-cols-2 gap-2',
+  fact: 'flex flex-col gap-0.5',
+  factLabel: PROPERTY_LABEL,
+  factValue: 'text-sm font-semibold',
+  warn: 'text-sm font-semibold text-[var(--color-danger)]',
+  list: 'flex flex-col gap-1',
+  line: 'text-xs',
+  banner:
+    'flex flex-wrap items-center gap-3 rounded-[var(--radius-lg)] border-2 border-[var(--color-brand-600)] bg-[var(--color-brand-100)] px-4 py-2',
+  bannerText: 'flex min-w-0 flex-1 flex-col',
+  bannerTitle: 'text-sm font-black',
+  bannerHint: 'text-xs text-[var(--color-ink-subtle)]',
 } as const

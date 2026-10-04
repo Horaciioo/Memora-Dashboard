@@ -49,6 +49,7 @@ export const EVENT_TYPES = createEnumeration({
   ModerationActed: { id: 40, label: 'Geste de modération' },
   LiveRosterMoved: { id: 41, label: 'Appel d’un live corrigé' },
   ParkourMoved: { id: 42, label: 'AcademicParkour' },
+  LiveFocused: { id: 43, label: 'Focus sur un modérateur' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

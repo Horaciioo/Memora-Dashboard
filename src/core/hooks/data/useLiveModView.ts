@@ -10,7 +10,13 @@ import type { SceneEvent } from '@/core/lib/modview/scene'
 import { LIVE_STREAM_EVENTS } from '@/declarations/lives/topics'
 import { TWITCH_ENDPOINTS } from '@/declarations/platforms/twitch'
 import type { LiveView } from '@/types/lives'
-import type { ModViewConnection, ModViewDriver, ModViewIntent, ModViewState } from '@/types/modview'
+import type {
+  ActContext,
+  ModViewConnection,
+  ModViewDriver,
+  ModViewIntent,
+  ModViewState,
+} from '@/types/modview'
 
 /**
  * Empty Mod View shown until the snapshot lands
@@ -114,9 +120,9 @@ export const useLiveModView = (live: LiveView): ModViewDriver => {
   }, [live.id, load])
 
   const act = useCallback(
-    async (intent: ModViewIntent) => {
+    async (intent: ModViewIntent, context?: ActContext) => {
       await run(() =>
-        apiPost(API_ROUTES.liveModView(live.id), { intent, key: crypto.randomUUID() })
+        apiPost(API_ROUTES.liveModView(live.id), { intent, context, key: crypto.randomUUID() })
       )
     },
     [live.id, run]

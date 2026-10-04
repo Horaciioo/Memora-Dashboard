@@ -14,6 +14,8 @@ export interface CommunityWindowProps {
   community: ModViewState['community']
   spotlight: ModViewTarget | null
   onPick: (chatter: Chatter) => void
+  // Drawn inside another window, no frame of its own
+  bare?: boolean
 }
 
 /**
@@ -21,24 +23,16 @@ export interface CommunityWindowProps {
  * @param {ModViewState['community']} community - Groups
  * @param {ModViewTarget | null} spotlight - Part lit by a scene
  * @param {(chatter: Chatter) => void} onPick - Open a viewer card
+ * @param {boolean} [bare] - Drawn inside another window
  * @return {JSX.Element}
  */
 
-export const CommunityWindow = ({ community, spotlight, onPick }: CommunityWindowProps) => {
+export const CommunityWindow = ({ community, spotlight, onPick, bare }: CommunityWindowProps) => {
   const [search, setSearch] = useState('')
   const needle = search.trim().toLowerCase()
 
-  return (
-    <ModWindow
-      title={MODVIEW_COPY.community}
-      isLit={
-        spotlight === 'community' ||
-        spotlight === 'broadcaster' ||
-        spotlight === 'moderators' ||
-        spotlight === 'vips'
-      }
-      grow
-    >
+  const content = (
+    <>
       <div className={MODVIEW_COMMUNITY.search}>
         <input
           className={MODVIEW_COMMUNITY.input}
@@ -82,6 +76,23 @@ export const CommunityWindow = ({ community, spotlight, onPick }: CommunityWindo
           </div>
         )
       })}
+    </>
+  )
+
+  if (bare) return content
+
+  return (
+    <ModWindow
+      title={MODVIEW_COPY.community}
+      isLit={
+        spotlight === 'community' ||
+        spotlight === 'broadcaster' ||
+        spotlight === 'moderators' ||
+        spotlight === 'vips'
+      }
+      grow
+    >
+      {content}
     </ModWindow>
   )
 }

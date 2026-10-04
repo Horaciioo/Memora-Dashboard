@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
+import { LiveGate } from '@/composites/lives/LiveGate'
 import { LiveModView } from '@/composites/modview/LiveModView'
+import { focusableMembers } from '@/core/services/lives/FocusService'
+import { readPanelMemory } from '@/core/services/lives/LiveInsightService'
 import { readLive } from '@/core/services/lives/LiveService'
 import { listLevels, readCurrentState } from '@/core/services/livecon/LiveconService'
 import { readPanel } from '@/core/services/sanctions/SanctionService'
@@ -29,7 +32,8 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
 
   // Panel of the creator at the level in force
   const [levels, state] = await Promise.all([listLevels(), readCurrentState(perimeter)])
-  const inForce = levelOfCreator(state, live.youtuber.id)?.level.id ?? levels[0]?.id ?? null
+  const creatorLevel = levelOfCreator(state, live.youtuber.id)?.level ?? levels[0] ?? null
+  const inForce = creatorLevel?.id ?? null
   const panel = await readPanel(
     perimeter,
     live.youtuber.id,
@@ -37,10 +41,32 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
     inForce
   )
 
+  // Rungs already applied, and who the viewer may follow
+  const memberIds = live.members.map((member) => member.id)
+  const [memory, focusable] = await Promise.all([
+    readPanelMemory(live.id),
+    focusableMembers(memberIds, session.role),
+  ])
+  const canEdit =
+    live.permissions.includes(Permissions.LiveAnnounce) || live.coordinator?.id === session.id
+
   return (
     <div className={PAGE_STYLES.wrapper}>
       <h1 className={MODVIEW_PAGE.title}>{`${LIVE_COPY.title} · ${live.youtuber.name}`}</h1>
-      <LiveModView live={live} panel={panel} />
+      <LiveGate live={live} canEdit={canEdit}>
+        <LiveModView
+          live={live}
+          panel={panel}
+          fallbackLevel={creatorLevel ? { name: creatorLevel.name, icon: creatorLevel.icon } : null}
+          tools={{
+            id: live.id,
+            viewerId: session.id,
+            members: live.members,
+            focusable,
+            initialMemory: memory,
+          }}
+        />
+      </LiveGate>
     </div>
   )
 }

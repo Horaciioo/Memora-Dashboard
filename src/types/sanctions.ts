@@ -50,6 +50,8 @@ export interface SanctionRungView {
  * @property {SanctionGravityName} gravity - Weight at the level on screen
  * @property {SanctionRungView | null} firstRung - What applies on sight
  * @property {number} rungCount - Steps of the ladder
+ * @property {SanctionRungView[]} rungs - Every step at that level
+ * @property {string[]} examples - Messages it covers, for the search
  */
 
 export interface SanctionOffenseCard {
@@ -58,6 +60,8 @@ export interface SanctionOffenseCard {
   gravity: SanctionGravityName
   firstRung: SanctionRungView | null
   rungCount: number
+  rungs: SanctionRungView[]
+  examples: string[]
 }
 
 /**

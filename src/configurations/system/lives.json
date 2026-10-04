@@ -15,5 +15,8 @@
   "logLines": 500,
   "pastLives": 20,
   "hoursWindowDays": 30,
-  "memberLives": 20
+  "memberLives": 20,
+  "viewerHistorySize": 10,
+  "inspectSize": 30,
+  "focusPollSeconds": 10
 }

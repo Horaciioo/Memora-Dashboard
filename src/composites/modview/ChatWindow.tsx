@@ -35,6 +35,12 @@ export interface ChatWindowProps {
   gate: GateCheck
   onAct: ActRunner
   onPick: (chatter: Chatter) => void
+  // Line being typed, the panel may write it
+  draft: string
+  onDraft: (text: string) => void
+  onSend: (text: string) => void
+  // Why the last line was not sent
+  hint: string | null
 }
 
 /**
@@ -44,12 +50,26 @@ export interface ChatWindowProps {
  * @param {GateCheck} gate - Permission check
  * @param {ActRunner} onAct - Gesture runner
  * @param {(chatter: Chatter) => void} onPick - Open a viewer card
+ * @param {string} draft - Line being typed
+ * @param {(text: string) => void} onDraft - Typing handler
+ * @param {(text: string) => void} onSend - Sending handler, commands included
+ * @param {string | null} hint - Why the last line was not sent
  * @return {JSX.Element}
  */
 
-export const ChatWindow = ({ state, spotlight, gate, onAct, onPick }: ChatWindowProps) => {
+export const ChatWindow = ({
+  state,
+  spotlight,
+  gate,
+  onAct,
+  onPick,
+  draft,
+  onDraft,
+  onSend,
+  hint,
+}: ChatWindowProps) => {
   const [menu, setMenu] = useState<'modes' | 'options' | null>(null)
-  const [draft, setDraft] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
   const [isFollowing, setFollowing] = useState(true)
   const [options, setOptions] = useState<Record<ChatOptionName, boolean>>({
     timestamps: true,
@@ -76,7 +96,11 @@ export const ChatWindow = ({ state, spotlight, gate, onAct, onPick }: ChatWindow
     setFollowing(list.scrollHeight - list.scrollTop - list.clientHeight < FOLLOW_SLACK)
   }
 
-  const sayGate = gate({ kind: 'say', text: draft })
+  // A command is gated as the gesture it carries, a plain line as a message
+  const isCommand = draft.trim().startsWith('/')
+  const sayGate = isCommand ? { allowed: true, reason: null } : gate({ kind: 'say', text: draft })
+  // Commands stay open where talking is closed, Livecon 1 included
+  const canCommand = gate({ kind: 'ban', chatterId: '', reason: null }).allowed
   const activeModes = CHAT_MODES.keys.filter((mode) =>
     mode === 'slow' ? state.modes.slowSeconds !== null : state.modes[mode]
   ).length
@@ -85,9 +109,13 @@ export const ChatWindow = ({ state, spotlight, gate, onAct, onPick }: ChatWindow
 
   const send = () => {
     if (!draft.trim() || !sayGate.allowed) return
-    onAct({ kind: 'say', text: draft.trim() })
-    setDraft('')
+    onSend(draft)
   }
+
+  // A line written by the panel lands under the cursor
+  useEffect(() => {
+    if (draft.startsWith('/')) inputRef.current?.focus()
+  }, [draft])
 
   return (
     <ModWindow
@@ -179,13 +207,21 @@ export const ChatWindow = ({ state, spotlight, gate, onAct, onPick }: ChatWindow
           send()
         }}
       >
+        {hint && <p className={MODVIEW_CHAT.hint}>{hint}</p>}
         <input
+          ref={inputRef}
           className={MODVIEW_CHAT.input}
-          placeholder={sayGate.allowed ? MODVIEW_COPY.placeholder : (sayGate.reason ?? '')}
+          placeholder={
+            sayGate.allowed
+              ? MODVIEW_COPY.placeholder
+              : canCommand
+                ? MODVIEW_COPY.commandsOnly
+                : (sayGate.reason ?? '')
+          }
           aria-label={MODVIEW_COPY.placeholder}
-          disabled={!sayGate.allowed}
+          disabled={!sayGate.allowed && !canCommand}
           value={draft}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => onDraft(event.target.value)}
         />
         <div className={MODVIEW_CHAT.composerRow}>
           <Button type="submit" variant="primary" disabled={!sayGate.allowed || !draft.trim()}>

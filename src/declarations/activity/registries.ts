@@ -157,6 +157,12 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     verb: 'a fait avancer',
     target: 'un parcours de PIM',
   },
+  LiveFocused: {
+    label: 'Focus',
+    tone: 'info',
+    verb: 'a suivi',
+    target: 'un modérateur en Focus',
+  },
 }
 
 export const ACTIVITY_EVENT_REGISTRY = createRegistry(ACTIVITY_EVENT_MAP)

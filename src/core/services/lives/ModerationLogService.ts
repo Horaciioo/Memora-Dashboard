@@ -66,6 +66,10 @@ const targetOf = (intent: ModViewIntent): string | null =>
  * @param {ModViewIntent} input.intent - Gesture
  * @param {string} input.idempotencyKey - Gesture key
  * @param {number | null} input.liveconLevel - Level in force
+ * @param {string | null} input.offenseId - Panel offence applied
+ * @param {number | null} input.rung - Panel rung applied
+ * @param {string | null} input.onBehalfOfId - Member followed in Focus mode
+ * @param {string | null} input.targetLogin - Viewer login
  * @return {Promise<string | null>} - Line identifier, none when the log is unavailable
  */
 
@@ -78,6 +82,10 @@ export const logMemoraGesture = async (input: {
   intent: ModViewIntent
   idempotencyKey: string
   liveconLevel: number | null
+  offenseId: string | null
+  rung: number | null
+  onBehalfOfId: string | null
+  targetLogin: string | null
 }): Promise<string | null> => {
   const { intent } = input
 
@@ -90,6 +98,7 @@ export const logMemoraGesture = async (input: {
         actorPlatformUserId: input.actorPlatformUserId,
         actorLogin: input.actorLogin,
         targetPlatformUserId: targetOf(intent),
+        targetLogin: input.targetLogin,
         kind: kindOfIntent(intent),
         durationSeconds: intent.kind === 'timeout' ? intent.seconds : null,
         reason: 'reason' in intent ? intent.reason : null,
@@ -102,6 +111,9 @@ export const logMemoraGesture = async (input: {
               : null,
         origin: 'MEMORA',
         idempotencyKey: input.idempotencyKey,
+        offenseId: input.offenseId,
+        rung: input.rung,
+        onBehalfOfId: input.onBehalfOfId,
       },
       select: { id: true },
     })
