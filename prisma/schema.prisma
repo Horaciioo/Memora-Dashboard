@@ -334,7 +334,10 @@ model Account {
   integrationClaims     IntegrationClaim[]       @relation("IntegrationClaimAccount")
   quizAnswers           JuniorAnswer[]
   trainingFeedbacks     TrainingFeedback[]
-  moderationActions     ModerationAction[]
+  moderationActions     ModerationAction[]       @relation("ModerationActor")
+  moderationsOnBehalf   ModerationAction[]       @relation("ModerationOnBehalf")
+  focusesWatching       ModViewFocus[]           @relation("FocusWatcher")
+  focusesWatched        ModViewFocus[]           @relation("FocusTarget")
   modViewPresences      ModViewPresence[]
   academyReviews        AcademyReview[]          @relation("AcademyReviewAuthor")
   academyReviewsDecided AcademyReview[]          @relation("AcademyReviewDecider")
@@ -1706,6 +1709,8 @@ model Live {
   streamExternalId String?
   // YouTube chat handle
   liveChatId       String?
+  // Instructions the responsables leave for the team, markdown
+  instructions     String       @default("")
   calendarEventId  String?      @unique
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
@@ -1718,6 +1723,7 @@ model Live {
   liveconEntries LiveconEntry[]
   actions        ModerationAction[]
   presences      ModViewPresence[]
+  focuses        ModViewFocus[]
 
   @@unique([platform, streamExternalId])
   @@index([status])
@@ -1757,6 +1763,11 @@ model ModerationAction {
   // Livecon level in force at the time
   liveconLevel         Int?
   messageExcerpt       String?
+  // Panel offence and rung the gesture applied, none when made by hand
+  offenseId            String?
+  rung                 Int?
+  // Member followed in Focus mode, the gesture made in their place
+  onBehalfOfId         String?
   origin               ModerationOrigin
   status               ModerationStatus @default(PENDING)
   errorCode            String?
@@ -1765,12 +1776,14 @@ model ModerationAction {
   occurredAt           DateTime         @default(now())
   createdAt            DateTime         @default(now())
 
-  live  Live     @relation(fields: [liveId], references: [id], onDelete: Cascade)
-  actor Account? @relation(fields: [actorAccountId], references: [id], onDelete: SetNull)
+  live       Live     @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  actor      Account? @relation("ModerationActor", fields: [actorAccountId], references: [id], onDelete: SetNull)
+  onBehalfOf Account? @relation("ModerationOnBehalf", fields: [onBehalfOfId], references: [id], onDelete: SetNull)
 
   @@unique([platform, externalEventId])
   @@index([actorAccountId, occurredAt])
   @@index([liveId, occurredAt])
+  @@index([targetPlatformUserId, occurredAt])
   @@index([kind])
   @@map("moderation_actions")
 }
@@ -1793,6 +1806,24 @@ model ModViewPresence {
   @@index([liveId, accountId])
   @@index([accountId, openedAt])
   @@map("modview_presences")
+}
+
+// One member following another's gestures live, Focus mode
+model ModViewFocus {
+  id        String    @id @default(cuid())
+  liveId    String
+  watcherId String
+  targetId  String
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  live    Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  watcher Account @relation("FocusWatcher", fields: [watcherId], references: [id], onDelete: Cascade)
+  target  Account @relation("FocusTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@index([liveId, endedAt])
+  @@index([watcherId])
+  @@map("modview_focuses")
 }
 
 // Platform grant of one member, both tokens encrypted at rest
