@@ -2,10 +2,15 @@ import 'server-only'
 
 import { countAccompaniedLives } from '@/core/lib/academy/lives'
 import { prisma } from '@/core/lib/db'
+import { notFound } from '@/core/lib/errors'
 import { syncStages } from '@/core/services/academy/ParkourService'
 import { AcademyJuniorStatuses, AcademySessionStatuses } from '@/utils/constants/hierarchy'
+import type { AccompaniedLiveView } from '@/types/academy'
+import { LiveStatuses } from '@/utils/constants/lives'
 import type { LiveStatusName } from '@/utils/constants/lives'
+import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
+import type { Prisma } from '@prisma/client'
 
 /**
  * Recount the lives of every running junior among some accounts, the roll-call deciding
@@ -60,4 +65,51 @@ export const syncJuniorLives = async (accountIds: string[]): Promise<string[]> =
   await syncStages(changed)
 
   return changed
+}
+
+/**
+ * Lives a junior was present on since their PIM started, the ones their count is made of
+ * @param {string} juniorId - Junior seat
+ * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @return {Promise<AccompaniedLiveView[]>} - Lives, latest first
+ */
+
+export const accompaniedLives = async (
+  juniorId: string,
+  scope: Prisma.AcademySessionWhereInput
+): Promise<AccompaniedLiveView[]> => {
+  const junior = await prisma.academyJunior.findFirst({
+    where: { id: juniorId, session: scope },
+    select: { accountId: true, startedAt: true },
+  })
+  if (!junior) throw notFound()
+
+  // Same rule as the count: ended, started after the junior, answered present
+  const rows = await prisma.live.findMany({
+    where: {
+      status: LiveStatuses.Ended,
+      startedAt: { gte: junior.startedAt },
+      calendarEvent: {
+        attendances: {
+          some: { accountId: junior.accountId, status: AttendanceStatuses.Present },
+        },
+      },
+    },
+    select: {
+      id: true,
+      title: true,
+      platform: true,
+      startedAt: true,
+      youtuber: { select: { name: true } },
+    },
+    orderBy: { startedAt: 'desc' },
+  })
+
+  return rows.map((row) => ({
+    liveId: row.id,
+    title: row.title,
+    creator: row.youtuber.name,
+    platform: row.platform,
+    startedAt: (row.startedAt ?? new Date()).toISOString(),
+  }))
 }

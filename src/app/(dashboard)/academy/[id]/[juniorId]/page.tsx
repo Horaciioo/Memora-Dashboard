@@ -14,6 +14,7 @@ import {
   listReviews,
   readJunior,
 } from '@/core/services/academy/AcademyService'
+import { accompaniedLives } from '@/core/services/academy/LiveCountService'
 import { readParkour } from '@/core/services/academy/ParkourService'
 import { readTimeline } from '@/core/services/academy/PimTimelineService'
 import { requireUser } from '@/core/wrappers/requireUser'
@@ -85,7 +86,7 @@ export default async function JuniorPage({
   // A junior never reads their own objectives nor the parkour behind them
   const isOwnFile = found.junior.accountId === session.id
   const canReadObjectives = canReadAny && !isOwnFile
-  const [fields, skills, notes, objectives, reviews, timeline, parkour] = await Promise.all([
+  const [fields, skills, notes, objectives, reviews, timeline, parkour, lives] = await Promise.all([
     juniorFields(found.junior.sessionId),
     listJuniorSkills(juniorId, scope),
     canReadNotes ? listJuniorNotes(juniorId, scope) : Promise.resolve([]),
@@ -93,6 +94,7 @@ export default async function JuniorPage({
     canReadReviews ? listReviews(juniorId, scope) : Promise.resolve([]),
     readTimeline(juniorId, scope),
     canReadObjectives ? readParkour(juniorId, scope) : Promise.resolve(null),
+    accompaniedLives(juniorId, scope),
   ])
 
   const jobFunction = found.session.function
@@ -111,6 +113,7 @@ export default async function JuniorPage({
         initialReviews={reviews}
         initialTimeline={timeline}
         parkour={parkour}
+        accompaniedLives={lives}
         initialTab={typeof requestedTab === 'string' ? requestedTab : undefined}
         sessionFunctionName={jobFunction.name}
         juniorFields={fields}

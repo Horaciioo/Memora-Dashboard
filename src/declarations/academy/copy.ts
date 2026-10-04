@@ -186,6 +186,8 @@ export const ACADEMY_COPY = {
   inviteCopyLink: 'Copier le lien d’admission',
   inviteCopied: 'Lien copié',
   mandatoryPending: 'Une formation obligatoire n’est pas encore terminée.',
+  accompaniedTitle: 'Lives où il était présent',
+  accompaniedEmpty: 'Aucun live compté pour l’instant.',
 } as const
 
 /**

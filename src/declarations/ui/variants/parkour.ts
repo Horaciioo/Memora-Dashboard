@@ -51,3 +51,19 @@ export const PARKOUR_BUBBLE = {
   title: 'text-lg font-black tracking-tight',
   text: 'text-sm text-[var(--color-ink-subtle)]',
 } as const
+
+/**
+ * Lives a junior accompanied, on their file
+ * @type {Record<string, string>}
+ */
+
+export const ACCOMPANIED_LIVES = {
+  root: 'flex flex-col gap-2',
+  label: PROPERTY_LABEL,
+  empty: 'text-sm text-[var(--color-ink-subtle)] italic',
+  glyph: 'h-5 w-5 shrink-0',
+  body: 'flex min-w-0 flex-1 flex-col',
+  creator: 'text-sm font-bold',
+  title: 'truncate text-xs text-[var(--color-ink-subtle)]',
+  date: 'shrink-0 text-xs text-[var(--color-ink-subtle)]',
+} as const

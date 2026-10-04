@@ -1,4 +1,5 @@
 import type { ParkourPhase } from '@/core/lib/academy/parkour'
+import type { LivePlatformName } from '@/utils/constants/lives'
 import type { TimelineStepState } from '@/core/services/academy/timeline'
 import type { PimDestinationName } from '@/declarations/academy/guides'
 import type { CourseSurface, CourseTrack } from '@/declarations/academy/curriculum/types'
@@ -675,4 +676,22 @@ export interface ParkourView {
   integrationPath: string | null
   canLaunchAnyway: boolean
   canOpenSecondPeriod: boolean
+}
+
+/**
+ * One live a junior accompanied, present on its roll-call
+ * @typedef {Object} AccompaniedLiveView
+ * @property {string} liveId - Live identifier
+ * @property {string} title - Live title
+ * @property {string} creator - Creator name
+ * @property {LivePlatformName} platform - Platform
+ * @property {string} startedAt - ISO start
+ */
+
+export interface AccompaniedLiveView {
+  liveId: string
+  title: string
+  creator: string
+  platform: LivePlatformName
+  startedAt: string
 }

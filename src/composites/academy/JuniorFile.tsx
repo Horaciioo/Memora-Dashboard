@@ -44,8 +44,16 @@ import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/s
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 
-import { LIST_STYLES, SECTION_STYLES, SESSION_CARD } from '@/declarations/ui/variants'
+import {
+  ACCOMPANIED_LIVES,
+  LIST_STYLES,
+  SECTION_STYLES,
+  SESSION_CARD,
+} from '@/declarations/ui/variants'
+import { LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
+import { ICONS } from '@/declarations/ui/icons'
 import type {
+  AccompaniedLiveView,
   AcademyReviewView,
   PimTimeline,
   JuniorNoteView,
@@ -93,6 +101,7 @@ export interface JuniorFileProps {
   initialReviews: AcademyReviewView[]
   initialTimeline: PimTimeline
   parkour: ParkourView | null
+  accompaniedLives: AccompaniedLiveView[]
   initialTab?: string
   sessionFunctionName: string
   juniorFields: FieldDefinition[]
@@ -119,6 +128,7 @@ export interface JuniorFileProps {
  * @param {AcademyReviewView[]} initialReviews - Check-ins resolved server-side
  * @param {PimTimeline} initialTimeline - Vertical timeline resolved server-side
  * @param {ParkourView | null} parkour - AcademicParkour standing, none for the junior
+ * @param {AccompaniedLiveView[]} accompaniedLives - Lives where they were present
  * @param {string} [initialTab] - Tab a walkthrough opens on
  * @param {string} sessionFunctionName - Function the session is scoped to
  * @param {FieldDefinition[]} juniorFields - Declarations of the junior form
@@ -145,6 +155,7 @@ export const JuniorFile = ({
   initialReviews,
   initialTimeline,
   parkour,
+  accompaniedLives,
   initialTab,
   sessionFunctionName,
   juniorFields,
@@ -299,6 +310,29 @@ export const JuniorFile = ({
             { label: ACADEMY_FIELD_COPY.juniorSummary, value: junior.summary },
           ]}
         />
+        <div className={ACCOMPANIED_LIVES.root}>
+          <span className={ACCOMPANIED_LIVES.label}>{ACADEMY_COPY.accompaniedTitle}</span>
+          {accompaniedLives.length === 0 ? (
+            <p className={ACCOMPANIED_LIVES.empty}>{ACADEMY_COPY.accompaniedEmpty}</p>
+          ) : (
+            <ul className={LIST_STYLES.stack}>
+              {accompaniedLives.map((live) => {
+                const Glyph = ICONS[LIVE_PLATFORM_REGISTRY.get(live.platform).icon]
+
+                return (
+                  <li key={live.liveId} className={LIST_STYLES.item}>
+                    <Glyph className={ACCOMPANIED_LIVES.glyph} aria-hidden="true" />
+                    <span className={ACCOMPANIED_LIVES.body}>
+                      <span className={ACCOMPANIED_LIVES.creator}>{live.creator}</span>
+                      <span className={ACCOMPANIED_LIVES.title}>{live.title}</span>
+                    </span>
+                    <span className={ACCOMPANIED_LIVES.date}>{formatDay(live.startedAt)}</span>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
       </div>
     </Section>
   )
