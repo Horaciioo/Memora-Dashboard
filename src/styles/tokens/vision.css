@@ -1,7 +1,9 @@
 /* Colour vision modes: a hand-written palette, not a filter. Red and green leave the status tones */
 
 html[data-color-vision='protanopia'],
-html[data-color-vision='deuteranopia'] {
+html[data-color-vision='deuteranopia'],
+[data-vision-preview='protanopia'],
+[data-vision-preview='deuteranopia'] {
   --color-success: #2b6ca3;
   --color-success-soft: #e3eef8;
   --color-danger: #a64a08;
@@ -11,7 +13,9 @@ html[data-color-vision='deuteranopia'] {
 }
 
 :root.dark[data-color-vision='protanopia'],
-:root.dark[data-color-vision='deuteranopia'] {
+:root.dark[data-color-vision='deuteranopia'],
+:root.dark [data-vision-preview='protanopia'],
+:root.dark [data-vision-preview='deuteranopia'] {
   --color-success: #8dbbe8;
   --color-success-soft: #172433;
   --color-danger: #f0a35c;
@@ -21,12 +25,14 @@ html[data-color-vision='deuteranopia'] {
 }
 
 /* Blue leaves the info tone */
-html[data-color-vision='tritanopia'] {
+html[data-color-vision='tritanopia'],
+[data-vision-preview='tritanopia'] {
   --color-info: #8e4354;
   --color-info-soft: #faeaec;
 }
 
-:root.dark[data-color-vision='tritanopia'] {
+:root.dark[data-color-vision='tritanopia'],
+:root.dark [data-vision-preview='tritanopia'] {
   --color-info: #edb8c0;
   --color-info-soft: #38252a;
 }

@@ -48,3 +48,29 @@ export const PROFILE_CARD = {
   value: 'text-sm',
   empty: 'text-[var(--color-ink-subtle)] italic',
 } as const
+
+/**
+ * Appearance picker cards
+ * @type {Record<string, string>}
+ */
+
+export const PICKER_CARD = {
+  stack: 'flex flex-col gap-6',
+  pair: 'grid gap-6 lg:grid-cols-2',
+  group: 'flex flex-col gap-3',
+  title: 'flex items-center gap-2 text-sm font-semibold',
+  three: 'grid grid-cols-3 gap-2',
+  two: 'grid grid-cols-2 gap-2',
+  option:
+    'flex flex-col items-center justify-end gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-3 text-center transition-[transform,box-shadow] hover:-translate-y-px',
+  optionWide: 'items-start justify-start text-left',
+  active: 'border-[var(--color-ink-subtle)] bg-[var(--color-surface-raised)]',
+  glyph: 'size-9',
+  sample: 'leading-none font-bold tracking-tight',
+  label: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
+  description: 'text-xs leading-snug text-[var(--color-ink-subtle)]',
+  // Palette of a vision mode drawn with its own colours
+  swatches: 'flex gap-1',
+  swatch: 'h-2 w-7 rounded-full',
+  note: 'pt-4 text-xs text-[var(--color-ink-subtle)]',
+} as const

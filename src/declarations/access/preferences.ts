@@ -28,7 +28,7 @@ interface PreferenceOption {
  * @typedef {Object} ColorVisionOption
  * @property {string} label - Full label
  * @property {string} short - Caption of the segmented control
- * @property {string} [attribute] - SVG filter id
+ * @property {string} [attribute] - Mode key on the page
  */
 
 interface ColorVisionOption extends PreferenceOption {
