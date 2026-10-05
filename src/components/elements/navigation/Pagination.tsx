@@ -7,7 +7,6 @@ import { PAGINATION_STYLES } from '@/declarations/ui/variants'
 export interface PaginationProps {
   page: number
   totalPages: number
-  total: number
   onPageChange: (page: number) => void
 }
 
@@ -15,17 +14,16 @@ export interface PaginationProps {
  * Page switcher
  * @param {number} page - Current page
  * @param {number} totalPages - Page count
- * @param {number} total - Result count
  * @param {(page: number) => void} onPageChange - Page handler
  * @return {JSX.Element | null}
  */
 
-export const Pagination = ({ page, totalPages, total, onPageChange }: PaginationProps) => {
+export const Pagination = ({ page, totalPages, onPageChange }: PaginationProps) => {
   if (totalPages <= 1) return null
 
   return (
     <nav className={PAGINATION_STYLES.bar} aria-label={PAGINATION_COPY.label}>
-      <p className={PAGINATION_STYLES.meta}>{PAGINATION_COPY.summary(page, totalPages, total)}</p>
+      <p className={PAGINATION_STYLES.meta}>{PAGINATION_COPY.summary(page, totalPages)}</p>
       <div className={PAGINATION_STYLES.actions}>
         <Button icon="back" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
           {PAGINATION_COPY.previous}

@@ -49,6 +49,5 @@ export const PAGINATION_COPY = {
   label: 'Pages',
   previous: 'Précédent',
   next: 'Suivant',
-  summary: (page: number, totalPages: number, total: number) =>
-    `Page ${page} sur ${totalPages}, ${total} résultat${total > 1 ? 's' : ''}`,
+  summary: (page: number, totalPages: number) => `Page ${page} sur ${totalPages}`,
 } as const

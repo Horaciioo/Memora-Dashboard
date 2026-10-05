@@ -5,6 +5,8 @@ import type { ReactNode } from 'react'
 import { cn } from '@/utils/classnames'
 import { TABLE_STYLES } from '@/declarations/ui/variants'
 import { ICONS } from '@/declarations/ui/icons'
+import { Pagination } from '@/components/elements/navigation/Pagination'
+import { PAGINATION_SETTINGS } from '@/declarations/configurations/settings'
 import { SkeletonList } from '@/components/elements/feedback/Skeleton'
 import { EmptyState, type EmptyStateProps } from '@/components/elements/feedback/EmptyState'
 import { useMenu, type MenuItem } from '@/managers/front-end'
@@ -38,6 +40,8 @@ export interface DataTableProps<T> {
   // Entries of the right click menu of a row
   rowMenu?: (row: T) => MenuItem[]
   activeRowId?: string
+  // Rows per page
+  pageSize?: number
   className?: string
 }
 
@@ -51,6 +55,7 @@ export interface DataTableProps<T> {
  * @param {(row: T) => void} [onRowOpen] - Called on click and on Enter
  * @param {(row: T) => MenuItem[]} [rowMenu] - Entries of the right click menu
  * @param {string} [activeRowId] - Row painted as selected
+ * @param {number} [pageSize] - Rows shown per page
  * @param {string} [className] - Extra classes merged onto the wrapper
  * @return {JSX.Element}
  */
@@ -64,9 +69,11 @@ export const DataTable = <T,>({
   onRowOpen,
   rowMenu,
   activeRowId,
+  pageSize = PAGINATION_SETTINGS.defaultPerPage,
   className,
 }: DataTableProps<T>) => {
   const [sort, setSort] = useState<{ key: string; ascending: boolean } | null>(null)
+  const [requestedPage, setRequestedPage] = useState(1)
   const { contextMenu } = useMenu()
   const SortIcon = ICONS.sort
 
@@ -88,10 +95,17 @@ export const DataTable = <T,>({
     })
   }, [rows, sort, columns])
 
-  const toggleSort = (key: string) =>
+  // Long tables page
+  const totalPages = Math.max(1, Math.ceil(sortedRows.length / pageSize))
+  const page = Math.min(requestedPage, totalPages)
+  const pageRows = sortedRows.slice((page - 1) * pageSize, page * pageSize)
+
+  const toggleSort = (key: string) => {
+    setRequestedPage(1)
     setSort((current) =>
       current?.key === key ? { key, ascending: !current.ascending } : { key, ascending: true }
     )
+  }
 
   // Every column past the first rides in a wrapped meta row on the mobile card
   const metaOf = (row: T) =>
@@ -111,7 +125,7 @@ export const DataTable = <T,>({
         ) : sortedRows.length === 0 && emptyState ? (
           <EmptyState {...emptyState} />
         ) : (
-          sortedRows.map((row) => {
+          pageRows.map((row) => {
             const id = getRowId(row)
             const head = columns[0]?.render(row)
             const meta = metaOf(row)
@@ -203,7 +217,7 @@ export const DataTable = <T,>({
               </td>
             </tr>
           ) : (
-            sortedRows.map((row) => {
+            pageRows.map((row) => {
               const id = getRowId(row)
 
               return (
@@ -236,6 +250,7 @@ export const DataTable = <T,>({
           )}
         </tbody>
       </table>
+      <Pagination page={page} totalPages={totalPages} onPageChange={setRequestedPage} />
     </div>
   )
 }
