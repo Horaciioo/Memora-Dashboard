@@ -2,6 +2,8 @@
 
 :root {
   --color-background: #f3ebdd;
+  /* The page window laid on the gradient, lighter than the ground */
+  --color-page: #fbf7ef;
   --color-surface: #fffefb;
   --color-surface-raised: #fffefc;
   --color-surface-sunken: #ede3d1;

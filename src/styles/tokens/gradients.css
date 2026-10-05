@@ -1,40 +1,31 @@
 /* Soft Arc-like gradients, mauve blue pink white */
 
 :root {
-  --color-frame-mauve: #dccdf9;
-  --color-frame-blue: #cfe3f5;
-  --color-frame-pink: #f9cfdc;
+  --color-frame-mauve: #7a52cc;
+  --color-frame-blue: #2f6fc2;
+  --color-frame-pink: #cf3f73;
   --color-frame-white: #fbf7ee;
   /* Solid stand-in, what a cut into a rail glyph shows */
-  --color-frame: #e8d8f0;
+  --color-frame: #a047a0;
 
-  /* Ink and washes of the rail standing on the frame */
-  --color-on-frame: #2b261d;
-  --color-on-frame-subtle: rgb(43 38 29 / 0.78);
-  --color-on-frame-wash: rgb(255 254 251 / 0.5);
-  --color-on-frame-raised: rgb(255 254 251 / 0.7);
-  --color-on-frame-line: rgb(43 38 29 / 0.12);
-  --color-on-frame-line-strong: rgb(43 38 29 / 0.22);
-  --color-on-frame-tint: #6b46b0;
-  --color-on-frame-blush: #a8355a;
-  --color-on-frame-deep: #2b261d;
+  /* White ink and washes of the rail standing on the frame */
+  --color-on-frame: #fffefb;
+  --color-on-frame-subtle: rgb(255 254 251 / 0.84);
+  --color-on-frame-wash: rgb(255 254 251 / 0.14);
+  --color-on-frame-raised: rgb(255 254 251 / 0.22);
+  --color-on-frame-line: rgb(255 254 251 / 0.2);
+  --color-on-frame-line-strong: rgb(255 254 251 / 0.34);
+  --color-on-frame-tint: #fffefb;
+  --color-on-frame-blush: #fffefb;
+  --color-on-frame-deep: #fffefb;
   /* Share of the frame colours the page ground keeps */
-  --page-wash: 85%;
+  --page-wash: 100%;
   --page-base: var(--color-background);
 }
 
 :root.dark {
-  --page-wash: 16%;
+  --page-wash: 42%;
   --page-base: var(--color-surface-sunken);
-  --color-on-frame: #f6efe4;
-  --color-on-frame-subtle: rgb(246 239 228 / 0.78);
-  --color-on-frame-wash: rgb(246 239 228 / 0.08);
-  --color-on-frame-raised: rgb(246 239 228 / 0.14);
-  --color-on-frame-line: rgb(246 239 228 / 0.12);
-  --color-on-frame-line-strong: rgb(246 239 228 / 0.22);
-  --color-on-frame-tint: #cdb8f5;
-  --color-on-frame-blush: #f29ab5;
-  --color-on-frame-deep: #f6efe4;
 }
 
 /* Rebuilt on .app-tone so a tone change follows the animated colours */
@@ -47,12 +38,18 @@
     radial-gradient(75% 65% at 0% 100%, var(--color-frame-white), transparent),
     linear-gradient(var(--color-frame-white), var(--color-frame-white));
   /* Page ground, the frame colours washed into the page colour */
-  --gradient-page: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-frame-mauve) var(--page-wash), var(--page-base)) 0%,
-    color-mix(in srgb, var(--color-frame-blue) var(--page-wash), var(--page-base)) 34%,
-    color-mix(in srgb, var(--color-frame-pink) var(--page-wash), var(--page-base)) 68%,
-    color-mix(in srgb, var(--color-frame-white) var(--page-wash), var(--page-base)) 100%
+  /* Lit from the top left corner as in Arc: the spark, the middle ramp, the far corner */
+  --gradient-page: radial-gradient(
+    farthest-corner at 0% 0%,
+    color-mix(in srgb, var(--color-frame-pink) var(--page-wash), var(--page-base)) 0%,
+    color-mix(
+        in oklab,
+        color-mix(in srgb, var(--color-frame-pink) var(--page-wash), var(--page-base)),
+        color-mix(in srgb, var(--color-frame-mauve) var(--page-wash), var(--page-base))
+      )
+      34%,
+    color-mix(in srgb, var(--color-frame-mauve) var(--page-wash), var(--page-base)) 64%,
+    color-mix(in srgb, var(--color-frame-blue) var(--page-wash), var(--page-base)) 100%
   );
   --gradient-soft: linear-gradient(
     135deg,

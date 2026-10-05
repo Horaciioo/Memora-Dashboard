@@ -2,6 +2,7 @@
 
 :root.dark {
   --color-background: #16130f;
+  --color-page: #16130f;
   --color-surface: #1e1a16;
   --color-surface-raised: #28231d;
   --color-surface-sunken: #110e0b;

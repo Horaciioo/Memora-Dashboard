@@ -36,7 +36,7 @@ export const APP_SHELL = {
   windowThumb:
     'absolute inset-x-0.5 top-0 cursor-grab rounded-full bg-[var(--color-ink)]/25 transition-[background-color,left,right] duration-[var(--motion-duration-fast)] group-hover/track:inset-x-0 group-hover/track:bg-[var(--color-ink)]/40 active:cursor-grabbing active:bg-[var(--color-ink)]/50',
   // Positioned so the page banner can span the whole column
-  main: 'relative flex min-w-0 flex-1 flex-col bg-[var(--color-background)]',
+  main: 'relative flex min-w-0 flex-1 flex-col bg-[var(--color-page)]',
   // Gutters widen past md so a page never welds itself to either rail
   content:
     'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--banner-h)+2.5rem)] print:max-w-none print:p-0',
@@ -80,21 +80,21 @@ export const LEFT_SIDEBAR = {
   // Creator switch
   creatorRow: 'flex shrink-0 justify-center px-3',
   // Search bar
-  searchRow: 'flex shrink-0 px-3',
+  searchRow: 'flex shrink-0 px-2',
   // Pins footer down
-  nav: 'flex min-h-0 w-full flex-1 flex-col gap-5 overflow-y-auto px-3 pt-7',
-  navGroup: 'flex flex-col gap-1.5',
+  nav: 'flex min-h-0 w-full flex-1 flex-col gap-6 overflow-y-auto px-2 pt-5',
+  navGroup: 'flex flex-col gap-1',
   navGroupLabel:
-    'group flex w-full items-center gap-1 px-2.5 pb-1 text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:text-[var(--color-ink)]',
+    'group flex w-full items-center gap-1 px-2 pb-1 text-body font-bold tracking-wide text-[var(--color-ink)] uppercase',
   navGroupChevron:
     'h-3.5 w-3.5 shrink-0 opacity-0 transition-[transform,opacity] group-hover:opacity-100 group-focus-visible:opacity-100',
   navGroupChevronCollapsed: '-rotate-90',
-  navGroupItems: 'flex flex-col gap-0.5',
+  navGroupItems: 'flex flex-col gap-px',
   navLink:
-    'group flex items-center gap-3 rounded-[var(--radius-md)] py-1.5 pr-2.5 pl-4 text-lg font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)]',
+    'group flex items-center gap-2 rounded-[var(--radius-md)] px-2 py-1 text-caption font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
   navLinkActive: 'font-semibold text-[var(--color-ink)]',
   navLabel: 'relative',
-  navIcon: 'h-[18px] w-[18px] shrink-0 transition-colors',
+  navIcon: 'size-4 shrink-0 transition-colors',
   navIconActive: 'text-[var(--color-ink)]',
   // Account footer
   footer:
@@ -118,7 +118,7 @@ export const LEFT_SIDEBAR = {
  */
 
 export const SEARCH_LAUNCHER = {
-  bar: 'glass-panel flex w-full items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-2 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  bar: 'glass-panel rail-reset flex w-full items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-2 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
   barLabel: 'flex-1 truncate text-body',
   barShortcut:
     'shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro font-medium text-[var(--color-ink-subtle)]',
@@ -149,7 +149,7 @@ export const MOBILE_NAV = {
  */
 
 export const TOP_BAR = {
-  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 bg-[var(--color-background)] px-3 md:hidden print:hidden',
+  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 bg-[var(--color-page)] px-3 md:hidden print:hidden',
   creator: 'flex min-w-0 flex-1 items-center gap-2',
   creatorName: 'truncate text-sm font-semibold',
   actions: 'flex shrink-0 items-center gap-1',
