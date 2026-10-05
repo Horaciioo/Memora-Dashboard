@@ -10,6 +10,7 @@ import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { CreatorAccountMenu } from '@/composites/shell/CreatorAccountMenu'
 import { CreatorSwitch } from '@/composites/shell/CreatorSwitch'
 import { RailLiveCall } from '@/composites/shell/RailLiveCall'
+import { RailShortcuts } from '@/composites/shell/RailShortcuts'
 import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
 import { useCalendarRail } from '@/core/hooks/interaction/useCalendarRail'
 import { useCourseRail } from '@/core/hooks/interaction/useCourseRail'
@@ -51,8 +52,16 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   // The live entry leaves the groups
   const entries = visibleNavGroups(viewContext.view, session, can, viewContext.live !== null)
   const liveItem = entries.flatMap((group) => group.items).find((item) => item.onlyLive)
+  // Shortcuts leave the groups too
+  const shortcuts = [
+    ...entries.flatMap((group) => group.items).filter((item) => item.quick),
+    { href: ROUTES.preferences, label: NAV_COPY.preferences, icon: 'settings' as const },
+  ]
   const groups = entries
-    .map((group) => ({ ...group, items: group.items.filter((item) => !item.onlyLive) }))
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => !item.onlyLive && !item.quick),
+    }))
     .filter((group) => group.items.length > 0)
 
   const toggleGroup = (label: string) => {
@@ -90,6 +99,8 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
           <SearchLauncher expanded />
         )}
       </div>
+
+      {!courseRail && !calendarRail && <RailShortcuts items={shortcuts} />}
 
       {liveItem && viewContext.live && !courseRail && !calendarRail && (
         <RailLiveCall item={liveItem} live={viewContext.live} />
@@ -166,13 +177,15 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
 
       {session && (
         <div className={LEFT_SIDEBAR.footer}>
-          <CreatorAccountMenu viewContext={viewContext} unreadCount={unreadCount} />
+          <div className={LEFT_SIDEBAR.footerBox}>
+            <CreatorAccountMenu viewContext={viewContext} unreadCount={unreadCount} />
 
-          <div className={LEFT_SIDEBAR.footerActions}>
-            <NotificationsBell
-              initialUnread={unreadCount}
-              iconClassName={LEFT_SIDEBAR.footerIcon}
-            />
+            <div className={LEFT_SIDEBAR.footerActions}>
+              <NotificationsBell
+                initialUnread={unreadCount}
+                iconClassName={LEFT_SIDEBAR.footerIcon}
+              />
+            </div>
           </div>
         </div>
       )}

@@ -160,6 +160,7 @@ export const TRAININGS_DONE_PARAM = 'achevee'
  * @property {MobileNavSlot} [mobile] - Promotes the entry onto the mobile nav pill
  * @property {boolean} [onlyLive] - Shown while a live is open
  * @property {PermissionName} [alwaysFor] - Shown regardless to whoever holds it
+ * @property {boolean} [quick] - Glyph box under the search
  */
 
 export interface NavigationItem {
@@ -173,6 +174,7 @@ export interface NavigationItem {
   mobile?: MobileNavSlot
   onlyLive?: boolean
   alwaysFor?: PermissionName
+  quick?: boolean
 }
 
 /**
@@ -262,10 +264,11 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Accueil',
         icon: 'dashboard',
         maturity: 'dev',
+        quick: true,
         mobile: { slot: 'home', order: 0 },
       },
       { href: ROUTES.absences, label: 'Absences', icon: 'absences' },
-      { href: ROUTES.changelog, label: 'Nouveautés', icon: 'news' },
+      { href: ROUTES.changelog, label: 'Nouveautés', icon: 'news', quick: true },
       {
         href: ROUTES.calendar,
         label: 'Calendrier',

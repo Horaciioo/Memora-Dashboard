@@ -78,23 +78,29 @@ export const LEFT_SIDEBAR = {
   // Page panel in the rail
   slot: 'flex min-h-0 flex-1 flex-col px-3',
   // Creator switch
-  creatorRow: 'flex shrink-0 justify-center px-3',
+  creatorRow: 'flex shrink-0 justify-center px-4 pb-3',
   // Search bar
-  searchRow: 'flex shrink-0 px-2',
+  searchRow: 'flex shrink-0 px-4',
+  // Glyph boxes under the search
+  shortcuts: 'flex shrink-0 gap-2 px-4 pt-3',
+  shortcut:
+    'glass-panel rail-reset flex h-11 flex-1 items-center justify-center rounded-[var(--radius-lg)] border text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  shortcutActive: 'text-[var(--color-ink)] shadow-[var(--shadow-md)]',
+  shortcutIcon: 'size-5 shrink-0',
   // Pins footer down
-  nav: 'flex min-h-0 w-full flex-1 flex-col gap-6 overflow-y-auto px-2 pt-5',
-  navGroup: 'flex flex-col gap-1',
+  nav: 'flex min-h-0 w-full flex-1 flex-col gap-7 overflow-y-auto px-4 pt-6 pb-4',
+  navGroup: 'flex flex-col gap-2',
   navGroupLabel:
-    'group flex w-full items-center gap-1 px-2 pb-1 text-body font-bold tracking-wide text-[var(--color-ink)] uppercase',
+    'group flex w-full items-center gap-1 px-3 pb-1 text-caption font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   navGroupChevron:
     'h-3.5 w-3.5 shrink-0 opacity-0 transition-[transform,opacity] group-hover:opacity-100 group-focus-visible:opacity-100',
   navGroupChevronCollapsed: '-rotate-90',
-  navGroupItems: 'flex flex-col gap-px',
+  navGroupItems: 'flex flex-col gap-1',
   navLink:
-    'group flex items-center gap-2 rounded-[var(--radius-md)] px-2 py-1 text-caption font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
+    'group flex items-center gap-3 rounded-[var(--radius-lg)] px-3 py-2.5 text-body font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
   navLinkActive: 'font-semibold text-[var(--color-ink)]',
   navLabel: 'relative',
-  navIcon: 'size-4 shrink-0 transition-colors',
+  navIcon: 'size-5 shrink-0 transition-colors',
   navIconActive: 'text-[var(--color-ink)]',
   // Live call under the search
   liveRow: 'relative flex shrink-0 px-2 pt-2',
@@ -105,16 +111,16 @@ export const LEFT_SIDEBAR = {
   liveArrow:
     'h-4 w-4 shrink-0 transition-transform duration-[var(--motion-duration-fast)] group-hover:translate-x-0.5',
   // Account footer
-  footer:
-    'flex shrink-0 items-center justify-between gap-1 border-t border-[var(--color-border)] px-3 pt-3',
-  footerAccount:
-    'flex min-w-0 flex-1 items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-2 text-left transition-colors hover:bg-[var(--color-hover)]',
+  footer: 'flex shrink-0 px-4 pt-3',
+  // Profile box, bell on its right
+  footerBox:
+    'glass-panel rail-reset flex min-w-0 flex-1 items-center gap-1 rounded-[var(--radius-xl)] border p-2',
   footerName: 'min-w-0 flex-1 truncate text-base font-semibold',
   footerActions: 'flex shrink-0 items-center gap-0.5',
-  footerIcon: 'h-4 w-4 shrink-0',
+  footerIcon: 'size-5 shrink-0',
   // Version under the nav
   version:
-    'mx-3 mt-2 mb-1 shrink-0 self-start rounded-[var(--radius-sm)] px-2 py-1 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+    'mx-4 mt-2 mb-1 shrink-0 self-start rounded-[var(--radius-sm)] px-2 py-1 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // View tints need a page plate
   footerPlate:
     'rail-reset bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)] hover:bg-[var(--color-hover)]',
@@ -126,7 +132,7 @@ export const LEFT_SIDEBAR = {
  */
 
 export const SEARCH_LAUNCHER = {
-  bar: 'glass-panel rail-reset flex w-full items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-2 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  bar: 'glass-panel rail-reset flex w-full items-center gap-2.5 rounded-[var(--radius-lg)] px-3.5 py-3 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
   barLabel: 'flex-1 truncate text-body',
   barShortcut:
     'shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro font-medium text-[var(--color-ink-subtle)]',
@@ -684,7 +690,7 @@ export const NUDGE = {
 export const CREATOR_MENU = {
   wrapper: 'relative min-w-0 flex-1',
   trigger:
-    'flex w-full min-w-0 items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-2 text-left transition-colors hover:bg-[var(--color-hover)]',
+    'flex w-full min-w-0 items-center gap-3 rounded-[var(--radius-lg)] px-2 py-1.5 text-left transition-colors hover:bg-[var(--color-hover)]',
   // Same footprint as a portrait
   noneGlyph: 'h-8 w-8 shrink-0 p-1',
   name: 'min-w-0 flex-1 truncate text-body font-medium',
