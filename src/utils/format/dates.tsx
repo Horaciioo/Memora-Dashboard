@@ -221,3 +221,35 @@ export function formatSince(date: Date | string): string {
 
   return DATE_COPY.daysAgo.replace('{count}', String(Math.floor(elapsed / DAY_MS)))
 }
+
+/**
+ * Format a time of day
+ * @param {Date | string | null | undefined} date - Date to format
+ * @return {string} - Hours and minutes
+ */
+
+export function formatClock(date: Date | string | null | undefined): string {
+  if (!date) return DATE_COPY.none
+
+  return new Date(date).toLocaleTimeString(DATE_LOCALE, { hour: '2-digit', minute: '2-digit' })
+}
+
+/**
+ * Format the gap between two dates
+ * @param {Date | string} start - Start
+ * @param {Date | string} end - End
+ * @return {string} - Hours and minutes
+ */
+
+export function formatSpan(start: Date | string, end: Date | string): string {
+  const total = Math.max(
+    0,
+    Math.round((new Date(end).getTime() - new Date(start).getTime()) / MINUTE_MS)
+  )
+  const hours = Math.floor(total / 60)
+  const minutes = total % 60
+
+  if (hours === 0) return `${minutes} min`
+
+  return minutes === 0 ? `${hours} h` : `${hours} h ${String(minutes).padStart(2, '0')}`
+}
