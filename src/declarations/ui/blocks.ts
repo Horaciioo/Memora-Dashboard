@@ -23,10 +23,20 @@ export const FLOATING_HINT = {
  */
 
 export const APP_SHELL = {
-  // Rail on the role gradient, the cream page beside it
-  frame: 'app-tone page-ground flex min-h-dvh',
+  // Room right of the page for the rim
+  frame: 'app-tone page-ground flex min-h-dvh md:pr-3',
+  // Window the page shows through
+  window:
+    'app-frame pointer-events-none fixed inset-y-3 right-3 left-[var(--shell-sidebar-w)] z-[35] hidden md:block print:hidden',
+  // No rail
+  windowBare: 'app-frame pointer-events-none fixed inset-3 z-[35] hidden md:block print:hidden',
+  // Scrollbar inside the window
+  windowTrack:
+    'group/track pointer-events-auto absolute top-[var(--radius-xl)] right-1 bottom-[var(--radius-xl)] w-2.5 cursor-pointer',
+  windowThumb:
+    'absolute inset-x-0.5 top-0 cursor-grab rounded-full bg-[var(--color-ink)]/25 transition-[background-color,left,right] duration-[var(--motion-duration-fast)] group-hover/track:inset-x-0 group-hover/track:bg-[var(--color-ink)]/40 active:cursor-grabbing active:bg-[var(--color-ink)]/50',
   // Positioned so the page banner can span the whole column
-  main: 'relative flex min-w-0 flex-1 flex-col bg-[var(--color-background)] md:rounded-l-[var(--radius-xl)] md:shadow-[var(--shadow-page)]',
+  main: 'relative flex min-w-0 flex-1 flex-col bg-[var(--color-background)]',
   // Gutters widen past md so a page never welds itself to either rail
   content:
     'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--banner-h)+2.5rem)] print:max-w-none print:p-0',
