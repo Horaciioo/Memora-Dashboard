@@ -445,9 +445,7 @@ export const MemberFileTabs = ({
   const overviewTab = () => (
     <MemberOverview
       absences={file.absences}
-      notes={file.notes}
       activity={activity}
-      canReadNotes={canReadNotes}
       canReadLogs={canReadLogs}
       onNavigate={setTab}
     />

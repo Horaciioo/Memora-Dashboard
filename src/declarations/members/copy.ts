@@ -81,7 +81,6 @@ export const MEMBER_COPY = {
   nowFreeLead: 'Aucune absence en cours ni prévue.',
   nowAbsent: 'En absence jusqu’au {date}',
   nowNext: 'Prochaine absence : {range}',
-  pinnedTitle: 'Notes épinglées',
   recentTitle: 'Activité récente',
   seeMore: 'Tout voir',
   journeyTitle: 'Son parcours',
