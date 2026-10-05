@@ -94,14 +94,4 @@ export const LIVE_PAGE_COPY = {
   open: 'J’ai lu, ouvrir la Mod View',
   reread: 'Relire les consignes',
   startedBubble: 'Le live a démarré ! On y va ?',
-  presentationTitle: 'Aucun live en cours',
-  presentationLead:
-    'Quand un Responsable lance un live, cette page passe au rouge et la Mod View s’ouvre ici. Voici à quoi elle ressemble.',
 } as const
-
-/**
- * Livecon level the presentation plays at
- * @type {number}
- */
-
-export const DEMO_LEVEL = 3
