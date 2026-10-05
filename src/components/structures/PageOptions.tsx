@@ -1,20 +1,16 @@
 'use client'
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { Toggle } from '@/components/elements/forms/Toggle'
+import { useBannerHost } from '@/core/hooks/interaction/useBannerHost'
 import { PAGE_OPTIONS_HOST_ID } from '@/declarations/ui/banners'
 import { PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { PAGE_OPTIONS } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-
-// The slot never changes once the banner is mounted
-const subscribeNothing = () => () => undefined
-
-const readHost = (): HTMLElement | null => document.getElementById(PAGE_OPTIONS_HOST_ID)
 
 export interface PageToggle {
   id: string
@@ -45,7 +41,7 @@ export interface PageOptionsProps {
  */
 
 export const PageOptions = ({ options }: PageOptionsProps) => {
-  const host = useSyncExternalStore(subscribeNothing, readHost, () => null)
+  const host = useBannerHost(PAGE_OPTIONS_HOST_ID)
   const [isOpen, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const MoreIcon = ICONS.more

@@ -29,11 +29,13 @@ export const PAGE_STYLES = {
   // Corner of the banner the page options sit in
   bannerOptions: 'absolute top-3 right-3 z-10 sm:top-4 sm:right-4',
   // Title sitting in the notch cut into the bottom edge of the banner
-  notch: 'absolute bottom-0 left-1/2 flex -translate-x-1/2 items-end',
+  notch: 'absolute bottom-0 left-1/2 flex -translate-x-1/2 items-stretch',
   notchBody:
-    'banner-notch-body flex min-w-0 max-w-[min(44rem,70vw)] items-center justify-center px-3 text-center',
+    'banner-notch-body flex min-w-0 max-w-[min(56rem,80vw)] flex-col items-center justify-center px-3 text-center',
   notchTitle: 'min-w-0 text-xl font-bold tracking-wide uppercase md:text-page',
   notchTitleText: 'min-w-0 text-balance md:truncate',
+  // Tab strip under the title, empty on most pages
+  notchTabs: 'flex max-w-full justify-center pb-2 empty:hidden',
   // Shoulders of the notch
   notchSlopeStart: 'banner-slope banner-slope-start',
   notchSlopeEnd: 'banner-slope banner-slope-end',

@@ -1,6 +1,9 @@
 'use client'
 
 import { useEffect, useLayoutEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import { useBannerHost } from '@/core/hooks/interaction/useBannerHost'
+import { PAGE_TABS_HOST_ID } from '@/declarations/ui/banners'
 import { TABS_STYLES } from '@/declarations/ui/variants'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
@@ -27,6 +30,8 @@ export interface TabsProps {
   collapse?: TabCollapse
   // Strip centred over its panel
   centered?: boolean
+  // Carried into the banner notch when the page has one
+  inBanner?: boolean
 }
 
 /**
@@ -51,6 +56,7 @@ const labelReveal = (collapse: TabCollapse, isActive: boolean): string => {
  * @param {string} label - Accessible name of the strip
  * @param {TabCollapse} [collapse] - Label visibility mode
  * @param {boolean} [centered] - Centres the strip
+ * @param {boolean} [inBanner] - Sits in the banner notch
  * @return {JSX.Element}
  */
 
@@ -61,7 +67,9 @@ export const Tabs = ({
   label,
   collapse = 'mobile',
   centered,
+  inBanner,
 }: TabsProps) => {
+  const host = useBannerHost(PAGE_TABS_HOST_ID)
   const tabsRef = useRef(new Map<string, HTMLButtonElement>())
   const listRef = useRef<HTMLDivElement | null>(null)
   const ruleRef = useRef<HTMLSpanElement | null>(null)
@@ -136,7 +144,7 @@ export const Tabs = ({
     tabsRef.current.get(value)?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   }, [value])
 
-  return (
+  const strip = (
     <div
       ref={listRef}
       className={cn(TABS_STYLES.list, centered && TABS_STYLES.listCentered)}
@@ -181,4 +189,6 @@ export const Tabs = ({
       <span ref={ruleRef} className={TABS_STYLES.indicator} aria-hidden="true" />
     </div>
   )
+
+  return inBanner && host ? createPortal(strip, host) : strip
 }

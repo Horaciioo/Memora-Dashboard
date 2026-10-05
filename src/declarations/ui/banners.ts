@@ -80,3 +80,6 @@ export const bannerFor = (pathname: string): BannerScene => {
 
 // Slot of the banner the page options are carried into
 export const PAGE_OPTIONS_HOST_ID = 'page-options-host'
+
+// Slot of the banner notch the tab strip is carried into
+export const PAGE_TABS_HOST_ID = 'page-tabs-host'

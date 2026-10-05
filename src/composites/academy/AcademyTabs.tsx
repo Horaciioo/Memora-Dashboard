@@ -20,6 +20,7 @@ export const AcademyTabs = () => {
 
   return (
     <Tabs
+      inBanner
       label={ACADEMY_COPY.title}
       value={value}
       onChange={(next) => router.push(next === 'glossary' ? ROUTES.glossary : ROUTES.academy)}

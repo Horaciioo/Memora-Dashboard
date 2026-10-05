@@ -63,6 +63,7 @@ export const FileTabs = ({ label, tabs, initial, value, onChange, centered }: Fi
         onChange={setTab}
         label={label}
         centered={centered}
+        inBanner
       />
       {current?.render()}
     </>
