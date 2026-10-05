@@ -47,23 +47,13 @@
     radial-gradient(75% 65% at 0% 100%, var(--color-frame-white), transparent),
     linear-gradient(var(--color-frame-white), var(--color-frame-white));
   /* Page ground, the frame colours washed into the page colour */
-  --gradient-page:
-    radial-gradient(
-      80% 70% at 0% 0%,
-      color-mix(in srgb, var(--color-frame-mauve) var(--page-wash), var(--page-base)),
-      transparent
-    ),
-    radial-gradient(
-      80% 70% at 100% 0%,
-      color-mix(in srgb, var(--color-frame-blue) var(--page-wash), var(--page-base)),
-      transparent
-    ),
-    radial-gradient(
-      80% 70% at 100% 100%,
-      color-mix(in srgb, var(--color-frame-pink) var(--page-wash), var(--page-base)),
-      transparent
-    ),
-    linear-gradient(var(--page-base), var(--page-base));
+  --gradient-page: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-frame-mauve) var(--page-wash), var(--page-base)) 0%,
+    color-mix(in srgb, var(--color-frame-blue) var(--page-wash), var(--page-base)) 34%,
+    color-mix(in srgb, var(--color-frame-pink) var(--page-wash), var(--page-base)) 68%,
+    color-mix(in srgb, var(--color-frame-white) var(--page-wash), var(--page-base)) 100%
+  );
   --gradient-soft: linear-gradient(
     135deg,
     var(--color-mauve-200) 0%,
