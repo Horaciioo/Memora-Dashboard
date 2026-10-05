@@ -60,13 +60,13 @@
   --color-sky-900: #213f61;
 
   /* Status tones, flat and laid down, never neon */
-  --color-success: #15803d;
+  --color-success: #2e7d4f;
   --color-caution: #8a5a00;
   --color-warning: #964f08;
-  --color-danger: #d32f2f;
+  --color-danger: #b83a3a;
   --color-info: #2f6496;
   --color-neutral: #636368;
-  --color-success-soft: #e6f6ec;
+  --color-success-soft: #e8f3ec;
   --color-caution-soft: #f8efd6;
   --color-warning-soft: #f9e9d6;
   --color-danger-soft: #fde5e6;
@@ -101,7 +101,7 @@
   --color-scrim: rgb(20 20 28 / 0.4);
 
   /* Authority, reserved to the two Administration roles */
-  --color-authority-admin: #d32f2f;
+  --color-authority-admin: #b83a3a;
   --color-authority-lead: #964f08;
   --color-authority-admin-soft: #fde5e6;
   --color-authority-lead-soft: #f9e9d6;
