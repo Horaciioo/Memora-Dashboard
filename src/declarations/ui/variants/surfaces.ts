@@ -111,17 +111,18 @@ export type GlyphSize = keyof Omit<typeof GLYPH_STYLES, 'base'>
 
 export const DIALOG_STYLES = {
   overlay:
-    'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-scrim)] sm:items-center sm:p-6',
+    'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-scrim)] backdrop-blur-sm sm:items-center sm:p-6',
   panel:
-    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] sm:rounded-[var(--radius-xl)]',
-  header: 'flex items-start gap-3 px-5 pt-5 pb-4 sm:px-6',
+    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/90 shadow-[var(--shadow-lg)] backdrop-blur-2xl backdrop-saturate-150 sm:rounded-[var(--radius-xl)]',
+  header: 'flex items-start gap-3 px-6 pt-6 pb-4 sm:px-8',
   heading: 'flex min-w-0 flex-1 flex-col gap-1',
-  title: 'text-lg leading-tight font-bold tracking-tight',
+  title: 'text-xl leading-tight font-bold tracking-tight',
   close: '-mt-1 -mr-2 shrink-0',
-  body: 'flex-1 overflow-y-auto border-t border-[var(--color-border)] px-5 py-5 sm:px-6',
+  body: 'flex-1 overflow-y-auto border-t border-[var(--color-border)] px-6 py-6 sm:px-8',
   // Tabs already rule the top
   bodyFlush: 'border-t-0 pt-1',
-  footer: 'flex flex-wrap items-center justify-end gap-2 px-5 pt-1 pb-5 sm:px-6',
+  footer:
+    'flex flex-wrap items-center justify-end gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface-sunken)]/40 px-6 py-4 sm:px-8',
 } as const
 
 /**
@@ -151,18 +152,20 @@ export const DRAWER_STYLES = {
   // Bottom sheet on mobile, floating card from md
   panel:
     'drawer-enter fixed inset-x-0 bottom-0 z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
-  header: 'flex shrink-0 items-center gap-3 px-5 pt-4 pb-3',
-  // Bare glyph
-  glyph: 'flex shrink-0 items-center text-[var(--color-ink-accent)]',
+  header: 'flex shrink-0 items-center gap-3.5 px-6 pt-5 pb-4',
+  // Glyph in a soft chip
+  glyph:
+    'flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[image:var(--gradient-soft)] text-[var(--color-ink)]',
   glyphIcon: 'h-5 w-5',
-  title: 'min-w-0 flex-1 truncate text-base leading-tight font-bold tracking-tight',
+  title: 'min-w-0 flex-1 truncate text-lg leading-tight font-bold tracking-tight',
   close: '-mr-2 shrink-0',
   // Section tabs under the header
-  sections: 'shrink-0 px-5 pb-1',
-  body: 'min-h-0 flex-1 overflow-y-auto px-5 py-4',
+  sections: 'shrink-0 px-6 pb-2',
+  body: 'min-h-0 flex-1 overflow-y-auto px-6 py-5',
   // Fields of the section on screen
   section: 'drawer-section-enter',
-  footer: 'shrink-0 border-t border-[var(--color-border)] px-2 py-2',
+  footer:
+    'shrink-0 border-t border-[var(--color-border)] bg-[var(--color-surface-sunken)]/40 px-3 py-3',
 } as const
 
 /**
