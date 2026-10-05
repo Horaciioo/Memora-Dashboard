@@ -20,15 +20,14 @@ export type SkeletonShape = keyof typeof SKELETON_SHAPES
  */
 
 export const BRAND_LOADER = {
-  // Pink tile holding the mark
-  tile: 'inline-flex shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-brand-600)] px-3 py-2 shadow-[var(--shadow-sm)]',
-  tileMark: 'loader-gif-brand h-10 w-auto',
+  // Bare mark, no box
+  tile: 'inline-flex shrink-0 items-center justify-center',
+  tileMark: 'loader-gif h-10 w-auto',
   // Centred in a panel waiting on its data
   block:
-    'flex min-h-48 w-full flex-col items-center justify-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] py-10',
-  blockTile:
-    'inline-flex items-center justify-center rounded-[var(--radius-xl)] bg-[var(--color-brand-600)] px-6 py-4 shadow-[var(--shadow-md)]',
-  blockMark: 'loader-gif-brand h-16 w-auto',
+    'flex min-h-48 w-full flex-col items-center justify-center gap-3 py-10',
+  blockTile: 'inline-flex items-center justify-center',
+  blockMark: 'loader-gif h-16 w-auto',
   // Inside a pink button
   inline: 'loader-gif-brand h-4 w-auto shrink-0',
   // On a light surface
@@ -43,8 +42,9 @@ export const BRAND_LOADER = {
 
 export const PAGE_SKELETON = {
   page: 'flex flex-col gap-8',
-  head: 'flex items-center justify-between gap-4',
-  title: 'flex flex-col gap-2',
+  // Banner stand-in and its notch title
+  bannerFill: 'absolute inset-0',
+  notchTitle: 'h-8 w-56 max-w-full',
   stack: 'flex flex-col gap-3',
   // Raised box like the real sections
   box: 'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',

@@ -1,6 +1,5 @@
-import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { Skeleton, SkeletonList } from '@/components/elements/feedback/Skeleton'
-import { PAGE_SKELETON } from '@/declarations/ui/variants'
+import { PAGE_SKELETON, PAGE_STYLES } from '@/declarations/ui/variants'
 import type { SkeletonShape } from '@/declarations/ui/variants'
 
 export interface PageSkeletonBlock {
@@ -16,6 +15,8 @@ export interface PageSkeletonProps {
   layout?: PageSkeletonLayout
   // Hand-picked stack
   blocks?: PageSkeletonBlock[]
+  // Pages without a banner
+  bare?: boolean
 }
 
 // Stand-in for a titled box of the real page
@@ -136,22 +137,37 @@ const LayoutBody = ({ layout }: { layout: PageSkeletonLayout }) => {
 }
 
 /**
- * Route-level skeleton: a title with the brand loader beside it, then the shape of the page
- * it stands in for, so nothing jumps once the data lands
- * @param {PageSkeletonLayout} [layout] - Page family to echo
- * @param {PageSkeletonBlock[]} [blocks] - Hand-picked stack replacing the layout
+ * Banner and notch of the page
  * @return {JSX.Element}
  */
 
-export const PageSkeleton = ({ layout = 'list', blocks }: PageSkeletonProps) => (
-  <div className={PAGE_SKELETON.page}>
-    <div className={PAGE_SKELETON.head}>
-      <div className={PAGE_SKELETON.title}>
-        <Skeleton shape="line" className="h-6 w-48" />
-        <Skeleton shape="line" className="w-80 max-w-full" />
+const BannerSkeleton = () => (
+  <div className={PAGE_STYLES.banner} aria-hidden="true">
+    <Skeleton shape="row" className={PAGE_SKELETON.bannerFill} />
+    <div className={PAGE_STYLES.notch}>
+      <span className={PAGE_STYLES.notchSlopeStart} />
+      <div className={PAGE_STYLES.notchBody}>
+        <div className={PAGE_STYLES.notchTitleRow}>
+          <Skeleton shape="line" className={PAGE_SKELETON.notchTitle} />
+        </div>
       </div>
-      <BrandLoader />
+      <span className={PAGE_STYLES.notchSlopeEnd} />
     </div>
+  </div>
+)
+
+/**
+ * Route-level skeleton: the banner then the whole page it stands in for, so nothing
+ * jumps once the data lands
+ * @param {PageSkeletonLayout} [layout] - Page family to echo
+ * @param {PageSkeletonBlock[]} [blocks] - Hand-picked stack replacing the layout
+ * @param {boolean} [bare] - Leaves the banner out
+ * @return {JSX.Element}
+ */
+
+export const PageSkeleton = ({ layout = 'list', blocks, bare }: PageSkeletonProps) => (
+  <div className={PAGE_SKELETON.page}>
+    {!bare && <BannerSkeleton />}
     {blocks ? (
       blocks.map((block, index) => (
         <SkeletonList key={index} shape={block.shape} rows={block.rows} />
