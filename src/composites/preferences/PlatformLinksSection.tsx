@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
+import { NetworkLogo } from '@/components/elements/display/NetworkLogo'
 import { Section } from '@/components/structures/Section'
 import { unlinkTwitchAccount } from '@/app/(dashboard)/parametres/actions'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -31,7 +32,6 @@ export interface PlatformLinksSectionProps {
 export const PlatformLinksSection = ({ links, twitchAvailable }: PlatformLinksSectionProps) => {
   const [isUnlinking, setUnlinking] = useState(false)
   const twitch = links.find((link) => link.platform === LivePlatforms.Twitch)
-  const Glyph = ICONS.twitch
   const StatusOn = ICONS.success
   const StatusOff = ICONS.warning
 
@@ -39,7 +39,7 @@ export const PlatformLinksSection = ({ links, twitchAvailable }: PlatformLinksSe
     <Section title={PLATFORM_ACCOUNT_COPY.title} description={PLATFORM_ACCOUNT_COPY.lead} padded>
       <ul className={SECURITY_LIST.list}>
         <li className={SECURITY_LIST.row}>
-          <Glyph className={SECURITY_LIST.glyph} />
+          <NetworkLogo network="twitch" className={SECURITY_LIST.glyph} />
           <div className={SECURITY_LIST.body}>
             <p className={SECURITY_LIST.title}>{PLATFORM_ACCOUNT_COPY.twitch}</p>
             <p className={SECURITY_LIST.meta}>
