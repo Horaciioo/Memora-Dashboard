@@ -303,7 +303,8 @@ export const MEMBER_FILE = {
     'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-3 transition-colors hover:bg-[var(--color-hover)]',
   socialLogo:
     'flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)]',
-  socialsGrid: 'grid gap-3 sm:grid-cols-2',
+  socialsGrid: 'grid auto-rows-[4.5rem] gap-3 sm:grid-cols-2',
+  socialAdd: 'h-full',
   more: 'self-start text-sm font-semibold text-[var(--color-brand-800)] underline-offset-4 hover:underline',
 } as const
 

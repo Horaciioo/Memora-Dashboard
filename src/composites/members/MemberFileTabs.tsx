@@ -609,7 +609,7 @@ export const MemberFileTabs = ({
             </div>
           ))}
           <AddRow
-            tile
+            className={MEMBER_FILE.socialAdd}
             label={MEMBER_COPY.socialAdd}
             disabled={!canWriteSocials}
             onClick={() => openSocial(null)}
