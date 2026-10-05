@@ -92,10 +92,10 @@ export const LEFT_SIDEBAR = {
   navGroupItems: 'flex flex-col gap-0.5',
   navLink:
     'group flex items-center gap-3 rounded-[var(--radius-md)] py-1.5 pr-2.5 pl-4 text-lg font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)]',
-  navLinkActive: 'font-bold text-[var(--color-ink-accent)]',
+  navLinkActive: 'font-semibold text-[var(--color-ink)]',
   navLabel: 'relative',
   navIcon: 'h-[18px] w-[18px] shrink-0 transition-colors',
-  navIconActive: 'fill-[var(--color-brand-soft)] text-[var(--color-ink-accent)]',
+  navIconActive: 'text-[var(--color-ink)]',
   // Account footer
   footer:
     'flex shrink-0 items-center justify-between gap-1 border-t border-[var(--color-border)] px-3 pt-3',

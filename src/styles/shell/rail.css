@@ -39,10 +39,9 @@
   color: var(--color-ink);
 }
 
-/* Open page: white pill, words in deep rose */
+/* Open page: a white box like Notion, text left plain */
 .rail-ground [aria-current='page'] {
-  --color-brand-600: var(--page-brand-800);
-  color: var(--page-brand-800);
+  color: var(--page-ink);
   background: var(--page-surface);
   box-shadow: var(--shadow-sm);
 }
