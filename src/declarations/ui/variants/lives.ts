@@ -43,7 +43,6 @@ export const LIVE_BOARD = {
 
 export const LIVE_NAV = {
   dotPulse: 'live-pulse',
-  labelLive: 'font-bold text-[var(--color-danger)]',
 } as const
 
 /**

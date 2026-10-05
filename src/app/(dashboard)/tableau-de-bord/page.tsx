@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { HomeAgenda } from '@/composites/personal/HomeAgenda'
+import { HomeNews } from '@/composites/personal/HomeNews'
 import { HomeLives } from '@/composites/personal/HomeLives'
 import { HomeQueue } from '@/composites/personal/HomeQueue'
 import { HomeLiveCall } from '@/composites/lives/HomeLiveCall'
@@ -11,10 +12,12 @@ import { readCurrentState } from '@/core/services/livecon/LiveconService'
 import { myMeetings, upcomingBirthdays } from '@/core/services/personal/HomeService'
 import { myTasks } from '@/core/services/personal/TaskInboxService'
 import { requireUser } from '@/core/wrappers/requireUser'
+import { changelogFor } from '@/declarations/changelog/helpers'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { HOME_FLOW } from '@/declarations/ui/variants'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import { Permissions } from '@/utils/constants/permissions'
+import { formatDay } from '@/utils/format/dates'
 
 export const metadata: Metadata = { title: PERSONAL_COPY.title }
 
@@ -47,6 +50,9 @@ export default async function DashboardPage() {
   return (
     <div className={HOME_FLOW.page}>
       <PageHeader title={PERSONAL_COPY.greeting.replace('{name}', session.displayName)} />
+      <p className={HOME_FLOW.lead}>
+        {PERSONAL_COPY.lead.replace('{date}', formatDay(new Date()))}
+      </p>
       <HomeLiveCall beacon={beacon} />
       <HomeLives items={livecon} />
       <div className={HOME_FLOW.grid}>
@@ -56,7 +62,7 @@ export default async function DashboardPage() {
           tasks={tasks}
           rollCalls={rollCalls}
         />
-        <section className={HOME_FLOW.column}>
+        <section className={HOME_FLOW.panel}>
           <h2 className={HOME_FLOW.label}>{PERSONAL_COPY.aheadTitle}</h2>
           <HomeAgenda
             meetings={meetings}
@@ -65,6 +71,7 @@ export default async function DashboardPage() {
           />
         </section>
       </div>
+      <HomeNews release={changelogFor(access.can)[0]} />
     </div>
   )
 }

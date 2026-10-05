@@ -96,6 +96,14 @@ export const LEFT_SIDEBAR = {
   navLabel: 'relative',
   navIcon: 'size-4 shrink-0 transition-colors',
   navIconActive: 'text-[var(--color-ink)]',
+  // Live call under the search
+  liveRow: 'relative flex shrink-0 px-2 pt-2',
+  liveLink:
+    'group flex w-full items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-1.5 text-left text-caption font-bold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
+  liveLabel: 'min-w-0 flex-1 truncate',
+  liveSweep: 'light-sweep [--sweep-base:color-mix(in_oklab,var(--color-ink)_62%,transparent)]',
+  liveArrow:
+    'h-4 w-4 shrink-0 transition-transform duration-[var(--motion-duration-fast)] group-hover:translate-x-0.5',
   // Account footer
   footer:
     'flex shrink-0 items-center justify-between gap-1 border-t border-[var(--color-border)] px-3 pt-3',

@@ -199,3 +199,30 @@
   animation: live-pulse var(--motion-duration-pulse) ease-in-out infinite;
   transform-origin: center;
 }
+
+/* Band of light running across a line of text while it waits */
+.light-sweep {
+  background-image: linear-gradient(
+    100deg,
+    var(--sweep-base, var(--color-ink-subtle)) 0 34%,
+    color-mix(in oklab, var(--sweep-light, var(--color-ink)) 55%, transparent) 42%,
+    var(--sweep-light, var(--color-ink)) 47% 53%,
+    color-mix(in oklab, var(--sweep-light, var(--color-ink)) 55%, transparent) 58%,
+    var(--sweep-base, var(--color-ink-subtle)) 66% 100%
+  );
+  background-size: 240% 100%;
+  background-position: 100% 0;
+  background-clip: text;
+  color: transparent;
+  animation: light-sweep var(--motion-duration-slow) var(--motion-ease-settle) infinite;
+}
+
+@keyframes light-sweep {
+  0% {
+    background-position: 100% 0;
+  }
+  55%,
+  100% {
+    background-position: 0% 0;
+  }
+}

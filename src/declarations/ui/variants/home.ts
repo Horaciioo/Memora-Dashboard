@@ -117,4 +117,22 @@ export const HOME_FLOW = {
   agendaGlyph: 'h-5 w-5 shrink-0',
   agendaTitle: 'min-w-0 flex-1 truncate font-semibold',
   quiet: 'text-sm text-[var(--color-ink-subtle)]',
+  // Opening line
+  lead: 'text-center text-body text-[var(--color-ink-subtle)] first-letter:uppercase',
+  // Agenda card
+  panel:
+    'flex min-w-0 flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6',
+  // Latest note
+  news: 'card-glow relative flex flex-col gap-6 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-7 sm:flex-row sm:items-center',
+  newsStar:
+    'flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-[var(--color-caution-soft)]',
+  newsStarIcon: 'h-11 w-11',
+  newsBody: 'flex min-w-0 flex-1 flex-col gap-2',
+  newsKicker: PROPERTY_LABEL,
+  newsTitle: 'text-2xl font-bold tracking-tight',
+  newsIntro: 'text-body text-[var(--color-ink-subtle)]',
+  newsLines: 'mt-1 flex flex-col gap-1.5',
+  newsLine: 'flex items-start gap-2 text-body',
+  newsLineIcon: 'mt-1 h-3.5 w-3.5 shrink-0',
+  newsActions: 'flex shrink-0 flex-col gap-2 sm:items-end',
 } as const
