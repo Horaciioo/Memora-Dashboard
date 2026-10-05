@@ -32,11 +32,11 @@ export const PAGE_STYLES = {
   notch: 'absolute inset-x-0 bottom-0 mx-auto flex w-fit items-stretch',
   notchBody:
     'banner-notch-body flex min-w-0 max-w-[min(56rem,80vw)] flex-col items-stretch px-6 text-center',
-  notchTitleRow: 'flex min-h-[var(--shell-notch-h)] translate-y-2 items-center justify-center',
+  notchTitleRow: 'flex min-h-[var(--shell-notch-h)] items-center justify-center pt-1 pb-4',
   notchTitle: 'min-w-0 text-xl font-bold tracking-wide uppercase md:text-page',
   notchTitleText: 'min-w-0 text-balance md:truncate',
   // Tab strip under the title, empty on most pages
-  notchTabs: 'flex w-full justify-center border-t border-[var(--color-border)] pt-3 pb-2 empty:hidden *:translate-y-5',
+  notchTabs: 'flex w-full justify-center border-t border-[var(--color-border)] pt-4 pb-2 empty:hidden',
   // Shoulders of the notch
   notchSlopeStart: 'banner-slope banner-slope-start',
   notchSlopeEnd: 'banner-slope banner-slope-end',
