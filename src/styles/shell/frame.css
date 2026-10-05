@@ -49,24 +49,6 @@
   box-shadow: var(--shadow-page);
 }
 
-/* A border wide enough for any screen, its inner edge following the window corners. The ramp is
-   pinned to the viewport so the rail and the rim read as one sheet */
-.app-frame::before {
-  content: '';
-  position: absolute;
-  inset: -100vmax;
-  border: 100vmax solid transparent;
-  border-radius: calc(100vmax + var(--radius-xl));
-  background: var(--gradient-frame) border-box fixed;
-  -webkit-mask:
-    linear-gradient(var(--color-ink) 0 0) padding-box,
-    linear-gradient(var(--color-ink) 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(var(--color-ink) 0 0) padding-box exclude,
-    linear-gradient(var(--color-ink) 0 0);
-}
-
 /* The framed page draws its own scrollbar */
 @media (width >= 768px) {
   :root:has(.app-frame) {

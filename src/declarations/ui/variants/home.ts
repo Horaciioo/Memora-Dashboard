@@ -76,7 +76,7 @@ export const HOME_FLOW = {
   liveState: 'text-xs text-[var(--color-ink-subtle)]',
   // Focus
   focus:
-    'course-pop flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-7',
+    'course-pop card-glow flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-7',
   focusTop: 'flex items-start justify-between gap-4',
   focusGlyph: 'h-12 w-12 shrink-0 text-[var(--color-ink-accent)]',
   focusDue: 'text-sm font-semibold text-[var(--color-ink-subtle)]',
@@ -99,7 +99,7 @@ export const HOME_FLOW = {
   queueDue: 'shrink-0 text-xs font-semibold text-[var(--color-ink-subtle)]',
   more: 'self-start rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // Nothing waits
-  calm: 'flex flex-col items-center gap-2 rounded-[var(--radius-xl)] border border-dashed border-[var(--color-border-strong)] px-6 py-14 text-center',
+  calm: 'card-glow flex flex-col items-center gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface px-6 py-14 text-center',
   calmGlyph: 'course-check mb-2 h-12 w-12 text-[var(--color-success)]',
   calmTitle: 'text-xl font-bold tracking-tight',
   calmLead: 'max-w-xs text-sm text-[var(--color-ink-subtle)]',
