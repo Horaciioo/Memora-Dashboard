@@ -1,11 +1,13 @@
 import { useId } from 'react'
 import type { FC, ReactNode } from 'react'
+import { RampStops } from '@/components/elements/display/RampStops'
+import { SCENE_RAMP } from '@/declarations/ui/ramps'
 
 export interface EmptyStateIllustrationProps {
   className?: string
 }
 
-// Gradients handed to a scene: candy pink body, pale lift, deep rose
+// Gradients handed to a scene: body, pale lift, deep shade
 interface ScenePaints {
   fill: string
   lift: string
@@ -32,7 +34,7 @@ const SPARK = 'M0-1C.16-.36.36-.16 1 0C.36.16.16.36 0 1C-.16.36-.36.16-1 0C-.36-
 const LINE = { fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' } as const
 
 /**
- * Canvas of every figure: a ground shadow and the candy pink ramp
+ * Canvas of every figure: a ground shadow and the pastel ramp
  * @param {Object} props - Sizing class and the drawing
  * @param {string} [props.className] - Classes merged onto the svg
  * @param {(paints: ScenePaints) => ReactNode} props.render - Drawing
@@ -64,8 +66,7 @@ const Scene = ({
           y2="180"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0" stopColor="var(--color-brand-200)" />
-          <stop offset="1" stopColor="var(--color-brand-500)" />
+          <RampStops colours={[SCENE_RAMP.fillFrom, SCENE_RAMP.fillMid, SCENE_RAMP.fillTo]} />
         </linearGradient>
         <linearGradient
           id={liftId}
@@ -75,8 +76,7 @@ const Scene = ({
           y2="150"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0" stopColor="var(--color-brand-50)" />
-          <stop offset="1" stopColor="var(--color-brand-200)" />
+          <RampStops colours={[SCENE_RAMP.liftFrom, SCENE_RAMP.liftMid, SCENE_RAMP.liftTo]} />
         </linearGradient>
         <linearGradient
           id={deepId}
@@ -86,8 +86,7 @@ const Scene = ({
           y2="190"
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0" stopColor="var(--color-brand-400)" />
-          <stop offset="1" stopColor="var(--color-brand-700)" />
+          <RampStops colours={[SCENE_RAMP.deepFrom, SCENE_RAMP.deepMid, SCENE_RAMP.deepTo]} />
         </linearGradient>
       </defs>
 

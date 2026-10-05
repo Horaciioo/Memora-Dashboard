@@ -318,7 +318,7 @@ export const PREFERENCE_STYLES = {
   stack: 'flex flex-col gap-6',
   rows: 'flex flex-col divide-y divide-[var(--color-border)]',
   row: 'flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0',
-  label: 'text-sm font-medium',
+  label: 'flex items-center gap-2 text-sm font-medium',
   notice: 'pt-3 text-xs text-[var(--color-ink-subtle)]',
   footer: 'flex justify-center pt-5',
 } as const

@@ -12,9 +12,8 @@ export type FontScale = 'sm' | 'md' | 'lg'
  * @typedef {Object} PreferenceOption
  * @property {string} label - Full label
  * @property {string} short - Caption of the segmented control
- * @property {IconName} [icon] - Glyph of its card
- * @property {string} [description] - Line under its card label
- * @property {string} [sample] - Text size of its card sample
+ * @property {IconName} [icon] - Glyph of its option
+ * @property {string} [description] - Line under its label
  */
 
 interface PreferenceOption {
@@ -22,7 +21,6 @@ interface PreferenceOption {
   short: string
   icon?: IconName
   description?: string
-  sample?: string
 }
 
 /**
@@ -85,9 +83,9 @@ export const THEME_REGISTRY = createRegistry(THEME_MAP)
  */
 
 const FONT_SCALE_MAP: Record<FontScale, PreferenceOption> = {
-  sm: { label: 'Petite', short: 'A-', sample: 'text-lg' },
-  md: { label: 'Normale', short: 'A', sample: 'text-2xl' },
-  lg: { label: 'Grande', short: 'A+', sample: 'text-3xl' },
+  sm: { label: 'Petite', short: 'A-' },
+  md: { label: 'Normale', short: 'A' },
+  lg: { label: 'Grande', short: 'A+' },
 }
 
 export const FONT_SCALE_REGISTRY = createRegistry(FONT_SCALE_MAP)

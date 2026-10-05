@@ -5,6 +5,7 @@
 @import './tokens/scale.css';
 @import './tokens/gradients.css';
 @import './tokens/external.css';
+@import './tokens/vision.css';
 @import './base/root.css';
 @import './base/motion.css';
 @import './shell/tones.css';

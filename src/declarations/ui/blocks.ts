@@ -695,29 +695,6 @@ export const CREATOR_MENU = {
 } as const
 
 /**
- * Setting cards: theme, text size, colour vision
- * @type {Record<string, string>}
- */
-
-export const PICKER_BLOCK = {
-  pair: 'grid gap-6 lg:grid-cols-2',
-  group: 'flex flex-col gap-2.5',
-  title: 'flex items-center gap-2 text-sm font-semibold',
-  three: 'grid grid-cols-3 gap-2',
-  two: 'grid grid-cols-2 gap-2',
-  option:
-    'flex flex-col items-center justify-end gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 transition-[border-color,transform] hover:-translate-y-px hover:border-[var(--color-border-strong)]',
-  optionWide:
-    'flex flex-col items-start gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-left transition-[border-color,transform] hover:-translate-y-px hover:border-[var(--color-border-strong)]',
-  active:
-    'border-[var(--color-brand-600)] bg-[var(--color-brand-50)] ring-2 ring-[var(--color-brand-600)]/20',
-  glyph: 'h-9 w-9',
-  sample: 'leading-none font-bold tracking-tight',
-  label: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
-  description: 'text-xs leading-snug text-[var(--color-ink-subtle)]',
-} as const
-
-/**
  * Glyph-led rows of the security tab
  * @type {Record<string, string>}
  */

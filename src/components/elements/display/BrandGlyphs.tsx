@@ -1,7 +1,9 @@
 import { useId } from 'react'
 import type { ReactNode } from 'react'
+import { RampStops } from '@/components/elements/display/RampStops'
 import { GLYPH_TINTS } from '@/declarations/members/tints'
 import type { GlyphTint } from '@/declarations/members/tints'
+import { BRAND_RAMP } from '@/declarations/ui/ramps'
 
 // GlyphProps
 export interface GlyphProps {
@@ -13,19 +15,7 @@ export type Paints = { fill: string; lift: string; deep: string; cut: string }
 
 // Stops of each ramp
 const FRAME_RAMPS = {
-  // Leaf green through sky blue into rose
-  brand: {
-    fillFrom: 'var(--color-leaf-600)',
-    fillMid: 'var(--color-sky-600)',
-    fillTo: 'var(--color-brand-700)',
-    liftFrom: 'var(--color-leaf-200)',
-    liftMid: 'var(--color-sky-200)',
-    liftTo: 'var(--color-brand-200)',
-    deepFrom: 'var(--color-leaf-700)',
-    deepMid: 'var(--color-sky-700)',
-    deepTo: 'var(--color-brand-800)',
-    cut: 'var(--color-brand-50)',
-  },
+  brand: BRAND_RAMP,
   success: {
     fillFrom: 'color-mix(in oklab, var(--color-success) 70%, var(--color-on-media))',
     fillTo: 'var(--color-success)',
@@ -58,15 +48,6 @@ const FRAME_RAMPS = {
 }
 
 export type FrameTone = keyof typeof FRAME_RAMPS
-
-// Evenly spaced stops, the middle one optional
-const RampStops = ({ colours }: { colours: (string | undefined)[] }) => {
-  const stops = colours.filter((colour): colour is string => Boolean(colour))
-
-  return stops.map((colour, index) => (
-    <stop key={colour} offset={index / (stops.length - 1)} stopColor={colour} />
-  ))
-}
 
 /**
  * Wraps a drawing in a 24 square with the shared three-tone ramp

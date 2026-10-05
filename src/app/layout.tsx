@@ -4,7 +4,6 @@ import { headers } from 'next/headers'
 import type { ReactNode } from 'react'
 import '@/styles/globals.css'
 import { ThemeScript } from '@/components/tools/ThemeScript'
-import { ColorVisionFilters } from '@/components/tools/ColorVisionFilters'
 import { Providers } from '@/app/providers'
 import { getSession } from '@/core/lib/auth/getSession'
 import { NONCE_HEADER } from '@/declarations/system/securityHeaders'
@@ -60,7 +59,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         style={SHELL_VARS}
         className="bg-[var(--color-background)] text-[var(--color-ink)] antialiased"
       >
-        <ColorVisionFilters />
         <Providers initialSession={initialSession}>{children}</Providers>
       </body>
     </html>

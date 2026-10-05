@@ -58,19 +58,6 @@ h4 {
   background-clip: content-box;
 }
 
-/* Colour vision filters, set by ColorVisionManager */
-html[data-color-vision='protanopia'] {
-  filter: url(#protanopia-filter);
-}
-
-html[data-color-vision='deuteranopia'] {
-  filter: url(#deuteranopia-filter);
-}
-
-html[data-color-vision='tritanopia'] {
-  filter: url(#tritanopia-filter);
-}
-
 /* Smallest comfortable tap area for a compact control */
 .touch-target {
   min-height: 2.75rem;
