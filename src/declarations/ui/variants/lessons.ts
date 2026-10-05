@@ -150,9 +150,6 @@ export const COURSE_PAGES = {
  */
 
 export const TRAININGS_WELCOME_STYLES = {
-  step: 'relative flex items-center md:mb-3',
-  box: 'relative flex flex-col justify-center gap-8 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6 sm:p-8',
-  page: 'course-erase-in flex min-w-0 flex-col gap-6',
   rows: 'flex flex-col gap-5',
   row: 'flex items-start gap-4',
   glyph: 'h-10 w-10 shrink-0',

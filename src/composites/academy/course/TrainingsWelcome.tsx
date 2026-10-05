@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { Button } from '@/components/elements/actions/Button'
+import { StoryDeck } from '@/components/structures/StoryDeck'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -14,7 +14,6 @@ import {
 } from '@/declarations/academy/welcome'
 import { ICONS } from '@/declarations/ui/icons'
 import { ABSENCE_WIZARD, TRAININGS_WELCOME_STYLES } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
 
 export interface TrainingsWelcomeProps {
   mandatory: number
@@ -22,7 +21,7 @@ export interface TrainingsWelcomeProps {
 }
 
 /**
- * First visit of the trainings page
+ * First visit of the trainings page, told as full-screen cards
  * @param {number} mandatory - Mandatory courses of the member
  * @param {string} trade - Platform the member trains for
  * @return {JSX.Element | null}
@@ -37,10 +36,10 @@ export const TrainingsWelcome = ({ mandatory, trade }: TrainingsWelcomeProps) =>
   if (isClosed) return null
 
   const page = TRAININGS_WELCOME[index]!
-  const isLast = index === TRAININGS_WELCOME.length - 1
   const fill = (text: string) =>
     text.replace('{count}', String(mandatory)).replace('{trade}', trade)
 
+  // Seen for good only once the last card is reached
   const finish = async () => {
     const saved = await run(() =>
       apiPost(API_ROUTES.seenGuide, { key: GUIDE_KEYS.trainingsWelcome })
@@ -52,69 +51,38 @@ export const TrainingsWelcome = ({ mandatory, trade }: TrainingsWelcomeProps) =>
   }
 
   return (
-    <section className={ABSENCE_WIZARD.root} aria-label={TRAININGS_WELCOME_COPY.label}>
-      <ol className={ABSENCE_WIZARD.timeline}>
-        {TRAININGS_WELCOME.map((entry, step) => (
-          <li key={entry.title} className={TRAININGS_WELCOME_STYLES.step}>
-            <span
-              className={cn(
-                ABSENCE_WIZARD.chip,
-                step === index
-                  ? ABSENCE_WIZARD.chipCurrent
-                  : step < index
-                    ? ABSENCE_WIZARD.chipDone
-                    : ABSENCE_WIZARD.chipTodo
-              )}
-            >
-              {step < index ? <ICONS.success className={ABSENCE_WIZARD.chipGlyph} /> : step + 1}
-            </span>
-          </li>
-        ))}
-      </ol>
+    <StoryDeck
+      label={TRAININGS_WELCOME_COPY.label}
+      count={TRAININGS_WELCOME.length}
+      index={index}
+      onIndex={setIndex}
+      onFinish={finish}
+      onSkip={() => setClosed(true)}
+      isFinishing={isSaving}
+      labels={TRAININGS_WELCOME_COPY}
+    >
+      <h2 className={ABSENCE_WIZARD.stageTitle}>{page.title}</h2>
 
-      <div className={TRAININGS_WELCOME_STYLES.box}>
-        <div key={index} className={TRAININGS_WELCOME_STYLES.page}>
-          <h2 className={ABSENCE_WIZARD.stageTitle}>{page.title}</h2>
+      {page.rows && (
+        <ul className={TRAININGS_WELCOME_STYLES.rows}>
+          {page.rows.map((row) => {
+            const Glyph = ICONS[row.glyph]
 
-          {page.rows && (
-            <ul className={TRAININGS_WELCOME_STYLES.rows}>
-              {page.rows.map((row) => {
-                const Glyph = ICONS[row.glyph]
+            return (
+              <li key={row.text} className={TRAININGS_WELCOME_STYLES.row}>
+                <Glyph className={TRAININGS_WELCOME_STYLES.glyph} aria-hidden="true" />
+                <p className={TRAININGS_WELCOME_STYLES.text}>{row.text}</p>
+              </li>
+            )
+          })}
+        </ul>
+      )}
 
-                return (
-                  <li key={row.text} className={TRAININGS_WELCOME_STYLES.row}>
-                    <Glyph className={TRAININGS_WELCOME_STYLES.glyph} aria-hidden="true" />
-                    <p className={TRAININGS_WELCOME_STYLES.text}>{row.text}</p>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-
-          {page.body?.map((paragraph) => (
-            <p key={paragraph} className={TRAININGS_WELCOME_STYLES.text}>
-              {fill(paragraph)}
-            </p>
-          ))}
-        </div>
-
-        <div className={ABSENCE_WIZARD.actions}>
-          {index > 0 && (
-            <Button variant="ghost" onClick={() => setIndex(index - 1)}>
-              {TRAININGS_WELCOME_COPY.previous}
-            </Button>
-          )}
-          {isLast ? (
-            <Button variant="primary" isLoading={isSaving} onClick={finish}>
-              {TRAININGS_WELCOME_COPY.finish}
-            </Button>
-          ) : (
-            <Button variant="primary" onClick={() => setIndex(index + 1)}>
-              {TRAININGS_WELCOME_COPY.next}
-            </Button>
-          )}
-        </div>
-      </div>
-    </section>
+      {page.body?.map((paragraph) => (
+        <p key={paragraph} className={TRAININGS_WELCOME_STYLES.text}>
+          {fill(paragraph)}
+        </p>
+      ))}
+    </StoryDeck>
   )
 }
