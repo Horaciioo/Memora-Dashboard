@@ -99,18 +99,18 @@ export const PROGRESS_STYLES = {
  */
 
 export const TOAST_STYLES = {
-  // Above the nav pill on mobile
+  // Bottom centre, above the nav pill on mobile
   stack:
-    'toast-pile pointer-events-auto fixed inset-x-4 bottom-[calc(var(--shell-bottom-nav-h)_+_1.5rem_+_env(safe-area-inset-bottom))] z-[60] md:inset-x-auto md:top-4 md:right-4 md:bottom-auto md:w-[min(23rem,calc(100vw-2rem))]',
+    'toast-pile pointer-events-auto fixed inset-x-4 bottom-[calc(var(--shell-bottom-nav-h)_+_1.5rem_+_env(safe-area-inset-bottom))] z-[60] md:inset-x-auto md:bottom-6 md:left-1/2 md:w-[min(26rem,calc(100vw-2rem))] md:-translate-x-1/2',
   stackSpread: 'toast-pile-spread',
   // Placed by .toast-pile
   item: 'absolute inset-x-0',
   // Space once spread
   gapPx: 8,
   toast:
-    'toast-enter relative flex touch-pan-y items-start gap-3 overflow-hidden rounded-[var(--radius-lg)] border border-l-4 border-[var(--color-border)] glass-panel px-4 py-3 text-sm shadow-[var(--shadow-lg)]',
+    'toast-enter relative flex touch-pan-y items-start gap-3 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel px-4 py-3 text-sm',
   settle: 'transition-[transform,opacity] motion-reduce:transition-none',
-  badge: 'flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)]',
+  badge: 'flex h-7 w-7 shrink-0 items-center justify-center rounded-full',
   glyph: 'h-4 w-4',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
   title: 'font-semibold',

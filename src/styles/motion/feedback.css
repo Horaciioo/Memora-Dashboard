@@ -93,7 +93,7 @@
 @keyframes toast-enter {
   from {
     opacity: 0;
-    transform: translateY(-0.5rem);
+    transform: translateY(0.75rem);
   }
 }
 
@@ -198,18 +198,4 @@
 .live-pulse {
   animation: live-pulse var(--motion-duration-pulse) ease-in-out infinite;
   transform-origin: center;
-}
-
-/* md: grows downward from the top */
-@media (width >= 768px) {
-  .toast-pile {
-    --toast-direction: 1;
-  }
-}
-
-@media (width >= 768px) {
-  .toast-pile > [data-toast] {
-    top: 0;
-    bottom: auto;
-  }
 }

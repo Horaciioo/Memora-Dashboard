@@ -58,11 +58,11 @@ export const PAGE_STYLES = {
  */
 
 export const PAGE_BANNER = {
-  art: 'absolute inset-0 bg-[var(--color-frame)]',
+  art: 'banner-wash absolute inset-0 bg-[image:var(--gradient-frame)]',
   image: 'h-full w-full object-cover dark:brightness-[0.82]',
   // Mirror of the photo above it, shown when the page is pulled down past the top
   extension:
-    'absolute inset-x-0 bottom-full h-full -scale-y-100 overflow-hidden bg-[var(--color-frame)]',
+    'banner-wash absolute inset-x-0 bottom-full h-full -scale-y-100 overflow-hidden bg-[image:var(--gradient-frame)]',
 } as const
 
 /**

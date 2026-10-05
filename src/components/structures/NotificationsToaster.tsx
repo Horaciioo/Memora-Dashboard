@@ -5,7 +5,7 @@ import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import { useIsMobileShell } from '@/core/hooks/interaction/useBreakpoint'
 import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
 import type { Notification } from '@/managers/infrastructure/Network/NotificationsManager'
-import { TONE_BORDER, TONE_ICON, TONES } from '@/declarations/ui/theme'
+import { TONE_ICON, TONES } from '@/declarations/ui/theme'
 import { TOAST_STYLES } from '@/declarations/ui/variants'
 import { TOAST_VISIBLE } from '@/declarations/ui/responsive'
 import { ACTION_COPY } from '@/declarations/ui/copy'
@@ -117,11 +117,7 @@ const Toast = ({
           transform: dragX ? `translateX(${dragX}px)` : undefined,
           opacity: isDragging ? Math.max(1 - Math.abs(dragX) / (SWIPE_DISMISS_PX * 2), 0.3) : 1,
         }}
-        className={cn(
-          TOAST_STYLES.toast,
-          TONE_BORDER[notification.tone],
-          !isDragging && TOAST_STYLES.settle
-        )}
+        className={cn(TOAST_STYLES.toast, !isDragging && TOAST_STYLES.settle)}
       >
         <span className={cn(TOAST_STYLES.badge, tone.soft, tone.text)}>
           <ToneIcon className={TOAST_STYLES.glyph} aria-hidden="true" />
