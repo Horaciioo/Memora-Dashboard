@@ -117,6 +117,16 @@ export const GLYPH_TINTS = {
     deepTo: '#7f0d0d',
     cut: '#fff5f5',
   },
+  // News star
+  GOLD: {
+    fillFrom: '#ffe066',
+    fillTo: '#f2b705',
+    liftFrom: '#fff8cc',
+    liftTo: '#ffeb85',
+    deepFrom: '#d99a00',
+    deepTo: '#8a5a00',
+    cut: '#fffbe6',
+  },
   // Live coordinator
   COORDINATOR: {
     fillFrom: '#fcd34d',

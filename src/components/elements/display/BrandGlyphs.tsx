@@ -629,6 +629,31 @@ export const StarGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
+ * Golden star
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const NewsGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    tone="GOLD"
+    render={({ fill, lift, deep }) => (
+      <>
+        <path
+          d="m12 2.6 2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6-4.5-4.2 6.1-.8z"
+          fill={fill}
+          stroke={deep}
+          strokeWidth="1.4"
+          strokeLinejoin="round"
+        />
+        <path d="m12 2.6 2.7 5.6 6.1.8-4.5 4.2-4.3-2.2z" fill={lift} />
+      </>
+    )}
+  />
+)
+
+/**
  * System
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}

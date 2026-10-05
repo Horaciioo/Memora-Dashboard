@@ -265,6 +265,7 @@ export const NAVIGATION: NavigationGroup[] = [
         mobile: { slot: 'home', order: 0 },
       },
       { href: ROUTES.absences, label: 'Absences', icon: 'absences' },
+      { href: ROUTES.changelog, label: 'Nouveautés', icon: 'news' },
       {
         href: ROUTES.calendar,
         label: 'Calendrier',
