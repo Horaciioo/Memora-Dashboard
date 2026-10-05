@@ -61,38 +61,22 @@ export const HOME_STYLES = {
 
 export const HOME_FLOW = {
   page: 'mx-auto flex w-full max-w-5xl flex-col gap-8',
-  grid: 'grid gap-10 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]',
-  column: 'flex min-w-0 flex-col gap-6',
-  label: PROPERTY_LABEL,
-  // Focus
-  focus:
-    'course-pop card-glow flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5',
-  focusTop: 'flex items-start justify-between gap-4',
-  focusGlyph: 'h-9 w-9 shrink-0 text-[var(--color-ink-accent)]',
-  focusDue: 'text-sm font-semibold text-[var(--color-ink-subtle)]',
-  focusBody: 'flex flex-col gap-2',
-  focusTitle: 'text-xl font-bold tracking-tight',
-  focusMeta: 'text-body text-[var(--color-ink-subtle)]',
-  focusNote:
-    'flex max-w-lg flex-col gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3',
-  focusNoteTitle: 'text-micro font-bold tracking-wide uppercase',
-  focusNoteText: 'text-body leading-relaxed',
-  focusActions: 'flex flex-wrap gap-3',
-  // What follows
-  queue: 'flex flex-col',
-  queueRow:
-    'flex w-full cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] px-3 py-3 text-left transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
-  queueGlyph: 'h-6 w-6 shrink-0 text-[var(--color-ink-subtle)]',
-  queueBody: 'flex min-w-0 flex-1 flex-col gap-0.5',
-  queueTitle: 'truncate font-semibold',
-  queueMeta: 'truncate text-xs text-[var(--color-ink-subtle)]',
-  queueDue: 'shrink-0 text-xs font-semibold text-[var(--color-ink-subtle)]',
-  more: 'self-start rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
-  // Nothing waits
-  calm: 'card-glow flex flex-col items-center gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface px-6 py-8 text-center',
-  calmGlyph: 'course-check h-9 w-9 text-[var(--color-success)]',
-  calmTitle: 'text-xl font-bold tracking-tight',
-  calmLead: 'max-w-xs text-sm text-[var(--color-ink-subtle)]',
+  grid: 'grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start lg:gap-10',
+  // Checklist, one way in per line
+  todoList: 'flex flex-col',
+  todoItem:
+    'relative after:absolute after:inset-x-0 after:bottom-0 after:mx-auto after:h-px after:w-3/5 after:bg-[var(--color-border)] last:after:hidden',
+  todoRow:
+    'group -mx-2 flex w-[calc(100%+1rem)] cursor-pointer items-center gap-3 rounded-[var(--radius-md)] px-2 py-2.5 text-left transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
+  todoMark: 'h-6 w-6 shrink-0 drop-shadow-[0_1px_1px_rgb(0_0_0/0.12)]',
+  todoBody: 'flex min-w-0 flex-1 flex-col',
+  todoLabel: 'truncate text-body font-semibold',
+  todoMeta: 'truncate text-xs text-[var(--color-ink-subtle)]',
+  todoDue: 'shrink-0 text-xs font-semibold text-[var(--color-ink-subtle)]',
+  todoChevron:
+    'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform group-hover:translate-x-0.5',
+  rest: 'flex items-center justify-center gap-3 py-4 text-sm font-semibold text-[var(--color-ink-subtle)]',
+  restMark: 'h-6 w-6 shrink-0',
   // Agenda
   agenda: 'flex flex-col gap-6',
   day: 'flex flex-col gap-1',

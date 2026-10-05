@@ -95,6 +95,32 @@ export const Frame = ({
 }
 
 /**
+ * Heavy cross of a task waiting
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const CrossGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    tone="danger"
+    render={({ fill, lift, deep }) => (
+      <>
+        <path d="M6 6 18 18" fill="none" stroke={deep} strokeWidth="3.6" strokeLinecap="round" />
+        <path d="M18 6 6 18" fill="none" stroke={fill} strokeWidth="4" strokeLinecap="round" />
+        <path
+          d="M16.2 7.8 14 10"
+          fill="none"
+          stroke={lift}
+          strokeWidth="1.1"
+          strokeLinecap="round"
+        />
+      </>
+    )}
+  />
+)
+
+/**
  * Heavy check of a chosen entry
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}

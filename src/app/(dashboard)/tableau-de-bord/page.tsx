@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
+import { Section } from '@/components/structures/Section'
 import { HomeAgenda } from '@/composites/personal/HomeAgenda'
 import { HomeNews } from '@/composites/personal/HomeNews'
 import { HomeQueue } from '@/composites/personal/HomeQueue'
@@ -59,14 +60,13 @@ export default async function DashboardPage() {
           tasks={tasks}
           rollCalls={rollCalls}
         />
-        <section className={HOME_FLOW.column}>
-          <h2 className={HOME_FLOW.label}>{PERSONAL_COPY.aheadTitle}</h2>
+        <Section title={PERSONAL_COPY.aheadTitle} padded>
           <HomeAgenda
             meetings={meetings}
             birthdays={birthdays}
             canOpenMeeting={access.can(Permissions.MeetingRead)}
           />
-        </section>
+        </Section>
       </div>
     </div>
   )

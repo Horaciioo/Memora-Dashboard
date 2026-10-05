@@ -7,7 +7,7 @@ export const SECTION_STYLES = {
   wrapper: 'flex flex-col gap-3',
   header: 'flex flex-wrap items-end justify-between gap-3',
   heading: 'flex flex-col gap-1',
-  title: 'text-section font-semibold tracking-tight',
+  title: 'text-xl font-bold tracking-tight uppercase italic',
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
   panel: 'rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface',
   panelPadded: 'p-4 sm:p-6',
@@ -36,7 +36,8 @@ export const PAGE_STYLES = {
   notchTitle: 'min-w-0 text-xl font-bold tracking-wide uppercase md:text-page',
   notchTitleText: 'min-w-0 text-balance md:truncate',
   // Tab strip under the title, empty on most pages
-  notchTabs: 'flex w-full justify-center border-t border-[var(--color-border)] pt-4 pb-2 empty:hidden',
+  notchTabs:
+    'flex w-full justify-center border-t border-[var(--color-border)] pt-4 pb-2 empty:hidden',
   // Shoulders of the notch
   notchSlopeStart: 'banner-slope banner-slope-start',
   notchSlopeEnd: 'banner-slope banner-slope-end',

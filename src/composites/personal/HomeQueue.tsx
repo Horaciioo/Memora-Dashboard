@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Glyph } from '@/components/elements/display/Glyph'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { Drawer } from '@/components/structures/Drawer'
+import { Section } from '@/components/structures/Section'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { useAbsences } from '@/core/hooks/data/useAbsences'
 import { useMutation } from '@/core/hooks/data/useMutation'
@@ -18,7 +18,6 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import type { PendingRollCall } from '@/core/services/calendar/attendance'
 import { ABSENCE_COPY } from '@/declarations/absences/copy'
 import { DEPARTURE_COPY } from '@/declarations/academy/parkour'
-import { HOME_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { PERSONAL_COPY, PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'
@@ -26,7 +25,7 @@ import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { DEPARTURE_TASK, HOME_FLOW, TASK_LIST } from '@/declarations/ui/variants'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
-import type { HomeAction, HomeEntry, HomeTask } from '@/types/personal'
+import type { HomeEntry, HomeTask } from '@/types/personal'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import type { AbsenceStatusName } from '@/utils/constants/workflow'
 import { absenceReasonText, absenceSpan } from '@/utils/format/absences'
@@ -68,8 +67,7 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
     setOpened(null)
     router.refresh()
   }
-  const [picked, setPicked] = useState<string | null>(null)
-  const [isExpanded, setExpanded] = useState(false)
+  const [pickedKey, setPickedKey] = useState<string | null>(null)
 
   const openReview = (absence: MemberAbsence, status: AbsenceStatusName) => {
     clearIssues()
@@ -148,92 +146,91 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requests, rollCalls, tasks])
 
-  const focus = entries.find((entry) => entry.key === picked) ?? entries[0] ?? null
-  const rest = entries.filter((entry) => entry !== focus)
-  const shown = isExpanded ? rest : rest.slice(0, HOME_SETTINGS.taskMax)
+  const picked = entries.find((entry) => entry.key === pickedKey) ?? null
+  const CrossIcon = ICONS.waiting
+  const CheckIcon = ICONS.picked
+  const ChevronIcon = ICONS.next
 
-  const renderGlyph = (entry: HomeEntry, className: string) => {
-    if (entry.emoji) return <Glyph value={entry.emoji} size="chip" />
-    const Icon = ICONS[entry.icon ?? 'success']
+  // One way in goes straight there
+  const soleAction = (entry: HomeEntry) => (entry.actions.length === 1 ? entry.actions[0] : null)
 
-    return <Icon className={className} aria-hidden="true" />
+  const openEntry = (entry: HomeEntry) => {
+    const action = soleAction(entry)
+    if (action) action.onSelect?.()
+    else setPickedKey(entry.key)
   }
 
-  const renderAction = (action: HomeAction) =>
-    action.href ? (
-      <Link key={action.id} href={action.href}>
-        <Button variant={action.variant}>{action.label}</Button>
-      </Link>
-    ) : (
-      <Button key={action.id} variant={action.variant} onClick={action.onSelect}>
-        {action.label}
-      </Button>
+  const renderRow = (entry: HomeEntry) => {
+    const href = soleAction(entry)?.href
+
+    const body = (
+      <>
+        <CrossIcon className={HOME_FLOW.todoMark} aria-hidden="true" />
+        <span className={HOME_FLOW.todoBody}>
+          <span className={HOME_FLOW.todoLabel}>{entry.title}</span>
+          {entry.meta && <span className={HOME_FLOW.todoMeta}>{entry.meta}</span>}
+        </span>
+        {entry.due && <span className={HOME_FLOW.todoDue}>{entry.due}</span>}
+        <ChevronIcon className={HOME_FLOW.todoChevron} aria-hidden="true" />
+      </>
     )
 
-  const CalmGlyph = ICONS.success
+    return (
+      <li key={entry.key} className={HOME_FLOW.todoItem}>
+        {href ? (
+          <Link href={href} className={HOME_FLOW.todoRow}>
+            {body}
+          </Link>
+        ) : (
+          <button type="button" className={HOME_FLOW.todoRow} onClick={() => openEntry(entry)}>
+            {body}
+          </button>
+        )}
+      </li>
+    )
+  }
 
   return (
-    <section className={HOME_FLOW.column}>
-      <h2 className={HOME_FLOW.label}>{PERSONAL_COPY.todoTitle}</h2>
-
-      {focus ? (
-        // The key restarts the entrance each time another entry takes the place
-        <article key={focus.key} className={HOME_FLOW.focus}>
-          <div className={HOME_FLOW.focusTop}>
-            {renderGlyph(focus, HOME_FLOW.focusGlyph)}
-            {focus.due && <span className={HOME_FLOW.focusDue}>{focus.due}</span>}
+    <>
+      <Section title={PERSONAL_COPY.todoTitle} padded>
+        {entries.length === 0 ? (
+          <div className={HOME_FLOW.rest}>
+            <CheckIcon className={HOME_FLOW.restMark} aria-hidden="true" />
+            <p>{PERSONAL_COPY.calmTodoTitle}</p>
           </div>
-          <div className={HOME_FLOW.focusBody}>
-            <h3 className={HOME_FLOW.focusTitle}>{focus.title}</h3>
-            {focus.meta && <p className={HOME_FLOW.focusMeta}>{focus.meta}</p>}
-          </div>
-          {focus.note && (
-            <div className={HOME_FLOW.focusNote}>
-              <span className={HOME_FLOW.focusNoteTitle}>{ABSENCE_COPY.reasonTitle}</span>
-              <p className={HOME_FLOW.focusNoteText}>{focus.note}</p>
-            </div>
-          )}
-          <div className={HOME_FLOW.focusActions}>{focus.actions.map(renderAction)}</div>
-        </article>
-      ) : (
-        <div className={HOME_FLOW.calm}>
-          <CalmGlyph className={HOME_FLOW.calmGlyph} aria-hidden="true" />
-          <p className={HOME_FLOW.calmTitle}>{PERSONAL_COPY.calmTodoTitle}</p>
-          <p className={HOME_FLOW.calmLead}>{PERSONAL_COPY.calmTodoLead}</p>
-        </div>
-      )}
+        ) : (
+          <ul className={HOME_FLOW.todoList}>{entries.map(renderRow)}</ul>
+        )}
+      </Section>
 
-      {rest.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <h3 className={HOME_FLOW.label}>{PERSONAL_COPY.nextTitle}</h3>
-          <ul className={HOME_FLOW.queue}>
-            {shown.map((entry) => (
-              <li key={entry.key}>
-                <button
-                  type="button"
-                  className={HOME_FLOW.queueRow}
-                  onClick={() => setPicked(entry.key)}
+      {picked && (
+        <Drawer
+          open
+          onClose={() => setPickedKey(null)}
+          title={picked.title}
+          icon={picked.icon ?? 'waiting'}
+          subheader={picked.meta}
+          footer={
+            <div className={DEPARTURE_TASK.actions}>
+              {picked.actions.map((action) => (
+                <Button
+                  key={action.id}
+                  variant={action.variant}
+                  onClick={() => {
+                    setPickedKey(null)
+                    action.onSelect?.()
+                  }}
                 >
-                  {renderGlyph(entry, HOME_FLOW.queueGlyph)}
-                  <span className={HOME_FLOW.queueBody}>
-                    <span className={HOME_FLOW.queueTitle}>{entry.title}</span>
-                    {entry.meta && <span className={HOME_FLOW.queueMeta}>{entry.meta}</span>}
-                  </span>
-                  {entry.due && <span className={HOME_FLOW.queueDue}>{entry.due}</span>}
-                </button>
-              </li>
-            ))}
-          </ul>
-          {rest.length > HOME_SETTINGS.taskMax && (
-            <button
-              type="button"
-              className={HOME_FLOW.more}
-              onClick={() => setExpanded(!isExpanded)}
-            >
-              {isExpanded ? PERSONAL_COPY.less : PERSONAL_COPY.more}
-            </button>
+                  {action.label}
+                </Button>
+              ))}
+            </div>
+          }
+        >
+          {picked.note && (
+            <DetailGrid entries={[{ label: ABSENCE_COPY.reasonTitle, value: picked.note }]} />
           )}
-        </div>
+        </Drawer>
       )}
 
       <FormDrawer
@@ -325,6 +322,6 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
           </div>
         </Drawer>
       )}
-    </section>
+    </>
   )
 }

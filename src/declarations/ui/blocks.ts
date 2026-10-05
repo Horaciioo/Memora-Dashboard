@@ -738,5 +738,5 @@ export const AUTH_SHELL = {
   logo: 'flex items-center justify-center',
   wordmark: 'h-auto w-40',
   card: 'card-surface rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 shadow-[var(--shadow-md)] sm:p-8',
-  title: 'mb-6 text-section font-semibold tracking-tight',
+  title: 'mb-6 text-xl font-bold tracking-tight uppercase italic',
 } as const
