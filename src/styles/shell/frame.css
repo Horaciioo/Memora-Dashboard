@@ -89,28 +89,34 @@
   }
 }
 
-/* Faint colour behind the page so the frosted cards have something to show */
-.page-wash {
-  background-image:
-    radial-gradient(
-      45% 40% at 90% 8%,
-      color-mix(in srgb, var(--color-mauve-400) 42%, transparent),
-      transparent
-    ),
-    radial-gradient(
-      40% 40% at 8% 45%,
-      color-mix(in srgb, var(--color-brand-400) 34%, transparent),
-      transparent
-    ),
-    radial-gradient(
-      45% 40% at 85% 85%,
-      color-mix(in srgb, var(--color-sky-400) 36%, transparent),
-      transparent
-    );
+/* The page ground and the title notch share one colour and one wash, so the notch reads as the page */
+.page-wash,
+.banner-notch-body,
+.banner-slope {
+  background-color: var(--color-page);
 }
 
+/* The wash is pinned to the viewport, so notch and page line up from md */
 @media (width >= 768px) {
-  .page-wash {
+  .page-wash,
+  .banner-notch-body,
+  .banner-slope {
     background-attachment: fixed;
+    background-image:
+      radial-gradient(
+        45% 40% at 90% 8%,
+        color-mix(in srgb, var(--color-mauve-400) 42%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        40% 40% at 8% 45%,
+        color-mix(in srgb, var(--color-brand-400) 34%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        45% 40% at 85% 85%,
+        color-mix(in srgb, var(--color-sky-400) 36%, transparent),
+        transparent
+      );
   }
 }

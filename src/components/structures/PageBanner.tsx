@@ -29,9 +29,11 @@ export const PageBanner = ({ title, isLabel, children }: PageBannerProps) => {
       <div className={PAGE_STYLES.notch}>
         <span className={PAGE_STYLES.notchSlopeStart} aria-hidden="true" />
         <div className={PAGE_STYLES.notchBody}>
-          <Title className={PAGE_STYLES.notchTitle} title={title}>
-            <span className={PAGE_STYLES.notchTitleText}>{title}</span>
-          </Title>
+          <div className={PAGE_STYLES.notchTitleRow}>
+            <Title className={PAGE_STYLES.notchTitle} title={title}>
+              <span className={PAGE_STYLES.notchTitleText}>{title}</span>
+            </Title>
+          </div>
           <div id={PAGE_TABS_HOST_ID} className={PAGE_STYLES.notchTabs} />
           {children}
         </div>

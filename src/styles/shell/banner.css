@@ -12,14 +12,12 @@ body {
 
 .banner-notch-body {
   min-height: var(--shell-notch-h);
-  background: var(--color-page);
 }
 
 .banner-slope {
   flex: none;
   width: var(--shell-notch-slope);
   min-height: var(--shell-notch-h);
-  background: var(--color-page);
   mask-repeat: no-repeat;
   mask-size: 100% 100%;
 }
