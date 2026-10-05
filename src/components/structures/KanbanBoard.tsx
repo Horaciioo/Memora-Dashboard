@@ -1,7 +1,6 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Status } from '@/components/elements/display/Status'
 import { AddRow } from '@/components/structures/AddRow'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { accentVars } from '@/declarations/ui/theme'
@@ -99,12 +98,10 @@ export const KanbanBoard = <T extends BoardItem>({
           <section
             key={column.id}
             style={accentStyle}
-            className={cn(BOARD_STYLES.column, tintByColumn && 'accent-border')}
+            className={cn(BOARD_STYLES.column, tintByColumn && BOARD_STYLES.columnTint)}
           >
             <header className={BOARD_STYLES.columnHead}>
-              <span className={BOARD_STYLES.columnTitle}>
-                <Status label={column.label} accent={column.accent} />
-              </span>
+              <span className={BOARD_STYLES.columnTitle}>{column.label}</span>
             </header>
             <div
               className={cn(BOARD_STYLES.body, over === column.id && 'is-drop-target')}
