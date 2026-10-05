@@ -1,4 +1,5 @@
 import { createRegistry } from '@/core/lib/registry'
+import type { IconName } from '@/declarations/ui/icons'
 import type { Tone } from '@/declarations/ui/theme'
 import type { EventTypeName } from '@/utils/constants/events'
 
@@ -165,3 +166,31 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
 }
 
 export const ACTIVITY_EVENT_REGISTRY = createRegistry(ACTIVITY_EVENT_MAP)
+
+/**
+ * Three-colour reading of an act
+ * @type {Record<Tone, 'success' | 'danger' | 'info'>}
+ */
+
+export const ACTIVITY_KIND: Record<Tone, 'success' | 'danger' | 'info'> = {
+  success: 'success',
+  danger: 'danger',
+  warning: 'danger',
+  caution: 'danger',
+  authorityAdmin: 'danger',
+  authorityLead: 'danger',
+  info: 'info',
+  neutral: 'info',
+  brand: 'info',
+}
+
+/**
+ * Glyph per kind of act
+ * @type {Record<'success' | 'danger' | 'info', IconName>}
+ */
+
+export const ACTIVITY_KIND_ICON: Record<'success' | 'danger' | 'info', IconName> = {
+  success: 'add',
+  danger: 'remove',
+  info: 'info',
+}

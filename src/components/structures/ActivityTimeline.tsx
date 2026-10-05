@@ -1,7 +1,13 @@
-import { Avatar } from '@/components/elements/display/Avatar'
 import { ACTIVITY_COPY } from '@/declarations/activity/copy'
-import { ACTIVITY_EVENT_REGISTRY } from '@/declarations/activity/registries'
+import {
+  ACTIVITY_EVENT_REGISTRY,
+  ACTIVITY_KIND,
+  ACTIVITY_KIND_ICON,
+} from '@/declarations/activity/registries'
+import { ICONS } from '@/declarations/ui/icons'
+import { TONES } from '@/declarations/ui/theme'
 import { JOURNAL_STYLES } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 import { formatDayTime } from '@/utils/format/dates'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 
@@ -21,25 +27,26 @@ export const ActivityTimeline = ({ entries }: ActivityTimelineProps) => (
       const event = entry.event ? ACTIVITY_EVENT_REGISTRY.get(entry.event) : null
       const actor = entry.actorName ?? ACTIVITY_COPY.system
 
+      // Colour of the act
+      const kind = event ? ACTIVITY_KIND[event.tone] : 'info'
+      const Glyph = ICONS[ACTIVITY_KIND_ICON[kind]]
+      const colour = TONES[kind].text
+      const verb = entry.change?.verb ?? event?.verb
+      const rest = entry.change?.rest ?? event?.target
+
       return (
         <li key={entry.id} className={JOURNAL_STYLES.item}>
           <div className={JOURNAL_STYLES.entry}>
-            <Avatar name={actor} src={entry.actorAvatar} size="xs" />
+            <Glyph className={cn(JOURNAL_STYLES.glyph, colour)} aria-hidden="true" />
             <div className={JOURNAL_STYLES.body}>
               <span className={JOURNAL_STYLES.head}>
                 <span className={JOURNAL_STYLES.moment}>{formatDayTime(entry.createdAt)}</span>
               </span>
-              {entry.change ? (
+              {verb ? (
                 <p className={JOURNAL_STYLES.sentence}>
                   {`${actor} ${ACTIVITY_COPY.did} `}
-                  <strong className={JOURNAL_STYLES.verb}>{entry.change.verb}</strong>
-                  {` ${entry.change.rest}.`}
-                </p>
-              ) : event ? (
-                <p className={JOURNAL_STYLES.sentence}>
-                  {`${actor} ${ACTIVITY_COPY.did} `}
-                  <strong className={JOURNAL_STYLES.verb}>{event.verb}</strong>
-                  {` ${event.target}.`}
+                  <strong className={cn(JOURNAL_STYLES.verb, colour)}>{verb}</strong>
+                  {` ${rest}.`}
                 </p>
               ) : (
                 <p className={JOURNAL_STYLES.sentence}>{`${actor}, ${entry.origin}.`}</p>

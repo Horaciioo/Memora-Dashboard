@@ -252,8 +252,10 @@ export const JOURNAL_STYLES = {
   moment: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
   sentence: 'text-sm text-[var(--color-ink)]',
   verb: 'font-bold',
-  // Short rule set under the portrait
-  separator: 'ml-9 h-px w-10 bg-[var(--color-border)]',
+  // Glyph leading the line
+  glyph: 'mt-0.5 size-5 shrink-0',
+  // Short rule set under the glyph
+  separator: 'ml-8 h-px w-10 bg-[var(--color-border)]',
 } as const
 
 /**
