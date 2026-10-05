@@ -30,7 +30,6 @@ export const LIVE_COPY = {
   urgentAnnounced: 'Live de {creator} prévu le {time}',
   urgentOpen: 'Rejoindre',
   liveBadge: 'En direct',
-  announcedBadge: 'Annoncé',
 } as const
 
 /**

@@ -11,50 +11,33 @@ export const LIVE_BOARD = {
   list: 'flex flex-col gap-6',
   // Raised card
   strip:
-    'card-glow relative flex flex-col gap-7 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-7',
+    'card-glow relative flex flex-col gap-5 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6',
   stripLive: 'border-[var(--color-danger)] shadow-[var(--shadow-md)]',
-  // Platform colour along the top
-  rule: 'absolute inset-x-0 top-0 h-1.5',
-  ruleTwitch: 'bg-[var(--color-twitch)]',
-  ruleYoutube: 'bg-[var(--color-youtube)]',
-  top: 'flex flex-wrap items-center justify-between gap-3',
-  status: 'flex items-center gap-2 text-xs font-bold tracking-wide uppercase',
-  statusLive: 'text-[var(--color-danger)]',
-  statusAnnounced: 'text-[var(--color-ink-subtle)]',
-  dot: 'h-3.5 w-3.5',
-  dotPulse: 'live-pulse h-3.5 w-3.5',
-  platform: 'flex items-center gap-2 text-xs font-bold tracking-wide uppercase',
-  platformIcon: 'h-6 w-6 shrink-0',
   head: 'flex min-w-0 items-center gap-5',
   creator: 'text-3xl font-bold tracking-tight sm:text-4xl',
   identity: 'flex min-w-0 flex-col gap-1',
   title: 'text-body text-[var(--color-ink-subtle)]',
-  panels: 'grid gap-4 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]',
-  panel:
-    'flex min-w-0 flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5',
-  panelLabel: PROPERTY_LABEL,
-  // Start and end as two big times
-  schedule: 'grid grid-cols-[1fr_auto_1fr] items-center gap-4',
-  moment: 'flex min-w-0 flex-col gap-0.5',
-  momentEnd: 'items-end text-right',
-  momentDay: 'text-xs font-semibold text-[var(--color-ink-subtle)] first-letter:uppercase',
-  momentClock: 'text-4xl leading-none font-bold tracking-tight tabular-nums',
-  momentClockLive: 'text-[var(--color-danger)]',
-  momentLabel: PROPERTY_LABEL,
-  span: 'flex min-w-16 flex-col items-center gap-1.5 text-xs font-semibold text-[var(--color-ink-subtle)]',
-  spanLine: 'h-px w-full min-w-16 bg-[var(--color-border-strong)]',
-  // Coordinator
-  coordinator: 'flex items-center gap-4',
+  onAir:
+    'flex items-center gap-2 text-xs font-bold tracking-wide text-[var(--color-danger)] uppercase',
+  dotPulse: 'live-pulse h-3.5 w-3.5',
+  // Coordinator and times on one line
+  facts: 'flex flex-wrap items-center gap-x-6 gap-y-4 border-y border-[var(--color-border)] py-4',
+  fact: 'flex min-w-0 flex-col gap-0.5',
+  factDivider: 'hidden h-10 w-px bg-[var(--color-border)] sm:block',
+  factLabel: PROPERTY_LABEL,
+  factClock: 'text-2xl leading-none font-bold tracking-tight tabular-nums',
+  factClockLive: 'text-[var(--color-danger)]',
+  factDay: 'text-xs font-semibold text-[var(--color-ink-subtle)] first-letter:uppercase',
+  coordinator: 'flex items-center gap-3',
   coordinatorPortrait: 'relative shrink-0',
   coordinatorBadge:
-    'absolute -right-1.5 -bottom-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
-  coordinatorGlyph: 'h-5 w-5',
-  coordinatorName: 'truncate text-xl font-bold tracking-tight',
+    'absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
+  coordinatorGlyph: 'h-4 w-4',
+  coordinatorName: 'truncate text-lg leading-tight font-bold tracking-tight',
   coordinatorEmpty: 'text-sm text-[var(--color-ink-subtle)] italic',
-  // Footer
-  actions: 'flex flex-wrap items-center gap-2',
-  actionsMain: 'flex flex-wrap items-center gap-2',
-  actionsSide: 'flex flex-wrap items-center gap-2 sm:ml-auto',
+  // Buttons side by side with dividers
+  actions: 'flex flex-wrap items-center gap-x-1 gap-y-2',
+  actionDivider: 'h-5 w-px shrink-0 bg-[var(--color-border-strong)]',
   confirm: 'w-full text-xs text-[var(--color-ink-subtle)]',
 } as const
 

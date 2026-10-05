@@ -18,22 +18,23 @@ export interface LiveCoordinatorProps {
 export const LiveCoordinator = ({ person }: LiveCoordinatorProps) => {
   const Icon = ICONS[LIVE_COORDINATOR.icon]
 
-  return (
-    <div className={LIVE_BOARD.panel}>
-      <span className={LIVE_BOARD.panelLabel}>{LIVE_COPY.coordinator}</span>
-      {person ? (
-        <div className={LIVE_BOARD.coordinator}>
-          <span className={LIVE_BOARD.coordinatorPortrait}>
-            <Avatar name={person.name} src={person.avatar} size="lg" />
-            <span className={LIVE_BOARD.coordinatorBadge}>
-              <Icon className={LIVE_BOARD.coordinatorGlyph} />
-            </span>
-          </span>
-          <p className={LIVE_BOARD.coordinatorName}>{person.name}</p>
-        </div>
-      ) : (
-        <p className={LIVE_BOARD.coordinatorEmpty}>{LIVE_COPY.noCoordinator}</p>
-      )}
+  return person ? (
+    <div className={LIVE_BOARD.coordinator}>
+      <span className={LIVE_BOARD.coordinatorPortrait}>
+        <Avatar name={person.name} src={person.avatar} size="md" />
+        <span className={LIVE_BOARD.coordinatorBadge}>
+          <Icon className={LIVE_BOARD.coordinatorGlyph} />
+        </span>
+      </span>
+      <div className={LIVE_BOARD.fact}>
+        <span className={LIVE_BOARD.factLabel}>{LIVE_COPY.coordinator}</span>
+        <p className={LIVE_BOARD.coordinatorName}>{person.name}</p>
+      </div>
+    </div>
+  ) : (
+    <div className={LIVE_BOARD.fact}>
+      <span className={LIVE_BOARD.factLabel}>{LIVE_COPY.coordinator}</span>
+      <p className={LIVE_BOARD.coordinatorEmpty}>{LIVE_COPY.noCoordinator}</p>
     </div>
   )
 }
