@@ -1,12 +1,12 @@
-/* Soft Arc-like gradients, green blue pink white, identical in both themes */
+/* Soft Arc-like gradients, mauve blue pink white */
 
 :root {
-  --color-frame-green: #dbe9b0;
+  --color-frame-mauve: #dccdf9;
   --color-frame-blue: #cfe3f5;
-  --color-frame-pink: #f5d5da;
+  --color-frame-pink: #f9cfdc;
   --color-frame-white: #fbf7ee;
   /* Solid stand-in, what a cut into a rail glyph shows */
-  --color-frame: #e6e2d0;
+  --color-frame: #e8d8f0;
 
   /* Ink and washes of the rail standing on the frame */
   --color-on-frame: #2b261d;
@@ -15,29 +15,64 @@
   --color-on-frame-raised: rgb(255 254 251 / 0.7);
   --color-on-frame-line: rgb(43 38 29 / 0.12);
   --color-on-frame-line-strong: rgb(43 38 29 / 0.22);
-  --color-on-frame-tint: #4f7a22;
-  --color-on-frame-blush: #8e4354;
+  --color-on-frame-tint: #6b46b0;
+  --color-on-frame-blush: #a8355a;
   --color-on-frame-deep: #2b261d;
+  /* Share of the frame colours the page ground keeps */
+  --page-wash: 85%;
+  --page-base: var(--color-background);
+}
+
+:root.dark {
+  --page-wash: 16%;
+  --page-base: var(--color-surface-sunken);
+  --color-on-frame: #f6efe4;
+  --color-on-frame-subtle: rgb(246 239 228 / 0.78);
+  --color-on-frame-wash: rgb(246 239 228 / 0.08);
+  --color-on-frame-raised: rgb(246 239 228 / 0.14);
+  --color-on-frame-line: rgb(246 239 228 / 0.12);
+  --color-on-frame-line-strong: rgb(246 239 228 / 0.22);
+  --color-on-frame-tint: #cdb8f5;
+  --color-on-frame-blush: #f29ab5;
+  --color-on-frame-deep: #f6efe4;
 }
 
 /* Rebuilt on .app-tone so a tone change follows the animated colours */
 :root,
 .app-tone {
   --gradient-frame:
-    radial-gradient(70% 60% at 0% 0%, var(--color-frame-green), transparent),
+    radial-gradient(70% 60% at 0% 0%, var(--color-frame-mauve), transparent),
     radial-gradient(70% 60% at 100% 0%, var(--color-frame-blue), transparent),
     radial-gradient(75% 65% at 100% 100%, var(--color-frame-pink), transparent),
     radial-gradient(75% 65% at 0% 100%, var(--color-frame-white), transparent),
     linear-gradient(var(--color-frame-white), var(--color-frame-white));
+  /* Page ground, the frame colours washed into the page colour */
+  --gradient-page:
+    radial-gradient(
+      80% 70% at 0% 0%,
+      color-mix(in srgb, var(--color-frame-mauve) var(--page-wash), var(--page-base)),
+      transparent
+    ),
+    radial-gradient(
+      80% 70% at 100% 0%,
+      color-mix(in srgb, var(--color-frame-blue) var(--page-wash), var(--page-base)),
+      transparent
+    ),
+    radial-gradient(
+      80% 70% at 100% 100%,
+      color-mix(in srgb, var(--color-frame-pink) var(--page-wash), var(--page-base)),
+      transparent
+    ),
+    linear-gradient(var(--page-base), var(--page-base));
   --gradient-soft: linear-gradient(
     135deg,
-    var(--color-leaf-200) 0%,
+    var(--color-mauve-200) 0%,
     var(--color-sky-200) 50%,
     var(--color-brand-200) 100%
   );
   --gradient-figure: linear-gradient(
     135deg,
-    var(--color-leaf-400) 0%,
+    var(--color-mauve-400) 0%,
     var(--color-sky-400) 50%,
     var(--color-brand-500) 100%
   );

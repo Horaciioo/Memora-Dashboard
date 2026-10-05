@@ -117,7 +117,7 @@ export const TOGGLE_STYLES = {
   // Exclusive states
   track:
     'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-[var(--motion-duration-panel)]',
-  trackOff: 'bg-[var(--color-border-strong)]',
+  trackOff: 'bg-[var(--color-track-off)]',
   trackOn: 'bg-[var(--color-brand-600)]',
   trackSuccess: 'bg-[var(--color-success)]',
   trackDanger: 'bg-[var(--color-danger)]',

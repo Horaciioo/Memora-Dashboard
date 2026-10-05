@@ -27,17 +27,6 @@ export const BannerArt = () => {
         fetchPriority="high"
         decoding="async"
       />
-      <div className={PAGE_BANNER.extension}>
-        <img
-          src={scene.image}
-          alt=""
-          width={2400}
-          height={420}
-          className={PAGE_BANNER.image}
-          style={{ objectPosition: position }}
-          decoding="async"
-        />
-      </div>
     </div>
   )
 }

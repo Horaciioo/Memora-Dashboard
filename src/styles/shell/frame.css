@@ -1,3 +1,15 @@
+/* Background around the page: the role gradient pinned to the viewport from md, flat below */
+.page-ground {
+  background-color: var(--color-background);
+}
+
+@media (width >= 768px) {
+  .page-ground {
+    background-image: var(--gradient-page);
+    background-attachment: fixed;
+  }
+}
+
 /* Clearance under the routed page for the floating mobile nav */
 .shell-page {
   padding-bottom: calc(var(--shell-bottom-nav-h) + env(safe-area-inset-bottom) + 2rem);
@@ -47,6 +59,23 @@
   border-radius: inherit;
   pointer-events: none;
   box-shadow: var(--shadow-page);
+}
+
+/* Rim of the same gradient hides what scrolls past the window, so the cream page stands out */
+.app-frame::before {
+  content: '';
+  position: absolute;
+  inset: -100vmax;
+  border: 100vmax solid transparent;
+  border-radius: calc(100vmax + var(--radius-xl));
+  background: var(--gradient-page) border-box fixed;
+  -webkit-mask:
+    linear-gradient(var(--color-ink) 0 0) padding-box,
+    linear-gradient(var(--color-ink) 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(var(--color-ink) 0 0) padding-box exclude,
+    linear-gradient(var(--color-ink) 0 0);
 }
 
 /* The framed page draws its own scrollbar */

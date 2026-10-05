@@ -7,30 +7,30 @@
   --color-surface-sunken: #110e0b;
   --color-ink: #f6efe4;
   --color-ink-subtle: #b5aa9c;
-  --color-ink-accent: #edb8c0;
+  --color-ink-accent: #f8c0d0;
   --color-border: #342e27;
   --color-border-strong: #4b4238;
   --color-hover: #262019;
 
-  --color-brand-50: #2a1c1f;
-  --color-brand-100: #38252a;
-  --color-brand-200: #4e3139;
-  --color-brand-300: #6e4450;
-  --color-brand-400: #a8707d;
-  --color-brand-500: #cf8f9b;
-  --color-brand-700: #ebb6be;
-  --color-brand-800: #f2cdd2;
-  --color-brand-900: #fae6e9;
-  --color-brand-soft: #38252a;
+  --color-brand-50: #2f1820;
+  --color-brand-100: #41202b;
+  --color-brand-200: #5a2c3b;
+  --color-brand-300: #7e3c52;
+  --color-brand-400: #b35b78;
+  --color-brand-500: #e0789a;
+  --color-brand-700: #f29ab5;
+  --color-brand-800: #f8c0d0;
+  --color-brand-900: #fde4ec;
+  --color-brand-soft: #41202b;
   --color-on-solid: #1e1a17;
 
-  --color-leaf-50: #1f2414;
-  --color-leaf-100: #2a301a;
-  --color-leaf-200: #3a4423;
-  --color-leaf-300: #566431;
-  --color-leaf-700: #b9d474;
-  --color-leaf-800: #cbe08c;
-  --color-leaf-900: #e0edb8;
+  --color-mauve-50: #1f1a2e;
+  --color-mauve-100: #2a2340;
+  --color-mauve-200: #3b315c;
+  --color-mauve-300: #54447f;
+  --color-mauve-700: #cdb8f5;
+  --color-mauve-800: #dccdf9;
+  --color-mauve-900: #ece3fc;
 
   --color-sky-50: #14202c;
   --color-sky-100: #1b2d3f;
@@ -43,17 +43,17 @@
   --color-success: #b9d474;
   --color-caution: #e3b341;
   --color-warning: #f0a35c;
-  --color-danger: #f0867b;
+  --color-danger: #ff7a7f;
   --color-info: #8dbbe8;
   --color-neutral: #b5aa9c;
   --color-success-soft: #232a16;
   --color-caution-soft: #2e2511;
   --color-warning-soft: #30220f;
-  --color-danger-soft: #301a17;
+  --color-danger-soft: #3a181c;
   --color-info-soft: #172433;
   --color-neutral-soft: #2a241d;
 
-  --color-twitch: #edb8c0;
+  --color-twitch: #f8c0d0;
   --color-youtube: #f87171;
   --color-apple-red: #ff453a;
   --color-apple-orange: #ff9f0a;
@@ -67,10 +67,11 @@
   --color-picker-wash: rgb(246 239 228 / 0.07);
   --color-picker-wash-strong: rgb(246 239 228 / 0.11);
 
+  --color-track-off: #4a4650;
   --color-scrim: rgb(8 5 2 / 0.6);
 
-  --color-authority-admin: #f0867b;
+  --color-authority-admin: #ff7a7f;
   --color-authority-lead: #f0a35c;
-  --color-authority-admin-soft: #301a17;
+  --color-authority-admin-soft: #3a181c;
   --color-authority-lead-soft: #30220f;
 }

@@ -7,38 +7,38 @@
   --color-surface-sunken: #ede3d1;
   --color-ink: #1e1a17;
   --color-ink-subtle: #675e57;
-  --color-ink-accent: #8e4354;
+  --color-ink-accent: #a8355a;
   --color-border: #e6dccb;
   --color-border-strong: #d3c6b0;
   --color-hover: #f6efe3;
 
   /* Rose: action fill (600) with a dark label, deep ink (800) for pink text */
-  --color-brand-50: #fdf5f6;
-  --color-brand-100: #faeaec;
-  --color-brand-200: #f5d8dc;
-  --color-brand-300: #edc3c9;
-  --color-brand-400: #e6b2ba;
-  --color-brand-500: #e2aab3;
-  --color-brand-600: #dfa5ae;
-  --color-brand-700: #d18c98;
-  --color-brand-800: #8e4354;
-  --color-brand-900: #4f2230;
+  --color-brand-50: #fff4f7;
+  --color-brand-100: #ffe6ed;
+  --color-brand-200: #fdcfdc;
+  --color-brand-300: #f9b1c5;
+  --color-brand-400: #f398b2;
+  --color-brand-500: #ef8aa8;
+  --color-brand-600: #ec86a4;
+  --color-brand-700: #dd6b8d;
+  --color-brand-800: #a8355a;
+  --color-brand-900: #5e1a33;
   --color-on-brand: #3a1822;
-  --color-brand-soft: #faeaec;
+  --color-brand-soft: #ffe6ed;
   /* Label over a deep solid fill */
   --color-on-solid: #fffefb;
 
-  /* Leaf green: warmth, comfort */
-  --color-leaf-50: #f7faeb;
-  --color-leaf-100: #eef5d6;
-  --color-leaf-200: #e0edb8;
-  --color-leaf-300: #cbe08c;
-  --color-leaf-400: #b9d474;
-  --color-leaf-500: #a8c95a;
-  --color-leaf-600: #8fb03f;
-  --color-leaf-700: #6f8b2e;
-  --color-leaf-800: #4f6422;
-  --color-leaf-900: #35441a;
+  /* Mauve violet: the second voice of the palette */
+  --color-mauve-50: #f7f3fe;
+  --color-mauve-100: #efe8fd;
+  --color-mauve-200: #e1d6fb;
+  --color-mauve-300: #d0bdf7;
+  --color-mauve-400: #c3a9f3;
+  --color-mauve-500: #ba99f0;
+  --color-mauve-600: #9d78e0;
+  --color-mauve-700: #6b46b0;
+  --color-mauve-800: #5f3f9c;
+  --color-mauve-900: #43296f;
 
   /* Sky blue: soft, never a dark saturated blue */
   --color-sky-50: #f3f8fd;
@@ -56,18 +56,18 @@
   --color-success: #46701e;
   --color-caution: #8a5a00;
   --color-warning: #964f08;
-  --color-danger: #b23a2e;
+  --color-danger: #c01f2b;
   --color-info: #2f6496;
   --color-neutral: #675e57;
   --color-success-soft: #eef4dc;
   --color-caution-soft: #f8efd6;
   --color-warning-soft: #f9e9d6;
-  --color-danger-soft: #f8e3df;
+  --color-danger-soft: #fde5e6;
   --color-info-soft: #e3eef8;
   --color-neutral-soft: #eae1d0;
 
   /* Brand marks of other products */
-  --color-twitch: #8e4354;
+  --color-twitch: #a8355a;
   --color-youtube: #e11d1d;
   --color-apple-red: #ff3b30;
   --color-apple-orange: #ff9500;
@@ -87,15 +87,16 @@
   /* Over photos, heroes and dark media: fixed in both themes */
   --color-on-media: #fffefb;
   --color-media-shade: #1e160e;
+  --color-track-off: #d4d0d6;
   --color-knob: #fffefb;
 
   /* Dimmer behind overlays and spotlights */
   --color-scrim: rgb(30 22 14 / 0.4);
 
   /* Authority, reserved to the two Administration roles */
-  --color-authority-admin: #b23a2e;
+  --color-authority-admin: #c01f2b;
   --color-authority-lead: #964f08;
-  --color-authority-admin-soft: #f8e3df;
+  --color-authority-admin-soft: #fde5e6;
   --color-authority-lead-soft: #f9e9d6;
 }
 

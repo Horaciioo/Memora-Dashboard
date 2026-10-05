@@ -24,7 +24,7 @@ export const FLOATING_HINT = {
 
 export const APP_SHELL = {
   // Room right of the page for the rim
-  frame: 'app-tone flex min-h-dvh bg-[var(--color-background)] md:pr-3',
+  frame: 'app-tone page-ground flex min-h-dvh md:pr-3',
   // Window the page shows through
   window:
     'app-frame pointer-events-none fixed inset-y-3 right-3 left-[var(--shell-sidebar-w)] z-[35] hidden md:block print:hidden',
@@ -36,7 +36,7 @@ export const APP_SHELL = {
   windowThumb:
     'absolute inset-x-0.5 top-0 cursor-grab rounded-full bg-[var(--color-ink)]/25 transition-[background-color,left,right] duration-[var(--motion-duration-fast)] group-hover/track:inset-x-0 group-hover/track:bg-[var(--color-ink)]/40 active:cursor-grabbing active:bg-[var(--color-ink)]/50',
   // Positioned so the page banner can span the whole column
-  main: 'relative flex min-w-0 flex-1 flex-col',
+  main: 'relative flex min-w-0 flex-1 flex-col bg-[var(--color-background)]',
   // Gutters widen past md so a page never welds itself to either rail
   content:
     'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--banner-h)+2.5rem)] print:max-w-none print:p-0',
@@ -594,7 +594,7 @@ export const RELEASE_NOTICE = {
   wrapPointed: 'mx-3 pt-2.5 pb-1',
   // The ^ aimed at the version entry
   caret:
-    'pointer-events-none absolute top-1 left-4 h-3 w-3 rotate-45 rounded-sm bg-[var(--color-leaf-200)]',
+    'pointer-events-none absolute top-1 left-4 h-3 w-3 rotate-45 rounded-sm bg-[var(--color-mauve-200)]',
   // Gradient plate
   frame:
     'group/news rail-reset relative z-10 overflow-hidden rounded-[var(--radius-lg)] bg-[image:var(--gradient-soft)] text-[var(--color-ink)] shadow-[var(--shadow-md)] ring-1 ring-[var(--color-surface)]/40 ring-inset transition-shadow hover:shadow-[var(--shadow-lg)]',

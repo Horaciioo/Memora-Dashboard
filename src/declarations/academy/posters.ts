@@ -37,7 +37,7 @@ const SHARED = {
   ink: '#1e1a17',
   paper: '#fffefb',
   accent: '#dfa5ae',
-  alert: '#b23a2e',
+  alert: '#c01f2b',
   chrome: '#2f2a25',
   rule: '#d9cfc0',
   alertSoft: '#f2cdc6',

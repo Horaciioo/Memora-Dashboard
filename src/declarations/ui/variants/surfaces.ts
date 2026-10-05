@@ -29,7 +29,7 @@ export const PAGE_STYLES = {
   // Corner of the banner the page options sit in
   bannerOptions: 'absolute top-3 right-3 z-10 sm:top-4 sm:right-4',
   // Title sitting in the notch cut into the bottom edge of the banner
-  notch: 'absolute bottom-0 left-1/2 flex -translate-x-1/2 items-stretch',
+  notch: 'absolute inset-x-0 bottom-0 mx-auto flex w-fit items-stretch',
   notchBody:
     'banner-notch-body flex min-w-0 max-w-[min(56rem,80vw)] flex-col items-center justify-center px-3 text-center',
   notchTitle: 'min-w-0 text-xl font-bold tracking-wide uppercase md:text-page',
@@ -62,9 +62,6 @@ export const PAGE_STYLES = {
 export const PAGE_BANNER = {
   art: 'banner-wash absolute inset-0 bg-[image:var(--gradient-frame)]',
   image: 'h-full w-full object-cover dark:brightness-[0.82]',
-  // Mirror of the photo above it, shown when the page is pulled down past the top
-  extension:
-    'banner-wash absolute inset-x-0 bottom-full h-full -scale-y-100 overflow-hidden bg-[image:var(--gradient-frame)]',
 } as const
 
 /**
