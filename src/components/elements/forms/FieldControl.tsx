@@ -3,7 +3,7 @@
 import { ScaleInput } from '@/components/elements/forms/ScaleInput'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { ColourField } from '@/components/elements/forms/ColourField'
-import { DatePicker } from '@/components/elements/forms/DatePicker'
+import { DatePicker } from '@/components/elements/forms/date'
 import { DiscordComposer } from '@/components/elements/forms/DiscordComposer'
 import { EmojiPicker } from '@/components/elements/forms/EmojiPicker'
 import { FileInput } from '@/components/elements/forms/FileInput'

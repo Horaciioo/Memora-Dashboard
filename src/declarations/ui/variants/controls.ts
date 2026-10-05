@@ -218,7 +218,7 @@ export const SELECT_MENU_STYLES = {
     'flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-2.5 text-left opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-surface)] hover:opacity-100',
   optionActive: 'bg-[var(--color-surface)] opacity-100',
   optionDisabled: 'cursor-not-allowed opacity-50',
-  scrim: 'fixed inset-0 z-[65]',
+  scrim: 'fixed inset-0 z-[65] max-md:bg-[var(--color-scrim)]',
   // Chosen entry
   optionSelected:
     'bg-linear-to-r from-[var(--color-picker-wash-strong)] via-[var(--color-picker-wash)] to-transparent font-semibold text-[var(--color-ink)] opacity-100',
@@ -281,6 +281,10 @@ export const DATE_PICKER_STYLES = {
   head: 'flex items-center justify-between gap-2 border-b border-[var(--color-border)] px-2 py-2',
   month: 'flex-1 text-center text-sm font-bold first-letter:uppercase',
   step: 'flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
+  stepIcon: 'h-4 w-4',
+  hint: 'text-xs text-[var(--color-ink-subtle)]',
+  action:
+    'flex h-7 w-auto items-center justify-center rounded-[var(--radius-sm)] px-2 text-xs text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   weekdays:
     'grid grid-cols-7 px-2 pt-2 text-center text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   grid: 'grid grid-cols-7 gap-y-0.5 p-2',
@@ -295,6 +299,26 @@ export const DATE_PICKER_STYLES = {
   dayRangeEnd: 'rounded-l-none',
   footer: 'flex items-center gap-2 border-t border-[var(--color-border)] px-2 py-2',
   time: 'w-24 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm tabular-nums outline-none',
+} as const
+
+/**
+ * Date wheel styles, five rows with the centre one selected
+ * @type {Record<string, string | number>}
+ */
+
+export const DATE_WHEEL = {
+  // Years either side of today
+  yearSpan: 10,
+  // Scroll rest before a row is read
+  settleMs: 120,
+  frame: 'relative grid grid-cols-[1fr_1.6fr_1fr] gap-1 px-3 py-2',
+  band: 'pointer-events-none absolute inset-x-3 top-1/2 h-10 -translate-y-1/2 rounded-[var(--radius-md)] bg-[var(--color-picker-wash-strong)]',
+  column: 'h-50 snap-y snap-mandatory overflow-y-scroll [scrollbar-width:none]',
+  // Two empty rows centre the first and last entries
+  spacer: 'block h-20',
+  item: 'flex h-10 snap-center items-center justify-center text-body tabular-nums',
+  itemOn: 'font-semibold text-[var(--color-ink)]',
+  itemOff: 'text-[var(--color-ink-subtle)]',
 } as const
 
 /**

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
+import { MOBILE_SHELL_QUERY } from '@/declarations/ui/responsive'
 
 // Room kept between the panel and the viewport edge
 const EDGE_MARGIN = 8
@@ -42,7 +43,7 @@ export interface AnchoredPanel {
 }
 
 /**
- * Float a panel under its trigger
+ * Float a panel under its trigger, or lift it as a bottom sheet on mobile
  * @param {AnchoredPanelOptions} [options] - Sizing knobs
  * @return {AnchoredPanel} - Panel state and refs
  */
@@ -68,6 +69,11 @@ export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPa
       const trigger = triggerRef.current?.getBoundingClientRect()
       const panel = panelRef.current
       if (!trigger || !panel) return
+
+      // A bottom sheet on mobile, placed by CSS
+      const isSheet = window.matchMedia(MOBILE_SHELL_QUERY).matches
+      panel.toggleAttribute('data-sheet', isSheet)
+      if (isSheet) return
 
       if (matchTriggerWidth) panel.style.width = `${Math.max(trigger.width, minWidth)}px`
 

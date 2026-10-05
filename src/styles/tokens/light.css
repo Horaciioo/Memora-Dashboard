@@ -48,16 +48,16 @@
   --color-sky-400: #86b6e4;
   --color-sky-500: #6aa2d8;
   --color-sky-600: #4f8ac4;
-  --color-sky-700: #356a9c;
+  --color-sky-700: #2f6496;
   --color-sky-800: #2d5580;
   --color-sky-900: #213f61;
 
   /* Status tones, flat and laid down, never neon */
-  --color-success: #4f7a22;
+  --color-success: #46701e;
   --color-caution: #8a5a00;
-  --color-warning: #a65a0a;
+  --color-warning: #964f08;
   --color-danger: #b23a2e;
-  --color-info: #356a9c;
+  --color-info: #2f6496;
   --color-neutral: #675e57;
   --color-success-soft: #eef4dc;
   --color-caution-soft: #f8efd6;
@@ -78,7 +78,7 @@
   --color-field-border: #eee5d4;
   --color-field-border-strong: #ddd0b8;
   --color-on-field: #1e1a17;
-  --color-on-field-subtle: #6f665e;
+  --color-on-field-subtle: #645c55;
   --color-picker-wash: rgb(60 40 20 / 0.055);
   --color-picker-wash-strong: rgb(60 40 20 / 0.09);
 
@@ -94,7 +94,7 @@
 
   /* Authority, reserved to the two Administration roles */
   --color-authority-admin: #b23a2e;
-  --color-authority-lead: #a65a0a;
+  --color-authority-lead: #964f08;
   --color-authority-admin-soft: #f8e3df;
   --color-authority-lead-soft: #f9e9d6;
 }
