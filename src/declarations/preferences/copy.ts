@@ -20,7 +20,7 @@ export const PREFERENCES_COPY = {
   textSizeSample: 'Aa',
   colorVisionTitle: 'Vision des couleurs',
   displayLead: 'Ce que tu changes ici ne concerne que toi.',
-  storageNotice: 'Ces réglages suivent ton compte, quel que soit le navigateur.',
+  storageNotice: 'Ces réglages sont liés à ton compte : tu les retrouves sur n’importe quel navigateur.',
   signInTitle: 'Connexion',
   signInLead: 'Memora te reconnaît à ton identifiant Discord, il n’y a pas de mot de passe.',
   sessionsTitle: 'Appareils connectés',
@@ -48,10 +48,10 @@ export const PREFERENCES_COPY = {
   exportAction: 'Télécharger mes données',
   exportPending: 'Préparation…',
   exportFileName: 'memora-mes-donnees.json',
-  guidesTitle: 'Accueils',
+  guidesTitle: 'Bulles d’accueil',
   guidesLead:
-    'Les bulles d’accueil ne s’affichent qu’une fois. Tu peux les revoir à ta prochaine visite.',
-  guidesAction: 'Revoir les accueils',
+    'Chaque page t’accueille avec une courte bulle qui explique à quoi elle sert, une seule fois. Relance-les pour les revoir en visitant les pages.',
+  guidesAction: 'Revoir les bulles d’accueil',
 } as const
 
 /**
