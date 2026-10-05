@@ -45,7 +45,7 @@ export const CourseTimeline = ({ chapters, current, fill, finished }: CourseTime
                   !done && !now && COURSE_TIMELINE.nodeNext
                 )}
               >
-                {done ? <CheckIcon className="h-4 w-4" aria-hidden="true" /> : index + 1}
+                {done ? <CheckIcon className="h-6 w-6" aria-hidden="true" /> : index + 1}
               </li>
 
               {index < chapters.length - 1 && (

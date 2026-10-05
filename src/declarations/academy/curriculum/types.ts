@@ -414,12 +414,14 @@ export type CourseBlock = ReadBlock | ExerciseBlock
  * @typedef {Object} CourseChapter
  * @property {string} key - Stable key
  * @property {string} title - Heading
+ * @property {string} [goal] - What the learner will manage
  * @property {CourseBlock[]} blocks - Content
  */
 
 export interface CourseChapter {
   key: string
   title: string
+  goal?: string
   blocks: CourseBlock[]
 }
 

@@ -11,6 +11,9 @@ import { useSyncExternalStore } from 'react'
  * @property {string} backLabel - Words of the way back
  * @property {{ key: string, title: string }[]} chapters - Chapters
  * @property {number} current - Chapter being read
+ * @property {{ key: string, label: string }[]} steps - Screens of the open chapter
+ * @property {number} step - Screen being read
+ * @property {(index: number) => void} onStep - Goes back to an earlier screen
  * @property {boolean} finished - Every chapter cleared
  * @property {(index: number) => void} onSelect - Goes back to an earlier chapter
  */
@@ -22,6 +25,9 @@ export interface CourseRailState {
   backLabel: string
   chapters: { key: string; title: string }[]
   current: number
+  steps: { key: string; label: string }[]
+  step: number
+  onStep: (index: number) => void
   finished: boolean
   onSelect: (index: number) => void
 }

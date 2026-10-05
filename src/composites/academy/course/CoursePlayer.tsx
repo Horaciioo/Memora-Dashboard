@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { CSSProperties } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { PageHeader } from '@/components/structures/PageHeader'
@@ -14,6 +15,7 @@ import { CourseContextProvider } from '@/composites/academy/course/CourseContext
 import { CourseIntro } from '@/composites/academy/course/CourseIntro'
 import { CourseOutro } from '@/composites/academy/course/CourseOutro'
 import { CourseTimeline } from '@/composites/academy/course/CourseTimeline'
+import { CourseWelcome } from '@/composites/academy/course/CourseWelcome'
 import { FillExercise } from '@/composites/academy/course/FillExercise'
 import { OrderExercise, SortExercise } from '@/composites/academy/course/OrderingExercises'
 import { SceneExercise } from '@/composites/academy/course/SceneExercise'
@@ -22,7 +24,8 @@ import { SimulationExercise } from '@/composites/academy/course/SimulationExerci
 import type { ExerciseViewProps } from '@/composites/academy/course/types'
 import { useCourse } from '@/core/hooks/data/useCourse'
 import { publishCourseRail } from '@/core/hooks/interaction/useCourseRail'
-import { useScrollFill } from '@/core/hooks/interaction/useScrollFill'
+import { useSlideAdvance } from '@/core/hooks/interaction/useSlideAdvance'
+import { stepsOf } from '@/core/lib/academy/courseSteps'
 import { COURSE_COPY } from '@/declarations/academy/copy'
 import { isExercise } from '@/declarations/academy/curriculum'
 import type { Course, ExerciseBlock } from '@/declarations/academy/curriculum/types'
@@ -101,7 +104,7 @@ export const CoursePlayer = ({
   const run = useCourse(submitPath, course, initialProgress)
   const surface = COURSE_SURFACE_REGISTRY.get(course.surface)
   const BackIcon = ICONS.back
-  const chapterRef = useRef<HTMLElement>(null)
+  const ExpandIcon = ICONS.expand
 
   const clearedAt = useCallback(
     (chapterIndex: number): boolean =>
@@ -117,6 +120,8 @@ export const CoursePlayer = ({
 
     return open === -1 ? course.chapters.length - 1 : open
   })
+  // Screen of the chapter on display
+  const [step, setStep] = useState(0)
   const [slide, setSlide] = useState<'forward' | 'back'>('forward')
   // Opening page until the first chapter
   const [page, setPage] = useState<'intro' | 'chapters' | 'outro'>(() =>
@@ -126,16 +131,45 @@ export const CoursePlayer = ({
   const chapter = course.chapters[current]!
   const isLast = current === course.chapters.length - 1
   const canAdvance = clearedAt(current)
-  const fill = useScrollFill(chapterRef, current)
+  const steps = useMemo(() => stepsOf(chapter), [chapter])
+  const screen = steps[Math.min(step, steps.length - 1)]!
+  const isLastStep = step >= steps.length - 1
+
+  // A screen clears once its exercises pass
+  const stepCleared = screen.blocks
+    .filter(isExercise)
+    .every((block) => run.progress.blocks[block.key]?.passed)
+  const fill = (step + (stepCleared ? 1 : 0)) / steps.length
 
   const goTo = useCallback(
     (index: number) => {
       setSlide(index > current ? 'forward' : 'back')
       setCurrent(index)
+      setStep(0)
       window.scrollTo({ top: 0 })
     },
     [current]
   )
+
+  const goStep = useCallback((index: number) => {
+    setStep(index)
+    window.scrollTo({ top: 0 })
+  }, [])
+
+  const next = () => {
+    if (!stepCleared) return
+
+    if (!isLastStep) goStep(step + 1)
+  }
+
+  // Sliding past the page edge moves along the chapter
+  useSlideAdvance({
+    enabled: page === 'chapters',
+    canNext: stepCleared && !isLastStep,
+    canPrevious: step > 0,
+    onNext: next,
+    onPrevious: () => goStep(step - 1),
+  })
 
   const chapters = useMemo(
     () => course.chapters.map(({ key, title }) => ({ key, title })),
@@ -151,12 +185,29 @@ export const CoursePlayer = ({
       backLabel,
       chapters,
       current,
+      steps: steps.map(({ key, label }) => ({ key, label })),
+      step,
+      onStep: (index) => {
+        if (index < step) goStep(index)
+      },
       finished: run.finished,
       onSelect: (index) => {
         if (index < current) goTo(index)
       },
     })
-  }, [backHref, backLabel, chapters, course.name, current, goTo, run.finished, surface.label])
+  }, [
+    backHref,
+    backLabel,
+    chapters,
+    course.name,
+    current,
+    goStep,
+    goTo,
+    run.finished,
+    step,
+    steps,
+    surface.label,
+  ])
 
   useEffect(() => () => publishCourseRail(null), [])
 
@@ -195,57 +246,88 @@ export const CoursePlayer = ({
         {page === 'chapters' && (
           <section
             key={chapter.key}
-            ref={chapterRef}
             className={cn(
               COURSE_PLAYER.stage,
               slide === 'forward' ? COURSE_PLAYER.slideForward : COURSE_PLAYER.slideBack
             )}
           >
             <header className={COURSE_PLAYER.chapterHead}>
+              <h2 className={COURSE_PLAYER.chapterTitle}>{chapter.title}</h2>
+              <span className={COURSE_PLAYER.chapterDivider} aria-hidden="true" />
               <span className={COURSE_PLAYER.chapterCount}>
                 {COURSE_COPY.chapterCount(current + 1, course.chapters.length)}
               </span>
-              <h2 className={COURSE_PLAYER.chapterTitle}>{chapter.title}</h2>
             </header>
 
-            <div className={COURSE_PLAYER.blocks}>
-              {chapter.blocks.map((block) => (
-                <div
-                  key={block.key}
-                  className={cn(!WIDE_KINDS.has(block.kind) && COURSE_PLAYER.column)}
-                >
-                  {isExercise(block) ? (
-                    <ExerciseView
-                      block={block as ExerciseBlock}
-                      answer={run.answers[block.key]}
-                      result={run.results[block.key]}
-                      isSaving={run.isSaving}
-                      onAnswer={(answer) => run.answer(block.key, answer)}
-                      onCheck={(answer) => void run.check(block, answer)}
-                      onRetry={() => run.retry(block.key)}
-                    />
-                  ) : (
-                    <ReadBlock block={block} />
-                  )}
+            <div key={screen.key} className={COURSE_PLAYER.step}>
+              {screen.welcome ? (
+                <CourseWelcome chapter={chapter} steps={steps} />
+              ) : (
+                <div className={COURSE_PLAYER.blocks}>
+                  {screen.blocks.map((block, index) => (
+                    <div
+                      key={block.key}
+                      className={cn(
+                        COURSE_PLAYER.reveal,
+                        !WIDE_KINDS.has(block.kind) && COURSE_PLAYER.column
+                      )}
+                      style={{ '--i': index } as CSSProperties}
+                    >
+                      {isExercise(block) ? (
+                        <ExerciseView
+                          block={block as ExerciseBlock}
+                          answer={run.answers[block.key]}
+                          result={run.results[block.key]}
+                          isSaving={run.isSaving}
+                          onAnswer={(answer) => run.answer(block.key, answer)}
+                          onCheck={(answer) => void run.check(block, answer)}
+                          onRetry={() => run.retry(block.key)}
+                        />
+                      ) : (
+                        <ReadBlock block={block} />
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
 
-            {(!isLast || reviewed) && (
-              <footer className={COURSE_PLAYER.foot}>
-                <span className={COURSE_PLAYER.rule} aria-hidden="true" />
-                <Button
-                  variant="primary"
-                  disabled={!canAdvance}
-                  onClick={() => (isLast ? open('outro') : goTo(current + 1))}
+            <footer className={COURSE_PLAYER.hint}>
+              <span className={COURSE_PLAYER.stepCount}>
+                {COURSE_COPY.stepCounter(step + 1, steps.length)}
+              </span>
+              {!isLastStep ? (
+                <button
+                  type="button"
+                  disabled={!stepCleared}
+                  onClick={next}
+                  className={COURSE_PLAYER.hintButton}
                 >
-                  {isLast
-                    ? COURSE_COPY.nextPage
-                    : COURSE_COPY.nextChapterTo(current + 2, course.chapters[current + 1]!.title)}
-                </Button>
-                {!canAdvance && <p className={COURSE_PLAYER.footHint}>{COURSE_COPY.nextLocked}</p>}
-              </footer>
-            )}
+                  {stepCleared ? COURSE_COPY.slideHint : COURSE_COPY.slideLocked}
+                  <ExpandIcon className={COURSE_PLAYER.hintGlyph} aria-hidden="true" />
+                </button>
+              ) : (
+                (!isLast || reviewed) && (
+                  <>
+                    <Button
+                      variant="primary"
+                      disabled={!canAdvance}
+                      onClick={() => (isLast ? open('outro') : goTo(current + 1))}
+                    >
+                      {isLast
+                        ? COURSE_COPY.nextPage
+                        : COURSE_COPY.nextChapterTo(
+                            current + 2,
+                            course.chapters[current + 1]!.title
+                          )}
+                    </Button>
+                    {!canAdvance && (
+                      <p className={COURSE_PLAYER.footHint}>{COURSE_COPY.nextLocked}</p>
+                    )}
+                  </>
+                )
+              )}
+            </footer>
           </section>
         )}
 

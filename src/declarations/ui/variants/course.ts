@@ -37,7 +37,7 @@ export const COURSE_CATALOG = {
  */
 
 export const COURSE_PLAYER = {
-  page: 'mx-auto flex w-full max-w-4xl flex-col gap-8',
+  page: 'mx-auto flex w-full max-w-6xl flex-col gap-8',
   back: 'inline-flex items-center gap-2 self-start text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] lg:hidden',
   hero: 'relative flex flex-col gap-4 overflow-hidden rounded-[var(--radius-xl)] p-8 text-[var(--color-on-media)] shadow-[var(--shadow-md)] sm:p-10',
   heroSurface: `flex items-center gap-2 ${PROPERTY_LABEL} text-[var(--color-on-media)]/85`,
@@ -49,12 +49,30 @@ export const COURSE_PLAYER = {
   stage: 'flex min-w-0 flex-col gap-10',
   slideForward: 'course-slide-forward',
   slideBack: 'course-slide-back',
-  chapterHead: 'flex flex-col gap-2',
+  chapterHead: 'flex flex-col items-center gap-3 text-center',
+  chapterTitle: 'text-3xl leading-tight font-bold tracking-tight text-balance sm:text-5xl',
+  chapterDivider: 'h-px w-24 bg-[var(--color-border-strong)]',
   chapterCount: PROPERTY_LABEL,
-  chapterTitle: 'text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl',
+  // Screen on display, filling the height
+  step: 'flex min-h-[55dvh] flex-col justify-center gap-8',
   blocks: 'flex flex-col gap-8',
+  // Each block writes itself in turn
+  reveal: 'course-reveal',
   // Reading column of an ordinary block
-  column: 'w-full max-w-3xl',
+  column: 'mx-auto w-full max-w-4xl text-lg',
+  // Welcome screen
+  welcome: 'mx-auto flex w-full max-w-3xl flex-col items-center gap-6 text-center',
+  welcomeHello: 'text-4xl font-bold tracking-tight sm:text-6xl',
+  welcomeLine: 'text-xl leading-relaxed text-balance text-[var(--color-ink)] sm:text-2xl',
+  welcomeList: 'flex flex-wrap items-center justify-center gap-2',
+  welcomeChip:
+    'flex items-center gap-2 rounded-full glass-soft px-3.5 py-1.5 text-sm font-semibold text-[var(--color-ink)]',
+  // Sliding hint under the screen
+  hint: 'flex flex-col items-center gap-1 pb-6 text-center',
+  hintButton:
+    'course-bounce flex flex-col items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] disabled:cursor-not-allowed disabled:opacity-60',
+  hintGlyph: 'size-5',
+  stepCount: 'text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   // Thin rule that stops short of both edges
   foot: 'flex flex-col items-center gap-4 pb-6',
   rule: 'h-px w-[calc(100%-4rem)] bg-[var(--color-border)]',
@@ -288,10 +306,11 @@ export const LEGACY_TRACK = {
  */
 
 export const COURSE_TIMELINE = {
-  bar: 'sticky top-0 z-20 -mx-2 overflow-x-auto bg-[var(--color-background)]/90 px-2 py-3 backdrop-blur-sm',
+  bar: 'sticky top-4 z-20 mx-auto w-fit max-w-full overflow-x-auto rounded-full border glass-panel px-6 py-3',
   track: 'flex min-w-max items-center',
   node: 'relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold tabular-nums transition-colors duration-[var(--motion-duration-panel)]',
-  nodeDone: 'border-[var(--color-success)] bg-[var(--color-success)] text-[var(--color-on-media)]',
+  // Only the glyph, no disc
+  nodeDone: 'border-transparent text-[var(--color-success)]',
   nodeNow:
     'border-[var(--color-info)] bg-[var(--color-info)] text-[var(--color-on-media)] shadow-[0_0_0_4px_var(--color-info-soft)]',
   nodeNext:
@@ -318,7 +337,7 @@ export const COURSE_RAIL = {
   itemOpen: 'cursor-pointer transition-colors hover:bg-[var(--color-hover)]',
   itemLocked: 'cursor-not-allowed opacity-60',
   node: 'relative z-[1] flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold tabular-nums',
-  nodeDone: 'border-[var(--color-success)] bg-[var(--color-success)] text-[var(--color-on-media)]',
+  nodeDone: 'border-transparent text-[var(--color-success)]',
   nodeNow: 'border-[var(--color-info)] bg-[var(--color-info)] text-[var(--color-on-media)]',
   nodeNext: 'border-[var(--color-border-strong)] bg-[var(--color-surface-raised)]',
   line: 'absolute top-9 bottom-0 left-[1.3125rem] w-0 border-l-2 border-dashed',
@@ -326,6 +345,17 @@ export const COURSE_RAIL = {
   lineNext: 'border-[var(--color-border-strong)]',
   title: 'min-w-0 pt-0.5 leading-snug',
   titleNow: 'font-bold',
+  // Screens under the open chapter
+  steps:
+    'mt-2 ml-1 flex flex-col gap-0.5 border-l-2 border-dashed border-[var(--color-border-strong)] pl-3',
+  stepItem:
+    'flex items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1 text-left text-xs font-medium text-[var(--color-ink-subtle)]',
+  stepOpen:
+    'cursor-pointer transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  stepNow: 'font-bold text-[var(--color-ink)]',
+  stepLocked: 'cursor-not-allowed opacity-60',
+  stepGlyph: 'size-3.5 shrink-0 text-[var(--color-success)]',
+  stepDot: 'size-1.5 shrink-0 rounded-full bg-current',
 } as const
 
 /**

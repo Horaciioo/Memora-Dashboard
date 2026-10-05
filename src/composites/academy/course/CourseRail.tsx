@@ -72,12 +72,46 @@ export const CourseRail = ({ rail }: CourseRailProps) => {
                     !done && !now && COURSE_RAIL.nodeNext
                   )}
                 >
-                  {done ? <CheckIcon className="h-3.5 w-3.5" aria-hidden="true" /> : index + 1}
+                  {done ? <CheckIcon className="h-5 w-5" aria-hidden="true" /> : index + 1}
                 </span>
                 <span className={cn(COURSE_RAIL.title, now && COURSE_RAIL.titleNow)}>
                   {chapter.title}
                 </span>
               </button>
+
+              {now && (
+                <ol className={COURSE_RAIL.steps} aria-label={COURSE_COPY.stepsLabel}>
+                  {rail.steps.map((step, stepIndex) => {
+                    const stepDone = stepIndex < rail.step
+                    const stepNow = stepIndex === rail.step
+
+                    return (
+                      <li key={step.key}>
+                        <button
+                          type="button"
+                          disabled={!stepDone}
+                          aria-current={stepNow ? 'step' : undefined}
+                          onClick={() => rail.onStep(stepIndex)}
+                          className={cn(
+                            COURSE_RAIL.stepItem,
+                            'w-full',
+                            stepDone && COURSE_RAIL.stepOpen,
+                            stepNow && COURSE_RAIL.stepNow,
+                            !stepDone && !stepNow && COURSE_RAIL.stepLocked
+                          )}
+                        >
+                          {stepDone ? (
+                            <CheckIcon className={COURSE_RAIL.stepGlyph} aria-hidden="true" />
+                          ) : (
+                            <span className={COURSE_RAIL.stepDot} aria-hidden="true" />
+                          )}
+                          <span>{step.label}</span>
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ol>
+              )}
             </li>
           )
         })}
