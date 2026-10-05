@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import type { ReactNode } from 'react'
+import { MembersIllustration } from '@/components/elements/feedback/EmptyStateIllustration'
 import { APP_ASSETS, APP_COMPANY, APP_NAME } from '@/declarations/app'
+import { AUTH_SHELL } from '@/declarations/ui/blocks'
 
 export interface AuthShellProps {
   title: string
@@ -10,29 +12,34 @@ export interface AuthShellProps {
 }
 
 /**
- * Centred card shared by every screen reachable without a session
+ * Gradient figure and card shared by every screen reachable without a session
  * @param {string} title - Card title
  * @param {ReactNode} children - Card content
  * @return {JSX.Element}
  */
 
 export const AuthShell = ({ title, children }: AuthShellProps) => (
-  <main className="flex min-h-screen items-center justify-center px-6 py-12">
-    <div className="flex w-full max-w-sm flex-col gap-6">
-      <div className="flex items-center justify-center">
-        <Image
-          src={APP_ASSETS.wordmark}
-          alt={`${APP_COMPANY} ${APP_NAME}`}
-          width={168}
-          height={59}
-          className="h-auto w-40"
-          priority
-        />
-      </div>
-      <div className="card-surface rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 shadow-[var(--shadow-md)] sm:p-8">
-        <h1 className="mb-6 text-xl font-bold tracking-tight">{title}</h1>
-        {children}
-      </div>
+  <div className={AUTH_SHELL.page}>
+    <div className={AUTH_SHELL.art} aria-hidden="true">
+      <MembersIllustration className={AUTH_SHELL.figure} />
     </div>
-  </main>
+    <main className={AUTH_SHELL.main}>
+      <div className={AUTH_SHELL.column}>
+        <div className={AUTH_SHELL.logo}>
+          <Image
+            src={APP_ASSETS.wordmark}
+            alt={`${APP_COMPANY} ${APP_NAME}`}
+            width={168}
+            height={59}
+            className={AUTH_SHELL.wordmark}
+            priority
+          />
+        </div>
+        <div className={AUTH_SHELL.card}>
+          <h1 className={AUTH_SHELL.title}>{title}</h1>
+          {children}
+        </div>
+      </div>
+    </main>
+  </div>
 )

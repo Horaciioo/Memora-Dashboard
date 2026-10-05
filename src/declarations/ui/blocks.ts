@@ -714,3 +714,21 @@ export const SECURITY_LIST = {
   statusGlyph: 'h-4 w-4 shrink-0',
   footer: 'mt-3 flex flex-wrap justify-center gap-2 border-t border-[var(--color-border)] pt-4',
 } as const
+
+/**
+ * Auth shell classes: a gradient figure beside the form
+ * @type {Record<string, string>}
+ */
+
+export const AUTH_SHELL = {
+  page: 'grid min-h-dvh lg:grid-cols-2',
+  // Gradient band above the form on mobile, the half page from lg
+  art: 'relative flex h-36 items-center justify-center overflow-hidden bg-[image:var(--gradient-frame)] lg:h-auto',
+  figure: 'hidden w-3/5 max-w-md lg:block',
+  main: 'flex flex-col items-center justify-center px-6 py-12',
+  column: 'flex w-full max-w-sm flex-col gap-6',
+  logo: 'flex items-center justify-center',
+  wordmark: 'h-auto w-40',
+  card: 'card-surface rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 shadow-[var(--shadow-md)] sm:p-8',
+  title: 'mb-6 text-section font-semibold tracking-tight',
+} as const
