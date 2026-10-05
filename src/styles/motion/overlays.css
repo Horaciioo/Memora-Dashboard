@@ -38,19 +38,34 @@ body {
   }
 }
 
-/* Page drawer, unfolding leftwards from the page edge like the search field */
+/* Floating drawer */
 .drawer-enter {
-  animation: drawer-enter var(--motion-duration-panel) var(--motion-ease-out);
+  animation: drawer-enter var(--motion-duration-panel) var(--motion-ease-spring);
 }
 
 @keyframes drawer-enter {
   from {
     opacity: 0;
-    clip-path: inset(0 0 0 100% round var(--radius-xl) 0 0 var(--radius-xl));
+    transform: translateX(2rem) scale(0.98);
   }
   to {
     opacity: 1;
-    clip-path: inset(0 0 0 0 round var(--radius-xl) 0 0 var(--radius-xl));
+    transform: none;
+  }
+}
+
+@keyframes drawer-rise {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@media (width < 768px) {
+  .drawer-enter {
+    animation-name: drawer-rise;
   }
 }
 

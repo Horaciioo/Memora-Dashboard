@@ -29,6 +29,6 @@
     "width": 600,
     "heightShare": 0.8,
     "minHeight": 600,
-    "gap": 0
+    "gap": 12
   }
 }

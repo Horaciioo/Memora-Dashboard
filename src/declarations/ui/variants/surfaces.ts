@@ -7,12 +7,12 @@ export const SECTION_STYLES = {
   wrapper: 'flex flex-col gap-3',
   header: 'flex flex-wrap items-end justify-between gap-3',
   heading: 'flex flex-col gap-1',
-  title: 'text-xl font-bold tracking-tight sm:text-2xl',
+  title: 'text-section font-semibold tracking-tight',
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
-  panel: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface',
-  panelPadded: 'p-4 sm:p-5',
+  panel: 'rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface',
+  panelPadded: 'p-4 sm:p-6',
   // Visible box
-  panelRaised: 'p-4 shadow-[var(--shadow-sm)] sm:p-5',
+  panelRaised: 'p-4 shadow-[var(--shadow-sm)] sm:p-6',
 } as const
 
 /**
@@ -111,9 +111,9 @@ export type GlyphSize = keyof Omit<typeof GLYPH_STYLES, 'base'>
 
 export const DIALOG_STYLES = {
   overlay:
-    'overlay-enter fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-ink)]/50 p-4 backdrop-blur-md sm:p-6',
+    'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-scrim)] sm:items-center sm:p-6',
   panel:
-    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
+    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] sm:rounded-[var(--radius-xl)]',
   header: 'flex items-start gap-3 px-5 pt-5 pb-4 sm:px-6',
   heading: 'flex min-w-0 flex-1 flex-col gap-1',
   title: 'text-lg leading-tight font-bold tracking-tight',
@@ -147,10 +147,10 @@ export type DialogSize = keyof typeof DIALOG_SIZES
 export const DRAWER_STYLES = {
   // Dims the page window only
   overlay:
-    'overlay-enter fixed inset-0 z-[45] bg-[var(--color-ink)]/25 md:inset-y-3 md:right-3 md:left-[var(--shell-sidebar-w)] md:rounded-[var(--radius-xl)]',
-  // Margin-centred
+    'overlay-enter fixed inset-0 z-[45] bg-[var(--color-scrim)] md:inset-y-3 md:right-3 md:left-[var(--shell-sidebar-w)] md:rounded-[var(--radius-xl)]',
+  // Bottom sheet on mobile, floating card from md
   panel:
-    'drawer-enter fixed inset-x-3 inset-y-0 z-50 my-auto flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)] md:right-[var(--drawer-page-right)] md:left-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-r-none md:border-r-0',
+    'drawer-enter fixed inset-x-0 bottom-0 z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
   header: 'flex shrink-0 items-center gap-3 px-5 pt-4 pb-3',
   // Bare glyph
   glyph: 'flex shrink-0 items-center text-[var(--color-ink-accent)]',
@@ -210,17 +210,17 @@ export const MENU_STYLES = {
  */
 
 export const TABS_STYLES = {
-  list: 'relative flex gap-1 overflow-x-auto border-b border-[var(--color-border)] pb-2',
+  list: 'relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-[var(--color-surface-sunken)] p-1',
   // Strip centred over its panel from sm
-  listCentered: 'sm:justify-center',
-  tab: 'relative z-10 shrink-0 rounded-[var(--radius-md)] px-3.5 py-2 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
-  // Open tab leaves the hover wash to the pink behind it
+  listCentered: 'sm:mx-auto',
+  tab: 'relative z-10 shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  // Open tab sits on the rose pill
   active:
-    'font-bold text-[var(--color-brand-800)] hover:bg-transparent hover:text-[var(--color-brand-800)]',
+    'font-semibold text-[var(--color-on-brand)] hover:bg-transparent hover:text-[var(--color-on-brand)]',
   flagged: 'text-[var(--color-danger)]',
-  // Pink wash lifted off the strip
+  // Rose pill gliding under the open tab
   indicator:
-    'tab-indicator pointer-events-none absolute top-0 bottom-2 left-0 rounded-[var(--radius-md)] border border-[var(--color-brand-200)] bg-[var(--color-brand-100)] shadow-[var(--shadow-sm)]',
+    'tab-indicator pointer-events-none absolute top-1 bottom-1 left-0 rounded-full bg-[var(--color-brand-600)] shadow-[var(--shadow-sm)]',
   panel: 'pt-4',
   content: 'flex items-center',
   icon: 'h-4 w-4 shrink-0',
