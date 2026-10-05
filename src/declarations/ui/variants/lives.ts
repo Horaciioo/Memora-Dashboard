@@ -205,11 +205,9 @@ export const LIVE_GATE = {
  */
 
 export const LIVE_STARTED_BUBBLE = {
-  root: 'surface-enter mx-2 mt-2 flex flex-col gap-2 rounded-[var(--radius-lg)] border-2 border-[var(--color-danger)] bg-[var(--color-surface-raised)] p-3 shadow-[var(--shadow-md)]',
-  title: 'flex items-center gap-2 text-sm font-bold text-[var(--color-danger)]',
-  glyph: 'live-pulse h-4 w-4',
-  body: 'text-xs text-[var(--color-ink-subtle)]',
-  actions: 'flex items-center gap-2',
+  // Pill beside the entry, one shadow over pill and tip
+  root: 'rail-reset nudge-enter absolute top-1/2 left-full z-50 ml-3 -translate-y-1/2 cursor-pointer rounded-full bg-[var(--color-surface-raised)] px-4 py-2 text-left text-caption font-semibold whitespace-nowrap text-[var(--color-ink)] [filter:drop-shadow(0_0_0.5px_rgb(0_0_0/0.3))_drop-shadow(0_0.5rem_1rem_rgb(0_0_0/0.14))] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  tail: 'pointer-events-none absolute top-1/2 -left-[0.5625rem] h-[1.125rem] w-3 -translate-y-1/2 text-[var(--color-surface-raised)]',
 } as const
 
 /**

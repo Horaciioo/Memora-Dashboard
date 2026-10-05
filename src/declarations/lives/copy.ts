@@ -93,10 +93,7 @@ export const LIVE_PAGE_COPY = {
   instructionsSave: 'Enregistrer',
   open: 'J’ai lu, ouvrir la Mod View',
   reread: 'Relire les consignes',
-  startedTitle: 'Un Live a débuté !',
-  startedBody: 'Le live de {creator} est en cours. L’équipe t’attend dans la Mod View.',
-  startedJoin: 'Rejoindre',
-  startedDismiss: 'Plus tard',
+  startedBubble: 'Le live a démarré ! On y va ?',
   presentationTitle: 'Aucun live en cours',
   presentationLead:
     'Quand un Responsable lance un live, cette page passe au rouge et la Mod View s’ouvre ici. Voici à quoi elle ressemble.',

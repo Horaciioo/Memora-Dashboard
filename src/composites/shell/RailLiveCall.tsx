@@ -45,9 +45,7 @@ export const RailLiveCall = ({ item, live }: RailLiveCallProps) => {
         </span>
         <ArrowIcon className={LEFT_SIDEBAR.liveArrow} aria-hidden="true" />
       </Link>
-      {live.unseenStart && (
-        <LiveStartedBubble liveId={live.unseenStart.id} creator={live.unseenStart.creator} />
-      )}
+      {live.unseenStart && <LiveStartedBubble liveId={live.unseenStart.id} />}
     </div>
   )
 }
