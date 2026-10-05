@@ -60,8 +60,8 @@ export const HOME_STYLES = {
  */
 
 export const HOME_FLOW = {
-  page: 'mx-auto flex w-full max-w-5xl flex-col gap-12',
-  grid: 'grid gap-14 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]',
+  page: 'mx-auto flex w-full max-w-5xl flex-col gap-8',
+  grid: 'grid gap-10 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]',
   column: 'flex min-w-0 flex-col gap-6',
   label: PROPERTY_LABEL,
   // Focus
