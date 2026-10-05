@@ -151,7 +151,7 @@ export const CandidateDialog = ({
               {candidate.comments.map((comment) => (
                 <article
                   key={comment.id}
-                  className="glass-surface flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-4 shadow-[var(--shadow-sm)]"
+                  className="card-surface flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-4 shadow-[var(--shadow-sm)]"
                 >
                   <span className="flex items-center gap-2 text-xs text-[var(--color-ink-subtle)]">
                     {[comment.authorName, formatDayTime(comment.createdAt)]

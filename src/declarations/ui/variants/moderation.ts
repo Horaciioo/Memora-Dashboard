@@ -110,7 +110,7 @@ export const MARSHA_GUIDE = {
   empty: 'px-4 py-10 text-center text-sm text-[var(--color-ink-subtle)] italic',
   // Detail of the one picked
   detail:
-    'surface-enter flex min-w-0 flex-col gap-7 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-6 sm:p-8',
+    'surface-enter flex min-w-0 flex-col gap-7 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6 sm:p-8',
   detailHead: 'flex items-center gap-4',
   detailName:
     'min-w-0 flex-1 truncate font-[family-name:var(--font-mono)] text-4xl font-extrabold tracking-tight',

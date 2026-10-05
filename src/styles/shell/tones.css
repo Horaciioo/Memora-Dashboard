@@ -1,0 +1,127 @@
+/* Frame colours follow the level in force (AppShell sets data-tone), registered so a change is interpolated */
+
+@property --color-frame-green {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #dbe9b0;
+}
+
+@property --color-frame-blue {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #cfe3f5;
+}
+
+@property --color-frame-pink {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #f5d5da;
+}
+
+@property --color-frame-white {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fbf7ee;
+}
+
+@property --color-frame {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #e6e2d0;
+}
+
+@property --color-on-frame {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2b261d;
+}
+
+@property --color-on-frame-subtle {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(43 38 29 / 0.78);
+}
+
+@property --color-on-frame-line {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(43 38 29 / 0.12);
+}
+
+@property --color-on-frame-line-strong {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(43 38 29 / 0.22);
+}
+
+@property --color-on-frame-tint {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #4f7a22;
+}
+
+@property --color-on-frame-blush {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #8e4354;
+}
+
+@property --color-on-frame-deep {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2b261d;
+}
+
+.app-tone {
+  transition-property:
+    --color-frame-green, --color-frame-blue, --color-frame-pink, --color-frame-white, --color-frame,
+    --color-on-frame, --color-on-frame-subtle, --color-on-frame-line, --color-on-frame-line-strong,
+    --color-on-frame-tint, --color-on-frame-blush, --color-on-frame-deep;
+  transition-duration: var(--motion-duration-celebrate);
+  transition-timing-function: var(--motion-ease-out);
+}
+
+.app-tone[data-tone='lead'] {
+  --color-frame-green: #cfe5a0;
+  --color-frame-blue: #e2eef8;
+  --color-frame-pink: #f9e6e8;
+  --color-frame-white: #fbf8f0;
+  --color-frame: #cfe5a0;
+  --color-on-frame: rgb(40 50 22);
+  --color-on-frame-subtle: rgb(40 50 22 / 0.78);
+  --color-on-frame-line: rgb(40 50 22 / 0.12);
+  --color-on-frame-line-strong: rgb(40 50 22 / 0.22);
+  --color-on-frame-tint: #4f7a22;
+  --color-on-frame-blush: #6f8b2e;
+  --color-on-frame-deep: #35441a;
+}
+
+.app-tone[data-tone='admin'] {
+  --color-frame-green: #e6efd0;
+  --color-frame-blue: #b9d6f0;
+  --color-frame-pink: #f6e2e5;
+  --color-frame-white: #fbf8f0;
+  --color-frame: #b9d6f0;
+  --color-on-frame: rgb(28 44 62);
+  --color-on-frame-subtle: rgb(28 44 62 / 0.78);
+  --color-on-frame-line: rgb(28 44 62 / 0.12);
+  --color-on-frame-line-strong: rgb(28 44 62 / 0.22);
+  --color-on-frame-tint: #356a9c;
+  --color-on-frame-blush: #2d5580;
+  --color-on-frame-deep: #213f61;
+}
+
+.app-tone[data-tone='junior'] {
+  --color-frame-green: #e9efd2;
+  --color-frame-blue: #dbe9f6;
+  --color-frame-pink: #f0c3cb;
+  --color-frame-white: #fbf8f0;
+  --color-frame: #f0c3cb;
+  --color-on-frame: rgb(79 34 48);
+  --color-on-frame-subtle: rgb(79 34 48 / 0.78);
+  --color-on-frame-line: rgb(79 34 48 / 0.12);
+  --color-on-frame-line-strong: rgb(79 34 48 / 0.22);
+  --color-on-frame-tint: #8e4354;
+  --color-on-frame-blush: #a65768;
+  --color-on-frame-deep: #4f2230;
+}

@@ -1,0 +1,101 @@
+/* Drawer footprint */
+body {
+  --drawer-mobile-h: min(calc(100dvh - 2rem), max(var(--drawer-min-h), 70dvh));
+  --drawer-page-h: min(
+    calc(100dvh - 1.5rem - 2 * var(--drawer-gap)),
+    max(var(--drawer-min-h), calc((100dvh - 1.5rem) * var(--drawer-h-share)))
+  );
+  --drawer-page-w: min(var(--drawer-w), calc((100vw - var(--shell-sidebar-w)) * 0.6));
+  --drawer-page-right: calc(0.75rem + var(--drawer-gap));
+}
+
+/* Dialog, drawer, menu, palette */
+.surface-enter {
+  animation: surface-enter var(--motion-duration-panel) var(--motion-ease-spring);
+}
+
+@keyframes surface-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.overlay-enter {
+  animation: overlay-enter var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+@keyframes overlay-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Page drawer, unfolding leftwards from the page edge like the search field */
+.drawer-enter {
+  animation: drawer-enter var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+@keyframes drawer-enter {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 0 100% round var(--radius-xl) 0 0 var(--radius-xl));
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0 round var(--radius-xl) 0 0 var(--radius-xl));
+  }
+}
+
+/* Fields of a new section slide in */
+.drawer-section-enter {
+  animation: surface-enter var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+/* Floating listbox of the select menu and the date picker */
+.popover-enter {
+  animation: popover-enter var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+@keyframes popover-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sliding underline of the tab strip — measured by Tabs (src/components/elements/navigation/Tabs.tsx) */
+/* Tab rule, moved frame by frame by Tabs, so no CSS transition */
+.tab-indicator {
+  will-change: transform, width;
+}
+
+/* Expanding search field of FilterBar (src/components/structures/FilterBar.tsx) */
+.search-expand {
+  transition:
+    width var(--motion-duration-panel) var(--motion-ease-out),
+    opacity var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+/* Drag and drop feedback — set by useDragAndDrop (src/core/hooks/interaction/useDragAndDrop.ts) */
+.is-dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+
+.is-drop-target {
+  outline: 2px dashed var(--color-brand-500);
+  outline-offset: -4px;
+  background: var(--color-brand-soft);
+}

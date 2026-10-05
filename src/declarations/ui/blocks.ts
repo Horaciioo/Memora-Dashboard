@@ -265,7 +265,7 @@ export const MEMBER_FILE = {
   layout: 'grid gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] lg:items-start',
   main: 'flex min-w-0 flex-col gap-6',
   // Rail follows the scroll on wide screens only
-  rail: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface shadow-[var(--shadow-sm)] lg:sticky lg:top-6',
+  rail: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)] lg:sticky lg:top-6',
   head: 'flex flex-col items-center gap-2 px-5 pt-7 text-center',
   name: 'text-xl font-black tracking-tight break-words',
   role: 'text-xs font-black tracking-wide text-[var(--color-brand-800)] uppercase',
@@ -284,14 +284,14 @@ export const MEMBER_FILE = {
   factValue: 'text-sm font-medium',
   factEmpty: 'text-sm text-[var(--color-ink-subtle)] italic',
   // Note card
-  note: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 shadow-[var(--shadow-sm)]',
+  note: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 shadow-[var(--shadow-sm)]',
   notePinned: 'border-[var(--color-brand-200)] bg-[var(--color-brand-50)]',
   noteHead: 'flex items-center gap-2 text-xs text-[var(--color-ink-subtle)]',
   noteBody: 'text-sm leading-relaxed whitespace-pre-wrap',
   notesGrid: 'grid gap-4 sm:grid-cols-2',
   // Social tile
   social:
-    'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-3 transition-colors hover:bg-[var(--color-hover)]',
+    'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-3 transition-colors hover:bg-[var(--color-hover)]',
   socialLogo:
     'flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)]',
   socialsGrid: 'grid gap-3 sm:grid-cols-2',
@@ -398,7 +398,7 @@ export const CONSOLE_BLOCK = {
   bannerTitle: 'text-sm font-semibold text-[var(--color-ink)]',
   bannerLead: 'text-xs text-[var(--color-ink-subtle)]',
   grid: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-4',
-  tile: 'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4',
+  tile: 'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4',
   tileLabel: 'text-xs font-medium tracking-wide text-[var(--color-ink-subtle)] uppercase',
   tileValue: 'font-[family-name:var(--font-display)] text-2xl leading-none',
   tileHint: 'text-xs text-[var(--color-ink-subtle)]',
@@ -414,7 +414,7 @@ export const CONSOLE_BLOCK = {
   cardLead: 'text-sm text-[var(--color-ink-subtle)]',
   chooser: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3',
   choice:
-    'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 text-left transition-colors hover:border-[var(--view)] hover:bg-[var(--color-surface)]',
+    'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left transition-colors hover:border-[var(--view)] hover:bg-[var(--color-surface)]',
   choiceActive: 'border-[var(--view)] bg-[var(--view)]/8',
   choiceName: 'truncate text-sm font-semibold',
   choiceMeta: 'truncate text-xs text-[var(--color-ink-subtle)]',
@@ -468,7 +468,7 @@ export const ACCESS_CONSOLE = {
   memberRole: 'shrink-0 text-xs text-[var(--color-ink-subtle)]',
   perimeter: 'flex flex-col gap-3',
   creator:
-    'flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4',
+    'flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4',
   creatorHead: 'flex items-center gap-3',
   creatorName: 'min-w-0 flex-1 truncate text-sm font-semibold',
   creatorMeta: 'shrink-0 text-xs tabular-nums text-[var(--color-ink-subtle)]',
@@ -541,7 +541,7 @@ export const CHANGELOG_BOARD = {
   // Three figures doubling as the way into each category
   counts: 'mt-2 flex flex-wrap items-stretch justify-center gap-3',
   count:
-    'group flex min-w-36 flex-col items-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-6 py-4 shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-1 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
+    'group flex min-w-36 flex-col items-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-6 py-4 shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-1 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
   countFigure: 'text-4xl leading-none font-black tabular-nums',
   countLabel: 'text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   blocks: 'flex flex-col gap-16',

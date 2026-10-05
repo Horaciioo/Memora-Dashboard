@@ -1,14 +1,8 @@
-/*
- * Typography of the theme format (src/utils/format/theme.ts → THEME.font).
- * Apple's system face carries text, headings and numerals: SF where it exists, the platform's
- * own face elsewhere. JetBrains Mono the code and eyebrows. The mono is fetched by the <link>
- * in app/layout.tsx; this file only names the families and their fallbacks.
- */
+/* Inter carries text, headings and numerals, JetBrains Mono the code. Both are fetched by the <link> in app/layout.tsx */
 
 :root {
   --font-system:
-    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, 'Segoe UI',
-    sans-serif;
+    'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Segoe UI', sans-serif;
   --font-display: var(--font-system);
   --font-body: var(--font-system);
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', monospace;

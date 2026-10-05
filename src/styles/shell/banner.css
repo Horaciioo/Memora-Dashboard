@@ -1,0 +1,36 @@
+/* Banner height and the page-coloured notch cut into its bottom edge */
+body {
+  --banner-h: var(--shell-banner-h-mobile);
+}
+
+/* md */
+@media (width >= 768px) {
+  body {
+    --banner-h: var(--shell-banner-h);
+  }
+}
+
+.banner-notch-body {
+  height: var(--shell-notch-h);
+  background: var(--color-background);
+}
+
+.banner-slope {
+  flex: none;
+  width: var(--shell-notch-slope);
+  height: var(--shell-notch-h);
+  background: var(--color-background);
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+}
+
+/* One pixel hides the seam */
+.banner-slope-start {
+  margin-right: -1px;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44' preserveAspectRatio='none'%3E%3Cpath d='M0 44C18 44 18 0 36 0V44Z'/%3E%3C/svg%3E");
+}
+
+.banner-slope-end {
+  margin-left: -1px;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44' preserveAspectRatio='none'%3E%3Cpath d='M36 44C18 44 18 0 0 0V44Z'/%3E%3C/svg%3E");
+}

@@ -1,0 +1,38 @@
+/* Soft Arc-like gradients, green blue pink white, identical in both themes */
+
+:root {
+  --color-frame-green: #dbe9b0;
+  --color-frame-blue: #cfe3f5;
+  --color-frame-pink: #f5d5da;
+  --color-frame-white: #fbf7ee;
+  /* Solid stand-in, what a cut into a rail glyph shows */
+  --color-frame: #e6e2d0;
+
+  /* Ink and washes of the rail standing on the frame */
+  --color-on-frame: #2b261d;
+  --color-on-frame-subtle: rgb(43 38 29 / 0.78);
+  --color-on-frame-wash: rgb(255 254 251 / 0.5);
+  --color-on-frame-raised: rgb(255 254 251 / 0.7);
+  --color-on-frame-line: rgb(43 38 29 / 0.12);
+  --color-on-frame-line-strong: rgb(43 38 29 / 0.22);
+  --color-on-frame-tint: #4f7a22;
+  --color-on-frame-blush: #8e4354;
+  --color-on-frame-deep: #2b261d;
+}
+
+/* Rebuilt on .app-tone so a tone change follows the animated colours */
+:root,
+.app-tone {
+  --gradient-frame:
+    radial-gradient(70% 60% at 0% 0%, var(--color-frame-green), transparent),
+    radial-gradient(70% 60% at 100% 0%, var(--color-frame-blue), transparent),
+    radial-gradient(75% 65% at 100% 100%, var(--color-frame-pink), transparent),
+    radial-gradient(75% 65% at 0% 100%, var(--color-frame-white), transparent),
+    var(--color-frame-white);
+  --gradient-figure: linear-gradient(
+    135deg,
+    var(--color-leaf-400) 0%,
+    var(--color-sky-400) 50%,
+    var(--color-brand-500) 100%
+  );
+}

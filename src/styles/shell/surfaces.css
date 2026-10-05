@@ -1,0 +1,47 @@
+/* Light glass, floating surfaces only */
+.glass-panel {
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  border-color: var(--glass-line);
+  box-shadow: var(--glass-shadow);
+}
+
+/* White card on the cream ground, in a layer so a hover or tint still wins */
+@layer components {
+  .card-surface {
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+/* Left-pointing tail of a box, sliding along its edge */
+.bubble-tail {
+  position: absolute;
+  left: 0;
+  width: 13px;
+  height: 24px;
+  transform: translate(-100%, -50%);
+  transition: top var(--motion-duration-slow) var(--motion-ease-out);
+  pointer-events: none;
+}
+
+.bubble-tail::before,
+.bubble-tail::after {
+  content: '';
+  position: absolute;
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+
+.bubble-tail::before {
+  inset: 0;
+  background: var(--color-border);
+}
+
+.bubble-tail::after {
+  top: 1.5px;
+  bottom: 1.5px;
+  left: 2px;
+  right: -1.5px;
+  background: var(--color-surface);
+}

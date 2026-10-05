@@ -31,7 +31,7 @@ export const PIM_TIMELINE = {
   titleCurrent: 'text-lg font-extrabold text-[var(--color-brand-800)]',
   meta: 'text-xs text-[var(--color-ink-subtle)]',
   description: 'text-sm',
-  card: 'mt-2 flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-brand-200)] glass-surface p-4',
+  card: 'mt-2 flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-brand-200)] card-surface p-4',
   guideTitle: PROPERTY_LABEL,
   actions: 'flex flex-wrap items-center gap-2',
 } as const

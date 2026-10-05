@@ -1,0 +1,76 @@
+/* Dark tokens: warm charcoal, cream ink, the rose action fill stays the same */
+
+:root.dark {
+  --color-background: #16130f;
+  --color-surface: #1e1a16;
+  --color-surface-raised: #28231d;
+  --color-surface-sunken: #110e0b;
+  --color-ink: #f6efe4;
+  --color-ink-subtle: #b5aa9c;
+  --color-ink-accent: #edb8c0;
+  --color-border: #342e27;
+  --color-border-strong: #4b4238;
+  --color-hover: #262019;
+
+  --color-brand-50: #2a1c1f;
+  --color-brand-100: #38252a;
+  --color-brand-200: #4e3139;
+  --color-brand-300: #6e4450;
+  --color-brand-400: #a8707d;
+  --color-brand-500: #cf8f9b;
+  --color-brand-700: #ebb6be;
+  --color-brand-800: #f2cdd2;
+  --color-brand-900: #fae6e9;
+  --color-brand-soft: #38252a;
+
+  --color-leaf-50: #1f2414;
+  --color-leaf-100: #2a301a;
+  --color-leaf-200: #3a4423;
+  --color-leaf-300: #566431;
+  --color-leaf-700: #b9d474;
+  --color-leaf-800: #cbe08c;
+  --color-leaf-900: #e0edb8;
+
+  --color-sky-50: #14202c;
+  --color-sky-100: #1b2d3f;
+  --color-sky-200: #264058;
+  --color-sky-300: #35597a;
+  --color-sky-700: #8dbbe8;
+  --color-sky-800: #a9ccee;
+  --color-sky-900: #cbe0f5;
+
+  --color-success: #b9d474;
+  --color-caution: #e3b341;
+  --color-warning: #f0a35c;
+  --color-danger: #f0867b;
+  --color-info: #8dbbe8;
+  --color-neutral: #b5aa9c;
+  --color-success-soft: #232a16;
+  --color-caution-soft: #2e2511;
+  --color-warning-soft: #30220f;
+  --color-danger-soft: #301a17;
+  --color-info-soft: #172433;
+  --color-neutral-soft: #2a241d;
+
+  --color-twitch: #edb8c0;
+  --color-youtube: #f87171;
+  --color-apple-red: #ff453a;
+  --color-apple-orange: #ff9f0a;
+  --color-apple-green: #30d158;
+
+  --color-field: #1a1612;
+  --color-field-border: #2c2620;
+  --color-field-border-strong: #4b4238;
+  --color-on-field: #f6efe4;
+  --color-on-field-subtle: #b5aa9c;
+  --color-picker-wash: rgb(246 239 228 / 0.07);
+  --color-picker-wash-strong: rgb(246 239 228 / 0.11);
+
+  --color-nav-surface: #2f2923;
+  --color-scrim: rgb(8 5 2 / 0.6);
+
+  --color-authority-admin: #f0867b;
+  --color-authority-lead: #f0a35c;
+  --color-authority-admin-soft: #301a17;
+  --color-authority-lead-soft: #30220f;
+}

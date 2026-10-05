@@ -5,7 +5,7 @@
 
 export const TABLE_STYLES = {
   wrapper:
-    'w-full overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface',
+    'w-full overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface',
   // The grid is desktop only
   table: 'hidden w-full min-w-full border-collapse text-sm md:table',
   headRow:
@@ -35,7 +35,7 @@ export const LIST_STYLES = {
   item: 'flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 transition-[border-color,box-shadow] hover:border-[var(--color-border-strong)]',
   itemClickable:
     'cursor-pointer hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-sm)]',
-  card: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 transition-[border-color,box-shadow]',
+  card: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 transition-[border-color,box-shadow]',
   cardClickable:
     'cursor-pointer hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)]',
   cardMuted: 'opacity-60',
@@ -56,10 +56,10 @@ export const LIST_STYLES = {
 
 export const RECORD_ROW = {
   stack: 'flex flex-col gap-3',
-  root: 'flex cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-5 py-4 transition-[border-color,box-shadow] hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-sm)]',
+  root: 'flex cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-5 py-4 transition-[border-color,box-shadow] hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-sm)]',
   // Same row without the pointer
   static:
-    'flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-5 py-4',
+    'flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-5 py-4',
   body: 'flex min-w-0 flex-1 flex-col gap-1',
   title: 'truncate text-base font-bold',
   meta: 'truncate text-sm text-[var(--color-ink-subtle)]',
@@ -72,7 +72,7 @@ export const RECORD_ROW = {
  */
 
 export const CALENDAR_AGENDA = {
-  list: 'flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-5',
+  list: 'flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-5',
   empty: 'py-16 text-center text-sm text-[var(--color-ink-subtle)]',
   day: 'grid grid-cols-[6rem_minmax(0,1fr)] gap-4 py-5',
   head: 'flex items-start gap-3',
@@ -207,7 +207,7 @@ export const GROUP_STYLES = {
 export const BOARD_STYLES = {
   scroller: 'flex gap-4 overflow-x-auto pb-2',
   column:
-    'flex w-72 shrink-0 flex-col gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-2.5',
+    'flex w-72 shrink-0 flex-col gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-2.5',
   columnArchived: 'opacity-60',
   columnHead: 'flex items-center justify-between gap-2 px-2 py-1.5',
   columnTitle: 'flex items-center gap-2 text-sm font-bold',
@@ -289,7 +289,7 @@ export const HORIZONTAL_TIMELINE_STYLES = {
 
 export const CALENDAR_STYLES = {
   frame:
-    'overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface',
+    'overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface',
   toolbar: 'flex flex-wrap items-center gap-2 pb-3',
   period: 'text-xl font-extrabold tracking-tight first-letter:uppercase sm:text-2xl',
   weekdays:
@@ -474,7 +474,7 @@ export const PERMISSION_TOGGLE_STYLES = {
     'rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-on-brand)] tabular-nums',
   section: 'flex flex-col gap-2',
   sectionTitle: 'text-sm font-bold',
-  rows: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-3',
+  rows: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-3',
   row: 'flex items-center gap-4 py-3',
   rowChild: 'pl-4',
   rootRow: 'flex flex-wrap items-center gap-x-3',
@@ -536,7 +536,7 @@ export const ABSENCE_WIZARD = {
   chipGlyph: 'h-5 w-5',
   // Box of the step
   stageBox:
-    'relative flex min-h-[42rem] flex-col justify-center rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-6 sm:p-8',
+    'relative flex min-h-[42rem] flex-col justify-center rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6 sm:p-8',
   tail: 'bubble-tail hidden md:block',
   stage: 'course-pop flex min-w-0 flex-col gap-6',
   stageTitle: 'text-2xl font-black tracking-tight sm:text-3xl',

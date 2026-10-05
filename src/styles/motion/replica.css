@@ -1,0 +1,100 @@
+/* Discord replica: a ticket opens, messages land, someone types */
+@keyframes replica-channel-in {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.replica-channel-in {
+  animation: replica-channel-in var(--motion-duration-slow) var(--motion-ease-settle) both;
+}
+
+@keyframes replica-lit {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-brand-500) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 14px 2px color-mix(in oklab, var(--color-brand-500) 55%, transparent);
+  }
+}
+
+.replica-lit {
+  animation: replica-lit 2400ms ease-in-out infinite;
+}
+
+/* The channel scrolls in as the ticket opens */
+@keyframes replica-scroll-in {
+  from {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.replica-scroll-in {
+  animation: replica-scroll-in var(--motion-duration-celebrate) var(--motion-ease-settle) both;
+}
+
+@keyframes replica-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.replica-message-in {
+  animation: replica-message-in var(--motion-duration-base) ease-out both;
+}
+
+@keyframes replica-typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: none;
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+.replica-typing-dot {
+  animation: replica-typing-dot 1200ms ease-in-out infinite;
+}
+
+.replica-typing-dot:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.replica-typing-dot:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes replica-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.replica-caret {
+  animation: replica-caret 1s steps(1) infinite;
+}
+
+/* Skeletons of the Discord replica shimmer in the client's own greys */
+.replica-shimmer {
+  --color-surface-raised: var(--discord-skeleton-sweep);
+}

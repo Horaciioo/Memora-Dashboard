@@ -1,0 +1,215 @@
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--color-surface-raised), transparent);
+  animation: skeleton-shimmer-sweep var(--motion-duration-moderate) linear infinite;
+}
+
+/* Loader mark: inked on light, plain on brand */
+.loader-gif {
+  filter: brightness(0);
+}
+
+.loader-gif-brand,
+:root.dark .loader-gif {
+  filter: none;
+}
+
+@keyframes skeleton-shimmer-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.floating-hint-bubble {
+  animation: floating-hint-rise var(--motion-duration-fast) ease-out;
+}
+
+@keyframes floating-hint-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -85%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
+}
+
+/* Toast pile, older ones tucked behind the front */
+.toast-pile {
+  --toast-direction: -1;
+  --toast-peek: 0.5rem;
+  --toast-shrink: 0.045;
+  --toast-fade: 0.2;
+  height: calc(var(--toast-front) + var(--toast-peek) * (var(--toast-count) - 1));
+  transition: height var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+.toast-pile > [data-toast] {
+  z-index: calc(100 - var(--toast-depth));
+  transform: translateY(calc(var(--toast-direction) * var(--toast-depth) * var(--toast-peek)))
+    scale(calc(1 - var(--toast-depth) * var(--toast-shrink)));
+  opacity: min(
+    clamp(0, calc(var(--toast-layers) - var(--toast-depth)), 1),
+    calc(1 - var(--toast-depth) * var(--toast-fade))
+  );
+  transition:
+    transform var(--motion-duration-panel) var(--motion-ease-out),
+    opacity var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+/* Anchored on the pile's leading edge */
+.toast-pile > [data-toast] {
+  bottom: 0;
+}
+
+/* Gathered, a back toast is cut to the front one's height */
+.toast-pile:not(.toast-pile-spread) > [data-toast]:not([data-front]) {
+  height: var(--toast-front);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.toast-pile-spread > [data-toast] {
+  transform: translateY(calc(var(--toast-direction) * var(--toast-lift))) scale(1);
+  opacity: 1;
+}
+
+.toast-enter {
+  animation: toast-enter var(--motion-duration-panel) var(--motion-ease-spring);
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+
+.toast-countdown {
+  animation-name: toast-countdown;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes toast-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* Notification bubble aimed at a rail entry (src/composites/notifications/NudgeBubble.tsx) */
+.nudge-enter {
+  transform-origin: left center;
+  animation: nudge-enter var(--motion-duration-panel) var(--motion-ease-out) both;
+}
+
+.nudge-close {
+  transform-origin: left center;
+  animation: nudge-close var(--motion-ease-out) both;
+}
+
+@keyframes nudge-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-0.5rem) scale(0.92);
+  }
+}
+
+@keyframes nudge-close {
+  to {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+}
+
+/* Entry pointed at hops once */
+[data-beacon-hop] {
+  animation: beacon-hop var(--motion-duration-celebrate) var(--motion-ease-out) 2;
+}
+
+@keyframes beacon-hop {
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+/* Height fold of a collapsible body (CollapsiblePanel, sidebar groups) */
+.fold {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--motion-duration-panel) var(--motion-ease-out),
+    opacity var(--motion-duration-fast) ease-out;
+}
+
+.fold[data-open='true'] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.fold > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Runner of the top loading bar (src/components/tools/LoadingBar.tsx) */
+.loading-bar-run {
+  animation: loading-bar-run var(--motion-duration-moderate) var(--motion-ease-out) infinite;
+}
+
+@keyframes loading-bar-run {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+/* Live dot breathing while a live runs */
+@keyframes live-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.82);
+    opacity: 0.65;
+  }
+}
+
+.live-pulse {
+  animation: live-pulse var(--motion-duration-pulse) ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* md: grows downward from the top */
+@media (width >= 768px) {
+  .toast-pile {
+    --toast-direction: 1;
+  }
+}
+
+@media (width >= 768px) {
+  .toast-pile > [data-toast] {
+    top: 0;
+    bottom: auto;
+  }
+}

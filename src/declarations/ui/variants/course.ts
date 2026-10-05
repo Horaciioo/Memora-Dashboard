@@ -12,7 +12,7 @@ export const COURSE_CATALOG = {
   title: 'text-2xl font-bold tracking-tight sm:text-3xl',
   lead: 'text-sm text-[var(--color-ink-subtle)]',
   grid: 'grid gap-7 sm:grid-cols-2 xl:grid-cols-3',
-  card: 'group flex h-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface transition-[border-color,transform] duration-[var(--motion-duration-panel)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
+  card: 'group flex h-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface transition-[border-color,transform] duration-[var(--motion-duration-panel)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
   poster: 'block aspect-[17/10] w-full',
   body: 'flex flex-1 flex-col gap-3 p-6',
   surface: `flex items-center gap-2 ${PROPERTY_LABEL}`,
@@ -125,7 +125,7 @@ export const COURSE_CHAT = {
 
 export const COURSE_EXERCISE = {
   frame:
-    'flex flex-col gap-5 rounded-[var(--radius-xl)] border-2 border-[var(--color-border)] glass-surface p-5 shadow-[var(--shadow-sm)] transition-colors sm:p-7',
+    'flex flex-col gap-5 rounded-[var(--radius-xl)] border-2 border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)] transition-colors sm:p-7',
   framePassed: 'border-[var(--color-success)]',
   frameFailed: 'border-[var(--color-danger)]',
   head: 'flex items-center gap-3',
@@ -199,7 +199,7 @@ export const COURSE_EXERCISE = {
 export const COURSE_COMPLETE = {
   wrap: 'flex flex-col items-center gap-8 py-10 text-center',
   // The name of the course
-  card: 'relative flex max-w-full items-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface px-6 py-5 shadow-[var(--shadow-md)]',
+  card: 'relative flex max-w-full items-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface px-6 py-5 shadow-[var(--shadow-md)]',
   mark: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-success)] text-white',
   markIcon: 'h-6 w-6',
   name: 'relative text-lg font-bold tracking-tight text-balance sm:text-2xl',
@@ -242,7 +242,7 @@ export const LEGACY_BOARD = {
 export const LEGACY_TRACK = {
   page: 'mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[27.5rem_minmax(0,1fr)] lg:items-start',
   summary:
-    'flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-7 lg:sticky lg:top-4',
+    'flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-7 lg:sticky lg:top-4',
   person: 'flex items-center gap-4',
   name: 'text-2xl leading-tight font-bold tracking-tight',
   trade: 'text-sm text-[var(--color-ink-subtle)]',
@@ -265,7 +265,7 @@ export const LEGACY_TRACK = {
   actions: 'flex flex-col gap-2.5',
   modules: 'flex flex-col gap-5',
   module:
-    'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-6',
+    'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6',
   moduleHead: 'flex min-w-0 items-center gap-2.5',
   moduleName: 'text-xl leading-tight font-bold tracking-tight',
   moduleCheck: 'h-5 w-5 shrink-0 text-[var(--color-success)]',
@@ -352,7 +352,7 @@ export const COURSE_FIGURE = {
   keypointsTitle: 'text-lg font-bold tracking-tight',
   keypointsGrid: 'grid gap-4 sm:grid-cols-3',
   keypoint:
-    'course-pop flex flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-5 shadow-[var(--shadow-sm)]',
+    'course-pop flex flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',
   disc: 'flex h-12 w-12 shrink-0 items-center justify-center rounded-full',
   discIcon: 'h-6 w-6',
   keypointTitle: 'text-base font-bold tracking-tight',

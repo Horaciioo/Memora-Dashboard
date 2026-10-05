@@ -9,7 +9,7 @@ export const SECTION_STYLES = {
   heading: 'flex flex-col gap-1',
   title: 'text-xl font-black tracking-tight sm:text-2xl',
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
-  panel: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface',
+  panel: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface',
   panelPadded: 'p-4 sm:p-5',
   // Visible box
   panelRaised: 'p-4 shadow-[var(--shadow-sm)] sm:p-5',
@@ -348,7 +348,7 @@ export const PRIVACY_STYLES = {
   section: 'flex flex-col gap-3',
   heading: 'text-lg font-bold tracking-tight',
   lead: 'text-sm text-[var(--color-ink-subtle)]',
-  card: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 text-sm',
+  card: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-sm',
   scroller: 'overflow-x-auto',
   table: 'w-full min-w-[40rem] border-collapse text-left text-sm',
   head: 'border-b border-[var(--color-border)] pb-2 text-xs font-semibold uppercase text-[var(--color-ink-subtle)]',

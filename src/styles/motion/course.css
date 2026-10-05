@@ -1,0 +1,314 @@
+/* Course chapters slide in from the side they come from, the check and its line play once */
+.course-slide-forward {
+  animation: course-slide-forward var(--motion-duration-slow) var(--motion-ease-out) both;
+}
+
+.course-slide-back {
+  animation: course-slide-back var(--motion-duration-slow) var(--motion-ease-out) both;
+}
+
+@keyframes course-slide-forward {
+  from {
+    opacity: 0;
+    transform: translateX(3rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes course-slide-back {
+  from {
+    opacity: 0;
+    transform: translateX(-3rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.course-check {
+  animation: course-check var(--motion-duration-slow) var(--motion-ease-out) 200ms both;
+}
+
+@keyframes course-check {
+  from {
+    opacity: 0;
+    transform: rotate(-35deg) scale(0.3);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(6deg) scale(1.18);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.course-strike {
+  animation: course-strike var(--motion-duration-slow) var(--motion-ease-out) 700ms both;
+}
+
+@keyframes course-strike {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.course-bravo {
+  animation: course-rise var(--motion-duration-slow) var(--motion-ease-out) 1300ms both;
+}
+
+.course-bubble {
+  animation: course-rise var(--motion-duration-slow) var(--motion-ease-out) 2000ms both;
+}
+
+@keyframes course-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Key points and diagrams rise one after the other, the demonstration marks its lines */
+.course-pop {
+  animation: course-rise var(--motion-duration-slow) var(--motion-ease-out)
+    calc(var(--i, 0) * var(--motion-stagger)) both;
+}
+
+.demo-focus {
+  outline: 2px solid var(--color-info);
+  outline-offset: -2px;
+  animation: demo-focus var(--motion-duration-moderate) ease-out both;
+}
+
+.demo-deleted {
+  opacity: 0.45;
+  text-decoration: line-through;
+  transition: opacity var(--motion-duration-base) ease-out;
+}
+
+.demo-tag-in {
+  animation: course-check var(--motion-duration-slow) var(--motion-ease-out) both;
+}
+
+.demo-pulse {
+  animation: demo-pulse var(--motion-duration-moderate) ease-in-out infinite;
+}
+
+.demo-type {
+  display: inline-block;
+  max-width: 100%;
+  animation: demo-type var(--motion-duration-moderate) steps(28) both;
+}
+
+@keyframes demo-focus {
+  from {
+    background-color: color-mix(in srgb, var(--color-info) 45%, transparent);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+@keyframes demo-pulse {
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-info) 30%, transparent);
+  }
+}
+
+@keyframes demo-type {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Rubber stamp struck once onto the error screen */
+.stamp-strike {
+  animation: stamp-strike var(--motion-duration-slow) var(--motion-ease-out) 180ms both;
+}
+
+@keyframes stamp-strike {
+  from {
+    opacity: 0;
+    scale: 1.6;
+  }
+  60% {
+    opacity: 0.95;
+    scale: 0.94;
+  }
+  to {
+    opacity: 0.9;
+    scale: 1;
+  }
+}
+
+/* A course content swapped for the next: the old one wipes away, the new one settles */
+@keyframes course-erase-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+.course-erase-in {
+  animation: course-erase-in var(--motion-duration-panel) ease-out both;
+}
+
+/* Rungs of the ladder land one after the other */
+@keyframes course-rung-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.course-rung-in {
+  animation: course-rung-in var(--motion-duration-slow) var(--motion-ease-settle) both;
+  animation-delay: var(--rung-delay, 0ms);
+}
+
+/* Course done: the stamp slams, confetti bursts, the stamp flies to its card */
+@keyframes stamp-slam {
+  0% {
+    opacity: 0;
+    transform: scale(3) rotate(-18deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.92) rotate(-8deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-8deg);
+  }
+}
+
+.stamp-slam {
+  animation: stamp-slam var(--motion-duration-celebrate) cubic-bezier(0.2, 0.9, 0.25, 1.1) both;
+}
+
+@keyframes confetti-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--confetti-x), var(--confetti-y)) rotate(var(--confetti-r));
+  }
+}
+
+.confetti-piece {
+  animation: confetti-burst 1300ms cubic-bezier(0.1, 0.7, 0.3, 1) both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise-in {
+  animation: rise-in var(--motion-duration-slow) ease-out both;
+}
+
+/* Steps of a finished card filling one after the other */
+@keyframes step-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.step-fill {
+  transform-origin: left;
+  animation: step-fill var(--motion-duration-base) ease-out both;
+  animation-delay: calc(var(--step-index, 0) * var(--motion-stagger));
+}
+
+/* Support guide slides out of its notch */
+@keyframes guide-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.guide-slide-in {
+  animation: guide-slide-in var(--motion-duration-slow) var(--motion-ease-settle) both;
+}
+
+@keyframes guide-dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-apple-orange) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--color-apple-orange) 0%, transparent);
+  }
+}
+
+.guide-dot-pulse {
+  animation: guide-dot-pulse var(--motion-duration-pulse) ease-in-out infinite;
+}
+
+/* A played case slides up to full size */
+@keyframes run-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.run-slide-in {
+  animation: run-slide-in var(--motion-duration-slow) var(--motion-ease-settle) both;
+}
+
+/* A course block showing the Mod View breaks out of the reading column */
+@media (width >= 1024px) {
+  .course-wide {
+    position: relative;
+    left: 50%;
+    width: min(calc(100vw - var(--shell-sidebar-w) - 6rem), 96rem);
+    transform: translateX(-50%);
+  }
+}

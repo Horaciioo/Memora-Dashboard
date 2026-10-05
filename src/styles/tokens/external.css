@@ -1,0 +1,53 @@
+/* Replicas of other products, identical in both themes */
+
+:root {
+  --discord-background: #313338;
+  --discord-input: #383a40;
+  --discord-popover: #2b2d31;
+  --discord-hover: #2e3035;
+  --discord-text: #dbdee1;
+  --discord-heading: #f2f3f5;
+  --discord-muted: #949ba4;
+  --discord-link: #00a8fc;
+  --discord-code: #2b2d31;
+  --discord-code-border: #1e1f22;
+  --discord-quote: #4e5058;
+  --discord-spoiler: #1e1f22;
+  --discord-mention: rgb(88 101 242 / 0.3);
+  --discord-mention-hover: #5865f2;
+  --discord-mention-text: #c9cdfb;
+  --discord-blurple: #5865f2;
+  /* Replica of the full client: sidebars, embeds, buttons */
+  --discord-sidebar: #2b2d31;
+  --discord-rail: #1e1f22;
+  --discord-divider: #3f4147;
+  --discord-channel: #80848e;
+  --discord-channel-active: #404249;
+  --discord-embed: #2b2d31;
+  --discord-button-danger: #da373c;
+  --discord-button-secondary: #4e5058;
+  --discord-button-success: #248046;
+  --discord-online: #23a55a;
+  --discord-skeleton: #3a3c42;
+  --discord-skeleton-sweep: #4a4c53;
+}
+
+/* Twitch and YouTube chats of the lessons, drawn the way each site shows them in both themes */
+:root {
+  --twitch-background: #18181b;
+  --twitch-line: #1f1f23;
+  --twitch-text: #efeff1;
+  --twitch-muted: #adadb8;
+  --twitch-purple: #9147ff;
+  --twitch-flag: rgb(235 4 40 / 0.22);
+  --youtube-background: #0f0f0f;
+  --youtube-line: #272727;
+  --youtube-text: #f1f1f1;
+  --youtube-muted: #aaaaaa;
+  --youtube-red: #ff0033;
+  --youtube-flag: rgb(255 0 51 / 0.2);
+  --chat-moderator: #00ad03;
+  --chat-creator: #ffd600;
+  --chat-vip: #e005b9;
+  --chat-bot: #5b8def;
+}

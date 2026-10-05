@@ -1,0 +1,79 @@
+/* Clearance under the routed page for the floating mobile nav */
+.shell-page {
+  padding-bottom: calc(var(--shell-bottom-nav-h) + env(safe-area-inset-bottom) + 2rem);
+}
+
+/* md */
+@media (width >= 768px) {
+  .shell-page {
+    padding-bottom: 2rem;
+  }
+}
+
+/* Mod View page drops the banner room and the width cap */
+.shell-page:has(.modview-bleed) {
+  max-width: none;
+  padding-top: 1rem;
+}
+
+/* Page tokens, so anything inside the rail can take them back */
+:root {
+  --page-ink: var(--color-ink);
+  --page-ink-subtle: var(--color-ink-subtle);
+  --page-border: var(--color-border);
+  --page-border-strong: var(--color-border-strong);
+  --page-surface: var(--color-surface);
+  --page-surface-raised: var(--color-surface-raised);
+  --page-hover: var(--color-hover);
+  --page-neutral: var(--color-neutral);
+  --page-brand-50: var(--color-brand-50);
+  --page-brand-200: var(--color-brand-200);
+  --page-brand-400: var(--color-brand-400);
+  --page-brand-600: var(--color-brand-600);
+  --page-brand-800: var(--color-brand-800);
+}
+
+/* Rounded window the page shows through (src/components/structures/WindowFrame.tsx) */
+.app-frame {
+  border-radius: var(--radius-xl);
+  box-shadow: inset 0 0 0 1px var(--color-frame-edge);
+}
+
+/* The page casts its shadow on the frame, drawn after the frame or it would hide under it */
+.app-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: var(--shadow-page);
+}
+
+/* A border wide enough for any screen, its inner edge following the window corners. The ramp is
+   pinned to the viewport so the rail and the rim read as one sheet */
+.app-frame::before {
+  content: '';
+  position: absolute;
+  inset: -100vmax;
+  border: 100vmax solid transparent;
+  border-radius: calc(100vmax + var(--radius-xl));
+  background: var(--gradient-frame) border-box fixed;
+  -webkit-mask:
+    linear-gradient(var(--color-ink) 0 0) padding-box,
+    linear-gradient(var(--color-ink) 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(var(--color-ink) 0 0) padding-box exclude,
+    linear-gradient(var(--color-ink) 0 0);
+}
+
+/* The framed page draws its own scrollbar */
+@media (width >= 768px) {
+  :root:has(.app-frame) {
+    scrollbar-width: none;
+  }
+
+  :root:has(.app-frame)::-webkit-scrollbar {
+    display: none;
+  }
+}

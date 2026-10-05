@@ -41,7 +41,7 @@ export const HOME_STYLES = {
   // Urgent tiles
   urgentGrid: 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3',
   urgentTile:
-    'flex w-full cursor-pointer items-start gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
+    'flex w-full cursor-pointer items-start gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
   urgentTitle: 'font-black tracking-tight',
   urgentScope: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
   urgentText: 'line-clamp-2 text-sm text-[var(--color-ink-subtle)]',
@@ -67,7 +67,7 @@ export const HOME_FLOW = {
   // Lives
   lives: 'grid gap-3 sm:flex sm:flex-wrap',
   liveTile:
-    'flex w-full min-w-0 cursor-pointer items-center sm:w-auto sm:min-w-52 gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface py-2.5 pr-6 pl-3 text-left transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
+    'flex w-full min-w-0 cursor-pointer items-center sm:w-auto sm:min-w-52 gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface py-2.5 pr-6 pl-3 text-left transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
   livePortrait: 'relative shrink-0',
   liveLevel:
     'absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-surface-raised)]',
@@ -76,7 +76,7 @@ export const HOME_FLOW = {
   liveState: 'text-xs text-[var(--color-ink-subtle)]',
   // Focus
   focus:
-    'course-pop flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-7',
+    'course-pop flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-7',
   focusTop: 'flex items-start justify-between gap-4',
   focusGlyph: 'h-12 w-12 shrink-0 text-[var(--color-brand-600)]',
   focusDue: 'text-sm font-semibold text-[var(--color-ink-subtle)]',

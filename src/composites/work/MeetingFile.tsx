@@ -168,7 +168,7 @@ export const MeetingFile = ({
 
   // Neutral box
   const boxClass =
-    'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 sm:p-5'
+    'rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 sm:p-5'
 
   const overviewTab = () => (
     <div className="flex flex-col gap-8">

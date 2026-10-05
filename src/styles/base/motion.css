@@ -1,0 +1,16 @@
+/* Reduced motion: every animation and transition collapses to its end state */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .confetti-piece {
+    display: none;
+  }
+}

@@ -42,7 +42,7 @@ export const APP_ASSETS = {
 export const APP_FONTS = {
   preconnect: ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
   stylesheet:
-    'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap',
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap',
 } as const
 
 /**

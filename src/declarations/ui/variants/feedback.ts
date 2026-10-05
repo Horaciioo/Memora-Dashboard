@@ -47,7 +47,7 @@ export const PAGE_SKELETON = {
   title: 'flex flex-col gap-2',
   stack: 'flex flex-col gap-3',
   // Raised box like the real sections
-  box: 'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-5 shadow-[var(--shadow-sm)]',
+  box: 'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',
   grid: 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3',
   gridWide: 'grid gap-4 sm:grid-cols-2 xl:grid-cols-4',
   group: 'flex flex-col gap-4',

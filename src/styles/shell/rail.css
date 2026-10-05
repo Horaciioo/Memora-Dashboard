@@ -1,0 +1,48 @@
+/* Rail on the frame: dark ink, light washes */
+.rail-ground {
+  --color-ink: var(--color-on-frame);
+  --color-ink-subtle: var(--color-on-frame-subtle);
+  --color-border: var(--color-on-frame-line);
+  --color-border-strong: var(--color-on-frame-line-strong);
+  --color-surface: var(--color-on-frame-wash);
+  --color-surface-raised: var(--color-on-frame-raised);
+  --color-hover: var(--color-on-frame-wash);
+  --color-neutral: var(--color-on-frame);
+  --color-brand-50: var(--color-frame);
+  --color-brand-200: var(--color-on-frame);
+  --color-brand-400: var(--color-on-frame-tint);
+  --color-brand-600: var(--color-on-frame-blush);
+  --color-brand-800: var(--color-on-frame-deep);
+  color: var(--color-ink);
+}
+
+/* Panels laid from the rail take the page tokens back */
+.rail-reset,
+.rail-ground [aria-current='page'] {
+  --color-ink: var(--page-ink);
+  --color-ink-subtle: var(--page-ink-subtle);
+  --color-border: var(--page-border);
+  --color-border-strong: var(--page-border-strong);
+  --color-surface: var(--page-surface);
+  --color-surface-raised: var(--page-surface-raised);
+  --color-hover: var(--page-hover);
+  --color-neutral: var(--page-neutral);
+  --color-brand-50: var(--page-brand-50);
+  --color-brand-200: var(--page-brand-200);
+  --color-brand-400: var(--page-brand-400);
+  --color-brand-600: var(--page-brand-600);
+  --color-brand-800: var(--page-brand-800);
+}
+
+/* Keep the rail ink out of panels */
+.rail-reset {
+  color: var(--color-ink);
+}
+
+/* Open page: white pill, words in deep rose */
+.rail-ground [aria-current='page'] {
+  --color-brand-600: var(--page-brand-800);
+  color: var(--page-brand-800);
+  background: var(--page-surface);
+  box-shadow: var(--shadow-sm);
+}
