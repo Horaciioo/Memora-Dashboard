@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import { Avatar } from '@/components/elements/display/Avatar'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { RoleGlyph } from '@/composites/members/MemberBadges'
 import { DetailGrid } from '@/components/structures/DetailGrid'
@@ -12,6 +11,7 @@ import { FormRenderer } from '@/components/structures/FormRenderer'
 import { ActionRow } from '@/components/structures/ActionRow'
 import { Section } from '@/components/structures/Section'
 import { SealedValue } from '@/components/structures/SealedValue'
+import { ProfileCard } from '@/composites/preferences/ProfileCard'
 import { DisplayPreferences } from '@/composites/preferences/DisplayPreferences'
 import { PlatformLinksSection } from '@/composites/preferences/PlatformLinksSection'
 import { TwoFactorSection } from '@/composites/security/TwoFactorSection'
@@ -79,35 +79,13 @@ export const PreferencesPanel = ({
   const informationTab = () => (
     <div className={TABS_STYLES.panel}>
       <div className={PREFERENCE_STYLES.stack}>
-        <Section title={PREFERENCES_COPY.fileTitle} description={PREFERENCES_COPY.fileLead} padded>
-          <DetailGrid
-            entries={[
-              { label: FIELD_COPY.division, value: profile.division },
-              {
-                label: FIELD_COPY.youtuber,
-                value: profile.youtubers.length > 0 ? profile.youtubers.join(', ') : null,
-              },
-              { label: FIELD_COPY.mainFunction, value: profile.primaryFunctions },
-              { label: FIELD_COPY.secondFunction, value: profile.secondaryFunctions },
-              {
-                label: FIELD_COPY.joinedAt,
-                value: formatDay(profile.joinedAt),
-              },
-              {
-                label: PREFERENCES_COPY.academyDispositif,
-                value: profile.academyDispositif ?? undefined,
-              },
-            ]}
-          />
-        </Section>
-
         <Section
           title={PREFERENCES_COPY.informationTitle}
           description={PREFERENCES_COPY.informationLead}
           padded
         >
           {sealedNames.length > 0 && (
-            <dl className={DETAIL_BLOCK.grid}>
+            <dl className={`${DETAIL_BLOCK.grid} mb-6`}>
               {sealedNames.map((name) => (
                 <div key={name} className={DETAIL_BLOCK.entry}>
                   <dt className={DETAIL_BLOCK.label}>{SENSITIVE_FIELD_REGISTRY.label(name)}</dt>
@@ -275,16 +253,9 @@ export const PreferencesPanel = ({
   )
 
   return (
-    <div className={PREFERENCE_STYLES.column}>
-      <div className={PREFERENCE_STYLES.hero}>
-        <Avatar name={profile.displayName} src={profile.avatarUrl} size="lg" />
-        <div className={PREFERENCE_STYLES.heroMeta}>
-          <p className={PREFERENCE_STYLES.heroName}>{profile.displayName}</p>
-          <RoleGlyph role={profile.role} />
-        </div>
-      </div>
+    <div className={PREFERENCE_STYLES.layout}>
+      <ProfileCard profile={profile} />
       <FileTabs
-        centered
         label={PREFERENCES_COPY.title}
         tabs={[
           {

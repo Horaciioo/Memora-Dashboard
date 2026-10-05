@@ -302,11 +302,7 @@ export const INLINE_EDIT_STYLES = {
  */
 
 export const PREFERENCE_STYLES = {
-  column: 'mx-auto flex w-full max-w-3xl flex-col gap-8',
-  // Who is signed in
-  hero: 'flex flex-col items-center gap-3 text-center',
-  heroName: 'text-3xl font-bold tracking-tight',
-  heroMeta: 'flex flex-col items-center gap-2',
+  layout: 'mx-auto grid w-full max-w-5xl items-start gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]',
   stack: 'flex flex-col gap-6',
   rows: 'flex flex-col divide-y divide-[var(--color-border)]',
   row: 'flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0',

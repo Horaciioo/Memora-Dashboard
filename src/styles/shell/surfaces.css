@@ -10,12 +10,13 @@
 /* Lightly frosted card on the page, in a layer so a hover or tint still wins */
 @layer components {
   .card-surface {
-    background: color-mix(in srgb, var(--color-surface) 72%, transparent);
-    -webkit-backdrop-filter: blur(14px) saturate(1.4);
-    backdrop-filter: blur(14px) saturate(1.4);
+    background: color-mix(in srgb, var(--color-surface) 52%, transparent);
+    -webkit-backdrop-filter: blur(20px) saturate(1.7);
+    backdrop-filter: blur(20px) saturate(1.7);
+    border-color: var(--glass-line);
     box-shadow:
       inset 0 1px 0 var(--glass-line),
-      var(--shadow-sm);
+      var(--shadow-md);
   }
 }
 

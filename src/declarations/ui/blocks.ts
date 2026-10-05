@@ -711,7 +711,8 @@ export const SECURITY_LIST = {
   on: 'text-[var(--color-success)]',
   off: 'glyph-danger text-[var(--color-danger)]',
   statusGlyph: 'h-4 w-4 shrink-0',
-  footer: 'mt-3 flex flex-wrap justify-center gap-2 border-t border-[var(--color-border)] pt-4',
+  footer:
+    'mt-3 flex flex-col gap-2 border-t border-[var(--color-border)] pt-4 sm:flex-row *:flex-1',
 } as const
 
 /**

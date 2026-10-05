@@ -93,13 +93,18 @@
 .page-wash {
   background-image:
     radial-gradient(
-      60% 50% at 100% 0%,
-      color-mix(in srgb, var(--color-mauve-300) 22%, transparent),
+      45% 40% at 90% 8%,
+      color-mix(in srgb, var(--color-mauve-400) 42%, transparent),
       transparent
     ),
     radial-gradient(
-      55% 50% at 0% 100%,
-      color-mix(in srgb, var(--color-brand-300) 20%, transparent),
+      40% 40% at 8% 45%,
+      color-mix(in srgb, var(--color-brand-400) 34%, transparent),
+      transparent
+    ),
+    radial-gradient(
+      45% 40% at 85% 85%,
+      color-mix(in srgb, var(--color-sky-400) 36%, transparent),
       transparent
     );
 }

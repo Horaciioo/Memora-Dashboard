@@ -33,3 +33,18 @@ export const ACTION_ROW = {
   lead: 'text-xs text-[var(--color-ink-subtle)]',
   action: 'shrink-0',
 } as const
+
+/**
+ * Profile card beside the settings tabs
+ * @type {Record<string, string>}
+ */
+
+export const PROFILE_CARD = {
+  root: 'card-surface flex flex-col items-center gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 text-center lg:sticky lg:top-6',
+  name: 'text-section font-semibold tracking-tight',
+  facts: 'mt-4 flex w-full flex-col divide-y divide-[var(--color-border)] text-left',
+  fact: 'flex flex-col gap-0.5 py-3 first:pt-0 last:pb-0',
+  label: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  value: 'text-sm',
+  empty: 'text-[var(--color-ink-subtle)] italic',
+} as const
