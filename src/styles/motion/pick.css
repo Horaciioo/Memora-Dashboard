@@ -8,10 +8,14 @@
   }
 }
 
-[aria-selected='true'],
 [aria-pressed='true'],
 [aria-checked='true'],
 [aria-current='page'],
 [class~='ring-[var(--color-pick)]'] {
+  animation: pick-ring var(--motion-duration-slow) var(--motion-ease-out);
+}
+
+/* The box of the field being worked on */
+.field-box > :focus-within {
   animation: pick-ring var(--motion-duration-slow) var(--motion-ease-out);
 }

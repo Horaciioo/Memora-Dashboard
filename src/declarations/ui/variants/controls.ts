@@ -80,7 +80,7 @@ export const EMPTY_VALUE = 'text-[var(--color-ink-subtle)] italic'
  */
 
 export const FIELD_STYLES = {
-  wrapper: `flex min-w-0 flex-col ${PROPERTY_SPACING.within}`,
+  wrapper: `field-box flex min-w-0 flex-col ${PROPERTY_SPACING.within}`,
   label: PROPERTY_LABEL,
   labelRow: 'flex flex-wrap items-center gap-1.5',
   control:

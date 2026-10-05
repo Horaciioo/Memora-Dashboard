@@ -92,7 +92,7 @@ body {
 
 @keyframes tab-arrive {
   0% {
-    box-shadow: 0 0 0 0 var(--color-brand-400);
+    box-shadow: 0 0 0 0 var(--color-focus);
   }
   100% {
     box-shadow: 0 0 0 0.75rem transparent;

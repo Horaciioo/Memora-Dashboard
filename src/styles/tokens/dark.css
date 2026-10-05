@@ -3,15 +3,15 @@
 :root.dark {
   --color-background: #131315;
   --color-page: #131315;
-  --color-surface: #1c1c1f;
-  --color-surface-raised: #2a2a2e;
+  --color-surface: #2a2a2f;
+  --color-surface-raised: #36363c;
   --color-surface-sunken: #0e0e10;
   --color-ink: #f5f5f7;
   --color-ink-subtle: #a1a1a6;
   --color-ink-accent: #f8c0d0;
-  --color-border: #2e2e33;
+  --color-border: #3c3c43;
   --color-border-strong: #46464c;
-  --color-hover: #232327;
+  --color-hover: #34343a;
   --color-focus: rgb(245 245 247 / 0.55);
   --color-pick: rgb(245 245 247 / 0.28);
   --color-focus-halo: rgb(245 245 247 / 0.12);
@@ -67,8 +67,8 @@
   --color-apple-orange: #ff9f0a;
   --color-apple-green: #30d158;
 
-  --color-field: #18181b;
-  --color-field-border: #2a2a2f;
+  --color-field: #202024;
+  --color-field-border: #3a3a41;
   --color-field-border-strong: #46464c;
   --color-on-field: #f5f5f7;
   --color-on-field-subtle: #a1a1a6;
