@@ -193,6 +193,7 @@ export const FormDrawer = ({
             items={tabs}
             value={current?.name ?? ''}
             label={FORM_COPY.categories}
+            emphasis
             onChange={goTo}
           />
         )

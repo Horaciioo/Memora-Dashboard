@@ -221,6 +221,8 @@ export const TABS_STYLES = {
   // White pill gliding under the open tab
   indicator:
     'tab-indicator pointer-events-none absolute top-1 bottom-1 left-0 rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
+  // Pulse ringing the open tab
+  arrive: 'tab-arrive',
   panel: 'pt-4',
   content: 'flex items-center',
   icon: 'h-4 w-4 shrink-0',

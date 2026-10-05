@@ -69,9 +69,34 @@ body {
   }
 }
 
-/* Fields of a new section slide in */
+/* Fields of a new section glide in from the side, slowly */
 .drawer-section-enter {
-  animation: surface-enter var(--motion-duration-panel) var(--motion-ease-out);
+  animation: section-arrive var(--motion-duration-celebrate) var(--motion-ease-out);
+}
+
+@keyframes section-arrive {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Ring spreading from the tab just opened */
+.tab-arrive {
+  animation: tab-arrive calc(var(--motion-duration-slow) * 2) var(--motion-ease-out);
+}
+
+@keyframes tab-arrive {
+  0% {
+    box-shadow: 0 0 0 0 var(--color-brand-400);
+  }
+  100% {
+    box-shadow: 0 0 0 0.75rem transparent;
+  }
 }
 
 /* Floating listbox of the select menu and the date picker */

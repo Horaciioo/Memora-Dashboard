@@ -26,7 +26,12 @@ export interface TabsProps {
   centered?: boolean
   // Carried into the banner notch when the page has one
   inBanner?: boolean
+  // Longer glide and a pulse on arrival
+  emphasis?: boolean
 }
+
+// Glide length factor
+const EMPHASIS_FACTOR = 2.5
 
 /**
  * Horizontal tab strip driving a single panel below it
@@ -36,10 +41,19 @@ export interface TabsProps {
  * @param {string} label - Accessible name of the strip
  * @param {boolean} [centered] - Centres the strip
  * @param {boolean} [inBanner] - Sits in the banner notch
+ * @param {boolean} [emphasis] - Slow glide with pulse
  * @return {JSX.Element}
  */
 
-export const Tabs = ({ items, value, onChange, label, centered, inBanner }: TabsProps) => {
+export const Tabs = ({
+  items,
+  value,
+  onChange,
+  label,
+  centered,
+  inBanner,
+  emphasis,
+}: TabsProps) => {
   const host = useBannerHost(PAGE_TABS_HOST_ID)
   const tabsRef = useRef(new Map<string, HTMLButtonElement>())
   const listRef = useRef<HTMLDivElement | null>(null)
@@ -64,7 +78,7 @@ export const Tabs = ({ items, value, onChange, label, centered, inBanner }: Tabs
     }
 
     const from = drawn.current
-    const duration = panelDurationMs()
+    const duration = panelDurationMs() * (emphasis ? EMPHASIS_FACTOR : 1)
     let frame = 0
     let gliding = false
 
@@ -75,6 +89,14 @@ export const Tabs = ({ items, value, onChange, label, centered, inBanner }: Tabs
     } else {
       const startedAt = performance.now()
       gliding = true
+
+      // Pulse restarts on each arrival
+      const rule = ruleRef.current
+      if (emphasis && rule) {
+        rule.classList.remove(TABS_STYLES.arrive)
+        void rule.offsetWidth
+        rule.classList.add(TABS_STYLES.arrive)
+      }
 
       const step = (now: number) => {
         const end = target()
@@ -108,7 +130,7 @@ export const Tabs = ({ items, value, onChange, label, centered, inBanner }: Tabs
       cancelAnimationFrame(frame)
       observer.disconnect()
     }
-  }, [value, items.length])
+  }, [value, items.length, emphasis])
 
   // A tab opened from off screen scrolls itself into view
   useEffect(() => {
