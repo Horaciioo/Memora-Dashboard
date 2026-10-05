@@ -55,6 +55,26 @@ export const TASK_LIST = {
 } as const
 
 /**
+ * One-by-one task stepper
+ * @type {Record<string, string>}
+ */
+
+export const TASK_STEPPER = {
+  body: 'flex flex-col gap-6',
+  hero: 'flex flex-col items-center gap-3 rounded-[var(--radius-xl)] bg-[image:var(--gradient-soft)] px-6 py-8 text-center',
+  heroGlyph: 'size-12 shrink-0 text-[var(--color-ink)]',
+  heroTitle: 'text-xl leading-tight font-bold tracking-tight text-[var(--color-ink)]',
+  heroMeta: 'text-sm font-medium text-[var(--color-ink-subtle)]',
+  heroDue: 'rounded-full glass-soft px-3 py-1 text-xs font-semibold text-[var(--color-ink)]',
+  dots: 'flex items-center justify-center gap-1.5',
+  dot: 'h-1.5 w-1.5 rounded-full bg-[var(--color-border-strong)] transition-all',
+  dotActive: 'w-5 bg-[var(--color-ink)]',
+  footer: 'flex flex-col gap-2 p-2',
+  nav: 'flex items-center justify-between gap-2',
+  actions: 'flex flex-wrap items-center justify-center gap-2',
+} as const
+
+/**
  * Guided walkthrough
  * @type {Record<string, string>}
  */

@@ -1,15 +1,13 @@
 'use client'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
-import { Button } from '@/components/elements/actions/Button'
-import { Markdown } from '@/components/elements/display/Markdown'
 import { DetailGrid } from '@/components/structures/DetailGrid'
-import { Drawer } from '@/components/structures/Drawer'
 import { Section } from '@/components/structures/Section'
 import { FormDrawer } from '@/components/structures/FormDrawer'
+import { HomeTaskDetail } from '@/composites/personal/HomeTaskDetail'
+import { HomeTaskStepper } from '@/composites/personal/HomeTaskStepper'
 import { useAbsences } from '@/core/hooks/data/useAbsences'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { useCopy } from '@/core/hooks/interaction/useCopy'
@@ -22,14 +20,14 @@ import { ROUTES } from '@/declarations/navigation'
 import { PERSONAL_COPY, PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { DEPARTURE_TASK, HOME_FLOW, TASK_LIST } from '@/declarations/ui/variants'
+import { HOME_FLOW } from '@/declarations/ui/variants'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
 import type { HomeEntry, HomeTask } from '@/types/personal'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import type { AbsenceStatusName } from '@/utils/constants/workflow'
 import { absenceReasonText, absenceSpan } from '@/utils/format/absences'
-import { formatDay, formatDayTime, formatRelativeDay } from '@/utils/format/dates'
+import { formatDayTime, formatRelativeDay } from '@/utils/format/dates'
 
 export interface HomeQueueProps {
   absences: MemberAbsence[]
@@ -54,20 +52,18 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
     absence: MemberAbsence
     status: AbsenceStatusName
   } | null>(null)
-  const [opened, setOpened] = useState<HomeTask | null>(null)
   const router = useRouter()
   const copy = useCopy(DEPARTURE_COPY.copied)
-  const { isSaving: isPublishing, run } = useMutation()
+  const { run } = useMutation()
 
   // A published announcement leaves the queue
   const publish = async (id: string) => {
     const done = await run(() => apiPost(API_ROUTES.departure(id), {}), DEPARTURE_COPY.published)
     if (!done) return
 
-    setOpened(null)
     router.refresh()
   }
-  const [pickedKey, setPickedKey] = useState<string | null>(null)
+  const [step, setStep] = useState<number | null>(null)
 
   const openReview = (absence: MemberAbsence, status: AbsenceStatusName) => {
     clearIssues()
@@ -89,6 +85,11 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
           meta: `${span.days} ${span.month}`,
           note: absenceReasonText(absence),
           due: null,
+          detail: (
+            <DetailGrid
+              entries={[{ label: ABSENCE_COPY.reasonTitle, value: absenceReasonText(absence) }]}
+            />
+          ),
           actions: [
             {
               id: 'approve',
@@ -132,39 +133,43 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
       meta: task.context,
       note: null,
       due: task.dueAt ? formatRelativeDay(task.dueAt) : null,
-      actions: [
-        {
-          id: 'open',
-          label: PERSONAL_TASK_COPY.open,
-          variant: 'primary',
-          onSelect: () => setOpened(task),
-        },
-      ],
+      detail: <HomeTaskDetail task={task} />,
+      actions: task.announcement
+        ? [
+            {
+              id: 'copy',
+              label: DEPARTURE_COPY.copy,
+              variant: 'secondary',
+              onSelect: () => void copy(task.announcement?.body ?? ''),
+            },
+            {
+              id: 'publish',
+              label: DEPARTURE_COPY.publish,
+              variant: 'primary',
+              onSelect: () => void publish(task.announcement?.id ?? ''),
+            },
+          ]
+        : [
+            {
+              id: 'go',
+              label: task.destinationLabel ? PERSONAL_TASK_COPY.go : PERSONAL_TASK_COPY.goPlain,
+              variant: 'primary',
+              href: task.href,
+            },
+          ],
     }))
 
     return [...asked, ...calls, ...todo]
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requests, rollCalls, tasks])
 
-  const picked = entries.find((entry) => entry.key === pickedKey) ?? null
   const CrossIcon = ICONS.waiting
   const CheckIcon = ICONS.picked
   const ChevronIcon = ICONS.next
 
-  // One way in goes straight there
-  const soleAction = (entry: HomeEntry) => (entry.actions.length === 1 ? entry.actions[0] : null)
-
-  const openEntry = (entry: HomeEntry) => {
-    const action = soleAction(entry)
-    if (action) action.onSelect?.()
-    else setPickedKey(entry.key)
-  }
-
-  const renderRow = (entry: HomeEntry) => {
-    const href = soleAction(entry)?.href
-
-    const body = (
-      <>
+  const renderRow = (entry: HomeEntry, index: number) => (
+    <li key={entry.key} className={HOME_FLOW.todoItem}>
+      <button type="button" className={HOME_FLOW.todoRow} onClick={() => setStep(index)}>
         <CrossIcon className={HOME_FLOW.todoMark} aria-hidden="true" />
         <span className={HOME_FLOW.todoBody}>
           <span className={HOME_FLOW.todoLabel}>{entry.title}</span>
@@ -172,23 +177,9 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
         </span>
         {entry.due && <span className={HOME_FLOW.todoDue}>{entry.due}</span>}
         <ChevronIcon className={HOME_FLOW.todoChevron} aria-hidden="true" />
-      </>
-    )
-
-    return (
-      <li key={entry.key} className={HOME_FLOW.todoItem}>
-        {href ? (
-          <Link href={href} className={HOME_FLOW.todoRow}>
-            {body}
-          </Link>
-        ) : (
-          <button type="button" className={HOME_FLOW.todoRow} onClick={() => openEntry(entry)}>
-            {body}
-          </button>
-        )}
-      </li>
-    )
-  }
+      </button>
+    </li>
+  )
 
   return (
     <>
@@ -203,34 +194,14 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
         )}
       </Section>
 
-      {picked && (
-        <Drawer
-          open
-          onClose={() => setPickedKey(null)}
-          title={picked.title}
-          icon={picked.icon ?? 'waiting'}
-          subheader={picked.meta}
-          footer={
-            <div className={DEPARTURE_TASK.actions}>
-              {picked.actions.map((action) => (
-                <Button
-                  key={action.id}
-                  variant={action.variant}
-                  onClick={() => {
-                    setPickedKey(null)
-                    action.onSelect?.()
-                  }}
-                >
-                  {action.label}
-                </Button>
-              ))}
-            </div>
-          }
-        >
-          {picked.note && (
-            <DetailGrid entries={[{ label: ABSENCE_COPY.reasonTitle, value: picked.note }]} />
-          )}
-        </Drawer>
+      {step !== null && entries.length > 0 && (
+        <HomeTaskStepper
+          entries={entries}
+          index={step}
+          onIndex={setStep}
+          onClose={() => setStep(null)}
+          hidden={reviewing !== null}
+        />
       )}
 
       <FormDrawer
@@ -258,70 +229,6 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
         }}
         onClose={() => setReviewing(null)}
       />
-
-      {opened && (
-        <Drawer
-          open
-          onClose={() => setOpened(null)}
-          title={opened.title}
-          icon={opened.icon}
-          subheader={opened.context}
-          footer={
-            opened.announcement ? (
-              <div className={DEPARTURE_TASK.actions}>
-                <Button
-                  variant="secondary"
-                  icon="copy"
-                  onClick={() => void copy(opened.announcement?.body ?? '')}
-                >
-                  {DEPARTURE_COPY.copy}
-                </Button>
-                <Button
-                  variant="primary"
-                  icon="confirm"
-                  isLoading={isPublishing}
-                  onClick={() => void publish(opened.announcement?.id ?? '')}
-                >
-                  {DEPARTURE_COPY.publish}
-                </Button>
-              </div>
-            ) : (
-              <Link href={opened.href}>
-                <Button variant="primary" icon="forward">
-                  {opened.destinationLabel ? PERSONAL_TASK_COPY.go : PERSONAL_TASK_COPY.goPlain}
-                </Button>
-              </Link>
-            )
-          }
-        >
-          <div className={TASK_LIST.drawer}>
-            <DetailGrid
-              entries={[
-                { label: PERSONAL_TASK_COPY.what, value: opened.description },
-                // An announcement is done here
-                ...(opened.announcement
-                  ? []
-                  : [
-                      { label: PERSONAL_TASK_COPY.where, value: opened.destinationLabel },
-                      {
-                        label: PERSONAL_TASK_COPY.due,
-                        value: opened.dueAt ? formatDay(opened.dueAt) : undefined,
-                      },
-                    ]),
-              ]}
-            />
-            {opened.announcement && (
-              <pre className={DEPARTURE_TASK.body}>{opened.announcement.body}</pre>
-            )}
-            {opened.guide && (
-              <div className="flex flex-col gap-2">
-                <span className={TASK_LIST.group}>{PERSONAL_TASK_COPY.guideTitle}</span>
-                <Markdown source={opened.guide} />
-              </div>
-            )}
-          </div>
-        </Drawer>
-      )}
     </>
   )
 }

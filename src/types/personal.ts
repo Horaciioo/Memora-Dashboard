@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { IconName } from '@/declarations/ui/icons'
 import type { AttendeeKindName, MeetingAudienceName } from '@/utils/constants/workflow'
 
@@ -96,6 +97,7 @@ export interface HomeTask {
  * @property {string | null} note - Words the requester left
  * @property {string | null} due - Relative wording of its day
  * @property {HomeAction[]} actions - What the member can do
+ * @property {ReactNode} [detail] - Extra reading in the stepper
  */
 
 export interface HomeEntry {
@@ -107,6 +109,7 @@ export interface HomeEntry {
   note: string | null
   due: string | null
   actions: HomeAction[]
+  detail?: ReactNode
 }
 
 /**
