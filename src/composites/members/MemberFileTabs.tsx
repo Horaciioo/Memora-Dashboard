@@ -409,6 +409,8 @@ export const MemberFileTabs = ({
     </div>
   )
 
+  const pinnedNotes = file.notes.filter((note) => note.pinned)
+
   const rail = (
     <MemberRail
       summary={summary}
@@ -424,6 +426,19 @@ export const MemberFileTabs = ({
         disabled={!canEdit}
         onCommit={saveField}
       />
+      {canReadNotes && pinnedNotes.length > 0 && (
+        <div className={MEMBER_FILE.pinned}>
+          <span className={MEMBER_FILE.pinnedLabel}>{MEMBER_COPY.railPinned}</span>
+          {pinnedNotes.map((note) => (
+            <article key={note.id} className={MEMBER_FILE.note}>
+              <span className={MEMBER_FILE.noteHead}>
+                {[note.authorName, formatDayTime(note.createdAt)].filter(Boolean).join(' · ')}
+              </span>
+              <p className={MEMBER_FILE.noteBody}>{note.body}</p>
+            </article>
+          ))}
+        </div>
+      )}
     </MemberRail>
   )
 

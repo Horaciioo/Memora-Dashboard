@@ -90,6 +90,7 @@ export const MEMBER_COPY = {
   stageAcademy: 'Academy',
   stageLegacy: 'Legacy',
   railContact: 'Contact',
+  railPinned: 'Note épinglée',
   railAssignment: 'Affectation',
   noFunction: 'Aucune fonction',
   absentHint: '{name} est actuellement en absence.',

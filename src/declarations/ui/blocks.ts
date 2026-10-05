@@ -298,6 +298,9 @@ export const MEMBER_FILE = {
   noteHead: 'flex items-center gap-2 text-xs text-[var(--color-ink-subtle)]',
   noteBody: 'text-sm leading-relaxed whitespace-pre-wrap',
   notesGrid: 'grid gap-4 sm:grid-cols-2',
+  // Pinned note under the rail details
+  pinned: 'flex flex-col gap-2',
+  pinnedLabel: 'text-xs font-bold tracking-wide uppercase',
   // Social tile
   social:
     'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-3 transition-colors hover:bg-[var(--color-hover)]',
