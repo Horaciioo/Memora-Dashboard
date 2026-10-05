@@ -9,11 +9,11 @@ import { GUIDE_PARAMS, PIM_DESTINATION_REGISTRY } from '@/declarations/academy/g
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { GUIDE_TOUR } from '@/declarations/ui/variants'
 
-// Room around the control and between the ring and the bubble, in pixels
+// Room around the control and between the ring and the bubble
 const RING_PADDING = 6
 const BUBBLE_GAP = 12
 
-// Frames a control may take to appear, a tab rendering after navigation
+// Frames a control may take to appear
 const SEARCH_FRAMES = 120
 
 /**
@@ -40,8 +40,7 @@ const findBeacon = (beacon: string): HTMLElement | null =>
   ) ?? null
 
 /**
- * Walkthrough opened by a task, a ring on each control to use and a bubble saying what to do.
- * Reads its destination from the address, so any page can be guided without knowing it
+ * Walkthrough opened by a task
  * @return {JSX.Element | null}
  */
 
@@ -90,7 +89,7 @@ export const GuideHost = () => {
 
   if (!destination || !mark) return null
 
-  // Drop the walkthrough from the address, the page stays where it is
+  // Drop the walkthrough from the address
   const close = () => {
     const next = new URLSearchParams(params.toString())
     next.delete(GUIDE_PARAMS.guide)

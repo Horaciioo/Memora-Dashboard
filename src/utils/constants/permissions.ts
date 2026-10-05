@@ -94,7 +94,7 @@ export interface PermissionMeta {
 }
 
 /**
- * Permission group keys, one per navigation page
+ * Permission group keys
  * @type {Record<string, string>}
  */
 
@@ -119,7 +119,7 @@ export const PermissionGroups = {
 export type PermissionGroup = (typeof PermissionGroups)[keyof typeof PermissionGroups]
 
 /**
- * Permission catalogue — one root permission per page, its refinements carrying a parent
+ * Permission catalogue — one root permission per page
  * @type {PermissionMeta[]}
  */
 
@@ -677,7 +677,7 @@ export const PermissionsList: PermissionMeta[] = [
 const PERMISSION_INDEX = new Map(PermissionsList.map((entry) => [entry.name, entry]))
 
 /**
- * Children of a page permission, in catalogue order
+ * Children of a page permission
  * @type {Map<PermissionName, PermissionName[]>}
  */
 

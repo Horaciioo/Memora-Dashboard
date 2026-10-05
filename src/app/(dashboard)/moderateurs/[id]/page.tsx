@@ -80,8 +80,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const detail = await readMember(id, canReadNotes).catch(() => null)
   if (!detail) notFound()
 
-  // The Discord identifier is the only bridge to their application, no account was ever created for it
-  // Own moderation, or the perimeter's for whoever reads live logs
+  // The Discord identifier is the only bridge to their application
   const canReadModeration = session.id === id || access.can(Permissions.LiveLogRead)
 
   const [

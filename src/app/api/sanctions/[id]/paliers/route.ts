@@ -10,7 +10,7 @@ import type { SanctionGravityName } from '@/utils/constants/moderation'
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
- * Read the ordered steps, each a condition and its measures
+ * Read the ordered steps
  * @param {unknown} raw - Body entry
  * @return {SanctionRungInput[]} - Steps
  */

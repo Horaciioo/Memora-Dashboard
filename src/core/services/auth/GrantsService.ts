@@ -17,12 +17,11 @@ import type { Account } from '@prisma/client'
 // Account row carrying the functions it holds
 export type HolderAccount = Account & { functions: { functionId: string }[] }
 
-// Applied once per process, every later call costing nothing
+// Applied once per process
 let synced = false
 
 /**
- * Land every grant batch the database has not seen yet, adding only — a permission
- * an administrator removed after a batch applied never comes back
+ * Land every grant batch the database has not seen yet
  * @return {Promise<void>} - Synchronised
  */
 
@@ -33,13 +32,13 @@ export const syncRoleGrants = async (): Promise<void> => {
   const known = new Set(applied.map((entry) => entry.key))
   const pending = GRANT_ADDITIONS.filter((addition) => !known.has(addition.key))
 
-  // One transaction per batch, so a half-applied key is never recorded
+  // One transaction per batch
   for (const addition of pending) {
     const rows = Object.entries(addition.grants).flatMap(([role, permissions]) =>
       (permissions ?? []).map((permission) => ({ role: role as MemberRoleName, permission }))
     )
 
-    // Function grants resolved by name, an unseeded function skipped
+    // Function grants resolved by name
     const functionNames = Object.keys(addition.functions ?? {})
     const holders =
       functionNames.length > 0
@@ -62,7 +61,7 @@ export const syncRoleGrants = async (): Promise<void> => {
         prisma.grantMigration.create({ data: { key: addition.key } }),
       ])
     } catch (error) {
-      // A concurrent request already recorded this key, nothing left to apply
+      // A concurrent request already recorded this key
       const isDuplicateKey =
         typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002'
       if (!isDuplicateKey) throw error
@@ -73,7 +72,7 @@ export const syncRoleGrants = async (): Promise<void> => {
 }
 
 /**
- * Keep the rows that carry a declared permission, in the overwrite shape the resolver folds
+ * Keep the rows that carry a declared permission
  * @param {Array<{ permission: string, effect: string }>} rows - Stored grants
  * @return {PermissionOverwrite[]} - Known overwrites
  */
@@ -88,7 +87,7 @@ const toOverwrites = (rows: { permission: string; effect: string }[]): Permissio
     }))
 
 /**
- * Build the clause reading the global layer plus, when one is open, a creator's own
+ * Build the clause reading the global layer plus
  * @param {string | null} youtuberId - Creator the perimeter is narrowed to
  * @return {{ OR: { youtuberId: string | null }[] }} - Scope clause
  */
@@ -98,7 +97,7 @@ const onLayers = (youtuberId: string | null) => ({
 })
 
 /**
- * Read what the floor role grants every account, the base every overwrite sits on
+ * Read what the floor role grants every account
  * @return {Promise<PermissionName[]>} - Floor permissions
  */
 
@@ -113,9 +112,7 @@ const readFloor = async (): Promise<PermissionName[]> => {
 }
 
 /**
- * Resolve every permission an account holds on one creator, the root bypass living in
- * resolvePermissions. Steps run widest first: the holders the account carries, then the
- * overwrites narrowed to the creator, then the account's own, so the narrowest always wins
+ * Resolve every permission an account holds on one creator
  * @param {HolderAccount} account - Account row with the functions it holds
  * @param {string | null} youtuberId - Creator the perimeter is narrowed to
  * @return {Promise<PermissionName[]>} - Granted permissions
@@ -145,7 +142,7 @@ export const resolveAccountPermissions = async (
   const scopedOf = <T extends { youtuberId: string | null }>(rows: T[]): T[] =>
     rows.filter((row) => row.youtuberId !== null)
 
-  // The floor role already stands in the base, so its own rows never replay as a step
+  // The floor role already stands in the base
   const holderGlobal: PermissionGroup = [
     account.role === FLOOR_ROLE ? [] : toOverwrites(globalOf(roleRows)),
     toOverwrites(globalOf(functionRows)),
@@ -165,8 +162,7 @@ export const resolveAccountPermissions = async (
 }
 
 /**
- * Read what everything but an account's own overrides grants it, the baseline its
- * tri-state picker greys out against
+ * Read what everything but an account's own overrides grants it
  * @param {string} accountId - Account identifier
  * @param {string | null} youtuberId - Creator the perimeter is narrowed to
  * @return {Promise<PermissionName[]>} - Inherited permissions
@@ -204,7 +200,7 @@ export const readInheritedGrants = async (
 }
 
 /**
- * Read the baseline one role resolves against, the floor alone unless the role is the floor
+ * Read the baseline one role resolves against
  * @param {MemberRoleName} role - Hierarchy level
  * @return {Promise<PermissionName[]>} - Baseline permissions
  */
@@ -213,7 +209,7 @@ export const readRoleBaseline = async (role: MemberRoleName): Promise<Permission
   role === FLOOR_ROLE ? [] : readFloor()
 
 /**
- * Read the baseline one function resolves against, the role of its category standing above the floor
+ * Read the baseline one function resolves against
  * @param {AccessCategoryName} category - Rail section of the function
  * @return {Promise<PermissionName[]>} - Baseline permissions
  */
@@ -234,7 +230,7 @@ export const readFunctionBaseline = async (
 }
 
 /**
- * Replace the overwrites of one role, on the global layer or on one creator
+ * Replace the overwrites of one role
  * @param {MemberRoleName} role - Hierarchy level
  * @param {PermissionOverwrite[]} overwrites - Overwrites to hold
  * @param {string | null} youtuberId - Creator the layer belongs to
@@ -261,7 +257,7 @@ export const replaceRoleGrants = async (
 }
 
 /**
- * Replace the overwrites of one function, on the global layer or on one creator
+ * Replace the overwrites of one function
  * @param {string} functionId - Function identifier
  * @param {PermissionOverwrite[]} overwrites - Overwrites to hold
  * @param {string | null} youtuberId - Creator the layer belongs to
@@ -288,7 +284,7 @@ export const replaceFunctionGrants = async (
 }
 
 /**
- * Apply the declared preset to a role, every entry landing as a plain allow
+ * Apply the declared preset to a role
  * @param {MemberRoleName} role - Hierarchy level
  * @return {Promise<void>} - Applied
  */
@@ -389,7 +385,7 @@ export const readFunctionGrants = async (
 }
 
 /**
- * Resolve what one role effectively grants, for the simulation preview
+ * Resolve what one role effectively grants
  * @param {MemberRoleName} role - Hierarchy level
  * @param {string | null} youtuberId - Creator the perimeter is narrowed to
  * @return {Promise<PermissionName[]>} - Effective permissions
@@ -413,7 +409,7 @@ export const simulateRoleGrants = async (
 }
 
 /**
- * Resolve what one function effectively grants on top of its category, for the simulation preview
+ * Resolve what one function effectively grants on top of its category
  * @param {string} functionId - Function identifier
  * @param {AccessCategoryName} category - Rail section of the function
  * @param {string | null} youtuberId - Creator the perimeter is narrowed to

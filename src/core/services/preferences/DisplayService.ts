@@ -41,7 +41,7 @@ export const toDisplayPreferences = (account: {
 })
 
 /**
- * Declarations of the display preference form, shared by the settings and the integration
+ * Declarations of the display preference form
  * @type {FieldDefinition[]}
  */
 

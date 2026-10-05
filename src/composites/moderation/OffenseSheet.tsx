@@ -52,8 +52,8 @@ export interface OffenseSheetProps {
 }
 
 /**
- * Commands of one step on the surface of its panel, ready to paste
- * @param {Object} props - Step, surface and offence name
+ * Commands of one step on the surface of its panel
+ * @param {Object} props - Step
  * @return {JSX.Element | null}
  */
 
@@ -113,7 +113,7 @@ const RungCommands = ({
 }
 
 /**
- * The ladder of one level as a staircase, each step its condition and measures
+ * The ladder of one level as a staircase
  * @param {Object} props - Steps and their offence
  * @return {JSX.Element}
  */
@@ -159,7 +159,7 @@ const LadderView = ({
 }
 
 /**
- * Ladder editor of one level: gravity, then each step with its condition and measures
+ * Ladder editor of one level: gravity
  * @param {Object} props - Starting ladder and handlers
  * @return {JSX.Element}
  */
@@ -259,7 +259,7 @@ const LadderEditor = ({
  * One offence opened in full: what it covers, the ladder of
  * the livecon in force with each command ready to paste, and the warning to send. A manager
  * rewrites any of it by clicking it, nothing carries an edit button
- * @param {OffenseSheetProps} props - Offence, level and handlers
+ * @param {OffenseSheetProps} props - Offence
  * @return {JSX.Element}
  */
 
@@ -288,7 +288,7 @@ export const OffenseSheet = ({
   const saveField = (name: string) => (value: string) =>
     onSaveOffense(offense.id, { [name]: value })
 
-  // Gravity picked from the label, the ladder kept as it stands
+  // Gravity picked from the label
   const gravityMenu = useActionMenu(
     canManage
       ? SANCTION_GRAVITY_REGISTRY.keys

@@ -31,7 +31,7 @@ export interface RecruitmentsPanelProps {
 }
 
 /**
- * Recruitment sessions, the running ones first then the finished, each opening its own file
+ * Recruitment sessions
  * @param {RecruitmentSummary[]} initialSessions - Sessions resolved server-side
  * @param {FieldDefinition[]} fields - Declarations of the session form
  * @param {boolean} canManage - Member may open and close sessions
@@ -52,7 +52,7 @@ export const RecruitmentsPanel = ({
   const [editing, setEditing] = useState<RecruitmentSummary | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<RecruitmentSummary | null>(null)
 
-  // Running sessions first, the finished ones below
+  // Running sessions first
   const [running, finished] = useMemo(
     () => [
       sessions.filter((entry) => !FINISHED_RECRUITMENT_STATUSES.includes(entry.status)),

@@ -13,10 +13,10 @@ export interface ProgressProps {
 }
 
 /**
- * Horizontal completion bar, its ratio always announced so colour is never the only carrier
+ * Horizontal completion bar
  * @param {number} value - Current progress
- * @param {number} [max] - Upper bound, defaults to a percentage
- * @param {Tone} [tone] - Colour tone, defaults to brand
+ * @param {number} [max] - Upper bound
+ * @param {Tone} [tone] - Colour tone
  * @param {string} [label] - Caption shown above the track
  * @param {boolean} [compact] - Thin track without the caption row
  * @param {string} [className] - Extra classes merged onto the frame

@@ -158,7 +158,7 @@ const applyOrder = async (
 const noReorder = async (): Promise<void> => {}
 
 /**
- * Replace the functions one creator opens, keeping the picked order
+ * Replace the functions one creator opens
  * @param {string} youtuberId - Creator identifier
  * @param {string[]} functionIds - Functions in their picked order
  * @return {Promise<void>} - Applied
@@ -266,8 +266,7 @@ const youtubers: ReferenceResource = {
       })
       .catch(rethrow)
 
-    // A creator starts with the declared sanction panel, editable right after
-    // Every written surface starts from its reference panel
+    // A creator starts with the declared sanction panel
     for (const panel of SANCTION_PANEL_REGISTRY.keys) {
       if (SANCTION_PANEL_REGISTRY.get(panel).written) await instantiatePanel(row.id, panel)
     }
@@ -291,10 +290,10 @@ const youtubers: ReferenceResource = {
       })
       .catch(rethrow)
 
-    // Open functions are replaced wholesale, the form always sends the full list
+    // Open functions are replaced wholesale
     if ('functionIds' in values) await replaceOpenFunctions(id, readList(values, 'functionIds'))
 
-    // Anchors travel with the row, only ever written by an administrator
+    // Anchors travel with the row
     if ('leadIds' in values) await replaceAnchors(id, readList(values, 'leadIds'))
 
     return youtubers.list().then((rows) => rows.find((entry) => entry.id === id)!)
@@ -321,7 +320,7 @@ const nextDivisionRank = async (): Promise<number> => {
 }
 
 const divisions: ReferenceResource = {
-  // A division is a name, a visual and who may hand it out, nothing else
+  // A division is a name
   fields: async () => [
     nameField,
     {
@@ -381,7 +380,7 @@ const divisions: ReferenceResource = {
         data: {
           name: readText(values, 'name') ?? undefined,
           imagePath: readText(values, 'imagePath'),
-          // Only an administrator ever reaches this key, the route strips it otherwise
+          // Only an administrator ever reaches this key
           ...('leadAssignable' in values
             ? { leadAssignable: readFlag(values, 'leadAssignable') }
             : {}),
@@ -618,7 +617,7 @@ const workflowStates: ReferenceResource = {
       })
       .catch(rethrow)
 
-    // One default per scope, the newest wins
+    // One default per scope
     if (row.isDefault) {
       await prisma.workflowState.updateMany({
         where: { scope, id: { not: row.id } },
@@ -1234,7 +1233,7 @@ const skills: ReferenceResource = {
         ...(row.dispositif ? [row.dispositif.name] : []),
       ],
       position: row.position,
-      // No consumer reads a skill yet, wired once the FSI lands
+      // No consumer reads a skill yet
       usage: 0,
       values: {
         name: row.name,
@@ -1285,7 +1284,7 @@ const skills: ReferenceResource = {
 }
 
 /**
- * Read the walkthrough of a PIM step, never trusting an undeclared glyph or destination
+ * Read the walkthrough of a PIM step
  * @param {FormValues} values - Parsed body
  * @return {{ icon: string | null, destination: string | null, guide: string | null }} - Columns
  */
@@ -1428,7 +1427,7 @@ const pimStepTemplates: ReferenceResource = {
         ...(row.required ? [REFERENCE_FIELD_COPY.mandatoryBadge] : []),
       ],
       position: row.position,
-      // No session instantiates a step from it yet, wired in the timeline phase
+      // No session instantiates a step from it yet
       usage: 0,
       values: {
         title: row.title,

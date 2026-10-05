@@ -14,15 +14,14 @@ import { cn } from '@/utils/classnames'
 import { absenceSentence } from '@/utils/format/absences'
 import { countDays } from '@/utils/format/dates'
 
-// Steps of a declaration, in order, with where each sits along the height of its box: near the
-// top, the middle and near the bottom, never touching the borders
+// Steps of a declaration
 const STEPS = [
   { number: 1, label: ABSENCE_COPY.stepPeriod, top: 11 },
   { number: 2, label: ABSENCE_COPY.stepReason, top: 50 },
   { number: 3, label: ABSENCE_COPY.stepDone, top: 89 },
 ] as const
 
-// Half the height of a chip, the dashed run starts and stops beyond it
+// Half the height of a chip
 const CHIP_REACH = '1.25rem'
 
 export interface AbsenceWizardProps {
@@ -39,7 +38,7 @@ export interface AbsenceWizardProps {
 /**
  * Declaring an absence in three steps drawn as a vertical timeline: the period on the calendar,
  * a reason if wanted, then the thanks. The page stays where it is, the last step is closed by hand
- * @param {AbsenceWizardProps} props - Absences in the way, limits and the send handler
+ * @param {AbsenceWizardProps} props - Absences in the way
  * @return {JSX.Element}
  */
 

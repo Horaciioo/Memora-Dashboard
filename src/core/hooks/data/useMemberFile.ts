@@ -15,9 +15,9 @@ import type { MemberAbsence, MemberDetail, MemberNote, MemberSocial } from '@/ty
  * @typedef {Object} MemberFile
  * @property {MemberNote[]} notes - Private remarks
  * @property {MemberSocial[]} socials - Social profiles
- * @property {MemberAbsence[]} absences - Absences, newest first
+ * @property {MemberAbsence[]} absences - Absences
  * @property {(values: FormValues) => Promise<boolean>} addAbsence - Post an absence
- * @property {PermissionLayers} overrides - Permission overwrites, per layer
+ * @property {PermissionLayers} overrides - Permission overwrites
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {() => void} clearIssues - Forget the rejections
@@ -221,7 +221,7 @@ export const useMemberFile = (
 }
 
 /**
- * Keep pinned remarks first, then the newest
+ * Keep pinned remarks first
  * @param {MemberNote[]} notes - Remarks to order
  * @return {MemberNote[]} - Ordered remarks
  */

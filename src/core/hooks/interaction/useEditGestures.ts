@@ -16,7 +16,7 @@ const OWN_CLICK = 'button, a, input, textarea, select, [role="button"]'
  * @property {boolean} canEdit - Member may write the record
  * @property {() => void} onEdit - Opens the edit form
  * @property {() => void} [onRemove] - Asks to drop the record
- * @property {boolean} [canRemove] - Dropping is allowed, defaults to canEdit
+ * @property {boolean} [canRemove] - Dropping is allowed
  * @property {string} [label] - Title of the menu
  * @property {MenuItem[]} [extra] - Entries added before the edit one
  */
@@ -31,8 +31,7 @@ export interface EditGestureOptions {
 }
 
 /**
- * Spread on a record surface, so it edits on click and offers edit or delete on right click,
- * never through an edit icon. A click landing on a control inside the surface stays that control's
+ * Spread on a record surface
  * @return {(options: EditGestureOptions) => HTMLAttributes<HTMLElement>} - Builder of the props
  */
 

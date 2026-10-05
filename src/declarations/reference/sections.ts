@@ -93,7 +93,7 @@ export const REFERENCE_GROUPS: ReferenceGroup[] = [
  * @property {IllustrationName} figure - Empty state figure
  * @property {boolean} reorderable - Rows can be dragged into order
  * @property {boolean} [openable] - Rows open a file of their own
- * @property {boolean} [fixed] - Declared in code, off the console, never written
+ * @property {boolean} [fixed] - Declared in code
  * @property {string} emptyTitle - Empty state headline
  * @property {string} emptyDescription - Empty state supporting line
  */

@@ -18,7 +18,7 @@ export const GlossaryBoard = () => {
   const [search, setSearch] = useState('')
   const needle = foldText(search.trim())
 
-  // Alphabetical, narrowed to the terms under the search
+  // Alphabetical
   const entries = useMemo(
     () =>
       [...GLOSSARY_REGISTRY.list]

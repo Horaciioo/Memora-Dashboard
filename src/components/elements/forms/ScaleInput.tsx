@@ -21,7 +21,7 @@ export interface ScaleInputProps {
 
 /**
  * Rating scale
- * @param {ScaleInputProps} props - Value, bounds and variant
+ * @param {ScaleInputProps} props - Value
  * @return {JSX.Element}
  */
 
@@ -44,7 +44,7 @@ export const ScaleInput = ({
   )
   const activeIndex = value === null ? -1 : steps.indexOf(value)
 
-  // Low red, high green
+  // Low red
   const toneOf = (index: number) =>
     index === 0
       ? SCALE_NUMERAL_TONES.low

@@ -42,10 +42,9 @@ export interface DataTableProps<T> {
 }
 
 /**
- * Table that substitutes its body with row skeletons while isLoading is true, with
- * emptyState once rows is empty, and answers sorting, opening and right click on a row
+ * Table that substitutes its body with row skeletons while isLoading is true
  * @param {DataTableColumn<T>[]} columns - Column definitions rendered in order
- * @param {T[]} rows - Data rows, ignored while isLoading is true
+ * @param {T[]} rows - Data rows
  * @param {(row: T) => string} getRowId - Stable key extractor for each row
  * @param {boolean} [isLoading] - Swaps the body for row skeletons when true
  * @param {EmptyStateProps} [emptyState] - Swaps the body for this once rows is empty
@@ -77,7 +76,7 @@ export const DataTable = <T,>({
     const column = columns.find((entry) => entry.key === sort.key)
     if (!column?.sortValue) return rows
 
-    // Copy first, the caller keeps its own ordering
+    // Copy first
     const read = column.sortValue
 
     return [...rows].sort((left, right) => {

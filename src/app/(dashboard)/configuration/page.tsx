@@ -24,7 +24,7 @@ export const metadata: Metadata = { title: REFERENCE_COPY.title }
 export default async function ConfigurationPage() {
   const { access } = await requirePermission(Permissions.ReferenceRead)
 
-  // Non-empty groups, in display order
+  // Non-empty groups
   const groups = REFERENCE_GROUPS.map((group) => ({
     label: group.label,
     sections: referenceSectionsOfGroup(group.key),

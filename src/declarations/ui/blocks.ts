@@ -25,16 +25,16 @@ export const FLOATING_HINT = {
 export const APP_SHELL = {
   // Room right of the page for the rim
   frame: 'app-tone flex min-h-dvh bg-[var(--color-background)] md:pr-3',
-  // Window the page shows through, the frame covers the rest
+  // Window the page shows through
   window:
     'app-frame pointer-events-none fixed inset-y-3 right-3 left-[var(--shell-sidebar-w)] z-[35] hidden md:block',
-  // No rail, rim all around
+  // No rail
   windowBare: 'app-frame pointer-events-none fixed inset-3 z-[35] hidden md:block',
-  // Scrollbar inside the window, clear of its corners
+  // Scrollbar inside the window
   windowTrack:
     'group/track pointer-events-auto absolute top-[var(--radius-xl)] right-1 bottom-[var(--radius-xl)] w-2.5 cursor-pointer',
   windowThumb:
-    'absolute inset-x-0.5 top-0 cursor-grab rounded-full bg-[var(--color-ink)]/25 transition-[background-color,left,right] duration-150 group-hover/track:inset-x-0 group-hover/track:bg-[var(--color-ink)]/40 active:cursor-grabbing active:bg-[var(--color-ink)]/50',
+    'absolute inset-x-0.5 top-0 cursor-grab rounded-full bg-[var(--color-ink)]/25 transition-[background-color,left,right] duration-[var(--motion-duration-fast)] group-hover/track:inset-x-0 group-hover/track:bg-[var(--color-ink)]/40 active:cursor-grabbing active:bg-[var(--color-ink)]/50',
   // Positioned so the page banner can span the whole column
   main: 'relative flex min-w-0 flex-1 flex-col',
   // Gutters widen past md so a page never welds itself to either rail
@@ -48,7 +48,7 @@ export const APP_SHELL = {
 } as const
 
 /**
- * Boxes opened from the rail, beside it at the page's bottom left corner
+ * Boxes opened from the rail
  * @type {Record<string, string>}
  */
 
@@ -58,7 +58,7 @@ export const RAIL_POPOVER = {
     'rail-reset surface-enter fixed bottom-6 left-[calc(var(--shell-sidebar-w)+1.5rem)] z-[70] flex max-h-[calc(100dvh-3rem)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   bell: 'w-[26rem] max-w-[calc(100vw-var(--shell-sidebar-w)-3rem)]',
   account: 'w-80',
-  // Glyph above the title, one head for both boxes
+  // Glyph above the title
   head: 'relative flex shrink-0 flex-col items-center gap-1.5 border-b border-[var(--color-border)] px-4 pt-5 pb-4 text-center',
   headGlyph: 'h-8 w-8 shrink-0',
   headTitle: 'text-xl leading-none font-black tracking-tight',
@@ -125,18 +125,18 @@ export const SEARCH_LAUNCHER = {
 } as const
 
 /**
- * Floating bottom nav pill classes — icon only, dark surface in both themes
+ * Floating bottom nav pill classes — icon only
  * @type {Record<string, string>}
  */
 
 export const MOBILE_NAV = {
   bar: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] left-1/2 z-40 flex -translate-x-1/2 items-center gap-0.5 rounded-[var(--radius-full)] bg-[var(--color-nav-surface)] px-2 py-1.5 shadow-[var(--shadow-lg)] md:hidden',
   link: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-full)] transition-colors',
-  // No colour here — one of the two below always wins, cn() is clsx so order alone would not
+  // No colour here — one of the two below always wins
   icon: 'h-5 w-5 shrink-0 transition-colors',
   iconIdle: 'text-[var(--color-nav-ink)]',
   iconActive: 'text-[var(--color-brand-600)]',
-  // Round button flanking the pill, same dark surface and outer size (56px)
+  // Round button flanking the pill
   fab: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-nav-surface)] text-[var(--color-nav-ink)] shadow-[var(--shadow-lg)] md:hidden',
   fabLeft: 'left-3',
   fabRight: 'right-3',
@@ -157,7 +157,7 @@ export const TOP_BAR = {
 } as const
 
 /**
- * Account sheet classes, opened from the mobile top bar avatar
+ * Account sheet classes
  * @type {Record<string, string>}
  */
 
@@ -166,7 +166,7 @@ export const ACCOUNT_SHEET = {
   row: 'flex flex-wrap items-center justify-between gap-2 pb-3',
   label: PROPERTY_LABEL,
   divider: 'h-px bg-[var(--color-border)]',
-  // A single row of glyph-only actions, split by vertical hairlines
+  // A single row of glyph-only actions
   iconRow: 'flex items-stretch pt-1',
   // Colour lives in the exclusive tones below
   iconButton: 'flex flex-1 items-center justify-center py-3 transition-colors',
@@ -179,7 +179,7 @@ export const ACCOUNT_SHEET = {
 } as const
 
 /**
- * More sheet classes, opened from the nav pill
+ * More sheet classes
  * @type {Record<string, string>}
  */
 
@@ -241,23 +241,23 @@ export const METRIC_BLOCK = {
 
 export const MEMBER_BLOCK = {
   frame: 'relative',
-  // Official logo on the portrait's corner, lifted off it
+  // Official logo on the portrait's corner
   divisionLogo: 'absolute -right-3 -bottom-3 h-14 w-14 drop-shadow-md',
-  // Division stamped on the portrait's corner, ringed like a presence dot
+  // Division stamped on the portrait's corner
   division:
     'absolute -right-1 -bottom-1 flex h-10 min-w-10 items-center justify-center rounded-full bg-[var(--color-brand-600)] px-1.5 text-sm font-black text-[var(--color-on-brand)] ring-4 ring-[var(--color-surface-raised)]',
   portrait:
     'block shrink-0 rounded-full ring-4 ring-[var(--color-surface-raised)] transition-[filter] enabled:cursor-pointer enabled:hover:brightness-95 disabled:cursor-default',
-  // Role glyph pinned to the portrait's corner, ringed like a presence dot
+  // Role glyph pinned to the portrait's corner
   emblem:
     'absolute -right-1 -bottom-1 h-9 w-9 rounded-full bg-[var(--color-surface)] p-1 ring-2 ring-[var(--color-surface)]',
-  // Read-only function list, each behind its small glyph
+  // Read-only function list
   marks: 'flex flex-wrap items-center gap-x-4 gap-y-2',
   mark: 'inline-flex items-center gap-2',
 } as const
 
 /**
- * Moderator file layout: an identity rail that stays put, the tabs beside it
+ * Moderator file layout: an identity rail that stays put
  * @type {Record<string, string>}
  */
 
@@ -271,7 +271,7 @@ export const MEMBER_FILE = {
   role: 'text-xs font-black tracking-wide text-[var(--color-brand-800)] uppercase',
   status:
     'inline-flex items-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-2.5 py-1 text-xs font-semibold text-[var(--color-ink-subtle)]',
-  // Dismissed or resigned, data erased
+  // Dismissed or resigned
   departed: 'cursor-help text-xs font-black tracking-wide text-[var(--color-danger)] uppercase',
   statusGlyph: 'h-4 w-4 shrink-0',
   functions: 'flex items-center justify-center gap-2',
@@ -283,7 +283,7 @@ export const MEMBER_FILE = {
   railItem: 'flex flex-col gap-1.5',
   factValue: 'text-sm font-medium',
   factEmpty: 'text-sm text-[var(--color-ink-subtle)] italic',
-  // Note card, pinned ones washed pink
+  // Note card
   note: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 shadow-[var(--shadow-sm)]',
   notePinned: 'border-[var(--color-brand-200)] bg-[var(--color-brand-50)]',
   noteHead: 'flex items-center gap-2 text-xs text-[var(--color-ink-subtle)]',
@@ -299,7 +299,7 @@ export const MEMBER_FILE = {
 } as const
 
 /**
- * Vertical list of stages joined by a rail, a journey or a timeline
+ * Vertical list of stages joined by a rail
  * @type {Record<string, string>}
  */
 
@@ -475,7 +475,7 @@ export const ACCESS_CONSOLE = {
 } as const
 
 /**
- * Creator picker classes, portraits side by side and the active one lit by its accent
+ * Creator picker classes
  * @type {Record<string, string>}
  */
 
@@ -518,7 +518,7 @@ export const DIVIDER_BLOCK = {
   rule: 'h-px flex-1 bg-[var(--color-border)]',
   label:
     'shrink-0 text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  // Standalone rule between two list rows, a touch stronger than a hairline
+  // Standalone rule between two list rows
   medium: 'h-px w-full bg-[var(--color-border-strong)]',
 } as const
 
@@ -552,7 +552,7 @@ export const CHANGELOG_BOARD = {
   categoryCount:
     'font-[family-name:var(--font-mono)] text-sm tabular-nums text-[var(--color-ink-subtle)]',
   groups: 'flex flex-col gap-10',
-  // Page name in the margin, its lines in the column beside it
+  // Page name in the margin
   group: 'grid gap-3 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-8',
   groupTitle:
     'flex items-center gap-2 text-sm font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase md:sticky md:top-24 md:self-start',
@@ -592,17 +592,17 @@ export const RELEASE_NOTICE = {
   wrap: 'relative',
   // Room above for the point
   wrapPointed: 'mx-3 pt-2.5 pb-1',
-  // The ^ aimed at the version entry, the gold of the plate's corner
+  // The ^ aimed at the version entry
   caret:
     'pointer-events-none absolute top-1 left-4 h-3 w-3 rotate-45 rounded-[3px] bg-[var(--color-halo-100)]',
-  // Gold plate, black ink, same on rail and home
+  // Gold plate
   frame:
     'group/news relative z-10 overflow-hidden rounded-[var(--radius-lg)] bg-linear-to-br from-[var(--color-halo-100)] via-[var(--color-halo-300)] to-[var(--color-halo-400)] text-black shadow-[0_10px_28px_-10px_var(--color-halo-500)] ring-1 ring-white/40 ring-inset transition-shadow hover:shadow-[0_14px_34px_-10px_var(--color-halo-500)]',
   // Light white veil from the top left
   veil: 'pointer-events-none absolute inset-0 bg-linear-to-br from-white/50 via-white/10 to-transparent',
   link: 'relative block p-3.5 pr-10',
   sheen:
-    'pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-white/55 to-transparent transition-[left] duration-700 ease-out group-hover/news:left-full motion-reduce:transition-none',
+    'pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-white/55 to-transparent transition-[left] duration-[var(--motion-duration-celebrate)] ease-out group-hover/news:left-full motion-reduce:transition-none',
   kicker:
     'relative block font-[family-name:var(--font-mono)] text-[10px] font-bold tracking-[0.16em] text-black/70 uppercase',
   title: 'relative mt-1.5 line-clamp-2 block text-lg leading-tight font-black tracking-tight',
@@ -640,7 +640,7 @@ export const SYSTEM_SCREEN = {
   description: 'max-w-sm text-sm leading-relaxed text-[var(--color-ink-subtle)] sm:text-base',
   reference: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
   action: 'pt-2',
-  // Word inked like a rubber stamp, tilted aside
+  // Word inked like a rubber stamp
   stampWord:
     'stamp-strike -rotate-12 rounded-[var(--radius-lg)] border-[6px] border-double border-current px-5 py-1 font-[family-name:var(--font-display)] text-[5rem] leading-none font-black tracking-tight text-[var(--color-danger)] uppercase opacity-90 sm:text-[7rem]',
 } as const

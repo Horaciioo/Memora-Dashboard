@@ -30,7 +30,7 @@ export default async function SanctionsPage() {
     panelsFor(session),
   ])
 
-  // Only the creator in perimeter is ever shown, the active one first
+  // Only the creator in perimeter is ever shown
   const creatorId = perimeter.activeYoutuberId ?? creators[0]?.value ?? null
 
   const empty = (title: string, description: string) => (

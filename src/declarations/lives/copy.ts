@@ -82,7 +82,7 @@ export const LIVE_INSTRUCTIONS_DEFAULT = `- Applique le panel de sanctions du ni
 - Reste présent jusqu’à la fin du live, ou préviens si tu dois partir.`
 
 /**
- * Copy of the page of one live, before and around the Mod View
+ * Copy of the page of one live
  * @type {Record<string, string>}
  */
 

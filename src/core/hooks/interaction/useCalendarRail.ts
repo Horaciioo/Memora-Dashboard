@@ -8,8 +8,8 @@ let rail: CalendarSidebarProps | null = null
 const listeners = new Set<() => void>()
 
 /**
- * Hands the calendar's month and switches to the sidebar, null once the page closes
- * @param {CalendarSidebarProps | null} next - Rail state, or none
+ * Hands the calendar's month and switches to the sidebar
+ * @param {CalendarSidebarProps | null} next - Rail state
  * @return {void}
  */
 
@@ -25,8 +25,8 @@ const subscribe = (listener: () => void) => {
 }
 
 /**
- * Calendar open in the page, read by the sidebar
- * @return {CalendarSidebarProps | null} - Rail state, null outside the calendar
+ * Calendar open in the page
+ * @return {CalendarSidebarProps | null} - Rail state
  */
 
 export const useCalendarRail = (): CalendarSidebarProps | null =>

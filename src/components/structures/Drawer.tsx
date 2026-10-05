@@ -14,7 +14,7 @@ import { DRAWER_STYLES } from '@/declarations/ui/variants'
 export interface DrawerProps {
   open: boolean
   onClose: () => void
-  // Action the drawer carries, or the record it opens on
+  // Action the drawer carries
   title: ReactNode
   icon: IconName
   description?: string

@@ -1,19 +1,15 @@
 /*
  * Typography of the theme format (src/utils/format/theme.ts → THEME.font).
- * Quicksand carries running text, headings and the big numerals (display),
- * its heaviest weight being 700; JetBrains Mono the code and eyebrows. The
- * families are fetched by the <link> in app/layout.tsx; this file only names
- * them and their fallbacks.
+ * Apple's system face carries text, headings and numerals: SF where it exists, the platform's
+ * own face elsewhere. JetBrains Mono the code and eyebrows. The mono is fetched by the <link>
+ * in app/layout.tsx; this file only names the families and their fallbacks.
  */
 
 :root {
-  --font-display: 'Quicksand', ui-rounded, 'Nunito', ui-sans-serif, system-ui, sans-serif;
-  --font-body:
-    'Quicksand', ui-rounded, 'Nunito', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
-    sans-serif;
-  /* Apple's own face where it exists, its heavy weights real unlike Quicksand's 700 ceiling */
   --font-system:
     -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, 'Segoe UI',
     sans-serif;
+  --font-display: var(--font-system);
+  --font-body: var(--font-system);
   --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
 }

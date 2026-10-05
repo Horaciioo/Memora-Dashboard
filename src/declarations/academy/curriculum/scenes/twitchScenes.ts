@@ -110,7 +110,7 @@ export const CHAT_SCENE: ModViewScene = scene(
 )
 
 /**
- * Community window: the streamer arrives, moderators come and go
+ * Community window: the streamer arrives
  * @type {ModViewScene}
  */
 
@@ -136,7 +136,7 @@ export const COMMUNITY_SCENE: ModViewScene = scene(
 )
 
 /**
- * Title of the live, lit
+ * Title of the live
  * @type {ModViewScene}
  */
 
@@ -149,7 +149,7 @@ export const TITLE_SCENE: ModViewScene = scene(
 )
 
 /**
- * Automod queue: held words in red, the same line in the chat
+ * Automod queue: held words in red
  * @type {ModViewScene}
  */
 
@@ -227,7 +227,7 @@ export const ACTIONS_SCENE: ModViewScene = scene(
 )
 
 /**
- * Modes: switched on one after the other, the chat reacting
+ * Modes: switched on one after the other
  * @type {ModViewScene}
  */
 
@@ -245,14 +245,14 @@ export const MODES_SCENE: ModViewScene = scene(
 )
 
 /**
- * Display options, the three dots lit
+ * Display options
  * @type {ModViewScene}
  */
 
 export const OPTIONS_SCENE: ModViewScene = scene(
   twitchStage({
     community: COMMUNITY,
-    // Everything hidden, the scene turns each option on
+    // Everything hidden
     chatScript: {
       menu: null,
       options: { timestamps: false, badges: false, deleted: false, firstMessages: false },
@@ -288,7 +288,7 @@ export const OPTIONS_SCENE: ModViewScene = scene(
 )
 
 /**
- * Case study, act 1: the wave starts, the windows tell where
+ * Case study
  * @type {ModViewScene}
  */
 
@@ -330,7 +330,7 @@ export const WAVE_START_SCENE: ModViewScene = scene(
 )
 
 /**
- * Case study, act 2: the wave insists, the coordinator then a responsable speak
+ * Case study
  * @type {ModViewScene}
  */
 
@@ -380,7 +380,7 @@ export const WAVE_INSIST_SCENE: ModViewScene = scene(
 )
 
 /**
- * Case study, act 3: the wave turns into a drama, Livecon 1
+ * Case study
  * @type {ModViewScene}
  */
 

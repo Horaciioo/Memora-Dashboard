@@ -48,7 +48,7 @@ export interface Reference {
   levels: { id: string; level: number }[]
 }
 
-// Extra permissions each trade opens, on top of the role
+// Extra permissions each trade opens
 const FUNCTION_GRANTS: Record<FunctionKey, string[]> = {
   functionDiscord: ['sanction:read', 'calendar:read'],
   functionLive: ['livecon:read', 'livecon:update', 'sanction:read'],
@@ -65,8 +65,8 @@ const FUNCTION_GRANTS: Record<FunctionKey, string[]> = {
 }
 
 /**
- * Reuse a creator by name, or open it with a generated portrait and banner
- * @return {Promise<Reference['creators']>} - Creators, in display order
+ * Reuse a creator by name
+ * @return {Promise<Reference['creators']>} - Creators
  */
 
 const seedCreators = async (): Promise<Reference['creators']> => {
@@ -114,7 +114,7 @@ const ensure = async <TRow>(
 ): Promise<TRow> => (await find()) ?? create()
 
 /**
- * Write every reference collection the fixtures need, reusing what already exists
+ * Write every reference collection the fixtures need
  * @return {Promise<Reference>} - Reference rows
  */
 
@@ -196,7 +196,7 @@ export const seedReference = async (): Promise<Reference> => {
     dispositifs.push(row.id)
   }
 
-  // Skills, the technical ones narrowed to the live trade
+  // Skills
   const skills: Reference['skills'] = []
   for (const [position, [name, accent, entries]] of SKILLS.entries()) {
     const category = await ensure(
@@ -325,7 +325,7 @@ export const seedReference = async (): Promise<Reference> => {
     })
   }
 
-  // Interview script, a few questions narrowed to one creator or trade
+  // Interview script
   const questionCount = await prisma.recruitmentQuestion.count()
   if (questionCount === 0) {
     for (const [position, [prompt, hint]] of RECRUITMENT_QUESTIONS.entries()) {
@@ -363,7 +363,7 @@ export const seedReference = async (): Promise<Reference> => {
     }
   }
 
-  // What each trade opens, set once and left alone afterwards
+  // What each trade opens
   for (const [key, permissions] of Object.entries(FUNCTION_GRANTS) as [FunctionKey, string[]][]) {
     const held = await prisma.functionPermission.count({ where: { functionId: functions[key].id } })
     if (held > 0) continue

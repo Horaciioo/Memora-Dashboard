@@ -10,7 +10,7 @@ import type {
   ParseResult,
 } from '@/types/forms'
 
-// Digits only, Discord snowflake
+// Digits only
 const DISCORD_PATTERN = /^\d{15,25}$/
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const COLOUR_PATTERN = /^#[0-9a-fA-F]{6}$/
@@ -156,7 +156,7 @@ export const parseFormValues = (
   }
 
   for (const field of fields) {
-    // A hidden field is never required, and never carries a value
+    // A hidden field is never required
     if (!isFieldVisible(field, draft)) continue
     if (!(field.name in raw) && !fillMissing) continue
 

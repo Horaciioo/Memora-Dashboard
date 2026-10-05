@@ -20,8 +20,7 @@ export interface ChatReplay {
 }
 
 /**
- * Play a chat back like a short clip: the lines arrive one after the other. At rest the whole
- * chat is on screen, only a press on replay empties it
+ * Play a chat back like a short clip: the lines arrive one after the other. At rest the whole chat is on screen
  * @param {number} total - Lines of the chat
  * @param {boolean} [autoplay] - Starts playing on arrival
  * @return {ChatReplay} - Replay state
@@ -54,7 +53,7 @@ export const useChatReplay = (total: number, autoplay = false): ChatReplay => {
   return {
     shown,
     playing: shown < total,
-    // The chat empties at once, the lines then arrive on the timer
+    // The chat empties at once
     replay: () => {
       setShown(0)
       setRun((current) => current + 1)

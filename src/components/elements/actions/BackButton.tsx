@@ -12,7 +12,7 @@ export interface BackButtonProps {
 }
 
 /**
- * Sends the viewer back where they came from, or home on a direct visit
+ * Sends the viewer back where they came from
  * @param {string} label - Button label
  * @param {IconName} [icon] - Leading glyph
  * @return {JSX.Element}

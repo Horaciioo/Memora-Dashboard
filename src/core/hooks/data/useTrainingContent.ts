@@ -42,7 +42,7 @@ export interface TrainingContentState {
 }
 
 /**
- * Drive the chapter, block, question and choice editors of one training
+ * Drive the chapter
  * @param {string} trainingId - Training identifier
  * @param {TrainingChapterView[]} initialChapters - Chapters resolved server-side
  * @return {TrainingContentState} - State and mutations
@@ -55,7 +55,7 @@ export const useTrainingContent = (
   const [chapters, setChapters] = useState(initialChapters)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
-  // One mutation shape shared by every level: post or patch, then replace the tree
+  // One mutation shape shared by every level: post or patch
   const post = useCallback(
     async (path: string, values: FormValues, name?: string) => {
       const next = await run(

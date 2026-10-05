@@ -5,7 +5,7 @@ import { capitalizeFirstLetter } from '@/utils/format/strings'
 const DISPLAY_LOCALE = 'fr'
 
 /**
- * Languages a member may declare, stored as ISO 639-1
+ * Languages a member may declare
  * @type {string[]}
  */
 
@@ -73,12 +73,12 @@ const zoneOffset = (zone: string): string => {
   return parts.find((part) => part.type === 'timeZoneName')?.value ?? ''
 }
 
-// Offsets shift with daylight saving, so the built list is kept for one day only
+// Offsets shift with daylight saving
 let cachedDay = ''
 let cachedZones: FieldOption[] = []
 
 /**
- * Choices of the timezone field, the whole IANA catalogue
+ * Choices of the timezone field
  * @return {FieldOption[]} - Zone options
  */
 

@@ -3,7 +3,7 @@ import type { Course } from '@/declarations/academy/curriculum/types'
 import type { CourseProgress } from '@/types/academy'
 
 /**
- * Read saved progress, forgiving a malformed column
+ * Read saved progress
  * @param {unknown} value - Stored progress
  * @return {CourseProgress} - Progress
  */

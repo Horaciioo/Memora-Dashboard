@@ -13,7 +13,7 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
 /**
- * Recount the lives of every running junior among some accounts, the roll-call deciding
+ * Recount the lives of every running junior among some accounts
  * @param {string[]} accountIds - Accounts whose count may have moved
  * @return {Promise<string[]>} - Junior seats whose count changed
  */
@@ -31,7 +31,7 @@ export const syncJuniorLives = async (accountIds: string[]): Promise<string[]> =
   })
   if (juniors.length === 0) return []
 
-  // Every live these juniors were called on, with their answer
+  // Every live these juniors were called on
   const answers = await prisma.eventAttendance.findMany({
     where: {
       accountId: { in: juniors.map((junior) => junior.accountId) },
@@ -68,10 +68,10 @@ export const syncJuniorLives = async (accountIds: string[]): Promise<string[]> =
 }
 
 /**
- * Lives a junior was present on since their PIM started, the ones their count is made of
+ * Lives a junior was present on since their PIM started
  * @param {string} juniorId - Junior seat
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
- * @return {Promise<AccompaniedLiveView[]>} - Lives, latest first
+ * @return {Promise<AccompaniedLiveView[]>} - Lives
  */
 
 export const accompaniedLives = async (

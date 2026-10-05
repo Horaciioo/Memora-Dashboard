@@ -18,7 +18,7 @@ export const useMediaQuery = (query: string): boolean =>
       return () => mql.removeEventListener('change', onChange)
     },
     () => window.matchMedia(query).matches,
-    // Server and first paint assume the wide layout, avoids a mobile flash of desktop chrome
+    // Server and first paint assume the wide layout
     () => false
   )
 

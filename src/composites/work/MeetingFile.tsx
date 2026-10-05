@@ -54,7 +54,7 @@ interface ContentAxis {
   empty: string
 }
 
-// The three written axes, the topics sitting between the first and the second
+// The three written axes
 const OPENING_AXIS: ContentAxis = {
   name: 'introduction',
   title: MEETING_COPY.introductionTitle,
@@ -67,8 +67,7 @@ const CLOSING_AXES: ContentAxis[] = [
 ]
 
 /**
- * Tabs of one meeting file — an overview edited in place, the content split across its four
- * axes, then the journal. Date and duration stay read-only, the calendar owns them
+ * Tabs of one meeting file — an overview edited in place
  * @param {MeetingDetail} detail - File resolved server-side
  * @param {FieldDefinition[]} meetingFields - Declarations of the meeting form
  * @param {FieldDefinition[]} topicFields - Declarations of the topic form
@@ -100,7 +99,7 @@ export const MeetingFile = ({
   const topicFieldFor = (name: string): FieldDefinition | undefined =>
     topicFields.find((field) => field.name === name)
 
-  // Option backing one select value, feeding the read rendering of the grid
+  // Option backing one select value
   const optionOf = (name: string) => {
     const value = file.values[name]
 
@@ -167,7 +166,7 @@ export const MeetingFile = ({
     },
   ]
 
-  // Neutral box, state colour on its badges
+  // Neutral box
   const boxClass =
     'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 sm:p-5'
 
@@ -201,7 +200,7 @@ export const MeetingFile = ({
   )
 
   /**
-   * Draw one written axis, its markdown edited in place
+   * Draw one written axis
    * @param {ContentAxis} axis - Axis declaration
    * @return {JSX.Element}
    */
@@ -224,7 +223,7 @@ export const MeetingFile = ({
     setWritingTopic(true)
   }
 
-  // One field saved, the rest shipped untouched
+  // One field saved
   const saveTopicField = (topic: MeetingTopicEntry, name: string, value: string | null) =>
     topics.update(topic.id, { ...topic.values, [name]: value })
 

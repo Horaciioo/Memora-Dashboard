@@ -23,9 +23,9 @@ export interface TeamsBoardProps {
   initialBoard: TeamBoardData
   fields: FieldDefinition[]
   canManage: boolean
-  // Creator the board belongs to, set when the board sits inside a creator file
+  // Creator the board belongs to
   youtuberId?: string
-  // YouTuber options driving the grouping, omitted once the board is already scoped to one
+  // YouTuber options driving the grouping
   youtubers?: FieldOption[]
 }
 
@@ -40,8 +40,7 @@ interface TeamGroup {
 }
 
 /**
- * Team board, a member moving from one team to another by dragging their card, its teams
- * categorised by YouTuber unless the board is already scoped to one
+ * Team board
  * @param {TeamBoardData} initialBoard - Board resolved server-side
  * @param {FieldDefinition[]} fields - Declarations of the team form
  * @param {boolean} canManage - Member may create teams and move people
@@ -86,7 +85,7 @@ export const TeamsBoard = ({
     move(item.id, container === UNASSIGNED ? null : container)
   )
 
-  // Unscoped, every configured YouTuber keeps its row even with no team yet
+  // Unscoped
   const groups = useMemo<TeamGroup[]>(() => {
     if (!youtubers) return [{ label: null, youtuberId: undefined, teams: board.teams }]
 

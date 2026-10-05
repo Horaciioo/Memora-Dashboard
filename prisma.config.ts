@@ -4,7 +4,7 @@ import { defineConfig, env } from 'prisma/config'
 try {
   process.loadEnvFile()
 } catch {
-  // No .env file, variables come from the environment
+  // No .env file
 }
 
 export default defineConfig({

@@ -16,7 +16,7 @@ const ECHO_WINDOW_SECONDS = 90
 const EXCERPT_LENGTH = 160
 
 /**
- * Kind of a gesture, as the log names it
+ * Kind of a gesture
  * @param {ModViewIntent} intent - Gesture
  * @return {ModerationKind} - Kind
  */
@@ -47,7 +47,7 @@ export const kindOfIntent = (intent: ModViewIntent): ModerationKind => {
 }
 
 /**
- * Who a gesture aims at, when it aims at someone
+ * Who a gesture aims at
  * @param {ModViewIntent} intent - Gesture
  * @return {string | null} - Platform user identifier
  */
@@ -56,7 +56,7 @@ const targetOf = (intent: ModViewIntent): string | null =>
   'chatterId' in intent ? intent.chatterId : null
 
 /**
- * Write a gesture sent from Memora, pending until the platform answers
+ * Write a gesture sent from Memora
  * @param {Object} input - Gesture
  * @param {string} input.liveId - Live
  * @param {LivePlatformName} input.platform - Platform
@@ -70,7 +70,7 @@ const targetOf = (intent: ModViewIntent): string | null =>
  * @param {number | null} input.rung - Panel rung applied
  * @param {string | null} input.onBehalfOfId - Member followed in Focus mode
  * @param {string | null} input.targetLogin - Viewer login
- * @return {Promise<string | null>} - Line identifier, none when the log is unavailable
+ * @return {Promise<string | null>} - Line identifier
  */
 
 export const logMemoraGesture = async (input: {
@@ -169,7 +169,7 @@ export const logPlatformGesture = async (input: {
   const { entry } = input
 
   try {
-    // Already recorded, a redelivery
+    // Already recorded
     const known = await prisma.moderationAction.findUnique({
       where: {
         platform_externalEventId: {
@@ -265,7 +265,7 @@ export const purgeModerationLog = async (): Promise<number> => {
 }
 
 /**
- * Livecon level in force for a creator right now, the shared one otherwise
+ * Livecon level in force for a creator right now
  * @param {string} youtuberId - Creator
  * @return {Promise<number | null>} - Level number
  */

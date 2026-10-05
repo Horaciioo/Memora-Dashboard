@@ -1,7 +1,7 @@
 import type { ChatLine } from '@/declarations/academy/curriculum/types'
 
 /**
- * Pseudonym colours of a chat, picked by the name so a viewer keeps the same one
+ * Pseudonym colours of a chat
  * @type {readonly string[]}
  */
 

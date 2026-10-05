@@ -6,7 +6,7 @@ import { JUNIOR_FUNCTION_OF } from '@/declarations/reference/fixed'
 import { AcademyJuniorStatuses, MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 
 /**
- * Read the junior function a trade trains through, the trade itself when none is declared
+ * Read the junior function a trade trains through
  * @param {string} functionId - Function the campaign recruits for
  * @return {Promise<string>} - Function identifier held during the PIM
  */
@@ -28,7 +28,7 @@ const juniorFunctionId = async (functionId: string): Promise<string> => {
 }
 
 /**
- * Open the file of an admitted candidate, or reuse the member they already are
+ * Open the file of an admitted candidate
  * @param {Object} candidate - Admitted application
  * @param {string} candidate.discordId - Discord identifier
  * @param {string | null} candidate.displayName - Pseudonym given at application
@@ -48,7 +48,7 @@ const admittedAccount = async (
     select: { id: true },
   })
 
-  // A member changing trade keeps their role, the junior function joins the ones held
+  // A member changing trade keeps their role
   if (known) {
     await prisma.accountFunction.upsert({
       where: {
@@ -78,7 +78,7 @@ const admittedAccount = async (
 }
 
 /**
- * Take back a seat nobody confirmed yet, and the file it pre-generated
+ * Take back a seat nobody confirmed yet
  * @param {Object} junior - Seat to take back
  * @param {string} junior.id - Junior identifier
  * @param {string} junior.accountId - Account holding it
@@ -101,8 +101,7 @@ const withdrawAdmission = async (junior: { id: string; accountId: string }): Pro
 }
 
 /**
- * Keep the promotion in step with one application, the Discord identifier being the key: an
- * admitting outcome enrols the candidate, leaving it before confirmation takes the seat back
+ * Keep the promotion in step with one application
  * @param {string} candidateId - Application identifier
  * @return {Promise<void>} - Synced
  */
@@ -127,7 +126,7 @@ export const syncAdmission = async (candidateId: string): Promise<void> => {
   const promotion = candidate.session.academySession
   const admitted = candidate.outcome?.admits === true && promotion !== null
 
-  // A confirmed seat belongs to the junior now, the board no longer drives it
+  // A confirmed seat belongs to the junior now
   if (candidate.admission?.confirmedAt) return
 
   if (!admitted) {
@@ -165,7 +164,7 @@ export const syncAdmission = async (candidateId: string): Promise<void> => {
     },
   })
 
-  // The shared trame lands now, the dispositif one once the junior picks it
+  // The shared trame lands now
   await instantiateJuniorSteps(
     junior.id,
     promotion.id,
@@ -176,7 +175,7 @@ export const syncAdmission = async (candidateId: string): Promise<void> => {
 }
 
 /**
- * The admitted seat one Discord identity holds on a promotion, still to confirm
+ * The admitted seat one Discord identity holds on a promotion
  * @typedef {Object} PendingAdmission
  * @property {string} juniorId - Junior identifier
  * @property {string} accountId - Pre-generated account
@@ -195,7 +194,7 @@ export interface PendingAdmission {
  * Look an identity up among the admitted candidates of a promotion
  * @param {string} sessionId - Academy session identifier
  * @param {string} discordId - Discord identifier resolved by Discord itself
- * @return {Promise<PendingAdmission | null>} - Seat to confirm, or none
+ * @return {Promise<PendingAdmission | null>} - Seat to confirm
  */
 
 export const findAdmission = async (
@@ -223,7 +222,7 @@ export const findAdmission = async (
 }
 
 /**
- * Swap the junior function for the trade it trained for, once the PIM is passed
+ * Swap the junior function for the trade it trained for
  * @param {string} accountId - Graduating account
  * @param {string} functionId - Trade the session trained for
  * @return {Promise<void>} - Applied
@@ -245,7 +244,7 @@ export const graduateAccount = async (accountId: string, functionId: string): Pr
       update: {},
       create: { accountId, functionId },
     }),
-    // A junior becomes a moderator, a member changing trade keeps their role
+    // A junior becomes a moderator
     prisma.account.updateMany({
       where: { id: accountId, role: MemberRoles.Junior },
       data: { role: MemberRoles.Moderateur },

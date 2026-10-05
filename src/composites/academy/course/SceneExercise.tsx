@@ -15,8 +15,8 @@ import { COURSE_SCENE } from '@/declarations/ui/variants'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 
 /**
- * Animated case study: a live plays in the Mod View, questions follow
- * @param {ExerciseViewProps} props - Block, answer, result and handlers
+ * Animated case study: a live plays in the Mod View
+ * @param {ExerciseViewProps} props - Block
  * @return {JSX.Element}
  */
 

@@ -3,7 +3,7 @@
     "name": "Live",
     "kind": "EVENT",
     "summary": "Live programmé du créateur.",
-    "accent": "#7c3aed",
+    "accent": "#c2548a",
     "visibility": "EVERYONE",
     "defaultMinutes": 180,
     "allDay": false

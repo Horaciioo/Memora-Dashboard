@@ -46,7 +46,7 @@ export async function generateMetadata({
 }
 
 /**
- * One academy session, its juniors and its thread
+ * One academy session
  * @param {Object} context - Route context
  * @param {Promise<{ id: string }>} context.params - Dynamic segments
  * @return {Promise<JSX.Element>} - Session page

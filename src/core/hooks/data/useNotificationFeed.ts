@@ -29,9 +29,9 @@ export interface NotificationCollection {
 }
 
 /**
- * Drive the personal notifications, the page being fetched on demand rather than polled
+ * Drive the personal notifications
  * @param {NotificationFeed} initial - Feed resolved server-side
- * @param {number} [size] - Entry count asked for, defaults to the full page
+ * @param {number} [size] - Entry count asked for
  * @return {NotificationCollection} - State and gestures
  */
 
@@ -43,7 +43,7 @@ export const useNotificationFeed = (
   const [isLoading, setLoading] = useState(false)
   const { run } = useMutation()
 
-  // Stamp of the last fetch, zero until one lands, so the first opening always travels
+  // Stamp of the last fetch
   const loadedAt = useRef(0)
 
   const load = useCallback(() => {
@@ -63,7 +63,7 @@ export const useNotificationFeed = (
 
   const open = useCallback(
     (id: string) => {
-      // The row settles at once, the write only confirms it
+      // The row settles at once
       setFeed((current) => {
         const entry = current.entries.find((row) => row.id === id)
         if (!entry || entry.isRead) return current

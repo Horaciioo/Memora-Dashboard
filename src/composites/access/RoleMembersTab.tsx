@@ -23,9 +23,7 @@ export interface RoleMembersTabProps {
 }
 
 /**
- * Members tab — the accounts carrying the selected role or function, and the picker that
- * seats more. Only floor-level accounts are offered: a leader or an administrator is moved
- * from their own file, never swept in from here
+ * Members tab — the accounts carrying the selected role or function
  * @param {AccessSelection} selection - Role or function on screen
  * @param {AccessCollection} access - Console state and mutations
  * @return {JSX.Element}

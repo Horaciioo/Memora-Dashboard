@@ -29,7 +29,7 @@ export interface RoleDisplayTabProps {
 }
 
 /**
- * Display tab — name, colour and glyph of a role, plus holder slot and delete for a function
+ * Display tab — name
  * @param {AccessSelection} selection - Role or function on screen
  * @param {AccessCollection} access - Console state and mutations
  * @param {() => void} onDeleted - Called once a function is removed

@@ -32,7 +32,7 @@ import type {
 import { TrainingBlockKinds } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
 
-// Single drop container, chapters only reorder within their own list
+// Single drop container
 const CHAPTERS_CONTAINER = 'chapters'
 
 type DialogState =
@@ -56,7 +56,7 @@ export interface TrainingContentEditorProps {
 }
 
 /**
- * Author a training's content — chapters, blocks, and the quizzes inside them
+ * Author a training's content — chapters
  * @param {string} trainingId - Training identifier
  * @param {TrainingChapterView[]} initialChapters - Chapters resolved server-side
  * @param {boolean} canManage - Member may edit the content

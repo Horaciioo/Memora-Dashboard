@@ -35,7 +35,7 @@ export interface SlotDrafting {
 }
 
 /**
- * Draw a stretch of the grid with the pointer, the release opening a prefilled form
+ * Draw a stretch of the grid with the pointer
  * @param {(from: string, to: string) => void} onDrawn - Handler of the released stretch
  * @param {boolean} enabled - Drafting is allowed
  * @return {SlotDrafting} - Draft state and props
@@ -47,20 +47,20 @@ export const useSlotDraft = (
 ): SlotDrafting => {
   const [draft, setDraft] = useState<SlotDraft | null>(null)
 
-  // The gesture is mirrored outside React state, so the release never fires twice
+  // The gesture is mirrored outside React state
   const pending = useRef<SlotDraft | null>(null)
 
   const slotProps = useCallback(
     (key: string) => ({
       onPointerDown: (event: PointerEvent<HTMLElement>) => {
-        // A press on a card, a button or a link is never a draft
+        // A press on a card
         if (!enabled || event.button !== 0) return
         if ((event.target as HTMLElement).closest('button, a')) return
 
         pending.current = { from: key, to: key }
         setDraft(pending.current)
 
-        // The release can land anywhere, so the window owns the end of the gesture
+        // The release can land anywhere
         const finish = () => {
           window.removeEventListener('pointerup', finish)
 

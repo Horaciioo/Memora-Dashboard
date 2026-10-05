@@ -47,7 +47,7 @@ export const InlineMarkdown = ({
   }
 
   const commit = async () => {
-    // Untouched, skip the save
+    // Untouched
     if (draft === value) {
       setEditing(false)
       return

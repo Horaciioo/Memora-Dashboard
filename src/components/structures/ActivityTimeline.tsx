@@ -10,8 +10,7 @@ export interface ActivityTimelineProps {
 }
 
 /**
- * Vertical journal of recorded events, newest first — the portrait of whoever acted opens
- * each row, the sentence saying what was done
+ * Vertical journal of recorded events
  * @param {ActivityEntry[]} entries - Journal entries
  * @return {JSX.Element}
  */

@@ -1,10 +1,10 @@
 import type { SanctionGravityName, SanctionPanelName } from '@/utils/constants/moderation'
 
 /**
- * One step of a ladder, a condition and the measures applied together
+ * One step of a ladder
  * @typedef {Object} SanctionRungSeed
  * @property {string} condition - When it applies
- * @property {string[]} measures - Measure names, applied together
+ * @property {string[]} measures - Measure names
  */
 
 export interface SanctionRungSeed {
@@ -16,7 +16,7 @@ export interface SanctionRungSeed {
  * How one offence is handled inside one livecon level
  * @typedef {Object} SanctionLevelSeed
  * @property {SanctionGravityName} gravity - Weight of the offence at this level
- * @property {SanctionRungSeed[]} ladder - Steps, first applied first
+ * @property {SanctionRungSeed[]} ladder - Steps
  */
 
 export interface SanctionLevelSeed {
@@ -28,7 +28,7 @@ export interface SanctionLevelSeed {
  * One offence of a reference panel. {creator} and {CREATOR} name the creator it is cloned for
  * @typedef {Object} SanctionOffenseSeed
  * @property {string} name - Display name
- * @property {string} summary - What the offence covers, markdown
+ * @property {string} summary - What the offence covers
  * @property {string[]} examples - Messages to moderate
  * @property {string[]} tolerated - Close messages left alone
  * @property {string | null} warningExample - Reason a moderator can paste
@@ -45,7 +45,7 @@ export interface SanctionOffenseSeed {
 }
 
 /**
- * Reference Twitch panel, level 3 copied from the moderation handbook
+ * Reference Twitch panel
  * @type {readonly SanctionOffenseSeed[]}
  */
 
@@ -53,7 +53,7 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
   {
     name: 'Autre langue',
     summary:
-      'Certaines personnes parlent dans une autre langue dans le chat et nous n’**acceptons que le français**.\n\nPense à vérifier si la phrase dite n’est pas propice à une insulte, ou un propos dénigrant. Si cela est le cas, utilise la sanction « Dès constaté • Si insulte » ci-dessous.',
+      'Certaines personnes parlent dans une autre langue dans le chat mais malheureusement nous n’**acceptons que le français**.\n\nPense à vérifier si la phrase dite n’est pas propice à une insulte, ou un propos dénigrant. Si cela est le cas, utilise la sanction « Dès constaté • Si insulte » ci-dessous.',
     examples: ['Hello how are you today {creator}'],
     tolerated: [],
     warningExample:
@@ -91,7 +91,7 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
   {
     name: 'Contournement de sanctions',
     summary:
-      'Lorsqu’un message apparaît en rouge comme « potentiel contournement de sanction », nous n’intervenons pas.',
+      "Lorsqu’un message apparaît en rouge comme « potentiel contournement de sanction », nous n’intervenons pas forcément, cela dépendra de la situation et concertation auprès de l'équipe..",
     examples: [],
     tolerated: [],
     warningExample: null,
@@ -151,7 +151,7 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
   {
     name: 'Flood excessif',
     summary:
-      'Lorsqu’une personne perturbe le chat en envoyant ostensiblement de l’excessivité dans ses messages.\n\n**Il faut savoir faire la différence entre l’euphorie et la démesure avant d’agir.** Par exemple, si {creator} le demande ou si la situation s’y prête, c’est acceptable.',
+      'Lorsqu’une personne perturbe le chat en envoyant ostensiblement de l’excessivité dans ses messages.\n\n**Il faut savoir faire la différence entre l’euphorie et la démesure avant d’agir.** Par exemple, si {creator} le demande ou si la situation s’y prête dans ce cas là, c’est acceptable.',
     examples: [
       '{creator}uuuuuuu, ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️ (sur plusieurs lignes)',
     ],
@@ -191,7 +191,7 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
   {
     name: 'Grossièreté',
     summary:
-      'Certains viewers sont grossiers en disant des petites insultes **sans grande gravité**.',
+      "Certains viewers sont grossiers en disant des petites insultes **sans grande gravité**. Attention cependant, cela peut être bon enfant. Il faut savoir le dissocier selon la situation et l'ambiance du live.",
     examples: ['T’es con {creator} !', 'Les modos vous êtes des méchants'],
     tolerated: [],
     warningExample:
@@ -232,8 +232,7 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
       'Certains membres du chat profitent de l’enchaînement de plusieurs messages dans le chat pour **insulter d’autres membres**.',
     examples: ['Lucas espèce de sale fils de p%@*'],
     tolerated: [],
-    warningExample:
-      'Les insultes ne sont pas tolérées dans le chat de {creator}, cela peut entraîner une sanction. Merci pour ta compréhension et bon live !',
+    warningExample: 'Merci de cesser immédiatement les insultes sous peine de sanction.',
     levels: {
       3: {
         gravity: 'LOW',
@@ -272,7 +271,7 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
     ],
     tolerated: ['{CREATOR} CA VA, MOI CA VA BIEN ?'],
     warningExample:
-      'Il est important de ne pas exagérer avec les majuscules dans tes messages, ceci est sujet à une sanction. Merci pour ta compréhension et bon live !',
+      'Salut chef, attention à ne pas trop écrire en majuscule, ça peut vite être gênant pour les autres viewers. Merci pour ta compréhension et bon live !',
     levels: {
       3: {
         gravity: 'LOW',
@@ -306,11 +305,11 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
   {
     name: 'Message inapproprié',
     summary:
-      'Un message est défini comme inapproprié lorsqu’il n’est **pas directement offensant** envers une personne mais qu’il perturbe le chat. Il peut être défini comme un **message puéril**.',
-    examples: ['Caca'],
+      'Un message est défini comme inapproprié lorsqu’il n’est **pas directement offensant** envers une personne mais qu’il perturbe le chat. Il peut être défini comme un **message puéril**.\n\n> Ce n’est pas parce qu’un message est inapproprié qu’il est forcément à modérer. Tout dépend du contenu et de la longueur du message.',
+    examples: ["Caca (j'ai pas eu d'autres idées jugez pas)"],
     tolerated: [],
     warningExample:
-      'Il est important de rester respectueux dans tes messages, ceci est sujet à une sanction. Merci pour ta compréhension et bon live !',
+      'Merci de ne pas poster ce genre de messages à outrance, ça peut gêner la lecture du chat. Merci pour ta compréhension et bon live !',
     levels: {
       3: {
         gravity: 'LOW',
@@ -345,10 +344,10 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
     name: 'Numéro de téléphone dans le pseudo',
     summary:
       'Un pseudo peut contenir des informations sensibles, notamment un numéro de téléphone. C’est assez commun mais doit être pris en compte **uniquement si la personne est active** dans le chat.',
-    examples: ['065267**** : Coucou le chat !!'],
+    examples: ['0607080910 : Coucou le chat !!'],
     tolerated: [],
     warningExample:
-      'Je te timeout le temps que tu puisses changer ton pseudo puisqu’il contient un numéro de téléphone, ce qui peut être dangereux pour toi. Durant ce timeout, pense à le changer pour ta protection sinon nous ne pourrons pas te laisser parler dans le chat ! Merci à toi !',
+      "Ton pseudo n'est pas conforme, tu es banni le temps que tu ne le changes pas. Lorsque ce sera fait, tu pourras effectuer une demande de débannissement qui sera acceptée si celle-ci est constructive.",
     levels: {
       3: {
         gravity: 'LOW',
@@ -413,7 +412,7 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
     examples: ['Les modos ils suppriment pour rien !!', 'Bavure des modos, honte à eux !!'],
     tolerated: [],
     warningExample:
-      'Il est important de rester respectueux dans tes messages, ceci est sujet à une sanction. Merci pour ta compréhension et bon live !',
+      "Merci de rester respectueux ! Si tu as une plainte, je te conseille dez te diriger sur Discord et d'en référer à mes responsables.",
     levels: {
       3: {
         gravity: 'LOW',
@@ -446,7 +445,7 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
   {
     name: 'Publicité',
     summary:
-      'La **publicité** est une sanction utilisée lorsqu’un·e viewer partage un lien, une chaîne ou du contenu externe sans autorisation. Elle sert à préserver l’intégrité du live et éviter toute promotion non sollicitée.',
+      "Lorsqu'un viewer fait la promotion d’un produit, d’un service ou d’une chaîne Twitch/YouTube, cela est considéré comme de la publicité et est **interdit sur le chat** (Sur Twitch tout court).\n\n> Il est important de noter que la publicité peut être faite de manière subtile, par exemple en mentionnant un lien ou en parlant d’un produit sans le nommer directement. Dans ces cas-là, il est recommandé de supprimer le message et d’avertir le viewer.",
     examples: [
       'J’ai sorti une vidéo youtube sur mon poisson rouge qui a bu du Redbull, venaiit vous abonnés à moi',
     ],
@@ -1015,8 +1014,7 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
 ]
 
 /**
- * Reference panel of each surface, cloned onto a creator and edited afterwards. The YouTube and
- * Discord panels are still to be written
+ * Reference panel of each surface
  * @type {Record<SanctionPanelName, readonly SanctionOffenseSeed[]>}
  */
 

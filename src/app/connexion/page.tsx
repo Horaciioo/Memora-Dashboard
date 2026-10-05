@@ -16,7 +16,7 @@ import { SIGN_IN_STYLES } from '@/declarations/ui/variants'
 export const metadata: Metadata = { title: AUTH_COPY.title }
 
 /**
- * Sign-in screen, Discord first and the identifier form only as a development fallback
+ * Sign-in screen
  * @param {Object} props - Route props
  * @param {Promise<Record<string, string | string[] | undefined>>} props.searchParams - URL query
  * @return {Promise<JSX.Element>} - Auth shell

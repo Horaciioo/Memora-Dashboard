@@ -10,7 +10,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const metadata: Metadata = { title: MODVIEW_PREVIEW_COPY.title }
 
 /**
- * Mod View played on a scripted evening, for the administration to validate
+ * Mod View played on a scripted evening
  * @return {Promise<JSX.Element>} - Preview page
  */
 

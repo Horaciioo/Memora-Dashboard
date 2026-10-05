@@ -36,9 +36,7 @@ const matches = (permission: PermissionMeta, term: string): boolean =>
   permission.description.toLowerCase().includes(term)
 
 /**
- * The one permission board of the product — a page per section, its permission, then the
- * refinements it opens, each set from the same three-state switch. Green allows outright,
- * grey falls back on what the layer underneath already grants, red takes it away even there
+ * The one permission board of the product — a page per section
  * @param {PermissionDraft} value - Current draft
  * @param {(next: PermissionDraft) => void} onChange - Draft handler
  * @param {PermissionName[]} baseline - Permissions the layer underneath already grants
@@ -57,7 +55,7 @@ export const PermissionBoard = ({
   const [term, setTerm] = useState('')
   const inherited = useMemo(() => new Set(baseline), [baseline])
 
-  // Search-filtered sections, keeping a refinement only alongside its page permission
+  // Search-filtered sections
   const sections = useMemo(() => {
     const needle = term.trim().toLowerCase()
 
@@ -93,7 +91,7 @@ export const PermissionBoard = ({
     onChange(next)
   }
 
-  // Grants or clears a whole page at once, its refinements travelling with it
+  // Grants or clears a whole page at once
   const applyRoot = (root: PermissionRoot, state: PermissionState) => {
     const next = { ...value }
 

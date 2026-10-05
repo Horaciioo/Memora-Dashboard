@@ -16,7 +16,7 @@ interface LegacyTrackPageProps {
 export const metadata: Metadata = { title: LEGACY_COPY.title }
 
 /**
- * One Legacy track, open to the encadrement and to the member following it
+ * One Legacy track
  * @param {LegacyTrackPageProps} props - Track identifier
  * @return {Promise<JSX.Element>} - Track page
  */

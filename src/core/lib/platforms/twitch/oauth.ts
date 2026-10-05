@@ -38,7 +38,7 @@ export interface TwitchIdentity {
 }
 
 /**
- * Credentials, refusing to run without them
+ * Credentials
  * @return {{ clientId: string, clientSecret: string, redirectUri: string }} - Credentials
  */
 
@@ -78,7 +78,7 @@ export const buildTwitchAuthorizeUrl = (state: string): string => {
     response_type: 'code',
     scope: TWITCH_SCOPES.join(' '),
     state,
-    // The member picks the account each time, never a stale one
+    // The member picks the account each time
     force_verify: 'true',
   }).toString()
 
@@ -167,7 +167,7 @@ export const refreshTwitchGrant = (refreshToken: string): Promise<TwitchGrant> =
 /**
  * Give a token back to Twitch
  * @param {string} accessToken - Token to revoke
- * @return {Promise<void>} - Revoked, failures ignored
+ * @return {Promise<void>} - Revoked
  */
 
 export const revokeTwitchToken = async (accessToken: string): Promise<void> => {
@@ -201,11 +201,11 @@ export const readTwitchUser = async (accessToken: string): Promise<TwitchIdentit
   return { id: user.id, login: user.login, displayName: user.display_name }
 }
 
-// App token, renewed shortly before it expires
+// App token
 let appToken: { value: string; expiresAt: number } | null = null
 
 /**
- * Application token, for reads that need no member
+ * Application token
  * @return {Promise<string>} - Bearer token
  */
 
@@ -241,7 +241,7 @@ export const readTwitchAppToken = async (): Promise<string> => {
 /**
  * Find a Twitch user by login
  * @param {string} login - Login
- * @return {Promise<TwitchIdentity | null>} - User, none when unknown
+ * @return {Promise<TwitchIdentity | null>} - User
  */
 
 export const findTwitchUser = async (login: string): Promise<TwitchIdentity | null> => {

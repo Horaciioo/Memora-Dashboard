@@ -74,7 +74,7 @@ import type {
 import { IntegrationLinkKinds } from '@/utils/constants/integration'
 import type { Prisma } from '@prisma/client'
 
-// Stages an actual voice check-in is written for, the others are timeline-driven
+// Stages an actual voice check-in is written for
 const REVIEW_STAGES = [
   AcademyStages.ReviewOne,
   AcademyStages.ReviewFinal,
@@ -272,7 +272,7 @@ export const REVIEW_FIELDS: FieldDefinition[] = [
     options: toOptions(REVIEW_ADVICE_REGISTRY),
     mark: 'dot',
     span: 'half',
-    // The first check-in carries no advice, the responsable alone decides
+    // The first check-in carries no advice
     visibleWhen: { field: 'stage', oneOf: [AcademyStages.ReviewFinal, AcademyStages.Bonus] },
   },
   {
@@ -445,7 +445,7 @@ const SESSION_SHAPE = {
 } as const
 
 /**
- * Read every session within scope, newest first, archived sessions left out
+ * Read every session within scope
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<SessionSummary[]>} - Sessions
  */
@@ -463,7 +463,7 @@ export const listSessions = async (
 }
 
 /**
- * Shortest run a session may last, proposed when no end date is given
+ * Shortest run a session may last
  * @param {Date} startsAt - First day of the session
  * @return {Date} - Proposed last day
  */
@@ -506,10 +506,10 @@ const sessionInScope = async (id: string, scope: Prisma.AcademySessionWhereInput
 }
 
 /**
- * Open the integration link of a session once it starts taking applications, idempotent
+ * Open the integration link of a session once it starts taking applications
  * @param {string} sessionId - Session identifier
  * @param {AcademySessionStatusName} status - Status the session was just set to
- * @return {Promise<void>} - Applied, a no-op outside OPEN or when a live link already exists
+ * @return {Promise<void>} - Applied
  */
 
 const ensureSessionInvite = async (
@@ -583,7 +583,7 @@ export const updateSession = async (
 
   if (launching) await ensureLaunchable(id)
 
-  // The trainer seats are replaced wholesale, the form always sends the full list
+  // The trainer seats are replaced wholesale
   await prisma.$transaction([
     prisma.academySession.update({ where: { id }, data }),
     prisma.academySessionTrainer.deleteMany({ where: { sessionId: id } }),
@@ -617,7 +617,7 @@ export const startSession = async (
 }
 
 /**
- * Start a promotion, its confirmed juniors leaving preparation together
+ * Start a promotion
  * @param {string} id - Session identifier
  * @return {Promise<void>} - Launched
  */
@@ -656,8 +656,7 @@ const ensureLaunchable = async (id: string): Promise<void> => {
 }
 
 /**
- * Start a promotion for real: its day starts now, the timeline re-anchors on it and every
- * junior leaves preparation
+ * Start a promotion for real: its day starts now
  * @param {string} id - Session identifier
  * @return {Promise<void>} - Launched
  */
@@ -667,7 +666,7 @@ const launchSession = async (id: string): Promise<void> => {
 
   await prisma.$transaction([
     prisma.academySession.update({ where: { id }, data: { startsAt } }),
-    // Only the seats whose form came back leave, the others follow once done
+    // Only the seats whose form came back leave
     prisma.academyJunior.updateMany({
       where: {
         sessionId: id,
@@ -796,9 +795,9 @@ const JUNIOR_SHAPE = {
 } as const
 
 /**
- * Read the trainings a function covers, the shared ones always included
+ * Read the trainings a function covers
  * @param {string} functionId - Function identifier
- * @param {string} [dispositifId] - Dispositif identifier, every dispositif when omitted
+ * @param {string} [dispositifId] - Dispositif identifier
  * @return {Promise<object[]>} - Trainings in display order
  */
 
@@ -916,7 +915,7 @@ const EVENT_SHAPE = {
 /**
  * Read the thread and the timeline of a session
  * @param {string} sessionId - Session identifier
- * @return {Promise<AcademyStepView[]>} - Steps, newest planned first
+ * @return {Promise<AcademyStepView[]>} - Steps
  */
 
 export const listSteps = async (sessionId: string): Promise<AcademyStepView[]> => {
@@ -952,7 +951,7 @@ export const readSession = async (
 }
 
 /**
- * Turn parsed values into a junior payload, ends going through the parkour
+ * Turn parsed values into a junior payload
  * @param {FormValues} values - Parsed body
  * @return {object} - Database payload
  */
@@ -964,7 +963,7 @@ const toJuniorData = (values: FormValues) => ({
 })
 
 /**
- * Take a moderator into a session, instantiating their own slice of the timeline
+ * Take a moderator into a session
  * @param {string} sessionId - Session identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {FormValues} values - Parsed body
@@ -1100,7 +1099,7 @@ export const setTrainingRecord = async (
 ): Promise<JuniorView[]> => {
   const junior = await juniorInScope(juniorId, scope)
 
-  // A clearance moves the record to done, a revoke is a correction back to in progress
+  // A clearance moves the record to done
   const status = validated ? TrainingStatuses.Done : TrainingStatuses.InProgress
 
   await prisma.trainingRecord.upsert({
@@ -1218,7 +1217,7 @@ export const setStepDone = async (
 }
 
 /**
- * Clear or reopen a timeline step, refusing to skip an earlier late one
+ * Clear or reopen a timeline step
  * @param {string} id - Step identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {boolean} validated - Wanted state
@@ -1346,7 +1345,7 @@ const REVIEW_SHAPE = { author: true, decidedBy: true } as const
  * Read the voice check-ins of a junior within scope
  * @param {string} juniorId - Junior identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
- * @return {Promise<AcademyReviewView[]>} - Reviews, newest first
+ * @return {Promise<AcademyReviewView[]>} - Reviews
  */
 
 export const listReviews = async (
@@ -1415,7 +1414,7 @@ const reviewInScope = async (id: string, scope: Prisma.AcademySessionWhereInput)
 }
 
 /**
- * Edit the trace of a voice check-in, only possible while still a draft
+ * Edit the trace of a voice check-in
  * @param {string} id - Review identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {FormValues} values - Parsed body
@@ -1436,7 +1435,7 @@ export const updateReview = async (
 }
 
 /**
- * Drop the trace of a voice check-in, a validated decision is kept for good
+ * Drop the trace of a voice check-in
  * @param {string} id - Review identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<AcademyReviewView[]>} - Reviews
@@ -1455,7 +1454,7 @@ export const removeReview = async (
 }
 
 /**
- * Submit a check-in for decision, only possible once from a draft
+ * Submit a check-in for decision
  * @param {string} id - Review identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<AcademyReviewView[]>} - Reviews
@@ -1503,7 +1502,7 @@ const ensureTrainingsCleared = async (junior: {
 }
 
 /**
- * Decide a submitted check-in: the responsable keeps an outcome, or sends it back
+ * Decide a submitted check-in: the responsable keeps an outcome
  * @param {string} id - Review identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {string} decidedById - Who decided
@@ -1520,7 +1519,7 @@ export const decideReview = async (
   const existing = await reviewInScope(id, scope)
   if (existing.status !== ReviewStatuses.Submitted) throw conflict()
 
-  // Sent back to the trainer, back to a draft they can rework
+  // Sent back to the trainer
   if (readText(values, 'status') === ReviewStatuses.Rejected) {
     await prisma.academyReview.update({
       where: { id },
@@ -1564,7 +1563,7 @@ export const decideReview = async (
 /**
  * Shape one competency grade
  * @param {object} skill - Skill row with its category
- * @param {object} [grade] - Existing grade, absent means never touched
+ * @param {object} [grade] - Existing grade
  * @return {JuniorSkillView} - Skill view
  */
 
@@ -1605,7 +1604,7 @@ export const listJuniorSkills = async (
   const [skills, grades] = await Promise.all([
     prisma.skill.findMany({
       where: {
-        // Only the skills declared in code, retired rows left untouched
+        // Only the skills declared in code
         name: { in: [...LIBRARY_SKILL_NAMES] },
         OR: [{ functionId: null }, { functionId: junior.session.functionId }],
         AND: [{ OR: [{ dispositifId: null }, { dispositifId: junior.dispositifId }] }],
@@ -1678,7 +1677,7 @@ const toJuniorNote = (row: {
  * Read the notes kept on a junior's FSI
  * @param {string} juniorId - Junior identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
- * @return {Promise<JuniorNoteView[]>} - Notes, newest first
+ * @return {Promise<JuniorNoteView[]>} - Notes
  */
 
 export const listJuniorNotes = async (
@@ -1860,7 +1859,7 @@ const toJuniorObjectiveData = (values: FormValues) => ({
 })
 
 /**
- * Set a personal objective, unlocked once a junior reaches practice
+ * Set a personal objective
  * @param {string} juniorId - Junior identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {string} authorId - Who set it
@@ -1956,7 +1955,7 @@ export const reorderJuniorObjectives = async (
 }
 
 /**
- * Read one junior on their own, for the individual follow-up file
+ * Read one junior on their own
  * @param {string} id - Junior identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<{ junior: JuniorView, session: SessionSummary }>} - Junior and its session
@@ -1982,7 +1981,7 @@ export const readJunior = async (
 /**
  * Resolve the FSI a signed-in junior acts on
  * @param {string} accountId - Signed-in member identifier
- * @return {Promise<{ id: string, sessionId: string, dispositifId: string, session: { functionId: string } } | null>} - Active FSI, or none
+ * @return {Promise<{ id: string, sessionId: string, dispositifId: string, session: { functionId: string } } | null>} - Active FSI
  */
 
 export const resolveOwnJunior = async (
@@ -2003,7 +2002,7 @@ export const resolveOwnJunior = async (
 /**
  * Shape one training on a junior's own progression page
  * @param {object} training - Training row
- * @param {object} [record] - Existing attendance, absent means never touched
+ * @param {object} [record] - Existing attendance
  * @return {MyTrainingView} - Training view
  */
 
@@ -2039,7 +2038,7 @@ const toMyTraining = (
  * Read the trainings open to a junior's own function and dispositif
  * @param {string} accountId - Signed-in member identifier
  * @param {string} functionId - Function identifier
- * @param {string | null} dispositifId - Dispositif identifier, none picked yet
+ * @param {string | null} dispositifId - Dispositif identifier
  * @return {Promise<MyTrainingView[]>} - Trainings in display order
  */
 
@@ -2061,7 +2060,7 @@ export const myTrainings = async (
 /**
  * Clear the nearest open training moment logged on a junior's thread
  * @param {string} juniorId - Junior identifier
- * @return {Promise<void>} - Applied, a no-op when nothing is open
+ * @return {Promise<void>} - Applied
  */
 
 export const clearOpenTrainingStep = async (juniorId: string): Promise<void> => {
@@ -2080,7 +2079,7 @@ export const clearOpenTrainingStep = async (juniorId: string): Promise<void> => 
  * @param {string} accountId - Signed-in member identifier
  * @param {string} juniorId - FSI the move is stamped with
  * @param {MyTrainingAction} action - Move applied
- * @return {Promise<{ view: MyTrainingView, completed: boolean }>} - Updated training, and whether it just finished
+ * @return {Promise<{ view: MyTrainingView, completed: boolean }>} - Updated training
  */
 
 const applyMyTraining = async (
@@ -2123,7 +2122,7 @@ const applyMyTraining = async (
 }
 
 /**
- * Move a junior's own attendance on one training, refusing to touch anyone else's FSI
+ * Move a junior's own attendance on one training
  * @param {string} trainingId - Training identifier
  * @param {string} accountId - Signed-in member identifier
  * @param {MyTrainingAction} action - Move applied

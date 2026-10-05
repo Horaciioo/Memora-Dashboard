@@ -41,7 +41,7 @@ export const PATCH = createProtectedRoute({
       summary: ABSENCE_STATUS_REGISTRY.label(status),
     })
 
-    // Taken into account reads as a sentence of its own, the dates in it
+    // Taken into account reads as a sentence of its own
     const isApproved = status === AbsenceStatuses.Approved
 
     await notify({

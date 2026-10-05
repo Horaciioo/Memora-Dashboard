@@ -1,5 +1,5 @@
 /**
- * Timed lifetimes for ephemeral UI, in milliseconds
+ * Timed lifetimes for ephemeral UI
  * @type {Record<string, number>}
  */
 

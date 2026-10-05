@@ -1,7 +1,7 @@
 import type { Course } from '@/declarations/academy/curriculum/types'
 
 /**
- * Communication and posture course, built on the warnings the reference panel gives
+ * Communication and posture course
  * @type {Course}
  */
 

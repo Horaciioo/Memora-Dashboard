@@ -13,15 +13,15 @@ import { cn } from '@/utils/classnames'
 export interface CreatorPickerProps {
   creators: CreatorLead[]
   activeYoutuberId: string | null
-  // A sheet has room for a heading, the rail strip has not
+  // A sheet has room for a heading
   labelled?: boolean
-  // Sits beside the heading, e.g. a maturity tag
+  // Sits beside the heading
   labelSlot?: ReactNode
   onPicked?: () => void
 }
 
 /**
- * Portraits laid out side by side, the dead screen standing for no creator at all
+ * Portraits laid out side by side
  * @param {CreatorLead[]} creators - Creators the member may pick between
  * @param {string | null} activeYoutuberId - Creator the view is narrowed to
  * @param {boolean} [labelled] - Renders the heading above the portraits

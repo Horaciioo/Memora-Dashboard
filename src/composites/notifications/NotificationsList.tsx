@@ -9,9 +9,8 @@ export interface NotificationsListProps {
 }
 
 /**
- * Stack of notifications separated by an inset rule, only the freshest few carrying the way
- * in so a long list never turns into a wall of buttons
- * @param {NotificationEntry[]} entries - Notifications, newest first
+ * Stack of notifications separated by an inset rule
+ * @param {NotificationEntry[]} entries - Notifications
  * @param {(id: string) => void} onOpen - Called once a row is settled
  * @return {JSX.Element}
  */

@@ -35,8 +35,7 @@ interface NotificationTargetOption {
 }
 
 /*
- * A notification stores its target as a kind and an identifier, never a resolved path — the
- * route is rebuilt on read, so moving a page never leaves a stale link behind in the table.
+ * A notification stores its target as a kind and an identifier
  */
 
 const NOTIFICATION_TARGET_MAP: Record<NotificationTargetName, NotificationTargetOption> = {

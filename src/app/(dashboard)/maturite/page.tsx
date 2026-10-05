@@ -13,7 +13,7 @@ import { cn } from '@/utils/classnames'
 export const metadata: Metadata = { title: MATURITY_COPY.pageTitle }
 
 /**
- * Explains every feature maturity tag, one row per stage
+ * Explains every feature maturity tag
  * @return {Promise<JSX.Element>} - Maturity page
  */
 

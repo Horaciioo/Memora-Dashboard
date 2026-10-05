@@ -11,7 +11,7 @@ import type { LegacyStatusName } from '@/utils/constants/hierarchy'
  * @property {number} exercises - Exercises of the module
  * @property {number} cleared - Exercises cleared
  * @property {number} auto - Points from the exercises
- * @property {number | null} evaluator - Evaluator's note, none before it is given
+ * @property {number | null} evaluator - Evaluator's note
  * @property {number} total - Points once the evaluator's note is in
  * @property {boolean} passed - Reaches the pass mark
  * @property {string | null} gradedByName - Who gave the note

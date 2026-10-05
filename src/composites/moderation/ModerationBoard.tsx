@@ -46,9 +46,8 @@ export interface ModerationBoardProps {
 }
 
 /**
- * One offence as a box, a click opening its sheet and a manager's right click offering to
- * rename or drop it
- * @param {Object} props - Offence, permission and handlers
+ * One offence as a box
+ * @param {Object} props - Offence
  * @return {JSX.Element}
  */
 
@@ -124,7 +123,7 @@ const OffenseBox = ({
     </>
   )
 
-  // A box being renamed holds a field, so it cannot be a button
+  // A box being renamed holds a field
   return renaming ? (
     <div className={SANCTION_PANEL.card} style={accentVars(gravity.accent)}>
       {body}
@@ -145,7 +144,7 @@ const OffenseBox = ({
 /**
  * Sanction panel of the creator the member works for: the livecon in force on top, then every
  * offence of the member's surface as a box, each opening its full sheet
- * @param {ModerationBoardProps} props - Creator, levels, panel and permissions
+ * @param {ModerationBoardProps} props - Creator
  * @return {JSX.Element}
  */
 
@@ -169,7 +168,7 @@ export const ModerationBoard = ({
   const level = levels.find((entry) => entry.id === sanctions.panel.levelId) ?? levels[0]
   const needle = foldText(search.trim())
 
-  // Heaviest first, the offences under the search
+  // Heaviest first
   const offenses = useMemo(
     () =>
       [...sanctions.panel.offenses]

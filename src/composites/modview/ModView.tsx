@@ -61,11 +61,11 @@ export interface ModViewProps {
   levelIcon?: IconName | null
   // Inside a course: no rail taken, no page bleed, sanctions folded away
   embedded?: boolean
-  // Shown off on a page: no rail taken, sanctions kept
+  // Shown off on a page: no rail taken
   showcase?: boolean
-  // Windows kept, in a single row
+  // Windows kept
   only?: ModViewWindow[]
-  // A real live, its history view and team tools
+  // A real live
   live?: ModViewLiveTools
 }
 
@@ -77,7 +77,7 @@ interface PendingRung {
 }
 
 /**
- * Moderator view of one live, fed by a live or a scripted driver
+ * Moderator view of one live
  * @param {ModViewDriver} driver - Data source
  * @param {PermissionName[]} permissions - Held on this live
  * @param {SanctionPanelView | null} panel - Creator panel at the level in force
@@ -118,7 +118,7 @@ export const ModView = ({
     ? focus.focuses.find((entry) => entry.watcherId === live.viewerId)
     : undefined
 
-  // Every chatter on screen, by identifier
+  // Every chatter on screen
   const chatters = useMemo(() => {
     const known = new Map<string, Chatter>()
     for (const message of state.messages) known.set(message.author.id, message.author)
@@ -160,7 +160,7 @@ export const ModView = ({
     ]
   )
 
-  // A refused gesture never reaches the driver, a Focus in place notes who it was for
+  // A refused gesture never reaches the driver
   const act = useCallback(
     (intent: ModViewIntent, context: ActContext = {}) => {
       if (!gate(intent).allowed) return
@@ -176,7 +176,7 @@ export const ModView = ({
     [driver, gate, chatters, following, actInPlace]
   )
 
-  // The panel writes the line, the moderator rereads then sends it
+  // The panel writes the line
   const prefill = (
     offense: SanctionOffenseCard,
     rung: number,
@@ -187,7 +187,7 @@ export const ModView = ({
 
     const text = writeRungCommand(step, chatter.login, offense.name)
 
-    // A deletion has no command, the last line goes at once
+    // A deletion has no command
     if (!text) {
       const lastLine = [...state.messages]
         .reverse()
@@ -252,7 +252,7 @@ export const ModView = ({
   const writeDraft = (text: string) => {
     setDraft(text)
     setHint(null)
-    // Rewritten by hand, the line no longer stands for the panel
+    // Rewritten by hand
     if (!text.startsWith('/')) setPending(null)
   }
 

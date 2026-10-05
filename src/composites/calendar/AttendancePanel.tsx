@@ -18,7 +18,7 @@ export interface AttendancePanelProps {
   onRemind: () => void
 }
 
-// Order the standings read in, no-answers last
+// Order the standings read in
 const GROUPS: AttendanceStatusName[] = [
   AttendanceStatuses.Present,
   AttendanceStatuses.Absent,
@@ -28,8 +28,7 @@ const GROUPS: AttendanceStatusName[] = [
 const RollCallIcon = ICONS.meetings
 
 /**
- * Roll-call block of the detail modal — the viewer's own answer, the head count, and the
- * name lists once they are open to them
+ * Roll-call block of the detail modal — the viewer's own answer
  * @param {CalendarEntry} entry - Roll-call entry on screen
  * @param {boolean} pending - A mutation is in flight
  * @param {(status: AttendanceStatusName) => void} onRespond - Send Present or Absent

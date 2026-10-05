@@ -10,7 +10,7 @@ import { AUTH_COPY } from '@/declarations/ui/copy/auth'
 const INITIAL_STATE: LoginState = {}
 
 /**
- * Discord identifier form, the only way into the dashboard
+ * Discord identifier form
  * @return {JSX.Element}
  */
 

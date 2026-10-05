@@ -12,7 +12,7 @@ export type ChatBadge = 'broadcaster' | 'moderator' | 'vip' | 'bot' | 'subscribe
  * One person of the chat
  * @typedef {Object} Chatter
  * @property {string} id - Platform user identifier
- * @property {string} login - Login, lower case
+ * @property {string} login - Login
  * @property {string} name - Display name
  * @property {string | null} colour - Name colour picked on the platform
  * @property {ChatBadge[]} badges - Badges
@@ -38,9 +38,9 @@ export interface ChatMessage {
   sentAt: string
   // First message of this chatter on the channel
   isFirst?: boolean
-  // Removed by a moderator, kept greyed in place
+  // Removed by a moderator
   deletedBy?: string | null
-  // Words the automod would hold, drawn in red
+  // Words the automod would hold
   flagged?: string[]
   // Line a scene points at
   highlighted?: boolean
@@ -119,7 +119,7 @@ export interface ChatModes {
   subscribers: boolean
   followers: boolean
   emotes: boolean
-  // Seconds between two messages, off when null
+  // Seconds between two messages
   slowSeconds: number | null
 }
 
@@ -167,11 +167,11 @@ export interface ModViewState {
     bots: Chatter[]
     viewers: Chatter[]
   }
-  // Livecon level in force, 1 forbids public talk
+  // Livecon level in force
   liveconLevel: number | null
   // Scene-driven chat menu
   chatScript?: ChatScript
-  // Why the platform is out of reach, said in the rail
+  // Why the platform is out of reach
   notice?: string | null
   // Seen but not moderated from here
   readOnly?: boolean
@@ -230,7 +230,7 @@ export type ModViewTarget =
  * @property {string} [offenseId] - Panel offence applied
  * @property {number} [rung] - Panel rung applied
  * @property {string} [onBehalfOfId] - Member followed in Focus mode
- * @property {string} [targetLogin] - Viewer login, kept for the log
+ * @property {string} [targetLogin] - Viewer login
  */
 
 export interface ActContext {

@@ -70,7 +70,7 @@ export const PLATFORM_NOTICE_COPY = {
 } as const
 
 /**
- * Twitch refusals, in French
+ * Twitch refusals
  * @type {Record<string, string>}
  */
 

@@ -15,7 +15,7 @@ export interface LivePresentationProps {
 }
 
 /**
- * No live open: the Mod View shown alone, played on a scripted evening
+ * No live open: the Mod View shown alone
  * @param {SanctionPanelView | null} panel - A real creator panel
  * @param {string | null} levelName - Level the scene plays at
  * @param {string} actorName - Name the viewer acts under

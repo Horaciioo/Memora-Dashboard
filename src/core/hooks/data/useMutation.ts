@@ -25,7 +25,7 @@ export interface MutationState {
 }
 
 /**
- * Wrap a mutation with its loading, rejection and toast handling, counted by the query client
+ * Wrap a mutation with its loading
  * @return {MutationState} - Mutation state and runner
  */
 
@@ -60,7 +60,7 @@ export const useMutation = (): MutationState => {
 
         return result
       } catch (error) {
-        // Field rejections land on the form, anything else lands in a toast
+        // Field rejections land on the form
         if (error instanceof ApiClientError && error.issues.length > 0) {
           setIssues(error.issues.filter((issue): issue is FieldIssue => Boolean(issue.field)))
         } else {

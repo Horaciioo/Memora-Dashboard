@@ -22,7 +22,7 @@ export interface TrainingsWelcomeProps {
 }
 
 /**
- * First visit of the trainings page, three pages in the absence box pattern
+ * First visit of the trainings page
  * @param {number} mandatory - Mandatory courses of the member
  * @param {string} trade - Platform the member trains for
  * @return {JSX.Element | null}

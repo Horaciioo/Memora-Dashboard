@@ -74,7 +74,7 @@ const pruneActivityLogs = async (): Promise<number> => {
 const pruneRejectedCandidates = async (): Promise<number> => {
   const cutoff = horizon(RETENTION_POLICIES.rejectedCandidates)
 
-  // A candidate who joined the team is a member now, their file lives elsewhere
+  // A candidate who joined the team is a member now
   const { count } = await prisma.recruitmentCandidate.deleteMany({
     where: {
       updatedAt: { lt: cutoff },
@@ -86,8 +86,7 @@ const pruneRejectedCandidates = async (): Promise<number> => {
 }
 
 /**
- * Weigh what the stored binaries add to the database, and to every backup of it.
- * Reported rather than acted on: moving them out is an infrastructure decision
+ * Weigh what the stored binaries add to the database
  * @return {Promise<number>} - Bytes held
  */
 
@@ -123,7 +122,7 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     moderationLogs,
     candidates,
     files,
-    // Weighed after the sweep, so the number reflects what is actually kept
+    // Weighed after the sweep
     storedBytes: await storedBytes(),
   }
 

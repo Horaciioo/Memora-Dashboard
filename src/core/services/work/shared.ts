@@ -20,10 +20,9 @@ import type { WorkflowPhaseName, WorkflowScopeName } from '@/utils/constants/wor
 import type { Prisma } from '@prisma/client'
 
 /**
- * Narrow a people list to what a bounded viewer may pick — the encadrement always, plus
- * whoever posts for a creator in their perimeter
+ * Narrow a people list to what a bounded viewer may pick — the encadrement always
  * @param {AccessScope} [scope] - Viewer perimeter
- * @return {Prisma.AccountWhereInput} - Clause, empty for a global viewer
+ * @return {Prisma.AccountWhereInput} - Clause
  */
 
 export const peopleInScope = (scope?: AccessScope): Prisma.AccountWhereInput =>
@@ -63,7 +62,7 @@ export const toTag = (row: TagRow | null | undefined): WorkTag | null =>
     : null
 
 /**
- * Creator row shaped like a tag, portrait included
+ * Creator row shaped like a tag
  * @param {{ id: string, name: string, accent: string | null, avatarUrl: string | null } | null} row - Creator row
  * @return {WorkTag | null} - Tag or null
  */
@@ -74,7 +73,7 @@ export const toCreatorTag = (
   row ? { id: row.id, label: row.name, accent: row.accent, image: row.avatarUrl } : null
 
 /**
- * Project row shaped like a tag, glyph included
+ * Project row shaped like a tag
  * @param {{ id: string, title: string, emoji: string | null } | null} row - Project row
  * @return {WorkTag | null} - Tag or null
  */
@@ -194,7 +193,7 @@ export const stateOptions = async (scope: WorkflowScopeName): Promise<FieldOptio
 
 /**
  * Read the moderators that can be assigned
- * @param {AccessScope} [scope] - Viewer perimeter, unbounded when absent
+ * @param {AccessScope} [scope] - Viewer perimeter
  * @return {Promise<FieldOption[]>} - Select options
  */
 
@@ -213,7 +212,7 @@ export const memberOptions = async (scope?: AccessScope): Promise<FieldOption[]>
 
     return {
       disabled: isAbsent,
-      // The hint tells homonyms apart, unless the member is out and it carries that instead
+      // The hint tells homonyms apart
       hint: isAbsent
         ? MEMBER_COPY.absentHint.replace('{name}', row.displayName)
         : (toMemberFunctions(row.functions)[0]?.label ?? ROLE_REGISTRY.label(row.role)),
@@ -222,8 +221,8 @@ export const memberOptions = async (scope?: AccessScope): Promise<FieldOption[]>
 }
 
 /**
- * Read the moderators allowed to lead a team, responsables and admins only
- * @param {AccessScope} [scope] - Viewer perimeter, unbounded when absent
+ * Read the moderators allowed to lead a team
+ * @param {AccessScope} [scope] - Viewer perimeter
  * @return {Promise<FieldOption[]>} - Select options
  */
 
@@ -303,7 +302,7 @@ export const priorityOptions = async (): Promise<FieldOption[]> => {
 
 /**
  * Read the ongoing or planned projects of a perimeter
- * @param {AccessScope} [scope] - Viewer perimeter, unbounded when absent
+ * @param {AccessScope} [scope] - Viewer perimeter
  * @return {Promise<FieldOption[]>} - Select options
  */
 
@@ -332,7 +331,7 @@ export const projectOptions = async (scope?: AccessScope): Promise<FieldOption[]
 export const positionAt = (cards: { id: string; position: number }[], index: number): number => {
   const step = FORM_SETTINGS.positionStep
 
-  // Dropped above the first card, or on an empty column
+  // Dropped above the first card
   if (cards.length === 0) return step
   if (index <= 0) return cards[0].position - step
 

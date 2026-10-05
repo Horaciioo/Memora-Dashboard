@@ -9,9 +9,7 @@ import type { TrainingFeedbackSummary } from '@/types/academy'
  * @return {Promise<TrainingFeedbackSummary>} - Averages and comments
  */
 
-export const readFeedbackSummary = async (
-  trainingId: string
-): Promise<TrainingFeedbackSummary> => {
+export const readFeedbackSummary = async (trainingId: string): Promise<TrainingFeedbackSummary> => {
   const [averages, comments] = await Promise.all([
     prisma.trainingFeedback.aggregate({
       where: { trainingId },

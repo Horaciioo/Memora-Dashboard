@@ -64,7 +64,7 @@ export const seedQaAccount = async (): Promise<void> => {
   console.log(`Compte QA prêt : ${QA_NAME}, identifiant ${QA_DISCORD_ID}.`)
 }
 
-// Runs only when launched directly, not when another script imports it
+// Runs only when launched directly
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   seedQaAccount()
     .catch((error: unknown) => {

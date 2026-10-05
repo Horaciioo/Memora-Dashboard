@@ -25,7 +25,7 @@ export interface RecruitmentHeroProps {
 export const RecruitmentHero = ({ summary, candidates, outcomes }: RecruitmentHeroProps) => {
   const status = RECRUITMENT_STATUS_REGISTRY.get(summary.status)
 
-  // Share of the candidates under each outcome, the ones without kept apart
+  // Share of the candidates under each outcome
   const parts = [
     ...outcomes.map((outcome) => ({
       id: outcome.id,

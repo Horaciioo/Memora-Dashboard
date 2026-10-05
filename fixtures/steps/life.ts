@@ -27,7 +27,7 @@ const reviewersOf = (cast: Cast, person: Person): Person[] => {
 }
 
 /**
- * Write absences over the whole history, a few running today and some ahead
+ * Write absences over the whole history
  * @param {Cast} cast - People
  * @return {Promise<{ id: string, accountId: string, reviewerId: string | null, status: string }[]>} - Absences
  */
@@ -35,7 +35,7 @@ const reviewersOf = (cast: Cast, person: Person): Person[] => {
 export const seedAbsences = async (cast: Cast) => {
   const written: { id: string; accountId: string; reviewerId: string | null; status: string }[] = []
 
-  // The root admin takes time off too, so their own list is never empty
+  // The root admin takes time off too
   for (const person of [cast.root, ...cast.everyone]) {
     if (person.status === 'PENDING') continue
 
@@ -94,7 +94,7 @@ export const seedAbsences = async (cast: Cast) => {
     }
   }
 
-  // Someone is always away today, so the list shows the running state
+  // Someone is always away today
   for (const person of sample(
     cast.moderators.filter((entry) => entry.status === 'ACTIVE'),
     5
@@ -128,7 +128,7 @@ export const seedAbsences = async (cast: Cast) => {
 }
 
 /**
- * Write the livecon history of every creator, the current level left open
+ * Write the livecon history of every creator
  * @param {Reference} reference - Reference rows
  * @param {Cast} cast - People
  * @return {Promise<{ id: string, actorId: string | null, creatorId: string }[]>} - Entries
@@ -151,7 +151,7 @@ export const seedLivecon = async (reference: Reference, cast: Cast) => {
 
     while (offset < 0) {
       const next = offset + between(2, 12)
-      // Tight levels never last long, the corp goes back to normal
+      // Tight levels never last long
       level =
         level === 3
           ? weighted([
@@ -201,7 +201,7 @@ export const seedCalendar = async (reference: Reference, cast: Cast, work: Work)
   const live = template('Live')
   const rollCalls: { id: string; attendeeIds: string[] }[] = []
 
-  // Three to four lives a week per creator, eight weeks back and four ahead
+  // Three to four lives a week per creator
   for (const creator of reference.creators) {
     const owner =
       cast.responsables.find((person) => person.creators.includes(creator.id)) ?? cast.admins[1]
@@ -231,7 +231,7 @@ export const seedCalendar = async (reference: Reference, cast: Cast, work: Work)
     }
   }
 
-  // Monthly community events, spread over several days
+  // Monthly community events
   const community = template('Événement communautaire')
   for (let offset = -170; offset <= 40; offset += between(24, 36)) {
     const creator = pick(reference.creators)
@@ -257,7 +257,7 @@ export const seedCalendar = async (reference: Reference, cast: Cast, work: Work)
     })
   }
 
-  // Recruitment windows, only responsables see them
+  // Recruitment windows
   const recruitment = template('Période de recrutement')
   for (const offset of [-150, -80, -20, 25]) {
     await prisma.calendarEvent.create({
@@ -339,7 +339,7 @@ export const seedCalendar = async (reference: Reference, cast: Cast, work: Work)
     })
   }
 
-  // Roll calls on team events, some already answered, the coming ones waiting on the root admin
+  // Roll calls on team events
   for (const team of sample(cast.teams, Math.min(8, cast.teams.length))) {
     for (const offset of [between(-40, -5), between(1, 21)]) {
       const startsAt = day(offset, 20)

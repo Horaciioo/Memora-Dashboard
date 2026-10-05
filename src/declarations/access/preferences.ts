@@ -26,7 +26,7 @@ interface PreferenceOption {
 }
 
 /**
- * Colour vision mode, its attribute naming the SVG filter that simulates it
+ * Colour vision mode
  * @typedef {Object} ColorVisionOption
  * @property {string} label - Full label
  * @property {string} short - Caption of the segmented control

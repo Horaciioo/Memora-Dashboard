@@ -42,7 +42,7 @@ export const TourBlock = ({ block }: TourBlockProps) => {
     return () => window.clearTimeout(timer)
   }, [])
 
-  // Auto mode walks every stop, then stops
+  // Auto mode walks every stop
   useEffect(() => {
     if (!isAuto) return
 

@@ -44,7 +44,7 @@ export const DISCORD_ANCHOR_REGISTRY = createRegistry(DISCORD_ANCHOR_MAP)
 export const memberToken = (id: string): string => `<@${id}>`
 
 /**
- * Mentions every server knows, never configured
+ * Mentions every server knows
  * @type {readonly string[]}
  */
 

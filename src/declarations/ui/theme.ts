@@ -40,10 +40,10 @@ export interface ToneStyles {
 /**
  * Draw one tone from the theme format
  * @param {Object} parts - Tone tokens
- * @param {TokenRef} parts.fill - Full colour, also the default text and border
+ * @param {TokenRef} parts.fill - Full colour
  * @param {TokenRef} parts.soft - Tinted background
- * @param {TokenRef} [parts.text] - Foreground, defaults to fill
- * @param {TokenRef} [parts.border] - Border, defaults to fill
+ * @param {TokenRef} [parts.text] - Foreground
+ * @param {TokenRef} [parts.border] - Border
  * @return {ToneStyles} - Class set
  */
 
@@ -98,7 +98,7 @@ export const TONES: Record<Tone, ToneStyles> = {
 }
 
 /**
- * Icon per tone, read by the toaster and the overlay headers
+ * Icon per tone
  * @type {Record<Tone, IconName>}
  */
 
@@ -142,7 +142,7 @@ export const toTone = (accent: string | null | undefined, fallback: Tone = 'neut
   accent !== null && accent !== undefined && accent in TONES ? (accent as Tone) : fallback
 
 /**
- * Token drawing each tone, read when an accent still holds a tone key
+ * Token drawing each tone
  * @type {Record<Tone, string>}
  */
 
@@ -159,7 +159,7 @@ export const TONE_VARS: Record<Tone, string> = {
 }
 
 /**
- * Classes reading the accent custom property, the hexadecimal counterpart of TONES
+ * Classes reading the accent custom property
  * @type {Record<string, string>}
  */
 
@@ -202,7 +202,7 @@ export const accentVars = (
  * @property {string} soft - Tinted background class
  * @property {string} border - Border class
  * @property {string} dot - Status dot class
- * @property {CSSProperties} [style] - Custom property, only on a picked colour
+ * @property {CSSProperties} [style] - Custom property
  */
 
 export interface AccentPaint extends ToneStyles {
@@ -210,7 +210,7 @@ export interface AccentPaint extends ToneStyles {
 }
 
 /**
- * Paint a stored accent, whichever notation it holds
+ * Paint a stored accent
  * @param {string | null | undefined} accent - Stored accent
  * @param {Tone} [fallback] - Tone used when no colour is stored
  * @return {AccentPaint} - Classes and custom property

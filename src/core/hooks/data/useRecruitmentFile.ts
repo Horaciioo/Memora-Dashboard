@@ -19,12 +19,12 @@ const REVIEW = 'Bilan'
 const INSTRUCTIONS = 'Consignes'
 
 /**
- * One recruitment session file, its candidates, its timeline and its written traces
+ * One recruitment session file
  * @typedef {Object} RecruitmentFile
  * @property {string} instructions - Consignes in force
  * @property {CandidateView[]} candidates - Applicants held
  * @property {RecruitmentStepView[]} steps - Timeline moments
- * @property {IntegrationLinkView | null} link - Integration form handed out, if any
+ * @property {IntegrationLinkView | null} link - Integration form handed out
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {() => void} clearIssues - Forget the rejections
@@ -82,7 +82,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
   const [link, setLink] = useState(detail.link)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
-  // Every candidate mutation answers with the whole card, so one merge covers them all
+  // Every candidate mutation answers with the whole card
   const mergeCandidate = useCallback((saved: CandidateView) => {
     setCandidates((current) =>
       current.some((entry) => entry.id === saved.id)
@@ -257,7 +257,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     [run, sessionId]
   )
 
-  // Handing out the form also clears the step that carries it, both land at once
+  // Handing out the form also clears the step that carries it
   const emitLink = useCallback(
     async (values: FormValues) => {
       const emitted = await run(

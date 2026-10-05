@@ -5,14 +5,14 @@ import { PrismaClient } from '@prisma/client'
 try {
   process.loadEnvFile()
 } catch {
-  // No .env file, variables come from the environment
+  // No .env file
 }
 
 export const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 })
 
-// Every fixture row carries this prefix, the only rows the teardown ever deletes
+// Every fixture row carries this prefix
 export const FIXTURE_PREFIX = 'fx-'
 
 // Discord identifiers of fixture accounts and candidates start here

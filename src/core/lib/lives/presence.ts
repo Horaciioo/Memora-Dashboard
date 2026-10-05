@@ -13,8 +13,7 @@ export interface PresenceTally {
 }
 
 /**
- * Add one beat to a presence: the time since the previous beat counts as visible or active,
- * capped so a late beat never inflates the total
+ * Add one beat to a presence: the time since the previous beat counts as visible or active
  * @param {PresenceTally} tally - Presence
  * @param {Object} beat - Beat
  * @param {Date} beat.at - When

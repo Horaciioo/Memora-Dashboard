@@ -17,7 +17,7 @@ import { PREFERENCE_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 /**
- * Theme, text size and colour vision as cards
+ * Theme
  * @return {JSX.Element}
  */
 

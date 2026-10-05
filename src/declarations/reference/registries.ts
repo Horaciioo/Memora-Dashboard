@@ -36,7 +36,7 @@ const WORKFLOW_SCOPE_MAP: Record<WorkflowScopeName, LabelledOption> = {
 
 export const WORKFLOW_SCOPE_REGISTRY = createRegistry(WORKFLOW_SCOPE_MAP)
 
-// Declared in flow order, the done bucket driving what boards hide
+// Declared in flow order
 const WORKFLOW_PHASE_MAP: Record<WorkflowPhaseName, LabelledOption> = {
   [WorkflowPhases.Todo]: { label: 'À faire', accent: 'neutral' },
   [WorkflowPhases.Doing]: { label: 'En cours', accent: 'info' },

@@ -20,8 +20,8 @@ export interface HandleMatch {
 /**
  * Answer of an account lookup
  * @typedef {Object} HandleLookupResult
- * @property {HandleVerdict} verdict - Found, missing or unknown
- * @property {HandleMatch[]} matches - Accounts to pick from, none unless found
+ * @property {HandleVerdict} verdict - Found
+ * @property {HandleMatch[]} matches - Accounts to pick from
  */
 
 export interface HandleLookupResult {

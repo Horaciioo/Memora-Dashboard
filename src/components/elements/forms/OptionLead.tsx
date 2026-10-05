@@ -13,7 +13,7 @@ export interface OptionLeadProps {
 }
 
 /**
- * Start of an option row, the check standing where the mark would
+ * Start of an option row
  * @param {FieldOption} option - Option drawn
  * @param {OptionMarkKind} [mark] - Mark shape of the field
  * @param {boolean} isSelected - Option is chosen

@@ -11,7 +11,7 @@ export function formatNumber(num: number): string {
 }
 
 /**
- * Format with K, M, B units
+ * Format with K
  * @param {number} num - Number
  * @return {string} - Number with units
  */
@@ -42,7 +42,7 @@ export function formatNumberReadable(num: number): string {
   return formatNumber(num)
 }
 
-// Byte unit ladder, each rung a thousandfold of the one below
+// Byte unit ladder
 const BYTE_UNITS = ['o', 'ko', 'Mo', 'Go', 'To']
 
 const BYTE_STEP = 1000

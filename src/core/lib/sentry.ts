@@ -25,7 +25,7 @@ const isSensitive = (key: string): boolean => {
 }
 
 /**
- * Replace every sensitive value of one payload, however deep it sits
+ * Replace every sensitive value of one payload
  * @param {unknown} value - Payload
  * @param {number} [depth] - Remaining depth
  * @return {unknown} - Scrubbed payload
@@ -45,7 +45,7 @@ const scrub = (value: unknown, depth = SENTRY_SETTINGS.scrubDepth): unknown => {
 }
 
 /**
- * Start error reporting, doing nothing without a DSN
+ * Start error reporting
  * @return {void}
  */
 
@@ -60,7 +60,7 @@ export const initialiseSentry = (): void => {
     tracesSampleRate: SENTRY_SETTINGS.tracesSampleRate,
     sendDefaultPii: false,
     beforeSend: (event) => {
-      // Request bodies, headers and cookies never reach a third party
+      // Request bodies
       if (event.request) {
         delete event.request.cookies
         delete event.request.headers
@@ -105,7 +105,7 @@ export const captureMessage = (message: string, level?: Sentry.SeverityLevel): v
 }
 
 /**
- * Report a failing request, the identity staying a bare identifier
+ * Report a failing request
  * @param {unknown} error - Caught exception
  * @param {unknown} request - Failing request
  * @param {unknown} context - Where it failed
@@ -123,7 +123,7 @@ export const captureRequestError = (error: unknown, request: unknown, context: u
 }
 
 /**
- * Attach the current user, by identifier only
+ * Attach the current user
  * @param {?{ id: string }} user - Session user
  * @return {void}
  */

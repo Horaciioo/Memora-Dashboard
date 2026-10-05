@@ -18,8 +18,8 @@ import { cn } from '@/utils/classnames'
 const POOL = 'pool'
 
 /**
- * Sort exercise: items go into their column by dragging, or by touching an item then a column
- * @param {ExerciseViewProps} props - Block, answer, result and handlers
+ * Sort exercise: items go into their column by dragging
+ * @param {ExerciseViewProps} props - Block
  * @return {JSX.Element}
  */
 
@@ -131,8 +131,8 @@ export const SortExercise = ({
 }
 
 /**
- * Order exercise: items shuffled on screen, moved with the arrows or dragged into place
- * @param {ExerciseViewProps} props - Block, answer, result and handlers
+ * Order exercise: items shuffled on screen
+ * @param {ExerciseViewProps} props - Block
  * @return {JSX.Element}
  */
 
@@ -177,7 +177,7 @@ export const OrderExercise = ({
       title={block.title}
       result={result}
       isSaving={isSaving}
-      // The shuffled start already is an answer, sending it unchanged is allowed
+      // The shuffled start already is an answer
       canCheck
       onCheck={() => onCheck(current)}
       onRetry={onRetry}

@@ -24,7 +24,7 @@ export interface FileTabsProps {
   label: string
   tabs: FileTab[]
   initial?: string
-  // Lets a parent drive the open tab, e.g. a locked panel linking to another one
+  // Lets a parent drive the open tab
   value?: string
   onChange?: (value: string) => void
   // Strip centred over its panel
@@ -32,12 +32,11 @@ export interface FileTabsProps {
 }
 
 /**
- * Tab strip paired with the single panel it drives, a hidden tab never rendering its
- * panel so a permission is checked once rather than beside every block
+ * Tab strip paired with the single panel it drives
  * @param {string} label - Accessible name of the strip
  * @param {FileTab[]} tabs - Tabs in display order
- * @param {string} [initial] - Tab opened first, defaults to the first visible one
- * @param {string} [value] - Open tab, makes the strip controlled by its parent
+ * @param {string} [initial] - Tab opened first
+ * @param {string} [value] - Open tab
  * @param {(value: string) => void} [onChange] - Called when the open tab changes
  * @param {boolean} [centered] - Centres the strip
  * @return {JSX.Element}

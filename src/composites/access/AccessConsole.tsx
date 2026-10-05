@@ -36,7 +36,7 @@ export type AccessSelection =
   { kind: 'role'; role: RoleGrantsView } | { kind: 'function'; fn: FunctionGrantsView }
 
 /**
- * Identity glyph of the open row, nothing standing in when none was picked
+ * Identity glyph of the open row
  * @param {string | null} icon - Stored glyph key
  * @return {JSX.Element | null}
  */
@@ -70,7 +70,7 @@ export const AccessConsole = ({ initial, canManageEncadrement }: AccessConsolePr
   const [search, setSearch] = useState('')
   const [simulation, setSimulation] = useState<AccessSimulation | null>(null)
 
-  // Resolve the live row behind the pick, dropping it if a function was deleted
+  // Resolve the live row behind the pick
   const selection: AccessSelection | null = (() => {
     if (selectedId === null) return null
 

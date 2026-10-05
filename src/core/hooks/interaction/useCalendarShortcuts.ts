@@ -37,7 +37,7 @@ const isTyping = (target: EventTarget | null): boolean => {
 }
 
 /**
- * Calendar keyboard shortcuts, the Google Agenda ones
+ * Calendar keyboard shortcuts
  * @param {CalendarShortcutHandlers} handlers - What each key does
  * @return {void}
  */

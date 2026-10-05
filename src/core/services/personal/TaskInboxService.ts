@@ -62,7 +62,7 @@ const stepTask = (open: OpenStep): HomeTask => {
  * @param {string} input.context - Who or what it concerns
  * @param {PimDestinationName} input.destination - Where it gets done
  * @param {string} input.sessionId - Promotion
- * @param {string | null} input.juniorId - Junior, when one is concerned
+ * @param {string | null} input.juniorId - Junior
  * @param {string} input.description - What must happen
  * @return {HomeTask} - Task
  */
@@ -331,11 +331,10 @@ const trainingTasks = async (accountId: string): Promise<HomeTask[]> => {
 }
 
 /**
- * Everything waiting on the signed-in member: steps they carry, promotions to prepare and
- * trainings to finish
+ * Everything waiting on the signed-in member: steps they carry
  * @param {SessionUser} viewer - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
- * @return {Promise<HomeTask[]>} - Tasks, most pressing first
+ * @return {Promise<HomeTask[]>} - Tasks
  */
 
 export const myTasks = async (

@@ -28,7 +28,7 @@ import type { Prisma } from '@prisma/client'
 // A measure row with the fields every view reads
 type MeasureRow = Prisma.SanctionMeasureGetPayload<object>
 
-// Steps with their measures, in order
+// Steps with their measures
 const TIER_INCLUDE = {
   measures: { include: { measure: true }, orderBy: { position: 'asc' } },
 } satisfies Prisma.SanctionTierInclude
@@ -119,7 +119,7 @@ export const offenseFields = (): FieldDefinition[] => [
 
 /**
  * Read the measures a ladder may pick from
- * @return {Promise<SanctionMeasureView[]>} - Measures, lightest first
+ * @return {Promise<SanctionMeasureView[]>} - Measures
  */
 
 export const listMeasures = async (): Promise<SanctionMeasureView[]> => {
@@ -134,8 +134,7 @@ export const listMeasures = async (): Promise<SanctionMeasureView[]> => {
 }
 
 /**
- * Read the panel of one creator on one surface, tiles carrying their weight and what applies
- * on sight at the level read
+ * Read the panel of one creator on one surface
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} youtuberId - Creator
  * @param {SanctionPanelName} panel - Surface
@@ -180,7 +179,7 @@ export const readPanel = async (
 }
 
 /**
- * Read one offence in full, every level included
+ * Read one offence in full
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} id - Offence identifier
  * @return {Promise<SanctionOffenseDetail>} - Offence detail
@@ -303,7 +302,7 @@ export const removeOffense = async (scope: AccessScope, id: string): Promise<str
  * @param {string} id - Offence identifier
  * @param {string} levelId - Level the ladder belongs to
  * @param {SanctionGravityName} gravity - Weight at this level
- * @param {SanctionRungInput[]} steps - Steps, first applied first
+ * @param {SanctionRungInput[]} steps - Steps
  * @return {Promise<SanctionOffenseDetail>} - Offence detail
  */
 
@@ -342,7 +341,7 @@ export const replaceLadder = async (
 }
 
 /**
- * Seed the declared measures, an administrator staying free to edit them afterwards
+ * Seed the declared measures
  * @return {Promise<void>} - Seeded
  */
 
@@ -362,8 +361,7 @@ export const seedMeasures = async (): Promise<void> => {
 }
 
 /**
- * Clone the reference panel of one surface onto a creator. Safe to replay: an offence already
- * there is left untouched, unless the caller asks to start over from the reference
+ * Clone the reference panel of one surface onto a creator. Safe to replay: an offence already there is left untouched
  * @param {string} youtuberId - Creator receiving the panel
  * @param {SanctionPanelName} panel - Surface
  * @param {boolean} [replace] - Drop the current panel of this surface first
@@ -398,7 +396,7 @@ export const instantiatePanel = async (
     .map((seed, index) => ({ seed, index, name: forCreator(seed.name, creator.name) }))
     .filter((entry) => !known.has(entry.name))
 
-  // One offence at a time, each with its gravities and ladders on every level
+  // One offence at a time
   for (const { seed, index, name } of seeds) {
     const text = (value: string) => forCreator(value, creator.name)
 
@@ -443,11 +441,9 @@ export const instantiatePanel = async (
 }
 
 /**
- * Surface of each trade a member works, a junior function counting as the trade it trains for.
- * A trade owning several surfaces opens on the first, a member holding none reads the first
- * surface of all
+ * Surface of each trade a member works
  * @param {SessionUser} viewer - Signed-in member
- * @return {Promise<SanctionPanelName[]>} - Surfaces, registry order
+ * @return {Promise<SanctionPanelName[]>} - Surfaces
  */
 
 export const panelsFor = async (viewer: SessionUser): Promise<SanctionPanelName[]> => {

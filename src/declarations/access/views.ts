@@ -62,14 +62,14 @@ export const VIEW_ROLES: Record<NavigationViewName, MemberRoleName> = {
 }
 
 /**
- * Colour of the frame around the page, named for the level the member stands on
+ * Colour of the frame around the page
  * @typedef {'junior' | 'moderator' | 'lead' | 'admin'} ShellTone
  */
 
 export type ShellTone = 'junior' | 'moderator' | 'lead' | 'admin'
 
 /**
- * Frame tone of a view: a Junior keeps the original violet, a Moderator the pink, the lead
+ * Frame tone of a view: a Junior the deep orchid, a Moderator the pink, the lead
  * view orange and the admin view red
  * @param {NavigationViewName} view - View in force
  * @param {MemberRoleName | undefined} role - Level of the signed-in member

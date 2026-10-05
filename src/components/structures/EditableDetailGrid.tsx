@@ -13,18 +13,18 @@ import { cn } from '@/utils/classnames'
 const WIDE_KINDS = ['textarea', 'markdown']
 
 /**
- * One value of a detail sheet, editable in place once it carries a field declaration
+ * One value of a detail sheet
  * @typedef {Object} EditableEntry
  * @property {string} label - Field label
- * @property {FieldDefinition} [field] - Declaration driving the editor, absent for a static entry
- * @property {ReactNode} [display] - Read mode rendering, a dash once absent
+ * @property {FieldDefinition} [field] - Declaration driving the editor
+ * @property {ReactNode} [display] - Read mode rendering
  */
 
 export interface EditableEntry {
   label: string
   field?: FieldDefinition
   display?: ReactNode
-  // Runs edge to edge, long text does by default
+  // Runs edge to edge
   wide?: boolean
 }
 
@@ -33,20 +33,19 @@ export interface EditableDetailGridProps {
   values: FormValues
   issues: FieldIssue[]
   disabled?: boolean
-  // One column, for a narrow rail
+  // One column
   stacked?: boolean
   onCommit: (name: string, value: FieldValue) => Promise<boolean>
 }
 
-// Kinds that save themselves as soon as a choice is made, no blur or Enter needed
+// Kinds that save themselves as soon as a choice is made
 const AUTO_SAVE_KINDS = ['select', 'date', 'datetime', 'multiselect', 'tags', 'image']
 
 // Kinds that keep taking more entries after a save instead of closing straight away
 const STAY_OPEN_KINDS = ['multiselect', 'tags']
 
 /**
- * Two column sheet where every declared value doubles as its own editor — a click swaps the
- * read rendering for the field's real control, which saves the whole record on change or blur
+ * Two column sheet where every declared value doubles as its own editor — a click swaps the read rendering for the field's real control
  * @param {EditableEntry[]} entries - Labelled entries in display order
  * @param {FormValues} values - Current values
  * @param {FieldIssue[]} issues - Rejections returned by the server
@@ -117,7 +116,7 @@ export const EditableDetailGrid = ({
         const isEditing = editing === field.name
         const autoSaves = AUTO_SAVE_KINDS.includes(field.kind)
         const error = errorOf(field.name)
-        // A locked entry keeps its read rendering, so it never poses as a control
+        // A locked entry keeps its read rendering
         const isLocked = Boolean(disabled) || Boolean(field.readOnly)
 
         const onBlur = (event: FocusEvent<HTMLElement>) => {

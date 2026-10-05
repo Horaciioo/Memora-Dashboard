@@ -9,9 +9,9 @@ export interface SectionHeaderProps {
 }
 
 /**
- * Section title with an optional right-aligned action, used when the frame is drawn elsewhere
+ * Section title with an optional right-aligned action
  * @param {string} [title] - Section title
- * @param {ReactNode} [action] - Control rendered on the right, e.g. a button
+ * @param {ReactNode} [action] - Control rendered on the right
  * @return {JSX.Element}
  */
 

@@ -45,7 +45,7 @@ export const COURSE_PLAYER = {
   heroSummary: 'max-w-2xl text-base leading-relaxed text-white/90 sm:text-lg',
   heroMeta:
     'flex flex-wrap gap-x-5 gap-y-1 font-[family-name:var(--font-mono)] text-xs tracking-wide text-white/85 uppercase',
-  // One chapter at a time, sliding in from the side it came from
+  // One chapter at a time
   stage: 'flex min-w-0 flex-col gap-10',
   slideForward: 'course-slide-forward',
   slideBack: 'course-slide-back',
@@ -53,7 +53,7 @@ export const COURSE_PLAYER = {
   chapterCount: PROPERTY_LABEL,
   chapterTitle: 'text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl',
   blocks: 'flex flex-col gap-8',
-  // Reading column of an ordinary block, a Mod View one spreading past it
+  // Reading column of an ordinary block
   column: 'w-full max-w-3xl',
   // Thin rule that stops short of both edges
   foot: 'flex flex-col items-center gap-4 pb-6',
@@ -119,7 +119,7 @@ export const COURSE_CHAT = {
 } as const
 
 /**
- * Exercises, their frame and their inputs
+ * Exercises
  * @type {Record<string, string>}
  */
 
@@ -198,14 +198,14 @@ export const COURSE_EXERCISE = {
 
 export const COURSE_COMPLETE = {
   wrap: 'flex flex-col items-center gap-8 py-10 text-center',
-  // The name of the course, its check drawn in front then a line struck through
+  // The name of the course
   card: 'relative flex max-w-full items-center gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface px-6 py-5 shadow-[var(--shadow-md)]',
   mark: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-success)] text-white',
   markIcon: 'h-6 w-6',
   name: 'relative text-lg font-bold tracking-tight text-balance sm:text-2xl',
   strike: 'course-strike absolute top-1/2 left-0 h-0.5 w-full origin-left bg-[var(--color-ink)]',
   title: 'course-bravo max-w-xl text-2xl font-bold tracking-tight text-balance sm:text-3xl',
-  // Bubble that pops in last, pointing back at the message
+  // Bubble that pops in last
   bubble:
     'course-bubble relative flex max-w-md items-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-info-soft)] px-5 py-3 text-sm font-semibold text-[var(--color-info)] shadow-[var(--shadow-sm)]',
   bubbleTail:
@@ -250,7 +250,7 @@ export const LEGACY_TRACK = {
   gauge: 'w-full',
   gaugeTrack: 'stroke-[var(--color-border)]',
   gaugeFill:
-    'stroke-[var(--color-brand-600)] transition-[stroke-dasharray] duration-[1100ms] ease-out',
+    'stroke-[var(--color-brand-600)] transition-[stroke-dasharray] duration-[var(--motion-duration-celebrate)] ease-out',
   gaugeFillDone: 'stroke-[var(--color-success)]',
   gaugeMark: 'stroke-[var(--color-ink)]',
   gaugeFigure: 'fill-[var(--color-ink)] text-[84px] font-bold tracking-tighter',
@@ -303,7 +303,7 @@ export const COURSE_TIMELINE = {
 } as const
 
 /**
- * Chapters listed in the left sidebar while a course is open, upright and still
+ * Chapters listed in the left sidebar while a course is open
  * @type {Record<string, string>}
  */
 
@@ -329,7 +329,7 @@ export const COURSE_RAIL = {
 } as const
 
 /**
- * Colour families of the illustrations, a soft disc and its ink
+ * Colour families of the illustrations
  * @type {Record<string, string>}
  */
 
@@ -343,7 +343,7 @@ export const COURSE_TONES = {
 } as const
 
 /**
- * Key points, diagrams and do and don't blocks
+ * Key points
  * @type {Record<string, string>}
  */
 

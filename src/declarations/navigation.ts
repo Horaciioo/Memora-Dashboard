@@ -76,7 +76,7 @@ export const NavigationViews = {
 export type NavigationViewName = (typeof NavigationViews)[keyof typeof NavigationViews]
 
 /**
- * Views, narrowest first
+ * Views
  * @type {NavigationViewName[]}
  */
 
@@ -104,7 +104,7 @@ export const isNavigationView = (candidate: string | undefined): candidate is Na
   candidate !== undefined && NAVIGATION_VIEW_ORDER.includes(candidate as NavigationViewName)
 
 /**
- * Walk the reachable views in order, wrapping back to the narrowest one
+ * Walk the reachable views in order
  * @param {NavigationViewName} view - View on screen
  * @param {NavigationViewName[]} available - Views the member may switch between
  * @return {NavigationViewName} - View the switch lands on
@@ -117,7 +117,7 @@ export const nextNavigationView = (
   available.length === 0 ? view : available[(available.indexOf(view) + 1) % available.length]
 
 /**
- * Rule showing an entry, met by either list
+ * Rule showing an entry
  * @typedef {Object} NavigationCondition
  * @property {MemberStatusName[]} [statuses] - Statuses the entry is meant for
  * @property {MemberRoleName[]} [roles] - Roles the entry is meant for
@@ -131,8 +131,8 @@ export interface NavigationCondition {
 /**
  * Placement of an entry on the floating mobile nav pill
  * @typedef {Object} MobileNavSlot
- * @property {'home' | 'primary'} slot - Home sits centred, primary either side of it
- * @property {number} order - Rank among every primary entry, lowest shown first
+ * @property {'home' | 'primary'} slot - Home sits centred
+ * @property {number} order - Rank among every primary entry
  */
 
 export interface MobileNavSlot {
@@ -141,7 +141,7 @@ export interface MobileNavSlot {
 }
 
 /**
- * Query flag naming the course just finished, read by the catalogue
+ * Query flag naming the course just finished
  * @type {string}
  */
 
@@ -153,7 +153,7 @@ export const TRAININGS_DONE_PARAM = 'achevee'
  * @property {string} href - Destination
  * @property {string} label - Display label
  * @property {IconName} icon - Icon key
- * @property {NavigationViewName} [from] - Narrowest view, defaults to the group's own
+ * @property {NavigationViewName} [from] - Narrowest view
  * @property {PermissionName} [permission] - Permission needed
  * @property {NavigationCondition} [visibleWhen] - Display rule
  * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
@@ -214,7 +214,7 @@ export const matchesNavigation = (
 }
 
 /**
- * Group belongs on the rail, an explicit hide winning over the floor
+ * Group belongs on the rail
  * @param {NavigationGroup} group - Navigation group
  * @param {NavigationViewName} view - Rail view on screen
  * @return {boolean} - Group belongs on the rail
@@ -224,7 +224,7 @@ export const groupInView = (group: NavigationGroup, view: NavigationViewName): b
   viewDepth(view) >= viewDepth(group.from) && !group.hiddenIn?.includes(view)
 
 /**
- * Entry belongs on the rail, its own floor winning over the group's
+ * Entry belongs on the rail
  * @param {NavigationItem} item - Navigation entry
  * @param {NavigationGroup} group - Group holding it
  * @param {NavigationViewName} view - Rail view on screen
@@ -253,7 +253,7 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'liveDot',
         permission: Permissions.LiveRead,
         onlyLive: true,
-        // Always there, it shows the Mod View until a live opens
+        // Always there
         alwaysFor: Permissions.LiveRead,
         mobile: { slot: 'primary', order: 0 },
       },
@@ -278,7 +278,7 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Formations',
         icon: 'academy',
         permission: Permissions.AcademyTrainingComplete,
-        // Juniors train, the encadrement previews
+        // Juniors train
         visibleWhen: { statuses: ['ACADEMY'], roles: ['ADMIN', 'RESPONSABLE'] },
       },
       {
@@ -354,7 +354,7 @@ export const NAVIGATION: NavigationGroup[] = [
   {
     label: 'Modération',
     from: NavigationViews.Moderation,
-    // Off the responsable view, kept for the modération and admin ones
+    // Off the responsable view
     hiddenIn: [NavigationViews.Lead],
     items: [
       {
@@ -442,7 +442,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
 }
 
 /**
- * Stand-in for a record until its name loads, keyed by the segment above it
+ * Stand-in for a record until its name loads
  * @type {Record<string, string>}
  */
 
@@ -501,8 +501,7 @@ export interface MobileNavigation {
 }
 
 /**
- * Pick Accueil and its ranked neighbours for the nav pill — anything left out is still
- * reachable through the more sheet, which reads the full visibleNavGroups on its own
+ * Pick Accueil and its ranked neighbours for the nav pill — anything left out is still reachable through the more sheet
  * @param {NavigationViewName} view - Rail view on screen
  * @param {Object} member - Signed-in member
  * @param {MemberStatusName} member.status - Membership status

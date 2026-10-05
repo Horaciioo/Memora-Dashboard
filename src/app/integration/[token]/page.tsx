@@ -33,7 +33,7 @@ const readFailure = (raw: string | string[] | undefined): IntegrationErrorName |
 }
 
 /**
- * Public integration form, reachable without a session
+ * Public integration form
  * @param {Object} context - Route context
  * @param {Promise<{ token: string }>} context.params - Dynamic segments
  * @param {Promise<Record<string, string | string[] | undefined>>} context.searchParams - Query
@@ -58,7 +58,7 @@ export default async function IntegrationPage({
     )
   }
 
-  // The identity is read from the ticket the server itself wrote, never from the URL
+  // The identity is read from the ticket the server itself wrote
   const cookieStore = await cookies()
   const ticket = unpackTicket(cookieStore.get(INTEGRATION_TICKET_COOKIE)?.value)
 

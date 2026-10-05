@@ -111,7 +111,7 @@ export const useJuniorFile = (
   const [reviews, setReviews] = useState(initialReviews)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
-  // Every junior mutation answers with the whole session, so the file picks its own row back
+  // Every junior mutation answers with the whole session
   const pickSelf = useCallback((rows: JuniorView[] | null, id: string) => {
     const mine = rows?.find((row) => row.id === id)
     if (mine) setJunior(mine)

@@ -19,9 +19,9 @@ export interface AttendancePerson {
 }
 
 /**
- * Roll-call standings attached to an entry, resolved per viewer
+ * Roll-call standings attached to an entry
  * @typedef {Object} AttendanceRoster
- * @property {AttendanceStatusName | null} mine - Viewer's own answer, null when not convened
+ * @property {AttendanceStatusName | null} mine - Viewer's own answer
  * @property {boolean} canManage - Viewer runs this roll-call
  * @property {boolean} visible - Viewer may see the name lists
  * @property {{ present: number, absent: number, pending: number }} counts - Head count per answer
@@ -41,9 +41,9 @@ export interface AttendanceRoster {
 }
 
 /**
- * Entry shown on the shared calendar, whichever domain it was read from
+ * Entry shown on the shared calendar
  * @typedef {Object} CalendarEntry
- * @property {string} id - Entry identifier, prefixed on a projection
+ * @property {string} id - Entry identifier
  * @property {CalendarSourceName} source - Domain the entry was read from
  * @property {CalendarKindName} kind - Shape it draws as
  * @property {string} title - Display title
@@ -53,7 +53,7 @@ export interface AttendanceRoster {
  * @property {string | null} templateName - Template label
  * @property {string | null} accent - Colour of the creator it belongs to
  * @property {string | null} youtuberId - Creator it belongs to
- * @property {boolean} muted - Drawn in retreat, greyed behind everything else
+ * @property {boolean} muted - Drawn in retreat
  * @property {EventVisibilityName} visibility - Who the entry is shown to
  * @property {string} startsAt - ISO start
  * @property {string | null} endsAt - ISO end
@@ -64,10 +64,10 @@ export interface AttendanceRoster {
  * @property {string | null} body - Markdown content of that record
  * @property {{ emoji: string | null, title: string }[]} [topics] - Meeting subject titles
  * @property {string | null} [minutes] - Meeting write-up
- * @property {boolean} readOnly - Projected from another domain, never edited here
+ * @property {boolean} readOnly - Projected from another domain
  * @property {boolean} rollCall - Asks its convened members to confirm presence
  * @property {boolean} rosterShared - Convened members may see the answers
- * @property {AttendanceRoster | null} attendance - Roll-call standings, null when not a roll-call
+ * @property {AttendanceRoster | null} attendance - Roll-call standings
  * @property {FormValues} values - Values feeding the edit form
  */
 

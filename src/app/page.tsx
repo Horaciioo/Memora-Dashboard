@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { ROUTES } from '@/declarations/navigation'
 
 /**
- * Entry point, everyone lands on their own dashboard
+ * Entry point
  * @return {never} - Redirect
  */
 

@@ -24,9 +24,9 @@ import { aimedPhrase } from '@/utils/format/grammar'
 
 export interface FormDrawerProps {
   open: boolean
-  // Action carried, e.g. "Nouvelle tâche"
+  // Action carried
   title: string
-  // Record written, naming the glyph and the closing gestures
+  // Record written
   subject: FormSubject
   description?: string
   // Visible context line shown above the fields
@@ -35,7 +35,7 @@ export interface FormDrawerProps {
   initialValues?: FormValues
   issues: FieldIssue[]
   isSaving: boolean
-  // Verb of the confirming line, "Enregistrer" by default
+  // Verb of the confirming line
   submitVerb?: string
   // Settings rows
   layout?: 'grid' | 'rows'
@@ -60,15 +60,14 @@ const presetContext = (actorId: string | null): PresetContext => {
 }
 
 /**
- * Form engine in a page drawer, one section of fields at a time, the last one closing on
- * save and cancel
+ * Form engine in a page drawer
  * @param {boolean} open - Drawer is mounted
  * @param {string} title - Action carried
  * @param {FormSubject} subject - Record written
  * @param {string} [description] - Screen reader only
  * @param {string} [note] - Visible context line above the fields
  * @param {FieldDefinition[]} fields - Field declarations
- * @param {FormValues} [initialValues] - Known values, presets fill the rest
+ * @param {FormValues} [initialValues] - Known values
  * @param {FieldIssue[]} issues - Rejections returned by the server
  * @param {boolean} isSaving - Submission in flight
  * @param {string} [submitVerb] - Confirming verb
@@ -134,7 +133,7 @@ export const FormDrawer = ({
 
   const [trail, setTrail] = useState({ issues, open, group: groups[0]?.name ?? '' })
 
-  // Reopening starts on the first section, a rejection jumps to the flagged one
+  // Reopening starts on the first section
   if (trail.issues !== issues || trail.open !== open) {
     const flagged = tabs.find((tab) => tab.flagged)
     setTrail({

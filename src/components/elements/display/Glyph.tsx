@@ -8,9 +8,9 @@ export interface GlyphProps {
 }
 
 /**
- * Emoji of a record, drawn bare beside its title and never inside a frame
+ * Emoji of a record
  * @param {string | null} value - Stored glyph
- * @param {GlyphSize} [size] - Text size, card by default
+ * @param {GlyphSize} [size] - Text size
  * @param {string} [className] - Extra classes merged onto the glyph
  * @return {JSX.Element | null}
  */

@@ -1,7 +1,7 @@
 import type { ModerationKind } from '@prisma/client'
 
 /**
- * One moderation gesture as Twitch reports it, for the log
+ * One moderation gesture as Twitch reports it
  * @typedef {Object} PlatformLogEntry
  */
 
@@ -18,7 +18,7 @@ export interface PlatformLogEntry {
   occurredAt: string
 }
 
-// Loose payload, every field checked before use
+// Loose payload
 type Payload = Record<string, unknown>
 
 // Chat setting actions of channel.moderate
@@ -44,7 +44,7 @@ const child = (payload: Payload, key: string): Payload => {
 }
 
 /**
- * Kind of a channel.moderate action, none for an unlogged one
+ * Kind of a channel.moderate action
  * @param {string} action - Twitch action
  * @param {Payload} event - Event
  * @return {ModerationKind | null} - Kind
@@ -75,7 +75,7 @@ const kindOf = (action: string, event: Payload): ModerationKind | null => {
 }
 
 /**
- * Read a log line out of an EventSub notification, none for what is not a gesture
+ * Read a log line out of an EventSub notification
  * @param {string} type - Subscription type
  * @param {Payload} event - Event
  * @param {{ id: string, at: string }} meta - Notification identifier and time

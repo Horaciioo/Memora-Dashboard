@@ -32,7 +32,7 @@ interface Watch {
   offline: ReturnType<typeof setTimeout> | null
 }
 
-// Survives dev hot reloads, one watcher per process
+// Survives dev hot reloads
 const globalForWatcher = globalThis as unknown as {
   liveWatcher?: { watches: Map<string, Watch>; timer: ReturnType<typeof setInterval> | null }
 }
@@ -96,7 +96,7 @@ const handleSignal = async (liveId: string, signal: TwitchSignal): Promise<void>
 /**
  * Start watching one live with the first member able to carry it
  * @param {Object} live - Live coordinates
- * @return {Promise<void>} - Watching, or the reason told
+ * @return {Promise<void>} - Watching
  */
 
 const watch = async (live: {
@@ -116,7 +116,7 @@ const watch = async (live: {
     return
   }
 
-  // The coordinator first, then the announcer, then the team
+  // The coordinator first
   const candidates = [
     ...new Set(
       [
@@ -226,7 +226,7 @@ export const syncLiveWatches = async (): Promise<void> => {
 }
 
 /**
- * Keep the open lives watched, every few seconds
+ * Keep the open lives watched
  * @return {void}
  */
 

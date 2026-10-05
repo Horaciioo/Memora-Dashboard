@@ -25,7 +25,7 @@ export const GET = createRedirectRoute({
   rateLimit: 'signIn',
   descriptor: { summary: 'Finish the Discord sign-in flow', tags: ['auth'] },
   onFailure: async (error, params) => {
-    // A link's round trip owns its own failure screen, the sign-in page owns the other
+    // A link's round trip owns its own failure screen
     const cookieStore = await cookies()
     const ticket = unpackTicket(cookieStore.get(INTEGRATION_TICKET_COOKIE)?.value)
 
@@ -48,7 +48,7 @@ export const GET = createRedirectRoute({
     const grant = await exchangeCode(code, handshake.codeVerifier)
     const identity = await readDiscordUser(grant.accessToken)
 
-    // A link only ever needs the identity, it never opens a session
+    // A link only ever needs the identity
     if (ticket) {
       const claimId = await claimIdentity(ticket.token, identity)
 
@@ -63,7 +63,7 @@ export const GET = createRedirectRoute({
       return ROUTES.integration(ticket.token)
     }
 
-    // Discord proves who they are, the dashboard decides whether they may enter
+    // Discord proves who they are
     const account = await resolveDiscordAccount(identity)
     if (!account) throw notAuthenticated(SIGN_IN_ERRORS.Unknown)
     if (GONE_MEMBER_STATUSES.includes(account.status))

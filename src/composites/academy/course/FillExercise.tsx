@@ -14,9 +14,8 @@ import { COURSE_EXERCISE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 /**
- * Gap text: a sentence with holes to fill, from a menu when a word bank is offered and by typing
- * otherwise
- * @param {ExerciseViewProps} props - Block, answer, result and handlers
+ * Gap text: a sentence with holes to fill
+ * @param {ExerciseViewProps} props - Block
  * @return {JSX.Element}
  */
 

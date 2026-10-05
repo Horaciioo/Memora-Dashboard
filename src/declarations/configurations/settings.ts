@@ -44,7 +44,7 @@ import {
 const readNumber = (value: unknown, fallback: number): number =>
   typeof value === 'number' && Number.isFinite(value) ? value : fallback
 
-// Breakpoint keys, narrowest first
+// Breakpoint keys
 const BREAKPOINT_NAMES = ['sm', 'md', 'lg', 'xl'] as const
 
 const maxPerPage = readInteger(pagination.maxPerPage, {
@@ -1005,7 +1005,7 @@ export const RETENTION_SETTINGS = {
 }
 
 /**
- * Request time limits, in milliseconds
+ * Request time limits
  * @type {{ readMs: number, writeMs: number, externalMs: number }}
  */
 
@@ -1124,7 +1124,7 @@ export const GESTURE_SETTINGS = {
 } as const
 
 /**
- * Legacy track: points, thresholds and length
+ * Legacy track: points
  * @type {{ modulePoints: number, modulesToPass: number, pointsToPass: number, modulePassPoints: number, evaluatorSharePercent: number, minWeeks: number, maxWeeks: number }}
  */
 
@@ -1149,7 +1149,7 @@ export const LEGACY_SETTINGS = {
     fallback: 70,
     min: 1,
   }),
-  // Share of a module total given by the evaluator, the exercises making up the rest
+  // Share of a module total given by the evaluator
   evaluatorSharePercent: readInteger(legacy.evaluatorSharePercent, {
     path: 'system/legacy.evaluatorSharePercent',
     fallback: 40,

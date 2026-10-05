@@ -23,7 +23,7 @@ export const PATCH = createProtectedRoute({
 
     const juniors = await updateJunior(params.id, academyScope(session, access), parsed.values)
 
-    // Only a real transition is journalled, a plain re-save is not a step forward
+    // Only a real transition is journalled
     const next = juniors.find((entry) => entry.id === params.id)
     if (next && next.status !== junior.status) {
       await recordEvent({

@@ -10,7 +10,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const metadata: Metadata = { title: RECRUITMENT_COPY.title }
 
 /**
- * Recruitment board, one card per session
+ * Recruitment board
  * @return {Promise<JSX.Element>} - Recruitments page
  */
 

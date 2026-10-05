@@ -21,7 +21,7 @@ export interface DetailGridProps {
 }
 
 /**
- * Two column read-only sheet, an empty value rendered as a dash rather than a blank
+ * Two column read-only sheet
  * @param {DetailEntry[]} entries - Labelled values in display order
  * @return {JSX.Element}
  */

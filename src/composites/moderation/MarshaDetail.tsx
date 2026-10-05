@@ -13,7 +13,7 @@ export interface MarshaDetailProps {
 }
 
 /**
- * Written form of a command, required arguments in angles and optional ones in brackets
+ * Written form of a command
  * @param {MarshaCommand} command - Command
  * @return {string} - Syntax
  */
@@ -25,7 +25,7 @@ const syntaxOf = (command: MarshaCommand): string =>
   ].join(' ')
 
 /**
- * Example as it looks once typed in Discord: the command, the members as mentions
+ * Example as it looks once typed in Discord: the command
  * @param {string} example - Text of the example
  * @return {JSX.Element}
  */

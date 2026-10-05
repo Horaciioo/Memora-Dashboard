@@ -47,7 +47,7 @@ const waitingState = (live: LiveView): ModViewState => ({
 })
 
 /**
- * Official Twitch player of a channel, muted
+ * Official Twitch player of a channel
  * @param {string} login - Channel login
  * @return {string} - Player URL
  */
@@ -74,7 +74,7 @@ export const useLiveModView = (live: LiveView): ModViewDriver => {
   const [state, setState] = useState<ModViewState>(() => waitingState(live))
   const { run } = useMutation()
 
-  // Snapshot, read again after each reconnection to catch up
+  // Snapshot
   const load = useCallback(
     () =>
       apiGet<{ state: ModViewState; channelLogin: string | null }>(API_ROUTES.liveModView(live.id))

@@ -17,7 +17,7 @@ import type { ChatBadge, ChatMessage, Chatter, ModViewState, ModViewTarget } fro
 import { cn } from '@/utils/classnames'
 import { formatClock } from '@/utils/format/modview'
 
-// Badge glyphs, drawn before the name
+// Badge glyphs
 const BADGE_ICONS: Record<ChatBadge, IconName> = {
   broadcaster: 'broadcaster',
   moderator: 'shield',
@@ -35,7 +35,7 @@ export interface ChatWindowProps {
   gate: GateCheck
   onAct: ActRunner
   onPick: (chatter: Chatter) => void
-  // Line being typed, the panel may write it
+  // Line being typed
   draft: string
   onDraft: (text: string) => void
   onSend: (text: string) => void
@@ -44,7 +44,7 @@ export interface ChatWindowProps {
 }
 
 /**
- * Live chat, its modes and its gestures
+ * Live chat
  * @param {ModViewState} state - Mod View state
  * @param {ModViewTarget | null} spotlight - Part lit by a scene
  * @param {GateCheck} gate - Permission check
@@ -96,10 +96,10 @@ export const ChatWindow = ({
     setFollowing(list.scrollHeight - list.scrollTop - list.clientHeight < FOLLOW_SLACK)
   }
 
-  // A command is gated as the gesture it carries, a plain line as a message
+  // A command is gated as the gesture it carries
   const isCommand = draft.trim().startsWith('/')
   const sayGate = isCommand ? { allowed: true, reason: null } : gate({ kind: 'say', text: draft })
-  // Commands stay open where talking is closed, Livecon 1 included
+  // Commands stay open where talking is closed
   const canCommand = gate({ kind: 'ban', chatterId: '', reason: null }).allowed
   const activeModes = CHAT_MODES.keys.filter((mode) =>
     mode === 'slow' ? state.modes.slowSeconds !== null : state.modes[mode]
@@ -252,7 +252,7 @@ const ChatLine = ({ message, options, gate, onAct, onPick }: ChatLineProps) => {
   const isDeleted = Boolean(message.deletedBy)
   const isFirst = message.isFirst && options.firstMessages
 
-  // Three quick gestures, each behind its own gate
+  // Three quick gestures
   const tools = [
     {
       icon: 'modDelete' as const,

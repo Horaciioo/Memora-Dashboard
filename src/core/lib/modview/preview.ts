@@ -11,13 +11,13 @@ import type { PermissionName } from '@/utils/constants/permissions'
 
 export type PreviewSeat = MemberRoleName | 'COORDINATOR'
 
-// Live grants as declared, floor role included everywhere
+// Live grants as declared
 const LIVE_GRANTS =
   GRANT_ADDITIONS.find((addition) => addition.key === 'live-modview')?.grants ?? {}
 const FLOOR = LIVE_GRANTS[MemberRoles.Moderateur] ?? []
 
 /**
- * Permissions a seat holds on a live, as declared in code
+ * Permissions a seat holds on a live
  * @param {PreviewSeat} seat - Seat
  * @return {PermissionName[]} - Permissions
  */

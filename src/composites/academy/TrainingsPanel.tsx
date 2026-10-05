@@ -20,7 +20,7 @@ export interface TrainingsPanelProps {
   initialTrainings: MyTrainingView[]
 }
 
-// One training row, its status badge and the actions its state allows
+// One training row
 const TrainingRow = ({
   training,
   isSaving,
@@ -125,7 +125,7 @@ const TrainingRow = ({
 }
 
 /**
- * A junior's own training progression — list, actions, and the content placeholder
+ * A junior's own training progression — list
  * @param {MyTrainingView[]} initialTrainings - Trainings resolved server-side
  * @return {JSX.Element}
  */

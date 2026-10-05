@@ -7,7 +7,7 @@ import type { SceneControls } from '@/core/hooks/interaction/useModViewScene'
 import type { DiscordReplicaState, DiscordSceneStep } from '@/types/replicas'
 
 /**
- * Play a Discord scene, steps appended later continuing from where it stands
+ * Play a Discord scene
  * @param {DiscordReplicaState} initial - State at the start
  * @param {DiscordSceneStep[]} steps - Beats in time order
  * @param {Object} [options] - Playback options

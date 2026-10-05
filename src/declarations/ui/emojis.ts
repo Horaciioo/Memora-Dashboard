@@ -33,9 +33,7 @@ export interface EmojiGroup {
 }
 
 /**
- * Glyphs offered by the picker, in keyboard order, the Unicode release the file
- * names. Country flags, skin tones and joined sequences stay out: they are the
- * ones systems disagree on
+ * Glyphs offered by the picker
  * @type {EmojiGroup[]}
  */
 

@@ -4,7 +4,7 @@ const SOURCE = new URL('../src/', import.meta.url)
 const EXTENSIONS = ['.ts', '/index.ts']
 
 /**
- * First file a bare module path points at, extension added
+ * First file a bare module path points at
  * @param {URL} base - Path without extension
  * @return {string | null} - File URL
  */

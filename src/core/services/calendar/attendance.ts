@@ -26,11 +26,11 @@ type AttendanceRow = Prisma.EventAttendanceGetPayload<{
 }>
 
 /**
- * Read the members a roll-call convenes, teams expanded and everyone deduplicated
+ * Read the members a roll-call convenes
  * @param {string[]} teamIds - Convened teams
  * @param {string[]} memberIds - Members named on top of the teams
  * @param {AccessScope} scope - Creator perimeter
- * @param {Date} startsAt - Start of the event, a member on a Legacy track over it being released
+ * @param {Date} startsAt - Start of the event
  * @return {Promise<string[]>} - Account identifiers
  */
 
@@ -71,7 +71,7 @@ export const expandRoster = async (
 }
 
 /**
- * Add the missing roster rows, an edit only ever widening the roll-call
+ * Add the missing roster rows
  * @param {string} eventId - Roll-call event
  * @param {string[]} memberIds - Convened accounts
  * @return {Promise<void>} - Synced
@@ -220,7 +220,7 @@ const pendingIds = async (eventId: string): Promise<string[]> => {
 }
 
 /**
- * Ping the members still owing an answer, leaving the stamp alone
+ * Ping the members still owing an answer
  * @param {Object} event - Roll-call event
  * @param {string} event.id - Event identifier
  * @param {string} event.title - Event title
@@ -281,7 +281,7 @@ export const markRemindersScheduled = (): void => {
 }
 
 /**
- * Take ownership of one due reminder, so concurrent sweeps never both fire it
+ * Take ownership of one due reminder
  * @param {string} eventId - Event identifier
  * @return {Promise<boolean>} - Caller owns the reminder
  */
@@ -296,8 +296,7 @@ const claimReminder = async (eventId: string): Promise<boolean> => {
 }
 
 /**
- * Fire every roll-call reminder now due, once each. This is the work itself,
- * called by the worker that owns it and, failing that, by whoever opens the calendar
+ * Fire every roll-call reminder now due
  * @return {Promise<void>} - Swept
  */
 
@@ -319,13 +318,13 @@ export const runReminderSweep = async (): Promise<void> => {
         .map((event) => notifyPending(event))
     )
   } catch (error) {
-    // A missed sweep is caught by the next read, but it stops being invisible
+    // A missed sweep is caught by the next read
     logger.warn('[calendar] reminder sweep failed', error)
   }
 }
 
 /**
- * Sweep from the request path, unless a worker already owns the job
+ * Sweep from the request path
  * @return {Promise<void>} - Swept
  */
 
@@ -379,7 +378,7 @@ export interface PendingRollCall {
 }
 
 /**
- * Read the roll-calls that still concern one member, soonest first
+ * Read the roll-calls that still concern one member
  * @param {string} accountId - Signed-in member
  * @return {Promise<PendingRollCall[]>} - Upcoming roll-calls
  */

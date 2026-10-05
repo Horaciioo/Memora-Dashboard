@@ -7,7 +7,7 @@ export interface SkeletonProps {
 }
 
 /**
- * Placeholder sized like the real content it stands in for, shimmering while active
+ * Placeholder sized like the real content it stands in for
  * @param {SkeletonShape} shape - Name of the shape to render
  * @param {string} [className] - Extra classes merged onto the placeholder
  * @return {JSX.Element}
@@ -26,7 +26,7 @@ export interface SkeletonListProps {
 /**
  * Stacks several skeletons of the same shape with vertical spacing
  * @param {SkeletonShape} shape - Shape repeated for every row
- * @param {number} [rows] - Number of placeholders to render, defaults to 3
+ * @param {number} [rows] - Number of placeholders to render
  * @param {string} [className] - Extra classes merged onto the stack
  * @return {JSX.Element}
  */

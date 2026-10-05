@@ -15,7 +15,7 @@ import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
 import { LIVE_GATE } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
 
-// Read once per live and browser, a reading convenience
+// Read once per live and browser
 const readKey = (liveId: string) => `memora:live-instructions:${liveId}`
 
 /**
@@ -35,12 +35,12 @@ const wasRead = (liveId: string): boolean => {
 export interface LiveGateProps {
   live: LiveView
   canEdit: boolean
-  // The Mod View, opened once the instructions are read
+  // The Mod View
   children: ReactNode
 }
 
 /**
- * Instructions of the responsables and the roll-call first, then the Mod View
+ * Instructions of the responsables and the roll-call first
  * @param {LiveView} live - Live
  * @param {boolean} canEdit - Viewer may rewrite the instructions
  * @param {ReactNode} children - Mod View

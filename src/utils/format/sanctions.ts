@@ -23,7 +23,7 @@ export const writeDuration = (minutes: number, format: DurationFormat): string =
 
 /**
  * Fill a command template
- * @param {string} template - Command with its {user}, {duration} and {reason} holes
+ * @param {string} template - Command with its {user}
  * @param {Record<string, string>} values - Hole values
  * @return {string} - Command ready to paste
  */

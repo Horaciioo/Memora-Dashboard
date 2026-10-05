@@ -8,7 +8,7 @@ import { PRIVACY_STYLES, SIGN_IN_STYLES } from '@/declarations/ui/variants'
 export const metadata: Metadata = { title: PRIVACY_COPY.title }
 
 /**
- * Public privacy notice, entirely derived from the processing register
+ * Public privacy notice
  * @return {JSX.Element} - Notice page
  */
 

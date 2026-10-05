@@ -47,7 +47,7 @@ export const rowsToOptions = (
   }))
 
 /**
- * Function options headed by kind, principal ones first
+ * Function options headed by kind
  * @param {Array<{ id: string, name: string, kind: FunctionKindName }>} rows - Function rows
  * @return {FieldOption[]} - Select options
  */
@@ -85,7 +85,7 @@ export interface PersonRow {
 }
 
 /**
- * People options sorted and headed by role, highest first
+ * People options sorted and headed by role
  * @param {TRow[]} rows - Account rows
  * @param {(row: TRow) => Partial<FieldOption>} [extra] - Per-row additions
  * @return {FieldOption[]} - Select options

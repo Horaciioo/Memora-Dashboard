@@ -14,13 +14,13 @@ export const BUTTON_STYLES = {
     'border border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] px-3 py-2 hover:bg-[var(--color-hover)]',
   ghost:
     'px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
-  // Hover deepens, never fades
+  // Hover deepens
   success: 'bg-[var(--color-success)] px-4 py-2 text-[var(--color-on-brand)] hover:brightness-90',
   danger: 'bg-[var(--color-danger)] px-4 py-2 text-[var(--color-on-brand)] hover:brightness-90',
-  // 44px hit area on touch, back to 36px from md
+  // 44px hit area on touch
   icon: 'h-9 w-9 min-h-11 min-w-11 rounded-[var(--radius-md)] p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] md:min-h-0 md:min-w-0',
   link: 'p-0 text-[var(--color-brand-600)] underline-offset-2 hover:underline',
-  // Square footprint for a label-less button, overriding a variant's padding
+  // Square footprint for a label-less button
   square: 'h-9 w-9 min-h-11 min-w-11 shrink-0 p-0 md:min-h-0 md:min-w-0',
 } as const
 
@@ -40,21 +40,21 @@ export const SEGMENTED_STYLES = {
 } as const
 
 /**
- * Property title, the one casing every label shares
+ * Property title
  * @type {string}
  */
 
 export const PROPERTY_LABEL = 'text-xs font-black tracking-wide text-[var(--color-ink)] uppercase'
 
 /**
- * Property content, lighter and quieter than its title
+ * Property content
  * @type {string}
  */
 
 export const PROPERTY_VALUE = 'font-light text-[var(--color-ink)]/80 italic'
 
 /**
- * Spacing between and within properties, the same on every page and form
+ * Spacing between and within properties
  * @type {Record<string, string>}
  */
 
@@ -69,7 +69,7 @@ export const PROPERTY_SPACING = {
 } as const
 
 /**
- * Empty content, never mistaken for a value
+ * Empty content
  * @type {string}
  */
 
@@ -95,13 +95,13 @@ export const FIELD_STYLES = {
   // Control sharing its line with the glyph picker
   row: 'flex min-w-0 items-center gap-2',
   rowControl: 'min-w-0 flex-1',
-  // Label and messages sit above the input, past the glyph
+  // Label and messages sit above the input
   glyphField: '[&>label]:pl-11 [&>p]:pl-11',
-  // Static prefix welded to the left of a control, the handle alone being typed
+  // Static prefix welded to the left of a control
   prefixRow:
     'flex min-w-0 items-stretch rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] transition-colors focus-within:border-[var(--color-field-border-strong)]',
   prefixRowInvalid: 'border-[var(--color-danger)]',
-  // Locked link start, a greyed block the handle leads from
+  // Locked link start
   prefix:
     'flex shrink-0 items-center rounded-l-[calc(var(--radius-md)-1px)] border-r border-[var(--color-field-border)] bg-[var(--color-surface-sunken)] px-3 font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)] select-none',
   prefixControl:
@@ -115,7 +115,7 @@ export const FIELD_STYLES = {
 
 export const TOGGLE_STYLES = {
   row: 'flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 text-sm',
-  // Exclusive states, cn never merges
+  // Exclusive states
   track:
     'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-[var(--motion-duration-panel)]',
   trackOff: 'bg-[var(--color-border-strong)]',
@@ -134,7 +134,7 @@ export const TOGGLE_STYLES = {
 } as const
 
 /**
- * Tri-state switch styles — one track holding a denied, an inherited and an allowed slot
+ * Tri-state switch styles — one track holding a denied
  * @type {Record<string, string>}
  */
 
@@ -181,7 +181,7 @@ export const FILE_INPUT_STYLES = {
 } as const
 
 /**
- * Option mark styles, one glyph shape per mark kind
+ * Option mark styles
  * @type {Record<string, string>}
  */
 
@@ -193,7 +193,7 @@ export const OPTION_MARK_STYLES = {
 } as const
 
 /**
- * Select menu styles, the dropdown standing in for the native select
+ * Select menu styles
  * @type {Record<string, string>}
  */
 
@@ -201,7 +201,7 @@ export const SELECT_MENU_STYLES = {
   trigger:
     'flex min-w-0 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] px-3 py-2 text-left text-sm text-[var(--color-on-field)] transition-colors hover:border-[var(--color-field-border-strong)] disabled:pointer-events-none disabled:opacity-60',
   invalid: 'border-[var(--color-danger)]',
-  // Chevron trails the text, not the edge
+  // Chevron trails the text
   value: 'flex min-w-0 items-center gap-2 truncate',
   placeholder: `truncate ${EMPTY_VALUE}`,
   // Category heading inside the list
@@ -213,19 +213,19 @@ export const SELECT_MENU_STYLES = {
     'popover-enter fixed z-[70] flex max-h-72 flex-col overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   search:
     'w-full border-b border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]',
-  // Rows breathe, none touching its neighbour
+  // Rows breathe
   list: 'flex flex-1 flex-col gap-0.5 overflow-y-auto p-1.5',
   option:
     'flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-2.5 text-left opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-surface)] hover:opacity-100',
   optionActive: 'bg-[var(--color-surface)] opacity-100',
   optionDisabled: 'cursor-not-allowed opacity-50',
   scrim: 'fixed inset-0 z-[65]',
-  // Chosen entry, a wash fading rightwards behind the green check
+  // Chosen entry
   optionSelected:
     'bg-linear-to-r from-[var(--color-picker-wash-strong)] via-[var(--color-picker-wash)] to-transparent font-semibold text-[var(--color-ink)] opacity-100',
   optionLabel: 'min-w-0 flex-1 truncate',
   check: 'h-4 w-4 shrink-0 text-[var(--color-success)]',
-  // Cell holding the check or the mark, so labels always start at the same edge
+  // Cell holding the check or the mark
   lead: 'flex shrink-0 items-center justify-center',
   leadGlyph: 'h-4 w-4',
   leadPortrait: 'h-6 w-6',
@@ -237,7 +237,7 @@ export const SELECT_MENU_STYLES = {
   action:
     'flex shrink-0 items-center gap-2 px-3 py-2 text-sm font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
   actionIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
-  // Selected entries on the trigger, never tags
+  // Selected entries on the trigger
   tags: 'flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1.5',
   entry: 'inline-flex min-w-0 items-center gap-2',
 } as const
@@ -261,7 +261,7 @@ export const SELECT_MENU_SIZES = {
 export type SelectMenuSize = keyof typeof SELECT_MENU_SIZES
 
 /**
- * Portrait size drawn beside an option, per select size
+ * Portrait size drawn beside an option
  * @type {Record<SelectMenuSize, AvatarSize>}
  */
 
@@ -272,7 +272,7 @@ export const SELECT_MENU_MARK_SIZES = {
 } as const satisfies Record<SelectMenuSize, AvatarSize>
 
 /**
- * Date picker styles, the drawn calendar standing in for the native date input
+ * Date picker styles
  * @type {Record<string, string>}
  */
 
@@ -299,7 +299,7 @@ export const DATE_PICKER_STYLES = {
 } as const
 
 /**
- * Emoji picker styles — a bare glyph opening the catalogue, never a framed box
+ * Emoji picker styles — a bare glyph opening the catalogue
  * @type {Record<string, string>}
  */
 
@@ -312,7 +312,7 @@ export const EMOJI_PICKER_STYLES = {
 } as const
 
 /**
- * Emoji catalogue styles — bare glyphs on the surface, the search pinned below them
+ * Emoji catalogue styles — bare glyphs on the surface
  * @type {Record<string, string>}
  */
 
@@ -345,7 +345,7 @@ export const COLOUR_FIELD_STYLES = {
 } as const
 
 /**
- * Colour wheel styles — a hue circle, a brightness slider, then the typed code
+ * Colour wheel styles — a hue circle
  * @type {Record<string, string>}
  */
 
@@ -386,10 +386,10 @@ export const SCALE_INPUT = {
   stepActive: 'flex-[2] border-[var(--color-brand-600)] bg-[var(--color-brand-600)]',
   endpoints: 'flex items-center justify-between text-xs text-[var(--color-ink-subtle)]',
   endpoint: 'truncate',
-  // Bare figures, the picked one grows
+  // Bare figures
   numerals: 'flex w-full items-end justify-between px-1',
   numeral:
-    'text-4xl leading-none font-black tabular-nums transition-[opacity,transform] duration-150 disabled:cursor-not-allowed',
+    'text-4xl leading-none font-black tabular-nums transition-[opacity,transform] duration-[var(--motion-duration-fast)] disabled:cursor-not-allowed',
   numeralIdle: 'opacity-35 hover:opacity-70',
   numeralActive: 'scale-125 opacity-100',
 } as const
@@ -416,7 +416,7 @@ export const HANDLE_LOOKUP_STYLES = {
   found: 'text-[var(--color-success)]',
   missing: 'text-[var(--color-danger)]',
   unknown: 'text-[var(--color-ink-subtle)]',
-  // Accounts to pick from, one click each
+  // Accounts to pick from
   list: 'flex flex-col gap-1',
   match:
     'flex w-full items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 text-left transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',

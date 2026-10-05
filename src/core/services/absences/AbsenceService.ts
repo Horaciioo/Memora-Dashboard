@@ -60,8 +60,7 @@ export const canReviewAbsence = async (
 }
 
 /**
- * Map an absence row to its display shape, the member name coming from the caller
- * so a member file never re-reads the account it already holds
+ * Map an absence row to its display shape
  * @param {Omit<AbsenceRow, 'account'>} row - Absence row with its reviewer
  * @param {string} memberName - Whose absence it is
  * @return {MemberAbsence} - List row
@@ -93,7 +92,7 @@ export const ABSENCE_FIELDS: FieldDefinition[] = [
     info: ABSENCE_FIELD_INFO.dates,
     required: true,
   },
-  // Free text is kept for logistics only, never for a medical detail
+  // Free text is kept for logistics only
   {
     name: 'reason',
     kind: 'textarea',
@@ -120,7 +119,7 @@ export const REVIEW_FIELDS: FieldDefinition[] = [
 ]
 
 /**
- * Read the absences of one member, newest first
+ * Read the absences of one member
  * @param {string} accountId - Account identifier
  * @param {number} [take] - Entry count
  * @return {Promise<MemberAbsence[]>} - Absences
@@ -141,8 +140,7 @@ export const listOwnAbsences = async (
 }
 
 /**
- * Read the pending requests one reviewer may settle, every team led by them, or every
- * request when they hold the admin level
+ * Read the pending requests one reviewer may settle
  * @param {string} reviewerId - Reviewer account identifier
  * @param {boolean} isAdmin - Reviewer holds the admin level
  * @return {Promise<MemberAbsence[]>} - Pending absences
@@ -179,7 +177,7 @@ export interface AbsenceApproval {
 }
 
 /**
- * Declare an absence, approved at once when a responsable posts it
+ * Declare an absence
  * @param {string} accountId - Account identifier
  * @param {FormValues} values - Parsed body
  * @param {AbsenceApproval} [approval] - Posting responsable
@@ -208,7 +206,7 @@ export const createAbsence = async (
     throw invalidInput([{ field: 'dates', message: FORM_COPY.endBeforeStart }])
   }
 
-  // Below the threshold there is nothing to declare, they just enjoy
+  // Below the threshold there is nothing to declare
   const dayCount = countDays(startDate, endDate)
 
   if (dayCount <= ABSENCE_SETTINGS.thresholdDays) {
@@ -310,7 +308,7 @@ export const removeAbsence = async (
     return
   }
 
-  // Anyone else needs the review permission, scoped to their own teams
+  // Anyone else needs the review permission
   if (!hasReviewPermission || !(await canReviewAbsence(requesterId, row.accountId, isAdmin))) {
     throw notFound()
   }

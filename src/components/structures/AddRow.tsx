@@ -7,15 +7,14 @@ import { cn } from '@/utils/classnames'
 export interface AddRowProps {
   label: string
   disabled?: boolean
-  // Stacks the glyph above the label, for a grid cell rather than a list row
+  // Stacks the glyph above the label
   tile?: boolean
   className?: string
   onClick: () => void
 }
 
 /**
- * Dashed creation row closing a non empty collection, the counterpart of the EmptyState
- * action — a create gesture never sits in the top right of a panel
+ * Dashed creation row closing a non empty collection
  * @param {string} label - Creation label
  * @param {boolean} [disabled] - Member may not write
  * @param {boolean} [tile] - Stacks glyph above label

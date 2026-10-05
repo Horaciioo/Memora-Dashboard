@@ -3,7 +3,7 @@ export interface FiltersGlyphProps {
 }
 
 /**
- * Three left-aligned rules of decreasing length, standing for the folded filter panel
+ * Three left-aligned rules of decreasing length
  * @param {string} [className] - Extra classes merged onto the glyph
  * @return {JSX.Element}
  */

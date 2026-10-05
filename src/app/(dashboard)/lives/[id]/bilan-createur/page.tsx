@@ -16,7 +16,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const metadata: Metadata = { title: LIVE_REPORT_COPY.creatorTitle }
 
 /**
- * Report of one live for its creator, in plain words, without viewer names nor excerpts
+ * Report of one live for its creator
  * @param {Object} props - Route props
  * @param {Promise<{ id: string }>} props.params - Live identifier
  * @return {Promise<JSX.Element>} - Creator report page
@@ -34,7 +34,7 @@ export default async function LiveCreatorReportPage({
   const end = live.endedAt ?? new Date().toISOString()
   const team = report.moderators.filter((row) => row.isMember).length
 
-  // Opening sentence, by team size
+  // Opening sentence
   const when = (
     team === 0
       ? LIVE_REPORT_COPY.creatorWhenNone

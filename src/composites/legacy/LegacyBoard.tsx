@@ -74,9 +74,8 @@ const TrackRow = ({ track }: { track: LegacyTrackSummary }) => {
 }
 
 /**
- * Every Legacy track, the running ones then the finished ones on demand, a manager opening a new
- * one from the dashed row
- * @param {LegacyBoardProps} props - Tracks, form fields and permission
+ * Every Legacy track
+ * @param {LegacyBoardProps} props - Tracks
  * @return {JSX.Element}
  */
 
@@ -85,7 +84,7 @@ export const LegacyBoard = ({ tracks, fields, canManage }: LegacyBoardProps) => 
   const [opening, setOpening] = useState(false)
   const [showFinished, setShowFinished] = useState(false)
 
-  // Running tracks first, the finished ones only when asked for
+  // Running tracks first
   const [running, finished] = useMemo(
     () => [
       tracks.filter((track) => track.status === LegacyStatuses.Running),

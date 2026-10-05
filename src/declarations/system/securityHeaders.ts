@@ -5,12 +5,11 @@
 
 export const NONCE_HEADER = 'x-nonce'
 
-// One year, the window a preloaded HSTS entry expects
+// One year
 const HSTS_MAX_AGE = 63_072_000
 
 /**
- * Headers applied to every response, whatever the route. This module is imported by
- * next.config.ts, which resolves no path alias — it must stay free of any import
+ * Headers applied to every response
  * @type {{ key: string, value: string }[]}
  */
 

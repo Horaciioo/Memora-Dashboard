@@ -21,7 +21,7 @@ export interface UseSwipeOptions {
   thresholdRatio?: number
   // Speed in px per
   flingVelocity?: number
-  // Bounds the live offset,
+  // Bounds the live offset
   clamp?: [number, number]
   // Arms only when the
   edgeStartPx?: number
@@ -63,9 +63,9 @@ const clampOffset = (value: number, bounds?: [number, number]): number => {
 }
 
 /**
- * Single pointer drag primitive, every swipe of the app is built on it
- * @param {UseSwipeOptions} options - Axis, commit handler, thresholds and guards
- * @return {UseSwipeResult} - Pointer handlers, the live offset and the axis lock style
+ * Single pointer drag primitive
+ * @param {UseSwipeOptions} options - Axis
+ * @return {UseSwipeResult} - Pointer handlers
  */
 
 export const useSwipe = ({

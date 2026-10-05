@@ -18,7 +18,7 @@ import { cn } from '@/utils/classnames'
 /**
  * One situation of a simulation: its scene plays out, then the moves appear, and the pick is
  * answered on the spot with the reason
- * @param {Object} props - Step, surface, pick and handlers
+ * @param {Object} props - Step
  * @return {JSX.Element}
  */
 
@@ -104,7 +104,7 @@ const SimulationStep = ({
 /**
  * Simulation: a button opens it over the blurred page, then a scene at a time, each ending on a
  * decision answered at once. Situations already played stay above, the next one opening below
- * @param {ExerciseViewProps} props - Block, answer, result and handlers
+ * @param {ExerciseViewProps} props - Block
  * @return {JSX.Element}
  */
 

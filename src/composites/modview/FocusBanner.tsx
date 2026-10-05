@@ -13,7 +13,7 @@ export interface FocusBannerProps {
 }
 
 /**
- * Banner of a Focus in course, acting in place behind a switch
+ * Banner of a Focus in course
  * @param {string} name - Moderator followed
  * @param {boolean} actInPlace - Gestures noted in their place
  * @param {(value: boolean) => void} onActInPlace - Switch handler

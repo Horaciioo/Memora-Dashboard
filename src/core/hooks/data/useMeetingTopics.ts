@@ -56,7 +56,7 @@ export const useMeetingTopics = (
         feedbackTitle(MEETING_TOPIC_ENTITY.label, 'created', MEETING_TOPIC_ENTITY.gender, name)
       )
 
-      // Every write lands in the journal, so the logs tab needs the refresh
+      // Every write lands in the journal
       if (entry) {
         setEntries((current) => [...current, entry])
         router.refresh()

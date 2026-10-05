@@ -1,7 +1,7 @@
 import type { IconName } from '@/declarations/ui/icons'
 
 /**
- * User agent tokens read as a browser, first match wins
+ * User agent tokens read as a browser
  * @type {ReadonlyArray<readonly [string, string]>}
  */
 
@@ -14,7 +14,7 @@ export const BROWSER_TOKENS = [
 ] as const
 
 /**
- * User agent tokens read as a system, first match wins
+ * User agent tokens read as a system
  * @type {ReadonlyArray<readonly [string, string]>}
  */
 

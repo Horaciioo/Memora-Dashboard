@@ -7,7 +7,7 @@ import commentStyle from './eslint-rules/comment-style.mjs'
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Comment convention, skill comments
+  // Comment convention
   {
     plugins: { local: commentStyle },
     rules: {

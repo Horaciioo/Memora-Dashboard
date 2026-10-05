@@ -26,7 +26,7 @@ export const picksOf = (value: string | string[] | undefined): string[] =>
 /**
  * One closed question: radios when a single answer is right, boxes when several are. Once
  * checked, right choices turn green, a wrong pick red, and the reason opens under it
- * @param {Object} props - Question, picks and verdict
+ * @param {Object} props - Question
  * @return {JSX.Element}
  */
 
@@ -103,7 +103,7 @@ export const ChoiceQuestion = ({
 
 /**
  * Multiple choice quiz
- * @param {ExerciseViewProps} props - Block, answer, result and handlers
+ * @param {ExerciseViewProps} props - Block
  * @return {JSX.Element}
  */
 
@@ -145,7 +145,7 @@ export const QuizExercise = ({
 /**
  * Case study: a situation, then closed questions and open ones, the expert's own answer to
  * an open one revealed once it is sent
- * @param {ExerciseViewProps} props - Block, answer, result and handlers
+ * @param {ExerciseViewProps} props - Block
  * @return {JSX.Element}
  */
 

@@ -1,14 +1,14 @@
 // Handle written as an at sign followed by one or two words of a display name
 const HANDLE_PATTERN = /@([\p{L}\p{N}._-]+(?:\s+[\p{L}\p{N}._-]+)?)/gu
 
-// Member tag as Discord stores it, the old nickname form included
+// Member tag as Discord stores it
 const MEMBER_TAG_PATTERN = /<@!?(\d+)>/g
 
 /**
  * Who a written text names
  * @typedef {Object} Mentions
- * @property {string[]} handles - Candidate display names, from `@Name`
- * @property {string[]} discordIds - Discord identifiers, from `<@id>`
+ * @property {string[]} handles - Candidate display names
+ * @property {string[]} discordIds - Discord identifiers
  */
 
 export interface Mentions {
@@ -17,7 +17,7 @@ export interface Mentions {
 }
 
 /**
- * Collect the members a text names, by handle and by Discord tag, each capped
+ * Collect the members a text names
  * @param {string} body - Written text
  * @param {number} limit - Most entries kept in each list
  * @return {Mentions} - Handles and Discord identifiers

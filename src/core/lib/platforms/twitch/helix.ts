@@ -4,7 +4,7 @@ import { HELIX_PATHS, TWITCH_ENDPOINTS, TWITCH_LIMITS } from '@/declarations/pla
 import type { ChatBadge, ChatModes, Chatter, ModViewIntent, UnbanRequest } from '@/types/modview'
 
 /**
- * Who acts, on which channel, with which token
+ * Who acts
  * @typedef {Object} TwitchSeat
  * @property {string} accessToken - The clicking member's token
  * @property {string} moderatorId - Their Twitch user identifier
@@ -18,7 +18,7 @@ export interface TwitchSeat {
 }
 
 /**
- * One Helix call, data only
+ * One Helix call
  * @typedef {Object} HelixCall
  * @property {'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'} method - Verb
  * @property {string} path - Helix path
@@ -43,11 +43,10 @@ const reasonOf = (reason: string | null): string | undefined =>
   reason ? reason.slice(0, TWITCH_LIMITS.maxReasonLength) : undefined
 
 /**
- * Translate a gesture into its Helix call. Removing a blocked term needs its identifier,
- * resolved beforehand
+ * Translate a gesture into its Helix call. Removing a blocked term needs its identifier
  * @param {ModViewIntent} intent - Gesture
  * @param {TwitchSeat} seat - Who acts where
- * @param {string} [termId] - Blocked term identifier, for a removal
+ * @param {string} [termId] - Blocked term identifier
  * @return {HelixCall} - Call
  */
 
@@ -238,7 +237,7 @@ export const performOnTwitch = async (intent: ModViewIntent, seat: TwitchSeat): 
 }
 
 /**
- * Whether the seat's account moderates the channel, or owns it
+ * Whether the seat's account moderates the channel
  * @param {TwitchSeat} seat - Seat
  * @return {Promise<boolean>} - Moderates
  */
@@ -283,7 +282,7 @@ export const readBlockedTerms = async (
 }
 
 /**
- * Chat restrictions in force, shield mode included
+ * Chat restrictions in force
  * @param {TwitchSeat} seat - Seat
  * @return {Promise<ChatModes>} - Modes
  */
@@ -352,7 +351,7 @@ export const readUnbanRequests = async (seat: TwitchSeat): Promise<UnbanRequest[
 }
 
 /**
- * Who sits in the chat, moderators and VIPs set apart
+ * Who sits in the chat
  * @param {TwitchSeat} seat - Seat
  * @return {Promise<{ moderators: Chatter[], vips: Chatter[], viewers: Chatter[] }>} - Community
  */
@@ -386,7 +385,7 @@ export const readCommunity = async (
   const vipIds = new Set((vips?.data ?? []).map((row) => row.user_id))
   const present = (chatters?.data ?? []).filter((row) => row.user_id !== seat.broadcasterId)
 
-  // Only who is present, sorted into the three groups
+  // Only who is present
   return {
     moderators: present
       .filter((row) => moderatorIds.has(row.user_id))
@@ -401,7 +400,7 @@ export const readCommunity = async (
 }
 
 /**
- * Title and category of the stream, none while offline
+ * Title and category of the stream
  * @param {TwitchSeat} seat - Seat
  * @return {Promise<{ title: string, category: string | null, startedAt: string } | null>} - Stream
  */

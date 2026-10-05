@@ -56,7 +56,7 @@ export const SIGN_IN_ERROR_REGISTRY = createRegistry<SignInErrorName, { label: s
  */
 
 export const signInFailure = (error: AppError): string => {
-  // A throttled attempt never reaches the flow, so it carries no reason of its own
+  // A throttled attempt never reaches the flow
   const reason: SignInErrorName = SIGN_IN_ERROR_REGISTRY.has(error.message)
     ? error.message
     : error.code === ErrorCodes.RateLimited

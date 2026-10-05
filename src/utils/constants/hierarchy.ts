@@ -44,7 +44,7 @@ export const MemberStatuses = {
 export type MemberStatusName = (typeof MemberStatuses)[keyof typeof MemberStatuses]
 
 /**
- * Statuses of a member who is gone, access closed
+ * Statuses of a member who is gone
  * @type {MemberStatusName[]}
  */
 

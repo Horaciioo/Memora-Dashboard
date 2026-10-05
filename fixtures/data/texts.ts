@@ -14,7 +14,7 @@ export const MEMBER_NOTES = [
   'Connaît le lore de la communauté par cœur, précieux pour repérer les trolls récurrents.',
 ]
 
-// Projects of the corp, their emoji first
+// Projects of the corp
 export const PROJECTS: [string, string, string][] = [
   [
     '🎉',
@@ -44,7 +44,7 @@ export const PROJECTS: [string, string, string][] = [
   ['📝', 'FAQ du serveur', 'Une FAQ qui répond aux dix questions posées chaque jour.'],
 ]
 
-// Tasks, their emoji first
+// Tasks
 export const TASKS: [string, string][] = [
   ['🔧', 'Configurer l’automod sur les liens'],
   ['📌', 'Épingler le nouveau règlement'],
@@ -66,7 +66,7 @@ export const TASKS: [string, string][] = [
   ['🔁', 'Faire la passation avec l’équipe du soir'],
 ]
 
-// Meetings, their emoji first
+// Meetings
 export const MEETINGS: [string, string][] = [
   ['🗓️', 'Réunion mensuelle'],
   ['🧭', 'Point d’équipe hebdomadaire'],
@@ -90,7 +90,7 @@ export const MEETING_TOPICS: [string, string, string][] = [
   ['🎓', 'Academy', 'Deux formateurs volontaires pour la prochaine session.'],
 ]
 
-// Announcement bodies, written in markdown
+// Announcement bodies
 export const COMMUNICATIONS = [
   '## Ce qui change\n\nLe règlement passe en version courte. **Trois règles** au lieu de douze, le détail reste dans la FAQ.\n\n- Respect des autres viewers\n- Pas de spam ni de pub\n- Le français sur le chat',
   '## Planning de l’événement\n\nOn ouvre les salons vendredi à 18 h.\n\n1. Vérifier les rôles\n2. Épingler le programme\n3. Lancer le compte à rebours',
@@ -98,7 +98,7 @@ export const COMMUNICATIONS = [
   '## Recrutement ouvert\n\nOn cherche des modérateurs lives disponibles en soirée. Le formulaire est épinglé dans #annonces.',
 ]
 
-// Why a moderator is away, in their own words
+// Why a moderator is away
 export const ABSENCE_REASONS_TEXT = [
   'Partiels toute la semaine.',
   'Vacances en famille, peu de réseau.',
@@ -214,7 +214,7 @@ export const EVENT_TEMPLATES: {
     name: 'Live',
     kind: 'EVENT',
     summary: 'Live programmé du créateur.',
-    accent: '#7c3aed',
+    accent: '#c2548a',
     visibility: 'EVERYONE',
     defaultMinutes: 180,
     allDay: false,
@@ -286,7 +286,7 @@ export const PLATFORMS: [string, string][] = [
 
 // Entry programmes of the academy
 export const DISPOSITIFS: [string, string, string][] = [
-  ['ATRIA', 'Parcours complet pour les juniors sans expérience.', '#7c3aed'],
+  ['ATRIA', 'Parcours complet pour les juniors sans expérience.', '#c2548a'],
   ['PULSE', 'Parcours accéléré pour les profils déjà expérimentés.', '#0ea5e9'],
 ]
 
@@ -297,7 +297,7 @@ export const SKILLS: [string, string, string[]][] = [
   ['Rédaction', '#d97706', ['Annonces claires', 'Messages de sanction']],
 ]
 
-// PIM trame, per stage
+// PIM trame
 export const PIM_STEPS: {
   title: string
   stage: 'PREPARATION' | 'DISCOVERY' | 'REVIEW_ONE' | 'PRACTICE' | 'REVIEW_FINAL' | 'BONUS'
@@ -380,7 +380,7 @@ export const PIM_STEPS: {
   },
 ]
 
-// Trainings of the academy, with their chapters
+// Trainings of the academy
 export const TRAININGS: {
   name: string
   summary: string

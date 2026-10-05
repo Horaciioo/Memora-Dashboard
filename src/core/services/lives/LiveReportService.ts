@@ -14,7 +14,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @typedef {Object} LiveReportDetail
  * @property {LiveView} live - Live
  * @property {LiveReport} report - Figures
- * @property {LiveLogLine[]} log - Latest lines, newest first
+ * @property {LiveLogLine[]} log - Latest lines
  * @property {boolean} available - The log tables exist
  */
 
@@ -44,7 +44,7 @@ export const readLiveReport = async (
   const start = new Date(live.startedAt ?? live.plannedStartAt)
   const end = live.endedAt ? new Date(live.endedAt) : new Date()
 
-  // Levels tied to the live, or in force for its creator during it
+  // Levels tied to the live
   const entries = await prisma.liveconEntry.findMany({
     where: {
       OR: [

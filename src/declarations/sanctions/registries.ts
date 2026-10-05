@@ -34,7 +34,7 @@ export const SANCTION_KIND_REGISTRY = createRegistry(SANCTION_KIND_MAP)
 /**
  * How one measure is carried out on a surface
  * @typedef {Object} SanctionCommand
- * @property {string | null} command - Command to paste, {user} {duration} {reason} filled in
+ * @property {string | null} command - Command to paste
  * @property {string} how - Where to do it by hand
  */
 
@@ -44,7 +44,7 @@ export interface SanctionCommand {
 }
 
 /**
- * Duration a surface writes, from a number of minutes
+ * Duration a surface writes
  * @typedef {'seconds' | 'marsha'} DurationFormat
  */
 

@@ -80,7 +80,7 @@ const snapshot = (): void => {
     fail(`les vérifications ont échoué, version remise à ${formatVersion(current as VersionParts)}`)
   }
 
-  // Commit, tag, push
+  // Commit
   git('add', 'package.json')
   git('commit', '-q', '-m', `🔖 Released snapshot ${next}`)
   git('tag', '-a', `v${next}`, '-m', `v${next}`)

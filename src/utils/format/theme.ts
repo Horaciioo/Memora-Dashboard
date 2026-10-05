@@ -50,7 +50,7 @@ export const THEME_COLOUR = {
 } as const
 
 /**
- * The three families, title to label
+ * The three families
  * @type {Record<string, TokenRef>}
  */
 
@@ -74,7 +74,7 @@ export const THEME_RADIUS = {
 } as const
 
 /**
- * Elevation steps, reserved for floating surfaces
+ * Elevation steps
  * @type {Record<string, TokenRef>}
  */
 
@@ -97,7 +97,7 @@ export const THEME_MOTION = {
 } as const
 
 /**
- * The whole format, grouped
+ * The whole format
  * @type {Record<string, Record<string, TokenRef>>}
  */
 
@@ -111,7 +111,7 @@ export const THEME = {
 
 /**
  * Build a Tailwind arbitrary-value class from a token
- * @param {string} property - Utility prefix, e.g. bg or text
+ * @param {string} property - Utility prefix
  * @param {TokenRef} token - Token reference
  * @return {string} - Utility class
  */

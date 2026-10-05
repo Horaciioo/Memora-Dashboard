@@ -190,7 +190,7 @@ export const MarkdownEditor = ({
       cut >= 0 ? block.text.slice(0, cut) + block.text.slice(cut + marker.length) : block.text
     ).trim()
 
-    // Empty line converts, full line grows a new one
+    // Empty line converts
     if (rest.length === 0) {
       const converted = { ...block, kind: command.kind, text: '' }
       const follower = createBlock('paragraph')

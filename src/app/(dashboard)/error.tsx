@@ -3,7 +3,7 @@
 import { ErrorBoundaryScreen } from '@/components/structures/ErrorBoundaryScreen'
 
 /**
- * Fallback of the dashboard, the shell around it staying mounted
+ * Fallback of the dashboard
  * @param {Object} props - Boundary props
  * @param {Error & { digest?: string }} props.error - Caught exception
  * @param {() => void} props.retry - Re-renders the failed segment

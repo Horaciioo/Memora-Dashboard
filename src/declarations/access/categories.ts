@@ -6,7 +6,7 @@ import type { AccessCategoryName, MemberRoleName } from '@/utils/constants/hiera
  * Access console category metadata
  * @typedef {Object} AccessCategoryOption
  * @property {string} label - Heading of the rail section
- * @property {number} position - Display order, widest first
+ * @property {number} position - Display order
  * @property {MemberRoleName} tier - Hierarchy level the functions of the section sit at
  * @property {MemberRoleName} [role] - Hierarchy level shown as the base row of the section
  */
@@ -18,7 +18,7 @@ interface AccessCategoryOption {
   role?: MemberRoleName
 }
 
-// Leaders sit above the administration, so the admin level heads the rail
+// Leaders sit above the administration
 const ACCESS_CATEGORY_MAP: Record<AccessCategoryName, AccessCategoryOption> = {
   [AccessCategories.Leader]: {
     label: 'Leader',

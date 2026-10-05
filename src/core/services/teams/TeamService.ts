@@ -59,7 +59,7 @@ export const teamFields = async (scope?: AccessScope): Promise<FieldDefinition[]
 }
 
 /**
- * Read every team and everyone left outside, optionally narrowed to one creator
+ * Read every team and everyone left outside
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} [youtuberId] - Creator the board is narrowed to
  * @return {Promise<TeamBoardData>} - Board data
@@ -190,7 +190,7 @@ export const removeTeam = async (
 /**
  * Move a member between teams
  * @param {string} accountId - Account identifier
- * @param {string | null} teamId - Target team, null to detach
+ * @param {string | null} teamId - Target team
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} [youtuberId] - Creator the board is narrowed to
  * @return {Promise<TeamBoardData>} - Board data

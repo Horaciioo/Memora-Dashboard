@@ -2,16 +2,16 @@ import type { AccessCategoryName } from '@/utils/constants/hierarchy'
 import type { RecruitmentOwnerName } from '@/utils/constants/recruitment'
 import type { FunctionKindName } from '@/utils/constants/workflow'
 
-// Read by the seed on plain node, so type imports only
+// Read by the seed on plain node
 
 /**
- * Division every member can be ranked in, lowest first
+ * Division every member can be ranked in
  * @typedef {Object} FixedDivision
  * @property {string} name - Display name
  * @property {number} rank - Unique rank
  * @property {string} summary - Supporting line
  * @property {boolean} leadAssignable - A responsable may assign it
- * @property {string | null} imagePath - Official logo under public, none for the entry level
+ * @property {string | null} imagePath - Official logo under public
  */
 
 export interface FixedDivision {
@@ -23,7 +23,7 @@ export interface FixedDivision {
 }
 
 /**
- * Divisions, changed in code only
+ * Divisions
  * @type {readonly FixedDivision[]}
  */
 
@@ -59,13 +59,13 @@ export const FIXED_DIVISIONS: readonly FixedDivision[] = [
 ]
 
 /**
- * Function a member holds under their role, principal ones opening a trade, secondary ones adding pages
+ * Function a member holds under their role
  * @typedef {Object} FixedFunction
  * @property {string} name - Display name
  * @property {FunctionKindName} kind - Principal or secondary
- * @property {number} position - Rank, principal ones first
- * @property {string} icon - Glyph key, also picking the tint of the role glyph
- * @property {string} accent - Colour, the glyph's own
+ * @property {number} position - Rank
+ * @property {string} icon - Glyph key
+ * @property {string} accent - Colour
  * @property {AccessCategoryName} category - Access console section
  * @property {string} summary - Supporting line
  */
@@ -81,7 +81,7 @@ export interface FixedFunction {
 }
 
 /**
- * Functions, changed in code only
+ * Functions
  * @type {readonly FixedFunction[]}
  */
 
@@ -100,7 +100,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     kind: 'PRIMARY',
     position: 2,
     icon: 'functionLive',
-    accent: '#7c3aed',
+    accent: '#c2548a',
     category: 'MODERATION',
     summary: 'Modère le chat des lives.',
   },
@@ -118,7 +118,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     kind: 'PRIMARY',
     position: 4,
     icon: 'functionDiscord',
-    accent: '#8f98f6',
+    accent: '#f29ab8',
     category: 'MODERATION',
     summary: 'Se forme à la modération Discord pendant sa PIM.',
   },
@@ -127,7 +127,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     kind: 'PRIMARY',
     position: 5,
     icon: 'functionLive',
-    accent: '#a78bfa',
+    accent: '#e58db8',
     category: 'MODERATION',
     summary: 'Se forme à la modération des lives pendant sa PIM.',
   },
@@ -172,7 +172,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     kind: 'SECONDARY',
     position: 10,
     icon: 'functionLive',
-    accent: '#5b21b6',
+    accent: '#8e2f63',
     category: 'MODERATION',
     summary: 'Se prépare à diriger la modération des lives pendant son Legacy.',
   },
@@ -188,7 +188,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
 ]
 
 /**
- * Junior function held during a PIM, keyed by the function it graduates to
+ * Junior function held during a PIM
  * @type {Readonly<Record<string, string>>}
  */
 
@@ -199,7 +199,7 @@ export const JUNIOR_FUNCTION_OF: Readonly<Record<string, string>> = {
 }
 
 /**
- * Function held during a Legacy track, keyed by the trade the future Responsable leads
+ * Function held during a Legacy track
  * @type {Readonly<Record<string, string>>}
  */
 
@@ -210,7 +210,7 @@ export const LEGACY_FUNCTION_OF: Readonly<Record<string, string>> = {
 }
 
 /**
- * Trade a function stands for, a junior one reading as the trade it trains for
+ * Trade a function stands for
  * @param {string} name - Function name
  * @return {string} - Trade name
  */
@@ -224,7 +224,7 @@ export const tradeOfFunction = (name: string): string =>
  * Urgency level shared by projects and tasks
  * @typedef {Object} FixedPriority
  * @property {string} name - Display name
- * @property {number} weight - Unique weight, heavier is more urgent
+ * @property {number} weight - Unique weight
  * @property {string} accent - Tone
  * @property {boolean} isDefault - Preset of a new record
  */
@@ -237,7 +237,7 @@ export interface FixedPriority {
 }
 
 /**
- * Priorities, changed in code only
+ * Priorities
  * @type {readonly FixedPriority[]}
  */
 
@@ -249,7 +249,7 @@ export const FIXED_PRIORITIES: readonly FixedPriority[] = [
 ]
 
 /**
- * Livecon level, lower is tenser
+ * Livecon level
  * @typedef {Object} FixedLiveconLevel
  * @property {number} level - Unique level
  * @property {string} name - Display name
@@ -269,7 +269,7 @@ export interface FixedLiveconLevel {
 }
 
 /**
- * The three livecon levels, changed in code only
+ * The three livecon levels
  * @type {readonly FixedLiveconLevel[]}
  */
 
@@ -324,7 +324,7 @@ export interface FixedRecruitmentOutcome {
 }
 
 /**
- * Recruitment outcomes, changed in code only
+ * Recruitment outcomes
  * @type {readonly FixedRecruitmentOutcome[]}
  */
 
@@ -344,7 +344,7 @@ export const FIXED_RECRUITMENT_OUTCOMES: readonly FixedRecruitmentOutcome[] = [
 ]
 
 /**
- * Step of the recruitment trame, days counted from the opening
+ * Step of the recruitment trame
  * @typedef {Object} FixedRecruitmentStep
  * @property {string} title - Display name
  * @property {string} description - What happens
@@ -362,7 +362,7 @@ export interface FixedRecruitmentStep {
 }
 
 /**
- * Recruitment trame, changed in code only
+ * Recruitment trame
  * @type {readonly FixedRecruitmentStep[]}
  */
 

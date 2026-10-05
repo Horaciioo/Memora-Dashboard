@@ -49,7 +49,7 @@ export const RailSlotProvider = ({ children }: { children: ReactNode }) => {
 
 /**
  * Read the rail slot
- * @return {RailSlotContextValue} - Slot state, inert outside
+ * @return {RailSlotContextValue} - Slot state
  */
 
 export const useRailSlot = (): RailSlotContextValue =>

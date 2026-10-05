@@ -6,7 +6,7 @@ import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
  */
 
 export const HOME_STYLES = {
-  // Two columns past lg, the task list always leading
+  // Two columns past lg
   grid: 'grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]',
   column: 'flex min-w-0 flex-col gap-8',
   list: 'flex flex-col divide-y divide-[var(--color-border)]',
@@ -16,7 +16,7 @@ export const HOME_STYLES = {
   rowBody: 'flex min-w-0 flex-1 flex-col gap-0.5',
   rowTitle: 'truncate font-semibold',
   rowMeta: 'text-xs text-[var(--color-ink-subtle)]',
-  // Mono day stamp, left of each row
+  // Mono day stamp
   stamp:
     'flex w-12 shrink-0 flex-col items-center font-[family-name:var(--font-mono)] leading-none tabular-nums',
   stampDay: 'text-lg font-bold',
@@ -26,7 +26,7 @@ export const HOME_STYLES = {
   marker: `flex shrink-0 items-center gap-1.5 ${PROPERTY_LABEL}`,
   markerIcon: 'h-3.5 w-3.5',
   empty: 'px-4 py-6 text-sm text-[var(--color-ink-subtle)] italic',
-  // Rows without a frame, the list simply breathes
+  // Rows without a frame
   rows: 'flex flex-col',
   // Hairline under each line but the last
   item: 'relative after:absolute after:inset-x-0 after:bottom-0 after:mx-auto after:h-px after:w-3/5 after:bg-[var(--color-border)] last:after:hidden',
@@ -38,14 +38,14 @@ export const HOME_STYLES = {
   // Glyph opening a dated row
   rowGlyph: 'h-6 w-6 shrink-0',
   consoleIcon: 'h-6 w-6 shrink-0',
-  // Urgent tiles, one per level in force
+  // Urgent tiles
   urgentGrid: 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3',
   urgentTile:
     'flex w-full cursor-pointer items-start gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
   urgentTitle: 'font-black tracking-tight',
   urgentScope: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
   urgentText: 'line-clamp-2 text-sm text-[var(--color-ink-subtle)]',
-  // Urgent box, a tone disc and a quoted reason
+  // Urgent box
   urgentChip: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full',
   urgentReason: 'truncate text-xs text-[var(--color-ink-subtle)] italic',
   more: 'self-start rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
@@ -64,7 +64,7 @@ export const HOME_FLOW = {
   grid: 'grid gap-14 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]',
   column: 'flex min-w-0 flex-col gap-6',
   label: PROPERTY_LABEL,
-  // Lives, one tile per scope with the level on the portrait corner
+  // Lives
   lives: 'grid gap-3 sm:flex sm:flex-wrap',
   liveTile:
     'flex w-full min-w-0 cursor-pointer items-center sm:w-auto sm:min-w-52 gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface py-2.5 pr-6 pl-3 text-left transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
@@ -74,7 +74,7 @@ export const HOME_FLOW = {
   liveLevelIcon: 'h-4 w-4',
   liveName: 'font-bold tracking-tight',
   liveState: 'text-xs text-[var(--color-ink-subtle)]',
-  // Focus, the next thing and the way to settle it
+  // Focus
   focus:
     'course-pop flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-7',
   focusTop: 'flex items-start justify-between gap-4',
@@ -88,7 +88,7 @@ export const HOME_FLOW = {
   focusNoteTitle: 'text-[11px] font-black tracking-wide uppercase',
   focusNoteText: 'text-[15px] leading-relaxed',
   focusActions: 'flex flex-wrap gap-3',
-  // What follows, a row promotes itself to the focus
+  // What follows
   queue: 'flex flex-col',
   queueRow:
     'flex w-full cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] px-3 py-3 text-left transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
@@ -103,7 +103,7 @@ export const HOME_FLOW = {
   calmGlyph: 'course-check mb-2 h-12 w-12 text-[var(--color-success)]',
   calmTitle: 'text-xl font-bold tracking-tight',
   calmLead: 'max-w-xs text-sm text-[var(--color-ink-subtle)]',
-  // Agenda, days heading their lines
+  // Agenda
   agenda: 'flex flex-col gap-6',
   day: 'flex flex-col gap-1',
   dayHead: 'px-2 pb-1 text-sm font-bold',

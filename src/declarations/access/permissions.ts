@@ -5,7 +5,7 @@ import type { FieldDefinition } from '@/types/forms'
 import { PermissionGroups, PermissionsList } from '@/utils/constants/permissions'
 import type { PermissionGroup, PermissionMeta } from '@/utils/constants/permissions'
 
-// A fallback code is the longest thing the field ever takes, two hex chars per byte
+// A fallback code is the longest thing the field ever takes
 const RECOVERY_CODE_LENGTH = TWO_FACTOR_SETTINGS.recoveryCodeBytes * 2
 
 /**
@@ -20,7 +20,7 @@ interface PermissionGroupOption {
   position: number
 }
 
-// One entry per navigation page, listed in rail order
+// One entry per navigation page
 const PERMISSION_GROUP_MAP: Record<PermissionGroup, PermissionGroupOption> = {
   [PermissionGroups.Members]: { label: 'Modérateurs', position: 0 },
   [PermissionGroups.Projects]: { label: 'Projets', position: 1 },
@@ -58,7 +58,7 @@ export interface PermissionRoot {
  * @typedef {Object} PermissionSection
  * @property {PermissionGroup} group - Group key
  * @property {string} label - Group label
- * @property {PermissionMeta[]} permissions - Every permission of the page, flat
+ * @property {PermissionMeta[]} permissions - Every permission of the page
  * @property {PermissionRoot[]} roots - Page permissions with their refinements
  */
 
@@ -83,7 +83,7 @@ export const PERMISSION_SECTIONS: PermissionSection[] = PERMISSION_GROUP_REGISTR
   .map((group) => {
     const permissions = PermissionsList.filter((entry) => entry.group === group)
 
-    // Rootless entries carry the page, the rest hang off their parent
+    // Rootless entries carry the page
     const roots = permissions
       .filter((entry) => !entry.parent)
       .map((meta) => ({

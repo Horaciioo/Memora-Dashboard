@@ -10,7 +10,7 @@ export interface WipNoticeProps {
 
 /**
  * Placeholder of a route that is declared but not wired yet
- * @param {IllustrationName} [figure] - Drawn figure, defaults to the start box
+ * @param {IllustrationName} [figure] - Drawn figure
  * @param {string} [description] - Supporting line replacing the generic one
  * @return {JSX.Element}
  */

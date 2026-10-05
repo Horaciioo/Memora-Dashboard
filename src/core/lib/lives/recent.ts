@@ -9,7 +9,7 @@ import type { ModViewConnection } from '@/types/modview'
 // A live's memory outlives it by a day at most
 const RECENT_TTL_SECONDS = 86400
 
-// Survives dev hot reloads, one store per process
+// Survives dev hot reloads
 const globalForRecent = globalThis as unknown as {
   liveRecent?: { events: Map<string, SceneEvent[]>; connections: Map<string, LiveConnection> }
 }
@@ -17,10 +17,10 @@ const globalForRecent = globalThis as unknown as {
 const memory = (globalForRecent.liveRecent ??= { events: new Map(), connections: new Map() })
 
 /**
- * Platform link of a live, and why it is down
+ * Platform link of a live
  * @typedef {Object} LiveConnection
  * @property {ModViewConnection} state - Where it stands
- * @property {string | null} notice - Why, said in the Mod View
+ * @property {string | null} notice - Why
  */
 
 export interface LiveConnection {
@@ -29,7 +29,7 @@ export interface LiveConnection {
 }
 
 /**
- * Redis client with its namespace, when shared
+ * Redis client with its namespace
  * @return {{ cache: NonNullable<ReturnType<NonNullable<ReturnType<typeof runtime>>['redis']['cache']>>, prefix: string } | null} - Client
  */
 
@@ -41,7 +41,7 @@ const shared = () => {
 }
 
 /**
- * Keep one Mod View event of a live, the oldest falling off
+ * Keep one Mod View event of a live
  * @param {string} liveId - Live
  * @param {SceneEvent} event - Event
  * @return {Promise<void>} - Kept
@@ -63,7 +63,7 @@ export const keepRecentEvent = async (liveId: string, event: SceneEvent): Promis
 }
 
 /**
- * Recent Mod View events of a live, oldest first
+ * Recent Mod View events of a live
  * @param {string} liveId - Live
  * @return {Promise<SceneEvent[]>} - Events
  */
@@ -106,7 +106,7 @@ export const keepConnection = async (liveId: string, connection: LiveConnection)
 }
 
 /**
- * Platform link of a live, none while nobody watches it
+ * Platform link of a live
  * @param {string} liveId - Live
  * @return {Promise<LiveConnection | null>} - Link
  */

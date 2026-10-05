@@ -9,7 +9,7 @@ export interface CreatorLabelProps {
 }
 
 /**
- * Creator shown by portrait and name, never a tag
+ * Creator shown by portrait and name
  * @param {string} name - Creator name
  * @param {string | null} [image] - Portrait URL
  * @param {AvatarSize} [size] - Portrait size
@@ -29,7 +29,7 @@ export interface ProjectLabelProps {
 }
 
 /**
- * Project shown by glyph and title, never a tag
+ * Project shown by glyph and title
  * @param {string} title - Project title
  * @param {string | null} [emoji] - Project glyph
  * @return {JSX.Element}

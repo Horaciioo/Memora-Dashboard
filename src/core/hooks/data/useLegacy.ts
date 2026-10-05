@@ -12,7 +12,7 @@ import type { LegacyTrackDetail } from '@/types/legacy'
 import type { LegacyStatusName } from '@/utils/constants/hierarchy'
 
 /**
- * Mutations of the Legacy pages, each refreshing the page it is called from
+ * Mutations of the Legacy pages
  * @typedef {Object} LegacyActions
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation

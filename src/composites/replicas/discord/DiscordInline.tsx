@@ -29,7 +29,7 @@ export const DiscordInline = ({ source, roles }: DiscordInlineProps) => (
         )
       }
 
-      // Role mention, tinted by the role
+      // Role mention
       const role = part.startsWith('<@&') ? roles[part.slice(3, -1)] : undefined
       if (role) {
         return (

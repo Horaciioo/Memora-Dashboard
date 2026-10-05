@@ -15,12 +15,12 @@ export interface ModActionsWindowProps {
   acts: ModAct[]
   isLit: boolean
   onPickTarget: (name: string) => void
-  // Moderator followed in Focus mode, their lines lit
+  // Moderator followed in Focus mode
   focusLogin?: string | null
 }
 
 /**
- * Every moderation act of the team, newest first
+ * Every moderation act of the team
  * @param {ModAct[]} acts - Acts
  * @param {boolean} isLit - Lit by a scene
  * @param {(name: string) => void} onPickTarget - Open a viewer card

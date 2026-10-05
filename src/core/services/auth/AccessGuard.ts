@@ -10,8 +10,7 @@ import { isPermissionName } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 
 /**
- * Refuse a permission write the second factor has not opened, an administrator being the
- * one holder that never has to unseal to reach the console
+ * Refuse a permission write the second factor has not opened
  * @param {PermissionHelpers} access - Permission helpers
  * @return {Promise<void>} - Throws while still sealed
  */
@@ -24,7 +23,7 @@ export const assertUnsealed = async (access: PermissionHelpers): Promise<void> =
 }
 
 /**
- * Read the creator an overwrite layer belongs to, nothing standing for the global layer
+ * Read the creator an overwrite layer belongs to
  * @param {Record<string, unknown>} raw - Untouched body
  * @return {string | null} - Creator identifier
  */
@@ -52,7 +51,7 @@ export const readOverwrites = (value: unknown): PermissionOverwrite[] => {
     const row = entry as { permission?: unknown; effect?: unknown }
     const permission = String(row.permission ?? '')
 
-    // One row per permission, the first one landing and the rest dropping
+    // One row per permission
     if (!isPermissionName(permission) || seen.has(permission)) return []
     seen.add(permission)
 

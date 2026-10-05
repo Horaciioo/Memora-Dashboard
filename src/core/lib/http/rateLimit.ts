@@ -49,12 +49,12 @@ const sweep = (now: number): void => {
   }
 }
 
-// Single process fallback, correct until a second instance exists
+// Single process fallback
 const memoryStore: RateLimitStore = {
   hit: async (key, windowSeconds) => {
     const now = Date.now()
 
-    // Amortised cleanup, no timer to unref
+    // Amortised cleanup
     hitsSinceSweep += 1
     if (hitsSinceSweep >= SWEEP_EVERY) {
       hitsSinceSweep = 0
@@ -129,7 +129,7 @@ export const consume = async (name: RateLimitName, identity: string): Promise<Ra
   }
 }
 
-// Headers a proxy sets, ordered from most to least trustworthy
+// Headers a proxy sets
 const ADDRESS_HEADERS = ['x-real-ip', 'cf-connecting-ip', 'x-forwarded-for'] as const
 
 /**

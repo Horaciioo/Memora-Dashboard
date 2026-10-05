@@ -44,7 +44,7 @@ export async function generateMetadata({
 }
 
 /**
- * Training content file, chapters and quizzes authored straight from here
+ * Training content file
  * @param {Object} context - Route context
  * @param {Promise<{ id: string }>} context.params - Dynamic segments
  * @return {Promise<JSX.Element>} - Training content file

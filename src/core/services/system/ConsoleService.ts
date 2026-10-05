@@ -49,7 +49,7 @@ export interface RuntimeReport {
  * Read one subject off a runtime report
  * @param {RuntimeReport} report - Runtime report
  * @param {ConfigSubject} subject - Subject key
- * @return {SubjectState} - Subject state, off when the container never loaded
+ * @return {SubjectState} - Subject state
  */
 
 export const subjectState = (report: RuntimeReport, subject: ConfigSubject): SubjectState =>
@@ -82,7 +82,7 @@ export const readRuntimeReport = (): RuntimeReport => {
 
   const subjects = CONFIG_SUBJECTS.map((subject) => ({
     subject,
-    // A container that never loaded reports every subject as off, which is the truth
+    // A container that never loaded reports every subject as off
     enabled: container?.isLoaded() ? container.config.isEnabled(subject) : false,
     required: manifest.required.includes(subject),
     probe: probes.find((probe) => probe.name === subject) ?? null,
@@ -166,8 +166,8 @@ export interface BucketUsage {
 /**
  * Storage report
  * @typedef {Object} StorageReport
- * @property {number} entries - Objects kept, every bucket together
- * @property {number} bytes - Bytes kept, every bucket together
+ * @property {number} entries - Objects kept
+ * @property {number} bytes - Bytes kept
  * @property {BucketUsage[]} buckets - One row per bucket holding something
  */
 

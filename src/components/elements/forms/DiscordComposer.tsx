@@ -18,15 +18,15 @@ import { foldText } from '@/utils/format/strings'
 // Longest name a mention query may run over
 const QUERY_MAX = 32
 
-// A sigil and the name typed after it, up to the caret
+// A sigil and the name typed after it
 const QUERY_PATTERN = new RegExp(`(^|\\s)([@#])([^\\n@#]{0,${QUERY_MAX}})$`, 'u')
 
 /**
- * Mention offered while typing, with what draws it
+ * Mention offered while typing
  * @typedef {Object} MentionChoice
  * @property {string} token - Token Discord reads
  * @property {string} display - What the writer types
- * @property {FieldOption | null} option - Directory entry, none for @everyone and @here
+ * @property {FieldOption | null} option - Directory entry
  */
 
 interface MentionChoice extends MentionEntry {
@@ -34,8 +34,8 @@ interface MentionChoice extends MentionEntry {
 }
 
 /**
- * Turn the directory into mention choices, channels behind #, everything else behind @
- * @param {FieldOption[]} options - Members, roles and channels
+ * Turn the directory into mention choices
+ * @param {FieldOption[]} options - Members
  * @return {MentionChoice[]} - Choices
  */
 
@@ -62,9 +62,9 @@ export interface DiscordComposerProps {
  * Announcement written the way Discord writes it: the message bar at the bottom, the rendered
  * message above it as it will read in the channel, mentions picked by typing @ or #
  * @param {string} id - Field identifier
- * @param {string} value - Markdown, mention tokens included
+ * @param {string} value - Markdown
  * @param {(value: string) => void} onChange - Markdown handler
- * @param {FieldOption[]} options - Members, roles and channels to mention
+ * @param {FieldOption[]} options - Members
  * @param {string} author - Name the preview is signed with
  * @param {boolean} [disabled] - Blocks the bar
  * @param {number} [maxLength] - Longest message
@@ -87,7 +87,7 @@ export const DiscordComposer = ({
 
   const display = toDisplay(value, choices)
 
-  // Choices under the query, grouped the way the directory declares them
+  // Choices under the query
   const matches = useMemo(() => {
     if (!query) return []
     const needle = foldText(query.text)

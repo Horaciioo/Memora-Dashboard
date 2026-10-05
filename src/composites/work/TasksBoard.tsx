@@ -32,7 +32,7 @@ export interface TasksBoardProps {
 }
 
 /**
- * Task board, its cards carrying the owner
+ * Task board
  * @param {TaskSummary[]} initialTasks - Cards resolved server-side
  * @param {BoardColumn[]} columns - Columns in display order
  * @param {FieldDefinition[]} fields - Field declarations of the task form

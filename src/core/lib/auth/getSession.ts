@@ -53,7 +53,7 @@ export const toSessionUser = async (account: SessionAccount): Promise<SessionUse
 }
 
 /**
- * Read the signed-in member, resolved once per render
+ * Read the signed-in member
  * @return {Promise<SessionUser | null>} - Session user or null
  */
 
@@ -76,7 +76,7 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
     logger.error('[reference] library sync failed', error)
   )
 
-  // The stamp only moves once a day, so the hot path stays a single read
+  // The stamp only moves once a day
   if (session.lastUsedAt < new Date(Date.now() - STAMP_INTERVAL_MS)) {
     void touchSession(token).catch(() => undefined)
   }
@@ -85,7 +85,7 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
 })
 
 /**
- * Check a session token against the database, resolved once per render
+ * Check a session token against the database
  * @param {string} token - Session cookie value
  * @return {Promise<boolean>} - Token still opens a session
  */

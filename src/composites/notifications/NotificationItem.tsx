@@ -19,8 +19,7 @@ export interface NotificationItemProps {
 }
 
 /**
- * One notification, the portrait of whoever acted opening the sentence and the verb alone
- * carrying the emphasis — the way in only appears on the freshest few
+ * One notification
  * @param {NotificationEntry} entry - Notification to draw
  * @param {boolean} withAction - Carries the way in
  * @param {(id: string) => void} onOpen - Called once the row is settled

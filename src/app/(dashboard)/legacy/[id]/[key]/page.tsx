@@ -15,7 +15,7 @@ interface LegacyModulePageProps {
 export const metadata: Metadata = { title: LEGACY_COPY.ownTitle }
 
 /**
- * One module of a Legacy track, played by the member it belongs to
+ * One module of a Legacy track
  * @param {LegacyModulePageProps} props - Track and module keys
  * @return {Promise<JSX.Element>} - Module page
  */
@@ -24,7 +24,7 @@ export default async function LegacyModulePage({ params }: LegacyModulePageProps
   const { id, key } = await params
   const { session } = await requireUser()
 
-  // Only the member plays it, anyone else goes back to the track
+  // Only the member plays it
   const found = await readModule(id, key, session, false).catch(() => null)
   if (!found || !found.playable) redirect(ROUTES.legacyTrack(id))
 

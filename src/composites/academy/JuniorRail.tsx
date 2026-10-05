@@ -10,7 +10,7 @@ import type { JuniorView } from '@/types/academy'
 export interface JuniorRailProps {
   junior: JuniorView
   functionName: string
-  // Mean mastery over the competencies, 0 to 100
+  // Mean mastery over the competencies
   skillAverage: number
   isReady: boolean
   canEdit: boolean
@@ -22,7 +22,7 @@ export interface JuniorRailProps {
  * The bars carry the progress, the tabs carry the detail
  * @param {JuniorView} junior - Junior followed
  * @param {string} functionName - Function the session is scoped to
- * @param {number} skillAverage - Mean mastery, 0 to 100
+ * @param {number} skillAverage - Mean mastery
  * @param {boolean} isReady - Every mandatory training is cleared
  * @param {boolean} canEdit - Viewer may change the file
  * @param {() => void} onEdit - Opens the junior form

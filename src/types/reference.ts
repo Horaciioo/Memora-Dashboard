@@ -2,7 +2,7 @@ import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { ReferenceKey } from '@/declarations/reference/sections'
 
 /**
- * Row of a reference collection, normalised for the admin console
+ * Row of a reference collection
  * @typedef {Object} ReferenceRow
  * @property {string} id - Row identifier
  * @property {string} label - Primary line

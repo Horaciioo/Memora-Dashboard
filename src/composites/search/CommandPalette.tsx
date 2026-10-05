@@ -19,8 +19,7 @@ export interface CommandPaletteProps {
 }
 
 /**
- * Overlay searching every resource at once, driven by the keyboard — mounted only while
- * open, so its term and its cursor reset on their own
+ * Overlay searching every resource at once
  * @param {() => void} onClose - Dismiss handler
  * @return {JSX.Element | null}
  */

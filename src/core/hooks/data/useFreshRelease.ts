@@ -40,7 +40,7 @@ export const useFreshRelease = (): FreshRelease => {
   const markSeen = useCallback(() => {
     if (!release || seenNow === release.version) return
 
-    // Hide at once, persist after
+    // Hide at once
     setSeenNow(release.version)
     void apiPost(API_ROUTES.seenRelease, { version: release.version })
       .then(() => router.refresh())

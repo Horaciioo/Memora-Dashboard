@@ -1,7 +1,7 @@
 import type { LivePlatformName } from '@/utils/constants/lives'
 
 /**
- * One platform link of a member, as the settings show it
+ * One platform link of a member
  * @typedef {Object} PlatformLinkView
  * @property {LivePlatformName} platform - Platform
  * @property {string} login - Account shown

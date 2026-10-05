@@ -27,7 +27,7 @@ export interface IntegrationLinkStepProps {
 
 /**
  * Controls of the closing timeline step — the moment the integration form is handed out
- * @param {IntegrationLinkView | null} link - Form handed out, if any
+ * @param {IntegrationLinkView | null} link - Form handed out
  * @param {FieldDefinition[]} fields - Declarations of the emission form
  * @param {FieldIssue[]} issues - Rejections returned by the server
  * @param {boolean} isSaving - Mutation in flight

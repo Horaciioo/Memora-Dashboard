@@ -13,7 +13,7 @@ import type { StorageBucket } from '@/types/storage'
 import type { PermissionName } from '@/utils/constants/permissions'
 
 /**
- * Stored file, as the interface refers to it
+ * Stored file
  * @typedef {Object} StoredFile
  * @property {string} id - Entry identifier
  * @property {string} url - Route serving the bytes
@@ -46,7 +46,7 @@ export const fileUrl = (id: string): string => `/api/fichiers/${id}`
 const etagOf = (id: string, updatedAt: Date): string => `"${id}-${updatedAt.getTime()}"`
 
 /**
- * Store an uploaded file, bounded by the declared size and type list
+ * Store an uploaded file
  * @param {StorageBucket} bucket - Declared bucket
  * @param {File} file - Uploaded file
  * @return {Promise<StoredFile>} - Stored file
@@ -63,7 +63,7 @@ export const storeFile = async (bucket: StorageBucket, file: File): Promise<Stor
 
   const data = Buffer.from(await file.arrayBuffer())
 
-  // The declared type is a claim, the bytes are the evidence
+  // The declared type is a claim
   const mimeType = sniffMimeType(data)
   if (!FILE_SETTINGS.allowedTypes.includes(mimeType)) {
     throw invalidInput([{ field: 'file', message: FILE_COPY.wrongType }])

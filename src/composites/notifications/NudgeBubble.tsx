@@ -32,7 +32,7 @@ export const NudgeBubble = ({ onGone, children }: NudgeBubbleProps) => {
 
   const fold = useCallback(() => setClosing(true), [])
 
-  // Hold, then fold
+  // Hold
   useEffect(() => {
     const timer = window.setTimeout(fold, NUDGE_SETTINGS.holdMs)
 

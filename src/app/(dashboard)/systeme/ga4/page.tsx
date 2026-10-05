@@ -9,7 +9,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const metadata: Metadata = { title: SYSTEM_COPY.analyticsTitle }
 
 /**
- * Audience of the dashboard, waiting on the Analytics property
+ * Audience of the dashboard
  * @return {Promise<JSX.Element>} - Analytics page
  */
 

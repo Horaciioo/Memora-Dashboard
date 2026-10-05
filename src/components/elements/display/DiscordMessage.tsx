@@ -20,7 +20,7 @@ export interface DiscordMessageProps {
 }
 
 /**
- * Spoiler hidden until clicked, the way Discord shows it
+ * Spoiler hidden until clicked
  * @param {Object} props - Hidden runs
  * @return {JSX.Element}
  */
@@ -44,8 +44,8 @@ const Spoiler = ({ children }: { children: ReactNode }) => {
 
 /**
  * Discord message rendered exactly as the client draws it: markdown, pill mentions, spoilers
- * @param {string} source - Message markdown, mention tokens included
- * @param {MentionEntry[]} mentions - Known mentions, token to name
+ * @param {string} source - Message markdown
+ * @param {MentionEntry[]} mentions - Known mentions
  * @param {string} author - Name above the message
  * @param {string | null} [avatarUrl] - Portrait beside it
  * @param {string} [time] - Stamp beside the name
@@ -61,7 +61,7 @@ export const DiscordMessage = ({
 }: DiscordMessageProps) => {
   const names = new Map(mentions.map((entry) => [entry.token, entry.display]))
 
-  // Name a token, an unknown one reading as Discord shows it
+  // Name a token
   const nameOf = (run: Extract<DiscordInline, { type: 'mention' }>): string => {
     if (run.kind === 'broadcast') return run.token
     const known = names.get(run.token.replace('<@!', '<@'))

@@ -18,7 +18,7 @@ export interface EmojiPickerProps {
 }
 
 /**
- * Chosen glyph standing alone beside a title, opening the catalogue on click
+ * Chosen glyph standing alone beside a title
  * @param {string} id - Identifier of the control
  * @param {string} label - Accessible name of the picker
  * @param {string} value - Stored glyph

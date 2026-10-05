@@ -10,7 +10,7 @@ import type { ModViewIntent, ModViewWindow } from '@/types/modview'
 const CRISIS_LEVEL = 1
 
 /**
- * Whether a gesture may be played, and why not
+ * Whether a gesture may be played
  * @typedef {Object} IntentGate
  * @property {boolean} allowed - Clickable
  * @property {string | null} reason - Said on the greyed control
@@ -70,7 +70,7 @@ const requirementOf = (intent: ModViewIntent): { permission: PermissionName; own
 const exposedOn = (intent: ModViewIntent, platform: LivePlatformName): boolean => {
   if (platform === LivePlatforms.Twitch) return true
 
-  // YouTube has no automod queue, terms, modes nor unban requests
+  // YouTube has no automod queue
   return !['automod', 'term', 'mode', 'unbanRequest', 'warn'].includes(intent.kind)
 }
 
@@ -82,7 +82,7 @@ const exposedOn = (intent: ModViewIntent, platform: LivePlatformName): boolean =
  * @param {LivePlatformName} context.platform - Live platform
  * @param {number | null} context.liveconLevel - Level in force
  * @param {boolean} [context.offline] - Platform not reached
- * @param {string | null} [context.offlineReason] - Why, said instead of the default
+ * @param {string | null} [context.offlineReason] - Why
  * @return {IntentGate} - Gate
  */
 

@@ -47,7 +47,7 @@ export interface SceneStep {
 }
 
 /**
- * A scripted Mod View, data only
+ * A scripted Mod View
  * @typedef {Object} ModViewScene
  * @property {ModViewState} initial - State at the start
  * @property {SceneStep[]} steps - Beats in time order
@@ -92,7 +92,7 @@ const strike = (
     match(message) && !message.deletedBy ? { ...message, deletedBy: moderator } : message
   )
 
-// Chat menu, closed by default
+// Chat menu
 const scriptOf = (view: ModViewState): ChatScript =>
   view.chatScript ?? { menu: null, options: {}, lit: null }
 
@@ -249,12 +249,12 @@ const nameOf = (view: ModViewState, chatterId: string): string =>
   view.messages.find((message) => message.author.id === chatterId)?.author.name ?? chatterId
 
 /**
- * Play a gesture inside a scene, as if the platform agreed
+ * Play a gesture inside a scene
  * @param {SceneState} state - Played state
  * @param {ModViewIntent} intent - Gesture
  * @param {Object} actor - Who plays it
  * @param {string} actor.name - Moderator name
- * @param {string} actor.at - Moment, ISO
+ * @param {string} actor.at - Moment
  * @param {string} actor.id - Act identifier
  * @return {SceneState} - Next state
  */

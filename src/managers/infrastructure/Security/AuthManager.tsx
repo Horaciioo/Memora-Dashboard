@@ -19,7 +19,7 @@ import type { PermissionHelpers, SessionUser } from '@/types/auth'
  * @property {boolean} isAdmin - User is administrator
  * @property {boolean} isResponsable - User leads a team or above
  * @property {boolean} isRoot - User is the root administrator
- * @property {ReturnType<typeof useAuth>} auth - Sign in, sign out, password mutations
+ * @property {ReturnType<typeof useAuth>} auth - Sign in
  */
 
 interface AuthContextValue extends PermissionHelpers {

@@ -76,7 +76,7 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
     setReviewing({ absence, status })
   }
 
-  // Requests first since a teammate waits on them, then calls by date, then tasks
+  // Requests first since a teammate waits on them
   const entries = useMemo<HomeEntry[]>(() => {
     const asked = requests
       .filter((absence) => absence.status === AbsenceStatuses.Pending)
@@ -301,7 +301,7 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
             <DetailGrid
               entries={[
                 { label: PERSONAL_TASK_COPY.what, value: opened.description },
-                // An announcement is done here, no place nor day to show
+                // An announcement is done here
                 ...(opened.announcement
                   ? []
                   : [

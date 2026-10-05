@@ -26,7 +26,7 @@ export async function switchView(view: string): Promise<void> {
 
 /**
  * Pin the creator
- * @param {string | null} youtuberId - Creator identifier, null clearing it
+ * @param {string | null} youtuberId - Creator identifier
  * @return {Promise<void>} - Pinned
  */
 

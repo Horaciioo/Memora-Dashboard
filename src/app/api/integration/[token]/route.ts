@@ -20,7 +20,7 @@ export const POST = createPublicRoute({
     const cookieStore = await cookies()
     const ticket = unpackTicket(cookieStore.get(INTEGRATION_TICKET_COOKIE)?.value)
 
-    // The identity is the one the server itself resolved, never one the form sent
+    // The identity is the one the server itself resolved
     if (!ticket || ticket.token !== params.token) throw notFound()
 
     const invite = await resolveInvite(params.token)
@@ -31,7 +31,7 @@ export const POST = createPublicRoute({
 
     const outcome = await submitIntegration(params.token, ticket.claimId, parsed.values)
 
-    // The ticket is spent, a reload never re-opens the same account
+    // The ticket is spent
     cookieStore.delete(INTEGRATION_TICKET_COOKIE)
 
     if (outcome.accountId) {

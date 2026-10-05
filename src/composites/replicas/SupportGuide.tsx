@@ -15,7 +15,7 @@ export interface SupportGuideProps {
 }
 
 /**
- * Notch on the left of a simulation, sliding out the steps of a ticket as a timeline
+ * Notch on the left of a simulation
  * @param {GuideStep[]} steps - Steps of the guide
  * @param {number | null} current - Step in force
  * @return {JSX.Element}

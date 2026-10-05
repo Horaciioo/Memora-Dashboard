@@ -20,7 +20,7 @@ export const PATCH = createProtectedRoute({
   handler: async ({ params, raw, session, access }) => {
     const scope = academyScope(session, access)
 
-    // A lone done flag only toggles a free moment, it never rewrites it
+    // A lone done flag only toggles a free moment
     if (typeof raw.done === 'boolean') return setStepDone(params.id, scope, raw.done)
 
     // A lone validated flag only clears or reopens a timeline step

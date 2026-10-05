@@ -1,7 +1,7 @@
 import type { Course } from '@/declarations/academy/curriculum/types'
 
 /**
- * Professional writing course, about reasons, notes and messages the team leaves behind
+ * Professional writing course
  * @type {Course}
  */
 

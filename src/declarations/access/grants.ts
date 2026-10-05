@@ -7,7 +7,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
 /**
  * One batch of permissions landing on an existing database
  * @typedef {Object} GrantAddition
- * @property {string} key - Stable identifier, never reused
+ * @property {string} key - Stable identifier
  * @property {Partial<Record<MemberRoleName, PermissionName[]>>} grants - Permissions per role
  * @property {Record<string, PermissionName[]>} [functions] - Permissions per function name
  */
@@ -19,8 +19,7 @@ export interface GrantAddition {
 }
 
 /**
- * Permission batches, applied once each and never taken back — a permission an
- * administrator removes afterwards stays removed
+ * Permission batches
  * @type {readonly GrantAddition[]}
  */
 
@@ -103,7 +102,7 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
         Permissions.LiveTerms,
         Permissions.LiveLogRead,
       ],
-      // Floor role, so every member down to a junior
+      // Floor role
       [MemberRoles.Moderateur]: [Permissions.LiveRead, Permissions.LiveModerate],
     },
     functions: { Formateurs: [Permissions.LiveLogRead] },
@@ -118,7 +117,7 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
         Permissions.LiveFocus,
       ],
     },
-    // Trainers follow their juniors only, checked on the server
+    // Trainers follow their juniors only
     functions: { Formateurs: [Permissions.LiveFocus] },
   },
 ]

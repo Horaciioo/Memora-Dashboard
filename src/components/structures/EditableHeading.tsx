@@ -9,16 +9,16 @@ import { cn } from '@/utils/classnames'
 
 export interface EditableHeadingProps {
   value: string
-  // Emoji of the record, drawn bare before the title
+  // Emoji of the record
   glyph?: string | null
   disabled: boolean
   onCommit: (value: string) => Promise<boolean>
-  // Persists a picked glyph, absent while the record carries none
+  // Persists a picked glyph
   onGlyphCommit?: (value: string | null) => Promise<boolean>
 }
 
 /**
- * Page title that swaps for an input on click, its glyph picked right beside it
+ * Page title that swaps for an input on click
  * @param {string} value - Current title
  * @param {string | null} [glyph] - Emoji of the record
  * @param {boolean} disabled - Blocks editing

@@ -1,5 +1,5 @@
 /**
- * Discord message and composer, drawn on Discord's own dark tokens
+ * Discord message and composer
  * @type {Record<string, string>}
  */
 
@@ -33,7 +33,7 @@ export const DISCORD_MESSAGE = {
     'rounded-[3px] bg-[var(--discord-mention)] px-0.5 font-medium text-[var(--discord-mention-text)] transition-colors hover:bg-[var(--discord-mention-hover)] hover:text-white',
   spoiler: 'cursor-pointer rounded-[3px] bg-[var(--discord-spoiler)] text-transparent',
   spoilerOpen: 'rounded-[3px] bg-[var(--discord-quote)]/40',
-  // Composer, the message bar of a channel
+  // Composer
   composer: 'relative px-4 pb-4',
   input:
     'block max-h-[50vh] min-h-11 w-full resize-none rounded-[var(--radius-md)] bg-[var(--discord-input)] px-4 py-2.5 text-[var(--discord-text)] placeholder:text-[var(--discord-muted)] focus:outline-none',

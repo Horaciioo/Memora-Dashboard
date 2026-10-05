@@ -11,7 +11,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { BUTTON_STYLES, NOTIFICATION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
-// Window built only once the bell is first rung, kept out of the shell bundle
+// Window built only once the bell is first rung
 const NotificationsPanel = dynamic(
   () =>
     import('@/composites/notifications/NotificationsPanel').then((mod) => mod.NotificationsPanel),
@@ -24,8 +24,7 @@ export interface NotificationsBellProps {
 }
 
 /**
- * Bell of the rail, its box opening beside the rail, its dot resolved server-side so it is
- * right on first paint
+ * Bell of the rail
  * @param {number} initialUnread - Unopened count resolved server-side
  * @param {string} [iconClassName] - Classes overriding the standard glyph size
  * @return {JSX.Element}

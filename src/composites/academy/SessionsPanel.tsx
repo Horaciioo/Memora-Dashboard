@@ -37,7 +37,7 @@ export interface SessionsPanelProps {
 // Glyph of a session
 
 /**
- * Academy board, one row per session, each opening its own follow-up screen
+ * Academy board
  * @param {SessionSummary[]} initialSessions - Sessions resolved server-side
  * @param {FieldDefinition[]} fields - Declarations of the session form
  * @param {boolean} canManage - Member may open and close sessions
@@ -51,7 +51,7 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
   const { contextMenu } = useMenu()
   const [isCreating, setCreating] = useState(false)
   const [showFinished, setShowFinished] = useState(false)
-  // Read once, a progress bar needs no ticking clock
+  // Read once
   const [now] = useState(() => Date.now())
   const [editing, setEditing] = useState<SessionSummary | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<SessionSummary | null>(null)
@@ -89,7 +89,7 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
     },
   ]
 
-  // Running sessions first, the finished ones below
+  // Running sessions first
   const [running, finished] = [
     sessions.filter((entry) => !FINISHED_ACADEMY_SESSION_STATUSES.includes(entry.status)),
     sessions.filter((entry) => FINISHED_ACADEMY_SESSION_STATUSES.includes(entry.status)),
@@ -98,7 +98,7 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
   const card = (session: SessionSummary) => {
     const status = ACADEMY_SESSION_STATUS_REGISTRY.get(session.status)
     const isFinished = FINISHED_ACADEMY_SESSION_STATUSES.includes(session.status)
-    // Inside the running group every card says so, only the others need their state
+    // Inside the running group every card says so
     const isRunning = session.status === AcademySessionStatuses.Running
 
     // How far the session went between its two dates

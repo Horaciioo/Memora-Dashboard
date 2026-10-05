@@ -17,7 +17,7 @@ export interface CourseOutroProps {
   trainingId: string
 }
 
-// Marks of one scale, 1 up to the declared top
+// Marks of one scale
 const MARKS = Array.from({ length: ACADEMY_SETTINGS.feedbackScale }, (_, index) => index + 1)
 
 interface ScaleProps {
@@ -71,7 +71,7 @@ export const CourseOutro = ({ trainingId }: CourseOutroProps) => {
   const [fluency, setFluency] = useState<number | null>(null)
   const [comment, setComment] = useState('')
 
-  // The review goes first, then the stamp plays on the catalogue
+  // The review goes first
   const leave = async () => {
     if (content === null || fluency === null) return
 

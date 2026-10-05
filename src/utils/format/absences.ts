@@ -4,16 +4,16 @@ import { AbsenceStatuses } from '@/utils/constants/workflow'
 import { parseDay, startOfDay } from '@/utils/format/days'
 
 /**
- * What the member wrote for their team, nothing else is shown about an absence
+ * What the member wrote for their team
  * @param {MemberAbsence} absence - Absence row
- * @return {string | null} - Reason, or null when none was given
+ * @return {string | null} - Reason
  */
 
 export const absenceReasonText = (absence: MemberAbsence): string | null =>
   absence.reason?.trim() || null
 
 /**
- * Days and month of an absence, split so the days can be set large and the month quiet
+ * Days and month of an absence
  * @param {string} start - First day
  * @param {string} end - Last day
  * @return {{ days: string, month: string }} - Large and small parts of the range
@@ -47,7 +47,7 @@ export const absenceSpan = (start: string, end: string): { days: string; month: 
  * A range read as a sentence: "lundi 26 au vendredi 30 octobre"
  * @param {string} start - First day
  * @param {string} end - Last day
- * @return {string} - Sentence, with the month once when both days share it
+ * @return {string} - Sentence
  */
 
 export const absenceSentence = (start: string, end: string): string => {
@@ -69,7 +69,7 @@ export const absenceSentence = (start: string, end: string): string => {
 /**
  * Whether an absence is closed: refused, withdrawn, or its last day already behind
  * @param {MemberAbsence} absence - Absence to read
- * @param {number} today - Start of today, in milliseconds
+ * @param {number} today - Start of today
  * @return {boolean}
  */
 

@@ -6,7 +6,7 @@ import { timeLabel } from '@/utils/format/days'
 // Milliseconds in one day
 const DAY_MS = 86_400_000
 
-// Milliseconds in one minute and one hour, read by the elapsed wording
+// Milliseconds in one minute and one hour
 const MINUTE_MS = 60_000
 const HOUR_MS = 3_600_000
 
@@ -84,7 +84,7 @@ export function formatDate(date: Date | string, utc: boolean = true): ReactNode 
 /**
  * Format a day
  * @param {Date | string | null | undefined} date - Date to format
- * @return {string} - Day, or a dash when absent
+ * @return {string} - Day
  */
 
 export function formatDay(date: Date | string | null | undefined): string {
@@ -100,7 +100,7 @@ export function formatDay(date: Date | string | null | undefined): string {
 /**
  * Format a day and its time
  * @param {Date | string | null | undefined} date - Date to format
- * @return {string} - Day and time, or a dash when absent
+ * @return {string} - Day and time
  */
 
 export function formatDayTime(date: Date | string | null | undefined): string {
@@ -177,7 +177,7 @@ export function isOverdue(date: Date | string | null | undefined): boolean {
 /**
  * Format a day for a date input
  * @param {Date | string | null | undefined} date - Date to format
- * @return {string} - ISO day, or an empty string
+ * @return {string} - ISO day
  */
 
 export function toDateInput(date: Date | string | null | undefined): string {
@@ -189,7 +189,7 @@ export function toDateInput(date: Date | string | null | undefined): string {
 /**
  * Format a moment for a datetime input
  * @param {Date | string | null | undefined} date - Date to format
- * @return {string} - ISO minute, or an empty string
+ * @return {string} - ISO minute
  */
 
 export function toDateTimeInput(date: Date | string | null | undefined): string {

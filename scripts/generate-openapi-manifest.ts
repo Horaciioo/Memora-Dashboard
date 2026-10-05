@@ -7,7 +7,7 @@ const ROOT = dirname(dirname(fileURLToPath(import.meta.url)))
 const API_DIR = join(ROOT, 'src/app/api')
 const OUTPUT = join(ROOT, 'src/generated/openapi/manifest.ts')
 
-// Serves the document, never lists itself
+// Serves the document
 const SELF = join(API_DIR, 'openapi/route.ts')
 
 // Exported HTTP verbs
@@ -38,7 +38,7 @@ const pathOf = (file: string): string =>
     .replace(/\[\.\.\.(\w+)\]/g, '{$1}')
     .replace(/\[(\w+)\]/g, '{$1}')
 
-// Static imports only, bundler-safe
+// Static imports only
 const entries = routeFiles(API_DIR)
   .filter((file) => file !== SELF)
   .sort()

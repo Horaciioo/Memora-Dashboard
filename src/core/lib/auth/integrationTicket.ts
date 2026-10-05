@@ -8,7 +8,7 @@ import { cookieName } from '@/utils/constants/cookies'
 export const INTEGRATION_TICKET_COOKIE = cookieName('integrationClaim')
 
 /**
- * What the integration flow carries between the link, Discord and the form
+ * What the integration flow carries between the link
  * @typedef {Object} IntegrationTicket
  * @property {string} token - Link the ticket belongs to
  * @property {string} [claimId] - Identity resolved by the callback

@@ -9,7 +9,7 @@ import { BUTTON_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 export interface SearchLauncherProps {
-  // Overrides the standard glyph button, e.g. the dark round button of the mobile shell
+  // Overrides the standard glyph button
   className?: string
   iconClassName?: string
   // Full bar variant
@@ -17,7 +17,7 @@ export interface SearchLauncherProps {
 }
 
 /**
- * Glyph opening the command palette, which the keyboard also reaches on its own
+ * Glyph opening the command palette
  * @param {string} [className] - Classes overriding the standard glyph button
  * @param {string} [iconClassName] - Classes overriding the standard glyph size
  * @param {boolean} [expanded] - Renders the full bar

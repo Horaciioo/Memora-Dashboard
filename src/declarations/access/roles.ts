@@ -83,7 +83,7 @@ export const byRoleRank = (left: MemberRoleName, right: MemberRoleName): number 
   ROLE_MAP[right].rank - ROLE_MAP[left].rank
 
 /**
- * Level every account stands on, its grants being the base every overwrite resolves against
+ * Level every account stands on
  * @type {MemberRoleName}
  */
 
@@ -233,6 +233,6 @@ export const ROLE_PRESETS: Record<MemberRoleName, PermissionName[]> = {
     Permissions.TeamRead,
     Permissions.CalendarRead,
   ],
-  // Stands on the floor role, nothing added on top
+  // Stands on the floor role
   [MemberRoles.Junior]: [],
 }

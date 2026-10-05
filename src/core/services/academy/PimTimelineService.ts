@@ -17,7 +17,7 @@ import {
 import type { AcademyStageName } from '@/utils/constants/hierarchy'
 import type { Prisma } from '@prisma/client'
 
-// Stages only a validated check-in opens, never a click on the timeline
+// Stages only a validated check-in opens
 const REVIEW_GATED: AcademyStageName[] = [AcademyStages.Practice, AcademyStages.Bonus]
 
 // Stage rank on the PIM
@@ -34,7 +34,7 @@ type StepRow = Prisma.AcademyStepGetPayload<{ include: typeof STEP_SHAPE }>
 /**
  * Order the steps of one junior the way the PIM runs them
  * @param {StepRow[]} rows - Timeline rows
- * @return {StepRow[]} - Rows, first to last
+ * @return {StepRow[]} - Rows
  */
 
 const inRunOrder = (rows: StepRow[]): StepRow[] =>
@@ -75,7 +75,7 @@ const readJuniorState = async (juniorId: string, scope: Prisma.AcademySessionWhe
  * Tell why the step in course cannot move yet
  * @param {object} junior - Junior with its session status
  * @param {StepRow | undefined} current - Step in course
- * @return {PimTimelineLock | null} - Lock, or none
+ * @return {PimTimelineLock | null} - Lock
  */
 
 const lockOf = (
@@ -95,7 +95,7 @@ const lockOf = (
     return 'awaitingDecision'
   }
 
-  // Passage granted, the promotion not yet in period 2
+  // Passage granted
   const granted = junior.reviews.some(
     (review) =>
       review.stage === AcademyStages.ReviewOne && review.status === ReviewStatuses.Validated
@@ -145,7 +145,7 @@ const toTimelineStep = (row: StepRow, currentId: string | null): PimTimelineStep
 }
 
 /**
- * Read the vertical timeline of one junior, the step in course first to act on
+ * Read the vertical timeline of one junior
  * @param {string} juniorId - Junior identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<PimTimeline>} - Timeline
@@ -176,7 +176,7 @@ export const readTimeline = async (
 }
 
 /**
- * Clear the step in course and light the next one, the junior's stage following along
+ * Clear the step in course and light the next one
  * @param {string} juniorId - Junior identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {string} actorId - Responsable moving the timeline
@@ -196,7 +196,7 @@ export const advanceTimeline = async (
   const current = timeline.steps[index]
   const next = timeline.steps[index + 1]
 
-  // The stage moves with the timeline, except into a stage a check-in opens
+  // The stage moves with the timeline
   const target = [current?.stage, next?.stage]
     .filter((stage): stage is AcademyStageName => Boolean(stage))
     .filter((stage) => !REVIEW_GATED.includes(stage))
@@ -217,7 +217,7 @@ export const advanceTimeline = async (
 }
 
 /**
- * Step in course of one junior, with who it waits for
+ * Step in course of one junior
  * @typedef {Object} OpenStep
  * @property {string} juniorId - Junior identifier
  * @property {string} sessionId - Promotion identifier
@@ -233,9 +233,9 @@ export interface OpenStep {
 }
 
 /**
- * Read the step in course of every running junior matching a filter, in two queries
+ * Read the step in course of every running junior matching a filter
  * @param {Prisma.AcademyJuniorWhereInput} where - Juniors concerned
- * @return {Promise<OpenStep[]>} - Steps in course, one per junior at most
+ * @return {Promise<OpenStep[]>} - Steps in course
  */
 
 export const openSteps = async (where: Prisma.AcademyJuniorWhereInput): Promise<OpenStep[]> => {
@@ -267,7 +267,7 @@ export const openSteps = async (where: Prisma.AcademyJuniorWhereInput): Promise<
     const current = inRunOrder(rows.filter((row) => row.juniorId === junior.id))[0]
     if (!current?.stage) return []
 
-    // A step behind a check-in waits for the decision, not for a task
+    // A step behind a check-in waits for the decision
     const gated =
       stageRank(current.stage) > stageRank(junior.stage) && REVIEW_GATED.includes(current.stage)
     if (gated) return []

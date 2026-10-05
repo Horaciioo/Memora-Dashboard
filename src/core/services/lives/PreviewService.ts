@@ -9,7 +9,7 @@ import type { SanctionPanelView } from '@/types/sanctions'
 import { SanctionPanels } from '@/utils/constants/moderation'
 
 /**
- * First real Twitch panel of the perimeter, so a scripted Mod View reads true
+ * First real Twitch panel of the perimeter
  * @param {AccessScope} perimeter - Viewer perimeter
  * @return {Promise<{ panel: SanctionPanelView | null, levelNames: Record<string, string> }>} - Panel and level names
  */
@@ -23,7 +23,7 @@ export const readDemoPanel = async (
     readCurrentState(perimeter),
   ])
 
-  // The active creator first, else the first one holding a panel
+  // The active creator first
   const candidates = perimeter.activeYoutuberId
     ? [perimeter.activeYoutuberId]
     : creators.map((creator) => creator.value)

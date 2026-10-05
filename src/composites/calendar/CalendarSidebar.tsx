@@ -32,7 +32,7 @@ export interface CalendarSidebarProps {
 }
 
 /**
- * Tick of one switch, only the check shows and only while it is on
+ * Tick of one switch
  * @param {Object} props - Box state
  * @param {string | undefined} props.accent - Stored colour
  * @param {boolean} props.on - Switch is on
@@ -51,8 +51,8 @@ const TickBox = ({ accent, on }: { accent: string | undefined; on: boolean }) =>
 }
 
 /**
- * Rail folded behind one button, for the screens that keep no sidebar
- * @param {CalendarSidebarProps} props - Cursor, filters and their handlers
+ * Rail folded behind one button
+ * @param {CalendarSidebarProps} props - Cursor
  * @return {JSX.Element}
  */
 
@@ -79,8 +79,8 @@ export const CalendarSidebar = (props: CalendarSidebarProps) => {
 }
 
 /**
- * Month in miniature then the switches, the body of the side rail
- * @param {CalendarSidebarProps} props - Cursor, filters and their handlers
+ * Month in miniature then the switches
+ * @param {CalendarSidebarProps} props - Cursor
  * @return {JSX.Element}
  */
 
@@ -165,9 +165,8 @@ export const CalendarRailBody = ({
 )
 
 /**
- * Left sidebar of the calendar, the way back, then the month and the switches where the
- * destinations usually stand
- * @param {CalendarSidebarProps} props - Cursor, filters and their handlers
+ * Left sidebar of the calendar
+ * @param {CalendarSidebarProps} props - Cursor
  * @return {JSX.Element}
  */
 
@@ -186,7 +185,7 @@ export const CalendarRailPanel = (props: CalendarSidebarProps) => {
 }
 
 /**
- * Search bar of the sidebar while the calendar is open, filtering the entries on screen
+ * Search bar of the sidebar while the calendar is open
  * @param {Object} props - Field state
  * @param {string} props.value - Typed words
  * @param {(value: string) => void} props.onChange - Change handler

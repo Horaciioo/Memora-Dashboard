@@ -48,7 +48,7 @@ export const PATCH = createProtectedRoute({
       query.get(SCOPE_PARAM) ?? undefined
     )
 
-    // Leaving a team concerns nobody but the board, joining one concerns the moderator
+    // Leaving a team concerns nobody but the board
     if (teamId) {
       await notify({
         kind: 'TeamAssigned',

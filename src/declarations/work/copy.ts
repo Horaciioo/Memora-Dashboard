@@ -7,23 +7,23 @@ import type { WorkflowScopeName } from '@/utils/constants/workflow'
 
 export const PROJECT_COPY = {
   title: 'Projets',
-  lead: 'Chaque projet porte son YouTubeur, son état, sa priorité, sa deadline et son équipe.',
+  lead: 'Un projet, un objectif, un responsable, un état.',
   add: 'Créer un projet',
   emptyTitle: 'Aucun projet pour le moment.',
   filterTitle: 'Aucun projet ne correspond',
   filterDescription: 'Élargis ou retire les filtres en cours.',
-  deleteTitle: 'Supprimer ce projet ?',
-  deleteDescription: 'Ses communications partent avec lui. Ses tâches et réunions sont détachées.',
+  deleteTitle: 'Souhaite-tu supprimer ce projet ?',
+  deleteDescription: 'Les annonces seront également supprimées. Ses tâches et réunions sont quant à elles détachées.',
   missingStates: 'Crée d’abord des états de projet dans la configuration.',
   tabOverview: 'Aperçu',
   tabCommunication: 'Communication',
   tabTasks: 'Tâches',
   tabMeetings: 'Réunions',
   communicationTitle: 'Communication',
-  communicationLead: 'Rédige l’annonce ici, l’aperçu montre le rendu Discord en direct.',
+  communicationLead: 'Ce que tu rédiges se transforme en aperçu directement sur Discord.',
   communicationAdd: 'Rédiger une annonce',
   communicationEmptyTitle: 'Aucune annonce pour le moment.',
-  communicationDeleteTitle: 'Supprimer cette annonce ?',
+  communicationDeleteTitle: 'Souhaite-tu supprimer cette annonce ?',
   communicationDeleteDescription: 'Le texte est perdu définitivement.',
   published: 'Publiée',
   draft: 'Brouillon',
@@ -76,7 +76,7 @@ export const PROJECT_FIELD_INFO = {
   leads: 'Les personnes qui pilotent le projet et en répondent. Par défaut, toi.',
   assistants: 'Les modérateurs qui prêtent main-forte sans piloter.',
   youtuber: 'Le créateur pour qui le projet est mené.',
-  state: 'L’étape où en est le projet, elle décide de sa colonne sur le tableau.',
+  state: 'L’étape où en est le projet.',
   priority: 'L’urgence du projet par rapport aux autres.',
   platform: 'La plateforme où se déroule l’action principale du projet.',
   deadline: 'Le jour où le projet doit être livré.',
@@ -133,7 +133,7 @@ export const TASK_FIELD_INFO = {
   description: 'Les détails utiles pour s’y mettre sans poser de question.',
   dueDate: 'Le jour où la tâche doit être faite.',
   owner: 'La personne qui s’occupe de la tâche. Par défaut, toi.',
-  state: 'L’étape où en est la tâche, elle décide de sa colonne sur le tableau.',
+  state: 'L’étape où en est la tâche.',
   priority: 'L’urgence de la tâche par rapport aux autres.',
   youtuber: 'Le créateur concerné par la tâche.',
   project: 'Le projet dont la tâche fait partie, s’il y en a un.',
@@ -220,7 +220,7 @@ export const MEETING_FIELD_INFO = {
   durationMin: 'Le temps prévu, en minutes.',
   audience:
     'Toute l’équipe ou une équipe (Discord, Twitch) : la réunion s’affiche sur l’Accueil de chacun de ses membres. Personnalisé : seulement chez les personnes nommées.',
-  state: 'L’étape où en est la réunion, elle décide de sa colonne sur le tableau.',
+  state: 'L’étape où en est la réunion.',
   youtuber: 'Le créateur concerné par la réunion.',
   project: 'Le projet dont on parle, s’il y en a un.',
   leads: 'Les personnes prévues pour prendre la parole majoritairement.',
@@ -255,7 +255,7 @@ export const BOARD_FILTER_COPY = {
 } as const
 
 /**
- * Singular label and gender of each board scope, driving its toasts
+ * Singular label and gender of each board scope
  * @type {Record<WorkflowScopeName, { label: string; gender: 'masculine' | 'feminine' }>}
  */
 
@@ -269,7 +269,7 @@ export const BOARD_ENTITY_COPY: Record<
 }
 
 /**
- * Singular label and gender of a meeting topic, driving its toasts
+ * Singular label and gender of a meeting topic
  * @type {{ label: string, gender: 'masculine' | 'feminine' }}
  */
 

@@ -43,7 +43,7 @@ export const useCalendarFiltersStore = create<CalendarFiltersStore>()(
       toggleCreator: (creatorId) =>
         set((state) => ({ hiddenCreators: flip(state.hiddenCreators, creatorId) })),
     }),
-    // Read after mount, so the server markup never disagrees with the browser
+    // Read after mount
     { name: 'calendarFilters', skipHydration: true }
   )
 )

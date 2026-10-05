@@ -67,10 +67,10 @@ export interface CandidateComment {
 }
 
 /**
- * One applicant of a session, keyed on their Discord identifier
+ * One applicant of a session
  * @typedef {Object} CandidateView
  * @property {string} id - Candidate identifier
- * @property {string} discordId - Discord identifier, the key to a later account
+ * @property {string} discordId - Discord identifier
  * @property {string | null} displayName - Pseudonym given at application
  * @property {string} name - Best known name
  * @property {string | null} formId - Meltdown Forms identifier
@@ -171,7 +171,7 @@ export interface RecruitmentOutcomeView {
  * @property {RecruitmentStepView[]} steps - Timeline moments
  * @property {RecruitmentQuestionView[]} questions - Interview script in force
  * @property {RecruitmentOutcomeView[]} outcomes - Columns of the results board
- * @property {IntegrationLinkView | null} link - Integration form handed out, if any
+ * @property {IntegrationLinkView | null} link - Integration form handed out
  */
 
 export interface RecruitmentDetail {

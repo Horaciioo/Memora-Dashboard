@@ -54,9 +54,9 @@ const FUNCTION_SHAPE = {
 } as const
 
 /**
- * Posts a member holds, every projection carrying them
+ * Posts a member holds
  * @typedef {Object} ProjectedPosts
- * @property {Array<Object>} functions - Held functions with their name, colour, kind and rank
+ * @property {Array<Object>} functions - Held functions with their name
  */
 
 export interface ProjectedPosts {
@@ -86,7 +86,7 @@ export interface ProjectedMember extends ProjectedPosts {
 export const memberFunction = (
   member: ProjectedPosts | null | undefined
 ): { name: string; accent: string } | null => {
-  // Down the hierarchy, principal posts first, then by rank
+  // Down the hierarchy
   const posts = (member?.functions ?? []).map((held) => held.jobFunction).sort(byHierarchy)
   const carrying = posts.find((post) => post.accent)
 
@@ -112,7 +112,7 @@ export const creatorId = (member: ProjectedMember | null | undefined): string | 
   member?.youtubers[0]?.id ?? null
 
 /**
- * Shape a projected entry, read-only by construction
+ * Shape a projected entry
  * @param {Object} input - Projection input
  * @param {CalendarSourceName} input.source - Domain it came from
  * @param {string} input.id - Identifier in that domain
@@ -176,7 +176,7 @@ const projected = ({
   return {
     id: `${source.toLowerCase()}:${id}`,
     source,
-    // Anything spanning whole days reads as a band, a dated moment reads as a card
+    // Anything spanning whole days reads as a band
     kind: kind ?? (allDay ? CalendarKinds.Period : CalendarKinds.Event),
     title,
     emoji: emoji ?? null,
@@ -217,7 +217,7 @@ export const absenceEntries = async ({
 }: ProjectionContext): Promise<CalendarEntry[]> => {
   if (!access.can(Permissions.AbsenceRead)) return []
 
-  // A pending absence is only a request, so only its reviewers see it coming
+  // A pending absence is only a request
   const statuses = access.can(Permissions.AbsenceReview)
     ? [AbsenceStatuses.Approved, AbsenceStatuses.Pending]
     : [AbsenceStatuses.Approved]
@@ -240,7 +240,7 @@ export const absenceEntries = async ({
       startsAt: row.startDate,
       endsAt: row.endDate,
       allDay: true,
-      // An absence is background information, so it never wears a creator colour
+      // An absence is background information
       kind: CalendarKinds.Event,
       muted: true,
       accent: null,
@@ -268,7 +268,7 @@ export const meetingEntries = async ({
   const rows = await prisma.meeting.findMany({
     where: scopedWhere('meeting', scope, {
       scheduledAt: { gte: from, lte: to },
-      // A meeting already posted on the calendar is drawn from its own row, never twice
+      // A meeting already posted on the calendar is drawn from its own row
       calendarEvents: { none: {} },
     }),
     include: {
@@ -298,7 +298,7 @@ export const meetingEntries = async ({
       allDay: false,
       accent: row.youtuber?.accent ?? creatorAccent(lead),
       youtuberId: row.youtuberId ?? creatorId(lead),
-      // A planned meeting shows nothing of its content, only its subject titles
+      // A planned meeting shows nothing of its content
       description: null,
       subjectName: lead?.displayName ?? null,
       href: ROUTES.meeting(row.id),
@@ -329,11 +329,11 @@ export interface BirthdayOccurrence {
 }
 
 /**
- * Read the celebrated birthdays of a window, members who declined it never listed
+ * Read the celebrated birthdays of a window
  * @param {Date} from - First moment
  * @param {Date} to - Last moment
  * @param {AccessScope} scope - Creator perimeter
- * @return {Promise<BirthdayOccurrence[]>} - Occurrences, soonest first
+ * @return {Promise<BirthdayOccurrence[]>} - Occurrences
  */
 
 export const birthdaysBetween = async (
@@ -342,14 +342,12 @@ export const birthdaysBetween = async (
   scope: AccessScope
 ): Promise<BirthdayOccurrence[]> => {
   /*
-   * Postgres narrows the candidates, Node keeps the last word. Comparing month
-   * and day as one integer avoids ever building a date that does not exist,
-   * which is what a 29 February birthday does in a non leap year
+   * Postgres narrows the candidates
    */
 
   const dayKey = (date: Date): number => (date.getMonth() + 1) * 100 + date.getDate()
 
-  // Widened by a day each side, so the filter below never loses a candidate
+  // Widened by a day each side
   const fromKey = dayKey(new Date(from.getTime() - DAY_MS))
   const toKey = dayKey(new Date(to.getTime() + DAY_MS))
 
@@ -381,7 +379,7 @@ export const birthdaysBetween = async (
     .flatMap((row) => {
       const birthday = row.birthday as Date
 
-      // A window can straddle a new year, so both candidate years are tried
+      // A window can straddle a new year
       return [start.getFullYear(), end.getFullYear()]
         .filter((year, index, years) => years.indexOf(year) === index)
         .map((year) => new Date(year, birthday.getMonth(), birthday.getDate()))
@@ -399,7 +397,7 @@ export const birthdaysBetween = async (
 }
 
 /**
- * Project the birthdays falling inside the window, year after year
+ * Project the birthdays falling inside the window
  * @param {ProjectionContext} context - Window and permissions
  * @return {Promise<CalendarEntry[]>} - Projected birthdays
  */
@@ -431,7 +429,7 @@ export const birthdayEntries = async ({
 }
 
 /**
- * Project the dated steps of the academy, or of one session
+ * Project the dated steps of the academy
  * @param {ProjectionContext} context - Window and permissions
  * @param {string} [sessionId] - Session the board is bound to
  * @return {Promise<CalendarEntry[]>} - Projected steps
@@ -515,7 +513,7 @@ export const academySessionEntries = async ({
 }
 
 /**
- * Project the recruitment campaigns open in the window, and the interviews they hold
+ * Project the recruitment campaigns open in the window
  * @param {ProjectionContext} context - Window and permissions
  * @return {Promise<CalendarEntry[]>} - Projected sessions and interviews
  */

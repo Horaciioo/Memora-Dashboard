@@ -16,7 +16,7 @@ export interface TagsInputProps {
 }
 
 /**
- * Free text list, entries confirmed with Enter or a comma
+ * Free text list
  * @param {string} id - Identifier of the inner control
  * @param {string[]} value - Current entries
  * @param {(value: string[]) => void} onChange - Entries handler

@@ -14,11 +14,11 @@ import { MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { FunctionKinds } from '@/utils/constants/workflow'
 
-// Role glyph, tinted by the function it carries
+// Role glyph
 type RoleGlyphComponent = ComponentType<{ className?: string; tone?: FrameTone }>
 
 /**
- * Glyph and own tint of each role, the top of the hierarchy
+ * Glyph and own tint of each role
  * @type {Record<MemberRoleName, { glyph: RoleGlyphComponent, tone: FrameTone, tinted: boolean }>}
  */
 
@@ -26,7 +26,7 @@ export const ROLE_EMBLEMS: Record<
   MemberRoleName,
   { glyph: RoleGlyphComponent; tone: FrameTone; tinted: boolean }
 > = {
-  // Holds no function, always its own red
+  // Holds no function
   [MemberRoles.Admin]: { glyph: AdminGlyph, tone: 'ADMIN', tinted: false },
   [MemberRoles.Responsable]: { glyph: ResponsableGlyph, tone: 'RESPONSABLE', tinted: true },
   [MemberRoles.Moderateur]: { glyph: ModeratorGlyph, tone: 'brand', tinted: true },
@@ -34,7 +34,7 @@ export const ROLE_EMBLEMS: Record<
 }
 
 /**
- * Short mark of each division, drawn in the corner of the portrait
+ * Short mark of each division
  * @type {Record<string, string>}
  */
 
@@ -46,17 +46,17 @@ export const DIVISION_MARKS: Record<string, string> = {
 }
 
 /**
- * Official logo of a division, the stored path first then the one declared in code
+ * Official logo of a division
  * @param {string} label - Division name
  * @param {string | null} [stored] - Path kept in the database
- * @return {string | null} - Public path, none for a division without logo
+ * @return {string | null} - Public path
  */
 
 export const divisionLogo = (label: string, stored?: string | null): string | null =>
   stored ?? FIXED_DIVISIONS.find((division) => division.name === label)?.imagePath ?? null
 
 /**
- * Mark of one division, its first letter when none is declared
+ * Mark of one division
  * @param {string} label - Division name
  * @return {string} - Short mark
  */
@@ -65,7 +65,7 @@ export const divisionMark = (label: string): string =>
   DIVISION_MARKS[label] ?? label.charAt(0).toUpperCase()
 
 /**
- * Tint a principal function lends to the role glyph, keyed by its glyph key
+ * Tint a principal function lends to the role glyph
  * @type {Partial<Record<string, FrameTone>>}
  */
 
@@ -76,7 +76,7 @@ export const FUNCTION_TINTS: Partial<Record<string, FrameTone>> = {
 }
 
 /**
- * Tint of a member's role glyph, from the highest principal function lending one
+ * Tint of a member's role glyph
  * @param {MemberSummary} member - Member to describe
  * @return {FrameTone} - Tint to paint
  */
@@ -93,7 +93,7 @@ export const roleTone = (member: MemberSummary): FrameTone => {
 }
 
 /**
- * Glyph of one function, nothing when its key is unknown
+ * Glyph of one function
  * @param {MemberFunction} entry - Held function
  * @return {LucideIcon | null} - Glyph component
  */

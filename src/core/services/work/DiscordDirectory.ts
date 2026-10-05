@@ -7,9 +7,9 @@ import type { FieldOption } from '@/types/forms'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
 
 /**
- * Everything an announcement of one creator may mention: members, then its roles and channels
+ * Everything an announcement of one creator may mention: members
  * @param {string | null} youtuberId - Creator the announcement is written for
- * @return {Promise<FieldOption[]>} - Mentions, each value the token Discord reads
+ * @return {Promise<FieldOption[]>} - Mentions
  */
 
 export const mentionOptions = async (youtuberId: string | null): Promise<FieldOption[]> => {

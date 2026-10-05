@@ -19,10 +19,10 @@ export interface MarshaArgument {
  * @typedef {Object} MarshaCommand
  * @property {string} key - Stable identifier
  * @property {string} name - Command as typed
- * @property {string} summary - What it does, one line
- * @property {MarshaArgument[]} args - Arguments, in order
+ * @property {string} summary - What it does
+ * @property {MarshaArgument[]} args - Arguments
  * @property {string[]} examples - Ready-made uses
- * @property {string[]} notes - What happens, limits and team rules
+ * @property {string[]} notes - What happens
  * @property {boolean} [presence] - The member must be on the server
  */
 
@@ -73,7 +73,7 @@ const DURATION: MarshaArgument = {
 }
 
 /**
- * Every command of Marsha Bot, the prefix form the team types
+ * Every command of Marsha Bot
  * @type {readonly MarshaCategory[]}
  */
 
@@ -493,10 +493,10 @@ export const MARSHA_CATEGORIES: readonly MarshaCategory[] = [
 ]
 
 /**
- * How to talk to the bot, read before the commands
+ * How to talk to the bot
  * @typedef {Object} MarshaRule
  * @property {string} title - Rule
- * @property {string} body - Detail, markdown
+ * @property {string} body - Detail
  */
 
 export interface MarshaRule {

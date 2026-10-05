@@ -20,7 +20,7 @@ import {
 /**
  * One day of a rendered grid
  * @typedef {Object} CalendarDay
- * @property {string} key - ISO day, the drop container identifier
+ * @property {string} key - ISO day
  * @property {number} dayOfMonth - Number shown in the corner
  * @property {boolean} isCurrentMonth - Belongs to the month on screen
  * @property {boolean} isToday - Is the current day
@@ -74,7 +74,7 @@ export const monthGrid = (anchor: string): CalendarDay[] => {
   const cursor = startOfWeek(startOfMonth(month))
   const today = new Date()
 
-  // A month never spans more than six weeks, so the grid is always the same height
+  // A month never spans more than six weeks
   return Array.from({ length: MONTH_GRID_DAYS }, (_, index) =>
     toCalendarDay(addDays(cursor, index), month.getMonth(), today)
   )
@@ -110,7 +110,7 @@ export const dayGrid = (anchor: string): CalendarDay[] => {
 }
 
 /**
- * Build the run of days a planning lists, from the day on screen
+ * Build the run of days a planning lists
  * @param {string} anchor - ISO day the planning opens on
  * @return {CalendarDay[]} - Days in display order
  */
@@ -141,7 +141,7 @@ export const unitGrid = (anchor: string, unit: CalendarUnit): CalendarDay[] => {
 }
 
 /**
- * Read the weekday of a day, Monday first
+ * Read the weekday of a day
  * @param {string} dayKey - ISO day
  * @return {number} - Index into the weekday labels
  */
@@ -149,7 +149,7 @@ export const unitGrid = (anchor: string, unit: CalendarUnit): CalendarDay[] => {
 export const weekdayOf = (dayKey: string): number => (parseDay(dayKey).getDay() + 6) % 7
 
 /**
- * Read the window a grid covers, so the server only sends what is shown
+ * Read the window a grid covers
  * @param {CalendarDay[]} days - Rendered days
  * @return {{ from: string, to: string }} - ISO bounds
  */
@@ -163,7 +163,7 @@ export const gridRange = (days: CalendarDay[]): { from: string; to: string } => 
  * Shift an anchor by one period
  * @param {string} anchor - ISO day on screen
  * @param {CalendarUnit} unit - Period being browsed
- * @param {number} amount - Steps to move, negative goes back
+ * @param {number} amount - Steps to move
  * @return {string} - New ISO day
  */
 
@@ -196,7 +196,7 @@ export const periodLabel = (anchor: string, unit: CalendarUnit): string => {
 }
 
 /**
- * Move a moment onto another day, keeping its time of day
+ * Move a moment onto another day
  * @param {string} startsAt - ISO moment being moved
  * @param {string} dayKey - ISO day it lands on
  * @return {Date} - New moment
@@ -291,7 +291,7 @@ export const dayBounds = (
 }
 
 /**
- * Order two grid keys, a slide being just as valid backwards
+ * Order two grid keys
  * @param {string} first - Key the pointer went down on
  * @param {string} second - Key the pointer stopped on
  * @return {[string, string]} - Keys in reading order

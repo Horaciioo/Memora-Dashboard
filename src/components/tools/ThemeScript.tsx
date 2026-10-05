@@ -14,7 +14,7 @@ export interface ThemeScriptProps {
 }
 
 /**
- * Applies the persisted theme before paint, the nonce letting the policy admit it
+ * Applies the persisted theme before paint
  * @param {string} [nonce] - Per-request nonce
  * @return {JSX.Element} - Script tag
  */

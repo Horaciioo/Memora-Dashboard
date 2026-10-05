@@ -12,7 +12,7 @@ import type {
 } from '@/utils/constants/workflow'
 
 /**
- * Status a project, a task or a meeting moves through
+ * Status a project
  * @typedef {Object} LibraryState
  * @property {string} scope - Record it applies to
  * @property {string} name - Display name
@@ -82,12 +82,12 @@ export interface LibraryDispositif {
 }
 
 /**
- * Skill of a junior, held by its family
+ * Skill of a junior
  * @typedef {Object} LibrarySkill
  * @property {string} name - Display name
  * @property {string} description - What it covers
- * @property {string | null} function - Function it belongs to, none for every one
- * @property {string | null} dispositif - Track it belongs to, none for every one
+ * @property {string | null} function - Function it belongs to
+ * @property {string | null} dispositif - Track it belongs to
  */
 
 export interface LibrarySkill {
@@ -120,8 +120,8 @@ export interface LibrarySkillCategory {
  * @property {number} offset - Days from the anchor
  * @property {StepOwnerName} owner - Who carries it out
  * @property {boolean} required - Blocks the next stage
- * @property {string | null} function - Function it belongs to, none for every one
- * @property {string | null} dispositif - Track it belongs to, none for every one
+ * @property {string | null} function - Function it belongs to
+ * @property {string | null} dispositif - Track it belongs to
  * @property {string | null} icon - Glyph key
  * @property {string | null} guide - Walkthrough
  * @property {string | null} destination - Where to act
@@ -142,49 +142,49 @@ export interface LibraryPimStep {
 }
 
 /**
- * Statuses, changed in code only
+ * Statuses
  * @type {readonly LibraryState[]}
  */
 
 export const LIBRARY_STATES = states as readonly LibraryState[]
 
 /**
- * Social networks, changed in code only
+ * Social networks
  * @type {readonly LibraryNetwork[]}
  */
 
 export const LIBRARY_NETWORKS = networks as readonly LibraryNetwork[]
 
 /**
- * Calendar templates, changed in code only
+ * Calendar templates
  * @type {readonly LibraryEventTemplate[]}
  */
 
 export const LIBRARY_EVENT_TEMPLATES = eventTemplates as readonly LibraryEventTemplate[]
 
 /**
- * Tracks, changed in code only
+ * Tracks
  * @type {readonly LibraryDispositif[]}
  */
 
 export const LIBRARY_DISPOSITIFS = dispositifs as readonly LibraryDispositif[]
 
 /**
- * Skill families, changed in code only
+ * Skill families
  * @type {readonly LibrarySkillCategory[]}
  */
 
 export const LIBRARY_SKILL_CATEGORIES = skills as readonly LibrarySkillCategory[]
 
 /**
- * PIM timeline, changed in code only
+ * PIM timeline
  * @type {readonly LibraryPimStep[]}
  */
 
 export const LIBRARY_PIM_STEPS = pimSteps as readonly LibraryPimStep[]
 
 /**
- * Names of the skills declared in code, the only ones graded
+ * Names of the skills declared in code
  * @type {readonly string[]}
  */
 

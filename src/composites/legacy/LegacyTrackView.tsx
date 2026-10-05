@@ -24,17 +24,16 @@ import { cn } from '@/utils/classnames'
 
 export interface LegacyTrackViewProps {
   detail: LegacyTrackDetail
-  // Evaluator, allowed to give a note
+  // Evaluator
   canGrade: boolean
-  // Administrator, allowed to decide
+  // Administrator
   canDecide: boolean
   // The member following the track
   isOwner: boolean
 }
 
 /**
- * The evaluator's note of a module: a click on it turns it into a field, so no edit control
- * sits beside it
+ * The evaluator's note of a module: a click on it turns it into a field
  * @param {Object} props - Note and handler
  * @return {JSX.Element}
  */
@@ -187,8 +186,7 @@ const ModuleRow = ({
 }
 
 /**
- * One track opened: a dial of the points against the threshold beside the three modules, the
- * ways to close the track under the facts for whoever may decide
+ * One track opened: a dial of the points against the threshold beside the three modules
  * @param {LegacyTrackViewProps} props - Track and permissions
  * @return {JSX.Element}
  */

@@ -171,7 +171,7 @@ export const updateJobFunction = async (
     summary: patch.summary,
   }
 
-  // Colour and glyph are nullable, so an explicit null still writes
+  // Colour and glyph are nullable
   if ('accent' in patch) data.accent = patch.accent
   if ('icon' in patch) data.icon = cleanIcon(patch.icon)
 
@@ -196,7 +196,7 @@ export const deleteJobFunction = async (id: string): Promise<void> => {
     include: { _count: { select: { holders: true } } },
   })
 
-  // A held function keeps its holders consistent, it is archived rather than deleted
+  // A held function keeps its holders consistent
   if (row && row._count.holders > 0) throw conflict()
 
   await prisma.jobFunction.delete({ where: { id } })
@@ -204,7 +204,7 @@ export const deleteJobFunction = async (id: string): Promise<void> => {
 
 /**
  * Read the roster feeding the members tab
- * @return {Promise<AccessMember[]>} - Active accounts, by name
+ * @return {Promise<AccessMember[]>} - Active accounts
  */
 
 export const readAccessRoster = async (): Promise<AccessMember[]> => {
@@ -228,7 +228,7 @@ export const readAccessRoster = async (): Promise<AccessMember[]> => {
 
 /**
  * Read every creator with the functions it opens
- * @return {Promise<CreatorPerimeter[]>} - Creators, in display order
+ * @return {Promise<CreatorPerimeter[]>} - Creators
  */
 
 export const readCreatorPerimeter = async (): Promise<CreatorPerimeter[]> => {
@@ -276,7 +276,7 @@ export const assignRoleMembers = async (
 }
 
 /**
- * Seat a set of accounts on one function, on top of the ones they already hold
+ * Seat a set of accounts on one function
  * @param {string[]} accountIds - Accounts to seat
  * @param {string} functionId - Function identifier
  * @return {Promise<void>} - Seated
@@ -293,9 +293,9 @@ export const assignFunctionMembers = async (
 }
 
 /**
- * Take one account off a role or function, a role falling back to the floor level
+ * Take one account off a role or function
  * @param {string} accountId - Account identifier
- * @param {string | null} functionId - Function to clear, null clearing the role instead
+ * @param {string | null} functionId - Function to clear
  * @return {Promise<void>} - Removed
  */
 

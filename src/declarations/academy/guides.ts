@@ -13,7 +13,7 @@ export const GUIDE_PARAMS = {
 } as const
 
 /**
- * Beacons the walkthroughs point at, one name per control
+ * Beacons the walkthroughs point at
  * @type {Record<string, string>}
  */
 
@@ -33,7 +33,7 @@ export const GUIDE_BEACONS = {
 } as const
 
 /**
- * One mark of a walkthrough, a bubble pinned on a control
+ * One mark of a walkthrough
  * @typedef {Object} GuideMark
  * @property {string} beacon - Control pointed at
  * @property {string} title - What to do
@@ -54,13 +54,13 @@ export interface GuideMark {
 export type GuideSurface = 'junior' | 'session' | 'calendar'
 
 /**
- * Where the owner of a PIM step acts, and the walkthrough that leads them there
+ * Where the owner of a PIM step acts
  * @typedef {Object} PimDestination
  * @property {string} label - Destination name
  * @property {IconName} icon - Glyph
  * @property {GuideSurface} surface - Page opened
  * @property {string} [tab] - Tab of the follow-up file opened
- * @property {GuideMark[]} marks - Walkthrough, in order
+ * @property {GuideMark[]} marks - Walkthrough
  */
 
 export interface PimDestination {
@@ -222,7 +222,7 @@ export const PIM_DESTINATION_REGISTRY = createRegistry<PimDestinationName, PimDe
 )
 
 /**
- * Glyph a PIM step may wear, with the name it is picked by
+ * Glyph a PIM step may wear
  * @typedef {Object} PimStepGlyph
  * @property {IconName} icon - Glyph key
  * @property {string} label - What it stands for

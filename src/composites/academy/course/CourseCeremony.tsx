@@ -8,7 +8,7 @@ import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
 import { COURSE_STAMP } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
-// Colours of the confetti, Apple's three and the brand pink
+// Colours of the confetti
 const CONFETTI_COLOURS = [
   'var(--color-apple-red)',
   'var(--color-apple-orange)',
@@ -33,7 +33,7 @@ export const CourseCeremony = ({ courseId, onDone }: CourseCeremonyProps) => {
   const [flight, setFlight] = useState<string | undefined>(undefined)
   const stampRef = useRef<HTMLDivElement>(null)
 
-  // Card fills first, then the stamp, then its flight
+  // Card fills first
   useEffect(() => {
     const timers = [
       window.setTimeout(() => setPhase('slam'), ACADEMY_SETTINGS.ceremonyFillMs),
@@ -43,7 +43,7 @@ export const CourseCeremony = ({ courseId, onDone }: CourseCeremonyProps) => {
           .querySelector(`[data-course-poster="${courseId}"]`)
           ?.getBoundingClientRect()
 
-        // Straight onto the card banner, shrunk to its size
+        // Straight onto the card banner
         if (stamp && card) {
           const x = card.left + card.width / 2 - (stamp.left + stamp.width / 2)
           const y = card.top + card.height / 2 - (stamp.top + stamp.height / 2)
@@ -81,7 +81,7 @@ export const CourseCeremony = ({ courseId, onDone }: CourseCeremonyProps) => {
       </div>
       {phase === 'slam' &&
         Array.from({ length: ACADEMY_SETTINGS.ceremonyConfetti }, (_, index) => {
-          // Even spread around the stamp, a little jitter by index
+          // Even spread around the stamp
           const angle = (index / ACADEMY_SETTINGS.ceremonyConfetti) * Math.PI * 2
           const reach = ACADEMY_SETTINGS.ceremonyBurstPx * (0.55 + ((index * 37) % 45) / 100)
 

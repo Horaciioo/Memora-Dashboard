@@ -31,10 +31,10 @@ export interface RecordFile {
 }
 
 /**
- * Drive one work file, every commit sending the whole record
+ * Drive one work file
  * @param {Object} input - File context
  * @param {string} input.path - Item route of the record
- * @param {WorkflowScopeName} input.scope - Board scope, naming the toasts
+ * @param {WorkflowScopeName} input.scope - Board scope
  * @param {FormValues} input.initialValues - Values resolved server-side
  * @return {RecordFile} - State and mutations
  */
@@ -49,7 +49,7 @@ export const useRecordFile = ({
   initialValues: FormValues
 }): RecordFile => {
   const router = useRouter()
-  // Kept in sync with every commit, always sent in full to the PATCH route
+  // Kept in sync with every commit
   const [values, setValues] = useState<FormValues>(initialValues)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
@@ -62,7 +62,7 @@ export const useRecordFile = ({
         feedbackTitle(entity.label, 'saved', entity.gender, name)
       )
 
-      // A saved record re-records the journal event, so the logs surface needs the refresh
+      // A saved record re-records the journal event
       if (saved !== null) {
         setValues(next)
         router.refresh()

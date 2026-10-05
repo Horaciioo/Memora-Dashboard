@@ -1,7 +1,7 @@
 import type { CourseSurface } from '@/declarations/academy/curriculum/types'
 
 /**
- * Flat colours of a course poster, fixed so the artwork reads the same in light and dark
+ * Flat colours of a course poster
  * @typedef {Object} PosterPalette
  * @property {string} ground - Background
  * @property {string} blob - Large round shape behind the scene

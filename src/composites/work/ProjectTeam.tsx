@@ -108,7 +108,7 @@ export const ProjectTeam = ({
   const assistantIds = assistants.map((person) => person.id)
   const leadIds = leads.map((person) => person.id)
 
-  // Nobody sits in both rosters, so each list drops whoever the other already holds
+  // Nobody sits in both rosters
   const freeLeadOptions = leadOptions.filter((option) => !assistantIds.includes(option.value))
   const freeAssistantOptions = assistantOptions.filter((option) => !leadIds.includes(option.value))
 

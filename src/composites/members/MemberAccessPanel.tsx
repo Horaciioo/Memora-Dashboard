@@ -27,10 +27,9 @@ export interface MemberAccessPanelProps {
 }
 
 /**
- * Per-account overwrites, on top of what the role and the functions already grant. A layer
- * is picked first: the global one, or one of the creators the member is actually attached to
- * @param {PermissionLayers} overrides - Stored overwrites, per layer
- * @param {Record<string, PermissionName[]>} inherited - What inheritance grants, per layer
+ * Per-account overwrites
+ * @param {PermissionLayers} overrides - Stored overwrites
+ * @param {Record<string, PermissionName[]>} inherited - What inheritance grants
  * @param {MemberTag[]} youtubers - Creators the member is attached to
  * @param {boolean} sealed - The second factor still has to be opened before writing
  * @param {boolean} isSaving - Mutation in flight

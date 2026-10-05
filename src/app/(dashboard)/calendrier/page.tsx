@@ -20,7 +20,7 @@ export const metadata: Metadata = { title: CALENDAR_COPY.title }
 const FOCUS_PARAM = 'evenement'
 
 /**
- * Shared calendar, opening on the current month or on a linked entry
+ * Shared calendar
  * @param {Object} props - Route props
  * @param {Promise<Record<string, string | string[] | undefined>>} props.searchParams - URL query
  * @return {Promise<JSX.Element>} - Calendar page

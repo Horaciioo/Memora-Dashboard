@@ -15,10 +15,10 @@ export interface ExerciseFrameProps {
   kind: ExerciseBlock['kind']
   title: string
   result: ExerciseResult | undefined
-  // Something is answered, so it can be checked
+  // Something is answered
   canCheck: boolean
   isSaving: boolean
-  // Checked by the exercise itself, as a simulation is on its last move
+  // Checked by the exercise itself
   autoCheck?: boolean
   onCheck: () => void
   onRetry: () => void
@@ -28,7 +28,7 @@ export interface ExerciseFrameProps {
 /**
  * Shared frame of an exercise: its kind and title, the inputs, then the check button or the
  * verdict with the way to try again
- * @param {ExerciseFrameProps} props - Kind, title, state and handlers
+ * @param {ExerciseFrameProps} props - Kind
  * @return {JSX.Element}
  */
 

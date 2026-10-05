@@ -27,8 +27,7 @@ export interface TaskFileProps {
 }
 
 /**
- * File of one task — an overview edited in place, then the journal, both stacked rather
- * than tabbed since a task carries nothing else
+ * File of one task — an overview edited in place
  * @param {TaskSummary} task - Card resolved server-side
  * @param {FieldDefinition[]} fields - Declarations of the task form
  * @param {ActivityEntry[]} activity - Journal entries
@@ -46,7 +45,7 @@ export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) =
   const fieldByName = new Map(fields.map((field) => [field.name, field]))
   const fieldFor = (name: string): FieldDefinition => fieldByName.get(name)!
 
-  // Option backing one select value, feeding the read rendering of the grid
+  // Option backing one select value
   const optionOf = (name: string) => {
     const value = file.values[name]
 
@@ -123,7 +122,7 @@ export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) =
     },
   ]
 
-  // Neutral box, state colour on its badges
+  // Neutral box
   const boxClass =
     'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 sm:p-5'
 

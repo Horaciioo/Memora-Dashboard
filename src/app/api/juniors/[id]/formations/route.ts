@@ -24,7 +24,7 @@ export const PATCH = createProtectedRoute({
       session.id
     )
 
-    // Revoking is a correction, only a clearance is worth a journal line
+    // Revoking is a correction
     if (validated) {
       const training = await prisma.training.findUnique({ where: { id: trainingId } })
       const learner = juniors.find((entry) => entry.id === params.id)?.accountId

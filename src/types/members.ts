@@ -69,7 +69,7 @@ export interface MemberDivision {
  * @property {string | null} legacyEndsAt - ISO end of that track
  * @property {MemberDivision | null} division - Division
  * @property {MemberTag[]} youtubers - Assigned YouTubers
- * @property {MemberFunction[]} functions - Functions held, principal ones first, by rank
+ * @property {MemberFunction[]} functions - Functions held
  * @property {string} joinedAt - ISO arrival date
  * @property {boolean} isRoot - Root administrator
  * @property {number} notesCount - Private remarks left on the account
@@ -117,7 +117,7 @@ export interface MemberNote {
 }
 
 /**
- * Social profile of a member, declared by the member themselves
+ * Social profile of a member
  * @typedef {Object} MemberSocial
  * @property {string} id - Link identifier
  * @property {string | null} networkId - Declared network

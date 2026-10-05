@@ -39,7 +39,7 @@ export interface ReportLevel {
 }
 
 /**
- * Report of one live, every figure computed from its rows
+ * Report of one live
  * @typedef {Object} LiveReport
  */
 
@@ -66,10 +66,10 @@ export interface LiveReport {
  * Build the report of a live
  * @param {Object} input - Rows of the live
  * @param {ReportAction[]} input.actions - Log lines
- * @param {ReportPresence[]} input.presences - Presences, one or more per member
+ * @param {ReportPresence[]} input.presences - Presences
  * @param {ReportLevel[]} input.levels - Livecon levels in force
  * @param {Date} input.start - Live start
- * @param {Date} input.end - Live end, or now
+ * @param {Date} input.end - Live end
  * @param {number} input.bucketMinutes - Width of one timeline slice
  * @return {LiveReport} - Report
  */
@@ -84,11 +84,11 @@ export const buildLiveReport = (input: {
 }): LiveReport => {
   const done = input.actions.filter((action) => action.succeeded)
 
-  // Gestures per kind, most frequent first
+  // Gestures per kind
   const kinds = new Map<ModerationKind, number>()
   done.forEach((action) => kinds.set(action.kind, (kinds.get(action.kind) ?? 0) + 1))
 
-  // Moderators: gestures and time, a platform-only actor keyed by name
+  // Moderators: gestures and time
   const moderators = new Map<string, LiveReport['moderators'][number]>()
   const seat = (key: string, name: string, isMember: boolean) => {
     const existing = moderators.get(key)
@@ -110,7 +110,7 @@ export const buildLiveReport = (input: {
     row.visibleSeconds += presence.visibleSeconds
   })
 
-  // Slices from the start, an action outside the live counted at its edge
+  // Slices from the start
   const bucketMs = input.bucketMinutes * 60 * 1000
   const slices = Math.max(1, Math.ceil((input.end.getTime() - input.start.getTime()) / bucketMs))
   const counts = new Array<number>(slices).fill(0)

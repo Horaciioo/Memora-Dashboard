@@ -35,18 +35,18 @@ export const APP_ASSETS = {
 } as const
 
 /**
- * Web font delivery, the families themselves named in src/styles/fonts.css
+ * Web font delivery
  * @type {{ preconnect: string[], stylesheet: string }}
  */
 
 export const APP_FONTS = {
   preconnect: ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'],
   stylesheet:
-    'https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap',
+    'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap',
 } as const
 
 /**
- * Shown version, set at build
+ * Shown version
  * @type {string}
  */
 
@@ -62,7 +62,7 @@ const STAGE_WORDS: Record<Exclude<ReleaseStage, 'release'>, string> = {
 }
 
 /**
- * Version label, e.g. v0.2.0 Snapshot 3
+ * Version label
  * @type {string}
  */
 

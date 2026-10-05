@@ -19,7 +19,7 @@ export interface MobileTopBarProps {
 }
 
 /**
- * Fixed top bar of the mobile shell — active creator, view switch, account
+ * Fixed top bar of the mobile shell — active creator
  * @param {SessionUser} session - Signed-in member
  * @param {number} unreadCount - Unopened notifications resolved server-side
  * @param {ViewContext} viewContext - View resolved server-side

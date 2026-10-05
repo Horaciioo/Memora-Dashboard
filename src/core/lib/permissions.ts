@@ -37,8 +37,7 @@ export interface PermissionOverwrite {
 export type PermissionGroup = PermissionOverwrite[][]
 
 /**
- * Fold one resolution step, every deny of the step landing before every allow so a
- * single allow outranks the denies it sits beside
+ * Fold one resolution step
  * @param {Set<PermissionName>} granted - Permissions held so far
  * @param {PermissionGroup} group - Overwrites sharing the step
  * @return {void} - Folded in place
@@ -47,7 +46,7 @@ export type PermissionGroup = PermissionOverwrite[][]
 const foldGroup = (granted: Set<PermissionName>, group: PermissionGroup): void => {
   const holders = group.flat()
 
-  // Denies first, so an allow beside them still wins the step
+  // Denies first
   for (const entry of holders) {
     if (entry.effect === PermissionEffects.Deny) granted.delete(entry.permission)
   }
@@ -58,11 +57,10 @@ const foldGroup = (granted: Set<PermissionName>, group: PermissionGroup): void =
 }
 
 /**
- * Resolve what a member effectively holds, following the order every layer of the product
- * shares — union of the base grants, then one step per overwrite scope, widest last
+ * Resolve what a member effectively holds
  * @param {Iterable<PermissionName>} base - Union of the role and function grants
- * @param {PermissionGroup[]} steps - Overwrite steps, applied in order
- * @return {PermissionName[]} - Effective permissions, orphan refinements dropped
+ * @param {PermissionGroup[]} steps - Overwrite steps
+ * @return {PermissionName[]} - Effective permissions
  */
 
 export const resolveGrants = (
@@ -78,15 +76,14 @@ export const resolveGrants = (
 }
 
 /**
- * Overwrite layers of one holder, the empty key carrying the global layer and every other
- * key the creator its overwrites are narrowed to
+ * Overwrite layers of one holder
  * @type {Record<string, PermissionOverwrite[]>}
  */
 
 export type PermissionLayers = Record<string, PermissionOverwrite[]>
 
 /**
- * Key one layer is stored under, the global layer carrying the empty key
+ * Key one layer is stored under
  * @param {string | null} youtuberId - Creator identifier
  * @return {string} - Layer key
  */
@@ -120,7 +117,7 @@ export const toDraft = (overwrites: PermissionOverwrite[]): PermissionDraft =>
   )
 
 /**
- * Read the overwrites back out of a draft, inheritance leaving no row behind
+ * Read the overwrites back out of a draft
  * @param {PermissionDraft} draft - Current draft
  * @return {PermissionOverwrite[]} - Overwrites to persist
  */

@@ -9,7 +9,7 @@ export interface SubjectBadgesProps {
 }
 
 /**
- * One infrastructure subject: the verdict of its probe with the latency, or only whether it is on
+ * One infrastructure subject: the verdict of its probe with the latency
  * @param {SubjectState} state - Subject state resolved server-side
  * @return {JSX.Element}
  */

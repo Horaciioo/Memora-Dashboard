@@ -15,7 +15,7 @@ export interface LiveEnvelope {
 }
 
 /**
- * Cross-instance carrier, Redis once the runtime binds it
+ * Cross-instance carrier
  * @typedef {Object} LiveTransport
  * @property {(envelope: LiveEnvelope) => Promise<void>} publish - Send to every instance
  */
@@ -24,7 +24,7 @@ export interface LiveTransport {
   publish: (envelope: LiveEnvelope) => Promise<void>
 }
 
-// Survives dev hot reloads, one bus per process
+// Survives dev hot reloads
 const globalForBus = globalThis as unknown as {
   liveBus?: { local: EventEmitter; transport: LiveTransport | null }
 }

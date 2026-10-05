@@ -10,7 +10,7 @@ import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { COURSE_LIVECON } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
-// Calmest first, its colour then each tighter one
+// Calmest first
 const SHADES = [
   { border: COURSE_LIVECON.calm, fill: COURSE_LIVECON.calmFill },
   { border: COURSE_LIVECON.watch, fill: COURSE_LIVECON.watchFill },
@@ -22,7 +22,7 @@ export interface LiveconBlockProps {
 }
 
 /**
- * Livecon levels one after the other, the panel changing with each
+ * Livecon levels one after the other
  * @param {LiveconBlockProps} props - Levels declared in code
  * @return {JSX.Element}
  */
@@ -32,7 +32,7 @@ export const LiveconBlock = ({ block }: LiveconBlockProps) => {
   const [active, setActive] = useState(0)
   const [isPinned, setPinned] = useState(false)
 
-  // Levels calmest first, as the course reads them
+  // Levels calmest first
   const stops = block.stops.map((stop) => ({
     stop,
     level: livecon.find((entry) => entry.level === stop.level) ?? null,

@@ -19,7 +19,7 @@ export interface LegacyGaugeProps {
 }
 
 /**
- * Point on the half circle for a share of the dial, 0 at the left end and 1 at the right
+ * Point on the half circle for a share of the dial
  * @param {number} share - Share of the dial
  * @param {number} [radius] - Distance from the centre
  * @return {{ x: number, y: number }} - Position
@@ -32,8 +32,7 @@ const pointAt = (share: number, radius = RADIUS) => {
 }
 
 /**
- * Half circle dial of the points earned, a tick on the points needed. The arc draws itself once
- * on arrival, the figure counts up with it
+ * Half circle dial of the points earned
  * @param {number} points - Points earned
  * @param {number} max - Points available
  * @param {number} threshold - Points needed

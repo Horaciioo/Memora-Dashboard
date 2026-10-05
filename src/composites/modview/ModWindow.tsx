@@ -62,7 +62,7 @@ export interface WindowEmptyProps {
 }
 
 /**
- * Empty window, a glyph and two lines
+ * Empty window
  * @param {IconName} icon - Glyph
  * @param {string} title - First line
  * @param {string} body - Second line

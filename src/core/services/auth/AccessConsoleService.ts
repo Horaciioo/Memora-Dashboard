@@ -35,7 +35,7 @@ export const readAccessConsole = async (
     readCreatorPerimeter(),
   ])
 
-  // Every category that heads a hierarchy level, in rail order
+  // Every category that heads a hierarchy level
   const headed = ACCESS_CATEGORY_ORDER.map((category) => ({
     category,
     role: ACCESS_CATEGORY_REGISTRY.get(category).role,
@@ -64,7 +64,7 @@ export const readAccessConsole = async (
     }
   })
 
-  // One baseline read per category rather than per function, they share it
+  // One baseline read per category rather than per function
   const categoryBaselines = new Map(
     await Promise.all(
       ACCESS_CATEGORY_ORDER.map(

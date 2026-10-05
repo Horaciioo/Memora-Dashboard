@@ -15,7 +15,7 @@ export const AcademyTabs = () => {
   const pathname = usePathname()
   const router = useRouter()
 
-  // The lexicon holds its own route, everything else is the board
+  // The lexicon holds its own route
   const value = pathname.startsWith(ROUTES.glossary) ? 'glossary' : 'sessions'
 
   return (

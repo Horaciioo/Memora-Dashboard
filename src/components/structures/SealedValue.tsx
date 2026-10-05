@@ -39,7 +39,7 @@ export const SealedValue = ({ field }: SealedValueProps) => {
 /**
  * Pick A2F mark or content
  * @param {SensitiveFieldName} field - Value key
- * @param {ReactNode} value - Content, shown once the window is open
+ * @param {ReactNode} value - Content
  * @param {boolean} isUnsealed - Window still open
  * @return {ReactNode} - A2F mark or content
  */

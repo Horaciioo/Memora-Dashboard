@@ -10,7 +10,7 @@ const OWN = { id: { startsWith: FIXTURE_PREFIX } }
 
 type Origin = 'User' | 'System' | 'Automation' | 'Scheduler'
 
-// Origin ids, as the app stores them
+// Origin ids
 const ORIGINS: Record<Origin, number> = { User: 0, System: 1, Automation: 2, Scheduler: 3 }
 
 /**
@@ -46,7 +46,7 @@ interface NoticeLine {
 }
 
 /**
- * Journal and notifications of everything the fixtures wrote, dated when it happened
+ * Journal and notifications of everything the fixtures wrote
  * @param {Cast} cast - People
  * @return {Promise<{ logs: number, notifications: number }>} - Counts
  */
@@ -548,7 +548,7 @@ export const seedJournal = async (cast: Cast) => {
     }
   }
 
-  // Administration, rare and mostly the root admin
+  // Administration
   for (let count = 0; count < 25; count += 1) {
     const at = day(-between(1, 175), between(9, 23))
     logs.push(
@@ -592,7 +592,7 @@ export const seedJournal = async (cast: Cast) => {
     origin: 'System',
   })
 
-  // Loose mentions and access changes, some aimed at the root admin
+  // Loose mentions and access changes
   for (let count = 0; count < 30; count += 1) {
     const recipient = count % 2 === 0 ? cast.root : pick(cast.everyone)
     notices.push(
@@ -646,7 +646,7 @@ export const seedJournal = async (cast: Cast) => {
   const past = notices.filter((notice) => notice.at <= now)
   await prisma.notification.createMany({
     data: past.map((notice) => {
-      // Older ones were read, the last few days are still waiting
+      // Older ones were read
       const ageDays = (now.getTime() - notice.at.getTime()) / 86_400_000
 
       return {

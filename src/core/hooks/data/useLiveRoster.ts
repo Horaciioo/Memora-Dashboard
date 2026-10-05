@@ -13,7 +13,7 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
 /**
  * Roll-call state and its one move
  * @typedef {Object} LiveRosterState
- * @property {LiveRoster | null} roster - Roll-call, null while loading
+ * @property {LiveRoster | null} roster - Roll-call
  * @property {boolean} isSaving - Move in flight
  * @property {(accountId: string, status: AttendanceStatusName) => Promise<boolean>} move - Move a member
  */
@@ -41,7 +41,7 @@ export const useLiveRoster = (liveId: string): LiveRosterState => {
 
   const move = useCallback(
     async (accountId: string, status: AttendanceStatusName) => {
-      // The column changes at once, the server answer settles it
+      // The column changes at once
       const previous = client.getQueryData<LiveRoster>(key)
       if (previous) {
         client.setQueryData<LiveRoster>(key, {

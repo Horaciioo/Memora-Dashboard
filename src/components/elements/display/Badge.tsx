@@ -7,18 +7,18 @@ import { isHexColour } from '@/utils/format/colour'
 export interface BadgeProps {
   label: string
   tone?: Tone
-  // Stored colour, a picked hexadecimal or a legacy tone key, winning over the tone
+  // Stored colour
   accent?: string | null
   icon?: IconName
-  // Same pill, calmer colour
+  // Same pill
   muted?: boolean
   className?: string
 }
 
 /**
- * Compact status pill, its tone always paired with a label so colour is never the only carrier
+ * Compact status pill
  * @param {string} label - Text shown inside the pill
- * @param {Tone} [tone] - Fallback tone, defaults to neutral
+ * @param {Tone} [tone] - Fallback tone
  * @param {string | null} [accent] - Stored colour taking over the tone
  * @param {IconName} [icon] - Icon rendered before the label
  * @param {boolean} [muted] - Desaturated fill

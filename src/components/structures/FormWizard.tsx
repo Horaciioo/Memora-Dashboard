@@ -16,7 +16,7 @@ import { WIZARD_STYLES } from '@/declarations/ui/variants'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
 
 /**
- * One stop of a wizard, either driven by field declarations or drawn by the caller
+ * One stop of a wizard
  * @typedef {Object} WizardStep
  * @property {string} id - Step identifier
  * @property {string} label - Step caption
@@ -52,7 +52,7 @@ export interface FormWizardProps {
 }
 
 /**
- * Linear form split into steps, gated on the required fields of the step on screen
+ * Linear form split into steps
  * @param {WizardStep[]} steps - Steps in display order
  * @param {FormValues} values - Current values
  * @param {FieldIssue[]} issues - Rejections returned by the server

@@ -58,7 +58,7 @@ const release = (): void => {
     fail(`les vérifications ont échoué, package.json remis à ${current}`)
   }
 
-  // Commit, tag, push
+  // Commit
   git('add', ...RELEASE_FILES)
   git('commit', '-q', '-m', `🔖 Released version ${version}`)
   git('tag', '-a', `v${version}`, '-m', `v${version}`)

@@ -10,13 +10,13 @@ import { ICONS } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
 
 export interface ReleaseNoticeProps {
-  // Hung under the rail's version entry, its point aimed at it
+  // Hung under the rail's version entry
   pointed?: boolean
   onNavigate?: () => void
 }
 
 /**
- * Unread note card, the same on the rail and on the home page
+ * Unread note card
  * @param {boolean} [pointed] - Draws the point
  * @param {() => void} [onNavigate] - Navigation handler
  * @return {JSX.Element | null}

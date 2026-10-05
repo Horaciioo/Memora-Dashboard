@@ -16,12 +16,12 @@ import { cn } from '@/utils/classnames'
 export interface AccountActionsProps {
   unreadCount: number
   onNavigate: () => void
-  // Lightning takes the bell's slot, the bell living on the rail
+  // Lightning takes the bell's slot
   viewContext?: ViewContext
 }
 
 /**
- * Dark mode, then glyph-only actions
+ * Dark mode
  * @param {number} unreadCount - Unopened notifications
  * @param {() => void} onNavigate - Close on leave
  * @param {ViewContext} [viewContext] - Swaps the bell for the lightning

@@ -6,8 +6,8 @@ export interface GlyphProps {
 }
 
 /**
- * Wraps a stroke drawing in a 24 square, currentColor throughout
- * @param {Object} props - Sizing class, stroke weight, and the shape
+ * Wraps a stroke drawing in a 24 square
+ * @param {Object} props - Sizing class
  * @return {JSX.Element}
  */
 
@@ -60,7 +60,7 @@ export const FlashGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Next, a chevron right
+ * Next
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -72,7 +72,7 @@ export const NextGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Back, an arrow left
+ * Back
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -84,7 +84,7 @@ export const BackGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Forward, an arrow right
+ * Forward
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -96,7 +96,7 @@ export const ForwardGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * More, three dots
+ * More
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -116,7 +116,7 @@ export const MoreGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Menu, three bars
+ * Menu
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -128,7 +128,7 @@ export const MenuGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Sort, an ascending and a descending arrow
+ * Sort
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -141,7 +141,7 @@ export const SortGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Drag, a grip of six dots
+ * Drag
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -164,7 +164,7 @@ export const DragGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Add, a plus
+ * Add
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -176,7 +176,7 @@ export const AddGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Close, a cross
+ * Close
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -188,7 +188,7 @@ export const CloseGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Confirm, a check
+ * Confirm
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -200,7 +200,7 @@ export const ConfirmGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Inherit, a dash
+ * Inherit
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -212,7 +212,7 @@ export const InheritGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Division, a double chevron
+ * Division
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -224,7 +224,7 @@ export const DivisionGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Checkbox, an empty square
+ * Checkbox
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -236,7 +236,7 @@ export const CheckboxGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Info, a filled dot over a stem
+ * Info
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -250,7 +250,7 @@ export const InfoGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Warning, a triangle with a mark
+ * Warning
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -264,7 +264,7 @@ export const WarningGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Danger, a disc with a mark
+ * Danger
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -278,7 +278,7 @@ export const DangerGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Success, a disc with a check
+ * Success
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -291,7 +291,7 @@ export const SuccessGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Failure, a disc with a cross
+ * Failure
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -304,7 +304,7 @@ export const FailureGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Pending, a broken ring
+ * Pending
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -316,7 +316,7 @@ export const PendingGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Bold, a stacked B
+ * Bold
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -328,7 +328,7 @@ export const BoldGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Italic, slanted strokes
+ * Italic
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -340,7 +340,7 @@ export const ItalicGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Underline, a rule below a curve
+ * Underline
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -352,7 +352,7 @@ export const UnderlineGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Strike, a crossed word
+ * Strike
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -364,7 +364,7 @@ export const StrikeGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Heading, a serif H
+ * Heading
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -376,7 +376,7 @@ export const HeadingGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Quote, two curling marks
+ * Quote
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -389,7 +389,7 @@ export const QuoteGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Bullet list, three dots and rules
+ * Bullet list
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -410,7 +410,7 @@ export const BulletListGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Ordered list, ticks and rules
+ * Ordered list
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -422,7 +422,7 @@ export const OrderedListGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Code, angle brackets
+ * Code
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -434,7 +434,7 @@ export const CodeGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Code block, angle brackets framed
+ * Code block
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -447,7 +447,7 @@ export const CodeBlockGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Link, two joined chain loops
+ * Link
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -460,7 +460,7 @@ export const LinkGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Filter, three tapering bars
+ * Filter
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -472,7 +472,7 @@ export const FilterGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Shield outline, a hierarchy level
+ * Shield outline
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -484,7 +484,7 @@ export const ShieldOutlineGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Flame, a hierarchy level
+ * Flame
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -496,7 +496,7 @@ export const FlameGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Crown, a hierarchy level
+ * Crown
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -560,7 +560,7 @@ export const RuleGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Bullet, a solid disc
+ * Bullet
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */
@@ -578,7 +578,7 @@ export const BulletGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Hollow bullet, a ring
+ * Hollow bullet
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
  */

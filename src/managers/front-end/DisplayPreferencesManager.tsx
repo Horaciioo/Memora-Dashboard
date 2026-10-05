@@ -27,14 +27,14 @@ export const DisplayPreferencesManager = ({ preferences }: DisplayPreferencesMan
   const colorVisionMode = useColorVisionStore((state) => state.colorVisionMode)
   const setColorVisionMode = useColorVisionStore((state) => state.setColorVisionMode)
 
-  // What the account is known to hold, and whether the stores have caught up with it
+  // What the account is known to hold
   const persisted = useRef<DisplayPreferences | null>(null)
   const settled = useRef(false)
 
   useEffect(() => {
     if (persisted.current || !preferences) return
 
-    // The account wins on a browser that never chose, the stores own it afterwards
+    // The account wins on a browser that never chose
     if (preferences.theme) setTheme(preferences.theme)
     if (preferences.fontScale) setFontScale(preferences.fontScale)
     if (preferences.colorVision) setColorVisionMode(preferences.colorVision)
@@ -65,7 +65,7 @@ export const DisplayPreferencesManager = ({ preferences }: DisplayPreferencesMan
 
     persisted.current = { theme, fontScale, colorVision: colorVisionMode }
 
-    // A failed write only costs this browser its carry-over, never the session
+    // A failed write only costs this browser its carry-over
     void apiPatch(API_ROUTES.displayPreferences, {
       theme,
       fontScale,

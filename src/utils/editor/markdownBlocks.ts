@@ -19,7 +19,7 @@ export type EditorBlockKind =
  * @typedef {Object} EditorBlock
  * @property {string} id - Local key
  * @property {EditorBlockKind} kind - Block kind
- * @property {string} text - Inline markdown, raw for code
+ * @property {string} text - Inline markdown
  */
 
 export interface EditorBlock {
@@ -37,7 +37,7 @@ const PREFIXES: Partial<Record<EditorBlockKind, string>> = {
   quote: '> ',
 }
 
-// List kinds, no blank line between
+// List kinds
 const LIST_KINDS: EditorBlockKind[] = ['bullet', 'numbered', 'quote']
 
 const FENCE = '```'
@@ -98,7 +98,7 @@ export const parseBlocks = (source: string): EditorBlock[] => {
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index] ?? ''
 
-    // Fenced code, raw lines
+    // Fenced code
     if (line.startsWith(FENCE)) {
       const body: string[] = []
       index += 1

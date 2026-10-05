@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import type { RefObject } from 'react'
 
 /**
- * Close a floating surface on a pointer landing outside it, or on escape
+ * Close a floating surface on a pointer landing outside it
  * @param {boolean} active - Surface is open
  * @param {RefObject<HTMLElement | null>} boundary - Element the pointer may stay inside
  * @param {() => void} onDismiss - Close handler

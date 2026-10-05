@@ -26,7 +26,7 @@ export interface MemberModerationViewProps {
 
 /**
  * Moderation of one member: time spent, then live by live, the detail on click
- * @param {View | null} view - History, none while unavailable
+ * @param {View | null} view - History
  * @param {boolean} canOpenReports - Report links shown
  * @return {JSX.Element}
  */

@@ -46,7 +46,7 @@ export interface FunctionInput {
 /**
  * Access console state and mutations
  * @typedef {Object} AccessCollection
- * @property {AccessConsole} console - Roles, functions, roster and perimeter of the open layer
+ * @property {AccessConsole} console - Roles
  * @property {boolean} isSaving - Mutation in flight
  * @property {(youtuberId: string | null) => Promise<AccessConsole | null>} openLayer - Switch creator
  * @property {(role: MemberRoleName, overwrites: PermissionOverwrite[]) => Promise<AccessConsole | null>} saveRole - Replace a role overwrite
@@ -143,7 +143,7 @@ export const useAccess = (initial: AccessConsole): AccessCollection => {
     [run]
   )
 
-  // The open layer travels with every write, so the answer comes back on the same one
+  // The open layer travels with every write
   const layer = data.youtuberId
 
   return {

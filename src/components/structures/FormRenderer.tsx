@@ -18,11 +18,11 @@ export interface FormRendererProps {
   onChange: (name: string, value: FieldValue) => void
   disabled?: boolean
   idPrefix?: string
-  // Settings rows, label left
+  // Settings rows
   layout?: 'grid' | 'rows'
-  // One field per line, e.g. in the narrow drawer
+  // One field per line
   single?: boolean
-  // Record being edited, never busy against itself
+  // Record being edited
   recordId?: string | null
 }
 
@@ -60,7 +60,7 @@ const resolvePrefix = (
 }
 
 /**
- * Columns a field takes, a single column form never opening a second one
+ * Columns a field takes
  * @param {FieldDefinition} field - Field declaration
  * @param {boolean} [single] - One field per line
  * @return {string} - Span class
@@ -70,7 +70,7 @@ const spanOf = (field: FieldDefinition, single?: boolean): string =>
   single || field.span === 'half' ? '' : 'sm:col-span-2'
 
 /**
- * Render field declarations into controls, one control shape per field kind
+ * Render field declarations into controls
  * @param {FieldDefinition[]} fields - Field declarations
  * @param {FormValues} values - Current values
  * @param {FieldIssue[]} issues - Rejections returned by the server
@@ -97,7 +97,7 @@ export const FormRenderer = ({
   const shown = visibleFields(fields, values)
   const errorOf = (name: string) => issues.find((issue) => issue.field === name)?.message
 
-  // A glyph field is drawn inside the control it decorates, never on a row of its own
+  // A glyph field is drawn inside the control it decorates
   const attached = new Set(shown.map((field) => field.glyph).filter(Boolean))
   const byName = new Map(shown.map((field) => [field.name, field]))
 
@@ -197,7 +197,7 @@ export const FormRenderer = ({
               />
             )
 
-            // A toggle carries its own label, so it skips the field wrapper
+            // A toggle carries its own label
             if (field.kind === 'toggle') {
               return (
                 <div key={field.name} className={cn(spanOf(field, single))}>

@@ -32,7 +32,7 @@ const SPARK = 'M0-1C.16-.36.36-.16 1 0C.36.16.16.36 0 1C-.16.36-.36.16-1 0C-.36-
 const LINE = { fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' } as const
 
 /**
- * Canvas of every figure: a ground shadow and the candy pink ramp, no disc behind
+ * Canvas of every figure: a ground shadow and the candy pink ramp
  * @param {Object} props - Sizing class and the drawing
  * @param {string} [props.className] - Classes merged onto the svg
  * @param {(paints: ScenePaints) => ReactNode} props.render - Drawing
@@ -151,7 +151,7 @@ const Sheet = ({
 
 /**
  * Round badge on a corner of a figure
- * @param {Object} props - Paint, centre and glyph
+ * @param {Object} props - Paint
  * @return {JSX.Element}
  */
 
@@ -177,7 +177,7 @@ const Badge = ({
 const GLYPH = { ...LINE, stroke: LIGHT, strokeWidth: 4.5 } as const
 
 /**
- * Open box, default figure of the start variant
+ * Open box
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -205,7 +205,7 @@ export const EmptyBoxIllustration: FC<EmptyStateIllustrationProps> = ({ classNam
 )
 
 /**
- * Magnifying glass, figure of the filter variant
+ * Magnifying glass
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -232,7 +232,7 @@ export const NoResultsIllustration: FC<EmptyStateIllustrationProps> = ({ classNa
 )
 
 /**
- * Two people side by side, figure of member collections
+ * Two people side by side
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -260,7 +260,7 @@ export const MembersIllustration: FC<EmptyStateIllustrationProps> = ({ className
 )
 
 /**
- * Three people gathered, figure of team collections
+ * Three people gathered
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -295,7 +295,7 @@ export const TeamsIllustration: FC<EmptyStateIllustrationProps> = ({ className }
 )
 
 /**
- * Board with three columns, figure of project collections
+ * Board with three columns
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -325,7 +325,7 @@ export const ProjectsIllustration: FC<EmptyStateIllustrationProps> = ({ classNam
 )
 
 /**
- * Checklist, figure of task collections
+ * Checklist
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -406,7 +406,7 @@ const CalendarPage = ({
 )
 
 /**
- * Calendar page, figure of meeting collections
+ * Calendar page
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -434,7 +434,7 @@ export const MeetingsIllustration: FC<EmptyStateIllustrationProps> = ({ classNam
 )
 
 /**
- * Calendar with a crossed out badge, figure of absence collections
+ * Calendar with a crossed out badge
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -461,7 +461,7 @@ export const AbsencesIllustration: FC<EmptyStateIllustrationProps> = ({ classNam
 )
 
 /**
- * Broadcast tower, figure of the livecon
+ * Broadcast tower
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -500,7 +500,7 @@ export const LiveconIllustration: FC<EmptyStateIllustrationProps> = ({ className
 )
 
 /**
- * Open book, figure of the academy
+ * Open book
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -540,7 +540,7 @@ export const AcademyIllustration: FC<EmptyStateIllustrationProps> = ({ className
 )
 
 /**
- * Note card with a folded corner, figure of note collections
+ * Note card with a folded corner
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -570,7 +570,7 @@ export const NotesIllustration: FC<EmptyStateIllustrationProps> = ({ className }
 )
 
 /**
- * Bell, figure of notification collections
+ * Bell
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -601,11 +601,11 @@ export const NotificationsIllustration: FC<EmptyStateIllustrationProps> = ({ cla
   />
 )
 
-// Teeth of the gear, one every 45 degrees
+// Teeth of the gear
 const GEAR_ANGLES = [0, 45, 90, 135] as const
 
 /**
- * Gear, figure of settings
+ * Gear
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */
@@ -643,7 +643,7 @@ export const SettingsIllustration: FC<EmptyStateIllustrationProps> = ({ classNam
 )
 
 /**
- * Shield with a check, figure of moderation
+ * Shield with a check
  * @param {string} [className] - Classes merged onto the svg
  * @return {JSX.Element}
  */

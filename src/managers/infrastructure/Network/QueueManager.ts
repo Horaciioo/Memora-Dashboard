@@ -160,8 +160,7 @@ export default class QueueManager {
   }
 
   /**
-   * Keep one recurring job on its cron. BullMQ 6 drives repeats through a job
-   * scheduler, a repeat flag on add() no longer registers anything
+   * Keep one recurring job on its cron. BullMQ 6 drives repeats through a job scheduler
    * @param {JobName} name - Queue name
    * @param {string} pattern - Cron pattern
    * @return {Promise<boolean>} - Schedule is in place

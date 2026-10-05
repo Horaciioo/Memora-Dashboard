@@ -43,7 +43,7 @@ export const beatPresence = async (
     return
   }
 
-  // Several tabs beat the same presence, each beat counting only since the last one
+  // Several tabs beat the same presence
   const next = tallyBeat(open, { at: now, ...beat }, LIVE_SETTINGS.heartbeatSeconds * 2)
   await prisma.modViewPresence.update({
     where: { id: open.id },
@@ -68,7 +68,7 @@ export const closeLivePresences = async (liveId: string): Promise<void> => {
 }
 
 /**
- * Close presences whose tab went silent, at their last beat
+ * Close presences whose tab went silent
  * @return {Promise<number>} - Closed
  */
 

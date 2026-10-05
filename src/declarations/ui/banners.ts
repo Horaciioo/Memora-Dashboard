@@ -1,5 +1,5 @@
 /**
- * Photograph behind a page banner, free to use under the Unsplash licence
+ * Photograph behind a page banner
  * @typedef {Object} BannerScene
  * @property {string} image - Path of the optimised file in public/banners
  * @property {string} author - Photographer
@@ -15,7 +15,7 @@ export interface BannerScene {
 }
 
 /**
- * Every scene, by area of the app
+ * Every scene
  * @type {Record<string, BannerScene>}
  */
 
@@ -35,7 +35,7 @@ export const BANNER_SCENES: Record<string, BannerScene> = {
 }
 
 /**
- * Area each route belongs to, the first prefix that matches wins
+ * Area each route belongs to
  * @type {readonly { prefix: string, scene: string }[]}
  */
 
@@ -65,7 +65,7 @@ export const BANNER_ROUTES: readonly { prefix: string; scene: string }[] = [
 ]
 
 /**
- * Scene of a route, the home one when none is declared
+ * Scene of a route
  * @param {string} pathname - Route on screen
  * @return {BannerScene} - Scene
  */

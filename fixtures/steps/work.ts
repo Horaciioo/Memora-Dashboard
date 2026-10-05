@@ -17,7 +17,7 @@ export interface Work {
 }
 
 /**
- * Phase a piece of work sits in, read from how far its date is
+ * Phase a piece of work sits in
  * @param {number} offset - Day offset of its deadline
  * @return {'TODO' | 'DOING' | 'DONE'} - Phase
  */
@@ -30,7 +30,7 @@ const phaseFor = (offset: number): 'TODO' | 'DOING' | 'DONE' => {
 }
 
 /**
- * People working for one creator, or everyone when none
+ * People working for one creator
  * @param {Person[]} people - Candidates
  * @param {string | null} creatorId - Creator
  * @return {Person[]} - Matching people
@@ -43,7 +43,7 @@ const forCreator = (people: Person[], creatorId: string | null): Person[] => {
 }
 
 /**
- * Write the projects, their tasks, their meetings and the loose ones around them
+ * Write the projects
  * @param {Reference} reference - Reference rows
  * @param {Cast} cast - People
  * @return {Promise<Work>} - Work rows
@@ -144,7 +144,7 @@ export const seedWork = async (reference: Reference, cast: Cast): Promise<Work> 
     }
   }
 
-  // Loose tasks, outside any project
+  // Loose tasks
   for (let index = 0; index < 30; index += 1) {
     const [emoji, title] = pick(TASKS)
     const creator = chance(0.8) ? pick(reference.creators).id : null
@@ -172,7 +172,7 @@ export const seedWork = async (reference: Reference, cast: Cast): Promise<Work> 
     work.tasks.push({ id: task, ownerId: owner.id, title })
   }
 
-  // One meeting a week or so over the whole history, and a few ahead
+  // One meeting a week or so over the whole history
   for (let offset = -175; offset <= 28; offset += between(3, 7)) {
     const [emoji, title] = pick(MEETINGS)
     const project = chance(0.4) ? pick(work.projects) : null

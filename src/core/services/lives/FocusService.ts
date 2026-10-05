@@ -17,7 +17,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
 // Seats that follow anyone and see every Focus
 const OVERSEERS: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Responsable]
 
-// Junior functions of the live trades, the only ones a trainer may follow
+// Junior functions of the live trades
 const JUNIOR_LIVE_FUNCTIONS = LIVE_FUNCTIONS.map((name) => JUNIOR_FUNCTION_OF[name]).filter(
   (name): name is string => Boolean(name)
 )
@@ -60,7 +60,7 @@ export const isFollowing = async (
 }
 
 /**
- * Read the Focus a viewer may see: every one for an overseer, their own otherwise
+ * Read the Focus a viewer may see: every one for an overseer
  * @param {Object} input - Reader
  * @param {string} input.liveId - Live
  * @param {AccessScope} input.scope - Viewer perimeter
@@ -86,7 +86,7 @@ export const listFocuses = async ({
     where: {
       liveId,
       endedAt: null,
-      // A trainer never sees another Focus, nor a responsable's
+      // A trainer never sees another Focus
       ...(OVERSEERS.includes(role) ? {} : { watcherId: viewerId }),
     },
     include: {
@@ -117,7 +117,7 @@ export const listFocuses = async ({
 }
 
 /**
- * Follow a member on a live, a trainer only reaching the juniors
+ * Follow a member on a live
  * @param {Object} input - Focus
  * @param {string} input.liveId - Live
  * @param {string} input.targetId - Member followed
@@ -180,10 +180,10 @@ export const stopFocus = async (liveId: string, viewerId: string): Promise<void>
 }
 
 /**
- * Platform login of a member, for the gestures they make
+ * Platform login of a member
  * @param {string} accountId - Member
  * @param {LivePlatformName} platform - Platform
- * @return {Promise<string | null>} - Login, none when unlinked
+ * @return {Promise<string | null>} - Login
  */
 
 export const platformLoginOf = async (

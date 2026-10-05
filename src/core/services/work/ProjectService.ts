@@ -241,7 +241,7 @@ const toProjectData = (values: FormValues) => ({
 })
 
 /**
- * Read the picked responsables, capped at the configured maximum
+ * Read the picked responsables
  * @param {FormValues} values - Parsed body
  * @return {string[]} - Account identifiers
  */
@@ -307,7 +307,7 @@ export const updateProject = async (
   const leadIds = readLeadIds(values)
   const assistantIds = readList(values, 'assistantIds')
 
-  // The team is replaced wholesale, the form always sends the full lists
+  // The team is replaced wholesale
   const row = await prisma.project.update({
     where: { id },
     data: {
@@ -395,7 +395,7 @@ const toCommunication = (
 
 /**
  * Build the announcement form declarations
- * @param {FieldOption[]} [mentions] - Members, roles and channels the body may mention
+ * @param {FieldOption[]} [mentions] - Members
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
@@ -610,7 +610,7 @@ export const readProject = async (id: string): Promise<ProjectDetail> => {
 }
 
 /**
- * Copy of the project surfaces, re-exported for the routes
+ * Copy of the project surfaces
  * @type {typeof PROJECT_COPY}
  */
 

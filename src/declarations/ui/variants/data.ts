@@ -6,7 +6,7 @@
 export const TABLE_STYLES = {
   wrapper:
     'w-full overflow-x-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface',
-  // The grid is desktop only, a card list stands in for it below md
+  // The grid is desktop only
   table: 'hidden w-full min-w-full border-collapse text-sm md:table',
   headRow:
     'border-b border-[var(--color-border)] text-left text-xs tracking-wide text-[var(--color-ink-subtle)] uppercase',
@@ -39,7 +39,7 @@ export const LIST_STYLES = {
   cardClickable:
     'cursor-pointer hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)]',
   cardMuted: 'opacity-60',
-  // Absent member, sunken and quiet but still legible
+  // Absent member
   cardAbsent: 'border-transparent bg-[var(--color-surface-sunken)] shadow-none',
   cardAbsentName: 'text-[var(--color-ink-subtle)]',
   cardAbsentNote:
@@ -50,14 +50,14 @@ export const LIST_STYLES = {
 } as const
 
 /**
- * Roomy record row styles, a name over one quiet line
+ * Roomy record row styles
  * @type {Record<string, string>}
  */
 
 export const RECORD_ROW = {
   stack: 'flex flex-col gap-3',
   root: 'flex cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-5 py-4 transition-[border-color,box-shadow] hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-sm)]',
-  // Same row without the pointer, for what only reads
+  // Same row without the pointer
   static:
     'flex items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface px-5 py-4',
   body: 'flex min-w-0 flex-1 flex-col gap-1',
@@ -67,7 +67,7 @@ export const RECORD_ROW = {
 } as const
 
 /**
- * Planning styles, one block per day that holds something
+ * Planning styles
  * @type {Record<string, string>}
  */
 
@@ -92,7 +92,7 @@ export const CALENDAR_AGENDA = {
 } as const
 
 /**
- * Calendar side rail styles, the month in miniature then the switches
+ * Calendar side rail styles
  * @type {Record<string, string>}
  */
 
@@ -100,7 +100,7 @@ export const CALENDAR_SIDEBAR = {
   // Folded rail of the screens without a sidebar
   rail: 'flex flex-col gap-4 md:hidden',
   railBody: 'flex-col gap-6',
-  // Sidebar version, standing where the destinations stand
+  // Sidebar version
   panel: 'flex min-h-0 w-full flex-1 flex-col gap-5 overflow-y-auto px-3',
   back: 'flex items-center gap-2 rounded-[var(--radius-md)] px-2 py-2 text-sm font-semibold transition-colors hover:bg-[var(--color-hover)]',
   toggle:
@@ -124,10 +124,10 @@ export const CALENDAR_SIDEBAR = {
   rowLabel: 'min-w-0 flex-1 truncate',
   box: 'flex h-5 w-5 shrink-0 items-center justify-center',
   boxCheck: 'h-5 w-5',
-  // A switched off row reads in retreat, its check gone
+  // A switched off row reads in retreat
   rowOff: 'text-[var(--color-ink-subtle)]',
   rowGlyph: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
-  // Bar standing where the global search stands, same look
+  // Bar standing where the global search stands
   searchBar:
     'flex w-full items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface-raised)] px-2.5 py-2 text-[var(--color-ink-subtle)] focus-within:text-[var(--color-ink)]',
   searchInput:
@@ -137,7 +137,7 @@ export const CALENDAR_SIDEBAR = {
 } as const
 
 /**
- * Own absence page: a composer on top, the list of what was declared underneath
+ * Own absence page: a composer on top
  * @type {Record<string, string>}
  */
 
@@ -180,17 +180,17 @@ export const ABSENCE_PAGE = {
 } as const
 
 /**
- * Grouped card list styles, one heading per bucket
+ * Grouped card list styles
  * @type {Record<string, string>}
  */
 
 export const GROUP_STYLES = {
   stack: 'flex flex-col',
-  // Blocks of a page, breathing apart
+  // Blocks of a page
   spaced: 'flex flex-col gap-12',
   section: 'flex flex-col gap-3',
   sectionDivided: 'border-t border-[var(--color-border)] mt-6 pt-6',
-  // Page-level buckets, a rule centred in the gap between each
+  // Page-level buckets
   ruledStack: 'flex flex-col divide-y divide-[var(--color-border)]',
   ruledSection: 'flex flex-col gap-4 py-8 first:pt-0 last:pb-0',
   heading: 'flex w-full items-center gap-2 text-left text-sm font-semibold text-[var(--color-ink)]',
@@ -215,11 +215,11 @@ export const BOARD_STYLES = {
     'rounded-[var(--radius-sm)] bg-[var(--color-surface-raised)] px-2 py-0.5 text-xs text-[var(--color-ink-subtle)]',
   body: 'flex min-h-24 flex-col gap-2 rounded-[var(--radius-md)] p-1',
   card: 'group flex cursor-grab flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3.5 shadow-[var(--shadow-sm)] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] active:cursor-grabbing motion-reduce:transition-none motion-reduce:hover:translate-y-0',
-  // Card sits lighter than its column so the two glass layers do not muddy, a tinted one blurs too
+  // Card sits lighter than its column so the two glass layers do not muddy
   cardGlass: 'bg-[var(--color-surface-raised)]/70 backdrop-blur-md',
   cardTint: 'accent-tint accent-border backdrop-blur-md',
   cardTitle: 'text-[15px] leading-snug font-bold',
-  // Glyph flowing before a title, spaced by text rather than framed
+  // Glyph flowing before a title
   cardGlyph: 'mr-1.5',
 } as const
 
@@ -238,7 +238,7 @@ export const TIMELINE_STYLES = {
 } as const
 
 /**
- * Journal styles, a portrait opening each recorded event rather than a bullet
+ * Journal styles
  * @type {Record<string, string>}
  */
 
@@ -252,12 +252,12 @@ export const JOURNAL_STYLES = {
   moment: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
   sentence: 'text-sm text-[var(--color-ink)]',
   verb: 'font-bold',
-  // Short rule set under the portrait, never a full width line across the panel
+  // Short rule set under the portrait
   separator: 'ml-9 h-px w-10 bg-[var(--color-border)]',
 } as const
 
 /**
- * Horizontal timeline styles, three steps connected by a rule
+ * Horizontal timeline styles
  * @type {Record<string, string>}
  */
 
@@ -296,7 +296,7 @@ export const CALENDAR_STYLES = {
     'border-b border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   weekdaysMonth: 'grid grid-cols-7',
   weekdaysTimed: 'grid',
-  // Hour gutter, then one column per day on screen
+  // Hour gutter
   columnsDay: 'grid-cols-[4rem_minmax(0,1fr)]',
   columnsWeek: 'grid-cols-[4rem_repeat(7,minmax(0,1fr))]',
   weekday: 'px-2 py-2 text-center',
@@ -323,19 +323,19 @@ export const CALENDAR_STYLES = {
   barRunsOut: '-mr-1.5',
   entry:
     'relative flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
-  // Month entry, a coloured bullet ahead of its words
+  // Month entry
   line: 'relative flex w-full cursor-grab items-center justify-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-left sm:justify-start text-xs transition-colors hover:bg-[var(--color-hover)] active:cursor-grabbing',
   lineBullet: 'h-3.5 w-[3px] shrink-0 rounded-full bg-current',
-  // Phones keep the bullet alone, the words come back from sm
+  // Phones keep the bullet alone
   lineTime: 'hidden shrink-0 tabular-nums text-[var(--color-ink-subtle)] sm:inline',
   lineTitle: 'hidden min-w-0 flex-1 truncate font-semibold sm:block',
   lineMuted: 'text-[var(--color-ink-subtle)]',
   entryTime: 'shrink-0 tabular-nums opacity-70',
   // A long title wraps onto the next line rather than losing its end
   entryTitle: 'min-w-0 flex-1 font-medium break-words',
-  // Full-colour fill, black label — pastel is kept for zones only
+  // Full-colour fill
   entrySolid: 'text-[var(--color-on-accent)]',
-  // Absences sit behind everything else, grey and a shade back
+  // Absences sit behind everything else
   entryMuted: 'border border-[var(--color-border)] opacity-75',
   entrySelected:
     'ring-2 ring-[var(--color-brand-600)] ring-offset-1 ring-offset-[var(--color-surface-raised)]',
@@ -366,7 +366,7 @@ export const CALENDAR_STYLES = {
   selectionBar:
     'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-brand-400)] bg-[var(--color-brand-soft)]/60 px-3 py-2 text-sm',
   selectionCount: 'font-semibold tabular-nums',
-  // Detail modal, meeting subjects and birthday note
+  // Detail modal
   detailList: 'flex list-disc flex-col gap-1 pl-5 text-sm',
   detailNote: 'text-sm text-[var(--color-ink-subtle)]',
   // Roll-call panel inside the detail modal
@@ -380,7 +380,7 @@ export const CALENDAR_STYLES = {
   rollCallGroup: 'flex flex-col gap-1.5',
   rollCallPeople: 'flex flex-col gap-1',
   rollCallPerson: 'flex items-center gap-2 text-sm',
-  // Hover preview card, portalled above the chip
+  // Hover preview card
   preview:
     'fixed z-[70] flex w-72 flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel p-4 text-sm shadow-[var(--shadow-md)]',
   previewHead: 'flex items-center gap-2 font-bold',
@@ -393,7 +393,7 @@ export const CALENDAR_STYLES = {
 } as const
 
 /**
- * Minute grid styles, day and week views
+ * Minute grid styles
  * @type {Record<string, string>}
  */
 
@@ -436,8 +436,7 @@ export const CALENDAR_GRID_STYLES = {
 } as const
 
 /**
- * Filter bar styles — a filter icon opening the dropdown sheet, a search icon expanding its
- * own field beside it
+ * Filter bar styles — a filter icon opening the dropdown sheet
  * @type {Record<string, string>}
  */
 
@@ -454,7 +453,7 @@ export const FILTER_STYLES = {
     'search-expand w-0 shrink-0 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 text-sm text-[var(--color-ink)] opacity-0 outline-none placeholder:text-[var(--color-ink-subtle)]',
   searchInputOpen: 'w-48 px-3 opacity-100 sm:w-64',
   trailing: 'ml-auto flex items-center gap-2',
-  // Divider lower, reset shares the row
+  // Divider lower
   panel: 'mt-3 flex flex-wrap items-start gap-3 border-t border-[var(--color-border)] pt-4',
   options: 'flex flex-1 flex-wrap items-start gap-3',
   reset: 'shrink-0',
@@ -462,7 +461,7 @@ export const FILTER_STYLES = {
 } as const
 
 /**
- * Permission toggle board styles — a page title, its permission, then indented refinements
+ * Permission toggle board styles — a page title
  * @type {Record<string, string>}
  */
 
@@ -516,33 +515,33 @@ export const PAGINATION_STYLES = {
 } as const
 
 /**
- * Absence declaration styles: a vertical timeline on the left, the step on the right
+ * Absence declaration styles: a vertical timeline on the left
  * @type {Record<string, string>}
  */
 
 export const ABSENCE_WIZARD = {
   root: 'surface-enter grid gap-5 md:grid-cols-[2rem_minmax(0,1fr)] md:gap-7',
-  // Bare chips and dashed runs, they sit top, middle and bottom of the box beside them
+  // Bare chips and dashed runs
   timeline: 'relative flex items-start justify-between gap-2 md:block',
   step: 'relative flex items-center md:absolute md:top-[var(--step-top)] md:left-0 md:-translate-y-1/2',
-  // Dashed run between two chips, drawn on a wide screen only
+  // Dashed run between two chips
   rail: 'absolute left-4 hidden w-0 -translate-x-1/2 border-l-2 border-dashed border-[var(--color-border-strong)] transition-colors md:block',
   railDone: 'border-[var(--color-success)]',
   chip: 'z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-black tabular-nums transition-colors',
   chipCurrent: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
-  // The check glyph paints itself in the success tones, it needs a pale ground
+  // The check glyph paints itself in the success tones
   chipDone: 'bg-[var(--color-success-soft)] ring-2 ring-[var(--color-success)] ring-inset',
   chipTodo:
     'border border-dashed border-[var(--color-border-strong)] text-[var(--color-ink-subtle)]',
   chipGlyph: 'h-5 w-5',
-  // Box of the step, its tail points at the one in force
+  // Box of the step
   stageBox:
     'relative flex min-h-[42rem] flex-col justify-center rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-surface p-6 sm:p-8',
   tail: 'bubble-tail hidden md:block',
   stage: 'course-pop flex min-w-0 flex-col gap-6',
   stageTitle: 'text-2xl font-black tracking-tight sm:text-3xl',
   hint: 'mt-1.5 text-[15px] text-[var(--color-ink-subtle)]',
-  // Divider under the calendar, the chosen period centred beneath it
+  // Divider under the calendar
   summary: 'min-h-24 border-t border-[var(--color-border)] pt-6 text-center',
   sentence: 'text-xl font-bold tracking-tight text-balance',
   duration: 'mt-1 text-[var(--color-ink-subtle)]',

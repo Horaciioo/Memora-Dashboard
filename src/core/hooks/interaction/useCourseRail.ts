@@ -9,7 +9,7 @@ import { useSyncExternalStore } from 'react'
  * @property {string} surfaceLabel - Surface it is about
  * @property {string} backHref - Where the way back leads
  * @property {string} backLabel - Words of the way back
- * @property {{ key: string, title: string }[]} chapters - Chapters, in order
+ * @property {{ key: string, title: string }[]} chapters - Chapters
  * @property {number} current - Chapter being read
  * @property {boolean} finished - Every chapter cleared
  * @property {(index: number) => void} onSelect - Goes back to an earlier chapter
@@ -30,8 +30,8 @@ let rail: CourseRailState | null = null
 const listeners = new Set<() => void>()
 
 /**
- * Hands the open course to the sidebar, null once it closes
- * @param {CourseRailState | null} next - Course state, or none
+ * Hands the open course to the sidebar
+ * @param {CourseRailState | null} next - Course state
  * @return {void}
  */
 
@@ -47,8 +47,8 @@ const subscribe = (listener: () => void) => {
 }
 
 /**
- * Course open in the page, read by the sidebar
- * @return {CourseRailState | null} - Course state, null outside a course
+ * Course open in the page
+ * @return {CourseRailState | null} - Course state
  */
 
 export const useCourseRail = (): CourseRailState | null =>

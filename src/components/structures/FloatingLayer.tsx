@@ -8,7 +8,7 @@ export interface FloatingLayerProps {
 }
 
 /**
- * Lift a floating panel to the body, out of any blurred or transformed parent
+ * Lift a floating panel to the body
  * @param {ReactNode} children - Scrim and panel
  * @return {JSX.Element | null}
  */

@@ -66,8 +66,7 @@ export interface ProjectFileTabsProps {
 }
 
 /**
- * Tabs of one project file — a pastel overview edited in place, quick task and meeting
- * creation scoped to the project, the announcement editor and the journal
+ * Tabs of one project file — a pastel overview edited in place
  * @param {ProjectDetail} detail - File resolved server-side
  * @param {FieldDefinition[]} projectFields - Declarations of the project form
  * @param {FieldDefinition[]} taskFields - Declarations of the task form
@@ -119,7 +118,7 @@ export const ProjectFileTabs = ({
   const fieldByName = new Map(projectFields.map((field) => [field.name, field]))
   const fieldFor = (name: string): FieldDefinition => fieldByName.get(name)!
 
-  // Option backing one select value, feeding the read rendering of the grid
+  // Option backing one select value
   const optionOf = (name: string) => {
     const value = file.values[name]
 
@@ -133,7 +132,7 @@ export const ProjectFileTabs = ({
     setDialog(kind)
   }
 
-  // Both dialogs prefill the project, and its YouTuber when it carries one
+  // Both dialogs prefill the project
   const workItemDefaults: FormValues = {
     projectId: summary.id,
     youtuberId: summary.youtuber?.id ?? null,
@@ -234,7 +233,7 @@ export const ProjectFileTabs = ({
     setWriting(true)
   }
 
-  // Neutral box, state colour on its badge
+  // Neutral box
   const boxClass =
     'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface p-4 sm:p-5'
 
@@ -269,7 +268,7 @@ export const ProjectFileTabs = ({
     </div>
   )
 
-  // Mentions an announcement may carry, read off the announcement field
+  // Mentions an announcement may carry
   const mentions = mentionChoices(
     communicationFields.find((field) => field.kind === 'announcement')?.options ?? []
   )

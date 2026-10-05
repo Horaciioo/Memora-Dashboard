@@ -12,7 +12,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { PARKOUR_BUBBLE } from '@/declarations/ui/variants'
 
 /**
- * Second period bubble, shown once: the specialisation courses are open
+ * Second period bubble
  * @return {JSX.Element | null}
  */
 

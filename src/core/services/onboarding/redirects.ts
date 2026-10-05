@@ -9,7 +9,7 @@ import { INTEGRATION_ERROR_PARAM, INTEGRATION_ERRORS } from '@/declarations/onbo
 import { ErrorCodes } from '@/utils/constants/errors'
 
 /**
- * Build the destination of a refused identity check, read from the live ticket
+ * Build the destination of a refused identity check
  * @param {AppError} error - Caught failure
  * @param {Record<string, string>} params - Dynamic segments
  * @return {Promise<string>} - Integration path

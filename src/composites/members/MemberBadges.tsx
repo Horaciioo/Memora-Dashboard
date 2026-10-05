@@ -7,15 +7,15 @@ import { cn } from '@/utils/classnames'
 
 export interface RoleGlyphProps {
   role: MemberRoleName
-  // Root administrator, marked apart from the ordinary role glyph
+  // Root administrator
   isRoot?: boolean
   className?: string
 }
 
 /**
- * Hierarchy level, a glyph replacing the role's name everywhere it would otherwise read as text
+ * Hierarchy level
  * @param {MemberRoleName} role - Role to describe
- * @param {boolean} [isRoot] - Root administrator, marked apart
+ * @param {boolean} [isRoot] - Root administrator
  * @param {string} [className] - Extra classes merged onto the glyph
  * @return {JSX.Element}
  */
@@ -40,7 +40,7 @@ export interface RoleEmblemProps {
 }
 
 /**
- * Large glyph of a member's role, tinted by their highest principal function
+ * Large glyph of a member's role
  * @param {MemberSummary} member - Member to describe
  * @param {string} [className] - Sizing classes
  * @return {JSX.Element}
@@ -65,7 +65,7 @@ export interface FunctionEmblemsProps {
 }
 
 /**
- * Glyphs of every function a member holds, side by side down the hierarchy
+ * Glyphs of every function a member holds
  * @param {MemberSummary} member - Member to describe
  * @param {string} [className] - Row classes
  * @param {string} [glyphClassName] - Sizing classes of each glyph

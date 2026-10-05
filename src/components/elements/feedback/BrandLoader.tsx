@@ -9,20 +9,19 @@ export type BrandLoaderVariant = 'tile' | 'block' | 'inline' | 'ink'
 
 export interface BrandLoaderProps {
   variant?: BrandLoaderVariant
-  // Line under the mark, block only
+  // Line under the mark
   caption?: string
   className?: string
 }
 
-// Natural size of the animation, the CSS height decides the rest
+// Natural size of the animation
 const MARK_WIDTH = 619
 const MARK_HEIGHT = 370
 
 /**
- * Animated Memora mark shown while something loads. The tile sits beside a title, the block
- * fills a panel, the inline one rides inside a pink button, the ink one a light surface
- * @param {BrandLoaderVariant} [variant] - Where it is drawn, defaults to tile
- * @param {string} [caption] - Line under the mark, block only
+ * Animated Memora mark shown while something loads. The tile sits beside a title
+ * @param {BrandLoaderVariant} [variant] - Where it is drawn
+ * @param {string} [caption] - Line under the mark
  * @param {string} [className] - Extra classes merged onto the wrapper
  * @return {JSX.Element}
  */

@@ -1,4 +1,4 @@
-// Fixed seed, the same run always writes the same data
+// Fixed seed
 let state = 20260928
 
 /**
@@ -24,7 +24,7 @@ export const between = (low: number, high: number): number =>
 
 /**
  * True with the given probability
- * @param {number} rate - Probability, 0 to 1
+ * @param {number} rate - Probability
  * @return {boolean} - Outcome
  */
 
@@ -79,7 +79,7 @@ export const weighted = <TItem>(entries: [TItem, number][]): TItem => {
 }
 
 /**
- * Random token, for links that need one
+ * Random token
  * @param {number} length - Characters
  * @return {string} - Token
  */

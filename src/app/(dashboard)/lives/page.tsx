@@ -33,7 +33,7 @@ export default async function LivesPage() {
   const [lives, fields, past] = await Promise.all([
     listOpenLives(perimeter, session.id, session.permissions),
     canAnnounce ? liveFields(perimeter) : Promise.resolve([]),
-    // Past lives and their reports, for whoever reads the logs
+    // Past lives and their reports
     canReadLogs
       ? listPastLives(perimeter, session.id, session.permissions, LIVE_SETTINGS.pastLives)
       : Promise.resolve([]),

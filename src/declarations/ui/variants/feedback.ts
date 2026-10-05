@@ -15,12 +15,12 @@ export const SKELETON_SHAPES = {
 export type SkeletonShape = keyof typeof SKELETON_SHAPES
 
 /**
- * Animated brand loader, white strokes so it lives on a pink ground or inked on a light one
+ * Animated brand loader
  * @type {Record<string, string>}
  */
 
 export const BRAND_LOADER = {
-  // Pink tile holding the mark, sits beside a title
+  // Pink tile holding the mark
   tile: 'inline-flex shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-brand-600)] px-3 py-2 shadow-[var(--shadow-sm)]',
   tileMark: 'loader-gif-brand h-10 w-auto',
   // Centred in a panel waiting on its data
@@ -31,13 +31,13 @@ export const BRAND_LOADER = {
   blockMark: 'loader-gif-brand h-16 w-auto',
   // Inside a pink button
   inline: 'loader-gif-brand h-4 w-auto shrink-0',
-  // On a light surface, inked
+  // On a light surface
   ink: 'loader-gif h-6 w-auto shrink-0',
   caption: 'text-sm text-[var(--color-ink-subtle)]',
 } as const
 
 /**
- * Route skeleton layouts, each echoing the page it stands in for
+ * Route skeleton layouts
  * @type {Record<string, string>}
  */
 
@@ -80,7 +80,7 @@ export const EMPTY_STATE_STYLES = {
 } as const
 
 /**
- * Progress bar styles, the fill width being the only inline style allowed
+ * Progress bar styles
  * @type {Record<string, string>}
  */
 
@@ -99,7 +99,7 @@ export const PROGRESS_STYLES = {
  */
 
 export const TOAST_STYLES = {
-  // Above the nav pill on mobile, top-right from md; the pile sets its own height
+  // Above the nav pill on mobile
   stack:
     'toast-pile pointer-events-auto fixed inset-x-4 bottom-[calc(var(--shell-bottom-nav-h)_+_1.5rem_+_env(safe-area-inset-bottom))] z-[60] md:inset-x-auto md:top-4 md:right-4 md:bottom-auto md:w-[min(23rem,calc(100vw-2rem))]',
   stackSpread: 'toast-pile-spread',
@@ -139,9 +139,10 @@ export const ADD_ROW_STYLES = {
  */
 
 export const MATURITY_STYLES = {
-  // Outlined, never filled
+  // Outlined
   tag: 'inline-flex shrink-0 items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-[10px] leading-none font-medium tracking-wide text-[var(--color-ink)] uppercase',
   progress: 'text-[var(--color-ink-subtle)]',
+  star: 'h-2.5 w-2.5 text-[var(--color-brand-600)]',
   link: 'transition-colors hover:border-[var(--color-ink)]',
   row: 'flex items-start gap-3 text-sm',
   meaning: 'text-[var(--color-ink-subtle)]',
@@ -155,7 +156,7 @@ export const MATURITY_STYLES = {
 export const NOTIFICATION_STYLES = {
   // The pastille sits on the bell itself
   trigger: 'relative',
-  // Unread dot, never a number
+  // Unread dot
   pastille:
     'pointer-events-none absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-surface-raised)]',
   scrim: 'fixed inset-0 z-[65]',
@@ -170,7 +171,7 @@ export const NOTIFICATION_STYLES = {
     'flex w-full items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[var(--color-brand-600)] transition-colors hover:bg-[var(--color-surface)]',
   footerIcon: 'h-3.5 w-3.5',
   list: 'flex flex-col',
-  // Inset rule between two rows, never reaching either edge of the panel
+  // Inset rule between two rows
   divider: 'mx-4 block h-px bg-[var(--color-border)]',
   row: 'flex gap-3 rounded-[var(--radius-md)] px-2 py-2.5 transition-colors',
   rowUnread: 'bg-[var(--color-brand-soft)]/40',
@@ -190,7 +191,7 @@ export const NOTIFICATION_STYLES = {
 } as const
 
 /**
- * Last resort error screen styles, standing without the app shell
+ * Last resort error screen styles
  * @type {Record<string, string>}
  */
 
@@ -250,7 +251,7 @@ export const QUERY_ERROR = {
 export const REVEAL_MARK = {
   root: 'group inline-flex items-center gap-1.5 rounded-full text-sm font-semibold outline-none',
   glyph: 'h-4 w-4 shrink-0',
-  // Track grows from nothing, so the words uncover from the glyph rightwards
+  // Track grows from nothing
   track:
     'grid grid-cols-[0fr] transition-[grid-template-columns] duration-[var(--motion-duration-panel)] ease-out group-hover:grid-cols-[1fr] group-focus-visible:grid-cols-[1fr] motion-reduce:transition-none',
   text: 'overflow-hidden whitespace-nowrap not-italic',

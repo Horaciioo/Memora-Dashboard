@@ -6,7 +6,7 @@ import type { ExerciseBlock } from '@/declarations/academy/curriculum/types'
  * @typedef {Object} ExerciseViewProps
  * @property {ExerciseBlock} block - Exercise declared in code
  * @property {ExerciseAnswer | undefined} answer - What sits in it
- * @property {ExerciseResult | undefined} result - Last check, none while unchecked
+ * @property {ExerciseResult | undefined} result - Last check
  * @property {boolean} isSaving - Check being saved
  * @property {(answer: ExerciseAnswer) => void} onAnswer - Change the answer
  * @property {(answer?: ExerciseAnswer) => void} onCheck - Score and save
@@ -26,7 +26,7 @@ export interface ExerciseViewProps<TBlock extends ExerciseBlock = ExerciseBlock>
 /**
  * Read an answer keyed by part
  * @param {ExerciseAnswer | undefined} answer - Raw answer
- * @return {Record<string, string | string[]>} - Record, empty when the shape differs
+ * @return {Record<string, string | string[]>} - Record
  */
 
 export const asRecord = (answer: ExerciseAnswer | undefined): Record<string, string | string[]> =>
@@ -37,7 +37,7 @@ export const asRecord = (answer: ExerciseAnswer | undefined): Record<string, str
 /**
  * Read an answer made of a list
  * @param {ExerciseAnswer | undefined} answer - Raw answer
- * @return {string[]} - List, empty when the shape differs
+ * @return {string[]} - List
  */
 
 export const asList = (answer: ExerciseAnswer | undefined): string[] =>

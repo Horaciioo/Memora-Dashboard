@@ -19,7 +19,7 @@ export interface CalendarAgendaProps {
 }
 
 /**
- * Planning, the days that hold something listed one under the other
+ * Planning
  * @param {CalendarDay[]} days - Days the planning spans
  * @param {CalendarEntry[]} entries - Entries drawn
  * @param {string[]} selection - Selected entry identifiers
@@ -31,7 +31,7 @@ export const CalendarAgenda = ({ days, entries, selection, onOpen }: CalendarAge
   const filled = days
     .map((day) => ({
       day,
-      // Whole days first, then by hour
+      // Whole days first
       items: entries
         .filter((entry) => coversDay(entry.startsAt, entry.endsAt, day.key))
         .sort(

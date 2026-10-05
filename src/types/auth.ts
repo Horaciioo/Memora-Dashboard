@@ -44,7 +44,7 @@ export interface SessionUser {
 /**
  * Display preferences a member set once and carries to every browser
  * @typedef {Object} DisplayPreferences
- * @property {ThemePreference | null} theme - Light, dark or the device's own
+ * @property {ThemePreference | null} theme - Light
  * @property {ColorVisionMode | null} colorVision - Colour vision correction
  * @property {FontScale | null} fontScale - Text size
  */

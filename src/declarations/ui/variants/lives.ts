@@ -1,7 +1,7 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 
 /**
- * Livecon page, one strip per open live
+ * Livecon page
  * @type {Record<string, string>}
  */
 
@@ -9,7 +9,7 @@ export const LIVE_BOARD = {
   wrapper: 'mx-auto flex w-full max-w-5xl flex-col gap-10',
   toolbar: 'flex flex-wrap items-center justify-center gap-3',
   list: 'flex flex-col gap-6',
-  // Raised strip, the platform colour a rule down the left edge
+  // Raised strip
   strip:
     'relative flex flex-col gap-6 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6 pl-8 shadow-[var(--shadow-sm)] sm:flex-row sm:flex-wrap sm:items-center',
   stripLive: 'border-[var(--color-danger)] shadow-[var(--shadow-md)]',
@@ -78,7 +78,7 @@ export const LIVE_REPORT = {
     'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5 py-4',
   figureLabel: PROPERTY_LABEL,
   figureValue: 'text-3xl font-black tracking-tight tabular-nums',
-  // Timeline, one bar per slice, rounded end on the data side
+  // Timeline
   chart: 'flex h-40 items-end gap-0.5',
   bar: 'group relative flex h-full flex-1 items-end',
   barFill:
@@ -157,7 +157,7 @@ export const MEMBER_MODERATION = {
 } as const
 
 /**
- * Roll-call board of a live: three columns, names dragged between them
+ * Roll-call board of a live: three columns
  * @type {Record<string, string>}
  */
 
@@ -197,7 +197,7 @@ export const LIVE_GATE = {
 } as const
 
 /**
- * Bubble telling a live just started, shown once
+ * Bubble telling a live just started
  * @type {Record<string, string>}
  */
 
@@ -210,7 +210,7 @@ export const LIVE_STARTED_BUBBLE = {
 } as const
 
 /**
- * Lives page with no live open, the Mod View shown alone
+ * Lives page with no live open
  * @type {Record<string, string>}
  */
 

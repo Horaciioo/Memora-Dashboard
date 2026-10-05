@@ -12,21 +12,21 @@ export interface ToggleProps {
   onChange: (checked: boolean) => void
   label: string
   disabled?: boolean
-  // Drops the framed row and the visible label, leaving the switch on its own
+  // Drops the framed row and the visible label
   bare?: boolean
   // Track paints green/red and the knob carries a check/cross
   binary?: boolean
 }
 
 /**
- * Switch carrying its own label, used for a single yes/no setting
+ * Switch carrying its own label
  * @param {string} [id] - Identifier of the control
  * @param {boolean} checked - Current state
  * @param {(checked: boolean) => void} onChange - State handler
- * @param {string} label - Visible label, kept for assistive tech when bare
+ * @param {string} label - Visible label
  * @param {boolean} [disabled] - Blocks interaction
- * @param {boolean} [bare] - Switch alone, label read out only
- * @param {boolean} [binary] - Track paints green/red, knob carries a check/cross
+ * @param {boolean} [bare] - Switch alone
+ * @param {boolean} [binary] - Track paints green/red
  * @return {JSX.Element}
  */
 

@@ -5,7 +5,8 @@
 
 export const PRIVACY_COPY = {
   title: 'Tes données',
-  subtitle: 'Ce que Memora enregistre, pourquoi, et pendant combien de temps.',
+  subtitle:
+    'Memora respecte ta vie privée et ne collecte que ce qui est nécessaire à ton accompagnement.',
   controllerTitle: 'Qui est responsable',
   processingTitle: 'Ce qui est traité',
   rightsTitle: 'Tes droits',
@@ -30,7 +31,7 @@ export const PRIVACY_COPY = {
 } as const
 
 /**
- * History consent copy, shown wherever the agreement is asked for
+ * History consent copy
  * @type {Record<string, string>}
  */
 

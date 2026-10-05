@@ -17,7 +17,7 @@ export interface ChatFeedProps {
   caption?: string
   // Offers to play the chat back like a clip
   replayable?: boolean
-  // Plays on arrival, as a scene opening
+  // Plays on arrival
   autoplay?: boolean
   // Called once every line is on screen
   onPlayed?: () => void
@@ -38,8 +38,8 @@ export interface ChatLineMark {
 }
 
 /**
- * One chat line, drawn as the platform draws it
- * @param {Object} props - Line, surface, whether it is arriving and any mark
+ * One chat line
+ * @param {Object} props - Line
  * @return {JSX.Element}
  */
 
@@ -111,9 +111,8 @@ export const ChatLineView = ({
 }
 
 /**
- * Twitch or YouTube chat as an illustration, whole at rest and playing back line by line on
- * demand, the line a lesson is about lit up
- * @param {ChatFeedProps} props - Surface, lines, caption and playback
+ * Twitch or YouTube chat as an illustration
+ * @param {ChatFeedProps} props - Surface
  * @return {JSX.Element}
  */
 

@@ -17,9 +17,8 @@ export interface AbsenceListProps {
 }
 
 /**
- * What was declared, newest first: dates, length, the reason as written, where it stands. A
- * request still waiting can be withdrawn from its row, any row from the right click
- * @param {MemberAbsence[]} absences - Own absences, newest first
+ * What was declared
+ * @param {MemberAbsence[]} absences - Own absences
  * @param {(absence: MemberAbsence) => void} onRemove - Asks to withdraw an absence
  * @return {JSX.Element}
  */

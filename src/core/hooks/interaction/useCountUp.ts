@@ -6,9 +6,9 @@ import { GESTURE_SETTINGS } from '@/declarations/configurations/settings'
 import { prefersReducedMotion } from '@/utils/motion'
 
 /**
- * Counts a number up from zero to its target, once, the first time it is shown
+ * Counts a number up from zero to its target
  * @param {number} target - Value the count settles on
- * @return {number} - Value to render now, the target at once under reduced motion
+ * @return {number} - Value to render now
  */
 
 export const useCountUp = (target: number): number => {

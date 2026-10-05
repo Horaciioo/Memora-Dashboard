@@ -8,7 +8,7 @@ export const SCENE_START = '2026-10-03T20:00:00.000Z'
 /**
  * Build one chatter
  * @param {string} login - Login
- * @param {Partial<Chatter>} [extra] - Badges, colour, name
+ * @param {Partial<Chatter>} [extra] - Badges
  * @return {Chatter} - Chatter
  */
 
@@ -26,7 +26,7 @@ export const chatter = (login: string, extra: Partial<Chatter> = {}): Chatter =>
  * @param {string} id - Stable line id
  * @param {Chatter} author - Who writes
  * @param {string} text - Line
- * @param {Partial<ChatMessage>} [extra] - First message, flags
+ * @param {Partial<ChatMessage>} [extra] - First message
  * @return {ChatMessage} - Message
  */
 
@@ -52,7 +52,7 @@ export const act = (id: string, act: Omit<ModAct, 'id' | 'at'>): ModAct => ({
 
 /**
  * Space beats evenly from a start
- * @param {number} start - First beat, milliseconds
+ * @param {number} start - First beat
  * @param {number} gap - Milliseconds between beats
  * @param {SceneEvent[]} events - Beats in order
  * @return {SceneStep[]} - Timed steps

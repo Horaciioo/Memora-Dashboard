@@ -34,7 +34,7 @@ const readLadder = async (): Promise<CourseContext['ladder']> => {
     }),
   ])
 
-  // Live responsables first, every responsable when none holds the trade
+  // Live responsables first
   const live = leads.filter((lead) =>
     lead.functions.some((held) => LIVE_FUNCTIONS.includes(held.jobFunction.name))
   )
@@ -46,9 +46,9 @@ const readLadder = async (): Promise<CourseContext['ladder']> => {
 }
 
 /**
- * Levels, each with a few offences of a real Twitch panel
+ * Levels
  * @param {AccessScope} scope - Learner perimeter
- * @return {Promise<CourseLiveconLevel[]>} - Levels, calmest first
+ * @return {Promise<CourseLiveconLevel[]>} - Levels
  */
 
 const readLivecon = async (scope: AccessScope): Promise<CourseLiveconLevel[]> => {

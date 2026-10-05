@@ -1,4 +1,4 @@
-// Build stages, Minecraft style
+// Build stages
 export const RELEASE_STAGES = ['snapshot', 'candidate', 'release'] as const
 
 /**

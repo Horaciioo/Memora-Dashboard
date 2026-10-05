@@ -27,7 +27,7 @@ export type DiscordBlock =
   | { type: 'list'; ordered: boolean; items: DiscordInline[][] }
   | { type: 'codeBlock'; text: string }
 
-// Wrapping marks, longest first so ** wins over *
+// Wrapping marks
 const WRAPS: { pattern: RegExp; type: 'bold' | 'italic' | 'underline' | 'strike' | 'spoiler' }[] = [
   { pattern: /^\*\*([\s\S]+?)\*\*(?!\*)/, type: 'bold' },
   { pattern: /^__([\s\S]+?)__(?!_)/, type: 'underline' },
@@ -37,7 +37,7 @@ const WRAPS: { pattern: RegExp; type: 'bold' | 'italic' | 'underline' | 'strike'
   { pattern: /^_(?!\s)([\s\S]+?)_(?!_)/, type: 'italic' },
 ]
 
-// Mentions, the token kept whole
+// Mentions
 const MENTIONS: { pattern: RegExp; kind: 'user' | 'role' | 'channel' | 'broadcast' }[] = [
   { pattern: /^<@&\d+>/, kind: 'role' },
   { pattern: /^<@!?\d+>/, kind: 'user' },
@@ -134,7 +134,7 @@ const FENCE = /^```/
 /**
  * Parse a whole Discord message into blocks
  * @param {string} source - Message markdown
- * @return {DiscordBlock[]} - Blocks, top to bottom
+ * @return {DiscordBlock[]} - Blocks
  */
 
 export const parseMessage = (source: string): DiscordBlock[] => {
@@ -216,7 +216,7 @@ export const parseMessage = (source: string): DiscordBlock[] => {
 }
 
 /**
- * Mention read both ways, the token Discord stores and the name a writer types
+ * Mention read both ways
  * @typedef {Object} MentionEntry
  * @property {string} token - Token Discord reads
  * @property {string} display - What the writer sees and types
@@ -231,7 +231,7 @@ export interface MentionEntry {
 const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 /**
- * Turn stored markdown into what the writer sees, tokens shown by name
+ * Turn stored markdown into what the writer sees
  * @param {string} raw - Stored markdown
  * @param {MentionEntry[]} entries - Known mentions
  * @return {string} - Text as typed
@@ -247,14 +247,14 @@ export const toDisplay = (raw: string, entries: MentionEntry[]): string => {
 }
 
 /**
- * Turn what the writer typed back into stored markdown, known names becoming tokens
+ * Turn what the writer typed back into stored markdown
  * @param {string} display - Text as typed
  * @param {MentionEntry[]} entries - Known mentions
  * @return {string} - Markdown Discord reads
  */
 
 export const toRaw = (display: string, entries: MentionEntry[]): string => {
-  // Longest names first, so « @Modo Lives » never loses to « @Modo »
+  // Longest names first
   const sorted = [...entries].sort((left, right) => right.display.length - left.display.length)
   if (sorted.length === 0) return display
 

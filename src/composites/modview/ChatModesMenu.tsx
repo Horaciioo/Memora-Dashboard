@@ -28,7 +28,7 @@ const isOn = (modes: ModViewState['modes'], mode: ChatModeName): boolean =>
   mode === 'slow' ? modes.slowSeconds !== null : modes[mode]
 
 /**
- * Chat modes and terms, each greyed for whoever may not touch it
+ * Chat modes and terms
  * @param {ModViewState} state - Mod View state
  * @param {GateCheck} gate - Permission check
  * @param {ActRunner} onAct - Gesture runner

@@ -25,9 +25,8 @@ export interface LiveconTitleProps {
 }
 
 /**
- * The livecon in force as a glyph and its name, a member allowed to change it clicking or right
- * clicking the name to pick another level
- * @param {LiveconTitleProps} props - Creator, levels, state and handlers
+ * The livecon in force as a glyph and its name
+ * @param {LiveconTitleProps} props - Creator
  * @return {JSX.Element}
  */
 
@@ -44,7 +43,7 @@ export const LiveconTitle = ({
   const inForce = levelOfCreator(livecon.state, creatorId)?.level ?? levels[0]
   const Icon = ICONS[inForce?.icon ?? 'livecon']
 
-  // Every other level, the one in force needing no switch
+  // Every other level
   const menu = useActionMenu(
     levels
       .filter((level) => level.id !== inForce?.id)

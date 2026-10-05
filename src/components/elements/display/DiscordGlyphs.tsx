@@ -4,7 +4,7 @@ import { Frame } from '@/components/elements/display/BrandGlyphs'
 import type { GlyphProps } from '@/components/elements/display/BrandGlyphs'
 
 /**
- * Flat Discord interface icon, drawn in the current colour like the client
+ * Flat Discord interface icon
  * @param {Object} props - Icon props
  * @param {string} [props.className] - Sizing class
  * @param {ReactNode} props.children - Shapes
@@ -210,7 +210,7 @@ export const DiscordChevronGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Ticket stub, thumbnail of the ticket embed
+ * Ticket stub
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */

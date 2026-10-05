@@ -16,7 +16,7 @@ export const needsHistoryConsent = (session: SessionUser): boolean =>
   (session.historyConsentVersion ?? 0) < HISTORY_CONSENT.version
 
 /**
- * Record the agreement of one member at the current version, proof in the journal
+ * Record the agreement of one member at the current version
  * @param {string} accountId - Account identifier
  * @return {Promise<void>} - Recorded
  */

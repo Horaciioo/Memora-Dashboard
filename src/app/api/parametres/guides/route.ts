@@ -5,7 +5,7 @@ import { GUIDE_KEYS } from '@/declarations/academy/welcome'
 import type { GuideKey } from '@/declarations/academy/welcome'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 
-// Keys a member may mark as seen, a started live included
+// Keys a member may mark as seen
 const KNOWN = new Set<string>(Object.values(GUIDE_KEYS))
 const LIVE_STARTED = /^live-started:[a-z0-9-]{1,40}$/
 

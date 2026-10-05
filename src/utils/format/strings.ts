@@ -54,7 +54,7 @@ export function extractQueryFromURL(url: string): Record<string, string> {
  */
 
 export function foldText(text: string): string {
-  // Strip diacritics, expand ligatures
+  // Strip diacritics
   return text
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')

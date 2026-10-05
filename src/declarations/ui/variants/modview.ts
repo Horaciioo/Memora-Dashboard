@@ -1,7 +1,7 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 
 /**
- * Mod View frame, a bar on top then the rail and the windows
+ * Mod View frame
  * @type {Record<string, string>}
  */
 
@@ -32,7 +32,7 @@ export const MODVIEW_FRAME = {
   column: 'flex min-h-0 flex-col gap-3',
   // Wrapper dropped in focus mode
   flat: 'contents',
-  // Windows of a course focus, side by side
+  // Windows of a course focus
   focus: 'grid min-h-0 flex-1 auto-cols-fr gap-3 lg:grid-flow-col lg:grid-rows-[minmax(0,1fr)]',
   pair: 'grid min-h-0 flex-1 gap-3 sm:grid-cols-2',
 } as const
@@ -45,7 +45,7 @@ export const MODVIEW_FRAME = {
 export const MODVIEW_WINDOW = {
   root: 'relative flex min-h-64 flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)] transition-[box-shadow,transform] duration-[var(--motion-duration-panel)] lg:min-h-0',
   grow: 'flex-1',
-  // Lit by a scene, the rest dims
+  // Lit by a scene
   lit: 'z-20 shadow-[0_0_0_3px_var(--color-brand-600),var(--shadow-md)] scale-[1.01]',
   head: 'flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-2',
   title: 'min-w-0 flex-1 truncate text-sm font-black tracking-tight',
@@ -86,7 +86,7 @@ export const MODVIEW_STREAM = {
 } as const
 
 /**
- * Moderator actions, automod queue and unban requests
+ * Moderator actions
  * @type {Record<string, string>}
  */
 
@@ -135,7 +135,7 @@ export const MODVIEW_CHAT = {
   badge: 'mr-1 inline-block h-4 w-4 align-[-2px]',
   name: 'cursor-pointer font-bold hover:underline',
   deleted: 'text-[var(--color-ink-subtle)] italic',
-  // Gestures shown on hover, keyboard focus too
+  // Gestures shown on hover
   tools:
     'absolute top-0.5 right-2 hidden items-center gap-0.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-0.5 shadow-[var(--shadow-sm)] group-hover:flex group-focus-within:flex',
   tool: 'flex h-7 w-7 items-center justify-center rounded-[var(--radius-md)] hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-35',
@@ -196,7 +196,7 @@ export const MODVIEW_COMMUNITY = {
 } as const
 
 /**
- * Viewer card, slides over the right of the Mod View
+ * Viewer card
  * @type {Record<string, string>}
  */
 
@@ -221,7 +221,7 @@ export const MODVIEW_USER = {
 } as const
 
 /**
- * Sanctions panel at hand, folded against the right edge
+ * Sanctions panel at hand
  * @type {Record<string, string>}
  */
 
@@ -313,7 +313,7 @@ export const MODVIEW_RAIL = {
  */
 
 export const MODVIEW_PAGE = {
-  // Named for screen readers, the rail already says it
+  // Named for screen readers
   title: 'sr-only',
 } as const
 

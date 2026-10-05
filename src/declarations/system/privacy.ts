@@ -2,7 +2,7 @@ import { createRegistry } from '@/core/lib/registry'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 
 /**
- * Who answers for the processing, the only part no code can infer
+ * Who answers for the processing
  * @type {{ name: string, contact: string }}
  */
 
@@ -12,8 +12,7 @@ export const DATA_CONTROLLER = {
 }
 
 /**
- * Age below which the organisation does not recruit. Sitting above the French
- * threshold for digital consent, a member always agrees for themselves
+ * Age below which the organisation does not recruit. Sitting above the French threshold for digital consent
  * @type {{ minimum: number, consentThreshold: number }}
  */
 
@@ -36,7 +35,7 @@ const inDays = (days: number): string => {
 }
 
 /**
- * How long each family of data is kept, the single source the purge also reads
+ * How long each family of data is kept
  * @type {Record<string, number>}
  */
 
@@ -147,7 +146,7 @@ const PROCESSING_MAP = {
 } satisfies Record<string, ProcessingRecord>
 
 /**
- * Register of processing, read by the public notice and by the retention job
+ * Register of processing
  * @type {Registry<ProcessingName, ProcessingRecord>}
  */
 
@@ -158,7 +157,7 @@ export const PROCESSING_REGISTRY = createRegistry<keyof typeof PROCESSING_MAP, P
 export type ProcessingName = keyof typeof PROCESSING_MAP
 
 /**
- * What a member is asked to agree to, and how that agreement is versioned
+ * What a member is asked to agree to
  * @type {{ version: number, title: string, body: string[], label: string }}
  */
 
@@ -176,8 +175,7 @@ export const HISTORY_CONSENT = {
 }
 
 /**
- * What leaving does to one account, field by field. Only what the member
- * volunteered is removed — what Discord already makes public stays
+ * What leaving does to one account
  * @typedef {Object} AnonymisationPlan
  * @property {string[]} cleared - Fields emptied
  * @property {string[]} kept - Fields deliberately preserved
@@ -191,7 +189,7 @@ export interface AnonymisationPlan {
 }
 
 /**
- * The plan the anonymisation executes, so the rule lives in one place
+ * The plan the anonymisation executes
  * @type {AnonymisationPlan}
  */
 

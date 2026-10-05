@@ -10,7 +10,7 @@ import type { HierarchyRung, ReadBlock } from '@/declarations/academy/curriculum
 import { COURSE_LADDER } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
-// Colour of each rung, top to bottom
+// Colour of each rung
 const RUNG_PAINT: Record<HierarchyRung['source'], string> = {
   admins: COURSE_LADDER.top,
   responsables: COURSE_LADDER.middle,
@@ -22,7 +22,7 @@ export interface LadderBlockProps {
 }
 
 /**
- * Decision ladder, its names read from the accounts, landing rung by rung
+ * Decision ladder
  * @param {LadderBlockProps} props - Ladder declared in code
  * @return {JSX.Element}
  */

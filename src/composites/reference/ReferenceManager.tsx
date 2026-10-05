@@ -37,7 +37,7 @@ export interface ReferenceManagerProps {
   canManage: boolean
 }
 
-// Single drop container, rows only move within their own collection
+// Single drop container
 const CONTAINER = 'reference'
 
 /**

@@ -15,7 +15,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const metadata: Metadata = { title: LIVE_REPORT_COPY.title }
 
 /**
- * Report of one live for the team, with its full log
+ * Report of one live for the team
  * @param {Object} props - Route props
  * @param {Promise<{ id: string }>} props.params - Live identifier
  * @return {Promise<JSX.Element>} - Report page

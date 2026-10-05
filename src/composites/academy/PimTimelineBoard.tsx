@@ -31,7 +31,7 @@ const NODE_STYLES = {
 } as const
 
 /**
- * Glyph of a step, a plain check once passed
+ * Glyph of a step
  * @param {PimTimelineStep} step - Step drawn
  * @return {JSX.Element}
  */
@@ -47,8 +47,7 @@ const StepNode = ({ step }: { step: PimTimelineStep }) => {
 }
 
 /**
- * Vertical PIM timeline, the step in course in colour and every other one greyed. Each step
- * says with its glyph what must happen, the one in course opening its walkthrough
+ * Vertical PIM timeline
  * @param {PimTimeline} initialTimeline - Timeline resolved server-side
  * @param {boolean} canAdvance - Member may move the timeline
  * @return {JSX.Element}

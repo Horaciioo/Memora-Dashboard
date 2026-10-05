@@ -28,7 +28,7 @@ export interface LiveReportViewProps {
 const EVERYONE = ''
 
 /**
- * Activity of the live, one bar per slice, Livecon levels beneath
+ * Activity of the live
  * @param {Object} props - Timeline props
  * @param {LiveReport} props.report - Report
  * @param {string} props.start - Live start

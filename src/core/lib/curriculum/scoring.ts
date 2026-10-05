@@ -3,7 +3,7 @@ import type { ExerciseBlock } from '@/declarations/academy/curriculum/types'
 import { foldText } from '@/utils/format/strings'
 
 /**
- * What a learner sent for one exercise, shaped by its kind
+ * What a learner sent for one exercise
  * @typedef {Object} ExerciseAnswer
  */
 
@@ -20,7 +20,7 @@ export type ExerciseAnswer =
  * @property {number} score - Points earned
  * @property {number} max - Points available
  * @property {boolean} passed - Clears the exercise
- * @property {Record<string, boolean>} marks - Right or wrong, per question, hole or item
+ * @property {Record<string, boolean>} marks - Right or wrong
  */
 
 export interface ExerciseResult {
@@ -30,7 +30,7 @@ export interface ExerciseResult {
   marks: Record<string, boolean>
 }
 
-// A hole of a gap text, [[answer|variant]]
+// A hole of a gap text
 const HOLE = /\[\[([^\]]+)\]\]/g
 
 /**
@@ -45,26 +45,26 @@ export const holesOf = (text: string): string[][] =>
 /**
  * Split a gap text around its holes
  * @param {string} text - Gap text
- * @return {string[]} - Text runs, one more than the holes
+ * @return {string[]} - Text runs
  */
 
 export const runsOf = (text: string): string[] =>
   text.split(HOLE).filter((_, index) => index % 2 === 0)
 
-// Answers compare without case, accents nor extra spaces
+// Answers compare without case
 const normalise = (value: string): string => foldText(value).replace(/\s+/g, ' ').trim()
 
 /**
  * Read a record answer safely
  * @param {ExerciseAnswer} answer - Raw answer
- * @return {Record<string, unknown>} - Record, empty when the shape is wrong
+ * @return {Record<string, unknown>} - Record
  */
 
 const asRecord = (answer: ExerciseAnswer): Record<string, unknown> =>
   answer && typeof answer === 'object' && !Array.isArray(answer) ? answer : {}
 
 /**
- * Same set of choice keys, order aside
+ * Same set of choice keys
  * @param {unknown} picked - Picked keys
  * @param {string[]} expected - Right keys
  * @return {boolean} - Exactly right
@@ -81,9 +81,9 @@ const sameChoices = (picked: unknown, expected: string[]): boolean => {
 }
 
 /**
- * Wrap marks into a result, a share of right marks deciding the pass
+ * Wrap marks into a result
  * @param {Record<string, boolean>} marks - Right or wrong per part
- * @param {number} passPercent - Share needed, 100 for all
+ * @param {number} passPercent - Share needed
  * @return {ExerciseResult} - Result
  */
 
@@ -95,7 +95,7 @@ const toResult = (marks: Record<string, boolean>, passPercent: number): Exercise
 }
 
 /**
- * Score one exercise, the same function on screen and on the server
+ * Score one exercise
  * @param {ExerciseBlock} block - Exercise
  * @param {ExerciseAnswer} answer - Learner answer
  * @param {number} passPercent - Share a quiz needs

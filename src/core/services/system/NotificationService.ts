@@ -39,7 +39,7 @@ export interface NotificationInput {
  */
 
 export const notify = async (input: NotificationInput): Promise<void> => {
-  // One row per person, each named once, and never the author of the act
+  // One row per person
   let recipients = [...new Set(input.recipients)].filter(
     (id): id is string => Boolean(id) && id !== input.actorId
   )
@@ -47,8 +47,7 @@ export const notify = async (input: NotificationInput): Promise<void> => {
   if (recipients.length === 0) return
 
   /*
-   * An edit fires as often as it is saved. Under the once flag, whoever still has the same
-   * alert unopened is left out rather than piling up rows saying the same thing.
+   * An edit fires as often as it is saved. Under the once flag
    */
 
   if (input.once) {
@@ -92,7 +91,7 @@ export const notifyMentions = async (
   body: string | null | undefined,
   input: Omit<NotificationInput, 'kind' | 'recipients'>
 ): Promise<void> => {
-  // No at sign, no lookup — the common case never reaches the database
+  // No at sign
   if (!body?.includes('@')) return
 
   const { handles, discordIds } = readMentions(body, NOTIFICATION_SETTINGS.maxMentions)
@@ -117,7 +116,7 @@ export const notifyMentions = async (
   })
 }
 
-// Row shape every reader maps from, the actor carrying the portrait drawn on the row
+// Row shape every reader maps from
 type NotificationRow = Prisma.NotificationGetPayload<{
   include: { actor: { select: { displayName: true; avatarUrl: true } } }
 }>
@@ -129,7 +128,7 @@ type NotificationRow = Prisma.NotificationGetPayload<{
  */
 
 const toEntry = (row: NotificationRow): NotificationEntry => {
-  // An unknown target kind simply loses its link, the sentence still reads
+  // An unknown target kind simply loses its link
   const target = row.targetType ?? ''
 
   return {

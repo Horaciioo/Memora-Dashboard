@@ -1,5 +1,5 @@
 /**
- * Creator the corp works for, looked up by name so a real row is reused rather than duplicated
+ * Creator the corp works for
  * @typedef {Object} CreatorSeed
  */
 
@@ -21,8 +21,8 @@ export const CREATORS: CreatorSeed[] = [
   {
     name: 'Inoxtag',
     handle: 'youtube.com/@inoxtag',
-    accent: '#4f46e5',
-    palette: ['#6366f1', '#1e1b4b'],
+    accent: '#2f6fb5',
+    palette: ['#4b8bd0', '#1b2f4d'],
   },
   {
     name: 'Doigby',
@@ -85,10 +85,10 @@ export const RESPONSABLES: ResponsableSeed[] = [
   { name: 'Orphée', creator: 'Anthony Collette', functions: ['functionDiscord'], seniority: 260 },
 ]
 
-// Second administrator, so the crown shows up beside the root one
+// Second administrator
 export const CO_ADMIN = { name: 'Nébula', seniority: 800 }
 
-// Pseudos of the moderators, one account each
+// Pseudos of the moderators
 export const MODERATOR_NAMES = [
   'Azuryx',
   'Brisk',
@@ -170,7 +170,7 @@ export const MODERATOR_NAMES = [
   'Cumin',
 ]
 
-// Pseudos of the candidates of recruitment campaigns, never given an account
+// Pseudos of the candidates of recruitment campaigns
 export const CANDIDATE_NAMES = [
   'Arkos',
   'Belka',

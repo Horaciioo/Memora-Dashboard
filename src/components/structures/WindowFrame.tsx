@@ -31,7 +31,7 @@ export const WindowFrame = ({ bare }: WindowFrameProps) => {
     const thumb = thumbRef.current
     if (!track || !thumb) return
 
-    // Written on the node, never through state
+    // Written on the node
     const place = () => {
       const root = document.documentElement
       const reach = root.scrollHeight - window.innerHeight

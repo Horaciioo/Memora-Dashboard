@@ -5,7 +5,7 @@
 
 export const TEAM_COPY = {
   title: 'Équipes',
-  lead: 'Glisse un modérateur d’une équipe à l’autre pour l’affecter.',
+  lead: 'Drag and Drop un modérateur d’une équipe à l’autre pour changer son affectation.',
   add: 'Créer une équipe',
   archive: 'Archiver',
   unarchive: 'Désarchiver',
@@ -39,8 +39,8 @@ export const TEAM_FIELD_COPY = {
  */
 
 export const TEAM_FIELD_INFO = {
-  name: 'Le nom de l’équipe, tel qu’il apparaît dans les listes.',
-  lead: 'Le responsable qui encadre l’équipe et valide ses absences.',
+  name: 'Le nom de l’équipe.',
+  lead: 'Le responsable d\'équipe.',
   youtuber: 'Le créateur sur lequel l’équipe intervient.',
-  summary: 'Le rôle de l’équipe, en une phrase.',
+  summary: 'Le rôle de l’équipe.',
 } as const

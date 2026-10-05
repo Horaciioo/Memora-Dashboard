@@ -10,7 +10,7 @@ import { cn } from '@/utils/classnames'
 export interface CourseTimelineProps {
   chapters: { key: string; title: string }[]
   current: number
-  // Share of the current chapter already read, 0 to 1
+  // Share of the current chapter already read
   fill: number
   // Every chapter cleared
   finished: boolean
@@ -19,7 +19,7 @@ export interface CourseTimelineProps {
 /**
  * Horizontal timeline: a circle per chapter, cleared ones green and the open one blue. The dashes
  * after the open chapter fill as it is read, and stop at the next circle until the reader moves on
- * @param {CourseTimelineProps} props - Chapters, open one and reading progress
+ * @param {CourseTimelineProps} props - Chapters
  * @return {JSX.Element}
  */
 

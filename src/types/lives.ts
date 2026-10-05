@@ -35,11 +35,11 @@ export interface LiveView {
   endedAt: string | null
   announcedBy: LivePerson | null
   coordinator: LivePerson | null
-  // Instructions of the responsables, markdown
+  // Instructions of the responsables
   instructions: string
   members: LivePerson[]
   liveconLevel: { level: number; name: string; icon: IconName | null; accent: string | null } | null
-  // Permissions the viewer holds on this live, coordinator rights folded in
+  // Permissions the viewer holds on this live
   permissions: PermissionName[]
 }
 
@@ -79,7 +79,7 @@ export interface LiveLogLine {
 }
 
 /**
- * One live a member moderated, as their file shows it
+ * One live a member moderated
  * @typedef {Object} MemberLiveSummary
  */
 
@@ -98,7 +98,7 @@ export interface MemberLiveSummary {
  * Moderation side of a member's file
  * @typedef {Object} MemberModerationView
  * @property {number} windowSeconds - Time spent in the Mod View over the window
- * @property {MemberLiveSummary[]} lives - Latest lives, newest first
+ * @property {MemberLiveSummary[]} lives - Latest lives
  */
 
 export interface MemberModerationView {
@@ -161,7 +161,7 @@ export interface LiveFocusView {
 }
 
 /**
- * One past sanction of a viewer, on the creator's channel
+ * One past sanction of a viewer
  * @typedef {Object} ViewerSanction
  * @property {string} id - Log line
  * @property {ModerationKind} kind - Gesture
@@ -185,7 +185,7 @@ export interface ViewerSanction {
 }
 
 /**
- * Activity of one moderator on a live, as Inspect Mod reads it
+ * Activity of one moderator on a live
  * @typedef {Object} ModeratorInspect
  * @property {string} accountId - Moderator
  * @property {string} name - Display name

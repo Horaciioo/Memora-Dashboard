@@ -17,7 +17,7 @@ import type { Prisma } from '@prisma/client'
  * @property {string} [targetType] - Target resource kind
  * @property {string} [targetId] - Target resource identifier
  * @property {string} summary - One line description
- * @property {ChangeSummary | null} [change] - What an edit moved, one line
+ * @property {ChangeSummary | null} [change] - What an edit moved
  * @property {Prisma.InputJsonValue} [payload] - Extra detail
  */
 
@@ -61,7 +61,7 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
 /**
  * Journal entry ready for display
  * @typedef {Object} ActivityEntry
- * @property {EventTypeName | null} event - Event kind, unresolved on a retired id
+ * @property {EventTypeName | null} event - Event kind
  * @property {string} id - Entry identifier
  * @property {string} origin - Origin label
  * @property {string} summary - One line description
@@ -70,7 +70,7 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
  * @property {string} createdAt - ISO timestamp
  * @property {string | null} targetType - Target resource kind
  * @property {string | null} targetId - Target resource identifier
- * @property {ChangeSummary | null} change - What the edit moved, one line
+ * @property {ChangeSummary | null} change - What the edit moved
  */
 
 export interface ActivityEntry {
@@ -103,7 +103,7 @@ const readChange = (payload: Prisma.JsonValue): ChangeSummary | null => {
   return typeof verb === 'string' && typeof rest === 'string' ? { verb, rest } : null
 }
 
-// Row shape every reader maps from, the actor carrying the portrait drawn on the rail
+// Row shape every reader maps from
 type ActivityRow = Prisma.ActivityLogGetPayload<{
   include: { actor: { select: { displayName: true; avatarUrl: true } } }
 }>

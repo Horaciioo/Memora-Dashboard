@@ -34,8 +34,8 @@ export interface CandidateDialogProps {
 }
 
 /**
- * One candidate opened in full — their interview, their bilan and the remarks left on them
- * @param {CandidateView | null} candidate - Applicant opened, null while the overlay is closed
+ * One candidate opened in full — their interview
+ * @param {CandidateView | null} candidate - Applicant opened
  * @param {FieldDefinition[]} commentFields - Declarations of the comment form
  * @param {FieldDefinition[]} reviewFields - Declarations of the bilan form
  * @param {FieldIssue[]} issues - Rejections of the last mutation
@@ -67,7 +67,7 @@ export const CandidateDialog = ({
   const [nested, setNested] = useState<'comment' | 'review' | null>(null)
   const [pendingComment, setPendingComment] = useState<string | null>(null)
 
-  // The overlay only mounts once a card is opened, every read below is then safe
+  // The overlay only mounts once a card is opened
   if (!candidate) return null
 
   const entries = [

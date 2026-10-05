@@ -20,7 +20,7 @@ export interface EmojiDialogProps {
   onClose: () => void
 }
 
-// One glyph of the grid, drawn bare on the panel
+// One glyph of the grid
 const EmojiCell = ({
   entry,
   selected,
@@ -43,7 +43,7 @@ const EmojiCell = ({
 )
 
 /**
- * Catalogue of every glyph the picker offers, searched by its French or English name
+ * Catalogue of every glyph the picker offers
  * @param {boolean} open - Overlay is mounted
  * @param {string} value - Glyph already chosen
  * @param {(glyph: string | null) => void} onSelect - Pick handler
@@ -60,7 +60,7 @@ export const EmojiDialog = ({ open, value, onSelect, onClose }: EmojiDialogProps
 
   const search = session.search
 
-  // The catalogue weighs more than the form, so it lands only once the panel opens
+  // The catalogue weighs more than the form
   useEffect(() => {
     if (!open || catalogue) return
 

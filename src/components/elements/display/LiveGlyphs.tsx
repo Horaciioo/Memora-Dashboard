@@ -311,7 +311,7 @@ export const FollowerModeGlyph = ({ className }: GlyphProps) => (
 export const SubscriberModeGlyph = ({ className }: GlyphProps) => (
   <Frame
     className={className}
-    tone="TWITCH"
+    tone="brand"
     render={({ fill, lift }) => (
       <>
         <path

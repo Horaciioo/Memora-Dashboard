@@ -35,7 +35,7 @@ export const POST = createProtectedRoute({
 
     const category = readCategory(String(raw.category ?? ''))
 
-    // A section sitting at admin level anchors a whole perimeter, only an admin opens one there
+    // A section sitting at admin level anchors a whole perimeter
     if (ACCESS_CATEGORY_REGISTRY.get(category).tier === MemberRoles.Admin && !access.isAdmin) {
       throw forbidden()
     }

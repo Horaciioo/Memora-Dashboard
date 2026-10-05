@@ -82,7 +82,7 @@ export const LIVE_REPORT_COPY = {
 } as const
 
 /**
- * Colour of each Livecon level on the report frise, calm to tense
+ * Colour of each Livecon level on the report frise
  * @type {Record<number, string>}
  */
 

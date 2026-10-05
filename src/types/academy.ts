@@ -61,7 +61,7 @@ export interface SessionFunction {
  * @property {boolean} mandatory - Required to progress
  * @property {string | null} completedAt - ISO completion date
  * @property {string | null} validatorName - Who validated it
- * @property {{ passed: number, total: number } | null} exercises - Exercises cleared, only on an interactive course
+ * @property {{ passed: number, total: number } | null} exercises - Exercises cleared
  */
 
 export interface JuniorTraining {
@@ -85,7 +85,7 @@ export interface JuniorTraining {
  * @property {string | null} summary - Description
  * @property {WorkPerson[]} trainers - Moderators holding the trainer seat
  * @property {number} juniorCount - Juniors inside
- * @property {string | null} inviteToken - Token of the active admission link, if any
+ * @property {string | null} inviteToken - Token of the active admission link
  * @property {FormValues} values - Values feeding the edit form
  */
 
@@ -110,7 +110,7 @@ export interface SessionSummary {
  * @property {string} accountId - Moderator identifier
  * @property {string} displayName - Display name
  * @property {string | null} avatarUrl - Portrait
- * @property {JuniorDispositif | null} dispositif - Entry programme, picked on the integration form
+ * @property {JuniorDispositif | null} dispositif - Entry programme
  * @property {string | null} confirmedAt - ISO date the junior confirmed their file
  * @property {AcademyJuniorStatusName} status - Outcome so far
  * @property {AcademyStageName} stage - Current phase of the PIM
@@ -223,27 +223,27 @@ export interface JuniorObjectiveView {
 }
 
 /**
- * Free moment on the session thread, or a PIMT step instantiated onto a timeline
+ * Free moment on the session thread
  * @typedef {Object} AcademyStepView
  * @property {string} id - Step identifier
- * @property {AcademyStepKindName | null} kind - Kind of moment, thread steps only
+ * @property {AcademyStepKindName | null} kind - Kind of moment
  * @property {string} title - Intitulé
- * @property {string | null} scheduledAt - ISO planned date, live-anchored steps have none yet
- * @property {string | null} doneAt - ISO date it was actually held, thread steps only
+ * @property {string | null} scheduledAt - ISO planned date
+ * @property {string | null} doneAt - ISO date it was actually held
  * @property {string | null} notes - Written trace
  * @property {string | null} juniorId - Junior it concerns
  * @property {string | null} accountId - Account of the junior it concerns
  * @property {string | null} juniorName - Junior display name
  * @property {string | null} authorName - Who recorded it
  * @property {string | null} templateId - PIMT template it was instantiated from
- * @property {AcademyStageName | null} stage - Phase this step belongs to, timeline steps only
- * @property {StepAnchorName | null} anchor - Day or live threshold, timeline steps only
- * @property {number | null} offset - Day offset or live threshold, timeline steps only
- * @property {StepOwnerName | null} owner - Who carries it, timeline steps only
+ * @property {AcademyStageName | null} stage - Phase this step belongs to
+ * @property {StepAnchorName | null} anchor - Day or live threshold
+ * @property {number | null} offset - Day offset or live threshold
+ * @property {StepOwnerName | null} owner - Who carries it
  * @property {boolean} required - Blocks the following steps of its stage while late
- * @property {string | null} validatedAt - ISO date it was cleared, timeline steps only
+ * @property {string | null} validatedAt - ISO date it was cleared
  * @property {string | null} validatedByName - Who cleared it
- * @property {TimelineStepState | null} state - Resolved position, timeline steps only
+ * @property {TimelineStepState | null} state - Resolved position
  * @property {FormValues} values - Values feeding the edit form
  */
 
@@ -271,8 +271,7 @@ export interface AcademyStepView {
 }
 
 /**
- * Written trace of one voice check-in, and the support of the decision that
- * authorises the following stage
+ * Written trace of one voice check-in
  * @typedef {Object} AcademyReviewView
  * @property {string} id - Review identifier
  * @property {AcademyStageName} stage - Phase this check-in belongs to
@@ -280,7 +279,7 @@ export interface AcademyStepView {
  * @property {number | null} durationMinutes - How long the call lasted
  * @property {string | null} authorName - Who held it
  * @property {string | null} feeling - Overall feeling
- * @property {string} summary - What moves, what blocks, what is decided
+ * @property {string} summary - What moves
  * @property {ReviewAdviceName} advice - Outcome proposed by the Formateur
  * @property {ReviewStatusName} status - Lifecycle of the check-in
  * @property {string | null} decidedByName - Who decided
@@ -357,7 +356,7 @@ export interface MyTrainingView {
 export type MyTrainingAction = 'start' | 'resume' | 'restart' | 'abandon' | 'complete'
 
 /**
- * One offered answer to a quiz question, editor view
+ * One offered answer to a quiz question
  * @typedef {Object} QuizChoiceView
  * @property {string} id - Choice identifier
  * @property {string} label - Display label
@@ -375,7 +374,7 @@ export interface QuizChoiceView {
 }
 
 /**
- * One question of a quiz block, editor view
+ * One question of a quiz block
  * @typedef {Object} QuizQuestionView
  * @property {string} id - Question identifier
  * @property {string} prompt - Question text
@@ -395,13 +394,13 @@ export interface QuizQuestionView {
 }
 
 /**
- * One piece of a chapter, editor view
+ * One piece of a chapter
  * @typedef {Object} TrainingBlockView
  * @property {string} id - Block identifier
  * @property {TrainingBlockKindName} kind - Written passage or quiz
- * @property {string | null} body - Markdown body, text blocks only
+ * @property {string | null} body - Markdown body
  * @property {number} position - Display order
- * @property {QuizQuestionView[]} questions - Quiz questions, quiz blocks only
+ * @property {QuizQuestionView[]} questions - Quiz questions
  * @property {FormValues} values - Values feeding the edit form
  */
 
@@ -415,7 +414,7 @@ export interface TrainingBlockView {
 }
 
 /**
- * One section of a training's content, editor view
+ * One section of a training's content
  * @typedef {Object} TrainingChapterView
  * @property {string} id - Chapter identifier
  * @property {string} title - Display title
@@ -433,12 +432,12 @@ export interface TrainingChapterView {
 }
 
 /**
- * One block on a junior's read of a training's content, quiz internals left out
+ * One block on a junior's read of a training's content
  * @typedef {Object} ContentBlockView
  * @property {string} id - Block identifier
  * @property {TrainingBlockKindName} kind - Written passage or quiz
- * @property {string | null} body - Markdown body, text blocks only
- * @property {number} questionCount - Questions in the quiz, quiz blocks only
+ * @property {string | null} body - Markdown body
+ * @property {number} questionCount - Questions in the quiz
  * @property {boolean} answered - Every question already has an answer on file
  */
 
@@ -485,7 +484,7 @@ export type PimStepPosition = 'done' | 'current' | 'upcoming'
  * @property {string} id - Step identifier
  * @property {string} title - What the step is
  * @property {string | null} description - What must happen
- * @property {string | null} guide - Detailed walkthrough, markdown
+ * @property {string | null} guide - Detailed walkthrough
  * @property {IconName | null} icon - Glyph
  * @property {PimDestinationName | null} destination - Where its owner acts
  * @property {AcademyStageName} stage - Phase it belongs to
@@ -519,9 +518,9 @@ export interface PimTimelineStep {
  * @property {string} juniorId - Junior identifier
  * @property {string} sessionId - Promotion identifier
  * @property {AcademyStageName} stage - Stage the junior stands in
- * @property {string | null} currentId - Step in course, none once finished
+ * @property {string | null} currentId - Step in course
  * @property {PimTimelineLock | null} lock - Why it cannot move
- * @property {PimTimelineStep[]} steps - Steps, first to last
+ * @property {PimTimelineStep[]} steps - Steps
  */
 
 export interface PimTimeline {
@@ -560,7 +559,7 @@ export interface CourseProgress {
 }
 
 /**
- * One course of the catalogue, as the member sees it
+ * One course of the catalogue
  * @typedef {Object} CourseCard
  * @property {string} id - Training identifier
  * @property {string} key - Course key
@@ -653,7 +652,7 @@ export interface TrainingFeedbackSummary {
 }
 
 /**
- * Where one junior stands on the AcademicParkour, with the gestures open
+ * Where one junior stands on the AcademicParkour
  * @typedef {Object} ParkourView
  * @property {string} juniorId - Junior identifier
  * @property {string} sessionId - Promotion
@@ -661,7 +660,7 @@ export interface TrainingFeedbackSummary {
  * @property {number} liveCount - Lives where they were present
  * @property {number | null} livesNeeded - Lives before the next check-in
  * @property {string | null} deadlineAt - Third period deadline
- * @property {string | null} integrationPath - Integration link, while awaited
+ * @property {string | null} integrationPath - Integration link
  * @property {boolean} canLaunchAnyway - Promotion launchable by hand
  * @property {boolean} canOpenSecondPeriod - Second period openable by hand
  */
@@ -679,7 +678,7 @@ export interface ParkourView {
 }
 
 /**
- * One live a junior accompanied, present on its roll-call
+ * One live a junior accompanied
  * @typedef {Object} AccompaniedLiveView
  * @property {string} liveId - Live identifier
  * @property {string} title - Live title

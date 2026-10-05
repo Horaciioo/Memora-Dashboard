@@ -5,7 +5,7 @@ import { prisma, FIXTURE_PREFIX } from './lib/client.ts'
 const OWN = { id: { startsWith: FIXTURE_PREFIX } }
 
 /**
- * Delete every fixture row, children first, never touching a row the app wrote
+ * Delete every fixture row
  * @return {Promise<number>} - Rows deleted
  */
 
@@ -82,7 +82,7 @@ export const teardown = async (): Promise<number> => {
   return total
 }
 
-// Run on its own, the fixtures are simply removed
+// Run on its own
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   teardown()
     .then((count) => console.log(`Données factices supprimées : ${count} lignes.`))

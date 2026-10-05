@@ -74,7 +74,7 @@ export const claimIdentity = async (token: string, identity: DiscordIdentity): P
   const invite = await resolveInvite(token)
   const mode = INTEGRATION_LINK_KIND_REGISTRY.get(invite.kind)
 
-  // An admitted candidate is expected, their file already waiting for them
+  // An admitted candidate is expected
   const admission = invite.session ? await findAdmission(invite.session.id, identity.id) : null
 
   // An admitted seat whose PIM start is not declared yet waits
@@ -118,7 +118,7 @@ export const claimIdentity = async (token: string, identity: DiscordIdentity): P
 }
 
 /**
- * Read what an admitted file already knows, the form opening on it
+ * Read what an admitted file already knows
  * @param {string} accountId - Pre-generated account
  * @return {Promise<FormValues>} - Starting values
  */
@@ -151,7 +151,7 @@ const admissionPrefill = async (accountId: string): Promise<FormValues> => {
 }
 
 /**
- * Read back an identity already claimed on a link, refusing a spent one
+ * Read back an identity already claimed on a link
  * @param {LiveInvite} invite - Live link
  * @param {string | undefined} claimId - Claim identifier held by the ticket
  * @return {Promise<IntegrationClaimView | null>} - Claimed identity
@@ -188,7 +188,7 @@ export const readClaim = async (
 }
 
 /**
- * Constraint field per stored kind, the three questions of the sensitive step
+ * Constraint field per stored kind
  * @type {Record<ConstraintKindName, { name: string, label: string, hint?: string }>}
  */
 
@@ -210,7 +210,7 @@ const CONSTRAINT_FIELDS: Record<
 }
 
 /**
- * Build the social fields from the declared networks, each carrying its own prefix
+ * Build the social fields from the declared networks
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
@@ -296,7 +296,7 @@ export const integrationFields = async (
     ...(await socialFields()),
   ]
 
-  // The three sensitive questions, each one free text and each one optional
+  // The three sensitive questions
   for (const kind of Object.keys(CONSTRAINT_FIELDS) as ConstraintKindName[]) {
     const declared = CONSTRAINT_FIELDS[kind]
 
@@ -343,7 +343,7 @@ export const integrationFields = async (
     }
   )
 
-  // A dispositif is never imposed by the link, the junior always picks their own
+  // A dispositif is never imposed by the link
   if (mode.enrolsAcademy || admitted) {
     const dispositifs = await prisma.dispositif.findMany({ orderBy: { position: 'asc' } })
 
@@ -370,7 +370,7 @@ export const integrationFields = async (
 }
 
 /**
- * Take one seat of a link, refusing once it is full or expired
+ * Take one seat of a link
  * @param {LiveInvite} invite - Live link
  * @return {Promise<void>} - Throws when the seat is gone
  */
@@ -456,7 +456,7 @@ const readPreference = (
 /**
  * What a submitted form hands back to the page
  * @typedef {Object} IntegrationOutcome
- * @property {string | null} accountId - Account opened, when the mode opens one
+ * @property {string | null} accountId - Account opened
  * @property {string} displayName - Name the person gave themselves
  * @property {boolean} awaitsApproval - Account held until a responsable validates it
  */
@@ -468,8 +468,7 @@ export interface IntegrationOutcome {
 }
 
 /**
- * Confirm an admitted file: the answers land on the pre-generated account, the junior seat is
- * confirmed and its dispositif steps are laid
+ * Confirm an admitted file: the answers land on the pre-generated account
  * @param {IntegrationClaimView} claim - Identity resolved by Discord
  * @param {IntegrationAdmission} admission - Seat waiting for this identity
  * @param {{ id: string, functionId: string, startsAt: Date }} session - Promotion
@@ -513,11 +512,11 @@ const confirmAdmission = async (
       colorVision: readFlag(values, 'hasColorVision')
         ? readPreference(values, 'colorVision', COLOR_VISION_REGISTRY)
         : null,
-      // A pre-generated file opens, a member changing trade keeps their standing
+      // A pre-generated file opens
       status: known.status === MemberStatuses.Pending ? MemberStatuses.Academy : undefined,
       historyConsentAt: new Date(),
       historyConsentVersion: HISTORY_CONSENT.version,
-      // Existing traces are never duplicated, only a blank file takes the answers
+      // Existing traces are never duplicated
       ...(known._count.socialLinks === 0 && socialLinks.length > 0
         ? { socialLinks: { create: socialLinks } }
         : {}),
@@ -546,14 +545,14 @@ const confirmAdmission = async (
     session.startsAt
   )
 
-  // The last form back launches the promotion, a late one joins it
+  // The last form back launches the promotion
   await afterIntegration(admission.juniorId)
 
   return { accountId: admission.accountId, displayName, awaitsApproval: false }
 }
 
 /**
- * Answer a link, opening the account its mode calls for
+ * Answer a link
  * @param {string} token - Link token
  * @param {string | undefined} claimId - Claim identifier held by the ticket
  * @param {FormValues} values - Parsed body
@@ -581,7 +580,7 @@ export const submitIntegration = async (
     throw invalidInput([{ field: 'dispositifId', message: FORM_COPY.required }])
   }
 
-  // The seat is taken before anything is written, so a lost race creates nothing
+  // The seat is taken before anything is written
   await claimSeat(invite)
 
   // An admitted candidate confirms the file the recruitment pre-generated
@@ -622,7 +621,7 @@ export const submitIntegration = async (
       colorVision: readFlag(values, 'hasColorVision')
         ? readPreference(values, 'colorVision', COLOR_VISION_REGISTRY)
         : null,
-      // The arrival date is the day the form was sent, not the day it came back
+      // The arrival date is the day the form was sent
       joinedAt: invite.createdAt,
       role: MemberRoles.Moderateur,
       status: mode.awaitsApproval ? MemberStatuses.Pending : MemberStatuses.Academy,

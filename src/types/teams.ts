@@ -10,7 +10,7 @@ import type { WorkPerson, WorkTag } from '@/types/work'
  * @property {WorkPerson | null} lead - Responsable
  * @property {WorkTag | null} youtuber - YouTuber the team covers
  * @property {WorkPerson[]} members - Members
- * @property {boolean} archived - Kept for history, out of the way
+ * @property {boolean} archived - Kept for history
  * @property {FormValues} values - Values feeding the edit form
  */
 

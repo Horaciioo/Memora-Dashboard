@@ -5,7 +5,7 @@ import { PAGE_STYLES } from '@/declarations/ui/variants'
 
 export interface PageBannerProps {
   title: string
-  // The page already carries its own h1, the notch then only names the area
+  // The page already carries its own h1
   isLabel?: boolean
   children?: ReactNode
 }
@@ -14,8 +14,8 @@ export interface PageBannerProps {
  * Banner across the top of a page: the photograph of its area and a notch cut into the bottom
  * edge that holds the title
  * @param {string} title - Title sitting in the notch
- * @param {boolean} [isLabel] - The notch names the area, an h1 sits further down the page
- * @param {ReactNode} [children] - Extra content of the notch, after the title
+ * @param {boolean} [isLabel] - The notch names the area
+ * @param {ReactNode} [children] - Extra content of the notch
  * @return {JSX.Element}
  */
 

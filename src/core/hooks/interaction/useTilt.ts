@@ -7,8 +7,7 @@ import { GESTURE_SETTINGS } from '@/declarations/configurations/settings'
 import { prefersReducedMotion } from '@/utils/motion'
 
 /**
- * Lean an element a few degrees toward the mouse, written on the node so no render runs. Touch
- * and calm mode leave it flat
+ * Lean an element a few degrees toward the mouse
  * @return {RefCallback<HTMLElement>} - Ref of the element that leans
  */
 

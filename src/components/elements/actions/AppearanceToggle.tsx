@@ -8,7 +8,7 @@ import { FONT_SCALE_REGISTRY, type FontScale } from '@/declarations/access/prefe
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { useAppearanceStore } from '@/core/store/appearance'
 
-// Compact captions, the rail has no room for the full labels
+// Compact captions
 const OPTIONS: SegmentedOption<FontScale>[] = FONT_SCALE_REGISTRY.keys.map((key) => ({
   value: key,
   label: FONT_SCALE_REGISTRY.get(key).short,

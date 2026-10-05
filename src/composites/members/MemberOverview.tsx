@@ -27,9 +27,9 @@ export interface MemberOverviewProps {
 /**
  * Where a moderator stands right now: available or away, what was pinned about them, what
  * they did last. Everything links to the tab holding the whole story
- * @param {MemberAbsence[]} absences - Time off, any status
+ * @param {MemberAbsence[]} absences - Time off
  * @param {MemberNote[]} notes - Private remarks
- * @param {ActivityEntry[]} activity - Journal entries, newest first
+ * @param {ActivityEntry[]} activity - Journal entries
  * @param {boolean} canReadNotes - Viewer may read notes
  * @param {boolean} canReadLogs - Viewer may read the journal
  * @param {(tab: string) => void} onNavigate - Opens another tab
@@ -50,7 +50,7 @@ export const MemberOverview = ({
     .filter((absence) => absence.status === AbsenceStatuses.Approved)
     .sort((left, right) => left.startDate.localeCompare(right.startDate))
 
-  // Away today, else the next one on the calendar
+  // Away today
   const current = approved.find(
     (absence) => absence.startDate.slice(0, 10) <= today && absence.endDate.slice(0, 10) >= today
   )

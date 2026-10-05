@@ -14,8 +14,7 @@ export interface OnboardingShellProps {
 }
 
 /**
- * Public integration chrome — the creator's banner standing the full height on the left,
- * carrying the heading, the form itself sitting bare on the page beside it
+ * Public integration chrome — the creator's banner standing the full height on the left
  * @param {string} title - Page title
  * @param {IntegrationCreator | null} creator - Creator the banner comes from
  * @param {ReactNode} children - Form content

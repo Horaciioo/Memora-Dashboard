@@ -33,7 +33,7 @@ export interface LivesBoardProps {
 }
 
 /**
- * Open lives, each on its strip
+ * Open lives
  * @param {LiveView[]} initialLives - Lives resolved server-side
  * @param {FieldDefinition[]} fields - Announce form declarations
  * @param {boolean} canAnnounce - Viewer may announce
@@ -123,9 +123,9 @@ interface LiveStripProps {
 }
 
 /**
- * One live, its facts and its moves
+ * One live
  * @param {LiveView} live - Live
- * @param {boolean} canMove - Viewer may start, end or cancel it
+ * @param {boolean} canMove - Viewer may start
  * @param {boolean} isSaving - Mutation in flight
  * @param {(status: LiveStatusName) => Promise<boolean>} onMove - Status change
  * @return {JSX.Element}
@@ -142,7 +142,7 @@ const LiveStrip = ({ live, canMove, isSaving, onMove }: LiveStripProps) => {
   const CoordinatorIcon = ICONS[LIVE_COORDINATOR.icon]
   const isLive = live.status === LiveStatuses.Live
 
-  // Ending or cancelling asks twice, starting does not
+  // Ending or cancelling asks twice
   const request = async (status: LiveStatusName) => {
     if (status !== LiveStatuses.Live && confirming !== status) {
       setConfirming(status)

@@ -52,7 +52,7 @@ export const EditableLine = ({
   // Last emitted value
   const emitted = useRef<string | null>(null)
 
-  // Outside changes only, caret kept
+  // Outside changes only
   useLayoutEffect(() => {
     const line = node.current
     if (!line || emitted.current === value) return

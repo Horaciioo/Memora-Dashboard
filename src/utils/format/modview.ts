@@ -35,7 +35,7 @@ export const formatClock = (iso: string): string =>
   new Date(iso).toLocaleTimeString(DATE_LOCALE, { hour: '2-digit', minute: '2-digit' })
 
 /**
- * Say a spent time, hours and minutes
+ * Say a spent time
  * @param {number} seconds - Time spent
  * @return {string} - Spoken time
  */

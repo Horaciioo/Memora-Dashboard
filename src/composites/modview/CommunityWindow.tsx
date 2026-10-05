@@ -14,12 +14,12 @@ export interface CommunityWindowProps {
   community: ModViewState['community']
   spotlight: ModViewTarget | null
   onPick: (chatter: Chatter) => void
-  // Drawn inside another window, no frame of its own
+  // Drawn inside another window
   bare?: boolean
 }
 
 /**
- * Who is in the chat, grouped by badge
+ * Who is in the chat
  * @param {ModViewState['community']} community - Groups
  * @param {ModViewTarget | null} spotlight - Part lit by a scene
  * @param {(chatter: Chatter) => void} onPick - Open a viewer card

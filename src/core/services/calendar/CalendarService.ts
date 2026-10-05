@@ -45,8 +45,8 @@ import { CalendarKinds, CalendarSources, EventVisibilities } from '@/utils/const
 import type { CalendarKindName, EventVisibilityName } from '@/utils/constants/workflow'
 
 /**
- * Read the members an entry may be attached to, each carrying the colour of its post
- * @param {AccessScope} [scope] - Viewer perimeter, unbounded when absent
+ * Read the members an entry may be attached to
+ * @param {AccessScope} [scope] - Viewer perimeter
  * @return {Promise<FieldOption[]>} - Select options
  */
 
@@ -319,8 +319,8 @@ const ENTRY_SHAPE = {
 } as const
 
 /**
- * Shape one stored entry, the creator it belongs to deciding the colour
- * @param {object} row - Entry row with its template, owner, creator, member and roster
+ * Shape one stored entry
+ * @param {object} row - Entry row with its template
  * @param {AttendanceRoster | null} [roster] - Roll-call standings for the viewer
  * @return {CalendarEntry} - Calendar entry
  */
@@ -365,7 +365,7 @@ const toEntry = (
     accent: row.youtuber?.accent ?? null,
     youtuberId: row.youtuberId,
     muted: false,
-    // The entry may tighten what its template allows, never loosen it silently
+    // The entry may tighten what its template allows
     visibility: row.visibility ?? row.template?.visibility ?? EventVisibilities.Everyone,
     startsAt: row.startsAt.toISOString(),
     endsAt: row.endsAt?.toISOString() ?? null,
@@ -436,7 +436,7 @@ const rollCallRosters = async (
 }
 
 /**
- * Read the entries of one window, filtered down to what the member may see
+ * Read the entries of one window
  * @param {Object} input - Read context
  * @param {Date} input.from - First moment shown
  * @param {Date} input.to - Last moment shown
@@ -462,7 +462,7 @@ export const listEntries = async ({
   scope: AccessScope
   sessionId?: string
 }): Promise<CalendarEntry[]> => {
-  // Reminders fire lazily, whoever opens the calendar first pays the sweep
+  // Reminders fire lazily
   await sweepDueReminders()
 
   const levels = allowedVisibilities(access)
@@ -517,8 +517,7 @@ export const listEntries = async ({
 }
 
 /**
- * Perimeter the calendar reads through, the sidebar choosing among every reachable creator
- * instead of the one the rail is narrowed to
+ * Perimeter the calendar reads through
  * @param {SessionUser} viewer - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
  * @return {Promise<AccessScope>} - Perimeter without the active creator
@@ -561,14 +560,14 @@ const toEntryData = (values: FormValues) => ({
   rollCallTeamIds: readList(values, 'teamIds'),
 })
 
-// Milliseconds in a day, for the default reminder offset
+// Milliseconds in a day
 const DAY = 86_400_000
 
 /**
- * Settle when the reminder fires, the config default kicking in when the form left it blank
+ * Settle when the reminder fires
  * @param {Date} startsAt - Event start
  * @param {Date | null} remindAt - Moment picked on the form
- * @return {Date | null} - Reminder moment, null when it would already be past
+ * @return {Date | null} - Reminder moment
  */
 
 const resolveRemindAt = (startsAt: Date, remindAt: Date | null): Date | null => {
@@ -580,7 +579,7 @@ const resolveRemindAt = (startsAt: Date, remindAt: Date | null): Date | null => 
   return at.getTime() <= Date.now() ? null : at
 }
 
-// Minutes are stored on the template, milliseconds are what a date needs
+// Minutes are stored on the template
 const MINUTE = 60_000
 
 /**
@@ -599,7 +598,7 @@ const applyTemplate = async (data: ReturnType<typeof toEntryData>) => {
 
   return {
     ...data,
-    // The template is a pre-designed thing, its shape comes with it
+    // The template is a pre-designed thing
     kind: template.kind,
     description: data.description ?? template.body,
     visibility: data.visibility ?? template.visibility,
@@ -685,7 +684,7 @@ export const updateEntry = async (
 
   if (!data.rollCall) return toEntry(row)
 
-  // Widen the roster, then ping only the members newly convened
+  // Widen the roster
   const known = new Set(row.attendances.map((seat) => seat.accountId))
   const memberIds = await expandRoster(
     data.rollCallTeamIds,
@@ -705,7 +704,7 @@ export const updateEntry = async (
 }
 
 /**
- * Move an entry to another moment, keeping its length
+ * Move an entry to another moment
  * @param {string} id - Entry identifier
  * @param {Date} startsAt - New start
  * @return {Promise<CalendarEntry>} - Moved entry
@@ -715,7 +714,7 @@ export const moveEntry = async (id: string, startsAt: Date): Promise<CalendarEnt
   const current = await prisma.calendarEvent.findUnique({ where: { id } })
   if (!current) throw notFound()
 
-  // Dragging never stretches an entry, so the end follows the same shift
+  // Dragging never stretches an entry
   const shift = startsAt.getTime() - current.startsAt.getTime()
   const endsAt = current.endsAt ? new Date(current.endsAt.getTime() + shift) : null
 
@@ -729,7 +728,7 @@ export const moveEntry = async (id: string, startsAt: Date): Promise<CalendarEnt
 }
 
 /**
- * Stretch an entry to a new end, the start staying put
+ * Stretch an entry to a new end
  * @param {string} id - Entry identifier
  * @param {Date} endsAt - New end
  * @return {Promise<CalendarEntry>} - Resized entry
@@ -770,7 +769,7 @@ export const updateEntries = async (
   ids: string[],
   values: FormValues
 ): Promise<CalendarEntry[]> => {
-  // Only the keys actually sent are written, so a bulk edit never blanks the rest
+  // Only the keys actually sent are written
   const data = Object.fromEntries(
     Object.entries(toEntryData(values)).filter(([key]) => key in values)
   )
@@ -796,7 +795,7 @@ export const removeEntries = async (ids: string[]): Promise<void> => {
 }
 
 /**
- * Guard a write, an entry only reachable by its owner or by a calendar manager
+ * Guard a write
  * @param {string} id - Entry identifier
  * @param {string} viewerId - Signed-in member identifier
  * @param {boolean} canManage - Member holds the manage permission
@@ -816,7 +815,7 @@ export const assertEntryAccess = async (
 }
 
 /**
- * Guard a bulk write, every entry of the selection passing the single-entry guard
+ * Guard a bulk write
  * @param {string[]} ids - Selected entries
  * @param {string} viewerId - Signed-in member identifier
  * @param {boolean} canManage - Member holds the manage permission
@@ -837,12 +836,12 @@ export const assertEntriesAccess = async (
 }
 
 /**
- * Read one entry by identifier, for a deep link opening straight on its detail
+ * Read one entry by identifier
  * @param {string} id - Entry identifier
  * @param {string} viewerId - Signed-in member identifier
  * @param {PermissionHelpers} access - Permission helpers
  * @param {AccessScope} scope - Creator perimeter
- * @return {Promise<CalendarEntry | null>} - Entry, or null when out of reach
+ * @return {Promise<CalendarEntry | null>} - Entry
  */
 
 export const getEntry = async (

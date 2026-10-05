@@ -10,7 +10,7 @@ export interface ConfirmDialogProps {
   title: string
   description: string
   confirmLabel?: string
-  // Weight of the gesture, danger by default since this guards destruction
+  // Weight of the gesture
   tone?: Tone
   pending?: boolean
   onConfirm: () => void
@@ -23,7 +23,7 @@ export interface ConfirmDialogProps {
  * @param {string} title - What is about to happen
  * @param {string} description - Consequence of confirming
  * @param {string} [confirmLabel] - Accessible name of the confirming button
- * @param {Tone} [tone] - Weight of the gesture, danger tints the confirming button
+ * @param {Tone} [tone] - Weight of the gesture
  * @param {boolean} [pending] - Blocks both buttons while the action runs
  * @param {() => void} onConfirm - Confirm handler
  * @param {() => void} onCancel - Dismiss handler

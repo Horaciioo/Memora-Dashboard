@@ -3,7 +3,7 @@ import type { StepAnchorName } from '@/utils/constants/hierarchy'
 import { isOverdue } from '@/utils/format/dates'
 
 /**
- * Where a timeline step stands, derived and never stored
+ * Where a timeline step stands
  * @typedef {'idle' | 'current' | 'done' | 'late'} TimelineStepState
  */
 
@@ -13,7 +13,7 @@ export type TimelineStepState = 'idle' | 'current' | 'done' | 'late'
  * Enough of one AcademyStep to resolve its state
  * @typedef {Object} TimelineStepInput
  * @property {StepAnchorName | null} anchor - Day or live threshold
- * @property {string | Date | null} scheduledAt - Resolved date, day anchor only
+ * @property {string | Date | null} scheduledAt - Resolved date
  * @property {number | null} offset - Day offset or live threshold
  * @property {string | Date | null} validatedAt - When it was cleared
  */
@@ -26,7 +26,7 @@ export interface TimelineStepInput {
 }
 
 /**
- * Where a junior's progress puts them, live anchor only
+ * Where a junior's progress puts them
  * @typedef {Object} TimelineJuniorInput
  * @property {number} liveCount - Lives already covered
  */
@@ -36,7 +36,7 @@ export interface TimelineJuniorInput {
 }
 
 /**
- * Resolve where a timeline step stands, informative only — never an authorisation
+ * Resolve where a timeline step stands
  * @param {TimelineStepInput} step - Step being resolved
  * @param {TimelineJuniorInput} junior - Junior it belongs to
  * @param {Date} [now] - Moment to resolve against
@@ -50,7 +50,7 @@ export const resolveStepState = (
 ): TimelineStepState => {
   if (step.validatedAt !== null) return 'done'
 
-  // A live threshold has no calendar deadline, only reached or not
+  // A live threshold has no calendar deadline
   if (step.anchor === StepAnchors.Live) {
     return step.offset !== null && junior.liveCount >= step.offset ? 'current' : 'idle'
   }

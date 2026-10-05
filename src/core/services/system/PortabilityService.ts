@@ -26,7 +26,7 @@ export interface PersonalExport {
 }
 
 /**
- * Every relation of an account, so the export never misses a table by omission
+ * Every relation of an account
  * @type {Record<string, (accountId: string) => Promise<unknown[]>>}
  */
 
@@ -57,7 +57,7 @@ const PERSONAL_RECORD_READERS = {
   sessions: (id: string) =>
     prisma.session.findMany({
       where: { accountId: id },
-      // The token itself is a credential, it never leaves the server
+      // The token itself is a credential
       select: { id: true, userAgent: true, address: true, createdAt: true, expiresAt: true },
     }),
   permissionOverrides: (id: string) =>
@@ -65,8 +65,7 @@ const PERSONAL_RECORD_READERS = {
 }
 
 /**
- * Bring every stored ciphertext back to clear, so the dossier is readable by
- * the person it belongs to rather than by the database
+ * Bring every stored ciphertext back to clear
  * @param {unknown} value - Row or list of rows
  * @return {unknown} - Readable payload
  */
@@ -84,7 +83,7 @@ const readable = (value: unknown): unknown => {
 }
 
 /**
- * Read the retention sentence of every processing, straight from the register
+ * Read the retention sentence of every processing
  * @return {Record<string, string>} - Retention per purpose
  */
 

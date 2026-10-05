@@ -20,8 +20,7 @@ export interface RolePermissionsTabProps {
 }
 
 /**
- * Permissions tab — the page-by-page switch board of the selected role or function, set on
- * the layer the creator filter has open
+ * Permissions tab — the page-by-page switch board of the selected role or function
  * @param {AccessSelection} selection - Role or function on screen
  * @param {AccessCollection} access - Console state and mutations
  * @param {boolean} sealed - The second factor still has to be opened before writing

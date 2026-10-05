@@ -6,6 +6,7 @@ import type { MaturityName } from '@/declarations/maturity/registries'
 import { stepsProgress } from '@/declarations/maturity/steps'
 import type { FeatureSteps } from '@/declarations/maturity/steps'
 import { ROUTES } from '@/declarations/navigation'
+import { ICONS } from '@/declarations/ui/icons'
 import { MATURITY_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -19,9 +20,9 @@ export interface MaturityTagProps {
 }
 
 /**
- * Lifecycle tag: mono label, the Dev share beside it
+ * Lifecycle tag: mono label, a small star on development
  * @param {MaturityName} maturity - Lifecycle stage of the feature
- * @param {boolean} [interactive] - Links to the explainer page, on by default
+ * @param {boolean} [interactive] - Links to the explainer page
  * @param {FeatureSteps} [steps] - Checked steps
  * @param {string} [className] - Extra classes merged onto the tag
  * @return {JSX.Element}
@@ -38,6 +39,7 @@ export const MaturityTag = ({
   const classes = cn(MATURITY_STYLES.tag, className)
   const body = (
     <>
+      {maturity === 'dev' && <ICONS.star className={MATURITY_STYLES.star} aria-hidden="true" />}
       {level.label}
       {progress !== null && (
         <span className={MATURITY_STYLES.progress}>{MATURITY_COPY.progress(progress)}</span>

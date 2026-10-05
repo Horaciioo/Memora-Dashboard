@@ -10,8 +10,8 @@ import type { NotificationKindName } from '@/utils/constants/notifications'
  * @property {Tone} tone - Colour of the tag and the glyph
  * @property {IconName} icon - Glyph drawn on the portrait
  * @property {string} lead - Words between the actor and the verb
- * @property {string} verb - Past participle, emphasised in the sentence
- * @property {string} trail - What the act landed on, its determiner included
+ * @property {string} verb - Past participle
+ * @property {string} trail - What the act landed on
  * @property {boolean} [addressed] - Reads to the member alone, no actor, the subject filling {subject}
  */
 
@@ -26,8 +26,7 @@ export interface NotificationKindOption {
 }
 
 /*
- * Every sentence reads "<actor> <lead> <verb> <trail>", the verb alone carrying the emphasis —
- * so a new kind is one line here, never a branch in a component.
+ * Every sentence reads "<actor> <lead> <verb> <trail>"
  */
 
 const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption> = {

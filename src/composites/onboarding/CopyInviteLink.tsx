@@ -14,7 +14,7 @@ export interface CopyInviteLinkProps {
 /**
  * Copy the public form link of an open invitation
  * @param {string} token - Link token
- * @param {ButtonVariant} [variant] - Button shape, secondary by default
+ * @param {ButtonVariant} [variant] - Button shape
  * @return {JSX.Element}
  */
 

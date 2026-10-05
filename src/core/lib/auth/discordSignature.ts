@@ -21,7 +21,7 @@ const toKeyObject = (publicKey: string): crypto.KeyObject =>
 /**
  * Check that a payload really comes from Discord and is not a replay
  * @param {Object} input - Received request
- * @param {string} input.body - Raw body, byte for byte
+ * @param {string} input.body - Raw body
  * @param {string | null} input.signature - Ed25519 signature header
  * @param {string | null} input.timestamp - Timestamp header
  * @param {string | null} input.publicKey - Application public key
@@ -41,7 +41,7 @@ export const isSignedByDiscord = ({
 }): boolean => {
   if (!signature || !timestamp || !publicKey) return false
 
-  // An old timestamp is a replay, whatever the signature says
+  // An old timestamp is a replay
   const sentAt = Number(timestamp)
   if (!Number.isFinite(sentAt)) return false
   if (Math.abs(Date.now() / 1000 - sentAt) > DISCORD_WEBHOOK.toleranceSeconds) return false

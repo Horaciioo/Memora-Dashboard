@@ -17,7 +17,7 @@ export interface TwoFactorState {
  * @typedef {Object} TwoFactorEnrolment
  * @property {string} secret - Base32 secret
  * @property {string} uri - otpauth URI
- * @property {string} qrCode - Scannable QR code, inline SVG
+ * @property {string} qrCode - Scannable QR code
  * @property {string[]} recoveryCodes - Clear fallback codes
  */
 

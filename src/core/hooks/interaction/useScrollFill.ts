@@ -4,10 +4,9 @@ import { useEffect, useState } from 'react'
 import type { RefObject } from 'react'
 
 /**
- * How far the reader has come down an element: 0 while its top is below the screen, 1 once its
- * bottom reaches the screen bottom
+ * How far the reader has come down an element: 0 while its top is below the screen
  * @param {RefObject<HTMLElement | null>} ref - Element read through
- * @param {unknown} reset - Changes when the element's content changes, restarting the count
+ * @param {unknown} reset - Changes when the element's content changes
  * @return {number} - Ratio between 0 and 1
  */
 
@@ -33,7 +32,7 @@ export const useScrollFill = (ref: RefObject<HTMLElement | null>, reset: unknown
     }
 
     schedule()
-    // Any scroller counts, the framed page may not be the window
+    // Any scroller counts
     window.addEventListener('scroll', schedule, { passive: true, capture: true })
     window.addEventListener('resize', schedule)
 

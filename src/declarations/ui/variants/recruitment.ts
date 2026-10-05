@@ -1,5 +1,5 @@
 /**
- * Recruitment session cards, a creator portrait, a function, how far interviews went
+ * Recruitment session cards
  * @type {Record<string, string>}
  */
 
@@ -42,7 +42,7 @@ export const SESSION_HERO = {
 } as const
 
 /**
- * Candidate cards of a session, a name, when they meet, who leads, how it ended
+ * Candidate cards of a session
  * @type {Record<string, string>}
  */
 
@@ -57,7 +57,7 @@ export const CANDIDATE_CARD = {
 } as const
 
 /**
- * Glossary, one line per term inside a single box
+ * Glossary
  * @type {Record<string, string>}
  */
 

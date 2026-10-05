@@ -5,8 +5,8 @@ import type { IconName } from '@/declarations/ui/icons'
  * @typedef {Object} DiscordAuthor
  * @property {string} id - Stable identifier
  * @property {string} name - Display name
- * @property {string | null} colour - Name colour, the top role's
- * @property {boolean} [isApp] - Bot account, APP badge
+ * @property {string | null} colour - Name colour
+ * @property {boolean} [isApp] - Bot account
  * @property {IconName} [glyph] - Glyph standing in for the avatar
  */
 
@@ -58,7 +58,7 @@ export interface DiscordButton {
  * @property {string} id - Stable identifier
  * @property {DiscordAuthor} author - Who writes
  * @property {string} time - Clock shown next to the name
- * @property {string} [content] - Markdown text, `<@&role>` mentions a role
+ * @property {string} [content] - Markdown text
  * @property {DiscordEmbed[]} [embeds] - Embeds below
  * @property {DiscordButton[]} [buttons] - Buttons below
  * @property {string} [replyTo] - Message quoted above
@@ -79,7 +79,7 @@ export interface DiscordReplicaMessage {
  * @typedef {Object} DiscordChannel
  * @property {string} name - Channel name
  * @property {'text' | 'announce' | 'rules'} kind - Glyph before it
- * @property {boolean} [lit] - Shines pink, the subject of the scene
+ * @property {boolean} [lit] - Shines pink
  */
 
 export interface DiscordChannel {
@@ -161,7 +161,7 @@ export interface DiscordSceneStep {
 }
 
 /**
- * A scripted Discord channel, data only
+ * A scripted Discord channel
  * @typedef {Object} DiscordScene
  * @property {DiscordReplicaState} initial - State at the start
  * @property {DiscordSceneStep[]} steps - Beats in time order

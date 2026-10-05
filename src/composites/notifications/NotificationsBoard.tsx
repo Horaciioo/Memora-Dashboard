@@ -13,8 +13,7 @@ export interface NotificationsBoardProps {
 }
 
 /**
- * Full listing of what reached the signed-in member, hydrated from the server render so the
- * page never refetches what it already holds
+ * Full listing of what reached the signed-in member
  * @param {NotificationFeed} feed - Feed resolved server-side
  * @return {JSX.Element}
  */

@@ -48,7 +48,7 @@ export const PUT = createProtectedRoute({
     const functionId = raw.functionId === undefined ? null : String(raw.functionId)
     const youtuberId = readLayer(raw)
 
-    // An encadrement level is what a whole perimeter hangs off, so only an admin writes one
+    // An encadrement level is what a whole perimeter hangs off
     if (role && ENCADREMENT_ROLES.includes(role as MemberRoleName) && !access.isAdmin) {
       throw forbidden()
     }

@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 // Lets the floating mobile nav pill read env(safe-area-inset-*) under the notch/home indicator
 export const viewport: Viewport = { viewportFit: 'cover' }
 
-// Chrome dimensions, on <body> so every shell surface reads the same source
+// Chrome dimensions
 const SHELL_VARS = {
   '--shell-top-bar-h': `${SHELL_DIMENSIONS.topBar}px`,
   '--shell-bottom-nav-h': `${SHELL_DIMENSIONS.bottomNav}px`,

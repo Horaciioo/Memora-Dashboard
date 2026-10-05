@@ -28,7 +28,7 @@ export interface RoleListProps {
 }
 
 /**
- * Glyph of a row, nothing standing in when none was picked
+ * Glyph of a row
  * @param {string | null} icon - Stored glyph key
  * @return {JSX.Element | null}
  */
@@ -42,9 +42,8 @@ const RowIcon = ({ icon }: { icon: string | null }) => {
 }
 
 /**
- * Discord-style role rail — one section per declared category, each holding its base role,
- * the functions filed under it and an add button
- * @param {AccessConsole['roles']} roles - Hierarchy levels, widest first
+ * Discord-style role rail — one section per declared category
+ * @param {AccessConsole['roles']} roles - Hierarchy levels
  * @param {AccessConsole['functions']} functions - Every function
  * @param {string | null} selectedId - Row on screen
  * @param {boolean} canManageEncadrement - Viewer may add to the leader tier

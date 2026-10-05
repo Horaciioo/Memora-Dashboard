@@ -73,10 +73,10 @@ import type { ReviewAdviceName } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
 import { formatDay } from '@/utils/format/dates'
 
-// Single drop container, objectives only reorder within their own list
+// Single drop container
 const CONTAINER = 'objectives'
 
-// Third period decision, its deadline then a note
+// Third period decision
 const THIRD_PERIOD_FIELDS: FieldDefinition[] = [
   {
     name: 'deadlineAt',
@@ -120,14 +120,14 @@ export interface JuniorFileProps {
 }
 
 /**
- * Individual follow-up file — informations, competencies, notes, objectives and bilans
+ * Individual follow-up file — informations
  * @param {JuniorView} initialJunior - Junior resolved server-side
  * @param {JuniorSkillView[]} initialSkills - Competencies resolved server-side
  * @param {JuniorNoteView[]} initialNotes - Notes resolved server-side
  * @param {JuniorObjectiveView[]} initialObjectives - Objectives resolved server-side
  * @param {AcademyReviewView[]} initialReviews - Check-ins resolved server-side
  * @param {PimTimeline} initialTimeline - Vertical timeline resolved server-side
- * @param {ParkourView | null} parkour - AcademicParkour standing, none for the junior
+ * @param {ParkourView | null} parkour - AcademicParkour standing
  * @param {AccompaniedLiveView[]} accompaniedLives - Lives where they were present
  * @param {string} [initialTab] - Tab a walkthrough opens on
  * @param {string} sessionFunctionName - Function the session is scoped to
@@ -139,7 +139,7 @@ export interface JuniorFileProps {
  * @param {boolean} canWriteSkills - Member may move a competency
  * @param {boolean} canReadNotes - Member may read the notes
  * @param {boolean} canWriteNotes - Member may write a note
- * @param {boolean} canReadObjectives - Member may read the objectives, never the junior
+ * @param {boolean} canReadObjectives - Member may read the objectives
  * @param {boolean} canWriteObjectives - Member may set objectives
  * @param {boolean} canReadReviews - Member may read the check-ins
  * @param {boolean} canWriteReviews - Member may write a check-in
@@ -194,7 +194,7 @@ export const JuniorFile = ({
     decision: ReviewAdviceName | null
   } | null>(null)
 
-  // Third period asks for its deadline in a drawer, every other outcome a confirmation
+  // Third period asks for its deadline in a drawer
   const opensThirdPeriod =
     decidingReview?.decision === ReviewAdvices.Bonus &&
     decidingReview.review.stage === AcademyStages.ReviewFinal

@@ -29,7 +29,7 @@ export const FORM_COPY = {
 } as const
 
 /**
- * Record a drawer form writes, naming its glyph and its gestures
+ * Record a drawer form writes
  * @typedef {Object} FormSubject
  * @property {string} label - Singular noun
  * @property {NounGender} gender - Noun gender
@@ -70,7 +70,7 @@ export const EDITOR_COPY = {
   codeBlock: 'Bloc de code',
   counter: 'caractères',
   // Block editor
-  placeholder: 'Écris, ou tape / pour choisir un bloc',
+  placeholder: '*Écris / pour insérer un bloc...*',
   slashEmpty: 'Aucun bloc ne correspond',
   slashLabel: 'Blocs',
   formatLabel: 'Mise en forme',
@@ -100,7 +100,7 @@ export const FILE_COPY = {
   replace: 'Remplacer l’image',
   remove: 'Retirer l’image',
   uploading: 'Envoi en cours…',
-  tooLarge: 'Ce fichier est trop lourd.',
+  tooLarge: 'Ce fichier est trop lourd, réduis le.',
   wrongType: 'Ce format d’image n’est pas accepté.',
   unknownBucket: 'Cette destination de fichier n’existe pas.',
   missing: 'Aucun fichier reçu.',
@@ -163,14 +163,14 @@ export const EMOJI_COPY = {
 } as const
 
 /**
- * Glyph drawn beside a priority option
+ * Glyph Fields
  * @type {string}
  */
 
 export const PRIORITY_GLYPH = '!!'
 
 /**
- * Category labels a form declaration groups its fields under
+ * Category labels
  * @type {Record<string, string>}
  */
 

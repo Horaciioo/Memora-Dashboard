@@ -46,7 +46,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const calendarRail = useCalendarRail()
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
 
-  // A lone creator sits on top, several move to the footer box
+  // A lone creator sits on top
   const hasCreators = viewContext.creators.length === 1
   const ChevronIcon = ICONS.expand
 

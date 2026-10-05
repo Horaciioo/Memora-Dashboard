@@ -68,19 +68,18 @@ export interface MemberFileTabsProps {
   canReadLogs: boolean
   canManageAccess: boolean
   canPostAbsence: boolean
-  // Moderation history, undefined when the viewer may not read it
+  // Moderation history
   moderation?: MemberModerationViewData | null
   canOpenReports: boolean
 }
 
-// Contact fields edited in place, in the order they appear under the section
-// Glyph of an outside link
+// Contact fields edited in place
 const ExternalIcon = ICONS.forward
 const CalendarIcon = ICONS.meetings
 
 const CONTACT_FIELD_NAMES = ['discordId', 'email', 'phone', 'birthday', 'languages']
 
-// Assignment fields edited in place, in the order they appear under the section
+// Assignment fields edited in place
 const ASSIGNMENT_FIELD_NAMES = [
   'youtuberIds',
   'divisionId',
@@ -104,7 +103,7 @@ const optionLabel = (field: FieldDefinition, value: FieldValue): ReactNode => {
 }
 
 /**
- * Label of one stored entry, falling back to the entry itself
+ * Label of one stored entry
  * @param {FieldDefinition} field - Field carrying the options
  * @param {string} value - Stored entry
  * @return {string} - Matching option label
@@ -117,7 +116,7 @@ const optionText = (field: FieldDefinition, value: string): string =>
  * Labels of every selected value of a multiselect field
  * @param {FieldDefinition} field - Field carrying the options
  * @param {FieldValue} value - Stored value
- * @return {ReactNode} - Matching option labels, joined
+ * @return {ReactNode} - Matching option labels
  */
 
 const optionLabels = (field: FieldDefinition, value: FieldValue): ReactNode => {
@@ -131,10 +130,10 @@ const optionLabels = (field: FieldDefinition, value: FieldValue): ReactNode => {
 }
 
 /**
- * Every selected option of a multiselect field, each behind its small glyph
+ * Every selected option of a multiselect field
  * @param {FieldDefinition} field - Field carrying the options
  * @param {FieldValue} value - Stored value
- * @return {ReactNode} - Marked labels, side by side
+ * @return {ReactNode} - Marked labels
  */
 
 const optionMarks = (field: FieldDefinition, value: FieldValue): ReactNode => {
@@ -159,16 +158,16 @@ const optionMarks = (field: FieldDefinition, value: FieldValue): ReactNode => {
 }
 
 /**
- * Tabs of one moderator file, each tab guarded by the permission that opens it
+ * Tabs of one moderator file
  * @param {MemberDetail} detail - File resolved server-side
- * @param {string | null} recruitmentSessionId - Session holding their application, by Discord identifier
+ * @param {string | null} recruitmentSessionId - Session holding their application
  * @param {FieldDefinition[]} memberFields - Declarations of the file form
  * @param {FieldDefinition[]} noteFields - Declarations of the note form
  * @param {FieldDefinition[]} socialFields - Declarations of the social form
  * @param {FieldDefinition[]} absenceFields - Declarations of the absence form
  * @param {ActivityEntry[]} activity - Journal entries
- * @param {PermissionLayers} overrides - Permission overwrites, per layer
- * @param {Record<string, PermissionName[]>} inherited - Permissions inheritance grants, per layer
+ * @param {PermissionLayers} overrides - Permission overwrites
+ * @param {Record<string, PermissionName[]>} inherited - Permissions inheritance grants
  * @param {boolean} canUpdate - Member may edit the file
  * @param {boolean} canReadNotes - Member may read private remarks
  * @param {boolean} canWriteNotes - Member may write private remarks
@@ -209,7 +208,7 @@ export const MemberFileTabs = ({
   const [pendingNote, setPendingNote] = useState<string | null>(null)
   const [editingSocial, setEditingSocial] = useState<MemberSocial | null>(null)
   const [pendingSocial, setPendingSocial] = useState<MemberSocial | null>(null)
-  // Kept in sync with every inline commit, always sent in full to the PATCH route
+  // Kept in sync with every inline commit
   const [identityValues, setIdentityValues] = useState<FormValues>(detail.values)
 
   const { summary } = detail
@@ -228,7 +227,7 @@ export const MemberFileTabs = ({
     setDialog(next)
   }
 
-  // A member always tends their own social rows, a manager tends anyone's
+  // A member always tends their own social rows
   const canWriteSocials = canUpdate || session?.id === summary.id
 
   const openSocial = (social: MemberSocial | null) => {
@@ -236,7 +235,7 @@ export const MemberFileTabs = ({
     openDialog('socials')
   }
 
-  // Every PATCH replaces the whole record, so a single field commit still ships the rest untouched
+  // Every PATCH replaces the whole record
   const saveField = async (name: string, value: FieldValue): Promise<boolean> => {
     const next = { ...identityValues, [name]: value }
     const saved = await file.saveIdentity(next)
@@ -370,10 +369,10 @@ export const MemberFileTabs = ({
     },
   ]
 
-  // Contact kept beside the portrait, the other fields live under the file tab
+  // Contact kept beside the portrait
   const RAIL_FIELDS = ['discordId', 'email', 'birthday']
 
-  // Erased personal data never comes back, nothing left to edit in its place
+  // Erased personal data never comes back
   const ERASED_FIELDS = ['email', 'phone', 'birthday', 'languages']
   const sealErased = (entry: EditableEntry): EditableEntry =>
     detail.erased && entry.field && ERASED_FIELDS.includes(entry.field.name)
@@ -452,7 +451,7 @@ export const MemberFileTabs = ({
   )
 
   const notesTab = () => {
-    // Pinned first, then the latest
+    // Pinned first
     const ordered = [...file.notes].sort(
       (left, right) => Number(right.pinned) - Number(left.pinned)
     )

@@ -38,7 +38,7 @@ export type FieldKind =
   | 'announcement'
 
 /**
- * Glyph drawn beside an option, telling colour and identity apart at a glance
+ * Glyph drawn beside an option
  * @type {string}
  */
 
@@ -60,7 +60,7 @@ export type FieldPreset = 'today' | 'actor' | 'default'
  * @property {string} [accent] - Colour token
  * @property {string} [image] - Portrait URL
  * @property {string} [emoji] - Glyph drawn before the label
- * @property {string | null} [icon] - Glyph key, drawn by the glyph mark
+ * @property {string | null} [icon] - Glyph key
  * @property {string} [prefix] - Link start it hands a handle field
  * @property {string} [group] - Category heading
  * @property {boolean} [isDefault] - Preset choice
@@ -114,9 +114,9 @@ export interface FieldCondition {
 }
 
 /**
- * Moment an existing event already holds, a date field warns when it lands inside
+ * Moment an existing event already holds
  * @typedef {Object} BusySlot
- * @property {string} refId - Record it belongs to, ignored while that record is edited
+ * @property {string} refId - Record it belongs to
  * @property {string} label - Event title
  * @property {string} startsAt - ISO start
  * @property {string | null} endsAt - ISO end
@@ -150,7 +150,7 @@ export interface BusySlot {
  * @property {number} [step] - Number increment
  * @property {number} [maxLength] - Longest text
  * @property {number} [maxItems] - Most entries
- * @property {string} [prefix] - Static text drawn before the control, never stored
+ * @property {string} [prefix] - Static text drawn before the control
  * @property {string} [prefixFrom] - Select whose chosen option hands the prefix
  * @property {string} [lookup] - Network a typed handle is checked against
  * @property {string} [glyph] - Emoji field drawn beside this control
@@ -161,7 +161,7 @@ export interface BusySlot {
  * @property {MaturityName} [maturity] - Lifecycle tag drawn beside the label
  * @property {boolean} [adminOnly] - Only an administrator may write it
  * @property {FieldCondition} [visibleWhen] - Display rule
- * @property {boolean} [binary] - A toggle drawn as a plain check/cross, no label
+ * @property {boolean} [binary] - A toggle drawn as a plain check/cross
  * @property {BusySlot[]} [busy] - Events a date field warns about
  */
 

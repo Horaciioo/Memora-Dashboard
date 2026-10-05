@@ -21,16 +21,15 @@ import { startOfDay } from '@/utils/format/days'
 
 export interface AbsencesPanelProps {
   mine: MemberAbsence[]
-  // Kept for the page contract, the composer carries its own fields
+  // Kept for the page contract
   fields: FieldDefinition[]
   thresholdDays: number
   canCreate: boolean
 }
 
 /**
- * Own absences: declared from a calendar on top, listed underneath. Requests waiting on the
- * viewer are settled from the home page
- * @param {AbsencesPanelProps} props - Own requests, limits and permission
+ * Own absences: declared from a calendar on top
+ * @param {AbsencesPanelProps} props - Own requests
  * @return {JSX.Element}
  */
 
@@ -40,7 +39,7 @@ export const AbsencesPanel = ({ mine, thresholdDays, canCreate }: AbsencesPanelP
   const [showFinished, setShowFinished] = useState(false)
   const [isDeclaring, setDeclaring] = useState(false)
 
-  // Current absences first, the finished ones only when the page options ask for them
+  // Current absences first
   const [current, finished] = useMemo(() => {
     const today = startOfDay(new Date()).getTime()
 

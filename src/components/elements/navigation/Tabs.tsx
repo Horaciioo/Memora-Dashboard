@@ -44,14 +44,12 @@ const labelReveal = (collapse: TabCollapse, isActive: boolean): string => {
 }
 
 /**
- * Horizontal tab strip driving a single panel below it, its rule sliding from the tab
- * being left to the tab being opened. A tab without an icon always keeps its label —
- * collapsing it would leave nothing to read
+ * Horizontal tab strip driving a single panel below it
  * @param {TabItem[]} items - Tabs in display order
  * @param {string} value - Selected tab value
  * @param {(value: string) => void} onChange - Selection handler
  * @param {string} label - Accessible name of the strip
- * @param {TabCollapse} [collapse] - Label visibility mode, defaults to 'mobile'
+ * @param {TabCollapse} [collapse] - Label visibility mode
  * @param {boolean} [centered] - Centres the strip
  * @return {JSX.Element}
  */
@@ -69,7 +67,7 @@ export const Tabs = ({
   const ruleRef = useRef<HTMLSpanElement | null>(null)
   const drawn = useRef<{ left: number; width: number } | null>(null)
 
-  // Written on the node, never through state
+  // Written on the node
   const draw = (left: number, width: number) => {
     const rule = ruleRef.current
     if (!rule) return
@@ -79,7 +77,7 @@ export const Tabs = ({
     rule.style.transform = `translateX(${left}px)`
   }
 
-  // The rule glides toward the open tab, re-reading it every frame while labels unfold
+  // The rule glides toward the open tab
   useLayoutEffect(() => {
     const target = () => {
       const tab = tabsRef.current.get(value)
@@ -91,7 +89,7 @@ export const Tabs = ({
     let frame = 0
     let gliding = false
 
-    // First paint or calm mode, no glide
+    // First paint or calm mode
     if (!from || prefersReducedMotion()) {
       const end = target()
       if (end) draw(end.left, end.width)
@@ -148,7 +146,7 @@ export const Tabs = ({
       {items.map((item) => {
         const Icon = item.icon ? ICONS[item.icon] : null
         const isActive = item.value === value
-        // Nothing to collapse to without an icon, the label stays put
+        // Nothing to collapse to without an icon
         const reveal = item.icon ? collapse : 'never'
 
         return (

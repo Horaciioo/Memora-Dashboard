@@ -88,7 +88,7 @@ export interface RouteDescriptor {
  * @property {number} [status] - Success status
  * @property {FieldDefinition[]} [fields] - Body declarations
  * @property {boolean} [partial] - Skip required checks
- * @property {RateLimitName | false} [rateLimit] - Policy, false disables it
+ * @property {RateLimitName | false} [rateLimit] - Policy
  * @property {RouteDescriptor} [descriptor] - Route documentation
  */
 
@@ -274,7 +274,7 @@ const authenticate = async (
 
   await guard(request, options.rateLimit, session.id)
 
-  // Permission gate, root bypasses every check
+  // Permission gate
   const access = resolvePermissions(session)
   assertPermission(access, permission)
 
@@ -384,7 +384,7 @@ export const createRedirectRoute = (options: RedirectRouteOptions): RouteHandler
     } catch (error) {
       const appError = toAppError(error)
 
-      // A browser flow never reads an envelope, it only follows a location
+      // A browser flow never reads an envelope
       if (appError.code === ErrorCodes.SystemFailure) logger.error('[oauth]', error)
 
       const destination = await options.onFailure(appError, await context.params)
@@ -452,7 +452,7 @@ export const createMediaRoute = (options: MediaRouteOptions): RouteHandler => {
       const params = await context.params
       const media = await options.describe(params)
 
-      // A private object still costs a session, a public one never does
+      // A private object still costs a session
       if (media.visibility === MEDIA_VISIBILITIES.Private) {
         await authenticate(request, { rateLimit: options.rateLimit }, media.permission)
       } else {

@@ -62,7 +62,7 @@ const INPUT_TYPES: Record<string, string> = {
 }
 
 /**
- * Control matching a field's kind, shared by the form engine and inline editors
+ * Control matching a field's kind
  * @param {string} id - Identifier of the control
  * @param {FieldDefinition} field - Field declaration
  * @param {FieldValue} value - Current value
@@ -293,7 +293,7 @@ export const FieldControl = ({
 
   if (!field.prefix) return input
 
-  // The prefix is drawn, never typed and never stored
+  // The prefix is drawn
   return (
     <div className={cn(FIELD_STYLES.prefixRow, invalid && FIELD_STYLES.prefixRowInvalid)}>
       <span className={FIELD_STYLES.prefix} aria-hidden="true">

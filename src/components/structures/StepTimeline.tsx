@@ -30,7 +30,7 @@ export interface StepTimelineProps {
   className?: string
 }
 
-// Glyph carried by each state, so colour is never the only carrier
+// Glyph carried by each state
 const STATE_ICONS: Record<StepState, IconName> = {
   idle: 'clock',
   current: 'pending',
@@ -55,7 +55,7 @@ const STATE_CONNECTORS: Record<StepState, string> = {
 }
 
 /**
- * Horizontal progress of any staged process, informative only — never an authorisation
+ * Horizontal progress of any staged process
  * @param {TimelineStep[]} steps - Steps in display order
  * @param {string} label - Accessible name of the whole timeline
  * @param {string} [className] - Extra classes merged onto the row
@@ -72,7 +72,7 @@ export const StepTimeline = ({ steps, label, className }: StepTimelineProps) => 
       return (
         <Fragment key={step.id}>
           <li className={HORIZONTAL_TIMELINE_STYLES.step}>
-            {/* A pickable step is a button, a plain one never pretends to be one */}
+            {/* A pickable step is a button */}
             {step.onClick ? (
               <button
                 type="button"

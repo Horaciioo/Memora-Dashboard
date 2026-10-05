@@ -1,5 +1,5 @@
 /**
- * Permissions edited from the app, off while they are decided in code
+ * Permissions edited from the app
  * @type {boolean}
  */
 

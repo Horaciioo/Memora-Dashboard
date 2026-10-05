@@ -52,7 +52,7 @@ export const useLives = (initialLives: LiveView[]): LiveCollection => {
       )
       if (!created) return false
 
-      // Reread the list, the new live sorted in
+      // Reread the list
       setLives(await apiGet<LiveView[]>(API_ROUTES.lives))
 
       return true

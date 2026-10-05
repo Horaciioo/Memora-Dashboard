@@ -18,7 +18,7 @@ export interface SectionProps {
 }
 
 /**
- * Titled block, its heading sitting above the frame rather than inside it
+ * Titled block
  * @param {string} [title] - Heading shown above the frame
  * @param {ReactNode} [action] - Control aligned to the right of the heading
  * @param {boolean} [bare] - Renders children without the framed panel

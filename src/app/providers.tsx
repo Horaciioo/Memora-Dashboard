@@ -19,7 +19,7 @@ import {
 } from '@/managers/front-end'
 import type { SessionUser } from '@/types/auth'
 
-// Overlay, empty until a toast fires — kept out of the initial bundle
+// Overlay
 const NotificationsToaster = dynamic(
   () =>
     import('@/components/structures/NotificationsToaster').then((mod) => mod.NotificationsToaster),
@@ -32,7 +32,7 @@ export interface ProvidersProps {
 }
 
 /**
- * Composes every client-side manager once, at the root of the app
+ * Composes every client-side manager once
  * @param {SessionUser | null} initialSession - Session resolved server-side
  * @param {ReactNode} children - App tree
  * @return {JSX.Element}

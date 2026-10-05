@@ -39,12 +39,12 @@ export interface CoursePlayerProps {
   initialProgress: CourseProgress
   backHref: string
   backLabel: string
-  // Training reviewed at the end, the old closing kept without it
+  // Training reviewed at the end
   trainingId?: string
   context?: CourseContext
 }
 
-// Blocks showing the Mod View, spread past the reading column
+// Blocks showing the Mod View
 const WIDE_KINDS = new Set<string>(['tour', 'focus', 'scene', 'compareRuns', 'branching'])
 
 // Context of a course read without the database
@@ -84,10 +84,8 @@ const ExerciseView = (props: ExerciseViewProps) => {
 }
 
 /**
- * Reader of one interactive course, one chapter at a time. A timeline of circles follows the
- * reading, the next chapter opens only from its button once every exercise is cleared, and the
- * chapters stand in the left sidebar while the course is open
- * @param {CoursePlayerProps} props - Address, course, saved progress and the way back
+ * Reader of one interactive course
+ * @param {CoursePlayerProps} props - Address
  * @return {JSX.Element}
  */
 
@@ -113,14 +111,14 @@ export const CoursePlayer = ({
     [course.chapters, run.progress.blocks]
   )
 
-  // Reopens on the first chapter still to clear, or on the last one once everything is done
+  // Reopens on the first chapter still to clear
   const [current, setCurrent] = useState(() => {
     const open = course.chapters.findIndex((_, index) => !clearedAt(index))
 
     return open === -1 ? course.chapters.length - 1 : open
   })
   const [slide, setSlide] = useState<'forward' | 'back'>('forward')
-  // Opening page until the first chapter, closing page once the last is cleared
+  // Opening page until the first chapter
   const [page, setPage] = useState<'intro' | 'chapters' | 'outro'>(() =>
     course.intro && Object.keys(initialProgress.blocks).length === 0 ? 'intro' : 'chapters'
   )
@@ -144,7 +142,7 @@ export const CoursePlayer = ({
     [course.chapters]
   )
 
-  // The sidebar only ever goes back, never ahead of the chapter reached
+  // The sidebar only ever goes back
   useEffect(() => {
     publishCourseRail({
       courseName: course.name,

@@ -40,7 +40,7 @@ export const PRACTICE_STAGES: AcademyStageName[] = [
 let synced: Promise<void> | null = null
 
 /**
- * Write the courses declared in code onto their training rows, once per process
+ * Write the courses declared in code onto their training rows
  * @return {Promise<void>} - Synced
  */
 
@@ -56,7 +56,7 @@ export const syncCurriculum = (): Promise<void> => {
         period:
           course.track === 'indispensable' ? AcademyPeriods.Discovery : AcademyPeriods.Practice,
         mandatory: course.track === 'indispensable',
-        // A course for one trade hangs on it, a shared one on none
+        // A course for one trade hangs on it
         functionId:
           course.functions.length === 1 ? (functionIds.get(course.functions[0]!) ?? null) : null,
         position,
@@ -77,7 +77,7 @@ export const syncCurriculum = (): Promise<void> => {
 }
 
 /**
- * Trades a member works, a junior function counting as the trade it trains for
+ * Trades a member works
  * @param {string[]} functionIds - Functions held
  * @return {Promise<Set<string>>} - Trade names
  */
@@ -103,10 +103,9 @@ const concerns = (course: Course, trades: Set<string>, seesAll: boolean): boolea
   seesAll || course.functions.length === 0 || course.functions.some((name) => trades.has(name))
 
 /**
- * Read the catalogue a member follows: the courses of the trade their session trains for and the
- * shared ones, the secondary courses appearing only once a junior reaches the second period
+ * Read the catalogue a member follows: the courses of the trade their session trains for and the shared ones
  * @param {SessionUser} viewer - Signed-in member
- * @return {Promise<CourseCard[]>} - Courses, indispensable first
+ * @return {Promise<CourseCard[]>} - Courses
  */
 
 export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> => {
@@ -133,7 +132,7 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
     const course = row.curriculumKey ? courseByKey(row.curriculumKey) : undefined
     if (!course || !concerns(course, trades, seesAll)) return []
 
-    // The first period shows the indispensable courses alone, the rest arrives with practice
+    // The first period shows the indispensable courses alone
     if (course.track === 'secondary' && !inPractice && !seesAll) return []
 
     const record = row.records[0]
@@ -162,7 +161,7 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
  * Address of a course when the member may open it
  * @param {SessionUser} viewer - Signed-in member
  * @param {string} key - Course key
- * @return {Promise<string | null>} - Reader address, none when not in their catalogue
+ * @return {Promise<string | null>} - Reader address
  */
 
 export const courseHrefFor = async (viewer: SessionUser, key: string): Promise<string | null> => {
@@ -235,8 +234,7 @@ const announceFinish = async (accountId: string, courseName: string): Promise<vo
 }
 
 /**
- * Score one exercise on the server, save it, and close the course once every exercise is
- * cleared, the follow-up file and the trainer hearing of it
+ * Score one exercise on the server
  * @param {string} trainingId - Training identifier
  * @param {SessionUser} viewer - Signed-in member
  * @param {string} blockKey - Exercise key
@@ -259,7 +257,7 @@ export const submitExercise = async (
   const next: CourseProgress = {
     blocks: {
       ...progress.blocks,
-      // A cleared exercise stays cleared, a later miss never undoes it
+      // A cleared exercise stays cleared
       [blockKey]: {
         passed: result.passed || progress.blocks[blockKey]?.passed === true,
         score: result.score,

@@ -16,14 +16,14 @@ export interface DialogProps {
   title: string
   description?: string
   size?: DialogSize
-  // Line rendered under the title, inside the header
+  // Line rendered under the title
   subheader?: ReactNode
   footer?: ReactNode
   children: ReactNode
 }
 
 /**
- * Centred overlay trapping focus until it closes, its header carrying nothing but the title
+ * Centred overlay trapping focus until it closes
  * @param {boolean} open - Overlay is mounted
  * @param {() => void} onClose - Dismiss handler
  * @param {string} title - Overlay title

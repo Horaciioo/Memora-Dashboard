@@ -37,7 +37,7 @@ const toLevel = (row: LevelRow): LiveconLevelView => ({
 
 /**
  * Read every declared level
- * @return {Promise<LiveconLevelView[]>} - Levels, tightest last
+ * @return {Promise<LiveconLevelView[]>} - Levels
  */
 
 export const listLevels = async (): Promise<LiveconLevelView[]> => {
@@ -173,7 +173,7 @@ export const switchLevel = async (
   const youtuberId = readText(values, 'youtuberId')
   assertInScope(scope, youtuberId)
 
-  // One open entry per scope, the previous one closes on the spot
+  // One open entry per scope
   await prisma.liveconEntry.updateMany({
     where: { youtuberId, endedAt: null },
     data: { endedAt: new Date() },

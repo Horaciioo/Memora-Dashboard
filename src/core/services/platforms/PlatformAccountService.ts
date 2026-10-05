@@ -14,7 +14,7 @@ import type { PlatformLinkView } from '@/types/platforms'
 const REFRESH_MARGIN_MS = 60_000
 
 /**
- * A usable Twitch seat, or why there is none
+ * A usable Twitch seat
  * @typedef {Object} SeatLookup
  */
 
@@ -23,7 +23,7 @@ export type SeatLookup =
   | { ok: false; reason: 'notLinked' | 'revoked' | 'notConfigured' }
 
 /**
- * Keep a Twitch grant, both tokens encrypted at rest
+ * Keep a Twitch grant
  * @param {string} accountId - Member
  * @param {TwitchGrant} grant - Tokens
  * @param {TwitchIdentity} identity - Twitch user
@@ -60,7 +60,7 @@ export const storeTwitchGrant = async (
 }
 
 /**
- * Read a usable Twitch token of a member, renewed when close to expiry
+ * Read a usable Twitch token of a member
  * @param {string} accountId - Member
  * @return {Promise<SeatLookup>} - Seat or reason
  */
@@ -120,7 +120,7 @@ export const readTwitchSeat = async (accountId: string): Promise<SeatLookup> => 
 }
 
 /**
- * Mark a member's Twitch access as refused, until they reconnect
+ * Mark a member's Twitch access as refused
  * @param {string} accountId - Member
  * @return {Promise<void>} - Marked
  */
@@ -133,7 +133,7 @@ export const markTwitchRevoked = async (accountId: string): Promise<void> => {
 }
 
 /**
- * Platform links of a member, for the settings
+ * Platform links of a member
  * @param {string} accountId - Member
  * @return {Promise<PlatformLinkView[]>} - Links
  */
@@ -152,7 +152,7 @@ export const listPlatformLinks = async (accountId: string): Promise<PlatformLink
 }
 
 /**
- * Unlink a member's Twitch account, giving the token back to Twitch
+ * Unlink a member's Twitch account
  * @param {string} accountId - Member
  * @return {Promise<void>} - Unlinked
  */

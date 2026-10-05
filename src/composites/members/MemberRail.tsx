@@ -13,7 +13,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import type { MemberSummary } from '@/types/members'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
 
-// Ends of a PIM, their data erased
+// Ends of a PIM
 const ERASED_STATUSES: string[] = [MemberStatuses.Dismissed, MemberStatuses.Resigned]
 
 export interface MemberRailProps {
@@ -21,7 +21,7 @@ export interface MemberRailProps {
   canEdit: boolean
   isLocked: boolean
   onEditPortrait: () => void
-  // Property groups, each a titled block
+  // Property groups
   children: ReactNode
 }
 
@@ -30,7 +30,7 @@ export interface MemberRailProps {
  * in place, always in view whichever tab is open
  * @param {MemberSummary} summary - Row of the moderator
  * @param {boolean} canEdit - Viewer may change the file
- * @param {boolean} isLocked - Root account, never editable
+ * @param {boolean} isLocked - Root account
  * @param {() => void} onEditPortrait - Opens the identity form
  * @param {ReactNode} children - Property groups
  * @return {JSX.Element}

@@ -16,8 +16,8 @@ export interface InlineCreateProps {
 }
 
 /**
- * Dashed creation row turning into a field on click, the entry made where it will live
- * @param {string} label - Creation label, also the field placeholder
+ * Dashed creation row turning into a field on click
+ * @param {string} label - Creation label
  * @param {number} [maxLength] - Longest accepted text
  * @param {boolean} [tile] - Stacks the glyph above the label
  * @param {string} [className] - Extra classes merged onto the row

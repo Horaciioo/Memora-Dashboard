@@ -10,7 +10,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const metadata: Metadata = { title: ACADEMY_COPY.glossaryTitle }
 
 /**
- * Academy lexicon, the terms the domain is written in
+ * Academy lexicon
  * @return {Promise<JSX.Element>} - Glossary page
  */
 

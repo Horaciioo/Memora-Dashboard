@@ -8,7 +8,7 @@ const MAX_TEXT = 500
  * Read a bounded string
  * @param {unknown} value - Raw value
  * @param {boolean} [required] - Must not be empty
- * @return {string | null} - Text, null when invalid
+ * @return {string | null} - Text
  */
 
 const textOf = (value: unknown, required = true): string | null => {
@@ -19,9 +19,9 @@ const textOf = (value: unknown, required = true): string | null => {
 }
 
 /**
- * Read a gesture sent by the browser, refusing anything malformed
+ * Read a gesture sent by the browser
  * @param {Record<string, unknown>} raw - Body
- * @return {ModViewIntent | null} - Gesture, null when invalid
+ * @return {ModViewIntent | null} - Gesture
  */
 
 export const readIntent = (raw: Record<string, unknown>): ModViewIntent | null => {

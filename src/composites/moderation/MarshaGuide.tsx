@@ -31,7 +31,7 @@ export interface MarshaGuideProps {
  * Marsha Bot handbook in three columns: the families, the commands of the one open, and the
  * detail of the one picked. A search looks across every family, the rules of talking to the bot
  * take the place of the commands under "Bien démarrer"
- * @param {string | null} trainingHref - The Marsha training, when it exists
+ * @param {string | null} trainingHref - The Marsha training
  * @return {JSX.Element}
  */
 
@@ -45,7 +45,7 @@ export const MarshaGuide = ({ trainingHref }: MarshaGuideProps) => {
 
   const category = MARSHA_CATEGORIES.find((entry) => entry.key === section)
 
-  // A search lists matches grouped by family, otherwise the commands of the open family
+  // A search lists matches grouped by family
   const groups = useMemo(
     () =>
       MARSHA_CATEGORIES.filter((entry) => needle || entry.key === section)

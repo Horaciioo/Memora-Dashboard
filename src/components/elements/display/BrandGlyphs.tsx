@@ -10,7 +10,7 @@ export interface GlyphProps {
 // Tone ramp per shape
 export type Paints = { fill: string; lift: string; deep: string; cut: string }
 
-// Stops of each ramp, brand by default, green for a thing done
+// Stops of each ramp
 const FRAME_RAMPS = {
   // Pink melting into white
   brand: {
@@ -49,16 +49,15 @@ const FRAME_RAMPS = {
     deepTo: 'color-mix(in oklab, var(--color-danger) 70%, black)',
     cut: 'var(--color-danger-soft)',
   },
-  // Role and function tints, fixed colours off the brand ramp
+  // Role and function tints
   ...GLYPH_TINTS,
 }
 
 export type FrameTone = keyof typeof FRAME_RAMPS
 
 /**
- * Wraps a drawing in a 24 square with the shared three-tone ramp, so every content glyph carries
- * the same depth rather than reading flat
- * @param {Object} props - Sizing class, ramp and the shape to paint
+ * Wraps a drawing in a 24 square with the shared three-tone ramp
+ * @param {Object} props - Sizing class
  * @return {JSX.Element}
  */
 
@@ -105,7 +104,7 @@ export const Frame = ({
 }
 
 /**
- * Heavy check of a chosen entry, a dark stroke under a lit one
+ * Heavy check of a chosen entry
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -144,7 +143,7 @@ export const CheckGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Accueil, a house
+ * Accueil
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -170,7 +169,7 @@ export const AccueilGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Absences, a suitcase
+ * Absences
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -190,7 +189,7 @@ export const AbsencesGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Meetings, a calendar page
+ * Meetings
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -361,7 +360,7 @@ export const SettingsGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Console, a terminal prompt
+ * Console
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -388,7 +387,7 @@ export const ConsoleGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Search, a magnifier
+ * Search
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -407,7 +406,7 @@ export const SearchGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Notifications, a bell
+ * Notifications
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -426,7 +425,7 @@ export const BellGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Lock, a shackle over a body
+ * Lock
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -452,7 +451,7 @@ export const LockGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Unlock, an open shackle
+ * Unlock
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -478,7 +477,7 @@ export const UnlockGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Key, a bow and warded shaft
+ * Key
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -503,7 +502,7 @@ export const KeyGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Mail, a sealed envelope
+ * Mail
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -529,7 +528,7 @@ export const MailGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Clock, a face with hands
+ * Clock
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -554,7 +553,7 @@ export const ClockGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Deadline, sand falling through
+ * Deadline
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -573,7 +572,7 @@ export const DeadlineGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Phone, a lifted handset
+ * Phone
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -594,7 +593,7 @@ export const PhoneGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Spark, one large star with two small
+ * Spark
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -618,7 +617,7 @@ export const SparkGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Star, a single point
+ * Star
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -639,7 +638,7 @@ export const StarGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * System, a screen on a stand
+ * System
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -664,7 +663,7 @@ export const SystemGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Dark, a night crescent
+ * Dark
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -683,7 +682,7 @@ export const DarkGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Light, a disc with rays
+ * Light
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -708,7 +707,7 @@ export const LightGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Edit, a slanted pencil
+ * Edit
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -727,7 +726,7 @@ export const EditGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Remove, a lidded bin
+ * Remove
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -753,7 +752,7 @@ export const RemoveGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Copy, two stacked sheets
+ * Copy
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -771,7 +770,7 @@ export const CopyGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Sign out, an arrow leaving a panel
+ * Sign out
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -797,7 +796,7 @@ export const SignOutGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Livecon, a broadcasting core
+ * Livecon
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -821,7 +820,7 @@ export const LiveconGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Analytics, a rising trace
+ * Analytics
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -853,7 +852,7 @@ export const AnalyticsGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Metrics, three rising bars
+ * Metrics
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -872,7 +871,7 @@ export const MetricsGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Queue, a stack of plates
+ * Queue
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -903,7 +902,7 @@ export const QueueGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Database, a stack of discs
+ * Database
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -922,7 +921,7 @@ export const DatabaseGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Storage, a hard drive
+ * Storage
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -941,7 +940,7 @@ export const StorageGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Scan, a sweeping line
+ * Scan
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -965,7 +964,7 @@ export const ScanGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Journal, a ruled scroll
+ * Journal
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -989,7 +988,7 @@ export const JournalGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Sheet, a document page
+ * Sheet
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1016,7 +1015,7 @@ export const SheetGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * History, a clock with a backward arc
+ * History
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1049,7 +1048,7 @@ export const HistoryGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Refresh, two circling arrows
+ * Refresh
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1080,7 +1079,7 @@ export const RefreshGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Visible, an open eye
+ * Visible
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1098,7 +1097,7 @@ export const VisibleGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Hidden, an eye with a slash
+ * Hidden
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1121,7 +1120,7 @@ export const HiddenGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Emoji, a smiling face
+ * Emoji
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1147,7 +1146,7 @@ export const EmojiGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Birthday, a candled cake
+ * Birthday
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1174,7 +1173,7 @@ export const BirthdayGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Skill, a target
+ * Skill
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1193,7 +1192,7 @@ export const SkillGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Objective, a planted flag
+ * Objective
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1212,7 +1211,7 @@ export const ObjectiveGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Dispositif, a forked signpost
+ * Dispositif
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1231,7 +1230,7 @@ export const DispositifGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Lead, a speedometer
+ * Lead
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1250,7 +1249,7 @@ export const LeadGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Youtuber, a play button on screen
+ * Youtuber
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1269,7 +1268,7 @@ export const YoutuberGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Youtuber off, a screen with a slash
+ * Youtuber off
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1288,7 +1287,7 @@ export const YoutuberNoneGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Platform, a grid of channels
+ * Platform
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1309,7 +1308,7 @@ export const PlatformGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Note, a folded sticky
+ * Note
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1333,7 +1332,7 @@ export const NoteGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Discord, a chat bubble
+ * Discord
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1356,7 +1355,7 @@ export const DiscordGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Glossary, an open book
+ * Glossary
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1375,7 +1374,7 @@ export const GlossaryGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Blocked, a barred disc
+ * Blocked
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1393,7 +1392,7 @@ export const BlockedGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Help, a question in a disc
+ * Help
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1418,7 +1417,7 @@ export const HelpGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Shield, a warded crest with a check
+ * Shield
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1444,7 +1443,7 @@ export const ShieldGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Second factor, a shield holding a padlock
+ * Second factor
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1475,7 +1474,7 @@ interface TintedGlyphProps extends GlyphProps {
 }
 
 /**
- * Moderator, a warded shield with a check, tinted by their main function
+ * Moderator
  * @param {TintedGlyphProps} props - Sizing class and tint
  * @return {JSX.Element}
  */
@@ -1510,7 +1509,7 @@ export const ModeratorGlyph = ({ className, tone = 'brand' }: TintedGlyphProps) 
 )
 
 /**
- * Junior, the moderator shield carrying a sprout, tinted by the function trained for
+ * Junior
  * @param {TintedGlyphProps} props - Sizing class and tint
  * @return {JSX.Element}
  */
@@ -1540,7 +1539,7 @@ export const JuniorGlyph = ({ className, tone = 'brand' }: TintedGlyphProps) => 
 )
 
 /**
- * Discord moderator function, two chat bubbles in Discord blurple
+ * Discord moderator function
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1568,7 +1567,7 @@ export const DiscordFunctionGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Live moderator function, a screen airing a stream
+ * Live moderator function
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1596,7 +1595,7 @@ export const LiveFunctionGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Recruiter function, a lens held over a candidate
+ * Recruiter function
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1625,7 +1624,7 @@ export const RecruiterFunctionGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Academy trainer function, a graduation cap with its tassel
+ * Academy trainer function
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1648,7 +1647,7 @@ export const TrainerFunctionGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Animateur function, a party popper bursting confetti
+ * Animateur function
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1717,7 +1716,7 @@ export const AnimatorFunctionGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Responsable, a tall flame with a lower tongue beside it, tinted by their main function
+ * Responsable
  * @param {TintedGlyphProps} props - Sizing class and tint
  * @return {JSX.Element}
  */
@@ -1755,7 +1754,7 @@ export const ResponsableGlyph = ({ className, tone = 'RESPONSABLE' }: TintedGlyp
 )
 
 /**
- * Administrator, a three-pointed crown on a jewelled band
+ * Administrator
  * @param {TintedGlyphProps} props - Sizing class and tint
  * @return {JSX.Element}
  */
@@ -1785,7 +1784,7 @@ export const AdminGlyph = ({ className, tone = 'ADMIN' }: TintedGlyphProps) => (
 )
 
 /**
- * Livecon 3, a green leaf, the calm watch
+ * Livecon 3
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1818,7 +1817,7 @@ export const LiveconCalmGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Livecon 2, a yellow warning sign, the heightened watch
+ * Livecon 2
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1840,7 +1839,7 @@ export const LiveconWatchGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Livecon 1, a red blast around an exclamation, everyone on alert
+ * Livecon 1
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */

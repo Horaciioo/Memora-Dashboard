@@ -249,7 +249,7 @@ export const ICONS = {
   shieldOutline: ShieldOutlineGlyph,
   flame: FlameGlyph,
   crown: CrownGlyph,
-  // One per fixed function, keyed as its row stores it
+  // One per fixed function
   functionDiscord: DiscordFunctionGlyph,
   functionLive: LiveFunctionGlyph,
   functionAnimator: AnimatorFunctionGlyph,
@@ -328,7 +328,7 @@ export const ICONS = {
 export type IconName = keyof typeof ICONS
 
 /**
- * Every icon key, in declaration order
+ * Every icon key
  * @type {IconName[]}
  */
 

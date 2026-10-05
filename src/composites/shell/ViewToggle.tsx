@@ -17,8 +17,7 @@ export interface ViewToggleProps {
 }
 
 /**
- * Glyph of the level in force, Moderator, Responsable or Admin, walking the reachable views on
- * click: its label names the one it lands on, no wording on screen
+ * Glyph of the level in force
  * @param {ViewContext} viewContext - View resolved server-side
  * @param {string} [className] - Classes overriding the standard glyph button
  * @param {string} [iconClassName] - Classes overriding the standard glyph size
@@ -32,7 +31,7 @@ export const ViewToggle = ({ viewContext, className, iconClassName }: ViewToggle
   if (!switchable) return null
 
   const meta = NAVIGATION_VIEW_REGISTRY.get(view)
-  // The glyph is the level in force: Moderator, Responsable or Admin
+  // The glyph is the level in force: Moderator
   const Glyph = ROLE_EMBLEMS[VIEW_ROLES[view]].glyph
   const target = nextNavigationView(view, available)
   const targetMeta = NAVIGATION_VIEW_REGISTRY.get(target)

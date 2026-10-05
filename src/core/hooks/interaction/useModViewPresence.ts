@@ -10,7 +10,7 @@ import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 const ACTIVITY_EVENTS = ['keydown', 'pointerdown', 'pointermove', 'wheel'] as const
 
 /**
- * Tell the server, every few seconds, that this Mod View is open, shown and used
+ * Tell the server
  * @param {string} liveId - Live
  * @return {void}
  */
@@ -27,7 +27,7 @@ export const useModViewPresence = (liveId: string): void => {
       active: Date.now() - lastActivity < LIVE_SETTINGS.idleSeconds * 1000,
     })
 
-    // Beats while the page lives, failures ignored
+    // Beats while the page lives
     const beat = () => void apiPost(path, { ...flags(), closing: false }).catch(() => null)
     beat()
     const timer = window.setInterval(beat, LIVE_SETTINGS.heartbeatSeconds * 1000)

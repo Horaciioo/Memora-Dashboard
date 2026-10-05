@@ -18,7 +18,7 @@ interface CoursePageProps {
 export const metadata: Metadata = { title: ACADEMY_COPY.myTrainingsTitle }
 
 /**
- * One interactive course, read and played to the end
+ * One interactive course
  * @param {CoursePageProps} props - Training identifier
  * @return {Promise<JSX.Element>} - Course page
  */
@@ -31,7 +31,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
     redirect(ROUTES.home)
   }
 
-  // A course out of the member's catalogue, or a training edited by hand, sends back to the list
+  // A course out of the member's catalogue
   const found = await readCourse(id, session).catch(() => null)
   if (!found) redirect(ROUTES.trainings)
 

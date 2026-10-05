@@ -18,7 +18,7 @@ export const applyDiscordEvent = (
 ): DiscordReplicaState => {
   switch (event.kind) {
     case 'open': {
-      // The channel joins its category once, then becomes the open one
+      // The channel joins its category once
       const categories = state.categories.map((category) =>
         category.name !== event.category ||
         category.channels.some((channel) => channel.name === event.channel.name)
@@ -58,9 +58,9 @@ export const playDiscordScene = (scene: DiscordScene): DiscordReplicaState =>
   scene.steps.reduce((state, step) => applyDiscordEvent(state, step.event), scene.initial)
 
 /**
- * Chain steps after a scene, keeping the clock going
+ * Chain steps after a scene
  * @param {DiscordSceneStep[]} base - Steps already played
- * @param {DiscordSceneStep[]} next - Steps to append, timed from zero
+ * @param {DiscordSceneStep[]} next - Steps to append
  * @param {number} [gap] - Pause between the two
  * @return {DiscordSceneStep[]} - Steps in time order
  */

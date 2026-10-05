@@ -2,7 +2,7 @@ import { timeOf, toDayKey } from '@/utils/format/calendar'
 import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
 
 /**
- * When an entry happens, on one line
+ * When an entry happens
  * @param {string} startsAt - ISO start
  * @param {string | null} endsAt - ISO end
  * @param {boolean} allDay - Spans whole days

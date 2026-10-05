@@ -6,10 +6,10 @@ import type Sharding from '@/managers/infrastructure/Core/Sharding'
 import type LoggerManager from '@/managers/infrastructure/Core/LoggerManager'
 import type { EncryptionConfig, LegacyEncryptionKey } from '@/types/infrastructure'
 
-// Packed into the first two bits of the vector, never written as a separate field
+// Packed into the first two bits of the vector
 const FORMAT_VERSION = 0x02
 
-// Block ciphers take a full block as their vector, authenticated modes take less
+// Block ciphers take a full block as their vector
 const BLOCK_IV_LENGTH = 16
 
 /**

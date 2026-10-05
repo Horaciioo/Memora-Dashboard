@@ -13,9 +13,9 @@ import type { AttendeeKindName, MeetingAudienceName } from '@/utils/constants/wo
 import { addDays, startOfDay } from '@/utils/format/days'
 
 /**
- * Read the birthdays coming up, only members who agreed to have theirs celebrated
+ * Read the birthdays coming up
  * @param {AccessScope} scope - Creator perimeter
- * @return {Promise<HomeBirthday[]>} - Coming birthdays, soonest first
+ * @return {Promise<HomeBirthday[]>} - Coming birthdays
  */
 
 export const upcomingBirthdays = async (scope: AccessScope): Promise<HomeBirthday[]> => {
@@ -55,10 +55,10 @@ const teamAudiences = async (viewerId: string): Promise<MeetingAudienceName[]> =
 }
 
 /**
- * Read the coming meetings a member is expected at, named or held for their team
+ * Read the coming meetings a member is expected at
  * @param {string} viewerId - Signed-in member
  * @param {AccessScope} scope - Creator perimeter
- * @return {Promise<HomeMeeting[]>} - Coming meetings, soonest first
+ * @return {Promise<HomeMeeting[]>} - Coming meetings
  */
 
 export const myMeetings = async (viewerId: string, scope: AccessScope): Promise<HomeMeeting[]> => {
@@ -69,7 +69,7 @@ export const myMeetings = async (viewerId: string, scope: AccessScope): Promise<
     where: {
       scheduledAt: { gte: now, lte: addDays(now, HOME_SETTINGS.meetingWindowDays) },
       OR: [
-        // A named seat always reaches its holder, whatever the perimeter
+        // A named seat always reaches its holder
         { attendees: { some: { accountId: viewerId } } },
         scopedWhere('meeting', scope, { audience: { in: [MeetingAudiences.Everyone, ...teams] } }),
       ],

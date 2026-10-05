@@ -40,8 +40,8 @@ interface QuizScore {
 }
 
 /**
- * Quiz block taken through a form dialog, its questions grouped into tabs
- * @param {string | null} blockId - Block identifier, mounted only while set
+ * Quiz block taken through a form dialog
+ * @param {string | null} blockId - Block identifier
  * @param {() => void} onClose - Dismiss handler
  * @param {() => void} onScored - Called once the quiz is graded, to refresh the outline
  * @return {JSX.Element}
@@ -97,8 +97,8 @@ const QuizDialog = ({
 }
 
 /**
- * A training's content, browsed chapter by chapter, quizzes opening in their own dialog
- * @param {string | null} trainingId - Training identifier, mounted only while set
+ * A training's content
+ * @param {string | null} trainingId - Training identifier
  * @param {() => void} onClose - Dismiss handler
  * @return {JSX.Element}
  */
@@ -112,7 +112,7 @@ export const TrainingContentViewer = ({ trainingId, onClose }: TrainingContentVi
     chapters: ContentChapterView[] | null
   }>({ trainingId, reloadToken, chapters: null })
 
-  // A new training, or a requested reload, starts loaded-blank during this render
+  // A new training
   if (track.trainingId !== trainingId || track.reloadToken !== reloadToken) {
     setTrack({ trainingId, reloadToken, chapters: null })
   }

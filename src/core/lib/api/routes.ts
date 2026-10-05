@@ -1,6 +1,6 @@
 import { SANCTION_PARAMS } from '@/declarations/sanctions/params'
 
-// Narrows a board route to one creator, the API reading it as a query parameter
+// Narrows a board route to one creator
 const withScope = (path: string, youtuberId?: string): string =>
   youtuberId ? `${path}?youtubeur=${encodeURIComponent(youtuberId)}` : path
 

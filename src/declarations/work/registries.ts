@@ -15,25 +15,28 @@ interface MeetingAudienceOption {
   label: string
   summary: string
   icon: IconName
-  // Trade whose holders are expected, absent for the whole team and the custom list
+  // Trade whose holders are expected
   functionName?: string
 }
 
 const MEETING_AUDIENCE_MAP: Record<MeetingAudienceName, MeetingAudienceOption> = {
   [MeetingAudiences.Everyone]: {
     label: 'Toute l’équipe',
-    summary: 'Tout le monde est attendu, la réunion apparaît sur l’Accueil de chacun.',
+    summary:
+      "La totalité de l'équipe est convoquée. Elle reçoit la notification dans leur page d’accueil.",
     icon: 'members',
   },
   [MeetingAudiences.Discord]: {
     label: 'Équipe Discord',
-    summary: 'Les modérateurs Discord sont attendus, elle apparaît sur leur Accueil.',
+    summary:
+      "Seule l'équipe Discord sera concernée et notifiée dans leur page d'Accueil respective.",
     icon: 'functionDiscord',
     functionName: 'Discord',
   },
   [MeetingAudiences.Twitch]: {
     label: 'Équipe Twitch',
-    summary: 'Les modérateurs des lives sont attendus, elle apparaît sur leur Accueil.',
+    summary:
+      "Seule l'équipe Twitch sera concernée et notifiée dans leur page d'Accueil respective.",
     icon: 'functionLive',
     functionName: 'Lives',
   },

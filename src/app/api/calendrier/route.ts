@@ -38,7 +38,7 @@ export const GET = createProtectedRoute({
       to: new Date(query.get('fin') ?? ''),
       viewerId: session.id,
       access,
-      // A session board keeps its own perimeter, the shared calendar reads every creator
+      // A session board keeps its own perimeter
       scope: query.get('session') ? await scope() : await readCalendarScope(session, access),
       sessionId: query.get('session') ?? undefined,
     }),
@@ -66,7 +66,7 @@ export const PATCH = createProtectedRoute({
     await assertEntriesAccess(ids, session.id, access.can(Permissions.CalendarManage))
     await assertRowsInScope('calendarEvent', ids, perimeter)
 
-    // Only the keys actually sent are validated, the rest of every entry stays put
+    // Only the keys actually sent are validated
     const parsed = parseFormValues(await calendarFields(perimeter), raw, {
       enforceRequired: false,
     })

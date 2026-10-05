@@ -16,7 +16,7 @@ import type {
 export const PARKOUR_NAME = 'AcademicParkour'
 
 /**
- * Division a graduate lands in, by rank
+ * Division a graduate lands in
  * @type {number}
  */
 
@@ -149,7 +149,7 @@ export const PARKOUR_PHASES: Record<ParkourPhase, ParkourPhaseOption> = {
 }
 
 /**
- * Decision buttons, per check-in stage
+ * Decision buttons
  * @type {Partial<Record<AcademyStageName, Partial<Record<ReviewAdviceName, string>>>>}
  */
 
@@ -238,7 +238,7 @@ export const ERASED_COPY = {
 } as const
 
 /**
- * Departure announcement template, filled by fillDeparture
+ * Departure announcement template
  * @type {string}
  */
 
@@ -247,7 +247,7 @@ export const DEPARTURE_TEMPLATE = `# Départ de {username}
 Nous le remercions pour son investissement et lui souhaitons une bonne continuation pour la suite !`
 
 /**
- * Verb of the announcement, per departure
+ * Verb of the announcement
  * @type {Record<DepartureKindName, string>}
  */
 
@@ -257,7 +257,7 @@ export const DEPARTURE_VERBS: Record<DepartureKindName, string> = {
 }
 
 /**
- * Emoji of the announcement, per trade
+ * Emoji of the announcement
  * @type {Readonly<Record<string, string>>}
  */
 

@@ -8,17 +8,17 @@ import type { Course, CourseBlock, ExerciseBlock } from '@/declarations/academy/
 import { EXERCISE_KINDS } from '@/declarations/academy/curriculum/types'
 
 /**
- * Every interactive course, in catalogue order
+ * Every interactive course
  * @type {readonly Course[]}
  */
 
 export const COURSES: readonly Course[] = [
-  // Indispensable, first period
+  // Indispensable
   TWITCH_FUNDAMENTALS,
   SUPPORT_TICKETS,
   MARSHA_BOT,
   COMMUNICATION_POSTURE,
-  // Secondary, second period
+  // Secondary
   PROFESSIONAL_WRITING,
   ANTI_RAID,
 ]
@@ -44,7 +44,7 @@ export const isExercise = (block: CourseBlock): block is ExerciseBlock =>
   EXERCISE_KINDS.includes(block.kind)
 
 /**
- * Every exercise of a course, in order
+ * Every exercise of a course
  * @param {Course} course - Course
  * @return {ExerciseBlock[]} - Exercises
  */

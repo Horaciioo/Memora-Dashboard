@@ -6,10 +6,10 @@ import type {
   DiscordSceneStep,
 } from '@/types/replicas'
 
-// Typing speed of the composer, matches the typewriter
+// Typing speed of the composer
 const DRAFT_MS_PER_CHAR = 32
 
-// Floor of a typed line, in ms
+// Floor of a typed line
 const DRAFT_MIN_MS = 700
 
 /**
@@ -22,7 +22,7 @@ export type Beat = [wait: number, event: DiscordSceneEvent]
 /**
  * Build one author
  * @param {string} id - Stable identifier
- * @param {Partial<DiscordAuthor>} [extra] - Name, colour, glyph, app badge
+ * @param {Partial<DiscordAuthor>} [extra] - Name
  * @return {DiscordAuthor} - Author
  */
 
@@ -34,7 +34,7 @@ export const author = (id: string, extra: Partial<DiscordAuthor> = {}): DiscordA
 })
 
 /**
- * Lay beats on a clock, each waiting after the previous one
+ * Lay beats on a clock
  * @param {Beat[]} beats - Beats in order
  * @param {number} [start] - First beat offset
  * @return {DiscordSceneStep[]} - Timed steps
@@ -51,7 +51,7 @@ export const timeline = (beats: Beat[], start: number = 0): DiscordSceneStep[] =
 }
 
 /**
- * Someone types then posts, the typing line showing meanwhile
+ * Someone types then posts
  * @param {DiscordReplicaMessage} message - Message posted
  * @param {Object} [options] - Timing
  * @param {number} [options.before] - Pause before typing
@@ -68,7 +68,7 @@ export const say = (
 ]
 
 /**
- * The learner's seat types in the composer, then sends
+ * The learner's seat types in the composer
  * @param {DiscordReplicaMessage} message - Message sent
  * @param {number} [before] - Pause before typing
  * @return {Beat[]} - Beats
@@ -100,7 +100,7 @@ export const guide = (step: number | null, before: number = 0): Beat => [
  * @param {DiscordAuthor} by - Author
  * @param {string} time - Clock shown
  * @param {string} [content] - Text
- * @param {Partial<DiscordReplicaMessage>} [extra] - Embeds, buttons, reply
+ * @param {Partial<DiscordReplicaMessage>} [extra] - Embeds
  * @return {DiscordReplicaMessage} - Message
  */
 

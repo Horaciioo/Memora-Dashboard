@@ -2,7 +2,7 @@ import crypto from 'crypto'
 
 import { TWO_FACTOR_SETTINGS } from '@/declarations/configurations/settings'
 
-// RFC 4648 alphabet, the one every authenticator app reads
+// RFC 4648 alphabet
 const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
 
 // Bits packed into one base32 symbol
@@ -22,7 +22,7 @@ const toBase32 = (bytes: Buffer): string => {
   let value = 0
   let output = ''
 
-  // Drain five bits at a time, whatever the byte boundary
+  // Drain five bits at a time
   for (const byte of bytes) {
     value = (value << 8) | byte
     bits += 8
@@ -86,7 +86,7 @@ const codeAt = (secret: string, step: number): string => {
 
   const digest = crypto.createHmac('sha1', fromBase32(secret)).update(counter).digest()
 
-  // Dynamic truncation, the low nibble of the last byte points at the window
+  // Dynamic truncation
   const offset = digest[digest.length - 1] & 0x0f
   const binary = digest.readUInt32BE(offset) & 0x7fffffff
 
@@ -107,7 +107,7 @@ export const stepAt = (at: number = Date.now()): number =>
  * @param {string} secret - Base32 secret
  * @param {string} code - Submitted code
  * @param {number} [afterStep] - Last step already spent
- * @return {number | null} - Matching step, null when rejected
+ * @return {number | null} - Matching step
  */
 
 export const verifyCode = (secret: string, code: string, afterStep?: number): number | null => {
@@ -117,7 +117,7 @@ export const verifyCode = (secret: string, code: string, afterStep?: number): nu
   const current = stepAt()
   const { driftSteps } = TWO_FACTOR_SETTINGS
 
-  // Walk the drift window, a replayed step never matching twice
+  // Walk the drift window
   for (let offset = -driftSteps; offset <= driftSteps; offset += 1) {
     const step = current + offset
     if (afterStep !== undefined && step <= afterStep) continue

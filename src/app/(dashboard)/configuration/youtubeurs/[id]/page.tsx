@@ -50,7 +50,7 @@ export async function generateMetadata({
 }
 
 /**
- * Creator file, its teams managed straight from here
+ * Creator file
  * @param {Object} context - Route context
  * @param {Promise<{ id: string }>} context.params - Dynamic segments
  * @return {Promise<JSX.Element>} - Creator file

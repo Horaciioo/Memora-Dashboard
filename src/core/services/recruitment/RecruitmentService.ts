@@ -35,7 +35,7 @@ import type { RecruitmentOwnerName, RecruitmentStatusName } from '@/utils/consta
 
 const { shortTextMaxLength, longTextMaxLength, markdownMaxLength, noteMaxLength } = FORM_SETTINGS
 
-// A day of milliseconds, the step offset being counted from the session opening
+// A day of milliseconds
 const DAY_IN_MS = 24 * 60 * 60 * 1000
 
 /**
@@ -61,7 +61,7 @@ const rethrow = (error: unknown): never => {
 const sessionScope = (scope: AccessScope) => scopedWhere('recruitmentSession', scope)
 
 /**
- * Read a session the viewer may reach, or throw
+ * Read a session the viewer may reach
  * @param {string} id - Session identifier
  * @param {AccessScope} scope - Perimeter
  * @return {Promise<{ id: string, youtuberId: string, functionId: string, academySessionId: string | null, opensAt: Date | null }>} - Session anchors
@@ -85,7 +85,7 @@ export const reachableSession = async (id: string, scope: AccessScope) => {
 }
 
 /**
- * Read the session a candidate belongs to, guarding the perimeter
+ * Read the session a candidate belongs to
  * @param {string} candidateId - Candidate identifier
  * @param {AccessScope} scope - Perimeter
  * @return {Promise<string>} - Session identifier
@@ -103,7 +103,7 @@ const reachableCandidate = async (candidateId: string, scope: AccessScope): Prom
 }
 
 /**
- * Rows matching a session, a null creator or function meaning every one of them
+ * Rows matching a session
  * @param {string} youtuberId - Creator of the session
  * @param {string} functionId - Post of the session
  * @return {object} - Where clause
@@ -285,7 +285,7 @@ export const candidateFields = async (): Promise<FieldDefinition[]> => {
     }),
   ])
 
-  // Spectators may sit in even while absent, only a recruiter has to be available
+  // Spectators may sit in even while absent
   const seats: FieldOption[] = members.map((option) => ({
     value: option.value,
     label: option.label,
@@ -424,7 +424,7 @@ export const commentFields = (): FieldDefinition[] => [
 ]
 
 /**
- * Declarations of the written trace forms, the bilan and the consignes
+ * Declarations of the written trace forms
  * @param {'review' | 'instructions'} kind - Which trace is edited
  * @return {FieldDefinition[]} - Field declarations
  */
@@ -506,7 +506,7 @@ const toCandidate = (
     id: row.id,
     discordId: row.discordId,
     displayName: row.displayName,
-    // The member file wins, then the pseudonym given, then the raw identifier
+    // The member file wins
     name: member?.displayName ?? row.displayName ?? row.discordId,
     formId: row.formId,
     recruiter: recruiter
@@ -564,7 +564,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
       where: { archived: false },
       orderBy: { position: 'asc' },
     }),
-    // The Discord identifier is the only bridge to a moderator file, no account is ever created
+    // The Discord identifier is the only bridge to a moderator file
     prisma.account.findMany({
       where: { discordId: { in: row.candidates.map((candidate) => candidate.discordId) } },
       select: { id: true, discordId: true, displayName: true },
@@ -635,7 +635,7 @@ export const createSession = async (
 
   const closingOffset = templates.reduce((last, template) => Math.max(last, template.offset), 0)
 
-  // A campaign always feeds a promotion, so its academy session is opened alongside
+  // A campaign always feeds a promotion
   const academySession = await prisma.academySession.create({
     data: {
       functionId,
@@ -715,7 +715,7 @@ export const updateSession = async (
 ): Promise<RecruitmentSummary> => {
   await reachableSession(id, scope)
 
-  // The responsable seats are replaced wholesale, the form always sends the full list
+  // The responsable seats are replaced wholesale
   const [, , , row] = await prisma
     .$transaction([
       prisma.recruitmentSession.update({
@@ -894,7 +894,7 @@ export const updateCandidate = async (
         outcomeId: readText(values, 'outcomeId'),
         interviewAt: readDate(values, 'interviewAt'),
         attended: readFlag(values, 'attended'),
-        // The seats are replaced wholesale, the form always ships them in full
+        // The seats are replaced wholesale
         spectators: {
           deleteMany: {},
           create: spectatorIds.map((accountId) => ({ accountId })),
@@ -1090,7 +1090,7 @@ export const createStep = async (
       notes: readText(values, 'notes'),
       owner: (readText(values, 'owner') ?? RecruitmentOwners.Responsable) as RecruitmentOwnerName,
       offset,
-      // An explicit day wins, otherwise the offset resolves against the opening
+      // An explicit day wins
       scheduledAt:
         scheduledAt ??
         (session.opensAt ? new Date(session.opensAt.getTime() + offset * DAY_IN_MS) : null),
@@ -1103,7 +1103,7 @@ export const createStep = async (
 }
 
 /**
- * Read the session a step belongs to, guarding the perimeter
+ * Read the session a step belongs to
  * @param {string} stepId - Step identifier
  * @param {AccessScope} scope - Perimeter
  * @return {Promise<void>} - Throws when out of perimeter

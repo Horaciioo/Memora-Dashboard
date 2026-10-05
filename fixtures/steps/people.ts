@@ -17,7 +17,7 @@ type Role = 'ADMIN' | 'RESPONSABLE' | 'MODERATEUR'
 type Status = 'PENDING' | 'ACADEMY' | 'ACTIVE' | 'PAUSED' | 'LEFT'
 
 /**
- * One person of the fixtures, as later steps need them
+ * One person of the fixtures
  * @typedef {Object} Person
  */
 
@@ -34,7 +34,7 @@ export interface Person {
 }
 
 /**
- * People of the fixtures, the real root administrator included
+ * People of the fixtures
  * @typedef {Object} Cast
  */
 
@@ -89,7 +89,7 @@ const divisionRank = (status: Status): number | null => {
  * Write one account with everything its file shows
  * @param {object} seed - Who to write
  * @param {Reference} reference - Reference rows
- * @param {number} index - Rank, used for identifiers and colours
+ * @param {number} index - Rank
  * @return {Promise<Person>} - Written person
  */
 
@@ -155,7 +155,7 @@ const writeAccount = async (
 }
 
 /**
- * Principal functions of a moderator, most hold one, a few hold two
+ * Principal functions of a moderator
  * @return {FunctionKey[]} - Functions
  */
 
@@ -168,7 +168,7 @@ const principalFunctions = (): FunctionKey[] =>
   ])
 
 /**
- * Write every fixture person, their teams and their file contents
+ * Write every fixture person
  * @param {Reference} reference - Reference rows
  * @return {Promise<Cast>} - People and teams
  */
@@ -265,7 +265,7 @@ export const seedPeople = async (reference: Reference): Promise<Cast> => {
     )
   }
 
-  // Each responsable anchored on their creator, as only an administrator can do
+  // Each responsable anchored on their creator
   for (const responsable of responsables) {
     await prisma.youtuberLead.create({
       data: { id: fx('lead'), youtuberId: responsable.creators[0], accountId: responsable.id },
@@ -336,7 +336,7 @@ const seedTeams = async (
     }
   }
 
-  // One old team, archived, so the archive has something to show
+  // One old team
   const archived = fx('team')
   await prisma.team.create({
     data: {
@@ -417,7 +417,7 @@ const seedFileContents = async (
     }
   }
 
-  // A handful of personal overrides, some narrowed to one creator
+  // A handful of personal overrides
   const overridden = sample(
     everyone.filter((person) => person.role === 'MODERATEUR' && person.status === 'ACTIVE'),
     8

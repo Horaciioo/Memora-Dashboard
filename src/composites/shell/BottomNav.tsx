@@ -20,8 +20,7 @@ export interface BottomNavProps {
 }
 
 /**
- * Floating nav pill of the mobile shell, Accueil always centred, white icons turning
- * pink on the page in force
+ * Floating nav pill of the mobile shell
  * @param {ViewContext} viewContext - View resolved server-side
  * @return {JSX.Element}
  */

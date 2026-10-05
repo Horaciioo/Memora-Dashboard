@@ -22,10 +22,10 @@ export const ACTIVE_CREATOR_COOKIE = cookieName('activeYoutuber')
 
 export const NAVIGATION_VIEW_COOKIE = cookieName('navigationView')
 
-// Days in one session, both cookies dying with it
+// Days in one session
 const DAY_SECONDS = 86_400
 
-// Shared shape, neither cookie ever leaving the site or reaching a script
+// Shared shape
 const COOKIE_OPTIONS = {
   httpOnly: true,
   sameSite: 'lax',
@@ -47,7 +47,7 @@ export const readActiveCreator = cache(async (): Promise<string | null> => {
 
 /**
  * Pin the creator
- * @param {string | null} youtuberId - Creator identifier, null clearing it
+ * @param {string | null} youtuberId - Creator identifier
  * @return {Promise<void>} - Written
  */
 

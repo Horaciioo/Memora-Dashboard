@@ -131,7 +131,7 @@ const absentOver = async (accountIds: string[], startsAt: Date, endsAt: Date) =>
 }
 
 /**
- * Members a live convenes, absent and released ones left out
+ * Members a live convenes
  * @param {Object} input - Roster context
  * @param {string} input.youtuberId - Creator
  * @param {string[]} input.picked - Members named by hand
@@ -271,7 +271,7 @@ const readPlatform = (values: FormValues): LivePlatformName => {
 }
 
 /**
- * Announce a live, convene its team and call its coordinator
+ * Announce a live
  * @param {FormValues} values - Parsed body
  * @param {string} actorId - Announcing responsable
  * @param {AccessScope} scope - Creator perimeter
@@ -288,7 +288,7 @@ export const announceLive = async (
   const startsAt = readDate(values, 'plannedStartAt')
   const coordinatorId = readText(values, 'coordinatorId')
 
-  // Required fields, read once more on the server
+  // Required fields
   const missing = [
     ['youtuberId', youtuberId],
     ['title', title],
@@ -306,7 +306,7 @@ export const announceLive = async (
   const minutes = readNumberValue(values, 'durationMinutes') ?? LIVE_SETTINGS.defaultDurationMinutes
   const endsAt = new Date(startsAt.getTime() + minutes * MINUTE)
 
-  // Convened team, the coordinator always on it
+  // Convened team
   const convened = await convene({
     youtuberId,
     picked: readList(values, 'memberIds'),
@@ -316,7 +316,7 @@ export const announceLive = async (
   })
   const memberIds = [...new Set([coordinatorId, ...convened])]
 
-  // Calendar entry carries the roll-call, filed under the live template
+  // Calendar entry carries the roll-call
   const template = await prisma.eventTemplate.findUnique({
     where: { name: LIVE_EVENT_TEMPLATE },
     select: { id: true },
@@ -373,7 +373,7 @@ export const announceLive = async (
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} viewerId - Signed-in member
  * @param {PermissionName[]} held - Permissions held
- * @return {Promise<LiveView[]>} - Open lives, soonest first
+ * @return {Promise<LiveView[]>} - Open lives
  */
 
 export const listOpenLives = async (
@@ -392,7 +392,7 @@ export const listOpenLives = async (
 }
 
 /**
- * Read the lives already over, the latest first
+ * Read the lives already over
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} viewerId - Signed-in member
  * @param {PermissionName[]} held - Permissions held
@@ -445,7 +445,7 @@ export const readLive = async (
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} viewerId - Signed-in member
  * @param {boolean} seesAll - Reads every live of the perimeter
- * @return {Promise<LiveBeacon | null>} - Beacon, none without an open live
+ * @return {Promise<LiveBeacon | null>} - Beacon
  */
 
 export const readBeacon = async (
@@ -495,11 +495,11 @@ export const readBeacon = async (
 }
 
 /**
- * Move a live to its next status, telling the team
+ * Move a live to its next status
  * @param {Object} live - Live row
  * @param {LiveStatusName} next - Next status
- * @param {string | null} actorId - Who moves it, none for the platform
- * @param {string} [streamExternalId] - Platform stream, once detected
+ * @param {string | null} actorId - Who moves it
+ * @param {string} [streamExternalId] - Platform stream
  * @return {Promise<void>} - Moved
  */
 
@@ -516,7 +516,7 @@ const applyLiveStatus = async (
   actorId: string | null,
   streamExternalId?: string
 ): Promise<void> => {
-  // Allowed moves only, a closed live staying closed
+  // Allowed moves only
   const allowed: Record<LiveStatusName, LiveStatusName[]> = {
     [LiveStatuses.Announced]: [LiveStatuses.Live, LiveStatuses.Cancelled],
     [LiveStatuses.Live]: [LiveStatuses.Ended],
@@ -542,7 +542,7 @@ const applyLiveStatus = async (
     status: next,
   })
 
-  // The end closes every Mod View presence, a table not migrated yet aside
+  // The end closes every Mod View presence
   if (next === LiveStatuses.Ended) {
     await closeLivePresences(live.id).catch(() => null)
 
@@ -615,11 +615,11 @@ export const moveLive = async (
 }
 
 /**
- * Move a live because the platform said so: online starts it, offline ends it
+ * Move a live because the platform said so: online starts it
  * @param {string} id - Live identifier
  * @param {LiveStatusName} next - Next status
  * @param {string} [streamExternalId] - Platform stream
- * @return {Promise<boolean>} - Moved, false when already there
+ * @return {Promise<boolean>} - Moved
  */
 
 export const moveLiveFromPlatform = async (
@@ -644,7 +644,7 @@ export const moveLiveFromPlatform = async (
 }
 
 /**
- * Rewrite the instructions of a live, its announcers and coordinator only
+ * Rewrite the instructions of a live
  * @param {Object} input - Edit
  * @param {string} input.id - Live identifier
  * @param {string} input.instructions - Markdown

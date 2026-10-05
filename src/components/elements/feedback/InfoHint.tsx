@@ -7,7 +7,7 @@ export interface InfoHintProps {
   className?: string
   // Trigger colours override
   triggerClassName?: string
-  // Bubble anchored left, for labels near an edge
+  // Bubble anchored left
   align?: 'center' | 'start'
 }
 

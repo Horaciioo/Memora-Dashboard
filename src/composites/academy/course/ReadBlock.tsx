@@ -21,7 +21,7 @@ import type { IconName } from '@/declarations/ui/icons'
 import { COURSE_READ, DISCLOSURE, DISCORD_MESSAGE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
-// Look of each callout, its glyph and the colours of its box
+// Look of each callout
 const CALLOUTS: Record<
   Extract<ReadBlockData, { kind: 'callout' }>['tone'],
   { icon: IconName; box: string; text: string; label: string }

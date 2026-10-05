@@ -1,7 +1,7 @@
 import type { Course } from '@/declarations/academy/curriculum/types'
 
 /**
- * Legacy module of the Discord trade, the tools a Responsable oversees
+ * Legacy module of the Discord trade
  * @type {Course}
  */
 
@@ -148,7 +148,7 @@ export const LEGACY_DISCORD: Course = {
 }
 
 /**
- * Legacy module of the Lives trade, the livecon and the briefing of a team
+ * Legacy module of the Lives trade
  * @type {Course}
  */
 
@@ -298,7 +298,7 @@ export const LEGACY_LIVES: Course = {
 }
 
 /**
- * Legacy module of the Animateurs trade, preparing and running an event
+ * Legacy module of the Animateurs trade
  * @type {Course}
  */
 

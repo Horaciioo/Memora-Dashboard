@@ -53,7 +53,7 @@ export const sealValues = (values: FormValues, isUnsealed: boolean): FormValues 
  * Lock sealed fields
  * @param {FieldDefinition[]} fields - Form declarations
  * @param {boolean} isUnsealed - Window still open
- * @return {FieldDefinition[]} - Declarations, sealed ones read-only
+ * @return {FieldDefinition[]} - Declarations
  */
 
 export const sealFields = (fields: FieldDefinition[], isUnsealed: boolean): FieldDefinition[] => {

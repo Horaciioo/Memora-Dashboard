@@ -26,8 +26,8 @@ export interface NotificationsPanelProps {
 }
 
 /**
- * Box raised by the bell beside the rail, the page loading on opening, never on a timer
- * @param {NotificationEntry[]} entries - Notifications, newest first
+ * Box raised by the bell beside the rail
+ * @param {NotificationEntry[]} entries - Notifications
  * @param {number} unread - Unopened count
  * @param {boolean} isLoading - First page still in flight
  * @param {(id: string) => void} onOpen - Called once a row is settled

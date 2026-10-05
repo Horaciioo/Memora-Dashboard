@@ -12,14 +12,14 @@ import { Permissions } from '@/utils/constants/permissions'
 export const metadata: Metadata = { title: LEGACY_COPY.title }
 
 /**
- * Every Legacy track, the running ones and the finished ones behind the page options
+ * Every Legacy track
  * @return {Promise<JSX.Element>} - Legacy page
  */
 
 export default async function LegacyPage() {
   const { access } = await requireUser()
 
-  // Without the right to read them all, a member only has their own page
+  // Without the right to read them all
   if (!access.isAdmin && !access.can(Permissions.LegacyRead)) redirect(ROUTES.myLegacy)
 
   const [tracks, fields] = await Promise.all([listTracks(), legacyFields()])

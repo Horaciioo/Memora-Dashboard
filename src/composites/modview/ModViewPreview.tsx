@@ -20,7 +20,7 @@ export interface ModViewPreviewProps {
 }
 
 /**
- * Mod View on a scripted evening, seen from any seat
+ * Mod View on a scripted evening
  * @param {SanctionPanelView | null} panel - A real creator panel
  * @param {Record<string, string>} levelNames - Livecon names by level
  * @param {string} actorName - Name the viewer acts under

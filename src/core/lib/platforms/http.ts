@@ -3,8 +3,8 @@ import { TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
 /**
  * Failure answered by a platform
  * @typedef {Object} PlatformError
- * @property {number} status - HTTP status, 0 when unreachable
- * @property {string} detail - Platform message, never shown raw
+ * @property {number} status - HTTP status
+ * @property {string} detail - Platform message
  */
 
 export class PlatformError extends Error {
@@ -20,10 +20,10 @@ export class PlatformError extends Error {
 }
 
 /**
- * Points left on one token, read from the rate limit headers
+ * Points left on one token
  * @typedef {Object} RateBucket
  * @property {number} remaining - Points left
- * @property {number} resetAt - When the bucket refills, epoch ms
+ * @property {number} resetAt - When the bucket refills
  */
 
 interface RateBucket {
@@ -31,13 +31,13 @@ interface RateBucket {
   resetAt: number
 }
 
-// Buckets per token key, shared by every call of the process
+// Buckets per token key
 const buckets = new Map<string, RateBucket>()
 
 // Retries after a server failure
 const MAX_RETRIES = 2
 
-// First retry delay, doubled each time
+// First retry delay
 const BACKOFF_MS = 400
 
 // Longest wait for a refill before giving up
@@ -50,7 +50,7 @@ const MAX_REFILL_WAIT_MS = 15000
  * @property {'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE'} [method] - Verb
  * @property {Record<string, string>} headers - Authorization and client headers
  * @property {unknown} [body] - JSON body
- * @property {string} bucket - Rate limit key, one per token
+ * @property {string} bucket - Rate limit key
  */
 
 export interface PlatformRequest {
@@ -99,7 +99,7 @@ const awaitRefill = async (key: string): Promise<void> => {
 /**
  * Call a platform: timeout, retry on server failure, wait on the rate limit
  * @param {PlatformRequest} request - Call
- * @return {Promise<T | null>} - JSON answer, null when empty
+ * @return {Promise<T | null>} - JSON answer
  */
 
 export const platformRequest = async <T>(request: PlatformRequest): Promise<T | null> => {
@@ -118,7 +118,7 @@ export const platformRequest = async <T>(request: PlatformRequest): Promise<T | 
         body: request.body === undefined ? undefined : JSON.stringify(request.body),
       })
     } catch (error) {
-      // Unreachable, retried like a server failure
+      // Unreachable
       if (attempt < MAX_RETRIES) {
         await wait(BACKOFF_MS * 2 ** attempt)
         continue
@@ -128,7 +128,7 @@ export const platformRequest = async <T>(request: PlatformRequest): Promise<T | 
 
     readBucket(request.bucket, response.headers)
 
-    // Rate limited: wait for the refill once, then give up
+    // Rate limited: wait for the refill once
     if (response.status === 429 && attempt < MAX_RETRIES) {
       buckets.set(request.bucket, {
         remaining: 0,
@@ -137,7 +137,7 @@ export const platformRequest = async <T>(request: PlatformRequest): Promise<T | 
       continue
     }
 
-    // Server failure, retried with backoff
+    // Server failure
     if (response.status >= 500 && attempt < MAX_RETRIES) {
       await wait(BACKOFF_MS * 2 ** attempt)
       continue
@@ -156,7 +156,7 @@ export const platformRequest = async <T>(request: PlatformRequest): Promise<T | 
 }
 
 /**
- * Forget every bucket, for tests
+ * Forget every bucket
  * @return {void}
  */
 

@@ -57,7 +57,7 @@ export const succeed = <T>(data: T, status = 200): Response =>
 export const fail = (error: unknown): Response => {
   const appError: AppError = toAppError(error)
 
-  // Only an unexpected throw is worth a log line, an expected one is a return value
+  // Only an unexpected throw is worth a log line
   if (appError.code === ErrorCodes.SystemFailure) logger.error('[api]', error)
 
   // An exhausted limit tells the caller when to come back

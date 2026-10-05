@@ -24,7 +24,7 @@ const CHANNEL_GLYPHS: Record<DiscordChannel['kind'], IconName> = {
   rules: 'discordRules',
 }
 
-// Tools of the channel header, left to right
+// Tools of the channel header
 const HEADER_TOOLS: IconName[] = ['discordThread', 'discordBell', 'discordPin', 'discordMembers']
 
 // Tools at the end of the composer

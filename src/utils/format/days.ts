@@ -2,10 +2,10 @@ import { DATE_LOCALE } from '@/declarations/ui/dates'
 
 // Native local-time day arithmetic
 
-// Grids always start on Monday, matching the weekday labels
+// Grids always start on Monday
 const WEEK_START = 1
 
-// Days in a week, and the six weeks a month grid always draws
+// Days in a week
 const WEEK_LENGTH = 7
 const MONTH_GRID_LENGTH = 42
 
@@ -19,14 +19,14 @@ const pad = (value: number): string => String(value).padStart(2, '0')
 
 /**
  * Read a day key or a moment as a local date
- * @param {Date | string} value - Day key, ISO moment or date
+ * @param {Date | string} value - Day key
  * @return {Date} - Local date
  */
 
 export const parseDay = (value: Date | string): Date => {
   if (value instanceof Date) return new Date(value.getTime())
 
-  // A bare day key is local midnight, never UTC midnight
+  // A bare day key is local midnight
   const dayKey = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
   if (dayKey) return new Date(Number(dayKey[1]), Number(dayKey[2]) - 1, Number(dayKey[3]))
 
@@ -48,7 +48,7 @@ export const formatDayKey = (value: Date | string): string => {
 /**
  * Move a date by whole days
  * @param {Date} date - Starting date
- * @param {number} amount - Days to add, negative goes back
+ * @param {number} amount - Days to add
  * @return {Date} - Moved date
  */
 
@@ -60,9 +60,9 @@ export const addDays = (date: Date, amount: number): Date => {
 }
 
 /**
- * Move a date by whole months, clamping onto the last day when the target is shorter
+ * Move a date by whole months
  * @param {Date} date - Starting date
- * @param {number} amount - Months to add, negative goes back
+ * @param {number} amount - Months to add
  * @return {Date} - Moved date
  */
 
@@ -97,7 +97,7 @@ export const startOfMonth = (date: Date): Date => new Date(date.getFullYear(), d
 export const startOfWeek = (date: Date): Date => {
   const weekday = date.getDay()
 
-  // Sunday reads as 0, so it belongs to the week that started six days earlier
+  // Sunday reads as 0
   const offset = (weekday - WEEK_START + WEEK_LENGTH) % WEEK_LENGTH
 
   return startOfDay(addDays(date, -offset))
@@ -122,7 +122,7 @@ export const endOfDay = (date: Date): Date =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999)
 
 /**
- * Set the time of day, seconds and milliseconds cleared
+ * Set the time of day
  * @param {Date} date - Day to set
  * @param {number} hour - Hour of the day
  * @param {number} [minute] - Minute of the hour

@@ -8,7 +8,7 @@ import { ERROR_PAGE_COPY } from '@/declarations/ui/copy'
 import { CRITICAL_ERROR_STYLES } from '@/declarations/ui/variants'
 
 /**
- * Last resort boundary, replacing the root layout when it is the one that failed
+ * Last resort boundary
  * @param {Object} props - Boundary props
  * @param {Error & { digest?: string }} props.error - Caught exception
  * @param {() => void} props.retry - Re-renders the document

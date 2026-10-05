@@ -13,7 +13,7 @@ import {
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
- * Read the writable section named by the route, or reject
+ * Read the writable section named by the route
  * @param {Record<string, string>} params - Dynamic segments
  * @return {string} - Collection key
  */

@@ -19,10 +19,10 @@ export const metadata: Metadata = { title: MEMBER_COPY.title }
 export default async function MembersPage() {
   const { access, scope } = await requirePermission(Permissions.MemberRead)
 
-  // The three reference reads are memoised, so memberFields shares them
+  // The three reference reads are memoised
   const perimeter = await scope()
 
-  // A picked creator, or the only one a perimeter holds, narrows the whole page
+  // A picked creator
   const creatorId =
     perimeter.activeYoutuberId ??
     (!perimeter.isGlobal && perimeter.youtuberIds.length === 1 ? perimeter.youtuberIds[0] : null)

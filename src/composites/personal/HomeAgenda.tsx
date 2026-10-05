@@ -28,7 +28,7 @@ interface AgendaLine {
 }
 
 /**
- * Meetings and birthdays to come, merged and grouped under the day they fall on
+ * Meetings and birthdays to come
  * @param {HomeMeeting[]} meetings - Coming meetings
  * @param {HomeBirthday[]} birthdays - Coming birthdays
  * @param {boolean} canOpenMeeting - Member may open a meeting file

@@ -18,8 +18,7 @@ export interface ModuleScore {
 }
 
 /**
- * Points the exercises of a module earned, each counting the same: a cleared one in full, a
- * missed one by the share it got right on the last try
+ * Points the exercises of a module earned
  * @param {Course} course - Module
  * @param {CourseProgress} progress - Saved exercises
  * @return {number} - Points out of the module maximum
@@ -41,8 +40,7 @@ export const autoScoreOf = (course: Course, progress: CourseProgress): number =>
 }
 
 /**
- * Total of a module: the exercises alone until the evaluator gives a note, then both by their
- * configured shares
+ * Total of a module: the exercises alone until the evaluator gives a note
  * @param {number} auto - Points from the exercises
  * @param {number | null} evaluator - Evaluator's note out of the module maximum
  * @return {number} - Total out of the module maximum

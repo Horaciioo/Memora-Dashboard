@@ -28,7 +28,7 @@ export interface SystemScreen {
 }
 
 /**
- * System screens in display order, read by the rail and by the section index alike
+ * System screens in display order
  * @type {SystemScreen[]}
  */
 

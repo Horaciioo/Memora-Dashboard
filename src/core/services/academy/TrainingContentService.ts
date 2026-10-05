@@ -202,7 +202,7 @@ export const updateChapter = async (
 }
 
 /**
- * Drop a chapter, its blocks and questions with it
+ * Drop a chapter
  * @param {string} id - Chapter identifier
  * @return {Promise<TrainingChapterView[]>} - Chapters
  */
@@ -259,7 +259,7 @@ const nextBlockPosition = async (chapterId: string): Promise<number> => {
 }
 
 /**
- * Load a chapter for its training identifier, or fail
+ * Load a chapter for its training identifier
  * @param {string} chapterId - Chapter identifier
  * @return {Promise<string>} - Training identifier
  */
@@ -319,7 +319,7 @@ export const updateBlock = async (
 }
 
 /**
- * Drop a block, its questions with it
+ * Drop a block
  * @param {string} id - Block identifier
  * @return {Promise<TrainingChapterView[]>} - Chapters
  */
@@ -369,7 +369,7 @@ const nextQuestionPosition = async (blockId: string): Promise<number> => {
 }
 
 /**
- * Load a question's block for its chapter, then its training identifier
+ * Load a question's block for its chapter
  * @param {string} blockId - Block identifier
  * @return {Promise<string>} - Training identifier
  */
@@ -442,7 +442,7 @@ export const updateQuestion = async (
 }
 
 /**
- * Drop a question, past answers kept for the record
+ * Drop a question
  * @param {string} id - Question identifier
  * @return {Promise<TrainingChapterView[]>} - Chapters
  */
@@ -492,7 +492,7 @@ const nextChoicePosition = async (questionId: string): Promise<number> => {
 }
 
 /**
- * Load a choice's question, then its training identifier
+ * Load a choice's question
  * @param {string} questionId - Question identifier
  * @return {Promise<string>} - Training identifier
  */
@@ -624,7 +624,7 @@ const assertTrainingOpenToJunior = async (trainingId: string, accountId: string)
  * Refuse access to a quiz block outside a junior's own function and dispositif
  * @param {string} blockId - Block identifier
  * @param {string} accountId - Signed-in member identifier
- * @return {Promise<void>} - Throws when the block, the FSI or the scope does not check out
+ * @return {Promise<void>} - Throws when the block
  */
 
 export const assertQuizOpenToJunior = async (blockId: string, accountId: string): Promise<void> => {
@@ -638,7 +638,7 @@ export const assertQuizOpenToJunior = async (blockId: string, accountId: string)
 }
 
 /**
- * Read a training's content the way a junior sees it, quiz internals left out
+ * Read a training's content the way a junior sees it
  * @param {string} trainingId - Training identifier
  * @param {string} accountId - Signed-in member identifier
  * @return {Promise<ContentChapterView[]>} - Chapters in display order
@@ -677,7 +677,7 @@ export const readTrainingContentForJunior = async (
 }
 
 /**
- * Build the quiz form declarations of one block, one category per question
+ * Build the quiz form declarations of one block
  * @param {string} blockId - Block identifier
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
@@ -700,9 +700,9 @@ export const quizFields = async (blockId: string): Promise<FieldDefinition[]> =>
 }
 
 /**
- * Read the choice identifiers submitted for one question, single or multiple
+ * Read the choice identifiers submitted for one question
  * @param {FormValues} values - Parsed body
- * @param {string} questionId - Question identifier, also the field name
+ * @param {string} questionId - Question identifier
  * @return {string[]} - Submitted choice identifiers
  */
 
@@ -717,7 +717,7 @@ const readChoiceIds = (values: FormValues, questionId: string): string[] => {
  * Score and store a junior's own answers to one quiz block
  * @param {string} blockId - Block identifier
  * @param {string} accountId - Signed-in member identifier
- * @param {FormValues} values - Parsed body, one submitted choice set per question
+ * @param {FormValues} values - Parsed body
  * @return {Promise<{ correct: number, total: number }>} - Score
  */
 

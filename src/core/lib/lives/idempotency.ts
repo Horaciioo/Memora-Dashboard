@@ -3,7 +3,7 @@ import 'server-only'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { runtime } from '@/managers/infrastructure/Core/runtime'
 
-// Survives dev hot reloads, keys and their expiry
+// Survives dev hot reloads
 const globalForKeys = globalThis as unknown as { liveActKeys?: Map<string, number> }
 
 const keys = (globalForKeys.liveActKeys ??= new Map())

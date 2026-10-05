@@ -281,7 +281,7 @@ export const listMeetings = async (scope: AccessScope): Promise<MeetingSummary[]
 const toAttendees = (values: FormValues) => {
   const seen = new Set<string>()
 
-  // A member holds one seat only, the strongest kind wins
+  // A member holds one seat only
   return (
     [
       [AttendeeKinds.Lead, readList(values, 'leadIds')],
@@ -296,7 +296,7 @@ const toAttendees = (values: FormValues) => {
 }
 
 /**
- * Read the audience, never trusting an undeclared one
+ * Read the audience
  * @param {FormValues} values - Parsed body
  * @return {MeetingAudienceName} - Audience
  */
@@ -384,7 +384,7 @@ export const updateMeeting = async (
 
   const scheduledAt = readDate(values, 'scheduledAt')
 
-  // Attendees are replaced wholesale, the form always sends the full lists
+  // Attendees are replaced wholesale
   const row = await prisma.meeting.update({
     where: { id },
     data: {
@@ -550,7 +550,7 @@ export const removeTopic = async (id: string): Promise<void> => {
 }
 
 /**
- * Stamp a meeting as edited, its topics being part of its own content
+ * Stamp a meeting as edited
  * @param {string} id - Meeting identifier
  * @param {string} actorId - Who edited it
  * @return {Promise<void>} - Stamped

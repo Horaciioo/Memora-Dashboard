@@ -29,7 +29,7 @@ export const storeImage = async (bucket: 'avatars' | 'banners', svg: string): Pr
 }
 
 /**
- * Initials of a name, two letters at most
+ * Initials of a name
  * @param {string} name - Display name
  * @return {string} - Initials
  */
@@ -62,10 +62,10 @@ export const creatorPortrait = (name: string, [from, to]: [string, string]): str
 export const creatorBanner = (name: string, [from, to]: [string, string]): string =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${to}"/><stop offset="1" stop-color="${from}"/></linearGradient></defs><rect width="1200" height="300" fill="url(#g)"/><text x="60" y="190" font-family="Arial, sans-serif" font-size="96" font-weight="800" fill="#ffffff" fill-opacity="0.9">${name}</text></svg>`
 
-// Portrait colours of the members, cycled
+// Portrait colours of the members
 const MEMBER_PALETTES: [string, string][] = [
   ['#f472b6', '#9d174d'],
-  ['#a78bfa', '#4c1d95'],
+  ['#e07fae', '#5e1f42'],
   ['#60a5fa', '#1e3a8a'],
   ['#34d399', '#065f46'],
   ['#fbbf24', '#92400e'],
@@ -77,7 +77,7 @@ const MEMBER_PALETTES: [string, string][] = [
 /**
  * Portrait of one member
  * @param {string} name - Display name
- * @param {number} index - Rank, picks the colours
+ * @param {number} index - Rank
  * @return {string} - SVG source
  */
 

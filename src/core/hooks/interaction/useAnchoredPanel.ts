@@ -42,8 +42,7 @@ export interface AnchoredPanel {
 }
 
 /**
- * Float a panel under its trigger, flipping above on overflow and dismissing on
- * escape, scroll or resize like a native popover
+ * Float a panel under its trigger
  * @param {AnchoredPanelOptions} [options] - Sizing knobs
  * @return {AnchoredPanel} - Panel state and refs
  */
@@ -61,7 +60,7 @@ export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPa
     triggerRef.current?.focus()
   }, [])
 
-  // Anchor under the trigger, re-placing when the panel resizes
+  // Anchor under the trigger
   useLayoutEffect(() => {
     if (!isOpen) return
 
@@ -91,7 +90,7 @@ export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPa
     return () => observer.disconnect()
   }, [isOpen, matchTriggerWidth, minWidth])
 
-  // A scroll outside the panel, or a resize, breaks the anchor
+  // A scroll outside the panel
   useEffect(() => {
     if (!isOpen) return
 
@@ -110,7 +109,7 @@ export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPa
     }
   }, [isOpen])
 
-  // An overlay behind the panel listens for escape too, and must not answer first
+  // An overlay behind the panel listens for escape too
   useEffect(() => {
     if (!isOpen) return
 

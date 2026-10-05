@@ -11,8 +11,7 @@ export interface StoragePanelProps {
 }
 
 /**
- * One row per destination, the declared ones first and anything still held under a
- * retired key after them, so nothing kept in the store stays invisible
+ * One row per destination
  * @param {StorageReport} report - Storage usage resolved server-side
  * @return {JSX.Element}
  */

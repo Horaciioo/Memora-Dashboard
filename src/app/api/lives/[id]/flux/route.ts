@@ -21,10 +21,10 @@ export const GET = createStreamRoute({
       start: (controller) => {
         const send = (chunk: string) => controller.enqueue(encoder.encode(chunk))
 
-        // First bytes at once, so the browser knows the feed is open
+        // First bytes at once
         send(': open\n\n')
 
-        // Each signal names its kind, the browser routes it
+        // Each signal names its kind
         const unsubscribe = subscribeLive(LIVE_TOPICS.live(params.id), (payload) => {
           const { type, ...data } = payload as { type: string }
           send(`event: ${type}\ndata: ${JSON.stringify(data)}\n\n`)
@@ -41,7 +41,7 @@ export const GET = createStreamRoute({
           unsubscribe()
         }
 
-        // Browser gone, listeners dropped
+        // Browser gone
         request.signal.addEventListener('abort', () => {
           release()
           controller.close()

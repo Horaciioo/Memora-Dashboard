@@ -1,7 +1,5 @@
 /**
- * Columns written through the cipher, named once so every reader agrees.
- * A portable export and a future re-key both walk this list rather than
- * rediscovering which columns carry ciphertext
+ * Columns written through the cipher
  * @type {string[]}
  */
 

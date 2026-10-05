@@ -13,7 +13,7 @@ import { LIVE_WORKER_MODES, liveWorkerMode } from '@/declarations/lives/worker'
 import { JOB_REGISTRY } from '@/declarations/system/jobs'
 import Sharding from '@/managers/infrastructure/Core/Sharding'
 
-// Survives dev hot reloads, one container per process
+// Survives dev hot reloads
 const globalForRuntime = globalThis as unknown as { sharding?: Sharding }
 
 let starting: Promise<Sharding> | null = null
@@ -96,8 +96,7 @@ const wireCipher = (container: Sharding): void => {
 }
 
 /**
- * Declare what each queue runs. Handlers are registered before the queues load,
- * so a worker starts with its queue rather than after it
+ * Declare what each queue runs. Handlers are registered before the queues load
  * @param {Sharding} container - Infrastructure container
  * @return {void} - Registered
  */
@@ -119,7 +118,7 @@ const registerJobs = (container: Sharding): void => {
 }
 
 /**
- * Put every recurring job on its cron, once the queues are actually up
+ * Put every recurring job on its cron
  * @param {Sharding} container - Infrastructure container
  * @return {Promise<void>} - Scheduled
  */
@@ -132,14 +131,14 @@ const scheduleJobs = async (container: Sharding): Promise<void> => {
     if (schedule) await container.queues.schedule(name, schedule)
   }
 
-  // A worker now owns the sweep, so the calendar stops paying for it
+  // A worker now owns the sweep
   markRemindersScheduled()
 
   logger.info('[runtime] scheduled jobs are running on their own')
 }
 
 /**
- * Boot the infrastructure once, later calls sharing the same container
+ * Boot the infrastructure once
  * @return {Promise<Sharding>} - Infrastructure container
  */
 
@@ -152,7 +151,7 @@ export const startRuntime = async (): Promise<Sharding> => {
   const container = existing ?? new Sharding()
   globalForRuntime.sharding = container
 
-  // Handlers exist before the queues open, so none of them loads without one
+  // Handlers exist before the queues open
   registerJobs(container)
 
   starting = container

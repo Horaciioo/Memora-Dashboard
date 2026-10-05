@@ -41,7 +41,7 @@ export const NOTE_FIELDS: FieldDefinition[] = [
 type NoteRow = Prisma.AccountNoteGetPayload<{ include: { author: true } }>
 
 /**
- * Map a note row to its display shape, the body coming back in clear
+ * Map a note row to its display shape
  * @param {NoteRow} note - Note row with its author
  * @return {MemberNote} - Display note
  */
@@ -108,7 +108,7 @@ export const removeNote = async (noteId: string): Promise<void> => {
 }
 
 /**
- * Guard a social profile write, a member always owning their own rows
+ * Guard a social profile write
  * @param {string} accountId - Owner identifier
  * @param {string} sessionId - Signed-in member identifier
  * @param {PermissionHelpers} access - Permission helpers
@@ -126,7 +126,7 @@ export const assertSocialAccess = (
 }
 
 /**
- * Declarations of the social profile form, the member owning every row themselves
+ * Declarations of the social profile form
  * @type {FieldDefinition[]}
  */
 
@@ -303,7 +303,7 @@ export const readOverrides = async (accountId: string): Promise<PermissionLayers
 }
 
 /**
- * Replace the overwrites of one member on a single layer, the others staying untouched
+ * Replace the overwrites of one member on a single layer
  * @param {string} accountId - Account identifier
  * @param {PermissionOverwrite[]} overwrites - Wanted overwrites
  * @param {string | null} youtuberId - Creator the layer belongs to

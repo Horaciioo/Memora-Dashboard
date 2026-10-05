@@ -48,8 +48,7 @@ export const readScope = async (
 ): Promise<AccessScope> => {
   const active = await readActiveCreator()
 
-  // An administrator always stays global, so no picker ever blocks a write they may make.
-  // Their choice only narrows reads, through the active creator scopedWhere reads below
+  // An administrator always stays global
   if (access.isAdmin) return { isGlobal: true, youtuberIds: [], activeYoutuberId: active }
 
   if (!access.isResponsable) {
@@ -63,7 +62,7 @@ export const readScope = async (
 
   const perimeter = [...new Set([...viewer.youtuberIds, ...ledTeams, ...anchored])]
 
-  // Holding several creators, a responsable works on one at a time
+  // Holding several creators
   const narrowed = active !== null && perimeter.includes(active)
 
   return {
@@ -110,7 +109,7 @@ export const scopedWhere = <T extends object>(
   const base = where ?? ({} as T)
   const kind = SCOPE_TARGETS[target]
 
-  // A global perimeter reads everything, unless a creator was picked to look at
+  // A global perimeter reads everything
   if (scope.isGlobal) {
     if (scope.activeYoutuberId === null) return base
 
@@ -149,7 +148,7 @@ export const assertInScope = (scope: AccessScope, youtuberId: string | null): vo
 }
 
 /**
- * Where each directly scoped model keeps its creator, so no service writes its own lookup
+ * Where each directly scoped model keeps its creator
  * @type {Record<string, (id: string) => Promise<{ youtuberId: string | null } | null>>}
  */
 
@@ -174,7 +173,7 @@ const SCOPE_LOOKUPS = {
 export type LookupTarget = keyof typeof SCOPE_LOOKUPS
 
 /**
- * Guard a row addressed by identifier, the read filter never covering a write
+ * Guard a row addressed by identifier
  * @param {LookupTarget} target - Scopable model
  * @param {string} id - Row identifier
  * @param {AccessScope} scope - Perimeter
@@ -193,7 +192,7 @@ export const assertRowInScope = async (
 }
 
 /**
- * Guard a whole selection, every row of it passing the single-row guard
+ * Guard a whole selection
  * @param {LookupTarget} target - Scopable model
  * @param {string[]} ids - Row identifiers
  * @param {AccessScope} scope - Perimeter

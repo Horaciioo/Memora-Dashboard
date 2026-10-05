@@ -118,7 +118,7 @@ const hasReview = (
  * Lives a junior needs before the check-in of their stage
  * @param {AcademyStageName} stage - Stage
  * @param {ParkourThresholds} thresholds - Lives thresholds
- * @return {number | null} - Lives needed, none when not lives-driven
+ * @return {number | null} - Lives needed
  */
 
 export const livesBeforeReview = (
@@ -136,7 +136,7 @@ export const livesBeforeReview = (
 }
 
 /**
- * Stage the lives counted push a junior to, the check-in falling due
+ * Stage the lives counted push a junior to
  * @param {AcademyStageName} stage - Current stage
  * @param {number} liveCount - Lives counted
  * @param {ParkourThresholds} thresholds - Lives thresholds
@@ -158,7 +158,7 @@ export const stageForLives = (
 }
 
 /**
- * Resolve where a junior stands, derived and never stored
+ * Resolve where a junior stands
  * @param {ParkourJunior} junior - Junior
  * @param {ParkourSession} session - Promotion
  * @param {Date} [now] - Moment to resolve against
@@ -206,7 +206,7 @@ export const resolvePhase = (
     return 'reviewTwoDue'
   }
 
-  // Third period, its deadline bringing the final check-in
+  // Third period
   if (hasReview(reviews, AcademyStages.Bonus, ReviewStatuses.Submitted)) {
     return 'finalReviewSubmitted'
   }
@@ -252,7 +252,7 @@ export const reviewStageOf = (stage: AcademyStageName): AcademyStageName | null 
 /**
  * Advices a trainer may give at a check-in
  * @param {AcademyStageName} stage - Check-in stage
- * @return {ReviewAdviceName[]} - Advices, none for the first check-in
+ * @return {ReviewAdviceName[]} - Advices
  */
 
 export const advicesFor = (stage: AcademyStageName): ReviewAdviceName[] => {
@@ -365,7 +365,7 @@ export interface DepartureInput {
  * @param {string} template - Template with its placeholders
  * @param {Record<DepartureKindName, string>} verbs - Verb per departure kind
  * @param {DepartureInput} input - Pieces
- * @return {string} - Announcement, ready to paste
+ * @return {string} - Announcement
  */
 
 export const fillDeparture = (
@@ -384,7 +384,7 @@ export const fillDeparture = (
 /**
  * Departure kind of an ending junior status
  * @param {AcademyJuniorStatusName} status - Junior status
- * @return {DepartureKindName | null} - Kind, none for a graduate
+ * @return {DepartureKindName | null} - Kind
  */
 
 export const departureOf = (status: AcademyJuniorStatusName): DepartureKindName | null => {

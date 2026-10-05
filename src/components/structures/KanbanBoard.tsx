@@ -16,7 +16,7 @@ import { cn } from '@/utils/classnames'
  * @property {string} id - Column identifier
  * @property {string} label - Column label
  * @property {string | null} accent - Colour token
- * @property {WorkflowPhaseName} [phase] - Lifecycle bucket, set on workflow boards
+ * @property {WorkflowPhaseName} [phase] - Lifecycle bucket
  */
 
 export interface BoardColumn {
@@ -56,7 +56,7 @@ export interface KanbanBoardProps<T extends BoardItem> {
 /**
  * Column board whose cards move between columns by dragging
  * @param {BoardColumn[]} columns - Columns in display order
- * @param {T[]} items - Cards, grouped by their columnId
+ * @param {T[]} items - Cards
  * @param {(item: T) => ReactNode} renderCard - Card renderer
  * @param {(itemId: string, columnId: string, index: number) => void} onMove - Drop handler
  * @param {(item: T) => void} [onOpen] - Called on click and on Enter
@@ -92,7 +92,7 @@ export const KanbanBoard = <T extends BoardItem>({
       {columns.map((column) => {
         const cards = items.filter((item) => item.columnId === column.id)
 
-        // Both surfaces read the same --accent, the card sitting a shade stronger
+        // Both surfaces read the same --accent
         const accentStyle = tintByColumn ? accentVars(column.accent) : undefined
 
         return (

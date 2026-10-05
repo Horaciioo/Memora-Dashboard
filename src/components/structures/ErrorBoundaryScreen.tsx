@@ -16,7 +16,7 @@ export interface ErrorBoundaryScreenProps {
 }
 
 /**
- * Shared fallback of every error boundary, reporting once and offering the way back
+ * Shared fallback of every error boundary
  * @param {Error & { digest?: string }} error - Caught exception
  * @param {() => void} retry - Re-renders the failed segment
  * @param {string} [title] - Headline override

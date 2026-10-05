@@ -21,7 +21,7 @@ export interface CreatorChannelsPanelProps {
 }
 
 /**
- * Platform channels of a creator, edited in place
+ * Platform channels of a creator
  * @param {string} youtuberId - Creator
  * @param {CreatorChannelView | null} initialTwitch - Twitch channel
  * @param {boolean} canManage - Viewer may edit

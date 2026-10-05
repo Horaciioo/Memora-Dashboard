@@ -4,8 +4,8 @@
  */
 
 export const SANCTION_COPY = {
-  title: 'Livecon & sanctions',
-  lead: 'Le livecon en vigueur choisit le barème. Chaque panel a ses propres règles, l’Administration change le livecon selon les besoins.',
+  title: 'Panel de sanctions',
+  lead: "Le livecon en vigueur influe sur le panel. Les sanctions affichées sont celles qui s’appliquent à ce livecon. Attention, le panel de sanctions n'est qu'une référence, il ne remplace pas ton jugement humain.",
   panelTitle: 'Panel {panel}',
   search: 'Chercher une infraction',
   opening: 'Ouverture de la fiche…',
@@ -42,7 +42,7 @@ export const SANCTION_COPY = {
   open: 'Ouvrir',
   rename: 'Renommer',
   remove: 'Supprimer',
-  removeTitle: 'Supprimer cette infraction ?',
+  removeTitle: 'Souhaites-tu supprimer cette infraction ?',
   removeDescription: 'La fiche disparaît de ce panel, avec ses barèmes à chaque livecon.',
   ladderEmpty: 'Définir le barème',
   changeGravity: 'Changer la gravité',

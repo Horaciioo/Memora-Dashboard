@@ -17,7 +17,7 @@ const POSITION_STEP = 1000
 try {
   process.loadEnvFile()
 } catch {
-  // No .env file, variables come from the environment
+  // No .env file
 }
 
 const discordId = process.env.ADMIN_DISCORD_ID?.trim() ?? ''
@@ -27,13 +27,13 @@ const MISSING_IDENTIFIER = 'ADMIN_DISCORD_ID is required to seed the root accoun
 const MISSING_NAME = 'ADMIN_DISPLAY_NAME is required to seed the root account'
 
 /**
- * Write the collections fixed in code, never deleting a row
+ * Write the collections fixed in code
  * @param {PrismaClient} prisma - Database client
  * @return {Promise<void>} - Synced
  */
 
 const syncFixedReferences = async (prisma: PrismaClient): Promise<void> => {
-  // Divisions, keyed on name
+  // Divisions
   for (const division of FIXED_DIVISIONS) {
     await prisma.division.upsert({
       where: { name: division.name },
@@ -47,7 +47,7 @@ const syncFixedReferences = async (prisma: PrismaClient): Promise<void> => {
     })
   }
 
-  // Functions, keyed on name
+  // Functions
   for (const jobFunction of FIXED_FUNCTIONS) {
     const { name, ...rest } = jobFunction
 
@@ -58,7 +58,7 @@ const syncFixedReferences = async (prisma: PrismaClient): Promise<void> => {
     })
   }
 
-  // Priorities, keyed on name
+  // Priorities
   for (const priority of FIXED_PRIORITIES) {
     await prisma.priority.upsert({
       where: { name: priority.name },
@@ -67,7 +67,7 @@ const syncFixedReferences = async (prisma: PrismaClient): Promise<void> => {
     })
   }
 
-  // Livecon, keyed on level
+  // Livecon
   for (const level of FIXED_LIVECON_LEVELS) {
     await prisma.liveconLevel.upsert({
       where: { level: level.level },
@@ -82,7 +82,7 @@ const syncFixedReferences = async (prisma: PrismaClient): Promise<void> => {
     })
   }
 
-  // Outcomes, keyed on name
+  // Outcomes
   for (const [index, outcome] of FIXED_RECRUITMENT_OUTCOMES.entries()) {
     await prisma.recruitmentOutcome.upsert({
       where: { name: outcome.name },
@@ -91,7 +91,7 @@ const syncFixedReferences = async (prisma: PrismaClient): Promise<void> => {
     })
   }
 
-  // Global trame, keyed on title
+  // Global trame
   for (const [index, step] of FIXED_RECRUITMENT_STEPS.entries()) {
     const data = {
       ...step,
@@ -119,7 +119,7 @@ const seed = async (): Promise<void> => {
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
   const prisma = new PrismaClient({ adapter })
 
-  // The name is refreshed on every seed, the identifier stays the key
+  // The name is refreshed on every seed
   await prisma.account.upsert({
     where: { discordId },
     update: {

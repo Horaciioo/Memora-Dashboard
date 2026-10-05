@@ -4,7 +4,7 @@ import type { FieldDefinition, FormValues } from '@/types/forms'
  * Lock restricted fields
  * @param {FieldDefinition[]} fields - Form declarations
  * @param {boolean} isAdmin - Viewer sits at admin level
- * @return {FieldDefinition[]} - Declarations, restricted ones read-only
+ * @return {FieldDefinition[]} - Declarations
  */
 
 export const applyRestrictions = (

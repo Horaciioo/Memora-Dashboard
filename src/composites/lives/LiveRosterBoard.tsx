@@ -15,7 +15,7 @@ import { cn } from '@/utils/classnames'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
 
-// Column order, answered first
+// Column order
 const COLUMNS: AttendanceStatusName[] = [
   AttendanceStatuses.Present,
   AttendanceStatuses.Pending,
@@ -27,7 +27,7 @@ export interface LiveRosterBoardProps {
 }
 
 /**
- * Roll-call of one live, names dragged between columns by those who run it
+ * Roll-call of one live
  * @param {string} liveId - Live identifier
  * @return {JSX.Element}
  */
@@ -100,7 +100,7 @@ interface RosterPersonProps {
 }
 
 /**
- * One name on the roll-call, its right click moving it without a drag
+ * One name on the roll-call
  * @param {LiveRosterPerson} person - Member
  * @param {boolean} canManage - Viewer runs the roll-call
  * @param {boolean} isDragged - Currently held

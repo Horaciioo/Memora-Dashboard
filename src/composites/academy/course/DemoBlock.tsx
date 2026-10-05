@@ -16,7 +16,7 @@ import { cn } from '@/utils/classnames'
 
 type DemoData = Extract<ReadBlock, { kind: 'demo' }>
 
-// Gestures the moderator toolbar offers, with their glyphs
+// Gestures the moderator toolbar offers
 const GESTURES: { act: 'delete' | 'warn' | 'timeout' | 'ban'; icon: IconName }[] = [
   { act: 'delete', icon: 'remove' },
   { act: 'warn', icon: 'warning' },
@@ -27,7 +27,7 @@ const GESTURES: { act: 'delete' | 'warn' | 'timeout' | 'ban'; icon: IconName }[]
 /**
  * Tag a gesture leaves next to the viewer's name
  * @param {DemoStep} step - Step that played
- * @return {ReactNode} - Tag, nothing for a deletion
+ * @return {ReactNode} - Tag
  */
 
 const tagOf = (step: DemoStep): ReactNode => {

@@ -11,7 +11,7 @@ export const SCOPE_TARGETS = {
   calendarEvent: 'direct',
   liveconEntry: 'direct',
   live: 'required',
-  // Never without a creator, so no unassigned branch
+  // Never without a creator
   sanctionOffense: 'required',
   recruitmentSession: 'required',
   account: 'relation',

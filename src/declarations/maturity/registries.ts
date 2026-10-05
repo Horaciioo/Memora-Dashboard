@@ -15,7 +15,7 @@ interface MaturityOption {
   tone: Tone
 }
 
-// Declared from least to most mature, then the two lifecycle markers
+// Declared from least to most mature
 const MATURITY_MAP = {
   dev: {
     label: 'Dev',

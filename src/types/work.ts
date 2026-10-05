@@ -36,7 +36,7 @@ export interface WorkPerson {
 }
 
 /**
- * Who touched a record and when, carried by every work item
+ * Who touched a record and when
  * @typedef {Object} WorkAuthorship
  * @property {WorkPerson | null} createdBy - Who opened it
  * @property {string} createdAt - ISO creation
@@ -217,7 +217,7 @@ export interface MeetingTopicEntry {
  * Full meeting file
  * @typedef {Object} MeetingDetail
  * @property {MeetingSummary} summary - Board level fields
- * @property {MeetingTopicEntry[]} topics - Points covered, in reading order
+ * @property {MeetingTopicEntry[]} topics - Points covered
  */
 
 export interface MeetingDetail {

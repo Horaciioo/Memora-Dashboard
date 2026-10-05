@@ -80,7 +80,7 @@ export interface ChangelogBoardProps {
 }
 
 /**
- * Current release note, opened by its hero, then its categories, the older notes closing it
+ * Current release note
  * @param {string} [version] - Asked version
  * @return {JSX.Element}
  */

@@ -58,8 +58,7 @@ export const requirePermission = async (
 }
 
 /**
- * Require a membership status on a server component, a rail entry hidden by
- * visibleWhen still being reachable by direct URL without it
+ * Require a membership status on a server component
  * @param {MemberStatusName | MemberStatusName[]} status - Statuses the page is meant for
  * @return {Promise<GuardedSession>} - Session and helpers
  */

@@ -32,14 +32,14 @@ export interface MembersPanelProps {
   divisions: FieldOption[]
   youtubers: FieldOption[]
   functions: FieldOption[]
-  // Creator the page is narrowed to, its members then grouped by role
+  // Creator the page is narrowed to
   creatorId: string | null
   canCreate: boolean
   canDelete: boolean
   canReadNotes: boolean
 }
 
-// One box of the list, a creator or, narrowed to one, a role
+// One box of the list
 interface MemberGroup {
   key: string
   label: string
@@ -50,7 +50,7 @@ interface MemberGroup {
 }
 
 /**
- * Moderator boxes, categorised by YouTuber, or by role once narrowed to one creator
+ * Moderator boxes
  * @param {MemberSummary[]} initialMembers - Rows resolved server-side
  * @param {FieldDefinition[]} fields - Field declarations of the moderator form
  * @param {FieldOption[]} divisions - Division filter options
@@ -130,10 +130,9 @@ export const MembersPanel = ({
     })
   }, [members, search, filters])
 
-  // One bucket per YouTuber, in their configured order, a member with several YouTubers
-  // appears in each, moderators left unassigned trailing behind
+  // One bucket per YouTuber
   const groups = useMemo((): MemberGroup[] => {
-    // Narrowed to one creator, the boxes follow the hierarchy instead
+    // Narrowed to one creator
     if (creatorId) {
       return toOptions(ROLE_REGISTRY)
         .map((option) => ({
@@ -158,7 +157,7 @@ export const MembersPanel = ({
       }
     }
 
-    // Unfiltered, every configured YouTuber keeps its box even with no moderator yet
+    // Unfiltered
     const ordered = (
       isFiltered ? youtubers.filter((option) => buckets.has(option.value)) : youtubers
     ).map((option) => ({

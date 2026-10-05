@@ -115,7 +115,7 @@ export const updateProfile = async (
   accountId: string,
   values: FormValues
 ): Promise<ProfileDetail> => {
-  // Only the declared fields are written, the rest of the file stays with the responsables
+  // Only the declared fields are written
   await prisma.account.update({
     where: { id: accountId },
     data: await withoutSealedWrites({

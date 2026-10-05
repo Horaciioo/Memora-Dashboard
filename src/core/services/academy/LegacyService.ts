@@ -93,7 +93,7 @@ const toDetail = (row: TrackRow): LegacyTrackDetail => {
 /**
  * Read the function a track holder wears while it runs
  * @param {string | null} trade - Trade the future Responsable leads
- * @return {Promise<string | null>} - Function identifier, none for an unknown trade
+ * @return {Promise<string | null>} - Function identifier
  */
 
 const legacyFunctionId = async (trade: string | null): Promise<string | null> => {
@@ -170,7 +170,7 @@ export const legacyFields = async (): Promise<FieldDefinition[]> => {
 }
 
 /**
- * Read every track, the running ones first
+ * Read every track
  * @return {Promise<LegacyTrackSummary[]>} - Tracks
  */
 
@@ -197,9 +197,9 @@ export const readTrack = async (id: string): Promise<LegacyTrackDetail> => {
 }
 
 /**
- * Read the track of a member, the running one before any older one
+ * Read the track of a member
  * @param {string} accountId - Member
- * @return {Promise<LegacyTrackDetail | null>} - Track, none when they never had one
+ * @return {Promise<LegacyTrackDetail | null>} - Track
  */
 
 export const readOwnTrack = async (accountId: string): Promise<LegacyTrackDetail | null> => {
@@ -313,7 +313,7 @@ export const openTrack = async (
 }
 
 /**
- * Give the evaluator's note of one module, the total and the verdict following from it
+ * Give the evaluator's note of one module
  * @param {string} trackId - Track identifier
  * @param {string} moduleKey - Module key
  * @param {number} score - Note out of the module maximum
@@ -383,7 +383,7 @@ export const gradeModule = async (
 }
 
 /**
- * Read one track row, refusing a missing one
+ * Read one track row
  * @param {string} id - Track identifier
  * @return {Promise<TrackRow>} - Row
  */
@@ -398,7 +398,7 @@ const readTrackRow = async (id: string): Promise<TrackRow> => {
 /**
  * Decide a running track. A success needs both thresholds and makes the member a Responsable
  * @param {string} trackId - Track identifier
- * @param {LegacyStatusName} decision - Passed, failed or cancelled
+ * @param {LegacyStatusName} decision - Passed
  * @param {string} actorId - Administrator who decides
  * @return {Promise<LegacyTrackDetail>} - Track
  */
@@ -424,7 +424,7 @@ export const decideTrack = async (
       where: { id: trackId },
       data: { status: decision, decidedById: actorId, decidedAt: new Date() },
     }),
-    // Whatever the verdict, the track no longer runs
+    // Whatever the verdict
     ...(juniorId
       ? [
           prisma.accountFunction.deleteMany({
@@ -463,7 +463,7 @@ export const decideTrack = async (
 }
 
 /**
- * Read one module the member may play, with what they already saved on it
+ * Read one module the member may play
  * @param {string} trackId - Track identifier
  * @param {string} moduleKey - Module key
  * @param {SessionUser} viewer - Signed-in member
@@ -489,13 +489,13 @@ export const readModule = async (
   return {
     course,
     progress: readProgress(track.results.find((entry) => entry.moduleKey === moduleKey)?.progress),
-    // Only the member plays, and only while their track runs
+    // Only the member plays
     playable: isOwner && track.status === LegacyStatuses.Running,
   }
 }
 
 /**
- * Score one exercise of a module on the server and save it, the module total following
+ * Score one exercise of a module on the server and save it
  * @param {string} trackId - Track identifier
  * @param {string} moduleKey - Module key
  * @param {SessionUser} viewer - Member answering
@@ -521,7 +521,7 @@ export const submitModuleExercise = async (
   const next: CourseProgress = {
     blocks: {
       ...progress.blocks,
-      // A cleared exercise stays cleared, a later miss never undoes it
+      // A cleared exercise stays cleared
       [blockKey]: {
         passed: result.passed || progress.blocks[blockKey]?.passed === true,
         score: result.score,

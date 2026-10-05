@@ -77,7 +77,7 @@ const GLOSSARY_MAP = {
 } satisfies Record<string, GlossaryEntry>
 
 /**
- * Academy lexicon, the words the domain is written in
+ * Academy lexicon
  * @type {Registry<string, GlossaryEntry>}
  */
 

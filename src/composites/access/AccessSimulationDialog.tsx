@@ -13,9 +13,8 @@ export interface AccessSimulationDialogProps {
 }
 
 /**
- * Simulation overlay — what a role or function actually opens once the floor, the overwrites
- * and the refusals have all been folded in, the way the member themselves would see it
- * @param {AccessSimulation | null} simulation - Resolved access, null keeping the overlay shut
+ * Simulation overlay — what a role or function actually opens once the floor
+ * @param {AccessSimulation | null} simulation - Resolved access
  * @param {() => void} onClose - Close handler
  * @return {JSX.Element}
  */
@@ -23,7 +22,7 @@ export interface AccessSimulationDialogProps {
 export const AccessSimulationDialog = ({ simulation, onClose }: AccessSimulationDialogProps) => {
   const held = new Set(simulation?.permissions ?? [])
 
-  // Only the pages the holder actually reaches, each with the permissions it opens
+  // Only the pages the holder actually reaches
   const sections = PERMISSION_SECTIONS.map((section) => ({
     ...section,
     permissions: section.permissions.filter((entry) => held.has(entry.name)),

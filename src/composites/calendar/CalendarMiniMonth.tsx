@@ -7,14 +7,14 @@ import type { CalendarUnit } from '@/utils/format/calendar'
 
 export interface CalendarMiniMonthProps {
   cursor: string
-  // Span on screen, its days tinted
+  // Span on screen
   unit: CalendarUnit
   onPick: (dayKey: string) => void
   onCursor: (dayKey: string) => void
 }
 
 /**
- * The month of the cursor in miniature, a day jumping the grid onto it
+ * The month of the cursor in miniature
  * @param {string} cursor - ISO day the grid is anchored on
  * @param {CalendarUnit} unit - Span on screen
  * @param {(dayKey: string) => void} onPick - Called with the chosen day
@@ -23,7 +23,7 @@ export interface CalendarMiniMonthProps {
  */
 
 export const CalendarMiniMonth = ({ cursor, unit, onPick, onCursor }: CalendarMiniMonthProps) => {
-  // A month fills the whole panel, so only the shorter spans are tinted
+  // A month fills the whole panel
   const inRange = new Set(unit === 'month' ? [] : unitGrid(cursor, unit).map((day) => day.key))
 
   return (

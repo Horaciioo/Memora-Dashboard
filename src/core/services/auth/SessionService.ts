@@ -43,7 +43,7 @@ const createToken = (): string => crypto.randomBytes(32).toString('base64url')
 export const ensureRootAccount = async (discordId: string): Promise<Account> =>
   prisma.account.upsert({
     where: { discordId },
-    // The stored name is never overwritten, the database owns it once seeded
+    // The stored name is never overwritten
     update: { role: MemberRoles.Admin, status: MemberStatuses.Active, leftAt: null },
     create: {
       discordId,
@@ -67,7 +67,7 @@ export const resolveSignInAccount = async (discordId: string): Promise<Account |
 }
 
 /**
- * Resolve the account behind a Discord identity, refreshing what Discord owns
+ * Resolve the account behind a Discord identity
  * @param {DiscordIdentity} identity - Identity read from Discord
  * @return {Promise<Account | null>} - Account or null
  */
@@ -76,7 +76,7 @@ export const resolveDiscordAccount = async (identity: DiscordIdentity): Promise<
   const existing = await resolveSignInAccount(identity.id)
   if (!existing) return null
 
-  // Discord owns the handle and the portrait, the dashboard owns the display name
+  // Discord owns the handle and the portrait
   return prisma.account.update({
     where: { id: existing.id },
     data: {
@@ -150,7 +150,7 @@ export const closeSession = async (token: string): Promise<void> => {
  * List the sessions still open for one member
  * @param {string} accountId - Account identifier
  * @param {string} [currentToken] - Token of the session on screen
- * @return {Promise<AccountSession[]>} - Open sessions, newest first
+ * @return {Promise<AccountSession[]>} - Open sessions
  */
 
 export const readSessions = async (
@@ -195,7 +195,7 @@ export const revokeOtherSessions = async (
   accountId: string,
   currentToken: string
 ): Promise<number> => {
-  // Without a token to spare, "every other one" would mean every single one
+  // Without a token to spare
   if (currentToken.length === 0) throw notFound()
 
   const { count } = await prisma.session.deleteMany({
@@ -206,7 +206,7 @@ export const revokeOtherSessions = async (
 }
 
 /**
- * Stamp a session as used, at most once a day
+ * Stamp a session as used
  * @param {string} token - Session token
  * @return {Promise<void>} - Stamped
  */

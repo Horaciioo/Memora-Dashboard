@@ -13,7 +13,7 @@ export const DISCORD_ENDPOINTS = {
 } as const
 
 /**
- * Scopes asked for, kept to the strict minimum
+ * Scopes asked for
  * @type {string[]}
  */
 
@@ -58,7 +58,7 @@ export interface DiscordCredentials {
 }
 
 /**
- * Read one environment value, empty becoming absent
+ * Read one environment value
  * @param {string | undefined} raw - Environment value
  * @return {string | null} - Trimmed value
  */
@@ -70,7 +70,7 @@ const readSecret = (raw: string | undefined): string | null => {
 }
 
 /**
- * Discord application credentials, never written in a configuration file
+ * Discord application credentials
  * @type {DiscordCredentials}
  */
 
@@ -107,7 +107,7 @@ export const isDiscordConfigured = (): boolean =>
 export const discordAvatarUrl = (discordId: string, avatarHash: string | null): string | null => {
   if (!avatarHash) return null
 
-  // An animated portrait keeps its extension, a still one is served as PNG
+  // An animated portrait keeps its extension
   const extension = avatarHash.startsWith('a_') ? 'gif' : 'png'
 
   return `${DISCORD_ENDPOINTS.cdn}/avatars/${discordId}/${avatarHash}.${extension}?size=${AUTH_SETTINGS.avatarSize}`

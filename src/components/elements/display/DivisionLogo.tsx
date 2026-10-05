@@ -5,14 +5,14 @@ import { cn } from '@/utils/classnames'
 
 export interface DivisionLogoProps {
   label: string
-  // Path kept in the database, the one in code otherwise
+  // Path kept in the database
   src?: string | null
   className?: string
 }
 
 /**
- * Official logo of a division, nothing for the one that has none
- * @param {string} label - Division name, also the accessible label
+ * Official logo of a division
+ * @param {string} label - Division name
  * @param {string | null} [src] - Stored path
  * @param {string} [className] - Sizing classes
  * @return {JSX.Element | null}

@@ -1,7 +1,7 @@
 import type { Course } from '@/declarations/academy/curriculum/types'
 
 /**
- * Anti-raid course, built on the anti-raid modes and mass commands of Marsha
+ * Anti-raid course
  * @type {Course}
  */
 

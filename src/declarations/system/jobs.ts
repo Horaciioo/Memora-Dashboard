@@ -22,9 +22,9 @@ interface JobOption {
  */
 
 const JOB_MAP = {
-  // Retention runs nightly, off the hour so it never lands with a deploy
+  // Retention runs nightly
   maintenance: { label: 'Maintenance', schedule: '17 4 * * *' },
-  // Roll-call reminders are due to the minute, so they are swept often
+  // Roll-call reminders are due to the minute
   reminders: { label: 'Rappels de présence', schedule: '*/5 * * * *' },
 } satisfies Record<string, JobOption>
 

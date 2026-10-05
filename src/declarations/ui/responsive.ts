@@ -1,7 +1,7 @@
 import { RESPONSIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 /**
- * Named breakpoints, in pixels
+ * Named breakpoints
  * @type {Record<'sm' | 'md' | 'lg' | 'xl', number>}
  */
 
@@ -10,7 +10,7 @@ export const BREAKPOINTS = RESPONSIVE_SETTINGS.breakpoints
 export type BreakpointName = keyof typeof BREAKPOINTS
 
 /**
- * matchMedia query per breakpoint, true from that width up
+ * matchMedia query per breakpoint
  * @type {Record<BreakpointName, string>}
  */
 
@@ -29,7 +29,7 @@ export const MEDIA: Record<BreakpointName, string> = {
 export const MOBILE_SHELL_QUERY = `(width < ${BREAKPOINTS[RESPONSIVE_SETTINGS.mobileUntil]}px)`
 
 /**
- * Fixed chrome dimensions of the shell, in pixels
+ * Fixed chrome dimensions of the shell
  * @type {{ topBar: number, bottomNav: number, sidebar: number, banner: number, bannerMobile: number, notch: number, notchSlope: number }}
  */
 

@@ -12,7 +12,7 @@ import {
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
- * Read the section named by the route, or reject
+ * Read the section named by the route
  * @param {Record<string, string>} params - Dynamic segments
  * @param {boolean} [writing] - Refuses a fixed collection
  * @return {string} - Collection key
@@ -47,7 +47,7 @@ export const POST = createProtectedRoute({
     const key = readSection(params, true)
     const resource = referenceResource(key as never)
 
-    // Declarations are resolved per section, so parsing happens here
+    // Declarations are resolved per section
     const fields = await resource.fields()
     const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)

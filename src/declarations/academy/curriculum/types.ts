@@ -1,4 +1,4 @@
-// Read by the seed on plain node, so type declarations only
+// Read by the seed on plain node
 import type { ModViewScene } from '@/core/lib/modview/scene'
 import type { IconName } from '@/declarations/ui/icons'
 import type { ModViewTarget, ModViewWindow } from '@/types/modview'
@@ -13,7 +13,7 @@ import type { DiscordAuthor, DiscordScene, DiscordSceneStep } from '@/types/repl
 export type CourseTrack = 'indispensable' | 'secondary' | 'legacy'
 
 /**
- * Surface a course is about, which decides where it is shown
+ * Surface a course is about
  * @typedef {'general' | 'youtube' | 'twitch' | 'lives' | 'discord'} CourseSurface
  */
 
@@ -43,7 +43,7 @@ export interface ChatLine {
 export type CourseTone = 'neutral' | 'brand' | 'info' | 'success' | 'caution' | 'danger'
 
 /**
- * One card of a key points block, readable at a glance
+ * One card of a key points block
  * @typedef {Object} KeyPoint
  * @property {IconName} glyph - Drawing on the card
  * @property {string} title - Two or three words
@@ -59,7 +59,7 @@ export interface KeyPoint {
 }
 
 /**
- * One stop of a diagram, drawn as a glyph on a coloured disc
+ * One stop of a diagram
  * @typedef {Object} DiagramNode
  * @property {IconName} glyph - Drawing
  * @property {string} label - What it is
@@ -92,7 +92,7 @@ export interface CompareSide {
  * @property {string} caption - What the coach says at this step
  * @property {number} [target] - Index of the line the step is about
  * @property {'delete' | 'warn' | 'timeout' | 'ban' | 'command'} [act] - Gesture played on it
- * @property {string} [detail] - Duration of a timeout, or the command typed
+ * @property {string} [detail] - Duration of a timeout
  * @property {ChatLine} [say] - Line that arrives in the chat at this step
  */
 
@@ -126,7 +126,7 @@ export interface TourStop {
  * @property {ModViewWindow[]} windows - Windows played on the right
  * @property {ModViewTarget} [spotlight] - Part lit in them
  * @property {ModViewScene} scene - Animation played
- * @property {string[]} points - What is said on the left, one line each
+ * @property {string[]} points - What is said on the left
  */
 
 export interface FocusItem {
@@ -139,7 +139,7 @@ export interface FocusItem {
 }
 
 /**
- * One rung of the decision ladder, names read from the accounts
+ * One rung of the decision ladder
  * @typedef {Object} HierarchyRung
  * @property {'admins' | 'responsables' | 'coordinator'} source - Who stands there
  * @property {string} label - Rung name
@@ -196,7 +196,7 @@ export interface GuideStep {
  * @property {string} key - Stable key
  * @property {DiscordScene} scene - Run played
  * @property {boolean} correct - The run to pick
- * @property {string} feedback - Why, once picked
+ * @property {string} feedback - Why
  */
 
 export interface ReplicaRun {
@@ -210,7 +210,7 @@ export interface ReplicaRun {
  * One node of a choice game
  * @typedef {Object} BranchNode
  * @property {string} key - Stable key
- * @property {DiscordSceneStep[]} steps - Beats played on reaching it, timed from zero
+ * @property {DiscordSceneStep[]} steps - Beats played on reaching it
  * @property {string} [prompt] - Question asked once played
  * @property {{ key: string, label: string, next: string }[]} [options] - Choices and where they lead
  * @property {{ good: boolean, title: string, body: string }} [ending] - Verdict of a leaf
@@ -272,7 +272,7 @@ export type ReadBlock =
  * @property {string} key - Stable key
  * @property {string} prompt - Question
  * @property {{ key: string, label: string, correct: boolean }[]} choices - Offered answers
- * @property {string} explanation - Why, shown once answered
+ * @property {string} explanation - Why
  */
 
 export interface QuizQuestionSeed {
@@ -308,7 +308,7 @@ export type CaseQuestionSeed =
   | { type: 'open'; key: string; prompt: string; expert: string }
 
 /**
- * Exercise blocks, each scored
+ * Exercise blocks
  * @typedef {Object} ExerciseBlock
  */
 
@@ -318,7 +318,7 @@ export type ExerciseBlock =
       kind: 'fill'
       key: string
       title: string
-      // Holes written [[answer|variant]], every variant accepted
+      // Holes written [[answer|variant]]
       text: string
       bank?: string[]
       explanation: string
@@ -337,7 +337,7 @@ export type ExerciseBlock =
       key: string
       title: string
       prompt: string
-      // Written in the right order, shuffled on screen
+      // Written in the right order
       items: { key: string; label: string }[]
       explanation: string
     }
@@ -361,7 +361,7 @@ export type ExerciseBlock =
       key: string
       title: string
       prompt: string
-      // Accepted answers, compared without case nor extra spaces
+      // Accepted answers
       accepted: string[]
       hint: string
       explanation: string
@@ -384,7 +384,7 @@ export type ExerciseBlock =
       // Button the runs wait for
       startLabel?: string
       guide?: GuideStep[]
-      // Played in order, then labelled Cas 1, Cas 2...
+      // Played in order
       runs: ReplicaRun[]
       question: string
     }
@@ -396,7 +396,7 @@ export type ExerciseBlock =
       // Button the game waits for
       startLabel?: string
       guide?: GuideStep[]
-      // Decor and first beats, before the first node
+      // Decor and first beats
       opening: DiscordScene
       root: string
       nodes: BranchNode[]
@@ -414,7 +414,7 @@ export type CourseBlock = ReadBlock | ExerciseBlock
  * @typedef {Object} CourseChapter
  * @property {string} key - Stable key
  * @property {string} title - Heading
- * @property {CourseBlock[]} blocks - Content, top to bottom
+ * @property {CourseBlock[]} blocks - Content
  */
 
 export interface CourseChapter {
@@ -426,14 +426,14 @@ export interface CourseChapter {
 /**
  * One interactive course
  * @typedef {Object} Course
- * @property {string} key - Stable key, stored on the training row
- * @property {string} name - Title, unique
- * @property {string} summary - What it teaches, one line
+ * @property {string} key - Stable key
+ * @property {string} name - Title
+ * @property {string} summary - What it teaches
  * @property {CourseTrack} track - Indispensable or secondary
  * @property {CourseSurface} surface - What it is about
- * @property {string[]} functions - Trades it is for, empty for every one
+ * @property {string[]} functions - Trades it is for
  * @property {number} minutes - Expected length
- * @property {CourseChapter[]} chapters - Chapters, in order
+ * @property {CourseChapter[]} chapters - Chapters
  */
 
 export interface Course {
@@ -449,7 +449,7 @@ export interface Course {
 }
 
 /**
- * Opening page of a course, its chapter list generated
+ * Opening page of a course
  * @typedef {Object} CourseIntro
  * @property {string} objective - What the learner will know
  * @property {string} outline - Said under the chapter list

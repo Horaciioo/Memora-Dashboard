@@ -18,7 +18,7 @@ export interface MemberCardProps {
 }
 
 /**
- * Moderator box, name only
+ * Moderator box
  * @param {MemberSummary} member - Row to show
  * @param {boolean} showNotesBubble - Reveal the notes indicator
  * @param {boolean} canDelete - Member may drop this moderator

@@ -27,14 +27,14 @@ export interface LoginState {
 }
 
 /**
- * Sign in with a Discord identifier, only while Discord itself is unavailable
- * @param {LoginState} _previousState - Previous form state, unused
+ * Sign in with a Discord identifier
+ * @param {LoginState} _previousState - Previous form state
  * @param {FormData} formData - Submitted identifier
  * @return {Promise<LoginState>} - Failure message or a redirect
  */
 
 export async function login(_previousState: LoginState, formData: FormData): Promise<LoginState> {
-  // The fallback is refused outright once Discord is wired, or on a deployed branch
+  // The fallback is refused outright once Discord is wired
   if (!isIdentifierSignInAllowed()) return { error: AUTH_COPY.identifierDisabled }
 
   const headerStore = await headers()

@@ -1,7 +1,7 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 
 /**
- * Livecon in force, a glyph and its name with no box around them
+ * Livecon in force
  * @type {Record<string, string>}
  */
 
@@ -17,18 +17,18 @@ export const LIVECON_TITLE = {
 } as const
 
 /**
- * Sanction panel, one box per offence
+ * Sanction panel
  * @type {Record<string, string>}
  */
 
 export const SANCTION_PANEL = {
   wrapper: 'mx-auto flex w-full max-w-6xl flex-col gap-14',
   toolbar: 'flex flex-wrap items-center justify-center gap-3',
-  // One gravity, its title above its boxes
+  // One gravity
   group: 'flex flex-col gap-5',
   groupTitle: `${PROPERTY_LABEL} text-[var(--accent)]`,
   grid: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
-  // Raised box, its gravity a rule down the left edge
+  // Raised box
   card: 'group relative flex min-h-16 w-full items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 pl-5 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
   cardRule: 'absolute inset-y-0 left-0 w-1 bg-[var(--accent)]',
   cardName: 'text-sm leading-snug font-black tracking-tight text-balance',
@@ -48,12 +48,12 @@ export const OFFENSE_SHEET = {
   label: PROPERTY_LABEL,
   gravity: `flex items-center gap-2 text-left ${PROPERTY_LABEL}`,
   gravityLabel: 'text-[var(--accent)]',
-  // A label a manager can open is underlined on hover, never iconed
+  // A label a manager can open is underlined on hover
   gravityLabelLive: 'cursor-pointer underline-offset-4 hover:underline',
   ladderLive:
     '-mx-2 -my-1 cursor-pointer rounded-[var(--radius-md)] px-2 py-1 transition-colors hover:bg-[var(--color-surface)]',
   placeholder: 'text-sm text-[var(--color-ink-subtle)] italic',
-  // A chat line, the side rule telling moderate from leave alone
+  // A chat line
   message:
     'border-l-4 bg-[var(--color-surface)] px-3 py-2 font-[family-name:var(--font-mono)] text-xs break-words',
   moderate: 'border-[var(--color-danger)]',
@@ -66,7 +66,7 @@ export const OFFENSE_SHEET = {
   rungBody: 'flex min-w-0 flex-1 flex-col gap-2',
   rungCondition: 'text-sm font-bold',
   measures: 'flex flex-wrap gap-1.5',
-  // Pastel ground, plain ink
+  // Pastel ground
   measure: 'rounded-[var(--radius-sm)] px-2 py-0.5 text-xs font-semibold text-[var(--color-ink)]',
   command:
     'flex items-center justify-between gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] py-1 pr-1 pl-3',
@@ -98,7 +98,7 @@ export const MARSHA_GUIDE = {
   navIcon: 'h-5 w-5 shrink-0 text-[var(--color-ink-subtle)]',
   navIconOn: 'text-[var(--color-brand-700)]',
   navFoot: 'flex flex-col gap-3 border-t border-[var(--color-border)] pt-5',
-  // Middle column, one entry per command or rule
+  // Middle column
   column: 'flex flex-col gap-0.5',
   lead: 'px-4 pb-3 text-sm leading-relaxed text-[var(--color-ink-subtle)]',
   group: `px-4 pt-4 pb-1.5 ${PROPERTY_LABEL}`,

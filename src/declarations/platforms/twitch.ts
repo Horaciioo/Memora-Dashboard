@@ -1,5 +1,5 @@
 /**
- * Twitch endpoints, checked on dev.twitch.tv on 2026-10-03
+ * Twitch endpoints
  * @type {Record<string, string>}
  */
 
@@ -14,7 +14,7 @@ export const TWITCH_ENDPOINTS = {
 } as const
 
 /**
- * Helix paths, relative to the helix base
+ * Helix paths
  * @type {Record<string, string>}
  */
 
@@ -38,7 +38,7 @@ export const HELIX_PATHS = {
 } as const
 
 /**
- * Scopes asked of a moderator, each one serving a gesture or a feed
+ * Scopes asked of a moderator
  * @type {readonly string[]}
  */
 
@@ -81,7 +81,7 @@ export interface TwitchSubscription {
 }
 
 /**
- * Subscriptions of a Mod View, all carried by the watching moderator's token
+ * Subscriptions of a Mod View
  * @type {readonly TwitchSubscription[]}
  */
 
@@ -109,7 +109,7 @@ export const TWITCH_SUBSCRIPTIONS: readonly TwitchSubscription[] = [
 export const TWITCH_LIMITS = {
   // Seconds left to subscribe once the welcome arrived
   subscribeWindowSeconds: 10,
-  // Longest timeout Twitch accepts, two weeks
+  // Longest timeout Twitch accepts
   maxTimeoutSeconds: 1209600,
   // Longest slow mode delay
   maxSlowSeconds: 120,
@@ -141,7 +141,7 @@ const readSecret = (raw: string | undefined): string | null => {
 }
 
 /**
- * Twitch application credentials, never written in a configuration file
+ * Twitch application credentials
  * @type {TwitchCredentials}
  */
 

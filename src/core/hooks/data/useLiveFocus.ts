@@ -26,8 +26,8 @@ export interface LiveFocusState {
 }
 
 /**
- * Drive the Focus of one live, reread on a short beat
- * @param {string | null} liveId - Live, none in a course
+ * Drive the Focus of one live
+ * @param {string | null} liveId - Live
  * @return {LiveFocusState} - State and gestures
  */
 

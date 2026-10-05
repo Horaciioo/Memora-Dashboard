@@ -48,7 +48,7 @@ export interface RecruitmentFileProps {
 }
 
 /**
- * Tabs of one recruitment session — candidates, script, timeline, results and consignes
+ * Tabs of one recruitment session — candidates
  * @param {RecruitmentDetail} detail - File resolved server-side
  * @param {FieldDefinition[]} candidateFields - Declarations of the candidate form
  * @param {FieldDefinition[]} stepFields - Declarations of the timeline form
@@ -302,7 +302,7 @@ export const RecruitmentFile = ({
           <ol>
             {file.steps.map((step, index) => {
               const owner = RECRUITMENT_OWNER_REGISTRY.get(step.owner)
-              // Informative only, a late step never blocks anything
+              // Informative only
               const late = step.doneAt === null && isOverdue(step.scheduledAt)
               const StepIcon = ICONS[step.doneAt ? 'success' : 'clock']
               const offset = `J${step.offset >= 0 ? '+' : ''}${step.offset}`

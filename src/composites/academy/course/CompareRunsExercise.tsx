@@ -15,7 +15,7 @@ import type { ExerciseBlock, GuideStep, ReplicaRun } from '@/declarations/academ
 import { COMPARE_RUNS, COURSE_SCENE, SUPPORT_GUIDE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
-// Pause between two runs, in ms
+// Pause between two runs
 const RUN_GAP_MS = 1600
 
 interface RunStageProps {
@@ -28,8 +28,8 @@ interface RunStageProps {
 }
 
 /**
- * One run played full size, the guide on its left
- * @param {RunStageProps} props - Run, guide and handlers
+ * One run played full size
+ * @param {RunStageProps} props - Run
  * @return {JSX.Element}
  */
 
@@ -68,9 +68,8 @@ const RunStage = ({ run, guide, label, onOver, replayable }: RunStageProps) => {
 }
 
 /**
- * Several runs of one ticket played one after the other, then laid side by side: the learner
- * opens any of them again and picks the best handling
- * @param {ExerciseViewProps} props - Block, answer, result and handlers
+ * Several runs of one ticket played one after the other
+ * @param {ExerciseViewProps} props - Block
  * @return {JSX.Element}
  */
 
@@ -84,9 +83,9 @@ export const CompareRunsExercise = ({
   onRetry,
 }: ExerciseViewProps<Extract<ExerciseBlock, { kind: 'compareRuns' }>>) => {
   const total = block.runs.length
-  // Watching each run in turn, unless already answered
+  // Watching each run in turn
   const [playing, setPlaying] = useState<number | null>(answer ? null : 0)
-  // Waits for its button, unless already answered
+  // Waits for its button
   const [started, setStarted] = useState(!block.startLabel || answer !== undefined)
   const [opened, setOpened] = useState<number | null>(null)
   const finals = useMemo(() => block.runs.map((run) => playDiscordScene(run.scene)), [block.runs])

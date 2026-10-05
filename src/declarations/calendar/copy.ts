@@ -44,21 +44,21 @@ export const CALENDAR_COPY = {
   sidebarLayers: 'Calendriers',
   sidebarCreators: 'YouTubeurs',
   search: 'Rechercher un event…',
-  // Legacy filter bar, absences staying out of the way until they are asked for
+  // Legacy filter bar
   allSources: 'Toutes les origines',
   filterAbsences: 'Absences',
   absencesHidden: 'Absences masquées',
   absencesShown: 'Absences affichées',
   filterAnswer: 'Ta réponse',
   allAnswers: 'Toutes les réponses',
-  // Detail modal, meetings and birthdays
+  // Detail modal
   meetingTopicsTitle: 'Sujets prévus',
   meetingTopicsEmpty: 'Aucun sujet prévu.',
   meetingMinutesTitle: 'Compte-rendu',
   meetingMinutesEmpty: 'Pas encore de compte-rendu.',
   birthdayMessage: 'N’hésite pas à lui souhaiter un merveilleux anniversaire !',
   preview: 'Aperçu',
-  // Roll-call, its answer buttons and its roster
+  // Roll-call
   rollCallTitle: 'Appel de présence',
   rollCallLead: 'Dis à ton Responsable si tu seras là.',
   respondPresent: 'Je serai là',
@@ -135,7 +135,7 @@ export const CALENDAR_PROJECTION_COPY = {
 } as const
 
 /**
- * Weekday abbreviations, Monday first
+ * Weekday abbreviations
  * @type {string[]}
  */
 

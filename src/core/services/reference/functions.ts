@@ -2,13 +2,13 @@ import { FunctionKinds } from '@/utils/constants/workflow'
 import type { MemberFunction } from '@/types/members'
 import type { JobFunction } from '@prisma/client'
 
-// Held functions with their reference row, the include every reader shares
+// Held functions with their reference row
 export const HELD_FUNCTIONS = {
   functions: { include: { jobFunction: true } },
 } as const
 
 /**
- * Compare two functions down the hierarchy, principal ones first, then by rank
+ * Compare two functions down the hierarchy
  * @param {Object} left - First function
  * @param {Object} right - Second function
  * @return {number} - Sort order
@@ -34,10 +34,10 @@ export const toMemberFunctions = (rows: { jobFunction: JobFunction }[]): MemberF
     .map((row) => ({ id: row.id, label: row.name, kind: row.kind, icon: row.icon }))
 
 /**
- * Names of the held functions of one kind, joined for a read-only line
+ * Names of the held functions of one kind
  * @param {MemberFunction[]} functions - Functions in display order
  * @param {string} kind - Principal or secondary
- * @return {string | null} - Joined names, nothing when none
+ * @return {string | null} - Joined names
  */
 
 export const joinFunctionNames = (functions: MemberFunction[], kind: string): string | null => {

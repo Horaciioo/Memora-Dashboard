@@ -16,7 +16,7 @@ export interface UnbanRequestsWindowProps {
 }
 
 /**
- * Requests to be unbanned, settled by responsables and admins
+ * Requests to be unbanned
  * @param {UnbanRequest[]} requests - Requests
  * @param {boolean} isLit - Lit by a scene
  * @param {GateCheck} gate - Permission check

@@ -13,7 +13,7 @@ export type TwitchSignal =
   | { kind: 'online'; streamId: string; startedAt: string }
   | { kind: 'offline' }
 
-// Loose payload, every field checked before use
+// Loose payload
 type Payload = Record<string, unknown>
 
 // Badge sets Memora draws
@@ -40,7 +40,7 @@ const MODE_ACTIONS = new Set([
 /**
  * Read a string field
  * @param {unknown} value - Raw value
- * @return {string} - String, empty otherwise
+ * @return {string} - String
  */
 
 const text = (value: unknown): string => (typeof value === 'string' ? value : '')
@@ -49,7 +49,7 @@ const text = (value: unknown): string => (typeof value === 'string' ? value : ''
  * Read a nested object
  * @param {Payload} payload - Parent
  * @param {string} key - Field
- * @return {Payload} - Child, empty otherwise
+ * @return {Payload} - Child
  */
 
 const child = (payload: Payload, key: string): Payload => {
@@ -59,7 +59,7 @@ const child = (payload: Payload, key: string): Payload => {
 }
 
 /**
- * Read a user of a payload, prefixed fields first
+ * Read a user of a payload
  * @param {Payload} payload - Payload
  * @param {string} prefix - Field prefix
  * @return {{ id: string, login: string, name: string }} - User
@@ -97,7 +97,7 @@ const wordsAt = (message: string, boundaries: unknown): string[] =>
  * @param {ModActKind} kind - Act
  * @param {Payload} event - Notification event
  * @param {string} at - When
- * @param {Partial<ModAct>} [extra] - Target, reason, duration
+ * @param {Partial<ModAct>} [extra] - Target
  * @return {ModAct} - Act
  */
 
@@ -237,7 +237,7 @@ const moderateSignals = (event: Payload, id: string, at: string): TwitchSignal[]
  * @param {Object} meta - Notification metadata
  * @param {string} meta.id - Message identifier
  * @param {string} meta.at - Message timestamp
- * @return {TwitchSignal[]} - Signals, none for an unknown type
+ * @return {TwitchSignal[]} - Signals
  */
 
 export const translateTwitchEvent = (

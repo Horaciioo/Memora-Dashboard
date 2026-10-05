@@ -46,7 +46,7 @@ const SEEN_LIMIT = 2000
 // Extra seconds tolerated past the keepalive window
 const KEEPALIVE_SLACK_SECONDS = 5
 
-// Reconnection delays, the last one repeated
+// Reconnection delays
 const BACKOFF_SECONDS = [1, 2, 5, 10, 30]
 
 type Frame = {
@@ -76,7 +76,7 @@ export class EventSubSession {
   private attempts = 0
   private stopped = false
   private readonly seen = new Set<string>()
-  // Socket opened on a reconnect, adopted once welcomed
+  // Socket opened on a reconnect
   private pending: WebSocket | null = null
 
   constructor(options: EventSubOptions) {
@@ -97,7 +97,7 @@ export class EventSubSession {
   }
 
   /**
-   * Close the session, its subscriptions die with it
+   * Close the session
    * @return {void}
    */
 
@@ -110,7 +110,7 @@ export class EventSubSession {
   }
 
   /**
-   * Connect one socket, a reconnect keeping the old one until welcomed
+   * Connect one socket
    * @param {string} url - Socket URL
    * @param {boolean} isReconnect - Asked by Twitch
    * @return {void}
@@ -164,7 +164,7 @@ export class EventSubSession {
       case 'session_welcome': {
         const sessionId = frame.payload?.session?.id ?? ''
 
-        // A reconnect keeps its subscriptions, the old socket can go
+        // A reconnect keeps its subscriptions
         if (this.pending === socket) {
           this.socket = socket
           this.pending = null
@@ -209,7 +209,7 @@ export class EventSubSession {
   /**
    * Open every subscription of the Mod View on the session
    * @param {string} sessionId - Session identifier
-   * @return {Promise<void>} - Subscribed, failures logged
+   * @return {Promise<void>} - Subscribed
    */
 
   private async subscribe(sessionId: string): Promise<void> {
@@ -219,7 +219,7 @@ export class EventSubSession {
       return
     }
 
-    // In parallel, Twitch leaves ten seconds after the welcome
+    // In parallel
     const results = await Promise.allSettled(
       TWITCH_SUBSCRIPTIONS.map((subscription) =>
         runHelix(seat, {
@@ -250,7 +250,7 @@ export class EventSubSession {
   }
 
   /**
-   * Remember one notification, forgetting the oldest
+   * Remember one notification
    * @param {string} id - Message identifier
    * @return {void}
    */

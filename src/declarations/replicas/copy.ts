@@ -1,5 +1,5 @@
 /**
- * Copy of the Discord replica, the client's own wording
+ * Copy of the Discord replica
  * @type {Record<string, string>}
  */
 

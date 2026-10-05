@@ -20,7 +20,7 @@ export interface MultiSelectProps {
   onChange: (value: string[]) => void
   // Names the control for assistive technology
   label: string
-  // Shown while nothing is chosen, and when no option exists yet
+  // Shown while nothing is chosen
   emptyLabel: string
   mark?: OptionMarkKind
   maxItems?: number
@@ -29,15 +29,14 @@ export interface MultiSelectProps {
   describedBy?: string
 }
 
-// Narrowest the panel ever gets, whatever the trigger measures
+// Narrowest the panel ever gets
 const MIN_PANEL_WIDTH = 200
 
 // Option count above which the panel gains its own filter field
 const SEARCH_THRESHOLD = 8
 
 /**
- * Collapsed multi-select — its trigger carries the chosen entries as tags, its panel a
- * filterable checklist that stays open while entries are toggled
+ * Collapsed multi-select — its trigger carries the chosen entries as tags
  * @param {string} id - Identifier of the trigger
  * @param {FieldOption[]} options - Selectable options
  * @param {string[]} value - Selected values
@@ -92,7 +91,7 @@ export const MultiSelect = ({
     open()
   }
 
-  // Toggle an option, explaining a blocked one where it was clicked
+  // Toggle an option
   const toggle = (option: FieldOption, origin: { x: number; y: number }) => {
     if (option.disabled) {
       if (option.hint) showHint(option.hint, origin, ICONS.blocked)

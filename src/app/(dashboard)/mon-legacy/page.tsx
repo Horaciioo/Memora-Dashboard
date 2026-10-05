@@ -12,7 +12,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const metadata: Metadata = { title: LEGACY_COPY.ownTitle }
 
 /**
- * The member's own Legacy track, opened straight onto it
+ * The member's own Legacy track
  * @return {Promise<JSX.Element>} - Own Legacy page
  */
 

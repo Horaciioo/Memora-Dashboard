@@ -4,12 +4,12 @@
  */
 
 export const LIVE_TOPICS = {
-  // Status of every live, read by the rail and the home
+  // Status of every live
   lives: 'lives',
   // Redis channel every instance shares
   channel: 'lives:bus',
   live: (id: string) => `live:${id}`,
-  // Recent Mod View events of a live, replayed on open
+  // Recent Mod View events of a live
   recent: (id: string) => `live:${id}:recent`,
   // Platform connection of a live
   connection: (id: string) => `live:${id}:connection`,

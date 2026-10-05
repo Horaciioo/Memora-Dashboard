@@ -5,8 +5,8 @@ type BranchingBlock = Extract<ExerciseBlock, { kind: 'branching' }>
 /**
  * Where a choice game stands
  * @typedef {Object} BranchWalk
- * @property {BranchNode[]} path - Nodes reached, root first
- * @property {BranchNode | null} ending - Leaf reached, none while playing
+ * @property {BranchNode[]} path - Nodes reached
+ * @property {BranchNode | null} ending - Leaf reached
  */
 
 export interface BranchWalk {

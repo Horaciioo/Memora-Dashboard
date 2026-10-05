@@ -21,7 +21,7 @@ export interface SanctionMeasureSeed {
 }
 
 /**
- * The measures every panel picks from, ordered from lightest to heaviest
+ * The measures every panel picks from
  * @type {readonly SanctionMeasureSeed[]}
  */
 
@@ -157,7 +157,7 @@ export const SANCTION_MEASURE_TEMPLATE: readonly SanctionMeasureSeed[] = [
 ]
 
 /**
- * Measure lookup by name, the ladder of an offence naming its rungs
+ * Measure lookup by name
  * @type {Map<string, SanctionMeasureSeed>}
  */
 

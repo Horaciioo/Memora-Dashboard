@@ -53,7 +53,7 @@ export const MODVIEW_WINDOWS = createRegistry(WINDOW_MAP)
  * @property {string} label - Mode name
  * @property {IconName} icon - Glyph
  * @property {PermissionName} permission - Needed to switch it
- * @property {string} owners - Who holds it, said when greyed
+ * @property {string} owners - Who holds it
  */
 
 interface ChatModeOption {
@@ -127,7 +127,7 @@ const ACT_MAP: Record<ModActKind, ModActOption> = {
 export const MOD_ACTS = createRegistry(ACT_MAP)
 
 /**
- * Who holds each gated gesture, said when greyed
+ * Who holds each gated gesture
  * @type {Partial<Record<PermissionName, string>>}
  */
 
@@ -139,7 +139,7 @@ export const PERMISSION_OWNERS: Partial<Record<PermissionName, string>> = {
 }
 
 /**
- * Timeout lengths offered on the user card, in seconds
+ * Timeout lengths offered on the user card
  * @type {readonly number[]}
  */
 
@@ -177,7 +177,7 @@ const COMMUNITY_GROUP_MAP: Record<keyof ModViewState['community'], CommunityGrou
 export const MODVIEW_COMMUNITY_GROUPS = createRegistry(COMMUNITY_GROUP_MAP)
 
 /**
- * Default lengths of the chat gestures, in seconds
+ * Default lengths of the chat gestures
  * @type {{ quickTimeout: number, slowMode: number }}
  */
 
@@ -187,7 +187,7 @@ export const MODVIEW_DEFAULTS = {
 }
 
 /**
- * Display options of the chat, the three dots
+ * Display options of the chat
  * @type {Record<string, { label: string }>}
  */
 

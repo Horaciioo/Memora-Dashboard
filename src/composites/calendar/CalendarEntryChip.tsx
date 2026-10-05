@@ -16,11 +16,11 @@ export interface CalendarEntryChipProps {
   entry: CalendarEntry
   // Draws a full width band instead of a card
   band?: boolean
-  // Band reaches its own start, so it gets a rounded left edge
+  // Band reaches its own start
   opensBand?: boolean
-  // Band reaches its own end, so it gets a rounded right edge
+  // Band reaches its own end
   closesBand?: boolean
-  // Band repeats its title, as on the first day of a week row
+  // Band repeats its title
   titled?: boolean
   selected: boolean
   draggable: boolean
@@ -28,9 +28,9 @@ export interface CalendarEntryChipProps {
   dragProps?: Record<string, unknown>
   // Fills its grid seat
   fill?: boolean
-  // One line, short span
+  // One line
   compact?: boolean
-  // Bullet and words on one line, no fill
+  // Bullet and words on one line
   line?: boolean
   // Overrides the start time
   timeLabel?: string
@@ -40,7 +40,7 @@ export interface CalendarEntryChipProps {
 const HOVER_DELAY = 140
 
 /**
- * One entry on the grid, a card on a slot or a band running across days
+ * One entry on the grid
  * @param {CalendarEntry} entry - Entry to draw
  * @param {boolean} [band] - Draws as a band
  * @param {boolean} [opensBand] - Band starts here
@@ -72,7 +72,7 @@ export const CalendarEntryChip = ({
   line,
   timeLabel,
 }: CalendarEntryChipProps) => {
-  // An entry wears the colour of its creator, an absence stays grey
+  // An entry wears the colour of its creator
   const paint = accentPaint(entry.accent, entry.muted ? 'neutral' : 'brand')
   const [anchor, setAnchor] = useState<DOMRect | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -86,7 +86,7 @@ export const CalendarEntryChip = ({
     []
   )
 
-  // A trailing band segment carries no title, so it opens no preview
+  // A trailing band segment carries no title
   const showsTitle = !band || opensBand || titled
   const previewable = showsTitle
 

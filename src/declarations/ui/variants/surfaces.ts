@@ -11,7 +11,7 @@ export const SECTION_STYLES = {
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
   panel: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-surface',
   panelPadded: 'p-4 sm:p-5',
-  // Visible box, a soft shadow lifting it off the page
+  // Visible box
   panelRaised: 'p-4 shadow-[var(--shadow-sm)] sm:p-5',
 } as const
 
@@ -23,10 +23,10 @@ export const SECTION_STYLES = {
 export const PAGE_STYLES = {
   wrapper: 'mx-auto flex w-full flex-col gap-8',
   header: 'flex flex-col gap-4',
-  // Banner across the top of the page: in the flow on a phone, laid over the column from md
+  // Banner across the top of the page: in the flow on a phone
   banner:
     'relative -mx-4 -mt-6 h-[var(--banner-h)] sm:-mx-6 sm:-mt-8 md:absolute md:inset-x-0 md:top-0 md:m-0',
-  // Corner of the banner the page options sit in, filled by PageOptions
+  // Corner of the banner the page options sit in
   bannerOptions: 'absolute top-3 right-3 z-10 sm:top-4 sm:right-4',
   // Title sitting in the notch cut into the bottom edge of the banner
   notch: 'absolute bottom-0 left-1/2 flex -translate-x-1/2 items-end',
@@ -34,10 +34,10 @@ export const PAGE_STYLES = {
     'banner-notch-body flex min-w-0 max-w-[min(44rem,70vw)] items-center justify-center px-3 text-center',
   notchTitle: 'min-w-0 text-xl font-black tracking-[0.12em] uppercase md:text-[1.75rem]',
   notchTitleText: 'min-w-0 text-balance md:truncate',
-  // Shoulders of the notch, drawn in globals.css
+  // Shoulders of the notch
   notchSlopeStart: 'banner-slope banner-slope-start',
   notchSlopeEnd: 'banner-slope banner-slope-end',
-  // Eyebrow left, actions right
+  // Eyebrow left
   headerRow: 'flex flex-wrap items-center justify-between gap-4',
   eyebrow:
     'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-accent)] uppercase',
@@ -58,8 +58,10 @@ export const PAGE_STYLES = {
  */
 
 export const PAGE_BANNER = {
-  art: 'absolute inset-0 overflow-hidden bg-[var(--color-surface-sunken)]',
+  art: 'absolute inset-0 bg-[var(--color-frame)]',
   image: 'h-full w-full object-cover dark:brightness-[0.82]',
+  // Mirror of the photo above it, shown when the page is pulled down past the top
+  extension: 'absolute inset-x-0 bottom-full h-full -scale-y-100 overflow-hidden bg-[var(--color-frame)]',
 } as const
 
 /**
@@ -71,12 +73,12 @@ export const BADGE_STYLES = {
   base: 'inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-0.5 text-xs font-medium whitespace-nowrap',
   outline: 'border',
   icon: 'h-3 w-3',
-  // Log tags, calmer but still solid
+  // Log tags
   muted: 'saturate-[0.45] brightness-[0.92] dark:brightness-[0.8]',
 } as const
 
 /**
- * Creator and project labels, never tags
+ * Creator and project labels
  * @type {Record<string, string>}
  */
 
@@ -87,7 +89,7 @@ export const RECORD_LABEL = {
 } as const
 
 /**
- * Glyph sizes, a record's emoji sitting on the surface without a frame
+ * Glyph sizes
  * @type {Record<string, string>}
  */
 
@@ -116,7 +118,7 @@ export const DIALOG_STYLES = {
   title: 'text-lg leading-tight font-bold tracking-tight',
   close: '-mt-1 -mr-2 shrink-0',
   body: 'flex-1 overflow-y-auto border-t border-[var(--color-border)] px-5 py-5 sm:px-6',
-  // Tabs already rule the top, drop the body border
+  // Tabs already rule the top
   bodyFlush: 'border-t-0 pt-1',
   footer: 'flex flex-wrap items-center justify-end gap-2 px-5 pt-1 pb-5 sm:px-6',
 } as const
@@ -142,14 +144,14 @@ export type DialogSize = keyof typeof DIALOG_SIZES
  */
 
 export const DRAWER_STYLES = {
-  // Dims the page window only, the rail stays lit
+  // Dims the page window only
   overlay:
     'overlay-enter fixed inset-0 z-[45] bg-[var(--color-ink)]/25 md:inset-y-3 md:right-3 md:left-[var(--shell-sidebar-w)] md:rounded-[var(--radius-xl)]',
-  // Margin-centred, never transformed
+  // Margin-centred
   panel:
     'drawer-enter fixed inset-x-3 inset-y-0 z-50 my-auto flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)] md:right-[var(--drawer-page-right)] md:left-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-r-none md:border-r-0',
   header: 'flex shrink-0 items-center gap-3 px-5 pt-4 pb-3',
-  // Bare glyph, no plate
+  // Bare glyph
   glyph: 'flex shrink-0 items-center text-[var(--color-brand-700)]',
   glyphIcon: 'h-5 w-5',
   title: 'min-w-0 flex-1 truncate text-base leading-tight font-bold tracking-tight',
@@ -163,20 +165,20 @@ export const DRAWER_STYLES = {
 } as const
 
 /**
- * Form drawer footer, one full-width line per gesture
+ * Form drawer footer
  * @type {Record<string, string>}
  */
 
 export const DRAWER_ACTIONS = {
   stack: 'flex flex-col gap-2 p-1',
-  // Previous at the far left, next at the far right, each name against its chevron
+  // Previous at the far left
   steps: 'flex items-center justify-between gap-2',
   step: 'group flex min-w-0 items-center gap-1 rounded-[var(--radius-md)] px-2 py-2.5 text-sm font-bold transition-colors hover:bg-[var(--color-hover)]',
   stepBack: 'mr-auto',
   stepNext: 'ml-auto',
   stepLabel: 'min-w-0 truncate',
   stepIcon: 'h-4 w-4 shrink-0 text-[var(--color-brand-700)]',
-  // Filled gestures, hover deepens
+  // Filled gestures
   line: 'flex w-full items-center justify-center gap-2.5 rounded-[var(--radius-md)] px-4 py-3 text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60',
   save: 'bg-[var(--color-success)]',
   cancel: 'bg-[var(--color-danger)]',
@@ -186,7 +188,7 @@ export const DRAWER_ACTIONS = {
 } as const
 
 /**
- * Menu styles, shared by context menu and dropdown
+ * Menu styles
  * @type {Record<string, string>}
  */
 
@@ -208,7 +210,7 @@ export const MENU_STYLES = {
 
 export const TABS_STYLES = {
   list: 'relative flex gap-1 overflow-x-auto border-b border-[var(--color-border)] pb-2',
-  // Strip centred over its panel from sm, the wash sliding on measured offsets
+  // Strip centred over its panel from sm
   listCentered: 'sm:justify-center',
   tab: 'relative z-10 shrink-0 rounded-[var(--radius-md)] px-3.5 py-2 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // Open tab leaves the hover wash to the pink behind it
@@ -221,7 +223,7 @@ export const TABS_STYLES = {
   panel: 'pt-4',
   content: 'flex items-center',
   icon: 'h-4 w-4 shrink-0',
-  // Track sized on the real label width, opening and closing alike
+  // Track sized on the real label width
   labelTrack:
     'grid transition-[grid-template-columns,opacity] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
   labelOpen: 'grid-cols-[1fr] opacity-100',
@@ -270,7 +272,7 @@ export const AVATAR_STYLES = {
 export type AvatarSize = Extract<keyof typeof AVATAR_STYLES, 'xs' | 'sm' | 'md' | 'lg' | 'xl'>
 
 /**
- * Corner ribbon styles, a folded band cutting across a card's corner
+ * Corner ribbon styles
  * @type {Record<string, string>}
  */
 
@@ -308,7 +310,7 @@ export const INLINE_EDIT_STYLES = {
 
 export const PREFERENCE_STYLES = {
   column: 'mx-auto flex w-full max-w-3xl flex-col gap-8',
-  // Who is signed in, centred over the tabs
+  // Who is signed in
   hero: 'flex flex-col items-center gap-3 text-center',
   heroName: 'text-3xl font-black tracking-tight',
   heroMeta: 'flex flex-col items-center gap-2',
@@ -364,7 +366,7 @@ export const CONSENT_STYLES = {
   heading: 'text-base font-bold tracking-tight',
   body: 'flex flex-col gap-3 text-sm text-[var(--color-ink-subtle)]',
   choice: 'flex items-start gap-3 text-sm',
-  // Both answers sit centred on one column, the rule between them matching their width
+  // Both answers sit centred on one column
   actions: 'mx-auto flex w-full max-w-xs flex-col items-stretch gap-3 pt-2',
   action: 'w-full justify-center',
   divider: 'h-px w-full bg-[var(--color-border)]',
@@ -372,7 +374,7 @@ export const CONSENT_STYLES = {
 } as const
 
 /**
- * Wizard styles — a progress header, one step on screen, a footer of two moves
+ * Wizard styles — a progress header
  * @type {Record<string, string>}
  */
 
@@ -385,17 +387,17 @@ export const WIZARD_STYLES = {
   title: 'text-xl font-black tracking-tight sm:text-2xl',
   body: 'flex min-h-64 flex-col gap-4',
   footer: 'flex items-center justify-between gap-3 border-t border-[var(--color-border)] pt-6',
-  // The rail only fits on a wide viewport, the bar carries the progress on a narrow one
+  // The rail only fits on a wide viewport
   rail: 'hidden sm:block',
 } as const
 
 /**
- * Public integration form styles — a standing creator banner, the form bare beside it
+ * Public integration form styles — a standing creator banner
  * @type {Record<string, string>}
  */
 
 export const ONBOARDING_STYLES = {
-  // A gutter of its own, so the banner never welds itself to the window edge
+  // A gutter of its own
   page: 'grid min-h-screen grid-cols-1 gap-2 p-2 lg:grid-cols-[40fr_60fr]',
   banner:
     'relative isolate flex h-56 flex-col justify-between overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-surface-sunken)] p-6 sm:h-72 lg:sticky lg:top-2 lg:h-[calc(100vh-1rem)] lg:p-8',
@@ -407,13 +409,13 @@ export const ONBOARDING_STYLES = {
   bannerEyebrow:
     'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-white/70 uppercase',
   bannerTitle: 'text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl',
-  // No frame, no card: the form stands on the page itself
+  // No frame
   panel: 'flex min-w-0 flex-col justify-center px-2 py-8 sm:px-6 lg:px-12 lg:py-14',
   form: 'mx-auto flex w-full max-w-xl flex-col gap-8',
   identity:
     'flex items-center gap-4 rounded-[var(--radius-lg)] bg-[var(--color-surface)] p-4 ring-1 ring-[var(--color-border)]',
   identityName: 'text-base font-semibold',
-  // The identifier sits under the name, smaller and quieter
+  // The identifier sits under the name
   identityHandle: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
   notice:
     'flex flex-col gap-1 rounded-[var(--radius-md)] border-l-2 border-[var(--color-brand-600)] bg-[var(--color-brand-soft)] px-4 py-3 text-xs text-[var(--color-ink-subtle)]',
@@ -425,7 +427,7 @@ export const ONBOARDING_STYLES = {
   actions: 'flex flex-wrap items-center gap-3',
   outcome: 'flex flex-col gap-2 text-center',
   outcomeTitle: 'text-xl font-extrabold tracking-tight',
-  // Admitted candidate, a green rule down the side rather than a card
+  // Admitted candidate
   admission: 'flex flex-col gap-1 border-l-4 border-[var(--color-success)] py-1 pl-4',
   admissionEyebrow:
     'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-[var(--color-success)] uppercase',
@@ -455,7 +457,7 @@ export const COLLAPSIBLE_PANEL = {
     'flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-md)] py-1.5 text-left transition-colors hover:text-[var(--color-ink)]',
   icon: 'h-4 w-4 shrink-0',
   title: 'truncate text-sm font-bold tracking-wide uppercase',
-  // Mono marker, never a filled pill
+  // Mono marker
   count: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)] tabular-nums',
   chevron: 'ml-auto h-4 w-4 shrink-0 transition-transform motion-reduce:transition-none',
   chevronOpen: 'rotate-0',
@@ -465,7 +467,7 @@ export const COLLAPSIBLE_PANEL = {
 } as const
 
 /**
- * Page options styles, the glass button of a banner and its panel of switches
+ * Page options styles
  * @type {Record<string, string>}
  */
 

@@ -20,7 +20,7 @@ export interface ViewerCardProps {
 }
 
 /**
- * One viewer, their lines on this live and every gesture on them
+ * One viewer
  * @param {Chatter} chatter - Viewer
  * @param {ChatMessage[]} messages - Their lines on this live
  * @param {GateCheck} gate - Permission check

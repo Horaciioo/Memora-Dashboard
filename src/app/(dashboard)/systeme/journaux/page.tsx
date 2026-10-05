@@ -16,7 +16,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const metadata: Metadata = { title: SYSTEM_COPY.journalTitle }
 
 /**
- * Latest recorded facts, newest first
+ * Latest recorded facts
  * @return {Promise<JSX.Element>} - Journal page
  */
 

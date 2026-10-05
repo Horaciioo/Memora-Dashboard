@@ -1,13 +1,13 @@
 import type { EmojiEntry, EmojiGroup } from '@/declarations/ui/emojis'
 import { foldText } from '@/utils/format/strings'
 
-// Ranks a match, the lowest showing first
+// Ranks a match
 const NAME_STARTS = 0
 const NAME_HOLDS = 1
 const TAG_HOLDS = 2
 
 /**
- * One glyph folded once, so a keystroke never folds the whole catalogue again
+ * One glyph folded once
  * @typedef {Object} EmojiSearchRow
  * @property {EmojiEntry} entry - Glyph and its names
  * @property {string[]} names - Folded French and English names
@@ -21,7 +21,7 @@ export interface EmojiSearchRow {
 }
 
 /**
- * Fold the catalogue once, ahead of the first keystroke
+ * Fold the catalogue once
  * @param {EmojiGroup[]} groups - Loaded catalogue
  * @return {EmojiSearchRow[]} - Searchable rows
  */
@@ -36,10 +36,10 @@ export const buildEmojiIndex = (groups: EmojiGroup[]): EmojiSearchRow[] =>
   )
 
 /**
- * Rank one row against typed text, both names weighing more than a keyword
+ * Rank one row against typed text
  * @param {EmojiSearchRow} row - Folded glyph
  * @param {string} search - Folded text
- * @return {number | null} - Rank, absent while nothing matches
+ * @return {number | null} - Rank
  */
 
 const rank = (row: EmojiSearchRow, search: string): number | null => {
@@ -51,11 +51,11 @@ const rank = (row: EmojiSearchRow, search: string): number | null => {
 }
 
 /**
- * Read every glyph matching typed text, accents and language aside
+ * Read every glyph matching typed text
  * @param {EmojiSearchRow[]} index - Folded catalogue
  * @param {string} search - Typed text
  * @param {number} limit - Glyphs kept
- * @return {EmojiEntry[]} - Matching glyphs, best first
+ * @return {EmojiEntry[]} - Matching glyphs
  */
 
 export const searchEmojis = (
@@ -66,7 +66,7 @@ export const searchEmojis = (
   const folded = foldText(search.trim())
   if (folded === '') return []
 
-  // Rank once, sort on the stored rank rather than ranking again per comparison
+  // Rank once
   const matches: { entry: EmojiEntry; rank: number }[] = []
 
   for (const row of index) {
@@ -81,7 +81,7 @@ export const searchEmojis = (
 }
 
 /**
- * Read the entry of one glyph, the catalogue answering in French
+ * Read the entry of one glyph
  * @param {EmojiGroup[]} groups - Loaded catalogue
  * @param {string} glyph - Rendered character
  * @return {EmojiEntry | null} - Catalogue entry

@@ -9,7 +9,7 @@ import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { useBreadcrumbOverrides } from '@/managers/front-end'
 
 /**
- * Path trail built from the current URL, with per-page label overrides
+ * Path trail built from the current URL
  * @return {JSX.Element | null}
  */
 
@@ -18,14 +18,14 @@ export const Breadcrumbs = () => {
   const overrides = useBreadcrumbOverrides()
   const segments = pathname.split('/').filter((segment) => segment.length > 0)
 
-  // A single segment is a classic list page, the trail only earns its place past it
+  // A single segment is a classic list page
   if (segments.length <= 1) return null
 
   // Rebuild each ancestor path so every crumb stays clickable
   const crumbs = segments.map((segment, index) => {
     const href = `/${segments.slice(0, index + 1).join('/')}`
 
-    // A raw segment is a record identifier, never shown
+    // A raw segment is a record identifier
     const stand = RECORD_LABELS[segments[index - 1]] ?? NAV_COPY.crumbRecord
 
     return { href, label: overrides[href] ?? SEGMENT_LABELS[segment] ?? stand }

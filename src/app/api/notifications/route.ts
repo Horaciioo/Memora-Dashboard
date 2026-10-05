@@ -2,7 +2,7 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { markAllRead, readNotifications } from '@/core/services/system/NotificationService'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 
-// Entry count asked by the caller, the bell reading fewer rows than the full listing
+// Entry count asked by the caller
 const SIZE_PARAM = 'taille'
 
 export const GET = createProtectedRoute({

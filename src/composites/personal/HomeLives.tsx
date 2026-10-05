@@ -22,8 +22,7 @@ export interface HomeLivesProps {
 }
 
 /**
- * Where each creator stands on the livecon: a portrait with its level on the corner, the
- * reason and the rest one click away
+ * Where each creator stands on the livecon: a portrait with its level on the corner
  * @param {LiveconStateView[]} items - Levels in force
  * @return {JSX.Element | null}
  */

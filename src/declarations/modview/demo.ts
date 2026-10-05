@@ -8,7 +8,7 @@ const START = '2026-10-03T20:00:00.000Z'
 /**
  * Build one chatter of the scene
  * @param {string} login - Login
- * @param {Partial<Chatter>} [extra] - Badges, colour
+ * @param {Partial<Chatter>} [extra] - Badges
  * @return {Chatter} - Chatter
  */
 
@@ -44,7 +44,7 @@ let sequence = 0
  * Build one chat line of the scene
  * @param {Chatter} author - Who writes
  * @param {string} text - Line
- * @param {Partial<ChatMessage>} [extra] - First message, flags
+ * @param {Partial<ChatMessage>} [extra] - First message
  * @return {ChatMessage} - Message
  */
 
@@ -54,7 +54,7 @@ const line = (author: Chatter, text: string, extra: Partial<ChatMessage> = {}): 
   return { id: `demo-line-${sequence}`, author, text, sentAt: START, ...extra }
 }
 
-// Messages the scene deletes later, kept by reference
+// Messages the scene deletes later
 const SPAM = line(CAST.spammer, 'GRATUIT abonnements offerts ici >>> lien-douteux.example')
 const RUDE = line(CAST.rude, 'franchement t’es nul, arrête le stream', { flagged: ['nul'] })
 
@@ -127,7 +127,7 @@ const STEPS: SceneStep[] = [
 ]
 
 /**
- * Preview scene of the Mod View, close to a real Twitch evening
+ * Preview scene of the Mod View
  * @type {ModViewScene}
  */
 

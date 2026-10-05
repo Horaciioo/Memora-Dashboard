@@ -20,14 +20,14 @@ export interface IntegrationCreator {
 }
 
 /**
- * Still-usable link, with enough of its targets to draw and answer the form
+ * Still-usable link
  * @typedef {Object} LiveInvite
  * @property {string} id - Link identifier
  * @property {IntegrationLinkKindName} kind - What a submission creates
  * @property {string | null} youtuberId - Creator the member joins
  * @property {string | null} functionId - Function the member takes
  * @property {number | null} maxUses - Seats the link opens
- * @property {Date} createdAt - Day the link was sent, kept as the arrival date
+ * @property {Date} createdAt - Day the link was sent
  * @property {string | null} recruitmentSessionId - Campaign that handed it out
  * @property {IntegrationCreator | null} youtuber - Creator the banner comes from
  * @property {{ id: string, functionId: string, startsAt: Date } | null} session - Academy session

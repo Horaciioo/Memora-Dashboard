@@ -17,7 +17,7 @@ export interface SegmentedControlProps<TValue extends string> {
 }
 
 /**
- * Inline single-choice switch, one button per option
+ * Inline single-choice switch
  * @param {SegmentedOption<TValue>[]} options - Selectable options
  * @param {TValue} value - Selected value
  * @param {(value: TValue) => void} onChange - Selection handler

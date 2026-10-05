@@ -67,13 +67,13 @@ import { entrySpan } from '@/utils/format/entrySpan'
 
 export interface CalendarBoardProps {
   initialEntries: CalendarEntry[]
-  // Creators in perimeter, the sidebar switching them on and off
+  // Creators in perimeter
   youtubers?: FieldOption[]
   fields: FieldDefinition[]
   anchor: string
   canManage: boolean
   sessionId?: string
-  // Opens straight on this entry's detail, for a deep link
+  // Opens straight on this entry's detail
   focusEntryId?: string
 }
 
@@ -129,12 +129,12 @@ export const CalendarBoard = ({
 }: CalendarBoardProps) => {
   const calendar = useCalendar(initialEntries, sessionId)
 
-  // A deep link lands with its detail already open, the entry sitting in the first window
+  // A deep link lands with its detail already open
   const linked = focusEntryId
     ? (initialEntries.find((row) => row.id === focusEntryId) ?? null)
     : null
 
-  // The span left on is remembered, a session board keeping its own
+  // The span left on is remembered
   const [localUnit, setLocalUnit] = useState<CalendarUnit>('month')
   const [gridMode, setGridMode] = useState<GridMode>('draw')
   const [cursor, setCursor] = useState(anchor)
@@ -206,7 +206,7 @@ export const CalendarBoard = ({
 
   const range = useMemo(() => gridRange(days), [days])
 
-  // The server only ever sends the window on screen, so browsing pulls the next one
+  // The server only ever sends the window on screen
   useEffect(() => {
     void calendar.load(range.from, range.to)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -256,7 +256,7 @@ export const CalendarBoard = ({
     (byDay.get(dayKey) ?? []).filter(
       (entry) =>
         entry.kind === kind &&
-        // A card belongs to the day it opens on, unless it runs all day across several
+        // A card belongs to the day it opens on
         (kind !== CalendarKinds.Event || entry.allDay || toDayKey(entry.startsAt) === dayKey)
     )
 
@@ -292,7 +292,7 @@ export const CalendarBoard = ({
     const [fromDay, fromHour] = from.split(SLOT_SEPARATOR)
     const [toDay, toHour] = to.split(SLOT_SEPARATOR)
 
-    // A slide across hours makes an event, a slide across days makes a period
+    // A slide across hours makes an event
     const bounds =
       fromHour === undefined
         ? {
@@ -320,7 +320,7 @@ export const CalendarBoard = ({
   }, canManage)
 
   const openEntry = (entry: CalendarEntry, additive: boolean) => {
-    // A modifier key gathers a selection, and a projection never joins one
+    // A modifier key gathers a selection
     if (additive && !entry.readOnly && canManage) {
       setSelection((current) =>
         current.includes(entry.id)
@@ -344,7 +344,7 @@ export const CalendarBoard = ({
     [fields]
   )
 
-  // Both timed views share their markup, only the column count changes
+  // Both timed views share their markup
   const isTimed = unit === 'day' || unit === 'week'
   const columns = unit === 'day' ? CALENDAR_STYLES.columnsDay : CALENDAR_STYLES.columnsWeek
 
@@ -404,7 +404,7 @@ export const CalendarBoard = ({
 
   const renderBands = (dayKey: string) =>
     entriesOf(dayKey, CalendarKinds.Period).map((entry) => {
-      // A single day reads as a bullet line, the month drawing it beneath its own cell
+      // A single day reads as a bullet line
       if (isSingleDay(entry)) return unit === 'month' ? null : renderCard(entry, dayKey, true)
 
       return (
@@ -612,7 +612,7 @@ export const CalendarBoard = ({
                 ) : (
                   <div className={CALENDAR_STYLES.month}>
                     {days.map((day) => {
-                      // Lines of the day, single day periods reading among the events by time
+                      // Lines of the day
                       const cards = [
                         ...entriesOf(day.key, CalendarKinds.Period).filter(isSingleDay),
                         ...entriesOf(day.key, CalendarKinds.Event),
@@ -798,7 +798,7 @@ export const CalendarBoard = ({
               <DetailGrid
                 entries={[
                   { label: CALENDAR_FIELD_COPY.subject, value: opened.subjectName },
-                  // A planned meeting never shows its description, only its subjects
+                  // A planned meeting never shows its description
                   ...(opened.source === CalendarSources.Meeting
                     ? []
                     : [{ label: CALENDAR_FIELD_COPY.description, value: opened.description }]),

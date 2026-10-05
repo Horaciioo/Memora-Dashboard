@@ -7,8 +7,8 @@ import type { EventTypeName } from '@/utils/constants/events'
  * @typedef {Object} ActivityEventOption
  * @property {string} label - Tag drawn before the moment
  * @property {Tone} tone - Colour of the tag
- * @property {string} verb - Past participle, emphasised in the sentence
- * @property {string} target - What the event landed on, its determiner included
+ * @property {string} verb - Past participle
+ * @property {string} target - What the event landed on
  */
 
 interface ActivityEventOption {
@@ -19,8 +19,7 @@ interface ActivityEventOption {
 }
 
 /*
- * Colour carries the nature of the act — green for what joined the corp, red for what left
- * it, blue for a plain edit, amber for anything touching rights or moderation.
+ * Colour carries the nature of the act — green for what joined the corp
  */
 
 const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {

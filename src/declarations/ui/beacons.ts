@@ -3,7 +3,7 @@ import { NAVIGATION, ROUTES } from '@/declarations/navigation'
 // Attribute read by the bubbles
 export const BEACON_ATTRIBUTE = 'data-beacon'
 
-// Set while pointed at
+// Attribution reads
 export const HOP_ATTRIBUTE = 'data-beacon-hop'
 
 /**

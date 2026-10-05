@@ -5,7 +5,7 @@ import { notFound } from '@/core/lib/errors'
 import { FORM_SETTINGS, TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
 import type { HandleLookupResult } from '@/types/social'
 
-// Characters a handle may hold, so it never reaches another host or path
+// Characters a handle may hold
 const HANDLE_PATTERN = /^[A-Za-z0-9._-]+$/
 
 // Only the document head is read
@@ -39,7 +39,7 @@ const headText = (html: string): string => {
     .toLowerCase()
 }
 
-// Title the page gives itself, its own social card first
+// Title the page gives itself
 const PAGE_TITLE =
   /<meta[^>]+property="og:title"[^>]+content="([^"]*)"|<title[^>]*>([^<]*)<\/title>/i
 
@@ -47,7 +47,7 @@ const PAGE_TITLE =
 const TITLE_SEPARATORS = /\s[-|·•]\s/
 
 /**
- * Name a profile page goes by, falling back on the handle
+ * Name a profile page goes by
  * @param {string} html - Page source
  * @param {string} handle - Typed handle
  * @return {string} - Display name

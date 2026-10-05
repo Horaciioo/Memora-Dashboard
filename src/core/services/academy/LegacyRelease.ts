@@ -4,7 +4,7 @@ import { prisma } from '@/core/lib/db'
 import { LegacyStatuses } from '@/utils/constants/hierarchy'
 
 /**
- * Members released from events at a moment, a Legacy track running over it
+ * Members released from events at a moment
  * @param {string[]} accountIds - Members convened
  * @param {Date} at - Moment of the event
  * @return {Promise<Set<string>>} - Members released

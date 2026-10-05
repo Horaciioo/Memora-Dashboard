@@ -22,7 +22,7 @@ interface SearchResult {
 }
 
 /**
- * Query the global search, debounced
+ * Query the global search
  * @param {string} term - Raw search term
  * @return {SearchResult} - Results and loading state
  */

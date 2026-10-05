@@ -1,12 +1,12 @@
 /**
- * Gradient stops of one glyph ramp, same shape as the brand one
+ * Gradient stops of one glyph ramp
  * @typedef {Object} GlyphTint
- * @property {string} fillFrom - Body, lit side
- * @property {string} fillTo - Body, shaded side
- * @property {string} liftFrom - Lit facet, lit side
- * @property {string} liftTo - Lit facet, shaded side
- * @property {string} deepFrom - Underside, lit side
- * @property {string} deepTo - Underside, shaded side
+ * @property {string} fillFrom - Body
+ * @property {string} fillTo - Body
+ * @property {string} liftFrom - Lit facet
+ * @property {string} liftTo - Lit facet
+ * @property {string} deepFrom - Underside
+ * @property {string} deepTo - Underside
  * @property {string} cut - Light cutout
  */
 
@@ -21,12 +21,12 @@ export interface GlyphTint {
 }
 
 /**
- * Colours of the role and function glyphs, fixed
+ * Colours of the role and function glyphs
  * @type {Record<string, GlyphTint>}
  */
 
 export const GLYPH_TINTS = {
-  // Discord, a clear blue
+  // Discord
   DISCORD: {
     fillFrom: '#8cc2ff',
     fillTo: '#2f7df0',
@@ -36,7 +36,7 @@ export const GLYPH_TINTS = {
     deepTo: '#173f94',
     cut: '#f4f9ff',
   },
-  // Live, a clear sky cyan
+  // Live
   LIVE: {
     fillFrom: '#7dd8f5',
     fillTo: '#0aa0d6',
@@ -91,7 +91,7 @@ export const GLYPH_TINTS = {
     deepTo: '#991b1b',
     cut: '#fef2f2',
   },
-  // Twitch, its own violet
+  // Twitch
   TWITCH: {
     fillFrom: '#b38cff',
     fillTo: '#7c3aed',
@@ -101,7 +101,7 @@ export const GLYPH_TINTS = {
     deepTo: '#3b1680',
     cut: '#f8f4ff',
   },
-  // YouTube, its own red
+  // YouTube
   YOUTUBE: {
     fillFrom: '#ff7a7a',
     fillTo: '#e11d1d',
@@ -111,7 +111,7 @@ export const GLYPH_TINTS = {
     deepTo: '#7f0d0d',
     cut: '#fff5f5',
   },
-  // Live coordinator, a warm amber
+  // Live coordinator
   COORDINATOR: {
     fillFrom: '#fcd34d',
     fillTo: '#d97706',

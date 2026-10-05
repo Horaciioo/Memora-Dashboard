@@ -167,7 +167,7 @@ const presetOf = (field: FieldDefinition, context: PresetContext): FieldValue | 
     return context.today
   }
 
-  // Actor, only when offered
+  // Actor
   if (field.preset === 'actor') {
     const offered = field.options?.some((option) => option.value === context.actorId)
     if (!context.actorId || (field.options && !offered)) return undefined
@@ -183,7 +183,7 @@ const presetOf = (field: FieldDefinition, context: PresetContext): FieldValue | 
 }
 
 /**
- * Blank values with presets, record values on top
+ * Blank values with presets
  * @param {FieldDefinition[]} fields - Field declarations
  * @param {PresetContext} context - Actor and clock
  * @param {FormValues} [seed] - Values already known

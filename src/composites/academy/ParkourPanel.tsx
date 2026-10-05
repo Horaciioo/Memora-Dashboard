@@ -39,7 +39,7 @@ export interface ParkourPanelProps {
 }
 
 /**
- * Where a junior stands on the AcademicParkour, with the next gesture at hand
+ * Where a junior stands on the AcademicParkour
  * @param {ParkourView} parkour - Parkour view
  * @param {boolean} canManage - Viewer pilots the academy
  * @return {JSX.Element}
@@ -57,7 +57,7 @@ export const ParkourPanel = ({ parkour, canManage }: ParkourPanelProps) => {
     .replace('{lives}', String(parkour.livesNeeded ?? ''))
     .replace('{deadline}', parkour.deadlineAt ? formatDay(parkour.deadlineAt) : '')
 
-  // Every gesture rereads the page, the whole file moves with it
+  // Every gesture rereads the page
   const act = async (path: string, body: object, success: string) => {
     const done = await run(() => apiPost(path, body), success)
     if (done) router.refresh()

@@ -29,7 +29,7 @@ export interface LiveconLevelView {
  * Level currently applied to one scope
  * @typedef {Object} LiveconStateView
  * @property {string} id - Entry identifier
- * @property {WorkTag | null} youtuber - Scope, null for the whole team
+ * @property {WorkTag | null} youtuber - Scope
  * @property {LiveconLevelView} level - Level in force
  * @property {string} startedAt - ISO start
  * @property {string | null} actorName - Who switched it

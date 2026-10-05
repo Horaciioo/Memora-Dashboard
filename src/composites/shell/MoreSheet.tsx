@@ -19,7 +19,7 @@ export interface MoreSheetProps {
 }
 
 /**
- * The reachable pages the nav pill has no room for, plus the creator picker
+ * The reachable pages the nav pill has no room for
  * @param {boolean} open - Sheet is mounted
  * @param {ViewContext} viewContext - View resolved server-side
  * @param {Set<string>} shown - Routes already on the pill

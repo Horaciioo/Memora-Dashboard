@@ -24,7 +24,7 @@ const CAST = {
 }
 
 /**
- * The three steps of a ticket, as the guide tells them
+ * The three steps of a ticket
  * @type {GuideStep[]}
  */
 
@@ -81,7 +81,7 @@ const ticketDecor = (): DiscordScene['initial'] =>
   })
 
 /**
- * A member opens a ticket: welcome embeds, then the call to the on-duty team
+ * A member opens a ticket: welcome embeds
  * @param {DiscordAuthor} member - Who opens it
  * @param {string} channel - Ticket channel
  * @param {string} ticketId - Fictitious ticket number
@@ -133,7 +133,7 @@ const ticketOpening = (member: DiscordAuthor, channel: string, ticketId: string)
   ],
 ]
 
-// Delta's request, the same in every run
+// Delta's request
 const DELTA_REQUEST: Beat[] = say(
   message(
     'delta-request',
@@ -145,7 +145,7 @@ const DELTA_REQUEST: Beat[] = say(
 )
 
 /**
- * One Delta run: the shared opening, then the moderator's handling
+ * One Delta run: the shared opening
  * @param {Beat[]} handling - The moderator's part
  * @return {DiscordScene} - Scene
  */
@@ -160,8 +160,7 @@ const deltaRun = (handling: Beat[]): DiscordScene => ({
 })
 
 /**
- * Delta, three handlings of the same ticket: a terrible one, a bad one, a good one. Declared in
- * the order shown, the good one never last
+ * Delta
  * @type {ReplicaRun[]}
  */
 
@@ -323,7 +322,7 @@ export const FOXTROT_OPENING: DiscordScene = {
 }
 
 /**
- * Steps of a node, timed from zero
+ * Steps of a node
  * @param {Beat[]} beats - Beats
  * @return {DiscordSceneStep[]} - Steps
  */
@@ -331,7 +330,7 @@ export const FOXTROT_OPENING: DiscordScene = {
 const node = (beats: Beat[]): DiscordSceneStep[] => timeline(beats)
 
 /**
- * Foxtrot's choice game: at each turn, keep going or hand over to a Responsable
+ * Foxtrot's choice game: at each turn
  * @type {BranchNode[]}
  */
 

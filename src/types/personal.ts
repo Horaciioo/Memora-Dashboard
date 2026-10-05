@@ -56,16 +56,16 @@ export type HomeTaskKind =
   | 'departure'
 
 /**
- * One thing the member has to do, computed and never stored
+ * One thing the member has to do
  * @typedef {Object} HomeTask
  * @property {string} key - Stable identifier
  * @property {HomeTaskKind} kind - Where it comes from
  * @property {string} title - What to do
  * @property {string} context - Who or what it concerns
  * @property {IconName} icon - Glyph
- * @property {string} href - Where it gets done, walkthrough included
+ * @property {string} href - Where it gets done
  * @property {string | null} description - What must happen
- * @property {string | null} guide - Detailed walkthrough, markdown
+ * @property {string | null} guide - Detailed walkthrough
  * @property {string | null} destinationLabel - Name of the place it opens
  * @property {string | null} dueAt - ISO planned day
  * @property {{ id: string, body: string } | null} [announcement] - Text to copy then mark published
@@ -86,7 +86,7 @@ export interface HomeTask {
 }
 
 /**
- * One line of the home queue, whatever it comes from
+ * One line of the home queue
  * @typedef {Object} HomeEntry
  * @property {string} key - Stable identifier
  * @property {IconName | null} icon - Glyph when no emoji
@@ -95,7 +95,7 @@ export interface HomeTask {
  * @property {string | null} meta - Who or what it concerns
  * @property {string | null} note - Words the requester left
  * @property {string | null} due - Relative wording of its day
- * @property {HomeAction[]} actions - What the member can do, the first one leading
+ * @property {HomeAction[]} actions - What the member can do
  */
 
 export interface HomeEntry {
@@ -110,7 +110,7 @@ export interface HomeEntry {
 }
 
 /**
- * Button of a home entry, a link or a handler
+ * Button of a home entry
  * @typedef {Object} HomeAction
  * @property {string} id - Stable identifier
  * @property {string} label - Button text

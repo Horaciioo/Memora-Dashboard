@@ -6,9 +6,9 @@ import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import { formatDay } from '@/utils/format/dates'
 
 /**
- * One-line change description, everything after the actor's name
+ * One-line change description
  * @typedef {Object} ChangeSummary
- * @property {string} verb - Past participle, emphasised on screen
+ * @property {string} verb - Past participle
  * @property {string} rest - Remainder of the sentence
  */
 
@@ -33,7 +33,7 @@ const isBlank = (value: FieldValue | undefined): boolean =>
   (Array.isArray(value) && value.length === 0)
 
 /**
- * Two values are equal, arrays compared as unordered sets
+ * Two values are equal
  * @param {FieldValue | undefined} left - First value
  * @param {FieldValue | undefined} right - Second value
  * @return {boolean} - Equal
@@ -51,7 +51,7 @@ const isSame = (left: FieldValue | undefined, right: FieldValue | undefined): bo
 }
 
 /**
- * Noun naming a field, its declared label as a fallback
+ * Noun naming a field
  * @param {FieldDefinition} field - Field declaration
  * @return {string} - Noun phrase
  */
@@ -60,7 +60,7 @@ const nounOf = (field: FieldDefinition): string =>
   FIELD_NOUNS[field.name as keyof typeof FIELD_NOUNS] ?? field.label.toLowerCase()
 
 /**
- * Human form of a stored value, resolved through the field declaration
+ * Human form of a stored value
  * @param {FieldDefinition} field - Field declaration
  * @param {FieldValue | undefined} value - Stored value
  * @return {string} - Readable value
@@ -127,7 +127,7 @@ const describeField = (
   const wasBlank = isBlank(before)
   const isNowBlank = isBlank(after)
 
-  // The emoji reads as decorating the title, whatever field carries it
+  // The emoji reads as decorating the title
   if (field.kind === 'emoji') {
     if (wasBlank)
       return {
@@ -185,12 +185,12 @@ const enumerate = (nouns: string[]): string => {
 }
 
 /**
- * Summarise what changed between two form snapshots, on a single line
+ * Summarise what changed between two form snapshots
  * @param {FieldDefinition[]} fields - Declarations bounding the comparison
  * @param {FormValues} before - Snapshot before the edit
  * @param {FormValues} after - Snapshot after the edit
  * @param {number} [maxListed] - Nouns spelled out before the rest is counted
- * @return {ChangeSummary | null} - Description, or null when nothing moved
+ * @return {ChangeSummary | null} - Description
  */
 
 export const summariseChange = (

@@ -2,7 +2,7 @@
 @import './fonts.css';
 @import './theme.css';
 
-/* Tone classes are built at runtime by tw() (src/declarations/ui/theme.ts), so the scanner never sees them — force-compiled here */
+/* Tone classes */
 @source inline(
   'bg-[var(--color-{brand-600,brand-soft,success,success-soft,caution,caution-soft,warning,warning-soft,danger,danger-soft,info,info-soft,neutral,neutral-soft,ink-subtle,authority-admin,authority-admin-soft,authority-lead,authority-lead-soft,scan-ground})]'
 );
@@ -13,7 +13,7 @@
   'border-[var(--color-{brand-600,brand-400,success,caution,warning,danger,info,neutral,border-strong,authority-admin,authority-lead})]'
 );
 
-/* Text size preference — set by AppearanceManager (src/managers/front-end/AppearanceManager.tsx) */
+/* Text size preference */
 :root[data-font-scale='sm'] {
   font-size: 14px;
 }
@@ -140,7 +140,7 @@ html[data-color-vision='tritanopia'] {
 }
 
 .floating-hint-bubble {
-  animation: floating-hint-rise 180ms ease-out;
+  animation: floating-hint-rise var(--motion-duration-fast) ease-out;
 }
 
 @keyframes floating-hint-rise {
@@ -185,11 +185,11 @@ html[data-color-vision='tritanopia'] {
 
 /* Course chapters slide in from the side they come from, the check and its line play once */
 .course-slide-forward {
-  animation: course-slide-forward 420ms var(--motion-ease-out) both;
+  animation: course-slide-forward var(--motion-duration-slow) var(--motion-ease-out) both;
 }
 
 .course-slide-back {
-  animation: course-slide-back 420ms var(--motion-ease-out) both;
+  animation: course-slide-back var(--motion-duration-slow) var(--motion-ease-out) both;
 }
 
 @keyframes course-slide-forward {
@@ -215,7 +215,7 @@ html[data-color-vision='tritanopia'] {
 }
 
 .course-check {
-  animation: course-check 520ms var(--motion-ease-out) 200ms both;
+  animation: course-check var(--motion-duration-slow) var(--motion-ease-out) 200ms both;
 }
 
 @keyframes course-check {
@@ -234,7 +234,7 @@ html[data-color-vision='tritanopia'] {
 }
 
 .course-strike {
-  animation: course-strike 520ms var(--motion-ease-out) 700ms both;
+  animation: course-strike var(--motion-duration-slow) var(--motion-ease-out) 700ms both;
 }
 
 @keyframes course-strike {
@@ -247,11 +247,11 @@ html[data-color-vision='tritanopia'] {
 }
 
 .course-bravo {
-  animation: course-rise 480ms var(--motion-ease-out) 1300ms both;
+  animation: course-rise var(--motion-duration-slow) var(--motion-ease-out) 1300ms both;
 }
 
 .course-bubble {
-  animation: course-rise 480ms var(--motion-ease-out) 2000ms both;
+  animation: course-rise var(--motion-duration-slow) var(--motion-ease-out) 2000ms both;
 }
 
 @keyframes course-rise {
@@ -267,7 +267,7 @@ html[data-color-vision='tritanopia'] {
 
 /* Key points and diagrams rise one after the other, the demonstration marks its lines */
 .course-pop {
-  animation: course-rise 420ms var(--motion-ease-out) calc(var(--i, 0) * 90ms) both;
+  animation: course-rise var(--motion-duration-slow) var(--motion-ease-out) calc(var(--i, 0) * 90ms) both;
 }
 
 .demo-focus {
@@ -279,11 +279,11 @@ html[data-color-vision='tritanopia'] {
 .demo-deleted {
   opacity: 0.45;
   text-decoration: line-through;
-  transition: opacity 300ms ease-out;
+  transition: opacity var(--motion-duration-base) ease-out;
 }
 
 .demo-tag-in {
-  animation: course-check 420ms var(--motion-ease-out) both;
+  animation: course-check var(--motion-duration-slow) var(--motion-ease-out) both;
 }
 
 .demo-pulse {
@@ -349,7 +349,7 @@ body {
 
 /* Rubber stamp struck once onto the error screen */
 .stamp-strike {
-  animation: stamp-strike 420ms var(--motion-ease-out) 180ms both;
+  animation: stamp-strike var(--motion-duration-slow) var(--motion-ease-out) 180ms both;
 }
 
 @keyframes stamp-strike {
@@ -546,7 +546,7 @@ body {
     --color-frame-plum, --color-frame, --color-on-frame, --color-on-frame-subtle,
     --color-on-frame-line, --color-on-frame-line-strong, --color-on-frame-tint,
     --color-on-frame-blush, --color-on-frame-deep;
-  transition-duration: 1100ms;
+  transition-duration: var(--motion-duration-celebrate);
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -589,19 +589,19 @@ body {
 }
 
 .app-tone[data-tone='junior'] {
-  --color-frame-rose: #c6a5fc;
-  --color-frame-spark: #d3bafd;
-  --color-frame-berry: #e0d0fe;
-  --color-frame-wine: #eee6ff;
-  --color-frame-plum: #f9f5ff;
-  --color-frame: #d3bafd;
-  --color-on-frame: rgb(44 26 82);
-  --color-on-frame-subtle: rgb(44 26 82 / 0.78);
-  --color-on-frame-line: rgb(44 26 82 / 0.12);
-  --color-on-frame-line-strong: rgb(44 26 82 / 0.22);
-  --color-on-frame-tint: #7a4fd6;
-  --color-on-frame-blush: #6339b8;
-  --color-on-frame-deep: #3f2078;
+  --color-frame-rose: #e58db8;
+  --color-frame-spark: #eca3c6;
+  --color-frame-berry: #f3bcd4;
+  --color-frame-wine: #f9d8e6;
+  --color-frame-plum: #fdeef4;
+  --color-frame: #eca3c6;
+  --color-on-frame: rgb(94 31 66);
+  --color-on-frame-subtle: rgb(94 31 66 / 0.78);
+  --color-on-frame-line: rgb(94 31 66 / 0.12);
+  --color-on-frame-line-strong: rgb(94 31 66 / 0.22);
+  --color-on-frame-tint: #b5457f;
+  --color-on-frame-blush: #9b3a6c;
+  --color-on-frame-deep: #6e2349;
 }
 
 /* Rounded window the page shows through (src/components/structures/WindowFrame.tsx) */
@@ -759,7 +759,7 @@ body {
   width: 13px;
   height: 24px;
   transform: translate(-100%, -50%);
-  transition: top 380ms var(--motion-ease-out);
+  transition: top var(--motion-duration-slow) var(--motion-ease-out);
   pointer-events: none;
 }
 
@@ -907,7 +907,7 @@ body {
 
 /* Entry pointed at hops once */
 [data-beacon-hop] {
-  animation: beacon-hop 600ms var(--motion-ease-out) 2;
+  animation: beacon-hop var(--motion-duration-celebrate) var(--motion-ease-out) 2;
 }
 
 @keyframes beacon-hop {
@@ -1218,7 +1218,7 @@ body {
 }
 
 .course-rung-in {
-  animation: course-rung-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: course-rung-in var(--motion-duration-slow) cubic-bezier(0.2, 0.8, 0.2, 1) both;
   animation-delay: var(--rung-delay, 0ms);
 }
 
@@ -1246,7 +1246,7 @@ body {
 }
 
 .stamp-slam {
-  animation: stamp-slam 520ms cubic-bezier(0.2, 0.9, 0.25, 1.1) both;
+  animation: stamp-slam var(--motion-duration-celebrate) cubic-bezier(0.2, 0.9, 0.25, 1.1) both;
 }
 
 @keyframes confetti-burst {
@@ -1276,7 +1276,7 @@ body {
 }
 
 .rise-in {
-  animation: rise-in 420ms ease-out both;
+  animation: rise-in var(--motion-duration-slow) ease-out both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1303,7 +1303,7 @@ body {
 
 .step-fill {
   transform-origin: left;
-  animation: step-fill 260ms ease-out both;
+  animation: step-fill var(--motion-duration-base) ease-out both;
   animation-delay: calc(var(--step-index, 0) * 90ms);
 }
 
@@ -1336,7 +1336,7 @@ body {
 }
 
 .replica-channel-in {
-  animation: replica-channel-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: replica-channel-in var(--motion-duration-slow) cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @keyframes replica-lit {
@@ -1366,7 +1366,7 @@ body {
 }
 
 .replica-scroll-in {
-  animation: replica-scroll-in 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: replica-scroll-in var(--motion-duration-celebrate) cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @keyframes replica-message-in {
@@ -1381,7 +1381,7 @@ body {
 }
 
 .replica-message-in {
-  animation: replica-message-in 320ms ease-out both;
+  animation: replica-message-in var(--motion-duration-base) ease-out both;
 }
 
 @keyframes replica-typing-dot {
@@ -1432,7 +1432,7 @@ body {
 }
 
 .guide-slide-in {
-  animation: guide-slide-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: guide-slide-in var(--motion-duration-slow) cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @keyframes guide-dot-pulse {
@@ -1462,7 +1462,7 @@ body {
 }
 
 .run-slide-in {
-  animation: run-slide-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: run-slide-in var(--motion-duration-slow) cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {

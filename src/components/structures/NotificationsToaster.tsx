@@ -39,7 +39,7 @@ interface ToastProps {
   notification: Notification
   // Rank from the newest
   depth: number
-  // Offset once spread, px
+  // Offset once spread
   lift: number
   isSpread: boolean
   // Replays the countdown
@@ -50,7 +50,7 @@ interface ToastProps {
 
 /**
  * One toast of the pile
- * @param {ToastProps} props - Content, place and handlers
+ * @param {ToastProps} props - Content
  * @return {JSX.Element}
  */
 
@@ -158,7 +158,7 @@ const Toast = ({
 }
 
 /**
- * Toast pile: newest in front, spreads on hover
+ * Toast pile: newest in front
  * @return {JSX.Element | null}
  */
 

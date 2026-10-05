@@ -31,7 +31,7 @@ export interface MeetingsBoardProps {
 }
 
 /**
- * Meeting board, its cards carrying the schedule and everyone expected
+ * Meeting board
  * @param {MeetingSummary[]} initialMeetings - Cards resolved server-side
  * @param {BoardColumn[]} columns - Columns in display order
  * @param {FieldDefinition[]} fields - Field declarations of the meeting form

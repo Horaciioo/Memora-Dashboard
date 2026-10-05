@@ -4,7 +4,7 @@
  */
 
 export const LIVE_WORKER_MODES = {
-  // Inside the web process, one instance only
+  // Inside the web process
   inline: 'inline',
   off: 'off',
 } as const
@@ -12,7 +12,7 @@ export const LIVE_WORKER_MODES = {
 export type LiveWorkerMode = (typeof LIVE_WORKER_MODES)[keyof typeof LIVE_WORKER_MODES]
 
 /**
- * Mode read from the environment, inline by default
+ * Mode read from the environment
  * @return {LiveWorkerMode} - Mode
  */
 

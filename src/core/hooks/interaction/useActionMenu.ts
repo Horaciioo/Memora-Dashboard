@@ -18,8 +18,8 @@ export interface ActionMenuHandlers {
 }
 
 /**
- * Options of an element reached by a click or a right click, never by an edit icon
- * @param {MenuItem[]} items - Entries, none opening nothing
+ * Options of an element reached by a click or a right click
+ * @param {MenuItem[]} items - Entries
  * @param {string} [title] - Label above the entries
  * @return {ActionMenuHandlers} - Handlers to spread on the element
  */

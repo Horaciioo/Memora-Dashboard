@@ -4,15 +4,14 @@ import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 
 export interface PageHeaderProps {
-  // Line sitting above the title, e.g. the identifier of the record on screen
+  // Line sitting above the title
   eyebrow?: string
   title: string
   actions?: ReactNode
 }
 
 /**
- * Top of a route, the only place a page level h1 is written. A banner of the area runs across
- * the top of the page, its bottom edge cut by a notch the title sits in
+ * Top of a route
  * @param {string} [eyebrow] - Line rendered above the title
  * @param {string} title - Page title
  * @param {ReactNode} [actions] - Controls aligned to the right

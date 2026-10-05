@@ -17,7 +17,7 @@ export interface AutoModWindowProps {
 }
 
 /**
- * Messages the automod holds, waiting on a moderator
+ * Messages the automod holds
  * @param {HeldMessage[]} held - Held messages
  * @param {boolean} isLit - Lit by a scene
  * @param {GateCheck} gate - Permission check

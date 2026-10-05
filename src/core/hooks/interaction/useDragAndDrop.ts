@@ -81,7 +81,7 @@ export const useDragAndDrop = (
       onDrop: (event: DragEvent<HTMLElement>) => {
         event.preventDefault()
 
-        // Read the payload back, falling back on component state
+        // Read the payload back
         const raw = event.dataTransfer.getData(TRANSFER_KEY)
         const item: DraggedItem | null = raw ? (JSON.parse(raw) as DraggedItem) : dragged
 

@@ -8,7 +8,7 @@ import { seedPipeline } from './steps/pipeline.ts'
 import { seedJournal } from './steps/journal.ts'
 
 /**
- * Replace the fixture dataset with a fresh one, six months of history up to today
+ * Replace the fixture dataset with a fresh one
  * @return {Promise<void>} - Seeded
  */
 

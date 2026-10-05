@@ -1,7 +1,7 @@
 import type { Course } from '@/declarations/academy/curriculum/types'
 
 /**
- * Marsha Bot course, built on the handbook rules and the prefix commands the team types
+ * Marsha Bot course
  * @type {Course}
  */
 

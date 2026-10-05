@@ -13,7 +13,7 @@ import { COURSE_EXERCISE } from '@/declarations/ui/variants'
 /**
  * Command exercise: the exact command to type, compared without case nor spaces, with a hint
  * on demand and the reason once checked
- * @param {ExerciseViewProps} props - Block, answer, result and handlers
+ * @param {ExerciseViewProps} props - Block
  * @return {JSX.Element}
  */
 

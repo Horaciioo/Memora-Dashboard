@@ -23,7 +23,7 @@ export const PATCH = createProtectedRoute({
       throw invalidInput([{ field: 'status', message: FORM_COPY.notAnOption }])
     }
 
-    // Announcers move a live by hand, the coordinator too
+    // Announcers move a live by hand
     const perimeter = await scope()
     const live = await readLive(params.id, perimeter, session.id, session.permissions)
     const isCoordinator = live.coordinator?.id === session.id

@@ -20,7 +20,7 @@ export interface ConsentState {
 
 /**
  * Record the agreement of the signed-in member
- * @param {ConsentState} _previousState - Previous form state, unused
+ * @param {ConsentState} _previousState - Previous form state
  * @param {FormData} formData - Submitted checkbox
  * @return {Promise<ConsentState>} - Failure message or a redirect
  */

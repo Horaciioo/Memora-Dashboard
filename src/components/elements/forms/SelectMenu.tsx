@@ -26,7 +26,7 @@ export interface SelectMenuProps {
   onChange: (value: string) => void
   // Names the control for assistive technology
   label: string
-  // First entry of the list, clearing the current choice
+  // First entry of the list
   emptyLabel?: string
   placeholder?: string
   mark?: OptionMarkKind
@@ -39,15 +39,14 @@ export interface SelectMenuProps {
   className?: string
 }
 
-// Narrowest the panel ever gets, whatever the trigger measures
+// Narrowest the panel ever gets
 const MIN_PANEL_WIDTH = 200
 
 // Option count above which the panel gains its own filter field
 const SEARCH_THRESHOLD = 8
 
 /**
- * Drawn dropdown replacing the native select, each option carrying the glyph its field
- * declared — a colour dot, a portrait, or the priority marks
+ * Drawn dropdown replacing the native select
  * @param {string} [id] - Identifier of the trigger
  * @param {FieldOption[]} options - Selectable options
  * @param {string} value - Selected value
@@ -57,7 +56,7 @@ const SEARCH_THRESHOLD = 8
  * @param {string} [placeholder] - Text shown while nothing is chosen
  * @param {OptionMarkKind} [mark] - Glyph drawn beside every option
  * @param {FieldAction} [action] - Link above the options
- * @param {SelectMenuSize} [size] - Size token, defaults to block
+ * @param {SelectMenuSize} [size] - Size token
  * @param {boolean} [disabled] - Blocks the control
  * @param {boolean} [invalid] - Paints the rejection border
  * @param {string} [describedBy] - Identifier of the message describing the control
@@ -99,7 +98,7 @@ export const SelectMenu = ({
   const selected = options.find((option) => option.value === value) ?? null
   const hasSearch = options.length > SEARCH_THRESHOLD
 
-  // The clearing entry rides in the same list, so one index walks everything
+  // The clearing entry rides in the same list
   const entries = useMemo(() => {
     const term = query.trim().toLowerCase()
     const matching = term
@@ -126,12 +125,12 @@ export const SelectMenu = ({
     close()
   }
 
-  // An unselectable option still explains itself, right where it was clicked
+  // An unselectable option still explains itself
   const explainDisabled = (entry: FieldOption, origin: { x: number; y: number }) => {
     if (entry.hint) showHint(entry.hint, origin, ICONS.blocked)
   }
 
-  // Keys are read on the panel, so it takes focus unless a filter field owns it
+  // Keys are read on the panel
   useEffect(() => {
     if (!isOpen || hasSearch) return
 

@@ -15,10 +15,10 @@ import type { IntegrationLinkView } from '@/types/onboarding'
 import { IntegrationLinkKinds } from '@/utils/constants/integration'
 import type { IntegrationLinkKindName } from '@/utils/constants/integration'
 
-// Entropy of a public token, wide enough that guessing one is hopeless
+// Entropy of a public token
 const TOKEN_BYTES = 24
 
-// A day, in milliseconds
+// A day
 const DAY_IN_MS = 86_400_000
 
 /**
@@ -45,7 +45,7 @@ export const toLinkView = (row: {
 })
 
 /**
- * Read the link a campaign hands out, if it has been emitted
+ * Read the link a campaign hands out
  * @param {string} recruitmentSessionId - Campaign identifier
  * @return {Promise<IntegrationLinkView | null>} - Emitted link
  */
@@ -59,8 +59,7 @@ export const readLink = async (
 }
 
 /**
- * Declarations of the emission form. The creator, the function and the academy
- * session are never asked: a campaign already names all three
+ * Declarations of the emission form. The creator
  * @return {FieldDefinition[]} - Field declarations
  */
 
@@ -70,7 +69,7 @@ export const linkFields = (): FieldDefinition[] => [
     kind: 'select',
     label: INTEGRATION_LINK_FIELD_COPY.kind,
     required: true,
-    // A campaign feeds a promotion, so the academy mode leads
+    // A campaign feeds a promotion
     preset: 'default',
     options: INTEGRATION_LINK_KIND_REGISTRY.keys.map((key) => ({
       value: key,
@@ -99,8 +98,7 @@ export const linkFields = (): FieldDefinition[] => [
 ]
 
 /**
- * Hand out the link of a campaign, its targets read from the campaign itself.
- * A campaign only ever carries one link, so a second call replaces the spent one
+ * Hand out the link of a campaign
  * @param {string} recruitmentSessionId - Campaign identifier
  * @param {FormValues} values - Parsed body
  * @param {AccessScope} scope - Creator perimeter
@@ -121,12 +119,12 @@ export const emitLink = async (
     readDate(values, 'expiresAt') ??
     new Date(Date.now() + ACADEMY_SETTINGS.inviteExpiryDays * DAY_IN_MS)
 
-  // The campaign names the creator, the function and the promotion it feeds
+  // The campaign names the creator
   const data = {
     kind,
     youtuberId: session.youtuberId,
     functionId: session.functionId,
-    // Always the promotion, so an admitted candidate is recognised whatever the mode
+    // Always the promotion
     sessionId: session.academySessionId,
     expiresAt,
     maxUses: readNumberValue(values, 'maxUses'),
@@ -153,7 +151,7 @@ export const emitLink = async (
 }
 
 /**
- * Close the link of a campaign, the accounts it already opened staying untouched
+ * Close the link of a campaign
  * @param {string} recruitmentSessionId - Campaign identifier
  * @param {AccessScope} scope - Creator perimeter
  * @return {Promise<void>} - Revoked

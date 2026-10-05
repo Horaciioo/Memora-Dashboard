@@ -69,7 +69,7 @@ export const useProfile = (initialProfile: ProfileDetail): ProfileState => {
     const dossier = await run(() => apiGet<unknown>(API_ROUTES.personalExport))
     if (!dossier) return
 
-    // The file is built in the page, the route only ever answers with the envelope
+    // The file is built in the page
     const url = URL.createObjectURL(
       new Blob([JSON.stringify(dossier, null, 2)], { type: 'application/json' })
     )

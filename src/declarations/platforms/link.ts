@@ -1,7 +1,7 @@
 import { ROUTES } from '@/declarations/navigation'
 
 /**
- * Outcome of a Twitch link, read back by the settings
+ * Outcome of a Twitch link
  * @type {Record<string, string>}
  */
 

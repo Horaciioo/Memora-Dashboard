@@ -19,7 +19,7 @@ const dayOffset = (startsAt: Date, offsetDays: number): Date => addDays(startsAt
  * @param {object[]} templates - Templates matched for this instantiation
  * @param {Date} startsAt - Session start date
  * @param {string} sessionId - Session identifier
- * @param {string} [juniorId] - Junior identifier, omitted for session-wide steps
+ * @param {string} [juniorId] - Junior identifier
  * @return {Promise<void>} - Instantiated
  */
 
@@ -60,7 +60,7 @@ const instantiateSteps = async (
 }
 
 /**
- * Instantiate the session-wide preparation steps of a PIMT trame, ahead of any junior
+ * Instantiate the session-wide preparation steps of a PIMT trame
  * @param {string} sessionId - Session identifier
  * @param {string} functionId - Function the session is scoped to
  * @param {Date} startsAt - Session start date

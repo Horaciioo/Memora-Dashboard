@@ -15,7 +15,7 @@ import { Permissions } from '@/utils/constants/permissions'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
 
 /**
- * Load a live inside the perimeter, with what its roll-call needs
+ * Load a live inside the perimeter
  * @param {string} id - Live identifier
  * @param {AccessScope} scope - Viewer perimeter
  * @return {Promise<object>} - Live row
@@ -92,7 +92,7 @@ export const readLiveRoster = async (
 }
 
 /**
- * Move one convened member on the roll-call, the PIM count following
+ * Move one convened member on the roll-call
  * @param {Object} input - Move
  * @param {string} input.id - Live identifier
  * @param {string} input.accountId - Member moved

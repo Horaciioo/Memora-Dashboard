@@ -19,10 +19,10 @@ type Stage = 'PREPARATION' | 'DISCOVERY' | 'REVIEW_ONE' | 'PRACTICE' | 'REVIEW_F
 type Campaign = 'DRAFT' | 'ANNOUNCED' | 'INTERVIEWS' | 'CLOSED' | 'ARCHIVED'
 type Promotion = 'DRAFT' | 'OPEN' | 'RUNNING' | 'CLOSED' | 'ARCHIVED'
 
-// Gap between two ordered rows, as the app spaces them
+// Gap between two ordered rows
 const POSITION_STEP = 1000
 
-// Days a PIM lasts from the promotion start, per stage
+// Days a PIM lasts from the promotion start
 const STAGE_STARTS: [Stage, number][] = [
   ['DISCOVERY', 0],
   ['REVIEW_ONE', 10],
@@ -41,7 +41,7 @@ const STAGE_ORDER: Stage[] = [
 ]
 
 /**
- * Campaigns of the fixtures, each feeding its own promotion
+ * Campaigns of the fixtures
  * @type {Array<Object>}
  */
 
@@ -121,7 +121,7 @@ const isPast = (stage: Stage, reached: Stage): boolean =>
   STAGE_ORDER.indexOf(stage) < STAGE_ORDER.indexOf(reached)
 
 /**
- * Write every campaign, its promotion and the whole path of its juniors
+ * Write every campaign
  * @param {Reference} reference - Reference rows
  * @param {Cast} cast - People
  * @return {Promise<{ juniorIds: string[], candidateCount: number }>} - What was written
@@ -234,7 +234,7 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
       },
     })
 
-    // Who the promotion takes in, read from the campaign's age
+    // Who the promotion takes in
     let juniors: Person[] = []
     if (seed.promotion === 'RUNNING') {
       const share = inAcademy.filter((person) => !used.has(person.id))
@@ -269,7 +269,7 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
 
     await writePrepSteps(reference, promotion.id, startsAt, sessionTrainers)
 
-    // Candidates, the accepted ones being the juniors themselves
+    // Candidates
     const candidates = await writeCandidates({
       campaignId: campaign.id,
       campaign: seed.campaign,
@@ -285,7 +285,7 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
     })
     written.candidateCount += candidates.length
 
-    // The integration link of a campaign in interviews, some candidates already through it
+    // The integration link of a campaign in interviews
     if (seed.campaign === 'INTERVIEWS') {
       await prisma.integrationInvite.create({
         data: {
@@ -332,7 +332,7 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
     }
   }
 
-  // Standing links: one to complete a profile, one to join the academy directly
+  // Standing links: one to complete a profile
   await prisma.integrationInvite.createMany({
     data: [
       {
@@ -410,7 +410,7 @@ const writeJunior = async (
 
   const validator = trainer ?? trainers[0] ?? null
 
-  // Timeline, from the trame, done up to where the junior stands
+  // Timeline
   const templates = reference.pimTemplates.filter((template) => template.stage !== 'PREPARATION')
   await prisma.academyStep.createMany({
     data: templates.map((template) => {
@@ -486,7 +486,7 @@ const writeJunior = async (
     })
   }
 
-  // Grades on the skills of the trade, higher the further along
+  // Grades on the skills of the trade
   const progress = STAGE_ORDER.indexOf(stage) / (STAGE_ORDER.length - 1)
   const functionId = reference.functions[functionKey].id
   const skills = reference.skills.filter(
@@ -521,7 +521,7 @@ const writeJunior = async (
     })
   }
 
-  // Personal objectives, once practice is reached
+  // Personal objectives
   if (STAGE_ORDER.indexOf(stage) >= STAGE_ORDER.indexOf('PRACTICE')) {
     for (const [position, [title, description]] of sample(
       JUNIOR_OBJECTIVES,
@@ -544,7 +544,7 @@ const writeJunior = async (
     }
   }
 
-  // Trainings of the trade, cleared according to the stage
+  // Trainings of the trade
   const trainings = reference.trainings.filter(
     (training) => training.functionId === null || training.functionId === functionId
   )
@@ -584,7 +584,7 @@ const writeJunior = async (
 }
 
 /**
- * Answer the quiz questions of a cleared training, mostly right
+ * Answer the quiz questions of a cleared training
  * @param {Reference['trainings'][number]['questions']} questions - Questions
  * @param {string} accountId - Who answered
  * @return {Promise<void>} - Written
@@ -770,7 +770,7 @@ const writeCandidates = async (input: {
 }
 
 /**
- * Trainings followed outside a promotion, so the formations page of veterans is filled too
+ * Trainings followed outside a promotion
  * @param {Reference} reference - Reference rows
  * @param {Cast} cast - People
  * @return {Promise<void>} - Written

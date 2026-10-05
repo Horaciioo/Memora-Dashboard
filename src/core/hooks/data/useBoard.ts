@@ -48,7 +48,7 @@ export interface BoardCollection<T extends BoardItem> {
 }
 
 /**
- * Drive one board, whatever resource sits behind it
+ * Drive one board
  * @param {WorkflowScopeName} scope - Board scope
  * @param {BoardEndpoints} endpoints - Paths of the resource
  * @param {T[]} initialCards - Cards resolved server-side
@@ -114,7 +114,7 @@ export const useBoard = <T extends BoardItem>(
 
   const move = useCallback(
     (id: string, columnId: string, index: number) => {
-      // Paint the drop first, the server confirms the exact position right after
+      // Paint the drop first
       setCards((current) =>
         current.map((entry) => (entry.id === id ? { ...entry, columnId } : entry))
       )

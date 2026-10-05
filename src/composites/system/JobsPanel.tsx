@@ -5,7 +5,7 @@ import { CONSOLE_BLOCK } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 
 /**
- * One row per declared job, its cadence and the overrides it carries
+ * One row per declared job
  * @return {JSX.Element}
  */
 

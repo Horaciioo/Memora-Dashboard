@@ -12,7 +12,7 @@ export interface DiscordReplicaMessageProps {
 }
 
 /**
- * Round portrait, a glyph or the initial
+ * Round portrait
  * @param {Object} props - Avatar props
  * @param {DiscordAuthor} props.author - Who
  * @param {string} props.className - Frame class

@@ -5,7 +5,7 @@ import { formatNumber } from '@/utils/format/numbers'
  * One counted figure
  * @typedef {Object} ConsoleMetric
  * @property {string} label - What is counted
- * @property {number | string} value - Count, or a figure already carrying its unit
+ * @property {number | string} value - Count
  * @property {string} [hint] - Supporting line
  */
 

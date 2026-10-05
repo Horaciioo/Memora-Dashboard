@@ -46,7 +46,7 @@ export interface FilterBarProps {
 }
 
 /**
- * A filter icon opening the dropdown sheet, a search icon expanding its own field beside it
+ * A filter icon opening the dropdown sheet
  * @param {string} searchLabel - Accessible label of the search field
  * @param {string} search - Current search term
  * @param {(value: string) => void} onSearch - Search handler

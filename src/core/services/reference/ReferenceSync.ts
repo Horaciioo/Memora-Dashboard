@@ -14,7 +14,7 @@ import {
 let synced: Promise<void> | null = null
 
 /**
- * Resolve a name to its row identifier, nothing when the name is empty or unknown
+ * Resolve a name to its row identifier
  * @param {Map<string, string>} ids - Identifiers by name
  * @param {string | null} name - Name to resolve
  * @return {string | null} - Row identifier
@@ -24,8 +24,7 @@ const idOf = (ids: Map<string, string>, name: string | null): string | null =>
   name === null ? null : (ids.get(name) ?? null)
 
 /**
- * Write the collections fixed in code onto their rows, by natural key and never deleting
- * a row, so every branch holds them whatever was seeded
+ * Write the collections fixed in code onto their rows
  * @return {Promise<void>} - Written
  */
 
@@ -48,7 +47,7 @@ const writeLibrary = async (): Promise<void> => {
   const functionIds = new Map(functions.map((row) => [row.name, row.id]))
   const dispositifIds = new Map(dispositifRows.map((row) => [row.name, row.id]))
 
-  // Statuses, positioned within their own record
+  // Statuses
   const positions = new Map<string, number>()
 
   for (const entry of LIBRARY_STATES) {
@@ -163,7 +162,7 @@ const writeLibrary = async (): Promise<void> => {
 }
 
 /**
- * Make sure the collections declared in code sit in the database, once per process
+ * Make sure the collections declared in code sit in the database
  * @return {Promise<void>} - Synced
  */
 

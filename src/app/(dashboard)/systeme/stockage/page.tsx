@@ -18,7 +18,7 @@ import { formatBytes } from '@/utils/format/numbers'
 export const metadata: Metadata = { title: SYSTEM_COPY.storageTitle }
 
 /**
- * What the file store holds, destination by destination
+ * What the file store holds
  * @return {Promise<JSX.Element>} - Storage page
  */
 

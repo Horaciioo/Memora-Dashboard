@@ -13,7 +13,7 @@ const originOf = (url: string): string => new URL(url).origin
 /**
  * Optional URL origin
  * @param {string} [url] - Absolute URL
- * @return {string[]} - Origin, or nothing
+ * @return {string[]} - Origin
  */
 
 const optionalOrigin = (url?: string): string[] => {
@@ -49,7 +49,7 @@ const ALLOWED_ORIGINS = {
  */
 
 export const buildContentSecurityPolicy = (nonce: string, isDevelopment: boolean): string => {
-  // The dev server evaluates its own refresh runtime, production never does
+  // The dev server evaluates its own refresh runtime
   const scriptSources = [
     "'self'",
     `'nonce-${nonce}'`,

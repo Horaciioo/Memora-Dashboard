@@ -27,7 +27,7 @@ export interface SanctionMeasureView {
 }
 
 /**
- * One step of a ladder, a condition and the measures applied together
+ * One step of a ladder
  * @typedef {Object} SanctionRungView
  * @property {string} id - Step identifier
  * @property {number} step - Zero-based position
@@ -43,7 +43,7 @@ export interface SanctionRungView {
 }
 
 /**
- * Tile of one offence on a panel, read at one level
+ * Tile of one offence on a panel
  * @typedef {Object} SanctionOffenseCard
  * @property {string} id - Offence identifier
  * @property {string} name - Display name
@@ -51,7 +51,7 @@ export interface SanctionRungView {
  * @property {SanctionRungView | null} firstRung - What applies on sight
  * @property {number} rungCount - Steps of the ladder
  * @property {SanctionRungView[]} rungs - Every step at that level
- * @property {string[]} examples - Messages it covers, for the search
+ * @property {string[]} examples - Messages it covers
  */
 
 export interface SanctionOffenseCard {
@@ -65,12 +65,12 @@ export interface SanctionOffenseCard {
 }
 
 /**
- * One offence in full, every level included
+ * One offence in full
  * @typedef {Object} SanctionOffenseDetail
  * @property {string} id - Offence identifier
  * @property {SanctionPanelName} panel - Surface
  * @property {string} name - Display name
- * @property {string | null} summary - What it covers, markdown
+ * @property {string | null} summary - What it covers
  * @property {string[]} examples - Messages to moderate
  * @property {string[]} tolerated - Close messages left alone
  * @property {string | null} warningExample - Reason a moderator can paste
@@ -91,7 +91,7 @@ export interface SanctionOffenseDetail {
 }
 
 /**
- * Panel of one creator on one surface, read at one level
+ * Panel of one creator on one surface
  * @typedef {Object} SanctionPanelView
  * @property {string} youtuberId - Creator
  * @property {SanctionPanelName} panel - Surface

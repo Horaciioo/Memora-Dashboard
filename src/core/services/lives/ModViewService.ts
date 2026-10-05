@@ -35,7 +35,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * What a Mod View opens on
  * @typedef {Object} ModViewSnapshot
  * @property {ModViewState} state - State to draw
- * @property {string | null} channelLogin - Twitch login, for the player
+ * @property {string | null} channelLogin - Twitch login
  */
 
 export interface ModViewSnapshot {
@@ -86,7 +86,7 @@ const channelOf = (youtuberId: string) =>
   })
 
 /**
- * The viewer's seat on the live's channel, or the notice saying why not
+ * The viewer's seat on the live's channel
  * @param {string} viewerId - Member
  * @param {string} youtuberId - Creator
  * @return {Promise<{ seat: TwitchSeat, login: string | null, memberLogin: string } | { notice: string }>} - Seat or notice
@@ -142,7 +142,7 @@ const translateRefusal = async (error: unknown, viewerId: string): Promise<AppEr
 }
 
 /**
- * Open the Mod View of a live: what Twitch says now, the recent feed replayed over it
+ * Open the Mod View of a live: what Twitch says now
  * @param {string} liveId - Live
  * @param {AccessScope} scope - Viewer's perimeter
  * @param {string} viewerId - Member
@@ -159,7 +159,7 @@ export const openModView = async (
   const live = await readLive(liveId, scope, viewerId, held)
   let state = baseState(live)
 
-  // Only Twitch is wired, YouTube comes with its own connector
+  // Only Twitch is wired
   if (live.platform !== LivePlatforms.Twitch) return { state, channelLogin: null }
 
   const found = await seatOf(viewerId, live.youtuber.id)
@@ -195,7 +195,7 @@ export const openModView = async (
     return { state: { ...state, notice: refusal.message, readOnly: true }, channelLogin: login }
   }
 
-  // The feed kept since the session opened, replayed in order
+  // The feed kept since the session opened
   const recent = await readRecentEvents(liveId)
   state = recent.reduce(
     (played, event) => applySceneEvent({ view: played, spotlight: null }, event).view,
@@ -216,16 +216,16 @@ export const openModView = async (
 }
 
 /**
- * Carry one gesture out on the platform, checked again on the server
+ * Carry one gesture out on the platform
  * @param {Object} input - Gesture
  * @param {string} input.liveId - Live
  * @param {ModViewIntent} input.intent - Gesture
- * @param {ActContext} input.context - Panel rung, Focus target
+ * @param {ActContext} input.context - Panel rung
  * @param {string} input.key - Idempotency key from the browser
  * @param {AccessScope} input.scope - Viewer's perimeter
  * @param {string} input.viewerId - Member who clicked
  * @param {PermissionName[]} input.held - Permissions held
- * @return {Promise<{ done: boolean }>} - Done, false for a repeated click
+ * @return {Promise<{ done: boolean }>} - Done
  */
 
 export const actOnLive = async (input: {
@@ -239,7 +239,7 @@ export const actOnLive = async (input: {
 }): Promise<{ done: boolean }> => {
   const live = await readLive(input.liveId, input.scope, input.viewerId, input.held)
 
-  // The same rule as the greyed buttons, never trusted from the browser
+  // The same rule as the greyed buttons
   const gate = gateIntent(input.intent, {
     permissions: live.permissions,
     platform: live.platform,
@@ -261,7 +261,7 @@ export const actOnLive = async (input: {
   if (!(await claimGestureKey(`${input.liveId}:${input.viewerId}:${input.key}`)))
     return { done: false }
 
-  // Written before the call, so a failure is logged too
+  // Written before the call
   const logId = await logMemoraGesture({
     liveId: input.liveId,
     platform: live.platform,
@@ -289,7 +289,7 @@ export const actOnLive = async (input: {
   }
   await settleGesture(logId, true)
 
-  // The audit line points at the log line, the business and the trace meet there
+  // The audit line points at the log line
   await recordEvent({
     eventType: 'ModerationActed',
     actorId: input.viewerId,

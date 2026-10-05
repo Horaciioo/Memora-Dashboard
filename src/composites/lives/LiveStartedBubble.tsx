@@ -18,7 +18,7 @@ export interface LiveStartedBubbleProps {
 }
 
 /**
- * A live just started, said once per live under the sidebar entry
+ * A live just started
  * @param {string} liveId - Live on air
  * @param {string} creator - Its creator
  * @return {JSX.Element | null}

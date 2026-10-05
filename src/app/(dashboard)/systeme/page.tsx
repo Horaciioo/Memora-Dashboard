@@ -14,7 +14,7 @@ import { Permissions } from '@/utils/constants/permissions'
 export const metadata: Metadata = { title: SYSTEM_COPY.title }
 
 /**
- * Hub of the system screens, read off the same declaration as the rail
+ * Hub of the system screens
  * @return {Promise<JSX.Element>} - System index
  */
 

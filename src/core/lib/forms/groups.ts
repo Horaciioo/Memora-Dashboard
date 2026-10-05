@@ -4,7 +4,7 @@ import type { IconName } from '@/declarations/ui/icons'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 
 /**
- * Icon of each form category, keyed on its label since that is all a group carries
+ * Icon of each form category
  * @type {Record<string, IconName>}
  */
 
@@ -22,7 +22,7 @@ export const FORM_GROUP_ICONS: Record<string, IconName> = {
 /**
  * One category of a form declaration
  * @typedef {Object} FieldGroup
- * @property {string} name - Category label, also its key
+ * @property {string} name - Category label
  * @property {FieldDefinition[]} fields - Visible fields of the category
  */
 

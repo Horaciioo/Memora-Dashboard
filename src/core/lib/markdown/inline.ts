@@ -13,7 +13,7 @@ interface InlineRule {
 }
 
 /**
- * Ordered rules, longest delimiters first
+ * Ordered rules
  * @type {InlineRule[]}
  */
 

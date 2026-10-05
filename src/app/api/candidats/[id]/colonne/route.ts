@@ -5,7 +5,7 @@ import { recordEvent } from '@/core/services/system/ActivityService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 
-// Where the card was dropped, the column and its index inside it
+// Where the card was dropped
 const OUTCOME_FIELD = 'outcomeId'
 const INDEX_FIELD = 'index'
 

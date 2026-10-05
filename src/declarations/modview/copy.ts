@@ -129,7 +129,7 @@ export const MODVIEW_DURATION_COPY = {
 } as const
 
 /**
- * Spent times, as reports say them
+ * Spent times
  * @type {Record<string, string>}
  */
 
@@ -153,7 +153,7 @@ export const MODVIEW_COMMAND_COPY = {
 } as const
 
 /**
- * Copy of the sanctions panel, second version
+ * Copy of the sanctions panel
  * @type {Record<string, string>}
  */
 

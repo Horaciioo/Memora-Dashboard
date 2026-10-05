@@ -17,8 +17,7 @@ export interface RecruitmentOutcomeSeed {
 }
 
 /**
- * The issues a recruitment starts with, freely edited from the admin console
- * afterwards — they are a starting point, never a fixed list
+ * The issues a recruitment starts with
  * @type {readonly RecruitmentOutcomeSeed[]}
  */
 

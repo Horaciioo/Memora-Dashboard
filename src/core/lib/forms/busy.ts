@@ -6,7 +6,7 @@ import { addDays, startOfDay } from '@/utils/format/days'
 const MINUTE_MS = 60_000
 
 /**
- * End of a slot, a bare moment lasting the default length
+ * End of a slot
  * @param {BusySlot} slot - Event slot
  * @param {Date} start - Slot start
  * @return {Date} - Slot end
@@ -18,7 +18,7 @@ const endOf = (slot: BusySlot, start: Date): Date =>
     : new Date(start.getTime() + AGENDA_SETTINGS.busyDefaultMinutes * MINUTE_MS)
 
 /**
- * Slots a date field value lands inside, a day value matching any event of that day
+ * Slots a date field value lands inside
  * @param {FieldValue} value - Field value
  * @param {FieldKind} kind - Field kind
  * @param {BusySlot[]} slots - Events already held
@@ -67,7 +67,7 @@ export const busyAt = (
  * @param {FieldKind} kind - Field kind
  * @param {BusySlot[] | undefined} slots - Events already held
  * @param {string | null} [ignoreId] - Record being edited
- * @return {string | undefined} - Warning, nothing when free
+ * @return {string | undefined} - Warning
  */
 
 export const busyNotice = (

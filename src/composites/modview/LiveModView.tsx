@@ -12,7 +12,7 @@ export interface LiveModViewProps {
   live: LiveView
   panel: SanctionPanelView | null
   tools: ModViewLiveTools
-  // Creator level, when the live carries none of its own
+  // Creator level
   fallbackLevel: { name: string; icon: IconName | null } | null
 }
 
@@ -20,7 +20,7 @@ export interface LiveModViewProps {
  * Mod View of one real live
  * @param {LiveView} live - Live
  * @param {SanctionPanelView | null} panel - Creator panel at the level in force
- * @param {ModViewLiveTools} tools - History, team and Focus
+ * @param {ModViewLiveTools} tools - History
  * @param {{ name: string, icon: IconName | null } | null} fallbackLevel - Creator level
  * @return {JSX.Element}
  */

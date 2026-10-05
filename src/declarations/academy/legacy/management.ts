@@ -1,7 +1,7 @@
 import type { Course } from '@/declarations/academy/curriculum/types'
 
 /**
- * Common Legacy module about managing volunteers, from motivation to feedback
+ * Common Legacy module about managing volunteers
  * @type {Course}
  */
 

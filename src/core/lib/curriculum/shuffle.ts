@@ -1,13 +1,12 @@
-// Seed of a text, small and stable across server and browser
+// Seed of a text
 const seedOf = (value: string): number =>
   [...value].reduce((seed, char) => (seed * 31 + char.charCodeAt(0)) >>> 0, 7)
 
 /**
- * Shuffle the same way on the server and in the browser, so nothing mismatches on hydration
- * and an order exercise never opens already solved
+ * Shuffle the same way on the server and in the browser
  * @param {T[]} items - Items in the right order
  * @param {string} salt - Text seeding the shuffle
- * @return {T[]} - Items shuffled, never in their original order
+ * @return {T[]} - Items shuffled
  */
 
 export const shuffled = <T>(items: T[], salt: string): T[] => {

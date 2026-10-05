@@ -60,7 +60,7 @@ export const readTwoFactorState = cache(async (accountId: string): Promise<TwoFa
  * @param {Object} member - Signed-in member
  * @param {string} member.id - Account identifier
  * @param {string} member.displayName - Display name
- * @return {Promise<TwoFactorEnrolment>} - Secret, QR code and fallback codes
+ * @return {Promise<TwoFactorEnrolment>} - Secret
  */
 
 export const startEnrolment = async (member: {
@@ -81,7 +81,7 @@ export const startEnrolment = async (member: {
     create: { accountId: member.id, secret: encryptSecret(secret) },
   })
 
-  // The clear codes are handed over once, only their digests are kept
+  // The clear codes are handed over once
   await prisma.$transaction([
     prisma.twoFactorRecoveryCode.deleteMany({ where: { credentialId: credential.id } }),
     prisma.twoFactorRecoveryCode.createMany({
@@ -230,7 +230,7 @@ export const sealSession = async (token: string): Promise<void> => {
 /**
  * Read the window
  * @param {string} token - Session token
- * @return {Promise<string | null>} - Instant it closes, null once shut
+ * @return {Promise<string | null>} - Instant it closes
  */
 
 export const readUnlockWindow = cache(async (token: string): Promise<string | null> => {

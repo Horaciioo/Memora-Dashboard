@@ -202,7 +202,7 @@ export const readDiscordUser = async (accessToken: string): Promise<DiscordIdent
 }
 
 /**
- * Keep the grant of one member, both halves encrypted at rest
+ * Keep the grant of one member
  * @param {string} accountId - Account identifier
  * @param {DiscordGrant} grant - Grant
  * @return {Promise<void>} - Stored
@@ -224,7 +224,7 @@ export const storeGrant = async (accountId: string, grant: DiscordGrant): Promis
 }
 
 /**
- * Read a usable bearer token, renewing it when it has expired
+ * Read a usable bearer token
  * @param {string} accountId - Account identifier
  * @return {Promise<string | null>} - Bearer token
  */

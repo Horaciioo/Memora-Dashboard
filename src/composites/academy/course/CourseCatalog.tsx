@@ -19,7 +19,7 @@ import { TrainingStatuses } from '@/utils/constants/hierarchy'
 
 export interface CourseCatalogProps {
   courses: CourseCard[]
-  // Course just finished, its stamp played once
+  // Course just finished
   celebrate?: string | null
 }
 
@@ -90,8 +90,7 @@ const CourseTile = ({ course, isPending }: { course: CourseCard; isPending: bool
 }
 
 /**
- * Catalogue of the interactive courses: the indispensable ones first, then those opening with
- * the practice period
+ * Catalogue of the interactive courses: the indispensable ones first
  * @param {CourseCatalogProps} props - Courses of the member
  * @return {JSX.Element}
  */
@@ -103,7 +102,7 @@ export const CourseCatalog = ({ courses, celebrate }: CourseCatalogProps) => {
     celebrate && courses.some((course) => course.id === celebrate) ? celebrate : null
   )
 
-  // Once landed, the flag leaves the address
+  // Once landed
   const land = useCallback(() => {
     setPending(null)
     router.replace(pathname)

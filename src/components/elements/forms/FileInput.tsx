@@ -21,7 +21,7 @@ export interface FileInputProps {
 }
 
 /**
- * Picture field, the file travelling to the storage route and only its URL landing in the form
+ * Picture field
  * @param {string} id - Control identifier
  * @param {string | null} value - Stored picture URL
  * @param {StorageBucket} bucket - Destination bucket
@@ -58,8 +58,7 @@ export const FileInput = ({ id, value, bucket, disabled, invalid, onChange }: Fi
   return (
     <div className={cn(FILE_INPUT_STYLES.frame, invalid && FILE_INPUT_STYLES.invalid)}>
       {value ? (
-        // The picture is user supplied, so no static import and no optimiser
-        // eslint-disable-next-line @next/next/no-img-element
+        // The picture is user supplied
         <img src={value} alt="" className={FILE_INPUT_STYLES.preview} />
       ) : (
         <span className={FILE_INPUT_STYLES.placeholder} aria-hidden="true" />

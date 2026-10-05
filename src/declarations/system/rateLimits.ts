@@ -57,7 +57,7 @@ const RATE_LIMIT_MAP = {
   export: policy('export', 'Export', RATE_LIMIT_SCOPES.Account, 86400, 5),
   twoFactor: policy('twoFactor', 'Second factor', RATE_LIMIT_SCOPES.Account, 300, 10),
   lookup: policy('lookup', 'Account lookup', RATE_LIMIT_SCOPES.Address, 60, 30),
-  // A busy live calls for many gestures a minute, Twitch counts its own points
+  // A busy live calls for many gestures a minute
   moderation: policy('moderation', 'Mod View gesture', RATE_LIMIT_SCOPES.Account, 60, 240),
 } satisfies Record<string, RateLimitPolicy>
 

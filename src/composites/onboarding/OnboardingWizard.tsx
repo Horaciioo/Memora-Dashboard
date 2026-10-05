@@ -28,7 +28,7 @@ export interface OnboardingWizardProps {
 /**
  * What a submitted form answers with
  * @typedef {Object} SubmitOutcome
- * @property {string | null} accountId - Account opened, when the mode opens one
+ * @property {string | null} accountId - Account opened
  * @property {boolean} awaitsApproval - Account held until a responsable validates it
  */
 
@@ -38,7 +38,7 @@ interface SubmitOutcome {
 }
 
 /**
- * Notice a step owes the person, drawn under its fields
+ * Notice a step owes the person
  * @type {Record<string, string>}
  */
 
@@ -49,7 +49,7 @@ const STEP_NOTICES: Record<string, string> = {
 }
 
 /**
- * Public integration form, the identity gate first then the declared groups
+ * Public integration form
  * @param {string} token - Link token
  * @param {FieldDefinition[]} fields - Declarations of the integration form
  * @param {IntegrationClaimView | null} claim - Identity the server resolved
@@ -67,7 +67,7 @@ export const OnboardingWizard = ({ token, fields, claim, failure }: OnboardingWi
   const onChange = (name: string, value: FieldValue) =>
     setValues((current) => ({ ...current, [name]: value }))
 
-  // The declared groups become the steps, the identity gate leading them
+  // The declared groups become the steps
   const steps: WizardStep[] = useMemo(() => {
     const identity: WizardStep = {
       id: 'identity',

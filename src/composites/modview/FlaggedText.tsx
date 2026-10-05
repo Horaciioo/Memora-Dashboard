@@ -8,7 +8,7 @@ export interface FlaggedTextProps {
 }
 
 /**
- * Message text, held words wrapped in red
+ * Message text
  * @param {string} text - Message
  * @param {string[]} [flagged] - Held words
  * @return {JSX.Element}
@@ -17,7 +17,7 @@ export interface FlaggedTextProps {
 export const FlaggedText = ({ text, flagged }: FlaggedTextProps) => {
   if (!flagged || flagged.length === 0) return <>{text}</>
 
-  // Split on every held word, case kept
+  // Split on every held word
   const escaped = flagged.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
   const parts = text.split(new RegExp(`(${escaped.join('|')})`, 'gi'))
   const held = new Set(flagged.map((word) => word.toLowerCase()))

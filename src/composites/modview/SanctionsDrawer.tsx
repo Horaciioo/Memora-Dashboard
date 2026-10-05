@@ -15,10 +15,10 @@ import type { Chatter } from '@/types/modview'
 import type { SanctionOffenseCard, SanctionPanelView, SanctionRungView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
 
-// Favourites kept per browser, a reading convenience
+// Favourites kept per browser
 const FAVORITES_KEY = 'memora:modview:favorites'
 
-// Glyph tabs, no written title
+// Glyph tabs
 type PanelTab = 'favorites' | 'recents' | 'all'
 const TABS: { key: PanelTab; icon: IconName; label: string }[] = [
   { key: 'favorites', icon: 'star', label: MODVIEW_PANEL_COPY.favorites },
@@ -27,7 +27,7 @@ const TABS: { key: PanelTab; icon: IconName; label: string }[] = [
 ]
 
 /**
- * Read the pinned offences, an empty list when storage is out of reach
+ * Read the pinned offences
  * @return {string[]} - Offence identifiers
  */
 
@@ -43,7 +43,7 @@ const readFavorites = (): string[] => {
 }
 
 /**
- * Keep the pinned offences, silently when storage is out of reach
+ * Keep the pinned offences
  * @param {string[]} ids - Offence identifiers
  * @return {void}
  */
@@ -101,7 +101,7 @@ export const SanctionsDrawer = ({
   const [search, setSearch] = useState('')
   const [favorites, setFavorites] = useState<string[]>([])
 
-  // Pins live in this browser, read once mounted
+  // Pins live in this browser
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFavorites(readFavorites())
@@ -118,7 +118,7 @@ export const SanctionsDrawer = ({
     writeFavorites(next)
   }
 
-  // Tab, then search on the name and the examples
+  // Tab
   const needle = search.trim().toLowerCase()
   const offenses = (panel?.offenses ?? [])
     .filter((offense) =>

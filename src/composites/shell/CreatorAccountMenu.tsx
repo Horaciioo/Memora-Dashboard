@@ -157,7 +157,7 @@ export const CreatorAccountMenu = ({ viewContext, unreadCount }: CreatorAccountM
 }
 
 /**
- * Creator portrait, or the none glyph at portrait size
+ * Creator portrait
  * @param {Object} props - Creator
  * @param {CreatorLead | null} props.creator - Creator on screen
  * @return {JSX.Element}

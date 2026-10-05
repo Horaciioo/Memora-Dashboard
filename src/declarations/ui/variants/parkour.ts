@@ -53,7 +53,7 @@ export const PARKOUR_BUBBLE = {
 } as const
 
 /**
- * Lives a junior accompanied, on their file
+ * Lives a junior accompanied
  * @type {Record<string, string>}
  */
 

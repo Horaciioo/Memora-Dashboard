@@ -42,7 +42,7 @@ export const KeyPointsBlock = ({ block }: { block: Extract_<'keypoints'> }) => (
 )
 
 /**
- * A process drawn as stops joined by arrows, each a glyph on a coloured disc
+ * A process drawn as stops joined by arrows
  * @param {Object} props - Block
  * @return {JSX.Element}
  */
@@ -87,7 +87,7 @@ export const DiagramBlock = ({ block }: { block: Extract_<'diagram'> }) => {
 }
 
 /**
- * What to do against what to avoid, side by side
+ * What to do against what to avoid
  * @param {Object} props - Block
  * @return {JSX.Element}
  */

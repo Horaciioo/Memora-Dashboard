@@ -56,12 +56,12 @@ export const useTwoFactor = (
 ): TwoFactorCollection => {
   const router = useRouter()
   const { isSaving, issues, clearIssues, run } = useMutation()
-  // The server owns both: a window that ran out is resealed on the next render, not on a timer
+  // The server owns both: a window that ran out is resealed on the next render
   const [state, setState] = useSyncedState(initialState)
   const [seal, setSeal] = useSyncedState(initialSeal)
   const [enrolment, setEnrolment] = useState<TwoFactorEnrolment | null>(null)
 
-  // Every sealed value on screen was rendered on the server, so the page has to be replayed
+  // Every sealed value on screen was rendered on the server
   const replay = useCallback(() => router.refresh(), [router])
 
   const enrol = useCallback(async () => {

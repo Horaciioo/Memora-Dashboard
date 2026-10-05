@@ -16,8 +16,7 @@ export interface CreatorSwitchProps {
 }
 
 /**
- * Trigger wearing the creator on screen, the strip of the others unfurling leftward
- * out of the rail and folding back on a second press
+ * Trigger wearing the creator on screen
  * @param {CreatorLead[]} creators - Creators the member may pick between
  * @param {string | null} activeYoutuberId - Creator the view is narrowed to
  * @return {JSX.Element}

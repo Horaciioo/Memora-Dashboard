@@ -10,7 +10,7 @@ import { Permissions } from '@/utils/constants/permissions'
  * @typedef {Object} LivePlatformOption
  * @property {string} label - Platform name
  * @property {IconName} icon - Platform glyph
- * @property {string} watchUrl - Public channel address, {login} filled in
+ * @property {string} watchUrl - Public channel address
  */
 
 interface LivePlatformOption {
@@ -56,7 +56,7 @@ const LIVE_STATUS_MAP: Record<LiveStatusName, LiveStatusOption> = {
 export const LIVE_STATUS_REGISTRY = createRegistry(LIVE_STATUS_MAP)
 
 /**
- * Live coordinator, a secondary function held for one live only
+ * Live coordinator
  * @type {{ label: string, icon: IconName, tint: string, grants: readonly PermissionName[] }}
  */
 

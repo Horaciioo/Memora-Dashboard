@@ -81,7 +81,7 @@ const PARKOUR_SHAPE = {
 
 type ParkourRow = Prisma.AcademyJuniorGetPayload<{ include: typeof PARKOUR_SHAPE }>
 
-// Lives thresholds, read once per call
+// Lives thresholds
 const thresholds = () => ({
   firstPeriodLives: ACADEMY_SETTINGS.firstPeriodLives,
   secondPeriodLives: ACADEMY_SETTINGS.secondPeriodLives,
@@ -140,7 +140,7 @@ const phaseOf = (row: ParkourRow): ParkourPhase =>
   resolvePhase(toParkourJunior(row), toParkourSession(row.session))
 
 /**
- * Load a junior, inside a visibility fragment when one is given
+ * Load a junior
  * @param {string} juniorId - Junior identifier
  * @param {Prisma.AcademySessionWhereInput} [scope] - Visibility fragment
  * @return {Promise<ParkourRow>} - Junior row
@@ -177,7 +177,7 @@ const responsablesOf = async (row: ParkourRow): Promise<string[]> => {
   const found = [...new Set([...named, ...anchors])]
   if (found.length > 0) return found
 
-  // No campaign behind the promotion, every responsable hears of it
+  // No campaign behind the promotion
   const everyone = await prisma.account.findMany({
     where: { role: MemberRoles.Responsable, status: { notIn: GONE_MEMBER_STATUSES } },
     select: { id: true },
@@ -187,7 +187,7 @@ const responsablesOf = async (row: ParkourRow): Promise<string[]> => {
 }
 
 /**
- * Integration link of a promotion, opened when none is usable
+ * Integration link of a promotion
  * @param {string} sessionId - Promotion
  * @param {string} functionId - Function trained for
  * @return {Promise<string>} - Link path
@@ -217,7 +217,7 @@ const ensureKickoffInvite = async (sessionId: string, functionId: string): Promi
 }
 
 /**
- * Read where a junior stands on the parkour, with what the viewer may do
+ * Read where a junior stands on the parkour
  * @param {string} juniorId - Junior identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<ParkourView>} - Parkour view
@@ -231,7 +231,7 @@ export const readParkour = async (
   const phase = phaseOf(row)
   const isPlanned = row.session.status !== AcademySessionStatuses.Running
 
-  // Seats of the promotion, for the manual launches
+  // Seats of the promotion
   const seats = await prisma.academyJunior.findMany({
     where: { sessionId: row.sessionId },
     include: { reviews: { select: { stage: true, status: true } } },
@@ -263,7 +263,7 @@ export const readParkour = async (
 }
 
 /**
- * Declare the PIM start of one junior, their integration link opening
+ * Declare the PIM start of one junior
  * @param {string} juniorId - Junior identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @return {Promise<string>} - Integration link path
@@ -284,7 +284,7 @@ export const declareKickoff = async (
 /**
  * Tell the juniors and their trainers a promotion is running
  * @param {string} sessionId - Promotion
- * @param {string | null} actorId - Who launched it, none for the automation
+ * @param {string | null} actorId - Who launched it
  * @return {Promise<void>} - Told
  */
 
@@ -309,7 +309,7 @@ const announceLaunch = async (sessionId: string, actorId: string | null): Promis
 }
 
 /**
- * Launch a promotion by hand, the juniors still on their form following later
+ * Launch a promotion by hand
  * @param {string} sessionId - Promotion
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {string} actorId - Responsable launching
@@ -362,7 +362,7 @@ const launchWhenReady = async (sessionId: string): Promise<boolean> => {
 }
 
 /**
- * Follow up a confirmed integration form: a late seat starts alone, a full promotion launches
+ * Follow up a confirmed integration form: a late seat starts alone
  * @param {string} juniorId - Junior whose form came back
  * @return {Promise<void>} - Followed up
  */
@@ -370,7 +370,7 @@ const launchWhenReady = async (sessionId: string): Promise<boolean> => {
 export const afterIntegration = async (juniorId: string): Promise<void> => {
   const row = await loadJunior(juniorId)
 
-  // The promotion already runs, this seat joins it on its own
+  // The promotion already runs
   if (row.session.status === AcademySessionStatuses.Running) {
     if (row.stage === AcademyStages.Preparation) {
       await prisma.academyJunior.update({
@@ -415,7 +415,7 @@ const planReview = async (row: ParkourRow): Promise<void> => {
 }
 
 /**
- * Move juniors whose lives count reached a threshold, their check-in falling due
+ * Move juniors whose lives count reached a threshold
  * @param {string[]} juniorIds - Juniors whose count moved
  * @return {Promise<void>} - Moved
  */
@@ -500,7 +500,7 @@ export const afterReviewSubmitted = async (reviewId: string, actorId: string): P
 }
 
 /**
- * Read the third period deadline a decision carries, bounded by the settings
+ * Read the third period deadline a decision carries
  * @param {Record<string, unknown>} raw - Request body
  * @return {Date} - Deadline
  */
@@ -531,7 +531,7 @@ export const readThirdPeriodDeadline = (raw: Record<string, unknown>): Date => {
 /**
  * Open the second period for a whole promotion
  * @param {string} sessionId - Promotion
- * @param {string | null} actorId - Who opened it, none for the automation
+ * @param {string | null} actorId - Who opened it
  * @return {Promise<void>} - Opened
  */
 
@@ -586,7 +586,7 @@ const openSecondPeriodWhenReady = async (sessionId: string): Promise<void> => {
 }
 
 /**
- * Open the second period by hand, the juniors still undecided joining later
+ * Open the second period by hand
  * @param {string} sessionId - Promotion
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {string} actorId - Responsable opening it
@@ -636,8 +636,7 @@ const graduate = async (row: ParkourRow): Promise<void> => {
 }
 
 /**
- * End a junior's parkour by dismissal or resignation: everything in course is cancelled, the
- * personal data erased for good and a departure announcement drafted
+ * End a junior's parkour by dismissal or resignation: everything in course is cancelled
  * @param {string} juniorId - Junior identifier
  * @param {DepartureKindName} kind - Dismissal or resignation
  * @param {string | null} actorId - Who ended it
@@ -656,7 +655,7 @@ export const endParkour = async (
   const dismissed = kind === DepartureKinds.Dismissal
   const now = new Date()
 
-  // The seat closes, every open check-in with it
+  // The seat closes
   await prisma.$transaction([
     prisma.academyJunior.update({
       where: { id: juniorId },
@@ -681,7 +680,7 @@ export const endParkour = async (
     }),
   ])
 
-  // Personal data erased, access closed, the Discord identity frozen
+  // Personal data erased
   await clearVolunteeredDetails(row.accountId)
   await prisma.$transaction([
     prisma.session.deleteMany({ where: { accountId: row.accountId } }),
@@ -733,7 +732,7 @@ export const endParkour = async (
  * Carry out what a responsable decided on a check-in
  * @param {string} reviewId - Decided check-in
  * @param {string} actorId - Responsable
- * @param {Date | null} deadlineAt - Third period deadline, when one opens
+ * @param {Date | null} deadlineAt - Third period deadline
  * @return {Promise<void>} - Applied
  */
 
@@ -762,7 +761,7 @@ export const applyDecision = async (
       await endParkour(row.id, DepartureKinds.Dismissal, actorId)
       return
     case 'secondPeriod':
-      // Late in a promotion already in period 2, the junior goes straight in
+      // Late in a promotion already in period 2
       if (row.session.secondPeriodAt) {
         await prisma.academyJunior.update({
           where: { id: row.id },
@@ -784,7 +783,7 @@ export const applyDecision = async (
 }
 
 /**
- * Record a junior's resignation, a single gesture
+ * Record a junior's resignation
  * @param {string} juniorId - Junior identifier
  * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
  * @param {string} actorId - Responsable recording it
@@ -836,7 +835,7 @@ export const publishDeparture = async (id: string, actorId: string): Promise<voi
 }
 
 /**
- * Where one running junior stands, for the task inbox
+ * Where one running junior stands
  * @typedef {Object} ParkourStanding
  */
 

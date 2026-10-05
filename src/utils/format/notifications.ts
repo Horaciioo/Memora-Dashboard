@@ -1,11 +1,11 @@
 import type { NotificationKindOption } from '@/declarations/notifications/registries'
 
 /**
- * One notification sentence, cut where its emphasis falls
+ * One notification sentence
  * @typedef {Object} NotificationSentence
  * @property {string} before - Words ahead of the emphasised verb
  * @property {string} verb - Emphasised words
- * @property {string} after - Words after it, the full stop included
+ * @property {string} after - Words after it
  */
 
 export interface NotificationSentence {
@@ -18,7 +18,7 @@ export interface NotificationSentence {
  * Read a notification as a sentence: "<actor> <lead> <verb> <trail>", or, for a kind addressed
  * to the member, its lead alone with the subject worked in
  * @param {NotificationKindOption} kind - Registry entry of the kind
- * @param {string} actor - Who acted, or the stand-in for the system
+ * @param {string} actor - Who acted
  * @param {string | null} subject - What the act was about
  * @return {NotificationSentence} - Sentence in three parts
  */

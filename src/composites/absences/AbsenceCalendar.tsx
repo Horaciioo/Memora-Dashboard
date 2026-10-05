@@ -10,7 +10,7 @@ import { cn } from '@/utils/classnames'
 import { monthGrid, toDayKey } from '@/utils/format/calendar'
 import { addMonths, monthLabel, parseDay, startOfMonth } from '@/utils/format/days'
 
-// Days of a week, a month row is dropped when none of its days belongs to the month
+// Days of a week
 const WEEK = 7
 
 export interface AbsenceSpan {
@@ -19,18 +19,16 @@ export interface AbsenceSpan {
 }
 
 export interface AbsenceCalendarProps {
-  // Days picked so far: both once the range is closed, only the first while it is open
+  // Days picked so far: both once the range is closed
   start: string | null
   end: string | null
-  // Absences already declared, drawn hatched and out of reach
+  // Absences already declared
   booked: AbsenceSpan[]
   onChange: (start: string | null, end: string | null) => void
 }
 
 /**
- * One month to pick the first and the last day of an absence. The first click
- * opens the range, the second closes it, a third starts over. Days behind and days already
- * covered by another absence cannot be picked
+ * One month to pick the first and the last day of an absence. The first click opens the range
  * @param {string | null} start - First day picked
  * @param {string | null} end - Last day picked
  * @param {AbsenceSpan[]} booked - Absences already declared
@@ -64,7 +62,7 @@ export const AbsenceCalendar = ({ start, end, booked, onChange }: AbsenceCalenda
     return onChange(start, day)
   }
 
-  // While the range is open, the days up to the pointer are drawn as if it were closed
+  // While the range is open
   const rangeEnd = end ?? (preview && start && preview >= start ? preview : null)
 
   return (

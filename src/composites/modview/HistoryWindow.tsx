@@ -49,8 +49,7 @@ export interface HistoryWindowProps {
 }
 
 /**
- * Who was sanctioned during the live, what comes next for each, the team and its Focus, the
- * connected list folded underneath
+ * Who was sanctioned during the live
  * @param {HistoryWindowProps} props - Window props
  * @return {JSX.Element}
  */
@@ -66,7 +65,7 @@ export const HistoryWindow = ({
 }: HistoryWindowProps) => {
   const [past, setPast] = useState<Record<string, ViewerSanction[] | null>>({})
 
-  // Every chatter seen on screen, to resolve names and identifiers
+  // Every chatter seen on screen
   const known = new Map<string, Chatter>()
   for (const message of state.messages) known.set(message.author.id, message.author)
   for (const group of Object.values(state.community)) {
@@ -77,7 +76,7 @@ export const HistoryWindow = ({
       (chatter) => chatter.name === name || chatter.login === name.toLowerCase()
     ) ?? null
 
-  // Sanctioned viewers: the panel memory first, then any sanction act on screen
+  // Sanctioned viewers: the panel memory first
   const sanctioned = new Map<string, Chatter>()
   for (const id of Object.keys(memory)) {
     const chatter = known.get(id)

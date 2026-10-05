@@ -16,14 +16,14 @@ export interface CalendarEntryPreviewProps {
   anchor: DOMRect
 }
 
-// Width of the card, kept in sync with CALENDAR_STYLES.preview
+// Width of the card
 const CARD_WIDTH = 288
 
 // Gap between the chip and the card
 const OFFSET = 8
 
 /**
- * Floating read-only glance at a calendar entry, shown while the pointer rests on its chip
+ * Floating read-only glance at a calendar entry
  * @param {CalendarEntry} entry - Entry under the pointer
  * @param {DOMRect} anchor - Bounding box of the chip
  * @return {JSX.Element | null}
@@ -38,7 +38,7 @@ export const CalendarEntryPreview = ({ entry, anchor }: CalendarEntryPreviewProp
   const SourceIcon = ICONS[source.icon]
   const paint = accentPaint(entry.accent, entry.muted ? 'neutral' : 'brand')
 
-  // Sit above the chip by default, clamped inside the viewport
+  // Sit above the chip by default
   const left = Math.max(8, Math.min(anchor.left, window.innerWidth - CARD_WIDTH - 8))
   const above = anchor.top > 220
   const top = above ? anchor.top - OFFSET : anchor.bottom + OFFSET

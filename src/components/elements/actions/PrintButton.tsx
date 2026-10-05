@@ -7,7 +7,7 @@ export interface PrintButtonProps {
 }
 
 /**
- * Open the browser's print dialog, where saving as PDF lives too
+ * Open the browser's print dialog
  * @param {string} label - Button text
  * @return {JSX.Element}
  */

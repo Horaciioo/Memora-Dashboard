@@ -20,7 +20,7 @@ export const hasSeenGuide = async (accountId: string, key: GuideKey): Promise<bo
 }
 
 /**
- * Mark a one-time guide as seen, once
+ * Mark a one-time guide as seen
  * @param {string} accountId - Account identifier
  * @param {GuideKey} key - Guide
  * @return {Promise<void>} - Marked

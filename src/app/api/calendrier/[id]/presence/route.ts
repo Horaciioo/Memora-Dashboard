@@ -7,7 +7,7 @@ import { Permissions } from '@/utils/constants/permissions'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
 
-// Answers a member may send, never a plain "no answer"
+// Answers a member may send
 const ANSWERS: AttendanceStatusName[] = [AttendanceStatuses.Present, AttendanceStatuses.Absent]
 
 export const POST = createProtectedRoute({

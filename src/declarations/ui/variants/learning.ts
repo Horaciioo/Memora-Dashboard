@@ -23,7 +23,7 @@ export const PIM_TIMELINE = {
   nodeIdle:
     'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink-subtle)]/70',
   nodeIcon: 'h-5 w-5',
-  // Greyed steps, the one in course keeps its colour
+  // Greyed steps
   body: 'flex min-w-0 flex-1 flex-col gap-1 pt-1.5',
   bodyMuted: 'opacity-60 grayscale',
   eyebrow: `${PROPERTY_LABEL} text-[0.6875rem]`,
@@ -55,13 +55,13 @@ export const TASK_LIST = {
 } as const
 
 /**
- * Guided walkthrough, a ring on the control and a bubble beside it
+ * Guided walkthrough
  * @type {Record<string, string>}
  */
 
 export const GUIDE_TOUR = {
   // Dims the page around the control
-  ring: 'pointer-events-none fixed z-[70] rounded-[var(--radius-md)] ring-2 ring-[var(--color-brand-600)] shadow-[0_0_0_9999px_rgb(0_0_0/0.35)] transition-[top,left,width,height] duration-200',
+  ring: 'pointer-events-none fixed z-[70] rounded-[var(--radius-md)] ring-2 ring-[var(--color-brand-600)] shadow-[0_0_0_9999px_rgb(0_0_0/0.35)] transition-[top,left,width,height] duration-[var(--motion-duration-base)]',
   bubble:
     'fixed z-[71] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel p-4 shadow-[var(--shadow-md)]',
   counter:

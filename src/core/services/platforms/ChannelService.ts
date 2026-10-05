@@ -25,9 +25,9 @@ export const readTwitchChannel = async (youtuberId: string): Promise<CreatorChan
 }
 
 /**
- * Set or clear the Twitch channel of a creator, its identifier read from Twitch
+ * Set or clear the Twitch channel of a creator
  * @param {string} youtuberId - Creator
- * @param {string} login - Channel login, empty to clear
+ * @param {string} login - Channel login
  * @return {Promise<CreatorChannelView | null>} - Channel
  */
 

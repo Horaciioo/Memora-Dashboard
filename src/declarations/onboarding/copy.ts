@@ -100,7 +100,7 @@ export const ONBOARDING_FIELD_COPY = {
 } as const
 
 /**
- * Notices the form owes the person, each shown on the step it applies to
+ * Notices the form owes the person
  * @type {Record<string, string>}
  */
 
@@ -115,7 +115,7 @@ export const ONBOARDING_NOTICE_COPY = {
 } as const
 
 /**
- * Copy of the integration link, handed out from the campaign timeline
+ * Copy of the integration link
  * @type {Record<string, string>}
  */
 

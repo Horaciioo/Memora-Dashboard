@@ -18,7 +18,7 @@ export const academyScope = (
 ): Prisma.AcademySessionWhereInput => {
   if (access.isAdmin || access.isResponsable) return {}
 
-  // A junior trains under a junior function, their own seat still opens the session
+  // A junior trains under a junior function
   return {
     OR: [
       { functionId: { in: viewer.functionIds } },
@@ -28,7 +28,7 @@ export const academyScope = (
 }
 
 /**
- * Guard a junior-scoped read, a plain junior only reaching their own file
+ * Guard a junior-scoped read
  * @param {SessionUser} viewer - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
  * @param {{ accountId: string }} junior - Junior being read

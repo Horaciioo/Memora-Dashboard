@@ -34,7 +34,7 @@ interface Stage {
  * stays drawn as an empty dashed step, so the path always reads end to end
  * @param {MemberSummary} summary - Row of the moderator
  * @param {(href: string) => void} onOpen - Navigates to a stage file
- * @param {Object} hrefs - Destination of each stage, null when it does not exist
+ * @param {Object} hrefs - Destination of each stage
  * @return {JSX.Element}
  */
 

@@ -1,7 +1,7 @@
 import type { LiveconStateView } from '@/types/livecon'
 
 /**
- * Read the level in force for one creator, the team-wide one standing in when it has none
+ * Read the level in force for one creator
  * @param {LiveconStateView[]} state - Open entries
  * @param {string} youtuberId - Creator
  * @return {LiveconStateView | null} - Entry in force

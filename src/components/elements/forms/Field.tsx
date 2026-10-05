@@ -13,7 +13,7 @@ export interface FieldProps {
   // Explanation behind the info glyph
   info?: string
   error?: string
-  // Soft warning that never blocks, e.g. a slot already held
+  // Soft warning that never blocks
   notice?: string
   required?: boolean
   maturity?: MaturityName
@@ -22,7 +22,7 @@ export interface FieldProps {
 }
 
 /**
- * Label, control and message wrapper shared by every input
+ * Label
  * @param {string} id - Identifier of the wrapped control
  * @param {string} label - Field label
  * @param {string} [hint] - Helper line below the control

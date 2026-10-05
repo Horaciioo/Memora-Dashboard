@@ -19,7 +19,7 @@ import { cn } from '@/utils/classnames'
 
 type BranchingBlock = Extract<ExerciseBlock, { kind: 'branching' }>
 
-// Pause before each node's beats, in ms
+// Pause before each node's beats
 const NODE_GAP_MS = 900
 
 interface BranchingStageProps {
@@ -31,8 +31,8 @@ interface BranchingStageProps {
 }
 
 /**
- * The conversation played so far, and the choice it stops on
- * @param {BranchingStageProps} props - Game, picks and handlers
+ * The conversation played so far
+ * @param {BranchingStageProps} props - Game
  * @return {JSX.Element}
  */
 
@@ -98,8 +98,8 @@ const BranchingStage = ({ block, picks, isChecked, onPick, onEnd }: BranchingSta
 }
 
 /**
- * Choice game in the Discord replica: at each turn the learner decides, the conversation follows
- * @param {ExerciseViewProps} props - Block, answer, result and handlers
+ * Choice game in the Discord replica: at each turn the learner decides
+ * @param {ExerciseViewProps} props - Block
  * @return {JSX.Element}
  */
 
@@ -115,7 +115,7 @@ export const BranchingExercise = ({
   const picks = asRecord(answer)
   // A new attempt replays from the first beat
   const [attempt, setAttempt] = useState(0)
-  // Waits for its button, unless already played
+  // Waits for its button
   const [started, setStarted] = useState(!block.startLabel || answer !== undefined)
 
   const restart = () => {

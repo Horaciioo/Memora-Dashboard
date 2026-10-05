@@ -21,7 +21,7 @@ export const PATCH = createProtectedRoute({
     await assertEntryAccess(params.id, session.id, canManage)
     await assertRowInScope('calendarEvent', params.id, perimeter)
 
-    // A lone start only drags the entry, it never rewrites the rest
+    // A lone start only drags the entry
     if (typeof raw.startsAt === 'string' && Object.keys(raw).length === 1) {
       const startsAt = new Date(raw.startsAt)
       if (Number.isNaN(startsAt.getTime())) {

@@ -24,8 +24,8 @@ export const liveStartedKey = (liveId: string): GuideKey => `live-started:${live
  * One page of the trainings welcome
  * @typedef {Object} WelcomePage
  * @property {string} title - Page title
- * @property {{ glyph: IconName, text: string }[]} [rows] - Glyph on the left, line on the right
- * @property {string[]} [body] - Paragraphs, {count} and {trade} filled in
+ * @property {{ glyph: IconName, text: string }[]} [rows] - Glyph on the left
+ * @property {string[]} [body] - Paragraphs
  */
 
 export interface WelcomePage {
@@ -35,7 +35,7 @@ export interface WelcomePage {
 }
 
 /**
- * Welcome of the trainings page, three pages
+ * Welcome of the trainings page
  * @type {readonly WelcomePage[]}
  */
 

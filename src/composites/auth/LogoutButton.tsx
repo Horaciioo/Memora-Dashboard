@@ -5,17 +5,17 @@ import type { ButtonVariant } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 export interface LogoutButtonProps {
-  // Danger by default, softened where the pair beside it must read evenly
+  // Danger by default
   variant?: ButtonVariant
-  // Merged onto the button, the form around it staying a bare wrapper
+  // Merged onto the button
   className?: string
-  // Borderless glyph, no label, for a tight row of controls
+  // Borderless glyph
   iconOnly?: boolean
 }
 
 /**
- * Ends the session through a plain form, no client JavaScript required
- * @param {ButtonVariant} [variant] - Visual weight, defaults to danger
+ * Ends the session through a plain form
+ * @param {ButtonVariant} [variant] - Visual weight
  * @param {string} [className] - Extra classes merged onto the button
  * @param {boolean} [iconOnly] - Renders a borderless glyph instead of the labelled button
  * @return {JSX.Element} - Form and sign-out button

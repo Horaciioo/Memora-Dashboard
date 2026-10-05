@@ -30,7 +30,7 @@ const liveInScope = async (liveId: string, scope: AccessScope) => {
 }
 
 /**
- * Past sanctions of a viewer on the creator's channel, every live included
+ * Past sanctions of a viewer on the creator's channel
  * @param {string} liveId - Live the view opens on
  * @param {string} viewerId - Platform user identifier of the viewer
  * @param {AccessScope} scope - Reader perimeter
@@ -139,9 +139,9 @@ export const inspectModerator = async (
 }
 
 /**
- * Rungs already applied on a live, the panel picking up where it stood
+ * Rungs already applied on a live
  * @param {string} liveId - Live
- * @return {Promise<PanelMemory>} - Memory, empty while the log is not migrated
+ * @return {Promise<PanelMemory>} - Memory
  */
 
 export const readPanelMemory = async (liveId: string): Promise<PanelMemory> => {

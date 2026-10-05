@@ -5,9 +5,9 @@ import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { MemberLiveSummary, MemberModerationView } from '@/types/lives'
 
 /**
- * Moderation history of one member: time in the Mod View and gestures, live by live
+ * Moderation history of one member: time in the Mod View and gestures
  * @param {string} accountId - Member
- * @return {Promise<MemberModerationView | null>} - History, none while the tables are missing
+ * @return {Promise<MemberModerationView | null>} - History
  */
 
 export const readMemberModeration = async (
@@ -16,7 +16,7 @@ export const readMemberModeration = async (
   const since = new Date(Date.now() - LIVE_SETTINGS.hoursWindowDays * 24 * 60 * 60 * 1000)
 
   try {
-    // Lives the member was in, by presence or by gesture
+    // Lives the member was in
     const [presences, actions, windowTime] = await Promise.all([
       prisma.modViewPresence.groupBy({
         by: ['liveId'],

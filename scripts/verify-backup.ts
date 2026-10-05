@@ -90,7 +90,7 @@ const latestMigration = (url: string): string =>
   ]).trim()
 
 /**
- * Dump, restore, compare
+ * Dump
  * @return {Promise<void>}
  */
 

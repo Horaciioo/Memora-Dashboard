@@ -26,7 +26,7 @@ export type FeedbackVerb = 'created' | 'saved' | 'deleted'
 export type FeedbackGender = 'masculine' | 'feminine'
 
 /**
- * Named toast, its emphasis marking the verb to bold
+ * Named toast
  * @typedef {Object} FeedbackTitle
  * @property {string} title - Full sentence
  * @property {string} emphasis - Substring rendered bold
@@ -38,7 +38,7 @@ export interface FeedbackTitle {
 }
 
 /**
- * Verb forms, singular and plural, by gender
+ * Verb forms
  * @type {Record<FeedbackVerb, Record<FeedbackGender, Record<'singular' | 'plural', string>>>}
  */
 
@@ -61,7 +61,7 @@ const FEEDBACK_VERBS: Record<
 } as const
 
 /**
- * Named feedback toast, the record's name quoted when known
+ * Named feedback toast
  * @param {string} entity - Entity label
  * @param {FeedbackVerb} verb - Mutation kind
  * @param {FeedbackGender} gender - Entity gender

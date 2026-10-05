@@ -103,7 +103,7 @@ export interface ChangelogRelease {
 }
 
 /**
- * Release notes, newest first
+ * Release notes
  * @type {ChangelogRelease[]}
  */
 

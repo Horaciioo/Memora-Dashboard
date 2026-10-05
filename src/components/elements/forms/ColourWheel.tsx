@@ -21,21 +21,21 @@ export interface ColourWheelProps {
   describedBy?: string
 }
 
-// Angle a fresh wheel opens on, fully saturated and fully lit
+// Angle a fresh wheel opens on
 const DEFAULT_POSITION: ColourHsv = { hue: 0, saturation: 1, value: 1 }
 
-// Steps one arrow key travels, in degrees of hue and in hundredths of saturation
+// Steps one arrow key travels
 const HUE_STEP = 6
 const SATURATION_STEP = 0.05
 
 // Slider reads brightness in whole percents
 const BRIGHTNESS_MAX = 100
 
-// Half a turn, the reference the thumb offsets from
+// Half a turn
 const HALF = 50
 
 /**
- * Hue circle, brightness slider and hexadecimal field, the single colour control of every form
+ * Hue circle
  * @param {string} id - Identifier of the typed field
  * @param {string} label - Accessible name of the wheel
  * @param {string} value - Stored colour
@@ -67,7 +67,7 @@ export const ColourWheel = ({
     onChange(hsvToHex(next))
   }
 
-  // Pointer position on the circle, read as an angle and a distance from the centre
+  // Pointer position on the circle
   const pickFromPointer = (event: PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect()
     const fromCentreX = event.clientX - rect.left - rect.width / 2
@@ -94,7 +94,7 @@ export const ColourWheel = ({
     pickFromPointer(event)
   }
 
-  // Arrows walk the circle, so the wheel is reachable without a pointer
+  // Arrows walk the circle
   const onWheelKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const hueShift = { ArrowRight: HUE_STEP, ArrowLeft: -HUE_STEP }[event.key]
     const saturationShift = { ArrowUp: SATURATION_STEP, ArrowDown: -SATURATION_STEP }[event.key]

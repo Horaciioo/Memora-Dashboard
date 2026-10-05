@@ -7,26 +7,25 @@ import { cn } from '@/utils/classnames'
 export type EmptyStateVariant = 'start' | 'filter'
 
 export interface EmptyStateProps {
-  // 'start' invites in, 'filter' invites to widen the search
+  // 'start' invites in
   variant?: EmptyStateVariant
   // Overrides the variant's default figure
   figure?: IllustrationName
-  // Falls back to generic copy on 'filter', required on 'start'
+  // Falls back to generic copy on 'filter'
   title?: string
   description?: string
   // Always rendered below the description — an EmptyState is never a dead end
   action: ReactNode
-  // Shrinks padding and illustration, for a box sitting among other content rather than alone
+  // Shrinks padding and illustration
   compact?: boolean
   className?: string
 }
 
 /**
- * Dashed placeholder shown in place of an empty table, list or board, its action being the
- * only way in — 'start' wires to a creation gesture, 'filter' to clearing the filter
- * @param {EmptyStateVariant} [variant] - Kind of emptiness, defaults to start
+ * Dashed placeholder shown in place of an empty table
+ * @param {EmptyStateVariant} [variant] - Kind of emptiness
  * @param {IllustrationName} [figure] - Drawn figure overriding the variant default
- * @param {string} [title] - Headline, required on the start variant
+ * @param {string} [title] - Headline
  * @param {string} [description] - Supporting line
  * @param {ReactNode} action - Mandatory way out
  * @param {boolean} [compact] - Smaller frame and illustration

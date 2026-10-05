@@ -9,7 +9,7 @@ import { PAGE_STYLES } from '@/declarations/ui/variants'
 export const metadata: Metadata = { title: MARSHA_COPY.title }
 
 /**
- * Marsha Bot handbook, open to every member
+ * Marsha Bot handbook
  * @return {Promise<JSX.Element>} - Handbook page
  */
 

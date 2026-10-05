@@ -16,7 +16,7 @@ export interface CourseIntroProps {
 }
 
 /**
- * Opening page of a course, its chapter list read from the chapters themselves
+ * Opening page of a course
  * @param {Course} course - Course
  * @param {CourseIntroData} intro - Opening text
  * @param {() => void} onStart - Open the first chapter

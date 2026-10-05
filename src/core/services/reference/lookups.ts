@@ -9,7 +9,7 @@ import type { Account, Division, JobFunction, Priority, Youtuber } from '@prisma
 
 /**
  * Read the functions a member can be given
- * @return {Promise<JobFunction[]>} - Active functions, in display order
+ * @return {Promise<JobFunction[]>} - Active functions
  */
 
 export const activeFunctions = cache(async (): Promise<JobFunction[]> =>
@@ -18,7 +18,7 @@ export const activeFunctions = cache(async (): Promise<JobFunction[]> =>
 
 /**
  * Read the creators still being worked for
- * @return {Promise<Youtuber[]>} - Active creators, in display order
+ * @return {Promise<Youtuber[]>} - Active creators
  */
 
 export const activeYoutubers = cache(async (): Promise<Youtuber[]> =>
@@ -27,7 +27,7 @@ export const activeYoutubers = cache(async (): Promise<Youtuber[]> =>
 
 /**
  * Read encadrement accounts
- * @return {Promise<Account[]>} - Responsables and admins, by name
+ * @return {Promise<Account[]>} - Responsables and admins
  */
 
 export const encadrementAccounts = cache(async (): Promise<Account[]> =>
@@ -38,8 +38,8 @@ export const encadrementAccounts = cache(async (): Promise<Account[]> =>
 )
 
 /**
- * Read every division, retired ones included
- * @return {Promise<Division[]>} - Divisions, by rank
+ * Read every division
+ * @return {Promise<Division[]>} - Divisions
  */
 
 export const allDivisions = cache(async (): Promise<Division[]> =>
@@ -47,7 +47,7 @@ export const allDivisions = cache(async (): Promise<Division[]> =>
 )
 
 /**
- * Read every priority, heaviest first
+ * Read every priority
  * @return {Promise<Priority[]>} - Priorities
  */
 

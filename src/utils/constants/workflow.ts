@@ -116,7 +116,7 @@ export const EventVisibilities = {
 export type EventVisibilityName = (typeof EventVisibilities)[keyof typeof EventVisibilities]
 
 /**
- * Shape a calendar entry takes on the grid, anchored in code
+ * Shape a calendar entry takes on the grid
  * @type {Record<string, string>}
  */
 
@@ -129,7 +129,7 @@ export const CalendarKinds = {
 export type CalendarKindName = (typeof CalendarKinds)[keyof typeof CalendarKinds]
 
 /**
- * Domain a calendar entry is read from, the shared calendar holding more than its own rows
+ * Domain a calendar entry is read from
  * @type {Record<string, string>}
  */
 
@@ -147,7 +147,7 @@ export const CalendarSources = {
 export type CalendarSourceName = (typeof CalendarSources)[keyof typeof CalendarSources]
 
 /**
- * Calendars a viewer can switch on and off, each gathering the sources it draws from
+ * Calendars a viewer can switch on and off
  * @type {Record<string, string>}
  */
 

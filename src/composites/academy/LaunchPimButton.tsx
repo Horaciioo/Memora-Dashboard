@@ -17,7 +17,7 @@ export interface LaunchPimButtonProps {
 }
 
 /**
- * Launch a planned promotion, confirmed first since every timeline starts on it
+ * Launch a planned promotion
  * @param {string} sessionId - Session identifier
  * @return {JSX.Element}
  */

@@ -22,7 +22,7 @@ export interface DatePickerProps {
   onChange: (value: string | string[]) => void
   label: string
   withTime?: boolean
-  // Picks two ordered days, by drag or two clicks
+  // Picks two ordered days
   range?: boolean
   disabled?: boolean
   invalid?: boolean
@@ -54,10 +54,9 @@ const splitValue = (value: string): { day: string; time: string } => {
 const orderedRange = (a: string, b: string): [string, string] => (a <= b ? [a, b] : [b, a])
 
 /**
- * Drawn calendar replacing the native date input, gaining a time field on a datetime field
- * or a two-day selection with range
+ * Drawn calendar replacing the native date input
  * @param {string} [id] - Identifier of the trigger
- * @param {string | string[]} value - ISO day, ISO minute, or a two-day tuple
+ * @param {string | string[]} value - ISO day
  * @param {(value: string | string[]) => void} onChange - Value handler
  * @param {string} label - Accessible name of the control
  * @param {boolean} [withTime] - Adds the time field under the grid
@@ -111,7 +110,7 @@ export const DatePicker = ({
       return
     }
 
-    // A datetime keeps the time already chosen, or opens the working day
+    // A datetime keeps the time already chosen
     onChange(`${nextDay}T${time || DEFAULT_TIME}`)
   }
 
@@ -126,7 +125,7 @@ export const DatePicker = ({
     [onChange, close]
   )
 
-  // One step of a range: set the anchor, then close it on the next day
+  // One step of a range: set the anchor
   const stepRange = (nextDay: string) => {
     if (anchor === null) {
       setAnchor(nextDay)
@@ -151,7 +150,7 @@ export const DatePicker = ({
     return () => window.removeEventListener('pointerup', onUp)
   }, [isOpen, range, anchor, preview, commitRange])
 
-  // Highlighted span, the live drag winning over the committed pair
+  // Highlighted span
   const activeRange =
     range && anchor !== null && preview !== null
       ? orderedRange(anchor, preview)

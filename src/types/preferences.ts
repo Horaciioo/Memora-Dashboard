@@ -4,16 +4,16 @@ import type { FormValues } from '@/types/forms'
 /**
  * What a member may read and change about themselves
  * @typedef {Object} ProfileDetail
- * @property {string} displayName - Display name, owned by the responsables
+ * @property {string} displayName - Display name
  * @property {string} discordId - Identifier used to sign in
- * @property {string | null} avatarUrl - Portrait, owned by Discord
+ * @property {string | null} avatarUrl - Portrait
  * @property {MemberRoleName} role - Hierarchy level
  * @property {MemberStatusName} status - Membership status
  * @property {string | null} academyDispositif - Dispositif of the active FSI
  * @property {string | null} division - Division name
  * @property {string[]} youtubers - Assigned creators
- * @property {string | null} primaryFunctions - Principal functions, joined
- * @property {string | null} secondaryFunctions - Secondary functions, joined
+ * @property {string | null} primaryFunctions - Principal functions
+ * @property {string | null} secondaryFunctions - Secondary functions
  * @property {string} joinedAt - Day the member arrived
  * @property {FormValues} values - Values feeding the editable form
  */

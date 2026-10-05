@@ -31,7 +31,7 @@ export const PUT = createProtectedRoute({
   permission: Permissions.ReferenceManage,
   descriptor: { summary: 'Replace the responsables anchored on a creator', tags: ['reference'] },
   handler: async ({ params, raw, session, access }) => {
-    // An anchor is what a whole perimeter is read from, so only an admin writes one
+    // An anchor is what a whole perimeter is read from
     if (!access.isAdmin) throw forbidden()
 
     const accountIds = Array.isArray(raw.accountIds) ? raw.accountIds.map(String) : []

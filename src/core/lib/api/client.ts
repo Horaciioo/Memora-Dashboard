@@ -42,7 +42,7 @@ export class ApiClientError extends Error {
  */
 
 const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
-  // Form data carries its own multipart boundary, so no content type is forced
+  // Form data carries its own multipart boundary
   const isFormData = init?.body instanceof FormData
 
   // Reads give up sooner
@@ -68,7 +68,7 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
 
   const envelope = (await response.json()) as ApiEnvelope<T>
 
-  // The envelope carries the outcome, never the status alone
+  // The envelope carries the outcome
   if (!envelope.success) {
     throw new ApiClientError(envelope.error, envelope.code, envelope.issues)
   }
@@ -117,7 +117,7 @@ export const apiPut = <T>(path: string, body: unknown): Promise<T> =>
   request<T>(path, { method: 'PUT', body: JSON.stringify(body) })
 
 /**
- * Remove a resource, a body carrying the selection when several go at once
+ * Remove a resource
  * @param {string} path - API path
  * @param {unknown} [body] - Payload to send
  * @return {Promise<T>} - Payload

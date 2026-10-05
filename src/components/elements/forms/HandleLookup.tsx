@@ -68,7 +68,7 @@ export const HandleLookup = ({ network, handle, onPick }: HandleLookupProps) => 
 
   const { verdict, matches } = result.answer
 
-  // Accounts found are chosen by a click, never ticked
+  // Accounts found are chosen by a click
   if (verdict === 'found' && matches.length > 0) {
     return (
       <ul className={HANDLE_LOOKUP_STYLES.list} aria-live="polite">

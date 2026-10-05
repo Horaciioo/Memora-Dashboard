@@ -10,8 +10,8 @@ import type { FunctionKindName } from '@/utils/constants/workflow'
  * @typedef {Object} RoleGrantsView
  * @property {MemberRoleName} role - Hierarchy level
  * @property {string} label - Display name
- * @property {string} accent - Colour token, appearance override winning
- * @property {string | null} icon - Glyph key, appearance override winning
+ * @property {string} accent - Colour token
+ * @property {string | null} icon - Glyph key
  * @property {boolean} locked - Only an admin writes this level
  * @property {AccessCategoryName} category - Rail section it heads
  * @property {boolean} isFloor - Its grants are the base every overwrite resolves against
@@ -104,9 +104,9 @@ export interface CreatorPerimeterView {
 /**
  * Everything the access console renders
  * @typedef {Object} AccessConsole
- * @property {RoleGrantsView[]} roles - Hierarchy levels, widest first
- * @property {FunctionGrantsView[]} functions - Functions, by category then position
- * @property {AccessMemberView[]} roster - Active accounts, by name
+ * @property {RoleGrantsView[]} roles - Hierarchy levels
+ * @property {FunctionGrantsView[]} functions - Functions
+ * @property {AccessMemberView[]} roster - Active accounts
  * @property {CreatorPerimeterView[]} perimeter - Creators and the functions they open
  * @property {string | null} youtuberId - Creator the open overwrite layer belongs to
  */
@@ -120,7 +120,7 @@ export interface AccessConsole {
 }
 
 /**
- * Effective access of a role or function, as the simulation preview renders it
+ * Effective access of a role or function
  * @typedef {Object} AccessSimulation
  * @property {string} label - Name of the holder being simulated
  * @property {PermissionName[]} permissions - Permissions the holder effectively resolves to
@@ -180,7 +180,7 @@ export interface CreatorLead {
  * @typedef {Object} ViewContext
  * @property {NavigationViewName} view - View on screen
  * @property {NavigationViewName[]} available - Views the member may switch between
- * @property {boolean} switchable - Lightning shows, encadrement only
+ * @property {boolean} switchable - Lightning shows
  * @property {CreatorLead[]} creators - Creators the member may pick between
  * @property {string | null} activeYoutuberId - Creator the view is narrowed to
  */

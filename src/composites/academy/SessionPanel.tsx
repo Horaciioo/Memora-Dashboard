@@ -52,7 +52,7 @@ const STEP_CHIPS: Record<TimelineStepState, string> = {
 // Box holding one group of steps
 const TIMELINE_BOX = SESSION_CARD.group
 
-// A thread moment always carries a kind, a timeline step never does
+// A thread moment always carries a kind
 const isThreadStep = (
   step: AcademyStepView
 ): step is AcademyStepView & { kind: NonNullable<AcademyStepView['kind']> } => step.stage === null
@@ -63,7 +63,7 @@ const isTimelineStep = (
 ): step is AcademyStepView & { stage: AcademyStageName } => step.stage !== null
 
 /**
- * Order two timeline steps by stage, then by their day or live offset
+ * Order two timeline steps by stage
  * @param {AcademyStepView & { stage: AcademyStageName }} a - First step
  * @param {AcademyStepView & { stage: AcademyStageName }} b - Second step
  * @return {number} - Comparator result
@@ -81,7 +81,7 @@ const byStagePosition = (
 
 /**
  * Steps of the same stage blocked behind an earlier late one
- * @param {(AcademyStepView & { stage: AcademyStageName })[]} steps - One group, already ordered
+ * @param {(AcademyStepView & { stage: AcademyStageName })[]} steps - One group
  * @return {Set<string>} - Blocked step identifiers
  */
 
@@ -115,7 +115,7 @@ export interface SessionPanelProps {
 }
 
 /**
- * One session — juniors, timeline, calendar, missions and the free thread
+ * One session — juniors
  * @param {SessionDetail} detail - Session resolved server-side
  * @param {FieldDefinition[]} juniorFields - Declarations of the junior form
  * @param {FieldDefinition[]} stepFields - Declarations of the thread form

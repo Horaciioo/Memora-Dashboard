@@ -7,7 +7,7 @@ import type { RefObject } from 'react'
 const FOCUSABLE =
   'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
 
-// Open overlays, the last one holding the keyboard
+// Open overlays
 const opened: symbol[] = []
 
 /**
@@ -30,7 +30,7 @@ export const useFocusTrap = (
     // Remember the trigger so focus goes back to it
     restoreRef.current = document.activeElement as HTMLElement | null
 
-    // Claim the keyboard, an overlay opened above never gives it back early
+    // Claim the keyboard
     const token = Symbol('trap')
     opened.push(token)
 

@@ -1,7 +1,7 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 
 /**
- * Guided tour of the Mod View, the stops on the left
+ * Guided tour of the Mod View
  * @type {Record<string, string>}
  */
 
@@ -47,7 +47,7 @@ export const COURSE_FOCUS = {
 } as const
 
 /**
- * Decision ladder, rung under rung
+ * Decision ladder
  * @type {Record<string, string>}
  */
 
@@ -100,13 +100,13 @@ export const COURSE_LIVECON = {
 } as const
 
 /**
- * Case study played in the Mod View, questions under it
+ * Case study played in the Mod View
  * @type {Record<string, string>}
  */
 
 export const COURSE_SCENE = {
   context: 'text-[15px] leading-relaxed',
-  // The whole exercise breaks out, its frame with it
+  // The whole exercise breaks out
   wide: 'course-wide',
   stage: 'rounded-[var(--radius-xl)] shadow-[var(--shadow-scene)]',
   controls: 'flex flex-wrap items-center gap-3',
@@ -167,15 +167,15 @@ export const TRAININGS_WELCOME_STYLES = {
 export const COURSE_STAMP = {
   overlay:
     'pointer-events-none fixed inset-0 z-[70] flex flex-col items-center justify-center gap-6',
-  veil: 'absolute inset-0 bg-[color-mix(in_oklab,var(--color-ink)_30%,transparent)] transition-opacity duration-500',
+  veil: 'absolute inset-0 bg-[color-mix(in_oklab,var(--color-ink)_30%,transparent)] transition-opacity duration-[var(--motion-duration-slow)]',
   veilGone: 'opacity-0',
   cheer:
     'rise-in relative text-4xl font-black tracking-tight text-white drop-shadow-lg sm:text-5xl',
   stamp:
     'relative rounded-[var(--radius-lg)] border-[6px] border-[var(--color-apple-red)] px-6 py-3 text-2xl font-black tracking-widest text-[var(--color-apple-red)] uppercase sm:text-4xl',
   stampSlam: 'stamp-slam bg-[color-mix(in_oklab,white_85%,transparent)]',
-  // Flying to the card, the transform written inline
-  stampFly: 'transition-transform duration-700 ease-in-out',
+  // Flying to the card
+  stampFly: 'transition-transform duration-[var(--motion-duration-celebrate)] ease-in-out',
   confetti: 'absolute top-1/2 left-1/2 h-3 w-2 rounded-sm confetti-piece',
   // Steps of the celebrated card fill one by one
   stepFill: 'step-fill bg-[var(--color-brand-600)]',

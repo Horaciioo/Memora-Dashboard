@@ -8,7 +8,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
   icon?: IconName
   iconAfter?: IconName
-  // Waiting on the server: locked, the brand mark running before the label
+  // Waiting on the server: locked
   isLoading?: boolean
 }
 
@@ -17,7 +17,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * @param {ButtonVariant} [variant] - Visual weight
  * @param {IconName} [icon] - Icon rendered instead of a label
  * @param {IconName} [iconAfter] - Icon rendered instead of a label
- * @param {boolean} [isLoading] - Locks the button, shows the loader
+ * @param {boolean} [isLoading] - Locks the button
  * @return {JSX.Element}
  */
 

@@ -11,7 +11,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { PAGE_OPTIONS } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
-// The slot never changes once the banner is mounted, nothing to subscribe to
+// The slot never changes once the banner is mounted
 const subscribeNothing = () => () => undefined
 
 const readHost = (): HTMLElement | null => document.getElementById(PAGE_OPTIONS_HOST_ID)
@@ -31,7 +31,7 @@ export interface PageChoice<TValue extends string = string> {
   onChange: (value: TValue) => void
 }
 
-// A yes/no switch or one pick among a few, told apart by `choices`
+// A yes/no switch or one pick among a few
 export type PageOption = PageToggle | PageChoice
 
 export interface PageOptionsProps {
@@ -39,9 +39,7 @@ export interface PageOptionsProps {
 }
 
 /**
- * Round button in the top right of the page banner, as Notion keeps its page menu, opening a
- * panel of switches and single choices. It lives in the page's own panel so the switches share its state, and is
- * carried into the banner through a portal
+ * Round button in the top right of the page banner
  * @param {PageOption[]} options - One switch per row
  * @return {JSX.Element | null}
  */

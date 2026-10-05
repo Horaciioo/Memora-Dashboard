@@ -14,7 +14,7 @@ export type PageSkeletonLayout =
 
 export interface PageSkeletonProps {
   layout?: PageSkeletonLayout
-  // Hand-picked stack, when no layout fits
+  // Hand-picked stack
   blocks?: PageSkeletonBlock[]
 }
 
@@ -138,7 +138,7 @@ const LayoutBody = ({ layout }: { layout: PageSkeletonLayout }) => {
 /**
  * Route-level skeleton: a title with the brand loader beside it, then the shape of the page
  * it stands in for, so nothing jumps once the data lands
- * @param {PageSkeletonLayout} [layout] - Page family to echo, defaults to a list
+ * @param {PageSkeletonLayout} [layout] - Page family to echo
  * @param {PageSkeletonBlock[]} [blocks] - Hand-picked stack replacing the layout
  * @return {JSX.Element}
  */

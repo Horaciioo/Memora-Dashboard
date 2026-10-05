@@ -1,5 +1,5 @@
 /**
- * Discord replica, the full client drawn on Discord's own tokens
+ * Discord replica
  * @type {Record<string, string>}
  */
 
@@ -17,7 +17,7 @@ export const DISCORD_REPLICA = {
   channel:
     'flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1.5 text-[var(--discord-channel)]',
   channelActive: 'bg-[var(--discord-channel-active)] text-[var(--discord-heading)]',
-  // The channel the scene is about, shining pink
+  // The channel the scene is about
   channelLit:
     'replica-lit bg-[color-mix(in_oklab,var(--color-brand-500)_28%,transparent)] font-semibold text-white ring-1 ring-[var(--color-brand-400)]',
   channelIn: 'replica-channel-in',
@@ -113,7 +113,7 @@ export const DISCORD_REPLICA = {
 } as const
 
 /**
- * Support guide, a notch on the left of a simulation
+ * Support guide
  * @type {Record<string, string>}
  */
 
@@ -130,13 +130,13 @@ export const SUPPORT_GUIDE = {
     'flex h-8 w-8 items-center justify-center rounded-full text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)]',
   closeIcon: 'h-4 w-4',
   steps: 'relative flex flex-col gap-5 pl-7',
-  // Vertical rail, filled up to the step in force
+  // Vertical rail
   rail: 'absolute top-2 bottom-2 left-[0.6875rem] w-0.5 rounded-full bg-[var(--color-border)]',
   railFill:
-    'absolute top-2 left-[0.6875rem] w-0.5 rounded-full bg-[var(--color-apple-green)] transition-[height] duration-700 ease-out',
-  step: 'relative flex flex-col gap-1 transition-opacity duration-500',
+    'absolute top-2 left-[0.6875rem] w-0.5 rounded-full bg-[var(--color-apple-green)] transition-[height] duration-[var(--motion-duration-celebrate)] ease-out',
+  step: 'relative flex flex-col gap-1 transition-opacity duration-[var(--motion-duration-slow)]',
   stepDim: 'opacity-45',
-  dot: 'absolute top-1 -left-7 flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors duration-500',
+  dot: 'absolute top-1 -left-7 flex h-6 w-6 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors duration-[var(--motion-duration-slow)]',
   dotTodo: 'border-[var(--color-border)] bg-[var(--color-surface)]',
   dotDone: 'border-[var(--color-apple-green)] bg-[var(--color-apple-green)] text-white',
   dotCurrent:
@@ -195,7 +195,7 @@ export const BRANCHING = {
 } as const
 
 /**
- * Example messages of a lesson, drawn in the replica's chat
+ * Example messages of a lesson
  * @type {Record<string, string>}
  */
 
@@ -219,6 +219,6 @@ export const DISCLOSURE = {
   root: 'group rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)]',
   summary:
     'flex cursor-pointer list-none items-center gap-3 px-5 py-4 font-bold text-[var(--color-apple-orange)] [&::-webkit-details-marker]:hidden',
-  chevron: 'h-4 w-4 transition-transform duration-300 group-open:rotate-90',
+  chevron: 'h-4 w-4 transition-transform duration-[var(--motion-duration-base)] group-open:rotate-90',
   body: 'course-erase-in flex flex-col gap-4 border-t border-[var(--color-border)] px-5 py-4',
 } as const

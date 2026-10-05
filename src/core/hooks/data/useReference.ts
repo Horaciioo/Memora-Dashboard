@@ -100,7 +100,7 @@ export const useReference = (
 
   const reorder = useCallback(
     async (ids: string[]) => {
-      // Paint the new order first, the server confirms right after
+      // Paint the new order first
       setRows((current) =>
         ids.map((id) => current.find((entry) => entry.id === id)).filter((row) => row !== undefined)
       )

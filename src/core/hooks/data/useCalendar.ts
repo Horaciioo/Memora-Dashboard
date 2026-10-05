@@ -56,7 +56,7 @@ export interface CalendarCollection {
 }
 
 /**
- * Drive the shared calendar, or one session's own window
+ * Drive the shared calendar
  * @param {CalendarEntry[]} initialEntries - Entries resolved server-side
  * @param {string} [sessionId] - Bounds every window read to one academy session
  * @return {CalendarCollection} - State and mutations
@@ -111,9 +111,9 @@ export const useCalendar = (
 
   const move = useCallback(
     async (id: string, startsAt: Date) => {
-      // Optimistic, so the card follows the pointer instead of waiting on the round trip
+      // Optimistic
       const previous = entries
-      // Length kept, as the server does
+      // Length kept
       setEntries((current) =>
         current.map((row) => {
           if (row.id !== id) return row
@@ -179,7 +179,7 @@ export const useCalendar = (
 
   const load = useCallback(
     async (from: string, to: string) => {
-      // A window read never raises a toast, the grid simply refills
+      // A window read never raises a toast
       setLoading(true)
       const next = await queryClient
         .fetchQuery({

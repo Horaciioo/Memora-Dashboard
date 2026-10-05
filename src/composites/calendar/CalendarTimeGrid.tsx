@@ -56,14 +56,14 @@ export interface CalendarTimeGridProps {
   agendaExtras?: (dayKey: string) => CalendarEntry[]
 }
 
-// Grid window, minutes
+// Grid window
 const DAY_START = CALENDAR_SETTINGS.dayStartHour * 60
 const DAY_END = (CALENDAR_SETTINGS.dayEndHour + 1) * 60
 const DAY_SPAN = DAY_END - DAY_START
 const ROW = CALENDAR_SETTINGS.rowMinutes
 const STEP = CALENDAR_SETTINGS.stepMinutes
 
-// Under this, one line
+// Under this
 const COMPACT_MINUTES = ROW / 2
 
 // Clock refresh
@@ -138,8 +138,8 @@ interface DayItem {
 }
 
 /**
- * Day and week board, placed to the minute
- * @param {CalendarTimeGridProps} props - Days, entries, rights and handlers
+ * Day and week board
+ * @param {CalendarTimeGridProps} props - Days
  * @return {JSX.Element}
  */
 
@@ -262,7 +262,7 @@ export const CalendarTimeGrid = ({
     event.preventDefault()
     const point = pointOf(event)
 
-    // Length kept, start snapped
+    // Length kept
     if (dragged && point) {
       const length = dragged.endsAt
         ? (new Date(dragged.endsAt).getTime() - new Date(dragged.startsAt).getTime()) / 60_000

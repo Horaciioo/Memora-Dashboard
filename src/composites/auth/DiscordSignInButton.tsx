@@ -6,7 +6,7 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
 
 /**
- * Hands the browser over to Discord, the exchange happening server side
+ * Hands the browser over to Discord
  * @return {JSX.Element}
  */
 

@@ -1,5 +1,5 @@
 /**
- * Hue, saturation and value of a colour
+ * Hue
  * @typedef {Object} ColourHsv
  * @property {number} hue - Angle in degrees
  * @property {number} saturation - Ratio from zero to one
@@ -36,7 +36,7 @@ export const isHexColour = (raw: string | null | undefined): boolean =>
 /**
  * Bring a typed colour back to its six digit form
  * @param {string} raw - Typed colour
- * @return {string | null} - Normalised colour, null when unreadable
+ * @return {string | null} - Normalised colour
  */
 
 export const normaliseHex = (raw: string): string | null => {
@@ -103,7 +103,7 @@ export const hexToHsv = (hex: string, fallback: ColourHsv): ColourHsv => {
   const highest = Math.max(red, green, blue)
   const chroma = highest - Math.min(red, green, blue)
 
-  // A grey has no angle of its own, so the previous hue is kept
+  // A grey has no angle of its own
   if (chroma === 0) return { hue: fallback.hue, saturation: 0, value: highest }
 
   // Sector the dominant channel sits in

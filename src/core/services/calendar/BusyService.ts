@@ -9,11 +9,11 @@ import type { BusySlot, FieldDefinition } from '@/types/forms'
 import { CalendarSources } from '@/utils/constants/workflow'
 import { addDays, startOfDay } from '@/utils/format/days'
 
-// Sources telling something is happening, never a birthday or an absence
+// Sources telling something is happening
 const HOLDING_SOURCES: string[] = [CalendarSources.Entry, CalendarSources.Meeting]
 
 /**
- * Record an entry stands for, so an edited meeting never collides with its own calendar row
+ * Record an entry stands for
  * @param {string} id - Entry identifier
  * @param {string} source - Entry source
  * @param {string | null} href - Page of the record
@@ -28,7 +28,7 @@ const refOf = (id: string, source: string, href: string | null): string => {
 }
 
 /**
- * Read the events happening from now on, what a date field warns about
+ * Read the events happening from now on
  * @param {Object} input - Read context
  * @param {string} input.viewerId - Signed-in member
  * @param {PermissionHelpers} input.access - Permission helpers

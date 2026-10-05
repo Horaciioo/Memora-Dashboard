@@ -8,7 +8,7 @@ export type NounGender = 'masculine' | 'feminine'
 // Masculine nouns taking "cet"
 const ELIDED_START = /^[aeiouyàâäéèêëîïôöùûüh]/i
 
-// Capital past the first letter, as in YouTubeur
+// Capital past the first letter
 const INNER_CAPITAL = /\p{Lu}/u
 
 /**
@@ -28,7 +28,7 @@ export const inlineNoun = (noun: string): string => {
  * Demonstrative before a noun
  * @param {string} noun - Display label
  * @param {NounGender} gender - Noun gender
- * @return {string} - ce, cet or cette
+ * @return {string} - ce
  */
 
 export const demonstrative = (noun: string, gender: NounGender): string => {

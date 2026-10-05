@@ -33,7 +33,7 @@ export const GET = createStreamRoute({
           unsubscribe()
         }
 
-        // Browser gone, listeners dropped
+        // Browser gone
         request.signal.addEventListener('abort', () => {
           release()
           controller.close()

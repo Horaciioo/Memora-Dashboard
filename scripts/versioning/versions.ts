@@ -26,7 +26,7 @@ const UNRELEASED_HEADING = '## [Non publié]'
  * @property {string} snapshotBranch - Testers branch
  * @property {string[]} promotionFlow - Promotion order
  * @property {Record<string, string>} stages - Stage per branch
- * @property {string | null} notesFile - User notes, none for a site
+ * @property {string | null} notesFile - User notes
  */
 
 interface VersioningSettings {

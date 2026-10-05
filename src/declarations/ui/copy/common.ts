@@ -52,7 +52,7 @@ export const FIELD_COPY = {
   project: 'Projet',
   lead: 'Responsable',
   assistants: 'Assistants',
-  participants: 'Modérateurs participants',
+  participants: 'Modérateurs',
   division: 'Division',
   role: 'Rôle',
   status: 'Statut',
@@ -84,11 +84,12 @@ export const FIELD_COPY = {
 
 export const WIP_COPY = {
   title: 'En cours de développement',
-  description: 'Cette partie n’est pas terminée, elle bouge encore.',
+  description:
+    'Cette partie n’est pas terminée. Elle est en cours de développement et sera disponible prochainement.',
 } as const
 
 /**
- * Page options menu, the toggles of a banner
+ * Page options menu
  * @type {Record<string, string>}
  */
 

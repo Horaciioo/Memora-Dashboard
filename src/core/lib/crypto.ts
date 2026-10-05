@@ -30,7 +30,7 @@ export const bindSecretCipher = (implementation: SecretCipher): void => {
 }
 
 /**
- * Drop the cipher, later writes landing in clear
+ * Drop the cipher
  * @return {void}
  */
 
@@ -53,7 +53,7 @@ export const isEncryptionActive = (): boolean => cipher !== null
 
 export const encryptSecret = (value: string): string => {
   if (!cipher) {
-    // Said once per process, not once per write
+    // Said once per process
     if (!warned) {
       warned = true
       logger.warn('[crypto] encryption is off, secrets are stored in clear')

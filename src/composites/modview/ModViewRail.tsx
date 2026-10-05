@@ -32,7 +32,7 @@ const STATUS_DOT = {
 } as const
 
 /**
- * Live rail, standing where the destinations stand
+ * Live rail
  * @param {ModViewState} state - Mod View state
  * @param {string | null} levelName - Livecon level in force
  * @param {ModViewWindow[]} windows - Windows of this platform

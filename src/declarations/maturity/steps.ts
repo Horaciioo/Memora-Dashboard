@@ -3,7 +3,7 @@ import { ROUTES } from '@/declarations/navigation'
 /**
  * Checked feature steps
  * @typedef {Object} FeatureSteps
- * @property {string[]} done - Shipped, seen in the code
+ * @property {string[]} done - Shipped
  * @property {string[]} todo - Still to build
  */
 

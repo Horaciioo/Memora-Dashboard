@@ -19,7 +19,7 @@ export interface ColourFieldProps {
 }
 
 /**
- * Collapsed colour control, the wheel opening in a modal
+ * Collapsed colour control
  * @param {string} id - Identifier of the trigger
  * @param {string} label - Accessible name of the field
  * @param {string} value - Stored colour

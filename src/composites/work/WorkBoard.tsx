@@ -147,7 +147,7 @@ export const WorkBoard = <T extends BoardItem>({
     [columns]
   )
 
-  // Done columns fold away, the toggle brings them back
+  // Done columns fold away
   const visibleColumns = useMemo(
     () => (showDone ? columns : columns.filter((column) => !doneColumnIds.has(column.id))),
     [columns, doneColumnIds, showDone]
@@ -163,7 +163,7 @@ export const WorkBoard = <T extends BoardItem>({
     [board.cards, doneColumnIds, showDone, search, filterValues, matches]
   )
 
-  // A card resting in a done column is finished work, not content the board carries
+  // A card resting in a done column is finished work
   const hasContent = useMemo(
     () => board.cards.some((card) => showDone || !doneColumnIds.has(card.columnId ?? '')),
     [board.cards, doneColumnIds, showDone]
@@ -233,7 +233,7 @@ export const WorkBoard = <T extends BoardItem>({
     },
   ]
 
-  // The drawn figure and the dashed creation rows are alternatives, never both at once
+  // The drawn figure and the dashed creation rows are alternatives
   const showEmptyState =
     columns.length === 0 || (isFiltered ? visibleCards.length === 0 : !hasContent)
 

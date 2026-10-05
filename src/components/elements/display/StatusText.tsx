@@ -9,7 +9,7 @@ export interface StatusTextProps {
 }
 
 /**
- * Status in plain words, its colour carried by the word itself, never by a bullet
+ * Status in plain words
  * @param {string} label - Status name
  * @param {string | null} [accent] - Stored colour
  * @param {string} [className] - Extra classes

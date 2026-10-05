@@ -40,7 +40,7 @@ export async function generateMetadata({
 }
 
 /**
- * One recruitment session, its candidates, its script and its results
+ * One recruitment session
  * @param {Object} context - Route context
  * @param {Promise<{ id: string }>} context.params - Dynamic segments
  * @return {Promise<JSX.Element>} - Session page

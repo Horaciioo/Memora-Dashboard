@@ -41,7 +41,7 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
     inForce
   )
 
-  // Rungs already applied, and who the viewer may follow
+  // Rungs already applied
   const memberIds = live.members.map((member) => member.id)
   const [memory, focusable] = await Promise.all([
     readPanelMemory(live.id),

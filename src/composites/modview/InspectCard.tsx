@@ -23,7 +23,7 @@ export interface InspectCardProps {
 }
 
 /**
- * Activity of one moderator on the live, for the responsables
+ * Activity of one moderator on the live
  * @param {string} liveId - Live
  * @param {string} accountId - Moderator inspected
  * @param {() => void} onClose - Close the card

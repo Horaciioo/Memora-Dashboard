@@ -1,4 +1,4 @@
-// Every date is read against the day the fixtures run, so the history always ends today
+// Every date is read against the day the fixtures run
 const DAY_MS = 86_400_000
 
 export const TODAY = (() => {
@@ -13,7 +13,7 @@ export const HISTORY_DAYS = 180
 
 /**
  * Day shifted from today
- * @param {number} days - Signed offset, negative in the past
+ * @param {number} days - Signed offset
  * @param {number} [hour] - Hour of the day
  * @param {number} [minute] - Minute of the hour
  * @return {Date} - Moment
@@ -40,7 +40,7 @@ export const plusMinutes = (from: Date, minutes: number): Date =>
  * Whole days between two moments
  * @param {Date} from - Start
  * @param {Date} to - End
- * @return {number} - Days, inclusive
+ * @return {number} - Days
  */
 
 export const spanDays = (from: Date, to: Date): number =>

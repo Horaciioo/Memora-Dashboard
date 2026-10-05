@@ -1,5 +1,5 @@
 /**
- * Nouns naming an edited field in a journal sentence, article included
+ * Nouns naming an edited field in a journal sentence
  * @type {Record<string, string>}
  */
 

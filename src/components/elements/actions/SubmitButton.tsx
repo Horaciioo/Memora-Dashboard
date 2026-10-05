@@ -6,8 +6,8 @@ import { Button } from '@/components/elements/actions/Button'
 import type { ButtonProps } from '@/components/elements/actions/Button'
 
 /**
- * Submit button of a server action form, locked with the brand loader while the action runs
- * @param {ButtonProps} props - Any button prop, the type being forced to submit
+ * Submit button of a server action form
+ * @param {ButtonProps} props - Any button prop
  * @return {JSX.Element}
  */
 

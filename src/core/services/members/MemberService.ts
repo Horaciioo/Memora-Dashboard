@@ -37,7 +37,7 @@ const SUMMARY_INCLUDE = {
     take: 1,
     include: { dispositif: true },
   },
-  // The track in course, or the latest one
+  // The track in course
   legacyTracks: {
     orderBy: { startsAt: 'desc' },
     take: 1,
@@ -133,7 +133,7 @@ export const assertDivisionAssignable = async (
 
 /**
  * Build the moderator form declarations
- * @param {boolean} [isAdmin] - Viewer sits at admin level, unlocking every division
+ * @param {boolean} [isAdmin] - Viewer sits at admin level
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
@@ -148,7 +148,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
   const optionsOf = (kind: FunctionKindName) =>
     rowsToOptions(functions.filter((entry) => entry.kind === kind))
 
-  // A restricted division still shows, greyed, so its holders keep reading it
+  // A restricted division still shows
   const divisionOptions = rowsToOptions(divisions).map((option, index) => ({
     ...option,
     disabled: !isAdmin && !divisions[index].leadAssignable,
@@ -347,7 +347,7 @@ const toAccountData = (values: FormValues) => ({
 })
 
 /**
- * Read the functions a member should hold, each id kept only under the kind it was sent as
+ * Read the functions a member should hold
  * @param {FormValues} values - Parsed body
  * @return {Promise<string[]>} - Function identifiers to hold
  */
@@ -433,7 +433,7 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
       ...data,
       joinedAt: joinedAt ?? current.joinedAt,
       youtubers: { set: youtuberIds.map((youtuberId) => ({ id: youtuberId })) },
-      // The whole set is sent every time, so it replaces what was held
+      // The whole set is sent every time
       functions: {
         deleteMany: {},
         create: functionIds.map((functionId) => ({ functionId })),
@@ -449,8 +449,7 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
 }
 
 /**
- * Drop the details a member volunteered, keeping everything Discord already
- * makes public. Notes of follow-up are not touched: they accompany, they do not judge
+ * Drop the details a member volunteered
  * @param {string} id - Account identifier
  * @return {Promise<void>} - Cleared
  */
@@ -467,8 +466,7 @@ export const clearVolunteeredDetails = async (id: string): Promise<void> => {
 }
 
 /**
- * Close a member's access and drop what they volunteered, the identity they
- * already show on Discord staying attached to the work they did
+ * Close a member's access and drop what they volunteered
  * @param {string} id - Account identifier
  * @return {Promise<void>} - Anonymised
  */
@@ -480,7 +478,7 @@ export const anonymiseMember = async (id: string): Promise<void> => {
 
   await clearVolunteeredDetails(id)
 
-  // Credentials go with the access, they are never part of the history
+  // Credentials go with the access
   await prisma.$transaction([
     prisma.session.deleteMany({ where: { accountId: id } }),
     prisma.discordToken.deleteMany({ where: { accountId: id } }),
@@ -497,7 +495,7 @@ export const anonymiseMember = async (id: string): Promise<void> => {
 }
 
 /**
- * Read one moderator file, the private remarks never leaving the server unasked
+ * Read one moderator file
  * @param {string} id - Account identifier
  * @param {boolean} canReadNotes - Member may read private remarks
  * @return {Promise<MemberDetail>} - Full file
@@ -598,7 +596,7 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
 }
 
 /**
- * Absence review labels, reused by the absence surfaces
+ * Absence review labels
  * @type {typeof ABSENCE_STATUS_REGISTRY}
  */
 

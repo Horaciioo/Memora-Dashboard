@@ -20,8 +20,7 @@ import { MemberStatuses } from '@/utils/constants/hierarchy'
 export const metadata: Metadata = { title: ACADEMY_COPY.myTrainingsTitle }
 
 /**
- * A junior's own trainings: the interactive courses of their trade first, then any training the
- * console edits by hand
+ * A junior's own trainings
  * @return {Promise<JSX.Element>} - Trainings page
  */
 
@@ -34,7 +33,7 @@ export default async function TrainingsPage({
   const query = await searchParams
   const celebrate = query[TRAININGS_DONE_PARAM]
 
-  // Juniors train here, the encadrement previews
+  // Juniors train here
   if (session.status !== MemberStatuses.Academy && !isEncadrement(session.role)) {
     redirect(ROUTES.home)
   }
@@ -46,16 +45,16 @@ export default async function TrainingsPage({
     hasSeenGuide(session.id, GUIDE_KEYS.specialisations),
   ])
 
-  // Second period reached: the specialisations open, said once
+  // Second period reached: the specialisations open
   const showSpecialisations =
     !seenSpecialisations && junior !== null && PRACTICE_STAGES.includes(junior.stage)
 
-  // First visit opens the welcome, sized on the mandatory courses
+  // First visit opens the welcome
   const mandatory = courses.filter((course) => course.track === 'indispensable')
   const showWelcome = !seen
   const trade = COURSE_SURFACE_REGISTRY.get(mandatory[0]?.surface ?? 'twitch').label
 
-  // A course already sits in the catalogue above, only the hand made ones stay below
+  // A course already sits in the catalogue above
   const courseIds = new Set(courses.map((course) => course.id))
   const trainings = junior
     ? (await myTrainings(session.id, junior.session.functionId, junior.dispositifId)).filter(

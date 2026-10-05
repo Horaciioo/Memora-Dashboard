@@ -23,7 +23,7 @@ export const POST = createProtectedRoute({
     const key = typeof raw.key === 'string' ? raw.key.slice(0, 64) : ''
     if (!intent || !key) throw invalidInput([{ field: 'intent', message: FORM_COPY.notAnOption }])
 
-    // Panel rung and Focus target, both checked again on the server
+    // Panel rung and Focus target
     const rawContext =
       typeof raw.context === 'object' && raw.context ? (raw.context as Record<string, unknown>) : {}
     const context = {

@@ -61,7 +61,7 @@ export const pickableCreators = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<CreatorLead[]> => {
-  // An administrator picks from every creator, a responsable only from their anchors
+  // An administrator picks from every creator
   if (!access.isAdmin) return readLedCreators(viewer.id)
 
   const rows = await prisma.youtuber.findMany({
@@ -77,7 +77,7 @@ export const pickableCreators = async (
  * Resolve the view
  * @param {SessionUser} viewer - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
- * @return {Promise<ViewContext>} - View, reachable views and creators
+ * @return {Promise<ViewContext>} - View
  */
 
 export const readViewContext = async (
@@ -90,7 +90,7 @@ export const readViewContext = async (
   // A view a member no longer reaches falls back to the base one
   const view = available.includes(stored) ? stored : NavigationViews.Moderation
 
-  // Lives light the Livecon entry, announcers seeing every one
+  // Lives light the Livecon entry
   const readLive = async () =>
     access.can(Permissions.LiveRead)
       ? readBeacon(await readScope(viewer, access), viewer.id, access.can(Permissions.LiveAnnounce))

@@ -2,16 +2,16 @@ import type { SanctionMeasureView, SanctionRungView } from '@/types/sanctions'
 import type { Chatter, ModViewIntent } from '@/types/modview'
 import { SanctionKinds } from '@/utils/constants/moderation'
 
-// Seconds per duration unit, the way Twitch writes them
+// Seconds per duration unit
 const UNITS: Record<string, number> = { s: 1, m: 60, h: 3600, d: 86_400, w: 604_800 }
 
-// Largest unit first, so 3600 reads 1h
+// Largest unit first
 const UNITS_DESC = Object.entries(UNITS).sort(([, a], [, b]) => b - a)
 
 /**
- * Read a Twitch duration, plain seconds or with a unit
+ * Read a Twitch duration
  * @param {string} raw - Duration as typed
- * @return {number | null} - Seconds, none when unreadable
+ * @return {number | null} - Seconds
  */
 
 export const parseDuration = (raw: string): number | null => {
@@ -28,7 +28,7 @@ export const parseDuration = (raw: string): number | null => {
 /**
  * Write seconds the short way Twitch reads them
  * @param {number} seconds - Duration
- * @return {string} - Duration, 10m or 1h or 45s
+ * @return {string} - Duration
  */
 
 export const formatDuration = (seconds: number): string => {
@@ -52,10 +52,10 @@ export type ChatCommandResult =
 const COMMANDS = ['timeout', 'ban', 'unban', 'warn'] as const
 
 /**
- * Read a chat line, a slash command turning into a gesture
+ * Read a chat line
  * @param {string} text - Line typed
  * @param {(name: string) => Chatter | null} findChatter - Viewer lookup by login or name
- * @return {ChatCommandResult} - Message, gesture or error
+ * @return {ChatCommandResult} - Message
  */
 
 export const parseChatCommand = (
@@ -65,7 +65,7 @@ export const parseChatCommand = (
   const line = text.trim()
   if (!line.startsWith('/')) return { kind: 'say', text: line }
 
-  // Command, user, then the rest
+  // Command
   const [head = '', user = '', ...rest] = line.slice(1).split(/\s+/)
   const command = head.toLowerCase()
   if (!(COMMANDS as readonly string[]).includes(command))
@@ -102,13 +102,13 @@ export const parseChatCommand = (
   return { kind: 'intent', target, intent: { kind: 'unban', chatterId: target.id } }
 }
 
-// Measures that read as a chat command, heaviest kept
+// Measures that read as a chat command
 const COMMAND_KINDS: string[] = [SanctionKinds.Ban, SanctionKinds.Timeout, SanctionKinds.Warn]
 
 /**
  * Heaviest measure of a rung a command can carry
  * @param {SanctionRungView} rung - Panel rung
- * @return {SanctionMeasureView | null} - Measure, none for notes only
+ * @return {SanctionMeasureView | null} - Measure
  */
 
 export const commandMeasure = (rung: SanctionRungView): SanctionMeasureView | null =>
@@ -117,11 +117,11 @@ export const commandMeasure = (rung: SanctionRungView): SanctionMeasureView | nu
     .sort((left, right) => right.weight - left.weight)[0] ?? null
 
 /**
- * Write the command a rung stands for, ready to reread then send
+ * Write the command a rung stands for
  * @param {SanctionRungView} rung - Panel rung
  * @param {string} login - Viewer login
  * @param {string} reason - Offence name kept as reason
- * @return {string | null} - Command, none when the rung holds no gesture
+ * @return {string | null} - Command
  */
 
 export const writeRungCommand = (
@@ -139,7 +139,7 @@ export const writeRungCommand = (
 }
 
 /**
- * Rungs already applied, per viewer then per offence
+ * Rungs already applied
  * @typedef {Record<string, Record<string, number[]>>} PanelMemory
  */
 
@@ -171,7 +171,7 @@ export const rememberRung = (
  * Rung that comes next for a viewer on one offence
  * @param {number[]} applied - Rungs already applied
  * @param {number} count - Rungs of the ladder
- * @return {number | null} - Next rung, none on an empty ladder
+ * @return {number | null} - Next rung
  */
 
 export const nextRung = (applied: number[], count: number): number | null => {
@@ -182,9 +182,9 @@ export const nextRung = (applied: number[], count: number): number | null => {
 }
 
 /**
- * Third rung of a ladder, its last when shorter
+ * Third rung of a ladder
  * @param {number} count - Rungs of the ladder
- * @return {number | null} - Rung, none on an empty ladder
+ * @return {number | null} - Rung
  */
 
 export const thirdRung = (count: number): number | null =>

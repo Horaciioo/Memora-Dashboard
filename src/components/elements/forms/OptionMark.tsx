@@ -17,25 +17,25 @@ export interface OptionMarkProps {
 }
 
 /**
- * Glyph drawn before an option label, so a choice reads by shape as well as by name
+ * Glyph drawn before an option label
  * @param {OptionMarkKind} mark - Glyph shape to draw
  * @param {FieldOption} option - Option carrying the accent and the portrait
- * @param {AvatarSize} [size] - Portrait size, defaults to xs
+ * @param {AvatarSize} [size] - Portrait size
  * @return {JSX.Element | null}
  */
 
 export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
-  // A portrait carries its own colour, the other two borrow the option accent
+  // A portrait carries its own colour
   if (mark === 'avatar') {
     return <Avatar name={option.label} src={option.image} size={size} />
   }
 
-  // Official logo of a division, nothing for the entry level
+  // Official logo of a division
   if (mark === 'division') {
     return <DivisionLogo label={option.label} src={option.image} className="h-5 w-5" />
   }
 
-  // Official logo of a network, its portrait when it has none
+  // Official logo of a network
   if (mark === 'network') {
     return hasNetworkLogo(option.label) ? (
       <NetworkLogo network={option.label} className="h-5 w-5" />
@@ -44,7 +44,7 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
     )
   }
 
-  // Project glyph, nothing when unset
+  // Project glyph
   if (mark === 'emoji') {
     return option.emoji ? (
       <span className={OPTION_MARK_STYLES.emoji} aria-hidden="true">
@@ -53,7 +53,7 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
     ) : null
   }
 
-  // A dot gives way to the glyph an option names, so every choice with a shape shows it
+  // A dot gives way to the glyph an option names
   const glyphName = option.icon && isIconName(option.icon) ? option.icon : null
   if (glyphName && (mark === 'glyph' || mark === 'dot')) {
     const Glyph = ICONS[glyphName]

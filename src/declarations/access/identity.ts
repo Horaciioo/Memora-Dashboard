@@ -5,7 +5,7 @@ import { readBoolean, readString } from '@/declarations/configurations/readers'
 import { MemberRoles, type MemberRoleName } from '@/utils/constants/hierarchy'
 
 /**
- * Root administrator profile, its display name living in the database rather than here
+ * Root administrator profile
  * @typedef {Object} RootIdentity
  * @property {string | null} discordId - Identifier from the environment
  * @property {string | null} seedName - Name written on the very first sign-in

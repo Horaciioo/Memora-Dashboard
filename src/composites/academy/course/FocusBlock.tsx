@@ -17,7 +17,7 @@ export interface FocusBlockProps {
 }
 
 /**
- * Parts of the Mod View one by one: the words on the left, the animation on the right
+ * Parts of the Mod View one by one: the words on the left
  * @param {FocusBlockProps} props - Parts declared in code
  * @return {JSX.Element}
  */
@@ -51,7 +51,7 @@ export const FocusBlock = ({ block }: FocusBlockProps) => {
 }
 
 /**
- * One part, its scene restarting each time it opens
+ * One part
  * @param {{ item: FocusItem }} props - Part
  * @return {JSX.Element}
  */
