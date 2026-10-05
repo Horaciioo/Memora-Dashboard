@@ -26,7 +26,7 @@ import { useCopy } from '@/core/hooks/interaction/useCopy'
 import { DiscordMessage } from '@/components/elements/display/DiscordMessage'
 import { mentionChoices } from '@/components/elements/forms/DiscordComposer'
 import { WORK_DISCORD_COPY } from '@/declarations/work/copy'
-import { DISCORD_MESSAGE } from '@/declarations/ui/variants'
+import { COMMUNICATION_HEAD, DISCORD_MESSAGE } from '@/declarations/ui/variants'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { useRecordFile } from '@/core/hooks/data/useRecordFile'
 import { ROUTES } from '@/declarations/navigation'
@@ -312,17 +312,23 @@ export const ProjectFileTabs = ({
               })}
               onContextMenu={contextMenu(entryMenu(entry), entry.title)}
             >
-              <header className="flex flex-wrap items-center gap-2">
-                <h3 className="text-base font-bold">{entry.title}</h3>
-                <Status
-                  label={entry.publishedAt ? PROJECT_COPY.published : PROJECT_COPY.draft}
-                  tone={entry.publishedAt ? 'success' : 'neutral'}
-                />
-                <span className="ml-auto text-xs text-[var(--color-ink-subtle)]">
-                  {[entry.authorName, entry.publishedAt ? formatDay(entry.publishedAt) : null]
-                    .filter(Boolean)
-                    .join(', ')}
-                </span>
+              <header className={COMMUNICATION_HEAD.wrapper}>
+                <h3 className={COMMUNICATION_HEAD.title}>{entry.title}</h3>
+                <dl className={COMMUNICATION_HEAD.list}>
+                  <div className={COMMUNICATION_HEAD.row}>
+                    <dt className={COMMUNICATION_HEAD.term}>{PROJECT_COPY.inCharge}</dt>
+                    <dd>{entry.authorName ?? WORK_DISCORD_COPY.author}</dd>
+                  </div>
+                  <div className={COMMUNICATION_HEAD.row}>
+                    <dt className={COMMUNICATION_HEAD.term}>{PROJECT_COPY.status}</dt>
+                    <dd>
+                      <Status
+                        label={entry.publishedAt ? PROJECT_COPY.published : PROJECT_COPY.draft}
+                        tone={entry.publishedAt ? 'success' : 'neutral'}
+                      />
+                    </dd>
+                  </div>
+                </dl>
               </header>
               <div className={DISCORD_MESSAGE.frame}>
                 <Button

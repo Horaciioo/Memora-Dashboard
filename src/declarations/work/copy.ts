@@ -26,6 +26,8 @@ export const PROJECT_COPY = {
   communicationEmptyTitle: 'Aucune annonce pour le moment.',
   communicationDeleteTitle: 'Souhaite-tu supprimer cette annonce ?',
   communicationDeleteDescription: 'Le texte est perdu définitivement.',
+  inCharge: 'En charge :',
+  status: 'Statut :',
   published: 'Publiée',
   draft: 'Brouillon',
   informations: 'Informations',
