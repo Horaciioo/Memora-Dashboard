@@ -36,7 +36,7 @@ export const PAGE_STYLES = {
   notchTitle: 'min-w-0 text-xl font-bold tracking-wide uppercase md:text-page',
   notchTitleText: 'min-w-0 text-balance md:truncate',
   // Tab strip under the title, empty on most pages
-  notchTabs: 'flex w-full justify-center border-t border-[var(--color-border)] py-2 empty:hidden',
+  notchTabs: 'flex w-full justify-center border-t border-[var(--color-border)] pt-4 pb-3 empty:hidden',
   // Shoulders of the notch
   notchSlopeStart: 'banner-slope banner-slope-start',
   notchSlopeEnd: 'banner-slope banner-slope-end',
