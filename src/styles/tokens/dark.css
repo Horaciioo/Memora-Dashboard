@@ -44,13 +44,13 @@
   --color-sky-800: #a9ccee;
   --color-sky-900: #cbe0f5;
 
-  --color-success: #b9d474;
+  --color-success: #4ade80;
   --color-caution: #e3b341;
   --color-warning: #f0a35c;
-  --color-danger: #ff7a7f;
+  --color-danger: #ff6b6b;
   --color-info: #8dbbe8;
   --color-neutral: #a1a1a6;
-  --color-success-soft: #232a16;
+  --color-success-soft: #14301f;
   --color-caution-soft: #2e2511;
   --color-warning-soft: #30220f;
   --color-danger-soft: #3a181c;
@@ -74,7 +74,7 @@
   --color-track-off: #48484e;
   --color-scrim: rgb(0 0 4 / 0.6);
 
-  --color-authority-admin: #ff7a7f;
+  --color-authority-admin: #ff6b6b;
   --color-authority-lead: #f0a35c;
   --color-authority-admin-soft: #3a181c;
   --color-authority-lead-soft: #30220f;
