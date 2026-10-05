@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 
-import { WindowFrame } from '@/components/structures/WindowFrame'
 import { SYSTEM_SCREEN } from '@/declarations/ui/blocks'
 
 export interface SystemScreenProps {
@@ -39,7 +38,6 @@ export const SystemScreen = ({
   stamped,
 }: SystemScreenProps) => (
   <main className={framed ? SYSTEM_SCREEN.stage : SYSTEM_SCREEN.inset}>
-    {framed && <WindowFrame bare />}
     <div className={SYSTEM_SCREEN.column}>
       <p className={stamped ? SYSTEM_SCREEN.stampWord : SYSTEM_SCREEN.word} aria-hidden="true">
         {word}

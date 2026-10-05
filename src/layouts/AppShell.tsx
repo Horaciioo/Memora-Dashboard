@@ -1,7 +1,6 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { WindowFrame } from '@/components/structures/WindowFrame'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
@@ -76,8 +75,6 @@ const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: 
         ) : (
           <LeftSidebar viewContext={viewContext} unreadCount={unreadCount} />
         )}
-        <WindowFrame />
-
         <div className={APP_SHELL.main}>
           {session && (
             <MobileTopBar session={session} unreadCount={unreadCount} viewContext={viewContext} />
