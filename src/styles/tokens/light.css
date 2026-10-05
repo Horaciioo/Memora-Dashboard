@@ -67,6 +67,10 @@
   --color-info: #2f6496;
   --color-neutral: #636368;
   --color-success-soft: #e8f3ec;
+  /* Angelic gold, same in both modes, ink stays black */
+  --color-gold-100: #fff3c4;
+  --color-gold-300: #fbd45a;
+  --color-gold-400: #f2b705;
   --color-caution-soft: #f8efd6;
   --color-warning-soft: #f9e9d6;
   --color-danger-soft: #fde5e6;

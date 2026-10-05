@@ -25,7 +25,6 @@ export const LIVE_COPY = {
   startedAt: 'Lancé à',
   coordinator: 'Coordinateur du Live',
   noCoordinator: 'Aucun coordinateur',
-  lengthOf: 'Durée',
   answered: 'Présents confirmés',
   urgentLive: 'Live de {creator} en cours',
   urgentAnnounced: 'Live de {creator} prévu le {time}',

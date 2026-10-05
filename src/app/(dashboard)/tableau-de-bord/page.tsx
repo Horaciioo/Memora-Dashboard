@@ -2,13 +2,11 @@ import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { HomeAgenda } from '@/composites/personal/HomeAgenda'
 import { HomeNews } from '@/composites/personal/HomeNews'
-import { HomeLives } from '@/composites/personal/HomeLives'
 import { HomeQueue } from '@/composites/personal/HomeQueue'
 import { HomeLiveCall } from '@/composites/lives/HomeLiveCall'
 import { readBeacon } from '@/core/services/lives/LiveService'
 import { REVIEW_FIELDS, listReviewQueue } from '@/core/services/absences/AbsenceService'
 import { myRollCalls } from '@/core/services/calendar/attendance'
-import { readCurrentState } from '@/core/services/livecon/LiveconService'
 import { myMeetings, upcomingBirthdays } from '@/core/services/personal/HomeService'
 import { myTasks } from '@/core/services/personal/TaskInboxService'
 import { requireUser } from '@/core/wrappers/requireUser'
@@ -32,13 +30,12 @@ export default async function DashboardPage() {
 
   const canReview = access.can(Permissions.AbsenceReview)
 
-  const [tasks, rollCalls, meetings, birthdays, requests, livecon, beacon] = await Promise.all([
+  const [tasks, rollCalls, meetings, birthdays, requests, beacon] = await Promise.all([
     myTasks(session, access),
     myRollCalls(session.id),
     myMeetings(session.id, perimeter),
     upcomingBirthdays(perimeter),
     canReview ? listReviewQueue(session.id, access.isAdmin) : Promise.resolve([]),
-    access.can(Permissions.LiveconRead) ? readCurrentState(perimeter) : Promise.resolve([]),
     access.can(Permissions.LiveRead)
       ? readBeacon(perimeter, session.id, access.can(Permissions.LiveAnnounce))
       : Promise.resolve(null),
@@ -53,8 +50,8 @@ export default async function DashboardPage() {
       <p className={HOME_FLOW.lead}>
         {PERSONAL_COPY.lead.replace('{date}', formatDay(new Date()))}
       </p>
+      <HomeNews release={changelogFor(access.can)[0]} />
       <HomeLiveCall beacon={beacon} />
-      <HomeLives items={livecon} />
       <div className={HOME_FLOW.grid}>
         <HomeQueue
           absences={pending}
@@ -62,7 +59,7 @@ export default async function DashboardPage() {
           tasks={tasks}
           rollCalls={rollCalls}
         />
-        <section className={HOME_FLOW.panel}>
+        <section className={HOME_FLOW.column}>
           <h2 className={HOME_FLOW.label}>{PERSONAL_COPY.aheadTitle}</h2>
           <HomeAgenda
             meetings={meetings}
@@ -71,7 +68,6 @@ export default async function DashboardPage() {
           />
         </section>
       </div>
-      <HomeNews release={changelogFor(access.can)[0]} />
     </div>
   )
 }
