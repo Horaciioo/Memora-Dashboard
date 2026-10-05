@@ -81,20 +81,40 @@
   transition-timing-function: var(--motion-ease-out);
 }
 
-/* Lead orange */
+/* Lead pastel orange */
 .app-tone[data-tone='lead'] {
-  --color-frame-pink: #d9741a;
-  --color-frame-mauve: #c8570f;
-  --color-frame-blue: #b8421a;
-  --color-frame: #c8570f;
+  --color-frame-pink: #f6b985;
+  --color-frame-mauve: #f2a566;
+  --color-frame-blue: #f4c6a0;
+  --color-frame: #f2a566;
+  /* Dark ink on the pastel */
+  --color-on-frame: #2e1f1b;
+  --color-on-frame-subtle: rgb(46 31 27 / 0.74);
+  --color-on-frame-line: rgb(46 31 27 / 0.16);
+  --color-on-frame-line-strong: rgb(46 31 27 / 0.3);
+  --color-on-frame-wash: rgb(255 255 255 / 0.4);
+  --color-on-frame-raised: rgb(255 255 255 / 0.62);
+  --color-on-frame-tint: #2e1f1b;
+  --color-on-frame-blush: #2e1f1b;
+  --color-on-frame-deep: #2e1f1b;
 }
 
-/* Admin red */
+/* Admin pastel red */
 .app-tone[data-tone='admin'] {
-  --color-frame-pink: #d03040;
-  --color-frame-mauve: #bd2231;
-  --color-frame-blue: #8f1a3a;
-  --color-frame: #bd2231;
+  --color-frame-pink: #f4a0a8;
+  --color-frame-mauve: #ee8791;
+  --color-frame-blue: #f6bcc2;
+  --color-frame: #ee8791;
+  /* Dark ink on the pastel */
+  --color-on-frame: #2e1f1b;
+  --color-on-frame-subtle: rgb(46 31 27 / 0.74);
+  --color-on-frame-line: rgb(46 31 27 / 0.16);
+  --color-on-frame-line-strong: rgb(46 31 27 / 0.3);
+  --color-on-frame-wash: rgb(255 255 255 / 0.4);
+  --color-on-frame-raised: rgb(255 255 255 / 0.62);
+  --color-on-frame-tint: #2e1f1b;
+  --color-on-frame-blush: #2e1f1b;
+  --color-on-frame-deep: #2e1f1b;
 }
 
 .app-tone[data-tone='junior'] {
