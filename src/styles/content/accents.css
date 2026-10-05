@@ -65,15 +65,6 @@
   border-color: color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
-/* Colour wheel — the hue circle and the saturation veil laid over it */
-.colour-wheel-hue {
-  background: conic-gradient(from 0deg, red, yellow, lime, cyan, blue, magenta, red);
-}
-
-.colour-wheel-tint {
-  background: radial-gradient(circle closest-side, var(--color-scan-ground), transparent);
-}
-
 /* Brand glyphs painted in the danger ramp */
 .glyph-danger {
   --color-brand-50: var(--color-surface);

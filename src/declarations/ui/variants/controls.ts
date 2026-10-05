@@ -344,31 +344,17 @@ export const COLOUR_FIELD_STYLES = {
 } as const
 
 /**
- * Colour wheel styles — a hue circle
+ * Colour swatches styles
  * @type {Record<string, string>}
  */
 
-export const COLOUR_WHEEL_STYLES = {
-  wrapper:
-    'flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-3',
-  board: 'flex flex-wrap items-center gap-4',
-  wheel:
-    'relative h-32 w-32 shrink-0 cursor-crosshair touch-none rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-600)]',
-  veil: 'pointer-events-none absolute inset-0 rounded-full',
-  shade: 'pointer-events-none absolute inset-0 rounded-full bg-black',
-  thumb:
-    'pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[var(--shadow-md)]',
-  controls: 'flex min-w-0 flex-1 flex-col gap-3',
-  row: 'flex items-center gap-2',
-  preview: 'h-9 w-9 shrink-0 rounded-[var(--radius-md)] border border-[var(--color-border-strong)]',
-  code: 'w-32 font-mono uppercase',
-  slider: 'h-2 w-full cursor-pointer appearance-none rounded-full',
-  swatches: 'flex flex-wrap gap-1.5',
+export const COLOUR_SWATCH_STYLES = {
+  wrapper: 'flex flex-col items-start gap-3',
+  grid: 'grid grid-cols-6 gap-2',
   swatch:
-    'h-6 w-6 rounded-[var(--radius-sm)] border border-[var(--color-border)] transition-transform hover:scale-110',
-  swatchSelected:
-    'ring-2 ring-[var(--color-brand-600)] ring-offset-1 ring-offset-[var(--color-surface-raised)]',
-  disabled: 'pointer-events-none opacity-60',
+    'size-9 rounded-full border border-[var(--color-border)] transition-transform hover:scale-110 disabled:pointer-events-none disabled:opacity-60',
+  selected:
+    'ring-2 ring-[var(--color-ink-accent)] ring-offset-2 ring-offset-[var(--color-surface-raised)]',
 } as const
 
 /**

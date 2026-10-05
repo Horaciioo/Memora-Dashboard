@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ColourWheel } from '@/components/elements/forms/ColourWheel'
+import { ColourSwatches } from '@/components/elements/forms/ColourSwatches'
 import { Dialog } from '@/components/structures/Dialog'
 import { COLOUR_COPY } from '@/declarations/ui/copy'
 import { COLOUR_FIELD_STYLES, FIELD_STYLES } from '@/declarations/ui/variants'
@@ -68,9 +68,8 @@ export const ColourField = ({
 
       <Dialog open={open} onClose={() => setOpen(false)} title={label} size="sm">
         <div className={COLOUR_FIELD_STYLES.dialog}>
-          <ColourWheel
-            id={`${id}-wheel`}
-            label={label}
+          <ColourSwatches
+            id={`${id}-swatches`}
             value={value}
             disabled={disabled}
             onChange={onChange}
