@@ -9,6 +9,7 @@ import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FormRenderer } from '@/components/structures/FormRenderer'
+import { ActionRow } from '@/components/structures/ActionRow'
 import { Section } from '@/components/structures/Section'
 import { SealedValue } from '@/components/structures/SealedValue'
 import { DisplayPreferences } from '@/composites/preferences/DisplayPreferences'
@@ -23,7 +24,7 @@ import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { DETAIL_BLOCK, SECURITY_LIST } from '@/declarations/ui/blocks'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
+import { ACTION_ROW, PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
 
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { AccountSession, ProfileDetail } from '@/types/preferences'
@@ -129,6 +130,7 @@ export const PreferencesPanel = ({
             <Button
               variant="primary"
               icon="confirm"
+              className="w-full"
               disabled={isSaving}
               onClick={() => void save(draft)}
             >
@@ -137,37 +139,34 @@ export const PreferencesPanel = ({
           </div>
         </Section>
 
-        <Section
-          title={PREFERENCES_COPY.privacyTitle}
-          description={PREFERENCES_COPY.privacyLead}
-          padded
-        >
-          <div className={PREFERENCE_STYLES.footer}>
-            <Button
-              variant="danger"
-              icon="remove"
-              disabled={isSaving}
-              onClick={() => setErasing(true)}
+        <Section title={PREFERENCES_COPY.dataTitle} padded>
+          <div className={ACTION_ROW.list}>
+            <ActionRow
+              title={PREFERENCES_COPY.exportTitle}
+              description={PREFERENCES_COPY.exportLead}
             >
-              {PREFERENCES_COPY.eraseDetails}
-            </Button>
-          </div>
-        </Section>
-
-        <Section
-          title={PREFERENCES_COPY.exportTitle}
-          description={PREFERENCES_COPY.exportLead}
-          padded
-        >
-          <div className={PREFERENCE_STYLES.footer}>
-            <Button
-              variant="secondary"
-              icon="sheet"
-              disabled={isSaving}
-              onClick={() => void download()}
+              <Button
+                variant="secondary"
+                icon="sheet"
+                disabled={isSaving}
+                onClick={() => void download()}
+              >
+                {isSaving ? PREFERENCES_COPY.exportPending : PREFERENCES_COPY.exportAction}
+              </Button>
+            </ActionRow>
+            <ActionRow
+              title={PREFERENCES_COPY.privacyTitle}
+              description={PREFERENCES_COPY.privacyLead}
             >
-              {isSaving ? PREFERENCES_COPY.exportPending : PREFERENCES_COPY.exportAction}
-            </Button>
+              <Button
+                variant="danger"
+                icon="remove"
+                disabled={isSaving}
+                onClick={() => setErasing(true)}
+              >
+                {PREFERENCES_COPY.eraseDetails}
+              </Button>
+            </ActionRow>
           </div>
         </Section>
       </div>
@@ -190,18 +189,15 @@ export const PreferencesPanel = ({
   const displayTab = () => (
     <div className={TABS_STYLES.panel}>
       <div className={PREFERENCE_STYLES.stack}>
-        <DisplayPreferences />
-        <Section
-          title={PREFERENCES_COPY.guidesTitle}
-          description={PREFERENCES_COPY.guidesLead}
-          padded
-        >
-          <form action={replayGuides} className={PREFERENCE_STYLES.footer}>
-            <Button type="submit" variant="secondary" icon="refresh">
-              {PREFERENCES_COPY.guidesAction}
-            </Button>
-          </form>
-        </Section>
+        <DisplayPreferences>
+          <ActionRow title={PREFERENCES_COPY.guidesTitle} description={PREFERENCES_COPY.guidesLead}>
+            <form action={replayGuides}>
+              <Button type="submit" variant="secondary" icon="refresh">
+                {PREFERENCES_COPY.guidesAction}
+              </Button>
+            </form>
+          </ActionRow>
+        </DisplayPreferences>
       </div>
     </div>
   )
@@ -267,7 +263,7 @@ export const PreferencesPanel = ({
               <p className={PREFERENCE_STYLES.notice}>{PREFERENCES_COPY.onlySession}</p>
             ) : (
               <form action={dropOtherSessions}>
-                <Button type="submit" variant="danger">
+                <Button type="submit" variant="danger" className="w-full">
                   {PREFERENCES_COPY.closeOthers}
                 </Button>
               </form>

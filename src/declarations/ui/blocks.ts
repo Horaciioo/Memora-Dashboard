@@ -36,7 +36,7 @@ export const APP_SHELL = {
   windowThumb:
     'absolute inset-x-0.5 top-0 cursor-grab rounded-full bg-[var(--color-ink)]/25 transition-[background-color,left,right] duration-[var(--motion-duration-fast)] group-hover/track:inset-x-0 group-hover/track:bg-[var(--color-ink)]/40 active:cursor-grabbing active:bg-[var(--color-ink)]/50',
   // Positioned so the page banner can span the whole column
-  main: 'relative flex min-w-0 flex-1 flex-col bg-[var(--color-page)]',
+  main: 'page-wash relative flex min-w-0 flex-1 flex-col bg-[var(--color-page)]',
   // Gutters widen past md so a page never welds itself to either rail
   content:
     'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--banner-h)+2.5rem)] print:max-w-none print:p-0',
@@ -436,7 +436,6 @@ export const ACCESS_CONSOLE = {
   row: 'group flex w-full items-center gap-2.5 rounded-[var(--radius-md)] px-2.5 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)]',
   rowActive: 'bg-[var(--color-hover)] font-medium',
   rowLocked: 'opacity-60',
-  dot: 'h-3.5 w-[3px] shrink-0 rounded-full',
   rowIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
   rowLabel: 'min-w-0 flex-1 truncate',
   rowCount: 'shrink-0 text-xs tabular-nums text-[var(--color-ink-subtle)]',
@@ -458,7 +457,7 @@ export const ACCESS_CONSOLE = {
   form: 'flex max-w-lg flex-col gap-4',
   members: 'flex flex-col gap-1',
   memberRow: 'flex items-center gap-1',
-  simulation: 'flex max-h-[60vh] flex-col gap-4 overflow-y-auto',
+  simulation: 'flex max-h-[60dvh] flex-col gap-4 overflow-y-auto',
   simulationSection: 'flex flex-col gap-2',
   simulationTitle: 'text-sm font-bold',
   simulationTags: 'flex flex-wrap gap-1.5',

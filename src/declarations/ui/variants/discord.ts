@@ -36,7 +36,7 @@ export const DISCORD_MESSAGE = {
   // Composer
   composer: 'relative px-4 pb-4',
   input:
-    'block max-h-[50vh] min-h-11 w-full resize-none rounded-[var(--radius-md)] bg-[var(--discord-input)] px-4 py-2.5 text-[var(--discord-text)] placeholder:text-[var(--discord-muted)] focus:outline-none',
+    'block max-h-[50dvh] min-h-11 w-full resize-none rounded-[var(--radius-md)] bg-[var(--discord-input)] px-4 py-2.5 text-[var(--discord-text)] placeholder:text-[var(--discord-muted)] focus:outline-none',
   hint: 'px-4 pt-1 text-xs text-[var(--discord-muted)]',
   popover:
     'absolute right-4 bottom-full left-4 mb-2 max-h-72 overflow-y-auto rounded-[var(--radius-md)] bg-[var(--discord-popover)] p-2 shadow-[var(--shadow-md)]',

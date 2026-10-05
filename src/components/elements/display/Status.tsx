@@ -17,7 +17,7 @@ export interface StatusProps {
 }
 
 /**
- * Status mark and label
+ * Status read by the colour of its words
  * @param {StatusProps} props - Label and colour
  * @return {JSX.Element}
  */
@@ -35,14 +35,10 @@ export const Status = ({
 
   return (
     <span
-      className={cn(STATUS_STYLES.base, muted && STATUS_STYLES.muted, className)}
+      className={cn(STATUS_STYLES.base, paint.text, muted && STATUS_STYLES.muted, className)}
       style={paint.style}
     >
-      {Icon ? (
-        <Icon className={cn(STATUS_STYLES.icon, paint.text)} aria-hidden="true" />
-      ) : (
-        <span className={cn(STATUS_STYLES.dot, paint.dot)} aria-hidden="true" />
-      )}
+      {Icon && <Icon className={STATUS_STYLES.icon} aria-hidden="true" />}
       {label}
     </span>
   )

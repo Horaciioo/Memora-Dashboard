@@ -1,4 +1,5 @@
 import { RESPONSIVE_SETTINGS } from '@/declarations/configurations/settings'
+import { ROUTES } from '@/declarations/navigation'
 
 /**
  * Named breakpoints
@@ -71,3 +72,10 @@ export const TOAST_VISIBLE = {
   mobile: RESPONSIVE_SETTINGS.toastVisibleMobile,
   desktop: RESPONSIVE_SETTINGS.toastVisibleDesktop,
 } as const
+
+/**
+ * Areas held back on mobile, shown as in development
+ * @type {readonly string[]}
+ */
+
+export const MOBILE_HELD_ROUTES: readonly string[] = [ROUTES.trainings, ROUTES.lives]

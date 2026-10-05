@@ -67,49 +67,45 @@ export const StoryDeck = ({
       style={axisStyle}
       {...handlers}
     >
-      <div className={STORY_DECK.progress} aria-hidden="true">
-        {Array.from({ length: count }, (_, step) => (
-          <span
-            key={step}
-            className={cn(
-              STORY_DECK.segment,
-              step <= index ? STORY_DECK.segmentDone : STORY_DECK.segmentIdle
-            )}
+      <div className={STORY_DECK.column}>
+        <div className={STORY_DECK.top}>
+          <div className={STORY_DECK.progress} aria-hidden="true">
+            {Array.from({ length: count }, (_, step) => (
+              <span
+                key={step}
+                className={cn(
+                  STORY_DECK.segment,
+                  step <= index ? STORY_DECK.segmentDone : STORY_DECK.segmentIdle
+                )}
+              />
+            ))}
+          </div>
+          <Button
+            variant="ghost"
+            icon="close"
+            className={STORY_DECK.skip}
+            onClick={onSkip}
+            aria-label={ACTION_COPY.close}
           />
-        ))}
-      </div>
+        </div>
 
-      <div className={STORY_DECK.top}>
-        <Button variant="ghost" icon="close" onClick={onSkip} aria-label={ACTION_COPY.close} />
-      </div>
-
-      <div className={STORY_DECK.stage}>
-        <button
-          type="button"
-          tabIndex={-1}
-          aria-hidden="true"
-          className={cn(STORY_DECK.zone, STORY_DECK.zoneBack)}
-          onClick={back}
-        />
-        <button
-          type="button"
-          tabIndex={-1}
-          aria-hidden="true"
-          className={cn(STORY_DECK.zone, STORY_DECK.zoneNext)}
-          onClick={next}
-        />
         <div key={index} className={STORY_DECK.card}>
           {children}
         </div>
-      </div>
 
-      <div className={STORY_DECK.actions}>
-        <Button variant="ghost" disabled={index === 0} onClick={back}>
-          {labels.previous}
-        </Button>
-        <Button variant="primary" isLoading={isLast && isFinishing} onClick={next}>
-          {isLast ? labels.finish : labels.next}
-        </Button>
+        <div className={STORY_DECK.actions}>
+          <Button variant="ghost" className={STORY_DECK.back} disabled={index === 0} onClick={back}>
+            {labels.previous}
+          </Button>
+          <Button
+            variant="primary"
+            className={STORY_DECK.next}
+            isLoading={isLast && isFinishing}
+            onClick={next}
+          >
+            {isLast ? labels.finish : labels.next}
+          </Button>
+        </div>
       </div>
     </div>
   )

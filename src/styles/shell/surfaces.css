@@ -7,11 +7,15 @@
   box-shadow: var(--glass-shadow);
 }
 
-/* White card on the cream ground, in a layer so a hover or tint still wins */
+/* Lightly frosted card on the page, in a layer so a hover or tint still wins */
 @layer components {
   .card-surface {
-    background: var(--color-surface);
-    box-shadow: var(--shadow-sm);
+    background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow:
+      inset 0 1px 0 var(--glass-line),
+      var(--shadow-sm);
   }
 }
 
@@ -83,4 +87,12 @@
   backdrop-filter: blur(24px) saturate(1.8);
   border: 1px solid var(--glass-line);
   box-shadow: var(--shadow-md);
+}
+
+/* Lightly frosted strip, for the tab bars */
+.glass-soft {
+  background: color-mix(in srgb, var(--color-surface-sunken) 60%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  backdrop-filter: blur(12px) saturate(1.3);
+  box-shadow: inset 0 1px 0 var(--glass-line);
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { AppearanceToggle } from '@/components/elements/actions/AppearanceToggle'
 import { ColorVisionSelect } from '@/components/elements/actions/ColorVisionSelect'
 import { ThemeToggle } from '@/components/elements/actions/ThemeToggle'
@@ -10,10 +11,11 @@ import { PREFERENCE_STYLES } from '@/declarations/ui/variants'
 
 /**
  * Appearance settings
+ * @param {ReactNode} [children] - Extra rows
  * @return {JSX.Element}
  */
 
-export const DisplayPreferences = () => (
+export const DisplayPreferences = ({ children }: { children?: ReactNode }) => (
   <Section title={PREFERENCES_COPY.displayTitle} padded>
     <div className={PREFERENCE_STYLES.rows}>
       <div className={PREFERENCE_STYLES.row}>
@@ -34,6 +36,7 @@ export const DisplayPreferences = () => (
         </span>
         <ColorVisionSelect />
       </div>
+      {children}
     </div>
     <p className={PREFERENCE_STYLES.notice}>{PREFERENCES_COPY.storageNotice}</p>
   </Section>

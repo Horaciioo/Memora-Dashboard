@@ -23,7 +23,7 @@
  * colour picked in the wheel tints a surface exactly like a declared tone would.
  */
 .accent-text {
-  color: color-mix(in srgb, var(--accent) 88%, var(--color-ink));
+  color: color-mix(in srgb, var(--accent) 50%, var(--color-ink));
 }
 
 .accent-dot {

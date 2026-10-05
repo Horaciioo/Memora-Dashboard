@@ -1,21 +1,35 @@
 /**
- * Story deck styles: full-screen cards over the gradient
+ * Story deck styles: one centred column of progress, card and buttons
  * @type {Record<string, string>}
  */
 
 export const STORY_DECK = {
-  root: 'overlay-enter fixed inset-0 z-[55] flex flex-col items-center bg-[image:var(--gradient-frame)] px-4 pt-[calc(env(safe-area-inset-top)+1rem)] pb-[calc(env(safe-area-inset-bottom)+1rem)]',
-  // One segment per card, filled up to the open one
-  progress: 'flex w-full max-w-md gap-1.5',
-  segment: 'h-1 flex-1 rounded-full',
-  segmentIdle: 'bg-[var(--color-ink)]/15',
-  segmentDone: 'bg-[var(--color-ink)]',
-  top: 'mt-3 flex w-full max-w-md justify-end',
-  stage: 'relative flex min-h-0 w-full max-w-md flex-1 flex-col justify-center py-4',
-  // Tap zones on the left and right thirds
-  zone: 'absolute inset-y-0 z-10 w-1/3',
-  zoneBack: 'left-0',
-  zoneNext: 'right-0',
-  card: 'course-erase-in relative flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6 shadow-[var(--shadow-md)] sm:p-8',
-  actions: 'flex w-full max-w-md flex-wrap items-center justify-between gap-2',
+  root: 'overlay-enter fixed inset-0 z-[55] flex overflow-y-auto bg-[image:var(--gradient-page)] p-4',
+  column: 'm-auto flex w-full max-w-lg flex-col gap-4',
+  // Segments and the skip button on one line, right above the card
+  top: 'flex items-center gap-3',
+  progress: 'flex flex-1 gap-1.5',
+  segment: 'h-1.5 flex-1 rounded-full',
+  segmentIdle: 'bg-[var(--color-on-frame)]/30',
+  segmentDone: 'bg-[var(--color-on-frame)]',
+  skip: 'text-[var(--color-on-frame)] hover:bg-[var(--color-on-frame-wash)]',
+  card: 'course-erase-in relative flex flex-col gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6 shadow-[var(--shadow-md)] sm:p-8',
+  // Buttons touch the card, never the bottom of the screen
+  actions: 'flex items-center justify-between gap-2',
+  next: 'h-auto min-w-0 shrink! py-2 text-center leading-tight whitespace-normal',
+  back: 'text-[var(--color-on-frame)] hover:bg-[var(--color-on-frame-wash)]',
+} as const
+
+/**
+ * Action row styles
+ * @type {Record<string, string>}
+ */
+
+export const ACTION_ROW = {
+  list: 'flex flex-col divide-y divide-[var(--color-border)]',
+  row: 'flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4 first:pt-0 last:pb-0',
+  body: 'min-w-0 flex-1',
+  title: 'text-sm font-semibold',
+  lead: 'text-xs text-[var(--color-ink-subtle)]',
+  action: 'shrink-0',
 } as const

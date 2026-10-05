@@ -24,11 +24,11 @@ export interface ModViewRailProps {
 }
 
 // Connection dot per state
-const STATUS_DOT = {
-  connected: MODVIEW_RAIL.dotConnected,
-  connecting: MODVIEW_RAIL.dotConnecting,
-  disconnected: MODVIEW_RAIL.dotOff,
-  scripted: MODVIEW_RAIL.dotScripted,
+const STATUS_TEXT = {
+  connected: MODVIEW_RAIL.connected,
+  connecting: MODVIEW_RAIL.connecting,
+  disconnected: MODVIEW_RAIL.off,
+  scripted: MODVIEW_RAIL.scripted,
 } as const
 
 /**
@@ -64,8 +64,7 @@ export const ModViewRail = ({ state, levelName, windows, hidden, onToggle }: Mod
         <PlatformIcon className={MODVIEW_RAIL.platform} aria-label={platform.label} />
         <div className={MODVIEW_RAIL.identityText}>
           <p className={MODVIEW_RAIL.channel}>{state.channel.name}</p>
-          <p className={MODVIEW_RAIL.status}>
-            <span className={cn(MODVIEW_RAIL.dot, STATUS_DOT[state.connection])} />
+          <p className={cn(MODVIEW_RAIL.status, STATUS_TEXT[state.connection])}>
             {MODVIEW_COPY[state.connection]}
           </p>
           {state.notice && <p className={MODVIEW_RAIL.notice}>{state.notice}</p>}

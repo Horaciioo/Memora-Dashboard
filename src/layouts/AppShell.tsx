@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { WindowFrame } from '@/components/structures/WindowFrame'
+import { MobileHold } from '@/components/structures/MobileHold'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
@@ -82,7 +83,9 @@ const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: 
           {session && (
             <MobileTopBar session={session} unreadCount={unreadCount} viewContext={viewContext} />
           )}
-          <main className={APP_SHELL.content}>{children}</main>
+          <main className={APP_SHELL.content}>
+            <MobileHold>{children}</MobileHold>
+          </main>
         </div>
 
         {session && <BottomNav viewContext={viewContext} />}

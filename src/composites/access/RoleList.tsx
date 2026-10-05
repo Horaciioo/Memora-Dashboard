@@ -109,13 +109,13 @@ export const RoleList = ({
                 )}
                 onClick={() => onPick({ kind: 'role', role })}
               >
-                <span
-                  className={cn(ACCESS_CONSOLE.dot, 'accent-dot')}
-                  style={accentVars(role.accent, 'neutral')}
-                  aria-hidden="true"
-                />
                 <RowIcon icon={role.icon} />
-                <span className={ACCESS_CONSOLE.rowLabel}>{role.label}</span>
+                <span
+                  className={cn(ACCESS_CONSOLE.rowLabel, 'accent-text')}
+                  style={accentVars(role.accent, 'neutral')}
+                >
+                  {role.label}
+                </span>
               </button>
             )}
 
@@ -126,13 +126,13 @@ export const RoleList = ({
                 className={cn(ACCESS_CONSOLE.row, selectedId === fn.id && ACCESS_CONSOLE.rowActive)}
                 onClick={() => onPick({ kind: 'function', fn })}
               >
-                <span
-                  className={cn(ACCESS_CONSOLE.dot, 'accent-dot')}
-                  style={accentVars(fn.accent, 'neutral')}
-                  aria-hidden="true"
-                />
                 <RowIcon icon={fn.icon} />
-                <span className={ACCESS_CONSOLE.rowLabel}>{fn.name}</span>
+                <span
+                  className={cn(ACCESS_CONSOLE.rowLabel, 'accent-text')}
+                  style={accentVars(fn.accent, 'neutral')}
+                >
+                  {fn.name}
+                </span>
               </button>
             ))}
 

@@ -32,6 +32,7 @@ export const PREFERENCES_COPY = {
   mobileDevice: 'Mobile',
   desktopDevice: 'Ordinateur',
   onlySession: 'C’est ta seule session ouverte.',
+  dataTitle: 'Mes données',
   privacyTitle: 'Mes informations privées',
   privacyLead:
     'Ton adresse e-mail, ton téléphone, ta date de naissance et tes réseaux t’appartiennent. Tu peux les effacer quand tu veux, sans te justifier.',

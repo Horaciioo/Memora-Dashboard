@@ -32,7 +32,7 @@ export type ButtonVariant = keyof Omit<typeof BUTTON_STYLES, 'base'>
  */
 
 export const SEGMENTED_STYLES = {
-  group: 'flex items-center gap-1 rounded-full bg-[var(--color-surface-sunken)] p-1',
+  group: 'flex items-center gap-1 rounded-full glass-soft p-1',
   option: 'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
   selected: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   idle: 'text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
@@ -218,7 +218,7 @@ export const SELECT_MENU_STYLES = {
     'flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-2.5 text-left opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-surface)] hover:opacity-100',
   optionActive: 'bg-[var(--color-surface)] opacity-100',
   optionDisabled: 'cursor-not-allowed opacity-50',
-  scrim: 'fixed inset-0 z-[65] max-md:bg-[var(--color-scrim)]',
+  scrim: 'fixed inset-0 z-[65] bg-[var(--color-scrim)] md:bg-transparent',
   // Chosen entry
   optionSelected:
     'bg-linear-to-r from-[var(--color-picker-wash-strong)] via-[var(--color-picker-wash)] to-transparent font-semibold text-[var(--color-ink)] opacity-100',

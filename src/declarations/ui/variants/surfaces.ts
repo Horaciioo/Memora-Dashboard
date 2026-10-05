@@ -70,8 +70,7 @@ export const PAGE_BANNER = {
  */
 
 export const STATUS_STYLES = {
-  base: 'inline-flex items-center gap-1.5 text-xs font-medium whitespace-nowrap text-[var(--color-ink)]',
-  dot: 'size-2 shrink-0 rounded-full',
+  base: 'inline-flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap',
   icon: 'size-3.5 shrink-0',
   // Done or past
   muted: 'opacity-70',
@@ -209,7 +208,7 @@ export const MENU_STYLES = {
  */
 
 export const TABS_STYLES = {
-  list: 'relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-[var(--color-surface-sunken)] p-1',
+  list: 'relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-full glass-soft p-1',
   // Strip centred over its panel from sm
   listCentered: 'sm:mx-auto',
   tab: 'relative z-10 shrink-0 rounded-full px-3 py-1.5 text-sm font-medium sm:px-3.5 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
@@ -237,7 +236,7 @@ export const PALETTE_STYLES = {
   overlay:
     'overlay-enter fixed inset-0 z-[80] flex items-start justify-center bg-[var(--color-ink)]/50 p-4 pt-[12vh] backdrop-blur-sm',
   panel:
-    'surface-enter flex max-h-[70vh] w-full max-w-xl flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
+    'surface-enter flex max-h-[70dvh] w-full max-w-xl flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   field: 'flex items-center gap-3 border-b border-[var(--color-border)] px-4 py-3',
   input: 'w-full bg-transparent text-base outline-none placeholder:text-[var(--color-ink-subtle)]',
   results: 'flex-1 overflow-y-auto py-2',
@@ -313,7 +312,7 @@ export const PREFERENCE_STYLES = {
   row: 'flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0',
   label: 'flex items-center gap-2 text-sm font-medium',
   notice: 'pt-3 text-xs text-[var(--color-ink-subtle)]',
-  footer: 'flex justify-center pt-5',
+  footer: 'flex pt-5',
 } as const
 
 /**
@@ -392,9 +391,9 @@ export const WIZARD_STYLES = {
 
 export const ONBOARDING_STYLES = {
   // A gutter of its own
-  page: 'grid min-h-screen grid-cols-1 gap-2 p-2 lg:grid-cols-[40fr_60fr]',
+  page: 'grid min-h-dvh grid-cols-1 gap-2 p-2 lg:grid-cols-[40fr_60fr]',
   banner:
-    'relative isolate flex h-56 flex-col justify-between overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-surface-sunken)] p-6 sm:h-72 lg:sticky lg:top-2 lg:h-[calc(100vh-1rem)] lg:p-8',
+    'relative isolate flex h-56 flex-col justify-between overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-surface-sunken)] p-6 sm:h-72 lg:sticky lg:top-2 lg:h-[calc(100dvh-1rem)] lg:p-8',
   bannerImage: 'absolute inset-0 -z-20 h-full w-full object-cover',
   // The scrim is what makes the title legible whatever the picture underneath
   bannerScrim:
