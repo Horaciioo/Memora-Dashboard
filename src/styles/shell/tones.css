@@ -21,7 +21,7 @@
 @property --color-frame-white {
   syntax: '<color>';
   inherits: true;
-  initial-value: #fbf7ee;
+  initial-value: #f5f5f8;
 }
 
 @property --color-frame {

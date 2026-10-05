@@ -1,21 +1,21 @@
 /* Light tokens: warm cream ground, white-warm cards, never a pure #fff or #000 */
 
 :root {
-  --color-background: #f3ebdd;
+  --color-background: #ececf0;
   /* The page window laid on the gradient, lighter than the ground */
-  --color-page: #fbf7ef;
-  --color-surface: #fffefb;
-  --color-surface-raised: #fffefc;
-  --color-surface-sunken: #ede3d1;
-  --color-ink: #1e1a17;
-  --color-ink-subtle: #675e57;
+  --color-page: #f7f7f9;
+  --color-surface: #fdfdfe;
+  --color-surface-raised: #ffffff;
+  --color-surface-sunken: #e8e8ed;
+  --color-ink: #1d1d1f;
+  --color-ink-subtle: #636368;
   --color-ink-accent: #a8355a;
-  --color-border: #e6dccb;
-  --color-border-strong: #d3c6b0;
-  --color-hover: #f6efe3;
+  --color-border: #e1e1e6;
+  --color-border-strong: #cfcfd6;
+  --color-hover: #f0f0f4;
   /* Keyboard focus and selection ring, soft and neutral */
-  --color-focus: rgb(30 26 23 / 0.45);
-  --color-focus-halo: rgb(30 26 23 / 0.1);
+  --color-focus: rgb(29 29 31 / 0.45);
+  --color-focus-halo: rgb(29 29 31 / 0.1);
 
   /* Rose: action fill (600) with a dark label, deep ink (800) for pink text */
   --color-brand-50: #fff4f7;
@@ -63,13 +63,13 @@
   --color-warning: #964f08;
   --color-danger: #c01f2b;
   --color-info: #2f6496;
-  --color-neutral: #675e57;
+  --color-neutral: #636368;
   --color-success-soft: #eef4dc;
   --color-caution-soft: #f8efd6;
   --color-warning-soft: #f9e9d6;
   --color-danger-soft: #fde5e6;
   --color-info-soft: #e3eef8;
-  --color-neutral-soft: #eae1d0;
+  --color-neutral-soft: #e8e8ed;
 
   /* Brand marks of other products */
   --color-twitch: #a8355a;
@@ -79,24 +79,24 @@
   --color-apple-green: #34c759;
 
   /* Typed fields: a tint below the card, no outline until focus */
-  --color-field: #f6f0e4;
-  --color-field-border: #eee5d4;
-  --color-field-border-strong: #ddd0b8;
-  --color-on-field: #1e1a17;
-  --color-on-field-subtle: #645c55;
-  --color-picker-wash: rgb(60 40 20 / 0.055);
-  --color-picker-wash-strong: rgb(60 40 20 / 0.09);
+  --color-field: #f0f0f4;
+  --color-field-border: #e6e6eb;
+  --color-field-border-strong: #d3d3da;
+  --color-on-field: #1d1d1f;
+  --color-on-field-subtle: #606065;
+  --color-picker-wash: rgb(20 20 40 / 0.055);
+  --color-picker-wash-strong: rgb(20 20 40 / 0.09);
 
   /* Fixed grounds, identical in both themes */
   --color-scan-ground: #ffffff;
   /* Over photos, heroes and dark media: fixed in both themes */
-  --color-on-media: #fffefb;
-  --color-media-shade: #1e160e;
-  --color-track-off: #d4d0d6;
-  --color-knob: #fffefb;
+  --color-on-media: #fafafc;
+  --color-media-shade: #14141c;
+  --color-track-off: #d1d1d6;
+  --color-knob: #ffffff;
 
   /* Dimmer behind overlays and spotlights */
-  --color-scrim: rgb(30 22 14 / 0.4);
+  --color-scrim: rgb(20 20 28 / 0.4);
 
   /* Authority, reserved to the two Administration roles */
   --color-authority-admin: #c01f2b;
@@ -107,7 +107,7 @@
 
 :root {
   /* Label over a full-colour fill */
-  --color-on-accent: #1e1a17;
+  --color-on-accent: #1d1d1f;
   /* Hairline where the page meets its frame */
-  --color-frame-edge: rgb(60 40 20 / 0.08);
+  --color-frame-edge: rgb(20 20 40 / 0.08);
 }

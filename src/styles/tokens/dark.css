@@ -1,19 +1,19 @@
 /* Dark tokens: warm charcoal, cream ink, the rose action fill stays the same */
 
 :root.dark {
-  --color-background: #16130f;
-  --color-page: #16130f;
-  --color-surface: #1e1a16;
-  --color-surface-raised: #28231d;
-  --color-surface-sunken: #110e0b;
-  --color-ink: #f6efe4;
-  --color-ink-subtle: #b5aa9c;
+  --color-background: #131315;
+  --color-page: #131315;
+  --color-surface: #1c1c1f;
+  --color-surface-raised: #2a2a2e;
+  --color-surface-sunken: #0e0e10;
+  --color-ink: #f5f5f7;
+  --color-ink-subtle: #a1a1a6;
   --color-ink-accent: #f8c0d0;
-  --color-border: #342e27;
-  --color-border-strong: #4b4238;
-  --color-hover: #262019;
-  --color-focus: rgb(246 239 228 / 0.55);
-  --color-focus-halo: rgb(246 239 228 / 0.12);
+  --color-border: #2e2e33;
+  --color-border-strong: #46464c;
+  --color-hover: #232327;
+  --color-focus: rgb(245 245 247 / 0.55);
+  --color-focus-halo: rgb(245 245 247 / 0.12);
 
   --color-brand-50: #2f1820;
   --color-brand-100: #41202b;
@@ -48,13 +48,13 @@
   --color-warning: #f0a35c;
   --color-danger: #ff7a7f;
   --color-info: #8dbbe8;
-  --color-neutral: #b5aa9c;
+  --color-neutral: #a1a1a6;
   --color-success-soft: #232a16;
   --color-caution-soft: #2e2511;
   --color-warning-soft: #30220f;
   --color-danger-soft: #3a181c;
   --color-info-soft: #172433;
-  --color-neutral-soft: #2a241d;
+  --color-neutral-soft: #2a2a2e;
 
   --color-twitch: #f8c0d0;
   --color-youtube: #f87171;
@@ -62,16 +62,16 @@
   --color-apple-orange: #ff9f0a;
   --color-apple-green: #30d158;
 
-  --color-field: #1a1612;
-  --color-field-border: #2c2620;
-  --color-field-border-strong: #4b4238;
-  --color-on-field: #f6efe4;
-  --color-on-field-subtle: #b5aa9c;
-  --color-picker-wash: rgb(246 239 228 / 0.07);
-  --color-picker-wash-strong: rgb(246 239 228 / 0.11);
+  --color-field: #18181b;
+  --color-field-border: #2a2a2f;
+  --color-field-border-strong: #46464c;
+  --color-on-field: #f5f5f7;
+  --color-on-field-subtle: #a1a1a6;
+  --color-picker-wash: rgb(245 245 247 / 0.07);
+  --color-picker-wash-strong: rgb(245 245 247 / 0.11);
 
-  --color-track-off: #4a4650;
-  --color-scrim: rgb(8 5 2 / 0.6);
+  --color-track-off: #48484e;
+  --color-scrim: rgb(0 0 4 / 0.6);
 
   --color-authority-admin: #ff7a7f;
   --color-authority-lead: #f0a35c;
