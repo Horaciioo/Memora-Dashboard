@@ -284,7 +284,7 @@ export const MEMBER_FILE = {
   departed: 'cursor-help text-xs font-bold tracking-wide text-[var(--color-danger)] uppercase',
   statusGlyph: 'h-4 w-4 shrink-0',
   functions: 'flex items-center justify-center gap-2',
-  body: 'mt-5 border-t border-[var(--color-border)] p-5',
+  body: 'mt-5 flex flex-col gap-5 border-t border-[var(--color-border)] p-5',
   groupTitle: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   lock: 'px-5 pt-3 text-center',
   // Property list of a rail
@@ -299,7 +299,7 @@ export const MEMBER_FILE = {
   noteBody: 'text-sm leading-relaxed whitespace-pre-wrap',
   notesGrid: 'grid gap-4 sm:grid-cols-2',
   // Pinned note under the rail details
-  pinned: 'flex flex-col gap-2',
+  pinned: 'flex flex-col gap-1.5',
   pinnedLabel: 'text-xs font-bold tracking-wide uppercase',
   // Social tile
   social:
