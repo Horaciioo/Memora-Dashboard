@@ -11,6 +11,8 @@
   --color-border: #342e27;
   --color-border-strong: #4b4238;
   --color-hover: #262019;
+  --color-focus: rgb(246 239 228 / 0.55);
+  --color-focus-halo: rgb(246 239 228 / 0.12);
 
   --color-brand-50: #2f1820;
   --color-brand-100: #41202b;

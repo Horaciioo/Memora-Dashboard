@@ -55,7 +55,7 @@ export const LIVE_URGENT = {
   section: 'flex flex-col gap-3',
   label: PROPERTY_LABEL,
   list: 'flex flex-col gap-2',
-  row: 'flex items-center gap-4 rounded-[var(--radius-lg)] border card-surface px-4 py-3 shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
+  row: 'flex items-center gap-4 rounded-[var(--radius-lg)] border card-surface px-4 py-3 shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   rowLive: 'border-[var(--color-danger)]',
   rowAnnounced: 'border-[var(--color-border)]',
   dot: 'h-7 w-7 shrink-0',

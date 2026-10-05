@@ -41,7 +41,7 @@ export const HOME_STYLES = {
   // Urgent tiles
   urgentGrid: 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3',
   urgentTile:
-    'flex w-full cursor-pointer items-start gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
+    'flex w-full cursor-pointer items-start gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   urgentTitle: 'font-bold tracking-tight',
   urgentScope: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
   urgentText: 'line-clamp-2 text-sm text-[var(--color-ink-subtle)]',
@@ -67,7 +67,7 @@ export const HOME_FLOW = {
   // Lives
   lives: 'grid gap-3 sm:flex sm:flex-wrap',
   liveTile:
-    'flex w-full min-w-0 cursor-pointer items-center sm:w-auto sm:min-w-52 gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface py-2.5 pr-6 pl-3 text-left transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
+    'flex w-full min-w-0 cursor-pointer items-center sm:w-auto sm:min-w-52 gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface py-2.5 pr-6 pl-3 text-left transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   livePortrait: 'relative shrink-0',
   liveLevel:
     'absolute -right-1 -bottom-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-surface-raised)]',

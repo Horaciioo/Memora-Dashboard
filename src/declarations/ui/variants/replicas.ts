@@ -19,7 +19,7 @@ export const DISCORD_REPLICA = {
   channelActive: 'bg-[var(--discord-channel-active)] text-[var(--discord-heading)]',
   // The channel the scene is about
   channelLit:
-    'replica-lit bg-[color-mix(in_oklab,var(--color-brand-500)_28%,transparent)] font-semibold text-white ring-1 ring-[var(--color-brand-400)]',
+    'replica-lit bg-[color-mix(in_oklab,var(--color-brand-500)_28%,transparent)] font-semibold text-white ring-1 ring-[var(--color-focus)]',
   channelIn: 'replica-channel-in',
   channelIcon: 'h-5 w-5 shrink-0 opacity-80',
   channelName: 'truncate',
@@ -120,7 +120,7 @@ export const DISCORD_REPLICA = {
 export const SUPPORT_GUIDE = {
   wrap: 'relative',
   notch:
-    'absolute top-1/2 left-0 z-20 flex h-28 w-7 -translate-y-1/2 items-center justify-center rounded-r-[var(--radius-lg)] bg-[var(--color-brand-600)] text-white shadow-[var(--shadow-scene)] transition-[width] hover:w-9 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink-accent)]',
+    'absolute top-1/2 left-0 z-20 flex h-28 w-7 -translate-y-1/2 items-center justify-center rounded-r-[var(--radius-lg)] bg-[var(--color-brand-600)] text-white shadow-[var(--shadow-scene)] transition-[width] hover:w-9 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
   notchIcon: 'h-4 w-4',
   panel:
     'guide-slide-in absolute inset-y-3 left-3 z-30 flex w-[min(20rem,calc(100%-1.5rem))] flex-col gap-4 overflow-y-auto rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-scene)]',
@@ -156,12 +156,12 @@ export const COMPARE_RUNS = {
   stageLabel: 'text-sm font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   strip: 'grid gap-4 sm:grid-cols-3',
   thumb:
-    'group relative flex flex-col gap-2 rounded-[var(--radius-xl)] text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ink-accent)]',
+    'group relative flex flex-col gap-2 rounded-[var(--radius-xl)] text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)]',
   thumbFrame:
     'pointer-events-none relative block h-40 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] transition-transform group-hover:-translate-y-0.5',
   // The replica drawn small inside a thumbnail
   thumbScale: 'block w-[300%] origin-top-left scale-[0.3333]',
-  thumbOpen: 'ring-2 ring-[var(--color-brand-600)]',
+  thumbOpen: 'ring-2 ring-[var(--color-focus)]',
   thumbLabel: 'block text-center font-bold',
   enlarged: 'run-slide-in relative',
   replay:

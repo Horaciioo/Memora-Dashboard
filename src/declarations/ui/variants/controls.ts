@@ -378,7 +378,7 @@ export const COLOUR_SWATCH_STYLES = {
   swatch:
     'size-9 rounded-full border border-[var(--color-border)] transition-transform hover:scale-110 disabled:pointer-events-none disabled:opacity-60',
   selected:
-    'ring-2 ring-[var(--color-ink-accent)] ring-offset-2 ring-offset-[var(--color-surface-raised)]',
+    'ring-2 ring-[var(--color-focus)] ring-offset-2 ring-offset-[var(--color-surface-raised)]',
 } as const
 
 /**
@@ -497,7 +497,7 @@ export const BLOCK_EDITOR = {
   },
   bullet: 'mt-[0.6rem] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-on-field)]',
   number: 'min-w-5 shrink-0 text-right tabular-nums text-[var(--color-on-field-subtle)]',
-  rule: 'w-full py-2 outline-none focus-visible:rounded-[var(--radius-sm)] focus-visible:ring-2 focus-visible:ring-[var(--color-brand-400)]',
+  rule: 'w-full py-2 outline-none focus-visible:rounded-[var(--radius-sm)] focus-visible:ring-2 focus-visible:ring-[var(--color-focus)]',
   ruleLine: 'border-[var(--color-border-strong)]',
   footer:
     'flex justify-end border-t border-[var(--color-field-border)] px-3 py-1.5 text-xs text-[var(--color-on-field-subtle)] tabular-nums',

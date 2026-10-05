@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { CalendarMiniMonth } from '@/composites/calendar/CalendarMiniMonth'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
@@ -32,20 +33,35 @@ export interface CalendarSidebarProps {
 }
 
 /**
- * Tick of one switch
- * @param {Object} props - Box state
+ * Mark of one switch: the tick stands where the icon is
+ * @param {Object} props - Mark state
  * @param {string | undefined} props.accent - Stored colour
  * @param {boolean} props.on - Switch is on
+ * @param {ReactNode} props.children - Icon or portrait shown while off
  * @return {JSX.Element}
  */
 
-const TickBox = ({ accent, on }: { accent: string | undefined; on: boolean }) => {
+const FilterMark = ({
+  accent,
+  on,
+  children,
+}: {
+  accent: string | undefined
+  on: boolean
+  children: ReactNode
+}) => {
   const paint = accentPaint(accent, 'brand')
   const Check = ICONS.picked
 
+  if (!on) return <span className={CALENDAR_SIDEBAR.mark}>{children}</span>
+
   return (
-    <span className={cn(CALENDAR_SIDEBAR.box, paint.text)} style={paint.style} aria-hidden="true">
-      {on && <Check className={CALENDAR_SIDEBAR.boxCheck} />}
+    <span
+      className={cn(CALENDAR_SIDEBAR.mark, CALENDAR_SIDEBAR.markOn, paint.solid)}
+      style={paint.style}
+      aria-hidden="true"
+    >
+      <Check className={CALENDAR_SIDEBAR.markCheck} />
     </span>
   )
 }
@@ -129,8 +145,9 @@ export const CalendarRailBody = ({
             onClick={() => onToggleLayer(layer)}
             className={cn(CALENDAR_SIDEBAR.row, !on && CALENDAR_SIDEBAR.rowOff)}
           >
-            <TickBox accent={undefined} on={on} />
-            <Glyph className={CALENDAR_SIDEBAR.rowGlyph} aria-hidden="true" />
+            <FilterMark accent={undefined} on={on}>
+              <Glyph className={CALENDAR_SIDEBAR.rowGlyph} aria-hidden="true" />
+            </FilterMark>
             <span className={CALENDAR_SIDEBAR.rowLabel}>{meta.label}</span>
           </button>
         )
@@ -153,8 +170,9 @@ export const CalendarRailBody = ({
               onClick={() => onToggleCreator(creator.value)}
               className={cn(CALENDAR_SIDEBAR.row, !on && CALENDAR_SIDEBAR.rowOff)}
             >
-              <TickBox accent={creator.accent} on={on} />
-              <Avatar name={creator.label} src={creator.image} size="xs" />
+              <FilterMark accent={creator.accent} on={on}>
+                <Avatar name={creator.label} src={creator.image} size="xs" />
+              </FilterMark>
               <span className={CALENDAR_SIDEBAR.rowLabel}>{creator.label}</span>
             </button>
           )

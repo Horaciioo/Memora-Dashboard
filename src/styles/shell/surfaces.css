@@ -75,3 +75,12 @@
     radial-gradient(60% 80% at 0% 100%, var(--color-brand-100), transparent 70%);
   pointer-events: none;
 }
+
+/* Apple-style notification: grey frosted glass */
+.glass-toast {
+  background: var(--glass-toast);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  backdrop-filter: blur(24px) saturate(1.8);
+  border: 1px solid var(--glass-line);
+  box-shadow: var(--shadow-md);
+}

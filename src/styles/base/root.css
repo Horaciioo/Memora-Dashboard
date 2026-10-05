@@ -35,9 +35,18 @@ h4 {
 }
 
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-ink-accent);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
+}
+
+/* Fields: a darker edge and a faint halo, no outline */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-ink-subtle);
+  box-shadow: 0 0 0 3px var(--color-focus-halo);
 }
 
 /* Scrollbars follow the surface tokens instead of the OS default */

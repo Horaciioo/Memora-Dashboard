@@ -5,7 +5,7 @@
 
 export const SESSION_CARD = {
   grid: 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3',
-  card: 'group flex cursor-pointer flex-col gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
+  card: 'group flex cursor-pointer flex-col gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   muted: 'bg-[var(--color-surface)]',
   head: 'flex items-start gap-4',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
@@ -48,7 +48,7 @@ export const SESSION_HERO = {
 
 export const CANDIDATE_CARD = {
   grid: 'grid gap-3 sm:grid-cols-2',
-  card: 'flex cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
+  card: 'flex cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
   name: 'truncate font-bold tracking-tight',
   meta: 'truncate text-xs text-[var(--color-ink-subtle)]',

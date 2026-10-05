@@ -541,7 +541,7 @@ export const CHANGELOG_BOARD = {
   // Three figures doubling as the way into each category
   counts: 'mt-2 flex flex-wrap items-stretch justify-center gap-3',
   count:
-    'group flex min-w-36 flex-col items-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-6 py-4 shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-1 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
+    'group flex min-w-36 flex-col items-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-6 py-4 shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-1 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   countFigure: 'text-4xl leading-none font-bold tabular-nums',
   countLabel: 'text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   blocks: 'flex flex-col gap-16',

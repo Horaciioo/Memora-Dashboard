@@ -25,7 +25,7 @@ export const MODVIEW_FRAME = {
   body: 'flex min-h-0 flex-1 gap-3',
   rail: 'hidden w-12 shrink-0 flex-col items-center gap-1.5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 shadow-[var(--shadow-sm)] md:flex',
   railButton:
-    'flex h-9 w-9 items-center justify-center rounded-[var(--radius-lg)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
+    'flex h-9 w-9 items-center justify-center rounded-[var(--radius-lg)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   railButtonOff: 'opacity-40 grayscale hover:opacity-100 hover:grayscale-0',
   railIcon: 'h-5 w-5',
   grid: 'grid min-h-0 flex-1 gap-3 overflow-y-auto lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.7fr)] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden',
@@ -93,7 +93,7 @@ export const MODVIEW_STREAM = {
 export const MODVIEW_FEED = {
   // Line of the moderator followed in Focus mode
   itemFocus:
-    'rounded-[var(--radius-md)] bg-[var(--color-brand-100)] ring-2 ring-[var(--color-brand-600)]',
+    'rounded-[var(--radius-md)] bg-[var(--color-brand-100)] ring-2 ring-[var(--color-focus)]',
   count: 'px-3 pt-2 text-xs font-bold text-[var(--color-ink-subtle)]',
   list: 'flex flex-col divide-y divide-[var(--color-border)]',
   item: 'flex gap-2.5 px-3 py-2.5',
@@ -123,7 +123,7 @@ export const MODVIEW_CHAT = {
   time: 'mr-1.5 font-[family-name:var(--font-mono)] text-micro text-[var(--color-ink-subtle)]',
   deletedText: 'text-[var(--color-ink-subtle)] line-through',
   deletedNote: 'ml-1.5 text-xs text-[var(--color-ink-subtle)] italic',
-  triggerLit: 'ring-2 ring-[var(--color-brand-600)]',
+  triggerLit: 'ring-2 ring-[var(--color-focus)]',
   welcome: 'px-3 pt-3 pb-1 text-sm text-[var(--color-ink-subtle)]',
   list: 'flex flex-col py-1',
   line: 'group relative px-3 py-1 text-sm leading-relaxed break-words transition-colors hover:bg-[var(--color-hover)]',
@@ -146,7 +146,7 @@ export const MODVIEW_CHAT = {
     'flex gap-3 border-t border-[var(--color-border)] px-3 pt-2 text-xs font-bold text-[var(--color-ink-subtle)]',
   composer: 'flex flex-col gap-2 p-3 pt-2',
   input:
-    'w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:border-[var(--color-brand-600)] disabled:cursor-not-allowed disabled:opacity-60',
+    'w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:border-[var(--color-ink-subtle)] disabled:cursor-not-allowed disabled:opacity-60',
   composerRow: 'flex items-center justify-end',
 } as const
 
@@ -163,7 +163,7 @@ export const MODVIEW_MODES = {
     'absolute top-11 right-2 z-30 flex w-72 flex-col gap-1 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-2 shadow-[var(--shadow-md)]',
   row: 'flex items-center gap-3 rounded-[var(--radius-lg)] px-2 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent',
   // Option a scene is setting
-  rowLit: 'bg-[var(--color-brand-soft)] ring-2 ring-[var(--color-brand-600)]',
+  rowLit: 'bg-[var(--color-brand-soft)] ring-2 ring-[var(--color-focus)]',
   rowIcon: 'h-5 w-5 shrink-0',
   rowLabel: 'min-w-0 flex-1 font-semibold',
   rowState: 'text-xs font-bold tracking-wide uppercase',
@@ -174,7 +174,7 @@ export const MODVIEW_MODES = {
   termList: 'flex flex-wrap gap-1.5',
   termForm: 'flex gap-2',
   termInput:
-    'min-w-0 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm outline-none focus:border-[var(--color-brand-600)]',
+    'min-w-0 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -185,10 +185,10 @@ export const MODVIEW_MODES = {
 export const MODVIEW_COMMUNITY = {
   search: 'flex items-center gap-2 p-3',
   input:
-    'w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-brand-600)]',
+    'w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
   group:
     'mx-2 mb-2 flex flex-col gap-1 rounded-[var(--radius-lg)] px-2 pb-2 transition-[background-color,box-shadow]',
-  groupLit: 'bg-[var(--color-brand-100)] ring-2 ring-[var(--color-brand-600)]',
+  groupLit: 'bg-[var(--color-brand-100)] ring-2 ring-[var(--color-focus)]',
   groupHead: 'flex items-center gap-2 py-1 text-sm font-bold',
   groupIcon: 'h-5 w-5 shrink-0',
   member: 'w-fit cursor-pointer text-sm font-semibold hover:underline',
@@ -214,9 +214,9 @@ export const MODVIEW_USER = {
   actions: 'grid grid-cols-2 gap-2',
   presets: 'flex flex-wrap gap-1.5',
   preset:
-    'rounded-[var(--radius-md)] border border-[var(--color-border)] px-2.5 py-1 text-xs font-bold transition-colors hover:border-[var(--color-brand-600)] disabled:cursor-not-allowed disabled:opacity-40',
+    'rounded-[var(--radius-md)] border border-[var(--color-border)] px-2.5 py-1 text-xs font-bold transition-colors hover:border-[var(--color-border-strong)] disabled:cursor-not-allowed disabled:opacity-40',
   reason:
-    'w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:border-[var(--color-brand-600)]',
+    'w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
   lock: 'text-xs text-[var(--color-ink-subtle)]',
 } as const
 
@@ -253,7 +253,7 @@ export const MODVIEW_SANCTIONS = {
   headGlyph: 'h-8 w-8',
   headName: 'text-sm font-bold tracking-wide uppercase',
   search:
-    'w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-brand-600)]',
+    'w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
   tabs: 'flex items-center justify-center gap-2 py-3',
   tab: 'flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)]',
   tabOn: 'bg-[var(--color-brand-100)] text-[var(--color-ink-accent)]',

@@ -61,7 +61,7 @@ export const TASK_LIST = {
 
 export const GUIDE_TOUR = {
   // Dims the page around the control
-  ring: 'pointer-events-none fixed z-[70] rounded-[var(--radius-md)] ring-2 ring-[var(--color-brand-600)] shadow-[0_0_0_9999px_var(--color-scrim)] transition-[top,left,width,height] duration-[var(--motion-duration-base)]',
+  ring: 'pointer-events-none fixed z-[70] rounded-[var(--radius-md)] ring-2 ring-[var(--color-focus)] shadow-[0_0_0_9999px_var(--color-scrim)] transition-[top,left,width,height] duration-[var(--motion-duration-base)]',
   bubble:
     'fixed z-[71] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel p-4 shadow-[var(--shadow-md)]',
   counter:

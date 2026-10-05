@@ -10,7 +10,7 @@ export const LIVECON_TITLE = {
   base: 'group flex min-w-0 items-center gap-4 rounded-[var(--radius-lg)] text-left',
   // Only a member allowed to change it feels it as a control
   interactive:
-    'cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-ink-accent)]',
+    'cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)]',
   icon: 'h-14 w-14 shrink-0 transition-transform duration-[var(--motion-duration-moderate)] group-hover:-rotate-6 group-hover:scale-110',
   name: 'text-4xl font-bold tracking-tight sm:text-5xl',
   search: 'w-full sm:w-72',
@@ -29,11 +29,11 @@ export const SANCTION_PANEL = {
   groupTitle: `${PROPERTY_LABEL} text-[var(--accent)]`,
   grid: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
   // Raised box
-  card: 'group relative flex min-h-16 w-full items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 pl-5 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
+  card: 'group relative flex min-h-16 w-full items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 pl-5 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   cardRule: 'absolute inset-y-0 left-0 w-1 bg-[var(--accent)]',
   cardName: 'text-sm leading-snug font-bold tracking-tight text-balance',
   cardInput:
-    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2 py-1 text-sm font-bold tracking-tight outline-none ring-2 ring-[var(--color-brand-600)]',
+    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2 py-1 text-sm font-bold tracking-tight outline-none ring-2 ring-[var(--color-focus)]',
   empty: 'text-center text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 
@@ -92,7 +92,7 @@ export const MARSHA_GUIDE = {
   search: 'h-11',
   navList: 'flex flex-col gap-1',
   navItem:
-    'flex w-full items-center gap-3 rounded-[var(--radius-lg)] border border-transparent px-3.5 py-2.5 text-left text-body font-semibold transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
+    'flex w-full items-center gap-3 rounded-[var(--radius-lg)] border border-transparent px-3.5 py-2.5 text-left text-body font-semibold transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   navItemOn:
     'border-[var(--color-brand-200)] bg-[var(--color-brand-50)] font-bold hover:bg-[var(--color-brand-50)]',
   navIcon: 'h-5 w-5 shrink-0 text-[var(--color-ink-subtle)]',
@@ -102,7 +102,7 @@ export const MARSHA_GUIDE = {
   column: 'flex flex-col gap-0.5',
   lead: 'px-4 pb-3 text-sm leading-relaxed text-[var(--color-ink-subtle)]',
   group: `px-4 pt-4 pb-1.5 ${PROPERTY_LABEL}`,
-  item: 'rounded-[var(--radius-lg)] border border-transparent px-4 py-3 text-left transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
+  item: 'rounded-[var(--radius-lg)] border border-transparent px-4 py-3 text-left transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   itemOn:
     'border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)] hover:bg-[var(--color-surface-raised)]',
   itemName: 'block font-[family-name:var(--font-mono)] text-body font-bold',

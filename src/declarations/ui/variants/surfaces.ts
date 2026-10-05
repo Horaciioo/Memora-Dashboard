@@ -50,7 +50,7 @@ export const PAGE_STYLES = {
   titleEditable:
     '-mx-1 cursor-pointer rounded-[var(--radius-sm)] px-1 transition-colors hover:bg-[var(--color-surface)]',
   titleInput:
-    'rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-brand-600)]',
+    'rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-focus)]',
   toolbar: 'flex flex-wrap items-center gap-2',
 } as const
 
@@ -157,8 +157,8 @@ export const DRAWER_STYLES = {
   title: 'min-w-0 flex-1 truncate text-base leading-tight font-bold tracking-tight',
   close: '-mr-2 shrink-0',
   // Section tabs under the header
-  sections: 'shrink-0 px-5',
-  body: 'min-h-0 flex-1 overflow-y-auto border-t border-[var(--color-border)] px-5 py-5',
+  sections: 'shrink-0 px-5 pb-1',
+  body: 'min-h-0 flex-1 overflow-y-auto px-5 py-4',
   // Fields of the section on screen
   section: 'drawer-section-enter',
   footer: 'shrink-0 border-t border-[var(--color-border)] px-2 py-2',
@@ -288,11 +288,11 @@ export const INLINE_EDIT_STYLES = {
     '-mx-2 -my-1 cursor-text rounded-[var(--radius-sm)] px-2 py-1 transition-colors hover:bg-[var(--color-surface)]',
   text: '-mx-1 cursor-text rounded-[var(--radius-sm)] px-1 transition-colors hover:bg-[var(--color-surface)]',
   input:
-    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-brand-600)]',
+    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-focus)]',
   area: 'block min-h-20 resize-y rounded-[var(--radius-md)] px-3 py-2 leading-relaxed',
   // Dashed field standing in for a creation row
   create:
-    'w-full rounded-[var(--radius-md)] border border-dashed border-[var(--color-brand-400)] bg-[var(--color-surface)] px-4 py-3 text-sm outline-none focus:border-solid focus:ring-2 focus:ring-[var(--color-brand-600)]',
+    'w-full rounded-[var(--radius-md)] border border-dashed border-[var(--color-brand-400)] bg-[var(--color-surface)] px-4 py-3 text-sm outline-none focus:border-solid focus:ring-2 focus:ring-[var(--color-focus)]',
   createTile: 'min-h-24 text-center',
   placeholder: 'text-sm text-[var(--color-ink-subtle)] italic',
 } as const
@@ -470,7 +470,7 @@ export const COLLAPSIBLE_PANEL = {
 export const PAGE_OPTIONS = {
   host: 'relative',
   button:
-    'glass-panel flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink)] transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink-accent)] motion-reduce:transition-none',
+    'glass-panel flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink)] transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] motion-reduce:transition-none',
   buttonOpen: 'scale-105',
   icon: 'h-5 w-5',
   panel:

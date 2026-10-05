@@ -11,6 +11,9 @@
   --color-border: #e6dccb;
   --color-border-strong: #d3c6b0;
   --color-hover: #f6efe3;
+  /* Keyboard focus and selection ring, soft and neutral */
+  --color-focus: rgb(30 26 23 / 0.45);
+  --color-focus-halo: rgb(30 26 23 / 0.1);
 
   /* Rose: action fill (600) with a dark label, deep ink (800) for pink text */
   --color-brand-50: #fff4f7;

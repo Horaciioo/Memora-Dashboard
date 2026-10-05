@@ -36,7 +36,7 @@ export const COURSE_FOCUS = {
   root: 'course-wide flex flex-col gap-5',
   prompt: 'text-body leading-relaxed',
   picks: 'flex flex-wrap gap-2',
-  pick: 'rounded-full border-2 border-[var(--color-border)] px-4 py-1.5 text-sm font-bold transition-[border-color,background-color,color] hover:border-[var(--color-brand-600)]',
+  pick: 'rounded-full border-2 border-[var(--color-border)] px-4 py-1.5 text-sm font-bold transition-[border-color,background-color,color] hover:border-[var(--color-border-strong)]',
   pickActive:
     'border-[var(--color-brand-600)] bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   layout: 'course-erase-in grid gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]',
@@ -137,11 +137,11 @@ export const COURSE_PAGES = {
   scaleEdge: 'text-sm text-[var(--color-ink-subtle)]',
   scaleDots: 'flex flex-wrap gap-1.5',
   scaleDot:
-    'flex h-10 w-10 items-center justify-center rounded-full border-2 border-[var(--color-border)] text-sm font-bold transition-[border-color,background-color,color,transform] hover:-translate-y-0.5 hover:border-[var(--color-brand-600)]',
+    'flex h-10 w-10 items-center justify-center rounded-full border-2 border-[var(--color-border)] text-sm font-bold transition-[border-color,background-color,color,transform] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)]',
   scaleDotPicked:
     'border-[var(--color-brand-600)] bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   comment:
-    'min-h-28 w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-body outline-none focus:border-[var(--color-brand-600)]',
+    'min-h-28 w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-body outline-none focus:border-[var(--color-ink-subtle)]',
 } as const
 
 /**

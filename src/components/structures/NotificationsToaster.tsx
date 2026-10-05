@@ -83,6 +83,9 @@ const Toast = ({
   }, [notification.id, onMeasure])
 
   const startDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
+    // Capturing the pointer would swallow the click on the close button
+    if ((event.target as HTMLElement).closest('button')) return
+
     startXRef.current = event.clientX
     setDragging(true)
     event.currentTarget.setPointerCapture(event.pointerId)
