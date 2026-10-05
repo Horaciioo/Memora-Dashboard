@@ -36,6 +36,7 @@
   --motion-duration-base: 200ms;
   --motion-duration-panel: 320ms;
   --motion-duration-slow: 500ms;
+  --motion-duration-theme: 500ms;
   --motion-duration-celebrate: 640ms;
   --motion-duration-moderate: 1400ms;
   --motion-duration-pulse: 1600ms;

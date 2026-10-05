@@ -8,6 +8,7 @@
 @import './tokens/vision.css';
 @import './base/root.css';
 @import './base/motion.css';
+@import './base/theme.css';
 @import './shell/tones.css';
 @import './shell/frame.css';
 @import './shell/banner.css';

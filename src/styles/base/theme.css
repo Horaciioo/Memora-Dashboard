@@ -1,0 +1,13 @@
+/* Light and dark swap with a slow glide, only while the class is set */
+.theme-fade,
+.theme-fade *,
+.theme-fade *::before,
+.theme-fade *::after {
+  transition:
+    background-color var(--motion-duration-theme) ease,
+    border-color var(--motion-duration-theme) ease,
+    color var(--motion-duration-theme) ease,
+    fill var(--motion-duration-theme) ease,
+    stroke var(--motion-duration-theme) ease,
+    box-shadow var(--motion-duration-theme) ease !important;
+}

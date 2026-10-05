@@ -193,7 +193,6 @@ export const FormDrawer = ({
             items={tabs}
             value={current?.name ?? ''}
             label={FORM_COPY.categories}
-            collapse="always"
             onChange={goTo}
           />
         )

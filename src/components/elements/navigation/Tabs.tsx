@@ -17,35 +17,15 @@ export interface TabItem {
   flagged?: boolean
 }
 
-// Which tabs keep their label alongside the icon
-export type TabCollapse = 'mobile' | 'always' | 'never'
-
 export interface TabsProps {
   items: TabItem[]
   value: string
   onChange: (value: string) => void
   label: string
-  // Icon-only tabs revealing their label — on the open tab only ('mobile', the default,
-  // widens to every tab from sm; 'always' never widens; 'never' keeps every label shown)
-  collapse?: TabCollapse
   // Strip centred over its panel
   centered?: boolean
   // Carried into the banner notch when the page has one
   inBanner?: boolean
-}
-
-/**
- * Label visibility of one tab
- * @param {TabCollapse} collapse - Strip-wide collapse mode
- * @param {boolean} isActive - Tab is the open one
- * @return {string} - Classes sizing the label track
- */
-
-const labelReveal = (collapse: TabCollapse, isActive: boolean): string => {
-  if (collapse === 'never' || isActive) return TABS_STYLES.labelOpen
-  if (collapse === 'always') return TABS_STYLES.labelShut
-
-  return TABS_STYLES.labelShutMobile
 }
 
 /**
@@ -54,21 +34,12 @@ const labelReveal = (collapse: TabCollapse, isActive: boolean): string => {
  * @param {string} value - Selected tab value
  * @param {(value: string) => void} onChange - Selection handler
  * @param {string} label - Accessible name of the strip
- * @param {TabCollapse} [collapse] - Label visibility mode
  * @param {boolean} [centered] - Centres the strip
  * @param {boolean} [inBanner] - Sits in the banner notch
  * @return {JSX.Element}
  */
 
-export const Tabs = ({
-  items,
-  value,
-  onChange,
-  label,
-  collapse = 'mobile',
-  centered,
-  inBanner,
-}: TabsProps) => {
+export const Tabs = ({ items, value, onChange, label, centered, inBanner }: TabsProps) => {
   const host = useBannerHost(PAGE_TABS_HOST_ID)
   const tabsRef = useRef(new Map<string, HTMLButtonElement>())
   const listRef = useRef<HTMLDivElement | null>(null)
@@ -154,8 +125,6 @@ export const Tabs = ({
       {items.map((item) => {
         const Icon = item.icon ? ICONS[item.icon] : null
         const isActive = item.value === value
-        // Nothing to collapse to without an icon
-        const reveal = item.icon ? collapse : 'never'
 
         return (
           <button
@@ -177,10 +146,8 @@ export const Tabs = ({
           >
             <span className={TABS_STYLES.content}>
               {Icon && <Icon className={TABS_STYLES.icon} aria-hidden="true" />}
-              <span className={cn(TABS_STYLES.labelTrack, labelReveal(reveal, isActive))}>
-                <span className={cn(TABS_STYLES.label, Icon && TABS_STYLES.labelBeside)}>
-                  {item.label}
-                </span>
+              <span className={cn(TABS_STYLES.label, Icon && TABS_STYLES.labelBeside)}>
+                {item.label}
               </span>
             </span>
           </button>

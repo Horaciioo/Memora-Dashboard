@@ -4,6 +4,9 @@ import { useEffect } from 'react'
 
 import { resolveTheme, useThemeStore } from '@/core/store/theme'
 
+// Longer than the fade in base/theme.css
+const THEME_FADE_MS = 700
+
 /**
  * Sync theme
  * @return {null} - No render
@@ -13,8 +16,12 @@ export const ThemeManager = () => {
   const theme = useThemeStore((state) => state.theme)
 
   useEffect(() => {
+    const root = document.documentElement
     const apply = () => {
-      document.documentElement.classList.toggle('dark', resolveTheme(theme) === 'dark')
+      // Colours glide instead of snapping
+      root.classList.add('theme-fade')
+      root.classList.toggle('dark', resolveTheme(theme) === 'dark')
+      window.setTimeout(() => root.classList.remove('theme-fade'), THEME_FADE_MS)
     }
 
     apply()

@@ -212,24 +212,18 @@ export const TABS_STYLES = {
   list: 'relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-[var(--color-surface-sunken)] p-1',
   // Strip centred over its panel from sm
   listCentered: 'sm:mx-auto',
-  tab: 'relative z-10 shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
-  // Open tab sits on the rose pill
+  tab: 'relative z-10 shrink-0 rounded-full px-3 py-1.5 text-sm font-medium sm:px-3.5 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  // Open tab sits on the white pill
   active:
-    'font-semibold text-[var(--color-on-brand)] hover:bg-transparent hover:text-[var(--color-on-brand)]',
+    'font-semibold text-[var(--color-ink)] hover:bg-transparent hover:text-[var(--color-ink)]',
   flagged: 'text-[var(--color-danger)]',
-  // Rose pill gliding under the open tab
+  // White pill gliding under the open tab
   indicator:
-    'tab-indicator pointer-events-none absolute top-1 bottom-1 left-0 rounded-full bg-[var(--color-brand-600)] shadow-[var(--shadow-sm)]',
+    'tab-indicator pointer-events-none absolute top-1 bottom-1 left-0 rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
   panel: 'pt-4',
   content: 'flex items-center',
   icon: 'h-4 w-4 shrink-0',
-  // Track sized on the real label width
-  labelTrack:
-    'grid transition-[grid-template-columns,opacity] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
-  labelOpen: 'grid-cols-[1fr] opacity-100',
-  labelShut: 'grid-cols-[0fr] opacity-0',
-  labelShutMobile: 'grid-cols-[0fr] opacity-0 sm:grid-cols-[1fr] sm:opacity-100',
-  label: 'min-w-0 overflow-hidden whitespace-nowrap',
+  label: 'whitespace-nowrap',
   // Gap folds away with the label
   labelBeside: 'pl-1.5',
 } as const
