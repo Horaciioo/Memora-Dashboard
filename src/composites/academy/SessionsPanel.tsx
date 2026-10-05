@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { StatusText } from '@/components/elements/display/StatusText'
+import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
@@ -125,9 +125,7 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
           <div className={SESSION_CARD.body}>
             <span className={SESSION_CARD.title}>{session.function.name}</span>
             <span className={SESSION_CARD.meta}>{formatDay(session.startsAt)}</span>
-            {!isRunning && (
-              <StatusText label={status.label} accent={status.accent} className="mt-1" />
-            )}
+            {!isRunning && <Status label={status.label} accent={status.accent} className="mt-1" />}
           </div>
         </div>
 

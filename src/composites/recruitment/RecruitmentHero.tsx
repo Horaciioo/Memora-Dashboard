@@ -1,5 +1,5 @@
 import { Avatar } from '@/components/elements/display/Avatar'
-import { StatusText } from '@/components/elements/display/StatusText'
+import { Status } from '@/components/elements/display/Status'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
 import { accentPaint } from '@/declarations/ui/theme'
@@ -55,7 +55,7 @@ export const RecruitmentHero = ({ summary, candidates, outcomes }: RecruitmentHe
             <h2 className={SESSION_HERO.title}>{summary.jobFunction.label}</h2>
             <div className={SESSION_HERO.meta}>
               <span>{summary.youtuber.label}</span>
-              <StatusText label={status.label} accent={status.accent} />
+              <Status label={status.label} accent={status.accent} />
             </div>
           </div>
         </div>
@@ -79,7 +79,7 @@ export const RecruitmentHero = ({ summary, candidates, outcomes }: RecruitmentHe
           </div>
           <div className={SESSION_HERO.legend}>
             {parts.map((part) => (
-              <StatusText key={part.id} label={part.label} accent={part.accent} />
+              <Status key={part.id} label={part.label} accent={part.accent} />
             ))}
           </div>
         </div>

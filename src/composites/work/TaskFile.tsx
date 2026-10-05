@@ -1,7 +1,7 @@
 'use client'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
@@ -69,13 +69,15 @@ export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) =
     {
       label: TASK_FIELD_COPY.state,
       field: fieldFor('stateId'),
-      display: stateOption ? <Badge label={stateOption.label} accent={stateOption.accent} /> : null,
+      display: stateOption ? (
+        <Status label={stateOption.label} accent={stateOption.accent} />
+      ) : null,
     },
     {
       label: TASK_FIELD_COPY.priority,
       field: fieldFor('priorityId'),
       display: priorityOption ? (
-        <Badge label={priorityOption.label} accent={priorityOption.accent} tone="warning" />
+        <Status label={priorityOption.label} accent={priorityOption.accent} tone="warning" />
       ) : null,
     },
     {
@@ -106,7 +108,7 @@ export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) =
       label: TASK_FIELD_COPY.dueDate,
       field: fieldFor('dueDate'),
       display: dueDateValue ? (
-        <Badge
+        <Status
           label={formatDay(dueDateValue)}
           tone={isOverdue(dueDateValue) ? 'danger' : 'neutral'}
           icon="deadline"
@@ -156,7 +158,7 @@ export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) =
               figure="notes"
               title={TASK_COPY.logsEmptyTitle}
               description={TASK_COPY.logsEmptyDescription}
-              action={<Badge label={TASK_COPY.logsTitle} tone="neutral" />}
+              action={<Status label={TASK_COPY.logsTitle} tone="neutral" />}
             />
           ) : (
             <div className={cn(SECTION_STYLES.panel, SECTION_STYLES.panelPadded)}>

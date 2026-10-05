@@ -3,8 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { StatusText } from '@/components/elements/display/StatusText'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { Markdown } from '@/components/elements/display/Markdown'
@@ -220,7 +219,7 @@ export const RecruitmentFile = ({
                       size="xs"
                     />
                   )}
-                  {outcome && <StatusText label={outcome.label} accent={outcome.accent} />}
+                  {outcome && <Status label={outcome.label} accent={outcome.accent} />}
                 </span>
               </div>
             )
@@ -329,7 +328,7 @@ export const RecruitmentFile = ({
                   </span>
                   <div className={STAGE_LIST.stageBody}>
                     <span className={STAGE_LIST.stageHead}>
-                      <Badge label={offset} tone="neutral" />
+                      <Status label={offset} tone="neutral" />
                       <span className={STAGE_LIST.stageTitle}>{step.title}</span>
                     </span>
                     <span className={STAGE_LIST.stageLead}>

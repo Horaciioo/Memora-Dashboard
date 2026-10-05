@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { Progress } from '@/components/elements/feedback/Progress'
@@ -39,10 +39,10 @@ const TrainingRow = ({
       <header className="flex flex-wrap items-center gap-2">
         <span className="font-medium">{training.name}</span>
         {training.period && (
-          <Badge label={ACADEMY_PERIOD_REGISTRY.label(training.period)} tone="neutral" />
+          <Status label={ACADEMY_PERIOD_REGISTRY.label(training.period)} tone="neutral" />
         )}
-        {training.mandatory && <Badge label={ACADEMY_COPY.mandatory} tone="brand" />}
-        <Badge label={status.label} accent={status.accent} tone={'neutral'} />
+        {training.mandatory && <Status label={ACADEMY_COPY.mandatory} tone="brand" />}
+        <Status label={status.label} accent={status.accent} tone={'neutral'} />
         <span className="ml-auto text-xs text-[var(--color-ink-subtle)]">
           {`${ACADEMY_SETTINGS.trainingMinMinutes}-${ACADEMY_SETTINGS.trainingMaxMinutes} ${ACADEMY_COPY.trainingDurationUnit}`}
         </span>
@@ -143,7 +143,7 @@ export const TrainingsPanel = ({ initialTrainings }: TrainingsPanelProps) => {
         figure="academy"
         title={ACADEMY_COPY.myTrainingsEmptyTitle}
         description={ACADEMY_COPY.myTrainingsEmptyDescription}
-        action={<Badge label={ACADEMY_COPY.myTrainingsEmptyTitle} tone="neutral" />}
+        action={<Status label={ACADEMY_COPY.myTrainingsEmptyTitle} tone="neutral" />}
       />
     )
   }

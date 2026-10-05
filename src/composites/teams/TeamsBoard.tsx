@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FormDrawer } from '@/components/structures/FormDrawer'
@@ -198,7 +198,7 @@ export const TeamsBoard = ({
                             <span className="truncate font-bold">{team.name}</span>
                             {team.archived && (
                               <span className="flex flex-wrap items-center gap-1.5">
-                                <Badge label={TEAM_COPY.archived} tone="neutral" icon="hidden" />
+                                <Status label={TEAM_COPY.archived} tone="neutral" icon="hidden" />
                               </span>
                             )}
                           </span>

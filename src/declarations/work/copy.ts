@@ -13,7 +13,8 @@ export const PROJECT_COPY = {
   filterTitle: 'Aucun projet ne correspond',
   filterDescription: 'Élargis ou retire les filtres en cours.',
   deleteTitle: 'Souhaite-tu supprimer ce projet ?',
-  deleteDescription: 'Les annonces seront également supprimées. Ses tâches et réunions sont quant à elles détachées.',
+  deleteDescription:
+    'Les annonces seront également supprimées. Ses tâches et réunions sont quant à elles détachées.',
   missingStates: 'Crée d’abord des états de projet dans la configuration.',
   tabOverview: 'Aperçu',
   tabCommunication: 'Communication',

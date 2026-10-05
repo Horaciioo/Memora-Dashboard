@@ -1,4 +1,4 @@
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { SubjectBadges } from '@/composites/system/SubjectBadges'
 import { VIEW_COPY } from '@/declarations/access/copy'
@@ -26,7 +26,7 @@ export const RuntimePanel = ({ report }: RuntimePanelProps) => {
         figure="settings"
         title={VIEW_COPY.runtimeDown}
         description={VIEW_COPY.runtimeDownLead}
-        action={<Badge label={report.label} tone="neutral" icon="console" />}
+        action={<Status label={report.label} tone="neutral" icon="console" />}
       />
     )
   }

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { Section } from '@/components/structures/Section'
 import { RuntimePanel } from '@/composites/system/RuntimePanel'
@@ -27,7 +27,7 @@ export default async function ProbesPage() {
       <PageHeader
         title={SYSTEM_COPY.probesTitle}
         actions={
-          <Badge
+          <Status
             label={`${VIEW_COPY.environment} : ${runtime.label}`}
             tone={runtime.started ? 'success' : 'neutral'}
             icon="console"

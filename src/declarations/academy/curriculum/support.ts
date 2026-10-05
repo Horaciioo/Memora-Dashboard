@@ -8,7 +8,7 @@ import type { Course, DiscordExampleLine } from '@/declarations/academy/curricul
 import { author } from '@/declarations/replicas/discordKit'
 
 // Moderator writing the examples
-const MODO = author('modo', { name: 'MODO', glyph: 'shield', colour: '#f47fb0' })
+const MODO = author('modo', { name: 'MODO', glyph: 'shield', colour: '#dfa5ae' })
 
 /**
  * One example line written by the moderator

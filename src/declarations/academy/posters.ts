@@ -10,6 +10,11 @@ import type { CourseSurface } from '@/declarations/academy/curriculum/types'
  * @property {string} paper - Light shapes
  * @property {string} accent - Pink accent
  * @property {string} alert - Red mark of what a moderator acts on
+ * @property {string} chrome - Window bar
+ * @property {string} rule - Light lines
+ * @property {string} alertSoft - Red wash
+ * @property {string} muted - Grey line
+ * @property {string} deep - Dark shape
  */
 
 export interface PosterPalette {
@@ -20,13 +25,25 @@ export interface PosterPalette {
   paper: string
   accent: string
   alert: string
+  chrome: string
+  rule: string
+  alertSoft: string
+  muted: string
+  deep: string
 }
 
 // Shared by every poster
-const INK = '#18181b'
-const PAPER = '#ffffff'
-const ACCENT = '#ff7fb2'
-const ALERT = '#dc2626'
+const SHARED = {
+  ink: '#1e1a17',
+  paper: '#fffefb',
+  accent: '#dfa5ae',
+  alert: '#b23a2e',
+  chrome: '#2f2a25',
+  rule: '#d9cfc0',
+  alertSoft: '#f2cdc6',
+  muted: '#8a8076',
+  deep: '#4a433b',
+}
 
 /**
  * Palette of each place a course happens
@@ -35,48 +52,33 @@ const ALERT = '#dc2626'
 
 export const COURSE_POSTERS: Record<CourseSurface, PosterPalette> = {
   twitch: {
-    ground: '#ffe3ee',
-    blob: '#ffcfe3',
-    blobSoft: '#ffd7e7',
-    ink: INK,
-    paper: PAPER,
-    accent: ACCENT,
-    alert: ALERT,
+    ground: '#faeaec',
+    blob: '#f5d8dc',
+    blobSoft: '#f7e1e4',
+    ...SHARED,
   },
   discord: {
-    ground: '#dbe8ff',
-    blob: '#c4d9ff',
-    blobSoft: '#cfe0ff',
-    ink: INK,
-    paper: PAPER,
-    accent: ACCENT,
-    alert: ALERT,
+    ground: '#e4effa',
+    blob: '#cbe0f5',
+    blobSoft: '#d6e7f7',
+    ...SHARED,
   },
   youtube: {
-    ground: '#ffe1e1',
-    blob: '#ffc9c9',
-    blobSoft: '#ffd3d3',
-    ink: INK,
-    paper: PAPER,
-    accent: ACCENT,
-    alert: ALERT,
+    ground: '#f8e3df',
+    blob: '#f2cdc6',
+    blobSoft: '#f5d6d0',
+    ...SHARED,
   },
   lives: {
-    ground: '#dcf5e4',
-    blob: '#c3ecd1',
-    blobSoft: '#cdf0d9',
-    ink: INK,
-    paper: PAPER,
-    accent: ACCENT,
-    alert: ALERT,
+    ground: '#eef5d6',
+    blob: '#e0edb8',
+    blobSoft: '#e6f0c6',
+    ...SHARED,
   },
   general: {
-    ground: '#ffe8d1',
-    blob: '#ffd9b0',
-    blobSoft: '#ffdcb8',
-    ink: INK,
-    paper: PAPER,
-    accent: ACCENT,
-    alert: ALERT,
+    ground: '#f9e9d6',
+    blob: '#f3d6b0',
+    blobSoft: '#f5deba',
+    ...SHARED,
   },
 }

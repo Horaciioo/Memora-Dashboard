@@ -1,4 +1,4 @@
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { Section } from '@/components/structures/Section'
 import { LEGACY_STATUS_REGISTRY } from '@/declarations/academy/registries'
@@ -104,7 +104,7 @@ export const MemberJourney = ({ summary, onOpen, hrefs }: MemberJourneyProps) =>
                 {reached ? (
                   <div className={STAGE_LIST.stageActions}>
                     {stage.status && (
-                      <Badge label={stage.status.label} accent={stage.status.accent} />
+                      <Status label={stage.status.label} accent={stage.status.accent} />
                     )}
                     {stage.note && <span className={STAGE_LIST.stageLead}>{stage.note}</span>}
                     <Button icon="forward" onClick={() => onOpen(stage.href!)}>

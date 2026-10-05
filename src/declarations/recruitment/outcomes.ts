@@ -22,12 +22,12 @@ export interface RecruitmentOutcomeSeed {
  */
 
 export const RECRUITMENT_OUTCOME_TEMPLATE: readonly RecruitmentOutcomeSeed[] = [
-  { name: 'À traiter', accent: '#64748b', isDefault: true, isTerminal: false },
-  { name: 'Entretien posé', accent: '#0284c7', isDefault: false, isTerminal: false },
-  { name: 'En délibération', accent: '#f59e0b', isDefault: false, isTerminal: false },
-  { name: 'Accepté', accent: '#16a34a', isDefault: false, isTerminal: true },
-  { name: 'Refusé', accent: '#dc2626', isDefault: false, isTerminal: true },
-  { name: 'Désisté', accent: '#78716c', isDefault: false, isTerminal: true },
+  { name: 'À traiter', accent: '#9fa8b3', isDefault: true, isTerminal: false },
+  { name: 'Entretien posé', accent: '#6a9bd1', isDefault: false, isTerminal: false },
+  { name: 'En délibération', accent: '#e3c25a', isDefault: false, isTerminal: false },
+  { name: 'Accepté', accent: '#7dbf8e', isDefault: false, isTerminal: true },
+  { name: 'Refusé', accent: '#e0867a', isDefault: false, isTerminal: true },
+  { name: 'Désisté', accent: '#b9a58f', isDefault: false, isTerminal: true },
 ]
 
 /**

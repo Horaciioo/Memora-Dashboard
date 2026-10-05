@@ -1,7 +1,7 @@
 'use client'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { ATTENDANCE_STATUS_REGISTRY } from '@/declarations/calendar/registries'
@@ -76,7 +76,7 @@ export const AttendancePanel = ({ entry, pending, onRespond, onRemind }: Attenda
 
       <div className={CALENDAR_STYLES.rollCallCounts}>
         {GROUPS.map((status) => (
-          <Badge
+          <Status
             key={status}
             label={ATTENDANCE_STATUS_REGISTRY.get(status).label}
             tone={ATTENDANCE_STATUS_REGISTRY.get(status).tone}

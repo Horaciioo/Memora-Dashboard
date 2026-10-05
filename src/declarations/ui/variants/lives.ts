@@ -153,7 +153,7 @@ export const MEMBER_MODERATION = {
   rowMeta: 'text-sm text-[var(--color-ink-subtle)]',
   rowTime: 'text-sm tabular-nums',
   details: 'course-erase-in flex flex-col gap-3 px-2 pb-4',
-  detailsLink: 'self-start text-sm font-semibold text-[var(--color-brand-600)] hover:underline',
+  detailsLink: 'self-start text-sm font-semibold text-[var(--color-ink-accent)] hover:underline',
 } as const
 
 /**

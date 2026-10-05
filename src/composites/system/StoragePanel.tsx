@@ -1,4 +1,4 @@
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { MEDIA_VISIBILITIES, STORAGE_BUCKETS } from '@/declarations/system/storage'
 import { CONSOLE_BLOCK } from '@/declarations/ui/blocks'
@@ -52,14 +52,14 @@ export const StoragePanel = ({ report }: StoragePanelProps) => {
                   <span className={CONSOLE_BLOCK.rowMeta}>
                     {`${SYSTEM_COPY.storageCeiling} ${formatBytes(meta.maxBytes)}`}
                   </span>
-                  <Badge
+                  <Status
                     label={isPublic ? SYSTEM_COPY.storagePublic : SYSTEM_COPY.storagePrivate}
                     tone={isPublic ? 'info' : 'neutral'}
                     icon={isPublic ? 'visible' : 'lock'}
                   />
                 </>
               ) : (
-                <Badge label={SYSTEM_COPY.storageUndeclared} tone="warning" />
+                <Status label={SYSTEM_COPY.storageUndeclared} tone="warning" />
               )}
             </span>
           </div>

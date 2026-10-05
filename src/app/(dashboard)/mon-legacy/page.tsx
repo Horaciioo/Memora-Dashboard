@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { LegacyTrackView } from '@/composites/legacy/LegacyTrackView'
@@ -30,7 +30,7 @@ export default async function MyLegacyPage() {
           figure="academy"
           title={LEGACY_COPY.ownEmptyTitle}
           description={LEGACY_COPY.ownEmptyDescription}
-          action={<Badge label={LEGACY_COPY.ownEmptyTitle} tone="neutral" />}
+          action={<Status label={LEGACY_COPY.ownEmptyTitle} tone="neutral" />}
         />
       )}
     </div>

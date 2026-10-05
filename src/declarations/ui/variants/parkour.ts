@@ -46,7 +46,7 @@ export const DEPARTURE_TASK = {
 
 export const PARKOUR_BUBBLE = {
   root: 'surface-enter flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-brand-300)] bg-[var(--color-brand-100)] p-5 shadow-[var(--shadow-md)] sm:flex-row sm:items-center',
-  glyph: 'h-10 w-10 shrink-0 text-[var(--color-brand-600)]',
+  glyph: 'h-10 w-10 shrink-0 text-[var(--color-ink-accent)]',
   body: 'flex min-w-0 flex-1 flex-col gap-1',
   title: 'text-lg font-bold tracking-tight',
   text: 'text-sm text-[var(--color-ink-subtle)]',

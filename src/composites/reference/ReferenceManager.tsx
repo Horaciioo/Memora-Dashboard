@@ -6,7 +6,7 @@ import { Avatar } from '@/components/elements/display/Avatar'
 import { DivisionLogo } from '@/components/elements/display/DivisionLogo'
 import { divisionLogo } from '@/declarations/members/profiles'
 import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/NetworkLogo'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
@@ -188,7 +188,7 @@ export const ReferenceManager = ({
               <span className="flex flex-wrap items-center gap-2 font-medium">
                 {row.label}
                 {row.badges.map((badge) => (
-                  <Badge key={badge} label={badge} accent={row.accent} tone={'neutral'} />
+                  <Status key={badge} label={badge} accent={row.accent} tone={'neutral'} />
                 ))}
               </span>
               {row.hint && (

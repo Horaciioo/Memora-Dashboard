@@ -1,4 +1,4 @@
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { JOB_REGISTRY } from '@/declarations/system/jobs'
 import { CONSOLE_BLOCK } from '@/declarations/ui/blocks'
@@ -36,9 +36,9 @@ export const JobsPanel = () => {
                 </span>
               )}
               {job.schedule ? (
-                <Badge label={job.schedule} tone="info" icon="clock" />
+                <Status label={job.schedule} tone="info" icon="clock" />
               ) : (
-                <Badge label={SYSTEM_COPY.queuesOnDemand} tone="neutral" icon="pending" />
+                <Status label={SYSTEM_COPY.queuesOnDemand} tone="neutral" icon="pending" />
               )}
             </span>
           </div>

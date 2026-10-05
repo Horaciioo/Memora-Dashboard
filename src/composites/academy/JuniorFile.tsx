@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { StatusText } from '@/components/elements/display/StatusText'
+import { Status } from '@/components/elements/display/Status'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Button } from '@/components/elements/actions/Button'
 import { Progress } from '@/components/elements/feedback/Progress'
@@ -425,7 +425,7 @@ export const JuniorFile = ({
             ).map((group) => (
               <article key={group.name} className={SESSION_CARD.group}>
                 <header className="flex items-center gap-2">
-                  <StatusText label={group.name} accent={group.accent} />
+                  <Status label={group.name} accent={group.accent} />
                 </header>
                 <div className="flex flex-col gap-4">
                   {group.items.map((skill) => (
@@ -539,7 +539,7 @@ export const JuniorFile = ({
                   })}
                 >
                   <header className="flex flex-wrap items-center gap-2">
-                    <StatusText label={kind.label} accent={kind.accent} />
+                    <Status label={kind.label} accent={kind.accent} />
                     <span className="text-xs text-[var(--color-ink-subtle)]">
                       {[
                         ACADEMY_STAGE_REGISTRY.label(note.stage),
@@ -632,7 +632,7 @@ export const JuniorFile = ({
                         .join(' · ')}
                     </span>
                   </span>
-                  <StatusText label={objectiveStatus.label} accent={objectiveStatus.accent} />
+                  <Status label={objectiveStatus.label} accent={objectiveStatus.accent} />
                 </div>
               )
             })}
@@ -710,15 +710,15 @@ export const JuniorFile = ({
                         .filter(Boolean)
                         .join(' · ')}
                     </span>
-                    <StatusText label={reviewStatus.label} accent={reviewStatus.accent} />
+                    <Status label={reviewStatus.label} accent={reviewStatus.accent} />
                     {advises && (
-                      <StatusText
+                      <Status
                         label={REVIEW_ADVICE_REGISTRY.label(review.advice)}
                         accent={REVIEW_ADVICE_REGISTRY.get(review.advice).accent}
                       />
                     )}
                     {review.decision && labels[review.decision] && (
-                      <StatusText
+                      <Status
                         label={labels[review.decision] ?? ''}
                         accent={review.decision === ReviewAdvices.Stop ? 'danger' : 'success'}
                       />

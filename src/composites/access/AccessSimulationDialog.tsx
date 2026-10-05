@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { Dialog } from '@/components/structures/Dialog'
 import { ACCESS_COPY } from '@/declarations/access/copy'
 import { PERMISSION_SECTIONS } from '@/declarations/access/permissions'
@@ -45,7 +45,7 @@ export const AccessSimulationDialog = ({ simulation, onClose }: AccessSimulation
               <h3 className={ACCESS_CONSOLE.simulationTitle}>{section.label}</h3>
               <div className={ACCESS_CONSOLE.simulationTags}>
                 {section.permissions.map((permission) => (
-                  <Badge
+                  <Status
                     key={permission.name}
                     label={permission.displayName}
                     tone={permission.important ? 'warning' : 'success'}

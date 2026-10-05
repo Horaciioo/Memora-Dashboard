@@ -96,7 +96,7 @@ export const MARSHA_GUIDE = {
   navItemOn:
     'border-[var(--color-brand-200)] bg-[var(--color-brand-50)] font-bold hover:bg-[var(--color-brand-50)]',
   navIcon: 'h-5 w-5 shrink-0 text-[var(--color-ink-subtle)]',
-  navIconOn: 'text-[var(--color-brand-700)]',
+  navIconOn: 'text-[var(--color-ink-accent)]',
   navFoot: 'flex flex-col gap-3 border-t border-[var(--color-border)] pt-5',
   // Middle column
   column: 'flex flex-col gap-0.5',

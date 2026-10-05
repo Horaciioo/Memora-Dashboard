@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { AvatarStack } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { Glyph } from '@/components/elements/display/Glyph'
 import { WorkBoard } from '@/composites/work/WorkBoard'
@@ -85,7 +85,7 @@ export const MeetingsBoard = ({
       header: FIELD_COPY.state,
       sortValue: (meeting) => meeting.state?.label ?? '',
       render: (meeting) =>
-        meeting.state ? <Badge label={meeting.state.label} accent={meeting.state.accent} /> : null,
+        meeting.state ? <Status label={meeting.state.label} accent={meeting.state.accent} /> : null,
     },
     {
       key: 'project',

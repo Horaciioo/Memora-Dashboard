@@ -84,19 +84,13 @@
 
   /* Fixed grounds, identical in both themes */
   --color-scan-ground: #ffffff;
-  --color-nav-surface: #25201b;
-  --color-nav-ink: #f6efe4;
+  /* Over photos, heroes and dark media: fixed in both themes */
+  --color-on-media: #fffefb;
+  --color-media-shade: #1e160e;
   --color-knob: #fffefb;
 
   /* Dimmer behind overlays and spotlights */
   --color-scrim: rgb(30 22 14 / 0.4);
-
-  /* Halo gold, the unread release card only */
-  --color-halo-100: #ffedc8;
-  --color-halo-200: #fdd585;
-  --color-halo-300: #fbba4c;
-  --color-halo-400: #f59c34;
-  --color-halo-500: #dd7f22;
 
   /* Authority, reserved to the two Administration roles */
   --color-authority-admin: #b23a2e;

@@ -256,7 +256,7 @@ export const MODVIEW_SANCTIONS = {
     'w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-brand-600)]',
   tabs: 'flex items-center justify-center gap-2 py-3',
   tab: 'flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)]',
-  tabOn: 'bg-[var(--color-brand-100)] text-[var(--color-brand-700)]',
+  tabOn: 'bg-[var(--color-brand-100)] text-[var(--color-ink-accent)]',
   tabGlyph: 'h-5 w-5',
   divider: 'mb-3 border-t border-[var(--color-border)]',
   list: 'flex flex-col gap-2',
@@ -338,7 +338,7 @@ export const MODVIEW_HISTORY = {
   tagOff: 'text-[var(--color-caution)]',
   member: 'flex flex-wrap items-center gap-x-2 gap-y-1 text-sm',
   memberName: 'min-w-0 flex-1 truncate font-semibold',
-  focus: 'text-xs font-semibold text-[var(--color-brand-700)]',
+  focus: 'text-xs font-semibold text-[var(--color-ink-accent)]',
   connected: 'border-t border-[var(--color-border)] pt-2',
   connectedSummary: `${PROPERTY_LABEL} cursor-pointer`,
 } as const

@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { AvatarStack } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { LiveRosterBoard } from '@/composites/lives/LiveRosterBoard'
@@ -63,7 +63,7 @@ export const LivesBoard = ({ initialLives, fields, canAnnounce, viewerId }: Live
                 {LIVE_COPY.announce}
               </Button>
             ) : (
-              <Badge label={LIVE_COPY.emptyTitle} tone="neutral" />
+              <Status label={LIVE_COPY.emptyTitle} tone="neutral" />
             )
           }
         />

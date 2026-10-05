@@ -1,4 +1,4 @@
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { VIEW_COPY } from '@/declarations/access/copy'
 import { PROBE_STATUS_REGISTRY } from '@/declarations/system/subjects'
 import { CONSOLE_BLOCK } from '@/declarations/ui/blocks'
@@ -23,9 +23,9 @@ export const SubjectBadges = ({ state }: SubjectBadgesProps) => {
         <span className={CONSOLE_BLOCK.rowMeta}>{`${state.probe.latencyMs} ms`}</span>
       )}
       {probe ? (
-        <Badge label={probe.label} tone={probe.tone} />
+        <Status label={probe.label} tone={probe.tone} />
       ) : (
-        <Badge
+        <Status
           label={state.enabled ? VIEW_COPY.subjectOn : VIEW_COPY.subjectOff}
           tone={state.enabled ? 'success' : 'neutral'}
         />

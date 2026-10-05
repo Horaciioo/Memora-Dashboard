@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { Glyph } from '@/components/elements/display/Glyph'
 import { WorkBoard } from '@/composites/work/WorkBoard'
@@ -82,14 +82,18 @@ export const ProjectsBoard = ({
       header: FIELD_COPY.state,
       sortValue: (project) => project.state?.label ?? '',
       render: (project) =>
-        project.state ? <Badge label={project.state.label} accent={project.state.accent} /> : null,
+        project.state ? <Status label={project.state.label} accent={project.state.accent} /> : null,
     },
     {
       key: 'priority',
       header: FIELD_COPY.priority,
       render: (project) =>
         project.priority ? (
-          <Badge label={project.priority.label} accent={project.priority.accent} tone={'warning'} />
+          <Status
+            label={project.priority.label}
+            accent={project.priority.accent}
+            tone={'warning'}
+          />
         ) : null,
     },
     {
@@ -104,7 +108,7 @@ export const ProjectsBoard = ({
       className: 'whitespace-nowrap',
       render: (project) =>
         project.deadline ? (
-          <Badge
+          <Status
             label={formatDay(project.deadline)}
             tone={isOverdue(project.deadline) ? 'danger' : 'neutral'}
             icon="deadline"

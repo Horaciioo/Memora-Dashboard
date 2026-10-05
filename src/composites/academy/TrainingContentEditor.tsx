@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -138,7 +138,7 @@ export const TrainingContentEditor = ({
     >
       <span className="min-w-0 flex-1 truncate text-sm">{choice.label}</span>
       {choice.correct && (
-        <Badge label={TRAINING_CONTENT_FIELD_COPY.choiceCorrect} tone="success" icon="confirm" />
+        <Status label={TRAINING_CONTENT_FIELD_COPY.choiceCorrect} tone="success" icon="confirm" />
       )}
     </div>
   )
@@ -157,7 +157,7 @@ export const TrainingContentEditor = ({
       <header className="flex flex-wrap items-center gap-2">
         <span className="min-w-0 flex-1 font-medium">{question.prompt}</span>
         {question.multiple && (
-          <Badge label={TRAINING_CONTENT_FIELD_COPY.questionMultiple} tone="info" />
+          <Status label={TRAINING_CONTENT_FIELD_COPY.questionMultiple} tone="info" />
         )}
       </header>
       <div className={LIST_STYLES.stack}>
@@ -206,7 +206,7 @@ export const TrainingContentEditor = ({
         })}
       >
         <header className="flex flex-wrap items-center gap-2">
-          <Badge label={kind.label} accent={kind.accent} tone={'neutral'} icon={kind.icon} />
+          <Status label={kind.label} accent={kind.accent} tone={'neutral'} icon={kind.icon} />
         </header>
         {block.kind === TrainingBlockKinds.Text ? (
           block.body && <Markdown source={block.body} />

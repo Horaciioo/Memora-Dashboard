@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import type { ReactNode } from 'react'
 import { GLYPH_TINTS } from '@/declarations/members/tints'
+import type { GlyphTint } from '@/declarations/members/tints'
 
 // GlyphProps
 export interface GlyphProps {
@@ -12,41 +13,44 @@ export type Paints = { fill: string; lift: string; deep: string; cut: string }
 
 // Stops of each ramp
 const FRAME_RAMPS = {
-  // Pink melting into white
+  // Leaf green through sky blue into rose
   brand: {
-    fillFrom: 'var(--color-brand-200)',
-    fillTo: 'var(--color-brand-500)',
-    liftFrom: 'color-mix(in oklab, var(--color-brand-50) 70%, white)',
+    fillFrom: 'var(--color-leaf-600)',
+    fillMid: 'var(--color-sky-600)',
+    fillTo: 'var(--color-brand-700)',
+    liftFrom: 'var(--color-leaf-200)',
+    liftMid: 'var(--color-sky-200)',
     liftTo: 'var(--color-brand-200)',
-    deepFrom: 'var(--color-brand-400)',
-    deepTo: 'var(--color-brand-700)',
-    cut: 'color-mix(in oklab, var(--color-brand-50) 40%, white)',
+    deepFrom: 'var(--color-leaf-700)',
+    deepMid: 'var(--color-sky-700)',
+    deepTo: 'var(--color-brand-800)',
+    cut: 'var(--color-brand-50)',
   },
   success: {
-    fillFrom: 'color-mix(in oklab, var(--color-success) 70%, white)',
+    fillFrom: 'color-mix(in oklab, var(--color-success) 70%, var(--color-on-media))',
     fillTo: 'var(--color-success)',
-    liftFrom: 'color-mix(in oklab, var(--color-success) 25%, white)',
-    liftTo: 'color-mix(in oklab, var(--color-success) 55%, white)',
+    liftFrom: 'color-mix(in oklab, var(--color-success) 25%, var(--color-on-media))',
+    liftTo: 'color-mix(in oklab, var(--color-success) 55%, var(--color-on-media))',
     deepFrom: 'var(--color-success)',
-    deepTo: 'color-mix(in oklab, var(--color-success) 70%, black)',
+    deepTo: 'color-mix(in oklab, var(--color-success) 70%, var(--color-media-shade))',
     cut: 'var(--color-success-soft)',
   },
   caution: {
-    fillFrom: 'color-mix(in oklab, var(--color-caution) 70%, white)',
+    fillFrom: 'color-mix(in oklab, var(--color-caution) 70%, var(--color-on-media))',
     fillTo: 'var(--color-caution)',
-    liftFrom: 'color-mix(in oklab, var(--color-caution) 25%, white)',
-    liftTo: 'color-mix(in oklab, var(--color-caution) 55%, white)',
+    liftFrom: 'color-mix(in oklab, var(--color-caution) 25%, var(--color-on-media))',
+    liftTo: 'color-mix(in oklab, var(--color-caution) 55%, var(--color-on-media))',
     deepFrom: 'var(--color-caution)',
-    deepTo: 'color-mix(in oklab, var(--color-caution) 70%, black)',
+    deepTo: 'color-mix(in oklab, var(--color-caution) 70%, var(--color-media-shade))',
     cut: 'var(--color-caution-soft)',
   },
   danger: {
-    fillFrom: 'color-mix(in oklab, var(--color-danger) 70%, white)',
+    fillFrom: 'color-mix(in oklab, var(--color-danger) 70%, var(--color-on-media))',
     fillTo: 'var(--color-danger)',
-    liftFrom: 'color-mix(in oklab, var(--color-danger) 25%, white)',
-    liftTo: 'color-mix(in oklab, var(--color-danger) 55%, white)',
+    liftFrom: 'color-mix(in oklab, var(--color-danger) 25%, var(--color-on-media))',
+    liftTo: 'color-mix(in oklab, var(--color-danger) 55%, var(--color-on-media))',
     deepFrom: 'var(--color-danger)',
-    deepTo: 'color-mix(in oklab, var(--color-danger) 70%, black)',
+    deepTo: 'color-mix(in oklab, var(--color-danger) 70%, var(--color-media-shade))',
     cut: 'var(--color-danger-soft)',
   },
   // Role and function tints
@@ -54,6 +58,15 @@ const FRAME_RAMPS = {
 }
 
 export type FrameTone = keyof typeof FRAME_RAMPS
+
+// Evenly spaced stops, the middle one optional
+const RampStops = ({ colours }: { colours: (string | undefined)[] }) => {
+  const stops = colours.filter((colour): colour is string => Boolean(colour))
+
+  return stops.map((colour, index) => (
+    <stop key={colour} offset={index / (stops.length - 1)} stopColor={colour} />
+  ))
+}
 
 /**
  * Wraps a drawing in a 24 square with the shared three-tone ramp
@@ -70,7 +83,7 @@ export const Frame = ({
   const fillId = `${scope}-fill`
   const liftId = `${scope}-lift`
   const deepId = `${scope}-deep`
-  const ramp = FRAME_RAMPS[tone]
+  const ramp: GlyphTint = FRAME_RAMPS[tone]
 
   return (
     <svg
@@ -81,16 +94,13 @@ export const Frame = ({
     >
       <defs>
         <linearGradient id={fillId} x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor={ramp.fillFrom} />
-          <stop offset="1" stopColor={ramp.fillTo} />
+          <RampStops colours={[ramp.fillFrom, ramp.fillMid, ramp.fillTo]} />
         </linearGradient>
         <linearGradient id={liftId} x1="6" y1="3" x2="18" y2="15" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor={ramp.liftFrom} />
-          <stop offset="1" stopColor={ramp.liftTo} />
+          <RampStops colours={[ramp.liftFrom, ramp.liftMid, ramp.liftTo]} />
         </linearGradient>
         <linearGradient id={deepId} x1="6" y1="10" x2="20" y2="24" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor={ramp.deepFrom} />
-          <stop offset="1" stopColor={ramp.deepTo} />
+          <RampStops colours={[ramp.deepFrom, ramp.deepMid, ramp.deepTo]} />
         </linearGradient>
       </defs>
       {render({

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { Section } from '@/components/structures/Section'
 import { CreatorChannelsPanel } from '@/composites/reference/CreatorChannelsPanel'
@@ -78,7 +78,7 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
         title={youtuber.name}
         actions={
           youtuber.archived ? (
-            <Badge label={REFERENCE_FIELD_COPY.archivedBadge} tone="neutral" icon="hidden" />
+            <Status label={REFERENCE_FIELD_COPY.archivedBadge} tone="neutral" icon="hidden" />
           ) : undefined
         }
       />

@@ -1,7 +1,7 @@
 [
   {
     "name": "Sociale",
-    "accent": "#16a34a",
+    "accent": "#7dbf8e",
     "skills": [
       {
         "name": "Travail en équipe",
@@ -19,7 +19,7 @@
   },
   {
     "name": "Professionnelle",
-    "accent": "#a63d74",
+    "accent": "#d98ba6",
     "skills": [
       {
         "name": "Veille & Anticipation",
@@ -55,7 +55,7 @@
   },
   {
     "name": "Technique",
-    "accent": "#2563eb",
+    "accent": "#6a9bd1",
     "skills": [
       {
         "name": "Maîtrise de Twitch",

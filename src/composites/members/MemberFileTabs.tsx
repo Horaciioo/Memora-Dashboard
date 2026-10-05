@@ -10,7 +10,7 @@ import type { MemberModerationView as MemberModerationViewData } from '@/types/l
 import type { ReactNode } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/NetworkLogo'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { RevealMark } from '@/components/elements/display/RevealMark'
 import { OptionMark } from '@/components/elements/forms/OptionMark'
 import { Button } from '@/components/elements/actions/Button'
@@ -483,7 +483,7 @@ export const MemberFileTabs = ({
                 className={cn(MEMBER_FILE.note, note.pinned && MEMBER_FILE.notePinned)}
               >
                 <span className={MEMBER_FILE.noteHead}>
-                  {note.pinned && <Badge label={MEMBER_COPY.notePin} tone="warning" icon="star" />}
+                  {note.pinned && <Status label={MEMBER_COPY.notePin} tone="warning" icon="star" />}
                   {[note.authorName, formatDayTime(note.createdAt)].filter(Boolean).join(' · ')}
                 </span>
                 <p className={MEMBER_FILE.noteBody}>{note.body}</p>
@@ -518,7 +518,7 @@ export const MemberFileTabs = ({
                 {MEMBER_COPY.absenceAdd}
               </Button>
             ) : (
-              <Badge label={MEMBER_COPY.absencesEmptyTitle} tone="neutral" />
+              <Status label={MEMBER_COPY.absencesEmptyTitle} tone="neutral" />
             )
           }
         />
@@ -539,7 +539,7 @@ export const MemberFileTabs = ({
                       <span className={HOME_STYLES.rowMeta}>{absenceReasonText(absence)}</span>
                     )}
                   </span>
-                  <Badge label={status.label} accent={status.accent} />
+                  <Status label={status.label} accent={status.accent} />
                 </li>
               )
             })}
@@ -641,7 +641,7 @@ export const MemberFileTabs = ({
           figure="notes"
           title={MEMBER_COPY.logsEmptyTitle}
           description={MEMBER_COPY.logsEmptyDescription}
-          action={<Badge label={MEMBER_COPY.logsEmptyTitle} tone="neutral" />}
+          action={<Status label={MEMBER_COPY.logsEmptyTitle} tone="neutral" />}
         />
       ) : (
         <ActivityTimeline entries={activity} />

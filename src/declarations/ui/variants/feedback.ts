@@ -139,11 +139,11 @@ export const ADD_ROW_STYLES = {
  */
 
 export const MATURITY_STYLES = {
-  // Outlined
-  tag: 'inline-flex shrink-0 items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro leading-none font-medium tracking-wide text-[var(--color-ink)] uppercase',
+  // Flat, no frame
+  tag: 'inline-flex shrink-0 items-center gap-1 font-[family-name:var(--font-mono)] text-micro leading-none font-medium tracking-wide text-[var(--color-ink)] uppercase',
   progress: 'text-[var(--color-ink-subtle)]',
-  star: 'h-2.5 w-2.5 text-[var(--color-brand-600)]',
-  link: 'transition-colors hover:border-[var(--color-ink)]',
+  star: 'h-2.5 w-2.5 text-[var(--color-ink-accent)]',
+  link: 'underline-offset-4 hover:underline',
   row: 'flex items-start gap-3 text-sm',
   meaning: 'text-[var(--color-ink-subtle)]',
 } as const
@@ -168,7 +168,7 @@ export const NOTIFICATION_STYLES = {
   body: 'flex-1 overflow-y-auto p-2',
   footer: 'shrink-0 border-t border-[var(--color-border)]',
   footerLink:
-    'flex w-full items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[var(--color-brand-600)] transition-colors hover:bg-[var(--color-surface)]',
+    'flex w-full items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[var(--color-ink-accent)] transition-colors hover:bg-[var(--color-surface)]',
   footerIcon: 'h-3.5 w-3.5',
   list: 'flex flex-col',
   // Inset rule between two rows
@@ -211,7 +211,7 @@ export const INFO_HINT = {
   trigger:
     'inline-flex items-center justify-center rounded-full transition-colors duration-[var(--motion-duration-fast)]',
   triggerTone:
-    'text-[var(--color-ink-subtle)] hover:text-[var(--color-brand-600)] focus-visible:text-[var(--color-brand-600)]',
+    'text-[var(--color-ink-subtle)] hover:text-[var(--color-ink-accent)] focus-visible:text-[var(--color-ink-accent)]',
   icon: 'h-4 w-4',
   // Shown on hover or focus
   pop: 'invisible absolute top-[calc(100%+0.5rem)] z-[60] w-max max-w-64 translate-y-1 rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel px-2.5 py-1.5 text-left text-xs leading-snug font-normal tracking-normal text-[var(--color-ink)] normal-case opacity-0 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-[var(--motion-duration-fast)] group-focus-within/info:visible group-focus-within/info:translate-y-0 group-focus-within/info:opacity-100 group-hover/info:visible group-hover/info:translate-y-0 group-hover/info:opacity-100 motion-reduce:transition-none',
@@ -255,13 +255,4 @@ export const REVEAL_MARK = {
   track:
     'grid grid-cols-[0fr] transition-[grid-template-columns] duration-[var(--motion-duration-panel)] ease-out group-hover:grid-cols-[1fr] group-focus-visible:grid-cols-[1fr] motion-reduce:transition-none',
   text: 'overflow-hidden whitespace-nowrap not-italic',
-} as const
-
-/**
- * Status read as words behind a coloured bullet styles
- * @type {Record<string, string>}
- */
-
-export const STATUS_TEXT = {
-  root: 'inline-flex items-center text-sm font-semibold',
 } as const

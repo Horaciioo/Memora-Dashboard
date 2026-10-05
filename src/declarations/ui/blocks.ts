@@ -92,10 +92,10 @@ export const LEFT_SIDEBAR = {
   navGroupItems: 'flex flex-col gap-0.5',
   navLink:
     'group flex items-center gap-3 rounded-[var(--radius-md)] py-1.5 pr-2.5 pl-4 text-lg font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)]',
-  navLinkActive: 'font-bold text-[var(--color-brand-600)]',
+  navLinkActive: 'font-bold text-[var(--color-ink-accent)]',
   navLabel: 'relative',
   navIcon: 'h-[18px] w-[18px] shrink-0 transition-colors',
-  navIconActive: 'fill-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
+  navIconActive: 'fill-[var(--color-brand-soft)] text-[var(--color-ink-accent)]',
   // Account footer
   footer:
     'flex shrink-0 items-center justify-between gap-1 border-t border-[var(--color-border)] px-3 pt-3',
@@ -130,14 +130,15 @@ export const SEARCH_LAUNCHER = {
  */
 
 export const MOBILE_NAV = {
-  bar: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] left-1/2 z-40 flex -translate-x-1/2 items-center gap-0.5 rounded-[var(--radius-full)] bg-[var(--color-nav-surface)] px-2 py-1.5 shadow-[var(--shadow-lg)] md:hidden',
+  bar: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] left-1/2 z-40 flex -translate-x-1/2 items-center gap-0.5 rounded-[var(--radius-full)] glass-panel border px-2 py-1.5 md:hidden',
   link: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-full)] transition-colors',
+  linkActive: 'bg-[var(--color-brand-600)]',
   // No colour here — one of the two below always wins
   icon: 'h-5 w-5 shrink-0 transition-colors',
-  iconIdle: 'text-[var(--color-nav-ink)]',
-  iconActive: 'text-[var(--color-brand-600)]',
+  iconIdle: 'text-[var(--color-ink-subtle)]',
+  iconActive: 'text-[var(--color-on-brand)]',
   // Round button flanking the pill
-  fab: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-[var(--radius-full)] bg-[var(--color-nav-surface)] text-[var(--color-nav-ink)] shadow-[var(--shadow-lg)] md:hidden',
+  fab: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-[var(--radius-full)] glass-panel border text-[var(--color-ink)] md:hidden',
   fabLeft: 'left-3',
   fabRight: 'right-3',
 } as const
@@ -148,7 +149,7 @@ export const MOBILE_NAV = {
  */
 
 export const TOP_BAR = {
-  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 md:hidden',
+  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 bg-[var(--color-background)] px-3 md:hidden',
   creator: 'flex min-w-0 flex-1 items-center gap-2',
   creatorName: 'truncate text-sm font-semibold',
   actions: 'flex shrink-0 items-center gap-1',
@@ -307,7 +308,7 @@ export const STAGE_LIST = {
   stage: 'relative flex gap-4 pb-6 last:pb-0',
   stageRail: 'absolute top-12 bottom-0 left-[1.375rem] w-0.5 bg-[var(--color-border)]',
   stageChip:
-    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-100)] text-[var(--color-brand-700)]',
+    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-100)] text-[var(--color-ink-accent)]',
   stageChipDone:
     'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-success-soft)] text-[var(--color-success)]',
   stageChipLate:
@@ -328,7 +329,7 @@ export const STAGE_LIST = {
 
 export const SEAL_BLOCK = {
   glyph:
-    'h-6 w-24 shrink-0 text-[var(--color-ink-subtle)] transition-colors group-hover:text-[var(--color-brand-600)]',
+    'h-6 w-24 shrink-0 text-[var(--color-ink-subtle)] transition-colors group-hover:text-[var(--color-ink-accent)]',
   chain: 'opacity-60 transition-opacity duration-[var(--motion-duration-panel)]',
   chainOpen: 'opacity-20',
   // Each half slides away from the lock once the shackle lets go
@@ -409,7 +410,7 @@ export const CONSOLE_BLOCK = {
   rowMeta: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
   rowStatus: 'flex flex-wrap items-center gap-2',
   cardHead: 'flex flex-wrap items-center gap-2',
-  cardIcon: 'h-4 w-4 shrink-0 text-[var(--color-brand-600)]',
+  cardIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-accent)]',
   cardTitle: 'font-bold',
   cardLead: 'text-sm text-[var(--color-ink-subtle)]',
   chooser: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3',
@@ -560,7 +561,7 @@ export const CHANGELOG_BOARD = {
   comment:
     'border-l-4 border-[var(--color-brand-400)] pl-4 text-base leading-relaxed text-[var(--color-ink-subtle)] italic',
   commentLabel:
-    'mb-1 block font-[family-name:var(--font-mono)] text-xs font-semibold tracking-wide text-[var(--color-brand-600)] uppercase not-italic',
+    'mb-1 block font-[family-name:var(--font-mono)] text-xs font-semibold tracking-wide text-[var(--color-ink-accent)] uppercase not-italic',
   lines: 'flex flex-col divide-y divide-[var(--color-border)]',
   line: 'py-3 text-base leading-relaxed first:pt-0 last:pb-0',
   archive: 'flex flex-wrap justify-center gap-2',
@@ -575,7 +576,7 @@ export const CHANGELOG_BOARD = {
   releaseMeta:
     'font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase',
   releaseCurrent:
-    'shrink-0 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-brand-600)] uppercase',
+    'shrink-0 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-accent)] uppercase',
   releaseChevron: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
   empty: 'flex flex-col items-center gap-1 py-16 text-center',
   emptyTitle: 'text-base font-semibold',
@@ -593,22 +594,22 @@ export const RELEASE_NOTICE = {
   wrapPointed: 'mx-3 pt-2.5 pb-1',
   // The ^ aimed at the version entry
   caret:
-    'pointer-events-none absolute top-1 left-4 h-3 w-3 rotate-45 rounded-sm bg-[var(--color-halo-100)]',
-  // Gold plate
+    'pointer-events-none absolute top-1 left-4 h-3 w-3 rotate-45 rounded-sm bg-[var(--color-leaf-200)]',
+  // Gradient plate
   frame:
-    'group/news relative z-10 overflow-hidden rounded-[var(--radius-lg)] bg-linear-to-br from-[var(--color-halo-100)] via-[var(--color-halo-300)] to-[var(--color-halo-400)] text-black shadow-[0_10px_28px_-10px_var(--color-halo-500)] ring-1 ring-white/40 ring-inset transition-shadow hover:shadow-[0_14px_34px_-10px_var(--color-halo-500)]',
-  // Light white veil from the top left
-  veil: 'pointer-events-none absolute inset-0 bg-linear-to-br from-white/50 via-white/10 to-transparent',
+    'group/news rail-reset relative z-10 overflow-hidden rounded-[var(--radius-lg)] bg-[image:var(--gradient-soft)] text-[var(--color-ink)] shadow-[var(--shadow-md)] ring-1 ring-[var(--color-surface)]/40 ring-inset transition-shadow hover:shadow-[var(--shadow-lg)]',
+  // Light veil from the top left
+  veil: 'pointer-events-none absolute inset-0 bg-linear-to-br from-[var(--color-surface)]/50 via-[var(--color-surface)]/10 to-transparent',
   link: 'relative block p-3.5 pr-10',
   sheen:
-    'pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-white/55 to-transparent transition-[left] duration-[var(--motion-duration-celebrate)] ease-out group-hover/news:left-full motion-reduce:transition-none',
+    'pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-[var(--color-surface)]/55 to-transparent transition-[left] duration-[var(--motion-duration-celebrate)] ease-out group-hover/news:left-full motion-reduce:transition-none',
   kicker:
-    'relative block font-[family-name:var(--font-mono)] text-micro font-bold tracking-wide text-black/70 uppercase',
+    'relative block font-[family-name:var(--font-mono)] text-micro font-bold tracking-wide text-[var(--color-ink)]/70 uppercase',
   title: 'relative mt-1.5 line-clamp-2 block text-lg leading-tight font-bold tracking-tight',
-  cta: 'relative mt-3 inline-flex items-center gap-1 rounded-full bg-black px-2.5 py-1 text-micro font-bold text-[var(--color-halo-100)]',
+  cta: 'relative mt-3 inline-flex items-center gap-1 rounded-full bg-[var(--color-ink)] px-2.5 py-1 text-micro font-bold text-[var(--color-surface)]',
   ctaIcon: 'h-3 w-3',
   dismiss:
-    'absolute top-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full text-black/55 transition-colors hover:bg-white/35 hover:text-black',
+    'absolute top-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full text-[var(--color-ink)]/55 transition-colors hover:bg-[var(--color-surface)]/35 hover:text-[var(--color-ink)]',
   dismissIcon: 'h-3.5 w-3.5',
 } as const
 
@@ -634,7 +635,7 @@ export const SYSTEM_SCREEN = {
   // Inside the shell
   inset: 'flex min-h-[60dvh] items-center justify-center py-12',
   column: 'flex w-full max-w-lg flex-col items-center gap-4 text-center',
-  word: 'font-[family-name:var(--font-display)] text-8xl leading-none font-bold tracking-tight text-[var(--color-brand-600)] sm:text-9xl',
+  word: 'font-[family-name:var(--font-display)] text-8xl leading-none font-bold tracking-tight text-[var(--color-ink-accent)] sm:text-9xl',
   title: 'text-2xl font-bold tracking-wide uppercase sm:text-3xl',
   description: 'max-w-sm text-sm leading-relaxed text-[var(--color-ink-subtle)] sm:text-base',
   reference: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
@@ -654,13 +655,13 @@ export const NUDGE = {
   anchor: 'fixed z-[45] hidden -translate-y-1/2 md:block',
   // One shadow over bubble and tip
   bubble:
-    'nudge-enter relative flex items-center gap-1 rounded-full bg-[var(--color-brand-800)] py-1 pr-1 pl-4 text-[var(--color-on-brand)] [filter:drop-shadow(0_0_0.5px_rgb(0_0_0/0.3))_drop-shadow(0_0.5rem_1rem_rgb(0_0_0/0.18))]',
+    'nudge-enter relative flex items-center gap-1 rounded-full bg-[var(--color-ink)] py-1 pr-1 pl-4 text-[var(--color-surface)] [filter:drop-shadow(0_0.5rem_1rem_color-mix(in_srgb,var(--color-ink)_20%,transparent))]',
   closing: 'nudge-close',
   // Tip aimed at the entry
-  tail: 'pointer-events-none absolute top-1/2 -left-[0.5625rem] h-[1.125rem] w-3 -translate-y-1/2 text-[var(--color-brand-800)]',
+  tail: 'pointer-events-none absolute top-1/2 -left-[0.5625rem] h-[1.125rem] w-3 -translate-y-1/2 text-[var(--color-ink)]',
   label: 'relative truncate py-1.5 text-left text-sm font-semibold',
   close:
-    'relative flex size-8 shrink-0 items-center justify-center rounded-full text-[var(--color-on-brand)]/80 transition-colors hover:bg-[var(--color-on-brand)]/15 hover:text-[var(--color-on-brand)]',
+    'relative flex size-8 shrink-0 items-center justify-center rounded-full text-[var(--color-surface)]/80 transition-colors hover:bg-[var(--color-surface)]/15 hover:text-[var(--color-surface)]',
   closeIcon: 'h-4 w-4',
 } as const
 

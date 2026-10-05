@@ -66,7 +66,7 @@ export const BottomNav = ({ viewContext }: BottomNavProps) => {
         href={item.href}
         aria-label={item.label}
         aria-current={isActive ? 'page' : undefined}
-        className={MOBILE_NAV.link}
+        className={cn(MOBILE_NAV.link, isActive && MOBILE_NAV.linkActive)}
       >
         <Icon
           className={cn(MOBILE_NAV.icon, isActive ? MOBILE_NAV.iconActive : MOBILE_NAV.iconIdle)}

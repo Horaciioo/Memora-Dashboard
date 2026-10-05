@@ -66,16 +66,16 @@ export const PAGE_BANNER = {
 } as const
 
 /**
- * Badge styles
+ * Status styles
  * @type {Record<string, string>}
  */
 
-export const BADGE_STYLES = {
-  base: 'inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-0.5 text-xs font-medium whitespace-nowrap',
-  outline: 'border',
-  icon: 'h-3 w-3',
-  // Log tags
-  muted: 'saturate-[0.45] brightness-[0.92] dark:brightness-[0.8]',
+export const STATUS_STYLES = {
+  base: 'inline-flex items-center gap-1.5 text-xs font-medium whitespace-nowrap text-[var(--color-ink)]',
+  dot: 'size-2 shrink-0 rounded-full',
+  icon: 'size-3.5 shrink-0',
+  // Done or past
+  muted: 'opacity-70',
 } as const
 
 /**
@@ -153,7 +153,7 @@ export const DRAWER_STYLES = {
     'drawer-enter fixed inset-x-3 inset-y-0 z-50 my-auto flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)] md:right-[var(--drawer-page-right)] md:left-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-r-none md:border-r-0',
   header: 'flex shrink-0 items-center gap-3 px-5 pt-4 pb-3',
   // Bare glyph
-  glyph: 'flex shrink-0 items-center text-[var(--color-brand-700)]',
+  glyph: 'flex shrink-0 items-center text-[var(--color-ink-accent)]',
   glyphIcon: 'h-5 w-5',
   title: 'min-w-0 flex-1 truncate text-base leading-tight font-bold tracking-tight',
   close: '-mr-2 shrink-0',
@@ -178,7 +178,7 @@ export const DRAWER_ACTIONS = {
   stepBack: 'mr-auto',
   stepNext: 'ml-auto',
   stepLabel: 'min-w-0 truncate',
-  stepIcon: 'h-4 w-4 shrink-0 text-[var(--color-brand-700)]',
+  stepIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-accent)]',
   // Filled gestures
   line: 'flex w-full items-center justify-center gap-2.5 rounded-[var(--radius-md)] px-4 py-3 text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60',
   save: 'bg-[var(--color-success)]',
@@ -404,12 +404,14 @@ export const ONBOARDING_STYLES = {
     'relative isolate flex h-56 flex-col justify-between overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-surface-sunken)] p-6 sm:h-72 lg:sticky lg:top-2 lg:h-[calc(100vh-1rem)] lg:p-8',
   bannerImage: 'absolute inset-0 -z-20 h-full w-full object-cover',
   // The scrim is what makes the title legible whatever the picture underneath
-  bannerScrim: 'absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/45 to-black/20',
+  bannerScrim:
+    'absolute inset-0 -z-10 bg-gradient-to-t from-[var(--color-media-shade)]/85 via-[var(--color-media-shade)]/45 to-[var(--color-media-shade)]/20',
   bannerMark: 'w-28 opacity-90 brightness-0 invert lg:w-32',
   bannerFoot: 'flex flex-col gap-2',
   bannerEyebrow:
-    'font-[family-name:var(--font-mono)] text-xs tracking-wide text-white/70 uppercase',
-  bannerTitle: 'text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl',
+    'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-on-media)]/70 uppercase',
+  bannerTitle:
+    'text-2xl font-bold tracking-tight text-[var(--color-on-media)] sm:text-3xl lg:text-4xl',
   // No frame
   panel: 'flex min-w-0 flex-col justify-center px-2 py-8 sm:px-6 lg:px-12 lg:py-14',
   form: 'mx-auto flex w-full max-w-xl flex-col gap-8',

@@ -2,31 +2,31 @@
   {
     "name": "Twitch",
     "urlPrefix": "https://twitch.tv/",
-    "accent": "#9146ff",
+    "accent": "#d98ba6",
     "required": true
   },
   {
     "name": "YouTube",
     "urlPrefix": "https://youtube.com/@",
-    "accent": "#ff0000",
+    "accent": "#e0867a",
     "required": false
   },
   {
     "name": "X",
     "urlPrefix": "https://x.com/",
-    "accent": "#111827",
+    "accent": "#9fa8b3",
     "required": false
   },
   {
     "name": "Instagram",
     "urlPrefix": "https://instagram.com/",
-    "accent": "#e1306c",
+    "accent": "#e9a15c",
     "required": false
   },
   {
     "name": "TikTok",
     "urlPrefix": "https://tiktok.com/@",
-    "accent": "#010101",
+    "accent": "#6fc0b5",
     "required": false
   }
 ]

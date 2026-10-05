@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { AddRow } from '@/components/structures/AddRow'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { accentVars } from '@/declarations/ui/theme'
@@ -103,7 +103,7 @@ export const KanbanBoard = <T extends BoardItem>({
           >
             <header className={BOARD_STYLES.columnHead}>
               <span className={BOARD_STYLES.columnTitle}>
-                <Badge label={column.label} accent={column.accent} />
+                <Status label={column.label} accent={column.accent} />
               </span>
             </header>
             <div

@@ -3,20 +3,26 @@
  * @typedef {Object} GlyphTint
  * @property {string} fillFrom - Body
  * @property {string} fillTo - Body
+ * @property {string} [fillMid] - Body middle
  * @property {string} liftFrom - Lit facet
  * @property {string} liftTo - Lit facet
+ * @property {string} [liftMid] - Lit middle
  * @property {string} deepFrom - Underside
  * @property {string} deepTo - Underside
+ * @property {string} [deepMid] - Underside middle
  * @property {string} cut - Light cutout
  */
 
 export interface GlyphTint {
   fillFrom: string
   fillTo: string
+  fillMid?: string
   liftFrom: string
   liftTo: string
+  liftMid?: string
   deepFrom: string
   deepTo: string
+  deepMid?: string
   cut: string
 }
 
@@ -93,13 +99,13 @@ export const GLYPH_TINTS = {
   },
   // Twitch
   TWITCH: {
-    fillFrom: '#b38cff',
-    fillTo: '#7c3aed',
-    liftFrom: '#efe6ff',
-    liftTo: '#cbb2ff',
-    deepFrom: '#6d28d9',
-    deepTo: '#3b1680',
-    cut: '#f8f4ff',
+    fillFrom: '#efc3cb',
+    fillTo: '#c9707f',
+    liftFrom: '#fdeff1',
+    liftTo: '#f5d5da',
+    deepFrom: '#a65768',
+    deepTo: '#6a2f3d',
+    cut: '#fff6f7',
   },
   // YouTube
   YOUTUBE: {

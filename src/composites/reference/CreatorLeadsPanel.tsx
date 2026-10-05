@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { MultiSelect } from '@/components/elements/forms/MultiSelect'
 import { SelectMenu } from '@/components/elements/forms/SelectMenu'
@@ -109,7 +109,7 @@ export const CreatorLeadsPanel = ({
               <div key={anchor.accountId} className={LIST_STYLES.item}>
                 <Avatar name={anchor.displayName} src={anchor.avatarUrl} size="sm" />
                 <span className={LEAD_BLOCK.name}>{anchor.displayName}</span>
-                <Badge label={role.label} accent={role.accent} tone="neutral" />
+                <Status label={role.label} accent={role.accent} tone="neutral" />
                 {canManage ? (
                   <SelectMenu
                     id={`lead-team-${anchor.accountId}`}

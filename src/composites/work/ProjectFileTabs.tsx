@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { AvatarStack } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { Button } from '@/components/elements/actions/Button'
@@ -166,19 +166,21 @@ export const ProjectFileTabs = ({
     {
       label: PROJECT_FIELD_COPY.state,
       field: fieldFor('stateId'),
-      display: stateOption ? <Badge label={stateOption.label} accent={stateOption.accent} /> : null,
+      display: stateOption ? (
+        <Status label={stateOption.label} accent={stateOption.accent} />
+      ) : null,
     },
     {
       label: PROJECT_FIELD_COPY.priority,
       field: fieldFor('priorityId'),
       display: priorityOption ? (
-        <Badge label={priorityOption.label} accent={priorityOption.accent} tone="warning" />
+        <Status label={priorityOption.label} accent={priorityOption.accent} tone="warning" />
       ) : null,
     },
     {
       label: PROJECT_FIELD_COPY.platform,
       field: fieldFor('platformId'),
-      display: platformOption ? <Badge label={platformOption.label} tone="neutral" /> : null,
+      display: platformOption ? <Status label={platformOption.label} tone="neutral" /> : null,
     },
     {
       label: PROJECT_FIELD_COPY.youtuber,
@@ -191,7 +193,7 @@ export const ProjectFileTabs = ({
       label: PROJECT_FIELD_COPY.deadline,
       field: fieldFor('deadline'),
       display: deadlineValue ? (
-        <Badge
+        <Status
           label={formatDay(deadlineValue)}
           tone={isOverdue(deadlineValue) ? 'danger' : 'neutral'}
           icon="deadline"
@@ -312,7 +314,7 @@ export const ProjectFileTabs = ({
             >
               <header className="flex flex-wrap items-center gap-2">
                 <h3 className="text-base font-bold">{entry.title}</h3>
-                <Badge
+                <Status
                   label={entry.publishedAt ? PROJECT_COPY.published : PROJECT_COPY.draft}
                   tone={entry.publishedAt ? 'success' : 'neutral'}
                 />
@@ -358,7 +360,7 @@ export const ProjectFileTabs = ({
       {task.owner && (
         <span className="text-xs text-[var(--color-ink-subtle)]">{task.owner.name}</span>
       )}
-      {task.state && <Badge label={task.state.label} accent={task.state.accent} />}
+      {task.state && <Status label={task.state.label} accent={task.state.accent} />}
     </>
   )
 
@@ -472,7 +474,7 @@ export const ProjectFileTabs = ({
             figure="notes"
             title={PROJECT_COPY.logsEmptyTitle}
             description={PROJECT_COPY.logsEmptyDescription}
-            action={<Badge label={PROJECT_COPY.tabLogs} tone="neutral" />}
+            action={<Status label={PROJECT_COPY.tabLogs} tone="neutral" />}
           />
         ) : (
           <div className={cn(SECTION_STYLES.panel, SECTION_STYLES.panelPadded)}>

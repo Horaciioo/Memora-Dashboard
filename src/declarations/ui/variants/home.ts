@@ -33,7 +33,7 @@ export const HOME_STYLES = {
   line: 'flex w-full items-center gap-4 rounded-[var(--radius-lg)] px-3 py-3 text-left transition-colors',
   lineLink:
     'cursor-pointer hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
-  chip: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-100)] text-[var(--color-brand-700)]',
+  chip: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-100)] text-[var(--color-ink-accent)]',
   chipIcon: 'h-5 w-5',
   // Glyph opening a dated row
   rowGlyph: 'h-6 w-6 shrink-0',
@@ -78,7 +78,7 @@ export const HOME_FLOW = {
   focus:
     'course-pop flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-7',
   focusTop: 'flex items-start justify-between gap-4',
-  focusGlyph: 'h-12 w-12 shrink-0 text-[var(--color-brand-600)]',
+  focusGlyph: 'h-12 w-12 shrink-0 text-[var(--color-ink-accent)]',
   focusDue: 'text-sm font-semibold text-[var(--color-ink-subtle)]',
   focusBody: 'flex flex-col gap-2',
   focusTitle: 'text-2xl font-bold tracking-tight',
@@ -107,7 +107,7 @@ export const HOME_FLOW = {
   agenda: 'flex flex-col gap-6',
   day: 'flex flex-col gap-1',
   dayHead: 'px-2 pb-1 text-sm font-bold',
-  dayToday: 'text-[var(--color-brand-700)]',
+  dayToday: 'text-[var(--color-ink-accent)]',
   agendaRow:
     'flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-2 text-sm transition-colors',
   agendaLink:

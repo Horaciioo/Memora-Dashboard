@@ -2,7 +2,7 @@
 
 import { Fragment, useMemo, useState } from 'react'
 
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { Input } from '@/components/elements/forms/Input'
 import { TriToggle } from '@/components/elements/forms/Toggle'
@@ -113,7 +113,7 @@ export const PermissionBoard = ({
           className={cn(PERMISSION_TOGGLE_STYLES.name, child && PERMISSION_TOGGLE_STYLES.nameChild)}
         >
           {permission.displayName}
-          {permission.important && <Badge label={ACCESS_COPY.sensitive} tone="warning" />}
+          {permission.important && <Status label={ACCESS_COPY.sensitive} tone="warning" />}
         </span>
         <span className={PERMISSION_TOGGLE_STYLES.description}>
           {disabled

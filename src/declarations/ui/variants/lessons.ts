@@ -58,9 +58,9 @@ export const COURSE_LADDER = {
   names: 'flex flex-wrap justify-center gap-2',
   name: 'rounded-full px-4 py-1.5 text-sm font-bold',
   link: 'h-6 w-0.5 bg-[var(--color-border-strong)]',
-  top: 'bg-[var(--color-apple-red)] text-white',
-  middle: 'bg-[var(--color-apple-orange)] text-white',
-  bottom: 'bg-[var(--color-apple-green)] text-white',
+  top: 'bg-[var(--color-apple-red)] text-[var(--color-on-media)]',
+  middle: 'bg-[var(--color-apple-orange)] text-[var(--color-on-media)]',
+  bottom: 'bg-[var(--color-apple-green)] text-[var(--color-on-media)]',
   empty: 'text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 
@@ -169,10 +169,11 @@ export const COURSE_STAMP = {
     'pointer-events-none fixed inset-0 z-[70] flex flex-col items-center justify-center gap-6',
   veil: 'absolute inset-0 bg-[color-mix(in_oklab,var(--color-ink)_30%,transparent)] transition-opacity duration-[var(--motion-duration-slow)]',
   veilGone: 'opacity-0',
-  cheer: 'rise-in relative text-4xl font-bold tracking-tight text-white drop-shadow-lg sm:text-5xl',
+  cheer:
+    'rise-in relative text-4xl font-bold tracking-tight text-[var(--color-on-media)] drop-shadow-lg sm:text-5xl',
   stamp:
     'relative rounded-[var(--radius-lg)] border-[6px] border-[var(--color-apple-red)] px-6 py-3 text-2xl font-bold tracking-wide text-[var(--color-apple-red)] uppercase sm:text-4xl',
-  stampSlam: 'stamp-slam bg-[color-mix(in_oklab,white_85%,transparent)]',
+  stampSlam: 'stamp-slam bg-[color-mix(in_oklab,var(--color-on-media)_85%,transparent)]',
   // Flying to the card
   stampFly: 'transition-transform duration-[var(--motion-duration-celebrate)] ease-in-out',
   confetti: 'absolute top-1/2 left-1/2 h-3 w-2 rounded-sm confetti-piece',
@@ -182,5 +183,5 @@ export const COURSE_STAMP = {
   posterWrap: 'relative',
   posterDone: 'grayscale',
   cardStamp:
-    'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-8 rounded-[var(--radius-md)] border-4 border-[var(--color-apple-red)] bg-[color-mix(in_oklab,white_80%,transparent)] px-3 py-1 text-sm font-bold tracking-wide whitespace-nowrap text-[var(--color-apple-red)] uppercase',
+    'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-8 rounded-[var(--radius-md)] border-4 border-[var(--color-apple-red)] bg-[color-mix(in_oklab,var(--color-on-media)_80%,transparent)] px-3 py-1 text-sm font-bold tracking-wide whitespace-nowrap text-[var(--color-apple-red)] uppercase',
 } as const

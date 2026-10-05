@@ -30,7 +30,7 @@ export const TABLE_STYLES = {
 
 export const LIST_STYLES = {
   // Glyph flagging a member who has private notes
-  cardNotes: 'h-4 w-4 shrink-0 text-[var(--color-brand-600)]',
+  cardNotes: 'h-4 w-4 shrink-0 text-[var(--color-ink-accent)]',
   stack: 'flex flex-col gap-2',
   item: 'flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 transition-[border-color,box-shadow] hover:border-[var(--color-border-strong)]',
   itemClickable:
@@ -267,7 +267,7 @@ export const HORIZONTAL_TIMELINE_STYLES = {
   dotDone:
     'border-[var(--color-brand-600)] bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   dotCurrent:
-    'border-[var(--color-brand-600)] bg-[var(--color-surface-raised)] text-[var(--color-brand-600)]',
+    'border-[var(--color-brand-600)] bg-[var(--color-surface-raised)] text-[var(--color-ink-accent)]',
   dotIdle:
     'border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] text-[var(--color-ink-subtle)]',
   dotLate: 'border-[var(--color-danger)] bg-[var(--color-danger-soft)] text-[var(--color-danger)]',
@@ -420,7 +420,7 @@ export const CALENDAR_GRID_STYLES = {
   nowLabel:
     'absolute left-1 -translate-y-1/2 rounded-full bg-[var(--color-danger)] px-1.5 py-0.5 text-micro font-bold text-[var(--color-on-brand)] tabular-nums',
   cellAdd:
-    'absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover/cell:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-brand-600)] focus-visible:opacity-100',
+    'absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover/cell:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-ink-accent)] focus-visible:opacity-100',
   cellAddIcon: 'h-4 w-4',
   // Phone fallback
   agenda: 'flex flex-col divide-y divide-[var(--color-border)] p-3 md:hidden',
@@ -443,7 +443,7 @@ export const FILTER_STYLES = {
   bar: 'flex flex-wrap items-center gap-2',
   iconButton:
     'relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-ink-subtle)] transition-colors hover:border-[var(--color-border-strong)] hover:text-[var(--color-ink)]',
-  iconButtonActive: 'border-[var(--color-brand-400)] text-[var(--color-brand-600)]',
+  iconButtonActive: 'border-[var(--color-brand-400)] text-[var(--color-ink-accent)]',
   glyph: 'h-4 w-4',
   tally:
     'absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-1 text-micro font-bold text-[var(--color-on-brand)] tabular-nums',

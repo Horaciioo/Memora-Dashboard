@@ -3,7 +3,7 @@
     "name": "Live",
     "kind": "EVENT",
     "summary": "Live programmé du créateur.",
-    "accent": "#c2548a",
+    "accent": "#d98ba6",
     "visibility": "EVERYONE",
     "defaultMinutes": 180,
     "allDay": false
@@ -12,7 +12,7 @@
     "name": "Réunion d’équipe",
     "kind": "EVENT",
     "summary": "Réunion en vocal.",
-    "accent": "#0284c7",
+    "accent": "#6a9bd1",
     "visibility": "EVERYONE",
     "defaultMinutes": 60,
     "allDay": false
@@ -21,7 +21,7 @@
     "name": "Événement communautaire",
     "kind": "PERIOD",
     "summary": "Plusieurs jours d’événement.",
-    "accent": "#f59e0b",
+    "accent": "#e3c25a",
     "visibility": "EVERYONE",
     "defaultMinutes": null,
     "allDay": true
@@ -30,7 +30,7 @@
     "name": "Période de recrutement",
     "kind": "ZONE",
     "summary": "Fenêtre de candidatures.",
-    "accent": "#0d9488",
+    "accent": "#6fc0b5",
     "visibility": "RESPONSABLES",
     "defaultMinutes": null,
     "allDay": true
@@ -39,7 +39,7 @@
     "name": "Point responsables",
     "kind": "EVENT",
     "summary": "Réservé aux responsables.",
-    "accent": "#ea580c",
+    "accent": "#e9a15c",
     "visibility": "RESPONSABLES",
     "defaultMinutes": 45,
     "allDay": false
@@ -48,7 +48,7 @@
     "name": "Maintenance Discord",
     "kind": "EVENT",
     "summary": "Serveur en travaux.",
-    "accent": "#64748b",
+    "accent": "#9fa8b3",
     "visibility": "ADMINS",
     "defaultMinutes": 120,
     "allDay": false

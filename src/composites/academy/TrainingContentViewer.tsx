@@ -3,7 +3,7 @@
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -157,7 +157,7 @@ export const TrainingContentViewer = ({ trainingId, onClose }: TrainingContentVi
             figure="academy"
             title={ACADEMY_COPY.noContentTitle}
             description={ACADEMY_COPY.noContentDescription}
-            action={<Badge label={ACADEMY_COPY.noContentTitle} tone="neutral" />}
+            action={<Status label={ACADEMY_COPY.noContentTitle} tone="neutral" />}
           />
         ) : (
           <div className="flex flex-col gap-6">
@@ -172,7 +172,9 @@ export const TrainingContentViewer = ({ trainingId, onClose }: TrainingContentVi
                       <span className="min-w-0 flex-1 text-sm text-[var(--color-ink-subtle)]">
                         {`${block.questionCount} ${block.questionCount === 1 ? ACADEMY_COPY.quizQuestionCountOne : ACADEMY_COPY.quizQuestionCount}`}
                       </span>
-                      {block.answered && <Badge label={ACADEMY_COPY.quizAnswered} tone="success" />}
+                      {block.answered && (
+                        <Status label={ACADEMY_COPY.quizAnswered} tone="success" />
+                      )}
                       <Button variant="primary" onClick={() => setQuizBlockId(block.id)}>
                         {ACADEMY_COPY.takeQuiz}
                       </Button>

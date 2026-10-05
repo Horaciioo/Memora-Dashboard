@@ -1,5 +1,5 @@
 import { Avatar } from '@/components/elements/display/Avatar'
-import { StatusText } from '@/components/elements/display/StatusText'
+import { Status } from '@/components/elements/display/Status'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ACADEMY_JUNIOR_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { MEMBER_BLOCK, MEMBER_FILE } from '@/declarations/ui/blocks'
@@ -56,7 +56,7 @@ export const JuniorRail = ({
         </button>
         <span className={MEMBER_FILE.name}>{junior.displayName}</span>
         <span className={MEMBER_FILE.role}>{functionName}</span>
-        <StatusText label={status.label} accent={status.accent} />
+        <Status label={status.label} accent={status.accent} />
       </div>
 
       <div className={MEMBER_FILE.body}>
@@ -91,7 +91,7 @@ export const JuniorRail = ({
           </div>
           <div className={MEMBER_FILE.railItem}>
             <dd>
-              <StatusText
+              <Status
                 label={isReady ? ACADEMY_COPY.ready : ACADEMY_COPY.blocked}
                 accent={isReady ? 'success' : 'warning'}
               />

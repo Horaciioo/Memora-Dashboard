@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { ModerationBoard } from '@/composites/moderation/ModerationBoard'
 import { liveconFields, listLevels, readCurrentState } from '@/core/services/livecon/LiveconService'
@@ -40,7 +40,7 @@ export default async function SanctionsPage() {
         figure="moderation"
         title={title}
         description={description}
-        action={<Badge label={title} tone="neutral" />}
+        action={<Status label={title} tone="neutral" />}
       />
     </div>
   )

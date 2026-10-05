@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { AvatarStack } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { Button } from '@/components/elements/actions/Button'
 import { EmojiPicker } from '@/components/elements/forms/EmojiPicker'
@@ -129,7 +129,9 @@ export const MeetingFile = ({
     {
       label: MEETING_FIELD_COPY.state,
       field: fieldFor('stateId'),
-      display: stateOption ? <Badge label={stateOption.label} accent={stateOption.accent} /> : null,
+      display: stateOption ? (
+        <Status label={stateOption.label} accent={stateOption.accent} />
+      ) : null,
     },
     {
       label: MEETING_FIELD_COPY.project,
@@ -308,7 +310,7 @@ export const MeetingFile = ({
             figure="notes"
             title={MEETING_COPY.logsEmptyTitle}
             description={MEETING_COPY.logsEmptyDescription}
-            action={<Badge label={MEETING_COPY.tabLogs} tone="neutral" />}
+            action={<Status label={MEETING_COPY.tabLogs} tone="neutral" />}
           />
         ) : (
           <div className={cn(SECTION_STYLES.panel, SECTION_STYLES.panelPadded)}>

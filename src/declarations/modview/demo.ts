@@ -32,7 +32,7 @@ const CAST = {
   modo: chatter('modo_lune', { name: 'modo_lune', badges: ['moderator'], colour: '#16a34a' }),
   vip: chatter('pixel_vip', { name: 'pixel_vip', badges: ['vip'], colour: '#c98a1e' }),
   calm: chatter('tartine_bleue', { colour: '#0aa0d6' }),
-  fan: chatter('soleil_2009', { badges: ['subscriber'], colour: '#7c3aed' }),
+  fan: chatter('soleil_2009', { badges: ['subscriber'], colour: '#d98ba6' }),
   newcomer: chatter('premiere_fois', { colour: '#ea580c' }),
   spammer: chatter('xX_spam_Xx', { colour: '#dc2626' }),
   rude: chatter('pas_sympa_42', { colour: '#9a3412' }),

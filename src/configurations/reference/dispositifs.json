@@ -2,11 +2,11 @@
   {
     "name": "ATRIA",
     "summary": "Parcours complet pour les juniors sans expérience.",
-    "accent": "#c2548a"
+    "accent": "#d98ba6"
   },
   {
     "name": "PULSE",
     "summary": "Parcours accéléré pour les profils déjà expérimentés.",
-    "accent": "#0ea5e9"
+    "accent": "#86b6e4"
   }
 ]

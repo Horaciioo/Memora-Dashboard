@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { StatusText } from '@/components/elements/display/StatusText'
+import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
@@ -131,7 +131,7 @@ export const RecruitmentsPanel = ({
             <span className={SESSION_CARD.meta}>
               {[entry.youtuber.label, entry.jobFunction.label].join(', ')}
             </span>
-            <StatusText label={status.label} accent={status.accent} className="mt-1" />
+            <Status label={status.label} accent={status.accent} className="mt-1" />
           </div>
         </div>
 

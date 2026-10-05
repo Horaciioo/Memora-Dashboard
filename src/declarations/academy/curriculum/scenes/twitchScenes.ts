@@ -14,7 +14,7 @@ const CAST = {
   responsable: chatter('resp_elio', { badges: ['moderator'], colour: '#ea580c' }),
   vip: chatter('pixel_vip', { badges: ['vip'], colour: '#c98a1e' }),
   calm: chatter('tartine_bleue', { colour: '#0aa0d6' }),
-  fan: chatter('soleil_2009', { badges: ['subscriber'], colour: '#7c3aed' }),
+  fan: chatter('soleil_2009', { badges: ['subscriber'], colour: '#d98ba6' }),
   newcomer: chatter('premiere_fois', { colour: '#ea580c' }),
   spammer: chatter('xX_spam_Xx', { colour: '#dc2626' }),
   // The harassment wave of the case study

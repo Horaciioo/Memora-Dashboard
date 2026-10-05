@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FormDrawer } from '@/components/structures/FormDrawer'
@@ -56,7 +56,7 @@ export const IntegrationLinkStep = ({
       {link ? (
         <>
           <div className={INTEGRATION_STEP_STYLES.row}>
-            <Badge
+            <Status
               label={INTEGRATION_LINK_KIND_REGISTRY.label(link.kind)}
               accent={INTEGRATION_LINK_KIND_REGISTRY.get(link.kind).accent}
             />
@@ -64,7 +64,7 @@ export const IntegrationLinkStep = ({
               {`${seats} ${INTEGRATION_LINK_COPY.usesLabel} · ${formatDay(link.expiresAt)}`}
             </span>
             {!link.usable && (
-              <Badge
+              <Status
                 label={
                   link.uses >= (link.maxUses ?? Number.POSITIVE_INFINITY)
                     ? INTEGRATION_LINK_COPY.exhaustedBadge

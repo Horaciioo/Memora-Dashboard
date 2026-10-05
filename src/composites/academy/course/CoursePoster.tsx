@@ -33,7 +33,7 @@ export const CoursePoster = ({ surface }: CoursePosterProps) => {
       {isScreen && (
         <>
           <rect x="40" y="38" width="176" height="112" rx="16" fill={c.ink} />
-          <rect x="40" y="38" width="176" height="20" rx="16" fill="#27272a" />
+          <rect x="40" y="38" width="176" height="20" rx="16" fill={c.chrome} />
           {surface === 'youtube' ? (
             <rect x="100" y="80" width="56" height="40" rx="12" fill={c.alert} />
           ) : null}
@@ -42,12 +42,12 @@ export const CoursePoster = ({ surface }: CoursePosterProps) => {
             fill={surface === 'youtube' ? c.paper : c.accent}
           />
           <rect x="230" y="38" width="72" height="112" rx="14" fill={c.paper} />
-          <rect x="240" y="52" width="40" height="7" rx="3.5" fill="#d4d4d8" />
-          <rect x="240" y="68" width="52" height="7" rx="3.5" fill="#d4d4d8" />
-          <rect x="236" y="84" width="60" height="16" rx="5" fill="#ffd1d1" />
+          <rect x="240" y="52" width="40" height="7" rx="3.5" fill={c.rule} />
+          <rect x="240" y="68" width="52" height="7" rx="3.5" fill={c.rule} />
+          <rect x="236" y="84" width="60" height="16" rx="5" fill={c.alertSoft} />
           <rect x="242" y="89" width="46" height="6" rx="3" fill={c.alert} />
-          <rect x="240" y="110" width="34" height="7" rx="3.5" fill="#d4d4d8" />
-          <rect x="240" y="126" width="48" height="7" rx="3.5" fill="#d4d4d8" />
+          <rect x="240" y="110" width="34" height="7" rx="3.5" fill={c.rule} />
+          <rect x="240" y="126" width="48" height="7" rx="3.5" fill={c.rule} />
           <rect x="76" y="160" width="100" height="10" rx="5" fill={c.ink} />
         </>
       )}
@@ -62,14 +62,14 @@ export const CoursePoster = ({ surface }: CoursePosterProps) => {
           <rect x="176" y="104" width="118" height="62" rx="20" fill={c.ink} />
           <path d="M262 166l8 22-28-22z" fill={c.ink} />
           <rect x="194" y="123" width="82" height="9" rx="4.5" fill={c.accent} />
-          <rect x="194" y="141" width="52" height="9" rx="4.5" fill="#71717a" />
+          <rect x="194" y="141" width="52" height="9" rx="4.5" fill={c.muted} />
         </>
       )}
 
       {surface === 'general' && (
         <>
           <path d="M170 44 82 84l88 40 88-40z" fill={c.ink} />
-          <path d="M118 104v34c0 14 24 24 52 24s52-10 52-24v-34l-52 24z" fill="#3f3f46" />
+          <path d="M118 104v34c0 14 24 24 52 24s52-10 52-24v-34l-52 24z" fill={c.deep} />
           <path d="M258 84v54" stroke={c.accent} strokeWidth="6" strokeLinecap="round" />
           <circle cx="258" cy="144" r="9" fill={c.accent} />
         </>

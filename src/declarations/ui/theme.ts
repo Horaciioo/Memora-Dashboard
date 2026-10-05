@@ -44,6 +44,7 @@ export interface ToneStyles {
  * @param {TokenRef} parts.soft - Tinted background
  * @param {TokenRef} [parts.text] - Foreground
  * @param {TokenRef} [parts.border] - Border
+ * @param {TokenRef} [parts.dot] - Status dot
  * @return {ToneStyles} - Class set
  */
 
@@ -52,17 +53,19 @@ const drawTone = ({
   soft,
   text = fill,
   border = fill,
+  dot = fill,
 }: {
   fill: TokenRef
   soft: TokenRef
   text?: TokenRef
   border?: TokenRef
+  dot?: TokenRef
 }): ToneStyles => ({
   text: tw('text', text),
   soft: tw('bg', soft),
   solid: tw('bg', fill),
   border: tw('border', border),
-  dot: tw('bg', text),
+  dot: tw('bg', dot),
 })
 
 /**
@@ -74,6 +77,7 @@ export const TONES: Record<Tone, ToneStyles> = {
   brand: drawTone({
     fill: THEME.colour.brand,
     soft: THEME.colour.brandSoft,
+    text: THEME.colour.inkAccent,
     border: THEME.colour.brandEdge,
   }),
   success: drawTone({ fill: THEME.colour.success, soft: THEME.colour.successSoft }),

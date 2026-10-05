@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { Glyph } from '@/components/elements/display/Glyph'
 import { WorkBoard } from '@/composites/work/WorkBoard'
@@ -87,7 +87,7 @@ export const TasksBoard = ({
       header: FIELD_COPY.state,
       sortValue: (task) => task.state?.label ?? '',
       render: (task) =>
-        task.state ? <Badge label={task.state.label} accent={task.state.accent} /> : null,
+        task.state ? <Status label={task.state.label} accent={task.state.accent} /> : null,
     },
     {
       key: 'project',
@@ -112,7 +112,7 @@ export const TasksBoard = ({
       className: 'whitespace-nowrap',
       render: (task) =>
         task.dueDate ? (
-          <Badge
+          <Status
             label={formatDay(task.dueDate)}
             tone={isOverdue(task.dueDate) ? 'danger' : 'neutral'}
             icon="clock"

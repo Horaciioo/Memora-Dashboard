@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { Section } from '@/components/structures/Section'
 import { ConsoleBanner } from '@/composites/system/ConsoleBanner'
@@ -36,7 +36,7 @@ export default async function AdministrationPage() {
         title={`${VIEW_COPY.environment} : ${runtime.label}`}
         lead={runtime.started ? undefined : VIEW_COPY.runtimeDownLead}
         aside={
-          <Badge
+          <Status
             label={runtime.encrypted ? VIEW_COPY.subjectOn : VIEW_COPY.subjectOff}
             tone={runtime.encrypted ? 'success' : 'neutral'}
             icon={runtime.encrypted ? 'lock' : 'unlock'}

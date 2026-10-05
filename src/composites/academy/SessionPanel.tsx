@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { StatusText } from '@/components/elements/display/StatusText'
+import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FileTabs } from '@/components/structures/FileTabs'
@@ -288,7 +288,7 @@ export const SessionPanel = ({
                         {junior.dispositif?.name ?? ACADEMY_COPY.awaitingConfirmation}
                       </span>
                       {!isActive && (
-                        <StatusText label={status.label} accent={status.accent} className="mt-1" />
+                        <Status label={status.label} accent={status.accent} className="mt-1" />
                       )}
                     </div>
                   </div>
@@ -366,7 +366,7 @@ export const SessionPanel = ({
                     <span className="pt-1 text-sm whitespace-pre-wrap">{step.notes}</span>
                   )}
                 </span>
-                <StatusText
+                <Status
                   label={step.doneAt ? ACADEMY_COPY.eventDone : ACADEMY_COPY.eventPlanned}
                   accent={step.doneAt ? 'success' : 'warning'}
                 />
@@ -491,7 +491,7 @@ export const SessionPanel = ({
               <h2 className={SESSION_HERO.title}>{detail.summary.function.name}</h2>
               <div className={SESSION_HERO.meta}>
                 {detail.summary.status !== AcademySessionStatuses.Running && (
-                  <StatusText label={sessionStatus.label} accent={sessionStatus.accent} />
+                  <Status label={sessionStatus.label} accent={sessionStatus.accent} />
                 )}
                 <span>{formatDay(detail.summary.startsAt)}</span>
               </div>

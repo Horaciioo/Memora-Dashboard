@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Badge } from '@/components/elements/display/Badge'
+import { Status } from '@/components/elements/display/Status'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { TrainingContentEditor } from '@/composites/academy/TrainingContentEditor'
 import { TrainingFeedbackPanel } from '@/composites/academy/TrainingFeedbackPanel'
@@ -70,7 +70,7 @@ export default async function TrainingContentPage({ params }: { params: Promise<
         title={training.name}
         actions={
           training.period ? (
-            <Badge label={ACADEMY_PERIOD_REGISTRY.label(training.period)} tone="neutral" />
+            <Status label={ACADEMY_PERIOD_REGISTRY.label(training.period)} tone="neutral" />
           ) : undefined
         }
       />

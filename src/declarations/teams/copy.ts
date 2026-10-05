@@ -40,7 +40,7 @@ export const TEAM_FIELD_COPY = {
 
 export const TEAM_FIELD_INFO = {
   name: 'Le nom de l’équipe.',
-  lead: 'Le responsable d\'équipe.',
+  lead: "Le responsable d'équipe.",
   youtuber: 'Le créateur sur lequel l’équipe intervient.',
   summary: 'Le rôle de l’équipe.',
 } as const
