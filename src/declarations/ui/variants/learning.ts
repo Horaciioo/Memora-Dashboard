@@ -26,9 +26,9 @@ export const PIM_TIMELINE = {
   // Greyed steps
   body: 'flex min-w-0 flex-1 flex-col gap-1 pt-1.5',
   bodyMuted: 'opacity-60 grayscale',
-  eyebrow: `${PROPERTY_LABEL} text-[0.6875rem]`,
+  eyebrow: `${PROPERTY_LABEL} text-micro`,
   title: 'text-base font-bold',
-  titleCurrent: 'text-lg font-extrabold text-[var(--color-brand-800)]',
+  titleCurrent: 'text-lg font-bold text-[var(--color-brand-800)]',
   meta: 'text-xs text-[var(--color-ink-subtle)]',
   description: 'text-sm',
   card: 'mt-2 flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-brand-200)] card-surface p-4',
@@ -66,7 +66,7 @@ export const GUIDE_TOUR = {
     'fixed z-[71] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel p-4 shadow-[var(--shadow-md)]',
   counter:
     'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  title: 'text-base font-extrabold',
+  title: 'text-base font-bold',
   body: 'text-sm text-[var(--color-ink)]',
   actions: 'mt-1 flex items-center justify-between gap-2',
 } as const

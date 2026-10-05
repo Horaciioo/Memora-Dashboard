@@ -14,13 +14,13 @@ export const MODVIEW_FRAME = {
   channel: 'flex items-center gap-2 font-bold',
   platform: 'h-6 w-6 shrink-0',
   status:
-    'flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)] px-3 py-1.5 text-xs font-black tracking-wide uppercase',
+    'flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)] px-3 py-1.5 text-xs font-bold tracking-wide uppercase',
   statusDot: 'h-2.5 w-2.5 shrink-0 rounded-full',
   statusConnected: 'bg-[var(--color-success)]',
   statusConnecting: 'bg-[var(--color-caution)]',
   statusOff: 'bg-[var(--color-ink-subtle)]',
   statusScripted: 'bg-[var(--color-brand-600)]',
-  livecon: 'flex items-center gap-1.5 text-xs font-black tracking-wide uppercase',
+  livecon: 'flex items-center gap-1.5 text-xs font-bold tracking-wide uppercase',
   liveconIcon: 'h-5 w-5',
   body: 'flex min-h-0 flex-1 gap-3',
   rail: 'hidden w-12 shrink-0 flex-col items-center gap-1.5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 shadow-[var(--shadow-sm)] md:flex',
@@ -48,7 +48,7 @@ export const MODVIEW_WINDOW = {
   // Lit by a scene
   lit: 'z-20 shadow-[0_0_0_3px_var(--color-brand-600),var(--shadow-md)] scale-[1.01]',
   head: 'flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-2',
-  title: 'min-w-0 flex-1 truncate text-sm font-black tracking-tight',
+  title: 'min-w-0 flex-1 truncate text-sm font-bold tracking-tight',
   headAction:
     'rounded-[var(--radius-md)] px-2 py-1 text-xs font-bold text-[var(--color-brand-800)] transition-colors hover:bg-[var(--color-hover)]',
   body: 'min-h-0 flex-1 overflow-y-auto',
@@ -56,7 +56,7 @@ export const MODVIEW_WINDOW = {
   pad: 'p-3',
   empty: 'flex h-full flex-col items-center justify-center gap-2 p-6 text-center',
   emptyIcon: 'h-10 w-10',
-  emptyTitle: 'text-sm font-black',
+  emptyTitle: 'text-sm font-bold',
   emptyBody: 'max-w-64 text-xs text-[var(--color-ink-subtle)]',
 } as const
 
@@ -120,7 +120,7 @@ export const MODVIEW_CHAT = {
   hint: 'px-3 pt-2 text-xs font-semibold text-[var(--color-danger)]',
   root: 'lg:h-full',
   scroller: 'min-h-0 flex-1 overflow-y-auto',
-  time: 'mr-1.5 font-[family-name:var(--font-mono)] text-[11px] text-[var(--color-ink-subtle)]',
+  time: 'mr-1.5 font-[family-name:var(--font-mono)] text-micro text-[var(--color-ink-subtle)]',
   deletedText: 'text-[var(--color-ink-subtle)] line-through',
   deletedNote: 'ml-1.5 text-xs text-[var(--color-ink-subtle)] italic',
   triggerLit: 'ring-2 ring-[var(--color-brand-600)]',
@@ -131,7 +131,7 @@ export const MODVIEW_CHAT = {
     'border-l-4 border-[var(--color-brand-600)] bg-[color-mix(in_oklab,var(--color-brand-600)_8%,transparent)]',
   lineLit: 'bg-[color-mix(in_oklab,var(--color-caution)_18%,transparent)]',
   firstTag:
-    'mb-0.5 block text-[11px] font-black tracking-wide text-[var(--color-brand-800)] uppercase',
+    'mb-0.5 block text-micro font-bold tracking-wide text-[var(--color-brand-800)] uppercase',
   badge: 'mr-1 inline-block h-4 w-4 align-[-2px]',
   name: 'cursor-pointer font-bold hover:underline',
   deleted: 'text-[var(--color-ink-subtle)] italic',
@@ -143,7 +143,7 @@ export const MODVIEW_CHAT = {
   resume:
     'absolute bottom-24 left-1/2 -translate-x-1/2 rounded-full bg-[var(--color-ink)] px-3 py-1 text-xs font-bold text-[var(--color-surface-raised)] shadow-[var(--shadow-md)]',
   quick:
-    'flex gap-3 border-t border-[var(--color-border)] px-3 pt-2 text-xs font-black text-[var(--color-ink-subtle)]',
+    'flex gap-3 border-t border-[var(--color-border)] px-3 pt-2 text-xs font-bold text-[var(--color-ink-subtle)]',
   composer: 'flex flex-col gap-2 p-3 pt-2',
   input:
     'w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:border-[var(--color-brand-600)] disabled:cursor-not-allowed disabled:opacity-60',
@@ -166,7 +166,7 @@ export const MODVIEW_MODES = {
   rowLit: 'bg-[var(--color-brand-soft)] ring-2 ring-[var(--color-brand-600)]',
   rowIcon: 'h-5 w-5 shrink-0',
   rowLabel: 'min-w-0 flex-1 font-semibold',
-  rowState: 'text-xs font-black tracking-wide uppercase',
+  rowState: 'text-xs font-bold tracking-wide uppercase',
   on: 'text-[var(--color-success)]',
   off: 'text-[var(--color-ink-subtle)]',
   reason: 'px-2 pb-1 text-xs text-[var(--color-ink-subtle)]',
@@ -189,7 +189,7 @@ export const MODVIEW_COMMUNITY = {
   group:
     'mx-2 mb-2 flex flex-col gap-1 rounded-[var(--radius-lg)] px-2 pb-2 transition-[background-color,box-shadow]',
   groupLit: 'bg-[var(--color-brand-100)] ring-2 ring-[var(--color-brand-600)]',
-  groupHead: 'flex items-center gap-2 py-1 text-sm font-black',
+  groupHead: 'flex items-center gap-2 py-1 text-sm font-bold',
   groupIcon: 'h-5 w-5 shrink-0',
   member: 'w-fit cursor-pointer text-sm font-semibold hover:underline',
   empty: 'text-xs text-[var(--color-ink-subtle)] italic',
@@ -204,7 +204,7 @@ export const MODVIEW_USER = {
   panel:
     'course-pop absolute inset-y-0 right-0 z-40 flex w-full max-w-sm flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-md)]',
   head: 'flex items-center gap-3 border-b border-[var(--color-border)] p-4',
-  name: 'min-w-0 flex-1 truncate text-lg font-black tracking-tight',
+  name: 'min-w-0 flex-1 truncate text-lg font-bold tracking-tight',
   body: 'flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-4',
   section: 'flex flex-col gap-2',
   label: PROPERTY_LABEL,
@@ -230,19 +230,19 @@ export const MODVIEW_SANCTIONS = {
   open: 'w-full lg:w-80',
   closed: 'hidden w-12 lg:flex',
   toggle:
-    'flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-2 text-left text-sm font-black transition-colors hover:bg-[var(--color-hover)]',
+    'flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-2 text-left text-sm font-bold transition-colors hover:bg-[var(--color-hover)]',
   toggleIcon: 'h-5 w-5 shrink-0',
   body: 'min-h-0 flex-1 overflow-y-auto p-3',
-  level: 'mb-3 flex items-center gap-2 text-xs font-black tracking-wide uppercase',
+  level: 'mb-3 flex items-center gap-2 text-xs font-bold tracking-wide uppercase',
   group: 'mb-4 flex flex-col gap-1.5',
   groupTitle: `${PROPERTY_LABEL} text-[var(--accent)]`,
   offense:
     'relative flex w-full flex-col gap-1 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] px-3 py-2 pl-4 text-left transition-colors hover:border-[var(--color-border-strong)]',
   offenseOpen: 'border-[var(--color-brand-600)]',
   offenseRule: 'absolute inset-y-0 left-0 w-1 bg-[var(--accent)]',
-  offenseName: 'text-sm font-black tracking-tight',
+  offenseName: 'text-sm font-bold tracking-tight',
   measures: 'flex flex-wrap gap-1',
-  measure: 'rounded-[var(--radius-sm)] px-1.5 py-0.5 text-[11px] font-bold',
+  measure: 'rounded-[var(--radius-sm)] px-1.5 py-0.5 text-micro font-bold',
   detail: 'flex flex-col gap-2 px-1 pt-2 pb-1',
   condition: 'text-xs text-[var(--color-ink-subtle)]',
   apply: 'w-full',
@@ -251,7 +251,7 @@ export const MODVIEW_SANCTIONS = {
   // Second version: centred level, search, glyph tabs, then text boxes
   head: 'flex flex-col items-center gap-1 pb-3 text-center',
   headGlyph: 'h-8 w-8',
-  headName: 'text-sm font-black tracking-wide uppercase',
+  headName: 'text-sm font-bold tracking-wide uppercase',
   search:
     'w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-brand-600)]',
   tabs: 'flex items-center justify-center gap-2 py-3',
@@ -293,15 +293,15 @@ export const MODVIEW_RAIL = {
   identity: 'flex items-center gap-3 px-2.5',
   platform: 'h-10 w-10 shrink-0',
   identityText: 'flex min-w-0 flex-col',
-  channel: 'truncate text-xl font-black tracking-tight',
-  status: 'flex items-center gap-1.5 text-xs font-black tracking-wide uppercase',
+  channel: 'truncate text-xl font-bold tracking-tight',
+  status: 'flex items-center gap-1.5 text-xs font-bold tracking-wide uppercase',
   notice: 'mt-1 text-xs leading-snug text-[var(--color-ink-subtle)]',
   dot: 'h-2.5 w-2.5 shrink-0 rounded-full',
   dotConnected: 'bg-[var(--color-success)]',
   dotConnecting: 'bg-[var(--color-caution)]',
   dotOff: 'bg-[var(--color-ink-subtle)]',
   dotScripted: 'bg-[var(--color-brand-600)]',
-  livecon: 'flex items-center gap-2 px-2.5 text-sm font-black tracking-wide uppercase',
+  livecon: 'flex items-center gap-2 px-2.5 text-sm font-bold tracking-wide uppercase',
   liveconIcon: 'h-6 w-6',
   shown: 'text-left font-semibold text-[var(--color-ink)]',
   folded: 'text-left opacity-55 hover:opacity-100',
@@ -329,11 +329,11 @@ export const MODVIEW_HISTORY = {
   viewer:
     'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] px-3 py-2',
   viewerHead: 'flex flex-wrap items-center gap-2',
-  name: 'text-sm font-black hover:underline',
+  name: 'text-sm font-bold hover:underline',
   line: 'text-xs text-[var(--color-ink-subtle)]',
   propose: 'self-start',
   past: 'flex flex-col gap-0.5 border-t border-[var(--color-border)] pt-1.5',
-  tag: 'text-[0.65rem] font-black tracking-wide uppercase',
+  tag: 'text-micro font-bold tracking-wide uppercase',
   tagPanel: 'text-[var(--color-success)]',
   tagOff: 'text-[var(--color-caution)]',
   member: 'flex flex-wrap items-center gap-x-2 gap-y-1 text-sm',
@@ -351,7 +351,7 @@ export const MODVIEW_HISTORY = {
 export const MODVIEW_INSPECT = {
   card: 'surface-enter absolute top-3 right-3 z-20 flex max-h-[80%] w-80 flex-col gap-3 overflow-y-auto rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 shadow-[var(--shadow-lg)]',
   head: 'flex items-center gap-3',
-  name: 'min-w-0 flex-1 truncate text-base font-black',
+  name: 'min-w-0 flex-1 truncate text-base font-bold',
   facts: 'grid grid-cols-2 gap-2',
   fact: 'flex flex-col gap-0.5',
   factLabel: PROPERTY_LABEL,
@@ -362,6 +362,6 @@ export const MODVIEW_INSPECT = {
   banner:
     'flex flex-wrap items-center gap-3 rounded-[var(--radius-lg)] border-2 border-[var(--color-brand-600)] bg-[var(--color-brand-100)] px-4 py-2',
   bannerText: 'flex min-w-0 flex-1 flex-col',
-  bannerTitle: 'text-sm font-black',
+  bannerTitle: 'text-sm font-bold',
   bannerHint: 'text-xs text-[var(--color-ink-subtle)]',
 } as const

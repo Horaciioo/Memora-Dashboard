@@ -30,7 +30,7 @@ export const AuthShell = ({ title, children }: AuthShellProps) => (
         />
       </div>
       <div className="card-surface rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 shadow-[var(--shadow-md)] sm:p-8">
-        <h1 className="mb-6 text-xl font-black tracking-tight">{title}</h1>
+        <h1 className="mb-6 text-xl font-bold tracking-tight">{title}</h1>
         {children}
       </div>
     </div>

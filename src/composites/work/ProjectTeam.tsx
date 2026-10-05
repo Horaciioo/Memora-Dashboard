@@ -44,7 +44,7 @@ const Roster = ({ title, people, options, disabled, full, onChange }: RosterProp
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase">
+      <p className="text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase">
         {title}
       </p>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">

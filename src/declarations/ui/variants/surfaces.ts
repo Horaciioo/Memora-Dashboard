@@ -7,7 +7,7 @@ export const SECTION_STYLES = {
   wrapper: 'flex flex-col gap-3',
   header: 'flex flex-wrap items-end justify-between gap-3',
   heading: 'flex flex-col gap-1',
-  title: 'text-xl font-black tracking-tight sm:text-2xl',
+  title: 'text-xl font-bold tracking-tight sm:text-2xl',
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
   panel: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface',
   panelPadded: 'p-4 sm:p-5',
@@ -32,7 +32,7 @@ export const PAGE_STYLES = {
   notch: 'absolute bottom-0 left-1/2 flex -translate-x-1/2 items-end',
   notchBody:
     'banner-notch-body flex min-w-0 max-w-[min(44rem,70vw)] items-center justify-center px-3 text-center',
-  notchTitle: 'min-w-0 text-xl font-black tracking-[0.12em] uppercase md:text-[1.75rem]',
+  notchTitle: 'min-w-0 text-xl font-bold tracking-wide uppercase md:text-page',
   notchTitleText: 'min-w-0 text-balance md:truncate',
   // Shoulders of the notch
   notchSlopeStart: 'banner-slope banner-slope-start',
@@ -41,7 +41,7 @@ export const PAGE_STYLES = {
   headerRow: 'flex flex-wrap items-center justify-between gap-4',
   eyebrow:
     'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-accent)] uppercase',
-  title: 'text-2xl font-black tracking-tight sm:text-3xl',
+  title: 'text-2xl font-bold tracking-tight sm:text-3xl',
   // Title and its glyph sharing one line
   heading: 'flex min-w-0 items-center gap-2',
   headingTitle: 'min-w-0 flex-1',
@@ -61,7 +61,8 @@ export const PAGE_BANNER = {
   art: 'absolute inset-0 bg-[var(--color-frame)]',
   image: 'h-full w-full object-cover dark:brightness-[0.82]',
   // Mirror of the photo above it, shown when the page is pulled down past the top
-  extension: 'absolute inset-x-0 bottom-full h-full -scale-y-100 overflow-hidden bg-[var(--color-frame)]',
+  extension:
+    'absolute inset-x-0 bottom-full h-full -scale-y-100 overflow-hidden bg-[var(--color-frame)]',
 } as const
 
 /**
@@ -260,7 +261,7 @@ export const PALETTE_STYLES = {
 
 export const AVATAR_STYLES = {
   base: 'inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-brand-600)] font-semibold text-[var(--color-on-brand)] select-none',
-  xs: 'h-6 w-6 text-[10px]',
+  xs: 'h-6 w-6 text-micro',
   sm: 'h-8 w-8 text-xs',
   md: 'h-10 w-10 text-sm',
   lg: 'h-16 w-16 text-lg',
@@ -278,7 +279,7 @@ export type AvatarSize = Extract<keyof typeof AVATAR_STYLES, 'xs' | 'sm' | 'md' 
 
 export const RIBBON_STYLES = {
   wrap: 'pointer-events-none absolute top-0 right-0 h-28 w-28 overflow-hidden',
-  band: 'absolute top-6 -right-8 flex w-[150px] items-center justify-center gap-1 rotate-45 py-1.5 text-[11px] font-bold tracking-wide uppercase',
+  band: 'absolute top-6 -right-8 flex w-[150px] items-center justify-center gap-1 rotate-45 py-1.5 text-micro font-bold tracking-wide uppercase',
   fold: 'absolute -bottom-1.5 h-0 w-0 border-[6px] border-transparent border-t-[var(--color-ink)]/30',
   foldLeft: 'left-0',
   foldRight: 'right-0',
@@ -312,7 +313,7 @@ export const PREFERENCE_STYLES = {
   column: 'mx-auto flex w-full max-w-3xl flex-col gap-8',
   // Who is signed in
   hero: 'flex flex-col items-center gap-3 text-center',
-  heroName: 'text-3xl font-black tracking-tight',
+  heroName: 'text-3xl font-bold tracking-tight',
   heroMeta: 'flex flex-col items-center gap-2',
   stack: 'flex flex-col gap-6',
   rows: 'flex flex-col divide-y divide-[var(--color-border)]',
@@ -331,7 +332,7 @@ export const SIGN_IN_STYLES = {
   stack: 'flex flex-col gap-5',
   alert:
     'rounded-[var(--radius-md)] border border-[var(--color-danger)] bg-[var(--color-surface)] px-3 py-2 text-xs text-[var(--color-danger)]',
-  divider: 'flex items-center gap-3 text-[11px] text-[var(--color-ink-subtle)] uppercase',
+  divider: 'flex items-center gap-3 text-micro text-[var(--color-ink-subtle)] uppercase',
   rule: 'h-px flex-1 bg-[var(--color-border)]',
   notice: 'text-xs text-[var(--color-ink-subtle)]',
   footer: 'pt-1 text-center text-xs',
@@ -383,8 +384,8 @@ export const WIZARD_STYLES = {
   header: 'flex flex-col gap-4',
   heading: 'flex flex-col gap-1',
   counter:
-    'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-[var(--color-ink-accent)] uppercase',
-  title: 'text-xl font-black tracking-tight sm:text-2xl',
+    'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-accent)] uppercase',
+  title: 'text-xl font-bold tracking-tight sm:text-2xl',
   body: 'flex min-h-64 flex-col gap-4',
   footer: 'flex items-center justify-between gap-3 border-t border-[var(--color-border)] pt-6',
   // The rail only fits on a wide viewport
@@ -407,8 +408,8 @@ export const ONBOARDING_STYLES = {
   bannerMark: 'w-28 opacity-90 brightness-0 invert lg:w-32',
   bannerFoot: 'flex flex-col gap-2',
   bannerEyebrow:
-    'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-white/70 uppercase',
-  bannerTitle: 'text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl',
+    'font-[family-name:var(--font-mono)] text-xs tracking-wide text-white/70 uppercase',
+  bannerTitle: 'text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl',
   // No frame
   panel: 'flex min-w-0 flex-col justify-center px-2 py-8 sm:px-6 lg:px-12 lg:py-14',
   form: 'mx-auto flex w-full max-w-xl flex-col gap-8',
@@ -426,11 +427,11 @@ export const ONBOARDING_STYLES = {
   intro: 'flex flex-col gap-1',
   actions: 'flex flex-wrap items-center gap-3',
   outcome: 'flex flex-col gap-2 text-center',
-  outcomeTitle: 'text-xl font-extrabold tracking-tight',
+  outcomeTitle: 'text-xl font-bold tracking-tight',
   // Admitted candidate
   admission: 'flex flex-col gap-1 border-l-4 border-[var(--color-success)] py-1 pl-4',
   admissionEyebrow:
-    'font-[family-name:var(--font-mono)] text-xs tracking-[0.2em] text-[var(--color-success)] uppercase',
+    'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-success)] uppercase',
 } as const
 
 /**
@@ -480,7 +481,7 @@ export const PAGE_OPTIONS = {
   panel:
     'popover-enter glass-panel absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex w-72 flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
   title:
-    'px-2.5 pt-1.5 pb-1 text-[11px] font-black tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'px-2.5 pt-1.5 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   row: 'flex items-center justify-between gap-4 rounded-[var(--radius-md)] px-2.5 py-2 font-semibold',
   // Many choices take the line under their label
   rowStacked: 'flex-col items-stretch gap-2',

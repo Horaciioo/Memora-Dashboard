@@ -140,7 +140,7 @@ export const ADD_ROW_STYLES = {
 
 export const MATURITY_STYLES = {
   // Outlined
-  tag: 'inline-flex shrink-0 items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-[10px] leading-none font-medium tracking-wide text-[var(--color-ink)] uppercase',
+  tag: 'inline-flex shrink-0 items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro leading-none font-medium tracking-wide text-[var(--color-ink)] uppercase',
   progress: 'text-[var(--color-ink-subtle)]',
   star: 'h-2.5 w-2.5 text-[var(--color-brand-600)]',
   link: 'transition-colors hover:border-[var(--color-ink)]',

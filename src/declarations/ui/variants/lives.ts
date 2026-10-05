@@ -19,9 +19,9 @@ export const LIVE_BOARD = {
   head: 'flex min-w-0 flex-1 items-center gap-5',
   platform: 'h-14 w-14 shrink-0',
   identity: 'flex min-w-0 flex-col gap-1',
-  creator: 'text-3xl font-black tracking-tight sm:text-4xl',
+  creator: 'text-3xl font-bold tracking-tight sm:text-4xl',
   title: 'truncate text-sm text-[var(--color-ink-subtle)]',
-  status: 'flex items-center gap-2 text-xs font-black tracking-wide uppercase',
+  status: 'flex items-center gap-2 text-xs font-bold tracking-wide uppercase',
   statusLive: 'text-[var(--color-danger)]',
   statusAnnounced: 'text-[var(--color-ink-subtle)]',
   dot: 'h-3.5 w-3.5',
@@ -43,7 +43,7 @@ export const LIVE_BOARD = {
 
 export const LIVE_NAV = {
   dotPulse: 'live-pulse',
-  labelLive: 'font-black text-[var(--color-danger)]',
+  labelLive: 'font-bold text-[var(--color-danger)]',
 } as const
 
 /**
@@ -60,7 +60,7 @@ export const LIVE_URGENT = {
   rowAnnounced: 'border-[var(--color-border)]',
   dot: 'h-7 w-7 shrink-0',
   text: 'min-w-0 flex-1 truncate font-bold tracking-tight',
-  go: 'shrink-0 text-sm font-black text-[var(--color-danger)]',
+  go: 'shrink-0 text-sm font-bold text-[var(--color-danger)]',
 } as const
 
 /**
@@ -77,12 +77,12 @@ export const LIVE_REPORT = {
   figure:
     'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5 py-4',
   figureLabel: PROPERTY_LABEL,
-  figureValue: 'text-3xl font-black tracking-tight tabular-nums',
+  figureValue: 'text-3xl font-bold tracking-tight tabular-nums',
   // Timeline
   chart: 'flex h-40 items-end gap-0.5',
   bar: 'group relative flex h-full flex-1 items-end',
   barFill:
-    'w-full rounded-t-[4px] bg-[var(--color-brand-600)] transition-colors group-hover:bg-[var(--color-brand-800)]',
+    'w-full rounded-t-sm bg-[var(--color-brand-600)] transition-colors group-hover:bg-[var(--color-brand-800)]',
   barEmpty: 'h-px w-full bg-[var(--color-border)]',
   barTip:
     'pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 rounded-[var(--radius-sm)] bg-[var(--color-ink)] px-2 py-1 text-xs whitespace-nowrap text-[var(--color-surface)] group-hover:block',
@@ -143,7 +143,7 @@ export const MEMBER_MODERATION = {
   switch: 'flex justify-center',
   hours: 'flex items-baseline gap-3',
   hoursLabel: PROPERTY_LABEL,
-  hoursValue: 'text-2xl font-black tracking-tight tabular-nums',
+  hoursValue: 'text-2xl font-bold tracking-tight tabular-nums',
   list: 'flex flex-col',
   item: 'border-t border-[var(--color-border)] first:border-t-0',
   row: 'flex w-full flex-wrap items-center gap-x-4 gap-y-1 rounded-[var(--radius-md)] px-2 py-3 text-left transition-colors hover:bg-[var(--color-hover)]',
@@ -170,15 +170,14 @@ export const LIVE_ROSTER = {
   column:
     'flex min-h-28 flex-col gap-2 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] p-3 transition-colors',
   columnOver: 'border-[var(--color-brand-600)] bg-[var(--color-brand-100)]',
-  columnHead: 'flex items-center gap-2 text-xs font-black tracking-wide uppercase',
+  columnHead: 'flex items-center gap-2 text-xs font-bold tracking-wide uppercase',
   columnGlyph: 'h-4 w-4 shrink-0',
   columnEmpty: 'text-xs text-[var(--color-ink-subtle)] italic',
   person:
     'flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2 py-1.5 text-sm font-semibold',
   personMovable: 'cursor-grab active:cursor-grabbing',
   personDragged: 'opacity-40',
-  junior:
-    'ml-auto text-[0.65rem] font-black tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  junior: 'ml-auto text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   toggle: 'self-start',
 } as const
 
@@ -190,7 +189,7 @@ export const LIVE_ROSTER = {
 export const LIVE_GATE = {
   root: 'mx-auto flex w-full max-w-3xl flex-col gap-6',
   card: 'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-6 shadow-[var(--shadow-sm)]',
-  title: 'text-2xl font-black tracking-tight',
+  title: 'text-2xl font-bold tracking-tight',
   lead: 'text-sm text-[var(--color-ink-subtle)]',
   actions: 'flex flex-wrap items-center justify-center gap-3',
   reread: 'self-end',
@@ -203,7 +202,7 @@ export const LIVE_GATE = {
 
 export const LIVE_STARTED_BUBBLE = {
   root: 'surface-enter mx-2 mt-2 flex flex-col gap-2 rounded-[var(--radius-lg)] border-2 border-[var(--color-danger)] bg-[var(--color-surface-raised)] p-3 shadow-[var(--shadow-md)]',
-  title: 'flex items-center gap-2 text-sm font-black text-[var(--color-danger)]',
+  title: 'flex items-center gap-2 text-sm font-bold text-[var(--color-danger)]',
   glyph: 'live-pulse h-4 w-4',
   body: 'text-xs text-[var(--color-ink-subtle)]',
   actions: 'flex items-center gap-2',
@@ -217,6 +216,6 @@ export const LIVE_STARTED_BUBBLE = {
 export const LIVE_PRESENTATION = {
   root: 'flex w-full flex-col gap-4',
   head: 'flex flex-col items-center gap-1 text-center',
-  title: 'text-xl font-black tracking-tight',
+  title: 'text-xl font-bold tracking-tight',
   lead: 'max-w-2xl text-sm text-[var(--color-ink-subtle)]',
 } as const

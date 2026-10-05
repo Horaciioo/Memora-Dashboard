@@ -9,7 +9,7 @@ export const SESSION_CARD = {
   muted: 'bg-[var(--color-surface)]',
   head: 'flex items-start gap-4',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
-  title: 'truncate text-base font-black tracking-tight',
+  title: 'truncate text-base font-bold tracking-tight',
   meta: 'truncate text-sm text-[var(--color-ink-subtle)]',
   foot: 'mt-auto flex items-center justify-between gap-3',
   track: 'h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-sunken)]',
@@ -19,7 +19,7 @@ export const SESSION_CARD = {
   group:
     'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',
   groupHead: 'flex cursor-pointer items-center gap-3',
-  groupTitle: 'text-sm font-black tracking-wide uppercase',
+  groupTitle: 'text-sm font-bold tracking-wide uppercase',
 } as const
 
 /**
@@ -32,7 +32,7 @@ export const SESSION_HERO = {
   body: 'flex flex-wrap items-center gap-x-6 gap-y-4 p-6',
   portrait: 'ring-4 ring-[var(--color-surface-raised)]',
   facts: 'flex min-w-0 flex-1 flex-col gap-1.5',
-  title: 'text-2xl font-black tracking-tight sm:text-3xl',
+  title: 'text-2xl font-bold tracking-tight sm:text-3xl',
   meta: 'flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-[var(--color-ink-subtle)]',
   aside: 'flex shrink-0 items-center gap-4',
   funnel: 'flex h-2 w-full overflow-hidden rounded-full bg-[var(--color-surface-sunken)]',
@@ -50,7 +50,7 @@ export const CANDIDATE_CARD = {
   grid: 'grid gap-3 sm:grid-cols-2',
   card: 'flex cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
-  name: 'truncate font-black tracking-tight',
+  name: 'truncate font-bold tracking-tight',
   meta: 'truncate text-xs text-[var(--color-ink-subtle)]',
   metaEmpty: 'truncate text-xs text-[var(--color-ink-subtle)] italic',
   aside: 'flex shrink-0 flex-col items-end gap-1',
@@ -66,7 +66,7 @@ export const GLOSSARY_STYLES = {
   search: 'h-12 text-base',
   list: 'flex flex-col divide-y divide-[var(--color-border)] overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)]',
   row: 'grid gap-1 px-6 py-5 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-6',
-  term: 'font-black tracking-tight',
+  term: 'font-bold tracking-tight',
   definition: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
   empty: 'py-10 text-center text-sm text-[var(--color-ink-subtle)] italic',
 } as const

@@ -5,7 +5,7 @@
 
 export const DISCORD_MESSAGE = {
   frame:
-    'relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--discord-background)] text-[0.9375rem] leading-[1.375rem] text-[var(--discord-text)]',
+    'relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--discord-background)] text-body leading-[1.375rem] text-[var(--discord-text)]',
   // Small copy control in the top right corner of the announcement
   copyCorner:
     'absolute top-2 right-2 z-10 text-[var(--discord-muted)] hover:text-[var(--discord-heading)]',

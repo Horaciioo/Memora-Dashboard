@@ -87,7 +87,7 @@ export const THEME_REGISTRY = createRegistry(THEME_MAP)
 const FONT_SCALE_MAP: Record<FontScale, PreferenceOption> = {
   sm: { label: 'Petite', short: 'A-', sample: 'text-lg' },
   md: { label: 'Normale', short: 'A', sample: 'text-2xl' },
-  lg: { label: 'Grande', short: 'A+', sample: 'text-[2rem]' },
+  lg: { label: 'Grande', short: 'A+', sample: 'text-3xl' },
 }
 
 export const FONT_SCALE_REGISTRY = createRegistry(FONT_SCALE_MAP)

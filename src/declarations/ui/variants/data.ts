@@ -77,10 +77,10 @@ export const CALENDAR_AGENDA = {
   day: 'grid grid-cols-[6rem_minmax(0,1fr)] gap-4 py-5',
   head: 'flex items-start gap-3',
   number:
-    'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg font-extrabold tabular-nums',
+    'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg font-bold tabular-nums',
   numberToday: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   weekday:
-    'flex flex-col pt-0.5 text-[11px] leading-tight font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'flex flex-col pt-0.5 text-micro leading-tight font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   month: 'font-semibold normal-case first-letter:uppercase',
   rows: 'flex flex-col',
   row: 'flex items-center gap-4 rounded-[var(--radius-md)] px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-hover)]',
@@ -107,10 +107,9 @@ export const CALENDAR_SIDEBAR = {
     'flex w-full items-center justify-between rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-3 text-sm font-semibold',
   mini: 'flex flex-col gap-2',
   miniHead: 'flex items-center justify-between gap-2',
-  miniTitle: 'pl-2 text-sm font-extrabold first-letter:uppercase',
+  miniTitle: 'pl-2 text-sm font-bold first-letter:uppercase',
   miniGrid: 'grid grid-cols-7 gap-y-0.5 text-center',
-  miniWeekday:
-    'py-1 text-[10px] font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  miniWeekday: 'py-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   miniDay:
     'mx-auto flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold tabular-nums transition-colors hover:bg-[var(--color-hover)]',
   miniDayOutside: 'text-[var(--color-ink-subtle)]',
@@ -119,7 +118,7 @@ export const CALENDAR_SIDEBAR = {
   miniDayInRange: 'bg-[var(--color-brand-100)]',
   miniDayPicked: 'ring-2 ring-[var(--color-brand-600)] ring-inset',
   group: 'flex flex-col gap-1',
-  groupTitle: 'px-2 pb-1 text-xs font-black tracking-wide text-[var(--color-ink)] uppercase',
+  groupTitle: 'px-2 pb-1 text-xs font-bold tracking-wide text-[var(--color-ink)] uppercase',
   row: 'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-hover)]',
   rowLabel: 'min-w-0 flex-1 truncate',
   box: 'flex h-5 w-5 shrink-0 items-center justify-center',
@@ -131,7 +130,7 @@ export const CALENDAR_SIDEBAR = {
   searchBar:
     'flex w-full items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface-raised)] px-2.5 py-2 text-[var(--color-ink-subtle)] focus-within:text-[var(--color-ink)]',
   searchInput:
-    'min-w-0 flex-1 bg-transparent text-[15px] text-[var(--color-ink)] outline-none placeholder:text-[var(--color-ink-subtle)]',
+    'min-w-0 flex-1 bg-transparent text-body text-[var(--color-ink)] outline-none placeholder:text-[var(--color-ink-subtle)]',
   search:
     'w-full rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] px-3 py-2 text-sm text-[var(--color-on-field)] outline-none placeholder:text-[var(--color-on-field-subtle)] focus:border-[var(--color-field-border-strong)]',
 } as const
@@ -151,7 +150,7 @@ export const ABSENCE_PAGE = {
     'flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
   grid: 'grid grid-cols-7 gap-y-0.5',
   weekday:
-    'pb-2 text-center text-[11px] font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'pb-2 text-center text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   day: 'relative flex h-14 w-full items-center justify-center text-xl font-bold tabular-nums transition-colors',
   dayFree: 'cursor-pointer rounded-[var(--radius-md)] hover:bg-[var(--color-hover)]',
   dayPast: 'cursor-not-allowed text-[var(--color-ink-subtle)]/50',
@@ -163,7 +162,7 @@ export const ABSENCE_PAGE = {
   dayEdge:
     'cursor-pointer rounded-[var(--radius-md)] bg-[var(--color-brand-300)] text-[var(--color-ink)] hover:bg-[var(--color-brand-400)]',
   list: 'flex flex-col',
-  listTitle: 'mb-2 text-[11px] font-black tracking-wide uppercase',
+  listTitle: 'mb-2 text-micro font-bold tracking-wide uppercase',
   row: 'grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 border-t border-[var(--color-border)] px-1 py-4 md:grid-cols-[13rem_5.5rem_minmax(0,1fr)_11rem]',
   rowDates: 'text-base font-bold',
   rowDuration: 'text-sm text-[var(--color-ink-subtle)]',
@@ -218,7 +217,7 @@ export const BOARD_STYLES = {
   // Card sits lighter than its column so the two glass layers do not muddy
   cardGlass: 'bg-[var(--color-surface-raised)]/70 backdrop-blur-md',
   cardTint: 'accent-tint accent-border backdrop-blur-md',
-  cardTitle: 'text-[15px] leading-snug font-bold',
+  cardTitle: 'text-body leading-snug font-bold',
   // Glyph flowing before a title
   cardGlyph: 'mr-1.5',
 } as const
@@ -291,7 +290,7 @@ export const CALENDAR_STYLES = {
   frame:
     'overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface',
   toolbar: 'flex flex-wrap items-center gap-2 pb-3',
-  period: 'text-xl font-extrabold tracking-tight first-letter:uppercase sm:text-2xl',
+  period: 'text-xl font-bold tracking-tight first-letter:uppercase sm:text-2xl',
   weekdays:
     'border-b border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   weekdaysMonth: 'grid grid-cols-7',
@@ -315,7 +314,7 @@ export const CALENDAR_STYLES = {
   zoneLayer: 'pointer-events-none absolute inset-0 flex flex-col',
   zoneBand: 'flex-1',
   zoneLabel:
-    'relative truncate rounded-[var(--radius-sm)] px-1.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase',
+    'relative truncate rounded-[var(--radius-sm)] px-1.5 py-0.5 text-micro font-semibold tracking-wide uppercase',
   bar: 'relative flex min-h-6 cursor-grab items-center gap-1.5 px-1.5 py-0.5 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
   barStart: 'ml-0 rounded-l-[var(--radius-sm)]',
   barEnd: 'mr-0 rounded-r-[var(--radius-sm)]',
@@ -415,11 +414,11 @@ export const CALENDAR_GRID_STYLES = {
   painted:
     'pointer-events-none absolute inset-x-0.5 z-20 rounded-[var(--radius-sm)] border-2 border-dashed border-[var(--color-brand-600)] bg-[var(--color-brand-soft)]/60',
   paintedLabel:
-    'absolute inset-x-0 top-1 text-center text-[11px] font-bold text-[var(--color-brand-800)] tabular-nums',
+    'absolute inset-x-0 top-1 text-center text-micro font-bold text-[var(--color-brand-800)] tabular-nums',
   dropTarget: 'ring-2 ring-[var(--color-brand-400)] ring-inset',
   nowLine: 'pointer-events-none absolute inset-x-0 z-30 h-0.5 bg-[var(--color-danger)]',
   nowLabel:
-    'absolute left-1 -translate-y-1/2 rounded-full bg-[var(--color-danger)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--color-on-brand)] tabular-nums',
+    'absolute left-1 -translate-y-1/2 rounded-full bg-[var(--color-danger)] px-1.5 py-0.5 text-micro font-bold text-[var(--color-on-brand)] tabular-nums',
   cellAdd:
     'absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover/cell:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-brand-600)] focus-visible:opacity-100',
   cellAddIcon: 'h-4 w-4',
@@ -430,7 +429,7 @@ export const CALENDAR_GRID_STYLES = {
   agendaHead: 'flex min-h-9 items-center gap-2 px-1',
   agendaDayName: 'text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   agendaToday:
-    'inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--color-brand-600)] px-1.5 text-[11px] font-bold text-[var(--color-on-brand)]',
+    'inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[var(--color-brand-600)] px-1.5 text-micro font-bold text-[var(--color-on-brand)]',
   agendaAdd:
     'touch-target ml-auto flex items-center justify-center rounded-full text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)]',
 } as const
@@ -447,7 +446,7 @@ export const FILTER_STYLES = {
   iconButtonActive: 'border-[var(--color-brand-400)] text-[var(--color-brand-600)]',
   glyph: 'h-4 w-4',
   tally:
-    'absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-1 text-[10px] font-bold text-[var(--color-on-brand)] tabular-nums',
+    'absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-1 text-micro font-bold text-[var(--color-on-brand)] tabular-nums',
   searchGroup: 'flex items-center gap-2',
   searchInput:
     'search-expand w-0 shrink-0 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 text-sm text-[var(--color-ink)] opacity-0 outline-none placeholder:text-[var(--color-ink-subtle)]',
@@ -471,7 +470,7 @@ export const PERMISSION_TOGGLE_STYLES = {
   search: 'w-full sm:max-w-xs',
   tally: 'text-xs text-[var(--color-ink-subtle)] tabular-nums',
   dirty:
-    'rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-on-brand)] tabular-nums',
+    'rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-2 py-0.5 text-micro font-semibold text-[var(--color-on-brand)] tabular-nums',
   section: 'flex flex-col gap-2',
   sectionTitle: 'text-sm font-bold',
   rows: 'rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-3',
@@ -497,9 +496,9 @@ export const SUMMARY_BAR = {
   bar: 'grid grid-cols-2 gap-x-6 gap-y-4 border-y border-[var(--color-border)] py-4 sm:flex sm:flex-wrap sm:divide-x sm:divide-[var(--color-border)] sm:gap-0',
   item: 'flex min-w-0 flex-col gap-1 sm:flex-1 sm:px-5 sm:first:pl-0 sm:last:pr-0',
   label:
-    'font-[family-name:var(--font-mono)] text-[11px] tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase',
   value: 'flex items-baseline gap-2',
-  figure: 'text-2xl font-black tracking-tight tabular-nums',
+  figure: 'text-2xl font-bold tracking-tight tabular-nums',
   hint: 'text-xs text-[var(--color-ink-subtle)]',
 } as const
 
@@ -527,7 +526,7 @@ export const ABSENCE_WIZARD = {
   // Dashed run between two chips
   rail: 'absolute left-4 hidden w-0 -translate-x-1/2 border-l-2 border-dashed border-[var(--color-border-strong)] transition-colors md:block',
   railDone: 'border-[var(--color-success)]',
-  chip: 'z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-black tabular-nums transition-colors',
+  chip: 'z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold tabular-nums transition-colors',
   chipCurrent: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   // The check glyph paints itself in the success tones
   chipDone: 'bg-[var(--color-success-soft)] ring-2 ring-[var(--color-success)] ring-inset',
@@ -539,8 +538,8 @@ export const ABSENCE_WIZARD = {
     'relative flex min-h-[42rem] flex-col justify-center rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6 sm:p-8',
   tail: 'bubble-tail hidden md:block',
   stage: 'course-pop flex min-w-0 flex-col gap-6',
-  stageTitle: 'text-2xl font-black tracking-tight sm:text-3xl',
-  hint: 'mt-1.5 text-[15px] text-[var(--color-ink-subtle)]',
+  stageTitle: 'text-2xl font-bold tracking-tight sm:text-3xl',
+  hint: 'mt-1.5 text-body text-[var(--color-ink-subtle)]',
   // Divider under the calendar
   summary: 'min-h-24 border-t border-[var(--color-border)] pt-6 text-center',
   sentence: 'text-xl font-bold tracking-tight text-balance',
@@ -550,10 +549,10 @@ export const ABSENCE_WIZARD = {
   actions: 'flex flex-wrap items-center justify-center gap-3 pt-2',
   success: 'flex flex-col items-center gap-4 py-4 text-center',
   successGlyph: 'course-check h-20 w-20 text-[var(--color-success)]',
-  thanks: 'text-2xl font-black tracking-tight sm:text-3xl',
+  thanks: 'text-2xl font-bold tracking-tight sm:text-3xl',
   reasonBlock: 'flex w-full max-w-md flex-col gap-2 text-left',
-  reasonLabel: 'text-[11px] font-black tracking-wide uppercase',
+  reasonLabel: 'text-micro font-bold tracking-wide uppercase',
   reasonBox:
-    'rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[15px] leading-relaxed break-words whitespace-pre-wrap',
+    'rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-body leading-relaxed break-words whitespace-pre-wrap',
   header: 'flex justify-end',
 } as const

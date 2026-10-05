@@ -20,7 +20,7 @@ export const HOME_STYLES = {
   stamp:
     'flex w-12 shrink-0 flex-col items-center font-[family-name:var(--font-mono)] leading-none tabular-nums',
   stampDay: 'text-lg font-bold',
-  stampMonth: 'text-[0.625rem] tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  stampMonth: 'text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase',
   // Today's row
   rowToday: 'bg-[var(--color-brand-50)]',
   marker: `flex shrink-0 items-center gap-1.5 ${PROPERTY_LABEL}`,
@@ -42,7 +42,7 @@ export const HOME_STYLES = {
   urgentGrid: 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3',
   urgentTile:
     'flex w-full cursor-pointer items-start gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
-  urgentTitle: 'font-black tracking-tight',
+  urgentTitle: 'font-bold tracking-tight',
   urgentScope: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
   urgentText: 'line-clamp-2 text-sm text-[var(--color-ink-subtle)]',
   // Urgent box
@@ -82,11 +82,11 @@ export const HOME_FLOW = {
   focusDue: 'text-sm font-semibold text-[var(--color-ink-subtle)]',
   focusBody: 'flex flex-col gap-2',
   focusTitle: 'text-2xl font-bold tracking-tight',
-  focusMeta: 'text-[15px] text-[var(--color-ink-subtle)]',
+  focusMeta: 'text-body text-[var(--color-ink-subtle)]',
   focusNote:
     'flex max-w-lg flex-col gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3',
-  focusNoteTitle: 'text-[11px] font-black tracking-wide uppercase',
-  focusNoteText: 'text-[15px] leading-relaxed',
+  focusNoteTitle: 'text-micro font-bold tracking-wide uppercase',
+  focusNoteText: 'text-body leading-relaxed',
   focusActions: 'flex flex-wrap gap-3',
   // What follows
   queue: 'flex flex-col',

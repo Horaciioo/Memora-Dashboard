@@ -4,7 +4,7 @@
  */
 
 export const DISCORD_REPLICA = {
-  root: 'relative grid h-[34rem] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--discord-background)] text-[0.9375rem] leading-[1.375rem] text-[var(--discord-text)] shadow-[var(--shadow-scene)] md:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[14rem_minmax(0,1fr)_14rem]',
+  root: 'relative grid h-[34rem] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--discord-background)] text-body leading-[1.375rem] text-[var(--discord-text)] shadow-[var(--shadow-scene)] md:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[14rem_minmax(0,1fr)_14rem]',
   // Channel sidebar
   sidebar: 'hidden min-h-0 flex-col bg-[var(--discord-sidebar)] md:flex',
   server:
@@ -48,7 +48,7 @@ export const DISCORD_REPLICA = {
   head: 'flex flex-wrap items-center gap-x-1.5',
   author: 'font-medium text-[var(--discord-heading)]',
   appBadge:
-    'rounded-[3px] bg-[var(--discord-blurple)] px-1 text-[0.625rem] leading-4 font-semibold text-white',
+    'rounded-[3px] bg-[var(--discord-blurple)] px-1 text-micro leading-4 font-semibold text-white',
   time: 'text-xs text-[var(--discord-muted)]',
   content: 'break-words whitespace-pre-wrap',
   strong: 'font-bold text-[var(--discord-heading)]',
@@ -202,7 +202,7 @@ export const BRANCHING = {
 export const DISCORD_EXAMPLE = {
   figure: 'flex flex-col gap-2',
   frame:
-    'relative overflow-hidden rounded-[var(--radius-lg)] border-l-4 bg-[var(--discord-background)] py-1 text-[0.9375rem] leading-[1.375rem] text-[var(--discord-text)] shadow-[var(--shadow-sm)]',
+    'relative overflow-hidden rounded-[var(--radius-lg)] border-l-4 bg-[var(--discord-background)] py-1 text-body leading-[1.375rem] text-[var(--discord-text)] shadow-[var(--shadow-sm)]',
   frameGood: 'border-[var(--color-apple-green)]',
   frameBad: 'border-[var(--color-apple-red)]',
   frameNeutral: 'border-[var(--discord-quote)]',
@@ -219,6 +219,7 @@ export const DISCLOSURE = {
   root: 'group rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)]',
   summary:
     'flex cursor-pointer list-none items-center gap-3 px-5 py-4 font-bold text-[var(--color-apple-orange)] [&::-webkit-details-marker]:hidden',
-  chevron: 'h-4 w-4 transition-transform duration-[var(--motion-duration-base)] group-open:rotate-90',
+  chevron:
+    'h-4 w-4 transition-transform duration-[var(--motion-duration-base)] group-open:rotate-90',
   body: 'course-erase-in flex flex-col gap-4 border-t border-[var(--color-border)] px-5 py-4',
 } as const

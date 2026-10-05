@@ -7,19 +7,19 @@ import type { AvatarSize } from '@/declarations/ui/variants/surfaces'
  */
 
 export const BUTTON_STYLES = {
-  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] text-sm font-medium transition-[background-color,border-color,color,opacity,filter] disabled:pointer-events-none disabled:opacity-50',
+  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-[background-color,border-color,color,filter] duration-[var(--motion-duration-fast)] disabled:pointer-events-none disabled:opacity-50',
   primary:
     'bg-[var(--color-brand-600)] px-4 py-2 text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
   secondary:
-    'border border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] px-3 py-2 hover:bg-[var(--color-hover)]',
+    'border border-[var(--color-border-strong)] bg-[var(--color-background)] px-3 py-2 hover:bg-[var(--color-surface-sunken)]',
   ghost:
     'px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // Hover deepens
-  success: 'bg-[var(--color-success)] px-4 py-2 text-[var(--color-on-brand)] hover:brightness-90',
-  danger: 'bg-[var(--color-danger)] px-4 py-2 text-[var(--color-on-brand)] hover:brightness-90',
+  success: 'bg-[var(--color-success)] px-4 py-2 text-[var(--color-on-solid)] hover:brightness-90',
+  danger: 'bg-[var(--color-danger)] px-4 py-2 text-[var(--color-on-solid)] hover:brightness-90',
   // 44px hit area on touch
-  icon: 'h-9 w-9 min-h-11 min-w-11 rounded-[var(--radius-md)] p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] md:min-h-0 md:min-w-0',
-  link: 'p-0 text-[var(--color-brand-600)] underline-offset-2 hover:underline',
+  icon: 'h-9 w-9 min-h-11 min-w-11 rounded-full p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] md:min-h-0 md:min-w-0',
+  link: 'p-0 text-[var(--color-ink-accent)] underline-offset-2 hover:underline',
   // Square footprint for a label-less button
   square: 'h-9 w-9 min-h-11 min-w-11 shrink-0 p-0 md:min-h-0 md:min-w-0',
 } as const
@@ -32,9 +32,8 @@ export type ButtonVariant = keyof Omit<typeof BUTTON_STYLES, 'base'>
  */
 
 export const SEGMENTED_STYLES = {
-  group:
-    'flex items-center gap-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-1',
-  option: 'rounded-[var(--radius-sm)] px-2 py-1 text-xs font-medium transition-colors',
+  group: 'flex items-center gap-1 rounded-full bg-[var(--color-surface-sunken)] p-1',
+  option: 'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
   selected: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   idle: 'text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
 } as const
@@ -44,14 +43,14 @@ export const SEGMENTED_STYLES = {
  * @type {string}
  */
 
-export const PROPERTY_LABEL = 'text-xs font-black tracking-wide text-[var(--color-ink)] uppercase'
+export const PROPERTY_LABEL = 'text-xs font-bold tracking-wide text-[var(--color-ink)] uppercase'
 
 /**
  * Property content
  * @type {string}
  */
 
-export const PROPERTY_VALUE = 'font-light text-[var(--color-ink)]/80 italic'
+export const PROPERTY_VALUE = 'text-[var(--color-ink)]'
 
 /**
  * Spacing between and within properties
@@ -85,12 +84,12 @@ export const FIELD_STYLES = {
   label: PROPERTY_LABEL,
   labelRow: 'flex flex-wrap items-center gap-1.5',
   control:
-    'w-full rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] px-3 py-2 text-sm text-[var(--color-on-field)] transition-colors placeholder:text-[var(--color-on-field-subtle)] hover:border-[var(--color-field-border-strong)] disabled:opacity-60',
+    'min-h-11 w-full rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] px-3.5 py-2 text-sm text-[var(--color-on-field)] transition-colors placeholder:text-[var(--color-on-field-subtle)] hover:border-[var(--color-field-border-strong)] disabled:opacity-60',
   invalid: 'border-[var(--color-danger)]',
   hint: 'text-xs text-[var(--color-ink-subtle)]',
   error: 'flex items-center gap-1 text-xs text-[var(--color-danger)]',
   notice: 'flex items-center gap-1 text-xs font-medium text-[var(--color-caution)]',
-  required: 'text-[var(--color-brand-600)]',
+  required: 'text-[var(--color-ink-accent)]',
   textarea: 'min-h-28 resize-y leading-relaxed',
   // Control sharing its line with the glyph picker
   row: 'flex min-w-0 items-center gap-2',
@@ -127,7 +126,7 @@ export const TOGGLE_STYLES = {
   knobOn: 'translate-x-6',
   knobGlyph: 'h-2.5 w-2.5',
   checkbox:
-    'flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--radius-sm)] border transition-colors',
+    'flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--radius-xs)] border transition-colors',
   checkboxOff: 'border-[var(--color-border-strong)] bg-[var(--color-surface-raised)]',
   checkboxOn:
     'border-[var(--color-brand-600)] bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
@@ -144,9 +143,9 @@ export const TRI_TOGGLE_STYLES = {
   slot: 'flex h-6 w-7 items-center justify-center rounded-full text-[var(--color-ink-subtle)] transition-colors',
   slotIdle: 'hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   glyph: 'h-3.5 w-3.5',
-  denied: 'bg-[var(--color-danger)] text-[var(--color-on-brand)]',
-  inherited: 'bg-[var(--color-neutral)] text-[var(--color-on-brand)]',
-  allowed: 'bg-[var(--color-success)] text-[var(--color-on-brand)]',
+  denied: 'bg-[var(--color-danger)] text-[var(--color-on-solid)]',
+  inherited: 'bg-[var(--color-neutral)] text-[var(--color-on-solid)]',
+  allowed: 'bg-[var(--color-success)] text-[var(--color-on-solid)]',
   disabled: 'pointer-events-none opacity-50',
 } as const
 
@@ -158,7 +157,7 @@ export const TRI_TOGGLE_STYLES = {
 export const TAGS_STYLES = {
   field:
     'flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] px-2 py-1.5',
-  tag: 'inline-flex items-center gap-1 rounded-[var(--radius-sm)] bg-[var(--color-brand-600)] px-2 py-0.5 text-xs text-[var(--color-on-brand)]',
+  tag: 'inline-flex items-center gap-1 rounded-full bg-[var(--color-brand-600)] px-2.5 py-0.5 text-xs text-[var(--color-on-brand)]',
   input:
     'min-w-24 flex-1 bg-transparent px-1 text-sm text-[var(--color-on-field)] outline-none placeholder:text-[var(--color-on-field-subtle)]',
   remove: 'opacity-70 transition-opacity hover:opacity-100',
@@ -187,7 +186,7 @@ export const FILE_INPUT_STYLES = {
 
 export const OPTION_MARK_STYLES = {
   dot: 'h-3.5 w-[3px] shrink-0 rounded-full',
-  priority: 'shrink-0 text-sm leading-none font-extrabold tracking-tighter',
+  priority: 'shrink-0 text-sm leading-none font-bold tracking-tight',
   emoji: 'shrink-0 text-base leading-none',
   glyph: 'h-4 w-4 shrink-0',
 } as const
@@ -206,11 +205,11 @@ export const SELECT_MENU_STYLES = {
   placeholder: `truncate ${EMPTY_VALUE}`,
   // Category heading inside the list
   group:
-    'px-2.5 pt-3 pb-1 text-[10px] font-extrabold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'px-2.5 pt-3 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   chevron: 'h-4 w-4 shrink-0 text-[var(--color-on-field-subtle)] transition-transform',
   chevronOpen: 'rotate-180',
   panel:
-    'popover-enter fixed z-[70] flex max-h-72 flex-col overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
+    'popover-enter fixed z-[70] flex max-h-72 flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   search:
     'w-full border-b border-[var(--color-border)] bg-transparent px-3 py-2 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]',
   // Rows breathe
@@ -278,20 +277,20 @@ export const SELECT_MENU_MARK_SIZES = {
 
 export const DATE_PICKER_STYLES = {
   panel:
-    'popover-enter fixed z-[70] w-72 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
+    'popover-enter fixed z-[70] w-72 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   head: 'flex items-center justify-between gap-2 border-b border-[var(--color-border)] px-2 py-2',
   month: 'flex-1 text-center text-sm font-bold first-letter:uppercase',
   step: 'flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   weekdays:
-    'grid grid-cols-7 px-2 pt-2 text-center text-[10px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'grid grid-cols-7 px-2 pt-2 text-center text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   grid: 'grid grid-cols-7 gap-y-0.5 p-2',
-  day: 'flex h-8 items-center justify-center rounded-[var(--radius-sm)] text-sm tabular-nums transition-colors hover:bg-[var(--color-surface)]',
+  day: 'flex h-8 items-center justify-center rounded-full text-sm tabular-nums transition-colors hover:bg-[var(--color-surface)]',
   dayOutside: 'text-[var(--color-ink-subtle)]/60',
-  dayToday: 'font-bold text-[var(--color-brand-600)]',
+  dayToday: 'font-bold text-[var(--color-ink-accent)]',
   daySelected:
     'bg-[var(--color-brand-600)] text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
   // Days between the two range edges
-  dayInRange: 'rounded-none bg-[var(--color-brand-soft)] text-[var(--color-brand-600)]',
+  dayInRange: 'rounded-none bg-[var(--color-brand-soft)] text-[var(--color-ink-accent)]',
   dayRangeStart: 'rounded-r-none',
   dayRangeEnd: 'rounded-l-none',
   footer: 'flex items-center gap-2 border-t border-[var(--color-border)] px-2 py-2',
@@ -319,10 +318,10 @@ export const EMOJI_PICKER_STYLES = {
 export const EMOJI_DIALOG_STYLES = {
   body: 'flex flex-col gap-5',
   family: 'flex flex-col gap-2',
-  familyName: 'text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  familyName: 'text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   grid: 'grid grid-cols-8 gap-1 sm:grid-cols-10 lg:grid-cols-12',
   cell: 'flex h-9 w-full items-center justify-center rounded-[var(--radius-sm)] bg-transparent text-xl leading-none transition-transform hover:scale-125',
-  cellSelected: 'scale-110 text-[var(--color-brand-600)]',
+  cellSelected: 'scale-110',
   tally: 'text-xs text-[var(--color-ink-subtle)] tabular-nums',
   empty: 'py-8 text-center text-sm text-[var(--color-ink-subtle)]',
   footer: 'flex w-full min-w-0 items-center gap-2',
@@ -379,17 +378,18 @@ export const COLOUR_WHEEL_STYLES = {
 
 export const SCALE_INPUT = {
   wrap: 'flex flex-col gap-1.5',
-  track: 'flex w-full gap-1',
-  step: 'h-8 flex-1 rounded-[var(--radius-md)] border transition-all disabled:cursor-not-allowed disabled:opacity-60',
+  track: 'flex w-full items-center justify-between gap-1',
+  step: 'size-7 shrink-0 rounded-full border transition-all duration-[var(--motion-duration-base)] disabled:cursor-not-allowed disabled:opacity-60',
   stepIdle: 'border-[var(--color-field-border)] bg-[var(--color-field)]',
   stepFilled: 'border-[var(--color-brand-300)] bg-[var(--color-brand-soft)]',
-  stepActive: 'flex-[2] border-[var(--color-brand-600)] bg-[var(--color-brand-600)]',
+  stepActive:
+    'scale-110 border-[var(--color-brand-600)] bg-[var(--color-brand-600)] shadow-[var(--shadow-sm)]',
   endpoints: 'flex items-center justify-between text-xs text-[var(--color-ink-subtle)]',
   endpoint: 'truncate',
   // Bare figures
   numerals: 'flex w-full items-end justify-between px-1',
   numeral:
-    'text-4xl leading-none font-black tabular-nums transition-[opacity,transform] duration-[var(--motion-duration-fast)] disabled:cursor-not-allowed',
+    'text-4xl leading-none font-bold tabular-nums transition-[opacity,transform] duration-[var(--motion-duration-fast)] disabled:cursor-not-allowed',
   numeralIdle: 'opacity-35 hover:opacity-70',
   numeralActive: 'scale-125 opacity-100',
 } as const
@@ -462,7 +462,7 @@ export const BLOCK_EDITOR = {
   page: 'flex min-h-40 flex-col gap-1 px-4 py-3 text-sm text-[var(--color-on-field)]',
   row: 'flex items-start gap-2',
   // Placeholder on the focused empty line
-  line: 'min-w-0 flex-1 leading-relaxed outline-none empty:before:pointer-events-none empty:before:text-[var(--color-on-field-subtle)] focus:empty:before:content-[attr(data-placeholder)] [&_a]:text-[var(--color-brand-600)] [&_a]:underline [&_code]:rounded-[var(--radius-sm)] [&_code]:bg-[var(--color-surface-sunken)] [&_code]:px-1 [&_code]:font-[family-name:var(--font-mono)] [&_code]:text-[0.9em]',
+  line: 'min-w-0 flex-1 leading-relaxed outline-none empty:before:pointer-events-none empty:before:text-[var(--color-on-field-subtle)] focus:empty:before:content-[attr(data-placeholder)] [&_a]:text-[var(--color-ink-accent)] [&_a]:underline [&_code]:rounded-[var(--radius-sm)] [&_code]:bg-[var(--color-surface-sunken)] [&_code]:px-1 [&_code]:font-[family-name:var(--font-mono)] [&_code]:text-[0.9em]',
   kinds: {
     paragraph: '',
     heading1: 'pt-3',
@@ -476,7 +476,7 @@ export const BLOCK_EDITOR = {
   },
   lineKinds: {
     paragraph: '',
-    heading1: 'text-xl font-black tracking-tight',
+    heading1: 'text-xl font-bold tracking-tight',
     heading2: 'text-lg font-bold tracking-tight',
     heading3: 'text-base font-bold',
     bullet: '',

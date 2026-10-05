@@ -25,6 +25,8 @@
   --color-brand-900: #4f2230;
   --color-on-brand: #3a1822;
   --color-brand-soft: #faeaec;
+  /* Label over a deep solid fill */
+  --color-on-solid: #fffefb;
 
   /* Leaf green: warmth, comfort */
   --color-leaf-50: #f7faeb;

@@ -61,7 +61,7 @@ export const RAIL_POPOVER = {
   // Glyph above the title
   head: 'relative flex shrink-0 flex-col items-center gap-1.5 border-b border-[var(--color-border)] px-4 pt-5 pb-4 text-center',
   headGlyph: 'h-8 w-8 shrink-0',
-  headTitle: 'text-xl leading-none font-black tracking-tight',
+  headTitle: 'text-xl leading-none font-bold tracking-tight',
   headMeta: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
   headAction: 'absolute top-2 right-2',
   body: 'min-h-0 flex-1 overflow-y-auto p-2',
@@ -91,7 +91,7 @@ export const LEFT_SIDEBAR = {
   navGroupChevronCollapsed: '-rotate-90',
   navGroupItems: 'flex flex-col gap-0.5',
   navLink:
-    'group flex items-center gap-3 rounded-[var(--radius-md)] py-1.5 pr-2.5 pl-4 text-[17px] font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)]',
+    'group flex items-center gap-3 rounded-[var(--radius-md)] py-1.5 pr-2.5 pl-4 text-lg font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)]',
   navLinkActive: 'font-bold text-[var(--color-brand-600)]',
   navLabel: 'relative',
   navIcon: 'h-[18px] w-[18px] shrink-0 transition-colors',
@@ -106,7 +106,7 @@ export const LEFT_SIDEBAR = {
   footerIcon: 'h-4 w-4 shrink-0',
   // Version under the nav
   version:
-    'mx-3 mt-2 mb-1 shrink-0 self-start rounded-[var(--radius-sm)] px-2 py-1 font-[family-name:var(--font-mono)] text-[11px] tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+    'mx-3 mt-2 mb-1 shrink-0 self-start rounded-[var(--radius-sm)] px-2 py-1 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // View tints need a page plate
   footerPlate:
     'rail-reset bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)] hover:bg-[var(--color-hover)]',
@@ -119,9 +119,9 @@ export const LEFT_SIDEBAR = {
 
 export const SEARCH_LAUNCHER = {
   bar: 'glass-panel flex w-full items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-2 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
-  barLabel: 'flex-1 truncate text-[15px]',
+  barLabel: 'flex-1 truncate text-body',
   barShortcut:
-    'shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-[10px] font-medium text-[var(--color-ink-subtle)]',
+    'shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro font-medium text-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -187,7 +187,7 @@ export const MOBILE_MORE = {
   wrapper: 'flex flex-col gap-5',
   section: 'flex flex-col gap-2',
   sectionLabel:
-    'px-1 text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'px-1 text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   grid: 'grid grid-cols-3 gap-2',
   tile: 'flex flex-col items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-3 text-center transition-colors hover:border-[var(--color-border-strong)]',
   tileIcon: 'h-5 w-5 text-[var(--color-ink-subtle)]',
@@ -245,7 +245,7 @@ export const MEMBER_BLOCK = {
   divisionLogo: 'absolute -right-3 -bottom-3 h-14 w-14 drop-shadow-md',
   // Division stamped on the portrait's corner
   division:
-    'absolute -right-1 -bottom-1 flex h-10 min-w-10 items-center justify-center rounded-full bg-[var(--color-brand-600)] px-1.5 text-sm font-black text-[var(--color-on-brand)] ring-4 ring-[var(--color-surface-raised)]',
+    'absolute -right-1 -bottom-1 flex h-10 min-w-10 items-center justify-center rounded-full bg-[var(--color-brand-600)] px-1.5 text-sm font-bold text-[var(--color-on-brand)] ring-4 ring-[var(--color-surface-raised)]',
   portrait:
     'block shrink-0 rounded-full ring-4 ring-[var(--color-surface-raised)] transition-[filter] enabled:cursor-pointer enabled:hover:brightness-95 disabled:cursor-default',
   // Role glyph pinned to the portrait's corner
@@ -267,16 +267,16 @@ export const MEMBER_FILE = {
   // Rail follows the scroll on wide screens only
   rail: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)] lg:sticky lg:top-6',
   head: 'flex flex-col items-center gap-2 px-5 pt-7 text-center',
-  name: 'text-xl font-black tracking-tight break-words',
-  role: 'text-xs font-black tracking-wide text-[var(--color-brand-800)] uppercase',
+  name: 'text-xl font-bold tracking-tight break-words',
+  role: 'text-xs font-bold tracking-wide text-[var(--color-brand-800)] uppercase',
   status:
     'inline-flex items-center gap-1.5 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-2.5 py-1 text-xs font-semibold text-[var(--color-ink-subtle)]',
   // Dismissed or resigned
-  departed: 'cursor-help text-xs font-black tracking-wide text-[var(--color-danger)] uppercase',
+  departed: 'cursor-help text-xs font-bold tracking-wide text-[var(--color-danger)] uppercase',
   statusGlyph: 'h-4 w-4 shrink-0',
   functions: 'flex items-center justify-center gap-2',
   body: 'mt-5 border-t border-[var(--color-border)] p-5',
-  groupTitle: 'text-[11px] font-black tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  groupTitle: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   lock: 'px-5 pt-3 text-center',
   // Property list of a rail
   railList: 'flex flex-col gap-5',
@@ -316,7 +316,7 @@ export const STAGE_LIST = {
     'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--color-border-strong)] text-[var(--color-ink-subtle)]',
   stageBody: 'flex min-w-0 flex-1 flex-col gap-1.5 pt-1',
   stageHead: 'flex min-w-0 flex-wrap items-center gap-2.5',
-  stageTitle: 'text-base font-black tracking-tight',
+  stageTitle: 'text-base font-bold tracking-tight',
   stageLead: 'text-sm text-[var(--color-ink-subtle)]',
   stageActions: 'flex flex-wrap items-center gap-3',
 } as const
@@ -343,7 +343,7 @@ export const SEAL_BLOCK = {
   hint: 'text-sm font-medium',
   value: 'flex flex-wrap items-center gap-2',
   window:
-    'inline-flex items-center gap-1.5 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-0.5 text-[11px] text-[var(--color-ink-subtle)]',
+    'inline-flex items-center gap-1.5 rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-0.5 text-micro text-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -356,12 +356,12 @@ export const TWO_FACTOR_BLOCK = {
   qr: 'shrink-0 self-center rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-scan-ground)] p-3 [&>svg]:h-40 [&>svg]:w-40',
   aside: 'flex min-w-0 flex-1 flex-col gap-3',
   secret:
-    'flex items-center justify-between gap-2 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] px-3 py-2 font-[family-name:var(--font-mono)] text-sm tracking-[0.18em] break-all',
+    'flex items-center justify-between gap-2 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] px-3 py-2 font-[family-name:var(--font-mono)] text-sm tracking-wide break-all',
   codes: 'grid grid-cols-2 gap-1.5 sm:grid-cols-3',
-  code: 'rounded-[var(--radius-sm)] bg-[var(--color-surface-sunken)] px-2 py-1 text-center font-[family-name:var(--font-mono)] text-xs tracking-wider',
+  code: 'rounded-[var(--radius-sm)] bg-[var(--color-surface-sunken)] px-2 py-1 text-center font-[family-name:var(--font-mono)] text-xs tracking-wide',
   codeSpent: 'line-through opacity-40',
   digits:
-    'w-full rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] px-3 py-2 text-center font-[family-name:var(--font-mono)] text-lg tracking-[0.5em] text-[var(--color-on-field)] transition-colors hover:border-[var(--color-field-border-strong)]',
+    'w-full rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] px-3 py-2 text-center font-[family-name:var(--font-mono)] text-lg tracking-wide text-[var(--color-on-field)] transition-colors hover:border-[var(--color-field-border-strong)]',
   panel: 'flex flex-col gap-4',
   field: 'flex flex-col gap-1.5',
   fieldLabel: PROPERTY_LABEL,
@@ -431,7 +431,7 @@ export const ACCESS_CONSOLE = {
   railHidden: 'hidden lg:flex',
   category: 'flex flex-col gap-1',
   categoryHead:
-    'flex items-center gap-2 px-1 pb-1 text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'flex items-center gap-2 px-1 pb-1 text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   row: 'group flex w-full items-center gap-2.5 rounded-[var(--radius-md)] px-2.5 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)]',
   rowActive: 'bg-[var(--color-hover)] font-medium',
   rowLocked: 'opacity-60',
@@ -516,8 +516,7 @@ export const CREATOR_SWITCH = {
 export const DIVIDER_BLOCK = {
   row: 'flex items-center gap-4 py-6',
   rule: 'h-px flex-1 bg-[var(--color-border)]',
-  label:
-    'shrink-0 text-[11px] font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  label: 'shrink-0 text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   // Standalone rule between two list rows
   medium: 'h-px w-full bg-[var(--color-border-strong)]',
 } as const
@@ -533,21 +532,21 @@ export const CHANGELOG_BOARD = {
   hero: 'relative flex flex-col items-center gap-5 px-4 pt-6 pb-4 text-center',
   stage: 'flex flex-col items-center gap-1 [transform-style:preserve-3d]',
   eyebrow:
-    'font-[family-name:var(--font-mono)] text-xs font-medium tracking-[0.3em] text-[var(--color-ink-subtle)] uppercase',
+    'font-[family-name:var(--font-mono)] text-xs font-medium tracking-wide text-[var(--color-ink-subtle)] uppercase',
   numeral:
-    'version-extrude font-[family-name:var(--font-display)] text-7xl leading-none font-black tracking-tight tabular-nums sm:text-9xl',
+    'version-extrude font-[family-name:var(--font-display)] text-7xl leading-none font-bold tracking-tight tabular-nums sm:text-9xl',
   date: 'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-subtle)] uppercase',
   intro: 'max-w-2xl text-lg leading-relaxed text-balance text-[var(--color-ink)] sm:text-xl',
   // Three figures doubling as the way into each category
   counts: 'mt-2 flex flex-wrap items-stretch justify-center gap-3',
   count:
     'group flex min-w-36 flex-col items-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-6 py-4 shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-1 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
-  countFigure: 'text-4xl leading-none font-black tabular-nums',
+  countFigure: 'text-4xl leading-none font-bold tabular-nums',
   countLabel: 'text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   blocks: 'flex flex-col gap-16',
   category: 'flex scroll-mt-24 flex-col gap-8',
   categoryHead: 'flex items-center gap-4',
-  categoryTitle: 'text-3xl font-black tracking-tight sm:text-4xl',
+  categoryTitle: 'text-3xl font-bold tracking-tight sm:text-4xl',
   categoryRule: 'h-0.5 flex-1 rounded-full opacity-60',
   categoryCount:
     'font-[family-name:var(--font-mono)] text-sm tabular-nums text-[var(--color-ink-subtle)]',
@@ -566,7 +565,7 @@ export const CHANGELOG_BOARD = {
   line: 'py-3 text-base leading-relaxed first:pt-0 last:pb-0',
   archive: 'flex flex-wrap justify-center gap-2',
   archiveHead: 'flex flex-col items-center gap-4 text-center',
-  archiveTitle: 'text-xl font-black tracking-tight',
+  archiveTitle: 'text-xl font-bold tracking-tight',
   monthList: 'flex flex-col gap-1',
   releaseRow: 'flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-2',
   releaseRowLink:
@@ -574,9 +573,9 @@ export const CHANGELOG_BOARD = {
   releaseBody: 'flex min-w-0 flex-1 flex-col gap-0.5',
   releaseTitle: 'truncate text-sm font-semibold',
   releaseMeta:
-    'font-[family-name:var(--font-mono)] text-[11px] tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase',
   releaseCurrent:
-    'shrink-0 font-[family-name:var(--font-mono)] text-[11px] tracking-wide text-[var(--color-brand-600)] uppercase',
+    'shrink-0 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-brand-600)] uppercase',
   releaseChevron: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
   empty: 'flex flex-col items-center gap-1 py-16 text-center',
   emptyTitle: 'text-base font-semibold',
@@ -594,7 +593,7 @@ export const RELEASE_NOTICE = {
   wrapPointed: 'mx-3 pt-2.5 pb-1',
   // The ^ aimed at the version entry
   caret:
-    'pointer-events-none absolute top-1 left-4 h-3 w-3 rotate-45 rounded-[3px] bg-[var(--color-halo-100)]',
+    'pointer-events-none absolute top-1 left-4 h-3 w-3 rotate-45 rounded-sm bg-[var(--color-halo-100)]',
   // Gold plate
   frame:
     'group/news relative z-10 overflow-hidden rounded-[var(--radius-lg)] bg-linear-to-br from-[var(--color-halo-100)] via-[var(--color-halo-300)] to-[var(--color-halo-400)] text-black shadow-[0_10px_28px_-10px_var(--color-halo-500)] ring-1 ring-white/40 ring-inset transition-shadow hover:shadow-[0_14px_34px_-10px_var(--color-halo-500)]',
@@ -604,9 +603,9 @@ export const RELEASE_NOTICE = {
   sheen:
     'pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-white/55 to-transparent transition-[left] duration-[var(--motion-duration-celebrate)] ease-out group-hover/news:left-full motion-reduce:transition-none',
   kicker:
-    'relative block font-[family-name:var(--font-mono)] text-[10px] font-bold tracking-[0.16em] text-black/70 uppercase',
-  title: 'relative mt-1.5 line-clamp-2 block text-lg leading-tight font-black tracking-tight',
-  cta: 'relative mt-3 inline-flex items-center gap-1 rounded-full bg-black px-2.5 py-1 text-[11px] font-bold text-[var(--color-halo-100)]',
+    'relative block font-[family-name:var(--font-mono)] text-micro font-bold tracking-wide text-black/70 uppercase',
+  title: 'relative mt-1.5 line-clamp-2 block text-lg leading-tight font-bold tracking-tight',
+  cta: 'relative mt-3 inline-flex items-center gap-1 rounded-full bg-black px-2.5 py-1 text-micro font-bold text-[var(--color-halo-100)]',
   ctaIcon: 'h-3 w-3',
   dismiss:
     'absolute top-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full text-black/55 transition-colors hover:bg-white/35 hover:text-black',
@@ -635,14 +634,14 @@ export const SYSTEM_SCREEN = {
   // Inside the shell
   inset: 'flex min-h-[60dvh] items-center justify-center py-12',
   column: 'flex w-full max-w-lg flex-col items-center gap-4 text-center',
-  word: 'font-[family-name:var(--font-display)] text-[6rem] leading-none font-black tracking-tight text-[var(--color-brand-600)] sm:text-[8rem]',
-  title: 'text-2xl font-black tracking-[0.06em] uppercase sm:text-3xl',
+  word: 'font-[family-name:var(--font-display)] text-8xl leading-none font-bold tracking-tight text-[var(--color-brand-600)] sm:text-9xl',
+  title: 'text-2xl font-bold tracking-wide uppercase sm:text-3xl',
   description: 'max-w-sm text-sm leading-relaxed text-[var(--color-ink-subtle)] sm:text-base',
   reference: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
   action: 'pt-2',
   // Word inked like a rubber stamp
   stampWord:
-    'stamp-strike -rotate-12 rounded-[var(--radius-lg)] border-[6px] border-double border-current px-5 py-1 font-[family-name:var(--font-display)] text-[5rem] leading-none font-black tracking-tight text-[var(--color-danger)] uppercase opacity-90 sm:text-[7rem]',
+    'stamp-strike -rotate-12 rounded-[var(--radius-lg)] border-[6px] border-double border-current px-5 py-1 font-[family-name:var(--font-display)] text-7xl leading-none font-bold tracking-tight text-[var(--color-danger)] uppercase opacity-90 sm:text-8xl',
 } as const
 
 /**
@@ -676,7 +675,7 @@ export const CREATOR_MENU = {
     'flex w-full min-w-0 items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-2 text-left transition-colors hover:bg-[var(--color-hover)]',
   // Same footprint as a portrait
   noneGlyph: 'h-8 w-8 shrink-0 p-1',
-  name: 'min-w-0 flex-1 truncate text-[15px] font-medium',
+  name: 'min-w-0 flex-1 truncate text-body font-medium',
   chevron: 'h-4 w-4 shrink-0 transition-transform motion-reduce:transition-none',
   // Closed points down
   chevronShut: 'rotate-0',
