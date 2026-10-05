@@ -16,6 +16,7 @@
 @import './shell/surfaces.css';
 @import './motion/feedback.css';
 @import './motion/overlays.css';
+@import './motion/pick.css';
 @import './motion/course.css';
 @import './motion/replica.css';
 @import './content/markdown.css';

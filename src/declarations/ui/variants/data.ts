@@ -84,7 +84,7 @@ export const CALENDAR_AGENDA = {
   month: 'font-semibold normal-case first-letter:uppercase',
   rows: 'flex flex-col',
   row: 'flex items-center gap-4 rounded-[var(--radius-md)] px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-hover)]',
-  rowSelected: 'ring-2 ring-[var(--color-focus)] ring-inset',
+  rowSelected: 'ring-2 ring-[var(--color-pick)] ring-inset',
   bullet: 'h-3.5 w-[3px] shrink-0 rounded-full bg-current',
   time: 'w-24 shrink-0 text-sm text-[var(--color-ink-subtle)] tabular-nums',
   title: 'min-w-0 flex-1 truncate text-sm font-semibold',
@@ -116,7 +116,7 @@ export const CALENDAR_SIDEBAR = {
   miniDayToday:
     'bg-[var(--color-brand-600)] text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
   miniDayInRange: 'bg-[var(--color-brand-100)]',
-  miniDayPicked: 'ring-2 ring-[var(--color-focus)] ring-inset',
+  miniDayPicked: 'ring-2 ring-[var(--color-pick)] ring-inset',
   group: 'flex flex-col gap-1',
   groupTitle: 'px-2 pb-1 text-xs font-bold tracking-wide text-[var(--color-ink)] uppercase',
   row: 'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-hover)]',
@@ -304,7 +304,7 @@ export const CALENDAR_STYLES = {
   month: 'grid grid-cols-7',
   day: 'group relative flex min-h-28 touch-none flex-col gap-1 overflow-hidden border-r border-b border-[var(--color-border)] p-1.5 last:border-r-0',
   dayOutside: 'bg-[var(--color-surface)]/50',
-  dayDrafted: 'ring-2 ring-[var(--color-focus)] ring-inset',
+  dayDrafted: 'ring-2 ring-[var(--color-pick)] ring-inset',
   dayNumber:
     'relative mx-auto flex h-6 w-6 items-center justify-center text-xs font-semibold tabular-nums',
   dayNumberButton: 'cursor-pointer transition-colors hover:bg-[var(--color-hover)] rounded-full',
@@ -338,7 +338,7 @@ export const CALENDAR_STYLES = {
   // Absences sit behind everything else
   entryMuted: 'border border-[var(--color-border)] opacity-75',
   entrySelected:
-    'ring-2 ring-[var(--color-focus)] ring-offset-1 ring-offset-[var(--color-surface-raised)]',
+    'ring-2 ring-[var(--color-pick)] ring-offset-1 ring-offset-[var(--color-surface-raised)]',
   // Seat of the minute grid
   entryFill: 'h-full overflow-hidden',
   entryCompact: 'items-center py-0',
@@ -416,7 +416,7 @@ export const CALENDAR_GRID_STYLES = {
     'pointer-events-none absolute inset-x-0.5 z-20 rounded-[var(--radius-sm)] border-2 border-dashed border-[var(--color-brand-600)] bg-[var(--color-brand-soft)]/60',
   paintedLabel:
     'absolute inset-x-0 top-1 text-center text-micro font-bold text-[var(--color-brand-800)] tabular-nums',
-  dropTarget: 'ring-2 ring-[var(--color-focus)] ring-inset',
+  dropTarget: 'ring-2 ring-[var(--color-pick)] ring-inset',
   nowLine: 'pointer-events-none absolute inset-x-0 z-30 h-0.5 bg-[var(--color-danger)]',
   nowLabel:
     'absolute left-1 -translate-y-1/2 rounded-full bg-[var(--color-danger)] px-1.5 py-0.5 text-micro font-bold text-[var(--color-on-brand)] tabular-nums',

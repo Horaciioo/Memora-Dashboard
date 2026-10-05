@@ -1,0 +1,17 @@
+/* A picked element grows a soft ring once: "this is the one you chose" */
+@keyframes pick-ring {
+  from {
+    box-shadow: 0 0 0 0 var(--color-focus);
+  }
+  to {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+
+[aria-selected='true'],
+[aria-pressed='true'],
+[aria-checked='true'],
+[aria-current='page'],
+[class~='ring-[var(--color-pick)]'] {
+  animation: pick-ring var(--motion-duration-slow) var(--motion-ease-out);
+}

@@ -33,7 +33,7 @@ export const SANCTION_PANEL = {
   cardRule: 'absolute inset-y-0 left-0 w-1 bg-[var(--accent)]',
   cardName: 'text-sm leading-snug font-bold tracking-tight text-balance',
   cardInput:
-    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2 py-1 text-sm font-bold tracking-tight outline-none ring-2 ring-[var(--color-focus)]',
+    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2 py-1 text-sm font-bold tracking-tight outline-none ring-2 ring-[var(--color-pick)]',
   empty: 'text-center text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 

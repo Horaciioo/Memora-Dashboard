@@ -50,7 +50,7 @@ export const PAGE_STYLES = {
   titleEditable:
     '-mx-1 cursor-pointer rounded-[var(--radius-sm)] px-1 transition-colors hover:bg-[var(--color-surface)]',
   titleInput:
-    'rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-focus)]',
+    'rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-pick)]',
   toolbar: 'flex flex-wrap items-center gap-2',
 } as const
 
@@ -287,7 +287,7 @@ export const INLINE_EDIT_STYLES = {
     '-mx-2 -my-1 cursor-text rounded-[var(--radius-sm)] px-2 py-1 transition-colors hover:bg-[var(--color-surface)]',
   text: '-mx-1 cursor-text rounded-[var(--radius-sm)] px-1 transition-colors hover:bg-[var(--color-surface)]',
   input:
-    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-focus)]',
+    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-pick)]',
   area: 'block min-h-20 resize-y rounded-[var(--radius-md)] px-3 py-2 leading-relaxed',
   // Dashed field standing in for a creation row
   create:

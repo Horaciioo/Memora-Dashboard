@@ -378,7 +378,7 @@ export const COLOUR_SWATCH_STYLES = {
   swatch:
     'size-9 rounded-full border border-[var(--color-border)] transition-transform hover:scale-110 disabled:pointer-events-none disabled:opacity-60',
   selected:
-    'ring-2 ring-[var(--color-focus)] ring-offset-2 ring-offset-[var(--color-surface-raised)]',
+    'ring-2 ring-[var(--color-pick)] ring-offset-2 ring-offset-[var(--color-surface-raised)]',
 } as const
 
 /**

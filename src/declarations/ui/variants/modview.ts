@@ -88,7 +88,7 @@ export const MODVIEW_STREAM = {
 export const MODVIEW_FEED = {
   // Line of the moderator followed in Focus mode
   itemFocus:
-    'rounded-[var(--radius-md)] bg-[var(--color-brand-100)] ring-2 ring-[var(--color-focus)]',
+    'rounded-[var(--radius-md)] bg-[var(--color-brand-100)] ring-2 ring-[var(--color-pick)]',
   count: 'px-3 pt-2 text-xs font-bold text-[var(--color-ink-subtle)]',
   list: 'flex flex-col divide-y divide-[var(--color-border)]',
   item: 'flex gap-2.5 px-3 py-2.5',
@@ -118,7 +118,7 @@ export const MODVIEW_CHAT = {
   time: 'mr-1.5 font-[family-name:var(--font-mono)] text-micro text-[var(--color-ink-subtle)]',
   deletedText: 'text-[var(--color-ink-subtle)] line-through',
   deletedNote: 'ml-1.5 text-xs text-[var(--color-ink-subtle)] italic',
-  triggerLit: 'ring-2 ring-[var(--color-focus)]',
+  triggerLit: 'ring-2 ring-[var(--color-pick)]',
   welcome: 'px-3 pt-3 pb-1 text-sm text-[var(--color-ink-subtle)]',
   list: 'flex flex-col py-1',
   line: 'group relative px-3 py-1 text-sm leading-relaxed break-words transition-colors hover:bg-[var(--color-hover)]',
@@ -158,7 +158,7 @@ export const MODVIEW_MODES = {
     'absolute top-11 right-2 z-30 flex w-72 flex-col gap-1 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-2 shadow-[var(--shadow-md)]',
   row: 'flex items-center gap-3 rounded-[var(--radius-lg)] px-2 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-transparent',
   // Option a scene is setting
-  rowLit: 'bg-[var(--color-brand-soft)] ring-2 ring-[var(--color-focus)]',
+  rowLit: 'bg-[var(--color-brand-soft)] ring-2 ring-[var(--color-pick)]',
   rowIcon: 'h-5 w-5 shrink-0',
   rowLabel: 'min-w-0 flex-1 font-semibold',
   rowState: 'text-xs font-bold tracking-wide uppercase',
@@ -183,7 +183,7 @@ export const MODVIEW_COMMUNITY = {
     'w-full rounded-[var(--radius-lg)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
   group:
     'mx-2 mb-2 flex flex-col gap-1 rounded-[var(--radius-lg)] px-2 pb-2 transition-[background-color,box-shadow]',
-  groupLit: 'bg-[var(--color-brand-100)] ring-2 ring-[var(--color-focus)]',
+  groupLit: 'bg-[var(--color-brand-100)] ring-2 ring-[var(--color-pick)]',
   groupHead: 'flex items-center gap-2 py-1 text-sm font-bold',
   groupIcon: 'h-5 w-5 shrink-0',
   member: 'w-fit cursor-pointer text-sm font-semibold hover:underline',

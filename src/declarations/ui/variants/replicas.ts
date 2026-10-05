@@ -19,7 +19,7 @@ export const DISCORD_REPLICA = {
   channelActive: 'bg-[var(--discord-channel-active)] text-[var(--discord-heading)]',
   // The channel the scene is about
   channelLit:
-    'replica-lit bg-[color-mix(in_oklab,var(--color-brand-500)_28%,transparent)] font-semibold text-white ring-1 ring-[var(--color-focus)]',
+    'replica-lit bg-[color-mix(in_oklab,var(--color-brand-500)_28%,transparent)] font-semibold text-white ring-1 ring-[var(--color-pick)]',
   channelIn: 'replica-channel-in',
   channelIcon: 'h-5 w-5 shrink-0 opacity-80',
   channelName: 'truncate',
@@ -161,7 +161,7 @@ export const COMPARE_RUNS = {
     'pointer-events-none relative block h-40 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] transition-transform group-hover:-translate-y-0.5',
   // The replica drawn small inside a thumbnail
   thumbScale: 'block w-[300%] origin-top-left scale-[0.3333]',
-  thumbOpen: 'ring-2 ring-[var(--color-focus)]',
+  thumbOpen: 'ring-2 ring-[var(--color-pick)]',
   thumbLabel: 'block text-center font-bold',
   enlarged: 'run-slide-in relative',
   replay:

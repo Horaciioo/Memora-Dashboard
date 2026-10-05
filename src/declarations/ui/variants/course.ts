@@ -166,7 +166,7 @@ export const COURSE_EXERCISE = {
   bucketTitle: PROPERTY_LABEL,
   pool: 'flex min-h-14 flex-wrap gap-2 rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)] p-3',
   chip: 'cursor-grab select-none rounded-full border-2 border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-2 text-sm font-semibold shadow-[var(--shadow-sm)] transition-transform hover:-translate-y-0.5 active:cursor-grabbing',
-  chipHeld: 'border-[var(--color-brand-600)] ring-2 ring-[var(--color-focus)]',
+  chipHeld: 'border-[var(--color-brand-600)] ring-2 ring-[var(--color-pick)]',
   chipRight: 'border-[var(--color-success)]',
   chipWrong: 'border-[var(--color-danger)]',
   orderList: 'flex flex-col gap-2',

@@ -15,6 +15,8 @@
   --color-hover: #f0f0f4;
   /* Keyboard focus and selection ring, soft and neutral */
   --color-focus: rgb(29 29 31 / 0.45);
+  /* Ring of a picked element, lighter than keyboard focus */
+  --color-pick: rgb(29 29 31 / 0.22);
   --color-focus-halo: rgb(29 29 31 / 0.1);
 
   /* Rose: action fill (600) with a dark label, deep ink (800) for pink text */
