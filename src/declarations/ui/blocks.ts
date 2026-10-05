@@ -27,9 +27,9 @@ export const APP_SHELL = {
   frame: 'app-tone flex min-h-dvh bg-[var(--color-background)] md:pr-3',
   // Window the page shows through
   window:
-    'app-frame pointer-events-none fixed inset-y-3 right-3 left-[var(--shell-sidebar-w)] z-[35] hidden md:block',
+    'app-frame pointer-events-none fixed inset-y-3 right-3 left-[var(--shell-sidebar-w)] z-[35] hidden md:block print:hidden',
   // No rail
-  windowBare: 'app-frame pointer-events-none fixed inset-3 z-[35] hidden md:block',
+  windowBare: 'app-frame pointer-events-none fixed inset-3 z-[35] hidden md:block print:hidden',
   // Scrollbar inside the window
   windowTrack:
     'group/track pointer-events-auto absolute top-[var(--radius-xl)] right-1 bottom-[var(--radius-xl)] w-2.5 cursor-pointer',
@@ -39,7 +39,7 @@ export const APP_SHELL = {
   main: 'relative flex min-w-0 flex-1 flex-col',
   // Gutters widen past md so a page never welds itself to either rail
   content:
-    'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--banner-h)+2.5rem)]',
+    'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--banner-h)+2.5rem)] print:max-w-none print:p-0',
   breadcrumbs: 'hidden flex-wrap items-center gap-1 text-xs text-[var(--color-ink-subtle)] sm:flex',
   // Below sm the trail folds to a single back link to the parent
   breadcrumbsCompact: 'flex items-center gap-1 text-xs text-[var(--color-ink-subtle)] sm:hidden',
@@ -74,7 +74,7 @@ export const RAIL_POPOVER = {
 
 export const LEFT_SIDEBAR = {
   // Rail standing on the frame
-  rail: 'rail-ground relative z-40 font-[family-name:var(--font-system)] hidden w-[var(--shell-sidebar-w)] shrink-0 flex-col py-3 md:sticky md:top-0 md:flex md:h-dvh',
+  rail: 'rail-ground relative z-40 font-[family-name:var(--font-system)] hidden w-[var(--shell-sidebar-w)] shrink-0 flex-col py-3 md:sticky md:top-0 md:flex md:h-dvh print:hidden',
   // Page panel in the rail
   slot: 'flex min-h-0 flex-1 flex-col px-3',
   // Creator switch
@@ -130,7 +130,7 @@ export const SEARCH_LAUNCHER = {
  */
 
 export const MOBILE_NAV = {
-  bar: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] left-1/2 z-40 flex -translate-x-1/2 items-center gap-0.5 rounded-[var(--radius-full)] glass-panel border px-2 py-1.5 md:hidden',
+  bar: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] left-1/2 z-40 flex -translate-x-1/2 items-center gap-0.5 rounded-[var(--radius-full)] glass-panel border px-2 py-1.5 md:hidden print:hidden',
   link: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-full)] transition-colors',
   linkActive: 'bg-[var(--color-brand-600)]',
   // No colour here — one of the two below always wins
@@ -138,7 +138,7 @@ export const MOBILE_NAV = {
   iconIdle: 'text-[var(--color-ink-subtle)]',
   iconActive: 'text-[var(--color-on-brand)]',
   // Round button flanking the pill
-  fab: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-[var(--radius-full)] glass-panel border text-[var(--color-ink)] md:hidden',
+  fab: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-[var(--radius-full)] glass-panel border text-[var(--color-ink)] md:hidden print:hidden',
   fabLeft: 'left-3',
   fabRight: 'right-3',
 } as const
@@ -149,7 +149,7 @@ export const MOBILE_NAV = {
  */
 
 export const TOP_BAR = {
-  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 bg-[var(--color-background)] px-3 md:hidden',
+  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 bg-[var(--color-background)] px-3 md:hidden print:hidden',
   creator: 'flex min-w-0 flex-1 items-center gap-2',
   creatorName: 'truncate text-sm font-semibold',
   actions: 'flex shrink-0 items-center gap-1',
@@ -541,7 +541,7 @@ export const CHANGELOG_BOARD = {
   // Three figures doubling as the way into each category
   counts: 'mt-2 flex flex-wrap items-stretch justify-center gap-3',
   count:
-    'group flex min-w-36 flex-col items-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-6 py-4 shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-1 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
+    'group flex min-w-36 flex-col items-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-6 py-4 shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-1 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
   countFigure: 'text-4xl leading-none font-bold tabular-nums',
   countLabel: 'text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   blocks: 'flex flex-col gap-16',

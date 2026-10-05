@@ -25,7 +25,7 @@ export const MODVIEW_FRAME = {
   body: 'flex min-h-0 flex-1 gap-3',
   rail: 'hidden w-12 shrink-0 flex-col items-center gap-1.5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 shadow-[var(--shadow-sm)] md:flex',
   railButton:
-    'flex h-9 w-9 items-center justify-center rounded-[var(--radius-lg)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
+    'flex h-9 w-9 items-center justify-center rounded-[var(--radius-lg)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
   railButtonOff: 'opacity-40 grayscale hover:opacity-100 hover:grayscale-0',
   railIcon: 'h-5 w-5',
   grid: 'grid min-h-0 flex-1 gap-3 overflow-y-auto lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.7fr)] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden',

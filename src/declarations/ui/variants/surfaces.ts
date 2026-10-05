@@ -25,7 +25,7 @@ export const PAGE_STYLES = {
   header: 'flex flex-col gap-4',
   // Banner across the top of the page: in the flow on a phone
   banner:
-    'relative -mx-4 -mt-6 h-[var(--banner-h)] sm:-mx-6 sm:-mt-8 md:absolute md:inset-x-0 md:top-0 md:m-0',
+    'relative -mx-4 -mt-6 h-[var(--banner-h)] sm:-mx-6 sm:-mt-8 md:absolute md:inset-x-0 md:top-0 md:m-0 print:hidden',
   // Corner of the banner the page options sit in
   bannerOptions: 'absolute top-3 right-3 z-10 sm:top-4 sm:right-4',
   // Title sitting in the notch cut into the bottom edge of the banner
@@ -477,7 +477,7 @@ export const COLLAPSIBLE_PANEL = {
 export const PAGE_OPTIONS = {
   host: 'relative',
   button:
-    'glass-panel flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink)] transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand-600)] motion-reduce:transition-none',
+    'glass-panel flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink)] transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink-accent)] motion-reduce:transition-none',
   buttonOpen: 'scale-105',
   icon: 'h-5 w-5',
   panel:

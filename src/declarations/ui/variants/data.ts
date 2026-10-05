@@ -147,7 +147,7 @@ export const ABSENCE_PAGE = {
   monthHead: 'flex h-8 items-center justify-between',
   monthName: 'text-base font-bold capitalize',
   monthNav:
-    'flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand-600)]',
+    'flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-ink-accent)]',
   grid: 'grid grid-cols-7 gap-y-0.5',
   weekday:
     'pb-2 text-center text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',

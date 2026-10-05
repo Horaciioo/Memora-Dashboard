@@ -101,7 +101,7 @@ export const PROGRESS_STYLES = {
 export const TOAST_STYLES = {
   // Bottom centre, above the nav pill on mobile
   stack:
-    'toast-pile pointer-events-auto fixed inset-x-4 bottom-[calc(var(--shell-bottom-nav-h)_+_1.5rem_+_env(safe-area-inset-bottom))] z-[60] md:inset-x-auto md:bottom-6 md:left-1/2 md:w-[min(26rem,calc(100vw-2rem))] md:-translate-x-1/2',
+    'toast-pile pointer-events-auto fixed inset-x-4 bottom-[calc(var(--shell-bottom-nav-h)_+_1.5rem_+_env(safe-area-inset-bottom))] z-[60] md:inset-x-auto md:bottom-6 md:left-1/2 md:w-[min(26rem,calc(100vw-2rem))] md:-translate-x-1/2 print:hidden',
   stackSpread: 'toast-pile-spread',
   // Placed by .toast-pile
   item: 'absolute inset-x-0',
