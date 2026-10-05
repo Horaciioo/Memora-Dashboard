@@ -81,21 +81,23 @@
   transition-timing-function: var(--motion-ease-out);
 }
 
-:root:not(.dark) .app-tone[data-tone='lead'] {
-  --color-frame-pink: #7a52cc;
-  --color-frame-mauve: #6a46c0;
-  --color-frame-blue: #2f6fc2;
-  --color-frame: #6a46c0;
+/* Lead orange */
+.app-tone[data-tone='lead'] {
+  --color-frame-pink: #d9741a;
+  --color-frame-mauve: #c8570f;
+  --color-frame-blue: #b8421a;
+  --color-frame: #c8570f;
 }
 
-:root:not(.dark) .app-tone[data-tone='admin'] {
-  --color-frame-pink: #2f6fc2;
-  --color-frame-mauve: #3f7cc9;
-  --color-frame-blue: #7a52cc;
-  --color-frame: #3f7cc9;
+/* Admin red */
+.app-tone[data-tone='admin'] {
+  --color-frame-pink: #d03040;
+  --color-frame-mauve: #bd2231;
+  --color-frame-blue: #8f1a3a;
+  --color-frame: #bd2231;
 }
 
-:root:not(.dark) .app-tone[data-tone='junior'] {
+.app-tone[data-tone='junior'] {
   --color-frame-pink: #c93a6b;
   --color-frame-mauve: #d9487b;
   --color-frame-blue: #7a52cc;
