@@ -33,13 +33,11 @@ body {
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44' preserveAspectRatio='none'%3E%3Cpath d='M36 44C18 44 18 0 0 0V44Z'/%3E%3C/svg%3E");
 }
 
-/* Soft gradient tint over a photograph */
-.banner-wash::after {
+/* Quiet shade at the foot of the photograph, under the notch */
+.banner-shade::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--gradient-soft);
-  mix-blend-mode: soft-light;
-  opacity: 0.6;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.18), transparent 55%);
   pointer-events: none;
 }

@@ -1,4 +1,4 @@
-/* Rail on the frame: dark ink, light washes */
+/* Rail on the pale frame: dark ink, faint washes */
 .rail-ground {
   --color-ink: var(--color-on-frame);
   --color-ink-subtle: var(--color-on-frame-subtle);
@@ -13,6 +13,8 @@
   --color-brand-400: var(--color-on-frame-tint);
   --color-brand-600: var(--color-on-frame-blush);
   --color-brand-800: var(--color-on-frame-deep);
+  --rail-accent: #b03a66;
+  --rail-accent-deep: #8a2a4e;
   color: var(--color-ink);
 }
 
@@ -44,4 +46,83 @@
   color: var(--page-ink);
   background: var(--page-surface);
   box-shadow: var(--shadow-sm);
+}
+
+/* Compact rail: glyphs only */
+.rail-ground[data-compact] .rail-fold {
+  display: none;
+}
+
+.rail-ground[data-compact] .rail-shortcuts,
+.rail-ground[data-compact] .rail-footer-box {
+  flex-direction: column;
+}
+
+.rail-ground[data-compact] .rail-nav {
+  align-items: center;
+  gap: 0.75rem;
+  padding-inline: 0.75rem;
+}
+
+.rail-ground[data-compact] .rail-nav a {
+  justify-content: center;
+  padding-inline: 0.625rem;
+}
+
+/* Rail boxes are a faint grey wash on the pale frame, no glass and no shadow */
+.rail-ground .glass-panel:not(.fixed, [aria-current='page']) {
+  background: var(--color-on-frame-wash);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-color: var(--color-border);
+  box-shadow: none;
+}
+
+.rail-ground .glass-panel:not(.fixed, [aria-current='page']):hover {
+  background: color-mix(in srgb, var(--color-on-frame) 9%, transparent);
+}
+
+/* Unread note: gold box, white glyph, a band of light crossing it on its own */
+.shortcut-fresh {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(
+    135deg,
+    var(--color-gold-100) -25%,
+    var(--color-gold-300) 45%,
+    var(--color-gold-400)
+  );
+  border-color: color-mix(in srgb, var(--color-gold-400) 60%, white);
+  color: white;
+}
+
+.shortcut-fresh:hover {
+  color: white;
+}
+
+.shortcut-fresh svg {
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.28));
+}
+
+.shortcut-fresh::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: -60%;
+  width: 50%;
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.8), transparent);
+  pointer-events: none;
+  animation: shortcut-sheen 3.4s ease-in-out infinite;
+}
+
+@keyframes shortcut-sheen {
+  0% {
+    left: -60%;
+  }
+  40%,
+  100% {
+    left: 130%;
+  }
 }

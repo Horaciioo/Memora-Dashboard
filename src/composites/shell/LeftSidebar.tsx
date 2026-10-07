@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CourseRail } from '@/composites/academy/course/CourseRail'
 import { CalendarRailPanel, CalendarSearchBar } from '@/composites/calendar/CalendarSidebar'
 import { NotificationsBell } from '@/composites/notifications/NotificationsBell'
@@ -10,14 +10,19 @@ import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { CreatorAccountMenu } from '@/composites/shell/CreatorAccountMenu'
 import { CreatorSwitch } from '@/composites/shell/CreatorSwitch'
 import { RailLiveCall } from '@/composites/shell/RailLiveCall'
+import { RailToolbar } from '@/composites/shell/RailToolbar'
 import { RailShortcuts } from '@/composites/shell/RailShortcuts'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
 import { useCalendarRail } from '@/core/hooks/interaction/useCalendarRail'
 import { useCourseRail } from '@/core/hooks/interaction/useCourseRail'
+import { useRailCompact } from '@/core/hooks/interaction/useRailCompact'
 import { APP_VERSION_LABEL } from '@/declarations/app'
+import { SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
 import { ROUTES, visibleNavGroups } from '@/declarations/navigation'
 import { BEACON_ATTRIBUTE, routeBeacon } from '@/declarations/ui/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
+import { railIcon } from '@/declarations/ui/railIcons'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
@@ -40,16 +45,36 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const pathname = usePathname()
   const { can, session } = useAuthContext()
   // An open course puts its chapters where the destinations stand
-  const courseRail = useCourseRail()
+  const openCourse = useCourseRail()
+  const courseRail = openCourse
   // The calendar puts its month and switches there too
   const calendarRail = useCalendarRail()
+  const [isRailCompact, toggleRailCompact] = useRailCompact()
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
 
   // A lone creator sits on top
   const hasCreators = viewContext.creators.length === 1
   const ChevronIcon = ICONS.expand
 
-  // The live entry leaves the groups
+  // Chapters and the month need their room
+  const isCompact = isRailCompact && !courseRail && !calendarRail
+
+  // Windows and panels read the rail width from the body
+  useEffect(() => {
+    if (!isCompact) return
+
+    const { style } = document.body
+    // Restored, not removed: the layout set it inline and React won't set it again
+    const previous = style.getPropertyValue('--shell-sidebar-w')
+
+    style.setProperty('--shell-sidebar-w', `${SHELL_DIMENSIONS.sidebarCompact}px`)
+
+    return () => {
+      style.setProperty('--shell-sidebar-w', previous)
+    }
+  }, [isCompact])
+
+  // The live entry leaves the groups while a live runs
   const entries = visibleNavGroups(viewContext.view, session, can, viewContext.live !== null)
   const liveItem = entries.flatMap((group) => group.items).find((item) => item.onlyLive)
   // Shortcuts leave the groups too
@@ -60,7 +85,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const groups = entries
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => !item.onlyLive && !item.quick),
+      items: group.items.filter((item) => !(item.onlyLive && viewContext.live) && !item.quick),
     }))
     .filter((group) => group.items.length > 0)
 
@@ -76,7 +101,13 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   }
 
   return (
-    <aside aria-label={NAV_COPY.sidebar} className={LEFT_SIDEBAR.rail}>
+    <aside
+      aria-label={NAV_COPY.sidebar}
+      data-compact={isCompact || undefined}
+      className={LEFT_SIDEBAR.rail}
+    >
+      <RailToolbar isCompact={isCompact} onToggle={toggleRailCompact} />
+
       {hasCreators && (
         <div className={LEFT_SIDEBAR.creatorRow}>
           <CreatorSwitch
@@ -96,7 +127,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
             </div>
           </>
         ) : (
-          <SearchLauncher expanded />
+          <SearchLauncher expanded={!isCompact} />
         )}
       </div>
 
@@ -113,7 +144,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
       ) : (
         <nav className={LEFT_SIDEBAR.nav}>
           {groups.map((group) => {
-            const isGroupCollapsed = collapsedGroups.has(group.label)
+            const isGroupCollapsed = collapsedGroups.has(group.label) && !isCompact
 
             return (
               <div key={group.label} className={LEFT_SIDEBAR.navGroup}>
@@ -136,7 +167,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
                 <div className="fold" data-open={!isGroupCollapsed} inert={isGroupCollapsed}>
                   <div className={LEFT_SIDEBAR.navGroupItems}>
                     {group.items.map((item) => {
-                      const Icon = ICONS[item.icon]
+                      const Icon = railIcon(item.icon)
                       const isActive =
                         pathname === item.href || pathname.startsWith(`${item.href}/`)
 
@@ -144,6 +175,8 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
                         <Link
                           key={item.href}
                           href={item.href}
+                          title={isCompact ? item.label : undefined}
+                          aria-label={isCompact ? item.label : undefined}
                           aria-current={isActive ? 'page' : undefined}
                           {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
                           className={cn(
@@ -159,6 +192,14 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
                             aria-hidden="true"
                           />
                           <span className={LEFT_SIDEBAR.navLabel}>{item.label}</span>
+                          {item.maturity && (
+                            <MaturityTag
+                              maturity={item.maturity}
+                              interactive={false}
+                              compact
+                              className="rail-fold ml-auto"
+                            />
+                          )}
                         </Link>
                       )
                     })}

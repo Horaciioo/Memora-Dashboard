@@ -30,6 +30,9 @@ export const ROUTES = {
   liveCreatorReport: (id: string) => `/lives/${id}/bilan-createur`,
   calendar: '/calendrier',
   calendarEvent: (id: string) => `/calendrier?evenement=${id}`,
+  // Grid opened on a day, optionally on one calendar only
+  calendarDay: (day: string, layer?: string) =>
+    `/calendrier?jour=${day}${layer ? `&calque=${layer}` : ''}`,
   trainings: '/formations',
   training: (id: string) => `/formations/${id}`,
   academy: '/academy',
@@ -263,11 +266,11 @@ export const NAVIGATION: NavigationGroup[] = [
         href: ROUTES.dashboard,
         label: 'Accueil',
         icon: 'dashboard',
-        maturity: 'dev',
+        maturity: 'alpha',
         quick: true,
         mobile: { slot: 'home', order: 0 },
       },
-      { href: ROUTES.absences, label: 'Absences', icon: 'absences' },
+      { href: ROUTES.absences, label: 'Absences', icon: 'absences', maturity: 'new' },
       { href: ROUTES.changelog, label: 'Nouveautés', icon: 'news', quick: true },
       {
         href: ROUTES.calendar,
@@ -284,13 +287,14 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.AcademyTrainingComplete,
         // Juniors train
         visibleWhen: { statuses: ['ACADEMY'], roles: ['ADMIN', 'RESPONSABLE'] },
+        maturity: 'alpha',
       },
       {
         href: ROUTES.myLegacy,
         label: 'Mon Legacy',
         icon: 'crown',
         permission: Permissions.LegacySelf,
-        maturity: 'dev',
+        maturity: 'alpha',
       },
     ],
   },
@@ -351,24 +355,23 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Legacy',
         icon: 'crown',
         permission: Permissions.LegacyRead,
-        maturity: 'dev',
+        maturity: 'alpha',
       },
     ],
   },
   {
     label: 'Modération',
     from: NavigationViews.Moderation,
-    // Off the responsable view
-    hiddenIn: [NavigationViews.Lead],
     items: [
       {
         href: ROUTES.sanctions,
-        label: 'Livecon & sanctions',
+        label: 'Panel de sanctions',
         icon: 'liveconCrisis',
         permission: Permissions.SanctionRead,
+        maturity: 'new',
         mobile: { slot: 'primary', order: 8 },
       },
-      { href: ROUTES.marsha, label: 'Marsha Bot', icon: 'discord' },
+      { href: ROUTES.marsha, label: 'Marsha Bots', icon: 'discord', maturity: 'beta' },
     ],
   },
   {
@@ -380,7 +383,7 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Configuration',
         icon: 'settings',
         permission: Permissions.ReferenceRead,
-        maturity: 'dev',
+        maturity: 'alpha',
         mobile: { slot: 'primary', order: 2 },
       },
       {
@@ -460,6 +463,20 @@ export const RECORD_LABELS: Record<string, string> = {
   legacy: 'Parcours',
   recrutements: 'Session',
   youtubeurs: 'YouTubeur',
+}
+
+/**
+ * Lifecycle stage declared for the page a path belongs to
+ * @param {string} pathname - Current path
+ * @return {MaturityName | null} - Stage of the closest declared entry
+ */
+
+export const maturityOfPath = (pathname: string): MaturityName | null => {
+  const match = NAVIGATION.flatMap((group) => group.items)
+    .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
+    .sort((left, right) => right.href.length - left.href.length)[0]
+
+  return match?.maturity ?? null
 }
 
 /**

@@ -3,6 +3,8 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useBannerHost } from '@/core/hooks/interaction/useBannerHost'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
+import type { MaturityName } from '@/declarations/maturity/registries'
 import { PAGE_TABS_HOST_ID } from '@/declarations/ui/banners'
 import { TABS_STYLES } from '@/declarations/ui/variants'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
@@ -15,6 +17,8 @@ export interface TabItem {
   icon?: IconName
   // Holds at least one rejection
   flagged?: boolean
+  // Lifecycle tag drawn after the label
+  maturity?: MaturityName
 }
 
 export interface TabsProps {
@@ -171,6 +175,9 @@ export const Tabs = ({
               <span className={cn(TABS_STYLES.label, Icon && TABS_STYLES.labelBeside)}>
                 {item.label}
               </span>
+              {item.maturity && (
+                <MaturityTag maturity={item.maturity} interactive={false} compact />
+              )}
             </span>
           </button>
         )

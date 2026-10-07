@@ -2,9 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useFreshRelease } from '@/core/hooks/data/useFreshRelease'
+import { ROUTES } from '@/declarations/navigation'
 import { BEACON_ATTRIBUTE, routeBeacon } from '@/declarations/ui/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
-import { ICONS, type IconName } from '@/declarations/ui/icons'
+import type { IconName } from '@/declarations/ui/icons'
+import { railIcon } from '@/declarations/ui/railIcons'
 import { cn } from '@/utils/classnames'
 
 export interface RailShortcut {
@@ -14,7 +17,7 @@ export interface RailShortcut {
 }
 
 /**
- * Glyph boxes under the search
+ * Glyph boxes under the search, the news one turns gold while a note is unread
  * @param {Object} props - Shortcuts
  * @param {RailShortcut[]} props.items - Destinations
  * @return {JSX.Element}
@@ -22,11 +25,12 @@ export interface RailShortcut {
 
 export const RailShortcuts = ({ items }: { items: RailShortcut[] }) => {
   const pathname = usePathname()
+  const { isFresh } = useFreshRelease()
 
   return (
     <nav className={LEFT_SIDEBAR.shortcuts}>
       {items.map((item) => {
-        const Icon = ICONS[item.icon]
+        const Icon = railIcon(item.icon)
         const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
         return (
@@ -37,7 +41,11 @@ export const RailShortcuts = ({ items }: { items: RailShortcut[] }) => {
             title={item.label}
             aria-current={isActive ? 'page' : undefined}
             {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
-            className={cn(LEFT_SIDEBAR.shortcut, isActive && LEFT_SIDEBAR.shortcutActive)}
+            className={cn(
+              LEFT_SIDEBAR.shortcut,
+              isActive && LEFT_SIDEBAR.shortcutActive,
+              isFresh && item.href === ROUTES.changelog && LEFT_SIDEBAR.shortcutFresh
+            )}
           >
             <Icon className={LEFT_SIDEBAR.shortcutIcon} aria-hidden="true" />
           </Link>

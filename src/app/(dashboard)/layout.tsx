@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import type { ReactNode } from 'react'
+import { MobileGate } from '@/components/structures/MobileGate'
 import { AppShell } from '@/layouts/AppShell'
 import { AuthShell } from '@/layouts/AuthShell'
 import { HistoryConsentGate } from '@/composites/consent/HistoryConsentGate'
@@ -54,11 +55,18 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   ])
 
   return (
-    <AppShell unreadCount={unreadCount} viewContext={viewContext} twoFactor={twoFactor} seal={seal}>
-      {children}
-      <Suspense fallback={null}>
-        <GuideHost />
-      </Suspense>
-    </AppShell>
+    <MobileGate>
+      <AppShell
+        unreadCount={unreadCount}
+        viewContext={viewContext}
+        twoFactor={twoFactor}
+        seal={seal}
+      >
+        {children}
+        <Suspense fallback={null}>
+          <GuideHost />
+        </Suspense>
+      </AppShell>
+    </MobileGate>
   )
 }
