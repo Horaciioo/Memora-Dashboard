@@ -61,7 +61,7 @@ export const HOME_STYLES = {
 
 export const HOME_FLOW = {
   // Reaches into the shell gutters, a little further where the shell caps its width
-  page: 'flex flex-col gap-10 md:-mx-5 xl:-mx-10',
+  page: 'flex flex-col gap-10 md:-mx-5 min-[1700px]:-mx-10',
   rest: 'flex items-center justify-center gap-3 py-4 text-sm font-semibold text-[var(--color-ink-subtle)]',
   restMark: 'h-6 w-6 shrink-0',
   // Latest note, one gold line
