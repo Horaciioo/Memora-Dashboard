@@ -7,6 +7,8 @@ import { DetailGrid } from '@/components/structures/DetailGrid'
 import { Section } from '@/components/structures/Section'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { HomeTaskDetail } from '@/composites/personal/HomeTaskDetail'
+import { CoordinationAnswer } from '@/composites/lives/CoordinationAnswer'
+import { HomeTaskGroups } from '@/composites/personal/HomeTaskGroups'
 import { HomeTaskStepper } from '@/composites/personal/HomeTaskStepper'
 import { useAbsences } from '@/core/hooks/data/useAbsences'
 import { useMutation } from '@/core/hooks/data/useMutation'
@@ -22,6 +24,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { HOME_FLOW } from '@/declarations/ui/variants'
 import type { FieldDefinition, FormValues } from '@/types/forms'
+import type { CoordinationRequest } from '@/types/lives'
 import type { MemberAbsence } from '@/types/members'
 import type { HomeEntry, HomeTask } from '@/types/personal'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
@@ -34,6 +37,7 @@ export interface HomeQueueProps {
   reviewFields: FieldDefinition[]
   tasks: HomeTask[]
   rollCalls: PendingRollCall[]
+  coordination: CoordinationRequest[]
 }
 
 /**
@@ -43,10 +47,17 @@ export interface HomeQueueProps {
  * @param {FieldDefinition[]} reviewFields - Declarations of the review form
  * @param {HomeTask[]} tasks - Tasks computed server-side
  * @param {PendingRollCall[]} rollCalls - Roll-calls waiting on an answer
+ * @param {CoordinationRequest[]} coordination - Requests to coordinate a live
  * @return {JSX.Element}
  */
 
-export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueueProps) => {
+export const HomeQueue = ({
+  absences,
+  reviewFields,
+  tasks,
+  rollCalls,
+  coordination,
+}: HomeQueueProps) => {
   const { absences: requests, isSaving, issues, clearIssues, review } = useAbsences(absences)
   const [reviewing, setReviewing] = useState<{
     absence: MemberAbsence
@@ -63,7 +74,7 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
 
     router.refresh()
   }
-  const [step, setStep] = useState<number | null>(null)
+  const [step, setStep] = useState<{ group: string; index: number } | null>(null)
 
   const openReview = (absence: MemberAbsence, status: AbsenceStatusName) => {
     clearIssues()
@@ -81,6 +92,7 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
           key: `absence:${absence.id}`,
           icon: 'absences',
           emoji: null,
+          group: 'absence',
           title: PERSONAL_COPY.absenceTitle.replace('{name}', absence.memberName),
           meta: `${span.days} ${span.month}`,
           note: absenceReasonText(absence),
@@ -111,6 +123,7 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
       key: `call:${call.eventId}`,
       icon: 'meetings',
       emoji: call.emoji,
+      group: 'call',
       title: call.title,
       meta: `${PERSONAL_COPY.attendanceKind}, ${formatDayTime(call.startsAt)}`,
       note: null,
@@ -129,6 +142,7 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
       key: task.key,
       icon: task.icon,
       emoji: null,
+      group: task.kind,
       title: task.title,
       meta: task.context,
       note: null,
@@ -159,46 +173,59 @@ export const HomeQueue = ({ absences, reviewFields, tasks, rollCalls }: HomeQueu
           ],
     }))
 
-    return [...asked, ...calls, ...todo]
+    const coords = coordination.map<HomeEntry>((request) => ({
+      key: `coordination:${request.liveId}`,
+      icon: 'coordinator',
+      emoji: null,
+      group: 'coordination',
+      title: PERSONAL_TASK_COPY.coordinationTitle.replace('{creator}', request.creator),
+      meta: formatDayTime(request.startsAt),
+      note: null,
+      due: formatRelativeDay(request.startsAt),
+      actions: [],
+      detail: <CoordinationAnswer request={request} />,
+    }))
+
+    return [...coords, ...asked, ...calls, ...todo]
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requests, rollCalls, tasks])
+  }, [requests, rollCalls, tasks, coordination])
 
-  const CrossIcon = ICONS.waiting
   const CheckIcon = ICONS.picked
-  const ChevronIcon = ICONS.next
 
-  const renderRow = (entry: HomeEntry, index: number) => (
-    <li key={entry.key} className={HOME_FLOW.todoItem}>
-      <button type="button" className={HOME_FLOW.todoRow} onClick={() => setStep(index)}>
-        <CrossIcon className={HOME_FLOW.todoMark} aria-hidden="true" />
-        <span className={HOME_FLOW.todoBody}>
-          <span className={HOME_FLOW.todoLabel}>{entry.title}</span>
-          {entry.meta && <span className={HOME_FLOW.todoMeta}>{entry.meta}</span>}
-        </span>
-        {entry.due && <span className={HOME_FLOW.todoDue}>{entry.due}</span>}
-        <ChevronIcon className={HOME_FLOW.todoChevron} aria-hidden="true" />
-      </button>
-    </li>
+  // A task treated here stays on the list, struck through, until the page is left
+  const [seen, setSeen] = useState<HomeEntry[]>(entries)
+  const fresh = entries.filter((entry) => !seen.some((known) => known.key === entry.key))
+  if (fresh.length > 0) setSeen([...seen, ...fresh])
+  const doneKeys = new Set(
+    seen
+      .filter((known) => !entries.some((entry) => entry.key === known.key))
+      .map((known) => known.key)
   )
+  const stepped = step === null ? [] : entries.filter((entry) => entry.group === step.group)
 
   return (
     <>
-      <Section title={PERSONAL_COPY.todoTitle} padded>
-        {entries.length === 0 ? (
+      <Section title={PERSONAL_COPY.todoTitle} bare>
+        {seen.length === 0 && entries.length === 0 ? (
           <div className={HOME_FLOW.rest}>
             <CheckIcon className={HOME_FLOW.restMark} aria-hidden="true" />
             <p>{PERSONAL_COPY.calmTodoTitle}</p>
           </div>
         ) : (
-          <ul className={HOME_FLOW.todoList}>{entries.map(renderRow)}</ul>
+          <HomeTaskGroups
+            entries={[...seen.filter((known) => doneKeys.has(known.key)), ...entries]}
+            doneKeys={doneKeys}
+            onWalk={(group) => setStep({ group, index: 0 })}
+          />
         )}
       </Section>
 
-      {step !== null && entries.length > 0 && (
+      {step !== null && stepped.length > 0 && (
         <HomeTaskStepper
-          entries={entries}
-          index={step}
-          onIndex={setStep}
+          group={step.group}
+          entries={stepped}
+          index={step.index}
+          onIndex={(index) => setStep({ group: step.group, index })}
           onClose={() => setStep(null)}
           hidden={reviewing !== null}
         />

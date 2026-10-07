@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import type { IconName } from '@/declarations/ui/icons'
-import type { AttendeeKindName, MeetingAudienceName } from '@/utils/constants/workflow'
 
 /**
  * Birthday shown on the home page
@@ -19,25 +18,23 @@ export interface HomeBirthday {
 }
 
 /**
- * Meeting a member is expected at
- * @typedef {Object} HomeMeeting
- * @property {string} id - Meeting identifier
- * @property {string} title - Meeting title
+ * Entry the calendar plans next
+ * @typedef {Object} HomePlanned
+ * @property {string} id - Entry identifier
+ * @property {string} title - Entry title
  * @property {string | null} emoji - Glyph drawn before the title
- * @property {string} scheduledAt - ISO start
- * @property {number | null} durationMin - Length in minutes
- * @property {MeetingAudienceName} audience - Whole team or named seats
- * @property {AttendeeKindName | null} seat - Seat the member holds
+ * @property {string} startsAt - ISO start
+ * @property {boolean} allDay - Takes the whole day
+ * @property {boolean} isDone - Already over
  */
 
-export interface HomeMeeting {
+export interface HomePlanned {
   id: string
   title: string
   emoji: string | null
-  scheduledAt: string
-  durationMin: number | null
-  audience: MeetingAudienceName
-  seat: AttendeeKindName | null
+  startsAt: string
+  allDay: boolean
+  isDone: boolean
 }
 
 /**
@@ -94,6 +91,7 @@ export interface HomeTask {
  * @property {string | null} emoji - Emoji standing for the entry
  * @property {string} title - What is asked
  * @property {string | null} meta - Who or what it concerns
+ * @property {string} group - Kind of task it belongs to
  * @property {string | null} note - Words the requester left
  * @property {string | null} due - Relative wording of its day
  * @property {HomeAction[]} actions - What the member can do
@@ -106,6 +104,7 @@ export interface HomeEntry {
   emoji: string | null
   title: string
   meta: string | null
+  group: string
   note: string | null
   due: string | null
   actions: HomeAction[]

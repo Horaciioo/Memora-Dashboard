@@ -5,12 +5,15 @@ import Link from 'next/link'
 import { Button } from '@/components/elements/actions/Button'
 import { Drawer } from '@/components/structures/Drawer'
 import { PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
+import { TASK_GROUPS } from '@/declarations/personal/groups'
 import { ICONS } from '@/declarations/ui/icons'
 import { TASK_STEPPER } from '@/declarations/ui/variants'
 import type { HomeEntry } from '@/types/personal'
 import { cn } from '@/utils/classnames'
 
 export interface HomeTaskStepperProps {
+  // Kind of task being walked
+  group: string
   entries: HomeEntry[]
   index: number
   onIndex: (index: number) => void
@@ -21,7 +24,8 @@ export interface HomeTaskStepperProps {
 
 /**
  * Tasks walked one after another
- * @param {HomeEntry[]} entries - Queue in order
+ * @param {string} group - Kind of task walked
+ * @param {HomeEntry[]} entries - The group in order
  * @param {number} index - Task on screen
  * @param {(index: number) => void} onIndex - Moves along the queue
  * @param {() => void} onClose - Dismiss handler
@@ -30,6 +34,7 @@ export interface HomeTaskStepperProps {
  */
 
 export const HomeTaskStepper = ({
+  group,
   entries,
   index,
   onIndex,
@@ -47,8 +52,8 @@ export const HomeTaskStepper = ({
     <Drawer
       open={!hidden}
       onClose={onClose}
-      title={PERSONAL_TASK_COPY.stepperLabel}
-      icon="tasks"
+      title={TASK_GROUPS[group]?.title ?? PERSONAL_TASK_COPY.stepperLabel}
+      icon={TASK_GROUPS[group]?.icon ?? 'tasks'}
       subheader={PERSONAL_TASK_COPY.stepCounter
         .replace('{index}', String(position + 1))
         .replace('{total}', String(entries.length))}
