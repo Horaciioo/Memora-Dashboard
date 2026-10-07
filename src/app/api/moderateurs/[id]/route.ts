@@ -1,4 +1,4 @@
-import { invalidInput } from '@/core/lib/errors'
+import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { readSealState, sealValues } from '@/core/services/auth/SealService'
@@ -6,6 +6,8 @@ import { assertAccountInScope } from '@/core/services/auth/ScopeService'
 import {
   anonymiseMember,
   assertDivisionAssignable,
+  assertMemberAssignable,
+  BELOW_LEAD_ROLES,
   memberFields,
   readMember,
   updateMember,
@@ -18,9 +20,18 @@ export const GET = createProtectedRoute({
   permission: Permissions.MemberRead,
   descriptor: { summary: 'Read a moderator file', tags: ['members'] },
   handler: async ({ params, access, session, scope }) => {
+    if (!access.isResponsable && params.id !== session.id) throw notFound()
     await assertAccountInScope(params.id, await scope(), session.id)
 
-    return readMember(params.id, access.can(Permissions.MemberNoteRead))
+    const detail = await readMember(params.id, access.can(Permissions.MemberNoteRead))
+    if (
+      !access.isAdmin &&
+      params.id !== session.id &&
+      !BELOW_LEAD_ROLES.includes(detail.summary.role)
+    )
+      throw notFound()
+
+    return detail
   },
 })
 
@@ -28,6 +39,7 @@ export const PATCH = createProtectedRoute({
   permission: Permissions.MemberUpdate,
   descriptor: { summary: 'Edit a moderator', tags: ['members'] },
   handler: async ({ params, raw, session, access, scope }) => {
+    if (!access.isResponsable) throw forbidden()
     await assertAccountInScope(params.id, await scope(), session.id)
     const fields = await memberFields(access.isAdmin)
 
@@ -41,6 +53,8 @@ export const PATCH = createProtectedRoute({
       access.isAdmin,
       before.summary.division?.id ?? null
     )
+
+    await assertMemberAssignable(parsed.values, access.isAdmin, params.id)
 
     const member = await updateMember(params.id, parsed.values)
 
