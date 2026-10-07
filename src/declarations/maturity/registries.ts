@@ -17,11 +17,6 @@ interface MaturityOption {
 
 // Declared from least to most mature
 const MATURITY_MAP = {
-  dev: {
-    label: 'Dev',
-    summary: 'En cours de création, pas encore utilisable ou incomplète.',
-    tone: 'neutral',
-  },
   alpha: {
     label: 'Alpha',
     summary:
@@ -36,13 +31,12 @@ const MATURITY_MAP = {
   },
   new: {
     label: 'New',
-    summary: 'Récemment ajoutée ou publiée.',
+    summary: 'Ce qui est nouveau, et fonctionnel.',
     tone: 'caution',
   },
   deprecated: {
-    label: 'Déprécié',
-    summary:
-      'Toujours disponible, mais vouée à être supprimée ou remplacée dans une future version.',
+    label: 'Deprecated',
+    summary: 'Ce visuel, ou ce système là va bientôt disparaître tel qu’il est présenté.',
     tone: 'danger',
   },
 } satisfies Record<string, MaturityOption>
