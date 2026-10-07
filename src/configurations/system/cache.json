@@ -1,5 +1,6 @@
 {
   "staleMs": 30000,
   "gcMs": 300000,
-  "readRetries": 1
+  "readRetries": 1,
+  "refreshMs": 30000
 }

@@ -2,6 +2,8 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import { projectVisibility } from '@/core/services/work/visibility'
+import type { WorkViewer } from '@/core/services/work/visibility'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { notFound } from '@/core/lib/errors'
 import { readDate, readList, readText } from '@/core/lib/forms/values'
@@ -210,12 +212,16 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
 /**
  * Read every project
  * @param {AccessScope} scope - Creator perimeter
+ * @param {WorkViewer} viewer - Who reads
  * @return {Promise<ProjectSummary[]>} - Board cards
  */
 
-export const listProjects = async (scope: AccessScope): Promise<ProjectSummary[]> => {
+export const listProjects = async (
+  scope: AccessScope,
+  viewer: WorkViewer
+): Promise<ProjectSummary[]> => {
   const rows = await prisma.project.findMany({
-    where: scopedWhere('project', scope, { archived: false }),
+    where: { AND: [scopedWhere('project', scope, { archived: false }), projectVisibility(viewer)] },
     include: PROJECT_INCLUDE,
     orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
   })
@@ -511,6 +517,24 @@ export const updateCommunication = async (
   })
 
   return toCommunication(row)
+}
+
+/**
+ * Read who wrote an announcement and where
+ * @param {string} id - Announcement identifier
+ * @return {Promise<{ projectId: string, authorId: string | null }>} - Ownership
+ */
+
+export const communicationOwner = async (
+  id: string
+): Promise<{ projectId: string; authorId: string | null }> => {
+  const row = await prisma.communication.findUnique({
+    where: { id },
+    select: { projectId: true, authorId: true },
+  })
+  if (!row) throw notFound()
+
+  return row
 }
 
 /**

@@ -35,4 +35,3 @@ export const SanctionGravities = {
 } as const
 
 export type SanctionGravityName = (typeof SanctionGravities)[keyof typeof SanctionGravities]
-

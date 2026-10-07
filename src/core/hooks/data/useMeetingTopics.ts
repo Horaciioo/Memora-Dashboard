@@ -1,11 +1,12 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/useMutation'
+import { useSyncedState } from '@/core/hooks/interaction/useSyncedState'
 import { feedbackTitle } from '@/declarations/ui/copy'
 import { MEETING_TOPIC_ENTITY } from '@/declarations/work/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
@@ -45,7 +46,8 @@ export const useMeetingTopics = (
   initialEntries: MeetingTopicEntry[]
 ): MeetingTopicCollection => {
   const router = useRouter()
-  const [entries, setEntries] = useState(initialEntries)
+  // Follows the server once it refreshes
+  const [entries, setEntries] = useSyncedState(initialEntries)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   const create = useCallback(
@@ -58,13 +60,13 @@ export const useMeetingTopics = (
 
       // Every write lands in the journal
       if (entry) {
-        setEntries((current) => [...current, entry])
+        setEntries([...entries, entry])
         router.refresh()
       }
 
       return entry !== null
     },
-    [meetingId, run, router]
+    [meetingId, run, router, entries, setEntries]
   )
 
   const update = useCallback(
@@ -76,13 +78,13 @@ export const useMeetingTopics = (
       )
 
       if (entry) {
-        setEntries((current) => current.map((row) => (row.id === id ? entry : row)))
+        setEntries(entries.map((row) => (row.id === id ? entry : row)))
         router.refresh()
       }
 
       return entry !== null
     },
-    [run, router]
+    [run, router, entries, setEntries]
   )
 
   const remove = useCallback(
@@ -94,11 +96,11 @@ export const useMeetingTopics = (
       )
 
       if (done) {
-        setEntries((current) => current.filter((row) => row.id !== id))
+        setEntries(entries.filter((row) => row.id !== id))
         router.refresh()
       }
     },
-    [run, router, entries]
+    [run, router, entries, setEntries]
   )
 
   return { entries, isSaving, issues, clearIssues, create, update, remove }

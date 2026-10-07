@@ -5,6 +5,13 @@ import { SEARCH_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { SEARCH_GROUPS } from '@/declarations/ui/copy/navigation'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
+import { readScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import {
+  meetingVisibility,
+  projectVisibility,
+  taskVisibility,
+  workViewer,
+} from '@/core/services/work/visibility'
 import { formatDay } from '@/utils/format/dates'
 import type { SessionUser } from '@/types/auth'
 import type { SearchHit, SearchSection } from '@/types/search'
@@ -22,6 +29,8 @@ export const search = async (term: string, session: SessionUser): Promise<Search
   if (query.length < SEARCH_SETTINGS.minLength) return []
 
   const access = resolvePermissions(session)
+  const scope = await readScope(session, access)
+  const viewer = workViewer(session, access)
   const take = SEARCH_SETTINGS.maxResultsPerGroup
   const contains = { contains: query, mode: 'insensitive' } as const
   const sections: SearchSection[] = []
@@ -29,7 +38,9 @@ export const search = async (term: string, session: SessionUser): Promise<Search
   // Every family is gated by the permission that opens its page
   if (access.can(Permissions.MemberRead)) {
     const rows = await prisma.account.findMany({
-      where: { OR: [{ displayName: contains }, { discordId: { contains: query } }] },
+      where: scopedWhere('account', scope, {
+        OR: [{ displayName: contains }, { discordId: { contains: query } }],
+      }),
       include: { division: true, youtubers: true },
       take,
     })
@@ -52,7 +63,12 @@ export const search = async (term: string, session: SessionUser): Promise<Search
 
   if (access.can(Permissions.ProjectRead)) {
     const rows = await prisma.project.findMany({
-      where: { OR: [{ title: contains }, { description: contains }] },
+      where: {
+        AND: [
+          scopedWhere('project', scope, { OR: [{ title: contains }, { description: contains }] }),
+          projectVisibility(viewer),
+        ],
+      },
       include: { youtuber: true, state: true },
       take,
     })
@@ -72,7 +88,12 @@ export const search = async (term: string, session: SessionUser): Promise<Search
 
   if (access.can(Permissions.TaskRead)) {
     const rows = await prisma.task.findMany({
-      where: { OR: [{ title: contains }, { description: contains }] },
+      where: {
+        AND: [
+          scopedWhere('task', scope, { OR: [{ title: contains }, { description: contains }] }),
+          taskVisibility(viewer),
+        ],
+      },
       include: { owner: true, state: true },
       take,
     })
@@ -92,7 +113,17 @@ export const search = async (term: string, session: SessionUser): Promise<Search
 
   if (access.can(Permissions.MeetingRead)) {
     const rows = await prisma.meeting.findMany({
-      where: { OR: [{ title: contains }, { introduction: contains }] },
+      where: {
+        AND: [
+          scopedWhere('meeting', scope, {
+            OR: [
+              { title: contains },
+              ...(access.can(Permissions.MeetingContentRead) ? [{ introduction: contains }] : []),
+            ],
+          }),
+          meetingVisibility(viewer),
+        ],
+      },
       take,
     })
 
@@ -111,7 +142,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
 
   if (access.can(Permissions.TeamRead)) {
     const rows = await prisma.team.findMany({
-      where: { name: contains },
+      where: scopedWhere('team', scope, { name: contains }),
       include: { lead: true },
       take,
     })

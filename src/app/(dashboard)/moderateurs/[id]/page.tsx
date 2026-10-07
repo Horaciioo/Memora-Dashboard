@@ -11,6 +11,7 @@ import {
 import { layerKey } from '@/core/lib/permissions'
 import { ABSENCE_FIELDS, canReviewAbsence } from '@/core/services/absences/AbsenceService'
 import { readInheritedGrants } from '@/core/services/auth/GrantsService'
+import { assertAccountInScope } from '@/core/services/auth/ScopeService'
 import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
 import { memberFields, readMember } from '@/core/services/members/MemberService'
 import { findCandidateFile } from '@/core/services/recruitment/RecruitmentService'
@@ -77,11 +78,17 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const canReadLogs = access.can(Permissions.MemberLogRead)
   const canReadNotes = access.can(Permissions.MemberNoteRead)
 
-  const detail = await readMember(id, canReadNotes).catch(() => null)
+  const perimeter = await scope()
+  const detail = await assertAccountInScope(id, perimeter, session.id)
+    .then(() => readMember(id, canReadNotes))
+    .catch(() => null)
   if (!detail) notFound()
 
-  // The Discord identifier is the only bridge to their application
-  const canReadModeration = session.id === id || access.can(Permissions.LiveLogRead)
+  // Only the responsables of their creators
+  const isConcerned =
+    perimeter.isGlobal ||
+    detail.summary.youtubers.some((tag) => perimeter.youtuberIds.includes(tag.id))
+  const canReadModeration = access.can(Permissions.LiveLogRead) && isConcerned
 
   const [
     fields,
@@ -99,7 +106,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     canManageAccess ? readOverrides(id) : Promise.resolve({}),
     canManageAccess ? readMemberBaselines(id, detail.summary.youtubers) : Promise.resolve({}),
     access.can(Permissions.RecruitmentRead)
-      ? findCandidateFile(detail.summary.discordId, await scope())
+      ? findCandidateFile(detail.summary.discordId, perimeter)
       : Promise.resolve(null),
     readSealState(),
     access.can(Permissions.AbsenceReview) && session.id !== id

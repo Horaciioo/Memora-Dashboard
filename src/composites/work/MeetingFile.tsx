@@ -38,6 +38,8 @@ export interface MeetingFileProps {
   topicFields: FieldDefinition[]
   activity: ActivityEntry[]
   canUpdate: boolean
+  canReadContent: boolean
+  canReadLogs: boolean
 }
 
 /**
@@ -73,6 +75,8 @@ const CLOSING_AXES: ContentAxis[] = [
  * @param {FieldDefinition[]} topicFields - Declarations of the topic form
  * @param {ActivityEntry[]} activity - Journal entries
  * @param {boolean} canUpdate - Member may edit the meeting
+ * @param {boolean} canReadContent - Member may read the content tab
+ * @param {boolean} canReadLogs - Member may read the journal
  * @return {JSX.Element}
  */
 
@@ -82,6 +86,8 @@ export const MeetingFile = ({
   topicFields,
   activity,
   canUpdate,
+  canReadContent,
+  canReadLogs,
 }: MeetingFileProps) => {
   const { summary } = detail
   const file = useRecordFile({
@@ -345,6 +351,7 @@ export const MeetingFile = ({
             label: MEETING_COPY.tabContent,
             icon: 'note',
             maturity: 'alpha',
+            visible: canReadContent,
             render: contentTab,
           },
           {
@@ -352,6 +359,7 @@ export const MeetingFile = ({
             label: MEETING_COPY.tabLogs,
             icon: 'history',
             maturity: 'beta',
+            visible: canReadLogs,
             render: logsTab,
           },
         ]}

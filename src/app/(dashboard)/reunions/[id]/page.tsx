@@ -5,6 +5,7 @@ import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { MeetingFile } from '@/composites/work/MeetingFile'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
 import { meetingFields, readMeeting, topicFields } from '@/core/services/work/MeetingService'
+import { assertMeetingVisible, workViewer } from '@/core/services/work/visibility'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { MEETING_COPY } from '@/declarations/work/copy'
@@ -42,15 +43,18 @@ export async function generateMetadata({
 
 export default async function MeetingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { access, scope } = await requirePermission(Permissions.MeetingRead)
+  const { session, access, scope } = await requirePermission(Permissions.MeetingRead)
   const perimeter = await scope()
+  const viewer = workViewer(session, access)
 
-  const detail = await readMeeting(id).catch(() => null)
+  const detail = await assertMeetingVisible(id, viewer)
+    .then(() => readMeeting(id))
+    .catch(() => null)
   if (!detail) notFound()
 
   const [fields, activity] = await Promise.all([
-    meetingFields(perimeter),
-    readRecordActivity('meeting', id),
+    meetingFields(perimeter, viewer),
+    access.can(Permissions.WorkLogRead) ? readRecordActivity('meeting', id) : Promise.resolve([]),
   ])
 
   return (
@@ -63,6 +67,8 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
         topicFields={topicFields()}
         activity={activity}
         canUpdate={access.can(Permissions.MeetingUpdate)}
+        canReadContent={access.can(Permissions.MeetingContentRead)}
+        canReadLogs={access.can(Permissions.WorkLogRead)}
       />
     </div>
   )

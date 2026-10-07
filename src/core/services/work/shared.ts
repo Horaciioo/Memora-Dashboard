@@ -9,6 +9,8 @@ import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { roleGroupedOptions } from '@/core/lib/forms/options'
 import { FIXED_PRIORITIES } from '@/declarations/reference/fixed'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
+import { projectVisibility } from '@/core/services/work/visibility'
+import type { WorkViewer } from '@/core/services/work/visibility'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { BoardColumn } from '@/components/structures/KanbanBoard'
@@ -303,10 +305,14 @@ export const priorityOptions = async (): Promise<FieldOption[]> => {
 /**
  * Read the ongoing or planned projects of a perimeter
  * @param {AccessScope} [scope] - Viewer perimeter
+ * @param {WorkViewer} [viewer] - Who reads
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-export const projectOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
+export const projectOptions = async (
+  scope?: AccessScope,
+  viewer?: WorkViewer
+): Promise<FieldOption[]> => {
   // Finished projects drop out
   const live: Prisma.ProjectWhereInput = {
     archived: false,
@@ -314,7 +320,12 @@ export const projectOptions = async (scope?: AccessScope): Promise<FieldOption[]
   }
 
   const rows = await prisma.project.findMany({
-    where: scope ? scopedWhere('project', scope, live) : live,
+    where: {
+      AND: [
+        scope ? scopedWhere('project', scope, live) : live,
+        viewer ? projectVisibility(viewer) : {},
+      ],
+    },
     orderBy: { title: 'asc' },
   })
 

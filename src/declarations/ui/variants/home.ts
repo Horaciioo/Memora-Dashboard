@@ -47,7 +47,7 @@ export const HOME_STYLES = {
   urgentText: 'line-clamp-2 text-sm text-[var(--color-ink-subtle)]',
   // Urgent box
   urgentChip: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full',
-  urgentReason: 'truncate text-xs text-[var(--color-ink-subtle)] italic',
+  urgentReason: 'truncate pr-[0.2em] text-xs text-[var(--color-ink-subtle)] italic',
   more: 'self-start rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   quiet: 'px-3 text-sm text-[var(--color-ink-subtle)]',
   chevron: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
@@ -61,7 +61,7 @@ export const HOME_STYLES = {
 
 export const HOME_FLOW = {
   // Reaches into the shell gutters, a little further where the shell caps its width
-  page: 'flex flex-col gap-10 md:-mx-5 xl:-mx-10',
+  page: 'flex flex-col gap-10 md:-mx-5 min-[1700px]:-mx-10',
   rest: 'flex items-center justify-center gap-3 py-4 text-sm font-semibold text-[var(--color-ink-subtle)]',
   restMark: 'h-6 w-6 shrink-0',
   // Latest note, one gold line
@@ -84,7 +84,7 @@ export const HOME_FLOW = {
 export const HOME_HERO = {
   row: 'flex flex-wrap items-end justify-between gap-x-6 gap-y-2',
   words: 'flex min-w-0 flex-col gap-1',
-  greeting: 'truncate text-4xl font-bold tracking-tight italic sm:text-5xl',
+  greeting: 'truncate pr-[0.2em] text-4xl font-bold tracking-tight italic sm:text-5xl',
   hello: 'text-sm font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase italic',
   date: 'text-4xl font-bold tracking-tight text-[var(--color-ink-subtle)] italic first-letter:uppercase sm:text-5xl',
 } as const

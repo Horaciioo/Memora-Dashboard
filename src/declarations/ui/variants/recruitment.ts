@@ -15,7 +15,7 @@ export const SESSION_CARD = {
   track: 'h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-sunken)]',
   fill: 'h-full rounded-full bg-[var(--color-brand-600)]',
   date: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
-  metaPending: 'truncate text-sm text-[var(--color-caution)] italic',
+  metaPending: 'truncate pr-[0.2em] text-sm text-[var(--color-caution)] italic',
   group:
     'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',
   groupHead: 'flex cursor-pointer items-center gap-3',
@@ -52,7 +52,7 @@ export const CANDIDATE_CARD = {
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
   name: 'truncate font-bold tracking-tight',
   meta: 'truncate text-xs text-[var(--color-ink-subtle)]',
-  metaEmpty: 'truncate text-xs text-[var(--color-ink-subtle)] italic',
+  metaEmpty: 'truncate pr-[0.2em] text-xs text-[var(--color-ink-subtle)] italic',
   aside: 'flex shrink-0 flex-col items-end gap-1',
 } as const
 

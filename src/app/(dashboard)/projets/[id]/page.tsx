@@ -10,7 +10,8 @@ import {
   projectFields,
   readProject,
 } from '@/core/services/work/ProjectService'
-import { taskFields } from '@/core/services/work/TaskService'
+import { creatableTaskFields, taskFields } from '@/core/services/work/TaskService'
+import { assertProjectVisible, workViewer } from '@/core/services/work/visibility'
 import { mentionOptions } from '@/core/services/work/DiscordDirectory'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -49,18 +50,21 @@ export async function generateMetadata({
 
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { access, scope } = await requirePermission(Permissions.ProjectRead)
+  const { session, access, scope } = await requirePermission(Permissions.ProjectRead)
   const perimeter = await scope()
+  const viewer = workViewer(session, access)
 
-  const detail = await readProject(id).catch(() => null)
+  const detail = await assertProjectVisible(id, viewer)
+    .then(() => readProject(id))
+    .catch(() => null)
   if (!detail) notFound()
 
   const [projectForm, taskForm, meetingForm, communicationForm, activity] = await Promise.all([
     projectFields(perimeter),
-    taskFields(perimeter),
-    meetingFields(perimeter),
+    taskFields(perimeter, viewer),
+    meetingFields(perimeter, viewer),
     mentionOptions(detail.summary.youtuber?.id ?? null).then(communicationFields),
-    readRecordActivity('project', id),
+    access.can(Permissions.WorkLogRead) ? readRecordActivity('project', id) : Promise.resolve([]),
   ])
 
   return (
@@ -70,11 +74,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       <ProjectFileTabs
         detail={detail}
         projectFields={projectForm}
-        taskFields={taskForm}
+        taskFields={access.can(Permissions.TaskManage) ? taskForm : creatableTaskFields(taskForm)}
         meetingFields={meetingForm}
         communicationFields={communicationForm}
         activity={activity}
         canUpdate={access.can(Permissions.ProjectUpdate)}
+        canReadLogs={access.can(Permissions.WorkLogRead)}
         canCreateTasks={access.can(Permissions.TaskCreate)}
         canReadTasks={access.can(Permissions.TaskRead)}
         canCreateMeetings={access.can(Permissions.MeetingCreate)}

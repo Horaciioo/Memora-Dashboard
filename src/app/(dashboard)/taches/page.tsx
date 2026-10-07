@@ -2,13 +2,14 @@ import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { TasksBoard } from '@/composites/work/TasksBoard'
 import { busySlots, withBusy } from '@/core/services/calendar/BusyService'
-import { listTasks, taskFields } from '@/core/services/work/TaskService'
+import { creatableTaskFields, listTasks, taskFields } from '@/core/services/work/TaskService'
 import {
   boardColumns,
   memberOptions,
   projectOptions,
   youtuberOptions,
 } from '@/core/services/work/shared'
+import { workViewer } from '@/core/services/work/visibility'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { TASK_COPY } from '@/declarations/work/copy'
@@ -25,18 +26,24 @@ export const metadata: Metadata = { title: TASK_COPY.title }
 export default async function TasksPage() {
   const { session, access, scope } = await requirePermission(Permissions.TaskRead)
   const perimeter = await scope()
+  const viewer = workViewer(session, access)
 
   const [tasks, columns, baseFields, slots, owners, youtubers, projects] = await Promise.all([
-    listTasks(perimeter),
+    listTasks(perimeter, viewer),
     boardColumns(WorkflowScopes.Task),
-    taskFields(perimeter),
+    taskFields(perimeter, viewer),
     busySlots({ viewerId: session.id, access, scope: perimeter }),
     memberOptions(),
     youtuberOptions(),
-    projectOptions(),
+    projectOptions(perimeter, viewer),
   ])
 
-  const fields = withBusy(baseFields, ['dueDate'], slots)
+  const canManage = access.can(Permissions.TaskManage)
+  const fields = withBusy(
+    canManage ? baseFields : creatableTaskFields(baseFields),
+    ['dueDate'],
+    slots
+  )
 
   return (
     <div className={PAGE_STYLES.wrapper}>

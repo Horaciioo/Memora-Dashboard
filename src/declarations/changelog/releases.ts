@@ -111,6 +111,90 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.1.1',
+    date: '2026-10-08',
+    title: 'Tes retours, déjà pris en compte',
+    intro:
+      'Les premiers testeurs ont parlé : des pages plus fluides, des accès mieux répartis et plusieurs bugs en moins.',
+    description:
+      'Les premiers essais ont montré des pages qui saccadaient, des accès trop larges pour les modérateurs et quelques fonctions qui ne répondaient pas. Cette version corrige tout ça : les pages se mettent à jour d’elles-mêmes, et chacun ne voit que ce qui le concerne.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la possibilité de voir les informations se mettre à jour toutes seules, sans recharger la page',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.projects,
+        permission: Permissions.ProjectRead,
+        text: 'Ajout de la possibilité, pour les modérateurs, de consulter les « Projets », « Tâches » et « Réunions » dans lesquels ils sont cités',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.projects,
+        permission: Permissions.CommunicationWrite,
+        text: 'Ajout de la possibilité de rédiger une communication dans un projet dont on fait partie',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.tasks,
+        permission: Permissions.TaskCreate,
+        text: 'Ajout de la possibilité de créer une tâche dans un projet dont on fait partie',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la fluidité de toutes les pages, surtout celles qui affichent de longues listes',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.dashboard,
+        text: 'Amélioration visuelle de la page « Accueil » : elle reste dans le cadre sur les écrans d’ordinateur portable',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des bulles de notification : elles restent plus longtemps à l’écran et ne se ferment plus tant que la souris est dessus',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.tasks,
+        permission: Permissions.TaskUpdate,
+        text: 'Amélioration des « Tâches » : le responsable, l’état et la deadline ne se changent plus que par les Responsables',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        text: 'Amélioration de la confidentialité des lives : leurs logs ne sont plus visibles que par les Responsables du créateur concerné',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        text: 'Amélioration de la confidentialité de la page « Modérateurs » : les fiches sont réservées aux Responsables, pour les créateurs dont ils s’occupent',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la recherche : elle ne montre plus que ce que chacun a le droit de consulter',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.absences,
+        permission: Permissions.AbsenceReview,
+        text: 'Correction d’un bug qui empêchait les Responsables de voir les absences posées par les modérateurs de leurs créateurs',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.meetings,
+        permission: Permissions.MeetingUpdate,
+        text: 'Correction d’un bug qui empêchait d’ajouter un sujet à une réunion sans avoir choisi d’émoji',
+      },
+    ],
+    comments: [
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Merci aux testeurs : chacun de ces points vient d’un retour reçu cette semaine.',
+      },
+    ],
+  },
+  {
     version: '0.1.0',
     date: '2026-09-03',
     title: 'Memora ouvre ses portes',

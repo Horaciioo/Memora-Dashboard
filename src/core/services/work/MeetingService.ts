@@ -2,6 +2,8 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import { meetingVisibility } from '@/core/services/work/visibility'
+import type { WorkViewer } from '@/core/services/work/visibility'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { notFound } from '@/core/lib/errors'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
@@ -100,14 +102,18 @@ const toSummary = (row: MeetingRow): MeetingSummary => ({
 /**
  * Build the meeting form declarations
  * @param {AccessScope} [scope] - Creator perimeter
+ * @param {WorkViewer} [viewer] - Who reads
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
+export const meetingFields = async (
+  scope?: AccessScope,
+  viewer?: WorkViewer
+): Promise<FieldDefinition[]> => {
   const [states, youtubers, projects, members] = await Promise.all([
     stateOptions(WorkflowScopes.Meeting),
     youtuberOptions(scope),
-    projectOptions(scope),
+    projectOptions(scope, viewer),
     memberOptions(scope),
   ])
 
@@ -259,12 +265,16 @@ export const meetingFields = async (scope?: AccessScope): Promise<FieldDefinitio
 /**
  * Read every meeting
  * @param {AccessScope} scope - Creator perimeter
+ * @param {WorkViewer} viewer - Who reads
  * @return {Promise<MeetingSummary[]>} - Board cards
  */
 
-export const listMeetings = async (scope: AccessScope): Promise<MeetingSummary[]> => {
+export const listMeetings = async (
+  scope: AccessScope,
+  viewer: WorkViewer
+): Promise<MeetingSummary[]> => {
   const rows = await prisma.meeting.findMany({
-    where: scopedWhere('meeting', scope, {}),
+    where: { AND: [scopedWhere('meeting', scope, {}), meetingVisibility(viewer)] },
     include: MEETING_INCLUDE,
     orderBy: [{ scheduledAt: 'desc' }],
   })
@@ -437,7 +447,6 @@ export const topicFields = (): FieldDefinition[] => [
     name: 'emoji',
     kind: 'emoji',
     label: MEETING_FIELD_COPY.topicEmoji,
-    required: true,
     maxLength: EMOJI_SETTINGS.maxLength,
   },
   {

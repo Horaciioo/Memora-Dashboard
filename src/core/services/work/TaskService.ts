@@ -2,6 +2,8 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import { taskVisibility } from '@/core/services/work/visibility'
+import type { WorkViewer } from '@/core/services/work/visibility'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { notFound } from '@/core/lib/errors'
 import { readDate, readText } from '@/core/lib/forms/values'
@@ -76,15 +78,19 @@ const toSummary = (row: TaskRow): TaskSummary => ({
 /**
  * Build the task form declarations
  * @param {AccessScope} [scope] - Creator perimeter
+ * @param {WorkViewer} [viewer] - Who reads
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
+export const taskFields = async (
+  scope?: AccessScope,
+  viewer?: WorkViewer
+): Promise<FieldDefinition[]> => {
   const [states, priorities, youtubers, projects, members] = await Promise.all([
     stateOptions(WorkflowScopes.Task),
     priorityOptions(),
     youtuberOptions(scope),
-    projectOptions(scope),
+    projectOptions(scope, viewer),
     memberOptions(scope),
   ])
 
@@ -179,14 +185,60 @@ export const taskFields = async (scope?: AccessScope): Promise<FieldDefinition[]
   ]
 }
 
+// Fields only a manager moves
+const MANAGED_FIELDS = ['ownerId', 'stateId', 'dueDate'] as const
+
+/**
+ * Pin the fields a member cannot move
+ * @param {FormValues} values - Parsed body
+ * @param {FormValues} [current] - Stored values
+ * @return {FormValues} - Safe values
+ */
+
+export const lockTaskValues = (values: FormValues, current?: FormValues): FormValues => {
+  const locked = { ...values }
+
+  // Keep stored, or let defaults land
+  for (const name of MANAGED_FIELDS) {
+    if (current && name in current) locked[name] = current[name]
+    else delete locked[name]
+  }
+
+  return locked
+}
+
+/**
+ * Show the managed fields read-only
+ * @param {FieldDefinition[]} fields - Task form
+ * @return {FieldDefinition[]} - Locked form
+ */
+
+export const lockTaskFields = (fields: FieldDefinition[]): FieldDefinition[] =>
+  fields.map((field) =>
+    (MANAGED_FIELDS as readonly string[]).includes(field.name)
+      ? { ...field, readOnly: true }
+      : field
+  )
+
+/**
+ * Drop the managed fields from a creation form
+ * @param {FieldDefinition[]} fields - Task form
+ * @return {FieldDefinition[]} - Form without them
+ */
+
+export const creatableTaskFields = (fields: FieldDefinition[]): FieldDefinition[] =>
+  fields.filter((field) => !(MANAGED_FIELDS as readonly string[]).includes(field.name))
+
 /**
  * Read every task
+ * @param {AccessScope} scope - Creator perimeter
+ * @param {WorkViewer} viewer - Who reads
  * @return {Promise<TaskSummary[]>} - Board cards
  */
 
-export const listTasks = async (scope: AccessScope): Promise<TaskSummary[]> => {
+export const listTasks = async (scope: AccessScope, viewer: WorkViewer): Promise<TaskSummary[]> => {
   const rows = await prisma.task.findMany({
-    where: scopedWhere('task', scope, { archived: false }),
+    where: { AND: [scopedWhere('task', scope, { archived: false }), taskVisibility(viewer)] },
     include: TASK_INCLUDE,
     orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
   })

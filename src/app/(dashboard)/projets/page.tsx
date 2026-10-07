@@ -8,6 +8,7 @@ import {
   priorityOptions,
   youtuberOptions,
 } from '@/core/services/work/shared'
+import { workViewer } from '@/core/services/work/visibility'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { PROJECT_COPY } from '@/declarations/work/copy'
@@ -22,11 +23,11 @@ export const metadata: Metadata = { title: PROJECT_COPY.title }
  */
 
 export default async function ProjectsPage() {
-  const { access, scope } = await requirePermission(Permissions.ProjectRead)
+  const { session, access, scope } = await requirePermission(Permissions.ProjectRead)
   const perimeter = await scope()
 
   const [projects, columns, fields, youtubers, priorities, platforms] = await Promise.all([
-    listProjects(perimeter),
+    listProjects(perimeter, workViewer(session, access)),
     boardColumns(WorkflowScopes.Project),
     projectFields(perimeter),
     youtuberOptions(),

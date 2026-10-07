@@ -23,6 +23,7 @@ export interface NudgeBubbleProps {
 
 export const NudgeBubble = ({ onGone, children }: NudgeBubbleProps) => {
   const [isClosing, setClosing] = useState(false)
+  const [isHeld, setHeld] = useState(false)
   const goneRef = useRef(onGone)
 
   // Latest callback
@@ -32,12 +33,14 @@ export const NudgeBubble = ({ onGone, children }: NudgeBubbleProps) => {
 
   const fold = useCallback(() => setClosing(true), [])
 
-  // Hold
+  // Hold, paused under the pointer
   useEffect(() => {
+    if (isHeld) return
+
     const timer = window.setTimeout(fold, NUDGE_SETTINGS.holdMs)
 
     return () => window.clearTimeout(timer)
-  }, [fold])
+  }, [fold, isHeld])
 
   // Hand over once folded
   useEffect(() => {
@@ -53,6 +56,10 @@ export const NudgeBubble = ({ onGone, children }: NudgeBubbleProps) => {
       className={cn(NUDGE.bubble, isClosing && NUDGE.closing)}
       style={isClosing ? { animationDuration: `${NUDGE_SETTINGS.closeMs}ms` } : undefined}
       role="status"
+      onMouseEnter={() => setHeld(true)}
+      onMouseLeave={() => setHeld(false)}
+      onFocus={() => setHeld(true)}
+      onBlur={() => setHeld(false)}
     >
       <svg viewBox="0 0 12 18" className={NUDGE.tail} aria-hidden="true">
         <path

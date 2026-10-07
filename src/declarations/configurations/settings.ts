@@ -1049,7 +1049,7 @@ export const TIMEOUT_SETTINGS = {
 
 /**
  * Client query cache
- * @type {{ staleMs: number, gcMs: number, readRetries: number }}
+ * @type {{ staleMs: number, gcMs: number, readRetries: number, refreshMs: number }}
  */
 
 export const CACHE_SETTINGS = {
@@ -1060,6 +1060,11 @@ export const CACHE_SETTINGS = {
     fallback: 1,
     min: 0,
     max: 5,
+  }),
+  refreshMs: readInteger(cache.refreshMs, {
+    path: 'system/cache.refreshMs',
+    fallback: 30000,
+    min: 0,
   }),
 } as const
 
@@ -1076,7 +1081,7 @@ export const NUDGE_SETTINGS = {
   }),
   holdMs: readInteger(notifications.nudgeHoldMs, {
     path: 'system/notifications.nudgeHoldMs',
-    fallback: 4000,
+    fallback: 12000,
     min: 1000,
   }),
   closeMs: readInteger(notifications.nudgeCloseMs, {

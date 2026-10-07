@@ -12,7 +12,7 @@ import { notifyMentions } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
-  permission: Permissions.MeetingRead,
+  permission: Permissions.MeetingContentRead,
   descriptor: { summary: 'List meeting topics', tags: ['meetings'] },
   handler: async ({ params }) => listTopics(params.id),
 })

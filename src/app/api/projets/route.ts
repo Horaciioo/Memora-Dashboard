@@ -4,12 +4,14 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { createProject, listProjects, projectFields } from '@/core/services/work/ProjectService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { notify } from '@/core/services/system/NotificationService'
+import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
   permission: Permissions.ProjectRead,
   descriptor: { summary: 'List projects', tags: ['projects'] },
-  handler: async ({ scope }) => listProjects(await scope()),
+  handler: async ({ scope, session, access }) =>
+    listProjects(await scope(), workViewer(session, access)),
 })
 
 export const POST = createProtectedRoute({

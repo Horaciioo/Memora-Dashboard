@@ -213,7 +213,7 @@ export const BOARD_STYLES = {
   columnArchived: 'opacity-60',
   // Column glass tinted by its classic colour
   columnTint:
-    'accent-tint accent-border border bg-clip-padding shadow-[inset_0_1px_0_var(--glass-line),var(--shadow-md)] backdrop-blur-xl backdrop-saturate-150',
+    'accent-tint accent-border border bg-clip-padding shadow-[inset_0_1px_0_var(--glass-line),var(--shadow-md)]',
   columnHead: 'flex items-center justify-between gap-2 px-2 py-1.5',
   columnTitle: 'text-sm font-bold tracking-wide text-[var(--color-ink)] uppercase italic',
   count:
@@ -221,8 +221,8 @@ export const BOARD_STYLES = {
   body: 'flex min-h-24 flex-col gap-2 rounded-[var(--radius-md)] p-1',
   card: 'group flex cursor-grab flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3.5 shadow-[var(--shadow-sm)] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] active:cursor-grabbing motion-reduce:transition-none motion-reduce:hover:translate-y-0',
   // Card sits lighter than its column so the two glass layers do not muddy
-  cardGlass: 'bg-[var(--color-surface-raised)]/70 backdrop-blur-md',
-  cardTint: 'accent-border bg-[var(--color-surface-raised)]/70 backdrop-blur-md',
+  cardGlass: 'bg-[var(--color-surface-raised)]/70',
+  cardTint: 'accent-border bg-[var(--color-surface-raised)]/70',
   cardTitle: 'text-body leading-snug font-bold',
   // Glyph flowing before a title
   cardGlyph: 'mr-1.5',

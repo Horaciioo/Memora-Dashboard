@@ -4,12 +4,14 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { createMeeting, listMeetings, meetingFields } from '@/core/services/work/MeetingService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { notify } from '@/core/services/system/NotificationService'
+import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
   permission: Permissions.MeetingRead,
   descriptor: { summary: 'List meetings', tags: ['meetings'] },
-  handler: async ({ scope }) => listMeetings(await scope()),
+  handler: async ({ scope, session, access }) =>
+    listMeetings(await scope(), workViewer(session, access)),
 })
 
 export const POST = createProtectedRoute({
