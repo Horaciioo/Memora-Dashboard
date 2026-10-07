@@ -30,9 +30,10 @@ const check = (): void => {
     if (hasChangelog() && !changelogHasVersion(version)) {
       problems.push(`CHANGELOG.md n'a pas de section [${version}]`)
     }
-  } else if (notes[0] && compareVersions(notes[0], baseVersion(parts)) >= 0) {
+  } else if (SETTINGS.notesFile && notes[0] !== baseVersion(parts)) {
+    // A version above the last release never ships without its patchnote
     problems.push(
-      `la note ${notes[0]} existe déjà alors que ${version} n'est qu'une snapshot : publie avec yarn release`
+      `la snapshot ${version} n'a pas sa note : écris la note ${baseVersion(parts)} en tête de ${SETTINGS.notesFile}`
     )
   }
 

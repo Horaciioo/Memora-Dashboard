@@ -602,11 +602,11 @@ export const CHANGELOG_BOARD = {
 
 export const RELEASE_NOTICE = {
   wrap: 'relative',
-  // Room above for the point
-  wrapPointed: 'mx-3 pt-2.5 pb-1',
-  // The ^ aimed at the version entry
+  // Room above for the point, flush with the shortcut row
+  wrapPointed: 'mx-4 pt-3 pb-1',
+  // The ^ aimed at the shortcut box
   caret:
-    'pointer-events-none absolute top-1 left-4 h-3 w-3 rotate-45 rounded-sm bg-[var(--color-gold-100)]',
+    'pointer-events-none absolute top-1.5 h-3 w-3 rotate-45 rounded-sm bg-[var(--color-gold-100)]',
   // Gradient plate
   frame:
     'group/news rail-reset relative z-10 overflow-hidden rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--color-gold-100)] via-[var(--color-gold-300)] to-[var(--color-gold-400)] text-black shadow-[var(--shadow-md)] ring-1 ring-white/40 ring-inset transition-shadow hover:shadow-[var(--shadow-lg)]',
