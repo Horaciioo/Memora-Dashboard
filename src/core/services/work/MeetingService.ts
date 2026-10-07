@@ -437,7 +437,6 @@ export const topicFields = (): FieldDefinition[] => [
     name: 'emoji',
     kind: 'emoji',
     label: MEETING_FIELD_COPY.topicEmoji,
-    required: true,
     maxLength: EMOJI_SETTINGS.maxLength,
   },
   {
