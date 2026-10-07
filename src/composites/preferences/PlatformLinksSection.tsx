@@ -36,7 +36,12 @@ export const PlatformLinksSection = ({ links, twitchAvailable }: PlatformLinksSe
   const StatusOff = ICONS.warning
 
   return (
-    <Section title={PLATFORM_ACCOUNT_COPY.title} description={PLATFORM_ACCOUNT_COPY.lead} padded>
+    <Section
+      title={PLATFORM_ACCOUNT_COPY.title}
+      description={PLATFORM_ACCOUNT_COPY.lead}
+      maturity="deprecated"
+      padded
+    >
       <ul className={SECURITY_LIST.list}>
         <li className={SECURITY_LIST.row}>
           <NetworkLogo network="twitch" className={SECURITY_LIST.glyph} />

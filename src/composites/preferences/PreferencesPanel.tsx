@@ -24,7 +24,7 @@ import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { DETAIL_BLOCK, SECURITY_LIST } from '@/declarations/ui/blocks'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { ACTION_ROW, PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
+import { ACTION_ROW, GUIDES_CARD, PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
 
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { AccountSession, ProfileDetail } from '@/types/preferences'
@@ -117,7 +117,7 @@ export const PreferencesPanel = ({
           </div>
         </Section>
 
-        <Section title={PREFERENCES_COPY.dataTitle} padded>
+        <Section title={PREFERENCES_COPY.dataTitle} maturity="deprecated" padded>
           <div className={ACTION_ROW.list}>
             <ActionRow
               title={PREFERENCES_COPY.exportTitle}
@@ -168,13 +168,21 @@ export const PreferencesPanel = ({
     <div className={TABS_STYLES.panel}>
       <div className={PREFERENCE_STYLES.stack}>
         <DisplayPreferences>
-          <ActionRow title={PREFERENCES_COPY.guidesTitle} description={PREFERENCES_COPY.guidesLead}>
+          <div className={GUIDES_CARD.card}>
+            <ICONS.bell className={GUIDES_CARD.glyph} aria-hidden="true" />
+            <div className={GUIDES_CARD.body}>
+              <p className={GUIDES_CARD.title}>
+                {PREFERENCES_COPY.guidesTitle} <MaturityTag maturity="alpha" />
+              </p>
+              <p className={GUIDES_CARD.lead}>{PREFERENCES_COPY.guidesLead}</p>
+              <p className={GUIDES_CARD.hint}>{PREFERENCES_COPY.guidesHint}</p>
+            </div>
             <form action={replayGuides}>
               <Button type="submit" variant="secondary" icon="refresh">
                 {PREFERENCES_COPY.guidesAction}
               </Button>
             </form>
-          </ActionRow>
+          </div>
         </DisplayPreferences>
       </div>
     </div>
@@ -203,7 +211,7 @@ export const PreferencesPanel = ({
         <Section
           title={PREFERENCES_COPY.sessionsTitle}
           description={PREFERENCES_COPY.sessionsLead}
-          action={<MaturityTag maturity="beta" />}
+          maturity="deprecated"
           padded
         >
           <ul className={SECURITY_LIST.list}>

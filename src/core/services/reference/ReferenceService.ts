@@ -44,9 +44,8 @@ import {
   SANCTION_KIND_REGISTRY,
   SANCTION_PANEL_REGISTRY,
 } from '@/declarations/sanctions/registries'
-import { DiscordAnchorKinds, SanctionKinds } from '@/utils/constants/moderation'
-import type { DiscordAnchorKindName, SanctionKindName } from '@/utils/constants/moderation'
-import { DISCORD_ANCHOR_REGISTRY } from '@/declarations/discord/registries'
+import { SanctionKinds } from '@/utils/constants/moderation'
+import type { SanctionKindName } from '@/utils/constants/moderation'
 import { RecruitmentOwners } from '@/utils/constants/recruitment'
 import type { RecruitmentOwnerName } from '@/utils/constants/recruitment'
 import type { ReferenceKey } from '@/declarations/reference/sections'
@@ -1497,117 +1496,6 @@ const pimStepTemplates: ReferenceResource = {
     ),
 }
 
-const discordAnchors: ReferenceResource = {
-  fields: async () => {
-    const creators = await prisma.youtuber.findMany({
-      where: { archived: false },
-      orderBy: { position: 'asc' },
-      select: { id: true, name: true, avatarUrl: true },
-    })
-
-    return [
-      nameField,
-      {
-        name: 'kind',
-        kind: 'select',
-        label: REFERENCE_FIELD_COPY.anchorKind,
-        required: true,
-        options: toOptions(DISCORD_ANCHOR_REGISTRY),
-        span: 'half',
-      },
-      {
-        name: 'discordId',
-        kind: 'text',
-        label: REFERENCE_FIELD_COPY.anchorDiscordId,
-        hint: REFERENCE_FIELD_COPY.anchorDiscordIdHint,
-        required: true,
-        maxLength: shortTextMaxLength,
-        span: 'half',
-      },
-      {
-        name: 'youtuberId',
-        kind: 'select',
-        label: REFERENCE_FIELD_COPY.anchorYoutuber,
-        hint: REFERENCE_FIELD_COPY.anchorYoutuberHint,
-        options: rowsToOptions(creators),
-        mark: 'avatar',
-      },
-      accentField,
-      { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
-    ]
-  },
-  list: async () => {
-    const rows = await prisma.discordAnchor.findMany({
-      orderBy: [{ kind: 'asc' }, { position: 'asc' }],
-      include: { youtuber: { select: { name: true } } },
-    })
-
-    return rows.map((row) => ({
-      id: row.id,
-      label: `${DISCORD_ANCHOR_REGISTRY.get(row.kind).sigil}${row.name}`,
-      hint: row.discordId,
-      accent: row.accent,
-      badges: [
-        DISCORD_ANCHOR_REGISTRY.label(row.kind),
-        ...(row.youtuber ? [row.youtuber.name] : []),
-        ...(row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : []),
-      ],
-      position: row.position,
-      usage: 0,
-      values: {
-        name: row.name,
-        kind: row.kind,
-        discordId: row.discordId,
-        youtuberId: row.youtuberId,
-        accent: row.accent,
-        archived: row.archived,
-      },
-    }))
-  },
-  create: async (values) => {
-    const row = await prisma.discordAnchor
-      .create({
-        data: {
-          name: readText(values, 'name') ?? '',
-          kind: (readText(values, 'kind') ?? DiscordAnchorKinds.Role) as DiscordAnchorKindName,
-          discordId: readText(values, 'discordId') ?? '',
-          youtuberId: readText(values, 'youtuberId'),
-          accent: readText(values, 'accent'),
-          archived: readFlag(values, 'archived'),
-          position: await nextPosition(prisma.discordAnchor),
-        },
-      })
-      .catch(rethrow)
-
-    return discordAnchors.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
-  },
-  update: async (id, values) => {
-    await prisma.discordAnchor
-      .update({
-        where: { id },
-        data: {
-          name: readText(values, 'name') ?? undefined,
-          kind: (readText(values, 'kind') ?? undefined) as DiscordAnchorKindName | undefined,
-          discordId: readText(values, 'discordId') ?? undefined,
-          youtuberId: readText(values, 'youtuberId'),
-          accent: readText(values, 'accent'),
-          archived: readFlag(values, 'archived'),
-        },
-      })
-      .catch(rethrow)
-
-    return discordAnchors.list().then((rows) => rows.find((entry) => entry.id === id)!)
-  },
-  remove: async (id) => {
-    await prisma.discordAnchor.delete({ where: { id } })
-  },
-  reorder: (ids) =>
-    applyOrder(
-      (id, position) => prisma.discordAnchor.update({ where: { id }, data: { position } }),
-      ids
-    ),
-}
-
 const sanctionMeasures: ReferenceResource = {
   fields: async () => [
     nameField,
@@ -2084,7 +1972,6 @@ const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
   'categories-competences': skillCategories,
   competences: skills,
   'etapes-pim': pimStepTemplates,
-  discord: discordAnchors,
   sanctions: sanctionMeasures,
   'questions-recrutement': recruitmentQuestions,
   'etapes-recrutement': recruitmentStepTemplates,

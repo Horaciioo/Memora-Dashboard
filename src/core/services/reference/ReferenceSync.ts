@@ -6,6 +6,7 @@ import {
   LIBRARY_EVENT_TEMPLATES,
   LIBRARY_NETWORKS,
   LIBRARY_PIM_STEPS,
+  LIBRARY_PLATFORMS,
   LIBRARY_SKILL_CATEGORIES,
   LIBRARY_STATES,
 } from '@/declarations/reference/library'
@@ -65,6 +66,17 @@ const writeLibrary = async (): Promise<void> => {
       where: { scope_name: { scope: entry.scope, name: entry.name } },
       update: data,
       create: { scope: entry.scope, name: entry.name, ...data },
+    })
+  }
+
+  // Platforms
+  for (const [position, entry] of LIBRARY_PLATFORMS.entries()) {
+    const data = { accent: entry.accent, position }
+
+    await prisma.platform.upsert({
+      where: { name: entry.name },
+      update: data,
+      create: { name: entry.name, ...data },
     })
   }
 

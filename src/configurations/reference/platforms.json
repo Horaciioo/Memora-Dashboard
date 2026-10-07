@@ -1,0 +1,7 @@
+[
+  { "name": "Twitch", "accent": "#d98ba6" },
+  { "name": "YouTube", "accent": "#e0867a" },
+  { "name": "Discord", "accent": "#8f9be0" },
+  { "name": "TikTok", "accent": "#6fc0b5" },
+  { "name": "X", "accent": "#9fa8b3" }
+]

@@ -447,7 +447,7 @@ const trainingMaxMinutes = readInteger(academy.trainingMaxMinutes, {
 
 /**
  * Academy bounds
- * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, courseSampleOffenses: number, tourStepMs: number, tourBuildMs: number, liveconCycleMs: number, ladderRungDelayMs: number, feedbackScale: number, ceremonyFillMs: number, ceremonySlamMs: number, ceremonyFlyMs: number, ceremonyConfetti: number, ceremonyBurstPx: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
+ * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, conversationLineMs: number, judgementLineMs: number, courseSampleOffenses: number, tourStepMs: number, tourBuildMs: number, orgBubbleMs: number, liveconCycleMs: number, ladderRungDelayMs: number, feedbackScale: number, ceremonyFillMs: number, ceremonySlamMs: number, ceremonyFlyMs: number, ceremonyConfetti: number, ceremonyBurstPx: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
  */
 
 export const ACADEMY_SETTINGS = {
@@ -553,10 +553,25 @@ export const ACADEMY_SETTINGS = {
     fallback: 1400,
     min: 0,
   }),
+  orgBubbleMs: readInteger(academy.orgBubbleMs, {
+    path: 'system/academy.orgBubbleMs',
+    fallback: 2600,
+    min: 600,
+  }),
   liveconCycleMs: readInteger(academy.liveconCycleMs, {
     path: 'system/academy.liveconCycleMs',
     fallback: 3800,
     min: 1000,
+  }),
+  judgementLineMs: readInteger(academy.judgementLineMs, {
+    path: 'system/academy.judgementLineMs',
+    fallback: 1800,
+    min: 300,
+  }),
+  conversationLineMs: readInteger(academy.conversationLineMs, {
+    path: 'system/academy.conversationLineMs',
+    fallback: 2800,
+    min: 500,
   }),
   ladderRungDelayMs: readInteger(academy.ladderRungDelayMs, {
     path: 'system/academy.ladderRungDelayMs',
@@ -711,7 +726,7 @@ const responsiveToastVisible = readNode(
 
 /**
  * Breakpoint and shell chrome bounds
- * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, sidebarWidth: number, bannerHeight: number, bannerHeightMobile: number, notchHeight: number, notchSlope: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
+ * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, sidebarWidth: number, sidebarCompactWidth: number, bannerHeight: number, bannerHeightMobile: number, notchHeight: number, notchSlope: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
  */
 
 export const RESPONSIVE_SETTINGS = {
@@ -735,6 +750,11 @@ export const RESPONSIVE_SETTINGS = {
     path: 'system/responsive.shell.sidebarWidth',
     fallback: 264,
     min: 160,
+  }),
+  sidebarCompactWidth: readInteger(responsiveShell.sidebarCompactWidth, {
+    path: 'system/responsive.shell.sidebarCompactWidth',
+    fallback: 80,
+    min: 64,
   }),
   bannerHeight: readInteger(responsiveShell.bannerHeight, {
     path: 'system/responsive.shell.bannerHeight',
@@ -1193,7 +1213,7 @@ export const AGENDA_SETTINGS = {
 
 /**
  * Home windows and caps
- * @type {{ birthdayWindowDays: number, birthdayMax: number, meetingWindowDays: number, meetingMax: number }}
+ * @type {{ birthdayWindowDays: number, birthdayMax: number }}
  */
 
 export const HOME_SETTINGS = {
@@ -1207,14 +1227,14 @@ export const HOME_SETTINGS = {
     fallback: 4,
     min: 1,
   }),
-  meetingWindowDays: readInteger(home.meetingWindowDays, {
-    path: 'system/accueil.meetingWindowDays',
-    fallback: 21,
+  plannedWindowDays: readInteger(home.plannedWindowDays, {
+    path: 'system/accueil.plannedWindowDays',
+    fallback: 30,
     min: 1,
   }),
-  meetingMax: readInteger(home.meetingMax, {
-    path: 'system/accueil.meetingMax',
-    fallback: 4,
+  plannedMax: readInteger(home.plannedMax, {
+    path: 'system/accueil.plannedMax',
+    fallback: 5,
     min: 1,
   }),
   taskMax: readInteger(home.taskMax, {

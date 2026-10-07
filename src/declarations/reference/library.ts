@@ -1,6 +1,7 @@
 import dispositifs from '@/configurations/reference/dispositifs.json'
 import eventTemplates from '@/configurations/reference/eventTemplates.json'
 import networks from '@/configurations/reference/networks.json'
+import platforms from '@/configurations/reference/platforms.json'
 import pimSteps from '@/configurations/reference/pimSteps.json'
 import skills from '@/configurations/reference/skills.json'
 import states from '@/configurations/reference/states.json'
@@ -27,6 +28,18 @@ export interface LibraryState {
   accent: string | null
   phase: WorkflowPhaseName
   isDefault: boolean
+}
+
+/**
+ * Platform a project starts on
+ * @typedef {Object} LibraryPlatform
+ * @property {string} name - Display name
+ * @property {string | null} accent - Colour
+ */
+
+export interface LibraryPlatform {
+  name: string
+  accent: string | null
 }
 
 /**
@@ -154,6 +167,13 @@ export const LIBRARY_STATES = states as readonly LibraryState[]
  */
 
 export const LIBRARY_NETWORKS = networks as readonly LibraryNetwork[]
+
+/**
+ * Platforms declared in code
+ * @type {readonly LibraryPlatform[]}
+ */
+
+export const LIBRARY_PLATFORMS = platforms as readonly LibraryPlatform[]
 
 /**
  * Calendar templates

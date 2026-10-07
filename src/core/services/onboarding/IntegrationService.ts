@@ -292,6 +292,7 @@ export const integrationFields = async (
       options: LANGUAGE_OPTIONS,
       maxItems: FORM_SETTINGS.tagMaxCount,
       group: ONBOARDING_STEP_COPY.informations,
+      maturity: 'alpha',
     },
     ...(await socialFields()),
   ]

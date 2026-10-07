@@ -54,7 +54,7 @@ export const profileFields = (): FieldDefinition[] => [
     label: PROFILE_FIELD_COPY.languages,
     options: LANGUAGE_OPTIONS,
     maxItems: FORM_SETTINGS.tagMaxCount,
-    maturity: 'beta',
+    maturity: 'alpha',
   },
   {
     name: 'celebrateBirthday',

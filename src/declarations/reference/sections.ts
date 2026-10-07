@@ -22,7 +22,6 @@ export const REFERENCE_KEYS = [
   'competences',
   'etapes-pim',
   'sanctions',
-  'discord',
   'questions-recrutement',
   'etapes-recrutement',
   'issues-recrutement',
@@ -258,21 +257,6 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     reorderable: true,
     emptyTitle: 'Aucune mesure',
     emptyDescription: 'Déclare les mesures avant de bâtir un panel de sanctions.',
-  },
-  {
-    key: 'discord',
-    group: 'moderation',
-    label: 'Rôles et salons Discord',
-    singular: 'Repère Discord',
-    gender: 'masculine',
-    description:
-      'Les rôles et salons qu’une annonce peut mentionner, avec leur identifiant Discord, par YouTubeur.',
-    icon: 'discord',
-    figure: 'moderation',
-    reorderable: true,
-    emptyTitle: 'Aucun rôle ni salon',
-    emptyDescription:
-      'Ajoute les rôles et salons à mentionner dans les annonces. Leur identifiant se copie depuis Discord en mode développeur.',
   },
   {
     key: 'dispositifs',
