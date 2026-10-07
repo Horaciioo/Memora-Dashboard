@@ -32,9 +32,11 @@ export interface NotificationEntry {
  * @typedef {Object} NotificationFeed
  * @property {NotificationEntry[]} entries - Newest first
  * @property {number} unread - Unopened count
+ * @property {boolean} [hasMore] - Older entries wait beyond this page
  */
 
 export interface NotificationFeed {
   entries: NotificationEntry[]
   unread: number
+  hasMore?: boolean
 }

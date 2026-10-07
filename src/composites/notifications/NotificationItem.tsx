@@ -16,6 +16,8 @@ export interface NotificationItemProps {
   entry: NotificationEntry
   withAction: boolean
   onOpen: (id: string) => void
+  // Dismisses the row for good
+  onRemove?: (id: string) => void
 }
 
 /**
@@ -23,10 +25,16 @@ export interface NotificationItemProps {
  * @param {NotificationEntry} entry - Notification to draw
  * @param {boolean} withAction - Carries the way in
  * @param {(id: string) => void} onOpen - Called once the row is settled
+ * @param {(id: string) => void} [onRemove] - Dismisses the row
  * @return {JSX.Element}
  */
 
-export const NotificationItem = ({ entry, withAction, onOpen }: NotificationItemProps) => {
+export const NotificationItem = ({
+  entry,
+  withAction,
+  onOpen,
+  onRemove,
+}: NotificationItemProps) => {
   const kind = entry.kind ? NOTIFICATION_KIND_REGISTRY.get(entry.kind) : null
   const target = entry.target ? NOTIFICATION_TARGETS.get(entry.target) : null
   const href = target?.route(entry.targetId) ?? null
@@ -35,9 +43,16 @@ export const NotificationItem = ({ entry, withAction, onOpen }: NotificationItem
   const tone = TONES[kind?.tone ?? 'neutral']
   const Glyph = ICONS[kind?.icon ?? 'bell']
   const ActionIcon = ICONS.forward
+  const RemoveIcon = ICONS.close
 
   return (
-    <div className={cn(NOTIFICATION_STYLES.row, !entry.isRead && NOTIFICATION_STYLES.rowUnread)}>
+    <div
+      className={cn(
+        NOTIFICATION_STYLES.row,
+        !entry.isRead && NOTIFICATION_STYLES.rowUnread,
+        'group/row relative'
+      )}
+    >
       <span className={NOTIFICATION_STYLES.portrait}>
         <Avatar name={actor} src={entry.actorAvatar} size="sm" />
         <span className={cn(NOTIFICATION_STYLES.glyph, tone.soft, tone.text)}>
@@ -74,6 +89,17 @@ export const NotificationItem = ({ entry, withAction, onOpen }: NotificationItem
           )}
         </div>
       </div>
+      {onRemove && (
+        <button
+          type="button"
+          aria-label={NOTIFICATION_COPY.remove}
+          title={NOTIFICATION_COPY.remove}
+          className={NOTIFICATION_STYLES.remove}
+          onClick={() => onRemove(entry.id)}
+        >
+          <RemoveIcon className={NOTIFICATION_STYLES.removeIcon} aria-hidden="true" />
+        </button>
+      )}
     </div>
   )
 }

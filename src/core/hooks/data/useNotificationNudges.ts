@@ -1,13 +1,15 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
 import { apiGet } from '@/core/lib/api/client'
 import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { useNotificationsStore } from '@/core/store/notifications'
 import { NOTIFICATION_SETTINGS, NUDGE_SETTINGS } from '@/declarations/configurations/settings'
 import { NOTIFICATION_KIND_REGISTRY } from '@/declarations/notifications/registries'
+import { NOTIFICATION_STREAM_EVENTS } from '@/declarations/notifications/topics'
 import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
 
 /**
@@ -22,14 +24,42 @@ export interface NotificationNudges {
   shift: () => void
 }
 
+// Readable kinds only
+const isReadable = (entry: NotificationEntry): boolean =>
+  entry.kind !== null && NOTIFICATION_KIND_REGISTRY.has(entry.kind)
+
 /**
- * Notifications landing during the visit
+ * Notifications landing during the visit: pushed by the stream the moment they are written, and
+ * caught by a slow poll when the stream is down
  * @param {boolean} isArmed - Bubbles allowed
  * @return {NotificationNudges} - Queue and consumer
  */
 
 export const useNotificationNudges = (isArmed: boolean): NotificationNudges => {
+  const queue = useNotificationsStore((state) => state.nudges)
+  const shift = useNotificationsStore((state) => state.shiftNudge)
   const size = NOTIFICATION_SETTINGS.panelSize
+
+  // Stream
+  useEffect(() => {
+    if (!isArmed) return
+
+    // The browser reconnects on its own after a drop
+    const source = new EventSource(API_ROUTES.notificationsStream)
+    const onFresh = (event: MessageEvent<string>) => {
+      const entry = JSON.parse(event.data) as NotificationEntry
+      useNotificationsStore.getState().receive(entry, isReadable(entry))
+    }
+
+    source.addEventListener(NOTIFICATION_STREAM_EVENTS.fresh, onFresh as EventListener)
+
+    return () => {
+      source.removeEventListener(NOTIFICATION_STREAM_EVENTS.fresh, onFresh as EventListener)
+      source.close()
+    }
+  }, [isArmed])
+
+  // Poll
   const { data } = useQuery({
     queryKey: QUERY_KEYS.notifications(size),
     queryFn: ({ signal }) => apiGet<NotificationFeed>(API_ROUTES.notifications(size), signal),
@@ -37,34 +67,25 @@ export const useNotificationNudges = (isArmed: boolean): NotificationNudges => {
     refetchInterval: NUDGE_SETTINGS.pollMs,
     refetchIntervalInBackground: false,
   })
-  const entries = data?.entries
+  const known = useRef<Set<string> | null>(null)
 
-  const [seenEntries, setSeenEntries] = useState<NotificationEntry[] | undefined>(undefined)
-  const [seenIds, setSeenIds] = useState<Set<string> | null>(null)
-  const [queue, setQueue] = useState<NotificationEntry[]>([])
+  useEffect(() => {
+    if (!data) return
 
-  // First page is the backlog
-  if (entries && entries !== seenEntries) {
-    setSeenEntries(entries)
-    setSeenIds(new Set([...(seenIds ?? []), ...entries.map((entry) => entry.id)]))
-
-    if (seenIds) {
-      // Readable kinds only
-      const fresh = entries.filter(
-        (entry) =>
-          !seenIds.has(entry.id) &&
-          !entry.isRead &&
-          entry.kind !== null &&
-          NOTIFICATION_KIND_REGISTRY.has(entry.kind)
-      )
-
-      // Feed is newest first
-      if (fresh.length > 0) setQueue([...queue, ...fresh.reverse()])
+    // First page is the backlog
+    if (!known.current) {
+      known.current = new Set(data.entries.map((entry) => entry.id))
+      return
     }
-  }
 
-  // Stable for the bubble timer
-  const shift = useCallback(() => setQueue((current) => current.slice(1)), [])
+    // Feed is newest first, bubbles come oldest first
+    for (const entry of [...data.entries].reverse()) {
+      if (known.current.has(entry.id)) continue
+
+      known.current.add(entry.id)
+      useNotificationsStore.getState().receive(entry, isReadable(entry))
+    }
+  }, [data])
 
   return { queue, shift }
 }

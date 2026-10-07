@@ -34,6 +34,10 @@ export const NOTIFICATION_KINDS = createEnumeration({
   PimLaunched: { id: 25, label: 'PIM lancée' },
   PimSecondPeriod: { id: 26, label: 'Période 2 lancée' },
   PimDeparture: { id: 27, label: 'Départ à annoncer' },
+  LiveCoordinatorAsked: { id: 28, label: 'Coordination demandée' },
+  LiveCoordinatorAccepted: { id: 29, label: 'Coordination acceptée' },
+  LiveCoordinatorDeclined: { id: 30, label: 'Coordination refusée' },
+  LiveCoordinatorGap: { id: 31, label: 'Coordinateur manquant' },
 })
 
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids

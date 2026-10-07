@@ -1,9 +1,14 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { markAllRead, readNotifications } from '@/core/services/system/NotificationService'
+import {
+  clearReadNotifications,
+  markAllRead,
+  readNotifications,
+} from '@/core/services/system/NotificationService'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 
-// Entry count asked by the caller
+// Entry count asked by the caller, and the entry a page follows
 const SIZE_PARAM = 'taille'
+const BEFORE_PARAM = 'apres'
 
 export const GET = createProtectedRoute({
   descriptor: { summary: 'Read my notifications', tags: ['notifications'] },
@@ -14,7 +19,7 @@ export const GET = createProtectedRoute({
         ? Math.min(asked, NOTIFICATION_SETTINGS.pageSize)
         : NOTIFICATION_SETTINGS.pageSize
 
-    return readNotifications(session.id, take)
+    return readNotifications(session.id, take, query.get(BEFORE_PARAM) ?? undefined)
   },
 })
 
@@ -24,5 +29,14 @@ export const PATCH = createProtectedRoute({
     await markAllRead(session.id)
 
     return { unread: 0 }
+  },
+})
+
+export const DELETE = createProtectedRoute({
+  descriptor: { summary: 'Remove the notifications already read', tags: ['notifications'] },
+  handler: async ({ session }) => {
+    await clearReadNotifications(session.id)
+
+    return { cleared: true }
   },
 })

@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { publishLive } from '@/core/lib/lives/bus'
+import { NOTIFICATION_TOPICS } from '@/declarations/notifications/topics'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 import { NOTIFICATION_TARGETS } from '@/declarations/notifications/targets'
 import type { NotificationTargetName } from '@/declarations/notifications/targets'
@@ -68,7 +70,7 @@ export const notify = async (input: NotificationInput): Promise<void> => {
     if (recipients.length === 0) return
   }
 
-  await prisma.notification.createMany({
+  const rows = await prisma.notification.createManyAndReturn({
     data: recipients.map((recipientId) => ({
       recipientId,
       actorId: input.actorId ?? null,
@@ -78,6 +80,36 @@ export const notify = async (input: NotificationInput): Promise<void> => {
       subject: input.subject,
     })),
   })
+
+  await pushNotifications(rows, input.actorId ?? null)
+}
+
+/**
+ * Hand fresh rows to whoever is connected, a lost push never fails the write that raised it
+ * @param {Prisma.NotificationGetPayload<object>[]} rows - Rows just written
+ * @param {string | null} actorId - Who caused them
+ * @return {Promise<void>} - Pushed
+ */
+
+const pushNotifications = async (
+  rows: Prisma.NotificationGetPayload<object>[],
+  actorId: string | null
+): Promise<void> => {
+  const actor = actorId
+    ? await prisma.account.findUnique({
+        where: { id: actorId },
+        select: { displayName: true, avatarUrl: true },
+      })
+    : null
+
+  await Promise.all(
+    rows.map((row) =>
+      publishLive(NOTIFICATION_TOPICS.fresh, {
+        recipientId: row.recipientId,
+        entry: toEntry({ ...row, actor }),
+      }).catch(() => undefined)
+    )
+  )
 }
 
 /**
@@ -117,9 +149,9 @@ export const notifyMentions = async (
 }
 
 // Row shape every reader maps from
-type NotificationRow = Prisma.NotificationGetPayload<{
-  include: { actor: { select: { displayName: true; avatarUrl: true } } }
-}>
+type NotificationRow = Prisma.NotificationGetPayload<object> & {
+  actor: { displayName: string; avatarUrl: string | null } | null
+}
 
 /**
  * Map a notification row to its display shape
@@ -127,7 +159,7 @@ type NotificationRow = Prisma.NotificationGetPayload<{
  * @return {NotificationEntry} - Display entry
  */
 
-const toEntry = (row: NotificationRow): NotificationEntry => {
+export const toEntry = (row: NotificationRow): NotificationEntry => {
   // An unknown target kind simply loses its link
   const target = row.targetType ?? ''
 
@@ -157,24 +189,28 @@ export const countUnread = (accountId: string): Promise<number> =>
  * Read one page of notifications and its badge in a single round trip
  * @param {string} accountId - Account identifier
  * @param {number} [take] - Entry count
- * @return {Promise<NotificationFeed>} - Entries and unopened count
+ * @param {string} [before] - Identifier of the last entry already held, the page follows it
+ * @return {Promise<NotificationFeed>} - Entries, unopened count and whether more wait
  */
 
 export const readNotifications = async (
   accountId: string,
-  take: number = NOTIFICATION_SETTINGS.pageSize
+  take: number = NOTIFICATION_SETTINGS.pageSize,
+  before?: string
 ): Promise<NotificationFeed> => {
   const [rows, unread] = await prisma.$transaction([
     prisma.notification.findMany({
       where: { recipientId: accountId },
       include: { actor: { select: { displayName: true, avatarUrl: true } } },
-      orderBy: { createdAt: 'desc' },
-      take,
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      // One more than asked tells whether another page waits
+      take: take + 1,
+      ...(before ? { cursor: { id: before }, skip: 1 } : {}),
     }),
     prisma.notification.count({ where: { recipientId: accountId, readAt: null } }),
   ])
 
-  return { entries: rows.map(toEntry), unread }
+  return { entries: rows.slice(0, take).map(toEntry), unread, hasMore: rows.length > take }
 }
 
 /**
@@ -202,4 +238,25 @@ export const markAllRead = async (accountId: string): Promise<void> => {
     where: { recipientId: accountId, readAt: null },
     data: { readAt: new Date() },
   })
+}
+
+/**
+ * Remove one notification of the member
+ * @param {string} id - Notification identifier
+ * @param {string} accountId - Account identifier
+ * @return {Promise<void>} - Removed
+ */
+
+export const removeNotification = async (id: string, accountId: string): Promise<void> => {
+  await prisma.notification.deleteMany({ where: { id, recipientId: accountId } })
+}
+
+/**
+ * Remove every notification already opened
+ * @param {string} accountId - Account identifier
+ * @return {Promise<void>} - Removed
+ */
+
+export const clearReadNotifications = async (accountId: string): Promise<void> => {
+  await prisma.notification.deleteMany({ where: { recipientId: accountId, readAt: { not: null } } })
 }
