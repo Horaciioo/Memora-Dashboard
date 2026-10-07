@@ -71,7 +71,7 @@ export const MemberCard = ({
         member.isAbsent && LIST_STYLES.cardAbsent
       )}
     >
-      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+      <span className="flex min-w-0 flex-1">
         <span
           className={cn(
             'flex min-w-0 items-center gap-1.5 truncate font-medium',
@@ -85,13 +85,13 @@ export const MemberCard = ({
               <span className="sr-only">{MEMBER_COPY.notesTitle}</span>
             </span>
           )}
+          {member.isAbsent && (
+            <span className={LIST_STYLES.cardAbsentNote}>
+              <AbsentIcon className={LIST_STYLES.cardAbsentGlyph} aria-hidden="true" />
+              {MEMBER_COPY.absent}
+            </span>
+          )}
         </span>
-        {member.isAbsent && (
-          <span className={LIST_STYLES.cardAbsentNote}>
-            <AbsentIcon className={LIST_STYLES.cardAbsentGlyph} aria-hidden="true" />
-            {MEMBER_COPY.absent}
-          </span>
-        )}
       </span>
       <FunctionEmblems
         member={member}
