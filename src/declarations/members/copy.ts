@@ -103,6 +103,7 @@ export const MEMBER_COPY = {
 export const MEMBER_FIELD_COPY = {
   displayName: 'Nom affiché',
   discordId: 'Identifiant Discord',
+  memoraId: 'Identifiant Memora',
   role: 'Rôle',
   status: 'Statut',
   division: 'Division',

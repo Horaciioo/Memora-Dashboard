@@ -255,6 +255,10 @@ export const MemberFileTabs = ({
       display: identityValues.discordId ? String(identityValues.discordId) : null,
     },
     {
+      label: MEMBER_FIELD_COPY.memoraId,
+      display: <span className="font-[family-name:var(--font-mono)] text-xs">{summary.id}</span>,
+    },
+    {
       label: FIELD_COPY.email,
       field: fieldFor('email'),
       display: sealedDisplay(
