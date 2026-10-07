@@ -215,7 +215,9 @@ export const lockTaskValues = (values: FormValues, current?: FormValues): FormVa
 
 export const lockTaskFields = (fields: FieldDefinition[]): FieldDefinition[] =>
   fields.map((field) =>
-    (MANAGED_FIELDS as readonly string[]).includes(field.name) ? { ...field, readOnly: true } : field
+    (MANAGED_FIELDS as readonly string[]).includes(field.name)
+      ? { ...field, readOnly: true }
+      : field
   )
 
 /**
