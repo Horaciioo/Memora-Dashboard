@@ -192,6 +192,29 @@ export const assertRowInScope = async (
 }
 
 /**
+ * Guard a member addressed by identifier
+ * @param {string} id - Account identifier
+ * @param {AccessScope} scope - Perimeter
+ * @param {string} viewerId - Signed-in account
+ * @return {Promise<void>} - Throws when out of perimeter
+ */
+
+export const assertAccountInScope = async (
+  id: string,
+  scope: AccessScope,
+  viewerId: string
+): Promise<void> => {
+  // Everyone reaches their own file
+  if (scope.isGlobal || id === viewerId) return
+
+  const found = await prisma.account.findFirst({
+    where: scopedWhere('account', scope, { id }),
+    select: { id: true },
+  })
+  if (!found) throw notFound()
+}
+
+/**
  * Guard a whole selection
  * @param {LookupTarget} target - Scopable model
  * @param {string[]} ids - Row identifiers

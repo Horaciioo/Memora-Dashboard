@@ -2,6 +2,7 @@ import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { readSealState, sealValues } from '@/core/services/auth/SealService'
+import { assertAccountInScope } from '@/core/services/auth/ScopeService'
 import {
   anonymiseMember,
   assertDivisionAssignable,
@@ -16,13 +17,18 @@ import { Permissions } from '@/utils/constants/permissions'
 export const GET = createProtectedRoute({
   permission: Permissions.MemberRead,
   descriptor: { summary: 'Read a moderator file', tags: ['members'] },
-  handler: ({ params, access }) => readMember(params.id, access.can(Permissions.MemberNoteRead)),
+  handler: async ({ params, access, session, scope }) => {
+    await assertAccountInScope(params.id, await scope(), session.id)
+
+    return readMember(params.id, access.can(Permissions.MemberNoteRead))
+  },
 })
 
 export const PATCH = createProtectedRoute({
   permission: Permissions.MemberUpdate,
   descriptor: { summary: 'Edit a moderator', tags: ['members'] },
-  handler: async ({ params, raw, session, access }) => {
+  handler: async ({ params, raw, session, access, scope }) => {
+    await assertAccountInScope(params.id, await scope(), session.id)
     const fields = await memberFields(access.isAdmin)
 
     const parsed = parseFormValues(fields, raw, { fillMissing: true })
@@ -59,7 +65,8 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   permission: Permissions.MemberDelete,
   descriptor: { summary: 'Close a moderator access', tags: ['members'] },
-  handler: async ({ params, session }) => {
+  handler: async ({ params, session, scope }) => {
+    await assertAccountInScope(params.id, await scope(), session.id)
     const member = await readMember(params.id)
     await anonymiseMember(params.id)
 

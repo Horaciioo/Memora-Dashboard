@@ -11,6 +11,7 @@ import {
 import { layerKey } from '@/core/lib/permissions'
 import { ABSENCE_FIELDS, canReviewAbsence } from '@/core/services/absences/AbsenceService'
 import { readInheritedGrants } from '@/core/services/auth/GrantsService'
+import { assertAccountInScope } from '@/core/services/auth/ScopeService'
 import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
 import { memberFields, readMember } from '@/core/services/members/MemberService'
 import { findCandidateFile } from '@/core/services/recruitment/RecruitmentService'
@@ -77,11 +78,13 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const canReadLogs = access.can(Permissions.MemberLogRead)
   const canReadNotes = access.can(Permissions.MemberNoteRead)
 
-  const detail = await readMember(id, canReadNotes).catch(() => null)
+  const perimeter = await scope()
+  const detail = await assertAccountInScope(id, perimeter, session.id)
+    .then(() => readMember(id, canReadNotes))
+    .catch(() => null)
   if (!detail) notFound()
 
   // Only the responsables of their creators
-  const perimeter = await scope()
   const isConcerned =
     perimeter.isGlobal ||
     detail.summary.youtubers.some((tag) => perimeter.youtuberIds.includes(tag.id))
