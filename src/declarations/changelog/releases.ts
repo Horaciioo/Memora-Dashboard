@@ -111,6 +111,78 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.2.0',
+    date: '2026-10-08',
+    title: 'Un calendrier plus clair',
+    intro:
+      'Le calendrier met enfin la présence au centre, et les équipes de responsables voient mieux ce qui les concerne.',
+    description:
+      'Le détail d’un évènement mélangeait toutes les informations et chacun ne savait pas quoi y faire. Cette version sépare la réponse de chaque convoqué de l’Appel de présence réservé aux responsables, et rend aux absences leurs réponses, jusque-là invisibles pour les membres.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        text: 'Ajout de la possibilité, pour chaque convoqué, de dire s’il sera présent ou absent depuis le détail d’un évènement',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarManage,
+        text: 'Ajout de la possibilité de relancer les sans-réponse de l’« Appel de présence » en leur envoyant une notification',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.absences,
+        text: 'Ajout de la réponse du responsable sous chaque absence, désormais visible par le membre concerné',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        permission: Permissions.MemberRead,
+        text: 'Ajout de l’identifiant Memora de chaque modérateur sous son identifiant Discord',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        text: 'Amélioration visuelle du détail d’un évènement dans la page « Calendrier » : date en tête, description dans une box, boutons avec du texte',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarManage,
+        text: 'Amélioration de l’« Appel de présence », qui s’ouvre et se ferme en douceur, réservé aux responsables et au-delà',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        permission: Permissions.MemberRead,
+        text: 'Amélioration de la page « Modérateurs » : la mention « En absence » se lit à côté du pseudo, sans agrandir la carte',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle de l’annonce d’une nouvelle version, désormais en or',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.projects,
+        permission: Permissions.ProjectDelete,
+        text: 'Amélioration des droits des responsables : ils peuvent désormais supprimer les « Projets », « Tâches » et « Réunions »',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.meetings,
+        permission: Permissions.MeetingUpdate,
+        text: 'Correction d’un bug qui empêchait de modifier l’état, la date et l’heure d’une réunion depuis la box « Informations »',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.members,
+        permission: Permissions.MemberRead,
+        text: 'Correction d’un bug qui permettait à un modérateur d’ouvrir la fiche d’un autre membre',
+      },
+    ],
+  },
+  {
     version: '0.1.1',
     date: '2026-10-08',
     title: 'Tes retours, déjà pris en compte',
