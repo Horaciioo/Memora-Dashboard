@@ -1,4 +1,4 @@
-import { formatVersion } from '../../src/utils/format/version.ts'
+import { baseVersion, formatVersion } from '../../src/utils/format/version.ts'
 import type { VersionParts } from '../../src/utils/format/version.ts'
 import {
   SETTINGS,
@@ -10,6 +10,7 @@ import {
   latestTag,
   openPullRequest,
   packageVersion,
+  noteVersions,
   parseVersion,
   pullRequestChangelog,
   writePackageVersion,
@@ -56,6 +57,13 @@ const snapshot = (): void => {
 
   // Plan
   const next = formatVersion(nextSnapshot(current as VersionParts))
+
+  // A version above the last release never ships without its patchnote
+  const base = baseVersion(parseVersion(next) as VersionParts)
+  if (SETTINGS.notesFile && noteVersions()[0] !== base) {
+    fail(`écris d'abord la note ${base} en tête de ${SETTINGS.notesFile}, puis relance`)
+  }
+
   const previous = latestTag()
   const subjects = commitSubjects(previous ? `${previous}..HEAD` : 'HEAD')
   if (subjects.length === 0) fail(`rien de neuf depuis ${previous}`)
