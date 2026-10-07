@@ -24,6 +24,8 @@ export const CALENDAR_COPY = {
   modeSelect: 'Sélectionner',
   today: 'Aujourd’hui',
   previous: 'Période précédente',
+  previousShort: 'Précédent',
+  nextShort: 'Suivant',
   next: 'Période suivante',
   allDayRow: 'Journée',
   moveHint:
@@ -64,10 +66,12 @@ export const CALENDAR_COPY = {
   respondPresent: 'Je serai là',
   respondAbsent: 'Je ne serai pas là',
   yourAnswer: 'Ta réponse',
+  yourPresence: 'Ta présence',
+  answerSaved: 'Ta réponse est prise en compte, tu peux la changer.',
+  nobody: 'Personne',
   noAnswerYet: 'Tu n’as pas encore répondu.',
   remindPending: 'Relancer les sans-réponse',
   reminderSent: 'Rappel envoyé aux sans-réponse',
-  rosterHidden: 'Ton Responsable n’a pas ouvert le détail des réponses.',
   noRoster: 'Personne n’est encore convoqué.',
 } as const
 
@@ -92,8 +96,6 @@ export const CALENDAR_FIELD_COPY = {
   rollCall: 'Demander la présence',
   teams: 'Équipes convoquées',
   members: 'Membres en plus',
-  rosterShared: 'Réponses visibles par l’équipe',
-  rosterSharedHint: 'Sinon, seuls les Responsables voient qui a répondu quoi.',
   remindAt: 'Rappel aux sans-réponse',
   remindAtHint: 'Laisse vide pour un rappel la veille en fin de journée.',
 } as const

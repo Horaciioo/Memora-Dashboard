@@ -266,14 +266,6 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       visibleWhen: WHEN_ROLL_CALL,
     },
     {
-      name: 'rosterShared',
-      kind: 'toggle',
-      label: CALENDAR_FIELD_COPY.rosterShared,
-      hint: CALENDAR_FIELD_COPY.rosterSharedHint,
-      group: FORM_GROUPS.visibility,
-      visibleWhen: WHEN_ROLL_CALL,
-    },
-    {
       name: 'remindAt',
       kind: 'datetime',
       label: CALENDAR_FIELD_COPY.remindAt,
@@ -342,7 +334,6 @@ const toEntry = (
     projectId: string | null
     meetingId: string | null
     rollCall: boolean
-    rosterShared: boolean
     rollCallTeamIds: string[]
     remindAt: Date | null
     template: { name: string; accent: string | null; visibility: EventVisibilityName } | null
@@ -377,7 +368,6 @@ const toEntry = (
     body: null,
     readOnly: false,
     rollCall: row.rollCall,
-    rosterShared: row.rosterShared,
     attendance: roster,
     values: {
       title: row.title,
@@ -393,7 +383,6 @@ const toEntry = (
       projectId: row.projectId,
       description: row.description,
       rollCall: row.rollCall,
-      rosterShared: row.rosterShared,
       remindAt: row.remindAt ? row.remindAt.toISOString().slice(0, 16) : null,
       teamIds: row.rollCallTeamIds,
       memberIds: row.attendances.map((seat) => seat.accountId),
@@ -403,14 +392,14 @@ const toEntry = (
 
 /**
  * Resolve every roll-call roster of a window in one round trip
- * @param {{ id: string, rollCall: boolean, rosterShared: boolean }[]} rows - Window rows
+ * @param {{ id: string, rollCall: boolean }[]} rows - Window rows
  * @param {string} viewerId - Signed-in member identifier
  * @param {boolean} canManage - Viewer holds the manage permission
  * @return {Promise<Map<string, AttendanceRoster>>} - Roster per event
  */
 
 const rollCallRosters = async (
-  rows: { id: string; rollCall: boolean; rosterShared: boolean }[],
+  rows: { id: string; rollCall: boolean }[],
   viewerId: string,
   canManage: boolean
 ): Promise<Map<string, AttendanceRoster>> => {
@@ -429,7 +418,6 @@ const rollCallRosters = async (
         rows: seats.filter((seat) => seat.eventId === row.id),
         viewerId,
         canManage,
-        rosterShared: row.rosterShared,
       }),
     ])
   )
@@ -555,7 +543,6 @@ const toEntryData = (values: FormValues) => ({
   youtuberId: readText(values, 'youtuberId'),
   projectId: readText(values, 'projectId'),
   rollCall: readFlag(values, 'rollCall'),
-  rosterShared: readFlag(values, 'rosterShared'),
   remindAt: readDate(values, 'remindAt'),
   rollCallTeamIds: readList(values, 'teamIds'),
 })

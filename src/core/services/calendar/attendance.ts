@@ -103,7 +103,6 @@ const toPerson = (account: AttendanceRow['account']): AttendancePerson => ({
  * @param {AttendanceRow[]} input.rows - Roster rows with their account
  * @param {string} input.viewerId - Signed-in member
  * @param {boolean} input.canManage - Viewer runs the roll-call
- * @param {boolean} input.rosterShared - Answers are open to the team
  * @return {AttendanceRoster} - Standings
  */
 
@@ -111,16 +110,15 @@ export const buildRoster = ({
   rows,
   viewerId,
   canManage,
-  rosterShared,
 }: {
   rows: AttendanceRow[]
   viewerId: string
   canManage: boolean
-  rosterShared: boolean
 }): AttendanceRoster => {
   const mineRow = rows.find((row) => row.accountId === viewerId)
   const mine = (mineRow?.status as AttendanceStatusName | undefined) ?? null
-  const visible = canManage || (rosterShared && mine !== null)
+  // Only the Responsables and above read who answered what
+  const visible = canManage
 
   const bucket = (status: AttendanceStatusName): AttendancePerson[] =>
     visible ? rows.filter((row) => row.status === status).map((row) => toPerson(row.account)) : []
@@ -156,20 +154,12 @@ export const readRosterFor = async (
   viewerId: string,
   canManage: boolean
 ): Promise<AttendanceRoster> => {
-  const [event, rows] = await Promise.all([
-    prisma.calendarEvent.findUnique({ where: { id: eventId }, select: { rosterShared: true } }),
-    prisma.eventAttendance.findMany({
-      where: { eventId },
-      include: { account: { select: { displayName: true, avatarUrl: true } } },
-    }),
-  ])
-
-  return buildRoster({
-    rows,
-    viewerId,
-    canManage,
-    rosterShared: event?.rosterShared ?? false,
+  const rows = await prisma.eventAttendance.findMany({
+    where: { eventId },
+    include: { account: { select: { displayName: true, avatarUrl: true } } },
   })
+
+  return buildRoster({ rows, viewerId, canManage })
 }
 
 /**
@@ -225,24 +215,25 @@ const pendingIds = async (eventId: string): Promise<string[]> => {
  * @param {string} event.id - Event identifier
  * @param {string} event.title - Event title
  * @param {string | null} event.ownerId - Who posted it
+ * @param {string | null} [actorId] - Who pressed the reminder, defaults to the poster
  * @return {Promise<void>} - Pinged
  */
 
-export const notifyPending = async (event: {
-  id: string
-  title: string
-  ownerId: string | null
-}): Promise<void> => {
+export const notifyPending = async (
+  event: { id: string; title: string; ownerId: string | null },
+  actorId?: string
+): Promise<void> => {
   const recipients = await pendingIds(event.id)
   if (recipients.length === 0) return
 
   await notify({
     ...NOTIFY,
     recipients,
-    actorId: event.ownerId,
+    actorId: actorId ?? event.ownerId,
     targetId: event.id,
     subject: event.title,
-    once: true,
+    // A pressed reminder always lands, the automatic one stays quiet while one waits unread
+    once: actorId === undefined,
   })
 }
 
@@ -252,15 +243,15 @@ export const notifyPending = async (event: {
  * @param {string} event.id - Event identifier
  * @param {string} event.title - Event title
  * @param {string | null} event.ownerId - Who posted it
+ * @param {string} [actorId] - Who pressed the reminder
  * @return {Promise<void>} - Pinged
  */
 
-export const remindPending = async (event: {
-  id: string
-  title: string
-  ownerId: string | null
-}): Promise<void> => {
-  await notifyPending(event)
+export const remindPending = async (
+  event: { id: string; title: string; ownerId: string | null },
+  actorId?: string
+): Promise<void> => {
+  await notifyPending(event, actorId)
 
   await prisma.calendarEvent.update({
     where: { id: event.id },

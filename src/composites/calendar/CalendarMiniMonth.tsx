@@ -32,17 +32,19 @@ export const CalendarMiniMonth = ({ cursor, unit, onPick, onCursor }: CalendarMi
         <span className={CALENDAR_SIDEBAR.miniTitle}>{periodLabel(cursor, 'month')}</span>
         <span className="flex items-center">
           <Button
-            variant="icon"
-            icon="back"
-            aria-label={CALENDAR_COPY.previous}
+            variant="ghost"
+            title={CALENDAR_COPY.previous}
             onClick={() => onCursor(shiftAnchor(cursor, 'month', -1))}
-          />
+          >
+            {CALENDAR_COPY.previousShort}
+          </Button>
           <Button
-            variant="icon"
-            icon="forward"
-            aria-label={CALENDAR_COPY.next}
+            variant="ghost"
+            title={CALENDAR_COPY.next}
             onClick={() => onCursor(shiftAnchor(cursor, 'month', 1))}
-          />
+          >
+            {CALENDAR_COPY.nextShort}
+          </Button>
         </span>
       </div>
 

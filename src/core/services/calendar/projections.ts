@@ -198,7 +198,6 @@ const projected = ({
     minutes,
     readOnly: true,
     rollCall: false,
-    rosterShared: false,
     attendance: null,
     values: {},
   }
