@@ -173,12 +173,6 @@ enum MeetingAudience {
   CUSTOM
 }
 
-// What a Discord anchor points at
-enum DiscordAnchorKind {
-  ROLE
-  CHANNEL
-}
-
 // Review outcome of an absence request
 enum AbsenceStatus {
   PENDING
@@ -269,6 +263,13 @@ enum LiveStatus {
   LIVE
   ENDED
   CANCELLED
+}
+
+// Answer of a member asked to coordinate a live
+enum CoordinationStatus {
+  ASKED
+  ACCEPTED
+  DECLINED
 }
 
 // Signed-in member
@@ -364,7 +365,7 @@ model Account {
   departuresPublished   DepartureNotice[]        @relation("DeparturePublisher")
   platformAccounts      PlatformAccount[]
   livesAnnounced        Live[]                   @relation("LiveAnnouncer")
-  livesCoordinated      Live[]                   @relation("LiveCoordinator")
+  liveCoordinations     LiveCoordination[]
   liveSeats             LiveMember[]
   activityAsSubject     ActivityLog[]            @relation("LogSubject")
   activityAsActor       ActivityLog[]            @relation("LogActor")
@@ -579,7 +580,6 @@ model Youtuber {
   recruitmentQuestions     RecruitmentQuestion[]
   recruitmentStepTemplates RecruitmentStepTemplate[]
   integrationInvites       IntegrationInvite[]
-  discordAnchors           DiscordAnchor[]
 
   @@index([archived])
   @@map("youtubers")
@@ -1704,8 +1704,6 @@ model Live {
   startedAt        DateTime?
   endedAt          DateTime?
   announcedById    String?
-  // Holds the coordinator rights while the live is not over
-  coordinatorId    String?
   streamExternalId String?
   // YouTube chat handle
   liveChatId       String?
@@ -1717,9 +1715,9 @@ model Live {
 
   youtuber       Youtuber           @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
   announcedBy    Account?           @relation("LiveAnnouncer", fields: [announcedById], references: [id], onDelete: SetNull)
-  coordinator    Account?           @relation("LiveCoordinator", fields: [coordinatorId], references: [id], onDelete: SetNull)
   calendarEvent  CalendarEvent?     @relation(fields: [calendarEventId], references: [id], onDelete: SetNull)
   members        LiveMember[]
+  coordinations  LiveCoordination[]
   liveconEntries LiveconEntry[]
   actions        ModerationAction[]
   presences      ModViewPresence[]
@@ -1728,8 +1726,27 @@ model Live {
   @@unique([platform, streamExternalId])
   @@index([status])
   @@index([youtuberId, plannedStartAt])
-  @@index([coordinatorId])
   @@map("lives")
+}
+
+// Member asked to coordinate a live over a window of their choosing
+model LiveCoordination {
+  id          String             @id @default(cuid())
+  liveId      String
+  accountId   String
+  status      CoordinationStatus @default(ASKED)
+  // Window the member agreed to, empty until they accept
+  startsAt    DateTime?
+  endsAt      DateTime?
+  askedAt     DateTime           @default(now())
+  respondedAt DateTime?
+
+  live    Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([liveId, accountId])
+  @@index([accountId, status])
+  @@map("live_coordinations")
 }
 
 // Member called on one live
@@ -2233,26 +2250,6 @@ model RecruitmentStep {
 
   @@index([sessionId, position])
   @@map("recruitment_steps")
-}
-
-// Role or channel of a creator's Discord an announcement may mention
-model DiscordAnchor {
-  id         String            @id @default(cuid())
-  youtuberId String?
-  kind       DiscordAnchorKind
-  name       String
-  discordId  String
-  accent     String?
-  position   Int               @default(0)
-  archived   Boolean           @default(false)
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
-
-  youtuber Youtuber? @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
-
-  @@unique([youtuberId, kind, discordId])
-  @@index([youtuberId, kind])
-  @@map("discord_anchors")
 }
 
 // Where a Legacy track stands
