@@ -238,7 +238,7 @@ export default class LoggerManager {
 
     if (config.file) {
       // Set directory path
-      this._directory = path.join(process.cwd(), config.directory)
+      this._directory = path.resolve(config.directory)
 
       const latest = path.join(this._directory, LATEST_FILE)
 

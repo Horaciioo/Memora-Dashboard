@@ -1,7 +1,7 @@
 {
-  "file": true,
+  "file": false,
   "telemetry": true,
   "archive": {
-    "status": true
+    "status": false
   }
 }
