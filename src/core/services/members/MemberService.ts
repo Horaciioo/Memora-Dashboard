@@ -17,10 +17,11 @@ import { FORM_SETTINGS, PAGINATION_SETTINGS } from '@/declarations/configuration
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { MEMBER_COPY, MEMBER_FIELD_COPY, MEMBER_FIELD_INFO } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
+import { LEGACY_FUNCTION_OF } from '@/declarations/reference/fixed'
 import { LANGUAGE_OPTIONS, timezoneOptions } from '@/declarations/system/locales'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence, MemberDetail, MemberSummary } from '@/types/members'
-import { AcademyJuniorStatuses, MemberStatuses } from '@/utils/constants/hierarchy'
+import { AcademyJuniorStatuses, MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import { AbsenceStatuses, FunctionKinds } from '@/utils/constants/workflow'
 import type { FunctionKindName } from '@/utils/constants/workflow'
@@ -131,6 +132,57 @@ export const assertDivisionAssignable = async (
   if (!division?.leadAssignable) throw forbidden()
 }
 
+// Levels below a Responsable, the only ones a Responsable sees and hands out
+export const BELOW_LEAD_ROLES: MemberRoleName[] = [MemberRoles.Moderateur, MemberRoles.Junior]
+
+// Functions only an Admin hands out
+const LEGACY_FUNCTION_NAMES = Object.values(LEGACY_FUNCTION_OF)
+
+/**
+ * Reject a role or a Junior Responsable function beyond what the viewer may hand out
+ * @param {FormValues} values - Parsed body
+ * @param {boolean} isAdmin - Viewer sits at admin level
+ * @param {string} [currentId] - Member being edited
+ * @return {Promise<void>} - Throws on an out-of-reach change
+ */
+
+export const assertMemberAssignable = async (
+  values: FormValues,
+  isAdmin: boolean,
+  currentId?: string
+): Promise<void> => {
+  if (isAdmin) return
+
+  const current = currentId
+    ? await prisma.account.findUnique({
+        where: { id: currentId },
+        select: { role: true, functions: { select: { functionId: true } } },
+      })
+    : null
+
+  // A Responsable never touches a peer or a superior
+  if (current && !BELOW_LEAD_ROLES.includes(current.role)) throw forbidden()
+
+  const role = (readText(values, 'role') ?? MemberRoles.Moderateur) as MemberRoleName
+  if (!BELOW_LEAD_ROLES.includes(role)) throw forbidden()
+
+  const legacy = await prisma.jobFunction.findMany({
+    where: { name: { in: LEGACY_FUNCTION_NAMES } },
+    select: { id: true },
+  })
+  const legacyIds = new Set(legacy.map((row) => row.id))
+  const held = new Set((current?.functions ?? []).map((row) => row.functionId))
+  const asked = [
+    ...readList(values, 'primaryFunctionIds'),
+    ...readList(values, 'secondaryFunctionIds'),
+  ].filter((id) => legacyIds.has(id))
+
+  // Neither a new one nor a removed one
+  const added = asked.some((id) => !held.has(id))
+  const removed = [...held].some((id) => legacyIds.has(id) && !asked.includes(id))
+  if (added || removed) throw forbidden()
+}
+
 /**
  * Build the moderator form declarations
  * @param {boolean} [isAdmin] - Viewer sits at admin level
@@ -146,7 +198,11 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
 
   // Each kind only offers its own functions
   const optionsOf = (kind: FunctionKindName) =>
-    rowsToOptions(functions.filter((entry) => entry.kind === kind))
+    rowsToOptions(
+      functions.filter(
+        (entry) => entry.kind === kind && (isAdmin || !LEGACY_FUNCTION_NAMES.includes(entry.name))
+      )
+    )
 
   // A restricted division still shows
   const divisionOptions = rowsToOptions(divisions).map((option, index) => ({
@@ -196,7 +252,9 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       label: MEMBER_FIELD_COPY.role,
       info: MEMBER_FIELD_INFO.role,
       required: true,
-      options: toOptions(ROLE_REGISTRY),
+      options: toOptions(ROLE_REGISTRY).filter(
+        (option) => isAdmin || BELOW_LEAD_ROLES.includes(option.value as MemberRoleName)
+      ),
       mark: 'dot',
       span: 'half',
       group: FORM_GROUPS.assignment,
@@ -307,13 +365,18 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
 }
 
 /**
- * Read every moderator
+ * Read every moderator, a Responsable only reads those below them
+ * @param {AccessScope} scope - Perimeter
+ * @param {boolean} [isAdmin] - Viewer sits at admin level
  * @return {Promise<MemberSummary[]>} - List rows
  */
 
-export const listMembers = async (scope: AccessScope): Promise<MemberSummary[]> => {
+export const listMembers = async (
+  scope: AccessScope,
+  isAdmin = false
+): Promise<MemberSummary[]> => {
   const rows = await prisma.account.findMany({
-    where: scopedWhere('account', scope, {}),
+    where: scopedWhere('account', scope, isAdmin ? {} : { role: { in: BELOW_LEAD_ROLES } }),
     include: {
       ...SUMMARY_INCLUDE,
       _count: { select: { notesReceived: true, absences: { where: activeAbsenceFilter() } } },

@@ -120,6 +120,9 @@ export const MeetingFile = ({
     return typeof value === 'string' && value.length > 0 ? value : null
   }
 
+  const scheduledValue = textOf('scheduledAt') ?? summary.scheduledAt
+  const durationValue =
+    typeof file.values.durationMin === 'number' ? file.values.durationMin : summary.durationMin
   const titleValue = textOf('title') ?? summary.title
   const emojiValue = textOf('emoji') ?? summary.emoji
   const stateOption = optionOf('stateId')
@@ -127,10 +130,15 @@ export const MeetingFile = ({
   const youtuberOption = optionOf('youtuberId')
 
   const infoEntries: EditableEntry[] = [
-    { label: MEETING_FIELD_COPY.scheduledAt, display: formatDayTime(summary.scheduledAt) },
+    {
+      label: MEETING_FIELD_COPY.scheduledAt,
+      field: fieldFor('scheduledAt'),
+      display: scheduledValue ? formatDayTime(scheduledValue) : null,
+    },
     {
       label: MEETING_FIELD_COPY.durationMin,
-      display: summary.durationMin ? `${summary.durationMin} ${MEETING_COPY.minuteUnit}` : null,
+      field: fieldFor('durationMin'),
+      display: durationValue ? `${durationValue} ${MEETING_COPY.minuteUnit}` : null,
     },
     {
       label: MEETING_FIELD_COPY.state,

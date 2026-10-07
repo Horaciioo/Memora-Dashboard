@@ -77,6 +77,24 @@ export const EditableDetailGrid = ({
     cellRef.current?.querySelector<HTMLElement>('input, button')?.focus()
   }, [editing])
 
+  // Pickers live in a layer outside the cell
+  useEffect(() => {
+    const field = entries.find((entry) => entry.field?.name === editing)?.field
+    if (!field || !AUTO_SAVE_KINDS.includes(field.kind)) return
+
+    const onPress = (event: PointerEvent) => {
+      const target = event.target as Element | null
+      if (cellRef.current?.contains(target)) return
+      if (target?.closest('[role="listbox"], [role="dialog"]')) return
+
+      setEditing(null)
+    }
+
+    document.addEventListener('pointerdown', onPress)
+
+    return () => document.removeEventListener('pointerdown', onPress)
+  }, [editing, entries])
+
   const startEditing = (field: FieldDefinition) => {
     if (disabled || field.readOnly) return
 
@@ -121,10 +139,8 @@ export const EditableDetailGrid = ({
 
         const onBlur = (event: FocusEvent<HTMLElement>) => {
           if (event.currentTarget.contains(event.relatedTarget as Node)) return
-          if (autoSaves) {
-            setEditing(null)
-            return
-          }
+          // A picker taking the focus must not unmount its own control
+          if (autoSaves) return
           void commit(field.name, draft, true)
         }
 

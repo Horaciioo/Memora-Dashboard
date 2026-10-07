@@ -4,16 +4,14 @@ import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { Button } from '@/components/elements/actions/Button'
-import { Markdown } from '@/components/elements/display/Markdown'
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { Dialog } from '@/components/structures/Dialog'
-import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/Section'
-import { AttendancePanel } from '@/composites/calendar/AttendancePanel'
+import { CalendarDetail } from '@/composites/calendar/CalendarDetail'
 import { CalendarAgenda } from '@/composites/calendar/CalendarAgenda'
 import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
 import { CalendarSidebar } from '@/composites/calendar/CalendarSidebar'
@@ -27,15 +25,13 @@ import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useSlotDraft } from '@/core/hooks/interaction/useSlotDraft'
 import { useCalendarFiltersStore } from '@/core/store/calendarFilters'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import { CALENDAR_COPY, CALENDAR_FIELD_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
+import { CALENDAR_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
 import {
-  CALENDAR_KIND_REGISTRY,
   CALENDAR_LAYER_REGISTRY,
   CALENDAR_SOURCE_REGISTRY,
   layerOfSource,
 } from '@/declarations/calendar/registries'
 import { CALENDAR_SETTINGS } from '@/declarations/configurations/settings'
-import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { accentPaint, accentVars } from '@/declarations/ui/theme'
@@ -45,7 +41,7 @@ import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import { GUIDE_BEACONS } from '@/declarations/academy/guides'
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
-import { CalendarKinds, CalendarSources } from '@/utils/constants/workflow'
+import { CalendarKinds } from '@/utils/constants/workflow'
 import type { CalendarLayerName } from '@/utils/constants/workflow'
 import type { CalendarUnit } from '@/utils/format/calendar'
 import {
@@ -64,7 +60,6 @@ import {
   unitGrid,
   weekdayOf,
 } from '@/utils/format/calendar'
-import { entrySpan } from '@/utils/format/entrySpan'
 
 export interface CalendarBoardProps {
   initialEntries: CalendarEntry[]
@@ -102,12 +97,6 @@ const GRID_MODES: { value: GridMode; label: string }[] = [
 
 // Day add glyph
 const DayAddIcon = ICONS.add
-
-// Glyphs of the detail lines
-const ClockIcon = ICONS.clock
-const VisibleIcon = ICONS.visible
-const RollCallIcon = ICONS.meetings
-const InfoIcon = ICONS.info
 
 /**
  * Shared calendar
@@ -235,10 +224,6 @@ export const CalendarBoard = ({
       return term.length === 0 || entry.title.toLowerCase().includes(term)
     })
   }, [calendar.entries, hiddenLayers, hiddenCreators, search, focusEntryId])
-
-  // Glyph of the origin of the open entry
-  const SourceIcon =
-    ICONS[CALENDAR_SOURCE_REGISTRY.get(opened?.source ?? CalendarSources.Entry).icon]
 
   // The open detail stays in step with roster updates
   const openedEntry = opened
@@ -478,17 +463,17 @@ export const CalendarBoard = ({
               <Button onClick={() => setCursor(toDayKey(new Date()))}>{CALENDAR_COPY.today}</Button>
               {calendar.isLoading && <BrandLoader variant="ink" />}
               <Button
-                variant="icon"
-                icon="back"
-                aria-label={CALENDAR_COPY.previous}
+                title={CALENDAR_COPY.previous}
                 onClick={() => setCursor(shiftAnchor(cursor, unit, -1))}
-              />
+              >
+                {CALENDAR_COPY.previousShort}
+              </Button>
               <Button
-                variant="icon"
-                icon="forward"
-                aria-label={CALENDAR_COPY.next}
+                title={CALENDAR_COPY.next}
                 onClick={() => setCursor(shiftAnchor(cursor, unit, 1))}
-              />
+              >
+                {CALENDAR_COPY.nextShort}
+              </Button>
               <span className={CALENDAR_STYLES.period}>{periodLabel(cursor, unit)}</span>
               <span className="ml-auto flex flex-wrap items-center gap-3">
                 {canManage && isTimed && (
@@ -501,7 +486,7 @@ export const CalendarBoard = ({
                 )}
                 {canManage && (
                   <span {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.calendarAdd }}>
-                    <Button variant="primary" icon="add" onClick={() => openForm(null)}>
+                    <Button variant="primary" onClick={() => openForm(null)}>
                       {CALENDAR_COPY.add}
                     </Button>
                   </span>
@@ -518,7 +503,6 @@ export const CalendarBoard = ({
                   {CALENDAR_COPY.clearSelection}
                 </Button>
                 <Button
-                  icon="edit"
                   onClick={() => {
                     calendar.clearIssues()
                     setDialog('bulk')
@@ -526,7 +510,7 @@ export const CalendarBoard = ({
                 >
                   {CALENDAR_COPY.editSelection}
                 </Button>
-                <Button variant="danger" icon="remove" onClick={() => setPendingDeletion(selected)}>
+                <Button variant="danger" onClick={() => setPendingDeletion(selected)}>
                   {CALENDAR_COPY.deleteSelection}
                 </Button>
               </div>
@@ -745,124 +729,44 @@ export const CalendarBoard = ({
             <>
               {opened.href && (
                 <Link href={opened.href}>
-                  <Button icon="forward" aria-label={ACTION_COPY.open} title={ACTION_COPY.open} />
+                  <Button>{ACTION_COPY.open}</Button>
                 </Link>
               )}
               {!opened.readOnly && (
                 <>
                   <Button
                     variant="danger"
-                    icon="remove"
-                    aria-label={ACTION_COPY.delete}
-                    title={ACTION_COPY.delete}
                     disabled={!canManage}
                     onClick={() => {
                       setPendingDeletion([opened])
                       setDialog(null)
                     }}
-                  />
+                  >
+                    {ACTION_COPY.delete}
+                  </Button>
                   <Button
                     variant="primary"
-                    icon="edit"
-                    aria-label={ACTION_COPY.edit}
-                    title={ACTION_COPY.edit}
+                    className="text-white!"
                     disabled={!canManage}
                     onClick={() => openForm(opened)}
-                  />
+                  >
+                    {ACTION_COPY.edit}
+                  </Button>
                 </>
               )}
             </>
           ) : undefined
         }
       >
-        {opened &&
-          (opened.source === CalendarSources.Birthday ? (
-            <p className={CALENDAR_STYLES.detailNote}>{CALENDAR_COPY.birthdayMessage}</p>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <div className={CALENDAR_STYLES.detailMeta}>
-                <span className={CALENDAR_STYLES.previewLine}>
-                  <ClockIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
-                  {entrySpan(opened.startsAt, opened.endsAt, opened.allDay)}
-                </span>
-                <span className={CALENDAR_STYLES.previewLine}>
-                  <SourceIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
-                  {opened.templateName ?? CALENDAR_KIND_REGISTRY.label(opened.kind)}
-                </span>
-                <span className={CALENDAR_STYLES.previewLine}>
-                  <VisibleIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
-                  {EVENT_VISIBILITY_REGISTRY.label(opened.visibility)}
-                </span>
-                {opened.rollCall && (
-                  <span className={CALENDAR_STYLES.previewLine}>
-                    <RollCallIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
-                    {CALENDAR_COPY.rollCallTitle}
-                  </span>
-                )}
-                {opened.readOnly && (
-                  <span className={CALENDAR_STYLES.previewLine}>
-                    <InfoIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
-                    {CALENDAR_COPY.readOnlyNotice}
-                  </span>
-                )}
-              </div>
-              <DetailGrid
-                entries={[
-                  { label: CALENDAR_FIELD_COPY.subject, value: opened.subjectName },
-                  // A planned meeting never shows its description
-                  ...(opened.source === CalendarSources.Meeting
-                    ? []
-                    : [{ label: CALENDAR_FIELD_COPY.description, value: opened.description }]),
-                ]}
-              />
-
-              {opened.source === CalendarSources.Meeting ? (
-                <>
-                  <div className="flex flex-col gap-1.5">
-                    <span className={CALENDAR_STYLES.legendTitle}>
-                      {CALENDAR_COPY.meetingTopicsTitle}
-                    </span>
-                    {opened.topics && opened.topics.length > 0 ? (
-                      <ul className={CALENDAR_STYLES.detailList}>
-                        {opened.topics.map((topic, index) => (
-                          <li key={index}>
-                            {[topic.emoji, topic.title].filter(Boolean).join(' ')}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className={CALENDAR_STYLES.detailNote}>
-                        {CALENDAR_COPY.meetingTopicsEmpty}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <span className={CALENDAR_STYLES.legendTitle}>
-                      {CALENDAR_COPY.meetingMinutesTitle}
-                    </span>
-                    {opened.minutes ? (
-                      <Markdown source={opened.minutes} />
-                    ) : (
-                      <p className={CALENDAR_STYLES.detailNote}>
-                        {CALENDAR_COPY.meetingMinutesEmpty}
-                      </p>
-                    )}
-                  </div>
-                </>
-              ) : (
-                opened.body && <Markdown source={opened.body} />
-              )}
-
-              {openedEntry?.rollCall && (
-                <AttendancePanel
-                  entry={openedEntry}
-                  pending={calendar.isSaving}
-                  onRespond={(status) => void calendar.respond(openedEntry.id, status)}
-                  onRemind={() => void calendar.remind(openedEntry.id)}
-                />
-              )}
-            </div>
-          ))}
+        {opened && (
+          <CalendarDetail
+            entry={opened}
+            live={openedEntry ?? opened}
+            pending={calendar.isSaving}
+            onRespond={(status) => void calendar.respond(opened.id, status)}
+            onRemind={() => void calendar.remind(opened.id)}
+          />
+        )}
       </Dialog>
 
       <ConfirmDialog

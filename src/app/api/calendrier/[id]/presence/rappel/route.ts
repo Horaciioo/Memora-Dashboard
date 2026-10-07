@@ -7,7 +7,7 @@ import { assertRowInScope } from '@/core/services/auth/ScopeService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const POST = createProtectedRoute({
-  permission: Permissions.CalendarRead,
+  permission: Permissions.CalendarManage,
   descriptor: { summary: 'Ping the roll-call no-answers now', tags: ['calendar'] },
   handler: async ({ params, session, access, scope }) => {
     const canManage = access.can(Permissions.CalendarManage)
@@ -20,7 +20,7 @@ export const POST = createProtectedRoute({
     })
     if (!event) throw notFound()
 
-    await remindPending(event)
+    await remindPending(event, session.id)
 
     return readRosterFor(params.id, session.id, canManage)
   },

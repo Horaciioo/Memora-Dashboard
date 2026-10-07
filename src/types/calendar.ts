@@ -66,7 +66,6 @@ export interface AttendanceRoster {
  * @property {string | null} [minutes] - Meeting write-up
  * @property {boolean} readOnly - Projected from another domain
  * @property {boolean} rollCall - Asks its convened members to confirm presence
- * @property {boolean} rosterShared - Convened members may see the answers
  * @property {AttendanceRoster | null} attendance - Roll-call standings
  * @property {FormValues} values - Values feeding the edit form
  */
@@ -95,7 +94,6 @@ export interface CalendarEntry {
   minutes?: string | null
   readOnly: boolean
   rollCall: boolean
-  rosterShared: boolean
   attendance: AttendanceRoster | null
   values: FormValues
 }

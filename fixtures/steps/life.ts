@@ -359,7 +359,6 @@ export const seedCalendar = async (reference: Reference, cast: Cast, work: Work)
           endsAt: plusMinutes(startsAt, 90),
           visibility: 'EVERYONE',
           rollCall: true,
-          rosterShared: chance(0.5),
           rollCallTeamIds: [team.id],
           remindAt: isPast ? null : plusMinutes(startsAt, -1440),
           attendances: {

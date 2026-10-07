@@ -606,22 +606,22 @@ export const RELEASE_NOTICE = {
   wrapPointed: 'mx-3 pt-2.5 pb-1',
   // The ^ aimed at the version entry
   caret:
-    'pointer-events-none absolute top-1 left-4 h-3 w-3 rotate-45 rounded-sm bg-[var(--color-mauve-200)]',
+    'pointer-events-none absolute top-1 left-4 h-3 w-3 rotate-45 rounded-sm bg-[var(--color-gold-100)]',
   // Gradient plate
   frame:
-    'group/news rail-reset relative z-10 overflow-hidden rounded-[var(--radius-lg)] bg-[image:var(--gradient-soft)] text-[var(--color-ink)] shadow-[var(--shadow-md)] ring-1 ring-[var(--color-surface)]/40 ring-inset transition-shadow hover:shadow-[var(--shadow-lg)]',
+    'group/news rail-reset relative z-10 overflow-hidden rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--color-gold-100)] via-[var(--color-gold-300)] to-[var(--color-gold-400)] text-black shadow-[var(--shadow-md)] ring-1 ring-white/40 ring-inset transition-shadow hover:shadow-[var(--shadow-lg)]',
   // Light veil from the top left
   veil: 'pointer-events-none absolute inset-0 bg-linear-to-br from-[var(--color-surface)]/50 via-[var(--color-surface)]/10 to-transparent',
   link: 'relative block p-3.5 pr-10',
   sheen:
     'pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-[var(--color-surface)]/55 to-transparent transition-[left] duration-[var(--motion-duration-celebrate)] ease-out group-hover/news:left-full motion-reduce:transition-none',
   kicker:
-    'relative block font-[family-name:var(--font-mono)] text-micro font-bold tracking-wide text-[var(--color-ink)]/70 uppercase',
+    'relative block font-[family-name:var(--font-mono)] text-micro font-bold tracking-wide text-black/70 uppercase',
   title: 'relative mt-1.5 line-clamp-2 block text-lg leading-tight font-bold tracking-tight',
-  cta: 'relative mt-3 inline-flex items-center gap-1 rounded-full bg-[var(--color-ink)] px-2.5 py-1 text-micro font-bold text-[var(--color-surface)]',
+  cta: 'relative mt-3 inline-flex items-center gap-1 rounded-full bg-black px-2.5 py-1 text-micro font-bold text-[var(--color-gold-100)]',
   ctaIcon: 'h-3 w-3',
   dismiss:
-    'absolute top-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full text-[var(--color-ink)]/55 transition-colors hover:bg-[var(--color-surface)]/35 hover:text-[var(--color-ink)]',
+    'absolute top-2 right-2 z-20 flex h-7 w-7 items-center justify-center rounded-full text-black/55 transition-colors hover:bg-white/35 hover:text-black',
   dismissIcon: 'h-3.5 w-3.5',
 } as const
 

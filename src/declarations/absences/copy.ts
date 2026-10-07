@@ -38,8 +38,9 @@ export const ABSENCE_COPY = {
   approve: 'Valider',
   refuse: 'Refuser',
   cancel: 'Annuler la demande',
+  replyFrom: 'Réponse de {name}',
   reviewTitle: 'Traiter cette absence',
-  reviewNote: 'Mot au modérateur',
+  reviewNote: 'Mot pour le membre',
   tooShort: 'Une absence se déclare à partir de {min} jours.',
   tooLong: 'Une absence ne peut pas dépasser {max} jours.',
   days: 'jours',
@@ -62,7 +63,7 @@ export const ABSENCE_FIELD_COPY = {
   reasonHint: 'Facultatif. Ce que ton équipe doit savoir, jamais un détail médical.',
   member: 'Modérateur',
   status: 'Statut',
-  reviewNote: 'Mot au modérateur',
+  reviewNote: 'Mot pour le membre',
 } as const
 
 /**
@@ -73,5 +74,5 @@ export const ABSENCE_FIELD_COPY = {
 export const ABSENCE_FIELD_INFO = {
   dates: 'Le premier et le dernier jour où tu ne seras pas disponible.',
   reason: 'Ce que tes responsables liront à côté de tes dates.',
-  reviewNote: 'Un mot que le modérateur lira avec la réponse.',
+  reviewNote: 'Un mot que le membre lira avec la réponse.',
 } as const

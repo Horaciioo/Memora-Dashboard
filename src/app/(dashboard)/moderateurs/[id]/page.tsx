@@ -13,7 +13,7 @@ import { ABSENCE_FIELDS, canReviewAbsence } from '@/core/services/absences/Absen
 import { readInheritedGrants } from '@/core/services/auth/GrantsService'
 import { assertAccountInScope } from '@/core/services/auth/ScopeService'
 import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
-import { memberFields, readMember } from '@/core/services/members/MemberService'
+import { BELOW_LEAD_ROLES, memberFields, readMember } from '@/core/services/members/MemberService'
 import { findCandidateFile } from '@/core/services/recruitment/RecruitmentService'
 import { readMemberActivity } from '@/core/services/system/ActivityService'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -74,6 +74,9 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const { id } = await params
   const { session, access, scope } = await requirePermission(Permissions.MemberRead)
 
+  // Floor roles never open another member's file, whatever grants they hold
+  if (!access.isResponsable && id !== session.id) notFound()
+
   const canManageAccess = access.can(Permissions.AccessManage)
   const canReadLogs = access.can(Permissions.MemberLogRead)
   const canReadNotes = access.can(Permissions.MemberNoteRead)
@@ -83,6 +86,10 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     .then(() => readMember(id, canReadNotes))
     .catch(() => null)
   if (!detail) notFound()
+
+  // A Responsable reads only those below them, and their own file
+  if (!access.isAdmin && id !== session.id && !BELOW_LEAD_ROLES.includes(detail.summary.role))
+    notFound()
 
   // Only the responsables of their creators
   const isConcerned =

@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { MembersPanel } from '@/composites/members/MembersPanel'
@@ -19,6 +20,9 @@ export const metadata: Metadata = { title: MEMBER_COPY.title }
 export default async function MembersPage() {
   const { access, scope } = await requirePermission(Permissions.MemberRead)
 
+  // The list is for the encadrement only
+  if (!access.isResponsable) notFound()
+
   // The three reference reads are memoised
   const perimeter = await scope()
 
@@ -28,7 +32,7 @@ export default async function MembersPage() {
     (!perimeter.isGlobal && perimeter.youtuberIds.length === 1 ? perimeter.youtuberIds[0] : null)
 
   const [members, fields, divisions, youtubers, functions] = await Promise.all([
-    listMembers(perimeter),
+    listMembers(perimeter, access.isAdmin),
     memberFields(access.isAdmin),
     allDivisions(),
     activeYoutubers(),

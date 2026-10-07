@@ -341,7 +341,6 @@ export const announceLive = async (
     data: {
       title,
       templateId: template?.id ?? null,
-      rosterShared: true,
       ownerId: actorId,
       youtuberId,
       startsAt,
