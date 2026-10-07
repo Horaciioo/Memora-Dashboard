@@ -4,6 +4,7 @@ import { decryptField, encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
 import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { readDateRange, readText } from '@/core/lib/forms/values'
+import { readLedCreatorIds } from '@/core/services/auth/LeadService'
 import {
   ABSENCE_SETTINGS,
   FORM_SETTINGS,
@@ -38,6 +39,47 @@ export const activeAbsenceFilter = (): Prisma.AbsenceWhereInput => {
 }
 
 /**
+ * Creators a reviewer answers for
+ * @param {string} reviewerId - Reviewer account identifier
+ * @return {Promise<string[]>} - Creator identifiers
+ */
+
+const reviewerCreatorIds = async (reviewerId: string): Promise<string[]> => {
+  const [teams, anchored, own] = await Promise.all([
+    prisma.team.findMany({
+      where: { leadId: reviewerId, archived: false },
+      select: { youtuberId: true },
+    }),
+    readLedCreatorIds(reviewerId),
+    prisma.account.findUnique({
+      where: { id: reviewerId },
+      select: { youtubers: { select: { id: true } } },
+    }),
+  ])
+
+  const led = teams.map((team) => team.youtuberId).filter((id): id is string => id !== null)
+
+  return [...new Set([...led, ...anchored, ...(own?.youtubers.map((row) => row.id) ?? [])])]
+}
+
+/**
+ * Accounts a reviewer answers for
+ * @param {string} reviewerId - Reviewer account identifier
+ * @return {Promise<Prisma.AccountWhereInput>} - Owner filter
+ */
+
+const reviewedAccounts = async (reviewerId: string): Promise<Prisma.AccountWhereInput> => {
+  const creatorIds = await reviewerCreatorIds(reviewerId)
+
+  return {
+    OR: [
+      { teamMemberships: { some: { team: { leadId: reviewerId } } } },
+      { youtubers: { some: { id: { in: creatorIds } } } },
+    ],
+  }
+}
+
+/**
  * Check a reviewer may act on one account's absences
  * @param {string} reviewerId - Reviewer account identifier
  * @param {string} accountId - Absence owner identifier
@@ -52,11 +94,15 @@ export const canReviewAbsence = async (
 ): Promise<boolean> => {
   if (isAdmin) return true
 
-  const membership = await prisma.teamMember.findFirst({
-    where: { accountId, team: { leadId: reviewerId } },
+  // Never one's own request
+  if (reviewerId === accountId) return false
+
+  const owner = await prisma.account.findFirst({
+    where: { id: accountId, ...(await reviewedAccounts(reviewerId)) },
+    select: { id: true },
   })
 
-  return membership !== null
+  return owner !== null
 }
 
 /**
@@ -155,7 +201,7 @@ export const listReviewQueue = async (
       status: AbsenceStatuses.Pending,
       ...(isAdmin
         ? {}
-        : { account: { teamMemberships: { some: { team: { leadId: reviewerId } } } } }),
+        : { account: { AND: [await reviewedAccounts(reviewerId), { id: { not: reviewerId } }] } }),
     },
     include: ABSENCE_INCLUDE,
     orderBy: { startDate: 'asc' },
