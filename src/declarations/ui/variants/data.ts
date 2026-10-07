@@ -43,7 +43,7 @@ export const LIST_STYLES = {
   cardAbsent: 'border-transparent bg-[var(--color-surface-sunken)] shadow-none',
   cardAbsentName: 'text-[var(--color-ink-subtle)]',
   cardAbsentNote:
-    'flex items-center gap-1 text-xs font-medium text-[var(--color-ink-subtle)] italic',
+    'flex shrink-0 items-center gap-1 text-xs font-medium whitespace-nowrap text-[var(--color-ink-subtle)] italic',
   cardAbsentGlyph: 'h-3.5 w-3.5 shrink-0',
   cardAbsentEmblems: 'opacity-50 grayscale',
   grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
@@ -171,6 +171,9 @@ export const ABSENCE_PAGE = {
   rowDuration: 'text-sm text-[var(--color-ink-subtle)]',
   rowReason: 'col-span-2 min-w-0 text-sm md:col-span-1',
   rowReasonEmpty: 'text-[var(--color-ink-subtle)] italic',
+  reply:
+    'col-span-full mt-1 flex flex-col gap-0.5 rounded-[var(--radius-md)] bg-[var(--color-brand-50)] px-3 py-2 text-sm',
+  replyFrom: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   rowStatus:
     'col-start-2 row-start-1 flex items-center justify-end gap-2 text-sm font-semibold md:col-start-auto md:row-start-auto',
   statusIcon: 'h-4 w-4',
@@ -287,6 +290,37 @@ export const HORIZONTAL_TIMELINE_STYLES = {
   labelDone: 'text-[var(--color-ink)]',
   labelIdle: 'text-[var(--color-ink-subtle)]',
   label: 'max-w-24 text-xs font-medium',
+} as const
+
+/**
+ * Calendar detail modal styles
+ * @type {Record<string, string>}
+ */
+
+export const CALENDAR_DETAIL = {
+  body: 'flex flex-col gap-6',
+  // Accent-tinted head: when, what
+  hero: 'flex flex-col gap-3 rounded-[var(--radius-lg)] p-4',
+  heroKind: 'text-micro font-bold tracking-wide uppercase',
+  heroSpan: 'text-section font-bold tracking-tight text-[var(--color-ink)] first-letter:uppercase',
+  facts: 'flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-[var(--color-ink-subtle)]',
+  section: 'flex flex-col gap-3',
+  foldToggle: 'flex w-full cursor-pointer items-center gap-2 text-left',
+  foldChevron:
+    'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform duration-[var(--motion-duration-slow)] ease-in-out motion-reduce:transition-none',
+  foldChevronShut: '-rotate-90',
+  // Folds open and shut on the row height itself
+  fold: 'group/fold grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-[var(--motion-duration-slow)] ease-in-out motion-reduce:transition-none',
+  foldOpen: 'grid-rows-[1fr] opacity-100',
+  // Names wait for the panel to open, then land one after the other
+  foldItem:
+    'translate-y-1 opacity-0 transition-[opacity,translate] duration-[var(--motion-duration-panel)] ease-out motion-reduce:transition-none group-data-[open=true]/fold:translate-y-0 group-data-[open=true]/fold:opacity-100 group-data-[open=true]/fold:delay-[calc(var(--motion-duration-panel)+var(--i)*70ms)]',
+  foldDivider: 'flex justify-center border-t border-[var(--color-border)] pt-4',
+  foldInner: 'min-h-0 overflow-hidden',
+  card: 'flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4',
+  answer: 'flex flex-wrap gap-2',
+  columns: 'grid gap-4 sm:grid-cols-3',
+  none: 'text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 
 /**
