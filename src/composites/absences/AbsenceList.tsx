@@ -102,6 +102,14 @@ export const AbsenceList = ({ absences, onRemove }: AbsenceListProps) => {
                 {status.label}
               </span>
             </span>
+            {absence.reviewNote && (
+              <p className={ABSENCE_PAGE.reply}>
+                <span className={ABSENCE_PAGE.replyFrom}>
+                  {ABSENCE_COPY.replyFrom.replace('{name}', absence.reviewerName ?? '')}
+                </span>
+                {absence.reviewNote}
+              </p>
+            )}
           </div>
         )
       })}
