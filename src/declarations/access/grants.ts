@@ -138,4 +138,19 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     // Trainers follow their juniors only
     functions: { Formateurs: [Permissions.LiveFocus] },
   },
+  {
+    key: 'work-deletion',
+    grants: {
+      [MemberRoles.Admin]: [
+        Permissions.ProjectDelete,
+        Permissions.TaskDelete,
+        Permissions.MeetingDelete,
+      ],
+      [MemberRoles.Responsable]: [
+        Permissions.ProjectDelete,
+        Permissions.TaskDelete,
+        Permissions.MeetingDelete,
+      ],
+    },
+  },
 ]
