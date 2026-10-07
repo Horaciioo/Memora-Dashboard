@@ -13,6 +13,8 @@ import { syncRoster } from '@/core/services/calendar/attendance'
 import { notify } from '@/core/services/system/NotificationService'
 import { memberOptions, peopleInScope, youtuberOptions } from '@/core/services/work/shared'
 import { publishLive } from '@/core/lib/lives/bus'
+import { activeCoordinatorIds, coordinationGaps } from '@/core/lib/lives/coordination'
+import type { CoordinationSeat } from '@/core/lib/lives/coordination'
 import { livePermissions } from '@/core/lib/lives/permissions'
 import { liveStartedKey } from '@/declarations/academy/welcome'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
@@ -28,7 +30,12 @@ import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { LiveBeacon, LivePerson, LiveView } from '@/types/lives'
 import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
-import { LivePlatforms, LiveStatuses, OPEN_LIVE_STATUSES } from '@/utils/constants/lives'
+import {
+  CoordinationStatuses,
+  LivePlatforms,
+  LiveStatuses,
+  OPEN_LIVE_STATUSES,
+} from '@/utils/constants/lives'
 import type { LivePlatformName, LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { Permissions } from '@/utils/constants/permissions'
@@ -44,7 +51,7 @@ const PERSON = { select: { id: true, displayName: true, avatarUrl: true } } as c
 const LIVE_SHAPE = {
   youtuber: { select: { id: true, name: true, avatarUrl: true } },
   announcedBy: PERSON,
-  coordinator: PERSON,
+  coordinations: { include: { account: PERSON }, orderBy: { askedAt: 'asc' } },
   members: { include: { account: PERSON }, orderBy: { convokedAt: 'asc' } },
   liveconEntries: {
     where: { endedAt: null },
@@ -77,6 +84,7 @@ const toPerson = (
 
 const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): LiveView => {
   const entry = row.liveconEntries[0]
+  const coordinatorIds = activeCoordinatorIds(row.coordinations)
 
   return {
     id: row.id,
@@ -89,7 +97,17 @@ const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): LiveVie
     startedAt: row.startedAt?.toISOString() ?? null,
     endedAt: row.endedAt?.toISOString() ?? null,
     announcedBy: toPerson(row.announcedBy),
-    coordinator: toPerson(row.coordinator),
+    coordinators: row.coordinations.map((seat) => ({
+      person: toPerson(seat.account) as LivePerson,
+      status: seat.status,
+      startsAt: seat.startsAt?.toISOString() ?? null,
+      endsAt: seat.endsAt?.toISOString() ?? null,
+    })),
+    gaps: coordinationGaps(row.plannedStartAt, row.plannedEndAt, row.coordinations).map((gap) => ({
+      from: gap.from.toISOString(),
+      to: gap.to.toISOString(),
+    })),
+    isCoordinating: coordinatorIds.includes(viewerId),
     instructions: row.instructions,
     members: row.members
       .map((seat) => toPerson(seat.account))
@@ -102,7 +120,7 @@ const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): LiveVie
           accent: entry.level.accent,
         }
       : null,
-    permissions: livePermissions(row, viewerId, held),
+    permissions: livePermissions({ coordinatorIds, status: row.status }, viewerId, held),
   }
 }
 
@@ -231,11 +249,10 @@ export const liveFields = async (scope: AccessScope): Promise<FieldDefinition[]>
       span: 'half',
     },
     {
-      name: 'coordinatorId',
-      kind: 'select',
+      name: 'coordinatorIds',
+      kind: 'multiselect',
       label: LIVE_FIELD_COPY.coordinator,
       hint: LIVE_FIELD_COPY.coordinatorHint,
-      required: true,
       options: members,
       mark: 'avatar',
     },
@@ -286,16 +303,15 @@ export const announceLive = async (
   const youtuberId = readText(values, 'youtuberId')
   const title = readText(values, 'title')
   const startsAt = readDate(values, 'plannedStartAt')
-  const coordinatorId = readText(values, 'coordinatorId')
+  const coordinatorIds = readList(values, 'coordinatorIds')
 
   // Required fields
   const missing = [
     ['youtuberId', youtuberId],
     ['title', title],
     ['plannedStartAt', startsAt],
-    ['coordinatorId', coordinatorId],
   ].filter(([, value]) => !value)
-  if (missing.length > 0 || !youtuberId || !title || !startsAt || !coordinatorId) {
+  if (missing.length > 0 || !youtuberId || !title || !startsAt) {
     throw invalidInput(
       missing.map(([field]) => ({ field: String(field), message: FORM_COPY.required }))
     )
@@ -314,7 +330,7 @@ export const announceLive = async (
     endsAt,
     scope,
   })
-  const memberIds = [...new Set([coordinatorId, ...convened])]
+  const memberIds = [...new Set([...coordinatorIds, ...convened])]
 
   // Calendar entry carries the roll-call
   const template = await prisma.eventTemplate.findUnique({
@@ -343,10 +359,10 @@ export const announceLive = async (
       plannedStartAt: startsAt,
       plannedEndAt: endsAt,
       announcedById: actorId,
-      coordinatorId,
       calendarEventId: event.id,
       instructions: readText(values, 'instructions') ?? LIVE_INSTRUCTIONS_DEFAULT,
       members: { create: memberIds.map((accountId) => ({ accountId })) },
+      coordinations: { create: coordinatorIds.map((accountId) => ({ accountId })) },
     },
   })
 
@@ -356,9 +372,18 @@ export const announceLive = async (
     status: LiveStatuses.Announced,
   })
 
+  // Coordinators are asked, never assigned
+  await notify({
+    kind: 'LiveCoordinatorAsked',
+    recipients: coordinatorIds,
+    actorId,
+    target: 'home',
+    subject: title,
+  })
+
   await notify({
     kind: 'LiveAnnounced',
-    recipients: memberIds,
+    recipients: memberIds.filter((id) => !coordinatorIds.includes(id)),
     actorId,
     target: 'live',
     targetId: live.id,
@@ -462,7 +487,7 @@ export const readBeacon = async (
       id: true,
       status: true,
       plannedStartAt: true,
-      youtuber: { select: { name: true } },
+      youtuber: { select: { name: true, avatarUrl: true } },
     },
     orderBy: { plannedStartAt: 'asc' },
     take: LIVE_SETTINGS.maxOpenLives,
@@ -488,6 +513,7 @@ export const readBeacon = async (
     lives: rows.map((row) => ({
       id: row.id,
       creator: row.youtuber.name,
+      creatorAvatar: row.youtuber.avatarUrl,
       status: row.status,
       plannedStartAt: row.plannedStartAt.toISOString(),
     })),
@@ -509,7 +535,7 @@ const applyLiveStatus = async (
     youtuberId: string
     title: string
     status: LiveStatusName
-    coordinatorId: string | null
+    coordinations: CoordinationSeat[]
     members: { accountId: string }[]
   },
   next: LiveStatusName,
@@ -552,7 +578,9 @@ const applyLiveStatus = async (
       kind: 'LiveReportReady',
       recipients: [
         ...anchors.map((anchor) => anchor.accountId),
-        ...(live.coordinatorId ? [live.coordinatorId] : []),
+        ...live.coordinations
+          .filter((seat) => seat.status === CoordinationStatuses.Accepted)
+          .map((seat) => seat.accountId),
       ],
       actorId,
       target: 'liveReport',
@@ -607,7 +635,7 @@ export const moveLive = async (
 ): Promise<void> => {
   const live = await prisma.live.findFirst({
     where: scopedWhere('live', scope, { id }),
-    include: { members: { select: { accountId: true } } },
+    include: { members: { select: { accountId: true } }, coordinations: true },
   })
   if (!live) throw notFound()
 
@@ -629,7 +657,7 @@ export const moveLiveFromPlatform = async (
 ): Promise<boolean> => {
   const live = await prisma.live.findUnique({
     where: { id },
-    include: { members: { select: { accountId: true } } },
+    include: { members: { select: { accountId: true } }, coordinations: true },
   })
   if (!live || live.status === next) return false
 
@@ -668,8 +696,7 @@ export const saveInstructions = async ({
   held: PermissionName[]
 }): Promise<LiveView> => {
   const live = await readLive(id, scope, viewerId, held)
-  const isCoordinator = live.coordinator?.id === viewerId
-  if (!held.includes(Permissions.LiveAnnounce) && !isCoordinator) throw forbidden()
+  if (!held.includes(Permissions.LiveAnnounce) && !live.isCoordinating) throw forbidden()
 
   await prisma.live.update({
     where: { id },

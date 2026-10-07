@@ -25,11 +25,15 @@ export const LIVE_COPY = {
   startedAt: 'Lancé à',
   coordinator: 'Coordinateur du Live',
   noCoordinator: 'Aucun coordinateur',
+  coordinators: 'Coordination du Live',
   answered: 'Présents confirmés',
   urgentLive: 'Live de {creator} en cours',
   urgentAnnounced: 'Live de {creator} prévu le {time}',
   urgentOpen: 'Rejoindre',
   liveBadge: 'En direct',
+  liveNow: '{creator} est {strong}, on le rejoint ?',
+  liveNowStrong: 'actuellement en Live',
+  liveJoin: 'Rejoindre le live',
 } as const
 
 /**
@@ -45,7 +49,8 @@ export const LIVE_FIELD_COPY = {
   startsAt: 'Début prévu',
   durationMinutes: 'Durée prévue (minutes)',
   coordinator: 'Coordinateur du Live',
-  coordinatorHint: 'Il garde ses droits jusqu’à la fin du live, puis les perd tout seul.',
+  coordinatorHint:
+    'Plusieurs possibles. Chacun reçoit une demande et choisit lui-même ses horaires, ses droits courent jusqu’à la fin de son créneau.',
   members: 'Modérateurs convoqués',
   membersHint: 'Vide : toute l’équipe Lives du YouTubeur. Les absents ne sont jamais convoqués.',
   instructions: 'Consignes',
@@ -94,4 +99,30 @@ export const LIVE_PAGE_COPY = {
   open: 'J’ai lu, ouvrir la Mod View',
   reread: 'Relire les consignes',
   startedBubble: 'Le live a démarré ! On y va ?',
+} as const
+
+/**
+ * Copy of the coordinator requests
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_COORDINATION_COPY = {
+  title: 'On te propose de coordonner',
+  lead: '{asker} souhaite t’avoir comme Coordinateur du Live de {creator}, « {title} ».',
+  leadAnonymous:
+    'Les Responsables souhaitent t’avoir comme Coordinateur du Live de {creator}, « {title} ».',
+  window: 'Live prévu {range}',
+  from: 'Je coordonne à partir de',
+  to: 'Jusqu’à',
+  accept: 'Je coordonne',
+  decline: 'Je ne peux pas',
+  badWindow: 'Choisis des horaires dans la durée du live.',
+  gapRange: 'de {from} à {to}',
+  gapAlert: 'Il manque un Coordinateur {ranges}.',
+  gapHint: 'Personne ne coordonne encore {ranges}.',
+  accepted: 'Tu coordonnes ce live, merci !',
+  declined: 'C’est noté, les Responsables sont prévenus.',
+  seatAsked: 'Sans réponse',
+  seatAccepted: '{from} à {to}',
+  seatDeclined: 'A refusé',
 } as const

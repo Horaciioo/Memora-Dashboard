@@ -50,6 +50,8 @@ export const LiveconBlock = ({ block }: LiveconBlockProps) => {
   }, [isPinned, stops.length])
 
   const current = stops[active]
+  // A few offences of the panel at the level on display
+  const samples = (current?.level?.samples ?? []).slice(0, ACADEMY_SETTINGS.courseSampleOffenses)
   const shade = SHADES[Math.min(active, SHADES.length - 1)]!
 
   return (
@@ -99,10 +101,10 @@ export const LiveconBlock = ({ block }: LiveconBlockProps) => {
               {COURSE_COPY.liveconPanel(current.level?.name ?? '')}
             </span>
           </header>
-          {(current.level?.samples ?? []).length === 0 ? (
+          {samples.length === 0 ? (
             <p className={COURSE_LIVECON.empty}>{COURSE_COPY.liveconNoPanel}</p>
           ) : (
-            current.level!.samples.map((sample) => (
+            samples.map((sample) => (
               <div key={sample.offense} className={COURSE_LIVECON.sample}>
                 <span className={COURSE_LIVECON.sampleName}>{sample.offense}</span>
                 <span className={COURSE_LIVECON.measures}>

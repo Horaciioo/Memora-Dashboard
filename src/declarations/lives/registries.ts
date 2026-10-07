@@ -56,6 +56,13 @@ const LIVE_STATUS_MAP: Record<LiveStatusName, LiveStatusOption> = {
 export const LIVE_STATUS_REGISTRY = createRegistry(LIVE_STATUS_MAP)
 
 /**
+ * Zone the team reads clock times in
+ * @type {string}
+ */
+
+export const LIVE_CLOCK_ZONE = 'Europe/Paris'
+
+/**
  * Live coordinator
  * @type {{ label: string, icon: IconName, tint: string, grants: readonly PermissionName[] }}
  */

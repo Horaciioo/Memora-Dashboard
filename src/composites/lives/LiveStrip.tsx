@@ -125,7 +125,7 @@ export const LiveStrip = ({ live, canMove, isSaving, onMove }: LiveStripProps) =
       </div>
 
       <div className={LIVE_BOARD.facts}>
-        <LiveCoordinator person={live.coordinator} />
+        <LiveCoordinator seats={live.coordinators} gaps={live.gaps} />
         <span className={LIVE_BOARD.factDivider} aria-hidden="true" />
         <LiveSchedule
           isLive={isLive}

@@ -32,6 +32,7 @@ import type {
 import type { SanctionOffenseCard, SanctionPanelView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
 import type { PermissionName } from '@/utils/constants/permissions'
+import { LivePlatforms } from '@/utils/constants/lives'
 import { SanctionKinds } from '@/utils/constants/moderation'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -286,7 +287,8 @@ export const ModView = ({
     <div
       className={cn(
         MODVIEW_FRAME.root,
-        embedded || showcase ? MODVIEW_FRAME.embedded : MODVIEW_FRAME.bleed
+        embedded || showcase ? MODVIEW_FRAME.embedded : MODVIEW_FRAME.bleed,
+        (embedded || showcase) && state.platform === LivePlatforms.Twitch && 'skin-twitch'
       )}
     >
       {!embedded && !showcase && (

@@ -70,7 +70,7 @@ export const beats = (start: number, gap: number, events: SceneEvent[]): SceneSt
 export const twitchStage = (over: Partial<ModViewState> = {}): ModViewState => ({
   platform: LivePlatforms.Twitch,
   connection: 'scripted',
-  channel: { name: 'Lumi', avatar: null, category: 'Just Chatting', categoryArt: null },
+  channel: { name: '{creator}', avatar: null, category: 'Just Chatting', categoryArt: null },
   title: 'Soirée discussion avec vous, on parle du prochain projet',
   embedUrl: null,
   messages: [],

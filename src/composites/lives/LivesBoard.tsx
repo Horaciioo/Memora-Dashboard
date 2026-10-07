@@ -19,7 +19,6 @@ export interface LivesBoardProps {
   initialLives: LiveView[]
   fields: FieldDefinition[]
   canAnnounce: boolean
-  viewerId: string
 }
 
 /**
@@ -27,11 +26,10 @@ export interface LivesBoardProps {
  * @param {LiveView[]} initialLives - Lives resolved server-side
  * @param {FieldDefinition[]} fields - Announce form declarations
  * @param {boolean} canAnnounce - Viewer may announce
- * @param {string} viewerId - Signed-in member
  * @return {JSX.Element}
  */
 
-export const LivesBoard = ({ initialLives, fields, canAnnounce, viewerId }: LivesBoardProps) => {
+export const LivesBoard = ({ initialLives, fields, canAnnounce }: LivesBoardProps) => {
   const { lives, isSaving, issues, clearIssues, announce, move } = useLives(initialLives)
   const [isAnnouncing, setAnnouncing] = useState(false)
 
@@ -72,8 +70,7 @@ export const LivesBoard = ({ initialLives, fields, canAnnounce, viewerId }: Live
                 <LiveStrip
                   live={live}
                   canMove={
-                    live.permissions.includes(Permissions.LiveAnnounce) ||
-                    live.coordinator?.id === viewerId
+                    live.permissions.includes(Permissions.LiveAnnounce) || live.isCoordinating
                   }
                   isSaving={isSaving}
                   onMove={(status) => move(live.id, status)}

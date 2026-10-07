@@ -47,8 +47,7 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
     readPanelMemory(live.id),
     focusableMembers(memberIds, session.role),
   ])
-  const canEdit =
-    live.permissions.includes(Permissions.LiveAnnounce) || live.coordinator?.id === session.id
+  const canEdit = live.permissions.includes(Permissions.LiveAnnounce) || live.isCoordinating
 
   return (
     <div className={PAGE_STYLES.wrapper}>

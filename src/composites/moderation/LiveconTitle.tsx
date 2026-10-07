@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { useActionMenu } from '@/core/hooks/interaction/useActionMenu'
 import { useLivecon } from '@/core/hooks/data/useLivecon'
@@ -64,6 +65,7 @@ export const LiveconTitle = ({
     <>
       <Icon className={LIVECON_TITLE.icon} aria-hidden="true" />
       <span className={LIVECON_TITLE.name}>{inForce.name}</span>
+      <MaturityTag maturity="new" interactive={false} compact />
     </>
   )
 

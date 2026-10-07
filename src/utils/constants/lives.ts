@@ -33,3 +33,17 @@ export const OPEN_LIVE_STATUSES: readonly LiveStatusName[] = [
   LiveStatuses.Announced,
   LiveStatuses.Live,
 ]
+
+/**
+ * Answer of a member asked to coordinate a live
+ * @type {Record<string, string>}
+ */
+
+export const CoordinationStatuses = {
+  Asked: 'ASKED',
+  Accepted: 'ACCEPTED',
+  Declined: 'DECLINED',
+} as const
+
+export type CoordinationStatusName =
+  (typeof CoordinationStatuses)[keyof typeof CoordinationStatuses]

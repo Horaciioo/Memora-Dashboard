@@ -2,6 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { forbidden, notFound } from '@/core/lib/errors'
+import { activeCoordinatorIds } from '@/core/lib/lives/coordination'
 import { livePermissions } from '@/core/lib/lives/permissions'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -32,7 +33,7 @@ const JUNIOR_LIVE_FUNCTIONS = LIVE_FUNCTIONS.map((name) => JUNIOR_FUNCTION_OF[na
 const liveInScope = async (liveId: string, scope: AccessScope) => {
   const live = await prisma.live.findFirst({
     where: scopedWhere('live', scope, { id: liveId }),
-    select: { id: true, status: true, coordinatorId: true, platform: true },
+    select: { id: true, status: true, coordinations: true, platform: true },
   })
   if (!live) throw notFound()
 
@@ -145,7 +146,10 @@ export const startFocus = async ({
 }): Promise<void> => {
   const live = await liveInScope(liveId, scope)
   const permissions = livePermissions(
-    { coordinatorId: live.coordinatorId, status: live.status as LiveStatusName },
+    {
+      coordinatorIds: activeCoordinatorIds(live.coordinations),
+      status: live.status as LiveStatusName,
+    },
     viewerId,
     held
   )

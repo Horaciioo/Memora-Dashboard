@@ -16,7 +16,12 @@ import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_STREAM_EVENTS, LIVE_TOPICS } from '@/declarations/lives/topics'
 import { PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
 import { isTwitchConfigured } from '@/declarations/platforms/twitch'
-import { LivePlatforms, LiveStatuses, OPEN_LIVE_STATUSES } from '@/utils/constants/lives'
+import {
+  CoordinationStatuses,
+  LivePlatforms,
+  LiveStatuses,
+  OPEN_LIVE_STATUSES,
+} from '@/utils/constants/lives'
 
 /**
  * One live being watched
@@ -102,7 +107,7 @@ const handleSignal = async (liveId: string, signal: TwitchSignal): Promise<void>
 const watch = async (live: {
   id: string
   youtuberId: string
-  coordinatorId: string | null
+  coordinatorIds: string[]
   announcedById: string | null
   members: { accountId: string }[]
   youtuber: { channels: { externalId: string }[] }
@@ -120,7 +125,7 @@ const watch = async (live: {
   const candidates = [
     ...new Set(
       [
-        live.coordinatorId,
+        ...live.coordinatorIds,
         live.announcedById,
         ...live.members.map((seat) => seat.accountId),
       ].filter((id): id is string => Boolean(id))
@@ -198,7 +203,10 @@ export const syncLiveWatches = async (): Promise<void> => {
     select: {
       id: true,
       youtuberId: true,
-      coordinatorId: true,
+      coordinations: {
+        where: { status: CoordinationStatuses.Accepted },
+        select: { accountId: true },
+      },
       announcedById: true,
       members: { select: { accountId: true } },
       youtuber: {
@@ -221,7 +229,8 @@ export const syncLiveWatches = async (): Promise<void> => {
   }
 
   for (const live of lives) {
-    if (!watcher.watches.has(live.id)) await watch(live)
+    if (watcher.watches.has(live.id)) continue
+    await watch({ ...live, coordinatorIds: live.coordinations.map((seat) => seat.accountId) })
   }
 }
 

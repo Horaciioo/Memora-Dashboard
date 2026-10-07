@@ -2,6 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
+import { activeCoordinatorIds } from '@/core/lib/lives/coordination'
 import { livePermissions } from '@/core/lib/lives/permissions'
 import { syncJuniorLives } from '@/core/services/academy/LiveCountService'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
@@ -24,7 +25,7 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
 const liveInScope = async (id: string, scope: AccessScope) => {
   const live = await prisma.live.findFirst({
     where: scopedWhere('live', scope, { id }),
-    select: { id: true, status: true, coordinatorId: true, calendarEventId: true },
+    select: { id: true, status: true, coordinations: true, calendarEventId: true },
   })
   if (!live) throw notFound()
 
@@ -48,7 +49,10 @@ export const readLiveRoster = async (
 ): Promise<LiveRoster> => {
   const live = await liveInScope(id, scope)
   const permissions = livePermissions(
-    { coordinatorId: live.coordinatorId, status: live.status as LiveStatusName },
+    {
+      coordinatorIds: activeCoordinatorIds(live.coordinations),
+      status: live.status as LiveStatusName,
+    },
     viewerId,
     held
   )

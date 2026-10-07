@@ -210,6 +210,7 @@ export const LiveReportView = ({ report, log, start, end, available }: LiveRepor
       <Section
         title={LIVE_REPORT_COPY.logTitle}
         description={LIVE_REPORT_COPY.logLead}
+        maturity="beta"
         action={
           report.moderators.length > 1 ? (
             <SelectMenu

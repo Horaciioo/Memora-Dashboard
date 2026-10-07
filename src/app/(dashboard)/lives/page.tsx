@@ -40,12 +40,7 @@ export default async function LivesPage() {
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={LIVE_COPY.title} />
-      <LivesBoard
-        initialLives={lives}
-        fields={fields}
-        canAnnounce={canAnnounce}
-        viewerId={session.id}
-      />
+      <LivesBoard initialLives={lives} fields={fields} canAnnounce={canAnnounce} />
       {canReadLogs && (
         <div className={LIVE_REPORT.pastWrap}>
           <Section title={LIVE_REPORT_COPY.pastTitle} padded>

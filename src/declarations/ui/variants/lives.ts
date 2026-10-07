@@ -68,6 +68,30 @@ export const LIVE_URGENT = {
 } as const
 
 /**
+ * Coordinator requests on the home and seats on a live
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_COORDINATION = {
+  answer: 'flex flex-col gap-4',
+  label: PROPERTY_LABEL,
+  lead: 'text-body font-bold tracking-tight',
+  meta: 'text-sm text-[var(--color-ink-subtle)]',
+  times: 'grid gap-3 sm:grid-cols-2',
+  timeField: 'flex flex-col gap-1.5',
+  timeLabel: PROPERTY_LABEL,
+  actions: 'flex flex-wrap items-center gap-3',
+  // Seats listed on a live
+  seats: 'flex flex-col gap-2',
+  seat: 'flex items-center gap-3',
+  seatText: 'flex min-w-0 flex-col',
+  seatName: 'truncate font-bold tracking-tight',
+  seatMeta: 'text-xs text-[var(--color-ink-subtle)]',
+  seatMuted: 'opacity-60',
+  gap: 'text-sm font-bold text-[var(--color-danger)]',
+} as const
+
+/**
  * Report of a live: figures, timeline, moderators, log
  * @type {Record<string, string>}
  */

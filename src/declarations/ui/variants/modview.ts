@@ -9,7 +9,7 @@ export const MODVIEW_FRAME = {
   root: 'flex h-[calc(100dvh-3rem)] min-h-[36rem] w-full flex-col gap-3',
   // Hook read by the page shell to drop banner room and width cap
   bleed: 'modview-bleed',
-  embedded: 'h-[40rem] min-h-0 lg:h-[44rem]',
+  embedded: 'h-[clamp(26rem,64dvh,44rem)] min-h-0',
   bar: 'flex flex-wrap items-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 shadow-[var(--shadow-sm)]',
   channel: 'flex items-center gap-2 font-bold',
   platform: 'h-6 w-6 shrink-0',
@@ -41,7 +41,7 @@ export const MODVIEW_WINDOW = {
   root: 'relative flex min-h-64 flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)] transition-[box-shadow,transform] duration-[var(--motion-duration-panel)] lg:min-h-0',
   grow: 'flex-1',
   // Lit by a scene
-  lit: 'z-20 shadow-[0_0_0_3px_var(--color-brand-600),var(--shadow-md)] scale-[1.01]',
+  lit: 'z-20 scale-[1.01] shadow-[0_0_0_2px_var(--color-brand-600),0_0_0_8px_color-mix(in_oklab,var(--color-brand-600)_35%,transparent),var(--shadow-md)]',
   head: 'flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-2',
   title: 'min-w-0 flex-1 truncate text-sm font-bold tracking-tight',
   headAction:
@@ -61,7 +61,7 @@ export const MODVIEW_WINDOW = {
  */
 
 export const MODVIEW_SPOTLIGHT = {
-  veil: 'pointer-events-none absolute inset-0 z-10 rounded-[var(--radius-xl)] bg-[color-mix(in_oklab,var(--color-ink)_45%,transparent)] transition-opacity duration-[var(--motion-duration-panel)]',
+  veil: 'pointer-events-none absolute inset-0 z-10 rounded-[var(--radius-xl)] bg-[var(--color-scrim)] backdrop-blur-[1.5px] transition-opacity duration-[var(--motion-duration-panel)]',
   stage: 'relative flex min-h-0 flex-1 flex-col overflow-hidden',
 } as const
 

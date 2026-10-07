@@ -26,8 +26,7 @@ export const PATCH = createProtectedRoute({
     // Announcers move a live by hand
     const perimeter = await scope()
     const live = await readLive(params.id, perimeter, session.id, session.permissions)
-    const isCoordinator = live.coordinator?.id === session.id
-    if (!session.permissions.includes(Permissions.LiveAnnounce) && !isCoordinator) {
+    if (!session.permissions.includes(Permissions.LiveAnnounce) && !live.isCoordinating) {
       throw forbidden()
     }
 
