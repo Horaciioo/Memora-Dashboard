@@ -105,7 +105,6 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
       // Floor role
       [MemberRoles.Moderateur]: [Permissions.LiveRead, Permissions.LiveModerate],
     },
-    functions: { Formateurs: [Permissions.LiveLogRead] },
   },
   {
     key: 'live-roster-focus',

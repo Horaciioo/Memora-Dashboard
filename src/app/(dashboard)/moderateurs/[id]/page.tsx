@@ -80,8 +80,12 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const detail = await readMember(id, canReadNotes).catch(() => null)
   if (!detail) notFound()
 
-  // The Discord identifier is the only bridge to their application
-  const canReadModeration = session.id === id || access.can(Permissions.LiveLogRead)
+  // Only the responsables of their creators
+  const perimeter = await scope()
+  const isConcerned =
+    perimeter.isGlobal ||
+    detail.summary.youtubers.some((tag) => perimeter.youtuberIds.includes(tag.id))
+  const canReadModeration = access.can(Permissions.LiveLogRead) && isConcerned
 
   const [
     fields,
@@ -99,7 +103,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     canManageAccess ? readOverrides(id) : Promise.resolve({}),
     canManageAccess ? readMemberBaselines(id, detail.summary.youtubers) : Promise.resolve({}),
     access.can(Permissions.RecruitmentRead)
-      ? findCandidateFile(detail.summary.discordId, await scope())
+      ? findCandidateFile(detail.summary.discordId, perimeter)
       : Promise.resolve(null),
     readSealState(),
     access.can(Permissions.AbsenceReview) && session.id !== id
