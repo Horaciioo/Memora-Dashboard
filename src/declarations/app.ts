@@ -10,6 +10,13 @@ import type { ReleaseStage } from '@/utils/format/version'
 export const APP_NAME = 'Memora'
 
 /**
+ * Zone the whole team lives in
+ * @type {string}
+ */
+
+export const APP_TIME_ZONE = 'Europe/Paris'
+
+/**
  * Publishing company
  * @type {string}
  */

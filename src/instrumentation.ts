@@ -16,6 +16,10 @@ export const register = async (): Promise<void> => {
   // Only the Node.js runtime carries the managers
   if (process.env.NEXT_RUNTIME !== 'nodejs') return
 
+  // Servers run in UTC, the team does not
+  const { APP_TIME_ZONE } = await import('@/declarations/app')
+  process.env.TZ = APP_TIME_ZONE
+
   await import('../sentry.server.config')
 
   const { startRuntime } = await import('@/managers/infrastructure/Core/runtime')
