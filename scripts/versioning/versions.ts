@@ -191,7 +191,8 @@ export const assertCleanWorkBranch = (allowed: string[] = []): void => {
   // Only script files dirty
   const dirty = git('status', '--porcelain', '--untracked-files=no')
     .split('\n')
-    .map((line) => line.slice(3).trim())
+    // The helper trims the first line
+    .map((line) => line.replace(/^\s*[A-Z?]{1,2}\s+/, '').trim())
     .filter((file) => file && !allowed.includes(file))
   if (dirty.length > 0) fail(`des fichiers ne sont pas commités : ${dirty.join(', ')}`)
 
