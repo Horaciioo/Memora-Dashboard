@@ -82,6 +82,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
     ...entries.flatMap((group) => group.items).filter((item) => item.quick),
     { href: ROUTES.preferences, label: NAV_COPY.preferences, icon: 'settings' as const },
   ]
+  const newsAt = shortcuts.findIndex((item) => item.href === ROUTES.changelog)
   const groups = entries
     .map((group) => ({
       ...group,
@@ -131,7 +132,13 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
         )}
       </div>
 
-      {!courseRail && !calendarRail && <RailShortcuts items={shortcuts} />}
+      {!courseRail && !calendarRail && (
+        <>
+          <RailShortcuts items={shortcuts} />
+          {/* Hangs under the news shortcut it announces */}
+          <ReleaseNotice pointedAt={newsAt >= 0 ? (newsAt + 0.5) / shortcuts.length : undefined} />
+        </>
+      )}
 
       {liveItem && viewContext.live && !courseRail && !calendarRail && (
         <RailLiveCall item={liveItem} live={viewContext.live} />
@@ -214,7 +221,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
       <Link href={ROUTES.changelog} className={LEFT_SIDEBAR.version}>
         {APP_VERSION_LABEL}
       </Link>
-      <ReleaseNotice pointed />
+      {(courseRail || calendarRail) && <ReleaseNotice />}
 
       {session && (
         <div className={LEFT_SIDEBAR.footer}>

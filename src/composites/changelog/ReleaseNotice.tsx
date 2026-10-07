@@ -10,28 +10,36 @@ import { ICONS } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
 
 export interface ReleaseNoticeProps {
-  // Hung under the rail's version entry
-  pointed?: boolean
+  // Hung under a shortcut box, 0 to 1 across the row
+  pointedAt?: number
   onNavigate?: () => void
 }
 
 /**
  * Unread note card
- * @param {boolean} [pointed] - Draws the point
+ * @param {number} [pointedAt] - Draws the point under this share of the row
  * @param {() => void} [onNavigate] - Navigation handler
  * @return {JSX.Element | null}
  */
 
-export const ReleaseNotice = ({ pointed, onNavigate }: ReleaseNoticeProps) => {
+export const ReleaseNotice = ({ pointedAt, onNavigate }: ReleaseNoticeProps) => {
   const { release, isFresh, markSeen } = useFreshRelease()
   if (!release || !isFresh) return null
 
   const CloseIcon = ICONS.close
   const ChevronIcon = ICONS.next
 
+  const isPointed = pointedAt !== undefined
+
   return (
-    <div className={cn(RELEASE_NOTICE.wrap, pointed && RELEASE_NOTICE.wrapPointed)}>
-      {pointed && <span className={RELEASE_NOTICE.caret} aria-hidden="true" />}
+    <div className={cn(RELEASE_NOTICE.wrap, isPointed && RELEASE_NOTICE.wrapPointed)}>
+      {isPointed && (
+        <span
+          className={RELEASE_NOTICE.caret}
+          style={{ left: `calc(${pointedAt * 100}% - 0.375rem)` }}
+          aria-hidden="true"
+        />
+      )}
 
       <div className={RELEASE_NOTICE.frame}>
         <span className={RELEASE_NOTICE.veil} aria-hidden="true" />
