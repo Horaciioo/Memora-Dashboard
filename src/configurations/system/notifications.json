@@ -5,7 +5,7 @@
   "maxMentions": 10,
   "staleMs": 60000,
   "pollMs": 60000,
-  "nudgeHoldMs": 4000,
+  "nudgeHoldMs": 12000,
   "nudgeCloseMs": 320,
   "nudgeDelayMs": 400,
   "nudgeGapPx": 10,

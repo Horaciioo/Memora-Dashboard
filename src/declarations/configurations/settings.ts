@@ -1081,7 +1081,7 @@ export const NUDGE_SETTINGS = {
   }),
   holdMs: readInteger(notifications.nudgeHoldMs, {
     path: 'system/notifications.nudgeHoldMs',
-    fallback: 4000,
+    fallback: 12000,
     min: 1000,
   }),
   closeMs: readInteger(notifications.nudgeCloseMs, {
