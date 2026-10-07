@@ -89,6 +89,7 @@ export interface ChangelogComment {
  * @property {string} date - YYYY-MM-DD
  * @property {string} title - Note title
  * @property {string} intro - Reader summary
+ * @property {string} description - Why the changes were made
  * @property {ChangelogItem[]} items - Change lines
  * @property {ChangelogComment[]} [comments] - Team words
  */
@@ -98,6 +99,7 @@ export interface ChangelogRelease {
   date: string
   title: string
   intro: string
+  description: string
   items: ChangelogItem[]
   comments?: ChangelogComment[]
 }
@@ -114,44 +116,58 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     title: 'Memora ouvre ses portes',
     intro:
       'Le premier Memora : l’équipe, les projets, le calendrier, la modération et la formation réunis au même endroit.',
+    description:
+      'Marsha réunit des équipes de modération réparties sur plusieurs créateurs. Planning, absences, formation et sanctions vivaient jusqu’ici dans des outils séparés. Cette première version les rassemble : chaque membre sait ce qu’on attend de lui, et les Responsables voient où en est chaque créateur.',
     items: [
       {
         tag: ChangelogTags.Added,
         page: ROUTES.dashboard,
-        text: 'Un accueil qui rassemble ce qui t’attend aujourd’hui.',
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Accueil » qui rassemble ce qui attend chaque membre aujourd’hui',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.calendar,
-        text: 'Un calendrier partagé avec l’appel de présence de chaque réunion.',
+        text: 'Ajout d’un « Calendrier » partagé avec l’appel de présence de chaque réunion',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.absences,
-        text: 'Déclare une absence en quelques clics, elle est validée par l’Administration.',
+        text: 'Ajout de la possibilité de déclarer une absence en quelques clics, validée ensuite par l’Administration',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.projects,
         permission: Permissions.ProjectRead,
-        text: 'Projets, tâches et réunions suivis sur des tableaux, créateur par créateur.',
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Projets » : projets, tâches et réunions suivis sur des tableaux, créateur par créateur',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.academy,
         permission: Permissions.AcademyRead,
-        text: 'La Marsha Academy : sessions, étapes et suivi de chaque junior.',
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Marsha Academy » : sessions, étapes et suivi de chaque Junior',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.sanctions,
         permission: Permissions.SanctionRead,
-        text: 'Un panel de sanctions gradué, avec le journal de chaque mesure.',
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Panel de sanctions » : des sanctions graduées avec le journal de chaque mesure',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.preferences,
-        text: 'Connexion en deux étapes, thème, taille du texte et export de tes données.',
+        text: 'Ajout de la possibilité de sécuriser son compte avec une connexion en deux étapes, de choisir son thème et la taille du texte, et d’exporter ses données',
+      },
+    ],
+    comments: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.dashboard,
+        text: 'On a voulu que tu ouvres Memora et que tout ce qui t’attend soit déjà là.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.absences,
+        text: 'Prévenir d’une absence ne doit pas demander plus d’une minute.',
       },
     ],
   },

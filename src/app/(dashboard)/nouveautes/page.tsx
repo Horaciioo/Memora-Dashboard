@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { PageHeader } from '@/components/structures/PageHeader'
 import { ChangelogBoard } from '@/composites/changelog/ChangelogBoard'
+import { ReleaseDeck } from '@/composites/changelog/ReleaseDeck'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
 import { changelogFor, resolveRelease } from '@/declarations/changelog/helpers'
@@ -29,7 +30,10 @@ export default async function ChangelogPage({ searchParams }: ChangelogPageProps
 
   return (
     <div className={cn(PAGE_STYLES.wrapper, CHANGELOG_BOARD.page)}>
-      <PageHeader title={release?.title ?? CHANGELOG_COPY.emptyTitle} />
+      <PageHeader
+        title={release?.title ?? CHANGELOG_COPY.emptyTitle}
+        note={release && <ReleaseDeck release={release} />}
+      />
       <ChangelogBoard version={release?.version} />
     </div>
   )
