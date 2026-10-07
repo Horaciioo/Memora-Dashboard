@@ -13,6 +13,7 @@ import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { frameToneOf } from '@/declarations/access/views'
 import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
+import { useAutoRefresh } from '@/core/hooks/interaction/useAutoRefresh'
 import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
 import type { ViewContext } from '@/types/access'
 import type { SealState, TwoFactorState } from '@/types/security'
@@ -66,6 +67,8 @@ export const AppShell = ({
 const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: AppShellProps) => {
   const { session, can } = useAuthContext()
   const { isClaimed, setSlot } = useRailSlot()
+
+  useAutoRefresh()
 
   return (
     <SealProvider initialState={twoFactor} initialSeal={seal}>
