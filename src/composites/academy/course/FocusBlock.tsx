@@ -8,7 +8,7 @@ import { useModViewScene } from '@/core/hooks/interaction/useModViewScene'
 import { previewPermissions } from '@/core/lib/modview/preview'
 import { COURSE_COPY } from '@/declarations/academy/copy'
 import type { FocusItem, ReadBlock } from '@/declarations/academy/curriculum/types'
-import { COURSE_FOCUS } from '@/declarations/ui/variants'
+import { COURSE_FOCUS, COURSE_READ, COURSE_TOUR } from '@/declarations/ui/variants'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { cn } from '@/utils/classnames'
 
@@ -17,7 +17,8 @@ export interface FocusBlockProps {
 }
 
 /**
- * Parts of the Mod View one by one: the words on the left
+ * Parts of the Mod View one by one: tabs on the left, the picked part floating beside them and
+ * its words under it
  * @param {FocusBlockProps} props - Parts declared in code
  * @return {JSX.Element}
  */
@@ -28,35 +29,63 @@ export const FocusBlock = ({ block }: FocusBlockProps) => {
 
   return (
     <div className={COURSE_FOCUS.root}>
-      <div className={COURSE_FOCUS.prompt}>
-        <Markdown source={block.prompt} />
-      </div>
-      <div className={COURSE_FOCUS.picks} role="tablist">
-        {block.items.map((entry) => (
-          <button
-            key={entry.key}
-            type="button"
-            role="tab"
-            aria-selected={entry.key === item?.key}
-            className={cn(COURSE_FOCUS.pick, entry.key === item?.key && COURSE_FOCUS.pickActive)}
-            onClick={() => setPicked(entry.key)}
-          >
-            {entry.label}
-          </button>
-        ))}
-      </div>
-      {item && <FocusPart key={item.key} item={item} />}
+      {item && (
+        <div className={COURSE_FOCUS.column}>
+          <section className={COURSE_READ.section}>
+            {block.title && <h2 className={COURSE_READ.heading}>{block.title}</h2>}
+            <div className={COURSE_READ.panel}>
+              <Markdown source={block.prompt} className={COURSE_READ.text} />
+            </div>
+          </section>
+
+          <div className={COURSE_FOCUS.layout}>
+            <nav className={COURSE_FOCUS.tabs} role="tablist" aria-label={COURSE_COPY.tourList}>
+              {block.items.map((entry) => {
+                const isActive = entry.key === item.key
+
+                return (
+                  <button
+                    key={entry.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    className={cn(COURSE_TOUR.stop, isActive && COURSE_TOUR.stopActive)}
+                    onClick={() => setPicked(entry.key)}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={cn(COURSE_TOUR.stopDot, isActive && COURSE_TOUR.stopDotActive)}
+                    />
+                    {entry.label}
+                  </button>
+                )
+              })}
+            </nav>
+
+            <FocusStage key={item.key} item={item} />
+
+            <section className={COURSE_FOCUS.note} role="tabpanel" aria-label={item.label}>
+              <p className={COURSE_FOCUS.noteTitle}>{item.label}</p>
+              <div className={COURSE_FOCUS.points}>
+                {item.points.map((point) => (
+                  <Markdown key={point} source={point} />
+                ))}
+              </div>
+            </section>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 /**
- * One part
+ * The picked part of the Mod View, played on its scene
  * @param {{ item: FocusItem }} props - Part
  * @return {JSX.Element}
  */
 
-const FocusPart = ({ item }: { item: FocusItem }) => {
+const FocusStage = ({ item }: { item: FocusItem }) => {
   const { session } = useAuthContext()
   const { driver } = useModViewScene(item.scene, {
     actorName: session?.displayName ?? COURSE_COPY.you,
@@ -67,24 +96,15 @@ const FocusPart = ({ item }: { item: FocusItem }) => {
   )
 
   return (
-    <div className={COURSE_FOCUS.layout} role="tabpanel">
-      <div className={COURSE_FOCUS.points}>
-        {item.points.map((point) => (
-          <div key={point} className={COURSE_FOCUS.point}>
-            <Markdown source={point} />
-          </div>
-        ))}
-      </div>
-      <div className={COURSE_FOCUS.stage}>
-        <ModView
-          driver={lit}
-          permissions={previewPermissions('JUNIOR')}
-          panel={null}
-          levelName={null}
-          embedded
-          only={item.windows}
-        />
-      </div>
+    <div className={COURSE_FOCUS.stage}>
+      <ModView
+        driver={lit}
+        permissions={previewPermissions('JUNIOR')}
+        panel={null}
+        levelName={null}
+        embedded
+        only={item.windows}
+      />
     </div>
   )
 }

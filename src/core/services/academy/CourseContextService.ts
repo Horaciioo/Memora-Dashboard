@@ -4,7 +4,7 @@ import { prisma } from '@/core/lib/db'
 import { listLevels } from '@/core/services/livecon/LiveconService'
 import { readPanel } from '@/core/services/sanctions/SanctionService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
+import { COURSE_COPY } from '@/declarations/academy/copy'
 import { LIVE_FUNCTIONS } from '@/declarations/lives/registries'
 import type { CourseContext, CourseLiveconLevel } from '@/types/academy'
 import { GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
@@ -46,15 +46,12 @@ const readLadder = async (): Promise<CourseContext['ladder']> => {
 }
 
 /**
- * Levels
+ * Creator the course is about: the first in reach holding a Twitch panel
  * @param {AccessScope} scope - Learner perimeter
- * @return {Promise<CourseLiveconLevel[]>} - Levels
+ * @return {Promise<{ id: string, name: string } | null>} - Creator, if any
  */
 
-const readLivecon = async (scope: AccessScope): Promise<CourseLiveconLevel[]> => {
-  const levels = await listLevels()
-
-  // First creator in reach holding a Twitch panel
+const readCreator = async (scope: AccessScope): Promise<{ id: string; name: string } | null> => {
   const creators = await prisma.sanctionOffense.findMany({
     where: { panel: SanctionPanels.Twitch, archived: false },
     select: { youtuberId: true },
@@ -63,6 +60,28 @@ const readLivecon = async (scope: AccessScope): Promise<CourseLiveconLevel[]> =>
   const creatorId =
     creators.find((row) => scope.isGlobal || scope.youtuberIds.includes(row.youtuberId))
       ?.youtuberId ?? creators[0]?.youtuberId
+  if (!creatorId) return null
+
+  const creator = await prisma.youtuber.findUnique({
+    where: { id: creatorId },
+    select: { name: true },
+  })
+
+  return creator ? { id: creatorId, name: creator.name } : null
+}
+
+/**
+ * Levels with every offence of the creator's Twitch panel
+ * @param {AccessScope} scope - Learner perimeter
+ * @param {string | null} creatorId - Creator the panel belongs to
+ * @return {Promise<CourseLiveconLevel[]>} - Levels
+ */
+
+const readLivecon = async (
+  scope: AccessScope,
+  creatorId: string | null
+): Promise<CourseLiveconLevel[]> => {
+  const levels = await listLevels()
 
   return Promise.all(
     levels.map(async (level) => {
@@ -75,12 +94,10 @@ const readLivecon = async (scope: AccessScope): Promise<CourseLiveconLevel[]> =>
         name: level.name,
         icon: level.icon,
         accent: level.accent,
-        samples: (panel?.offenses ?? [])
-          .slice(0, ACADEMY_SETTINGS.courseSampleOffenses)
-          .map((offense) => ({
-            offense: offense.name,
-            measures: offense.firstRung?.measures.map((measure) => measure.name) ?? [],
-          })),
+        samples: (panel?.offenses ?? []).map((offense) => ({
+          offense: offense.name,
+          measures: offense.firstRung?.measures.map((measure) => measure.name) ?? [],
+        })),
       }
     })
   )
@@ -93,7 +110,11 @@ const readLivecon = async (scope: AccessScope): Promise<CourseLiveconLevel[]> =>
  */
 
 export const readCourseContext = async (scope: AccessScope): Promise<CourseContext> => {
-  const [ladder, livecon] = await Promise.all([readLadder(), readLivecon(scope)])
+  const creator = await readCreator(scope)
+  const [ladder, livecon] = await Promise.all([
+    readLadder(),
+    readLivecon(scope, creator?.id ?? null),
+  ])
 
-  return { ladder, livecon }
+  return { ladder, livecon, creator: creator?.name ?? COURSE_COPY.defaultCreator }
 }

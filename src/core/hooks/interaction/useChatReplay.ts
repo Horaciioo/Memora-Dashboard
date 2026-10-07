@@ -23,10 +23,15 @@ export interface ChatReplay {
  * Play a chat back like a short clip: the lines arrive one after the other. At rest the whole chat is on screen
  * @param {number} total - Lines of the chat
  * @param {boolean} [autoplay] - Starts playing on arrival
+ * @param {number} [delayMs] - Gap between lines
  * @return {ChatReplay} - Replay state
  */
 
-export const useChatReplay = (total: number, autoplay = false): ChatReplay => {
+export const useChatReplay = (
+  total: number,
+  autoplay = false,
+  delayMs: number = ACADEMY_SETTINGS.chatLineDelayMs
+): ChatReplay => {
   const [shown, setShown] = useState(autoplay ? 0 : total)
   const [run, setRun] = useState(autoplay ? 1 : 0)
 
@@ -45,10 +50,10 @@ export const useChatReplay = (total: number, autoplay = false): ChatReplay => {
       count += 1
       setShown(count)
       if (count >= total) clearInterval(timer)
-    }, ACADEMY_SETTINGS.chatLineDelayMs)
+    }, delayMs)
 
     return () => clearInterval(timer)
-  }, [run, total])
+  }, [run, total, delayMs])
 
   return {
     shown,

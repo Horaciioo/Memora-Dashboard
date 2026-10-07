@@ -68,43 +68,49 @@ export const TourBlock = ({ block }: TourBlockProps) => {
 
   return (
     <div className={COURSE_TOUR.root}>
-      <p className={COURSE_TOUR.intro}>{block.intro}</p>
-      <div className={COURSE_TOUR.toolbar}>
-        <Button
-          variant={isAuto ? 'secondary' : 'primary'}
-          icon={undefined}
-          disabled={!isBuilt}
-          onClick={() => {
-            setActive(null)
-            setAuto(!isAuto)
-          }}
-        >
-          {isAuto ? COURSE_COPY.tourStop : COURSE_COPY.tourAuto}
-        </Button>
-      </div>
-
       <div className={COURSE_TOUR.layout}>
-        <nav className={COURSE_TOUR.list} aria-label={COURSE_COPY.tourList}>
-          {block.stops.map((entry, index) => (
-            <button
-              key={entry.target}
-              type="button"
-              aria-current={index === active ? 'step' : undefined}
-              disabled={!isBuilt}
-              className={cn(COURSE_TOUR.stop, index === active && COURSE_TOUR.stopActive)}
-              onClick={() => {
-                setAuto(false)
-                setActive(index === active ? null : index)
-              }}
-            >
-              <span
-                aria-hidden="true"
-                className={cn(COURSE_TOUR.stopDot, index === active && COURSE_TOUR.stopDotActive)}
-              />
-              {entry.label}
-            </button>
-          ))}
-        </nav>
+        <div className={COURSE_TOUR.side}>
+          <p className={COURSE_TOUR.intro}>{block.intro}</p>
+          <Button
+            className="w-full"
+            variant={isAuto ? 'secondary' : 'primary'}
+            icon={undefined}
+            disabled={!isBuilt}
+            onClick={() => {
+              setActive(null)
+              setAuto(!isAuto)
+            }}
+          >
+            {isAuto ? COURSE_COPY.tourStop : COURSE_COPY.tourAuto}
+          </Button>
+          <nav className={COURSE_TOUR.list} aria-label={COURSE_COPY.tourList}>
+            {block.stops.map((entry, index) => (
+              <button
+                key={entry.target}
+                type="button"
+                aria-current={index === active ? 'step' : undefined}
+                disabled={!isBuilt}
+                className={cn(COURSE_TOUR.stop, index === active && COURSE_TOUR.stopActive)}
+                onClick={() => {
+                  setAuto(false)
+                  setActive(index === active ? null : index)
+                }}
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(COURSE_TOUR.stopDot, index === active && COURSE_TOUR.stopDotActive)}
+                />
+                {entry.label}
+              </button>
+            ))}
+          </nav>
+
+          {stop ? (
+            <TourNote key={stop.target} label={stop.label} body={stop.body} />
+          ) : (
+            <div className={COURSE_TOUR.noteSpace} aria-hidden="true" />
+          )}
+        </div>
 
         <div className={COURSE_TOUR.stage}>
           {isBuilt ? (
@@ -129,15 +135,23 @@ export const TourBlock = ({ block }: TourBlockProps) => {
               </div>
             </div>
           )}
-
-          {stop && (
-            <div key={stop.target} className={COURSE_TOUR.bubble} role="status">
-              <p className={COURSE_TOUR.bubbleTitle}>{stop.label}</p>
-              <p className={COURSE_TOUR.bubbleBody}>{stop.body}</p>
-            </div>
-          )}
         </div>
       </div>
+    </div>
+  )
+}
+
+/**
+ * What the lit part is, written beside the view rather than over it
+ * @param {{ label: string, body: string }} props - Part and its words
+ * @return {JSX.Element}
+ */
+
+const TourNote = ({ label, body }: { label: string; body: string }) => {
+  return (
+    <div className={COURSE_TOUR.note} role="status">
+      <p className={COURSE_TOUR.noteTitle}>{label}</p>
+      <p className={COURSE_TOUR.noteBody}>{body}</p>
     </div>
   )
 }

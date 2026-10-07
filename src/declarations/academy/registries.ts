@@ -29,7 +29,11 @@ import type {
   TrainingBlockKindName,
   LegacyStatusName,
 } from '@/utils/constants/hierarchy'
-import type { CourseSurface, ExerciseBlock } from '@/declarations/academy/curriculum/types'
+import type {
+  CourseSurface,
+  CourseTrack,
+  ExerciseBlock,
+} from '@/declarations/academy/curriculum/types'
 import type { IconName } from '@/declarations/ui/icons'
 
 /**
@@ -195,6 +199,17 @@ const COURSE_SURFACE_MAP: Record<CourseSurface, CourseSurfaceOption> = {
 export const COURSE_SURFACE_REGISTRY = createRegistry(COURSE_SURFACE_MAP)
 
 /**
+ * Period a course opens in
+ * @type {Record<CourseTrack, number>}
+ */
+
+export const COURSE_PERIODS: Record<CourseTrack, number> = {
+  indispensable: 1,
+  secondary: 2,
+  legacy: 2,
+}
+
+/**
  * Metadata of one exercise kind
  * @typedef {Object} CourseKindOption
  * @property {string} label - Display name
@@ -217,6 +232,7 @@ const COURSE_KIND_MAP: Record<ExerciseBlock['kind'], CourseKindOption> = {
   scene: { label: 'Cas d’étude', icon: 'stream' },
   compareRuns: { label: 'Simulation', icon: 'ticket' },
   branching: { label: 'Jeu de choix', icon: 'ticket' },
+  judgement: { label: 'Jugement', icon: 'sanctions' },
 }
 
 export const COURSE_KIND_REGISTRY = createRegistry(COURSE_KIND_MAP)

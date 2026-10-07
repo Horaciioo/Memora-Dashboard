@@ -1,7 +1,9 @@
+import type { MaturityName } from '@/declarations/maturity/registries'
 // Read by the seed on plain node
-import type { ModViewScene } from '@/core/lib/modview/scene'
+import type { ModViewScene, SceneStep } from '@/core/lib/modview/scene'
 import type { IconName } from '@/declarations/ui/icons'
 import type { ModViewTarget, ModViewWindow } from '@/types/modview'
+import type { SanctionGravityName } from '@/utils/constants/moderation'
 import type { DiscordAuthor, DiscordScene, DiscordSceneStep } from '@/types/replicas'
 
 /**
@@ -167,6 +169,76 @@ export interface LiveconStop {
 }
 
 /**
+ * How an offence of the panel is handled at one Livecon level
+ * @typedef {Object} SanctionBoxLevel
+ * @property {number} level - Livecon level
+ * @property {{ condition: string, measures: string[] }[]} tiers - What applies on sight, then at each repeat
+ */
+
+export interface SanctionBoxLevel {
+  level: number
+  tiers: { condition: string; measures: string[] }[]
+}
+
+/**
+ * One part of the decision chart, centred on a grid of 160 by 100
+ * @typedef {Object} OrgNode
+ * @property {string} key - Stable key
+ * @property {string} label - Who it is
+ * @property {number} x - Centre, left to right
+ * @property {number} y - Centre, top to bottom
+ * @property {OrgRole} role - Who it is in the chain, which gives its colour
+ */
+
+export type OrgRole = 'owner' | 'admin' | 'lead' | 'moderation' | 'outside'
+
+export interface OrgNode {
+  key: string
+  label: string
+  x: number
+  y: number
+  role: OrgRole
+}
+
+/**
+ * One arrow of the decision chart
+ * @typedef {Object} OrgLink
+ * @property {string} from - Node it leaves
+ * @property {string} to - Node it reaches
+ * @property {boolean} [turns] - Leaves upright, then turns into the side of the target
+ */
+
+export interface OrgLink {
+  from: string
+  to: string
+  turns?: boolean
+}
+
+/**
+ * Words said beside a part of the decision chart
+ * @typedef {Object} OrgBubble
+ * @property {string} node - Node it sits beside
+ * @property {string} text - What is said
+ */
+
+export interface OrgBubble {
+  node: string
+  text: string
+}
+
+/**
+ * One level and its instruction in a table of rules
+ * @typedef {Object} LiveconRule
+ * @property {number} level - Level number
+ * @property {string} text - What the moderation does
+ */
+
+export interface LiveconRule {
+  level: number
+  text: string
+}
+
+/**
  * One example message drawn in the Discord replica
  * @typedef {Object} DiscordExampleLine
  * @property {DiscordAuthor} author - Who writes
@@ -225,13 +297,153 @@ export interface BranchNode {
 }
 
 /**
+ * One card of a layered figure
+ * @typedef {Object} PanelCard
+ * @property {IconName} icon - Glyph
+ * @property {string} label - Title
+ * @property {string} text - What it says
+ */
+
+export interface PanelCard {
+  icon: IconName
+  label: string
+  text: string
+}
+
+/**
+ * One fact of a viewer file
+ * @typedef {Object} JudgementFact
+ * @property {string} key - Stable key
+ * @property {IconName} icon - Glyph
+ * @property {string} label - What it measures
+ * @property {string} value - What the file says
+ * @property {boolean} [blink] - Flashes when the learner is asked to look again
+ */
+
+export interface JudgementFact {
+  key: string
+  icon: IconName
+  label: string
+  value: string
+  blink?: boolean
+}
+
+/**
+ * A case where the learner weighs the panel against the person
+ * @typedef {Object} JudgementCase
+ * @property {string} context - Said before the scene plays
+ * @property {ChatLine[]} chat - Chat played first, the flagged line is the offence
+ * @property {string} viewer - Who it is about, as named in the chat
+ * @property {JudgementFact[]} facts - Their file
+ * @property {Object} panel - Livecon level and offence as the panel shows them
+ * @property {string} question - Asked once the file is open
+ * @property {{ yes: string, no: string }} answers - The two replies
+ * @property {{ title: string, text: string }} doubt - Said to whoever answers yes
+ * @property {{ title: string, text: string, action: string }} reveal - The human judgement
+ * @property {Object} warn - The warning typed, its reply in the chat and its trace
+ */
+
+export interface JudgementCase {
+  context: string
+  chat: ChatLine[]
+  viewer: string
+  facts: JudgementFact[]
+  panel: {
+    level: number
+    levelAccent: string
+    offense: string
+    tiers: SanctionBoxLevel['tiers']
+  }
+  question: string
+  answers: { yes: string; no: string }
+  doubt: { title: string; text: string }
+  reveal: { title: string; text: string; action: string }
+  warn: { command: string; message: string; reply: ChatLine }
+}
+
+/**
+ * Where a role's box sits on the page
+ * @typedef {'left' | 'center' | 'right'} RoleSide
+ */
+
+export type RoleSide = 'left' | 'center' | 'right'
+
+/**
+ * What one role does
+ * @typedef {Object} RoleRule
+ * @property {string} label - Role
+ * @property {CourseTone} tone - Colour of the label
+ * @property {RoleSide} side - Side of the page
+ * @property {string} text - What happens
+ */
+
+export interface RoleRule {
+  label: string
+  tone: CourseTone
+  side: RoleSide
+  text: string
+}
+
+/**
+ * Who speaks in a handover
+ * @typedef {'coordinator' | 'responsable' | 'admin' | 'moderator'} ConversationRole
+ */
+
+export type ConversationRole = 'coordinator' | 'responsable' | 'admin' | 'moderator'
+
+/**
+ * One message of a handover
+ * @typedef {Object} ConversationLine
+ * @property {ConversationRole} from - Who speaks
+ * @property {ConversationRole} to - Who listens
+ * @property {string} text - What is said
+ */
+
+export interface ConversationLine {
+  from: ConversationRole
+  to: ConversationRole
+  text: string
+}
+
+/**
+ * Someone in a voice channel
+ * @typedef {Object} VoiceMember
+ * @property {string} name - Display name
+ * @property {CourseTone} tone - Avatar colour
+ */
+
+export interface VoiceMember {
+  name: string
+  tone: CourseTone
+}
+
+/**
+ * One voice channel of the animation
+ * @typedef {Object} VoiceChannel
+ * @property {string} key - Stable id
+ * @property {string} name - Channel name
+ * @property {boolean} [isCreator] - Join to create one
+ * @property {VoiceMember[]} members - Who sits in it
+ */
+
+export interface VoiceChannel {
+  key: string
+  name: string
+  isCreator?: boolean
+  members: VoiceMember[]
+}
+
+/**
  * Read-only blocks
  * @typedef {Object} ReadBlock
  */
 
 export type ReadBlock =
-  | { kind: 'text'; key: string; body: string }
+  | { kind: 'text'; key: string; body: string; title?: string; strongTone?: CourseTone }
+  | { kind: 'step'; key: string; title: string }
   | { kind: 'callout'; key: string; tone: 'tip' | 'warning' | 'rule'; title: string; body: string }
+  | { kind: 'outline'; key: string }
+  | { kind: 'ask'; key: string; prompt: string; yes: string; no: string; note?: string }
   | {
       kind: 'chat'
       key: string
@@ -254,9 +466,58 @@ export type ReadBlock =
       steps: DemoStep[]
     }
   | { kind: 'tour'; key: string; intro: string; scene: ModViewScene; stops: TourStop[] }
-  | { kind: 'focus'; key: string; prompt: string; items: FocusItem[] }
+  | { kind: 'focus'; key: string; title?: string; prompt: string; items: FocusItem[] }
   | { kind: 'hierarchy'; key: string; rungs: HierarchyRung[] }
   | { kind: 'livecon'; key: string; stops: LiveconStop[] }
+  | {
+      kind: 'sanctionBox'
+      key: string
+      offense: string
+      example: string
+      levels: SanctionBoxLevel[]
+    }
+  | { kind: 'sanctionCompare'; key: string; offense: string; levels: SanctionBoxLevel[] }
+  | { kind: 'orgChart'; key: string; nodes: OrgNode[]; links: OrgLink[]; bubbles: OrgBubble[] }
+  | { kind: 'rules'; key: string; title: string; rows: LiveconRule[] }
+  | { kind: 'roles'; key: string; title: string; rows: RoleRule[] }
+  | {
+      kind: 'panelStack'
+      key: string
+      title: string
+      // Said before the page is named
+      where: string
+      // Page the panel lives in
+      page: { icon: IconName; label: string }
+      intro: string
+      outro: string
+      // The panel as that page shows it: the level, offences by gravity, the one opened
+      panel: {
+        level: number
+        levelAccent: string
+        groups: { gravity: SanctionGravityName; offenses: string[] }[]
+        offense: string
+        tiers: SanctionBoxLevel['tiers']
+      }
+      // Cards that fan out over it
+      factors: PanelCard[]
+    }
+  | {
+      kind: 'pillars'
+      key: string
+      title: string
+      intro: string
+      outro: string
+      items: (PanelCard & { tone: CourseTone })[]
+    }
+  | {
+      kind: 'severity'
+      key: string
+      title: string
+      intro: string
+      outro: string
+      ends: { calm: string; firm: string }
+      criteria: PanelCard[]
+    }
   | {
       kind: 'discordExample'
       key: string
@@ -264,6 +525,7 @@ export type ReadBlock =
       caption?: string
       lines: DiscordExampleLine[]
     }
+  | { kind: 'voices'; key: string; channels: VoiceChannel[] }
   | { kind: 'disclosure'; key: string; title: string; blocks: ReadBlock[] }
 
 /**
@@ -372,6 +634,10 @@ export type ExerciseBlock =
       title: string
       // Said before the scene plays
       context: string
+      // Handover told first, the scene plays once it is over
+      conversation?: ConversationLine[]
+      // Updates played once the handover is over
+      reaction?: SceneStep[]
       scene: ModViewScene
       // Asked once it has played
       questions: QuizQuestionSeed[]
@@ -401,6 +667,7 @@ export type ExerciseBlock =
       root: string
       nodes: BranchNode[]
     }
+  | ({ kind: 'judgement'; key: string; title: string } & JudgementCase)
 
 /**
  * Any block of a chapter
@@ -421,7 +688,6 @@ export type CourseBlock = ReadBlock | ExerciseBlock
 export interface CourseChapter {
   key: string
   title: string
-  goal?: string
   blocks: CourseBlock[]
 }
 
@@ -446,6 +712,8 @@ export interface Course {
   surface: CourseSurface
   functions: string[]
   minutes: number
+  // Lifecycle tag shown beside the name
+  maturity?: MaturityName
   intro?: CourseIntro
   chapters: CourseChapter[]
 }
@@ -484,4 +752,5 @@ export const EXERCISE_KINDS: readonly string[] = [
   'scene',
   'compareRuns',
   'branching',
+  'judgement',
 ]

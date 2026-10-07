@@ -5,6 +5,7 @@ import { notFound } from '@/core/lib/errors'
 import { readProgress } from '@/core/lib/curriculum/progress'
 import { scoreExercise } from '@/core/lib/curriculum/scoring'
 import type { ExerciseAnswer, ExerciseResult } from '@/core/lib/curriculum/scoring'
+import { hasSeenGuide } from '@/core/services/preferences/GuideService'
 import { clearOpenTrainingStep } from '@/core/services/academy/AcademyService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { notify } from '@/core/services/system/NotificationService'
@@ -12,6 +13,7 @@ import { COURSES, courseByKey, exercisesOf } from '@/declarations/academy/curric
 import type { Course } from '@/declarations/academy/curriculum/types'
 import { isEncadrement } from '@/declarations/access/roles'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
+import { GUIDE_KEYS } from '@/declarations/academy/welcome'
 import { ROUTES } from '@/declarations/navigation'
 import { tradeOfFunction } from '@/declarations/reference/fixed'
 import type { SessionUser } from '@/types/auth'
@@ -35,6 +37,25 @@ export const PRACTICE_STAGES: AcademyStageName[] = [
   AcademyStages.ReviewFinal,
   AcademyStages.Bonus,
 ]
+
+/**
+ * Whether the specialisations opened for a junior who has not been told yet
+ * @param {string} accountId - Junior account
+ * @return {Promise<boolean>} - Bubble due
+ */
+
+export const hasNewSpecialisations = async (accountId: string): Promise<boolean> => {
+  const [junior, seen] = await Promise.all([
+    prisma.academyJunior.findFirst({
+      where: { accountId, status: AcademyJuniorStatuses.Active },
+      select: { stage: true },
+      orderBy: { startedAt: 'desc' },
+    }),
+    hasSeenGuide(accountId, GUIDE_KEYS.specialisations),
+  ])
+
+  return !seen && junior !== null && PRACTICE_STAGES.includes(junior.stage)
+}
 
 // Catalogue written once per server process
 let synced: Promise<void> | null = null
@@ -128,12 +149,29 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
   const seesAll = isEncadrement(viewer.role)
   const inPractice = !junior || PRACTICE_STAGES.includes(junior.stage)
 
-  return rows.flatMap((row) => {
+  return rows.flatMap((row): CourseCard[] => {
     const course = row.curriculumKey ? courseByKey(row.curriculumKey) : undefined
     if (!course || !concerns(course, trades, seesAll)) return []
 
-    // The first period shows the indispensable courses alone
-    if (course.track === 'secondary' && !inPractice && !seesAll) return []
+    // Specialisations wait for the practice period
+    if (course.track === 'secondary' && !inPractice && !seesAll) {
+      return [
+        {
+          id: row.id,
+          key: course.key,
+          name: '',
+          summary: '',
+          track: course.track,
+          surface: 'general',
+          minutes: 0,
+          chapters: 0,
+          exercises: 0,
+          passed: 0,
+          status: TrainingStatuses.NotStarted as TrainingStatusName,
+          isLocked: true,
+        },
+      ]
+    }
 
     const record = row.records[0]
     const progress = readProgress(record?.progress)
@@ -152,6 +190,8 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
         exercises: exercises.length,
         passed: exercises.filter((block) => progress.blocks[block.key]?.passed).length,
         status: (record?.status ?? TrainingStatuses.NotStarted) as TrainingStatusName,
+        isLocked: false,
+        maturity: course.maturity,
       },
     ]
   })
@@ -165,7 +205,7 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
  */
 
 export const courseHrefFor = async (viewer: SessionUser, key: string): Promise<string | null> => {
-  const card = (await listCourses(viewer)).find((entry) => entry.key === key)
+  const card = (await listCourses(viewer)).find((entry) => entry.key === key && !entry.isLocked)
 
   return card ? ROUTES.training(card.id) : null
 }
@@ -181,7 +221,9 @@ export const readCourse = async (
   trainingId: string,
   viewer: SessionUser
 ): Promise<{ card: CourseCard; course: Course; progress: CourseProgress }> => {
-  const card = (await listCourses(viewer)).find((entry) => entry.id === trainingId)
+  const card = (await listCourses(viewer)).find(
+    (entry) => entry.id === trainingId && !entry.isLocked
+  )
   const course = card ? courseByKey(card.key) : undefined
   if (!card || !course) throw notFound()
 

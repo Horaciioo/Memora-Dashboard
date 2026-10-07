@@ -219,10 +219,6 @@ export const PARKOUR_COPY = {
   kickoffPending: 'Ton début de PIM n’a pas encore été déclaré. Ton Responsable te préviendra.',
   launchNobodyReady: 'Aucun Junior n’a fini son formulaire.',
   objectivesHidden: 'Le Junior ne voit pas ses objectifs.',
-  specialisationsTitle: 'Spécialisations débloquées',
-  specialisationsBody:
-    'La période 2 est lancée : les formations de spécialisation sont ouvertes. Elles sont optionnelles, mais fortement recommandées.',
-  specialisationsDismiss: 'J’ai compris',
   reviewDueTitle: 'Bilan de {name}',
 } as const
 

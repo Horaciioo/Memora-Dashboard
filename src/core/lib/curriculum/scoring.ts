@@ -208,6 +208,9 @@ export const scoreExercise = (
     case 'branching':
       return toResult({ ending: walkBranches(block, record).ending?.ending?.good === true }, 100)
 
+    case 'judgement':
+      return toResult({ verdict: answer === 'done' }, 100)
+
     case 'command': {
       const given = normalise(typeof answer === 'string' ? answer : '')
 

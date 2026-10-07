@@ -3,11 +3,17 @@
 import { createContext, useContext } from 'react'
 import type { ReactNode } from 'react'
 
+import { COURSE_COPY } from '@/declarations/academy/copy'
 import type { CourseContext } from '@/types/academy'
 
-const EMPTY: CourseContext = { ladder: { admins: [], responsables: [] }, livecon: [] }
+// Context of a course read without the database
+export const EMPTY_COURSE_CONTEXT: CourseContext = {
+  ladder: { admins: [], responsables: [] },
+  livecon: [],
+  creator: COURSE_COPY.defaultCreator,
+}
 
-const Context = createContext<CourseContext>(EMPTY)
+const Context = createContext<CourseContext>(EMPTY_COURSE_CONTEXT)
 
 /**
  * Hand the course context to every block

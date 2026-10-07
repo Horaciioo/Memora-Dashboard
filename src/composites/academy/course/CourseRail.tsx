@@ -23,6 +23,11 @@ export const CourseRail = ({ rail }: CourseRailProps) => {
   const BackIcon = ICONS.back
   const CheckIcon = ICONS.picked
 
+  // Share of the course read
+  const total = rail.chapters.length
+  const reading = rail.steps.length > 0 ? rail.step / rail.steps.length : 0
+  const share = rail.finished ? 1 : (rail.current + reading) / total
+
   return (
     <div className={COURSE_RAIL.wrap}>
       <Link href={rail.backHref} className={COURSE_RAIL.back}>
@@ -36,6 +41,12 @@ export const CourseRail = ({ rail }: CourseRailProps) => {
       </div>
 
       <ol className={COURSE_RAIL.list} aria-label={COURSE_COPY.chapters}>
+        <span className={COURSE_RAIL.track} aria-hidden="true">
+          <span
+            className={COURSE_RAIL.trackFill}
+            style={{ height: `${Math.round(share * 100)}%` }}
+          />
+        </span>
         {rail.chapters.map((chapter, index) => {
           const done = rail.finished || index < rail.current
           const now = !rail.finished && index === rail.current
@@ -43,15 +54,6 @@ export const CourseRail = ({ rail }: CourseRailProps) => {
 
           return (
             <li key={chapter.key} className="relative">
-              {index < rail.chapters.length - 1 && (
-                <span
-                  className={cn(
-                    COURSE_RAIL.line,
-                    done ? COURSE_RAIL.lineDone : COURSE_RAIL.lineNext
-                  )}
-                  aria-hidden="true"
-                />
-              )}
               <button
                 type="button"
                 disabled={!reopenable}
@@ -61,18 +63,19 @@ export const CourseRail = ({ rail }: CourseRailProps) => {
                   COURSE_RAIL.item,
                   'w-full',
                   reopenable && COURSE_RAIL.itemOpen,
+                  now && COURSE_RAIL.itemNow,
                   !done && !now && COURSE_RAIL.itemLocked
                 )}
               >
                 <span
                   className={cn(
-                    COURSE_RAIL.node,
-                    done && COURSE_RAIL.nodeDone,
-                    now && COURSE_RAIL.nodeNow,
-                    !done && !now && COURSE_RAIL.nodeNext
+                    COURSE_RAIL.index,
+                    done && COURSE_RAIL.indexDone,
+                    now && COURSE_RAIL.indexNow,
+                    !done && !now && COURSE_RAIL.indexNext
                   )}
                 >
-                  {done ? <CheckIcon className="h-5 w-5" aria-hidden="true" /> : index + 1}
+                  {done ? <CheckIcon className="size-4" aria-hidden="true" /> : index + 1}
                 </span>
                 <span className={cn(COURSE_RAIL.title, now && COURSE_RAIL.titleNow)}>
                   {chapter.title}
@@ -100,11 +103,16 @@ export const CourseRail = ({ rail }: CourseRailProps) => {
                             !stepDone && !stepNow && COURSE_RAIL.stepLocked
                           )}
                         >
-                          {stepDone ? (
-                            <CheckIcon className={COURSE_RAIL.stepGlyph} aria-hidden="true" />
-                          ) : (
-                            <span className={COURSE_RAIL.stepDot} aria-hidden="true" />
-                          )}
+                          <span
+                            className={cn(
+                              COURSE_RAIL.stepNumber,
+                              stepDone && COURSE_RAIL.stepNumberDone,
+                              stepNow && COURSE_RAIL.stepNumberNow
+                            )}
+                          >
+                            {stepNow && <span className={COURSE_RAIL.ping} aria-hidden="true" />}
+                            {index + 1}.{stepIndex + 1}
+                          </span>
                           <span>{step.label}</span>
                         </button>
                       </li>

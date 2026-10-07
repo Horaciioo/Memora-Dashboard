@@ -1,39 +1,30 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { CSSProperties } from 'react'
+import { useCallback, useEffect, useMemo, useState, ViewTransition } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { PageHeader } from '@/components/structures/PageHeader'
-import { BranchingExercise } from '@/composites/academy/course/BranchingExercise'
-import { CaseExercise, QuizExercise } from '@/composites/academy/course/ChoiceExercises'
-import { CommandExercise } from '@/composites/academy/course/CommandExercise'
-import { CompareRunsExercise } from '@/composites/academy/course/CompareRunsExercise'
 import { CourseComplete } from '@/composites/academy/course/CourseComplete'
-import { CourseContextProvider } from '@/composites/academy/course/CourseContextProvider'
+import {
+  CourseContextProvider,
+  EMPTY_COURSE_CONTEXT,
+} from '@/composites/academy/course/CourseContextProvider'
 import { CourseIntro } from '@/composites/academy/course/CourseIntro'
 import { CourseOutro } from '@/composites/academy/course/CourseOutro'
-import { CourseTimeline } from '@/composites/academy/course/CourseTimeline'
-import { CourseWelcome } from '@/composites/academy/course/CourseWelcome'
-import { FillExercise } from '@/composites/academy/course/FillExercise'
-import { OrderExercise, SortExercise } from '@/composites/academy/course/OrderingExercises'
-import { SceneExercise } from '@/composites/academy/course/SceneExercise'
-import { ReadBlock } from '@/composites/academy/course/ReadBlock'
-import { SimulationExercise } from '@/composites/academy/course/SimulationExercise'
-import type { ExerciseViewProps } from '@/composites/academy/course/types'
+import { CourseScreen } from '@/composites/academy/course/CourseScreen'
 import { useCourse } from '@/core/hooks/data/useCourse'
 import { publishCourseRail } from '@/core/hooks/interaction/useCourseRail'
-import { useSlideAdvance } from '@/core/hooks/interaction/useSlideAdvance'
 import { stepsOf } from '@/core/lib/academy/courseSteps'
+import { fillCreator } from '@/core/lib/academy/creator'
+import { moveSteps, STEP_TRANSITION } from '@/core/lib/academy/stepTransition'
 import { COURSE_COPY } from '@/declarations/academy/copy'
 import { isExercise } from '@/declarations/academy/curriculum'
-import type { Course, ExerciseBlock } from '@/declarations/academy/curriculum/types'
+import type { Course } from '@/declarations/academy/curriculum/types'
 import { COURSE_SURFACE_REGISTRY } from '@/declarations/academy/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import { COURSE_PLAYER } from '@/declarations/ui/variants'
 import type { CourseContext, CourseProgress } from '@/types/academy'
-import { cn } from '@/utils/classnames'
 
 export interface CoursePlayerProps {
   // Where each exercise is sent
@@ -47,45 +38,6 @@ export interface CoursePlayerProps {
   context?: CourseContext
 }
 
-// Blocks showing the Mod View
-const WIDE_KINDS = new Set<string>(['tour', 'focus', 'scene', 'compareRuns', 'branching'])
-
-// Context of a course read without the database
-const EMPTY_CONTEXT: CourseContext = { ladder: { admins: [], responsables: [] }, livecon: [] }
-
-/**
- * Exercise view of a block
- * @param {ExerciseViewProps} props - Block and its state
- * @return {JSX.Element}
- */
-
-const ExerciseView = (props: ExerciseViewProps) => {
-  const { block } = props
-
-  switch (block.kind) {
-    case 'quiz':
-      return <QuizExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-    case 'fill':
-      return <FillExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-    case 'sort':
-      return <SortExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-    case 'order':
-      return <OrderExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-    case 'simulation':
-      return <SimulationExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-    case 'case':
-      return <CaseExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-    case 'command':
-      return <CommandExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-    case 'scene':
-      return <SceneExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-    case 'compareRuns':
-      return <CompareRunsExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-    case 'branching':
-      return <BranchingExercise {...(props as ExerciseViewProps<typeof block>)} block={block} />
-  }
-}
-
 /**
  * Reader of one interactive course
  * @param {CoursePlayerProps} props - Address
@@ -94,17 +46,20 @@ const ExerciseView = (props: ExerciseViewProps) => {
 
 export const CoursePlayer = ({
   submitPath,
-  course,
+  course: source,
   initialProgress,
   backHref,
   backLabel,
   trainingId,
   context,
 }: CoursePlayerProps) => {
+  const creator = (context ?? EMPTY_COURSE_CONTEXT).creator
+  // The name of the creator it is about goes where the course left its token
+  const course = useMemo(() => fillCreator(source, creator), [source, creator])
   const run = useCourse(submitPath, course, initialProgress)
   const surface = COURSE_SURFACE_REGISTRY.get(course.surface)
   const BackIcon = ICONS.back
-  const ExpandIcon = ICONS.expand
+  const ForwardIcon = ICONS.forward
 
   const clearedAt = useCallback(
     (chapterIndex: number): boolean =>
@@ -122,7 +77,6 @@ export const CoursePlayer = ({
   })
   // Screen of the chapter on display
   const [step, setStep] = useState(0)
-  const [slide, setSlide] = useState<'forward' | 'back'>('forward')
   // Opening page until the first chapter
   const [page, setPage] = useState<'intro' | 'chapters' | 'outro'>(() =>
     course.intro && Object.keys(initialProgress.blocks).length === 0 ? 'intro' : 'chapters'
@@ -134,42 +88,37 @@ export const CoursePlayer = ({
   const steps = useMemo(() => stepsOf(chapter), [chapter])
   const screen = steps[Math.min(step, steps.length - 1)]!
   const isLastStep = step >= steps.length - 1
+  // The welcome question has its own buttons
+  const hasQuestion = screen.blocks.some((block) => block.kind === 'ask')
 
   // A screen clears once its exercises pass
-  const stepCleared = screen.blocks
-    .filter(isExercise)
-    .every((block) => run.progress.blocks[block.key]?.passed)
-  const fill = (step + (stepCleared ? 1 : 0)) / steps.length
+  const screenExercises = screen.blocks.filter(isExercise)
+  const stepCleared = screenExercises.every((block) => run.progress.blocks[block.key]?.passed)
 
   const goTo = useCallback(
     (index: number) => {
-      setSlide(index > current ? 'forward' : 'back')
-      setCurrent(index)
-      setStep(0)
+      moveSteps(index > current ? 'forward' : 'back', () => {
+        setCurrent(index)
+        setStep(0)
+      })
       window.scrollTo({ top: 0 })
     },
     [current]
   )
 
-  const goStep = useCallback((index: number) => {
-    setStep(index)
-    window.scrollTo({ top: 0 })
-  }, [])
+  const goStep = useCallback(
+    (index: number) => {
+      moveSteps(index > step ? 'forward' : 'back', () => setStep(index))
+      window.scrollTo({ top: 0 })
+    },
+    [step]
+  )
 
   const next = () => {
     if (!stepCleared) return
 
     if (!isLastStep) goStep(step + 1)
   }
-
-  // Sliding past the page edge moves along the chapter
-  useSlideAdvance({
-    enabled: page === 'chapters',
-    canNext: stepCleared && !isLastStep,
-    canPrevious: step > 0,
-    onNext: next,
-    onPrevious: () => goStep(step - 1),
-  })
 
   const chapters = useMemo(
     () => course.chapters.map(({ key, title }) => ({ key, title })),
@@ -219,15 +168,13 @@ export const CoursePlayer = ({
   }
 
   return (
-    <CourseContextProvider value={context ?? EMPTY_CONTEXT}>
+    <CourseContextProvider value={context ?? EMPTY_COURSE_CONTEXT}>
       <PageHeader title={course.name} />
       <div className={COURSE_PLAYER.page}>
         <Link href={backHref} className={COURSE_PLAYER.back}>
           <BackIcon className="h-4 w-4" aria-hidden="true" />
           {backLabel}
         </Link>
-
-        <CourseTimeline chapters={chapters} current={current} fill={fill} finished={run.finished} />
 
         {page === 'intro' && course.intro && (
           <CourseIntro
@@ -244,71 +191,35 @@ export const CoursePlayer = ({
         {page === 'outro' && trainingId && <CourseOutro trainingId={trainingId} />}
 
         {page === 'chapters' && (
-          <section
-            key={chapter.key}
-            className={cn(
-              COURSE_PLAYER.stage,
-              slide === 'forward' ? COURSE_PLAYER.slideForward : COURSE_PLAYER.slideBack
-            )}
-          >
-            <header className={COURSE_PLAYER.chapterHead}>
-              <h2 className={COURSE_PLAYER.chapterTitle}>{chapter.title}</h2>
-              <span className={COURSE_PLAYER.chapterDivider} aria-hidden="true" />
-              <span className={COURSE_PLAYER.chapterCount}>
-                {COURSE_COPY.chapterCount(current + 1, course.chapters.length)}
-              </span>
-            </header>
-
-            <div key={screen.key} className={COURSE_PLAYER.step}>
-              {screen.welcome ? (
-                <CourseWelcome chapter={chapter} steps={steps} />
-              ) : (
-                <div className={COURSE_PLAYER.blocks}>
-                  {screen.blocks.map((block, index) => (
-                    <div
-                      key={block.key}
-                      className={cn(
-                        COURSE_PLAYER.reveal,
-                        !WIDE_KINDS.has(block.kind) && COURSE_PLAYER.column
-                      )}
-                      style={{ '--i': index } as CSSProperties}
-                    >
-                      {isExercise(block) ? (
-                        <ExerciseView
-                          block={block as ExerciseBlock}
-                          answer={run.answers[block.key]}
-                          result={run.results[block.key]}
-                          isSaving={run.isSaving}
-                          onAnswer={(answer) => run.answer(block.key, answer)}
-                          onCheck={(answer) => void run.check(block, answer)}
-                          onRetry={() => run.retry(block.key)}
-                        />
-                      ) : (
-                        <ReadBlock block={block} />
-                      )}
-                    </div>
-                  ))}
+          <section className={COURSE_PLAYER.stage}>
+            <div className={COURSE_PLAYER.body}>
+              <ViewTransition
+                key={screen.key}
+                enter={STEP_TRANSITION}
+                exit={STEP_TRANSITION}
+                default="none"
+              >
+                <div className={COURSE_PLAYER.step}>
+                  <CourseScreen step={screen} run={run} onNext={next} chapters={chapters} />
                 </div>
-              )}
-            </div>
+              </ViewTransition>
 
-            <footer className={COURSE_PLAYER.hint}>
-              <span className={COURSE_PLAYER.stepCount}>
-                {COURSE_COPY.stepCounter(step + 1, steps.length)}
-              </span>
-              {!isLastStep ? (
-                <button
-                  type="button"
-                  disabled={!stepCleared}
-                  onClick={next}
-                  className={COURSE_PLAYER.hintButton}
-                >
-                  {stepCleared ? COURSE_COPY.slideHint : COURSE_COPY.slideLocked}
-                  <ExpandIcon className={COURSE_PLAYER.hintGlyph} aria-hidden="true" />
-                </button>
-              ) : (
-                (!isLast || reviewed) && (
-                  <>
+              {!hasQuestion && (
+                <footer className={COURSE_PLAYER.foot}>
+                  {step > 0 ? (
+                    <Button variant="secondary" onClick={() => goStep(step - 1)}>
+                      <BackIcon className={COURSE_PLAYER.footGlyph} aria-hidden="true" />
+                      {COURSE_COPY.previousStep}
+                    </Button>
+                  ) : (
+                    <span aria-hidden="true" />
+                  )}
+                  {!isLastStep ? (
+                    <Button variant="primary" disabled={!stepCleared} onClick={next}>
+                      {COURSE_COPY.nextStep}
+                      <ForwardIcon className={COURSE_PLAYER.footGlyph} aria-hidden="true" />
+                    </Button>
+                  ) : !isLast || reviewed ? (
                     <Button
                       variant="primary"
                       disabled={!canAdvance}
@@ -320,14 +231,20 @@ export const CoursePlayer = ({
                             current + 2,
                             course.chapters[current + 1]!.title
                           )}
+                      <ForwardIcon className={COURSE_PLAYER.footGlyph} aria-hidden="true" />
                     </Button>
-                    {!canAdvance && (
-                      <p className={COURSE_PLAYER.footHint}>{COURSE_COPY.nextLocked}</p>
-                    )}
-                  </>
-                )
+                  ) : (
+                    <span aria-hidden="true" />
+                  )}
+                  {!isLastStep && !stepCleared && (
+                    <p className={COURSE_PLAYER.footHint}>{COURSE_COPY.stepLocked}</p>
+                  )}
+                  {isLastStep && !canAdvance && (!isLast || reviewed) && (
+                    <p className={COURSE_PLAYER.footHint}>{COURSE_COPY.nextLocked}</p>
+                  )}
+                </footer>
               )}
-            </footer>
+            </div>
           </section>
         )}
 

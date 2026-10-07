@@ -1,3 +1,4 @@
+import type { MaturityName } from '@/declarations/maturity/registries'
 import type { ParkourPhase } from '@/core/lib/academy/parkour'
 import type { LivePlatformName } from '@/utils/constants/lives'
 import type { TimelineStepState } from '@/core/services/academy/timeline'
@@ -572,6 +573,7 @@ export interface CourseProgress {
  * @property {number} exercises - Exercises
  * @property {number} passed - Exercises cleared
  * @property {TrainingStatusName} status - Where the member stands
+ * @property {boolean} isLocked - Not in its period yet
  */
 
 export interface CourseCard {
@@ -586,18 +588,22 @@ export interface CourseCard {
   exercises: number
   passed: number
   status: TrainingStatusName
+  isLocked: boolean
+  maturity?: MaturityName
 }
 
 /**
  * What a course reads from the database around its declared content
  * @typedef {Object} CourseContext
  * @property {{ admins: string[], responsables: string[] }} ladder - Names of the decision ladder
- * @property {CourseLiveconLevel[]} livecon - Levels with a few panel offences each
+ * @property {CourseLiveconLevel[]} livecon - Levels with their panel offences
+ * @property {string} creator - Creator the course is about
  */
 
 export interface CourseContext {
   ladder: { admins: string[]; responsables: string[] }
   livecon: CourseLiveconLevel[]
+  creator: string
 }
 
 /**

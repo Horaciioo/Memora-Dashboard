@@ -20,6 +20,8 @@ export interface ExerciseFrameProps {
   isSaving: boolean
   // Checked by the exercise itself
   autoCheck?: boolean
+  // Drawn as a heading and its parts, no card
+  isBare?: boolean
   onCheck: () => void
   onRetry: () => void
   children: ReactNode
@@ -39,6 +41,7 @@ export const ExerciseFrame = ({
   canCheck,
   isSaving,
   autoCheck,
+  isBare = false,
   onCheck,
   onRetry,
   children,
@@ -49,19 +52,27 @@ export const ExerciseFrame = ({
 
   return (
     <section
-      className={cn(
-        COURSE_EXERCISE.frame,
-        result?.passed && [COURSE_EXERCISE.framePassed, COURSE_EXERCISE.pop],
-        result && !result.passed && [COURSE_EXERCISE.frameFailed, COURSE_EXERCISE.shake]
-      )}
+      className={
+        isBare
+          ? COURSE_EXERCISE.bare
+          : cn(
+              COURSE_EXERCISE.frame,
+              result?.passed && [COURSE_EXERCISE.framePassed, COURSE_EXERCISE.pop],
+              result && !result.passed && [COURSE_EXERCISE.frameFailed, COURSE_EXERCISE.shake]
+            )
+      }
     >
-      <header className={COURSE_EXERCISE.head}>
-        <KindIcon className={COURSE_EXERCISE.headIcon} aria-hidden="true" />
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <span className={COURSE_EXERCISE.kind}>{meta.label}</span>
-          <h3 className={COURSE_EXERCISE.title}>{title}</h3>
-        </div>
-      </header>
+      {isBare ? (
+        <h2 className={COURSE_EXERCISE.bareTitle}>{title}</h2>
+      ) : (
+        <header className={COURSE_EXERCISE.head}>
+          <KindIcon className={COURSE_EXERCISE.headIcon} aria-hidden="true" />
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className={COURSE_EXERCISE.kind}>{meta.label}</span>
+            <h3 className={COURSE_EXERCISE.title}>{title}</h3>
+          </div>
+        </header>
+      )}
 
       <div className={COURSE_EXERCISE.body}>{children}</div>
 

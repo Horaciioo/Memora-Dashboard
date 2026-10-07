@@ -36,14 +36,3 @@ export const SanctionGravities = {
 
 export type SanctionGravityName = (typeof SanctionGravities)[keyof typeof SanctionGravities]
 
-/**
- * What a Discord anchor points at
- * @type {Record<string, string>}
- */
-
-export const DiscordAnchorKinds = {
-  Role: 'ROLE',
-  Channel: 'CHANNEL',
-} as const
-
-export type DiscordAnchorKindName = (typeof DiscordAnchorKinds)[keyof typeof DiscordAnchorKinds]

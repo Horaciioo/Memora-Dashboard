@@ -16,7 +16,7 @@ const TICKET_PINK = '#f47fb0'
 
 // Cast of the support simulations
 const CAST = {
-  bot: author('lumi-tickets', { name: 'Lumi Tickets', isApp: true, glyph: 'ticket' }),
+  bot: author('lumi-tickets', { name: '{creator} Tickets', isApp: true, glyph: 'ticket' }),
   modo: author('modo', { name: 'MODO', glyph: 'shield', colour: TICKET_PINK }),
   responsable: author('responsable', { name: 'Responsable', glyph: 'lead', colour: '#ea580c' }),
   delta: author('delta', { name: 'Delta', colour: '#3ba55c' }),
@@ -62,7 +62,7 @@ export const SUPPORT_GUIDE_STEPS: GuideStep[] = [
 
 const ticketDecor = (): DiscordScene['initial'] =>
   discordStage({
-    server: 'Lumi',
+    server: '{creator}',
     categories: [
       { name: 'Informations', channels: [], skeletons: 2 },
       {
@@ -202,10 +202,9 @@ export const DELTA_RUNS: ReplicaRun[] = [
           'Bien noté, je prends ta demande en charge. Peux-tu préciser le pseudo exact de la personne concernée ?'
         )
       ),
-      ...say(
-        message('d2-3', CAST.delta, '21:06', 'C’est raid_noir_01, je t’envoie les captures.'),
-        { typing: 1800 }
-      ),
+      ...say(message('d2-3', CAST.delta, '21:06', 'C’est foxtrot, je t’envoie les captures.'), {
+        typing: 1800,
+      }),
       ...write(
         message(
           'd2-4',
