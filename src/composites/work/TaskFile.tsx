@@ -24,6 +24,7 @@ export interface TaskFileProps {
   fields: FieldDefinition[]
   activity: ActivityEntry[]
   canUpdate: boolean
+  canReadLogs: boolean
 }
 
 /**
@@ -32,10 +33,11 @@ export interface TaskFileProps {
  * @param {FieldDefinition[]} fields - Declarations of the task form
  * @param {ActivityEntry[]} activity - Journal entries
  * @param {boolean} canUpdate - Member may edit the task
+ * @param {boolean} canReadLogs - Member may read the journal
  * @return {JSX.Element}
  */
 
-export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) => {
+export const TaskFile = ({ task, fields, activity, canUpdate, canReadLogs }: TaskFileProps) => {
   const file = useRecordFile({
     path: API_ROUTES.task(task.id),
     scope: WorkflowScopes.Task,
@@ -151,22 +153,24 @@ export const TaskFile = ({ task, fields, activity, canUpdate }: TaskFileProps) =
         </div>
       </section>
 
-      <Section title={TASK_COPY.logsTitle} bare>
-        <div className="flex flex-col gap-4">
-          {activity.length === 0 ? (
-            <EmptyState
-              figure="notes"
-              title={TASK_COPY.logsEmptyTitle}
-              description={TASK_COPY.logsEmptyDescription}
-              action={<Status label={TASK_COPY.logsTitle} tone="neutral" />}
-            />
-          ) : (
-            <div className={cn(SECTION_STYLES.panel, SECTION_STYLES.panelPadded)}>
-              <ActivityTimeline entries={activity} />
-            </div>
-          )}
-        </div>
-      </Section>
+      {canReadLogs && (
+        <Section title={TASK_COPY.logsTitle} bare>
+          <div className="flex flex-col gap-4">
+            {activity.length === 0 ? (
+              <EmptyState
+                figure="notes"
+                title={TASK_COPY.logsEmptyTitle}
+                description={TASK_COPY.logsEmptyDescription}
+                action={<Status label={TASK_COPY.logsTitle} tone="neutral" />}
+              />
+            ) : (
+              <div className={cn(SECTION_STYLES.panel, SECTION_STYLES.panelPadded)}>
+                <ActivityTimeline entries={activity} />
+              </div>
+            )}
+          </div>
+        </Section>
+      )}
     </div>
   )
 }

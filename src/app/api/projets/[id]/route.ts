@@ -10,12 +10,17 @@ import {
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { summariseChange } from '@/core/services/system/changes'
 import { notify } from '@/core/services/system/NotificationService'
+import { assertProjectVisible, workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
   permission: Permissions.ProjectRead,
   descriptor: { summary: 'Read a project file', tags: ['projects'] },
-  handler: ({ params }) => readProject(params.id),
+  handler: async ({ params, session, access }) => {
+    await assertProjectVisible(params.id, workViewer(session, access))
+
+    return readProject(params.id)
+  },
 })
 
 export const PATCH = createProtectedRoute({

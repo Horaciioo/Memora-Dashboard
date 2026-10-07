@@ -57,6 +57,7 @@ export interface ProjectFileTabsProps {
   communicationFields: FieldDefinition[]
   activity: ActivityEntry[]
   canUpdate: boolean
+  canReadLogs: boolean
   canCreateTasks: boolean
   canReadTasks: boolean
   canCreateMeetings: boolean
@@ -74,6 +75,7 @@ export interface ProjectFileTabsProps {
  * @param {FieldDefinition[]} communicationFields - Declarations of the announcement form
  * @param {ActivityEntry[]} activity - Journal entries
  * @param {boolean} canUpdate - Member may edit the project
+ * @param {boolean} canReadLogs - Member may read the journal
  * @param {boolean} canCreateTasks - Member may open a task
  * @param {boolean} canReadTasks - Member may open a task file
  * @param {boolean} canCreateMeetings - Member may plan a meeting
@@ -91,6 +93,7 @@ export const ProjectFileTabs = ({
   communicationFields,
   activity,
   canUpdate,
+  canReadLogs,
   canCreateTasks,
   canReadTasks,
   canCreateMeetings,
@@ -530,6 +533,7 @@ export const ProjectFileTabs = ({
             label: PROJECT_COPY.tabLogs,
             icon: 'history',
             maturity: 'beta',
+            visible: canReadLogs,
             render: logsTab,
           },
         ]}

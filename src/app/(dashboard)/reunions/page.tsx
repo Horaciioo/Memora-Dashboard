@@ -4,6 +4,7 @@ import { MeetingsBoard } from '@/composites/work/MeetingsBoard'
 import { busySlots, withBusy } from '@/core/services/calendar/BusyService'
 import { listMeetings, meetingFields } from '@/core/services/work/MeetingService'
 import { boardColumns, projectOptions, youtuberOptions } from '@/core/services/work/shared'
+import { workViewer } from '@/core/services/work/visibility'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { MEETING_COPY } from '@/declarations/work/copy'
@@ -22,12 +23,12 @@ export default async function MeetingsPage() {
   const perimeter = await scope()
 
   const [meetings, columns, baseFields, slots, youtubers, projects] = await Promise.all([
-    listMeetings(perimeter),
+    listMeetings(perimeter, workViewer(session, access)),
     boardColumns(WorkflowScopes.Meeting),
     meetingFields(perimeter),
     busySlots({ viewerId: session.id, access, scope: perimeter }),
     youtuberOptions(),
-    projectOptions(),
+    projectOptions(perimeter, workViewer(session, access)),
   ])
 
   const fields = withBusy(baseFields, ['scheduledAt'], slots)

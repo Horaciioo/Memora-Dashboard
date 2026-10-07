@@ -8,13 +8,16 @@ import {
 } from '@/core/services/work/ProjectService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { notify, notifyMentions } from '@/core/services/system/NotificationService'
+import { assertProjectVisible, workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const POST = createProtectedRoute({
   permission: Permissions.CommunicationWrite,
   status: 201,
   descriptor: { summary: 'Write a project announcement', tags: ['projects'] },
-  handler: async ({ params, raw, session }) => {
+  handler: async ({ params, raw, session, access }) => {
+    await assertProjectVisible(params.id, workViewer(session, access))
+
     const parsed = parseFormValues(await communicationFields(), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 

@@ -18,12 +18,12 @@ export const PATCH = createProtectedRoute({
 
     if (!id || !columnId) throw invalidInput([{ field: 'id', message: FORM_COPY.required }])
 
-    // Each board is gated by the permission that edits its own resource
+    // Each board is gated by the permission that edits its own resource, a task by its manager
     if (scope === WorkflowScopes.Project && access.can(Permissions.ProjectUpdate)) {
       return moveProject(id, columnId, index, session.id)
     }
 
-    if (scope === WorkflowScopes.Task && access.can(Permissions.TaskUpdate)) {
+    if (scope === WorkflowScopes.Task && access.can(Permissions.TaskManage)) {
       return moveTask(id, columnId, index, session.id)
     }
 

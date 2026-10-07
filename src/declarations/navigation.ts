@@ -300,12 +300,13 @@ export const NAVIGATION: NavigationGroup[] = [
   },
   {
     label: 'Pilotage',
-    from: NavigationViews.Lead,
+    from: NavigationViews.Moderation,
     items: [
       {
         href: ROUTES.members,
         label: 'Modérateurs',
         icon: 'members',
+        from: NavigationViews.Lead,
         permission: Permissions.MemberRead,
         mobile: { slot: 'primary', order: 6 },
       },

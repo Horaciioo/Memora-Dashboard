@@ -26,6 +26,25 @@ export interface GrantAddition {
 export const GRANT_ADDITIONS: readonly GrantAddition[] = [
   { key: 'initial-role-presets', grants: ROLE_PRESETS },
   {
+    key: 'work-visibility',
+    grants: {
+      [MemberRoles.Admin]: [
+        Permissions.ProjectReadAll,
+        Permissions.TaskManage,
+        Permissions.MeetingContentRead,
+        Permissions.WorkLogRead,
+      ],
+      [MemberRoles.Responsable]: [
+        Permissions.ProjectReadAll,
+        Permissions.TaskManage,
+        Permissions.MeetingContentRead,
+        Permissions.WorkLogRead,
+      ],
+      // Floor role writes announcements and tasks, inside the projects naming them
+      [MemberRoles.Moderateur]: [Permissions.CommunicationWrite, Permissions.TaskCreate],
+    },
+  },
+  {
     key: 'academy-fsi',
     grants: {
       [MemberRoles.Responsable]: [
