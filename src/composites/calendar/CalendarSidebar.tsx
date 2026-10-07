@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import type { ReactNode } from 'react'
+import { RailSearchGlyph } from '@/components/elements/display/RailGlyphs'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { CalendarMiniMonth } from '@/composites/calendar/CalendarMiniMonth'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { CALENDAR_LAYER_REGISTRY } from '@/declarations/calendar/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
-import { accentPaint } from '@/declarations/ui/theme'
+import { railIcon } from '@/declarations/ui/railIcons'
 import { CALENDAR_SIDEBAR } from '@/declarations/ui/variants'
 import type { FieldOption } from '@/types/forms'
 import { cn } from '@/utils/classnames'
@@ -30,40 +30,6 @@ export interface CalendarSidebarProps {
   youtubers: FieldOption[]
   hiddenCreators: string[]
   onToggleCreator: (creatorId: string) => void
-}
-
-/**
- * Mark of one switch: the tick stands where the icon is
- * @param {Object} props - Mark state
- * @param {string | undefined} props.accent - Stored colour
- * @param {boolean} props.on - Switch is on
- * @param {ReactNode} props.children - Icon or portrait shown while off
- * @return {JSX.Element}
- */
-
-const FilterMark = ({
-  accent,
-  on,
-  children,
-}: {
-  accent: string | undefined
-  on: boolean
-  children: ReactNode
-}) => {
-  const paint = accentPaint(accent, 'brand')
-  const Check = ICONS.picked
-
-  if (!on) return <span className={CALENDAR_SIDEBAR.mark}>{children}</span>
-
-  return (
-    <span
-      className={cn(CALENDAR_SIDEBAR.mark, CALENDAR_SIDEBAR.markOn, paint.solid)}
-      style={paint.style}
-      aria-hidden="true"
-    >
-      <Check className={CALENDAR_SIDEBAR.markCheck} />
-    </span>
-  )
 }
 
 /**
@@ -133,7 +99,7 @@ export const CalendarRailBody = ({
       <h2 className={CALENDAR_SIDEBAR.groupTitle}>{CALENDAR_COPY.sidebarLayers}</h2>
       {layers.map((layer) => {
         const meta = CALENDAR_LAYER_REGISTRY.get(layer)
-        const Glyph = ICONS[meta.icon]
+        const Glyph = railIcon(meta.icon)
         const on = !hiddenLayers.includes(layer)
 
         return (
@@ -145,9 +111,10 @@ export const CalendarRailBody = ({
             onClick={() => onToggleLayer(layer)}
             className={cn(CALENDAR_SIDEBAR.row, !on && CALENDAR_SIDEBAR.rowOff)}
           >
-            <FilterMark accent={undefined} on={on}>
-              <Glyph className={CALENDAR_SIDEBAR.rowGlyph} aria-hidden="true" />
-            </FilterMark>
+            <Glyph
+              className={cn(CALENDAR_SIDEBAR.rowGlyph, on && CALENDAR_SIDEBAR.rowGlyphOn)}
+              aria-hidden="true"
+            />
             <span className={CALENDAR_SIDEBAR.rowLabel}>{meta.label}</span>
           </button>
         )
@@ -170,9 +137,9 @@ export const CalendarRailBody = ({
               onClick={() => onToggleCreator(creator.value)}
               className={cn(CALENDAR_SIDEBAR.row, !on && CALENDAR_SIDEBAR.rowOff)}
             >
-              <FilterMark accent={creator.accent} on={on}>
+              <span className={cn(CALENDAR_SIDEBAR.mark, !on && CALENDAR_SIDEBAR.markOff)}>
                 <Avatar name={creator.label} src={creator.image} size="xs" />
-              </FilterMark>
+              </span>
               <span className={CALENDAR_SIDEBAR.rowLabel}>{creator.label}</span>
             </button>
           )
@@ -194,7 +161,7 @@ export const CalendarRailPanel = (props: CalendarSidebarProps) => {
   return (
     <div className={CALENDAR_SIDEBAR.panel}>
       <Link href={ROUTES.dashboard} className={CALENDAR_SIDEBAR.back}>
-        <BackIcon className="h-4 w-4" aria-hidden="true" />
+        <BackIcon className="size-5 shrink-0" aria-hidden="true" />
         {CALENDAR_COPY.railBack}
       </Link>
       <CalendarRailBody {...props} />
@@ -217,11 +184,9 @@ export const CalendarSearchBar = ({
   value: string
   onChange: (value: string) => void
 }) => {
-  const SearchIcon = ICONS.search
-
   return (
     <label className={CALENDAR_SIDEBAR.searchBar}>
-      <SearchIcon className="h-4 w-4 shrink-0" aria-hidden="true" />
+      <RailSearchGlyph className="size-4 shrink-0" aria-hidden="true" />
       <input
         type="search"
         value={value}

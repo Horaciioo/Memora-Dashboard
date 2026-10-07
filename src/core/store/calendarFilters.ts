@@ -14,6 +14,7 @@ import type { CalendarUnit } from '@/utils/format/calendar'
  * @property {string[]} hiddenCreators - Creators switched off
  * @property {CalendarUnit} unit - Span the grid was left on
  * @property {(unit: CalendarUnit) => void} setUnit - Change the span
+ * @property {(layers: CalendarLayerName[]) => void} setHiddenLayers - Replace the switched off calendars
  * @property {(layer: CalendarLayerName) => void} toggleLayer - Flip a calendar
  * @property {(creatorId: string) => void} toggleCreator - Flip a creator
  */
@@ -23,6 +24,7 @@ interface CalendarFiltersStore {
   hiddenCreators: string[]
   unit: CalendarUnit
   setUnit: (unit: CalendarUnit) => void
+  setHiddenLayers: (layers: CalendarLayerName[]) => void
   toggleLayer: (layer: CalendarLayerName) => void
   toggleCreator: (creatorId: string) => void
 }
@@ -39,6 +41,7 @@ export const useCalendarFiltersStore = create<CalendarFiltersStore>()(
       hiddenCreators: [],
       unit: 'month',
       setUnit: (unit) => set({ unit }),
+      setHiddenLayers: (layers) => set({ hiddenLayers: layers }),
       toggleLayer: (layer) => set((state) => ({ hiddenLayers: flip(state.hiddenLayers, layer) })),
       toggleCreator: (creatorId) =>
         set((state) => ({ hiddenCreators: flip(state.hiddenCreators, creatorId) })),

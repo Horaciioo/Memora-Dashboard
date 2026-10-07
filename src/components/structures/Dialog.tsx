@@ -3,10 +3,9 @@
 import { useId } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { Button } from '@/components/elements/actions/Button'
+import { ModalHeader } from '@/components/structures/ModalHeader'
 import { useFocusTrap } from '@/core/hooks/interaction/useFocusTrap'
 import { useScrollLock } from '@/core/hooks/interaction/useScrollLock'
-import { ACTION_COPY } from '@/declarations/ui/copy'
 import { DIALOG_SIZES, DIALOG_STYLES, type DialogSize } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -68,26 +67,13 @@ export const Dialog = ({
         aria-describedby={description ? descriptionId : undefined}
         className={cn(DIALOG_STYLES.panel, DIALOG_SIZES[size])}
       >
-        <div className={DIALOG_STYLES.header}>
-          <div className={DIALOG_STYLES.heading}>
-            <h2 id={titleId} className={DIALOG_STYLES.title}>
-              {title}
-            </h2>
-            {description && (
-              <p id={descriptionId} className="sr-only">
-                {description}
-              </p>
-            )}
-            {subheader}
-          </div>
-          <Button
-            variant="icon"
-            icon="close"
-            onClick={onClose}
-            aria-label={ACTION_COPY.close}
-            className={DIALOG_STYLES.close}
-          />
-        </div>
+        <ModalHeader titleId={titleId} title={title} onClose={onClose} />
+        {description && (
+          <p id={descriptionId} className="sr-only">
+            {description}
+          </p>
+        )}
+        {subheader && <div className={DIALOG_STYLES.subheader}>{subheader}</div>}
         <div className={cn(DIALOG_STYLES.body, subheader && DIALOG_STYLES.bodyFlush)}>
           {children}
         </div>

@@ -10,14 +10,17 @@ import {
 import { youtuberOptions } from '@/core/services/work/shared'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
+import { CALENDAR_LAYER_REGISTRY } from '@/declarations/calendar/registries'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 import { gridRange, monthGrid, toDayKey } from '@/utils/format/calendar'
 
 export const metadata: Metadata = { title: CALENDAR_COPY.title }
 
-// Query key of the entry a deep link opens straight onto
+// Query keys of a deep link: an entry to open, a day to open on, a calendar left on alone
 const FOCUS_PARAM = 'evenement'
+const DAY_PARAM = 'jour'
+const LAYER_PARAM = 'calque'
 
 /**
  * Shared calendar
@@ -42,7 +45,16 @@ export default async function CalendarPage({
     ? await getEntry(focusEntryId, session.id, access, perimeter)
     : null
 
-  const anchor = toDayKey(focusEntry ? new Date(focusEntry.startsAt) : new Date())
+  const day = (await searchParams)[DAY_PARAM]
+  const asked = typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day) ? day : null
+  const layer = (await searchParams)[LAYER_PARAM]
+  const onlyLayer = CALENDAR_LAYER_REGISTRY.keys.find(
+    (key) => typeof layer === 'string' && key.toLowerCase() === layer.toLowerCase()
+  )
+
+  const anchor = toDayKey(
+    focusEntry ? new Date(focusEntry.startsAt) : asked ? new Date(`${asked}T12:00:00`) : new Date()
+  )
   const { from, to } = gridRange(monthGrid(anchor))
 
   const [window, fields, youtubers] = await Promise.all([
@@ -73,6 +85,7 @@ export default async function CalendarPage({
         anchor={anchor}
         canManage={access.can(Permissions.CalendarManage)}
         focusEntryId={focusEntry ? focusEntryId : undefined}
+        onlyLayer={onlyLayer}
       />
     </div>
   )

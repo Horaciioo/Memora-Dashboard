@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
+import type { MaturityName } from '@/declarations/maturity/registries'
 import { SECTION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -8,6 +10,8 @@ export interface SectionProps {
   // No longer rendered
   description?: string
   action?: ReactNode
+  // Lifecycle tag drawn beside the title
+  maturity?: MaturityName
   // Drops the framed panel and renders children bare
   bare?: boolean
   padded?: boolean
@@ -21,6 +25,7 @@ export interface SectionProps {
  * Titled block
  * @param {string} [title] - Heading shown above the frame
  * @param {ReactNode} [action] - Control aligned to the right of the heading
+ * @param {MaturityName} [maturity] - Lifecycle tag beside the title
  * @param {boolean} [bare] - Renders children without the framed panel
  * @param {boolean} [padded] - Adds inner padding to the panel
  * @param {boolean} [raised] - Padded panel lifted by a shadow
@@ -32,6 +37,7 @@ export interface SectionProps {
 export const Section = ({
   title,
   action,
+  maturity,
   bare,
   padded,
   raised,
@@ -43,6 +49,7 @@ export const Section = ({
       <div className={SECTION_STYLES.header}>
         <div className={SECTION_STYLES.heading}>
           {title && <h2 className={SECTION_STYLES.title}>{title}</h2>}
+          {maturity && <MaturityTag maturity={maturity} />}
         </div>
         {action && <div className={SECTION_STYLES.actions}>{action}</div>}
       </div>

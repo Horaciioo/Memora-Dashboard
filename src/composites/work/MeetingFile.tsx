@@ -303,7 +303,7 @@ export const MeetingFile = ({
   )
 
   const logsTab = () => (
-    <Section title={MEETING_COPY.tabLogs} bare>
+    <Section title={MEETING_COPY.tabLogs} maturity="beta" bare>
       <div className="flex flex-col gap-4">
         {activity.length === 0 ? (
           <EmptyState
@@ -340,8 +340,20 @@ export const MeetingFile = ({
             icon: 'sheet',
             render: overviewTab,
           },
-          { value: 'content', label: MEETING_COPY.tabContent, icon: 'note', render: contentTab },
-          { value: 'logs', label: MEETING_COPY.tabLogs, icon: 'history', render: logsTab },
+          {
+            value: 'content',
+            label: MEETING_COPY.tabContent,
+            icon: 'note',
+            maturity: 'alpha',
+            render: contentTab,
+          },
+          {
+            value: 'logs',
+            label: MEETING_COPY.tabLogs,
+            icon: 'history',
+            maturity: 'beta',
+            render: logsTab,
+          },
         ]}
       />
 

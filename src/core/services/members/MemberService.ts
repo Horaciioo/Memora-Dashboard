@@ -283,6 +283,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       options: LANGUAGE_OPTIONS,
       maxItems: FORM_SETTINGS.tagMaxCount,
       group: FORM_GROUPS.contact,
+      maturity: 'alpha',
     },
     {
       name: 'joinedAt',

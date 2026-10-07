@@ -75,7 +75,7 @@ export const InlineMarkdown = ({
   if (editing) {
     return (
       <div onBlur={onBlur} onKeyDown={onKeyDown}>
-        <MarkdownEditor id={id} value={draft} maxLength={maxLength} onChange={setDraft} />
+        <MarkdownEditor id={id} value={draft} maxLength={maxLength} onChange={setDraft} autoFocus />
       </div>
     )
   }

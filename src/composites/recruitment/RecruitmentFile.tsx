@@ -376,7 +376,7 @@ export const RecruitmentFile = ({
           figure="members"
           title={RECRUITMENT_COPY.outcomesEmptyTitle}
           description={RECRUITMENT_COPY.outcomesEmptyDescription}
-          action={<MaturityTag maturity="dev" interactive={false} />}
+          action={<MaturityTag maturity="alpha" interactive={false} />}
         />
       ) : (
         <KanbanBoard

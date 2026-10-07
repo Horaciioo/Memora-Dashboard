@@ -46,6 +46,7 @@ import { cn } from '@/utils/classnames'
 import { GUIDE_BEACONS } from '@/declarations/academy/guides'
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { CalendarKinds, CalendarSources } from '@/utils/constants/workflow'
+import type { CalendarLayerName } from '@/utils/constants/workflow'
 import type { CalendarUnit } from '@/utils/format/calendar'
 import {
   atMinute,
@@ -75,6 +76,8 @@ export interface CalendarBoardProps {
   sessionId?: string
   // Opens straight on this entry's detail
   focusEntryId?: string
+  // Calendar left on alone
+  onlyLayer?: CalendarLayerName
 }
 
 // A week slot identifier pairs its day with its padded hour
@@ -115,6 +118,7 @@ const InfoIcon = ICONS.info
  * @param {boolean} canManage - Member may post and move entries
  * @param {string} [sessionId] - Bounds the board to one academy session
  * @param {string} [focusEntryId] - Entry the board opens straight onto
+ * @param {CalendarLayerName} [onlyLayer] - Calendar left on alone when the board opens
  * @return {JSX.Element}
  */
 
@@ -126,6 +130,7 @@ export const CalendarBoard = ({
   canManage,
   sessionId,
   focusEntryId,
+  onlyLayer,
 }: CalendarBoardProps) => {
   const calendar = useCalendar(initialEntries, sessionId)
 
@@ -144,6 +149,7 @@ export const CalendarBoard = ({
     hiddenLayers,
     hiddenCreators,
     toggleLayer,
+    setHiddenLayers,
     toggleCreator,
     unit: storedUnit,
     setUnit: storeUnit,
@@ -154,6 +160,11 @@ export const CalendarBoard = ({
   // Stored choices are read once mounted
   useEffect(() => {
     void useCalendarFiltersStore.persist.rehydrate()
+    // A link from the home leaves one calendar on
+    if (onlyLayer) {
+      setHiddenLayers(CALENDAR_LAYER_REGISTRY.keys.filter((layer) => layer !== onlyLayer))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Calendars this viewer may read at all

@@ -20,6 +20,6 @@ export const WipNotice = ({ figure = 'start', description }: WipNoticeProps) => 
     figure={figure}
     title={WIP_COPY.title}
     description={description ?? WIP_COPY.description}
-    action={<MaturityTag maturity="dev" />}
+    action={<MaturityTag maturity="alpha" />}
   />
 )

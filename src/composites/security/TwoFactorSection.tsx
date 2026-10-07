@@ -37,7 +37,7 @@ export const TwoFactorSection = () => {
   const StatusGlyph = ICONS[state.isEnrolled ? 'shield' : 'twoFactor']
 
   return (
-    <Section title={TWO_FACTOR_COPY.title} padded>
+    <Section title={TWO_FACTOR_COPY.title} maturity="deprecated" padded>
       <ul className={SECURITY_LIST.list}>
         <li className={SECURITY_LIST.row}>
           <ICONS.twoFactor className={SECURITY_LIST.glyph} />

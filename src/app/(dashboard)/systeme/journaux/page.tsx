@@ -45,7 +45,7 @@ export default async function JournalPage() {
             figure="notes"
             title={SYSTEM_COPY.journalEmptyTitle}
             description={SYSTEM_COPY.journalEmptyLead}
-            action={<MaturityTag maturity="new" interactive={false} />}
+            action={<MaturityTag maturity="beta" interactive={false} />}
             compact
           />
         ) : (

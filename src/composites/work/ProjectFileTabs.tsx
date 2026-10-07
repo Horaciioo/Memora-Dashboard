@@ -473,7 +473,7 @@ export const ProjectFileTabs = ({
   )
 
   const logsTab = () => (
-    <Section title={PROJECT_COPY.tabLogs} bare>
+    <Section title={PROJECT_COPY.tabLogs} maturity="beta" bare>
       <div className="flex flex-col gap-4">
         {activity.length === 0 ? (
           <EmptyState
@@ -514,6 +514,7 @@ export const ProjectFileTabs = ({
             value: 'communication',
             label: PROJECT_COPY.tabCommunication,
             icon: 'discord',
+            maturity: 'alpha',
             visible: canReadCommunications,
             render: communicationTab,
           },
@@ -524,7 +525,13 @@ export const ProjectFileTabs = ({
             icon: 'meetings',
             render: meetingsTab,
           },
-          { value: 'logs', label: PROJECT_COPY.tabLogs, icon: 'history', render: logsTab },
+          {
+            value: 'logs',
+            label: PROJECT_COPY.tabLogs,
+            icon: 'history',
+            maturity: 'beta',
+            render: logsTab,
+          },
         ]}
       />
 

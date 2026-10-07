@@ -16,7 +16,14 @@ const initialsOf = (name: string): string =>
     .join('')
 
 // Pixel size per token
-const PIXEL_SIZES: Record<AvatarSize, number> = { xs: 24, sm: 32, md: 40, lg: 64, xl: 96 }
+const PIXEL_SIZES: Record<AvatarSize, number> = {
+  xs: 24,
+  sm: 32,
+  md: 40,
+  lg: 64,
+  xl: 96,
+  hero: 176,
+}
 
 export interface AvatarProps {
   name: string

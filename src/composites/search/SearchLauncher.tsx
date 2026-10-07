@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { RailSearchGlyph } from '@/components/elements/display/RailGlyphs'
 import { CommandPalette } from '@/composites/search/CommandPalette'
 import { SEARCH_LAUNCHER } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
-import { ICONS } from '@/declarations/ui/icons'
 import { BUTTON_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -30,7 +30,6 @@ export const SearchLauncher = ({
   expanded,
 }: SearchLauncherProps = {}) => {
   const [isOpen, setOpen] = useState(false)
-  const SearchIcon = ICONS.search
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -57,7 +56,7 @@ export const SearchLauncher = ({
           className ?? cn(BUTTON_STYLES.base, expanded ? SEARCH_LAUNCHER.bar : BUTTON_STYLES.icon)
         }
       >
-        <SearchIcon className={iconClassName ?? 'h-4 w-4 shrink-0'} aria-hidden="true" />
+        <RailSearchGlyph className={iconClassName ?? 'h-4 w-4 shrink-0'} aria-hidden="true" />
         {expanded && (
           <>
             <span className={SEARCH_LAUNCHER.barLabel}>{NAV_COPY.searchPlaceholder}</span>

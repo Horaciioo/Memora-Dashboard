@@ -39,7 +39,7 @@ export default async function QueuesPage() {
             figure="settings"
             title={SYSTEM_COPY.queuesEmptyTitle}
             description={SYSTEM_COPY.queuesEmptyLead}
-            action={<MaturityTag maturity="dev" interactive={false} />}
+            action={<MaturityTag maturity="alpha" interactive={false} />}
             compact
           />
         ) : (

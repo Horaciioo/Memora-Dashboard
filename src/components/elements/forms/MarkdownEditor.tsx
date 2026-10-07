@@ -27,6 +27,8 @@ export interface MarkdownEditorProps {
   placeholder?: string
   maxLength?: number
   invalid?: boolean
+  // Caret lands at the end on mount
+  autoFocus?: boolean
 }
 
 // Kinds a new line keeps
@@ -88,6 +90,7 @@ const filterCommands = (query: string): SlashCommand[] => {
  * @param {string} [placeholder] - Empty hint
  * @param {number} [maxLength] - Longest markdown
  * @param {boolean} [invalid] - Rejection border
+ * @param {boolean} [autoFocus] - Caret lands at the end on mount
  * @return {JSX.Element}
  */
 
@@ -98,12 +101,15 @@ export const MarkdownEditor = ({
   placeholder,
   maxLength,
   invalid,
+  autoFocus,
 }: MarkdownEditorProps) => {
   const [blocks, setBlocks] = useState<EditorBlock[]>(() => parseBlocks(value))
   const [slash, setSlash] = useState<SlashState | null>(null)
   const [format, setFormat] = useState<{ rect: DOMRect; line: HTMLElement } | null>(null)
   const lines = useRef(new Map<string, HTMLDivElement>())
-  const pendingFocus = useRef<FocusTarget | null>(null)
+  const pendingFocus = useRef<FocusTarget | null>(
+    autoFocus ? { id: blocks[blocks.length - 1]!.id, at: 'end' } : null
+  )
   const lastSent = useRef(value)
 
   // Outside value replaces blocks
@@ -415,7 +421,18 @@ export const MarkdownEditor = ({
       onKeyUp={readSelection}
       onBlur={() => setFormat(null)}
     >
-      <div className={BLOCK_EDITOR.page}>
+      <div
+        className={cn(BLOCK_EDITOR.page, 'cursor-text')}
+        onMouseDown={(event) => {
+          // Empty space reaches the last line
+          if (event.target !== event.currentTarget) return
+          const last = blocks.findLast((row) => row.kind !== 'rule')
+          const node = last ? lines.current.get(last.id) : undefined
+          if (!node) return
+          event.preventDefault()
+          placeCaret(node, 'end')
+        }}
+      >
         {blocks.map((block, index) => {
           if (block.kind === 'rule') {
             return (

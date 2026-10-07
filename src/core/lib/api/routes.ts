@@ -58,6 +58,7 @@ export const API_ROUTES = {
   liveFeed: (id: string) => `/api/lives/${id}/flux`,
   livePresence: (id: string) => `/api/lives/${id}/presence`,
   liveRoster: (id: string) => `/api/lives/${id}/appel`,
+  liveCoordination: (id: string) => `/api/lives/${id}/coordination`,
   liveInstructions: (id: string) => `/api/lives/${id}/consignes`,
   liveViewer: (id: string, viewerId: string) => `/api/lives/${id}/spectateurs/${viewerId}`,
   liveInspect: (id: string, accountId: string) => `/api/lives/${id}/moderateurs/${accountId}`,
@@ -143,8 +144,11 @@ export const API_ROUTES = {
   recruitmentStepStatus: (id: string) => `/api/etapes-recrutement/${id}/statut`,
   teams: (youtuberId?: string) => withScope('/api/equipes', youtuberId),
   team: (id: string, youtuberId?: string) => withScope(`/api/equipes/${id}`, youtuberId),
-  notifications: (size?: number) =>
-    size ? `/api/notifications?taille=${size}` : '/api/notifications',
+  notifications: (size?: number, after?: string) =>
+    size
+      ? `/api/notifications?taille=${size}${after ? `&apres=${after}` : ''}`
+      : '/api/notifications',
+  notificationsStream: '/api/notifications/flux',
   notification: (id: string) => `/api/notifications/${id}`,
   access: '/api/acces',
   accessFunctions: '/api/acces/fonctions',

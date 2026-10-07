@@ -11,7 +11,7 @@ export interface GlyphProps {
  * @return {JSX.Element}
  */
 
-const Stroke = ({
+export const Stroke = ({
   className,
   width = 2,
   children,
@@ -80,6 +80,19 @@ export const NextGlyph = ({ className }: GlyphProps) => (
 export const BackGlyph = ({ className }: GlyphProps) => (
   <Stroke className={className}>
     <path d="M19 12H5M11 6l-6 6 6 6" />
+  </Stroke>
+)
+
+/**
+ * Sidebar
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const SidebarGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className}>
+    <rect x="3.5" y="5" width="17" height="14" rx="3" />
+    <path d="M9.5 5v14" />
   </Stroke>
 )
 
@@ -586,5 +599,18 @@ export const BulletGlyph = ({ className }: GlyphProps) => (
 export const BulletRingGlyph = ({ className }: GlyphProps) => (
   <Stroke className={className} width={3}>
     <circle cx="12" cy="12" r="7" />
+  </Stroke>
+)
+
+/**
+ * Voice channel speaker
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const VoiceGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={2}>
+    <path d="M4 10v4h3.5L12 18V6L7.5 10H4z" />
+    <path d="M15.5 9a4 4 0 010 6M18 6.5a7.5 7.5 0 010 11" />
   </Stroke>
 )

@@ -648,7 +648,12 @@ export const MemberFileTabs = ({
   )
 
   const activityLog = () => (
-    <Section title={MEMBER_COPY.tabLogs} raised={activity.length > 0} bare={activity.length === 0}>
+    <Section
+      title={MEMBER_COPY.tabLogs}
+      maturity="beta"
+      raised={activity.length > 0}
+      bare={activity.length === 0}
+    >
       {activity.length === 0 ? (
         <EmptyState
           figure="notes"
@@ -728,6 +733,7 @@ export const MemberFileTabs = ({
               value: 'socials',
               label: MEMBER_COPY.tabSocials,
               icon: 'link',
+              maturity: 'alpha',
               render: socialsTab,
             },
             {
@@ -741,12 +747,14 @@ export const MemberFileTabs = ({
               value: 'path',
               label: MEMBER_COPY.tabPath,
               icon: 'recruitment',
+              maturity: 'alpha',
               render: pathTab,
             },
             {
               value: 'logs',
               label: MEMBER_COPY.tabLogs,
               icon: 'history',
+              maturity: 'beta',
               visible: canReadLogs || moderation !== undefined,
               render: logsTab,
             },
