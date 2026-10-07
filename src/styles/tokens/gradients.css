@@ -8,24 +8,19 @@
   /* Solid stand-in, what a cut into a rail glyph shows */
   --color-frame: #a047a0;
 
-  /* White ink and washes of the rail standing on the frame */
-  --color-on-frame: #fffefb;
-  --color-on-frame-subtle: rgb(255 254 251 / 0.84);
-  --color-on-frame-wash: rgb(255 254 251 / 0.14);
-  --color-on-frame-raised: rgb(255 254 251 / 0.22);
-  --color-on-frame-line: rgb(255 254 251 / 0.2);
-  --color-on-frame-line-strong: rgb(255 254 251 / 0.34);
-  --color-on-frame-tint: #fffefb;
-  --color-on-frame-blush: #fffefb;
-  --color-on-frame-deep: #fffefb;
-  /* Share of the frame colours the page ground keeps */
-  --page-wash: 100%;
-  --page-base: var(--color-background);
-}
-
-:root.dark {
-  --page-wash: 42%;
-  --page-base: var(--color-surface-sunken);
+  /* Dark ink and washes of the rail standing on the frame */
+  --color-on-frame: #2a2733;
+  --color-on-frame-subtle: rgb(42 39 51 / 0.66);
+  --color-on-frame-wash: rgb(42 39 51 / 0.06);
+  --color-on-frame-raised: rgb(255 255 255 / 0.55);
+  --color-on-frame-line: rgb(42 39 51 / 0.1);
+  --color-on-frame-line-strong: rgb(42 39 51 / 0.18);
+  --color-on-frame-tint: #2a2733;
+  --color-on-frame-blush: #2a2733;
+  --color-on-frame-deep: #2a2733;
+  /* Share of the frame colours the page ground keeps, the rest is a pale neutral, same in both modes */
+  --page-wash: 22%;
+  --page-base: #f4f2f7;
 }
 
 /* Rebuilt on .app-tone so a tone change follows the animated colours */

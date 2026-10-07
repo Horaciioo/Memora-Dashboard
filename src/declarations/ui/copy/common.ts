@@ -78,6 +78,16 @@ export const FIELD_COPY = {
 } as const
 
 /**
+ * Message shown in place of the whole app on a phone
+ * @type {Record<string, string>}
+ */
+
+export const MOBILE_GATE_COPY = {
+  title: 'Memora n’est pour le moment pas disponible sur mobile',
+  description: 'Mais ça arrive très bientôt !',
+} as const
+
+/**
  * Work in progress surfaces
  * @type {Record<string, string>}
  */

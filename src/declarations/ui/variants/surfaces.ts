@@ -6,7 +6,7 @@
 export const SECTION_STYLES = {
   wrapper: 'flex flex-col gap-3',
   header: 'flex flex-wrap items-end justify-between gap-3',
-  heading: 'flex flex-col gap-1',
+  heading: 'flex items-center gap-3',
   title: 'text-xl font-bold tracking-tight uppercase italic',
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
   panel: 'rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface',
@@ -31,13 +31,19 @@ export const PAGE_STYLES = {
   // Title sitting in the notch cut into the bottom edge of the banner
   notch: 'absolute inset-x-0 bottom-0 mx-auto flex w-fit items-stretch',
   notchBody:
-    'banner-notch-body flex min-w-0 max-w-[min(56rem,80vw)] flex-col items-stretch px-6 text-center',
-  notchTitleRow: 'flex min-h-[var(--shell-notch-h)] items-center justify-center pt-1 pb-4',
-  notchTitle: 'min-w-0 text-xl font-bold tracking-wide uppercase md:text-page',
+    'banner-notch-body flex min-w-0 max-w-[min(56rem,80vw)] flex-col items-stretch px-8 text-center',
+  notchTitleRow: 'flex min-h-[var(--shell-notch-h)] items-center justify-center gap-3 pt-2',
+  notchTitleRowFree: 'pb-5',
+  notchTitle:
+    'min-w-0 text-2xl font-semibold tracking-tight text-[var(--color-ink)] md:text-[2rem] md:leading-tight',
+  // Title sits lower when a line follows its divider
+  notchTitleRowNoted: 'pb-2',
   notchTitleText: 'min-w-0 text-balance md:truncate',
   // Tab strip under the title, empty on most pages
   notchTabs:
     'flex w-full justify-center border-t border-[var(--color-border)] pt-4 pb-2 empty:hidden',
+  // Line under the title divider, like the tab strip
+  notchNote: 'flex w-full justify-center border-t border-[var(--color-border)] pt-4 pb-3',
   // Shoulders of the notch
   notchSlopeStart: 'banner-slope banner-slope-start',
   notchSlopeEnd: 'banner-slope banner-slope-end',
@@ -62,8 +68,22 @@ export const PAGE_STYLES = {
  */
 
 export const PAGE_BANNER = {
-  art: 'banner-wash absolute inset-0 bg-[image:var(--gradient-frame)]',
+  art: 'banner-shade absolute inset-0 bg-[image:var(--gradient-frame)]',
   image: 'h-full w-full object-cover dark:brightness-[0.82]',
+} as const
+
+/**
+ * Centred title of every dialog and drawer
+ * @type {Record<string, string>}
+ */
+
+export const MODAL_HEADER = {
+  root: 'relative flex shrink-0 flex-col items-center gap-3 px-14 pt-7 pb-5 text-center sm:px-16',
+  close: 'absolute top-3 right-3',
+  glyph:
+    'flex size-12 items-center justify-center rounded-full bg-[var(--color-surface-sunken)] text-[var(--color-ink)]',
+  glyphIcon: 'size-6',
+  title: 'min-w-0 text-lg leading-tight font-bold tracking-wide text-balance uppercase',
 } as const
 
 /**
@@ -114,10 +134,8 @@ export const DIALOG_STYLES = {
     'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-scrim)] backdrop-blur-sm sm:items-center sm:p-6',
   panel:
     'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/90 shadow-[var(--shadow-lg)] backdrop-blur-2xl backdrop-saturate-150 sm:rounded-[var(--radius-xl)]',
-  header: 'flex items-start gap-3 px-6 pt-6 pb-4 sm:px-8',
-  heading: 'flex min-w-0 flex-1 flex-col gap-1',
-  title: 'text-xl leading-tight font-bold tracking-tight',
-  close: '-mt-1 -mr-2 shrink-0',
+  // Line under the banner
+  subheader: 'px-6 pt-4 sm:px-8',
   body: 'flex-1 overflow-y-auto border-t border-[var(--color-border)] px-6 py-6 sm:px-8',
   // Tabs already rule the top
   bodyFlush: 'border-t-0 pt-1',
@@ -152,13 +170,6 @@ export const DRAWER_STYLES = {
   // Bottom sheet on mobile, floating card from md
   panel:
     'drawer-enter fixed inset-x-0 bottom-0 z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
-  header: 'flex shrink-0 items-center gap-3.5 px-6 pt-5 pb-4',
-  // Glyph in a soft chip
-  glyph:
-    'flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[image:var(--gradient-soft)] text-[var(--color-ink)]',
-  glyphIcon: 'h-5 w-5',
-  title: 'min-w-0 flex-1 truncate text-lg leading-tight font-bold tracking-tight',
-  close: '-mr-2 shrink-0',
   // Section tabs under the header
   sections: 'shrink-0 px-6 pb-2',
   body: 'min-h-0 flex-1 overflow-y-auto px-6 py-5',
@@ -265,11 +276,15 @@ export const AVATAR_STYLES = {
   md: 'h-10 w-10 text-sm',
   lg: 'h-16 w-16 text-lg',
   xl: 'h-24 w-24 text-2xl',
+  hero: 'h-36 w-36 text-5xl sm:h-44 sm:w-44',
   stack: 'flex items-center -space-x-2',
   ring: 'ring-2 ring-[var(--color-surface-raised)]',
 } as const
 
-export type AvatarSize = Extract<keyof typeof AVATAR_STYLES, 'xs' | 'sm' | 'md' | 'lg' | 'xl'>
+export type AvatarSize = Extract<
+  keyof typeof AVATAR_STYLES,
+  'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'hero'
+>
 
 /**
  * Corner ribbon styles

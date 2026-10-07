@@ -1,34 +1,101 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 
+// Box of the app (frosted card, border, shadow), greyed a little for the words of a course
+export const COURSE_PANEL =
+  'rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface bg-[color-mix(in_srgb,var(--color-surface-sunken)_40%,var(--color-surface))]'
+
 /**
- * Catalogue of interactive courses
+ * Catalogue of interactive courses: a stage for the course in focus and a carousel to pick from
  * @type {Record<string, string>}
  */
 
 export const COURSE_CATALOG = {
-  page: 'mx-auto flex w-full max-w-6xl flex-col gap-14',
+  page: 'mx-auto flex w-full max-w-6xl flex-col gap-10',
   group: 'flex flex-col gap-6',
-  head: 'flex flex-wrap items-baseline gap-x-4 gap-y-1',
   title: 'text-2xl font-bold tracking-tight sm:text-3xl',
-  lead: 'text-sm text-[var(--color-ink-subtle)]',
-  grid: 'grid gap-7 sm:grid-cols-2 xl:grid-cols-3',
-  card: 'group flex h-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface transition-[border-color,transform] duration-[var(--motion-duration-panel)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
-  poster: 'block aspect-[17/10] w-full',
-  body: 'flex flex-1 flex-col gap-3 p-6',
-  surface: `flex items-center gap-2 ${PROPERTY_LABEL}`,
-  surfaceIcon: 'h-4 w-4',
-  name: 'text-xl leading-tight font-bold tracking-tight text-balance',
-  summary: 'text-body leading-relaxed text-[var(--color-ink-subtle)]',
-  foot: 'mt-auto flex flex-col gap-3.5 pt-3',
-  steps: 'flex gap-1',
-  step: 'h-1.5 flex-1 rounded-full bg-[var(--color-border-strong)]',
-  stepDone: 'bg-[var(--color-brand-600)]',
-  footRow: 'flex items-center justify-between gap-3',
-  meta: 'text-sm text-[var(--color-ink-subtle)]',
+  // Stage of the selected course: photo alone on top, words and progress below
+  stage:
+    'relative isolate flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-md)]',
+  stagePhoto: 'size-full object-cover',
+  stageBand: 'relative block h-40 overflow-hidden sm:h-52',
+  stageShade:
+    'absolute inset-0 bg-gradient-to-t from-[color-mix(in_oklab,var(--color-media-shade)_55%,transparent)] to-transparent',
+  stageTop: 'absolute top-4 left-4 flex flex-wrap items-center gap-2',
+  stageSurface: `flex items-center gap-2 rounded-[var(--radius-full)] bg-[color-mix(in_oklab,var(--color-media-shade)_55%,transparent)] px-3 py-1 ${PROPERTY_LABEL} text-[var(--color-on-media)]`,
+  stageBody: 'grid gap-6 p-5 sm:p-7 md:grid-cols-[minmax(0,1fr)_20rem] md:gap-10',
+  stageText: 'flex min-w-0 flex-col gap-3',
+  stageKicker: `${PROPERTY_LABEL} text-[var(--color-ink-subtle)]`,
+  stageName: 'text-2xl leading-tight font-bold tracking-tight text-balance sm:text-3xl',
+  stageSummary: 'max-w-2xl text-body leading-relaxed text-[var(--color-ink-subtle)]',
+  stageSide: 'flex flex-col gap-4 md:border-l md:border-[var(--color-border)] md:pl-8',
+  stageProgress: 'flex flex-col gap-2',
+  stageProgressLabel: `${PROPERTY_LABEL} text-[var(--color-ink-subtle)]`,
+  stageProgressValue: 'text-body font-bold tabular-nums',
+  stageMeta:
+    'flex flex-wrap gap-x-4 gap-y-1 text-caption font-semibold text-[var(--color-ink-subtle)]',
+  stageSteps: 'flex gap-1',
+  stageStep: 'h-1.5 flex-1 rounded-full bg-[var(--color-border-strong)]',
+  stageStepDone: 'bg-[var(--color-ink)]',
+  stageAction:
+    'inline-flex items-center justify-center gap-2 rounded-[var(--radius-full)] bg-[var(--color-brand-600)] px-5 py-2.5 text-body font-bold text-[var(--color-on-brand)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
+  actionIcon: 'size-4 transition-transform group-hover:translate-x-0.5',
+  // Heading of a group, with what it is for
+  groupLead: 'text-body text-[var(--color-ink-subtle)]',
+  // Carousel
+  carouselHead: 'flex items-center justify-between gap-4',
+  carouselArrows: 'flex gap-2',
+  arrow:
+    'flex size-10 items-center justify-center rounded-[var(--radius-full)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)] disabled:opacity-35 disabled:hover:bg-[var(--color-surface-raised)]',
+  arrowIcon: 'size-4',
+  track:
+    '-mx-3 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth scroll-px-3 px-3 pt-3 pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+  tile: 'group relative flex w-72 shrink-0 snap-start flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface text-left transition-[transform,box-shadow] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-spring)] hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] active:scale-[0.98] sm:w-[22rem]',
+  tileSelected:
+    'ring-2 ring-[var(--color-brand-600)] ring-offset-2 ring-offset-[var(--color-page)] shadow-[var(--shadow-lg)]',
+  infoList: 'flex flex-col gap-2',
+  infoLine: 'flex items-center gap-2.5 text-caption font-semibold',
+  infoBullet: 'size-3 shrink-0 text-[var(--color-brand-600)]',
+  tileDoneCard: 'bg-[var(--color-surface-sunken)]',
+  tilePhoto: 'relative block aspect-[4/3] overflow-hidden',
+  tileImage:
+    'size-full object-cover transition-transform duration-[var(--motion-duration-slow)] group-hover:scale-110',
+  tileImageDone: 'grayscale',
+  tileShade: 'absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent',
+  tileTag:
+    'absolute top-3 left-3 rounded-[var(--radius-full)] bg-[var(--color-brand-600)] px-2.5 py-1 text-micro font-bold tracking-wide text-[var(--color-on-brand)] uppercase shadow-[var(--shadow-sm)]',
+  tileSurfaceIcon: 'size-4',
+  // Title over the foot of the banner
+  tileTitle:
+    'absolute inset-x-0 bottom-0 p-4 text-body leading-snug font-bold tracking-tight text-balance text-[var(--color-on-media)]',
+  tileBody: 'flex flex-1 flex-col gap-3 p-4',
+  tileState: 'mt-auto text-caption font-bold text-[var(--color-ink)]',
+  tileDone: 'text-[var(--color-ink-subtle)]',
+  // Specialisation waiting for its period
+  tileLocked:
+    'group relative flex w-64 shrink-0 snap-start cursor-not-allowed flex-col overflow-hidden rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] sm:w-[22rem]',
+  lockedBanner:
+    'relative flex aspect-[4/3] items-center justify-center gap-3 bg-[var(--color-border)]',
+  lockedGlyph: 'size-11 drop-shadow-[var(--shadow-sm)]',
+  lockedBody: 'flex flex-1 flex-col justify-center gap-3 p-4',
+  lockedName: 'text-body font-bold tracking-widest text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Bubble announcing new courses, floating beside the page
+ * @type {Record<string, string>}
+ */
+
+export const COURSE_UNLOCK = {
+  root: 'surface-enter fixed right-6 bottom-6 z-[60] flex w-[min(22rem,calc(100vw-3rem))] flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 shadow-[var(--shadow-lg)]',
+  head: 'flex items-start gap-3',
+  glyph: 'size-8 shrink-0 text-[var(--color-ink-accent)]',
+  title: 'min-w-0 flex-1 text-body leading-snug font-bold tracking-tight',
+  close:
+    'flex size-7 shrink-0 items-center justify-center rounded-[var(--radius-full)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  closeIcon: 'size-4',
+  text: 'text-sm text-[var(--color-ink-subtle)]',
   action:
-    'inline-flex items-center gap-1.5 text-body font-bold whitespace-nowrap text-[var(--color-ink-accent)]',
-  actionIcon: 'h-4 w-4 transition-transform group-hover:translate-x-0.5',
-  done: 'text-[var(--color-success)]',
+    'self-start rounded-[var(--radius-full)] bg-[var(--color-brand-600)] px-5 py-2.5 text-sm font-bold text-[var(--color-on-brand)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
 } as const
 
 /**
@@ -39,44 +106,24 @@ export const COURSE_CATALOG = {
 export const COURSE_PLAYER = {
   page: 'mx-auto flex w-full max-w-6xl flex-col gap-8',
   back: 'inline-flex items-center gap-2 self-start text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] lg:hidden',
-  hero: 'relative flex flex-col gap-4 overflow-hidden rounded-[var(--radius-xl)] p-8 text-[var(--color-on-media)] shadow-[var(--shadow-md)] sm:p-10',
-  heroSurface: `flex items-center gap-2 ${PROPERTY_LABEL} text-[var(--color-on-media)]/85`,
-  heroTitle: 'max-w-3xl text-3xl leading-tight font-bold tracking-tight text-balance sm:text-5xl',
-  heroSummary: 'max-w-2xl text-base leading-relaxed text-[var(--color-on-media)]/90 sm:text-lg',
-  heroMeta:
-    'flex flex-wrap gap-x-5 gap-y-1 font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-on-media)]/85 uppercase',
   // One chapter at a time
   stage: 'flex min-w-0 flex-col gap-10',
-  slideForward: 'course-slide-forward',
-  slideBack: 'course-slide-back',
-  chapterHead: 'flex flex-col items-center gap-3 text-center',
-  chapterTitle: 'text-3xl leading-tight font-bold tracking-tight text-balance sm:text-5xl',
-  chapterDivider: 'h-px w-24 bg-[var(--color-border-strong)]',
-  chapterCount: PROPERTY_LABEL,
-  // Screen on display, filling the height
-  step: 'flex min-h-[55dvh] flex-col justify-center gap-8',
-  blocks: 'flex flex-col gap-8',
-  // Each block writes itself in turn
-  reveal: 'course-reveal',
+  // Screen and its footer
+  body: 'flex flex-col gap-16',
+  // Screen on display, anchored at the top so writing never moves it
+  step: 'flex min-h-[55dvh] shrink-0 flex-col justify-start gap-8',
+  // A wide gap between two subjects
+  blocks: 'flex flex-col gap-16',
   // Reading column of an ordinary block
   column: 'mx-auto w-full max-w-4xl text-lg',
-  // Welcome screen
-  welcome: 'mx-auto flex w-full max-w-3xl flex-col items-center gap-6 text-center',
-  welcomeHello: 'text-4xl font-bold tracking-tight sm:text-6xl',
-  welcomeLine: 'text-xl leading-relaxed text-balance text-[var(--color-ink)] sm:text-2xl',
-  welcomeList: 'flex flex-wrap items-center justify-center gap-2',
-  welcomeChip:
-    'flex items-center gap-2 rounded-full glass-soft px-3.5 py-1.5 text-sm font-semibold text-[var(--color-ink)]',
-  // Sliding hint under the screen
-  hint: 'flex flex-col items-center gap-1 pb-6 text-center',
-  hintButton:
-    'course-bounce flex flex-col items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] disabled:cursor-not-allowed disabled:opacity-60',
-  hintGlyph: 'size-5',
-  stepCount: 'text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  // Thin rule that stops short of both edges
-  foot: 'flex flex-col items-center gap-4 pb-6',
-  rule: 'h-px w-[calc(100%-4rem)] bg-[var(--color-border)]',
-  footHint: 'text-sm text-[var(--color-ink-subtle)]',
+  // Words take the whole width of the page
+  lead: 'w-full',
+  // A box with a figure on its corner
+  beside: 'relative flex flex-col gap-6 lg:block',
+  // Back on the left, on to the next on the right, what is missing under both
+  foot: 'flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-[var(--color-border)] pt-6 pb-6',
+  footGlyph: 'size-4',
+  footHint: 'basis-full text-center text-sm text-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -85,11 +132,36 @@ export const COURSE_PLAYER = {
  */
 
 export const COURSE_READ = {
-  text: 'max-w-prose text-base leading-relaxed',
-  callout: 'flex gap-4 rounded-[var(--radius-lg)] border-2 p-5',
-  calloutIcon: 'mt-0.5 h-6 w-6 shrink-0',
-  calloutBody: 'flex min-w-0 flex-col gap-1',
-  calloutTitle: 'text-base font-bold tracking-tight',
+  text: 'text-xl leading-relaxed',
+  // A subject: a heading, then its words
+  section: 'flex flex-col gap-4',
+  heading: 'text-2xl font-bold tracking-tight',
+  // A subject's words on a quiet panel
+  panel: `flex flex-col gap-8 ${COURSE_PANEL} p-5 sm:p-6`,
+  // Note: a quiet panel, a chip for the glyph, a property title
+  callout: `flex items-start gap-4 ${COURSE_PANEL} p-5 sm:p-6`,
+  calloutChip:
+    'grid size-10 shrink-0 place-items-center rounded-[var(--radius-lg)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
+  // Inside a panel: smaller, a touch darker than the panel around it
+  calloutNested:
+    'gap-3 bg-[color-mix(in_srgb,var(--color-ink)_5%,color-mix(in_srgb,var(--color-surface-sunken)_40%,var(--color-surface)))] p-4 sm:p-4',
+  calloutChipNested: 'size-8',
+  calloutTextNested: 'text-base',
+  calloutIcon: 'size-5',
+  // Chapters of the course, listed
+  plan: 'flex flex-col gap-4',
+  planTitle: 'text-xl font-bold tracking-tight',
+  planList: 'flex flex-col gap-2',
+  planItem: 'flex items-baseline gap-4 text-lg font-semibold',
+  planIndex: 'w-6 shrink-0 text-base font-bold tabular-nums text-[var(--color-ink-subtle)]',
+  calloutBody: 'flex min-w-0 flex-col gap-1.5',
+  calloutTitle: `${PROPERTY_LABEL} pt-1`,
+  calloutText: 'text-lg leading-relaxed text-[var(--color-ink-subtle)]',
+  ask: 'flex flex-col gap-6',
+  askPrompt: 'text-2xl font-bold tracking-tight',
+  askActions: 'flex flex-wrap gap-3',
+  // Aside under the buttons, no panel of its own
+  askNote: 'text-base text-[var(--color-ink-subtle)]',
   steps: 'flex flex-col',
   stepsTitle: 'mb-4 text-lg font-bold tracking-tight',
   step: 'relative flex gap-5 pb-8 last:pb-0',
@@ -144,6 +216,9 @@ export const COURSE_CHAT = {
 export const COURSE_EXERCISE = {
   frame:
     'flex flex-col gap-5 rounded-[var(--radius-xl)] border-2 border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)] transition-colors sm:p-7',
+  // No card around it: a heading, then its parts
+  bare: 'flex flex-col gap-8',
+  bareTitle: COURSE_READ.heading,
   framePassed: 'border-[var(--color-success)]',
   frameFailed: 'border-[var(--color-danger)]',
   head: 'flex items-center gap-3',
@@ -301,27 +376,6 @@ export const LEGACY_TRACK = {
 } as const
 
 /**
- * Horizontal timeline of a course: numbered circles joined by dashes that fill as the chapter is read
- * @type {Record<string, string>}
- */
-
-export const COURSE_TIMELINE = {
-  bar: 'sticky top-4 z-20 mx-auto w-fit max-w-full overflow-x-auto rounded-full border glass-panel px-6 py-3',
-  track: 'flex min-w-max items-center',
-  node: 'relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold tabular-nums transition-colors duration-[var(--motion-duration-panel)]',
-  // Only the glyph, no disc
-  nodeDone: 'border-transparent text-[var(--color-success)]',
-  nodeNow:
-    'border-[var(--color-info)] bg-[var(--color-info)] text-[var(--color-on-media)] shadow-[0_0_0_4px_var(--color-info-soft)]',
-  nodeNext:
-    'border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] text-[var(--color-ink-subtle)]',
-  link: 'relative mx-2 h-0.5 min-w-10 flex-1 bg-[repeating-linear-gradient(90deg,var(--color-border-strong)_0_6px,transparent_6px_12px)]',
-  fill: 'absolute inset-y-0 left-0 transition-[width] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)]',
-  fillDone: 'bg-[repeating-linear-gradient(90deg,var(--color-success)_0_6px,transparent_6px_12px)]',
-  fillNow: 'bg-[repeating-linear-gradient(90deg,var(--color-info)_0_6px,transparent_6px_12px)]',
-} as const
-
-/**
  * Chapters listed in the left sidebar while a course is open
  * @type {Record<string, string>}
  */
@@ -332,30 +386,38 @@ export const COURSE_RAIL = {
   head: 'flex flex-col gap-1 px-2',
   surface: `flex items-center gap-2 ${PROPERTY_LABEL}`,
   name: 'text-base leading-snug font-bold text-balance',
-  list: 'flex flex-col',
-  item: 'relative flex items-start gap-3 rounded-[var(--radius-md)] px-2 pt-1.5 pb-5 text-left text-sm font-medium last:pb-1.5',
+  // Plain line through the course, solid as it is read
+  list: 'relative flex flex-col gap-1 pr-3 pl-5',
+  track: 'absolute inset-y-3 left-1 w-px bg-[var(--color-border-strong)]',
+  trackFill:
+    'absolute inset-x-0 top-0 w-px bg-[var(--color-ink-accent)] transition-[height] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)]',
+  item: 'relative flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-left text-sm font-medium',
   itemOpen: 'cursor-pointer transition-colors hover:bg-[var(--color-hover)]',
-  itemLocked: 'cursor-not-allowed opacity-60',
-  node: 'relative z-[1] flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold tabular-nums',
-  nodeDone: 'border-transparent text-[var(--color-success)]',
-  nodeNow: 'border-[var(--color-info)] bg-[var(--color-info)] text-[var(--color-on-media)]',
-  nodeNext: 'border-[var(--color-border-strong)] bg-[var(--color-surface-raised)]',
-  line: 'absolute top-9 bottom-0 left-[1.3125rem] w-0 border-l-2 border-dashed',
-  lineDone: 'border-[var(--color-success)]',
-  lineNext: 'border-[var(--color-border-strong)]',
-  title: 'min-w-0 pt-0.5 leading-snug',
+  itemLocked: 'cursor-not-allowed text-[var(--color-ink-subtle)]',
+  itemNow: 'font-bold',
+  // Chapter number
+  index:
+    'relative grid size-6 shrink-0 place-items-center rounded-[var(--radius-sm)] text-caption font-bold tabular-nums',
+  indexDone: 'text-[var(--color-ink-subtle)]',
+  indexNow: 'text-[var(--color-ink)]',
+  // Box of the screen being read, swells and fades away
+  ping: 'course-echo absolute inset-0 rounded-[var(--radius-sm)] bg-[var(--color-ink)]',
+  indexNext: 'text-[var(--color-ink-subtle)]',
+  title: 'min-w-0 leading-snug',
   titleNow: 'font-bold',
-  // Screens under the open chapter
-  steps:
-    'mt-2 ml-1 flex flex-col gap-0.5 border-l-2 border-dashed border-[var(--color-border-strong)] pl-3',
+  // Screens under the open chapter, one segment each
+  steps: 'mt-1 mb-2 ml-3 flex flex-col gap-0.5',
   stepItem:
-    'flex items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1 text-left text-xs font-medium text-[var(--color-ink-subtle)]',
+    'flex items-center gap-2 rounded-[var(--radius-sm)] px-3 py-1 text-left text-xs font-medium text-[var(--color-ink-subtle)]',
   stepOpen:
     'cursor-pointer transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   stepNow: 'font-bold text-[var(--color-ink)]',
   stepLocked: 'cursor-not-allowed opacity-60',
-  stepGlyph: 'size-3.5 shrink-0 text-[var(--color-success)]',
-  stepDot: 'size-1.5 shrink-0 rounded-full bg-current',
+  stepNumber:
+    'relative grid h-5 w-8 shrink-0 place-items-center rounded-[var(--radius-sm)] text-[0.6875rem] font-semibold tabular-nums',
+  stepNumberDone: 'text-[var(--color-ink-subtle)]',
+  stepNumberNow:
+    'bg-[var(--color-surface-raised)] text-[var(--color-ink)] ring-1 ring-[var(--color-ink)]',
 } as const
 
 /**
@@ -370,6 +432,34 @@ export const COURSE_TONES = {
   success: 'bg-[var(--color-success-soft)] text-[var(--color-success)]',
   caution: 'bg-[var(--color-caution-soft)] text-[var(--color-caution)]',
   danger: 'bg-[var(--color-danger-soft)] text-[var(--color-danger)]',
+} as const
+
+/**
+ * Text colour of a role name
+ * @type {Record<string, string>}
+ */
+
+export const COURSE_TONE_TEXT = {
+  neutral: 'text-[var(--color-ink)]',
+  brand: 'text-[var(--color-ink-accent)]',
+  info: 'text-[var(--color-info)]',
+  success: 'text-[var(--color-success)]',
+  caution: 'text-[var(--color-caution)]',
+  danger: 'text-[var(--color-danger)]',
+} as const
+
+/**
+ * Colour of the bold words of a text
+ * @type {Record<string, string>}
+ */
+
+export const COURSE_STRONG_TONES = {
+  neutral: '',
+  brand: '[&_strong]:text-[var(--color-ink-accent)]',
+  info: '[&_strong]:text-[var(--color-info)]',
+  success: '[&_strong]:text-[var(--color-success)]',
+  caution: '[&_strong]:text-[var(--color-caution)]',
+  danger: '[&_strong]:text-[var(--color-danger)]',
 } as const
 
 /**
@@ -466,4 +556,20 @@ export const TRAINING_FEEDBACK = {
   meta: 'text-[var(--color-ink-subtle)] tabular-nums',
   comment: 'col-start-2 text-sm whitespace-pre-line',
   empty: 'text-sm text-[var(--color-ink-subtle)] italic',
+} as const
+
+/**
+ * Voice channel animation
+ * @type {Record<string, string>}
+ */
+
+export const COURSE_VOICE = {
+  // Straddles the bottom right corner
+  list: 'flex w-full flex-col gap-0.5 rounded-[var(--radius-xl)] bg-[var(--discord-sidebar)] p-3 text-[var(--discord-channel)] shadow-[var(--shadow-md)] lg:absolute lg:right-0 lg:bottom-0 lg:z-10 lg:w-64 lg:translate-x-[20%] lg:translate-y-[30%] lg:rotate-2',
+  channel: 'replica-channel-in flex flex-col gap-0.5',
+  row: 'flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1.5 font-semibold',
+  rowIcon: 'h-5 w-5 shrink-0 opacity-80',
+  member:
+    'replica-channel-in flex items-center gap-2 rounded-[var(--radius-sm)] py-0.5 pr-2 pl-8 text-sm text-[var(--discord-text)]',
+  avatar: 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold',
 } as const

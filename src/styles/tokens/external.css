@@ -40,6 +40,12 @@
   --twitch-muted: #adadb8;
   --twitch-purple: #9147ff;
   --twitch-flag: rgb(235 4 40 / 0.22);
+  --twitch-ground: #0e0e10;
+  --twitch-border: #2f2f35;
+  --twitch-border-strong: #464649;
+  --twitch-lilac: #bf94ff;
+  --twitch-purple-wash: #2a1d45;
+  --twitch-purple-deep: #1f1630;
   --youtube-background: #0f0f0f;
   --youtube-line: #272727;
   --youtube-text: #f1f1f1;
@@ -50,4 +56,32 @@
   --chat-creator: #ffd600;
   --chat-vip: #e005b9;
   --chat-bot: #5b8def;
+}
+
+/* The Mod View of a Twitch lesson wears Twitch's dark panels and purple in both themes */
+.skin-twitch {
+  --color-surface-raised: var(--twitch-background);
+  --color-surface: var(--twitch-ground);
+  --color-surface-sunken: var(--twitch-ground);
+  --color-border: var(--twitch-border);
+  --color-border-strong: var(--twitch-border-strong);
+  --color-ink: var(--twitch-text);
+  --color-ink-subtle: var(--twitch-muted);
+  --color-hover: color-mix(in srgb, var(--twitch-text) 8%, transparent);
+  --color-brand-50: var(--twitch-purple-deep);
+  --color-brand-100: var(--twitch-purple-wash);
+  --color-brand-600: var(--twitch-purple);
+  --color-brand-800: var(--twitch-lilac);
+  --color-brand-soft: color-mix(in srgb, var(--twitch-purple) 22%, transparent);
+  --color-pick: var(--twitch-lilac);
+  --color-on-brand: var(--twitch-text);
+  --radius-xl: var(--radius-xs);
+  --radius-lg: var(--radius-xs);
+  --radius-md: var(--radius-xs);
+  --shadow-sm: none;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  background: var(--twitch-ground);
+  color: var(--twitch-text);
+  color-scheme: dark;
 }

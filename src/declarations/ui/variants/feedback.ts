@@ -24,8 +24,7 @@ export const BRAND_LOADER = {
   tile: 'inline-flex shrink-0 items-center justify-center',
   tileMark: 'loader-gif h-10 w-auto',
   // Centred in a panel waiting on its data
-  block:
-    'flex min-h-48 w-full flex-col items-center justify-center gap-3 py-10',
+  block: 'flex min-h-48 w-full flex-col items-center justify-center gap-3 py-10',
   blockTile: 'inline-flex items-center justify-center',
   blockMark: 'loader-gif h-16 w-auto',
   // Inside a pink button
@@ -139,13 +138,29 @@ export const ADD_ROW_STYLES = {
  */
 
 export const MATURITY_STYLES = {
-  // Flat, no frame
-  tag: 'inline-flex shrink-0 items-center gap-1 font-[family-name:var(--font-mono)] text-micro leading-none font-medium tracking-wide text-[var(--color-ink)] uppercase',
-  progress: 'text-[var(--color-ink-subtle)]',
-  star: 'h-2.5 w-2.5 text-[var(--color-ink-accent)]',
-  link: 'underline-offset-4 hover:underline',
-  row: 'flex items-start gap-3 text-sm',
+  // Solid box, white word, a star on the right edge
+  tag: 'relative isolate inline-flex shrink-0 items-center overflow-hidden rounded-[0.45rem] pt-[0.34rem] pr-3 pb-[0.3rem] pl-2 text-[0.625rem] leading-none font-bold tracking-[0.14em] text-white uppercase shadow-[0_1px_2px_rgb(0_0_0/0.18)] [text-shadow:0_1px_0_rgb(0_0_0/0.18)]',
+  // Rail size keeps a line of navigation wider than its tag
+  compact: 'rounded-[0.35rem] pt-[0.24rem] pr-2 pb-[0.2rem] pl-1.5 text-[0.5rem] tracking-[0.1em]',
+  // Four-pointed star, never on the very corner
+  star: 'pointer-events-none absolute top-[2px] right-[7%] h-[0.4rem] w-[0.4rem] text-white/90',
+  // Softer light over the top half
+  sheen:
+    'pointer-events-none absolute inset-x-0 top-0 -z-10 h-1/2 bg-gradient-to-b from-white/25 to-transparent',
+  fills: {
+    alpha: 'bg-gradient-to-br from-slate-500 to-slate-700',
+    beta: 'bg-gradient-to-br from-[var(--color-brand-700)] to-[var(--color-brand-800)]',
+    // Same gold as the news cards, the star in white to show on it
+    new: 'bg-gradient-to-br from-[var(--color-gold-100)] via-[var(--color-gold-300)] to-[var(--color-gold-400)] text-black [text-shadow:none] ring-1 ring-inset ring-[var(--color-gold-400)]/40 [&>svg]:text-white',
+    deprecated: 'bg-gradient-to-br from-red-600 to-red-800',
+  },
+  link: 'transition-[transform,filter] hover:-translate-y-px hover:brightness-110 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  // Tag column of one width, so every meaning starts at the same place
+  list: 'flex flex-col gap-4',
+  row: 'grid grid-cols-[6.5rem_minmax(0,1fr)] items-center gap-4 text-sm',
   meaning: 'text-[var(--color-ink-subtle)]',
+  rule: 'h-px w-full bg-[var(--color-border)]',
+  actions: 'flex flex-col gap-4',
 } as const
 
 /**
@@ -188,6 +203,14 @@ export const NOTIFICATION_STYLES = {
   action:
     'ml-auto inline-flex items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2 py-0.5 text-xs font-semibold transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   actionIcon: 'h-3 w-3',
+  // Shows on the row under the pointer
+  remove:
+    'absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-ink-subtle)] opacity-0 transition-[opacity,background-color] group-hover/row:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:opacity-100',
+  removeIcon: 'h-3.5 w-3.5',
+  // Board toolbar and its older-entries button
+  tools: 'flex flex-wrap items-center justify-between gap-3 pb-3',
+  filters: 'flex items-center gap-1',
+  more: 'flex justify-center pt-4',
 } as const
 
 /**

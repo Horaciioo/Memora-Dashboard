@@ -55,6 +55,10 @@
   --color-gold-100: #fff3c4;
   --color-gold-300: #fbd45a;
   --color-gold-400: #f2b705;
+  /* Same ramp as the gold, in red, for a live on air */
+  --color-live-100: #ffe3e0;
+  --color-live-300: #ff9c94;
+  --color-live-400: #f0625a;
   --color-caution-soft: #2e2511;
   --color-warning-soft: #30220f;
   --color-danger-soft: #3a181c;

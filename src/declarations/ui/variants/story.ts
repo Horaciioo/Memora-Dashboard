@@ -35,6 +35,20 @@ export const ACTION_ROW = {
 } as const
 
 /**
+ * Guides replay card: glyph, words, action
+ * @type {Record<string, string>}
+ */
+
+export const GUIDES_CARD = {
+  card: 'flex flex-wrap items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4',
+  glyph: 'size-10 shrink-0 text-[var(--color-ink-subtle)]',
+  body: 'flex min-w-0 flex-1 basis-60 flex-col gap-1',
+  title: 'text-sm font-semibold',
+  lead: 'text-sm leading-snug',
+  hint: 'text-xs leading-snug text-[var(--color-ink-subtle)]',
+} as const
+
+/**
  * Profile card beside the settings tabs
  * @type {Record<string, string>}
  */

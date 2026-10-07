@@ -101,8 +101,8 @@ export const CALENDAR_SIDEBAR = {
   rail: 'flex flex-col gap-4 md:hidden',
   railBody: 'flex-col gap-6',
   // Sidebar version
-  panel: 'flex min-h-0 w-full flex-1 flex-col gap-5 overflow-y-auto px-3',
-  back: 'flex items-center gap-2 rounded-[var(--radius-md)] px-2 py-2 text-sm font-semibold transition-colors hover:bg-[var(--color-hover)]',
+  panel: 'flex min-h-0 w-full flex-1 flex-col gap-5 overflow-y-auto px-4 pt-5 pb-4',
+  back: 'flex items-center gap-3 rounded-[var(--radius-lg)] px-3 py-2 text-body font-medium transition-colors hover:bg-[var(--color-surface)]',
   toggle:
     'flex w-full items-center justify-between rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-3 text-sm font-semibold',
   mini: 'flex flex-col gap-2',
@@ -117,19 +117,21 @@ export const CALENDAR_SIDEBAR = {
     'bg-[var(--color-brand-600)] text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
   miniDayInRange: 'bg-[var(--color-brand-100)]',
   miniDayPicked: 'ring-2 ring-[var(--color-pick)] ring-inset',
-  group: 'flex flex-col gap-1',
-  groupTitle: 'px-2 pb-1 text-xs font-bold tracking-wide text-[var(--color-ink)] uppercase',
-  row: 'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-hover)]',
+  group: 'flex flex-col gap-px',
+  groupTitle:
+    'px-3 pb-2 text-caption font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  row: 'flex w-full items-center gap-3 rounded-[var(--radius-lg)] px-3 py-2 text-left text-body font-medium transition-colors hover:bg-[var(--color-surface)]',
   rowLabel: 'min-w-0 flex-1 truncate',
   mark: 'flex size-6 shrink-0 items-center justify-center',
-  markOn: 'rounded-full text-[var(--color-on-accent)]',
-  markCheck: 'size-4',
+  markOff: 'opacity-45 grayscale',
   // A switched off row reads in retreat
   rowOff: 'text-[var(--color-ink-subtle)]',
-  rowGlyph: 'size-5 shrink-0 text-[var(--color-ink-subtle)]',
+  rowGlyph: 'size-5 shrink-0 opacity-70',
+  // A selected calendar turns its glyph green
+  rowGlyphOn: 'text-[color-mix(in_srgb,var(--color-success)_70%,black)] opacity-100',
   // Bar standing where the global search stands
   searchBar:
-    'flex w-full items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface-raised)] px-2.5 py-2 text-[var(--color-ink-subtle)] focus-within:text-[var(--color-ink)]',
+    'glass-panel flex w-full items-center gap-2.5 rounded-[var(--radius-lg)] border px-3.5 py-3 text-[var(--color-ink-subtle)] focus-within:text-[var(--color-ink)]',
   searchInput:
     'min-w-0 flex-1 bg-transparent text-body text-[var(--color-ink)] outline-none placeholder:text-[var(--color-ink-subtle)]',
   search:

@@ -57,6 +57,7 @@
 }
 
 .toast-pile > [data-toast] {
+  top: 0;
   z-index: calc(100 - var(--toast-depth));
   transform: translateY(calc(var(--toast-direction) * var(--toast-depth) * var(--toast-peek)))
     scale(calc(1 - var(--toast-depth) * var(--toast-shrink)));
@@ -67,11 +68,6 @@
   transition:
     transform var(--motion-duration-panel) var(--motion-ease-out),
     opacity var(--motion-duration-panel) var(--motion-ease-out);
-}
-
-/* Anchored on the pile's leading edge */
-.toast-pile > [data-toast] {
-  top: 0;
 }
 
 /* Gathered, a back toast is cut to the front one's height */
@@ -112,7 +108,7 @@
   }
 }
 
-/* Notification bubble aimed at a rail entry (src/composites/notifications/NudgeBubble.tsx) */
+/* Notification bubble */
 .nudge-enter {
   transform-origin: left center;
   animation: nudge-enter var(--motion-duration-panel) var(--motion-ease-out) both;
@@ -227,11 +223,6 @@
   }
 }
 
-/* Bubble sliding out of its entry */
-.nudge-enter {
-  animation: nudge-enter var(--motion-duration-panel) var(--motion-ease-spring) both;
-}
-
 @keyframes nudge-enter {
   from {
     opacity: 0;
@@ -242,5 +233,43 @@
     opacity: 1;
     translate: 0 0;
     scale: 1;
+  }
+}
+
+/* Live card: a halo breathing around the logo and a band of light crossing the card */
+.live-halo {
+  animation: live-halo 2.4s ease-out infinite;
+}
+
+@keyframes live-halo {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.22);
+  }
+}
+
+.live-card::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: -40%;
+  width: 30%;
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  pointer-events: none;
+  animation: live-card-sheen 5s ease-in-out infinite;
+}
+
+@keyframes live-card-sheen {
+  0% {
+    left: -40%;
+  }
+  35%,
+  100% {
+    left: 130%;
   }
 }

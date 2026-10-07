@@ -97,6 +97,7 @@ import {
   ItalicGlyph,
   LinkGlyph,
   MenuGlyph,
+  SidebarGlyph,
   MoreGlyph,
   NextGlyph,
   OrderedListGlyph,
@@ -113,6 +114,7 @@ import {
   DropGlyph,
   ParagraphGlyph,
   RuleGlyph,
+  VoiceGlyph,
 } from '@/components/elements/display/Glyphs'
 import {
   LiveDotGlyph,
@@ -269,6 +271,7 @@ export const ICONS = {
   journal: JournalGlyph,
   alert: SanctionsGlyph,
   add: AddGlyph,
+  voice: VoiceGlyph,
   edit: EditGlyph,
   remove: RemoveGlyph,
   close: CloseGlyph,
@@ -289,6 +292,7 @@ export const ICONS = {
   more: MoreGlyph,
   menu: MenuGlyph,
   forward: ForwardGlyph,
+  sidebar: SidebarGlyph,
   back: BackGlyph,
   signOut: SignOutGlyph,
   light: LightGlyph,

@@ -82,28 +82,30 @@ export const LEFT_SIDEBAR = {
   // Search bar
   searchRow: 'flex shrink-0 px-4',
   // Glyph boxes under the search
-  shortcuts: 'flex shrink-0 gap-2 px-4 pt-3',
+  shortcuts: 'rail-shortcuts flex shrink-0 gap-2 px-4 pt-3',
   shortcut:
-    'glass-panel rail-reset flex h-11 flex-1 items-center justify-center rounded-[var(--radius-lg)] border text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
-  shortcutActive: 'text-[var(--color-ink)] shadow-[var(--shadow-md)]',
+    'glass-panel flex h-11 flex-1 items-center justify-center rounded-[var(--radius-lg)] border text-[var(--rail-accent)] transition-colors hover:text-[var(--rail-accent-deep)]',
+  shortcutActive: 'shadow-[var(--shadow-md)]',
+  // Unread note, painted in rail.css
+  shortcutFresh: 'shortcut-fresh',
   shortcutIcon: 'size-5 shrink-0',
   // Pins footer down
-  nav: 'flex min-h-0 w-full flex-1 flex-col gap-7 overflow-y-auto px-4 pt-6 pb-4',
+  nav: 'rail-nav flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto px-4 pt-5 pb-4',
   navGroup: 'flex flex-col gap-2',
   navGroupLabel:
-    'group flex w-full items-center gap-1 px-3 pb-1 text-caption font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'rail-fold group flex w-full items-center gap-1 px-3 pb-1 text-caption font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   navGroupChevron:
     'h-3.5 w-3.5 shrink-0 opacity-0 transition-[transform,opacity] group-hover:opacity-100 group-focus-visible:opacity-100',
   navGroupChevronCollapsed: '-rotate-90',
-  navGroupItems: 'flex flex-col gap-1',
+  navGroupItems: 'flex flex-col gap-px',
   navLink:
-    'group flex items-center gap-3 rounded-[var(--radius-lg)] px-3 py-2.5 text-body font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
+    'group flex items-center gap-3 rounded-[var(--radius-lg)] px-3 py-1.5 text-body font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
   navLinkActive: 'font-semibold text-[var(--color-ink)]',
-  navLabel: 'relative',
+  navLabel: 'rail-fold relative',
   navIcon: 'size-5 shrink-0 transition-colors',
-  navIconActive: 'text-[var(--color-ink)]',
+  navIconActive: 'text-[var(--color-ink-accent)]',
   // Live call under the search
-  liveRow: 'relative flex shrink-0 px-2 pt-2',
+  liveRow: 'rail-fold relative flex shrink-0 px-2 pt-2',
   liveLink:
     'group flex w-full items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-1.5 text-left text-caption font-bold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
   liveLabel: 'min-w-0 flex-1 truncate',
@@ -112,15 +114,20 @@ export const LEFT_SIDEBAR = {
     'h-4 w-4 shrink-0 transition-transform duration-[var(--motion-duration-fast)] group-hover:translate-x-0.5',
   // Account footer
   footer: 'flex shrink-0 px-4 pt-3',
+  // Bare glyph row above the search
+  toolbar: 'flex shrink-0 items-center gap-1 px-4 pb-3',
+  toolbarButton:
+    'flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] active:scale-95',
+  toolbarIcon: 'size-[1.125rem] shrink-0',
   // Profile box, bell on its right
   footerBox:
-    'glass-panel rail-reset flex min-w-0 flex-1 items-center gap-1 rounded-[var(--radius-xl)] border p-2',
+    'rail-footer-box glass-panel flex min-w-0 flex-1 items-center gap-1 rounded-[var(--radius-xl)] border p-2',
   footerName: 'min-w-0 flex-1 truncate text-base font-semibold',
   footerActions: 'flex shrink-0 items-center gap-0.5',
   footerIcon: 'size-5 shrink-0',
   // Version under the nav
   version:
-    'mx-4 mt-2 mb-1 shrink-0 self-start rounded-[var(--radius-sm)] px-2 py-1 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+    'rail-fold mx-4 mt-2 mb-1 shrink-0 self-start rounded-[var(--radius-sm)] px-2 py-1 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // View tints need a page plate
   footerPlate:
     'rail-reset bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)] hover:bg-[var(--color-hover)]',
@@ -132,7 +139,7 @@ export const LEFT_SIDEBAR = {
  */
 
 export const SEARCH_LAUNCHER = {
-  bar: 'glass-panel rail-reset flex w-full items-center gap-2.5 rounded-[var(--radius-lg)] px-3.5 py-3 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  bar: 'glass-panel flex w-full items-center gap-2.5 rounded-[var(--radius-lg)] px-3.5 py-3 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
   barLabel: 'flex-1 truncate text-body',
   barShortcut:
     'shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro font-medium text-[var(--color-ink-subtle)]',
@@ -546,41 +553,30 @@ export const DIVIDER_BLOCK = {
 
 export const CHANGELOG_BOARD = {
   page: 'max-w-4xl',
-  // Version pressed out
-  hero: 'relative flex flex-col items-center gap-5 px-4 pt-6 pb-4 text-center',
-  stage: 'flex flex-col items-center gap-1 [transform-style:preserve-3d]',
-  eyebrow:
-    'font-[family-name:var(--font-mono)] text-xs font-medium tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  numeral:
-    'version-extrude font-[family-name:var(--font-display)] text-7xl leading-none font-bold tracking-tight tabular-nums sm:text-9xl',
-  date: 'font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  intro: 'max-w-2xl text-lg leading-relaxed text-balance text-[var(--color-ink)] sm:text-xl',
-  // Three figures doubling as the way into each category
-  counts: 'mt-2 flex flex-wrap items-stretch justify-center gap-3',
-  count:
-    'group flex min-w-36 flex-col items-center gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-6 py-4 shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-1 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
-  countFigure: 'text-4xl leading-none font-bold tabular-nums',
-  countLabel: 'text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  blocks: 'flex flex-col gap-16',
-  category: 'flex scroll-mt-24 flex-col gap-8',
-  categoryHead: 'flex items-center gap-4',
-  categoryTitle: 'text-3xl font-bold tracking-tight sm:text-4xl',
-  categoryRule: 'h-0.5 flex-1 rounded-full opacity-60',
-  categoryCount:
-    'font-[family-name:var(--font-mono)] text-sm tabular-nums text-[var(--color-ink-subtle)]',
-  groups: 'flex flex-col gap-10',
-  // Page name in the margin
-  group: 'grid gap-3 md:grid-cols-[11rem_minmax(0,1fr)] md:gap-8',
-  groupTitle:
-    'flex items-center gap-2 text-sm font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase md:sticky md:top-24 md:self-start',
-  groupIcon: 'h-4 w-4 shrink-0',
-  groupBody: 'flex min-w-0 flex-col gap-4',
+  // Version and day, read in the notch under the title divider
+  meta: 'flex flex-wrap items-baseline justify-center gap-x-3',
+  version: 'text-sm font-bold tracking-wide text-[var(--color-ink-accent)] uppercase tabular-nums',
+  date: 'text-sm font-semibold text-[var(--color-ink-subtle)]',
+  // Description box: lead, why, then one figure per category
+  lead: 'text-lg font-semibold tracking-tight sm:text-xl',
+  description: 'text-body leading-relaxed text-[var(--color-ink-subtle)]',
+  descriptionBody: 'flex flex-col gap-4',
+  rule: 'h-px w-full bg-[var(--color-border)]',
+  figures: 'grid auto-cols-fr grid-flow-col divide-x divide-[var(--color-border)]',
+  figure: 'flex min-w-0 flex-col items-center gap-1 px-2 text-center',
+  figureValue: 'text-3xl leading-none font-bold tabular-nums',
+  figureLabel: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  blocks: 'flex flex-col gap-10',
+  // Pages of a category inside its card, apart by a hairline
+  groups: 'divide-y divide-[var(--color-border)]',
+  group: 'flex flex-col gap-2.5 py-5 first:pt-0 last:pb-0',
+  groupTitle: 'text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   comment:
-    'border-l-4 border-[var(--color-brand-400)] pl-4 text-base leading-relaxed text-[var(--color-ink-subtle)] italic',
-  commentLabel:
-    'mb-1 block font-[family-name:var(--font-mono)] text-xs font-semibold tracking-wide text-[var(--color-ink-accent)] uppercase not-italic',
-  lines: 'flex flex-col divide-y divide-[var(--color-border)]',
-  line: 'py-3 text-base leading-relaxed first:pt-0 last:pb-0',
+    'border-l-2 border-[var(--color-border-strong)] pl-3.5 text-sm leading-relaxed text-[var(--color-ink-subtle)] italic',
+  commentLabel: 'sr-only',
+  lines: 'flex flex-col gap-1.5',
+  line: 'flex gap-3 text-body leading-relaxed',
+  lineDot: 'mt-[0.6em] h-1.5 w-1.5 shrink-0 rounded-full',
   archive: 'flex flex-wrap justify-center gap-2',
   archiveHead: 'flex flex-col items-center gap-4 text-center',
   archiveTitle: 'text-xl font-bold tracking-tight',
@@ -590,10 +586,9 @@ export const CHANGELOG_BOARD = {
     'flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-2 transition-colors hover:bg-[var(--color-hover)]',
   releaseBody: 'flex min-w-0 flex-1 flex-col gap-0.5',
   releaseTitle: 'truncate text-sm font-semibold',
-  releaseMeta:
-    'font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  releaseMeta: 'text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   releaseCurrent:
-    'shrink-0 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-accent)] uppercase',
+    'shrink-0 text-micro font-bold tracking-wide text-[var(--color-ink-accent)] uppercase',
   releaseChevron: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
   empty: 'flex flex-col items-center gap-1 py-16 text-center',
   emptyTitle: 'text-base font-semibold',
@@ -693,8 +688,8 @@ export const CREATOR_MENU = {
     'flex w-full min-w-0 items-center gap-3 rounded-[var(--radius-lg)] px-2 py-1.5 text-left transition-colors hover:bg-[var(--color-hover)]',
   // Same footprint as a portrait
   noneGlyph: 'h-8 w-8 shrink-0 p-1',
-  name: 'min-w-0 flex-1 truncate text-body font-medium',
-  chevron: 'h-4 w-4 shrink-0 transition-transform motion-reduce:transition-none',
+  name: 'rail-fold min-w-0 flex-1 truncate text-body font-medium',
+  chevron: 'rail-fold h-4 w-4 shrink-0 transition-transform motion-reduce:transition-none',
   // Closed points down
   chevronShut: 'rotate-0',
   chevronOpen: 'rotate-180',

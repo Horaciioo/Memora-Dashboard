@@ -1,31 +1,57 @@
-/* Course chapters slide in from the side they come from, the check and its line play once */
-.course-slide-forward {
-  animation: course-slide-forward var(--motion-duration-slow) var(--motion-ease-out) both;
-}
-
-.course-slide-back {
-  animation: course-slide-back var(--motion-duration-slow) var(--motion-ease-out) both;
-}
-
-@keyframes course-slide-forward {
+/* Screens of a chapter slide */
+@keyframes step-fade {
   from {
     opacity: 0;
-    transform: translateX(3rem);
-  }
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 
-@keyframes course-slide-back {
+@keyframes step-slide {
   from {
-    opacity: 0;
-    transform: translateX(-3rem);
+    translate: var(--step-offset);
   }
   to {
-    opacity: 1;
-    transform: none;
+    translate: 0;
+  }
+}
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(.step-forward) {
+  --step-offset: -2rem;
+  animation:
+    120ms linear both step-fade reverse,
+    260ms cubic-bezier(0.22, 1, 0.36, 1) both step-slide reverse;
+}
+
+::view-transition-new(.step-forward) {
+  --step-offset: 2rem;
+  animation:
+    200ms ease-out 60ms both step-fade,
+    300ms cubic-bezier(0.22, 1, 0.36, 1) both step-slide;
+}
+
+::view-transition-old(.step-back) {
+  --step-offset: 2rem;
+  animation:
+    120ms linear both step-fade reverse,
+    260ms cubic-bezier(0.22, 1, 0.36, 1) both step-slide reverse;
+}
+
+::view-transition-new(.step-back) {
+  --step-offset: -2rem;
+  animation:
+    200ms ease-out 60ms both step-fade,
+    300ms cubic-bezier(0.22, 1, 0.36, 1) both step-slide;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
   }
 }
 
@@ -80,7 +106,7 @@
   }
 }
 
-/* Key points and diagrams rise one after the other, the demonstration marks its lines */
+/* Key points and diagrams */
 .course-pop {
   animation: course-rise var(--motion-duration-slow) var(--motion-ease-out)
     calc(var(--i, 0) * var(--motion-stagger)) both;
@@ -156,7 +182,7 @@
   }
 }
 
-/* A course content swapped for the next: the old one wipes away, the new one settles */
+/* A course content */
 @keyframes course-erase-in {
   from {
     opacity: 0;
@@ -191,7 +217,7 @@
   animation-delay: var(--rung-delay, 0ms);
 }
 
-/* Course done: the stamp slams, confetti bursts, the stamp flies to its card */
+/* Course done */
 @keyframes stamp-slam {
   0% {
     opacity: 0;
@@ -239,22 +265,6 @@
 
 .rise-in {
   animation: rise-in var(--motion-duration-slow) ease-out both;
-}
-
-/* Steps of a finished card filling one after the other */
-@keyframes step-fill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-.step-fill {
-  transform-origin: left;
-  animation: step-fill var(--motion-duration-base) ease-out both;
-  animation-delay: calc(var(--step-index, 0) * var(--motion-stagger));
 }
 
 /* Support guide slides out of its notch */
@@ -313,34 +323,41 @@
   }
 }
 
-/* Content writes itself in turn */
-.course-reveal {
-  animation: course-reveal var(--motion-duration-slow) var(--motion-ease-out) both;
-  animation-delay: calc(var(--i, 0) * 160ms);
-}
-
-@keyframes course-reveal {
+/* Ghost of the box in the timeline, swells and melts away */
+@keyframes course-echo {
   from {
-    opacity: 0;
-    transform: translateY(1.25rem);
+    opacity: 0.45;
+    scale: 1;
   }
   to {
-    opacity: 1;
-    transform: none;
+    opacity: 0;
+    scale: 1.9;
   }
 }
 
-/* Hint nudging the reader down */
-.course-bounce {
-  animation: course-bounce 1.6s var(--motion-ease-out) infinite;
+.course-echo {
+  animation: 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite course-echo;
 }
 
-@keyframes course-bounce {
+@media (prefers-reduced-motion: reduce) {
+  .course-echo {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* A fact of the viewer file that asks to be looked at again */
+@keyframes judgement-blink {
   0%,
   100% {
-    transform: translateY(0);
+    box-shadow: 0 0 0 0 transparent;
   }
   50% {
-    transform: translateY(0.4rem);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-caution) 55%, transparent);
   }
+}
+
+.judgement-blink {
+  border-color: var(--color-caution);
+  animation: judgement-blink 1s ease-in-out infinite;
 }

@@ -1,26 +1,5 @@
-/* Numeral pressed out of the page in brand tones, stacked shadows read as depth */
-.version-extrude {
-  /* Sides darker than the face in either theme */
-  --extrude: color-mix(in srgb, var(--color-brand-600) 58%, var(--color-ink));
-  color: var(--color-brand-600);
-  text-shadow:
-    0 1px 0 var(--extrude),
-    0 2px 0 var(--extrude),
-    0 3px 0 var(--extrude),
-    0 4px 0 var(--extrude),
-    0 5px 0 var(--extrude),
-    0 6px 0 var(--extrude),
-    0 7px 0 var(--extrude),
-    0 8px 0 var(--extrude),
-    0 18px 24px color-mix(in srgb, var(--color-ink) 25%, transparent);
-  transition: transform var(--motion-duration-moderate) var(--motion-ease-out);
-  will-change: transform;
-}
-
 /*
- * Accent classes — the hexadecimal counterpart of the tone classes. Every rule reads the
- * --accent custom property posed by accentVars (src/declarations/ui/theme.ts), so an arbitrary
- * colour picked in the wheel tints a surface exactly like a declared tone would.
+ * Accent classes
  */
 .accent-text {
   color: color-mix(in srgb, var(--accent) 50%, var(--color-ink));
@@ -43,12 +22,12 @@
   border-color: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
-/* Solid fill of a picked accent — the tag treatment, label on a full colour */
+/* Solid fill of a picked accent */
 .accent-solid {
   background-color: var(--accent);
 }
 
-/* A stored colour is picked against the light theme, so it is lifted to stay readable on dark */
+/* A stored colour  */
 :root.dark .accent-text {
   color: color-mix(in srgb, var(--accent) 55%, var(--color-ink));
 }

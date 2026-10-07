@@ -1,4 +1,8 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
+import { COURSE_PANEL } from '@/declarations/ui/variants/course'
+
+// A view floating over the page
+export const COURSE_FLOAT = 'rounded-[var(--radius-sm)] shadow-[var(--shadow-float)]'
 
 /**
  * Guided tour of the Mod View
@@ -6,22 +10,25 @@ import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
  */
 
 export const COURSE_TOUR = {
-  root: 'course-wide flex flex-col gap-5',
-  intro: 'text-body leading-relaxed',
-  toolbar: 'flex flex-wrap items-center gap-3',
-  layout: 'grid gap-4 lg:grid-cols-[14rem_minmax(0,1fr)]',
-  list: 'flex flex-col gap-1 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-2 shadow-[var(--shadow-scene)]',
+  root: 'course-wide flex flex-col gap-5 py-12',
+  // Instructions heading the list they are about, on a panel
+  intro: `${COURSE_PANEL} p-4 text-sm leading-relaxed`,
+  layout: 'grid gap-5 lg:grid-cols-[18rem_minmax(0,1fr)]',
+  list: 'flex flex-col gap-0.5',
   stop: 'relative flex items-center gap-2 rounded-[var(--radius-lg)] px-3 py-2 text-left text-sm font-semibold transition-[background-color,color,transform] duration-[var(--motion-duration-panel)] hover:bg-[var(--color-hover)]',
   stopActive: 'translate-x-1 bg-[var(--color-brand-100)] font-bold text-[var(--color-brand-800)]',
   stopDot: 'h-2 w-2 shrink-0 rounded-full bg-[var(--color-border-strong)] transition-colors',
   stopDotActive: 'bg-[var(--color-brand-600)]',
-  stage: 'relative min-w-0 rounded-[var(--radius-xl)] shadow-[var(--shadow-scene)]',
-  bubble:
-    'course-erase-in absolute inset-x-4 bottom-4 z-30 flex max-w-xl flex-col gap-1 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 shadow-[var(--shadow-scene)] lg:left-6 lg:right-auto',
-  bubbleTitle: 'text-sm font-bold tracking-tight',
-  bubbleBody: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
+  stage: `relative min-w-0 lg:self-center ${COURSE_FLOAT}`,
+  // List of parts and the words of the lit one, beside the view
+  side: 'flex flex-col gap-4 lg:justify-center',
+  // Keeps the room of the note so the list never moves when it shows
+  noteSpace: 'hidden min-h-32 lg:block',
+  note: `flex min-h-32 flex-col gap-2 ${COURSE_PANEL} p-4`,
+  noteTitle: PROPERTY_LABEL,
+  noteBody: 'text-base leading-relaxed',
   building:
-    'grid h-[40rem] gap-3 lg:h-[44rem] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.7fr)]',
+    'grid h-[clamp(26rem,64dvh,44rem)] gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.7fr)]',
   buildingColumn: 'flex flex-col gap-3',
   buildingBlock:
     'skeleton-shimmer flex-1 rounded-[var(--radius-xl)] bg-[var(--color-surface-sunken)]',
@@ -33,17 +40,16 @@ export const COURSE_TOUR = {
  */
 
 export const COURSE_FOCUS = {
-  root: 'course-wide flex flex-col gap-5',
-  prompt: 'text-body leading-relaxed',
-  picks: 'flex flex-wrap gap-2',
-  pick: 'rounded-full border-2 border-[var(--color-border)] px-4 py-1.5 text-sm font-bold transition-[border-color,background-color,color] hover:border-[var(--color-border-strong)]',
-  pickActive:
-    'border-[var(--color-brand-600)] bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
-  layout: 'course-erase-in grid gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]',
-  points: 'flex flex-col gap-3',
-  point:
-    'rounded-[var(--radius-lg)] border-l-4 border-[var(--color-brand-600)] bg-[var(--color-surface-raised)] px-4 py-3 text-body leading-relaxed shadow-[var(--shadow-sm)]',
-  stage: 'min-w-0 rounded-[var(--radius-xl)] shadow-[var(--shadow-scene)]',
+  root: 'course-wide py-12',
+  // Intro on top, then tabs beside the visual and its words
+  column: 'mx-auto flex w-full max-w-6xl flex-col gap-10',
+  layout: 'grid gap-x-6 gap-y-8 lg:grid-cols-[18rem_minmax(0,1fr)]',
+  tabs: 'flex flex-col gap-0.5 lg:justify-center',
+  stage: `min-w-0 ${COURSE_FLOAT}`,
+  // Under the visual, as tall as its words need
+  note: `flex flex-col gap-4 ${COURSE_PANEL} p-5 sm:p-6 lg:col-start-2`,
+  noteTitle: PROPERTY_LABEL,
+  points: 'flex flex-col gap-3 text-lg leading-relaxed',
 } as const
 
 /**
@@ -52,7 +58,7 @@ export const COURSE_FOCUS = {
  */
 
 export const COURSE_LADDER = {
-  root: 'flex flex-col items-center gap-3 rounded-[var(--radius-xl)] bg-[var(--color-surface-raised)] p-6 shadow-[var(--shadow-scene)]',
+  root: 'flex flex-col items-center gap-3 rounded-[var(--radius-xl)] bg-[var(--color-surface-raised)] p-6 shadow-[var(--shadow-md)]',
   rung: 'course-rung-in flex flex-col items-center gap-2',
   label: PROPERTY_LABEL,
   names: 'flex flex-wrap justify-center gap-2',
@@ -74,14 +80,14 @@ export const COURSE_LIVECON = {
   levels: 'flex flex-col gap-2',
   level:
     'flex items-start gap-3 rounded-[var(--radius-xl)] border-2 border-transparent bg-[var(--color-surface-raised)] p-4 text-left shadow-[var(--shadow-sm)] transition-[border-color,transform,box-shadow] duration-[var(--motion-duration-panel)]',
-  levelActive: 'translate-x-1 shadow-[var(--shadow-scene)]',
+  levelActive: 'translate-x-1 shadow-[var(--shadow-md)]',
   levelIcon: 'h-9 w-9 shrink-0',
   levelBody: 'flex min-w-0 flex-col gap-1',
   levelName: 'text-base font-bold tracking-tight',
   levelText: 'text-sm leading-relaxed',
   levelNote: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
   panel:
-    'course-erase-in flex flex-col gap-3 rounded-[var(--radius-xl)] bg-[var(--color-surface-raised)] p-5 shadow-[var(--shadow-scene)]',
+    'course-erase-in flex flex-col gap-3 rounded-[var(--radius-xl)] bg-[var(--color-surface-raised)] p-5 shadow-[var(--shadow-md)]',
   panelHead: 'flex items-center gap-2',
   panelIcon: 'h-5 w-5',
   panelTitle: PROPERTY_LABEL,
@@ -105,12 +111,19 @@ export const COURSE_LIVECON = {
  */
 
 export const COURSE_SCENE = {
-  context: 'text-body leading-relaxed',
-  // The whole exercise breaks out
-  wide: 'course-wide',
-  stage: 'rounded-[var(--radius-xl)] shadow-[var(--shadow-scene)]',
+  context: `mx-auto w-full max-w-6xl ${COURSE_PANEL} p-6 text-lg leading-relaxed sm:p-8`,
+  // The whole exercise breaks out, its parts share one centred width
+  wide: 'course-wide py-16',
+  // Context, stage and questions, well apart
+  flow: 'flex flex-col gap-14',
+  column: 'w-full',
+  // Reading width, the stage may go wider
+  narrow: 'mx-auto flex w-full max-w-6xl flex-col gap-5',
+  stage: COURSE_FLOAT,
   controls: 'flex flex-wrap items-center gap-3',
-  questions: 'flex flex-col gap-6',
+  questions: `mx-auto flex w-full max-w-6xl flex-col gap-8 ${COURSE_PANEL} p-6 sm:p-8`,
+  pager: 'flex items-center justify-between gap-3 border-t border-[var(--color-border)] pt-6',
+  pagerCount: 'text-sm font-bold text-[var(--color-ink-subtle)] tabular-nums',
 } as const
 
 /**
@@ -174,11 +187,8 @@ export const COURSE_STAMP = {
   // Flying to the card
   stampFly: 'transition-transform duration-[var(--motion-duration-celebrate)] ease-in-out',
   confetti: 'absolute top-1/2 left-1/2 h-3 w-2 rounded-sm confetti-piece',
-  // Steps of the celebrated card fill one by one
-  stepFill: 'step-fill bg-[var(--color-brand-600)]',
   // Left on a finished card
   posterWrap: 'relative',
-  posterDone: 'grayscale',
   cardStamp:
     'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-8 rounded-[var(--radius-md)] border-4 border-[var(--color-apple-red)] bg-[color-mix(in_oklab,var(--color-on-media)_80%,transparent)] px-3 py-1 text-sm font-bold tracking-wide whitespace-nowrap text-[var(--color-apple-red)] uppercase',
 } as const
