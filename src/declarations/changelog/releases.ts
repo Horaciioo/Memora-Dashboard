@@ -160,7 +160,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Improved,
-        text: 'Amélioration visuelle de l’annonce d’une nouvelle version, désormais en or',
+        text: 'Amélioration visuelle de l’annonce d’une nouvelle version, désormais en or et placée sous le raccourci « Nouveautés » en haut de la barre latérale',
       },
       {
         tag: ChangelogTags.Improved,
