@@ -61,16 +61,30 @@ export const pickableCreators = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<CreatorLead[]> => {
-  // An administrator picks from every creator
-  if (!access.isAdmin) return readLedCreators(viewer.id)
+  const select = { id: true, name: true, handle: true, accent: true, avatarUrl: true }
 
-  const rows = await prisma.youtuber.findMany({
-    where: { archived: false },
+  // An administrator picks from every creator
+  if (access.isAdmin) {
+    const rows = await prisma.youtuber.findMany({
+      where: { archived: false },
+      orderBy: { position: 'asc' },
+      select,
+    })
+
+    return rows.map((row) => ({ ...row, teamId: null, teamName: null }))
+  }
+
+  const led = await readLedCreators(viewer.id)
+  const ledIds = new Set(led.map((creator) => creator.id))
+
+  // Assigned creators sit in the perimeter too
+  const assigned = await prisma.youtuber.findMany({
+    where: { archived: false, id: { in: viewer.youtuberIds.filter((id) => !ledIds.has(id)) } },
     orderBy: { position: 'asc' },
-    select: { id: true, name: true, handle: true, accent: true, avatarUrl: true },
+    select,
   })
 
-  return rows.map((row) => ({ ...row, teamId: null, teamName: null }))
+  return [...led, ...assigned.map((row) => ({ ...row, teamId: null, teamName: null }))]
 }
 
 /**
