@@ -125,10 +125,14 @@ export const MarshaGuide = ({ trainingHref }: MarshaGuideProps) => {
             />
             {MARSHA_COPY.startTitle}
           </button>
-          {trainingHref && (
+          {trainingHref ? (
             <Link href={trainingHref}>
               <Button icon="academy">{MARSHA_COPY.training}</Button>
             </Link>
+          ) : (
+            <Button icon="academy" disabled>
+              {MARSHA_COPY.training}
+            </Button>
           )}
         </div>
       </nav>

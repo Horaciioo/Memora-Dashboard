@@ -46,7 +46,10 @@ export const CourseCatalog = ({ courses, celebrate, showUnlock }: CourseCatalogP
     ],
     [courses]
   )
-  const open = useMemo(() => ordered.filter((course) => !course.isLocked), [ordered])
+  const open = useMemo(
+    () => ordered.filter((course) => !course.isLocked && !course.isUnavailable && !course.isTour),
+    [ordered]
+  )
   const next = open.find((course) => course.status !== TrainingStatuses.Done) ?? null
   const freshIds = useMemo(
     () =>
@@ -91,7 +94,7 @@ export const CourseCatalog = ({ courses, celebrate, showUnlock }: CourseCatalogP
     reveal(first.id)
   }, [freshIds, ordered, reveal])
 
-  if (!selected) {
+  if (courses.length === 0) {
     return (
       <EmptyState
         figure="academy"
@@ -106,10 +109,12 @@ export const CourseCatalog = ({ courses, celebrate, showUnlock }: CourseCatalogP
     <div className={COURSE_CATALOG.page}>
       {pending && <CourseCeremony courseId={pending} onDone={land} />}
       {showUnlock && <CourseUnlockBubble onOpen={openFresh} />}
-      <section className={COURSE_CATALOG.group} {...beaconProps(TOUR_BEACONS.coursesStage)}>
-        <h2 className={COURSE_CATALOG.title}>{COURSE_COPY.stageTitle}</h2>
-        <CourseStage course={selected} />
-      </section>
+      {selected && (
+        <section className={COURSE_CATALOG.group} {...beaconProps(TOUR_BEACONS.coursesStage)}>
+          <h2 className={COURSE_CATALOG.title}>{COURSE_COPY.stageTitle}</h2>
+          <CourseStage course={selected} />
+        </section>
+      )}
       <div className={COURSE_CATALOG.page} {...beaconProps(TOUR_BEACONS.coursesList)}>
         {[
           {
@@ -132,7 +137,7 @@ export const CourseCatalog = ({ courses, celebrate, showUnlock }: CourseCatalogP
                 title={title}
                 lead={lead}
                 courses={list}
-                selectedId={selected.id}
+                selectedId={selected?.id ?? ''}
                 pendingId={pending}
                 freshIds={freshIds}
                 onSelect={(courseId) => router.push(ROUTES.training(courseId))}

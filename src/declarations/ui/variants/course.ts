@@ -50,6 +50,9 @@ export const COURSE_CATALOG = {
   track:
     '-mx-3 flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth scroll-px-3 px-3 pt-3 pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
   tile: 'group relative flex w-72 shrink-0 snap-start flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface text-left transition-[transform,box-shadow] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-spring)] hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] active:scale-[0.98] sm:w-[22rem]',
+  // Not clickable: the visit, or a course not open yet
+  tileInert: 'cursor-default hover:shadow-none active:scale-100 [&_img]:group-hover:scale-100',
+  tileUnavailable: 'cursor-not-allowed opacity-55 grayscale',
   tileSelected:
     'ring-2 ring-[var(--color-brand-600)] ring-offset-2 ring-offset-[var(--color-page)] shadow-[var(--shadow-lg)]',
   infoList: 'flex flex-col gap-2',

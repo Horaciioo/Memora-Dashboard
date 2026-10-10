@@ -574,6 +574,8 @@ export interface CourseProgress {
  * @property {number} passed - Exercises cleared
  * @property {TrainingStatusName} status - Where the member stands
  * @property {boolean} isLocked - Not in its period yet
+ * @property {boolean} [isUnavailable] - Not open to take yet
+ * @property {boolean} [isTour] - The first visit, done by walking the pages
  */
 
 export interface CourseCard {
@@ -589,6 +591,8 @@ export interface CourseCard {
   passed: number
   status: TrainingStatusName
   isLocked: boolean
+  isUnavailable?: boolean
+  isTour?: boolean
   maturity?: MaturityName
 }
 

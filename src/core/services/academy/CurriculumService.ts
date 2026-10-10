@@ -9,11 +9,17 @@ import { hasSeenGuide } from '@/core/services/preferences/GuideService'
 import { clearOpenTrainingStep } from '@/core/services/academy/AcademyService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { notify } from '@/core/services/system/NotificationService'
-import { COURSES, courseByKey, exercisesOf } from '@/declarations/academy/curriculum'
+import {
+  AVAILABLE_COURSE_KEYS,
+  COURSES,
+  courseByKey,
+  exercisesOf,
+} from '@/declarations/academy/curriculum'
 import type { Course } from '@/declarations/academy/curriculum/types'
 import { isEncadrement } from '@/declarations/access/roles'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
-import { GUIDE_KEYS } from '@/declarations/academy/welcome'
+import { COURSE_COPY } from '@/declarations/academy/copy'
+import { GUIDE_KEYS, TOUR_COURSE_ID } from '@/declarations/academy/welcome'
 import { ROUTES } from '@/declarations/navigation'
 import { tradeOfFunction } from '@/declarations/reference/fixed'
 import type { SessionUser } from '@/types/auth'
@@ -124,6 +130,28 @@ const concerns = (course: Course, trades: Set<string>, seesAll: boolean): boolea
   seesAll || course.functions.length === 0 || course.functions.some((name) => trades.has(name))
 
 /**
+ * The first visit as a course: done by walking the pages, never opened
+ * @param {boolean} isDone - Visit finished
+ * @return {CourseCard} - Card
+ */
+
+const tourCard = (isDone: boolean): CourseCard => ({
+  id: TOUR_COURSE_ID,
+  key: TOUR_COURSE_ID,
+  name: COURSE_COPY.tourName,
+  summary: COURSE_COPY.tourSummary,
+  track: 'indispensable',
+  surface: 'general',
+  minutes: 5,
+  chapters: 0,
+  exercises: 0,
+  passed: 0,
+  status: (isDone ? TrainingStatuses.Done : TrainingStatuses.NotStarted) as TrainingStatusName,
+  isLocked: false,
+  isTour: true,
+})
+
+/**
  * Read the catalogue a member follows: the courses of the trade their session trains for and the shared ones
  * @param {SessionUser} viewer - Signed-in member
  * @return {Promise<CourseCard[]>} - Courses
@@ -132,7 +160,7 @@ const concerns = (course: Course, trades: Set<string>, seesAll: boolean): boolea
 export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> => {
   await syncCurriculum()
 
-  const [trades, junior, rows] = await Promise.all([
+  const [trades, junior, rows, isTourDone] = await Promise.all([
     tradesOf(viewer.functionIds),
     prisma.academyJunior.findFirst({
       where: { accountId: viewer.id, status: AcademyJuniorStatuses.Active },
@@ -144,12 +172,13 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
       include: { records: { where: { accountId: viewer.id } } },
       orderBy: { position: 'asc' },
     }),
+    hasSeenGuide(viewer.id, GUIDE_KEYS.tourDone),
   ])
 
   const seesAll = isEncadrement(viewer.role)
   const inPractice = !junior || PRACTICE_STAGES.includes(junior.stage)
 
-  return rows.flatMap((row): CourseCard[] => {
+  const cards = rows.flatMap((row): CourseCard[] => {
     const course = row.curriculumKey ? courseByKey(row.curriculumKey) : undefined
     if (!course || !concerns(course, trades, seesAll)) return []
 
@@ -191,10 +220,13 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
         passed: exercises.filter((block) => progress.blocks[block.key]?.passed).length,
         status: (record?.status ?? TrainingStatuses.NotStarted) as TrainingStatusName,
         isLocked: false,
+        isUnavailable: !AVAILABLE_COURSE_KEYS.includes(course.key),
         maturity: course.maturity,
       },
     ]
   })
+
+  return [tourCard(isTourDone), ...cards]
 }
 
 /**
@@ -205,7 +237,9 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
  */
 
 export const courseHrefFor = async (viewer: SessionUser, key: string): Promise<string | null> => {
-  const card = (await listCourses(viewer)).find((entry) => entry.key === key && !entry.isLocked)
+  const card = (await listCourses(viewer)).find(
+    (entry) => entry.key === key && !entry.isLocked && !entry.isUnavailable && !entry.isTour
+  )
 
   return card ? ROUTES.training(card.id) : null
 }
@@ -222,7 +256,7 @@ export const readCourse = async (
   viewer: SessionUser
 ): Promise<{ card: CourseCard; course: Course; progress: CourseProgress }> => {
   const card = (await listCourses(viewer)).find(
-    (entry) => entry.id === trainingId && !entry.isLocked
+    (entry) => entry.id === trainingId && !entry.isLocked && !entry.isUnavailable && !entry.isTour
   )
   const course = card ? courseByKey(card.key) : undefined
   if (!card || !course) throw notFound()
