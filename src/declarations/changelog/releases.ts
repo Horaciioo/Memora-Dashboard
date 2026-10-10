@@ -121,6 +121,11 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     items: [
       {
         tag: ChangelogTags.Added,
+        page: ROUTES.dashboard,
+        text: 'Ajout de raccourcis sur l’accueil adaptés au métier de chaque modérateur',
+      },
+      {
+        tag: ChangelogTags.Added,
         page: ROUTES.calendar,
         text: 'Ajout de la possibilité, pour chaque convoqué, de dire s’il sera présent ou absent depuis le détail d’un évènement',
       },
@@ -167,6 +172,21 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.projects,
         permission: Permissions.ProjectDelete,
         text: 'Amélioration des droits des responsables : ils peuvent désormais supprimer les « Projets », « Tâches » et « Réunions »',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.trainings,
+        text: 'Amélioration de la page « Formations » : la visite de Memora y apparaît et les formations pas encore ouvertes sont signalées comme indisponibles',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la fin de la visite de Memora, qui se termine par une petite célébration',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.projects,
+        permission: Permissions.ProjectRead,
+        text: 'Amélioration des droits des modérateurs : ils consultent leurs « Tâches » sans pouvoir les modifier, et les pages « Formations » et « Recrutement » restent aux formateurs et recruteurs',
       },
       {
         tag: ChangelogTags.Fixed,
