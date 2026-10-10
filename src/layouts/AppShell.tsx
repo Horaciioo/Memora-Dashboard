@@ -54,7 +54,8 @@ export const AppShell = ({
 }: AppShellProps) => {
   return (
     <RailSlotProvider>
-      <TourProvider initial={tour}>
+      {/* A visit reset on the server starts over, a visit under way is left alone */}
+      <TourProvider key={String(tour !== null && !tour.isIntroSeen)} initial={tour}>
         <AppShellFrame
           unreadCount={unreadCount}
           viewContext={viewContext}
