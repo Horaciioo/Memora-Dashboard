@@ -4,9 +4,9 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { findVisibleBeacon } from '@/core/lib/beacons'
 import { GUIDE_COPY } from '@/declarations/academy/copy'
 import { GUIDE_PARAMS, PIM_DESTINATION_REGISTRY } from '@/declarations/academy/guides'
-import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { GUIDE_TOUR } from '@/declarations/ui/variants'
 
 // Room around the control and between the ring and the bubble
@@ -27,17 +27,6 @@ interface TourSpot {
   rect: DOMRect
   above: boolean
 }
-
-/**
- * First visible control carrying a beacon
- * @param {string} beacon - Beacon name
- * @return {HTMLElement | null} - Control or null
- */
-
-const findBeacon = (beacon: string): HTMLElement | null =>
-  [...document.querySelectorAll<HTMLElement>(`[${BEACON_ATTRIBUTE}="${beacon}"]`)].find(
-    (node) => node.getBoundingClientRect().width > 0
-  ) ?? null
 
 /**
  * Walkthrough opened by a task
@@ -64,7 +53,7 @@ export const GuideHost = () => {
     let target: HTMLElement | null = null
 
     const place = () => {
-      target = target?.isConnected ? target : findBeacon(mark.beacon)
+      target = target?.isConnected ? target : findVisibleBeacon(mark.beacon)
 
       if (!target) {
         tries += 1

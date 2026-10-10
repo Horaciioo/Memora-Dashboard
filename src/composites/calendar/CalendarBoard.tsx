@@ -15,6 +15,7 @@ import { CalendarDetail } from '@/composites/calendar/CalendarDetail'
 import { CalendarAgenda } from '@/composites/calendar/CalendarAgenda'
 import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
 import { CalendarSidebar } from '@/composites/calendar/CalendarSidebar'
+import { MeetingRequest } from '@/composites/calendar/MeetingRequest'
 import type { CalendarSidebarProps } from '@/composites/calendar/CalendarSidebar'
 import { CalendarTimeGrid } from '@/composites/calendar/CalendarTimeGrid'
 import type { GridMode } from '@/composites/calendar/CalendarTimeGrid'
@@ -484,6 +485,7 @@ export const CalendarBoard = ({
                     label={CALENDAR_COPY.gridMode}
                   />
                 )}
+                {!canManage && <MeetingRequest />}
                 {canManage && (
                   <span {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.calendarAdd }}>
                     <Button variant="primary" onClick={() => openForm(null)}>

@@ -6,17 +6,22 @@ import { MobileHold } from '@/components/structures/MobileHold'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
+import { TourHost } from '@/composites/tour/TourHost'
 import { BottomNav } from '@/composites/shell/BottomNav'
 import { LeftSidebar } from '@/composites/shell/LeftSidebar'
 import { MobileTopBar } from '@/composites/shell/MobileTopBar'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { frameToneOf } from '@/declarations/access/views'
+import { beaconProps } from '@/declarations/ui/beacons'
+import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { useAutoRefresh } from '@/core/hooks/interaction/useAutoRefresh'
 import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
+import { TourProvider } from '@/managers/front-end/TourManager'
 import type { ViewContext } from '@/types/access'
 import type { SealState, TwoFactorState } from '@/types/security'
+import type { TourState } from '@/types/tour'
 import { Permissions } from '@/utils/constants/permissions'
 
 export interface AppShellProps {
@@ -24,6 +29,7 @@ export interface AppShellProps {
   viewContext: ViewContext
   twoFactor: TwoFactorState
   seal: SealState
+  tour: TourState | null
   children: ReactNode
 }
 
@@ -33,6 +39,7 @@ export interface AppShellProps {
  * @param {ViewContext} viewContext - View resolved server-side
  * @param {TwoFactorState} twoFactor - Enrolment state resolved server-side
  * @param {SealState} seal - Unlock window resolved server-side
+ * @param {TourState | null} tour - First visit resolved server-side
  * @param {ReactNode} children - Routed page content
  * @return {JSX.Element}
  */
@@ -42,29 +49,39 @@ export const AppShell = ({
   viewContext,
   twoFactor,
   seal,
+  tour,
   children,
 }: AppShellProps) => {
   return (
     <RailSlotProvider>
-      <AppShellFrame
-        unreadCount={unreadCount}
-        viewContext={viewContext}
-        twoFactor={twoFactor}
-        seal={seal}
-      >
-        {children}
-      </AppShellFrame>
+      {/* A visit reset on the server starts over, a visit under way is left alone */}
+      <TourProvider key={String(tour !== null && !tour.isIntroSeen)} initial={tour}>
+        <AppShellFrame
+          unreadCount={unreadCount}
+          viewContext={viewContext}
+          twoFactor={twoFactor}
+          seal={seal}
+        >
+          {children}
+        </AppShellFrame>
+      </TourProvider>
     </RailSlotProvider>
   )
 }
 
 /**
  * Shell inside the rail slot
- * @param {AppShellProps} props - Shell props
+ * @param {Omit<AppShellProps, 'tour'>} props - Shell props
  * @return {JSX.Element}
  */
 
-const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: AppShellProps) => {
+const AppShellFrame = ({
+  unreadCount,
+  viewContext,
+  twoFactor,
+  seal,
+  children,
+}: Omit<AppShellProps, 'tour'>) => {
   const { session, can } = useAuthContext()
   const { isClaimed, setSlot } = useRailSlot()
 
@@ -86,7 +103,7 @@ const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: 
           {session && (
             <MobileTopBar session={session} unreadCount={unreadCount} viewContext={viewContext} />
           )}
-          <main className={APP_SHELL.content}>
+          <main className={APP_SHELL.content} {...beaconProps(TOUR_BEACONS.page)}>
             <MobileHold>{children}</MobileHold>
           </main>
         </div>
@@ -94,6 +111,7 @@ const AppShellFrame = ({ unreadCount, viewContext, twoFactor, seal, children }: 
         {session && <BottomNav viewContext={viewContext} />}
         <SealDialog />
         {session && <NudgeHost />}
+        {session && <TourHost />}
         {session && can(Permissions.LiveRead) && <LiveSignalListener />}
       </div>
     </SealProvider>

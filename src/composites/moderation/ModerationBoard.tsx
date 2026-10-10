@@ -19,6 +19,8 @@ import { useSanctions } from '@/core/hooks/data/useSanctions'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { SANCTION_COPY } from '@/declarations/sanctions/copy'
+import { TOUR_BEACONS } from '@/declarations/tour/beacons'
+import { beaconProps } from '@/declarations/ui/beacons'
 import {
   SANCTION_GRAVITY_REGISTRY,
   SANCTION_PANEL_REGISTRY,
@@ -254,7 +256,12 @@ export const ModerationBoard = ({
             const tone = SANCTION_GRAVITY_REGISTRY.get(key)
 
             return (
-              <section key={key} className={SANCTION_PANEL.group} style={accentVars(tone.accent)}>
+              <section
+                key={key}
+                className={SANCTION_PANEL.group}
+                style={accentVars(tone.accent)}
+                {...beaconProps(TOUR_BEACONS.sanctionsOffenses)}
+              >
                 <h2 className={SANCTION_PANEL.groupTitle}>{tone.label}</h2>
                 <div className={SANCTION_PANEL.grid}>
                   {entries.map((offense) => (
@@ -287,7 +294,7 @@ export const ModerationBoard = ({
 
   return (
     <div className={SANCTION_PANEL.wrapper}>
-      <div className={LIVECON_TITLE.row}>
+      <div className={LIVECON_TITLE.row} {...beaconProps(TOUR_BEACONS.sanctionsLivecon)}>
         <LiveconTitle
           creatorId={creatorId}
           levels={levels}

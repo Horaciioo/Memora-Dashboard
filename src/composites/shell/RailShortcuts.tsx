@@ -8,6 +8,7 @@ import { BEACON_ATTRIBUTE, routeBeacon } from '@/declarations/ui/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import type { IconName } from '@/declarations/ui/icons'
 import { railIcon } from '@/declarations/ui/railIcons'
+import { TOUR_RAIL } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 export interface RailShortcut {
@@ -20,10 +21,17 @@ export interface RailShortcut {
  * Glyph boxes under the search, the news one turns gold while a note is unread
  * @param {Object} props - Shortcuts
  * @param {RailShortcut[]} props.items - Destinations
+ * @param {boolean} [props.isUnlocking] - The first visit is adding them one by one
  * @return {JSX.Element}
  */
 
-export const RailShortcuts = ({ items }: { items: RailShortcut[] }) => {
+export const RailShortcuts = ({
+  items,
+  isUnlocking,
+}: {
+  items: RailShortcut[]
+  isUnlocking?: boolean
+}) => {
   const pathname = usePathname()
   const { isFresh } = useFreshRelease()
 
@@ -44,7 +52,8 @@ export const RailShortcuts = ({ items }: { items: RailShortcut[] }) => {
             className={cn(
               LEFT_SIDEBAR.shortcut,
               isActive && LEFT_SIDEBAR.shortcutActive,
-              isFresh && item.href === ROUTES.changelog && LEFT_SIDEBAR.shortcutFresh
+              isFresh && item.href === ROUTES.changelog && LEFT_SIDEBAR.shortcutFresh,
+              isUnlocking && TOUR_RAIL.unlock
             )}
           >
             <Icon className={LEFT_SIDEBAR.shortcutIcon} aria-hidden="true" />

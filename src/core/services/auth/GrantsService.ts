@@ -39,7 +39,10 @@ export const syncRoleGrants = async (): Promise<void> => {
     )
 
     // Function grants resolved by name
-    const functionNames = Object.keys(addition.functions ?? {})
+    const functionNames = [
+      ...Object.keys(addition.functions ?? {}),
+      ...Object.keys(addition.denies ?? {}),
+    ]
     const holders =
       functionNames.length > 0
         ? await prisma.jobFunction.findMany({
@@ -47,17 +50,34 @@ export const syncRoleGrants = async (): Promise<void> => {
             select: { id: true, name: true },
           })
         : []
-    const functionRows = holders.flatMap((holder) =>
-      (addition.functions?.[holder.name] ?? []).map((permission) => ({
+    const functionRows = holders.flatMap((holder) => [
+      ...(addition.functions?.[holder.name] ?? []).map((permission) => ({
         functionId: holder.id,
         permission,
-      }))
+      })),
+      ...(addition.denies?.[holder.name] ?? []).map((permission) => ({
+        functionId: holder.id,
+        permission,
+        effect: PermissionEffects.Deny,
+      })),
+    ])
+
+    // Global role rows only, creator overrides stay
+    const revoked = Object.entries(addition.revokes ?? {}).map(([role, permissions]) =>
+      prisma.rolePermission.deleteMany({
+        where: {
+          role: role as MemberRoleName,
+          permission: { in: permissions ?? [] },
+          youtuberId: null,
+        },
+      })
     )
 
     try {
       await prisma.$transaction([
         prisma.rolePermission.createMany({ data: rows, skipDuplicates: true }),
         prisma.functionPermission.createMany({ data: functionRows }),
+        ...revoked,
         prisma.grantMigration.create({ data: { key: addition.key } }),
       ])
     } catch (error) {

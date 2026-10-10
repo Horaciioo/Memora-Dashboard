@@ -13,11 +13,13 @@ import { readBeacon } from '@/core/services/lives/LiveService'
 import { hasNewSpecialisations } from '@/core/services/academy/CurriculumService'
 import { REVIEW_FIELDS, listReviewQueue } from '@/core/services/absences/AbsenceService'
 import { myRollCalls } from '@/core/services/calendar/attendance'
-import { upcomingBirthdays } from '@/core/services/personal/HomeService'
+import { moderatorTrade, upcomingBirthdays } from '@/core/services/personal/HomeService'
 import { upcomingPlans } from '@/core/services/personal/HomePlanService'
 import { myTasks } from '@/core/services/personal/TaskInboxService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { changelogFor } from '@/declarations/changelog/helpers'
+import { TOUR_BEACONS } from '@/declarations/tour/beacons'
+import { beaconProps } from '@/declarations/ui/beacons'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { HOME_BOARD, HOME_FLOW } from '@/declarations/ui/variants'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
@@ -36,7 +38,7 @@ export default async function DashboardPage() {
 
   const canReview = access.can(Permissions.AbsenceReview)
 
-  const [tasks, rollCalls, planned, birthdays, requests, beacon, hasUnlock, coordination] =
+  const [tasks, rollCalls, planned, birthdays, requests, beacon, hasUnlock, coordination, trade] =
     await Promise.all([
       myTasks(session, access),
       myRollCalls(session.id),
@@ -48,20 +50,25 @@ export default async function DashboardPage() {
         : Promise.resolve(null),
       hasNewSpecialisations(session.id),
       myCoordinationRequests(session.id),
+      moderatorTrade(session),
     ])
 
-  // Pending requests are the only ones that wait on the member
+  // Pending requests
   const pending = requests.filter((absence) => absence.status === AbsenceStatuses.Pending)
 
   return (
     <div className={HOME_FLOW.page}>
       {hasUnlock && <CourseUnlockBubble />}
       <PageHeader title={PERSONAL_COPY.title} />
-      <HomeHeader name={session.displayName} />
-      <HomeNews release={changelogFor(access.can)[0]} />
+      <div {...beaconProps(TOUR_BEACONS.homeHeader)}>
+        <HomeHeader name={session.displayName} />
+      </div>
+      <div {...beaconProps(TOUR_BEACONS.homeNews)}>
+        <HomeNews release={changelogFor(access.can)[0]} />
+      </div>
       <HomeLiveCall beacon={beacon} />
       <div className={HOME_BOARD.card}>
-        <div className={HOME_BOARD.col}>
+        <div className={HOME_BOARD.col} {...beaconProps(TOUR_BEACONS.homeQueue)}>
           <HomeQueue
             absences={pending}
             reviewFields={REVIEW_FIELDS}
@@ -70,14 +77,16 @@ export default async function DashboardPage() {
             coordination={coordination}
           />
         </div>
-        <div className={HOME_BOARD.col}>
+        <div className={HOME_BOARD.col} {...beaconProps(TOUR_BEACONS.homePlanned)}>
           <HomePlanned entries={planned} />
         </div>
-        <div className={HOME_BOARD.col}>
+        <div className={HOME_BOARD.col} {...beaconProps(TOUR_BEACONS.homeBirthdays)}>
           <HomeBirthdays birthdays={birthdays} />
         </div>
       </div>
-      <HomeShortcuts can={access.can} />
+      <div {...beaconProps(TOUR_BEACONS.homeShortcuts)}>
+        <HomeShortcuts can={access.can} trade={trade} />
+      </div>
     </div>
   )
 }

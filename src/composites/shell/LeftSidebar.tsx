@@ -20,11 +20,14 @@ import { useRailCompact } from '@/core/hooks/interaction/useRailCompact'
 import { APP_VERSION_LABEL } from '@/declarations/app'
 import { SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
 import { ROUTES, visibleNavGroups } from '@/declarations/navigation'
-import { BEACON_ATTRIBUTE, routeBeacon } from '@/declarations/ui/beacons'
+import { BEACON_ATTRIBUTE, beaconProps, routeBeacon } from '@/declarations/ui/beacons'
+import { TOUR_BEACONS } from '@/declarations/tour/beacons'
+import { TOUR_RAIL } from '@/declarations/ui/variants'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { railIcon } from '@/declarations/ui/railIcons'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { ICONS } from '@/declarations/ui/icons'
+import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'
 import { cn } from '@/utils/classnames'
@@ -44,6 +47,8 @@ export interface LeftSidebarProps {
 export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const pathname = usePathname()
   const { can, session } = useAuthContext()
+  // The first visit shows pages as it explains them
+  const { isTouring, isUnlocked } = useTour()
   // An open course puts its chapters where the destinations stand
   const openCourse = useCourseRail()
   const courseRail = openCourse
@@ -81,12 +86,14 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const shortcuts = [
     ...entries.flatMap((group) => group.items).filter((item) => item.quick),
     { href: ROUTES.preferences, label: NAV_COPY.preferences, icon: 'settings' as const },
-  ]
+  ].filter((item) => isUnlocked(item.href))
   const newsAt = shortcuts.findIndex((item) => item.href === ROUTES.changelog)
   const groups = entries
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => !(item.onlyLive && viewContext.live) && !item.quick),
+      items: group.items.filter(
+        (item) => !(item.onlyLive && viewContext.live) && !item.quick && isUnlocked(item.href)
+      ),
     }))
     .filter((group) => group.items.length > 0)
 
@@ -106,6 +113,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
       aria-label={NAV_COPY.sidebar}
       data-compact={isCompact || undefined}
       className={LEFT_SIDEBAR.rail}
+      {...beaconProps(TOUR_BEACONS.rail)}
     >
       <RailToolbar isCompact={isCompact} onToggle={toggleRailCompact} />
 
@@ -134,9 +142,13 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
 
       {!courseRail && !calendarRail && (
         <>
-          <RailShortcuts items={shortcuts} />
+          <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
           {/* Hangs under the news shortcut it announces */}
-          <ReleaseNotice pointedAt={newsAt >= 0 ? (newsAt + 0.5) / shortcuts.length : undefined} />
+          {!isCompact && (
+            <ReleaseNotice
+              pointedAt={newsAt >= 0 ? (newsAt + 0.5) / shortcuts.length : undefined}
+            />
+          )}
         </>
       )}
 
@@ -188,7 +200,8 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
                           {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
                           className={cn(
                             LEFT_SIDEBAR.navLink,
-                            isActive && LEFT_SIDEBAR.navLinkActive
+                            isActive && LEFT_SIDEBAR.navLinkActive,
+                            isTouring && TOUR_RAIL.unlock
                           )}
                         >
                           <Icon
@@ -221,7 +234,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
       <Link href={ROUTES.changelog} className={LEFT_SIDEBAR.version}>
         {APP_VERSION_LABEL}
       </Link>
-      {(courseRail || calendarRail) && <ReleaseNotice />}
+      {(courseRail || calendarRail) && !isCompact && <ReleaseNotice />}
 
       {session && (
         <div className={LEFT_SIDEBAR.footer}>

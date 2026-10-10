@@ -9,9 +9,12 @@ import { readSealState } from '@/core/services/auth/SealService'
 import { readTwoFactorState } from '@/core/services/auth/TwoFactorService'
 import { readViewContext } from '@/core/services/auth/ViewService'
 import { needsHistoryConsent } from '@/core/services/preferences/ConsentService'
+import { readTourState } from '@/core/services/tour/TourService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { LogoutButton } from '@/composites/auth/LogoutButton'
 import { GuideHost } from '@/composites/shell/GuideHost'
+import { openRoutes } from '@/core/lib/tour/progress'
+import { NavigationViews, visibleNavGroups } from '@/declarations/navigation'
 import { PENDING_ACCOUNT_COPY } from '@/declarations/onboarding/copy'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
@@ -47,11 +50,15 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     )
   }
 
-  const [unreadCount, viewContext, twoFactor, seal] = await Promise.all([
+  // The visit covers what the member's role and functions open, whatever the view on screen
+  const open = openRoutes(visibleNavGroups(NavigationViews.Moderation, session, access.can))
+
+  const [unreadCount, viewContext, twoFactor, seal, tour] = await Promise.all([
     countUnread(session.id),
     readViewContext(session, access),
     readTwoFactorState(session.id),
     readSealState(),
+    readTourState(session, open),
   ])
 
   return (
@@ -61,6 +68,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         viewContext={viewContext}
         twoFactor={twoFactor}
         seal={seal}
+        tour={tour}
       >
         {children}
         <Suspense fallback={null}>

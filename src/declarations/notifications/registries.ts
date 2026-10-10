@@ -87,6 +87,14 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     trail: '',
     addressed: true,
   },
+  MeetingRequested: {
+    label: 'Réunion',
+    tone: 'info',
+    icon: 'meetings',
+    lead: 't’a',
+    verb: 'demandé',
+    trail: 'un rendez-vous',
+  },
   LiveAnnounced: {
     label: 'Live',
     tone: 'danger',

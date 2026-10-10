@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { logout } from '@/app/connexion/actions'
@@ -34,6 +35,8 @@ export async function acceptConsent(
   const { session } = await requireUser()
   await acceptHistoryConsent(session.id)
 
+  // The gate sits in the layout
+  revalidatePath('/', 'layout')
   redirect(ROUTES.dashboard)
 }
 

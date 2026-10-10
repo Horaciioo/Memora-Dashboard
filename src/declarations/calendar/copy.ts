@@ -7,6 +7,11 @@ export const CALENDAR_COPY = {
   title: 'Calendrier',
   lead: 'Ce qui est prévu cette semaine et ce mois-ci, filtré sur ce que tu as le droit de voir.',
   add: 'Poser un évènement',
+  requestMeeting: 'Demander un rendez-vous',
+  requestSend: 'Envoyer',
+  requestSent: 'Demande envoyée à tes responsables',
+  requestNoLead: 'Aucun responsable n’est rattaché à tes équipes pour l’instant.',
+  requestLead: 'Tes responsables reçoivent ta demande et te répondent.',
   noTemplatesTitle: 'Aucun modèle d’évènement',
   noTemplatesDescription:
     'Déclare tes modèles de lives et de réunions dans la configuration pour aller plus vite.',
@@ -98,6 +103,8 @@ export const CALENDAR_FIELD_COPY = {
   members: 'Membres en plus',
   remindAt: 'Rappel aux sans-réponse',
   remindAtHint: 'Laisse vide pour un rappel la veille en fin de journée.',
+  requestSubject: 'Sujet',
+  requestDay: 'Jour souhaité',
 } as const
 
 /**

@@ -2,7 +2,7 @@
 import Link from 'next/link'
 
 import { Section } from '@/components/structures/Section'
-import { HOME_SHORTCUTS } from '@/declarations/personal/shortcuts'
+import { HOME_SHORTCUTS, TRADE_SHORTCUTS } from '@/declarations/personal/shortcuts'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { HOME_CARDS as STYLES } from '@/declarations/ui/variants'
@@ -10,16 +10,20 @@ import type { PermissionName } from '@/utils/constants/permissions'
 
 export interface HomeShortcutsProps {
   can: (permission: PermissionName) => boolean
+  // Trade of a moderator, none for everyone else
+  trade: string | null
 }
 
 /**
- * Three big cards leading to the main areas
+ * Big cards leading to the main areas, a moderator gets the ones of their trade
  * @param {(permission: PermissionName) => boolean} can - Permission check
+ * @param {string | null} trade - Moderator trade
  * @return {JSX.Element | null}
  */
 
-export const HomeShortcuts = ({ can }: HomeShortcutsProps) => {
-  const cards = HOME_SHORTCUTS.filter((card) => can(card.permission))
+export const HomeShortcuts = ({ can, trade }: HomeShortcutsProps) => {
+  const source = (trade && TRADE_SHORTCUTS[trade]) || HOME_SHORTCUTS
+  const cards = source.filter((card) => !card.permission || can(card.permission))
   const GoIcon = ICONS.next
 
   if (cards.length === 0) return null

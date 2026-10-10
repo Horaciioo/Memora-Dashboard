@@ -3,8 +3,19 @@ import { NAVIGATION, ROUTES } from '@/declarations/navigation'
 // Attribute read by the bubbles
 export const BEACON_ATTRIBUTE = 'data-beacon'
 
+// Marks a page still loading
+export const LOADING_SELECTOR = '.skeleton-shimmer'
+
 // Attribution reads
 export const HOP_ATTRIBUTE = 'data-beacon-hop'
+
+/**
+ * Attributes making an element a beacon
+ * @param {string} name - Beacon name
+ * @return {Record<string, string>} - Attributes to spread
+ */
+
+export const beaconProps = (name: string): Record<string, string> => ({ [BEACON_ATTRIBUTE]: name })
 
 /**
  * Beacon of a rail entry

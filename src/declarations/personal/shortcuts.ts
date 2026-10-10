@@ -12,7 +12,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @property {IconName} icon - Glyph on the card
  * @property {string} image - Photograph in the mood of the course covers
  * @property {string} position - Where the crop sits on the photograph
- * @property {PermissionName} permission - Needed to see the card
+ * @property {PermissionName} [permission] - Needed to see the card
  */
 
 export interface HomeShortcut {
@@ -22,7 +22,7 @@ export interface HomeShortcut {
   icon: IconName
   image: string
   position: string
-  permission: PermissionName
+  permission?: PermissionName
 }
 
 /**
@@ -59,3 +59,52 @@ export const HOME_SHORTCUTS: HomeShortcut[] = [
     permission: Permissions.RecruitmentRead,
   },
 ]
+
+const SANCTIONS_CARD: HomeShortcut = {
+  key: 'sanctions',
+  title: 'Panel de sanctions',
+  href: ROUTES.sanctions,
+  icon: 'sanctionsPanel',
+  image: '/courses/twitch.jpg',
+  position: '60% 60%',
+  permission: Permissions.SanctionRead,
+}
+
+const ABSENCES_CARD: HomeShortcut = {
+  key: 'absences',
+  title: 'Absences',
+  href: ROUTES.absences,
+  icon: 'absences',
+  image: '/courses/youtube.jpg',
+  position: '50% 50%',
+  permission: Permissions.AbsenceCreate,
+}
+
+const CALENDAR_CARD: HomeShortcut = {
+  key: 'calendar',
+  title: 'Calendrier',
+  href: ROUTES.calendar,
+  icon: 'meetings',
+  image: '/courses/general.jpg',
+  position: '50% 65%',
+  permission: Permissions.CalendarRead,
+}
+
+const MARSHA_CARD: HomeShortcut = {
+  key: 'marsha',
+  title: 'Marsha Bots',
+  href: ROUTES.marsha,
+  icon: 'discord',
+  image: '/courses/discord.jpg',
+  position: '60% 40%',
+}
+
+/**
+ * Cards a moderator sees, by trade
+ * @type {Record<string, HomeShortcut[]>}
+ */
+
+export const TRADE_SHORTCUTS: Record<string, HomeShortcut[]> = {
+  Lives: [SANCTIONS_CARD, ABSENCES_CARD, CALENDAR_CARD],
+  Discord: [MARSHA_CARD, SANCTIONS_CARD, ABSENCES_CARD],
+}

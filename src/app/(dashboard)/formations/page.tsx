@@ -45,7 +45,7 @@ export default async function TrainingsPage({
   ])
 
   // First visit opens the welcome
-  const mandatory = courses.filter((course) => course.track === 'indispensable')
+  const mandatory = courses.filter((course) => course.track === 'indispensable' && !course.isTour)
   const showWelcome = !seen
   const trade = COURSE_SURFACE_REGISTRY.get(mandatory[0]?.surface ?? 'twitch').label
 

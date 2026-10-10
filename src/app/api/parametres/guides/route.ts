@@ -3,14 +3,19 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { markGuideSeen } from '@/core/services/preferences/GuideService'
 import { GUIDE_KEYS } from '@/declarations/academy/welcome'
 import type { GuideKey } from '@/declarations/academy/welcome'
+import { TOUR_ROUTES } from '@/declarations/tour/pages'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 
 // Keys a member may mark as seen
 const KNOWN = new Set<string>(Object.values(GUIDE_KEYS))
 const LIVE_STARTED = /^live-started:[a-z0-9-]{1,40}$/
+const TOUR_PAGE = 'tour-page:'
 
 // Whether a key names a guide
-const isGuideKey = (key: string): boolean => KNOWN.has(key) || LIVE_STARTED.test(key)
+const isGuideKey = (key: string): boolean =>
+  KNOWN.has(key) ||
+  LIVE_STARTED.test(key) ||
+  (key.startsWith(TOUR_PAGE) && TOUR_ROUTES.has(key.slice(TOUR_PAGE.length)))
 
 export const POST = createProtectedRoute({
   descriptor: { summary: 'Mark a one-time guide as seen', tags: ['preferences'] },

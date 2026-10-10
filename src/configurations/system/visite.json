@@ -1,0 +1,16 @@
+{
+  "newcomerDays": 14,
+  "typingMsPerChar": 28,
+  "typingMinMs": 600,
+  "typingMaxMs": 1800,
+  "sendPauseMs": 350,
+  "loadingMs": 3200,
+  "demoStepMs": 1800,
+  "ringPaddingPx": 8,
+  "bubbleGapPx": 16,
+  "bubbleWidthPx": 352,
+  "bubbleHeightPx": 220,
+  "graceMs": 700,
+  "minAgeYears": 12,
+  "maxAgeYears": 90
+}

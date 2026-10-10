@@ -23,6 +23,13 @@ export const COURSES: readonly Course[] = [
   ANTI_RAID,
 ]
 
+/**
+ * Courses open to take, the others wait
+ * @type {readonly string[]}
+ */
+
+export const AVAILABLE_COURSE_KEYS: readonly string[] = [TWITCH_FUNDAMENTALS.key]
+
 // Course lookup by key
 const BY_KEY = new Map(COURSES.map((course) => [course.key, course]))
 

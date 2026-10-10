@@ -34,24 +34,19 @@ export const CourseTile = ({
   const surface = COURSE_SURFACE_REGISTRY.get(course.surface)
   // A card waiting for its ceremony keeps its colours until the stamp lands
   const isDone = course.status === TrainingStatuses.Done && !isPending
-  const state = isDone
-    ? COURSE_COPY.done
-    : course.passed > 0
-      ? COURSE_COPY.resume
-      : COURSE_COPY.start
+  const isInert = Boolean(course.isTour || course.isUnavailable)
+  const state = course.isUnavailable
+    ? COURSE_COPY.unavailable
+    : isDone
+      ? COURSE_COPY.done
+      : course.isTour
+        ? COURSE_COPY.tourState
+        : course.passed > 0
+          ? COURSE_COPY.resume
+          : COURSE_COPY.start
 
-  return (
-    <button
-      type="button"
-      aria-pressed={isSelected}
-      onClick={onSelect}
-      data-course-tile={course.id}
-      className={cn(
-        COURSE_CATALOG.tile,
-        isDone && COURSE_CATALOG.tileDoneCard,
-        isSelected && COURSE_CATALOG.tileSelected
-      )}
-    >
+  const content = (
+    <>
       <span
         data-course-poster={course.id}
         className={cn(COURSE_CATALOG.tilePhoto, COURSE_STAMP.posterWrap)}
@@ -80,6 +75,33 @@ export const CourseTile = ({
           {state}
         </span>
       </span>
+    </>
+  )
+  const className = cn(
+    COURSE_CATALOG.tile,
+    isDone && COURSE_CATALOG.tileDoneCard,
+    isInert && COURSE_CATALOG.tileInert,
+    course.isUnavailable && COURSE_CATALOG.tileUnavailable,
+    isSelected && COURSE_CATALOG.tileSelected
+  )
+
+  if (isInert) {
+    return (
+      <div aria-disabled="true" data-course-tile={course.id} className={className}>
+        {content}
+      </div>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      aria-pressed={isSelected}
+      onClick={onSelect}
+      data-course-tile={course.id}
+      className={className}
+    >
+      {content}
     </button>
   )
 }

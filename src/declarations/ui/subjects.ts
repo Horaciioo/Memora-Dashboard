@@ -10,6 +10,7 @@ import type { WorkflowScopeName } from '@/utils/constants/workflow'
 export const FORM_SUBJECTS = {
   absence: { label: 'Absence', gender: 'feminine', icon: 'absences' },
   event: { label: 'Évènement', gender: 'masculine', icon: 'meetings' },
+  meetingRequest: { label: 'Demande', gender: 'feminine', icon: 'meetings' },
   selection: { label: 'Sélection', gender: 'feminine', icon: 'meetings' },
   comment: { label: 'Commentaire', gender: 'masculine', icon: 'note' },
   review: { label: 'Bilan', gender: 'masculine', icon: 'objective' },
