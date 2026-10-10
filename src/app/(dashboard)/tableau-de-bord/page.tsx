@@ -13,7 +13,7 @@ import { readBeacon } from '@/core/services/lives/LiveService'
 import { hasNewSpecialisations } from '@/core/services/academy/CurriculumService'
 import { REVIEW_FIELDS, listReviewQueue } from '@/core/services/absences/AbsenceService'
 import { myRollCalls } from '@/core/services/calendar/attendance'
-import { upcomingBirthdays } from '@/core/services/personal/HomeService'
+import { moderatorTrade, upcomingBirthdays } from '@/core/services/personal/HomeService'
 import { upcomingPlans } from '@/core/services/personal/HomePlanService'
 import { myTasks } from '@/core/services/personal/TaskInboxService'
 import { requireUser } from '@/core/wrappers/requireUser'
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
 
   const canReview = access.can(Permissions.AbsenceReview)
 
-  const [tasks, rollCalls, planned, birthdays, requests, beacon, hasUnlock, coordination] =
+  const [tasks, rollCalls, planned, birthdays, requests, beacon, hasUnlock, coordination, trade] =
     await Promise.all([
       myTasks(session, access),
       myRollCalls(session.id),
@@ -50,6 +50,7 @@ export default async function DashboardPage() {
         : Promise.resolve(null),
       hasNewSpecialisations(session.id),
       myCoordinationRequests(session.id),
+      moderatorTrade(session),
     ])
 
   // Pending requests
@@ -84,7 +85,7 @@ export default async function DashboardPage() {
         </div>
       </div>
       <div {...beaconProps(TOUR_BEACONS.homeShortcuts)}>
-        <HomeShortcuts can={access.can} />
+        <HomeShortcuts can={access.can} trade={trade} />
       </div>
     </div>
   )
