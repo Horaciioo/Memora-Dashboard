@@ -63,11 +63,6 @@ export const TOUR_PAGES: TourPage[] = [
         body: 'Chaque page de Memora s’ouvre depuis ce menu. Il n’en montre qu’une pour l’instant : les autres apparaissent au fil de la visite.',
       },
       {
-        beacon: TOUR_BEACONS.homeHeader,
-        title: 'Ton accueil',
-        body: 'Ton prénom et la date du jour, puis tout ce qui te concerne en dessous.',
-      },
-      {
         beacon: TOUR_BEACONS.homeNews,
         title: 'La dernière note de mise à jour',
         body: 'Elle apparaît quand Memora change. Clique dessus pour lire ce qui est nouveau.',

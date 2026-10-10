@@ -10,10 +10,18 @@ export const GUIDE_KEYS = {
   specialisations: 'specialisations-ouvertes',
   tourIntro: 'visite-presentation',
   tourSkipped: 'visite-passee',
+  tourDone: 'visite-terminee',
 } as const
 
 export type GuideKey =
   (typeof GUIDE_KEYS)[keyof typeof GUIDE_KEYS] | `live-started:${string}` | `tour-page:${string}`
+
+/**
+ * Identifier of the first visit in the course catalogue
+ * @type {string}
+ */
+
+export const TOUR_COURSE_ID = 'tour-memora'
 
 /**
  * One-time bubble key of a live that started

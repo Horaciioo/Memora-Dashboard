@@ -1252,7 +1252,7 @@ export const HOME_SETTINGS = {
 
 /**
  * First visit timings and spotlight sizes
- * @type {{ newcomerDays: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, sendPauseMs: number, loadingMs: number, demoStepMs: number, ringPaddingPx: number, ringLines: number, ringGapPx: number, bubbleGapPx: number, bubbleWidthPx: number, bubbleHeightPx: number, minAgeYears: number, maxAgeYears: number, graceMs: number }}
+ * @type {{ newcomerDays: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, sendPauseMs: number, loadingMs: number, demoStepMs: number, ringPaddingPx: number, bubbleGapPx: number, bubbleWidthPx: number, bubbleHeightPx: number, minAgeYears: number, maxAgeYears: number, graceMs: number }}
  */
 
 export const TOUR_SETTINGS = {
@@ -1295,16 +1295,6 @@ export const TOUR_SETTINGS = {
     path: 'system/visite.ringPaddingPx',
     fallback: 8,
     min: 0,
-  }),
-  ringLines: readInteger(tour.ringLines, {
-    path: 'system/visite.ringLines',
-    fallback: 3,
-    min: 1,
-  }),
-  ringGapPx: readInteger(tour.ringGapPx, {
-    path: 'system/visite.ringGapPx',
-    fallback: 6,
-    min: 1,
   }),
   bubbleGapPx: readInteger(tour.bubbleGapPx, {
     path: 'system/visite.bubbleGapPx',

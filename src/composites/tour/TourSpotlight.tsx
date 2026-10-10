@@ -35,23 +35,6 @@ export const TourSpotlight = ({ rect, isInteractive }: TourSpotlightProps) => {
       />
       <span className={TOUR_SPOTLIGHT.dim} style={{ top, left: 0, width: left, height }} />
       <span className={TOUR_SPOTLIGHT.dim} style={{ top, left: left + width, right: 0, height }} />
-      <span className={TOUR_SPOTLIGHT.ring} style={hole}>
-        {Array.from({ length: TOUR_SETTINGS.ringLines }, (_, line) => {
-          const reach = line * TOUR_SETTINGS.ringGapPx
-
-          return (
-            <span
-              key={line}
-              className={TOUR_SPOTLIGHT.line}
-              style={{
-                inset: -reach,
-                borderRadius: `calc(var(--radius-md) + ${reach}px)`,
-                animationDelay: `${line * 250}ms`,
-              }}
-            />
-          )
-        })}
-      </span>
       {!isInteractive && <span className={TOUR_SPOTLIGHT.shield} style={hole} />}
     </div>
   )

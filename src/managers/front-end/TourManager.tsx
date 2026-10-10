@@ -24,6 +24,9 @@ import type { TourState } from '@/types/tour'
  * @property {() => void} finishIntro - Admission and presentation done
  * @property {(route: string) => void} finishPage - Page explained
  * @property {() => void} skip - Leave the visit
+ * @property {boolean} isCelebrating - The last page is explained, the visit is saluted
+ * @property {() => void} finishTour - Last page explained: remembered and saluted
+ * @property {() => void} endCelebration - Salute closed
  * @property {TourScene | null} scene - What the page plays by itself right now
  * @property {(scene: TourScene | null) => void} playScene - Start or stop it
  */
@@ -37,6 +40,9 @@ interface TourContextValue {
   finishIntro: () => void
   finishPage: (route: string) => void
   skip: () => void
+  isCelebrating: boolean
+  finishTour: () => void
+  endCelebration: () => void
   scene: TourScene | null
   playScene: (scene: TourScene | null) => void
 }
@@ -50,6 +56,9 @@ const INACTIVE: TourContextValue = {
   finishIntro: () => undefined,
   finishPage: () => undefined,
   skip: () => undefined,
+  isCelebrating: false,
+  finishTour: () => undefined,
+  endCelebration: () => undefined,
   scene: null,
   playScene: () => undefined,
 }
@@ -73,6 +82,7 @@ export const TourProvider = ({
 }) => {
   const [state, setState] = useState(initial)
   const [scene, playScene] = useState<TourScene | null>(null)
+  const [isCelebrating, setCelebrating] = useState(false)
   const { run } = useMutation()
   const isMobile = useIsMobileShell()
 
@@ -104,8 +114,15 @@ export const TourProvider = ({
     remember(GUIDE_KEYS.tourSkipped)
   }, [remember])
 
+  const finishTour = useCallback(() => {
+    setCelebrating(true)
+    remember(GUIDE_KEYS.tourDone)
+  }, [remember])
+
+  const endCelebration = useCallback(() => setCelebrating(false), [])
+
   const value = useMemo<TourContextValue>(() => {
-    if (!state) return INACTIVE
+    if (!state) return { ...INACTIVE, isCelebrating, endCelebration }
 
     const next = nextRoute(state.routes, state.seen)
     // The pages walk is for the desktop rail
@@ -121,10 +138,23 @@ export const TourProvider = ({
       finishIntro,
       finishPage,
       skip,
+      isCelebrating,
+      finishTour,
+      endCelebration,
       scene,
       playScene,
     }
-  }, [state, isMobile, finishIntro, finishPage, skip, scene])
+  }, [
+    state,
+    isMobile,
+    finishIntro,
+    finishPage,
+    skip,
+    isCelebrating,
+    finishTour,
+    endCelebration,
+    scene,
+  ])
 
   return <TourContext.Provider value={value}>{children}</TourContext.Provider>
 }

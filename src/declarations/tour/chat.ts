@@ -29,27 +29,27 @@ export const WELCOME_CHAT: ChatTurn[] = [
   {
     say: [
       'Salut {name}, moi c’est Memora.',
-      'C’est ta première connexion. Avant de te montrer l’application, j’ai quelques questions : ça prend deux minutes.',
+      "C’est ta première connexion. Avant de te montrer l’application, j’ai quelques questions d'informations. T'en fais pas, ça prend deux minutes.",
     ],
     ask: null,
   },
   { say: ['Pour commencer, quelle est ta date de naissance ?'], ask: 'birthday' },
   {
-    say: ['Merci. Tu veux que l’équipe te la souhaite ?'],
+    say: ['Merci. Tu veux que l’équipe te souhaite ton anniversaire ?'],
     ask: 'celebrate',
     requires: 'birthday',
   },
-  { say: ['Quelles langues parles-tu ?'], ask: 'languages' },
+  { say: ["Très bien, c'est noté, ensuite quelles langues parles-tu ?"], ask: 'languages' },
   { say: ['Passons à l’affichage. Quel thème préfères-tu ?'], ask: 'theme' },
   { say: ['Et la taille du texte ?'], ask: 'fontScale' },
   {
-    say: ['Dernière question : as-tu une vision des couleurs particulière ? Je peux les adapter.'],
+    say: ['Super choix ! Passons à la dernière question : as-tu une vision des couleurs particulière ? Je peux les adapter.'],
     ask: 'colorVision',
   },
   {
     say: [
-      'C’est noté. Tu pourras tout changer plus tard dans les paramètres.',
-      'Je te présente Memora ?',
+      'C’est fait ! Sache que tu pourras tout changer plus tard dans les paramètres.',
+      'Je te présente l\'App maintenant ?',
     ],
     ask: 'ready',
   },

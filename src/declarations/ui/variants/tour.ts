@@ -62,9 +62,6 @@ export const TOUR_DECK = {
 
 export const TOUR_SPOTLIGHT = {
   dim: 'fixed z-[70] bg-[var(--color-scrim)] transition-[top,left,width,height] duration-[var(--motion-duration-base)]',
-  ring: 'pointer-events-none fixed z-[71] transition-[top,left,width,height] duration-[var(--motion-duration-base)]',
-  // One of the white lines around the lit part, each a little wider and fainter
-  line: 'tour-line absolute border-2 border-[var(--color-on-media)]',
   shield: 'fixed z-[71]',
   bubble:
     'surface-enter fixed z-[72] flex w-[var(--tour-bubble-w)] max-w-[calc(100vw-2rem)] flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel p-4 shadow-[var(--shadow-md)]',
@@ -85,4 +82,23 @@ export const TOUR_SPOTLIGHT = {
 
 export const TOUR_RAIL = {
   unlock: 'tour-unlock',
+} as const
+
+/**
+ * The salute closing the first visit, in the middle of the screen
+ * @type {Record<string, string>}
+ */
+
+export const TOUR_CELEBRATION = {
+  overlay: 'fixed inset-0 z-[75] flex items-center justify-center p-4',
+  veil: 'overlay-enter absolute inset-0 bg-[color-mix(in_oklab,var(--color-ink)_45%,transparent)]',
+  panel:
+    'surface-enter relative flex w-full max-w-md flex-col items-center gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel p-8 text-center shadow-[var(--shadow-lg)]',
+  title: 'rise-in text-2xl font-bold tracking-tight text-balance',
+  stage: 'relative flex h-28 w-full items-center justify-center',
+  stamp:
+    'stamp-slam relative rounded-[var(--radius-lg)] border-[6px] border-[var(--color-apple-red)] bg-[color-mix(in_oklab,var(--color-on-media)_85%,transparent)] px-6 py-3 text-2xl font-bold tracking-wide text-[var(--color-apple-red)] uppercase',
+  confetti: 'absolute top-1/2 left-1/2 h-3 w-2 rounded-sm confetti-piece',
+  body: 'text-body text-[var(--color-ink-subtle)]',
+  actions: 'flex items-center gap-2',
 } as const

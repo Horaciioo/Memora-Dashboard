@@ -1,4 +1,4 @@
-/* First visit: a page lands in the menu, the lit part breathes */
+/* First visit: a page lands in the menu */
 @keyframes tour-unlock {
   0% {
     opacity: 0;
@@ -16,18 +16,4 @@
 
 .tour-unlock {
   animation: tour-unlock var(--motion-duration-slow) var(--motion-ease-spring) both;
-}
-
-@keyframes tour-line {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.25;
-  }
-}
-
-.tour-line {
-  animation: tour-line 2200ms ease-in-out infinite;
 }

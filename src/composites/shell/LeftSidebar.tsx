@@ -144,7 +144,11 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
         <>
           <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
           {/* Hangs under the news shortcut it announces */}
-          <ReleaseNotice pointedAt={newsAt >= 0 ? (newsAt + 0.5) / shortcuts.length : undefined} />
+          {!isCompact && (
+            <ReleaseNotice
+              pointedAt={newsAt >= 0 ? (newsAt + 0.5) / shortcuts.length : undefined}
+            />
+          )}
         </>
       )}
 
@@ -230,7 +234,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
       <Link href={ROUTES.changelog} className={LEFT_SIDEBAR.version}>
         {APP_VERSION_LABEL}
       </Link>
-      {(courseRail || calendarRail) && <ReleaseNotice />}
+      {(courseRail || calendarRail) && !isCompact && <ReleaseNotice />}
 
       {session && (
         <div className={LEFT_SIDEBAR.footer}>

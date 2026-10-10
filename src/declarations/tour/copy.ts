@@ -30,5 +30,8 @@ export const TOUR_COPY = {
   pointerBody: 'Clique sur « {label} » dans le menu.',
   pointerBackBody: 'Reviens d’abord à l’accueil, puis clique sur « {label} » dans le menu.',
   doneTitle: 'Tu as fait le tour de Memora',
+  doneCourse: 'Retrouve cette formation, achevée, dans tes Formations.',
+  doneOpen: 'Voir mes formations',
+  doneClose: 'Fermer',
   progress: 'Avancée de la visite',
 } as const

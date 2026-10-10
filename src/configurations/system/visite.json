@@ -12,7 +12,5 @@
   "bubbleHeightPx": 220,
   "graceMs": 700,
   "minAgeYears": 12,
-  "maxAgeYears": 90,
-  "ringLines": 3,
-  "ringGapPx": 6
+  "maxAgeYears": 90
 }
