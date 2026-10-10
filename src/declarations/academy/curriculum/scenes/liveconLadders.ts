@@ -1,8 +1,7 @@
 import type { SanctionBoxLevel } from '@/declarations/academy/curriculum/types'
 
 /**
- * An insult against the creator at each Livecon level: level 3 is the reference panel, each level
- * below it hardens, with a heavier first sanction and the ban reached sooner
+ * An insult against the creator at each Livecon level
  * @type {SanctionBoxLevel[]}
  */
 

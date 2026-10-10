@@ -10,12 +10,16 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @property {string} key - Stable identifier
  * @property {Partial<Record<MemberRoleName, PermissionName[]>>} grants - Permissions per role
  * @property {Record<string, PermissionName[]>} [functions] - Permissions per function name
+ * @property {Partial<Record<MemberRoleName, PermissionName[]>>} [revokes] - Role permissions taken back
+ * @property {Record<string, PermissionName[]>} [denies] - Permissions refused per function name
  */
 
 export interface GrantAddition {
   key: string
   grants: Partial<Record<MemberRoleName, PermissionName[]>>
   functions?: Record<string, PermissionName[]>
+  revokes?: Partial<Record<MemberRoleName, PermissionName[]>>
+  denies?: Record<string, PermissionName[]>
 }
 
 /**
@@ -41,7 +45,7 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
         Permissions.WorkLogRead,
       ],
       // Floor role writes announcements and tasks, inside the projects naming them
-      [MemberRoles.Moderateur]: [Permissions.CommunicationWrite, Permissions.TaskCreate],
+      [MemberRoles.Moderateur]: [Permissions.CommunicationWrite],
     },
   },
   {
@@ -80,14 +84,22 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
         Permissions.RecruitmentCandidateWrite,
         Permissions.RecruitmentInstructionWrite,
       ],
-      [MemberRoles.Moderateur]: [Permissions.RecruitmentRead],
     },
   },
   {
     key: 'legacy-track',
     grants: {
       [MemberRoles.Responsable]: [Permissions.LegacyRead, Permissions.LegacyManage],
-      [MemberRoles.Moderateur]: [Permissions.LegacySelf],
+    },
+  },
+  {
+    key: 'legacy-self-functions',
+    grants: {},
+    // Only a Junior Responsable follows a track
+    functions: {
+      'Junior Responsable Discord': [Permissions.LegacySelf],
+      'Junior Responsable Lives': [Permissions.LegacySelf],
+      'Junior Responsable Animateurs': [Permissions.LegacySelf],
     },
   },
   {
@@ -152,5 +164,30 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
         Permissions.MeetingDelete,
       ],
     },
+  },
+  {
+    key: 'floor-work-read-only',
+    grants: {},
+    // Moderators read their work, never change it
+    revokes: { [MemberRoles.Moderateur]: [Permissions.TaskCreate, Permissions.TaskUpdate] },
+  },
+  {
+    key: 'discord-no-live',
+    grants: {},
+    // Discord moderators have no live to follow
+    denies: {
+      Discord: [Permissions.LiveRead, Permissions.LiveModerate, Permissions.LiveLogRead],
+      'Junior Discord': [Permissions.LiveRead, Permissions.LiveModerate, Permissions.LiveLogRead],
+    },
+  },
+  {
+    key: 'academy-recruitment-by-function',
+    grants: {},
+    // Only trainers and recruiters open these pages
+    functions: {
+      Formateurs: [Permissions.AcademyRead],
+      Recruteurs: [Permissions.RecruitmentRead],
+    },
+    revokes: { [MemberRoles.Moderateur]: [Permissions.AcademyRead, Permissions.RecruitmentRead] },
   },
 ]

@@ -211,26 +211,32 @@ export const WorkBoard = <T extends BoardItem>({
           },
         ]
       : []),
-    {
-      id: 'edit',
-      label: ACTION_COPY.edit,
-      icon: 'edit',
-      disabled: !canUpdate,
-      onSelect: () => {
-        board.clearIssues()
-        setEditing(card)
-      },
-    },
+    ...(canUpdate
+      ? [
+          {
+            id: 'edit',
+            label: ACTION_COPY.edit,
+            icon: 'edit' as const,
+            onSelect: () => {
+              board.clearIssues()
+              setEditing(card)
+            },
+          },
+        ]
+      : []),
     ...(extraMenu?.(card) ?? []),
-    {
-      id: 'delete',
-      label: ACTION_COPY.delete,
-      icon: 'remove',
-      danger: true,
-      separatorBefore: true,
-      disabled: !canDelete,
-      onSelect: () => setPendingDeletion(card),
-    },
+    ...(canDelete
+      ? [
+          {
+            id: 'delete',
+            label: ACTION_COPY.delete,
+            icon: 'remove' as const,
+            danger: true,
+            separatorBefore: true,
+            onSelect: () => setPendingDeletion(card),
+          },
+        ]
+      : []),
   ]
 
   // The drawn figure and the dashed creation rows are alternatives
@@ -249,16 +255,16 @@ export const WorkBoard = <T extends BoardItem>({
         figure,
         title: copy.emptyTitle,
         description: columns.length === 0 ? copy.missingStates : copy.emptyDescription,
-        action: (
+        action: canCreate ? (
           <Button
             variant="primary"
             icon="add"
-            disabled={!canCreate || columns.length === 0}
+            disabled={columns.length === 0}
             onClick={() => openCreate()}
           >
             {copy.add}
           </Button>
-        ),
+        ) : undefined,
       }
 
   return (
