@@ -157,6 +157,8 @@ export const API_ROUTES = {
   accessSimulation: '/api/acces/simulation',
   profile: '/api/parametres',
   displayPreferences: '/api/parametres/affichage',
+  tourIntake: '/api/parametres/visite',
+  meetingRequests: '/api/calendrier/demandes',
   board: '/api/tableau',
   search: '/api/recherche',
 } as const

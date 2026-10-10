@@ -14,6 +14,7 @@ import {
 } from '@/declarations/academy/welcome'
 import { ICONS } from '@/declarations/ui/icons'
 import { ABSENCE_WIZARD, TRAININGS_WELCOME_STYLES } from '@/declarations/ui/variants'
+import { useTour } from '@/managers/front-end/TourManager'
 
 export interface TrainingsWelcomeProps {
   mandatory: number
@@ -32,8 +33,10 @@ export const TrainingsWelcome = ({ mandatory, trade }: TrainingsWelcomeProps) =>
   const { isSaving, run } = useMutation()
   const [index, setIndex] = useState(0)
   const [isClosed, setClosed] = useState(false)
+  // The first visit already walks through this page
+  const { isTouring } = useTour()
 
-  if (isClosed) return null
+  if (isClosed || isTouring) return null
 
   const page = TRAININGS_WELCOME[index]!
   const fill = (text: string) =>

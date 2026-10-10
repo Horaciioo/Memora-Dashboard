@@ -10,14 +10,22 @@ import { AbsenceWizard } from '@/composites/absences/AbsenceWizard'
 import { AbsenceList } from '@/composites/absences/AbsenceList'
 import { useAbsences } from '@/core/hooks/data/useAbsences'
 import { ABSENCE_COPY } from '@/declarations/absences/copy'
+import { ABSENCE_DEMO_SCRIPT } from '@/declarations/absences/demo'
+import { TOUR_BEACONS } from '@/declarations/tour/beacons'
+import { beaconProps } from '@/declarations/ui/beacons'
 import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import { ABSENCE_PAGE, ABSENCE_WIZARD } from '@/declarations/ui/variants'
+import { useTour } from '@/managers/front-end/TourManager'
 import type { FieldDefinition } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import { isFinishedAbsence } from '@/utils/format/absences'
 import { toDayKey } from '@/utils/format/calendar'
 import { startOfDay } from '@/utils/format/days'
+
+// The example declaration saves nothing
+const SAVE_NOTHING = async () => true
+const DO_NOTHING = () => undefined
 
 export interface AbsencesPanelProps {
   mine: MemberAbsence[]
@@ -38,6 +46,7 @@ export const AbsencesPanel = ({ mine, thresholdDays, canCreate }: AbsencesPanelP
   const [pendingDeletion, setPendingDeletion] = useState<MemberAbsence | null>(null)
   const [showFinished, setShowFinished] = useState(false)
   const [isDeclaring, setDeclaring] = useState(false)
+  const { scene } = useTour()
 
   // Current absences first
   const [current, finished] = useMemo(() => {
@@ -84,6 +93,26 @@ export const AbsencesPanel = ({ mine, thresholdDays, canCreate }: AbsencesPanelP
     [absences]
   )
 
+  // The first visit shows how it is done
+  if (scene === 'absence') {
+    return (
+      <div className={ABSENCE_PAGE.page}>
+        <div {...beaconProps(TOUR_BEACONS.absencesWizard)}>
+          <AbsenceWizard
+            booked={[]}
+            thresholdDays={thresholdDays}
+            isSaving={false}
+            issues={[]}
+            onSubmit={SAVE_NOTHING}
+            onEdit={DO_NOTHING}
+            onClose={DO_NOTHING}
+            autopilot={ABSENCE_DEMO_SCRIPT}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={ABSENCE_PAGE.page}>
       <PageOptions options={pageOptions} />
@@ -105,9 +134,11 @@ export const AbsencesPanel = ({ mine, thresholdDays, canCreate }: AbsencesPanelP
           figure="absences"
           title={ABSENCE_COPY.emptyTitle}
           action={
-            <Button variant="primary" icon="add" disabled={!canCreate} onClick={openDeclaration}>
-              {ABSENCE_COPY.declare}
-            </Button>
+            <span {...beaconProps(TOUR_BEACONS.absencesDeclare)}>
+              <Button variant="primary" icon="add" disabled={!canCreate} onClick={openDeclaration}>
+                {ABSENCE_COPY.declare}
+              </Button>
+            </span>
           }
         />
       )}
@@ -116,9 +147,11 @@ export const AbsencesPanel = ({ mine, thresholdDays, canCreate }: AbsencesPanelP
         <>
           {!isDeclaring && canCreate && (
             <div className={ABSENCE_WIZARD.header}>
-              <Button variant="primary" icon="add" onClick={openDeclaration}>
-                {ABSENCE_COPY.declare}
-              </Button>
+              <span {...beaconProps(TOUR_BEACONS.absencesDeclare)}>
+                <Button variant="primary" icon="add" onClick={openDeclaration}>
+                  {ABSENCE_COPY.declare}
+                </Button>
+              </span>
             </div>
           )}
           <AbsenceList absences={visible} onRemove={setPendingDeletion} />

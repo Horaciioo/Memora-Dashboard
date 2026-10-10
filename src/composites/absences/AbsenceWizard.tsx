@@ -1,11 +1,14 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Textarea } from '@/components/elements/forms/Textarea'
 import { AbsenceCalendar, type AbsenceSpan } from '@/composites/absences/AbsenceCalendar'
+import { useAbsenceAutopilot } from '@/core/hooks/interaction/useAbsenceAutopilot'
+import { demoSpan } from '@/core/lib/absences/demo'
 import { ABSENCE_COPY, ABSENCE_FIELD_COPY } from '@/declarations/absences/copy'
+import type { AbsenceAutopilot } from '@/declarations/absences/demo'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { ICONS } from '@/declarations/ui/icons'
 import { ABSENCE_WIZARD } from '@/declarations/ui/variants'
@@ -33,6 +36,8 @@ export interface AbsenceWizardProps {
   onSubmit: (values: FormValues) => Promise<boolean>
   onEdit: () => void
   onClose: () => void
+  // Fills the declaration by itself, to show how it is done
+  autopilot?: AbsenceAutopilot
 }
 
 /**
@@ -50,6 +55,7 @@ export const AbsenceWizard = ({
   onSubmit,
   onEdit,
   onClose,
+  autopilot,
 }: AbsenceWizardProps) => {
   const [step, setStep] = useState(1)
   const [start, setStart] = useState<string | null>(null)
@@ -73,6 +79,25 @@ export const AbsenceWizard = ({
       setStep(3)
     }
   }
+
+  // The example's days, picked on the calendar by Memora
+  const span = useMemo(
+    () => (autopilot ? demoSpan(new Date(), thresholdDays, autopilot) : null),
+    [autopilot, thresholdDays]
+  )
+  useAbsenceAutopilot(autopilot, span, {
+    pickStart: (day) => setStart(day),
+    pickEnd: (day) => setEnd(day),
+    goTo: setStep,
+    write: setReason,
+    send: () => {
+      if (!autopilot || !span) return
+
+      void onSubmit({ dates: [span.start, span.end], reason: autopilot.reason })
+      setSentReason(autopilot.reason)
+      setStep(3)
+    },
+  })
 
   const current = STEPS[Math.min(step, STEPS.length) - 1]!
 
@@ -141,6 +166,7 @@ export const AbsenceWizard = ({
                 <p className={ABSENCE_WIZARD.hint}>{ABSENCE_COPY.stepPeriodHint}</p>
               </div>
               <AbsenceCalendar
+                focusDay={span?.start}
                 start={start}
                 end={end}
                 booked={booked}

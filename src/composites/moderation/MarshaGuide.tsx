@@ -15,6 +15,8 @@ import {
   type MarshaCommand,
 } from '@/declarations/marsha/commands'
 import { MARSHA_COPY } from '@/declarations/marsha/copy'
+import { TOUR_BEACONS } from '@/declarations/tour/beacons'
+import { beaconProps } from '@/declarations/ui/beacons'
 import { ICONS } from '@/declarations/ui/icons'
 import { MARSHA_GUIDE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -73,7 +75,11 @@ export const MarshaGuide = ({ trainingHref }: MarshaGuideProps) => {
 
   return (
     <div className={MARSHA_GUIDE.page}>
-      <nav className={MARSHA_GUIDE.nav} aria-label={MARSHA_COPY.indexTitle}>
+      <nav
+        className={MARSHA_GUIDE.nav}
+        aria-label={MARSHA_COPY.indexTitle}
+        {...beaconProps(TOUR_BEACONS.marshaFamilies)}
+      >
         <Input
           type="search"
           value={search}
@@ -127,7 +133,7 @@ export const MarshaGuide = ({ trainingHref }: MarshaGuideProps) => {
         </div>
       </nav>
 
-      <div className={MARSHA_GUIDE.column}>
+      <div className={MARSHA_GUIDE.column} {...beaconProps(TOUR_BEACONS.marshaList)}>
         {isStart ? (
           <>
             <p className={MARSHA_GUIDE.lead}>{MARSHA_COPY.startLead}</p>

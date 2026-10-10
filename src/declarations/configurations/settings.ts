@@ -24,6 +24,7 @@ import projects from '@/configurations/system/projets.json'
 import responsive from '@/configurations/system/responsive.json'
 import sanctions from '@/configurations/system/sanctions.json'
 import search from '@/configurations/system/search.json'
+import tour from '@/configurations/system/visite.json'
 import {
   readBoolean,
   readChoice,
@@ -1246,5 +1247,93 @@ export const HOME_SETTINGS = {
     path: 'system/accueil.taskMax',
     fallback: 4,
     min: 1,
+  }),
+}
+
+/**
+ * First visit timings and spotlight sizes
+ * @type {{ newcomerDays: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, sendPauseMs: number, loadingMs: number, demoStepMs: number, ringPaddingPx: number, ringLines: number, ringGapPx: number, bubbleGapPx: number, bubbleWidthPx: number, bubbleHeightPx: number, minAgeYears: number, maxAgeYears: number, graceMs: number }}
+ */
+
+export const TOUR_SETTINGS = {
+  newcomerDays: readInteger(tour.newcomerDays, {
+    path: 'system/visite.newcomerDays',
+    fallback: 14,
+    min: 1,
+  }),
+  typingMsPerChar: readInteger(tour.typingMsPerChar, {
+    path: 'system/visite.typingMsPerChar',
+    fallback: 28,
+    min: 1,
+  }),
+  typingMinMs: readInteger(tour.typingMinMs, {
+    path: 'system/visite.typingMinMs',
+    fallback: 600,
+    min: 0,
+  }),
+  typingMaxMs: readInteger(tour.typingMaxMs, {
+    path: 'system/visite.typingMaxMs',
+    fallback: 1800,
+    min: 0,
+  }),
+  sendPauseMs: readInteger(tour.sendPauseMs, {
+    path: 'system/visite.sendPauseMs',
+    fallback: 350,
+    min: 0,
+  }),
+  loadingMs: readInteger(tour.loadingMs, {
+    path: 'system/visite.loadingMs',
+    fallback: 3200,
+    min: 0,
+  }),
+  demoStepMs: readInteger(tour.demoStepMs, {
+    path: 'system/visite.demoStepMs',
+    fallback: 1800,
+    min: 200,
+  }),
+  ringPaddingPx: readInteger(tour.ringPaddingPx, {
+    path: 'system/visite.ringPaddingPx',
+    fallback: 8,
+    min: 0,
+  }),
+  ringLines: readInteger(tour.ringLines, {
+    path: 'system/visite.ringLines',
+    fallback: 3,
+    min: 1,
+  }),
+  ringGapPx: readInteger(tour.ringGapPx, {
+    path: 'system/visite.ringGapPx',
+    fallback: 6,
+    min: 1,
+  }),
+  bubbleGapPx: readInteger(tour.bubbleGapPx, {
+    path: 'system/visite.bubbleGapPx',
+    fallback: 16,
+    min: 0,
+  }),
+  bubbleWidthPx: readInteger(tour.bubbleWidthPx, {
+    path: 'system/visite.bubbleWidthPx',
+    fallback: 352,
+    min: 200,
+  }),
+  bubbleHeightPx: readInteger(tour.bubbleHeightPx, {
+    path: 'system/visite.bubbleHeightPx',
+    fallback: 220,
+    min: 100,
+  }),
+  minAgeYears: readInteger(tour.minAgeYears, {
+    path: 'system/visite.minAgeYears',
+    fallback: 12,
+    min: 0,
+  }),
+  maxAgeYears: readInteger(tour.maxAgeYears, {
+    path: 'system/visite.maxAgeYears',
+    fallback: 90,
+    min: 1,
+  }),
+  graceMs: readInteger(tour.graceMs, {
+    path: 'system/visite.graceMs',
+    fallback: 700,
+    min: 0,
   }),
 }

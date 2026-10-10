@@ -25,6 +25,8 @@ export interface AbsenceCalendarProps {
   // Absences already declared
   booked: AbsenceSpan[]
   onChange: (start: string | null, end: string | null) => void
+  // Day whose month opens first, today's month when missing
+  focusDay?: string
 }
 
 /**
@@ -33,11 +35,20 @@ export interface AbsenceCalendarProps {
  * @param {string | null} end - Last day picked
  * @param {AbsenceSpan[]} booked - Absences already declared
  * @param {(start: string | null, end: string | null) => void} onChange - Selection handler
+ * @param {string} [focusDay] - Day whose month opens first
  * @return {JSX.Element}
  */
 
-export const AbsenceCalendar = ({ start, end, booked, onChange }: AbsenceCalendarProps) => {
-  const [cursor, setCursor] = useState(() => toDayKey(startOfMonth(new Date())))
+export const AbsenceCalendar = ({
+  start,
+  end,
+  booked,
+  onChange,
+  focusDay,
+}: AbsenceCalendarProps) => {
+  const [cursor, setCursor] = useState(() =>
+    toDayKey(startOfMonth(focusDay ? parseDay(focusDay) : new Date()))
+  )
   const [preview, setPreview] = useState<string | null>(null)
 
   const Previous = ICONS.back

@@ -18,6 +18,8 @@ import { upcomingPlans } from '@/core/services/personal/HomePlanService'
 import { myTasks } from '@/core/services/personal/TaskInboxService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { changelogFor } from '@/declarations/changelog/helpers'
+import { TOUR_BEACONS } from '@/declarations/tour/beacons'
+import { beaconProps } from '@/declarations/ui/beacons'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { HOME_BOARD, HOME_FLOW } from '@/declarations/ui/variants'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
@@ -50,18 +52,22 @@ export default async function DashboardPage() {
       myCoordinationRequests(session.id),
     ])
 
-  // Pending requests are the only ones that wait on the member
+  // Pending requests
   const pending = requests.filter((absence) => absence.status === AbsenceStatuses.Pending)
 
   return (
     <div className={HOME_FLOW.page}>
       {hasUnlock && <CourseUnlockBubble />}
       <PageHeader title={PERSONAL_COPY.title} />
-      <HomeHeader name={session.displayName} />
-      <HomeNews release={changelogFor(access.can)[0]} />
+      <div {...beaconProps(TOUR_BEACONS.homeHeader)}>
+        <HomeHeader name={session.displayName} />
+      </div>
+      <div {...beaconProps(TOUR_BEACONS.homeNews)}>
+        <HomeNews release={changelogFor(access.can)[0]} />
+      </div>
       <HomeLiveCall beacon={beacon} />
       <div className={HOME_BOARD.card}>
-        <div className={HOME_BOARD.col}>
+        <div className={HOME_BOARD.col} {...beaconProps(TOUR_BEACONS.homeQueue)}>
           <HomeQueue
             absences={pending}
             reviewFields={REVIEW_FIELDS}
@@ -70,14 +76,16 @@ export default async function DashboardPage() {
             coordination={coordination}
           />
         </div>
-        <div className={HOME_BOARD.col}>
+        <div className={HOME_BOARD.col} {...beaconProps(TOUR_BEACONS.homePlanned)}>
           <HomePlanned entries={planned} />
         </div>
-        <div className={HOME_BOARD.col}>
+        <div className={HOME_BOARD.col} {...beaconProps(TOUR_BEACONS.homeBirthdays)}>
           <HomeBirthdays birthdays={birthdays} />
         </div>
       </div>
-      <HomeShortcuts can={access.can} />
+      <div {...beaconProps(TOUR_BEACONS.homeShortcuts)}>
+        <HomeShortcuts can={access.can} />
+      </div>
     </div>
   )
 }
