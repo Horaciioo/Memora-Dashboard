@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 
+import { findVisibleBeacon } from '@/core/lib/beacons'
 import { NUDGE_SETTINGS } from '@/declarations/configurations/settings'
-import { BEACON_ATTRIBUTE, HOME_BEACON, HOP_ATTRIBUTE } from '@/declarations/ui/beacons'
+import { HOME_BEACON, HOP_ATTRIBUTE } from '@/declarations/ui/beacons'
 
 /**
  * Point beside an entry
@@ -16,17 +17,6 @@ export interface BeaconSpot {
   top: number
   left: number
 }
-
-/**
- * Visible entry of a beacon
- * @param {string} beacon - Beacon name
- * @return {HTMLElement | null} - Entry or null
- */
-
-const findVisible = (beacon: string): HTMLElement | null =>
-  [...document.querySelectorAll<HTMLElement>(`[${BEACON_ATTRIBUTE}="${beacon}"]`)].find(
-    (node) => node.getBoundingClientRect().width > 0
-  ) ?? null
 
 /**
  * Aim at a rail entry
@@ -46,7 +36,7 @@ export const useBeaconSpot = (isActive: boolean, beacon: string): BeaconSpot | n
     // Follow the entry
     const place = () => {
       target?.removeAttribute(HOP_ATTRIBUTE)
-      target = findVisible(beacon) ?? findVisible(HOME_BEACON)
+      target = findVisibleBeacon(beacon) ?? findVisibleBeacon(HOME_BEACON)
 
       if (!target) {
         setSpot(null)
