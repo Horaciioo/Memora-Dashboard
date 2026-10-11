@@ -33,11 +33,28 @@ export const markGuideSeen = async (accountId: string, key: GuideKey): Promise<v
 }
 
 /**
- * Show every one-time guide again
+ * Guides of the first visit, never shown again by a reset
+ * @param {string} key - Guide key
+ * @return {boolean} - Belongs to the first visit
+ */
+
+const isTourGuide = (key: string): boolean =>
+  key.startsWith('visite-') || key.startsWith('tour-page:')
+
+/**
+ * Show the one-time guides again, the first visit stays done
  * @param {string} accountId - Account identifier
  * @return {Promise<void>} - Reset
  */
 
 export const resetGuides = async (accountId: string): Promise<void> => {
-  await prisma.account.update({ where: { id: accountId }, data: { seenGuides: { set: [] } } })
+  const account = await prisma.account.findUnique({
+    where: { id: accountId },
+    select: { seenGuides: true },
+  })
+
+  await prisma.account.update({
+    where: { id: accountId },
+    data: { seenGuides: { set: (account?.seenGuides ?? []).filter(isTourGuide) } },
+  })
 }

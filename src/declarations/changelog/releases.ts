@@ -352,6 +352,10 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         audience: ChangelogAudiences.Responsables,
         text: 'Correction d’un bug qui rendait certaines phrases du « Journal » ambiguës quand elles concernaient un sujet de réunion',
       },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui faisait réapparaître le formulaire d’informations dès qu’on réaffichait les explications',
+      },
     ],
   },
   {
