@@ -8,6 +8,7 @@ import { Button } from '@/components/elements/actions/Button'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { ATTENDANCE_STATUS_REGISTRY } from '@/declarations/calendar/registries'
 import { ICONS } from '@/declarations/ui/icons'
+import { TONES } from '@/declarations/ui/theme'
 import { CALENDAR_DETAIL, CALENDAR_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { AttendancePerson, CalendarEntry } from '@/types/calendar'
@@ -42,8 +43,21 @@ const ChevronIcon = ICONS.expand
 export const AttendancePanel = ({ entry, pending, onRespond, onRemind }: AttendancePanelProps) => {
   // Closed on arrival, the answer comes first
   const [isOpen, setIsOpen] = useState(false)
+  const [isChanging, setIsChanging] = useState(false)
   const roster = entry.attendance
   if (!roster) return null
+
+  const isAnswered = roster.mine !== null && roster.mine !== AttendanceStatuses.Pending
+  const isPresent = roster.mine === AttendanceStatuses.Present
+  const AnswerIcon = ICONS[isPresent ? 'success' : 'failure']
+  const answerTone = isPresent ? 'success' : 'danger'
+  const answerCopy = isPresent ? CALENDAR_COPY.answeredPresent : CALENDAR_COPY.answeredAbsent
+
+  // Leaving the answer view closes the change view
+  const answer = (status: AttendanceStatusName) => {
+    setIsChanging(false)
+    onRespond(status)
+  }
 
   const people: Record<AttendanceStatusName, AttendancePerson[]> = {
     [AttendanceStatuses.Present]: roster.present,
@@ -57,29 +71,48 @@ export const AttendancePanel = ({ entry, pending, onRespond, onRemind }: Attenda
         <section className={CALENDAR_DETAIL.section}>
           <h3 className={SECTION_STYLES.title}>{CALENDAR_COPY.yourPresence}</h3>
           <div className={CALENDAR_DETAIL.card}>
-            <p className={CALENDAR_STYLES.detailNote}>
-              {roster.mine === AttendanceStatuses.Pending
-                ? CALENDAR_COPY.noAnswerYet
-                : CALENDAR_COPY.answerSaved}
-            </p>
-            <div className={CALENDAR_DETAIL.answer}>
-              <Button
-                variant={roster.mine === AttendanceStatuses.Present ? 'primary' : 'secondary'}
-                disabled={pending}
-                className="flex-1"
-                onClick={() => onRespond(AttendanceStatuses.Present)}
-              >
-                {CALENDAR_COPY.respondPresent}
-              </Button>
-              <Button
-                variant={roster.mine === AttendanceStatuses.Absent ? 'danger' : 'secondary'}
-                disabled={pending}
-                className="flex-1"
-                onClick={() => onRespond(AttendanceStatuses.Absent)}
-              >
-                {CALENDAR_COPY.respondAbsent}
-              </Button>
-            </div>
+            {isAnswered && !isChanging ? (
+              <>
+                <p className={CALENDAR_DETAIL.answered}>
+                  <AnswerIcon
+                    className={cn(CALENDAR_STYLES.previewIcon, TONES[answerTone].text)}
+                    aria-hidden="true"
+                  />
+                  <span>
+                    {answerCopy[0]}
+                    <strong>{answerCopy[1]}</strong>
+                    {answerCopy[2]}
+                  </span>
+                </p>
+                <Button variant="ghost" onClick={() => setIsChanging(true)}>
+                  {CALENDAR_COPY.changeMind}
+                </Button>
+              </>
+            ) : (
+              <>
+                {!isAnswered && (
+                  <p className={CALENDAR_STYLES.detailNote}>{CALENDAR_COPY.noAnswerYet}</p>
+                )}
+                <div className={CALENDAR_DETAIL.answer}>
+                  <Button
+                    variant="secondary"
+                    disabled={pending}
+                    className="flex-1"
+                    onClick={() => answer(AttendanceStatuses.Present)}
+                  >
+                    {CALENDAR_COPY.respondPresent}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    disabled={pending}
+                    className="flex-1"
+                    onClick={() => answer(AttendanceStatuses.Absent)}
+                  >
+                    {CALENDAR_COPY.respondAbsent}
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </section>
       )}

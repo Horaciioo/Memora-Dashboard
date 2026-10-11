@@ -740,8 +740,10 @@ const eventTemplates: ReferenceResource = {
       kind: 'select',
       label: REFERENCE_FIELD_COPY.visibility,
       required: true,
-      options: toOptions(EVENT_VISIBILITY_REGISTRY),
-      mark: 'dot',
+      options: toOptions(EVENT_VISIBILITY_REGISTRY).filter(
+        (option) => option.value !== EventVisibilities.Team
+      ),
+      mark: 'glyph',
       span: 'half',
     },
     accentField,
@@ -1347,7 +1349,7 @@ const pimStepTemplates: ReferenceResource = {
         label: REFERENCE_FIELD_COPY.owner,
         required: true,
         options: toOptions(STEP_OWNER_REGISTRY),
-        mark: 'dot',
+        mark: 'glyph',
         span: 'half',
       },
       {
@@ -1745,7 +1747,7 @@ const recruitmentStepTemplates: ReferenceResource = {
         label: RECRUITMENT_FIELD_COPY.owner,
         required: true,
         options: toOptions(RECRUITMENT_OWNER_REGISTRY),
-        mark: 'dot',
+        mark: 'glyph',
         span: 'half',
       },
       {

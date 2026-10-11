@@ -11,12 +11,15 @@ import { nextRoute, unlockedRoutes } from '@/core/lib/tour/progress'
 import { GUIDE_KEYS, tourPageKey } from '@/declarations/academy/welcome'
 import type { GuideKey } from '@/declarations/academy/welcome'
 import type { TourScene } from '@/declarations/tour/pages'
-import type { TourState } from '@/types/tour'
+import type { FieldDefinition } from '@/types/forms'
+import type { TourCreator, TourState } from '@/types/tour'
 
 /**
  * First visit state and the gestures that move it
  * @typedef {Object} TourContextValue
  * @property {boolean} isIntroOpen - Admission and presentation still to play
+ * @property {TourCreator | null} creator - Creator whose face the welcome shows
+ * @property {FieldDefinition[]} socialFields - Social form the welcome asks
  * @property {boolean} isTouring - Pages are being unlocked one by one
  * @property {string | null} next - Page waiting to be explained
  * @property {number} remaining - Pages still to explain
@@ -33,6 +36,8 @@ import type { TourState } from '@/types/tour'
 
 interface TourContextValue {
   isIntroOpen: boolean
+  creator: TourCreator | null
+  socialFields: FieldDefinition[]
   isTouring: boolean
   next: string | null
   remaining: number
@@ -49,6 +54,8 @@ interface TourContextValue {
 
 const INACTIVE: TourContextValue = {
   isIntroOpen: false,
+  creator: null,
+  socialFields: [],
   isTouring: false,
   next: null,
   remaining: 0,
@@ -131,6 +138,8 @@ export const TourProvider = ({
 
     return {
       isIntroOpen: !state.isIntroSeen,
+      creator: state.creator,
+      socialFields: state.socialFields,
       isTouring,
       next,
       remaining: state.routes.length - state.seen.length,

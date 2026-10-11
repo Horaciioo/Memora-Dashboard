@@ -190,7 +190,7 @@ export const MembersPanel = ({
       label: MEMBER_FILTER_COPY.role,
       allLabel: MEMBER_FILTER_COPY.allRoles,
       options: toOptions(ROLE_REGISTRY),
-      mark: 'dot',
+      mark: 'glyph',
     },
     {
       name: 'status',

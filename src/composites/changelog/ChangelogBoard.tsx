@@ -22,8 +22,8 @@ export interface ChangelogBoardProps {
  */
 
 export const ChangelogBoard = ({ version }: ChangelogBoardProps) => {
-  const { can } = useAuthContext()
-  const releases = changelogFor(can)
+  const { can, isResponsable } = useAuthContext()
+  const releases = changelogFor({ can, isResponsable })
   const release = resolveRelease(releases, version)
   const { release: latest, isFresh, markSeen } = useFreshRelease()
   const isLatestOpen = latest !== null && latest.version === release?.version

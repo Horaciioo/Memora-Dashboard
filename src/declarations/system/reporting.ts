@@ -9,8 +9,6 @@ export const SCRUBBED_KEYS = [
   'password',
   'authorization',
   'cookie',
-  'email',
-  'phone',
   'birthday',
   'discordid',
   'displayname',

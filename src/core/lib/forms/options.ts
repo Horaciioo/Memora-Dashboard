@@ -3,7 +3,7 @@ import { ROLE_REGISTRY, byRoleRank } from '@/declarations/access/roles'
 import { FUNCTION_KIND_REGISTRY } from '@/declarations/reference/registries'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import type { FunctionKindName } from '@/utils/constants/workflow'
-import type { FieldOption } from '@/types/forms'
+import type { FieldDefinition, FieldOption, FieldValue } from '@/types/forms'
 
 /**
  * Turn a registry into select options
@@ -13,7 +13,7 @@ import type { FieldOption } from '@/types/forms'
 
 export const toOptions = <
   TKey extends string,
-  TValue extends { label: string; accent?: string | null },
+  TValue extends { label: string; accent?: string | null; icon?: string },
 >(
   registry: Registry<TKey, TValue>
 ): FieldOption[] =>
@@ -21,6 +21,7 @@ export const toOptions = <
     value: key,
     label: registry.label(key),
     accent: registry.get(key).accent ?? undefined,
+    icon: registry.get(key).icon,
   }))
 
 /**
@@ -107,3 +108,18 @@ export const roleGroupedOptions = <TRow extends PersonRow>(
       group: ROLE_REGISTRY.get(row.role).plural,
       ...extra?.(row),
     }))
+
+/**
+ * Options a multiselect value points at
+ * @param {FieldDefinition} field - Multiselect declaration
+ * @param {FieldValue | undefined} value - Picked identifiers
+ * @return {FieldOption[]} - Picked options in the field order
+ */
+
+export const pickedOptions = (
+  field: FieldDefinition,
+  value: FieldValue | undefined
+): FieldOption[] =>
+  Array.isArray(value)
+    ? (field.options?.filter((option) => value.includes(option.value)) ?? [])
+    : []

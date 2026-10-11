@@ -62,10 +62,11 @@ export interface WorkAuthorship {
  * @property {WorkTag | null} state - Workflow state
  * @property {WorkTag | null} priority - Priority
  * @property {WorkTag | null} platform - Platform
- * @property {WorkTag | null} youtuber - YouTuber concerned
+ * @property {WorkTag[]} youtubers - YouTubers concerned
  * @property {WorkPerson[]} leads - Project responsables
  * @property {WorkPerson[]} assistants - Project assistants
  * @property {string | null} deadline - ISO deadline
+ * @property {boolean} isOverdue - Deadline gone by, work not done
  * @property {number} position - Order inside its column
  * @property {number} communicationCount - Announcements written
  * @property {number} taskCount - Tasks attached
@@ -82,10 +83,11 @@ export interface ProjectSummary extends WorkAuthorship {
   state: WorkTag | null
   priority: WorkTag | null
   platform: WorkTag | null
-  youtuber: WorkTag | null
+  youtubers: WorkTag[]
   leads: WorkPerson[]
   assistants: WorkPerson[]
   deadline: string | null
+  isOverdue: boolean
   position: number
   communicationCount: number
   taskCount: number
@@ -125,10 +127,11 @@ export interface CommunicationEntry {
  * @property {string | null} columnId - Workflow state identifier
  * @property {WorkTag | null} state - Workflow state
  * @property {WorkTag | null} priority - Priority
- * @property {WorkTag | null} youtuber - YouTuber concerned
+ * @property {WorkTag[]} youtubers - YouTubers concerned
  * @property {WorkTag | null} project - Project it belongs to
  * @property {WorkPerson | null} owner - Task owner
  * @property {string | null} dueDate - ISO due date
+ * @property {boolean} isOverdue - Date gone by, work not done
  * @property {number} position - Order inside its column
  * @property {FormValues} values - Values feeding the edit form
  */
@@ -141,10 +144,11 @@ export interface TaskSummary extends WorkAuthorship {
   columnId: string | null
   state: WorkTag | null
   priority: WorkTag | null
-  youtuber: WorkTag | null
+  youtubers: WorkTag[]
   project: WorkTag | null
   owner: WorkPerson | null
   dueDate: string | null
+  isOverdue: boolean
   position: number
   values: FormValues
 }
@@ -160,9 +164,10 @@ export interface TaskSummary extends WorkAuthorship {
  * @property {string | null} minutes - Meeting minutes
  * @property {string | null} columnId - Workflow state identifier
  * @property {WorkTag | null} state - Workflow state
- * @property {WorkTag | null} youtuber - YouTuber concerned
+ * @property {WorkTag[]} youtubers - YouTubers concerned
  * @property {WorkTag | null} project - Project it belongs to
  * @property {string} scheduledAt - ISO date and time
+ * @property {boolean} isOverdue - Day gone by, meeting not done
  * @property {number | null} durationMin - Length in minutes
  * @property {MeetingAudienceName} audience - Who is expected
  * @property {WorkPerson[]} leads - Main attendees
@@ -181,9 +186,10 @@ export interface MeetingSummary extends WorkAuthorship {
   minutes: string | null
   columnId: string | null
   state: WorkTag | null
-  youtuber: WorkTag | null
+  youtubers: WorkTag[]
   project: WorkTag | null
   scheduledAt: string
+  isOverdue: boolean
   durationMin: number | null
   audience: MeetingAudienceName
   leads: WorkPerson[]
@@ -239,4 +245,18 @@ export interface ProjectDetail {
   communications: CommunicationEntry[]
   tasks: TaskSummary[]
   meetings: MeetingSummary[]
+}
+
+/**
+ * Pages holding a late item of the member
+ * @typedef {Object} OverdueFlags
+ * @property {boolean} projects - A project of theirs is late
+ * @property {boolean} tasks - A task of theirs is late
+ * @property {boolean} meetings - A meeting of theirs is late
+ */
+
+export interface OverdueFlags {
+  projects: boolean
+  tasks: boolean
+  meetings: boolean
 }

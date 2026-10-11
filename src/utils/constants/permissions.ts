@@ -65,7 +65,6 @@ export const Permissions = {
   AcademyTrainingComplete: 'academy:training:complete',
   LegacyRead: 'legacy:read',
   LegacyManage: 'legacy:manage',
-  LegacySelf: 'legacy:self',
   CalendarRead: 'calendar:read',
   CalendarManage: 'calendar:manage',
   TeamRead: 'team:read',
@@ -659,13 +658,6 @@ export const PermissionsList: PermissionMeta[] = [
     description: 'Ouvrir un parcours, noter chaque module et suivre la progression.',
     important: true,
     parent: Permissions.LegacyRead,
-  },
-  {
-    name: Permissions.LegacySelf,
-    group: PermissionGroups.Legacy,
-    displayName: 'Suivre son parcours Legacy',
-    description: 'Ouvrir ses modules et répondre à leurs exercices.',
-    important: false,
   },
   {
     name: Permissions.TeamRead,

@@ -6,7 +6,7 @@ import { Field } from '@/components/elements/forms/Field'
 import { FieldControl } from '@/components/elements/forms/FieldControl'
 import { HandleLookup } from '@/components/elements/forms/HandleLookup'
 import { Toggle } from '@/components/elements/forms/Toggle'
-import { busyNotice, visibleFields } from '@/core/lib/forms'
+import { busyNotice, narrowOptions, visibleFields } from '@/core/lib/forms'
 import { FIELD_STYLES, FORM_GRID, FORM_ROWS } from '@/declarations/ui/variants'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
@@ -94,7 +94,7 @@ export const FormRenderer = ({
   single,
   recordId,
 }: FormRendererProps) => {
-  const shown = visibleFields(fields, values)
+  const shown = visibleFields(fields, values).map((field) => narrowOptions(field, values))
   const errorOf = (name: string) => issues.find((issue) => issue.field === name)?.message
 
   // A glyph field is drawn inside the control it decorates

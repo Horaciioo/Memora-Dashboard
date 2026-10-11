@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { RecordId } from '@/components/elements/display/RecordId'
 import { useState } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
@@ -13,7 +13,6 @@ import { LEGACY_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { accentPaint } from '@/declarations/ui/theme'
 import { ICONS } from '@/declarations/ui/icons'
 import { LEGACY_SETTINGS } from '@/declarations/configurations/settings'
-import { ROUTES } from '@/declarations/navigation'
 import { LEGACY_FUNCTION_OF } from '@/declarations/reference/fixed'
 import { INLINE_EDIT_STYLES, LEGACY_TRACK } from '@/declarations/ui/variants'
 import type { LegacyModuleView, LegacyTrackDetail } from '@/types/legacy'
@@ -28,8 +27,6 @@ export interface LegacyTrackViewProps {
   canGrade: boolean
   // Administrator
   canDecide: boolean
-  // The member following the track
-  isOwner: boolean
 }
 
 /**
@@ -112,28 +109,18 @@ const GradeCell = ({
  */
 
 const ModuleRow = ({
-  trackId,
   module,
   canGrade,
-  isOwner,
   isRunning,
   onGrade,
 }: {
-  trackId: string
   module: LegacyModuleView
   canGrade: boolean
-  isOwner: boolean
   isRunning: boolean
   onGrade: (moduleKey: string, score: number) => Promise<boolean>
 }) => {
   const Check = ICONS.success
   const markAt = (LEGACY_SETTINGS.modulePassPoints / LEGACY_SETTINGS.modulePoints) * 100
-  const action =
-    module.cleared === 0
-      ? LEGACY_COPY.start
-      : module.cleared < module.exercises
-        ? LEGACY_COPY.resume
-        : LEGACY_COPY.review
 
   return (
     <article className={LEGACY_TRACK.module}>
@@ -173,14 +160,6 @@ const ModuleRow = ({
         />
         {'.'}
       </p>
-
-      {isOwner && isRunning && (
-        <Link href={ROUTES.legacyModule(trackId, module.key)} className={LEGACY_TRACK.moduleAction}>
-          <Button variant={module.cleared >= module.exercises ? 'secondary' : 'primary'}>
-            {action}
-          </Button>
-        </Link>
-      )}
     </article>
   )
 }
@@ -191,7 +170,7 @@ const ModuleRow = ({
  * @return {JSX.Element}
  */
 
-export const LegacyTrackView = ({ detail, canGrade, canDecide, isOwner }: LegacyTrackViewProps) => {
+export const LegacyTrackView = ({ detail, canGrade, canDecide }: LegacyTrackViewProps) => {
   const legacy = useLegacy()
   const [deciding, setDeciding] = useState<LegacyStatusName | null>(null)
   const { summary, modules } = detail
@@ -227,6 +206,7 @@ export const LegacyTrackView = ({ detail, canGrade, canDecide, isOwner }: Legacy
                 summary.functionName ??
                 LEGACY_COPY.trade}
             </p>
+            <RecordId id={summary.id} className="text-[var(--color-ink-subtle)]" />
             {!isRunning && (
               <p className={cn(LEGACY_TRACK.statusClosed, paint.text)} style={paint.style}>
                 {status.label}
@@ -298,10 +278,8 @@ export const LegacyTrackView = ({ detail, canGrade, canDecide, isOwner }: Legacy
         {modules.map((module) => (
           <ModuleRow
             key={module.key}
-            trackId={summary.id}
             module={module}
             canGrade={canGrade}
-            isOwner={isOwner}
             isRunning={isRunning}
             onGrade={(moduleKey, score) => legacy.grade(summary.id, moduleKey, score)}
           />

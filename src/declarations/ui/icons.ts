@@ -42,6 +42,7 @@ import {
   RecruitmentGlyph,
   RefreshGlyph,
   RemoveGlyph,
+  ResponsableGlyph,
   SanctionsGlyph,
   ScanGlyph,
   SearchGlyph,
@@ -118,6 +119,7 @@ import {
 } from '@/components/elements/display/Glyphs'
 import {
   LiveDotGlyph,
+  StatusDotGlyph,
   TwitchGlyph,
   YoutubeGlyph,
   ModDeleteGlyph,
@@ -186,6 +188,7 @@ export const ICONS = {
   liveconWatch: LiveconWatchGlyph,
   liveconCrisis: LiveconCrisisGlyph,
   liveDot: LiveDotGlyph,
+  statusDot: StatusDotGlyph,
   twitch: TwitchGlyph,
   youtube: YoutubeGlyph,
   modDelete: ModDeleteGlyph,
@@ -253,6 +256,8 @@ export const ICONS = {
   shieldOutline: ShieldOutlineGlyph,
   flame: FlameGlyph,
   crown: CrownGlyph,
+  // Same flame as the Responsable role
+  legacy: ResponsableGlyph,
   // One per fixed function
   functionDiscord: DiscordFunctionGlyph,
   functionLive: LiveFunctionGlyph,

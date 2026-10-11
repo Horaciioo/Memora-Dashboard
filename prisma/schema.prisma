@@ -205,6 +205,7 @@ enum EventVisibility {
   EVERYONE
   RESPONSABLES
   ADMINS
+  TEAM
 }
 
 // Where a member stands on a roll-call
@@ -280,8 +281,6 @@ model Account {
   discordAvatarHash     String?
   discordSyncedAt       DateTime?
   displayName           String
-  email                 String?
-  phone                 String?
   birthday              DateTime?
   celebrateBirthday     Boolean      @default(true)
   joinedAt              DateTime     @default(now())
@@ -293,6 +292,8 @@ model Account {
   // One-time guides already shown, by key
   seenGuides            String[]     @default([])
   anonymisedAt          DateTime?
+  // Access shut until lifted
+  frozenAt              DateTime?
   languages             String[]     @default([])
   timezone              String?
   theme                 String?
@@ -347,7 +348,7 @@ model Account {
   juniorObjectivesSet   JuniorObjective[]        @relation("JuniorObjectiveAuthor")
   calendarEvents        CalendarEvent[]          @relation("CalendarOwner")
   eventAttendances      EventAttendance[]
-  ledTeams              Team[]                   @relation("TeamLead")
+  ledTeams              TeamLead[]
   teamMemberships       TeamMember[]
   projectLeads          ProjectLead[]
   projectAssists        ProjectAssistant[]
@@ -363,6 +364,8 @@ model Account {
   liveconChanges        LiveconEntry[]
   departureNotices      DepartureNotice[]        @relation("DepartureSubject")
   departuresPublished   DepartureNotice[]        @relation("DeparturePublisher")
+  liveSuspensions       LiveSuspension[]         @relation("SuspensionSubject")
+  liveSuspensionsIssued LiveSuspension[]         @relation("SuspensionAuthor")
   platformAccounts      PlatformAccount[]
   livesAnnounced        Live[]                   @relation("LiveAnnouncer")
   liveCoordinations     LiveCoordination[]
@@ -398,6 +401,24 @@ model DepartureNotice {
 
   @@index([publishedAt])
   @@map("departure_notices")
+}
+
+// Pause on a member's access to the live moderation
+model LiveSuspension {
+  id          String    @id @default(cuid())
+  accountId   String
+  startsAt    DateTime  @default(now())
+  endsAt      DateTime
+  reason      String?
+  createdById String?
+  liftedAt    DateTime?
+  createdAt   DateTime  @default(now())
+
+  account   Account  @relation("SuspensionSubject", fields: [accountId], references: [id], onDelete: Cascade)
+  createdBy Account? @relation("SuspensionAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([accountId, endsAt])
+  @@map("live_suspensions")
 }
 
 // Signed cookie handle of an open session
@@ -729,20 +750,33 @@ model Team {
   id         String   @id @default(cuid())
   name       String
   summary    String?
-  leadId     String?
   youtuberId String?
   archived   Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  lead     Account?       @relation("TeamLead", fields: [leadId], references: [id], onDelete: SetNull)
   youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+  leads    TeamLead[]
   members  TeamMember[]
   anchors  YoutuberLead[]
 
-  @@index([leadId])
   @@index([youtuberId, archived])
   @@map("teams")
+}
+
+// Responsable or admin running a team
+model TeamLead {
+  id        String   @id @default(cuid())
+  teamId    String
+  accountId String
+  createdAt DateTime @default(now())
+
+  team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, accountId])
+  @@index([accountId])
+  @@map("team_leads")
 }
 
 // Membership of an account inside a team
@@ -765,7 +799,6 @@ model Project {
   title       String
   emoji       String?
   description String?
-  youtuberId  String?
   stateId     String?
   priorityId  String?
   platformId  String?
@@ -780,10 +813,10 @@ model Project {
   createdBy Account? @relation("ProjectAuthor", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy Account? @relation("ProjectEditor", fields: [updatedById], references: [id], onDelete: SetNull)
 
-  youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
-  state    WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
-  priority Priority?      @relation(fields: [priorityId], references: [id], onDelete: SetNull)
-  platform Platform?      @relation(fields: [platformId], references: [id], onDelete: SetNull)
+  youtubers Youtuber[]
+  state     WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
+  priority  Priority?      @relation(fields: [priorityId], references: [id], onDelete: SetNull)
+  platform  Platform?      @relation(fields: [platformId], references: [id], onDelete: SetNull)
 
   leads          ProjectLead[]
   assistants     ProjectAssistant[]
@@ -793,7 +826,6 @@ model Project {
   calendarEvents CalendarEvent[]
 
   @@index([stateId, position])
-  @@index([youtuberId])
   @@index([archived])
   @@map("projects")
 }
@@ -857,7 +889,6 @@ model Task {
   ownerId     String?
   stateId     String?
   priorityId  String?
-  youtuberId  String?
   projectId   String?
   createdById String?
   updatedById String?
@@ -869,11 +900,11 @@ model Task {
   createdBy Account? @relation("TaskAuthor", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy Account? @relation("TaskEditor", fields: [updatedById], references: [id], onDelete: SetNull)
 
-  owner    Account?       @relation("TaskOwner", fields: [ownerId], references: [id], onDelete: SetNull)
-  state    WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
-  priority Priority?      @relation(fields: [priorityId], references: [id], onDelete: SetNull)
-  youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
-  project  Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  owner     Account?       @relation("TaskOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  state     WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
+  priority  Priority?      @relation(fields: [priorityId], references: [id], onDelete: SetNull)
+  youtubers Youtuber[]
+  project   Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   @@index([stateId, position])
   @@index([ownerId])
@@ -893,7 +924,6 @@ model Meeting {
   durationMin  Int?
   audience     MeetingAudience @default(CUSTOM)
   stateId      String?
-  youtuberId   String?
   projectId    String?
   createdById  String?
   updatedById  String?
@@ -904,9 +934,9 @@ model Meeting {
   createdBy Account? @relation("MeetingAuthor", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy Account? @relation("MeetingEditor", fields: [updatedById], references: [id], onDelete: SetNull)
 
-  state    WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
-  youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
-  project  Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  state     WorkflowState? @relation(fields: [stateId], references: [id], onDelete: SetNull)
+  youtubers Youtuber[]
+  project   Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   attendees      MeetingAttendee[]
   topics         MeetingTopic[]
@@ -1567,30 +1597,34 @@ model EventTemplate {
 
 // Anything planned on the shared calendar
 model CalendarEvent {
-  id              String           @id @default(cuid())
-  title           String
-  emoji           String?
-  description     String?
-  kind            CalendarKind     @default(EVENT)
-  templateId      String?
-  accent          String?
-  ownerId         String?
-  accountId       String?
-  youtuberId      String?
-  projectId       String?
-  meetingId       String?
-  sessionId       String?
-  startsAt        DateTime
-  endsAt          DateTime?
-  allDay          Boolean          @default(false)
-  visibility      EventVisibility?
-  rollCall        Boolean          @default(false)
-  rosterShared    Boolean          @default(false)
-  rollCallTeamIds String[]         @default([])
-  remindAt        DateTime?
-  remindedAt      DateTime?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id                String           @id @default(cuid())
+  title             String
+  emoji             String?
+  description       String?
+  kind              CalendarKind     @default(EVENT)
+  templateId        String?
+  accent            String?
+  ownerId           String?
+  accountId         String?
+  youtuberId        String?
+  projectId         String?
+  meetingId         String?
+  sessionId         String?
+  startsAt          DateTime
+  endsAt            DateTime?
+  allDay            Boolean          @default(false)
+  visibility        EventVisibility?
+  // Team or promotion an audience-bound entry is shown to
+  audienceTeamId    String?
+  audienceSessionId String?
+  audienceLeadsOnly Boolean          @default(false)
+  rollCall          Boolean          @default(false)
+  rosterShared      Boolean          @default(false)
+  rollCallTeamIds   String[]         @default([])
+  remindAt          DateTime?
+  remindedAt        DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
   attendances EventAttendance[]
   live        Live?
@@ -1673,7 +1707,7 @@ model LiveconEntry {
   @@map("livecon_entries")
 }
 
-// Channel a creator streams on, one per platform
+// Channel a creator streams on, several per platform
 model YoutuberChannel {
   id          String       @id @default(cuid())
   youtuberId  String
@@ -1687,8 +1721,8 @@ model YoutuberChannel {
 
   youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
 
-  @@unique([youtuberId, platform])
   @@unique([platform, externalId])
+  @@index([youtuberId])
   @@map("youtuber_channels")
 }
 

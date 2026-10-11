@@ -12,7 +12,7 @@ import { touchSession } from '@/core/services/auth/SessionService'
 import { syncReferenceLibrary } from '@/core/services/reference/ReferenceSync'
 import { toDisplayPreferences } from '@/core/services/preferences/DisplayService'
 import { isRootIdentity } from '@/declarations/access/identity'
-import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
+import { isAccessClosed } from '@/core/lib/auth/closed'
 import type { SessionUser } from '@/types/auth'
 import type { Account, AccountFunction, Youtuber } from '@prisma/client'
 
@@ -68,8 +68,8 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
   })
   if (!session || session.expiresAt < new Date()) return null
 
-  // A member who left keeps no access
-  if (GONE_MEMBER_STATUSES.includes(session.account.status)) return null
+  // A member who left or froze keeps no access
+  if (isAccessClosed(session.account)) return null
 
   // Collections fixed in code sit in the database before anything reads them
   await syncReferenceLibrary().catch((error: unknown) =>
@@ -93,9 +93,9 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
 export const isSessionTokenValid = cache(async (token: string): Promise<boolean> => {
   const session = await prisma.session.findUnique({
     where: { token },
-    select: { expiresAt: true, account: { select: { status: true } } },
+    select: { expiresAt: true, account: { select: { status: true, frozenAt: true } } },
   })
   if (!session || session.expiresAt < new Date()) return false
 
-  return !GONE_MEMBER_STATUSES.includes(session.account.status)
+  return !isAccessClosed(session.account)
 })

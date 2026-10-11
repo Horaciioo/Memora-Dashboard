@@ -10,6 +10,7 @@ import {
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { summariseChange } from '@/core/services/system/changes'
 import { notify } from '@/core/services/system/NotificationService'
+import { redactProject } from '@/core/services/work/redaction'
 import { assertProjectVisible, workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -19,14 +20,16 @@ export const GET = createProtectedRoute({
   handler: async ({ params, session, access }) => {
     await assertProjectVisible(params.id, workViewer(session, access))
 
-    return readProject(params.id)
+    return redactProject(await readProject(params.id), access)
   },
 })
 
 export const PATCH = createProtectedRoute({
   permission: Permissions.ProjectUpdate,
   descriptor: { summary: 'Edit a project', tags: ['projects'] },
-  handler: async ({ params, raw, session, scope }) => {
+  handler: async ({ params, raw, session, scope, access }) => {
+    await assertProjectVisible(params.id, workViewer(session, access))
+
     const perimeter = await scope()
     const fields = await projectFields(perimeter)
 
@@ -62,7 +65,9 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   permission: Permissions.ProjectDelete,
   descriptor: { summary: 'Drop a project', tags: ['projects'] },
-  handler: async ({ params, session, scope }) => {
+  handler: async ({ params, session, scope, access }) => {
+    await assertProjectVisible(params.id, workViewer(session, access))
+
     const project = await readProject(params.id)
     await removeProject(params.id, await scope())
 

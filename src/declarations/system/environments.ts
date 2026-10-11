@@ -32,6 +32,13 @@ const resolveEnvironment = (): Environment => {
 export const APP_ENVIRONMENT = resolveEnvironment()
 
 /**
+ * Whether the first visit welcomes every account once
+ * @type {boolean}
+ */
+
+export const WELCOMES_EVERY_ACCOUNT = APP_ENVIRONMENT === 'dev' || APP_ENVIRONMENT === 'staging'
+
+/**
  * Environment manifests
  * @type {Record<Environment, EnvironmentManifest>}
  */

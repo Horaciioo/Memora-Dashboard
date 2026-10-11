@@ -1,9 +1,8 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 
 import { WelcomeChat } from '@/composites/tour/WelcomeChat'
-import { WelcomeDeck } from '@/composites/tour/WelcomeDeck'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { apiPatch } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -11,30 +10,43 @@ import type { IntakeAnswers } from '@/core/lib/tour/chat'
 import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 
+// Answers that only routed the talk
+const ROUTING_ANSWERS = ['colorBlind', 'colorFit', 'instagram']
+
 /**
- * First connection: the admission chat, then the presentation
+ * First connection: one conversation with Memora, then the pages
  * @return {JSX.Element}
  */
 
 export const WelcomeFlow = () => {
   const { session } = useAuthContext()
-  const { finishIntro } = useTour()
+  const { creator, socialFields, finishIntro } = useTour()
   const { run } = useMutation()
-  const [isChatDone, setChatDone] = useState(false)
 
-  // Answers go to the account before the presentation starts
+  // Answers go to the account before the pages start
   const save = useCallback(
     async (answers: IntakeAnswers) => {
-      if (Object.keys(answers).length > 0) {
-        await run(() => apiPatch(API_ROUTES.tourIntake, answers))
+      // The colour answer only routed the talk, the mode itself is kept by the display preferences
+      const kept = Object.fromEntries(
+        Object.entries(answers).filter(([key]) => !ROUTING_ANSWERS.includes(key))
+      )
+
+      if (Object.keys(kept).length > 0) {
+        await run(() => apiPatch(API_ROUTES.tourIntake, kept))
       }
 
-      setChatDone(true)
+      finishIntro()
     },
-    [run]
+    [run, finishIntro]
   )
 
-  if (isChatDone) return <WelcomeDeck onFinish={finishIntro} />
-
-  return <WelcomeChat name={session?.displayName ?? ''} onDone={save} />
+  return (
+    <WelcomeChat
+      name={session?.displayName ?? ''}
+      avatarUrl={session?.avatarUrl ?? null}
+      creator={creator}
+      socialFields={socialFields}
+      onDone={save}
+    />
+  )
 }

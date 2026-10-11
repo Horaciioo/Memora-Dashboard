@@ -160,7 +160,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
   },
   {
     name: 'Junior Responsable Discord',
-    kind: 'SECONDARY',
+    kind: 'PRIMARY',
     position: 9,
     icon: 'functionDiscord',
     accent: '#4f8ac4',
@@ -169,7 +169,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
   },
   {
     name: 'Junior Responsable Lives',
-    kind: 'SECONDARY',
+    kind: 'PRIMARY',
     position: 10,
     icon: 'functionLive',
     accent: '#c76f8c',
@@ -178,7 +178,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
   },
   {
     name: 'Junior Responsable Animateurs',
-    kind: 'SECONDARY',
+    kind: 'PRIMARY',
     position: 11,
     icon: 'functionAnimator',
     accent: '#c99a2e',

@@ -63,8 +63,6 @@ export const PREFERENCES_COPY = {
  */
 
 export const PROFILE_FIELD_COPY = {
-  email: 'Mail',
-  phone: 'Téléphone',
   birthday: 'Date de naissance',
   timezone: 'Fuseau horaire',
   languages: 'Langues',

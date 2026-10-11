@@ -14,7 +14,7 @@ import { recordEvent } from '@/core/services/system/ActivityService'
 import { isIdentifierSignInAllowed } from '@/declarations/access/signIn'
 import { ROUTES } from '@/declarations/navigation'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
-import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
+import { isAccessClosed } from '@/core/lib/auth/closed'
 
 /**
  * Result of a sign-in attempt
@@ -48,7 +48,7 @@ export async function login(_previousState: LoginState, formData: FormData): Pro
 
   const account = await resolveSignInAccount(discordId)
   if (!account) return { error: AUTH_COPY.unknownId }
-  if (GONE_MEMBER_STATUSES.includes(account.status)) return { error: AUTH_COPY.revokedAccess }
+  if (isAccessClosed(account)) return { error: AUTH_COPY.revokedAccess }
 
   // Session token lands in an httpOnly cookie
   const { token, expiresAt } = await openSession(account.id, {

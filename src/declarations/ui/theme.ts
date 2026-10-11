@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 
 import { COLOUR_SETTINGS } from '@/declarations/configurations/settings'
 import type { IconName } from '@/declarations/ui/icons'
-import { isHexColour } from '@/utils/format/colour'
+import { isHexColour, visionSafe } from '@/utils/format/colour'
 import { THEME, tw, type TokenRef } from '@/utils/format/theme'
 
 // Tones of the interface. The two authority ones are reserved to the encadrement roles of
@@ -185,7 +185,8 @@ export const ACCENT_STYLES = {
 export const accentColour = (
   accent: string | null | undefined,
   fallback: Tone = 'neutral'
-): string => (isHexColour(accent) ? (accent as string) : TONE_VARS[toTone(accent, fallback)])
+): string =>
+  isHexColour(accent) ? visionSafe(accent as string) : TONE_VARS[toTone(accent, fallback)]
 
 /**
  * Carry an accent down to the classes drawing it

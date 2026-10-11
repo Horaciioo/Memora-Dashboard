@@ -17,7 +17,6 @@ import { moderatorTrade, upcomingBirthdays } from '@/core/services/personal/Home
 import { upcomingPlans } from '@/core/services/personal/HomePlanService'
 import { myTasks } from '@/core/services/personal/TaskInboxService'
 import { requireUser } from '@/core/wrappers/requireUser'
-import { changelogFor } from '@/declarations/changelog/helpers'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { beaconProps } from '@/declarations/ui/beacons'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
@@ -64,7 +63,7 @@ export default async function DashboardPage() {
         <HomeHeader name={session.displayName} />
       </div>
       <div {...beaconProps(TOUR_BEACONS.homeNews)}>
-        <HomeNews release={changelogFor(access.can)[0]} />
+        <HomeNews />
       </div>
       <HomeLiveCall beacon={beacon} />
       <div className={HOME_BOARD.card}>

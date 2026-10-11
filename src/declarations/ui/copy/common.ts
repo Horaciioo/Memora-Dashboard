@@ -39,6 +39,8 @@ export const ACTION_COPY = {
  */
 
 export const FIELD_COPY = {
+  id: 'Identifiant',
+  idCopied: 'Identifiant copié',
   name: 'Nom',
   title: 'Titre',
   description: 'Description',
@@ -59,8 +61,6 @@ export const FIELD_COPY = {
   mainFunction: 'Fonction principale',
   secondFunction: 'Fonction secondaire',
   discordId: 'Identifiant Discord',
-  email: 'Mail',
-  phone: 'Téléphone',
   birthday: 'Anniversaire',
   languages: 'Langues',
   joinedAt: 'Date d’arrivée',

@@ -2,69 +2,167 @@
 
 import { useState } from 'react'
 
-import { InlineText } from '@/components/structures/InlineText'
+import { AddRow } from '@/components/structures/AddRow'
+import { FormDrawer } from '@/components/structures/FormDrawer'
 import { useMutation } from '@/core/hooks/data/useMutation'
-import { apiPut } from '@/core/lib/api/client'
+import { apiDelete, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { CHANNEL_COPY } from '@/declarations/platforms/copy'
-import { SECURITY_LIST } from '@/declarations/ui/blocks'
+import { CHANNEL_BLOCK } from '@/declarations/ui/blocks'
+import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
+import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
+import { useMenu } from '@/managers/front-end'
+import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { CreatorChannelView } from '@/types/platforms'
+import { LivePlatforms } from '@/utils/constants/lives'
 
-// Longest Twitch login
-const CHANNEL_LOGIN_MAX = 25
+// Name shown for each platform
+const PLATFORM_LABELS = {
+  [LivePlatforms.Twitch]: CHANNEL_COPY.twitch,
+  [LivePlatforms.YouTube]: CHANNEL_COPY.youtube,
+}
+
+// Glyph drawn for each platform
+const PLATFORM_ICONS = {
+  [LivePlatforms.Twitch]: 'twitch',
+  [LivePlatforms.YouTube]: 'youtube',
+} as const
+
+// Creation form
+const CHANNEL_FIELDS: FieldDefinition[] = [
+  {
+    name: 'platform',
+    kind: 'select',
+    label: CHANNEL_COPY.platform,
+    required: true,
+    options: Object.values(LivePlatforms).map((platform) => ({
+      value: platform,
+      label: PLATFORM_LABELS[platform],
+    })),
+  },
+  {
+    name: 'value',
+    kind: 'text',
+    label: CHANNEL_COPY.channel,
+    info: CHANNEL_COPY.channelInfo,
+    required: true,
+  },
+]
 
 export interface CreatorChannelsPanelProps {
   youtuberId: string
-  initialTwitch: CreatorChannelView | null
+  initialChannels: CreatorChannelView[]
   canManage: boolean
 }
 
 /**
  * Platform channels of a creator
  * @param {string} youtuberId - Creator
- * @param {CreatorChannelView | null} initialTwitch - Twitch channel
+ * @param {CreatorChannelView[]} initialChannels - Channels resolved server-side
  * @param {boolean} canManage - Viewer may edit
  * @return {JSX.Element}
  */
 
 export const CreatorChannelsPanel = ({
   youtuberId,
-  initialTwitch,
+  initialChannels,
   canManage,
 }: CreatorChannelsPanelProps) => {
-  const { run } = useMutation()
-  const [twitch, setTwitch] = useState(initialTwitch)
-  const Glyph = ICONS.twitch
+  const { isSaving, issues, clearIssues, run } = useMutation()
+  const { contextMenu } = useMenu()
+  const [channels, setChannels] = useState(initialChannels)
+  const [isAdding, setAdding] = useState(false)
 
-  const save = async (login: string): Promise<boolean> => {
+  const add = async (values: FormValues): Promise<boolean> => {
     const next = await run(
-      () => apiPut<CreatorChannelView | null>(API_ROUTES.creatorChannel(youtuberId), { login }),
+      () => apiPost<CreatorChannelView[]>(API_ROUTES.creatorChannels(youtuberId), values),
       CHANNEL_COPY.saved
     )
-    // A failure already told the member
-    if (next === null) return false
+    if (!next) return false
 
-    setTwitch(next)
+    setChannels(next)
+    setAdding(false)
     return true
   }
 
+  const remove = async (id: string) => {
+    const next = await run(
+      () => apiDelete<CreatorChannelView[]>(API_ROUTES.creatorChannels(youtuberId), { id }),
+      CHANNEL_COPY.removed
+    )
+    if (next) setChannels(next)
+  }
+
   return (
-    <ul className={SECURITY_LIST.list}>
-      <li className={SECURITY_LIST.row}>
-        <Glyph className={SECURITY_LIST.glyph} />
-        <div className={SECURITY_LIST.body}>
-          <p className={SECURITY_LIST.title}>{CHANNEL_COPY.twitch}</p>
-          <InlineText
-            id="creator-twitch-channel"
-            value={twitch?.login ?? ''}
-            placeholder={CHANNEL_COPY.placeholder}
-            disabled={!canManage}
-            maxLength={CHANNEL_LOGIN_MAX}
-            onCommit={save}
+    <>
+      <div className={CHANNEL_BLOCK.list}>
+        {channels.map((channel) => {
+          const Glyph = ICONS[PLATFORM_ICONS[channel.platform]]
+
+          return (
+            <div
+              key={channel.id}
+              className={CHANNEL_BLOCK.card}
+              onContextMenu={
+                canManage
+                  ? contextMenu(
+                      [
+                        {
+                          id: 'remove',
+                          label: CHANNEL_COPY.remove,
+                          icon: 'remove',
+                          danger: true,
+                          onSelect: () => void remove(channel.id),
+                        },
+                      ],
+                      channel.login
+                    )
+                  : undefined
+              }
+            >
+              <Glyph className={CHANNEL_BLOCK.glyph} />
+              <div className={CHANNEL_BLOCK.body}>
+                <p className={CHANNEL_BLOCK.name}>{PLATFORM_LABELS[channel.platform]}</p>
+                <a
+                  href={channel.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={CHANNEL_BLOCK.link}
+                >
+                  {channel.url}
+                </a>
+              </div>
+            </div>
+          )
+        })}
+        {channels.length === 0 && !canManage && (
+          <p className={CHANNEL_BLOCK.empty}>{CHANNEL_COPY.empty}</p>
+        )}
+        {canManage && (
+          <AddRow
+            label={CHANNEL_COPY.add}
+            tile="channel"
+            onClick={() => {
+              clearIssues()
+              setAdding(true)
+            }}
+            className="w-56! shrink-0"
           />
-        </div>
-      </li>
-    </ul>
+        )}
+      </div>
+
+      <FormDrawer
+        subject={FORM_SUBJECTS.channel}
+        open={isAdding}
+        title={CHANNEL_COPY.add}
+        fields={CHANNEL_FIELDS}
+        issues={issues}
+        isSaving={isSaving}
+        submitVerb={ACTION_COPY.add}
+        onSubmit={add}
+        onClose={() => setAdding(false)}
+      />
+    </>
   )
 }

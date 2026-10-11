@@ -1,3 +1,5 @@
+import { visionSafe } from '@/utils/format/colour'
+
 export interface RampStopsProps {
   colours: (string | undefined)[]
 }
@@ -12,6 +14,10 @@ export const RampStops = ({ colours }: RampStopsProps) => {
   const stops = colours.filter((colour): colour is string => Boolean(colour))
 
   return stops.map((colour, index) => (
-    <stop key={colour} offset={index / (stops.length - 1)} stopColor={colour} />
+    <stop
+      key={colour}
+      offset={index / (stops.length - 1)}
+      stopColor={colour.startsWith('#') ? visionSafe(colour) : colour}
+    />
   ))
 }

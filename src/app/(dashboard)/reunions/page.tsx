@@ -21,14 +21,15 @@ export const metadata: Metadata = { title: MEETING_COPY.title }
 export default async function MeetingsPage() {
   const { session, access, scope } = await requirePermission(Permissions.MeetingRead)
   const perimeter = await scope()
+  const viewer = workViewer(session, access)
 
   const [meetings, columns, baseFields, slots, youtubers, projects] = await Promise.all([
-    listMeetings(perimeter, workViewer(session, access)),
+    listMeetings(perimeter, viewer),
     boardColumns(WorkflowScopes.Meeting),
-    meetingFields(perimeter),
+    meetingFields(perimeter, viewer),
     busySlots({ viewerId: session.id, access, scope: perimeter }),
     youtuberOptions(),
-    projectOptions(perimeter, workViewer(session, access)),
+    projectOptions(perimeter, viewer),
   ])
 
   const fields = withBusy(baseFields, ['scheduledAt'], slots)

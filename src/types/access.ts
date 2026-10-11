@@ -1,4 +1,5 @@
 import type { LiveBeacon } from '@/types/lives'
+import type { OverdueFlags } from '@/types/work'
 import type { PermissionOverwrite } from '@/core/lib/permissions'
 import type { NavigationViewName } from '@/declarations/navigation'
 import type { AccessCategoryName, MemberRoleName } from '@/utils/constants/hierarchy'
@@ -193,4 +194,6 @@ export interface ViewContext {
   activeYoutuberId: string | null
   // Open lives lighting the Livecon entry
   live: LiveBeacon | null
+  // Pages holding a late item of the member
+  overdue: OverdueFlags
 }

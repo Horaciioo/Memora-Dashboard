@@ -163,6 +163,27 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     verb: 'a suivi',
     target: 'un modérateur en Focus',
   },
+  MemberFrozen: { label: 'Gel', tone: 'danger', verb: 'gelé', target: 'cet accès' },
+  MemberThawed: { label: 'Dégel', tone: 'success', verb: 'rétabli', target: 'cet accès' },
+  MemberDeparted: { label: 'Départ', tone: 'danger', verb: 'enregistré', target: 'ce départ' },
+  LiveSuspended: {
+    label: 'Suspension',
+    tone: 'danger',
+    verb: 'suspendu',
+    target: 'la modération des lives',
+  },
+  LiveSuspensionLifted: {
+    label: 'Suspension',
+    tone: 'success',
+    verb: 'levé',
+    target: 'la suspension des lives',
+  },
+  ErrorRaised: {
+    label: 'Erreur',
+    tone: 'danger',
+    verb: 'rencontré',
+    target: 'une erreur',
+  },
 }
 
 export const ACTIVITY_EVENT_REGISTRY = createRegistry(ACTIVITY_EVENT_MAP)

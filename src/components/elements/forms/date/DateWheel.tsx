@@ -25,7 +25,7 @@ interface WheelColumnProps {
  * @return {JSX.Element}
  */
 
-const WheelColumn = ({ items, value, label, onSelect }: WheelColumnProps) => {
+export const WheelColumn = ({ items, value, label, onSelect }: WheelColumnProps) => {
   const columnRef = useRef<HTMLDivElement>(null)
   const timerRef = useRef<number | undefined>(undefined)
 
@@ -79,6 +79,8 @@ export interface DateWheelProps {
   // ISO day
   value: string
   onChange: (day: string) => void
+  // Month and year only
+  period?: boolean
 }
 
 /**
@@ -87,7 +89,7 @@ export interface DateWheelProps {
  * @return {JSX.Element}
  */
 
-export const DateWheel = ({ value, onChange }: DateWheelProps) => {
+export const DateWheel = ({ value, onChange, period }: DateWheelProps) => {
   const [year, month, day] = (value || toDayKey(new Date())).split('-').map(Number) as [
     number,
     number,
@@ -96,8 +98,8 @@ export const DateWheel = ({ value, onChange }: DateWheelProps) => {
 
   const years = useMemo(
     () =>
-      Array.from({ length: DATE_WHEEL.yearSpan * 2 + 1 }, (_, index) => {
-        const entry = new Date().getFullYear() - DATE_WHEEL.yearSpan + index
+      Array.from({ length: DATE_WHEEL.yearsBack + DATE_WHEEL.yearsAhead + 1 }, (_, index) => {
+        const entry = new Date().getFullYear() - DATE_WHEEL.yearsBack + index
 
         return { value: entry, label: String(entry) }
       }),
@@ -131,14 +133,16 @@ export const DateWheel = ({ value, onChange }: DateWheelProps) => {
   }
 
   return (
-    <div className={DATE_WHEEL.frame}>
+    <div className={period ? DATE_WHEEL.framePeriod : DATE_WHEEL.frame}>
       <span className={DATE_WHEEL.band} aria-hidden="true" />
-      <WheelColumn
-        items={days}
-        value={day}
-        label={PICKER_COPY.wheelDay}
-        onSelect={(next) => write({ day: next })}
-      />
+      {!period && (
+        <WheelColumn
+          items={days}
+          value={day}
+          label={PICKER_COPY.wheelDay}
+          onSelect={(next) => write({ day: next })}
+        />
+      )}
       <WheelColumn
         items={months}
         value={month}

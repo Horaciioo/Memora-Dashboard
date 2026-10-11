@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSearch } from '@/core/hooks/data/useSearch'
 import { useFocusTrap } from '@/core/hooks/interaction/useFocusTrap'
+import { useRecentSearches } from '@/core/hooks/interaction/useRecentSearches'
 import { useScrollLock } from '@/core/hooks/interaction/useScrollLock'
 import { SEARCH_SETTINGS } from '@/declarations/configurations/settings'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
@@ -29,6 +30,7 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
   const [term, setTerm] = useState('')
   const [pointer, setPointer] = useState({ term: '', cursor: 0 })
   const { sections, isLoading } = useSearch(term)
+  const { recents, remember } = useRecentSearches()
   const containerRef = useFocusTrap(true, onClose)
   useScrollLock(true)
 
@@ -44,6 +46,7 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
   if (typeof document === 'undefined') return null
 
   const openHit = (hit: SearchHit) => {
+    remember(term)
     onClose()
     router.push(hit.href)
   }
@@ -68,7 +71,9 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
   }
 
   const SearchIcon = ICONS.search
+  const ClockIcon = ICONS.clock
   const isTooShort = term.trim().length < SEARCH_SETTINGS.minLength
+  const showRecents = isTooShort && recents.length > 0
 
   return createPortal(
     <div
@@ -97,8 +102,21 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
             className={PALETTE_STYLES.input}
           />
         </div>
+        <div className={PALETTE_STYLES.divider} role="separator" />
         <div className={PALETTE_STYLES.results}>
-          {isTooShort && (
+          {showRecents &&
+            recents.map((recent) => (
+              <button
+                key={recent}
+                type="button"
+                onClick={() => setTerm(recent)}
+                className={cn(PALETTE_STYLES.result, 'hover:bg-[var(--color-hover)]')}
+              >
+                <ClockIcon className="h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
+                <span className="min-w-0 flex-1 truncate">{recent}</span>
+              </button>
+            ))}
+          {isTooShort && !showRecents && (
             <p className="px-4 py-6 text-sm text-[var(--color-ink-subtle)]">
               {NAV_COPY.searchPrompt}
             </p>

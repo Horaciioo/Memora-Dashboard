@@ -4,7 +4,7 @@ import { listEntries, readCalendarScope } from '@/core/services/calendar/Calenda
 import { HOME_SETTINGS } from '@/declarations/configurations/settings'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { HomePlanned } from '@/types/personal'
-import { CalendarSources } from '@/utils/constants/workflow'
+import { AttendanceStatuses, CalendarSources } from '@/utils/constants/workflow'
 import type { CalendarSourceName } from '@/utils/constants/workflow'
 import { Permissions } from '@/utils/constants/permissions'
 import { addDays, startOfDay } from '@/utils/format/days'
@@ -38,6 +38,8 @@ export const upcomingPlans = async (
   return (
     entries
       .filter((entry) => !LEFT_OUT.includes(entry.source))
+      // A declined presence leaves the plan
+      .filter((entry) => entry.attendance?.mine !== AttendanceStatuses.Absent)
       // What ended earlier today stays, struck through
       .filter((entry) => new Date(entry.endsAt ?? entry.startsAt) >= startOfDay(now))
       .slice(0, HOME_SETTINGS.plannedMax + 1)

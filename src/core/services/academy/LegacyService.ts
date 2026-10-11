@@ -3,21 +3,15 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { invalidInput, notFound } from '@/core/lib/errors'
 import { readProgress } from '@/core/lib/curriculum/progress'
-import { scoreExercise } from '@/core/lib/curriculum/scoring'
-import type { ExerciseAnswer, ExerciseResult } from '@/core/lib/curriculum/scoring'
 import { outcomeOf, scoreModule } from '@/core/lib/legacy/scoring'
 import { readDate, readText } from '@/core/lib/forms/values'
 import { recordEvent } from '@/core/services/system/ActivityService'
-import { notify } from '@/core/services/system/NotificationService'
 import { exercisesOf } from '@/declarations/academy/curriculum'
-import type { Course } from '@/declarations/academy/curriculum/types'
 import { LEGACY_COPY, LEGACY_FIELD_COPY } from '@/declarations/academy/legacy/copy'
 import { LEGACY_TRADES, modulesForTrade } from '@/declarations/academy/legacy'
-import { ACADEMY_SETTINGS, LEGACY_SETTINGS } from '@/declarations/configurations/settings'
+import { LEGACY_SETTINGS } from '@/declarations/configurations/settings'
 import { LEGACY_FUNCTION_OF } from '@/declarations/reference/fixed'
 import type { FieldDefinition, FormValues } from '@/types/forms'
-import type { SessionUser } from '@/types/auth'
-import type { CourseProgress } from '@/types/academy'
 import type { LegacyModuleView, LegacyTrackDetail, LegacyTrackSummary } from '@/types/legacy'
 import { LegacyStatuses, MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { LegacyStatusName } from '@/utils/constants/hierarchy'
@@ -197,24 +191,6 @@ export const readTrack = async (id: string): Promise<LegacyTrackDetail> => {
 }
 
 /**
- * Read the track of a member
- * @param {string} accountId - Member
- * @return {Promise<LegacyTrackDetail | null>} - Track
- */
-
-export const readOwnTrack = async (accountId: string): Promise<LegacyTrackDetail | null> => {
-  const rows = await prisma.legacyTrack.findMany({
-    where: { accountId },
-    include: TRACK_INCLUDE,
-    orderBy: { startsAt: 'desc' },
-    take: 8,
-  })
-  const row = rows.find((entry) => entry.status === LegacyStatuses.Running) ?? rows[0]
-
-  return row ? toDetail(row) : null
-}
-
-/**
  * Open a track: a moderator, the trade they will lead, and the period they are released from
  * their events
  * @param {FormValues} values - Parsed body
@@ -299,14 +275,6 @@ export const openTrack = async (
     targetType: 'legacy',
     targetId: row.id,
     summary: trade.name,
-  })
-  await notify({
-    kind: 'LegacyOpened',
-    recipients: [accountId],
-    actorId,
-    target: 'legacy',
-    targetId: row.id,
-    subject: trade.name,
   })
 
   return toDetail(row)
@@ -450,114 +418,6 @@ export const decideTrack = async (
     targetId: trackId,
     summary: decision,
   })
-  await notify({
-    kind: 'LegacyDecided',
-    recipients: [track.accountId],
-    actorId,
-    target: 'legacy',
-    targetId: trackId,
-    subject: track.jobFunction?.name ?? null,
-  })
 
   return readTrack(trackId)
-}
-
-/**
- * Read one module the member may play
- * @param {string} trackId - Track identifier
- * @param {string} moduleKey - Module key
- * @param {SessionUser} viewer - Signed-in member
- * @param {boolean} isEncadrement - Viewer may read anyone's track
- * @return {Promise<{ course: Course, progress: CourseProgress, playable: boolean }>} - Module
- */
-
-export const readModule = async (
-  trackId: string,
-  moduleKey: string,
-  viewer: SessionUser,
-  isEncadrement: boolean
-): Promise<{ course: Course; progress: CourseProgress; playable: boolean }> => {
-  const track = await readTrackRow(trackId)
-  const isOwner = track.accountId === viewer.id
-  if (!isOwner && !isEncadrement) throw notFound()
-
-  const course = modulesForTrade(track.jobFunction?.name ?? null).find(
-    (entry) => entry.key === moduleKey
-  )
-  if (!course) throw notFound()
-
-  return {
-    course,
-    progress: readProgress(track.results.find((entry) => entry.moduleKey === moduleKey)?.progress),
-    // Only the member plays
-    playable: isOwner && track.status === LegacyStatuses.Running,
-  }
-}
-
-/**
- * Score one exercise of a module on the server and save it
- * @param {string} trackId - Track identifier
- * @param {string} moduleKey - Module key
- * @param {SessionUser} viewer - Member answering
- * @param {string} blockKey - Exercise key
- * @param {ExerciseAnswer} answer - Learner answer
- * @return {Promise<{ result: ExerciseResult, progress: CourseProgress, finished: boolean }>} - Outcome
- */
-
-export const submitModuleExercise = async (
-  trackId: string,
-  moduleKey: string,
-  viewer: SessionUser,
-  blockKey: string,
-  answer: ExerciseAnswer
-): Promise<{ result: ExerciseResult; progress: CourseProgress; finished: boolean }> => {
-  const { course, progress, playable } = await readModule(trackId, moduleKey, viewer, false)
-  if (!playable) throw notFound()
-
-  const block = exercisesOf(course).find((entry) => entry.key === blockKey)
-  if (!block) throw notFound()
-
-  const result = scoreExercise(block, answer, ACADEMY_SETTINGS.exercisePassPercent)
-  const next: CourseProgress = {
-    blocks: {
-      ...progress.blocks,
-      // A cleared exercise stays cleared
-      [blockKey]: {
-        passed: result.passed || progress.blocks[blockKey]?.passed === true,
-        score: result.score,
-        max: result.max,
-        answer,
-      },
-    },
-  }
-
-  const existing = await prisma.legacyModuleResult.findUnique({
-    where: { trackId_moduleKey: { trackId, moduleKey } },
-    select: { evaluatorScore: true },
-  })
-  const computed = scoreModule(course, next, existing?.evaluatorScore ?? null)
-
-  await prisma.legacyModuleResult.upsert({
-    where: { trackId_moduleKey: { trackId, moduleKey } },
-    update: {
-      progress: next as unknown as Prisma.InputJsonValue,
-      autoScore: computed.auto,
-      total: computed.total,
-      passed: computed.passed,
-    },
-    create: {
-      trackId,
-      moduleKey,
-      progress: next as unknown as Prisma.InputJsonValue,
-      autoScore: computed.auto,
-      total: computed.total,
-      passed: computed.passed,
-    },
-  })
-
-  return {
-    result,
-    progress: next,
-    finished: exercisesOf(course).every((entry) => next.blocks[entry.key]?.passed),
-  }
 }

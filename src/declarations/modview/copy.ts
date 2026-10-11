@@ -137,6 +137,10 @@ export const MODVIEW_SPAN_COPY = {
   hours: '{hours} h {minutes}',
   minutes: '{minutes} min',
   seconds: '{seconds} s',
+  underMinute: '<1 minute',
+  unitHour: 'h',
+  unitMinute: 'min',
+  unitSecond: 's',
 } as const
 
 /**

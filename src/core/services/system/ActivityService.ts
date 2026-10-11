@@ -18,8 +18,23 @@ import type { Prisma } from '@prisma/client'
  * @property {string} [targetId] - Target resource identifier
  * @property {string} summary - One line description
  * @property {ChangeSummary | null} [change] - What an edit moved
+ * @property {ActivityError} [error] - Failure behind the event
  * @property {Prisma.InputJsonValue} [payload] - Extra detail
  */
+
+/**
+ * Failure kept with an entry
+ * @typedef {Object} ActivityError
+ * @property {string} message - What went wrong
+ * @property {string} route - Request that failed
+ * @property {string} [trace] - Stack of the failure
+ */
+
+export interface ActivityError {
+  message: string
+  route: string
+  trace?: string
+}
 
 export interface EventInput {
   eventType: EventTypeName
@@ -30,7 +45,23 @@ export interface EventInput {
   targetId?: string
   summary: string
   change?: ChangeSummary | null
+  error?: ActivityError
   payload?: Prisma.InputJsonValue
+}
+
+/**
+ * Stored shape of an event's detail
+ * @param {EventInput} input - Event to record
+ * @return {Prisma.InputJsonValue | undefined} - Payload
+ */
+
+const toPayload = (input: EventInput): Prisma.InputJsonValue | undefined => {
+  if (!input.change && !input.error) return undefined
+
+  return {
+    ...(input.change ? { change: input.change } : {}),
+    ...(input.error ? { error: input.error } : {}),
+  } as Prisma.InputJsonValue
 }
 
 /**
@@ -49,11 +80,7 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
       targetType: input.targetType,
       targetId: input.targetId,
       summary: input.summary,
-      payload:
-        input.payload ??
-        (input.change
-          ? { change: { verb: input.change.verb, rest: input.change.rest } }
-          : undefined),
+      payload: input.payload ?? toPayload(input),
     },
   })
 }
@@ -71,6 +98,7 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
  * @property {string | null} targetType - Target resource kind
  * @property {string | null} targetId - Target resource identifier
  * @property {ChangeSummary | null} change - What the edit moved
+ * @property {ActivityError | null} error - Failure behind the entry
  */
 
 export interface ActivityEntry {
@@ -84,23 +112,45 @@ export interface ActivityEntry {
   targetType: string | null
   targetId: string | null
   change: ChangeSummary | null
+  error: ActivityError | null
 }
 
+// Stored payload read as a loose record
+const asRecord = (value: unknown): Record<string, unknown> | null =>
+  value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null
+
 /**
- * Read the one-line change description off a stored payload
+ * Read the change description off a stored payload
  * @param {Prisma.JsonValue} payload - Stored payload
  * @return {ChangeSummary | null} - Change description
  */
 
 const readChange = (payload: Prisma.JsonValue): ChangeSummary | null => {
-  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null
+  const change = asRecord(asRecord(payload)?.change)
+  if (!change || typeof change.verb !== 'string' || typeof change.rest !== 'string') return null
 
-  const change = (payload as Record<string, unknown>).change
-  if (!change || typeof change !== 'object') return null
+  const lines = Array.isArray(change.lines) ? (change.lines as ChangeSummary['lines']) : undefined
 
-  const { verb, rest } = change as Record<string, unknown>
+  return { verb: change.verb, rest: change.rest, ...(lines ? { lines } : {}) }
+}
 
-  return typeof verb === 'string' && typeof rest === 'string' ? { verb, rest } : null
+/**
+ * Read the failure off a stored payload
+ * @param {Prisma.JsonValue} payload - Stored payload
+ * @return {ActivityError | null} - Failure
+ */
+
+const readError = (payload: Prisma.JsonValue): ActivityError | null => {
+  const error = asRecord(asRecord(payload)?.error)
+  if (!error || typeof error.message !== 'string') return null
+
+  return {
+    message: error.message,
+    route: typeof error.route === 'string' ? error.route : '',
+    ...(typeof error.trace === 'string' ? { trace: error.trace } : {}),
+  }
 }
 
 // Row shape every reader maps from
@@ -125,6 +175,7 @@ const toEntry = (row: ActivityRow): ActivityEntry => ({
   targetType: row.targetType,
   targetId: row.targetId,
   change: readChange(row.payload),
+  error: readError(row.payload),
 })
 
 /**

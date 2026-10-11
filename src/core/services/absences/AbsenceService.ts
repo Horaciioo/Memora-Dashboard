@@ -47,7 +47,7 @@ export const activeAbsenceFilter = (): Prisma.AbsenceWhereInput => {
 const reviewerCreatorIds = async (reviewerId: string): Promise<string[]> => {
   const [teams, anchored, own] = await Promise.all([
     prisma.team.findMany({
-      where: { leadId: reviewerId, archived: false },
+      where: { leads: { some: { accountId: reviewerId } }, archived: false },
       select: { youtuberId: true },
     }),
     readLedCreatorIds(reviewerId),
@@ -73,7 +73,7 @@ const reviewedAccounts = async (reviewerId: string): Promise<Prisma.AccountWhere
 
   return {
     OR: [
-      { teamMemberships: { some: { team: { leadId: reviewerId } } } },
+      { teamMemberships: { some: { team: { leads: { some: { accountId: reviewerId } } } } } },
       { youtubers: { some: { id: { in: creatorIds } } } },
     ],
   }
@@ -121,7 +121,6 @@ export const toAbsence = (row: Omit<AbsenceRow, 'account'>, memberName: string):
   dayCount: row.dayCount,
   reason: decryptField(row.reason),
   status: row.status,
-  reviewerName: row.reviewer?.displayName ?? null,
   reviewNote: decryptField(row.reviewNote),
 })
 

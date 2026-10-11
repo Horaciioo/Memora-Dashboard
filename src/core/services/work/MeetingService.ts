@@ -1,25 +1,31 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import { assertAllInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import { hideMeetingContent } from '@/core/services/work/redaction'
 import { meetingVisibility } from '@/core/services/work/visibility'
 import type { WorkViewer } from '@/core/services/work/visibility'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { notFound } from '@/core/lib/errors'
 import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
+import { emojiOrRandom, isBehindDeadline } from '@/core/lib/work'
 import {
   AUTHORSHIP_INCLUDE,
+  creatorLinks,
   defaultState,
+  keptCreatorIds,
   memberOptions,
   positionAt,
   projectOptions,
+  readCreatorIds,
   stateOptions,
   toAuthorship,
+  toCreatorTags,
   toPerson,
+  toProjectTag,
   toTag,
   youtuberOptions,
-  toCreatorTag,
-  toProjectTag,
+  YOUTUBERS_INCLUDE,
 } from '@/core/services/work/shared'
 import { EMOJI_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
@@ -33,9 +39,9 @@ import type { AttendeeKindName, MeetingAudienceName } from '@/utils/constants/wo
 import type { Prisma } from '@prisma/client'
 
 // Relations every meeting card needs
-const MEETING_INCLUDE = {
+export const MEETING_INCLUDE = {
   state: true,
-  youtuber: true,
+  youtubers: YOUTUBERS_INCLUDE,
   project: true,
   attendees: { include: { account: true } },
   ...AUTHORSHIP_INCLUDE,
@@ -62,7 +68,7 @@ const seats = (row: MeetingRow, kind: AttendeeKindName): WorkPerson[] =>
  * @return {MeetingSummary} - Board card
  */
 
-const toSummary = (row: MeetingRow): MeetingSummary => ({
+export const toMeetingSummary = (row: MeetingRow): MeetingSummary => ({
   ...toAuthorship(row),
   id: row.id,
   title: row.title,
@@ -72,9 +78,10 @@ const toSummary = (row: MeetingRow): MeetingSummary => ({
   minutes: row.minutes,
   columnId: row.stateId,
   state: toTag(row.state),
-  youtuber: toCreatorTag(row.youtuber),
+  youtubers: toCreatorTags(row.youtubers),
   project: toProjectTag(row.project),
   scheduledAt: row.scheduledAt.toISOString(),
+  isOverdue: isBehindDeadline(row.scheduledAt, row.state?.phase),
   durationMin: row.durationMin,
   audience: row.audience,
   leads: seats(row, AttendeeKinds.Lead),
@@ -88,7 +95,7 @@ const toSummary = (row: MeetingRow): MeetingSummary => ({
     durationMin: row.durationMin,
     audience: row.audience,
     stateId: row.stateId,
-    youtuberId: row.youtuberId,
+    youtuberIds: row.youtubers.map((youtuber) => youtuber.id),
     projectId: row.projectId,
     leadIds: seats(row, AttendeeKinds.Lead).map((person) => person.id),
     assistantIds: seats(row, AttendeeKinds.Assistant).map((person) => person.id),
@@ -136,10 +143,11 @@ export const meetingFields = async (
       group: FORM_GROUPS.essentials,
     },
     {
-      name: 'youtuberId',
-      kind: 'select',
-      label: MEETING_FIELD_COPY.youtuber,
-      info: MEETING_FIELD_INFO.youtuber,
+      name: 'youtuberIds',
+      kind: 'multiselect',
+      label: MEETING_FIELD_COPY.youtubers,
+      info: MEETING_FIELD_INFO.youtubers,
+      placeholder: MEETING_FIELD_COPY.youtubersEmpty,
       preset: 'default',
       // The creator the member is viewing leads
       options: youtubers.map((option) => ({
@@ -279,7 +287,7 @@ export const listMeetings = async (
     orderBy: [{ scheduledAt: 'desc' }],
   })
 
-  return rows.map(toSummary)
+  return rows.map((row) => hideMeetingContent(toMeetingSummary(row), viewer.readsContent))
 }
 
 /**
@@ -334,7 +342,6 @@ const toMeetingData = (values: FormValues) => ({
   durationMin: readNumberValue(values, 'durationMin'),
   audience: readAudience(values),
   stateId: readText(values, 'stateId'),
-  youtuberId: readText(values, 'youtuberId'),
   projectId: readText(values, 'projectId'),
 })
 
@@ -352,7 +359,8 @@ export const createMeeting = async (
   actorId: string
 ): Promise<MeetingSummary> => {
   const data = toMeetingData(values)
-  assertInScope(scope, data.youtuberId ?? null)
+  const youtuberIds = readCreatorIds(values)
+  assertAllInScope(scope, youtuberIds)
 
   const stateId = data.stateId ?? (await defaultState(WorkflowScopes.Meeting))
 
@@ -362,7 +370,9 @@ export const createMeeting = async (
   const row = await prisma.meeting.create({
     data: {
       ...data,
+      emoji: emojiOrRandom(data.emoji),
       stateId,
+      youtubers: { connect: creatorLinks(youtuberIds) },
       scheduledAt: readDate(values, 'scheduledAt') ?? new Date(),
       position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
       createdById: actorId,
@@ -372,7 +382,7 @@ export const createMeeting = async (
     include: MEETING_INCLUDE,
   })
 
-  return toSummary(row)
+  return toMeetingSummary(row)
 }
 
 /**
@@ -392,6 +402,13 @@ export const updateMeeting = async (
 ): Promise<MeetingSummary> => {
   await assertRowInScope('meeting', id, scope)
 
+  const picked = readCreatorIds(values)
+  assertAllInScope(scope, picked)
+
+  const stored = await prisma.meeting.findUnique({
+    where: { id },
+    select: { youtubers: { select: { id: true } } },
+  })
   const scheduledAt = readDate(values, 'scheduledAt')
 
   // Attendees are replaced wholesale
@@ -401,12 +418,21 @@ export const updateMeeting = async (
       ...toMeetingData(values),
       scheduledAt: scheduledAt ?? undefined,
       updatedById: actorId,
+      youtubers: {
+        set: creatorLinks(
+          keptCreatorIds(
+            picked,
+            scope,
+            stored?.youtubers.map((youtuber) => youtuber.id)
+          )
+        ),
+      },
       attendees: { deleteMany: {}, create: toAttendees(values) },
     },
     include: MEETING_INCLUDE,
   })
 
-  return toSummary(row)
+  return toMeetingSummary(row)
 }
 
 /**
@@ -480,7 +506,7 @@ export const readMeeting = async (id: string): Promise<MeetingDetail> => {
     orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
   })
 
-  return { summary: toSummary(row), topics: topics.map(toTopic) }
+  return { summary: toMeetingSummary(row), topics: topics.map(toTopic) }
 }
 
 /**
@@ -622,5 +648,5 @@ export const moveMeeting = async (
     include: MEETING_INCLUDE,
   })
 
-  return toSummary(row)
+  return toMeetingSummary(row)
 }

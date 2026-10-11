@@ -20,6 +20,7 @@ import type {
  * Legend entry of the calendar
  * @typedef {Object} CalendarLegendOption
  * @property {string} label - Display label
+ * @property {string} [plural] - Category heading
  * @property {string} summary - What the entry stands for
  * @property {string} accent - Colour token used when nothing else applies
  * @property {IconName} icon - Glyph drawn in the legend
@@ -27,6 +28,7 @@ import type {
 
 interface CalendarLegendOption {
   label: string
+  plural?: string
   summary: string
   accent: string
   icon: IconName
@@ -35,18 +37,21 @@ interface CalendarLegendOption {
 const CALENDAR_KIND_MAP: Record<CalendarKindName, CalendarLegendOption> = {
   [CalendarKinds.Zone]: {
     label: 'Zone',
+    plural: 'Zones',
     summary: 'Un fond posé sur une plage de jours.',
     accent: 'neutral',
     icon: 'sheet',
   },
   [CalendarKinds.Period]: {
     label: 'Période',
+    plural: 'Périodes',
     summary: 'Une barre courant d’un jour à un autre.',
     accent: 'info',
     icon: 'clock',
   },
   [CalendarKinds.Event]: {
     label: 'Évènement',
+    plural: 'Évènements',
     summary: 'Une carte posée sur un créneau.',
     accent: 'brand',
     icon: 'spark',

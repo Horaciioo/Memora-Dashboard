@@ -37,9 +37,13 @@ const PROFILE_INCLUDE = {
  */
 
 export const profileFields = (): FieldDefinition[] => [
-  { name: 'email', kind: 'email', label: PROFILE_FIELD_COPY.email, span: 'half' },
-  { name: 'phone', kind: 'phone', label: PROFILE_FIELD_COPY.phone, span: 'half' },
-  { name: 'birthday', kind: 'date', label: PROFILE_FIELD_COPY.birthday, span: 'half' },
+  {
+    name: 'birthday',
+    kind: 'date',
+    startYear: FORM_SETTINGS.birthdayStartYear,
+    label: PROFILE_FIELD_COPY.birthday,
+    span: 'half',
+  },
   {
     name: 'timezone',
     kind: 'select',
@@ -53,6 +57,7 @@ export const profileFields = (): FieldDefinition[] => [
     kind: 'multiselect',
     label: PROFILE_FIELD_COPY.languages,
     options: LANGUAGE_OPTIONS,
+    mark: 'flag',
     maxItems: FORM_SETTINGS.tagMaxCount,
     maturity: 'alpha',
   },
@@ -94,8 +99,6 @@ export const readProfile = async (accountId: string): Promise<ProfileDetail> => 
     ),
     joinedAt: row.joinedAt.toISOString(),
     values: {
-      email: row.email,
-      phone: row.phone,
       birthday: row.birthday ? row.birthday.toISOString().slice(0, 10) : null,
       timezone: row.timezone,
       languages: row.languages,
@@ -119,8 +122,6 @@ export const updateProfile = async (
   await prisma.account.update({
     where: { id: accountId },
     data: await withoutSealedWrites({
-      email: readText(values, 'email'),
-      phone: readText(values, 'phone'),
       birthday: readDate(values, 'birthday'),
       timezone: readText(values, 'timezone'),
       languages: readList(values, 'languages'),

@@ -342,7 +342,6 @@ export const COURSE_COPY = {
   carouselTitle: 'Tes formations',
   carouselPrevious: 'Formations précédentes',
   carouselNext: 'Formations suivantes',
-  newTag: 'Nouveau',
   lockedName: '? ? ?',
   lockedLabel: 'Formation verrouillée',
   trackIndispensable: 'Indispensable',

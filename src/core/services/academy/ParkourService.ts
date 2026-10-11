@@ -21,7 +21,7 @@ import { notify } from '@/core/services/system/NotificationService'
 import { isRootIdentity } from '@/declarations/access/identity'
 import {
   DEPARTURE_EMOJIS,
-  DEPARTURE_TEMPLATE,
+  DEPARTURE_TEMPLATES,
   DEPARTURE_VERBS,
   GRADUATE_DIVISION_RANK,
   PARKOUR_COPY,
@@ -702,7 +702,7 @@ export const endParkour = async (
       accountId: row.accountId,
       kind,
       functionName: trade,
-      body: fillDeparture(DEPARTURE_TEMPLATE, DEPARTURE_VERBS, {
+      body: fillDeparture(DEPARTURE_TEMPLATES[kind], DEPARTURE_VERBS, {
         username: row.account.discordUsername ?? row.account.displayName,
         discordId: row.account.discordId,
         functionName: trade,

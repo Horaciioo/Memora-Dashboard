@@ -169,9 +169,10 @@ export const LIVE_REPORT = {
 export const MEMBER_MODERATION = {
   stack: 'flex flex-col gap-6',
   switch: 'flex justify-center',
-  hours: 'flex items-baseline gap-3',
-  hoursLabel: PROPERTY_LABEL,
-  hoursValue: 'text-2xl font-bold tracking-tight tabular-nums',
+  stats: 'grid grid-cols-1 gap-4 sm:grid-cols-3',
+  stat: 'flex flex-col gap-1',
+  statLabel: PROPERTY_LABEL,
+  statValue: 'text-2xl font-bold tracking-tight tabular-nums',
   list: 'flex flex-col',
   item: 'border-t border-[var(--color-border)] first:border-t-0',
   row: 'flex w-full flex-wrap items-center gap-x-4 gap-y-1 rounded-[var(--radius-md)] px-2 py-3 text-left transition-colors hover:bg-[var(--color-hover)]',

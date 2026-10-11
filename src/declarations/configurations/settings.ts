@@ -11,6 +11,7 @@ import colours from '@/configurations/system/couleurs.json'
 import timeouts from '@/configurations/system/delais.json'
 import retention from '@/configurations/system/conservation.json'
 import emojis from '@/configurations/system/emojis.json'
+import failures from '@/configurations/system/erreurs.json'
 import files from '@/configurations/system/fichiers.json'
 import forms from '@/configurations/system/forms.json'
 import gestures from '@/configurations/system/gestes.json'
@@ -104,6 +105,12 @@ export const FORM_SETTINGS = {
   // Rating bounds
   scaleMin: readInteger(forms.scaleMin, { path: 'system/forms.scaleMin', fallback: 1, min: 0 }),
   scaleMax: readInteger(forms.scaleMax, { path: 'system/forms.scaleMax', fallback: 5, min: 1 }),
+  // Year a birthday picker opens on
+  birthdayStartYear: readInteger(forms.birthdayStartYear, {
+    path: 'system/forms.birthdayStartYear',
+    fallback: 2005,
+    min: 1900,
+  }),
   longTextMaxLength,
   markdownMaxLength,
   titleMaxLength: readInteger(forms.titleMaxLength, {
@@ -171,7 +178,7 @@ export const ABSENCE_SETTINGS = {
 
 /**
  * Search behaviour
- * @type {{ minLength: number, maxResultsPerGroup: number, debounceMs: number }}
+ * @type {{ minLength: number, maxResultsPerGroup: number, debounceMs: number, recentLimit: number }}
  */
 
 export const SEARCH_SETTINGS = {
@@ -191,6 +198,7 @@ export const SEARCH_SETTINGS = {
     fallback: 180,
     min: 0,
   }),
+  recentLimit: 5,
 }
 
 const pageSize = readInteger(notifications.pageSize, {
@@ -260,7 +268,7 @@ export const LIVECON_SETTINGS = {
 
 /**
  * Announced lives and their Mod View
- * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, eventsubKeepaliveSeconds: number, recentEvents: number, idempotencyMinutes: number, watchLeadMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number }}
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, eventsubKeepaliveSeconds: number, recentEvents: number, idempotencyMinutes: number, watchLeadMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, suspensionMaxDays: number }}
  */
 
 export const LIVE_SETTINGS = {
@@ -277,6 +285,11 @@ export const LIVE_SETTINGS = {
   inspectSize: readInteger(lives.inspectSize, {
     path: 'system/lives.inspectSize',
     fallback: 30,
+    min: 1,
+  }),
+  suspensionMaxDays: readInteger(lives.suspensionMaxDays, {
+    path: 'system/lives.suspensionMaxDays',
+    fallback: 365,
     min: 1,
   }),
   focusPollSeconds: readInteger(lives.focusPollSeconds, {
@@ -1252,7 +1265,7 @@ export const HOME_SETTINGS = {
 
 /**
  * First visit timings and spotlight sizes
- * @type {{ newcomerDays: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, sendPauseMs: number, loadingMs: number, demoStepMs: number, ringPaddingPx: number, bubbleGapPx: number, bubbleWidthPx: number, bubbleHeightPx: number, minAgeYears: number, maxAgeYears: number, graceMs: number }}
+ * @type {{ newcomerDays: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, sendPauseMs: number, loadingMs: number, demoStepMs: number, demoBeats: number, stageHoldMs: number, paneInsetPx: number, photoSharePercent: number, ringPaddingPx: number, bubbleGapPx: number, bubbleWidthPx: number, bubbleHeightPx: number, minAgeYears: number, maxAgeYears: number, graceMs: number }}
  */
 
 export const TOUR_SETTINGS = {
@@ -1291,6 +1304,27 @@ export const TOUR_SETTINGS = {
     fallback: 1800,
     min: 200,
   }),
+  demoBeats: readInteger(tour.demoBeats, {
+    path: 'system/visite.demoBeats',
+    fallback: 3,
+    min: 1,
+  }),
+  stageHoldMs: readInteger(tour.stageHoldMs, {
+    path: 'system/visite.stageHoldMs',
+    fallback: 4000,
+    min: 0,
+  }),
+  paneInsetPx: readInteger(tour.paneInsetPx, {
+    path: 'system/visite.paneInsetPx',
+    fallback: 12,
+    min: 0,
+  }),
+  photoSharePercent: readInteger(tour.photoSharePercent, {
+    path: 'system/visite.photoSharePercent',
+    fallback: 40,
+    min: 20,
+    max: 60,
+  }),
   ringPaddingPx: readInteger(tour.ringPaddingPx, {
     path: 'system/visite.ringPaddingPx',
     fallback: 8,
@@ -1325,5 +1359,33 @@ export const TOUR_SETTINGS = {
     path: 'system/visite.graceMs',
     fallback: 700,
     min: 0,
+  }),
+}
+
+/**
+ * Failures kept in the journal
+ * @type {{ traceMaxLength: number, messageMaxLength: number, repeatWindowSeconds: number, repeatKeysMax: number }}
+ */
+
+export const FAILURE_SETTINGS = {
+  traceMaxLength: readInteger(failures.traceMaxLength, {
+    path: 'system/erreurs.traceMaxLength',
+    fallback: 2000,
+    min: 200,
+  }),
+  messageMaxLength: readInteger(failures.messageMaxLength, {
+    path: 'system/erreurs.messageMaxLength',
+    fallback: 300,
+    min: 50,
+  }),
+  repeatWindowSeconds: readInteger(failures.repeatWindowSeconds, {
+    path: 'system/erreurs.repeatWindowSeconds',
+    fallback: 300,
+    min: 10,
+  }),
+  repeatKeysMax: readInteger(failures.repeatKeysMax, {
+    path: 'system/erreurs.repeatKeysMax',
+    fallback: 200,
+    min: 10,
   }),
 }

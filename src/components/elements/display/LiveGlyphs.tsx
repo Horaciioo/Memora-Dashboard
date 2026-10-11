@@ -2,6 +2,19 @@ import { Frame } from '@/components/elements/display/BrandGlyphs'
 import type { GlyphProps } from '@/components/elements/display/BrandGlyphs'
 
 /**
+ * Dot following the colour of its words
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const StatusDotGlyph = ({ className }: GlyphProps) => (
+  <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+    <circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.22" />
+    <circle cx="12" cy="12" r="5.5" fill="currentColor" />
+  </svg>
+)
+
+/**
  * Red dot of a live
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}

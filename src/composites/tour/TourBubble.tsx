@@ -1,11 +1,13 @@
 'use client'
 
+import { Fragment } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 
 import { useViewportSize } from '@/core/hooks/interaction/useViewportSize'
 import { placeBubble } from '@/core/lib/tour/placement'
 import { TOUR_SETTINGS } from '@/declarations/configurations/settings'
 import { TOUR_COPY } from '@/declarations/tour/copy'
+import { ICONS } from '@/declarations/ui/icons'
 import { TOUR_SPOTLIGHT } from '@/declarations/ui/variants'
 import type { TourRect } from '@/types/tour'
 import { cn } from '@/utils/classnames'
@@ -29,6 +31,7 @@ export interface TourBubbleProps {
 
 export const TourBubble = ({ rect, title, body, progress, children }: TourBubbleProps) => {
   const viewport = useViewportSize()
+  const Done = ICONS.confirm
   if (!viewport) return null
 
   const spot = placeBubble(
@@ -47,13 +50,27 @@ export const TourBubble = ({ rect, title, body, progress, children }: TourBubble
       {progress && (
         <div className={TOUR_SPOTLIGHT.progress} role="img" aria-label={TOUR_COPY.progress}>
           {Array.from({ length: progress.total }, (_, step) => (
-            <span
-              key={step}
-              className={cn(
-                TOUR_SPOTLIGHT.segment,
-                step <= progress.index ? TOUR_SPOTLIGHT.segmentDone : TOUR_SPOTLIGHT.segmentIdle
+            <Fragment key={step}>
+              <span
+                className={cn(
+                  TOUR_SPOTLIGHT.step,
+                  step < progress.index
+                    ? TOUR_SPOTLIGHT.stepDone
+                    : step === progress.index
+                      ? TOUR_SPOTLIGHT.stepCurrent
+                      : TOUR_SPOTLIGHT.stepTodo
+                )}
+              >
+                {step < progress.index ? (
+                  <Done className={TOUR_SPOTLIGHT.stepGlyph} aria-hidden="true" />
+                ) : (
+                  step + 1
+                )}
+              </span>
+              {step < progress.total - 1 && (
+                <span className={TOUR_SPOTLIGHT.stepLine} aria-hidden="true" />
               )}
-            />
+            </Fragment>
           ))}
         </div>
       )}

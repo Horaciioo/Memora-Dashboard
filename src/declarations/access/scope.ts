@@ -1,12 +1,13 @@
 /**
  * How each scopable model reaches its creator
- * @type {Record<string, 'direct' | 'required' | 'relation'>}
+ * @type {Record<string, 'direct' | 'required' | 'relation' | 'shared'>}
  */
 
 export const SCOPE_TARGETS = {
-  project: 'direct',
-  task: 'direct',
-  meeting: 'direct',
+  // Several creators, or none
+  project: 'shared',
+  task: 'shared',
+  meeting: 'shared',
   team: 'direct',
   calendarEvent: 'direct',
   liveconEntry: 'direct',

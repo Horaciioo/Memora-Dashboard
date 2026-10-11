@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { WipNotice } from '@/components/structures/WipNotice'
 import { CoursePlayer } from '@/composites/academy/course/CoursePlayer'
-import { readCourse } from '@/core/services/academy/CurriculumService'
+import { listCourses, readCourse } from '@/core/services/academy/CurriculumService'
 import { readCourseContext } from '@/core/services/academy/CourseContextService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -29,6 +30,16 @@ export default async function CoursePage({ params }: CoursePageProps) {
 
   if (session.status !== MemberStatuses.Academy && !isEncadrement(session.role)) {
     redirect(ROUTES.home)
+  }
+
+  // An unfinished course shows nothing of its content
+  const card = (await listCourses(session)).find((entry) => entry.id === id)
+  if (card?.isUnavailable) {
+    return (
+      <div className={PAGE_STYLES.wrapper}>
+        <WipNotice figure="academy" />
+      </div>
+    )
   }
 
   // A course out of the member's catalogue

@@ -22,10 +22,13 @@ import {
 import type { TwitchSeat } from '@/core/lib/platforms/twitch/helix'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readLive } from '@/core/services/lives/LiveService'
+import { activeSuspension } from '@/core/services/members/admin/SuspensionService'
 import { logMemoraGesture, settleGesture } from '@/core/services/lives/ModerationLogService'
 import { markTwitchRevoked, readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
+import { formatDay } from '@/utils/format/dates'
 import type { LiveView } from '@/types/lives'
 import type { ActContext, ModViewIntent, ModViewState } from '@/types/modview'
 import { LivePlatforms, LiveStatuses } from '@/utils/constants/lives'
@@ -76,14 +79,19 @@ const baseState = (live: LiveView): ModViewState => ({
 /**
  * Twitch channel of a creator
  * @param {string} youtuberId - Creator
- * @return {Promise<{ externalId: string, login: string | null } | null>} - Channel
+ * @return {Promise<{ externalId: string, login: string | null } | 'several' | null>} - Channel, or none
  */
 
-const channelOf = (youtuberId: string) =>
-  prisma.youtuberChannel.findUnique({
-    where: { youtuberId_platform: { youtuberId, platform: LivePlatforms.Twitch } },
+const channelOf = async (youtuberId: string) => {
+  const channels = await prisma.youtuberChannel.findMany({
+    where: { youtuberId, platform: LivePlatforms.Twitch },
     select: { externalId: true, login: true },
+    take: 2,
   })
+
+  // A live names no channel, guessing would moderate the wrong one
+  return channels.length > 1 ? 'several' : (channels[0] ?? null)
+}
 
 /**
  * The viewer's seat on the live's channel
@@ -100,6 +108,7 @@ const seatOf = async (
 > => {
   const channel = await channelOf(youtuberId)
   if (!channel) return { notice: PLATFORM_NOTICE_COPY.noChannel }
+  if (channel === 'several') return { notice: PLATFORM_NOTICE_COPY.severalChannels }
 
   const lookup = await readTwitchSeat(viewerId)
   if (!lookup.ok) return { notice: PLATFORM_NOTICE_COPY[lookup.reason] }
@@ -142,6 +151,15 @@ const translateRefusal = async (error: unknown, viewerId: string): Promise<AppEr
 }
 
 /**
+ * Notice shown to a paused member
+ * @param {string} endsAt - Last moment of the pause, ISO
+ * @return {string} - Sentence
+ */
+
+const suspensionNotice = (endsAt: string): string =>
+  MEMBER_ADMIN_COPY.suspendedNotice.replace('{date}', formatDay(endsAt))
+
+/**
  * Open the Mod View of a live: what Twitch says now
  * @param {string} liveId - Live
  * @param {AccessScope} scope - Viewer's perimeter
@@ -158,6 +176,15 @@ export const openModView = async (
 ): Promise<ModViewSnapshot> => {
   const live = await readLive(liveId, scope, viewerId, held)
   let state = baseState(live)
+
+  // A paused member only watches
+  const paused = await activeSuspension(viewerId)
+  if (paused) {
+    return {
+      state: { ...state, notice: suspensionNotice(paused.endsAt), readOnly: true },
+      channelLogin: null,
+    }
+  }
 
   // Only Twitch is wired
   if (live.platform !== LivePlatforms.Twitch) return { state, channelLogin: null }
@@ -238,6 +265,9 @@ export const actOnLive = async (input: {
   held: PermissionName[]
 }): Promise<{ done: boolean }> => {
   const live = await readLive(input.liveId, input.scope, input.viewerId, input.held)
+
+  const paused = await activeSuspension(input.viewerId)
+  if (paused) throw forbidden(suspensionNotice(paused.endsAt))
 
   // The same rule as the greyed buttons
   const gate = gateIntent(input.intent, {

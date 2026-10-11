@@ -80,8 +80,6 @@ export const ONBOARDING_DISCORD_COPY = {
 export const ONBOARDING_FIELD_COPY = {
   displayName: 'Pseudonyme',
   displayNameHint: 'Celui sous lequel l’équipe te connaîtra.',
-  email: 'Adresse e-mail',
-  phone: 'Numéro de téléphone',
   birthday: 'Date de naissance',
   celebrateBirthday: 'Je souhaite que mon anniversaire soit fêté',
   languages: 'Langues maîtrisées',

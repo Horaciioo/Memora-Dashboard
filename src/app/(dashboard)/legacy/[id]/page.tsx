@@ -23,20 +23,21 @@ export const metadata: Metadata = { title: LEGACY_COPY.title }
 
 export default async function LegacyTrackPage({ params }: LegacyTrackPageProps) {
   const { id } = await params
-  const { session, access } = await requireUser()
+  const { access } = await requireUser()
+
+  // Never open to moderators
+  if (!access.isAdmin && !access.can(Permissions.LegacyRead)) redirect(ROUTES.dashboard)
 
   const detail = await readTrack(id).catch(() => null)
-  const isOwner = detail?.summary.accountId === session.id
-  if (!detail || (!isOwner && !access.can(Permissions.LegacyRead))) redirect(ROUTES.legacy)
+  if (!detail) redirect(ROUTES.legacy)
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={isOwner ? LEGACY_COPY.ownTitle : LEGACY_COPY.title} />
+      <PageHeader title={LEGACY_COPY.title} />
       <LegacyTrackView
         detail={detail}
         canGrade={access.can(Permissions.LegacyManage)}
         canDecide={access.isAdmin && access.can(Permissions.LegacyManage)}
-        isOwner={isOwner}
       />
     </div>
   )

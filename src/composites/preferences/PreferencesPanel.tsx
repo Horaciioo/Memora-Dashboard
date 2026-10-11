@@ -29,7 +29,7 @@ import { ACTION_ROW, GUIDES_CARD, PREFERENCE_STYLES, TABS_STYLES } from '@/decla
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { AccountSession, ProfileDetail } from '@/types/preferences'
 import type { PlatformLinkView } from '@/types/platforms'
-import { formatDay, formatDayTime } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/dates'
 import { readDevice } from '@/utils/format/device'
 
 export interface PreferencesPanelProps {

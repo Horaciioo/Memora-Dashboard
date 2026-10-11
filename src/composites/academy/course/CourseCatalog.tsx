@@ -51,21 +51,6 @@ export const CourseCatalog = ({ courses, celebrate, showUnlock }: CourseCatalogP
     [ordered]
   )
   const next = open.find((course) => course.status !== TrainingStatuses.Done) ?? null
-  const freshIds = useMemo(
-    () =>
-      new Set(
-        courses
-          .filter(
-            (course) =>
-              !course.isLocked &&
-              course.track === 'secondary' &&
-              course.status === TrainingStatuses.NotStarted
-          )
-          .map((course) => course.id)
-      ),
-    [courses]
-  )
-
   // The most fitting course sits on the stage
   const selected = next ?? open[0]
 
@@ -88,11 +73,11 @@ export const CourseCatalog = ({ courses, celebrate, showUnlock }: CourseCatalogP
 
   // The first specialisation takes the stage
   const openFresh = useCallback(() => {
-    const first = ordered.find((course) => freshIds.has(course.id))
+    const first = ordered.find((course) => !course.isLocked && course.track === 'secondary')
     if (!first) return
 
     reveal(first.id)
-  }, [freshIds, ordered, reveal])
+  }, [ordered, reveal])
 
   if (courses.length === 0) {
     return (
@@ -139,7 +124,6 @@ export const CourseCatalog = ({ courses, celebrate, showUnlock }: CourseCatalogP
                 courses={list}
                 selectedId={selected?.id ?? ''}
                 pendingId={pending}
-                freshIds={freshIds}
                 onSelect={(courseId) => router.push(ROUTES.training(courseId))}
               />
             )

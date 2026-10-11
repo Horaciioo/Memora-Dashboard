@@ -10,5 +10,6 @@
   "meetingMaxDuration": 480,
   "priorityMaxWeight": 100,
   "scaleMin": 1,
-  "scaleMax": 5
+  "scaleMax": 5,
+  "birthdayStartYear": 2005
 }

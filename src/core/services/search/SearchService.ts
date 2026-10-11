@@ -69,7 +69,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
           projectVisibility(viewer),
         ],
       },
-      include: { youtuber: true, state: true },
+      include: { youtubers: true, state: true },
       take,
     })
 
@@ -80,7 +80,10 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         id: row.id,
         group: 'projects',
         label: row.title,
-        hint: [row.youtuber?.name, row.state?.name].filter(Boolean).join(' · ') || undefined,
+        hint:
+          [...row.youtubers.map((youtuber) => youtuber.name), row.state?.name]
+            .filter(Boolean)
+            .join(' · ') || undefined,
         href: ROUTES.project(row.id),
       })),
     })
@@ -143,7 +146,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
   if (access.can(Permissions.TeamRead)) {
     const rows = await prisma.team.findMany({
       where: scopedWhere('team', scope, { name: contains }),
-      include: { lead: true },
+      include: { leads: { include: { account: true } } },
       take,
     })
 
@@ -154,7 +157,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         id: row.id,
         group: 'teams',
         label: row.name,
-        hint: row.lead?.displayName ?? undefined,
+        hint: row.leads.map((lead) => lead.account.displayName).join(', ') || undefined,
         // Teams live in their creator's file
         href: row.youtuberId ? ROUTES.settingsRecord('youtubeurs', row.youtuberId) : ROUTES.teams,
       })),

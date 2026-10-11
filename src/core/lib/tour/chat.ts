@@ -1,4 +1,4 @@
-import type { ChatTurn } from '@/declarations/tour/chat'
+import type { ChatGate, ChatTurn } from '@/declarations/tour/chat'
 
 /**
  * What the member told Memora
@@ -6,13 +6,39 @@ import type { ChatTurn } from '@/declarations/tour/chat'
  * @property {string} [birthday] - ISO day
  * @property {boolean} [celebrateBirthday] - Wants it wished
  * @property {string[]} [languages] - Language codes
+ * @property {boolean} [colorBlind] - Said they have a colour vision deficiency, asked only to route the talk
+ * @property {boolean} [colorFit] - Found a colour mode that suits them, asked only to route the talk
+ * @property {boolean} [instagram] - Gave the one network that is required, asked only to route the talk
  */
 
 export interface IntakeAnswers {
   birthday?: string
   celebrateBirthday?: boolean
   languages?: string[]
+  colorBlind?: boolean
+  colorFit?: boolean
+  instagram?: boolean
 }
+
+// What each gate asks of the answers
+const GATES: Record<ChatGate, (answers: IntakeAnswers) => boolean> = {
+  birthday: (answers) => Boolean(answers.birthday),
+  colorBlind: (answers) => answers.colorBlind === true,
+  notColorBlind: (answers) => answers.colorBlind === false,
+  colorFit: (answers) => answers.colorFit === true,
+  colorNoFit: (answers) => answers.colorFit === false,
+  noInstagram: (answers) => answers.instagram === false,
+}
+
+/**
+ * Tell whether the answers let a turn be played
+ * @param {ChatGate | undefined} gate - Answer the turn waits for
+ * @param {IntakeAnswers} answers - Answers so far
+ * @return {boolean} - Turn open
+ */
+
+const isOpen = (gate: ChatGate | undefined, answers: IntakeAnswers): boolean =>
+  gate === undefined || GATES[gate](answers)
 
 /**
  * Turn that follows, skipping those whose answer is missing
@@ -28,8 +54,7 @@ export const nextTurn = (
   answers: IntakeAnswers
 ): number | null => {
   for (let index = from + 1; index < script.length; index += 1) {
-    const requires = script[index]?.requires
-    if (!requires || answers[requires]) return index
+    if (isOpen(script[index]?.requires, answers)) return index
   }
 
   return null

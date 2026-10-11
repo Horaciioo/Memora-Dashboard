@@ -225,6 +225,7 @@ export const liveFields = async (scope: AccessScope): Promise<FieldDefinition[]>
         label: LIVE_PLATFORM_REGISTRY.label(key),
         icon: LIVE_PLATFORM_REGISTRY.get(key).icon,
       })),
+      mark: 'glyph',
       span: 'half',
     },
     {

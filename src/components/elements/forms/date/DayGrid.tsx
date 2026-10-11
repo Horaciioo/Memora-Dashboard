@@ -21,6 +21,8 @@ export interface DayGridProps {
   onPick: (day: string) => void
   onHover: (day: string) => void
   isAnchored: boolean
+  // Opens the month and year wheels
+  onTitle: () => void
 }
 
 /**
@@ -38,6 +40,7 @@ export const DayGrid = ({
   onPick,
   onHover,
   isAnchored,
+  onTitle,
 }: DayGridProps) => {
   const days = useMemo(() => monthGrid(cursor), [cursor])
   const PreviousIcon = ICONS.back
@@ -54,7 +57,14 @@ export const DayGrid = ({
         >
           <PreviousIcon className={DATE_PICKER_STYLES.stepIcon} aria-hidden="true" />
         </button>
-        <span className={DATE_PICKER_STYLES.month}>{periodLabel(cursor, 'month')}</span>
+        <button
+          type="button"
+          aria-label={PICKER_COPY.pickYear}
+          className={DATE_PICKER_STYLES.monthPick}
+          onClick={onTitle}
+        >
+          {periodLabel(cursor, 'month')}
+        </button>
         <button
           type="button"
           aria-label={PICKER_COPY.nextMonth}

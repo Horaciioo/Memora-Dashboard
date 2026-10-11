@@ -28,7 +28,8 @@ export const TEAM_COPY = {
 export const TEAM_FIELD_COPY = {
   name: 'Nom de l’équipe',
   summary: 'Description',
-  lead: 'Responsable',
+  lead: 'Responsables',
+  admin: 'Admin',
   youtuber: 'YouTubeur',
   archived: 'Archiver cette équipe',
 } as const
@@ -40,7 +41,8 @@ export const TEAM_FIELD_COPY = {
 
 export const TEAM_FIELD_INFO = {
   name: 'Le nom de l’équipe.',
-  lead: "Le responsable d'équipe.",
+  lead: 'Les responsables de l’équipe.',
+  admin: 'Les admins qui suivent l’équipe.',
   youtuber: 'Le créateur sur lequel l’équipe intervient.',
   summary: 'Le rôle de l’équipe.',
 } as const

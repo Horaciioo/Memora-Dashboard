@@ -11,6 +11,7 @@ import {
 } from '@/core/services/calendar/CalendarService'
 import { assertRowInScope } from '@/core/services/auth/ScopeService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
+import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
@@ -41,7 +42,11 @@ export const PATCH = createProtectedRoute({
       return resizeEntry(params.id, endsAt)
     }
 
-    const parsed = parseFormValues(await calendarFields(perimeter), raw, { fillMissing: true })
+    const parsed = parseFormValues(
+      await calendarFields(perimeter, workViewer(session, access)),
+      raw,
+      { fillMissing: true }
+    )
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     return updateEntry(params.id, parsed.values, perimeter, session.id, canManage)

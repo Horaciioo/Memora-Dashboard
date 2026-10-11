@@ -20,7 +20,7 @@ export default async function LegacyPage() {
   const { access } = await requireUser()
 
   // Without the right to read them all
-  if (!access.isAdmin && !access.can(Permissions.LegacyRead)) redirect(ROUTES.myLegacy)
+  if (!access.isAdmin && !access.can(Permissions.LegacyRead)) redirect(ROUTES.dashboard)
 
   const [tracks, fields] = await Promise.all([listTracks(), legacyFields()])
 

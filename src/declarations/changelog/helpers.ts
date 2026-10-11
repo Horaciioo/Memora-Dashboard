@@ -1,6 +1,11 @@
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
-import { CHANGELOG_RELEASES, CHANGELOG_TAGS } from '@/declarations/changelog/releases'
+import {
+  CHANGELOG_RELEASES,
+  CHANGELOG_TAGS,
+  ChangelogAudiences,
+} from '@/declarations/changelog/releases'
 import type {
+  ChangelogAudience,
   ChangelogComment,
   ChangelogItem,
   ChangelogPage,
@@ -9,6 +14,7 @@ import type {
 } from '@/declarations/changelog/releases'
 import { NAVIGATION, ROUTES, SEGMENT_LABELS } from '@/declarations/navigation'
 import type { IconName } from '@/declarations/ui/icons'
+import type { PermissionHelpers } from '@/types/auth'
 import type { PermissionName } from '@/utils/constants/permissions'
 
 // Rail glyph per page
@@ -50,13 +56,16 @@ export const changelogPage = (page?: ChangelogPage): ChangelogPageMeta => {
 
 /**
  * Notes a member may read
- * @param {(permission: PermissionName) => boolean} can - Permission check
+ * @param {Pick<PermissionHelpers, 'can' | 'isResponsable'>} access - Permission check and level
  * @return {ChangelogRelease[]} - Filtered notes
  */
 
-export const changelogFor = (can: (permission: PermissionName) => boolean): ChangelogRelease[] => {
-  const readable = (entry: { permission?: PermissionName }) =>
-    !entry.permission || can(entry.permission)
+export const changelogFor = (
+  access: Pick<PermissionHelpers, 'can' | 'isResponsable'>
+): ChangelogRelease[] => {
+  const readable = (entry: { audience?: ChangelogAudience; permission?: PermissionName }) =>
+    (entry.audience !== ChangelogAudiences.Responsables || access.isResponsable) &&
+    (!entry.permission || access.can(entry.permission))
 
   return CHANGELOG_RELEASES.map((release) => ({
     ...release,

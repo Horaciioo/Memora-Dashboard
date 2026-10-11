@@ -145,16 +145,6 @@ export const TOUR_PAGES: TourPage[] = [
     ],
   },
   {
-    route: ROUTES.myLegacy,
-    steps: [
-      {
-        beacon: TOUR_BEACONS.page,
-        title: 'Mon Legacy',
-        body: 'Tes modules, ta progression et ton verdict. Ton parcours apparaît ici quand l’Administration l’ouvre pour toi.',
-      },
-    ],
-  },
-  {
     route: ROUTES.sanctions,
     steps: [
       {

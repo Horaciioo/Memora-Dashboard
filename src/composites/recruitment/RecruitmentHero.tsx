@@ -1,4 +1,5 @@
 import { Avatar } from '@/components/elements/display/Avatar'
+import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
@@ -15,7 +16,7 @@ export interface RecruitmentHeroProps {
 
 /**
  * Header of a session: who it recruits for, where it stands, who carries it, and one bar
- * showing how the candidates are spread over the outcomes. Identifiers and tallies stay out
+ * showing how the candidates are spread over the outcomes. Tallies stay out
  * @param {RecruitmentSummary} summary - Session row
  * @param {CandidateView[]} candidates - Applicants held
  * @param {Object[]} outcomes - Outcomes of the results board
@@ -56,6 +57,7 @@ export const RecruitmentHero = ({ summary, candidates, outcomes }: RecruitmentHe
             <div className={SESSION_HERO.meta}>
               <span>{summary.youtuber.label}</span>
               <Status label={status.label} accent={status.accent} />
+              <RecordId id={summary.id} />
             </div>
           </div>
         </div>

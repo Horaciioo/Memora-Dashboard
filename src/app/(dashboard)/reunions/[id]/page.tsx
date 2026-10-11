@@ -5,7 +5,12 @@ import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { MeetingFile } from '@/composites/work/MeetingFile'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
 import { meetingFields, readMeeting, topicFields } from '@/core/services/work/MeetingService'
-import { assertMeetingVisible, workViewer } from '@/core/services/work/visibility'
+import { redactMeeting } from '@/core/services/work/redaction'
+import {
+  assertMeetingVisible,
+  currentWorkViewer,
+  workViewer,
+} from '@/core/services/work/visibility'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { MEETING_COPY } from '@/declarations/work/copy'
@@ -26,6 +31,11 @@ export async function generateMetadata({
   const { id } = await params
 
   try {
+    // A hidden file lends no title
+    const viewer = await currentWorkViewer()
+    if (!viewer) return { title: MEETING_COPY.title }
+
+    await assertMeetingVisible(id, viewer)
     const meeting = await readMeeting(id)
 
     return { title: meeting.summary.title }
@@ -47,10 +57,12 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
   const perimeter = await scope()
   const viewer = workViewer(session, access)
 
-  const detail = await assertMeetingVisible(id, viewer)
+  const found = await assertMeetingVisible(id, viewer)
     .then(() => readMeeting(id))
     .catch(() => null)
-  if (!detail) notFound()
+  if (!found) notFound()
+
+  const detail = redactMeeting(found, access)
 
   const [fields, activity] = await Promise.all([
     meetingFields(perimeter, viewer),

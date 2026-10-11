@@ -53,3 +53,23 @@ export const formatSpan = (seconds: number): string => {
 
   return MODVIEW_SPAN_COPY.seconds.replace('{seconds}', String(Math.max(0, Math.round(seconds))))
 }
+
+/**
+ * Say a spent time to the second
+ * @param {number} seconds - Time spent
+ * @return {string} - Exact time, or under a minute
+ */
+
+export const formatExactSpan = (seconds: number): string => {
+  const total = Math.round(seconds)
+  if (total < MINUTE) return MODVIEW_SPAN_COPY.underMinute
+
+  return [
+    [Math.floor(total / HOUR), MODVIEW_SPAN_COPY.unitHour],
+    [Math.floor((total % HOUR) / MINUTE), MODVIEW_SPAN_COPY.unitMinute],
+    [total % MINUTE, MODVIEW_SPAN_COPY.unitSecond],
+  ]
+    .filter(([count]) => count !== 0)
+    .map(([count, unit]) => `${count} ${unit}`)
+    .join(' ')
+}

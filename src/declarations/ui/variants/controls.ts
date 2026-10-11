@@ -185,7 +185,6 @@ export const FILE_INPUT_STYLES = {
  */
 
 export const OPTION_MARK_STYLES = {
-  dot: 'h-3.5 w-[3px] shrink-0 rounded-full',
   priority: 'shrink-0 text-sm leading-none font-bold tracking-tight',
   emoji: 'shrink-0 text-base leading-none',
   glyph: 'h-4 w-4 shrink-0',
@@ -280,6 +279,8 @@ export const DATE_PICKER_STYLES = {
     'popover-enter fixed z-[70] w-72 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
   head: 'flex items-center justify-between gap-2 border-b border-[var(--color-border)] px-2 py-2',
   month: 'flex-1 text-center text-sm font-bold first-letter:uppercase',
+  monthPick:
+    'flex-1 rounded-[var(--radius-sm)] py-1 text-center text-sm font-bold transition-colors first-letter:uppercase hover:bg-[var(--color-surface)]',
   step: 'flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   stepIcon: 'h-4 w-4',
   hint: 'text-xs text-[var(--color-ink-subtle)]',
@@ -307,13 +308,17 @@ export const DATE_PICKER_STYLES = {
  */
 
 export const DATE_WHEEL = {
-  // Years either side of today
-  yearSpan: 10,
+  // Years offered before today
+  yearsBack: 100,
+  // Years offered after today
+  yearsAhead: 10,
   // Scroll rest before a row is read
   settleMs: 120,
   frame: 'relative grid grid-cols-[1fr_1.6fr_1fr] gap-1 px-3 py-2',
+  framePeriod: 'relative grid grid-cols-[1.6fr_1fr] gap-1 px-3 py-2',
   band: 'pointer-events-none absolute inset-x-3 top-1/2 h-10 -translate-y-1/2 rounded-[var(--radius-md)] bg-[var(--color-picker-wash-strong)]',
-  column: 'h-50 snap-y snap-mandatory overflow-y-scroll [scrollbar-width:none]',
+  column:
+    'h-50 snap-y snap-mandatory overflow-y-scroll [scrollbar-width:none] [mask-image:linear-gradient(transparent,black_30%,black_70%,transparent)]',
   // Two empty rows centre the first and last entries
   spacer: 'block h-20',
   item: 'flex h-10 snap-center items-center justify-center text-body tabular-nums',

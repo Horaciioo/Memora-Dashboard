@@ -1,3 +1,5 @@
+import type { ChatStage } from '@/declarations/tour/chat'
+
 /**
  * Words of the first visit that are not Memora's script
  * @type {Record<string, string>}
@@ -6,20 +8,31 @@
 export const TOUR_COPY = {
   chatLabel: 'Discussion avec Memora',
   memora: 'Memora',
+  tabTitle: 'Informations',
   typing: 'Memora écrit…',
+  inputPlaceholder: 'Écris à Memora…',
+  inputWaiting: 'La suite arrive…',
+  inputLabel: 'Ton message à Memora',
+  inputSend: 'Envoyer le message',
   send: 'Envoyer',
-  yes: 'Oui',
-  no: 'Non',
+  yes: 'Yep, je veux bien',
+  no: 'Non, je ne préfère pas.',
   skip: 'Passer',
   skipBirthday: 'Je préfère ne pas la donner',
   birthdayLabel: 'Ma date de naissance',
   languagesLabel: 'Mes langues',
   languagesEmpty: 'Choisir mes langues',
+  colorBlindYes: 'Yep',
+  colorBlindNo: 'Nope',
+  colorNone: 'Aucune de ces propositions ne me convient',
+  colorVisionLabel: 'Mon daltonisme',
+  socialsLabel: 'Mes réseaux',
+  socialAdd: 'Ajouter ce réseau',
+  socialDone: 'Continuer',
+  socialNone: 'Je n’ai rien à partager',
+  sample: 'Aa',
   ready: 'C’est parti',
-  deckLabel: 'Présentation de Memora',
-  deckNext: 'Suivant',
-  deckPrevious: 'Retour',
-  deckFinish: 'C’est parti',
+  timelineLabel: 'Étapes de la discussion',
   loading: 'Je prépare ta visite…',
   loaded: 'Tout est prêt.',
   stepNext: 'Suivant',
@@ -35,3 +48,21 @@ export const TOUR_COPY = {
   doneClose: 'Fermer',
   progress: 'Avancée de la visite',
 } as const
+
+/**
+ * The one network a member must give, the others are optional
+ * @type {string}
+ */
+
+export const TOUR_REQUIRED_NETWORK = 'Instagram'
+
+/**
+ * Steps of the welcome conversation, in order
+ * @type {readonly { key: ChatStage, label: string }[]}
+ */
+
+export const TOUR_STAGES: readonly { key: ChatStage; label: string }[] = [
+  { key: 'presentation', label: 'Présentation de Memora' },
+  { key: 'information', label: 'Prise d’informations' },
+  { key: 'preferences', label: 'Préférences' },
+]

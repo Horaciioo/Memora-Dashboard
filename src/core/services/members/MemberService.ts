@@ -10,6 +10,7 @@ import { conflict, forbidden, immutable, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import { activeAbsenceFilter, toAbsence } from '@/core/services/absences/AbsenceService'
+import { fileUrl } from '@/core/services/system/FileService'
 import { toMemberNote } from '@/core/services/members/MemberFileService'
 import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/roles'
 import { isRootIdentity } from '@/declarations/access/identity'
@@ -21,7 +22,12 @@ import { LEGACY_FUNCTION_OF } from '@/declarations/reference/fixed'
 import { LANGUAGE_OPTIONS, timezoneOptions } from '@/declarations/system/locales'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence, MemberDetail, MemberSummary } from '@/types/members'
-import { AcademyJuniorStatuses, MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
+import {
+  AcademyJuniorStatuses,
+  GONE_MEMBER_STATUSES,
+  MemberRoles,
+  MemberStatuses,
+} from '@/utils/constants/hierarchy'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import { AbsenceStatuses, FunctionKinds } from '@/utils/constants/workflow'
 import type { FunctionKindName } from '@/utils/constants/workflow'
@@ -37,12 +43,6 @@ const SUMMARY_INCLUDE = {
     orderBy: { startedAt: 'desc' },
     take: 1,
     include: { dispositif: true },
-  },
-  // The track in course
-  legacyTracks: {
-    orderBy: { startsAt: 'desc' },
-    take: 1,
-    select: { id: true, status: true, endsAt: true },
   },
 } satisfies Prisma.AccountInclude
 
@@ -83,9 +83,6 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
     : null,
   academyJuniorId: row.academyJuniors[0]?.id ?? null,
   academySessionId: row.academyJuniors[0]?.sessionId ?? null,
-  legacyTrackId: row.legacyTracks[0]?.id ?? null,
-  legacyStatus: row.legacyTracks[0]?.status ?? null,
-  legacyEndsAt: row.legacyTracks[0]?.endsAt.toISOString() ?? null,
   division: row.division
     ? {
         id: row.division.id,
@@ -190,10 +187,15 @@ export const assertMemberAssignable = async (
  */
 
 export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> => {
-  const [divisions, youtubers, functions] = await Promise.all([
+  const [divisions, youtubers, functions, teams] = await Promise.all([
     allDivisions(),
     activeYoutubers(),
     activeFunctions(),
+    prisma.team.findMany({
+      where: { archived: false },
+      select: { id: true, name: true },
+      orderBy: { name: 'asc' },
+    }),
   ])
 
   // Each kind only offers its own functions
@@ -233,6 +235,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
     {
       name: 'birthday',
       kind: 'date',
+      startYear: FORM_SETTINGS.birthdayStartYear,
       label: MEMBER_FIELD_COPY.birthday,
       info: MEMBER_FIELD_INFO.birthday,
       span: 'half',
@@ -255,7 +258,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       options: toOptions(ROLE_REGISTRY).filter(
         (option) => isAdmin || BELOW_LEAD_ROLES.includes(option.value as MemberRoleName)
       ),
-      mark: 'dot',
+      mark: 'role',
       span: 'half',
       group: FORM_GROUPS.assignment,
     },
@@ -311,18 +314,13 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       group: FORM_GROUPS.assignment,
     },
     {
-      name: 'email',
-      kind: 'email',
-      label: MEMBER_FIELD_COPY.email,
+      name: 'teamIds',
+      kind: 'multiselect',
+      label: MEMBER_FIELD_COPY.team,
+      info: MEMBER_FIELD_INFO.team,
+      options: rowsToOptions(teams),
       span: 'half',
-      group: FORM_GROUPS.contact,
-    },
-    {
-      name: 'phone',
-      kind: 'phone',
-      label: MEMBER_FIELD_COPY.phone,
-      span: 'half',
-      group: FORM_GROUPS.contact,
+      group: FORM_GROUPS.assignment,
     },
     {
       name: 'timezone',
@@ -339,6 +337,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       label: MEMBER_FIELD_COPY.languages,
       info: MEMBER_FIELD_INFO.languages,
       options: LANGUAGE_OPTIONS,
+      mark: 'flag',
       maxItems: FORM_SETTINGS.tagMaxCount,
       group: FORM_GROUPS.contact,
       maturity: 'alpha',
@@ -401,8 +400,6 @@ const toAccountData = (values: FormValues) => ({
   role: (readText(values, 'role') ?? 'MODERATEUR') as MemberRoleName,
   status: (readText(values, 'status') ?? MemberStatuses.Academy) as MemberStatusName,
   divisionId: readText(values, 'divisionId'),
-  email: readText(values, 'email'),
-  phone: readText(values, 'phone'),
   timezone: readText(values, 'timezone'),
   birthday: readDate(values, 'birthday'),
   leftAt: readDate(values, 'leftAt'),
@@ -444,6 +441,46 @@ const readKindIds = async (ids: string[], kind: FunctionKindName): Promise<strin
 }
 
 /**
+ * Keep the ids that name a team
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<string[]>} - Known team identifiers
+ */
+
+const readTeamIds = async (values: FormValues): Promise<string[]> => {
+  const ids = readList(values, 'teamIds')
+  if (ids.length === 0) return []
+
+  const rows = await prisma.team.findMany({ where: { id: { in: ids } }, select: { id: true } })
+
+  return rows.map((row) => row.id)
+}
+
+/**
+ * Refuse an identifier another file already holds
+ * @param {string} discordId - Identifier to give
+ * @param {string} [currentId] - File being edited
+ * @return {Promise<void>} - Throws when taken
+ */
+
+export const assertIdentifierFree = async (
+  discordId: string,
+  currentId?: string
+): Promise<void> => {
+  const holder = await prisma.account.findUnique({
+    where: { discordId },
+    select: { id: true, status: true },
+  })
+  if (!holder || holder.id === currentId) return
+
+  // A departed file keeps its identifier until it is deleted
+  throw conflict(
+    GONE_MEMBER_STATUSES.includes(holder.status)
+      ? MEMBER_COPY.identifierHeldByGone
+      : MEMBER_COPY.identifierTaken
+  )
+}
+
+/**
  * Add a moderator
  * @param {FormValues} values - Parsed body
  * @return {Promise<MemberSummary>} - Created row
@@ -454,9 +491,9 @@ export const createMember = async (values: FormValues): Promise<MemberSummary> =
   const joinedAt = readDate(values, 'joinedAt')
   const youtuberIds = readList(values, 'youtuberIds')
   const functionIds = await readHeldFunctionIds(values)
+  const teamIds = await readTeamIds(values)
 
-  const existing = await prisma.account.findUnique({ where: { discordId: data.discordId } })
-  if (existing) throw conflict()
+  await assertIdentifierFree(data.discordId)
 
   const row = await prisma.account.create({
     data: {
@@ -464,6 +501,7 @@ export const createMember = async (values: FormValues): Promise<MemberSummary> =
       joinedAt: joinedAt ?? new Date(),
       youtubers: { connect: youtuberIds.map((id) => ({ id })) },
       functions: { create: functionIds.map((functionId) => ({ functionId })) },
+      teamMemberships: { create: teamIds.map((teamId) => ({ teamId })) },
     },
     include: SUMMARY_INCLUDE,
   })
@@ -487,9 +525,14 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
   if (isRootIdentity(current.discordId)) throw immutable(MEMBER_COPY.rootLocked)
 
   const data = await withoutSealedWrites(toAccountData(values))
+  if (data.discordId && data.discordId !== current.discordId) {
+    await assertIdentifierFree(data.discordId, id)
+  }
+
   const joinedAt = readDate(values, 'joinedAt')
   const youtuberIds = readList(values, 'youtuberIds')
   const functionIds = await readHeldFunctionIds(values)
+  const teamIds = await readTeamIds(values)
 
   const row = await prisma.account.update({
     where: { id },
@@ -501,6 +544,10 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
       functions: {
         deleteMany: {},
         create: functionIds.map((functionId) => ({ functionId })),
+      },
+      teamMemberships: {
+        deleteMany: {},
+        create: teamIds.map((teamId) => ({ teamId })),
       },
     },
     include: {
@@ -524,37 +571,36 @@ export const clearVolunteeredDetails = async (id: string): Promise<void> => {
     prisma.accountConstraint.deleteMany({ where: { accountId: id } }),
     prisma.account.update({
       where: { id },
-      data: { email: null, phone: null, birthday: null, celebrateBirthday: false },
+      data: { birthday: null, celebrateBirthday: false },
     }),
   ])
 }
 
 /**
- * Close a member's access and drop what they volunteered
+ * Erase a member and every trace holding their identifier
  * @param {string} id - Account identifier
- * @return {Promise<void>} - Anonymised
+ * @return {Promise<void>} - Deleted
  */
 
-export const anonymiseMember = async (id: string): Promise<void> => {
+export const deleteMember = async (id: string): Promise<void> => {
   const current = await prisma.account.findUnique({ where: { id } })
   if (!current) throw notFound()
   if (isRootIdentity(current.discordId)) throw immutable(MEMBER_COPY.rootLocked)
 
-  await clearVolunteeredDetails(id)
+  const filePrefix = fileUrl('')
+  const avatarId = current.avatarUrl?.startsWith(filePrefix)
+    ? current.avatarUrl.slice(filePrefix.length)
+    : null
 
-  // Credentials go with the access
+  // Owned rows follow through the foreign keys, loose references go by hand
   await prisma.$transaction([
-    prisma.session.deleteMany({ where: { accountId: id } }),
-    prisma.discordToken.deleteMany({ where: { accountId: id } }),
-    prisma.account.update({
-      where: { id },
-      data: {
-        discordUsername: null,
-        status: MemberStatuses.Left,
-        leftAt: current.leftAt ?? new Date(),
-        anonymisedAt: new Date(),
-      },
+    prisma.activityLog.deleteMany({
+      where: { OR: [{ subjectId: id }, { targetType: 'member', targetId: id }] },
     }),
+    prisma.notification.deleteMany({ where: { targetType: 'member', targetId: id } }),
+    prisma.integrationClaim.deleteMany({ where: { discordId: current.discordId } }),
+    ...(avatarId ? [prisma.storageEntry.deleteMany({ where: { id: avatarId } })] : []),
+    prisma.account.delete({ where: { id } }),
   ])
 }
 
@@ -626,8 +672,7 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
       secondaryFunctionIds: row.functions
         .filter((held) => held.jobFunction.kind === FunctionKinds.Secondary)
         .map((held) => held.functionId),
-      email: row.email,
-      phone: row.phone,
+      teamIds: row.teamMemberships.map((membership) => membership.teamId),
       timezone: row.timezone,
       birthday: row.birthday ? row.birthday.toISOString().slice(0, 10) : null,
       joinedAt: row.joinedAt.toISOString().slice(0, 10),
@@ -635,8 +680,6 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
       languages: row.languages,
       celebrateBirthday: row.celebrateBirthday,
     },
-    email: row.email,
-    phone: row.phone,
     birthday: row.birthday?.toISOString() ?? null,
     celebrateBirthday: row.celebrateBirthday,
     languages: row.languages,

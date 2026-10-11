@@ -1,0 +1,6 @@
+{
+  "traceMaxLength": 2000,
+  "messageMaxLength": 300,
+  "repeatWindowSeconds": 300,
+  "repeatKeysMax": 200
+}

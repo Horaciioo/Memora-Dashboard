@@ -1,5 +1,8 @@
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 
+// Minute-precision datetime with no zone
+const WALL_CLOCK_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
+
 /**
  * Build blank values from declarations
  * @param {FieldDefinition[]} fields - Field declarations
@@ -116,7 +119,8 @@ export const readDate = (values: FormValues, name: string): Date | null => {
   const text = readText(values, name)
   if (!text) return null
 
-  const parsed = new Date(text)
+  // Wall-clock minutes are stored as UTC
+  const parsed = new Date(WALL_CLOCK_PATTERN.test(text) ? `${text}Z` : text)
   return Number.isNaN(parsed.getTime()) ? null : parsed
 }
 
@@ -176,7 +180,10 @@ const presetOf = (field: FieldDefinition, context: PresetContext): FieldValue | 
 
   // Flagged option
   if (field.preset === 'default') {
-    return field.options?.find((option) => option.isDefault && !option.disabled)?.value
+    const flagged = field.options?.find((option) => option.isDefault && !option.disabled)?.value
+    if (flagged === undefined) return undefined
+
+    return field.kind === 'multiselect' ? [flagged] : flagged
   }
 
   return undefined

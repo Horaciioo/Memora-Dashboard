@@ -10,14 +10,18 @@ import {
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { summariseChange } from '@/core/services/system/changes'
 import { notify } from '@/core/services/system/NotificationService'
+import { assertMeetingVisible, workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
   permission: Permissions.MeetingUpdate,
   descriptor: { summary: 'Edit a meeting', tags: ['meetings'] },
-  handler: async ({ params, raw, session, scope }) => {
+  handler: async ({ params, raw, session, scope, access }) => {
+    const viewer = workViewer(session, access)
+    await assertMeetingVisible(params.id, viewer)
+
     const perimeter = await scope()
-    const fields = await meetingFields(perimeter)
+    const fields = await meetingFields(perimeter, viewer)
 
     const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
@@ -53,7 +57,8 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   permission: Permissions.MeetingDelete,
   descriptor: { summary: 'Drop a meeting', tags: ['meetings'] },
-  handler: async ({ params, session, scope }) => {
+  handler: async ({ params, session, scope, access }) => {
+    await assertMeetingVisible(params.id, workViewer(session, access))
     await removeMeeting(params.id, await scope())
 
     await recordEvent({

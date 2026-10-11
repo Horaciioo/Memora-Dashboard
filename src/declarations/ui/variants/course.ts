@@ -64,8 +64,6 @@ export const COURSE_CATALOG = {
     'size-full object-cover transition-transform duration-[var(--motion-duration-slow)] group-hover:scale-110',
   tileImageDone: 'grayscale',
   tileShade: 'absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent',
-  tileTag:
-    'absolute top-3 left-3 rounded-[var(--radius-full)] bg-[var(--color-brand-600)] px-2.5 py-1 text-micro font-bold tracking-wide text-[var(--color-on-brand)] uppercase shadow-[var(--shadow-sm)]',
   tileSurfaceIcon: 'size-4',
   // Title over the foot of the banner
   tileTitle:
@@ -375,7 +373,6 @@ export const LEGACY_TRACK = {
   barMarkLabel:
     'absolute top-5 -translate-x-1/2 text-micro font-bold tracking-wide whitespace-nowrap text-[var(--color-ink-subtle)] uppercase',
   moduleMeta: 'text-sm text-[var(--color-ink-subtle)]',
-  moduleAction: 'justify-self-end',
 } as const
 
 /**

@@ -1,6 +1,8 @@
 import { Avatar } from '@/components/elements/display/Avatar'
+import { CountryFlag } from '@/components/elements/display/CountryFlag'
 import { DivisionLogo } from '@/components/elements/display/DivisionLogo'
 import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/NetworkLogo'
+import { ROLE_EMBLEMS } from '@/declarations/members/profiles'
 import { PRIORITY_GLYPH } from '@/declarations/ui/copy'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { ACCENT_STYLES, TONES, accentVars, toTone } from '@/declarations/ui/theme'
@@ -8,6 +10,7 @@ import { OPTION_MARK_STYLES } from '@/declarations/ui/variants'
 import type { AvatarSize } from '@/declarations/ui/variants/surfaces'
 import type { FieldOption, OptionMark as OptionMarkKind } from '@/types/forms'
 import { cn } from '@/utils/classnames'
+import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { isHexColour } from '@/utils/format/colour'
 
 export interface OptionMarkProps {
@@ -30,6 +33,13 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
     return <Avatar name={option.label} src={option.image} size={size} />
   }
 
+  // Emblem of a hierarchy level
+  if (mark === 'role') {
+    const Emblem = ROLE_EMBLEMS[option.value as MemberRoleName]?.glyph
+
+    return Emblem ? <Emblem className="h-6 w-6 shrink-0" /> : null
+  }
+
   // Official logo of a division
   if (mark === 'division') {
     return <DivisionLogo label={option.label} src={option.image} className="h-5 w-5" />
@@ -44,6 +54,11 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
     )
   }
 
+  // Flag of a country
+  if (mark === 'flag') {
+    return option.flag ? <CountryFlag country={option.flag} /> : null
+  }
+
   // Project glyph
   if (mark === 'emoji') {
     return option.emoji ? (
@@ -54,7 +69,8 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
   }
 
   // A dot gives way to the glyph an option names
-  const glyphName = option.icon && isIconName(option.icon) ? option.icon : null
+  const glyphName =
+    option.icon && isIconName(option.icon) ? option.icon : mark === 'dot' ? 'statusDot' : null
   if (glyphName && (mark === 'glyph' || mark === 'dot')) {
     const Glyph = ICONS[glyphName]
     const paint = isHexColour(option.accent)
@@ -71,26 +87,19 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
     )
   }
 
-  if (mark === 'glyph') return null
+  // Only the priority mark is left
+  if (mark !== 'priority') return null
 
-  const fallback = mark === 'priority' ? 'warning' : 'neutral'
   const picked = isHexColour(option.accent)
-  const styles = picked ? ACCENT_STYLES : TONES[toTone(option.accent, fallback)]
-  const style = picked ? accentVars(option.accent, fallback) : undefined
-
-  if (mark === 'priority') {
-    return (
-      <span
-        className={cn(OPTION_MARK_STYLES.priority, styles.text)}
-        style={style}
-        aria-hidden="true"
-      >
-        {PRIORITY_GLYPH}
-      </span>
-    )
-  }
+  const styles = picked ? ACCENT_STYLES : TONES[toTone(option.accent, 'warning')]
 
   return (
-    <span className={cn(OPTION_MARK_STYLES.dot, styles.dot)} style={style} aria-hidden="true" />
+    <span
+      className={cn(OPTION_MARK_STYLES.priority, styles.text)}
+      style={picked ? accentVars(option.accent, 'warning') : undefined}
+      aria-hidden="true"
+    >
+      {PRIORITY_GLYPH}
+    </span>
   )
 }

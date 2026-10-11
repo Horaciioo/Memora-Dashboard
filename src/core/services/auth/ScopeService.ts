@@ -28,7 +28,7 @@ export interface AccessScope {
 // Teams a responsable leads widen their perimeter to the whole creator
 const leadPerimeter = cache(async (accountId: string): Promise<string[]> => {
   const teams = await prisma.team.findMany({
-    where: { leadId: accountId, archived: false },
+    where: { leads: { some: { accountId } }, archived: false },
     select: { youtuberId: true },
   })
 
@@ -114,7 +114,7 @@ export const scopedWhere = <T extends object>(
     if (scope.activeYoutuberId === null) return base
 
     const pinned =
-      kind === 'relation'
+      kind === 'relation' || kind === 'shared'
         ? { youtubers: { some: { id: scope.activeYoutuberId } } }
         : { youtuberId: scope.activeYoutuberId }
 
@@ -122,12 +122,20 @@ export const scopedWhere = <T extends object>(
   }
 
   const ids = scope.youtuberIds
+  const reach = { youtubers: { some: { id: { in: ids } } } }
+
+  // Shared rows may carry no creator at all
+  const open = SCOPE_SETTINGS.includeUnassigned
   const filter =
     kind === 'relation'
-      ? { youtubers: { some: { id: { in: ids } } } }
-      : SCOPE_SETTINGS.includeUnassigned && kind === 'direct'
-        ? { OR: [{ youtuberId: null }, { youtuberId: { in: ids } }] }
-        : { youtuberId: { in: ids } }
+      ? reach
+      : kind === 'shared'
+        ? open
+          ? { OR: [{ youtubers: { none: {} } }, reach] }
+          : reach
+        : open && kind === 'direct'
+          ? { OR: [{ youtuberId: null }, { youtuberId: { in: ids } }] }
+          : { youtuberId: { in: ids } }
 
   return { AND: [base, filter] } as unknown as T
 }
@@ -148,21 +156,61 @@ export const assertInScope = (scope: AccessScope, youtuberId: string | null): vo
 }
 
 /**
- * Where each directly scoped model keeps its creator
- * @type {Record<string, (id: string) => Promise<{ youtuberId: string | null } | null>>}
+ * Guard a write naming several creators
+ * @param {AccessScope} scope - Perimeter
+ * @param {string[]} youtuberIds - Creators carried by the row
+ * @return {void} - Throws when one is out of perimeter
+ */
+
+export const assertAllInScope = (scope: AccessScope, youtuberIds: string[]): void => {
+  if (scope.isGlobal) return
+  if (youtuberIds.length === 0 && SCOPE_SETTINGS.includeUnassigned) return
+  if (youtuberIds.length > 0 && youtuberIds.every((id) => scope.youtuberIds.includes(id))) return
+
+  throw notFound()
+}
+
+/**
+ * Creators a stored row carries
+ * @param {string | null | undefined} youtuberId - Single creator column
+ * @return {string[]} - Creator identifiers
+ */
+
+const single = (youtuberId: string | null | undefined): string[] => (youtuberId ? [youtuberId] : [])
+
+// Creators a shared row carries
+const HELD_CREATORS = { youtubers: { select: { id: true } } } as const
+
+// Identifiers of the creators a row carries
+const heldBy = (row: { youtubers: { id: string }[] } | null): string[] =>
+  row?.youtubers.map((youtuber) => youtuber.id) ?? []
+
+/**
+ * Where each scoped model keeps its creators
+ * @type {Record<string, (id: string) => Promise<string[]>>}
  */
 
 const SCOPE_LOOKUPS = {
-  project: (id: string) =>
-    prisma.project.findUnique({ where: { id }, select: { youtuberId: true } }),
-  task: (id: string) => prisma.task.findUnique({ where: { id }, select: { youtuberId: true } }),
-  meeting: (id: string) =>
-    prisma.meeting.findUnique({ where: { id }, select: { youtuberId: true } }),
-  team: (id: string) => prisma.team.findUnique({ where: { id }, select: { youtuberId: true } }),
-  calendarEvent: (id: string) =>
-    prisma.calendarEvent.findUnique({ where: { id }, select: { youtuberId: true } }),
-  liveconEntry: (id: string) =>
-    prisma.liveconEntry.findUnique({ where: { id }, select: { youtuberId: true } }),
+  project: async (id: string) =>
+    heldBy(await prisma.project.findUnique({ where: { id }, select: HELD_CREATORS })),
+  task: async (id: string) =>
+    heldBy(await prisma.task.findUnique({ where: { id }, select: HELD_CREATORS })),
+  meeting: async (id: string) =>
+    heldBy(await prisma.meeting.findUnique({ where: { id }, select: HELD_CREATORS })),
+  team: async (id: string) =>
+    single(
+      (await prisma.team.findUnique({ where: { id }, select: { youtuberId: true } }))?.youtuberId
+    ),
+  calendarEvent: async (id: string) =>
+    single(
+      (await prisma.calendarEvent.findUnique({ where: { id }, select: { youtuberId: true } }))
+        ?.youtuberId
+    ),
+  liveconEntry: async (id: string) =>
+    single(
+      (await prisma.liveconEntry.findUnique({ where: { id }, select: { youtuberId: true } }))
+        ?.youtuberId
+    ),
 } as const
 
 /**
@@ -187,8 +235,12 @@ export const assertRowInScope = async (
 ): Promise<void> => {
   if (scope.isGlobal) return
 
-  const row = await SCOPE_LOOKUPS[target](id)
-  assertInScope(scope, row?.youtuberId ?? null)
+  // One creator in perimeter is enough to reach a shared row
+  const creators = await SCOPE_LOOKUPS[target](id)
+  if (creators.length === 0) return assertInScope(scope, null)
+  if (creators.some((creator) => scope.youtuberIds.includes(creator))) return
+
+  throw notFound()
 }
 
 /**

@@ -17,7 +17,7 @@ export const readMemberModeration = async (
 
   try {
     // Lives the member was in
-    const [presences, actions, windowTime] = await Promise.all([
+    const [presences, actions, windowTime, windowLives] = await Promise.all([
       prisma.modViewPresence.groupBy({
         by: ['liveId'],
         where: { accountId },
@@ -33,7 +33,11 @@ export const readMemberModeration = async (
       }),
       prisma.modViewPresence.aggregate({
         where: { accountId, openedAt: { gte: since } },
-        _sum: { visibleSeconds: true },
+        _sum: { visibleSeconds: true, activeSeconds: true },
+      }),
+      prisma.modViewPresence.groupBy({
+        by: ['liveId'],
+        where: { accountId, openedAt: { gte: since } },
       }),
     ])
 
@@ -89,6 +93,8 @@ export const readMemberModeration = async (
 
     return {
       windowSeconds: windowTime._sum.visibleSeconds ?? 0,
+      windowActiveSeconds: windowTime._sum.activeSeconds ?? 0,
+      windowLives: windowLives.length,
       lives: summaries
         .sort((left, right) => Date.parse(right.startedAt) - Date.parse(left.startedAt))
         .slice(0, LIVE_SETTINGS.memberLives),

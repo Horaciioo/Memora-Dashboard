@@ -3574,6 +3574,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"country-flag-icons@npm:^1.6.20":
+  version: 1.6.20
+  resolution: "country-flag-icons@npm:1.6.20"
+  checksum: 10c0/e270cbf3f31d8f57a7f6da56c15733897f4dcc9c7fd50f88c7d295d16cb9fd97dcae96c054b2d840916bec3f27472335201938dc569961d935da4c4d341f9d32
+  languageName: node
+  linkType: hard
+
 "cron-parser@npm:5.10.0":
   version: 5.10.0
   resolution: "cron-parser@npm:5.10.0"
@@ -5891,6 +5898,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:^4.1.11"
     bullmq: "npm:^6.1.2"
     clsx: "npm:^2.1.1"
+    country-flag-icons: "npm:^1.6.20"
     eslint: "npm:^9"
     eslint-config-next: "npm:16.3.0"
     ioredis: "npm:^6.0.0"

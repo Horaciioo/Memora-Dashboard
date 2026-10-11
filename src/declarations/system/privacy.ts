@@ -194,7 +194,7 @@ export interface AnonymisationPlan {
  */
 
 export const ANONYMISATION_PLAN: AnonymisationPlan = {
-  cleared: ['email', 'phone', 'birthday'],
+  cleared: ['birthday'],
   kept: ['discordId', 'displayName', 'avatarUrl'],
   purged: ['socialLinks', 'discordToken', 'sessions'],
 }

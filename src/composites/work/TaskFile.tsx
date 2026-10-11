@@ -1,23 +1,29 @@
 'use client'
 
 import { Avatar } from '@/components/elements/display/Avatar'
+import { RecordId } from '@/components/elements/display/RecordId'
+import { OptionMark } from '@/components/elements/forms/OptionMark'
 import { Status } from '@/components/elements/display/Status'
-import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
+import { CreatorLabels, ProjectLabel } from '@/components/elements/display/RecordLabel'
+import { pickedOptions } from '@/core/lib/forms/options'
+import { OverdueMark } from '@/composites/work/OverdueMark'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
 import { EditableDetailGrid, type EditableEntry } from '@/components/structures/EditableDetailGrid'
 import { EditableHeading } from '@/components/structures/EditableHeading'
+import { InlineMarkdown } from '@/components/structures/InlineMarkdown'
 import { Section } from '@/components/structures/Section'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useRecordFile } from '@/core/hooks/data/useRecordFile'
 import { SECTION_STYLES } from '@/declarations/ui/variants'
+import { FIELD_COPY } from '@/declarations/ui/copy'
 import { cn } from '@/utils/classnames'
 import { TASK_COPY, TASK_FIELD_COPY } from '@/declarations/work/copy'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { FieldDefinition } from '@/types/forms'
 import type { TaskSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDay, isOverdue } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/dates'
 
 export interface TaskFileProps {
   task: TaskSummary
@@ -59,27 +65,31 @@ export const TaskFile = ({ task, fields, activity, canUpdate, canReadLogs }: Tas
   const titleValue = typeof file.values.title === 'string' ? file.values.title : task.title
   const emojiValue = typeof file.values.emoji === 'string' ? file.values.emoji : task.emoji
   const descriptionValue =
-    typeof file.values.description === 'string' ? file.values.description : null
+    typeof file.values.description === 'string' ? file.values.description : ''
   const dueDateValue = typeof file.values.dueDate === 'string' ? file.values.dueDate : null
   const stateOption = optionOf('stateId')
   const priorityOption = optionOf('priorityId')
   const ownerOption = optionOf('ownerId')
   const projectOption = optionOf('projectId')
-  const youtuberOption = optionOf('youtuberId')
+  const youtuberOptions = pickedOptions(fieldFor('youtuberIds'), file.values.youtuberIds)
 
   const infoEntries: EditableEntry[] = [
+    { label: FIELD_COPY.id, display: <RecordId id={task.id} /> },
     {
       label: TASK_FIELD_COPY.state,
       field: fieldFor('stateId'),
       display: stateOption ? (
-        <Status label={stateOption.label} accent={stateOption.accent} />
+        <Status label={stateOption.label} accent={stateOption.accent} icon="statusDot" />
       ) : null,
     },
     {
       label: TASK_FIELD_COPY.priority,
       field: fieldFor('priorityId'),
       display: priorityOption ? (
-        <Status label={priorityOption.label} accent={priorityOption.accent} tone="warning" />
+        <span className="inline-flex items-center gap-2">
+          <OptionMark mark="priority" option={priorityOption} />
+          <Status label={priorityOption.label} accent={priorityOption.accent} tone="warning" />
+        </span>
       ) : null,
     },
     {
@@ -100,28 +110,30 @@ export const TaskFile = ({ task, fields, activity, canUpdate, canReadLogs }: Tas
       ) : null,
     },
     {
-      label: TASK_FIELD_COPY.youtuber,
-      field: fieldFor('youtuberId'),
-      display: youtuberOption ? (
-        <CreatorLabel name={youtuberOption.label} image={youtuberOption.image} />
-      ) : null,
+      label: TASK_FIELD_COPY.youtubers,
+      field: fieldFor('youtuberIds'),
+      display:
+        youtuberOptions.length > 0 ? (
+          <CreatorLabels
+            creators={youtuberOptions.map((option) => ({
+              name: option.label,
+              image: option.image,
+            }))}
+          />
+        ) : null,
     },
     {
       label: TASK_FIELD_COPY.dueDate,
       field: fieldFor('dueDate'),
       display: dueDateValue ? (
-        <Status
-          label={formatDay(dueDateValue)}
-          tone={isOverdue(dueDateValue) ? 'danger' : 'neutral'}
-          icon="deadline"
-        />
-      ) : null,
-    },
-    {
-      label: TASK_FIELD_COPY.description,
-      field: fieldFor('description'),
-      display: descriptionValue ? (
-        <span className="whitespace-pre-line">{descriptionValue}</span>
+        <span className="inline-flex items-center gap-3">
+          <Status
+            label={formatDay(dueDateValue)}
+            tone={task.isOverdue ? 'danger' : 'neutral'}
+            icon="deadline"
+          />
+          {task.isOverdue && <OverdueMark kind="task" />}
+        </span>
       ) : null,
     },
   ]
@@ -150,6 +162,17 @@ export const TaskFile = ({ task, fields, activity, canUpdate, canReadLogs }: Tas
             disabled={!canUpdate}
             onCommit={file.saveField}
           />
+          <h3 className={SECTION_STYLES.wellTitle}>{TASK_FIELD_COPY.description}</h3>
+          <div className={SECTION_STYLES.well}>
+            <InlineMarkdown
+              id="task-description"
+              value={descriptionValue}
+              placeholder={TASK_COPY.descriptionEmpty}
+              disabled={!canUpdate}
+              maxLength={fieldFor('description').maxLength}
+              onCommit={(next) => file.saveField('description', next.trim() === '' ? null : next)}
+            />
+          </div>
         </div>
       </section>
 

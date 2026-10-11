@@ -196,6 +196,21 @@
   transform-origin: center;
 }
 
+/* Today's pill blinking softly in the mini calendar */
+@keyframes day-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.day-blink {
+  animation: day-blink var(--motion-duration-pulse) ease-in-out infinite;
+}
+
 /* Band of light running across a line of text while it waits */
 .light-sweep {
   background-image: linear-gradient(

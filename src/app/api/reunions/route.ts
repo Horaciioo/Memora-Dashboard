@@ -18,8 +18,9 @@ export const POST = createProtectedRoute({
   permission: Permissions.MeetingCreate,
   status: 201,
   descriptor: { summary: 'Plan a meeting', tags: ['meetings'] },
-  handler: async ({ raw, session, scope }) => {
-    const parsed = parseFormValues(await meetingFields(await scope()), raw, { fillMissing: true })
+  handler: async ({ raw, session, scope, access }) => {
+    const fields = await meetingFields(await scope(), workViewer(session, access))
+    const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     const meeting = await createMeeting(parsed.values, await scope(), session.id)

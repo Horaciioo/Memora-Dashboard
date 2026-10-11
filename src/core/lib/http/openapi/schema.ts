@@ -21,8 +21,6 @@ const KIND_SCHEMAS: Record<FieldKind, JsonSchema> = {
   multiselect: { type: 'array', items: { type: 'string' } },
   toggle: { type: 'boolean' },
   tags: { type: 'array', items: { type: 'string' } },
-  email: { type: 'string', format: 'email' },
-  phone: { type: 'string' },
   url: { type: 'string', format: 'uri' },
   discord: { type: 'string', pattern: '^\\d{15,25}$' },
   colour: { type: 'string' },

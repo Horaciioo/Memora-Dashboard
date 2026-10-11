@@ -22,6 +22,7 @@ import { ACADEMY_COPY, ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
 import { PARKOUR_COPY } from '@/declarations/academy/parkour'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { courseByKey } from '@/declarations/academy/curriculum'
+import { tradeOfFunction } from '@/declarations/reference/fixed'
 import {
   ACADEMY_STAGE_REGISTRY,
   ACADEMY_STEP_KIND_REGISTRY,
@@ -801,16 +802,28 @@ const JUNIOR_SHAPE = {
  * @return {Promise<object[]>} - Trainings in display order
  */
 
-const sessionTrainings = (functionId: string, dispositifId?: string | null) =>
-  prisma.training.findMany({
-    where: {
-      OR: [{ functionId: null }, { functionId }],
-      ...(dispositifId !== undefined
-        ? { AND: [{ OR: [{ dispositifId: null }, { dispositifId }] }] }
-        : {}),
-    },
-    orderBy: [{ period: 'asc' }, { position: 'asc' }],
+const sessionTrainings = async (functionId: string, dispositifId?: string | null) => {
+  const [rows, fn] = await Promise.all([
+    prisma.training.findMany({
+      where: {
+        OR: [{ functionId: null }, { functionId }],
+        ...(dispositifId !== undefined
+          ? { AND: [{ OR: [{ dispositifId: null }, { dispositifId }] }] }
+          : {}),
+      },
+      orderBy: [{ period: 'asc' }, { position: 'asc' }],
+    }),
+    prisma.jobFunction.findUnique({ where: { id: functionId }, select: { name: true } }),
+  ])
+  const trade = fn ? tradeOfFunction(fn.name) : null
+
+  // A course for other trades is ignored
+  return rows.filter((row) => {
+    const course = row.curriculumKey ? courseByKey(row.curriculumKey) : undefined
+
+    return !course || !trade || course.functions.length === 0 || course.functions.includes(trade)
   })
+}
 
 /**
  * Read every junior of a session

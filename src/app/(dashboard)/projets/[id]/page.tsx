@@ -11,7 +11,12 @@ import {
   readProject,
 } from '@/core/services/work/ProjectService'
 import { creatableTaskFields, taskFields } from '@/core/services/work/TaskService'
-import { assertProjectVisible, workViewer } from '@/core/services/work/visibility'
+import { redactProject } from '@/core/services/work/redaction'
+import {
+  assertProjectVisible,
+  currentWorkViewer,
+  workViewer,
+} from '@/core/services/work/visibility'
 import { mentionOptions } from '@/core/services/work/DiscordDirectory'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -33,6 +38,11 @@ export async function generateMetadata({
   const { id } = await params
 
   try {
+    // A hidden file lends no title
+    const viewer = await currentWorkViewer()
+    if (!viewer) return { title: PROJECT_COPY.title }
+
+    await assertProjectVisible(id, viewer)
     const project = await readProject(id)
 
     return { title: project.summary.title }
@@ -54,16 +64,20 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const perimeter = await scope()
   const viewer = workViewer(session, access)
 
-  const detail = await assertProjectVisible(id, viewer)
+  const found = await assertProjectVisible(id, viewer)
     .then(() => readProject(id))
     .catch(() => null)
-  if (!detail) notFound()
+  if (!found) notFound()
+
+  const detail = redactProject(found, access)
 
   const [projectForm, taskForm, meetingForm, communicationForm, activity] = await Promise.all([
     projectFields(perimeter),
     taskFields(perimeter, viewer),
     meetingFields(perimeter, viewer),
-    mentionOptions(detail.summary.youtuber?.id ?? null).then(communicationFields),
+    mentionOptions(detail.summary.youtubers.map((youtuber) => youtuber.id)).then(
+      communicationFields
+    ),
     access.can(Permissions.WorkLogRead) ? readRecordActivity('project', id) : Promise.resolve([]),
   ])
 

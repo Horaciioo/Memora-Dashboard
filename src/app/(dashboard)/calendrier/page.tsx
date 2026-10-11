@@ -12,6 +12,7 @@ import { requirePermission } from '@/core/wrappers/requireUser'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { CALENDAR_LAYER_REGISTRY } from '@/declarations/calendar/registries'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
+import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 import { gridRange, monthGrid, toDayKey } from '@/utils/format/calendar'
 
@@ -65,7 +66,7 @@ export default async function CalendarPage({
       access,
       scope: perimeter,
     }),
-    calendarFields(perimeter),
+    calendarFields(perimeter, workViewer(session, access)),
     youtuberOptions(perimeter),
   ])
 

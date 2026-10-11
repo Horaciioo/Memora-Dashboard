@@ -8,6 +8,7 @@ import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { MemberAbsence } from '@/types/members'
 import { cn } from '@/utils/classnames'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
+import { AbsenceReason } from '@/components/elements/display/AbsenceReason'
 import { absenceReasonText, absenceSpan } from '@/utils/format/absences'
 import { parseDay, startOfDay } from '@/utils/format/days'
 
@@ -84,8 +85,8 @@ export const AbsenceList = ({ absences, onRemove }: AbsenceListProps) => {
                 ? ABSENCE_COPY.durationOne
                 : ABSENCE_COPY.duration.replace('{days}', String(absence.dayCount))}
             </span>
-            <span className={cn(ABSENCE_PAGE.rowReason, !reason && ABSENCE_PAGE.rowReasonEmpty)}>
-              {reason ?? ABSENCE_COPY.noReason}
+            <span className={ABSENCE_PAGE.rowReason}>
+              <AbsenceReason reason={reason} />
             </span>
             <span className={ABSENCE_PAGE.rowStatus}>
               {isPending && !isOver && (
@@ -104,9 +105,7 @@ export const AbsenceList = ({ absences, onRemove }: AbsenceListProps) => {
             </span>
             {absence.reviewNote && (
               <p className={ABSENCE_PAGE.reply}>
-                <span className={ABSENCE_PAGE.replyFrom}>
-                  {ABSENCE_COPY.replyFrom.replace('{name}', absence.reviewerName ?? '')}
-                </span>
+                <span className={ABSENCE_PAGE.replyFrom}>{ABSENCE_COPY.replyFrom}</span>
                 {absence.reviewNote}
               </p>
             )}

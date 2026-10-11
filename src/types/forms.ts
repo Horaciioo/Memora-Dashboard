@@ -27,8 +27,6 @@ export type FieldKind =
   | 'multiselect'
   | 'toggle'
   | 'tags'
-  | 'email'
-  | 'phone'
   | 'url'
   | 'discord'
   | 'colour'
@@ -42,7 +40,8 @@ export type FieldKind =
  * @type {string}
  */
 
-export type OptionMark = 'dot' | 'avatar' | 'priority' | 'emoji' | 'glyph' | 'network' | 'division'
+export type OptionMark =
+  'dot' | 'avatar' | 'priority' | 'emoji' | 'glyph' | 'network' | 'division' | 'role' | 'flag'
 
 /**
  * Value a blank creation form starts from
@@ -60,11 +59,13 @@ export type FieldPreset = 'today' | 'actor' | 'default'
  * @property {string} [accent] - Colour token
  * @property {string} [image] - Portrait URL
  * @property {string} [emoji] - Glyph drawn before the label
+ * @property {string} [flag] - Country code of the flag it wears
  * @property {string | null} [icon] - Glyph key
  * @property {string} [prefix] - Link start it hands a handle field
  * @property {string} [group] - Category heading
  * @property {boolean} [isDefault] - Preset choice
  * @property {boolean} [disabled] - Shown but not selectable
+ * @property {string} [owner] - Value of the owner field it belongs to
  */
 
 export interface FieldOption {
@@ -74,11 +75,15 @@ export interface FieldOption {
   accent?: string
   image?: string | null
   emoji?: string | null
+  flag?: string
   icon?: string | null
   prefix?: string
   group?: string
+  // A line is drawn under it
+  hasDividerAfter?: boolean
   isDefault?: boolean
   disabled?: boolean
+  owner?: string
 }
 
 /**
@@ -161,6 +166,7 @@ export interface BusySlot {
  * @property {MaturityName} [maturity] - Lifecycle tag drawn beside the label
  * @property {boolean} [adminOnly] - Only an administrator may write it
  * @property {FieldCondition} [visibleWhen] - Display rule
+ * @property {string} [ownerField] - Field whose picks narrow the owned options
  * @property {boolean} [binary] - A toggle drawn as a plain check/cross
  * @property {BusySlot[]} [busy] - Events a date field warns about
  */
@@ -182,6 +188,8 @@ export interface FieldDefinition {
   step?: number
   maxLength?: number
   maxItems?: number
+  // Year a date picker opens on while empty
+  startYear?: number
   prefix?: string
   prefixFrom?: string
   lookup?: string
@@ -193,6 +201,7 @@ export interface FieldDefinition {
   maturity?: MaturityName
   adminOnly?: boolean
   visibleWhen?: FieldCondition
+  ownerField?: string
   binary?: boolean
   busy?: BusySlot[]
 }

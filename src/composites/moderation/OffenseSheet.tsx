@@ -20,7 +20,8 @@ import {
   SANCTION_GRAVITY_REGISTRY,
   SANCTION_PANEL_REGISTRY,
 } from '@/declarations/sanctions/registries'
-import { accentPaint, accentVars } from '@/declarations/ui/theme'
+import { ICONS } from '@/declarations/ui/icons'
+import { accentPaint } from '@/declarations/ui/theme'
 import { OFFENSE_SHEET } from '@/declarations/ui/variants'
 import type { FormValues } from '@/types/forms'
 import type { LiveconLevelView } from '@/types/livecon'
@@ -256,9 +257,9 @@ const LadderEditor = ({
 }
 
 /**
- * One offence opened in full: what it covers, the ladder of
- * the livecon in force with each command ready to paste, and the warning to send. A manager
- * rewrites any of it by clicking it, nothing carries an edit button
+ * One offence opened in full, in two columns: gravity, livecon and what it covers on the left,
+ * the ladder of the livecon picked with each command ready to paste and the suggested reason on
+ * the right. A manager rewrites any of it by clicking it, nothing carries an edit button
  * @param {OffenseSheetProps} props - Offence
  * @return {JSX.Element}
  */
@@ -278,29 +279,10 @@ export const OffenseSheet = ({
   const gravity = offense.gravities[level.id] ?? SanctionGravities.Low
   const tone = SANCTION_GRAVITY_REGISTRY.get(gravity)
   const rungs = offense.ladders[level.id] ?? []
-
-  const asInputs = (from: SanctionRungView[]): SanctionRungInput[] =>
-    from.map((rung) => ({
-      condition: rung.condition,
-      measureIds: rung.measures.map((measure) => measure.id),
-    }))
+  const Bullet = ICONS.bullet
 
   const saveField = (name: string) => (value: string) =>
     onSaveOffense(offense.id, { [name]: value })
-
-  // Gravity picked from the label
-  const gravityMenu = useActionMenu(
-    canManage
-      ? SANCTION_GRAVITY_REGISTRY.keys
-          .filter((key) => key !== gravity)
-          .map((key) => ({
-            id: key,
-            label: SANCTION_GRAVITY_REGISTRY.label(key),
-            onSelect: () => void onSaveLadder(offense.id, level.id, key, asInputs(rungs)),
-          }))
-      : [],
-    SANCTION_COPY.changeGravity
-  )
 
   const ladderMenu = useActionMenu(
     canManage
@@ -315,21 +297,10 @@ export const OffenseSheet = ({
       : []
   )
 
-  const gravityLabel = (
-    <>
-      <span
-        className={cn(OFFENSE_SHEET.gravityLabel, canManage && OFFENSE_SHEET.gravityLabelLive)}
-        style={accentVars(tone.accent)}
-      >
-        {tone.label}
-      </span>
-      <span>{level.name}</span>
-    </>
-  )
-
   return (
     <Drawer
       open
+      isWide
       onClose={onClose}
       title={
         <InlineText
@@ -341,96 +312,124 @@ export const OffenseSheet = ({
         />
       }
       icon="sanctions"
-      subheader={
-        canManage ? (
-          <button type="button" className={OFFENSE_SHEET.gravity} {...gravityMenu}>
-            {gravityLabel}
-          </button>
-        ) : (
-          <span className={OFFENSE_SHEET.gravity}>{gravityLabel}</span>
-        )
-      }
     >
       <div className={OFFENSE_SHEET.body}>
-        {(offense.summary || canManage) && (
-          <div className={OFFENSE_SHEET.block}>
-            <span className={OFFENSE_SHEET.label}>{SANCTION_COPY.descriptionTitle}</span>
-            {canManage ? (
-              <InlineMarkdown
-                id="offense-summary"
-                value={offense.summary ?? ''}
-                placeholder={SANCTION_COPY.descriptionEmpty}
-                maxLength={FORM_SETTINGS.markdownMaxLength}
-                onCommit={saveField('summary')}
-              />
-            ) : (
-              <Markdown source={offense.summary ?? ''} />
-            )}
-          </div>
-        )}
+        <div className={OFFENSE_SHEET.column}>
+          <div className={OFFENSE_SHEET.properties}>
+            {[
+              {
+                key: 'gravity',
+                title: SANCTION_COPY.gravityTitle,
+                text: tone.short,
+                accent: tone.accent,
+              },
+              {
+                key: 'livecon',
+                title: SANCTION_COPY.liveconTitle,
+                text: String(level.level),
+                accent: level.accent,
+              },
+            ].map((entry) => {
+              const paint = accentPaint(entry.accent)
 
-        <div className={OFFENSE_SHEET.block}>
-          <span className={OFFENSE_SHEET.label}>
-            {SANCTION_COPY.ladderTitle.replace('{level}', level.name)}
-          </span>
-          {editingLadder ? (
-            <LadderEditor
-              initial={rungs}
-              gravity={gravity}
-              measures={measures}
-              isSaving={isSaving}
-              onCancel={() => setEditingLadder(false)}
-              onSave={async (nextGravity, steps) => {
-                const done = await onSaveLadder(offense.id, level.id, nextGravity, steps)
-                if (done) setEditingLadder(false)
-              }}
-            />
-          ) : canManage ? (
-            <div
-              role="button"
-              tabIndex={0}
-              className={OFFENSE_SHEET.ladderLive}
-              onClick={() => setEditingLadder(true)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') setEditingLadder(true)
-              }}
-              onContextMenu={ladderMenu.onContextMenu}
-            >
-              {rungs.length === 0 ? (
-                <span className={OFFENSE_SHEET.placeholder}>{SANCTION_COPY.ladderEmpty}</span>
-              ) : (
-                <LadderView rungs={rungs} offense={offense} />
-              )}
+              return (
+                <div key={entry.key} className={OFFENSE_SHEET.property}>
+                  <Bullet className={OFFENSE_SHEET.propertyDot} aria-hidden="true" />
+                  <span className={OFFENSE_SHEET.label}>{`${entry.title} :`}</span>
+                  <span className={cn(OFFENSE_SHEET.propertyValue, paint.text)} style={paint.style}>
+                    {entry.text}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+
+          {(offense.summary || canManage) && (
+            <div className={OFFENSE_SHEET.block}>
+              <span className={OFFENSE_SHEET.label}>{SANCTION_COPY.descriptionTitle}</span>
+              <div className={OFFENSE_SHEET.summary}>
+                {canManage ? (
+                  <InlineMarkdown
+                    id="offense-summary"
+                    value={offense.summary ?? ''}
+                    placeholder={SANCTION_COPY.descriptionEmpty}
+                    maxLength={FORM_SETTINGS.markdownMaxLength}
+                    onCommit={saveField('summary')}
+                  />
+                ) : (
+                  <Markdown source={offense.summary ?? ''} />
+                )}
+              </div>
             </div>
-          ) : (
-            <LadderView rungs={rungs} offense={offense} />
+          )}
+
+          {(offense.warningExample || canManage) && (
+            <div className={OFFENSE_SHEET.block}>
+              <span className={OFFENSE_SHEET.label}>{SANCTION_COPY.warningTitle}</span>
+              <div className={OFFENSE_SHEET.warning}>
+                <InlineArea
+                  id="offense-warning"
+                  value={offense.warningExample ?? ''}
+                  placeholder={SANCTION_COPY.warningEmpty}
+                  disabled={!canManage}
+                  maxLength={FORM_SETTINGS.longTextMaxLength}
+                  className="min-w-0 flex-1"
+                  onCommit={saveField('warningExample')}
+                />
+                {offense.warningExample && (
+                  <Button
+                    variant="icon"
+                    icon="copy"
+                    aria-label={SANCTION_COPY.copy}
+                    onClick={() => void copy(offense.warningExample!)}
+                  />
+                )}
+              </div>
+            </div>
           )}
         </div>
 
-        {(offense.warningExample || canManage) && (
+        <div className={OFFENSE_SHEET.divider} aria-hidden="true" />
+
+        <div className={OFFENSE_SHEET.column}>
           <div className={OFFENSE_SHEET.block}>
-            <span className={OFFENSE_SHEET.label}>{SANCTION_COPY.warningTitle}</span>
-            <div className={OFFENSE_SHEET.warning}>
-              <InlineArea
-                id="offense-warning"
-                value={offense.warningExample ?? ''}
-                placeholder={SANCTION_COPY.warningEmpty}
-                disabled={!canManage}
-                maxLength={FORM_SETTINGS.longTextMaxLength}
-                className="min-w-0 flex-1"
-                onCommit={saveField('warningExample')}
+            <span className={OFFENSE_SHEET.label}>
+              {SANCTION_COPY.ladderTitle.replace('{level}', level.name)}
+            </span>
+            {editingLadder ? (
+              <LadderEditor
+                initial={rungs}
+                gravity={gravity}
+                measures={measures}
+                isSaving={isSaving}
+                onCancel={() => setEditingLadder(false)}
+                onSave={async (nextGravity, steps) => {
+                  const done = await onSaveLadder(offense.id, level.id, nextGravity, steps)
+                  if (done) setEditingLadder(false)
+                }}
               />
-              {offense.warningExample && (
-                <Button
-                  variant="icon"
-                  icon="copy"
-                  aria-label={SANCTION_COPY.copy}
-                  onClick={() => void copy(offense.warningExample!)}
-                />
-              )}
-            </div>
+            ) : canManage ? (
+              <div
+                role="button"
+                tabIndex={0}
+                className={OFFENSE_SHEET.ladderLive}
+                onClick={() => setEditingLadder(true)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') setEditingLadder(true)
+                }}
+                onContextMenu={ladderMenu.onContextMenu}
+              >
+                {rungs.length === 0 ? (
+                  <span className={OFFENSE_SHEET.placeholder}>{SANCTION_COPY.ladderEmpty}</span>
+                ) : (
+                  <LadderView rungs={rungs} offense={offense} />
+                )}
+              </div>
+            ) : (
+              <LadderView rungs={rungs} offense={offense} />
+            )}
           </div>
-        )}
+        </div>
       </div>
     </Drawer>
   )

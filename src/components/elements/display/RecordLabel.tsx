@@ -23,6 +23,25 @@ export const CreatorLabel = ({ name, image, size = 'xs' }: CreatorLabelProps) =>
   </span>
 )
 
+export interface CreatorLabelsProps {
+  creators: { name: string; image?: string | null }[]
+}
+
+/**
+ * Creators shown side by side
+ * @param {Array<{ name: string, image?: string | null }>} creators - Creators concerned
+ * @return {JSX.Element | null}
+ */
+
+export const CreatorLabels = ({ creators }: CreatorLabelsProps) =>
+  creators.length > 0 ? (
+    <span className={RECORD_LABEL.group}>
+      {creators.map((creator) => (
+        <CreatorLabel key={creator.name} name={creator.name} image={creator.image} />
+      ))}
+    </span>
+  ) : null
+
 export interface ProjectLabelProps {
   title: string
   emoji?: string | null

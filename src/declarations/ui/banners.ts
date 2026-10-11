@@ -46,7 +46,6 @@ export const BANNER_ROUTES: readonly { prefix: string; scene: string }[] = [
   { prefix: '/formations', scene: 'formations' },
   { prefix: '/academy', scene: 'academy' },
   { prefix: '/legacy', scene: 'legacy' },
-  { prefix: '/mon-legacy', scene: 'legacy' },
   { prefix: '/moderation/marsha', scene: 'marsha' },
   { prefix: '/moderation', scene: 'moderation' },
   { prefix: '/lives', scene: 'moderation' },

@@ -9,10 +9,10 @@ import { NotificationsBell } from '@/composites/notifications/NotificationsBell'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { CreatorAccountMenu } from '@/composites/shell/CreatorAccountMenu'
 import { CreatorSwitch } from '@/composites/shell/CreatorSwitch'
+import { RailDeadlineBubble } from '@/composites/shell/RailDeadlineBubble'
 import { RailLiveCall } from '@/composites/shell/RailLiveCall'
 import { RailToolbar } from '@/composites/shell/RailToolbar'
 import { RailShortcuts } from '@/composites/shell/RailShortcuts'
-import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
 import { useCalendarRail } from '@/core/hooks/interaction/useCalendarRail'
 import { useCourseRail } from '@/core/hooks/interaction/useCourseRail'
@@ -26,6 +26,8 @@ import { TOUR_RAIL } from '@/declarations/ui/variants'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { railIcon } from '@/declarations/ui/railIcons'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
+import { DEADLINE_NUDGE_COPY } from '@/declarations/work/copy'
+import { OVERDUE_ROUTES } from '@/declarations/work/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
@@ -48,7 +50,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const pathname = usePathname()
   const { can, session } = useAuthContext()
   // The first visit shows pages as it explains them
-  const { isTouring, isUnlocked } = useTour()
+  const { isTouring, isIntroOpen, isUnlocked } = useTour()
   // An open course puts its chapters where the destinations stand
   const openCourse = useCourseRail()
   const courseRail = openCourse
@@ -212,14 +214,6 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
                             aria-hidden="true"
                           />
                           <span className={LEFT_SIDEBAR.navLabel}>{item.label}</span>
-                          {item.maturity && (
-                            <MaturityTag
-                              maturity={item.maturity}
-                              interactive={false}
-                              compact
-                              className="rail-fold ml-auto"
-                            />
-                          )}
                         </Link>
                       )
                     })}
@@ -230,6 +224,20 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
           })}
         </nav>
       )}
+
+      {/* A late item lights its page */}
+      {!courseRail &&
+        !calendarRail &&
+        !isIntroOpen &&
+        (Object.keys(OVERDUE_ROUTES) as (keyof typeof OVERDUE_ROUTES)[])
+          .filter((flag) => viewContext.overdue[flag] && isUnlocked(OVERDUE_ROUTES[flag]))
+          .map((flag) => (
+            <RailDeadlineBubble
+              key={flag}
+              href={OVERDUE_ROUTES[flag]}
+              message={DEADLINE_NUDGE_COPY[flag]}
+            />
+          ))}
 
       <Link href={ROUTES.changelog} className={LEFT_SIDEBAR.version}>
         {APP_VERSION_LABEL}

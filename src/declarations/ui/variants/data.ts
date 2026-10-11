@@ -85,7 +85,7 @@ export const CALENDAR_AGENDA = {
   rows: 'flex flex-col',
   row: 'flex items-center gap-4 rounded-[var(--radius-md)] px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-hover)]',
   rowSelected: 'ring-2 ring-[var(--color-pick)] ring-inset',
-  bullet: 'h-3.5 w-[3px] shrink-0 rounded-full bg-current',
+  bullet: 'h-2 w-2 shrink-0 rounded-full bg-current',
   time: 'w-24 shrink-0 text-sm text-[var(--color-ink-subtle)] tabular-nums',
   title: 'min-w-0 flex-1 truncate text-sm font-semibold',
   meta: 'hidden shrink-0 text-sm text-[var(--color-ink-subtle)] md:inline',
@@ -114,9 +114,10 @@ export const CALENDAR_SIDEBAR = {
     'mx-auto flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold tabular-nums transition-colors hover:bg-[var(--color-hover)]',
   miniDayOutside: 'text-[var(--color-ink-subtle)]',
   miniDayToday:
-    'bg-[var(--color-brand-600)] text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
-  miniDayInRange: 'bg-[var(--color-brand-100)]',
-  miniDayPicked: 'ring-2 ring-[var(--color-pick)] ring-inset',
+    'day-blink bg-[var(--page-surface-raised)] text-[var(--page-ink)] shadow-[var(--shadow-sm)] hover:bg-[var(--page-surface-raised)]',
+  miniDayInRange: 'bg-[var(--page-surface-raised)] text-[var(--page-ink)]',
+  miniDayPicked:
+    'bg-[var(--page-surface-raised)] text-[var(--page-ink)] hover:bg-[var(--page-surface-raised)]',
   group: 'flex flex-col gap-px',
   groupTitle:
     'px-3 pb-2 text-caption font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
@@ -169,8 +170,7 @@ export const ABSENCE_PAGE = {
   row: 'grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-1 border-t border-[var(--color-border)] px-1 py-4 md:grid-cols-[13rem_5.5rem_minmax(0,1fr)_11rem]',
   rowDates: 'text-base font-bold',
   rowDuration: 'text-sm text-[var(--color-ink-subtle)]',
-  rowReason: 'col-span-2 min-w-0 text-sm md:col-span-1',
-  rowReasonEmpty: 'text-[var(--color-ink-subtle)] italic',
+  rowReason: 'col-span-2 min-w-0 md:col-span-1',
   reply:
     'col-span-full mt-1 flex flex-col gap-0.5 rounded-[var(--radius-md)] bg-[var(--color-brand-50)] px-3 py-2 text-sm',
   replyFrom: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
@@ -264,6 +264,18 @@ export const JOURNAL_STYLES = {
   glyph: 'mt-0.5 size-5 shrink-0',
   // Short rule set under the glyph
   separator: 'ml-8 h-px w-10 bg-[var(--color-border)]',
+  // Compact box under the sentence
+  box: 'mt-1 flex flex-col gap-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-sunken)] px-3 py-2 text-xs text-[var(--color-ink-muted)]',
+  boxError: 'border-[var(--color-danger)] bg-[var(--color-danger-soft)]',
+  line: 'flex min-w-0 flex-wrap items-baseline gap-x-1.5',
+  lineLabel: 'font-bold uppercase text-[var(--color-ink-subtle)]',
+  lineBefore: 'truncate text-[var(--color-ink-subtle)] line-through',
+  lineAfter: 'truncate text-[var(--color-ink)]',
+  errorMessage: 'line-clamp-1 break-words text-[var(--color-ink)]',
+  more: 'text-[var(--color-ink-subtle)]',
+  trace:
+    'max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-[var(--color-surface-sunken)] p-3 text-xs text-[var(--color-ink-muted)]',
+  dialogBody: 'flex flex-col gap-3',
 } as const
 
 /**
@@ -302,8 +314,9 @@ export const CALENDAR_DETAIL = {
   // Accent-tinted head: when, what
   hero: 'flex flex-col gap-3 rounded-[var(--radius-lg)] p-4',
   heroKind: 'text-micro font-bold tracking-wide uppercase',
-  heroSpan: 'text-section font-bold tracking-tight text-[var(--color-ink)] first-letter:uppercase',
-  facts: 'flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-[var(--color-ink-subtle)]',
+  heroSpan:
+    'text-section font-medium tracking-tight text-[var(--color-ink)] first-letter:uppercase [&>strong]:font-bold',
+  facts: 'flex flex-col gap-1.5 text-sm text-[var(--color-ink-subtle)]',
   section: 'flex flex-col gap-3',
   foldToggle: 'flex w-full cursor-pointer items-center gap-2 text-left',
   foldChevron:
@@ -319,6 +332,7 @@ export const CALENDAR_DETAIL = {
   foldInner: 'min-h-0 overflow-hidden',
   card: 'flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4',
   answer: 'flex flex-wrap gap-2',
+  answered: 'flex items-center gap-2 text-sm',
   columns: 'grid gap-4 sm:grid-cols-3',
   none: 'text-sm text-[var(--color-ink-subtle)] italic',
 } as const
@@ -366,7 +380,7 @@ export const CALENDAR_STYLES = {
     'relative flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
   // Month entry
   line: 'relative flex w-full cursor-grab items-center justify-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-left sm:justify-start text-xs transition-colors hover:bg-[var(--color-hover)] active:cursor-grabbing',
-  lineBullet: 'h-3.5 w-[3px] shrink-0 rounded-full bg-current',
+  lineBullet: 'h-2 w-2 shrink-0 rounded-full bg-current',
   // Phones keep the bullet alone
   lineTime: 'hidden shrink-0 tabular-nums text-[var(--color-ink-subtle)] sm:inline',
   lineTitle: 'hidden min-w-0 flex-1 truncate font-semibold sm:block',
@@ -402,7 +416,7 @@ export const CALENDAR_STYLES = {
   legendRow:
     'flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2 py-1 text-xs transition-colors',
   legendRowMuted: 'opacity-40',
-  legendDot: 'h-3.5 w-[3px] shrink-0 rounded-full',
+  legendDot: 'h-2 w-2 shrink-0 rounded-full',
   legendCount: 'tabular-nums opacity-60',
   selectionBar:
     'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-brand-400)] bg-[var(--color-brand-soft)]/60 px-3 py-2 text-sm',
@@ -425,7 +439,7 @@ export const CALENDAR_STYLES = {
   preview:
     'fixed z-[70] flex w-72 flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel p-4 text-sm shadow-[var(--shadow-md)]',
   previewHead: 'flex items-center gap-2 font-bold',
-  previewBullet: 'h-3.5 w-[3px] shrink-0 rounded-full bg-current',
+  previewBullet: 'h-2 w-2 shrink-0 rounded-full bg-current',
   previewLine: 'flex items-center gap-2',
   detailMeta: 'flex flex-col gap-2 text-sm text-[var(--color-ink-subtle)]',
   previewIcon: 'h-4 w-4 shrink-0',
@@ -457,7 +471,7 @@ export const CALENDAR_GRID_STYLES = {
     'pointer-events-none absolute inset-x-0.5 z-20 rounded-[var(--radius-sm)] border-2 border-dashed border-[var(--color-brand-600)] bg-[var(--color-brand-soft)]/60',
   paintedLabel:
     'absolute inset-x-0 top-1 text-center text-micro font-bold text-[var(--color-brand-800)] tabular-nums',
-  dropTarget: 'ring-2 ring-[var(--color-pick)] ring-inset',
+  dropTarget: 'bg-[var(--color-hover)] ring-2 ring-[var(--color-border-strong)] ring-inset',
   nowLine: 'pointer-events-none absolute inset-x-0 z-30 h-0.5 bg-[var(--color-danger)]',
   nowLabel:
     'absolute left-1 -translate-y-1/2 rounded-full bg-[var(--color-danger)] px-1.5 py-0.5 text-micro font-bold text-[var(--color-on-brand)] tabular-nums',
@@ -597,4 +611,43 @@ export const ABSENCE_WIZARD = {
   reasonBox:
     'rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-body leading-relaxed break-words whitespace-pre-wrap',
   header: 'flex justify-end',
+} as const
+
+/**
+ * Reason of an absence, quoted in a small box
+ * @type {Record<string, string>}
+ */
+
+export const ABSENCE_REASON = {
+  box: 'inline-block max-w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2 py-0.5 text-xs italic',
+  filled: 'text-[var(--color-ink)]',
+  empty: 'text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Admin tab of a moderator file
+ * @type {Record<string, string>}
+ */
+
+export const MEMBER_ADMIN = {
+  stack: 'flex flex-col gap-6',
+  // State lines and their button
+  state: 'flex flex-col gap-3',
+  stateLine: 'flex items-center gap-2 text-sm',
+  stateGlyph: 'h-5 w-5 shrink-0',
+  stateEmphasis: 'font-bold',
+  stateTones: {
+    success: 'text-[var(--color-success)]',
+    caution: 'text-[var(--color-caution)]',
+    danger: 'text-[var(--color-danger)]',
+  },
+  stateActions: 'flex flex-wrap gap-2 pt-1',
+  // Gestures side by side, divider stops short of both ends
+  split: 'flex flex-col lg:flex-row',
+  // Role box left, state box right
+  pair: 'grid items-stretch gap-6 lg:grid-cols-2',
+  cell: 'relative flex flex-1 flex-col items-center gap-2 px-4 py-4 text-center not-first:before:absolute not-first:before:inset-x-4 not-first:before:top-0 not-first:before:h-px not-first:before:bg-[var(--color-border)] lg:not-first:before:inset-x-auto lg:not-first:before:inset-y-4 lg:not-first:before:left-0 lg:not-first:before:h-auto lg:not-first:before:w-px',
+  cellNote: 'text-xs text-[var(--color-ink-subtle)]',
+  // Sanction drawer fields
+  form: 'flex flex-col gap-5',
 } as const

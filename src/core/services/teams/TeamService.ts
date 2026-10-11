@@ -3,13 +3,14 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { readFlag, readText } from '@/core/lib/forms/values'
+import { readFlag, readList, readText } from '@/core/lib/forms/values'
 import { leadOptions, toPerson, toTag, youtuberOptions } from '@/core/services/work/shared'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { TEAM_FIELD_COPY, TEAM_FIELD_INFO } from '@/declarations/teams/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { TeamBoardData } from '@/types/teams'
-import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
+import { ENCADREMENT_ROLES } from '@/declarations/access/roles'
+import { GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
 
 /**
  * Build the team form declarations
@@ -18,7 +19,11 @@ import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
  */
 
 export const teamFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
-  const [leads, youtubers] = await Promise.all([leadOptions(scope), youtuberOptions(scope)])
+  const [leads, admins, youtubers] = await Promise.all([
+    leadOptions(scope, [MemberRoles.Responsable]),
+    leadOptions(scope, [MemberRoles.Admin]),
+    youtuberOptions(scope),
+  ])
 
   return [
     {
@@ -30,11 +35,20 @@ export const teamFields = async (scope?: AccessScope): Promise<FieldDefinition[]
       maxLength: FORM_SETTINGS.shortTextMaxLength,
     },
     {
-      name: 'leadId',
-      kind: 'select',
+      name: 'leadIds',
+      kind: 'multiselect',
       label: TEAM_FIELD_COPY.lead,
       info: TEAM_FIELD_INFO.lead,
       options: leads,
+      mark: 'avatar',
+      span: 'half',
+    },
+    {
+      name: 'adminIds',
+      kind: 'multiselect',
+      label: TEAM_FIELD_COPY.admin,
+      info: TEAM_FIELD_INFO.admin,
+      options: admins,
       mark: 'avatar',
       span: 'half',
     },
@@ -59,6 +73,16 @@ export const teamFields = async (scope?: AccessScope): Promise<FieldDefinition[]
 }
 
 /**
+ * Lead accounts of one role
+ * @param {Array<{ accountId: string, account: { role: string } }>} leads - Team leads
+ * @param {string} role - Role kept
+ * @return {string[]} - Account identifiers
+ */
+
+const leadsOf = (leads: { accountId: string; account: { role: string } }[], role: string) =>
+  leads.filter((lead) => lead.account.role === role).map((lead) => lead.accountId)
+
+/**
  * Read every team and everyone left outside
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} [youtuberId] - Creator the board is narrowed to
@@ -73,14 +97,19 @@ export const readTeamBoard = async (
     prisma.team.findMany({
       where: scopedWhere('team', scope, youtuberId ? { youtuberId } : {}),
       include: {
-        lead: true,
+        leads: { include: { account: true } },
         youtuber: true,
         members: { include: { account: true } },
       },
       orderBy: [{ archived: 'asc' }, { name: 'asc' }],
     }),
     prisma.account.findMany({
-      where: { status: { notIn: GONE_MEMBER_STATUSES }, teamMemberships: { none: {} } },
+      where: {
+        status: { notIn: GONE_MEMBER_STATUSES },
+        // Administration sits outside the teams
+        role: { notIn: ENCADREMENT_ROLES },
+        teamMemberships: { none: {} },
+      },
       orderBy: { displayName: 'asc' },
     }),
   ])
@@ -90,7 +119,7 @@ export const readTeamBoard = async (
       id: row.id,
       name: row.name,
       summary: row.summary,
-      lead: toPerson(row.lead),
+      leads: row.leads.map((lead) => toPerson(lead.account)).filter((person) => person !== null),
       youtuber: toTag(row.youtuber),
       members: row.members
         .map((membership) => toPerson(membership.account))
@@ -99,7 +128,8 @@ export const readTeamBoard = async (
       values: {
         name: row.name,
         summary: row.summary,
-        leadId: row.leadId,
+        leadIds: leadsOf(row.leads, MemberRoles.Responsable),
+        adminIds: leadsOf(row.leads, MemberRoles.Admin),
         youtuberId: row.youtuberId,
         archived: row.archived,
       },
@@ -117,10 +147,19 @@ export const readTeamBoard = async (
 const toTeamData = (values: FormValues) => ({
   name: readText(values, 'name') ?? '',
   summary: readText(values, 'summary'),
-  leadId: readText(values, 'leadId'),
   youtuberId: readText(values, 'youtuberId'),
   archived: readFlag(values, 'archived'),
 })
+
+/**
+ * Accounts running the team
+ * @param {FormValues} values - Parsed body
+ * @return {string[]} - Account identifiers
+ */
+
+const readLeadIds = (values: FormValues): string[] => [
+  ...new Set([...readList(values, 'leadIds'), ...readList(values, 'adminIds')]),
+]
 
 /**
  * Create a team
@@ -138,7 +177,9 @@ export const createTeam = async (
   const data = toTeamData(values)
   assertInScope(scope, data.youtuberId ?? null)
 
-  await prisma.team.create({ data })
+  await prisma.team.create({
+    data: { ...data, leads: { create: readLeadIds(values).map((accountId) => ({ accountId })) } },
+  })
 
   return readTeamBoard(scope, youtuberId)
 }
@@ -163,7 +204,16 @@ export const updateTeam = async (
   const data = toTeamData(values)
   assertInScope(scope, data.youtuberId ?? null)
 
-  await prisma.team.update({ where: { id }, data })
+  await prisma.team.update({
+    where: { id },
+    data: {
+      ...data,
+      leads: {
+        deleteMany: {},
+        create: readLeadIds(values).map((accountId) => ({ accountId })),
+      },
+    },
+  })
 
   return readTeamBoard(scope, youtuberId)
 }

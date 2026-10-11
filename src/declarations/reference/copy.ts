@@ -61,14 +61,16 @@ export const REFERENCE_FIELD_COPY = {
   leads: 'Responsables',
   leadsHint:
     'Ils voient tout ce qui touche ce créateur. Seul un admin peut les ajouter ou les retirer.',
-  leadsTitle: 'Responsables ancrés',
-  leadsLead: 'Qui pilote ce créateur, et sur quelle équipe chacun est resserré.',
-  leadsEmptyTitle: 'Aucun responsable ancré',
-  leadsEmptyDescription: 'Ancre un responsable pour lui ouvrir le périmètre de ce créateur.',
+  leadsTitle: 'Administration',
+  leadsLead:
+    'Les responsables et admins de ce créateur, et l’équipe sur laquelle chacun est resserré.',
+  leadsEmptyTitle: 'Aucune administration',
+  leadsEmptyDescription:
+    'Ajoute un responsable ou un admin pour lui ouvrir le périmètre de ce créateur.',
   leadTeam: 'Équipe',
   leadTeamAll: 'Toutes les équipes',
-  leadsLocked: 'Seul un administrateur modifie cet ancrage.',
-  leadsSaved: 'Ancrage enregistré.',
+  leadsLocked: 'Seul un administrateur modifie l’administration.',
+  leadsSaved: 'Administration enregistrée.',
   frozenLocked: 'Fonction figée, non modifiable',
   encadrementRows: 'Encadrement',
   editableRows: 'Fonctions modifiables',

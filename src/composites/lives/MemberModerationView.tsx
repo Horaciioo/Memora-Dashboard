@@ -16,7 +16,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_REPORT, MEMBER_MODERATION } from '@/declarations/ui/variants'
 import type { MemberModerationView as View } from '@/types/lives'
 import { formatDay } from '@/utils/format/dates'
-import { formatClock, formatDuration, formatSpan } from '@/utils/format/modview'
+import { formatClock, formatDuration, formatExactSpan, formatSpan } from '@/utils/format/modview'
 
 export interface MemberModerationViewProps {
   view: View | null
@@ -38,12 +38,26 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
 
   return (
     <div className={MEMBER_MODERATION.stack}>
-      <p className={MEMBER_MODERATION.hours}>
-        <span className={MEMBER_MODERATION.hoursLabel}>
-          {MEMBER_MODERATION_COPY.hours.replace('{days}', String(LIVE_SETTINGS.hoursWindowDays))}
-        </span>
-        <span className={MEMBER_MODERATION.hoursValue}>{formatSpan(view.windowSeconds)}</span>
-      </p>
+      <Section
+        title={MEMBER_MODERATION_COPY.windowTitle.replace(
+          '{days}',
+          String(LIVE_SETTINGS.hoursWindowDays)
+        )}
+        raised
+      >
+        <dl className={MEMBER_MODERATION.stats}>
+          {[
+            [MEMBER_MODERATION_COPY.windowVisible, formatSpan(view.windowSeconds)],
+            [MEMBER_MODERATION_COPY.windowActive, formatSpan(view.windowActiveSeconds)],
+            [MEMBER_MODERATION_COPY.windowLives, String(view.windowLives)],
+          ].map(([label, value]) => (
+            <div key={label} className={MEMBER_MODERATION.stat}>
+              <dt className={MEMBER_MODERATION.statLabel}>{label}</dt>
+              <dd className={MEMBER_MODERATION.statValue}>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
 
       <Section title={MEMBER_MODERATION_COPY.livesTitle} padded>
         {view.lives.length === 0 ? (
@@ -81,7 +95,7 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
                     <span className={MEMBER_MODERATION.rowTime}>
                       {MEMBER_MODERATION_COPY.activeTime.replace(
                         '{time}',
-                        formatSpan(live.activeSeconds)
+                        formatExactSpan(live.activeSeconds)
                       )}
                     </span>
                   </button>

@@ -1,0 +1,118 @@
+/* Tab of the welcome window: it leaves the window on its left edge and lies over the portrait,
+   carrying the title. The rail spans the window height so the tab sits on its middle, a soft
+   shadow follows the whole shape and is cut at the window edge so it never falls on the page */
+.welcome-tab-rail {
+  --welcome-tab: 3.75rem;
+  --welcome-tab-round: 1.25rem;
+  --welcome-join: var(--welcome-tab-round);
+  position: absolute;
+  top: var(--tour-inset);
+  bottom: var(--tour-inset);
+  left: calc(var(--tour-inset) * 2 + var(--tour-photo) - var(--welcome-tab));
+  z-index: 2;
+  display: none;
+  align-items: center;
+  pointer-events: none;
+  filter: drop-shadow(-3px 0 6px rgb(8 10 18 / 0.18)) drop-shadow(-10px 0 22px rgb(8 10 18 / 0.22));
+  clip-path: inset(-4rem 0 -4rem -4rem);
+}
+
+@media (width >= 1024px) {
+  .welcome-tab-rail {
+    display: flex;
+  }
+}
+
+/* 2px into the window, over its edge, so the seam never shows */
+.welcome-tab {
+  position: relative;
+  display: flex;
+  width: calc(var(--welcome-tab) + 2px);
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 2px 1.5rem 0;
+  border-radius: var(--welcome-tab-round) 0 0 var(--welcome-tab-round);
+  background-color: var(--color-page);
+}
+
+/* The page colour curves joining the tab to the window */
+.welcome-tab::before,
+.welcome-tab::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  width: calc(var(--welcome-join) + 2px);
+  height: var(--welcome-join);
+  background: inherit;
+}
+
+.welcome-tab::before {
+  bottom: 100%;
+  mask: radial-gradient(
+    circle at 0 0,
+    transparent var(--welcome-join),
+    #000 calc(var(--welcome-join) + 0.5px)
+  );
+}
+
+.welcome-tab::after {
+  top: 100%;
+  mask: radial-gradient(
+    circle at 0 100%,
+    transparent var(--welcome-join),
+    #000 calc(var(--welcome-join) + 0.5px)
+  );
+}
+
+/* Mini windows of the theme picker, painted with the page, card and ink of each theme */
+.tour-theme {
+  --pv-page: #f7f7f9;
+  --pv-card: #fdfdfe;
+  --pv-ink: #1d1d1f;
+  --pv-line: #e1e1e6;
+  display: flex;
+  height: 4rem;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem;
+  border: 1px solid var(--pv-line);
+  border-radius: var(--radius-md);
+  background: var(--pv-page);
+}
+
+.tour-theme::before {
+  content: '';
+  width: 40%;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: var(--pv-ink);
+  opacity: 0.6;
+}
+
+.tour-theme::after {
+  content: '';
+  flex: 1;
+  border: 1px solid var(--pv-line);
+  border-radius: var(--radius-sm);
+  background: var(--pv-card);
+}
+
+.tour-theme-dark {
+  --pv-page: #131315;
+  --pv-card: #2a2a2f;
+  --pv-ink: #f5f5f7;
+  --pv-line: #3c3c43;
+}
+
+/* Half and half: the device decides */
+.tour-theme-system {
+  background: linear-gradient(115deg, #f7f7f9 50%, #131315 50%);
+}
+
+.tour-theme-system::before {
+  background: linear-gradient(115deg, #1d1d1f 50%, #f5f5f7 50%);
+}
+
+.tour-theme-system::after {
+  background: linear-gradient(115deg, #fdfdfe 50%, #2a2a2f 50%);
+}

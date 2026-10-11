@@ -1,7 +1,9 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { getSession } from '@/core/lib/auth/getSession'
 import { notFound } from '@/core/lib/errors'
+import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { Prisma } from '@prisma/client'
@@ -11,11 +13,14 @@ import type { Prisma } from '@prisma/client'
  * @typedef {Object} WorkViewer
  * @property {string} id - Account identifier
  * @property {boolean} seesAll - Reads every project in the perimeter
+ * @property {boolean} readsContent - Reads what meetings hold
  */
 
 export interface WorkViewer {
   id: string
   seesAll: boolean
+  readsContent: boolean
+  isAdmin: boolean
 }
 
 /**
@@ -25,10 +30,33 @@ export interface WorkViewer {
  * @return {WorkViewer} - Viewer
  */
 
-export const workViewer = (session: SessionUser, access: PermissionHelpers): WorkViewer => ({
-  id: session.id,
+export const workViewer = (session: SessionUser, access: PermissionHelpers): WorkViewer =>
+  workViewerOf(session.id, access)
+
+/**
+ * Viewer of the work pages by account
+ * @param {string} accountId - Account identifier
+ * @param {PermissionHelpers} access - Permission helpers
+ * @return {WorkViewer} - Viewer
+ */
+
+export const workViewerOf = (accountId: string, access: PermissionHelpers): WorkViewer => ({
+  id: accountId,
   seesAll: access.can(Permissions.ProjectReadAll),
+  readsContent: access.can(Permissions.MeetingContentRead),
+  isAdmin: access.isAdmin,
 })
+
+/**
+ * Viewer behind the current request
+ * @return {Promise<WorkViewer | null>} - Viewer, or null when signed out
+ */
+
+export const currentWorkViewer = async (): Promise<WorkViewer | null> => {
+  const session = await getSession()
+
+  return session ? workViewer(session, resolvePermissions(session)) : null
+}
 
 /**
  * Projects naming the viewer

@@ -276,6 +276,9 @@ export const MEMBER_BLOCK = {
   // Read-only function list
   marks: 'flex flex-wrap items-center gap-x-4 gap-y-2',
   mark: 'inline-flex items-center gap-2',
+  // Stacked rows of marks and the rule between them
+  rows: 'flex flex-col gap-3',
+  divider: 'block h-px w-full bg-[var(--color-border)]',
 } as const
 
 /**
@@ -287,7 +290,8 @@ export const MEMBER_FILE = {
   layout: 'grid gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] lg:items-start',
   main: 'flex min-w-0 flex-col gap-6',
   // Rail follows the scroll on wide screens only
-  rail: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)] lg:sticky lg:top-6',
+  railStack: 'flex flex-col gap-3 lg:sticky lg:top-6',
+  rail: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)]',
   head: 'flex flex-col items-center gap-2 px-5 pt-7 text-center',
   name: 'text-xl font-bold tracking-tight break-words',
   role: 'text-xs font-bold tracking-wide text-[var(--color-brand-800)] uppercase',
@@ -306,13 +310,14 @@ export const MEMBER_FILE = {
   factValue: 'text-sm font-medium',
   factEmpty: 'text-sm text-[var(--color-ink-subtle)] italic',
   // Note card
-  note: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 shadow-[var(--shadow-sm)]',
+  note: 'flex min-h-24 flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 shadow-[var(--shadow-sm)]',
   notePinned: 'border-[var(--color-brand-200)] bg-[var(--color-brand-50)]',
   noteHead: 'flex items-center gap-2 text-xs text-[var(--color-ink-subtle)]',
   noteBody: 'text-sm leading-relaxed whitespace-pre-wrap',
   notesGrid: 'grid gap-4 sm:grid-cols-2',
   // Pinned note under the rail details
   pinned: 'flex flex-col gap-1.5',
+  pinnedNote: 'flex flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] p-4',
   pinnedLabel: 'text-xs font-bold tracking-wide uppercase',
   // Social tile
   social:
@@ -726,6 +731,21 @@ export const SECURITY_LIST = {
   statusGlyph: 'h-4 w-4 shrink-0',
   footer:
     'mt-3 flex flex-col gap-2 border-t border-[var(--color-border)] pt-4 sm:flex-row *:flex-1',
+} as const
+
+/**
+ * Creator channel cards, side by side
+ * @type {Record<string, string>}
+ */
+
+export const CHANNEL_BLOCK = {
+  list: 'flex flex-wrap gap-3',
+  card: 'flex min-h-16 min-w-56 items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] px-4 py-3',
+  glyph: 'h-9 w-9 shrink-0',
+  body: 'min-w-0 space-y-0.5',
+  name: 'text-sm font-bold tracking-tight',
+  link: 'block truncate text-xs text-[var(--color-ink-subtle)] hover:underline',
+  empty: 'text-sm italic text-[var(--color-ink-subtle)]',
 } as const
 
 /**

@@ -13,6 +13,9 @@ export const SECTION_STYLES = {
   panelPadded: 'p-4 sm:p-6',
   // Visible box
   panelRaised: 'p-4 shadow-[var(--shadow-sm)] sm:p-6',
+  // Greyer well inside a box
+  well: 'rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] p-4',
+  wellTitle: 'mt-6 mb-2 text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
 } as const
 
 /**
@@ -105,6 +108,7 @@ export const STATUS_STYLES = {
 
 export const RECORD_LABEL = {
   row: 'inline-flex min-w-0 items-center gap-2 align-middle',
+  group: 'inline-flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 align-middle',
   name: 'truncate',
   emoji: 'shrink-0 text-base leading-none',
 } as const
@@ -170,6 +174,8 @@ export const DRAWER_STYLES = {
   // Bottom sheet on mobile, floating card from md
   panel:
     'drawer-enter fixed inset-x-0 bottom-0 z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
+  // Wider footprint from md
+  wide: 'md:w-[var(--drawer-page-wide-w)]',
   // Section tabs under the header
   sections: 'shrink-0 px-6 pb-2',
   body: 'min-h-0 flex-1 overflow-y-auto px-6 py-5',
@@ -252,16 +258,19 @@ export const TABS_STYLES = {
 
 export const PALETTE_STYLES = {
   overlay:
-    'overlay-enter fixed inset-0 z-[80] flex items-start justify-center bg-[var(--color-ink)]/50 p-4 pt-[12vh] backdrop-blur-sm',
+    'overlay-enter fixed inset-0 z-[80] flex items-center justify-center bg-[var(--color-scrim)] p-4 backdrop-blur-sm',
   panel:
-    'surface-enter flex max-h-[70dvh] w-full max-w-xl flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
-  field: 'flex items-center gap-3 border-b border-[var(--color-border)] px-4 py-3',
-  input: 'w-full bg-transparent text-base outline-none placeholder:text-[var(--color-ink-subtle)]',
-  results: 'flex-1 overflow-y-auto py-2',
-  group: 'px-4 py-1 text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  result: 'flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition-colors',
-  resultActive: 'bg-[var(--color-brand-soft)]',
-  hint: 'flex items-center justify-between border-t border-[var(--color-border)] px-4 py-2 text-xs text-[var(--color-ink-subtle)]',
+    'surface-enter flex max-h-[70dvh] w-full max-w-xl flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/90 shadow-[var(--shadow-lg)] backdrop-blur-2xl backdrop-saturate-150',
+  field: 'flex items-center gap-3 px-5 py-4',
+  input: 'w-full bg-transparent text-lg outline-none placeholder:text-[var(--color-ink-subtle)]',
+  divider: 'mx-5 h-px shrink-0 bg-[var(--color-border)]',
+  results: 'flex-1 overflow-y-auto p-2',
+  group:
+    'px-3 pt-2 pb-1 text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  result:
+    'flex w-full items-center gap-3 rounded-[var(--radius-lg)] px-3 py-2.5 text-left text-sm transition-colors duration-150',
+  resultActive: 'bg-[var(--color-hover)]',
+  hint: 'flex items-center justify-between px-5 py-2.5 text-xs text-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -314,7 +323,7 @@ export const INLINE_EDIT_STYLES = {
   // Dashed field standing in for a creation row
   create:
     'w-full rounded-[var(--radius-md)] border border-dashed border-[var(--color-brand-400)] bg-[var(--color-surface)] px-4 py-3 text-sm outline-none focus:border-solid focus:ring-2 focus:ring-[var(--color-focus)]',
-  createTile: 'min-h-24 text-center',
+  createTile: 'min-h-16 text-center',
   placeholder: 'text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 
@@ -496,5 +505,6 @@ export const PAGE_OPTIONS = {
     'px-2.5 pt-1.5 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   row: 'flex items-center justify-between gap-4 rounded-[var(--radius-md)] px-2.5 py-2 font-semibold',
   // Many choices take the line under their label
-  rowStacked: 'flex-col items-stretch gap-2',
+  rowStacked:
+    'flex-col items-stretch gap-2 [&_[role=group]]:w-full [&_[role=group]>button]:flex-1 [&_[role=group]>button]:px-2',
 } as const

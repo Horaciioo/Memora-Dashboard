@@ -302,14 +302,14 @@ export const seedJournal = async (cast: Cast) => {
     }
   }
 
-  const teams = await prisma.team.findMany({ where: OWN, include: { members: true } })
+  const teams = await prisma.team.findMany({ where: OWN, include: { members: true, leads: true } })
   for (const team of teams) {
     for (const member of team.members) {
       if (chance(0.5))
         notices.push({
           kind: 'TeamAssigned',
           recipientId: member.accountId,
-          actorId: team.leadId,
+          actorId: team.leads[0]?.accountId ?? null,
           targetType: 'team',
           targetId: team.id,
           subject: team.name,

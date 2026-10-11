@@ -4,14 +4,11 @@ import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Avatar } from '@/components/elements/display/Avatar'
+import { MemoraMark } from '@/components/elements/display/MemoraMark'
 import { TOUR_SETTINGS } from '@/declarations/configurations/settings'
 import { NOTIFY_DEMO } from '@/declarations/tour/deck'
-import { ICONS } from '@/declarations/ui/icons'
 import { TOUR_DECK } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-
-// Beats: the card, the click on Notifier, Memora's refusal
-const BEATS = 3
 
 /**
  * Someone tries to notify a member in absence on a task, and Memora says no
@@ -20,11 +17,10 @@ const BEATS = 3
 
 export const NotifyDemo = () => {
   const [beat, setBeat] = useState(1)
-  const Mark = ICONS.spark
 
   // One beat after the other
   useEffect(() => {
-    if (beat >= BEATS) return
+    if (beat >= TOUR_SETTINGS.demoBeats) return
 
     const timer = window.setTimeout(
       () => setBeat((current) => current + 1),
@@ -34,7 +30,7 @@ export const NotifyDemo = () => {
     return () => window.clearTimeout(timer)
   }, [beat])
 
-  const isRefused = beat >= BEATS
+  const isRefused = beat >= TOUR_SETTINGS.demoBeats
 
   return (
     <div className={TOUR_DECK.demo} aria-live="polite">
@@ -65,7 +61,7 @@ export const NotifyDemo = () => {
 
       {isRefused && (
         <p className={TOUR_DECK.demoRefusal} role="status">
-          <Mark className={TOUR_DECK.demoMark} aria-hidden="true" />
+          <MemoraMark className={TOUR_DECK.demoMark} />
           {NOTIFY_DEMO.refusal}
         </p>
       )}

@@ -385,7 +385,7 @@ export const stepFields = (): FieldDefinition[] => [
     label: RECRUITMENT_FIELD_COPY.owner,
     required: true,
     options: toOptions(RECRUITMENT_OWNER_REGISTRY),
-    mark: 'dot',
+    mark: 'glyph',
     span: 'half',
   },
   {
