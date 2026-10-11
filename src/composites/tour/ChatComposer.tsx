@@ -102,13 +102,13 @@ export const ChatComposer = ({
         key: 'examples',
         label: TOUR_COPY.hurdleExamples,
         patch: { examples: true },
-        wayOut: true,
+        variant: 'success',
       },
       {
         key: 'quiet',
         label: TOUR_COPY.hurdleKeepQuiet,
         patch: { written: false },
-        wayOut: true,
+        variant: 'danger',
       },
     ],
     hurdleWrite: [
@@ -116,7 +116,7 @@ export const ChatComposer = ({
         key: 'quiet',
         label: TOUR_COPY.hurdleKeepQuiet,
         patch: { written: false },
-        wayOut: true,
+        variant: 'danger',
       },
     ],
     colorBlind: [
