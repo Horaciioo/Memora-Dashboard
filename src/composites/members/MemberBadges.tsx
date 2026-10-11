@@ -1,7 +1,9 @@
+import { Tip } from '@/components/elements/feedback/Tip'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { ROLE_EMBLEMS, functionGlyph, roleTone } from '@/declarations/members/profiles'
 import { ICONS } from '@/declarations/ui/icons'
 import type { MemberSummary } from '@/types/members'
+import { MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
 
@@ -26,11 +28,14 @@ export const RoleGlyph = ({ role: roleName, isRoot, className }: RoleGlyphProps)
   const RootIcon = ICONS.shield
 
   return (
-    <span className={cn('inline-flex items-center gap-1.5', className)} title={role.label}>
-      <Glyph className="h-6 w-6 shrink-0" />
+    <Tip label={role.label} className={cn('items-center gap-1.5', className)}>
+      <Glyph
+        className="h-6 w-6 shrink-0"
+        tone={roleName === MemberRoles.Junior ? 'brand_JUNIOR' : undefined}
+      />
       <span className="sr-only">{role.label}</span>
       {isRoot && <RootIcon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />}
-    </span>
+    </Tip>
   )
 }
 
@@ -51,10 +56,10 @@ export const RoleEmblem = ({ member, className }: RoleEmblemProps) => {
   const label = ROLE_REGISTRY.label(member.role)
 
   return (
-    <span className={cn('shrink-0', className)} title={label}>
+    <Tip label={label} className={className}>
       <Glyph className="h-full w-full" tone={roleTone(member)} />
       <span className="sr-only">{label}</span>
-    </span>
+    </Tip>
   )
 }
 
@@ -81,10 +86,10 @@ export const FunctionEmblems = ({ member, className, glyphClassName }: FunctionE
         const Glyph = functionGlyph(entry)
 
         return (
-          <span key={entry.id} title={entry.label} className={cn('shrink-0', glyphClassName)}>
+          <Tip key={entry.id} label={entry.label} className={glyphClassName}>
             {Glyph && <Glyph className="h-full w-full" aria-hidden="true" />}
             <span className="sr-only">{entry.label}</span>
-          </span>
+          </Tip>
         )
       })}
     </span>

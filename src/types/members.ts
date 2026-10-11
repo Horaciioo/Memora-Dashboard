@@ -1,6 +1,6 @@
 import type { FormValues } from '@/types/forms'
 import type {
-  LegacyStatusName,
+  DepartureKindName,
   MemberRoleName,
   MemberStatusName,
 } from '@/utils/constants/hierarchy'
@@ -64,9 +64,6 @@ export interface MemberDivision {
  * @property {MemberTag | null} academyDispositif - Dispositif of the active FSI
  * @property {string | null} academyJuniorId - Junior identifier of the active FSI
  * @property {string | null} academySessionId - Session identifier of the active FSI
- * @property {string | null} legacyTrackId - Latest Legacy track
- * @property {LegacyStatusName | null} legacyStatus - Where that track stands
- * @property {string | null} legacyEndsAt - ISO end of that track
  * @property {MemberDivision | null} division - Division
  * @property {MemberTag[]} youtubers - Assigned YouTubers
  * @property {MemberFunction[]} functions - Functions held
@@ -86,9 +83,6 @@ export interface MemberSummary {
   academyDispositif: MemberTag | null
   academyJuniorId: string | null
   academySessionId: string | null
-  legacyTrackId: string | null
-  legacyStatus: LegacyStatusName | null
-  legacyEndsAt: string | null
   division: MemberDivision | null
   youtubers: MemberTag[]
   functions: MemberFunction[]
@@ -147,7 +141,6 @@ export interface MemberSocial {
  * @property {number} dayCount - Day count
  * @property {string | null} reason - Motive
  * @property {AbsenceStatusName} status - Review outcome
- * @property {string | null} reviewerName - Who reviewed it
  * @property {string | null} reviewNote - Review remark
  */
 
@@ -160,7 +153,6 @@ export interface MemberAbsence {
   dayCount: number
   reason: string | null
   status: AbsenceStatusName
-  reviewerName: string | null
   reviewNote: string | null
 }
 
@@ -169,8 +161,6 @@ export interface MemberAbsence {
  * @typedef {Object} MemberDetail
  * @property {MemberSummary} summary - List level fields
  * @property {FormValues} values - Values feeding the edit form
- * @property {string | null} email - Mail address
- * @property {string | null} phone - Phone number
  * @property {string | null} birthday - ISO birthday
  * @property {boolean} celebrateBirthday - Wants it celebrated
  * @property {string[]} languages - Spoken languages
@@ -188,8 +178,6 @@ export interface MemberAbsence {
 export interface MemberDetail {
   summary: MemberSummary
   values: FormValues
-  email: string | null
-  phone: string | null
   birthday: string | null
   celebrateBirthday: boolean
   languages: string[]
@@ -202,4 +190,48 @@ export interface MemberDetail {
   projectCount: number
   taskCount: number
   meetingCount: number
+}
+
+/**
+ * Pause on a member's live moderation
+ * @typedef {Object} MemberSuspension
+ * @property {string} id - Row identifier
+ * @property {string} endsAt - Last moment, ISO
+ * @property {string | null} reason - Why
+ */
+
+export interface MemberSuspension {
+  id: string
+  endsAt: string
+  reason: string | null
+}
+
+/**
+ * Departure announcement of a member
+ * @typedef {Object} MemberDeparture
+ * @property {string} id - Notice identifier
+ * @property {DepartureKindName} kind - Dismissal or resignation
+ * @property {string} body - Discord markdown, ready to paste
+ */
+
+export interface MemberDeparture {
+  id: string
+  kind: DepartureKindName
+  body: string
+}
+
+/**
+ * What the Admin tab acts on
+ * @typedef {Object} MemberAdminState
+ * @property {string | null} frozenAt - Freeze moment, ISO
+ * @property {MemberSuspension | null} suspension - Live pause in force
+ * @property {MemberDeparture | null} departure - Last announcement
+ * @property {boolean} isGone - Member already left
+ */
+
+export interface MemberAdminState {
+  frozenAt: string | null
+  suspension: MemberSuspension | null
+  departure: MemberDeparture | null
+  isGone: boolean
 }

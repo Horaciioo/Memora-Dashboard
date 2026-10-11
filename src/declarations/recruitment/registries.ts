@@ -1,5 +1,6 @@
 import { createRegistry } from '@/core/lib/registry'
 import { RecruitmentOwners, RecruitmentStatuses } from '@/utils/constants/recruitment'
+import type { IconName } from '@/declarations/ui/icons'
 import type { RecruitmentOwnerName, RecruitmentStatusName } from '@/utils/constants/recruitment'
 
 /**
@@ -7,11 +8,13 @@ import type { RecruitmentOwnerName, RecruitmentStatusName } from '@/utils/consta
  * @typedef {Object} RecruitmentOption
  * @property {string} label - Display label
  * @property {string} accent - Colour token
+ * @property {IconName} [icon] - Role glyph
  */
 
 interface RecruitmentOption {
   label: string
   accent: string
+  icon?: IconName
 }
 
 const STATUS_MAP: Record<RecruitmentStatusName, RecruitmentOption> = {
@@ -25,9 +28,13 @@ const STATUS_MAP: Record<RecruitmentStatusName, RecruitmentOption> = {
 export const RECRUITMENT_STATUS_REGISTRY = createRegistry(STATUS_MAP)
 
 const OWNER_MAP: Record<RecruitmentOwnerName, RecruitmentOption> = {
-  [RecruitmentOwners.Responsable]: { label: 'Responsable', accent: 'warning' },
-  [RecruitmentOwners.Recruteurs]: { label: 'Recruteurs', accent: 'brand' },
-  [RecruitmentOwners.Both]: { label: 'Responsable + Recruteurs', accent: 'info' },
+  [RecruitmentOwners.Responsable]: { label: 'Responsable', accent: 'warning', icon: 'flame' },
+  [RecruitmentOwners.Recruteurs]: {
+    label: 'Recruteurs',
+    accent: 'brand',
+    icon: 'functionRecruiter',
+  },
+  [RecruitmentOwners.Both]: { label: 'Responsable + Recruteurs', accent: 'info', icon: 'teams' },
 }
 
 export const RECRUITMENT_OWNER_REGISTRY = createRegistry(OWNER_MAP)

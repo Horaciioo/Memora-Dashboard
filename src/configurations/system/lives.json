@@ -18,5 +18,6 @@
   "memberLives": 20,
   "viewerHistorySize": 10,
   "inspectSize": 30,
-  "focusPollSeconds": 10
+  "focusPollSeconds": 10,
+  "suspensionMaxDays": 365
 }

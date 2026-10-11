@@ -127,8 +127,17 @@ export const TOAST_STYLES = {
  */
 
 export const ADD_ROW_STYLES = {
-  base: 'flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] px-4 py-3 text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] disabled:pointer-events-none disabled:opacity-50',
-  tile: 'min-h-24 flex-col',
+  base: 'flex w-full items-center justify-center gap-2 border border-dashed border-[var(--color-border-strong)] text-sm font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] disabled:pointer-events-none disabled:opacity-50',
+  row: 'rounded-[var(--radius-md)] px-4 py-3',
+  // Same radius, padding and min height as the card it sits beside
+  tiles: {
+    session: 'min-h-28 flex-col rounded-[var(--radius-xl)] p-5',
+    candidate: 'min-h-18 flex-col rounded-[var(--radius-lg)] p-4',
+    note: 'min-h-24 flex-col rounded-[var(--radius-lg)] p-4',
+    column: 'min-h-24 flex-col rounded-[var(--radius-xl)] p-2.5',
+    channel: 'min-h-16 flex-col rounded-[var(--radius-lg)] px-4 py-3',
+    offense: 'min-h-16 flex-col rounded-[var(--radius-md)] px-4 py-3',
+  },
   icon: 'h-4 w-4',
 } as const
 
@@ -241,6 +250,18 @@ export const INFO_HINT = {
   // Exclusive anchors
   popCenter: 'left-1/2 -translate-x-1/2',
   popStart: '-left-2',
+} as const
+
+/**
+ * Instant label pointing at its glyph
+ * @type {Record<string, string>}
+ */
+
+export const TIP = {
+  wrapper: 'group/tip relative inline-flex shrink-0',
+  pop: 'pointer-events-none invisible absolute bottom-[calc(100%+0.5rem)] left-1/2 z-[60] -translate-x-1/2 translate-y-1 rounded-[var(--radius-sm)] bg-[var(--color-ink)] px-2 py-1 text-xs leading-none font-semibold tracking-normal whitespace-nowrap text-[var(--color-surface-raised)] normal-case opacity-0 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-75 group-focus-within/tip:visible group-focus-within/tip:translate-y-0 group-focus-within/tip:opacity-100 group-hover/tip:visible group-hover/tip:translate-y-0 group-hover/tip:opacity-100 motion-reduce:transition-none',
+  arrow:
+    'absolute top-full left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[var(--color-ink)]',
 } as const
 
 /**

@@ -1,26 +1,31 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import { assertAllInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
 import { taskVisibility } from '@/core/services/work/visibility'
 import type { WorkViewer } from '@/core/services/work/visibility'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { notFound } from '@/core/lib/errors'
 import { readDate, readText } from '@/core/lib/forms/values'
+import { emojiOrRandom, isBehindDeadline } from '@/core/lib/work'
 import {
   AUTHORSHIP_INCLUDE,
+  creatorLinks,
   defaultState,
+  keptCreatorIds,
   memberOptions,
   positionAt,
   priorityOptions,
   projectOptions,
+  readCreatorIds,
   stateOptions,
   toAuthorship,
+  toCreatorTags,
   toPerson,
+  toProjectTag,
   toTag,
   youtuberOptions,
-  toCreatorTag,
-  toProjectTag,
+  YOUTUBERS_INCLUDE,
 } from '@/core/services/work/shared'
 import { EMOJI_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
@@ -31,10 +36,10 @@ import { WorkflowScopes } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
 // Relations every task card needs
-const TASK_INCLUDE = {
+export const TASK_INCLUDE = {
   state: true,
   priority: true,
-  youtuber: true,
+  youtubers: YOUTUBERS_INCLUDE,
   project: true,
   owner: true,
   ...AUTHORSHIP_INCLUDE,
@@ -48,7 +53,7 @@ type TaskRow = Prisma.TaskGetPayload<{ include: typeof TASK_INCLUDE }>
  * @return {TaskSummary} - Board card
  */
 
-const toSummary = (row: TaskRow): TaskSummary => ({
+export const toTaskSummary = (row: TaskRow): TaskSummary => ({
   ...toAuthorship(row),
   id: row.id,
   title: row.title,
@@ -57,10 +62,11 @@ const toSummary = (row: TaskRow): TaskSummary => ({
   columnId: row.stateId,
   state: toTag(row.state),
   priority: toTag(row.priority),
-  youtuber: toCreatorTag(row.youtuber),
+  youtubers: toCreatorTags(row.youtubers),
   project: toProjectTag(row.project),
   owner: toPerson(row.owner),
   dueDate: row.dueDate?.toISOString() ?? null,
+  isOverdue: isBehindDeadline(row.dueDate, row.state?.phase),
   position: row.position,
   values: {
     title: row.title,
@@ -70,7 +76,7 @@ const toSummary = (row: TaskRow): TaskSummary => ({
     ownerId: row.ownerId,
     stateId: row.stateId,
     priorityId: row.priorityId,
-    youtuberId: row.youtuberId,
+    youtuberIds: row.youtubers.map((youtuber) => youtuber.id),
     projectId: row.projectId,
   },
 })
@@ -114,10 +120,10 @@ export const taskFields = async (
     },
     {
       name: 'description',
-      kind: 'textarea',
+      kind: 'markdown',
       label: TASK_FIELD_COPY.description,
       info: TASK_FIELD_INFO.description,
-      maxLength: FORM_SETTINGS.longTextMaxLength,
+      maxLength: FORM_SETTINGS.markdownMaxLength,
       group: FORM_GROUPS.essentials,
     },
     {
@@ -142,10 +148,11 @@ export const taskFields = async (
       group: FORM_GROUPS.assignment,
     },
     {
-      name: 'youtuberId',
-      kind: 'select',
-      label: TASK_FIELD_COPY.youtuber,
-      info: TASK_FIELD_INFO.youtuber,
+      name: 'youtuberIds',
+      kind: 'multiselect',
+      label: TASK_FIELD_COPY.youtubers,
+      info: TASK_FIELD_INFO.youtubers,
+      placeholder: TASK_FIELD_COPY.youtubersEmpty,
       options: youtubers,
       mark: 'avatar',
       span: 'half',
@@ -243,7 +250,7 @@ export const listTasks = async (scope: AccessScope, viewer: WorkViewer): Promise
     orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
   })
 
-  return rows.map(toSummary)
+  return rows.map(toTaskSummary)
 }
 
 /**
@@ -256,7 +263,7 @@ export const readTask = async (id: string): Promise<TaskSummary> => {
   const row = await prisma.task.findUnique({ where: { id }, include: TASK_INCLUDE })
   if (!row) throw notFound()
 
-  return toSummary(row)
+  return toTaskSummary(row)
 }
 
 /**
@@ -273,7 +280,6 @@ const toTaskData = (values: FormValues) => ({
   ownerId: readText(values, 'ownerId'),
   stateId: readText(values, 'stateId'),
   priorityId: readText(values, 'priorityId'),
-  youtuberId: readText(values, 'youtuberId'),
   projectId: readText(values, 'projectId'),
 })
 
@@ -291,7 +297,8 @@ export const createTask = async (
   actorId: string
 ): Promise<TaskSummary> => {
   const data = toTaskData(values)
-  assertInScope(scope, data.youtuberId ?? null)
+  const youtuberIds = readCreatorIds(values)
+  assertAllInScope(scope, youtuberIds)
 
   const stateId = data.stateId ?? (await defaultState(WorkflowScopes.Task))
 
@@ -301,7 +308,9 @@ export const createTask = async (
   const row = await prisma.task.create({
     data: {
       ...data,
+      emoji: emojiOrRandom(data.emoji),
       stateId,
+      youtubers: { connect: creatorLinks(youtuberIds) },
       position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
       createdById: actorId,
       updatedById: actorId,
@@ -309,7 +318,7 @@ export const createTask = async (
     include: TASK_INCLUDE,
   })
 
-  return toSummary(row)
+  return toTaskSummary(row)
 }
 
 /**
@@ -329,13 +338,33 @@ export const updateTask = async (
 ): Promise<TaskSummary> => {
   await assertRowInScope('task', id, scope)
 
+  const picked = readCreatorIds(values)
+  assertAllInScope(scope, picked)
+
+  const stored = await prisma.task.findUnique({
+    where: { id },
+    select: { youtubers: { select: { id: true } } },
+  })
+
   const row = await prisma.task.update({
     where: { id },
-    data: { ...toTaskData(values), updatedById: actorId },
+    data: {
+      ...toTaskData(values),
+      updatedById: actorId,
+      youtubers: {
+        set: creatorLinks(
+          keptCreatorIds(
+            picked,
+            scope,
+            stored?.youtubers.map((youtuber) => youtuber.id)
+          )
+        ),
+      },
+    },
     include: TASK_INCLUDE,
   })
 
-  return toSummary(row)
+  return toTaskSummary(row)
 }
 
 /**
@@ -378,5 +407,5 @@ export const moveTask = async (
     include: TASK_INCLUDE,
   })
 
-  return toSummary(row)
+  return toTaskSummary(row)
 }

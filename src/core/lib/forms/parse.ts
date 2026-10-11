@@ -12,7 +12,6 @@ import type {
 
 // Digits only
 const DISCORD_PATTERN = /^\d{15,25}$/
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const COLOUR_PATTERN = /^#[0-9a-fA-F]{6}$/
 
 /**
@@ -121,7 +120,6 @@ const parseField = (field: FieldDefinition, raw: unknown, issues: FieldIssue[]):
   // Shape checks per text flavour
   if (field.kind === 'discord' && !DISCORD_PATTERN.test(text))
     return reject(FORM_COPY.notADiscordId)
-  if (field.kind === 'email' && !EMAIL_PATTERN.test(text)) return reject(FORM_COPY.notAnEmail)
   if (field.kind === 'colour' && !COLOUR_PATTERN.test(text)) return reject(FORM_COPY.notAColour)
   if (field.kind === 'url' && !URL.canParse(text)) return reject(FORM_COPY.notAUrl)
   if (field.kind === 'select' && field.options) {

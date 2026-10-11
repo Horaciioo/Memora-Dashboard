@@ -3,9 +3,13 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { AvatarStack } from '@/components/elements/display/Avatar'
+import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
-import { CreatorLabel } from '@/components/elements/display/RecordLabel'
-import { MaturityTag } from '@/components/elements/display/MaturityTag'
+import { ICONS } from '@/declarations/ui/icons'
+import { OptionMark } from '@/components/elements/forms/OptionMark'
+import { CreatorLabels } from '@/components/elements/display/RecordLabel'
+import { pickedOptions } from '@/core/lib/forms/options'
+import { OverdueMark } from '@/composites/work/OverdueMark'
 import { Button } from '@/components/elements/actions/Button'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
 import { AddRow } from '@/components/structures/AddRow'
@@ -16,6 +20,7 @@ import { EditableHeading } from '@/components/structures/EditableHeading'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
+import { InlineMarkdown } from '@/components/structures/InlineMarkdown'
 import { Section } from '@/components/structures/Section'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { ProjectTeam } from '@/composites/work/ProjectTeam'
@@ -30,7 +35,7 @@ import { COMMUNICATION_HEAD, DISCORD_MESSAGE } from '@/declarations/ui/variants'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { useRecordFile } from '@/core/hooks/data/useRecordFile'
 import { ROUTES } from '@/declarations/navigation'
-import { ACTION_COPY, feedbackTitle } from '@/declarations/ui/copy'
+import { ACTION_COPY, FIELD_COPY, feedbackTitle } from '@/declarations/ui/copy'
 import { LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -47,7 +52,9 @@ import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { CommunicationEntry, MeetingSummary, ProjectDetail, TaskSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDay, formatDayTime, isOverdue } from '@/utils/format/dates'
+import { formatDay, formatDayTime } from '@/utils/format/dates'
+
+const DotGlyph = ICONS.statusDot
 
 export interface ProjectFileTabsProps {
   detail: ProjectDetail
@@ -138,7 +145,7 @@ export const ProjectFileTabs = ({
   // Both dialogs prefill the project
   const workItemDefaults: FormValues = {
     projectId: summary.id,
-    youtuberId: summary.youtuber?.id ?? null,
+    youtuberIds: summary.youtubers.map((youtuber) => youtuber.id),
   }
 
   const createWorkItem = async (
@@ -159,48 +166,68 @@ export const ProjectFileTabs = ({
 
   const titleValue = typeof file.values.title === 'string' ? file.values.title : summary.title
   const emojiValue = typeof file.values.emoji === 'string' ? file.values.emoji : summary.emoji
+  const descriptionValue =
+    typeof file.values.description === 'string' ? file.values.description : ''
   const deadlineValue = typeof file.values.deadline === 'string' ? file.values.deadline : null
   const stateOption = optionOf('stateId')
   const priorityOption = optionOf('priorityId')
   const platformOption = optionOf('platformId')
-  const youtuberOption = optionOf('youtuberId')
+  const youtuberOptions = pickedOptions(fieldFor('youtuberIds'), file.values.youtuberIds)
 
   const infoEntries: EditableEntry[] = [
+    { label: FIELD_COPY.id, display: <RecordId id={summary.id} /> },
     {
       label: PROJECT_FIELD_COPY.state,
       field: fieldFor('stateId'),
       display: stateOption ? (
-        <Status label={stateOption.label} accent={stateOption.accent} />
+        <Status label={stateOption.label} accent={stateOption.accent} icon="statusDot" />
       ) : null,
     },
     {
       label: PROJECT_FIELD_COPY.priority,
       field: fieldFor('priorityId'),
       display: priorityOption ? (
-        <Status label={priorityOption.label} accent={priorityOption.accent} tone="warning" />
+        <span className="inline-flex items-center gap-2">
+          <OptionMark mark="priority" option={priorityOption} />
+          <Status label={priorityOption.label} accent={priorityOption.accent} tone="warning" />
+        </span>
       ) : null,
     },
     {
       label: PROJECT_FIELD_COPY.platform,
       field: fieldFor('platformId'),
-      display: platformOption ? <Status label={platformOption.label} tone="neutral" /> : null,
+      display: platformOption ? (
+        <span className="inline-flex items-center gap-2">
+          <OptionMark mark="network" option={platformOption} />
+          <Status label={platformOption.label} tone="neutral" />
+        </span>
+      ) : null,
     },
     {
-      label: PROJECT_FIELD_COPY.youtuber,
-      field: fieldFor('youtuberId'),
-      display: youtuberOption ? (
-        <CreatorLabel name={youtuberOption.label} image={youtuberOption.image} />
-      ) : null,
+      label: PROJECT_FIELD_COPY.youtubers,
+      field: fieldFor('youtuberIds'),
+      display:
+        youtuberOptions.length > 0 ? (
+          <CreatorLabels
+            creators={youtuberOptions.map((option) => ({
+              name: option.label,
+              image: option.image,
+            }))}
+          />
+        ) : null,
     },
     {
       label: PROJECT_FIELD_COPY.deadline,
       field: fieldFor('deadline'),
       display: deadlineValue ? (
-        <Status
-          label={formatDay(deadlineValue)}
-          tone={isOverdue(deadlineValue) ? 'danger' : 'neutral'}
-          icon="deadline"
-        />
+        <span className="inline-flex items-center gap-3">
+          <Status
+            label={formatDay(deadlineValue)}
+            tone={summary.isOverdue ? 'danger' : 'neutral'}
+            icon="deadline"
+          />
+          {summary.isOverdue && <OverdueMark kind="project" />}
+        </span>
       ) : null,
     },
   ]
@@ -254,6 +281,17 @@ export const ProjectFileTabs = ({
             disabled={!canUpdate}
             onCommit={file.saveField}
           />
+          <h3 className={SECTION_STYLES.wellTitle}>{PROJECT_FIELD_COPY.description}</h3>
+          <div className={SECTION_STYLES.well}>
+            <InlineMarkdown
+              id="project-description"
+              value={descriptionValue}
+              placeholder={PROJECT_COPY.descriptionEmpty}
+              disabled={!canUpdate}
+              maxLength={fieldFor('description').maxLength}
+              onCommit={(next) => file.saveField('description', next.trim() === '' ? null : next)}
+            />
+          </div>
         </div>
       </section>
       <section className={SECTION_STYLES.wrapper}>
@@ -282,7 +320,7 @@ export const ProjectFileTabs = ({
     <Section
       title={PROJECT_COPY.communicationTitle}
       description={PROJECT_COPY.communicationLead}
-      action={<MaturityTag maturity="beta" />}
+      maturity="beta"
       bare
     >
       {communications.entries.length === 0 ? (
@@ -319,20 +357,28 @@ export const ProjectFileTabs = ({
                 <h3 className={COMMUNICATION_HEAD.title}>{entry.title}</h3>
                 <dl className={COMMUNICATION_HEAD.list}>
                   <div className={COMMUNICATION_HEAD.row}>
-                    <dt className={COMMUNICATION_HEAD.term}>{PROJECT_COPY.inCharge}</dt>
+                    <dt className={COMMUNICATION_HEAD.term}>
+                      <DotGlyph className="size-3.5 shrink-0" />
+                      {PROJECT_COPY.inCharge}
+                    </dt>
                     <dd>{entry.authorName ?? WORK_DISCORD_COPY.author}</dd>
                   </div>
                   <div className={COMMUNICATION_HEAD.row}>
-                    <dt className={COMMUNICATION_HEAD.term}>{PROJECT_COPY.status}</dt>
+                    <dt className={COMMUNICATION_HEAD.term}>
+                      <DotGlyph className="size-3.5 shrink-0" />
+                      {PROJECT_COPY.status}
+                    </dt>
                     <dd>
                       <Status
                         label={entry.publishedAt ? PROJECT_COPY.published : PROJECT_COPY.draft}
                         tone={entry.publishedAt ? 'success' : 'neutral'}
+                        icon="statusDot"
                       />
                     </dd>
                   </div>
                 </dl>
               </header>
+              <h4 className={COMMUNICATION_HEAD.section}>{PROJECT_FIELD_COPY.communicationBody}</h4>
               <div className={DISCORD_MESSAGE.frame}>
                 <Button
                   variant="icon"
@@ -517,7 +563,6 @@ export const ProjectFileTabs = ({
             value: 'communication',
             label: PROJECT_COPY.tabCommunication,
             icon: 'discord',
-            maturity: 'alpha',
             visible: canReadCommunications,
             render: communicationTab,
           },
@@ -532,7 +577,6 @@ export const ProjectFileTabs = ({
             value: 'logs',
             label: PROJECT_COPY.tabLogs,
             icon: 'history',
-            maturity: 'beta',
             visible: canReadLogs,
             render: logsTab,
           },

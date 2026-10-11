@@ -151,20 +151,27 @@ export const SANCTION_PANEL_REGISTRY = createRegistry(SANCTION_PANEL_MAP)
  * Gravity metadata
  * @typedef {Object} SanctionGravityOption
  * @property {string} label - Display name
+ * @property {string} short - Picker name
  * @property {string} accent - Tone
  * @property {number} rank - Heavier is higher
  */
 
 interface SanctionGravityOption {
   label: string
+  short: string
   accent: string
   rank: number
 }
 
 const SANCTION_GRAVITY_MAP: Record<SanctionGravityName, SanctionGravityOption> = {
-  [SanctionGravities.Low]: { label: 'Gravité basse', accent: 'success', rank: 1 },
-  [SanctionGravities.Medium]: { label: 'Gravité moyenne', accent: 'caution', rank: 2 },
-  [SanctionGravities.High]: { label: 'Gravité haute', accent: 'danger', rank: 3 },
+  [SanctionGravities.Low]: { label: 'Gravité basse', short: 'Basse', accent: 'success', rank: 1 },
+  [SanctionGravities.Medium]: {
+    label: 'Gravité moyenne',
+    short: 'Moyenne',
+    accent: 'caution',
+    rank: 2,
+  },
+  [SanctionGravities.High]: { label: 'Gravité haute', short: 'Grave', accent: 'danger', rank: 3 },
 }
 
 export const SANCTION_GRAVITY_REGISTRY = createRegistry(SANCTION_GRAVITY_MAP)

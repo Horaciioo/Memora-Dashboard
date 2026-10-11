@@ -160,11 +160,15 @@ export interface MemberLiveSummary {
  * Moderation side of a member's file
  * @typedef {Object} MemberModerationView
  * @property {number} windowSeconds - Time spent in the Mod View over the window
+ * @property {number} windowActiveSeconds - Time actually acting over the window
+ * @property {number} windowLives - Lives joined over the window
  * @property {MemberLiveSummary[]} lives - Latest lives
  */
 
 export interface MemberModerationView {
   windowSeconds: number
+  windowActiveSeconds: number
+  windowLives: number
   lives: MemberLiveSummary[]
 }
 

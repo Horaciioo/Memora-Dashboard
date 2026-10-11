@@ -170,7 +170,7 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
             <div className={SESSION_CARD.grid}>
               {running.map(card)}
               <AddRow
-                tile
+                tile="session"
                 label={ACADEMY_COPY.sessionAdd}
                 disabled={!canManage}
                 onClick={openCreate}

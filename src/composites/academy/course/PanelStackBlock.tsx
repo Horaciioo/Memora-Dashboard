@@ -96,7 +96,6 @@ export const PanelStackBlock = ({ block }: PanelStackBlockProps) => {
                             name === panel.offense && COURSE_PANELSTACK.cardOpen
                           )}
                         >
-                          <span className={SANCTION_PANEL.cardRule} aria-hidden="true" />
                           <span className={SANCTION_PANEL.cardName}>{name}</span>
                         </div>
                       ))}

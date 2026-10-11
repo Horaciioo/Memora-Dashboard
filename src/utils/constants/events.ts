@@ -40,7 +40,7 @@ export const EVENT_TYPES = createEnumeration({
   RecruitmentOpened: { id: 31, label: 'Recrutement ouvert' },
   RecruitmentDecided: { id: 32, label: 'Candidature tranchée' },
   SecurityChanged: { id: 33, label: 'Sécurité modifiée' },
-  LeadsAnchored: { id: 34, label: 'Responsables ancrés' },
+  LeadsAnchored: { id: 34, label: 'Administration' },
   ConsentAccepted: { id: 35, label: 'Accord accepté' },
   LegacyChanged: { id: 36, label: 'Parcours Legacy modifié' },
   LiveAnnounced: { id: 37, label: 'Live annoncé' },
@@ -50,6 +50,12 @@ export const EVENT_TYPES = createEnumeration({
   LiveRosterMoved: { id: 41, label: 'Appel d’un live corrigé' },
   ParkourMoved: { id: 42, label: 'AcademicParkour' },
   LiveFocused: { id: 43, label: 'Focus sur un modérateur' },
+  MemberFrozen: { id: 44, label: 'Accès gelé' },
+  MemberThawed: { id: 45, label: 'Accès rétabli' },
+  MemberDeparted: { id: 46, label: 'Départ enregistré' },
+  LiveSuspended: { id: 47, label: 'Lives suspendus' },
+  LiveSuspensionLifted: { id: 48, label: 'Suspension levée' },
+  ErrorRaised: { id: 49, label: 'Erreur rencontrée' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
+import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { Section } from '@/components/structures/Section'
@@ -10,7 +11,7 @@ import { TeamsBoard } from '@/composites/teams/TeamsBoard'
 import { roleGroupedOptions } from '@/core/lib/forms/options'
 import { prisma } from '@/core/lib/db'
 import { readAnchors } from '@/core/services/auth/LeadService'
-import { readTwitchChannel } from '@/core/services/platforms/ChannelService'
+import { readChannels } from '@/core/services/platforms/ChannelService'
 import { encadrementAccounts } from '@/core/services/reference/lookups'
 import { readTeamBoard, teamFields } from '@/core/services/teams/TeamService'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -63,12 +64,12 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
   const youtuber = await readYoutuber(id)
   if (!youtuber) notFound()
 
-  const [board, fields, anchors, candidates, twitch] = await Promise.all([
+  const [board, fields, anchors, candidates, channels] = await Promise.all([
     readTeamBoard(await scope(), id),
     teamFields(),
     readAnchors(id),
     encadrementAccounts(),
-    readTwitchChannel(id),
+    readChannels(id),
   ])
 
   return (
@@ -83,10 +84,17 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
         }
       />
       <Section padded>
-        <CreatorLabel name={youtuber.name} image={youtuber.avatarUrl} size="lg" />
+        <div className="flex flex-wrap items-center gap-4">
+          <CreatorLabel name={youtuber.name} image={youtuber.avatarUrl} size="lg" />
+          <RecordId id={youtuber.id} className="text-[var(--color-ink-subtle)]" />
+        </div>
       </Section>
       <Section title={CHANNEL_COPY.title} description={CHANNEL_COPY.lead} padded>
-        <CreatorChannelsPanel youtuberId={id} initialTwitch={twitch} canManage={access.isAdmin} />
+        <CreatorChannelsPanel
+          youtuberId={id}
+          initialChannels={channels}
+          canManage={access.isAdmin}
+        />
       </Section>
       <Section
         title={REFERENCE_FIELD_COPY.leadsTitle}

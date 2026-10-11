@@ -1,4 +1,5 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
+import { SECTION_STYLES } from '@/declarations/ui/variants/surfaces'
 
 /**
  * Livecon in force
@@ -29,8 +30,7 @@ export const SANCTION_PANEL = {
   groupTitle: `${PROPERTY_LABEL} text-[var(--accent)]`,
   grid: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
   // Raised box
-  card: 'group relative flex min-h-16 w-full items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 pl-5 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
-  cardRule: 'absolute inset-y-0 left-0 w-1 bg-[var(--accent)]',
+  card: 'group relative flex min-h-16 w-full items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   cardName: 'text-sm leading-snug font-bold tracking-tight text-balance',
   cardInput:
     'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2 py-1 text-sm font-bold tracking-tight outline-none ring-2 ring-[var(--color-pick)]',
@@ -43,7 +43,16 @@ export const SANCTION_PANEL = {
  */
 
 export const OFFENSE_SHEET = {
-  body: 'flex flex-col gap-8',
+  body: 'flex flex-col gap-8 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1.4fr)] md:gap-x-8',
+  column: 'flex min-w-0 flex-col gap-8',
+  // Short of both edges
+  divider: 'hidden w-px self-stretch bg-[var(--color-border)] md:my-6 md:block',
+  properties: 'flex flex-col gap-5',
+  property: 'flex items-center gap-2',
+  propertyDot: 'h-3 w-3 shrink-0',
+  propertyValue: 'text-xs font-bold tracking-wide uppercase',
+  // Same well as a task description
+  summary: SECTION_STYLES.well,
   block: 'flex flex-col gap-3',
   label: PROPERTY_LABEL,
   gravity: `flex items-center gap-2 text-left ${PROPERTY_LABEL}`,

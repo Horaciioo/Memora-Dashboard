@@ -4,6 +4,8 @@ import { prisma } from '@/core/lib/db'
 import { endOfDay, startOfDay } from '@/utils/format/days'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
+import { meetingVisibility } from '@/core/services/work/visibility'
+import type { WorkViewer } from '@/core/services/work/visibility'
 import { ACADEMY_STAGE_REGISTRY } from '@/declarations/academy/registries'
 import { CALENDAR_PROJECTION_COPY } from '@/declarations/calendar/copy'
 import { CALENDAR_SOURCE_REGISTRY } from '@/declarations/calendar/registries'
@@ -36,6 +38,7 @@ export interface ProjectionContext {
   to: Date
   access: PermissionHelpers
   scope: AccessScope
+  viewer: WorkViewer
 }
 
 // Milliseconds in one day and one minute
@@ -261,15 +264,22 @@ export const meetingEntries = async ({
   to,
   access,
   scope,
+  viewer,
 }: ProjectionContext): Promise<CalendarEntry[]> => {
   if (!access.can(Permissions.MeetingRead)) return []
 
   const rows = await prisma.meeting.findMany({
-    where: scopedWhere('meeting', scope, {
-      scheduledAt: { gte: from, lte: to },
-      // A meeting already posted on the calendar is drawn from its own row
-      calendarEvents: { none: {} },
-    }),
+    where: {
+      AND: [
+        scopedWhere('meeting', scope, {
+          scheduledAt: { gte: from, lte: to },
+          // A meeting already posted on the calendar is drawn from its own row
+          calendarEvents: { none: {} },
+        }),
+        // Only the meetings the member reaches
+        meetingVisibility(viewer),
+      ],
+    },
     include: {
       attendees: {
         where: { kind: AttendeeKinds.Lead },
@@ -277,7 +287,11 @@ export const meetingEntries = async ({
         include: { account: FUNCTION_SHAPE },
       },
       topics: { orderBy: [{ position: 'asc' }, { createdAt: 'asc' }] },
-      youtuber: { select: { accent: true } },
+      youtubers: {
+        select: { id: true, accent: true },
+        orderBy: { position: 'asc' },
+        take: 1,
+      },
     },
     orderBy: { scheduledAt: 'asc' },
   })
@@ -295,8 +309,8 @@ export const meetingEntries = async ({
         ? new Date(row.scheduledAt.getTime() + row.durationMin * MINUTE_MS)
         : null,
       allDay: false,
-      accent: row.youtuber?.accent ?? creatorAccent(lead),
-      youtuberId: row.youtuberId ?? creatorId(lead),
+      accent: row.youtubers[0]?.accent ?? creatorAccent(lead),
+      youtuberId: row.youtubers[0]?.id ?? creatorId(lead),
       // A planned meeting shows nothing of its content
       description: null,
       subjectName: lead?.displayName ?? null,

@@ -34,7 +34,6 @@ export const seedQaAccount = async (): Promise<void> => {
     discordId: QA_DISCORD_ID,
     discordUsername: 'qa-claude',
     displayName: QA_NAME,
-    email: 'qa-claude@example.com',
     birthday: new Date(Date.UTC(2000, 5, 15)),
     celebrateBirthday: true,
     historyConsentAt: new Date(),

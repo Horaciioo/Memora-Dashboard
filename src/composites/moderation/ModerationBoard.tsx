@@ -103,7 +103,6 @@ const OffenseBox = ({
 
   const body = (
     <>
-      <span className={SANCTION_PANEL.cardRule} aria-hidden="true" />
       {renaming ? (
         <input
           ref={(node) => node?.focus()}
@@ -281,7 +280,7 @@ export const ModerationBoard = ({
         {canManageSanctions && !needle && (
           <div className={SANCTION_PANEL.grid}>
             <InlineCreate
-              tile
+              tile="offense"
               label={SANCTION_COPY.newOffense}
               maxLength={FORM_SETTINGS.titleMaxLength}
               onCommit={sanctions.createOffense}

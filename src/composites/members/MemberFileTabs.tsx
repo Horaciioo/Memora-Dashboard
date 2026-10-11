@@ -1,13 +1,14 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { MemberModerationView } from '@/composites/lives/MemberModerationView'
 import { MEMBER_MODERATION_COPY } from '@/declarations/lives/moderation'
 import { MEMBER_MODERATION } from '@/declarations/ui/variants'
 import type { MemberModerationView as MemberModerationViewData } from '@/types/lives'
 import type { ReactNode } from 'react'
+import { AbsenceReason } from '@/components/elements/display/AbsenceReason'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/NetworkLogo'
 import { Status } from '@/components/elements/display/Status'
@@ -27,27 +28,42 @@ import { useMemberFile } from '@/core/hooks/data/useMemberFile'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { ACCESS_EDITABLE } from '@/declarations/access/editing'
 import { ROUTES } from '@/declarations/navigation'
+import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
+import { tradeOfFunction } from '@/declarations/reference/fixed'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
-import { MEMBER_BLOCK, MEMBER_FILE } from '@/declarations/ui/blocks'
+import { DETAIL_BLOCK, MEMBER_BLOCK, MEMBER_FILE } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 import { HOME_STYLES, RECORD_ROW } from '@/declarations/ui/variants'
 import { MemberJourney } from '@/composites/members/MemberJourney'
+import { RoleGlyph } from '@/composites/members/MemberBadges'
 import { MemberOverview } from '@/composites/members/MemberOverview'
 import { MemberRail } from '@/composites/members/MemberRail'
-import { sealedDisplay } from '@/components/structures/SealedValue'
-import { SensitiveFields } from '@/declarations/access/sensitive'
+import { MemberAdminTab } from '@/composites/members/admin/MemberAdminTab'
+import { DepartureMessageDialog } from '@/composites/members/admin/DepartureMessageDialog'
+import { SanctionDrawer } from '@/composites/members/admin/SanctionDrawer'
+import type { SanctionInput } from '@/composites/members/admin/SanctionDrawer'
+import { useMemberAdmin } from '@/core/hooks/data/useMemberAdmin'
+import { DepartureKinds } from '@/utils/constants/hierarchy'
+import type { DepartureKindName } from '@/utils/constants/hierarchy'
 import { MemberAccessPanel } from '@/composites/members/MemberAccessPanel'
+import { MemberRoles } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
 import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { PermissionLayers } from '@/core/lib/permissions'
-import type { FieldDefinition, FieldOption, FieldValue, FormValues } from '@/types/forms'
+import type {
+  FieldDefinition,
+  FieldOption,
+  FieldValue,
+  FormValues,
+  OptionMark as OptionMarkKind,
+} from '@/types/forms'
 import { ErasedValue } from '@/composites/members/ErasedValue'
-import type { MemberDetail, MemberSocial } from '@/types/members'
+import type { MemberAdminState, MemberDetail, MemberSocial } from '@/types/members'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { absenceReasonText } from '@/utils/format/absences'
 import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
@@ -71,13 +87,47 @@ export interface MemberFileTabsProps {
   // Moderation history
   moderation?: MemberModerationViewData | null
   canOpenReports: boolean
+  // Heavy gestures, Responsables only
+  adminState: MemberAdminState | null
+  canDelete: boolean
+}
+
+// Before the server state is known
+const NO_ADMIN_STATE: MemberAdminState = {
+  frozenAt: null,
+  suspension: null,
+  departure: null,
+  isGone: false,
 }
 
 // Contact fields edited in place
 const ExternalIcon = ICONS.forward
 const CalendarIcon = ICONS.meetings
 
-const CONTACT_FIELD_NAMES = ['discordId', 'email', 'phone', 'birthday', 'languages']
+// Trade of the live moderators
+const LIVES_TRADE = 'Lives'
+
+// Roles that sit in the Administration
+const LEAD_ROLES: string[] = [MemberRoles.Admin, MemberRoles.Responsable]
+
+const CONTACT_FIELD_NAMES = ['discordId', 'birthday', 'languages', 'timezone']
+
+// Functions of a junior in training, then of a junior Responsable
+const JUNIOR_RESPONSABLE_PREFIX = 'Junior Responsable'
+const JUNIOR_FUNCTION_PREFIX = 'Junior'
+
+/**
+ * Row of a primary function: regular, junior, junior Responsable
+ * @param {FieldOption} option - Function option
+ * @return {number} - Row index
+ */
+
+const functionRow = (option: FieldOption): number =>
+  option.label.startsWith(JUNIOR_RESPONSABLE_PREFIX)
+    ? 2
+    : option.label.startsWith(JUNIOR_FUNCTION_PREFIX)
+      ? 1
+      : 0
 
 // Assignment fields edited in place
 const ASSIGNMENT_FIELD_NAMES = [
@@ -85,6 +135,7 @@ const ASSIGNMENT_FIELD_NAMES = [
   'divisionId',
   'primaryFunctionIds',
   'secondaryFunctionIds',
+  'teamIds',
   'joinedAt',
   'leftAt',
 ]
@@ -130,13 +181,20 @@ const optionLabels = (field: FieldDefinition, value: FieldValue): ReactNode => {
 }
 
 /**
- * Every selected option of a multiselect field
+ * Every selected option of a multiselect field, one row per group with a divider between rows
  * @param {FieldDefinition} field - Field carrying the options
  * @param {FieldValue} value - Stored value
+ * @param {OptionMarkKind} [mark] - Glyph drawn before each label
+ * @param {(option: FieldOption) => number} [groupOf] - Row an option belongs to
  * @return {ReactNode} - Marked labels
  */
 
-const optionMarks = (field: FieldDefinition, value: FieldValue): ReactNode => {
+const optionMarks = (
+  field: FieldDefinition,
+  value: FieldValue,
+  mark: OptionMarkKind = 'glyph',
+  groupOf: (option: FieldOption) => number = () => 0
+): ReactNode => {
   if (!Array.isArray(value)) return null
 
   const options = value
@@ -145,14 +203,29 @@ const optionMarks = (field: FieldDefinition, value: FieldValue): ReactNode => {
 
   if (options.length === 0) return null
 
+  const rows: FieldOption[][] = []
+  options.forEach((option) => {
+    const index = groupOf(option)
+    rows[index] = [...(rows[index] ?? []), option]
+  })
+
   return (
-    <span className={MEMBER_BLOCK.marks}>
-      {options.map((option) => (
-        <span key={option.value} className={MEMBER_BLOCK.mark}>
-          <OptionMark mark="glyph" option={option} />
-          {option.label}
-        </span>
-      ))}
+    <span className={MEMBER_BLOCK.rows}>
+      {rows
+        .filter((row) => row !== undefined)
+        .map((row, index) => (
+          <Fragment key={row[0].value}>
+            {index > 0 && <span aria-hidden="true" className={MEMBER_BLOCK.divider} />}
+            <span className={MEMBER_BLOCK.marks}>
+              {row.map((option) => (
+                <span key={option.value} className={MEMBER_BLOCK.mark}>
+                  <OptionMark mark={mark} option={option} />
+                  {option.label}
+                </span>
+              ))}
+            </span>
+          </Fragment>
+        ))}
     </span>
   )
 }
@@ -195,6 +268,8 @@ export const MemberFileTabs = ({
   canPostAbsence,
   moderation,
   canOpenReports,
+  adminState,
+  canDelete,
 }: MemberFileTabsProps) => {
   const router = useRouter()
   const file = useMemberFile(detail, overrides)
@@ -217,6 +292,22 @@ export const MemberFileTabs = ({
 
   const fieldByName = new Map(memberFields.map((field) => [field.name, field]))
   const fieldFor = (name: string): FieldDefinition => fieldByName.get(name)!
+
+  const admin = useMemberAdmin(detail.summary.id, adminState ?? NO_ADMIN_STATE)
+  const [isSanctioning, setIsSanctioning] = useState(false)
+  const [departureMessage, setDepartureMessage] = useState<string | null>(null)
+
+  // Departure and its message
+  const depart = async (kind: DepartureKindName) => {
+    const departure = await admin.depart(kind)
+    if (departure) setDepartureMessage(departure.body)
+
+    return departure !== null
+  }
+
+  // Sanction from the drawer
+  const sanction = ({ kind, until, reason }: SanctionInput) =>
+    kind === 'temporary' ? admin.suspend(until, reason) : depart(DepartureKinds.Dismissal)
 
   // Everything not already edited in place lands behind the portrait
   const inlineNames = new Set([...CONTACT_FIELD_NAMES, ...ASSIGNMENT_FIELD_NAMES])
@@ -255,28 +346,6 @@ export const MemberFileTabs = ({
       display: identityValues.discordId ? String(identityValues.discordId) : null,
     },
     {
-      label: MEMBER_FIELD_COPY.memoraId,
-      display: <span className="font-[family-name:var(--font-mono)] text-xs">{summary.id}</span>,
-    },
-    {
-      label: FIELD_COPY.email,
-      field: fieldFor('email'),
-      display: sealedDisplay(
-        SensitiveFields.Email,
-        identityValues.email ? String(identityValues.email) : null,
-        factor.seal.isUnsealed
-      ),
-    },
-    {
-      label: FIELD_COPY.phone,
-      field: fieldFor('phone'),
-      display: sealedDisplay(
-        SensitiveFields.Phone,
-        identityValues.phone ? String(identityValues.phone) : null,
-        factor.seal.isUnsealed
-      ),
-    },
-    {
       label: FIELD_COPY.birthday,
       field: fieldFor('birthday'),
       display:
@@ -298,12 +367,12 @@ export const MemberFileTabs = ({
     {
       label: FIELD_COPY.languages,
       field: fieldFor('languages'),
-      display:
-        Array.isArray(identityValues.languages) && identityValues.languages.length > 0
-          ? identityValues.languages
-              .map((language) => optionText(fieldFor('languages'), language))
-              .join(', ')
-          : null,
+      display: optionMarks(fieldFor('languages'), identityValues.languages, 'flag'),
+    },
+    {
+      label: MEMBER_FIELD_COPY.timezone,
+      field: fieldFor('timezone'),
+      display: optionText(fieldFor('timezone'), String(identityValues.timezone ?? '')) || null,
     },
   ]
 
@@ -325,7 +394,12 @@ export const MemberFileTabs = ({
     {
       label: MEMBER_FIELD_COPY.primaryFunctions,
       field: fieldFor('primaryFunctionIds'),
-      display: optionMarks(fieldFor('primaryFunctionIds'), identityValues.primaryFunctionIds),
+      display: optionMarks(
+        fieldFor('primaryFunctionIds'),
+        identityValues.primaryFunctionIds,
+        'glyph',
+        functionRow
+      ),
     },
     {
       label: MEMBER_FIELD_COPY.secondaryFunctions,
@@ -350,7 +424,10 @@ export const MemberFileTabs = ({
     },
     {
       label: FIELD_COPY.team,
-      display: detail.teams.length > 0 ? detail.teams.join(', ') : null,
+      field: fieldFor('teamIds'),
+      display:
+        optionLabels(fieldFor('teamIds'), identityValues.teamIds) ??
+        (LEAD_ROLES.includes(summary.role) ? MEMBER_COPY.administration : null),
     },
   ]
 
@@ -374,42 +451,64 @@ export const MemberFileTabs = ({
   ]
 
   // Contact kept beside the portrait
-  const RAIL_FIELDS = ['discordId', 'email', 'birthday']
+  const RAIL_FIELDS = ['discordId', 'birthday']
 
   // Erased personal data never comes back
-  const ERASED_FIELDS = ['email', 'phone', 'birthday', 'languages']
+  const ERASED_FIELDS = ['birthday', 'languages']
   const sealErased = (entry: EditableEntry): EditableEntry =>
     detail.erased && entry.field && ERASED_FIELDS.includes(entry.field.name)
       ? { label: entry.label, display: <ErasedValue /> }
       : entry
 
-  const railEntries = contactEntries
-    .filter((entry) => entry.field && RAIL_FIELDS.includes(entry.field.name))
-    .map(sealErased)
+  const railEntries = [
+    ...contactEntries.filter((entry) => entry.field && RAIL_FIELDS.includes(entry.field.name)),
+    ...assignmentEntries.filter((entry) => entry.label === MEMBER_FIELD_COPY.youtuber),
+  ].map(sealErased)
   const fileContactEntries = contactEntries
-    .filter((entry) => !entry.field || !RAIL_FIELDS.includes(entry.field.name))
+    .filter((entry) => entry.field && !RAIL_FIELDS.includes(entry.field.name))
     .map(sealErased)
+
+  // Boxes of the file tab, each answering one question
+  const boxes: { title: string; labels: string[] }[] = [
+    {
+      title: MEMBER_COPY.boxMissions,
+      labels: [
+        MEMBER_FIELD_COPY.primaryFunctions,
+        MEMBER_FIELD_COPY.secondaryFunctions,
+        MEMBER_FIELD_COPY.youtuber,
+      ],
+    },
+    {
+      title: MEMBER_COPY.boxTeam,
+      labels: [FIELD_COPY.team, FIELD_COPY.division, MEMBER_FIELD_COPY.dispositif],
+    },
+    {
+      title: MEMBER_COPY.boxPresence,
+      labels: [
+        FIELD_COPY.joinedAt,
+        FIELD_COPY.leftAt,
+        FIELD_COPY.languages,
+        MEMBER_FIELD_COPY.timezone,
+      ],
+    },
+  ]
+  const pool = [...assignmentEntries, ...fileContactEntries]
 
   const identityTab = () => (
     <div className={MEMBER_FILE.main}>
-      <Section title={MEMBER_COPY.railContact} raised>
-        <EditableDetailGrid
-          entries={fileContactEntries}
-          values={identityValues}
-          issues={file.issues}
-          disabled={!canEdit}
-          onCommit={saveField}
-        />
-      </Section>
-      <Section title={MEMBER_COPY.railAssignment} raised>
-        <EditableDetailGrid
-          entries={assignmentEntries}
-          values={identityValues}
-          issues={file.issues}
-          disabled={!canEdit}
-          onCommit={saveField}
-        />
-      </Section>
+      {boxes.map((box) => (
+        <Section key={box.title} title={box.title} raised>
+          <EditableDetailGrid
+            entries={box.labels
+              .map((label) => pool.find((entry) => entry.label === label))
+              .filter((entry): entry is EditableEntry => entry !== undefined)}
+            values={identityValues}
+            issues={file.issues}
+            disabled={!canEdit}
+            onCommit={saveField}
+          />
+        </Section>
+      ))}
     </div>
   )
 
@@ -421,6 +520,7 @@ export const MemberFileTabs = ({
       canEdit={canEdit}
       isLocked={isLocked}
       onEditPortrait={() => openDialog('identity')}
+      isFrozen={adminState?.frozenAt != null}
     >
       <EditableDetailGrid
         stacked
@@ -434,7 +534,7 @@ export const MemberFileTabs = ({
         <div className={MEMBER_FILE.pinned}>
           <span className={MEMBER_FILE.pinnedLabel}>{MEMBER_COPY.railPinned}</span>
           {pinnedNotes.map((note) => (
-            <article key={note.id} className={MEMBER_FILE.note}>
+            <article key={note.id} className={MEMBER_FILE.pinnedNote}>
               <span className={MEMBER_FILE.noteHead}>
                 {[note.authorName, formatDayTime(note.createdAt)].filter(Boolean).join(' · ')}
               </span>
@@ -507,7 +607,7 @@ export const MemberFileTabs = ({
               </article>
             ))}
             <AddRow
-              tile
+              tile="note"
               label={MEMBER_COPY.noteAdd}
               disabled={!canWriteNotes}
               onClick={() => openDialog('note')}
@@ -532,11 +632,9 @@ export const MemberFileTabs = ({
           action={
             canPostAbsence ? (
               <Button variant="primary" icon="add" onClick={() => openDialog('absence')}>
-                {MEMBER_COPY.absenceAdd}
+                {MEMBER_COPY.absenceFirst}
               </Button>
-            ) : (
-              <Status label={MEMBER_COPY.absencesEmptyTitle} tone="neutral" />
-            )
+            ) : null
           }
         />
       ) : (
@@ -552,9 +650,7 @@ export const MemberFileTabs = ({
                     <span className={HOME_STYLES.rowTitle}>
                       {formatDayRange(absence.startDate, absence.endDate)}
                     </span>
-                    {absenceReasonText(absence) && (
-                      <span className={HOME_STYLES.rowMeta}>{absenceReasonText(absence)}</span>
-                    )}
+                    <AbsenceReason reason={absenceReasonText(absence)} className="self-start" />
                   </span>
                   <Status label={status.label} accent={status.accent} />
                 </li>
@@ -570,7 +666,7 @@ export const MemberFileTabs = ({
   )
 
   const socialsTab = () => (
-    <Section title={MEMBER_COPY.socialsTitle} bare>
+    <Section title={MEMBER_COPY.socialsTitle} maturity="alpha" bare>
       {file.socials.length === 0 ? (
         <EmptyState
           figure="settings"
@@ -646,7 +742,6 @@ export const MemberFileTabs = ({
           summary.academyJuniorId && summary.academySessionId
             ? ROUTES.junior(summary.academySessionId, summary.academyJuniorId)
             : null,
-        legacy: summary.legacyTrackId ? ROUTES.legacyTrack(summary.legacyTrackId) : null,
       }}
     />
   )
@@ -672,6 +767,52 @@ export const MemberFileTabs = ({
   )
 
   // Activity and moderation are two views of the same tab
+  const adminTab = () =>
+    adminState && (
+      <MemberAdminTab
+        admin={admin}
+        onDepart={depart}
+        onShowMessage={setDepartureMessage}
+        canDelete={canDelete}
+        roleSection={
+          isAdmin ? (
+            <Section title={MEMBER_ADMIN_COPY.sectionRole} raised>
+              <EditableDetailGrid
+                stacked
+                entries={[
+                  {
+                    label: '',
+                    display: (
+                      <span className="inline-flex items-center gap-3">
+                        <span className={DETAIL_BLOCK.label}>{MEMBER_FIELD_COPY.memoraId}</span>
+                        <span className="font-[family-name:var(--font-mono)] text-xs">
+                          {summary.id}
+                        </span>
+                      </span>
+                    ),
+                  },
+                  {
+                    label: '',
+                    field: fieldFor('role'),
+                    display: (
+                      <span className="inline-flex items-center gap-2">
+                        <RoleGlyph role={summary.role} />
+                        {optionLabel(fieldFor('role'), identityValues.role)}
+                      </span>
+                    ),
+                  },
+                ]}
+                values={identityValues}
+                issues={file.issues}
+                disabled={!canEdit}
+                onCommit={saveField}
+              />
+            </Section>
+          ) : null
+        }
+      />
+    )
+
   const logsTab = () =>
     moderation === undefined ? (
       activityLog()
@@ -700,7 +841,21 @@ export const MemberFileTabs = ({
 
   return (
     <div className={MEMBER_FILE.layout}>
-      {rail}
+      <div className={MEMBER_FILE.railStack}>
+        {rail}
+        {adminState && !admin.state.isGone && (
+          <Button
+            variant={admin.state.suspension ? 'primary' : 'danger'}
+            className="w-full"
+            isLoading={admin.state.suspension ? admin.isSaving : undefined}
+            onClick={() => (admin.state.suspension ? void admin.lift() : setIsSanctioning(true))}
+          >
+            {admin.state.suspension
+              ? MEMBER_ADMIN_COPY.liftAction
+              : MEMBER_ADMIN_COPY.sanctionAction}
+          </Button>
+        )}
+      </div>
 
       <div className={MEMBER_FILE.main}>
         <FileTabs
@@ -737,7 +892,6 @@ export const MemberFileTabs = ({
               value: 'socials',
               label: MEMBER_COPY.tabSocials,
               icon: 'link',
-              maturity: 'alpha',
               render: socialsTab,
             },
             {
@@ -751,20 +905,43 @@ export const MemberFileTabs = ({
               value: 'path',
               label: MEMBER_COPY.tabPath,
               icon: 'recruitment',
-              maturity: 'alpha',
               render: pathTab,
+            },
+            {
+              value: 'admin',
+              label: MEMBER_ADMIN_COPY.tab,
+              icon: 'shield',
+              visible: adminState !== null,
+              render: adminTab,
             },
             {
               value: 'logs',
               label: MEMBER_COPY.tabLogs,
               icon: 'history',
-              maturity: 'beta',
               visible: canReadLogs || moderation !== undefined,
               render: logsTab,
             },
           ]}
         />
       </div>
+
+      {isSanctioning && (
+        <SanctionDrawer
+          open
+          canTemporary={summary.functions.some(
+            (entry) => tradeOfFunction(entry.label) === LIVES_TRADE
+          )}
+          isSaving={admin.isSaving}
+          onSubmit={sanction}
+          onClose={() => setIsSanctioning(false)}
+        />
+      )}
+
+      <DepartureMessageDialog
+        open={departureMessage !== null}
+        body={departureMessage ?? ''}
+        onClose={() => setDepartureMessage(null)}
+      />
 
       <FormDrawer
         subject={FORM_SUBJECTS.member}

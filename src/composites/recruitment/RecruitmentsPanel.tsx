@@ -215,7 +215,12 @@ export const RecruitmentsPanel = ({
         <Section title={RECRUITMENT_COPY.groupOpen} bare>
           <div className={SESSION_CARD.grid}>
             {running.map(card)}
-            <AddRow tile label={RECRUITMENT_COPY.add} disabled={!canManage} onClick={openCreate} />
+            <AddRow
+              tile="session"
+              label={RECRUITMENT_COPY.add}
+              disabled={!canManage}
+              onClick={openCreate}
+            />
           </div>
         </Section>
 

@@ -2,8 +2,11 @@
 
 import { useState } from 'react'
 import { AvatarStack } from '@/components/elements/display/Avatar'
+import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
-import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
+import { CreatorLabels, ProjectLabel } from '@/components/elements/display/RecordLabel'
+import { pickedOptions } from '@/core/lib/forms/options'
+import { OverdueMark } from '@/composites/work/OverdueMark'
 import { Button } from '@/components/elements/actions/Button'
 import { EmojiPicker } from '@/components/elements/forms/EmojiPicker'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -22,7 +25,7 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMeetingTopics } from '@/core/hooks/data/useMeetingTopics'
 import { useRecordFile } from '@/core/hooks/data/useRecordFile'
 import { useMenu, type MenuItem } from '@/managers/front-end'
-import { ACTION_COPY } from '@/declarations/ui/copy'
+import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { MEETING_COPY, MEETING_FIELD_COPY } from '@/declarations/work/copy'
@@ -127,13 +130,19 @@ export const MeetingFile = ({
   const emojiValue = textOf('emoji') ?? summary.emoji
   const stateOption = optionOf('stateId')
   const projectOption = optionOf('projectId')
-  const youtuberOption = optionOf('youtuberId')
+  const youtuberOptions = pickedOptions(fieldFor('youtuberIds'), file.values.youtuberIds)
 
   const infoEntries: EditableEntry[] = [
+    { label: FIELD_COPY.id, display: <RecordId id={summary.id} /> },
     {
       label: MEETING_FIELD_COPY.scheduledAt,
       field: fieldFor('scheduledAt'),
-      display: scheduledValue ? formatDayTime(scheduledValue) : null,
+      display: scheduledValue ? (
+        <span className="inline-flex items-center gap-3">
+          {formatDayTime(scheduledValue)}
+          {summary.isOverdue && <OverdueMark kind="meeting" />}
+        </span>
+      ) : null,
     },
     {
       label: MEETING_FIELD_COPY.durationMin,
@@ -144,7 +153,7 @@ export const MeetingFile = ({
       label: MEETING_FIELD_COPY.state,
       field: fieldFor('stateId'),
       display: stateOption ? (
-        <Status label={stateOption.label} accent={stateOption.accent} />
+        <Status label={stateOption.label} accent={stateOption.accent} icon="statusDot" />
       ) : null,
     },
     {
@@ -155,11 +164,17 @@ export const MeetingFile = ({
       ) : null,
     },
     {
-      label: MEETING_FIELD_COPY.youtuber,
-      field: fieldFor('youtuberId'),
-      display: youtuberOption ? (
-        <CreatorLabel name={youtuberOption.label} image={youtuberOption.image} />
-      ) : null,
+      label: MEETING_FIELD_COPY.youtubers,
+      field: fieldFor('youtuberIds'),
+      display:
+        youtuberOptions.length > 0 ? (
+          <CreatorLabels
+            creators={youtuberOptions.map((option) => ({
+              name: option.label,
+              image: option.image,
+            }))}
+          />
+        ) : null,
     },
   ]
 
@@ -222,7 +237,7 @@ export const MeetingFile = ({
    */
 
   const renderAxis = (axis: ContentAxis) => (
-    <Section key={axis.name} title={axis.title} padded>
+    <Section key={axis.name} title={axis.title} maturity="alpha" padded>
       <InlineMarkdown
         id={`axis-${axis.name}`}
         value={textOf(axis.name) ?? ''}
@@ -255,7 +270,7 @@ export const MeetingFile = ({
   ]
 
   const topicsSection = () => (
-    <Section title={MEETING_COPY.topicsTitle} bare>
+    <Section title={MEETING_COPY.topicsTitle} maturity="alpha" bare>
       {topics.entries.length === 0 ? (
         <EmptyState
           figure="notes"
@@ -358,7 +373,6 @@ export const MeetingFile = ({
             value: 'content',
             label: MEETING_COPY.tabContent,
             icon: 'note',
-            maturity: 'alpha',
             visible: canReadContent,
             render: contentTab,
           },
@@ -366,7 +380,6 @@ export const MeetingFile = ({
             value: 'logs',
             label: MEETING_COPY.tabLogs,
             icon: 'history',
-            maturity: 'beta',
             visible: canReadLogs,
             render: logsTab,
           },

@@ -1,27 +1,76 @@
-/* Colour vision modes: a hand-written palette, not a filter. Red and green leave the status tones */
+/* Hue shifts of stored colours, none until a mode turns them on */
+:root {
+  --vision-shift-green: 0;
+  --vision-shift-red: 0;
+}
+
+/* Colour vision modes: a hand-written palette, not a filter. Red and green leave the status tones, which keep apart by hue (Okabe-Ito axis) and by lightness, checked under both simulations */
 
 html[data-color-vision='protanopia'],
 html[data-color-vision='deuteranopia'],
 [data-vision-preview='protanopia'],
 [data-vision-preview='deuteranopia'] {
-  --color-success: #2b6ca3;
-  --color-success-soft: #e3eef8;
-  --color-danger: #a64a08;
-  --color-danger-soft: #f9e9d6;
-  --color-authority-admin: #a64a08;
-  --color-authority-admin-soft: #f9e9d6;
+  --color-success: #0058a0;
+  --color-success-soft: #dfe9f3;
+  --color-info: #00667f;
+  --color-info-soft: #dfebef;
+  --color-caution: #7a6200;
+  --color-caution-soft: #edeae0;
+  --color-warning: #7a3300;
+  --color-warning-soft: #ede5e0;
+  --color-danger: #8e1f5e;
+  --color-danger-soft: #f0e2eb;
+  --color-authority-admin: #8e1f5e;
+  --color-authority-admin-soft: #f0e2eb;
+  --color-authority-lead: #7a3300;
+  --color-authority-lead-soft: #ede5e0;
+  /* Traffic-light fills: blue, yellow, reddish purple */
+  --color-apple-green: #0072b2;
+  --color-apple-orange: #e69f00;
+  --color-apple-red: #cc79a7;
+  --color-youtube: #cc79a7;
+  --color-live-100: #f6e4ee;
+  --color-live-300: #dd9bc0;
+  --color-live-400: #cc79a7;
+  /* Green drifts to blue, red to reddish purple */
+  --vision-shift-green: 115;
+  --vision-shift-red: -45;
 }
 
 :root.dark[data-color-vision='protanopia'],
 :root.dark[data-color-vision='deuteranopia'],
 :root.dark [data-vision-preview='protanopia'],
 :root.dark [data-vision-preview='deuteranopia'] {
-  --color-success: #8dbbe8;
-  --color-success-soft: #172433;
-  --color-danger: #f0a35c;
-  --color-danger-soft: #30220f;
-  --color-authority-admin: #f0a35c;
-  --color-authority-admin-soft: #30220f;
+  --color-success: #56a8f0;
+  --color-success-soft: #253241;
+  --color-info: #4fd0e0;
+  --color-info-soft: #24393f;
+  --color-caution: #f0e442;
+  --color-caution-soft: #3e3c25;
+  --color-warning: #e69f00;
+  --color-warning-soft: #3c311b;
+  --color-danger: #f0a0c8;
+  --color-danger-soft: #3e313b;
+  --color-authority-admin: #f0a0c8;
+  --color-authority-admin-soft: #3e313b;
+  --color-authority-lead: #e69f00;
+  --color-authority-lead-soft: #3c311b;
+  --color-apple-green: #56b4e9;
+  --color-apple-orange: #f0e442;
+  --color-apple-red: #e58fba;
+  --color-youtube: #e58fba;
+  --color-live-100: #f6e4ee;
+  --color-live-300: #dd9bc0;
+  --color-live-400: #e58fba;
+}
+
+/* Frame of the Administration levels: orange stays, red turns reddish purple */
+html[data-color-vision='protanopia'] .app-tone[data-tone='admin'],
+html[data-color-vision='deuteranopia'] .app-tone[data-tone='admin'] {
+  --color-frame-pink: #d58fb6;
+  --color-frame-mauve: #b45a8e;
+  --color-frame-blue: #a04a82;
+  --color-frame: #b45a8e;
 }
 
 /* Blue leaves the info tone */

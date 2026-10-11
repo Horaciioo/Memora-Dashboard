@@ -8,6 +8,7 @@ import { useFocusTrap } from '@/core/hooks/interaction/useFocusTrap'
 import { useScrollLock } from '@/core/hooks/interaction/useScrollLock'
 import type { IconName } from '@/declarations/ui/icons'
 import { DRAWER_STYLES } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 
 export interface DrawerProps {
   open: boolean
@@ -19,6 +20,7 @@ export interface DrawerProps {
   // Line under the header
   subheader?: ReactNode
   footer?: ReactNode
+  isWide?: boolean
   children: ReactNode
 }
 
@@ -31,6 +33,7 @@ export interface DrawerProps {
  * @param {string} [description] - Screen reader only
  * @param {ReactNode} [subheader] - Line under the header
  * @param {ReactNode} [footer] - Controls pinned to the bottom
+ * @param {boolean} [isWide] - Wider panel from md
  * @param {ReactNode} children - Drawer content
  * @return {JSX.Element | null}
  */
@@ -43,6 +46,7 @@ export const Drawer = ({
   description,
   subheader,
   footer,
+  isWide = false,
   children,
 }: DrawerProps) => {
   const containerRef = useFocusTrap(open, onClose)
@@ -61,7 +65,7 @@ export const Drawer = ({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={description ? descriptionId : undefined}
-        className={DRAWER_STYLES.panel}
+        className={cn(DRAWER_STYLES.panel, isWide && DRAWER_STYLES.wide)}
       >
         <ModalHeader titleId={titleId} title={title} icon={icon} onClose={onClose} />
         {description && (

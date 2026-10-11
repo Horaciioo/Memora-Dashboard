@@ -72,7 +72,10 @@ export const CALENDAR_COPY = {
   respondAbsent: 'Je ne serai pas là',
   yourAnswer: 'Ta réponse',
   yourPresence: 'Ta présence',
-  answerSaved: 'Ta réponse est prise en compte, tu peux la changer.',
+  // Weighted word sits between the parts
+  answeredPresent: ['Tu as ', 'répondu', ' présent !'],
+  answeredAbsent: ['Tu as ', 'notifié', ' ne pas être présent.'],
+  changeMind: 'Je change d’avis',
   nobody: 'Personne',
   noAnswerYet: 'Tu n’as pas encore répondu.',
   remindPending: 'Relancer les sans-réponse',
@@ -108,6 +111,19 @@ export const CALENDAR_FIELD_COPY = {
 } as const
 
 /**
+ * Audience picker wording
+ * @type {Record<string, string>}
+ */
+
+export const AUDIENCE_COPY = {
+  teams: 'Équipes',
+  juniorTeams: 'Équipes junior',
+  leadsOnly: 'Responsables de l’équipe uniquement',
+  leadsOnlyInfo: 'Seuls les responsables associés à l’équipe voient l’évènement.',
+  leadsOnlyLabel: 'Responsables de l’équipe',
+} as const
+
+/**
  * Explanations behind each calendar field
  * @type {Record<string, string>}
  */
@@ -117,7 +133,8 @@ export const CALENDAR_FIELD_INFO = {
   kind: 'La nature de l’évènement, elle décide de sa couleur.',
   template: 'Un évènement préparé à l’avance : il remplit le type, la couleur et la visibilité.',
   subject: 'Le membre que l’évènement concerne directement, s’il y en a un.',
-  visibility: 'Qui voit l’évènement sur son calendrier.',
+  visibility:
+    'Qui voit l’évènement sur son calendrier. L’administration entière, c’est celle du YouTubeur.',
   startsAt: 'Le moment où l’évènement commence.',
   endsAt: 'Le moment où il se termine. Vide, il dure une heure.',
   youtuber: 'Le créateur concerné par l’évènement.',

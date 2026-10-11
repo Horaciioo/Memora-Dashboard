@@ -35,6 +35,26 @@ export const visibleFields = (fields: FieldDefinition[], values: FormValues): Fi
   fields.filter((field) => isFieldVisible(field, values))
 
 /**
+ * Narrow owned options to the picked owners
+ * @param {FieldDefinition} field - Field declaration
+ * @param {FormValues} values - Current values
+ * @return {FieldDefinition} - Field with its reachable options
+ */
+
+export const narrowOptions = (field: FieldDefinition, values: FormValues): FieldDefinition => {
+  if (!field.ownerField || !field.options) return field
+
+  const picked = values[field.ownerField]
+  const owners = Array.isArray(picked) ? picked : picked ? [String(picked)] : []
+  if (owners.length === 0) return field
+
+  return {
+    ...field,
+    options: field.options.filter((option) => !option.owner || owners.includes(option.owner)),
+  }
+}
+
+/**
  * List unfilled required fields
  * @param {FieldDefinition[]} fields - Field declarations
  * @param {FormValues} values - Current values

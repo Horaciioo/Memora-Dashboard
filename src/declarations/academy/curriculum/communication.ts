@@ -12,7 +12,7 @@ export const COMMUNICATION_POSTURE: Course = {
     'Parler comme l’équipe, garder son calme face à la colère et formuler un avertissement qui passe.',
   track: 'indispensable',
   surface: 'general',
-  functions: [],
+  functions: ['Lives'],
   minutes: 30,
   chapters: [
     {

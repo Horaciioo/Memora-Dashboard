@@ -12,6 +12,7 @@ import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import { prisma } from '@/core/lib/db'
 import { readScope } from '@/core/services/auth/ScopeService'
 import { readBeacon } from '@/core/services/lives/LiveService'
+import { readOverdueFlags } from '@/core/services/work/OverdueService'
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
@@ -110,10 +111,11 @@ export const readViewContext = async (
       ? readBeacon(await readScope(viewer, access), viewer.id, access.can(Permissions.LiveAnnounce))
       : null
 
-  const [creators, activeYoutuberId, live] = await Promise.all([
+  const [creators, activeYoutuberId, live, overdue] = await Promise.all([
     view === NavigationViews.Moderation ? Promise.resolve([]) : pickableCreators(viewer, access),
     readActiveCreator(),
     readLive(),
+    readOverdueFlags(viewer.id, access),
   ])
 
   const known = creators.some((creator) => creator.id === activeYoutuberId)
@@ -126,6 +128,7 @@ export const readViewContext = async (
     creators,
     activeYoutuberId: known ? activeYoutuberId : null,
     live,
+    overdue,
   }
 }
 

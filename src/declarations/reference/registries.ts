@@ -1,4 +1,5 @@
 import { createRegistry } from '@/core/lib/registry'
+import type { IconName } from '@/declarations/ui/icons'
 import {
   AbsenceStatuses,
   AttendeeKinds,
@@ -21,11 +22,13 @@ import type {
  * @typedef {Object} LabelledOption
  * @property {string} label - Display label
  * @property {string} [accent] - Colour token
+ * @property {IconName} [icon] - Glyph
  */
 
 interface LabelledOption {
   label: string
   accent?: string
+  icon?: IconName
 }
 
 const WORKFLOW_SCOPE_MAP: Record<WorkflowScopeName, LabelledOption> = {
@@ -78,9 +81,14 @@ const ABSENCE_STATUS_MAP: Record<AbsenceStatusName, LabelledOption> = {
 export const ABSENCE_STATUS_REGISTRY = createRegistry(ABSENCE_STATUS_MAP)
 
 const EVENT_VISIBILITY_MAP: Record<EventVisibilityName, LabelledOption> = {
-  [EventVisibilities.Everyone]: { label: 'Tout le monde', accent: 'success' },
-  [EventVisibilities.Responsables]: { label: 'Responsables et plus', accent: 'warning' },
-  [EventVisibilities.Admins]: { label: 'Administrateurs seuls', accent: 'danger' },
+  [EventVisibilities.Everyone]: { label: 'Tout le monde', accent: 'success', icon: 'members' },
+  [EventVisibilities.Responsables]: {
+    label: 'Administration entière',
+    accent: 'warning',
+    icon: 'flame',
+  },
+  [EventVisibilities.Admins]: { label: 'Administrateurs seuls', accent: 'danger', icon: 'crown' },
+  [EventVisibilities.Team]: { label: 'Une équipe', accent: 'info', icon: 'teams' },
 }
 
 export const EVENT_VISIBILITY_REGISTRY = createRegistry(EVENT_VISIBILITY_MAP)

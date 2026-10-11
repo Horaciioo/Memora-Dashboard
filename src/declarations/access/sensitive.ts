@@ -7,8 +7,6 @@ import type { IconName } from '@/declarations/ui/icons'
  */
 
 export const SensitiveFields = {
-  Email: 'email',
-  Phone: 'phone',
   Medical: 'medical',
   Illness: 'illness',
   Private: 'private',
@@ -34,8 +32,6 @@ interface SensitiveFieldOption {
 }
 
 const SENSITIVE_FIELD_MAP: Record<SensitiveFieldName, SensitiveFieldOption> = {
-  [SensitiveFields.Email]: { label: 'Adresse mail', icon: 'mail' },
-  [SensitiveFields.Phone]: { label: 'Numéro de téléphone', icon: 'phone' },
   [SensitiveFields.Medical]: { label: 'Contraintes pathologiques', icon: 'shield' },
   [SensitiveFields.Illness]: { label: 'Maladies', icon: 'shield' },
   [SensitiveFields.Private]: { label: 'Contraintes privées', icon: 'shield' },

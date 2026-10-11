@@ -225,7 +225,7 @@ export const RecruitmentFile = ({
             )
           })}
           <AddRow
-            tile
+            tile="candidate"
             label={RECRUITMENT_COPY.candidateAdd}
             disabled={!canManage}
             onClick={() => openCandidateForm(null)}

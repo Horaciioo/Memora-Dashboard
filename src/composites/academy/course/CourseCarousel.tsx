@@ -15,7 +15,6 @@ export interface CourseCarouselProps {
   selectedId: string
   pendingId: string | null
   // Specialisations not started yet wear the new tag
-  freshIds: Set<string>
   onSelect: (courseId: string) => void
 }
 
@@ -31,7 +30,6 @@ export const CourseCarousel = ({
   courses,
   selectedId,
   pendingId,
-  freshIds,
   onSelect,
 }: CourseCarouselProps) => {
   const { track, canPrevious, canNext, page } = useCarousel()
@@ -76,7 +74,6 @@ export const CourseCarousel = ({
               course={course}
               isSelected={course.id === selectedId}
               isPending={course.id === pendingId}
-              isFresh={freshIds.has(course.id)}
               onSelect={() => onSelect(course.id)}
             />
           )

@@ -311,7 +311,7 @@ export const SessionPanel = ({
               )
             })}
             <AddRow
-              tile
+              tile="session"
               label={ACADEMY_COPY.juniorAdd}
               disabled={!canManage || !hasCandidates}
               onClick={() => openJunior(null)}

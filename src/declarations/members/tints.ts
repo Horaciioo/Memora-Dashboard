@@ -26,12 +26,8 @@ export interface GlyphTint {
   cut: string
 }
 
-/**
- * Colours of the role and function glyphs
- * @type {Record<string, GlyphTint>}
- */
-
-export const GLYPH_TINTS = {
+// Original ramps, before the moderator pass
+const BASE_TINTS = {
   // Discord
   DISCORD: {
     fillFrom: '#8cc2ff',
@@ -137,4 +133,68 @@ export const GLYPH_TINTS = {
     deepTo: '#78350f',
     cut: '#fffbeb',
   },
+} satisfies Record<string, GlyphTint>
+
+/**
+ * Copy of a ramp with every stop mixed toward one colour
+ * @param {GlyphTint} tint - Ramp to shift
+ * @param {string} target - Colour to mix toward
+ * @param {number} amount - Share of target, 0 to 100
+ * @return {GlyphTint} - Shifted ramp
+ */
+
+const shift = (tint: GlyphTint, target: string, amount: number): GlyphTint => {
+  const mix = (color?: string) =>
+    color && `color-mix(in oklab, ${color} ${100 - amount}%, ${target})`
+  return {
+    fillFrom: mix(tint.fillFrom)!,
+    fillMid: mix(tint.fillMid),
+    fillTo: mix(tint.fillTo)!,
+    liftFrom: mix(tint.liftFrom)!,
+    liftMid: mix(tint.liftMid),
+    liftTo: mix(tint.liftTo)!,
+    deepFrom: mix(tint.deepFrom)!,
+    deepMid: mix(tint.deepMid),
+    deepTo: mix(tint.deepTo)!,
+    cut: tint.cut,
+  }
+}
+
+/**
+ * Paler copy of a ramp
+ * @param {GlyphTint} tint - Ramp to lighten
+ * @return {GlyphTint} - Lighter ramp
+ */
+
+export const lighten = (tint: GlyphTint): GlyphTint => shift(tint, 'white', 55)
+
+/**
+ * Slightly darker copy of a ramp
+ * @param {GlyphTint} tint - Ramp to deepen
+ * @return {GlyphTint} - Darker ramp
+ */
+
+export const deepen = (tint: GlyphTint): GlyphTint => shift(tint, 'black', 16)
+
+/**
+ * Colours of the role and function glyphs, moderator pass slightly deeper
+ * @type {Record<string, GlyphTint>}
+ */
+
+export const GLYPH_TINTS = {
+  ...BASE_TINTS,
+  DISCORD: deepen(BASE_TINTS.DISCORD),
+  LIVE: deepen(BASE_TINTS.LIVE),
+  ANIMATOR: deepen(BASE_TINTS.ANIMATOR),
+} satisfies Record<string, GlyphTint>
+
+/**
+ * Junior tints, much paler than the originals
+ * @type {Record<string, GlyphTint>}
+ */
+
+export const JUNIOR_TINTS = {
+  DISCORD_JUNIOR: lighten(BASE_TINTS.DISCORD),
+  LIVE_JUNIOR: lighten(BASE_TINTS.LIVE),
+  ANIMATOR_JUNIOR: lighten(BASE_TINTS.ANIMATOR),
 } satisfies Record<string, GlyphTint>

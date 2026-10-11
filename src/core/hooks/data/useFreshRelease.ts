@@ -30,10 +30,10 @@ export interface FreshRelease {
 
 export const useFreshRelease = (): FreshRelease => {
   const router = useRouter()
-  const { session, can } = useAuthContext()
+  const { session, can, isResponsable } = useAuthContext()
   const [seenNow, setSeenNow] = useState<string | null>(null)
 
-  const release = session ? (changelogFor(can)[0] ?? null) : null
+  const release = session ? (changelogFor({ can, isResponsable })[0] ?? null) : null
   const seen = seenNow ?? session?.seenReleaseVersion ?? null
   const isFresh = release !== null && seen !== release.version
 

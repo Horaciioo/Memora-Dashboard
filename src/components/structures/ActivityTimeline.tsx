@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { ActivityDetail } from '@/components/structures/ActivityDetail'
 import { Pagination } from '@/components/elements/navigation/Pagination'
 import { PAGINATION_SETTINGS } from '@/declarations/configurations/settings'
 import { ACTIVITY_COPY } from '@/declarations/activity/copy'
@@ -64,6 +65,7 @@ export const ActivityTimeline = ({ entries }: ActivityTimelineProps) => {
                   ) : (
                     <p className={JOURNAL_STYLES.sentence}>{`${actor}, ${entry.origin}.`}</p>
                   )}
+                  <ActivityDetail entry={entry} />
                 </div>
               </div>
               {index < shown.length - 1 && (

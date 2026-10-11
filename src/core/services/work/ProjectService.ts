@@ -1,27 +1,33 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { assertInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import { assertAllInScope, assertRowInScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import { MEETING_INCLUDE, toMeetingSummary } from '@/core/services/work/MeetingService'
+import { TASK_INCLUDE, toTaskSummary } from '@/core/services/work/TaskService'
 import { projectVisibility } from '@/core/services/work/visibility'
 import type { WorkViewer } from '@/core/services/work/visibility'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { notFound } from '@/core/lib/errors'
 import { readDate, readList, readText } from '@/core/lib/forms/values'
+import { emojiOrRandom, isBehindDeadline } from '@/core/lib/work'
 import {
   AUTHORSHIP_INCLUDE,
+  creatorLinks,
   defaultState,
+  keptCreatorIds,
   leadOptions,
   memberOptions,
   platformOptions,
   positionAt,
   priorityOptions,
+  readCreatorIds,
   stateOptions,
   toAuthorship,
+  toCreatorTags,
   toPerson,
   toTag,
   youtuberOptions,
-  toCreatorTag,
-  toProjectTag,
+  YOUTUBERS_INCLUDE,
 } from '@/core/services/work/shared'
 import {
   EMOJI_SETTINGS,
@@ -40,7 +46,7 @@ const PROJECT_INCLUDE = {
   state: true,
   priority: true,
   platform: true,
-  youtuber: true,
+  youtubers: YOUTUBERS_INCLUDE,
   leads: { include: { account: true } },
   assistants: { include: { account: true } },
   _count: { select: { communications: true, tasks: true, meetings: true } },
@@ -65,12 +71,13 @@ const toSummary = (row: ProjectRow): ProjectSummary => ({
   state: toTag(row.state),
   priority: toTag(row.priority),
   platform: toTag(row.platform),
-  youtuber: toCreatorTag(row.youtuber),
+  youtubers: toCreatorTags(row.youtubers),
   leads: row.leads.map((lead) => toPerson(lead.account)).filter((person) => person !== null),
   assistants: row.assistants
     .map((assistant) => toPerson(assistant.account))
     .filter((person) => person !== null),
   deadline: row.deadline?.toISOString() ?? null,
+  isOverdue: isBehindDeadline(row.deadline, row.state?.phase),
   position: row.position,
   communicationCount: row._count.communications,
   taskCount: row._count.tasks,
@@ -79,7 +86,7 @@ const toSummary = (row: ProjectRow): ProjectSummary => ({
     title: row.title,
     emoji: row.emoji,
     description: row.description,
-    youtuberId: row.youtuberId,
+    youtuberIds: row.youtubers.map((youtuber) => youtuber.id),
     stateId: row.stateId,
     priorityId: row.priorityId,
     platformId: row.platformId,
@@ -125,10 +132,10 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
     },
     {
       name: 'description',
-      kind: 'textarea',
+      kind: 'markdown',
       label: PROJECT_FIELD_COPY.description,
       info: PROJECT_FIELD_INFO.description,
-      maxLength: FORM_SETTINGS.longTextMaxLength,
+      maxLength: FORM_SETTINGS.markdownMaxLength,
       group: FORM_GROUPS.essentials,
     },
     {
@@ -156,10 +163,11 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       group: FORM_GROUPS.assignment,
     },
     {
-      name: 'youtuberId',
-      kind: 'select',
-      label: PROJECT_FIELD_COPY.youtuber,
-      info: PROJECT_FIELD_INFO.youtuber,
+      name: 'youtuberIds',
+      kind: 'multiselect',
+      label: PROJECT_FIELD_COPY.youtubers,
+      info: PROJECT_FIELD_INFO.youtubers,
+      placeholder: PROJECT_FIELD_COPY.youtubersEmpty,
       options: youtubers,
       mark: 'avatar',
       span: 'half',
@@ -193,7 +201,7 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       label: PROJECT_FIELD_COPY.platform,
       info: PROJECT_FIELD_INFO.platform,
       options: platforms,
-      mark: 'avatar',
+      mark: 'network',
       span: 'half',
       group: FORM_GROUPS.details,
     },
@@ -239,7 +247,6 @@ const toProjectData = (values: FormValues) => ({
   title: readText(values, 'title') ?? '',
   emoji: readText(values, 'emoji'),
   description: readText(values, 'description'),
-  youtuberId: readText(values, 'youtuberId'),
   stateId: readText(values, 'stateId'),
   priorityId: readText(values, 'priorityId'),
   platformId: readText(values, 'platformId'),
@@ -269,7 +276,8 @@ export const createProject = async (
   actorId: string
 ): Promise<ProjectSummary> => {
   const data = toProjectData(values)
-  assertInScope(scope, data.youtuberId ?? null)
+  const youtuberIds = readCreatorIds(values)
+  assertAllInScope(scope, youtuberIds)
   const stateId = data.stateId ?? (await defaultState(WorkflowScopes.Project))
   const leadIds = readLeadIds(values)
   const assistantIds = readList(values, 'assistantIds')
@@ -280,10 +288,12 @@ export const createProject = async (
   const row = await prisma.project.create({
     data: {
       ...data,
+      emoji: emojiOrRandom(data.emoji),
       stateId,
       position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
       createdById: actorId,
       updatedById: actorId,
+      youtubers: { connect: creatorLinks(youtuberIds) },
       leads: { create: leadIds.map((accountId) => ({ accountId })) },
       assistants: { create: assistantIds.map((accountId) => ({ accountId })) },
     },
@@ -310,6 +320,13 @@ export const updateProject = async (
 ): Promise<ProjectSummary> => {
   await assertRowInScope('project', id, scope)
 
+  const picked = readCreatorIds(values)
+  assertAllInScope(scope, picked)
+
+  const stored = await prisma.project.findUnique({
+    where: { id },
+    select: { youtubers: { select: { id: true } } },
+  })
   const leadIds = readLeadIds(values)
   const assistantIds = readList(values, 'assistantIds')
 
@@ -319,6 +336,15 @@ export const updateProject = async (
     data: {
       ...toProjectData(values),
       updatedById: actorId,
+      youtubers: {
+        set: creatorLinks(
+          keptCreatorIds(
+            picked,
+            scope,
+            stored?.youtubers.map((youtuber) => youtuber.id)
+          )
+        ),
+      },
       leads: {
         deleteMany: {},
         create: leadIds.map((accountId) => ({ accountId })),
@@ -565,25 +591,12 @@ export const readProject = async (id: string): Promise<ProjectDetail> => {
     }),
     prisma.task.findMany({
       where: { projectId: id },
-      include: {
-        state: true,
-        priority: true,
-        youtuber: true,
-        owner: true,
-        project: true,
-        ...AUTHORSHIP_INCLUDE,
-      },
+      include: TASK_INCLUDE,
       orderBy: [{ position: 'asc' }],
     }),
     prisma.meeting.findMany({
       where: { projectId: id },
-      include: {
-        state: true,
-        youtuber: true,
-        project: true,
-        attendees: { include: { account: true } },
-        ...AUTHORSHIP_INCLUDE,
-      },
+      include: MEETING_INCLUDE,
       orderBy: { scheduledAt: 'desc' },
     }),
   ])
@@ -591,45 +604,8 @@ export const readProject = async (id: string): Promise<ProjectDetail> => {
   return {
     summary: toSummary(row),
     communications: communications.map(toCommunication),
-    tasks: tasks.map((task) => ({
-      ...toAuthorship(task),
-      id: task.id,
-      title: task.title,
-      emoji: task.emoji,
-      description: task.description,
-      columnId: task.stateId,
-      state: toTag(task.state),
-      priority: toTag(task.priority),
-      youtuber: toCreatorTag(task.youtuber),
-      project: toProjectTag(task.project),
-      owner: toPerson(task.owner),
-      dueDate: task.dueDate?.toISOString() ?? null,
-      position: task.position,
-      values: {},
-    })),
-    meetings: meetings.map((meeting) => ({
-      ...toAuthorship(meeting),
-      id: meeting.id,
-      title: meeting.title,
-      emoji: meeting.emoji,
-      introduction: meeting.introduction,
-      outro: meeting.outro,
-      minutes: meeting.minutes,
-      columnId: meeting.stateId,
-      state: toTag(meeting.state),
-      youtuber: toCreatorTag(meeting.youtuber),
-      project: toProjectTag(meeting.project),
-      scheduledAt: meeting.scheduledAt.toISOString(),
-      durationMin: meeting.durationMin,
-      audience: meeting.audience,
-      leads: [],
-      assistants: [],
-      participants: meeting.attendees
-        .map((attendee) => toPerson(attendee.account))
-        .filter((person) => person !== null),
-      position: meeting.position,
-      values: {},
-    })),
+    tasks: tasks.map(toTaskSummary),
+    meetings: meetings.map(toMeetingSummary),
   }
 }
 

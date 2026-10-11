@@ -13,6 +13,8 @@ export const SANCTION_COPY = {
   onSight: 'Dès constaté',
   steps: '{count} paliers',
   descriptionTitle: 'Description',
+  gravityTitle: 'Type de gravité',
+  liveconTitle: 'Livecon',
   moderateTitle: 'À modérer',
   tolerateTitle: 'À laisser passer',
   ladderTitle: 'Barème au {level}',

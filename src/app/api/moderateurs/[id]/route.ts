@@ -3,11 +3,12 @@ import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { readSealState, sealValues } from '@/core/services/auth/SealService'
 import { assertAccountInScope } from '@/core/services/auth/ScopeService'
+import { loadTarget, resolveActor } from '@/core/services/members/admin'
 import {
-  anonymiseMember,
   assertDivisionAssignable,
   assertMemberAssignable,
   BELOW_LEAD_ROLES,
+  deleteMember,
   memberFields,
   readMember,
   updateMember,
@@ -58,19 +59,24 @@ export const PATCH = createProtectedRoute({
 
     const member = await updateMember(params.id, parsed.values)
 
-    await recordEvent({
-      eventType: 'MemberUpdated',
-      actorId: session.id,
-      subjectId: member.id,
-      targetType: 'member',
-      targetId: member.id,
-      summary: member.displayName,
-      change: summariseChange(
-        fields,
-        sealValues(before.values, isUnsealed),
-        sealValues(parsed.values, isUnsealed)
-      ),
-    })
+    // Journal only a real change
+    const change = summariseChange(
+      fields,
+      sealValues(before.values, isUnsealed),
+      sealValues(parsed.values, isUnsealed)
+    )
+
+    if (change) {
+      await recordEvent({
+        eventType: 'MemberUpdated',
+        actorId: session.id,
+        subjectId: member.id,
+        targetType: 'member',
+        targetId: member.id,
+        summary: member.displayName,
+        change,
+      })
+    }
 
     return member
   },
@@ -78,20 +84,23 @@ export const PATCH = createProtectedRoute({
 
 export const DELETE = createProtectedRoute({
   permission: Permissions.MemberDelete,
-  descriptor: { summary: 'Close a moderator access', tags: ['members'] },
-  handler: async ({ params, session, scope }) => {
-    await assertAccountInScope(params.id, await scope(), session.id)
-    const member = await readMember(params.id)
-    await anonymiseMember(params.id)
+  descriptor: { summary: 'Delete a moderator', tags: ['members'] },
+  handler: async (context) => {
+    // Same limits as the Admin tab
+    const actor = await resolveActor(context)
+    const { id } = context.params
+    await loadTarget(id, actor)
+
+    const member = await readMember(id)
+    await deleteMember(id)
 
     await recordEvent({
       eventType: 'MemberDeleted',
-      actorId: session.id,
+      actorId: actor.id,
       targetType: 'member',
-      targetId: params.id,
       summary: member.summary.displayName,
     })
 
-    return { id: params.id }
+    return { id }
   },
 })

@@ -8,7 +8,9 @@ export const COMMUNICATION_HEAD = {
   title: 'text-base font-bold',
   list: 'flex flex-col gap-0.5 text-sm',
   row: 'flex items-center gap-1.5',
-  term: 'text-[var(--color-ink-subtle)]',
+  term: 'inline-flex items-center gap-1.5 text-[var(--color-ink-subtle)]',
+  // Title of the box under the head
+  section: 'mt-4 mb-2 text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
 } as const
 
 /**
@@ -21,7 +23,7 @@ export const DISCORD_MESSAGE = {
     'relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--discord-background)] text-body leading-[1.375rem] text-[var(--discord-text)]',
   // Small copy control in the top right corner of the announcement
   copyCorner:
-    'notch-bite absolute top-0 right-0 z-10 flex h-11 w-12 items-start justify-start rounded-none rounded-tr-[var(--radius-lg)] bg-white/10 pt-2 pl-3 text-[var(--discord-muted)] hover:bg-white/20 hover:text-[var(--discord-heading)]',
+    'absolute top-0 right-0 z-10 flex size-10 items-center justify-center rounded-none rounded-tr-[var(--radius-lg)] rounded-bl-[var(--radius-lg)] bg-white/10 text-[var(--discord-muted)] hover:bg-white/20 hover:text-[var(--discord-heading)]',
   message: 'flex gap-4 px-4 py-3',
   avatar: 'h-10 w-10 shrink-0 rounded-full bg-[var(--discord-blurple)]',
   body: 'flex min-w-0 flex-1 flex-col',

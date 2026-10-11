@@ -3,8 +3,9 @@
 import { useRouter } from 'next/navigation'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Status } from '@/components/elements/display/Status'
-import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
+import { CreatorLabels, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { Glyph } from '@/components/elements/display/Glyph'
+import { OverdueMark } from '@/composites/work/OverdueMark'
 import { WorkBoard } from '@/composites/work/WorkBoard'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { ROUTES } from '@/declarations/navigation'
@@ -17,7 +18,7 @@ import type { DataTableColumn } from '@/components/structures/DataTable'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { TaskSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import { formatDay, isOverdue } from '@/utils/format/dates'
+import { formatDay } from '@/utils/format/dates'
 
 export interface TasksBoardProps {
   initialTasks: TaskSummary[]
@@ -87,7 +88,9 @@ export const TasksBoard = ({
       header: FIELD_COPY.state,
       sortValue: (task) => task.state?.label ?? '',
       render: (task) =>
-        task.state ? <Status label={task.state.label} accent={task.state.accent} /> : null,
+        task.state ? (
+          <Status label={task.state.label} accent={task.state.accent} icon="statusDot" />
+        ) : null,
     },
     {
       key: 'project',
@@ -100,10 +103,14 @@ export const TasksBoard = ({
     {
       key: 'youtuber',
       header: FIELD_COPY.youtuber,
-      render: (task) =>
-        task.youtuber ? (
-          <CreatorLabel name={task.youtuber.label} image={task.youtuber.image} />
-        ) : null,
+      render: (task) => (
+        <CreatorLabels
+          creators={task.youtubers.map((youtuber) => ({
+            name: youtuber.label,
+            image: youtuber.image,
+          }))}
+        />
+      ),
     },
     {
       key: 'dueDate',
@@ -112,11 +119,14 @@ export const TasksBoard = ({
       className: 'whitespace-nowrap',
       render: (task) =>
         task.dueDate ? (
-          <Status
-            label={formatDay(task.dueDate)}
-            tone={isOverdue(task.dueDate) ? 'danger' : 'neutral'}
-            icon="clock"
-          />
+          <span className="inline-flex items-center gap-2">
+            <Status
+              label={formatDay(task.dueDate)}
+              tone={task.isOverdue ? 'danger' : 'neutral'}
+              icon="clock"
+            />
+            {task.isOverdue && <OverdueMark kind="task" />}
+          </span>
         ) : null,
     },
   ]
@@ -157,7 +167,8 @@ export const TasksBoard = ({
       matches={(task, search, filters) => {
         if (search.length > 0 && !task.title.toLowerCase().includes(search)) return false
         if (filters.owner && task.owner?.id !== filters.owner) return false
-        if (filters.youtuber && task.youtuber?.id !== filters.youtuber) return false
+        if (filters.youtuber && !task.youtubers.some((item) => item.id === filters.youtuber))
+          return false
         if (filters.project && task.project?.id !== filters.project) return false
 
         return true

@@ -14,6 +14,7 @@ import { readInheritedGrants } from '@/core/services/auth/GrantsService'
 import { assertAccountInScope } from '@/core/services/auth/ScopeService'
 import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
 import { BELOW_LEAD_ROLES, memberFields, readMember } from '@/core/services/members/MemberService'
+import { readAdminState } from '@/core/services/members/admin'
 import { findCandidateFile } from '@/core/services/recruitment/RecruitmentService'
 import { readMemberActivity } from '@/core/services/system/ActivityService'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -97,6 +98,13 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     detail.summary.youtubers.some((tag) => perimeter.youtuberIds.includes(tag.id))
   const canReadModeration = access.can(Permissions.LiveLogRead) && isConcerned
 
+  // Heavy gestures reach the members below, never oneself nor the root
+  const canLead =
+    access.isResponsable &&
+    id !== session.id &&
+    !detail.summary.isRoot &&
+    (access.isAdmin || BELOW_LEAD_ROLES.includes(detail.summary.role))
+
   const [
     fields,
     activity,
@@ -107,6 +115,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     canPostAbsence,
     socialFields,
     moderation,
+    adminState,
   ] = await Promise.all([
     memberFields(access.isAdmin),
     canReadLogs ? readMemberActivity(id) : Promise.resolve([]),
@@ -121,14 +130,13 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
       : Promise.resolve(false),
     socialFormFields(),
     canReadModeration ? readMemberModeration(id) : Promise.resolve(undefined),
+    canLead ? readAdminState(id) : Promise.resolve(null),
   ])
 
   // Sensitive values never leave the server while the window is shut
   const sealed = {
     ...detail,
     values: sealValues(detail.values, seal.isUnsealed),
-    email: seal.isUnsealed ? detail.email : null,
-    phone: seal.isUnsealed ? detail.phone : null,
   }
 
   return (
@@ -152,6 +160,8 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
         canPostAbsence={canPostAbsence}
         moderation={moderation}
         canOpenReports={access.can(Permissions.LiveLogRead)}
+        adminState={adminState}
+        canDelete={access.can(Permissions.MemberDelete)}
       />
     </div>
   )

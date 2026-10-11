@@ -57,6 +57,11 @@ export const seedWork = async (reference: Reference, cast: Cast): Promise<Work> 
     const creator =
       position % 5 === 4 ? null : reference.creators[position % reference.creators.length]
     const creatorId = creator?.id ?? null
+    // A few projects serve two creators
+    const second =
+      creatorId && position % 6 === 0
+        ? reference.creators[(position + 1) % reference.creators.length].id
+        : null
     const deadlineOffset = between(-120, 70)
     const createdAt = day(Math.min(deadlineOffset, 0) - between(20, 50), 10)
     const leads = sample(
@@ -73,7 +78,11 @@ export const seedWork = async (reference: Reference, cast: Cast): Promise<Work> 
         title,
         emoji,
         description: `${description}\n\n## Objectif\n\nLivrer avant la date prévue, avec un point d’étape chaque semaine.`,
-        youtuberId: creatorId,
+        youtubers: {
+          connect: [...new Set([creatorId, second])]
+            .filter((id) => id !== null)
+            .map((id) => ({ id })),
+        },
         stateId: reference.states.PROJECT[phaseFor(deadlineOffset)],
         priorityId: pick(reference.priorities),
         platformId: pick(reference.platforms).id,
@@ -131,7 +140,7 @@ export const seedWork = async (reference: Reference, cast: Cast): Promise<Work> 
           ownerId: owner.id,
           stateId: reference.states.TASK[phaseFor(dueOffset)],
           priorityId: pick(reference.priorities),
-          youtuberId: creatorId,
+          youtubers: { connect: creatorId ? [{ id: creatorId }] : [] },
           projectId: id,
           createdById: author.id,
           updatedById: pick(leads).id,
@@ -161,7 +170,7 @@ export const seedWork = async (reference: Reference, cast: Cast): Promise<Work> 
         ownerId: owner.id,
         stateId: reference.states.TASK[phaseFor(dueOffset)],
         priorityId: pick(reference.priorities),
-        youtuberId: creator,
+        youtubers: { connect: creator ? [{ id: creator }] : [] },
         createdById: pick(leaders).id,
         position: 100 + index,
         archived: dueOffset < -100 && chance(0.4),
@@ -200,7 +209,7 @@ export const seedWork = async (reference: Reference, cast: Cast): Promise<Work> 
         scheduledAt,
         durationMin: pick([30, 45, 60, 90]),
         stateId: reference.states.MEETING[isPast ? 'DONE' : chance(0.6) ? 'DOING' : 'TODO'],
-        youtuberId: creatorId,
+        youtubers: { connect: creatorId ? [{ id: creatorId }] : [] },
         projectId: project?.id ?? null,
         createdById: lead.id,
         updatedById: lead.id,

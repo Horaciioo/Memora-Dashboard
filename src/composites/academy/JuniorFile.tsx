@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/elements/forms/Toggle'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
+import { RecordId } from '@/components/elements/display/RecordId'
 import { DetailGrid } from '@/components/structures/DetailGrid'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { FormDrawer } from '@/components/structures/FormDrawer'
@@ -42,7 +43,7 @@ import {
 } from '@/declarations/academy/registries'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
-import { ACTION_COPY } from '@/declarations/ui/copy'
+import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 
 import {
   ACCOMPANIED_LIVES,
@@ -297,6 +298,7 @@ export const JuniorFile = ({
         <StepTimeline steps={stageSteps} label={ACADEMY_COPY.tabInformations} />
         <DetailGrid
           entries={[
+            { label: FIELD_COPY.id, value: <RecordId id={junior.id} /> },
             { label: ACADEMY_FIELD_COPY.trainer, value: junior.trainer?.name },
             {
               label: ACADEMY_FIELD_COPY.liveCount,

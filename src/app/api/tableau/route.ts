@@ -3,6 +3,12 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { moveMeeting } from '@/core/services/work/MeetingService'
 import { moveProject } from '@/core/services/work/ProjectService'
 import { moveTask } from '@/core/services/work/TaskService'
+import {
+  assertMeetingVisible,
+  assertProjectVisible,
+  assertTaskVisible,
+  workViewer,
+} from '@/core/services/work/visibility'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { WorkflowScopes } from '@/utils/constants/workflow'
 import { Permissions } from '@/utils/constants/permissions'
@@ -18,16 +24,25 @@ export const PATCH = createProtectedRoute({
 
     if (!id || !columnId) throw invalidInput([{ field: 'id', message: FORM_COPY.required }])
 
+    // A card moves only for who reaches it
+    const viewer = workViewer(session, access)
+
     // Each board is gated by the permission that edits its own resource, a task by its manager
     if (scope === WorkflowScopes.Project && access.can(Permissions.ProjectUpdate)) {
+      await assertProjectVisible(id, viewer)
+
       return moveProject(id, columnId, index, session.id)
     }
 
     if (scope === WorkflowScopes.Task && access.can(Permissions.TaskManage)) {
+      await assertTaskVisible(id, viewer)
+
       return moveTask(id, columnId, index, session.id)
     }
 
     if (scope === WorkflowScopes.Meeting && access.can(Permissions.MeetingUpdate)) {
+      await assertMeetingVisible(id, viewer)
+
       return moveMeeting(id, columnId, index, session.id)
     }
 

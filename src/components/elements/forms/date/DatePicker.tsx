@@ -15,7 +15,7 @@ import {
   SELECT_MENU_STYLES,
 } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { toDayKey } from '@/utils/format/calendar'
+import { periodLabel, toDayKey } from '@/utils/format/calendar'
 import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
 
 export interface DatePickerProps {
@@ -30,6 +30,8 @@ export interface DatePickerProps {
   disabled?: boolean
   invalid?: boolean
   describedBy?: string
+  // Year the calendar opens on while empty
+  startYear?: number
 }
 
 // Time of day a datetime lands on when the day is picked first
@@ -51,6 +53,7 @@ export const DatePicker = ({
   disabled,
   invalid,
   describedBy,
+  startYear,
 }: DatePickerProps) => {
   const single = typeof value === 'string' ? value : ''
   const [rangeStart = '', rangeEnd = ''] = Array.isArray(value) ? value : []
@@ -58,7 +61,10 @@ export const DatePicker = ({
   const time = clock.slice(0, 5)
 
   const { isOpen, setOpen, close, triggerRef, panelRef } = useAnchoredPanel()
-  const [cursor, setCursor] = useState(() => day || rangeStart || toDayKey(new Date()))
+  const firstDay = () =>
+    day || rangeStart || (startYear ? `${startYear}-01-01` : toDayKey(new Date()))
+  const [cursor, setCursor] = useState(firstDay)
+  const [isPickingYear, setPickingYear] = useState(false)
   const isWheel = useIsMobileShell() && !range
 
   const picking = useRangePick({
@@ -77,7 +83,8 @@ export const DatePicker = ({
   const open = () => {
     if (disabled) return
 
-    setCursor(day || rangeStart || toDayKey(new Date()))
+    setCursor(firstDay())
+    setPickingYear(false)
     picking.reset()
     setOpen(true)
   }
@@ -141,7 +148,21 @@ export const DatePicker = ({
           <div className={SELECT_MENU_STYLES.scrim} role="presentation" onMouseDown={close} />
           <div ref={panelRef} role="dialog" aria-label={label} className={DATE_PICKER_STYLES.panel}>
             {isWheel ? (
-              <DateWheel value={day || toDayKey(new Date())} onChange={pick} />
+              <DateWheel value={day || firstDay()} onChange={pick} />
+            ) : isPickingYear ? (
+              <>
+                <div className={DATE_PICKER_STYLES.head}>
+                  <button
+                    type="button"
+                    aria-label={PICKER_COPY.pickYear}
+                    className={DATE_PICKER_STYLES.monthPick}
+                    onClick={() => setPickingYear(false)}
+                  >
+                    {periodLabel(cursor, 'month')}
+                  </button>
+                </div>
+                <DateWheel period value={cursor} onChange={setCursor} />
+              </>
             ) : (
               <DayGrid
                 cursor={cursor}
@@ -151,6 +172,7 @@ export const DatePicker = ({
                 range={range}
                 isAnchored={picking.isAnchored}
                 onHover={picking.hover}
+                onTitle={() => setPickingYear(true)}
                 onPick={range ? (next) => picking.step(next) && onChange([]) : pick}
               />
             )}

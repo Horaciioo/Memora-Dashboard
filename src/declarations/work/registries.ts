@@ -1,5 +1,7 @@
 import { createRegistry } from '@/core/lib/registry'
 import type { IconName } from '@/declarations/ui/icons'
+import { ROUTES } from '@/declarations/navigation'
+import type { OverdueFlags } from '@/types/work'
 import { MeetingAudiences } from '@/utils/constants/workflow'
 import type { MeetingAudienceName } from '@/utils/constants/workflow'
 
@@ -48,3 +50,14 @@ const MEETING_AUDIENCE_MAP: Record<MeetingAudienceName, MeetingAudienceOption> =
 }
 
 export const MEETING_AUDIENCE_REGISTRY = createRegistry(MEETING_AUDIENCE_MAP)
+
+/**
+ * Rail entry lit by each late-item flag
+ * @type {Record<keyof OverdueFlags, string>}
+ */
+
+export const OVERDUE_ROUTES: Record<keyof OverdueFlags, string> = {
+  projects: ROUTES.projects,
+  tasks: ROUTES.tasks,
+  meetings: ROUTES.meetings,
+}

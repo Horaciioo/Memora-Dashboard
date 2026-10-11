@@ -6,6 +6,7 @@ body {
     max(var(--drawer-min-h), calc((100dvh - 1.5rem) * var(--drawer-h-share)))
   );
   --drawer-page-w: min(var(--drawer-w), calc((100vw - var(--shell-sidebar-w)) * 0.6));
+  --drawer-page-wide-w: min(60rem, calc((100vw - var(--shell-sidebar-w)) * 0.9));
   --drawer-page-right: calc(0.75rem + var(--drawer-gap));
 }
 
@@ -135,7 +136,7 @@ body {
 }
 
 .is-drop-target {
-  outline: 2px dashed var(--color-brand-500);
+  outline: 2px dashed var(--color-border-strong);
   outline-offset: -4px;
-  background: var(--color-brand-soft);
+  background: var(--color-hover);
 }

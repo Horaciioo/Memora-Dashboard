@@ -379,6 +379,7 @@ export const fillDeparture = (
     .replaceAll('{verbe}', verbs[input.kind])
     .replaceAll('{fonction}', input.functionName)
     .replaceAll('{emoji}', input.emoji)
+    .replace(/[ \t]+$/gm, '')
     .trim()
 
 /**

@@ -3,8 +3,9 @@
 import { useRouter } from 'next/navigation'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { Status } from '@/components/elements/display/Status'
-import { CreatorLabel, ProjectLabel } from '@/components/elements/display/RecordLabel'
+import { CreatorLabels, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { Glyph } from '@/components/elements/display/Glyph'
+import { OverdueMark } from '@/composites/work/OverdueMark'
 import { WorkBoard } from '@/composites/work/WorkBoard'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { ROUTES } from '@/declarations/navigation'
@@ -78,14 +79,21 @@ export const MeetingsBoard = ({
       header: FIELD_COPY.date,
       sortValue: (meeting) => meeting.scheduledAt,
       className: 'whitespace-nowrap',
-      render: (meeting) => formatDayTime(meeting.scheduledAt),
+      render: (meeting) => (
+        <span className="inline-flex items-center gap-2">
+          {formatDayTime(meeting.scheduledAt)}
+          {meeting.isOverdue && <OverdueMark kind="meeting" />}
+        </span>
+      ),
     },
     {
       key: 'state',
       header: FIELD_COPY.state,
       sortValue: (meeting) => meeting.state?.label ?? '',
       render: (meeting) =>
-        meeting.state ? <Status label={meeting.state.label} accent={meeting.state.accent} /> : null,
+        meeting.state ? (
+          <Status label={meeting.state.label} accent={meeting.state.accent} icon="statusDot" />
+        ) : null,
     },
     {
       key: 'project',
@@ -98,10 +106,14 @@ export const MeetingsBoard = ({
     {
       key: 'youtuber',
       header: FIELD_COPY.youtuber,
-      render: (meeting) =>
-        meeting.youtuber ? (
-          <CreatorLabel name={meeting.youtuber.label} image={meeting.youtuber.image} />
-        ) : null,
+      render: (meeting) => (
+        <CreatorLabels
+          creators={meeting.youtubers.map((youtuber) => ({
+            name: youtuber.label,
+            image: youtuber.image,
+          }))}
+        />
+      ),
     },
     {
       key: 'attendees',
@@ -138,7 +150,8 @@ export const MeetingsBoard = ({
       ]}
       matches={(meeting, search, filters) => {
         if (search.length > 0 && !meeting.title.toLowerCase().includes(search)) return false
-        if (filters.youtuber && meeting.youtuber?.id !== filters.youtuber) return false
+        if (filters.youtuber && !meeting.youtubers.some((item) => item.id === filters.youtuber))
+          return false
         if (filters.project && meeting.project?.id !== filters.project) return false
 
         return true

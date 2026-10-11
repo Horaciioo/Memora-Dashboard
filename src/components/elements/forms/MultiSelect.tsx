@@ -211,6 +211,9 @@ export const MultiSelect = ({
                       <OptionLead option={option} mark={mark} isSelected={isSelected} />
                       <span className={SELECT_MENU_STYLES.optionLabel}>{option.label}</span>
                     </button>
+                    {option.hasDividerAfter && (
+                      <span className={SELECT_MENU_STYLES.divider} role="separator" />
+                    )}
                   </Fragment>
                 )
               })}

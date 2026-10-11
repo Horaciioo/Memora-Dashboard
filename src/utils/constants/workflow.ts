@@ -111,6 +111,7 @@ export const EventVisibilities = {
   Everyone: 'EVERYONE',
   Responsables: 'RESPONSABLES',
   Admins: 'ADMINS',
+  Team: 'TEAM',
 } as const
 
 export type EventVisibilityName = (typeof EventVisibilities)[keyof typeof EventVisibilities]

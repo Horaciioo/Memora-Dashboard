@@ -45,7 +45,7 @@ const DATE_KINDS = ['date', 'datetime']
  * @type {string[]}
  */
 
-const SIMPLE_KINDS = ['text', 'number', 'email', 'phone', 'url', 'discord']
+const SIMPLE_KINDS = ['text', 'number', 'url', 'discord']
 
 /**
  * Native input type per field kind
@@ -55,8 +55,6 @@ const SIMPLE_KINDS = ['text', 'number', 'email', 'phone', 'url', 'discord']
 const INPUT_TYPES: Record<string, string> = {
   text: 'text',
   number: 'number',
-  email: 'email',
-  phone: 'tel',
   url: 'url',
   discord: 'text',
 }
@@ -139,6 +137,7 @@ export const FieldControl = ({
         label={field.label}
         value={typeof value === 'string' ? value : ''}
         withTime={field.kind === 'datetime'}
+        startYear={field.startYear}
         disabled={disabled || field.readOnly}
         invalid={invalid}
         describedBy={describedBy}

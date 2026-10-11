@@ -1,24 +1,24 @@
+'use client'
+
 import Link from 'next/link'
 
+import { useFreshRelease } from '@/core/hooks/data/useFreshRelease'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
 import { changelogPath } from '@/declarations/changelog/helpers'
-import type { ChangelogRelease } from '@/declarations/changelog/releases'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { HOME_FLOW } from '@/declarations/ui/variants'
 
-export interface HomeNewsProps {
-  release: ChangelogRelease | undefined
-}
-
 /**
- * Latest note, one gold line
- * @param {ChangelogRelease | undefined} release - Newest readable note
+ * Latest unread note, one gold line
  * @return {JSX.Element | null}
  */
 
-export const HomeNews = ({ release }: HomeNewsProps) => {
-  if (!release) return null
+export const HomeNews = () => {
+  const { release, isFresh } = useFreshRelease()
+
+  // Gone once read
+  if (!release || !isFresh) return null
 
   const StarIcon = ICONS.news
 

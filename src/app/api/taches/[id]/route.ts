@@ -61,7 +61,8 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   permission: Permissions.TaskDelete,
   descriptor: { summary: 'Drop a task', tags: ['tasks'] },
-  handler: async ({ params, session, scope }) => {
+  handler: async ({ params, session, scope, access }) => {
+    await assertTaskVisible(params.id, workViewer(session, access))
     await removeTask(params.id, await scope())
 
     await recordEvent({

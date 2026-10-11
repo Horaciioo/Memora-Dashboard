@@ -38,10 +38,8 @@ export const ROUTES = {
   academy: '/academy',
   glossary: '/academy/lexique',
   session: (id: string) => `/academy/${id}`,
-  myLegacy: '/mon-legacy',
   legacy: '/legacy',
   legacyTrack: (id: string) => `/legacy/${id}`,
-  legacyModule: (id: string, key: string) => `/legacy/${id}/${key}`,
   junior: (sessionId: string, juniorId: string) => `/academy/${sessionId}/${juniorId}`,
   recruitments: '/recrutements',
   recruitment: (id: string) => `/recrutements/${id}`,
@@ -253,16 +251,6 @@ export const NAVIGATION: NavigationGroup[] = [
     from: NavigationViews.Moderation,
     items: [
       {
-        href: ROUTES.lives,
-        label: 'Live en cours',
-        icon: 'liveDot',
-        permission: Permissions.LiveRead,
-        onlyLive: true,
-        // Always there
-        alwaysFor: Permissions.LiveRead,
-        mobile: { slot: 'primary', order: 0 },
-      },
-      {
         href: ROUTES.dashboard,
         label: 'Accueil',
         icon: 'dashboard',
@@ -287,13 +275,6 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.AcademyTrainingComplete,
         // Juniors train
         visibleWhen: { statuses: ['ACADEMY'], roles: ['ADMIN', 'RESPONSABLE'] },
-        maturity: 'alpha',
-      },
-      {
-        href: ROUTES.myLegacy,
-        label: 'Mon Legacy',
-        icon: 'crown',
-        permission: Permissions.LegacySelf,
         maturity: 'alpha',
       },
     ],
@@ -354,7 +335,7 @@ export const NAVIGATION: NavigationGroup[] = [
       {
         href: ROUTES.legacy,
         label: 'Legacy',
-        icon: 'crown',
+        icon: 'flame',
         permission: Permissions.LegacyRead,
         maturity: 'alpha',
       },
@@ -364,6 +345,16 @@ export const NAVIGATION: NavigationGroup[] = [
     label: 'Modération',
     from: NavigationViews.Moderation,
     items: [
+      {
+        href: ROUTES.lives,
+        label: 'Live en cours',
+        icon: 'liveDot',
+        permission: Permissions.LiveRead,
+        onlyLive: true,
+        // Always there
+        alwaysFor: Permissions.LiveRead,
+        mobile: { slot: 'primary', order: 0 },
+      },
       {
         href: ROUTES.sanctions,
         label: 'Panel de sanctions',
@@ -429,7 +420,6 @@ export const SEGMENT_LABELS: Record<string, string> = {
   formations: 'Formations',
   academy: 'Marsha Academy',
   legacy: 'Legacy',
-  'mon-legacy': 'Mon Legacy',
   recrutements: 'Recrutements',
   lexique: 'Lexique',
   moderation: 'Modération',

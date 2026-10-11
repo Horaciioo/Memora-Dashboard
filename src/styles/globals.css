@@ -14,6 +14,7 @@
 @import './shell/banner.css';
 @import './shell/rail.css';
 @import './shell/surfaces.css';
+@import './shell/welcome.css';
 @import './motion/feedback.css';
 @import './motion/overlays.css';
 @import './motion/pick.css';

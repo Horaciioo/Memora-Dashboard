@@ -7,16 +7,16 @@ import type { FieldOption } from '@/types/forms'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
 
 /**
- * Members an announcement of one creator may mention
- * @param {string | null} youtuberId - Creator the announcement is written for
+ * Members an announcement of some creators may mention
+ * @param {string[]} youtuberIds - Creators the announcement is written for
  * @return {Promise<FieldOption[]>} - Mentions
  */
 
-export const mentionOptions = async (youtuberId: string | null): Promise<FieldOption[]> => {
+export const mentionOptions = async (youtuberIds: string[]): Promise<FieldOption[]> => {
   const members = await prisma.account.findMany({
     where: {
       status: { in: [MemberStatuses.Active, MemberStatuses.Academy] },
-      ...(youtuberId ? { youtubers: { some: { id: youtuberId } } } : {}),
+      ...(youtuberIds.length > 0 ? { youtubers: { some: { id: { in: youtuberIds } } } } : {}),
     },
     select: { discordId: true, displayName: true, avatarUrl: true },
     orderBy: { displayName: 'asc' },

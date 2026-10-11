@@ -26,7 +26,20 @@ import {
 } from '@/core/services/calendar/projections'
 import type { ProjectedPosts, ProjectionContext } from '@/core/services/calendar/projections'
 import { peopleInScope, projectOptions, youtuberOptions } from '@/core/services/work/shared'
-import { CALENDAR_FIELD_COPY, CALENDAR_FIELD_INFO } from '@/declarations/calendar/copy'
+import {
+  AUDIENCE_KEYS,
+  audienceClauses,
+  audienceOptions,
+  audienceValue,
+  parseAudience,
+} from '@/core/services/calendar/audience'
+import { workViewerOf } from '@/core/services/work/visibility'
+import type { WorkViewer } from '@/core/services/work/visibility'
+import {
+  AUDIENCE_COPY,
+  CALENDAR_FIELD_COPY,
+  CALENDAR_FIELD_INFO,
+} from '@/declarations/calendar/copy'
 import { CALENDAR_KIND_REGISTRY } from '@/declarations/calendar/registries'
 import {
   CALENDAR_SETTINGS,
@@ -81,15 +94,20 @@ const subjectOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
 const templateOptions = async (): Promise<FieldOption[]> => {
   const rows = await prisma.eventTemplate.findMany({
     where: { archived: false },
-    orderBy: [{ kind: 'asc' }, { position: 'asc' }],
+    orderBy: [{ position: 'asc' }, { name: 'asc' }],
   })
 
-  return rows.map((row) => ({
-    value: row.id,
-    label: row.name,
-    hint: CALENDAR_KIND_REGISTRY.label(row.kind),
-    accent: row.accent ?? undefined,
-  }))
+  // One heading per kind
+  return CALENDAR_KIND_REGISTRY.keys.flatMap((kind) =>
+    rows
+      .filter((row) => row.kind === kind)
+      .map((row) => ({
+        value: row.id,
+        label: row.name,
+        accent: row.accent ?? undefined,
+        group: CALENDAR_KIND_REGISTRY.get(kind).plural ?? CALENDAR_KIND_REGISTRY.label(kind),
+      }))
+  )
 }
 
 /**
@@ -113,17 +131,29 @@ const WHEN_ROLL_CALL = { field: 'rollCall', truthy: true } as const
 /**
  * Build the calendar entry form declarations
  * @param {AccessScope} [scope] - Creator perimeter
+ * @param {WorkViewer} [viewer] - Who reads
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const calendarFields = async (scope?: AccessScope): Promise<FieldDefinition[]> => {
-  const [templates, subjects, youtubers, projects, teams] = await Promise.all([
+export const calendarFields = async (
+  scope?: AccessScope,
+  viewer?: WorkViewer
+): Promise<FieldDefinition[]> => {
+  const [templates, subjects, youtubers, projects, teams, audiences] = await Promise.all([
     templateOptions(),
     subjectOptions(scope),
     youtuberOptions(scope),
-    projectOptions(scope),
+    projectOptions(scope, viewer),
     teamOptions(scope),
+    audienceOptions(scope),
   ])
+
+  // Only an administrator may close an entry to administrators
+  const levels = toOptions(EVENT_VISIBILITY_REGISTRY).filter(
+    (option) =>
+      option.value !== EventVisibilities.Team &&
+      (viewer?.isAdmin || option.value !== EventVisibilities.Admins)
+  )
 
   return [
     {
@@ -167,6 +197,16 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       group: FORM_GROUPS.essentials,
     },
     {
+      name: 'youtuberId',
+      kind: 'select',
+      label: CALENDAR_FIELD_COPY.youtuber,
+      info: CALENDAR_FIELD_INFO.youtuber,
+      options: youtubers,
+      mark: 'avatar',
+      span: 'half',
+      group: FORM_GROUPS.essentials,
+    },
+    {
       name: 'description',
       kind: 'textarea',
       label: CALENDAR_FIELD_COPY.description,
@@ -179,10 +219,19 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       kind: 'select',
       label: CALENDAR_FIELD_COPY.visibility,
       info: CALENDAR_FIELD_INFO.visibility,
-      options: toOptions(EVENT_VISIBILITY_REGISTRY),
-      mark: 'dot',
+      options: [...levels, ...audiences],
+      ownerField: 'youtuberId',
+      mark: 'glyph',
       span: 'half',
       group: FORM_GROUPS.visibility,
+    },
+    {
+      name: 'audienceLeadsOnly',
+      kind: 'toggle',
+      label: AUDIENCE_COPY.leadsOnly,
+      info: AUDIENCE_COPY.leadsOnlyInfo,
+      group: FORM_GROUPS.visibility,
+      visibleWhen: { field: 'visibility', oneOf: audiences.map((option) => option.value) },
     },
     {
       name: 'startsAt',
@@ -214,16 +263,6 @@ export const calendarFields = async (scope?: AccessScope): Promise<FieldDefiniti
       label: CALENDAR_FIELD_COPY.subject,
       info: CALENDAR_FIELD_INFO.subject,
       options: subjects,
-      mark: 'avatar',
-      span: 'half',
-      group: FORM_GROUPS.assignment,
-    },
-    {
-      name: 'youtuberId',
-      kind: 'select',
-      label: CALENDAR_FIELD_COPY.youtuber,
-      info: CALENDAR_FIELD_INFO.youtuber,
-      options: youtubers,
       mark: 'avatar',
       span: 'half',
       group: FORM_GROUPS.assignment,
@@ -327,6 +366,9 @@ const toEntry = (
     templateId: string | null
     accountId: string | null
     visibility: EventVisibilityName | null
+    audienceTeamId: string | null
+    audienceSessionId: string | null
+    audienceLeadsOnly: boolean
     startsAt: Date
     endsAt: Date | null
     allDay: boolean
@@ -375,7 +417,8 @@ const toEntry = (
       kind: row.kind,
       templateId: row.templateId,
       accountId: row.accountId,
-      visibility: row.visibility,
+      visibility: audienceValue(row),
+      audienceLeadsOnly: row.audienceLeadsOnly,
       startsAt: row.startsAt.toISOString().slice(0, 16),
       endsAt: row.endsAt ? row.endsAt.toISOString().slice(0, 16) : null,
       allDay: row.allDay,
@@ -454,6 +497,7 @@ export const listEntries = async ({
   await sweepDueReminders()
 
   const levels = allowedVisibilities(access)
+  const audiences = access.isAdmin ? [] : await audienceClauses(viewerId)
 
   const rows = await prisma.calendarEvent.findMany({
     where: scopedWhere('calendarEvent', scope, {
@@ -471,6 +515,7 @@ export const listEntries = async ({
             // A convened member always sees their own roll-call
             { attendances: { some: { accountId: viewerId } } },
             { visibility: { in: levels } },
+            ...audiences,
             { visibility: null, template: { visibility: { in: levels } } },
             { visibility: null, templateId: null },
           ],
@@ -483,7 +528,13 @@ export const listEntries = async ({
 
   const rosters = await rollCallRosters(rows, viewerId, access.can(Permissions.CalendarManage))
 
-  const context: ProjectionContext = { from, to, access, scope }
+  const context: ProjectionContext = {
+    from,
+    to,
+    access,
+    scope,
+    viewer: workViewerOf(viewerId, access),
+  }
 
   // A session board only ever shows its own rows and its own steps
   const projections = sessionId
@@ -536,7 +587,7 @@ const toEntryData = (values: FormValues) => ({
   kind: (readText(values, 'kind') ?? CalendarKinds.Event) as CalendarKindName,
   templateId: readText(values, 'templateId'),
   accountId: readText(values, 'accountId'),
-  visibility: (readText(values, 'visibility') ?? null) as EventVisibilityName | null,
+  ...parseAudience(values),
   startsAt: readDate(values, 'startsAt') ?? new Date(),
   endsAt: readDate(values, 'endsAt'),
   allDay: readFlag(values, 'allDay'),
@@ -758,7 +809,11 @@ export const updateEntries = async (
 ): Promise<CalendarEntry[]> => {
   // Only the keys actually sent are written
   const data = Object.fromEntries(
-    Object.entries(toEntryData(values)).filter(([key]) => key in values)
+    Object.entries(toEntryData(values)).filter(
+      ([key]) =>
+        key in values ||
+        (AUDIENCE_KEYS.some((audienceKey) => audienceKey === key) && 'visibility' in values)
+    )
   )
 
   await prisma.calendarEvent.updateMany({ where: { id: { in: ids } }, data })

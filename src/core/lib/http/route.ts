@@ -15,6 +15,7 @@ import { parseFormValues } from '@/core/lib/forms'
 import { consume, readIdentity } from '@/core/lib/http/rateLimit'
 import { fail, succeed } from '@/core/lib/http/response'
 import { logger } from '@/core/lib/logger'
+import { reportFailure } from '@/core/services/system/FailureReport'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import { readScope } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -320,8 +321,11 @@ export const createPublicRoute = <T>(options: PublicRouteOptions<T>): RouteHandl
 
 export const createProtectedRoute = <T>(options: ProtectedRouteOptions<T>): RouteHandler => {
   const handler: RouteHandler = async (request, context) => {
+    let actorId: string | null = null
+
     try {
       const { session, access } = await authenticate(request, options, options.permission)
+      actorId = session.id
       const routeContext = await buildContext(request, context, options)
 
       return succeed(
@@ -334,6 +338,7 @@ export const createProtectedRoute = <T>(options: ProtectedRouteOptions<T>): Rout
         options.status ?? 200
       )
     } catch (error) {
+      await reportFailure(request, actorId, error)
       return fail(error)
     }
   }

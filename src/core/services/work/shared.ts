@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { readList } from '@/core/lib/forms/values'
 import { HELD_FUNCTIONS, toMemberFunctions } from '@/core/services/reference/functions'
 import { allPriorities } from '@/core/services/reference/lookups'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -14,9 +15,10 @@ import type { WorkViewer } from '@/core/services/work/visibility'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { BoardColumn } from '@/components/structures/KanbanBoard'
-import type { FieldOption } from '@/types/forms'
+import type { FieldOption, FormValues } from '@/types/forms'
 import type { WorkAuthorship, WorkPerson, WorkTag } from '@/types/work'
 import { GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
+import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { WorkflowPhases } from '@/utils/constants/workflow'
 import type { WorkflowPhaseName, WorkflowScopeName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
@@ -73,6 +75,54 @@ export const toCreatorTag = (
   row: { id: string; name: string; accent: string | null; avatarUrl: string | null } | null
 ): WorkTag | null =>
   row ? { id: row.id, label: row.name, accent: row.accent, image: row.avatarUrl } : null
+
+/**
+ * Creator rows shaped like tags
+ * @param {Array<{ id: string, name: string, accent: string | null, avatarUrl: string | null }>} rows - Creator rows
+ * @return {WorkTag[]} - Tags
+ */
+
+export const toCreatorTags = (
+  rows: { id: string; name: string; accent: string | null; avatarUrl: string | null }[]
+): WorkTag[] => rows.map((row) => toCreatorTag(row)).filter((tag) => tag !== null)
+
+// Creators a work card lists, in display order
+export const YOUTUBERS_INCLUDE = { orderBy: { position: 'asc' } } as const
+
+/**
+ * Read the picked creators
+ * @param {FormValues} values - Parsed body
+ * @return {string[]} - Creator identifiers
+ */
+
+export const readCreatorIds = (values: FormValues): string[] => [
+  ...new Set(readList(values, 'youtuberIds')),
+]
+
+/**
+ * Creators a row ends up with
+ * @param {string[]} picked - Creators chosen in the form
+ * @param {AccessScope} scope - Editor perimeter
+ * @param {string[]} [stored] - Creators the row already carries
+ * @return {string[]} - Chosen creators, plus the stored ones the editor cannot see
+ */
+
+export const keptCreatorIds = (
+  picked: string[],
+  scope: AccessScope,
+  stored: string[] = []
+): string[] =>
+  scope.isGlobal
+    ? picked
+    : [...picked, ...stored.filter((id) => !scope.youtuberIds.includes(id) && !picked.includes(id))]
+
+/**
+ * Identify creators for a relation write
+ * @param {string[]} ids - Creator identifiers
+ * @return {Array<{ id: string }>} - Relation targets
+ */
+
+export const creatorLinks = (ids: string[]): { id: string }[] => ids.map((id) => ({ id }))
 
 /**
  * Project row shaped like a tag
@@ -228,11 +278,14 @@ export const memberOptions = async (scope?: AccessScope): Promise<FieldOption[]>
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-export const leadOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
+export const leadOptions = async (
+  scope?: AccessScope,
+  roles: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Responsable]
+): Promise<FieldOption[]> => {
   const rows = await prisma.account.findMany({
     where: {
       status: { notIn: GONE_MEMBER_STATUSES },
-      role: { in: [MemberRoles.Admin, MemberRoles.Responsable] },
+      role: { in: roles },
       ...peopleInScope(scope),
     },
     orderBy: { displayName: 'asc' },

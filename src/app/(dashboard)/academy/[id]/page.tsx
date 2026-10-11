@@ -17,6 +17,7 @@ import { ACADEMY_COPY } from '@/declarations/academy/copy'
 
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
+import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 import { formatDay } from '@/utils/format/dates'
 import { gridRange, monthGrid, toDayKey } from '@/utils/format/calendar'
@@ -74,7 +75,7 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
       scope: await scope(),
       sessionId: id,
     }),
-    calendarFields(),
+    calendarFields(undefined, workViewer(session, access)),
   ])
 
   const canManage = access.can(Permissions.AcademyManage)

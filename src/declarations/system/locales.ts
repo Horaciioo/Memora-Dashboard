@@ -10,7 +10,6 @@ const DISPLAY_LOCALE = 'fr'
  */
 
 const LANGUAGE_CODES: string[] = [
-  'fr',
   'en',
   'es',
   'de',
@@ -45,18 +44,86 @@ const LANGUAGE_CODES: string[] = [
   'eu',
 ]
 
+// Country whose flag stands for each language
+export const LANGUAGE_COUNTRIES: Record<string, string> = {
+  fr: 'FR',
+  en: 'GB',
+  es: 'ES',
+  de: 'DE',
+  it: 'IT',
+  pt: 'PT',
+  nl: 'NL',
+  pl: 'PL',
+  ro: 'RO',
+  ru: 'RU',
+  uk: 'UA',
+  ar: 'SA',
+  tr: 'TR',
+  zh: 'CN',
+  ja: 'JP',
+  ko: 'KR',
+  hi: 'IN',
+  sv: 'SE',
+  no: 'NO',
+  da: 'DK',
+  fi: 'FI',
+  cs: 'CZ',
+  el: 'GR',
+  he: 'IL',
+  th: 'TH',
+  vi: 'VN',
+  id: 'ID',
+  hu: 'HU',
+  bg: 'BG',
+  sr: 'RS',
+  hr: 'HR',
+  ca: 'ES',
+  eu: 'ES',
+  'fr-BE': 'BE',
+  lb: 'LU',
+}
+
 const languageNames = new Intl.DisplayNames([DISPLAY_LOCALE], { type: 'language' })
 
 /**
- * Choices of the spoken languages field
+ * Languages the team speaks most, listed first and in this order
+ * @type {{ code: string, label?: string }[]}
+ */
+
+const PRIORITY_LANGUAGES: { code: string; label?: string }[] = [
+  { code: 'fr' },
+  { code: 'fr-BE', label: 'Belge' },
+  { code: 'lb' },
+]
+
+/**
+ * One language as a picker option
+ * @param {string} code - Language code
+ * @param {string} [label] - Name when the locale data has none that fits
+ * @return {FieldOption} - Option
+ */
+
+const toLanguageOption = (code: string, label?: string): FieldOption => ({
+  value: code,
+  label: label ?? capitalizeFirstLetter(languageNames.of(code) ?? code),
+  hint: code.toUpperCase(),
+  flag: LANGUAGE_COUNTRIES[code],
+})
+
+/**
+ * Choices of the spoken languages field: the usual ones, a line, then the rest by name
  * @type {FieldOption[]}
  */
 
-export const LANGUAGE_OPTIONS: FieldOption[] = LANGUAGE_CODES.map((code) => ({
-  value: code,
-  label: capitalizeFirstLetter(languageNames.of(code) ?? code),
-  hint: code.toUpperCase(),
-})).sort((left, right) => left.label.localeCompare(right.label, DISPLAY_LOCALE))
+export const LANGUAGE_OPTIONS: FieldOption[] = [
+  ...PRIORITY_LANGUAGES.map(({ code, label }, index) => ({
+    ...toLanguageOption(code, label),
+    hasDividerAfter: index === PRIORITY_LANGUAGES.length - 1,
+  })),
+  ...LANGUAGE_CODES.map((code) => toLanguageOption(code)).sort((left, right) =>
+    left.label.localeCompare(right.label, DISPLAY_LOCALE)
+  ),
+]
 
 /**
  * Read the offset a zone stands at right now

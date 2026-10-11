@@ -234,13 +234,20 @@ export const ERASED_COPY = {
 } as const
 
 /**
- * Departure announcement template
- * @type {string}
+ * Departure announcement template per kind
+ * @type {Record<DepartureKindName, string>}
  */
 
-export const DEPARTURE_TEMPLATE = `# Départ de {username}
-**{username}** (\`{identifiant}\`) {verbe} de ses fonctions de {fonction} {emoji}.
-Nous le remercions pour son investissement et lui souhaitons une bonne continuation pour la suite !`
+export const DEPARTURE_TEMPLATES: Record<DepartureKindName, string> = {
+  [DepartureKinds.Dismissal]: `# Départ de {username}
+**{username}** (\`{identifiant}\`) {verbe} de ses fonctions de {fonction}. {emoji}
+
+Nous remercions sincèrement **{username}** pour l’investissement donné tout ce temps et lui souhaitons une bonne continuation.`,
+  [DepartureKinds.Resignation]: `# Départ de {username}
+**{username}** (\`{identifiant}\`) {verbe} de ses fonctions de {fonction}. {emoji}
+
+Nous remercions **{username}** pour son temps, ainsi que ses mois passés à nos côtés, et lui souhaitons une bonne continuation pour la suite.`,
+}
 
 /**
  * Verb of the announcement
@@ -248,8 +255,8 @@ Nous le remercions pour son investissement et lui souhaitons une bonne continuat
  */
 
 export const DEPARTURE_VERBS: Record<DepartureKindName, string> = {
-  [DepartureKinds.Dismissal]: 'a été **démis**',
-  [DepartureKinds.Resignation]: 'a **démissionné**',
+  [DepartureKinds.Dismissal]: 'a été destitué·e',
+  [DepartureKinds.Resignation]: 'a décidé de démissionner',
 }
 
 /**
@@ -259,7 +266,8 @@ export const DEPARTURE_VERBS: Record<DepartureKindName, string> = {
 
 export const DEPARTURE_EMOJIS: Readonly<Record<string, string>> = {
   Discord: '⚔️',
-  Lives: '🪓',
+  Lives: '🔨',
+  Animateurs: '🎉',
 }
 
 /**

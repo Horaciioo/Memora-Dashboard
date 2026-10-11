@@ -31,3 +31,12 @@ export const normaliseHex = (raw: string): string | null => {
         .join('')}`
     : `#${digits}`
 }
+
+/**
+ * Turn a stored colour aside from red and green when a vision mode asks for it
+ * @param {string} hex - Stored colour
+ * @return {string} - CSS colour, unchanged while no mode is on
+ */
+
+export const visionSafe = (hex: string): string =>
+  `oklch(from ${hex} l c calc(h + var(--vision-shift-green) * max(0, 1 - abs(h - 140) / 45) + var(--vision-shift-red) * max(0, 1 - abs(h - 25) / 30)))`

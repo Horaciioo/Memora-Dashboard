@@ -93,16 +93,6 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     },
   },
   {
-    key: 'legacy-self-functions',
-    grants: {},
-    // Only a Junior Responsable follows a track
-    functions: {
-      'Junior Responsable Discord': [Permissions.LegacySelf],
-      'Junior Responsable Lives': [Permissions.LegacySelf],
-      'Junior Responsable Animateurs': [Permissions.LegacySelf],
-    },
-  },
-  {
     key: 'integration-links',
     grants: {
       [MemberRoles.Admin]: [Permissions.IntegrationManage],

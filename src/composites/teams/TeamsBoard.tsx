@@ -196,6 +196,13 @@ export const TeamsBoard = ({
                         <header className={BOARD_STYLES.columnHead}>
                           <span className="flex min-w-0 flex-col gap-1">
                             <span className="truncate font-bold">{team.name}</span>
+                            {team.leads.length > 0 && (
+                              <span className="flex flex-wrap items-center gap-1.5">
+                                {team.leads.map((lead) => (
+                                  <Avatar key={lead.id} name={lead.name} src={lead.src} size="xs" />
+                                ))}
+                              </span>
+                            )}
                             {team.archived && (
                               <span className="flex flex-wrap items-center gap-1.5">
                                 <Status label={TEAM_COPY.archived} tone="neutral" icon="hidden" />
@@ -228,7 +235,7 @@ export const TeamsBoard = ({
                     {canManage && (
                       <AddRow
                         label={TEAM_COPY.add}
-                        tile
+                        tile="column"
                         onClick={() => openCreate(group.youtuberId)}
                         className="w-72! shrink-0"
                       />

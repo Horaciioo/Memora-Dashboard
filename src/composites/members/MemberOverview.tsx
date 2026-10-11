@@ -1,3 +1,4 @@
+import { AbsenceReason } from '@/components/elements/display/AbsenceReason'
 import { Section } from '@/components/structures/Section'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
@@ -53,7 +54,7 @@ export const MemberOverview = ({
     ? {
         icon: 'absences' as const,
         title: MEMBER_COPY.nowAbsent.replace('{date}', formatDay(current.endDate)),
-        meta: absenceReasonText(current),
+        meta: <AbsenceReason reason={absenceReasonText(current)} />,
       }
     : upcoming
       ? {
@@ -62,9 +63,9 @@ export const MemberOverview = ({
             '{range}',
             formatDayRange(upcoming.startDate, upcoming.endDate)
           ),
-          meta: absenceReasonText(upcoming),
+          meta: <AbsenceReason reason={absenceReasonText(upcoming)} />,
         }
-      : { icon: 'success' as const, title: MEMBER_COPY.nowFree, meta: null }
+      : { icon: 'history' as const, title: MEMBER_COPY.nowFree, meta: null }
 
   const SituationIcon = ICONS[situation.icon]
 
@@ -76,9 +77,10 @@ export const MemberOverview = ({
           className={cn(HOME_STYLES.line, HOME_STYLES.lineLink)}
           onClick={() => onNavigate('absences')}
         >
-          <span className={HOME_STYLES.chip}>
-            <SituationIcon className={HOME_STYLES.chipIcon} aria-hidden="true" />
-          </span>
+          <SituationIcon
+            className={cn(HOME_STYLES.chipIcon, 'shrink-0 text-[var(--color-ink-accent)]')}
+            aria-hidden="true"
+          />
           <span className={TASK_LIST.body}>
             <span className={TASK_LIST.title}>{situation.title}</span>
             {situation.meta && <span className={TASK_LIST.meta}>{situation.meta}</span>}

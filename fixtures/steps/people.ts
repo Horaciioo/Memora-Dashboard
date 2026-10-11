@@ -61,14 +61,6 @@ const slug = (name: string): string =>
     .toLowerCase()
 
 /**
- * French mobile number
- * @return {string} - Phone
- */
-
-const phone = (): string =>
-  `+33 6 ${Array.from({ length: 4 }, () => String(between(10, 99))).join(' ')}`
-
-/**
  * Division rank a status and seniority lead to
  * @param {Status} status - Membership status
  * @return {number | null} - Division rank
@@ -122,8 +114,6 @@ const writeAccount = async (
       discordId,
       discordUsername: anonymised ? null : handle,
       displayName: seed.name,
-      email: anonymised || chance(0.25) ? null : `${handle}@example.com`,
-      phone: anonymised || chance(0.45) ? null : phone(),
       birthday:
         anonymised || chance(0.15)
           ? null
@@ -318,7 +308,7 @@ const seedTeams = async (
           id,
           name: `${name} · ${creator.name}`,
           summary,
-          leadId: lead?.id ?? null,
+          leads: { create: lead ? [{ accountId: lead.id }] : [] },
           youtuberId: creator.id,
           archived: false,
           members: {

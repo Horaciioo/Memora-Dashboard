@@ -48,6 +48,7 @@ interface AcademyOption {
   label: string
   summary?: string
   accent: string
+  icon?: IconName
 }
 
 const SESSION_STATUS_MAP: Record<AcademySessionStatusName, AcademyOption> = {
@@ -120,10 +121,10 @@ const STEP_ANCHOR_MAP: Record<StepAnchorName, AcademyOption> = {
 export const STEP_ANCHOR_REGISTRY = createRegistry(STEP_ANCHOR_MAP)
 
 const STEP_OWNER_MAP: Record<StepOwnerName, AcademyOption> = {
-  [StepOwners.Responsable]: { label: 'Responsable', accent: 'warning' },
-  [StepOwners.Formateurs]: { label: 'Formateurs', accent: 'brand' },
-  [StepOwners.Both]: { label: 'Responsable + Formateurs', accent: 'info' },
-  [StepOwners.Junior]: { label: 'Junior', accent: 'success' },
+  [StepOwners.Responsable]: { label: 'Responsable', accent: 'warning', icon: 'flame' },
+  [StepOwners.Formateurs]: { label: 'Formateurs', accent: 'brand', icon: 'functionTrainer' },
+  [StepOwners.Both]: { label: 'Responsable + Formateurs', accent: 'info', icon: 'teams' },
+  [StepOwners.Junior]: { label: 'Junior', accent: 'success', icon: 'academy' },
 }
 
 export const STEP_OWNER_REGISTRY = createRegistry(STEP_OWNER_MAP)

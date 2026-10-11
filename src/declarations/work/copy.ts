@@ -31,6 +31,7 @@ export const PROJECT_COPY = {
   published: 'Publiée',
   draft: 'Brouillon',
   informations: 'Informations',
+  descriptionEmpty: 'Clique pour rédiger la description du projet.',
   teamTitle: 'Équipes',
   responsables: 'Responsables',
   assistants: 'Assistants',
@@ -53,7 +54,8 @@ export const PROJECT_FIELD_COPY = {
   title: 'Titre',
   emoji: 'Émoji',
   description: 'Description',
-  youtuber: 'YouTubeur concerné',
+  youtubers: 'YouTubeurs concernés',
+  youtubersEmpty: 'Aucun',
   state: 'État',
   priority: 'Priorité',
   platform: 'Plateforme',
@@ -78,7 +80,7 @@ export const PROJECT_FIELD_INFO = {
   description: 'Le contexte, l’objectif, et ce qu’on attend à la fin.',
   leads: 'Les personnes qui pilotent le projet et en répondent. Par défaut, toi.',
   assistants: 'Les modérateurs qui prêtent main-forte sans piloter.',
-  youtuber: 'Le créateur pour qui le projet est mené.',
+  youtubers: 'Les créateurs pour qui le projet est mené.',
   state: 'L’étape où en est le projet.',
   priority: 'L’urgence du projet par rapport aux autres.',
   platform: 'La plateforme où se déroule l’action principale du projet.',
@@ -104,6 +106,7 @@ export const TASK_COPY = {
   all: 'Toutes',
   overdue: 'En retard',
   informations: 'Aperçu',
+  descriptionEmpty: 'Clique pour rédiger la description de la tâche.',
   logsTitle: 'Journal',
   logsEmptyTitle: 'Aucun évènement pour le moment.',
   logsEmptyDescription: 'Les créations et modifications de la tâche apparaîtront ici.',
@@ -122,7 +125,8 @@ export const TASK_FIELD_COPY = {
   owner: 'Responsable de la tâche',
   state: 'État',
   priority: 'Priorité',
-  youtuber: 'YouTubeur concerné',
+  youtubers: 'YouTubeurs concernés',
+  youtubersEmpty: 'Aucun',
   project: 'Projet concerné',
 } as const
 
@@ -138,7 +142,7 @@ export const TASK_FIELD_INFO = {
   owner: 'La personne qui s’occupe de la tâche. Par défaut, toi.',
   state: 'L’étape où en est la tâche.',
   priority: 'L’urgence de la tâche par rapport aux autres.',
-  youtuber: 'Le créateur concerné par la tâche.',
+  youtubers: 'Les créateurs concernés par la tâche.',
   project: 'Le projet dont la tâche fait partie, s’il y en a un.',
 } as const
 
@@ -198,7 +202,8 @@ export const MEETING_FIELD_COPY = {
   durationMin: 'Durée en minutes',
   audience: 'Public attendu',
   state: 'État',
-  youtuber: 'YouTubeur concerné',
+  youtubers: 'YouTubeurs concernés',
+  youtubersEmpty: 'Aucun',
   project: 'Projet concerné',
   leads: 'Auditeurs principaux',
   assistants: 'Assistants',
@@ -224,7 +229,7 @@ export const MEETING_FIELD_INFO = {
   audience:
     'Toute l’équipe ou une équipe (Discord, Twitch) : la réunion s’affiche sur l’Accueil de chacun de ses membres. Personnalisé : seulement chez les personnes nommées.',
   state: 'L’étape où en est la réunion.',
-  youtuber: 'Le créateur concerné par la réunion.',
+  youtubers: 'Les créateurs concernés par la réunion.',
   project: 'Le projet dont on parle, s’il y en a un.',
   leads: 'Les personnes prévues pour prendre la parole majoritairement.',
   assistants: 'Les personnes qui épaulent les intervenants : notes, partage d’écran, minutage.',
@@ -298,4 +303,26 @@ export const WORK_DISCORD_COPY = {
   spoiler: 'Spoiler',
   mentionHint: 'Tape @ pour mentionner un membre ou un rôle, # pour un salon.',
   noMatch: 'Aucune correspondance',
+} as const
+
+/**
+ * Words raised by a deadline gone by
+ * @type {Record<string, string>}
+ */
+
+export const DEADLINE_COPY = {
+  project: 'Ce projet est hors deadline !',
+  task: 'Cette tâche est hors deadline !',
+  meeting: 'Cette réunion est hors deadline !',
+} as const
+
+/**
+ * Bubble beside a page holding late items of the member
+ * @type {Record<string, string>}
+ */
+
+export const DEADLINE_NUDGE_COPY = {
+  projects: 'Un de tes projets est hors deadline !',
+  tasks: 'Une de tes tâches est hors deadline !',
+  meetings: 'Une de tes réunions est hors deadline !',
 } as const

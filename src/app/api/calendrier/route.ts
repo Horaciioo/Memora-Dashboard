@@ -12,6 +12,7 @@ import {
 } from '@/core/services/calendar/CalendarService'
 import { assertRowsInScope } from '@/core/services/auth/ScopeService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
+import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
@@ -48,9 +49,10 @@ export const POST = createProtectedRoute({
   permission: Permissions.CalendarManage,
   status: 201,
   descriptor: { summary: 'Post an entry on the calendar', tags: ['calendar'] },
-  handler: async ({ raw, session, scope }) => {
+  handler: async ({ raw, session, access, scope }) => {
     const perimeter = await scope()
-    const parsed = parseFormValues(await calendarFields(perimeter), raw, { fillMissing: true })
+    const fields = await calendarFields(perimeter, workViewer(session, access))
+    const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     return createEntry(session.id, parsed.values, perimeter)
@@ -67,9 +69,11 @@ export const PATCH = createProtectedRoute({
     await assertRowsInScope('calendarEvent', ids, perimeter)
 
     // Only the keys actually sent are validated
-    const parsed = parseFormValues(await calendarFields(perimeter), raw, {
-      enforceRequired: false,
-    })
+    const parsed = parseFormValues(
+      await calendarFields(perimeter, workViewer(session, access)),
+      raw,
+      { enforceRequired: false }
+    )
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     return updateEntries(ids, parsed.values)

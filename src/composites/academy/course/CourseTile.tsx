@@ -13,8 +13,6 @@ export interface CourseTileProps {
   isSelected: boolean
   // Waiting for its ceremony
   isPending: boolean
-  // Specialisation not started yet
-  isFresh: boolean
   onSelect: () => void
 }
 
@@ -24,17 +22,11 @@ export interface CourseTileProps {
  * @return {JSX.Element}
  */
 
-export const CourseTile = ({
-  course,
-  isSelected,
-  isPending,
-  isFresh,
-  onSelect,
-}: CourseTileProps) => {
+export const CourseTile = ({ course, isSelected, isPending, onSelect }: CourseTileProps) => {
   const surface = COURSE_SURFACE_REGISTRY.get(course.surface)
   // A card waiting for its ceremony keeps its colours until the stamp lands
   const isDone = course.status === TrainingStatuses.Done && !isPending
-  const isInert = Boolean(course.isTour || course.isUnavailable)
+  const isInert = Boolean(course.isTour)
   const state = course.isUnavailable
     ? COURSE_COPY.unavailable
     : isDone
@@ -57,7 +49,6 @@ export const CourseTile = ({
           sizes="(min-width: 640px) 288px, 256px"
         />
         <span className={COURSE_CATALOG.tileShade} aria-hidden="true" />
-        {isFresh && !isDone && <span className={COURSE_CATALOG.tileTag}>{COURSE_COPY.newTag}</span>}
         <span className={COURSE_CATALOG.tileTitle}>{course.name}</span>
         {course.maturity && (
           <MaturityTag

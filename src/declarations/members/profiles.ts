@@ -29,7 +29,7 @@ export const ROLE_EMBLEMS: Record<
   // Holds no function
   [MemberRoles.Admin]: { glyph: AdminGlyph, tone: 'ADMIN', tinted: false },
   [MemberRoles.Responsable]: { glyph: ResponsableGlyph, tone: 'RESPONSABLE', tinted: true },
-  [MemberRoles.Moderateur]: { glyph: ModeratorGlyph, tone: 'brand', tinted: true },
+  [MemberRoles.Moderateur]: { glyph: ModeratorGlyph, tone: 'brand_MODERATOR', tinted: true },
   [MemberRoles.Junior]: { glyph: JuniorGlyph, tone: 'brand', tinted: true },
 }
 
@@ -76,6 +76,18 @@ export const FUNCTION_TINTS: Partial<Record<string, FrameTone>> = {
 }
 
 /**
+ * Paler tone worn by juniors
+ * @type {Partial<Record<FrameTone, FrameTone>>}
+ */
+
+const JUNIOR_TONES: Partial<Record<FrameTone, FrameTone>> = {
+  brand: 'brand_JUNIOR',
+  DISCORD: 'DISCORD_JUNIOR',
+  LIVE: 'LIVE_JUNIOR',
+  ANIMATOR: 'ANIMATOR_JUNIOR',
+}
+
+/**
  * Tint of a member's role glyph
  * @param {MemberSummary} member - Member to describe
  * @return {FrameTone} - Tint to paint
@@ -88,8 +100,9 @@ export const roleTone = (member: MemberSummary): FrameTone => {
   const lending = member.functions.find(
     (entry) => entry.kind === FunctionKinds.Primary && entry.icon && FUNCTION_TINTS[entry.icon]
   )
+  const tone = (lending?.icon && FUNCTION_TINTS[lending.icon]) || emblem.tone
 
-  return (lending?.icon && FUNCTION_TINTS[lending.icon]) || emblem.tone
+  return member.role === MemberRoles.Junior ? (JUNIOR_TONES[tone] ?? tone) : tone
 }
 
 /**

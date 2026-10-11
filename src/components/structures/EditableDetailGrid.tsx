@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FocusEvent, KeyboardEvent, ReactNode } from 'react'
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { FieldControl } from '@/components/elements/forms/FieldControl'
+import { isSameValue } from '@/core/lib/forms/compare'
 import { DETAIL_BLOCK } from '@/declarations/ui/blocks'
 import { DATE_COPY } from '@/declarations/ui/dates'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
@@ -103,6 +104,13 @@ export const EditableDetailGrid = ({
   }
 
   const commit = async (name: string, value: FieldValue, closeAfter: boolean) => {
+    // Nothing moved
+    if (isSameValue(values[name], value)) {
+      if (closeAfter) setEditing(null)
+
+      return
+    }
+
     setPending(true)
     const ok = await onCommit(name, value)
     setPending(false)
@@ -122,7 +130,7 @@ export const EditableDetailGrid = ({
         if (!field) {
           return (
             <div key={label} className={entryClass}>
-              <dt className={DETAIL_BLOCK.label}>{label}</dt>
+              {label && <dt className={DETAIL_BLOCK.label}>{label}</dt>}
               <dd className={display ? DETAIL_BLOCK.value : DETAIL_BLOCK.empty}>
                 {display ?? DATE_COPY.none}
               </dd>
@@ -158,7 +166,7 @@ export const EditableDetailGrid = ({
 
         return (
           <div key={field.name} className={entryClass}>
-            <dt className={DETAIL_BLOCK.label}>{label}</dt>
+            {label && <dt className={DETAIL_BLOCK.label}>{label}</dt>}
             {isEditing ? (
               <dd
                 ref={cellRef}

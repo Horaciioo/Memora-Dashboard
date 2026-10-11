@@ -26,7 +26,7 @@ export default async function ChangelogPage({ searchParams }: ChangelogPageProps
   const { access } = await requireUser()
   const { version } = await searchParams
   const asked = typeof version === 'string' ? version : undefined
-  const release = resolveRelease(changelogFor(access.can), asked)
+  const release = resolveRelease(changelogFor(access), asked)
 
   return (
     <div className={cn(PAGE_STYLES.wrapper, CHANGELOG_BOARD.page)}>

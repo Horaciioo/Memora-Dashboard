@@ -5,6 +5,7 @@ import { DivisionLogo } from '@/components/elements/display/DivisionLogo'
 import { FunctionEmblems } from '@/composites/members/MemberBadges'
 import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/roles'
 import { ERASED_COPY } from '@/declarations/academy/parkour'
+import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { divisionLogo, divisionMark } from '@/declarations/members/profiles'
 import { MEMBER_BLOCK, MEMBER_FILE } from '@/declarations/ui/blocks'
@@ -20,6 +21,7 @@ export interface MemberRailProps {
   summary: MemberSummary
   canEdit: boolean
   isLocked: boolean
+  isFrozen?: boolean
   onEditPortrait: () => void
   // Property groups
   children: ReactNode
@@ -31,6 +33,7 @@ export interface MemberRailProps {
  * @param {MemberSummary} summary - Row of the moderator
  * @param {boolean} canEdit - Viewer may change the file
  * @param {boolean} isLocked - Root account
+ * @param {boolean} [isFrozen] - Access shut
  * @param {() => void} onEditPortrait - Opens the identity form
  * @param {ReactNode} children - Property groups
  * @return {JSX.Element}
@@ -40,6 +43,7 @@ export const MemberRail = ({
   summary,
   canEdit,
   isLocked,
+  isFrozen,
   onEditPortrait,
   children,
 }: MemberRailProps) => {
@@ -85,6 +89,7 @@ export const MemberRail = ({
             {MEMBER_STATUS_REGISTRY.label(summary.status)}
           </span>
         )}
+        {isFrozen && <span className={MEMBER_FILE.departed}>{MEMBER_ADMIN_COPY.frozenDone}</span>}
         {summary.isAbsent && (
           <span className={MEMBER_FILE.status}>
             <AbsentIcon className={MEMBER_FILE.statusGlyph} aria-hidden="true" />

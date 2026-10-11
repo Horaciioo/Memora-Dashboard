@@ -54,11 +54,10 @@ export const FileTabs = ({ label, tabs, initial, value, onChange, centered }: Fi
   return (
     <>
       <Tabs
-        items={visible.map(({ value, label: tabLabel, icon, maturity }) => ({
+        items={visible.map(({ value, label: tabLabel, icon }) => ({
           value,
           label: tabLabel,
           icon,
-          maturity,
         }))}
         value={current?.value ?? ''}
         onChange={setTab}
