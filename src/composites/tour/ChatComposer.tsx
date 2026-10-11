@@ -87,6 +87,21 @@ export const ChatComposer = ({
         variant: 'success',
       },
       { key: 'no', label: TOUR_COPY.hurdleDetailNo, patch: { detail: false }, variant: 'danger' },
+      {
+        key: 'examples',
+        label: TOUR_COPY.hurdleExamples,
+        patch: { examples: true },
+        variant: 'secondary',
+      },
+    ],
+    // The member can stay silent at any moment
+    hurdleNote: [
+      {
+        key: 'quiet',
+        label: TOUR_COPY.hurdleKeepQuiet,
+        patch: { written: false },
+        variant: 'secondary',
+      },
     ],
     colorBlind: [
       {
@@ -102,8 +117,6 @@ export const ChatComposer = ({
 
   if (ask === 'theme' || ask === 'fontScale') return <LookChoices kind={ask} onAnswer={onAnswer} />
   if (ask === 'colorVision') return <VisionChoices onAnswer={onAnswer} />
-  // Written in the chat bar
-  if (ask === 'hurdleNote') return null
   if (ask === 'socials') return <SocialsReply fields={socialFields} onAnswer={onAnswer} />
 
   const clicks = choices[ask]

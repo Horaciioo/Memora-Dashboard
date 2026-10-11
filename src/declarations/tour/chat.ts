@@ -35,7 +35,7 @@ export type ChatStage = 'presentation' | 'information' | 'preferences'
 
 /**
  * Answer a turn waits for before it is played
- * @typedef {'birthday' | 'colorBlind' | 'notColorBlind' | 'colorFit' | 'colorNoFit' | 'noInstagram' | 'hurdle' | 'noHurdle' | 'detail' | 'noDetail'} ChatGate
+ * @typedef {'birthday' | 'colorBlind' | 'notColorBlind' | 'colorFit' | 'colorNoFit' | 'noInstagram' | 'hurdle' | 'detail' | 'examples' | 'written' | 'passed'} ChatGate
  */
 
 export type ChatGate =
@@ -46,9 +46,10 @@ export type ChatGate =
   | 'colorNoFit'
   | 'noInstagram'
   | 'hurdle'
-  | 'noHurdle'
   | 'detail'
-  | 'noDetail'
+  | 'examples'
+  | 'written'
+  | 'passed'
 
 /**
  * Memora's lines, then what she plays and the question she waits on
@@ -194,24 +195,31 @@ export const WELCOME_CHAT: ChatTurn[] = [
   {
     stage: 'information',
     say: [
-      'Très bien, les Responsables en sont notifiés.',
+      'Oui, pas de souci. Parmi les exemples que nous avons déjà rencontrés :',
+      '« Je suis atteint(e) de dyslexie sévère et de dysorthographie modérée. »',
+      '« Un problème de santé me force à être inactif(ve) après 2h de travail consécutives. »',
+      '« J’ai des troubles neurologiques. »',
+      'Et bien d’autres : dis-le avec tes propres mots.',
+      'Je sais que cela peut faire peur de dévoiler ceci. À tout moment, tu peux décider de ne rien dire et de passer à la suite.',
+    ],
+    ask: 'hurdleNote',
+    requires: 'examples',
+  },
+  {
+    stage: 'information',
+    say: [
+      'Merci, les Responsables en sont notifiés.',
       'Nous te remercions sincèrement pour ta franchise.',
       'On passe à la section suivante.',
     ],
     ask: null,
-    requires: 'detail',
+    requires: 'written',
   },
   {
     stage: 'information',
     say: ['Pas de souci, passons désormais à la section suivante.'],
     ask: null,
-    requires: 'noDetail',
-  },
-  {
-    stage: 'information',
-    say: ['Pas de souci, passons désormais à la section suivante.'],
-    ask: null,
-    requires: 'noHurdle',
+    requires: 'passed',
   },
   // Preferences
   {

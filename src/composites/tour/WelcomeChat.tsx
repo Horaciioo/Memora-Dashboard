@@ -149,7 +149,7 @@ export const WelcomeChat = ({
           </div>
         </div>
 
-        <ChatBar draft={draft} holdMs={holdMs} ask={ask} onSend={answer} />
+        <ChatBar draft={draft} holdMs={holdMs} ask={ask} onSend={(text) => answer(text, { written: true })} />
       </div>
     </div>
   )
