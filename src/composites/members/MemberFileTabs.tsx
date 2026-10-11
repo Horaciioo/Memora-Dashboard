@@ -39,6 +39,7 @@ import { HOME_STYLES, RECORD_ROW } from '@/declarations/ui/variants'
 import { MemberJourney } from '@/composites/members/MemberJourney'
 import { RoleGlyph } from '@/composites/members/MemberBadges'
 import { MemberOverview } from '@/composites/members/MemberOverview'
+import { NoteStamp } from '@/composites/members/NoteStamp'
 import { MemberRail } from '@/composites/members/MemberRail'
 import { MemberAdminTab } from '@/composites/members/admin/MemberAdminTab'
 import { DepartureMessageDialog } from '@/composites/members/admin/DepartureMessageDialog'
@@ -66,7 +67,7 @@ import { ErasedValue } from '@/composites/members/ErasedValue'
 import type { MemberAdminState, MemberDetail, MemberSocial } from '@/types/members'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { absenceReasonText } from '@/utils/format/absences'
-import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
+import { formatDay, formatDayRange } from '@/utils/format/dates'
 
 export interface MemberFileTabsProps {
   detail: MemberDetail
@@ -536,7 +537,7 @@ export const MemberFileTabs = ({
           {pinnedNotes.map((note) => (
             <article key={note.id} className={MEMBER_FILE.pinnedNote}>
               <span className={MEMBER_FILE.noteHead}>
-                {[note.authorName, formatDayTime(note.createdAt)].filter(Boolean).join(' · ')}
+                <NoteStamp note={note} />
               </span>
               <p className={MEMBER_FILE.noteBody}>{note.body}</p>
             </article>
@@ -601,7 +602,7 @@ export const MemberFileTabs = ({
               >
                 <span className={MEMBER_FILE.noteHead}>
                   {note.pinned && <Status label={MEMBER_COPY.notePin} tone="warning" icon="star" />}
-                  {[note.authorName, formatDayTime(note.createdAt)].filter(Boolean).join(' · ')}
+                  <NoteStamp note={note} />
                 </span>
                 <p className={MEMBER_FILE.noteBody}>{note.body}</p>
               </article>

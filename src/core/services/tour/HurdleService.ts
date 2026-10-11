@@ -1,6 +1,8 @@
 import 'server-only'
 
-import { addNote } from '@/core/services/members/MemberFileService'
+import { prisma } from '@/core/lib/db'
+import { encryptField } from '@/core/lib/crypto'
+import { readText } from '@/core/lib/forms/values'
 import { responsablesOf } from '@/core/services/calendar/MeetingRequestService'
 import { notify } from '@/core/services/system/NotificationService'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
@@ -23,7 +25,7 @@ export const HURDLE_FIELDS: FieldDefinition[] = [
 ]
 
 /**
- * Keep what the member shared as a note on their file and tell their responsables
+ * Keep what the member shared as a note of the system on their file and tell their responsables
  * @param {Object} member - Signed-in member
  * @param {string} member.id - Account identifier
  * @param {string[]} member.youtuberIds - Creators of the member
@@ -35,7 +37,13 @@ export const shareHurdle = async (
   member: { id: string; youtuberIds: string[] },
   values: FormValues
 ): Promise<void> => {
-  await addNote(member.id, member.id, values)
+  await prisma.accountNote.create({
+    data: {
+      accountId: member.id,
+      body: encryptField(readText(values, 'body')) ?? '',
+      system: true,
+    },
+  })
 
   const recipients = await responsablesOf(member.youtuberIds)
   if (recipients.length === 0) return

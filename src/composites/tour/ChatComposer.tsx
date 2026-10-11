@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { MultiSelect } from '@/components/elements/forms/MultiSelect'
 import { BirthdayPicker } from '@/composites/tour/BirthdayPicker'
-import { HurdleReply } from '@/composites/tour/HurdleReply'
 import { LookChoices } from '@/composites/tour/LookChoices'
 import { VisionChoices } from '@/composites/tour/VisionChoices'
 import { SocialsReply } from '@/composites/tour/SocialsReply'
@@ -80,6 +79,15 @@ export const ChatComposer = ({
       { key: 'yes', label: TOUR_COPY.hurdleYes, patch: { hurdle: true }, variant: 'secondary' },
       { key: 'no', label: TOUR_COPY.hurdleNo, patch: { hurdle: false }, variant: 'primary' },
     ],
+    hurdleDetail: [
+      {
+        key: 'yes',
+        label: TOUR_COPY.hurdleDetailYes,
+        patch: { detail: true },
+        variant: 'success',
+      },
+      { key: 'no', label: TOUR_COPY.hurdleDetailNo, patch: { detail: false }, variant: 'danger' },
+    ],
     colorBlind: [
       {
         key: 'yes',
@@ -94,7 +102,8 @@ export const ChatComposer = ({
 
   if (ask === 'theme' || ask === 'fontScale') return <LookChoices kind={ask} onAnswer={onAnswer} />
   if (ask === 'colorVision') return <VisionChoices onAnswer={onAnswer} />
-  if (ask === 'hurdleNote') return <HurdleReply onAnswer={onAnswer} />
+  // Written in the chat bar
+  if (ask === 'hurdleNote') return null
   if (ask === 'socials') return <SocialsReply fields={socialFields} onAnswer={onAnswer} />
 
   const clicks = choices[ask]

@@ -36,6 +36,9 @@ export const MEMBER_COPY = {
   noteField: 'Note',
   noteAdd: 'Ajouter une note',
   notePin: 'Épingler',
+  noteSystem: 'SYSTÈME',
+  noteSystemHint:
+    'Cette note a été automatiquement créée par Memora à la suite d’une demande d’informations.',
   noteUnpin: 'Désépingler',
   socialsTitle: 'Réseaux sociaux',
   socialsLead: 'Chacun ajoute et tient ses propres réseaux depuis sa fiche.',

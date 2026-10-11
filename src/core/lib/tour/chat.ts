@@ -9,6 +9,7 @@ import type { ChatGate, ChatTurn } from '@/declarations/tour/chat'
  * @property {boolean} [colorBlind] - Said they have a colour vision deficiency, asked only to route the talk
  * @property {boolean} [colorFit] - Found a colour mode that suits them, asked only to route the talk
  * @property {boolean} [instagram] - Gave the one network that is required, asked only to route the talk
+ * @property {boolean} [detail] - Can say which ones, asked only to route the talk
  * @property {boolean} [hurdle] - Has something that could slow their moderation, asked only to route the talk
  */
 
@@ -20,6 +21,7 @@ export interface IntakeAnswers {
   colorFit?: boolean
   instagram?: boolean
   hurdle?: boolean
+  detail?: boolean
 }
 
 // What each gate asks of the answers
@@ -32,6 +34,8 @@ const GATES: Record<ChatGate, (answers: IntakeAnswers) => boolean> = {
   noInstagram: (answers) => answers.instagram === false,
   hurdle: (answers) => answers.hurdle === true,
   noHurdle: (answers) => answers.hurdle === false,
+  detail: (answers) => answers.detail === true,
+  noDetail: (answers) => answers.detail === false,
 }
 
 /**

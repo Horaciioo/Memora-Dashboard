@@ -1,6 +1,6 @@
 /**
  * What Memora waits for after speaking
- * @typedef {'birthday' | 'celebrate' | 'languages' | 'socials' | 'hurdle' | 'hurdleNote' | 'colorBlind' | 'colorVision' | 'fontScale' | 'theme' | 'ready'} ChatAsk
+ * @typedef {'birthday' | 'celebrate' | 'languages' | 'socials' | 'hurdle' | 'hurdleDetail' | 'hurdleNote' | 'colorBlind' | 'colorVision' | 'fontScale' | 'theme' | 'ready'} ChatAsk
  */
 
 export type ChatAsk =
@@ -9,6 +9,7 @@ export type ChatAsk =
   | 'languages'
   | 'socials'
   | 'hurdle'
+  | 'hurdleDetail'
   | 'hurdleNote'
   | 'colorBlind'
   | 'colorVision'
@@ -34,7 +35,7 @@ export type ChatStage = 'presentation' | 'information' | 'preferences'
 
 /**
  * Answer a turn waits for before it is played
- * @typedef {'birthday' | 'colorBlind' | 'notColorBlind' | 'colorFit' | 'colorNoFit' | 'noInstagram' | 'hurdle' | 'noHurdle'} ChatGate
+ * @typedef {'birthday' | 'colorBlind' | 'notColorBlind' | 'colorFit' | 'colorNoFit' | 'noInstagram' | 'hurdle' | 'noHurdle' | 'detail' | 'noDetail'} ChatGate
  */
 
 export type ChatGate =
@@ -46,6 +47,8 @@ export type ChatGate =
   | 'noInstagram'
   | 'hurdle'
   | 'noHurdle'
+  | 'detail'
+  | 'noDetail'
 
 /**
  * Memora's lines, then what she plays and the question she waits on
@@ -176,7 +179,18 @@ export const WELCOME_CHAT: ChatTurn[] = [
     scene: 'privacy',
     ask: 'hurdle',
   },
-  { stage: 'information', say: [], ask: 'hurdleNote', requires: 'hurdle' },
+  {
+    stage: 'information',
+    say: ['Très bien, tu serais capable de me dire lesquelles ?'],
+    ask: 'hurdleDetail',
+    requires: 'hurdle',
+  },
+  {
+    stage: 'information',
+    say: ['D’accord, tu peux les écrire ci-dessous :'],
+    ask: 'hurdleNote',
+    requires: 'detail',
+  },
   {
     stage: 'information',
     say: [
@@ -185,7 +199,13 @@ export const WELCOME_CHAT: ChatTurn[] = [
       'On passe à la section suivante.',
     ],
     ask: null,
-    requires: 'hurdle',
+    requires: 'detail',
+  },
+  {
+    stage: 'information',
+    say: ['Pas de souci, passons désormais à la section suivante.'],
+    ask: null,
+    requires: 'noDetail',
   },
   {
     stage: 'information',

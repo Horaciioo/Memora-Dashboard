@@ -53,6 +53,11 @@ export const TOUR_CHAT = {
     'h-11 w-11 shrink-0 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)]',
   barBox:
     'flex min-w-0 flex-1 items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] py-2.5 pr-2.5 pl-4 shadow-[var(--shadow-sm)]',
+  // Open to the member's words: lit up, the same sunken card as the demonstration tasks
+  barBoxOpen:
+    'items-end border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] shadow-[var(--shadow-md)] ring-2 ring-[color-mix(in_oklab,var(--color-ink)_18%,transparent)]',
+  barField:
+    'min-w-0 flex-1 resize-none bg-transparent text-body outline-none placeholder:text-[var(--color-ink-subtle)] disabled:opacity-60',
   barText: 'min-w-0 flex-1 text-body',
   barPlaceholder: 'text-[var(--color-ink-subtle)]',
   barCaret: 'ml-px inline-block h-4 w-px translate-y-0.5 animate-pulse bg-[var(--color-ink)]',
@@ -128,7 +133,7 @@ export const TOUR_SPOTLIGHT = {
   // Clicks are swallowed by the panels, the frame only paints
   swallow: 'fixed z-[70]',
   frame:
-    'pointer-events-none fixed z-[70] rounded-[var(--radius-lg)] border-2 border-[var(--color-brand-600)] shadow-[0_0_0_100vmax_var(--color-scrim)] transition-[top,left,width,height] duration-[var(--motion-duration-base)]',
+    'pointer-events-none fixed z-[70] rounded-[var(--radius-lg)] shadow-[0_0_0_100vmax_var(--color-scrim)] transition-[top,left,width,height] duration-[var(--motion-duration-base)]',
   shield: 'fixed z-[71]',
   bubble:
     'surface-enter fixed z-[72] flex w-[var(--tour-bubble-w)] max-w-[calc(100vw-2rem)] flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel p-4 shadow-[var(--shadow-md)]',

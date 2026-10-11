@@ -32,8 +32,10 @@ export const TOUR_COPY = {
   socialNone: 'Je n’ai rien à partager',
   hurdleYes: 'Oui, j’en ai',
   hurdleNo: 'Non, c’est tout bon.',
+  hurdleDetailYes: 'Oui',
+  hurdleDetailNo: 'Non',
   hurdleLabel: 'Ce qui pourrait freiner ma modération',
-  hurdlePlaceholder: 'Écris ici ce que les Responsables doivent savoir…',
+  inputHurdlePlaceholder: 'Écris ce que tu as besoin d’écrire pour tes particularités…',
   privacyKicker: 'Confidentialité',
   privacy:
     'Je précise que ces informations seront entièrement confidentielles et internes à l’Administration qui est en charge du YouTubeur pour qui tu as postulé.',
