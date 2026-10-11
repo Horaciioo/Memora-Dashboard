@@ -1011,6 +1011,8 @@ model AccountNote {
   authorId  String?
   body      String
   pinned    Boolean  @default(false)
+  // Written by Memora itself, not by a member
+  system    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

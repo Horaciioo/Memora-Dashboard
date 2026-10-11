@@ -14,7 +14,7 @@ import type { FormValues } from '@/types/forms'
  * @return {Promise<string[]>} - Responsable identifiers
  */
 
-const responsablesOf = async (youtuberIds: string[]): Promise<string[]> => {
+export const responsablesOf = async (youtuberIds: string[]): Promise<string[]> => {
   const anchors = await prisma.youtuberLead.findMany({
     where: { youtuberId: { in: youtuberIds } },
     select: { accountId: true },

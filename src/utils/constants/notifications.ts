@@ -39,6 +39,7 @@ export const NOTIFICATION_KINDS = createEnumeration({
   LiveCoordinatorDeclined: { id: 30, label: 'Coordination refusée' },
   LiveCoordinatorGap: { id: 31, label: 'Coordinateur manquant' },
   MeetingRequested: { id: 32, label: 'Rendez-vous demandé' },
+  HurdleShared: { id: 33, label: 'Difficulté confiée' },
 })
 
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids

@@ -98,6 +98,7 @@ export interface MemberSummary {
  * @property {string} id - Note identifier
  * @property {string} body - Remark text
  * @property {boolean} pinned - Kept on top
+ * @property {boolean} system - Written by Memora itself
  * @property {string | null} authorName - Who wrote it
  * @property {string} createdAt - ISO timestamp
  */
@@ -106,6 +107,7 @@ export interface MemberNote {
   id: string
   body: string
   pinned: boolean
+  system: boolean
   authorName: string | null
   createdAt: string
 }

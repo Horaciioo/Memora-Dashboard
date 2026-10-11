@@ -5,6 +5,7 @@ import type { ReactNode, Ref } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { MemoraMark } from '@/components/elements/display/MemoraMark'
 import { NotifyDemo } from '@/composites/tour/NotifyDemo'
+import { PrivacyNote } from '@/composites/tour/PrivacyNote'
 import { TourLoader } from '@/composites/tour/TourLoader'
 import type { ChatLine } from '@/core/hooks/interaction/useWelcomeChat'
 import { TOUR_COPY } from '@/declarations/tour/copy'
@@ -83,11 +84,9 @@ export const ChatPanel = ({
                   {group.lines.map((line, position) =>
                     line.scene ? (
                       <div key={position} className={TOUR_CHAT.scene}>
-                        {line.scene === 'notify' ? (
-                          <NotifyDemo />
-                        ) : (
-                          <TourLoader onReady={onReady} />
-                        )}
+                        {line.scene === 'notify' && <NotifyDemo />}
+                        {line.scene === 'privacy' && <PrivacyNote />}
+                        {line.scene === 'loading' && <TourLoader onReady={onReady} />}
                       </div>
                     ) : (
                       <p key={position} className={TOUR_CHAT.line}>

@@ -53,6 +53,11 @@ export const TOUR_CHAT = {
     'h-11 w-11 shrink-0 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)]',
   barBox:
     'flex min-w-0 flex-1 items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] py-2.5 pr-2.5 pl-4 shadow-[var(--shadow-sm)]',
+  // Open to the member's words: it glows until the pointer reaches it, then grows with the text like Discord's
+  barBoxOpen: 'items-end border-[var(--color-border-strong)]',
+  barGlow: 'tour-glow',
+  barField:
+    'max-h-[40dvh] min-w-0 flex-1 resize-none self-center border-0 bg-transparent text-body outline-none focus-visible:border-transparent focus-visible:shadow-none focus-visible:outline-none placeholder:text-[var(--color-ink-subtle)] disabled:opacity-60',
   barText: 'min-w-0 flex-1 text-body',
   barPlaceholder: 'text-[var(--color-ink-subtle)]',
   barCaret: 'ml-px inline-block h-4 w-px translate-y-0.5 animate-pulse bg-[var(--color-ink)]',
@@ -103,6 +108,14 @@ export const TOUR_DECK = {
   demoRefusal:
     'surface-enter flex items-start gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-brand-soft)] px-3 py-2 text-body',
   demoMark: 'h-6 w-6 shrink-0',
+  // Same card as the news one on the home, in red
+  privacy:
+    'relative isolate flex items-start gap-3 overflow-hidden rounded-[var(--radius-lg)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-danger)_55%,white)] via-[color-mix(in_srgb,var(--color-danger)_85%,white)] to-[var(--color-danger)] px-4 py-3 text-white shadow-[var(--shadow-md)] ring-1 ring-white/40 ring-inset',
+  privacySheen:
+    'pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-white/40 to-transparent',
+  privacyBody: 'relative flex min-w-0 flex-1 flex-col',
+  privacyKicker: 'text-micro font-bold tracking-wide text-white/80 uppercase',
+  privacyText: 'text-body leading-snug font-semibold',
   loader: 'flex flex-col gap-2',
   loaderTrack: 'h-1.5 overflow-hidden rounded-full bg-[var(--color-surface-sunken)]',
   loaderFill:
@@ -120,7 +133,7 @@ export const TOUR_SPOTLIGHT = {
   // Clicks are swallowed by the panels, the frame only paints
   swallow: 'fixed z-[70]',
   frame:
-    'pointer-events-none fixed z-[70] rounded-[var(--radius-lg)] border-2 border-[var(--color-brand-600)] shadow-[0_0_0_100vmax_var(--color-scrim)] transition-[top,left,width,height] duration-[var(--motion-duration-base)]',
+    'pointer-events-none fixed z-[70] rounded-[var(--radius-lg)] shadow-[0_0_0_100vmax_var(--color-scrim)] transition-[top,left,width,height] duration-[var(--motion-duration-base)]',
   shield: 'fixed z-[71]',
   bubble:
     'surface-enter fixed z-[72] flex w-[var(--tour-bubble-w)] max-w-[calc(100vw-2rem)] flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel p-4 shadow-[var(--shadow-md)]',

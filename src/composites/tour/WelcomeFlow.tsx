@@ -11,7 +11,7 @@ import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 
 // Answers that only routed the talk
-const ROUTING_ANSWERS = ['colorBlind', 'colorFit', 'instagram']
+const ROUTING_ANSWERS = ['colorBlind', 'colorFit', 'instagram', 'hurdle', 'detail', 'examples', 'written']
 
 /**
  * First connection: one conversation with Memora, then the pages

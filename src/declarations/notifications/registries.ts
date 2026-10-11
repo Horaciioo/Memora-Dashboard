@@ -95,6 +95,14 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     verb: 'demandé',
     trail: 'un rendez-vous',
   },
+  HurdleShared: {
+    label: 'Suivi',
+    tone: 'caution',
+    icon: 'members',
+    lead: 't’a',
+    verb: 'confié',
+    trail: 'une difficulté',
+  },
   LiveAnnounced: {
     label: 'Live',
     tone: 'danger',
