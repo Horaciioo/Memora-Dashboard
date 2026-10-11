@@ -319,6 +319,10 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Amélioration de la visite de Memora : une courte pause avant chaque nouvelle étape de la discussion',
       },
       {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la possibilité de signaler en fin de visite ce qui pourrait freiner sa modération, avec des exemples ou en restant discret, la réponse rejoignant la fiche du modérateur sous une note « SYSTÈME »',
+      },
+      {
         tag: ChangelogTags.Fixed,
         page: ROUTES.calendar,
         text: 'Correction d’un bug qui empêchait la bulle du jour dans le mini-calendrier de s’afficher correctement',
