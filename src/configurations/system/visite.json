@@ -12,5 +12,9 @@
   "bubbleHeightPx": 220,
   "graceMs": 700,
   "minAgeYears": 12,
-  "maxAgeYears": 90
+  "maxAgeYears": 90,
+  "demoBeats": 3,
+  "paneInsetPx": 12,
+  "photoSharePercent": 40,
+  "stageHoldMs": 4000
 }

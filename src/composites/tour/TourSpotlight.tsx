@@ -28,13 +28,17 @@ export const TourSpotlight = ({ rect, isInteractive }: TourSpotlightProps) => {
 
   return (
     <div aria-hidden="true">
-      <span className={TOUR_SPOTLIGHT.dim} style={{ top: 0, left: 0, right: 0, height: top }} />
+      <span className={TOUR_SPOTLIGHT.frame} style={hole} />
+      <span className={TOUR_SPOTLIGHT.swallow} style={{ top: 0, left: 0, right: 0, height: top }} />
       <span
-        className={TOUR_SPOTLIGHT.dim}
+        className={TOUR_SPOTLIGHT.swallow}
         style={{ top: top + height, left: 0, right: 0, bottom: 0 }}
       />
-      <span className={TOUR_SPOTLIGHT.dim} style={{ top, left: 0, width: left, height }} />
-      <span className={TOUR_SPOTLIGHT.dim} style={{ top, left: left + width, right: 0, height }} />
+      <span className={TOUR_SPOTLIGHT.swallow} style={{ top, left: 0, width: left, height }} />
+      <span
+        className={TOUR_SPOTLIGHT.swallow}
+        style={{ top, left: left + width, right: 0, height }}
+      />
       {!isInteractive && <span className={TOUR_SPOTLIGHT.shield} style={hole} />}
     </div>
   )
