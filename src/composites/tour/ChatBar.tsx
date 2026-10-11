@@ -31,7 +31,7 @@ export interface ChatBarProps {
  */
 
 export const ChatBar = ({ draft, holdMs, ask, onSend }: ChatBarProps) => {
-  const isOpen = ask === 'hurdleNote'
+  const isOpen = ask === 'hurdleNote' || ask === 'hurdleWrite'
   const isWriting = draft.length > 0
   const field = useRef<HTMLTextAreaElement>(null)
   const [text, setText] = useState('')

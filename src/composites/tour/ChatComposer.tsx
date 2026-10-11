@@ -96,8 +96,22 @@ export const ChatComposer = ({
         wayOut: true,
       },
     ],
-    // The member can stay silent at any moment
+    // The member can see examples first, and stay silent at any moment
     hurdleNote: [
+      {
+        key: 'examples',
+        label: TOUR_COPY.hurdleExamples,
+        patch: { examples: true },
+        wayOut: true,
+      },
+      {
+        key: 'quiet',
+        label: TOUR_COPY.hurdleKeepQuiet,
+        patch: { written: false },
+        wayOut: true,
+      },
+    ],
+    hurdleWrite: [
       {
         key: 'quiet',
         label: TOUR_COPY.hurdleKeepQuiet,

@@ -1,6 +1,6 @@
 /**
  * What Memora waits for after speaking
- * @typedef {'birthday' | 'celebrate' | 'languages' | 'socials' | 'hurdle' | 'hurdleDetail' | 'hurdleNote' | 'colorBlind' | 'colorVision' | 'fontScale' | 'theme' | 'ready'} ChatAsk
+ * @typedef {'birthday' | 'celebrate' | 'languages' | 'socials' | 'hurdle' | 'hurdleDetail' | 'hurdleNote' | 'hurdleWrite' | 'colorBlind' | 'colorVision' | 'fontScale' | 'theme' | 'ready'} ChatAsk
  */
 
 export type ChatAsk =
@@ -11,6 +11,8 @@ export type ChatAsk =
   | 'hurdle'
   | 'hurdleDetail'
   | 'hurdleNote'
+  // Same, once the examples were shown
+  | 'hurdleWrite'
   | 'colorBlind'
   | 'colorVision'
   | 'fontScale'
@@ -202,7 +204,7 @@ export const WELCOME_CHAT: ChatTurn[] = [
       'Et bien d’autres : dis-le avec tes propres mots.',
       'Je sais que cela peut faire peur de dévoiler ceci. À tout moment, tu peux décider de ne rien dire et de passer à la suite.',
     ],
-    ask: 'hurdleNote',
+    ask: 'hurdleWrite',
     requires: 'examples',
   },
   {

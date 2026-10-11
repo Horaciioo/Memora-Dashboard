@@ -34,7 +34,7 @@ export const TOUR_COPY = {
   hurdleNo: 'Non, c’est tout bon.',
   hurdleDetailYes: 'Oui',
   hurdleDetailNo: 'Non',
-  hurdleExamples: 'D’abord, montre-moi des exemples s’il te plaît',
+  hurdleExamples: 'Montre-moi des exemples d’abord',
   hurdleKeepQuiet: 'Je préfère ne rien dire',
   hurdleLabel: 'Ce qui pourrait freiner ma modération',
   inputHurdlePlaceholder: 'Écris ce que tu as besoin d’écrire pour tes particularités…',
