@@ -127,6 +127,234 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.3.0',
+    date: '2026-10-11',
+    title: 'Memora s’améliore !',
+    intro:
+      'Les responsables gèrent désormais un départ, un gel d’accès ou une suspension depuis la fiche d’un modérateur, et chacun voit plus vite ce qui est en retard.',
+    description:
+      'Jusqu’ici, les gestes lourds sur un modérateur se faisaient hors de Memora, et un projet, une tâche ou une réunion ne pouvait concerner qu’un seul créateur. Cette version regroupe ces gestes dans la fiche du modérateur, permet de rattacher plusieurs créateurs et plusieurs chaînes, et signale les éléments en retard avant qu’ils ne passent inaperçus.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Ajout d’un onglet « Admin » dans la fiche d’un modérateur, qui réunit les gestes lourds au même endroit',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Ajout de la possibilité de geler et de dégeler l’accès d’un modérateur sans toucher à sa fiche',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Ajout de la possibilité d’enregistrer le départ d’un modérateur, par dérank ou par démission, avec un message de départ prêt à copier pour Discord',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Ajout de la possibilité de suspendre un modérateur des lives, pour une durée choisie ou définitivement, puis de lever la suspension',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberDelete,
+        text: 'Ajout de la possibilité de supprimer la fiche d’un modérateur',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CalendarManage,
+        text: 'Ajout de la possibilité de réserver un évènement du « Calendrier » à une équipe, ou aux seuls responsables de cette équipe',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.teams,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.TeamRead,
+        text: 'Ajout de la possibilité d’associer plusieurs chaînes à un créateur, y compris plusieurs sur la même plateforme',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.projects,
+        text: 'Ajout de la possibilité de rattacher plusieurs créateurs, ou aucun, à un projet, une tâche ou une réunion',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.projects,
+        text: 'Ajout d’une marque rouge « hors deadline » sur tout projet, toute tâche ou toute réunion dont la date limite est dépassée',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une bulle à côté de « Projets », « Tâches » ou « Réunions » dans la barre latérale quand un de tes éléments est en retard',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la possibilité de retrouver tes dernières recherches en ouvrant la recherche',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de l’identifiant de chaque projet, tâche, réunion et créateur sur sa fiche, copiable d’un clic',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Amélioration de la fiche d’un modérateur : l’état de son accès, ses sanctions et sa suspension en cours se lisent d’un coup d’œil',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberDelete,
+        text: 'Amélioration de la suppression d’un modérateur : il n’est plus possible de se supprimer soi-même ni de supprimer un rang supérieur',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Amélioration de la vue d’un modérateur sur les lives : temps en Mod View, temps actif et lives rejoints sur les derniers jours sont réunis dans une même box',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la protection des données : l’adresse mail et le numéro de téléphone ne sont plus demandés ni affichés sur les fiches',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la confidentialité de la recherche : les dernières recherches sont propres à chaque compte',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        text: 'Amélioration de la réponse à un évènement du « Calendrier » : une fois répondu, un message le confirme et un bouton « Je change d’avis » permet de modifier',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CalendarManage,
+        text: 'Amélioration de la visibilité d’un évènement du « Calendrier » : « Responsables et plus » devient « Administration entière », avec un glyphe par niveau',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.teams,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.TeamRead,
+        text: 'Amélioration de la page d’un créateur : la section « Responsables ancrés » devient « Administration » et accueille aussi les administrateurs',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.projects,
+        text: 'Amélioration visuelle de la fiche d’un projet : description dans une box, propriétés sur une colonne et contenu sur l’autre',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.projects,
+        text: 'Amélioration de la fiche d’une tâche et d’un projet : la description se rédige directement en cliquant dessus',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.sanctions,
+        text: 'Amélioration de la fiche d’une infraction, désormais sur deux colonnes : gravité et livecon à gauche, commandes et raison suggérée à droite',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.absences,
+        text: 'Amélioration visuelle de la raison d’une absence, lisible dans une petite box en italique',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.journal,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Amélioration du « Journal » : une action longue ouvre son détail champ par champ via « Voir le détail », et les erreurs rencontrées y figurent aussi',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des calendriers de date : un clic sur le mois ouvre le choix du mois et de l’année, et l’anniversaire s’ouvre sur une année de naissance réaliste',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.trainings,
+        text: 'Amélioration du catalogue « Formations » : le rôle concerné s’affiche par un glyphe et la mention « Nouveau » disparaît',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration des étapes du « Recrutement » : le rôle concerné se repère par un glyphe',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        text: 'Amélioration de la fiche d’un modérateur : les drapeaux des langues parlées s’affichent à côté de leur nom',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.meetings,
+        text: 'Amélioration des droits sur les réunions : le contenu rédigé (introduction, sujets, compte rendu) n’est lu que par ceux qui y ont droit',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la visite de Memora : l’accueil devient une vraie discussion avec Memora, à côté de la photo du créateur de l’équipe',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la visite de Memora : l’accueil se déroule en trois étapes, avec les préférences, les réseaux sociaux et le daltonisme demandés au fil de la discussion',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la visite de Memora : une courte pause avant chaque nouvelle étape de la discussion',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        text: 'Correction d’un bug qui empêchait la bulle du jour dans le mini-calendrier de s’afficher correctement',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        text: 'Correction d’un bug qui empêchait les rails de sélection du « Calendrier » d’afficher uniquement les informations du YouTubeur sélectionné',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Correction d’un bug qui empêchait de supprimer un identifiant placé par erreur sur la mauvaise personne',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberDelete,
+        text: 'Correction d’un bug qui empêchait de supprimer un modérateur',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui laissait un modérateur dont l’accès avait été coupé ouvrir une nouvelle session',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.journal,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Correction d’un bug qui rendait certaines phrases du « Journal » ambiguës quand elles concernaient un sujet de réunion',
+      },
+    ],
+  },
+  {
     version: '0.2.0',
     date: '2026-10-08',
     title: 'Un calendrier plus clair',
