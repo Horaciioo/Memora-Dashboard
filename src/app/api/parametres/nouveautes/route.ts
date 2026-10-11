@@ -3,6 +3,7 @@ import { readText } from '@/core/lib/forms/values'
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
+import { releaseSeenKey } from '@/declarations/changelog/helpers'
 import { CHANGELOG_RELEASES } from '@/declarations/changelog/releases'
 import { SEEN_RELEASE_FIELDS } from '@/declarations/changelog/fields'
 
@@ -13,7 +14,7 @@ export const POST = createProtectedRoute({
     const version = readText(body, 'version')
 
     // Only published notes
-    if (!CHANGELOG_RELEASES.some((release) => release.version === version)) {
+    if (!CHANGELOG_RELEASES.some((release) => releaseSeenKey(release) === version)) {
       throw invalidInput([{ field: 'version', message: CHANGELOG_COPY.unknownVersion }])
     }
 
