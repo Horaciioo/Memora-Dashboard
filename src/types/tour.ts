@@ -4,12 +4,14 @@ import type { FieldDefinition } from '@/types/forms'
  * Creator the visit puts a face on
  * @typedef {Object} TourCreator
  * @property {string} name - Creator name
- * @property {string | null} avatarUrl - Portrait
+ * @property {string | null} avatarUrl - Logo
+ * @property {string | null} bannerUrl - Tall banner
  */
 
 export interface TourCreator {
   name: string
   avatarUrl: string | null
+  bannerUrl: string | null
 }
 
 /**
