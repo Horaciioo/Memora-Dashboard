@@ -17,3 +17,25 @@
 .tour-unlock {
   animation: tour-unlock var(--motion-duration-slow) var(--motion-ease-spring) both;
 }
+
+@keyframes tour-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-ink) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-ink) 16%, transparent),
+      0 0 18px 2px color-mix(in oklab, var(--color-ink) 22%, transparent);
+  }
+}
+
+.tour-glow {
+  animation: tour-glow 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-glow {
+    animation: none;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ink) 18%, transparent);
+  }
+}

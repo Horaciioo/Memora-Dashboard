@@ -53,11 +53,11 @@ export const TOUR_CHAT = {
     'h-11 w-11 shrink-0 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)]',
   barBox:
     'flex min-w-0 flex-1 items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] py-2.5 pr-2.5 pl-4 shadow-[var(--shadow-sm)]',
-  // Open to the member's words: lit up, the same sunken card as the demonstration tasks
-  barBoxOpen:
-    'items-end border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] shadow-[var(--shadow-md)] ring-2 ring-[color-mix(in_oklab,var(--color-ink)_18%,transparent)]',
+  // Open to the member's words: it glows until the pointer reaches it, then grows with the text like Discord's
+  barBoxOpen: 'items-end border-[var(--color-border-strong)]',
+  barGlow: 'tour-glow',
   barField:
-    'min-w-0 flex-1 resize-none bg-transparent text-body outline-none placeholder:text-[var(--color-ink-subtle)] disabled:opacity-60',
+    'max-h-[40dvh] min-w-0 flex-1 resize-none self-center bg-transparent text-body outline-none placeholder:text-[var(--color-ink-subtle)] disabled:opacity-60',
   barText: 'min-w-0 flex-1 text-body',
   barPlaceholder: 'text-[var(--color-ink-subtle)]',
   barCaret: 'ml-px inline-block h-4 w-px translate-y-0.5 animate-pulse bg-[var(--color-ink)]',
