@@ -57,7 +57,7 @@ export const TOUR_CHAT = {
   barBoxOpen: 'items-end border-[var(--color-border-strong)]',
   barGlow: 'tour-glow',
   barField:
-    'max-h-[40dvh] min-w-0 flex-1 resize-none self-center bg-transparent text-body outline-none placeholder:text-[var(--color-ink-subtle)] disabled:opacity-60',
+    'max-h-[40dvh] min-w-0 flex-1 resize-none self-center border-0 bg-transparent text-body outline-none focus-visible:border-transparent focus-visible:shadow-none focus-visible:outline-none placeholder:text-[var(--color-ink-subtle)] disabled:opacity-60',
   barText: 'min-w-0 flex-1 text-body',
   barPlaceholder: 'text-[var(--color-ink-subtle)]',
   barCaret: 'ml-px inline-block h-4 w-px translate-y-0.5 animate-pulse bg-[var(--color-ink)]',
