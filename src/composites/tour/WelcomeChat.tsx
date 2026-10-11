@@ -63,6 +63,9 @@ export const WelcomeChat = ({
   const markReady = useCallback(() => setReady(true), [])
   useScrollLock(true)
 
+  // The banner suits the tall frame, the logo only stands in without one
+  const portrait = creator?.bannerUrl ?? creator?.avatarUrl ?? null
+
   const current = TOUR_STAGES.findIndex((step) => step.key === stage)
   const shown = looking?.from === stage ? looking.index : current
 
@@ -81,11 +84,10 @@ export const WelcomeChat = ({
       style={STAGE_VARS}
     >
       <figure className={TOUR_CHAT.figure}>
-        {creator?.avatarUrl ? (
+        {portrait ? (
           <>
-            {/* The portrait comes from the session guarded file route */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={creator.avatarUrl} alt="" className={TOUR_CHAT.figureImage} />
+            <img src={portrait} alt="" className={TOUR_CHAT.figureImage} />
             <span className={TOUR_CHAT.figureShade} aria-hidden="true" />
           </>
         ) : (

@@ -11,7 +11,7 @@ import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import type { TourCreator, TourState } from '@/types/tour'
 
 // Fields the visit reads on a creator
-const CREATOR_SELECT = { name: true, avatarUrl: true } as const
+const CREATOR_SELECT = { name: true, avatarUrl: true, bannerUrl: true } as const
 
 /**
  * Creator the visit shows: the member's own, else the first one of the team
