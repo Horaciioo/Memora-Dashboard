@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { MultiSelect } from '@/components/elements/forms/MultiSelect'
 import { BirthdayPicker } from '@/composites/tour/BirthdayPicker'
+import { HurdleReply } from '@/composites/tour/HurdleReply'
 import { LookChoices } from '@/composites/tour/LookChoices'
 import { VisionChoices } from '@/composites/tour/VisionChoices'
 import { SocialsReply } from '@/composites/tour/SocialsReply'
@@ -75,6 +76,10 @@ export const ChatComposer = ({
         variant: 'danger',
       },
     ],
+    hurdle: [
+      { key: 'yes', label: TOUR_COPY.hurdleYes, patch: { hurdle: true }, variant: 'secondary' },
+      { key: 'no', label: TOUR_COPY.hurdleNo, patch: { hurdle: false }, variant: 'primary' },
+    ],
     colorBlind: [
       {
         key: 'yes',
@@ -89,6 +94,7 @@ export const ChatComposer = ({
 
   if (ask === 'theme' || ask === 'fontScale') return <LookChoices kind={ask} onAnswer={onAnswer} />
   if (ask === 'colorVision') return <VisionChoices onAnswer={onAnswer} />
+  if (ask === 'hurdleNote') return <HurdleReply onAnswer={onAnswer} />
   if (ask === 'socials') return <SocialsReply fields={socialFields} onAnswer={onAnswer} />
 
   const clicks = choices[ask]

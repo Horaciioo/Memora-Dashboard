@@ -161,6 +161,7 @@ export const API_ROUTES = {
   profile: '/api/parametres',
   displayPreferences: '/api/parametres/affichage',
   tourIntake: '/api/parametres/visite',
+  tourHurdle: '/api/parametres/visite/difficulte',
   meetingRequests: '/api/calendrier/demandes',
   board: '/api/tableau',
   search: '/api/recherche',

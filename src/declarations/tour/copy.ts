@@ -30,6 +30,13 @@ export const TOUR_COPY = {
   socialAdd: 'Ajouter ce réseau',
   socialDone: 'Continuer',
   socialNone: 'Je n’ai rien à partager',
+  hurdleYes: 'Oui, j’en ai',
+  hurdleNo: 'Non, c’est tout bon.',
+  hurdleLabel: 'Ce qui pourrait freiner ma modération',
+  hurdlePlaceholder: 'Écris ici ce que les Responsables doivent savoir…',
+  privacyKicker: 'Confidentialité',
+  privacy:
+    'Je précise que ces informations seront entièrement confidentielles et internes à l’Administration qui est en charge du YouTubeur pour qui tu as postulé.',
   sample: 'Aa',
   ready: 'C’est parti',
   timelineLabel: 'Étapes de la discussion',

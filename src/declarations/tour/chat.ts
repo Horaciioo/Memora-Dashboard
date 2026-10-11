@@ -1,6 +1,6 @@
 /**
  * What Memora waits for after speaking
- * @typedef {'birthday' | 'celebrate' | 'languages' | 'socials' | 'colorBlind' | 'colorVision' | 'fontScale' | 'theme' | 'ready'} ChatAsk
+ * @typedef {'birthday' | 'celebrate' | 'languages' | 'socials' | 'hurdle' | 'hurdleNote' | 'colorBlind' | 'colorVision' | 'fontScale' | 'theme' | 'ready'} ChatAsk
  */
 
 export type ChatAsk =
@@ -8,6 +8,8 @@ export type ChatAsk =
   | 'celebrate'
   | 'languages'
   | 'socials'
+  | 'hurdle'
+  | 'hurdleNote'
   | 'colorBlind'
   | 'colorVision'
   | 'fontScale'
@@ -18,10 +20,10 @@ export type ChatAsk =
 
 /**
  * Something Memora plays inside the thread between two messages
- * @typedef {'notify' | 'loading'} ChatScene
+ * @typedef {'notify' | 'privacy' | 'loading'} ChatScene
  */
 
-export type ChatScene = 'notify' | 'loading'
+export type ChatScene = 'notify' | 'privacy' | 'loading'
 
 /**
  * Part of the welcome a turn belongs to
@@ -32,11 +34,18 @@ export type ChatStage = 'presentation' | 'information' | 'preferences'
 
 /**
  * Answer a turn waits for before it is played
- * @typedef {'birthday' | 'colorBlind' | 'notColorBlind' | 'colorFit' | 'colorNoFit' | 'noInstagram'} ChatGate
+ * @typedef {'birthday' | 'colorBlind' | 'notColorBlind' | 'colorFit' | 'colorNoFit' | 'noInstagram' | 'hurdle' | 'noHurdle'} ChatGate
  */
 
 export type ChatGate =
-  'birthday' | 'colorBlind' | 'notColorBlind' | 'colorFit' | 'colorNoFit' | 'noInstagram'
+  | 'birthday'
+  | 'colorBlind'
+  | 'notColorBlind'
+  | 'colorFit'
+  | 'colorNoFit'
+  | 'noInstagram'
+  | 'hurdle'
+  | 'noHurdle'
 
 /**
  * Memora's lines, then what she plays and the question she waits on
@@ -155,6 +164,34 @@ export const WELCOME_CHAT: ChatTurn[] = [
     ],
     ask: null,
     requires: 'noInstagram',
+  },
+  {
+    stage: 'information',
+    say: [
+      'Désormais, je vais te poser une question un poil délicate.',
+      'Tu n’es bien évidemment pas obligé(e) d’y répondre. C’est simplement pour affiner et améliorer notre accompagnement vis-à-vis de toi, et de tes potentiels troubles.',
+      'Donc, tu l’auras deviné : disposes-tu de problématiques particulières qui pourraient freiner ta modération ?',
+      'Si tu ne souhaites pas y répondre, clique sur « Non, c’est tout bon. »',
+    ],
+    scene: 'privacy',
+    ask: 'hurdle',
+  },
+  { stage: 'information', say: [], ask: 'hurdleNote', requires: 'hurdle' },
+  {
+    stage: 'information',
+    say: [
+      'Très bien, les Responsables en sont notifiés.',
+      'Nous te remercions sincèrement pour ta franchise.',
+      'On passe à la section suivante.',
+    ],
+    ask: null,
+    requires: 'hurdle',
+  },
+  {
+    stage: 'information',
+    say: ['Pas de souci, passons désormais à la section suivante.'],
+    ask: null,
+    requires: 'noHurdle',
   },
   // Preferences
   {

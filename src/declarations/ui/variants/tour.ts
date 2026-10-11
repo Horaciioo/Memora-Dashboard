@@ -103,6 +103,14 @@ export const TOUR_DECK = {
   demoRefusal:
     'surface-enter flex items-start gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-brand-soft)] px-3 py-2 text-body',
   demoMark: 'h-6 w-6 shrink-0',
+  // Same card as the news one on the home, in red
+  privacy:
+    'relative isolate flex items-start gap-3 overflow-hidden rounded-[var(--radius-lg)] bg-gradient-to-br from-[color-mix(in_srgb,var(--color-danger)_55%,white)] via-[color-mix(in_srgb,var(--color-danger)_85%,white)] to-[var(--color-danger)] px-4 py-3 text-white shadow-[var(--shadow-md)] ring-1 ring-white/40 ring-inset',
+  privacySheen:
+    'pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-white/40 to-transparent',
+  privacyBody: 'relative flex min-w-0 flex-1 flex-col',
+  privacyKicker: 'text-micro font-bold tracking-wide text-white/80 uppercase',
+  privacyText: 'text-body leading-snug font-semibold',
   loader: 'flex flex-col gap-2',
   loaderTrack: 'h-1.5 overflow-hidden rounded-full bg-[var(--color-surface-sunken)]',
   loaderFill:
