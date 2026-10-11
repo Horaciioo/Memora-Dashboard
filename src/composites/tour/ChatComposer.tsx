@@ -34,6 +34,7 @@ export interface ChatComposerProps {
  * @property {IntakeAnswers} [patch] - Answers it records
  * @property {() => void} [apply] - Effect on the app
  * @property {ButtonVariant} [variant] - Tone of its button
+ * @property {boolean} [wayOut] - A quiet way out, drawn under the others
  */
 
 interface Choice {
@@ -42,6 +43,7 @@ interface Choice {
   patch?: IntakeAnswers
   apply?: () => void
   variant?: ButtonVariant
+  wayOut?: boolean
 }
 
 /**
@@ -76,8 +78,8 @@ export const ChatComposer = ({
       },
     ],
     hurdle: [
-      { key: 'yes', label: TOUR_COPY.hurdleYes, patch: { hurdle: true }, variant: 'secondary' },
-      { key: 'no', label: TOUR_COPY.hurdleNo, patch: { hurdle: false }, variant: 'primary' },
+      { key: 'yes', label: TOUR_COPY.hurdleYes, patch: { hurdle: true }, variant: 'success' },
+      { key: 'no', label: TOUR_COPY.hurdleNo, patch: { hurdle: false }, variant: 'danger' },
     ],
     hurdleDetail: [
       {
@@ -91,7 +93,7 @@ export const ChatComposer = ({
         key: 'examples',
         label: TOUR_COPY.hurdleExamples,
         patch: { examples: true },
-        variant: 'secondary',
+        wayOut: true,
       },
     ],
     // The member can stay silent at any moment
@@ -100,7 +102,7 @@ export const ChatComposer = ({
         key: 'quiet',
         label: TOUR_COPY.hurdleKeepQuiet,
         patch: { written: false },
-        variant: 'secondary',
+        wayOut: true,
       },
     ],
     colorBlind: [
@@ -121,22 +123,38 @@ export const ChatComposer = ({
 
   const clicks = choices[ask]
   if (clicks) {
+    const main = clicks.filter((choice) => !choice.wayOut)
+    const outs = clicks.filter((choice) => choice.wayOut)
+
+    const draw = (choice: Choice, variant: ButtonVariant, className: string) => (
+      <Button
+        key={choice.key}
+        variant={variant}
+        disabled={isLocked}
+        className={className}
+        onClick={() => {
+          choice.apply?.()
+          onAnswer(choice.label, choice.patch)
+        }}
+      >
+        {choice.label}
+      </Button>
+    )
+
     return (
-      <div className={TOUR_CHAT.quick}>
-        {clicks.map((choice) => (
-          <Button
-            key={choice.key}
-            variant={choice.variant ?? (ask === 'ready' ? 'primary' : 'secondary')}
-            disabled={isLocked}
-            className={TOUR_CHAT.chip}
-            onClick={() => {
-              choice.apply?.()
-              onAnswer(choice.label, choice.patch)
-            }}
-          >
-            {choice.label}
-          </Button>
-        ))}
+      <div className={TOUR_CHAT.offer}>
+        {main.length > 0 && (
+          <div className={TOUR_CHAT.quick}>
+            {main.map((choice) =>
+              draw(
+                choice,
+                choice.variant ?? (ask === 'ready' ? 'primary' : 'secondary'),
+                TOUR_CHAT.chip
+              )
+            )}
+          </div>
+        )}
+        {outs.map((choice) => draw(choice, 'ghost', TOUR_CHAT.offerNone))}
       </div>
     )
   }
