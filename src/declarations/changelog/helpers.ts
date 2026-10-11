@@ -1,3 +1,4 @@
+import { APP_VERSION } from '@/declarations/app'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
 import {
   CHANGELOG_RELEASES,
@@ -16,6 +17,7 @@ import { NAVIGATION, ROUTES, SEGMENT_LABELS } from '@/declarations/navigation'
 import type { IconName } from '@/declarations/ui/icons'
 import type { PermissionHelpers } from '@/types/auth'
 import type { PermissionName } from '@/utils/constants/permissions'
+import { baseVersion, parseVersion } from '@/utils/format/version'
 
 // Rail glyph per page
 const PAGE_ICONS = new Map<string, IconName>(
@@ -52,6 +54,19 @@ export const changelogPage = (page?: ChangelogPage): ChangelogPageMeta => {
     label: SEGMENT_LABELS[segment] ?? CHANGELOG_COPY.wholeApp,
     icon: PAGE_ICONS.get(page) ?? FALLBACK_ICON,
   }
+}
+
+/**
+ * What a member marks as read: the shown version while its note is being built, so each
+ * snapshot announces itself again
+ * @param {ChangelogRelease} release - Note
+ * @return {string} - Read key
+ */
+
+export const releaseSeenKey = (release: ChangelogRelease): string => {
+  const shown = parseVersion(APP_VERSION)
+
+  return shown && baseVersion(shown) === release.version ? APP_VERSION : release.version
 }
 
 /**
