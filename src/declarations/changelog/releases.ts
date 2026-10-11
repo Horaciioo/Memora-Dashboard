@@ -4,6 +4,18 @@ import type { IconName } from '@/declarations/ui/icons'
 import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 
+// Note readers
+export const ChangelogAudiences = {
+  Responsables: 'responsables',
+} as const
+
+/**
+ * Restricted readers
+ * @type {(typeof ChangelogAudiences)[keyof typeof ChangelogAudiences]}
+ */
+
+export type ChangelogAudience = (typeof ChangelogAudiences)[keyof typeof ChangelogAudiences]
+
 // Note categories
 export const ChangelogTags = {
   Added: 'nouveau',
@@ -56,6 +68,7 @@ export type ChangelogPage = Extract<(typeof ROUTES)[keyof typeof ROUTES], string
  * @property {ChangelogTag} tag - Category
  * @property {string} text - Reader sentence
  * @property {ChangelogPage} [page] - Concerned page
+ * @property {ChangelogAudience} [audience] - Reserved readers, all when empty
  * @property {PermissionName} [permission] - Required to read
  */
 
@@ -63,6 +76,7 @@ export interface ChangelogItem {
   tag: ChangelogTag
   text: string
   page?: ChangelogPage
+  audience?: ChangelogAudience
   permission?: PermissionName
 }
 
@@ -72,6 +86,7 @@ export interface ChangelogItem {
  * @property {ChangelogTag} tag - Category
  * @property {ChangelogPage} [page] - Concerned page
  * @property {string} text - Word
+ * @property {ChangelogAudience} [audience] - Reserved readers, all when empty
  * @property {PermissionName} [permission] - Required to read
  */
 
@@ -79,6 +94,7 @@ export interface ChangelogComment {
   tag: ChangelogTag
   page?: ChangelogPage
   text: string
+  audience?: ChangelogAudience
   permission?: PermissionName
 }
 
@@ -117,8 +133,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     intro:
       'Le calendrier met enfin la présence au centre, et les équipes de responsables voient mieux ce qui les concerne.',
     description:
-      'Le détail d’un évènement mélangeait toutes les informations et chacun ne savait pas quoi y faire. Cette version sépare la réponse de chaque convoqué de l’Appel de présence réservé aux responsables, et rend aux absences leurs réponses, jusque-là invisibles pour les membres.',
+      'Le détail d’un évènement mélangeait toutes les informations et chacun ne savait pas quoi y faire. Cette version sépare la réponse de chaque convoqué de l’Appel de présence réservé aux responsables, rend aux absences leurs réponses, jusque-là invisibles pour les membres, et accueille chaque nouvel arrivant avec une visite guidée au lieu de le laisser seul devant l’application.',
     items: [
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Visite de Memora », réservée aux nouveaux arrivants : à la première connexion, Memora se présente dans une conversation, enregistre sur le compte l’anniversaire, les langues, les réseaux et l’affichage choisis, puis fait découvrir les pages une à une',
+      },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.dashboard,
@@ -132,6 +152,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Added,
         page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.CalendarManage,
         text: 'Ajout de la possibilité de relancer les sans-réponse de l’« Appel de présence » en leur envoyant une notification',
       },
@@ -143,6 +164,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Added,
         page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.MemberRead,
         text: 'Ajout de l’identifiant Memora de chaque modérateur sous son identifiant Discord',
       },
@@ -154,12 +176,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Improved,
         page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.CalendarManage,
         text: 'Amélioration de l’« Appel de présence », qui s’ouvre et se ferme en douceur, réservé aux responsables et au-delà',
       },
       {
         tag: ChangelogTags.Improved,
         page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.MemberRead,
         text: 'Amélioration de la page « Modérateurs » : la mention « En absence » se lit à côté du pseudo, sans agrandir la carte',
       },
@@ -170,17 +194,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Improved,
         page: ROUTES.projects,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.ProjectDelete,
         text: 'Amélioration des droits des responsables : ils peuvent désormais supprimer les « Projets », « Tâches » et « Réunions »',
       },
       {
         tag: ChangelogTags.Improved,
         page: ROUTES.trainings,
-        text: 'Amélioration de la page « Formations » : la visite de Memora y apparaît et les formations pas encore ouvertes sont signalées comme indisponibles',
-      },
-      {
-        tag: ChangelogTags.Improved,
-        text: 'Amélioration de la fin de la visite de Memora, qui se termine par une petite célébration',
+        text: 'Amélioration de la page « Formations » : les formations pas encore ouvertes sont signalées comme indisponibles',
       },
       {
         tag: ChangelogTags.Improved,
@@ -191,12 +212,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Fixed,
         page: ROUTES.meetings,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.MeetingUpdate,
         text: 'Correction d’un bug qui empêchait de modifier l’état, la date et l’heure d’une réunion depuis la box « Informations »',
       },
       {
         tag: ChangelogTags.Fixed,
         page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.MemberRead,
         text: 'Correction d’un bug qui permettait à un modérateur d’ouvrir la fiche d’un autre membre',
       },
@@ -249,6 +272,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Improved,
         page: ROUTES.tasks,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.TaskUpdate,
         text: 'Amélioration des « Tâches » : le responsable, l’état et la deadline ne se changent plus que par les Responsables',
       },
@@ -269,12 +293,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Fixed,
         page: ROUTES.absences,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.AbsenceReview,
         text: 'Correction d’un bug qui empêchait les Responsables de voir les absences posées par les modérateurs de leurs créateurs',
       },
       {
         tag: ChangelogTags.Fixed,
         page: ROUTES.meetings,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.MeetingUpdate,
         text: 'Correction d’un bug qui empêchait d’ajouter un sujet à une réunion sans avoir choisi d’émoji',
       },
@@ -325,6 +351,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Added,
         page: ROUTES.sanctions,
+        audience: ChangelogAudiences.Responsables,
         permission: Permissions.SanctionRead,
         text: 'Ajout d’une nouvelle fonctionnalité nommée « Panel de sanctions » : des sanctions graduées avec le journal de chaque mesure',
       },
