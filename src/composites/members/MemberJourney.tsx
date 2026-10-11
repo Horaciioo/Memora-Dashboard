@@ -1,20 +1,16 @@
-import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { Section } from '@/components/structures/Section'
-import { LEGACY_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { STAGE_LIST } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import type { MemberSummary } from '@/types/members'
 import { cn } from '@/utils/classnames'
-import { LegacyStatuses } from '@/utils/constants/hierarchy'
-import { formatDay } from '@/utils/format/dates'
 
 export interface MemberJourneyProps {
   summary: MemberSummary
   onOpen: (href: string) => void
-  hrefs: { recruitment: string | null; academy: string | null; legacy: string | null }
+  hrefs: { recruitment: string | null; academy: string | null }
 }
 
 interface Stage {
@@ -25,12 +21,11 @@ interface Stage {
   open: string
   href: string | null
   note?: string
-  status?: { label: string; accent: string | null }
 }
 
 /**
- * Journey of a moderator as three stages in the order they were lived through: the
- * application, the Academy follow-up, the Legacy track. A stage they never went through
+ * Journey of a moderator as two stages in the order they were lived through: the
+ * application, the Academy follow-up. A stage they never went through
  * stays drawn as an empty dashed step, so the path always reads end to end
  * @param {MemberSummary} summary - Row of the moderator
  * @param {(href: string) => void} onOpen - Navigates to a stage file
@@ -57,28 +52,15 @@ export const MemberJourney = ({ summary, onOpen, hrefs }: MemberJourneyProps) =>
       href: hrefs.academy,
       note: summary.academyDispositif?.label,
     },
-    {
-      key: 'legacy',
-      title: MEMBER_COPY.stageLegacy,
-      icon: 'crown',
-      none: MEMBER_COPY.legacyNoneDescription,
-      open: MEMBER_COPY.legacyOpen,
-      href: hrefs.legacy,
-      status: summary.legacyStatus
-        ? {
-            label: LEGACY_STATUS_REGISTRY.label(summary.legacyStatus),
-            accent: LEGACY_STATUS_REGISTRY.get(summary.legacyStatus).accent,
-          }
-        : undefined,
-      note:
-        summary.legacyStatus === LegacyStatuses.Running && summary.legacyEndsAt
-          ? `${MEMBER_COPY.legacyExempt} ${formatDay(summary.legacyEndsAt)}`
-          : undefined,
-    },
   ]
 
   return (
-    <Section title={MEMBER_COPY.journeyTitle} description={MEMBER_COPY.journeyLead} raised>
+    <Section
+      title={MEMBER_COPY.journeyTitle}
+      description={MEMBER_COPY.journeyLead}
+      maturity="alpha"
+      raised
+    >
       <ol>
         {stages.map((stage, index) => {
           const Icon = ICONS[stage.icon]
@@ -103,9 +85,6 @@ export const MemberJourney = ({ summary, onOpen, hrefs }: MemberJourneyProps) =>
                 </span>
                 {reached ? (
                   <div className={STAGE_LIST.stageActions}>
-                    {stage.status && (
-                      <Status label={stage.status.label} accent={stage.status.accent} />
-                    )}
                     {stage.note && <span className={STAGE_LIST.stageLead}>{stage.note}</span>}
                     <Button icon="forward" onClick={() => onOpen(stage.href!)}>
                       {stage.open}
