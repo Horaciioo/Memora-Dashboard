@@ -8,6 +8,7 @@ import {
   socialFormFields,
   readOverrides,
 } from '@/core/services/members/MemberFileService'
+import { nullIfMissing } from '@/core/lib/errors'
 import { layerKey } from '@/core/lib/permissions'
 import { ABSENCE_FIELDS, canReviewAbsence } from '@/core/services/absences/AbsenceService'
 import { readInheritedGrants } from '@/core/services/auth/GrantsService'
@@ -85,7 +86,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const perimeter = await scope()
   const detail = await assertAccountInScope(id, perimeter, session.id)
     .then(() => readMember(id, canReadNotes))
-    .catch(() => null)
+    .catch(nullIfMissing)
   if (!detail) notFound()
 
   // A Responsable reads only those below them, and their own file
