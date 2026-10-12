@@ -1,4 +1,5 @@
 import {
+  EDITING_MARK,
   EMPTY_VALUE,
   PROPERTY_LABEL,
   PROPERTY_SPACING,
@@ -36,7 +37,7 @@ export const APP_SHELL = {
   windowThumb:
     'absolute inset-x-0.5 top-0 cursor-grab rounded-full bg-[var(--color-ink)]/25 transition-[background-color,left,right] duration-[var(--motion-duration-fast)] group-hover/track:inset-x-0 group-hover/track:bg-[var(--color-ink)]/40 active:cursor-grabbing active:bg-[var(--color-ink)]/50',
   // Positioned so the page banner can span the whole column
-  main: 'page-wash relative flex min-w-0 flex-1 flex-col bg-[var(--color-page)]',
+  main: 'page-wash relative flex min-w-0 flex-1 flex-col bg-[var(--color-page)] md:ml-[var(--shell-sidebar-w)]',
   // Gutters widen past md so a page never welds itself to either rail
   content:
     'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--banner-h)+2.5rem)] print:max-w-none print:p-0',
@@ -74,7 +75,18 @@ export const RAIL_POPOVER = {
 
 export const LEFT_SIDEBAR = {
   // Rail standing on the frame
-  rail: 'rail-ground relative z-40 font-[family-name:var(--font-system)] hidden w-[var(--shell-sidebar-w)] shrink-0 flex-col py-3 md:sticky md:top-0 md:flex md:h-dvh print:hidden',
+  rail: 'rail-ground relative z-40 font-[family-name:var(--font-system)] hidden w-[var(--shell-sidebar-w)] shrink-0 flex-col py-3 md:fixed md:inset-y-0 md:left-0 md:flex print:hidden',
+  // Calendar menu or classic menu, plain buttons
+  viewButtons: 'flex shrink-0 gap-2 px-4 pb-3',
+  viewButton:
+    'flex h-8 flex-1 items-center justify-center rounded-[var(--radius-lg)] border border-transparent text-caption font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
+  viewButtonActive:
+    'glass-panel !border-solid text-[var(--color-ink)] shadow-[var(--shadow-md)] hover:bg-transparent',
+  // Panes gliding sideways
+  slides: 'relative flex min-h-0 flex-1 overflow-hidden',
+  slidesStrip:
+    'flex h-full shrink-0 transition-transform duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)]',
+  slidesPane: 'flex h-full min-w-0 flex-1 flex-col',
   // Page panel in the rail
   slot: 'flex min-h-0 flex-1 flex-col px-3',
   // Creator switch
@@ -104,14 +116,11 @@ export const LEFT_SIDEBAR = {
   navLabel: 'rail-fold relative',
   navIcon: 'size-5 shrink-0 transition-colors',
   navIconActive: 'text-[var(--color-ink-accent)]',
-  // Live call under the search
-  liveRow: 'rail-fold relative flex shrink-0 px-2 pt-2',
-  liveLink:
-    'group flex w-full items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-1.5 text-left text-caption font-bold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
-  liveLabel: 'min-w-0 flex-1 truncate',
-  liveSweep: 'light-sweep [--sweep-base:color-mix(in_oklab,var(--color-ink)_62%,transparent)]',
-  liveArrow:
-    'h-4 w-4 shrink-0 transition-transform duration-[var(--motion-duration-fast)] group-hover:translate-x-0.5',
+  // Pulse on the live entry, bubble anchored beside it
+  livePulse: 'rail-fold relative ml-auto flex size-2.5 shrink-0',
+  livePulseRing: 'live-halo absolute inset-0 rounded-full bg-[var(--color-live-400)]',
+  livePulseDot: 'relative size-full rounded-full bg-[var(--color-live-400)]',
+  liveBubbleAnchor: 'fixed z-50 size-0',
   // Account footer
   footer: 'flex shrink-0 px-4 pt-3',
   // Bare glyph row above the search
@@ -121,7 +130,11 @@ export const LEFT_SIDEBAR = {
   toolbarIcon: 'size-[1.125rem] shrink-0',
   // Profile box, bell on its right
   footerBox:
-    'rail-footer-box glass-panel flex min-w-0 flex-1 items-center gap-1 rounded-[var(--radius-xl)] border p-2',
+    'rail-footer-box glass-panel flex min-w-0 flex-1 flex-col rounded-[var(--radius-xl)] border p-2',
+  // Level switch heading the profile box, a rule under it
+  footerSwitch: 'px-1 pt-1',
+  footerRule: 'mx-1 my-2 h-px bg-[var(--color-border)]',
+  footerRow: 'flex min-w-0 items-center gap-1',
   footerName: 'min-w-0 flex-1 truncate text-base font-semibold',
   footerActions: 'flex shrink-0 items-center gap-0.5',
   footerIcon: 'size-5 shrink-0',
@@ -242,6 +255,11 @@ export const DETAIL_BLOCK = {
   label: PROPERTY_LABEL,
   value: `text-sm break-words ${PROPERTY_VALUE}`,
   empty: `text-sm ${EMPTY_VALUE}`,
+  // Read value that opens its editor on click
+  editable:
+    '-mx-1.5 -my-0.5 cursor-pointer rounded-[var(--radius-sm)] px-1.5 py-0.5 transition-colors hover:bg-[var(--color-surface)]',
+  // Same box while its editor is open
+  editing: `relative ${EDITING_MARK}`,
 } as const
 
 /**
@@ -268,8 +286,11 @@ export const MEMBER_BLOCK = {
   // Division stamped on the portrait's corner
   division:
     'absolute -right-1 -bottom-1 flex h-10 min-w-10 items-center justify-center rounded-full bg-[var(--color-brand-600)] px-1.5 text-sm font-bold text-[var(--color-on-brand)] ring-4 ring-[var(--color-surface-raised)]',
+  // Role on the portrait's corner
+  roleMark: 'absolute -right-3 -bottom-3 drop-shadow-md',
+  roleGlyph: 'h-14 w-14',
   portrait:
-    'block shrink-0 rounded-full ring-4 ring-[var(--color-surface-raised)] transition-[filter] enabled:cursor-pointer enabled:hover:brightness-95 disabled:cursor-default',
+    'block shrink-0 rounded-full transition-[filter] enabled:cursor-pointer enabled:hover:brightness-95 disabled:cursor-default',
   // Role glyph pinned to the portrait's corner
   emblem:
     'absolute -right-1 -bottom-1 h-9 w-9 rounded-full bg-[var(--color-surface)] p-1 ring-2 ring-[var(--color-surface)]',
@@ -558,10 +579,13 @@ export const DIVIDER_BLOCK = {
 
 export const CHANGELOG_BOARD = {
   page: 'max-w-4xl',
-  // Version and day, read in the notch under the title divider
-  meta: 'flex flex-wrap items-baseline justify-center gap-x-3',
-  version: 'text-sm font-bold tracking-wide text-[var(--color-ink-accent)] uppercase tabular-nums',
-  date: 'text-sm font-semibold text-[var(--color-ink-subtle)]',
+  // Version and day, read under the banner title
+  meta: 'flex flex-wrap items-baseline gap-x-3',
+  version: 'text-xs font-bold tracking-wide uppercase tabular-nums',
+  date: 'text-xs font-semibold',
+  // Build in use, closing the page
+  running:
+    'text-center font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase',
   // Description box: lead, why, then one figure per category
   lead: 'text-lg font-semibold tracking-tight sm:text-xl',
   description: 'text-body leading-relaxed text-[var(--color-ink-subtle)]',
@@ -763,5 +787,5 @@ export const AUTH_SHELL = {
   logo: 'flex items-center justify-center',
   wordmark: 'h-auto w-40',
   card: 'card-surface rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 shadow-[var(--shadow-md)] sm:p-8',
-  title: 'mb-6 text-xl font-bold tracking-tight uppercase italic',
+  title: 'mb-6 text-2xl font-bold tracking-tight',
 } as const

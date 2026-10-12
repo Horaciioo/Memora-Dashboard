@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { forbidden } from 'next/navigation'
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { MembersPanel } from '@/composites/members/MembersPanel'
@@ -21,7 +21,7 @@ export default async function MembersPage() {
   const { access, scope } = await requirePermission(Permissions.MemberRead)
 
   // The list is for the encadrement only
-  if (!access.isResponsable) notFound()
+  if (!access.isResponsable) forbidden()
 
   // The three reference reads are memoised
   const perimeter = await scope()

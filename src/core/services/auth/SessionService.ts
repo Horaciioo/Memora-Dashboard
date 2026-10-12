@@ -5,7 +5,7 @@ import crypto from 'crypto'
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
 import { AUTH_SETTINGS } from '@/declarations/configurations/settings'
-import { discordAvatarUrl } from '@/declarations/access/discord'
+import { discordAvatarUrl, discordBannerUrl } from '@/declarations/access/discord'
 import { ROOT_IDENTITY, isRootIdentity } from '@/declarations/access/identity'
 import type { DiscordIdentity } from '@/core/services/auth/DiscordService'
 import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
@@ -84,6 +84,8 @@ export const resolveDiscordAccount = async (identity: DiscordIdentity): Promise<
       discordAvatarHash: identity.avatar,
       discordSyncedAt: new Date(),
       avatarUrl: discordAvatarUrl(identity.id, identity.avatar) ?? existing.avatarUrl,
+      // Dropped on Discord, dropped here
+      bannerUrl: discordBannerUrl(identity.id, identity.banner),
     },
   })
 }

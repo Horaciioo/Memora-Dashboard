@@ -3,6 +3,7 @@ import crypto from 'crypto'
 import { NextResponse, type NextRequest } from 'next/server'
 import { isSessionTokenValid } from '@/core/lib/auth/getSession'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
+import { readPublicOrigin } from '@/core/lib/http/origin'
 import { buildContentSecurityPolicy } from '@/declarations/system/contentSecurityPolicy'
 import { NONCE_HEADER } from '@/declarations/system/securityHeaders'
 import { ROUTES } from '@/declarations/navigation'
@@ -67,21 +68,18 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // A stale token fails closed rather than crashing the proxy
   const hasSession = token ? await isSessionTokenValid(token).catch(() => false) : false
 
+  // Origin members used
+  const origin = readPublicOrigin(request.headers, request.nextUrl.origin)
+
   // Redirect unauthenticated users
   if (!hasSession && !isOpenToEveryone) {
-    const url = request.nextUrl.clone()
-    url.pathname = ROUTES.login
-    const response = NextResponse.redirect(url)
+    const response = NextResponse.redirect(new URL(ROUTES.login, origin))
     if (token) response.cookies.delete(SESSION_COOKIE)
     return response
   }
 
   // Redirect away from the sign-in screen
-  if (hasSession && isSignInScreen) {
-    const url = request.nextUrl.clone()
-    url.pathname = ROUTES.dashboard
-    return NextResponse.redirect(url)
-  }
+  if (hasSession && isSignInScreen) return NextResponse.redirect(new URL(ROUTES.dashboard, origin))
 
   const response = withPolicy(request)
 

@@ -19,7 +19,10 @@ export default async function MarshaPage() {
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={MARSHA_COPY.title} />
-      <MarshaGuide trainingHref={await courseHrefFor(session, 'marsha-bot')} />
+      <MarshaGuide
+        trainingHref={await courseHrefFor(session, 'marsha-bot')}
+        viewer={{ name: session.displayName, avatarUrl: session.avatarUrl }}
+      />
     </div>
   )
 }

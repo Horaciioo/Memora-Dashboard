@@ -70,6 +70,15 @@ const SANCTIONS_CARD: HomeShortcut = {
   permission: Permissions.SanctionRead,
 }
 
+const DISCORD_SANCTIONS_CARD: HomeShortcut = {
+  ...SANCTIONS_CARD,
+  key: 'discordSanctions',
+  title: 'Panel Discord',
+  href: ROUTES.discordSanctions,
+  image: '/courses/discord.jpg',
+  position: '60% 40%',
+}
+
 const ABSENCES_CARD: HomeShortcut = {
   key: 'absences',
   title: 'Absences',
@@ -106,5 +115,5 @@ const MARSHA_CARD: HomeShortcut = {
 
 export const TRADE_SHORTCUTS: Record<string, HomeShortcut[]> = {
   Lives: [SANCTIONS_CARD, ABSENCES_CARD, CALENDAR_CARD],
-  Discord: [MARSHA_CARD, SANCTIONS_CARD, ABSENCES_CARD],
+  Discord: [MARSHA_CARD, DISCORD_SANCTIONS_CARD, ABSENCES_CARD],
 }

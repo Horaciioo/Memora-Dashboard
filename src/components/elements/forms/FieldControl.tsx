@@ -28,6 +28,8 @@ export interface FieldControlProps {
   disabled?: boolean
   invalid?: boolean
   describedBy?: string
+  // Long text keeps the size of its read text
+  inline?: boolean
 }
 
 // Bucket an image field lands in when its declaration stays silent
@@ -68,6 +70,7 @@ const INPUT_TYPES: Record<string, string> = {
  * @param {boolean} [disabled] - Blocks the control
  * @param {boolean} [invalid] - Paints the rejection border
  * @param {string} [describedBy] - Identifier of the message describing the control
+ * @param {boolean} [inline] - Bare long text
  * @return {JSX.Element | null}
  */
 
@@ -79,8 +82,9 @@ export const FieldControl = ({
   disabled,
   invalid,
   describedBy,
+  inline,
 }: FieldControlProps) => {
-  const { can, session } = useAuthContext()
+  const { can } = useAuthContext()
 
   if (field.kind === 'select') {
     return (
@@ -239,7 +243,6 @@ export const FieldControl = ({
         id={id}
         value={typeof value === 'string' ? value : ''}
         options={field.options ?? []}
-        author={session?.displayName ?? ''}
         maxLength={field.maxLength}
         disabled={disabled || field.readOnly}
         onChange={onChange}
@@ -255,6 +258,7 @@ export const FieldControl = ({
         maxLength={field.maxLength}
         placeholder={field.placeholder}
         invalid={invalid}
+        inline={inline}
         onChange={onChange}
       />
     )

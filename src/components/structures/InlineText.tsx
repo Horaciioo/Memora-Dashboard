@@ -65,7 +65,7 @@ export const InlineText = ({
           if (event.key === 'Enter') void commit()
           if (event.key === 'Escape') setEditing(false)
         }}
-        className={cn(INLINE_EDIT_STYLES.input, className)}
+        className={cn(INLINE_EDIT_STYLES.input, INLINE_EDIT_STYLES.line, className)}
       />
     )
   }

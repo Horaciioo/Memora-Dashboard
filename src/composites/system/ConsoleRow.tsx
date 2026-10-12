@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { HOME_STYLES } from '@/declarations/ui/variants'

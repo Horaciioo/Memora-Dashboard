@@ -4,7 +4,6 @@ import { useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { DiscordMessage } from '@/components/elements/display/DiscordMessage'
 import { BROADCAST_MENTIONS } from '@/declarations/discord/registries'
 import { accentPaint } from '@/declarations/ui/theme'
 import { DISCORD_MESSAGE } from '@/declarations/ui/variants'
@@ -53,19 +52,16 @@ export interface DiscordComposerProps {
   value: string
   onChange: (value: string) => void
   options: FieldOption[]
-  author: string
   disabled?: boolean
   maxLength?: number
 }
 
 /**
- * Announcement written the way Discord writes it: the message bar at the bottom, the rendered
- * message above it as it will read in the channel, mentions picked by typing @ or #
+ * Announcement written in Discord's message bar, mentions picked by typing @ or #
  * @param {string} id - Field identifier
  * @param {string} value - Markdown
  * @param {(value: string) => void} onChange - Markdown handler
  * @param {FieldOption[]} options - Members
- * @param {string} author - Name the preview is signed with
  * @param {boolean} [disabled] - Blocks the bar
  * @param {number} [maxLength] - Longest message
  * @return {JSX.Element}
@@ -76,7 +72,6 @@ export const DiscordComposer = ({
   value,
   onChange,
   options,
-  author,
   disabled,
   maxLength,
 }: DiscordComposerProps) => {
@@ -148,9 +143,7 @@ export const DiscordComposer = ({
   let lastGroup: string | null = null
 
   return (
-    <div className={DISCORD_MESSAGE.frame}>
-      <DiscordMessage source={value} mentions={choices} author={author} />
-
+    <div className={cn(DISCORD_MESSAGE.frame, DISCORD_MESSAGE.pane)}>
       <div className={DISCORD_MESSAGE.composer}>
         {query && (
           <div className={DISCORD_MESSAGE.popover} role="listbox" aria-labelledby={id}>
@@ -199,7 +192,6 @@ export const DiscordComposer = ({
         <textarea
           id={id}
           ref={input}
-          rows={3}
           className={DISCORD_MESSAGE.input}
           value={display}
           disabled={disabled}

@@ -8,7 +8,7 @@ export interface ReleaseDeckProps {
 }
 
 /**
- * Version and day, carried in the title notch under its divider
+ * Version and day, under the banner title
  * @param {ReleaseDeckProps} props - Note
  * @return {JSX.Element}
  */

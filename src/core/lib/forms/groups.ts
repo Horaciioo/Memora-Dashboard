@@ -17,6 +17,7 @@ export const FORM_GROUP_ICONS: Record<string, IconName> = {
   [FORM_GROUPS.contact]: 'mail',
   [FORM_GROUPS.visibility]: 'visible',
   [FORM_GROUPS.encadrement]: 'shield',
+  [FORM_GROUPS.message]: 'note',
 }
 
 /**

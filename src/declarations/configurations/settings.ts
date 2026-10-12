@@ -740,7 +740,7 @@ const responsiveToastVisible = readNode(
 
 /**
  * Breakpoint and shell chrome bounds
- * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, sidebarWidth: number, sidebarCompactWidth: number, bannerHeight: number, bannerHeightMobile: number, notchHeight: number, notchSlope: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
+ * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, sidebarWidth: number, sidebarCompactWidth: number, bannerHeight: number, bannerHeightMobile: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
  */
 
 export const RESPONSIVE_SETTINGS = {
@@ -779,16 +779,6 @@ export const RESPONSIVE_SETTINGS = {
     path: 'system/responsive.shell.bannerHeightMobile',
     fallback: 144,
     min: 96,
-  }),
-  notchHeight: readInteger(responsiveShell.notchHeight, {
-    path: 'system/responsive.shell.notchHeight',
-    fallback: 52,
-    min: 32,
-  }),
-  notchSlope: readInteger(responsiveShell.notchSlope, {
-    path: 'system/responsive.shell.notchSlope',
-    fallback: 36,
-    min: 12,
   }),
   maxPrimarySlots: readInteger(responsiveBottomNav.maxSlots, {
     path: 'system/responsive.bottomNav.maxSlots',
@@ -877,7 +867,7 @@ export const COLOUR_SETTINGS = {
 
 /**
  * Sign-in and session bounds
- * @type {{ sessionDays: number, stateTtlSeconds: number, avatarSize: number, maxConcurrentSessions: number }}
+ * @type {{ sessionDays: number, stateTtlSeconds: number, avatarSize: number, bannerSize: number, maxConcurrentSessions: number }}
  */
 
 export const AUTH_SETTINGS = {
@@ -896,6 +886,12 @@ export const AUTH_SETTINGS = {
   avatarSize: readInteger(authentication.avatarSize, {
     path: 'system/authentification.avatarSize',
     fallback: 128,
+    min: 16,
+    max: 4096,
+  }),
+  bannerSize: readInteger(authentication.bannerSize, {
+    path: 'system/authentification.bannerSize',
+    fallback: 1024,
     min: 16,
     max: 4096,
   }),

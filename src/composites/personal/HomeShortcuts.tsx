@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { Section } from '@/components/structures/Section'
 import { HOME_SHORTCUTS, TRADE_SHORTCUTS } from '@/declarations/personal/shortcuts'

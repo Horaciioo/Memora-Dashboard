@@ -1,4 +1,4 @@
-/* Banner height and the page-coloured notch cut into its bottom edge */
+/* Banner height */
 body {
   --banner-h: var(--shell-banner-h-mobile);
 }
@@ -10,34 +10,11 @@ body {
   }
 }
 
-.banner-notch-body {
-  min-height: var(--shell-notch-h);
-}
-
-.banner-slope {
-  flex: none;
-  width: var(--shell-notch-slope);
-  min-height: var(--shell-notch-h);
-  mask-repeat: no-repeat;
-  mask-size: 100% 100%;
-}
-
-/* One pixel hides the seam */
-.banner-slope-start {
-  margin-right: -1px;
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44' preserveAspectRatio='none'%3E%3Cpath d='M0 44C18 44 18 0 36 0V44Z'/%3E%3C/svg%3E");
-}
-
-.banner-slope-end {
-  margin-left: -1px;
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 44' preserveAspectRatio='none'%3E%3Cpath d='M36 44C18 44 18 0 0 0V44Z'/%3E%3C/svg%3E");
-}
-
-/* Quiet shade at the foot of the photograph, under the notch */
+/* Shade at the foot, keeps the title legible */
 .banner-shade::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgb(0 0 0 / 0.18), transparent 55%);
+  background: linear-gradient(to top, rgb(0 0 0 / 0.55), transparent 75%);
   pointer-events: none;
 }

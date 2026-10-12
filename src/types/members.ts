@@ -59,6 +59,7 @@ export interface MemberDivision {
  * @property {string} displayName - Display name
  * @property {string} discordId - Discord identifier
  * @property {string | null} avatarUrl - Portrait
+ * @property {string | null} bannerUrl - Discord profile banner
  * @property {MemberRoleName} role - Hierarchy level
  * @property {MemberStatusName} status - Membership status
  * @property {MemberTag | null} academyDispositif - Dispositif of the active FSI
@@ -78,6 +79,7 @@ export interface MemberSummary {
   displayName: string
   discordId: string
   avatarUrl: string | null
+  bannerUrl: string | null
   role: MemberRoleName
   status: MemberStatusName
   academyDispositif: MemberTag | null

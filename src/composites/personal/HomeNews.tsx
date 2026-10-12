@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { useFreshRelease } from '@/core/hooks/data/useFreshRelease'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'

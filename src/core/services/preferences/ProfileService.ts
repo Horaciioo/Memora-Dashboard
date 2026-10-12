@@ -38,6 +38,13 @@ const PROFILE_INCLUDE = {
 
 export const profileFields = (): FieldDefinition[] => [
   {
+    name: 'displayName',
+    kind: 'text',
+    label: PROFILE_FIELD_COPY.displayName,
+    required: true,
+    maxLength: FORM_SETTINGS.shortTextMaxLength,
+  },
+  {
     name: 'birthday',
     kind: 'date',
     startYear: FORM_SETTINGS.birthdayStartYear,
@@ -87,6 +94,7 @@ export const readProfile = async (accountId: string): Promise<ProfileDetail> => 
     displayName: row.displayName,
     discordId: row.discordId,
     avatarUrl: row.avatarUrl,
+    bannerUrl: row.bannerUrl,
     role: row.role,
     status: row.status,
     academyDispositif: row.academyJuniors[0]?.dispositif?.name ?? null,
@@ -99,6 +107,7 @@ export const readProfile = async (accountId: string): Promise<ProfileDetail> => 
     ),
     joinedAt: row.joinedAt.toISOString(),
     values: {
+      displayName: row.displayName,
       birthday: row.birthday ? row.birthday.toISOString().slice(0, 10) : null,
       timezone: row.timezone,
       languages: row.languages,
@@ -122,6 +131,7 @@ export const updateProfile = async (
   await prisma.account.update({
     where: { id: accountId },
     data: await withoutSealedWrites({
+      displayName: readText(values, 'displayName') ?? undefined,
       birthday: readDate(values, 'birthday'),
       timezone: readText(values, 'timezone'),
       languages: readList(values, 'languages'),

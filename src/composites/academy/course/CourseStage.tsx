@@ -1,5 +1,5 @@
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { CoursePhoto } from '@/composites/academy/course/CoursePhoto'
 import { CourseSteps } from '@/composites/academy/course/CourseSteps'

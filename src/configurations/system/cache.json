@@ -2,5 +2,5 @@
   "staleMs": 30000,
   "gcMs": 300000,
   "readRetries": 1,
-  "refreshMs": 30000
+  "refreshMs": 120000
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { usePathname } from 'next/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { APP_SHELL } from '@/declarations/ui/blocks'

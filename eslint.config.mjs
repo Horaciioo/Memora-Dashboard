@@ -25,6 +25,16 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // Viewport prefetch floods requests
+  {
+    ignores: ['src/components/elements/navigation/AppLink.tsx'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { paths: [{ name: 'next/link', message: 'Use AppLink, it prefetches on intent only.' }] },
+      ],
+    },
+  },
   globalIgnores([
     '.next/**',
     '.next-*/**',

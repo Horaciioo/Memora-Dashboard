@@ -56,6 +56,7 @@ export const EVENT_TYPES = createEnumeration({
   LiveSuspended: { id: 47, label: 'Lives suspendus' },
   LiveSuspensionLifted: { id: 48, label: 'Suspension levée' },
   ErrorRaised: { id: 49, label: 'Erreur rencontrée' },
+  AbsenceEdited: { id: 50, label: 'Absence modifiée' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

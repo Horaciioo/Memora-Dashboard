@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Dialog } from '@/components/structures/Dialog'

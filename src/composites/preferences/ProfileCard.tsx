@@ -1,5 +1,6 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { RoleGlyph } from '@/composites/members/MemberBadges'
+import { MEMBER_BLOCK } from '@/declarations/ui/blocks'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { FIELD_COPY } from '@/declarations/ui/copy'
 import { DATE_COPY } from '@/declarations/ui/dates'
@@ -33,9 +34,13 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
 
   return (
     <aside className={PROFILE_CARD.root}>
-      <Avatar name={profile.displayName} src={profile.avatarUrl} size="lg" />
+      <div className={MEMBER_BLOCK.frame}>
+        <Avatar name={profile.displayName} src={profile.avatarUrl} size="xl" />
+        <span className={MEMBER_BLOCK.roleMark}>
+          <RoleGlyph role={profile.role} glyphClassName={MEMBER_BLOCK.roleGlyph} />
+        </span>
+      </div>
       <p className={PROFILE_CARD.name}>{profile.displayName}</p>
-      <RoleGlyph role={profile.role} />
       <dl className={PROFILE_CARD.facts}>
         {facts.map((fact) => (
           <div key={fact.label} className={PROFILE_CARD.fact}>

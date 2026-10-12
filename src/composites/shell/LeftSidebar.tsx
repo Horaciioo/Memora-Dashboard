@@ -1,38 +1,36 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { CourseRail } from '@/composites/academy/course/CourseRail'
 import { CalendarRailPanel, CalendarSearchBar } from '@/composites/calendar/CalendarSidebar'
+import { CalendarRailSwitch } from '@/composites/calendar/CalendarRailSwitch'
 import { NotificationsBell } from '@/composites/notifications/NotificationsBell'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { CreatorAccountMenu } from '@/composites/shell/CreatorAccountMenu'
 import { CreatorSwitch } from '@/composites/shell/CreatorSwitch'
 import { RailDeadlineBubble } from '@/composites/shell/RailDeadlineBubble'
-import { RailLiveCall } from '@/composites/shell/RailLiveCall'
+import { RailNav } from '@/composites/shell/RailNav'
+import { RailSlides } from '@/composites/shell/RailSlides'
+import { RoleSwitch } from '@/composites/shell/RoleSwitch'
+import { ViewToggle } from '@/composites/shell/ViewToggle'
 import { RailToolbar } from '@/composites/shell/RailToolbar'
 import { RailShortcuts } from '@/composites/shell/RailShortcuts'
 import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
 import { useCalendarRail } from '@/core/hooks/interaction/useCalendarRail'
+import { useCalendarRailView } from '@/core/hooks/interaction/useCalendarRailView'
 import { useCourseRail } from '@/core/hooks/interaction/useCourseRail'
 import { useRailCompact } from '@/core/hooks/interaction/useRailCompact'
-import { APP_VERSION_LABEL } from '@/declarations/app'
 import { SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
 import { ROUTES, visibleNavGroups } from '@/declarations/navigation'
-import { BEACON_ATTRIBUTE, beaconProps, routeBeacon } from '@/declarations/ui/beacons'
+import { beaconProps } from '@/declarations/ui/beacons'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
-import { TOUR_RAIL } from '@/declarations/ui/variants'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
-import { railIcon } from '@/declarations/ui/railIcons'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { DEADLINE_NUDGE_COPY } from '@/declarations/work/copy'
 import { OVERDUE_ROUTES } from '@/declarations/work/registries'
-import { ICONS } from '@/declarations/ui/icons'
 import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'
-import { cn } from '@/utils/classnames'
 
 export interface LeftSidebarProps {
   viewContext: ViewContext
@@ -47,21 +45,21 @@ export interface LeftSidebarProps {
  */
 
 export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
-  const pathname = usePathname()
   const { can, session } = useAuthContext()
   // The first visit shows pages as it explains them
   const { isTouring, isIntroOpen, isUnlocked } = useTour()
   // An open course puts its chapters where the destinations stand
-  const openCourse = useCourseRail()
-  const courseRail = openCourse
-  // The calendar puts its month and switches there too
+  const courseRail = useCourseRail()
+  // The calendar puts its month and switches there too, or steps aside for the classic menu
   const calendarRail = useCalendarRail()
+  const [calendarView, chooseCalendarView] = useCalendarRailView()
   const [isRailCompact, toggleRailCompact] = useRailCompact()
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
 
   // A lone creator sits on top
   const hasCreators = viewContext.creators.length === 1
-  const ChevronIcon = ICONS.expand
+
+  // The calendar menu wears the page's own search and hides the shortcuts
+  const isCalendarMenu = Boolean(calendarRail) && calendarView === 'calendar'
 
   // Chapters and the month need their room
   const isCompact = isRailCompact && !courseRail && !calendarRail
@@ -81,9 +79,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
     }
   }, [isCompact])
 
-  // The live entry leaves the groups while a live runs
-  const entries = visibleNavGroups(viewContext.view, session, can, viewContext.live !== null)
-  const liveItem = entries.flatMap((group) => group.items).find((item) => item.onlyLive)
+  const entries = visibleNavGroups(viewContext.view, session, can)
   // Shortcuts leave the groups too
   const shortcuts = [
     ...entries.flatMap((group) => group.items).filter((item) => item.quick),
@@ -93,22 +89,24 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const groups = entries
     .map((group) => ({
       ...group,
-      items: group.items.filter(
-        (item) => !(item.onlyLive && viewContext.live) && !item.quick && isUnlocked(item.href)
-      ),
+      items: group.items.filter((item) => !item.quick && isUnlocked(item.href)),
     }))
     .filter((group) => group.items.length > 0)
 
-  const toggleGroup = (label: string) => {
-    setCollapsedGroups((current) => {
-      const next = new Set(current)
+  const nav = (
+    <RailNav groups={groups} isCompact={isCompact} isTouring={isTouring} live={viewContext.live} />
+  )
 
-      if (next.has(label)) next.delete(label)
-      else next.add(label)
-
-      return next
-    })
-  }
+  // Shortcuts and the release notice, in every menu but a course's
+  const topBlock = (
+    <>
+      <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
+      {/* Hangs under the news shortcut it announces */}
+      {!isCompact && (
+        <ReleaseNotice pointedAt={newsAt >= 0 ? (newsAt + 0.5) / shortcuts.length : undefined} />
+      )}
+    </>
+  )
 
   return (
     <aside
@@ -118,6 +116,10 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
       {...beaconProps(TOUR_BEACONS.rail)}
     >
       <RailToolbar isCompact={isCompact} onToggle={toggleRailCompact} />
+
+      {calendarRail && !courseRail && (
+        <CalendarRailSwitch value={calendarView} onChange={chooseCalendarView} />
+      )}
 
       {hasCreators && (
         <div className={LEFT_SIDEBAR.creatorRow}>
@@ -129,7 +131,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
       )}
 
       <div className={LEFT_SIDEBAR.searchRow}>
-        {calendarRail ? (
+        {isCalendarMenu && calendarRail ? (
           <>
             <CalendarSearchBar value={calendarRail.search} onChange={calendarRail.onSearch} />
             {/* Kept mounted so the palette shortcut still answers */}
@@ -142,87 +144,17 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
         )}
       </div>
 
-      {!courseRail && !calendarRail && (
-        <>
-          <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
-          {/* Hangs under the news shortcut it announces */}
-          {!isCompact && (
-            <ReleaseNotice
-              pointedAt={newsAt >= 0 ? (newsAt + 0.5) / shortcuts.length : undefined}
-            />
-          )}
-        </>
-      )}
-
-      {liveItem && viewContext.live && !courseRail && !calendarRail && (
-        <RailLiveCall item={liveItem} live={viewContext.live} />
-      )}
+      {!courseRail && topBlock}
 
       {courseRail ? (
         <CourseRail rail={courseRail} />
       ) : calendarRail ? (
-        <CalendarRailPanel {...calendarRail} />
+        <RailSlides
+          index={isCalendarMenu ? 0 : 1}
+          panes={[<CalendarRailPanel key="calendar" {...calendarRail} />, nav]}
+        />
       ) : (
-        <nav className={LEFT_SIDEBAR.nav}>
-          {groups.map((group) => {
-            const isGroupCollapsed = collapsedGroups.has(group.label) && !isCompact
-
-            return (
-              <div key={group.label} className={LEFT_SIDEBAR.navGroup}>
-                <button
-                  type="button"
-                  onClick={() => toggleGroup(group.label)}
-                  aria-expanded={!isGroupCollapsed}
-                  className={LEFT_SIDEBAR.navGroupLabel}
-                >
-                  {group.label}
-                  <ChevronIcon
-                    className={cn(
-                      LEFT_SIDEBAR.navGroupChevron,
-                      isGroupCollapsed && LEFT_SIDEBAR.navGroupChevronCollapsed
-                    )}
-                    aria-hidden="true"
-                  />
-                </button>
-
-                <div className="fold" data-open={!isGroupCollapsed} inert={isGroupCollapsed}>
-                  <div className={LEFT_SIDEBAR.navGroupItems}>
-                    {group.items.map((item) => {
-                      const Icon = railIcon(item.icon)
-                      const isActive =
-                        pathname === item.href || pathname.startsWith(`${item.href}/`)
-
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          title={isCompact ? item.label : undefined}
-                          aria-label={isCompact ? item.label : undefined}
-                          aria-current={isActive ? 'page' : undefined}
-                          {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
-                          className={cn(
-                            LEFT_SIDEBAR.navLink,
-                            isActive && LEFT_SIDEBAR.navLinkActive,
-                            isTouring && TOUR_RAIL.unlock
-                          )}
-                        >
-                          <Icon
-                            className={cn(
-                              LEFT_SIDEBAR.navIcon,
-                              isActive && LEFT_SIDEBAR.navIconActive
-                            )}
-                            aria-hidden="true"
-                          />
-                          <span className={LEFT_SIDEBAR.navLabel}>{item.label}</span>
-                        </Link>
-                      )
-                    })}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </nav>
+        nav
       )}
 
       {/* A late item lights its page */}
@@ -239,21 +171,33 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
             />
           ))}
 
-      <Link href={ROUTES.changelog} className={LEFT_SIDEBAR.version}>
-        {APP_VERSION_LABEL}
-      </Link>
-      {(courseRail || calendarRail) && !isCompact && <ReleaseNotice />}
+      {courseRail && !isCompact && <ReleaseNotice />}
 
       {session && (
         <div className={LEFT_SIDEBAR.footer}>
           <div className={LEFT_SIDEBAR.footerBox}>
-            <CreatorAccountMenu viewContext={viewContext} unreadCount={unreadCount} />
+            {viewContext.switchable && (
+              <>
+                <div className={LEFT_SIDEBAR.footerSwitch}>
+                  {isCompact ? (
+                    <ViewToggle viewContext={viewContext} />
+                  ) : (
+                    <RoleSwitch viewContext={viewContext} />
+                  )}
+                </div>
+                <span className={LEFT_SIDEBAR.footerRule} aria-hidden="true" />
+              </>
+            )}
 
-            <div className={LEFT_SIDEBAR.footerActions}>
-              <NotificationsBell
-                initialUnread={unreadCount}
-                iconClassName={LEFT_SIDEBAR.footerIcon}
-              />
+            <div className={LEFT_SIDEBAR.footerRow}>
+              <CreatorAccountMenu viewContext={viewContext} />
+
+              <div className={LEFT_SIDEBAR.footerActions}>
+                <NotificationsBell
+                  initialUnread={unreadCount}
+                  iconClassName={LEFT_SIDEBAR.footerIcon}
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -22,6 +22,8 @@ const nextConfig: NextConfig = {
   // The content security policy carries a per-request nonce
   headers: async () => [{ source: '/:path*', headers: STATIC_SECURITY_HEADERS }],
   experimental: {
+    // Enables forbidden()
+    authInterrupts: true,
     // Keeps .next small
     turbopackFileSystemCacheForDev: false,
   },

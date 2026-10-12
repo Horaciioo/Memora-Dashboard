@@ -24,9 +24,14 @@ import {
  */
 
 const nextSnapshot = (current: VersionParts): VersionParts => {
-  if (current.stage === 'snapshot') return { ...current, build: (current.build ?? 0) + 1 }
+  const isBump = flag('major') || flag('patch') || flag('minor')
 
-  // First snapshot picks the digit
+  // Counter only, unless a digit is asked for
+  if (current.stage === 'snapshot' && !isBump) {
+    return { ...current, build: (current.build ?? 0) + 1 }
+  }
+
+  // New version picks the digit, an unreleased one is closed
   if (flag('major')) {
     return { major: current.major + 1, minor: 0, patch: 0, stage: 'snapshot', build: 1 }
   }

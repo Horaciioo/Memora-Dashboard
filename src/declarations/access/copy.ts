@@ -128,6 +128,9 @@ export const TWO_FACTOR_COPY = {
  */
 
 export const VIEW_COPY = {
+  // Toast once a view is in force, its last word in bold
+  switchedEmphasis: 'mise',
+  switched: (name: string) => `La vue "${name}" a bien été mise.`,
   noCreator: 'Aucun',
   activeCreator: 'YouTubeur en cours',
   adminTitle: 'Console admin',

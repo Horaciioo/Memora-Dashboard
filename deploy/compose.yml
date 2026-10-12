@@ -1,0 +1,102 @@
+# Production stack: app, Postgres, Redis, Caddy, daily dump
+services:
+  app:
+    build:
+      context: ..
+      args:
+        APP_ENV: ${APP_ENV:-main}
+        NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://memora:${POSTGRES_PASSWORD}@db:5432/memora?schema=public
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks: [internal]
+
+  # Applies pending migrations, then exits
+  migrate:
+    build:
+      context: ..
+      target: build
+    profiles: [tools]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://memora:${POSTGRES_PASSWORD}@db:5432/memora?schema=public
+    command: yarn db:migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [internal]
+
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: memora
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: memora
+    volumes:
+      - db18-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U memora -d memora']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [internal]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - redis-data:/data
+    networks: [internal]
+
+  # One compressed dump a day, a week of dailies and a month of weeklies
+  backup:
+    image: prodrigestivill/postgres-backup-local:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: memora
+      POSTGRES_USER: memora
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SCHEDULE: '@daily'
+      BACKUP_KEEP_DAYS: 7
+      BACKUP_KEEP_WEEKS: 4
+      BACKUP_KEEP_MONTHS: 3
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [internal]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [app]
+    networks: [internal]
+
+volumes:
+  db18-data:
+  redis-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  internal:

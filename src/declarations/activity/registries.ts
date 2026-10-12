@@ -69,6 +69,7 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     target: 'cette réunion',
   },
   AbsenceRequested: { label: 'Demande', tone: 'success', verb: 'posé', target: 'une absence' },
+  AbsenceEdited: { label: 'Modification', tone: 'info', verb: 'modifié', target: 'une absence' },
   AbsenceReviewed: { label: 'Traitement', tone: 'info', verb: 'traité', target: 'une absence' },
   LiveconChanged: { label: 'Livecon', tone: 'warning', verb: 'changé', target: 'le Livecon' },
   TrainingValidated: {

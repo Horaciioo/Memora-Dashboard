@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { TASK_GROUPS } from '@/declarations/personal/groups'
 import { cn } from '@/utils/classnames'

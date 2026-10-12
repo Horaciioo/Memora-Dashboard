@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { Glyph } from '@/components/elements/display/Glyph'
 import { Section } from '@/components/structures/Section'

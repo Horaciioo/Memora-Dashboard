@@ -57,7 +57,7 @@ export const InlineArea = ({
         id={id}
         ref={(node) => node?.focus()}
         value={draft}
-        rows={Math.max(3, draft.split('\n').length)}
+        rows={1}
         maxLength={maxLength}
         onChange={(event) => setDraft(event.target.value)}
         onBlur={commit}

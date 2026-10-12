@@ -1,5 +1,6 @@
 'use client'
 
+import { Avatar } from '@/components/elements/display/Avatar'
 import { FunctionEmblems } from '@/composites/members/MemberBadges'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
@@ -67,10 +68,11 @@ export const MemberCard = ({
       className={cn(
         LIST_STYLES.card,
         LIST_STYLES.cardClickable,
-        'flex-row items-center py-3',
+        'flex-row items-center gap-3 py-3',
         member.isAbsent && LIST_STYLES.cardAbsent
       )}
     >
+      <Avatar name={member.displayName} src={member.avatarUrl} size="sm" className="shrink-0" />
       <span className="flex min-w-0 flex-1">
         <span
           className={cn(

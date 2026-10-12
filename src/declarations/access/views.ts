@@ -62,6 +62,17 @@ export const VIEW_ROLES: Record<NavigationViewName, MemberRoleName> = {
 }
 
 /**
+ * Colour each view takes on the switch: blue, orange, red
+ * @type {Record<NavigationViewName, string>}
+ */
+
+export const VIEW_TINTS: Record<NavigationViewName, string> = {
+  [NavigationViews.Moderation]: 'var(--switch-blue)',
+  [NavigationViews.Lead]: 'var(--switch-orange)',
+  [NavigationViews.Administration]: 'var(--switch-red)',
+}
+
+/**
  * Colour of the frame around the page
  * @typedef {'junior' | 'moderator' | 'lead' | 'admin'} ShellTone
  */

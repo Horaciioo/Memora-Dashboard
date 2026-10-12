@@ -48,6 +48,19 @@ export interface TourPage {
   steps: TourStep[]
 }
 
+const SANCTION_STEPS: TourStep[] = [
+  {
+    beacon: TOUR_BEACONS.sanctionsLivecon,
+    title: 'Le livecon en vigueur',
+    body: 'Le niveau de livecon du créateur change les sanctions affichées. Le panel n’est qu’une référence, il ne remplace pas ton jugement. La recherche retrouve une infraction.',
+  },
+  {
+    beacon: TOUR_BEACONS.sanctionsOffenses,
+    title: 'Les infractions',
+    body: 'Classées de la plus grave à la moins grave. Clique sur l’une d’elles : description, ce qu’il faut modérer ou laisser passer, barème au livecon en cours et raison de sanction suggérée.',
+  },
+]
+
 /**
  * Pages in the order the first visit unlocks them
  * @type {TourPage[]}
@@ -144,21 +157,8 @@ export const TOUR_PAGES: TourPage[] = [
       },
     ],
   },
-  {
-    route: ROUTES.sanctions,
-    steps: [
-      {
-        beacon: TOUR_BEACONS.sanctionsLivecon,
-        title: 'Le livecon en vigueur',
-        body: 'Le niveau de livecon du créateur change les sanctions affichées. Le panel n’est qu’une référence, il ne remplace pas ton jugement. La recherche retrouve une infraction.',
-      },
-      {
-        beacon: TOUR_BEACONS.sanctionsOffenses,
-        title: 'Les infractions',
-        body: 'Classées de la plus grave à la moins grave. Clique sur l’une d’elles : description, ce qu’il faut modérer ou laisser passer, barème au livecon en cours et raison de sanction suggérée.',
-      },
-    ],
-  },
+  { route: ROUTES.sanctions, steps: SANCTION_STEPS },
+  { route: ROUTES.discordSanctions, functions: ['Discord'], steps: SANCTION_STEPS },
   {
     route: ROUTES.marsha,
     functions: ['Discord'],

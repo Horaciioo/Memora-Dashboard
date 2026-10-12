@@ -112,3 +112,15 @@ export const discordAvatarUrl = (discordId: string, avatarHash: string | null): 
 
   return `${DISCORD_ENDPOINTS.cdn}/avatars/${discordId}/${avatarHash}.${extension}?size=${AUTH_SETTINGS.avatarSize}`
 }
+
+/**
+ * Build the profile banner served by the Discord CDN
+ * @param {string} discordId - Member identifier
+ * @param {string | null} bannerHash - Banner hash
+ * @return {string | null} - Banner URL
+ */
+
+export const discordBannerUrl = (discordId: string, bannerHash: string | null): string | null =>
+  bannerHash
+    ? `${DISCORD_ENDPOINTS.cdn}/banners/${discordId}/${bannerHash}.png?size=${AUTH_SETTINGS.bannerSize}`
+    : null

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'

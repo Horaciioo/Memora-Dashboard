@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { MATURITY_COPY } from '@/declarations/maturity/copy'
 import { MATURITY_REGISTRY } from '@/declarations/maturity/registries'

@@ -1,14 +1,21 @@
 'use client'
 
 import { Button } from '@/components/elements/actions/Button'
+import { Avatar } from '@/components/elements/display/Avatar'
 import { MARSHA_COPY } from '@/declarations/marsha/copy'
 import type { MarshaCommand } from '@/declarations/marsha/commands'
 import { ICONS } from '@/declarations/ui/icons'
 import { MARSHA_GUIDE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
+export interface MarshaViewer {
+  name: string
+  avatarUrl: string | null
+}
+
 export interface MarshaDetailProps {
   command: MarshaCommand
+  viewer: MarshaViewer
   onCopy: (text: string) => void
 }
 
@@ -55,11 +62,11 @@ const TypedLine = ({ example }: { example: string }) => {
 /**
  * Everything about one command: what it does, how it is written, what each part takes, what
  * it looks like typed, and what to know before using it
- * @param {MarshaDetailProps} props - Command and the copy handler
+ * @param {MarshaDetailProps} props - Command, viewer and the copy handler
  * @return {JSX.Element}
  */
 
-export const MarshaDetail = ({ command, onCopy }: MarshaDetailProps) => {
+export const MarshaDetail = ({ command, viewer, onCopy }: MarshaDetailProps) => {
   const syntax = syntaxOf(command)
   const [word = '', ...rest] = syntax.split(' ')
   const notes = command.presence ? [MARSHA_COPY.presence, ...command.notes] : command.notes
@@ -121,8 +128,11 @@ export const MarshaDetail = ({ command, onCopy }: MarshaDetailProps) => {
           {command.examples.map((example) => (
             <div key={example} className={MARSHA_GUIDE.example}>
               <div className={MARSHA_GUIDE.exampleBody}>
-                <span className={MARSHA_GUIDE.exampleAuthor}>{MARSHA_COPY.typedBy}</span>
-                <span className={MARSHA_GUIDE.exampleTime}>{MARSHA_COPY.typedAt}</span>
+                <span className={MARSHA_GUIDE.exampleHead}>
+                  <Avatar name={viewer.name} src={viewer.avatarUrl} size="xs" />
+                  <span className={MARSHA_GUIDE.exampleAuthor}>{viewer.name}</span>
+                  <span className={MARSHA_GUIDE.exampleTime}>{MARSHA_COPY.typedAt}</span>
+                </span>
                 <div className={MARSHA_GUIDE.exampleLine}>
                   <TypedLine example={example} />
                 </div>

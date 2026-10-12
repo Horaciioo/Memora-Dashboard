@@ -143,3 +143,14 @@ export const toAppError = (error: unknown): AppError => {
 
   return new AppError(ErrorCodes.SystemFailure)
 }
+
+/**
+ * Missing page guard, any other failure keeps its error
+ * @param {unknown} error - Caught failure
+ * @return {null} - Nothing found
+ */
+
+export const nullIfMissing = (error: unknown): null => {
+  if (error instanceof AppError && error.code === ErrorCodes.ResourceNotFound) return null
+  throw error
+}

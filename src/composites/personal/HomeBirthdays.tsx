@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { Section } from '@/components/structures/Section'
 import { ROUTES } from '@/declarations/navigation'

@@ -2,6 +2,18 @@ import type { Tone } from '@/declarations/ui/theme'
 import type { AvatarSize } from '@/declarations/ui/variants/surfaces'
 
 /**
+ * Value followed by its copy glyph
+ * @type {Record<string, string>}
+ */
+
+export const COPY_VALUE = {
+  root: 'inline-flex items-center gap-1.5',
+  button:
+    'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  glyph: 'h-3.5 w-3.5',
+} as const
+
+/**
  * Button styles
  * @type {Record<string, string>}
  */
@@ -73,6 +85,13 @@ export const PROPERTY_SPACING = {
  */
 
 export const EMPTY_VALUE = 'text-[var(--color-ink-subtle)] italic'
+
+/**
+ * Mark of a value being edited, drawn outside its box so nothing moves
+ * @type {string}
+ */
+
+export const EDITING_MARK = 'bg-[var(--color-surface)] ring-2 ring-[var(--color-pick)]'
 
 /**
  * Field styles shared by every input
@@ -466,6 +485,43 @@ export const FORM_ROWS = {
 } as const
 
 /**
+ * Editor laid over the read rendering of the same markdown: same sizes, same spacing
+ * @type {object}
+ */
+
+export const BLOCK_EDITOR_INLINE = {
+  page: 'flex flex-col',
+  base: 'flex items-start',
+  // Blocks sit 0.75em apart, list items touch
+  gap: 'mt-[0.75em]',
+  row: {
+    paragraph: '',
+    heading1: 'text-[1.35em]',
+    heading2: 'text-[1.2em]',
+    heading3: 'text-[1.05em]',
+    bullet: '',
+    numbered: '',
+    quote: 'border-l-[3px] border-[var(--color-brand-400)] pl-[0.8em]',
+    code: 'rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-[1em] py-[0.8em] text-[0.9em]',
+    rule: '',
+  },
+  line: {
+    paragraph: '',
+    heading1: 'heading-face leading-[1.25]! font-bold',
+    heading2: 'heading-face leading-[1.25]! font-bold',
+    heading3: 'heading-face leading-[1.25]! font-bold',
+    bullet: '',
+    numbered: '',
+    quote: 'text-[var(--color-ink-subtle)]',
+    code: 'font-[family-name:var(--font-mono)] text-[0.9em] whitespace-pre-wrap',
+    rule: '',
+  },
+  bullet:
+    'mt-[0.65em] mr-[calc(1.4em-0.375rem)] h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-ink)]',
+  number: 'w-[1.4em] shrink-0 tabular-nums',
+} as const
+
+/**
  * Block editor styles
  * @type {Object}
  */
@@ -474,10 +530,12 @@ export const BLOCK_EDITOR = {
   frame:
     'relative flex flex-col rounded-[var(--radius-lg)] border border-[var(--color-field-border)] bg-[var(--color-field)] transition-colors focus-within:border-[var(--color-field-border-strong)]',
   frameInvalid: 'border-[var(--color-danger)]',
+  // Bare frame laid over read text
+  frameInline: 'relative flex flex-col',
   page: 'flex min-h-40 flex-col gap-1 px-4 py-3 text-sm text-[var(--color-on-field)]',
   row: 'flex items-start gap-2',
   // Placeholder on the focused empty line
-  line: 'min-w-0 flex-1 leading-relaxed outline-none empty:before:pointer-events-none empty:before:text-[var(--color-on-field-subtle)] focus:empty:before:content-[attr(data-placeholder)] [&_a]:text-[var(--color-ink-accent)] [&_a]:underline [&_code]:rounded-[var(--radius-sm)] [&_code]:bg-[var(--color-surface-sunken)] [&_code]:px-1 [&_code]:font-[family-name:var(--font-mono)] [&_code]:text-[0.9em]',
+  line: 'min-w-0 flex-1 leading-[1.65] outline-none empty:before:pointer-events-none empty:before:text-[var(--color-on-field-subtle)] focus:empty:before:content-[attr(data-placeholder)] [&_a]:text-[var(--color-ink-accent)] [&_a]:underline [&_code]:rounded-[var(--radius-sm)] [&_code]:bg-[var(--color-surface-sunken)] [&_code]:px-1 [&_code]:font-[family-name:var(--font-mono)] [&_code]:text-[0.9em]',
   kinds: {
     paragraph: '',
     heading1: 'pt-3',

@@ -127,6 +127,149 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.3.1',
+    date: '2026-10-12',
+    title: 'Memora se range',
+    intro:
+      'Le menu et le haut de chaque page se simplifient, et les gestes du quotidien se font plus près de là où on les cherche.',
+    description:
+      'Jusqu’ici, le menu mélangeait Twitch et Discord, le titre des pages laissait peu de place à la photo, et certains gestes simples comme renommer un modérateur, corriger une absence ou copier un identifiant demandaient un détour. Cette version sépare clairement les deux plateformes, donne sa place à chaque page et corrige plusieurs plantages et affichages erronés.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        text: 'Ajout de la possibilité de passer, dans le menu latéral du « Calendrier », entre le mini-calendrier et le menu habituel',
+      },
+      {
+        tag: ChangelogTags.Added,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout d’un sélecteur de vue en trois couleurs, bleu modérateur, orange responsable et rouge admin, dans le menu latéral',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Ajout de la possibilité de corriger une absence depuis la fiche d’un modérateur tant qu’elle n’est pas terminée',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Ajout de la possibilité de renommer un modérateur en cliquant sur son pseudo, sur sa fiche',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.projects,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.TaskManage,
+        text: 'Ajout de la possibilité de valider une tâche depuis la fiche d’un projet',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.preferences,
+        text: 'Ajout de la possibilité de modifier son pseudo dans « Paramètres »',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la possibilité de copier un identifiant Discord d’un clic',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la bannière Discord de ton compte, reprise à chaque connexion',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle du haut de chaque page : le titre se pose sur la photo, avec une courte phrase en dessous',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration du menu latéral : « Modération » devient « Twitch », et Discord a son propre groupe',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la rapidité : une page ne se charge qu’au moment où tu t’apprêtes à l’ouvrir',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        text: 'Amélioration du mini-calendrier : de simples flèches changent de mois, et un clic sur un jour ouvre ce dernier',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des listes de choix : une entrée « Aucun » en tête permet de tout désélectionner, et les choix s’ouvrent dès que tu modifies un champ',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.marsha,
+        text: 'Amélioration de l’exemple de commande de « Marsha Bots » : il s’affiche à ton nom et avec ta photo',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Amélioration de la fiche et de la carte d’un modérateur : sa photo et le glyphe de son rôle remplacent le logo de division',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.changelog,
+        text: 'Amélioration de la page « Nouveautés » : le bandeau annonce la version que tu utilises',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Correction d’un bug qui affichait « page introuvable » à la place de la vraie erreur quand la fiche d’un modérateur ne s’ouvrait pas',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui laissait la « Recherche » proposer des modérateurs que tu n’as pas le droit d’ouvrir, toi-même compris',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui menait certains résultats de la « Recherche » vers une page qui t’était interdite',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui te renvoyait à l’accueil, ou sur « page introuvable », quand tu n’avais pas accès à une page : une page « Accès refusé » s’affiche à la place',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui renvoyait vers une mauvaise adresse après certaines actions de connexion',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui faisait bouger la page quand on modifiait un champ en place',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui n’affichait pas les bons fuseaux horaires',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        text: 'Correction d’un bug qui n’affichait pas le bon temps de départ dans la page « Live en cours »',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug rare qui faisait planter Memora à cause d’une redirection vers une mauvaise version de l’application',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        text: 'Correction d’un bug qui empêchait le live de se lancer quand son horaire tombait en même temps qu’un autre évènement',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.members,
+        text: 'Correction d’un bug qui faisait planter Memora en ouvrant sa propre fiche',
+      },
+    ],
+  },
+  {
     version: '0.3.0',
     date: '2026-10-11',
     title: 'Memora s’améliore !',

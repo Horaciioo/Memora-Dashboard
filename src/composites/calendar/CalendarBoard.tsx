@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { Button } from '@/components/elements/actions/Button'
@@ -176,10 +176,16 @@ export const CalendarBoard = ({
 
   const days = useMemo(() => unitGrid(cursor, unit), [cursor, unit])
 
+  // A day number opens that day on its own
+  const openDay = (dayKey: string) => {
+    setCursor(dayKey)
+    setUnit('day')
+  }
+
   const railProps: CalendarSidebarProps = {
     cursor,
     unit,
-    onPick: setCursor,
+    onPick: openDay,
     onCursor: setCursor,
     search,
     onSearch: setSearch,
@@ -271,12 +277,6 @@ export const CalendarBoard = ({
       hour === undefined ? moveToDay(entry.startsAt, dayKey) : moveToSlot(dayKey, Number(hour))
     )
   })
-
-  // A day number opens that day on its own
-  const openDay = (dayKey: string) => {
-    setCursor(dayKey)
-    setUnit('day')
-  }
 
   const openForm = (entry: CalendarEntry | null, prefill?: FormValues) => {
     calendar.clearIssues()

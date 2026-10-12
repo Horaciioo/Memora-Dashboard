@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { PageHeader } from '@/components/structures/PageHeader'
 import { LiveReportView } from '@/composites/lives/LiveReportView'

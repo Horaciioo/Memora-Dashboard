@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { useState } from 'react'
 
 import { Section } from '@/components/structures/Section'

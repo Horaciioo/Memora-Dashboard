@@ -1,3 +1,5 @@
+import { EDITING_MARK } from '@/declarations/ui/variants/controls'
+
 /**
  * Section and panel styles
  * @type {Record<string, string>}
@@ -7,7 +9,7 @@ export const SECTION_STYLES = {
   wrapper: 'flex flex-col gap-3',
   header: 'flex flex-wrap items-end justify-between gap-3',
   heading: 'flex items-center gap-3',
-  title: 'text-xl font-bold tracking-tight uppercase italic',
+  title: 'text-2xl font-bold tracking-tight',
   actions: 'flex shrink-0 flex-wrap items-center gap-2',
   panel: 'rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface',
   panelPadded: 'p-4 sm:p-6',
@@ -31,25 +33,21 @@ export const PAGE_STYLES = {
     'relative -mx-4 -mt-6 h-[var(--banner-h)] sm:-mx-6 sm:-mt-8 md:absolute md:inset-x-0 md:top-0 md:m-0 print:hidden',
   // Corner of the banner the page options sit in
   bannerOptions: 'absolute top-3 right-3 z-10 sm:top-4 sm:right-4',
-  // Title sitting in the notch cut into the bottom edge of the banner
-  notch: 'absolute inset-x-0 bottom-0 mx-auto flex w-fit items-stretch',
-  notchBody:
-    'banner-notch-body flex min-w-0 max-w-[min(56rem,80vw)] flex-col items-stretch px-8 text-center',
-  notchTitleRow: 'flex min-h-[var(--shell-notch-h)] items-center justify-center gap-3 pt-2',
-  notchTitleRowFree: 'pb-5',
-  notchTitle:
-    'min-w-0 text-2xl font-semibold tracking-tight text-[var(--color-ink)] md:text-[2rem] md:leading-tight',
-  // Title sits lower when a line follows its divider
-  notchTitleRowNoted: 'pb-2',
-  notchTitleText: 'min-w-0 text-balance md:truncate',
-  // Tab strip under the title, empty on most pages
-  notchTabs:
-    'flex w-full justify-center border-t border-[var(--color-border)] pt-4 pb-2 empty:hidden',
-  // Line under the title divider, like the tab strip
-  notchNote: 'flex w-full justify-center border-t border-[var(--color-border)] pt-4 pb-3',
-  // Shoulders of the notch
-  notchSlopeStart: 'banner-slope banner-slope-start',
-  notchSlopeEnd: 'banner-slope banner-slope-end',
+  // Title and note laid over the foot of the photograph
+  bannerFoot:
+    'absolute inset-x-0 bottom-0 flex flex-col gap-1.5 px-5 pb-5 text-[var(--color-on-media)] sm:px-8 sm:pb-7',
+  bannerTitleRow: 'flex min-w-0 items-center gap-3',
+  // Letters fade out towards their foot
+  bannerTitle:
+    'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-5xl leading-none font-bold tracking-tight text-transparent uppercase italic md:text-8xl',
+  bannerTitleText: 'min-w-0 pr-2 text-balance md:truncate',
+  // Faint two-to-six word line under the title
+  bannerHero:
+    'relative -mt-2 text-base leading-none font-bold tracking-tight text-balance text-[var(--color-on-media)] uppercase italic drop-shadow-[0_1px_6px_rgb(0_0_0/0.45)] md:-mt-4 md:text-2xl',
+  // Very small line under the title
+  bannerNote: 'flex text-xs font-medium',
+  // Tab strip centred under the photograph, empty on most pages
+  tabsHost: 'flex w-full justify-center empty:hidden',
   // Eyebrow left
   headerRow: 'flex flex-wrap items-center justify-between gap-4',
   eyebrow:
@@ -60,8 +58,7 @@ export const PAGE_STYLES = {
   headingTitle: 'min-w-0 flex-1',
   titleEditable:
     '-mx-1 cursor-pointer rounded-[var(--radius-sm)] px-1 transition-colors hover:bg-[var(--color-surface)]',
-  titleInput:
-    'rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-pick)]',
+  titleInput: `heading-face -mx-1 rounded-[var(--radius-sm)] px-1 outline-none ${EDITING_MARK}`,
   toolbar: 'flex flex-wrap items-center gap-2',
 } as const
 
@@ -176,6 +173,10 @@ export const DRAWER_STYLES = {
     'drawer-enter fixed inset-x-0 bottom-0 z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
   // Wider footprint from md
   wide: 'md:w-[var(--drawer-page-wide-w)]',
+  // Form on the left, live result on the right, same width and height
+  split:
+    'flex min-h-full flex-col gap-6 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-x-8',
+  splitDivider: 'hidden w-px self-stretch bg-[var(--color-border)] md:block',
   // Section tabs under the header
   sections: 'shrink-0 px-6 pb-2',
   body: 'min-h-0 flex-1 overflow-y-auto px-6 py-5',
@@ -317,14 +318,18 @@ export const INLINE_EDIT_STYLES = {
   block:
     '-mx-2 -my-1 cursor-text rounded-[var(--radius-sm)] px-2 py-1 transition-colors hover:bg-[var(--color-surface)]',
   text: '-mx-1 cursor-text rounded-[var(--radius-sm)] px-1 transition-colors hover:bg-[var(--color-surface)]',
-  input:
-    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-1 outline-none ring-2 ring-[var(--color-pick)]',
-  area: 'block min-h-20 resize-y rounded-[var(--radius-md)] px-3 py-2 leading-relaxed',
+  input: `rounded-[var(--radius-sm)] outline-none ${EDITING_MARK}`,
+  // Input laid exactly over its read text
+  line: '-mx-1 max-w-full field-sizing-content px-1 py-0 text-inherit [text-align:inherit]',
+  area: 'block -mx-2 -my-1 w-full field-sizing-content resize-none px-2 py-1 text-inherit [text-align:inherit]',
+  blockEditing: `-mx-2 -my-1 rounded-[var(--radius-sm)] px-2 py-1 ${EDITING_MARK}`,
   // Dashed field standing in for a creation row
   create:
     'w-full rounded-[var(--radius-md)] border border-dashed border-[var(--color-brand-400)] bg-[var(--color-surface)] px-4 py-3 text-sm outline-none focus:border-solid focus:ring-2 focus:ring-[var(--color-focus)]',
   createTile: 'min-h-16 text-center',
   placeholder: 'text-sm text-[var(--color-ink-subtle)] italic',
+  // Blank markdown, same size as its editor line
+  placeholderBlock: 'leading-[1.65] text-[var(--color-ink-subtle)] italic',
 } as const
 
 /**

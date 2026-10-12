@@ -48,11 +48,13 @@ export const DISCORD_MESSAGE = {
     'rounded-[3px] bg-[var(--discord-mention)] px-0.5 font-medium text-[var(--discord-mention-text)] transition-colors hover:bg-[var(--discord-mention-hover)] hover:text-white',
   spoiler: 'cursor-pointer rounded-[3px] bg-[var(--discord-spoiler)] text-transparent',
   spoilerOpen: 'rounded-[3px] bg-[var(--discord-quote)]/40',
+  // Message bar and preview share one height
+  pane: 'h-[22rem]',
   // Composer
-  composer: 'relative px-4 pb-4',
+  composer: 'relative flex min-h-0 flex-1 flex-col p-4',
   input:
-    'block max-h-[50dvh] min-h-11 w-full resize-none rounded-[var(--radius-md)] bg-[var(--discord-input)] px-4 py-2.5 text-[var(--discord-text)] placeholder:text-[var(--discord-muted)] focus:outline-none',
-  hint: 'px-4 pt-1 text-xs text-[var(--discord-muted)]',
+    'block min-h-11 w-full flex-1 resize-none rounded-[var(--radius-md)] bg-[var(--discord-input)] px-4 py-2.5 text-[var(--discord-text)] placeholder:text-[var(--discord-muted)] focus:outline-none',
+  hint: 'pt-2 text-xs text-[var(--discord-muted)]',
   popover:
     'absolute right-4 bottom-full left-4 mb-2 max-h-72 overflow-y-auto rounded-[var(--radius-md)] bg-[var(--discord-popover)] p-2 shadow-[var(--shadow-md)]',
   popoverGroup:

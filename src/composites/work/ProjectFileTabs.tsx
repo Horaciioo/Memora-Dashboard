@@ -24,7 +24,7 @@ import { InlineMarkdown } from '@/components/structures/InlineMarkdown'
 import { Section } from '@/components/structures/Section'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { ProjectTeam } from '@/composites/work/ProjectTeam'
-import { apiPost } from '@/core/lib/api/client'
+import { apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useCommunications } from '@/core/hooks/data/useCommunications'
 import { useCopy } from '@/core/hooks/interaction/useCopy'
@@ -35,6 +35,7 @@ import { COMMUNICATION_HEAD, DISCORD_MESSAGE } from '@/declarations/ui/variants'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { useRecordFile } from '@/core/hooks/data/useRecordFile'
 import { ROUTES } from '@/declarations/navigation'
+import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { ACTION_COPY, FIELD_COPY, feedbackTitle } from '@/declarations/ui/copy'
 import { LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -51,7 +52,7 @@ import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { CommunicationEntry, MeetingSummary, ProjectDetail, TaskSummary } from '@/types/work'
-import { WorkflowScopes } from '@/utils/constants/workflow'
+import { WorkflowPhases, WorkflowScopes } from '@/utils/constants/workflow'
 import { formatDay, formatDayTime } from '@/utils/format/dates'
 
 const DotGlyph = ICONS.statusDot
@@ -65,6 +66,8 @@ export interface ProjectFileTabsProps {
   activity: ActivityEntry[]
   canUpdate: boolean
   canReadLogs: boolean
+  doneStateId: string | null
+  canValidateTasks: boolean
   canCreateTasks: boolean
   canReadTasks: boolean
   canCreateMeetings: boolean
@@ -83,6 +86,8 @@ export interface ProjectFileTabsProps {
  * @param {ActivityEntry[]} activity - Journal entries
  * @param {boolean} canUpdate - Member may edit the project
  * @param {boolean} canReadLogs - Member may read the journal
+ * @param {string | null} doneStateId - Task state meaning validated
+ * @param {boolean} canValidateTasks - Member may validate a task
  * @param {boolean} canCreateTasks - Member may open a task
  * @param {boolean} canReadTasks - Member may open a task file
  * @param {boolean} canCreateMeetings - Member may plan a meeting
@@ -101,6 +106,8 @@ export const ProjectFileTabs = ({
   activity,
   canUpdate,
   canReadLogs,
+  doneStateId,
+  canValidateTasks,
   canCreateTasks,
   canReadTasks,
   canCreateMeetings,
@@ -117,6 +124,7 @@ export const ProjectFileTabs = ({
   })
   const communications = useCommunications(summary.id, detail.communications)
   const copyAnnouncement = useCopy(WORK_DISCORD_COPY.copied)
+  const { session } = useAuthContext()
   const workItem = useMutation()
   const { contextMenu } = useMenu()
   const gestures = useEditGestures()
@@ -316,6 +324,20 @@ export const ProjectFileTabs = ({
     communicationFields.find((field) => field.kind === 'announcement')?.options ?? []
   )
 
+  // Announcement as Discord draws it, live
+  const communicationPreview = {
+    label: PROJECT_COPY.communicationPreview,
+    render: (values: FormValues) => (
+      <div className={cn(DISCORD_MESSAGE.frame, DISCORD_MESSAGE.pane, 'overflow-y-auto')}>
+        <DiscordMessage
+          source={typeof values.body === 'string' ? values.body : ''}
+          mentions={mentions}
+          author={session?.displayName ?? ''}
+        />
+      </div>
+    ),
+  }
+
   const communicationTab = () => (
     <Section
       title={PROJECT_COPY.communicationTitle}
@@ -407,11 +429,58 @@ export const ProjectFileTabs = ({
     </Section>
   )
 
+  const validateTask = async (task: TaskSummary) => {
+    const moved = await workItem.run(
+      () =>
+        apiPatch(API_ROUTES.board, {
+          scope: WorkflowScopes.Task,
+          id: task.id,
+          columnId: doneStateId,
+          index: 0,
+        }),
+      TASK_COPY.validated
+    )
+
+    if (moved !== null) router.refresh()
+  }
+
+  // Check ahead of a task row
+  const taskCheck = (task: TaskSummary) => {
+    const done = isValidated(task)
+
+    return (
+      <Button
+        variant="icon"
+        icon="check"
+        aria-label={TASK_COPY.validate}
+        title={done ? TASK_COPY.validated : TASK_COPY.validate}
+        aria-pressed={done}
+        disabled={done || !doneStateId || !canValidateTasks || workItem.isSaving}
+        className={cn(!done && 'opacity-40 grayscale hover:opacity-100 hover:grayscale-0')}
+        onClick={() => void validateTask(task)}
+      />
+    )
+  }
+
+  const isValidated = (task: TaskSummary) => task.state?.phase === WorkflowPhases.Done
+
+  // Validated tasks sink, order kept otherwise
+  const orderedTasks = [...detail.tasks].sort(
+    (a, b) => Number(isValidated(a)) - Number(isValidated(b))
+  )
+
   // Shared task row body
   const taskLine = (task: TaskSummary) => (
     <>
       <Glyph value={task.emoji} size="row" />
-      <span className="min-w-0 flex-1 truncate font-medium">{task.title}</span>
+      <span
+        className={cn(
+          'min-w-0 flex-1 truncate font-medium',
+          isValidated(task) && 'text-[var(--color-ink-subtle)] line-through'
+        )}
+      >
+        {task.title}
+      </span>
       {task.owner && (
         <span className="text-xs text-[var(--color-ink-subtle)]">{task.owner.name}</span>
       )}
@@ -450,22 +519,29 @@ export const ProjectFileTabs = ({
         />
       ) : (
         <div className={LIST_STYLES.stack}>
-          {detail.tasks.map((task) =>
-            canReadTasks ? (
-              <button
-                key={task.id}
-                type="button"
-                onClick={() => router.push(ROUTES.task(task.id))}
-                className={cn(LIST_STYLES.item, LIST_STYLES.itemClickable, 'text-left')}
-              >
-                {taskLine(task)}
-              </button>
-            ) : (
-              <div key={task.id} className={LIST_STYLES.item}>
-                {taskLine(task)}
-              </div>
-            )
-          )}
+          {orderedTasks.map((task) => (
+            <div
+              key={task.id}
+              className={cn(
+                LIST_STYLES.item,
+                canReadTasks && LIST_STYLES.itemClickable,
+                isValidated(task) && 'opacity-60'
+              )}
+            >
+              {taskCheck(task)}
+              {canReadTasks ? (
+                <button
+                  type="button"
+                  onClick={() => router.push(ROUTES.task(task.id))}
+                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                >
+                  {taskLine(task)}
+                </button>
+              ) : (
+                <div className="flex min-w-0 flex-1 items-center gap-3">{taskLine(task)}</div>
+              )}
+            </div>
+          ))}
           <AddRow
             label={PROJECT_COPY.taskCreate}
             disabled={!canCreateTasks}
@@ -614,6 +690,7 @@ export const ProjectFileTabs = ({
         open={isWriting}
         title={PROJECT_COPY.communicationAdd}
         fields={communicationFields}
+        aside={communicationPreview}
         issues={communications.issues}
         isSaving={communications.isSaving}
         onSubmit={communications.create}
@@ -625,6 +702,7 @@ export const ProjectFileTabs = ({
         open={editing !== null}
         title={editing ? `${ACTION_COPY.edit} · ${editing.title}` : ACTION_COPY.edit}
         fields={communicationFields}
+        aside={communicationPreview}
         initialValues={editing?.values}
         issues={communications.issues}
         isSaving={communications.isSaving}

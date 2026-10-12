@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Status } from '@/components/elements/display/Status'

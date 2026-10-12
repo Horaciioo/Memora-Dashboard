@@ -10,6 +10,7 @@ import {
   projectFields,
   readProject,
 } from '@/core/services/work/ProjectService'
+import { boardColumns } from '@/core/services/work/shared'
 import { creatableTaskFields, taskFields } from '@/core/services/work/TaskService'
 import { redactProject } from '@/core/services/work/redaction'
 import {
@@ -22,6 +23,7 @@ import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { PROJECT_COPY } from '@/declarations/work/copy'
 import { Permissions } from '@/utils/constants/permissions'
+import { WorkflowPhases, WorkflowScopes } from '@/utils/constants/workflow'
 
 /**
  * Name the browser tab after the project
@@ -71,15 +73,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
   const detail = redactProject(found, access)
 
-  const [projectForm, taskForm, meetingForm, communicationForm, activity] = await Promise.all([
-    projectFields(perimeter),
-    taskFields(perimeter, viewer),
-    meetingFields(perimeter, viewer),
-    mentionOptions(detail.summary.youtubers.map((youtuber) => youtuber.id)).then(
-      communicationFields
-    ),
-    access.can(Permissions.WorkLogRead) ? readRecordActivity('project', id) : Promise.resolve([]),
-  ])
+  const [projectForm, taskForm, meetingForm, communicationForm, activity, taskColumns] =
+    await Promise.all([
+      projectFields(perimeter),
+      taskFields(perimeter, viewer),
+      meetingFields(perimeter, viewer),
+      mentionOptions(detail.summary.youtubers.map((youtuber) => youtuber.id)).then(
+        communicationFields
+      ),
+      access.can(Permissions.WorkLogRead) ? readRecordActivity('project', id) : Promise.resolve([]),
+      boardColumns(WorkflowScopes.Task),
+    ])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
@@ -94,6 +98,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         activity={activity}
         canUpdate={access.can(Permissions.ProjectUpdate)}
         canReadLogs={access.can(Permissions.WorkLogRead)}
+        doneStateId={taskColumns.find((column) => column.phase === WorkflowPhases.Done)?.id ?? null}
+        canValidateTasks={access.can(Permissions.TaskManage)}
         canCreateTasks={access.can(Permissions.TaskCreate)}
         canReadTasks={access.can(Permissions.TaskRead)}
         canCreateMeetings={access.can(Permissions.MeetingCreate)}

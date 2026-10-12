@@ -56,6 +56,7 @@ export const MEMBER_COPY = {
   absencesEmptyTitle: 'Aucune absence',
   absencesEmptyDescription: 'Rien de posé pour l’instant.',
   absenceAdd: 'Poser une absence',
+  absenceEdit: 'Modifier cette absence',
   absenceFirst: 'On te pose la 1ère absence ?',
   pathLead: 'Les deux fiches qui retracent son passage, de la candidature au suivi.',
   academyFsiTitle: 'Fiche de suivi individuel',

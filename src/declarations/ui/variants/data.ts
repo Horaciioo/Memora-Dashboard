@@ -102,12 +102,15 @@ export const CALENDAR_SIDEBAR = {
   railBody: 'flex-col gap-6',
   // Sidebar version
   panel: 'flex min-h-0 w-full flex-1 flex-col gap-5 overflow-y-auto px-4 pt-5 pb-4',
-  back: 'flex items-center gap-3 rounded-[var(--radius-lg)] px-3 py-2 text-body font-medium transition-colors hover:bg-[var(--color-surface)]',
   toggle:
     'flex w-full items-center justify-between rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-3 text-sm font-semibold',
   mini: 'flex flex-col gap-2',
   miniHead: 'flex items-center justify-between gap-2',
-  miniTitle: 'pl-2 text-sm font-bold first-letter:uppercase',
+  miniTitle: 'min-w-0 flex-1 pl-2 text-sm font-bold first-letter:uppercase',
+  miniSteps: 'flex shrink-0 items-center',
+  miniStep:
+    'flex size-7 items-center justify-center text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  miniStepIcon: 'size-4',
   miniGrid: 'grid grid-cols-7 gap-y-0.5 text-center',
   miniWeekday: 'py-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   miniDay:
@@ -218,7 +221,7 @@ export const BOARD_STYLES = {
   columnTint:
     'accent-tint accent-border border bg-clip-padding shadow-[inset_0_1px_0_var(--glass-line),var(--shadow-md)]',
   columnHead: 'flex items-center justify-between gap-2 px-2 py-1.5',
-  columnTitle: 'text-sm font-bold tracking-wide text-[var(--color-ink)] uppercase italic',
+  columnTitle: 'text-sm font-bold tracking-wide text-[var(--color-ink)] uppercase',
   count:
     'rounded-[var(--radius-sm)] bg-[var(--color-surface-raised)] px-2 py-0.5 text-xs text-[var(--color-ink-subtle)]',
   body: 'flex min-h-24 flex-col gap-2 rounded-[var(--radius-md)] p-1',

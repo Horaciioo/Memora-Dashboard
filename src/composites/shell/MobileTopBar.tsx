@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { AccountSheet } from '@/composites/shell/AccountSheet'
@@ -14,19 +14,17 @@ import type { SessionUser } from '@/types/auth'
 
 export interface MobileTopBarProps {
   session: SessionUser
-  unreadCount: number
   viewContext: ViewContext
 }
 
 /**
  * Fixed top bar of the mobile shell — active creator
  * @param {SessionUser} session - Signed-in member
- * @param {number} unreadCount - Unopened notifications resolved server-side
  * @param {ViewContext} viewContext - View resolved server-side
  * @return {JSX.Element}
  */
 
-export const MobileTopBar = ({ session, unreadCount, viewContext }: MobileTopBarProps) => {
+export const MobileTopBar = ({ session, viewContext }: MobileTopBarProps) => {
   const [isAccountOpen, setAccountOpen] = useState(false)
 
   const { creators, activeYoutuberId } = viewContext
@@ -57,11 +55,7 @@ export const MobileTopBar = ({ session, unreadCount, viewContext }: MobileTopBar
         </button>
       </div>
 
-      <AccountSheet
-        open={isAccountOpen}
-        unreadCount={unreadCount}
-        onClose={() => setAccountOpen(false)}
-      />
+      <AccountSheet open={isAccountOpen} onClose={() => setAccountOpen(false)} />
     </header>
   )
 }
