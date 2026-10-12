@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { forbidden } from 'next/navigation'
 import { ModViewPreview } from '@/composites/modview/ModViewPreview'
 import { readDemoPanel } from '@/core/services/lives/PreviewService'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: MODVIEW_PREVIEW_COPY.title }
 
 export default async function ModViewPreviewPage() {
   const { session, access, scope } = await requirePermission(Permissions.LiveRead)
-  if (!access.isAdmin) notFound()
+  if (!access.isAdmin) forbidden()
 
   const { panel, levelNames } = await readDemoPanel(await scope())
 

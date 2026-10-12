@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import { forbidden, notFound } from 'next/navigation'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { MemberFileTabs } from '@/composites/members/MemberFileTabs'
 import { readMemberModeration } from '@/core/services/lives/MemberModerationService'
@@ -76,8 +76,8 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const { id } = await params
   const { session, access, scope } = await requirePermission(Permissions.MemberRead)
 
-  // Floor roles never open another member's file, whatever grants they hold
-  if (!access.isResponsable && id !== session.id) notFound()
+  // Only responsables open a file, never one's own
+  if (!access.isResponsable || id === session.id) forbidden()
 
   const canManageAccess = access.can(Permissions.AccessManage)
   const canReadLogs = access.can(Permissions.MemberLogRead)
@@ -89,9 +89,8 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     .catch(nullIfMissing)
   if (!detail) notFound()
 
-  // A Responsable reads only those below them, and their own file
-  if (!access.isAdmin && id !== session.id && !BELOW_LEAD_ROLES.includes(detail.summary.role))
-    notFound()
+  // A Responsable reads only those below them
+  if (!access.isAdmin && !BELOW_LEAD_ROLES.includes(detail.summary.role)) forbidden()
 
   // Only the responsables of their creators
   const isConcerned =
@@ -142,7 +141,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={detail.summary.displayName} />
+      <PageHeader title={detail.summary.displayName} image={detail.summary.bannerUrl} />
       <MemberFileTabs
         detail={sealed}
         recruitmentSessionId={recruitment?.sessionId ?? null}

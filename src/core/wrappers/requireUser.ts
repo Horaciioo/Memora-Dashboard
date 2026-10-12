@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { redirect } from 'next/navigation'
+import { forbidden, redirect } from 'next/navigation'
 
 import { getSession } from '@/core/lib/auth/getSession'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
@@ -52,7 +52,7 @@ export const requirePermission = async (
     ? guarded.access.canAny(permission)
     : guarded.access.can(permission)
 
-  if (!allowed) redirect(ROUTES.home)
+  if (!allowed) forbidden()
 
   return guarded
 }
@@ -69,7 +69,7 @@ export const requireStatus = async (
   const guarded = await requireUser()
   const allowed = Array.isArray(status) ? status : [status]
 
-  if (!allowed.includes(guarded.session.status)) redirect(ROUTES.home)
+  if (!allowed.includes(guarded.session.status)) forbidden()
 
   return guarded
 }
