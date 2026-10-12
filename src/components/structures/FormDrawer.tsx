@@ -2,6 +2,7 @@
 
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { Tabs } from '@/components/elements/navigation/Tabs'
 import { Drawer } from '@/components/structures/Drawer'
 import { FormRenderer } from '@/components/structures/FormRenderer'
@@ -15,7 +16,7 @@ import type { PresetContext } from '@/core/lib/forms'
 import { ACTION_COPY, DRAWER_COPY, FORM_COPY } from '@/declarations/ui/copy'
 import type { FormSubject } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { DRAWER_ACTIONS, DRAWER_STYLES } from '@/declarations/ui/variants'
+import { DRAWER_ACTIONS, DRAWER_STYLES, FIELD_STYLES } from '@/declarations/ui/variants'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
@@ -39,6 +40,8 @@ export interface FormDrawerProps {
   submitVerb?: string
   // Settings rows
   layout?: 'grid' | 'rows'
+  // Live result shown beside the fields
+  aside?: { label: string; render: (values: FormValues) => ReactNode }
   // Record being edited
   recordId?: string | null
   onSubmit: (values: FormValues) => Promise<boolean>
@@ -72,6 +75,7 @@ const presetContext = (actorId: string | null): PresetContext => {
  * @param {boolean} isSaving - Submission in flight
  * @param {string} [submitVerb] - Confirming verb
  * @param {'grid' | 'rows'} [layout] - Field layout
+ * @param {{ label: string, render: (values: FormValues) => ReactNode }} [aside] - Live result beside the fields
  * @param {string | null} [recordId] - Record being edited
  * @param {(values: FormValues) => Promise<boolean>} onSubmit - Submission handler
  * @param {() => void} onClose - Dismiss handler
@@ -90,6 +94,7 @@ export const FormDrawer = ({
   isSaving,
   submitVerb = DRAWER_COPY.save,
   layout,
+  aside,
   recordId,
   onSubmit,
   onClose,
@@ -180,10 +185,27 @@ export const FormDrawer = ({
   const CancelIcon = ICONS.close
   const BackIcon = ICONS.back
 
+  const section = (
+    <div key={current?.name} className={DRAWER_STYLES.section}>
+      {note && <p className={DRAWER_ACTIONS.note}>{note}</p>}
+      <FormRenderer
+        fields={current?.fields ?? []}
+        values={values}
+        issues={shownIssues}
+        onChange={change}
+        disabled={isSaving}
+        layout={layout}
+        recordId={recordId}
+        single
+      />
+    </div>
+  )
+
   return (
     <Drawer
       open={open}
       onClose={onClose}
+      isWide={Boolean(aside)}
       title={title}
       icon={subject.icon}
       description={description}
@@ -256,19 +278,20 @@ export const FormDrawer = ({
         </div>
       }
     >
-      <div key={current?.name} className={DRAWER_STYLES.section}>
-        {note && <p className={DRAWER_ACTIONS.note}>{note}</p>}
-        <FormRenderer
-          fields={current?.fields ?? []}
-          values={values}
-          issues={shownIssues}
-          onChange={change}
-          disabled={isSaving}
-          layout={layout}
-          recordId={recordId}
-          single
-        />
-      </div>
+      {aside ? (
+        <div className={DRAWER_STYLES.split}>
+          {section}
+          <div className={DRAWER_STYLES.splitDivider} aria-hidden="true" />
+          <div className={FIELD_STYLES.wrapper}>
+            <span className={FIELD_STYLES.labelRow}>
+              <span className={FIELD_STYLES.label}>{aside.label}</span>
+            </span>
+            {aside.render(values)}
+          </div>
+        </div>
+      ) : (
+        section
+      )}
     </Drawer>
   )
 }

@@ -444,6 +444,7 @@ export const communicationFields = async (
       required: true,
       maxLength: FORM_SETTINGS.titleMaxLength,
       span: 'half',
+      group: FORM_GROUPS.essentials,
     },
     {
       name: 'platformId',
@@ -451,12 +452,14 @@ export const communicationFields = async (
       label: PROJECT_FIELD_COPY.communicationPlatform,
       options: platforms,
       span: 'half',
+      group: FORM_GROUPS.essentials,
     },
     {
       name: 'publishedAt',
       kind: 'date',
       label: PROJECT_FIELD_COPY.publishedAt,
       span: 'half',
+      group: FORM_GROUPS.essentials,
     },
     {
       name: 'body',
@@ -464,6 +467,7 @@ export const communicationFields = async (
       label: PROJECT_FIELD_COPY.communicationBody,
       options: mentions,
       maxLength: FORM_SETTINGS.markdownMaxLength,
+      group: FORM_GROUPS.message,
     },
   ]
 }
