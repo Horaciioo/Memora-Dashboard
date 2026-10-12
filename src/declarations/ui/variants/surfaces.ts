@@ -235,7 +235,7 @@ export const TABS_STYLES = {
   list: 'relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-full glass-soft p-1',
   // Strip centred over its panel from sm
   listCentered: 'sm:mx-auto',
-  tab: 'relative z-10 shrink-0 rounded-full px-3 py-1.5 text-sm font-medium sm:px-3.5 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  tab: 'relative z-10 min-h-11 shrink-0 rounded-full px-3 py-1.5 text-sm font-medium sm:px-3.5 md:min-h-0 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // Open tab sits on the white pill
   active:
     'font-semibold text-[var(--color-ink)] hover:bg-transparent hover:text-[var(--color-ink)]',

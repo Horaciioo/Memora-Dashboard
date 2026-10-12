@@ -1,11 +1,16 @@
 'use client'
 
+import { useState } from 'react'
 import type { ReactNode } from 'react'
+import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { AddRow } from '@/components/structures/AddRow'
+import { useMediaQuery } from '@/core/hooks/interaction/useBreakpoint'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
+import { ACTION_COPY } from '@/declarations/ui/copy'
 import { accentVars } from '@/declarations/ui/theme'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
 import { useMenu, type MenuItem } from '@/managers/front-end'
+import { COARSE_POINTER_QUERY } from '@/declarations/ui/responsive'
 import type { WorkflowPhaseName } from '@/utils/constants/workflow'
 import { cn } from '@/utils/classnames'
 
@@ -82,12 +87,39 @@ export const KanbanBoard = <T extends BoardItem>({
   tintByColumn,
 }: KanbanBoardProps<T>) => {
   const { contextMenu } = useMenu()
+  const [picked, setPicked] = useState<string | null>(null)
+  // A finger cannot drag a card across lanes, the menu moves it instead
+  const isTouch = useMediaQuery(COARSE_POINTER_QUERY)
+  const shown = columns.some((column) => column.id === picked) ? picked : columns[0]?.id
   const { over, itemProps, containerProps } = useDragAndDrop((item, container, index) =>
     onMove(item.id, container, index)
   )
 
+  const menuOf = (item: T, current: string): MenuItem[] => [
+    ...(cardMenu?.(item) ?? []),
+    ...(isTouch && canMove
+      ? columns
+          .filter((column) => column.id !== current)
+          .map((column, index) => ({
+            id: `move-${column.id}`,
+            label: ACTION_COPY.moveTo.replace('{column}', column.label),
+            icon: 'forward' as const,
+            separatorBefore: index === 0,
+            onSelect: () => onMove(item.id, column.id, Number.MAX_SAFE_INTEGER),
+          }))
+      : []),
+  ]
+
   return (
     <div className={BOARD_STYLES.scroller}>
+      <div className={BOARD_STYLES.picker}>
+        <SegmentedControl
+          label={ACTION_COPY.columns}
+          value={shown ?? ''}
+          options={columns.map((column) => ({ value: column.id, label: column.label }))}
+          onChange={setPicked}
+        />
+      </div>
       {columns.map((column) => {
         const cards = items.filter((item) => item.columnId === column.id)
 
@@ -98,7 +130,11 @@ export const KanbanBoard = <T extends BoardItem>({
           <section
             key={column.id}
             style={accentStyle}
-            className={cn(BOARD_STYLES.column, tintByColumn && BOARD_STYLES.columnTint)}
+            className={cn(
+              BOARD_STYLES.column,
+              column.id === shown ? BOARD_STYLES.columnShown : BOARD_STYLES.columnHidden,
+              tintByColumn && BOARD_STYLES.columnTint
+            )}
           >
             <header className={BOARD_STYLES.columnHead}>
               <span className={BOARD_STYLES.columnTitle}>{column.label}</span>
@@ -120,13 +156,15 @@ export const KanbanBoard = <T extends BoardItem>({
                         }
                       : undefined
                   }
-                  onContextMenu={cardMenu ? contextMenu(cardMenu(item)) : undefined}
+                  onContextMenu={
+                    cardMenu || isTouch ? contextMenu(menuOf(item, column.id)) : undefined
+                  }
                   style={accentStyle}
                   className={cn(
                     BOARD_STYLES.card,
                     tintByColumn ? BOARD_STYLES.cardTint : BOARD_STYLES.cardGlass
                   )}
-                  {...(canMove ? itemProps({ id: item.id, from: column.id }) : {})}
+                  {...(canMove && !isTouch ? itemProps({ id: item.id, from: column.id }) : {})}
                 >
                   {renderCard(item)}
                 </article>

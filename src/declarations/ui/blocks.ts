@@ -188,7 +188,7 @@ export const TOP_BAR = {
   creatorName: 'truncate text-sm font-semibold',
   actions: 'flex shrink-0 items-center gap-1',
   avatarButton:
-    'shrink-0 rounded-full ring-2 ring-transparent transition-shadow hover:ring-[var(--color-border-strong)]',
+    '-m-1.5 shrink-0 rounded-full p-1.5 ring-2 ring-transparent transition-shadow hover:ring-[var(--color-border-strong)]',
 } as const
 
 /**

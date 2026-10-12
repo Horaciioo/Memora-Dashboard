@@ -213,9 +213,14 @@ export const GROUP_STYLES = {
  */
 
 export const BOARD_STYLES = {
-  scroller: 'flex gap-4 overflow-x-auto pb-2',
+  scroller: 'flex flex-col gap-3 md:flex-row md:gap-4 md:overflow-x-auto md:pb-2',
+  // Column picker of a phone
+  picker: 'md:hidden',
+  // One lane at a time on a phone
+  columnShown: 'flex',
+  columnHidden: 'hidden md:flex',
   column:
-    'flex w-72 shrink-0 flex-col gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-2.5',
+    'w-full shrink-0 flex-col gap-2 md:w-72 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-2.5',
   columnArchived: 'opacity-60',
   // Column glass tinted by its classic colour
   columnTint:
@@ -225,7 +230,7 @@ export const BOARD_STYLES = {
   count:
     'rounded-[var(--radius-sm)] bg-[var(--color-surface-raised)] px-2 py-0.5 text-xs text-[var(--color-ink-subtle)]',
   body: 'flex min-h-24 flex-col gap-2 rounded-[var(--radius-md)] p-1',
-  card: 'group flex cursor-grab flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3.5 shadow-[var(--shadow-sm)] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] active:cursor-grabbing motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+  card: 'group flex cursor-pointer flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3.5 shadow-[var(--shadow-sm)] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] md:cursor-grab md:active:cursor-grabbing motion-reduce:transition-none motion-reduce:hover:translate-y-0',
   // Card sits lighter than its column so the two glass layers do not muddy
   cardGlass: 'bg-[var(--color-surface-raised)]/70',
   cardTint: 'accent-border bg-[var(--color-surface-raised)]/70',

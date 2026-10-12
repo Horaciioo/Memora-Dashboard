@@ -93,3 +93,10 @@ export const LONG_PRESS = {
   // Travel in pixels that turns a hold into a scroll
   slop: 10,
 } as const
+
+/**
+ * True while a finger, not a mouse, drives the page
+ * @type {string}
+ */
+
+export const COARSE_POINTER_QUERY = '(pointer: coarse)'

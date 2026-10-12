@@ -19,7 +19,7 @@ export const COPY_VALUE = {
  */
 
 export const BUTTON_STYLES = {
-  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-[background-color,border-color,color,filter] duration-[var(--motion-duration-fast)] disabled:pointer-events-none disabled:opacity-50',
+  base: 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold md:min-h-0 transition-[background-color,border-color,color,filter] duration-[var(--motion-duration-fast)] disabled:pointer-events-none disabled:opacity-50',
   primary:
     'bg-[var(--color-brand-600)] px-4 py-2 text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
   secondary:
@@ -31,7 +31,7 @@ export const BUTTON_STYLES = {
   danger: 'bg-[var(--color-danger)] px-4 py-2 text-[var(--color-on-solid)] hover:brightness-90',
   // 44px hit area on touch
   icon: 'h-9 w-9 min-h-11 min-w-11 rounded-full p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] md:min-h-0 md:min-w-0',
-  link: 'p-0 text-[var(--color-ink-accent)] underline-offset-2 hover:underline',
+  link: 'min-h-0 p-0 text-[var(--color-ink-accent)] underline-offset-2 hover:underline',
   // Square footprint for a label-less button
   square: 'h-9 w-9 min-h-11 min-w-11 shrink-0 p-0 md:min-h-0 md:min-w-0',
 } as const
@@ -44,8 +44,9 @@ export type ButtonVariant = keyof Omit<typeof BUTTON_STYLES, 'base'>
  */
 
 export const SEGMENTED_STYLES = {
-  group: 'flex items-center gap-1 rounded-full glass-soft p-1',
-  option: 'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+  group: 'flex max-w-full items-center gap-1 overflow-x-auto rounded-full glass-soft p-1',
+  option:
+    'min-h-11 shrink-0 rounded-full px-3 py-1.5 text-xs md:min-h-0 font-semibold whitespace-nowrap transition-colors',
   selected: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   idle: 'text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
 } as const

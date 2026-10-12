@@ -189,6 +189,7 @@ export const TeamsBoard = ({
                         key={team.id}
                         className={cn(
                           BOARD_STYLES.column,
+                          BOARD_STYLES.columnShown,
                           team.archived && BOARD_STYLES.columnArchived
                         )}
                         onContextMenu={contextMenu(teamMenu(team), team.name)}
@@ -266,7 +267,9 @@ export const TeamsBoard = ({
             </button>
             {!collapsed.has('unassigned') && (
               <div className={BOARD_STYLES.scroller}>
-                <section className={cn(BOARD_STYLES.column, 'border-dashed')}>
+                <section
+                  className={cn(BOARD_STYLES.column, BOARD_STYLES.columnShown, 'border-dashed')}
+                >
                   <div
                     className={cn(BOARD_STYLES.body, over === UNASSIGNED && 'is-drop-target')}
                     {...(canManage ? containerProps(UNASSIGNED) : {})}
