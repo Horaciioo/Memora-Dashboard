@@ -9,7 +9,7 @@ import { SlashMenu } from '@/components/elements/forms/editor/SlashMenu'
 import { EDITOR_COPY, FORM_COPY } from '@/declarations/ui/copy/forms'
 import { SLASH_COMMANDS } from '@/declarations/ui/editor'
 import type { SlashCommand } from '@/declarations/ui/editor'
-import { BLOCK_EDITOR } from '@/declarations/ui/variants'
+import { BLOCK_EDITOR, BLOCK_EDITOR_INLINE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import {
   createBlock,
@@ -29,6 +29,8 @@ export interface MarkdownEditorProps {
   invalid?: boolean
   // Caret lands at the end on mount
   autoFocus?: boolean
+  // Bare, takes the size of the surrounding text
+  inline?: boolean
 }
 
 // Kinds a new line keeps
@@ -91,6 +93,7 @@ const filterCommands = (query: string): SlashCommand[] => {
  * @param {number} [maxLength] - Longest markdown
  * @param {boolean} [invalid] - Rejection border
  * @param {boolean} [autoFocus] - Caret lands at the end on mount
+ * @param {boolean} [inline] - Bare frame
  * @return {JSX.Element}
  */
 
@@ -102,6 +105,7 @@ export const MarkdownEditor = ({
   maxLength,
   invalid,
   autoFocus,
+  inline,
 }: MarkdownEditorProps) => {
   const [blocks, setBlocks] = useState<EditorBlock[]>(() => parseBlocks(value))
   const [slash, setSlash] = useState<SlashState | null>(null)
@@ -416,13 +420,17 @@ export const MarkdownEditor = ({
   return (
     <div
       id={id}
-      className={cn(BLOCK_EDITOR.frame, invalid && BLOCK_EDITOR.frameInvalid)}
+      className={
+        inline
+          ? BLOCK_EDITOR.frameInline
+          : cn(BLOCK_EDITOR.frame, invalid && BLOCK_EDITOR.frameInvalid)
+      }
       onMouseUp={readSelection}
       onKeyUp={readSelection}
       onBlur={() => setFormat(null)}
     >
       <div
-        className={cn(BLOCK_EDITOR.page, 'cursor-text')}
+        className={cn(inline ? BLOCK_EDITOR_INLINE.page : BLOCK_EDITOR.page, 'cursor-text')}
         onMouseDown={(event) => {
           // Empty space reaches the last line
           if (event.target !== event.currentTarget) return
@@ -450,18 +458,31 @@ export const MarkdownEditor = ({
             )
           }
 
+          // Inline mode mirrors the read rendering
+          const listKinds: EditorBlockKind[] = ['bullet', 'numbered']
+          const previous = blocks[index - 1]
+          const touches = previous?.kind === block.kind && listKinds.includes(block.kind)
+
           return (
             <div
               key={block.id}
-              className={cn(BLOCK_EDITOR.row, BLOCK_EDITOR.kinds[block.kind])}
+              className={cn(
+                inline
+                  ? [BLOCK_EDITOR_INLINE.base, BLOCK_EDITOR_INLINE.row[block.kind]]
+                  : [BLOCK_EDITOR.row, BLOCK_EDITOR.kinds[block.kind]],
+                inline && index > 0 && !touches && BLOCK_EDITOR_INLINE.gap
+              )}
               data-rich-line={block.kind === 'code' ? undefined : true}
             >
               {block.kind === 'bullet' && (
-                <span className={BLOCK_EDITOR.bullet} aria-hidden="true" />
+                <span
+                  className={inline ? BLOCK_EDITOR_INLINE.bullet : BLOCK_EDITOR.bullet}
+                  aria-hidden="true"
+                />
               )}
               {block.kind === 'numbered' && (
                 <span
-                  className={BLOCK_EDITOR.number}
+                  className={inline ? BLOCK_EDITOR_INLINE.number : BLOCK_EDITOR.number}
                   aria-hidden="true"
                 >{`${numbers[index]}.`}</span>
               )}
@@ -469,7 +490,9 @@ export const MarkdownEditor = ({
                 value={block.text}
                 isRich={block.kind !== 'code'}
                 placeholder={(blocks.length === 1 && placeholder) || EDITOR_COPY.placeholder}
-                className={BLOCK_EDITOR.lineKinds[block.kind]}
+                className={
+                  inline ? BLOCK_EDITOR_INLINE.line[block.kind] : BLOCK_EDITOR.lineKinds[block.kind]
+                }
                 onChange={(text) => updateText(block.id, text)}
                 onKeyCommand={handleKey(block.id)}
                 onSlash={(query, rect) =>

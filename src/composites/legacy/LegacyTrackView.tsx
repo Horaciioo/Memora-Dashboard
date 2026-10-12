@@ -63,7 +63,7 @@ const GradeCell = ({
         max={LEGACY_SETTINGS.modulePoints}
         value={draft}
         aria-label={LEGACY_COPY.gradeTitle}
-        className={cn(INLINE_EDIT_STYLES.input, 'w-20 text-right')}
+        className={cn(INLINE_EDIT_STYLES.input, 'w-20 px-1 text-right')}
         onChange={(event) => setDraft(event.target.value)}
         onBlur={commit}
         onKeyDown={(event) => {

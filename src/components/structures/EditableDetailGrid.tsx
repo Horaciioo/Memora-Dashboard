@@ -42,6 +42,9 @@ export interface EditableDetailGridProps {
 // Kinds that save themselves as soon as a choice is made
 const AUTO_SAVE_KINDS = ['select', 'date', 'datetime', 'multiselect', 'tags', 'image']
 
+// Kinds opening a panel on entry
+const OPEN_KINDS = ['select', 'date', 'datetime', 'multiselect']
+
 // Kinds that keep taking more entries after a save instead of closing straight away
 const STAY_OPEN_KINDS = ['multiselect', 'tags']
 
@@ -75,7 +78,13 @@ export const EditableDetailGrid = ({
   useEffect(() => {
     if (!editing) return
 
-    cellRef.current?.querySelector<HTMLElement>('input, button')?.focus()
+    const control = cellRef.current?.querySelector<HTMLElement>('input, button')
+    control?.focus({ preventScroll: true })
+
+    // A picker shows its choices straight away
+    const field = entries.find((entry) => entry.field?.name === editing)?.field
+    if (field && OPEN_KINDS.includes(field.kind)) control?.click()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editing])
 
   // Pickers live in a layer outside the cell
@@ -164,30 +173,55 @@ export const EditableDetailGrid = ({
           }
         }
 
+        // Pickers keep the read rendering in place and carry their panel from a ghost control
+        const isGhost = isEditing && OPEN_KINDS.includes(field.kind)
+        const readClass = cn(
+          display ? DETAIL_BLOCK.value : DETAIL_BLOCK.empty,
+          !isLocked && DETAIL_BLOCK.editable
+        )
+
+        const control = (
+          <FieldControl
+            id={id}
+            field={field}
+            value={draft}
+            disabled={pending}
+            invalid={Boolean(error)}
+            describedBy={error ? `${id}-error` : undefined}
+            inline
+            onChange={(next) => {
+              setDraft(next)
+              if (autoSaves) void commit(field.name, next, !STAY_OPEN_KINDS.includes(field.kind))
+            }}
+          />
+        )
+
         return (
           <div key={field.name} className={entryClass}>
             {label && <dt className={DETAIL_BLOCK.label}>{label}</dt>}
-            {isEditing ? (
+            {isGhost ? (
               <dd
                 ref={cellRef}
                 onBlur={onBlur}
                 onKeyDown={onKeyDown}
-                className="flex flex-col gap-1"
+                className={cn(readClass, DETAIL_BLOCK.editing)}
               >
-                <FieldControl
-                  id={id}
-                  field={field}
-                  value={draft}
-                  disabled={pending}
-                  invalid={Boolean(error)}
-                  describedBy={error ? `${id}-error` : undefined}
-                  onChange={(next) => {
-                    setDraft(next)
-                    if (autoSaves)
-                      void commit(field.name, next, !STAY_OPEN_KINDS.includes(field.kind))
-                  }}
-                />
-                {pending && <BrandLoader variant="ink" />}
+                {display ?? DATE_COPY.none}
+                <div className="inline-ghost">{control}</div>
+              </dd>
+            ) : isEditing ? (
+              <dd
+                ref={cellRef}
+                onBlur={onBlur}
+                onKeyDown={onKeyDown}
+                className="inline-cell relative flex flex-col gap-1"
+              >
+                {control}
+                {pending && (
+                  <span className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2">
+                    <BrandLoader variant="ink" />
+                  </span>
+                )}
                 {error && (
                   <p id={`${id}-error`} className="text-xs text-[var(--color-danger)]">
                     {error}
@@ -202,11 +236,7 @@ export const EditableDetailGrid = ({
                 onKeyDown={(event) => {
                   if (!isLocked && event.key === 'Enter') startEditing(field)
                 }}
-                className={cn(
-                  display ? DETAIL_BLOCK.value : DETAIL_BLOCK.empty,
-                  !isLocked &&
-                    '-mx-1.5 -my-0.5 cursor-pointer rounded-[var(--radius-sm)] px-1.5 py-0.5 transition-colors hover:bg-[var(--color-surface)]'
-                )}
+                className={readClass}
               >
                 {display ?? DATE_COPY.none}
               </dd>

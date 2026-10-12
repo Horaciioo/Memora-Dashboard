@@ -6,7 +6,7 @@ import type { MouseEvent } from 'react'
 import { OptionLead } from '@/components/elements/forms/OptionLead'
 import { OptionMark } from '@/components/elements/forms/OptionMark'
 import { useAnchoredPanel } from '@/core/hooks/interaction/useAnchoredPanel'
-import { PICKER_COPY } from '@/declarations/ui/copy'
+import { ACTION_COPY, PICKER_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { EMPTY_VALUE, SELECT_MENU_SIZES, SELECT_MENU_STYLES } from '@/declarations/ui/variants'
 import { useHints } from '@/managers/front-end'
@@ -28,6 +28,9 @@ export interface MultiSelectProps {
   invalid?: boolean
   describedBy?: string
 }
+
+// Entry emptying the selection
+const CLEARING_OPTION: FieldOption = { value: '', label: ACTION_COPY.none }
 
 // Narrowest the panel ever gets
 const MIN_PANEL_WIDTH = 200
@@ -179,6 +182,29 @@ export const MultiSelect = ({
             <div className={SELECT_MENU_STYLES.list}>
               {matching.length === 0 && (
                 <p className={SELECT_MENU_STYLES.empty}>{PICKER_COPY.noOption}</p>
+              )}
+              {query.trim() === '' && (
+                <>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={value.length === 0}
+                    onClick={() => onChange([])}
+                    className={cn(
+                      SELECT_MENU_STYLES.option,
+                      SELECT_MENU_SIZES.block.option,
+                      value.length === 0 && SELECT_MENU_STYLES.optionSelected
+                    )}
+                  >
+                    <OptionLead
+                      option={CLEARING_OPTION}
+                      mark={mark}
+                      isSelected={value.length === 0}
+                    />
+                    <span className={SELECT_MENU_STYLES.optionLabel}>{CLEARING_OPTION.label}</span>
+                  </button>
+                  <div className={SELECT_MENU_STYLES.divider} aria-hidden="true" />
+                </>
               )}
               {matching.map((option, index) => {
                 const isSelected = value.includes(option.value)

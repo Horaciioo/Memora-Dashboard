@@ -74,8 +74,15 @@ export const InlineMarkdown = ({
 
   if (editing) {
     return (
-      <div onBlur={onBlur} onKeyDown={onKeyDown}>
-        <MarkdownEditor id={id} value={draft} maxLength={maxLength} onChange={setDraft} autoFocus />
+      <div onBlur={onBlur} onKeyDown={onKeyDown} className={INLINE_EDIT_STYLES.blockEditing}>
+        <MarkdownEditor
+          id={id}
+          value={draft}
+          maxLength={maxLength}
+          onChange={setDraft}
+          autoFocus
+          inline
+        />
       </div>
     )
   }
@@ -94,7 +101,7 @@ export const InlineMarkdown = ({
       {value.trim().length > 0 ? (
         <Markdown source={value} />
       ) : (
-        <p className={INLINE_EDIT_STYLES.placeholder}>{placeholder}</p>
+        <p className={INLINE_EDIT_STYLES.placeholderBlock}>{placeholder}</p>
       )}
     </div>
   )
