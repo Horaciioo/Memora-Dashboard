@@ -12,6 +12,7 @@ import {
 } from '@/core/lib/errors'
 import type { AppError } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
+import { readPublicOrigin } from '@/core/lib/http/origin'
 import { consume, readIdentity } from '@/core/lib/http/rateLimit'
 import { fail, succeed } from '@/core/lib/http/response'
 import { logger } from '@/core/lib/logger'
@@ -378,7 +379,7 @@ interface RedirectRouteOptions {
 
 export const createRedirectRoute = (options: RedirectRouteOptions): RouteHandler => {
   const handler: RouteHandler = async (request, context) => {
-    const base = request.nextUrl.origin
+    const base = readPublicOrigin(request.headers, request.nextUrl.origin)
 
     try {
       await guard(request, options.rateLimit)
