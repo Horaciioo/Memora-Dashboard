@@ -16,6 +16,22 @@
   }
 }
 
+/* Touch: no grey flash on tap, no double-tap zoom, no callout on a hold */
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+:where(a, button, [role='button'], [role='tab'], summary, label, select) {
+  touch-action: manipulation;
+}
+
+@media (pointer: coarse) {
+  :where(a, img, [role='button'], article) {
+    -webkit-touch-callout: none;
+  }
+}
+
 body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
