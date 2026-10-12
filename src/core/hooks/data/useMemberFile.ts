@@ -17,6 +17,7 @@ import type { MemberAbsence, MemberDetail, MemberNote, MemberSocial } from '@/ty
  * @property {MemberSocial[]} socials - Social profiles
  * @property {MemberAbsence[]} absences - Absences
  * @property {(values: FormValues) => Promise<boolean>} addAbsence - Post an absence
+ * @property {(id: string, values: FormValues) => Promise<boolean>} updateAbsence - Edit dates and reason
  * @property {PermissionLayers} overrides - Permission overwrites
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
@@ -36,6 +37,7 @@ export interface MemberFile {
   socials: MemberSocial[]
   absences: MemberAbsence[]
   addAbsence: (values: FormValues) => Promise<boolean>
+  updateAbsence: (id: string, values: FormValues) => Promise<boolean>
   overrides: PermissionLayers
   isSaving: boolean
   issues: FieldIssue[]
@@ -125,6 +127,26 @@ export const useMemberFile = (
     [memberId, run]
   )
 
+  const updateAbsence = useCallback(
+    async (id: string, values: FormValues) => {
+      const absence = await run(
+        () => apiPatch<MemberAbsence>(API_ROUTES.absence(id), values),
+        feedbackTitle('Absence', 'saved', 'feminine')
+      )
+
+      if (absence) {
+        setAbsences((current) =>
+          current
+            .map((entry) => (entry.id === id ? absence : entry))
+            .sort((left, right) => right.startDate.localeCompare(left.startDate))
+        )
+      }
+
+      return absence !== null
+    },
+    [run]
+  )
+
   const addSocial = useCallback(
     async (values: FormValues) => {
       const name = typeof values.handle === 'string' ? values.handle : undefined
@@ -205,6 +227,7 @@ export const useMemberFile = (
     socials,
     absences,
     addAbsence,
+    updateAbsence,
     overrides,
     isSaving,
     issues,

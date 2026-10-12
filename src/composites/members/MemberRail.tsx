@@ -1,13 +1,12 @@
 import type { ReactNode } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { DivisionLogo } from '@/components/elements/display/DivisionLogo'
-import { FunctionEmblems } from '@/composites/members/MemberBadges'
-import { MEMBER_STATUS_REGISTRY, ROLE_REGISTRY } from '@/declarations/access/roles'
+import { InlineText } from '@/components/structures/InlineText'
+import { FunctionEmblems, RoleGlyph } from '@/composites/members/MemberBadges'
+import { MEMBER_STATUS_REGISTRY } from '@/declarations/access/roles'
 import { ERASED_COPY } from '@/declarations/academy/parkour'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MEMBER_COPY } from '@/declarations/members/copy'
-import { divisionLogo, divisionMark } from '@/declarations/members/profiles'
 import { MEMBER_BLOCK, MEMBER_FILE } from '@/declarations/ui/blocks'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
@@ -23,6 +22,7 @@ export interface MemberRailProps {
   isLocked: boolean
   isFrozen?: boolean
   onEditPortrait: () => void
+  onRename: (value: string) => Promise<boolean>
   // Property groups
   children: ReactNode
 }
@@ -35,6 +35,7 @@ export interface MemberRailProps {
  * @param {boolean} isLocked - Root account
  * @param {boolean} [isFrozen] - Access shut
  * @param {() => void} onEditPortrait - Opens the identity form
+ * @param {(value: string) => Promise<boolean>} onRename - Persists the new name
  * @param {ReactNode} children - Property groups
  * @return {JSX.Element}
  */
@@ -45,6 +46,7 @@ export const MemberRail = ({
   isLocked,
   isFrozen,
   onEditPortrait,
+  onRename,
   children,
 }: MemberRailProps) => {
   const AbsentIcon = ICONS.absences
@@ -63,22 +65,21 @@ export const MemberRail = ({
           >
             <Avatar name={summary.displayName} src={summary.avatarUrl} size="xl" />
           </button>
-          {summary.division &&
-            (divisionLogo(summary.division.label, summary.division.imagePath) ? (
-              <DivisionLogo
-                label={summary.division.label}
-                src={summary.division.imagePath}
-                className={MEMBER_BLOCK.divisionLogo}
-              />
-            ) : (
-              <span className={MEMBER_BLOCK.division} title={summary.division.label}>
-                {divisionMark(summary.division.label)}
-                <span className="sr-only">{summary.division.label}</span>
-              </span>
-            ))}
+          <span className={MEMBER_BLOCK.roleMark}>
+            <RoleGlyph
+              role={summary.role}
+              isRoot={summary.isRoot}
+              glyphClassName={MEMBER_BLOCK.roleGlyph}
+            />
+          </span>
         </div>
-        <span className={MEMBER_FILE.name}>{summary.displayName}</span>
-        <span className={MEMBER_FILE.role}>{ROLE_REGISTRY.label(summary.role)}</span>
+        <InlineText
+          id="member-display-name"
+          value={summary.displayName}
+          disabled={!canEdit}
+          className={MEMBER_FILE.name}
+          onCommit={onRename}
+        />
         <FunctionEmblems
           member={summary}
           className={MEMBER_FILE.functions}

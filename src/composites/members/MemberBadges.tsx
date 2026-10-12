@@ -12,17 +12,24 @@ export interface RoleGlyphProps {
   // Root administrator
   isRoot?: boolean
   className?: string
+  glyphClassName?: string
 }
 
 /**
  * Hierarchy level
  * @param {MemberRoleName} role - Role to describe
  * @param {boolean} [isRoot] - Root administrator
- * @param {string} [className] - Extra classes merged onto the glyph
+ * @param {string} [className] - Extra classes merged onto the wrapper
+ * @param {string} [glyphClassName] - Sizing classes of the glyph
  * @return {JSX.Element}
  */
 
-export const RoleGlyph = ({ role: roleName, isRoot, className }: RoleGlyphProps) => {
+export const RoleGlyph = ({
+  role: roleName,
+  isRoot,
+  className,
+  glyphClassName = 'h-6 w-6',
+}: RoleGlyphProps) => {
   const role = ROLE_REGISTRY.get(roleName)
   const Glyph = ROLE_EMBLEMS[roleName].glyph
   const RootIcon = ICONS.shield
@@ -30,7 +37,7 @@ export const RoleGlyph = ({ role: roleName, isRoot, className }: RoleGlyphProps)
   return (
     <Tip label={role.label} className={cn('items-center gap-1.5', className)}>
       <Glyph
-        className="h-6 w-6 shrink-0"
+        className={cn(glyphClassName, 'shrink-0')}
         tone={roleName === MemberRoles.Junior ? 'brand_JUNIOR' : undefined}
       />
       <span className="sr-only">{role.label}</span>

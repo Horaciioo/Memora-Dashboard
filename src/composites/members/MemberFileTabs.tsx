@@ -8,6 +8,7 @@ import { MEMBER_MODERATION_COPY } from '@/declarations/lives/moderation'
 import { MEMBER_MODERATION } from '@/declarations/ui/variants'
 import type { MemberModerationView as MemberModerationViewData } from '@/types/lives'
 import type { ReactNode } from 'react'
+import { CopyValue } from '@/components/elements/actions/CopyValue'
 import { AbsenceReason } from '@/components/elements/display/AbsenceReason'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/NetworkLogo'
@@ -64,10 +65,11 @@ import type {
   OptionMark as OptionMarkKind,
 } from '@/types/forms'
 import { ErasedValue } from '@/composites/members/ErasedValue'
-import type { MemberAdminState, MemberDetail, MemberSocial } from '@/types/members'
+import type { MemberAbsence, MemberAdminState, MemberDetail, MemberSocial } from '@/types/members'
 import type { PermissionName } from '@/utils/constants/permissions'
-import { absenceReasonText } from '@/utils/format/absences'
+import { absenceReasonText, isFinishedAbsence } from '@/utils/format/absences'
 import { formatDay, formatDayRange } from '@/utils/format/dates'
+import { startOfDay } from '@/utils/format/days'
 
 export interface MemberFileTabsProps {
   detail: MemberDetail
@@ -282,6 +284,7 @@ export const MemberFileTabs = ({
   const [logView, setLogView] = useState<'activity' | 'moderation'>('moderation')
   const [dialog, setDialog] = useState<'identity' | 'note' | 'socials' | 'absence' | null>(null)
   const [pendingNote, setPendingNote] = useState<string | null>(null)
+  const [editingAbsence, setEditingAbsence] = useState<MemberAbsence | null>(null)
   const [editingSocial, setEditingSocial] = useState<MemberSocial | null>(null)
   const [pendingSocial, setPendingSocial] = useState<MemberSocial | null>(null)
   // Kept in sync with every inline commit
@@ -322,6 +325,11 @@ export const MemberFileTabs = ({
   // A member always tends their own social rows
   const canWriteSocials = canUpdate || session?.id === summary.id
 
+  const openAbsence = (absence: MemberAbsence | null) => {
+    setEditingAbsence(absence)
+    openDialog('absence')
+  }
+
   const openSocial = (social: MemberSocial | null) => {
     setEditingSocial(social)
     openDialog('socials')
@@ -344,7 +352,9 @@ export const MemberFileTabs = ({
     {
       label: FIELD_COPY.discordId,
       field: fieldFor('discordId'),
-      display: identityValues.discordId ? String(identityValues.discordId) : null,
+      display: identityValues.discordId ? (
+        <CopyValue value={String(identityValues.discordId)} />
+      ) : null,
     },
     {
       label: FIELD_COPY.birthday,
@@ -521,6 +531,7 @@ export const MemberFileTabs = ({
       canEdit={canEdit}
       isLocked={isLocked}
       onEditPortrait={() => openDialog('identity')}
+      onRename={(next) => saveField('displayName', next)}
       isFrozen={adminState?.frozenAt != null}
     >
       <EditableDetailGrid
@@ -619,6 +630,8 @@ export const MemberFileTabs = ({
     )
   }
 
+  const today = startOfDay(new Date()).getTime()
+
   const absencesTab = () => (
     <Section
       title={MEMBER_COPY.tabAbsences}
@@ -632,7 +645,7 @@ export const MemberFileTabs = ({
           description={MEMBER_COPY.absencesEmptyDescription}
           action={
             canPostAbsence ? (
-              <Button variant="primary" icon="add" onClick={() => openDialog('absence')}>
+              <Button variant="primary" icon="add" onClick={() => openAbsence(null)}>
                 {MEMBER_COPY.absenceFirst}
               </Button>
             ) : null
@@ -643,9 +656,22 @@ export const MemberFileTabs = ({
           <ul className={HOME_STYLES.rows}>
             {file.absences.map((absence) => {
               const status = ABSENCE_STATUS_REGISTRY.get(absence.status)
+              const canEditAbsence = canPostAbsence && !isFinishedAbsence(absence, today)
 
               return (
-                <li key={absence.id} className={cn(HOME_STYLES.line, HOME_STYLES.item)}>
+                <li
+                  key={absence.id}
+                  className={cn(
+                    HOME_STYLES.line,
+                    HOME_STYLES.item,
+                    canEditAbsence && 'cursor-pointer'
+                  )}
+                  {...gestures({
+                    canEdit: canEditAbsence,
+                    label: formatDayRange(absence.startDate, absence.endDate),
+                    onEdit: () => openAbsence(absence),
+                  })}
+                >
                   <CalendarIcon className={HOME_STYLES.rowGlyph} aria-hidden="true" />
                   <span className={HOME_STYLES.rowBody}>
                     <span className={HOME_STYLES.rowTitle}>
@@ -659,7 +685,7 @@ export const MemberFileTabs = ({
             })}
           </ul>
           {canPostAbsence && (
-            <AddRow label={MEMBER_COPY.absenceAdd} onClick={() => openDialog('absence')} />
+            <AddRow label={MEMBER_COPY.absenceAdd} onClick={() => openAbsence(null)} />
           )}
         </>
       )}
@@ -980,11 +1006,22 @@ export const MemberFileTabs = ({
       <FormDrawer
         subject={FORM_SUBJECTS.absence}
         open={dialog === 'absence'}
-        title={MEMBER_COPY.absenceAdd}
+        recordId={editingAbsence?.id}
+        title={editingAbsence ? MEMBER_COPY.absenceEdit : MEMBER_COPY.absenceAdd}
         fields={absenceFields}
+        initialValues={
+          editingAbsence
+            ? {
+                dates: [editingAbsence.startDate.slice(0, 10), editingAbsence.endDate.slice(0, 10)],
+                reason: editingAbsence.reason ?? '',
+              }
+            : undefined
+        }
         issues={file.issues}
         isSaving={file.isSaving}
-        onSubmit={file.addAbsence}
+        onSubmit={(values) =>
+          editingAbsence ? file.updateAbsence(editingAbsence.id, values) : file.addAbsence(values)
+        }
         onClose={() => setDialog(null)}
       />
 

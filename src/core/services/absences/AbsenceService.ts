@@ -210,35 +210,12 @@ export const listReviewQueue = async (
 }
 
 /**
- * Responsable posting on someone's behalf
- * @typedef {Object} AbsenceApproval
- * @property {string} reviewerId - Responsable identifier
- * @property {boolean} isAdmin - Holds the admin level
- */
-
-export interface AbsenceApproval {
-  reviewerId: string
-  isAdmin: boolean
-}
-
-/**
- * Declare an absence
- * @param {string} accountId - Account identifier
+ * Validated span of an absence form
  * @param {FormValues} values - Parsed body
- * @param {AbsenceApproval} [approval] - Posting responsable
- * @return {Promise<MemberAbsence>} - Created absence
+ * @return {{ startDate: Date, endDate: Date, dayCount: number }} - Checked span
  */
 
-export const createAbsence = async (
-  accountId: string,
-  values: FormValues,
-  approval?: AbsenceApproval
-): Promise<MemberAbsence> => {
-  // Only for someone they lead
-  if (approval && !(await canReviewAbsence(approval.reviewerId, accountId, approval.isAdmin))) {
-    throw forbidden()
-  }
-
+const readSpan = (values: FormValues): { startDate: Date; endDate: Date; dayCount: number } => {
   const range = readDateRange(values, 'dates')
 
   if (!range) {
@@ -272,6 +249,41 @@ export const createAbsence = async (
     ])
   }
 
+  return { startDate, endDate, dayCount }
+}
+
+/**
+ * Responsable posting on someone's behalf
+ * @typedef {Object} AbsenceApproval
+ * @property {string} reviewerId - Responsable identifier
+ * @property {boolean} isAdmin - Holds the admin level
+ */
+
+export interface AbsenceApproval {
+  reviewerId: string
+  isAdmin: boolean
+}
+
+/**
+ * Declare an absence
+ * @param {string} accountId - Account identifier
+ * @param {FormValues} values - Parsed body
+ * @param {AbsenceApproval} [approval] - Posting responsable
+ * @return {Promise<MemberAbsence>} - Created absence
+ */
+
+export const createAbsence = async (
+  accountId: string,
+  values: FormValues,
+  approval?: AbsenceApproval
+): Promise<MemberAbsence> => {
+  // Only for someone they lead
+  if (approval && !(await canReviewAbsence(approval.reviewerId, accountId, approval.isAdmin))) {
+    throw forbidden()
+  }
+
+  const { startDate, endDate, dayCount } = readSpan(values)
+
   const row = await prisma.absence.create({
     data: {
       accountId,
@@ -287,6 +299,49 @@ export const createAbsence = async (
           }
         : { status: AbsenceStatuses.Pending }),
     },
+    include: ABSENCE_INCLUDE,
+  })
+
+  return toAbsence(row, row.account.displayName)
+}
+
+/**
+ * Edit the dates and the reason of a current absence
+ * @param {string} id - Absence identifier
+ * @param {string} reviewerId - Editing responsable identifier
+ * @param {boolean} isAdmin - Editor holds the admin level
+ * @param {FormValues} values - Parsed body
+ * @return {Promise<MemberAbsence>} - Edited absence
+ */
+
+export const updateAbsence = async (
+  id: string,
+  reviewerId: string,
+  isAdmin: boolean,
+  values: FormValues
+): Promise<MemberAbsence> => {
+  const current = await prisma.absence.findUnique({ where: { id } })
+  if (!current) throw notFound()
+
+  if (!(await canReviewAbsence(reviewerId, current.accountId, isAdmin))) throw forbidden()
+
+  // Only a current absence can move
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  if (
+    current.status === AbsenceStatuses.Refused ||
+    current.status === AbsenceStatuses.Cancelled ||
+    current.endDate < today
+  ) {
+    throw forbidden()
+  }
+
+  const { startDate, endDate, dayCount } = readSpan(values)
+
+  const row = await prisma.absence.update({
+    where: { id },
+    data: { startDate, endDate, dayCount, reason: encryptField(readText(values, 'reason')) },
     include: ABSENCE_INCLUDE,
   })
 

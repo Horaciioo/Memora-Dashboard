@@ -1,9 +1,11 @@
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import {
+  ABSENCE_FIELDS,
   REVIEW_FIELDS,
   removeAbsence,
   reviewAbsence,
+  updateAbsence,
 } from '@/core/services/absences/AbsenceService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { notify } from '@/core/services/system/NotificationService'
@@ -12,14 +14,31 @@ import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 import { AbsenceStatuses, type AbsenceStatusName } from '@/utils/constants/workflow'
 import { absenceSentence } from '@/utils/format/absences'
+import { formatDayRange } from '@/utils/format/dates'
 
 export const PATCH = createProtectedRoute({
   permission: Permissions.AbsenceReview,
-  fields: REVIEW_FIELDS,
+  fields: [...REVIEW_FIELDS, ...ABSENCE_FIELDS],
   partial: true,
-  descriptor: { summary: 'Settle an absence request', tags: ['absences'] },
+  descriptor: { summary: 'Settle or edit an absence', tags: ['absences'] },
   handler: async ({ params, raw, body, session, access }) => {
-    const status = String(raw.status ?? '')
+    // Without an outcome the request edits dates and reason
+    if (raw.status === undefined) {
+      const edited = await updateAbsence(params.id, session.id, access.isAdmin, body)
+
+      await recordEvent({
+        eventType: 'AbsenceEdited',
+        actorId: session.id,
+        subjectId: edited.accountId,
+        targetType: 'absence',
+        targetId: edited.id,
+        summary: formatDayRange(edited.startDate, edited.endDate),
+      })
+
+      return edited
+    }
+
+    const status = String(raw.status)
     if (!ABSENCE_STATUS_REGISTRY.has(status)) {
       throw invalidInput([{ field: 'status', message: FORM_COPY.notAnOption }])
     }
