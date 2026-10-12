@@ -1,5 +1,6 @@
 'use client'
 
+import { CopyValue } from '@/components/elements/actions/CopyValue'
 import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
@@ -71,7 +72,7 @@ export const CandidateDialog = ({
   if (!candidate) return null
 
   const entries = [
-    { label: RECRUITMENT_FIELD_COPY.discordId, value: candidate.discordId },
+    { label: RECRUITMENT_FIELD_COPY.discordId, value: <CopyValue value={candidate.discordId} /> },
     { label: RECRUITMENT_FIELD_COPY.recruiter, value: candidate.recruiter?.label ?? null },
     {
       label: RECRUITMENT_FIELD_COPY.interviewAt,
