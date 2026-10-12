@@ -63,6 +63,7 @@ export const PREFERENCES_COPY = {
  */
 
 export const PROFILE_FIELD_COPY = {
+  displayName: 'Pseudo',
   birthday: 'Date de naissance',
   timezone: 'Fuseau horaire',
   languages: 'Langues',
