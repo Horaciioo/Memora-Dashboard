@@ -41,9 +41,9 @@ export const BRAND_LOADER = {
 
 export const PAGE_SKELETON = {
   page: 'flex flex-col gap-8',
-  // Banner stand-in and its notch title
+  // Banner stand-in and its title
   bannerFill: 'absolute inset-0',
-  notchTitle: 'h-8 w-56 max-w-full',
+  bannerTitle: 'h-8 w-56 max-w-full',
   stack: 'flex flex-col gap-3',
   // Raised box like the real sections
   box: 'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',

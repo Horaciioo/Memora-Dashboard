@@ -824,6 +824,7 @@ export const CopyGlyph = ({ className }: GlyphProps) => (
 export const SignOutGlyph = ({ className }: GlyphProps) => (
   <Frame
     className={className}
+    tone="danger"
     render={({ fill, deep, cut }) => (
       <>
         <rect x="3" y="3" width="10" height="18" rx="3.5" fill={fill} />

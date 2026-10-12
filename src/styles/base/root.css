@@ -24,14 +24,15 @@ body {
 h1,
 h2,
 h3,
-h4 {
+h4,
+.heading-face {
   font-family: var(--font-system);
   letter-spacing: -0.02em;
 }
 
 ::selection {
-  background: var(--color-brand-soft);
-  color: var(--color-ink);
+  background: var(--color-selection);
+  color: var(--color-on-selection);
 }
 
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {

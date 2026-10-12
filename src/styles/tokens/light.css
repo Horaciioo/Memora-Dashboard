@@ -12,6 +12,8 @@
   --color-ink-accent: #a8355a;
   --color-border: #e1e1e6;
   --color-border-strong: #cfcfd6;
+  --color-selection: #f6bfd2;
+  --color-on-selection: #2a1620;
   --color-hover: #f0f0f4;
   /* Keyboard focus and selection ring, soft and neutral */
   --color-focus: rgb(29 29 31 / 0.45);

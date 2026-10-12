@@ -24,6 +24,7 @@ export const ACTION_COPY = {
   archive: 'Archiver',
   copyLink: 'Copier le lien',
   copyId: 'Copier l’identifiant',
+  idCopied: 'Identifiant copié',
   all: 'Tout',
   none: 'Aucun',
   optional: 'facultatif',

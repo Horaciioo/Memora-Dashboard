@@ -186,4 +186,5 @@ export const FORM_GROUPS = {
   contact: 'Contact',
   visibility: 'Visibilité',
   encadrement: 'Encadrement',
+  message: 'Message',
 } as const

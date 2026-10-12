@@ -1,0 +1,105 @@
+/* Dark track of dots, a white thumb gliding along it */
+:root {
+  --switch-track: rgb(78 78 94 / 0.4);
+  --switch-thumb: #fafafc;
+  --switch-blue: #7a9cf5;
+  --switch-orange: #f5a04a;
+  --switch-red: #f26a6a;
+  --switch-mauve: #a590ee;
+}
+
+.slide-switch {
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+.slide-switch-rail {
+  position: relative;
+  height: 1.375rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(255 255 255 / 0.32);
+  background: var(--switch-track);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.4),
+    inset 0 -6px 10px rgb(255 255 255 / 0.1),
+    0 2px 8px rgb(0 0 0 / 0.14);
+  backdrop-filter: blur(18px) saturate(1.7);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.slide-switch-field {
+  position: absolute;
+  border-radius: 0.4rem;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Role glyph standing on a stop the thumb is not on */
+.slide-switch-glyph-mark {
+  position: absolute;
+  top: 50%;
+  display: flex;
+  opacity: 0.85;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* A stop the thumb is not on: dot at the start, bar after */
+.slide-switch-mark {
+  position: absolute;
+  top: 50%;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.5);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Role glyph riding the rail, taller than it */
+.slide-switch-thumb {
+  position: absolute;
+  top: -0.25rem;
+  left: 0;
+  display: flex;
+  width: 1.625rem;
+  height: 1.625rem;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.slide-switch-thumb-face {
+  display: flex;
+  filter: drop-shadow(0 0 6px currentColor) drop-shadow(0 1px 2px rgb(0 0 0 / 0.55));
+  animation: slide-switch-pop 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slide-switch-pop {
+  from {
+    transform: scale(0.5) rotate(-18deg);
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide-switch-thumb-face {
+    animation: none;
+  }
+}
+
+.slide-switch-hit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.slide-switch-hit:focus-visible {
+  outline: 2px solid var(--switch-thumb);
+  outline-offset: -3px;
+  border-radius: 0.5rem;
+}

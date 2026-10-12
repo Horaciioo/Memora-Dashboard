@@ -140,8 +140,9 @@ export const MARSHA_GUIDE = {
   example:
     'flex items-start gap-3 rounded-[var(--radius-lg)] bg-[var(--discord-background)] py-3.5 pr-2 pl-4 text-body leading-snug text-[var(--discord-text)]',
   exampleBody: 'min-w-0 flex-1',
+  exampleHead: 'flex items-center gap-2',
   exampleAuthor: 'font-semibold text-[var(--discord-heading)]',
-  exampleTime: 'ml-2 text-micro text-[var(--discord-muted)]',
+  exampleTime: 'text-micro text-[var(--discord-muted)]',
   exampleLine: 'mt-0.5 break-words',
   mention: 'rounded-[3px] bg-[var(--discord-mention)] px-1 text-[var(--discord-mention-text)]',
   exampleCopy: 'text-[var(--discord-muted)] hover:text-[var(--discord-heading)]',

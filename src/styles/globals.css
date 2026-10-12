@@ -14,6 +14,7 @@
 @import './shell/banner.css';
 @import './shell/rail.css';
 @import './shell/surfaces.css';
+@import './shell/switch.css';
 @import './shell/welcome.css';
 @import './motion/feedback.css';
 @import './motion/overlays.css';
@@ -22,6 +23,7 @@
 @import './motion/replica.css';
 @import './motion/tour.css';
 @import './content/markdown.css';
+@import './content/inline-edit.css';
 @import './content/accents.css';
 
 /* Tone classes */

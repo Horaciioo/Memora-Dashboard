@@ -5,8 +5,17 @@
 
 @media (width >= 768px) {
   .page-ground {
-    background-image: var(--gradient-page);
-    background-attachment: fixed;
+    isolation: isolate;
+  }
+
+  /* Own layer, a fixed background repaints on every trackpad scroll tick */
+  .page-ground::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--gradient-page);
   }
 }
 
@@ -89,9 +98,7 @@
   }
 }
 
-/* The page ground and the title notch share one flat colour, so the notch reads as the page */
-.page-wash,
-.banner-notch-body,
-.banner-slope {
+/* Page ground */
+.page-wash {
   background-color: var(--color-page);
 }

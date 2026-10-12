@@ -282,6 +282,7 @@ export const ICONS = {
   close: CloseGlyph,
   confirm: ConfirmGlyph,
   picked: CheckGlyph,
+  check: CheckGlyph,
   waiting: CrossGlyph,
   copy: CopyGlyph,
   link: LinkGlyph,

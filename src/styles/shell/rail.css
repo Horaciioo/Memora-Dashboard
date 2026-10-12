@@ -48,6 +48,14 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Dark mode: the rail stays on the pale frame, so the open page is a pale box, not a black one */
+:root.dark .rail-ground [aria-current='page'] {
+  --color-ink: var(--color-on-frame);
+  --color-ink-subtle: var(--color-on-frame-subtle);
+  color: var(--color-on-frame);
+  background: var(--color-on-frame-raised);
+}
+
 /* Compact rail: glyphs only */
 .rail-ground[data-compact] .rail-fold {
   display: none;
