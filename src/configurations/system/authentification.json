@@ -2,5 +2,6 @@
   "sessionDays": 14,
   "stateTtlSeconds": 600,
   "avatarSize": 128,
+  "bannerSize": 1024,
   "maxConcurrentSessions": 10
 }

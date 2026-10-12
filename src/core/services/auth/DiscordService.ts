@@ -36,6 +36,7 @@ export interface DiscordGrant {
  * @property {string} id - Member identifier
  * @property {string} username - Handle
  * @property {string | null} avatar - Portrait hash
+ * @property {string | null} banner - Profile banner hash
  * @property {string | null} globalName - Display name
  */
 
@@ -43,6 +44,7 @@ export interface DiscordIdentity {
   id: string
   username: string
   avatar: string | null
+  banner: string | null
   globalName: string | null
 }
 
@@ -197,6 +199,7 @@ export const readDiscordUser = async (accessToken: string): Promise<DiscordIdent
     id,
     username: typeof payload.username === 'string' ? payload.username : id,
     avatar: typeof payload.avatar === 'string' ? payload.avatar : null,
+    banner: typeof payload.banner === 'string' ? payload.banner : null,
     globalName: typeof payload.global_name === 'string' ? payload.global_name : null,
   }
 }

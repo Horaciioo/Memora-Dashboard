@@ -300,6 +300,7 @@ model Account {
   colorVision           String?
   fontScale             String?
   avatarUrl             String?
+  bannerUrl             String?
   role                  MemberRole   @default(MODERATEUR)
   status                MemberStatus @default(ACADEMY)
   divisionId            String?
