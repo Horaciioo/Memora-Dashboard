@@ -24,7 +24,7 @@ export interface TabsProps {
   label: string
   // Strip centred over its panel
   centered?: boolean
-  // Carried into the banner notch when the page has one
+  // Carried under the banner when the page has one
   inBanner?: boolean
   // Longer glide and a pulse on arrival
   emphasis?: boolean
@@ -40,7 +40,7 @@ const EMPHASIS_FACTOR = 2.5
  * @param {(value: string) => void} onChange - Selection handler
  * @param {string} label - Accessible name of the strip
  * @param {boolean} [centered] - Centres the strip
- * @param {boolean} [inBanner] - Sits in the banner notch
+ * @param {boolean} [inBanner] - Sits under the banner
  * @param {boolean} [emphasis] - Slow glide with pulse
  * @return {JSX.Element}
  */

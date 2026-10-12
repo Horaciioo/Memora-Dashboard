@@ -11,10 +11,8 @@
     "bottomNavHeight": 64,
     "sidebarWidth": 270,
     "sidebarCompactWidth": 80,
-    "bannerHeight": 200,
-    "bannerHeightMobile": 156,
-    "notchHeight": 76,
-    "notchSlope": 48
+    "bannerHeight": 260,
+    "bannerHeightMobile": 190
   },
   "bottomNav": {
     "maxSlots": 3

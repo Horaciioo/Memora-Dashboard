@@ -137,21 +137,15 @@ const LayoutBody = ({ layout }: { layout: PageSkeletonLayout }) => {
 }
 
 /**
- * Banner and notch of the page
+ * Banner of the page
  * @return {JSX.Element}
  */
 
 const BannerSkeleton = () => (
   <div className={PAGE_STYLES.banner} aria-hidden="true">
     <Skeleton shape="row" className={PAGE_SKELETON.bannerFill} />
-    <div className={PAGE_STYLES.notch}>
-      <span className={PAGE_STYLES.notchSlopeStart} />
-      <div className={PAGE_STYLES.notchBody}>
-        <div className={PAGE_STYLES.notchTitleRow}>
-          <Skeleton shape="line" className={PAGE_SKELETON.notchTitle} />
-        </div>
-      </div>
-      <span className={PAGE_STYLES.notchSlopeEnd} />
+    <div className={PAGE_STYLES.bannerFoot}>
+      <Skeleton shape="line" className={PAGE_SKELETON.bannerTitle} />
     </div>
   </div>
 )

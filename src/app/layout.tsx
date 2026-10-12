@@ -27,8 +27,6 @@ const SHELL_VARS = {
   '--shell-sidebar-w': `${SHELL_DIMENSIONS.sidebar}px`,
   '--shell-banner-h': `${SHELL_DIMENSIONS.banner}px`,
   '--shell-banner-h-mobile': `${SHELL_DIMENSIONS.bannerMobile}px`,
-  '--shell-notch-h': `${SHELL_DIMENSIONS.notch}px`,
-  '--shell-notch-slope': `${SHELL_DIMENSIONS.notchSlope}px`,
   '--drawer-w': `${DRAWER_DIMENSIONS.width}px`,
   '--drawer-h-share': `${DRAWER_DIMENSIONS.heightShare}`,
   '--drawer-min-h': `${DRAWER_DIMENSIONS.minHeight}px`,
