@@ -1,0 +1,12 @@
+node_modules
+.next*
+.git
+.github
+.claude
+.env*
+logs
+tests
+fixtures
+deploy
+*.log
+.DS_Store
