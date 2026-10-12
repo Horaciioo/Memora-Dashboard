@@ -5,6 +5,7 @@
 
 export const SANCTION_COPY = {
   title: 'Panel de sanctions',
+  discordTitle: 'Panel Discord',
   lead: "Le livecon en vigueur influe sur le panel. Les sanctions affichées sont celles qui s’appliquent à ce livecon. Attention, le panel de sanctions n'est qu'une référence, il ne remplace pas ton jugement humain.",
   panelTitle: 'Panel {panel}',
   search: 'Chercher une infraction',
@@ -59,8 +60,6 @@ export const SANCTION_COPY = {
   levelsEmptyTitle: 'Aucun niveau de livecon',
   levelsEmptyDescription:
     'Les trois niveaux sont fixés en code, ils arrivent au prochain déploiement.',
-  noFunctionTitle: 'Aucun panel pour ta fonction',
-  noFunctionDescription: 'Les panels couvrent les fonctions Lives et Discord.',
 } as const
 
 /**
