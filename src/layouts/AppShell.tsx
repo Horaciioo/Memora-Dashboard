@@ -100,9 +100,7 @@ const AppShellFrame = ({
         <WindowFrame />
 
         <div className={APP_SHELL.main}>
-          {session && (
-            <MobileTopBar session={session} viewContext={viewContext} />
-          )}
+          {session && <MobileTopBar session={session} viewContext={viewContext} />}
           <main className={APP_SHELL.content} {...beaconProps(TOUR_BEACONS.page)}>
             <MobileHold>{children}</MobileHold>
           </main>

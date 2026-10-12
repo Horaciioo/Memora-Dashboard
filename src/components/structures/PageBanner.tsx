@@ -28,7 +28,13 @@ export interface PageBannerProps {
  * @return {JSX.Element}
  */
 
-export const PageBanner = ({ title, isLabel, heroDescription, image, children }: PageBannerProps) => {
+export const PageBanner = ({
+  title,
+  isLabel,
+  heroDescription,
+  image,
+  children,
+}: PageBannerProps) => {
   const Title = isLabel ? 'p' : 'h1'
 
   return (

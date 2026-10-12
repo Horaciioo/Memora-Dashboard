@@ -197,7 +197,9 @@ export const MarshaGuide = ({ trainingHref, viewer }: MarshaGuideProps) => {
           </div>
         </article>
       ) : (
-        command && <MarshaDetail command={command} viewer={viewer} onCopy={(text) => void copy(text)} />
+        command && (
+          <MarshaDetail command={command} viewer={viewer} onCopy={(text) => void copy(text)} />
+        )
       )}
     </div>
   )

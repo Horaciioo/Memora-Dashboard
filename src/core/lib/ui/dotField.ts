@@ -110,7 +110,9 @@ export const drawDotField = ({
 
       // Crest running along the lit trail, ahead of the thumb
       const gap = reach - x
-      const crest = Math.exp(-Math.abs(gap) / (gap >= 0 ? 22 : 40)) * (0.6 + 0.4 * Math.sin(time * 11 - x * 0.35))
+      const crest =
+        Math.exp(-Math.abs(gap) / (gap >= 0 ? 22 : 40)) *
+        (0.6 + 0.4 * Math.sin(time * 11 - x * 0.35))
 
       // Faint grid underneath
       context.fillStyle = 'rgba(255, 255, 255, 0.14)'

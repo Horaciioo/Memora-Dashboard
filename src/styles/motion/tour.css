@@ -24,7 +24,8 @@
     box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-ink) 0%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-ink) 16%, transparent),
+    box-shadow:
+      0 0 0 4px color-mix(in oklab, var(--color-ink) 16%, transparent),
       0 0 18px 2px color-mix(in oklab, var(--color-ink) 22%, transparent);
   }
 }

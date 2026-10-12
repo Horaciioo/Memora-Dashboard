@@ -247,7 +247,11 @@ export const SlideSwitch = ({ options, value, onChange, label }: SlideSwitchProp
         ))}
 
         <span ref={thumbRef} className={SLIDE_SWITCH.thumb} aria-hidden="true">
-          <span key={shown} className={SLIDE_SWITCH.thumbFace} style={{ color: options[shown]!.tint }}>
+          <span
+            key={shown}
+            className={SLIDE_SWITCH.thumbFace}
+            style={{ color: options[shown]!.tint }}
+          >
             {ThumbGlyph ? <ThumbGlyph className={SLIDE_SWITCH.thumbGlyph} /> : null}
           </span>
         </span>
