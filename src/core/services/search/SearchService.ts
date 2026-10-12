@@ -6,6 +6,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { SEARCH_GROUPS } from '@/declarations/ui/copy/navigation'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import { readScope, scopedWhere } from '@/core/services/auth/ScopeService'
+import { BELOW_LEAD_ROLES } from '@/core/services/members/MemberService'
 import {
   meetingVisibility,
   projectVisibility,
@@ -36,9 +37,12 @@ export const search = async (term: string, session: SessionUser): Promise<Search
   const sections: SearchSection[] = []
 
   // Every family is gated by the permission that opens its page
-  if (access.can(Permissions.MemberRead)) {
+  // Same gate as the moderator file
+  if (access.isResponsable && access.can(Permissions.MemberRead)) {
     const rows = await prisma.account.findMany({
       where: scopedWhere('account', scope, {
+        id: { not: session.id },
+        ...(access.isAdmin ? {} : { role: { in: BELOW_LEAD_ROLES } }),
         OR: [{ displayName: contains }, { discordId: { contains: query } }],
       }),
       include: { division: true, youtubers: true },
@@ -159,7 +163,10 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         label: row.name,
         hint: row.leads.map((lead) => lead.account.displayName).join(', ') || undefined,
         // Teams live in their creator's file
-        href: row.youtuberId ? ROUTES.settingsRecord('youtubeurs', row.youtuberId) : ROUTES.teams,
+        href:
+          row.youtuberId && access.can(Permissions.ReferenceRead)
+            ? ROUTES.settingsRecord('youtubeurs', row.youtuberId)
+            : ROUTES.teams,
       })),
     })
   }

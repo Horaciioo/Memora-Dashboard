@@ -72,6 +72,7 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
   displayName: row.displayName,
   discordId: row.discordId,
   avatarUrl: row.avatarUrl,
+  bannerUrl: row.bannerUrl,
   role: row.role,
   status: row.status,
   academyDispositif: row.academyJuniors[0]?.dispositif
