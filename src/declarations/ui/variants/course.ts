@@ -22,7 +22,7 @@ export const COURSE_CATALOG = {
     'absolute inset-0 bg-gradient-to-t from-[color-mix(in_oklab,var(--color-media-shade)_55%,transparent)] to-transparent',
   stageTop: 'absolute top-4 left-4 flex flex-wrap items-center gap-2',
   stageSurface: `flex items-center gap-2 rounded-[var(--radius-full)] bg-[color-mix(in_oklab,var(--color-media-shade)_55%,transparent)] px-3 py-1 ${PROPERTY_LABEL} text-[var(--color-on-media)]`,
-  stageBody: 'grid gap-6 p-5 sm:p-7 md:grid-cols-[minmax(0,1fr)_20rem] md:gap-10',
+  stageBody: 'grid grid-cols-1 gap-6 p-5 sm:p-7 md:grid-cols-[minmax(0,1fr)_20rem] md:gap-10',
   stageText: 'flex min-w-0 flex-col gap-3',
   stageKicker: `${PROPERTY_LABEL} text-[var(--color-ink-subtle)]`,
   stageName: 'text-2xl leading-tight font-bold tracking-tight text-balance sm:text-3xl',
@@ -253,7 +253,7 @@ export const COURSE_EXERCISE = {
   holeWrong: 'border-solid border-[var(--color-danger)] bg-[var(--color-danger-soft)]',
   bank: 'flex flex-wrap items-center gap-2',
   bankWord: 'rounded-full bg-[var(--color-surface-sunken)] px-3 py-1 text-xs font-bold',
-  sortBoard: 'grid gap-4 sm:grid-cols-2',
+  sortBoard: 'grid grid-cols-1 gap-4 sm:grid-cols-2',
   bucket:
     'flex min-h-32 flex-col gap-2 rounded-[var(--radius-lg)] border-2 border-dashed border-[var(--color-border-strong)] p-3 transition-colors',
   bucketOver: 'border-solid border-[var(--color-brand-600)] bg-[var(--color-brand-50)]',
@@ -334,7 +334,7 @@ export const LEGACY_BOARD = {
  */
 
 export const LEGACY_TRACK = {
-  page: 'mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[27.5rem_minmax(0,1fr)] lg:items-start',
+  page: 'mx-auto grid grid-cols-1 w-full max-w-6xl gap-10 lg:grid-cols-[27.5rem_minmax(0,1fr)] lg:items-start',
   summary:
     'flex flex-col gap-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-7 lg:sticky lg:top-4',
   person: 'flex items-center gap-4',
@@ -470,7 +470,7 @@ export const COURSE_STRONG_TONES = {
 export const COURSE_FIGURE = {
   keypoints: 'flex flex-col gap-4',
   keypointsTitle: 'text-lg font-bold tracking-tight',
-  keypointsGrid: 'grid gap-4 sm:grid-cols-3',
+  keypointsGrid: 'grid grid-cols-1 gap-4 sm:grid-cols-3',
   keypoint:
     'course-pop flex flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',
   disc: 'flex h-12 w-12 shrink-0 items-center justify-center rounded-full',
@@ -490,7 +490,7 @@ export const COURSE_FIGURE = {
   diagramCaption: 'text-center text-xs text-[var(--color-ink-subtle)]',
   compare: 'flex flex-col gap-4',
   compareTitle: 'text-lg font-bold tracking-tight',
-  compareGrid: 'grid gap-4 sm:grid-cols-2',
+  compareGrid: 'grid grid-cols-1 gap-4 sm:grid-cols-2',
   compareSide: 'flex flex-col gap-3 rounded-[var(--radius-xl)] border-2 p-5',
   compareGood: 'border-[var(--color-success)] bg-[var(--color-success-soft)]',
   compareBad: 'border-[var(--color-danger)] bg-[var(--color-danger-soft)]',
@@ -509,7 +509,7 @@ export const COURSE_DEMO = {
   head: 'flex items-center justify-between gap-3',
   title: 'text-lg font-bold tracking-tight',
   count: PROPERTY_LABEL,
-  stage: 'grid gap-3 lg:grid-cols-[minmax(0,1fr)_13rem]',
+  stage: 'grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_13rem]',
   chat: 'min-w-0',
   tools:
     'flex flex-col gap-2 rounded-[var(--radius-lg)] bg-[var(--twitch-background)] p-3 text-[var(--twitch-text)] shadow-[var(--shadow-md)]',
@@ -545,7 +545,7 @@ export const COURSE_DEMO = {
 
 export const TRAINING_FEEDBACK = {
   stack: 'flex flex-col gap-6',
-  marks: 'grid gap-4 sm:grid-cols-2',
+  marks: 'grid grid-cols-1 gap-4 sm:grid-cols-2',
   mark: 'flex flex-col gap-1',
   markLabel: 'text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   markValue: 'text-3xl font-bold tracking-tight tabular-nums',

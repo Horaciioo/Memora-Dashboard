@@ -47,14 +47,14 @@ export const PAGE_SKELETON = {
   stack: 'flex flex-col gap-3',
   // Raised box like the real sections
   box: 'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',
-  grid: 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3',
-  gridWide: 'grid gap-4 sm:grid-cols-2 xl:grid-cols-4',
+  grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
+  gridWide: 'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4',
   group: 'flex flex-col gap-4',
   groupHead: 'flex items-center gap-3',
-  columns: 'grid gap-4 md:grid-cols-3',
+  columns: 'grid grid-cols-1 gap-4 md:grid-cols-3',
   column: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3',
-  split: 'grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]',
-  file: 'grid gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] lg:items-start',
+  split: 'grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]',
+  file: 'grid grid-cols-1 gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] lg:items-start',
   tabs: 'flex gap-2',
   hero: 'flex items-center gap-4',
 } as const
@@ -259,7 +259,8 @@ export const INFO_HINT = {
 
 export const TIP = {
   wrapper: 'group/tip relative inline-flex shrink-0',
-  pop: 'pointer-events-none invisible absolute bottom-[calc(100%+0.5rem)] left-1/2 z-[60] -translate-x-1/2 translate-y-1 rounded-[var(--radius-sm)] bg-[var(--color-ink)] px-2 py-1 text-xs leading-none font-semibold tracking-normal whitespace-nowrap text-[var(--color-surface-raised)] normal-case opacity-0 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-75 group-focus-within/tip:visible group-focus-within/tip:translate-y-0 group-focus-within/tip:opacity-100 group-hover/tip:visible group-hover/tip:translate-y-0 group-hover/tip:opacity-100 motion-reduce:transition-none',
+  // Hover only, a touch screen never draws it
+  pop: 'pointer-events-none invisible absolute bottom-[calc(100%+0.5rem)] left-1/2 z-[60] -translate-x-1/2 translate-y-1 rounded-[var(--radius-sm)] bg-[var(--color-ink)] px-2 py-1 text-xs leading-none font-semibold tracking-normal whitespace-nowrap text-[var(--color-surface-raised)] normal-case opacity-0 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-75 group-focus-within/tip:visible group-focus-within/tip:translate-y-0 group-focus-within/tip:opacity-100 group-hover/tip:visible group-hover/tip:translate-y-0 group-hover/tip:opacity-100 motion-reduce:transition-none [@media(hover:none)]:hidden',
   arrow:
     'absolute top-full left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[var(--color-ink)]',
 } as const

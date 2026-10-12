@@ -77,7 +77,7 @@ export const LIVE_COORDINATION = {
   label: PROPERTY_LABEL,
   lead: 'text-body font-bold tracking-tight',
   meta: 'text-sm text-[var(--color-ink-subtle)]',
-  times: 'grid gap-3 sm:grid-cols-2',
+  times: 'grid grid-cols-1 gap-3 sm:grid-cols-2',
   timeField: 'flex flex-col gap-1.5',
   timeLabel: PROPERTY_LABEL,
   actions: 'flex flex-wrap items-center gap-3',
@@ -101,7 +101,7 @@ export const LIVE_REPORT = {
   toolbar: 'flex flex-wrap items-center justify-center gap-3 print:hidden',
   notice:
     'rounded-[var(--radius-lg)] border-l-4 border-[var(--color-caution)] bg-[var(--color-caution-soft)] px-4 py-3 text-sm',
-  figures: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-4',
+  figures: 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4',
   figure:
     'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5 py-4',
   figureLabel: PROPERTY_LABEL,
@@ -131,7 +131,7 @@ export const LIVE_REPORT = {
   rowFill: 'block h-full rounded-full bg-[var(--color-brand-600)]',
   rowValue: 'text-right text-sm tabular-nums',
   rowMeta: 'block text-xs text-[var(--color-ink-subtle)]',
-  kinds: 'grid gap-2 sm:grid-cols-2',
+  kinds: 'grid grid-cols-1 gap-2 sm:grid-cols-2',
   kind: 'flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2',
   kindIcon: 'h-6 w-6 shrink-0',
   kindLabel: 'flex-1 text-sm',
@@ -195,7 +195,7 @@ export const LIVE_ROSTER = {
   head: 'flex flex-wrap items-baseline justify-between gap-2',
   title: PROPERTY_LABEL,
   lead: 'text-xs text-[var(--color-ink-subtle)]',
-  columns: 'grid gap-3 sm:grid-cols-3',
+  columns: 'grid grid-cols-1 gap-3 sm:grid-cols-3',
   column:
     'flex min-h-28 flex-col gap-2 rounded-[var(--radius-lg)] border border-dashed border-[var(--color-border)] p-3 transition-colors',
   columnOver: 'border-[var(--color-brand-600)] bg-[var(--color-brand-100)]',

@@ -308,7 +308,7 @@ export const MEMBER_BLOCK = {
  */
 
 export const MEMBER_FILE = {
-  layout: 'grid gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] lg:items-start',
+  layout: 'grid grid-cols-1 gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] lg:items-start',
   main: 'flex min-w-0 flex-col gap-6',
   // Rail follows the scroll on wide screens only
   railStack: 'flex flex-col gap-3 lg:sticky lg:top-6',
@@ -335,7 +335,7 @@ export const MEMBER_FILE = {
   notePinned: 'border-[var(--color-brand-200)] bg-[var(--color-brand-50)]',
   noteHead: 'flex items-center gap-2 text-xs text-[var(--color-ink-subtle)]',
   noteBody: 'text-sm leading-relaxed whitespace-pre-wrap',
-  notesGrid: 'grid gap-4 sm:grid-cols-2',
+  notesGrid: 'grid grid-cols-1 gap-4 sm:grid-cols-2',
   // Pinned note under the rail details
   pinned: 'flex flex-col gap-1.5',
   pinnedNote: 'flex flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] p-4',
@@ -345,7 +345,7 @@ export const MEMBER_FILE = {
     'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-3 transition-colors hover:bg-[var(--color-hover)]',
   socialLogo:
     'flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)]',
-  socialsGrid: 'grid auto-rows-[4.5rem] gap-3 sm:grid-cols-2',
+  socialsGrid: 'grid grid-cols-1 auto-rows-[4.5rem] gap-3 sm:grid-cols-2',
   socialAdd: 'h-full',
   more: 'self-start text-sm font-semibold text-[var(--color-brand-800)] underline-offset-4 hover:underline',
 } as const
@@ -449,7 +449,7 @@ export const CONSOLE_BLOCK = {
   bannerBody: 'flex min-w-0 flex-1 flex-col',
   bannerTitle: 'text-sm font-semibold text-[var(--color-ink)]',
   bannerLead: 'text-xs text-[var(--color-ink-subtle)]',
-  grid: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-4',
+  grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4',
   tile: 'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4',
   tileLabel: 'text-xs font-medium tracking-wide text-[var(--color-ink-subtle)] uppercase',
   tileValue: 'font-[family-name:var(--font-display)] text-2xl leading-none',
@@ -464,7 +464,7 @@ export const CONSOLE_BLOCK = {
   cardIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-accent)]',
   cardTitle: 'font-bold',
   cardLead: 'text-sm text-[var(--color-ink-subtle)]',
-  chooser: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3',
+  chooser: 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3',
   choice:
     'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left transition-colors hover:border-[var(--view)] hover:bg-[var(--color-surface)]',
   choiceActive: 'border-[var(--view)] bg-[var(--view)]/8',
@@ -778,7 +778,7 @@ export const CHANNEL_BLOCK = {
  */
 
 export const AUTH_SHELL = {
-  page: 'grid min-h-dvh lg:grid-cols-2',
+  page: 'grid grid-cols-1 min-h-dvh lg:grid-cols-2',
   // Gradient band above the form on mobile, the half page from lg
   art: 'relative flex h-36 items-center justify-center overflow-hidden bg-[image:var(--gradient-frame)] lg:h-auto',
   figure: 'hidden w-3/5 max-w-md lg:block',

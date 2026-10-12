@@ -4,7 +4,7 @@
  */
 
 export const DISCORD_REPLICA = {
-  root: 'relative grid h-[34rem] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--discord-background)] text-body leading-[1.375rem] text-[var(--discord-text)] shadow-[var(--shadow-scene)] md:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[14rem_minmax(0,1fr)_14rem]',
+  root: 'relative grid grid-cols-1 h-[34rem] overflow-hidden rounded-[var(--radius-xl)] bg-[var(--discord-background)] text-body leading-[1.375rem] text-[var(--discord-text)] shadow-[var(--shadow-scene)] md:grid-cols-[14rem_minmax(0,1fr)] xl:grid-cols-[14rem_minmax(0,1fr)_14rem]',
   // Channel sidebar
   sidebar: 'hidden min-h-0 flex-col bg-[var(--discord-sidebar)] md:flex',
   server:
@@ -154,7 +154,7 @@ export const COMPARE_RUNS = {
   stage: 'flex flex-col gap-3',
   stageHead: 'flex flex-wrap items-center justify-between gap-3',
   stageLabel: 'text-sm font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  strip: 'grid gap-4 sm:grid-cols-3',
+  strip: 'grid grid-cols-1 gap-4 sm:grid-cols-3',
   thumb:
     'group relative flex flex-col gap-2 rounded-[var(--radius-xl)] text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)]',
   thumbFrame:
@@ -166,7 +166,7 @@ export const COMPARE_RUNS = {
   enlarged: 'run-slide-in relative',
   replay:
     'absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 shadow-[var(--shadow-scene)]',
-  picks: 'grid gap-3 sm:grid-cols-3',
+  picks: 'grid grid-cols-1 gap-3 sm:grid-cols-3',
   pick: 'justify-center',
   feedback:
     'course-erase-in rounded-[var(--radius-lg)] border-l-4 bg-[var(--color-surface)] px-4 py-3 text-sm',

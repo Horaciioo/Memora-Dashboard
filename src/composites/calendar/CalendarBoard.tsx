@@ -90,6 +90,12 @@ const UNITS: { value: CalendarUnit; label: string }[] = [
   { value: 'agenda', label: CALENDAR_COPY.agenda },
 ]
 
+// Buttons stepping the period
+const STEPS = [
+  { amount: -1, icon: 'back', title: CALENDAR_COPY.previous, short: CALENDAR_COPY.previousShort },
+  { amount: 1, icon: 'forward', title: CALENDAR_COPY.next, short: CALENDAR_COPY.nextShort },
+] as const
+
 // Pointer modes of the timed views
 const GRID_MODES: { value: GridMode; label: string }[] = [
   { value: 'draw', label: CALENDAR_COPY.modeDraw },
@@ -461,29 +467,44 @@ export const CalendarBoard = ({
 
           <div className="flex min-w-0 flex-col gap-4">
             <div className={CALENDAR_STYLES.toolbar}>
-              <Button onClick={() => setCursor(toDayKey(new Date()))}>{CALENDAR_COPY.today}</Button>
+              <Button
+                className="order-3 md:order-none"
+                onClick={() => setCursor(toDayKey(new Date()))}
+              >
+                {CALENDAR_COPY.today}
+              </Button>
               {calendar.isLoading && <BrandLoader variant="ink" />}
-              <Button
-                title={CALENDAR_COPY.previous}
-                onClick={() => setCursor(shiftAnchor(cursor, unit, -1))}
-              >
-                {CALENDAR_COPY.previousShort}
-              </Button>
-              <Button
-                title={CALENDAR_COPY.next}
-                onClick={() => setCursor(shiftAnchor(cursor, unit, 1))}
-              >
-                {CALENDAR_COPY.nextShort}
-              </Button>
-              <span className={CALENDAR_STYLES.period}>{periodLabel(cursor, unit)}</span>
-              <span className="ml-auto flex flex-wrap items-center gap-3">
-                {canManage && isTimed && (
-                  <SegmentedControl
-                    options={GRID_MODES}
-                    value={gridMode}
-                    onChange={setGridMode}
-                    label={CALENDAR_COPY.gridMode}
+              {STEPS.map(({ amount, icon, title, short }) => (
+                <span key={amount} className="contents">
+                  <Button
+                    icon={icon}
+                    title={title}
+                    aria-label={title}
+                    className="order-2 md:hidden"
+                    onClick={() => setCursor(shiftAnchor(cursor, unit, amount))}
                   />
+                  <span className="hidden md:contents">
+                    <Button
+                      title={title}
+                      onClick={() => setCursor(shiftAnchor(cursor, unit, amount))}
+                    >
+                      {short}
+                    </Button>
+                  </span>
+                </span>
+              ))}
+              <span className={CALENDAR_STYLES.period}>{periodLabel(cursor, unit)}</span>
+              <span className="order-4 ml-auto flex flex-wrap items-center gap-3 md:order-none">
+                {canManage && isTimed && (
+                  // The minute grid is desktop only, a phone reads the list
+                  <span className="hidden md:inline-flex">
+                    <SegmentedControl
+                      options={GRID_MODES}
+                      value={gridMode}
+                      onChange={setGridMode}
+                      label={CALENDAR_COPY.gridMode}
+                    />
+                  </span>
                 )}
                 {!canManage && <MeetingRequest />}
                 {canManage && (
@@ -531,7 +552,7 @@ export const CalendarBoard = ({
                   className={cn(
                     CALENDAR_STYLES.weekdays,
                     isTimed
-                      ? cn(CALENDAR_STYLES.weekdaysTimed, columns)
+                      ? cn(CALENDAR_STYLES.weekdaysTimed, columns, 'hidden md:grid')
                       : CALENDAR_STYLES.weekdaysMonth
                   )}
                 >
@@ -569,7 +590,7 @@ export const CalendarBoard = ({
 
                 {isTimed ? (
                   <>
-                    <div className={cn(CALENDAR_STYLES.allDay, columns)}>
+                    <div className={cn(CALENDAR_STYLES.allDay, columns, 'hidden md:grid')}>
                       <span className={CALENDAR_STYLES.allDayLabel}>{CALENDAR_COPY.allDayRow}</span>
                       {days.map((day) => (
                         <div key={day.key} className={CALENDAR_STYLES.allDayCell}>
@@ -671,7 +692,8 @@ export const CalendarBoard = ({
                               onClick={() => openDay(day.key)}
                               className={CALENDAR_STYLES.overflow}
                             >
-                              {`+${hiddenCount} ${CALENDAR_COPY.more}`}
+                              {`+${hiddenCount}`}
+                              <span className="hidden sm:inline"> {CALENDAR_COPY.more}</span>
                             </button>
                           )}
                         </div>

@@ -28,7 +28,7 @@ export const SANCTION_PANEL = {
   // One gravity
   group: 'flex flex-col gap-5',
   groupTitle: `${PROPERTY_LABEL} text-[var(--accent)]`,
-  grid: 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+  grid: 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
   // Raised box
   card: 'group relative flex min-h-16 w-full items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   cardName: 'text-sm leading-snug font-bold tracking-tight text-balance',
@@ -96,7 +96,7 @@ export const OFFENSE_SHEET = {
  */
 
 export const MARSHA_GUIDE = {
-  page: 'mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[15rem_20.5rem_minmax(0,1fr)] lg:items-start',
+  page: 'mx-auto grid grid-cols-1 w-full max-w-6xl gap-8 lg:grid-cols-[15rem_20.5rem_minmax(0,1fr)] lg:items-start',
   nav: 'flex flex-col gap-5',
   search: 'h-11',
   navList: 'flex flex-col gap-1',
@@ -130,7 +130,7 @@ export const MARSHA_GUIDE = {
   code: 'flex items-center gap-3 rounded-[var(--radius-lg)] bg-[var(--color-ink)] py-3 pr-2 pl-5 font-[family-name:var(--font-mono)] text-body text-[var(--color-background)]',
   codeText: 'min-w-0 flex-1 break-words',
   codeWord: 'text-[var(--color-brand-300)]',
-  args: 'grid gap-x-5 gap-y-4 border-t border-[var(--color-border)] pt-4 sm:grid-cols-[9.5rem_minmax(0,1fr)]',
+  args: 'grid grid-cols-1 gap-x-5 gap-y-4 border-t border-[var(--color-border)] pt-4 sm:grid-cols-[9.5rem_minmax(0,1fr)]',
   argName: 'font-[family-name:var(--font-mono)] text-sm font-bold break-words',
   argKind:
     'mt-0.5 block font-[family-name:var(--font-sans)] text-micro font-bold tracking-wide uppercase',

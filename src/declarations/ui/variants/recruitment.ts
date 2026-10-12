@@ -4,7 +4,7 @@
  */
 
 export const SESSION_CARD = {
-  grid: 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3',
+  grid: 'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3',
   card: 'group flex min-h-28 cursor-pointer flex-col gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   muted: 'bg-[var(--color-surface)]',
   head: 'flex items-start gap-4',
@@ -47,7 +47,7 @@ export const SESSION_HERO = {
  */
 
 export const CANDIDATE_CARD = {
-  grid: 'grid gap-3 sm:grid-cols-2',
+  grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2',
   card: 'flex min-h-18 cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
   name: 'truncate font-bold tracking-tight',
@@ -65,7 +65,7 @@ export const GLOSSARY_STYLES = {
   page: 'mx-auto flex w-full max-w-4xl flex-col gap-6',
   search: 'h-12 text-base',
   list: 'flex flex-col divide-y divide-[var(--color-border)] overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)]',
-  row: 'grid gap-1 px-6 py-5 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-6',
+  row: 'grid grid-cols-1 gap-1 px-6 py-5 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-6',
   term: 'font-bold tracking-tight',
   definition: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
   empty: 'py-10 text-center text-sm text-[var(--color-ink-subtle)] italic',

@@ -8,7 +8,7 @@ import { COURSE_PANEL } from '@/declarations/ui/variants/course'
 
 export const COURSE_JUDGEMENT = {
   flow: 'flex flex-col gap-10',
-  stage: 'grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)_minmax(0,1fr)] lg:items-start',
+  stage: 'grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)_minmax(0,1fr)] lg:items-start',
   // Arrives one after the other once the scene is played
   enter:
     'transition-[opacity,translate] duration-[var(--motion-duration-celebrate)] ease-[var(--motion-ease-spring)] [transition-delay:var(--delay)]',

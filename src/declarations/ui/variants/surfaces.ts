@@ -36,11 +36,12 @@ export const PAGE_STYLES = {
   // Title and note laid over the foot of the photograph
   bannerFoot:
     'absolute inset-x-0 bottom-0 flex flex-col gap-1.5 px-5 pb-5 text-[var(--color-on-media)] sm:px-8 sm:pb-7',
-  bannerTitleRow: 'flex min-w-0 items-center gap-3',
+  bannerTitleRow: 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 md:flex-nowrap',
   // Letters fade out towards their foot
   bannerTitle:
-    'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-5xl leading-none font-bold tracking-tight text-transparent uppercase italic md:text-8xl',
-  bannerTitleText: 'min-w-0 pr-2 text-balance md:truncate',
+    'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-[clamp(1.75rem,9.5vw,3rem)] leading-none font-bold tracking-tight text-transparent uppercase italic sm:text-5xl md:text-8xl',
+  bannerTitleText:
+    'line-clamp-2 min-w-0 pr-2 text-balance [overflow-wrap:anywhere] md:line-clamp-1 md:[overflow-wrap:normal]',
   // Faint two-to-six word line under the title
   bannerHero:
     'relative -mt-2 text-base leading-none font-bold tracking-tight text-balance text-[var(--color-on-media)] uppercase italic drop-shadow-[0_1px_6px_rgb(0_0_0/0.45)] md:-mt-4 md:text-2xl',
@@ -132,16 +133,16 @@ export type GlyphSize = keyof Omit<typeof GLYPH_STYLES, 'base'>
 
 export const DIALOG_STYLES = {
   overlay:
-    'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-scrim)] backdrop-blur-sm sm:items-center sm:p-6',
+    'overlay-enter fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-scrim)] p-4 backdrop-blur-sm sm:p-6',
   panel:
-    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/90 shadow-[var(--shadow-lg)] backdrop-blur-2xl backdrop-saturate-150 sm:rounded-[var(--radius-xl)]',
+    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/90 shadow-[var(--shadow-lg)] backdrop-blur-2xl backdrop-saturate-150',
   // Line under the banner
-  subheader: 'px-6 pt-4 sm:px-8',
-  body: 'flex-1 overflow-y-auto border-t border-[var(--color-border)] px-6 py-6 sm:px-8',
+  subheader: 'px-5 pt-4 sm:px-8',
+  body: 'flex-1 overflow-y-auto border-t border-[var(--color-border)] px-5 py-5 sm:px-8 sm:py-6',
   // Tabs already rule the top
   bodyFlush: 'border-t-0 pt-1',
   footer:
-    'flex flex-wrap items-center justify-end gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface-sunken)]/40 px-6 py-4 sm:px-8',
+    'flex flex-wrap items-center justify-end gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface-sunken)]/40 px-5 py-3 sm:px-8 sm:py-4',
 } as const
 
 /**
@@ -217,7 +218,7 @@ export const DRAWER_ACTIONS = {
 export const MENU_STYLES = {
   panel:
     'surface-enter fixed z-[70] min-w-52 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel py-1 shadow-[var(--shadow-lg)]',
-  item: 'flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-40',
+  item: 'flex min-h-11 w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-40 md:min-h-0',
   danger: 'text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
   icon: 'h-4 w-4 shrink-0 opacity-70',
   separator: 'my-1 h-px bg-[var(--color-border)]',
@@ -338,7 +339,7 @@ export const INLINE_EDIT_STYLES = {
  */
 
 export const PREFERENCE_STYLES = {
-  layout: 'mx-auto grid w-full max-w-5xl items-start gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]',
+  layout: 'mx-auto grid grid-cols-1 w-full max-w-5xl items-start gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]',
   stack: 'flex flex-col gap-6',
   rows: 'flex flex-col divide-y divide-[var(--color-border)]',
   row: 'flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0',

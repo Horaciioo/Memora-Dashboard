@@ -13,7 +13,7 @@ export const COURSE_TOUR = {
   root: 'course-wide flex flex-col gap-5 py-12',
   // Instructions heading the list they are about, on a panel
   intro: `${COURSE_PANEL} p-4 text-sm leading-relaxed`,
-  layout: 'grid gap-5 lg:grid-cols-[18rem_minmax(0,1fr)]',
+  layout: 'grid grid-cols-1 gap-5 lg:grid-cols-[18rem_minmax(0,1fr)]',
   list: 'flex flex-col gap-0.5',
   stop: 'relative flex items-center gap-2 rounded-[var(--radius-lg)] px-3 py-2 text-left text-sm font-semibold transition-[background-color,color,transform] duration-[var(--motion-duration-panel)] hover:bg-[var(--color-hover)]',
   stopActive: 'translate-x-1 bg-[var(--color-brand-100)] font-bold text-[var(--color-brand-800)]',
@@ -28,7 +28,7 @@ export const COURSE_TOUR = {
   noteTitle: PROPERTY_LABEL,
   noteBody: 'text-base leading-relaxed',
   building:
-    'grid h-[clamp(26rem,64dvh,44rem)] gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.7fr)]',
+    'grid grid-cols-1 h-[clamp(26rem,64dvh,44rem)] gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.7fr)]',
   buildingColumn: 'flex flex-col gap-3',
   buildingBlock:
     'skeleton-shimmer flex-1 rounded-[var(--radius-xl)] bg-[var(--color-surface-sunken)]',
@@ -43,7 +43,7 @@ export const COURSE_FOCUS = {
   root: 'course-wide py-12',
   // Intro on top, then tabs beside the visual and its words
   column: 'mx-auto flex w-full max-w-6xl flex-col gap-10',
-  layout: 'grid gap-x-6 gap-y-8 lg:grid-cols-[18rem_minmax(0,1fr)]',
+  layout: 'grid grid-cols-1 gap-x-6 gap-y-8 lg:grid-cols-[18rem_minmax(0,1fr)]',
   tabs: 'flex flex-col gap-0.5 lg:justify-center',
   stage: `min-w-0 ${COURSE_FLOAT}`,
   // Under the visual, as tall as its words need
@@ -76,7 +76,7 @@ export const COURSE_LADDER = {
  */
 
 export const COURSE_LIVECON = {
-  root: 'grid gap-5 lg:grid-cols-2',
+  root: 'grid grid-cols-1 gap-5 lg:grid-cols-2',
   levels: 'flex flex-col gap-2',
   level:
     'flex items-start gap-3 rounded-[var(--radius-xl)] border-2 border-transparent bg-[var(--color-surface-raised)] p-4 text-left shadow-[var(--shadow-sm)] transition-[border-color,transform,box-shadow] duration-[var(--motion-duration-panel)]',
