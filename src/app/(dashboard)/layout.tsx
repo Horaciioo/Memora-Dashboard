@@ -15,7 +15,7 @@ import { GuideHost } from '@/composites/shell/GuideHost'
 import { openRoutes } from '@/core/lib/tour/progress'
 import { NavigationViews, visibleNavGroups } from '@/declarations/navigation'
 import { APP_ENVIRONMENT } from '@/declarations/system/environments'
-import { mobileHeldRoutes } from '@/declarations/ui/responsive'
+import { heldRoutes } from '@/declarations/ui/responsive'
 import { PENDING_ACCOUNT_COPY } from '@/declarations/onboarding/copy'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
@@ -69,7 +69,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       twoFactor={twoFactor}
       seal={seal}
       tour={tour}
-      heldRoutes={mobileHeldRoutes(APP_ENVIRONMENT)}
+      heldRoutes={heldRoutes(APP_ENVIRONMENT)}
     >
       {children}
       <Suspense fallback={null}>

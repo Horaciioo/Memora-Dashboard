@@ -21,7 +21,7 @@
 
 /* Clearance under the routed page for the floating mobile nav */
 .shell-page {
-  padding-bottom: calc(var(--shell-bottom-nav-h) + env(safe-area-inset-bottom) + 2rem);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);
 }
 
 /* md */

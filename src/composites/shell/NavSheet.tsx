@@ -1,0 +1,86 @@
+'use client'
+
+import Link from '@/components/elements/navigation/AppLink'
+import { usePathname } from 'next/navigation'
+import { useEffect } from 'react'
+import { BottomSheet } from '@/components/structures/BottomSheet'
+import { SearchLauncher } from '@/composites/search/SearchLauncher'
+import { RailNav } from '@/composites/shell/RailNav'
+import { RailShortcuts } from '@/composites/shell/RailShortcuts'
+import { RoleSwitch } from '@/composites/shell/RoleSwitch'
+import { useRailEntries } from '@/core/hooks/interaction/useRailEntries'
+import { ROUTES } from '@/declarations/navigation'
+import { NAV_SHEET } from '@/declarations/ui/blocks'
+import { NAV_COPY } from '@/declarations/ui/copy/navigation'
+import { ICONS } from '@/declarations/ui/icons'
+import { BOTTOM_SHEET } from '@/declarations/ui/variants'
+import { useTour } from '@/managers/front-end/TourManager'
+import type { ViewContext } from '@/types/access'
+
+export interface NavSheetProps {
+  open: boolean
+  viewContext: ViewContext
+  unreadCount: number
+  onClose: () => void
+}
+
+/**
+ * The rail's pages in a sheet rising from the bottom: level switch first, then the search,
+ * the shortcuts and every group
+ * @param {boolean} open - Sheet is mounted
+ * @param {ViewContext} viewContext - View resolved server-side
+ * @param {number} unreadCount - Unopened notifications resolved server-side
+ * @param {() => void} onClose - Dismiss handler
+ * @return {JSX.Element | null}
+ */
+
+export const NavSheet = ({ open, viewContext, unreadCount, onClose }: NavSheetProps) => {
+  const pathname = usePathname()
+  const { isTouring } = useTour()
+  const { shortcuts, groups } = useRailEntries(viewContext)
+  const BellIcon = ICONS.bell
+
+  // A page reached by the sheet closes it
+  useEffect(() => {
+    onClose()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname])
+
+  return (
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      title={NAV_COPY.menuTitle}
+      figure={
+        <>
+          <h2 className={BOTTOM_SHEET.figureTitle} aria-hidden="true">
+            {NAV_COPY.menuTitle}
+          </h2>
+          <p className={BOTTOM_SHEET.figureLine}>{NAV_COPY.menuLine}</p>
+        </>
+      }
+    >
+      {/* A tap on any link leaves the sheet, even on the page already open */}
+      <div
+        className={NAV_SHEET.stack}
+        onClick={(event) => {
+          if ((event.target as HTMLElement).closest('a')) onClose()
+        }}
+      >
+        {viewContext.switchable && (
+          <div className={NAV_SHEET.switch}>
+            <RoleSwitch viewContext={viewContext} />
+          </div>
+        )}
+        <SearchLauncher expanded />
+        <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
+        <RailNav groups={groups} isCompact={false} isTouring={isTouring} live={viewContext.live} />
+        <Link href={ROUTES.notifications} className={NAV_SHEET.notifications}>
+          <BellIcon className={NAV_SHEET.notificationsIcon} aria-hidden="true" />
+          {NAV_COPY.notifications}
+          {unreadCount > 0 && <span className={NAV_SHEET.dot} aria-hidden="true" />}
+        </Link>
+      </div>
+    </BottomSheet>
+  )
+}

@@ -10,6 +10,7 @@ import { OptionMark } from '@/components/elements/forms/OptionMark'
 import { CreatorLabels } from '@/components/elements/display/RecordLabel'
 import { pickedOptions } from '@/core/lib/forms/options'
 import { OverdueMark } from '@/composites/work/OverdueMark'
+import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
 import { AddRow } from '@/components/structures/AddRow'
@@ -469,21 +470,30 @@ export const ProjectFileTabs = ({
     (a, b) => Number(isValidated(a)) - Number(isValidated(b))
   )
 
-  // Shared task row body
+  // Shared task row body: on a phone the owner stands over the title
   const taskLine = (task: TaskSummary) => (
     <>
-      <Glyph value={task.emoji} size="row" />
-      <span
-        className={cn(
-          'min-w-0 flex-1 truncate font-medium',
-          isValidated(task) && 'text-[var(--color-ink-subtle)] line-through'
+      <span className="flex min-w-0 flex-1 flex-col gap-1 md:flex-row md:items-center md:gap-3">
+        {task.owner && (
+          <span className="flex items-center gap-1.5 text-xs text-[var(--color-ink-subtle)] md:order-2">
+            <span className="md:hidden">
+              <Avatar name={task.owner.name} src={task.owner.src} size="xs" />
+            </span>
+            {task.owner.name}
+          </span>
         )}
-      >
-        {task.title}
+        <span className="flex min-w-0 flex-1 items-center gap-2 md:order-1 md:gap-3">
+          <Glyph value={task.emoji} size="row" />
+          <span
+            className={cn(
+              'min-w-0 flex-1 truncate font-medium',
+              isValidated(task) && 'text-[var(--color-ink-subtle)] line-through'
+            )}
+          >
+            {task.title}
+          </span>
+        </span>
       </span>
-      {task.owner && (
-        <span className="text-xs text-[var(--color-ink-subtle)]">{task.owner.name}</span>
-      )}
       {task.state && <Status label={task.state.label} accent={task.state.accent} />}
     </>
   )

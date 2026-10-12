@@ -228,6 +228,7 @@ export const FormDrawer = ({
                 <button
                   type="button"
                   onClick={() => goTo(previous.name)}
+                  aria-label={previous.name}
                   className={cn(DRAWER_ACTIONS.step, DRAWER_ACTIONS.stepBack)}
                 >
                   <BackIcon className={DRAWER_ACTIONS.stepIcon} aria-hidden="true" />
@@ -238,6 +239,7 @@ export const FormDrawer = ({
                 <button
                   type="button"
                   onClick={advance}
+                  aria-label={next.name}
                   className={cn(DRAWER_ACTIONS.step, DRAWER_ACTIONS.stepNext)}
                 >
                   <span className={DRAWER_ACTIONS.stepLabel}>{next.name}</span>
@@ -252,6 +254,7 @@ export const FormDrawer = ({
                 type="button"
                 onClick={submit}
                 disabled={isSaving}
+                aria-label={aimedPhrase(submitVerb, subject.label, subject.gender)}
                 className={cn(DRAWER_ACTIONS.line, DRAWER_ACTIONS.save)}
               >
                 {isSaving ? (
@@ -259,19 +262,24 @@ export const FormDrawer = ({
                 ) : (
                   <SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
                 )}
-                {isSaving
-                  ? ACTION_COPY.saving
-                  : aimedPhrase(submitVerb, subject.label, subject.gender)}
+                <span className={DRAWER_ACTIONS.lineLabel}>
+                  {isSaving
+                    ? ACTION_COPY.saving
+                    : aimedPhrase(submitVerb, subject.label, subject.gender)}
+                </span>
               </button>
               <span className={DRAWER_ACTIONS.divider} aria-hidden="true" />
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isSaving}
+                aria-label={aimedPhrase(DRAWER_COPY.cancel, subject.label, subject.gender)}
                 className={cn(DRAWER_ACTIONS.line, DRAWER_ACTIONS.cancel)}
               >
                 <CancelIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
-                {aimedPhrase(DRAWER_COPY.cancel, subject.label, subject.gender)}
+                <span className={DRAWER_ACTIONS.lineLabel}>
+                  {aimedPhrase(DRAWER_COPY.cancel, subject.label, subject.gender)}
+                </span>
               </button>
             </>
           )}

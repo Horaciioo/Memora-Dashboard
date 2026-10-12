@@ -18,10 +18,11 @@ import { RailShortcuts } from '@/composites/shell/RailShortcuts'
 import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
 import { useCalendarRail } from '@/core/hooks/interaction/useCalendarRail'
 import { useCalendarRailView } from '@/core/hooks/interaction/useCalendarRailView'
+import { useRailEntries } from '@/core/hooks/interaction/useRailEntries'
 import { useCourseRail } from '@/core/hooks/interaction/useCourseRail'
 import { useRailCompact } from '@/core/hooks/interaction/useRailCompact'
 import { SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
-import { ROUTES, visibleNavGroups } from '@/declarations/navigation'
+import { ROUTES } from '@/declarations/navigation'
 import { beaconProps } from '@/declarations/ui/beacons'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
@@ -45,8 +46,7 @@ export interface LeftSidebarProps {
  */
 
 export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
-  const { can, session } = useAuthContext()
-  // The first visit shows pages as it explains them
+  const { session } = useAuthContext()
   const { isTouring, isIntroOpen, isUnlocked } = useTour()
   // An open course puts its chapters where the destinations stand
   const courseRail = useCourseRail()
@@ -79,19 +79,8 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
     }
   }, [isCompact])
 
-  const entries = visibleNavGroups(viewContext.view, session, can)
-  // Shortcuts leave the groups too
-  const shortcuts = [
-    ...entries.flatMap((group) => group.items).filter((item) => item.quick),
-    { href: ROUTES.preferences, label: NAV_COPY.preferences, icon: 'settings' as const },
-  ].filter((item) => isUnlocked(item.href))
+  const { shortcuts, groups } = useRailEntries(viewContext)
   const newsAt = shortcuts.findIndex((item) => item.href === ROUTES.changelog)
-  const groups = entries
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) => !item.quick && isUnlocked(item.href)),
-    }))
-    .filter((group) => group.items.length > 0)
 
   const nav = (
     <RailNav groups={groups} isCompact={isCompact} isTouring={isTouring} live={viewContext.live} />

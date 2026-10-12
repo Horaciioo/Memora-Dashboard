@@ -729,8 +729,13 @@ const xlBreakpoint = readInteger((responsive.breakpoints as Record<string, unkno
   min: lgBreakpoint,
 })
 
+const xxlBreakpoint = readInteger((responsive.breakpoints as Record<string, unknown>)['2xl'], {
+  path: 'system/responsive.breakpoints.2xl',
+  fallback: 1536,
+  min: xlBreakpoint,
+})
+
 const responsiveShell = readNode(responsive.shell, 'system/responsive.shell')
-const responsiveBottomNav = readNode(responsive.bottomNav, 'system/responsive.bottomNav')
 const responsiveToast = readNode(responsive.toast, 'system/responsive.toast')
 const responsiveDrawer = readNode(responsive.drawer, 'system/responsive.drawer')
 const responsiveToastVisible = readNode(
@@ -740,11 +745,17 @@ const responsiveToastVisible = readNode(
 
 /**
  * Breakpoint and shell chrome bounds
- * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, bottomNavHeight: number, sidebarWidth: number, sidebarCompactWidth: number, bannerHeight: number, bannerHeightMobile: number, maxPrimarySlots: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, longPressMs: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
+ * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl' | '2xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, sidebarWidth: number, sidebarCompactWidth: number, bannerHeight: number, bannerHeightMobile: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, longPressMs: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
  */
 
 export const RESPONSIVE_SETTINGS = {
-  breakpoints: { sm: smBreakpoint, md: mdBreakpoint, lg: lgBreakpoint, xl: xlBreakpoint },
+  breakpoints: {
+    sm: smBreakpoint,
+    md: mdBreakpoint,
+    lg: lgBreakpoint,
+    xl: xlBreakpoint,
+    '2xl': xxlBreakpoint,
+  },
   mobileUntil: readChoice(responsive.mobileUntil, {
     path: 'system/responsive.mobileUntil',
     fallback: 'md',
@@ -754,11 +765,6 @@ export const RESPONSIVE_SETTINGS = {
     path: 'system/responsive.shell.topBarHeight',
     fallback: 52,
     min: 32,
-  }),
-  bottomNavHeight: readInteger(responsiveShell.bottomNavHeight, {
-    path: 'system/responsive.shell.bottomNavHeight',
-    fallback: 64,
-    min: 40,
   }),
   sidebarWidth: readInteger(responsiveShell.sidebarWidth, {
     path: 'system/responsive.shell.sidebarWidth',
@@ -779,12 +785,6 @@ export const RESPONSIVE_SETTINGS = {
     path: 'system/responsive.shell.bannerHeightMobile',
     fallback: 144,
     min: 96,
-  }),
-  maxPrimarySlots: readInteger(responsiveBottomNav.maxSlots, {
-    path: 'system/responsive.bottomNav.maxSlots',
-    fallback: 4,
-    min: 2,
-    max: 6,
   }),
   toastVisibleMobile: readInteger(responsiveToastVisible.mobile, {
     path: 'system/responsive.toast.maxVisible.mobile',

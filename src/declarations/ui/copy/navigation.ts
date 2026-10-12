@@ -17,6 +17,10 @@ export const NAV_COPY = {
   historyForward: 'Page suivante',
   reloadPage: 'Actualiser',
   account: 'Mon compte',
+  openMenu: 'Ouvrir le menu',
+  menuTitle: 'Navigation',
+  menuLine: 'Toutes tes pages, au même endroit.',
+  notifications: 'Notifications',
   searchPlaceholder: 'Effectue une recherche...',
   searchShortcut: '⌘ K',
   searchTitle: 'Recherche',
@@ -30,8 +34,6 @@ export const NAV_COPY = {
   textSize: 'Taille du texte',
   colorVision: 'Mode daltonien',
   wip: 'En cours de développement',
-  openMore: 'Voir plus de pages',
-  moreTitle: 'Plus de pages',
 } as const
 
 /**

@@ -131,18 +131,6 @@ export interface NavigationCondition {
 }
 
 /**
- * Placement of an entry on the floating mobile nav pill
- * @typedef {Object} MobileNavSlot
- * @property {'home' | 'primary'} slot - Home sits centred
- * @property {number} order - Rank among every primary entry
- */
-
-export interface MobileNavSlot {
-  slot: 'home' | 'primary'
-  order: number
-}
-
-/**
  * Query flag naming the course just finished
  * @type {string}
  */
@@ -159,7 +147,6 @@ export const TRAININGS_DONE_PARAM = 'achevee'
  * @property {PermissionName} [permission] - Permission needed
  * @property {NavigationCondition} [visibleWhen] - Display rule
  * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
- * @property {MobileNavSlot} [mobile] - Promotes the entry onto the mobile nav pill
  * @property {boolean} [onLive] - Lights up while a live is open
  * @property {boolean} [quick] - Glyph box under the search
  */
@@ -172,7 +159,6 @@ export interface NavigationItem {
   permission?: PermissionName
   visibleWhen?: NavigationCondition
   maturity?: MaturityName
-  mobile?: MobileNavSlot
   onLive?: boolean
   quick?: boolean
 }
@@ -255,7 +241,6 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'dashboard',
         maturity: 'alpha',
         quick: true,
-        mobile: { slot: 'home', order: 0 },
       },
       { href: ROUTES.absences, label: 'Absences', icon: 'absences', maturity: 'new' },
       { href: ROUTES.changelog, label: 'Nouveautés', icon: 'news', quick: true },
@@ -265,7 +250,6 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'meetings',
         permission: Permissions.CalendarRead,
         maturity: 'beta',
-        mobile: { slot: 'primary', order: 7 },
       },
       {
         href: ROUTES.trainings,
@@ -288,28 +272,24 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'members',
         from: NavigationViews.Lead,
         permission: Permissions.MemberRead,
-        mobile: { slot: 'primary', order: 6 },
       },
       {
         href: ROUTES.projects,
         label: 'Projets',
         icon: 'projects',
         permission: Permissions.ProjectRead,
-        mobile: { slot: 'primary', order: 3 },
       },
       {
         href: ROUTES.tasks,
         label: 'Tâches',
         icon: 'tasks',
         permission: Permissions.TaskRead,
-        mobile: { slot: 'primary', order: 4 },
       },
       {
         href: ROUTES.meetings,
         label: 'Réunions',
         icon: 'meetings',
         permission: Permissions.MeetingRead,
-        mobile: { slot: 'primary', order: 5 },
       },
     ],
   },
@@ -350,7 +330,6 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'liveDot',
         permission: Permissions.LiveRead,
         onLive: true,
-        mobile: { slot: 'primary', order: 0 },
       },
       {
         href: ROUTES.sanctions,
@@ -358,7 +337,6 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'liveconCrisis',
         permission: Permissions.SanctionRead,
         maturity: 'new',
-        mobile: { slot: 'primary', order: 8 },
       },
     ],
   },
@@ -386,7 +364,6 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'settings',
         permission: Permissions.ReferenceRead,
         maturity: 'alpha',
-        mobile: { slot: 'primary', order: 2 },
       },
       {
         href: ROUTES.system,
@@ -394,7 +371,6 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'system',
         from: NavigationViews.Administration,
         permission: Permissions.AccessManage,
-        mobile: { slot: 'primary', order: 1 },
       },
     ],
   },
@@ -508,45 +484,3 @@ export const visibleNavGroups = (
       ),
     }))
     .filter((group) => group.items.length > 0)
-
-/**
- * Bar contents of the floating mobile nav
- * @typedef {Object} MobileNavigation
- * @property {NavigationItem | null} home - Centre destination
- * @property {NavigationItem[]} primary - Destinations shown either side of home
- */
-
-export interface MobileNavigation {
-  home: NavigationItem | null
-  primary: NavigationItem[]
-}
-
-/**
- * Pick Accueil and its ranked neighbours for the nav pill — anything left out is still reachable through the more sheet
- * @param {NavigationViewName} view - Rail view on screen
- * @param {Object} member - Signed-in member
- * @param {MemberStatusName} member.status - Membership status
- * @param {MemberRoleName} member.role - Hierarchy level
- * @param {(permission: PermissionName) => boolean} can - Permission check
- * @param {number} maxPrimary - Primary slots kept before overflowing
- * @return {MobileNavigation} - Bar contents
- */
-
-export const mobileNavigation = (
-  view: NavigationViewName,
-  member: { status: MemberStatusName; role: MemberRoleName } | null,
-  can: (permission: PermissionName) => boolean,
-  maxPrimary: number
-): MobileNavigation => {
-  const items = visibleNavGroups(view, member, can)
-    .flatMap((group) => group.items)
-    .filter((item): item is NavigationItem & { mobile: MobileNavSlot } => item.mobile !== undefined)
-
-  const home = items.find((item) => item.mobile.slot === 'home') ?? null
-  const primary = items
-    .filter((item) => item.mobile.slot === 'primary')
-    .sort((a, b) => a.mobile.order - b.mobile.order)
-    .slice(0, maxPrimary)
-
-  return { home, primary }
-}

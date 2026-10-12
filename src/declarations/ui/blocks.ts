@@ -155,26 +155,22 @@ export const SEARCH_LAUNCHER = {
   bar: 'glass-panel flex w-full items-center gap-2.5 rounded-[var(--radius-lg)] px-3.5 py-3 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
   barLabel: 'flex-1 truncate text-body',
   barShortcut:
-    'shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro font-medium text-[var(--color-ink-subtle)]',
+    'hidden shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro font-medium text-[var(--color-ink-subtle)] md:inline',
 } as const
 
 /**
- * Floating bottom nav pill classes — icon only
+ * Navigation sheet of the phone
  * @type {Record<string, string>}
  */
 
-export const MOBILE_NAV = {
-  bar: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] left-1/2 z-40 flex -translate-x-1/2 items-center gap-0.5 rounded-[var(--radius-full)] glass-panel border px-2 py-1.5 md:hidden print:hidden',
-  link: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-full)] transition-colors',
-  linkActive: 'bg-[var(--color-brand-600)]',
-  // No colour here — one of the two below always wins
-  icon: 'h-5 w-5 shrink-0 transition-colors',
-  iconIdle: 'text-[var(--color-ink-subtle)]',
-  iconActive: 'text-[var(--color-on-brand)]',
-  // Round button flanking the pill
-  fab: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-[var(--radius-full)] glass-panel border text-[var(--color-ink)] md:hidden print:hidden',
-  fabLeft: 'left-3',
-  fabRight: 'right-3',
+export const NAV_SHEET = {
+  stack: 'flex flex-col gap-4',
+  // Level switch sits first
+  switch: 'w-full',
+  notifications:
+    'relative flex min-h-11 items-center gap-3 rounded-[var(--radius-lg)] px-3 text-body font-medium transition-colors hover:bg-[var(--color-surface)]',
+  notificationsIcon: 'size-5 shrink-0',
+  dot: 'ml-auto size-2 rounded-full bg-[var(--color-danger)]',
 } as const
 
 /**
@@ -183,10 +179,10 @@ export const MOBILE_NAV = {
  */
 
 export const TOP_BAR = {
-  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 bg-[var(--color-page)] px-3 md:hidden print:hidden',
-  creator: 'flex min-w-0 flex-1 items-center gap-2',
-  creatorName: 'truncate text-sm font-semibold',
-  actions: 'flex shrink-0 items-center gap-1',
+  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center justify-between gap-2 bg-[var(--color-page)] px-3 md:hidden print:hidden',
+  menuButton:
+    'flex size-11 items-center justify-center rounded-full text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
+  menuIcon: 'size-6',
   avatarButton:
     '-m-1.5 shrink-0 rounded-full p-1.5 ring-2 ring-transparent transition-shadow hover:ring-[var(--color-border-strong)]',
 } as const
@@ -214,22 +210,6 @@ export const ACCOUNT_SHEET = {
 } as const
 
 /**
- * More sheet classes
- * @type {Record<string, string>}
- */
-
-export const MOBILE_MORE = {
-  wrapper: 'flex flex-col gap-5',
-  section: 'flex flex-col gap-2',
-  sectionLabel:
-    'px-1 text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  grid: 'grid grid-cols-3 gap-2',
-  tile: 'flex flex-col items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-3 text-center transition-colors hover:border-[var(--color-border-strong)]',
-  tileIcon: 'h-5 w-5 text-[var(--color-ink-subtle)]',
-  tileLabel: 'text-xs leading-tight font-medium',
-} as const
-
-/**
  * Account menu classes
  * @type {Record<string, string>}
  */
@@ -247,11 +227,12 @@ export const ACCOUNT_BLOCK = {
  */
 
 export const DETAIL_BLOCK = {
-  grid: `grid grid-cols-1 sm:grid-cols-2 ${PROPERTY_SPACING.rows} ${PROPERTY_SPACING.columns}`,
+  // Two properties side by side from the narrowest screen
+  grid: `grid grid-cols-2 ${PROPERTY_SPACING.rows} ${PROPERTY_SPACING.columns}`,
   entry: `flex min-w-0 flex-col ${PROPERTY_SPACING.within}`,
   stack: `flex flex-col ${PROPERTY_SPACING.rows}`,
   // Long text runs edge to edge
-  entryWide: `flex min-w-0 flex-col sm:col-span-2 ${PROPERTY_SPACING.within}`,
+  entryWide: `flex min-w-0 flex-col col-span-2 ${PROPERTY_SPACING.within}`,
   label: PROPERTY_LABEL,
   value: `text-sm break-words ${PROPERTY_VALUE}`,
   empty: `text-sm ${EMPTY_VALUE}`,

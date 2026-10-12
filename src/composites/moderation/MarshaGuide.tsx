@@ -1,12 +1,13 @@
 'use client'
 
 import Link from '@/components/elements/navigation/AppLink'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Input } from '@/components/elements/forms/Input'
 import { MarshaDetail, type MarshaViewer } from '@/composites/moderation/MarshaDetail'
+import { useMediaQuery } from '@/core/hooks/interaction/useBreakpoint'
 import { useCopy } from '@/core/hooks/interaction/useCopy'
 import {
   MARSHA_CATEGORIES,
@@ -14,6 +15,7 @@ import {
   MARSHA_RULES,
   type MarshaCommand,
 } from '@/declarations/marsha/commands'
+import { MEDIA } from '@/declarations/ui/responsive'
 import { MARSHA_COPY } from '@/declarations/marsha/copy'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { beaconProps } from '@/declarations/ui/beacons'
@@ -74,6 +76,14 @@ export const MarshaGuide = ({ trainingHref, viewer }: MarshaGuideProps) => {
   }
 
   const Training = ICONS.academy
+
+  // Below xl the detail sits under the list, so a pick scrolls down to it
+  const isSplit = useMediaQuery(MEDIA.xl)
+  const detailRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (picked && !isSplit)
+      detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [picked, isSplit])
 
   return (
     <div className={MARSHA_GUIDE.page}>
@@ -184,23 +194,30 @@ export const MarshaGuide = ({ trainingHref, viewer }: MarshaGuideProps) => {
         )}
       </div>
 
-      {isStart ? (
-        <article key={rule.title} className={MARSHA_GUIDE.detail}>
-          <h2 className={MARSHA_GUIDE.detailTitle}>{rule.title}</h2>
-          <Markdown source={rule.body} />
-          <div className={MARSHA_GUIDE.resources}>
-            {MARSHA_RESOURCES.map((resource) => (
-              <a key={resource.href} href={resource.href} target="_blank" rel="noreferrer noopener">
-                <Button icon="link">{resource.label}</Button>
-              </a>
-            ))}
-          </div>
-        </article>
-      ) : (
-        command && (
-          <MarshaDetail command={command} viewer={viewer} onCopy={(text) => void copy(text)} />
-        )
-      )}
+      <div ref={detailRef} className={MARSHA_GUIDE.detailHost}>
+        {isStart ? (
+          <article key={rule.title} className={MARSHA_GUIDE.detail}>
+            <h2 className={MARSHA_GUIDE.detailTitle}>{rule.title}</h2>
+            <Markdown source={rule.body} />
+            <div className={MARSHA_GUIDE.resources}>
+              {MARSHA_RESOURCES.map((resource) => (
+                <a
+                  key={resource.href}
+                  href={resource.href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <Button icon="link">{resource.label}</Button>
+                </a>
+              ))}
+            </div>
+          </article>
+        ) : (
+          command && (
+            <MarshaDetail command={command} viewer={viewer} onCopy={(text) => void copy(text)} />
+          )
+        )}
+      </div>
     </div>
   )
 }

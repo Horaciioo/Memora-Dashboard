@@ -46,7 +46,10 @@ export const LIST_STYLES = {
     'flex shrink-0 items-center gap-1 text-xs font-medium whitespace-nowrap text-[var(--color-ink-subtle)] italic',
   cardAbsentGlyph: 'h-3.5 w-3.5 shrink-0',
   cardAbsentEmblems: 'opacity-50 grayscale',
-  grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
+  // Two small boxes per row on a phone
+  grid: 'grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-3',
+  // Words and glyphs the small box drops on a phone
+  cardExtra: 'hidden sm:contents',
 } as const
 
 /**

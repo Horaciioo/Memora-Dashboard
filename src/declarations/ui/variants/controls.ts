@@ -72,8 +72,8 @@ export const PROPERTY_VALUE = 'text-[var(--color-ink)]'
 
 export const PROPERTY_SPACING = {
   // Between two properties
-  rows: 'gap-y-7',
-  columns: 'gap-x-10',
+  rows: 'gap-y-5 sm:gap-y-7',
+  columns: 'gap-x-4 sm:gap-x-10',
   // Between a title and its value
   within: 'gap-2',
   // Settings rows

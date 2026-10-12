@@ -70,6 +70,11 @@ body {
   }
 }
 
+/* Sheet rising from the bottom edge */
+.sheet-enter {
+  animation: drawer-rise var(--motion-duration-panel) var(--motion-ease-spring);
+}
+
 /* Fields of a new section glide in from the side, slowly */
 .drawer-section-enter {
   animation: section-arrive var(--motion-duration-celebrate) var(--motion-ease-out);

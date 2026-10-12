@@ -7,7 +7,6 @@ import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
 import { TourHost } from '@/composites/tour/TourHost'
-import { BottomNav } from '@/composites/shell/BottomNav'
 import { LeftSidebar } from '@/composites/shell/LeftSidebar'
 import { MobileTopBar } from '@/composites/shell/MobileTopBar'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
@@ -15,6 +14,7 @@ import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { frameToneOf } from '@/declarations/access/views'
 import { beaconProps } from '@/declarations/ui/beacons'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
+import type { HeldRoutes } from '@/declarations/ui/responsive'
 import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { useAutoRefresh } from '@/core/hooks/interaction/useAutoRefresh'
 import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
@@ -30,7 +30,7 @@ export interface AppShellProps {
   twoFactor: TwoFactorState
   seal: SealState
   tour: TourState | null
-  heldRoutes: readonly string[]
+  heldRoutes: HeldRoutes
   children: ReactNode
 }
 
@@ -41,7 +41,7 @@ export interface AppShellProps {
  * @param {TwoFactorState} twoFactor - Enrolment state resolved server-side
  * @param {SealState} seal - Unlock window resolved server-side
  * @param {TourState | null} tour - First visit resolved server-side
- * @param {readonly string[]} heldRoutes - Areas held back on mobile
+ * @param {HeldRoutes} heldRoutes - Areas held back on small screens
  * @param {ReactNode} children - Routed page content
  * @return {JSX.Element}
  */
@@ -105,13 +105,14 @@ const AppShellFrame = ({
         <WindowFrame />
 
         <div className={APP_SHELL.main}>
-          {session && <MobileTopBar session={session} viewContext={viewContext} />}
+          {session && (
+            <MobileTopBar session={session} viewContext={viewContext} unreadCount={unreadCount} />
+          )}
           <main className={APP_SHELL.content} {...beaconProps(TOUR_BEACONS.page)}>
             <MobileHold routes={heldRoutes}>{children}</MobileHold>
           </main>
         </div>
 
-        {session && <BottomNav viewContext={viewContext} />}
         <SealDialog />
         {session && <NudgeHost />}
         {session && <TourHost />}

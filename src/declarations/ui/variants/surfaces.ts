@@ -35,16 +35,16 @@ export const PAGE_STYLES = {
   bannerOptions: 'absolute top-3 right-3 z-10 sm:top-4 sm:right-4',
   // Title and note laid over the foot of the photograph
   bannerFoot:
-    'absolute inset-x-0 bottom-0 flex flex-col gap-1.5 px-5 pb-5 text-[var(--color-on-media)] sm:px-8 sm:pb-7',
+    'absolute inset-x-0 bottom-0 flex flex-col gap-1.5 px-5 pb-3 text-[var(--color-on-media)] sm:px-8 sm:pb-7',
   bannerTitleRow: 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 md:flex-nowrap',
   // Letters fade out towards their foot
   bannerTitle:
-    'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-[clamp(1.75rem,9.5vw,3rem)] leading-none font-bold tracking-tight text-transparent uppercase italic sm:text-5xl md:text-8xl',
+    'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-[clamp(1.5rem,8vw,2.25rem)] leading-none font-bold tracking-tight text-transparent uppercase italic sm:text-5xl md:text-8xl',
   bannerTitleText:
     'line-clamp-2 min-w-0 pr-2 text-balance [overflow-wrap:anywhere] md:line-clamp-1 md:[overflow-wrap:normal]',
   // Faint two-to-six word line under the title
   bannerHero:
-    'relative -mt-2 text-base leading-none font-bold tracking-tight text-balance text-[var(--color-on-media)] uppercase italic drop-shadow-[0_1px_6px_rgb(0_0_0/0.45)] md:-mt-4 md:text-2xl',
+    'relative -mt-1 text-xs leading-none font-bold tracking-tight text-balance text-[var(--color-on-media)] uppercase italic drop-shadow-[0_1px_6px_rgb(0_0_0/0.45)] md:-mt-4 md:text-2xl',
   // Very small line under the title
   bannerNote: 'flex text-xs font-medium',
   // Tab strip centred under the photograph, empty on most pages
@@ -146,6 +146,29 @@ export const DIALOG_STYLES = {
 } as const
 
 /**
+ * Floating sheet rising from the bottom edge
+ * @type {Record<string, string>}
+ */
+
+export const BOTTOM_SHEET = {
+  overlay:
+    'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-scrim)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur-lg md:hidden',
+  frame: 'sheet-enter relative flex w-full max-w-lg flex-col items-center gap-4',
+  // Title laid on the scrim, over the panel
+  figure: 'w-full px-2 text-center text-[var(--color-on-media)]',
+  panel:
+    'relative flex max-h-[calc(100dvh-9rem)] w-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/95 shadow-[var(--shadow-lg)]',
+  // Pulled down to close
+  grip: 'flex shrink-0 cursor-grab touch-none justify-center pt-2.5 pb-1',
+  gripBar: 'h-1 w-10 rounded-full bg-[var(--color-ink)]/20',
+  close: 'absolute top-1.5 right-2',
+  body: 'min-h-0 flex-1 overflow-y-auto p-4',
+  figureTitle:
+    'text-4xl leading-none font-bold tracking-tight uppercase italic drop-shadow-[0_2px_10px_rgb(0_0_0/0.5)]',
+  figureLine: 'text-sm font-medium opacity-80 drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]',
+} as const
+
+/**
  * Panel width per dialog size
  * @type {Record<string, string>}
  */
@@ -169,9 +192,9 @@ export const DRAWER_STYLES = {
   // Dims the page window only
   overlay:
     'overlay-enter fixed inset-0 z-[45] bg-[var(--color-scrim)] md:inset-y-3 md:right-3 md:left-[var(--shell-sidebar-w)] md:rounded-[var(--radius-xl)]',
-  // Bottom sheet on mobile, floating card from md
+  // Floating sheet rising from the bottom on mobile, side card from md
   panel:
-    'drawer-enter fixed inset-x-0 bottom-0 z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
+    'drawer-enter fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
   // Wider footprint from md
   wide: 'md:w-[var(--drawer-page-wide-w)]',
   // Form on the left, live result on the right, same width and height
@@ -193,20 +216,22 @@ export const DRAWER_STYLES = {
  */
 
 export const DRAWER_ACTIONS = {
-  stack: 'flex flex-col gap-2 p-1',
+  // One row of glyphs on a phone, stacked lines from md
+  stack: 'flex items-center gap-2 p-1 md:flex-col md:items-stretch',
   // Previous at the far left
-  steps: 'flex items-center justify-between gap-2',
-  step: 'group flex min-w-0 items-center gap-1 rounded-[var(--radius-md)] px-2 py-2.5 text-sm font-bold transition-colors hover:bg-[var(--color-hover)]',
+  steps: 'contents md:flex md:items-center md:justify-between md:gap-2',
+  step: 'group flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full px-2 text-sm font-bold transition-colors hover:bg-[var(--color-hover)] md:min-h-0 md:min-w-0 md:justify-start md:rounded-[var(--radius-md)] md:py-2.5',
   stepBack: 'mr-auto',
   stepNext: 'ml-auto',
-  stepLabel: 'min-w-0 truncate',
-  stepIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-accent)]',
+  stepLabel: 'hidden min-w-0 truncate md:block',
+  stepIcon: 'h-5 w-5 shrink-0 text-[var(--color-ink-accent)] md:h-4 md:w-4',
   // Filled gestures
-  line: 'flex w-full items-center justify-center gap-2.5 rounded-[var(--radius-md)] px-4 py-3 text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60',
+  line: 'flex size-11 shrink-0 items-center justify-center gap-2.5 rounded-full text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60 md:size-auto md:w-full md:rounded-[var(--radius-md)] md:px-4 md:py-3',
+  lineLabel: 'hidden md:inline',
   save: 'bg-[var(--color-success)]',
   cancel: 'bg-[var(--color-danger)]',
-  icon: 'h-4.5 w-4.5 shrink-0',
-  divider: 'mx-1 h-px bg-[var(--color-border)]',
+  icon: 'h-5 w-5 shrink-0 md:h-4.5 md:w-4.5',
+  divider: 'mx-1 hidden h-px bg-[var(--color-border)] md:block',
   note: 'mb-4 text-sm text-[var(--color-ink-subtle)]',
 } as const
 
@@ -247,10 +272,10 @@ export const TABS_STYLES = {
   arrive: 'tab-arrive',
   panel: 'pt-4',
   content: 'flex items-center',
-  icon: 'h-4 w-4 shrink-0',
+  icon: 'h-5 w-5 shrink-0 md:h-4 md:w-4',
   label: 'whitespace-nowrap',
-  // Gap folds away with the label
-  labelBeside: 'pl-1.5',
+  // A tab with a glyph shows no words on a phone, the name stays on its aria-label
+  labelBeside: 'hidden pl-1.5 md:inline',
 } as const
 
 /**
@@ -339,7 +364,8 @@ export const INLINE_EDIT_STYLES = {
  */
 
 export const PREFERENCE_STYLES = {
-  layout: 'mx-auto grid grid-cols-1 w-full max-w-5xl items-start gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]',
+  layout:
+    'mx-auto grid grid-cols-1 w-full max-w-5xl items-start gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]',
   stack: 'flex flex-col gap-6',
   rows: 'flex flex-col divide-y divide-[var(--color-border)]',
   row: 'flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0',

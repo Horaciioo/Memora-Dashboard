@@ -96,8 +96,11 @@ export const OFFENSE_SHEET = {
  */
 
 export const MARSHA_GUIDE = {
-  page: 'mx-auto grid grid-cols-1 w-full max-w-6xl gap-8 lg:grid-cols-[15rem_20.5rem_minmax(0,1fr)] lg:items-start',
-  nav: 'flex flex-col gap-5',
+  // Families, list and detail side by side from xl, the detail under the list before
+  page: 'mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start xl:grid-cols-[15rem_20.5rem_minmax(0,1fr)]',
+  nav: 'flex flex-col gap-5 lg:row-span-2 xl:row-span-1',
+  // Scrolled to when a command is picked below xl
+  detailHost: 'scroll-mt-16 min-w-0',
   search: 'h-11',
   navList: 'flex flex-col gap-1',
   navItem:
