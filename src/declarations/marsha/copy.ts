@@ -26,7 +26,6 @@ export const MARSHA_COPY = {
   copied: 'Commande copiée',
   resources: 'Ressources officielles',
   results: 'Résultats',
-  typedBy: 'toi',
   typedAt: 'aujourd’hui à 21:04',
   startTitle: 'Bien démarrer',
   startLead: 'Comment parler au bot sans erreur, avant de taper la première commande.',

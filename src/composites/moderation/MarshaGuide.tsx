@@ -1,12 +1,12 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Input } from '@/components/elements/forms/Input'
-import { MarshaDetail } from '@/composites/moderation/MarshaDetail'
+import { MarshaDetail, type MarshaViewer } from '@/composites/moderation/MarshaDetail'
 import { useCopy } from '@/core/hooks/interaction/useCopy'
 import {
   MARSHA_CATEGORIES,
@@ -27,6 +27,7 @@ const START = 'start'
 
 export interface MarshaGuideProps {
   trainingHref: string | null
+  viewer: MarshaViewer
 }
 
 /**
@@ -34,10 +35,11 @@ export interface MarshaGuideProps {
  * detail of the one picked. A search looks across every family, the rules of talking to the bot
  * take the place of the commands under "Bien démarrer"
  * @param {string | null} trainingHref - The Marsha training
+ * @param {MarshaViewer} viewer - Member reading the page
  * @return {JSX.Element}
  */
 
-export const MarshaGuide = ({ trainingHref }: MarshaGuideProps) => {
+export const MarshaGuide = ({ trainingHref, viewer }: MarshaGuideProps) => {
   const [section, setSection] = useState<string>(MARSHA_CATEGORIES[0]!.key)
   const [picked, setPicked] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -195,7 +197,7 @@ export const MarshaGuide = ({ trainingHref }: MarshaGuideProps) => {
           </div>
         </article>
       ) : (
-        command && <MarshaDetail command={command} onCopy={(text) => void copy(text)} />
+        command && <MarshaDetail command={command} viewer={viewer} onCopy={(text) => void copy(text)} />
       )}
     </div>
   )
