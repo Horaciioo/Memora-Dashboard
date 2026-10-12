@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/structures/PageHeader'
 import { ChangelogBoard } from '@/composites/changelog/ChangelogBoard'
 import { ReleaseDeck } from '@/composites/changelog/ReleaseDeck'
 import { requireUser } from '@/core/wrappers/requireUser'
+import { APP_VERSION_LABEL } from '@/declarations/app'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
 import { changelogFor, resolveRelease } from '@/declarations/changelog/helpers'
 import { CHANGELOG_BOARD } from '@/declarations/ui/blocks'
@@ -32,9 +33,11 @@ export default async function ChangelogPage({ searchParams }: ChangelogPageProps
     <div className={cn(PAGE_STYLES.wrapper, CHANGELOG_BOARD.page)}>
       <PageHeader
         title={release?.title ?? CHANGELOG_COPY.emptyTitle}
+        heroDescription={CHANGELOG_COPY.heroDescription}
         note={release && <ReleaseDeck release={release} />}
       />
       <ChangelogBoard version={release?.version} />
+      <p className={CHANGELOG_BOARD.running}>{CHANGELOG_COPY.running(APP_VERSION_LABEL)}</p>
     </div>
   )
 }
