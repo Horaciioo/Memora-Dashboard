@@ -30,6 +30,7 @@ export interface AppShellProps {
   twoFactor: TwoFactorState
   seal: SealState
   tour: TourState | null
+  heldRoutes: readonly string[]
   children: ReactNode
 }
 
@@ -40,6 +41,7 @@ export interface AppShellProps {
  * @param {TwoFactorState} twoFactor - Enrolment state resolved server-side
  * @param {SealState} seal - Unlock window resolved server-side
  * @param {TourState | null} tour - First visit resolved server-side
+ * @param {readonly string[]} heldRoutes - Areas held back on mobile
  * @param {ReactNode} children - Routed page content
  * @return {JSX.Element}
  */
@@ -50,6 +52,7 @@ export const AppShell = ({
   twoFactor,
   seal,
   tour,
+  heldRoutes,
   children,
 }: AppShellProps) => {
   return (
@@ -61,6 +64,7 @@ export const AppShell = ({
           viewContext={viewContext}
           twoFactor={twoFactor}
           seal={seal}
+          heldRoutes={heldRoutes}
         >
           {children}
         </AppShellFrame>
@@ -80,6 +84,7 @@ const AppShellFrame = ({
   viewContext,
   twoFactor,
   seal,
+  heldRoutes,
   children,
 }: Omit<AppShellProps, 'tour'>) => {
   const { session, can } = useAuthContext()
@@ -102,7 +107,7 @@ const AppShellFrame = ({
         <div className={APP_SHELL.main}>
           {session && <MobileTopBar session={session} viewContext={viewContext} />}
           <main className={APP_SHELL.content} {...beaconProps(TOUR_BEACONS.page)}>
-            <MobileHold>{children}</MobileHold>
+            <MobileHold routes={heldRoutes}>{children}</MobileHold>
           </main>
         </div>
 

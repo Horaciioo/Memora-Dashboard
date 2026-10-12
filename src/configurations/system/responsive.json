@@ -12,7 +12,7 @@
     "sidebarWidth": 270,
     "sidebarCompactWidth": 80,
     "bannerHeight": 260,
-    "bannerHeightMobile": 190
+    "bannerHeightMobile": 168
   },
   "bottomNav": {
     "maxSlots": 3
@@ -24,6 +24,7 @@
     }
   },
   "touchTargetMin": 44,
+  "longPressMs": 450,
   "drawer": {
     "width": 600,
     "heightShare": 0.8,

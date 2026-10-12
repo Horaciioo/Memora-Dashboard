@@ -1,5 +1,6 @@
 import { RESPONSIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
+import type { Environment } from '@/types/infrastructure'
 
 /**
  * Named breakpoints
@@ -74,7 +75,21 @@ export const TOAST_VISIBLE = {
 
 /**
  * Areas held back on mobile, shown as in development
- * @type {readonly string[]}
+ * @param {Environment} environment - Running environment
+ * @return {readonly string[]} - Routes held back
  */
 
-export const MOBILE_HELD_ROUTES: readonly string[] = [ROUTES.trainings, ROUTES.lives]
+export const mobileHeldRoutes = (environment: Environment): readonly string[] =>
+  // Only the dev branch exposes the trainings on a phone
+  environment === 'dev' ? [ROUTES.lives] : [ROUTES.trainings, ROUTES.lives]
+
+/**
+ * Hold that stands for a right click on a touch screen
+ * @type {{ delay: number, slop: number }}
+ */
+
+export const LONG_PRESS = {
+  delay: RESPONSIVE_SETTINGS.longPressMs,
+  // Travel in pixels that turns a hold into a scroll
+  slop: 10,
+} as const
