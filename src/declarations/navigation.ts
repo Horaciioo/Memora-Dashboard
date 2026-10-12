@@ -44,6 +44,7 @@ export const ROUTES = {
   recruitments: '/recrutements',
   recruitment: (id: string) => `/recrutements/${id}`,
   sanctions: '/moderation/sanctions',
+  discordSanctions: '/moderation/discord',
   marsha: '/moderation/marsha',
   notifications: '/notifications',
   administration: '/administration',
@@ -159,8 +160,7 @@ export const TRAININGS_DONE_PARAM = 'achevee'
  * @property {NavigationCondition} [visibleWhen] - Display rule
  * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
  * @property {MobileNavSlot} [mobile] - Promotes the entry onto the mobile nav pill
- * @property {boolean} [onlyLive] - Shown while a live is open
- * @property {PermissionName} [alwaysFor] - Shown regardless to whoever holds it
+ * @property {boolean} [onLive] - Lights up while a live is open
  * @property {boolean} [quick] - Glyph box under the search
  */
 
@@ -173,8 +173,7 @@ export interface NavigationItem {
   visibleWhen?: NavigationCondition
   maturity?: MaturityName
   mobile?: MobileNavSlot
-  onlyLive?: boolean
-  alwaysFor?: PermissionName
+  onLive?: boolean
   quick?: boolean
 }
 
@@ -342,7 +341,7 @@ export const NAVIGATION: NavigationGroup[] = [
     ],
   },
   {
-    label: 'Modération',
+    label: 'Twitch',
     from: NavigationViews.Moderation,
     items: [
       {
@@ -350,9 +349,7 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Live en cours',
         icon: 'liveDot',
         permission: Permissions.LiveRead,
-        onlyLive: true,
-        // Always there
-        alwaysFor: Permissions.LiveRead,
+        onLive: true,
         mobile: { slot: 'primary', order: 0 },
       },
       {
@@ -362,6 +359,19 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.SanctionRead,
         maturity: 'new',
         mobile: { slot: 'primary', order: 8 },
+      },
+    ],
+  },
+  {
+    label: 'Discord',
+    from: NavigationViews.Moderation,
+    items: [
+      {
+        href: ROUTES.discordSanctions,
+        label: 'Panel Discord',
+        icon: 'liveconCrisis',
+        permission: Permissions.SanctionRead,
+        maturity: 'new',
       },
       { href: ROUTES.marsha, label: 'Marsha Bots', icon: 'discord', maturity: 'beta' },
     ],
@@ -424,6 +434,8 @@ export const SEGMENT_LABELS: Record<string, string> = {
   lexique: 'Lexique',
   moderation: 'Modération',
   sanctions: 'Panel de sanctions',
+  discord: 'Panel Discord',
+  marsha: 'Marsha Bots',
   notifications: 'Notifications',
   administration: 'Console admin',
   maturite: 'Maturité',
@@ -477,15 +489,13 @@ export const maturityOfPath = (pathname: string): MaturityName | null => {
  * @param {MemberStatusName} member.status - Membership status
  * @param {MemberRoleName} member.role - Hierarchy level
  * @param {(permission: PermissionName) => boolean} can - Permission check
- * @param {boolean} [hasLive] - A live is open
  * @return {NavigationGroup[]} - Groups holding only their visible items
  */
 
 export const visibleNavGroups = (
   view: NavigationViewName,
   member: { status: MemberStatusName; role: MemberRoleName } | null,
-  can: (permission: PermissionName) => boolean,
-  hasLive: boolean = false
+  can: (permission: PermissionName) => boolean
 ): NavigationGroup[] =>
   NAVIGATION.filter((group) => groupInView(group, view))
     .map((group) => ({
@@ -493,7 +503,6 @@ export const visibleNavGroups = (
       items: group.items.filter(
         (item) =>
           itemInView(item, group, view) &&
-          (!item.onlyLive || hasLive || (item.alwaysFor !== undefined && can(item.alwaysFor))) &&
           (!item.permission || can(item.permission)) &&
           (!member || matchesNavigation(item.visibleWhen, member))
       ),
@@ -520,7 +529,6 @@ export interface MobileNavigation {
  * @param {MemberRoleName} member.role - Hierarchy level
  * @param {(permission: PermissionName) => boolean} can - Permission check
  * @param {number} maxPrimary - Primary slots kept before overflowing
- * @param {boolean} [hasLive] - A live is open
  * @return {MobileNavigation} - Bar contents
  */
 
@@ -528,10 +536,9 @@ export const mobileNavigation = (
   view: NavigationViewName,
   member: { status: MemberStatusName; role: MemberRoleName } | null,
   can: (permission: PermissionName) => boolean,
-  maxPrimary: number,
-  hasLive: boolean = false
+  maxPrimary: number
 ): MobileNavigation => {
-  const items = visibleNavGroups(view, member, can, hasLive)
+  const items = visibleNavGroups(view, member, can)
     .flatMap((group) => group.items)
     .filter((item): item is NavigationItem & { mobile: MobileNavSlot } => item.mobile !== undefined)
 

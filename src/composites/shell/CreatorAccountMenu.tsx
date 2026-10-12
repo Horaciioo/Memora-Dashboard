@@ -11,23 +11,21 @@ import { CREATOR_MENU, RAIL_POPOVER } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 import { accentVars } from '@/declarations/ui/theme'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import type { CreatorLead, ViewContext } from '@/types/access'
+import type { ViewContext } from '@/types/access'
 import { cn } from '@/utils/classnames'
 
 export interface CreatorAccountMenuProps {
   viewContext: ViewContext
-  unreadCount: number
 }
 
 /**
  * Account footer of the rail, its box opening beside the rail with the account actions and,
  * for a member of several creators, the creator on screen
  * @param {ViewContext} viewContext - View resolved server-side
- * @param {number} unreadCount - Unopened notifications
  * @return {JSX.Element | null}
  */
 
-export const CreatorAccountMenu = ({ viewContext, unreadCount }: CreatorAccountMenuProps) => {
+export const CreatorAccountMenu = ({ viewContext }: CreatorAccountMenuProps) => {
   const { session } = useAuthContext()
   const [isOpen, setOpen] = useState(false)
   const [isPicking, startPicking] = useTransition()
@@ -56,6 +54,7 @@ export const CreatorAccountMenu = ({ viewContext, unreadCount }: CreatorAccountM
   if (!session) return null
 
   const active = creators.find((creator) => creator.id === activeYoutuberId) ?? null
+  const shown = hasChoice ? active : null
 
   const pick = (youtuberId: string | null) => {
     shut()
@@ -71,14 +70,12 @@ export const CreatorAccountMenu = ({ viewContext, unreadCount }: CreatorAccountM
         onClick={() => setOpen((open) => !open)}
         className={CREATOR_MENU.trigger}
       >
-        {hasChoice ? (
-          <CreatorFace creator={active} />
+        {shown ? (
+          <Avatar name={shown.name} src={shown.avatarUrl} size="sm" />
         ) : (
           <Avatar name={session.displayName} src={session.avatarUrl} size="sm" />
         )}
-        <span className={CREATOR_MENU.name}>
-          {hasChoice ? (active?.name ?? VIEW_COPY.noCreator) : session.displayName}
-        </span>
+        <span className={CREATOR_MENU.name}>{shown?.name ?? session.displayName}</span>
         <Chevron
           className={cn(
             CREATOR_MENU.chevron,
@@ -97,7 +94,7 @@ export const CreatorAccountMenu = ({ viewContext, unreadCount }: CreatorAccountM
           </div>
 
           <div className={cn(RAIL_POPOVER.body, CREATOR_MENU.body)}>
-            <AccountActions unreadCount={unreadCount} onNavigate={shut} viewContext={viewContext} />
+            <AccountActions onNavigate={shut} />
 
             {hasChoice && (
               <>
@@ -153,22 +150,5 @@ export const CreatorAccountMenu = ({ viewContext, unreadCount }: CreatorAccountM
         </div>
       )}
     </div>
-  )
-}
-
-/**
- * Creator portrait
- * @param {Object} props - Creator
- * @param {CreatorLead | null} props.creator - Creator on screen
- * @return {JSX.Element}
- */
-
-const CreatorFace = ({ creator }: { creator: CreatorLead | null }) => {
-  const OffIcon = ICONS.youtuberNone
-
-  return creator ? (
-    <Avatar name={creator.name} src={creator.avatarUrl} size="sm" />
-  ) : (
-    <OffIcon className={CREATOR_MENU.noneGlyph} aria-hidden="true" />
   )
 }

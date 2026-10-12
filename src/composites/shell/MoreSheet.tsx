@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { Dialog } from '@/components/structures/Dialog'
 import { CreatorPicker } from '@/composites/shell/CreatorPicker'
 import { visibleNavGroups } from '@/declarations/navigation'
@@ -30,7 +30,7 @@ export interface MoreSheetProps {
 export const MoreSheet = ({ open, viewContext, shown, onClose }: MoreSheetProps) => {
   const { can, session } = useAuthContext()
 
-  const groups = visibleNavGroups(viewContext.view, session, can, viewContext.live !== null)
+  const groups = visibleNavGroups(viewContext.view, session, can)
     .map((group) => ({ ...group, items: group.items.filter((item) => !shown.has(item.href)) }))
     .filter((group) => group.items.length > 0)
 

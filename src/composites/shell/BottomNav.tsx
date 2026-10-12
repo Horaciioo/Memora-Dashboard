@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { MoreSheet } from '@/composites/shell/MoreSheet'
@@ -31,25 +31,17 @@ export const BottomNav = ({ viewContext }: BottomNavProps) => {
   const [isMoreOpen, setMoreOpen] = useState(false)
   const MoreIcon = ICONS.more
 
-  const { home, primary } = mobileNavigation(
-    viewContext.view,
-    session,
-    can,
-    BOTTOM_NAV_MAX_PRIMARY,
-    viewContext.live !== null
-  )
+  const { home, primary } = mobileNavigation(viewContext.view, session, can, BOTTOM_NAV_MAX_PRIMARY)
   const shown = new Set(
     [home, ...primary]
       .filter((item): item is NavigationItem => item !== null)
       .map((item) => item.href)
   )
 
-  const reachableCount = visibleNavGroups(
-    viewContext.view,
-    session,
-    can,
-    viewContext.live !== null
-  ).reduce((count, group) => count + group.items.length, 0)
+  const reachableCount = visibleNavGroups(viewContext.view, session, can).reduce(
+    (count, group) => count + group.items.length,
+    0
+  )
   const hasMore = reachableCount > shown.size
 
   // Accueil always sits between the two halves of the primary destinations

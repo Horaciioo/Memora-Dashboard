@@ -1,14 +1,11 @@
 'use client'
 
-import Link from 'next/link'
 import { useState } from 'react'
 import { RailSearchGlyph } from '@/components/elements/display/RailGlyphs'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { CalendarMiniMonth } from '@/composites/calendar/CalendarMiniMonth'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { CALENDAR_LAYER_REGISTRY } from '@/declarations/calendar/registries'
-import { ROUTES } from '@/declarations/navigation'
-import { HOME_BEACON, beaconProps } from '@/declarations/ui/beacons'
 import { ICONS } from '@/declarations/ui/icons'
 import { railIcon } from '@/declarations/ui/railIcons'
 import { CALENDAR_SIDEBAR } from '@/declarations/ui/variants'
@@ -157,14 +154,8 @@ export const CalendarRailBody = ({
  */
 
 export const CalendarRailPanel = (props: CalendarSidebarProps) => {
-  const BackIcon = ICONS.back
-
   return (
     <div className={CALENDAR_SIDEBAR.panel}>
-      <Link href={ROUTES.dashboard} className={CALENDAR_SIDEBAR.back} {...beaconProps(HOME_BEACON)}>
-        <BackIcon className="size-5 shrink-0" aria-hidden="true" />
-        {CALENDAR_COPY.railBack}
-      </Link>
       <CalendarRailBody {...props} />
     </div>
   )

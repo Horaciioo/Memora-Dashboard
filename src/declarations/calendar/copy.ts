@@ -47,7 +47,6 @@ export const CALENDAR_COPY = {
   readOnlyNotice: 'Cet élément vient d’un autre écran, il se modifie là-bas.',
   // Sidebar
   sidebarToggle: 'Calendriers et filtres',
-  railBack: 'Accueil',
   sidebarLayers: 'Calendriers',
   sidebarCreators: 'YouTubeurs',
   search: 'Rechercher un event…',

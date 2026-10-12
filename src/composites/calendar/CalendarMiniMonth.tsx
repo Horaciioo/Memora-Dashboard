@@ -1,9 +1,15 @@
-import { Button } from '@/components/elements/actions/Button'
 import { CALENDAR_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
+import { railIcon } from '@/declarations/ui/railIcons'
 import { CALENDAR_SIDEBAR } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { periodLabel, shiftAnchor, unitGrid } from '@/utils/format/calendar'
 import type { CalendarUnit } from '@/utils/format/calendar'
+
+// Bare arrows either side of the month
+const STEPS = [
+  { amount: -1, title: CALENDAR_COPY.previous, Icon: railIcon('back') },
+  { amount: 1, title: CALENDAR_COPY.next, Icon: railIcon('forward') },
+]
 
 export interface CalendarMiniMonthProps {
   cursor: string
@@ -17,7 +23,7 @@ export interface CalendarMiniMonthProps {
  * The month of the cursor in miniature
  * @param {string} cursor - ISO day the grid is anchored on
  * @param {CalendarUnit} unit - Span on screen
- * @param {(dayKey: string) => void} onPick - Called with the chosen day
+ * @param {(dayKey: string) => void} onPick - Called with the chosen day, which opens its Day view
  * @param {(dayKey: string) => void} onCursor - Called with the day a month step lands on
  * @return {JSX.Element}
  */
@@ -30,21 +36,19 @@ export const CalendarMiniMonth = ({ cursor, unit, onPick, onCursor }: CalendarMi
     <div className={CALENDAR_SIDEBAR.mini}>
       <div className={CALENDAR_SIDEBAR.miniHead}>
         <span className={CALENDAR_SIDEBAR.miniTitle}>{periodLabel(cursor, 'month')}</span>
-        <span className="flex items-center">
-          <Button
-            variant="ghost"
-            title={CALENDAR_COPY.previous}
-            onClick={() => onCursor(shiftAnchor(cursor, 'month', -1))}
-          >
-            {CALENDAR_COPY.previousShort}
-          </Button>
-          <Button
-            variant="ghost"
-            title={CALENDAR_COPY.next}
-            onClick={() => onCursor(shiftAnchor(cursor, 'month', 1))}
-          >
-            {CALENDAR_COPY.nextShort}
-          </Button>
+        <span className={CALENDAR_SIDEBAR.miniSteps}>
+          {STEPS.map((step) => (
+            <button
+              key={step.amount}
+              type="button"
+              title={step.title}
+              aria-label={step.title}
+              onClick={() => onCursor(shiftAnchor(cursor, 'month', step.amount))}
+              className={CALENDAR_SIDEBAR.miniStep}
+            >
+              <step.Icon className={CALENDAR_SIDEBAR.miniStepIcon} aria-hidden="true" />
+            </button>
+          ))}
         </span>
       </div>
 

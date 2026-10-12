@@ -1,7 +1,6 @@
 'use client'
 
-import { useTransition } from 'react'
-import { switchView } from '@/app/(dashboard)/actions'
+import { useViewSwitch } from '@/core/hooks/interaction/useViewSwitch'
 import { NAVIGATION_VIEW_REGISTRY, VIEW_ROLES } from '@/declarations/access/views'
 import { ROLE_EMBLEMS } from '@/declarations/members/profiles'
 import { nextNavigationView } from '@/declarations/navigation'
@@ -25,8 +24,8 @@ export interface ViewToggleProps {
  */
 
 export const ViewToggle = ({ viewContext, className, iconClassName }: ViewToggleProps) => {
-  const [isSwitching, startSwitching] = useTransition()
   const { view, available, switchable } = viewContext
+  const { isSwitching, switchTo } = useViewSwitch(view)
 
   if (!switchable) return null
 
@@ -42,7 +41,7 @@ export const ViewToggle = ({ viewContext, className, iconClassName }: ViewToggle
       disabled={isSwitching}
       aria-label={targetMeta.label}
       title={`${targetMeta.label} : ${targetMeta.summary}`}
-      onClick={() => startSwitching(() => void switchView(target))}
+      onClick={() => switchTo(target)}
       style={{ color: TONE_VARS[meta.tone] }}
       className={className ?? cn(BUTTON_STYLES.base, BUTTON_STYLES.icon)}
     >
