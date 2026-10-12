@@ -118,7 +118,7 @@ export const HOME_PLAN = {
  */
 
 export const HOME_CARDS = {
-  grid: 'grid grid-cols-1 gap-4 md:grid-cols-3',
+  grid: 'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3',
   card: 'group relative isolate flex h-36 flex-col justify-end md:h-48 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] p-5 text-[var(--color-on-media)] shadow-[var(--shadow-md)] transition-[transform,box-shadow] duration-[var(--motion-duration-panel)] hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   image:
     'absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-[var(--motion-duration-slow)] group-hover:scale-105',

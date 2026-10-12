@@ -39,7 +39,7 @@ export const PAGE_STYLES = {
   bannerTitleRow: 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 md:flex-nowrap',
   // Letters fade out towards their foot
   bannerTitle:
-    'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-[clamp(1.5rem,8vw,2.25rem)] leading-none font-bold tracking-tight text-transparent uppercase italic sm:text-5xl md:text-8xl',
+    'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-[clamp(1.5rem,8vw,2.25rem)] leading-none font-bold tracking-tight text-transparent uppercase italic sm:text-5xl md:text-6xl xl:text-8xl',
   bannerTitleText:
     'line-clamp-2 min-w-0 pr-2 text-balance [overflow-wrap:anywhere] md:line-clamp-1 md:[overflow-wrap:normal]',
   // Faint two-to-six word line under the title
