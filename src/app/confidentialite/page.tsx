@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { AGE_POLICY, DATA_CONTROLLER, PROCESSING_REGISTRY } from '@/declarations/system/privacy'
 import { ROUTES } from '@/declarations/navigation'
 import { PRIVACY_COPY } from '@/declarations/ui/copy/privacy'

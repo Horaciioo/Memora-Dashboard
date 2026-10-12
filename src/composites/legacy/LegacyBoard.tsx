@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { useMemo, useState } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'

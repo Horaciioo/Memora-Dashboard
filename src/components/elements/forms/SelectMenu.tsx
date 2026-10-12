@@ -1,7 +1,7 @@
 'use client'
 
 import { FloatingLayer } from '@/components/structures/FloatingLayer'
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
 import { OptionLead } from '@/components/elements/forms/OptionLead'

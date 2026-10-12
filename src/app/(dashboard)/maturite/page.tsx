@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { Button } from '@/components/elements/actions/Button'
 import { BackButton } from '@/components/elements/actions/BackButton'

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { LivesBoard } from '@/composites/lives/LivesBoard'
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import { Section } from '@/components/structures/Section'
 import { listOpenLives, listPastLives, liveFields } from '@/core/services/lives/LiveService'

@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 
 import type { CourseRailState } from '@/core/hooks/interaction/useCourseRail'
 import { COURSE_COPY } from '@/declarations/academy/copy'

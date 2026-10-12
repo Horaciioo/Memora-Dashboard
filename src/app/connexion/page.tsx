@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Link from '@/components/elements/navigation/AppLink'
 import { LoginForm } from '@/composites/auth/LoginForm'
 import { DiscordSignInButton } from '@/composites/auth/DiscordSignInButton'
 import { AuthShell } from '@/layouts/AuthShell'
