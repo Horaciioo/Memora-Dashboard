@@ -41,7 +41,7 @@ export const PAGE_STYLES = {
   bannerTitle:
     'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-[clamp(1.5rem,8vw,2.25rem)] leading-none font-bold tracking-tight text-transparent uppercase italic sm:text-5xl md:text-6xl xl:text-8xl',
   bannerTitleText:
-    'line-clamp-2 min-w-0 pr-2 text-balance [overflow-wrap:anywhere] md:line-clamp-1 md:[overflow-wrap:normal]',
+    'line-clamp-1 min-w-0 pr-2 text-balance [overflow-wrap:anywhere] md:[overflow-wrap:normal]',
   // Faint two-to-six word line under the title
   bannerHero:
     'relative -mt-1 text-xs leading-none font-bold tracking-tight text-balance text-[var(--color-on-media)] uppercase italic drop-shadow-[0_1px_6px_rgb(0_0_0/0.45)] md:-mt-4 md:text-2xl',
