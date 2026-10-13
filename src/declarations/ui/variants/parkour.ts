@@ -6,7 +6,7 @@ import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
  */
 
 export const PARKOUR_PANEL = {
-  root: 'flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 shadow-[var(--shadow-sm)]',
+  root: 'flex flex-col gap-4 border-b border-[var(--color-border)] pb-6',
   head: 'flex flex-wrap items-center gap-3',
   title: 'flex min-w-0 flex-col gap-1',
   eyebrow: PROPERTY_LABEL,

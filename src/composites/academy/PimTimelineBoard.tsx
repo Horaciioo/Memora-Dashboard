@@ -127,7 +127,9 @@ export const PimTimelineBoard = ({ initialTimeline, canAdvance }: PimTimelineBoa
                     .filter(Boolean)
                     .join(' · ')}
                 </span>
-                {step.description && <p className={PIM_TIMELINE.description}>{step.description}</p>}
+                {step.description && !step.description.includes(step.title) && (
+                  <p className={PIM_TIMELINE.description}>{step.description}</p>
+                )}
 
                 {isCurrent && (step.guide || step.destination || canAdvance) && (
                   <div className={PIM_TIMELINE.card}>

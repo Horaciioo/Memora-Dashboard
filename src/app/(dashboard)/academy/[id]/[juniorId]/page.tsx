@@ -101,10 +101,7 @@ export default async function JuniorPage({
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader
-        eyebrow={`${jobFunction.name} • ${formatDay(found.session.startsAt)}`}
-        title={found.junior.displayName}
-      />
+      <PageHeader title={found.junior.displayName} />
       <JuniorFile
         initialJunior={found.junior}
         initialSkills={skills}

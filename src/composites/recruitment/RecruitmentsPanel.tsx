@@ -2,8 +2,6 @@
 
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
-import { AvatarStack } from '@/components/elements/display/Avatar'
-import { PhaseTrack } from '@/components/elements/display/PhaseTrack'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
@@ -11,31 +9,39 @@ import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { ProgramCard } from '@/components/structures/ProgramCard'
-import { Section } from '@/components/structures/Section'
+import { RowList, type RowListGroup } from '@/components/structures/RowList'
 import { useRecruitments } from '@/core/hooks/data/useRecruitments'
 import { ROUTES } from '@/declarations/navigation'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
 import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
-import { GROUP_STYLES, PROGRAM_CARD, PROGRAM_ROW } from '@/declarations/ui/variants'
+import { GROUP_STYLES } from '@/declarations/ui/variants'
 import type { MenuItem } from '@/managers/front-end'
 import type { FieldDefinition } from '@/types/forms'
 import type { RecruitmentSummary } from '@/types/recruitment'
 import { FINISHED_RECRUITMENT_STATUSES, RecruitmentStatuses } from '@/utils/constants/recruitment'
 import { formatDay, formatDayRange } from '@/utils/format/dates'
 
-// Phases a campaign walks through
-const PHASES: string[] = RECRUITMENT_STATUS_REGISTRY.keys.filter(
-  (status) => status !== RecruitmentStatuses.Archived
-)
+// Display order of the states
+const STATUS_ORDER = [
+  RecruitmentStatuses.Interviews,
+  RecruitmentStatuses.Announced,
+  RecruitmentStatuses.Draft,
+  RecruitmentStatuses.Closed,
+  RecruitmentStatuses.Archived,
+]
 
-// Responsable as a stack entry
-const toPerson = (ref: RecruitmentSummary['responsables'][number]) => ({
-  id: ref.id,
-  name: ref.label,
-  src: ref.image,
-})
+/**
+ * Days a campaign runs between
+ * @param {RecruitmentSummary} entry - Campaign
+ * @return {string | undefined} - Period
+ */
+
+const periodOf = (entry: RecruitmentSummary): string | undefined => {
+  if (entry.opensAt && entry.closesAt) return formatDayRange(entry.opensAt, entry.closesAt)
+
+  return entry.opensAt ? formatDay(entry.opensAt) : undefined
+}
 
 export interface RecruitmentsPanelProps {
   initialSessions: RecruitmentSummary[]
@@ -64,26 +70,40 @@ export const RecruitmentsPanel = ({
   const [editing, setEditing] = useState<RecruitmentSummary | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<RecruitmentSummary | null>(null)
 
-  // Running sessions first
-  const [running, finished] = useMemo(
-    () => [
-      sessions.filter((entry) => !FINISHED_RECRUITMENT_STATUSES.includes(entry.status)),
-      sessions.filter((entry) => FINISHED_RECRUITMENT_STATUSES.includes(entry.status)),
-    ],
-    [sessions]
+  // Heaviest state first, finished ones only on request
+  const groups: RowListGroup[] = STATUS_ORDER.filter(
+    (status) => showFinished || !FINISHED_RECRUITMENT_STATUSES.includes(status)
   )
+    .map((status) => ({
+      id: status,
+      label: RECRUITMENT_STATUS_REGISTRY.label(status),
+      accent: RECRUITMENT_STATUS_REGISTRY.get(status).accent,
+      items: sessions
+        .filter((entry) => entry.status === status)
+        .map((entry) => ({
+          id: entry.id,
+          title: entry.jobFunction.label,
+          meta: periodOf(entry),
+          icon: entry.jobFunction.icon,
+          muted: FINISHED_RECRUITMENT_STATUSES.includes(status),
+          menu: sessionMenu(entry),
+          onOpen: () => router.push(ROUTES.recruitment(entry.id)),
+        })),
+    }))
+    .filter((group) => group.items.length > 0)
 
-  const pageOptions: PageOption[] =
-    finished.length > 0
-      ? [
-          {
-            id: 'finished',
-            label: PAGE_OPTIONS_COPY.showFinished,
-            checked: showFinished,
-            onChange: setShowFinished,
-          },
-        ]
-      : []
+  const hasFinished = sessions.some((entry) => FINISHED_RECRUITMENT_STATUSES.includes(entry.status))
+
+  const pageOptions: PageOption[] = hasFinished
+    ? [
+        {
+          id: 'finished',
+          label: PAGE_OPTIONS_COPY.showFinished,
+          checked: showFinished,
+          onChange: setShowFinished,
+        },
+      ]
+    : []
 
   const openCreate = () => {
     clearIssues()
@@ -117,38 +137,6 @@ export const RecruitmentsPanel = ({
       onSelect: () => setPendingDeletion(entry),
     },
   ]
-
-  const card = (entry: RecruitmentSummary, compact = false) => {
-    const status = RECRUITMENT_STATUS_REGISTRY.get(entry.status)
-    const period =
-      entry.opensAt && entry.closesAt
-        ? formatDayRange(entry.opensAt, entry.closesAt)
-        : entry.opensAt
-          ? formatDay(entry.opensAt)
-          : undefined
-
-    return (
-      <ProgramCard
-        key={entry.id}
-        compact={compact}
-        title={entry.jobFunction.label}
-        meta={compact ? status.label : period}
-        icon={entry.jobFunction.icon}
-        accent={entry.jobFunction.accent}
-        foot={
-          <PhaseTrack
-            phases={PHASES}
-            current={entry.status}
-            label={status.label}
-            accent={status.accent}
-          />
-        }
-        side={<AvatarStack people={entry.responsables.map(toPerson)} size="sm" />}
-        menu={sessionMenu(entry)}
-        onOpen={() => router.push(ROUTES.recruitment(entry.id))}
-      />
-    )
-  }
 
   const drawers = () => (
     <>
@@ -211,23 +199,8 @@ export const RecruitmentsPanel = ({
     <>
       <PageOptions options={pageOptions} />
       <div className={GROUP_STYLES.spaced}>
-        <Section title={RECRUITMENT_COPY.groupOpen} bare>
-          <div className={PROGRAM_CARD.grid}>
-            {running.map((entry) => card(entry))}
-            <AddRow
-              tile="session"
-              label={RECRUITMENT_COPY.add}
-              disabled={!canManage}
-              onClick={openCreate}
-            />
-          </div>
-        </Section>
-
-        {showFinished && finished.length > 0 && (
-          <Section title={RECRUITMENT_COPY.groupFinished} bare>
-            <div className={PROGRAM_ROW.list}>{finished.map((entry) => card(entry, true))}</div>
-          </Section>
-        )}
+        <RowList groups={groups} />
+        <AddRow label={RECRUITMENT_COPY.add} disabled={!canManage} onClick={openCreate} />
       </div>
 
       {drawers()}

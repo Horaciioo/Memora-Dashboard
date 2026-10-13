@@ -1,46 +1,13 @@
 /**
- * Recruitment session cards
+ * Timeline groups of a session
  * @type {Record<string, string>}
  */
 
 export const SESSION_CARD = {
-  grid: 'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3',
-  card: 'group flex min-h-28 cursor-pointer flex-col gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
-  muted: 'bg-[var(--color-surface)]',
-  head: 'flex items-start gap-4',
-  body: 'flex min-w-0 flex-1 flex-col gap-0.5',
-  title: 'truncate text-base font-bold tracking-tight',
-  meta: 'truncate text-sm text-[var(--color-ink-subtle)]',
-  foot: 'mt-auto flex items-center justify-between gap-3',
-  track: 'h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-sunken)]',
-  fill: 'h-full rounded-full bg-[var(--color-brand-600)]',
-  date: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
-  metaPending: 'truncate pr-[0.2em] text-sm text-[var(--color-caution)] italic',
   group:
-    'flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5 shadow-[var(--shadow-sm)]',
+    'flex flex-col gap-4 border-t border-[var(--color-border)] pt-6 first:border-t-0 first:pt-0',
   groupHead: 'flex cursor-pointer items-center gap-3',
   groupTitle: 'text-sm font-bold tracking-wide uppercase',
-} as const
-
-/**
- * Header card of one session file
- * @type {Record<string, string>}
- */
-
-export const SESSION_HERO = {
-  card: 'flex flex-col gap-6 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)]',
-  body: 'flex flex-wrap items-center gap-x-6 gap-y-4 p-6',
-  // Function glyph on its tinted square
-  mark: 'accent-tint accent-text flex size-16 shrink-0 items-center justify-center rounded-[var(--radius-xl)] sm:size-20',
-  markGlyph: 'size-9 sm:size-11',
-  facts: 'flex min-w-0 flex-1 flex-col gap-1.5',
-  title: 'text-2xl font-bold tracking-tight sm:text-3xl',
-  meta: 'flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-[var(--color-ink-subtle)]',
-  aside: 'flex shrink-0 items-center gap-4',
-  funnel: 'flex h-2 w-full overflow-hidden rounded-full bg-[var(--color-surface-sunken)]',
-  funnelPart: 'h-full',
-  funnelWrap: 'flex flex-col gap-2 px-6 pb-6',
-  legend: 'flex flex-wrap gap-x-5 gap-y-1 text-xs text-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -49,13 +16,10 @@ export const SESSION_HERO = {
  */
 
 export const CANDIDATE_CARD = {
-  grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2',
-  card: 'flex min-h-18 cursor-pointer items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
   name: 'truncate font-bold tracking-tight',
   meta: 'truncate text-xs text-[var(--color-ink-subtle)]',
   metaEmpty: 'truncate pr-[0.2em] text-xs text-[var(--color-ink-subtle)] italic',
-  aside: 'flex shrink-0 flex-col items-end gap-1',
 } as const
 
 /**

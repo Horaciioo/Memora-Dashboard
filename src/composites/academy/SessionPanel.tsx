@@ -4,12 +4,12 @@ import { useRouter } from 'next/navigation'
 import Link from '@/components/elements/navigation/AppLink'
 import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { FunctionMark } from '@/components/elements/display/FunctionMark'
 import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { AddRow } from '@/components/structures/AddRow'
+import { RowList, type RowListGroup } from '@/components/structures/RowList'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
@@ -23,15 +23,13 @@ import {
   ACADEMY_STAGE_REGISTRY,
   ACADEMY_STEP_KIND_REGISTRY,
   ACADEMY_JUNIOR_STATUS_REGISTRY,
-  ACADEMY_SESSION_STATUS_REGISTRY,
   STEP_OWNER_REGISTRY,
 } from '@/declarations/academy/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { HOME_STYLES, RECORD_ROW, SESSION_CARD, SESSION_HERO } from '@/declarations/ui/variants'
+import { HOME_STYLES, RECORD_ROW, SESSION_CARD } from '@/declarations/ui/variants'
 import { STAGE_LIST } from '@/declarations/ui/blocks'
-import { AcademyJuniorStatuses, AcademySessionStatuses } from '@/utils/constants/hierarchy'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { AcademyStageName } from '@/utils/constants/hierarchy'
 import type { AcademyStepView, JuniorView, SessionDetail } from '@/types/academy'
@@ -40,7 +38,6 @@ import type { FieldDefinition } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import { GUIDE_BEACONS } from '@/declarations/academy/guides'
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
-import { sessionTitle } from '@/utils/format/academy'
 import { formatDay, formatDayTime } from '@/utils/format/dates'
 
 // Chip carried by each resolved timeline state
@@ -224,6 +221,25 @@ export const SessionPanel = ({
     },
   ]
 
+  // One heading per outcome, the stage on the right
+  const juniorGroupsList: RowListGroup[] = ACADEMY_JUNIOR_STATUS_REGISTRY.keys
+    .map((status) => ({
+      id: status,
+      label: ACADEMY_JUNIOR_STATUS_REGISTRY.label(status),
+      accent: ACADEMY_JUNIOR_STATUS_REGISTRY.get(status).accent,
+      items: session.juniors
+        .filter((junior) => junior.status === status)
+        .map((junior) => ({
+          id: junior.id,
+          title: junior.displayName,
+          lead: <Avatar name={junior.displayName} src={junior.avatarUrl} size="md" />,
+          trail: ACADEMY_STAGE_REGISTRY.label(junior.stage),
+          menu: juniorMenu(junior),
+          onOpen: () => router.push(ROUTES.junior(detail.summary.id, junior.id)),
+        })),
+    }))
+    .filter((group) => group.items.length > 0)
+
   const juniorsTab = () => (
     <div {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.sessionJuniors }}>
       <Section bare>
@@ -258,52 +274,9 @@ export const SessionPanel = ({
             }
           />
         ) : (
-          <div className={SESSION_CARD.grid}>
-            {session.juniors.map((junior) => {
-              const status = ACADEMY_JUNIOR_STATUS_REGISTRY.get(junior.status)
-              const isActive = junior.status === AcademyJuniorStatuses.Active
-
-              return (
-                <article
-                  key={junior.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => router.push(ROUTES.junior(detail.summary.id, junior.id))}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter')
-                      router.push(ROUTES.junior(detail.summary.id, junior.id))
-                  }}
-                  onContextMenu={contextMenu(juniorMenu(junior), junior.displayName)}
-                  className={SESSION_CARD.card}
-                >
-                  <div className={SESSION_CARD.head}>
-                    <Avatar name={junior.displayName} src={junior.avatarUrl} size="lg" />
-                    <div className={SESSION_CARD.body}>
-                      <span className={SESSION_CARD.title}>{junior.displayName}</span>
-                      <span
-                        className={junior.dispositif ? SESSION_CARD.meta : SESSION_CARD.metaPending}
-                      >
-                        {junior.dispositif?.name ?? ACADEMY_COPY.awaitingConfirmation}
-                      </span>
-                      {!isActive && (
-                        <Status label={status.label} accent={status.accent} className="mt-1" />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className={SESSION_CARD.foot}>
-                    <span className={SESSION_CARD.date}>
-                      {junior.trainer?.name ?? ACADEMY_COPY.noTrainer}
-                    </span>
-                    <span className={SESSION_CARD.date}>
-                      {ACADEMY_STAGE_REGISTRY.label(junior.stage)}
-                    </span>
-                  </div>
-                </article>
-              )
-            })}
+          <div className="flex flex-col gap-6">
+            <RowList groups={juniorGroupsList} />
             <AddRow
-              tile="session"
               label={ACADEMY_COPY.juniorAdd}
               disabled={!canManage || !hasCandidates}
               onClick={() => openJunior(null)}
@@ -472,30 +445,8 @@ export const SessionPanel = ({
     />
   )
 
-  const sessionStatus = ACADEMY_SESSION_STATUS_REGISTRY.get(detail.summary.status)
-
   return (
     <>
-      <div className={SESSION_HERO.card}>
-        <div>
-          <div className={SESSION_HERO.body}>
-            <FunctionMark
-              icon={detail.summary.function.icon}
-              accent={detail.summary.function.accent}
-            />
-            <div className={SESSION_HERO.facts}>
-              <h2 className={SESSION_HERO.title}>{sessionTitle(detail.summary)}</h2>
-              <div className={SESSION_HERO.meta}>
-                {detail.summary.status !== AcademySessionStatuses.Running && (
-                  <Status label={sessionStatus.label} accent={sessionStatus.accent} />
-                )}
-                <span>{formatDay(detail.summary.startsAt)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <FileTabs
         label={ACADEMY_COPY.title}
         tabs={[

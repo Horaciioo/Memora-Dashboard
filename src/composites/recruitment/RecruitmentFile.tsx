@@ -9,6 +9,7 @@ import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
+import { RowList, type RowListGroup } from '@/components/structures/RowList'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FileTabs } from '@/components/structures/FileTabs'
 import { IntegrationLinkStep } from '@/composites/onboarding/IntegrationLinkStep'
@@ -25,7 +26,6 @@ import { ICONS } from '@/declarations/ui/icons'
 import { CANDIDATE_CARD, HOME_STYLES } from '@/declarations/ui/variants'
 import { STAGE_LIST } from '@/declarations/ui/blocks'
 import { useMenu, type MenuItem } from '@/managers/front-end'
-import { RecruitmentHero } from '@/composites/recruitment/RecruitmentHero'
 import { CandidateDialog } from '@/composites/recruitment/CandidateDialog'
 import type { FieldDefinition } from '@/types/forms'
 import type { CandidateView, RecruitmentDetail, RecruitmentStepView } from '@/types/recruitment'
@@ -174,6 +174,32 @@ export const RecruitmentFile = ({
     </span>
   )
 
+  // One heading per outcome, the interview day on the right
+  const candidateGroups: RowListGroup[] = [
+    ...detail.outcomes.map((outcome) => ({
+      id: outcome.id,
+      label: outcome.label,
+      accent: outcome.accent,
+    })),
+    { id: 'none', label: RECRUITMENT_COPY.noOutcomeLegend, accent: 'neutral' },
+  ]
+    .map((group) => ({
+      ...group,
+      items: file.candidates
+        .filter((candidate) => (candidate.outcomeId ?? 'none') === group.id)
+        .map((candidate) => ({
+          id: candidate.id,
+          title: candidate.name,
+          lead: <Avatar name={candidate.name} size="md" />,
+          trail: candidate.interviewAt
+            ? formatDayTime(candidate.interviewAt)
+            : RECRUITMENT_COPY.toSchedule,
+          menu: candidateMenu(candidate),
+          onOpen: () => setOpenedCandidateId(candidate.id),
+        })),
+    }))
+    .filter((group) => group.items.length > 0)
+
   const candidatesTab = () => (
     <Section title={RECRUITMENT_COPY.tabCandidates} bare>
       {file.candidates.length === 0 ? (
@@ -193,39 +219,9 @@ export const RecruitmentFile = ({
           }
         />
       ) : (
-        <div className={CANDIDATE_CARD.grid}>
-          {file.candidates.map((candidate) => {
-            const outcome = detail.outcomes.find((entry) => entry.id === candidate.outcomeId)
-
-            return (
-              <div
-                key={candidate.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => setOpenedCandidateId(candidate.id)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') setOpenedCandidateId(candidate.id)
-                }}
-                onContextMenu={contextMenu(candidateMenu(candidate), candidate.discordId)}
-                className={CANDIDATE_CARD.card}
-              >
-                <Avatar name={candidate.name} size="md" />
-                {candidateCard(candidate)}
-                <span className={CANDIDATE_CARD.aside}>
-                  {candidate.recruiter && (
-                    <Avatar
-                      name={candidate.recruiter.label}
-                      src={candidate.recruiter.image}
-                      size="xs"
-                    />
-                  )}
-                  {outcome && <Status label={outcome.label} accent={outcome.accent} />}
-                </span>
-              </div>
-            )
-          })}
+        <div className="flex flex-col gap-6">
+          <RowList groups={candidateGroups} />
           <AddRow
-            tile="candidate"
             label={RECRUITMENT_COPY.candidateAdd}
             disabled={!canManage}
             onClick={() => openCandidateForm(null)}
@@ -441,12 +437,6 @@ export const RecruitmentFile = ({
 
   return (
     <div className="flex flex-col gap-8">
-      <RecruitmentHero
-        summary={detail.summary}
-        candidates={file.candidates}
-        outcomes={detail.outcomes}
-      />
-
       <FileTabs
         label={RECRUITMENT_COPY.title}
         tabs={[

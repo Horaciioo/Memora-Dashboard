@@ -16,8 +16,7 @@ export const PIM_TIMELINE = {
   railDone: 'bg-[var(--color-ink-subtle)]/40',
   railIdle: 'bg-[var(--color-border)]',
   node: 'relative z-[1] flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2',
-  nodeCurrent:
-    'border-[var(--color-brand-600)] bg-[var(--color-brand-50)] text-[var(--color-brand-800)] shadow-[0_0_0_4px_var(--color-brand-100)]',
+  nodeCurrent: 'border-[var(--color-ink)] bg-[var(--color-surface-raised)] text-[var(--color-ink)]',
   nodeDone:
     'border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] text-[var(--color-ink-subtle)]',
   nodeIdle:
@@ -28,10 +27,10 @@ export const PIM_TIMELINE = {
   bodyMuted: 'opacity-60 grayscale',
   eyebrow: `${PROPERTY_LABEL} text-micro`,
   title: 'text-base font-bold',
-  titleCurrent: 'text-lg font-bold text-[var(--color-brand-800)]',
+  titleCurrent: 'text-lg font-bold',
   meta: 'text-xs text-[var(--color-ink-subtle)]',
   description: 'text-sm',
-  card: 'mt-2 flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-brand-200)] card-surface p-4',
+  card: 'mt-2 flex flex-col gap-4',
   guideTitle: PROPERTY_LABEL,
   actions: 'flex flex-wrap items-center gap-2',
 } as const

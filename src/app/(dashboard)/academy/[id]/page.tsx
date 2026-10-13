@@ -84,7 +84,7 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader
-        title={ACADEMY_COPY.sessionOf.replace('{date}', formatDay(detail.summary.startsAt))}
+        title={sessionTitle(detail.summary)}
         actions={
           <span className="flex items-center gap-2">
             {detail.summary.inviteToken && <CopyInviteLink token={detail.summary.inviteToken} />}

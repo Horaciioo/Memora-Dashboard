@@ -6,7 +6,6 @@
 export const ACADEMY_COPY = {
   railProgramme: 'Dispositif',
   railTrainer: 'Formateur',
-  sessionOf: 'Session du {date}',
   untilDate: 'Jusqu’au {date}',
   title: 'Marsha Academy',
   lead: 'Chaque session accueille, forme, suit et valide ses juniors jusqu’à leur autonomie.',

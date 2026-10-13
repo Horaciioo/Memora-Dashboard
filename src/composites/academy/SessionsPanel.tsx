@@ -2,8 +2,6 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { AvatarStack } from '@/components/elements/display/Avatar'
-import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
@@ -11,15 +9,14 @@ import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { ProgramCard } from '@/components/structures/ProgramCard'
-import { Section } from '@/components/structures/Section'
+import { RowList, type RowListGroup } from '@/components/structures/RowList'
 import { useSessions } from '@/core/hooks/data/useAcademy'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ACADEMY_SESSION_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 
-import { GROUP_STYLES, PROGRAM_CARD, PROGRAM_ROW } from '@/declarations/ui/variants'
+import { GROUP_STYLES } from '@/declarations/ui/variants'
 import type { MenuItem } from '@/managers/front-end'
 import type { SessionSummary } from '@/types/academy'
 import type { FieldDefinition } from '@/types/forms'
@@ -29,6 +26,15 @@ import {
 } from '@/utils/constants/hierarchy'
 import { sessionTitle } from '@/utils/format/academy'
 import { formatDay, formatDayRange } from '@/utils/format/dates'
+
+// Display order of the states
+const STATUS_ORDER = [
+  AcademySessionStatuses.Running,
+  AcademySessionStatuses.Open,
+  AcademySessionStatuses.Draft,
+  AcademySessionStatuses.Closed,
+  AcademySessionStatuses.Archived,
+]
 
 export interface SessionsPanelProps {
   initialSessions: SessionSummary[]
@@ -86,49 +92,44 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
     },
   ]
 
-  // Running sessions first
-  const [running, finished] = [
-    sessions.filter((entry) => !FINISHED_ACADEMY_SESSION_STATUSES.includes(entry.status)),
-    sessions.filter((entry) => FINISHED_ACADEMY_SESSION_STATUSES.includes(entry.status)),
-  ]
+  // Heaviest state first, finished ones only on request
+  const groups: RowListGroup[] = STATUS_ORDER.filter(
+    (status) => showFinished || !FINISHED_ACADEMY_SESSION_STATUSES.includes(status)
+  )
+    .map((status) => ({
+      id: status,
+      label: ACADEMY_SESSION_STATUS_REGISTRY.label(status),
+      accent: ACADEMY_SESSION_STATUS_REGISTRY.get(status).accent,
+      items: sessions
+        .filter((entry) => entry.status === status)
+        .map((session) => ({
+          id: session.id,
+          title: sessionTitle(session),
+          meta: session.endsAt
+            ? formatDayRange(session.startsAt, session.endsAt)
+            : formatDay(session.startsAt),
+          icon: session.function.icon,
+          muted: FINISHED_ACADEMY_SESSION_STATUSES.includes(status),
+          menu: sessionMenu(session),
+          onOpen: () => router.push(ROUTES.session(session.id)),
+        })),
+    }))
+    .filter((group) => group.items.length > 0)
 
-  const card = (session: SessionSummary, compact = false) => {
-    const status = ACADEMY_SESSION_STATUS_REGISTRY.get(session.status)
-    const range = session.endsAt
-      ? formatDayRange(session.startsAt, session.endsAt)
-      : formatDay(session.startsAt)
+  const hasFinished = sessions.some((entry) =>
+    FINISHED_ACADEMY_SESSION_STATUSES.includes(entry.status)
+  )
 
-    return (
-      <ProgramCard
-        key={session.id}
-        compact={compact}
-        title={sessionTitle(session)}
-        meta={range}
-        icon={session.function.icon}
-        accent={session.function.accent}
-        foot={
-          session.status === AcademySessionStatuses.Running ? undefined : (
-            <Status label={status.label} accent={status.accent} />
-          )
-        }
-        side={<AvatarStack people={session.trainers} size="sm" />}
-        menu={sessionMenu(session)}
-        onOpen={() => router.push(ROUTES.session(session.id))}
-      />
-    )
-  }
-
-  const pageOptions: PageOption[] =
-    finished.length > 0
-      ? [
-          {
-            id: 'finished',
-            label: PAGE_OPTIONS_COPY.showFinished,
-            checked: showFinished,
-            onChange: setShowFinished,
-          },
-        ]
-      : []
+  const pageOptions: PageOption[] = hasFinished
+    ? [
+        {
+          id: 'finished',
+          label: PAGE_OPTIONS_COPY.showFinished,
+          checked: showFinished,
+          onChange: setShowFinished,
+        },
+      ]
+    : []
 
   return (
     <>
@@ -146,25 +147,8 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
       ) : (
         <div className={GROUP_STYLES.spaced}>
           <PageOptions options={pageOptions} />
-          <Section title={ACADEMY_COPY.groupRunning} bare>
-            <div className={PROGRAM_CARD.grid}>
-              {running.map((session) => card(session))}
-              <AddRow
-                tile="session"
-                label={ACADEMY_COPY.sessionAdd}
-                disabled={!canManage}
-                onClick={openCreate}
-              />
-            </div>
-          </Section>
-
-          {showFinished && finished.length > 0 && (
-            <Section title={ACADEMY_COPY.groupFinished} bare>
-              <div className={PROGRAM_ROW.list}>
-                {finished.map((session) => card(session, true))}
-              </div>
-            </Section>
-          )}
+          <RowList groups={groups} />
+          <AddRow label={ACADEMY_COPY.sessionAdd} disabled={!canManage} onClick={openCreate} />
         </div>
       )}
 

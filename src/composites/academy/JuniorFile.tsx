@@ -217,7 +217,6 @@ export const JuniorFile = ({
   }
 
   const { junior } = file
-  const isReady = junior.mandatoryPending === 0
 
   const stageKeys = ACADEMY_STAGE_REGISTRY.keys
   const stageIndex = stageKeys.indexOf(junior.stage)
@@ -229,13 +228,6 @@ export const JuniorFile = ({
     label: ACADEMY_STAGE_REGISTRY.label(key),
     state: graduated || index < stageIndex ? 'done' : index === stageIndex ? 'current' : 'idle',
   }))
-
-  const skillAverage =
-    file.skills.length === 0
-      ? 0
-      : Math.round(
-          file.skills.reduce((total, skill) => total + skill.percent, 0) / file.skills.length
-        )
 
   const openNote = (note: JuniorNoteView | null) => {
     file.clearIssues()
@@ -271,7 +263,7 @@ export const JuniorFile = ({
   const beacon = (name: string) => ({ [BEACON_ATTRIBUTE]: name })
 
   const timelineTab = () => (
-    <Section title={ACADEMY_COPY.timelineTab} raised>
+    <Section title={ACADEMY_COPY.timelineTab} bare>
       <div className="flex flex-col gap-6">
         {parkour && <ParkourPanel parkour={parkour} canManage={canManage} />}
         <PimTimelineBoard initialTimeline={initialTimeline} canAdvance={canManage} />
@@ -280,7 +272,7 @@ export const JuniorFile = ({
   )
 
   const informationsTab = () => (
-    <Section title={ACADEMY_COPY.tabInformations} raised>
+    <Section title={ACADEMY_COPY.tabInformations} bare>
       <div className="flex flex-col gap-4">
         <span className="flex justify-end" {...beacon(GUIDE_BEACONS.fsiEdit)}>
           <Button
@@ -799,8 +791,6 @@ export const JuniorFile = ({
         <JuniorRail
           junior={junior}
           functionName={sessionFunctionName}
-          skillAverage={skillAverage}
-          isReady={isReady}
           canEdit={canManage}
           onEdit={() => {
             file.clearIssues()
