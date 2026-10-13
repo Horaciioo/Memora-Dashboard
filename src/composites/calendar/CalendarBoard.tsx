@@ -21,6 +21,8 @@ import { CalendarTimeGrid } from '@/composites/calendar/CalendarTimeGrid'
 import type { GridMode } from '@/composites/calendar/CalendarTimeGrid'
 import { useCalendar } from '@/core/hooks/data/useCalendar'
 import { publishCalendarRail } from '@/core/hooks/interaction/useCalendarRail'
+import { useIsMobileShell } from '@/core/hooks/interaction/useBreakpoint'
+import { useSwipe } from '@/core/hooks/interaction/useSwipe'
 import { useCalendarShortcuts } from '@/core/hooks/interaction/useCalendarShortcuts'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { useSlotDraft } from '@/core/hooks/interaction/useSlotDraft'
@@ -129,6 +131,7 @@ export const CalendarBoard = ({
   onlyLayer,
 }: CalendarBoardProps) => {
   const calendar = useCalendar(initialEntries, sessionId)
+  const isMobile = useIsMobileShell()
 
   // A deep link lands with its detail already open
   const linked = focusEntryId
@@ -187,6 +190,13 @@ export const CalendarBoard = ({
     setCursor(dayKey)
     setUnit('day')
   }
+
+  // A swipe steps the period
+  const { handlers: swipe, axisStyle } = useSwipe({
+    axis: 'x',
+    enabled: isMobile,
+    onSwipe: (direction) => setCursor(shiftAnchor(cursor, unit, direction === 'left' ? 1 : -1)),
+  })
 
   const railProps: CalendarSidebarProps = {
     cursor,
@@ -463,38 +473,47 @@ export const CalendarBoard = ({
       <PageOptions options={pageOptions} />
       <Section description={CALENDAR_COPY.moveHint} bare>
         <div className="flex flex-col gap-6">
-          {!sessionId && <CalendarSidebar {...railProps} />}
-
           <div className="flex min-w-0 flex-col gap-4">
             <div className={CALENDAR_STYLES.toolbar}>
-              <Button
-                className="order-3 md:order-none"
-                onClick={() => setCursor(toDayKey(new Date()))}
-              >
-                {CALENDAR_COPY.today}
-              </Button>
-              {calendar.isLoading && <BrandLoader variant="ink" />}
-              {STEPS.map(({ amount, icon, title, short }) => (
-                <span key={amount} className="contents">
-                  <Button
-                    icon={icon}
-                    title={title}
-                    aria-label={title}
-                    className="order-2 md:hidden"
-                    onClick={() => setCursor(shiftAnchor(cursor, unit, amount))}
-                  />
-                  <span className="hidden md:contents">
+              <div className={CALENDAR_STYLES.toolbarMain}>
+                <Button
+                  className="order-1 md:order-none"
+                  onClick={() => setCursor(toDayKey(new Date()))}
+                >
+                  {CALENDAR_COPY.today}
+                </Button>
+                {calendar.isLoading && <BrandLoader variant="ink" />}
+                {STEPS.map(({ amount, icon, title, short }) => (
+                  <span key={amount} className="contents">
                     <Button
+                      icon={icon}
                       title={title}
+                      aria-label={title}
+                      className={cn('md:hidden', amount < 0 ? 'order-2' : 'order-4')}
                       onClick={() => setCursor(shiftAnchor(cursor, unit, amount))}
-                    >
-                      {short}
-                    </Button>
+                    />
+                    <span className="hidden md:contents">
+                      <Button
+                        title={title}
+                        onClick={() => setCursor(shiftAnchor(cursor, unit, amount))}
+                      >
+                        {short}
+                      </Button>
+                    </span>
                   </span>
+                ))}
+                <span className={CALENDAR_STYLES.period}>{periodLabel(cursor, unit)}</span>
+              </div>
+              <div className={CALENDAR_STYLES.toolbarTools}>
+                <span className="min-w-0 flex-1 md:hidden">
+                  <SegmentedControl
+                    options={UNITS}
+                    value={unit}
+                    onChange={setUnit}
+                    label={PAGE_OPTIONS_COPY.view}
+                  />
                 </span>
-              ))}
-              <span className={CALENDAR_STYLES.period}>{periodLabel(cursor, unit)}</span>
-              <span className="order-4 ml-auto flex flex-wrap items-center gap-3 md:order-none">
+                {!sessionId && <CalendarSidebar {...railProps} />}
                 {canManage && isTimed && (
                   // The minute grid is desktop only, a phone reads the list
                   <span className="hidden md:inline-flex">
@@ -509,12 +528,17 @@ export const CalendarBoard = ({
                 {!canManage && <MeetingRequest />}
                 {canManage && (
                   <span {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.calendarAdd }}>
-                    <Button variant="primary" onClick={() => openForm(null)}>
-                      {CALENDAR_COPY.add}
+                    <Button
+                      variant="primary"
+                      icon={isMobile ? 'add' : undefined}
+                      aria-label={CALENDAR_COPY.add}
+                      onClick={() => openForm(null)}
+                    >
+                      {isMobile ? undefined : CALENDAR_COPY.add}
                     </Button>
                   </span>
                 )}
-              </span>
+              </div>
             </div>
 
             {selected.length > 0 && (
@@ -547,7 +571,7 @@ export const CalendarBoard = ({
                 onOpen={openEntry}
               />
             ) : (
-              <div className={CALENDAR_STYLES.frame}>
+              <div className={CALENDAR_STYLES.frame} style={axisStyle} {...swipe}>
                 <div
                   className={cn(
                     CALENDAR_STYLES.weekdays,
@@ -649,16 +673,18 @@ export const CalendarBoard = ({
                           )}
                           {...(canManage ? containerProps(day.key) : {})}
                           {...slotProps(day.key)}
+                          onClick={isMobile ? () => setCursor(day.key) : undefined}
                         >
                           {renderZones(day.key)}
                           <button
                             type="button"
-                            onClick={() => openDay(day.key)}
+                            onClick={() => (isMobile ? setCursor(day.key) : openDay(day.key))}
                             className={cn(
                               CALENDAR_STYLES.dayNumber,
                               CALENDAR_STYLES.dayNumberButton,
                               !day.isCurrentMonth && CALENDAR_STYLES.dayNumberOutside,
-                              day.isToday && CALENDAR_STYLES.dayNumberToday
+                              day.isToday && CALENDAR_STYLES.dayNumberToday,
+                              isMobile && day.key === cursor && CALENDAR_STYLES.dayNumberPicked
                             )}
                           >
                             {day.dayOfMonth}
@@ -702,6 +728,15 @@ export const CalendarBoard = ({
                   </div>
                 )}
               </div>
+            )}
+
+            {isMobile && unit === 'month' && (
+              <CalendarAgenda
+                days={days.filter((day) => day.key === cursor)}
+                entries={visible}
+                selection={selection}
+                onOpen={openEntry}
+              />
             )}
           </div>
         </div>
