@@ -44,6 +44,7 @@ export interface JuniorDispositif {
  * @property {string} name - Display name
  * @property {string | null} summary - Surface the function covers
  * @property {string | null} accent - Colour token
+ * @property {string | null} icon - Glyph key
  */
 
 export interface SessionFunction {
@@ -51,6 +52,7 @@ export interface SessionFunction {
   name: string
   summary: string | null
   accent: string | null
+  icon: string | null
 }
 
 /**
@@ -79,6 +81,7 @@ export interface JuniorTraining {
  * Session listed on the academy board
  * @typedef {Object} SessionSummary
  * @property {string} id - Session identifier
+ * @property {number} number - Rank among the sessions of its function
  * @property {SessionFunction} function - Function the session is scoped to
  * @property {string} startsAt - ISO start date
  * @property {string | null} endsAt - ISO end date
@@ -92,6 +95,7 @@ export interface JuniorTraining {
 
 export interface SessionSummary {
   id: string
+  number: number
   function: SessionFunction
   startsAt: string
   endsAt: string | null

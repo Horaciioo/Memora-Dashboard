@@ -393,29 +393,62 @@ export const juniorCandidates = async (sessionId: string): Promise<FieldOption[]
 }
 
 /**
+ * Rank of each session among those of its function
+ * @return {Promise<Map<string, number>>} - Number by session
+ */
+
+const sessionNumbers = async (): Promise<Map<string, number>> => {
+  const rows = await prisma.academySession.findMany({
+    select: { id: true, functionId: true },
+    orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+  })
+  const seen = new Map<string, number>()
+
+  return new Map(
+    rows.map((row) => {
+      const rank = (seen.get(row.functionId) ?? 0) + 1
+      seen.set(row.functionId, rank)
+
+      return [row.id, rank]
+    })
+  )
+}
+
+/**
  * Shape one session row
+ * @param {Map<string, number>} numbers - Session ranks
  * @param {object} row - Session row with its trainers and counts
  * @return {SessionSummary} - Session summary
  */
 
-const toSummary = (row: {
-  id: string
-  functionId: string
-  startsAt: Date
-  endsAt: Date | null
-  status: AcademySessionStatusName
-  summary: string | null
-  jobFunction: { id: string; name: string; summary: string | null; accent: string | null }
-  trainers: { account: { id: string; displayName: string; avatarUrl: string | null } }[]
-  _count: { juniors: number }
-  invites: { token: string; expiresAt: Date; maxUses: number | null; uses: number }[]
-}): SessionSummary => {
+const toSummary = (
+  numbers: Map<string, number>,
+  row: {
+    id: string
+    functionId: string
+    startsAt: Date
+    endsAt: Date | null
+    status: AcademySessionStatusName
+    summary: string | null
+    jobFunction: {
+      id: string
+      name: string
+      summary: string | null
+      accent: string | null
+      icon: string | null
+    }
+    trainers: { account: { id: string; displayName: string; avatarUrl: string | null } }[]
+    _count: { juniors: number }
+    invites: { token: string; expiresAt: Date; maxUses: number | null; uses: number }[]
+  }
+): SessionSummary => {
   const invite = row.invites[0]
   const inviteUsable =
     invite && invite.expiresAt > new Date() && invite.uses < (invite.maxUses ?? Infinity)
 
   return {
     id: row.id,
+    number: numbers.get(row.id) ?? 1,
     function: row.jobFunction,
     startsAt: row.startsAt.toISOString(),
     endsAt: row.endsAt?.toISOString() ?? null,
@@ -460,7 +493,9 @@ export const listSessions = async (
     orderBy: { startsAt: 'desc' },
   })
 
-  return rows.map(toSummary)
+  const numbers = await sessionNumbers()
+
+  return rows.map((row) => toSummary(numbers, row))
 }
 
 /**
@@ -960,7 +995,7 @@ export const readSession = async (
 
   const [juniors, steps] = await Promise.all([listJuniors(id, row.functionId), listSteps(id)])
 
-  return { summary: toSummary(row), juniors, steps }
+  return { summary: toSummary(await sessionNumbers(), row), juniors, steps }
 }
 
 /**
@@ -1988,7 +2023,10 @@ export const readJunior = async (
   const trainings = await sessionTrainings(row.session.functionId, row.dispositifId)
   const records = new Map(row.account.trainingRecords.map((record) => [record.trainingId, record]))
 
-  return { junior: toJunior(row, trainings, records), session: toSummary(row.session) }
+  return {
+    junior: toJunior(row, trainings, records),
+    session: toSummary(await sessionNumbers(), row.session),
+  }
 }
 
 /**

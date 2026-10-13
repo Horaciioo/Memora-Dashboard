@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
-import { Avatar } from '@/components/elements/display/Avatar'
-import { Status } from '@/components/elements/display/Status'
+import { AvatarStack } from '@/components/elements/display/Avatar'
+import { PhaseTrack } from '@/components/elements/display/PhaseTrack'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
@@ -11,18 +11,31 @@ import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
+import { ProgramCard } from '@/components/structures/ProgramCard'
 import { Section } from '@/components/structures/Section'
 import { useRecruitments } from '@/core/hooks/data/useRecruitments'
 import { ROUTES } from '@/declarations/navigation'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
 import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
-import { GROUP_STYLES, SESSION_CARD } from '@/declarations/ui/variants'
-import { useMenu, type MenuItem } from '@/managers/front-end'
+import { GROUP_STYLES, PROGRAM_CARD, PROGRAM_ROW } from '@/declarations/ui/variants'
+import type { MenuItem } from '@/managers/front-end'
 import type { FieldDefinition } from '@/types/forms'
 import type { RecruitmentSummary } from '@/types/recruitment'
-import { cn } from '@/utils/classnames'
-import { FINISHED_RECRUITMENT_STATUSES } from '@/utils/constants/recruitment'
+import { FINISHED_RECRUITMENT_STATUSES, RecruitmentStatuses } from '@/utils/constants/recruitment'
+import { formatDay, formatDayRange } from '@/utils/format/dates'
+
+// Phases a campaign walks through
+const PHASES: string[] = RECRUITMENT_STATUS_REGISTRY.keys.filter(
+  (status) => status !== RecruitmentStatuses.Archived
+)
+
+// Responsable as a stack entry
+const toPerson = (ref: RecruitmentSummary['responsables'][number]) => ({
+  id: ref.id,
+  name: ref.label,
+  src: ref.image,
+})
 
 export interface RecruitmentsPanelProps {
   initialSessions: RecruitmentSummary[]
@@ -46,7 +59,6 @@ export const RecruitmentsPanel = ({
   const router = useRouter()
   const { sessions, isSaving, issues, clearIssues, create, update, remove } =
     useRecruitments(initialSessions)
-  const { contextMenu } = useMenu()
   const [isCreating, setCreating] = useState(false)
   const [showFinished, setShowFinished] = useState(false)
   const [editing, setEditing] = useState<RecruitmentSummary | null>(null)
@@ -106,48 +118,35 @@ export const RecruitmentsPanel = ({
     },
   ]
 
-  const card = (entry: RecruitmentSummary) => {
+  const card = (entry: RecruitmentSummary, compact = false) => {
     const status = RECRUITMENT_STATUS_REGISTRY.get(entry.status)
-    const isFinished = FINISHED_RECRUITMENT_STATUSES.includes(entry.status)
-    const progress =
-      entry.candidateCount > 0 ? (entry.interviewedCount / entry.candidateCount) * 100 : null
+    const period =
+      entry.opensAt && entry.closesAt
+        ? formatDayRange(entry.opensAt, entry.closesAt)
+        : entry.opensAt
+          ? formatDay(entry.opensAt)
+          : undefined
 
     return (
-      <article
+      <ProgramCard
         key={entry.id}
-        role="button"
-        tabIndex={0}
-        onClick={() => router.push(ROUTES.recruitment(entry.id))}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter') router.push(ROUTES.recruitment(entry.id))
-        }}
-        onContextMenu={contextMenu(sessionMenu(entry), entry.name)}
-        className={cn(SESSION_CARD.card, isFinished && SESSION_CARD.muted)}
-      >
-        <div className={SESSION_CARD.head}>
-          <Avatar name={entry.youtuber.label} src={entry.youtuber.image} size="lg" />
-          <div className={SESSION_CARD.body}>
-            <span className={SESSION_CARD.title}>{entry.name}</span>
-            <span className={SESSION_CARD.meta}>
-              {[entry.youtuber.label, entry.jobFunction.label].join(', ')}
-            </span>
-            <Status label={status.label} accent={status.accent} className="mt-1" />
-          </div>
-        </div>
-
-        {progress !== null && (
-          <div
-            className={SESSION_CARD.track}
-            role="progressbar"
-            aria-label={RECRUITMENT_COPY.interviewsProgress}
-            aria-valuemin={0}
-            aria-valuemax={entry.candidateCount}
-            aria-valuenow={entry.interviewedCount}
-          >
-            <div className={SESSION_CARD.fill} style={{ width: `${progress}%` }} />
-          </div>
-        )}
-      </article>
+        compact={compact}
+        title={entry.jobFunction.label}
+        meta={compact ? status.label : period}
+        icon={entry.jobFunction.icon}
+        accent={entry.jobFunction.accent}
+        foot={
+          <PhaseTrack
+            phases={PHASES}
+            current={entry.status}
+            label={status.label}
+            accent={status.accent}
+          />
+        }
+        side={<AvatarStack people={entry.responsables.map(toPerson)} size="sm" />}
+        menu={sessionMenu(entry)}
+        onOpen={() => router.push(ROUTES.recruitment(entry.id))}
+      />
     )
   }
 
@@ -213,8 +212,8 @@ export const RecruitmentsPanel = ({
       <PageOptions options={pageOptions} />
       <div className={GROUP_STYLES.spaced}>
         <Section title={RECRUITMENT_COPY.groupOpen} bare>
-          <div className={SESSION_CARD.grid}>
-            {running.map(card)}
+          <div className={PROGRAM_CARD.grid}>
+            {running.map((entry) => card(entry))}
             <AddRow
               tile="session"
               label={RECRUITMENT_COPY.add}
@@ -226,7 +225,7 @@ export const RecruitmentsPanel = ({
 
         {showFinished && finished.length > 0 && (
           <Section title={RECRUITMENT_COPY.groupFinished} bare>
-            <div className={SESSION_CARD.grid}>{finished.map(card)}</div>
+            <div className={PROGRAM_ROW.list}>{finished.map((entry) => card(entry, true))}</div>
           </Section>
         )}
       </div>

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from '@/components/elements/navigation/AppLink'
 import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
+import { FunctionMark } from '@/components/elements/display/FunctionMark'
 import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -39,6 +40,7 @@ import type { FieldDefinition } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import { GUIDE_BEACONS } from '@/declarations/academy/guides'
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
+import { sessionTitle } from '@/utils/format/academy'
 import { formatDay, formatDayTime } from '@/utils/format/dates'
 
 // Chip carried by each resolved timeline state
@@ -260,10 +262,6 @@ export const SessionPanel = ({
             {session.juniors.map((junior) => {
               const status = ACADEMY_JUNIOR_STATUS_REGISTRY.get(junior.status)
               const isActive = junior.status === AcademyJuniorStatuses.Active
-              const progress =
-                junior.trainings.length > 0
-                  ? (junior.completedCount / junior.trainings.length) * 100
-                  : null
 
               return (
                 <article
@@ -292,12 +290,6 @@ export const SessionPanel = ({
                       )}
                     </div>
                   </div>
-
-                  {progress !== null && (
-                    <div className={SESSION_CARD.track} aria-hidden="true">
-                      <div className={SESSION_CARD.fill} style={{ width: `${progress}%` }} />
-                    </div>
-                  )}
 
                   <div className={SESSION_CARD.foot}>
                     <span className={SESSION_CARD.date}>
@@ -487,8 +479,12 @@ export const SessionPanel = ({
       <div className={SESSION_HERO.card}>
         <div>
           <div className={SESSION_HERO.body}>
+            <FunctionMark
+              icon={detail.summary.function.icon}
+              accent={detail.summary.function.accent}
+            />
             <div className={SESSION_HERO.facts}>
-              <h2 className={SESSION_HERO.title}>{detail.summary.function.name}</h2>
+              <h2 className={SESSION_HERO.title}>{sessionTitle(detail.summary)}</h2>
               <div className={SESSION_HERO.meta}>
                 {detail.summary.status !== AcademySessionStatuses.Running && (
                   <Status label={sessionStatus.label} accent={sessionStatus.accent} />

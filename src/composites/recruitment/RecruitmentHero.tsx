@@ -1,4 +1,4 @@
-import { Avatar } from '@/components/elements/display/Avatar'
+import { FunctionMark } from '@/components/elements/display/FunctionMark'
 import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
@@ -46,16 +46,10 @@ export const RecruitmentHero = ({ summary, candidates, outcomes }: RecruitmentHe
     <div className={SESSION_HERO.card}>
       <div>
         <div className={SESSION_HERO.body}>
-          <Avatar
-            name={summary.youtuber.label}
-            src={summary.youtuber.image}
-            size="xl"
-            className={SESSION_HERO.portrait}
-          />
+          <FunctionMark icon={summary.jobFunction.icon} accent={summary.jobFunction.accent} />
           <div className={SESSION_HERO.facts}>
             <h2 className={SESSION_HERO.title}>{summary.jobFunction.label}</h2>
             <div className={SESSION_HERO.meta}>
-              <span>{summary.youtuber.label}</span>
               <Status label={status.label} accent={status.accent} />
               <RecordId id={summary.id} />
             </div>

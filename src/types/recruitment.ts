@@ -9,6 +9,7 @@ import type { RecruitmentOwnerName, RecruitmentStatusName } from '@/utils/consta
  * @property {string} label - Display label
  * @property {string | null} accent - Colour token
  * @property {string | null} [image] - Portrait shown beside the label
+ * @property {string | null} [icon] - Glyph key of a function
  */
 
 export interface RecruitmentRef {
@@ -16,6 +17,7 @@ export interface RecruitmentRef {
   label: string
   accent: string | null
   image?: string | null
+  icon?: string | null
 }
 
 /**

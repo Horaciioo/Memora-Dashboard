@@ -128,11 +128,13 @@ const toRef = (row: {
   name: string
   accent: string | null
   avatarUrl?: string | null
+  icon?: string | null
 }): RecruitmentRef => ({
   id: row.id,
   label: row.name,
   accent: row.accent,
   image: row.avatarUrl ?? null,
+  icon: row.icon ?? null,
 })
 
 // Relations every session summary reads

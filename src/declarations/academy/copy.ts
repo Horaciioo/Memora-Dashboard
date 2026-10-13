@@ -52,6 +52,8 @@ export const ACADEMY_COPY = {
   tabSessions: 'Sessions',
   tabGlossary: 'Lexique',
   sessionAdd: 'Ouvrir une session',
+  // {function} and {number} fill in
+  sessionTitle: 'Mod. {function} #{number}',
   emptyTitle: 'Aucune session',
   emptyDescription: 'Ouvre une première session pour accueillir des juniors.',
   sessionDeleteTitle: 'Supprimer cette session ?',

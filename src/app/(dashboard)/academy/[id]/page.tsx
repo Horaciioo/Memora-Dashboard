@@ -19,6 +19,7 @@ import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
 import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
+import { sessionTitle } from '@/utils/format/academy'
 import { formatDay } from '@/utils/format/dates'
 import { gridRange, monthGrid, toDayKey } from '@/utils/format/calendar'
 
@@ -40,7 +41,7 @@ export async function generateMetadata({
   try {
     const { summary } = await readSession(id, academyScope(session, access))
 
-    return { title: `${summary.function.name} • ${formatDay(summary.startsAt)}` }
+    return { title: `${sessionTitle(summary)} • ${formatDay(summary.startsAt)}` }
   } catch {
     return { title: ACADEMY_COPY.title }
   }
