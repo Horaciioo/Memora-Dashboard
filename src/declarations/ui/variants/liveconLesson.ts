@@ -57,7 +57,7 @@ export const COURSE_RULES = {
   card: `${COURSE_PANEL} px-6 pt-9 pb-6`,
   text: 'text-lg leading-relaxed',
   // One box, shown once scrolled to
-  item: 'flex flex-col max-md:not-first:mt-16',
+  item: 'flex flex-col not-first:mt-16 md:not-first:mt-0',
   box: 'relative w-full transition-[opacity,translate] duration-[var(--motion-duration-slow)] md:w-[55%]',
   boxHidden: 'translate-y-6 opacity-0',
   left: 'items-start',

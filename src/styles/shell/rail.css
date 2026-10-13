@@ -20,6 +20,7 @@
 
 /* Panels laid from the rail take the page tokens back */
 .rail-reset,
+.nav-sheet [aria-current='page'],
 .rail-ground [aria-current='page'] {
   --color-ink: var(--page-ink);
   --color-ink-subtle: var(--page-ink-subtle);
@@ -42,6 +43,7 @@
 }
 
 /* Open page: a white box like Notion, text left plain */
+.nav-sheet [aria-current='page'],
 .rail-ground [aria-current='page'] {
   color: var(--page-ink);
   background: var(--page-surface);

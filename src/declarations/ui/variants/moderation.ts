@@ -38,6 +38,18 @@ export const SANCTION_PANEL = {
 } as const
 
 /**
+ * Legend of the measures
+ * @type {Record<string, string>}
+ */
+
+export const SANCTION_LEGEND = {
+  root: 'flex flex-col gap-3',
+  title: PROPERTY_LABEL,
+  list: 'flex flex-wrap gap-2',
+  item: 'accent-tint accent-text accent-border rounded-[var(--radius-sm)] border px-2.5 py-1 text-xs font-semibold whitespace-nowrap',
+} as const
+
+/**
  * One offence opened in full
  * @type {Record<string, string>}
  */

@@ -13,7 +13,6 @@ export const ACTION_COPY = {
   delete: 'Supprimer',
   // {column} is the lane the card goes to
   moveTo: 'Déplacer vers « {column} »',
-  columns: 'Colonnes',
   confirm: 'Confirmer',
   search: 'Rechercher',
   filter: 'Filtrer',

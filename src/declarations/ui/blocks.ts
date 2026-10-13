@@ -107,7 +107,7 @@ export const LEFT_SIDEBAR = {
   navGroupLabel:
     'rail-fold group flex w-full items-center gap-1 px-3 pb-1 text-caption font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   navGroupChevron:
-    'h-3.5 w-3.5 shrink-0 opacity-0 transition-[transform,opacity] group-hover:opacity-100 group-focus-visible:opacity-100',
+    'h-4 w-4 shrink-0 opacity-70 transition-[transform,opacity] group-hover:opacity-100 group-focus-visible:opacity-100 md:h-3.5 md:w-3.5 md:opacity-0',
   navGroupChevronCollapsed: '-rotate-90',
   navGroupItems: 'flex flex-col gap-px',
   navLink:
@@ -153,6 +153,9 @@ export const LEFT_SIDEBAR = {
 
 export const SEARCH_LAUNCHER = {
   bar: 'glass-panel flex w-full items-center gap-2.5 rounded-[var(--radius-lg)] px-3.5 py-3 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  // Slim bar beside the bell
+  sheetBar:
+    'glass-panel flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-lg)] px-3 py-2 text-left text-sm text-[var(--color-ink-subtle)]',
   barLabel: 'flex-1 truncate text-body',
   barShortcut:
     'hidden shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro font-medium text-[var(--color-ink-subtle)] md:inline',
@@ -164,13 +167,15 @@ export const SEARCH_LAUNCHER = {
  */
 
 export const NAV_SHEET = {
-  stack: 'flex flex-col gap-4',
+  stack: 'nav-sheet flex flex-col gap-4',
   // Level switch sits first
   switch: 'w-full',
+  // Search and bell share a line
+  searchRow: 'flex items-center gap-2',
   notifications:
-    'relative flex min-h-11 items-center gap-3 rounded-[var(--radius-lg)] px-3 text-body font-medium transition-colors hover:bg-[var(--color-surface)]',
+    'glass-panel relative flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-lg)] text-[var(--color-ink)]',
   notificationsIcon: 'size-5 shrink-0',
-  dot: 'ml-auto size-2 rounded-full bg-[var(--color-danger)]',
+  dot: 'absolute top-2 right-2 size-2 rounded-full bg-[var(--color-danger)]',
 } as const
 
 /**
@@ -183,8 +188,8 @@ export const TOP_BAR = {
   menuButton:
     'flex size-11 items-center justify-center rounded-full text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
   menuIcon: 'size-6',
-  avatarButton:
-    '-m-1.5 shrink-0 rounded-full p-1.5 ring-2 ring-transparent transition-shadow hover:ring-[var(--color-border-strong)]',
+  moreButton:
+    'flex size-11 items-center justify-center text-[var(--color-ink)] transition-opacity hover:opacity-70',
 } as const
 
 /**
@@ -262,6 +267,7 @@ export const METRIC_BLOCK = {
 
 export const MEMBER_BLOCK = {
   frame: 'relative',
+  frameCompact: 'relative row-span-3 md:row-auto',
   // Official logo on the portrait's corner
   divisionLogo: 'absolute -right-3 -bottom-3 h-14 w-14 drop-shadow-md',
   // Division stamped on the portrait's corner
@@ -270,6 +276,9 @@ export const MEMBER_BLOCK = {
   // Role on the portrait's corner
   roleMark: 'absolute -right-3 -bottom-3 drop-shadow-md',
   roleGlyph: 'h-14 w-14',
+  // Smaller portrait on a phone
+  roleMarkCompact: 'absolute -right-2 -bottom-2 drop-shadow-md md:-right-3 md:-bottom-3',
+  roleGlyphCompact: 'h-9 w-9 md:h-14 md:w-14',
   portrait:
     'block shrink-0 rounded-full transition-[filter] enabled:cursor-pointer enabled:hover:brightness-95 disabled:cursor-default',
   // Role glyph pinned to the portrait's corner
@@ -294,7 +303,7 @@ export const MEMBER_FILE = {
   // Rail follows the scroll on wide screens only
   railStack: 'flex flex-col gap-3 lg:sticky lg:top-6',
   rail: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)]',
-  head: 'flex flex-col items-center gap-2 px-5 pt-7 text-center',
+  head: 'grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1 px-4 pt-4 text-left md:flex md:flex-col md:gap-2 md:px-5 md:pt-7 md:text-center',
   name: 'text-xl font-bold tracking-tight break-words',
   role: 'text-xs font-bold tracking-wide text-[var(--color-brand-800)] uppercase',
   status:
@@ -302,8 +311,8 @@ export const MEMBER_FILE = {
   // Dismissed or resigned
   departed: 'cursor-help text-xs font-bold tracking-wide text-[var(--color-danger)] uppercase',
   statusGlyph: 'h-4 w-4 shrink-0',
-  functions: 'flex items-center justify-center gap-2',
-  body: 'mt-5 flex flex-col gap-5 border-t border-[var(--color-border)] p-5',
+  functions: 'flex items-center gap-2 md:justify-center',
+  body: 'mt-3 flex flex-col gap-5 border-t border-[var(--color-border)] p-4 md:mt-5 md:p-5',
   groupTitle: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   lock: 'px-5 pt-3 text-center',
   // Property list of a rail

@@ -56,7 +56,7 @@ export const DISCORD_MESSAGE = {
     'block min-h-11 w-full flex-1 resize-none rounded-[var(--radius-md)] bg-[var(--discord-input)] px-4 py-2.5 text-[var(--discord-text)] placeholder:text-[var(--discord-muted)] focus:outline-none',
   hint: 'pt-2 text-xs text-[var(--discord-muted)]',
   popover:
-    'absolute right-4 bottom-full left-4 mb-2 max-h-72 overflow-y-auto rounded-[var(--radius-md)] bg-[var(--discord-popover)] p-2 shadow-[var(--shadow-md)]',
+    'mb-2 max-h-40 shrink-0 overflow-y-auto rounded-[var(--radius-md)] bg-[var(--discord-popover)] p-2 shadow-[var(--shadow-md)]',
   popoverGroup:
     'px-2 pt-2 pb-1 text-xs font-bold tracking-wide text-[var(--discord-muted)] uppercase',
   popoverItem:

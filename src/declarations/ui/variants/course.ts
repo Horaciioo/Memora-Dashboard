@@ -486,7 +486,7 @@ export const COURSE_FIGURE = {
   diagramLabel: 'text-sm leading-snug font-bold text-balance',
   diagramNote: 'text-xs leading-snug text-[var(--color-ink-subtle)]',
   diagramLink:
-    'course-pop flex shrink-0 items-center justify-center self-center text-[var(--color-ink-subtle)] max-sm:rotate-90 sm:mt-4',
+    'course-pop flex shrink-0 items-center justify-center self-center text-[var(--color-ink-subtle)] rotate-90 sm:mt-4 sm:rotate-0',
   diagramCaption: 'text-center text-xs text-[var(--color-ink-subtle)]',
   compare: 'flex flex-col gap-4',
   compareTitle: 'text-lg font-bold tracking-tight',

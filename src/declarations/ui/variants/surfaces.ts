@@ -155,13 +155,13 @@ export const BOTTOM_SHEET = {
     'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-scrim)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur-lg md:hidden',
   frame: 'sheet-enter relative flex w-full max-w-lg flex-col items-center gap-4',
   // Title laid on the scrim, over the panel
-  figure: 'w-full px-2 text-center text-[var(--color-on-media)]',
+  figure: 'w-full px-12 text-center text-[var(--color-on-media)]',
   panel:
     'relative flex max-h-[calc(100dvh-9rem)] w-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/95 shadow-[var(--shadow-lg)]',
   // Pulled down to close
   grip: 'flex shrink-0 cursor-grab touch-none justify-center pt-2.5 pb-1',
   gripBar: 'h-1 w-10 rounded-full bg-[var(--color-ink)]/20',
-  close: 'absolute top-1.5 right-2',
+  close: 'absolute -top-1 right-0 !text-[var(--color-on-media)] hover:!bg-white/15',
   body: 'min-h-0 flex-1 overflow-y-auto p-4',
   figureTitle:
     'text-4xl leading-none font-bold tracking-tight uppercase italic drop-shadow-[0_2px_10px_rgb(0_0_0/0.5)]',
@@ -200,6 +200,12 @@ export const DRAWER_STYLES = {
   // Form on the left, live result on the right, same width and height
   split:
     'flex min-h-full flex-col gap-6 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-x-8',
+  // Tabs and the result switch share a line
+  subheaderRow: 'flex items-center justify-between gap-3',
+  subheaderTabs: 'min-w-0 flex-1',
+  asideToggle:
+    'min-h-11 shrink-0 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] px-3 text-xs font-semibold text-[var(--color-ink-subtle)] md:hidden',
+  asideToggleOn: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   splitDivider: 'hidden w-px self-stretch bg-[var(--color-border)] md:block',
   // Section tabs under the header
   sections: 'shrink-0 px-6 pb-2',
@@ -529,7 +535,9 @@ export const PAGE_OPTIONS = {
   host: 'relative',
   button:
     'glass-panel flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink)] transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] motion-reduce:transition-none',
-  buttonOpen: 'scale-105',
+  buttonOpen: 'relative z-[60] scale-105',
+  // Blurs the page behind on a phone
+  backdrop: 'fixed inset-0 z-[55] bg-[var(--color-scrim)]/30 backdrop-blur-sm md:hidden',
   icon: 'h-5 w-5',
   panel:
     'popover-enter glass-panel absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex w-72 flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',

@@ -30,7 +30,9 @@ export const SESSION_CARD = {
 export const SESSION_HERO = {
   card: 'flex flex-col gap-6 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)]',
   body: 'flex flex-wrap items-center gap-x-6 gap-y-4 p-6',
-  portrait: 'ring-4 ring-[var(--color-surface-raised)]',
+  // Function glyph on its tinted square
+  mark: 'accent-tint accent-text flex size-16 shrink-0 items-center justify-center rounded-[var(--radius-xl)] sm:size-20',
+  markGlyph: 'size-9 sm:size-11',
   facts: 'flex min-w-0 flex-1 flex-col gap-1.5',
   title: 'text-2xl font-bold tracking-tight sm:text-3xl',
   meta: 'flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-[var(--color-ink-subtle)]',
