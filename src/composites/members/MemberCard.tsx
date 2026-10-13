@@ -82,7 +82,7 @@ export const MemberCard = ({
         >
           <span className="truncate">{member.displayName}</span>
           {showNotesBubble && member.notesCount > 0 && (
-            <span title={MEMBER_COPY.notesTitle} className="inline-flex">
+            <span title={MEMBER_COPY.notesTitle} className={LIST_STYLES.cardNotesWrap}>
               <NotesIcon className={LIST_STYLES.cardNotes} />
               <span className="sr-only">{MEMBER_COPY.notesTitle}</span>
             </span>

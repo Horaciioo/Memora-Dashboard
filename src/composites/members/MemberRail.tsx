@@ -54,7 +54,7 @@ export const MemberRail = ({
   return (
     <aside className={MEMBER_FILE.rail}>
       <div className={MEMBER_FILE.head}>
-        <div className={MEMBER_BLOCK.frame}>
+        <div className={MEMBER_BLOCK.frameCompact}>
           <button
             type="button"
             disabled={!canEdit}
@@ -63,13 +63,18 @@ export const MemberRail = ({
             onClick={onEditPortrait}
             className={MEMBER_BLOCK.portrait}
           >
-            <Avatar name={summary.displayName} src={summary.avatarUrl} size="xl" />
+            <Avatar
+              name={summary.displayName}
+              src={summary.avatarUrl}
+              size="lg"
+              className="md:h-24 md:w-24 md:text-2xl"
+            />
           </button>
-          <span className={MEMBER_BLOCK.roleMark}>
+          <span className={MEMBER_BLOCK.roleMarkCompact}>
             <RoleGlyph
               role={summary.role}
               isRoot={summary.isRoot}
-              glyphClassName={MEMBER_BLOCK.roleGlyph}
+              glyphClassName={MEMBER_BLOCK.roleGlyphCompact}
             />
           </span>
         </div>
@@ -83,7 +88,7 @@ export const MemberRail = ({
         <FunctionEmblems
           member={summary}
           className={MEMBER_FILE.functions}
-          glyphClassName="h-6 w-6"
+          glyphClassName="h-5 w-5 md:h-6 md:w-6"
         />
         {ERASED_STATUSES.includes(summary.status) && (
           <span className={MEMBER_FILE.departed} title={ERASED_COPY.notice}>
