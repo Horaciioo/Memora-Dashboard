@@ -176,6 +176,11 @@ export const NAV_SHEET = {
     'glass-panel relative flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-lg)] text-[var(--color-ink)]',
   notificationsIcon: 'size-5 shrink-0',
   dot: 'absolute top-2 right-2 size-2 rounded-full bg-[var(--color-danger)]',
+  // Account sits last, under a rule
+  divider: 'h-px border-0 bg-[var(--color-border)]',
+  account:
+    'flex min-h-11 items-center gap-3 rounded-[var(--radius-lg)] px-3 text-left text-body font-semibold transition-colors hover:bg-[var(--color-surface)]',
+  accountName: 'min-w-0 flex-1 truncate',
 } as const
 
 /**
@@ -188,8 +193,6 @@ export const TOP_BAR = {
   menuButton:
     'flex size-11 items-center justify-center rounded-full text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
   menuIcon: 'size-6',
-  moreButton:
-    'flex size-11 items-center justify-center text-[var(--color-ink)] transition-opacity hover:opacity-70',
 } as const
 
 /**

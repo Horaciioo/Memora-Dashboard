@@ -3,6 +3,7 @@
 import Link from '@/components/elements/navigation/AppLink'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
+import { Avatar } from '@/components/elements/display/Avatar'
 import { BottomSheet } from '@/components/structures/BottomSheet'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { RailNav } from '@/composites/shell/RailNav'
@@ -16,12 +17,16 @@ import { ICONS } from '@/declarations/ui/icons'
 import { BOTTOM_SHEET } from '@/declarations/ui/variants'
 import { useTour } from '@/managers/front-end/TourManager'
 import type { ViewContext } from '@/types/access'
+import type { SessionUser } from '@/types/auth'
 
 export interface NavSheetProps {
   open: boolean
   viewContext: ViewContext
   unreadCount: number
+  session: SessionUser
   onClose: () => void
+  // Opens the account box
+  onAccount: () => void
 }
 
 /**
@@ -30,11 +35,20 @@ export interface NavSheetProps {
  * @param {boolean} open - Sheet is mounted
  * @param {ViewContext} viewContext - View resolved server-side
  * @param {number} unreadCount - Unopened notifications resolved server-side
+ * @param {SessionUser} session - Signed-in member
  * @param {() => void} onClose - Dismiss handler
+ * @param {() => void} onAccount - Opens the account box
  * @return {JSX.Element | null}
  */
 
-export const NavSheet = ({ open, viewContext, unreadCount, onClose }: NavSheetProps) => {
+export const NavSheet = ({
+  open,
+  viewContext,
+  unreadCount,
+  session,
+  onClose,
+  onAccount,
+}: NavSheetProps) => {
   const pathname = usePathname()
   const { isTouring } = useTour()
   const { shortcuts, groups } = useRailEntries(viewContext)
@@ -85,6 +99,16 @@ export const NavSheet = ({ open, viewContext, unreadCount, onClose }: NavSheetPr
         </div>
         <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
         <RailNav groups={groups} isCompact={false} isTouring={isTouring} live={viewContext.live} />
+        <hr className={NAV_SHEET.divider} />
+        <button
+          type="button"
+          aria-label={NAV_COPY.account}
+          onClick={onAccount}
+          className={NAV_SHEET.account}
+        >
+          <Avatar name={session.displayName} src={session.avatarUrl} size="sm" />
+          <span className={NAV_SHEET.accountName}>{session.displayName}</span>
+        </button>
       </div>
     </BottomSheet>
   )

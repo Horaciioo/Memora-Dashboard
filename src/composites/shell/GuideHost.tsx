@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { useIsMobileShell } from '@/core/hooks/interaction/useBreakpoint'
 import { findVisibleBeacon } from '@/core/lib/beacons'
 import { GUIDE_COPY } from '@/declarations/academy/copy'
 import { GUIDE_PARAMS, PIM_DESTINATION_REGISTRY } from '@/declarations/academy/guides'
@@ -37,6 +38,7 @@ export const GuideHost = () => {
   const params = useSearchParams()
   const pathname = usePathname()
   const router = useRouter()
+  const isMobile = useIsMobileShell()
   const name = params.get(GUIDE_PARAMS.guide)
   const destination =
     name && PIM_DESTINATION_REGISTRY.has(name) ? PIM_DESTINATION_REGISTRY.get(name) : null
@@ -76,7 +78,7 @@ export const GuideHost = () => {
     return () => cancelAnimationFrame(frame)
   }, [mark])
 
-  if (!destination || !mark) return null
+  if (isMobile || !destination || !mark) return null
 
   // Drop the walkthrough from the address
   const close = () => {
