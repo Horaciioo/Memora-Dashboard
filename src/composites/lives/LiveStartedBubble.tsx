@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import { useIsMobileShell } from '@/core/hooks/interaction/useBreakpoint'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { liveStartedKey } from '@/declarations/academy/welcome'
@@ -25,6 +26,7 @@ export interface LiveStartedBubbleProps {
 
 export const LiveStartedBubble = ({ liveId }: LiveStartedBubbleProps) => {
   const router = useRouter()
+  const isMobile = useIsMobileShell()
   const [isClosed, setClosed] = useState(false)
 
   // Seen for good once gone
@@ -36,15 +38,17 @@ export const LiveStartedBubble = ({ liveId }: LiveStartedBubbleProps) => {
 
   // Folds by itself
   useEffect(() => {
+    if (isMobile) return
+
     const timer = window.setTimeout(() => {
       setClosed(true)
       void apiPost(API_ROUTES.seenGuide, { key: liveStartedKey(liveId) }).catch(() => null)
     }, BUBBLE_LIFE_MS)
 
     return () => window.clearTimeout(timer)
-  }, [liveId])
+  }, [liveId, isMobile])
 
-  if (isClosed) return null
+  if (isMobile || isClosed) return null
 
   return (
     <button

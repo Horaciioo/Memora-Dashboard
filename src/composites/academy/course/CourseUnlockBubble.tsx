@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { useIsMobileShell } from '@/core/hooks/interaction/useBreakpoint'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -26,11 +27,12 @@ export interface CourseUnlockBubbleProps {
 export const CourseUnlockBubble = ({ onOpen }: CourseUnlockBubbleProps) => {
   const router = useRouter()
   const { run } = useMutation()
+  const isMobile = useIsMobileShell()
   const [isClosed, setClosed] = useState(false)
   const Glyph = ICONS.spark
   const CloseIcon = ICONS.close
 
-  if (isClosed) return null
+  if (isMobile || isClosed) return null
 
   // Seen once, wherever it is closed
   const dismiss = async (open: boolean) => {

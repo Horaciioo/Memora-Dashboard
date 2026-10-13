@@ -239,7 +239,8 @@ export const CRITICAL_ERROR_STYLES = {
  */
 
 export const INFO_HINT = {
-  wrapper: 'group/info relative inline-flex shrink-0',
+  // Info marks only exist from md up
+  wrapper: 'group/info relative hidden shrink-0 md:inline-flex',
   trigger:
     'inline-flex items-center justify-center rounded-full transition-colors duration-[var(--motion-duration-fast)]',
   triggerTone:
