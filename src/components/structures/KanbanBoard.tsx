@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { AddRow } from '@/components/structures/AddRow'
-import { useMediaQuery } from '@/core/hooks/interaction/useBreakpoint'
+import { useIsMobileShell, useMediaQuery } from '@/core/hooks/interaction/useBreakpoint'
 import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
 import { ACTION_COPY } from '@/declarations/ui/copy'
+import { ICONS } from '@/declarations/ui/icons'
 import { accentVars } from '@/declarations/ui/theme'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
 import { useMenu, type MenuItem } from '@/managers/front-end'
@@ -87,13 +87,25 @@ export const KanbanBoard = <T extends BoardItem>({
   tintByColumn,
 }: KanbanBoardProps<T>) => {
   const { contextMenu } = useMenu()
-  const [picked, setPicked] = useState<string | null>(null)
+  // Lanes folded on a phone until opened
+  const [opened, setOpened] = useState<Set<string>>(new Set())
+  const isMobile = useIsMobileShell()
+  const ChevronIcon = ICONS.expand
   // A finger cannot drag a card across lanes, the menu moves it instead
   const isTouch = useMediaQuery(COARSE_POINTER_QUERY)
-  const shown = columns.some((column) => column.id === picked) ? picked : columns[0]?.id
   const { over, itemProps, containerProps } = useDragAndDrop((item, container, index) =>
     onMove(item.id, container, index)
   )
+
+  const toggleColumn = (id: string) =>
+    setOpened((current) => {
+      const next = new Set(current)
+
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+
+      return next
+    })
 
   const menuOf = (item: T, current: string): MenuItem[] => [
     ...(cardMenu?.(item) ?? []),
@@ -112,16 +124,9 @@ export const KanbanBoard = <T extends BoardItem>({
 
   return (
     <div className={BOARD_STYLES.scroller}>
-      <div className={BOARD_STYLES.picker}>
-        <SegmentedControl
-          label={ACTION_COPY.columns}
-          value={shown ?? ''}
-          options={columns.map((column) => ({ value: column.id, label: column.label }))}
-          onChange={setPicked}
-        />
-      </div>
       {columns.map((column) => {
         const cards = items.filter((item) => item.columnId === column.id)
+        const isOpen = opened.has(column.id)
 
         // Both surfaces read the same --accent
         const accentStyle = tintByColumn ? accentVars(column.accent) : undefined
@@ -132,44 +137,59 @@ export const KanbanBoard = <T extends BoardItem>({
             style={accentStyle}
             className={cn(
               BOARD_STYLES.column,
-              column.id === shown ? BOARD_STYLES.columnShown : BOARD_STYLES.columnHidden,
+              BOARD_STYLES.columnShown,
               tintByColumn && BOARD_STYLES.columnTint
             )}
           >
             <header className={BOARD_STYLES.columnHead}>
-              <span className={BOARD_STYLES.columnTitle}>{column.label}</span>
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                onClick={() => toggleColumn(column.id)}
+                className={BOARD_STYLES.columnToggle}
+              >
+                <span className={BOARD_STYLES.columnTitle}>{column.label}</span>
+                <ChevronIcon
+                  className={cn(BOARD_STYLES.columnChevron, !isOpen && '-rotate-90')}
+                  aria-hidden="true"
+                />
+              </button>
             </header>
-            <div
-              className={cn(BOARD_STYLES.body, over === column.id && 'is-drop-target')}
-              {...(canMove ? containerProps(column.id) : {})}
-            >
-              {cards.map((item, index) => (
-                <article
-                  key={item.id}
-                  data-drop-index={index}
-                  tabIndex={onOpen ? 0 : undefined}
-                  onClick={onOpen ? () => onOpen(item) : undefined}
-                  onKeyDown={
-                    onOpen
-                      ? (event) => {
-                          if (event.key === 'Enter') onOpen(item)
-                        }
-                      : undefined
-                  }
-                  onContextMenu={
-                    cardMenu || isTouch ? contextMenu(menuOf(item, column.id)) : undefined
-                  }
-                  style={accentStyle}
-                  className={cn(
-                    BOARD_STYLES.card,
-                    tintByColumn ? BOARD_STYLES.cardTint : BOARD_STYLES.cardGlass
-                  )}
-                  {...(canMove && !isTouch ? itemProps({ id: item.id, from: column.id }) : {})}
+            <div className="fold fold-wide" data-open={isOpen} inert={isMobile && !isOpen}>
+              <div>
+                <div
+                  className={cn(BOARD_STYLES.body, over === column.id && 'is-drop-target')}
+                  {...(canMove ? containerProps(column.id) : {})}
                 >
-                  {renderCard(item)}
-                </article>
-              ))}
-              {canCreate && <AddRow label={addLabel} onClick={() => onCreate(column.id)} />}
+                  {cards.map((item, index) => (
+                    <article
+                      key={item.id}
+                      data-drop-index={index}
+                      tabIndex={onOpen ? 0 : undefined}
+                      onClick={onOpen ? () => onOpen(item) : undefined}
+                      onKeyDown={
+                        onOpen
+                          ? (event) => {
+                              if (event.key === 'Enter') onOpen(item)
+                            }
+                          : undefined
+                      }
+                      onContextMenu={
+                        cardMenu || isTouch ? contextMenu(menuOf(item, column.id)) : undefined
+                      }
+                      style={accentStyle}
+                      className={cn(
+                        BOARD_STYLES.card,
+                        tintByColumn ? BOARD_STYLES.cardTint : BOARD_STYLES.cardGlass
+                      )}
+                      {...(canMove && !isTouch ? itemProps({ id: item.id, from: column.id }) : {})}
+                    >
+                      {renderCard(item)}
+                    </article>
+                  ))}
+                  {canCreate && <AddRow label={addLabel} onClick={() => onCreate(column.id)} />}
+                </div>
+              </div>
             </div>
           </section>
         )

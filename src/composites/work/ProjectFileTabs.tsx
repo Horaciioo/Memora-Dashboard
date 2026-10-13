@@ -38,6 +38,7 @@ import { useRecordFile } from '@/core/hooks/data/useRecordFile'
 import { ROUTES } from '@/declarations/navigation'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { ACTION_COPY, FIELD_COPY, feedbackTitle } from '@/declarations/ui/copy'
+import { accentVars } from '@/declarations/ui/theme'
 import { LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -457,7 +458,10 @@ export const ProjectFileTabs = ({
         title={done ? TASK_COPY.validated : TASK_COPY.validate}
         aria-pressed={done}
         disabled={done || !doneStateId || !canValidateTasks || workItem.isSaving}
-        className={cn(!done && 'opacity-40 grayscale hover:opacity-100 hover:grayscale-0')}
+        className={cn(
+          '-mr-1.5 -ml-1 md:m-0',
+          !done && 'opacity-40 grayscale hover:opacity-100 hover:grayscale-0'
+        )}
         onClick={() => void validateTask(task)}
       />
     )
@@ -470,31 +474,33 @@ export const ProjectFileTabs = ({
     (a, b) => Number(isValidated(a)) - Number(isValidated(b))
   )
 
-  // Shared task row body: on a phone the owner stands over the title
+  // Shared task row body
   const taskLine = (task: TaskSummary) => (
     <>
-      <span className="flex min-w-0 flex-1 flex-col gap-1 md:flex-row md:items-center md:gap-3">
-        {task.owner && (
-          <span className="flex items-center gap-1.5 text-xs text-[var(--color-ink-subtle)] md:order-2">
-            <span className="md:hidden">
-              <Avatar name={task.owner.name} src={task.owner.src} size="xs" />
-            </span>
-            {task.owner.name}
-          </span>
-        )}
-        <span className="flex min-w-0 flex-1 items-center gap-2 md:order-1 md:gap-3">
-          <Glyph value={task.emoji} size="row" />
-          <span
-            className={cn(
-              'min-w-0 flex-1 truncate font-medium',
-              isValidated(task) && 'text-[var(--color-ink-subtle)] line-through'
-            )}
-          >
-            {task.title}
-          </span>
+      <span className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
+        <Glyph value={task.emoji} size="row" />
+        <span
+          className={cn(
+            'min-w-0 flex-1 truncate font-medium',
+            isValidated(task) && 'text-[var(--color-ink-subtle)] line-through'
+          )}
+        >
+          {task.title}
         </span>
       </span>
-      {task.state && <Status label={task.state.label} accent={task.state.accent} />}
+      {task.owner && (
+        <span className="flex items-center gap-1.5 text-xs text-[var(--color-ink-subtle)]">
+          <span className="md:hidden">
+            <Avatar name={task.owner.name} src={task.owner.src} size="xs" />
+          </span>
+          <span className={LIST_STYLES.desktopOnly}>{task.owner.name}</span>
+        </span>
+      )}
+      {task.state && (
+        <span className={LIST_STYLES.desktopOnly}>
+          <Status label={task.state.label} accent={task.state.accent} />
+        </span>
+      )}
     </>
   )
 
@@ -503,7 +509,7 @@ export const ProjectFileTabs = ({
     <>
       <Glyph value={meeting.emoji} size="row" />
       <span className="min-w-0 flex-1 truncate font-medium">{meeting.title}</span>
-      <span className="text-xs text-[var(--color-ink-subtle)]">
+      <span className={cn('text-xs text-[var(--color-ink-subtle)]', LIST_STYLES.desktopOnly)}>
         {formatDayTime(meeting.scheduledAt)}
       </span>
       <AvatarStack people={meeting.participants} />
@@ -532,8 +538,10 @@ export const ProjectFileTabs = ({
           {orderedTasks.map((task) => (
             <div
               key={task.id}
+              style={accentVars(task.state?.accent)}
               className={cn(
                 LIST_STYLES.item,
+                LIST_STYLES.itemAccent,
                 canReadTasks && LIST_STYLES.itemClickable,
                 isValidated(task) && 'opacity-60'
               )}
@@ -543,12 +551,14 @@ export const ProjectFileTabs = ({
                 <button
                   type="button"
                   onClick={() => router.push(ROUTES.task(task.id))}
-                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                  className="flex min-w-0 flex-1 items-center gap-1.5 text-left md:gap-3"
                 >
                   {taskLine(task)}
                 </button>
               ) : (
-                <div className="flex min-w-0 flex-1 items-center gap-3">{taskLine(task)}</div>
+                <div className="flex min-w-0 flex-1 items-center gap-1.5 md:gap-3">
+                  {taskLine(task)}
+                </div>
               )}
             </div>
           ))}
@@ -648,7 +658,7 @@ export const ProjectFileTabs = ({
           {
             value: 'communication',
             label: PROJECT_COPY.tabCommunication,
-            icon: 'discord',
+            icon: 'pencil',
             visible: canReadCommunications,
             render: communicationTab,
           },
