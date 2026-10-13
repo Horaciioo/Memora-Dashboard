@@ -544,6 +544,9 @@ export const PAGE_OPTIONS = {
   title:
     'px-2.5 pt-1.5 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   row: 'flex items-center justify-between gap-4 rounded-[var(--radius-md)] px-2.5 py-2 font-semibold',
+  // Block drawn on a phone only, scrolls inside the panel
+  content: 'flex max-h-[60dvh] flex-col gap-2 overflow-y-auto px-2.5 py-2 md:hidden',
+  contentTitle: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   // Many choices take the line under their label
   rowStacked:
     'flex-col items-stretch gap-2 [&_[role=group]]:w-full [&_[role=group]>button]:flex-1 [&_[role=group]>button]:px-2',

@@ -5,6 +5,8 @@ import { useCallback, useEffect, useMemo, useState, ViewTransition } from 'react
 
 import { Button } from '@/components/elements/actions/Button'
 import { PageHeader } from '@/components/structures/PageHeader'
+import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
+import { CourseRail } from '@/composites/academy/course/CourseRail'
 import { CourseComplete } from '@/composites/academy/course/CourseComplete'
 import {
   CourseContextProvider,
@@ -14,6 +16,7 @@ import { CourseIntro } from '@/composites/academy/course/CourseIntro'
 import { CourseOutro } from '@/composites/academy/course/CourseOutro'
 import { CourseScreen } from '@/composites/academy/course/CourseScreen'
 import { useCourse } from '@/core/hooks/data/useCourse'
+import type { CourseRailState } from '@/core/hooks/interaction/useCourseRail'
 import { publishCourseRail } from '@/core/hooks/interaction/useCourseRail'
 import { stepsOf } from '@/core/lib/academy/courseSteps'
 import { fillCreator } from '@/core/lib/academy/creator'
@@ -126,8 +129,8 @@ export const CoursePlayer = ({
   )
 
   // The sidebar only ever goes back
-  useEffect(() => {
-    publishCourseRail({
+  const railState = useMemo<CourseRailState>(
+    () => ({
       courseName: course.name,
       surfaceLabel: surface.label,
       backHref,
@@ -143,24 +146,38 @@ export const CoursePlayer = ({
       onSelect: (index) => {
         if (index < current) goTo(index)
       },
-    })
-  }, [
-    backHref,
-    backLabel,
-    chapters,
-    course.name,
-    current,
-    goStep,
-    goTo,
-    run.finished,
-    step,
-    steps,
-    surface.label,
-  ])
+    }),
+    [
+      backHref,
+      backLabel,
+      chapters,
+      course.name,
+      current,
+      goStep,
+      goTo,
+      run.finished,
+      step,
+      steps,
+      surface.label,
+    ]
+  )
+
+  useEffect(() => {
+    publishCourseRail(railState)
+  }, [railState])
 
   useEffect(() => () => publishCourseRail(null), [])
 
   const reviewed = Boolean(trainingId)
+
+  // Where the reader stands, on a phone
+  const pageOptions: PageOption[] = [
+    {
+      id: 'progress',
+      label: COURSE_COPY.chapters,
+      render: () => <CourseRail rail={railState} />,
+    },
+  ]
 
   const open = (next: 'intro' | 'chapters' | 'outro') => {
     setPage(next)
@@ -170,6 +187,7 @@ export const CoursePlayer = ({
   return (
     <CourseContextProvider value={context ?? EMPTY_COURSE_CONTEXT}>
       <PageHeader title={course.name} />
+      <PageOptions options={pageOptions} />
       <div className={COURSE_PLAYER.page}>
         <Link href={backHref} className={COURSE_PLAYER.back}>
           <BackIcon className="h-4 w-4" aria-hidden="true" />
