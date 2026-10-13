@@ -70,6 +70,39 @@ export const RecruitmentsPanel = ({
   const [editing, setEditing] = useState<RecruitmentSummary | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<RecruitmentSummary | null>(null)
 
+  const openCreate = () => {
+    clearIssues()
+    setCreating(true)
+  }
+
+  const sessionMenu = (entry: RecruitmentSummary): MenuItem[] => [
+    {
+      id: 'open',
+      label: ACTION_COPY.open,
+      icon: 'forward',
+      onSelect: () => router.push(ROUTES.recruitment(entry.id)),
+    },
+    {
+      id: 'edit',
+      label: ACTION_COPY.edit,
+      icon: 'edit',
+      disabled: !canManage,
+      onSelect: () => {
+        clearIssues()
+        setEditing(entry)
+      },
+    },
+    {
+      id: 'delete',
+      label: ACTION_COPY.delete,
+      icon: 'remove',
+      danger: true,
+      separatorBefore: true,
+      disabled: !canManage,
+      onSelect: () => setPendingDeletion(entry),
+    },
+  ]
+
   // Heaviest state first, finished ones only on request
   const groups: RowListGroup[] = STATUS_ORDER.filter(
     (status) => showFinished || !FINISHED_RECRUITMENT_STATUSES.includes(status)
@@ -104,39 +137,6 @@ export const RecruitmentsPanel = ({
         },
       ]
     : []
-
-  const openCreate = () => {
-    clearIssues()
-    setCreating(true)
-  }
-
-  const sessionMenu = (entry: RecruitmentSummary): MenuItem[] => [
-    {
-      id: 'open',
-      label: ACTION_COPY.open,
-      icon: 'forward',
-      onSelect: () => router.push(ROUTES.recruitment(entry.id)),
-    },
-    {
-      id: 'edit',
-      label: ACTION_COPY.edit,
-      icon: 'edit',
-      disabled: !canManage,
-      onSelect: () => {
-        clearIssues()
-        setEditing(entry)
-      },
-    },
-    {
-      id: 'delete',
-      label: ACTION_COPY.delete,
-      icon: 'remove',
-      danger: true,
-      separatorBefore: true,
-      disabled: !canManage,
-      onSelect: () => setPendingDeletion(entry),
-    },
-  ]
 
   const drawers = () => (
     <>
