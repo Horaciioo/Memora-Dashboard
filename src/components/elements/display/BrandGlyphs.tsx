@@ -1379,6 +1379,30 @@ export const NoteGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
+ * Pencil
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const PencilGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    render={({ fill, lift, deep, cut }) => (
+      <>
+        <path d="M14 5l5 5L8.6 20.4 3.6 15.4z" fill={fill} />
+        <path
+          d="M14 5l1.7-1.7a1.9 1.9 0 0 1 2.7 0l2.3 2.3a1.9 1.9 0 0 1 0 2.7L19 10z"
+          fill={lift}
+        />
+        <path d="M3.6 15.4l5 5L2.4 21.6z" fill={deep} />
+        <path d="M10.6 8.4l5 5" stroke={cut} strokeWidth="1.4" strokeLinecap="round" />
+        <path d="M13 21.2h8" stroke={fill} strokeWidth="1.6" strokeLinecap="round" />
+      </>
+    )}
+  />
+)
+
+/**
  * Discord
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}

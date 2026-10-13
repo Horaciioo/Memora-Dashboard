@@ -111,8 +111,12 @@ export const FormDrawer = ({
     missing: [] as FieldIssue[],
   }))
 
+  // Phone shows the result in place of the fields
+  const [showAside, setShowAside] = useState(false)
+
   // Reopening always starts from the record being edited
   if (draft.open !== open) {
+    setShowAside(false)
     setDraft({ open, values: open ? startValues() : draft.values, missing: [] })
   }
 
@@ -180,7 +184,7 @@ export const FormDrawer = ({
     if (accepted) onClose()
   }
 
-  const NextIcon = ICONS.next
+  const NextIcon = ICONS.forward
   const SaveIcon = ICONS.confirm
   const CancelIcon = ICONS.close
   const BackIcon = ICONS.back
@@ -210,14 +214,33 @@ export const FormDrawer = ({
       icon={subject.icon}
       description={description}
       subheader={
-        groups.length > 1 && (
-          <Tabs
-            items={tabs}
-            value={current?.name ?? ''}
-            label={FORM_COPY.categories}
-            emphasis
-            onChange={goTo}
-          />
+        (groups.length > 1 || aside) && (
+          <div className={DRAWER_STYLES.subheaderRow}>
+            {groups.length > 1 && (
+              <div className={DRAWER_STYLES.subheaderTabs}>
+                <Tabs
+                  items={tabs}
+                  value={current?.name ?? ''}
+                  label={FORM_COPY.categories}
+                  emphasis
+                  onChange={(group) => {
+                    setShowAside(false)
+                    goTo(group)
+                  }}
+                />
+              </div>
+            )}
+            {aside && (
+              <button
+                type="button"
+                aria-pressed={showAside}
+                onClick={() => setShowAside(!showAside)}
+                className={cn(DRAWER_STYLES.asideToggle, showAside && DRAWER_STYLES.asideToggleOn)}
+              >
+                {aside.label}
+              </button>
+            )}
+          </div>
         )
       }
       footer={
@@ -288,13 +311,15 @@ export const FormDrawer = ({
     >
       {aside ? (
         <div className={DRAWER_STYLES.split}>
-          {section}
+          <div className={cn(showAside && 'hidden md:block')}>{section}</div>
           <div className={DRAWER_STYLES.splitDivider} aria-hidden="true" />
-          <div className={FIELD_STYLES.wrapper}>
-            <span className={FIELD_STYLES.labelRow}>
-              <span className={FIELD_STYLES.label}>{aside.label}</span>
-            </span>
-            {aside.render(values)}
+          <div className={cn(!showAside && 'hidden md:block')}>
+            <div className={FIELD_STYLES.wrapper}>
+              <span className={FIELD_STYLES.labelRow}>
+                <span className={FIELD_STYLES.label}>{aside.label}</span>
+              </span>
+              {aside.render(values)}
+            </div>
           </div>
         </div>
       ) : (
