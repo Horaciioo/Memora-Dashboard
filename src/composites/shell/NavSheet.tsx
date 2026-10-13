@@ -10,7 +10,7 @@ import { RailShortcuts } from '@/composites/shell/RailShortcuts'
 import { RoleSwitch } from '@/composites/shell/RoleSwitch'
 import { useRailEntries } from '@/core/hooks/interaction/useRailEntries'
 import { ROUTES } from '@/declarations/navigation'
-import { NAV_SHEET } from '@/declarations/ui/blocks'
+import { NAV_SHEET, SEARCH_LAUNCHER } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { BOTTOM_SHEET } from '@/declarations/ui/variants'
@@ -72,14 +72,19 @@ export const NavSheet = ({ open, viewContext, unreadCount, onClose }: NavSheetPr
             <RoleSwitch viewContext={viewContext} />
           </div>
         )}
-        <SearchLauncher expanded />
+        <div className={NAV_SHEET.searchRow}>
+          <SearchLauncher expanded className={SEARCH_LAUNCHER.sheetBar} />
+          <Link
+            href={ROUTES.notifications}
+            aria-label={NAV_COPY.notifications}
+            className={NAV_SHEET.notifications}
+          >
+            <BellIcon className={NAV_SHEET.notificationsIcon} aria-hidden="true" />
+            {unreadCount > 0 && <span className={NAV_SHEET.dot} aria-hidden="true" />}
+          </Link>
+        </div>
         <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
         <RailNav groups={groups} isCompact={false} isTouring={isTouring} live={viewContext.live} />
-        <Link href={ROUTES.notifications} className={NAV_SHEET.notifications}>
-          <BellIcon className={NAV_SHEET.notificationsIcon} aria-hidden="true" />
-          {NAV_COPY.notifications}
-          {unreadCount > 0 && <span className={NAV_SHEET.dot} aria-hidden="true" />}
-        </Link>
       </div>
     </BottomSheet>
   )

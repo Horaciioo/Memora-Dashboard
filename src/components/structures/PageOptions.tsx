@@ -80,6 +80,10 @@ export const PageOptions = ({ options }: PageOptionsProps) => {
       </button>
 
       {isOpen && (
+        <div className={PAGE_OPTIONS.backdrop} aria-hidden="true" onClick={() => setOpen(false)} />
+      )}
+
+      {isOpen && (
         <div role="group" aria-label={PAGE_OPTIONS_COPY.title} className={PAGE_OPTIONS.panel}>
           <p className={PAGE_OPTIONS.title}>{PAGE_OPTIONS_COPY.title}</p>
           {options.map((option) => (

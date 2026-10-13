@@ -53,6 +53,13 @@ export const BottomSheet = ({ open, onClose, title, figure, children }: BottomSh
             : undefined
         }
       >
+        <Button
+          variant="icon"
+          icon="close"
+          onClick={onClose}
+          aria-label={ACTION_COPY.close}
+          className={BOTTOM_SHEET.close}
+        />
         {figure && <div className={BOTTOM_SHEET.figure}>{figure}</div>}
         <h2 id={titleId} className="sr-only">
           {title}
@@ -61,13 +68,6 @@ export const BottomSheet = ({ open, onClose, title, figure, children }: BottomSh
           <div className={BOTTOM_SHEET.grip} {...drag.handlers}>
             <span className={BOTTOM_SHEET.gripBar} aria-hidden="true" />
           </div>
-          <Button
-            variant="icon"
-            icon="close"
-            onClick={onClose}
-            aria-label={ACTION_COPY.close}
-            className={BOTTOM_SHEET.close}
-          />
           <div className={BOTTOM_SHEET.body}>{children}</div>
         </div>
       </div>
