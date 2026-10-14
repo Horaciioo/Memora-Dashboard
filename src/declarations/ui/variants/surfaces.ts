@@ -35,15 +35,16 @@ export const PAGE_STYLES = {
   bannerOptions: 'absolute top-3 right-3 z-10 sm:top-4 sm:right-4',
   // Title and note laid over the foot of the photograph
   bannerFoot:
-    'absolute inset-x-0 bottom-0 flex flex-col gap-1.5 px-5 pb-5 text-[var(--color-on-media)] sm:px-8 sm:pb-7',
-  bannerTitleRow: 'flex min-w-0 items-center gap-3',
+    'absolute inset-x-0 bottom-0 flex flex-col gap-1.5 px-5 pb-3 text-[var(--color-on-media)] sm:px-8 sm:pb-7',
+  bannerTitleRow: 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 md:flex-nowrap',
   // Letters fade out towards their foot
   bannerTitle:
-    'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-5xl leading-none font-bold tracking-tight text-transparent uppercase italic md:text-8xl',
-  bannerTitleText: 'min-w-0 pr-2 text-balance md:truncate',
+    'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-[clamp(1.5rem,8vw,2.25rem)] leading-none font-bold tracking-tight text-transparent uppercase italic sm:text-5xl md:text-6xl xl:text-8xl',
+  bannerTitleText:
+    'line-clamp-1 min-w-0 pr-2 text-balance [overflow-wrap:anywhere] md:[overflow-wrap:normal]',
   // Faint two-to-six word line under the title
   bannerHero:
-    'relative -mt-2 text-base leading-none font-bold tracking-tight text-balance text-[var(--color-on-media)] uppercase italic drop-shadow-[0_1px_6px_rgb(0_0_0/0.45)] md:-mt-4 md:text-2xl',
+    'relative -mt-1 text-xs leading-none font-bold tracking-tight text-balance text-[var(--color-on-media)] uppercase italic drop-shadow-[0_1px_6px_rgb(0_0_0/0.45)] md:-mt-4 md:text-2xl',
   // Very small line under the title
   bannerNote: 'flex text-xs font-medium',
   // Tab strip centred under the photograph, empty on most pages
@@ -132,16 +133,39 @@ export type GlyphSize = keyof Omit<typeof GLYPH_STYLES, 'base'>
 
 export const DIALOG_STYLES = {
   overlay:
-    'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-scrim)] backdrop-blur-sm sm:items-center sm:p-6',
+    'overlay-enter fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-scrim)] p-4 backdrop-blur-sm sm:p-6',
   panel:
-    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/90 shadow-[var(--shadow-lg)] backdrop-blur-2xl backdrop-saturate-150 sm:rounded-[var(--radius-xl)]',
+    'surface-enter relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/90 shadow-[var(--shadow-lg)] backdrop-blur-2xl backdrop-saturate-150',
   // Line under the banner
-  subheader: 'px-6 pt-4 sm:px-8',
-  body: 'flex-1 overflow-y-auto border-t border-[var(--color-border)] px-6 py-6 sm:px-8',
+  subheader: 'px-5 pt-4 sm:px-8',
+  body: 'flex-1 overflow-y-auto border-t border-[var(--color-border)] px-5 py-5 sm:px-8 sm:py-6',
   // Tabs already rule the top
   bodyFlush: 'border-t-0 pt-1',
   footer:
-    'flex flex-wrap items-center justify-end gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface-sunken)]/40 px-6 py-4 sm:px-8',
+    'flex flex-wrap items-center justify-end gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface-sunken)]/40 px-5 py-3 sm:px-8 sm:py-4',
+} as const
+
+/**
+ * Floating sheet rising from the bottom edge
+ * @type {Record<string, string>}
+ */
+
+export const BOTTOM_SHEET = {
+  overlay:
+    'overlay-enter fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-scrim)] px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur-lg md:hidden',
+  frame: 'sheet-enter relative flex w-full max-w-lg flex-col items-center gap-4',
+  // Title laid on the scrim, over the panel
+  figure: 'w-full px-12 text-center text-[var(--color-on-media)]',
+  panel:
+    'relative flex max-h-[calc(100dvh-9rem)] w-full flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--glass-line)] bg-[var(--color-surface-raised)]/95 shadow-[var(--shadow-lg)]',
+  // Pulled down to close
+  grip: 'flex shrink-0 cursor-grab touch-none justify-center pt-2.5 pb-1',
+  gripBar: 'h-1 w-10 rounded-full bg-[var(--color-ink)]/20',
+  close: 'absolute -top-1 right-0 !text-[var(--color-on-media)] hover:!bg-white/15',
+  body: 'min-h-0 flex-1 overflow-y-auto p-4',
+  figureTitle:
+    'text-4xl leading-none font-bold tracking-tight uppercase italic drop-shadow-[0_2px_10px_rgb(0_0_0/0.5)]',
+  figureLine: 'text-sm font-medium opacity-80 drop-shadow-[0_1px_6px_rgb(0_0_0/0.5)]',
 } as const
 
 /**
@@ -168,14 +192,20 @@ export const DRAWER_STYLES = {
   // Dims the page window only
   overlay:
     'overlay-enter fixed inset-0 z-[45] bg-[var(--color-scrim)] md:inset-y-3 md:right-3 md:left-[var(--shell-sidebar-w)] md:rounded-[var(--radius-xl)]',
-  // Bottom sheet on mobile, floating card from md
+  // Floating sheet rising from the bottom on mobile, side card from md
   panel:
-    'drawer-enter fixed inset-x-0 bottom-0 z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-t-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
+    'drawer-enter fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-50 flex h-[var(--drawer-mobile-h)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)] md:top-0 md:right-[var(--drawer-page-right)] md:bottom-0 md:left-auto md:my-auto md:h-[var(--drawer-page-h)] md:w-[var(--drawer-page-w)] md:rounded-[var(--radius-xl)]',
   // Wider footprint from md
   wide: 'md:w-[var(--drawer-page-wide-w)]',
   // Form on the left, live result on the right, same width and height
   split:
     'flex min-h-full flex-col gap-6 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-x-8',
+  // Tabs and the result switch share a line
+  subheaderRow: 'flex items-center justify-between gap-3',
+  subheaderTabs: 'min-w-0 flex-1',
+  asideToggle:
+    'min-h-11 shrink-0 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] px-3 text-xs font-semibold text-[var(--color-ink-subtle)] md:hidden',
+  asideToggleOn: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   splitDivider: 'hidden w-px self-stretch bg-[var(--color-border)] md:block',
   // Section tabs under the header
   sections: 'shrink-0 px-6 pb-2',
@@ -192,20 +222,22 @@ export const DRAWER_STYLES = {
  */
 
 export const DRAWER_ACTIONS = {
-  stack: 'flex flex-col gap-2 p-1',
+  // One row of glyphs on a phone, stacked lines from md
+  stack: 'flex items-center gap-2 p-1 md:flex-col md:items-stretch',
   // Previous at the far left
-  steps: 'flex items-center justify-between gap-2',
-  step: 'group flex min-w-0 items-center gap-1 rounded-[var(--radius-md)] px-2 py-2.5 text-sm font-bold transition-colors hover:bg-[var(--color-hover)]',
+  steps: 'contents md:flex md:items-center md:justify-between md:gap-2',
+  step: 'group flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-full px-2 text-sm font-bold transition-colors hover:bg-[var(--color-hover)] md:min-h-0 md:min-w-0 md:justify-start md:rounded-[var(--radius-md)] md:py-2.5',
   stepBack: 'mr-auto',
   stepNext: 'ml-auto',
-  stepLabel: 'min-w-0 truncate',
-  stepIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-accent)]',
+  stepLabel: 'hidden min-w-0 truncate md:block',
+  stepIcon: 'h-5 w-5 shrink-0 text-[var(--color-ink-accent)] md:h-4 md:w-4',
   // Filled gestures
-  line: 'flex w-full items-center justify-center gap-2.5 rounded-[var(--radius-md)] px-4 py-3 text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60',
+  line: 'flex size-11 shrink-0 items-center justify-center gap-2.5 rounded-full text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60 md:size-auto md:w-full md:rounded-[var(--radius-md)] md:px-4 md:py-3',
+  lineLabel: 'hidden md:inline',
   save: 'bg-[var(--color-success)]',
   cancel: 'bg-[var(--color-danger)]',
-  icon: 'h-4.5 w-4.5 shrink-0',
-  divider: 'mx-1 h-px bg-[var(--color-border)]',
+  icon: 'h-5 w-5 shrink-0 md:h-4.5 md:w-4.5',
+  divider: 'mx-1 hidden h-px bg-[var(--color-border)] md:block',
   note: 'mb-4 text-sm text-[var(--color-ink-subtle)]',
 } as const
 
@@ -217,7 +249,7 @@ export const DRAWER_ACTIONS = {
 export const MENU_STYLES = {
   panel:
     'surface-enter fixed z-[70] min-w-52 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel py-1 shadow-[var(--shadow-lg)]',
-  item: 'flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-40',
+  item: 'flex min-h-11 w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-surface)] disabled:pointer-events-none disabled:opacity-40 md:min-h-0',
   danger: 'text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
   icon: 'h-4 w-4 shrink-0 opacity-70',
   separator: 'my-1 h-px bg-[var(--color-border)]',
@@ -234,7 +266,7 @@ export const TABS_STYLES = {
   list: 'relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-full glass-soft p-1',
   // Strip centred over its panel from sm
   listCentered: 'sm:mx-auto',
-  tab: 'relative z-10 shrink-0 rounded-full px-3 py-1.5 text-sm font-medium sm:px-3.5 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  tab: 'relative z-10 min-h-11 shrink-0 rounded-full px-3 py-1.5 text-sm font-medium sm:px-3.5 md:min-h-0 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // Open tab sits on the white pill
   active:
     'font-semibold text-[var(--color-ink)] hover:bg-transparent hover:text-[var(--color-ink)]',
@@ -246,10 +278,10 @@ export const TABS_STYLES = {
   arrive: 'tab-arrive',
   panel: 'pt-4',
   content: 'flex items-center',
-  icon: 'h-4 w-4 shrink-0',
+  icon: 'h-5 w-5 shrink-0 md:h-4 md:w-4',
   label: 'whitespace-nowrap',
-  // Gap folds away with the label
-  labelBeside: 'pl-1.5',
+  // A tab with a glyph shows no words on a phone, the name stays on its aria-label
+  labelBeside: 'hidden pl-1.5 md:inline',
 } as const
 
 /**
@@ -338,7 +370,8 @@ export const INLINE_EDIT_STYLES = {
  */
 
 export const PREFERENCE_STYLES = {
-  layout: 'mx-auto grid w-full max-w-5xl items-start gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]',
+  layout:
+    'mx-auto grid grid-cols-1 w-full max-w-5xl items-start gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]',
   stack: 'flex flex-col gap-6',
   rows: 'flex flex-col divide-y divide-[var(--color-border)]',
   row: 'flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0',
@@ -466,8 +499,7 @@ export const ONBOARDING_STYLES = {
  */
 
 export const INTEGRATION_STEP_STYLES = {
-  frame:
-    'mt-2 flex w-full flex-col gap-3 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)] p-3',
+  frame: 'mt-1 flex w-full flex-col gap-2',
   row: 'flex flex-wrap items-center gap-2',
   meta: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
 } as const
@@ -502,13 +534,18 @@ export const PAGE_OPTIONS = {
   host: 'relative',
   button:
     'glass-panel flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink)] transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] motion-reduce:transition-none',
-  buttonOpen: 'scale-105',
+  buttonOpen: 'relative z-[60] scale-105',
+  // Blurs the page behind on a phone
+  backdrop: 'fixed inset-0 z-[55] bg-[var(--color-scrim)]/30 backdrop-blur-sm md:hidden',
   icon: 'h-5 w-5',
   panel:
     'popover-enter glass-panel absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex w-72 flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
   title:
     'px-2.5 pt-1.5 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   row: 'flex items-center justify-between gap-4 rounded-[var(--radius-md)] px-2.5 py-2 font-semibold',
+  // Block drawn on a phone only, scrolls inside the panel
+  content: 'flex max-h-[60dvh] flex-col gap-2 overflow-y-auto px-2.5 py-2 md:hidden',
+  contentTitle: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   // Many choices take the line under their label
   rowStacked:
     'flex-col items-stretch gap-2 [&_[role=group]]:w-full [&_[role=group]>button]:flex-1 [&_[role=group]>button]:px-2',

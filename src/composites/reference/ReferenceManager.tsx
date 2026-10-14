@@ -9,6 +9,7 @@ import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/Netwo
 import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
+import { DiscordIdentifierList } from '@/composites/discord/DiscordIdentifierList'
 import { AddRow } from '@/components/structures/AddRow'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { FormDrawer } from '@/components/structures/FormDrawer'
@@ -140,6 +141,18 @@ export const ReferenceManager = ({
           </Button>
         }
       />
+    ) : section.key === 'identifiants-discord' ? (
+      <DiscordIdentifierList
+        rows={rows}
+        canManage={canManage}
+        addLabel={`${ACTION_COPY.add} ${section.singular.toLowerCase()}`}
+        menu={rowMenu}
+        onEdit={(row) => {
+          clearIssues()
+          setEditing(row)
+        }}
+        onCreate={openCreate}
+      />
     ) : (
       <div
         className={cn(
@@ -195,9 +208,11 @@ export const ReferenceManager = ({
                 <span className="truncate text-xs text-[var(--color-ink-subtle)]">{row.hint}</span>
               )}
             </div>
-            <span className="shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums">
-              {`${row.usage} ${row.usage === 1 ? REFERENCE_COPY.usageOne : REFERENCE_COPY.usage}`}
-            </span>
+            {!section.noUsage && (
+              <span className="shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums">
+                {`${row.usage} ${row.usage === 1 ? REFERENCE_COPY.usageOne : REFERENCE_COPY.usage}`}
+              </span>
+            )}
           </div>
         ))}
         <AddRow

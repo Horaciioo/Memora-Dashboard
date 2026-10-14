@@ -23,7 +23,6 @@ export const viewport: Viewport = { viewportFit: 'cover' }
 // Chrome dimensions
 const SHELL_VARS = {
   '--shell-top-bar-h': `${SHELL_DIMENSIONS.topBar}px`,
-  '--shell-bottom-nav-h': `${SHELL_DIMENSIONS.bottomNav}px`,
   '--shell-sidebar-w': `${SHELL_DIMENSIONS.sidebar}px`,
   '--shell-banner-h': `${SHELL_DIMENSIONS.banner}px`,
   '--shell-banner-h-mobile': `${SHELL_DIMENSIONS.bannerMobile}px`,

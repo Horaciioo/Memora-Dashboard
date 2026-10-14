@@ -1,5 +1,6 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { setStepDone } from '@/core/services/recruitment/RecruitmentService'
+import { setStepDone, stepSession } from '@/core/services/recruitment/RecruitmentService'
+import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { Permissions } from '@/utils/constants/permissions'
 
 // Whether the step is being cleared or reopened
@@ -8,6 +9,18 @@ const DONE_FIELD = 'done'
 export const PATCH = createProtectedRoute({
   permission: Permissions.RecruitmentManage,
   descriptor: { summary: 'Clear or reopen a recruitment timeline step', tags: ['recruitment'] },
-  handler: async ({ params, raw, scope }) =>
-    setStepDone(params.id, raw[DONE_FIELD] === true, await scope()),
+  handler: async ({ params, raw, session, scope }) => {
+    const perimeter = await scope()
+    const step = await setStepDone(params.id, raw[DONE_FIELD] === true, perimeter)
+
+    await recordFileEvent({
+      eventType: 'RecruitmentStepMoved',
+      file: JOURNAL_FILES.Recruitment,
+      fileId: await stepSession(params.id, perimeter),
+      actorId: session.id,
+      summary: step.title,
+    })
+
+    return step
+  },
 })

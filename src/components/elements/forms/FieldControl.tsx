@@ -124,6 +124,9 @@ export const FieldControl = ({
       <DatePicker
         id={id}
         range
+        startsTimed={field.withTime}
+        dayOnly={field.dayOnly}
+        defaultTimes={field.defaultTimes}
         label={field.label}
         value={Array.isArray(value) ? value : []}
         disabled={disabled || field.readOnly}
@@ -141,6 +144,9 @@ export const FieldControl = ({
         label={field.label}
         value={typeof value === 'string' ? value : ''}
         withTime={field.kind === 'datetime'}
+        startsTimed={field.withTime}
+        dayOnly={field.dayOnly}
+        defaultTimes={field.defaultTimes}
         startYear={field.startYear}
         disabled={disabled || field.readOnly}
         invalid={invalid}

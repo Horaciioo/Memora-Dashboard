@@ -52,5 +52,45 @@
     "visibility": "ADMINS",
     "defaultMinutes": 120,
     "allDay": false
+  },
+  {
+    "name": "Entrevue Junior <> Formateurs",
+    "purpose": "TRAINER_INTERVIEW",
+    "kind": "EVENT",
+    "summary": "Point entre un Junior et un Formateur.",
+    "accent": "#6a9bd1",
+    "visibility": "RESPONSABLES",
+    "defaultMinutes": 30,
+    "allDay": false
+  },
+  {
+    "name": "Entrevue Junior <> Formateurs <> Responsables",
+    "purpose": "PANEL_INTERVIEW",
+    "kind": "EVENT",
+    "summary": "Point entre un Junior, un Formateur et des Responsables.",
+    "accent": "#e3c25a",
+    "visibility": "RESPONSABLES",
+    "defaultMinutes": 45,
+    "allDay": false
+  },
+  {
+    "name": "Bilan de fin de période 1",
+    "purpose": "REVIEW_ONE",
+    "kind": "EVENT",
+    "summary": "Bilan vocal qui clôt la période 1.",
+    "accent": "#6fc0b5",
+    "visibility": "RESPONSABLES",
+    "defaultMinutes": 60,
+    "allDay": false
+  },
+  {
+    "name": "Bilan de fin de période 2",
+    "purpose": "REVIEW_FINAL",
+    "kind": "EVENT",
+    "summary": "Bilan vocal qui clôt la période 2.",
+    "accent": "#d98ba6",
+    "visibility": "RESPONSABLES",
+    "defaultMinutes": 60,
+    "allDay": false
   }
 ]

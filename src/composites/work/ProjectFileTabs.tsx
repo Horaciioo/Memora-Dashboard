@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
@@ -10,6 +11,7 @@ import { OptionMark } from '@/components/elements/forms/OptionMark'
 import { CreatorLabels } from '@/components/elements/display/RecordLabel'
 import { pickedOptions } from '@/core/lib/forms/options'
 import { OverdueMark } from '@/composites/work/OverdueMark'
+import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
 import { AddRow } from '@/components/structures/AddRow'
@@ -37,6 +39,7 @@ import { useRecordFile } from '@/core/hooks/data/useRecordFile'
 import { ROUTES } from '@/declarations/navigation'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { ACTION_COPY, FIELD_COPY, feedbackTitle } from '@/declarations/ui/copy'
+import { accentVars } from '@/declarations/ui/theme'
 import { LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -51,6 +54,7 @@ import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
 import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { FieldDefinition, FormValues } from '@/types/forms'
+import { ANNOUNCEMENT_PARAM } from '@/declarations/work/announcements'
 import type { CommunicationEntry, MeetingSummary, ProjectDetail, TaskSummary } from '@/types/work'
 import { WorkflowPhases, WorkflowScopes } from '@/utils/constants/workflow'
 import { formatDay, formatDayTime } from '@/utils/format/dates'
@@ -129,7 +133,12 @@ export const ProjectFileTabs = ({
   const { contextMenu } = useMenu()
   const gestures = useEditGestures()
   const [isWriting, setWriting] = useState(false)
-  const [editing, setEditing] = useState<CommunicationEntry | null>(null)
+  // Arriving from the announcements page opens the announcement itself
+  const focused = useSearchParams().get(ANNOUNCEMENT_PARAM)
+  const [editing, setEditing] = useState<CommunicationEntry | null>(
+    () =>
+      (canWriteCommunications && detail.communications.find((row) => row.id === focused)) || null
+  )
   const [pendingDeletion, setPendingDeletion] = useState<CommunicationEntry | null>(null)
   const [dialog, setDialog] = useState<'task' | 'meeting' | null>(null)
 
@@ -456,7 +465,10 @@ export const ProjectFileTabs = ({
         title={done ? TASK_COPY.validated : TASK_COPY.validate}
         aria-pressed={done}
         disabled={done || !doneStateId || !canValidateTasks || workItem.isSaving}
-        className={cn(!done && 'opacity-40 grayscale hover:opacity-100 hover:grayscale-0')}
+        className={cn(
+          '-mr-1.5 -ml-1 md:m-0',
+          !done && 'opacity-40 grayscale hover:opacity-100 hover:grayscale-0'
+        )}
         onClick={() => void validateTask(task)}
       />
     )
@@ -472,19 +484,30 @@ export const ProjectFileTabs = ({
   // Shared task row body
   const taskLine = (task: TaskSummary) => (
     <>
-      <Glyph value={task.emoji} size="row" />
-      <span
-        className={cn(
-          'min-w-0 flex-1 truncate font-medium',
-          isValidated(task) && 'text-[var(--color-ink-subtle)] line-through'
-        )}
-      >
-        {task.title}
+      <span className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
+        <Glyph value={task.emoji} size="row" />
+        <span
+          className={cn(
+            'min-w-0 flex-1 truncate font-medium',
+            isValidated(task) && 'text-[var(--color-ink-subtle)] line-through'
+          )}
+        >
+          {task.title}
+        </span>
       </span>
       {task.owner && (
-        <span className="text-xs text-[var(--color-ink-subtle)]">{task.owner.name}</span>
+        <span className="flex items-center gap-1.5 text-xs text-[var(--color-ink-subtle)]">
+          <span className="md:hidden">
+            <Avatar name={task.owner.name} src={task.owner.src} size="xs" />
+          </span>
+          <span className={LIST_STYLES.desktopOnly}>{task.owner.name}</span>
+        </span>
       )}
-      {task.state && <Status label={task.state.label} accent={task.state.accent} />}
+      {task.state && (
+        <span className={LIST_STYLES.desktopOnly}>
+          <Status label={task.state.label} accent={task.state.accent} />
+        </span>
+      )}
     </>
   )
 
@@ -493,7 +516,7 @@ export const ProjectFileTabs = ({
     <>
       <Glyph value={meeting.emoji} size="row" />
       <span className="min-w-0 flex-1 truncate font-medium">{meeting.title}</span>
-      <span className="text-xs text-[var(--color-ink-subtle)]">
+      <span className={cn('text-xs text-[var(--color-ink-subtle)]', LIST_STYLES.desktopOnly)}>
         {formatDayTime(meeting.scheduledAt)}
       </span>
       <AvatarStack people={meeting.participants} />
@@ -522,8 +545,10 @@ export const ProjectFileTabs = ({
           {orderedTasks.map((task) => (
             <div
               key={task.id}
+              style={accentVars(task.state?.accent)}
               className={cn(
                 LIST_STYLES.item,
+                LIST_STYLES.itemAccent,
                 canReadTasks && LIST_STYLES.itemClickable,
                 isValidated(task) && 'opacity-60'
               )}
@@ -533,12 +558,14 @@ export const ProjectFileTabs = ({
                 <button
                   type="button"
                   onClick={() => router.push(ROUTES.task(task.id))}
-                  className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                  className="flex min-w-0 flex-1 items-center gap-1.5 text-left md:gap-3"
                 >
                   {taskLine(task)}
                 </button>
               ) : (
-                <div className="flex min-w-0 flex-1 items-center gap-3">{taskLine(task)}</div>
+                <div className="flex min-w-0 flex-1 items-center gap-1.5 md:gap-3">
+                  {taskLine(task)}
+                </div>
               )}
             </div>
           ))}
@@ -628,6 +655,7 @@ export const ProjectFileTabs = ({
 
       <FileTabs
         label={PROJECT_COPY.title}
+        initial={focused && canReadCommunications ? 'communication' : undefined}
         tabs={[
           {
             value: 'overview',
@@ -638,7 +666,7 @@ export const ProjectFileTabs = ({
           {
             value: 'communication',
             label: PROJECT_COPY.tabCommunication,
-            icon: 'discord',
+            icon: 'pencil',
             visible: canReadCommunications,
             render: communicationTab,
           },

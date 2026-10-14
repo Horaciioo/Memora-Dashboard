@@ -200,20 +200,18 @@ export const readMemberActivity = async (
 }
 
 /**
- * Read the journal of one record
- * @param {string} targetType - Target resource kind
- * @param {string} targetId - Target resource identifier
+ * Read the journal entries matching a filter
+ * @param {Prisma.ActivityLogWhereInput} where - Rows wanted
  * @param {number} [take] - Entry count
  * @return {Promise<ActivityEntry[]>} - Journal entries
  */
 
-export const readRecordActivity = async (
-  targetType: string,
-  targetId: string,
+export const readActivityWhere = async (
+  where: Prisma.ActivityLogWhereInput,
   take: number = PAGINATION_SETTINGS.defaultPerPage
 ): Promise<ActivityEntry[]> => {
   const rows = await prisma.activityLog.findMany({
-    where: { targetType, targetId },
+    where,
     include: { actor: { select: { displayName: true, avatarUrl: true } } },
     orderBy: { createdAt: 'desc' },
     take,
@@ -221,6 +219,20 @@ export const readRecordActivity = async (
 
   return rows.map(toEntry)
 }
+
+/**
+ * Read the journal of one record
+ * @param {string} targetType - Target resource kind
+ * @param {string} targetId - Target resource identifier
+ * @param {number} [take] - Entry count
+ * @return {Promise<ActivityEntry[]>} - Journal entries
+ */
+
+export const readRecordActivity = (
+  targetType: string,
+  targetId: string,
+  take?: number
+): Promise<ActivityEntry[]> => readActivityWhere({ targetType, targetId }, take)
 
 /**
  * Read the latest journal entries

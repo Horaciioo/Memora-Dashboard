@@ -99,7 +99,6 @@ export const IntegrationLinkStep = ({
           >
             {INTEGRATION_LINK_COPY.emit}
           </Button>
-          <span className={INTEGRATION_STEP_STYLES.meta}>{INTEGRATION_LINK_COPY.pendingHint}</span>
         </div>
       )}
 

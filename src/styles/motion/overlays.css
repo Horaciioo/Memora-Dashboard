@@ -70,6 +70,11 @@ body {
   }
 }
 
+/* Sheet rising from the bottom edge */
+.sheet-enter {
+  animation: drawer-rise var(--motion-duration-panel) var(--motion-ease-spring);
+}
+
 /* Fields of a new section glide in from the side, slowly */
 .drawer-section-enter {
   animation: section-arrive var(--motion-duration-celebrate) var(--motion-ease-out);
@@ -139,4 +144,25 @@ body {
   outline: 2px dashed var(--color-border-strong);
   outline-offset: -4px;
   background: var(--color-hover);
+}
+
+/* Hint bubble bobbing up and down */
+.hint-float {
+  animation: hint-float 1.3s ease-in-out infinite;
+}
+
+@keyframes hint-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint-float {
+    animation: none;
+  }
 }

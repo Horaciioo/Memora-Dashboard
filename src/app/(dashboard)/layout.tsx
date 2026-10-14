@@ -1,6 +1,5 @@
 import { Suspense } from 'react'
 import type { ReactNode } from 'react'
-import { MobileGate } from '@/components/structures/MobileGate'
 import { AppShell } from '@/layouts/AppShell'
 import { AuthShell } from '@/layouts/AuthShell'
 import { HistoryConsentGate } from '@/composites/consent/HistoryConsentGate'
@@ -15,6 +14,8 @@ import { LogoutButton } from '@/composites/auth/LogoutButton'
 import { GuideHost } from '@/composites/shell/GuideHost'
 import { openRoutes } from '@/core/lib/tour/progress'
 import { NavigationViews, visibleNavGroups } from '@/declarations/navigation'
+import { APP_ENVIRONMENT } from '@/declarations/system/environments'
+import { heldRoutes } from '@/declarations/ui/responsive'
 import { PENDING_ACCOUNT_COPY } from '@/declarations/onboarding/copy'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
@@ -62,19 +63,18 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   ])
 
   return (
-    <MobileGate>
-      <AppShell
-        unreadCount={unreadCount}
-        viewContext={viewContext}
-        twoFactor={twoFactor}
-        seal={seal}
-        tour={tour}
-      >
-        {children}
-        <Suspense fallback={null}>
-          <GuideHost />
-        </Suspense>
-      </AppShell>
-    </MobileGate>
+    <AppShell
+      unreadCount={unreadCount}
+      viewContext={viewContext}
+      twoFactor={twoFactor}
+      seal={seal}
+      tour={tour}
+      heldRoutes={heldRoutes(APP_ENVIRONMENT)}
+    >
+      {children}
+      <Suspense fallback={null}>
+        <GuideHost />
+      </Suspense>
+    </AppShell>
   )
 }

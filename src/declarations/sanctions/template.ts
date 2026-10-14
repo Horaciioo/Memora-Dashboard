@@ -1,3 +1,4 @@
+import { DISCORD_PANEL } from '@/declarations/sanctions/discordPanel'
 import type { SanctionGravityName, SanctionPanelName } from '@/utils/constants/moderation'
 
 /**
@@ -1021,7 +1022,7 @@ const TWITCH_PANEL: readonly SanctionOffenseSeed[] = [
 export const SANCTION_TEMPLATES: Record<SanctionPanelName, readonly SanctionOffenseSeed[]> = {
   TWITCH: TWITCH_PANEL,
   YOUTUBE: [],
-  DISCORD: [],
+  DISCORD: DISCORD_PANEL,
 }
 
 /**

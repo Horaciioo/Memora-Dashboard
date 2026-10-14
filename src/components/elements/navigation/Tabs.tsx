@@ -132,9 +132,16 @@ export const Tabs = ({
     }
   }, [value, items.length, emphasis])
 
-  // A tab opened from off screen scrolls itself into view
+  // A tab opened from off screen scrolls the strip, never the page
   useEffect(() => {
-    tabsRef.current.get(value)?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+    const list = listRef.current
+    const tab = tabsRef.current.get(value)
+    if (!list || !tab || list.scrollWidth <= list.clientWidth) return
+
+    list.scrollTo({
+      left: tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    })
   }, [value])
 
   const strip = (

@@ -13,6 +13,8 @@ import { TrainingStatuses } from '@/utils/constants/hierarchy'
 
 export interface CourseStageProps {
   course: CourseCard
+  // Shown to someone else: no way in, their wording
+  isReadOnly?: boolean
 }
 
 /**
@@ -21,7 +23,7 @@ export interface CourseStageProps {
  * @return {JSX.Element}
  */
 
-export const CourseStage = ({ course }: CourseStageProps) => {
+export const CourseStage = ({ course, isReadOnly }: CourseStageProps) => {
   const surface = COURSE_SURFACE_REGISTRY.get(course.surface)
   const SurfaceIcon = ICONS[surface.icon]
   const Forward = ICONS.forward
@@ -65,7 +67,9 @@ export const CourseStage = ({ course }: CourseStageProps) => {
         </div>
         <div className={COURSE_CATALOG.stageSide}>
           <div className={COURSE_CATALOG.stageProgress}>
-            <span className={COURSE_CATALOG.stageProgressLabel}>{COURSE_COPY.progressTitle}</span>
+            <span className={COURSE_CATALOG.stageProgressLabel}>
+              {isReadOnly ? COURSE_COPY.juniorProgressTitle : COURSE_COPY.progressTitle}
+            </span>
             <span className={COURSE_CATALOG.stageProgressValue}>
               {COURSE_COPY.passedOf(isDone ? course.exercises : course.passed, course.exercises)}
             </span>
@@ -75,10 +79,15 @@ export const CourseStage = ({ course }: CourseStageProps) => {
             <span>{COURSE_COPY.minutes(course.minutes)}</span>
             <span>{COURSE_COPY.chaptersCount(course.chapters)}</span>
           </p>
-          <Link href={ROUTES.training(course.id)} className={`group ${COURSE_CATALOG.stageAction}`}>
-            {action}
-            <Forward className={COURSE_CATALOG.actionIcon} aria-hidden="true" />
-          </Link>
+          {!isReadOnly && (
+            <Link
+              href={ROUTES.training(course.id)}
+              className={`group ${COURSE_CATALOG.stageAction}`}
+            >
+              {action}
+              <Forward className={COURSE_CATALOG.actionIcon} aria-hidden="true" />
+            </Link>
+          )}
         </div>
       </div>
     </section>

@@ -3,19 +3,16 @@
     "sm": 640,
     "md": 768,
     "lg": 1024,
-    "xl": 1280
+    "xl": 1280,
+    "2xl": 1536
   },
   "mobileUntil": "md",
   "shell": {
     "topBarHeight": 52,
-    "bottomNavHeight": 64,
     "sidebarWidth": 270,
     "sidebarCompactWidth": 80,
     "bannerHeight": 260,
-    "bannerHeightMobile": 190
-  },
-  "bottomNav": {
-    "maxSlots": 3
+    "bannerHeightMobile": 120
   },
   "toast": {
     "maxVisible": {
@@ -24,6 +21,7 @@
     }
   },
   "touchTargetMin": 44,
+  "longPressMs": 450,
   "drawer": {
     "width": 600,
     "heightShare": 0.8,

@@ -7,7 +7,7 @@ import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 
 export const HOME_STYLES = {
   // Two columns past lg
-  grid: 'grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]',
+  grid: 'grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]',
   column: 'flex min-w-0 flex-col gap-8',
   list: 'flex flex-col divide-y divide-[var(--color-border)]',
   row: 'flex items-center gap-3 px-4 py-3 text-sm',
@@ -39,7 +39,7 @@ export const HOME_STYLES = {
   rowGlyph: 'h-6 w-6 shrink-0',
   consoleIcon: 'h-6 w-6 shrink-0',
   // Urgent tiles
-  urgentGrid: 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3',
+  urgentGrid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
   urgentTile:
     'flex w-full cursor-pointer items-start gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   urgentTitle: 'font-bold tracking-tight',
@@ -61,7 +61,7 @@ export const HOME_STYLES = {
 
 export const HOME_FLOW = {
   // Reaches into the shell gutters, a little further where the shell caps its width
-  page: 'flex flex-col gap-10 md:-mx-5 min-[1700px]:-mx-10',
+  page: 'flex flex-col gap-8 md:gap-10 md:-mx-5 min-[1700px]:-mx-10',
   rest: 'flex items-center justify-center gap-3 py-4 text-sm font-semibold text-[var(--color-ink-subtle)]',
   restMark: 'h-6 w-6 shrink-0',
   // Latest note, one gold line
@@ -84,9 +84,9 @@ export const HOME_FLOW = {
 export const HOME_HERO = {
   row: 'flex flex-wrap items-end justify-between gap-x-6 gap-y-2',
   words: 'flex min-w-0 flex-col gap-1',
-  greeting: 'truncate pr-[0.2em] text-4xl font-bold tracking-tight italic sm:text-5xl',
+  greeting: 'truncate pr-[0.2em] text-3xl font-bold tracking-tight italic sm:text-5xl',
   hello: 'text-sm font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase italic',
-  date: 'text-4xl font-bold tracking-tight text-[var(--color-ink-subtle)] italic first-letter:uppercase sm:text-5xl',
+  date: 'hidden text-3xl font-bold tracking-tight text-[var(--color-ink-subtle)] italic first-letter:uppercase sm:block sm:text-5xl',
 } as const
 
 /**
@@ -100,7 +100,7 @@ export const HOME_PLAN = {
   row: 'group flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-2.5 text-sm transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
   when: 'w-14 shrink-0 text-xs font-bold text-[var(--color-ink-subtle)]',
   whenExact:
-    'shrink-0 text-xs font-bold tabular-nums text-[var(--color-ink)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100',
+    'shrink-0 text-xs font-bold tabular-nums text-[var(--color-ink)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:hidden',
   glyph: 'h-5 w-5 shrink-0',
   title: 'min-w-0 flex-1 truncate font-semibold',
   titleDone:
@@ -118,8 +118,8 @@ export const HOME_PLAN = {
  */
 
 export const HOME_CARDS = {
-  grid: 'grid gap-4 md:grid-cols-3',
-  card: 'group relative isolate flex h-48 flex-col justify-end overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] p-5 text-[var(--color-on-media)] shadow-[var(--shadow-md)] transition-[transform,box-shadow] duration-[var(--motion-duration-panel)] hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  grid: 'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3',
+  card: 'group relative isolate flex h-36 flex-col justify-end md:h-48 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] p-5 text-[var(--color-on-media)] shadow-[var(--shadow-md)] transition-[transform,box-shadow] duration-[var(--motion-duration-panel)] hover:-translate-y-1 hover:shadow-[var(--shadow-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   image:
     'absolute inset-0 -z-20 h-full w-full object-cover transition-transform duration-[var(--motion-duration-slow)] group-hover:scale-105',
   shade: 'absolute inset-0 -z-10 bg-gradient-to-t from-black/75 via-black/25 to-black/5',
@@ -137,16 +137,17 @@ export const HOME_CARDS = {
 
 export const HOME_LIVE = {
   list: 'flex flex-col gap-6',
-  card: 'live-card group relative isolate flex min-h-72 items-center gap-10 overflow-hidden rounded-[var(--radius-xl)] bg-gradient-to-br from-[var(--color-live-100)] via-[var(--color-live-300)] to-[var(--color-live-400)] px-8 py-10 text-black shadow-[var(--shadow-lg)] ring-1 ring-white/40 ring-inset sm:px-14 sm:py-14',
-  body: 'relative flex min-w-0 flex-1 flex-col gap-6',
-  eyebrow: 'flex items-center gap-2.5 text-sm font-bold tracking-wide text-black/70 uppercase',
-  pulse: 'live-pulse h-5 w-5',
-  text: 'text-3xl leading-tight font-semibold tracking-tight text-balance sm:text-5xl',
+  card: 'live-card group relative isolate flex min-h-0 flex-col items-start gap-3 overflow-hidden sm:min-h-72 sm:flex-row sm:items-center sm:gap-10 rounded-[var(--radius-xl)] bg-gradient-to-br from-[var(--color-live-100)] via-[var(--color-live-300)] to-[var(--color-live-400)] px-5 py-4 text-black shadow-[var(--shadow-lg)] ring-1 ring-white/40 ring-inset sm:px-14 sm:py-14',
+  body: 'relative flex min-w-0 flex-1 flex-col gap-2 sm:gap-6',
+  eyebrow:
+    'flex items-center gap-2 text-xs sm:gap-2.5 sm:text-sm font-bold tracking-wide text-black/70 uppercase',
+  pulse: 'live-pulse h-4 w-4 sm:h-5 sm:w-5',
+  text: 'text-lg leading-tight font-semibold tracking-tight text-balance sm:text-5xl',
   strong: 'font-bold',
-  actions: 'flex flex-wrap items-center gap-3 pt-2',
-  join: 'inline-flex items-center gap-2 rounded-full bg-black px-7 py-3.5 text-base font-bold text-[var(--color-live-100)] shadow-[var(--shadow-md)] transition-transform hover:-translate-y-0.5',
+  actions: 'flex flex-wrap items-center gap-3 sm:pt-2',
+  join: 'inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold sm:px-7 sm:py-3.5 sm:text-base text-[var(--color-live-100)] shadow-[var(--shadow-md)] transition-transform hover:-translate-y-0.5',
   joinGlyph: 'h-4 w-4',
-  logo: 'relative shrink-0',
+  logo: 'relative hidden shrink-0 sm:block',
   logoRing: 'live-halo absolute -inset-3 rounded-full border-2 border-white/60',
   logoImage: 'relative shadow-[var(--shadow-lg)] ring-8 ring-white/70',
 } as const
@@ -175,7 +176,7 @@ export const HOME_TASKS = {
  */
 
 export const HOME_BOARD = {
-  card: 'card-surface grid rounded-[var(--radius-xl)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] md:grid-cols-3',
+  card: 'card-surface grid grid-cols-1 rounded-[var(--radius-xl)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] xl:grid-cols-3',
   // The vertical divider stops short of the top and the bottom edges
-  col: 'relative flex min-w-0 flex-col px-10 py-8 md:before:absolute md:before:inset-y-8 md:before:left-0 md:before:w-px md:before:bg-[var(--color-border)] md:first:before:hidden',
+  col: 'relative flex min-w-0 flex-col border-t border-[var(--color-border)] px-5 py-6 first:border-t-0 xl:border-t-0 sm:px-8 xl:px-10 xl:py-8 xl:before:absolute xl:before:inset-y-8 xl:before:left-0 xl:before:w-px xl:before:bg-[var(--color-border)] xl:first:before:hidden',
 } as const

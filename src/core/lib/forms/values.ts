@@ -109,6 +109,14 @@ export const readList = (values: FormValues, name: string): string[] => {
 }
 
 /**
+ * Wall-clock minutes read as UTC
+ * @param {string} text - Day or ISO minute
+ * @return {string} - Text a Date parses the same everywhere
+ */
+
+const wallClock = (text: string): string => (WALL_CLOCK_PATTERN.test(text) ? `${text}Z` : text)
+
+/**
  * Read a date value
  * @param {FormValues} values - Form values
  * @param {string} name - Field name
@@ -120,7 +128,7 @@ export const readDate = (values: FormValues, name: string): Date | null => {
   if (!text) return null
 
   // Wall-clock minutes are stored as UTC
-  const parsed = new Date(WALL_CLOCK_PATTERN.test(text) ? `${text}Z` : text)
+  const parsed = new Date(wallClock(text))
   return Number.isNaN(parsed.getTime()) ? null : parsed
 }
 
@@ -135,8 +143,8 @@ export const readDateRange = (values: FormValues, name: string): [Date, Date] | 
   const value = values[name]
   if (!Array.isArray(value) || value.length !== 2) return null
 
-  const start = new Date(String(value[0]))
-  const end = new Date(String(value[1]))
+  const start = new Date(wallClock(String(value[0])))
+  const end = new Date(wallClock(String(value[1])))
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null
 
   return [start, end]
@@ -169,6 +177,20 @@ const presetOf = (field: FieldDefinition, context: PresetContext): FieldValue | 
     if (field.kind === 'datetime') return context.now
     if (field.kind === 'daterange') return [context.today, context.today]
     return context.today
+  }
+
+  // Monday to Sunday of the coming week
+  if (field.preset === 'nextWeek') {
+    const monday = new Date(`${context.today}T00:00:00Z`)
+    monday.setUTCDate(monday.getUTCDate() + ((8 - monday.getUTCDay()) % 7 || 7))
+    const sunday = new Date(monday)
+    sunday.setUTCDate(monday.getUTCDate() + 6)
+
+    const [opens, closes] = field.withTime ? (field.defaultTimes ?? ['00:00', '23:59']) : ['', '']
+    const at = (day: Date, hour: string) =>
+      `${day.toISOString().slice(0, 10)}${field.withTime ? `T${hour}` : ''}`
+
+    return [at(monday, opens), at(sunday, closes)]
   }
 
   // Actor

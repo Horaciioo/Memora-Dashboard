@@ -1,0 +1,10 @@
+{
+  "linkTtlMinutes": 120,
+  "maxPlays": 3,
+  "revealMs": 1600,
+  "shuffleMs": 1000,
+  "shuffleStepMs": 90,
+  "sceneLineMs": 2200,
+  "defaultStepSeconds": 30,
+  "pollSeconds": 6
+}

@@ -387,7 +387,6 @@ export const seedJournal = async (cast: Cast) => {
       account: true,
       reviews: true,
       skills: true,
-      steps: { where: { validatedAt: { not: null } } },
       trainingRecords: true,
     },
   })
@@ -430,27 +429,6 @@ export const seedJournal = async (cast: Cast) => {
         targetType: 'academy-junior',
         targetId: junior.id,
         summary: name,
-      })
-    }
-
-    for (const step of junior.steps.slice(0, 4)) {
-      logs.push({
-        event: 'StepValidated',
-        at: step.validatedAt!,
-        actorId: step.validatedById,
-        subjectId: junior.accountId,
-        targetType: 'academy-step',
-        targetId: step.id,
-        summary: step.title,
-      })
-      notices.push({
-        kind: 'StepValidated',
-        recipientId: junior.accountId,
-        actorId: step.validatedById,
-        targetType: 'member',
-        targetId: junior.accountId,
-        subject: step.title,
-        at: step.validatedAt!,
       })
     }
 

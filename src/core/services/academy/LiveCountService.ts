@@ -2,16 +2,16 @@ import 'server-only'
 
 import { countAccompaniedLives } from '@/core/lib/academy/lives'
 import { prisma } from '@/core/lib/db'
+import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import { notFound } from '@/core/lib/errors'
 import { syncStages } from '@/core/services/academy/ParkourService'
 import { AcademyJuniorStatuses, AcademySessionStatuses } from '@/utils/constants/hierarchy'
-import type { AccompaniedLiveView } from '@/types/academy'
+import type { JuniorLiveView } from '@/types/academy'
+import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
 import { LiveStatuses } from '@/utils/constants/lives'
 import type { LiveStatusName } from '@/utils/constants/lives'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
-import type { Prisma } from '@prisma/client'
-
 /**
  * Recount the lives of every running junior among some accounts
  * @param {string[]} accountIds - Accounts whose count may have moved
@@ -68,32 +68,28 @@ export const syncJuniorLives = async (accountIds: string[]): Promise<string[]> =
 }
 
 /**
- * Lives a junior was present on since their PIM started
+ * Lives a junior was called on since their PIM started, whether they came or not
  * @param {string} juniorId - Junior seat
- * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
- * @return {Promise<AccompaniedLiveView[]>} - Lives
+ * @param {AcademyScope} scope - Visibility fragment
+ * @return {Promise<JuniorLiveView[]>} - Ended lives, newest first
  */
 
-export const accompaniedLives = async (
+export const juniorLives = async (
   juniorId: string,
-  scope: Prisma.AcademySessionWhereInput
-): Promise<AccompaniedLiveView[]> => {
+  scope: AcademyScope
+): Promise<JuniorLiveView[]> => {
   const junior = await prisma.academyJunior.findFirst({
-    where: { id: juniorId, session: scope },
+    where: { id: juniorId, session: scope.session, ...scope.juniors },
     select: { accountId: true, startedAt: true },
   })
   if (!junior) throw notFound()
 
-  // Same rule as the count: ended, started after the junior, answered present
+  // Same window as the count: ended lives that started after the junior
   const rows = await prisma.live.findMany({
     where: {
       status: LiveStatuses.Ended,
       startedAt: { gte: junior.startedAt },
-      calendarEvent: {
-        attendances: {
-          some: { accountId: junior.accountId, status: AttendanceStatuses.Present },
-        },
-      },
+      calendarEvent: { attendances: { some: { accountId: junior.accountId } } },
     },
     select: {
       id: true,
@@ -101,8 +97,17 @@ export const accompaniedLives = async (
       platform: true,
       startedAt: true,
       youtuber: { select: { name: true } },
+      calendarEvent: {
+        select: {
+          attendances: {
+            where: { accountId: junior.accountId },
+            select: { status: true },
+          },
+        },
+      },
     },
     orderBy: { startedAt: 'desc' },
+    take: ACADEMY_SETTINGS.juniorLivesLimit,
   })
 
   return rows.map((row) => ({
@@ -111,5 +116,7 @@ export const accompaniedLives = async (
     creator: row.youtuber.name,
     platform: row.platform,
     startedAt: (row.startedAt ?? new Date()).toISOString(),
+    attendance: (row.calendarEvent?.attendances[0]?.status ??
+      AttendanceStatuses.Pending) as AttendanceStatusName,
   }))
 }

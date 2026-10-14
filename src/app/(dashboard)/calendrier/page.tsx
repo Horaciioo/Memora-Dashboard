@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { academyScope } from '@/core/services/academy/AcademyScope'
 import { PageHeader } from '@/components/structures/PageHeader'
 import { CalendarBoard } from '@/composites/calendar/CalendarBoard'
 import {
@@ -66,7 +67,7 @@ export default async function CalendarPage({
       access,
       scope: perimeter,
     }),
-    calendarFields(perimeter, workViewer(session, access)),
+    calendarFields(perimeter, workViewer(session, access), academyScope(session, access)),
     youtuberOptions(perimeter),
   ])
 

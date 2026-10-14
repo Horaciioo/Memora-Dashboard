@@ -95,7 +95,7 @@ export const COURSE_SEVERITY = {
     'relative h-3 rounded-full bg-[linear-gradient(90deg,var(--color-apple-green),var(--color-apple-orange),var(--color-apple-red))]',
   needle:
     'absolute top-1/2 size-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-[var(--color-surface-raised)] bg-[var(--color-ink)] shadow-[var(--shadow-float)] transition-[left] duration-[1400ms] ease-[var(--motion-ease-spring)]',
-  cards: 'grid gap-4 md:grid-cols-3',
+  cards: 'grid grid-cols-1 gap-4 md:grid-cols-3',
   card: 'flex cursor-pointer flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 text-left shadow-[var(--shadow-sm)] transition-[translate,box-shadow,border-color] duration-[var(--motion-duration-panel)] hover:border-[var(--color-border-strong)]',
   cardLit: '-translate-y-2 border-[var(--color-ink)] shadow-[var(--shadow-float)]',
   chip: 'grid size-10 place-items-center rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] text-[var(--color-ink)] transition-colors duration-[var(--motion-duration-panel)]',

@@ -68,7 +68,7 @@ export const MemberCard = ({
       className={cn(
         LIST_STYLES.card,
         LIST_STYLES.cardClickable,
-        'flex-row items-center gap-3 py-3',
+        'flex-row items-center gap-2 px-2.5 py-2 sm:gap-3 sm:px-4 sm:py-3',
         member.isAbsent && LIST_STYLES.cardAbsent
       )}
     >
@@ -82,7 +82,7 @@ export const MemberCard = ({
         >
           <span className="truncate">{member.displayName}</span>
           {showNotesBubble && member.notesCount > 0 && (
-            <span title={MEMBER_COPY.notesTitle} className="inline-flex">
+            <span title={MEMBER_COPY.notesTitle} className={LIST_STYLES.cardNotesWrap}>
               <NotesIcon className={LIST_STYLES.cardNotes} />
               <span className="sr-only">{MEMBER_COPY.notesTitle}</span>
             </span>
@@ -90,16 +90,18 @@ export const MemberCard = ({
           {member.isAbsent && (
             <span className={LIST_STYLES.cardAbsentNote}>
               <AbsentIcon className={LIST_STYLES.cardAbsentGlyph} aria-hidden="true" />
-              {MEMBER_COPY.absent}
+              <span className="hidden sm:inline">{MEMBER_COPY.absent}</span>
             </span>
           )}
         </span>
       </span>
-      <FunctionEmblems
-        member={member}
-        className={cn('gap-1', member.isAbsent && LIST_STYLES.cardAbsentEmblems)}
-        glyphClassName="h-5 w-5"
-      />
+      <span className={LIST_STYLES.cardExtra}>
+        <FunctionEmblems
+          member={member}
+          className={cn('gap-1', member.isAbsent && LIST_STYLES.cardAbsentEmblems)}
+          glyphClassName="h-5 w-5"
+        />
+      </span>
     </div>
   )
 }

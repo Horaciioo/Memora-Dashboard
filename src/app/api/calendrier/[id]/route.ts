@@ -1,6 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
+import { academyScope } from '@/core/services/academy/AcademyScope'
 import {
   assertEntryAccess,
   calendarFields,
@@ -42,14 +43,15 @@ export const PATCH = createProtectedRoute({
       return resizeEntry(params.id, endsAt)
     }
 
+    const academy = academyScope(session, access)
     const parsed = parseFormValues(
-      await calendarFields(perimeter, workViewer(session, access)),
+      await calendarFields(perimeter, workViewer(session, access), academy),
       raw,
       { fillMissing: true }
     )
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    return updateEntry(params.id, parsed.values, perimeter, session.id, canManage)
+    return updateEntry(params.id, parsed.values, perimeter, session.id, canManage, academy)
   },
 })
 

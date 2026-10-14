@@ -127,6 +127,9 @@ export const PICKER_COPY = {
   today: 'Aujourd’hui',
   clear: 'Effacer',
   time: 'Heure',
+  start: 'de début',
+  end: 'de fin',
+  done: 'Valider',
 } as const
 
 /**

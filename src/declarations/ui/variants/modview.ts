@@ -23,13 +23,13 @@ export const MODVIEW_FRAME = {
     'flex h-9 w-9 items-center justify-center rounded-[var(--radius-lg)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   railButtonOff: 'opacity-40 grayscale hover:opacity-100 hover:grayscale-0',
   railIcon: 'h-5 w-5',
-  grid: 'grid min-h-0 flex-1 gap-3 overflow-y-auto lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.7fr)] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden',
+  grid: 'grid grid-cols-1 min-h-0 flex-1 gap-3 overflow-y-auto lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,0.7fr)] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden',
   column: 'flex min-h-0 flex-col gap-3',
   // Wrapper dropped in focus mode
   flat: 'contents',
   // Windows of a course focus
   focus: 'grid min-h-0 flex-1 auto-cols-fr gap-3 lg:grid-flow-col lg:grid-rows-[minmax(0,1fr)]',
-  pair: 'grid min-h-0 flex-1 gap-3 sm:grid-cols-2',
+  pair: 'grid grid-cols-1 min-h-0 flex-1 gap-3 sm:grid-cols-2',
 } as const
 
 /**

@@ -3,6 +3,7 @@ import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { createJunior, juniorFields } from '@/core/services/academy/AcademyService'
+import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const POST = createProtectedRoute({
@@ -13,6 +14,16 @@ export const POST = createProtectedRoute({
     const parsed = parseFormValues(await juniorFields(params.id), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    return createJunior(params.id, academyScope(session, access), parsed.values)
+    const created = await createJunior(params.id, academyScope(session, access), parsed.values)
+
+    await recordFileEvent({
+      eventType: 'JuniorEnrolled',
+      file: JOURNAL_FILES.Academy,
+      fileId: params.id,
+      actorId: session.id,
+      summary: created.at(-1)?.displayName ?? params.id,
+    })
+
+    return created
   },
 })

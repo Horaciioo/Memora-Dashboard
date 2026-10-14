@@ -8,6 +8,7 @@ import { CourseCarousel } from '@/composites/academy/course/CourseCarousel'
 import { CourseCeremony } from '@/composites/academy/course/CourseCeremony'
 import { CourseStage } from '@/composites/academy/course/CourseStage'
 import { CourseUnlockBubble } from '@/composites/academy/course/CourseUnlockBubble'
+import { groupCourses } from '@/core/lib/academy/courseGroups'
 import { COURSE_COPY } from '@/declarations/academy/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
@@ -101,33 +102,17 @@ export const CourseCatalog = ({ courses, celebrate, showUnlock }: CourseCatalogP
         </section>
       )}
       <div className={COURSE_CATALOG.page} {...beaconProps(TOUR_BEACONS.coursesList)}>
-        {[
-          {
-            key: 'indispensable',
-            title: COURSE_COPY.indispensableTitle,
-            lead: COURSE_COPY.indispensableLead,
-            list: ordered.filter((course) => course.track === 'indispensable'),
-          },
-          {
-            key: 'secondary',
-            title: COURSE_COPY.secondaryTitle,
-            lead: COURSE_COPY.secondaryLead,
-            list: ordered.filter((course) => course.track !== 'indispensable'),
-          },
-        ].map(
-          ({ key, title, lead, list }) =>
-            list.length > 0 && (
-              <CourseCarousel
-                key={key}
-                title={title}
-                lead={lead}
-                courses={list}
-                selectedId={selected?.id ?? ''}
-                pendingId={pending}
-                onSelect={(courseId) => router.push(ROUTES.training(courseId))}
-              />
-            )
-        )}
+        {groupCourses(ordered).map(({ key, title, lead, list }) => (
+          <CourseCarousel
+            key={key}
+            title={title}
+            lead={lead}
+            courses={list}
+            selectedId={selected?.id ?? ''}
+            pendingId={pending}
+            onSelect={(courseId) => router.push(ROUTES.training(courseId))}
+          />
+        ))}
       </div>
     </div>
   )

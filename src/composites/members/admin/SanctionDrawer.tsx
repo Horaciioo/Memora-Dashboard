@@ -24,8 +24,6 @@ export interface SanctionInput {
 
 export interface SanctionDrawerProps {
   open: boolean
-  // Lives trade holders only
-  canTemporary: boolean
   isSaving: boolean
   onSubmit: (input: SanctionInput) => Promise<boolean>
   onClose: () => void
@@ -37,14 +35,8 @@ export interface SanctionDrawerProps {
  * @return {JSX.Element}
  */
 
-export const SanctionDrawer = ({
-  open,
-  canTemporary,
-  isSaving,
-  onSubmit,
-  onClose,
-}: SanctionDrawerProps) => {
-  const [kind, setKind] = useState<SanctionKind>(canTemporary ? 'temporary' : 'permanent')
+export const SanctionDrawer = ({ open, isSaving, onSubmit, onClose }: SanctionDrawerProps) => {
+  const [kind, setKind] = useState<SanctionKind>('temporary')
   const [until, setUntil] = useState('')
   const [reason, setReason] = useState('')
 
@@ -54,7 +46,7 @@ export const SanctionDrawer = ({
 
   // Types on offer
   const options = [
-    ...(canTemporary ? [{ value: 'temporary', label: MEMBER_ADMIN_COPY.sanctionTemporary }] : []),
+    { value: 'temporary', label: MEMBER_ADMIN_COPY.sanctionTemporary },
     { value: 'permanent', label: MEMBER_ADMIN_COPY.sanctionPermanent },
   ]
 
@@ -75,6 +67,7 @@ export const SanctionDrawer = ({
             type="button"
             onClick={submit}
             disabled={isSaving || (isTemporary && !until)}
+            aria-label={MEMBER_ADMIN_COPY.sanctionSubmit}
             className={cn(DRAWER_ACTIONS.line, DRAWER_ACTIONS.save)}
           >
             {isSaving ? (
@@ -82,17 +75,20 @@ export const SanctionDrawer = ({
             ) : (
               <SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
             )}
-            {isSaving ? ACTION_COPY.saving : MEMBER_ADMIN_COPY.sanctionSubmit}
+            <span className={DRAWER_ACTIONS.lineLabel}>
+              {isSaving ? ACTION_COPY.saving : MEMBER_ADMIN_COPY.sanctionSubmit}
+            </span>
           </button>
           <span className={DRAWER_ACTIONS.divider} aria-hidden="true" />
           <button
             type="button"
             onClick={onClose}
             disabled={isSaving}
+            aria-label={MEMBER_ADMIN_COPY.sanctionCancel}
             className={cn(DRAWER_ACTIONS.line, DRAWER_ACTIONS.cancel)}
           >
             <CancelIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
-            {MEMBER_ADMIN_COPY.sanctionCancel}
+            <span className={DRAWER_ACTIONS.lineLabel}>{MEMBER_ADMIN_COPY.sanctionCancel}</span>
           </button>
         </div>
       }

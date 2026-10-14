@@ -161,14 +161,17 @@ export const CalendarEntryChip = ({
         ) : (
           <>
             {!entry.allDay && (
-              <span className={CALENDAR_STYLES.entryTime}>
+              <span className={cn(CALENDAR_STYLES.entryTime, band && 'hidden md:inline')}>
                 {timeLabel ?? timeOf(entry.startsAt)}
               </span>
             )}
             {previewable && entry.rollCall && (
-              <RollCallIcon className={CALENDAR_STYLES.chipMark} aria-hidden="true" />
+              <RollCallIcon
+                className={cn(CALENDAR_STYLES.chipMark, band && 'hidden md:block')}
+                aria-hidden="true"
+              />
             )}
-            <span className={CALENDAR_STYLES.entryTitle}>
+            <span className={band ? CALENDAR_STYLES.barTitle : CALENDAR_STYLES.entryTitle}>
               {showsTitle ? entry.title : '\u00a0'}
             </span>
           </>

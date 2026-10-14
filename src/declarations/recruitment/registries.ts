@@ -1,7 +1,15 @@
 import { createRegistry } from '@/core/lib/registry'
-import { RecruitmentOwners, RecruitmentStatuses } from '@/utils/constants/recruitment'
+import {
+  RecruitmentOwners,
+  RecruitmentPlatforms,
+  RecruitmentStatuses,
+} from '@/utils/constants/recruitment'
 import type { IconName } from '@/declarations/ui/icons'
-import type { RecruitmentOwnerName, RecruitmentStatusName } from '@/utils/constants/recruitment'
+import type {
+  RecruitmentOwnerName,
+  RecruitmentPlatformName,
+  RecruitmentStatusName,
+} from '@/utils/constants/recruitment'
 
 /**
  * Labelled option carrying a colour token
@@ -38,3 +46,26 @@ const OWNER_MAP: Record<RecruitmentOwnerName, RecruitmentOption> = {
 }
 
 export const RECRUITMENT_OWNER_REGISTRY = createRegistry(OWNER_MAP)
+
+const PLATFORM_MAP: Record<RecruitmentPlatformName, RecruitmentOption> = {
+  [RecruitmentPlatforms.Discord]: { label: 'Discord', accent: 'info', icon: 'discord' },
+  [RecruitmentPlatforms.Twitch]: { label: 'Twitch', accent: 'brand', icon: 'twitch' },
+}
+
+export const RECRUITMENT_PLATFORM_REGISTRY = createRegistry(PLATFORM_MAP)
+
+/**
+ * Platform a trade is recruited on, Discord when absent
+ * @type {Readonly<Record<string, RecruitmentPlatformName>>}
+ */
+
+export const PLATFORM_OF_TRADE: Readonly<Record<string, RecruitmentPlatformName>> = {
+  Lives: RecruitmentPlatforms.Twitch,
+}
+
+/**
+ * Hours a recruitment opens and closes at, on its first and last day
+ * @type {readonly [string, string]}
+ */
+
+export const RECRUITMENT_PERIOD_TIMES = ['00:00', '18:30'] as const

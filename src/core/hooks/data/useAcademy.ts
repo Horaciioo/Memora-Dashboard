@@ -4,15 +4,10 @@ import { useCallback, useState } from 'react'
 
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { useSyncedState } from '@/core/hooks/interaction/useSyncedState'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { feedbackTitle } from '@/declarations/ui/copy'
-import type {
-  AcademyStepView,
-  JuniorView,
-  MyTrainingAction,
-  MyTrainingView,
-  SessionSummary,
-} from '@/types/academy'
+import type { JuniorView, MyTrainingAction, MyTrainingView, SessionSummary } from '@/types/academy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 
 /**
@@ -94,72 +89,47 @@ export const useSessions = (initialSessions: SessionSummary[]): SessionCollectio
  * One session state and mutations
  * @typedef {Object} SessionState
  * @property {JuniorView[]} juniors - Juniors inside
- * @property {AcademyStepView[]} steps - Session thread
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {() => void} clearIssues - Forget the rejections
  * @property {(values: FormValues) => Promise<boolean>} addJunior - Take a moderator in
  * @property {(id: string, values: FormValues) => Promise<boolean>} editJunior - Edit a junior
  * @property {(id: string) => Promise<void>} dropJunior - Take a junior out
- * @property {(values: FormValues) => Promise<boolean>} addStep - Note a moment
- * @property {(id: string, values: FormValues) => Promise<boolean>} editStep - Edit a moment
- * @property {(id: string, done: boolean) => Promise<void>} setStepDone - Flip a moment
- * @property {(id: string) => Promise<void>} dropStep - Drop a moment
- * @property {(id: string, validated: boolean) => Promise<void>} setStepValidated - Clear or reopen a timeline step
  */
 
 export interface SessionState {
   juniors: JuniorView[]
-  steps: AcademyStepView[]
   isSaving: boolean
   issues: FieldIssue[]
   clearIssues: () => void
   addJunior: (values: FormValues) => Promise<boolean>
   editJunior: (id: string, values: FormValues) => Promise<boolean>
   dropJunior: (id: string) => Promise<void>
-  addStep: (values: FormValues) => Promise<boolean>
-  editStep: (id: string, values: FormValues) => Promise<boolean>
-  setStepDone: (id: string, done: boolean) => Promise<void>
-  dropStep: (id: string) => Promise<void>
-  setStepValidated: (id: string, validated: boolean) => Promise<void>
 }
 
 /**
  * Drive one academy session
  * @param {string} sessionId - Session identifier
  * @param {JuniorView[]} initialJuniors - Juniors resolved server-side
- * @param {AcademyStepView[]} initialSteps - Thread resolved server-side
  * @return {SessionState} - State and mutations
  */
 
-export const useSession = (
-  sessionId: string,
-  initialJuniors: JuniorView[],
-  initialSteps: AcademyStepView[]
-): SessionState => {
-  const [juniors, setJuniors] = useState(initialJuniors)
-  const [steps, setSteps] = useState(initialSteps)
+export const useSession = (sessionId: string, initialJuniors: JuniorView[]): SessionState => {
+  const [juniors, setJuniors] = useSyncedState(initialJuniors)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   const addJunior = useCallback(
     async (values: FormValues) => {
       const next = await run(
-        () =>
-          apiPost<{ juniors: JuniorView[]; steps: AcademyStepView[] }>(
-            API_ROUTES.sessionJuniors(sessionId),
-            values
-          ),
+        () => apiPost<JuniorView[]>(API_ROUTES.sessionJuniors(sessionId), values),
         feedbackTitle('Junior', 'created', 'masculine')
       )
 
-      if (next) {
-        setJuniors(next.juniors)
-        setSteps(next.steps)
-      }
+      if (next) setJuniors(next)
 
       return next !== null
     },
-    [run, sessionId]
+    [run, sessionId, setJuniors]
   )
 
   const editJunior = useCallback(
@@ -174,7 +144,7 @@ export const useSession = (
 
       return next !== null
     },
-    [run, juniors]
+    [run, juniors, setJuniors]
   )
 
   const dropJunior = useCallback(
@@ -187,84 +157,17 @@ export const useSession = (
 
       if (next) setJuniors(next)
     },
-    [run, juniors]
-  )
-
-  const addStep = useCallback(
-    async (values: FormValues) => {
-      const name = typeof values.title === 'string' ? values.title : undefined
-      const next = await run(
-        () => apiPost<AcademyStepView[]>(API_ROUTES.sessionSteps(sessionId), values),
-        feedbackTitle('Moment', 'created', 'masculine', name)
-      )
-
-      if (next) setSteps(next)
-
-      return next !== null
-    },
-    [run, sessionId]
-  )
-
-  const editStep = useCallback(
-    async (id: string, values: FormValues) => {
-      const name = steps.find((step) => step.id === id)?.title
-      const next = await run(
-        () => apiPatch<AcademyStepView[]>(API_ROUTES.step(id), values),
-        feedbackTitle('Moment', 'saved', 'masculine', name)
-      )
-
-      if (next) setSteps(next)
-
-      return next !== null
-    },
-    [run, steps]
-  )
-
-  const setStepDone = useCallback(
-    async (id: string, done: boolean) => {
-      const next = await run(() => apiPatch<AcademyStepView[]>(API_ROUTES.step(id), { done }))
-
-      if (next) setSteps(next)
-    },
-    [run]
-  )
-
-  const dropStep = useCallback(
-    async (id: string) => {
-      const name = steps.find((step) => step.id === id)?.title
-      const next = await run(
-        () => apiDelete<AcademyStepView[]>(API_ROUTES.step(id)),
-        feedbackTitle('Moment', 'deleted', 'masculine', name)
-      )
-
-      if (next) setSteps(next)
-    },
-    [run, steps]
-  )
-
-  const setStepValidated = useCallback(
-    async (id: string, validated: boolean) => {
-      const next = await run(() => apiPatch<AcademyStepView[]>(API_ROUTES.step(id), { validated }))
-
-      if (next) setSteps(next)
-    },
-    [run]
+    [run, juniors, setJuniors]
   )
 
   return {
     juniors,
-    steps,
     isSaving,
     issues,
     clearIssues,
     addJunior,
     editJunior,
     dropJunior,
-    addStep,
-    editStep,
-    setStepDone,
-    dropStep,
-    setStepValidated,
   }
 }
 

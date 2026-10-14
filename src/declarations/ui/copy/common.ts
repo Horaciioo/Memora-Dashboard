@@ -11,6 +11,8 @@ export const ACTION_COPY = {
   cancel: 'Annuler',
   close: 'Fermer',
   delete: 'Supprimer',
+  // {column} is the lane the card goes to
+  moveTo: 'Déplacer vers « {column} »',
   confirm: 'Confirmer',
   search: 'Rechercher',
   filter: 'Filtrer',
@@ -76,16 +78,6 @@ export const FIELD_COPY = {
   author: 'Auteur',
   position: 'Ordre',
   colour: 'Couleur',
-} as const
-
-/**
- * Message shown in place of the whole app on a phone
- * @type {Record<string, string>}
- */
-
-export const MOBILE_GATE_COPY = {
-  title: 'Memora n’est pour le moment pas disponible sur mobile',
-  description: 'Mais ça arrive très bientôt !',
 } as const
 
 /**

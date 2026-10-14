@@ -4,82 +4,43 @@
  */
 
 export const ACADEMY_COPY = {
-  railProgramme: 'Dispositif',
-  railTrainer: 'Formateur',
-  sessionOf: 'Session du {date}',
-  untilDate: 'Jusqu’au {date}',
-  title: 'Marsha Academy',
+  title: 'Academy',
+  heroDescription: 'Les juniors & leurs suivis',
   lead: 'Chaque session accueille, forme, suit et valide ses juniors jusqu’à leur autonomie.',
-  awaitingConfirmation: 'Fiche à confirmer',
   timelineTab: 'Timeline',
-  timelineAdvance: 'Passer à l’étape supérieure',
-  timelineAdvanced: 'Étape validée, la suivante est ouverte',
-  timelineCurrent: 'En cours',
-  timelineAdvanceTitle: 'Valider l’étape en cours ?',
-  timelineAdvanceDescription:
-    'L’étape passe en terminée à ton nom, la suivante se colore et sa tâche part chez la personne qui la porte.',
-  timelineFinished: 'Toutes les étapes de cette PIM sont passées.',
-  juniorTimelineEmptyTitle: 'Aucune étape sur cette timeline',
-  juniorTimelineEmptyDescription:
-    'La trame de PIM se déclare dans la configuration, elle se pose sur chaque junior à son arrivée.',
-  timelineOwner: 'Portée par',
-  timelineDue: 'Prévue le',
-  timelineDoneOn: 'Passée le',
-  timelineGuide: 'Marche à suivre',
-  timelineGo: 'Y aller, avec le guide',
-  timelineLocks: {
-    notStarted:
-      'La PIM n’est pas encore lancée. Elle démarre quand un Responsable passe la session En cours.',
-    awaitingReview:
-      'L’étape suivante s’ouvre avec la validation du bilan de fin de période, pas depuis la timeline.',
-    awaitingDecision:
-      'Le bilan est déposé : la timeline est en pause jusqu’à la décision du Responsable.',
-    standby:
-      'Période 1 achevée. La période 2 démarre pour toute la promotion en même temps, rien n’est bloqué en attendant.',
-    closed: 'Ce junior n’est plus en formation, sa timeline est figée.',
-  },
+  recruitment: 'Recrutement',
+  recruitmentFile: 'Voir sa fiche de recrutement',
+  phase: 'Où il en est',
+  validatedOn: 'Officialisé le',
   launch: 'Lancer la PIM',
   launchTitle: 'Lancer la PIM maintenant ?',
   launchDescription:
     'La session passe En cours. La timeline de chaque junior démarre aujourd’hui et les premières tâches partent chez les Formateurs.',
   launched: 'PIM lancée',
+  objectivesManage: 'Gérer les objectifs',
+  reviewStageLabel: 'Étape',
+  reviewRejected: 'Renvoyé par le Responsable',
+  reviewDecisionTitle: 'Décision',
+  reviewNotPlannable: 'Ce bilan n’a plus lieu d’être planifié pour ce Junior.',
+  launchAwaitingRecruitment: 'La session de Recrutement est encore en cours !',
   launchMissingTrainer:
     'Un junior confirmé n’a pas encore de Formateur. Attribue-lui en un avant de passer la PIM En cours.',
-  glossaryTitle: 'Lexique de l’Academy',
   glossarySearch: 'Chercher un mot',
   glossaryEmpty: 'Aucun mot ne correspond.',
-  glossaryLead: 'Les mots du domaine, définis une fois pour toutes.',
-  tabSessions: 'Sessions',
   tabGlossary: 'Lexique',
   sessionAdd: 'Ouvrir une session',
+  // {function} and {number} fill in
+  sessionTitle: 'Mod. {function} #{number}',
+  attachedRecruitment: 'Recrutement rattaché',
   emptyTitle: 'Aucune session',
   emptyDescription: 'Ouvre une première session pour accueillir des juniors.',
   sessionDeleteTitle: 'Supprimer cette session ?',
   sessionDeleteDescription: 'Ses juniors, son fil et ses bilans disparaissent avec elle.',
-  sessionCount: 'juniors',
-  sessionCountOne: 'junior',
   trainers: 'Formateurs',
-  trainersLead: 'Les modérateurs qui encadrent cette session.',
-  noTrainer: 'Aucun formateur assigné',
   confidential: 'Confidentiel',
-  confidentialLead:
-    'Tout ce qui vit ici reste entre les personnes autorisées : organisation, retours, évaluations, incidents.',
   tabJuniors: 'Juniors',
   tabTimeline: 'Timeline',
   tabCalendar: 'Calendrier',
-  tabMissions: 'Missions',
-  tabThread: 'Fil de session',
-  juniorsLead: 'Chaque junior est un modérateur existant, suivi par sa fiche individuelle.',
-  timelineLead: 'Les étapes de la trame, en retard, en cours ou franchies, junior par junior.',
-  timelineSessionWide: 'Avant l’arrivée des juniors',
-  timelineEmptyTitle: 'Aucune étape',
-  timelineEmptyDescription: 'La trame se configure depuis /configuration/etapes-pim.',
-  stepValidate: 'Marquer comme franchie',
-  stepReopen: 'Rouvrir cette étape',
-  stateDone: 'Franchie',
-  stateLate: 'En retard',
-  stateCurrent: 'En cours',
-  stateIdle: 'À venir',
   juniorAdd: 'Ajouter un junior',
   juniorEmptyTitle: 'Aucun junior',
   juniorEmptyDescription: 'Rattache un modérateur existant pour démarrer son suivi.',
@@ -88,27 +49,13 @@ export const ACADEMY_COPY = {
   noMembersTitle: 'Aucun modérateur disponible',
   noMembersDescription: 'Crée d’abord une fiche de modérateur, le junior s’y rattache ensuite.',
   openMembers: 'Ouvrir les modérateurs',
-  threadLead: 'Tout ce qui est prévu ou tenu, surtout ce qui se fait en autonomie.',
-  eventAdd: 'Noter un moment',
-  eventEmptyTitle: 'Rien de noté',
-  eventEmptyDescription:
-    'Note formations, bilans, entrevues et points responsables au fil de l’eau.',
-  eventDeleteTitle: 'Supprimer ce moment ?',
-  eventDeleteDescription: 'La trace disparaît du fil de session.',
-  eventDone: 'Tenu',
-  eventPlanned: 'Prévu',
-  markDone: 'Marquer comme tenu',
-  markPlanned: 'Remettre en prévu',
   fileTitle: 'Fiche de suivi individuelle',
-  fileLead: 'Progression, bilans et moments de ce junior.',
   progression: 'Progression',
   progressionLead: 'Les formations du programme, validées au fur et à mesure.',
   noTrainingsTitle: 'Aucune formation',
   noTrainingsDescription: 'Déclare les formations du programme dans la configuration.',
-  configure: 'Ouvrir la configuration',
   groupRunning: 'En cours',
   groupFinished: 'Terminées',
-  openCatalogue: 'Ouvrir le catalogue',
   openSessions: 'Ouvrir les sessions',
   mandatory: 'Obligatoire',
   progress: 'formations validées',
@@ -124,25 +71,15 @@ export const ACADEMY_COPY = {
   reviewDeleteTitle: 'Supprimer ce bilan ?',
   reviewDeleteDescription: 'La trace écrite de ce point disparaît.',
   reviewSubmit: 'Soumettre à décision',
-  reviewValidate: 'Valider ce bilan',
-  reviewValidateTitle: 'Valider ce bilan ?',
-  reviewValidateDescription: 'La FSI avance à l’étape suivante selon l’avis proposé.',
-  reviewReject: 'Refuser ce bilan',
-  reviewRejectTitle: 'Refuser ce bilan ?',
   reviewRejectDescription: 'Le Formateur devra rédiger un nouveau bilan.',
   validate: 'Valider ce junior',
-  validateTitle: 'Valider ce junior ?',
-  validateDescription: 'Il sort de l’Academy et passe en modérateur autonome.',
   stop: 'Arrêter le suivi',
-  stopTitle: 'Arrêter le suivi ?',
-  stopDescription: 'Le junior quitte la session sans validation. Rien n’est supprimé.',
-  reopen: 'Reprendre le suivi',
   lives: 'lives accompagnés',
-  tabInformations: 'Informations',
   tabCompetences: 'Compétences',
   tabNotes: 'Notes',
   tabObjectives: 'Objectifs',
   tabReviews: 'Bilans',
+  skillPercentLabel: 'maîtrise en pourcentage',
   skillsLead: 'Le pourcentage de maîtrise de chaque compétence de la fonction et du dispositif.',
   noteAdd: 'Poser une note',
   noteEmptyTitle: 'Aucune note',
@@ -159,9 +96,6 @@ export const ACADEMY_COPY = {
   objectiveDeleteTitle: 'Supprimer cet objectif ?',
   objectiveDeleteDescription: 'Il disparaît de la FSI.',
   myTrainingsTitle: 'Mes formations',
-  myTrainingsLead: 'Les formations de ta fonction et de ton dispositif, à ton rythme.',
-  myTrainingsNoFsiTitle: 'Aucune FSI active',
-  myTrainingsNoFsiDescription: 'Les formations apparaissent une fois ton suivi commencé.',
   myTrainingsEmptyTitle: 'Aucune formation',
   myTrainingsEmptyDescription: 'Rien n’est encore déclaré pour ta fonction et ton dispositif.',
   trainingStart: 'Démarrer',
@@ -173,21 +107,21 @@ export const ACADEMY_COPY = {
   trainingAttemptsOne: 'tentative',
   trainingDurationUnit: 'min',
   trainingContentTitle: 'Contenu',
-  trainingContentLead: 'Le déroulé de la formation, chapitre par chapitre.',
   viewContent: 'Voir le contenu',
   noContentTitle: 'Contenu à venir',
   noContentDescription: 'Rien n’est encore rédigé pour cette formation.',
   takeQuiz: 'Faire le quiz',
-  quizSubmit: 'Valider mes réponses',
   quizResultSuffix: 'bonnes réponses',
   quizAnswered: 'Répondu',
   quizQuestionCount: 'questions',
   quizQuestionCountOne: 'question',
-  inviteCopyLink: 'Copier le lien d’admission',
-  inviteCopied: 'Lien copié',
   mandatoryPending: 'Une formation obligatoire n’est pas encore terminée.',
-  accompaniedTitle: 'Lives où il était présent',
-  accompaniedEmpty: 'Aucun live compté pour l’instant.',
+  livesTitle: 'Lives passés',
+  doneCoursesTitle: 'Formations réalisées',
+  doneCoursesEmpty: 'Aucune formation terminée pour l’instant.',
+  livesPresent: (present: number, total: number) =>
+    `${present} ${present > 1 ? 'présents' : 'présent'} sur ${total}`,
+  livesEmpty: 'Aucun live terminé depuis le début de la PIM.',
 } as const
 
 /**
@@ -198,23 +132,19 @@ export const ACADEMY_COPY = {
 export const ACADEMY_FIELD_COPY = {
   function: 'Fonction',
   startsAt: 'Date de début',
-  endsAt: 'Date de fin',
-  endsAtHint: 'Laissée vide, elle est posée sur la durée la plus courte prévue.',
+  period: 'Période',
+  periodHint: 'Du premier au dernier jour de la promotion.',
   status: 'État',
-  summary: 'Description',
   trainers: 'Formateurs',
   account: 'Modérateur',
   trainer: 'Formateur référent',
   dispositif: 'Dispositif',
-  juniorStatus: 'Suivi',
   liveCount: 'Lives accompagnés',
   bonusLives: 'Lives bonus',
-  bonusLivesHint: 'Ouverts sur décision du Responsable, jusqu’au maximum réglé.',
-  juniorSummary: 'Remarques',
   kind: 'Type de moment',
   title: 'Intitulé',
   scheduledAt: 'Date et heure',
-  junior: 'Junior concerné',
+  junior: 'ID du Junior',
   notes: 'Notes',
   heldAt: 'Date du bilan',
   feeling: 'Ressenti global',
@@ -230,36 +160,6 @@ export const ACADEMY_FIELD_COPY = {
   objectiveDescription: 'Détail',
   objectiveDueAt: 'Échéance',
   objectiveStatus: 'Statut',
-  skillPercent: 'Maîtrise',
-} as const
-
-/**
- * Copy of the public admission form
- * @type {Record<string, string>}
- */
-
-export const ADMISSION_COPY = {
-  title: 'Admission Marsha Academy',
-  subtitle: 'Rejoins une session en cours de recrutement.',
-  submit: 'Envoyer ma candidature',
-  pending: 'Envoi…',
-  successTitle: 'Candidature envoyée',
-  successDescription: 'Un Formateur vérifie ton dossier, à très vite en vocal !',
-  invalidTitle: 'Lien invalide',
-  invalidDescription:
-    'Ce lien d’admission n’existe plus, a expiré ou a atteint son nombre d’utilisations.',
-  rejected: 'Cette candidature n’a pas pu être enregistrée. Vérifie ton identifiant Discord.',
-  consentLabel: 'J’accepte la conservation de mes données',
-} as const
-
-/**
- * Labels of the public admission form
- * @type {Record<string, string>}
- */
-
-export const ADMISSION_FIELD_COPY = {
-  displayName: 'Pseudo',
-  dispositif: 'Dispositif souhaité',
 } as const
 
 /**
@@ -328,9 +228,6 @@ export const GUIDE_COPY = {
  */
 
 export const COURSE_COPY = {
-  catalogTitle: 'Parcours',
-  catalogLead:
-    'Chaque formation se lit, se joue et se vérifie ici. Tout se valide par des exercices.',
   indispensableTitle: 'Les indispensables',
   indispensableLead: 'À terminer pendant la période de découverte.',
   secondaryTitle: 'Pour aller plus loin',
@@ -338,8 +235,9 @@ export const COURSE_COPY = {
   consoleTitle: 'Autres formations',
   stageTitle: 'La suite logique',
   progressTitle: 'Ton avancée',
+  juniorProgressTitle: 'Son avancée',
+  notStarted: 'Pas commencée',
   passedOf: (done: number, total: number) => `${done} sur ${total} exercices`,
-  carouselTitle: 'Tes formations',
   carouselPrevious: 'Formations précédentes',
   carouselNext: 'Formations suivantes',
   lockedName: '? ? ?',
@@ -355,7 +253,6 @@ export const COURSE_COPY = {
   minutes: (value: number) => `${value} min`,
   exercises: (value: number) => `${value} ${value > 1 ? 'exercices' : 'exercice'}`,
   progress: (done: number, total: number) => `${done} sur ${total}`,
-  exercisesUnit: 'exercices réussis',
   start: 'Commencer',
   resume: 'Reprendre',
   review: 'Revoir',
@@ -380,7 +277,6 @@ export const COURSE_COPY = {
   pick: 'Choisis ton geste',
   yourAnswer: 'Ta réponse',
   expert: 'Réponse de l’expert',
-  showExpert: 'Voir la réponse de l’expert',
   openPlaceholder: 'Écris ta réponse',
   commandPlaceholder: '!commande',
   hint: 'Indice',
@@ -391,7 +287,6 @@ export const COURSE_COPY = {
   orderHint: 'Glisse les éléments dans le bon ordre, ou utilise les flèches.',
   moveUp: 'Monter',
   moveDown: 'Descendre',
-  unsorted: 'À classer',
   tip: 'Astuce',
   warning: 'Attention',
   rule: 'Règle',
@@ -400,7 +295,6 @@ export const COURSE_COPY = {
   bravo: 'Bravo, cette formation est accomplie avec brio !',
   anotherWaiting: 'Une autre formation t’attend !',
   completeCta: 'Voir les autres formations',
-  nextChapter: 'Chapitre suivant',
   nextChapterTo: (index: number, title: string) => `Passer au chapitre ${index} : ${title}`,
   nextPage: 'Page suivante',
   you: 'Toi',
@@ -420,7 +314,6 @@ export const COURSE_COPY = {
   sceneReplay: 'Rejouer la scène',
   judgementChat: 'Chat',
   judgementWatch: 'Regarde la scène, puis ouvre l’œil sur la fiche et le panel.',
-  judgementFile: 'Fiche du viewer',
   judgementHistory: 'Historique de modération',
   judgementHistoryEmpty: 'Aucune action de modération',
   judgementPanel: 'Panel de sanctions',
@@ -439,7 +332,6 @@ export const COURSE_COPY = {
   runLabel: (index: number) => `Cas ${index}`,
   runPlaying: (index: number, total: number) => `Cas ${index} sur ${total}`,
   runReplay: 'Rejouer',
-  runPickTitle: 'Quelle prise en charge est la plus adéquate ?',
   runPick: (index: number) => `Cas ${index}`,
   branchingRestart: 'Recommencer la discussion',
   introKicker: 'Formation',
@@ -507,15 +399,12 @@ export const COURSE_COPY = {
     judgement: 'Jugement',
   } as Record<string, string>,
   simulationFinish: 'Terminer la simulation',
-  simulationReplay: 'Rejouer la simulation',
   demoStart: 'Lancer la démo',
   demoNext: 'Étape suivante',
   demoPrev: 'Précédent',
   demoReplay: 'Rejouer la démo',
   demoStep: (current: number, total: number) => `Étape ${current} sur ${total}`,
   demoActions: 'Actions du modérateur',
-  demoDeleted: 'Message supprimé par un modérateur',
-  demoComposer: 'Écris ta commande',
   demoGesture: {
     delete: 'Supprimer',
     warn: 'Avertir',
@@ -526,10 +415,7 @@ export const COURSE_COPY = {
   demoTagBan: 'Banni',
   demoTagTimeout: (duration: string) => `Timeout ${duration}`,
   chatLive: 'En direct',
-  chatFlagged: 'Message à traiter',
   chatEmpty: 'Le chat est calme.',
-  unlockedIn: 'Verrouillée',
-  attemptsWrong: 'À revoir',
 } as const
 
 /**
@@ -546,3 +432,17 @@ export const TRAINING_FEEDBACK_COPY = {
   empty: 'Aucun avis pour l’instant.',
   noComments: 'Aucun commentaire écrit.',
 } as const
+
+/**
+ * Wording of the toast naming a session
+ * @type {{ label: string, gender: 'feminine' }}
+ */
+
+export const ACADEMY_ENTITY = { label: 'Session', gender: 'feminine' } as const
+
+/**
+ * Wording of the toast naming a voice check-in
+ * @type {{ label: string, gender: 'masculine' }}
+ */
+
+export const REVIEW_ENTITY = { label: 'Bilan', gender: 'masculine' } as const

@@ -107,7 +107,7 @@ export const LEFT_SIDEBAR = {
   navGroupLabel:
     'rail-fold group flex w-full items-center gap-1 px-3 pb-1 text-caption font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   navGroupChevron:
-    'h-3.5 w-3.5 shrink-0 opacity-0 transition-[transform,opacity] group-hover:opacity-100 group-focus-visible:opacity-100',
+    'h-4 w-4 shrink-0 opacity-70 transition-[transform,opacity] group-hover:opacity-100 group-focus-visible:opacity-100 md:h-3.5 md:w-3.5 md:opacity-0',
   navGroupChevronCollapsed: '-rotate-90',
   navGroupItems: 'flex flex-col gap-px',
   navLink:
@@ -153,28 +153,34 @@ export const LEFT_SIDEBAR = {
 
 export const SEARCH_LAUNCHER = {
   bar: 'glass-panel flex w-full items-center gap-2.5 rounded-[var(--radius-lg)] px-3.5 py-3 text-left text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  // Slim bar beside the bell
+  sheetBar:
+    'glass-panel flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-lg)] px-3 py-2 text-left text-sm text-[var(--color-ink-subtle)]',
   barLabel: 'flex-1 truncate text-body',
   barShortcut:
-    'shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro font-medium text-[var(--color-ink-subtle)]',
+    'hidden shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro font-medium text-[var(--color-ink-subtle)] md:inline',
 } as const
 
 /**
- * Floating bottom nav pill classes — icon only
+ * Navigation sheet of the phone
  * @type {Record<string, string>}
  */
 
-export const MOBILE_NAV = {
-  bar: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] left-1/2 z-40 flex -translate-x-1/2 items-center gap-0.5 rounded-[var(--radius-full)] glass-panel border px-2 py-1.5 md:hidden print:hidden',
-  link: 'flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-full)] transition-colors',
-  linkActive: 'bg-[var(--color-brand-600)]',
-  // No colour here — one of the two below always wins
-  icon: 'h-5 w-5 shrink-0 transition-colors',
-  iconIdle: 'text-[var(--color-ink-subtle)]',
-  iconActive: 'text-[var(--color-on-brand)]',
-  // Round button flanking the pill
-  fab: 'fixed bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-[var(--radius-full)] glass-panel border text-[var(--color-ink)] md:hidden print:hidden',
-  fabLeft: 'left-3',
-  fabRight: 'right-3',
+export const NAV_SHEET = {
+  stack: 'nav-sheet flex flex-col gap-4',
+  // Level switch sits first
+  switch: 'w-full',
+  // Search and bell share a line
+  searchRow: 'flex items-center gap-2',
+  notifications:
+    'glass-panel relative flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-lg)] text-[var(--color-ink)]',
+  notificationsIcon: 'size-5 shrink-0',
+  dot: 'absolute top-2 right-2 size-2 rounded-full bg-[var(--color-danger)]',
+  // Account sits last, under a rule
+  divider: 'h-px border-0 bg-[var(--color-border)]',
+  account:
+    'flex min-h-11 items-center gap-3 rounded-[var(--radius-lg)] px-3 text-left text-body font-semibold transition-colors hover:bg-[var(--color-surface)]',
+  accountName: 'min-w-0 flex-1 truncate',
 } as const
 
 /**
@@ -183,12 +189,10 @@ export const MOBILE_NAV = {
  */
 
 export const TOP_BAR = {
-  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 bg-[var(--color-page)] px-3 md:hidden print:hidden',
-  creator: 'flex min-w-0 flex-1 items-center gap-2',
-  creatorName: 'truncate text-sm font-semibold',
-  actions: 'flex shrink-0 items-center gap-1',
-  avatarButton:
-    'shrink-0 rounded-full ring-2 ring-transparent transition-shadow hover:ring-[var(--color-border-strong)]',
+  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center justify-between gap-2 bg-[var(--color-page)] px-3 md:hidden print:hidden',
+  menuButton:
+    'flex size-11 items-center justify-center rounded-full text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
+  menuIcon: 'size-6',
 } as const
 
 /**
@@ -214,22 +218,6 @@ export const ACCOUNT_SHEET = {
 } as const
 
 /**
- * More sheet classes
- * @type {Record<string, string>}
- */
-
-export const MOBILE_MORE = {
-  wrapper: 'flex flex-col gap-5',
-  section: 'flex flex-col gap-2',
-  sectionLabel:
-    'px-1 text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
-  grid: 'grid grid-cols-3 gap-2',
-  tile: 'flex flex-col items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-3 text-center transition-colors hover:border-[var(--color-border-strong)]',
-  tileIcon: 'h-5 w-5 text-[var(--color-ink-subtle)]',
-  tileLabel: 'text-xs leading-tight font-medium',
-} as const
-
-/**
  * Account menu classes
  * @type {Record<string, string>}
  */
@@ -247,11 +235,12 @@ export const ACCOUNT_BLOCK = {
  */
 
 export const DETAIL_BLOCK = {
-  grid: `grid grid-cols-1 sm:grid-cols-2 ${PROPERTY_SPACING.rows} ${PROPERTY_SPACING.columns}`,
+  // Two properties side by side from the narrowest screen
+  grid: `grid grid-cols-2 ${PROPERTY_SPACING.rows} ${PROPERTY_SPACING.columns}`,
   entry: `flex min-w-0 flex-col ${PROPERTY_SPACING.within}`,
   stack: `flex flex-col ${PROPERTY_SPACING.rows}`,
   // Long text runs edge to edge
-  entryWide: `flex min-w-0 flex-col sm:col-span-2 ${PROPERTY_SPACING.within}`,
+  entryWide: `flex min-w-0 flex-col col-span-2 ${PROPERTY_SPACING.within}`,
   label: PROPERTY_LABEL,
   value: `text-sm break-words ${PROPERTY_VALUE}`,
   empty: `text-sm ${EMPTY_VALUE}`,
@@ -281,6 +270,7 @@ export const METRIC_BLOCK = {
 
 export const MEMBER_BLOCK = {
   frame: 'relative',
+  frameCompact: 'relative row-span-3 md:row-auto',
   // Official logo on the portrait's corner
   divisionLogo: 'absolute -right-3 -bottom-3 h-14 w-14 drop-shadow-md',
   // Division stamped on the portrait's corner
@@ -289,6 +279,9 @@ export const MEMBER_BLOCK = {
   // Role on the portrait's corner
   roleMark: 'absolute -right-3 -bottom-3 drop-shadow-md',
   roleGlyph: 'h-14 w-14',
+  // Smaller portrait on a phone
+  roleMarkCompact: 'absolute -right-2 -bottom-2 drop-shadow-md md:-right-3 md:-bottom-3',
+  roleGlyphCompact: 'h-9 w-9 md:h-14 md:w-14',
   portrait:
     'block shrink-0 rounded-full transition-[filter] enabled:cursor-pointer enabled:hover:brightness-95 disabled:cursor-default',
   // Role glyph pinned to the portrait's corner
@@ -308,12 +301,12 @@ export const MEMBER_BLOCK = {
  */
 
 export const MEMBER_FILE = {
-  layout: 'grid gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] lg:items-start',
+  layout: 'grid grid-cols-1 gap-8 lg:grid-cols-[21rem_minmax(0,1fr)] lg:items-start',
   main: 'flex min-w-0 flex-col gap-6',
   // Rail follows the scroll on wide screens only
   railStack: 'flex flex-col gap-3 lg:sticky lg:top-6',
   rail: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)]',
-  head: 'flex flex-col items-center gap-2 px-5 pt-7 text-center',
+  head: 'grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1 px-4 pt-4 text-left md:flex md:flex-col md:gap-2 md:px-5 md:pt-7 md:text-center',
   name: 'text-xl font-bold tracking-tight break-words',
   role: 'text-xs font-bold tracking-wide text-[var(--color-brand-800)] uppercase',
   status:
@@ -321,8 +314,8 @@ export const MEMBER_FILE = {
   // Dismissed or resigned
   departed: 'cursor-help text-xs font-bold tracking-wide text-[var(--color-danger)] uppercase',
   statusGlyph: 'h-4 w-4 shrink-0',
-  functions: 'flex items-center justify-center gap-2',
-  body: 'mt-5 flex flex-col gap-5 border-t border-[var(--color-border)] p-5',
+  functions: 'flex items-center gap-2 md:justify-center',
+  body: 'mt-3 flex flex-col gap-5 border-t border-[var(--color-border)] p-4 md:mt-5 md:p-5',
   groupTitle: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   lock: 'px-5 pt-3 text-center',
   // Property list of a rail
@@ -335,7 +328,7 @@ export const MEMBER_FILE = {
   notePinned: 'border-[var(--color-brand-200)] bg-[var(--color-brand-50)]',
   noteHead: 'flex items-center gap-2 text-xs text-[var(--color-ink-subtle)]',
   noteBody: 'text-sm leading-relaxed whitespace-pre-wrap',
-  notesGrid: 'grid gap-4 sm:grid-cols-2',
+  notesGrid: 'grid grid-cols-1 gap-4 sm:grid-cols-2',
   // Pinned note under the rail details
   pinned: 'flex flex-col gap-1.5',
   pinnedNote: 'flex flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] p-4',
@@ -345,7 +338,7 @@ export const MEMBER_FILE = {
     'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-3 transition-colors hover:bg-[var(--color-hover)]',
   socialLogo:
     'flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)]',
-  socialsGrid: 'grid auto-rows-[4.5rem] gap-3 sm:grid-cols-2',
+  socialsGrid: 'grid grid-cols-1 auto-rows-[4.5rem] gap-3 sm:grid-cols-2',
   socialAdd: 'h-full',
   more: 'self-start text-sm font-semibold text-[var(--color-brand-800)] underline-offset-4 hover:underline',
 } as const
@@ -356,21 +349,47 @@ export const MEMBER_FILE = {
  */
 
 export const STAGE_LIST = {
-  stage: 'relative flex gap-4 pb-6 last:pb-0',
-  stageRail: 'absolute top-12 bottom-0 left-[1.375rem] w-0.5 bg-[var(--color-border)]',
+  stage: 'relative flex gap-4 pb-7 last:pb-0',
+  // Thread running between two bare glyphs
+  stageRail: 'absolute top-9 bottom-1 left-3 w-px -translate-x-1/2 bg-[var(--color-border-strong)]',
+  stageRailDone: 'bg-[var(--color-success)]/50',
   stageChip:
-    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-100)] text-[var(--color-ink-accent)]',
+    'z-10 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--color-info)]',
   stageChipDone:
-    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-success-soft)] text-[var(--color-success)]',
+    'z-10 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--color-success)]',
   stageChipLate:
-    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-danger-soft)] text-[var(--color-danger)]',
+    'z-10 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--color-danger)]',
   stageChipOff:
-    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--color-border-strong)] text-[var(--color-ink-subtle)]',
-  stageBody: 'flex min-w-0 flex-1 flex-col gap-1.5 pt-1',
+    'z-10 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--color-ink-subtle)]/60 opacity-50 grayscale',
+  stageGlyph: 'h-6 w-6',
+  stageBody: 'flex min-w-0 flex-1 flex-col gap-1.5',
   stageHead: 'flex min-w-0 flex-wrap items-center gap-2.5',
   stageTitle: 'text-base font-bold tracking-tight',
+  stageTitleCurrent: 'text-[var(--color-info)]',
   stageLead: 'text-sm text-[var(--color-ink-subtle)]',
   stageActions: 'flex flex-wrap items-center gap-3',
+} as const
+
+/**
+ * Discreet timeline laid in a corner
+ * @type {Record<string, string>}
+ */
+
+export const STAGE_COMPACT = {
+  root: 'opacity-80',
+  stage: 'relative flex gap-2.5 pb-3 last:pb-0',
+  stageRail: 'absolute top-6 bottom-0.5 left-2 w-px -translate-x-1/2 bg-[var(--color-border)]',
+  stageChip: 'z-10 flex h-4 w-4 shrink-0 items-center justify-center',
+  stageGlyph: 'h-4 w-4',
+  stageTitle: 'text-sm leading-4 font-semibold',
+  stageTitleDone: 'line-through decoration-[var(--color-ink-subtle)]/60',
+  stageTitleCurrent: 'text-[var(--color-info)]',
+  tone: {
+    done: 'text-[var(--color-success)]',
+    current: 'text-[var(--color-info)]',
+    late: 'text-[var(--color-danger)]',
+    upcoming: 'text-[var(--color-ink-subtle)]/60',
+  },
 } as const
 
 /**
@@ -449,7 +468,7 @@ export const CONSOLE_BLOCK = {
   bannerBody: 'flex min-w-0 flex-1 flex-col',
   bannerTitle: 'text-sm font-semibold text-[var(--color-ink)]',
   bannerLead: 'text-xs text-[var(--color-ink-subtle)]',
-  grid: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-4',
+  grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4',
   tile: 'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4',
   tileLabel: 'text-xs font-medium tracking-wide text-[var(--color-ink-subtle)] uppercase',
   tileValue: 'font-[family-name:var(--font-display)] text-2xl leading-none',
@@ -464,7 +483,7 @@ export const CONSOLE_BLOCK = {
   cardIcon: 'h-4 w-4 shrink-0 text-[var(--color-ink-accent)]',
   cardTitle: 'font-bold',
   cardLead: 'text-sm text-[var(--color-ink-subtle)]',
-  chooser: 'grid gap-3 sm:grid-cols-2 lg:grid-cols-3',
+  chooser: 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3',
   choice:
     'flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-left transition-colors hover:border-[var(--view)] hover:bg-[var(--color-surface)]',
   choiceActive: 'border-[var(--view)] bg-[var(--view)]/8',
@@ -778,7 +797,7 @@ export const CHANNEL_BLOCK = {
  */
 
 export const AUTH_SHELL = {
-  page: 'grid min-h-dvh lg:grid-cols-2',
+  page: 'grid grid-cols-1 min-h-dvh lg:grid-cols-2',
   // Gradient band above the form on mobile, the half page from lg
   art: 'relative flex h-36 items-center justify-center overflow-hidden bg-[image:var(--gradient-frame)] lg:h-auto',
   figure: 'hidden w-3/5 max-w-md lg:block',
@@ -788,4 +807,21 @@ export const AUTH_SHELL = {
   wordmark: 'h-auto w-40',
   card: 'card-surface rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 shadow-[var(--shadow-md)] sm:p-8',
   title: 'mb-6 text-2xl font-bold tracking-tight',
+} as const
+
+/**
+ * Splash screen classes
+ * @type {Record<string, string>}
+ */
+
+export const SPLASH = {
+  overlay: 'splash cursor-pointer select-none',
+  ground: 'splash-ground pointer-events-none absolute inset-0 overflow-hidden',
+  camera: 'splash-camera',
+  body: 'splash-body absolute top-1/2 left-1/2 flex w-max -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-5',
+  word: 'splash-word relative flex justify-center',
+  wordFill: 'splash-word-fill absolute inset-0 flex justify-center',
+  letter: 'splash-letter block',
+  label:
+    'splash-label text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
 } as const

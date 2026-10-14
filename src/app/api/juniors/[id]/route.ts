@@ -5,6 +5,7 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { juniorFields, removeJunior, updateJunior } from '@/core/services/academy/AcademyService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { ACADEMY_JUNIOR_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -43,5 +44,23 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   permission: Permissions.AcademyManage,
   descriptor: { summary: 'Take a junior out of a session', tags: ['academy'] },
-  handler: ({ params, session, access }) => removeJunior(params.id, academyScope(session, access)),
+  handler: async ({ params, session, access }) => {
+    const junior = await prisma.academyJunior.findUnique({
+      where: { id: params.id },
+      include: { account: true },
+    })
+    const juniors = await removeJunior(params.id, academyScope(session, access))
+
+    if (junior) {
+      await recordFileEvent({
+        eventType: 'JuniorRemoved',
+        file: JOURNAL_FILES.Academy,
+        fileId: junior.sessionId,
+        actorId: session.id,
+        summary: junior.account.displayName,
+      })
+    }
+
+    return juniors
+  },
 })

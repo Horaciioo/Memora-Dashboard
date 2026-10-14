@@ -32,7 +32,12 @@ export const LIST_STYLES = {
   // Glyph flagging a member who has private notes
   cardNotes: 'h-4 w-4 shrink-0 text-[var(--color-ink-accent)]',
   stack: 'flex flex-col gap-2',
-  item: 'flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 transition-[border-color,box-shadow] hover:border-[var(--color-border-strong)]',
+  item: 'flex items-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-2 py-3 md:gap-3 md:px-4 transition-[border-color,box-shadow] hover:border-[var(--color-border-strong)]',
+  // Row washed in its stored colour on a phone
+  itemAccent:
+    'bg-linear-to-r from-[color-mix(in_srgb,var(--accent)_24%,transparent)] via-[color-mix(in_srgb,var(--accent)_8%,transparent)] to-transparent md:bg-none',
+  // Words a phone drops
+  desktopOnly: 'hidden md:inline-flex',
   itemClickable:
     'cursor-pointer hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-sm)]',
   card: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 transition-[border-color,box-shadow]',
@@ -46,7 +51,11 @@ export const LIST_STYLES = {
     'flex shrink-0 items-center gap-1 text-xs font-medium whitespace-nowrap text-[var(--color-ink-subtle)] italic',
   cardAbsentGlyph: 'h-3.5 w-3.5 shrink-0',
   cardAbsentEmblems: 'opacity-50 grayscale',
-  grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
+  // One box per row on a phone
+  grid: 'grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 xl:grid-cols-3',
+  // Words and glyphs the box drops on a phone
+  cardExtra: 'hidden md:contents',
+  cardNotesWrap: 'hidden md:inline-flex',
 } as const
 
 /**
@@ -72,9 +81,9 @@ export const RECORD_ROW = {
  */
 
 export const CALENDAR_AGENDA = {
-  list: 'flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-5',
+  list: 'flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface px-3 sm:px-5',
   empty: 'py-16 text-center text-sm text-[var(--color-ink-subtle)]',
-  day: 'grid grid-cols-[6rem_minmax(0,1fr)] gap-4 py-5',
+  day: 'grid grid-cols-1 gap-2 py-4 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-4 sm:py-5',
   head: 'flex items-start gap-3',
   number:
     'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg font-bold tabular-nums',
@@ -83,10 +92,10 @@ export const CALENDAR_AGENDA = {
     'flex flex-col pt-0.5 text-micro leading-tight font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   month: 'font-semibold normal-case first-letter:uppercase',
   rows: 'flex flex-col',
-  row: 'flex items-center gap-4 rounded-[var(--radius-md)] px-3 py-2.5 text-left transition-colors hover:bg-[var(--color-hover)]',
+  row: 'flex min-h-11 items-center gap-3 rounded-[var(--radius-md)] px-2 py-2.5 sm:gap-4 sm:px-3 text-left transition-colors hover:bg-[var(--color-hover)]',
   rowSelected: 'ring-2 ring-[var(--color-pick)] ring-inset',
   bullet: 'h-2 w-2 shrink-0 rounded-full bg-current',
-  time: 'w-24 shrink-0 text-sm text-[var(--color-ink-subtle)] tabular-nums',
+  time: 'w-16 shrink-0 text-sm sm:w-24 text-[var(--color-ink-subtle)] tabular-nums',
   title: 'min-w-0 flex-1 truncate text-sm font-semibold',
   meta: 'hidden shrink-0 text-sm text-[var(--color-ink-subtle)] md:inline',
 } as const
@@ -97,9 +106,10 @@ export const CALENDAR_AGENDA = {
  */
 
 export const CALENDAR_SIDEBAR = {
-  // Folded rail of the screens without a sidebar
-  rail: 'flex flex-col gap-4 md:hidden',
-  railBody: 'flex-col gap-6',
+  // Filters button of the screens without a sidebar
+  trigger: 'md:hidden',
+  triggerActive: '!border-[var(--color-brand-600)] !text-[var(--color-ink-accent)]',
+  sheetBody: 'flex flex-col gap-6',
   // Sidebar version
   panel: 'flex min-h-0 w-full flex-1 flex-col gap-5 overflow-y-auto px-4 pt-5 pb-4',
   toggle:
@@ -213,39 +223,32 @@ export const GROUP_STYLES = {
  */
 
 export const BOARD_STYLES = {
-  scroller: 'flex gap-4 overflow-x-auto pb-2',
+  scroller: 'flex flex-col gap-3 md:flex-row md:gap-4 md:overflow-x-auto md:pb-2',
+  columnShown: 'flex',
   column:
-    'flex w-72 shrink-0 flex-col gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-2.5',
+    'w-full shrink-0 flex-col gap-2 md:w-72 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-2.5',
   columnArchived: 'opacity-60',
   // Column glass tinted by its classic colour
   columnTint:
     'accent-tint accent-border border bg-clip-padding shadow-[inset_0_1px_0_var(--glass-line),var(--shadow-md)]',
   columnHead: 'flex items-center justify-between gap-2 px-2 py-1.5',
+  // Folds the lane on a phone
+  columnToggle:
+    'flex min-h-11 w-full items-center justify-between gap-2 text-left md:min-h-0 md:cursor-default',
+  columnChevron: 'size-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform md:hidden',
   columnTitle: 'text-sm font-bold tracking-wide text-[var(--color-ink)] uppercase',
   count:
     'rounded-[var(--radius-sm)] bg-[var(--color-surface-raised)] px-2 py-0.5 text-xs text-[var(--color-ink-subtle)]',
   body: 'flex min-h-24 flex-col gap-2 rounded-[var(--radius-md)] p-1',
-  card: 'group flex cursor-grab flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3.5 shadow-[var(--shadow-sm)] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] active:cursor-grabbing motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+  card: 'group flex cursor-pointer flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3.5 shadow-[var(--shadow-sm)] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] md:cursor-grab md:active:cursor-grabbing motion-reduce:transition-none motion-reduce:hover:translate-y-0',
   // Card sits lighter than its column so the two glass layers do not muddy
   cardGlass: 'bg-[var(--color-surface-raised)]/70',
   cardTint: 'accent-border bg-[var(--color-surface-raised)]/70',
   cardTitle: 'text-body leading-snug font-bold',
+  // Where a card comes from, under a divider
+  cardOrigin: 'border-t border-[var(--color-border)] pt-2 text-xs text-[var(--color-ink-subtle)]',
   // Glyph flowing before a title
   cardGlyph: 'mr-1.5',
-} as const
-
-/**
- * Timeline styles
- * @type {Record<string, string>}
- */
-
-export const TIMELINE_STYLES = {
-  list: 'flex flex-col',
-  item: 'relative flex gap-3 pb-4 pl-6 last:pb-0',
-  rail: 'absolute top-1.5 bottom-0 left-[7px] w-px bg-[var(--color-border)]',
-  dot: 'absolute top-1.5 left-0 h-3.5 w-3.5 rounded-full border-2 border-[var(--color-surface-raised)]',
-  body: 'flex min-w-0 flex-col gap-0.5 text-sm',
-  meta: 'text-xs text-[var(--color-ink-subtle)]',
 } as const
 
 /**
@@ -336,7 +339,7 @@ export const CALENDAR_DETAIL = {
   card: 'flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4',
   answer: 'flex flex-wrap gap-2',
   answered: 'flex items-center gap-2 text-sm',
-  columns: 'grid gap-4 sm:grid-cols-3',
+  columns: 'grid grid-cols-1 gap-4 sm:grid-cols-3',
   none: 'text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 
@@ -348,8 +351,11 @@ export const CALENDAR_DETAIL = {
 export const CALENDAR_STYLES = {
   frame:
     'overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface',
-  toolbar: 'flex flex-wrap items-center gap-2 pb-3',
-  period: 'text-xl font-bold tracking-tight first-letter:uppercase sm:text-2xl',
+  toolbar: 'flex flex-col gap-2 pb-3 md:flex-row md:flex-wrap md:items-center md:justify-between',
+  toolbarMain: 'flex items-center gap-2',
+  toolbarTools: 'flex items-center gap-2',
+  period:
+    'order-3 min-w-0 flex-1 truncate text-center text-lg font-bold tracking-tight first-letter:uppercase md:order-none md:flex-none md:text-left md:text-2xl',
   weekdays:
     'border-b border-[var(--color-border)] bg-[var(--color-surface)] text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   weekdaysMonth: 'grid grid-cols-7',
@@ -360,13 +366,15 @@ export const CALENDAR_STYLES = {
   weekday: 'px-2 py-2 text-center',
   weekdayHead: 'flex flex-col items-center gap-1',
   month: 'grid grid-cols-7',
-  day: 'group relative flex min-h-28 touch-none flex-col gap-1 overflow-hidden border-r border-b border-[var(--color-border)] p-1.5 last:border-r-0',
+  day: 'group relative flex min-h-16 flex-col gap-1 overflow-hidden md:touch-none border-r border-b border-[var(--color-border)] p-0.5 last:border-r-0 sm:p-1.5 md:min-h-28',
   dayOutside: 'bg-[var(--color-surface)]/50',
   dayDrafted: 'ring-2 ring-[var(--color-pick)] ring-inset',
   dayNumber:
     'relative mx-auto flex h-6 w-6 items-center justify-center text-xs font-semibold tabular-nums',
   dayNumberButton: 'cursor-pointer transition-colors hover:bg-[var(--color-hover)] rounded-full',
   dayNumberToday: 'rounded-full bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
+  // Day on screen below the month of a phone
+  dayNumberPicked: 'ring-2 ring-[var(--color-pick)]',
   dayNumberOutside: 'text-[var(--color-ink-subtle)]',
   dayAdd:
     'absolute top-1 right-1 z-20 flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
@@ -374,11 +382,13 @@ export const CALENDAR_STYLES = {
   zoneBand: 'flex-1',
   zoneLabel:
     'relative truncate rounded-[var(--radius-sm)] px-1.5 py-0.5 text-micro font-semibold tracking-wide uppercase',
-  bar: 'relative flex min-h-6 cursor-grab items-center gap-1.5 px-1.5 py-0.5 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
+  bar: 'relative flex h-2 min-h-2 cursor-grab items-center gap-1.5 px-0 py-0 text-left text-xs md:h-auto md:min-h-6 md:px-1.5 md:py-0.5 transition-[filter] hover:brightness-95 active:cursor-grabbing',
   barStart: 'ml-0 rounded-l-[var(--radius-sm)]',
   barEnd: 'mr-0 rounded-r-[var(--radius-sm)]',
-  barRunsIn: '-ml-1.5',
-  barRunsOut: '-mr-1.5',
+  barRunsIn: '-ml-0.5 sm:-ml-1.5',
+  barRunsOut: '-mr-0.5 sm:-mr-1.5',
+  // A band shows no words on a phone
+  barTitle: 'hidden min-w-0 flex-1 font-medium break-words md:block',
   entry:
     'relative flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
   // Month entry
@@ -407,7 +417,7 @@ export const CALENDAR_STYLES = {
     'relative rounded-[var(--radius-sm)] px-1.5 text-left text-xs text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   week: 'grid',
   hour: 'border-r border-b border-[var(--color-border)] px-2 py-1 text-right text-xs text-[var(--color-ink-subtle)] tabular-nums',
-  slot: 'relative flex min-h-12 touch-none flex-col gap-1 border-r border-b border-[var(--color-border)] p-1 last:border-r-0',
+  slot: 'relative flex min-h-12 flex-col md:touch-none gap-1 border-r border-b border-[var(--color-border)] p-1 last:border-r-0',
   allDay: 'grid border-b border-[var(--color-border)] bg-[var(--color-surface)]/60',
   allDayLabel:
     'border-r border-[var(--color-border)] px-2 py-1 text-right text-xs text-[var(--color-ink-subtle)]',
@@ -578,7 +588,7 @@ export const PAGINATION_STYLES = {
  */
 
 export const ABSENCE_WIZARD = {
-  root: 'surface-enter grid gap-5 md:grid-cols-[2rem_minmax(0,1fr)] md:gap-7',
+  root: 'surface-enter grid grid-cols-1 gap-5 md:grid-cols-[2rem_minmax(0,1fr)] md:gap-7',
   // Bare chips and dashed runs
   timeline: 'relative flex items-start justify-between gap-2 md:block',
   step: 'relative flex items-center md:absolute md:top-[var(--step-top)] md:left-0 md:-translate-y-1/2',
@@ -648,7 +658,7 @@ export const MEMBER_ADMIN = {
   // Gestures side by side, divider stops short of both ends
   split: 'flex flex-col lg:flex-row',
   // Role box left, state box right
-  pair: 'grid items-stretch gap-6 lg:grid-cols-2',
+  pair: 'grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2',
   cell: 'relative flex flex-1 flex-col items-center gap-2 px-4 py-4 text-center not-first:before:absolute not-first:before:inset-x-4 not-first:before:top-0 not-first:before:h-px not-first:before:bg-[var(--color-border)] lg:not-first:before:inset-x-auto lg:not-first:before:inset-y-4 lg:not-first:before:left-0 lg:not-first:before:h-auto lg:not-first:before:w-px',
   cellNote: 'text-xs text-[var(--color-ink-subtle)]',
   // Sanction drawer fields

@@ -130,6 +130,20 @@ export const CalendarKinds = {
 export type CalendarKindName = (typeof CalendarKinds)[keyof typeof CalendarKinds]
 
 /**
+ * What an academy calendar template stands for
+ * @type {Record<string, string>}
+ */
+
+export const EventPurposes = {
+  TrainerInterview: 'TRAINER_INTERVIEW',
+  PanelInterview: 'PANEL_INTERVIEW',
+  ReviewOne: 'REVIEW_ONE',
+  ReviewFinal: 'REVIEW_FINAL',
+} as const
+
+export type EventPurposeName = (typeof EventPurposes)[keyof typeof EventPurposes]
+
+/**
  * Domain a calendar entry is read from
  * @type {Record<string, string>}
  */
@@ -139,8 +153,10 @@ export const CalendarSources = {
   Absence: 'ABSENCE',
   Meeting: 'MEETING',
   Birthday: 'BIRTHDAY',
-  AcademyStep: 'ACADEMY_STEP',
   AcademySession: 'ACADEMY_SESSION',
+  AcademyPeriod: 'ACADEMY_PERIOD',
+  AcademyTrainings: 'ACADEMY_TRAININGS',
+  AcademyReviews: 'ACADEMY_REVIEWS',
   Recruitment: 'RECRUITMENT',
   RecruitmentInterview: 'RECRUITMENT_INTERVIEW',
 } as const

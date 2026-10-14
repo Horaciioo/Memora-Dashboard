@@ -159,6 +159,14 @@
   opacity: 1;
 }
 
+/* Open from tablets up whatever the state */
+@media (width >= 768px) {
+  .fold-wide {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
 .fold > * {
   min-height: 0;
   overflow: hidden;

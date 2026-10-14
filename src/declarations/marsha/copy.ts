@@ -5,6 +5,7 @@
 
 export const MARSHA_COPY = {
   title: 'Marsha Bot',
+  heroDescription: 'Ton outil de modération',
   lead: 'Les commandes de notre bot de modération Discord, et comment s’en servir sans erreur.',
   tabCommands: 'Commandes',
   tabStart: 'Bien démarrer',

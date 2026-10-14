@@ -1,7 +1,6 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { instantiateJuniorSteps } from '@/core/services/academy/timelineSteps'
 import { JUNIOR_FUNCTION_OF } from '@/declarations/reference/fixed'
 import { AcademyJuniorStatuses, MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 
@@ -155,7 +154,7 @@ export const syncAdmission = async (candidateId: string): Promise<void> => {
     return
   }
 
-  const junior = await prisma.academyJunior.create({
+  await prisma.academyJunior.create({
     data: {
       sessionId: promotion.id,
       accountId,
@@ -163,15 +162,6 @@ export const syncAdmission = async (candidateId: string): Promise<void> => {
       status: AcademyJuniorStatuses.Active,
     },
   })
-
-  // The shared trame lands now
-  await instantiateJuniorSteps(
-    junior.id,
-    promotion.id,
-    promotion.functionId,
-    null,
-    promotion.startsAt
-  )
 }
 
 /**

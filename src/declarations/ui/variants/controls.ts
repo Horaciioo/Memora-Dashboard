@@ -19,19 +19,21 @@ export const COPY_VALUE = {
  */
 
 export const BUTTON_STYLES = {
-  base: 'inline-flex shrink-0 items-center justify-center gap-2 rounded-full text-sm font-semibold transition-[background-color,border-color,color,filter] duration-[var(--motion-duration-fast)] disabled:pointer-events-none disabled:opacity-50',
+  base: 'inline-flex min-h-11 shrink-0 items-center justify-center gap-2 text-sm font-semibold md:min-h-0 transition-[background-color,border-color,color,filter] duration-[var(--motion-duration-fast)] disabled:pointer-events-none disabled:opacity-50',
   primary:
-    'bg-[var(--color-brand-600)] px-4 py-2 text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
+    'rounded-[var(--radius-md)] md:rounded-full bg-[var(--color-brand-600)] px-4 py-2 text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',
   secondary:
-    'border border-[var(--color-border-strong)] bg-[var(--color-background)] px-3 py-2 hover:bg-[var(--color-surface-sunken)]',
+    'rounded-[var(--radius-md)] md:rounded-full border border-[var(--color-border-strong)] bg-[var(--color-background)] px-3 py-2 hover:bg-[var(--color-surface-sunken)]',
   ghost:
-    'px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+    'rounded-[var(--radius-md)] md:rounded-full px-3 py-2 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // Hover deepens
-  success: 'bg-[var(--color-success)] px-4 py-2 text-[var(--color-on-solid)] hover:brightness-90',
-  danger: 'bg-[var(--color-danger)] px-4 py-2 text-[var(--color-on-solid)] hover:brightness-90',
+  success:
+    'rounded-[var(--radius-md)] md:rounded-full bg-[var(--color-success)] px-4 py-2 text-[var(--color-on-solid)] hover:brightness-90',
+  danger:
+    'rounded-[var(--radius-md)] md:rounded-full bg-[var(--color-danger)] px-4 py-2 text-[var(--color-on-solid)] hover:brightness-90',
   // 44px hit area on touch
   icon: 'h-9 w-9 min-h-11 min-w-11 rounded-full p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] md:min-h-0 md:min-w-0',
-  link: 'p-0 text-[var(--color-ink-accent)] underline-offset-2 hover:underline',
+  link: 'min-h-0 p-0 text-[var(--color-ink-accent)] underline-offset-2 hover:underline',
   // Square footprint for a label-less button
   square: 'h-9 w-9 min-h-11 min-w-11 shrink-0 p-0 md:min-h-0 md:min-w-0',
 } as const
@@ -44,8 +46,10 @@ export type ButtonVariant = keyof Omit<typeof BUTTON_STYLES, 'base'>
  */
 
 export const SEGMENTED_STYLES = {
-  group: 'flex items-center gap-1 rounded-full glass-soft p-1',
-  option: 'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+  group:
+    'flex max-w-full items-center gap-1 overflow-x-auto rounded-[var(--radius-md)] glass-soft p-1 md:rounded-full',
+  option:
+    'min-h-11 shrink-0 rounded-[var(--radius-sm)] px-2.5 py-1.5 text-xs font-semibold md:min-h-0 md:rounded-full md:px-3 whitespace-nowrap transition-colors',
   selected: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   idle: 'text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
 } as const
@@ -71,8 +75,8 @@ export const PROPERTY_VALUE = 'text-[var(--color-ink)]'
 
 export const PROPERTY_SPACING = {
   // Between two properties
-  rows: 'gap-y-7',
-  columns: 'gap-x-10',
+  rows: 'gap-y-5 sm:gap-y-7',
+  columns: 'gap-x-4 sm:gap-x-10',
   // Between a title and its value
   within: 'gap-2',
   // Settings rows
@@ -236,7 +240,7 @@ export const SELECT_MENU_STYLES = {
     'flex w-full items-center gap-3 rounded-[var(--radius-sm)] px-2.5 text-left opacity-60 transition-[background-color,opacity] hover:bg-[var(--color-surface)] hover:opacity-100',
   optionActive: 'bg-[var(--color-surface)] opacity-100',
   optionDisabled: 'cursor-not-allowed opacity-50',
-  scrim: 'fixed inset-0 z-[65] bg-[var(--color-scrim)] md:bg-transparent',
+  scrim: 'fixed inset-0 z-[65] bg-transparent',
   // Chosen entry
   optionSelected:
     'bg-linear-to-r from-[var(--color-picker-wash-strong)] via-[var(--color-picker-wash)] to-transparent font-semibold text-[var(--color-ink)] opacity-100',
@@ -305,6 +309,7 @@ export const DATE_PICKER_STYLES = {
   hint: 'text-xs text-[var(--color-ink-subtle)]',
   action:
     'flex h-7 w-auto items-center justify-center rounded-[var(--radius-sm)] px-2 text-xs text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
+  actionOn: 'bg-[var(--color-surface)] font-semibold text-[var(--color-ink)]',
   weekdays:
     'grid grid-cols-7 px-2 pt-2 text-center text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   grid: 'grid grid-cols-7 gap-y-0.5 p-2',

@@ -1,6 +1,13 @@
+import type { CommentView } from '@/types/comments'
+import type { DiscordIdentifierView } from '@/types/discord'
 import type { IntegrationLinkView } from '@/types/onboarding'
-import type { FormValues } from '@/types/forms'
-import type { RecruitmentOwnerName, RecruitmentStatusName } from '@/utils/constants/recruitment'
+import type { FieldDefinition, FormValues } from '@/types/forms'
+import type {
+  AnswerAppreciationName,
+  RecruitmentOwnerName,
+  RecruitmentPlatformName,
+  RecruitmentStatusName,
+} from '@/utils/constants/recruitment'
 
 /**
  * Named row a session points at
@@ -9,6 +16,7 @@ import type { RecruitmentOwnerName, RecruitmentStatusName } from '@/utils/consta
  * @property {string} label - Display label
  * @property {string | null} accent - Colour token
  * @property {string | null} [image] - Portrait shown beside the label
+ * @property {string | null} [icon] - Glyph key of a function
  */
 
 export interface RecruitmentRef {
@@ -16,6 +24,7 @@ export interface RecruitmentRef {
   label: string
   accent: string | null
   image?: string | null
+  icon?: string | null
 }
 
 /**
@@ -28,6 +37,11 @@ export interface RecruitmentRef {
  * @property {RecruitmentRef} youtuber - Creator recruited for
  * @property {RecruitmentRef} jobFunction - Post recruited for
  * @property {RecruitmentRef[]} responsables - Moderators carrying the session
+ * @property {RecruitmentRef[]} recruiters - Moderators leading interviews
+ * @property {RecruitmentPlatformName} platform - Platform the script is written for
+ * @property {string | null} academySessionId - Promotion this campaign feeds
+ * @property {string | null} promotionTitle - Name of that promotion
+ * @property {string | null} youtuberBanner - Banner of the creator
  * @property {string | null} opensAt - Announcement day
  * @property {string | null} closesAt - Closing day
  * @property {number} candidateCount - Applicants held
@@ -43,6 +57,13 @@ export interface RecruitmentSummary {
   youtuber: RecruitmentRef
   jobFunction: RecruitmentRef
   responsables: RecruitmentRef[]
+  recruiters: RecruitmentRef[]
+  platform: RecruitmentPlatformName
+  academySessionId: string | null
+  promotionTitle: string | null
+  youtuberBanner: string | null
+  // Discord wording once announced
+  announcement: string | null
   opensAt: string | null
   closesAt: string | null
   candidateCount: number
@@ -51,19 +72,17 @@ export interface RecruitmentSummary {
 }
 
 /**
- * Remark left on one candidate
- * @typedef {Object} CandidateComment
- * @property {string} id - Comment identifier
- * @property {string | null} authorName - Who wrote it
- * @property {string} body - Written trace
- * @property {string} createdAt - When it was written
+ * What the recruiter wrote on one question
+ * @typedef {Object} AnswerState
+ * @property {string} notes - Free notes
+ * @property {AnswerAppreciationName | null} appreciation - Reaction
+ * @property {boolean} skipped - Left out
  */
 
-export interface CandidateComment {
-  id: string
-  authorName: string | null
-  body: string
-  createdAt: string
+export interface AnswerState {
+  notes: string
+  appreciation: AnswerAppreciationName | null
+  skipped: boolean
 }
 
 /**
@@ -75,7 +94,7 @@ export interface CandidateComment {
  * @property {string} name - Best known name
  * @property {string | null} formId - Meltdown Forms identifier
  * @property {RecruitmentRef | null} recruiter - Moderator leading the interview
- * @property {RecruitmentRef[]} spectators - Moderators sitting in
+ * @property {RecruitmentRef[]} observers - Moderators sitting in
  * @property {string | null} interviewAt - When the interview is held
  * @property {boolean} attended - Showed up
  * @property {string | null} outcomeId - Column of the results board
@@ -83,7 +102,9 @@ export interface CandidateComment {
  * @property {number} position - Order inside its column
  * @property {string | null} memberId - Existing moderator holding that Discord identifier
  * @property {string | null} memberName - Display name of that moderator
- * @property {CandidateComment[]} comments - Remarks left on the application
+ * @property {Record<string, boolean>} stageMarks - Timeline moments ticked by hand
+ * @property {CommentView[]} comments - Remarks left on the application
+ * @property {Record<string, AnswerState>} answers - Interview notes by question key
  */
 
 export interface CandidateView {
@@ -93,7 +114,7 @@ export interface CandidateView {
   name: string
   formId: string | null
   recruiter: RecruitmentRef | null
-  spectators: RecruitmentRef[]
+  observers: RecruitmentRef[]
   interviewAt: string | null
   attended: boolean
   outcomeId: string | null
@@ -101,7 +122,9 @@ export interface CandidateView {
   position: number
   memberId: string | null
   memberName: string | null
-  comments: CandidateComment[]
+  stageMarks: Record<string, boolean>
+  comments: CommentView[]
+  answers: Record<string, AnswerState>
 }
 
 /**
@@ -133,20 +156,6 @@ export interface RecruitmentStepView {
 }
 
 /**
- * One question of the interview script
- * @typedef {Object} RecruitmentQuestionView
- * @property {string} id - Question identifier
- * @property {string} prompt - What is asked
- * @property {string | null} hint - What the answer should cover
- */
-
-export interface RecruitmentQuestionView {
-  id: string
-  prompt: string
-  hint: string | null
-}
-
-/**
  * One column of the results board
  * @typedef {Object} RecruitmentOutcomeView
  * @property {string} id - Outcome identifier
@@ -163,14 +172,31 @@ export interface RecruitmentOutcomeView {
 }
 
 /**
+ * Temporary member sitting in on interviews
+ * @typedef {Object} ObserverView
+ * @property {string} id - Observer row identifier
+ * @property {RecruitmentRef} person - Member observing
+ * @property {number} quota - Interviews they may sit in on
+ * @property {number} used - Interviews they already joined
+ */
+
+export interface ObserverView {
+  id: string
+  person: RecruitmentRef
+  quota: number
+  used: number
+}
+
+/**
  * Everything one session page renders
  * @typedef {Object} RecruitmentDetail
  * @property {RecruitmentSummary} summary - Session header
  * @property {string} instructions - Consignes of this session
  * @property {CandidateView[]} candidates - Applicants held
  * @property {RecruitmentStepView[]} steps - Timeline moments
- * @property {RecruitmentQuestionView[]} questions - Interview script in force
+ * @property {string[]} questionKeys - Questions picked for the interviews
  * @property {RecruitmentOutcomeView[]} outcomes - Columns of the results board
+ * @property {ObserverView[]} observers - Members sitting in on interviews
  * @property {IntegrationLinkView | null} link - Integration form handed out
  */
 
@@ -179,7 +205,63 @@ export interface RecruitmentDetail {
   instructions: string
   candidates: CandidateView[]
   steps: RecruitmentStepView[]
-  questions: RecruitmentQuestionView[]
+  questionKeys: string[]
   outcomes: RecruitmentOutcomeView[]
+  observers: ObserverView[]
   link: IntegrationLinkView | null
+  identifiers: DiscordIdentifierView[]
+}
+
+/**
+ * Declarations of the forms of a session file
+ * @typedef {Object} RecruitmentFields
+ */
+
+export interface RecruitmentFields {
+  session: FieldDefinition[]
+  candidate: FieldDefinition[]
+  step: FieldDefinition[]
+  comment: FieldDefinition[]
+  review: FieldDefinition[]
+  instruction: FieldDefinition[]
+  link: FieldDefinition[]
+  observer: FieldDefinition[]
+}
+
+/**
+ * What the viewer may do on the file
+ * @typedef {Object} RecruitmentRights
+ */
+
+export interface RecruitmentRights {
+  manage: boolean
+  writeCandidates: boolean
+  writeInstructions: boolean
+  manageLinks: boolean
+  readLogs: boolean
+  // Reads as an observer, nothing writes
+  observing: boolean
+  viewerId: string
+}
+
+/**
+ * Temporary link handing a written context to a candidate
+ * @typedef {Object} ExerciseLinkView
+ * @property {string} id - Link identifier
+ * @property {string} contextKey - Context handed out
+ * @property {string} token - Public token
+ * @property {number} plays - Times the situation was played
+ * @property {boolean} isClaimed - Candidate proved their identity
+ * @property {string} expiresAt - End of validity, ISO date
+ * @property {boolean} isExpired - Over, by time or by hand
+ */
+
+export interface ExerciseLinkView {
+  id: string
+  contextKey: string
+  token: string
+  plays: number
+  isClaimed: boolean
+  expiresAt: string
+  isExpired: boolean
 }

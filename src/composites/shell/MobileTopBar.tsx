@@ -1,61 +1,60 @@
 'use client'
 
-import Link from '@/components/elements/navigation/AppLink'
 import { useState } from 'react'
-import { Avatar } from '@/components/elements/display/Avatar'
 import { AccountSheet } from '@/composites/shell/AccountSheet'
-import { ViewToggle } from '@/composites/shell/ViewToggle'
-import { APP_NAME } from '@/declarations/app'
-import { ROUTES } from '@/declarations/navigation'
+import { NavSheet } from '@/composites/shell/NavSheet'
 import { TOP_BAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
+import { ICONS } from '@/declarations/ui/icons'
 import type { ViewContext } from '@/types/access'
 import type { SessionUser } from '@/types/auth'
 
 export interface MobileTopBarProps {
   session: SessionUser
   viewContext: ViewContext
+  unreadCount: number
 }
 
 /**
- * Fixed top bar of the mobile shell — active creator
+ * Top bar of the mobile shell holding the menu
  * @param {SessionUser} session - Signed-in member
  * @param {ViewContext} viewContext - View resolved server-side
+ * @param {number} unreadCount - Unopened notifications resolved server-side
  * @return {JSX.Element}
  */
 
-export const MobileTopBar = ({ session, viewContext }: MobileTopBarProps) => {
+export const MobileTopBar = ({ session, viewContext, unreadCount }: MobileTopBarProps) => {
   const [isAccountOpen, setAccountOpen] = useState(false)
-
-  const { creators, activeYoutuberId } = viewContext
-  const creator = creators.find((entry) => entry.id === activeYoutuberId) ?? null
+  const [isMenuOpen, setMenuOpen] = useState(false)
+  const MenuIcon = ICONS.menu
 
   return (
     <header className={TOP_BAR.bar}>
-      <Link href={ROUTES.dashboard} className={TOP_BAR.creator}>
-        {creator ? (
-          <>
-            <Avatar name={creator.name} src={creator.avatarUrl} size="xs" />
-            <span className={TOP_BAR.creatorName}>{creator.name}</span>
-          </>
-        ) : (
-          <span className={TOP_BAR.creatorName}>{APP_NAME}</span>
-        )}
-      </Link>
+      <button
+        type="button"
+        aria-label={NAV_COPY.openMenu}
+        onClick={() => setMenuOpen(true)}
+        className={TOP_BAR.menuButton}
+      >
+        <MenuIcon className={TOP_BAR.menuIcon} aria-hidden="true" />
+      </button>
 
-      <div className={TOP_BAR.actions}>
-        <ViewToggle viewContext={viewContext} />
-        <button
-          type="button"
-          aria-label={NAV_COPY.account}
-          onClick={() => setAccountOpen(true)}
-          className={TOP_BAR.avatarButton}
-        >
-          <Avatar name={session.displayName} src={session.avatarUrl} size="sm" />
-        </button>
-      </div>
-
-      <AccountSheet open={isAccountOpen} onClose={() => setAccountOpen(false)} />
+      <NavSheet
+        open={isMenuOpen}
+        viewContext={viewContext}
+        unreadCount={unreadCount}
+        session={session}
+        onClose={() => setMenuOpen(false)}
+        onAccount={() => {
+          setMenuOpen(false)
+          setAccountOpen(true)
+        }}
+      />
+      <AccountSheet
+        open={isAccountOpen}
+        viewContext={viewContext}
+        onClose={() => setAccountOpen(false)}
+      />
     </header>
   )
 }

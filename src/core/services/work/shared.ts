@@ -273,6 +273,49 @@ export const memberOptions = async (scope?: AccessScope): Promise<FieldOption[]>
 }
 
 /**
+ * Read the members of a creator's team holding a role or a function
+ * @param {Object} filter - Who qualifies
+ * @param {MemberRoleName} [filter.role] - Role held
+ * @param {string} [filter.functionName] - Function held
+ * @param {string} [filter.youtuberId] - Creator whose team narrows the list, else each option names its creators
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+export const teamOptions = async ({
+  role,
+  functionName,
+  youtuberId,
+}: {
+  role?: MemberRoleName
+  functionName?: string
+  youtuberId?: string
+}): Promise<FieldOption[]> => {
+  const rows = await prisma.account.findMany({
+    where: {
+      status: { notIn: GONE_MEMBER_STATUSES },
+      ...(role && { role }),
+      ...(functionName && { functions: { some: { jobFunction: { name: functionName } } } }),
+      ...(youtuberId && { youtubers: { some: { id: youtuberId } } }),
+    },
+    orderBy: { displayName: 'asc' },
+    include: {
+      ...HELD_FUNCTIONS,
+      youtubers: { select: { id: true } },
+      _count: { select: { absences: { where: activeAbsenceFilter() } } },
+    },
+  })
+
+  return roleGroupedOptions(rows, (row) => ({
+    disabled: row._count.absences > 0,
+    owners: row.youtubers.map((youtuber) => youtuber.id),
+    hint:
+      row._count.absences > 0
+        ? MEMBER_COPY.absentHint.replace('{name}', row.displayName)
+        : (toMemberFunctions(row.functions)[0]?.label ?? ROLE_REGISTRY.label(row.role)),
+  }))
+}
+
+/**
  * Read the moderators allowed to lead a team
  * @param {AccessScope} [scope] - Viewer perimeter
  * @return {Promise<FieldOption[]>} - Select options

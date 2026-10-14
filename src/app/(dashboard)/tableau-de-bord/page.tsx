@@ -58,7 +58,7 @@ export default async function DashboardPage() {
   return (
     <div className={HOME_FLOW.page}>
       {hasUnlock && <CourseUnlockBubble />}
-      <PageHeader title={PERSONAL_COPY.title} />
+      <PageHeader title={PERSONAL_COPY.title} heroDescription={PERSONAL_COPY.heroDescription} />
       <div {...beaconProps(TOUR_BEACONS.homeHeader)}>
         <HomeHeader name={session.displayName} />
       </div>

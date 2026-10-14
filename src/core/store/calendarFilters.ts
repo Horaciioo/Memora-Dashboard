@@ -46,7 +46,11 @@ export const useCalendarFiltersStore = create<CalendarFiltersStore>()(
       toggleCreator: (creatorId) =>
         set((state) => ({ hiddenCreators: flip(state.hiddenCreators, creatorId) })),
     }),
-    // Read after mount
-    { name: 'calendarFilters', skipHydration: true }
+    // Read after mount, the span always opens on the month
+    {
+      name: 'calendarFilters',
+      skipHydration: true,
+      partialize: ({ hiddenLayers, hiddenCreators }) => ({ hiddenLayers, hiddenCreators }),
+    }
   )
 )

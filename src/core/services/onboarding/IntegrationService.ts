@@ -21,10 +21,6 @@ import { HISTORY_CONSENT } from '@/declarations/system/privacy'
 import { LANGUAGE_OPTIONS } from '@/declarations/system/locales'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
-import {
-  instantiateDispositifSteps,
-  instantiateJuniorSteps,
-} from '@/core/services/academy/timelineSteps'
 import { findAdmission } from '@/core/services/academy/AdmissionService'
 import { afterIntegration } from '@/core/services/academy/ParkourService'
 import { PARKOUR_COPY } from '@/declarations/academy/parkour'
@@ -519,14 +515,6 @@ const confirmAdmission = async (
     }),
   ])
 
-  await instantiateDispositifSteps(
-    admission.juniorId,
-    session.id,
-    session.functionId,
-    dispositifId,
-    session.startsAt
-  )
-
   // The last form back launches the promotion
   await afterIntegration(admission.juniorId)
 
@@ -621,7 +609,7 @@ export const submitIntegration = async (
 
   // The academy mode also opens the junior file and its timeline
   if (mode.enrolsAcademy && invite.session && dispositifId) {
-    const junior = await prisma.academyJunior.create({
+    await prisma.academyJunior.create({
       data: {
         sessionId: invite.session.id,
         accountId: account.id,
@@ -629,14 +617,6 @@ export const submitIntegration = async (
         status: AcademyJuniorStatuses.Active,
       },
     })
-
-    await instantiateJuniorSteps(
-      junior.id,
-      invite.session.id,
-      invite.session.functionId,
-      dispositifId,
-      invite.session.startsAt
-    )
   }
 
   return { accountId: account.id, displayName, awaitsApproval: mode.awaitsApproval }

@@ -57,7 +57,7 @@ export const COURSE_RULES = {
   card: `${COURSE_PANEL} px-6 pt-9 pb-6`,
   text: 'text-lg leading-relaxed',
   // One box, shown once scrolled to
-  item: 'flex flex-col max-md:not-first:mt-16',
+  item: 'flex flex-col not-first:mt-16 md:not-first:mt-0',
   box: 'relative w-full transition-[opacity,translate] duration-[var(--motion-duration-slow)] md:w-[55%]',
   boxHidden: 'translate-y-6 opacity-0',
   left: 'items-start',
@@ -79,7 +79,7 @@ export const COURSE_COMPARE = {
   root: 'flex w-full flex-col gap-4',
   rootBox: `mx-auto max-w-5xl ${COURSE_PANEL} p-5 sm:p-7`,
   offense: `${PROPERTY_LABEL} text-[var(--color-ink-subtle)]`,
-  columns: 'grid gap-4 md:grid-cols-3',
+  columns: 'grid grid-cols-1 gap-4 md:grid-cols-3',
   column:
     'flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-5 shadow-[var(--shadow-sm)]',
   head: 'flex items-center gap-3',
@@ -109,7 +109,7 @@ export const COURSE_SANCTIONBOX = {
   table:
     'flex flex-col rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-5 pt-14 pb-2 shadow-[var(--shadow-sm)] sm:px-6',
   tableHead:
-    'grid gap-x-6 border-b border-[var(--color-border)] pb-3 sm:grid-cols-[10rem_minmax(0,1fr)]',
+    'grid grid-cols-1 gap-x-6 border-b border-[var(--color-border)] pb-3 sm:grid-cols-[10rem_minmax(0,1fr)]',
   // Every level stacked in one place, the one in force shown
   badges:
     'absolute top-0 right-5 grid cursor-pointer rounded-full text-left focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] sm:right-6',
@@ -119,7 +119,7 @@ export const COURSE_SANCTIONBOX = {
   // Every level's rows stacked in one place: the table keeps the height of the longest
   rows: 'grid',
   rowsHidden: 'invisible',
-  row: 'course-rung-in grid gap-x-6 gap-y-2 border-t border-[var(--color-border)] py-4 first:border-t-0 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-center',
+  row: 'course-rung-in grid grid-cols-1 gap-x-6 gap-y-2 border-t border-[var(--color-border)] py-4 first:border-t-0 sm:grid-cols-[10rem_minmax(0,1fr)] sm:items-center',
   column: `${PROPERTY_LABEL} text-[var(--color-ink-subtle)]`,
   measures: 'flex flex-wrap gap-2',
 } as const
@@ -150,7 +150,7 @@ export const COURSE_HEAT = {
  */
 
 export const COURSE_CONVERSATION = {
-  layout: 'grid gap-8 lg:grid-cols-[minmax(22rem,28rem)_minmax(0,1fr)]',
+  layout: 'grid grid-cols-1 gap-8 lg:grid-cols-[minmax(22rem,28rem)_minmax(0,1fr)]',
   side: 'flex min-w-0 flex-col gap-5',
   // Column as tall as the Mod View, older bubbles melt away at the top
   column: 'relative h-[28rem] min-h-0 lg:h-auto lg:flex-1',

@@ -14,7 +14,8 @@ export interface CourseCarouselProps {
   courses: CourseCard[]
   selectedId: string
   pendingId: string | null
-  // Specialisations not started yet wear the new tag
+  // Shown to someone else: the tiles open nothing
+  isReadOnly?: boolean
   onSelect: (courseId: string) => void
 }
 
@@ -30,6 +31,7 @@ export const CourseCarousel = ({
   courses,
   selectedId,
   pendingId,
+  isReadOnly,
   onSelect,
 }: CourseCarouselProps) => {
   const { track, canPrevious, canNext, page } = useCarousel()
@@ -74,6 +76,7 @@ export const CourseCarousel = ({
               course={course}
               isSelected={course.id === selectedId}
               isPending={course.id === pendingId}
+              isReadOnly={isReadOnly}
               onSelect={() => onSelect(course.id)}
             />
           )

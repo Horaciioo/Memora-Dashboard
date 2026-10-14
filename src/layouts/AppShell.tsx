@@ -3,11 +3,11 @@
 import type { ReactNode } from 'react'
 import { WindowFrame } from '@/components/structures/WindowFrame'
 import { MobileHold } from '@/components/structures/MobileHold'
+import { BrandSplash } from '@/composites/splash/BrandSplash'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
 import { TourHost } from '@/composites/tour/TourHost'
-import { BottomNav } from '@/composites/shell/BottomNav'
 import { LeftSidebar } from '@/composites/shell/LeftSidebar'
 import { MobileTopBar } from '@/composites/shell/MobileTopBar'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
@@ -15,6 +15,7 @@ import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { frameToneOf } from '@/declarations/access/views'
 import { beaconProps } from '@/declarations/ui/beacons'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
+import type { HeldRoutes } from '@/declarations/ui/responsive'
 import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { useAutoRefresh } from '@/core/hooks/interaction/useAutoRefresh'
 import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
@@ -30,6 +31,7 @@ export interface AppShellProps {
   twoFactor: TwoFactorState
   seal: SealState
   tour: TourState | null
+  heldRoutes: HeldRoutes
   children: ReactNode
 }
 
@@ -40,6 +42,7 @@ export interface AppShellProps {
  * @param {TwoFactorState} twoFactor - Enrolment state resolved server-side
  * @param {SealState} seal - Unlock window resolved server-side
  * @param {TourState | null} tour - First visit resolved server-side
+ * @param {HeldRoutes} heldRoutes - Areas held back on small screens
  * @param {ReactNode} children - Routed page content
  * @return {JSX.Element}
  */
@@ -50,10 +53,12 @@ export const AppShell = ({
   twoFactor,
   seal,
   tour,
+  heldRoutes,
   children,
 }: AppShellProps) => {
   return (
     <RailSlotProvider>
+      <BrandSplash />
       {/* A visit reset on the server starts over, a visit under way is left alone */}
       <TourProvider key={String(tour !== null && !tour.isIntroSeen)} initial={tour}>
         <AppShellFrame
@@ -61,6 +66,7 @@ export const AppShell = ({
           viewContext={viewContext}
           twoFactor={twoFactor}
           seal={seal}
+          heldRoutes={heldRoutes}
         >
           {children}
         </AppShellFrame>
@@ -80,6 +86,7 @@ const AppShellFrame = ({
   viewContext,
   twoFactor,
   seal,
+  heldRoutes,
   children,
 }: Omit<AppShellProps, 'tour'>) => {
   const { session, can } = useAuthContext()
@@ -100,13 +107,14 @@ const AppShellFrame = ({
         <WindowFrame />
 
         <div className={APP_SHELL.main}>
-          {session && <MobileTopBar session={session} viewContext={viewContext} />}
+          {session && (
+            <MobileTopBar session={session} viewContext={viewContext} unreadCount={unreadCount} />
+          )}
           <main className={APP_SHELL.content} {...beaconProps(TOUR_BEACONS.page)}>
-            <MobileHold>{children}</MobileHold>
+            <MobileHold routes={heldRoutes}>{children}</MobileHold>
           </main>
         </div>
 
-        {session && <BottomNav viewContext={viewContext} />}
         <SealDialog />
         {session && <NudgeHost />}
         {session && <TourHost />}

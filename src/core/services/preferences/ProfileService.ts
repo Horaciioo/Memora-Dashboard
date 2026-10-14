@@ -47,6 +47,7 @@ export const profileFields = (): FieldDefinition[] => [
   {
     name: 'birthday',
     kind: 'date',
+    dayOnly: true,
     startYear: FORM_SETTINGS.birthdayStartYear,
     label: PROFILE_FIELD_COPY.birthday,
     span: 'half',

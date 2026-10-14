@@ -2,12 +2,11 @@ import dispositifs from '@/configurations/reference/dispositifs.json'
 import eventTemplates from '@/configurations/reference/eventTemplates.json'
 import networks from '@/configurations/reference/networks.json'
 import platforms from '@/configurations/reference/platforms.json'
-import pimSteps from '@/configurations/reference/pimSteps.json'
 import skills from '@/configurations/reference/skills.json'
 import states from '@/configurations/reference/states.json'
-import type { AcademyStageName, StepAnchorName, StepOwnerName } from '@/utils/constants/hierarchy'
 import type {
   CalendarKindName,
+  EventPurposeName,
   EventVisibilityName,
   WorkflowPhaseName,
 } from '@/utils/constants/workflow'
@@ -68,6 +67,7 @@ export interface LibraryNetwork {
  * @property {EventVisibilityName} visibility - Who sees it
  * @property {number | null} defaultMinutes - Usual length
  * @property {boolean} allDay - Spans whole days
+ * @property {EventPurposeName} [purpose] - What the academy reads it as
  */
 
 export interface LibraryEventTemplate {
@@ -78,6 +78,7 @@ export interface LibraryEventTemplate {
   visibility: EventVisibilityName
   defaultMinutes: number | null
   allDay: boolean
+  purpose?: EventPurposeName
 }
 
 /**
@@ -125,36 +126,6 @@ export interface LibrarySkillCategory {
 }
 
 /**
- * Step of the PIM timeline
- * @typedef {Object} LibraryPimStep
- * @property {string} title - Display title
- * @property {AcademyStageName} stage - Stage it opens
- * @property {StepAnchorName} anchor - What its offset counts from
- * @property {number} offset - Days from the anchor
- * @property {StepOwnerName} owner - Who carries it out
- * @property {boolean} required - Blocks the next stage
- * @property {string | null} function - Function it belongs to
- * @property {string | null} dispositif - Track it belongs to
- * @property {string | null} icon - Glyph key
- * @property {string | null} guide - Walkthrough
- * @property {string | null} destination - Where to act
- */
-
-export interface LibraryPimStep {
-  title: string
-  stage: AcademyStageName
-  anchor: StepAnchorName
-  offset: number
-  owner: StepOwnerName
-  required: boolean
-  function: string | null
-  dispositif: string | null
-  icon: string | null
-  guide: string | null
-  destination: string | null
-}
-
-/**
  * Statuses
  * @type {readonly LibraryState[]}
  */
@@ -195,13 +166,6 @@ export const LIBRARY_DISPOSITIFS = dispositifs as readonly LibraryDispositif[]
  */
 
 export const LIBRARY_SKILL_CATEGORIES = skills as readonly LibrarySkillCategory[]
-
-/**
- * PIM timeline
- * @type {readonly LibraryPimStep[]}
- */
-
-export const LIBRARY_PIM_STEPS = pimSteps as readonly LibraryPimStep[]
 
 /**
  * Names of the skills declared in code

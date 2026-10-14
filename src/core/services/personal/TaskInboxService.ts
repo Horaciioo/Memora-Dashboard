@@ -2,12 +2,10 @@ import 'server-only'
 
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { myTrainings, resolveOwnJunior } from '@/core/services/academy/AcademyService'
-import { openSteps } from '@/core/services/academy/PimTimelineService'
 import { openDepartures, parkourStandings } from '@/core/services/academy/ParkourService'
 import type { ParkourStanding } from '@/core/services/academy/ParkourService'
 import { DECISION_PHASES, REVIEW_DUE_PHASES, reviewStageOf } from '@/core/lib/academy/parkour'
 import { DEPARTURE_COPY, PARKOUR_NAME } from '@/declarations/academy/parkour'
-import type { OpenStep } from '@/core/services/academy/PimTimelineService'
 import {
   destinationHref,
   GUIDE_PARAMS,
@@ -19,39 +17,9 @@ import { PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { IconName } from '@/declarations/ui/icons'
 import type { HomeTask } from '@/types/personal'
-import { AcademyStages, StepOwners } from '@/utils/constants/hierarchy'
-import type { StepOwnerName } from '@/utils/constants/hierarchy'
+import { AcademyStages } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
-
-// Owners each seat acts for
-const FORMATEUR_OWNERS: StepOwnerName[] = [StepOwners.Formateurs, StepOwners.Both]
-const RESPONSABLE_OWNERS: StepOwnerName[] = [StepOwners.Responsable, StepOwners.Both]
-const JUNIOR_OWNERS: StepOwnerName[] = [StepOwners.Junior]
-
-/**
- * Turn a step in course into the task of whoever carries it
- * @param {OpenStep} open - Step in course
- * @return {HomeTask} - Task
- */
-
-const stepTask = (open: OpenStep): HomeTask => {
-  const destination = open.step.destination
-
-  return {
-    key: `step:${open.step.id}`,
-    kind: 'pimStep',
-    title: open.step.title,
-    context: open.juniorName,
-    icon: open.step.icon ?? 'clock',
-    href: destination
-      ? destinationHref(destination, { sessionId: open.sessionId, juniorId: open.juniorId })
-      : ROUTES.junior(open.sessionId, open.juniorId),
-    description: open.step.description,
-    guide: open.step.guide,
-    destinationLabel: destination ? PIM_DESTINATION_REGISTRY.label(destination) : null,
-    dueAt: open.step.scheduledAt,
-  }
-}
+import { unreadMentions } from '@/core/services/system/NotificationService'
 
 /**
  * Build a task pointing at a declared destination
@@ -153,7 +121,7 @@ const parkourTask = ({
 })
 
 /**
- * Read what the AcademicParkour waits on from a responsable: trainers, PIM starts, launches,
+ * Read what the PIM journey waits on from a responsable: trainers, PIM starts, launches,
  * decisions and the second period
  * @param {SessionUser} viewer - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
@@ -164,7 +132,8 @@ const managerTasks = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<HomeTask[]> => {
-  const standings = await parkourStandings({ session: academyScope(viewer, access) })
+  const scope = academyScope(viewer, access)
+  const standings = await parkourStandings({ session: scope.session, ...scope.juniors })
   const tasks: HomeTask[] = []
 
   for (const standing of standings) {
@@ -331,7 +300,39 @@ const trainingTasks = async (accountId: string): Promise<HomeTask[]> => {
 }
 
 /**
- * Everything waiting on the signed-in member: steps they carry
+ * Comments of a recruitment session that named the member
+ * @param {string} accountId - Member
+ * @return {Promise<HomeTask[]>} - One task per unseen mention
+ */
+
+const mentionTasks = async (accountId: string): Promise<HomeTask[]> => {
+  const mentions = await unreadMentions(accountId, 'recruitment')
+
+  return mentions.flatMap((mention) =>
+    mention.targetId
+      ? [
+          {
+            key: `mention:${mention.id}`,
+            kind: 'mention' as const,
+            title: PERSONAL_TASK_COPY.mentionTitle.replace(
+              '{name}',
+              mention.actorName ?? PERSONAL_TASK_COPY.mentionSomeone
+            ),
+            context: mention.subject ?? '',
+            icon: 'note' as const,
+            href: ROUTES.recruitment(mention.targetId),
+            description: PERSONAL_TASK_COPY.mentionDescription,
+            guide: null,
+            destinationLabel: null,
+            dueAt: null,
+          },
+        ]
+      : []
+  )
+}
+
+/**
+ * Everything waiting on the signed-in member: what the parkour asks of their seat
  * @param {SessionUser} viewer - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
  * @return {Promise<HomeTask[]>} - Tasks
@@ -341,32 +342,12 @@ export const myTasks = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<HomeTask[]> => {
-  const manages = access.can(Permissions.AcademyManage)
-
-  const [trained, managed, own, preparation, reviews, trainings] = await Promise.all([
-    openSteps({ trainerId: viewer.id }),
-    manages ? openSteps({ session: academyScope(viewer, access) }) : Promise.resolve([]),
-    openSteps({ accountId: viewer.id }),
-    manages ? managerTasks(viewer, access) : Promise.resolve([]),
+  const [preparation, reviews, trainings, mentions] = await Promise.all([
+    access.can(Permissions.AcademyManage) ? managerTasks(viewer, access) : Promise.resolve([]),
     reviewTasks(viewer.id),
     trainingTasks(viewer.id),
+    mentionTasks(viewer.id),
   ])
 
-  const carried = (steps: OpenStep[], owners: StepOwnerName[]) =>
-    steps.filter((open) => open.step.owner !== null && owners.includes(open.step.owner))
-
-  // A step shared by both seats shows once
-  const seen = new Set<string>()
-  const steps = [
-    ...carried(trained, FORMATEUR_OWNERS),
-    ...carried(managed, RESPONSABLE_OWNERS),
-    ...carried(own, JUNIOR_OWNERS),
-  ]
-    .filter((open) => !seen.has(open.step.id) && seen.add(open.step.id))
-    .sort((left, right) =>
-      (left.step.scheduledAt ?? '').localeCompare(right.step.scheduledAt ?? '')
-    )
-    .map(stepTask)
-
-  return [...preparation, ...reviews, ...steps, ...trainings]
+  return [...mentions, ...preparation, ...reviews, ...trainings]
 }

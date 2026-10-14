@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
@@ -27,8 +28,15 @@ export interface PageChoice<TValue extends string = string> {
   onChange: (value: TValue) => void
 }
 
-// A yes/no switch or one pick among a few
-export type PageOption = PageToggle | PageChoice
+export interface PageContent {
+  id: string
+  label: string
+  // Free content, drawn on a phone only
+  render: () => ReactNode
+}
+
+// A yes/no switch, one pick among a few, or a whole block
+export type PageOption = PageToggle | PageChoice | PageContent
 
 export interface PageOptionsProps {
   options: PageOption[]
@@ -80,34 +88,45 @@ export const PageOptions = ({ options }: PageOptionsProps) => {
       </button>
 
       {isOpen && (
+        <div className={PAGE_OPTIONS.backdrop} aria-hidden="true" onClick={() => setOpen(false)} />
+      )}
+
+      {isOpen && (
         <div role="group" aria-label={PAGE_OPTIONS_COPY.title} className={PAGE_OPTIONS.panel}>
           <p className={PAGE_OPTIONS.title}>{PAGE_OPTIONS_COPY.title}</p>
-          {options.map((option) => (
-            <div
-              key={option.id}
-              className={cn(
-                PAGE_OPTIONS.row,
-                'choices' in option && option.choices.length > 2 && PAGE_OPTIONS.rowStacked
-              )}
-            >
-              <span>{option.label}</span>
-              {'choices' in option ? (
-                <SegmentedControl
-                  options={option.choices}
-                  value={option.value}
-                  onChange={option.onChange}
-                  label={option.label}
-                />
-              ) : (
-                <Toggle
-                  bare
-                  label={option.label}
-                  checked={option.checked}
-                  onChange={option.onChange}
-                />
-              )}
-            </div>
-          ))}
+          {options.map((option) =>
+            'render' in option ? (
+              <div key={option.id} className={PAGE_OPTIONS.content}>
+                <span className={PAGE_OPTIONS.contentTitle}>{option.label}</span>
+                {option.render()}
+              </div>
+            ) : (
+              <div
+                key={option.id}
+                className={cn(
+                  PAGE_OPTIONS.row,
+                  'choices' in option && option.choices.length > 2 && PAGE_OPTIONS.rowStacked
+                )}
+              >
+                <span>{option.label}</span>
+                {'choices' in option ? (
+                  <SegmentedControl
+                    options={option.choices}
+                    value={option.value}
+                    onChange={option.onChange}
+                    label={option.label}
+                  />
+                ) : (
+                  <Toggle
+                    bare
+                    label={option.label}
+                    checked={option.checked}
+                    onChange={option.onChange}
+                  />
+                )}
+              </div>
+            )
+          )}
         </div>
       )}
     </div>,

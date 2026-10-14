@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/PageHeader'
-import { AcademyTabs } from '@/composites/academy/AcademyTabs'
 import { SessionsPanel } from '@/composites/academy/SessionsPanel'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { listSessions, sessionFields } from '@/core/services/academy/AcademyService'
@@ -25,8 +24,7 @@ export default async function AcademyPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={ACADEMY_COPY.title} />
-      <AcademyTabs />
+      <PageHeader title={ACADEMY_COPY.title} heroDescription={ACADEMY_COPY.heroDescription} />
       <SessionsPanel
         initialSessions={sessions}
         fields={fields}

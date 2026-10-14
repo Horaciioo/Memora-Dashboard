@@ -16,7 +16,7 @@ export const NOTIFICATION_KINDS = createEnumeration({
   CommunicationPublished: { id: 7, label: 'Annonce' },
   SkillGraded: { id: 8, label: 'Compétence évaluée' },
   ReviewDecided: { id: 9, label: 'Bilan tranché' },
-  StepValidated: { id: 10, label: 'Étape validée' },
+  StepValidated: { id: 10, label: 'Étape validée', deprecated: true },
   TrainingValidated: { id: 11, label: 'Formation validée' },
   CandidateAssigned: { id: 12, label: 'Candidature confiée' },
   RecruitmentAssigned: { id: 13, label: 'Recrutement confié' },

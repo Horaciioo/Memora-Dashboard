@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageBanner } from '@/components/structures/PageBanner'
+import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { JuniorFile } from '@/composites/academy/JuniorFile'
 import { academyScope, assertJuniorViewer } from '@/core/services/academy/AcademyScope'
 import {
@@ -14,16 +15,22 @@ import {
   listReviews,
   readJunior,
 } from '@/core/services/academy/AcademyService'
-import { accompaniedLives } from '@/core/services/academy/LiveCountService'
+import { listJuniorComments } from '@/core/services/academy/CommentService'
+import { juniorCourses } from '@/core/services/academy/CurriculumService'
+import { juniorCandidate } from '@/core/services/academy/JuniorService'
+import { juniorLives } from '@/core/services/academy/LiveCountService'
 import { readParkour } from '@/core/services/academy/ParkourService'
+import { readPeriods } from '@/core/services/academy/PeriodService'
 import { readTimeline } from '@/core/services/academy/PimTimelineService'
+import { readRecordActivity } from '@/core/services/system/ActivityService'
+import { commentFields } from '@/core/lib/forms'
+import { sessionTitle } from '@/utils/format/academy'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { GUIDE_PARAMS } from '@/declarations/academy/guides'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
-import { formatDay } from '@/utils/format/dates'
 
 /**
  * Name the browser tab after the junior
@@ -86,7 +93,22 @@ export default async function JuniorPage({
   // A junior never reads their own objectives nor the parkour behind them
   const isOwnFile = found.junior.accountId === session.id
   const canReadObjectives = canReadAny && !isOwnFile
-  const [fields, skills, notes, objectives, reviews, timeline, parkour, lives] = await Promise.all([
+  const canReadLogs = access.can(Permissions.WorkLogRead)
+  const [
+    fields,
+    skills,
+    notes,
+    objectives,
+    reviews,
+    timeline,
+    parkour,
+    lives,
+    courses,
+    periods,
+    comments,
+    activity,
+    candidate,
+  ] = await Promise.all([
     juniorFields(found.junior.sessionId),
     listJuniorSkills(juniorId, scope),
     canReadNotes ? listJuniorNotes(juniorId, scope) : Promise.resolve([]),
@@ -94,41 +116,61 @@ export default async function JuniorPage({
     canReadReviews ? listReviews(juniorId, scope) : Promise.resolve([]),
     readTimeline(juniorId, scope),
     canReadObjectives ? readParkour(juniorId, scope) : Promise.resolve(null),
-    accompaniedLives(juniorId, scope),
+    juniorLives(juniorId, scope),
+    juniorCourses(juniorId, scope),
+    readPeriods(found.junior.sessionId),
+    canReadNotes ? listJuniorComments(juniorId, scope) : Promise.resolve([]),
+    canReadLogs ? readRecordActivity('junior', juniorId) : Promise.resolve([]),
+    access.can(Permissions.RecruitmentRead) ? juniorCandidate(juniorId) : Promise.resolve(null),
   ])
-
-  const jobFunction = found.session.function
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader
-        eyebrow={`${jobFunction.name} • ${formatDay(found.session.startsAt)}`}
-        title={found.junior.displayName}
-      />
+      <PageBanner title={ACADEMY_COPY.title} isLabel />
+      <BreadcrumbLabel label={found.junior.displayName} />
       <JuniorFile
-        initialJunior={found.junior}
-        initialSkills={skills}
-        initialNotes={notes}
-        initialObjectives={objectives}
-        initialReviews={reviews}
-        initialTimeline={timeline}
-        parkour={parkour}
-        accompaniedLives={lives}
+        rows={{
+          junior: found.junior,
+          skills,
+          notes,
+          objectives,
+          reviews,
+          comments,
+        }}
+        surroundings={{
+          sessionId: found.junior.sessionId,
+          sessionTitle: sessionTitle(found.session),
+          functionName: found.session.function.name,
+          timeline,
+          periods,
+          parkour,
+          lives,
+          courses,
+          recruitmentPath: candidate ? ROUTES.candidate(candidate.sessionId, candidate.id) : null,
+        }}
+        fields={{
+          junior: fields,
+          note: NOTE_FIELDS,
+          objective: OBJECTIVE_FIELDS,
+          review: REVIEW_FIELDS,
+          comment: commentFields(),
+        }}
+        can={{
+          viewerId: session.id,
+          manage: access.can(Permissions.AcademyManage),
+          lead: access.isResponsable,
+          readLogs: canReadLogs,
+          writeSkills: access.can(Permissions.AcademySkillWrite),
+          readNotes: canReadNotes,
+          writeNotes: access.can(Permissions.AcademyNoteWrite),
+          readObjectives: canReadObjectives,
+          writeObjectives: access.can(Permissions.AcademyObjectiveWrite),
+          readReviews: canReadReviews,
+          writeReviews: access.can(Permissions.AcademyReviewWrite),
+          validateReviews: access.can(Permissions.AcademyReviewValidate),
+        }}
+        activity={activity}
         initialTab={typeof requestedTab === 'string' ? requestedTab : undefined}
-        sessionFunctionName={jobFunction.name}
-        juniorFields={fields}
-        noteFields={NOTE_FIELDS}
-        objectiveFields={OBJECTIVE_FIELDS}
-        reviewFields={REVIEW_FIELDS}
-        canManage={access.can(Permissions.AcademyManage)}
-        canWriteSkills={access.can(Permissions.AcademySkillWrite)}
-        canReadNotes={canReadNotes}
-        canWriteNotes={access.can(Permissions.AcademyNoteWrite)}
-        canReadObjectives={canReadObjectives}
-        canWriteObjectives={access.can(Permissions.AcademyObjectiveWrite)}
-        canReadReviews={canReadReviews}
-        canWriteReviews={access.can(Permissions.AcademyReviewWrite)}
-        canValidateReviews={access.can(Permissions.AcademyReviewValidate)}
       />
     </div>
   )

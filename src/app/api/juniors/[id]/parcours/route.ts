@@ -1,4 +1,4 @@
-import { invalidInput } from '@/core/lib/errors'
+import { forbidden, invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { juniorAccount } from '@/core/services/academy/AcademyService'
@@ -10,7 +10,7 @@ import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
   permission: Permissions.AcademyRead,
-  descriptor: { summary: 'Read where a junior stands on the AcademicParkour', tags: ['academy'] },
+  descriptor: { summary: 'Read where a junior stands on the PIM journey', tags: ['academy'] },
   handler: async ({ params, session, access }) =>
     readParkour(params.id, academyScope(session, access)),
 })
@@ -36,6 +36,9 @@ export const POST = createProtectedRoute({
         summary: PARKOUR_COPY.kickoffDeclared,
       })
     } else if (raw.action === 'resign') {
+      // Only a responsable or above records a departure
+      if (!access.isResponsable) throw forbidden()
+
       await resignJunior(params.id, scope, session.id)
       await recordEvent({
         eventType: 'ParkourMoved',

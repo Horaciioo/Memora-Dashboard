@@ -35,7 +35,9 @@
     ".next-dockercheck/types/**/*.ts",
     ".next-dockercheck/dev/types/**/*.ts",
     ".next-qa/types/**/*.ts",
-    ".next-qa/dev/types/**/*.ts"
+    ".next-qa/dev/types/**/*.ts",
+    ".next-qa3/types/**/*.ts",
+    ".next-qa3/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

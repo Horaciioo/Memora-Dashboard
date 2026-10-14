@@ -1,0 +1,453 @@
+/* First visit: the name fills with colour while the app loads, then the camera dives into its e and the page opens there */
+:root {
+  --splash-bubble-rose: radial-gradient(
+    circle at 30% 28%,
+    var(--color-brand-100),
+    var(--color-brand-500)
+  );
+  --splash-bubble-mauve: radial-gradient(
+    circle at 30% 28%,
+    var(--color-mauve-100),
+    var(--color-mauve-500)
+  );
+  --splash-bubble-sky: radial-gradient(
+    circle at 30% 28%,
+    var(--color-sky-100),
+    var(--color-sky-400)
+  );
+}
+
+/* Hole growing out of the e, one scale per axis so a slit turns round */
+@property --splash-sx {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+@property --splash-sy {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+/* Armed by the head script, hidden otherwise */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  overflow: hidden;
+}
+
+html[data-splash] .splash {
+  display: block;
+}
+
+/* The page shows through the e: the ground is cut by an oval a little larger than the hole, the letters stay above it so their outline shapes the window. Measures are written by BrandSplash */
+.splash[data-phase='exit'] {
+  pointer-events: none;
+}
+
+.splash[data-phase='exit'] .splash-ground {
+  -webkit-mask-image: radial-gradient(
+    ellipse calc(var(--splash-rx) * var(--splash-sx)) calc(var(--splash-ry) * var(--splash-sy)) at
+      var(--splash-eye-x) var(--splash-eye-y),
+    transparent 86%,
+    black 100%
+  );
+  mask-image: radial-gradient(
+    ellipse calc(var(--splash-rx) * var(--splash-sx)) calc(var(--splash-ry) * var(--splash-sy)) at
+      var(--splash-eye-x) var(--splash-eye-y),
+    transparent 86%,
+    black 100%
+  );
+}
+
+.splash[data-phase='exit'] {
+  animation: splash-dive 1800ms linear forwards;
+}
+
+/* The e stays closed while the page builds, then its hole opens gradually and rides the zoom and frees the corners */
+@keyframes splash-dive {
+  0%,
+  38% {
+    --splash-sx: 0.01;
+    --splash-sy: 0.01;
+  }
+  48% {
+    --splash-sx: 1.5;
+    --splash-sy: 1.5;
+  }
+  56% {
+    --splash-sx: 10;
+    --splash-sy: 10;
+  }
+  62% {
+    --splash-sx: 18;
+    --splash-sy: 18;
+  }
+  75% {
+    --splash-sx: 32;
+    --splash-sy: 32;
+  }
+  87% {
+    --splash-sx: 58;
+    --splash-sy: 58;
+  }
+  100% {
+    --splash-sx: 170;
+    --splash-sy: 170;
+  }
+}
+
+/* Everything of the name flies toward the viewer */
+.splash-camera {
+  position: absolute;
+  inset: 0;
+  transform-origin: var(--splash-eye-x, 50%) var(--splash-eye-y, 50%);
+}
+
+.splash[data-phase='exit'] .splash-camera {
+  animation: splash-zoom 1800ms linear forwards;
+}
+
+@keyframes splash-zoom {
+  0% {
+    scale: 1;
+  }
+  12% {
+    scale: 1.8;
+  }
+  25% {
+    scale: 3.2;
+  }
+  37% {
+    scale: 5.8;
+  }
+  50% {
+    scale: 10;
+  }
+  62% {
+    scale: 18;
+  }
+  75% {
+    scale: 32;
+  }
+  87% {
+    scale: 58;
+  }
+  100% {
+    scale: 110;
+  }
+}
+
+/* Ground, the page gradient with colour drifting over it */
+.splash-ground {
+  background: var(--gradient-page), var(--color-background);
+  animation: splash-fade-in 500ms ease-out both;
+}
+
+@keyframes splash-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes splash-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.splash-ground > span {
+  position: absolute;
+  width: 70vmax;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  will-change: transform;
+  animation: splash-drift 14s ease-in-out infinite alternate;
+}
+
+.splash-ground > span:nth-child(1) {
+  top: -30vmax;
+  left: -24vmax;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-brand-400) 55%, transparent),
+    transparent
+  );
+}
+
+.splash-ground > span:nth-child(2) {
+  right: -30vmax;
+  bottom: -34vmax;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-sky-300) 60%, transparent),
+    transparent
+  );
+  animation-delay: -7s;
+}
+
+@keyframes splash-drift {
+  from {
+    transform: translate3d(-4%, -3%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(8%, 7%, 0) scale(1.14);
+  }
+}
+
+/* Round beads floating around the name */
+.splash-camera > i {
+  position: absolute;
+  border-radius: 50%;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  animation:
+    splash-bead-in 700ms var(--motion-ease-spring) both,
+    splash-float 5s ease-in-out infinite alternate;
+}
+
+.splash-camera > i:nth-of-type(1) {
+  top: 16%;
+  left: 12%;
+  width: clamp(2.5rem, 7vw, 5.5rem);
+  aspect-ratio: 1;
+  background: var(--splash-bubble-rose);
+  animation-delay: 700ms, 700ms;
+}
+
+.splash-camera > i:nth-of-type(2) {
+  right: 14%;
+  top: 22%;
+  width: clamp(1.75rem, 4.5vw, 3.5rem);
+  aspect-ratio: 1;
+  background: var(--splash-bubble-mauve);
+  animation-delay: 900ms, 1.2s;
+}
+
+.splash-camera > i:nth-of-type(3) {
+  bottom: 18%;
+  left: 18%;
+  width: clamp(1.75rem, 4vw, 3rem);
+  aspect-ratio: 1;
+  background: var(--splash-bubble-sky);
+  animation-delay: 1100ms, 0.4s;
+}
+
+.splash-camera > i:nth-of-type(4) {
+  right: 12%;
+  bottom: 14%;
+  width: clamp(2.75rem, 8vw, 6.5rem);
+  aspect-ratio: 1;
+  background: var(--splash-bubble-rose);
+  animation-delay: 1300ms, 2s;
+}
+
+@keyframes splash-bead-in {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes splash-float {
+  to {
+    translate: 0 -1.1rem;
+  }
+}
+
+/* Wave stops, the line leaves, the colour is full */
+.splash[data-phase='exit'] .splash-letter {
+  animation: none;
+}
+
+.splash[data-phase='exit'] .splash-label {
+  animation: splash-fade-out 200ms ease-in forwards;
+}
+
+/* The name, frosted until a wave of colour rises through it */
+@property --splash-progress {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.splash {
+  transition: --splash-progress 1100ms var(--motion-ease-out);
+}
+
+.splash[data-phase='exit'] {
+  transition-duration: 260ms;
+}
+
+.splash-word {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 15vw, 6.25rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.splash-word > .flex {
+  color: color-mix(in srgb, var(--color-surface-raised) 62%, transparent);
+}
+
+/* Two waves and the body below them, riding the level */
+.splash-word-fill {
+  --splash-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0 10Q25 0 50 10T100 10V20H0Z'/%3E%3C/svg%3E");
+  --splash-level: calc(1em - var(--splash-progress, 0) * 1.25em);
+  -webkit-mask-image: var(--splash-wave), var(--splash-wave), linear-gradient(black 0 0);
+  mask-image: var(--splash-wave), var(--splash-wave), linear-gradient(black 0 0);
+  -webkit-mask-size:
+    1.7em 0.25em,
+    2.6em 0.25em,
+    100% 100%;
+  mask-size:
+    1.7em 0.25em,
+    2.6em 0.25em,
+    100% 100%;
+  -webkit-mask-repeat: repeat-x, repeat-x, no-repeat;
+  mask-repeat: repeat-x, repeat-x, no-repeat;
+  -webkit-mask-position:
+    0 var(--splash-level),
+    0 var(--splash-level),
+    0 calc(var(--splash-level) + 0.24em);
+  mask-position:
+    0 var(--splash-level),
+    0 var(--splash-level),
+    0 calc(var(--splash-level) + 0.24em);
+  animation: splash-flow 2.6s linear infinite;
+}
+
+@keyframes splash-flow {
+  to {
+    -webkit-mask-position:
+      1.7em var(--splash-level),
+      -2.6em var(--splash-level),
+      0 calc(var(--splash-level) + 0.24em);
+    mask-position:
+      1.7em var(--splash-level),
+      -2.6em var(--splash-level),
+      0 calc(var(--splash-level) + 0.24em);
+  }
+}
+
+.splash-word-fill .splash-letter {
+  color: var(--c);
+}
+
+/* Letters land with a squash, then wave while waiting */
+.splash-letter {
+  animation:
+    splash-pop 760ms var(--motion-ease-out) calc(650ms + var(--i) * 80ms) both,
+    splash-wave 1.7s ease-in-out calc(2000ms + var(--i) * 130ms) infinite;
+}
+
+@keyframes splash-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(70%) scale(0.7, 1.3);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-14%) scale(1.1, 0.9);
+  }
+  80% {
+    transform: translateY(3%) scale(0.97, 1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes splash-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8%);
+  }
+}
+
+.splash-label {
+  animation: splash-rise 600ms var(--motion-ease-out) 1900ms both;
+}
+
+@keyframes splash-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* The app builds itself behind the e, only during the exit */
+html[data-splash='exit'] .rail-ground > * {
+  animation: splash-from-left 640ms var(--motion-ease-out) calc(350ms + var(--n, 0) * 50ms) both;
+}
+
+html[data-splash='exit'] .rail-ground > :nth-child(2) {
+  --n: 1;
+}
+
+html[data-splash='exit'] .rail-ground > :nth-child(3) {
+  --n: 2;
+}
+
+html[data-splash='exit'] .rail-ground > :nth-child(4) {
+  --n: 3;
+}
+
+html[data-splash='exit'] .rail-ground > :nth-child(5) {
+  --n: 4;
+}
+
+html[data-splash='exit'] .rail-ground > :nth-child(6) {
+  --n: 5;
+}
+
+html[data-splash='exit'] .rail-ground > :nth-child(n + 7) {
+  --n: 6;
+}
+
+/* A transform on the header would drag the banner it holds, so it only fades */
+html[data-splash='exit'] .shell-page > * > header {
+  animation: splash-fade-in 700ms ease-out 400ms both;
+}
+
+html[data-splash='exit'] .shell-page > * > :not(header) {
+  animation: splash-from-below 620ms var(--motion-ease-out) calc(420ms + var(--n, 0) * 60ms) both;
+}
+
+html[data-splash='exit'] .shell-page > * > :nth-child(3) {
+  --n: 1;
+}
+
+html[data-splash='exit'] .shell-page > * > :nth-child(4) {
+  --n: 2;
+}
+
+html[data-splash='exit'] .shell-page > * > :nth-child(n + 5) {
+  --n: 3;
+}
+
+@keyframes splash-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-1.75rem);
+  }
+}
+
+@keyframes splash-from-below {
+  from {
+    opacity: 0;
+    transform: translateY(1.75rem);
+  }
+}

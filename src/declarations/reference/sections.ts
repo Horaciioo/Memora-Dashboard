@@ -20,11 +20,10 @@ export const REFERENCE_KEYS = [
   'dispositifs',
   'categories-competences',
   'competences',
-  'etapes-pim',
   'sanctions',
-  'questions-recrutement',
   'etapes-recrutement',
   'issues-recrutement',
+  'identifiants-discord',
 ] as const
 
 /**
@@ -45,6 +44,7 @@ export const REFERENCE_GROUP_KEYS = [
   'moderation',
   'academy',
   'recrutement',
+  'discord',
 ] as const
 
 /**
@@ -77,6 +77,7 @@ export const REFERENCE_GROUPS: ReferenceGroup[] = [
   { key: 'moderation', label: 'Modération' },
   { key: 'academy', label: 'Marsha Academy' },
   { key: 'recrutement', label: 'Recrutement' },
+  { key: 'discord', label: 'Discord' },
 ]
 
 /**
@@ -93,6 +94,7 @@ export const REFERENCE_GROUPS: ReferenceGroup[] = [
  * @property {boolean} reorderable - Rows can be dragged into order
  * @property {boolean} [openable] - Rows open a file of their own
  * @property {boolean} [fixed] - Declared in code
+ * @property {boolean} [noUsage] - Rows carry no usage count
  * @property {string} emptyTitle - Empty state headline
  * @property {string} emptyDescription - Empty state supporting line
  */
@@ -109,6 +111,7 @@ export interface ReferenceSection {
   reorderable: boolean
   openable?: boolean
   fixed?: boolean
+  noUsage?: boolean
   emptyTitle: string
   emptyDescription: string
 }
@@ -301,33 +304,6 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     emptyDescription: 'Déclare les premières compétences d’une catégorie.',
   },
   {
-    key: 'etapes-pim',
-    group: 'academy',
-    label: 'Étapes de PIM',
-    singular: 'Étape de PIM',
-    gender: 'feminine',
-    description: 'La trame de timeline instanciée à la création d’une session.',
-    icon: 'clock',
-    figure: 'academy',
-    reorderable: true,
-    fixed: true,
-    emptyTitle: 'Aucune étape',
-    emptyDescription: 'Déclare la trame de PIM avant d’ouvrir une session.',
-  },
-  {
-    key: 'questions-recrutement',
-    group: 'recrutement',
-    label: 'Questions de recrutement',
-    singular: 'Question de recrutement',
-    gender: 'feminine',
-    description: 'La trame d’entretien, par YouTubeur et par fonction.',
-    icon: 'recruitment',
-    figure: 'members',
-    reorderable: true,
-    emptyTitle: 'Aucune question',
-    emptyDescription: 'Écris la trame d’entretien avant d’ouvrir une session de recrutement.',
-  },
-  {
     key: 'etapes-recrutement',
     group: 'recrutement',
     label: 'Étapes de recrutement',
@@ -354,6 +330,21 @@ export const REFERENCE_SECTIONS: ReferenceSection[] = [
     fixed: true,
     emptyTitle: 'Aucune issue',
     emptyDescription: 'Déclare les issues pour ouvrir le tableau de résultats.',
+  },
+  {
+    key: 'identifiants-discord',
+    group: 'discord',
+    label: 'Identifiants Discord',
+    singular: 'Identifiant Discord',
+    gender: 'masculine',
+    description:
+      'Membres, rôles, salons et serveurs que Memora connaît, nommés et typés. Les annonces les affichent par leur nom.',
+    icon: 'discord',
+    figure: 'settings',
+    reorderable: false,
+    noUsage: true,
+    emptyTitle: 'Aucun identifiant',
+    emptyDescription: 'Ajoute un rôle ou un salon Discord pour le nommer dans les annonces.',
   },
 ]
 

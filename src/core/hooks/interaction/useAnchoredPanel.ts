@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
-import { MOBILE_SHELL_QUERY } from '@/declarations/ui/responsive'
 
 // Room kept between the panel and the viewport edge
 const EDGE_MARGIN = 8
@@ -43,7 +42,7 @@ export interface AnchoredPanel {
 }
 
 /**
- * Float a panel under its trigger, or lift it as a bottom sheet on mobile
+ * Float a panel under its trigger
  * @param {AnchoredPanelOptions} [options] - Sizing knobs
  * @return {AnchoredPanel} - Panel state and refs
  */
@@ -70,21 +69,22 @@ export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPa
       const panel = panelRef.current
       if (!trigger || !panel) return
 
-      // A bottom sheet on mobile, placed by CSS
-      const isSheet = window.matchMedia(MOBILE_SHELL_QUERY).matches
-      panel.toggleAttribute('data-sheet', isSheet)
-      if (isSheet) return
-
       if (matchTriggerWidth) panel.style.width = `${Math.max(trigger.width, minWidth)}px`
 
       // Flip above when the panel would spill past the bottom edge
+      panel.style.maxHeight = ''
       const height = panel.offsetHeight
       const room = window.innerHeight - trigger.bottom - EDGE_MARGIN
-      const flip = height > room && trigger.top > room
+      const above = trigger.top - EDGE_MARGIN
+      const flip = height > room && above > room
+
+      // Panel shrinks to the side it sits on
+      const space = (flip ? above : room) - PANEL_GAP
+      if (height > space) panel.style.maxHeight = `${space}px`
 
       panel.style.left = `${Math.max(EDGE_MARGIN, Math.min(trigger.left, window.innerWidth - panel.offsetWidth - EDGE_MARGIN))}px`
       panel.style.top = flip
-        ? `${Math.max(EDGE_MARGIN, trigger.top - height - PANEL_GAP)}px`
+        ? `${Math.max(EDGE_MARGIN, trigger.top - Math.min(height, above - PANEL_GAP) - PANEL_GAP)}px`
         : `${trigger.bottom + PANEL_GAP}px`
     }
 

@@ -13,6 +13,7 @@ import { Drawer } from '@/components/structures/Drawer'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { InlineCreate } from '@/components/structures/InlineCreate'
 import { LiveconTitle } from '@/composites/moderation/LiveconTitle'
+import { SanctionLegend } from '@/composites/moderation/SanctionLegend'
 import { OffenseSheet } from '@/composites/moderation/OffenseSheet'
 import { useActionMenu } from '@/core/hooks/interaction/useActionMenu'
 import { useSanctions } from '@/core/hooks/data/useSanctions'
@@ -25,6 +26,7 @@ import {
   SANCTION_GRAVITY_REGISTRY,
   SANCTION_PANEL_REGISTRY,
 } from '@/declarations/sanctions/registries'
+import { measureSeed } from '@/declarations/sanctions/measures'
 import { SANCTION_TEMPLATES } from '@/declarations/sanctions/template'
 import { accentVars } from '@/declarations/ui/theme'
 import { LIVECON_TITLE, SANCTION_PANEL } from '@/declarations/ui/variants'
@@ -182,6 +184,12 @@ export const ModerationBoard = ({
     [needle, sanctions.panel.offenses]
   )
 
+  // A ladder only offers its surface's measures
+  const panelMeasures = useMemo(
+    () => measures.filter((measure) => measureSeed(measure.name)?.panels?.includes(panel) ?? true),
+    [measures, panel]
+  )
+
   const hasTemplate = SANCTION_TEMPLATES[panel].length > 0
   const isEmpty = sanctions.panel.offenses.length === 0
 
@@ -328,6 +336,8 @@ export const ModerationBoard = ({
         </div>
       )}
 
+      {!isEmpty && <SanctionLegend panel={panel} />}
+
       {panelBody()}
 
       {sanctions.isOpening && (
@@ -340,7 +350,7 @@ export const ModerationBoard = ({
         <OffenseSheet
           offense={sanctions.open}
           level={level}
-          measures={measures}
+          measures={panelMeasures}
           canManage={canManageSanctions}
           isSaving={sanctions.isSaving}
           onSaveOffense={sanctions.saveOffense}

@@ -7,7 +7,6 @@
   "stepOffsetMax": 60,
   "bonusMaxLives": 4,
   "skillMaxPercent": 100,
-  "skillStep": 5,
   "trainingMinMinutes": 20,
   "trainingMaxMinutes": 50,
   "inviteExpiryDays": 14,
@@ -32,6 +31,8 @@
   "firstPeriodLives": 7,
   "secondPeriodLives": 6,
   "maxObjectives": 2,
+  "juniorLivesLimit": 60,
+  "formJuniorsLimit": 200,
   "thirdPeriodMinDays": 3,
   "thirdPeriodMaxDays": 30
 }

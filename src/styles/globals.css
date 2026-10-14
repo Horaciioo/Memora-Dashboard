@@ -18,10 +18,12 @@
 @import './shell/welcome.css';
 @import './motion/feedback.css';
 @import './motion/overlays.css';
+@import './motion/splash.css';
 @import './motion/pick.css';
 @import './motion/course.css';
 @import './motion/replica.css';
 @import './motion/tour.css';
+@import './motion/exercise.css';
 @import './content/markdown.css';
 @import './content/inline-edit.css';
 @import './content/accents.css';

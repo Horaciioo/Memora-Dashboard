@@ -180,4 +180,26 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     },
     revokes: { [MemberRoles.Moderateur]: [Permissions.AcademyRead, Permissions.RecruitmentRead] },
   },
+  {
+    key: 'trainers-recruiters-working-rights',
+    grants: {},
+    // They do their work without any Responsable access
+    functions: {
+      Formateurs: [
+        Permissions.AcademyReviewRead,
+        Permissions.AcademyReviewWrite,
+        Permissions.AcademySkillWrite,
+        Permissions.AcademyNoteRead,
+        Permissions.AcademyNoteWrite,
+        Permissions.AcademyObjectiveWrite,
+      ],
+      Recruteurs: [Permissions.RecruitmentCandidateWrite],
+    },
+  },
+  {
+    key: 'trainers-calendar',
+    grants: {},
+    // They plan their own interviews and check-ins
+    functions: { Formateurs: [Permissions.CalendarManage] },
+  },
 ]

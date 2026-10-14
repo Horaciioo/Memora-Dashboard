@@ -12,10 +12,6 @@ export const CALENDAR_COPY = {
   requestSent: 'Demande envoyée à tes responsables',
   requestNoLead: 'Aucun responsable n’est rattaché à tes équipes pour l’instant.',
   requestLead: 'Tes responsables reçoivent ta demande et te répondent.',
-  noTemplatesTitle: 'Aucun modèle d’évènement',
-  noTemplatesDescription:
-    'Déclare tes modèles de lives et de réunions dans la configuration pour aller plus vite.',
-  configure: 'Ouvrir la configuration',
   deleteTitle: 'Supprimer cet évènement ?',
   deleteDescription: 'Il disparaît du calendrier de tout le monde.',
   month: 'Mois',
@@ -50,14 +46,6 @@ export const CALENDAR_COPY = {
   sidebarLayers: 'Calendriers',
   sidebarCreators: 'YouTubeurs',
   search: 'Rechercher un event…',
-  // Legacy filter bar
-  allSources: 'Toutes les origines',
-  filterAbsences: 'Absences',
-  absencesHidden: 'Absences masquées',
-  absencesShown: 'Absences affichées',
-  filterAnswer: 'Ta réponse',
-  allAnswers: 'Toutes les réponses',
-  // Detail modal
   meetingTopicsTitle: 'Sujets prévus',
   meetingTopicsEmpty: 'Aucun sujet prévu.',
   meetingMinutesTitle: 'Compte-rendu',
@@ -66,7 +54,6 @@ export const CALENDAR_COPY = {
   preview: 'Aperçu',
   // Roll-call
   rollCallTitle: 'Appel de présence',
-  rollCallLead: 'Dis à ton Responsable si tu seras là.',
   respondPresent: 'Je serai là',
   respondAbsent: 'Je ne serai pas là',
   yourAnswer: 'Ta réponse',
@@ -79,7 +66,6 @@ export const CALENDAR_COPY = {
   noAnswerYet: 'Tu n’as pas encore répondu.',
   remindPending: 'Relancer les sans-réponse',
   reminderSent: 'Rappel envoyé aux sans-réponse',
-  noRoster: 'Personne n’est encore convoqué.',
 } as const
 
 /**
@@ -107,6 +93,22 @@ export const CALENDAR_FIELD_COPY = {
   remindAtHint: 'Laisse vide pour un rappel la veille en fin de journée.',
   requestSubject: 'Sujet',
   requestDay: 'Jour souhaité',
+  junior: 'Junior',
+  trainer: 'Formateur',
+  responsables: 'Responsables',
+} as const
+
+/**
+ * Wording of the academy templates of the calendar
+ * @type {Record<string, string>}
+ */
+
+export const ACADEMY_EVENT_COPY = {
+  juniorInfo: 'Le Junior que l’évènement concerne, il en est convoqué.',
+  trainerInfo: 'Le Formateur qui reçoit le Junior, toi par défaut.',
+  responsablesInfo: 'Les Responsables du YouTubeur qui ne sont pas absents.',
+  reviewDone: 'Bilan déjà réalisé',
+  reviewWaitsFirst: 'Le bilan de la période 1 passe d’abord',
 } as const
 
 /**
@@ -156,6 +158,8 @@ export const CALENDAR_PROJECTION_COPY = {
   meeting: 'Réunion',
   pendingAbsence: 'Absence en attente',
   academySession: 'PIM',
+  trainingsZone: 'Formations',
+  reviewsZone: 'Bilans',
   interview: 'Entretien',
 } as const
 

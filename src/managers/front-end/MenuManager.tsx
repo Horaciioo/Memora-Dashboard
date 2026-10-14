@@ -1,8 +1,18 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import type { MouseEvent, ReactNode } from 'react'
 
+import { useLongPress } from '@/core/hooks/interaction/useLongPress'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 import { MENU_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -80,6 +90,8 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
 
   const closeMenu = useCallback(() => setMenu(null), [])
 
+  useLongPress()
+
   const openMenu = useCallback(
     (items: MenuItem[], origin: { x: number; y: number }, title?: string) => {
       if (items.length === 0) return
@@ -143,42 +155,56 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
  * @return {JSX.Element} - Menu overlay
  */
 
-const MenuLayer = ({ menu, onClose }: { menu: OpenMenu; onClose: () => void }) => (
-  <>
-    <div className="fixed inset-0 z-[65]" role="presentation" onMouseDown={onClose} />
-    <div
-      role="menu"
-      aria-label={menu.title}
-      className={MENU_STYLES.panel}
-      style={{ left: menu.x, top: menu.y }}
-    >
-      {menu.title && <p className={MENU_STYLES.label}>{menu.title}</p>}
-      {menu.items.map((item) => {
-        const Icon = item.icon ? ICONS[item.icon] : null
+const MenuLayer = ({ menu, onClose }: { menu: OpenMenu; onClose: () => void }) => {
+  const panel = useRef<HTMLDivElement>(null)
 
-        return (
-          <div key={item.id}>
-            {item.separatorBefore && <div className={MENU_STYLES.separator} />}
-            <button
-              type="button"
-              role="menuitem"
-              disabled={item.disabled}
-              onClick={() => {
-                onClose()
-                item.onSelect()
-              }}
-              className={cn(MENU_STYLES.item, item.danger && MENU_STYLES.danger)}
-            >
-              {Icon && <Icon className={MENU_STYLES.icon} aria-hidden="true" />}
-              {item.label}
-              {item.shortcut && <span className={MENU_STYLES.shortcut}>{item.shortcut}</span>}
-            </button>
-          </div>
-        )
-      })}
-    </div>
-  </>
-)
+  // Rows are taller on touch, measure rather than guess
+  useLayoutEffect(() => {
+    const node = panel.current
+    if (!node) return
+
+    const overflow = node.getBoundingClientRect().bottom - (window.innerHeight - EDGE_MARGIN)
+    if (overflow > 0) node.style.top = `${Math.max(EDGE_MARGIN, menu.y - overflow)}px`
+  }, [menu])
+
+  return (
+    <>
+      <div className="fixed inset-0 z-[65]" role="presentation" onMouseDown={onClose} />
+      <div
+        ref={panel}
+        role="menu"
+        aria-label={menu.title}
+        className={MENU_STYLES.panel}
+        style={{ left: menu.x, top: menu.y }}
+      >
+        {menu.title && <p className={MENU_STYLES.label}>{menu.title}</p>}
+        {menu.items.map((item) => {
+          const Icon = item.icon ? ICONS[item.icon] : null
+
+          return (
+            <div key={item.id}>
+              {item.separatorBefore && <div className={MENU_STYLES.separator} />}
+              <button
+                type="button"
+                role="menuitem"
+                disabled={item.disabled}
+                onClick={() => {
+                  onClose()
+                  item.onSelect()
+                }}
+                className={cn(MENU_STYLES.item, item.danger && MENU_STYLES.danger)}
+              >
+                {Icon && <Icon className={MENU_STYLES.icon} aria-hidden="true" />}
+                {item.label}
+                {item.shortcut && <span className={MENU_STYLES.shortcut}>{item.shortcut}</span>}
+              </button>
+            </div>
+          )
+        })}
+      </div>
+    </>
+  )
+}
 
 /**
  * Use menu

@@ -523,6 +523,27 @@ export const KeyGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
+ * Communications
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const CommunicationsGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    render={({ fill, lift, deep, cut }) => (
+      <>
+        <rect x="3" y="4" width="14" height="17" rx="3" fill={fill} />
+        <rect x="6" y="8" width="8" height="2.2" rx="1.1" fill={cut} />
+        <rect x="6" y="12" width="5.5" height="2.2" rx="1.1" fill={cut} />
+        <path d="M17.5 8.5 21 12l-6.5 6.5-3.8.8.8-3.8z" fill={lift} />
+        <path d="M17.5 8.5 21 12l-1.4 1.4-3.5-3.5z" fill={deep} />
+      </>
+    )}
+  />
+)
+
+/**
  * Mail
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
@@ -1379,6 +1400,30 @@ export const NoteGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
+ * Pencil
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const PencilGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    render={({ fill, lift, deep, cut }) => (
+      <>
+        <path d="M14 5l5 5L8.6 20.4 3.6 15.4z" fill={fill} />
+        <path
+          d="M14 5l1.7-1.7a1.9 1.9 0 0 1 2.7 0l2.3 2.3a1.9 1.9 0 0 1 0 2.7L19 10z"
+          fill={lift}
+        />
+        <path d="M3.6 15.4l5 5L2.4 21.6z" fill={deep} />
+        <path d="M10.6 8.4l5 5" stroke={cut} strokeWidth="1.4" strokeLinecap="round" />
+        <path d="M13 21.2h8" stroke={fill} strokeWidth="1.6" strokeLinecap="round" />
+      </>
+    )}
+  />
+)
+
+/**
  * Discord
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
@@ -1684,6 +1729,31 @@ export const TrainerFunctionGlyph = ({ className }: GlyphProps) => (
         <path d="M20 9.4v5.6" stroke={deep} strokeWidth="1.2" strokeLinecap="round" />
         <circle cx="20" cy="15.8" r="1.3" fill={deep} />
         <circle cx="12" cy="9" r="0.9" fill={cut} />
+      </>
+    )}
+  />
+)
+
+/**
+ * Observer function
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const ObserverFunctionGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    tone="OBSERVER"
+    render={({ fill, lift, deep, cut }) => (
+      <>
+        <path
+          d="M1.8 12C4.2 7.4 8 5.2 12 5.2s7.8 2.2 10.2 6.8c-2.4 4.6-6.2 6.8-10.2 6.8S4.2 16.6 1.8 12z"
+          fill={fill}
+        />
+        <path d="M1.8 12C4.2 7.4 8 5.2 12 5.2s7.8 2.2 10.2 6.8z" fill={lift} opacity="0.5" />
+        <circle cx="12" cy="12" r="4.4" fill={cut} />
+        <circle cx="12" cy="12" r="2.7" fill={deep} />
+        <circle cx="13" cy="11" r="0.9" fill={cut} />
       </>
     )}
   />

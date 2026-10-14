@@ -40,10 +40,10 @@ export interface EditableDetailGridProps {
 }
 
 // Kinds that save themselves as soon as a choice is made
-const AUTO_SAVE_KINDS = ['select', 'date', 'datetime', 'multiselect', 'tags', 'image']
+const AUTO_SAVE_KINDS = ['select', 'date', 'datetime', 'daterange', 'multiselect', 'tags', 'image']
 
 // Kinds opening a panel on entry
-const OPEN_KINDS = ['select', 'date', 'datetime', 'multiselect']
+const OPEN_KINDS = ['select', 'date', 'datetime', 'daterange', 'multiselect']
 
 // Kinds that keep taking more entries after a save instead of closing straight away
 const STAY_OPEN_KINDS = ['multiselect', 'tags']

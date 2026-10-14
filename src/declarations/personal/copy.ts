@@ -4,7 +4,8 @@
  */
 
 export const PERSONAL_COPY = {
-  title: 'Ton accueil',
+  title: 'Ton Accueil',
+  heroDescription: 'Ton hub personnel',
   greeting: 'Salut, {name}',
   hello: 'On bosse sur quoi aujourd’hui ?',
   plannedTitle: 'Ton planning',
@@ -54,6 +55,9 @@ export const PERSONAL_COPY = {
 export const PERSONAL_TASK_COPY = {
   title: 'À faire',
   empty: 'Rien ne t’attend, tout est à jour.',
+  mentionTitle: '{name} t’a mentionné',
+  mentionSomeone: 'Quelqu’un',
+  mentionDescription: 'Un commentaire du recrutement te cite. Va jeter un œil.',
   assignTrainer: 'Attribuer un Formateur',
   assignTrainerDescription:
     'Ce junior a confirmé sa fiche. Choisis le Formateur qui le suivra pendant toute sa PIM.',

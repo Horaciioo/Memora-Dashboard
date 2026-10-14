@@ -42,7 +42,7 @@
   position: absolute;
   top: 50%;
   display: flex;
-  opacity: 0.85;
+  filter: drop-shadow(0 0 3px rgb(255 255 255 / 0.55)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.35));
   transform: translate(-50%, -50%);
   pointer-events: none;
 }

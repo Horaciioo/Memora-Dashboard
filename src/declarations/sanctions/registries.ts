@@ -122,7 +122,7 @@ const SANCTION_PANEL_MAP: Record<SanctionPanelName, SanctionPanelOption> = {
     icon: 'functionDiscord',
     userPlaceholder: 'ID',
     durationFormat: 'marsha',
-    written: false,
+    written: true,
     commands: {
       [SanctionKinds.Delete]: {
         command: '!clear <@{user}> 1',

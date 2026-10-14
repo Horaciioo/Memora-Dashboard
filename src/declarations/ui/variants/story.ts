@@ -70,7 +70,7 @@ export const PROFILE_CARD = {
 
 export const PICKER_CARD = {
   stack: 'flex flex-col gap-6',
-  pair: 'grid gap-6 lg:grid-cols-2',
+  pair: 'grid grid-cols-1 gap-6 lg:grid-cols-2',
   group: 'flex flex-col gap-3',
   title: 'flex items-center gap-2 text-sm font-semibold',
   three: 'grid grid-cols-3 gap-2',

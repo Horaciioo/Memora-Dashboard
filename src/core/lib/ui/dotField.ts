@@ -1,6 +1,10 @@
 // Pitch of the dot grid in pixels
 export const DOT_PITCH = 5
 
+// Whitening of a lit dot
+const PASTEL_BASE = 0.4
+const PASTEL_SPREAD = 0.35
+
 export type Rgb = [number, number, number]
 
 /**
@@ -83,10 +87,9 @@ export const drawDotField = ({
   const left = (width - columns * DOT_PITCH) / 2 + DOT_PITCH / 2
   const top = (height - rows * DOT_PITCH) / 2 + DOT_PITCH / 2
   const shade = (spread: number, lift: number): string => {
-    // Lighter or deeper cousin of the tint
-    const toward = spread > 0 ? 255 : 0
-    const amount = Math.min(Math.abs(spread) * 0.6 + lift, 0.9)
-    const [r, g, b] = tint.map((channel) => Math.round(channel + (toward - channel) * amount))
+    // Pastel cousin of the tint
+    const amount = Math.min(PASTEL_BASE + Math.abs(spread) * PASTEL_SPREAD + lift, 0.92)
+    const [r, g, b] = tint.map((channel) => Math.round(channel + (255 - channel) * amount))
 
     return `${r}, ${g}, ${b}`
   }
@@ -115,7 +118,7 @@ export const drawDotField = ({
         (0.6 + 0.4 * Math.sin(time * 11 - x * 0.35))
 
       // Faint grid underneath
-      context.fillStyle = 'rgba(255, 255, 255, 0.14)'
+      context.fillStyle = `rgba(${shade(0, 0.1)}, 0.3)`
       context.beginPath()
       context.roundRect(x - 1.25, y - 1.25, 2.5, 2.5, 0.6)
       context.fill()

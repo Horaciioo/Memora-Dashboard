@@ -18,7 +18,7 @@ import {
 import {
   absenceEntries,
   academySessionEntries,
-  academyStepEntries,
+  academyZoneEntries,
   birthdayEntries,
   meetingEntries,
   memberFunction,
@@ -41,6 +41,14 @@ import {
   CALENDAR_FIELD_INFO,
 } from '@/declarations/calendar/copy'
 import { CALENDAR_KIND_REGISTRY } from '@/declarations/calendar/registries'
+import type { AcademyScope } from '@/core/services/academy/AcademyScope'
+import {
+  academyFields,
+  isTemplateGreyed,
+  readAcademyForm,
+} from '@/core/services/calendar/academyForm'
+import type { AcademyFormContext } from '@/core/services/calendar/academyForm'
+import { resolveAcademyEntry } from '@/core/services/calendar/academyEntries'
 import {
   CALENDAR_SETTINGS,
   EMOJI_SETTINGS,
@@ -88,10 +96,11 @@ const subjectOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
 
 /**
  * Read the templates a new entry may start from
+ * @param {AcademyFormContext} academy - Academy templates and juniors
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-const templateOptions = async (): Promise<FieldOption[]> => {
+const templateOptions = async (academy: AcademyFormContext): Promise<FieldOption[]> => {
   const rows = await prisma.eventTemplate.findMany({
     where: { archived: false },
     orderBy: [{ position: 'asc' }, { name: 'asc' }],
@@ -105,6 +114,8 @@ const templateOptions = async (): Promise<FieldOption[]> => {
         value: row.id,
         label: row.name,
         accent: row.accent ?? undefined,
+        // A check-in nobody is left to be planned for is shown but shut
+        disabled: isTemplateGreyed(academy, row.id),
         group: CALENDAR_KIND_REGISTRY.get(kind).plural ?? CALENDAR_KIND_REGISTRY.label(kind),
       }))
   )
@@ -132,21 +143,28 @@ const WHEN_ROLL_CALL = { field: 'rollCall', truthy: true } as const
  * Build the calendar entry form declarations
  * @param {AccessScope} [scope] - Creator perimeter
  * @param {WorkViewer} [viewer] - Who reads
+ * @param {AcademyScope} [academy] - Juniors the member may plan for, none without it
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
 export const calendarFields = async (
   scope?: AccessScope,
-  viewer?: WorkViewer
+  viewer?: WorkViewer,
+  academy?: AcademyScope
 ): Promise<FieldDefinition[]> => {
-  const [templates, subjects, youtubers, projects, teams, audiences] = await Promise.all([
-    templateOptions(),
-    subjectOptions(scope),
-    youtuberOptions(scope),
-    projectOptions(scope, viewer),
-    teamOptions(scope),
-    audienceOptions(scope),
-  ])
+  const academyContext = academy
+    ? await readAcademyForm(academy)
+    : { purposes: new Map(), juniors: [] }
+  const [templates, subjects, youtubers, projects, teams, audiences, academyExtras] =
+    await Promise.all([
+      templateOptions(academyContext),
+      subjectOptions(scope),
+      youtuberOptions(scope),
+      projectOptions(scope, viewer),
+      teamOptions(scope),
+      audienceOptions(scope),
+      academyFields(academyContext, viewer?.id ?? ''),
+    ])
 
   // Only an administrator may close an entry to administrators
   const levels = toOptions(EVENT_VISIBILITY_REGISTRY).filter(
@@ -267,6 +285,7 @@ export const calendarFields = async (
       span: 'half',
       group: FORM_GROUPS.assignment,
     },
+    ...academyExtras,
     {
       name: 'projectId',
       kind: 'select',
@@ -375,6 +394,9 @@ const toEntry = (
     youtuberId: string | null
     projectId: string | null
     meetingId: string | null
+    sessionId: string | null
+    juniorId: string | null
+    trainerId: string | null
     rollCall: boolean
     rollCallTeamIds: string[]
     remindAt: Date | null
@@ -406,7 +428,11 @@ const toEntry = (
     ownerName: row.owner?.displayName ?? null,
     subjectName: row.subject?.displayName ?? null,
     // A posted entry standing for a meeting still points at the file that owns its content
-    href: row.meetingId ? ROUTES.meeting(row.meetingId) : null,
+    href: row.meetingId
+      ? ROUTES.meeting(row.meetingId)
+      : row.juniorId && row.sessionId
+        ? ROUTES.junior(row.sessionId, row.juniorId)
+        : null,
     body: null,
     readOnly: false,
     rollCall: row.rollCall,
@@ -429,6 +455,14 @@ const toEntry = (
       remindAt: row.remindAt ? row.remindAt.toISOString().slice(0, 16) : null,
       teamIds: row.rollCallTeamIds,
       memberIds: row.attendances.map((seat) => seat.accountId),
+      juniorId: row.juniorId,
+      trainerId: row.trainerId,
+      // Whoever is convened beside the junior and their trainer
+      responsableIds: row.juniorId
+        ? row.attendances
+            .map((seat) => seat.accountId)
+            .filter((id) => id !== row.accountId && id !== row.trainerId)
+        : [],
     },
   }
 }
@@ -536,16 +570,16 @@ export const listEntries = async ({
     viewer: workViewerOf(viewerId, access),
   }
 
-  // A session board only ever shows its own rows and its own steps
+  // A session board only ever shows its own rows and its own zones
   const projections = sessionId
-    ? await academyStepEntries(context, sessionId)
+    ? await academyZoneEntries(context, sessionId)
     : (
         await Promise.all([
           absenceEntries(context),
           meetingEntries(context),
           birthdayEntries(context),
           academySessionEntries(context),
-          academyStepEntries(context),
+          academyZoneEntries(context),
           recruitmentEntries(context),
         ])
       ).flat()
@@ -596,6 +630,9 @@ const toEntryData = (values: FormValues) => ({
   rollCall: readFlag(values, 'rollCall'),
   remindAt: readDate(values, 'remindAt'),
   rollCallTeamIds: readList(values, 'teamIds'),
+  // An academy template fixes these afterwards
+  juniorId: null as string | null,
+  trainerId: null as string | null,
 })
 
 // Milliseconds in a day
@@ -653,15 +690,25 @@ const applyTemplate = async (data: ReturnType<typeof toEntryData>) => {
  * Post an entry on the calendar
  * @param {string} ownerId - Who posts it
  * @param {FormValues} values - Parsed body
+ * @param {AccessScope} scope - Creator perimeter
+ * @param {AcademyScope} academy - Juniors the member may plan for
  * @return {Promise<CalendarEntry>} - Created entry
  */
 
 export const createEntry = async (
   ownerId: string,
   values: FormValues,
-  scope: AccessScope
+  scope: AccessScope,
+  academy: AcademyScope
 ): Promise<CalendarEntry> => {
-  const data = await applyTemplate(toEntryData(values))
+  const base = toEntryData(values)
+  const { memberIds: convened, ...fixed } = await resolveAcademyEntry(
+    base.templateId,
+    values,
+    ownerId,
+    academy
+  )
+  const data = await applyTemplate({ ...base, ...fixed })
 
   const row = await prisma.calendarEvent.create({
     data: {
@@ -677,7 +724,7 @@ export const createEntry = async (
   // Fan the roll-call out to its convened members
   const memberIds = await expandRoster(
     data.rollCallTeamIds,
-    readList(values, 'memberIds'),
+    convened ?? readList(values, 'memberIds'),
     scope,
     data.startsAt
   )
@@ -699,6 +746,7 @@ export const createEntry = async (
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} viewerId - Signed-in member identifier
  * @param {boolean} canManage - Viewer holds the manage permission
+ * @param {AcademyScope} academy - Juniors the member may plan for
  * @return {Promise<CalendarEntry>} - Updated entry
  */
 
@@ -707,9 +755,17 @@ export const updateEntry = async (
   values: FormValues,
   scope: AccessScope,
   viewerId: string,
-  canManage: boolean
+  canManage: boolean,
+  academy: AcademyScope
 ): Promise<CalendarEntry> => {
-  const data = await applyTemplate(toEntryData(values))
+  const base = toEntryData(values)
+  const { memberIds: convened, ...fixed } = await resolveAcademyEntry(
+    base.templateId,
+    values,
+    viewerId,
+    academy
+  )
+  const data = await applyTemplate({ ...base, ...fixed })
 
   const row = await prisma.calendarEvent.update({
     where: { id },
@@ -726,7 +782,7 @@ export const updateEntry = async (
   const known = new Set(row.attendances.map((seat) => seat.accountId))
   const memberIds = await expandRoster(
     data.rollCallTeamIds,
-    readList(values, 'memberIds'),
+    convened ?? readList(values, 'memberIds'),
     scope,
     data.startsAt
   )
@@ -904,11 +960,3 @@ export const getEntry = async (
 
   return toEntry(row, roster)
 }
-
-/**
- * Count the templates a member may start from
- * @return {Promise<number>} - Declared templates
- */
-
-export const countTemplates = (): Promise<number> =>
-  prisma.eventTemplate.count({ where: { archived: false } })

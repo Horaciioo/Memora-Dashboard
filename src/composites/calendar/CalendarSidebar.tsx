@@ -1,14 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import { Button } from '@/components/elements/actions/Button'
+import { BottomSheet } from '@/components/structures/BottomSheet'
 import { RailSearchGlyph } from '@/components/elements/display/RailGlyphs'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { CalendarMiniMonth } from '@/composites/calendar/CalendarMiniMonth'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { CALENDAR_LAYER_REGISTRY } from '@/declarations/calendar/registries'
-import { ICONS } from '@/declarations/ui/icons'
 import { railIcon } from '@/declarations/ui/railIcons'
-import { CALENDAR_SIDEBAR } from '@/declarations/ui/variants'
+import { BOTTOM_SHEET, CALENDAR_SIDEBAR } from '@/declarations/ui/variants'
 import type { FieldOption } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import type { CalendarUnit } from '@/utils/format/calendar'
@@ -31,30 +32,40 @@ export interface CalendarSidebarProps {
 }
 
 /**
- * Rail folded behind one button
+ * Filters button lifting the rail from the bottom
  * @param {CalendarSidebarProps} props - Cursor
  * @return {JSX.Element}
  */
 
 export const CalendarSidebar = (props: CalendarSidebarProps) => {
   const [isOpen, setOpen] = useState(false)
-  const Chevron = ICONS.expand
+  const hiddenTally = props.hiddenLayers.length + props.hiddenCreators.length
 
   return (
-    <aside className={CALENDAR_SIDEBAR.rail}>
-      <button
-        type="button"
+    <>
+      <Button
+        icon="filter"
+        title={CALENDAR_COPY.sidebarToggle}
+        aria-label={CALENDAR_COPY.sidebarToggle}
         aria-expanded={isOpen}
-        onClick={() => setOpen(!isOpen)}
-        className={CALENDAR_SIDEBAR.toggle}
+        className={cn(CALENDAR_SIDEBAR.trigger, hiddenTally > 0 && CALENDAR_SIDEBAR.triggerActive)}
+        onClick={() => setOpen(true)}
+      />
+      <BottomSheet
+        open={isOpen}
+        onClose={() => setOpen(false)}
+        title={CALENDAR_COPY.sidebarToggle}
+        figure={
+          <h2 className={BOTTOM_SHEET.figureTitle} aria-hidden="true">
+            {CALENDAR_COPY.sidebarToggle}
+          </h2>
+        }
       >
-        {CALENDAR_COPY.sidebarToggle}
-        <Chevron className={cn('h-4 w-4', isOpen && 'rotate-180')} aria-hidden="true" />
-      </button>
-      <div className={cn(CALENDAR_SIDEBAR.railBody, isOpen ? 'flex' : 'hidden')}>
-        <CalendarRailBody {...props} withSearch />
-      </div>
-    </aside>
+        <div className={CALENDAR_SIDEBAR.sheetBody}>
+          <CalendarRailBody {...props} withSearch hideMonth />
+        </div>
+      </BottomSheet>
+    </>
   )
 }
 
@@ -66,6 +77,7 @@ export const CalendarSidebar = (props: CalendarSidebarProps) => {
 
 export const CalendarRailBody = ({
   withSearch,
+  hideMonth,
   cursor,
   unit,
   onPick,
@@ -78,9 +90,11 @@ export const CalendarRailBody = ({
   youtubers,
   hiddenCreators,
   onToggleCreator,
-}: CalendarSidebarProps & { withSearch?: boolean }) => (
+}: CalendarSidebarProps & { withSearch?: boolean; hideMonth?: boolean }) => (
   <>
-    <CalendarMiniMonth cursor={cursor} unit={unit} onPick={onPick} onCursor={onCursor} />
+    {!hideMonth && (
+      <CalendarMiniMonth cursor={cursor} unit={unit} onPick={onPick} onCursor={onCursor} />
+    )}
 
     {withSearch && (
       <input

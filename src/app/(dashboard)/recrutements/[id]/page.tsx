@@ -1,19 +1,13 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageBanner } from '@/components/structures/PageBanner'
+import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { RecruitmentFile } from '@/composites/recruitment/RecruitmentFile'
-import {
-  candidateFields,
-  commentFields,
-  proseFields,
-  readSession,
-  stepFields,
-} from '@/core/services/recruitment/RecruitmentService'
-import { linkFields } from '@/core/services/onboarding/IntegrationLinkService'
-import { requirePermission } from '@/core/wrappers/requireUser'
+import { loadRecruitment } from '@/core/services/recruitment/FileLoader'
+import { readSession } from '@/core/services/recruitment/RecruitmentService'
+import { requireRecruitment } from '@/core/wrappers/requireRecruitment'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
-import { Permissions } from '@/utils/constants/permissions'
 
 /**
  * Name the browser tab after the session
@@ -28,10 +22,10 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const { scope } = await requirePermission(Permissions.RecruitmentRead)
+  const { perimeter } = await requireRecruitment(id)
 
   try {
-    const { summary } = await readSession(id, await scope())
+    const { summary } = await readSession(id, perimeter)
 
     return { title: `${summary.name} • ${summary.jobFunction.label}` }
   } catch {
@@ -48,29 +42,16 @@ export async function generateMetadata({
 
 export default async function RecruitmentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { access, scope } = await requirePermission(Permissions.RecruitmentRead)
+  const loaded = await loadRecruitment(id, await requireRecruitment(id))
+  if (!loaded) notFound()
 
-  const detail = await readSession(id, await scope()).catch(() => null)
-  if (!detail) notFound()
-
-  const [candidates, steps] = await Promise.all([candidateFields(), stepFields()])
+  const { detail, fields, can, activity } = loaded
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={detail.summary.name} />
-      <RecruitmentFile
-        detail={detail}
-        candidateFields={candidates}
-        stepFields={steps}
-        commentFields={commentFields()}
-        reviewFields={proseFields('review')}
-        instructionFields={proseFields('instructions')}
-        linkFields={linkFields()}
-        canManage={access.can(Permissions.RecruitmentManage)}
-        canWriteCandidates={access.can(Permissions.RecruitmentCandidateWrite)}
-        canWriteInstructions={access.can(Permissions.RecruitmentInstructionWrite)}
-        canManageLinks={access.can(Permissions.IntegrationManage)}
-      />
+      <PageBanner title={RECRUITMENT_COPY.title} isLabel image={detail.summary.youtuberBanner} />
+      <BreadcrumbLabel label={detail.summary.name} />
+      <RecruitmentFile detail={detail} activity={activity} fields={fields} can={can} />
     </div>
   )
 }

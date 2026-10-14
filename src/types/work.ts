@@ -260,3 +260,34 @@ export interface OverdueFlags {
   tasks: boolean
   meetings: boolean
 }
+
+/**
+ * Where an announcement was written
+ * @typedef {'project' | 'departure' | 'recruitment'} AnnouncementSource
+ */
+
+export type AnnouncementSource = 'project' | 'departure' | 'recruitment'
+
+/**
+ * Row of the announcements page, a pointer back to where it was written
+ * @typedef {Object} AnnouncementRow
+ * @property {string} id - Row identifier, prefixed by its source
+ * @property {AnnouncementSource} source - Where it was written
+ * @property {string} title - Announcement title
+ * @property {'draft' | 'announced'} state - Written only, or posted on Discord
+ * @property {string} origin - Name of the project, member or session it belongs to
+ * @property {string} at - ISO announcement date, creation date while a draft
+ * @property {WorkPerson | null} person - Who it names or who wrote it
+ * @property {string} href - Page it can be edited on
+ */
+
+export interface AnnouncementRow {
+  id: string
+  source: AnnouncementSource
+  title: string
+  state: 'draft' | 'announced'
+  origin: string
+  at: string
+  person: WorkPerson | null
+  href: string
+}

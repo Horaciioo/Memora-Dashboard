@@ -7,6 +7,7 @@ import type { WorkflowScopeName } from '@/utils/constants/workflow'
 
 export const PROJECT_COPY = {
   title: 'Projets',
+  heroDescription: 'Tout en un endroit',
   lead: 'Un projet, un objectif, un responsable, un état.',
   add: 'Créer un projet',
   emptyTitle: 'Aucun projet pour le moment.',
@@ -95,6 +96,7 @@ export const PROJECT_FIELD_INFO = {
 
 export const TASK_COPY = {
   title: 'Tâches',
+  heroDescription: 'Tout ce qu’il faut que tu fasses',
   lead: 'Une tâche, une date, un responsable, un état.',
   add: 'Créer une tâche',
   emptyTitle: 'Aucune tâche pour le moment.',
@@ -156,6 +158,7 @@ export const TASK_FIELD_INFO = {
 
 export const MEETING_COPY = {
   title: 'Réunions',
+  heroDescription: 'Tous tes vocaux',
   minuteUnit: 'min',
   lead: 'Date, participants et projet concerné pour chaque réunion.',
   add: 'Planifier une réunion',
@@ -318,6 +321,13 @@ export const DEADLINE_COPY = {
   task: 'Cette tâche est hors deadline !',
   meeting: 'Cette réunion est hors deadline !',
 } as const
+
+/**
+ * Bubble beside Recrutement when a comment names the member
+ * @type {string}
+ */
+
+export const MENTION_NUDGE_COPY = 'On t’a mentionné, va jeter un œil.'
 
 /**
  * Bubble beside a page holding late items of the member

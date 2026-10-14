@@ -6,24 +6,44 @@ import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { Prisma } from '@prisma/client'
 
 /**
- * Sessions a member is allowed to see
- * @param {SessionUser} viewer - Signed-in member
- * @param {PermissionHelpers} access - Permission helpers
- * @return {Prisma.AcademySessionWhereInput} - Where clause
+ * Promotions and juniors a member is allowed to see
+ * @typedef {Object} AcademyScope
+ * @property {Prisma.AcademySessionWhereInput} session - Promotions in reach
+ * @property {Prisma.AcademyJuniorWhereInput} juniors - Juniors in reach inside them
  */
 
-export const academyScope = (
-  viewer: SessionUser,
-  access: PermissionHelpers
-): Prisma.AcademySessionWhereInput => {
-  if (access.isAdmin || access.isResponsable) return {}
+export interface AcademyScope {
+  session: Prisma.AcademySessionWhereInput
+  juniors: Prisma.AcademyJuniorWhereInput
+}
 
-  // A junior trains under a junior function
+/**
+ * Everything a member is allowed to see
+ * @type {AcademyScope}
+ */
+
+export const OPEN_SCOPE: AcademyScope = { session: {}, juniors: {} }
+
+/**
+ * Sessions and juniors a member is allowed to see
+ * @param {SessionUser} viewer - Signed-in member
+ * @param {PermissionHelpers} access - Permission helpers
+ * @return {AcademyScope} - Where clauses
+ */
+
+export const academyScope = (viewer: SessionUser, access: PermissionHelpers): AcademyScope => {
+  if (access.isAdmin || access.isResponsable) return OPEN_SCOPE
+
+  // A trainer follows their own juniors only, a junior sees nobody but themselves
   return {
-    OR: [
-      { functionId: { in: viewer.functionIds } },
-      { juniors: { some: { accountId: viewer.id } } },
-    ],
+    session: {
+      OR: [
+        { functionId: { in: viewer.functionIds } },
+        { juniors: { some: { OR: [{ accountId: viewer.id }, { trainerId: viewer.id }] } } },
+        { trainers: { some: { accountId: viewer.id } } },
+      ],
+    },
+    juniors: { OR: [{ accountId: viewer.id }, { trainerId: viewer.id }] },
   }
 }
 

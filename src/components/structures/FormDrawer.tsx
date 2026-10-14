@@ -10,6 +10,7 @@ import {
   FORM_GROUP_ICONS,
   collectMissingRequired,
   groupFields,
+  settleOwned,
   presetValues,
 } from '@/core/lib/forms'
 import type { PresetContext } from '@/core/lib/forms'
@@ -111,8 +112,12 @@ export const FormDrawer = ({
     missing: [] as FieldIssue[],
   }))
 
+  // Phone shows the result in place of the fields
+  const [showAside, setShowAside] = useState(false)
+
   // Reopening always starts from the record being edited
   if (draft.open !== open) {
+    setShowAside(false)
     setDraft({ open, values: open ? startValues() : draft.values, missing: [] })
   }
 
@@ -123,7 +128,7 @@ export const FormDrawer = ({
   const change = (name: string, value: FieldValue) =>
     setDraft((current) => ({
       ...current,
-      values: { ...current.values, [name]: value },
+      values: settleOwned(fields, { ...current.values, [name]: value }, name),
       missing: current.missing.filter((issue) => issue.field !== name),
     }))
 
@@ -180,7 +185,7 @@ export const FormDrawer = ({
     if (accepted) onClose()
   }
 
-  const NextIcon = ICONS.next
+  const NextIcon = ICONS.forward
   const SaveIcon = ICONS.confirm
   const CancelIcon = ICONS.close
   const BackIcon = ICONS.back
@@ -210,14 +215,33 @@ export const FormDrawer = ({
       icon={subject.icon}
       description={description}
       subheader={
-        groups.length > 1 && (
-          <Tabs
-            items={tabs}
-            value={current?.name ?? ''}
-            label={FORM_COPY.categories}
-            emphasis
-            onChange={goTo}
-          />
+        (groups.length > 1 || aside) && (
+          <div className={DRAWER_STYLES.subheaderRow}>
+            {groups.length > 1 && (
+              <div className={DRAWER_STYLES.subheaderTabs}>
+                <Tabs
+                  items={tabs}
+                  value={current?.name ?? ''}
+                  label={FORM_COPY.categories}
+                  emphasis
+                  onChange={(group) => {
+                    setShowAside(false)
+                    goTo(group)
+                  }}
+                />
+              </div>
+            )}
+            {aside && (
+              <button
+                type="button"
+                aria-pressed={showAside}
+                onClick={() => setShowAside(!showAside)}
+                className={cn(DRAWER_STYLES.asideToggle, showAside && DRAWER_STYLES.asideToggleOn)}
+              >
+                {aside.label}
+              </button>
+            )}
+          </div>
         )
       }
       footer={
@@ -228,6 +252,7 @@ export const FormDrawer = ({
                 <button
                   type="button"
                   onClick={() => goTo(previous.name)}
+                  aria-label={previous.name}
                   className={cn(DRAWER_ACTIONS.step, DRAWER_ACTIONS.stepBack)}
                 >
                   <BackIcon className={DRAWER_ACTIONS.stepIcon} aria-hidden="true" />
@@ -238,6 +263,7 @@ export const FormDrawer = ({
                 <button
                   type="button"
                   onClick={advance}
+                  aria-label={next.name}
                   className={cn(DRAWER_ACTIONS.step, DRAWER_ACTIONS.stepNext)}
                 >
                   <span className={DRAWER_ACTIONS.stepLabel}>{next.name}</span>
@@ -252,6 +278,7 @@ export const FormDrawer = ({
                 type="button"
                 onClick={submit}
                 disabled={isSaving}
+                aria-label={aimedPhrase(submitVerb, subject.label, subject.gender)}
                 className={cn(DRAWER_ACTIONS.line, DRAWER_ACTIONS.save)}
               >
                 {isSaving ? (
@@ -259,19 +286,24 @@ export const FormDrawer = ({
                 ) : (
                   <SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
                 )}
-                {isSaving
-                  ? ACTION_COPY.saving
-                  : aimedPhrase(submitVerb, subject.label, subject.gender)}
+                <span className={DRAWER_ACTIONS.lineLabel}>
+                  {isSaving
+                    ? ACTION_COPY.saving
+                    : aimedPhrase(submitVerb, subject.label, subject.gender)}
+                </span>
               </button>
               <span className={DRAWER_ACTIONS.divider} aria-hidden="true" />
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isSaving}
+                aria-label={aimedPhrase(DRAWER_COPY.cancel, subject.label, subject.gender)}
                 className={cn(DRAWER_ACTIONS.line, DRAWER_ACTIONS.cancel)}
               >
                 <CancelIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
-                {aimedPhrase(DRAWER_COPY.cancel, subject.label, subject.gender)}
+                <span className={DRAWER_ACTIONS.lineLabel}>
+                  {aimedPhrase(DRAWER_COPY.cancel, subject.label, subject.gender)}
+                </span>
               </button>
             </>
           )}
@@ -280,13 +312,15 @@ export const FormDrawer = ({
     >
       {aside ? (
         <div className={DRAWER_STYLES.split}>
-          {section}
+          <div className={cn(showAside && 'hidden md:block')}>{section}</div>
           <div className={DRAWER_STYLES.splitDivider} aria-hidden="true" />
-          <div className={FIELD_STYLES.wrapper}>
-            <span className={FIELD_STYLES.labelRow}>
-              <span className={FIELD_STYLES.label}>{aside.label}</span>
-            </span>
-            {aside.render(values)}
+          <div className={cn(!showAside && 'hidden md:block')}>
+            <div className={FIELD_STYLES.wrapper}>
+              <span className={FIELD_STYLES.labelRow}>
+                <span className={FIELD_STYLES.label}>{aside.label}</span>
+              </span>
+              {aside.render(values)}
+            </div>
           </div>
         </div>
       ) : (
