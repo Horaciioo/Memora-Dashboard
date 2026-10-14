@@ -92,10 +92,9 @@ export const OverviewTab = () => {
     {
       id: 'session',
       title: SESSION_FILE_COPY.informations,
-      entries,
+      entries: [...entries, ...team],
       side: can.writeReviews || can.validateReviews ? <SessionDesk /> : undefined,
     },
-    { id: 'team', title: SESSION_FILE_COPY.team, entries: team },
   ]
 
   return (
