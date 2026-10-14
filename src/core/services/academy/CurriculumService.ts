@@ -6,7 +6,6 @@ import { readProgress } from '@/core/lib/curriculum/progress'
 import { scoreExercise } from '@/core/lib/curriculum/scoring'
 import type { ExerciseAnswer, ExerciseResult } from '@/core/lib/curriculum/scoring'
 import { hasSeenGuide } from '@/core/services/preferences/GuideService'
-import { clearOpenTrainingStep } from '@/core/services/academy/AcademyService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { notify } from '@/core/services/system/NotificationService'
 import {
@@ -22,6 +21,7 @@ import { COURSE_COPY } from '@/declarations/academy/copy'
 import { GUIDE_KEYS, TOUR_COURSE_ID } from '@/declarations/academy/welcome'
 import { ROUTES } from '@/declarations/navigation'
 import { tradeOfFunction } from '@/declarations/reference/fixed'
+import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import type { SessionUser } from '@/types/auth'
 import type { CourseCard, CourseProgress } from '@/types/academy'
 import {
@@ -152,38 +152,47 @@ const tourCard = (isDone: boolean): CourseCard => ({
 })
 
 /**
- * Read the catalogue a member follows: the courses of the trade their session trains for and the shared ones
- * @param {SessionUser} viewer - Signed-in member
- * @return {Promise<CourseCard[]>} - Courses
+ * Who a catalogue is read for
+ * @typedef {Object} CourseSubject
+ * @property {string} accountId - Member whose records are read
+ * @property {string[]} functionIds - Functions they hold
+ * @property {boolean} seesAll - Encadrement preview, nothing is hidden
+ * @property {AcademyStageName | null} stage - Stage of their PIM, none outside one
  */
 
-export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> => {
+export interface CourseSubject {
+  accountId: string
+  functionIds: string[]
+  seesAll: boolean
+  stage: AcademyStageName | null
+}
+
+/**
+ * Build the catalogue of one member: the courses of their trade and the shared ones
+ * @param {CourseSubject} subject - Member read
+ * @return {Promise<CourseCard[]>} - Courses, without the first visit
+ */
+
+const buildCourses = async (subject: CourseSubject): Promise<CourseCard[]> => {
   await syncCurriculum()
 
-  const [trades, junior, rows, isTourDone] = await Promise.all([
-    tradesOf(viewer.functionIds),
-    prisma.academyJunior.findFirst({
-      where: { accountId: viewer.id, status: AcademyJuniorStatuses.Active },
-      select: { stage: true },
-      orderBy: { startedAt: 'desc' },
-    }),
+  const [trades, rows] = await Promise.all([
+    tradesOf(subject.functionIds),
     prisma.training.findMany({
       where: { curriculumKey: { not: null } },
-      include: { records: { where: { accountId: viewer.id } } },
+      include: { records: { where: { accountId: subject.accountId } } },
       orderBy: { position: 'asc' },
     }),
-    hasSeenGuide(viewer.id, GUIDE_KEYS.tourDone),
   ])
 
-  const seesAll = isEncadrement(viewer.role)
-  const inPractice = !junior || PRACTICE_STAGES.includes(junior.stage)
+  const inPractice = subject.stage === null || PRACTICE_STAGES.includes(subject.stage)
 
-  const cards = rows.flatMap((row): CourseCard[] => {
+  return rows.flatMap((row): CourseCard[] => {
     const course = row.curriculumKey ? courseByKey(row.curriculumKey) : undefined
-    if (!course || !concerns(course, trades, seesAll)) return []
+    if (!course || !concerns(course, trades, subject.seesAll)) return []
 
     // Specialisations wait for the practice period
-    if (course.track === 'secondary' && !inPractice && !seesAll) {
+    if (course.track === 'secondary' && !inPractice && !subject.seesAll) {
       return [
         {
           id: row.id,
@@ -225,8 +234,61 @@ export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> =>
       },
     ]
   })
+}
+
+/**
+ * Read the catalogue a member follows: the courses of the trade their session trains for and the shared ones
+ * @param {SessionUser} viewer - Signed-in member
+ * @return {Promise<CourseCard[]>} - Courses
+ */
+
+export const listCourses = async (viewer: SessionUser): Promise<CourseCard[]> => {
+  const [junior, isTourDone] = await Promise.all([
+    prisma.academyJunior.findFirst({
+      where: { accountId: viewer.id, status: AcademyJuniorStatuses.Active },
+      select: { stage: true },
+      orderBy: { startedAt: 'desc' },
+    }),
+    hasSeenGuide(viewer.id, GUIDE_KEYS.tourDone),
+  ])
+
+  const cards = await buildCourses({
+    accountId: viewer.id,
+    functionIds: viewer.functionIds,
+    seesAll: isEncadrement(viewer.role),
+    stage: junior?.stage ?? null,
+  })
 
   return [tourCard(isTourDone), ...cards]
+}
+
+/**
+ * Read the catalogue of a junior, as they would see it
+ * @param {string} juniorId - Junior seat
+ * @param {AcademyScope} scope - Visibility fragment
+ * @return {Promise<CourseCard[]>} - Courses, locked ones hidden behind their period
+ */
+
+export const juniorCourses = async (
+  juniorId: string,
+  scope: AcademyScope
+): Promise<CourseCard[]> => {
+  const junior = await prisma.academyJunior.findFirst({
+    where: { id: juniorId, session: scope.session, ...scope.juniors },
+    select: {
+      accountId: true,
+      stage: true,
+      account: { select: { role: true, functions: { select: { functionId: true } } } },
+    },
+  })
+  if (!junior) throw notFound()
+
+  return buildCourses({
+    accountId: junior.accountId,
+    functionIds: junior.account.functions.map((held) => held.functionId),
+    seesAll: isEncadrement(junior.account.role),
+    stage: junior.stage,
+  })
 }
 
 /**
@@ -283,8 +345,6 @@ const announceFinish = async (accountId: string, courseName: string): Promise<vo
     orderBy: { startedAt: 'desc' },
   })
   if (!junior) return
-
-  await clearOpenTrainingStep(junior.id)
 
   // Responsables of the junior's creators hear of it too
   const creators = await prisma.account.findUnique({

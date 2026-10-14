@@ -2,7 +2,6 @@ import {
   AcademyJuniorStatuses,
   AcademySessionStatuses,
   AcademyStages,
-  DepartureKinds,
   ReviewAdvices,
   ReviewStatuses,
 } from '@/utils/constants/hierarchy'
@@ -16,7 +15,7 @@ import type {
 } from '@/utils/constants/hierarchy'
 
 /**
- * Where a junior stands on the AcademicParkour
+ * Where a junior stands on the PIM journey
  * @typedef {string} ParkourPhase
  */
 
@@ -234,11 +233,24 @@ export const DECISION_PHASES: ParkourPhase[] = [
 ]
 
 /**
- * Phases freezing a junior's own timeline
+ * Phases a resignation can still end
  * @type {ParkourPhase[]}
  */
 
-export const PAUSED_PHASES: ParkourPhase[] = [...DECISION_PHASES, 'periodOneDone']
+export const RESIGNABLE_PHASES: ParkourPhase[] = [
+  'awaitingInfo',
+  'ready',
+  'periodOne',
+  'reviewOneDue',
+  'reviewOneSubmitted',
+  'periodOneDone',
+  'periodTwo',
+  'reviewTwoDue',
+  'reviewTwoSubmitted',
+  'periodThree',
+  'finalReviewDue',
+  'finalReviewSubmitted',
+]
 
 /**
  * Stage of the check-in a phase waits on
@@ -381,16 +393,3 @@ export const fillDeparture = (
     .replaceAll('{emoji}', input.emoji)
     .replace(/[ \t]+$/gm, '')
     .trim()
-
-/**
- * Departure kind of an ending junior status
- * @param {AcademyJuniorStatusName} status - Junior status
- * @return {DepartureKindName | null} - Kind
- */
-
-export const departureOf = (status: AcademyJuniorStatusName): DepartureKindName | null => {
-  if (status === AcademyJuniorStatuses.Stopped) return DepartureKinds.Dismissal
-  if (status === AcademyJuniorStatuses.Resigned) return DepartureKinds.Resignation
-
-  return null
-}

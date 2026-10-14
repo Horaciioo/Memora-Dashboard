@@ -9,14 +9,20 @@ import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { RowList, type RowListGroup } from '@/components/structures/RowList'
+import { Avatar } from '@/components/elements/display/Avatar'
+import { SessionTiles, type SessionTileGroup } from '@/components/structures/SessionTiles'
 import { useSessions } from '@/core/hooks/data/useAcademy'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
-import { ACADEMY_SESSION_STATUS_REGISTRY } from '@/declarations/academy/registries'
+import {
+  ACADEMY_SESSION_STATUS_REGISTRY,
+  AWAITING_RECRUITMENT_OPTION,
+} from '@/declarations/academy/registries'
+import { ICONS, isIconName } from '@/declarations/ui/icons'
+import { accentVars } from '@/declarations/ui/theme'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 
-import { GROUP_STYLES } from '@/declarations/ui/variants'
+import { GROUP_STYLES, SESSION_TILE } from '@/declarations/ui/variants'
 import type { MenuItem } from '@/managers/front-end'
 import type { SessionSummary } from '@/types/academy'
 import type { FieldDefinition } from '@/types/forms'
@@ -27,14 +33,29 @@ import {
 import { sessionTitle } from '@/utils/format/academy'
 import { formatDay, formatDayRange } from '@/utils/format/dates'
 
-// Display order of the states
-const STATUS_ORDER = [
+// Key of the promotions held back by a campaign
+const AWAITING_KEY = 'AWAITING_RECRUITMENT'
+
+// Display order of the states, the wait on a campaign standing apart
+const GROUP_ORDER = [
   AcademySessionStatuses.Running,
   AcademySessionStatuses.Open,
+  AWAITING_KEY,
   AcademySessionStatuses.Draft,
   AcademySessionStatuses.Closed,
   AcademySessionStatuses.Archived,
-]
+] as const
+
+/**
+ * Group a session sits in
+ * @param {SessionSummary} session - Session
+ * @return {string} - Group key
+ */
+
+const groupOf = (session: SessionSummary): string =>
+  session.awaitingRecruitment && session.status === AcademySessionStatuses.Draft
+    ? AWAITING_KEY
+    : session.status
 
 export interface SessionsPanelProps {
   initialSessions: SessionSummary[]
@@ -93,27 +114,58 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
   ]
 
   // Heaviest state first, finished ones only on request
-  const groups: RowListGroup[] = STATUS_ORDER.filter(
-    (status) => showFinished || !FINISHED_ACADEMY_SESSION_STATUSES.includes(status)
+  const groups: SessionTileGroup[] = GROUP_ORDER.filter(
+    (key) =>
+      showFinished ||
+      !FINISHED_ACADEMY_SESSION_STATUSES.includes(
+        key as (typeof FINISHED_ACADEMY_SESSION_STATUSES)[number]
+      )
   )
-    .map((status) => ({
-      id: status,
-      label: ACADEMY_SESSION_STATUS_REGISTRY.label(status),
-      accent: ACADEMY_SESSION_STATUS_REGISTRY.get(status).accent,
-      items: sessions
-        .filter((entry) => entry.status === status)
-        .map((session) => ({
-          id: session.id,
-          title: sessionTitle(session),
-          meta: session.endsAt
-            ? formatDayRange(session.startsAt, session.endsAt)
-            : formatDay(session.startsAt),
-          icon: session.function.icon,
-          muted: FINISHED_ACADEMY_SESSION_STATUSES.includes(status),
-          menu: sessionMenu(session),
-          onOpen: () => router.push(ROUTES.session(session.id)),
-        })),
-    }))
+    .map((key) => {
+      const members = sessions.filter((entry) => groupOf(entry) === key)
+      const option =
+        key === AWAITING_KEY
+          ? AWAITING_RECRUITMENT_OPTION
+          : ACADEMY_SESSION_STATUS_REGISTRY.get(key)
+
+      return {
+        id: key,
+        label: option.label,
+        accent: option.accent,
+        items: members.map((session) => {
+          const FunctionGlyph =
+            session.function.icon && isIconName(session.function.icon)
+              ? ICONS[session.function.icon]
+              : null
+
+          return {
+            id: session.id,
+            // The creator's portrait once a campaign feeds the promotion
+            lead: session.recruitment ? (
+              <Avatar
+                name={session.recruitment.creator}
+                src={session.recruitment.creatorImage}
+                size="xl"
+              />
+            ) : (
+              FunctionGlyph && (
+                <span className="accent-text" style={accentVars(session.function.accent)}>
+                  <FunctionGlyph className={SESSION_TILE.glyph} aria-hidden="true" />
+                </span>
+              )
+            ),
+            title: sessionTitle(session),
+            meta: session.endsAt
+              ? formatDayRange(session.startsAt, session.endsAt)
+              : formatDay(session.startsAt),
+            people: session.trainers,
+            muted: FINISHED_ACADEMY_SESSION_STATUSES.includes(session.status),
+            menu: sessionMenu(session),
+            onOpen: () => router.push(ROUTES.session(session.id)),
+          }
+        }),
+      }
+    })
     .filter((group) => group.items.length > 0)
 
   const hasFinished = sessions.some((entry) =>
@@ -147,7 +199,7 @@ export const SessionsPanel = ({ initialSessions, fields, canManage }: SessionsPa
       ) : (
         <div className={GROUP_STYLES.spaced}>
           <PageOptions options={pageOptions} />
-          <RowList groups={groups} />
+          <SessionTiles groups={groups} />
           <AddRow label={ACADEMY_COPY.sessionAdd} disabled={!canManage} onClick={openCreate} />
         </div>
       )}

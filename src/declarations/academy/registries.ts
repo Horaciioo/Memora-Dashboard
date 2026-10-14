@@ -1,10 +1,8 @@
 import { createRegistry } from '@/core/lib/registry'
 import {
-  AcademyStepKinds,
   AcademyJuniorStatuses,
   AcademySessionStatuses,
   AcademyStages,
-  StepAnchors,
   StepOwners,
   NoteKinds,
   ObjectiveStatuses,
@@ -15,11 +13,9 @@ import {
   LegacyStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
-  AcademyStepKindName,
   AcademyJuniorStatusName,
   AcademySessionStatusName,
   AcademyStageName,
-  StepAnchorName,
   StepOwnerName,
   NoteKindName,
   ObjectiveStatusName,
@@ -61,6 +57,16 @@ const SESSION_STATUS_MAP: Record<AcademySessionStatusName, AcademyOption> = {
 
 export const ACADEMY_SESSION_STATUS_REGISTRY = createRegistry(SESSION_STATUS_MAP)
 
+/**
+ * State of a planned promotion held back by its campaign
+ * @type {AcademyOption}
+ */
+
+export const AWAITING_RECRUITMENT_OPTION: AcademyOption = {
+  label: 'En attente de fin de Recrutement',
+  accent: 'caution',
+}
+
 const JUNIOR_STATUS_MAP: Record<AcademyJuniorStatusName, AcademyOption> = {
   [AcademyJuniorStatuses.Active]: { label: 'En formation', accent: 'warning' },
   [AcademyJuniorStatuses.Validated]: { label: 'Validé', accent: 'success' },
@@ -69,38 +75,6 @@ const JUNIOR_STATUS_MAP: Record<AcademyJuniorStatusName, AcademyOption> = {
 }
 
 export const ACADEMY_JUNIOR_STATUS_REGISTRY = createRegistry(JUNIOR_STATUS_MAP)
-
-/**
- * Session thread moment metadata
- * @typedef {Object} StepKindOption
- * @property {string} label - Display label
- * @property {string} accent - Colour token
- * @property {IconName} icon - Glyph key
- */
-
-interface StepKindOption {
-  label: string
-  accent: string
-  icon: IconName
-}
-
-const STEP_KIND_MAP: Record<AcademyStepKindName, StepKindOption> = {
-  [AcademyStepKinds.Training]: { label: 'Formation', accent: 'brand', icon: 'academy' },
-  [AcademyStepKinds.VoiceReview]: { label: 'Bilan vocal', accent: 'info', icon: 'note' },
-  [AcademyStepKinds.Interview]: { label: 'Entrevue', accent: 'success', icon: 'members' },
-  [AcademyStepKinds.LeadCheckIn]: {
-    label: 'Point responsable',
-    accent: 'warning',
-    icon: 'shield',
-  },
-  [AcademyStepKinds.WorkSession]: {
-    label: 'Session de travail',
-    accent: 'neutral',
-    icon: 'tasks',
-  },
-}
-
-export const ACADEMY_STEP_KIND_REGISTRY = createRegistry(STEP_KIND_MAP)
 
 const STAGE_MAP: Record<AcademyStageName, AcademyOption> = {
   [AcademyStages.Preparation]: { label: 'Préparation', accent: 'neutral' },
@@ -112,13 +86,6 @@ const STAGE_MAP: Record<AcademyStageName, AcademyOption> = {
 }
 
 export const ACADEMY_STAGE_REGISTRY = createRegistry(STAGE_MAP)
-
-const STEP_ANCHOR_MAP: Record<StepAnchorName, AcademyOption> = {
-  [StepAnchors.Day]: { label: 'Jour', accent: 'info' },
-  [StepAnchors.Live]: { label: 'Live', accent: 'brand' },
-}
-
-export const STEP_ANCHOR_REGISTRY = createRegistry(STEP_ANCHOR_MAP)
 
 const STEP_OWNER_MAP: Record<StepOwnerName, AcademyOption> = {
   [StepOwners.Responsable]: { label: 'Responsable', accent: 'warning', icon: 'flame' },
@@ -170,7 +137,14 @@ const TRAINING_STATUS_MAP: Record<TrainingStatusName, AcademyOption> = {
 
 export const TRAINING_STATUS_REGISTRY = createRegistry(TRAINING_STATUS_MAP)
 
-const BLOCK_KIND_MAP: Record<TrainingBlockKindName, StepKindOption> = {
+// Label, colour and glyph of a block
+interface BlockKindOption {
+  label: string
+  accent: string
+  icon: IconName
+}
+
+const BLOCK_KIND_MAP: Record<TrainingBlockKindName, BlockKindOption> = {
   [TrainingBlockKinds.Text]: { label: 'Texte', accent: 'neutral', icon: 'note' },
   [TrainingBlockKinds.Quiz]: { label: 'Quiz', accent: 'brand', icon: 'confirm' },
 }

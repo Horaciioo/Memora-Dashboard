@@ -1,14 +1,13 @@
 import type { MaturityName } from '@/declarations/maturity/registries'
 import type { ParkourPhase } from '@/core/lib/academy/parkour'
 import type { LivePlatformName } from '@/utils/constants/lives'
-import type { TimelineStepState } from '@/core/services/academy/timeline'
-import type { PimDestinationName } from '@/declarations/academy/guides'
+import type { RecruitmentStatusName } from '@/utils/constants/recruitment'
+import type { AttendanceStatusName } from '@/utils/constants/workflow'
+import type { MilestoneView } from '@/core/lib/academy/parkourTimeline'
 import type { CourseSurface, CourseTrack } from '@/declarations/academy/curriculum/types'
-import type { IconName } from '@/declarations/ui/icons'
 import type { FormValues } from '@/types/forms'
 import type { WorkPerson } from '@/types/work'
 import type {
-  AcademyStepKindName,
   AcademyJuniorStatusName,
   AcademyPeriodName,
   AcademySessionStatusName,
@@ -17,8 +16,6 @@ import type {
   ObjectiveStatusName,
   ReviewAdviceName,
   ReviewStatusName,
-  StepAnchorName,
-  StepOwnerName,
   TrainingStatusName,
   TrainingBlockKindName,
 } from '@/utils/constants/hierarchy'
@@ -78,6 +75,30 @@ export interface JuniorTraining {
 }
 
 /**
+ * Campaign feeding a promotion
+ * @typedef {Object} SessionRecruitment
+ * @property {string} id - Campaign identifier
+ * @property {string} name - Campaign name
+ * @property {RecruitmentStatusName} status - Campaign status
+ * @property {string} youtuberId - Creator recruited for
+ * @property {string} creator - Creator name
+ * @property {string | null} creatorImage - Portrait of the creator
+ * @property {WorkPerson[]} responsables - Moderators carrying the campaign
+ * @property {WorkPerson[]} recruiters - Moderators leading interviews
+ */
+
+export interface SessionRecruitment {
+  id: string
+  name: string
+  status: RecruitmentStatusName
+  youtuberId: string
+  creator: string
+  creatorImage: string | null
+  responsables: WorkPerson[]
+  recruiters: WorkPerson[]
+}
+
+/**
  * Session listed on the academy board
  * @typedef {Object} SessionSummary
  * @property {string} id - Session identifier
@@ -86,10 +107,13 @@ export interface JuniorTraining {
  * @property {string} startsAt - ISO start date
  * @property {string | null} endsAt - ISO end date
  * @property {AcademySessionStatusName} status - Lifecycle state
- * @property {string | null} summary - Description
+ * @property {string | null} secondPeriodAt - ISO moment the second period opened
  * @property {WorkPerson[]} trainers - Moderators holding the trainer seat
  * @property {number} juniorCount - Juniors inside
  * @property {string | null} inviteToken - Token of the active admission link
+ * @property {ParkourPhase[]} phases - Phase of every junior, furthest along first
+ * @property {SessionRecruitment | null} recruitment - Campaign feeding the promotion
+ * @property {boolean} awaitingRecruitment - Held back by a campaign still running
  * @property {FormValues} values - Values feeding the edit form
  */
 
@@ -100,10 +124,13 @@ export interface SessionSummary {
   startsAt: string
   endsAt: string | null
   status: AcademySessionStatusName
-  summary: string | null
+  secondPeriodAt: string | null
   trainers: WorkPerson[]
   juniorCount: number
   inviteToken: string | null
+  phases: ParkourPhase[]
+  recruitment: SessionRecruitment | null
+  awaitingRecruitment: boolean
   values: FormValues
 }
 
@@ -119,12 +146,13 @@ export interface SessionSummary {
  * @property {string | null} confirmedAt - ISO date the junior confirmed their file
  * @property {AcademyJuniorStatusName} status - Outcome so far
  * @property {AcademyStageName} stage - Current phase of the PIM
+ * @property {ParkourPhase} phase - Where the junior stands on the journey
+ * @property {ParkourPhase} progress - Furthest phase reached, whatever the outcome
  * @property {WorkPerson | null} trainer - Trainer in charge
  * @property {string} startedAt - ISO arrival date
  * @property {string | null} validatedAt - ISO validation date
  * @property {number} liveCount - Lives already covered
  * @property {number} bonusLives - Extra lives opened by a bonus decision
- * @property {string | null} summary - Remarks
  * @property {JuniorTraining[]} trainings - Training progression
  * @property {number} completedCount - Trainings validated
  * @property {number} mandatoryPending - Mandatory trainings still open
@@ -142,12 +170,13 @@ export interface JuniorView {
   confirmedAt: string | null
   status: AcademyJuniorStatusName
   stage: AcademyStageName
+  phase: ParkourPhase
+  progress: ParkourPhase
   trainer: WorkPerson | null
   startedAt: string
   validatedAt: string | null
   liveCount: number
   bonusLives: number
-  summary: string | null
   trainings: JuniorTraining[]
   completedCount: number
   mandatoryPending: number
@@ -228,54 +257,6 @@ export interface JuniorObjectiveView {
 }
 
 /**
- * Free moment on the session thread
- * @typedef {Object} AcademyStepView
- * @property {string} id - Step identifier
- * @property {AcademyStepKindName | null} kind - Kind of moment
- * @property {string} title - Intitulé
- * @property {string | null} scheduledAt - ISO planned date
- * @property {string | null} doneAt - ISO date it was actually held
- * @property {string | null} notes - Written trace
- * @property {string | null} juniorId - Junior it concerns
- * @property {string | null} accountId - Account of the junior it concerns
- * @property {string | null} juniorName - Junior display name
- * @property {string | null} authorName - Who recorded it
- * @property {string | null} templateId - PIMT template it was instantiated from
- * @property {AcademyStageName | null} stage - Phase this step belongs to
- * @property {StepAnchorName | null} anchor - Day or live threshold
- * @property {number | null} offset - Day offset or live threshold
- * @property {StepOwnerName | null} owner - Who carries it
- * @property {boolean} required - Blocks the following steps of its stage while late
- * @property {string | null} validatedAt - ISO date it was cleared
- * @property {string | null} validatedByName - Who cleared it
- * @property {TimelineStepState | null} state - Resolved position
- * @property {FormValues} values - Values feeding the edit form
- */
-
-export interface AcademyStepView {
-  id: string
-  kind: AcademyStepKindName | null
-  title: string
-  scheduledAt: string | null
-  doneAt: string | null
-  notes: string | null
-  juniorId: string | null
-  accountId: string | null
-  juniorName: string | null
-  authorName: string | null
-  templateId: string | null
-  stage: AcademyStageName | null
-  anchor: StepAnchorName | null
-  offset: number | null
-  owner: StepOwnerName | null
-  required: boolean
-  validatedAt: string | null
-  validatedByName: string | null
-  state: TimelineStepState | null
-  values: FormValues
-}
-
-/**
  * Written trace of one voice check-in
  * @typedef {Object} AcademyReviewView
  * @property {string} id - Review identifier
@@ -316,13 +297,11 @@ export interface AcademyReviewView {
  * @typedef {Object} SessionDetail
  * @property {SessionSummary} summary - Session header
  * @property {JuniorView[]} juniors - Juniors inside
- * @property {AcademyStepView[]} steps - Session thread
  */
 
 export interface SessionDetail {
   summary: SessionSummary
   juniors: JuniorView[]
-  steps: AcademyStepView[]
 }
 
 /**
@@ -469,71 +448,25 @@ export interface ContentChapterView {
 }
 
 /**
- * Why the step in course cannot move yet
- * @typedef {'notStarted' | 'awaitingReview' | 'awaitingDecision' | 'standby' | 'closed'} PimTimelineLock
+ * One moment of a junior's journey
+ * @typedef {MilestoneView} PimTimelineStep
  */
 
-export type PimTimelineLock =
-  'notStarted' | 'awaitingReview' | 'awaitingDecision' | 'standby' | 'closed'
+export type PimTimelineStep = MilestoneView
 
 /**
- * Place of a step against the one in course
- * @typedef {'done' | 'current' | 'upcoming'} PimStepPosition
- */
-
-export type PimStepPosition = 'done' | 'current' | 'upcoming'
-
-/**
- * One step of a junior's vertical timeline
- * @typedef {Object} PimTimelineStep
- * @property {string} id - Step identifier
- * @property {string} title - What the step is
- * @property {string | null} description - What must happen
- * @property {string | null} guide - Detailed walkthrough
- * @property {IconName | null} icon - Glyph
- * @property {PimDestinationName | null} destination - Where its owner acts
- * @property {AcademyStageName} stage - Phase it belongs to
- * @property {StepOwnerName | null} owner - Who carries it
- * @property {boolean} required - Cannot be skipped
- * @property {string | null} scheduledAt - ISO planned day
- * @property {string | null} validatedAt - ISO day it was cleared
- * @property {string | null} validatedByName - Who cleared it
- * @property {PimStepPosition} position - Against the step in course
- */
-
-export interface PimTimelineStep {
-  id: string
-  title: string
-  description: string | null
-  guide: string | null
-  icon: IconName | null
-  destination: PimDestinationName | null
-  stage: AcademyStageName
-  owner: StepOwnerName | null
-  required: boolean
-  scheduledAt: string | null
-  validatedAt: string | null
-  validatedByName: string | null
-  position: PimStepPosition
-}
-
-/**
- * Vertical timeline of one junior
+ * Journey of one junior
  * @typedef {Object} PimTimeline
  * @property {string} juniorId - Junior identifier
  * @property {string} sessionId - Promotion identifier
- * @property {AcademyStageName} stage - Stage the junior stands in
- * @property {string | null} currentId - Step in course
- * @property {PimTimelineLock | null} lock - Why it cannot move
- * @property {PimTimelineStep[]} steps - Steps
+ * @property {ParkourPhase} phase - Phase the junior stands in
+ * @property {PimTimelineStep[]} steps - Moments in running order
  */
 
 export interface PimTimeline {
   juniorId: string
   sessionId: string
-  stage: AcademyStageName
-  currentId: string | null
-  lock: PimTimelineLock | null
+  phase: ParkourPhase
   steps: PimTimelineStep[]
 }
 
@@ -666,7 +599,7 @@ export interface TrainingFeedbackSummary {
 }
 
 /**
- * Where one junior stands on the AcademicParkour
+ * Where one junior stands on the PIM journey
  * @typedef {Object} ParkourView
  * @property {string} juniorId - Junior identifier
  * @property {string} sessionId - Promotion
@@ -692,19 +625,39 @@ export interface ParkourView {
 }
 
 /**
- * One live a junior accompanied
- * @typedef {Object} AccompaniedLiveView
+ * One dated period of a promotion, days as ISO strings
+ * @typedef {Object} PeriodView
+ * @property {'periodOne' | 'periodTwo' | 'periodThree'} key - Which period
+ * @property {string} startsAt - ISO first day
+ * @property {string | null} reviewsFrom - ISO day the first check-in falls due
+ * @property {string | null} endsAt - ISO day the last decision was taken
+ * @property {string | null} expectedEndsAt - ISO day it should end by
+ */
+
+export interface PeriodView {
+  key: 'periodOne' | 'periodTwo' | 'periodThree'
+  startsAt: string
+  reviewsFrom: string | null
+  endsAt: string | null
+  expectedEndsAt: string | null
+}
+
+/**
+ * One live a junior was called on
+ * @typedef {Object} JuniorLiveView
  * @property {string} liveId - Live identifier
  * @property {string} title - Live title
  * @property {string} creator - Creator name
  * @property {LivePlatformName} platform - Platform
  * @property {string} startedAt - ISO start
+ * @property {AttendanceStatusName} attendance - Present, absent, or not answered
  */
 
-export interface AccompaniedLiveView {
+export interface JuniorLiveView {
   liveId: string
   title: string
   creator: string
   platform: LivePlatformName
   startedAt: string
+  attendance: AttendanceStatusName
 }

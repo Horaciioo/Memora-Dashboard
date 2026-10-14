@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { Tip } from '@/components/elements/feedback/Tip'
 import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -14,18 +15,32 @@ import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 
 export interface LaunchPimButtonProps {
   sessionId: string
+  // The campaign feeding the promotion still runs
+  awaitingRecruitment?: boolean
 }
 
 /**
  * Launch a planned promotion
  * @param {string} sessionId - Session identifier
+ * @param {boolean} [awaitingRecruitment] - Held back by the campaign
  * @return {JSX.Element}
  */
 
-export const LaunchPimButton = ({ sessionId }: LaunchPimButtonProps) => {
+export const LaunchPimButton = ({ sessionId, awaitingRecruitment }: LaunchPimButtonProps) => {
   const router = useRouter()
   const [confirming, setConfirming] = useState(false)
   const { isSaving, run } = useMutation()
+
+  // Greyed, and says why
+  if (awaitingRecruitment) {
+    return (
+      <Tip label={ACADEMY_COPY.launchAwaitingRecruitment}>
+        <Button variant="primary" icon="climb" disabled>
+          {ACADEMY_COPY.launch}
+        </Button>
+      </Tip>
+    )
+  }
 
   return (
     <span {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.sessionLaunch }}>

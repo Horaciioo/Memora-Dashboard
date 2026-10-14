@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 
+import { TwitchModBadge } from '@/components/elements/display/LiveGlyphs'
 import { useChatReplay } from '@/core/hooks/interaction/useChatReplay'
 import { CHAT_ROLE_BADGES, nameColour } from '@/declarations/academy/chat'
 import type { ChatLine } from '@/declarations/academy/curriculum/types'
@@ -19,6 +20,8 @@ export interface ChatFeedProps {
   replayable?: boolean
   // Plays on arrival
   autoplay?: boolean
+  // Takes the whole box instead of its own card
+  fill?: boolean
   // Called once every line is on screen
   onPlayed?: () => void
 }
@@ -95,10 +98,14 @@ export const ChatLineView = ({
 
   return (
     <div className={cn(COURSE_CHAT.line, flagged, marked, arriving && COURSE_CHAT.lineIn)}>
-      {badge && (
-        <span className={COURSE_CHAT.badge} style={{ background: badge.colour }}>
-          {badge.label}
-        </span>
+      {line.role === 'moderator' ? (
+        <TwitchModBadge className={COURSE_CHAT.modBadge} />
+      ) : (
+        badge && (
+          <span className={COURSE_CHAT.badge} style={{ background: badge.colour }}>
+            {badge.label}
+          </span>
+        )
       )}
       <span className={COURSE_CHAT.author} style={{ color: colour }}>
         {line.author}
@@ -122,6 +129,7 @@ export const ChatFeed = ({
   caption,
   replayable,
   autoplay,
+  fill,
   onPlayed,
 }: ChatFeedProps) => {
   const { shown, playing, replay } = useChatReplay(lines.length, autoplay)
@@ -135,7 +143,12 @@ export const ChatFeed = ({
   const isTwitch = surface === 'twitch'
 
   return (
-    <figure className={cn(COURSE_CHAT.panel, isTwitch ? COURSE_CHAT.twitch : COURSE_CHAT.youtube)}>
+    <figure
+      className={cn(
+        fill ? COURSE_CHAT.panelFill : COURSE_CHAT.panel,
+        isTwitch ? COURSE_CHAT.twitch : COURSE_CHAT.youtube
+      )}
+    >
       <figcaption
         className={cn(
           COURSE_CHAT.head,
@@ -153,7 +166,7 @@ export const ChatFeed = ({
           </button>
         )}
       </figcaption>
-      <div className={COURSE_CHAT.body} aria-live="polite">
+      <div className={fill ? COURSE_CHAT.bodyFill : COURSE_CHAT.body} aria-live="polite">
         {lines.slice(0, shown).map((line, index) => (
           <ChatLineView
             key={`${index}-${line.author}`}

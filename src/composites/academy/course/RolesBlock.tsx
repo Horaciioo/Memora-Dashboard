@@ -19,7 +19,7 @@ const SIDE_CENTRES: Record<RoleSide, number> = { left: 27.5, center: 50, right: 
  * @return {JSX.Element}
  */
 
-const RoleStep = ({ row, from }: { row: RoleRule; from?: RoleSide }) => {
+export const RoleStep = ({ row, from }: { row: RoleRule; from?: RoleSide }) => {
   const [ref, isSeen] = useInView()
 
   return (

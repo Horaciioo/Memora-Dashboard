@@ -13,6 +13,8 @@ export interface CourseTileProps {
   isSelected: boolean
   // Waiting for its ceremony
   isPending: boolean
+  // Shown to someone else: no way in, the progress in place of the invitation
+  isReadOnly?: boolean
   onSelect: () => void
 }
 
@@ -22,20 +24,30 @@ export interface CourseTileProps {
  * @return {JSX.Element}
  */
 
-export const CourseTile = ({ course, isSelected, isPending, onSelect }: CourseTileProps) => {
+export const CourseTile = ({
+  course,
+  isSelected,
+  isPending,
+  isReadOnly,
+  onSelect,
+}: CourseTileProps) => {
   const surface = COURSE_SURFACE_REGISTRY.get(course.surface)
   // A card waiting for its ceremony keeps its colours until the stamp lands
   const isDone = course.status === TrainingStatuses.Done && !isPending
-  const isInert = Boolean(course.isTour)
+  const isInert = Boolean(course.isTour) || Boolean(isReadOnly)
   const state = course.isUnavailable
     ? COURSE_COPY.unavailable
     : isDone
       ? COURSE_COPY.done
       : course.isTour
         ? COURSE_COPY.tourState
-        : course.passed > 0
-          ? COURSE_COPY.resume
-          : COURSE_COPY.start
+        : isReadOnly
+          ? course.passed > 0
+            ? COURSE_COPY.passedOf(course.passed, course.exercises)
+            : COURSE_COPY.notStarted
+          : course.passed > 0
+            ? COURSE_COPY.resume
+            : COURSE_COPY.start
 
   const content = (
     <>

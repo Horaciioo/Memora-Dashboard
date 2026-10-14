@@ -9,11 +9,14 @@ import {
   resolvePhase,
   stageForLives,
 } from '@/core/lib/academy/parkour'
-import type { ParkourJunior, ParkourPhase, ParkourSession } from '@/core/lib/academy/parkour'
+import type { ParkourPhase } from '@/core/lib/academy/parkour'
 import { prisma } from '@/core/lib/db'
+import type { AcademyScope } from '@/core/services/academy/AcademyScope'
+import { thresholds, toParkourJunior, toParkourSession } from '@/core/services/academy/phases'
 import { conflict, immutable, invalidInput, notFound } from '@/core/lib/errors'
 import { readDate } from '@/core/lib/forms/values'
 import { launchPromotion } from '@/core/services/academy/AcademyService'
+import { assertRecruitmentOver, awaitsRecruitment } from '@/core/services/academy/recruitmentGate'
 import { graduateAccount } from '@/core/services/academy/AdmissionService'
 import { readAnchors } from '@/core/services/auth/LeadService'
 import { clearVolunteeredDetails } from '@/core/services/members/MemberService'
@@ -44,15 +47,12 @@ import {
   ReviewStatuses,
 } from '@/utils/constants/hierarchy'
 import type {
-  AcademyJuniorStatusName,
-  AcademySessionStatusName,
   AcademyStageName,
   DepartureKindName,
   ReviewAdviceName,
-  ReviewStatusName,
 } from '@/utils/constants/hierarchy'
 import { IntegrationLinkKinds } from '@/utils/constants/integration'
-import { EventVisibilities } from '@/utils/constants/workflow'
+import { CalendarKinds, EventPurposes, EventVisibilities } from '@/utils/constants/workflow'
 import { LiveStatuses } from '@/utils/constants/lives'
 import { addDays, startOfDay } from '@/utils/format/days'
 import type { Prisma } from '@prisma/client'
@@ -81,55 +81,6 @@ const PARKOUR_SHAPE = {
 
 type ParkourRow = Prisma.AcademyJuniorGetPayload<{ include: typeof PARKOUR_SHAPE }>
 
-// Lives thresholds
-const thresholds = () => ({
-  firstPeriodLives: ACADEMY_SETTINGS.firstPeriodLives,
-  secondPeriodLives: ACADEMY_SETTINGS.secondPeriodLives,
-})
-
-/**
- * Read a junior row the way the parkour reasons about it
- * @param {Object} row - Junior row with its reviews
- * @return {ParkourJunior} - Parkour junior
- */
-
-const toParkourJunior = (row: {
-  status: string
-  stage: string
-  trainerId: string | null
-  kickoffAt: Date | null
-  confirmedAt: Date | null
-  liveCount: number
-  deadlineAt: Date | null
-  reviews: { stage: string; status: string }[]
-}): ParkourJunior => ({
-  status: row.status as AcademyJuniorStatusName,
-  stage: row.stage as AcademyStageName,
-  trainerId: row.trainerId,
-  kickoffAt: row.kickoffAt,
-  confirmedAt: row.confirmedAt,
-  liveCount: row.liveCount,
-  deadlineAt: row.deadlineAt,
-  reviews: row.reviews.map((review) => ({
-    stage: review.stage as AcademyStageName,
-    status: review.status as ReviewStatusName,
-  })),
-})
-
-/**
- * Read a promotion row the way the parkour reasons about it
- * @param {{ status: string, secondPeriodAt: Date | null }} session - Promotion row
- * @return {ParkourSession} - Parkour promotion
- */
-
-const toParkourSession = (session: {
-  status: string
-  secondPeriodAt: Date | null
-}): ParkourSession => ({
-  status: session.status as AcademySessionStatusName,
-  secondPeriodAt: session.secondPeriodAt,
-})
-
 /**
  * Phase of one loaded junior
  * @param {ParkourRow} row - Junior row
@@ -142,16 +93,13 @@ const phaseOf = (row: ParkourRow): ParkourPhase =>
 /**
  * Load a junior
  * @param {string} juniorId - Junior identifier
- * @param {Prisma.AcademySessionWhereInput} [scope] - Visibility fragment
+ * @param {AcademyScope} [scope] - Visibility fragment
  * @return {Promise<ParkourRow>} - Junior row
  */
 
-const loadJunior = async (
-  juniorId: string,
-  scope?: Prisma.AcademySessionWhereInput
-): Promise<ParkourRow> => {
+const loadJunior = async (juniorId: string, scope?: AcademyScope): Promise<ParkourRow> => {
   const row = await prisma.academyJunior.findFirst({
-    where: { id: juniorId, ...(scope ? { session: scope } : {}) },
+    where: { id: juniorId, ...(scope ? { session: scope.session, ...scope.juniors } : {}) },
     include: PARKOUR_SHAPE,
   })
   if (!row) throw notFound()
@@ -219,14 +167,11 @@ const ensureKickoffInvite = async (sessionId: string, functionId: string): Promi
 /**
  * Read where a junior stands on the parkour
  * @param {string} juniorId - Junior identifier
- * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {AcademyScope} scope - Visibility fragment
  * @return {Promise<ParkourView>} - Parkour view
  */
 
-export const readParkour = async (
-  juniorId: string,
-  scope: Prisma.AcademySessionWhereInput
-): Promise<ParkourView> => {
+export const readParkour = async (juniorId: string, scope: AcademyScope): Promise<ParkourView> => {
   const row = await loadJunior(juniorId, scope)
   const phase = phaseOf(row)
   const isPlanned = row.session.status !== AcademySessionStatuses.Running
@@ -265,14 +210,11 @@ export const readParkour = async (
 /**
  * Declare the PIM start of one junior
  * @param {string} juniorId - Junior identifier
- * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {AcademyScope} scope - Visibility fragment
  * @return {Promise<string>} - Integration link path
  */
 
-export const declareKickoff = async (
-  juniorId: string,
-  scope: Prisma.AcademySessionWhereInput
-): Promise<string> => {
+export const declareKickoff = async (juniorId: string, scope: AcademyScope): Promise<string> => {
   const row = await loadJunior(juniorId, scope)
   if (phaseOf(row) !== 'needsKickoff') throw conflict()
 
@@ -311,22 +253,23 @@ const announceLaunch = async (sessionId: string, actorId: string | null): Promis
 /**
  * Launch a promotion by hand
  * @param {string} sessionId - Promotion
- * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {AcademyScope} scope - Visibility fragment
  * @param {string} actorId - Responsable launching
  * @return {Promise<void>} - Launched
  */
 
 export const launchAnyway = async (
   sessionId: string,
-  scope: Prisma.AcademySessionWhereInput,
+  scope: AcademyScope,
   actorId: string
 ): Promise<void> => {
   const session = await prisma.academySession.findFirst({
-    where: { id: sessionId, ...scope },
+    where: { id: sessionId, ...scope.session },
     select: { status: true },
   })
   if (!session) throw notFound()
   if (session.status === AcademySessionStatuses.Running) throw conflict()
+  await assertRecruitmentOver(sessionId)
 
   const ready = await prisma.academyJunior.count({
     where: { sessionId, status: AcademyJuniorStatuses.Active, confirmedAt: { not: null } },
@@ -344,6 +287,9 @@ export const launchAnyway = async (
  */
 
 const launchWhenReady = async (sessionId: string): Promise<boolean> => {
+  // The campaign feeding it decides first
+  if (await awaitsRecruitment(sessionId)) return false
+
   const session = await prisma.academySession.findUniqueOrThrow({
     where: { id: sessionId },
     select: { status: true, secondPeriodAt: true },
@@ -359,6 +305,21 @@ const launchWhenReady = async (sessionId: string): Promise<boolean> => {
   await announceLaunch(sessionId, null)
 
   return true
+}
+
+/**
+ * Free the promotion a campaign feeds once the campaign ends
+ * @param {string} recruitmentId - Campaign identifier
+ * @return {Promise<void>} - Followed up
+ */
+
+export const afterRecruitmentClosed = async (recruitmentId: string): Promise<void> => {
+  const row = await prisma.recruitmentSession.findUnique({
+    where: { id: recruitmentId },
+    select: { academySessionId: true },
+  })
+
+  if (row?.academySessionId) await launchWhenReady(row.academySessionId)
 }
 
 /**
@@ -384,19 +345,39 @@ export const afterIntegration = async (juniorId: string): Promise<void> => {
   await launchWhenReady(row.sessionId)
 }
 
+// Column holding the moment a junior entered each check-in
+const DUE_COLUMNS = {
+  [AcademyStages.ReviewOne]: 'reviewOneDueAt',
+  [AcademyStages.ReviewFinal]: 'reviewFinalDueAt',
+} as const
+
+// Calendar template each check-in is planned from
+const REVIEW_PURPOSES_BY_STAGE = {
+  [AcademyStages.ReviewOne]: EventPurposes.ReviewOne,
+  [AcademyStages.ReviewFinal]: EventPurposes.ReviewFinal,
+} as const
+
 /**
  * Put a check-in falling due in its trainer's calendar
  * @param {ParkourRow} row - Junior row
+ * @param {AcademyStageName} stage - Check-in stage entered
  * @return {Promise<void>} - Planned
  */
 
-const planReview = async (row: ParkourRow): Promise<void> => {
+const planReview = async (row: ParkourRow, stage: AcademyStageName): Promise<void> => {
   if (!row.trainerId) return
+
+  const purpose = REVIEW_PURPOSES_BY_STAGE[stage as keyof typeof REVIEW_PURPOSES_BY_STAGE]
+  const template = purpose ? await prisma.eventTemplate.findUnique({ where: { purpose } }) : null
 
   await prisma.calendarEvent.create({
     data: {
       title: PARKOUR_COPY.reviewDueTitle.replace('{name}', row.account.displayName),
+      templateId: template?.id ?? null,
+      kind: template?.kind ?? CalendarKinds.Event,
       ownerId: row.trainerId,
+      accountId: row.accountId,
+      juniorId: row.id,
       sessionId: row.sessionId,
       startsAt: startOfDay(new Date()),
       allDay: true,
@@ -428,8 +409,13 @@ export const syncStages = async (juniorIds: string[]): Promise<void> => {
     const next = stageForLives(row.stage as AcademyStageName, row.liveCount, thresholds())
     if (next === row.stage) continue
 
-    await prisma.academyJunior.update({ where: { id: juniorId }, data: { stage: next } })
-    await planReview(row)
+    // The moment a check-in falls due bounds its window on the calendar
+    const dueColumn = DUE_COLUMNS[next as keyof typeof DUE_COLUMNS]
+    await prisma.academyJunior.update({
+      where: { id: juniorId },
+      data: { stage: next, ...(dueColumn ? { [dueColumn]: new Date() } : {}) },
+    })
+    await planReview(row, next)
   }
 }
 
@@ -588,18 +574,18 @@ const openSecondPeriodWhenReady = async (sessionId: string): Promise<void> => {
 /**
  * Open the second period by hand
  * @param {string} sessionId - Promotion
- * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {AcademyScope} scope - Visibility fragment
  * @param {string} actorId - Responsable opening it
  * @return {Promise<void>} - Opened
  */
 
 export const openSecondPeriodAnyway = async (
   sessionId: string,
-  scope: Prisma.AcademySessionWhereInput,
+  scope: AcademyScope,
   actorId: string
 ): Promise<void> => {
   const session = await prisma.academySession.findFirst({
-    where: { id: sessionId, ...scope },
+    where: { id: sessionId, ...scope.session },
     select: { status: true, secondPeriodAt: true },
   })
   if (!session) throw notFound()
@@ -750,12 +736,6 @@ export const applyDecision = async (
   const row = await loadJunior(review.juniorId)
   const stage = review.stage as AcademyStageName
 
-  // The steps of the closed stage close with the check-in
-  await prisma.academyStep.updateMany({
-    where: { juniorId: row.id, stage, validatedAt: null },
-    data: { validatedAt: new Date(), validatedById: actorId },
-  })
-
   switch (decisionEffect(stage, review.decision as ReviewAdviceName)) {
     case 'dismiss':
       await endParkour(row.id, DepartureKinds.Dismissal, actorId)
@@ -785,14 +765,14 @@ export const applyDecision = async (
 /**
  * Record a junior's resignation
  * @param {string} juniorId - Junior identifier
- * @param {Prisma.AcademySessionWhereInput} scope - Visibility fragment
+ * @param {AcademyScope} scope - Visibility fragment
  * @param {string} actorId - Responsable recording it
  * @return {Promise<void>} - Recorded
  */
 
 export const resignJunior = async (
   juniorId: string,
-  scope: Prisma.AcademySessionWhereInput,
+  scope: AcademyScope,
   actorId: string
 ): Promise<void> => {
   await loadJunior(juniorId, scope)

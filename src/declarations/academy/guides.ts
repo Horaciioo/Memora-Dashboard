@@ -20,7 +20,6 @@ export const GUIDE_PARAMS = {
 export const GUIDE_BEACONS = {
   fsiTabs: 'fsi:tabs',
   fsiTimeline: 'fsi:timeline',
-  fsiAdvance: 'fsi:advance',
   fsiReviewAdd: 'fsi:review-add',
   fsiNoteAdd: 'fsi:note-add',
   fsiObjectiveAdd: 'fsi:objective-add',
@@ -73,8 +72,8 @@ export interface PimDestination {
 
 // Tabs of the follow-up file a walkthrough may open
 export const FSI_TABS = {
-  timeline: 'timeline',
   informations: 'informations',
+  timeline: 'timeline',
   trainings: 'trainings',
   skills: 'skills',
   notes: 'notes',
@@ -93,11 +92,6 @@ const PIM_DESTINATION_MAP = {
         beacon: GUIDE_BEACONS.fsiTimeline,
         title: 'Lis l’étape en couleur',
         body: 'C’est celle en cours. Son glyph et son texte disent exactement ce qui doit se passer maintenant.',
-      },
-      {
-        beacon: GUIDE_BEACONS.fsiAdvance,
-        title: 'Passe à l’étape supérieure une fois faite',
-        body: 'Seul un Responsable voit ce bouton. Il valide l’étape en cours et colore la suivante.',
       },
     ],
   },
@@ -154,7 +148,7 @@ const PIM_DESTINATION_MAP = {
       {
         beacon: GUIDE_BEACONS.fsiSkills,
         title: 'Ajuste chaque compétence',
-        body: 'Monte ou descend le pourcentage d’après ce que tu as vu, pas d’après l’impression générale.',
+        body: 'Saisis le pourcentage d’après ce que tu as vu, pas d’après l’impression générale.',
       },
     ],
   },
@@ -180,7 +174,7 @@ const PIM_DESTINATION_MAP = {
       {
         beacon: GUIDE_BEACONS.fsiEdit,
         title: 'Attribue un Formateur',
-        body: 'Ouvre la fiche, choisis le Formateur dans la liste et enregistre. Il retrouvera ses tâches sur son Accueil.',
+        body: 'Clique sur « Attribuer un Formateur » dans la timeline, choisis-le dans la liste et enregistre. Il retrouvera ses tâches sur son Accueil.',
       },
     ],
   },
@@ -220,39 +214,6 @@ export type PimDestinationName = keyof typeof PIM_DESTINATION_MAP
 export const PIM_DESTINATION_REGISTRY = createRegistry<PimDestinationName, PimDestination>(
   PIM_DESTINATION_MAP
 )
-
-/**
- * Glyph a PIM step may wear
- * @typedef {Object} PimStepGlyph
- * @property {IconName} icon - Glyph key
- * @property {string} label - What it stands for
- */
-
-export interface PimStepGlyph {
-  icon: IconName
-  label: string
-}
-
-/**
- * Glyphs a PIM step may wear on the timeline
- * @type {readonly PimStepGlyph[]}
- */
-
-export const PIM_STEP_GLYPHS: readonly PimStepGlyph[] = [
-  { icon: 'academy', label: 'Formation' },
-  { icon: 'functionTrainer', label: 'Formateur' },
-  { icon: 'meetings', label: 'Rendez-vous' },
-  { icon: 'confirm', label: 'Bilan' },
-  { icon: 'note', label: 'Note' },
-  { icon: 'objective', label: 'Objectif' },
-  { icon: 'skill', label: 'Compétence' },
-  { icon: 'livecon', label: 'Live' },
-  { icon: 'discord', label: 'Discord' },
-  { icon: 'sanctions', label: 'Sanctions' },
-  { icon: 'members', label: 'Équipe' },
-  { icon: 'star', label: 'Validation' },
-  { icon: 'clock', label: 'Échéance' },
-]
 
 /**
  * Build the address a walkthrough opens on

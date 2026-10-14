@@ -1,6 +1,9 @@
 import type { ParkourPhase } from '@/core/lib/academy/parkour'
+import { ACADEMY_FIELD_COPY } from '@/declarations/academy/copy'
+import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import type { IconName } from '@/declarations/ui/icons'
 import type { Tone } from '@/declarations/ui/theme'
+import type { FieldDefinition } from '@/types/forms'
 import { AcademyStages, DepartureKinds, ReviewAdvices } from '@/utils/constants/hierarchy'
 import type {
   AcademyStageName,
@@ -13,7 +16,7 @@ import type {
  * @type {string}
  */
 
-export const PARKOUR_NAME = 'AcademicParkour'
+export const PARKOUR_NAME = 'PIM'
 
 /**
  * Division a graduate lands in
@@ -190,10 +193,10 @@ export const PARKOUR_DECISION_CONFIRM: Record<ReviewAdviceName, string> = {
 
 export const PARKOUR_COPY = {
   title: PARKOUR_NAME,
+  assignTrainer: 'Attribuer un Formateur',
   declareKickoff: 'Déclarer le début de la PIM',
   kickoffDeclared: 'Début de PIM déclaré',
   integrationLink: 'Lien d’intégration',
-  copyLink: 'Copier le lien',
   launchAnyway: 'Lancer la PIM quand même',
   launchAnywayHint:
     'Seuls les Juniors qui ont fini leur formulaire partent. Les autres partent dès qu’ils ont fini.',
@@ -218,8 +221,23 @@ export const PARKOUR_COPY = {
   livesOf: '{count} / {needed}',
   kickoffPending: 'Ton début de PIM n’a pas encore été déclaré. Ton Responsable te préviendra.',
   launchNobodyReady: 'Aucun Junior n’a fini son formulaire.',
-  objectivesHidden: 'Le Junior ne voit pas ses objectifs.',
   reviewDueTitle: 'Bilan de {name}',
+  doReviews: 'Réaliser mes bilans',
+  depositVerb: 'Déposer',
+  skillsPanel: 'Compétences',
+  doDecisions: 'Donner mes décisions',
+  reviewFlowTitle: 'Bilan de {name}',
+  decisionFlowTitle: 'Décision pour {name}',
+  flowStep: '{index} sur {total}',
+  reviewsDeskTitle: 'Mes bilans',
+  decisionsDeskTitle: 'Mes décisions',
+  reviewsDeskEmpty: 'Aucun bilan à réaliser pour le moment.',
+  decisionsDeskEmpty: 'Aucune décision n’attend.',
+  reviewsPending: (count: number) =>
+    `${count} ${count > 1 ? 'bilans à réaliser' : 'bilan à réaliser'}`,
+  decisionsPending: (count: number) =>
+    `${count} ${count > 1 ? 'décisions à donner' : 'décision à donner'}`,
+  skillsLead: 'Note chaque compétence avant de déposer le bilan.',
 } as const
 
 /**
@@ -284,3 +302,24 @@ export const DEPARTURE_COPY = {
   publish: 'Marquer comme publiée',
   published: 'Annonce publiée',
 } as const
+
+/**
+ * Declarations of the third period decision
+ * @type {FieldDefinition[]}
+ */
+
+export const THIRD_PERIOD_FIELDS: FieldDefinition[] = [
+  {
+    name: 'deadlineAt',
+    kind: 'date',
+    label: PARKOUR_COPY.deadline,
+    hint: PARKOUR_COPY.deadlineHint,
+    required: true,
+  },
+  {
+    name: 'decisionNote',
+    kind: 'textarea',
+    label: ACADEMY_FIELD_COPY.decisionNote,
+    maxLength: FORM_SETTINGS.noteMaxLength,
+  },
+]
