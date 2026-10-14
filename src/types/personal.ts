@@ -43,7 +43,6 @@ export interface HomePlanned {
  */
 
 export type HomeTaskKind =
-  | 'pimStep'
   | 'assignTrainer'
   | 'launchPim'
   | 'training'
@@ -52,6 +51,7 @@ export type HomeTaskKind =
   | 'pimDecision'
   | 'secondPeriod'
   | 'departure'
+  | 'mention'
 
 /**
  * One thing the member has to do

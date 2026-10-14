@@ -10,6 +10,7 @@ import {
   FORM_GROUP_ICONS,
   collectMissingRequired,
   groupFields,
+  settleOwned,
   presetValues,
 } from '@/core/lib/forms'
 import type { PresetContext } from '@/core/lib/forms'
@@ -127,7 +128,7 @@ export const FormDrawer = ({
   const change = (name: string, value: FieldValue) =>
     setDraft((current) => ({
       ...current,
-      values: { ...current.values, [name]: value },
+      values: settleOwned(fields, { ...current.values, [name]: value }, name),
       missing: current.missing.filter((issue) => issue.field !== name),
     }))
 

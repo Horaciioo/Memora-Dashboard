@@ -72,6 +72,58 @@ export const NextGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
+ * Thumb up
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const LikeGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className}>
+    <path d="M7 11v9H4.5a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1H7zm0 0 3.8-7.2a1.9 1.9 0 0 1 2.2 1.8V9h5.2a2 2 0 0 1 2 2.3l-.9 6.2a2 2 0 0 1-2 1.7H7" />
+  </Stroke>
+)
+
+/**
+ * Thumb held sideways
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const NeutralGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className}>
+    <g transform="rotate(90 12 12)">
+      <path d="M7 11v9H4.5a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1H7zm0 0 3.8-7.2a1.9 1.9 0 0 1 2.2 1.8V9h5.2a2 2 0 0 1 2 2.3l-.9 6.2a2 2 0 0 1-2 1.7H7" />
+    </g>
+  </Stroke>
+)
+
+/**
+ * Thumb down
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const DislikeGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className}>
+    <g transform="rotate(180 12 12)">
+      <path d="M7 11v9H4.5a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1H7zm0 0 3.8-7.2a1.9 1.9 0 0 1 2.2 1.8V9h5.2a2 2 0 0 1 2 2.3l-.9 6.2a2 2 0 0 1-2 1.7H7" />
+    </g>
+  </Stroke>
+)
+
+/**
+ * Skip
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const SkipGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className}>
+    <path d="M6 5.5v13l9-6.5-9-6.5zM19 5v14" />
+  </Stroke>
+)
+
+/**
  * Back
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}

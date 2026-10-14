@@ -37,7 +37,7 @@ export default async function ProjectsPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={PROJECT_COPY.title} />
+      <PageHeader title={PROJECT_COPY.title} heroDescription={PROJECT_COPY.heroDescription} />
       <ProjectsBoard
         initialProjects={projects}
         columns={columns}

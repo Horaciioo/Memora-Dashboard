@@ -75,6 +75,15 @@ const BASE_TINTS = {
     deepTo: '#14532d',
     cut: '#f0fdf4',
   },
+  OBSERVER: {
+    fillFrom: '#a99cf0',
+    fillTo: '#6d5fd0',
+    liftFrom: '#ece9fd',
+    liftTo: '#c5bdf6',
+    deepFrom: '#5a4bb8',
+    deepTo: '#352c78',
+    cut: '#f6f4ff',
+  },
   RESPONSABLE: {
     fillFrom: '#fb923c',
     fillTo: '#ea580c',

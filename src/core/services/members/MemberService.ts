@@ -236,6 +236,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
     {
       name: 'birthday',
       kind: 'date',
+      dayOnly: true,
       startYear: FORM_SETTINGS.birthdayStartYear,
       label: MEMBER_FIELD_COPY.birthday,
       info: MEMBER_FIELD_INFO.birthday,

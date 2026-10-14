@@ -9,7 +9,13 @@ import { INTEGRATION_LINK_COPY } from '@/declarations/onboarding/copy'
 import { feedbackTitle } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { IntegrationLinkView } from '@/types/onboarding'
-import type { CandidateView, RecruitmentDetail, RecruitmentStepView } from '@/types/recruitment'
+import type {
+  AnswerState,
+  CandidateView,
+  RecruitmentDetail,
+  RecruitmentStepView,
+} from '@/types/recruitment'
+import { BLANK_ANSWER } from '@/core/lib/recruitment/questionnaire'
 
 // Toast entity labels
 const CANDIDATE = 'Candidat'
@@ -25,6 +31,9 @@ const INSTRUCTIONS = 'Consignes'
  * @property {CandidateView[]} candidates - Applicants held
  * @property {RecruitmentStepView[]} steps - Timeline moments
  * @property {IntegrationLinkView | null} link - Integration form handed out
+ * @property {string[]} questionKeys - Questions picked for the interviews
+ * @property {(id: string, key: string, patch: Partial<AnswerState>) => Promise<void>} saveAnswer - Note one question
+ * @property {(id: string, stage: string, done: boolean) => Promise<void>} markStage - Tick a timeline moment
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {() => void} clearIssues - Forget the rejections
@@ -49,6 +58,9 @@ export interface RecruitmentFile {
   candidates: CandidateView[]
   steps: RecruitmentStepView[]
   link: IntegrationLinkView | null
+  questionKeys: string[]
+  saveAnswer: (id: string, key: string, patch: Partial<AnswerState>) => Promise<void>
+  markStage: (id: string, stage: string, done: boolean) => Promise<void>
   isSaving: boolean
   issues: FieldIssue[]
   clearIssues: () => void
@@ -80,6 +92,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
   const [candidates, setCandidates] = useState(detail.candidates)
   const [steps, setSteps] = useState(detail.steps)
   const [link, setLink] = useState(detail.link)
+  const questionKeys = detail.questionKeys
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   // Every candidate mutation answers with the whole card
@@ -257,6 +270,42 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     [run, sessionId]
   )
 
+  // Notes land on the card at once, the server follows
+  const saveAnswer = useCallback(
+    async (id: string, key: string, patch: Partial<AnswerState>) => {
+      setCandidates((current) =>
+        current.map((entry) =>
+          entry.id === id
+            ? {
+                ...entry,
+                answers: {
+                  ...entry.answers,
+                  [key]: { ...BLANK_ANSWER, ...entry.answers[key], ...patch },
+                },
+              }
+            : entry
+        )
+      )
+
+      await run(() => apiPut(API_ROUTES.candidateAnswer(id, key), patch))
+    },
+    [run]
+  )
+
+  // The moment flips at once, the server follows
+  const markStage = useCallback(
+    async (id: string, stage: string, done: boolean) => {
+      setCandidates((current) =>
+        current.map((entry) =>
+          entry.id === id ? { ...entry, stageMarks: { ...entry.stageMarks, [stage]: done } } : entry
+        )
+      )
+
+      await run(() => apiPut(API_ROUTES.candidateStage(id, stage), { done }))
+    },
+    [run]
+  )
+
   // Handing out the form also clears the step that carries it
   const emitLink = useCallback(
     async (values: FormValues) => {
@@ -290,6 +339,9 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     candidates,
     steps,
     link,
+    questionKeys,
+    saveAnswer,
+    markStage,
     isSaving,
     issues,
     clearIssues,

@@ -24,8 +24,6 @@ export interface SanctionInput {
 
 export interface SanctionDrawerProps {
   open: boolean
-  // Lives trade holders only
-  canTemporary: boolean
   isSaving: boolean
   onSubmit: (input: SanctionInput) => Promise<boolean>
   onClose: () => void
@@ -39,12 +37,11 @@ export interface SanctionDrawerProps {
 
 export const SanctionDrawer = ({
   open,
-  canTemporary,
   isSaving,
   onSubmit,
   onClose,
 }: SanctionDrawerProps) => {
-  const [kind, setKind] = useState<SanctionKind>(canTemporary ? 'temporary' : 'permanent')
+  const [kind, setKind] = useState<SanctionKind>('temporary')
   const [until, setUntil] = useState('')
   const [reason, setReason] = useState('')
 
@@ -54,7 +51,7 @@ export const SanctionDrawer = ({
 
   // Types on offer
   const options = [
-    ...(canTemporary ? [{ value: 'temporary', label: MEMBER_ADMIN_COPY.sanctionTemporary }] : []),
+    { value: 'temporary', label: MEMBER_ADMIN_COPY.sanctionTemporary },
     { value: 'permanent', label: MEMBER_ADMIN_COPY.sanctionPermanent },
   ]
 

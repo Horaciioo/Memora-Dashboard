@@ -11,6 +11,18 @@ import type { FieldIssue, FieldValue, FormValues } from '@/types/forms'
 import type { WorkflowScopeName } from '@/utils/constants/workflow'
 
 /**
+ * Wording of the toast naming a record
+ * @typedef {Object} EntityCopy
+ * @property {string} label - Singular label
+ * @property {'masculine' | 'feminine'} gender - Grammatical gender
+ */
+
+export interface EntityCopy {
+  label: string
+  gender: 'masculine' | 'feminine'
+}
+
+/**
  * File state and inline mutations of one work record
  * @typedef {Object} RecordFile
  * @property {FormValues} values - Current field values
@@ -34,7 +46,8 @@ export interface RecordFile {
  * Drive one work file
  * @param {Object} input - File context
  * @param {string} input.path - Item route of the record
- * @param {WorkflowScopeName} input.scope - Board scope
+ * @param {WorkflowScopeName} [input.scope] - Board scope
+ * @param {EntityCopy} [input.entity] - Toast wording when there is no board scope
  * @param {FormValues} input.initialValues - Values resolved server-side
  * @return {RecordFile} - State and mutations
  */
@@ -42,10 +55,12 @@ export interface RecordFile {
 export const useRecordFile = ({
   path,
   scope,
+  entity: ownEntity,
   initialValues,
 }: {
   path: string
-  scope: WorkflowScopeName
+  scope?: WorkflowScopeName
+  entity?: EntityCopy
   initialValues: FormValues
 }): RecordFile => {
   const router = useRouter()
@@ -55,8 +70,9 @@ export const useRecordFile = ({
 
   const commit = useCallback(
     async (next: FormValues) => {
-      const entity = BOARD_ENTITY_COPY[scope]
-      const name = typeof next.title === 'string' ? next.title : undefined
+      const entity = ownEntity ?? BOARD_ENTITY_COPY[scope!]
+      const name = [next.title, next.name].find((value) => typeof value === 'string') as
+        string | undefined
       const saved = await run(
         () => apiPatch(path, next),
         feedbackTitle(entity.label, 'saved', entity.gender, name)
@@ -70,7 +86,7 @@ export const useRecordFile = ({
 
       return saved !== null
     },
-    [path, scope, run, router]
+    [path, scope, ownEntity, run, router]
   )
 
   const saveField = useCallback(

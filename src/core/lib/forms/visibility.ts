@@ -50,7 +50,12 @@ export const narrowOptions = (field: FieldDefinition, values: FormValues): Field
 
   return {
     ...field,
-    options: field.options.filter((option) => !option.owner || owners.includes(option.owner)),
+    options: field.options.filter(
+      (option) =>
+        (!option.owner && !option.owners) ||
+        (option.owner !== undefined && owners.includes(option.owner)) ||
+        option.owners?.some((owner) => owners.includes(owner))
+    ),
   }
 }
 
@@ -71,3 +76,37 @@ export const collectMissingRequired = (fields: FieldDefinition[], values: FormVa
       return value === null || value === undefined || value === ''
     })
     .map((field) => field.name)
+
+/**
+ * Settle the fields owned by a field that just changed: defaults are picked, stale picks dropped
+ * @param {FieldDefinition[]} fields - Field declarations
+ * @param {FormValues} values - Values after the change
+ * @param {string} owner - Name of the field that changed
+ * @return {FormValues} - Values with the owned fields settled
+ */
+
+export const settleOwned = (
+  fields: FieldDefinition[],
+  values: FormValues,
+  owner: string
+): FormValues => {
+  const next = { ...values }
+
+  for (const field of fields) {
+    if (field.ownerField !== owner || !field.options) continue
+
+    const reachable = new Set(
+      (narrowOptions(field, next).options ?? [])
+        .filter((option) => !option.disabled)
+        .map((option) => option.value)
+    )
+    const current = next[field.name]
+
+    if (field.defaultFromOwner) next[field.name] = values[owner] ? [...reachable] : []
+    else if (Array.isArray(current))
+      next[field.name] = current.filter((value) => reachable.has(value))
+    else if (typeof current === 'string' && !reachable.has(current)) next[field.name] = null
+  }
+
+  return next
+}

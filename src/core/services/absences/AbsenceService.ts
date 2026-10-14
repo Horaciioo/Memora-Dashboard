@@ -133,6 +133,7 @@ export const ABSENCE_FIELDS: FieldDefinition[] = [
   {
     name: 'dates',
     kind: 'daterange',
+    dayOnly: true,
     label: ABSENCE_FIELD_COPY.dates,
     info: ABSENCE_FIELD_INFO.dates,
     required: true,

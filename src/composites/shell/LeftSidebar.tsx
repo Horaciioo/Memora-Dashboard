@@ -27,7 +27,7 @@ import { beaconProps } from '@/declarations/ui/beacons'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
-import { DEADLINE_NUDGE_COPY } from '@/declarations/work/copy'
+import { DEADLINE_NUDGE_COPY, MENTION_NUDGE_COPY } from '@/declarations/work/copy'
 import { OVERDUE_ROUTES } from '@/declarations/work/registries'
 import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
@@ -159,6 +159,15 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
               message={DEADLINE_NUDGE_COPY[flag]}
             />
           ))}
+
+      {/* A comment naming the member lights Recrutement */}
+      {!courseRail &&
+        !calendarRail &&
+        !isIntroOpen &&
+        viewContext.mentioned &&
+        isUnlocked(ROUTES.recruitments) && (
+          <RailDeadlineBubble href={ROUTES.recruitments} message={MENTION_NUDGE_COPY} />
+        )}
 
       {courseRail && !isCompact && <ReleaseNotice />}
 

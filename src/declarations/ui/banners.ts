@@ -116,6 +116,7 @@ export const BANNER_ROUTES: readonly { prefix: string; scene: string }[] = [
   { prefix: '/projets', scene: 'work' },
   { prefix: '/taches', scene: 'work' },
   { prefix: '/reunions', scene: 'work' },
+  { prefix: '/communications', scene: 'work' },
   { prefix: '/notifications', scene: 'comfort' },
   { prefix: '/parametres', scene: 'comfort' },
   { prefix: '/nouveautes', scene: 'comfort' },

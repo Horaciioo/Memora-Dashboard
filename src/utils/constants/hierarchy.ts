@@ -120,21 +120,6 @@ export type AcademyJuniorStatusName =
   (typeof AcademyJuniorStatuses)[keyof typeof AcademyJuniorStatuses]
 
 /**
- * Kind of moment recorded on the session thread
- * @type {Record<string, string>}
- */
-
-export const AcademyStepKinds = {
-  Training: 'FORMATION',
-  VoiceReview: 'BILAN_VOCAL',
-  Interview: 'ENTREVUE',
-  LeadCheckIn: 'POINT_RESPONSABLE',
-  WorkSession: 'SESSION_TRAVAIL',
-} as const
-
-export type AcademyStepKindName = (typeof AcademyStepKinds)[keyof typeof AcademyStepKinds]
-
-/**
  * Broad phase of a junior's PIM
  * @type {Record<string, string>}
  */
@@ -149,18 +134,6 @@ export const AcademyStages = {
 } as const
 
 export type AcademyStageName = (typeof AcademyStages)[keyof typeof AcademyStages]
-
-/**
- * How a timeline step's due date is computed
- * @type {Record<string, string>}
- */
-
-export const StepAnchors = {
-  Day: 'DAY',
-  Live: 'LIVE',
-} as const
-
-export type StepAnchorName = (typeof StepAnchors)[keyof typeof StepAnchors]
 
 /**
  * Who is responsible for carrying out a timeline step

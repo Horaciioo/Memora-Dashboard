@@ -18,7 +18,7 @@ export default async function MarshaPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={MARSHA_COPY.title} />
+      <PageHeader title={MARSHA_COPY.title} heroDescription={MARSHA_COPY.heroDescription} />
       <MarshaGuide
         trainingHref={await courseHrefFor(session, 'marsha-bot')}
         viewer={{ name: session.displayName, avatarUrl: session.avatarUrl }}

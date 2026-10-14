@@ -12,6 +12,15 @@ export const FEEDBACK_COPY = {
 } as const
 
 /**
+ * Splash screen copy
+ * @type {Record<string, string>}
+ */
+
+export const SPLASH_COPY = {
+  status: 'Ouverture de ton espace',
+} as const
+
+/**
  * Mutation kind driving a toast verb
  * @type {'created' | 'saved' | 'deleted'}
  */

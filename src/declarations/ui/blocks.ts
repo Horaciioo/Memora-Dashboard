@@ -349,21 +349,47 @@ export const MEMBER_FILE = {
  */
 
 export const STAGE_LIST = {
-  stage: 'relative flex gap-4 pb-6 last:pb-0',
-  stageRail: 'absolute top-12 bottom-0 left-[1.375rem] w-0.5 bg-[var(--color-border)]',
+  stage: 'relative flex gap-4 pb-7 last:pb-0',
+  // Thread running between two bare glyphs
+  stageRail: 'absolute top-9 bottom-1 left-3 w-px -translate-x-1/2 bg-[var(--color-border-strong)]',
+  stageRailDone: 'bg-[var(--color-success)]/50',
   stageChip:
-    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-100)] text-[var(--color-ink-accent)]',
+    'z-10 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--color-info)]',
   stageChipDone:
-    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-success-soft)] text-[var(--color-success)]',
+    'z-10 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--color-success)]',
   stageChipLate:
-    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-danger-soft)] text-[var(--color-danger)]',
+    'z-10 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--color-danger)]',
   stageChipOff:
-    'z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--color-border-strong)] text-[var(--color-ink-subtle)]',
-  stageBody: 'flex min-w-0 flex-1 flex-col gap-1.5 pt-1',
+    'z-10 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--color-ink-subtle)]/60 opacity-50 grayscale',
+  stageGlyph: 'h-6 w-6',
+  stageBody: 'flex min-w-0 flex-1 flex-col gap-1.5',
   stageHead: 'flex min-w-0 flex-wrap items-center gap-2.5',
   stageTitle: 'text-base font-bold tracking-tight',
+  stageTitleCurrent: 'text-[var(--color-info)]',
   stageLead: 'text-sm text-[var(--color-ink-subtle)]',
   stageActions: 'flex flex-wrap items-center gap-3',
+} as const
+
+/**
+ * Discreet timeline laid in a corner
+ * @type {Record<string, string>}
+ */
+
+export const STAGE_COMPACT = {
+  root: 'opacity-80',
+  stage: 'relative flex gap-2.5 pb-3 last:pb-0',
+  stageRail: 'absolute top-6 bottom-0.5 left-2 w-px -translate-x-1/2 bg-[var(--color-border)]',
+  stageChip: 'z-10 flex h-4 w-4 shrink-0 items-center justify-center',
+  stageGlyph: 'h-4 w-4',
+  stageTitle: 'text-sm leading-4 font-semibold',
+  stageTitleDone: 'line-through decoration-[var(--color-ink-subtle)]/60',
+  stageTitleCurrent: 'text-[var(--color-info)]',
+  tone: {
+    done: 'text-[var(--color-success)]',
+    current: 'text-[var(--color-info)]',
+    late: 'text-[var(--color-danger)]',
+    upcoming: 'text-[var(--color-ink-subtle)]/60',
+  },
 } as const
 
 /**
@@ -781,4 +807,21 @@ export const AUTH_SHELL = {
   wordmark: 'h-auto w-40',
   card: 'card-surface rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 shadow-[var(--shadow-md)] sm:p-8',
   title: 'mb-6 text-2xl font-bold tracking-tight',
+} as const
+
+/**
+ * Splash screen classes
+ * @type {Record<string, string>}
+ */
+
+export const SPLASH = {
+  overlay: 'splash cursor-pointer select-none',
+  ground: 'splash-ground pointer-events-none absolute inset-0 overflow-hidden',
+  camera: 'splash-camera',
+  body: 'splash-body absolute top-1/2 left-1/2 flex w-max -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-5',
+  word: 'splash-word relative flex justify-center',
+  wordFill: 'splash-word-fill absolute inset-0 flex justify-center',
+  letter: 'splash-letter block',
+  label:
+    'splash-label text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
 } as const

@@ -196,4 +196,6 @@ export interface ViewContext {
   live: LiveBeacon | null
   // Pages holding a late item of the member
   overdue: OverdueFlags
+  // A recruitment comment named the member and is still unseen
+  mentioned: boolean
 }

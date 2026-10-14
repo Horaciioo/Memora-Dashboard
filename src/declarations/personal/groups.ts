@@ -88,6 +88,12 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     title: 'Périodes 2 à lancer',
     icon: 'tasks',
   },
+  mention: {
+    one: 'On t’a mentionné dans {n} commentaire',
+    other: 'On t’a mentionné dans {n} commentaires',
+    title: 'Mentions',
+    icon: 'note',
+  },
   departure: {
     one: 'Tu as {n} départ à annoncer',
     other: 'Tu as {n} départs à annoncer',

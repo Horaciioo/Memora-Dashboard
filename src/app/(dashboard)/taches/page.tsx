@@ -47,7 +47,7 @@ export default async function TasksPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={TASK_COPY.title} />
+      <PageHeader title={TASK_COPY.title} heroDescription={TASK_COPY.heroDescription} />
       <TasksBoard
         initialTasks={tasks}
         columns={columns}

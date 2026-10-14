@@ -1,41 +1,6 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
 
 /**
- * Vertical PIM timeline
- * @type {Record<string, string>}
- */
-
-export const PIM_TIMELINE = {
-  wrapper: 'flex flex-col gap-5',
-  lock: 'flex items-start gap-3 border-l-4 border-[var(--color-border-strong)] py-1 pl-4 text-sm text-[var(--color-ink-subtle)]',
-  lockIcon: 'mt-0.5 h-4 w-4 shrink-0',
-  list: 'relative flex flex-col',
-  item: 'relative flex gap-4 pb-6 last:pb-0',
-  // Rail joining two nodes
-  rail: 'absolute top-10 bottom-0 left-5 w-0.5 -translate-x-1/2',
-  railDone: 'bg-[var(--color-ink-subtle)]/40',
-  railIdle: 'bg-[var(--color-border)]',
-  node: 'relative z-[1] flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2',
-  nodeCurrent: 'border-[var(--color-ink)] bg-[var(--color-surface-raised)] text-[var(--color-ink)]',
-  nodeDone:
-    'border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] text-[var(--color-ink-subtle)]',
-  nodeIdle:
-    'border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-ink-subtle)]/70',
-  nodeIcon: 'h-5 w-5',
-  // Greyed steps
-  body: 'flex min-w-0 flex-1 flex-col gap-1 pt-1.5',
-  bodyMuted: 'opacity-60 grayscale',
-  eyebrow: `${PROPERTY_LABEL} text-micro`,
-  title: 'text-base font-bold',
-  titleCurrent: 'text-lg font-bold',
-  meta: 'text-xs text-[var(--color-ink-subtle)]',
-  description: 'text-sm',
-  card: 'mt-2 flex flex-col gap-4',
-  guideTitle: PROPERTY_LABEL,
-  actions: 'flex flex-wrap items-center gap-2',
-} as const
-
-/**
  * Task list of the home page
  * @type {Record<string, string>}
  */

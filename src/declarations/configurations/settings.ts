@@ -10,6 +10,7 @@ import calendar from '@/configurations/system/calendrier.json'
 import colours from '@/configurations/system/couleurs.json'
 import timeouts from '@/configurations/system/delais.json'
 import retention from '@/configurations/system/conservation.json'
+import exercises from '@/configurations/system/exercices.json'
 import emojis from '@/configurations/system/emojis.json'
 import failures from '@/configurations/system/erreurs.json'
 import files from '@/configurations/system/fichiers.json'
@@ -461,7 +462,7 @@ const trainingMaxMinutes = readInteger(academy.trainingMaxMinutes, {
 
 /**
  * Academy bounds
- * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, conversationLineMs: number, judgementLineMs: number, courseSampleOffenses: number, tourStepMs: number, tourBuildMs: number, orgBubbleMs: number, liveconCycleMs: number, ladderRungDelayMs: number, feedbackScale: number, ceremonyFillMs: number, ceremonySlamMs: number, ceremonyFlyMs: number, ceremonyConfetti: number, ceremonyBurstPx: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, skillStep: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
+ * @type {{ exercisePassPercent: number, chatLineDelayMs: number, chatTypingMs: number, conversationLineMs: number, judgementLineMs: number, courseSampleOffenses: number, tourStepMs: number, tourBuildMs: number, orgBubbleMs: number, liveconCycleMs: number, ladderRungDelayMs: number, feedbackScale: number, ceremonyFillMs: number, ceremonySlamMs: number, ceremonyFlyMs: number, ceremonyConfetti: number, ceremonyBurstPx: number, maxLives: number, minObjectives: number, weeksMin: number, weeksMax: number, stepOffsetMin: number, stepOffsetMax: number, bonusMaxLives: number, skillMaxPercent: number, trainingMinMinutes: number, trainingMaxMinutes: number, inviteExpiryDays: number, inviteMaxUses: number }}
  */
 
 export const ACADEMY_SETTINGS = {
@@ -498,6 +499,16 @@ export const ACADEMY_SETTINGS = {
   secondPeriodLives: readInteger(academy.secondPeriodLives, {
     path: 'system/academy.secondPeriodLives',
     fallback: 6,
+    min: 1,
+  }),
+  formJuniorsLimit: readInteger(academy.formJuniorsLimit, {
+    path: 'system/academy.formJuniorsLimit',
+    fallback: 200,
+    min: 1,
+  }),
+  juniorLivesLimit: readInteger(academy.juniorLivesLimit, {
+    path: 'system/academy.juniorLivesLimit',
+    fallback: 60,
     min: 1,
   }),
   maxObjectives: readInteger(academy.maxObjectives, {
@@ -621,12 +632,6 @@ export const ACADEMY_SETTINGS = {
     path: 'system/academy.ceremonyBurstPx',
     fallback: 340,
     min: 0,
-  }),
-  skillStep: readInteger(academy.skillStep, {
-    path: 'system/academy.skillStep',
-    fallback: 5,
-    min: 1,
-    max: skillMaxPercent,
   }),
 }
 
@@ -1391,3 +1396,51 @@ export const FAILURE_SETTINGS = {
     min: 10,
   }),
 }
+
+/**
+ * Interview exercises
+ * @type {Record<string, number>}
+ */
+
+export const EXERCISE_SETTINGS = {
+  linkTtlMinutes: readInteger(exercises.linkTtlMinutes, {
+    path: 'system/exercices.linkTtlMinutes',
+    fallback: 120,
+    min: 5,
+  }),
+  maxPlays: readInteger(exercises.maxPlays, {
+    path: 'system/exercices.maxPlays',
+    fallback: 3,
+    min: 1,
+  }),
+  revealMs: readInteger(exercises.revealMs, {
+    path: 'system/exercices.revealMs',
+    fallback: 1600,
+    min: 400,
+  }),
+  shuffleMs: readInteger(exercises.shuffleMs, {
+    path: 'system/exercices.shuffleMs',
+    fallback: 1000,
+    min: 0,
+  }),
+  shuffleStepMs: readInteger(exercises.shuffleStepMs, {
+    path: 'system/exercices.shuffleStepMs',
+    fallback: 90,
+    min: 30,
+  }),
+  sceneLineMs: readInteger(exercises.sceneLineMs, {
+    path: 'system/exercices.sceneLineMs',
+    fallback: 2200,
+    min: 500,
+  }),
+  defaultStepSeconds: readInteger(exercises.defaultStepSeconds, {
+    path: 'system/exercices.defaultStepSeconds',
+    fallback: 30,
+    min: 5,
+  }),
+  pollSeconds: readInteger(exercises.pollSeconds, {
+    path: 'system/exercices.pollSeconds',
+    fallback: 6,
+    min: 2,
+  }),
+} as const

@@ -192,6 +192,10 @@ export const COURSE_CHAT = {
   replay:
     'inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1 text-xs font-bold tracking-wide uppercase transition-colors hover:bg-[var(--color-on-media)]/10 focus-visible:outline-2 focus-visible:outline-[var(--color-on-media)]',
   body: 'flex min-h-28 flex-col gap-0.5 p-2',
+  // Fills the box it stands in, newest line at the bottom
+  panelFill: 'flex h-full min-h-0 flex-col overflow-hidden',
+  bodyFill: 'flex min-h-0 flex-1 flex-col justify-end gap-0.5 overflow-hidden p-2',
+  modBadge: 'mr-1.5 inline-block size-[18px] align-middle',
   line: 'rounded-[var(--radius-sm)] px-2 py-1.5 text-body leading-snug break-words',
   lineIn: 'chat-line-in',
   flagged: 'bg-[var(--twitch-flag)] shadow-[inset_3px_0_0_var(--youtube-red)]',

@@ -8,6 +8,7 @@ export const CookieKeys = {
   oauthState: 'oauth_state',
   twitchState: 'twitch_state',
   integrationClaim: 'integration_claim',
+  exerciseClaim: 'exercise_claim',
   navigationView: 'navigation_view',
   activeYoutuber: 'active_youtuber',
 } as const

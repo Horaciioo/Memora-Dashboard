@@ -309,6 +309,7 @@ export const DATE_PICKER_STYLES = {
   hint: 'text-xs text-[var(--color-ink-subtle)]',
   action:
     'flex h-7 w-auto items-center justify-center rounded-[var(--radius-sm)] px-2 text-xs text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
+  actionOn: 'bg-[var(--color-surface)] font-semibold text-[var(--color-ink)]',
   weekdays:
     'grid grid-cols-7 px-2 pt-2 text-center text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   grid: 'grid grid-cols-7 gap-y-0.5 p-2',

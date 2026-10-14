@@ -499,8 +499,7 @@ export const ONBOARDING_STYLES = {
  */
 
 export const INTEGRATION_STEP_STYLES = {
-  frame:
-    'mt-2 flex w-full flex-col gap-3 rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface)] p-3',
+  frame: 'mt-1 flex w-full flex-col gap-2',
   row: 'flex flex-wrap items-center gap-2',
   meta: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
 } as const

@@ -585,3 +585,22 @@ export const SanctionsPanelGlyph = ({ className }: GlyphProps) => (
     )}
   />
 )
+
+/**
+ * Twitch moderator badge, the green sword
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const TwitchModBadge = ({ className }: GlyphProps) => (
+  <svg viewBox="0 0 16 16" className={className} role="img" aria-label="Modérateur">
+    <rect width="16" height="16" rx="2" fill="var(--chat-moderator)" />
+    <path
+      d="M12.6 3.4 8 8M4.6 10.4l1.8 1.8M5.4 11.2 3.4 13.2M6.8 6.2l3 3"
+      fill="none"
+      stroke="#fff"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+    />
+  </svg>
+)

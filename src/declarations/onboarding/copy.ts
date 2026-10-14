@@ -118,7 +118,7 @@ export const ONBOARDING_NOTICE_COPY = {
  */
 
 export const INTEGRATION_LINK_COPY = {
-  emit: 'Envoyer le formulaire',
+  emit: 'Générer le lien',
   emitTitle: 'Envoyer le formulaire d’intégration',
   emitDescription:
     'Le YouTubeur, la fonction et la promotion sont ceux de ce recrutement. Il ne reste qu’à choisir ce que le formulaire ouvre.',
@@ -134,7 +134,6 @@ export const INTEGRATION_LINK_COPY = {
   unlimited: '∞',
   expiredBadge: 'Expiré',
   exhaustedBadge: 'Complet',
-  pendingHint: 'Le lien part une fois la réunion d’information terminée.',
 } as const
 
 /**

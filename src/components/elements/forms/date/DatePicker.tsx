@@ -24,9 +24,16 @@ export interface DatePickerProps {
   value: string | string[]
   onChange: (value: string | string[]) => void
   label: string
+  // The value always carries an hour
   withTime?: boolean
+  // The first pick carries an hour, the toggle can still drop it
+  startsTimed?: boolean
+  // The hour cannot be added
+  dayOnly?: boolean
   // Picks two ordered days
   range?: boolean
+  // Hours a timed range starts and ends on while none is chosen
+  defaultTimes?: [string, string]
   disabled?: boolean
   invalid?: boolean
   describedBy?: string
@@ -49,7 +56,10 @@ export const DatePicker = ({
   onChange,
   label,
   withTime,
+  startsTimed,
+  dayOnly,
   range = false,
+  defaultTimes = [DEFAULT_TIME, DEFAULT_TIME],
   disabled,
   invalid,
   describedBy,
@@ -60,9 +70,24 @@ export const DatePicker = ({
   const [day = '', clock = ''] = single.split('T')
   const time = clock.slice(0, 5)
 
+  // A timed range carries an hour on each end
+  const [startDay = '', startStamp = ''] = rangeStart.split('T')
+  const [endDay = '', endStamp = ''] = rangeEnd.split('T')
+  const clocks = [
+    startStamp.slice(0, 5) || defaultTimes[0],
+    endStamp.slice(0, 5) || defaultTimes[1],
+  ]
+
+  // The hour shows once forced, once the value has one, or once asked for
+  const [wantTime, setWantTime] = useState(Boolean(startsTimed))
+  const hasValue = range ? startDay !== '' : day !== ''
+  const timed = Boolean(withTime) || (hasValue ? (range ? startStamp : clock) !== '' : wantTime)
+  const stamp = (target: string, clockValue: string, on = timed) =>
+    on ? `${target}T${clockValue}` : target
+
   const { isOpen, setOpen, close, triggerRef, panelRef } = useAnchoredPanel()
   const firstDay = () =>
-    day || rangeStart || (startYear ? `${startYear}-01-01` : toDayKey(new Date()))
+    day || startDay || (startYear ? `${startYear}-01-01` : toDayKey(new Date()))
   const [cursor, setCursor] = useState(firstDay)
   const [isPickingYear, setPickingYear] = useState(false)
   const isWheel = useIsMobileShell() && !range
@@ -70,10 +95,10 @@ export const DatePicker = ({
   const picking = useRangePick({
     isOpen,
     enabled: range,
-    committed: rangeStart && rangeEnd ? [rangeStart, rangeEnd] : null,
+    committed: startDay && endDay ? [startDay, endDay] : null,
     onCommit: (next) => {
-      onChange(next)
-      close()
+      onChange([stamp(next[0], clocks[0]), stamp(next[1], clocks[1])])
+      if (!timed) close()
     },
   })
 
@@ -91,10 +116,22 @@ export const DatePicker = ({
 
   // A datetime keeps the time already chosen
   const pick = (nextDay: string) => {
-    if (withTime) return onChange(`${nextDay}T${time || DEFAULT_TIME}`)
+    if (timed) return onChange(`${nextDay}T${time || defaultTimes[0]}`)
 
     onChange(nextDay)
     if (!isWheel) close()
+  }
+
+  // Adding the hour keeps the days, dropping it keeps them too
+  const toggleTime = () => {
+    const next = !timed
+    setWantTime(next)
+
+    if (range && startDay && endDay) {
+      onChange([stamp(startDay, clocks[0], next), stamp(endDay, clocks[1], next)])
+    } else if (!range && day) {
+      onChange(stamp(day, defaultTimes[0], next))
+    }
   }
 
   const clear = () => {
@@ -104,11 +141,13 @@ export const DatePicker = ({
   }
 
   const triggerLabel = range
-    ? rangeStart && rangeEnd
-      ? formatDayRange(rangeStart, rangeEnd)
+    ? startDay && endDay
+      ? timed
+        ? `${formatDayTime(rangeStart)} – ${formatDayTime(rangeEnd)}`
+        : formatDayRange(startDay, endDay)
       : null
     : day
-      ? withTime
+      ? timed
         ? formatDayTime(single)
         : formatDay(day)
       : null
@@ -178,8 +217,38 @@ export const DatePicker = ({
             )}
 
             <div className={DATE_PICKER_STYLES.footer}>
-              {range && <span className={DATE_PICKER_STYLES.hint}>{PICKER_COPY.rangeHint}</span>}
-              {withTime && !range && (
+              {range && !timed && (
+                <span className={DATE_PICKER_STYLES.hint}>{PICKER_COPY.rangeHint}</span>
+              )}
+              {range && timed && (
+                <>
+                  {[0, 1].map((side) => (
+                    <input
+                      key={side}
+                      type="time"
+                      value={clocks[side]}
+                      disabled={!startDay || !endDay}
+                      aria-label={`${PICKER_COPY.time} ${side === 0 ? PICKER_COPY.start : PICKER_COPY.end}`}
+                      className={DATE_PICKER_STYLES.time}
+                      onChange={(event) => {
+                        const next =
+                          side === 0
+                            ? [event.target.value, clocks[1]]
+                            : [clocks[0], event.target.value]
+                        onChange([stamp(startDay, next[0]), stamp(endDay, next[1])])
+                      }}
+                    />
+                  ))}
+                  <button
+                    type="button"
+                    className={cn(DATE_PICKER_STYLES.action, 'ml-auto')}
+                    onClick={close}
+                  >
+                    {PICKER_COPY.done}
+                  </button>
+                </>
+              )}
+              {timed && !range && (
                 <input
                   type="time"
                   value={time}
@@ -189,6 +258,16 @@ export const DatePicker = ({
                     onChange(`${day || toDayKey(new Date())}T${event.target.value}`)
                   }
                 />
+              )}
+              {!withTime && !dayOnly && (
+                <button
+                  type="button"
+                  aria-pressed={timed}
+                  className={cn(DATE_PICKER_STYLES.action, timed && DATE_PICKER_STYLES.actionOn)}
+                  onClick={toggleTime}
+                >
+                  {PICKER_COPY.time}
+                </button>
               )}
               {!range && (
                 <button
@@ -201,7 +280,7 @@ export const DatePicker = ({
               )}
               <button
                 type="button"
-                className={cn(DATE_PICKER_STYLES.action, range && 'ml-auto')}
+                className={cn(DATE_PICKER_STYLES.action, range && !timed && 'ml-auto')}
                 onClick={clear}
               >
                 {PICKER_COPY.clear}

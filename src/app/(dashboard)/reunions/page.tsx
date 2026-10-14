@@ -36,7 +36,7 @@ export default async function MeetingsPage() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={MEETING_COPY.title} />
+      <PageHeader title={MEETING_COPY.title} heroDescription={MEETING_COPY.heroDescription} />
       <MeetingsBoard
         initialMeetings={meetings}
         columns={columns}

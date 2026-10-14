@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { useSyncedState } from '@/core/hooks/interaction/useSyncedState'
 import { useMutation } from '@/core/hooks/data/useMutation'
 import { feedbackTitle } from '@/declarations/ui/copy'
 import type {
@@ -104,20 +105,23 @@ export const useJuniorFile = (
   initialObjectives: JuniorObjectiveView[],
   initialReviews: AcademyReviewView[]
 ): JuniorFileState => {
-  const [junior, setJunior] = useState(initialJunior)
-  const [skills, setSkills] = useState(initialSkills)
-  const [notes, setNotes] = useState(initialNotes)
-  const [objectives, setObjectives] = useState(initialObjectives)
-  const [reviews, setReviews] = useState(initialReviews)
+  const [junior, setJunior] = useSyncedState(initialJunior)
+  const [skills, setSkills] = useSyncedState(initialSkills)
+  const [notes, setNotes] = useSyncedState(initialNotes)
+  const [objectives, setObjectives] = useSyncedState(initialObjectives)
+  const [reviews, setReviews] = useSyncedState(initialReviews)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   // Every junior mutation answers with the whole session
-  const pickSelf = useCallback((rows: JuniorView[] | null, id: string) => {
-    const mine = rows?.find((row) => row.id === id)
-    if (mine) setJunior(mine)
+  const pickSelf = useCallback(
+    (rows: JuniorView[] | null, id: string) => {
+      const mine = rows?.find((row) => row.id === id)
+      if (mine) setJunior(mine)
 
-    return rows !== null
-  }, [])
+      return rows !== null
+    },
+    [setJunior]
+  )
 
   const setTraining = useCallback(
     async (trainingId: string, validated: boolean) => {
@@ -150,7 +154,7 @@ export const useJuniorFile = (
 
       if (next) setSkills(next)
     },
-    [junior.id, run]
+    [junior.id, run, setSkills]
   )
 
   const addNote = useCallback(
@@ -164,7 +168,7 @@ export const useJuniorFile = (
 
       return next !== null
     },
-    [junior.id, run]
+    [junior.id, run, setNotes]
   )
 
   const editNote = useCallback(
@@ -178,7 +182,7 @@ export const useJuniorFile = (
 
       return next !== null
     },
-    [run]
+    [run, setNotes]
   )
 
   const dropNote = useCallback(
@@ -190,7 +194,7 @@ export const useJuniorFile = (
 
       if (next) setNotes(next)
     },
-    [run]
+    [run, setNotes]
   )
 
   const addObjective = useCallback(
@@ -204,7 +208,7 @@ export const useJuniorFile = (
 
       return next !== null
     },
-    [junior.id, run]
+    [junior.id, run, setObjectives]
   )
 
   const editObjective = useCallback(
@@ -218,7 +222,7 @@ export const useJuniorFile = (
 
       return next !== null
     },
-    [run]
+    [run, setObjectives]
   )
 
   const dropObjective = useCallback(
@@ -230,7 +234,7 @@ export const useJuniorFile = (
 
       if (next) setObjectives(next)
     },
-    [run]
+    [run, setObjectives]
   )
 
   const reorderObjectives = useCallback(
@@ -241,7 +245,7 @@ export const useJuniorFile = (
 
       if (next) setObjectives(next)
     },
-    [junior.id, run]
+    [junior.id, run, setObjectives]
   )
 
   const addReview = useCallback(
@@ -255,7 +259,7 @@ export const useJuniorFile = (
 
       return next !== null
     },
-    [junior.id, run]
+    [junior.id, run, setReviews]
   )
 
   const editReview = useCallback(
@@ -269,7 +273,7 @@ export const useJuniorFile = (
 
       return next !== null
     },
-    [run]
+    [run, setReviews]
   )
 
   const dropReview = useCallback(
@@ -281,7 +285,7 @@ export const useJuniorFile = (
 
       if (next) setReviews(next)
     },
-    [run]
+    [run, setReviews]
   )
 
   const submitReview = useCallback(
@@ -293,7 +297,7 @@ export const useJuniorFile = (
 
       if (next) setReviews(next)
     },
-    [run]
+    [run, setReviews]
   )
 
   const decideReview = useCallback(
@@ -313,7 +317,7 @@ export const useJuniorFile = (
 
       return next !== null
     },
-    [run]
+    [run, setReviews]
   )
 
   return {

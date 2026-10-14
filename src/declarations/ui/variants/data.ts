@@ -245,22 +245,11 @@ export const BOARD_STYLES = {
   cardGlass: 'bg-[var(--color-surface-raised)]/70',
   cardTint: 'accent-border bg-[var(--color-surface-raised)]/70',
   cardTitle: 'text-body leading-snug font-bold',
+  // Where a card comes from, under a divider
+  cardOrigin:
+    'border-t border-[var(--color-border)] pt-2 text-xs text-[var(--color-ink-subtle)]',
   // Glyph flowing before a title
   cardGlyph: 'mr-1.5',
-} as const
-
-/**
- * Timeline styles
- * @type {Record<string, string>}
- */
-
-export const TIMELINE_STYLES = {
-  list: 'flex flex-col',
-  item: 'relative flex gap-3 pb-4 pl-6 last:pb-0',
-  rail: 'absolute top-1.5 bottom-0 left-[7px] w-px bg-[var(--color-border)]',
-  dot: 'absolute top-1.5 left-0 h-3.5 w-3.5 rounded-full border-2 border-[var(--color-surface-raised)]',
-  body: 'flex min-w-0 flex-col gap-0.5 text-sm',
-  meta: 'text-xs text-[var(--color-ink-subtle)]',
 } as const
 
 /**

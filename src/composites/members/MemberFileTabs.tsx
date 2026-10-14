@@ -1,6 +1,7 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { ANNOUNCEMENT_PARAM } from '@/declarations/work/announcements'
 import { Fragment, useState } from 'react'
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { MemberModerationView } from '@/composites/lives/MemberModerationView'
@@ -31,7 +32,6 @@ import { ACCESS_EDITABLE } from '@/declarations/access/editing'
 import { ROUTES } from '@/declarations/navigation'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
-import { tradeOfFunction } from '@/declarations/reference/fixed'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
 import { DETAIL_BLOCK, MEMBER_BLOCK, MEMBER_FILE } from '@/declarations/ui/blocks'
@@ -106,9 +106,6 @@ const NO_ADMIN_STATE: MemberAdminState = {
 // Contact fields edited in place
 const ExternalIcon = ICONS.forward
 const CalendarIcon = ICONS.meetings
-
-// Trade of the live moderators
-const LIVES_TRADE = 'Lives'
 
 // Roles that sit in the Administration
 const LEAD_ROLES: string[] = [MemberRoles.Admin, MemberRoles.Responsable]
@@ -299,7 +296,11 @@ export const MemberFileTabs = ({
 
   const admin = useMemberAdmin(detail.summary.id, adminState ?? NO_ADMIN_STATE)
   const [isSanctioning, setIsSanctioning] = useState(false)
-  const [departureMessage, setDepartureMessage] = useState<string | null>(null)
+  // Arriving from the announcements page shows the departure message
+  const isFocused = useSearchParams().has(ANNOUNCEMENT_PARAM)
+  const [departureMessage, setDepartureMessage] = useState<string | null>(
+    isFocused ? (adminState?.departure?.body ?? null) : null
+  )
 
   // Departure and its message
   const depart = async (kind: DepartureKindName) => {
@@ -955,9 +956,6 @@ export const MemberFileTabs = ({
       {isSanctioning && (
         <SanctionDrawer
           open
-          canTemporary={summary.functions.some(
-            (entry) => tradeOfFunction(entry.label) === LIVES_TRADE
-          )}
           isSaving={admin.isSaving}
           onSubmit={sanction}
           onClose={() => setIsSanctioning(false)}

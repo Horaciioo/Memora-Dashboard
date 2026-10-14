@@ -45,10 +45,10 @@ export type OptionMark =
 
 /**
  * Value a blank creation form starts from
- * @type {'today' | 'actor' | 'default'}
+ * @type {'today' | 'nextWeek' | 'actor' | 'default'}
  */
 
-export type FieldPreset = 'today' | 'actor' | 'default'
+export type FieldPreset = 'today' | 'nextWeek' | 'actor' | 'default'
 
 /**
  * Choice offered by a select field
@@ -66,6 +66,7 @@ export type FieldPreset = 'today' | 'actor' | 'default'
  * @property {boolean} [isDefault] - Preset choice
  * @property {boolean} [disabled] - Shown but not selectable
  * @property {string} [owner] - Value of the owner field it belongs to
+ * @property {string[]} [owners] - Several owner values it belongs to
  */
 
 export interface FieldOption {
@@ -84,6 +85,7 @@ export interface FieldOption {
   isDefault?: boolean
   disabled?: boolean
   owner?: string
+  owners?: string[]
 }
 
 /**
@@ -167,6 +169,10 @@ export interface BusySlot {
  * @property {boolean} [adminOnly] - Only an administrator may write it
  * @property {FieldCondition} [visibleWhen] - Display rule
  * @property {string} [ownerField] - Field whose picks narrow the owned options
+ * @property {boolean} [withTime] - A date or day range starts with the hour of each end, the picker can drop it
+ * @property {boolean} [dayOnly] - The picker never offers an hour
+ * @property {[string, string]} [defaultTimes] - Hours a timed range starts and ends on
+ * @property {boolean} [defaultFromOwner] - Every reachable option is picked once the owner changes
  * @property {boolean} [binary] - A toggle drawn as a plain check/cross
  * @property {BusySlot[]} [busy] - Events a date field warns about
  */
@@ -202,6 +208,10 @@ export interface FieldDefinition {
   adminOnly?: boolean
   visibleWhen?: FieldCondition
   ownerField?: string
+  defaultFromOwner?: boolean
+  withTime?: boolean
+  dayOnly?: boolean
+  defaultTimes?: [string, string]
   binary?: boolean
   busy?: BusySlot[]
 }

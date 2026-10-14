@@ -268,3 +268,16 @@ export const RailBirthdayGlyph = ({ className }: GlyphProps) => (
     <path d="M5.5 13.5V20h13v-6.5M12 9.5V20M12 9.5c-1-3-4.5-3.5-4.5-1.5 0 1.3 2 1.5 4.5 1.5 2.5 0 4.5-.2 4.5-1.5 0-2-3.5-1.5-4.5 1.5z" />
   </Stroke>
 )
+
+/**
+ * Communications line glyph
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const RailCommunicationsGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={1.6}>
+    <path d="M13.5 20.5H7a3 3 0 0 1-3-3v-11a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3V10M8 8.5h6M8 12h3" />
+    <path d="m19.5 12.5-6 6-.8 3 3-.8 6-6a1.4 1.4 0 0 0-2.2-2.2z" />
+  </Stroke>
+)

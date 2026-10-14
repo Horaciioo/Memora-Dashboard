@@ -228,6 +228,56 @@ export const markRead = async (id: string, accountId: string): Promise<void> => 
 }
 
 /**
+ * Mentions of a member not yet seen on one kind of record
+ * @param {string} accountId - Account identifier
+ * @param {NotificationTargetName} target - Kind of record
+ * @return {Promise<NotificationEntry[]>} - Unopened mentions, newest first
+ */
+
+export const unreadMentions = async (
+  accountId: string,
+  target: NotificationTargetName
+): Promise<NotificationEntry[]> => {
+  const rows = await prisma.notification.findMany({
+    where: {
+      recipientId: accountId,
+      kind: NOTIFICATION_KINDS.ids.Mentioned,
+      targetType: target,
+      readAt: null,
+    },
+    include: { actor: { select: { displayName: true, avatarUrl: true } } },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+  })
+
+  return rows.map(toEntry)
+}
+
+/**
+ * Mark the mentions of one record as seen, the record being open
+ * @param {string} accountId - Account identifier
+ * @param {NotificationTargetName} target - Kind of record
+ * @param {string} targetId - Record identifier
+ * @return {Promise<void>} - Marked
+ */
+
+export const markMentionsRead = async (
+  accountId: string,
+  target: NotificationTargetName,
+  targetId: string
+): Promise<void> => {
+  await prisma.notification.updateMany({
+    where: {
+      recipientId: accountId,
+      kind: NOTIFICATION_KINDS.ids.Mentioned,
+      targetType: target,
+      targetId,
+      readAt: null,
+    },
+    data: { readAt: new Date() },
+  })
+}
+
+/**
  * Mark every notification as opened
  * @param {string} accountId - Account identifier
  * @return {Promise<void>} - Marked

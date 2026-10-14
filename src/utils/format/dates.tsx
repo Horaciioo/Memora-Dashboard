@@ -98,6 +98,20 @@ export function formatDay(date: Date | string | null | undefined): string {
 }
 
 /**
+ * Format a day with its weekday
+ * @param {Date | string} date - Date to format
+ * @return {string} - Weekday, day and month
+ */
+
+export function formatWeekday(date: Date | string): string {
+  return new Date(date).toLocaleDateString(DATE_LOCALE, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+}
+
+/**
  * Format a day and its time
  * @param {Date | string | null | undefined} date - Date to format
  * @return {string} - Day and time
