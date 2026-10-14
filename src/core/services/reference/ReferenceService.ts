@@ -6,6 +6,7 @@ import {
   activeYoutubers,
   encadrementAccounts,
 } from '@/core/services/reference/lookups'
+import { discordIdentifiers } from '@/core/services/reference/discordIdentifiers'
 import { replaceAnchors } from '@/core/services/auth/LeadService'
 import { conflict, notFound } from '@/core/lib/errors'
 import {
@@ -21,11 +22,6 @@ import {
   LIVECON_SETTINGS,
   SANCTION_SETTINGS,
 } from '@/declarations/configurations/settings'
-import {
-  ACADEMY_STAGE_REGISTRY,
-  STEP_ANCHOR_REGISTRY,
-  STEP_OWNER_REGISTRY,
-} from '@/declarations/academy/registries'
 import { ACADEMY_PERIOD_REGISTRY } from '@/declarations/access/roles'
 import {
   EVENT_VISIBILITY_REGISTRY,
@@ -35,7 +31,6 @@ import {
 import { CALENDAR_KIND_REGISTRY } from '@/declarations/calendar/registries'
 import { FORM_GROUPS } from '@/declarations/ui/copy/forms'
 import { REFERENCE_FIELD_COPY } from '@/declarations/reference/copy'
-import { PIM_DESTINATION_REGISTRY, PIM_STEP_GLYPHS } from '@/declarations/academy/guides'
 import { RECRUITMENT_FIELD_COPY, RECRUITMENT_FILTER_COPY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_OWNER_REGISTRY } from '@/declarations/recruitment/registries'
 import { instantiatePanel } from '@/core/services/sanctions/SanctionService'
@@ -51,7 +46,6 @@ import type { RecruitmentOwnerName } from '@/utils/constants/recruitment'
 import type { ReferenceKey } from '@/declarations/reference/sections'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { ReferenceRow } from '@/types/reference'
-import { AcademyStages, StepAnchors, StepOwners } from '@/utils/constants/hierarchy'
 import {
   CalendarKinds,
   EventVisibilities,
@@ -61,9 +55,6 @@ import {
 import type {
   CalendarKindName,
   AcademyPeriodName,
-  AcademyStageName,
-  StepAnchorName,
-  StepOwnerName,
   EventVisibilityName,
   WorkflowPhaseName,
   WorkflowScopeName,
@@ -1284,220 +1275,6 @@ const skills: ReferenceResource = {
     applyOrder((id, position) => prisma.skill.update({ where: { id }, data: { position } }), ids),
 }
 
-/**
- * Read the walkthrough of a PIM step
- * @param {FormValues} values - Parsed body
- * @return {{ icon: string | null, destination: string | null, guide: string | null }} - Columns
- */
-
-const readStepGuide = (values: FormValues) => {
-  const icon = readText(values, 'icon')
-  const destination = readText(values, 'destination')
-
-  return {
-    icon: icon && PIM_STEP_GLYPHS.some((glyph) => glyph.icon === icon) ? icon : null,
-    destination: destination && PIM_DESTINATION_REGISTRY.has(destination) ? destination : null,
-    guide: readText(values, 'guide'),
-  }
-}
-
-const pimStepTemplates: ReferenceResource = {
-  fields: async () => {
-    const [functions, dispositifRows] = await Promise.all([
-      activeFunctions(),
-      prisma.dispositif.findMany({ orderBy: { position: 'asc' } }),
-    ])
-
-    return [
-      {
-        name: 'title',
-        kind: 'text',
-        label: REFERENCE_FIELD_COPY.title,
-        required: true,
-        maxLength: shortTextMaxLength,
-      },
-      {
-        name: 'stage',
-        kind: 'select',
-        label: REFERENCE_FIELD_COPY.stage,
-        required: true,
-        options: toOptions(ACADEMY_STAGE_REGISTRY),
-        mark: 'dot',
-        span: 'half',
-      },
-      {
-        name: 'anchor',
-        kind: 'select',
-        label: REFERENCE_FIELD_COPY.anchor,
-        required: true,
-        options: toOptions(STEP_ANCHOR_REGISTRY),
-        mark: 'dot',
-        span: 'half',
-      },
-      {
-        name: 'offset',
-        kind: 'number',
-        label: REFERENCE_FIELD_COPY.offset,
-        required: true,
-        min: ACADEMY_SETTINGS.stepOffsetMin,
-        max: ACADEMY_SETTINGS.stepOffsetMax,
-        span: 'half',
-      },
-      {
-        name: 'owner',
-        kind: 'select',
-        label: REFERENCE_FIELD_COPY.owner,
-        required: true,
-        options: toOptions(STEP_OWNER_REGISTRY),
-        mark: 'glyph',
-        span: 'half',
-      },
-      {
-        name: 'functionId',
-        kind: 'select',
-        label: REFERENCE_FIELD_COPY.jobFunction,
-        options: functionOptions(functions),
-        span: 'half',
-      },
-      {
-        name: 'dispositifId',
-        kind: 'select',
-        label: REFERENCE_FIELD_COPY.dispositif,
-        options: rowsToOptions(dispositifRows),
-        span: 'half',
-      },
-      {
-        name: 'icon',
-        kind: 'select',
-        label: REFERENCE_FIELD_COPY.stepGlyph,
-        info: REFERENCE_FIELD_COPY.stepGlyphInfo,
-        options: PIM_STEP_GLYPHS.map((glyph) => ({
-          value: glyph.icon,
-          label: glyph.label,
-          icon: glyph.icon,
-        })),
-        mark: 'glyph',
-        span: 'half',
-      },
-      {
-        name: 'destination',
-        kind: 'select',
-        label: REFERENCE_FIELD_COPY.stepDestination,
-        info: REFERENCE_FIELD_COPY.stepDestinationInfo,
-        options: PIM_DESTINATION_REGISTRY.keys.map((key) => ({
-          value: key,
-          label: PIM_DESTINATION_REGISTRY.label(key),
-          icon: PIM_DESTINATION_REGISTRY.get(key).icon,
-        })),
-        mark: 'glyph',
-        span: 'half',
-      },
-      {
-        name: 'description',
-        kind: 'textarea',
-        label: REFERENCE_FIELD_COPY.summary,
-        maxLength: longTextMaxLength,
-      },
-      {
-        name: 'guide',
-        kind: 'markdown',
-        label: REFERENCE_FIELD_COPY.stepGuide,
-        info: REFERENCE_FIELD_COPY.stepGuideInfo,
-        maxLength: FORM_SETTINGS.markdownMaxLength,
-      },
-      { name: 'required', kind: 'toggle', label: REFERENCE_FIELD_COPY.mandatory },
-    ]
-  },
-  list: async () => {
-    const rows = await prisma.pimStepTemplate.findMany({
-      orderBy: [{ stage: 'asc' }, { offset: 'asc' }, { position: 'asc' }],
-      include: { jobFunction: true, dispositif: true },
-    })
-
-    return rows.map((row) => ({
-      id: row.id,
-      label: row.title,
-      hint: row.description,
-      accent: ACADEMY_STAGE_REGISTRY.get(row.stage).accent,
-      badges: [
-        ACADEMY_STAGE_REGISTRY.label(row.stage),
-        `${STEP_ANCHOR_REGISTRY.label(row.anchor)} ${row.offset >= 0 ? '+' : ''}${row.offset}`,
-        STEP_OWNER_REGISTRY.label(row.owner),
-        ...(row.jobFunction ? [row.jobFunction.name] : []),
-        ...(row.dispositif ? [row.dispositif.name] : []),
-        ...(row.required ? [REFERENCE_FIELD_COPY.mandatoryBadge] : []),
-      ],
-      position: row.position,
-      // No session instantiates a step from it yet
-      usage: 0,
-      values: {
-        title: row.title,
-        stage: row.stage,
-        anchor: row.anchor,
-        offset: row.offset,
-        owner: row.owner,
-        functionId: row.functionId,
-        dispositifId: row.dispositifId,
-        description: row.description,
-        icon: row.icon,
-        destination: row.destination,
-        guide: row.guide,
-        required: row.required,
-      },
-    }))
-  },
-  create: async (values) => {
-    const row = await prisma.pimStepTemplate
-      .create({
-        data: {
-          title: readText(values, 'title') ?? '',
-          stage: (readText(values, 'stage') ?? AcademyStages.Preparation) as AcademyStageName,
-          anchor: (readText(values, 'anchor') ?? StepAnchors.Day) as StepAnchorName,
-          offset: readNumberValue(values, 'offset') ?? 0,
-          owner: (readText(values, 'owner') ?? StepOwners.Responsable) as StepOwnerName,
-          functionId: readText(values, 'functionId'),
-          dispositifId: readText(values, 'dispositifId'),
-          description: readText(values, 'description'),
-          ...readStepGuide(values),
-          required: readFlag(values, 'required'),
-          position: await nextPosition(prisma.pimStepTemplate),
-        },
-      })
-      .catch(rethrow)
-
-    return pimStepTemplates.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
-  },
-  update: async (id, values) => {
-    await prisma.pimStepTemplate
-      .update({
-        where: { id },
-        data: {
-          title: readText(values, 'title') ?? undefined,
-          stage: (readText(values, 'stage') ?? undefined) as AcademyStageName | undefined,
-          anchor: (readText(values, 'anchor') ?? undefined) as StepAnchorName | undefined,
-          offset: readNumberValue(values, 'offset') ?? undefined,
-          owner: (readText(values, 'owner') ?? undefined) as StepOwnerName | undefined,
-          functionId: readText(values, 'functionId'),
-          dispositifId: readText(values, 'dispositifId'),
-          description: readText(values, 'description'),
-          ...readStepGuide(values),
-          required: readFlag(values, 'required'),
-        },
-      })
-      .catch(rethrow)
-
-    return pimStepTemplates.list().then((rows) => rows.find((entry) => entry.id === id)!)
-  },
-  remove: async (id) => {
-    await prisma.pimStepTemplate.delete({ where: { id } })
-  },
-  reorder: (ids) =>
-    applyOrder(
-      (id, position) => prisma.pimStepTemplate.update({ where: { id }, data: { position } }),
-      ids
-    ),
-}
-
 const sanctionMeasures: ReferenceResource = {
   fields: async () => [
     nameField,
@@ -1613,111 +1390,6 @@ const clearOtherDefaults = async (id: string): Promise<void> => {
     where: { id: { not: id } },
     data: { isDefault: false },
   })
-}
-
-const recruitmentQuestions: ReferenceResource = {
-  fields: async () => {
-    const [creators, functions] = await Promise.all([activeYoutubers(), activeFunctions()])
-
-    return [
-      {
-        name: 'prompt',
-        kind: 'text',
-        label: RECRUITMENT_FIELD_COPY.prompt,
-        required: true,
-        maxLength: longTextMaxLength,
-      },
-      {
-        name: 'hint',
-        kind: 'textarea',
-        label: RECRUITMENT_FIELD_COPY.hint,
-        maxLength: longTextMaxLength,
-      },
-      {
-        name: 'youtuberId',
-        kind: 'select',
-        label: RECRUITMENT_FIELD_COPY.youtuber,
-        options: rowsToOptions(creators),
-        mark: 'avatar',
-        span: 'half',
-      },
-      {
-        name: 'functionId',
-        kind: 'select',
-        label: RECRUITMENT_FIELD_COPY.jobFunction,
-        options: functionOptions(functions),
-        span: 'half',
-      },
-      { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
-    ]
-  },
-  list: async () => {
-    const rows = await prisma.recruitmentQuestion.findMany({
-      orderBy: { position: 'asc' },
-      include: { youtuber: true, jobFunction: true },
-    })
-
-    return rows.map((row) => ({
-      id: row.id,
-      label: row.prompt,
-      hint: row.hint,
-      accent: row.jobFunction?.accent ?? null,
-      badges: [
-        row.youtuber?.name ?? RECRUITMENT_FILTER_COPY.allYoutubers,
-        row.jobFunction?.name ?? RECRUITMENT_FILTER_COPY.allFunctions,
-        ...(row.archived ? [REFERENCE_FIELD_COPY.archivedBadge] : []),
-      ],
-      position: row.position,
-      usage: 0,
-      values: {
-        prompt: row.prompt,
-        hint: row.hint,
-        youtuberId: row.youtuberId,
-        functionId: row.functionId,
-        archived: row.archived,
-      },
-    }))
-  },
-  create: async (values) => {
-    const row = await prisma.recruitmentQuestion
-      .create({
-        data: {
-          prompt: readText(values, 'prompt') ?? '',
-          hint: readText(values, 'hint'),
-          youtuberId: readText(values, 'youtuberId'),
-          functionId: readText(values, 'functionId'),
-          archived: readFlag(values, 'archived'),
-          position: await nextPosition(prisma.recruitmentQuestion),
-        },
-      })
-      .catch(rethrow)
-
-    return recruitmentQuestions.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
-  },
-  update: async (id, values) => {
-    await prisma.recruitmentQuestion
-      .update({
-        where: { id },
-        data: {
-          prompt: readText(values, 'prompt') ?? undefined,
-          hint: readText(values, 'hint'),
-          youtuberId: readText(values, 'youtuberId'),
-          functionId: readText(values, 'functionId'),
-          archived: readFlag(values, 'archived'),
-        },
-      })
-      .catch(rethrow)
-
-    return recruitmentQuestions.list().then((rows) => rows.find((entry) => entry.id === id)!)
-  },
-  remove: async (id) => {
-    await prisma.recruitmentQuestion.delete({ where: { id } })
-  },
-  reorder: (ids) =>
-    applyOrder(
-      (id, position) => prisma.recruitmentQuestion.update({ where: { id }, data: { position } }),
-      ids
-    ),
 }
 
 const recruitmentStepTemplates: ReferenceResource = {
@@ -1973,11 +1645,10 @@ const RESOURCES: Record<ReferenceKey, ReferenceResource> = {
   dispositifs,
   'categories-competences': skillCategories,
   competences: skills,
-  'etapes-pim': pimStepTemplates,
   sanctions: sanctionMeasures,
-  'questions-recrutement': recruitmentQuestions,
   'etapes-recrutement': recruitmentStepTemplates,
   'issues-recrutement': recruitmentOutcomes,
+  'identifiants-discord': discordIdentifiers,
 }
 
 /**

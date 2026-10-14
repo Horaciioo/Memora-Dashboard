@@ -5,7 +5,6 @@ import {
   LIBRARY_DISPOSITIFS,
   LIBRARY_EVENT_TEMPLATES,
   LIBRARY_NETWORKS,
-  LIBRARY_PIM_STEPS,
   LIBRARY_PLATFORMS,
   LIBRARY_SKILL_CATEGORIES,
   LIBRARY_STATES,
@@ -109,10 +108,11 @@ const writeLibrary = async (): Promise<void> => {
       position,
     }
 
+    // An academy template is found by what it stands for, its name may have been edited
     await prisma.eventTemplate.upsert({
-      where: { name: entry.name },
-      update: data,
-      create: { name: entry.name, ...data },
+      where: entry.purpose ? { purpose: entry.purpose } : { name: entry.name },
+      update: entry.purpose ? { ...data, name: entry.name } : data,
+      create: { name: entry.name, purpose: entry.purpose, ...data },
     })
   }
 
@@ -142,33 +142,6 @@ const writeLibrary = async (): Promise<void> => {
           data: { ...key, categoryId: row.id, position, description: skill.description },
         })
       }
-    }
-  }
-
-  // PIM timeline
-  for (const [position, step] of LIBRARY_PIM_STEPS.entries()) {
-    const key = {
-      title: step.title,
-      functionId: idOf(functionIds, step.function),
-      dispositifId: idOf(dispositifIds, step.dispositif),
-    }
-    const data = {
-      stage: step.stage,
-      anchor: step.anchor,
-      offset: step.offset,
-      owner: step.owner,
-      required: step.required,
-      icon: step.icon,
-      guide: step.guide,
-      destination: step.destination,
-      position,
-    }
-    const existing = await prisma.pimStepTemplate.findFirst({ where: key, select: { id: true } })
-
-    if (existing) {
-      await prisma.pimStepTemplate.update({ where: { id: existing.id }, data })
-    } else {
-      await prisma.pimStepTemplate.create({ data: { ...key, ...data } })
     }
   }
 }

@@ -80,6 +80,10 @@ export interface FixedFunction {
   summary: string
 }
 
+// Secondary functions that open a team picker
+export const OBSERVER_FUNCTION = 'Observateurs'
+export const TRAINER_FUNCTION = 'Formateurs'
+
 /**
  * Functions
  * @type {readonly FixedFunction[]}
@@ -150,13 +154,22 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     summary: 'Mène les recrutements.',
   },
   {
-    name: 'Formateurs',
+    name: TRAINER_FUNCTION,
     kind: 'SECONDARY',
     position: 8,
     icon: 'functionTrainer',
     accent: '#7dbf8e',
     category: 'MODERATION',
     summary: 'Forme les juniors de l’Academy.',
+  },
+  {
+    name: OBSERVER_FUNCTION,
+    kind: 'SECONDARY',
+    position: 12,
+    icon: 'functionObserver',
+    accent: '#8b7fd6',
+    category: 'MODERATION',
+    summary: 'Assiste aux entretiens de recrutement.',
   },
   {
     name: 'Junior Responsable Discord',
@@ -338,6 +351,9 @@ export const FIXED_RECRUITMENT_OUTCOMES: readonly FixedRecruitmentOutcome[] = [
     isTerminal: false,
     admits: false,
   },
+  { name: 'Favorable', accent: 'success', isDefault: false, isTerminal: false, admits: false },
+  { name: 'Défavorable', accent: 'danger', isDefault: false, isTerminal: false, admits: false },
+  { name: 'Mitigé', accent: 'caution', isDefault: false, isTerminal: false, admits: false },
   { name: 'Accepté', accent: 'success', isDefault: false, isTerminal: true, admits: true },
   { name: 'Refusé', accent: 'danger', isDefault: false, isTerminal: true, admits: false },
   { name: 'Désisté', accent: 'neutral', isDefault: false, isTerminal: true, admits: false },

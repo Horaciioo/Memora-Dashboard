@@ -24,7 +24,7 @@ export const DISCORD_MESSAGE = {
   // Small copy control in the top right corner of the announcement
   copyCorner:
     'absolute top-0 right-0 z-10 flex size-10 items-center justify-center rounded-none rounded-tr-[var(--radius-lg)] rounded-bl-[var(--radius-lg)] bg-white/10 text-[var(--discord-muted)] hover:bg-white/20 hover:text-[var(--discord-heading)]',
-  message: 'flex gap-4 px-4 py-3',
+  message: 'flex gap-4 px-4 py-3 text-body leading-[1.375rem] text-[var(--discord-text)]',
   avatar: 'h-10 w-10 shrink-0 rounded-full bg-[var(--discord-blurple)]',
   body: 'flex min-w-0 flex-1 flex-col',
   head: 'flex items-baseline gap-2',
