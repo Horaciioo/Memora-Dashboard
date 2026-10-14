@@ -11,6 +11,7 @@ import { CalendarTab } from '@/composites/academy/session/CalendarTab'
 import { GlossaryTab } from '@/composites/academy/session/GlossaryTab'
 import { JuniorsTab } from '@/composites/academy/session/JuniorsTab'
 import { OverviewTab } from '@/composites/academy/session/OverviewTab'
+import { TimelineTab } from '@/composites/academy/session/TimelineTab'
 import { SessionDrawers } from '@/composites/academy/session/SessionDrawers'
 import {
   SessionFileProvider,
@@ -89,6 +90,12 @@ const SessionBody = ({ activity }: { activity: ActivityEntry[] }) => {
             label: SESSION_FILE_COPY.tabOverview,
             icon: 'sheet',
             render: () => <OverviewTab />,
+          },
+          {
+            value: 'timeline',
+            label: ACADEMY_COPY.tabTimeline,
+            icon: 'clock',
+            render: () => <TimelineTab />,
           },
           {
             value: 'juniors',

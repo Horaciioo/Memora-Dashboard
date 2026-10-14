@@ -1,19 +1,17 @@
 'use client'
 
-import { CreatorLabels } from '@/components/elements/display/RecordLabel'
+import { AvatarStack } from '@/components/elements/display/Avatar'
 import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
 import { CommentThread } from '@/components/structures/CommentThread'
 import type { EditableEntry } from '@/components/structures/EditableDetailGrid'
 import { FileOverview, type FileOverviewGroup } from '@/components/structures/FileOverview'
-import { Section } from '@/components/structures/Section'
 import { SessionDesk } from '@/composites/academy/session/SessionDesk'
 import { useSessionState } from '@/composites/academy/session/SessionFileContext'
-import { PromotionTimeline } from '@/composites/academy/timeline/PromotionTimeline'
 import { useRecordFile } from '@/core/hooks/data/useRecordFile'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { pickedOptions } from '@/core/lib/forms/options'
-import { ACADEMY_COPY, ACADEMY_ENTITY } from '@/declarations/academy/copy'
+import { ACADEMY_ENTITY } from '@/declarations/academy/copy'
 import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { FILE_BOX } from '@/declarations/ui/variants'
@@ -21,15 +19,13 @@ import type { WorkPerson } from '@/types/work'
 import { sessionState } from '@/utils/format/academy'
 import { formatDayRange } from '@/utils/format/dates'
 
-// People drawn side by side
+// Portraits drawn side by side
 const people = (list: WorkPerson[]) =>
-  list.length > 0 ? (
-    <CreatorLabels creators={list.map((person) => ({ name: person.name, image: person.src }))} />
-  ) : null
+  list.length > 0 ? <AvatarStack size="sm" people={list} /> : null
 
 /**
  * Overview of an academy session: its information beside the work waiting for the viewer, the
- * team, then the timeline of the promotion and the remarks left on it
+ * team, then the remarks left on it
  * @return {JSX.Element}
  */
 
@@ -79,13 +75,17 @@ export const OverviewTab = () => {
       field: fieldFor('trainerIds'),
       display:
         trainers.length > 0 ? (
-          <CreatorLabels
-            creators={trainers.map((option) => ({ name: option.label, image: option.image }))}
+          <AvatarStack
+            size="sm"
+            people={trainers.map((option) => ({
+              id: option.value,
+              name: option.label,
+              src: option.image,
+            }))}
           />
         ) : null,
     },
     { label: SESSION_FILE_COPY.responsables, display: people(recruitment?.responsables ?? []) },
-    { label: SESSION_FILE_COPY.recruiters, display: people(recruitment?.recruiters ?? []) },
   ]
 
   const groups: FileOverviewGroup[] = [
@@ -107,9 +107,6 @@ export const OverviewTab = () => {
       onCommit={record.saveField}
     >
       <div className={FILE_BOX.stack}>
-        <Section title={ACADEMY_COPY.tabTimeline} bare>
-          <PromotionTimeline />
-        </Section>
         {can.readNotes && (
           <CommentThread
             comments={comments.comments}

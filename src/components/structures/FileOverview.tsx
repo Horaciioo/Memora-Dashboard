@@ -74,10 +74,13 @@ export const FileOverview = ({
     { id: 'main', title: SESSION_FILE_COPY.informations, entries: entries ?? [] },
   ]
 
+  // One beside-panel makes every box share the same column
+  const hasSide = boxes.some((box) => box.side)
+
   return (
     <div className={FILE_BOX.stack}>
       {boxes.map((box, index) => (
-        <section key={box.id} className={box.side ? FILE_BOX.row : SECTION_STYLES.wrapper}>
+        <section key={box.id} className={hasSide ? FILE_BOX.row : SECTION_STYLES.wrapper}>
           <h2 className={cn(SECTION_STYLES.title, FILE_BOX.rowTitle)}>{box.title}</h2>
           <div className={cn(FILE_BOX.box, FILE_BOX.rowBox)}>
             <div className={FILE_BOX.main}>
@@ -114,7 +117,7 @@ export const FileOverview = ({
         </section>
       ))}
       {children &&
-        (boxes.some((box) => box.side) ? (
+        (hasSide ? (
           <div className={FILE_BOX.row}>
             <div className={FILE_BOX.rowBox}>{children}</div>
           </div>
