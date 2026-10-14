@@ -6,7 +6,7 @@
 export const PERIOD_TIMELINE = {
   root: 'flex flex-col gap-5',
   card: 'overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface transition-shadow',
-  cardCurrent: 'shadow-[var(--shadow-md)]',
+  cardCurrent: 'bg-[var(--color-surface)] shadow-[var(--shadow-lg)]',
   cardDone: 'opacity-80',
   cardUpcoming: 'border-dashed opacity-70',
   head: 'flex w-full items-center gap-3 p-4 text-left',

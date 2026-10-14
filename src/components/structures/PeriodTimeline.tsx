@@ -87,7 +87,7 @@ export const PeriodTimeline = ({ groups, label }: PeriodTimelineProps) => {
             key={group.id}
             className={cn(
               PERIOD_TIMELINE.card,
-              group.state === 'current' && cn(PERIOD_TIMELINE.cardCurrent, tone.border),
+              group.state === 'current' && PERIOD_TIMELINE.cardCurrent,
               group.state === 'done' && PERIOD_TIMELINE.cardDone,
               group.state === 'upcoming' && PERIOD_TIMELINE.cardUpcoming
             )}
