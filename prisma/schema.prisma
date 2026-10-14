@@ -76,15 +76,6 @@ enum DepartureKind {
   RESIGNATION
 }
 
-// Kind of step recorded on the session timeline
-enum AcademyStepKind {
-  FORMATION
-  BILAN_VOCAL
-  ENTREVUE
-  POINT_RESPONSABLE
-  SESSION_TRAVAIL
-}
-
 // Broad phase of a junior's PIM, drives which timeline steps are open
 enum AcademyStage {
   PREPARATION
@@ -95,18 +86,15 @@ enum AcademyStage {
   BONUS
 }
 
-// How a timeline step's due date is computed
-enum StepAnchor {
-  DAY
-  LIVE
-}
-
-// Who is responsible for carrying out a timeline step
-enum StepOwner {
-  RESPONSABLE
-  FORMATEURS
-  BOTH
-  JUNIOR
+// What a stored Discord identifier points at
+enum DiscordIdKind {
+  MEMBER
+  ROLE
+  ACADEMY_ROLE
+  RECRUITMENT_ROLE
+  TEXT_CHANNEL
+  VOICE_CHANNEL
+  SERVER
 }
 
 // Kind of trace kept on a junior's FSI
@@ -319,6 +307,7 @@ model Account {
   socialLinks           SocialLink[]
   constraints           AccountConstraint[]
   calendarEntries       CalendarEvent[]          @relation("CalendarSubject")
+  trainedEvents         CalendarEvent[]          @relation("CalendarTrainer")
   absences              Absence[]                @relation("AbsenceOwner")
   reviewedAbsences      Absence[]                @relation("AbsenceReviewer")
   notesReceived         AccountNote[]            @relation("NoteSubject")
@@ -331,8 +320,6 @@ model Account {
   legacyGrades          LegacyModuleResult[]     @relation("LegacyGrader")
   academyTrainees       AcademyJunior[]          @relation("AcademyJuniorTrainer")
   academySeats          AcademySessionTrainer[]  @relation("AcademyTrainer")
-  academySteps          AcademyStep[]            @relation("AcademyStepAuthor")
-  academyStepsValidated AcademyStep[]            @relation("AcademyStepValidator")
   integrationInvites    IntegrationInvite[]      @relation("IntegrationInviteCreatedBy")
   integrationClaims     IntegrationClaim[]       @relation("IntegrationClaimAccount")
   quizAnswers           JuniorAnswer[]
@@ -376,9 +363,12 @@ model Account {
   notificationsReceived Notification[]           @relation("NotificationRecipient")
   notificationsCaused   Notification[]           @relation("NotificationActor")
   recruitmentInterviews RecruitmentCandidate[]   @relation("RecruitmentRecruiter")
-  recruitmentSeats      RecruitmentSpectator[]   @relation("RecruitmentSpectator")
+  recruitmentSeats      RecruitmentSeat[]        @relation("RecruitmentSeat")
   recruitmentLeads      RecruitmentResponsable[] @relation("RecruitmentResponsable")
+  recruitmentWatches    RecruitmentObserver[]    @relation("RecruitmentObserver")
   recruitmentComments   RecruitmentComment[]     @relation("RecruitmentCommentAuthor")
+  academyComments       AcademyComment[]         @relation("AcademyCommentAuthor")
+  exerciseLinks         ExerciseLink[]           @relation("ExerciseLinkCreatedBy")
 
   @@index([role])
   @@index([status])
@@ -595,6 +585,7 @@ model Youtuber {
   liveconEntries      LiveconEntry[]
   calendarEvents      CalendarEvent[]
   channels            YoutuberChannel[]
+  discordIdentifiers  DiscordIdentifier[]
   lives               Live[]
   sanctionOffenses    SanctionOffense[]
 
@@ -674,14 +665,13 @@ model JobFunction {
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
 
-  holders          AccountFunction[]
-  legacyTracks     LegacyTrack[]
-  permissions      FunctionPermission[]
-  trainings        Training[]
-  skills           Skill[]
-  pimStepTemplates PimStepTemplate[]
-  academySessions  AcademySession[]
-  youtubers        YoutuberFunction[]
+  holders         AccountFunction[]
+  legacyTracks    LegacyTrack[]
+  permissions     FunctionPermission[]
+  trainings       Training[]
+  skills          Skill[]
+  academySessions AcademySession[]
+  youtubers       YoutuberFunction[]
 
   recruitmentSessions      RecruitmentSession[]
   recruitmentQuestions     RecruitmentQuestion[]
@@ -1090,7 +1080,6 @@ model Dispositif {
   updatedAt DateTime @updatedAt
 
   skills    Skill[]
-  steps     PimStepTemplate[]
   juniors   AcademyJunior[]
   trainings Training[]
 
@@ -1132,37 +1121,6 @@ model Skill {
   @@unique([name, functionId, dispositifId])
   @@index([functionId, dispositifId])
   @@map("skills")
-}
-
-// Timeline template step, instantiated onto a session at creation
-model PimStepTemplate {
-  id           String       @id @default(cuid())
-  title        String
-  description  String?
-  position     Int          @default(0)
-  required     Boolean      @default(true)
-  functionId   String?
-  dispositifId String?
-  stage        AcademyStage
-  anchor       StepAnchor
-  offset       Int
-  owner        StepOwner
-  // Glyph drawn on the timeline
-  icon         String?
-  // Walkthrough the owner follows, markdown
-  guide        String?
-  // Destination key declared in code, where the owner acts
-  destination  String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-
-  jobFunction JobFunction?  @relation(fields: [functionId], references: [id], onDelete: Cascade)
-  dispositif  Dispositif?   @relation(fields: [dispositifId], references: [id], onDelete: Cascade)
-  steps       AcademyStep[]
-
-  @@unique([title, functionId, dispositifId])
-  @@index([functionId, dispositifId])
-  @@map("pim_step_templates")
 }
 
 // Course a junior must clear during the academy
@@ -1339,7 +1297,7 @@ model AcademySession {
 
   trainers       AcademySessionTrainer[]
   juniors        AcademyJunior[]
-  steps          AcademyStep[]
+  comments       AcademyComment[]
   calendarEvents CalendarEvent[]
   invites        IntegrationInvite[]
 
@@ -1413,30 +1371,33 @@ model AcademySessionTrainer {
 
 // Junior followed through one session, always an existing moderator
 model AcademyJunior {
-  id           String              @id @default(cuid())
-  sessionId    String
-  accountId    String
-  trainerId    String?
+  id               String              @id @default(cuid())
+  sessionId        String
+  accountId        String
+  trainerId        String?
   // Chosen by the junior on the integration form, empty until then
-  dispositifId String?
+  dispositifId     String?
   // Application this seat was admitted from
-  candidateId  String?             @unique
+  candidateId      String?             @unique
   // Integration form answered, the pre-generated file confirmed
-  confirmedAt  DateTime?
+  confirmedAt      DateTime?
   // PIM start declared by a responsable, opens the integration form
-  kickoffAt    DateTime?
+  kickoffAt        DateTime?
   // End of the third period, set by the responsable
-  deadlineAt   DateTime?
-  leftAt       DateTime?
-  status       AcademyJuniorStatus @default(ACTIVE)
-  stage        AcademyStage        @default(PREPARATION)
-  startedAt    DateTime            @default(now())
-  validatedAt  DateTime?
-  liveCount    Int                 @default(0)
-  bonusLives   Int                 @default(0)
-  summary      String?
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
+  deadlineAt       DateTime?
+  // Moments the junior entered each check-in, they bound the review windows of the calendar
+  reviewOneDueAt   DateTime?
+  reviewFinalDueAt DateTime?
+  leftAt           DateTime?
+  status           AcademyJuniorStatus @default(ACTIVE)
+  stage            AcademyStage        @default(PREPARATION)
+  startedAt        DateTime            @default(now())
+  validatedAt      DateTime?
+  liveCount        Int                 @default(0)
+  bonusLives       Int                 @default(0)
+  summary          String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 
   session    AcademySession        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   account    Account               @relation("AcademyJunior", fields: [accountId], references: [id], onDelete: Cascade)
@@ -1444,8 +1405,9 @@ model AcademyJunior {
   dispositif Dispositif?           @relation(fields: [dispositifId], references: [id], onDelete: Restrict)
   candidate  RecruitmentCandidate? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
 
-  steps           AcademyStep[]
   reviews         AcademyReview[]
+  comments        AcademyComment[]
+  calendarEvents  CalendarEvent[]
   skills          JuniorSkill[]
   notes           JuniorNote[]
   objectives      JuniorObjective[]
@@ -1512,38 +1474,22 @@ model JuniorObjective {
   @@map("junior_objectives")
 }
 
-// Free moment logged on the session thread, or a PIMT template instantiated onto a junior's timeline
-model AcademyStep {
-  id            String           @id @default(cuid())
-  sessionId     String
-  juniorId      String?
-  authorId      String?
-  templateId    String?
-  kind          AcademyStepKind?
-  title         String
-  scheduledAt   DateTime?
-  doneAt        DateTime?
-  notes         String?
-  stage         AcademyStage?
-  anchor        StepAnchor?
-  offset        Int?
-  owner         StepOwner?
-  required      Boolean          @default(false)
-  validatedById String?
-  validatedAt   DateTime?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+// Remark left on a promotion or on one of its juniors
+model AcademyComment {
+  id        String   @id @default(cuid())
+  sessionId String?
+  juniorId  String?
+  authorId  String?
+  body      String
+  createdAt DateTime @default(now())
 
-  session   AcademySession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  junior    AcademyJunior?   @relation(fields: [juniorId], references: [id], onDelete: Cascade)
-  author    Account?         @relation("AcademyStepAuthor", fields: [authorId], references: [id], onDelete: SetNull)
-  template  PimStepTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
-  validator Account?         @relation("AcademyStepValidator", fields: [validatedById], references: [id], onDelete: SetNull)
+  session AcademySession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  junior  AcademyJunior?  @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  author  Account?        @relation("AcademyCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
 
-  @@index([sessionId, scheduledAt])
-  @@index([kind])
-  @@index([juniorId, stage])
-  @@map("academy_steps")
+  @@index([sessionId, createdAt])
+  @@index([juniorId, createdAt])
+  @@map("academy_comments")
 }
 
 // Written trace of one voice check-in held with a junior, and the support of the decision
@@ -1575,6 +1521,14 @@ model AcademyReview {
   @@map("academy_reviews")
 }
 
+// What a calendar template stands for in the academy, fixed in code
+enum EventPurpose {
+  TRAINER_INTERVIEW
+  PANEL_INTERVIEW
+  REVIEW_ONE
+  REVIEW_FINAL
+}
+
 // Pre-designed entry the calendar form starts from, declared from the admin console
 model EventTemplate {
   id             String          @id @default(cuid())
@@ -1585,6 +1539,7 @@ model EventTemplate {
   accent         String?
   visibility     EventVisibility @default(EVERYONE)
   defaultMinutes Int?
+  purpose        EventPurpose?   @unique
   allDay         Boolean         @default(false)
   position       Int             @default(0)
   archived       Boolean         @default(false)
@@ -1613,6 +1568,8 @@ model CalendarEvent {
   projectId         String?
   meetingId         String?
   sessionId         String?
+  juniorId          String?
+  trainerId         String?
   startsAt          DateTime
   endsAt            DateTime?
   allDay            Boolean          @default(false)
@@ -1639,10 +1596,14 @@ model CalendarEvent {
   project  Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
   meeting  Meeting?        @relation(fields: [meetingId], references: [id], onDelete: SetNull)
   session  AcademySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  junior   AcademyJunior?  @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  trainer  Account?        @relation("CalendarTrainer", fields: [trainerId], references: [id], onDelete: SetNull)
 
   @@index([startsAt])
   @@index([kind, startsAt])
   @@index([templateId])
+  @@index([juniorId])
+  @@index([trainerId])
   @@index([ownerId])
   @@index([accountId])
   @@index([rollCall, remindAt, remindedAt])
@@ -1708,6 +1669,24 @@ model LiveconEntry {
   @@index([endedAt])
   @@index([liveId])
   @@map("livecon_entries")
+}
+
+// Discord identifier Memora knows, typed and named, collected or entered by hand
+model DiscordIdentifier {
+  id         String        @id @default(cuid())
+  discordId  String        @unique
+  kind       DiscordIdKind
+  name       String
+  // Creator a role or channel belongs to
+  youtuberId String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  youtuber Youtuber? @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+
+  @@index([kind])
+  @@index([youtuberId])
+  @@map("discord_identifiers")
 }
 
 // Channel a creator streams on, several per platform
@@ -2092,6 +2071,19 @@ enum RecruitmentStatus {
   ARCHIVED
 }
 
+// Platform an interview script is written for
+enum RecruitmentPlatform {
+  DISCORD
+  TWITCH
+}
+
+// Recruiter's reaction to an answer
+enum AnswerAppreciation {
+  LIKE
+  NEUTRAL
+  DISLIKE
+}
+
 // Who carries out a recruitment timeline step
 enum RecruitmentOwner {
   RESPONSABLE
@@ -2101,18 +2093,24 @@ enum RecruitmentOwner {
 
 // Campaign opened for one creator and one function, announced outside then held on Discord
 model RecruitmentSession {
-  id               String            @id @default(cuid())
+  id               String              @id @default(cuid())
   youtuberId       String
   functionId       String
-  academySessionId String?           @unique
+  academySessionId String?             @unique
   name             String
-  status           RecruitmentStatus @default(DRAFT)
+  status           RecruitmentStatus   @default(DRAFT)
   summary          String?
-  instructions     String            @default("")
+  instructions     String              @default("")
+  platform         RecruitmentPlatform @default(DISCORD)
+  // Keys of the questions the recruiters picked, in asking order
+  questionKeys     String[]            @default([])
   opensAt          DateTime?
   closesAt         DateTime?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  // Discord wording posted for the interviews, once announced
+  announcement     String?
+  announcedAt      DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 
   youtuber       Youtuber                 @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
   jobFunction    JobFunction              @relation(fields: [functionId], references: [id], onDelete: Restrict)
@@ -2120,6 +2118,7 @@ model RecruitmentSession {
   candidates     RecruitmentCandidate[]
   steps          RecruitmentStep[]
   responsables   RecruitmentResponsable[]
+  observers      RecruitmentObserver[]
   invite         IntegrationInvite?
 
   @@unique([youtuberId, functionId, name])
@@ -2143,6 +2142,23 @@ model RecruitmentResponsable {
   @@map("recruitment_responsables")
 }
 
+// Temporary member who may sit in on a few interviews of one session, never edit it
+model RecruitmentObserver {
+  id        String   @id @default(cuid())
+  sessionId String
+  accountId String
+  // Interviews this observer may sit in on
+  quota     Int      @default(1)
+  createdAt DateTime @default(now())
+
+  session RecruitmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account            @relation("RecruitmentObserver", fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@index([accountId])
+  @@map("recruitment_observers")
+}
+
 // Applicant of one campaign, held by their Discord identifier and never given an account
 model RecruitmentCandidate {
   id          String    @id @default(cuid())
@@ -2156,16 +2172,20 @@ model RecruitmentCandidate {
   interviewAt DateTime?
   attended    Boolean   @default(false)
   review      String    @default("")
+  // Timeline moments ticked or unticked by hand, by moment key
+  stageMarks  Json      @default("{}")
   position    Int       @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  session    RecruitmentSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  recruiter  Account?               @relation("RecruitmentRecruiter", fields: [recruiterId], references: [id], onDelete: SetNull)
-  outcome    RecruitmentOutcome?    @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
-  spectators RecruitmentSpectator[]
-  comments   RecruitmentComment[]
-  admission  AcademyJunior?
+  session   RecruitmentSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  recruiter Account?             @relation("RecruitmentRecruiter", fields: [recruiterId], references: [id], onDelete: SetNull)
+  outcome   RecruitmentOutcome?  @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
+  observers RecruitmentSeat[]
+  comments  RecruitmentComment[]
+  exercises ExerciseLink[]
+  answers   RecruitmentAnswer[]
+  admission AcademyJunior?
 
   @@unique([sessionId, discordId])
   @@index([discordId])
@@ -2174,16 +2194,58 @@ model RecruitmentCandidate {
 }
 
 // Moderator sitting in on one interview without leading it
-model RecruitmentSpectator {
+model RecruitmentSeat {
   candidateId String
   accountId   String
 
   candidate RecruitmentCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-  account   Account              @relation("RecruitmentSpectator", fields: [accountId], references: [id], onDelete: Cascade)
+  account   Account              @relation("RecruitmentSeat", fields: [accountId], references: [id], onDelete: Cascade)
 
   @@id([candidateId, accountId])
   @@index([accountId])
-  @@map("recruitment_spectators")
+  @@map("recruitment_seats")
+}
+
+// Temporary link handing one written context to one candidate, readable by their Discord identity only
+model ExerciseLink {
+  id          String    @id @default(cuid())
+  candidateId String
+  token       String    @unique
+  // Context of the code-declared bank
+  contextKey  String
+  // Secret held by the browser that proved the identity
+  claimToken  String?
+  claimedAt   DateTime?
+  plays       Int       @default(0)
+  expiresAt   DateTime
+  // Cut short by the recruiter
+  expiredAt   DateTime?
+  createdById String?
+  createdAt   DateTime  @default(now())
+
+  candidate RecruitmentCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  createdBy Account?             @relation("ExerciseLinkCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([candidateId, createdAt])
+  @@map("exercise_links")
+}
+
+// What the recruiter noted on one question of the script while interviewing a candidate
+model RecruitmentAnswer {
+  id           String              @id @default(cuid())
+  candidateId  String
+  // Key of the question in the code-declared bank
+  questionKey  String
+  notes        String              @default("")
+  appreciation AnswerAppreciation?
+  skipped      Boolean             @default(false)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  candidate RecruitmentCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@unique([candidateId, questionKey])
+  @@map("recruitment_answers")
 }
 
 // Remark left on a candidate while their application is being weighed
