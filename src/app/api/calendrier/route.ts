@@ -1,6 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
+import { academyScope } from '@/core/services/academy/AcademyScope'
 import {
   assertEntriesAccess,
   calendarFields,
@@ -51,11 +52,12 @@ export const POST = createProtectedRoute({
   descriptor: { summary: 'Post an entry on the calendar', tags: ['calendar'] },
   handler: async ({ raw, session, access, scope }) => {
     const perimeter = await scope()
-    const fields = await calendarFields(perimeter, workViewer(session, access))
+    const academy = academyScope(session, access)
+    const fields = await calendarFields(perimeter, workViewer(session, access), academy)
     const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    return createEntry(session.id, parsed.values, perimeter)
+    return createEntry(session.id, parsed.values, perimeter, academy)
   },
 })
 
@@ -70,7 +72,7 @@ export const PATCH = createProtectedRoute({
 
     // Only the keys actually sent are validated
     const parsed = parseFormValues(
-      await calendarFields(perimeter, workViewer(session, access)),
+      await calendarFields(perimeter, workViewer(session, access), academyScope(session, access)),
       raw,
       { enforceRequired: false }
     )

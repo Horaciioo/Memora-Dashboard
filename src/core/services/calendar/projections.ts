@@ -6,14 +6,17 @@ import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { meetingVisibility } from '@/core/services/work/visibility'
 import type { WorkViewer } from '@/core/services/work/visibility'
-import { ACADEMY_STAGE_REGISTRY } from '@/declarations/academy/registries'
+import { periodZones, promotionPeriods, toPeriodInput } from '@/core/lib/academy/periods'
+import { sessionNumbers } from '@/core/services/academy/AcademyService'
+import { PIM_PERIOD_REGISTRY } from '@/declarations/academy/timeline'
 import { CALENDAR_PROJECTION_COPY } from '@/declarations/calendar/copy'
 import { CALENDAR_SOURCE_REGISTRY } from '@/declarations/calendar/registries'
 import { ROUTES } from '@/declarations/navigation'
 import type { PermissionHelpers } from '@/types/auth'
 import type { CalendarEntry } from '@/types/calendar'
-import type { AcademyStageName } from '@/utils/constants/hierarchy'
+import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
+import { sessionTitle } from '@/utils/format/academy'
 import {
   AbsenceStatuses,
   AttendeeKinds,
@@ -442,51 +445,6 @@ export const birthdayEntries = async ({
 }
 
 /**
- * Project the dated steps of the academy
- * @param {ProjectionContext} context - Window and permissions
- * @param {string} [sessionId] - Session the board is bound to
- * @return {Promise<CalendarEntry[]>} - Projected steps
- */
-
-export const academyStepEntries = async (
-  { from, to, access, scope }: ProjectionContext,
-  sessionId?: string
-): Promise<CalendarEntry[]> => {
-  if (!access.can(Permissions.AcademyRead)) return []
-
-  const rows = await prisma.academyStep.findMany({
-    where: {
-      ...(sessionId ? { sessionId } : {}),
-      scheduledAt: { gte: from, lte: to },
-      // A creator's perimeter only reaches the juniors that work for it
-      ...(!sessionId && !scope.isGlobal
-        ? { junior: { account: { youtubers: { some: { id: { in: scope.youtuberIds } } } } } }
-        : {}),
-    },
-    include: { junior: { include: { account: FUNCTION_SHAPE } } },
-    orderBy: { scheduledAt: 'asc' },
-  })
-
-  return rows.map((row) => {
-    const junior = row.junior?.account ?? null
-    const stage = row.stage ? ACADEMY_STAGE_REGISTRY.get(row.stage as AcademyStageName) : null
-
-    return projected({
-      source: CalendarSources.AcademyStep,
-      id: row.id,
-      title: junior ? `${row.title} · ${junior.displayName}` : row.title,
-      startsAt: row.scheduledAt ?? new Date(),
-      endsAt: null,
-      allDay: true,
-      accent: creatorAccent(junior) ?? stage?.accent ?? null,
-      youtuberId: creatorId(junior),
-      description: row.notes,
-      subjectName: junior?.displayName ?? null,
-    })
-  })
-}
-
-/**
  * Project the running length of every academy session in the window
  * @param {ProjectionContext} context - Window and permissions
  * @return {Promise<CalendarEntry[]>} - Projected sessions
@@ -594,4 +552,81 @@ export const recruitmentEntries = async ({
   )
 
   return [...campaigns, ...interviews]
+}
+
+// Source each part of a period is drawn from
+const ZONE_SOURCES = {
+  period: CalendarSources.AcademyPeriod,
+  trainings: CalendarSources.AcademyTrainings,
+  reviews: CalendarSources.AcademyReviews,
+} as const
+
+/**
+ * Project the periods, trainings and review windows of running promotions as zones
+ * @param {ProjectionContext} context - Window and permissions
+ * @param {string} [sessionId] - Promotion the board is bound to
+ * @return {Promise<CalendarEntry[]>} - Zones
+ */
+
+export const academyZoneEntries = async (
+  { from, to, access }: ProjectionContext,
+  sessionId?: string
+): Promise<CalendarEntry[]> => {
+  if (!access.can(Permissions.AcademyRead)) return []
+
+  const rows = await prisma.academySession.findMany({
+    where: {
+      ...(sessionId ? { id: sessionId } : {}),
+      status: { in: [AcademySessionStatuses.Running, AcademySessionStatuses.Closed] },
+      startsAt: { lte: to },
+    },
+    include: {
+      jobFunction: { select: { name: true } },
+      juniors: {
+        select: {
+          reviewOneDueAt: true,
+          reviewFinalDueAt: true,
+          deadlineAt: true,
+          reviews: { select: { stage: true, status: true, decision: true, decidedAt: true } },
+        },
+      },
+    },
+    orderBy: { startsAt: 'asc' },
+  })
+  const numbers = await sessionNumbers()
+
+  const zones = rows.flatMap((row) => {
+    const title = sessionTitle({ function: row.jobFunction, number: numbers.get(row.id) ?? 1 })
+    const periods = promotionPeriods(toPeriodInput(row))
+
+    return periods.flatMap((period) => {
+      const option = PIM_PERIOD_REGISTRY.get(period.key)
+
+      return periodZones(period, option.hasTrainings).map((zone) => {
+        const label =
+          zone.part === 'period'
+            ? option.label
+            : zone.part === 'trainings'
+              ? CALENDAR_PROJECTION_COPY.trainingsZone
+              : CALENDAR_PROJECTION_COPY.reviewsZone
+
+        return projected({
+          source: ZONE_SOURCES[zone.part],
+          id: `${row.id}:${period.key}`,
+          title: `${label} · ${title}`,
+          startsAt: zone.from,
+          endsAt: zone.to ?? row.endsAt ?? to,
+          allDay: true,
+          kind: CalendarKinds.Zone,
+          accent: zone.part === 'period' ? option.tone : null,
+          description: null,
+          subjectName: null,
+          href: ROUTES.session(row.id),
+        })
+      })
+    })
+  })
+
+  // A zone still on screen merely overlaps the window
+  return zones.filter((zone) => new Date(zone.endsAt ?? zone.startsAt) >= from)
 }

@@ -85,17 +85,29 @@ const CALENDAR_SOURCE_MAP: Record<CalendarSourceName, CalendarLegendOption> = {
     accent: 'danger',
     icon: 'birthday',
   },
-  [CalendarSources.AcademyStep]: {
-    label: 'Étape Academy',
-    summary: 'Les étapes datées d’une session de formation.',
-    accent: 'success',
-    icon: 'academy',
-  },
   [CalendarSources.AcademySession]: {
     label: 'Session PIM',
     summary: 'La durée d’une session de formation.',
     accent: 'success',
     icon: 'academy',
+  },
+  [CalendarSources.AcademyPeriod]: {
+    label: 'Période de PIM',
+    summary: 'Les périodes que traverse une promotion.',
+    accent: 'info',
+    icon: 'academy',
+  },
+  [CalendarSources.AcademyTrainings]: {
+    label: 'Période de formations',
+    summary: 'Le temps laissé aux formations avant les bilans.',
+    accent: 'success',
+    icon: 'academy',
+  },
+  [CalendarSources.AcademyReviews]: {
+    label: 'Période de bilans',
+    summary: 'Du premier bilan dû à la dernière décision.',
+    accent: 'warning',
+    icon: 'sheet',
   },
   [CalendarSources.Recruitment]: {
     label: 'Session de recrutement',
@@ -157,7 +169,12 @@ const CALENDAR_LAYER_MAP: Record<CalendarLayerName, CalendarLayerOption> = {
   [CalendarLayers.Academy]: {
     label: 'Marsha Academy',
     icon: 'academy',
-    sources: [CalendarSources.AcademySession, CalendarSources.AcademyStep],
+    sources: [
+      CalendarSources.AcademySession,
+      CalendarSources.AcademyPeriod,
+      CalendarSources.AcademyTrainings,
+      CalendarSources.AcademyReviews,
+    ],
     permission: Permissions.AcademyRead,
   },
   [CalendarLayers.Recruitment]: {
