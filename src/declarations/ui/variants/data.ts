@@ -246,8 +246,7 @@ export const BOARD_STYLES = {
   cardTint: 'accent-border bg-[var(--color-surface-raised)]/70',
   cardTitle: 'text-body leading-snug font-bold',
   // Where a card comes from, under a divider
-  cardOrigin:
-    'border-t border-[var(--color-border)] pt-2 text-xs text-[var(--color-ink-subtle)]',
+  cardOrigin: 'border-t border-[var(--color-border)] pt-2 text-xs text-[var(--color-ink-subtle)]',
   // Glyph flowing before a title
   cardGlyph: 'mr-1.5',
 } as const

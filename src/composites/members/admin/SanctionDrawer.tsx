@@ -35,12 +35,7 @@ export interface SanctionDrawerProps {
  * @return {JSX.Element}
  */
 
-export const SanctionDrawer = ({
-  open,
-  isSaving,
-  onSubmit,
-  onClose,
-}: SanctionDrawerProps) => {
+export const SanctionDrawer = ({ open, isSaving, onSubmit, onClose }: SanctionDrawerProps) => {
   const [kind, setKind] = useState<SanctionKind>('temporary')
   const [until, setUntil] = useState('')
   const [reason, setReason] = useState('')
