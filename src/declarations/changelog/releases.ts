@@ -127,6 +127,151 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.4.0',
+    date: '2026-10-14',
+    title: 'Les Recrutements & l’Academy débarquent !',
+    intro:
+      'Tu suis chaque candidat et chaque junior de bout en bout, et tout ce qui se planifie arrive dans le calendrier.',
+    description:
+      'Jusqu’ici, un entretien se tenait hors de Memora, la timeline de l’Academy était une suite d’étapes à cocher à la main, et les bilans n’apparaissaient nulle part dans le calendrier. Cette version fait vivre le recrutement dans Memora, de l’annonce à l’entretien. Elle repense le suivi de l’Academy autour des moments réels de la promotion et rend les échanges visibles là où ils ont lieu.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une animation d’ouverture : le nom « Memora » se remplit de couleur pendant le chargement, puis la caméra plonge dans le « e » et la page s’ouvre. Un clic permet de la passer',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Ajout d’une fiche par candidat, avec sa timeline et ses informations',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Ajout de la possibilité de passer l’entretien d’un candidat depuis sa fiche, de le reprendre ou de le revoir',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Ajout de la possibilité d’observer un entretien, dans la limite d’un quota d’observations par observateur',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.RecruitmentManage,
+        text: 'Ajout de la gestion des « Observateurs » d’une session : ajout, quota et retrait',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Ajout d’exercices pratiques pour les candidats : choix de l’exercice, questions chronométrées et cas à présenter',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Ajout de la possibilité d’envoyer à un candidat des liens de mise en situation, un contexte modéré et un complexe : chaque lien ne s’ouvre qu’avec son compte Discord, se copie, peut expirer et se régénérer',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.RecruitmentManage,
+        text: 'Ajout de l’annonce d’une session : texte et image à copier, avec une version générique à restaurer',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.settings,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.ReferenceRead,
+        text: 'Ajout de la liste des identifiants Discord (membres, rôles, salons, serveur) dans « Configuration », pour que les annonces affichent leur nom',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Ajout d’une timeline de promotion découpée en périodes, qui montre où en est chaque junior et ce qui l’attend',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Ajout de la timeline d’un junior, avec les gestes à faire à chaque moment',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyNoteRead,
+        text: 'Ajout d’un fil de commentaires sur chaque session et sur chaque fiche de junior',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyReviewRead,
+        text: 'Ajout de fenêtres de bilan : le premier bilan et le bilan final ont chacun leur échéance',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Ajout du lien vers la fiche de recrutement d’un junior, depuis sa fiche',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        permission: Permissions.AcademyRead,
+        text: 'Ajout des entretiens de formateur, des entretiens de panel et des bilans de l’Academy dans le « Calendrier », avec le formateur concerné',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        permission: Permissions.RecruitmentRead,
+        text: 'Ajout des entretiens de recrutement dans le « Calendrier »',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Amélioration de la fiche d’un junior : « Progression », « Objectifs », « Compétences », « Notes » et « Bilans » sont rangés en onglets',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Amélioration de la fiche d’une session : « Juniors », « Calendrier » et « Lexique » vivent dans la session, la page « Lexique » à part disparaît',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.academy,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.AcademyManage,
+        text: 'Amélioration du lancement d’une session : un message prévient quand le recrutement rattaché est encore en cours',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des listes « Academy » et « Recrutements » : des lignes simples remplacent les cartes',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des champs de date : une journée entière se choisit sans heure, et l’heure par défaut se pré-remplit',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des champs de pourcentage : un curseur et une saisie directe',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Correction d’un bug qui faisait planter la page « Recrutements » à l’ouverture de la liste',
+      },
+    ],
+  },
+  {
     version: '0.3.1',
     date: '2026-10-12',
     title: 'Memora se range',
