@@ -1,4 +1,5 @@
-import { RecruitmentOwners } from '@/utils/constants/recruitment'
+import { AnswerAppreciations, RecruitmentOwners } from '@/utils/constants/recruitment'
+import type { AnswerAppreciationName } from '@/utils/constants/recruitment'
 
 /**
  * One column of the results board
@@ -25,6 +26,9 @@ export const RECRUITMENT_OUTCOME_TEMPLATE: readonly RecruitmentOutcomeSeed[] = [
   { name: 'À traiter', accent: '#9fa8b3', isDefault: true, isTerminal: false },
   { name: 'Entretien posé', accent: '#6a9bd1', isDefault: false, isTerminal: false },
   { name: 'En délibération', accent: '#e3c25a', isDefault: false, isTerminal: false },
+  { name: 'Favorable', accent: '#7dbf8e', isDefault: false, isTerminal: false },
+  { name: 'Défavorable', accent: '#e0867a', isDefault: false, isTerminal: false },
+  { name: 'Mitigé', accent: '#e3c25a', isDefault: false, isTerminal: false },
   { name: 'Accepté', accent: '#7dbf8e', isDefault: false, isTerminal: true },
   { name: 'Refusé', accent: '#e0867a', isDefault: false, isTerminal: true },
   { name: 'Désisté', accent: '#b9a58f', isDefault: false, isTerminal: true },
@@ -37,8 +41,19 @@ export const RECRUITMENT_OUTCOME_TEMPLATE: readonly RecruitmentOutcomeSeed[] = [
  */
 
 export const INTEGRATION_STEP = {
-  title: 'Envoi du formulaire d’intégration',
+  title: 'Générer le lien',
   description: 'À la fin de la réunion d’information collective, le formulaire part aux validés.',
   owner: RecruitmentOwners.Responsable,
   required: true,
 } as const
+
+/**
+ * Verdicts closing an interview, in display order, with their tone
+ * @type {readonly { label: string, tone: AnswerAppreciationName }[]}
+ */
+
+export const DELIBERATION_VERDICTS: readonly { label: string; tone: AnswerAppreciationName }[] = [
+  { label: 'Favorable', tone: AnswerAppreciations.Like },
+  { label: 'Mitigé', tone: AnswerAppreciations.Neutral },
+  { label: 'Défavorable', tone: AnswerAppreciations.Dislike },
+]

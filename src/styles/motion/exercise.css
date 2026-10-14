@@ -1,0 +1,80 @@
+/* Exercise title takes the whole window then steps aside */
+.exercise-reveal {
+  animation: exercise-reveal var(--reveal-ms, 1600ms) var(--motion-ease-out) both;
+}
+
+@keyframes exercise-reveal {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.exercise-title {
+  animation: exercise-title var(--motion-duration-slow) var(--motion-ease-spring) both;
+}
+
+@keyframes exercise-title {
+  from {
+    opacity: 0;
+    transform: scale(0.86) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.exercise-kicker {
+  animation: exercise-kicker var(--motion-duration-celebrate) var(--motion-ease-out) both;
+}
+
+@keyframes exercise-kicker {
+  from {
+    opacity: 0;
+    letter-spacing: 0.5em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.18em;
+  }
+}
+
+/* Page that follows the title */
+.exercise-arrive {
+  animation: exercise-arrive var(--motion-duration-celebrate) var(--motion-ease-out) both;
+}
+
+@keyframes exercise-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Bar draining over the length of a question */
+.exercise-drain {
+  transform-origin: left;
+  animation: exercise-drain var(--drain-ms, 5000ms) linear forwards;
+}
+
+@keyframes exercise-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}

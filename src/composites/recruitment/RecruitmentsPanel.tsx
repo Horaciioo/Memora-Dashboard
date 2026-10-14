@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { AddRow } from '@/components/structures/AddRow'
@@ -9,7 +9,8 @@ import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
 import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
 import { FormDrawer } from '@/components/structures/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { RowList, type RowListGroup } from '@/components/structures/RowList'
+import { Avatar } from '@/components/elements/display/Avatar'
+import { SessionTiles, type SessionTileGroup } from '@/components/structures/SessionTiles'
 import { useRecruitments } from '@/core/hooks/data/useRecruitments'
 import { ROUTES } from '@/declarations/navigation'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
@@ -42,6 +43,9 @@ const periodOf = (entry: RecruitmentSummary): string | undefined => {
 
   return entry.opensAt ? formatDay(entry.opensAt) : undefined
 }
+
+// Left for later, nobody sits in on a session yet
+const CREATION_SKIPPED = ['observerIds']
 
 export interface RecruitmentsPanelProps {
   initialSessions: RecruitmentSummary[]
@@ -104,25 +108,34 @@ export const RecruitmentsPanel = ({
   ]
 
   // Heaviest state first, finished ones only on request
-  const groups: RowListGroup[] = STATUS_ORDER.filter(
+  const groups: SessionTileGroup[] = STATUS_ORDER.filter(
     (status) => showFinished || !FINISHED_RECRUITMENT_STATUSES.includes(status)
   )
-    .map((status) => ({
-      id: status,
-      label: RECRUITMENT_STATUS_REGISTRY.label(status),
-      accent: RECRUITMENT_STATUS_REGISTRY.get(status).accent,
-      items: sessions
-        .filter((entry) => entry.status === status)
-        .map((entry) => ({
-          id: entry.id,
-          title: entry.jobFunction.label,
-          meta: periodOf(entry),
-          icon: entry.jobFunction.icon,
-          muted: FINISHED_RECRUITMENT_STATUSES.includes(status),
-          menu: sessionMenu(entry),
-          onOpen: () => router.push(ROUTES.recruitment(entry.id)),
-        })),
-    }))
+    .map((status) => {
+      const option = RECRUITMENT_STATUS_REGISTRY.get(status)
+
+      return {
+        id: status,
+        label: option.label,
+        accent: option.accent,
+        items: sessions
+          .filter((entry) => entry.status === status)
+          .map((entry) => ({
+            id: entry.id,
+            lead: <Avatar name={entry.youtuber.label} src={entry.youtuber.image} size="xl" />,
+            title: entry.promotionTitle ?? entry.name,
+            meta: periodOf(entry),
+            people: entry.responsables.map((person) => ({
+              id: person.id,
+              name: person.label,
+              src: person.image,
+            })),
+            muted: FINISHED_RECRUITMENT_STATUSES.includes(status),
+            menu: sessionMenu(entry),
+            onOpen: () => router.push(ROUTES.recruitment(entry.id)),
+          })),
+      }
+    })
     .filter((group) => group.items.length > 0)
 
   const hasFinished = sessions.some((entry) => FINISHED_RECRUITMENT_STATUSES.includes(entry.status))
@@ -144,7 +157,7 @@ export const RecruitmentsPanel = ({
         subject={FORM_SUBJECTS.recruitment}
         open={isCreating}
         title={RECRUITMENT_COPY.addTitle}
-        fields={fields}
+        fields={fields.filter((field) => !CREATION_SKIPPED.includes(field.name))}
         issues={issues}
         isSaving={isSaving}
         onSubmit={create}
@@ -199,7 +212,7 @@ export const RecruitmentsPanel = ({
     <>
       <PageOptions options={pageOptions} />
       <div className={GROUP_STYLES.spaced}>
-        <RowList groups={groups} />
+        <SessionTiles groups={groups} />
         <AddRow label={RECRUITMENT_COPY.add} disabled={!canManage} onClick={openCreate} />
       </div>
 

@@ -1,6 +1,6 @@
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { moveCandidate } from '@/core/services/recruitment/RecruitmentService'
+import { candidateSession, moveCandidate } from '@/core/services/recruitment/RecruitmentService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
@@ -19,14 +19,15 @@ export const PATCH = createProtectedRoute({
     }
 
     const index = typeof raw[INDEX_FIELD] === 'number' ? raw[INDEX_FIELD] : 0
-    const moved = await moveCandidate(params.id, outcomeId, index, await scope())
+    const perimeter = await scope()
+    const moved = await moveCandidate(params.id, outcomeId, index, perimeter)
 
     await recordEvent({
       eventType: 'RecruitmentDecided',
       actorId: session.id,
       targetType: 'recruitment',
-      targetId: moved.id,
-      summary: moved.discordId,
+      targetId: await candidateSession(params.id, perimeter),
+      summary: moved.name,
     })
 
     return moved

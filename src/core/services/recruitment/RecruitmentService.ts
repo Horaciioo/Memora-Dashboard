@@ -1,37 +1,67 @@
 import 'server-only'
 
 import { decryptField, encryptField } from '@/core/lib/crypto'
+import { identifiersForCreator } from '@/core/services/discord/DiscordIdentifierService'
 import { prisma } from '@/core/lib/db'
+import { readObservers } from '@/core/services/recruitment/ObserverReader'
 import { activeFunctions } from '@/core/services/reference/lookups'
+import { sessionNumbers } from '@/core/services/academy/AcademyService'
 import { syncAdmission } from '@/core/services/academy/AdmissionService'
 import { conflict, notFound } from '@/core/lib/errors'
-import { readDate, readFlag, readList, readNumberValue, readText } from '@/core/lib/forms/values'
-import { toOptions } from '@/core/lib/forms/options'
+import type { CommentView } from '@/types/comments'
+import {
+  readDate,
+  readDateRange,
+  readFlag,
+  readList,
+  readNumberValue,
+  readText,
+} from '@/core/lib/forms/values'
+import { functionOptions, toOptions } from '@/core/lib/forms/options'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { memberOptions, positionAt, toPerson, youtuberOptions } from '@/core/services/work/shared'
+import {
+  memberOptions,
+  positionAt,
+  teamOptions,
+  toPerson,
+  youtuberOptions,
+} from '@/core/services/work/shared'
+import { OBSERVER_FUNCTION } from '@/declarations/reference/fixed'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
 import { toLinkView } from '@/core/services/onboarding/IntegrationLinkService'
 import { INTEGRATION_STEP } from '@/declarations/recruitment/outcomes'
 import {
+  PLATFORM_OF_TRADE,
+  RECRUITMENT_PERIOD_TIMES,
   RECRUITMENT_OWNER_REGISTRY,
   RECRUITMENT_STATUS_REGISTRY,
 } from '@/declarations/recruitment/registries'
+import { recommendedKeys } from '@/core/lib/recruitment/questionnaire'
+import { tradeOfFunction } from '@/declarations/reference/fixed'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import type {
-  CandidateComment,
+  AnswerState,
   CandidateView,
   RecruitmentDetail,
   RecruitmentOutcomeView,
-  RecruitmentQuestionView,
   RecruitmentRef,
   RecruitmentStepView,
   RecruitmentSummary,
 } from '@/types/recruitment'
-import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
-import { RecruitmentOwners, RecruitmentStatuses } from '@/utils/constants/recruitment'
-import type { RecruitmentOwnerName, RecruitmentStatusName } from '@/utils/constants/recruitment'
+import { AcademySessionStatuses, MemberRoles } from '@/utils/constants/hierarchy'
+import { sessionTitle } from '@/utils/format/academy'
+import {
+  RecruitmentOwners,
+  RecruitmentPlatforms,
+  RecruitmentStatuses,
+} from '@/utils/constants/recruitment'
+import type {
+  RecruitmentOwnerName,
+  RecruitmentPlatformName,
+  RecruitmentStatusName,
+} from '@/utils/constants/recruitment'
 
 const { shortTextMaxLength, longTextMaxLength, markdownMaxLength, noteMaxLength } = FORM_SETTINGS
 
@@ -141,7 +171,9 @@ const toRef = (row: {
 const SUMMARY_INCLUDE = {
   youtuber: true,
   jobFunction: true,
+  academySession: { include: { jobFunction: true } },
   responsables: { include: { account: true } },
+  observers: true,
   _count: { select: { candidates: true } },
 } as const
 
@@ -157,11 +189,18 @@ type SummaryRow = Awaited<
 /**
  * Map a session row to its summary
  * @param {SummaryRow} row - Session row
+ * @param {Map<string, number>} numbers - Promotion ranks
  * @param {number} interviewedCount - Applicants who attended
+ * @param {RecruitmentRef[]} [recruiters] - Moderators leading interviews
  * @return {RecruitmentSummary} - Session header
  */
 
-const toSummary = (row: SummaryRow, interviewedCount: number): RecruitmentSummary => {
+const toSummary = (
+  row: SummaryRow,
+  numbers: Map<string, number>,
+  interviewedCount: number,
+  recruiters: RecruitmentRef[] = []
+): RecruitmentSummary => {
   const responsables = row.responsables.map(({ account }) => ({
     id: account.id,
     label: account.displayName,
@@ -177,19 +216,29 @@ const toSummary = (row: SummaryRow, interviewedCount: number): RecruitmentSummar
     youtuber: toRef(row.youtuber),
     jobFunction: toRef(row.jobFunction),
     responsables,
+    recruiters,
+    platform: row.platform,
+    academySessionId: row.academySessionId,
+    promotionTitle: row.academySession
+      ? sessionTitle({
+          function: { name: row.academySession.jobFunction.name },
+          number: numbers.get(row.academySession.id) ?? 1,
+        })
+      : null,
+    youtuberBanner: row.youtuber.bannerUrl,
+    announcement: row.announcement,
     opensAt: row.opensAt?.toISOString() ?? null,
     closesAt: row.closesAt?.toISOString() ?? null,
     candidateCount: row._count.candidates,
     interviewedCount,
     values: {
-      name: row.name,
       youtuberId: row.youtuberId,
       functionId: row.functionId,
       status: row.status,
       summary: row.summary,
-      opensAt: row.opensAt?.toISOString() ?? null,
-      closesAt: row.closesAt?.toISOString() ?? null,
+      period: row.opensAt ? [minuteOf(row.opensAt), minuteOf(row.closesAt ?? row.opensAt)] : null,
       responsableIds: responsables.map((seat) => seat.id),
+      observerIds: row.observers.map((seat) => seat.accountId),
     },
   }
 }
@@ -197,24 +246,32 @@ const toSummary = (row: SummaryRow, interviewedCount: number): RecruitmentSummar
 /**
  * Declarations of the session form
  * @param {AccessScope} scope - Perimeter
+ * @param {string} [youtuberId] - Creator of an existing session, narrowing the team pickers
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const sessionFields = async (scope: AccessScope): Promise<FieldDefinition[]> => {
-  const [creators, functions, members] = await Promise.all([
+export const sessionFields = async (
+  scope: AccessScope,
+  youtuberId?: string
+): Promise<FieldDefinition[]> => {
+  const [creators, functions, responsables, observers, links] = await Promise.all([
     youtuberOptions(scope),
     activeFunctions(),
-    memberOptions(),
+    teamOptions({ role: MemberRoles.Responsable, youtuberId }),
+    teamOptions({ functionName: OBSERVER_FUNCTION, youtuberId }),
+    prisma.youtuberFunction.findMany({ select: { youtuberId: true, functionId: true } }),
   ])
 
+  // Creators each function is held for
+  const creatorsOfFunction = new Map<string, string[]>()
+  for (const link of links) {
+    creatorsOfFunction.set(link.functionId, [
+      ...(creatorsOfFunction.get(link.functionId) ?? []),
+      link.youtuberId,
+    ])
+  }
+
   return [
-    {
-      name: 'name',
-      kind: 'text',
-      label: RECRUITMENT_FIELD_COPY.name,
-      required: true,
-      maxLength: shortTextMaxLength,
-    },
     {
       name: 'youtuberId',
       kind: 'select',
@@ -229,11 +286,11 @@ export const sessionFields = async (scope: AccessScope): Promise<FieldDefinition
       kind: 'select',
       label: RECRUITMENT_FIELD_COPY.jobFunction,
       required: true,
-      options: functions.map((row) => ({
-        value: row.id,
-        label: row.name,
-        accent: row.accent ?? undefined,
+      options: functionOptions(functions).map((option) => ({
+        ...option,
+        owners: creatorsOfFunction.get(option.value) ?? [],
       })),
+      ownerField: 'youtuberId',
       span: 'half',
     },
     {
@@ -241,27 +298,38 @@ export const sessionFields = async (scope: AccessScope): Promise<FieldDefinition
       kind: 'select',
       label: RECRUITMENT_FIELD_COPY.status,
       required: true,
-      options: toOptions(RECRUITMENT_STATUS_REGISTRY),
+      options: toOptions(RECRUITMENT_STATUS_REGISTRY).map((option) => ({
+        ...option,
+        isDefault: option.value === RecruitmentStatuses.Draft,
+      })),
+      preset: 'default',
       mark: 'dot',
       span: 'half',
     },
     {
-      name: 'opensAt',
-      kind: 'date',
-      label: RECRUITMENT_FIELD_COPY.opensAt,
-      span: 'half',
-    },
-    {
-      name: 'closesAt',
-      kind: 'date',
-      label: RECRUITMENT_FIELD_COPY.closesAt,
-      span: 'half',
+      name: 'period',
+      kind: 'daterange',
+      label: RECRUITMENT_FIELD_COPY.period,
+      preset: 'nextWeek',
+      withTime: true,
+      defaultTimes: [...RECRUITMENT_PERIOD_TIMES],
+      required: true,
     },
     {
       name: 'responsableIds',
       kind: 'multiselect',
       label: RECRUITMENT_FIELD_COPY.responsables,
-      options: members,
+      options: responsables,
+      ownerField: 'youtuberId',
+      defaultFromOwner: true,
+      mark: 'avatar',
+    },
+    {
+      name: 'observerIds',
+      kind: 'multiselect',
+      label: RECRUITMENT_FIELD_COPY.observers,
+      options: observers,
+      ownerField: 'youtuberId',
       mark: 'avatar',
     },
     {
@@ -287,7 +355,7 @@ export const candidateFields = async (): Promise<FieldDefinition[]> => {
     }),
   ])
 
-  // Spectators may sit in even while absent
+  // Observers may sit in even while absent
   const seats: FieldOption[] = members.map((option) => ({
     value: option.value,
     label: option.label,
@@ -332,9 +400,9 @@ export const candidateFields = async (): Promise<FieldDefinition[]> => {
       span: 'half',
     },
     {
-      name: 'spectatorIds',
+      name: 'observerIds',
       kind: 'multiselect',
-      label: RECRUITMENT_FIELD_COPY.spectators,
+      label: RECRUITMENT_FIELD_COPY.observers,
       options: seats,
       mark: 'avatar',
     },
@@ -411,21 +479,6 @@ export const stepFields = (): FieldDefinition[] => [
 ]
 
 /**
- * Declarations of the comment form
- * @return {FieldDefinition[]} - Field declarations
- */
-
-export const commentFields = (): FieldDefinition[] => [
-  {
-    name: 'body',
-    kind: 'textarea',
-    label: RECRUITMENT_FIELD_COPY.comment,
-    required: true,
-    maxLength: noteMaxLength,
-  },
-]
-
-/**
  * Declarations of the written trace forms
  * @param {'review' | 'instructions'} kind - Which trace is edited
  * @return {FieldDefinition[]} - Field declarations
@@ -453,6 +506,8 @@ export const listSessions = async (scope: AccessScope): Promise<RecruitmentSumma
     include: SUMMARY_INCLUDE,
   })
 
+  const numbers = await sessionNumbers()
+
   // One grouped count rather than one query per session
   const attended = await prisma.recruitmentCandidate.groupBy({
     by: ['sessionId'],
@@ -462,7 +517,7 @@ export const listSessions = async (scope: AccessScope): Promise<RecruitmentSumma
 
   const attendedBySession = new Map(attended.map((row) => [row.sessionId, row._count._all]))
 
-  return rows.map((row) => toSummary(row, attendedBySession.get(row.id) ?? 0))
+  return rows.map((row) => toSummary(row, numbers, attendedBySession.get(row.id) ?? 0))
 }
 
 /**
@@ -482,14 +537,21 @@ const toCandidate = (
     attended: boolean
     outcomeId: string | null
     review: string
+    stageMarks: unknown
     position: number
     recruiter: { id: string; displayName: string; avatarUrl: string | null } | null
-    spectators: { account: { id: string; displayName: string; avatarUrl: string | null } }[]
+    observers: { account: { id: string; displayName: string; avatarUrl: string | null } }[]
     comments: {
       id: string
       body: string
       createdAt: Date
       author: { displayName: string } | null
+    }[]
+    answers: {
+      questionKey: string
+      notes: string
+      appreciation: AnswerState['appreciation']
+      skipped: boolean
     }[]
   },
   members: Map<string, { id: string; displayName: string }>
@@ -497,7 +559,7 @@ const toCandidate = (
   const member = members.get(row.discordId) ?? null
   const recruiter = toPerson(row.recruiter)
 
-  const comments: CandidateComment[] = row.comments.map((comment) => ({
+  const comments: CommentView[] = row.comments.map((comment) => ({
     id: comment.id,
     authorName: comment.author?.displayName ?? null,
     body: decryptField(comment.body) ?? '',
@@ -514,7 +576,7 @@ const toCandidate = (
     recruiter: recruiter
       ? { id: recruiter.id, label: recruiter.name, accent: null, image: recruiter.src }
       : null,
-    spectators: row.spectators.map(({ account }) => ({
+    observers: row.observers.map(({ account }) => ({
       id: account.id,
       label: account.displayName,
       accent: null,
@@ -527,7 +589,18 @@ const toCandidate = (
     position: row.position,
     memberId: member?.id ?? null,
     memberName: member?.displayName ?? null,
+    stageMarks: row.stageMarks as Record<string, boolean>,
     comments,
+    answers: Object.fromEntries(
+      row.answers.map((answer) => [
+        answer.questionKey,
+        {
+          notes: decryptField(answer.notes) ?? '',
+          appreciation: answer.appreciation,
+          skipped: answer.skipped,
+        },
+      ])
+    ),
   }
 }
 
@@ -549,8 +622,9 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
         orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
         include: {
           recruiter: true,
-          spectators: { include: { account: true } },
+          observers: { include: { account: true } },
           comments: { orderBy: { createdAt: 'desc' }, include: { author: true } },
+          answers: true,
         },
       },
     },
@@ -558,10 +632,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
 
   if (!row) throw notFound()
 
-  const filter = trameFilter(row.youtuberId, row.functionId)
-
-  const [questions, outcomes, members] = await Promise.all([
-    prisma.recruitmentQuestion.findMany({ where: filter, orderBy: { position: 'asc' } }),
+  const [outcomes, members] = await Promise.all([
     prisma.recruitmentOutcome.findMany({
       where: { archived: false },
       orderBy: { position: 'asc' },
@@ -589,12 +660,6 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     position: step.position,
   }))
 
-  const questionViews: RecruitmentQuestionView[] = questions.map((question) => ({
-    id: question.id,
-    prompt: question.prompt,
-    hint: question.hint,
-  }))
-
   const outcomeViews: RecruitmentOutcomeView[] = outcomes.map((outcome) => ({
     id: outcome.id,
     label: outcome.name,
@@ -602,15 +667,61 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     isTerminal: outcome.isTerminal,
   }))
 
+  // Every moderator who leads an interview, once
+  const recruiters = [
+    ...new Map(
+      row.candidates.flatMap((candidate) =>
+        candidate.recruiter ? [[candidate.recruiter.id, candidate.recruiter] as const] : []
+      )
+    ).values(),
+  ].map((account) => ({
+    id: account.id,
+    label: account.displayName,
+    accent: null,
+    image: account.avatarUrl,
+  }))
+
   return {
-    summary: toSummary(row, attendedCount),
+    summary: toSummary(row, await sessionNumbers(), attendedCount, recruiters),
     instructions: row.instructions,
     candidates: row.candidates.map((candidate) => toCandidate(candidate, byDiscordId)),
     steps,
-    questions: questionViews,
+    // A session nobody configured asks the suggested pick
+    questionKeys: row.questionKeys.length > 0 ? row.questionKeys : recommendedKeys(row.platform),
     outcomes: outcomeViews,
+    observers: await readObservers(row.id),
     link: row.invite ? toLinkView(row.invite) : null,
+    identifiers: await identifiersForCreator(row.youtuberId),
   }
+}
+
+/**
+ * Platform a function recruits on
+ * @param {string} functionName - Function recruited for
+ * @return {RecruitmentPlatformName} - Platform
+ */
+
+const platformOf = (functionName: string): RecruitmentPlatformName =>
+  PLATFORM_OF_TRADE[tradeOfFunction(functionName)] ?? RecruitmentPlatforms.Discord
+
+/**
+ * Wall-clock minute of a stored date
+ * @param {Date} date - Stored date
+ * @return {string} - ISO minute
+ */
+
+const minuteOf = (date: Date): string => date.toISOString().slice(0, 16)
+
+/**
+ * Opening and closing days of a submitted period
+ * @param {FormValues} values - Parsed body
+ * @return {{ opensAt: Date | null, closesAt: Date | null }} - Days
+ */
+
+const readPeriod = (values: FormValues): { opensAt: Date | null; closesAt: Date | null } => {
+  const range = readDateRange(values, 'period')
+
+  return { opensAt: range?.[0] ?? null, closesAt: range?.[1] ?? null }
 }
 
 /**
@@ -626,9 +737,15 @@ export const createSession = async (
 ): Promise<RecruitmentSummary> => {
   const youtuberId = readText(values, 'youtuberId') ?? ''
   const functionId = readText(values, 'functionId') ?? ''
-  const opensAt = readDate(values, 'opensAt')
+  const { opensAt, closesAt } = readPeriod(values)
 
   if (!scope.isGlobal && !scope.youtuberIds.includes(youtuberId)) throw notFound()
+
+  const recruited = await prisma.jobFunction.findUniqueOrThrow({
+    where: { id: functionId },
+    select: { name: true },
+  })
+  const platform = platformOf(recruited.name)
 
   const templates = await prisma.recruitmentStepTemplate.findMany({
     where: trameFilter(youtuberId, functionId),
@@ -641,25 +758,35 @@ export const createSession = async (
   const academySession = await prisma.academySession.create({
     data: {
       functionId,
-      startsAt: readDate(values, 'closesAt') ?? opensAt ?? new Date(),
+      startsAt: closesAt ?? opensAt ?? new Date(),
       status: AcademySessionStatuses.Draft,
-      summary: readText(values, 'name'),
     },
+  })
+
+  // The campaign takes the title of the promotion it feeds
+  const name = sessionTitle({
+    function: { name: recruited.name },
+    number: (await sessionNumbers()).get(academySession.id) ?? 1,
   })
 
   const row = await prisma.recruitmentSession
     .create({
       data: {
-        name: readText(values, 'name') ?? '',
+        name,
         youtuberId,
         functionId,
         academySessionId: academySession.id,
+        platform,
+        questionKeys: recommendedKeys(platform),
         status: (readText(values, 'status') ?? RecruitmentStatuses.Draft) as RecruitmentStatusName,
         summary: readText(values, 'summary'),
         opensAt,
-        closesAt: readDate(values, 'closesAt'),
+        closesAt,
         responsables: {
           create: readList(values, 'responsableIds').map((accountId) => ({ accountId })),
+        },
+        observers: {
+          create: readList(values, 'observerIds').map((accountId) => ({ accountId })),
         },
         steps: {
           create: [
@@ -699,7 +826,7 @@ export const createSession = async (
       return rethrow(error)
     })
 
-  return toSummary(row, 0)
+  return toSummary(row, await sessionNumbers(), 0)
 }
 
 /**
@@ -717,22 +844,41 @@ export const updateSession = async (
 ): Promise<RecruitmentSummary> => {
   await reachableSession(id, scope)
 
+  const { opensAt, closesAt } = readPeriod(values)
+
+  // Observer seats kept keep their quota, dropped ones leave their interviews
+  const observerIds = readList(values, 'observerIds')
+  const dropped = { sessionId: id, accountId: { notIn: observerIds } }
+  const kept = await prisma.recruitmentObserver.findMany({
+    where: { sessionId: id, accountId: { in: observerIds } },
+    select: { accountId: true },
+  })
+  const keptIds = new Set(kept.map((seat) => seat.accountId))
+
   // The responsable seats are replaced wholesale
-  const [, , , row] = await prisma
+  const [, , , , , , row] = await prisma
     .$transaction([
       prisma.recruitmentSession.update({
         where: { id },
         data: {
-          name: readText(values, 'name') ?? undefined,
           status: (readText(values, 'status') ?? undefined) as RecruitmentStatusName | undefined,
           summary: readText(values, 'summary'),
-          opensAt: readDate(values, 'opensAt'),
-          closesAt: readDate(values, 'closesAt'),
+          opensAt,
+          closesAt,
         },
       }),
       prisma.recruitmentResponsable.deleteMany({ where: { sessionId: id } }),
       prisma.recruitmentResponsable.createMany({
         data: readList(values, 'responsableIds').map((accountId) => ({ sessionId: id, accountId })),
+      }),
+      prisma.recruitmentSeat.deleteMany({
+        where: { accountId: { notIn: observerIds }, candidate: { sessionId: id } },
+      }),
+      prisma.recruitmentObserver.deleteMany({ where: dropped }),
+      prisma.recruitmentObserver.createMany({
+        data: observerIds
+          .filter((accountId) => !keptIds.has(accountId))
+          .map((accountId) => ({ sessionId: id, accountId })),
       }),
       prisma.recruitmentSession.findUniqueOrThrow({ where: { id }, include: SUMMARY_INCLUDE }),
     ])
@@ -742,7 +888,7 @@ export const updateSession = async (
     where: { sessionId: id, attended: true },
   })
 
-  return toSummary(row, attended)
+  return toSummary(row, await sessionNumbers(), attended)
 }
 
 /**
@@ -784,8 +930,9 @@ export const removeSession = async (id: string, scope: AccessScope): Promise<voi
 // Relations every candidate read carries
 const CANDIDATE_INCLUDE = {
   recruiter: true,
-  spectators: { include: { account: true } },
+  observers: { include: { account: true } },
   comments: { orderBy: { createdAt: 'desc' }, include: { author: true } },
+  answers: true,
 } as const
 
 /**
@@ -839,7 +986,7 @@ export const createCandidate = async (
 ): Promise<CandidateView> => {
   await reachableSession(sessionId, scope)
 
-  const spectatorIds = readList(values, 'spectatorIds')
+  const observerIds = readList(values, 'observerIds')
   const last = await prisma.recruitmentCandidate.findFirst({
     where: { sessionId },
     orderBy: { position: 'desc' },
@@ -858,7 +1005,7 @@ export const createCandidate = async (
         interviewAt: readDate(values, 'interviewAt'),
         attended: readFlag(values, 'attended'),
         position: (last?.position ?? 0) + FORM_SETTINGS.positionStep,
-        spectators: { create: spectatorIds.map((accountId) => ({ accountId })) },
+        observers: { create: observerIds.map((accountId) => ({ accountId })) },
       },
     })
     .catch(rethrow)
@@ -883,7 +1030,7 @@ export const updateCandidate = async (
 ): Promise<CandidateView> => {
   await reachableCandidate(id, scope)
 
-  const spectatorIds = readList(values, 'spectatorIds')
+  const observerIds = readList(values, 'observerIds')
 
   await prisma.recruitmentCandidate
     .update({
@@ -897,9 +1044,9 @@ export const updateCandidate = async (
         interviewAt: readDate(values, 'interviewAt'),
         attended: readFlag(values, 'attended'),
         // The seats are replaced wholesale
-        spectators: {
+        observers: {
           deleteMany: {},
-          create: spectatorIds.map((accountId) => ({ accountId })),
+          create: observerIds.map((accountId) => ({ accountId })),
         },
       },
     })
@@ -1108,16 +1255,18 @@ export const createStep = async (
  * Read the session a step belongs to
  * @param {string} stepId - Step identifier
  * @param {AccessScope} scope - Perimeter
- * @return {Promise<void>} - Throws when out of perimeter
+ * @return {Promise<string>} - Session identifier
  */
 
-const reachableStep = async (stepId: string, scope: AccessScope): Promise<void> => {
+export const stepSession = async (stepId: string, scope: AccessScope): Promise<string> => {
   const row = await prisma.recruitmentStep.findFirst({
     where: { AND: [{ id: stepId }, { session: sessionScope(scope) }] },
-    select: { id: true },
+    select: { sessionId: true },
   })
 
   if (!row) throw notFound()
+
+  return row.sessionId
 }
 
 /**
@@ -1133,7 +1282,7 @@ export const updateStep = async (
   values: FormValues,
   scope: AccessScope
 ): Promise<RecruitmentStepView> => {
-  await reachableStep(id, scope)
+  await stepSession(id, scope)
 
   const row = await prisma.recruitmentStep.update({
     where: { id },
@@ -1163,7 +1312,7 @@ export const setStepDone = async (
   done: boolean,
   scope: AccessScope
 ): Promise<RecruitmentStepView> => {
-  await reachableStep(id, scope)
+  await stepSession(id, scope)
 
   const row = await prisma.recruitmentStep.update({
     where: { id },
@@ -1181,7 +1330,7 @@ export const setStepDone = async (
  */
 
 export const removeStep = async (id: string, scope: AccessScope): Promise<void> => {
-  await reachableStep(id, scope)
+  await stepSession(id, scope)
   await prisma.recruitmentStep.delete({ where: { id } })
 }
 

@@ -5,6 +5,7 @@
 
 export const RECRUITMENT_COPY = {
   title: 'Recrutements',
+  heroDescription: 'Les futures recrues & leurs suivis',
   lead: 'Une session par créateur et par fonction. L’annonce part dehors, les entretiens se tiennent sur Discord, tout ce qui compte se garde ici.',
   add: 'Ouvrir une session',
   groupOpen: 'En cours',
@@ -12,7 +13,6 @@ export const RECRUITMENT_COPY = {
   closesOn: 'Jusqu’au {date}',
   interviewsProgress: 'Entretiens passés',
   toSchedule: 'À planifier',
-  funnelTitle: 'Où en sont les candidats',
   noOutcomeLegend: 'Sans issue',
   groupFinished: 'Terminées',
   addTitle: 'Ouvrir une session de recrutement',
@@ -27,12 +27,18 @@ export const RECRUITMENT_COPY = {
   noYoutuber: 'Sans créateur',
   candidateCount: 'candidats',
 
+  logPicked: 'Questionnaire des entretiens',
+  logNoted: 'Prise de notes',
+  logRemoved: 'Candidat retiré de la session',
+  logStepRemoved: 'Étape retirée de la timeline',
+
   informationsTitle: 'Informations',
   infoStatus: 'Statut',
   infoSessionId: 'ID de session',
 
   tabCandidates: 'Candidats',
   tabQuestions: 'Questionnaire',
+  tabCalendar: 'Calendrier',
   tabTimeline: 'Timeline',
   tabResults: 'Résultats',
   tabInstructions: 'Consignes',
@@ -49,26 +55,16 @@ export const RECRUITMENT_COPY = {
   missed: 'Absent',
   noInterview: 'Entretien non posé',
   noRecruiter: 'Aucun recruteur',
-  spectatorsTitle: 'Spectateurs',
-  noSpectator: 'Aucun spectateur',
+  observersTitle: 'Observateurs',
+  noObserver: 'Aucun observateur',
   memberLinked: 'Déjà modérateur',
   openMember: 'Ouvrir la fiche',
 
-  commentsTitle: 'Commentaires',
-  commentAdd: 'Écrire un commentaire',
-  commented: 'Commenté',
-  commentsEmptyTitle: 'Aucun commentaire',
-  commentsEmptyDescription: 'Consigne ici ce que l’entretien a montré.',
-  commentDeleteTitle: 'Supprimer ce commentaire ?',
-  commentDeleteDescription: 'Il ne sera plus lisible par personne.',
+  calendarEmptyTitle: 'Aucun entretien posé',
+  calendarEmptyDescription: 'Les entretiens apparaissent ici dès qu’une date leur est donnée.',
 
-  questionsTitle: 'Questionnaire d’entretien',
-  questionsLead: 'La même trame pour tous les candidats de cette session.',
-  questionsEmptyTitle: 'Aucune question',
-  questionsEmptyDescription:
-    'Déclare les questions depuis la configuration pour ce créateur et cette fonction.',
-  questionsConfigure: 'Ouvrir la configuration',
-
+  attachedAcademy: 'Academy rattachée',
+  instructionsPlaceholder: 'Écris ce que les recruteurs doivent savoir avant les entretiens.',
   timelineTitle: 'Timeline de la session',
   timelineLead: 'Posée depuis la trame déclarée en configuration, puis tenue à la main.',
   stepAdd: 'Ajouter une étape',
@@ -109,11 +105,12 @@ export const RECRUITMENT_FIELD_COPY = {
   name: 'Nom de la session',
   youtuber: 'YouTubeur',
   jobFunction: 'Fonction',
+  platform: 'Plateforme',
   status: 'État',
   responsables: 'Responsables',
+  observers: 'Observateurs',
   summary: 'Résumé',
-  opensAt: 'Ouverture',
-  closesAt: 'Clôture',
+  period: 'Période',
   instructions: 'Consignes',
 
   discordId: 'Identifiant Discord',
@@ -122,13 +119,12 @@ export const RECRUITMENT_FIELD_COPY = {
     'Le nom sous lequel sa fiche est pré-remplie dans Modérateurs s’il est accepté. Il le confirme lui-même dans son formulaire d’intégration.',
   formId: 'Identifiant du formulaire',
   recruiter: 'Recruteur',
-  spectators: 'Spectateurs',
+  observer: 'Observateur',
+  observerQuota: 'Entretiens observables',
   interviewAt: 'Date de l’entretien',
   attended: 'Présence',
   outcome: 'Issue',
   review: 'Bilan',
-
-  comment: 'Commentaire',
 
   prompt: 'Question',
   hint: 'Précision',
@@ -161,4 +157,51 @@ export const RECRUITMENT_FILTER_COPY = {
   allFunctions: 'Toutes les fonctions',
   outcome: 'Issue',
   allOutcomes: 'Toutes les issues',
+} as const
+
+/**
+ * Wording of the toast naming a session
+ * @type {{ label: string, gender: 'feminine' }}
+ */
+
+export const RECRUITMENT_ENTITY = { label: 'Session', gender: 'feminine' } as const
+
+// Where the stored waiting role slips in
+export const WAITING_ROLE_PLACEHOLDER = '{waitingRole}'
+
+/**
+ * Copy and layout of the weekly interview planning
+ * @type {Record<string, string>}
+ */
+
+export const PLANNING_COPY = {
+  previousWeek: 'Semaine précédente',
+  nextWeek: 'Semaine suivante',
+  copyText: 'Copier l’annonce',
+  showAnnouncement: 'Afficher l’annonce',
+  includeImage: 'Inclure l’image',
+  editTitle: 'Modification',
+  previewLabel: 'Aperçu',
+  author: 'Memora',
+  restore: 'Restaurer l’annonce générique',
+  copyImage: 'Copier l’image',
+  textCopied: 'Annonce copiée',
+  imageCopied: 'Image copiée, colle-la sous l’annonce',
+  imageFailed: 'Image impossible à copier',
+  previewTitle: 'Annonce',
+  weekEmpty: 'Aucun entretien cette semaine',
+  waitingFallback: '@En attente de passage',
+  newIdentifierTitle: 'Nouveaux identifiants',
+  newIdentifierHint: 'Enregistre-les pour que les annonces affichent leur nom.',
+  identifierName: 'Nom',
+  identifierSave: 'Enregistrer',
+  announcement: [
+    `**Bonsoir à toutes et à tous** ${WAITING_ROLE_PLACEHOLDER},`,
+    'Nous revenons vers vous pour vous annoncer le **Planning de la semaine**.',
+    '',
+    'Pensez à être présent **5 minutes avant votre entretien**.',
+    'Gardez en tête que le planning peut ne pas être complet. Si vous voyez votre nom, c’est que l’horaire a été **finalisé**.',
+    '',
+    'Merci de respecter vos horaires !',
+  ].join('\n'),
 } as const
