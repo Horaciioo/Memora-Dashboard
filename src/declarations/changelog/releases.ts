@@ -129,7 +129,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
     version: '0.4.0',
     date: '2026-10-14',
-    title: 'Les Recrutements & l’Academy débarquent !',
+    title: 'Responsive, Recrutements & Academy débarquent !',
     intro:
       'Tu suis chaque candidat et chaque junior de bout en bout, et tout ce qui se planifie arrive dans le calendrier.',
     description:
@@ -249,6 +249,27 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.academy,
         permission: Permissions.AcademyNoteRead,
         text: 'Ajout de la possibilité de mentionner des personnes dans les commentaires d’une session ou d’un junior',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la possibilité d’ouvrir le menu d’un élément par un appui long sur téléphone',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        text: 'Ajout, sur téléphone, d’une feuille de filtres et du balayage pour changer de période dans le « Calendrier »',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de colonnes repliables dans les tableaux sur téléphone',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de l’affichage sur téléphone et sur tablette : bannières, grilles, fenêtres, accueil et raccourcis s’adaptent à la taille de l’écran',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la navigation sur téléphone : le menu, la barre du haut et les options de page sont repensés, avec des zones tactiles plus grandes',
       },
       {
         tag: ChangelogTags.Improved,
