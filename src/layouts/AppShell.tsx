@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { WindowFrame } from '@/components/structures/WindowFrame'
 import { MobileHold } from '@/components/structures/MobileHold'
+import { BrandSplash } from '@/composites/splash/BrandSplash'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
@@ -57,6 +58,7 @@ export const AppShell = ({
 }: AppShellProps) => {
   return (
     <RailSlotProvider>
+      <BrandSplash />
       {/* A visit reset on the server starts over, a visit under way is left alone */}
       <TourProvider key={String(tour !== null && !tour.isIntroSeen)} initial={tour}>
         <AppShellFrame
