@@ -21,12 +21,11 @@ export const teardown = async (): Promise<number> => {
     () => prisma.juniorNote.deleteMany({ where: OWN }),
     () => prisma.juniorSkill.deleteMany({ where: OWN }),
     () => prisma.academyReview.deleteMany({ where: OWN }),
-    () => prisma.academyStep.deleteMany({ where: OWN }),
     () => prisma.integrationClaim.deleteMany({ where: OWN }),
     () => prisma.integrationInvite.deleteMany({ where: OWN }),
     () => prisma.recruitmentComment.deleteMany({ where: OWN }),
     () =>
-      prisma.recruitmentSpectator.deleteMany({
+      prisma.recruitmentSeat.deleteMany({
         where: { candidateId: { startsWith: FIXTURE_PREFIX } },
       }),
     () => prisma.recruitmentCandidate.deleteMany({ where: OWN }),
@@ -65,7 +64,6 @@ export const teardown = async (): Promise<number> => {
     () => prisma.trainingBlock.deleteMany({ where: OWN }),
     () => prisma.trainingChapter.deleteMany({ where: OWN }),
     () => prisma.training.deleteMany({ where: OWN }),
-    () => prisma.pimStepTemplate.deleteMany({ where: OWN }),
     () => prisma.skill.deleteMany({ where: OWN }),
     () => prisma.skillCategory.deleteMany({ where: OWN }),
     () => prisma.dispositif.deleteMany({ where: OWN }),

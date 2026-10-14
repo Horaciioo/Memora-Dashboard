@@ -2,6 +2,7 @@ import { INTEGRATION_STEP } from '@/declarations/recruitment/outcomes'
 import { prisma, fx, fxDiscordId } from '../lib/client.ts'
 import { day, plusMinutes } from '../lib/dates.ts'
 import { between, chance, pick, sample, token, weighted } from '../lib/random.ts'
+import { CANDIDATE_NAMES } from '../data/roster.ts'
 import type { FunctionKey } from '../data/roster.ts'
 import {
   CANDIDATE_COMMENTS,
@@ -267,8 +268,6 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
       )
     }
 
-    await writePrepSteps(reference, promotion.id, startsAt, sessionTrainers)
-
     // Candidates
     const candidates = await writeCandidates({
       campaignId: campaign.id,
@@ -277,7 +276,7 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
       juniors,
       recruiters: recruiters.length > 0 ? recruiters : leads,
       commenters: [...leads, ...recruiters],
-      spectators: cast.moderators.filter(
+      observers: cast.moderators.filter(
         (person) => person.creators.includes(creator.id) && person.status === 'ACTIVE'
       ),
       outcome,
@@ -409,41 +408,6 @@ const writeJunior = async (
   })
 
   const validator = trainer ?? trainers[0] ?? null
-
-  // Timeline
-  const templates = reference.pimTemplates.filter((template) => template.stage !== 'PREPARATION')
-  await prisma.academyStep.createMany({
-    data: templates.map((template) => {
-      const scheduledAt =
-        template.anchor === 'DAY'
-          ? day(Math.round((startsAt.getTime() - Date.now()) / 86_400_000) + template.offset, 20)
-          : null
-      const done =
-        isPast(template.stage as Stage, stage) ||
-        (template.anchor === 'LIVE' && liveCount >= template.offset)
-
-      return {
-        id: fx('academy-step'),
-        sessionId,
-        juniorId: id,
-        templateId: template.id,
-        title: template.title,
-        notes: `Étape « ${template.title} ».`,
-        stage: template.stage as Stage,
-        anchor: template.anchor as 'DAY' | 'LIVE',
-        offset: template.offset,
-        owner: template.owner as 'RESPONSABLE' | 'FORMATEURS' | 'BOTH' | 'JUNIOR',
-        required: template.required,
-        scheduledAt,
-        doneAt: done ? (scheduledAt ?? plusMinutes(startsAt, template.offset * 1440)) : null,
-        validatedById: done && template.required ? (validator?.id ?? null) : null,
-        validatedAt:
-          done && template.required
-            ? (scheduledAt ?? plusMinutes(startsAt, template.offset * 1440))
-            : null,
-      }
-    }),
-  })
 
   // Voice check-ins of each review stage reached
   for (const reviewStage of ['REVIEW_ONE', 'REVIEW_FINAL'] as Stage[]) {
@@ -618,75 +582,6 @@ const writeAnswers = async (
 }
 
 /**
- * Session-wide preparation steps and a few free moments on the session thread
- * @return {Promise<void>} - Written
- */
-
-const writePrepSteps = async (
-  reference: Reference,
-  sessionId: string,
-  startsAt: Date,
-  trainers: Person[]
-): Promise<void> => {
-  const startOffset = Math.round((startsAt.getTime() - Date.now()) / 86_400_000)
-
-  await prisma.academyStep.createMany({
-    data: reference.pimTemplates
-      .filter((template) => template.stage === 'PREPARATION')
-      .map((template) => {
-        const scheduledAt = day(startOffset + template.offset, 20)
-
-        return {
-          id: fx('academy-step'),
-          sessionId,
-          templateId: template.id,
-          title: template.title,
-          stage: 'PREPARATION' as const,
-          anchor: template.anchor as 'DAY' | 'LIVE',
-          offset: template.offset,
-          owner: template.owner as 'RESPONSABLE' | 'FORMATEURS' | 'BOTH' | 'JUNIOR',
-          required: template.required,
-          scheduledAt,
-          doneAt: scheduledAt < new Date() ? scheduledAt : null,
-        }
-      }),
-  })
-
-  if (startOffset > 0) return
-
-  const kinds = [
-    'FORMATION',
-    'BILAN_VOCAL',
-    'ENTREVUE',
-    'POINT_RESPONSABLE',
-    'SESSION_TRAVAIL',
-  ] as const
-  await prisma.academyStep.createMany({
-    data: Array.from({ length: between(3, 6) }, () => {
-      const kind = pick(kinds)
-      const scheduledAt = day(startOffset + between(0, Math.min(35, -startOffset + 10)), 20)
-
-      return {
-        id: fx('academy-step'),
-        sessionId,
-        authorId: trainers.length > 0 ? pick(trainers).id : null,
-        kind,
-        title: {
-          FORMATION: 'Formation collective',
-          BILAN_VOCAL: 'Bilan vocal de groupe',
-          ENTREVUE: 'Entrevue individuelle',
-          POINT_RESPONSABLE: 'Point avec le responsable',
-          SESSION_TRAVAIL: 'Session de travail sur les cas pratiques',
-        }[kind],
-        scheduledAt,
-        doneAt: scheduledAt < new Date() ? scheduledAt : null,
-        notes: 'Compte rendu partagé dans le salon des formateurs.',
-      }
-    }),
-  })
-}
-
-/**
  * Write the candidates of one campaign
  * @return {Promise<string[]>} - Discord identifiers of the candidates
  */
@@ -698,7 +593,7 @@ const writeCandidates = async (input: {
   juniors: Person[]
   recruiters: Person[]
   commenters: Person[]
-  spectators: Person[]
+  observers: Person[]
   outcome: (name: string) => string
   nextIndex: () => number
 }): Promise<string[]> => {
@@ -740,6 +635,7 @@ const writeCandidates = async (input: {
         id: fx('candidate'),
         sessionId: input.campaignId,
         discordId,
+        displayName: isJunior ? null : pick(CANDIDATE_NAMES),
         formId: `FORM-${String(between(100, 999))}`,
         recruiterId: recruiter?.id ?? null,
         outcomeId: outcome(name),
@@ -747,8 +643,8 @@ const writeCandidates = async (input: {
         attended: interviewAt !== null && interviewAt < new Date() && name !== 'Désisté',
         review: interviewAt && interviewAt < new Date() ? pick(CANDIDATE_REVIEWS) : '',
         position: position * POSITION_STEP,
-        spectators: {
-          create: sample(input.spectators, interviewed ? between(0, 2) : 0).map((person) => ({
+        observers: {
+          create: sample(input.observers, interviewed ? between(0, 2) : 0).map((person) => ({
             accountId: person.id,
           })),
         },

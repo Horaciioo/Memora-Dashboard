@@ -5,7 +5,6 @@ import { CREATORS, type FunctionKey } from '../data/roster.ts'
 import {
   DISPOSITIFS,
   EVENT_TEMPLATES,
-  PIM_STEPS,
   PLATFORMS,
   RECRUITMENT_QUESTIONS,
   SKILLS,
@@ -30,15 +29,6 @@ export interface Reference {
   templates: { id: string; name: string; kind: string; accent: string | null }[]
   dispositifs: string[]
   skills: { id: string; functionId: string | null }[]
-  pimTemplates: {
-    id: string
-    title: string
-    stage: string
-    anchor: string
-    offset: number
-    owner: string
-    required: boolean
-  }[]
   trainings: {
     id: string
     functionId: string | null
@@ -226,26 +216,6 @@ export const seedReference = async (): Promise<Reference> => {
     }
   }
 
-  const pimTemplates: Reference['pimTemplates'] = []
-  for (const [position, step] of PIM_STEPS.entries()) {
-    const row = await ensure(
-      () =>
-        prisma.pimStepTemplate.findFirst({
-          where: { title: step.title, functionId: null, dispositifId: null },
-        }),
-      () =>
-        prisma.pimStepTemplate.create({
-          data: {
-            id: fx('pim-template'),
-            ...step,
-            description: `Étape « ${step.title} ».`,
-            position,
-          },
-        })
-    )
-    pimTemplates.push(row)
-  }
-
   const trainings: Reference['trainings'] = []
   for (const [position, seed] of TRAININGS.entries()) {
     const functionId = seed.functionKey ? functions[seed.functionKey as FunctionKey].id : null
@@ -393,7 +363,6 @@ export const seedReference = async (): Promise<Reference> => {
     templates,
     dispositifs,
     skills,
-    pimTemplates,
     trainings,
     outcomes,
     levels,
