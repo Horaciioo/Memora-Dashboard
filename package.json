@@ -11,6 +11,7 @@
     "release": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/versioning/release.ts",
     "promote": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/versioning/promote.ts",
     "start": "next start",
+    "status:dev": "STATUS_DATA_FILE=.next/status-state.json STATUS_APP_URL=http://127.0.0.1:3000/api/sante STATUS_DATABASE_ADDRESS=127.0.0.1:5432 STATUS_CACHE_ADDRESS=127.0.0.1:6379 node --disable-warning=ExperimentalWarning status/server.ts",
     "lint": "eslint .",
     "type-check": "yarn openapi:generate && tsc --noEmit",
     "comments:trim": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/comments/trim.ts",
