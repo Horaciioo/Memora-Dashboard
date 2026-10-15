@@ -102,3 +102,36 @@ export const reportFailure = async (
     error: failure,
   }).catch(() => undefined)
 }
+
+// Refusals worth a trace
+const REFUSALS = {
+  [ErrorCodes.InsufficientPermissions]: 'AccessDenied',
+  [ErrorCodes.RateLimited]: 'RateLimited',
+} as const
+
+/**
+ * Keep a refused request in the journal
+ * @param {NextRequest} request - Refused request
+ * @param {string | null} actorId - Signed-in member
+ * @param {unknown} error - Thrown value
+ * @return {Promise<void>} - Recorded
+ */
+
+export const reportRefusal = async (
+  request: NextRequest,
+  actorId: string | null,
+  error: unknown
+): Promise<void> => {
+  const code = toAppError(error).code
+  if (!(code in REFUSALS)) return
+
+  const route = `${request.method} ${request.nextUrl.pathname}`
+  if (isRecent(`${code} ${actorId ?? ''} ${route}`)) return
+
+  await recordEvent({
+    eventType: REFUSALS[code as keyof typeof REFUSALS],
+    origin: 'System',
+    actorId,
+    summary: route,
+  }).catch(() => undefined)
+}

@@ -67,6 +67,11 @@ export const EVENT_TYPES = createEnumeration({
   AcademyEdited: { id: 58, label: 'Promotion modifiée' },
   AcademyLaunched: { id: 59, label: 'PIM lancée' },
   JuniorRemoved: { id: 60, label: 'Junior retiré' },
+  LoginFailed: { id: 61, label: 'Connexion refusée' },
+  AccessDenied: { id: 62, label: 'Accès refusé' },
+  RateLimited: { id: 63, label: 'Rythme limité' },
+  DataExported: { id: 64, label: 'Données exportées' },
+  JobFailed: { id: 65, label: 'Tâche de fond échouée' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids
@@ -86,3 +91,29 @@ export const EVENT_ORIGINS = createEnumeration({
 
 export type EventOriginName = keyof typeof EVENT_ORIGINS.ids
 export type EventOriginId = (typeof EVENT_ORIGINS.ids)[EventOriginName]
+
+/**
+ * Journal severity enumeration
+ * @type {Enumeration<EnumerationSource>}
+ */
+
+export const LOG_LEVELS = createEnumeration({
+  Info: { id: 0, label: 'Information' },
+  Warning: { id: 1, label: 'Alerte' },
+  Error: { id: 2, label: 'Erreur' },
+})
+
+export type LogLevelName = keyof typeof LOG_LEVELS.ids
+
+/**
+ * Severity of events above info
+ * @type {Partial<Record<EventTypeName, LogLevelName>>}
+ */
+
+export const EVENT_LEVELS: Partial<Record<EventTypeName, LogLevelName>> = {
+  ErrorRaised: 'Error',
+  JobFailed: 'Error',
+  LoginFailed: 'Warning',
+  AccessDenied: 'Warning',
+  RateLimited: 'Warning',
+}

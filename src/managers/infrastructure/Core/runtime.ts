@@ -7,6 +7,7 @@ import { bindLiveTransport, deliverLive } from '@/core/lib/lives/bus'
 import type { LiveEnvelope } from '@/core/lib/lives/bus'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
 import { markRemindersScheduled, runReminderSweep } from '@/core/services/calendar/attendance'
+import { recordEvent } from '@/core/services/system/ActivityService'
 import { runMaintenance } from '@/core/services/system/MaintenanceService'
 import { startLiveWatcher } from '@/core/services/lives/LiveWatcher'
 import { LIVE_WORKER_MODES, liveWorkerMode } from '@/declarations/lives/worker'
@@ -95,6 +96,26 @@ const wireCipher = (container: Sharding): void => {
   logger.info('[runtime] secrets are encrypted at rest')
 }
 
+// Failed run kept in the journal
+const journalFailure = async (name: string, run: () => Promise<unknown>): Promise<void> => {
+  try {
+    await run()
+  } catch (error) {
+    await recordEvent({
+      eventType: 'JobFailed',
+      origin: 'Scheduler',
+      summary: name,
+      error: {
+        message: error instanceof Error ? error.message.split('\n')[0] : String(error),
+        route: name,
+        trace: error instanceof Error ? error.stack : undefined,
+      },
+    }).catch(() => undefined)
+
+    throw error
+  }
+}
+
 /**
  * Declare what each queue runs. Handlers are registered before the queues load
  * @param {Sharding} container - Infrastructure container
@@ -104,16 +125,12 @@ const wireCipher = (container: Sharding): void => {
 const registerJobs = (container: Sharding): void => {
   container.queues.register({
     queueName: 'maintenance',
-    process: async () => {
-      await runMaintenance()
-    },
+    process: () => journalFailure('maintenance', runMaintenance),
   })
 
   container.queues.register({
     queueName: 'reminders',
-    process: async () => {
-      await runReminderSweep()
-    },
+    process: () => journalFailure('reminders', runReminderSweep),
   })
 }
 

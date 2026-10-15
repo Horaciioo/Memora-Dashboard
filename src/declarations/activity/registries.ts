@@ -215,6 +215,16 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     verb: 'rencontré',
     target: 'une erreur',
   },
+  LoginFailed: { label: 'Connexion', tone: 'warning', verb: 'refusé', target: 'une connexion' },
+  AccessDenied: { label: 'Accès', tone: 'warning', verb: 'refusé', target: 'un accès' },
+  RateLimited: { label: 'Limite', tone: 'warning', verb: 'ralenti', target: 'des requêtes' },
+  DataExported: {
+    label: 'Export',
+    tone: 'info',
+    verb: 'exporté',
+    target: 'ses données personnelles',
+  },
+  JobFailed: { label: 'Erreur', tone: 'danger', verb: 'échoué', target: 'une tâche de fond' },
 }
 
 export const ACTIVITY_EVENT_REGISTRY = createRegistry(ACTIVITY_EVENT_MAP)

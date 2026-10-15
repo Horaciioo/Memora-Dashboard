@@ -1895,6 +1895,12 @@ model ActivityLog {
   targetId   String?
   summary    String
   payload    Json?
+  // 0 info, 1 warning, 2 error
+  level      Int      @default(0)
+  // Where the request came from
+  ip         String?
+  userAgent  String?
+  route      String?
   createdAt  DateTime @default(now())
 
   actor   Account? @relation("LogActor", fields: [actorId], references: [id], onDelete: SetNull)
@@ -1903,6 +1909,9 @@ model ActivityLog {
   @@index([subjectId, createdAt])
   @@index([targetType, targetId])
   @@index([eventType])
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([level, createdAt])
   @@map("activity_logs")
 }
 
