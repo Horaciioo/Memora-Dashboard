@@ -72,3 +72,35 @@ export interface JobStats {
   isPaused: boolean
   hasWorker: boolean
 }
+
+/**
+ * One finished or running job
+ * @typedef {Object} JobRun
+ * @property {string} id - Job ID
+ * @property {'completed' | 'failed' | 'active'} state - Outcome
+ * @property {number} startedAt - Epoch ms
+ * @property {number | null} finishedAt - Epoch ms
+ * @property {number} attempts - Attempts made
+ * @property {string | null} reason - Failure message
+ */
+
+export interface JobRun {
+  id: string
+  state: 'completed' | 'failed' | 'active'
+  startedAt: number
+  finishedAt: number | null
+  attempts: number
+  reason: string | null
+}
+
+/**
+ * Queue detail
+ * @typedef {Object} JobOverview
+ * @property {JobRun[]} runs - Latest runs, newest first
+ * @property {number | null} nextRun - Epoch ms of the next schedule
+ */
+
+export interface JobOverview {
+  runs: JobRun[]
+  nextRun: number | null
+}

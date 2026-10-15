@@ -15,6 +15,7 @@ export const API_ROUTES = {
   openSessions: '/api/parametres/sessions',
   openSession: (id: string) => `/api/parametres/sessions/${id}`,
   personalExport: '/api/parametres/export',
+  retryJob: (name: string) => `/api/systeme/files/${name}`,
   journalExport: (query: string) => `/api/journaux?${query}`,
   seenRelease: '/api/parametres/nouveautes',
   seenGuide: '/api/parametres/guides',

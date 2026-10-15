@@ -1,7 +1,7 @@
 import { COMPONENTS, COPY, HEALTH_LEVELS, SETTINGS } from './declarations.ts'
 import type { Health } from './declarations.ts'
-import { dayHealth, uptimePercent } from './store.ts'
-import type { Incident, StatusState } from './store.ts'
+import { dayHealth, uptimePercent } from './history.ts'
+import type { Incident, StatusState } from './history.ts'
 import { STYLES } from './styles.ts'
 
 // Date in the display zone

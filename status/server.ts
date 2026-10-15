@@ -3,7 +3,8 @@ import { createServer } from 'node:http'
 import { COMPONENTS, SETTINGS } from './declarations.ts'
 import { renderPage } from './page.ts'
 import { probe } from './probes.ts'
-import { loadState, recordCheck, saveState } from './store.ts'
+import { recordCheck } from './history.ts'
+import { loadState, saveState } from './store.ts'
 
 const state = loadState()
 
@@ -29,7 +30,12 @@ const server = createServer((request, response) => {
 
   if (request.url === '/api/status') {
     response.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' })
-    response.end(JSON.stringify(state))
+    response.end(
+      JSON.stringify({
+        ...state,
+        meta: COMPONENTS.map(({ id, label, lead }) => ({ id, label, lead })),
+      })
+    )
     return
   }
 

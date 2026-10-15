@@ -72,6 +72,7 @@ export const EVENT_TYPES = createEnumeration({
   RateLimited: { id: 63, label: 'Rythme limité' },
   DataExported: { id: 64, label: 'Données exportées' },
   JobFailed: { id: 65, label: 'Tâche de fond échouée' },
+  JobRetried: { id: 66, label: 'Tâche de fond relancée' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

@@ -688,3 +688,52 @@ export const JOURNAL_TABLE_STYLES = {
   factLabel: 'font-bold uppercase text-[var(--color-ink-subtle)]',
   factValue: 'min-w-0 break-words text-[var(--color-ink)]',
 } as const
+
+/**
+ * Service history styles
+ * @type {Record<string, string>}
+ */
+
+export const STATUS_HISTORY_STYLES = {
+  list: 'flex flex-col divide-y divide-[var(--color-border)]',
+  service: 'flex flex-col gap-2 py-3 first:pt-0 last:pb-0',
+  head: 'flex flex-wrap items-center justify-between gap-2',
+  name: 'text-sm font-medium',
+  lead: 'text-xs text-[var(--color-ink-subtle)]',
+  meta: 'flex items-center gap-3',
+  mono: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
+  bars: 'flex h-7 gap-px',
+  bar: 'min-w-px flex-1 rounded-[2px]',
+  foot: 'flex justify-between text-xs text-[var(--color-ink-subtle)]',
+  incident: 'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-2 text-sm',
+  incidentWhen: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Colour of a day bar per health
+ * @type {Record<'up' | 'degraded' | 'down' | 'none', string>}
+ */
+
+export const STATUS_BAR_COLOURS = {
+  up: 'bg-[var(--color-success)]',
+  degraded: 'bg-[var(--color-warning)]',
+  down: 'bg-[var(--color-danger)]',
+  none: 'bg-[var(--color-border-strong)]',
+} as const
+
+/**
+ * Daily bars styles
+ * @type {Record<string, string>}
+ */
+
+export const DAILY_BARS_STYLES = {
+  chart: 'flex h-32 items-end gap-1',
+  column: 'group relative flex h-full min-w-0 flex-1 items-end',
+  bar: 'w-full rounded-t-[3px] bg-[var(--color-brand-500)] transition-colors group-hover:bg-[var(--color-brand-700)]',
+  empty: 'w-full border-b border-dashed border-[var(--color-border-strong)]',
+  axis: 'mt-1 flex justify-between text-xs tabular-nums text-[var(--color-ink-subtle)]',
+  split: 'grid gap-6 md:grid-cols-2',
+  share: 'flex items-center justify-between gap-3 py-2 text-sm',
+  track: 'h-1.5 w-24 overflow-hidden rounded-full bg-[var(--color-surface-sunken)]',
+  fill: 'h-full rounded-full bg-[var(--color-brand-500)]',
+} as const

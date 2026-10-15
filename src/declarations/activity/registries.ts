@@ -225,6 +225,12 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     target: 'ses données personnelles',
   },
   JobFailed: { label: 'Erreur', tone: 'danger', verb: 'échoué', target: 'une tâche de fond' },
+  JobRetried: {
+    label: 'Relance',
+    tone: 'info',
+    verb: 'relancé',
+    target: 'les tâches de fond échouées',
+  },
 }
 
 export const ACTIVITY_EVENT_REGISTRY = createRegistry(ACTIVITY_EVENT_MAP)

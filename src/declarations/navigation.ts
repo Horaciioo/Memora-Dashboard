@@ -65,7 +65,7 @@ export const ROUTES = {
   journal: '/systeme/journaux',
   queues: '/systeme/files',
   probes: '/systeme/sondes',
-  analytics: '/systeme/ga4',
+  analytics: '/systeme/activite',
 } as const
 
 // The three faces of the rail
@@ -435,7 +435,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   journaux: 'Journaux',
   files: 'Files de jobs',
   sondes: 'Sondes',
-  ga4: 'GA4',
+  activite: 'Activité',
 }
 
 /**

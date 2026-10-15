@@ -65,14 +65,15 @@ export const JournalFilters = ({ actors }: JournalFiltersProps) => {
     emptyLabel: string,
     options: { value: string; label: string }[]
   ) => (
-    <SelectMenu
-      className={JOURNAL_TABLE_STYLES.select}
-      label={label}
-      emptyLabel={emptyLabel}
-      options={options}
-      value={params.get(key) ?? ''}
-      onChange={(value) => apply(key, value)}
-    />
+    <div className={JOURNAL_TABLE_STYLES.select}>
+      <SelectMenu
+        label={label}
+        emptyLabel={emptyLabel}
+        options={options}
+        value={params.get(key) ?? ''}
+        onChange={(value) => apply(key, value)}
+      />
+    </div>
   )
 
   return (
@@ -111,16 +112,17 @@ export const JournalFilters = ({ actors }: JournalFiltersProps) => {
         JOURNAL_COPY.allActors,
         actors.map((actor) => ({ value: actor.id, label: actor.name }))
       )}
-      <SelectMenu
-        className={JOURNAL_TABLE_STYLES.select}
-        label={JOURNAL_COPY.periodLabel}
-        options={Object.entries(JOURNAL_PERIODS).map(([value, period]) => ({
-          value,
-          label: period.label,
-        }))}
-        value={params.get(JOURNAL_PARAMS.period) ?? JOURNAL_DEFAULT_PERIOD}
-        onChange={(value) => apply(JOURNAL_PARAMS.period, value)}
-      />
+      <div className={JOURNAL_TABLE_STYLES.select}>
+        <SelectMenu
+          label={JOURNAL_COPY.periodLabel}
+          options={Object.entries(JOURNAL_PERIODS).map(([value, period]) => ({
+            value,
+            label: period.label,
+          }))}
+          value={params.get(JOURNAL_PARAMS.period) ?? JOURNAL_DEFAULT_PERIOD}
+          onChange={(value) => apply(JOURNAL_PARAMS.period, value)}
+        />
+      </div>
       <Button onClick={reset}>{JOURNAL_COPY.reset}</Button>
       <JournalExport />
     </div>
