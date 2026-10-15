@@ -77,6 +77,16 @@ services:
         condition: service_healthy
     networks: [internal]
 
+  # Own container and file, keeps answering when the app is down
+  status:
+    build:
+      context: ..
+      dockerfile: status/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - status-data:/data
+    networks: [internal]
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -85,16 +95,18 @@ services:
       - '443:443'
     environment:
       DOMAIN: ${DOMAIN}
+      STATUS_DOMAIN: ${STATUS_DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
-    depends_on: [app]
+    depends_on: [app, status]
     networks: [internal]
 
 volumes:
   db18-data:
   redis-data:
+  status-data:
   caddy-data:
   caddy-config:
 
