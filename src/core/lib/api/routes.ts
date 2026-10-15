@@ -15,6 +15,7 @@ export const API_ROUTES = {
   openSessions: '/api/parametres/sessions',
   openSession: (id: string) => `/api/parametres/sessions/${id}`,
   personalExport: '/api/parametres/export',
+  journalExport: (query: string) => `/api/journaux?${query}`,
   seenRelease: '/api/parametres/nouveautes',
   seenGuide: '/api/parametres/guides',
   twitchLink: '/api/connexion/twitch',

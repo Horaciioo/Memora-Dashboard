@@ -664,3 +664,27 @@ export const MEMBER_ADMIN = {
   // Sanction drawer fields
   form: 'flex flex-col gap-5',
 } as const
+
+/**
+ * Admin journal styles
+ * @type {Record<string, string>}
+ */
+
+export const JOURNAL_TABLE_STYLES = {
+  filters: 'flex flex-wrap items-center gap-2',
+  search: 'min-w-56 flex-1',
+  select: 'w-48',
+  list: 'flex flex-col',
+  head: 'hidden grid-cols-[11rem_6rem_12rem_10rem_1fr] gap-3 border-b border-[var(--color-border)] px-4 py-2 text-xs font-bold uppercase text-[var(--color-ink-subtle)] lg:grid',
+  row: 'border-b border-[var(--color-border)] last:border-b-0',
+  summary:
+    'grid cursor-pointer list-none grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-1 px-4 py-2.5 text-sm hover:bg-[var(--color-hover)] lg:grid-cols-[11rem_6rem_12rem_10rem_1fr]',
+  moment: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
+  cell: 'min-w-0 truncate text-[var(--color-ink)]',
+  muted: 'min-w-0 truncate text-[var(--color-ink-subtle)]',
+  detail:
+    'flex flex-col gap-2 border-t border-dashed border-[var(--color-border)] bg-[var(--color-surface-sunken)] px-4 py-3 text-xs',
+  facts: 'grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1',
+  factLabel: 'font-bold uppercase text-[var(--color-ink-subtle)]',
+  factValue: 'min-w-0 break-words text-[var(--color-ink)]',
+} as const
