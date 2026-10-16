@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Checkbox } from '@/components/elements/forms/Toggle'
+import { Checkbox } from '@/components/elements/forms/inputs/Toggle'
 import { MODVIEW_INSPECT_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_INSPECT } from '@/declarations/ui/variants'
 

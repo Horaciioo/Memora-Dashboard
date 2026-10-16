@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { HISTORY_CONSENT } from '@/declarations/system/privacy'
+import { HISTORY_CONSENT } from '@/declarations/system/security/privacy'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import type { SessionUser } from '@/types/auth'
 import { EVENT_ORIGINS, EVENT_TYPES } from '@/utils/constants/events'

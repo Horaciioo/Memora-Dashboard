@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { SessionsPanel } from '@/composites/academy/SessionsPanel'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { listSessions, sessionFields } from '@/core/services/academy/AcademyService'

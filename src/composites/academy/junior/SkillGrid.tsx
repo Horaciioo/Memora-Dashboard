@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { Status } from '@/components/elements/display/Status'
-import { PercentSlider } from '@/components/elements/forms/PercentSlider'
+import { PercentSlider } from '@/components/elements/forms/inputs/PercentSlider'
 import { groupSkills } from '@/core/lib/academy/skillGroups'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'

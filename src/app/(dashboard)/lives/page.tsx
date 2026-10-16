@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { LivesBoard } from '@/composites/lives/LivesBoard'
 import Link from '@/components/elements/navigation/AppLink'
 
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { listOpenLives, listPastLives, liveFields } from '@/core/services/lives/LiveService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'

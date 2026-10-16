@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 
 import { TwitchStage } from '@/composites/recruitment/exercise/TwitchStage'
 import { DiscordReplica } from '@/composites/replicas/discord/DiscordReplica'
-import { useDiscordScene } from '@/core/hooks/interaction/useDiscordScene'
+import { useDiscordScene } from '@/core/hooks/interaction/scenes/useDiscordScene'
 import { discordScene, twitchLines } from '@/core/lib/recruitment/contextScene'
 import type { WrittenContext } from '@/declarations/recruitment/questionnaire'
 import { EXERCISE_PUBLIC_COPY } from '@/declarations/recruitment/exerciseCopy'

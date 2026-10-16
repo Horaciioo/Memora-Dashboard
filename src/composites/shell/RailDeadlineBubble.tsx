@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-import { useBeaconRect } from '@/core/hooks/interaction/useBeaconRect'
+import { useBeaconRect } from '@/core/hooks/interaction/layout/useBeaconRect'
 import { routeBeacon } from '@/declarations/ui/beacons'
 import { DEADLINE_BUBBLE } from '@/declarations/ui/variants'
 

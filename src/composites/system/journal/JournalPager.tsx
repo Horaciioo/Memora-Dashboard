@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Pagination } from '@/components/elements/navigation/Pagination'
-import { JOURNAL_PARAMS } from '@/declarations/system/journal'
+import { JOURNAL_PARAMS } from '@/declarations/system/monitoring/journal'
 
 export interface JournalPagerProps {
   page: number

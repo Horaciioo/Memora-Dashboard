@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/elements/actions/Button'
 import { Status } from '@/components/elements/display/Status'
-import { ScrollCard } from '@/components/structures/ScrollCard'
+import { ScrollCard } from '@/components/structures/data/ScrollCard'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'
 import { objectivesUnlocked } from '@/core/lib/academy/objectives'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'

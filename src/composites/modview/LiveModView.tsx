@@ -2,8 +2,8 @@
 
 import { ModView } from '@/composites/modview/ModView'
 import type { ModViewLiveTools } from '@/composites/modview/ModView'
-import { useLiveModView } from '@/core/hooks/data/useLiveModView'
-import { useModViewPresence } from '@/core/hooks/interaction/useModViewPresence'
+import { useLiveModView } from '@/core/hooks/data/lives/useLiveModView'
+import { useModViewPresence } from '@/core/hooks/interaction/scenes/useModViewPresence'
 import type { IconName } from '@/declarations/ui/icons'
 import type { LiveView } from '@/types/lives'
 import type { SanctionPanelView } from '@/types/sanctions'

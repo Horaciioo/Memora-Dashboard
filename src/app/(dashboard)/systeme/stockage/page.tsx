@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
-import { Section } from '@/components/structures/Section'
+import { PageHeader } from '@/components/structures/page/PageHeader'
+import { Section } from '@/components/structures/page/Section'
 import { ConsoleMetrics } from '@/composites/system/ConsoleMetrics'
 import { LargestFiles } from '@/composites/system/LargestFiles'
 import { StoragePanel } from '@/composites/system/StoragePanel'

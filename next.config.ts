@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs'
 
 import type { NextConfig } from 'next'
 
-import { stageOfBranch } from './scripts/versioning/versions'
-import { STATIC_SECURITY_HEADERS } from './src/declarations/system/securityHeaders'
+import { stageOfBranch } from './src/scripts/versioning/versions'
+import { STATIC_SECURITY_HEADERS } from './src/declarations/system/security/securityHeaders'
 import { displayVersion } from './src/utils/format/version'
 
 // Single version source

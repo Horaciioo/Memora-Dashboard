@@ -3,7 +3,10 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { decisionEffect } from '@/core/lib/academy/parkour'
 import { decideReview } from '@/core/services/academy/AcademyService'
 import { academyScope } from '@/core/services/academy/AcademyScope'
-import { applyDecision, readThirdPeriodDeadline } from '@/core/services/academy/ParkourService'
+import {
+  applyDecision,
+  readThirdPeriodDeadline,
+} from '@/core/services/academy/parkour/ParkourService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { notify } from '@/core/services/system/NotificationService'
 import { ReviewAdvices, ReviewStatuses } from '@/utils/constants/hierarchy'

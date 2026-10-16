@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 
-import { AddRow } from '@/components/structures/AddRow'
-import { FormDrawer } from '@/components/structures/FormDrawer'
-import { useMutation } from '@/core/hooks/data/useMutation'
+import { AddRow } from '@/components/structures/inline/AddRow'
+import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
+import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { apiDelete, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { CHANNEL_COPY } from '@/declarations/platforms/copy'

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { PageBanner } from '@/components/structures/PageBanner'
+import { PageBanner } from '@/components/structures/page/PageBanner'
 import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { TaskFile } from '@/composites/work/TaskFile'
 import { readRecordActivity } from '@/core/services/system/ActivityService'

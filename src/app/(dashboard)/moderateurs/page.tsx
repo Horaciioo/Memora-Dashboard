@@ -1,6 +1,6 @@
 import { forbidden } from 'next/navigation'
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { MembersPanel } from '@/composites/members/MembersPanel'
 import { rowsToOptions } from '@/core/lib/forms/options'
 import { listMembers, memberFields } from '@/core/services/members/MemberService'

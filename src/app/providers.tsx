@@ -22,7 +22,9 @@ import type { SessionUser } from '@/types/auth'
 // Overlay
 const NotificationsToaster = dynamic(
   () =>
-    import('@/components/structures/NotificationsToaster').then((mod) => mod.NotificationsToaster),
+    import('@/components/structures/overlays/NotificationsToaster').then(
+      (mod) => mod.NotificationsToaster
+    ),
   { ssr: false }
 )
 

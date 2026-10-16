@@ -1,7 +1,7 @@
 'use client'
 
-import { Checkbox } from '@/components/elements/forms/Toggle'
-import { Section } from '@/components/structures/Section'
+import { Checkbox } from '@/components/elements/forms/inputs/Toggle'
+import { Section } from '@/components/structures/page/Section'
 import { DoneCourses } from '@/composites/academy/junior/DoneCourses'
 import { JuniorLives } from '@/composites/academy/junior/JuniorLives'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'

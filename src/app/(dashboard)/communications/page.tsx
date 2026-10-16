@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { AnnouncementsList } from '@/composites/work/AnnouncementsList'
 import { listAnnouncements } from '@/core/services/work/AnnouncementService'
 import { workViewer } from '@/core/services/work/visibility'

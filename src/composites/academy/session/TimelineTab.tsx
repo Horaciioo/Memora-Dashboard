@@ -1,6 +1,6 @@
 'use client'
 
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { PromotionTimeline } from '@/composites/academy/timeline/PromotionTimeline'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { forbidden, notFound } from 'next/navigation'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { MemberFileTabs } from '@/composites/members/MemberFileTabs'
 import { readMemberModeration } from '@/core/services/lives/MemberModerationService'
 import {

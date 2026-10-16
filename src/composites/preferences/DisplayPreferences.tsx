@@ -1,7 +1,7 @@
 'use client'
 
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { useAppearanceStore } from '@/core/store/appearance'
 import { useColorVisionStore } from '@/core/store/colorVision'
 import { useThemeStore } from '@/core/store/theme'

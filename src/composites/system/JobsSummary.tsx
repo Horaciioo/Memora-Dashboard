@@ -1,6 +1,6 @@
 import { Status } from '@/components/elements/display/Status'
 import type { QueueReport } from '@/core/services/system/QueueReportService'
-import { CONSOLE_COPY } from '@/declarations/system/console'
+import { CONSOLE_COPY } from '@/declarations/system/monitoring/console'
 import { CONSOLE_BLOCK } from '@/declarations/ui/blocks'
 import { formatDayTime } from '@/utils/format/dates'
 

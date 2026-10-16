@@ -12,7 +12,7 @@ import {
 } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
 
-import { useLongPress } from '@/core/hooks/interaction/useLongPress'
+import { useLongPress } from '@/core/hooks/interaction/gestures/useLongPress'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 import { MENU_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'

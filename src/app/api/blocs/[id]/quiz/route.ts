@@ -5,7 +5,7 @@ import {
   assertQuizOpenToJunior,
   quizFields,
   submitQuiz,
-} from '@/core/services/academy/TrainingContentService'
+} from '@/core/services/academy/training/TrainingContentService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({

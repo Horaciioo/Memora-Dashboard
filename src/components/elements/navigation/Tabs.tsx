@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { useBannerHost } from '@/core/hooks/interaction/useBannerHost'
+import { useBannerHost } from '@/core/hooks/interaction/layout/useBannerHost'
 import { PAGE_TABS_HOST_ID } from '@/declarations/ui/banners'
 import { TABS_STYLES } from '@/declarations/ui/variants'
 import { ICONS, type IconName } from '@/declarations/ui/icons'

@@ -1,6 +1,6 @@
 'use client'
 
-import { Dialog } from '@/components/structures/Dialog'
+import { Dialog } from '@/components/structures/overlays/Dialog'
 import { AccountActions } from '@/composites/shell/AccountActions'
 import { CreatorPicker } from '@/composites/shell/CreatorPicker'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'

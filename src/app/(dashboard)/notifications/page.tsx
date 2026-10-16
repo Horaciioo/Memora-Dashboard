@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { NotificationsBoard } from '@/composites/notifications/NotificationsBoard'
 import { readNotifications } from '@/core/services/system/NotificationService'
 import { requireUser } from '@/core/wrappers/requireUser'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { RailSearchGlyph } from '@/components/elements/display/RailGlyphs'
+import { RailSearchGlyph } from '@/components/elements/display/glyphs/RailGlyphs'
 import { CommandPalette } from '@/composites/search/CommandPalette'
 import { SEARCH_LAUNCHER } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'

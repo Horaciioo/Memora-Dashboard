@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from '@/components/elements/navigation/AppLink'
 
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { LiveReportView } from '@/composites/lives/LiveReportView'
 import { readLiveReport } from '@/core/services/lives/LiveReportService'
 import { requirePermission } from '@/core/wrappers/requireUser'

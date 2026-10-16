@@ -1,14 +1,17 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { PageHeader } from '@/components/structures/PageHeader'
-import { CourseCatalog } from '@/composites/academy/course/CourseCatalog'
-import { TrainingsWelcome } from '@/composites/academy/course/TrainingsWelcome'
+import { PageHeader } from '@/components/structures/page/PageHeader'
+import { CourseCatalog } from '@/composites/academy/course/catalog/CourseCatalog'
+import { TrainingsWelcome } from '@/composites/academy/course/catalog/TrainingsWelcome'
 import { hasSeenGuide } from '@/core/services/preferences/GuideService'
 import { COURSE_SURFACE_REGISTRY } from '@/declarations/academy/registries'
 import { GUIDE_KEYS } from '@/declarations/academy/welcome'
 import { TrainingsPanel } from '@/composites/academy/TrainingsPanel'
 import { myTrainings, resolveOwnJunior } from '@/core/services/academy/AcademyService'
-import { hasNewSpecialisations, listCourses } from '@/core/services/academy/CurriculumService'
+import {
+  hasNewSpecialisations,
+  listCourses,
+} from '@/core/services/academy/training/CurriculumService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { ACADEMY_COPY, COURSE_COPY } from '@/declarations/academy/copy'
 import { isEncadrement } from '@/declarations/access/roles'

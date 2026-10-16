@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation'
 
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { KanbanBoard, type BoardColumn } from '@/components/structures/KanbanBoard'
-import { Section } from '@/components/structures/Section'
+import { KanbanBoard, type BoardColumn } from '@/components/structures/data/KanbanBoard'
+import { Section } from '@/components/structures/page/Section'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
 import {
   ANNOUNCEMENT_COPY,

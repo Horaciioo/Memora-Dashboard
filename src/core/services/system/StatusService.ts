@@ -4,7 +4,7 @@ import { dayHealth, uptimePercent } from '../../../../status/history.ts'
 import type { StatusState } from '../../../../status/history.ts'
 import { HEALTH_LEVELS, SETTINGS } from '../../../../status/declarations.ts'
 import type { Health } from '../../../../status/declarations.ts'
-import { STATUS_LINK } from '@/declarations/system/status'
+import { STATUS_LINK } from '@/declarations/system/monitoring/status'
 
 /**
  * One watched service

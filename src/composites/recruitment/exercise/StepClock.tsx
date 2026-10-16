@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react'
 
-import { useCountdown } from '@/core/hooks/interaction/useCountdown'
+import { useCountdown } from '@/core/hooks/interaction/state/useCountdown'
 import { EXERCISE_COPY } from '@/declarations/recruitment/exerciseCopy'
 import { EXERCISE_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'

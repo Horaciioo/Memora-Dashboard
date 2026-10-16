@@ -7,7 +7,7 @@ import {
   refuseConsent,
   type ConsentState,
 } from '@/app/(dashboard)/consentement/actions'
-import { HISTORY_CONSENT } from '@/declarations/system/privacy'
+import { HISTORY_CONSENT } from '@/declarations/system/security/privacy'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { CONSENT_STYLES } from '@/declarations/ui/variants'
 

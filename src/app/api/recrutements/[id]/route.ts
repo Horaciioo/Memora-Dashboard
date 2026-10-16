@@ -7,7 +7,7 @@ import {
   sessionFields,
   updateSession,
 } from '@/core/services/recruitment/RecruitmentService'
-import { afterRecruitmentClosed } from '@/core/services/academy/ParkourService'
+import { afterRecruitmentClosed } from '@/core/services/academy/parkour/ParkourService'
 import { summariseChange } from '@/core/services/system/changes'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { JOURNAL_FILES } from '@/core/services/system/FileJournal'

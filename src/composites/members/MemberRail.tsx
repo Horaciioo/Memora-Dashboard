@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { InlineText } from '@/components/structures/InlineText'
+import { InlineText } from '@/components/structures/inline/InlineText'
 import { FunctionEmblems, RoleGlyph } from '@/composites/members/MemberBadges'
 import { MEMBER_STATUS_REGISTRY } from '@/declarations/access/roles'
 import { ERASED_COPY } from '@/declarations/academy/parkour'

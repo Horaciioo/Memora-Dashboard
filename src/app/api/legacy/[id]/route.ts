@@ -1,6 +1,6 @@
 import { forbidden, invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { decideTrack, readTrack } from '@/core/services/academy/LegacyService'
+import { decideTrack, readTrack } from '@/core/services/academy/legacy/LegacyService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { LegacyStatuses } from '@/utils/constants/hierarchy'
 import type { LegacyStatusName } from '@/utils/constants/hierarchy'

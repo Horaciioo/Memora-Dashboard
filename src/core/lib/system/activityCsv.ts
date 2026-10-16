@@ -1,5 +1,5 @@
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
-import { JOURNAL_COPY } from '@/declarations/system/journal'
+import { JOURNAL_COPY } from '@/declarations/system/monitoring/journal'
 import { EVENT_TYPES, LOG_LEVELS } from '@/utils/constants/events'
 
 // Leading characters a spreadsheet reads as a formula

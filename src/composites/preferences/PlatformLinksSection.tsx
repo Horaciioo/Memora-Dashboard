@@ -3,9 +3,9 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { NetworkLogo } from '@/components/elements/display/NetworkLogo'
-import { Section } from '@/components/structures/Section'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
+import { NetworkLogo } from '@/components/elements/display/marks/NetworkLogo'
+import { Section } from '@/components/structures/page/Section'
 import { unlinkTwitchAccount } from '@/app/(dashboard)/parametres/actions'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { PLATFORM_ACCOUNT_COPY } from '@/declarations/platforms/copy'

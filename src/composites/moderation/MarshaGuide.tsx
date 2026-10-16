@@ -5,10 +5,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
-import { Input } from '@/components/elements/forms/Input'
+import { Input } from '@/components/elements/forms/inputs/Input'
 import { MarshaDetail, type MarshaViewer } from '@/composites/moderation/MarshaDetail'
-import { useMediaQuery } from '@/core/hooks/interaction/useBreakpoint'
-import { useCopy } from '@/core/hooks/interaction/useCopy'
+import { useMediaQuery } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import {
   MARSHA_CATEGORIES,
   MARSHA_RESOURCES,

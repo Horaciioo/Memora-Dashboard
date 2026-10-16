@@ -1,4 +1,4 @@
-import { RevealMark } from '@/components/elements/display/RevealMark'
+import { RevealMark } from '@/components/elements/display/marks/RevealMark'
 import { DEADLINE_COPY } from '@/declarations/work/copy'
 
 export interface OverdueMarkProps {

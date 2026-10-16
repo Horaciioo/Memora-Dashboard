@@ -4,8 +4,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import { Input } from '@/components/elements/forms/Input'
-import { SelectMenu } from '@/components/elements/forms/SelectMenu'
+import { Input } from '@/components/elements/forms/inputs/Input'
+import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { JournalExport } from '@/composites/system/journal/JournalExport'
 import {
   JOURNAL_COPY,
@@ -13,7 +13,7 @@ import {
   JOURNAL_LIMITS,
   JOURNAL_PARAMS,
   JOURNAL_PERIODS,
-} from '@/declarations/system/journal'
+} from '@/declarations/system/monitoring/journal'
 import { JOURNAL_TABLE_STYLES } from '@/declarations/ui/variants'
 import { EVENT_ORIGINS, EVENT_TYPES, LOG_LEVELS } from '@/utils/constants/events'
 

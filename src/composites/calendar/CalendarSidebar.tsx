@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import { BottomSheet } from '@/components/structures/BottomSheet'
-import { RailSearchGlyph } from '@/components/elements/display/RailGlyphs'
+import { BottomSheet } from '@/components/structures/overlays/BottomSheet'
+import { RailSearchGlyph } from '@/components/elements/display/glyphs/RailGlyphs'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { CalendarMiniMonth } from '@/composites/calendar/CalendarMiniMonth'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'

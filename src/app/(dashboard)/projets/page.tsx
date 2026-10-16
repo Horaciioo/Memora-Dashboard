@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { ProjectsBoard } from '@/composites/work/ProjectsBoard'
 import { listProjects, projectFields } from '@/core/services/work/ProjectService'
 import {

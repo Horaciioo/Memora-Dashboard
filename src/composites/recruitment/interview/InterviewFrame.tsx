@@ -1,7 +1,7 @@
 import { cn } from '@/utils/classnames'
 import type { CSSProperties, ReactNode } from 'react'
 
-import { MemoraMark } from '@/components/elements/display/MemoraMark'
+import { MemoraMark } from '@/components/elements/display/marks/MemoraMark'
 import { TOUR_SETTINGS } from '@/declarations/configurations/settings'
 import { QUESTIONNAIRE_COPY } from '@/declarations/recruitment/questionnaireCopy'
 import { INTERVIEW, TOUR_CHAT } from '@/declarations/ui/variants'

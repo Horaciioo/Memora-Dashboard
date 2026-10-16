@@ -5,7 +5,7 @@ import {
   ModeratorGlyph,
   ResponsableGlyph,
   type FrameTone,
-} from '@/components/elements/display/BrandGlyphs'
+} from '@/components/elements/display/glyphs/BrandGlyphs'
 import { FIXED_DIVISIONS } from '@/declarations/reference/fixed'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
 import type { LucideIcon } from '@/declarations/ui/icons'

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { useDebouncedValue } from '@/core/hooks/interaction/useDebouncedValue'
+import { useDebouncedValue } from '@/core/hooks/interaction/state/useDebouncedValue'
 import { apiGet } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { SEARCH_SETTINGS } from '@/declarations/configurations/settings'

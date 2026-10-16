@@ -3,14 +3,14 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { useComments, type CommentsState } from '@/core/hooks/data/useComments'
-import { useJuniorFile, type JuniorFileState } from '@/core/hooks/data/useJuniorFile'
+import { useComments, type CommentsState } from '@/core/hooks/data/work/useComments'
+import { useJuniorFile, type JuniorFileState } from '@/core/hooks/data/academy/useJuniorFile'
 import {
   useJuniorActions,
   usePromotionActions,
   type JuniorActions,
   type PromotionActions,
-} from '@/core/hooks/data/useParkourActions'
+} from '@/core/hooks/data/academy/useParkourActions'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { FSI_TABS } from '@/declarations/academy/guides'
 import type {

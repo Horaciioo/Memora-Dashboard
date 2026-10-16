@@ -1,6 +1,6 @@
 'use client'
 
-import { useViewSwitch } from '@/core/hooks/interaction/useViewSwitch'
+import { useViewSwitch } from '@/core/hooks/interaction/layout/useViewSwitch'
 import { SlideSwitch } from '@/components/elements/actions/SlideSwitch'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { VIEW_ROLES, VIEW_TINTS } from '@/declarations/access/views'

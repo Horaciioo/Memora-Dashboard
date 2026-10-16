@@ -1,6 +1,6 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
-import { removeAcademyComment } from '@/core/services/academy/CommentService'
+import { removeAcademyComment } from '@/core/services/academy/juniors/CommentService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const DELETE = createProtectedRoute({

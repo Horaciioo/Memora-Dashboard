@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'
 import { RESIGNABLE_PHASES } from '@/core/lib/academy/parkour'
 import { PARKOUR_COPY } from '@/declarations/academy/parkour'

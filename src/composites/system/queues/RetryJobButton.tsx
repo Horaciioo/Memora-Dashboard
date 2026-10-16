@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { QUEUES_COPY } from '@/declarations/system/queues'

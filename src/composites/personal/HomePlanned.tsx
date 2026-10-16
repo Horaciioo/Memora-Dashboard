@@ -1,7 +1,7 @@
 import Link from '@/components/elements/navigation/AppLink'
 
-import { Glyph } from '@/components/elements/display/Glyph'
-import { Section } from '@/components/structures/Section'
+import { Glyph } from '@/components/elements/display/glyphs/Glyph'
+import { Section } from '@/components/structures/page/Section'
 import { HOME_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'

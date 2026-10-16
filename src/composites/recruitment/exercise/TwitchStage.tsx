@@ -1,5 +1,5 @@
 import { ICONS } from '@/declarations/ui/icons'
-import { ChatFeed } from '@/composites/academy/course/ChatFeed'
+import { ChatFeed } from '@/composites/academy/course/player/ChatFeed'
 import type { ChatLine } from '@/declarations/academy/curriculum/types'
 import { EXERCISE_PUBLIC_COPY } from '@/declarations/recruitment/exerciseCopy'
 import { EXERCISE_PUBLIC } from '@/declarations/ui/variants'

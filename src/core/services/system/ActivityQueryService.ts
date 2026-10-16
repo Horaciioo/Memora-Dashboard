@@ -4,7 +4,7 @@ import { prisma } from '@/core/lib/db'
 import type { ActivityFilters } from '@/core/lib/system/activityFilters'
 import { toEntry } from '@/core/services/system/ActivityService'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
-import { JOURNAL_LIMITS, JOURNAL_PERIODS } from '@/declarations/system/journal'
+import { JOURNAL_LIMITS, JOURNAL_PERIODS } from '@/declarations/system/monitoring/journal'
 import { EVENT_ORIGINS, EVENT_TYPES, LOG_LEVELS } from '@/utils/constants/events'
 import type { Prisma } from '@prisma/client'
 

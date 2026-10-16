@@ -3,7 +3,7 @@
 import { Button } from '@/components/elements/actions/Button'
 import { TourBubble } from '@/composites/tour/TourBubble'
 import { TourSpotlight } from '@/composites/tour/TourSpotlight'
-import { useBeaconRect } from '@/core/hooks/interaction/useBeaconRect'
+import { useBeaconRect } from '@/core/hooks/interaction/layout/useBeaconRect'
 import { HOME_BEACON, routeBeacon } from '@/declarations/ui/beacons'
 import { TOUR_COPY } from '@/declarations/tour/copy'
 import { useTour } from '@/managers/front-end/TourManager'

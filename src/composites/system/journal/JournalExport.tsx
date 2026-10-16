@@ -7,7 +7,7 @@ import { apiGet } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { toActivityCsv } from '@/core/lib/system/activityCsv'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
-import { JOURNAL_COPY } from '@/declarations/system/journal'
+import { JOURNAL_COPY } from '@/declarations/system/monitoring/journal'
 
 /**
  * Download the filtered journal

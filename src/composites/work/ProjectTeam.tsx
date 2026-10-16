@@ -2,7 +2,7 @@
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
-import { SelectMenu } from '@/components/elements/forms/SelectMenu'
+import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { PROJECT_SETTINGS } from '@/declarations/configurations/settings'
 import { PROJECT_COPY } from '@/declarations/work/copy'
 import type { FieldOption } from '@/types/forms'

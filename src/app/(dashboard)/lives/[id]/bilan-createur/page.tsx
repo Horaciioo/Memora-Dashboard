@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 import { PrintButton } from '@/components/elements/actions/PrintButton'
-import { PageHeader } from '@/components/structures/PageHeader'
-import { Section } from '@/components/structures/Section'
+import { PageHeader } from '@/components/structures/page/PageHeader'
+import { Section } from '@/components/structures/page/Section'
 import { readLiveReport } from '@/core/services/lives/LiveReportService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'

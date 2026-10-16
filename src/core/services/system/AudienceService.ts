@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { AUDIENCE_COPY, AUDIENCE_WINDOWS } from '@/declarations/system/activity'
+import { AUDIENCE_COPY, AUDIENCE_WINDOWS } from '@/declarations/system/monitoring/activity'
 import { EVENT_ORIGINS, EVENT_TYPES } from '@/utils/constants/events'
 import { readDevice } from '@/utils/format/device'
 

@@ -1,7 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import type { ExerciseAnswer } from '@/core/lib/curriculum/scoring'
-import { submitExercise } from '@/core/services/academy/CurriculumService'
+import { submitExercise } from '@/core/services/academy/training/CurriculumService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 
 export const POST = createProtectedRoute({

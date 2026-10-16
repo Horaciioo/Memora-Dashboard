@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { AccessConsole } from '@/composites/access/AccessConsole'
 import { readAccessConsole } from '@/core/services/auth/AccessConsoleService'
 import { readActiveCreator } from '@/core/lib/auth/activeCreator'

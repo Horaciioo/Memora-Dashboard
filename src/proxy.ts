@@ -4,8 +4,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { isSessionTokenValid } from '@/core/lib/auth/getSession'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { readPublicOrigin } from '@/core/lib/http/origin'
-import { buildContentSecurityPolicy } from '@/declarations/system/contentSecurityPolicy'
-import { NONCE_HEADER } from '@/declarations/system/securityHeaders'
+import { buildContentSecurityPolicy } from '@/declarations/system/security/contentSecurityPolicy'
+import { NONCE_HEADER } from '@/declarations/system/security/securityHeaders'
 import { ROUTES } from '@/declarations/navigation'
 
 // Paths reachable

@@ -1,6 +1,6 @@
 import { AbsenceReason } from '@/components/elements/display/AbsenceReason'
-import { Section } from '@/components/structures/Section'
-import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
+import { Section } from '@/components/structures/page/Section'
+import { ActivityTimeline } from '@/components/structures/data/ActivityTimeline'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { MEMBER_FILE } from '@/declarations/ui/blocks'

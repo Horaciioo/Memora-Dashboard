@@ -1,4 +1,4 @@
-import { CoursePhoto } from '@/composites/academy/course/CoursePhoto'
+import { CoursePhoto } from '@/composites/academy/course/catalog/CoursePhoto'
 import { ACADEMY_COPY, COURSE_COPY } from '@/declarations/academy/copy'
 import { COURSE_SURFACE_REGISTRY } from '@/declarations/academy/registries'
 import { ICONS } from '@/declarations/ui/icons'

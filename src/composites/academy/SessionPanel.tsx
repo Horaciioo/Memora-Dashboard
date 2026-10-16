@@ -1,9 +1,9 @@
 'use client'
 
 import Link from '@/components/elements/navigation/AppLink'
-import { ActivityPanel } from '@/components/structures/ActivityPanel'
-import { FileHead } from '@/components/structures/FileHead'
-import { FileTabs } from '@/components/structures/FileTabs'
+import { ActivityPanel } from '@/components/structures/data/ActivityPanel'
+import { FileHead } from '@/components/structures/page/FileHead'
+import { FileTabs } from '@/components/structures/page/FileTabs'
 import { LaunchPimButton } from '@/composites/academy/LaunchPimButton'
 import { DecisionFlow } from '@/composites/academy/review/DecisionFlow'
 import { ReviewFlow } from '@/composites/academy/review/ReviewFlow'

@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import type { GlyphProps } from '@/components/elements/display/Glyphs'
+import type { GlyphProps } from '@/components/elements/display/glyphs/Glyphs'
 import {
   RailLiveGlyph,
   RailHomeGlyph,
@@ -23,7 +23,7 @@ import {
   RailSparkGlyph,
   RailBirthdayGlyph,
   RailCommunicationsGlyph,
-} from '@/components/elements/display/RailGlyphs'
+} from '@/components/elements/display/glyphs/RailGlyphs'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 
 /**

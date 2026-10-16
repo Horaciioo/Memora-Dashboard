@@ -1,6 +1,6 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
-import { openSecondPeriodAnyway } from '@/core/services/academy/ParkourService'
+import { openSecondPeriodAnyway } from '@/core/services/academy/parkour/ParkourService'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { PARKOUR_COPY } from '@/declarations/academy/parkour'
 import { Permissions } from '@/utils/constants/permissions'

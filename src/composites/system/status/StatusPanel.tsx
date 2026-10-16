@@ -1,6 +1,6 @@
 import { Status } from '@/components/elements/display/Status'
 import type { StatusReport } from '@/core/services/system/StatusService'
-import { STATUS_COPY } from '@/declarations/system/status'
+import { STATUS_COPY } from '@/declarations/system/monitoring/status'
 import { STATUS_BAR_COLOURS, STATUS_HISTORY_STYLES } from '@/declarations/ui/variants'
 import type { Tone } from '@/declarations/ui/theme'
 import { cn } from '@/utils/classnames'

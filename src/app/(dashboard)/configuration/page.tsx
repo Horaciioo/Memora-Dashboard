@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
-import { Section } from '@/components/structures/Section'
+import { PageHeader } from '@/components/structures/page/PageHeader'
+import { Section } from '@/components/structures/page/Section'
 import { ConsoleRow } from '@/composites/system/ConsoleRow'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ROUTES } from '@/declarations/navigation'

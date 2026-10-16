@@ -4,7 +4,7 @@ import {
   DiscordAvatar,
   DiscordReplicaMessage,
 } from '@/composites/replicas/discord/DiscordReplicaMessage'
-import { useTypewriter } from '@/core/hooks/interaction/useTypewriter'
+import { useTypewriter } from '@/core/hooks/interaction/scenes/useTypewriter'
 import { DISCORD_REPLICA_COPY } from '@/declarations/replicas/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'

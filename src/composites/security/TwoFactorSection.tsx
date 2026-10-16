@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import { Dialog } from '@/components/structures/Dialog'
-import { Section } from '@/components/structures/Section'
+import { Dialog } from '@/components/structures/overlays/Dialog'
+import { Section } from '@/components/structures/page/Section'
 import { TwoFactorPanel } from '@/composites/security/TwoFactorPanel'
 import { TWO_FACTOR_COPY } from '@/declarations/access/copy'
 import { SECURITY_LIST, TWO_FACTOR_BLOCK } from '@/declarations/ui/blocks'

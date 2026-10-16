@@ -2,7 +2,7 @@
 
 import Link from '@/components/elements/navigation/AppLink'
 import { usePathname } from 'next/navigation'
-import { useFreshRelease } from '@/core/hooks/data/useFreshRelease'
+import { useFreshRelease } from '@/core/hooks/data/system/useFreshRelease'
 import { ROUTES } from '@/declarations/navigation'
 import { BEACON_ATTRIBUTE, routeBeacon } from '@/declarations/ui/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'

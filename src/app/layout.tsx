@@ -6,7 +6,7 @@ import '@/styles/globals.css'
 import { ThemeScript } from '@/components/tools/ThemeScript'
 import { Providers } from '@/app/providers'
 import { getSession } from '@/core/lib/auth/getSession'
-import { NONCE_HEADER } from '@/declarations/system/securityHeaders'
+import { NONCE_HEADER } from '@/declarations/system/security/securityHeaders'
 import { APP_COMPANY, APP_DESCRIPTION, APP_FONTS, APP_NAME } from '@/declarations/app'
 import { DRAWER_DIMENSIONS, SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
 

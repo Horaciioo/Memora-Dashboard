@@ -1,7 +1,7 @@
 'use client'
 
 import { Status } from '@/components/elements/display/Status'
-import { PeriodTimeline } from '@/components/structures/PeriodTimeline'
+import { PeriodTimeline } from '@/components/structures/data/PeriodTimeline'
 import { JuniorStepActions } from '@/composites/academy/timeline/JuniorStepActions'
 import { toPeriodGroups } from '@/composites/academy/timeline/toPeriodGroups'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'

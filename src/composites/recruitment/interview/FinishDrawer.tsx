@@ -3,8 +3,8 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Textarea } from '@/components/elements/forms/Textarea'
-import { Drawer } from '@/components/structures/Drawer'
+import { Textarea } from '@/components/elements/forms/inputs/Textarea'
+import { Drawer } from '@/components/structures/overlays/Drawer'
 import { InterviewTally } from '@/composites/recruitment/interview/InterviewTally'
 import type { ResolvedQuestion } from '@/core/lib/recruitment/questionnaire'
 import { DELIBERATION_VERDICTS } from '@/declarations/recruitment/outcomes'

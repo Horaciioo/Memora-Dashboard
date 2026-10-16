@@ -1,6 +1,6 @@
 'use client'
 
-import { useViewSwitch } from '@/core/hooks/interaction/useViewSwitch'
+import { useViewSwitch } from '@/core/hooks/interaction/layout/useViewSwitch'
 import { NAVIGATION_VIEW_REGISTRY, VIEW_ROLES } from '@/declarations/access/views'
 import { ROLE_EMBLEMS } from '@/declarations/members/profiles'
 import { nextNavigationView } from '@/declarations/navigation'

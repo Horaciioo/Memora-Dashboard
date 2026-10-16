@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 
-import { SelectMenu } from '@/components/elements/forms/SelectMenu'
-import { Section } from '@/components/structures/Section'
+import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
+import { Section } from '@/components/structures/page/Section'
 import type { LiveLogLine } from '@/types/lives'
 import type { LiveReport } from '@/core/lib/lives/report'
 import {

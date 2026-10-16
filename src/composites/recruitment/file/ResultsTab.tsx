@@ -2,8 +2,8 @@
 
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { KanbanBoard, type BoardColumn } from '@/components/structures/KanbanBoard'
-import { Section } from '@/components/structures/Section'
+import { KanbanBoard, type BoardColumn } from '@/components/structures/data/KanbanBoard'
+import { Section } from '@/components/structures/page/Section'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { CANDIDATE_CARD } from '@/declarations/ui/variants'

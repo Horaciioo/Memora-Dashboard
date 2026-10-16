@@ -1,4 +1,4 @@
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
 import { groupByPage } from '@/declarations/changelog/helpers'
 import type { ChangelogCategory as CategoryLines } from '@/declarations/changelog/helpers'

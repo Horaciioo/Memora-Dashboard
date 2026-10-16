@@ -4,8 +4,14 @@ import { useRouter } from 'next/navigation'
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { useQuestionnaire, type Questionnaire } from '@/core/hooks/data/useQuestionnaire'
-import { useRecruitmentFile, type RecruitmentFile } from '@/core/hooks/data/useRecruitmentFile'
+import {
+  useQuestionnaire,
+  type Questionnaire,
+} from '@/core/hooks/data/recruitment/useQuestionnaire'
+import {
+  useRecruitmentFile,
+  type RecruitmentFile,
+} from '@/core/hooks/data/recruitment/useRecruitmentFile'
 import { ROUTES } from '@/declarations/navigation'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { QUESTIONNAIRE_COPY } from '@/declarations/recruitment/questionnaireCopy'

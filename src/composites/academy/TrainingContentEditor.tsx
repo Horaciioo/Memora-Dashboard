@@ -5,19 +5,19 @@ import { Status } from '@/components/elements/display/Status'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { AddRow } from '@/components/structures/AddRow'
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDrawer } from '@/components/structures/FormDrawer'
+import { AddRow } from '@/components/structures/inline/AddRow'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
+import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
-import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
-import { useTrainingContent } from '@/core/hooks/data/useTrainingContent'
+import { useEditGestures } from '@/core/hooks/interaction/gestures/useEditGestures'
+import { useDragAndDrop } from '@/core/hooks/interaction/gestures/useDragAndDrop'
+import { useTrainingContent } from '@/core/hooks/data/academy/useTrainingContent'
 import {
   blockFields,
   chapterFields,
   choiceFields,
   questionFields,
-} from '@/core/services/academy/trainingContentFields'
+} from '@/core/services/academy/training/trainingContentFields'
 import { TRAINING_CONTENT_COPY, TRAINING_CONTENT_FIELD_COPY } from '@/declarations/academy/copy'
 import { TRAINING_BLOCK_KIND_REGISTRY } from '@/declarations/academy/registries'
 import { ACTION_COPY } from '@/declarations/ui/copy'

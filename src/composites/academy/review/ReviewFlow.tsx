@@ -3,10 +3,10 @@
 import { useState } from 'react'
 
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
-import { Drawer } from '@/components/structures/Drawer'
-import { FormDrawer } from '@/components/structures/FormDrawer'
+import { Drawer } from '@/components/structures/overlays/Drawer'
+import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { SkillGrid } from '@/composites/academy/junior/SkillGrid'
-import { useReviewDesk } from '@/core/hooks/data/useReviewDesk'
+import { useReviewDesk } from '@/core/hooks/data/academy/useReviewDesk'
 import { reviewStageOf } from '@/core/lib/academy/parkour'
 import { flowStep } from '@/core/lib/academy/queues'
 import { PARKOUR_COPY } from '@/declarations/academy/parkour'

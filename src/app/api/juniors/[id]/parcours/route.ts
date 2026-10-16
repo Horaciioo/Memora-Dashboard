@@ -2,7 +2,11 @@ import { forbidden, invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { juniorAccount } from '@/core/services/academy/AcademyService'
-import { declareKickoff, readParkour, resignJunior } from '@/core/services/academy/ParkourService'
+import {
+  declareKickoff,
+  readParkour,
+  resignJunior,
+} from '@/core/services/academy/parkour/ParkourService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { PARKOUR_COPY } from '@/declarations/academy/parkour'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'

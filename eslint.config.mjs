@@ -2,7 +2,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import nextVitals from 'eslint-config-next/core-web-vitals'
 import nextTs from 'eslint-config-next/typescript'
 
-import commentStyle from './eslint-rules/comment-style.mjs'
+import commentStyle from './src/scripts/lint/comment-style.mjs'
 
 const eslintConfig = defineConfig([
   ...nextVitals,

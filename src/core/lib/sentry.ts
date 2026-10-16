@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 
 import { APP_ENVIRONMENT } from '@/declarations/system/environments'
-import { SENTRY_SETTINGS, SCRUBBED_KEYS } from '@/declarations/system/reporting'
+import { SENTRY_SETTINGS, SCRUBBED_KEYS } from '@/declarations/system/monitoring/reporting'
 
 /**
  * Sentry availability

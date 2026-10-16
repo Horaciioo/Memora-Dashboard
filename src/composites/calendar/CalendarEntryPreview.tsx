@@ -2,7 +2,7 @@
 
 import { createPortal } from 'react-dom'
 
-import { Glyph } from '@/components/elements/display/Glyph'
+import { Glyph } from '@/components/elements/display/glyphs/Glyph'
 import { CALENDAR_SOURCE_REGISTRY } from '@/declarations/calendar/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import { accentPaint } from '@/declarations/ui/theme'

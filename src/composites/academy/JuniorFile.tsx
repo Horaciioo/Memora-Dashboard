@@ -4,9 +4,9 @@ import Link from '@/components/elements/navigation/AppLink'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Status } from '@/components/elements/display/Status'
-import { ActivityPanel } from '@/components/structures/ActivityPanel'
-import { FileHead } from '@/components/structures/FileHead'
-import { FileTabs } from '@/components/structures/FileTabs'
+import { ActivityPanel } from '@/components/structures/data/ActivityPanel'
+import { FileHead } from '@/components/structures/page/FileHead'
+import { FileTabs } from '@/components/structures/page/FileTabs'
 import { JuniorDrawers } from '@/composites/academy/junior/JuniorDrawers'
 import {
   JuniorFileProvider,

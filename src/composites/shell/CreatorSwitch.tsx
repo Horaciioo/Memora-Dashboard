@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { CreatorPicker } from '@/composites/shell/CreatorPicker'
-import { useOutsideDismiss } from '@/core/hooks/interaction/useOutsideDismiss'
+import { useOutsideDismiss } from '@/core/hooks/interaction/layout/useOutsideDismiss'
 import { VIEW_COPY } from '@/declarations/access/copy'
 import { CREATOR_SWITCH } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'

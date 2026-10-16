@@ -6,7 +6,7 @@ import { pruneSessions } from '@/core/services/auth/SessionService'
 import { purgeModerationLog } from '@/core/services/lives/ModerationLogService'
 import { pruneOrphanFiles } from '@/core/services/system/FileService'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
-import { RETENTION_POLICIES } from '@/declarations/system/privacy'
+import { RETENTION_POLICIES } from '@/declarations/system/security/privacy'
 
 // Milliseconds in one day
 const DAY_MS = 86_400_000

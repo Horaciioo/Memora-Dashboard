@@ -1,6 +1,6 @@
 'use client'
 
-import { useCopy } from '@/core/hooks/interaction/useCopy'
+import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { FIELD_COPY } from '@/declarations/ui/copy'
 import { cn } from '@/utils/classnames'
 

@@ -1,5 +1,5 @@
-import { RATE_LIMIT_REGISTRY, RATE_LIMIT_SCOPES } from '@/declarations/system/rateLimits'
-import type { RateLimitName, RateLimitPolicy } from '@/declarations/system/rateLimits'
+import { RATE_LIMIT_REGISTRY, RATE_LIMIT_SCOPES } from '@/declarations/system/security/rateLimits'
+import type { RateLimitName, RateLimitPolicy } from '@/declarations/system/security/rateLimits'
 
 /**
  * Outcome of one attempt

@@ -1,5 +1,5 @@
 import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
-import { COURSE_PANEL } from '@/declarations/ui/variants/course'
+import { COURSE_PANEL } from '@/declarations/ui/variants/courses/course'
 
 /**
  * Questionnaire planner of a recruitment session

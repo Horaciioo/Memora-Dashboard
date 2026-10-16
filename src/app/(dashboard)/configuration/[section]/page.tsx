@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { ReferenceManager } from '@/composites/reference/ReferenceManager'
 import { applyRestrictions } from '@/core/lib/forms/restrictions'
 import { referenceResource } from '@/core/services/reference/ReferenceService'

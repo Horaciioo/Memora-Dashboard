@@ -1,7 +1,7 @@
 import { commentFields } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
-import { addJuniorComment } from '@/core/services/academy/CommentService'
+import { addJuniorComment } from '@/core/services/academy/juniors/CommentService'
 import { notifyMentions } from '@/core/services/system/NotificationService'
 import { juniorTargetId } from '@/declarations/notifications/targets'
 import { Permissions } from '@/utils/constants/permissions'

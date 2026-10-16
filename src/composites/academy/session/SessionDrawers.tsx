@@ -1,7 +1,7 @@
 'use client'
 
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDrawer } from '@/components/structures/FormDrawer'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
+import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { useSessionState } from '@/composites/academy/session/SessionFileContext'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'

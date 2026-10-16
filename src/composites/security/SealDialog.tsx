@@ -1,6 +1,6 @@
 'use client'
 
-import { Dialog } from '@/components/structures/Dialog'
+import { Dialog } from '@/components/structures/overlays/Dialog'
 import { TwoFactorPanel } from '@/composites/security/TwoFactorPanel'
 import { TWO_FACTOR_COPY } from '@/declarations/access/copy'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'

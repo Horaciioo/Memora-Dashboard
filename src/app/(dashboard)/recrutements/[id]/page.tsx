@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { PageBanner } from '@/components/structures/PageBanner'
+import { PageBanner } from '@/components/structures/page/PageBanner'
 import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { RecruitmentFile } from '@/composites/recruitment/RecruitmentFile'
 import { loadRecruitment } from '@/core/services/recruitment/FileLoader'

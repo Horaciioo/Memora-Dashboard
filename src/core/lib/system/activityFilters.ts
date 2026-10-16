@@ -3,8 +3,8 @@ import {
   JOURNAL_LIMITS,
   JOURNAL_PARAMS,
   JOURNAL_PERIODS,
-} from '@/declarations/system/journal'
-import type { JournalPeriod } from '@/declarations/system/journal'
+} from '@/declarations/system/monitoring/journal'
+import type { JournalPeriod } from '@/declarations/system/monitoring/journal'
 import { EVENT_ORIGINS, EVENT_TYPES, LOG_LEVELS } from '@/utils/constants/events'
 import type { EventOriginName, EventTypeName, LogLevelName } from '@/utils/constants/events'
 
