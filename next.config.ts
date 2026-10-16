@@ -12,7 +12,7 @@ const { version } = JSON.parse(
 ) as { version: string }
 
 // Branch decides the stage
-const deployedBranch = process.env.APP_ENV || process.env.VERCEL_GIT_COMMIT_REF || ''
+const deployedBranch = process.env.APP_ENV || ''
 
 const nextConfig: NextConfig = {
   // Second dev server
