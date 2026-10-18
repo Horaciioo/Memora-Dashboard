@@ -127,6 +127,192 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.5.0',
+    date: '2026-10-18',
+    title: 'Encore et toujours des améliorations',
+    intro:
+      'La Mod View s’organise comme tu l’entends, les bilans de live racontent enfin la soirée, et tes pages préférées sont à un clic.',
+    description:
+      'Jusqu’ici, la Mod View imposait la même disposition à tout le monde, le bilan d’un live se résumait à quelques chiffres et les annonces ne s’écrivaient que depuis un projet. Cette version laisse chaque poste ranger ses fenêtres, donne aux bilans de quoi comparer et exporter, et fait des « Communications » un vrai tableau de travail. Elle prépare aussi le terrain à l’équipe d’administration, avec un journal qui se filtre et des pages d’état branchées sur le réel.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la possibilité de mettre une page en favori depuis l’étoile de sa bannière : trois favoris au plus, retrouvés dans le menu de gauche sous « Favoris »',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout du chemin de la page ouverte sous sa destination dans le menu de gauche, pour remonter d’un niveau en un clic',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.preferences,
+        text: 'Ajout du mode « Achromatopsie » aux modes de vision des couleurs, qui lit tout Memora en gris',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.announcements,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CommunicationWrite,
+        text: 'Ajout de la possibilité d’écrire une annonce directement dans « Communications », sans projet, avec un statut : prévue, en cours d’écriture, écrite, publiée ou annulée',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.announcements,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CommunicationWrite,
+        text: 'Ajout de la possibilité de sélectionner plusieurs annonces, au clic avec Ctrl ou Maj ou en traçant un rectangle, pour les modifier ou les supprimer d’un coup',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.announcements,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CommunicationRead,
+        text: 'Ajout de filtres par projet, plateforme et statut dans « Communications », avec les annonces publiées et annulées repliées par défaut',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de la possibilité de ranger les fenêtres de la « Mod View » en colonnes : glisser-déposer, redimensionnement, repli, plein écran et affichage fenêtre par fenêtre depuis « Paramètres »',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une disposition de départ propre à chaque poste de la « Mod View » : Modérateur, Formateur, Responsable et Admin, mémorisée séparément',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de l’onglet « Surveillance » à côté de la file AutoMod, pour suivre des viewers à part',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.SanctionRead,
+        text: 'Ajout d’une « Suggestion » dans le « Panel de sanctions » : la commande à copier selon la catégorie AutoMod et le palier suivant',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.SanctionRead,
+        text: 'Ajout de l’« Historique des sanctions » sous les infractions du « Panel de sanctions », avec une poignée pour ajuster la place de chaque moitié',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une section « Dossier » dans la fiche d’un viewer : ses paliers de sanction sur les 90 derniers jours, chez ce créateur',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveFocus,
+        text: 'Ajout d’un panneau « Équipe » dans la colonne de gauche de la « Mod View » : un clic sur un modérateur, ou « Entrer en mode Focus » au clic droit, pour le suivre',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de la possibilité d’afficher les lives passés depuis le menu « … » de « Live en cours »',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveLogRead,
+        text: 'Ajout de graphes et d’une comparaison aux cinq lives précédents dans le « Bilan » d’un live',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveLogRead,
+        text: 'Ajout de la courbe d’audience du live dans le « Bilan », relevée toutes les minutes pendant la diffusion',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveLogRead,
+        text: 'Ajout de la possibilité d’exporter un « Bilan » en CSV, en JSON ou en PDF',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.LiveCreatorReport,
+        text: 'Amélioration du « Bilan » du créateur : il s’ouvre depuis la liste des lives passés, sous le nom « Bilan » comme celui de l’équipe, avec les mêmes graphes et exports',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de « Live en cours » : les lives se rangent en deux sections, « En direct » et « À venir »',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la « Mod View » : plus de barre du haut, une colonne d’icônes à gauche avec le retour à l’Accueil et les « Paramètres », et un flux plus grand par défaut',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la fenêtre du flux : un live hors ligne affiche « Déconnecté(e) » avec le nom du créateur',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.announcements,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CommunicationRead,
+        text: 'Amélioration de « Communications » : une annonce se réécrit en place, dans une barre de message Discord, et chaque propriété se modifie sur la carte',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.home,
+        text: 'Amélioration de l’« Accueil » : les évènements prévus le même jour se regroupent sous un seul libellé',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.preferences,
+        text: 'Amélioration des modes de vision des couleurs : chaque aperçu montre le fond du cadre et les couleurs d’état de son mode',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.journal,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.AccessManage,
+        text: 'Amélioration du « Journal » : des filtres, une recherche, une pagination et un export CSV, avec l’adresse, la requête et la gravité de chaque entrée',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.administration,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.AccessManage,
+        text: 'Amélioration de « Administration », « Files de jobs », « Sondes », « Stockage » et « Activité » : ces pages affichent l’état réel du service, et une tâche échouée peut être relancée',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        text: 'Correction d’un bug qui décalait l’heure des évènements dans les calendriers selon le fuseau horaire',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.announcements,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CommunicationRead,
+        text: 'Correction d’un bug qui laissait les modérateurs ouvrir « Communications » malgré un accès réservé aux Responsables',
+      },
+    ],
+    comments: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        text: 'La « Mod View » reste en cours de construction : dis-nous ce qui te manque ou te gêne dans ta disposition.',
+      },
+    ],
+  },
+  {
     version: '0.4.0',
     date: '2026-10-14',
     title: 'Responsive, Recrutements & Academy débarquent !',
