@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/page/PageHeader'
 import { LivesBoard } from '@/composites/lives/LivesBoard'
-import { listOpenLives, listPastLives, liveFields } from '@/core/services/lives/LiveService'
+import { listOpenLives, listPastLives } from '@/core/services/lives/LiveService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { LIVE_COPY } from '@/declarations/lives/copy'
@@ -21,9 +21,8 @@ export default async function LivesPage() {
   const canAnnounce = access.can(Permissions.LiveAnnounce)
   const canReadLogs = access.can(Permissions.LiveLogRead)
 
-  const [lives, fields, past] = await Promise.all([
+  const [lives, past] = await Promise.all([
     listOpenLives(perimeter, session.id, session.permissions),
-    canAnnounce ? liveFields(perimeter) : Promise.resolve([]),
     // Past lives, shown on demand
     canReadLogs
       ? listPastLives(perimeter, session.id, session.permissions, LIVE_SETTINGS.pastLives)
@@ -35,7 +34,6 @@ export default async function LivesPage() {
       <PageHeader title={LIVE_COPY.title} />
       <LivesBoard
         initialLives={lives}
-        fields={fields}
         canAnnounce={canAnnounce}
         past={past}
         canReport={canReadLogs}

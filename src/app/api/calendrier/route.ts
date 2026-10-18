@@ -11,6 +11,7 @@ import {
   removeEntries,
   updateEntries,
 } from '@/core/services/calendar/CalendarService'
+import { assertLiveAccess } from '@/core/services/lives/LiveService'
 import { assertRowsInScope } from '@/core/services/auth/ScopeService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { workViewer } from '@/core/services/work/visibility'
@@ -53,9 +54,19 @@ export const POST = createProtectedRoute({
   handler: async ({ raw, session, access, scope }) => {
     const perimeter = await scope()
     const academy = academyScope(session, access)
-    const fields = await calendarFields(perimeter, workViewer(session, access), academy)
+    const canAnnounceLive = access.can(Permissions.LiveAnnounce)
+    const fields = await calendarFields(
+      perimeter,
+      workViewer(session, access),
+      academy,
+      canAnnounceLive
+    )
     const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
+    await assertLiveAccess({
+      canAnnounce: canAnnounceLive,
+      templateId: typeof parsed.values.templateId === 'string' ? parsed.values.templateId : null,
+    })
 
     return createEntry(session.id, parsed.values, perimeter, academy)
   },
@@ -69,10 +80,16 @@ export const PATCH = createProtectedRoute({
 
     await assertEntriesAccess(ids, session.id, access.can(Permissions.CalendarManage))
     await assertRowsInScope('calendarEvent', ids, perimeter)
+    await assertLiveAccess({ canAnnounce: access.can(Permissions.LiveAnnounce), entryIds: ids })
 
     // Only the keys actually sent are validated
     const parsed = parseFormValues(
-      await calendarFields(perimeter, workViewer(session, access), academyScope(session, access)),
+      await calendarFields(
+        perimeter,
+        workViewer(session, access),
+        academyScope(session, access),
+        access.can(Permissions.LiveAnnounce)
+      ),
       raw,
       { enforceRequired: false }
     )
@@ -89,6 +106,7 @@ export const DELETE = createProtectedRoute({
 
     await assertEntriesAccess(ids, session.id, access.can(Permissions.CalendarManage))
     await assertRowsInScope('calendarEvent', ids, await scope())
+    await assertLiveAccess({ canAnnounce: access.can(Permissions.LiveAnnounce), entryIds: ids })
     await removeEntries(ids)
 
     return { ids }

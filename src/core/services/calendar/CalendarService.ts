@@ -4,7 +4,7 @@ import { roleGroupedOptions } from '@/core/lib/forms/options'
 import { prisma } from '@/core/lib/db'
 import { readFullPerimeter, scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { forbidden, notFound } from '@/core/lib/errors'
+import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import {
@@ -25,6 +25,14 @@ import {
   recruitmentEntries,
 } from '@/core/services/calendar/projections'
 import type { ProjectedPosts, ProjectionContext } from '@/core/services/calendar/projections'
+import {
+  cancelLivesOfEntries,
+  liveFormFields,
+  openLive,
+  readLiveInput,
+  readLiveTemplateId,
+  syncLiveWithEntry,
+} from '@/core/services/lives/LiveService'
 import { peopleInScope, projectOptions, youtuberOptions } from '@/core/services/work/shared'
 import {
   AUDIENCE_KEYS,
@@ -97,10 +105,14 @@ const subjectOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
 /**
  * Read the templates a new entry may start from
  * @param {AcademyFormContext} academy - Academy templates and juniors
+ * @param {{ templateId: string | null, allowed: boolean }} live - Live template and whether the viewer may announce
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-const templateOptions = async (academy: AcademyFormContext): Promise<FieldOption[]> => {
+const templateOptions = async (
+  academy: AcademyFormContext,
+  live: { templateId: string | null; allowed: boolean }
+): Promise<FieldOption[]> => {
   const rows = await prisma.eventTemplate.findMany({
     where: { archived: false },
     orderBy: [{ position: 'asc' }, { name: 'asc' }],
@@ -115,7 +127,8 @@ const templateOptions = async (academy: AcademyFormContext): Promise<FieldOption
         label: row.name,
         accent: row.accent ?? undefined,
         // A check-in nobody is left to be planned for is shown but shut
-        disabled: isTemplateGreyed(academy, row.id),
+        disabled:
+          isTemplateGreyed(academy, row.id) || (row.id === live.templateId && !live.allowed),
         group: CALENDAR_KIND_REGISTRY.get(kind).plural ?? CALENDAR_KIND_REGISTRY.label(kind),
       }))
   )
@@ -144,26 +157,31 @@ const WHEN_ROLL_CALL = { field: 'rollCall', truthy: true } as const
  * @param {AccessScope} [scope] - Creator perimeter
  * @param {WorkViewer} [viewer] - Who reads
  * @param {AcademyScope} [academy] - Juniors the member may plan for, none without it
+ * @param {boolean} [canAnnounceLive] - Viewer may post a live
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
 export const calendarFields = async (
   scope?: AccessScope,
   viewer?: WorkViewer,
-  academy?: AcademyScope
+  academy?: AcademyScope,
+  canAnnounceLive = false
 ): Promise<FieldDefinition[]> => {
+  const liveTemplateId = await readLiveTemplateId()
   const academyContext = academy
     ? await readAcademyForm(academy)
     : { purposes: new Map(), juniors: [] }
-  const [templates, subjects, youtubers, projects, teams, audiences, academyExtras] =
+  const [templates, subjects, youtubers, projects, teams, audiences, academyExtras, liveExtras] =
     await Promise.all([
-      templateOptions(academyContext),
+      templateOptions(academyContext, { templateId: liveTemplateId, allowed: canAnnounceLive }),
       subjectOptions(scope),
       youtuberOptions(scope),
       projectOptions(scope, viewer),
       teamOptions(scope),
       audienceOptions(scope),
       academyFields(academyContext, viewer?.id ?? ''),
+      // The Live template brings its own fields
+      canAnnounceLive ? liveFormFields(scope, liveTemplateId) : Promise.resolve([]),
     ])
 
   // Only an administrator may close an entry to administrators
@@ -286,6 +304,7 @@ export const calendarFields = async (
       group: FORM_GROUPS.assignment,
     },
     ...academyExtras,
+    ...liveExtras.map((field) => ({ ...field, group: FORM_GROUPS.assignment })),
     {
       name: 'projectId',
       kind: 'select',
@@ -708,7 +727,12 @@ export const createEntry = async (
     ownerId,
     academy
   )
-  const data = await applyTemplate({ ...base, ...fixed })
+  const applied = await applyTemplate({ ...base, ...fixed })
+
+  // A live is checked before anything is written, and always calls the roll
+  const isLive = applied.templateId !== null && applied.templateId === (await readLiveTemplateId())
+  const live = isLive ? await readLiveInput(values) : null
+  const data = live ? { ...applied, rollCall: true, youtuberId: live.youtuberId } : applied
 
   const row = await prisma.calendarEvent.create({
     data: {
@@ -718,6 +742,31 @@ export const createEntry = async (
     },
     include: ENTRY_SHAPE,
   })
+
+  if (live) {
+    // The live convenes its team and asks its Coordinators itself
+    await openLive({
+      entry: row,
+      live: {
+        ...live,
+        pickedIds: await expandRoster(
+          data.rollCallTeamIds,
+          readList(values, 'memberIds'),
+          scope,
+          data.startsAt
+        ),
+      },
+      actorId: ownerId,
+      scope,
+    })
+
+    const fresh = await prisma.calendarEvent.findUnique({
+      where: { id: row.id },
+      include: ENTRY_SHAPE,
+    })
+
+    return toEntry(fresh ?? row, await readRosterFor(row.id, ownerId, true))
+  }
 
   if (!data.rollCall) return toEntry(row)
 
@@ -775,6 +824,7 @@ export const updateEntry = async (
     },
     include: ENTRY_SHAPE,
   })
+  await syncLiveWithEntry(id, values, viewerId)
 
   if (!data.rollCall) return toEntry(row)
 
@@ -817,6 +867,7 @@ export const moveEntry = async (id: string, startsAt: Date): Promise<CalendarEnt
     data: { startsAt, endsAt },
     include: ENTRY_SHAPE,
   })
+  await syncLiveWithEntry(id)
 
   return toEntry(row)
 }
@@ -838,6 +889,7 @@ export const resizeEntry = async (id: string, endsAt: Date): Promise<CalendarEnt
     data: { endsAt },
     include: ENTRY_SHAPE,
   })
+  await syncLiveWithEntry(id)
 
   return toEntry(row)
 }
@@ -849,6 +901,7 @@ export const resizeEntry = async (id: string, endsAt: Date): Promise<CalendarEnt
  */
 
 export const removeEntry = async (id: string): Promise<void> => {
+  await cancelLivesOfEntries([id])
   await prisma.calendarEvent.delete({ where: { id } })
 }
 
@@ -863,6 +916,11 @@ export const updateEntries = async (
   ids: string[],
   values: FormValues
 ): Promise<CalendarEntry[]> => {
+  // A live is posted one at a time, it needs its platform and its Coordinators
+  if (readText(values, 'templateId') === (await readLiveTemplateId())) {
+    throw invalidInput([{ field: 'templateId', message: CALENDAR_FIELD_INFO.liveAlone }])
+  }
+
   // Only the keys actually sent are written
   const data = Object.fromEntries(
     Object.entries(toEntryData(values)).filter(
@@ -889,6 +947,7 @@ export const updateEntries = async (
  */
 
 export const removeEntries = async (ids: string[]): Promise<void> => {
+  await cancelLivesOfEntries(ids)
   await prisma.calendarEvent.deleteMany({ where: { id: { in: ids } } })
 }
 

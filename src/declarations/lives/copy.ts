@@ -7,9 +7,6 @@ export const LIVE_COPY = {
   title: 'Live en cours',
   navLabel: 'Live en cours',
   announce: 'Annoncer un live',
-  announceTitle: 'Annoncer un live',
-  announceVerb: 'Annoncer',
-  announceLead: 'L’équipe convoquée est prévenue, sauf les membres en absence.',
   start: 'Lancer le live',
   end: 'Clore le live',
   cancel: 'Annuler le live',
@@ -39,23 +36,17 @@ export const LIVE_COPY = {
 } as const
 
 /**
- * Labels of the announce form
+ * Labels of the live fields of the calendar form
  * @type {Record<string, string>}
  */
 
 export const LIVE_FIELD_COPY = {
-  youtuber: 'YouTubeur',
   platform: 'Plateforme',
-  title: 'Titre du live',
-  titlePlaceholder: 'Ce que le live annonce',
-  startsAt: 'Début prévu',
-  endsAt: 'Fin prévue',
-  endsAtHint: 'Indicative, le live se ferme à la main.',
   coordinator: 'Coordinateur du Live',
+  coordinatorRefused:
+    'Seuls l’équipe Lives du YouTubeur (hors Junior), ses Responsables et les Administrateurs peuvent coordonner.',
   coordinatorHint:
     'Plusieurs possibles. Chacun reçoit une demande et choisit lui-même ses horaires, ses droits courent jusqu’à la fin de son créneau.',
-  members: 'Modérateurs convoqués',
-  membersHint: 'Vide : toute l’équipe Lives du YouTubeur. Les absents ne sont jamais convoqués.',
   instructions: 'Consignes',
   instructionsHint:
     'Ce que l’équipe lit avant d’ouvrir la Mod View. Modifiables jusqu’à la fin du live.',

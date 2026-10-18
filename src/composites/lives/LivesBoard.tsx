@@ -2,27 +2,26 @@
 
 import { useState } from 'react'
 
-import { Button } from '@/components/elements/actions/Button'
+import AppLink from '@/components/elements/navigation/AppLink'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { PageOptions } from '@/components/structures/page/PageOptions'
 import { LiveStage } from '@/composites/lives/LiveStage'
 import { LiveTile } from '@/composites/lives/LiveTile'
 import { PastLives } from '@/composites/lives/PastLives'
 import { useLives } from '@/core/hooks/data/lives/useLives'
 import { LIVE_COPY } from '@/declarations/lives/copy'
+import { LIVE_PRESET } from '@/declarations/lives/registries'
+import { ROUTES } from '@/declarations/navigation'
 import { PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
-import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { LIVE_BOARD } from '@/declarations/ui/variants'
-import type { FieldDefinition } from '@/types/forms'
+import { BUTTON_STYLES, LIVE_BOARD } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
+import { cn } from '@/utils/classnames'
 import { LiveStatuses } from '@/utils/constants/lives'
 import { Permissions } from '@/utils/constants/permissions'
 
 export interface LivesBoardProps {
   initialLives: LiveView[]
-  fields: FieldDefinition[]
   canAnnounce: boolean
   past: LiveView[]
   canReport: boolean
@@ -32,7 +31,6 @@ export interface LivesBoardProps {
 /**
  * Open lives
  * @param {LiveView[]} initialLives - Lives resolved server-side
- * @param {FieldDefinition[]} fields - Announce form declarations
  * @param {boolean} canAnnounce - Viewer may announce
  * @param {LiveView[]} past - Finished lives
  * @param {boolean} canReport - Viewer reads the Bilan
@@ -42,22 +40,25 @@ export interface LivesBoardProps {
 
 export const LivesBoard = ({
   initialLives,
-  fields,
   canAnnounce,
   past,
   canReport,
   canCreatorReport,
 }: LivesBoardProps) => {
-  const { lives, isSaving, issues, clearIssues, announce, move } = useLives(initialLives)
-  const [isAnnouncing, setAnnouncing] = useState(false)
+  const { lives, isSaving, move } = useLives(initialLives)
   const [showPast, setShowPast] = useState(false)
   const onAir = lives.filter((live) => live.status === LiveStatuses.Live)
   const upcoming = lives.filter((live) => live.status !== LiveStatuses.Live)
 
-  const openAnnounce = () => {
-    clearIssues()
-    setAnnouncing(true)
-  }
+  // A live is planned on the calendar
+  const announceButton = (
+    <AppLink
+      href={ROUTES.calendarNew(LIVE_PRESET)}
+      className={cn(BUTTON_STYLES.base, BUTTON_STYLES.primary)}
+    >
+      {LIVE_COPY.announce}
+    </AppLink>
+  )
 
   return (
     <div className={LIVE_BOARD.wrapper}>
@@ -81,24 +82,12 @@ export const LivesBoard = ({
           title={LIVE_COPY.emptyTitle}
           description={LIVE_COPY.emptyDescription}
           action={
-            canAnnounce ? (
-              <Button variant="primary" onClick={openAnnounce}>
-                {LIVE_COPY.announce}
-              </Button>
-            ) : (
-              <Status label={LIVE_COPY.emptyTitle} tone="neutral" />
-            )
+            canAnnounce ? announceButton : <Status label={LIVE_COPY.emptyTitle} tone="neutral" />
           }
         />
       ) : (
         <>
-          {canAnnounce && (
-            <div className={LIVE_BOARD.toolbar}>
-              <Button variant="primary" onClick={openAnnounce}>
-                {LIVE_COPY.announce}
-              </Button>
-            </div>
-          )}
+          {canAnnounce && <div className={LIVE_BOARD.toolbar}>{announceButton}</div>}
           {[
             {
               key: 'live',
@@ -141,24 +130,6 @@ export const LivesBoard = ({
       {showPast && (
         <PastLives lives={past} canReport={canReport} canCreatorReport={canCreatorReport} />
       )}
-
-      <FormDrawer
-        subject={FORM_SUBJECTS.live}
-        open={isAnnouncing}
-        title={LIVE_COPY.announceTitle}
-        description={LIVE_COPY.announceLead}
-        fields={fields}
-        issues={issues}
-        isSaving={isSaving}
-        submitVerb={LIVE_COPY.announceVerb}
-        onSubmit={async (values) => {
-          const saved = await announce(values)
-          if (saved) setAnnouncing(false)
-
-          return saved
-        }}
-        onClose={() => setAnnouncing(false)}
-      />
     </div>
   )
 }

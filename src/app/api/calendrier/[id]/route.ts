@@ -10,6 +10,7 @@ import {
   resizeEntry,
   updateEntry,
 } from '@/core/services/calendar/CalendarService'
+import { assertLiveAccess } from '@/core/services/lives/LiveService'
 import { assertRowInScope } from '@/core/services/auth/ScopeService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { workViewer } from '@/core/services/work/visibility'
@@ -22,6 +23,8 @@ export const PATCH = createProtectedRoute({
     const canManage = access.can(Permissions.CalendarManage)
     await assertEntryAccess(params.id, session.id, canManage)
     await assertRowInScope('calendarEvent', params.id, perimeter)
+    const canAnnounceLive = access.can(Permissions.LiveAnnounce)
+    await assertLiveAccess({ canAnnounce: canAnnounceLive, entryIds: [params.id] })
 
     // A lone start only drags the entry
     if (typeof raw.startsAt === 'string' && Object.keys(raw).length === 1) {
@@ -45,11 +48,15 @@ export const PATCH = createProtectedRoute({
 
     const academy = academyScope(session, access)
     const parsed = parseFormValues(
-      await calendarFields(perimeter, workViewer(session, access), academy),
+      await calendarFields(perimeter, workViewer(session, access), academy, canAnnounceLive),
       raw,
       { fillMissing: true }
     )
     if (!parsed.ok) throw invalidInput(parsed.issues)
+    await assertLiveAccess({
+      canAnnounce: canAnnounceLive,
+      templateId: typeof parsed.values.templateId === 'string' ? parsed.values.templateId : null,
+    })
 
     return updateEntry(params.id, parsed.values, perimeter, session.id, canManage, academy)
   },
@@ -60,6 +67,10 @@ export const DELETE = createProtectedRoute({
   handler: async ({ params, session, access, scope }) => {
     await assertEntryAccess(params.id, session.id, access.can(Permissions.CalendarManage))
     await assertRowInScope('calendarEvent', params.id, await scope())
+    await assertLiveAccess({
+      canAnnounce: access.can(Permissions.LiveAnnounce),
+      entryIds: [params.id],
+    })
     await removeEntry(params.id)
 
     return { id: params.id }

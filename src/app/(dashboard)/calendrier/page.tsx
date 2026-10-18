@@ -8,6 +8,8 @@ import {
   listEntries,
   readCalendarScope,
 } from '@/core/services/calendar/CalendarService'
+import { readLiveTemplateId } from '@/core/services/lives/LiveService'
+import { LIVE_PRESET } from '@/declarations/lives/registries'
 import { youtuberOptions } from '@/core/services/work/shared'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
@@ -23,6 +25,7 @@ export const metadata: Metadata = { title: CALENDAR_COPY.title }
 const FOCUS_PARAM = 'evenement'
 const DAY_PARAM = 'jour'
 const LAYER_PARAM = 'calque'
+const PRESET_PARAM = 'modele'
 
 /**
  * Shared calendar
@@ -38,6 +41,9 @@ export default async function CalendarPage({
 }) {
   const { session, access } = await requirePermission(Permissions.CalendarRead)
   const perimeter = await readCalendarScope(session, access)
+
+  const canAnnounceLive = access.can(Permissions.LiveAnnounce)
+  const preset = (await searchParams)[PRESET_PARAM]
 
   const raw = (await searchParams)[FOCUS_PARAM]
   const focusEntryId = typeof raw === 'string' ? raw : undefined
@@ -67,9 +73,18 @@ export default async function CalendarPage({
       access,
       scope: perimeter,
     }),
-    calendarFields(perimeter, workViewer(session, access), academyScope(session, access)),
+    calendarFields(
+      perimeter,
+      workViewer(session, access),
+      academyScope(session, access),
+      canAnnounceLive
+    ),
     youtuberOptions(perimeter),
   ])
+
+  // The Live button of "Live en cours" lands here with the form open on the Live template
+  const liveTemplateId =
+    canAnnounceLive && preset === LIVE_PRESET ? await readLiveTemplateId() : null
 
   // The linked entry joins the window when the visibility filter left it out
   const entries =
@@ -88,6 +103,7 @@ export default async function CalendarPage({
         canManage={access.can(Permissions.CalendarManage)}
         focusEntryId={focusEntry ? focusEntryId : undefined}
         onlyLayer={onlyLayer}
+        startWith={liveTemplateId ? { templateId: liveTemplateId } : undefined}
       />
     </div>
   )

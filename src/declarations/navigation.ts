@@ -32,6 +32,8 @@ export const ROUTES = {
   liveCreatorReport: (id: string) => `/lives/${id}/bilan-createur`,
   calendar: '/calendrier',
   calendarEvent: (id: string) => `/calendrier?evenement=${id}`,
+  // Calendar opened on the form of a template
+  calendarNew: (preset: string) => `/calendrier?modele=${preset}`,
   // Grid opened on a day, optionally on one calendar only
   calendarDay: (day: string, layer?: string) =>
     `/calendrier?jour=${day}${layer ? `&calque=${layer}` : ''}`,

@@ -65,6 +65,8 @@ import {
 } from '@/utils/format/calendar'
 
 export interface CalendarBoardProps {
+  // Form opened on arrival, with these values
+  startWith?: FormValues
   initialEntries: CalendarEntry[]
   // Creators in perimeter
   youtubers?: FieldOption[]
@@ -117,6 +119,7 @@ const DayAddIcon = ICONS.add
  * @param {string} [sessionId] - Bounds the board to one academy session
  * @param {string} [focusEntryId] - Entry the board opens straight onto
  * @param {CalendarLayerName} [onlyLayer] - Calendar left on alone when the board opens
+ * @param {FormValues} [startWith] - Values the form opens with on arrival
  * @return {JSX.Element}
  */
 
@@ -129,6 +132,7 @@ export const CalendarBoard = ({
   sessionId,
   focusEntryId,
   onlyLayer,
+  startWith,
 }: CalendarBoardProps) => {
   const calendar = useCalendar(initialEntries, sessionId)
   const isMobile = useIsMobileShell()
@@ -176,9 +180,11 @@ export const CalendarBoard = ({
       }),
     [can]
   )
-  const [dialog, setDialog] = useState<'form' | 'detail' | 'bulk' | null>(linked ? 'detail' : null)
+  const [dialog, setDialog] = useState<'form' | 'detail' | 'bulk' | null>(
+    linked ? 'detail' : startWith ? 'form' : null
+  )
   const [editing, setEditing] = useState<CalendarEntry | null>(null)
-  const [draft, setDraft] = useState<FormValues | null>(null)
+  const [draft, setDraft] = useState<FormValues | null>(startWith ?? null)
   const [opened, setOpened] = useState<CalendarEntry | null>(linked)
   const [selection, setSelection] = useState<string[]>([])
   const [pendingDeletion, setPendingDeletion] = useState<CalendarEntry[] | null>(null)
