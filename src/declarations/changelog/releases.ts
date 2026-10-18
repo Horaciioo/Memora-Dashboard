@@ -133,7 +133,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     intro:
       'La Mod View s’organise comme tu l’entends, les bilans de live racontent enfin la soirée, et tes pages préférées sont à un clic.',
     description:
-      'Jusqu’ici, la Mod View imposait la même disposition à tout le monde, le bilan d’un live se résumait à quelques chiffres et les annonces ne s’écrivaient que depuis un projet. Cette version laisse chaque poste ranger ses fenêtres, donne aux bilans de quoi comparer et exporter, et fait des « Communications » un vrai tableau de travail. Elle prépare aussi le terrain à l’équipe d’administration, avec un journal qui se filtre et des pages d’état branchées sur le réel.',
+      'Jusqu’ici, la Mod View imposait la même disposition à tout le monde, le bilan d’un live se résumait à quelques chiffres et les annonces ne s’écrivaient que depuis un projet. Cette version laisse chaque poste ranger ses fenêtres, donne aux bilans de quoi comparer et exporter, et fait des « Communications » un vrai tableau de travail.',
     items: [
       {
         tag: ChangelogTags.Added,
@@ -285,11 +285,31 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Amélioration du « Journal » : des filtres, une recherche, une pagination et un export CSV, avec l’adresse, la requête et la gravité de chaque entrée',
       },
       {
-        tag: ChangelogTags.Improved,
-        page: ROUTES.administration,
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug sur mobile qui empêchait de bien vivre la conversation de première connexion',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug rare qui empêchait certaines personnes de vivre correctement la visite de bienvenue',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui ne détectait pas correctement les bannissements temporaires',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui empêchait le live de se lancer à la bonne heure',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.announcements,
         audience: ChangelogAudiences.Responsables,
-        permission: Permissions.AccessManage,
-        text: 'Amélioration de « Administration », « Files de jobs », « Sondes », « Stockage » et « Activité » : ces pages affichent l’état réel du service, et une tâche échouée peut être relancée',
+        permission: Permissions.CommunicationRead,
+        text: 'Correction d’un bug qui empêchait les identifiants prédéfinis d’apparaître dans « Communications »',
       },
       {
         tag: ChangelogTags.Fixed,
