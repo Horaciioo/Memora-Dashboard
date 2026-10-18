@@ -10,6 +10,7 @@ import type { TwitchSignal } from '@/core/lib/platforms/twitch/eventsub'
 import { moveLiveFromPlatform } from '@/core/services/lives/LiveService'
 import { liveconLevelOf, logPlatformGesture } from '@/core/services/lives/ModerationLogService'
 import { logEntryOf } from '@/core/lib/platforms/twitch/logEntry'
+import { forgetSampling, sampleViewers } from '@/core/services/lives/LiveSampler'
 import { sweepStalePresences } from '@/core/services/lives/PresenceService'
 import { readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
@@ -28,12 +29,14 @@ import {
  * @typedef {Object} Watch
  * @property {EventSubSession} session - Platform session
  * @property {string} holderId - Member whose token carries it
+ * @property {string} broadcasterId - Channel
  * @property {ReturnType<typeof setTimeout> | null} offline - Pending end after an offline
  */
 
 interface Watch {
   session: EventSubSession
   holderId: string
+  broadcasterId: string
   offline: ReturnType<typeof setTimeout> | null
 }
 
@@ -184,7 +187,7 @@ const watch = async (live: {
     },
   })
 
-  watcher.watches.set(live.id, { session, holderId: holder, offline: null })
+  watcher.watches.set(live.id, { session, holderId: holder, broadcasterId, offline: null })
   session.start()
 }
 
@@ -225,7 +228,13 @@ export const syncLiveWatches = async (): Promise<void> => {
     current.session.stop()
     if (current.offline) clearTimeout(current.offline)
     watcher.watches.delete(liveId)
+    forgetSampling(liveId)
     await forgetLive(liveId)
+  }
+
+  // Viewer curve of the lives on air
+  for (const [liveId, current] of watcher.watches) {
+    void sampleViewers({ liveId, ...current }).catch(() => null)
   }
 
   for (const live of lives) {

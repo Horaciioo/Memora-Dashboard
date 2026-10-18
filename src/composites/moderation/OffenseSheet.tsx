@@ -69,8 +69,9 @@ const RungCommands = ({
   const surface = SANCTION_PANEL_REGISTRY.get(offense.panel)
 
   const lines = rung.measures.flatMap((measure) => {
-    const tool = surface.commands[measure.kind]
-    if (!tool) return []
+    const base = surface.commands[measure.kind]
+    if (!base) return []
+    const tool = measure.durationMinutes && base.timed ? base.timed : base
 
     const command = tool.command
       ? fillCommand(tool.command, {

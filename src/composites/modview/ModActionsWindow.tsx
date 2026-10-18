@@ -1,7 +1,10 @@
 'use client'
 
 import { FlaggedText } from '@/composites/modview/FlaggedText'
+import { memberMenu, memberNamed } from '@/composites/modview/memberMenu'
+import type { TeamTools } from '@/composites/modview/memberMenu'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
+import { useMenu } from '@/managers/front-end'
 import { MODVIEW_ACT_COPY, MODVIEW_COPY } from '@/declarations/modview/copy'
 import { MOD_ACTS } from '@/declarations/modview/registries'
 import { ICONS } from '@/declarations/ui/icons'
@@ -17,6 +20,8 @@ export interface ModActionsWindowProps {
   onPickTarget: (name: string) => void
   // Moderator followed in Focus mode
   focusLogin?: string | null
+  // Right click on a moderator
+  team?: TeamTools
 }
 
 /**
@@ -25,6 +30,7 @@ export interface ModActionsWindowProps {
  * @param {boolean} isLit - Lit by a scene
  * @param {(name: string) => void} onPickTarget - Open a viewer card
  * @param {string | null} [focusLogin] - Moderator followed
+ * @param {TeamTools} [team] - Focus gestures
  * @return {JSX.Element}
  */
 
@@ -33,59 +39,73 @@ export const ModActionsWindow = ({
   isLit,
   onPickTarget,
   focusLogin,
-}: ModActionsWindowProps) => (
-  <ModWindow title={MODVIEW_COPY.modActions} isLit={isLit} grow>
-    {acts.length === 0 ? (
-      <WindowEmpty
-        icon="modActions"
-        title={MODVIEW_COPY.actsEmptyTitle}
-        body={MODVIEW_COPY.actsEmptyBody}
-      />
-    ) : (
-      <ul className={MODVIEW_FEED.list}>
-        {acts.map((act) => {
-          const Icon = ICONS[MOD_ACTS.get(act.kind).icon]
+  team,
+}: ModActionsWindowProps) => {
+  const { contextMenu } = useMenu()
 
-          return (
-            <li
-              key={act.id}
-              className={cn(
-                MODVIEW_FEED.item,
-                act.pending && MODVIEW_FEED.itemPending,
-                focusLogin &&
-                  act.moderator.toLowerCase() === focusLogin.toLowerCase() &&
-                  MODVIEW_FEED.itemFocus
-              )}
-            >
-              <Icon className={MODVIEW_FEED.icon} aria-hidden="true" />
-              <div className={MODVIEW_FEED.main}>
-                {act.target && (
-                  <button
-                    type="button"
-                    className={MODVIEW_FEED.target}
-                    onClick={() => onPickTarget(act.target!)}
-                  >
-                    {act.target}
-                  </button>
+  return (
+    <ModWindow title={MODVIEW_COPY.modActions} isLit={isLit} grow>
+      {acts.length === 0 ? (
+        <WindowEmpty
+          icon="modActions"
+          title={MODVIEW_COPY.actsEmptyTitle}
+          body={MODVIEW_COPY.actsEmptyBody}
+        />
+      ) : (
+        <ul className={MODVIEW_FEED.list}>
+          {acts.map((act) => {
+            const Icon = ICONS[MOD_ACTS.get(act.kind).icon]
+
+            return (
+              <li
+                key={act.id}
+                className={cn(
+                  MODVIEW_FEED.item,
+                  act.pending && MODVIEW_FEED.itemPending,
+                  focusLogin &&
+                    act.moderator.toLowerCase() === focusLogin.toLowerCase() &&
+                    MODVIEW_FEED.itemFocus
                 )}
-                <p className={MODVIEW_FEED.line}>
-                  {MODVIEW_ACT_COPY[act.kind]}{' '}
-                  <span className={MODVIEW_FEED.who}>{act.moderator}</span>
-                  {act.durationSeconds
-                    ? ` ${MODVIEW_COPY.during} ${formatDuration(act.durationSeconds)}`
-                    : ''}
-                  {` · ${act.pending ? MODVIEW_COPY.pending : formatSince(act.at)}`}
-                </p>
-                {act.quote && (
-                  <p className={MODVIEW_FEED.quote}>
-                    <FlaggedText text={act.quote} />
+              >
+                <Icon className={MODVIEW_FEED.icon} aria-hidden="true" />
+                <div className={MODVIEW_FEED.main}>
+                  {act.target && (
+                    <button
+                      type="button"
+                      className={MODVIEW_FEED.target}
+                      onClick={() => onPickTarget(act.target!)}
+                    >
+                      {act.target}
+                    </button>
+                  )}
+                  <p className={MODVIEW_FEED.line}>
+                    {MODVIEW_ACT_COPY[act.kind]}{' '}
+                    <span
+                      className={MODVIEW_FEED.who}
+                      onContextMenu={(event) => {
+                        const member = team ? memberNamed(act.moderator, team.members) : null
+                        if (team && member)
+                          contextMenu(memberMenu(member, team), member.name)(event)
+                      }}
+                    >
+                      {act.moderator}
+                    </span>
+                    {act.durationSeconds
+                      ? ` ${MODVIEW_COPY.during} ${formatDuration(act.durationSeconds)}`
+                      : ''}
+                    {` · ${act.pending ? MODVIEW_COPY.pending : formatSince(act.at)}`}
                   </p>
-                )}
-              </div>
-            </li>
-          )
-        })}
-      </ul>
-    )}
-  </ModWindow>
-)
+                  {act.quote && (
+                    <p className={MODVIEW_FEED.quote}>
+                      <FlaggedText text={act.quote} />
+                    </p>
+                  )}
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </ModWindow>
+  )
+}

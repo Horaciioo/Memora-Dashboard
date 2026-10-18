@@ -1,40 +1,45 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
+import type { PageOption } from '@/components/structures/page/PageOptions'
 import { AutoModWindow } from '@/composites/modview/AutoModWindow'
 import { ChatWindow } from '@/composites/modview/ChatWindow'
 import { CommunityWindow } from '@/composites/modview/CommunityWindow'
 import { FocusBanner } from '@/composites/modview/FocusBanner'
-import { HistoryWindow } from '@/composites/modview/HistoryWindow'
 import { InspectCard } from '@/composites/modview/InspectCard'
+import type { TeamTools } from '@/composites/modview/memberMenu'
 import { ModActionsWindow } from '@/composites/modview/ModActionsWindow'
+import { ModViewSidebar } from '@/composites/modview/ModViewSidebar'
 import { SanctionsDrawer } from '@/composites/modview/SanctionsDrawer'
 import { StreamWindow } from '@/composites/modview/StreamWindow'
 import { UnbanRequestsWindow } from '@/composites/modview/UnbanRequestsWindow'
 import { ViewerCard } from '@/composites/modview/ViewerCard'
-import { ModViewRail } from '@/composites/modview/ModViewRail'
+import { ModWorkspace } from '@/composites/modview/workspace/ModWorkspace'
 import { useLiveFocus } from '@/core/hooks/data/lives/useLiveFocus'
-import { parseChatCommand, rememberRung, writeRungCommand } from '@/core/lib/modview/commands'
+import { useBareShell } from '@/core/hooks/interaction/layout/useBareShell'
+import { useModLayout } from '@/core/hooks/interaction/layout/useModLayout'
+import { useModViewActions } from '@/core/hooks/interaction/state/useModViewActions'
+import { useSuggestions } from '@/core/hooks/interaction/state/useSuggestions'
+import { useWatchlist } from '@/core/hooks/interaction/state/useWatchlist'
 import type { PanelMemory } from '@/core/lib/modview/commands'
-import { gateIntent, windowsOf } from '@/core/lib/modview/gate'
-import { MODVIEW_COMMAND_COPY, MODVIEW_PANEL_COPY } from '@/declarations/modview/copy'
+import { windowsOf } from '@/core/lib/modview/gate'
+import { profileOfPermissions } from '@/core/lib/modview/profile'
+import type { Suggestion } from '@/core/lib/modview/suggest'
+import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
+import { MODVIEW_WORKSPACE_COPY } from '@/declarations/modview/workspace'
+import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
+import { MODVIEW_WINDOWS } from '@/declarations/modview/registries'
+import type { ModViewProfileName } from '@/declarations/modview/profiles'
 import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_FRAME, MODVIEW_SPOTLIGHT } from '@/declarations/ui/variants'
 import type { LivePerson } from '@/types/lives'
-import type {
-  ActContext,
-  Chatter,
-  ModViewDriver,
-  ModViewIntent,
-  ModViewWindow,
-} from '@/types/modview'
-import type { SanctionOffenseCard, SanctionPanelView } from '@/types/sanctions'
+import type { ModViewDriver, ModViewWindow } from '@/types/modview'
+import type { SanctionPanelView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
-import type { PermissionName } from '@/utils/constants/permissions'
 import { LivePlatforms } from '@/utils/constants/lives'
-import { SanctionKinds } from '@/utils/constants/moderation'
 import { Permissions } from '@/utils/constants/permissions'
+import type { PermissionName } from '@/utils/constants/permissions'
 
 /**
  * What a real live adds to the Mod View: history, team, Inspect Mod, Focus
@@ -43,7 +48,8 @@ import { Permissions } from '@/utils/constants/permissions'
  * @property {string} viewerId - Signed-in member
  * @property {LivePerson[]} members - Convened team
  * @property {string[]} focusable - Members the viewer may follow
- * @property {PanelMemory} initialMemory - Rungs already applied on this live
+ * @property {boolean} [canEnd] - Viewer may close the live
+ * @property {PanelMemory} initialMemory - Rungs already applied to the creator's viewers
  */
 
 export interface ModViewLiveTools {
@@ -51,6 +57,8 @@ export interface ModViewLiveTools {
   viewerId: string
   members: LivePerson[]
   focusable: string[]
+  // Viewer may close the live
+  canEnd?: boolean
   initialMemory: PanelMemory
 }
 
@@ -60,34 +68,23 @@ export interface ModViewProps {
   panel: SanctionPanelView | null
   levelName: string | null
   levelIcon?: IconName | null
-  // Inside a course: no rail taken, no page bleed, sanctions folded away
+  // Inside a course: no bar, sanctions folded away
   embedded?: boolean
-  // Shown off on a page: no rail taken
+  // Shown off on a page: no bar
   showcase?: boolean
   // Windows kept
   only?: ModViewWindow[]
   // A real live
   live?: ModViewLiveTools
-}
-
-// Rung a prefilled line carries until it is sent
-interface PendingRung {
-  chatterId: string
-  offenseId: string
-  rung: number
+  // Seat the arrangement is made for, read from the permissions when absent
+  profile?: ModViewProfileName
+  // Brings the live instructions back
+  onReread?: (() => void) | null
 }
 
 /**
  * Moderator view of one live
- * @param {ModViewDriver} driver - Data source
- * @param {PermissionName[]} permissions - Held on this live
- * @param {SanctionPanelView | null} panel - Creator panel at the level in force
- * @param {string | null} levelName - Livecon level in force
- * @param {IconName | null} [levelIcon] - Glyph of that level
- * @param {boolean} [embedded] - Played inside a course
- * @param {boolean} [showcase] - Shown off on a page
- * @param {ModViewWindow[]} [only] - Windows kept
- * @param {ModViewLiveTools} [live] - Real live tools
+ * @param {ModViewProps} props - Mod View props
  * @return {JSX.Element}
  */
 
@@ -101,203 +98,170 @@ export const ModView = ({
   showcase = false,
   only,
   live,
+  profile,
+  onReread,
 }: ModViewProps) => {
   const { state, spotlight } = driver
-  const [hidden, setHidden] = useState<Set<ModViewWindow>>(new Set())
-  const [picked, setPicked] = useState<Chatter | null>(null)
+  const isWorkspace = !embedded && !showcase && !only
   const [isPanelOpen, setPanelOpen] = useState(true)
-  const [draft, setDraft] = useState('')
-  const [hint, setHint] = useState<string | null>(null)
-  const [pending, setPending] = useState<PendingRung | null>(null)
-  const [memory, setMemory] = useState<PanelMemory>(live?.initialMemory ?? {})
   const [inspected, setInspected] = useState<string | null>(null)
   const [actInPlace, setActInPlace] = useState(false)
   const focus = useLiveFocus(live?.id ?? null)
-
-  const available = useMemo(() => windowsOf(state.platform), [state.platform])
   const following = live
     ? focus.focuses.find((entry) => entry.watcherId === live.viewerId)
     : undefined
 
-  // Every chatter on screen
-  const chatters = useMemo(() => {
-    const known = new Map<string, Chatter>()
-    for (const message of state.messages) known.set(message.author.id, message.author)
-    for (const group of Object.values(state.community)) {
-      for (const chatter of group) known.set(chatter.id, chatter)
-    }
+  const actions = useModViewActions({
+    driver,
+    permissions,
+    initialMemory: live?.initialMemory ?? {},
+    onBehalfOfId: following && actInPlace ? following.targetId : null,
+  })
+  const { gate, act, picked, setPicked, memory } = actions
+  const watchlist = useWatchlist(state.messages)
+  const { suggestions, dismiss } = useSuggestions(state, panel, memory)
 
-    return known
-  }, [state.messages, state.community])
+  // Windows this platform and seat can open
+  const seat = profile ?? profileOfPermissions(permissions)
+  const available = useMemo(() => windowsOf(state.platform), [state.platform])
+  const model = useModLayout(seat, available)
+  useBareShell(isWorkspace)
 
-  const findChatter = useCallback(
-    (name: string) =>
-      [...chatters.values()].find(
-        (chatter) =>
-          chatter.login === name.toLowerCase() || chatter.name.toLowerCase() === name.toLowerCase()
-      ) ?? null,
-    [chatters]
-  )
+  const canInspect = permissions.includes(Permissions.LiveInspect)
+  const canFocus = permissions.includes(Permissions.LiveFocus)
+  // Only seats that may follow or inspect see the team
+  const team: TeamTools | undefined =
+    live && (canInspect || canFocus)
+      ? {
+          members: live.members.filter((member) => member.id !== live.viewerId),
+          canInspect,
+          canFocus: (accountId) => canFocus && live.focusable.includes(accountId),
+          followingId: following?.targetId ?? null,
+          onFocus: (accountId) => void focus.start(accountId),
+          onStopFocus: () => {
+            setActInPlace(false)
+            void focus.stop()
+          },
+          onInspect: setInspected,
+        }
+      : undefined
 
-  const gate = useCallback(
-    (intent: ModViewIntent) =>
-      gateIntent(intent, {
-        permissions,
-        platform: state.platform,
-        liveconLevel: state.liveconLevel,
-        offline:
-          state.connection === 'disconnected' ||
-          state.connection === 'connecting' ||
-          state.readOnly === true,
-        offlineReason: state.notice,
-      }),
-    [
-      permissions,
-      state.platform,
-      state.liveconLevel,
-      state.connection,
-      state.readOnly,
-      state.notice,
-    ]
-  )
-
-  // A refused gesture never reaches the driver
-  const act = useCallback(
-    (intent: ModViewIntent, context: ActContext = {}) => {
-      if (!gate(intent).allowed) return
-
-      const chatterId = 'chatterId' in intent ? intent.chatterId : null
-      void driver.act(intent, {
-        ...context,
-        targetLogin:
-          context.targetLogin ?? (chatterId ? chatters.get(chatterId)?.login : undefined),
-        ...(following && actInPlace ? { onBehalfOfId: following.targetId } : {}),
-      })
-    },
-    [driver, gate, chatters, following, actInPlace]
-  )
-
-  // The panel writes the line
-  const prefill = (
-    offense: SanctionOffenseCard,
-    rung: number,
-    chatter: Chatter | null = picked
-  ) => {
-    const step = offense.rungs[rung]
-    if (!chatter || !step) return
-
-    const text = writeRungCommand(step, chatter.login, offense.name)
-
-    // A deletion has no command
-    if (!text) {
-      const lastLine = [...state.messages]
-        .reverse()
-        .find((message) => message.author.id === chatter.id && !message.deletedBy)
-      const deletes = step.measures.some((measure) => measure.kind === SanctionKinds.Delete)
-
-      if (deletes && lastLine) {
-        act(
-          { kind: 'delete', messageId: lastLine.id, chatterId: chatter.id },
-          { offenseId: offense.id, rung, targetLogin: chatter.login }
-        )
-        setMemory((current) => rememberRung(current, chatter.id, offense.id, rung))
-        setHint(null)
-        return
-      }
-
-      setHint(MODVIEW_PANEL_COPY.noGesture)
-      return
-    }
-
-    setPicked(chatter)
-    setDraft(text)
-    setHint(null)
-    setPending({ chatterId: chatter.id, offenseId: offense.id, rung })
-  }
-
-  const send = (text: string) => {
-    const parsed = parseChatCommand(text, findChatter)
-
-    if (parsed.kind === 'error') {
-      setHint(MODVIEW_COMMAND_COPY[parsed.reason])
-      return
-    }
-
-    if (parsed.kind === 'say') {
-      act({ kind: 'say', text: parsed.text })
-    } else {
-      const check = gate(parsed.intent)
-      if (!check.allowed) {
-        setHint(MODVIEW_COMMAND_COPY.refused.replace('{reason}', check.reason ?? ''))
-        return
-      }
-
-      // The rung counts only for the viewer it was written for
-      const fromPanel = pending?.chatterId === parsed.target.id ? pending : null
-      act(parsed.intent, {
-        targetLogin: parsed.target.login,
-        ...(fromPanel ? { offenseId: fromPanel.offenseId, rung: fromPanel.rung } : {}),
-      })
-      if (fromPanel) {
-        setMemory((current) =>
-          rememberRung(current, fromPanel.chatterId, fromPanel.offenseId, fromPanel.rung)
-        )
-      }
-    }
-
-    setDraft('')
-    setHint(null)
-    setPending(null)
-  }
-
-  const writeDraft = (text: string) => {
-    setDraft(text)
-    setHint(null)
-    // Rewritten by hand
-    if (!text.startsWith('/')) setPending(null)
-  }
-
-  const shows = (window: ModViewWindow) =>
-    available.includes(window) && !hidden.has(window) && (!only || only.includes(window))
   const lit = (target: string) => spotlight === target
-
-  const toggleWindow = (window: ModViewWindow) =>
-    setHidden((current) => {
-      const next = new Set(current)
-      if (next.has(window)) next.delete(window)
-      else next.add(window)
-      return next
-    })
-
   const pickByName = (name: string) => {
-    const found = findChatter(name)
+    const found = actions.findChatter(name)
     if (found) setPicked(found)
+  }
+
+  // The panel line a suggestion stands for
+  const useSuggestion = (suggestion: Suggestion) => {
+    if (!suggestion.command) return
+    actions.useLine(
+      suggestion.command,
+      suggestion.offense && suggestion.rung !== null
+        ? {
+            chatterId: suggestion.source.chatter.id,
+            offenseId: suggestion.offense.id,
+            rung: suggestion.rung,
+          }
+        : undefined
+    )
+  }
+
+  const windowFor = (id: ModViewWindow) => {
+    switch (id) {
+      case 'stream':
+        return <StreamWindow state={state} isLit={lit('stream')} isTitleLit={lit('title')} />
+      case 'modActions':
+        return (
+          <ModActionsWindow
+            acts={state.acts}
+            isLit={lit('modActions')}
+            onPickTarget={pickByName}
+            focusLogin={following?.targetLogin ?? null}
+            team={team}
+          />
+        )
+      case 'automod':
+        return (
+          <AutoModWindow
+            held={state.held}
+            isLit={lit('automod')}
+            gate={gate}
+            onAct={act}
+            hasQueue={state.platform === LivePlatforms.Twitch}
+            watchlist={watchlist}
+            onPick={setPicked}
+          />
+        )
+      case 'chat':
+        return (
+          <ChatWindow
+            state={state}
+            spotlight={spotlight}
+            gate={gate}
+            onAct={act}
+            onPick={setPicked}
+            onWatch={watchlist.watch}
+            draft={actions.draft}
+            onDraft={actions.writeDraft}
+            onSend={actions.send}
+            hint={actions.hint}
+          />
+        )
+      case 'community':
+        return (
+          <CommunityWindow community={state.community} spotlight={spotlight} onPick={setPicked} />
+        )
+      case 'unbanRequests':
+        return (
+          <UnbanRequestsWindow
+            requests={state.unbanRequests}
+            isLit={lit('unbanRequests')}
+            gate={gate}
+            onAct={act}
+          />
+        )
+    }
   }
 
   const pickedLines = picked
     ? state.messages.filter((message) => message.author.id === picked.id)
     : []
-  const recentIds = [
-    ...new Set(Object.values(memory).flatMap((byOffense) => Object.keys(byOffense))),
+
+  // One switch per window in the page options
+  const pageOptions: PageOption[] = [
+    ...available.map((id) => ({
+      id,
+      label:
+        id === 'automod' && state.platform !== LivePlatforms.Twitch
+          ? MODVIEW_WATCH_COPY.watch
+          : MODVIEW_WINDOWS.label(id),
+      checked: model.isShown(id),
+      onChange: () => model.toggleHidden(id),
+    })),
+    { id: 'reset', label: MODVIEW_WORKSPACE_COPY.reset, onSelect: model.reset },
+    ...(onReread ? [{ id: 'reread', label: LIVE_PAGE_COPY.reread, onSelect: onReread }] : []),
   ]
-  const canInspect = permissions.includes(Permissions.LiveInspect)
-  const canFocus = permissions.includes(Permissions.LiveFocus)
+
+  // Legacy grid of the courses and showcases
+  const shows = (id: ModViewWindow) =>
+    windowsOf(state.platform).includes(id) && (!only || only.includes(id))
+
+  const grid = (ids: ModViewWindow[]) => ids.filter(shows).map((id) => windowFor(id))
 
   return (
     <div
       className={cn(
         MODVIEW_FRAME.root,
-        embedded || showcase ? MODVIEW_FRAME.embedded : MODVIEW_FRAME.bleed,
-        (embedded || showcase) && state.platform === LivePlatforms.Twitch && 'skin-twitch'
+        isWorkspace ? MODVIEW_FRAME.bleed : MODVIEW_FRAME.embedded,
+        !isWorkspace && state.platform === LivePlatforms.Twitch && 'skin-twitch'
       )}
     >
-      {!embedded && !showcase && (
-        <ModViewRail
-          state={state}
-          levelName={levelName}
-          windows={available}
-          hidden={hidden}
-          onToggle={toggleWindow}
+      {isWorkspace && (
+        <ModViewSidebar
+          options={pageOptions}
+          team={team ? { tools: team, focuses: focus.focuses } : undefined}
+          endLiveId={live?.canEnd ? live.id : undefined}
         />
       )}
 
@@ -310,86 +274,28 @@ export const ModView = ({
               name={following.targetName}
               actInPlace={actInPlace}
               onActInPlace={setActInPlace}
-              onStop={() => {
-                setActInPlace(false)
-                void focus.stop()
-              }}
+              onStop={() => team?.onStopFocus()}
             />
           )}
 
-          <div className={only ? MODVIEW_FRAME.focus : MODVIEW_FRAME.grid}>
-            <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.column}>
-              {shows('stream') && (
-                <StreamWindow state={state} isLit={lit('stream')} isTitleLit={lit('title')} />
-              )}
-              <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.pair}>
-                {shows('modActions') && (
-                  <ModActionsWindow
-                    acts={state.acts}
-                    isLit={lit('modActions')}
-                    onPickTarget={pickByName}
-                    focusLogin={following?.targetLogin ?? null}
-                  />
-                )}
-                {shows('automod') && (
-                  <AutoModWindow held={state.held} isLit={lit('automod')} gate={gate} onAct={act} />
-                )}
+          {isWorkspace ? (
+            <ModWorkspace model={model} render={windowFor} />
+          ) : (
+            <div className={only ? MODVIEW_FRAME.focus : MODVIEW_FRAME.grid}>
+              <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.column}>
+                {grid(['stream'])}
+                <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.pair}>
+                  {grid(['modActions', 'automod'])}
+                </div>
+              </div>
+              <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.column}>
+                {grid(['chat'])}
+              </div>
+              <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.column}>
+                {grid(['community', 'unbanRequests'])}
               </div>
             </div>
-
-            <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.column}>
-              {shows('chat') && (
-                <ChatWindow
-                  state={state}
-                  spotlight={spotlight}
-                  gate={gate}
-                  onAct={act}
-                  onPick={setPicked}
-                  draft={draft}
-                  onDraft={writeDraft}
-                  onSend={send}
-                  hint={hint}
-                />
-              )}
-            </div>
-
-            <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.column}>
-              {shows('community') &&
-                (live ? (
-                  <HistoryWindow
-                    state={state}
-                    spotlight={spotlight}
-                    panel={panel}
-                    memory={memory}
-                    onPick={setPicked}
-                    onPrefill={prefill}
-                    live={{
-                      id: live.id,
-                      members: live.members.filter((member) => member.id !== live.viewerId),
-                      canInspect,
-                      canFocus: (accountId) => canFocus && live.focusable.includes(accountId),
-                      focuses: focus.focuses,
-                      onInspect: setInspected,
-                      onFocus: (accountId) => void focus.start(accountId),
-                    }}
-                  />
-                ) : (
-                  <CommunityWindow
-                    community={state.community}
-                    spotlight={spotlight}
-                    onPick={setPicked}
-                  />
-                ))}
-              {shows('unbanRequests') && (
-                <UnbanRequestsWindow
-                  requests={state.unbanRequests}
-                  isLit={lit('unbanRequests')}
-                  gate={gate}
-                  onAct={act}
-                />
-              )}
-            </div>
-          </div>
+          )}
 
           {picked && (
             <ViewerCard
@@ -398,6 +304,15 @@ export const ModView = ({
               gate={gate}
               onAct={act}
               onClose={() => setPicked(null)}
+              isWatched={watchlist.watched.some((entry) => entry.id === picked.id)}
+              onWatch={() =>
+                watchlist.watched.some((entry) => entry.id === picked.id)
+                  ? watchlist.unwatch(picked.id)
+                  : watchlist.watch(picked)
+              }
+              dossier={
+                live ? { liveId: live.id, panel, memory, onPrefill: actions.prefill } : undefined
+              }
             />
           )}
 
@@ -419,8 +334,29 @@ export const ModView = ({
             onToggle={() => setPanelOpen((open) => !open)}
             target={picked}
             memory={memory}
-            recentIds={recentIds}
-            onPrefill={prefill}
+            recentIds={[
+              ...new Set(Object.values(memory).flatMap((byOffense) => Object.keys(byOffense))),
+            ]}
+            onPrefill={actions.prefill}
+            history={{
+              state,
+              liveId: live?.id ?? null,
+              onPick: setPicked,
+              onPrefill: actions.prefill,
+            }}
+            suggest={
+              isWorkspace
+                ? {
+                    suggestions,
+                    gate,
+                    onAct: act,
+                    onUse: useSuggestion,
+                    onPick: setPicked,
+                    onWatch: watchlist.watch,
+                    onDismiss: dismiss,
+                  }
+                : undefined
+            }
           />
         )}
       </div>

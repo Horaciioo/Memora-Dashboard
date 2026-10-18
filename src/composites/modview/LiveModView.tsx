@@ -1,5 +1,6 @@
 'use client'
 
+import { useReread } from '@/composites/lives/LiveGate'
 import { ModView } from '@/composites/modview/ModView'
 import type { ModViewLiveTools } from '@/composites/modview/ModView'
 import { useLiveModView } from '@/core/hooks/data/lives/useLiveModView'
@@ -28,6 +29,7 @@ export interface LiveModViewProps {
 export const LiveModView = ({ live, panel, tools, fallbackLevel }: LiveModViewProps) => {
   const driver = useLiveModView(live)
   useModViewPresence(live.id)
+  const reread = useReread()
 
   return (
     <ModView
@@ -37,6 +39,7 @@ export const LiveModView = ({ live, panel, tools, fallbackLevel }: LiveModViewPr
       levelName={live.liveconLevel?.name ?? fallbackLevel?.name ?? null}
       levelIcon={live.liveconLevel?.icon ?? fallbackLevel?.icon ?? null}
       live={tools}
+      onReread={reread}
     />
   )
 }

@@ -4,8 +4,11 @@ import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { FlaggedText } from '@/composites/modview/FlaggedText'
+import { ViewerDossier } from '@/composites/modview/ViewerDossier'
+import type { ViewerDossierProps } from '@/composites/modview/ViewerDossier'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
+import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
 import { TIMEOUT_PRESETS } from '@/declarations/modview/registries'
 import { MODVIEW_USER } from '@/declarations/ui/variants'
 import type { ChatMessage, Chatter } from '@/types/modview'
@@ -17,6 +20,10 @@ export interface ViewerCardProps {
   gate: GateCheck
   onAct: ActRunner
   onClose: () => void
+  isWatched: boolean
+  onWatch: () => void
+  // Dossier of a real live
+  dossier?: Omit<ViewerDossierProps, 'chatter'>
 }
 
 /**
@@ -26,10 +33,22 @@ export interface ViewerCardProps {
  * @param {GateCheck} gate - Permission check
  * @param {ActRunner} onAct - Gesture runner
  * @param {() => void} onClose - Close the card
+ * @param {boolean} isWatched - Under watch
+ * @param {() => void} onWatch - Start or stop watching
+ * @param {Omit<ViewerDossierProps, 'chatter'>} [dossier] - Dossier data
  * @return {JSX.Element}
  */
 
-export const ViewerCard = ({ chatter, messages, gate, onAct, onClose }: ViewerCardProps) => {
+export const ViewerCard = ({
+  chatter,
+  messages,
+  gate,
+  onAct,
+  onClose,
+  isWatched,
+  onWatch,
+  dossier,
+}: ViewerCardProps) => {
   const [reason, setReason] = useState('')
   const chatterId = chatter.id
   const lastLine = [...messages].reverse().find((message) => !message.deletedBy)
@@ -54,6 +73,12 @@ export const ViewerCard = ({ chatter, messages, gate, onAct, onClose }: ViewerCa
       </header>
 
       <div className={MODVIEW_USER.body}>
+        <Button variant={isWatched ? 'secondary' : 'primary'} icon="visible" onClick={onWatch}>
+          {isWatched ? MODVIEW_WATCH_COPY.stop : MODVIEW_WATCH_COPY.start}
+        </Button>
+
+        {dossier && <ViewerDossier chatter={chatter} {...dossier} />}
+
         <section className={MODVIEW_USER.section}>
           <h4 className={MODVIEW_USER.label}>{MODVIEW_USER_COPY.messages}</h4>
           <ul className={MODVIEW_USER.messages}>

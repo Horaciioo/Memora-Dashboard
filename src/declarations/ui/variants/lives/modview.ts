@@ -6,9 +6,9 @@ import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
  */
 
 export const MODVIEW_FRAME = {
-  root: 'flex h-[calc(100dvh-3rem)] min-h-[36rem] w-full flex-col gap-3',
+  root: 'flex min-h-0 w-full flex-col gap-3',
   // Hook read by the page shell to drop banner room and width cap
-  bleed: 'modview-bleed',
+  bleed: 'modview-bleed flex-1 flex-row gap-2',
   embedded: 'h-[clamp(26rem,64dvh,44rem)] min-h-0',
   bar: 'flex flex-wrap items-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-2 shadow-[var(--shadow-sm)]',
   channel: 'flex items-center gap-2 font-bold',
@@ -40,9 +40,18 @@ export const MODVIEW_FRAME = {
 export const MODVIEW_WINDOW = {
   root: 'relative flex min-h-64 flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)] transition-[box-shadow,transform] duration-[var(--motion-duration-panel)] lg:min-h-0',
   grow: 'flex-1',
+  // Window of the workspace: the slot sizes it
+  tiled: 'h-full min-h-0',
+  headDraggable: 'cursor-grab active:cursor-grabbing',
+  grip: 'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)]',
+  controls: 'flex shrink-0 items-center',
+  control:
+    'flex h-6 w-6 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  controlIcon: 'h-3.5 w-3.5',
   // Lit by a scene
   lit: 'z-20 scale-[1.01] shadow-[0_0_0_2px_var(--color-brand-600),0_0_0_8px_color-mix(in_oklab,var(--color-brand-600)_35%,transparent),var(--shadow-md)]',
-  head: 'flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-2',
+  // Heading band tinted apart from the body, as on Twitch
+  head: 'flex items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-sunken)] px-3 py-2',
   title: 'min-w-0 flex-1 truncate text-sm font-bold tracking-tight',
   headAction:
     'rounded-[var(--radius-md)] px-2 py-1 text-xs font-bold text-[var(--color-brand-800)] transition-colors hover:bg-[var(--color-hover)]',
@@ -72,6 +81,8 @@ export const MODVIEW_SPOTLIGHT = {
 
 export const MODVIEW_STREAM = {
   frame: 'aspect-video w-full bg-[var(--color-surface-sunken)]',
+  // In the workspace the player takes the room the title leaves
+  fill: 'min-h-0 w-full flex-1 bg-[var(--color-surface-sunken)]',
   embed: 'h-full w-full border-0',
   title: 'flex items-center gap-3 px-3 py-2.5',
   art: 'h-12 w-9 shrink-0 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] object-cover',
@@ -225,9 +236,18 @@ export const MODVIEW_SANCTIONS = {
   open: 'w-full lg:w-80',
   closed: 'hidden w-12 lg:flex',
   toggle:
-    'flex items-center gap-2 border-b border-[var(--color-border)] px-3 py-2 text-left text-sm font-bold transition-colors hover:bg-[var(--color-hover)]',
+    'flex items-center gap-2 border-b border-[var(--color-border)] bg-[var(--color-surface-sunken)] px-3 py-2 text-left text-sm font-bold transition-colors hover:bg-[var(--color-hover)]',
   toggleIcon: 'h-5 w-5 shrink-0',
   body: 'min-h-0 flex-1 overflow-y-auto p-3',
+  // Offences above, sanctions history below
+  split: 'flex min-h-0 flex-1 flex-col',
+  top: 'min-h-0 overflow-y-auto p-3',
+  bottom: 'flex min-h-0 flex-col',
+  bottomTitle:
+    'border-y border-[var(--color-border)] bg-[var(--color-surface-sunken)] px-3 py-2 text-sm font-bold tracking-tight',
+  bottomBody: 'flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3',
+  suggestion: 'flex flex-col gap-2 rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)] p-2',
+  suggestionTitle: PROPERTY_LABEL,
   level: 'mb-3 flex items-center gap-2 text-xs font-bold tracking-wide uppercase',
   group: 'mb-4 flex flex-col gap-1.5',
   groupTitle: `${PROPERTY_LABEL} text-[var(--accent)]`,
@@ -250,8 +270,8 @@ export const MODVIEW_SANCTIONS = {
   search:
     'w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
   tabs: 'flex items-center justify-center gap-2 py-3',
-  tab: 'flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)]',
-  tabOn: 'bg-[var(--color-brand-100)] text-[var(--color-ink-accent)]',
+  tab: 'flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  tabOn: 'bg-[var(--color-surface-sunken)] text-[var(--color-ink)]',
   tabGlyph: 'h-5 w-5',
   divider: 'mb-3 border-t border-[var(--color-border)]',
   list: 'flex flex-col gap-2',
@@ -266,40 +286,70 @@ export const MODVIEW_SANCTIONS = {
   actions: 'flex flex-wrap gap-1.5 pt-1',
 } as const
 
+// Share the offences keep when the history is dragged
+export const MODVIEW_SANCTIONS_SPLIT = { min: 0.2, max: 0.8 } as const
+
 /**
  * Preview page around the Mod View
  * @type {Record<string, string>}
  */
 
 export const MODVIEW_PREVIEW = {
-  root: 'flex w-full flex-col gap-4',
+  root: 'flex min-h-0 w-full flex-1 flex-col gap-2',
   toolbar: 'flex flex-wrap items-center justify-center gap-3',
 } as const
 
 /**
- * Live rail standing in the sidebar
+ * Workspace holding the windows: columns, handles, drop marks
  * @type {Record<string, string>}
  */
 
-export const MODVIEW_RAIL = {
-  root: 'flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pt-2',
-  back: 'flex items-center gap-2 px-2.5 text-sm font-bold text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
-  backIcon: 'h-4 w-4',
-  identity: 'flex items-center gap-3 px-2.5',
-  platform: 'h-10 w-10 shrink-0',
-  identityText: 'flex min-w-0 flex-col',
-  channel: 'truncate text-xl font-bold tracking-tight',
-  status: 'flex items-center gap-1.5 text-xs font-bold tracking-wide uppercase',
-  notice: 'mt-1 text-xs leading-snug text-[var(--color-ink-subtle)]',
-  // Connection read by the colour of its words
-  connected: 'text-[var(--color-success)]',
-  connecting: 'text-[var(--color-caution)]',
-  off: 'text-[var(--color-ink-subtle)]',
-  scripted: 'text-[var(--color-ink-accent)]',
-  livecon: 'flex items-center gap-2 px-2.5 text-sm font-bold tracking-wide uppercase',
-  liveconIcon: 'h-6 w-6',
-  shown: 'text-left font-semibold text-[var(--color-ink)]',
-  folded: 'text-left opacity-55 hover:opacity-100',
+export const MODVIEW_WORKSPACE = {
+  root: 'flex min-h-0 min-w-0 flex-1',
+  column: 'flex min-h-0 min-w-0 flex-col',
+  away: 'hidden',
+  slot: 'relative flex min-h-0 min-w-0 flex-col',
+  // Handles between two columns or two windows
+  columnHandle:
+    'group relative z-10 w-2 shrink-0 cursor-col-resize touch-none outline-none focus-visible:bg-[var(--color-focus-halo)]',
+  rowHandle:
+    'group relative z-10 h-2 shrink-0 cursor-row-resize touch-none outline-none focus-visible:bg-[var(--color-focus-halo)]',
+  columnGrip:
+    'absolute inset-y-6 left-1/2 w-0.5 -translate-x-1/2 rounded-full bg-transparent transition-colors group-hover:bg-[var(--color-brand-400)] group-active:bg-[var(--color-brand-600)]',
+  rowGrip:
+    'absolute inset-x-6 top-1/2 h-0.5 -translate-y-1/2 rounded-full bg-transparent transition-colors group-hover:bg-[var(--color-brand-400)] group-active:bg-[var(--color-brand-600)]',
+  // Where a dragged window would land
+  dropLeft:
+    'pointer-events-none absolute inset-y-0 left-0 z-40 w-1.5 rounded-full bg-[var(--color-brand-600)]',
+  dropRight:
+    'pointer-events-none absolute inset-y-0 right-0 z-40 w-1.5 rounded-full bg-[var(--color-brand-600)]',
+  dropTop:
+    'pointer-events-none absolute inset-x-0 top-0 z-40 h-1.5 rounded-full bg-[var(--color-brand-600)]',
+  dropBottom:
+    'pointer-events-none absolute inset-x-0 bottom-0 z-40 h-1.5 rounded-full bg-[var(--color-brand-600)]',
+  dragging: 'opacity-50',
+} as const
+
+/**
+ * Icon column on the left of a Mod View, bare on the page
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_SIDEBAR = {
+  root: 'relative z-30 flex w-11 shrink-0 flex-col items-center justify-between py-1',
+  stack: 'flex flex-col items-center gap-1',
+  group: 'relative flex flex-col items-center gap-1',
+  button:
+    'flex size-10 cursor-pointer items-center justify-center rounded-[var(--radius-lg)] text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
+  buttonOpen: 'bg-[var(--color-hover)]',
+  icon: 'size-5',
+  panel:
+    'popover-enter glass-panel absolute left-full z-[60] ml-2 flex max-h-[80dvh] w-72 flex-col gap-1 overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
+  panelTop: 'top-0',
+  panelBottom: 'bottom-0',
+  subtitle: 'px-2.5 pb-1 text-xs text-[var(--color-ink-subtle)]',
+  title:
+    'px-2.5 pt-1.5 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
 } as const
 
 /**
@@ -310,6 +360,8 @@ export const MODVIEW_RAIL = {
 export const MODVIEW_PAGE = {
   // Named for screen readers
   title: 'sr-only',
+  // Fills the screen under the shell padding
+  wrapper: 'flex min-h-0 w-full flex-1 flex-col gap-2',
 } as const
 
 /**
@@ -318,8 +370,6 @@ export const MODVIEW_PAGE = {
  */
 
 export const MODVIEW_HISTORY = {
-  section: 'flex flex-col gap-2 pb-3',
-  label: PROPERTY_LABEL,
   empty: 'text-xs text-[var(--color-ink-subtle)] italic',
   viewer:
     'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] px-3 py-2',
@@ -331,11 +381,6 @@ export const MODVIEW_HISTORY = {
   tag: 'text-micro font-bold tracking-wide uppercase',
   tagPanel: 'text-[var(--color-success)]',
   tagOff: 'text-[var(--color-caution)]',
-  member: 'flex flex-wrap items-center gap-x-2 gap-y-1 text-sm',
-  memberName: 'min-w-0 flex-1 truncate font-semibold',
-  focus: 'text-xs font-semibold text-[var(--color-ink-accent)]',
-  connected: 'border-t border-[var(--color-border)] pt-2',
-  connectedSummary: `${PROPERTY_LABEL} cursor-pointer`,
 } as const
 
 /**
