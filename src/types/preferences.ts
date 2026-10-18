@@ -4,8 +4,10 @@ import type { FormValues } from '@/types/forms'
 /**
  * What a member may read and change about themselves
  * @typedef {Object} ProfileDetail
+ * @property {string} id - Memora identifier
  * @property {string} displayName - Display name
  * @property {string} discordId - Identifier used to sign in
+ * @property {string | null} discordUsername - Discord username
  * @property {string | null} avatarUrl - Portrait
  * @property {string | null} bannerUrl - Discord profile banner
  * @property {MemberRoleName} role - Hierarchy level
@@ -20,8 +22,10 @@ import type { FormValues } from '@/types/forms'
  */
 
 export interface ProfileDetail {
+  id: string
   displayName: string
   discordId: string
+  discordUsername: string | null
   avatarUrl: string | null
   bannerUrl: string | null
   role: MemberRoleName

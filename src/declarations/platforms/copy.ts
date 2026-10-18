@@ -34,6 +34,15 @@ export const TWITCH_EVENT_COPY: {
 }
 
 /**
+ * How an account is named in the Accounts section
+ * @type {Record<string, string>}
+ */
+
+export const ACCOUNT_NAME_COPY = {
+  discord: '{username} ({id})',
+} as const
+
+/**
  * Copy of the platform accounts in the settings
  * @type {Record<string, string>}
  */

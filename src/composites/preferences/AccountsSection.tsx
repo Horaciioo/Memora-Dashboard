@@ -12,7 +12,7 @@ import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { ROUTES } from '@/declarations/navigation'
 import { LINK_RESULT, accountPageOf } from '@/declarations/platforms/link'
-import { PLATFORM_ACCOUNT_COPY } from '@/declarations/platforms/copy'
+import { ACCOUNT_NAME_COPY, PLATFORM_ACCOUNT_COPY } from '@/declarations/platforms/copy'
 import { platformLogoOf } from '@/declarations/platforms/logos'
 import { SECURITY_LIST } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
@@ -32,7 +32,7 @@ const LINK_ROUTES: Record<LivePlatformName, string> = {
 
 export interface AccountsSectionProps {
   // Discord account the member signed in with
-  discord: { id: string }
+  discord: { id: string; username: string }
   links: PlatformLinkView[]
   // Platforms whose application is declared on this server
   available: Record<LivePlatformName, boolean>
@@ -50,7 +50,7 @@ const labelOf = (key: string): string => platformLogoOf(key)?.label ?? key
 
 /**
  * Accounts linked to the member
- * @param {{ id: string }} discord - Sign-in account
+ * @param {{ id: string, username: string }} discord - Sign-in account
  * @param {PlatformLinkView[]} links - Linked platform accounts
  * @param {Record<LivePlatformName, boolean>} available - Platforms that can be linked here
  * @param {{ platform: LivePlatformName, result: string } | null} returned - Link just ended
@@ -99,14 +99,20 @@ export const AccountsSection = ({ discord, links, available, returned }: Account
     })
   const addMenu = useActionMenu(menuItems, PLATFORM_ACCOUNT_COPY.add)
 
-  const row = (key: string, handle: string, actions?: React.ReactNode, warning?: string) => {
+  const row = (
+    key: string,
+    handle: string,
+    name: string,
+    actions?: React.ReactNode,
+    warning?: string
+  ) => {
     const page = accountPageOf(key, handle)
 
     return (
       <li key={key} className={SECURITY_LIST.row}>
         <NetworkLogo network={key} className={SECURITY_LIST.glyph} />
         <div className={SECURITY_LIST.body}>
-          <p className={SECURITY_LIST.title}>{labelOf(key)}</p>
+          <p className={SECURITY_LIST.title}>{name}</p>
           <a
             href={page.href}
             target="_blank"
@@ -133,13 +139,20 @@ export const AccountsSection = ({ discord, links, available, returned }: Account
   return (
     <Section title={PLATFORM_ACCOUNT_COPY.title} description={PLATFORM_ACCOUNT_COPY.lead} padded>
       <ul className={SECURITY_LIST.list}>
-        {row('discord', discord.id)}
+        {row(
+          'discord',
+          discord.id,
+          ACCOUNT_NAME_COPY.discord
+            .replace('{username}', discord.username)
+            .replace('{id}', discord.id)
+        )}
         {links.map((link) => {
           const key = link.platform.toLowerCase()
 
           return row(
             key,
             link.handle,
+            labelOf(key),
             <>
               {link.revoked && available[link.platform] && (
                 <a

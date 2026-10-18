@@ -19,6 +19,7 @@ import { replayGuides } from '@/app/(dashboard)/parametres/actions'
 import { SENSITIVE_FIELD_REGISTRY, isSensitiveField } from '@/declarations/access/sensitive'
 import type { SensitiveFieldName } from '@/declarations/access/sensitive'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'
+import { MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { DETAIL_BLOCK } from '@/declarations/ui/blocks'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
@@ -151,13 +152,16 @@ export const PreferencesPanel = ({
         >
           <DetailGrid
             entries={[
-              { label: FIELD_COPY.discordId, value: <CopyValue value={profile.discordId} /> },
+              { label: MEMBER_FIELD_COPY.memoraId, value: <CopyValue value={profile.id} /> },
               { label: FIELD_COPY.role, value: <RoleGlyph role={profile.role} /> },
             ]}
           />
         </Section>
         <AccountsSection
-          discord={{ id: profile.discordId }}
+          discord={{
+            id: profile.discordId,
+            username: profile.discordUsername ?? profile.displayName,
+          }}
           links={links}
           available={available}
           returned={returned}
