@@ -13,6 +13,7 @@ import {
   settleOwned,
   presetValues,
 } from '@/core/lib/forms'
+import { toInstantValues } from '@/core/lib/forms'
 import type { PresetContext } from '@/core/lib/forms'
 import { ACTION_COPY, DRAWER_COPY, FORM_COPY } from '@/declarations/ui/copy'
 import type { FormSubject } from '@/declarations/ui/copy'
@@ -23,6 +24,7 @@ import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/type
 import { cn } from '@/utils/classnames'
 import { toDayKey, toFieldValue } from '@/utils/format/calendar'
 import { aimedPhrase } from '@/utils/format/grammar'
+import { shiftToZone } from '@/utils/format/zone'
 
 export interface FormDrawerProps {
   open: boolean
@@ -56,7 +58,8 @@ export interface FormDrawerProps {
  */
 
 const presetContext = (actorId: string | null): PresetContext => {
-  const now = new Date()
+  // The clock reads in the member's zone
+  const now = shiftToZone(new Date())
   const nextHour = new Date(now)
   nextHour.setHours(now.getHours() + 1, 0, 0, 0)
 
@@ -104,7 +107,8 @@ export const FormDrawer = ({
   const actorId = session?.id ?? null
 
   // Presets fill only what the caller left out
-  const startValues = () => presetValues(fields, presetContext(actorId), initialValues)
+  const startValues = () =>
+    toInstantValues(fields, presetValues(fields, presetContext(actorId), initialValues))
 
   const [draft, setDraft] = useState(() => ({
     open,

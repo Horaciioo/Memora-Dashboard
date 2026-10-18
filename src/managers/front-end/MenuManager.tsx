@@ -13,6 +13,7 @@ import {
 import type { MouseEvent, ReactNode } from 'react'
 
 import { useLongPress } from '@/core/hooks/interaction/gestures/useLongPress'
+import { isKeyboardShift } from '@/core/lib/ui/keyboard'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 import { MENU_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -118,7 +119,11 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!menu) return
 
-    const dismiss = () => closeMenu()
+    const width = window.innerWidth
+    const dismiss = (event: Event) => {
+      // A keyboard opening is not a move away
+      if (!isKeyboardShift(event, width)) closeMenu()
+    }
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') closeMenu()
     }

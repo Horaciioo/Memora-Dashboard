@@ -342,7 +342,6 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       mark: 'flag',
       maxItems: FORM_SETTINGS.tagMaxCount,
       group: FORM_GROUPS.contact,
-      maturity: 'alpha',
     },
     {
       name: 'joinedAt',
@@ -382,7 +381,7 @@ export const listMembers = async (
       ...SUMMARY_INCLUDE,
       _count: { select: { notesReceived: true, absences: { where: activeAbsenceFilter() } } },
     },
-    orderBy: [{ status: 'asc' }, { displayName: 'asc' }],
+    orderBy: { displayName: 'asc' },
   })
 
   return rows.map((row) =>

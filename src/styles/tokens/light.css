@@ -77,6 +77,11 @@
   --color-live-100: #ffe3e0;
   --color-live-300: #ff9c94;
   --color-live-400: #f0625a;
+  /* Same ramp, in violet, for a Twitch live */
+  --color-youtube-ink: #b30e12;
+  --color-twitch-100: #efe6ff;
+  --color-twitch-300: #bb9bff;
+  --color-twitch-400: #8f5cf0;
   --color-caution-soft: #f8efd6;
   --color-warning-soft: #f9e9d6;
   --color-danger-soft: #fde5e6;
@@ -84,7 +89,7 @@
   --color-neutral-soft: #e8e8ed;
 
   /* Brand marks of other products */
-  --color-twitch: #a8355a;
+  --color-twitch: #7c3aed;
   --color-youtube: #e11d1d;
   --color-apple-red: #ff3b30;
   --color-apple-orange: #ff9500;

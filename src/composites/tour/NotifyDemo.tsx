@@ -53,6 +53,7 @@ export const NotifyDemo = () => {
           <Button
             variant={member.isAbsent && beat >= 2 ? 'ghost' : 'secondary'}
             disabled={member.isAbsent && isRefused}
+            className={TOUR_DECK.demoButton}
           >
             {NOTIFY_DEMO.notify}
           </Button>

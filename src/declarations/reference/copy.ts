@@ -69,7 +69,7 @@ export const REFERENCE_FIELD_COPY = {
     'Ajoute un responsable ou un admin pour lui ouvrir le périmètre de ce créateur.',
   leadTeam: 'Équipe',
   leadTeamAll: 'Toutes les équipes',
-  leadsLocked: 'Seul un administrateur modifie l’administration.',
+  leadsLocked: 'Seul un administrateur peut modifier l’administration.',
   leadsSaved: 'Administration enregistrée.',
   frozenLocked: 'Fonction figée, non modifiable',
   encadrementRows: 'Encadrement',

@@ -12,6 +12,7 @@ import { MarkdownEditor } from '@/components/elements/forms/MarkdownEditor'
 import { MultiSelect } from '@/components/elements/forms/selects/MultiSelect'
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { TagsInput } from '@/components/elements/forms/selects/TagsInput'
+import { toWallText } from '@/core/lib/forms/values'
 import { Textarea } from '@/components/elements/forms/inputs/Textarea'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { FIELD_STYLES } from '@/declarations/ui/variants'
@@ -19,6 +20,7 @@ import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { StorageBucket } from '@/types/storage'
 import type { FieldDefinition, FieldValue } from '@/types/forms'
 import { cn } from '@/utils/classnames'
+import { isWallClock, wallToInstant } from '@/utils/format/zone'
 
 export interface FieldControlProps {
   id: string
@@ -34,6 +36,15 @@ export interface FieldControlProps {
 
 // Bucket an image field lands in when its declaration stays silent
 const DEFAULT_BUCKET: StorageBucket = 'files'
+
+/**
+ * Moment a picked wall clock stands for in the member's zone
+ * @param {string} text - Picked day or wall clock
+ * @return {string} - Moment, or the day untouched
+ */
+
+const toMoment = (text: string): string =>
+  isWallClock(text) ? wallToInstant(text).toISOString() : text
 
 /**
  * Field kinds rendered by the drawn calendar
@@ -128,11 +139,13 @@ export const FieldControl = ({
         dayOnly={field.dayOnly}
         defaultTimes={field.defaultTimes}
         label={field.label}
-        value={Array.isArray(value) ? value : []}
+        value={Array.isArray(value) ? value.map(toWallText) : []}
         disabled={disabled || field.readOnly}
         invalid={invalid}
         describedBy={describedBy}
-        onChange={(next) => onChange(Array.isArray(next) && next.length === 2 ? next : null)}
+        onChange={(next) =>
+          onChange(Array.isArray(next) && next.length === 2 ? next.map(toMoment) : null)
+        }
       />
     )
   }
@@ -142,7 +155,7 @@ export const FieldControl = ({
       <DatePicker
         id={id}
         label={field.label}
-        value={typeof value === 'string' ? value : ''}
+        value={typeof value === 'string' ? toWallText(value) : ''}
         withTime={field.kind === 'datetime'}
         startsTimed={field.withTime}
         dayOnly={field.dayOnly}
@@ -151,7 +164,9 @@ export const FieldControl = ({
         disabled={disabled || field.readOnly}
         invalid={invalid}
         describedBy={describedBy}
-        onChange={(next) => onChange(typeof next === 'string' && next !== '' ? next : null)}
+        onChange={(next) =>
+          onChange(typeof next === 'string' && next !== '' ? toMoment(next) : null)
+        }
       />
     )
   }

@@ -10,6 +10,7 @@ import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { resolveAccountPermissions } from '@/core/services/auth/GrantsService'
 import { touchSession } from '@/core/services/auth/SessionService'
 import { syncReferenceLibrary } from '@/core/services/reference/ReferenceSync'
+import { toFavorites } from '@/core/services/preferences/FavoriteService'
 import { toDisplayPreferences } from '@/core/services/preferences/DisplayService'
 import { isRootIdentity } from '@/declarations/access/identity'
 import { isAccessClosed } from '@/core/lib/auth/closed'
@@ -46,8 +47,10 @@ export const toSessionUser = async (account: SessionAccount): Promise<SessionUse
     functionIds: account.functions.map((held) => held.functionId),
     isRoot,
     display: toDisplayPreferences(account),
+    timezone: account.timezone,
     historyConsentVersion: account.historyConsentVersion,
     seenReleaseVersion: account.seenReleaseVersion,
+    favorites: toFavorites(account.favorites),
     permissions: await resolveAccountPermissions(account, activeYoutuberId),
   }
 }

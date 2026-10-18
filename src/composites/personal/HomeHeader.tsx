@@ -6,7 +6,7 @@ export interface HomeHeaderProps {
 }
 
 /**
- * Greeting under the banner, the day on the same line at the far right
+ * Greeting under the banner
  * @param {string} name - Signed-in member
  * @return {JSX.Element}
  */
@@ -17,8 +17,5 @@ export const HomeHeader = ({ name }: HomeHeaderProps) => (
       <h2 className={HOME_HERO.greeting}>{PERSONAL_COPY.greeting.replace('{name}', name)}</h2>
       <p className={HOME_HERO.hello}>{PERSONAL_COPY.hello}</p>
     </div>
-    <time className={HOME_HERO.date} dateTime={new Date().toISOString().slice(0, 10)}>
-      {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-    </time>
   </header>
 )

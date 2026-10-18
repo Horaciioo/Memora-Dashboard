@@ -2,9 +2,11 @@
 
 import Link from '@/components/elements/navigation/AppLink'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { LiveStartedBubble } from '@/composites/lives/LiveStartedBubble'
+import { RailSubPages } from '@/composites/shell/RailSubPages'
+import { FAVORITE_COPY } from '@/declarations/ui/favorites'
 import { visibleNavGroups } from '@/declarations/navigation'
 import { BEACON_ATTRIBUTE, routeBeacon } from '@/declarations/ui/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
@@ -12,6 +14,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { railIcon } from '@/declarations/ui/railIcons'
 import { TOUR_RAIL } from '@/declarations/ui/variants'
 import type { ViewContext } from '@/types/access'
+import { LiveStatuses } from '@/utils/constants/lives'
 import { cn } from '@/utils/classnames'
 
 export interface RailNavProps {
@@ -49,9 +52,18 @@ export const RailNav = ({ groups, isCompact, isTouring, live }: RailNavProps) =>
     })
   }
 
+  // One lit entry at a time: deepest destination, favorites only when nothing else matches
+  const reaches = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
+  const current = groups
+    .filter((group) => group.label !== FAVORITE_COPY.group)
+    .flatMap((group) => group.items.map((item) => item.href))
+    .filter(reaches)
+    .sort((a, b) => b.length - a.length)[0]
+
   return (
     <nav className={LEFT_SIDEBAR.nav}>
       {groups.map((group) => {
+        const isFavorite = group.label === FAVORITE_COPY.group
         const isGroupCollapsed = collapsedGroups.has(group.label) && !isCompact
 
         return (
@@ -75,38 +87,57 @@ export const RailNav = ({ groups, isCompact, isTouring, live }: RailNavProps) =>
             <div className="fold" data-open={!isGroupCollapsed} inert={isGroupCollapsed}>
               <div className={LEFT_SIDEBAR.navGroupItems}>
                 {group.items.map((item) => {
-                  const Icon = railIcon(item.icon)
-                  const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+                  // A creator is on air: the glyph turns into the live dot
+                  const isOnAir = Boolean(item.onLive) && live?.status === LiveStatuses.Live
+                  const Icon = isOnAir ? ICONS.liveDot : railIcon(item.icon)
+                  // A destination hands the light to its open sub page
+                  const isActive = isFavorite
+                    ? !current && reaches(item.href)
+                    : item.href === current && (pathname === item.href || isCompact)
                   const isLit = Boolean(item.onLive && live) && !openedLive && !isActive
 
                   return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      ref={item.onLive ? setLiveAnchor : undefined}
-                      onClick={item.onLive ? () => setOpenedLive(true) : undefined}
-                      title={isCompact ? item.label : undefined}
-                      aria-label={isCompact ? item.label : undefined}
-                      aria-current={isActive ? 'page' : undefined}
-                      {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
-                      className={cn(
-                        LEFT_SIDEBAR.navLink,
-                        isActive && LEFT_SIDEBAR.navLinkActive,
-                        isTouring && TOUR_RAIL.unlock
-                      )}
-                    >
-                      <Icon
-                        className={cn(LEFT_SIDEBAR.navIcon, isActive && LEFT_SIDEBAR.navIconActive)}
-                        aria-hidden="true"
-                      />
-                      <span className={LEFT_SIDEBAR.navLabel}>{item.label}</span>
-                      {isLit && (
-                        <span className={LEFT_SIDEBAR.livePulse} aria-hidden="true">
-                          <span className={LEFT_SIDEBAR.livePulseRing} />
-                          <span className={LEFT_SIDEBAR.livePulseDot} />
+                    <Fragment key={item.href}>
+                      <Link
+                        href={item.href}
+                        ref={item.onLive ? setLiveAnchor : undefined}
+                        onClick={item.onLive ? () => setOpenedLive(true) : undefined}
+                        title={isCompact ? item.label : undefined}
+                        aria-label={isCompact ? item.label : undefined}
+                        aria-current={isActive ? 'page' : undefined}
+                        {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
+                        className={cn(
+                          LEFT_SIDEBAR.navLink,
+                          isActive && LEFT_SIDEBAR.navLinkActive,
+                          isTouring && TOUR_RAIL.unlock
+                        )}
+                      >
+                        <Icon
+                          className={cn(
+                            LEFT_SIDEBAR.navIcon,
+                            isActive && LEFT_SIDEBAR.navIconActive,
+                            isOnAir && 'live-pulse'
+                          )}
+                          aria-hidden="true"
+                        />
+                        <span
+                          className={cn(
+                            LEFT_SIDEBAR.navLabel,
+                            isOnAir && LEFT_SIDEBAR.navLabelLive
+                          )}
+                        >
+                          {item.label}
                         </span>
-                      )}
-                    </Link>
+                        {isLit && !isOnAir && (
+                          <span className={LEFT_SIDEBAR.livePulse} aria-hidden="true">
+                            <span className={LEFT_SIDEBAR.livePulseRing} />
+                            <span className={LEFT_SIDEBAR.livePulseDot} />
+                          </span>
+                        )}
+                      </Link>
+                      {/* Starred pages repeat destinations, one trail is enough */}
+                      {!isCompact && !isFavorite && <RailSubPages base={item.href} />}
+                    </Fragment>
                   )
                 })}
               </div>

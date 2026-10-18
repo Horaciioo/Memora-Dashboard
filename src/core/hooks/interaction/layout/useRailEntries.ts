@@ -1,6 +1,7 @@
 'use client'
 
 import { ROUTES, visibleNavGroups } from '@/declarations/navigation'
+import { FAVORITE_COPY } from '@/declarations/ui/favorites'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
@@ -30,5 +31,21 @@ export const useRailEntries = (viewContext: ViewContext) => {
     }))
     .filter((group) => group.items.length > 0)
 
-  return { shortcuts, groups }
+  // Starred pages lead the menu
+  const favorites = session?.favorites ?? []
+  const starred = favorites.length
+    ? [
+        {
+          label: FAVORITE_COPY.group,
+          from: viewContext.view,
+          items: favorites.map((page) => ({
+            href: page.path,
+            label: page.label,
+            icon: 'star' as const,
+          })),
+        },
+      ]
+    : []
+
+  return { shortcuts, groups: [...starred, ...groups] }
 }

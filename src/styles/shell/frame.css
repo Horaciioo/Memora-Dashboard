@@ -31,10 +31,16 @@
   }
 }
 
-/* Mod View page drops the banner room and the width cap */
+/* Mod View page drops the banner room and the width cap, it fits the screen and never scrolls */
 .shell-page:has(.modview-bleed) {
   max-width: none;
-  padding-top: 1rem;
+  height: 100dvh;
+  gap: 0;
+  padding: 1rem;
+}
+
+html:has(.modview-bleed) {
+  overflow: hidden;
 }
 
 /* Page tokens, so anything inside the rail can take them back */
@@ -56,7 +62,7 @@
 
 /* Rounded window the page shows through (src/components/structures/WindowFrame.tsx) */
 .app-frame {
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-window);
   box-shadow: inset 0 0 0 1px var(--color-frame-edge);
 }
 
@@ -76,7 +82,7 @@
   position: absolute;
   inset: -100vmax;
   border: 100vmax solid transparent;
-  border-radius: calc(100vmax + var(--radius-xl));
+  border-radius: calc(100vmax + var(--radius-window));
   background: var(--gradient-page) border-box fixed;
   -webkit-mask:
     linear-gradient(var(--color-ink) 0 0) padding-box,

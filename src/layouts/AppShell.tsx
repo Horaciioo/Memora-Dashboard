@@ -90,21 +90,21 @@ const AppShellFrame = ({
   children,
 }: Omit<AppShellProps, 'tour'>) => {
   const { session, can } = useAuthContext()
-  const { isClaimed, setSlot } = useRailSlot()
+  const { isClaimed, isBare, setSlot } = useRailSlot()
 
   useAutoRefresh()
 
   return (
     <SealProvider initialState={twoFactor} initialSeal={seal}>
       <div className={APP_SHELL.frame} data-tone={frameToneOf(viewContext.view, session?.role)}>
-        {isClaimed ? (
+        {isBare ? null : isClaimed ? (
           <aside className={LEFT_SIDEBAR.rail}>
             <div ref={setSlot} className={LEFT_SIDEBAR.slot} />
           </aside>
         ) : (
           <LeftSidebar viewContext={viewContext} unreadCount={unreadCount} />
         )}
-        <WindowFrame />
+        <WindowFrame bare={isBare} />
 
         <div className={APP_SHELL.main}>
           {session && (

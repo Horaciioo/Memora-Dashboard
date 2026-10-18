@@ -40,7 +40,7 @@ export const ACTION_ROW = {
  */
 
 export const GUIDES_CARD = {
-  card: 'flex flex-wrap items-center gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4',
+  card: 'flex flex-wrap items-center gap-4',
   glyph: 'size-10 shrink-0 text-[var(--color-ink-subtle)]',
   body: 'flex min-w-0 flex-1 basis-60 flex-col gap-1',
   title: 'text-sm font-semibold',
@@ -69,22 +69,26 @@ export const PROFILE_CARD = {
  */
 
 export const PICKER_CARD = {
-  stack: 'flex flex-col gap-6',
-  pair: 'grid grid-cols-1 gap-6 lg:grid-cols-2',
-  group: 'flex flex-col gap-3',
+  stack: 'flex flex-col gap-8',
+  pair: 'grid grid-cols-1 gap-8 lg:grid-cols-2',
+  group: 'flex flex-col gap-4',
   title: 'flex items-center gap-2 text-sm font-semibold',
   three: 'grid grid-cols-3 gap-2',
-  two: 'grid grid-cols-2 gap-2',
+  wide: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
   option:
-    'flex flex-col items-center justify-end gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-3 text-center transition-[transform,box-shadow] hover:-translate-y-px',
-  optionWide: 'items-start justify-start text-left',
+    'flex flex-col items-center justify-end gap-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-center transition-[transform,box-shadow] hover:-translate-y-px',
+  optionWide: 'items-stretch justify-start gap-3 text-left',
   active: 'border-[var(--color-ink-subtle)] bg-[var(--color-surface-raised)]',
   glyph: 'size-9',
   sample: 'leading-none font-bold tracking-tight',
   label: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
   description: 'text-xs leading-snug text-[var(--color-ink-subtle)]',
   // Palette of a vision mode drawn with its own colours
-  swatches: 'flex gap-1',
-  swatch: 'h-2 w-7 rounded-full',
-  note: 'pt-4 text-xs text-[var(--color-ink-subtle)]',
+  swatches: 'flex gap-1.5',
+  swatch: 'h-2.5 w-8 rounded-full',
+  // Page background as the mode draws it
+  frameStrip:
+    'h-6 w-full rounded-[var(--radius-md)] bg-[linear-gradient(90deg,var(--color-frame-mauve),var(--color-frame-blue),var(--color-frame-pink))]',
+  lead: 'text-sm text-[var(--color-ink-subtle)]',
+  note: 'text-xs text-[var(--color-ink-subtle)]',
 } as const

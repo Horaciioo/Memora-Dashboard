@@ -1,3 +1,11 @@
+// Ring around a picked card or entry
+const PICK_RING =
+  'ring-2 ring-[var(--color-pick)] ring-offset-1 ring-offset-[var(--color-surface-raised)]'
+
+// Bar listing what a selection can do
+const SELECTION_BAR =
+  'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-brand-400)] bg-[var(--color-brand-soft)]/60 px-3 py-2 text-sm'
+
 /**
  * Table styles
  * @type {Record<string, string>}
@@ -249,6 +257,10 @@ export const BOARD_STYLES = {
   cardOrigin: 'border-t border-[var(--color-border)] pt-2 text-xs text-[var(--color-ink-subtle)]',
   // Glyph flowing before a title
   cardGlyph: 'mr-1.5',
+  cardSelected: PICK_RING,
+  // Rectangle drawn over empty space
+  marquee:
+    'pointer-events-none fixed z-50 rounded-[var(--radius-sm)] border border-[var(--color-pick)] bg-[var(--color-pick)]/15',
 } as const
 
 /**
@@ -405,8 +417,7 @@ export const CALENDAR_STYLES = {
   entrySolid: 'text-[var(--color-on-accent)]',
   // Absences sit behind everything else
   entryMuted: 'border border-[var(--color-border)] opacity-75',
-  entrySelected:
-    'ring-2 ring-[var(--color-pick)] ring-offset-1 ring-offset-[var(--color-surface-raised)]',
+  entrySelected: PICK_RING,
   // Seat of the minute grid
   entryFill: 'h-full overflow-hidden',
   entryCompact: 'items-center py-0',
@@ -431,8 +442,7 @@ export const CALENDAR_STYLES = {
   legendRowMuted: 'opacity-40',
   legendDot: 'h-2 w-2 shrink-0 rounded-full',
   legendCount: 'tabular-nums opacity-60',
-  selectionBar:
-    'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-brand-400)] bg-[var(--color-brand-soft)]/60 px-3 py-2 text-sm',
+  selectionBar: SELECTION_BAR,
   selectionCount: 'font-semibold tabular-nums',
   // Detail modal
   detailList: 'flex list-disc flex-col gap-1 pl-5 text-sm',

@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 
+import { isKeyboardShift } from '@/core/lib/ui/keyboard'
+
 // Room kept between the panel and the viewport edge
 const EDGE_MARGIN = 8
 
@@ -100,8 +102,11 @@ export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPa
   useEffect(() => {
     if (!isOpen) return
 
+    const width = window.innerWidth
     const dismiss = (event: Event) => {
       if (event.type === 'scroll' && panelRef.current?.contains(event.target as Node)) return
+      // A keyboard opening must not close the panel it opened for
+      if (isKeyboardShift(event, width)) return
 
       setOpen(false)
     }

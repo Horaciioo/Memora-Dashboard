@@ -28,24 +28,27 @@ export const APP_SHELL = {
   frame: 'app-tone page-ground flex min-h-dvh md:pr-3',
   // Window the page shows through
   window:
-    'app-frame pointer-events-none fixed inset-y-3 right-3 left-[var(--shell-sidebar-w)] z-[35] hidden md:block print:hidden',
+    'app-frame pointer-events-none fixed inset-y-3 right-3 left-[var(--shell-sidebar-w)] z-[35] transition-[left] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none hidden md:block print:hidden',
   // No rail
   windowBare: 'app-frame pointer-events-none fixed inset-3 z-[35] hidden md:block print:hidden',
   // Scrollbar inside the window
   windowTrack:
-    'group/track pointer-events-auto absolute top-[var(--radius-xl)] right-1 bottom-[var(--radius-xl)] w-2.5 cursor-pointer',
+    'group/track pointer-events-auto absolute top-[var(--radius-window)] right-1 bottom-[var(--radius-window)] w-2.5 cursor-pointer',
   windowThumb:
     'absolute inset-x-0.5 top-0 cursor-grab rounded-full bg-[var(--color-ink)]/25 transition-[background-color,left,right] duration-[var(--motion-duration-fast)] group-hover/track:inset-x-0 group-hover/track:bg-[var(--color-ink)]/40 active:cursor-grabbing active:bg-[var(--color-ink)]/50',
   // Positioned so the page banner can span the whole column
-  main: 'page-wash relative flex min-w-0 flex-1 flex-col bg-[var(--color-page)] md:ml-[var(--shell-sidebar-w)]',
+  main: 'page-wash relative flex min-w-0 flex-1 flex-col bg-[var(--color-page)] md:ml-[var(--shell-sidebar-w)] md:transition-[margin-left] md:duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
   // Gutters widen past md so a page never welds itself to either rail
   content:
     'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--banner-h)+2.5rem)] print:max-w-none print:p-0',
-  breadcrumbs: 'hidden flex-wrap items-center gap-1 text-xs text-[var(--color-ink-subtle)] sm:flex',
-  // Below sm the trail folds to a single back link to the parent
-  breadcrumbsCompact: 'flex items-center gap-1 text-xs text-[var(--color-ink-subtle)] sm:hidden',
-  crumbLink: 'transition-colors hover:text-[var(--color-ink)]',
-  crumbCurrent: 'font-medium text-[var(--color-ink)]',
+  // Trail on the photograph, the foot of the path stays whole
+  breadcrumbs: 'flex min-w-0 items-center gap-1 text-sm font-medium',
+  crumb: 'flex min-w-0 items-center gap-1',
+  crumbSeparator: 'size-3 shrink-0 opacity-60',
+  crumbLink:
+    'shrink-0 text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
+  crumbCategory: 'shrink-0 text-[var(--color-ink-subtle)]',
+  crumbCurrent: 'truncate font-semibold',
 } as const
 
 /**
@@ -75,7 +78,7 @@ export const RAIL_POPOVER = {
 
 export const LEFT_SIDEBAR = {
   // Rail standing on the frame
-  rail: 'rail-ground relative z-40 font-[family-name:var(--font-system)] hidden w-[var(--shell-sidebar-w)] shrink-0 flex-col py-3 md:fixed md:inset-y-0 md:left-0 md:flex print:hidden',
+  rail: 'rail-ground relative z-40 font-[family-name:var(--font-system)] hidden w-[var(--shell-sidebar-w)] shrink-0 flex-col py-3 md:fixed md:inset-y-0 md:left-0 md:flex md:transition-[width] md:duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none print:hidden',
   // Calendar menu or classic menu, plain buttons
   viewButtons: 'flex shrink-0 gap-2 px-4 pb-3',
   viewButton:
@@ -93,10 +96,13 @@ export const LEFT_SIDEBAR = {
   creatorRow: 'flex shrink-0 justify-center px-4 pb-3',
   // Search bar
   searchRow: 'flex shrink-0 px-4',
+  // Search folded to a glyph box, as wide as the shortcuts
+  searchGlyph:
+    'glass-panel flex h-11 w-full items-center justify-center rounded-[var(--radius-lg)] border text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
   // Glyph boxes under the search
   shortcuts: 'rail-shortcuts flex shrink-0 gap-2 px-4 pt-3',
   shortcut:
-    'glass-panel flex h-11 flex-1 items-center justify-center rounded-[var(--radius-lg)] border text-[var(--rail-accent)] transition-colors hover:text-[var(--rail-accent-deep)]',
+    'glass-panel flex h-11 flex-1 items-center justify-center rounded-[var(--radius-lg)] border text-[var(--color-ink)] transition-colors hover:text-[var(--color-ink-subtle)]',
   shortcutActive: 'shadow-[var(--shadow-md)]',
   // Unread note, painted in rail.css
   shortcutFresh: 'shortcut-fresh',
@@ -114,8 +120,18 @@ export const LEFT_SIDEBAR = {
     'group flex items-center gap-3 rounded-[var(--radius-lg)] px-3 py-1.5 text-body font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
   navLinkActive: 'font-semibold text-[var(--color-ink)]',
   navLabel: 'rail-fold relative',
+  // A creator is on air: red text breathing a soft glow
+  navLabelLive: 'live-glow font-semibold text-[var(--color-live-400)]',
+  // Elbow joins each page opened under a destination: straight down, then a tight turn
+  subPage:
+    'relative ml-[1.375rem] pl-5 before:absolute before:top-0 before:left-0 before:h-4 before:w-3.5 before:rounded-bl-[0.5rem] before:border-b-2 before:border-l-2 before:border-[var(--color-ink-subtle)]/60',
+  // First level starts right under the destination glyph
+  subPageRoot: '-mt-1.5',
+  subLink:
+    'flex h-8 items-center rounded-[var(--radius-md)] px-2 text-caption font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
+  subLinkActive: 'font-semibold text-[var(--color-ink)]',
   navIcon: 'size-5 shrink-0 transition-colors',
-  navIconActive: 'text-[var(--color-ink-accent)]',
+  navIconActive: 'text-[var(--color-ink)]',
   // Pulse on the live entry, bubble anchored beside it
   livePulse: 'rail-fold relative ml-auto flex size-2.5 shrink-0',
   livePulseRing: 'live-halo absolute inset-0 rounded-full bg-[var(--color-live-400)]',
@@ -131,6 +147,8 @@ export const LEFT_SIDEBAR = {
   // Profile box, bell on its right
   footerBox:
     'rail-footer-box glass-panel flex min-w-0 flex-1 flex-col rounded-[var(--radius-xl)] border p-2',
+  // Folded rail: the portrait alone, centred
+  footerBare: 'flex min-w-0 flex-1 justify-center',
   // Level switch heading the profile box, a rule under it
   footerSwitch: 'px-1 pt-1',
   footerRule: 'mx-1 my-2 h-px bg-[var(--color-border)]',
@@ -734,6 +752,8 @@ export const CREATOR_MENU = {
   wrapper: 'relative min-w-0 flex-1',
   trigger:
     'flex w-full min-w-0 items-center gap-3 rounded-[var(--radius-lg)] px-2 py-1.5 text-left transition-colors hover:bg-[var(--color-hover)]',
+  // Folded rail, portrait alone
+  triggerBare: 'w-auto flex-none justify-center gap-0 p-1',
   // Same footprint as a portrait
   noneGlyph: 'h-8 w-8 shrink-0 p-1',
   name: 'rail-fold min-w-0 flex-1 truncate text-body font-medium',

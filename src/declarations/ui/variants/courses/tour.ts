@@ -24,10 +24,10 @@ export const TOUR_CHAT = {
   scroll: 'min-h-0 flex-1 overflow-y-auto px-5 py-8 sm:px-10 lg:px-14',
   column: 'mx-auto flex w-full max-w-3xl flex-col gap-2',
   // Discord's way: portrait, then the speaker's name and his messages under it
-  group: 'replica-message-in flex w-full gap-4',
+  group: 'replica-message-in flex w-full gap-3 sm:gap-4',
   groupBreak: 'mt-5',
-  avatar: 'flex h-10 w-10 shrink-0 items-start justify-center',
-  avatarGlyph: 'h-10 w-10',
+  avatar: 'flex h-8 w-8 shrink-0 items-start justify-center sm:h-10 sm:w-10',
+  avatarGlyph: 'h-8 w-8 sm:h-10 sm:w-10',
   body: 'flex min-w-0 flex-1 flex-col gap-0.5',
   author: 'text-body font-bold',
   authorMemora: 'text-[var(--color-ink-accent)]',
@@ -35,17 +35,18 @@ export const TOUR_CHAT = {
   typing: 'flex h-6 w-fit items-center gap-1',
   typingDot: 'replica-typing-dot h-1.5 w-1.5 rounded-full bg-[var(--color-ink-subtle)]',
   // A scene Memora plays, in the flow of her messages
-  scene: 'my-1 w-full min-w-0 max-w-[90%]',
+  scene: 'my-1 w-full min-w-0 sm:max-w-[90%]',
   // Answers come under the question, on Memora's side, spread over the width of her messages
   quick:
-    'surface-enter ml-14 mt-1 grid w-full max-w-[90%] grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-2',
+    'surface-enter mt-1 grid w-full grid-cols-1 gap-2 sm:ml-14 sm:w-auto sm:max-w-[90%] sm:grid-cols-[repeat(auto-fit,minmax(9rem,1fr))]',
   chip: 'w-full justify-center rounded-full',
   // A field is asked in an embed: accent bar, title, the control, then the actions in a column
   reply:
-    'surface-enter ml-14 mt-1 flex w-full max-w-[90%] flex-col gap-3 rounded-[var(--radius-sm)] border border-[var(--color-border)] border-l-4 border-l-[var(--color-brand-600)] bg-[var(--color-surface)] py-3 pr-4 pl-4 shadow-[var(--shadow-sm)]',
+    'surface-enter mt-1 flex w-full flex-col gap-3 sm:ml-14 sm:w-auto sm:max-w-[90%] rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] py-3 pr-4 pl-4 shadow-[var(--shadow-sm)]',
   embedTitle: 'text-body font-bold',
   replyActions: 'flex flex-col items-stretch',
-  replyDivider: 'my-2 h-px w-full bg-[var(--color-border)]',
+  // Ghost button pads itself
+  replyDivider: 'mt-[1.125rem] mb-2 h-px w-full bg-[var(--color-border)]',
   replyAction: 'w-full justify-center',
   // The chat bar under the conversation, written for the member
   bar: 'mx-auto flex w-full max-w-3xl shrink-0 items-center gap-3 px-5 pt-1 pb-5 sm:px-10 lg:px-14',
@@ -86,8 +87,8 @@ export const TOUR_CHAT = {
   previewHint: 'text-micro leading-snug text-[var(--color-ink-subtle)]',
   // The offers, then the way out under them
   offer: 'flex w-full flex-col gap-2',
-  offerNone: 'ml-14 w-full max-w-[90%] justify-center',
-  birthday: 'grid grid-cols-[1fr_1.6fr_1fr] gap-2',
+  offerNone: 'w-full justify-center sm:ml-14 sm:w-auto sm:max-w-[90%]',
+  birthday: 'grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1.6fr_1fr]',
 } as const
 
 /**
@@ -101,9 +102,11 @@ export const TOUR_DECK = {
   demoTask: 'text-section font-semibold tracking-tight',
   demoLabel: 'text-caption font-semibold text-[var(--color-ink-subtle)]',
   demoRow:
-    'flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] card-surface px-3 py-2 transition-opacity',
+    'flex flex-wrap items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] card-surface px-3 py-2 transition-opacity sm:flex-nowrap',
   demoRowAbsent: 'opacity-60',
-  demoName: 'flex min-w-0 flex-1 flex-col text-body font-semibold',
+  demoName: 'flex min-w-[8rem] flex-1 flex-col text-body font-semibold',
+  // Under the name on a phone, beside it from sm
+  demoButton: 'w-full justify-center sm:w-auto',
   demoAbsent: 'text-caption font-normal text-[var(--color-ink-subtle)]',
   demoRefusal:
     'surface-enter flex items-start gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-brand-soft)] px-3 py-2 text-body',

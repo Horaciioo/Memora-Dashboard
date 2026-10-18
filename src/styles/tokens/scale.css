@@ -22,6 +22,8 @@
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
+  /* Page window, a notch under xl */
+  --radius-window: 0.75rem;
   --radius-full: 999px;
 
   /* Shadows, warm and wide, almost no edge */

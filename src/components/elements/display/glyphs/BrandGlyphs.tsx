@@ -801,6 +801,7 @@ export const EditGlyph = ({ className }: GlyphProps) => (
 export const RemoveGlyph = ({ className }: GlyphProps) => (
   <Frame
     className={className}
+    tone="danger"
     render={({ fill, deep, cut }) => (
       <>
         <path d="M5 7h14l-1 12.6a2.5 2.5 0 0 1-2.5 2.3h-7A2.5 2.5 0 0 1 6 19.6z" fill={fill} />

@@ -147,10 +147,12 @@ import {
   ViewerGlyph,
   ChatGlyph,
   StreamGlyph,
+  StreamOffGlyph,
   ModActionsGlyph,
   UnbanRequestGlyph,
   CoordinatorGlyph,
   SanctionsPanelGlyph,
+  SpanArrowGlyph,
 } from '@/components/elements/display/glyphs/LiveGlyphs'
 import {
   DiscordHashGlyph,
@@ -195,6 +197,7 @@ export const ICONS = {
   liveconWatch: LiveconWatchGlyph,
   liveconCrisis: LiveconCrisisGlyph,
   liveDot: LiveDotGlyph,
+  spanArrow: SpanArrowGlyph,
   statusDot: StatusDotGlyph,
   twitch: TwitchGlyph,
   youtube: YoutubeGlyph,
@@ -216,6 +219,7 @@ export const ICONS = {
   viewer: ViewerGlyph,
   chat: ChatGlyph,
   stream: StreamGlyph,
+  streamOff: StreamOffGlyph,
   modActions: ModActionsGlyph,
   unbanRequest: UnbanRequestGlyph,
   coordinator: CoordinatorGlyph,

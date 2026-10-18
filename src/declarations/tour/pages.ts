@@ -126,7 +126,7 @@ export const TOUR_PAGES: TourPage[] = [
       {
         beacon: TOUR_BEACONS.page,
         title: 'Le calendrier',
-        body: 'Lives, réunions, absences, anniversaires : tout ce que tu as le droit de voir, par mois, par semaine ou en planning. Le menu de gauche laisse choisir quels calendriers afficher.',
+        body: 'Lives, réunions, absences, anniversaires : tout ce que tu as le droit de voir, par mois, par semaine ou en planning. Le menu de gauche liste les calendriers à afficher ; ses boutons « Calendrier » et « Menu », en haut, basculent avec le menu des pages.',
       },
       {
         beacon: TOUR_BEACONS.calendarRequest,
@@ -137,7 +137,7 @@ export const TOUR_PAGES: TourPage[] = [
       {
         beacon: GUIDE_BEACONS.calendarAdd,
         title: 'Poser un évènement',
-        body: 'Ce bouton pose un évènement dans le calendrier. Tu peux aussi tirer sur une colonne de la grille pour en créer un.',
+        body: 'Ce bouton pose un évènement dans le calendrier. Sur ordinateur, avec le mode « Tracer » de la grille à la minute, tu peux aussi tirer sur une colonne pour en créer un.',
         permission: Permissions.CalendarManage,
       },
     ],

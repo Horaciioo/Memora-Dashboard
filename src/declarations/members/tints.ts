@@ -104,13 +104,13 @@ const BASE_TINTS = {
   },
   // Twitch
   TWITCH: {
-    fillFrom: '#efc3cb',
-    fillTo: '#c9707f',
-    liftFrom: '#fdeff1',
-    liftTo: '#f5d5da',
-    deepFrom: '#a65768',
-    deepTo: '#6a2f3d',
-    cut: '#fff6f7',
+    fillFrom: '#b794ff',
+    fillTo: '#7c3aed',
+    liftFrom: '#ede4ff',
+    liftTo: '#cdb6ff',
+    deepFrom: '#6428c9',
+    deepTo: '#3f1a82',
+    cut: '#f7f2ff',
   },
   // YouTube
   YOUTUBE: {

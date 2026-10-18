@@ -31,8 +31,15 @@ export const PAGE_STYLES = {
   // Banner across the top of the page: in the flow on a phone
   banner:
     'relative -mx-4 -mt-6 h-[var(--banner-h)] sm:-mx-6 sm:-mt-8 md:absolute md:inset-x-0 md:top-0 md:m-0 print:hidden',
-  // Corner of the banner the page options sit in
-  bannerOptions: 'absolute top-3 right-3 z-10 sm:top-4 sm:right-4',
+  // Bar on the page colour across the top of the banner, clear of the window rim
+  bannerBar:
+    'absolute inset-x-0 top-0 z-10 flex h-11 items-center justify-between gap-3 bg-[var(--color-page)] px-5 text-[var(--color-ink)] sm:px-6 md:h-14 md:pt-3',
+  // Slot the page options are carried into
+  bannerOptions: 'flex shrink-0 items-center gap-0.5',
+  barButton:
+    'inline-flex size-8 cursor-pointer items-center justify-center rounded-[var(--radius-sm)] transition-colors hover:bg-[var(--color-hover)] disabled:cursor-not-allowed',
+  barStar: 'size-5',
+  barStarDim: 'opacity-40',
   // Title and note laid over the foot of the photograph
   bannerFoot:
     'absolute inset-x-0 bottom-0 flex flex-col gap-1.5 px-5 pb-3 text-[var(--color-on-media)] sm:px-8 sm:pb-7',
@@ -255,6 +262,26 @@ export const MENU_STYLES = {
   separator: 'my-1 h-px bg-[var(--color-border)]',
   label: 'px-3 py-1 text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   shortcut: 'ml-auto text-xs text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Selection menu styles
+ * @type {Record<string, string>}
+ */
+
+export const SELECTION_MENU_STYLES = {
+  panel:
+    'surface-enter fixed z-[60] flex w-64 flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel p-1.5 shadow-[var(--shadow-lg)]',
+  search:
+    'w-full rounded-[var(--radius-md)] border border-[var(--color-pick)] bg-[var(--color-field)] px-2.5 py-1.5 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]',
+  heading: 'px-2.5 pt-2 pb-1 text-xs font-semibold text-[var(--color-ink-subtle)]',
+  item: 'flex min-h-9 w-full items-center gap-2.5 rounded-[var(--radius-sm)] px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-[var(--color-surface)] focus-visible:bg-[var(--color-surface)] focus-visible:outline-none',
+  danger: 'text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
+  icon: 'h-4 w-4 shrink-0 opacity-70',
+  separator: 'mx-1 my-0.5 h-px bg-[var(--color-border)]',
+  shortcut: 'ml-auto text-xs text-[var(--color-ink-subtle)]',
+  footer: 'px-2.5 pt-1 pb-1.5 text-xs text-[var(--color-ink-subtle)]',
+  empty: 'px-2.5 py-2 text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 
 /**
@@ -533,11 +560,11 @@ export const COLLAPSIBLE_PANEL = {
 export const PAGE_OPTIONS = {
   host: 'relative',
   button:
-    'glass-panel flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] text-[var(--color-ink)] transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] motion-reduce:transition-none',
-  buttonOpen: 'relative z-[60] scale-105',
+    'flex size-8 cursor-pointer items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] motion-reduce:transition-none',
+  buttonOpen: 'relative z-[60] bg-[var(--color-hover)]',
   // Blurs the page behind on a phone
   backdrop: 'fixed inset-0 z-[55] bg-[var(--color-scrim)]/30 backdrop-blur-sm md:hidden',
-  icon: 'h-5 w-5',
+  icon: 'size-4',
   panel:
     'popover-enter glass-panel absolute top-[calc(100%+0.5rem)] right-0 z-[60] flex w-72 flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
   title:
@@ -546,6 +573,9 @@ export const PAGE_OPTIONS = {
   // Block drawn on a phone only, scrolls inside the panel
   content: 'flex max-h-[60dvh] flex-col gap-2 overflow-y-auto px-2.5 py-2 md:hidden',
   contentTitle: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  // One gesture on its own line
+  action:
+    'mt-1 rounded-[var(--radius-md)] border-t border-[var(--color-border)] px-2.5 py-2 text-left font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // Many choices take the line under their label
   rowStacked:
     'flex-col items-stretch gap-2 [&_[role=group]]:w-full [&_[role=group]>button]:flex-1 [&_[role=group]>button]:px-2',
