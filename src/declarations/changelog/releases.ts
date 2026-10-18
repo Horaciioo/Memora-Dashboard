@@ -145,6 +145,25 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Ajout de la section « Comptes » dans l’onglet « Sécurité » des « Paramètres » : Discord, Twitch et YouTube y sont réunis, avec « Ajouter une liaison » pour relier un compte et « Délier » pour le retirer',
       },
       {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.preferences,
+        text: 'Amélioration de la section « Connexion » des « Paramètres » : elle montre l’ID Memora à la place de l’identifiant Discord',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.LiveAnnounce,
+        text: 'Amélioration de l’annonce d’un live : elle se fait désormais depuis le « Calendrier » avec le modèle « Live », et le bouton « Annoncer un live » de « Live en cours » y mène directement',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.LiveAnnounce,
+        text: 'Ajout de la plateforme, des Coordinateurs et des consignes au modèle « Live » : toute l’équipe Lives du YouTubeur est convoquée par défaut, et seuls cette équipe (hors Junior), les Responsables du YouTubeur et les Administrateurs sont proposés comme Coordinateurs',
+      },
+      {
         tag: ChangelogTags.Added,
         text: 'Ajout du chemin de la page ouverte sous sa destination dans le menu de gauche, pour remonter d’un niveau en un clic',
       },
