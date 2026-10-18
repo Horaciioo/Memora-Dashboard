@@ -91,8 +91,10 @@ export const readProfile = async (accountId: string): Promise<ProfileDetail> => 
   if (!row) throw notFound()
 
   return {
+    id: row.id,
     displayName: row.displayName,
     discordId: row.discordId,
+    discordUsername: row.discordUsername,
     avatarUrl: row.avatarUrl,
     bannerUrl: row.bannerUrl,
     role: row.role,

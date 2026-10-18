@@ -34,24 +34,32 @@ export const TWITCH_EVENT_COPY: {
 }
 
 /**
+ * How an account is named in the Accounts section
+ * @type {Record<string, string>}
+ */
+
+export const ACCOUNT_NAME_COPY = {
+  discord: '{username} ({id})',
+} as const
+
+/**
  * Copy of the platform accounts in the settings
  * @type {Record<string, string>}
  */
 
 export const PLATFORM_ACCOUNT_COPY = {
-  title: 'Comptes de plateforme',
-  lead: 'La Mod View agit sur Twitch avec ton propre compte de modérateur. Tes accès restent chiffrés et ne quittent jamais le serveur.',
-  twitch: 'Twitch',
-  link: 'Lier mon compte Twitch',
-  relink: 'Reconnecter Twitch',
+  title: 'Comptes',
+  lead: 'Les comptes liés à ton profil. La Mod View agit sur Twitch avec ton propre compte de modérateur : tes accès restent chiffrés et ne quittent jamais le serveur.',
+  add: 'Ajouter une liaison',
+  relink: 'Reconnecter',
   unlink: 'Délier',
-  linkedAs: 'Lié à {login}',
-  notLinked: 'Aucun compte lié',
   revoked: 'Accès expiré, à reconnecter',
-  unavailable: 'La liaison Twitch n’est pas encore configurée sur ce serveur.',
-  unlinkConfirm: 'Délier ton compte Twitch ? La Mod View passera en lecture seule pour toi.',
-  linked: 'Compte Twitch lié',
-  unlinked: 'Compte Twitch délié',
+  unconfigured: '{platform} · pas configuré',
+  unlinkConfirm:
+    'Délier ton compte {platform} ? Memora ne pourra plus agir avec lui tant que tu ne l’auras pas relié de nouveau.',
+  linked: '{platform} est lié à ton profil',
+  unlinked: '{platform} n’est plus lié à ton profil',
+  failed: 'La liaison avec {platform} a échoué, réessaie',
 } as const
 
 /**

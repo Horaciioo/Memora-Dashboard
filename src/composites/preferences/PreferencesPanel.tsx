@@ -10,6 +10,7 @@ import { FileTabs } from '@/components/structures/page/FileTabs'
 import { FormRenderer } from '@/components/structures/data/FormRenderer'
 import { Section } from '@/components/structures/page/Section'
 import { SealedValue } from '@/components/structures/inline/SealedValue'
+import { AccountsSection } from '@/composites/preferences/AccountsSection'
 import { ProfileCard } from '@/composites/preferences/ProfileCard'
 import { ColorVisionPreferences } from '@/composites/preferences/ColorVisionPreferences'
 import { DisplayPreferences } from '@/composites/preferences/DisplayPreferences'
@@ -18,6 +19,7 @@ import { replayGuides } from '@/app/(dashboard)/parametres/actions'
 import { SENSITIVE_FIELD_REGISTRY, isSensitiveField } from '@/declarations/access/sensitive'
 import type { SensitiveFieldName } from '@/declarations/access/sensitive'
 import { useSeal } from '@/managers/infrastructure/Security/SealManager'
+import { MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { DETAIL_BLOCK } from '@/declarations/ui/blocks'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
@@ -25,21 +27,35 @@ import { ICONS } from '@/declarations/ui/icons'
 import { GUIDES_CARD, PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/variants'
 
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
+import type { PlatformLinkView } from '@/types/platforms'
 import type { ProfileDetail } from '@/types/preferences'
+import type { LivePlatformName } from '@/utils/constants/lives'
 
 export interface PreferencesPanelProps {
   initialProfile: ProfileDetail
   fields: FieldDefinition[]
+  links: PlatformLinkView[]
+  available: Record<LivePlatformName, boolean>
+  returned: { platform: LivePlatformName; result: string } | null
 }
 
 /**
  * Personal settings
  * @param {ProfileDetail} initialProfile - File resolved server-side
  * @param {FieldDefinition[]} fields - Declarations of the editable fields
+ * @param {PlatformLinkView[]} links - Linked platform accounts
+ * @param {Record<LivePlatformName, boolean>} available - Platforms that can be linked here
+ * @param {{ platform: LivePlatformName, result: string } | null} returned - Link just ended
  * @return {JSX.Element}
  */
 
-export const PreferencesPanel = ({ initialProfile, fields }: PreferencesPanelProps) => {
+export const PreferencesPanel = ({
+  initialProfile,
+  fields,
+  links,
+  available,
+  returned,
+}: PreferencesPanelProps) => {
   const { profile, isSaving, issues, save } = useProfile(initialProfile)
   const { factor } = useSeal()
   const [draft, setDraft] = useState<FormValues>(initialProfile.values)
@@ -136,11 +152,20 @@ export const PreferencesPanel = ({ initialProfile, fields }: PreferencesPanelPro
         >
           <DetailGrid
             entries={[
-              { label: FIELD_COPY.discordId, value: <CopyValue value={profile.discordId} /> },
+              { label: MEMBER_FIELD_COPY.memoraId, value: <CopyValue value={profile.id} /> },
               { label: FIELD_COPY.role, value: <RoleGlyph role={profile.role} /> },
             ]}
           />
         </Section>
+        <AccountsSection
+          discord={{
+            id: profile.discordId,
+            username: profile.discordUsername ?? profile.displayName,
+          }}
+          links={links}
+          available={available}
+          returned={returned}
+        />
       </div>
     </div>
   )

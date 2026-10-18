@@ -143,7 +143,8 @@ export const CALENDAR_FIELD_INFO = {
   description: 'Ce qu’il faut savoir avant d’y aller.',
   rollCall: 'Chaque personne convoquée indique si elle sera là.',
   teams: 'Les équipes dont tous les membres sont convoqués.',
-  members: 'Des personnes convoquées en plus des équipes.',
+  liveAlone: 'Un live se planifie seul : il demande sa plateforme et ses Coordinateurs.',
+  members: 'Des personnes convoquées en plus des équipes (et de l’équipe Lives pour un live).',
   remindAt: 'Le moment où un rappel part à ceux qui n’ont pas répondu.',
 } as const
 

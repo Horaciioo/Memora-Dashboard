@@ -1,3 +1,5 @@
+import { readSecret } from '@/declarations/platforms/credentials'
+
 /**
  * Twitch endpoints
  * @type {Record<string, string>}
@@ -131,13 +133,6 @@ export interface TwitchCredentials {
   clientId: string | null
   clientSecret: string | null
   redirectUri: string | null
-}
-
-// Empty values read as absent
-const readSecret = (raw: string | undefined): string | null => {
-  const value = raw?.trim() ?? ''
-
-  return value.length > 0 ? value : null
 }
 
 /**

@@ -780,13 +780,15 @@ export const CREATOR_MENU = {
  */
 
 export const SECURITY_LIST = {
-  list: '-my-1 divide-y divide-[var(--color-border)]',
+  list: '-my-1 divide-y divide-[var(--color-border-strong)]',
   row: 'flex items-center gap-3.5 py-3',
   glyph: 'h-9 w-9 shrink-0',
   body: 'min-w-0 flex-1 space-y-0.5',
   title: 'flex flex-wrap items-center gap-2 text-sm font-bold tracking-tight',
   current: 'text-xs font-semibold text-[var(--color-success)]',
   meta: 'flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[var(--color-ink-subtle)]',
+  link: 'w-fit max-w-full truncate text-[11px] italic hover:underline',
+  actions: 'flex shrink-0 items-center gap-2',
   time: 'shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums',
   status: 'inline-flex items-center gap-1.5 text-xs font-semibold',
   on: 'text-[var(--color-success)]',

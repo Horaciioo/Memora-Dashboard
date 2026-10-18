@@ -93,3 +93,10 @@ export const LIVE_FUNCTIONS: readonly string[] = ['Lives', 'Junior Lives']
  */
 
 export const LIVE_EVENT_TEMPLATE = 'Live'
+
+/**
+ * Calendar preset opening the form on the Live template
+ * @type {string}
+ */
+
+export const LIVE_PRESET = 'live'

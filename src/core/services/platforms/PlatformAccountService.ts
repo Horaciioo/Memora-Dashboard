@@ -4,10 +4,12 @@ import { decryptSecret, encryptSecret } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
 import { logger } from '@/core/lib/logger'
 import { PlatformError } from '@/core/lib/platforms/http'
-import { refreshTwitchGrant, revokeTwitchToken } from '@/core/lib/platforms/twitch/oauth'
-import type { TwitchGrant, TwitchIdentity } from '@/core/lib/platforms/twitch/oauth'
+import type { PlatformGrant, PlatformIdentity } from '@/core/lib/platforms/grant'
+import { PLATFORM_LINKERS } from '@/core/lib/platforms/linkers'
+import { refreshTwitchGrant } from '@/core/lib/platforms/twitch/oauth'
 import { isTwitchConfigured } from '@/declarations/platforms/twitch'
 import { LivePlatforms } from '@/utils/constants/lives'
+import type { LivePlatformName } from '@/utils/constants/lives'
 import type { PlatformLinkView } from '@/types/platforms'
 
 // Renew this long before expiry
@@ -23,17 +25,19 @@ export type SeatLookup =
   | { ok: false; reason: 'notLinked' | 'revoked' | 'notConfigured' }
 
 /**
- * Keep a Twitch grant
+ * Keep a platform grant
  * @param {string} accountId - Member
- * @param {TwitchGrant} grant - Tokens
- * @param {TwitchIdentity} identity - Twitch user
+ * @param {LivePlatformName} platform - Platform linked
+ * @param {PlatformGrant} grant - Tokens
+ * @param {PlatformIdentity} identity - Platform user
  * @return {Promise<void>} - Stored
  */
 
-export const storeTwitchGrant = async (
+export const storePlatformGrant = async (
   accountId: string,
-  grant: TwitchGrant,
-  identity: TwitchIdentity
+  platform: LivePlatformName,
+  grant: PlatformGrant,
+  identity: PlatformIdentity
 ): Promise<void> => {
   const payload = {
     externalUserId: identity.id,
@@ -46,15 +50,15 @@ export const storeTwitchGrant = async (
     revokedAt: null,
   }
 
-  // A Twitch account belongs to one member at a time
+  // A platform account belongs to one member at a time
   await prisma.$transaction([
     prisma.platformAccount.deleteMany({
-      where: { platform: LivePlatforms.Twitch, externalUserId: identity.id, NOT: { accountId } },
+      where: { platform, externalUserId: identity.id, NOT: { accountId } },
     }),
     prisma.platformAccount.upsert({
-      where: { accountId_platform: { accountId, platform: LivePlatforms.Twitch } },
+      where: { accountId_platform: { accountId, platform } },
       update: payload,
-      create: { accountId, platform: LivePlatforms.Twitch, ...payload },
+      create: { accountId, platform, ...payload },
     }),
   ])
 }
@@ -147,24 +151,30 @@ export const listPlatformLinks = async (accountId: string): Promise<PlatformLink
   return rows.map((row) => ({
     platform: row.platform,
     login: row.displayName ?? row.login,
+    handle: row.login,
     revoked: row.revokedAt !== null,
   }))
 }
 
 /**
- * Unlink a member's Twitch account
+ * Unlink a member's account on a platform
  * @param {string} accountId - Member
+ * @param {LivePlatformName} platform - Platform to leave
  * @return {Promise<void>} - Unlinked
  */
 
-export const unlinkTwitch = async (accountId: string): Promise<void> => {
+export const unlinkPlatform = async (
+  accountId: string,
+  platform: LivePlatformName
+): Promise<void> => {
   const stored = await prisma.platformAccount.findUnique({
-    where: { accountId_platform: { accountId, platform: LivePlatforms.Twitch } },
+    where: { accountId_platform: { accountId, platform } },
   })
   if (!stored) return
 
+  const linker = PLATFORM_LINKERS[platform]
   const accessToken = decryptSecret(stored.accessToken)
-  if (accessToken && isTwitchConfigured()) await revokeTwitchToken(accessToken)
+  if (accessToken && linker.isConfigured()) await linker.revoke(accessToken)
 
   await prisma.platformAccount.delete({ where: { id: stored.id } })
 }

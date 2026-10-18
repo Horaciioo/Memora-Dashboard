@@ -1,3 +1,5 @@
+import { postGrant } from '@/core/lib/platforms/grant'
+import type { PlatformGrant, PlatformIdentity } from '@/core/lib/platforms/grant'
 import { PlatformError, platformRequest } from '@/core/lib/platforms/http'
 import { TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
 import {
@@ -7,35 +9,9 @@ import {
   TWITCH_SCOPES,
 } from '@/declarations/platforms/twitch'
 
-/**
- * Tokens Twitch handed over
- * @typedef {Object} TwitchGrant
- * @property {string} accessToken - Bearer token
- * @property {string} refreshToken - Renewal token
- * @property {string[]} scopes - Scopes granted
- * @property {Date} expiresAt - Access token end
- */
-
-export interface TwitchGrant {
-  accessToken: string
-  refreshToken: string
-  scopes: string[]
-  expiresAt: Date
-}
-
-/**
- * Who a grant belongs to
- * @typedef {Object} TwitchIdentity
- * @property {string} id - Twitch user identifier
- * @property {string} login - Login
- * @property {string} displayName - Display name
- */
-
-export interface TwitchIdentity {
-  id: string
-  login: string
-  displayName: string
-}
+// Shared shapes of a platform link
+export type TwitchGrant = PlatformGrant
+export type TwitchIdentity = PlatformIdentity
 
 /**
  * Credentials
@@ -86,48 +62,13 @@ export const buildTwitchAuthorizeUrl = (state: string): string => {
 }
 
 /**
- * Read a token answer
- * @param {Response} response - Twitch answer
- * @return {Promise<TwitchGrant>} - Grant
- */
-
-const readGrant = async (response: Response): Promise<TwitchGrant> => {
-  const payload = (await response.json().catch(() => null)) as {
-    access_token?: string
-    refresh_token?: string
-    expires_in?: number
-    scope?: string[]
-    message?: string
-  } | null
-
-  if (!response.ok || !payload?.access_token || !payload.refresh_token) {
-    throw new PlatformError(response.status, payload?.message ?? 'grant refused')
-  }
-
-  return {
-    accessToken: payload.access_token,
-    refreshToken: payload.refresh_token,
-    scopes: payload.scope ?? [],
-    expiresAt: new Date(Date.now() + (payload.expires_in ?? 0) * 1000),
-  }
-}
-
-/**
  * Post a token form
  * @param {Record<string, string>} form - Form fields
  * @return {Promise<TwitchGrant>} - Grant
  */
 
-const postToken = async (form: Record<string, string>): Promise<TwitchGrant> => {
-  const response = await fetch(TWITCH_ENDPOINTS.token, {
-    method: 'POST',
-    signal: AbortSignal.timeout(TIMEOUT_SETTINGS.externalMs),
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams(form),
-  })
-
-  return readGrant(response)
-}
+const postToken = (form: Record<string, string>): Promise<TwitchGrant> =>
+  postGrant(TWITCH_ENDPOINTS.token, form)
 
 /**
  * Trade an authorization code for a grant
