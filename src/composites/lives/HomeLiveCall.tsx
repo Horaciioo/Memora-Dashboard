@@ -2,6 +2,7 @@ import Link from '@/components/elements/navigation/AppLink'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { LIVE_COPY } from '@/declarations/lives/copy'
+import { LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'
@@ -33,10 +34,12 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
       {onAir.length > 0 && (
         <div className={HOME_LIVE.list}>
           {onAir.map((live) => {
-            const [before, after] = LIVE_COPY.liveNow.split('{strong}')
+            const [before, rest] = LIVE_COPY.liveNow.split('{strong}')
+            const [between, after] = rest.split('{platform}')
+            const PlatformIcon = ICONS[LIVE_PLATFORM_REGISTRY.get(live.platform).icon]
 
             return (
-              <article key={live.id} className={HOME_LIVE.card}>
+              <article key={live.id} className={cn(HOME_LIVE.card, HOME_LIVE.tone[live.platform])}>
                 <div className={HOME_LIVE.body}>
                   <span className={HOME_LIVE.eyebrow}>
                     <DotIcon className={HOME_LIVE.pulse} aria-hidden="true" />
@@ -45,10 +48,18 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
                   <p className={HOME_LIVE.text}>
                     {before.replace('{creator}', live.creator)}
                     <strong className={HOME_LIVE.strong}>{LIVE_COPY.liveNowStrong}</strong>
+                    {between}
+                    <span className={cn(HOME_LIVE.platform, HOME_LIVE.platformTone[live.platform])}>
+                      <PlatformIcon className={HOME_LIVE.platformGlyph} aria-hidden="true" />
+                      {LIVE_PLATFORM_REGISTRY.label(live.platform)}
+                    </span>
                     {after}
                   </p>
                   <div className={HOME_LIVE.actions}>
-                    <Link href={ROUTES.live(live.id)} className={HOME_LIVE.join}>
+                    <Link
+                      href={ROUTES.live(live.id)}
+                      className={cn(HOME_LIVE.join, HOME_LIVE.joinTone[live.platform])}
+                    >
                       {LIVE_COPY.liveJoin}
                       <ICONS.next className={HOME_LIVE.joinGlyph} aria-hidden="true" />
                     </Link>

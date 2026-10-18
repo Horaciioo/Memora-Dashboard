@@ -1,4 +1,5 @@
 import { createRegistry } from '@/core/lib/registry'
+import { DEFAULT_ZONE } from '@/declarations/ui/dates'
 import type { IconName } from '@/declarations/ui/icons'
 import type { Tone } from '@/declarations/ui/theme'
 import { LivePlatforms, LiveStatuses } from '@/utils/constants/lives'
@@ -60,7 +61,7 @@ export const LIVE_STATUS_REGISTRY = createRegistry(LIVE_STATUS_MAP)
  * @type {string}
  */
 
-export const LIVE_CLOCK_ZONE = 'Europe/Paris'
+export const LIVE_CLOCK_ZONE = DEFAULT_ZONE
 
 /**
  * Live coordinator

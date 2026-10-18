@@ -16,6 +16,7 @@ import {
   startOfWeek,
   timeLabel,
 } from '@/utils/format/days'
+import { isInstantText, shiftToZone } from '@/utils/format/zone'
 
 /**
  * One day of a rendered grid
@@ -41,12 +42,21 @@ export interface CalendarDay {
 export type CalendarUnit = 'day' | 'week' | 'month' | 'agenda'
 
 /**
+ * Read a moment on the clock of the member's zone
+ * @param {Date | string} value - Moment, or a day key
+ * @return {Date} - Date whose local getters read the zone
+ */
+
+const momentOf = (value: Date | string): Date =>
+  isInstantText(value) ? shiftToZone(value) : parseDay(value)
+
+/**
  * Read the ISO day of a moment
  * @param {Date | string} date - Moment to read
  * @return {string} - ISO day
  */
 
-export const toDayKey = (date: Date | string): string => formatDayKey(date)
+export const toDayKey = (date: Date | string): string => formatDayKey(momentOf(date))
 
 /**
  * Build one day of a grid
@@ -203,7 +213,7 @@ export const periodLabel = (anchor: string, unit: CalendarUnit): string => {
  */
 
 export const moveToDay = (startsAt: string, dayKey: string): Date => {
-  const source = parseDay(startsAt)
+  const source = momentOf(startsAt)
 
   return atTime(parseDay(dayKey), source.getHours(), source.getMinutes())
 }
@@ -223,7 +233,7 @@ export const moveToSlot = (dayKey: string, hour: number): Date => atTime(parseDa
  * @return {number} - Hour of the day
  */
 
-export const hourOf = (date: string): number => parseDay(date).getHours()
+export const hourOf = (date: string): number => momentOf(date).getHours()
 
 /**
  * Read the time of a moment
@@ -231,7 +241,7 @@ export const hourOf = (date: string): number => parseDay(date).getHours()
  * @return {string} - Hours and minutes
  */
 
-export const timeOf = (date: string): string => timeLabel(parseDay(date))
+export const timeOf = (date: string): string => timeLabel(momentOf(date))
 
 /**
  * Tell whether an entry is still running on one day
@@ -245,8 +255,8 @@ export const coversDay = (startsAt: string, endsAt: string | null, dayKey: strin
   const day = startOfDay(parseDay(dayKey)).getTime()
 
   return (
-    day >= startOfDay(parseDay(startsAt)).getTime() &&
-    day <= startOfDay(parseDay(endsAt ?? startsAt)).getTime()
+    day >= startOfDay(momentOf(startsAt)).getTime() &&
+    day <= startOfDay(momentOf(endsAt ?? startsAt)).getTime()
   )
 }
 
@@ -258,7 +268,7 @@ export const coversDay = (startsAt: string, endsAt: string | null, dayKey: strin
  */
 
 export const lastDayKey = (startsAt: string, endsAt: string | null): string =>
-  formatDayKey(endsAt ?? startsAt)
+  toDayKey(endsAt ?? startsAt)
 
 /**
  * Read the moment one slot ends on
@@ -315,7 +325,7 @@ export const toFieldValue = (date: Date): string => `${formatDayKey(date)}T${tim
  */
 
 export const minuteOfDay = (date: Date | string): number => {
-  const parsed = parseDay(date)
+  const parsed = momentOf(date)
 
   return parsed.getHours() * 60 + parsed.getMinutes()
 }

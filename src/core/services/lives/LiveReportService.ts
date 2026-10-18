@@ -1,9 +1,12 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { buildInsights } from '@/core/lib/lives/insights'
+import type { LiveBaseline, LiveInsights } from '@/core/lib/lives/insights'
 import { buildLiveReport } from '@/core/lib/lives/report'
 import type { LiveReport } from '@/core/lib/lives/report'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
+import { readBaseline } from '@/core/services/lives/LiveBaselineService'
 import { readLive } from '@/core/services/lives/LiveService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { LiveLogLine, LiveView } from '@/types/lives'
@@ -15,6 +18,9 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @property {LiveView} live - Live
  * @property {LiveReport} report - Figures
  * @property {LiveLogLine[]} log - Latest lines
+ * @property {LiveInsights} insights - Chart data
+ * @property {LiveBaseline | null} baseline - Average of earlier lives
+ * @property {{ start: string, end: string }} period - Span the charts cover
  * @property {boolean} available - The log tables exist
  */
 
@@ -22,6 +28,9 @@ export interface LiveReportDetail {
   live: LiveView
   report: LiveReport
   log: LiveLogLine[]
+  insights: LiveInsights
+  baseline: LiveBaseline | null
+  period: { start: string; end: string }
   available: boolean
 }
 
@@ -42,7 +51,16 @@ export const readLiveReport = async (
 ): Promise<LiveReportDetail> => {
   const live = await readLive(liveId, scope, viewerId, held)
   const start = new Date(live.startedAt ?? live.plannedStartAt)
-  const end = live.endedAt ? new Date(live.endedAt) : new Date()
+  // A live left open for days stops at the report ceiling
+  const ceiling = new Date(start.getTime() + LIVE_SETTINGS.reportMaxHours * 3_600_000)
+  const end = live.endedAt
+    ? new Date(Math.min(Date.parse(live.endedAt), +ceiling))
+    : new Date(Math.min(Date.now(), +ceiling))
+  // Wider slices keep the charts readable on a long live
+  const bucketMinutes = Math.max(
+    LIVE_SETTINGS.reportBucketMinutes,
+    Math.ceil((end.getTime() - start.getTime()) / 60_000 / LIVE_SETTINGS.reportMaxSlices)
+  )
 
   // Levels tied to the live
   const entries = await prisma.liveconEntry.findMany({
@@ -67,7 +85,7 @@ export const readLiveReport = async (
   }))
 
   // The log tables may not be migrated yet
-  const [actions, presences] = await Promise.all([
+  const [actions, presences, samples, baseline] = await Promise.all([
     prisma.moderationAction
       .findMany({
         where: { liveId },
@@ -78,6 +96,14 @@ export const readLiveReport = async (
     prisma.modViewPresence
       .findMany({ where: { liveId }, include: { account: { select: { displayName: true } } } })
       .catch(() => null),
+    // A client generated before the table existed has no model for it
+    (async () =>
+      prisma.liveSample.findMany({
+        where: { liveId, at: { lte: end } },
+        orderBy: { at: 'asc' },
+        select: { at: true, viewers: true },
+      }))().catch(() => []),
+    readBaseline(live.youtuber.id, liveId, start).catch(() => null),
   ])
 
   const nameOf = (row: { actor: { displayName: string } | null; actorLogin: string | null }) =>
@@ -101,12 +127,35 @@ export const readLiveReport = async (
     levels,
     start,
     end,
-    bucketMinutes: LIVE_SETTINGS.reportBucketMinutes,
+    bucketMinutes,
+  })
+
+  const insights = buildInsights({
+    actions: (actions ?? []).map((row) => ({
+      kind: row.kind,
+      actorKey: row.actorAccountId ?? `platform:${nameOf(row)}`,
+      actorName: nameOf(row),
+      isMember: row.actorAccountId !== null,
+      targetLogin: row.targetLogin,
+      reason: row.reason,
+      occurredAt: row.occurredAt,
+      succeeded: row.status === 'SUCCEEDED',
+      origin: row.origin,
+      liveconLevel: row.liveconLevel,
+    })),
+    samples,
+    levels,
+    start,
+    end,
+    bucketMinutes,
   })
 
   return {
     live,
     report,
+    insights,
+    baseline,
+    period: { start: start.toISOString(), end: end.toISOString() },
     available: actions !== null && presences !== null,
     log: (actions ?? []).slice(0, LIVE_SETTINGS.logLines).map((row) => ({
       id: row.id,

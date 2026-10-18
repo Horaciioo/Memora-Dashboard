@@ -1,13 +1,11 @@
 import type { Metadata } from 'next'
 
-import { PrintButton } from '@/components/elements/actions/PrintButton'
 import { PageHeader } from '@/components/structures/page/PageHeader'
-import { Section } from '@/components/structures/page/Section'
+import { CreatorBilan } from '@/composites/lives/CreatorBilan'
 import { readLiveReport } from '@/core/services/lives/LiveReportService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
-import { LIVE_REPORT_COPY, MODERATION_KINDS } from '@/declarations/lives/moderation'
-import { ICONS } from '@/declarations/ui/icons'
+import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
 import { LIVE_REPORT, PAGE_STYLES } from '@/declarations/ui/variants'
 import { formatDay } from '@/utils/format/dates'
 import { formatClock, formatSpan } from '@/utils/format/modview'
@@ -29,9 +27,14 @@ export default async function LiveCreatorReportPage({
 }) {
   const { id } = await params
   const { session, scope } = await requirePermission(Permissions.LiveCreatorReport)
-  const { live, report } = await readLiveReport(id, await scope(), session.id, session.permissions)
+  const { live, report, insights, baseline, period } = await readLiveReport(
+    id,
+    await scope(),
+    session.id,
+    session.permissions
+  )
   const start = live.startedAt ?? live.plannedStartAt
-  const end = live.endedAt ?? new Date().toISOString()
+  const end = period.end
   const team = report.moderators.filter((row) => row.isMember).length
 
   // Opening sentence
@@ -49,10 +52,12 @@ export default async function LiveCreatorReportPage({
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader eyebrow={live.youtuber.name} title={LIVE_REPORT_COPY.creatorTitle} />
-      <div className={LIVE_REPORT.toolbar}>
-        <PrintButton label={LIVE_REPORT_COPY.print} />
-      </div>
+      <PageHeader
+        eyebrow={LIVE_REPORT_COPY.creatorEyebrow
+          .replace('{name}', live.youtuber.name)
+          .replace('{day}', formatDay(start))}
+        title={LIVE_REPORT_COPY.creatorTitle}
+      />
 
       <article className={LIVE_REPORT.letter}>
         <p className={LIVE_REPORT.sentence}>{LIVE_REPORT_COPY.creatorLead}</p>
@@ -77,42 +82,16 @@ export default async function LiveCreatorReportPage({
               .replace('{minutes}', String(LIVE_SETTINGS.reportBucketMinutes))}
           </p>
         )}
-
-        {report.byKind.length > 0 && (
-          <Section title={LIVE_REPORT_COPY.kindsTitle} padded>
-            <ul className={LIVE_REPORT.kinds}>
-              {report.byKind.map((entry) => {
-                const meta = MODERATION_KINDS[entry.kind]
-                const Icon = ICONS[meta.icon]
-
-                return (
-                  <li key={entry.kind} className={LIVE_REPORT.kind}>
-                    <Icon className={LIVE_REPORT.kindIcon} aria-hidden="true" />
-                    <span className={LIVE_REPORT.kindLabel}>{meta.label}</span>
-                    <span className={LIVE_REPORT.kindCount}>{entry.count}</span>
-                  </li>
-                )
-              })}
-            </ul>
-          </Section>
-        )}
-
-        <Section title={LIVE_REPORT_COPY.creatorLevels} padded>
-          {report.levels.length === 0 ? (
-            <p className={LIVE_REPORT.empty}>{LIVE_REPORT_COPY.levelsEmpty}</p>
-          ) : (
-            <ul className={LIVE_REPORT.kinds}>
-              {report.levels.map((level) => (
-                <li key={level.from} className={LIVE_REPORT.kind}>
-                  {LIVE_REPORT_COPY.creatorLevel
-                    .replace('{name}', level.name)
-                    .replace('{time}', formatClock(level.from))}
-                </li>
-              ))}
-            </ul>
-          )}
-        </Section>
       </article>
+
+      <CreatorBilan
+        report={report}
+        insights={insights}
+        baseline={baseline}
+        start={start}
+        end={end}
+        stem={`${live.youtuber.name}-${live.id}`}
+      />
     </div>
   )
 }

@@ -13,6 +13,7 @@ import { LIVE_COORDINATION } from '@/declarations/ui/variants'
 import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
 import type { CoordinationRequest, LiveGap } from '@/types/lives'
 import { formatClock, formatDayTime, toDateTimeInput } from '@/utils/format/dates'
+import { wallToInstant } from '@/utils/format/zone'
 
 export interface CoordinationAnswerProps {
   request: CoordinationRequest
@@ -37,8 +38,8 @@ export const CoordinationAnswer = ({ request }: CoordinationAnswerProps) => {
       () =>
         apiPost<{ gaps: LiveGap[] }>(API_ROUTES.liveCoordination(request.liveId), {
           accept,
-          startsAt: from ? new Date(from).toISOString() : null,
-          endsAt: to ? new Date(to).toISOString() : null,
+          startsAt: from ? wallToInstant(from).toISOString() : null,
+          endsAt: to ? wallToInstant(to).toISOString() : null,
         }),
       accept ? LIVE_COORDINATION_COPY.accepted : LIVE_COORDINATION_COPY.declined
     )

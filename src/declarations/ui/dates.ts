@@ -6,6 +6,13 @@
 export const DATE_LOCALE = 'fr-FR'
 
 /**
+ * Zone clock times read in until a member picks theirs
+ * @type {string}
+ */
+
+export const DEFAULT_ZONE = 'Europe/Paris'
+
+/**
  * Month abbreviations
  * @type {string[]}
  */

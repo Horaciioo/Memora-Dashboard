@@ -6,24 +6,18 @@ import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
  */
 
 export const LIVE_BOARD = {
-  wrapper: 'mx-auto flex w-full max-w-5xl flex-col gap-10',
+  wrapper: 'mx-auto flex w-full max-w-6xl flex-col gap-10',
   toolbar: 'flex flex-wrap items-center justify-center gap-3',
   list: 'flex flex-col gap-6',
-  // Raised card
-  strip:
-    'card-glow relative flex flex-col gap-5 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6',
-  stripLive: 'border-[var(--color-danger)] shadow-[var(--shadow-md)]',
-  head: 'flex min-w-0 items-center gap-5',
-  creator: 'text-3xl font-bold tracking-tight sm:text-4xl',
-  identity: 'flex min-w-0 flex-col gap-1',
-  title: 'text-body text-[var(--color-ink-subtle)]',
-  onAir:
-    'flex items-center gap-2 text-xs font-bold tracking-wide text-[var(--color-danger)] uppercase',
-  dotPulse: 'live-pulse h-3.5 w-3.5',
+  group: 'flex flex-col gap-4',
+  groupTitle: `${PROPERTY_LABEL} px-1`,
+  tiles: 'grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3',
+  dotPulse: 'live-pulse h-3 w-3',
   // Coordinator and times on one line
   facts: 'flex flex-wrap items-center gap-x-6 gap-y-4 border-y border-[var(--color-border)] py-4',
   fact: 'flex min-w-0 flex-col gap-0.5',
   factDivider: 'hidden h-10 w-px bg-[var(--color-border)] sm:block',
+  factArrow: 'hidden h-6 w-58 shrink-0 text-[var(--color-ink-subtle)] sm:block',
   factLabel: PROPERTY_LABEL,
   factClock: 'text-2xl leading-none font-bold tracking-tight tabular-nums',
   factClockLive: 'text-[var(--color-danger)]',
@@ -39,6 +33,56 @@ export const LIVE_BOARD = {
   actions: 'flex flex-wrap items-center gap-x-1 gap-y-2',
   actionDivider: 'h-5 w-px shrink-0 bg-[var(--color-border-strong)]',
   confirm: 'w-full text-xs text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Poster of the live on air: the creator's banner as the backdrop
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_STAGE = {
+  root: 'relative isolate flex min-h-[26rem] flex-col justify-between gap-10 overflow-hidden rounded-[var(--radius-xl)] bg-[var(--color-media-shade)] p-5 text-[var(--color-on-media)] shadow-[var(--shadow-lg)] sm:p-8',
+  backdrop: 'absolute inset-0 -z-20 h-full w-full scale-110 object-cover blur-2xl saturate-150',
+  wash: 'absolute inset-0 -z-10 bg-[radial-gradient(80%_70%_at_20%_30%,transparent,color-mix(in_srgb,var(--color-media-shade)_70%,transparent))]',
+  halo: 'absolute -top-24 -left-24 -z-10 h-80 w-80 rounded-full bg-[var(--color-danger)] opacity-30 blur-3xl',
+  hero: 'flex min-w-0 flex-col items-start gap-6 sm:flex-row sm:items-end',
+  titleRow: 'flex w-full flex-wrap items-center justify-between gap-x-6 gap-y-4',
+  // Black pill on the poster, far from the creator
+  cta: 'group inline-flex shrink-0 items-center gap-3 rounded-full bg-[var(--color-media-shade)] px-7 py-4 text-lg font-bold tracking-tight text-[var(--color-on-media)] ring-1 ring-[color-mix(in_srgb,var(--color-on-media)_25%,transparent)] shadow-[var(--shadow-lg)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-xl,var(--shadow-lg))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-on-media)]',
+  ctaArrow: 'h-5 w-5 transition-transform group-hover:translate-x-1',
+  portrait: 'shrink-0 shadow-[var(--shadow-lg)] ring-4 ring-[var(--color-on-media)]',
+  identity: 'flex min-w-0 flex-1 flex-col gap-3 self-stretch justify-end',
+  creator: 'text-5xl leading-none font-bold tracking-tight sm:text-7xl',
+  title: 'min-w-0 max-w-2xl text-lg opacity-90 sm:text-xl',
+  // Every fact takes its share of the box, centred
+  facts:
+    'w-full justify-between [&>div]:flex-1 [&>div]:items-center [&>div]:text-center [&_ul]:items-center',
+  actions: 'w-full justify-center gap-3',
+  dock: 'flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-[var(--color-ink)] sm:p-5',
+} as const
+
+/**
+ * Tile of a live still to come
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_TILE = {
+  root: 'relative flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)] transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]',
+  cover: 'relative h-28 overflow-hidden bg-[image:var(--gradient-soft)]',
+  coverImage: 'h-full w-full scale-125 object-cover blur-xl saturate-150',
+  platform:
+    'absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--color-surface)] px-2.5 py-1 text-xs font-semibold shadow-[var(--shadow-sm)]',
+  platformGlyph: 'h-3.5 w-3.5',
+  body: 'flex flex-1 flex-col gap-4 p-5 pt-0',
+  head: '-mt-12 flex items-end justify-between gap-4',
+  portrait: 'relative z-10 shadow-[var(--shadow-md)] ring-4 ring-[var(--color-surface)]',
+  creator: 'truncate text-2xl font-bold tracking-tight',
+  title: 'line-clamp-2 text-sm text-[var(--color-ink-subtle)]',
+  when: 'flex flex-col items-end gap-1 pb-1',
+  clock: 'text-3xl leading-none font-bold tracking-tight tabular-nums',
+  day: 'text-xs font-semibold text-[var(--color-ink-subtle)] first-letter:uppercase',
+  actions:
+    'mt-auto grid grid-cols-2 gap-2 border-t border-[var(--color-border)] pt-4 *:w-full [&>*:first-child]:col-span-2',
 } as const
 
 /**
@@ -136,6 +180,7 @@ export const LIVE_REPORT = {
   kindIcon: 'h-6 w-6 shrink-0',
   kindLabel: 'flex-1 text-sm',
   kindCount: 'text-sm font-bold tabular-nums',
+  exports: 'flex flex-wrap gap-3 print:hidden',
   // Log
   logHead: 'flex flex-wrap items-center justify-between gap-3',
   log: 'flex flex-col',
@@ -153,6 +198,7 @@ export const LIVE_REPORT = {
   past: 'flex flex-col',
   pastRow:
     'flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-border)] py-3 first:border-t-0',
+  pastWho: 'flex min-w-0 items-center gap-3',
   pastName: 'font-semibold',
   pastMeta: 'text-sm text-[var(--color-ink-subtle)]',
   pastLinks: 'flex flex-wrap gap-2',
@@ -221,7 +267,7 @@ export const LIVE_GATE = {
   title: 'text-2xl font-bold tracking-tight',
   lead: 'text-sm text-[var(--color-ink-subtle)]',
   actions: 'flex flex-wrap items-center justify-center gap-3',
-  reread: 'self-end',
+  screen: 'flex min-h-0 flex-1 flex-col',
 } as const
 
 /**

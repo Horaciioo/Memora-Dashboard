@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react'
 
 import { DATE_COPY, DATE_LOCALE, MONTH_LABELS } from '@/declarations/ui/dates'
 import { timeLabel } from '@/utils/format/days'
+import { getActiveZone, instantToWall, shiftToZone } from '@/utils/format/zone'
 
 // Milliseconds in one day
 const DAY_MS = 86_400_000
@@ -66,11 +67,13 @@ export function formatDate(date: Date | string, utc: boolean = true): ReactNode 
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
+    timeZone: getActiveZone(),
   })
-  const formattedHour = timeLabel(parsed)
+  const formattedHour = timeLabel(shiftToZone(parsed))
 
-  // Get timezone offset
-  const timezoneOffset = -parsed.getTimezoneOffset() / 60
+  // Offset the zone stands at on that day
+  const minute = Math.floor(parsed.getTime() / MINUTE_MS) * MINUTE_MS
+  const timezoneOffset = (Date.parse(`${instantToWall(parsed)}:00Z`) - minute) / HOUR_MS
 
   return (
     <>
@@ -94,6 +97,7 @@ export function formatDay(date: Date | string | null | undefined): string {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
+    timeZone: getActiveZone(),
   })
 }
 
@@ -108,6 +112,7 @@ export function formatWeekday(date: Date | string): string {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
+    timeZone: getActiveZone(),
   })
 }
 
@@ -125,6 +130,7 @@ export function formatDayTime(date: Date | string | null | undefined): string {
   return `${formatDay(parsed)} ${DATE_COPY.at} ${parsed.toLocaleTimeString(DATE_LOCALE, {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: getActiveZone(),
   })}`
 }
 
@@ -209,10 +215,7 @@ export function toDateInput(date: Date | string | null | undefined): string {
 export function toDateTimeInput(date: Date | string | null | undefined): string {
   if (!date) return ''
 
-  const parsed = new Date(date)
-  const offset = parsed.getTimezoneOffset() * 60_000
-
-  return new Date(parsed.getTime() - offset).toISOString().slice(0, 16)
+  return instantToWall(date)
 }
 
 /**
@@ -245,7 +248,11 @@ export function formatSince(date: Date | string): string {
 export function formatClock(date: Date | string | null | undefined): string {
   if (!date) return DATE_COPY.none
 
-  return new Date(date).toLocaleTimeString(DATE_LOCALE, { hour: '2-digit', minute: '2-digit' })
+  return new Date(date).toLocaleTimeString(DATE_LOCALE, {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: getActiveZone(),
+  })
 }
 
 /**

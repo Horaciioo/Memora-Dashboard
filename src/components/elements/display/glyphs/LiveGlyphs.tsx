@@ -1,5 +1,5 @@
 import { Frame } from '@/components/elements/display/glyphs/BrandGlyphs'
-import type { GlyphProps } from '@/components/elements/display/glyphs/BrandGlyphs'
+import type { FrameTone, GlyphProps } from '@/components/elements/display/glyphs/BrandGlyphs'
 
 /**
  * Dot following the colour of its words
@@ -11,6 +11,26 @@ export const StatusDotGlyph = ({ className }: GlyphProps) => (
   <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
     <circle cx="12" cy="12" r="9" fill="currentColor" opacity="0.22" />
     <circle cx="12" cy="12" r="5.5" fill="currentColor" />
+  </svg>
+)
+
+/**
+ * Dotted trail ending in a rounded head
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const SpanArrowGlyph = ({ className }: GlyphProps) => (
+  <svg viewBox="0 0 232 24" className={className} aria-hidden="true">
+    <path d="M2 12h196" stroke="currentColor" strokeWidth="2.4" strokeDasharray="9 8" fill="none" />
+    <path
+      d="M207.4 12h19m-6-6 6 6-6 6"
+      stroke="currentColor"
+      strokeWidth="2.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+    />
   </svg>
 )
 
@@ -463,25 +483,41 @@ export const ChatGlyph = ({ className }: GlyphProps) => (
   />
 )
 
+// Stream screen in one tone
+const streamGlyph = (tone?: FrameTone) => {
+  const Stream = ({ className }: GlyphProps) => (
+    <Frame
+      className={className}
+      tone={tone}
+      render={({ fill, lift, deep, cut }) => (
+        <>
+          <rect x="2" y="3.5" width="20" height="14" rx="3" fill={fill} />
+          <path d="M2 6.5a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3z" fill={lift} opacity="0.55" />
+          <path d="M8 21h8" stroke={deep} strokeWidth="2" strokeLinecap="round" />
+          <path d="M10 7.8v6.4l5.4-3.2z" fill={cut} />
+        </>
+      )}
+    />
+  )
+
+  return Stream
+}
+
 /**
  * Stream screen
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
 
-export const StreamGlyph = ({ className }: GlyphProps) => (
-  <Frame
-    className={className}
-    render={({ fill, lift, deep, cut }) => (
-      <>
-        <rect x="2" y="3.5" width="20" height="14" rx="3" fill={fill} />
-        <path d="M2 6.5a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3z" fill={lift} opacity="0.55" />
-        <path d="M8 21h8" stroke={deep} strokeWidth="2" strokeLinecap="round" />
-        <path d="M10 7.8v6.4l5.4-3.2z" fill={cut} />
-      </>
-    )}
-  />
-)
+export const StreamGlyph = streamGlyph()
+
+/**
+ * Stream player of a channel offline
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const StreamOffGlyph = streamGlyph('danger')
 
 /**
  * Moderation actions list

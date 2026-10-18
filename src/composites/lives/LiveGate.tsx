@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
@@ -14,6 +14,16 @@ import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
 import { LIVE_GATE } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
+
+// Opens the instructions again from inside the Mod View
+const RereadContext = createContext<(() => void) | null>(null)
+
+/**
+ * Gesture that brings the instructions back, none outside a gate
+ * @return {(() => void) | null}
+ */
+
+export const useReread = (): (() => void) | null => useContext(RereadContext)
 
 // Read once per live and browser
 const readKey = (liveId: string) => `memora:live-instructions:${liveId}`
@@ -79,17 +89,9 @@ export const LiveGate = ({ live, canEdit, children }: LiveGateProps) => {
 
   if (isOpen) {
     return (
-      <div className="flex flex-col gap-3">
-        <Button
-          variant="ghost"
-          icon="sheet"
-          className={LIVE_GATE.reread}
-          onClick={() => setOpen(false)}
-        >
-          {LIVE_PAGE_COPY.reread}
-        </Button>
-        {children}
-      </div>
+      <RereadContext.Provider value={() => setOpen(false)}>
+        <div className={LIVE_GATE.screen}>{children}</div>
+      </RereadContext.Provider>
     )
   }
 
