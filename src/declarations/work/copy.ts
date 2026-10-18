@@ -69,6 +69,9 @@ export const PROJECT_FIELD_COPY = {
   communicationTitle: 'Titre de l’annonce',
   communicationBody: 'Annonce',
   communicationPlatform: 'Plateforme',
+  communicationStatus: 'Statut',
+  communicationAuthor: 'Auteur',
+  communicationProject: 'Projet',
   publishedAt: 'Date de publication',
 } as const
 
@@ -338,4 +341,31 @@ export const DEADLINE_NUDGE_COPY = {
   projects: 'Un de tes projets est hors deadline !',
   tasks: 'Une de tes tâches est hors deadline !',
   meetings: 'Une de tes réunions est hors deadline !',
+} as const
+
+/**
+ * Singular label and gender of a board selection
+ * @type {{ label: string, gender: 'feminine' }}
+ */
+
+export const SELECTION_ENTITY = { label: 'Sélection', gender: 'feminine' } as const
+
+/**
+ * Copy of the board selection bar
+ * @type {Record<string, string>}
+ */
+
+export const SELECTION_COPY = {
+  label: 'Sélection en cours',
+  search: 'Rechercher des actions…',
+  none: 'Aucune action',
+  count: (count: number) =>
+    `${count} ${count > 1 ? 'éléments sélectionnés' : 'élément sélectionné'}`,
+  select: 'Sélectionner',
+  deselect: 'Désélectionner',
+  clear: 'Tout désélectionner',
+  edit: 'Modifier la sélection',
+  delete: 'Supprimer la sélection',
+  deleteTitle: 'Supprimer la sélection ?',
+  deleteDescription: 'Tout ce qui est sélectionné disparaît définitivement.',
 } as const

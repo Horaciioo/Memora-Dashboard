@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { AddRow } from '@/components/structures/inline/AddRow'
 import { useIsMobileShell, useMediaQuery } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { useDragAndDrop } from '@/core/hooks/interaction/gestures/useDragAndDrop'
+import { SELECTABLE_ATTRIBUTE, useMarquee } from '@/core/hooks/interaction/gestures/useMarquee'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { accentVars } from '@/declarations/ui/theme'
@@ -53,8 +54,17 @@ export interface KanbanBoardProps<T extends BoardItem> {
   canCreate: boolean
   onCreate: (columnId: string) => void
   canMove: boolean
+  // Narrows which cards may be dragged
+  canMoveItem?: (item: T) => boolean
   // Washes each column and its cards in the column accent
   tintByColumn?: boolean
+  // Ids of the selected cards
+  selection?: string[]
+  // Cards that may join a selection, none when absent
+  canSelectItem?: (item: T) => boolean
+  onToggle?: (item: T) => void
+  // Marquee result, additive when a modifier key was held
+  onSelectMany?: (ids: string[], additive: boolean) => void
 }
 
 /**
@@ -69,7 +79,12 @@ export interface KanbanBoardProps<T extends BoardItem> {
  * @param {boolean} canCreate - Member may add a card
  * @param {(columnId: string) => void} onCreate - Called with the column the row sits under
  * @param {boolean} canMove - Member may drag cards
+ * @param {(item: T) => boolean} [canMoveItem] - Narrows which cards may be dragged
  * @param {boolean} [tintByColumn] - Washes columns and cards in the column accent
+ * @param {string[]} [selection] - Ids of the selected cards
+ * @param {(item: T) => boolean} [canSelectItem] - Cards that may join a selection
+ * @param {(item: T) => void} [onToggle] - Adds or drops one card from the selection
+ * @param {(ids: string[], additive: boolean) => void} [onSelectMany] - Marquee result
  * @return {JSX.Element}
  */
 
@@ -84,11 +99,18 @@ export const KanbanBoard = <T extends BoardItem>({
   canCreate,
   onCreate,
   canMove,
+  canMoveItem,
   tintByColumn,
+  selection = [],
+  canSelectItem,
+  onToggle,
+  onSelectMany,
 }: KanbanBoardProps<T>) => {
   const { contextMenu } = useMenu()
-  // Lanes folded on a phone until opened
-  const [opened, setOpened] = useState<Set<string>>(new Set())
+  // Lanes folded on a phone, the first one open
+  const [opened, setOpened] = useState<Set<string>>(
+    () => new Set(columns[0] ? [columns[0].id] : [])
+  )
   const isMobile = useIsMobileShell()
   const ChevronIcon = ICONS.expand
   // A finger cannot drag a card across lanes, the menu moves it instead
@@ -96,6 +118,17 @@ export const KanbanBoard = <T extends BoardItem>({
   const { over, itemProps, containerProps } = useDragAndDrop((item, container, index) =>
     onMove(item.id, container, index)
   )
+
+  const marquee = useMarquee(Boolean(onSelectMany), (ids, additive) =>
+    onSelectMany?.(ids, additive)
+  )
+
+  // A modifier key, or a selection under way, turns a click into a pick
+  const activate = (item: T, additive: boolean) => {
+    if (onToggle && (canSelectItem?.(item) ?? true) && (additive || selection.length > 0))
+      onToggle(item)
+    else onOpen?.(item)
+  }
 
   const toggleColumn = (id: string) =>
     setOpened((current) => {
@@ -109,7 +142,7 @@ export const KanbanBoard = <T extends BoardItem>({
 
   const menuOf = (item: T, current: string): MenuItem[] => [
     ...(cardMenu?.(item) ?? []),
-    ...(isTouch && canMove
+    ...(isTouch && canMove && (canMoveItem?.(item) ?? true)
       ? columns
           .filter((column) => column.id !== current)
           .map((column, index) => ({
@@ -123,7 +156,8 @@ export const KanbanBoard = <T extends BoardItem>({
   ]
 
   return (
-    <div className={BOARD_STYLES.scroller}>
+    <div className={BOARD_STYLES.scroller} onPointerDown={marquee.onPointerDown}>
+      {marquee.rect && <div className={BOARD_STYLES.marquee} style={marquee.rect} />}
       {columns.map((column) => {
         const cards = items.filter((item) => item.columnId === column.id)
         const isOpen = opened.has(column.id)
@@ -165,12 +199,20 @@ export const KanbanBoard = <T extends BoardItem>({
                     <article
                       key={item.id}
                       data-drop-index={index}
-                      tabIndex={onOpen ? 0 : undefined}
-                      onClick={onOpen ? () => onOpen(item) : undefined}
+                      {...(onToggle && (canSelectItem?.(item) ?? true)
+                        ? { [SELECTABLE_ATTRIBUTE]: item.id }
+                        : {})}
+                      tabIndex={onOpen || onToggle ? 0 : undefined}
+                      onClick={
+                        onOpen || onToggle
+                          ? (event) =>
+                              activate(item, event.ctrlKey || event.metaKey || event.shiftKey)
+                          : undefined
+                      }
                       onKeyDown={
-                        onOpen
+                        onOpen || onToggle
                           ? (event) => {
-                              if (event.key === 'Enter') onOpen(item)
+                              if (event.key === 'Enter') activate(item, event.shiftKey)
                             }
                           : undefined
                       }
@@ -178,11 +220,15 @@ export const KanbanBoard = <T extends BoardItem>({
                         cardMenu || isTouch ? contextMenu(menuOf(item, column.id)) : undefined
                       }
                       style={accentStyle}
+                      data-picked={selection.includes(item.id) || undefined}
                       className={cn(
                         BOARD_STYLES.card,
-                        tintByColumn ? BOARD_STYLES.cardTint : BOARD_STYLES.cardGlass
+                        tintByColumn ? BOARD_STYLES.cardTint : BOARD_STYLES.cardGlass,
+                        selection.includes(item.id) && BOARD_STYLES.cardSelected
                       )}
-                      {...(canMove && !isTouch ? itemProps({ id: item.id, from: column.id }) : {})}
+                      {...(canMove && !isTouch && (canMoveItem?.(item) ?? true)
+                        ? itemProps({ id: item.id, from: column.id })
+                        : {})}
                     >
                       {renderCard(item)}
                     </article>

@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 
-import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
+import { apiDelete, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { feedbackTitle } from '@/declarations/ui/copy'
@@ -21,7 +21,6 @@ const GENDER = 'feminine'
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {() => void} clearIssues - Forget the rejections
  * @property {(values: FormValues) => Promise<boolean>} create - Write an announcement
- * @property {(id: string, values: FormValues) => Promise<boolean>} update - Edit an announcement
  * @property {(id: string) => Promise<void>} remove - Drop an announcement
  */
 
@@ -31,7 +30,6 @@ export interface CommunicationCollection {
   issues: FieldIssue[]
   clearIssues: () => void
   create: (values: FormValues) => Promise<boolean>
-  update: (id: string, values: FormValues) => Promise<boolean>
   remove: (id: string) => Promise<void>
 }
 
@@ -64,21 +62,6 @@ export const useCommunications = (
     [projectId, run]
   )
 
-  const update = useCallback(
-    async (id: string, values: FormValues) => {
-      const name = typeof values.title === 'string' ? values.title : undefined
-      const entry = await run(
-        () => apiPatch<CommunicationEntry>(API_ROUTES.communication(id), values),
-        feedbackTitle(ENTITY, 'saved', GENDER, name)
-      )
-
-      if (entry) setEntries((current) => current.map((row) => (row.id === id ? entry : row)))
-
-      return entry !== null
-    },
-    [run]
-  )
-
   const remove = useCallback(
     async (id: string) => {
       const name = entries.find((row) => row.id === id)?.title
@@ -92,5 +75,5 @@ export const useCommunications = (
     [run, entries]
   )
 
-  return { entries, isSaving, issues, clearIssues, create, update, remove }
+  return { entries, isSaving, issues, clearIssues, create, remove }
 }

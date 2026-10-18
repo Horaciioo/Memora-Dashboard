@@ -6,7 +6,7 @@ import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { feedbackTitle } from '@/declarations/ui/copy'
-import { BOARD_ENTITY_COPY } from '@/declarations/work/copy'
+import { BOARD_ENTITY_COPY, SELECTION_ENTITY } from '@/declarations/work/copy'
 import type { BoardItem } from '@/components/structures/data/KanbanBoard'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { WorkflowScopeName } from '@/utils/constants/workflow'
@@ -16,11 +16,25 @@ import type { WorkflowScopeName } from '@/utils/constants/workflow'
  * @typedef {Object} BoardEndpoints
  * @property {string} collection - Collection path
  * @property {(id: string) => string} item - Item path
+ * @property {(id: string) => string} [move] - Path moving a card, replaces the shared board route
  */
 
 export interface BoardEndpoints {
   collection: string
   item: (id: string) => string
+  move?: (id: string) => string
+}
+
+/**
+ * Toast label of a board card
+ * @typedef {Object} BoardEntity
+ * @property {string} label - Singular label
+ * @property {'masculine' | 'feminine'} gender - Grammatical gender
+ */
+
+export interface BoardEntity {
+  label: string
+  gender: 'masculine' | 'feminine'
 }
 
 /**
@@ -34,7 +48,14 @@ export interface BoardEndpoints {
  * @property {(id: string, values: FormValues) => Promise<boolean>} update - Edit a card
  * @property {(id: string) => Promise<void>} remove - Drop a card
  * @property {(id: string, columnId: string, index: number) => void} move - Move a card
+ * @property {(updates: BoardUpdate[]) => Promise<boolean>} updateMany - Edit several cards
+ * @property {(ids: string[]) => Promise<void>} removeMany - Drop several cards
  */
+
+export interface BoardUpdate {
+  id: string
+  values: FormValues
+}
 
 export interface BoardCollection<T extends BoardItem> {
   cards: T[]
@@ -45,28 +66,32 @@ export interface BoardCollection<T extends BoardItem> {
   update: (id: string, values: FormValues) => Promise<boolean>
   remove: (id: string) => Promise<void>
   move: (id: string, columnId: string, index: number) => void
+  updateMany: (updates: BoardUpdate[]) => Promise<boolean>
+  removeMany: (ids: string[]) => Promise<void>
 }
 
 /**
  * Drive one board
- * @param {WorkflowScopeName} scope - Board scope
+ * @param {WorkflowScopeName | null} scope - Board scope, null for a board outside the workflows
  * @param {BoardEndpoints} endpoints - Paths of the resource
  * @param {T[]} initialCards - Cards resolved server-side
  * @param {(card: T) => string} labelOf - Display label of a card
+ * @param {BoardEntity} [entityOverride] - Toast label, defaults to the scope one
  * @return {BoardCollection<T>} - State and mutations
  */
 
 export const useBoard = <T extends BoardItem>(
-  scope: WorkflowScopeName,
+  scope: WorkflowScopeName | null,
   endpoints: BoardEndpoints,
   initialCards: T[],
-  labelOf: (card: T) => string
+  labelOf: (card: T) => string,
+  entityOverride?: BoardEntity
 ): BoardCollection<T> => {
   const [cards, setCards] = useState(initialCards)
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   // Toast entity label
-  const { label: entity, gender } = BOARD_ENTITY_COPY[scope]
+  const { label: entity, gender } = entityOverride ?? BOARD_ENTITY_COPY[scope!]
 
   const create = useCallback(
     async (values: FormValues) => {
@@ -119,12 +144,78 @@ export const useBoard = <T extends BoardItem>(
         current.map((entry) => (entry.id === id ? { ...entry, columnId } : entry))
       )
 
-      void run(() => apiPatch<T>(API_ROUTES.board, { scope, id, columnId, index })).then((card) => {
+      const request = endpoints.move
+        ? () => apiPatch<T>(endpoints.move!(id), { columnId })
+        : () => apiPatch<T>(API_ROUTES.board, { scope, id, columnId, index })
+
+      void run(request).then((card) => {
         if (card) setCards((current) => current.map((entry) => (entry.id === id ? card : entry)))
       })
     },
-    [scope, run]
+    [scope, endpoints, run]
   )
 
-  return { cards, isSaving, issues, clearIssues, create, update, remove, move }
+  // Settled writes keep the cards that went through
+  const updateMany = useCallback(
+    async (updates: BoardUpdate[]) => {
+      const saved = await run(
+        async () => {
+          const results = await Promise.allSettled(
+            updates.map(({ id, values }) => apiPatch<T>(endpoints.item(id), values))
+          )
+          const done = results.flatMap((result) =>
+            result.status === 'fulfilled' ? [result.value] : []
+          )
+
+          setCards((current) =>
+            current.map((entry) => done.find((card) => card.id === entry.id) ?? entry)
+          )
+
+          const failed = results.find((result) => result.status === 'rejected')
+          if (failed) throw failed.reason
+
+          return done
+        },
+        feedbackTitle(SELECTION_ENTITY.label, 'saved', SELECTION_ENTITY.gender)
+      )
+
+      return saved !== null
+    },
+    [endpoints, run]
+  )
+
+  const removeMany = useCallback(
+    async (ids: string[]) => {
+      await run(
+        async () => {
+          const results = await Promise.allSettled(
+            ids.map((id) => apiDelete<{ id: string }>(endpoints.item(id)))
+          )
+          const gone = ids.filter((_, index) => results[index].status === 'fulfilled')
+
+          setCards((current) => current.filter((entry) => !gone.includes(entry.id)))
+
+          const failed = results.find((result) => result.status === 'rejected')
+          if (failed) throw failed.reason
+
+          return gone
+        },
+        feedbackTitle(SELECTION_ENTITY.label, 'deleted', SELECTION_ENTITY.gender)
+      )
+    },
+    [endpoints, run]
+  )
+
+  return {
+    cards,
+    isSaving,
+    issues,
+    clearIssues,
+    create,
+    update,
+    remove,
+    move,
+    updateMany,
+    removeMany,
+  }
 }
