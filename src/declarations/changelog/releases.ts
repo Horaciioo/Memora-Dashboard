@@ -131,13 +131,13 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: '2026-10-18',
     title: 'Encore et toujours des améliorations',
     intro:
-      'La Mod View s’organise comme tu l’entends, les bilans de live racontent enfin la soirée, et tes pages préférées sont à un clic.',
+      'La Mod View subit une grande amélioration, les bilans sont mieux comparés et exportés, et les annonces se créent sans projet.',
     description:
-      'Jusqu’ici, la Mod View imposait la même disposition à tout le monde, le bilan d’un live se résumait à quelques chiffres et les annonces ne s’écrivaient que depuis un projet. Cette version laisse chaque poste ranger ses fenêtres, donne aux bilans de quoi comparer et exporter, et fait des « Communications » un vrai tableau de travail.',
+      "Jusqu'ici, la Mod View était figée, les bilans du créateur et de l’équipe étaient séparés, et les annonces ne pouvaient pas se créer sans projet. Cette version rend la Mod View plus flexible, améliore drastiquement les bilans et permet de créer des annonces sans projet.",
     items: [
       {
         tag: ChangelogTags.Added,
-        text: 'Ajout de la possibilité de mettre une page en favori depuis l’étoile de sa bannière : trois favoris au plus, retrouvés dans le menu de gauche sous « Favoris »',
+        text: 'Ajout de la possibilité de mettre une page en favori depuis l’étoile de sa bannière',
       },
       {
         tag: ChangelogTags.Added,
@@ -160,7 +160,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.announcements,
         audience: ChangelogAudiences.Responsables,
         permission: Permissions.CommunicationWrite,
-        text: 'Ajout de la possibilité de sélectionner plusieurs annonces, au clic avec Ctrl ou Maj ou en traçant un rectangle, pour les modifier ou les supprimer d’un coup',
+        text: "Ajout de la possibilité de sélectionner simultanément plusieurs évènements dans Projets, Tâches, Communications et Calendrier, pour les supprimer, ou modifier des propriétés d'un seul clic",
       },
       {
         tag: ChangelogTags.Added,
