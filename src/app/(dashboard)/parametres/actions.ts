@@ -5,11 +5,12 @@ import { cookies } from 'next/headers'
 
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { revokeOtherSessions } from '@/core/services/auth/SessionService'
-import { unlinkTwitch } from '@/core/services/platforms/PlatformAccountService'
+import { unlinkPlatform } from '@/core/services/platforms/PlatformAccountService'
 import { resetGuides } from '@/core/services/preferences/GuideService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
+import { LivePlatforms } from '@/utils/constants/lives'
 
 /**
  * Close every session of the signed-in member but the one in use
@@ -45,14 +46,19 @@ export async function replayGuides(): Promise<void> {
 }
 
 /**
- * Unlink the member's Twitch account
+ * Unlink the member's account on a platform
+ * @param {string} platform - Platform to leave
  * @return {Promise<void>} - Unlinked
  */
 
-export async function unlinkTwitchAccount(): Promise<void> {
+export async function unlinkPlatformAccount(platform: string): Promise<void> {
   const { session } = await requireUser()
 
-  await unlinkTwitch(session.id)
+  // A server action takes any string a browser sends
+  const known = Object.values(LivePlatforms).find((value) => value === platform)
+  if (!known) return
+
+  await unlinkPlatform(session.id, known)
 
   refresh()
 }

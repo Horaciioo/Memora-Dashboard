@@ -21,6 +21,7 @@ export const API_ROUTES = {
   seenGuide: '/api/parametres/guides',
   favoritePage: '/api/parametres/favoris',
   twitchLink: '/api/connexion/twitch',
+  youtubeLink: '/api/connexion/youtube',
   health: '/api/sante',
   twoFactor: '/api/a2f',
   twoFactorSeal: '/api/a2f/sceau',

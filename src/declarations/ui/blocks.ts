@@ -787,6 +787,8 @@ export const SECURITY_LIST = {
   title: 'flex flex-wrap items-center gap-2 text-sm font-bold tracking-tight',
   current: 'text-xs font-semibold text-[var(--color-success)]',
   meta: 'flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-[var(--color-ink-subtle)]',
+  link: 'w-fit max-w-full truncate text-xs font-semibold hover:underline',
+  actions: 'flex shrink-0 items-center gap-2',
   time: 'shrink-0 text-xs text-[var(--color-ink-subtle)] tabular-nums',
   status: 'inline-flex items-center gap-1.5 text-xs font-semibold',
   on: 'text-[var(--color-success)]',

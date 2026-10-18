@@ -5,12 +5,14 @@ import type { LivePlatformName } from '@/utils/constants/lives'
  * @typedef {Object} PlatformLinkView
  * @property {LivePlatformName} platform - Platform
  * @property {string} login - Account shown
+ * @property {string} handle - Login in the channel address
  * @property {boolean} revoked - Must be reconnected
  */
 
 export interface PlatformLinkView {
   platform: LivePlatformName
   login: string
+  handle: string
   revoked: boolean
 }
 
