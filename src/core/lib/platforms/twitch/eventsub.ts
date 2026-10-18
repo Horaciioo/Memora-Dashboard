@@ -327,6 +327,7 @@ export const translateTwitchEvent = (
             author: twitchChatter(author.id, author.login, author.name),
             text: message,
             flagged,
+            categoryKey: isTerm ? 'blocked_term' : text(automod.category),
             category: isTerm
               ? TWITCH_EVENT_COPY.blockedTerm
               : (TWITCH_EVENT_COPY.automodCategories[text(automod.category)] ??
