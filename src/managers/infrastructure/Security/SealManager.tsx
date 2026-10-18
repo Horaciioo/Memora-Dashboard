@@ -3,8 +3,8 @@
 import { createContext, useContext, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { useTwoFactor } from '@/core/hooks/data/useTwoFactor'
-import type { TwoFactorCollection } from '@/core/hooks/data/useTwoFactor'
+import { useTwoFactor } from '@/core/hooks/data/people/useTwoFactor'
+import type { TwoFactorCollection } from '@/core/hooks/data/people/useTwoFactor'
 import type { SealState, TwoFactorState } from '@/types/security'
 
 /**

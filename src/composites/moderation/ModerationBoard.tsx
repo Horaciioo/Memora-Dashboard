@@ -8,18 +8,20 @@ import { SegmentedControl } from '@/components/elements/actions/SegmentedControl
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { Skeleton } from '@/components/elements/feedback/Skeleton'
-import { Input } from '@/components/elements/forms/Input'
-import { Drawer } from '@/components/structures/Drawer'
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { InlineCreate } from '@/components/structures/InlineCreate'
+import { Input } from '@/components/elements/forms/inputs/Input'
+import { PageOptions, type PageOption } from '@/components/structures/page/PageOptions'
+import { Drawer } from '@/components/structures/overlays/Drawer'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
+import { InlineCreate } from '@/components/structures/inline/InlineCreate'
 import { LiveconTitle } from '@/composites/moderation/LiveconTitle'
 import { SanctionLegend } from '@/composites/moderation/SanctionLegend'
 import { OffenseSheet } from '@/composites/moderation/OffenseSheet'
-import { useActionMenu } from '@/core/hooks/interaction/useActionMenu'
-import { useSanctions } from '@/core/hooks/data/useSanctions'
+import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
+import { useSanctions } from '@/core/hooks/data/lives/useSanctions'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { SANCTION_COPY } from '@/declarations/sanctions/copy'
+import { PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { beaconProps } from '@/declarations/ui/beacons'
 import {
@@ -164,6 +166,7 @@ export const ModerationBoard = ({
 }: ModerationBoardProps) => {
   const sanctions = useSanctions(initialPanel)
   const [search, setSearch] = useState('')
+  const [showLegend, setShowLegend] = useState(false)
   const [removing, setRemoving] = useState<SanctionOffenseCard | null>(null)
 
   const panel = sanctions.panel.panel
@@ -192,6 +195,17 @@ export const ModerationBoard = ({
 
   const hasTemplate = SANCTION_TEMPLATES[panel].length > 0
   const isEmpty = sanctions.panel.offenses.length === 0
+
+  const pageOptions: PageOption[] = isEmpty
+    ? []
+    : [
+        {
+          id: 'legend',
+          label: PAGE_OPTIONS_COPY.showLegend,
+          checked: showLegend,
+          onChange: setShowLegend,
+        },
+      ]
 
   const panelBody = () => {
     if (sanctions.isLoading) {
@@ -301,6 +315,7 @@ export const ModerationBoard = ({
 
   return (
     <div className={SANCTION_PANEL.wrapper}>
+      <PageOptions options={pageOptions} />
       <div className={LIVECON_TITLE.row} {...beaconProps(TOUR_BEACONS.sanctionsLivecon)}>
         <LiveconTitle
           creatorId={creatorId}
@@ -336,7 +351,7 @@ export const ModerationBoard = ({
         </div>
       )}
 
-      {!isEmpty && <SanctionLegend panel={panel} />}
+      {!isEmpty && showLegend && <SanctionLegend panel={panel} />}
 
       {panelBody()}
 

@@ -1,29 +1,46 @@
 import type { Metadata } from 'next'
-import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
+import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { MaturityTag } from '@/components/elements/display/MaturityTag'
-import { PageHeader } from '@/components/structures/PageHeader'
-import { Section } from '@/components/structures/Section'
+import AppLink from '@/components/elements/navigation/AppLink'
+import { PageHeader } from '@/components/structures/page/PageHeader'
+import { Section } from '@/components/structures/page/Section'
 import { ConsoleMetrics } from '@/composites/system/ConsoleMetrics'
-import { readRecentActivity } from '@/core/services/system/ActivityService'
-import { readDataReport } from '@/core/services/system/ConsoleService'
+import { JournalFilters } from '@/composites/system/journal/JournalFilters'
+import { JournalPager } from '@/composites/system/journal/JournalPager'
+import { JournalRow } from '@/composites/system/journal/JournalRow'
+import { parseActivityFilters } from '@/core/lib/system/activityFilters'
+import { readActivityPage, readActivityStats } from '@/core/services/system/ActivityQueryService'
 import { requirePermission } from '@/core/wrappers/requireUser'
+import { ROUTES } from '@/declarations/navigation'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
+import { JOURNAL_COPY } from '@/declarations/system/monitoring/journal'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
-import { PAGE_STYLES } from '@/declarations/ui/variants'
+import { JOURNAL_TABLE_STYLES, PAGE_STYLES } from '@/declarations/ui/variants'
+import { formatDayTime } from '@/utils/format/dates'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: SYSTEM_COPY.journalTitle }
 
+interface JournalPageProps {
+  searchParams: Promise<Record<string, string | undefined>>
+}
+
 /**
- * Latest recorded facts
+ * Searchable journal of recorded facts
+ * @param {JournalPageProps} props - Address filters
  * @return {Promise<JSX.Element>} - Journal page
  */
 
-export default async function JournalPage() {
-  const { scope } = await requirePermission(Permissions.AccessManage)
+export default async function JournalPage({ searchParams }: JournalPageProps) {
+  await requirePermission(Permissions.AccessManage)
 
-  const [entries, data] = await Promise.all([readRecentActivity(), readDataReport(await scope())])
+  const filters = parseActivityFilters(
+    new URLSearchParams(
+      Object.entries(await searchParams).flatMap(([key, value]) => (value ? [[key, value]] : []))
+    )
+  )
+
+  const [result, stats] = await Promise.all([readActivityPage(filters), readActivityStats()])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
@@ -31,25 +48,46 @@ export default async function JournalPage() {
 
       <ConsoleMetrics
         metrics={[
-          { label: SYSTEM_COPY.metricEntries, value: data.counts.logs },
+          { label: JOURNAL_COPY.statLast24h, value: stats.last24h },
+          { label: JOURNAL_COPY.statWarnings, value: stats.warnings },
+          { label: JOURNAL_COPY.statErrors, value: stats.errors },
           {
-            label: SYSTEM_COPY.metricRetention,
-            value: `${RETENTION_SETTINGS.activityLogDays} ${SYSTEM_COPY.retentionDays}`,
+            label: JOURNAL_COPY.statLastError,
+            value: stats.lastError ? formatDayTime(stats.lastError) : JOURNAL_COPY.statNoError,
+            hint: `${SYSTEM_COPY.metricRetention} ${RETENTION_SETTINGS.activityLogDays} ${SYSTEM_COPY.retentionDays}`,
           },
         ]}
       />
 
-      <Section title={SYSTEM_COPY.journalRecent} description={SYSTEM_COPY.journalRecentLead} padded>
-        {entries.length === 0 ? (
+      <JournalFilters actors={stats.actors} />
+
+      <Section bare>
+        {result.entries.length === 0 ? (
           <EmptyState
             figure="notes"
-            title={SYSTEM_COPY.journalEmptyTitle}
-            description={SYSTEM_COPY.journalEmptyLead}
-            action={<MaturityTag maturity="beta" interactive={false} />}
+            title={JOURNAL_COPY.noResultTitle}
+            description={JOURNAL_COPY.noResultLead}
+            action={
+              <AppLink href={ROUTES.journal}>
+                <Button>{JOURNAL_COPY.reset}</Button>
+              </AppLink>
+            }
             compact
           />
         ) : (
-          <ActivityTimeline entries={entries} />
+          <>
+            <div className={JOURNAL_TABLE_STYLES.head}>
+              {JOURNAL_COPY.columns.map((column) => (
+                <span key={column}>{column}</span>
+              ))}
+            </div>
+            <ol className={JOURNAL_TABLE_STYLES.list}>
+              {result.entries.map((entry) => (
+                <JournalRow key={entry.id} entry={entry} />
+              ))}
+            </ol>
+            <JournalPager page={result.page} pages={result.pages} />
+          </>
         )}
       </Section>
     </div>

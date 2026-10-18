@@ -13,7 +13,7 @@ export interface RailToolbarProps {
 }
 
 /**
- * Bare glyphs above the search: fold the rail, walk the history, reload the page
+ * Bare glyphs above the search: walk the history, fold the rail
  * @param {boolean} isCompact - Rail is folded to its glyphs
  * @param {() => void} onToggle - Folds or unfolds the rail
  * @return {JSX.Element}
@@ -24,7 +24,6 @@ export const RailToolbar = ({ isCompact, onToggle }: RailToolbarProps) => {
   const foldLabel = isCompact ? NAV_COPY.expandRail : NAV_COPY.collapseRail
 
   const buttons: { icon: IconName; label: string; onClick: () => void; className?: string }[] = [
-    { icon: 'sidebar', label: foldLabel, onClick: onToggle },
     { icon: 'back', label: NAV_COPY.historyBack, onClick: router.back, className: 'rail-fold' },
     {
       icon: 'forward',
@@ -32,11 +31,12 @@ export const RailToolbar = ({ isCompact, onToggle }: RailToolbarProps) => {
       onClick: router.forward,
       className: 'rail-fold',
     },
+    // Fold sits at the far end, centred once the rail is folded
     {
-      icon: 'refresh',
-      label: NAV_COPY.reloadPage,
-      onClick: router.refresh,
-      className: 'rail-fold ml-auto',
+      icon: 'sidebar',
+      label: foldLabel,
+      onClick: onToggle,
+      className: isCompact ? undefined : 'ml-auto',
     },
   ]
 

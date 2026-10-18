@@ -1,6 +1,6 @@
 import Link from '@/components/elements/navigation/AppLink'
 import { Button } from '@/components/elements/actions/Button'
-import { SystemScreen } from '@/components/structures/SystemScreen'
+import { SystemScreen } from '@/components/structures/page/SystemScreen'
 import { ROUTES } from '@/declarations/navigation'
 import { ERROR_PAGE_COPY } from '@/declarations/ui/copy'
 

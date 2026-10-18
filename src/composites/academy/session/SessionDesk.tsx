@@ -2,7 +2,7 @@
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
-import { ScrollCard } from '@/components/structures/ScrollCard'
+import { ScrollCard } from '@/components/structures/data/ScrollCard'
 import { useSessionState } from '@/composites/academy/session/SessionFileContext'
 import { decisionQueue, reviewQueue } from '@/core/lib/academy/queues'
 import { PARKOUR_COPY } from '@/declarations/academy/parkour'

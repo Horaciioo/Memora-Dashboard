@@ -22,6 +22,15 @@ enum AccessCategory {
   MODERATION
 }
 
+// Writing progress of an announcement
+enum CommunicationStatus {
+  PLANNED
+  WRITING
+  WRITTEN
+  PUBLISHED
+  CANCELLED
+}
+
 // Lifecycle of a member inside the organisation
 enum MemberStatus {
   PENDING
@@ -279,6 +288,8 @@ model Account {
   seenReleaseVersion    String?
   // One-time guides already shown, by key
   seenGuides            String[]     @default([])
+  // Pages starred from the banner, by path
+  favorites             Json         @default("[]")
   anonymisedAt          DateTime?
   // Access shut until lifted
   frozenAt              DateTime?
@@ -851,18 +862,19 @@ model ProjectAssistant {
 
 // Markdown announcement written for a project
 model Communication {
-  id          String    @id @default(cuid())
-  projectId   String
+  id          String              @id @default(cuid())
+  projectId   String?
   authorId    String?
   platformId  String?
   title       String
-  body        String    @default("")
+  body        String              @default("")
+  status      CommunicationStatus @default(PLANNED)
   publishedAt DateTime?
-  position    Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  position    Int                 @default(0)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
 
-  project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project  Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   author   Account?  @relation(fields: [authorId], references: [id], onDelete: SetNull)
   platform Platform? @relation(fields: [platformId], references: [id], onDelete: SetNull)
 
@@ -1738,6 +1750,7 @@ model Live {
   actions        ModerationAction[]
   presences      ModViewPresence[]
   focuses        ModViewFocus[]
+  samples        LiveSample[]
 
   @@unique([platform, streamExternalId])
   @@index([status])
@@ -1841,6 +1854,19 @@ model ModViewPresence {
   @@map("modview_presences")
 }
 
+// Viewer count read from the platform while a live runs
+model LiveSample {
+  id      String   @id @default(cuid())
+  liveId  String
+  at      DateTime @default(now())
+  viewers Int
+
+  live Live @relation(fields: [liveId], references: [id], onDelete: Cascade)
+
+  @@index([liveId, at])
+  @@map("live_samples")
+}
+
 // One member following another's gestures live, Focus mode
 model ModViewFocus {
   id        String    @id @default(cuid())
@@ -1895,6 +1921,12 @@ model ActivityLog {
   targetId   String?
   summary    String
   payload    Json?
+  // 0 info, 1 warning, 2 error
+  level      Int      @default(0)
+  // Where the request came from
+  ip         String?
+  userAgent  String?
+  route      String?
   createdAt  DateTime @default(now())
 
   actor   Account? @relation("LogActor", fields: [actorId], references: [id], onDelete: SetNull)
@@ -1903,6 +1935,9 @@ model ActivityLog {
   @@index([subjectId, createdAt])
   @@index([targetType, targetId])
   @@index([eventType])
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([level, createdAt])
   @@map("activity_logs")
 }
 

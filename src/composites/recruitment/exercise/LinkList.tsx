@@ -3,7 +3,7 @@
 import { Fragment } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { useCopy } from '@/core/hooks/interaction/useCopy'
+import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { EXERCISE_SETTINGS } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { EXERCISE_COPY } from '@/declarations/recruitment/exerciseCopy'

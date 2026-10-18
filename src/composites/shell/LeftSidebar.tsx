@@ -1,26 +1,26 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
-import { CourseRail } from '@/composites/academy/course/CourseRail'
+import { CourseRail } from '@/composites/academy/course/player/CourseRail'
 import { CalendarRailPanel, CalendarSearchBar } from '@/composites/calendar/CalendarSidebar'
 import { CalendarRailSwitch } from '@/composites/calendar/CalendarRailSwitch'
 import { NotificationsBell } from '@/composites/notifications/NotificationsBell'
 import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { CreatorAccountMenu } from '@/composites/shell/CreatorAccountMenu'
 import { CreatorSwitch } from '@/composites/shell/CreatorSwitch'
-import { RailDeadlineBubble } from '@/composites/shell/RailDeadlineBubble'
+import { RailDeadlineBubbles } from '@/composites/shell/RailDeadlineBubbles'
 import { RailNav } from '@/composites/shell/RailNav'
 import { RailSlides } from '@/composites/shell/RailSlides'
 import { RoleSwitch } from '@/composites/shell/RoleSwitch'
-import { ViewToggle } from '@/composites/shell/ViewToggle'
 import { RailToolbar } from '@/composites/shell/RailToolbar'
 import { RailShortcuts } from '@/composites/shell/RailShortcuts'
 import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
-import { useCalendarRail } from '@/core/hooks/interaction/useCalendarRail'
-import { useCalendarRailView } from '@/core/hooks/interaction/useCalendarRailView'
-import { useRailEntries } from '@/core/hooks/interaction/useRailEntries'
-import { useCourseRail } from '@/core/hooks/interaction/useCourseRail'
-import { useRailCompact } from '@/core/hooks/interaction/useRailCompact'
+import { useCalendarRail } from '@/core/hooks/interaction/calendar/useCalendarRail'
+import { useCalendarRailView } from '@/core/hooks/interaction/calendar/useCalendarRailView'
+import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
+import { useCourseRail } from '@/core/hooks/interaction/scenes/useCourseRail'
+import { useRailCompact } from '@/core/hooks/interaction/layout/useRailCompact'
 import { SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
 import { ROUTES } from '@/declarations/navigation'
 import { beaconProps } from '@/declarations/ui/beacons'
@@ -47,7 +47,10 @@ export interface LeftSidebarProps {
 
 export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const { session } = useAuthContext()
-  const { isTouring, isIntroOpen, isUnlocked } = useTour()
+  const { isTouring, isIntroOpen, isUnlocked, next } = useTour()
+  const pathname = usePathname()
+  // The visit points at a page of the menu, which the calendar menu would hide
+  const isPointing = isTouring && next !== null && pathname !== next
   // An open course puts its chapters where the destinations stand
   const courseRail = useCourseRail()
   // The calendar puts its month and switches there too, or steps aside for the classic menu
@@ -58,11 +61,12 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   // A lone creator sits on top
   const hasCreators = viewContext.creators.length === 1
 
-  // The calendar menu wears the page's own search and hides the shortcuts
-  const isCalendarMenu = Boolean(calendarRail) && calendarView === 'calendar'
+  // Chapters need their room
+  const isCompact = isRailCompact && !courseRail
 
-  // Chapters and the month need their room
-  const isCompact = isRailCompact && !courseRail && !calendarRail
+  // The calendar menu wears the page's own search, a folded rail keeps the classic glyphs
+  const isCalendarMenu =
+    Boolean(calendarRail) && calendarView === 'calendar' && !isPointing && !isCompact
 
   // Windows and panels read the rail width from the body
   useEffect(() => {
@@ -91,7 +95,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
     <>
       <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
       {/* Hangs under the news shortcut it announces */}
-      {!isCompact && (
+      {!isCompact && !isCalendarMenu && (
         <ReleaseNotice pointedAt={newsAt >= 0 ? (newsAt + 0.5) / shortcuts.length : undefined} />
       )}
     </>
@@ -106,11 +110,11 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
     >
       <RailToolbar isCompact={isCompact} onToggle={toggleRailCompact} />
 
-      {calendarRail && !courseRail && (
+      {calendarRail && !courseRail && !isPointing && !isCompact && (
         <CalendarRailSwitch value={calendarView} onChange={chooseCalendarView} />
       )}
 
-      {hasCreators && (
+      {hasCreators && !isCompact && (
         <div className={LEFT_SIDEBAR.creatorRow}>
           <CreatorSwitch
             creators={viewContext.creators}
@@ -129,7 +133,11 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
             </div>
           </>
         ) : (
-          <SearchLauncher expanded={!isCompact} />
+          <SearchLauncher
+            expanded={!isCompact}
+            className={isCompact ? LEFT_SIDEBAR.searchGlyph : undefined}
+            iconClassName={isCompact ? LEFT_SIDEBAR.shortcutIcon : undefined}
+          />
         )}
       </div>
 
@@ -146,56 +154,46 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
         nav
       )}
 
-      {/* A late item lights its page */}
-      {!courseRail &&
-        !calendarRail &&
-        !isIntroOpen &&
-        (Object.keys(OVERDUE_ROUTES) as (keyof typeof OVERDUE_ROUTES)[])
-          .filter((flag) => viewContext.overdue[flag] && isUnlocked(OVERDUE_ROUTES[flag]))
-          .map((flag) => (
-            <RailDeadlineBubble
-              key={flag}
-              href={OVERDUE_ROUTES[flag]}
-              message={DEADLINE_NUDGE_COPY[flag]}
-            />
-          ))}
-
-      {/* A comment naming the member lights Recrutement */}
-      {!courseRail &&
-        !calendarRail &&
-        !isIntroOpen &&
-        viewContext.mentioned &&
-        isUnlocked(ROUTES.recruitments) && (
-          <RailDeadlineBubble href={ROUTES.recruitments} message={MENTION_NUDGE_COPY} />
-        )}
+      {/* A late item or a mention lights its page */}
+      {!courseRail && !calendarRail && !isIntroOpen && (
+        <RailDeadlineBubbles
+          bubbles={[
+            ...(Object.keys(OVERDUE_ROUTES) as (keyof typeof OVERDUE_ROUTES)[])
+              .filter((flag) => viewContext.overdue[flag])
+              .map((flag) => ({ href: OVERDUE_ROUTES[flag], message: DEADLINE_NUDGE_COPY[flag] })),
+            ...(viewContext.mentioned
+              ? [{ href: ROUTES.recruitments, message: MENTION_NUDGE_COPY }]
+              : []),
+          ].filter(({ href }) => isUnlocked(href))}
+        />
+      )}
 
       {courseRail && !isCompact && <ReleaseNotice />}
 
       {session && (
         <div className={LEFT_SIDEBAR.footer}>
-          <div className={LEFT_SIDEBAR.footerBox}>
-            {viewContext.switchable && (
+          <div className={isCompact ? LEFT_SIDEBAR.footerBare : LEFT_SIDEBAR.footerBox}>
+            {viewContext.switchable && !isCompact && (
               <>
                 <div className={LEFT_SIDEBAR.footerSwitch}>
-                  {isCompact ? (
-                    <ViewToggle viewContext={viewContext} />
-                  ) : (
-                    <RoleSwitch viewContext={viewContext} />
-                  )}
+                  <RoleSwitch viewContext={viewContext} />
                 </div>
                 <span className={LEFT_SIDEBAR.footerRule} aria-hidden="true" />
               </>
             )}
 
             <div className={LEFT_SIDEBAR.footerRow}>
-              <CreatorAccountMenu viewContext={viewContext} />
+              <CreatorAccountMenu viewContext={viewContext} isCompact={isCompact} />
 
-              <div className={LEFT_SIDEBAR.footerActions}>
-                <NotificationsBell
-                  initialUnread={unreadCount}
-                  iconClassName={LEFT_SIDEBAR.footerIcon}
-                />
-              </div>
+              {/* A folded rail keeps the portrait alone */}
+              {!isCompact && (
+                <div className={LEFT_SIDEBAR.footerActions}>
+                  <NotificationsBell
+                    initialUnread={unreadCount}
+                    iconClassName={LEFT_SIDEBAR.footerIcon}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import { pickCreator } from '@/app/(dashboard)/actions'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { AccountActions } from '@/composites/shell/AccountActions'
-import { useOutsideDismiss } from '@/core/hooks/interaction/useOutsideDismiss'
+import { useOutsideDismiss } from '@/core/hooks/interaction/layout/useOutsideDismiss'
 import { VIEW_COPY } from '@/declarations/access/copy'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { CREATOR_MENU, RAIL_POPOVER } from '@/declarations/ui/blocks'
@@ -16,16 +16,18 @@ import { cn } from '@/utils/classnames'
 
 export interface CreatorAccountMenuProps {
   viewContext: ViewContext
+  isCompact?: boolean
 }
 
 /**
  * Account footer of the rail, its box opening beside the rail with the account actions and,
  * for a member of several creators, the creator on screen
  * @param {ViewContext} viewContext - View resolved server-side
+ * @param {boolean} [isCompact] - Rail is folded, only a small portrait shows
  * @return {JSX.Element | null}
  */
 
-export const CreatorAccountMenu = ({ viewContext }: CreatorAccountMenuProps) => {
+export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMenuProps) => {
   const { session } = useAuthContext()
   const [isOpen, setOpen] = useState(false)
   const [isPicking, startPicking] = useTransition()
@@ -68,13 +70,14 @@ export const CreatorAccountMenu = ({ viewContext }: CreatorAccountMenuProps) => 
         aria-expanded={isOpen}
         aria-haspopup="true"
         onClick={() => setOpen((open) => !open)}
-        className={CREATOR_MENU.trigger}
+        title={isCompact ? (shown?.name ?? session.displayName) : undefined}
+        className={cn(CREATOR_MENU.trigger, isCompact && CREATOR_MENU.triggerBare)}
       >
-        {shown ? (
-          <Avatar name={shown.name} src={shown.avatarUrl} size="sm" />
-        ) : (
-          <Avatar name={session.displayName} src={session.avatarUrl} size="sm" />
-        )}
+        <Avatar
+          name={shown?.name ?? session.displayName}
+          src={shown ? shown.avatarUrl : session.avatarUrl}
+          size={isCompact ? 'xs' : 'sm'}
+        />
         <span className={CREATOR_MENU.name}>{shown?.name ?? session.displayName}</span>
         <Chevron
           className={cn(

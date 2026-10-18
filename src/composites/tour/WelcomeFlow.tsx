@@ -2,8 +2,8 @@
 
 import { useCallback } from 'react'
 
-import { WelcomeChat } from '@/composites/tour/WelcomeChat'
-import { useMutation } from '@/core/hooks/data/useMutation'
+import { WelcomeChat } from '@/composites/tour/chat/WelcomeChat'
+import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { apiPatch } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import type { IntakeAnswers } from '@/core/lib/tour/chat'

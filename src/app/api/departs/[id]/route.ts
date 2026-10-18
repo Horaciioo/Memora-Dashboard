@@ -1,5 +1,5 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { publishDeparture } from '@/core/services/academy/ParkourService'
+import { publishDeparture } from '@/core/services/academy/parkour/ParkourService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const POST = createProtectedRoute({

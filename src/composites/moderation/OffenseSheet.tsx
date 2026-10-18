@@ -4,15 +4,15 @@ import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
-import { Input } from '@/components/elements/forms/Input'
-import { MultiSelect } from '@/components/elements/forms/MultiSelect'
-import { SelectMenu } from '@/components/elements/forms/SelectMenu'
-import { Drawer } from '@/components/structures/Drawer'
-import { InlineArea } from '@/components/structures/InlineArea'
-import { InlineMarkdown } from '@/components/structures/InlineMarkdown'
-import { InlineText } from '@/components/structures/InlineText'
-import { useActionMenu } from '@/core/hooks/interaction/useActionMenu'
-import { useCopy } from '@/core/hooks/interaction/useCopy'
+import { Input } from '@/components/elements/forms/inputs/Input'
+import { MultiSelect } from '@/components/elements/forms/selects/MultiSelect'
+import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
+import { Drawer } from '@/components/structures/overlays/Drawer'
+import { InlineArea } from '@/components/structures/inline/InlineArea'
+import { InlineMarkdown } from '@/components/structures/inline/InlineMarkdown'
+import { InlineText } from '@/components/structures/inline/InlineText'
+import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
+import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { toOptions } from '@/core/lib/forms/options'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { SANCTION_COPY } from '@/declarations/sanctions/copy'
@@ -69,8 +69,9 @@ const RungCommands = ({
   const surface = SANCTION_PANEL_REGISTRY.get(offense.panel)
 
   const lines = rung.measures.flatMap((measure) => {
-    const tool = surface.commands[measure.kind]
-    if (!tool) return []
+    const base = surface.commands[measure.kind]
+    if (!base) return []
+    const tool = measure.durationMinutes && base.timed ? base.timed : base
 
     const command = tool.command
       ? fillCommand(tool.command, {

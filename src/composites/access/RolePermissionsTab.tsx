@@ -3,13 +3,13 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { PermissionBoard } from '@/components/structures/PermissionBoard'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
+import { PermissionBoard } from '@/components/structures/data/PermissionBoard'
 import { countChanges, fromDraft, toDraft } from '@/core/lib/permissions'
 import { ACCESS_COPY } from '@/declarations/access/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import type { PermissionDraft } from '@/core/lib/permissions'
-import type { AccessCollection } from '@/core/hooks/data/useAccess'
+import type { AccessCollection } from '@/core/hooks/data/people/useAccess'
 import type { AccessSelection } from '@/composites/access/AccessConsole'
 
 export interface RolePermissionsTabProps {

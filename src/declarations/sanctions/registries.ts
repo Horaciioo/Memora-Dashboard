@@ -36,11 +36,13 @@ export const SANCTION_KIND_REGISTRY = createRegistry(SANCTION_KIND_MAP)
  * @typedef {Object} SanctionCommand
  * @property {string | null} command - Command to paste
  * @property {string} how - Where to do it by hand
+ * @property {SanctionCommand} [timed] - Variant when a duration applies
  */
 
 export interface SanctionCommand {
   command: string | null
   how: string
+  timed?: SanctionCommand
 }
 
 /**
@@ -136,6 +138,10 @@ const SANCTION_PANEL_MAP: Record<SanctionPanelName, SanctionPanelOption> = {
       [SanctionKinds.Ban]: {
         command: '!ban <@{user}> {reason}',
         how: 'Définitif jusqu’à un !unban.',
+        timed: {
+          command: '!tempban <@{user}> {duration} {reason}',
+          how: 'Marsha lève le ban seule à la fin de la durée.',
+        },
       },
       [SanctionKinds.Comment]: {
         command: '!note <@{user}> {reason}',

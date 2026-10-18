@@ -4,7 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { useIsMobileShell } from '@/core/hooks/interaction/useBreakpoint'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { findVisibleBeacon } from '@/core/lib/beacons'
 import { GUIDE_COPY } from '@/declarations/academy/copy'
 import { GUIDE_PARAMS, PIM_DESTINATION_REGISTRY } from '@/declarations/academy/guides'

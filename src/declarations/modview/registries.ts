@@ -31,11 +31,8 @@ const BOTH = [LivePlatforms.Twitch, LivePlatforms.YouTube]
 const WINDOW_MAP: Record<ModViewWindow, ModViewWindowOption> = {
   stream: { label: 'Flux', icon: 'stream', platforms: BOTH },
   modActions: { label: 'Actions de modérateur', icon: 'modActions', platforms: BOTH },
-  automod: {
-    label: 'File d’attente de l’AutoMod',
-    icon: 'automod',
-    platforms: [LivePlatforms.Twitch],
-  },
+  // Surveillance runs on both platforms, the queue only on Twitch
+  automod: { label: 'File d’attente de l’AutoMod', icon: 'automod', platforms: BOTH },
   chat: { label: 'Chat', icon: 'chat', platforms: BOTH },
   community: { label: 'Communauté', icon: 'viewer', platforms: BOTH },
   unbanRequests: {

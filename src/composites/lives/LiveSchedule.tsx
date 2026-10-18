@@ -1,4 +1,5 @@
 import { LIVE_COPY } from '@/declarations/lives/copy'
+import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { formatClock, formatRelativeDay } from '@/utils/format/dates'
@@ -26,13 +27,13 @@ export const LiveSchedule = ({ isLive, start, end }: LiveScheduleProps) => (
       <span className={cn(LIVE_BOARD.factClock, isLive && LIVE_BOARD.factClockLive)}>
         {formatClock(start)}
       </span>
-      <span className={LIVE_BOARD.factDay}>{formatRelativeDay(start)}</span>
+      {!isLive && <span className={LIVE_BOARD.factDay}>{formatRelativeDay(start)}</span>}
     </div>
-    <span className={LIVE_BOARD.factDivider} aria-hidden="true" />
+    <ICONS.spanArrow className={LIVE_BOARD.factArrow} aria-hidden="true" />
     <div className={LIVE_BOARD.fact}>
       <span className={LIVE_BOARD.factLabel}>{LIVE_COPY.endsAt}</span>
       <span className={LIVE_BOARD.factClock}>{formatClock(end)}</span>
-      <span className={LIVE_BOARD.factDay}>{end ? formatRelativeDay(end) : ''}</span>
+      {!isLive && end && <span className={LIVE_BOARD.factDay}>{formatRelativeDay(end)}</span>}
     </div>
   </>
 )

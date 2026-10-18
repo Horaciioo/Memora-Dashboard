@@ -1,0 +1,94 @@
+/**
+ * Story deck styles: one centred column of progress, card and buttons
+ * @type {Record<string, string>}
+ */
+
+export const STORY_DECK = {
+  root: 'overlay-enter fixed inset-0 z-[55] flex overflow-y-auto bg-[image:var(--gradient-page)] p-4',
+  column: 'm-auto flex w-full max-w-lg flex-col gap-4',
+  // Segments and the skip button on one line, right above the card
+  top: 'flex items-center gap-3',
+  progress: 'flex flex-1 gap-1.5',
+  segment: 'h-1.5 flex-1 rounded-full',
+  segmentIdle: 'bg-[var(--color-on-frame)]/30',
+  segmentDone: 'bg-[var(--color-on-frame)]',
+  skip: 'text-[var(--color-on-frame)] hover:bg-[var(--color-on-frame-wash)]',
+  card: 'course-erase-in relative flex flex-col gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-6 shadow-[var(--shadow-md)] sm:p-8',
+  // Buttons touch the card, never the bottom of the screen
+  actions: 'flex items-center justify-between gap-2',
+  next: 'h-auto min-w-0 shrink! py-2 text-center leading-tight whitespace-normal',
+  back: 'text-[var(--color-on-frame)] hover:bg-[var(--color-on-frame-wash)]',
+} as const
+
+/**
+ * Action row styles
+ * @type {Record<string, string>}
+ */
+
+export const ACTION_ROW = {
+  list: 'flex flex-col divide-y divide-[var(--color-border)]',
+  row: 'flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4 first:pt-0 last:pb-0',
+  body: 'min-w-0 flex-1',
+  title: 'text-sm font-semibold',
+  lead: 'text-xs text-[var(--color-ink-subtle)]',
+  action: 'shrink-0',
+} as const
+
+/**
+ * Guides replay card: glyph, words, action
+ * @type {Record<string, string>}
+ */
+
+export const GUIDES_CARD = {
+  card: 'flex flex-wrap items-center gap-4',
+  glyph: 'size-10 shrink-0 text-[var(--color-ink-subtle)]',
+  body: 'flex min-w-0 flex-1 basis-60 flex-col gap-1',
+  title: 'text-sm font-semibold',
+  lead: 'text-sm leading-snug',
+  hint: 'text-xs leading-snug text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Profile card beside the settings tabs
+ * @type {Record<string, string>}
+ */
+
+export const PROFILE_CARD = {
+  root: 'card-surface flex flex-col items-center gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] p-6 text-center lg:sticky lg:top-6',
+  name: 'text-section font-semibold tracking-tight',
+  facts: 'mt-4 flex w-full flex-col divide-y divide-[var(--color-border)] text-left',
+  fact: 'flex flex-col gap-0.5 py-3 first:pt-0 last:pb-0',
+  label: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  value: 'text-sm',
+  empty: 'text-[var(--color-ink-subtle)] italic',
+} as const
+
+/**
+ * Appearance picker cards
+ * @type {Record<string, string>}
+ */
+
+export const PICKER_CARD = {
+  stack: 'flex flex-col gap-8',
+  pair: 'grid grid-cols-1 gap-8 lg:grid-cols-2',
+  group: 'flex flex-col gap-4',
+  title: 'flex items-center gap-2 text-sm font-semibold',
+  three: 'grid grid-cols-3 gap-2',
+  wide: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
+  option:
+    'flex flex-col items-center justify-end gap-2.5 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4 text-center transition-[transform,box-shadow] hover:-translate-y-px',
+  optionWide: 'items-stretch justify-start gap-3 text-left',
+  active: 'border-[var(--color-ink-subtle)] bg-[var(--color-surface-raised)]',
+  glyph: 'size-9',
+  sample: 'leading-none font-bold tracking-tight',
+  label: 'text-xs font-semibold text-[var(--color-ink-subtle)]',
+  description: 'text-xs leading-snug text-[var(--color-ink-subtle)]',
+  // Palette of a vision mode drawn with its own colours
+  swatches: 'flex gap-1.5',
+  swatch: 'h-2.5 w-8 rounded-full',
+  // Page background as the mode draws it
+  frameStrip:
+    'h-6 w-full rounded-[var(--radius-md)] bg-[linear-gradient(90deg,var(--color-frame-mauve),var(--color-frame-blue),var(--color-frame-pink))]',
+  lead: 'text-sm text-[var(--color-ink-subtle)]',
+  note: 'text-xs text-[var(--color-ink-subtle)]',
+} as const

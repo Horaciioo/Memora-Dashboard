@@ -1,5 +1,5 @@
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { TRAINING_FEEDBACK_COPY } from '@/declarations/academy/copy'
 import { TRAINING_FEEDBACK } from '@/declarations/ui/variants'
 import type { TrainingFeedbackSummary } from '@/types/academy'

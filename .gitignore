@@ -28,7 +28,7 @@ dist
 /logs
 
 # test suites and seeded datasets, kept out of the delivered repository
-/tests
+/src/tests
 /prisma/fixtures
 vitest.config.mts
 

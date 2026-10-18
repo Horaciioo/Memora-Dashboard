@@ -1,4 +1,4 @@
-import type { TimelineState } from '@/components/structures/Timeline'
+import type { TimelineState } from '@/components/structures/data/Timeline'
 import type { RecruitmentOutcomeView } from '@/types/recruitment'
 
 /**

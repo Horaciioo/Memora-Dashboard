@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 
-import { Input } from '@/components/elements/forms/Input'
+import { Input } from '@/components/elements/forms/inputs/Input'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { GLOSSARY_REGISTRY } from '@/declarations/academy/glossary'
 import { GLOSSARY_STYLES } from '@/declarations/ui/variants'

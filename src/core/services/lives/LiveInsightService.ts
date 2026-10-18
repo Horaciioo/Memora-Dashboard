@@ -66,6 +66,8 @@ export const viewerSanctions = async (
     actorName: row.actor?.displayName ?? row.actorLogin ?? '',
     liveTitle: row.live.title,
     fromPanel: row.offenseId !== null,
+    offenseId: row.offenseId,
+    rung: row.rung,
     occurredAt: row.occurredAt.toISOString(),
   }))
 }
@@ -139,15 +141,22 @@ export const inspectModerator = async (
 }
 
 /**
- * Rungs already applied on a live
- * @param {string} liveId - Live
+ * Rungs already applied to the viewers of a creator's channel, across its lives
+ * @param {string} youtuberId - Creator
  * @return {Promise<PanelMemory>} - Memory
  */
 
-export const readPanelMemory = async (liveId: string): Promise<PanelMemory> => {
+export const readPanelMemory = async (youtuberId: string): Promise<PanelMemory> => {
   try {
+    const since = new Date(Date.now() - LIVE_SETTINGS.dossierWindowDays * 86_400_000)
     const rows = await prisma.moderationAction.findMany({
-      where: { liveId, offenseId: { not: null }, rung: { not: null }, status: { not: 'FAILED' } },
+      where: {
+        live: { youtuberId },
+        offenseId: { not: null },
+        rung: { not: null },
+        status: { not: 'FAILED' },
+        occurredAt: { gte: since },
+      },
       select: { targetPlatformUserId: true, offenseId: true, rung: true },
     })
 

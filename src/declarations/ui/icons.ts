@@ -73,7 +73,7 @@ import {
   LiveconCalmGlyph,
   LiveconWatchGlyph,
   LiveconCrisisGlyph,
-} from '@/components/elements/display/BrandGlyphs'
+} from '@/components/elements/display/glyphs/BrandGlyphs'
 import {
   AddGlyph,
   BackGlyph,
@@ -123,7 +123,7 @@ import {
   ParagraphGlyph,
   RuleGlyph,
   VoiceGlyph,
-} from '@/components/elements/display/Glyphs'
+} from '@/components/elements/display/glyphs/Glyphs'
 import {
   LiveDotGlyph,
   StatusDotGlyph,
@@ -147,11 +147,13 @@ import {
   ViewerGlyph,
   ChatGlyph,
   StreamGlyph,
+  StreamOffGlyph,
   ModActionsGlyph,
   UnbanRequestGlyph,
   CoordinatorGlyph,
   SanctionsPanelGlyph,
-} from '@/components/elements/display/LiveGlyphs'
+  SpanArrowGlyph,
+} from '@/components/elements/display/glyphs/LiveGlyphs'
 import {
   DiscordHashGlyph,
   DiscordAnnounceGlyph,
@@ -170,7 +172,7 @@ import {
   DiscordEmojiGlyph,
   DiscordChevronGlyph,
   TicketGlyph,
-} from '@/components/elements/display/DiscordGlyphs'
+} from '@/components/elements/display/glyphs/DiscordGlyphs'
 
 // Widened for brand glyphs
 export type LucideIcon = ComponentType<{ className?: string } & Record<string, unknown>>
@@ -195,6 +197,7 @@ export const ICONS = {
   liveconWatch: LiveconWatchGlyph,
   liveconCrisis: LiveconCrisisGlyph,
   liveDot: LiveDotGlyph,
+  spanArrow: SpanArrowGlyph,
   statusDot: StatusDotGlyph,
   twitch: TwitchGlyph,
   youtube: YoutubeGlyph,
@@ -216,6 +219,7 @@ export const ICONS = {
   viewer: ViewerGlyph,
   chat: ChatGlyph,
   stream: StreamGlyph,
+  streamOff: StreamOffGlyph,
   modActions: ModActionsGlyph,
   unbanRequest: UnbanRequestGlyph,
   coordinator: CoordinatorGlyph,

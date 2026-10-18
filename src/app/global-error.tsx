@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import '@/styles/globals.css'
-import { SystemScreen } from '@/components/structures/SystemScreen'
+import { SystemScreen } from '@/components/structures/page/SystemScreen'
 import { captureException } from '@/core/lib/sentry'
 import { ERROR_PAGE_COPY } from '@/declarations/ui/copy'
 import { CRITICAL_ERROR_STYLES } from '@/declarations/ui/variants'

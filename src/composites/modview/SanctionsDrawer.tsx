@@ -1,16 +1,23 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { SanctionHistory } from '@/composites/modview/SanctionHistory'
+import type { SanctionHistoryProps } from '@/composites/modview/SanctionHistory'
+import { SuggestionList } from '@/composites/modview/SuggestionList'
+import type { SuggestionListProps } from '@/composites/modview/SuggestionList'
+import { SplitHandle } from '@/composites/modview/workspace/SplitHandle'
 import { nextRung, thirdRung } from '@/core/lib/modview/commands'
 import type { PanelMemory } from '@/core/lib/modview/commands'
-import { MODVIEW_COPY, MODVIEW_PANEL_COPY } from '@/declarations/modview/copy'
+import { MODVIEW_COPY, MODVIEW_HISTORY_COPY, MODVIEW_PANEL_COPY } from '@/declarations/modview/copy'
+import { MODVIEW_WORKSPACE_COPY } from '@/declarations/modview/workspace'
+import { MODVIEW_SUGGESTION_COPY } from '@/declarations/modview/suggestions'
 import { SANCTION_GRAVITY_REGISTRY } from '@/declarations/sanctions/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { accentVars } from '@/declarations/ui/theme'
-import { MODVIEW_SANCTIONS } from '@/declarations/ui/variants'
+import { MODVIEW_SANCTIONS, MODVIEW_SANCTIONS_SPLIT } from '@/declarations/ui/variants'
 import type { Chatter } from '@/types/modview'
 import type { SanctionOffenseCard, SanctionPanelView, SanctionRungView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
@@ -77,6 +84,10 @@ export interface SanctionsDrawerProps {
   memory: PanelMemory
   recentIds: string[]
   onPrefill: (offense: SanctionOffenseCard, rung: number) => void
+  // Commands ready to paste, on a real live
+  suggest?: Omit<SuggestionListProps, 'levelName'>
+  // Sanctions of the live, under the offences
+  history?: Omit<SanctionHistoryProps, 'panel' | 'memory'>
 }
 
 /**
@@ -96,10 +107,15 @@ export const SanctionsDrawer = ({
   memory,
   recentIds,
   onPrefill,
+  suggest,
+  history,
 }: SanctionsDrawerProps) => {
   const [tab, setTab] = useState<PanelTab>('all')
   const [search, setSearch] = useState('')
   const [favorites, setFavorites] = useState<string[]>([])
+  // Share of the panel the offences keep
+  const [topShare, setTopShare] = useState(0.5)
+  const splitRef = useRef<HTMLDivElement>(null)
 
   // Pins live in this browser
   useEffect(() => {
@@ -164,113 +180,171 @@ export const SanctionsDrawer = ({
       </button>
 
       {isOpen && (
-        <div className={MODVIEW_SANCTIONS.body}>
-          <div className={MODVIEW_SANCTIONS.head}>
-            {LevelIcon && <LevelIcon className={MODVIEW_SANCTIONS.headGlyph} aria-hidden="true" />}
-            {levelName && <p className={MODVIEW_SANCTIONS.headName}>{levelName}</p>}
-          </div>
+        <div ref={splitRef} className={MODVIEW_SANCTIONS.split}>
+          <div className={MODVIEW_SANCTIONS.top} style={{ flex: `${history ? topShare : 1} 1 0%` }}>
+            <div className={MODVIEW_SANCTIONS.head}>
+              {LevelIcon && (
+                <LevelIcon className={MODVIEW_SANCTIONS.headGlyph} aria-hidden="true" />
+              )}
+              {levelName && <p className={MODVIEW_SANCTIONS.headName}>{levelName}</p>}
+            </div>
 
-          <input
-            className={MODVIEW_SANCTIONS.search}
-            placeholder={MODVIEW_PANEL_COPY.search}
-            aria-label={MODVIEW_PANEL_COPY.search}
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
+            <input
+              className={MODVIEW_SANCTIONS.search}
+              placeholder={MODVIEW_PANEL_COPY.search}
+              aria-label={MODVIEW_PANEL_COPY.search}
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
 
-          <div className={MODVIEW_SANCTIONS.tabs} role="tablist">
-            {TABS.map((entry) => {
-              const Glyph = ICONS[entry.icon]
+            <div className={MODVIEW_SANCTIONS.tabs} role="tablist">
+              {TABS.map((entry) => {
+                const Glyph = ICONS[entry.icon]
 
-              return (
-                <button
-                  key={entry.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={tab === entry.key}
-                  aria-label={entry.label}
-                  title={entry.label}
-                  className={cn(
-                    MODVIEW_SANCTIONS.tab,
-                    tab === entry.key && MODVIEW_SANCTIONS.tabOn
+                return (
+                  <button
+                    key={entry.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === entry.key}
+                    aria-label={entry.label}
+                    title={entry.label}
+                    className={cn(
+                      MODVIEW_SANCTIONS.tab,
+                      tab === entry.key && MODVIEW_SANCTIONS.tabOn
+                    )}
+                    onClick={() => setTab(entry.key)}
+                  >
+                    <Glyph className={MODVIEW_SANCTIONS.tabGlyph} aria-hidden="true" />
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className={MODVIEW_SANCTIONS.divider} />
+
+            {suggest && (
+              <>
+                <section
+                  className={MODVIEW_SANCTIONS.suggestion}
+                  aria-label={MODVIEW_SUGGESTION_COPY.title}
+                >
+                  <h4 className={MODVIEW_SANCTIONS.suggestionTitle}>
+                    {MODVIEW_SUGGESTION_COPY.title}
+                  </h4>
+                  {suggest.suggestions.length === 0 ? (
+                    <p className={MODVIEW_SANCTIONS.empty}>{MODVIEW_SUGGESTION_COPY.emptyShort}</p>
+                  ) : (
+                    <SuggestionList {...suggest} levelName={levelName} />
                   )}
-                  onClick={() => setTab(entry.key)}
-                >
-                  <Glyph className={MODVIEW_SANCTIONS.tabGlyph} aria-hidden="true" />
-                </button>
-              )
-            })}
-          </div>
+                </section>
+                <div className={MODVIEW_SANCTIONS.divider} />
+              </>
+            )}
 
-          <div className={MODVIEW_SANCTIONS.divider} />
+            {!target && offenses.length > 0 && (
+              <p className={MODVIEW_SANCTIONS.hint}>{MODVIEW_PANEL_COPY.pickTarget}</p>
+            )}
+            {offenses.length === 0 && <p className={MODVIEW_SANCTIONS.empty}>{empty}</p>}
 
-          {!target && offenses.length > 0 && (
-            <p className={MODVIEW_SANCTIONS.hint}>{MODVIEW_PANEL_COPY.pickTarget}</p>
-          )}
-          {offenses.length === 0 && <p className={MODVIEW_SANCTIONS.empty}>{empty}</p>}
+            <div className={MODVIEW_SANCTIONS.list}>
+              {offenses.map((offense) => {
+                const applied = target ? (memory[target.id]?.[offense.id] ?? []) : []
+                const next = nextRung(applied, offense.rungs.length)
+                const third = thirdRung(offense.rungs.length)
+                const isFavorite = favorites.includes(offense.id)
 
-          <div className={MODVIEW_SANCTIONS.list}>
-            {offenses.map((offense) => {
-              const applied = target ? (memory[target.id]?.[offense.id] ?? []) : []
-              const next = nextRung(applied, offense.rungs.length)
-              const third = thirdRung(offense.rungs.length)
-              const isFavorite = favorites.includes(offense.id)
-
-              return (
-                <article
-                  key={offense.id}
-                  className={MODVIEW_SANCTIONS.box}
-                  style={accentVars(SANCTION_GRAVITY_REGISTRY.get(offense.gravity).accent)}
-                >
-                  <span className={MODVIEW_SANCTIONS.offenseRule} aria-hidden="true" />
-                  <div className={MODVIEW_SANCTIONS.boxHead}>
-                    <span className={MODVIEW_SANCTIONS.offenseName}>{offense.name}</span>
-                    <button
-                      type="button"
-                      className={cn(MODVIEW_SANCTIONS.star, isFavorite && MODVIEW_SANCTIONS.starOn)}
-                      aria-pressed={isFavorite}
-                      title={
-                        isFavorite ? MODVIEW_PANEL_COPY.unfavorite : MODVIEW_PANEL_COPY.favorite
-                      }
-                      onClick={() => toggleFavorite(offense.id)}
-                    >
-                      <StarIcon className={MODVIEW_SANCTIONS.starGlyph} aria-hidden="true" />
-                    </button>
-                  </div>
-
-                  {offense.rungs.map((rung, index) => (
-                    <p
-                      key={rung.id}
-                      className={
-                        applied.includes(index)
-                          ? MODVIEW_SANCTIONS.rungDone
-                          : target && index === next
-                            ? MODVIEW_SANCTIONS.rungNext
-                            : MODVIEW_SANCTIONS.rung
-                      }
-                    >
-                      {`${MODVIEW_PANEL_COPY.rung.replace('{n}', String(index + 1))} : ${rungText(rung)}`}
-                    </p>
-                  ))}
-
-                  {target && next !== null && (
-                    <div className={MODVIEW_SANCTIONS.actions}>
-                      <Button variant="primary" onClick={() => onPrefill(offense, next)}>
-                        {applied.length === 0
-                          ? MODVIEW_PANEL_COPY.prefill.replace('{name}', target.name)
-                          : MODVIEW_PANEL_COPY.next}
-                      </Button>
-                      {third !== null && third !== next && (
-                        <Button variant="secondary" onClick={() => onPrefill(offense, third)}>
-                          {MODVIEW_PANEL_COPY.third}
-                        </Button>
-                      )}
+                return (
+                  <article
+                    key={offense.id}
+                    className={MODVIEW_SANCTIONS.box}
+                    style={accentVars(SANCTION_GRAVITY_REGISTRY.get(offense.gravity).accent)}
+                  >
+                    <span className={MODVIEW_SANCTIONS.offenseRule} aria-hidden="true" />
+                    <div className={MODVIEW_SANCTIONS.boxHead}>
+                      <span className={MODVIEW_SANCTIONS.offenseName}>{offense.name}</span>
+                      <button
+                        type="button"
+                        className={cn(
+                          MODVIEW_SANCTIONS.star,
+                          isFavorite && MODVIEW_SANCTIONS.starOn
+                        )}
+                        aria-pressed={isFavorite}
+                        title={
+                          isFavorite ? MODVIEW_PANEL_COPY.unfavorite : MODVIEW_PANEL_COPY.favorite
+                        }
+                        onClick={() => toggleFavorite(offense.id)}
+                      >
+                        <StarIcon className={MODVIEW_SANCTIONS.starGlyph} aria-hidden="true" />
+                      </button>
                     </div>
-                  )}
-                </article>
-              )
-            })}
+
+                    {offense.rungs.map((rung, index) => (
+                      <p
+                        key={rung.id}
+                        className={
+                          applied.includes(index)
+                            ? MODVIEW_SANCTIONS.rungDone
+                            : target && index === next
+                              ? MODVIEW_SANCTIONS.rungNext
+                              : MODVIEW_SANCTIONS.rung
+                        }
+                      >
+                        {`${MODVIEW_PANEL_COPY.rung.replace('{n}', String(index + 1))} : ${rungText(rung)}`}
+                      </p>
+                    ))}
+
+                    {target && next !== null && (
+                      <div className={MODVIEW_SANCTIONS.actions}>
+                        <Button variant="primary" onClick={() => onPrefill(offense, next)}>
+                          {applied.length === 0
+                            ? MODVIEW_PANEL_COPY.prefill.replace('{name}', target.name)
+                            : MODVIEW_PANEL_COPY.next}
+                        </Button>
+                        {third !== null && third !== next && (
+                          <Button variant="secondary" onClick={() => onPrefill(offense, third)}>
+                            {MODVIEW_PANEL_COPY.third}
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </article>
+                )
+              })}
+            </div>
           </div>
+
+          {history && (
+            <>
+              <SplitHandle
+                orientation="horizontal"
+                label={MODVIEW_WORKSPACE_COPY.resizeWindows}
+                onMove={(pixels) =>
+                  setTopShare((share) =>
+                    Math.min(
+                      MODVIEW_SANCTIONS_SPLIT.max,
+                      Math.max(
+                        MODVIEW_SANCTIONS_SPLIT.min,
+                        share + pixels / (splitRef.current?.clientHeight || 1)
+                      )
+                    )
+                  )
+                }
+              />
+              <section
+                className={MODVIEW_SANCTIONS.bottom}
+                style={{ flex: `${1 - topShare} 1 0%` }}
+                aria-label={MODVIEW_HISTORY_COPY.sanctionsTitle}
+              >
+                <h4 className={MODVIEW_SANCTIONS.bottomTitle}>
+                  {MODVIEW_HISTORY_COPY.sanctionsTitle}
+                </h4>
+                <div className={MODVIEW_SANCTIONS.bottomBody}>
+                  <SanctionHistory {...history} panel={panel} memory={memory} />
+                </div>
+              </section>
+            </>
+          )}
         </div>
       )}
     </aside>

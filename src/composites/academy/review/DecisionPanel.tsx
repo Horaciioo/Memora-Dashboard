@@ -3,9 +3,9 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDrawer } from '@/components/structures/FormDrawer'
-import type { ReviewDecisionInput } from '@/core/hooks/data/useJuniorFile'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
+import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
+import type { ReviewDecisionInput } from '@/core/hooks/data/academy/useJuniorFile'
 import { decisionsFor } from '@/core/lib/academy/parkour'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import {

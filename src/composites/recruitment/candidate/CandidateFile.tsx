@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 
 import Link from '@/components/elements/navigation/AppLink'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { FileHead } from '@/components/structures/FileHead'
+import { FileHead } from '@/components/structures/page/FileHead'
 import { CandidateComments } from '@/composites/recruitment/candidate/CandidateComments'
 import { CandidateOverview } from '@/composites/recruitment/candidate/CandidateOverview'
 import { CandidateTimeline } from '@/composites/recruitment/candidate/CandidateTimeline'
@@ -12,7 +12,7 @@ import {
   RecruitmentFileProvider,
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { useRecordFile } from '@/core/hooks/data/useRecordFile'
+import { useRecordFile } from '@/core/hooks/data/work/useRecordFile'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { candidateRecordValues } from '@/core/lib/recruitment/candidateRecord'
 import { candidateStates } from '@/core/lib/recruitment/candidateTimeline'

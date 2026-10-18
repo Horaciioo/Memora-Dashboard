@@ -3,7 +3,7 @@
 import { useActionState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { Field } from '@/components/elements/forms/Field'
-import { Input } from '@/components/elements/forms/Input'
+import { Input } from '@/components/elements/forms/inputs/Input'
 import { login, type LoginState } from '@/app/connexion/actions'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
 

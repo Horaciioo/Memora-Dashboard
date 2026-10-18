@@ -6,39 +6,38 @@ import { useSearchParams } from 'next/navigation'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
-import { ICONS } from '@/declarations/ui/icons'
-import { OptionMark } from '@/components/elements/forms/OptionMark'
+import { OptionMark } from '@/components/elements/forms/selects/OptionMark'
 import { CreatorLabels } from '@/components/elements/display/RecordLabel'
 import { pickedOptions } from '@/core/lib/forms/options'
 import { OverdueMark } from '@/composites/work/OverdueMark'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
-import { ActivityTimeline } from '@/components/structures/ActivityTimeline'
-import { AddRow } from '@/components/structures/AddRow'
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { EditableDetailGrid, type EditableEntry } from '@/components/structures/EditableDetailGrid'
-import { Glyph } from '@/components/elements/display/Glyph'
-import { EditableHeading } from '@/components/structures/EditableHeading'
+import { ActivityTimeline } from '@/components/structures/data/ActivityTimeline'
+import { AddRow } from '@/components/structures/inline/AddRow'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
+import {
+  EditableDetailGrid,
+  type EditableEntry,
+} from '@/components/structures/inline/EditableDetailGrid'
+import { Glyph } from '@/components/elements/display/glyphs/Glyph'
+import { EditableHeading } from '@/components/structures/inline/EditableHeading'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { FormDrawer } from '@/components/structures/FormDrawer'
+import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { InlineMarkdown } from '@/components/structures/InlineMarkdown'
-import { Section } from '@/components/structures/Section'
-import { FileTabs } from '@/components/structures/FileTabs'
+import { InlineMarkdown } from '@/components/structures/inline/InlineMarkdown'
+import { Section } from '@/components/structures/page/Section'
+import { FileTabs } from '@/components/structures/page/FileTabs'
+import { CommunicationCard } from '@/composites/work/CommunicationCard'
+import { announcementAside } from '@/composites/work/announcementAside'
 import { ProjectTeam } from '@/composites/work/ProjectTeam'
 import { apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { useCommunications } from '@/core/hooks/data/useCommunications'
-import { useCopy } from '@/core/hooks/interaction/useCopy'
-import { DiscordMessage } from '@/components/elements/display/DiscordMessage'
-import { mentionChoices } from '@/components/elements/forms/DiscordComposer'
-import { WORK_DISCORD_COPY } from '@/declarations/work/copy'
-import { COMMUNICATION_HEAD, DISCORD_MESSAGE } from '@/declarations/ui/variants'
-import { useMutation } from '@/core/hooks/data/useMutation'
-import { useRecordFile } from '@/core/hooks/data/useRecordFile'
+import { useCommunications } from '@/core/hooks/data/work/useCommunications'
+import { useMutation } from '@/core/hooks/data/system/useMutation'
+import { useRecordFile } from '@/core/hooks/data/work/useRecordFile'
 import { ROUTES } from '@/declarations/navigation'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import { ACTION_COPY, FIELD_COPY, feedbackTitle } from '@/declarations/ui/copy'
+import { FIELD_COPY, feedbackTitle } from '@/declarations/ui/copy'
 import { accentVars } from '@/declarations/ui/theme'
 import { LIST_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -50,16 +49,12 @@ import {
   PROJECT_FIELD_COPY,
   TASK_COPY,
 } from '@/declarations/work/copy'
-import { useEditGestures } from '@/core/hooks/interaction/useEditGestures'
-import { useMenu, type MenuItem } from '@/managers/front-end'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import { ANNOUNCEMENT_PARAM } from '@/declarations/work/announcements'
 import type { CommunicationEntry, MeetingSummary, ProjectDetail, TaskSummary } from '@/types/work'
 import { WorkflowPhases, WorkflowScopes } from '@/utils/constants/workflow'
 import { formatDay, formatDayTime } from '@/utils/format/dates'
-
-const DotGlyph = ICONS.statusDot
 
 export interface ProjectFileTabsProps {
   detail: ProjectDetail
@@ -127,18 +122,10 @@ export const ProjectFileTabs = ({
     initialValues: summary.values,
   })
   const communications = useCommunications(summary.id, detail.communications)
-  const copyAnnouncement = useCopy(WORK_DISCORD_COPY.copied)
   const { session } = useAuthContext()
   const workItem = useMutation()
-  const { contextMenu } = useMenu()
-  const gestures = useEditGestures()
   const [isWriting, setWriting] = useState(false)
-  // Arriving from the announcements page opens the announcement itself
   const focused = useSearchParams().get(ANNOUNCEMENT_PARAM)
-  const [editing, setEditing] = useState<CommunicationEntry | null>(
-    () =>
-      (canWriteCommunications && detail.communications.find((row) => row.id === focused)) || null
-  )
   const [pendingDeletion, setPendingDeletion] = useState<CommunicationEntry | null>(null)
   const [dialog, setDialog] = useState<'task' | 'meeting' | null>(null)
 
@@ -249,34 +236,6 @@ export const ProjectFileTabs = ({
     },
   ]
 
-  const entryMenu = (entry: CommunicationEntry): MenuItem[] => [
-    {
-      id: 'edit',
-      label: ACTION_COPY.edit,
-      icon: 'edit',
-      disabled: !canWriteCommunications,
-      onSelect: () => {
-        communications.clearIssues()
-        setEditing(entry)
-      },
-    },
-    {
-      id: 'copy',
-      label: ACTION_COPY.copyLink,
-      icon: 'copy',
-      onSelect: () => void navigator.clipboard.writeText(entry.body),
-    },
-    {
-      id: 'delete',
-      label: ACTION_COPY.delete,
-      icon: 'remove',
-      danger: true,
-      separatorBefore: true,
-      disabled: !canWriteCommunications,
-      onSelect: () => setPendingDeletion(entry),
-    },
-  ]
-
   const openWrite = () => {
     communications.clearIssues()
     setWriting(true)
@@ -328,24 +287,12 @@ export const ProjectFileTabs = ({
     </div>
   )
 
-  // Mentions an announcement may carry
-  const mentions = mentionChoices(
-    communicationFields.find((field) => field.kind === 'announcement')?.options ?? []
-  )
-
   // Announcement as Discord draws it, live
-  const communicationPreview = {
-    label: PROJECT_COPY.communicationPreview,
-    render: (values: FormValues) => (
-      <div className={cn(DISCORD_MESSAGE.frame, DISCORD_MESSAGE.pane, 'overflow-y-auto')}>
-        <DiscordMessage
-          source={typeof values.body === 'string' ? values.body : ''}
-          mentions={mentions}
-          author={session?.displayName ?? ''}
-        />
-      </div>
-    ),
-  }
+  const communicationPreview = announcementAside(
+    PROJECT_COPY.communicationPreview,
+    communicationFields,
+    session
+  )
 
   const communicationTab = () => (
     <Section
@@ -372,61 +319,13 @@ export const ProjectFileTabs = ({
       ) : (
         <div className="flex flex-col gap-4">
           {communications.entries.map((entry) => (
-            <article
+            <CommunicationCard
               key={entry.id}
-              className={cn(LIST_STYLES.card, canWriteCommunications && LIST_STYLES.cardClickable)}
-              {...gestures({
-                canEdit: canWriteCommunications,
-                onEdit: () => {
-                  communications.clearIssues()
-                  setEditing(entry)
-                },
-              })}
-              onContextMenu={contextMenu(entryMenu(entry), entry.title)}
-            >
-              <header className={COMMUNICATION_HEAD.wrapper}>
-                <h3 className={COMMUNICATION_HEAD.title}>{entry.title}</h3>
-                <dl className={COMMUNICATION_HEAD.list}>
-                  <div className={COMMUNICATION_HEAD.row}>
-                    <dt className={COMMUNICATION_HEAD.term}>
-                      <DotGlyph className="size-3.5 shrink-0" />
-                      {PROJECT_COPY.inCharge}
-                    </dt>
-                    <dd>{entry.authorName ?? WORK_DISCORD_COPY.author}</dd>
-                  </div>
-                  <div className={COMMUNICATION_HEAD.row}>
-                    <dt className={COMMUNICATION_HEAD.term}>
-                      <DotGlyph className="size-3.5 shrink-0" />
-                      {PROJECT_COPY.status}
-                    </dt>
-                    <dd>
-                      <Status
-                        label={entry.publishedAt ? PROJECT_COPY.published : PROJECT_COPY.draft}
-                        tone={entry.publishedAt ? 'success' : 'neutral'}
-                        icon="statusDot"
-                      />
-                    </dd>
-                  </div>
-                </dl>
-              </header>
-              <h4 className={COMMUNICATION_HEAD.section}>{PROJECT_FIELD_COPY.communicationBody}</h4>
-              <div className={DISCORD_MESSAGE.frame}>
-                <Button
-                  variant="icon"
-                  icon="copy"
-                  aria-label={WORK_DISCORD_COPY.copy}
-                  title={WORK_DISCORD_COPY.copy}
-                  className={DISCORD_MESSAGE.copyCorner}
-                  onClick={() => void copyAnnouncement(entry.body)}
-                />
-                <DiscordMessage
-                  source={entry.body}
-                  mentions={mentions}
-                  author={entry.authorName ?? WORK_DISCORD_COPY.author}
-                  time={entry.publishedAt ? formatDay(entry.publishedAt) : undefined}
-                />
-              </div>
-            </article>
+              entry={entry}
+              fields={communicationFields}
+              canWrite={canWriteCommunications}
+              onDelete={() => setPendingDeletion(entry)}
+            />
           ))}
           <AddRow
             label={PROJECT_COPY.communicationAdd}
@@ -723,19 +622,6 @@ export const ProjectFileTabs = ({
         isSaving={communications.isSaving}
         onSubmit={communications.create}
         onClose={() => setWriting(false)}
-      />
-
-      <FormDrawer
-        subject={FORM_SUBJECTS.project}
-        open={editing !== null}
-        title={editing ? `${ACTION_COPY.edit} · ${editing.title}` : ACTION_COPY.edit}
-        fields={communicationFields}
-        aside={communicationPreview}
-        initialValues={editing?.values}
-        issues={communications.issues}
-        isSaving={communications.isSaving}
-        onSubmit={(values) => communications.update(editing!.id, values)}
-        onClose={() => setEditing(null)}
       />
 
       <ConfirmDialog

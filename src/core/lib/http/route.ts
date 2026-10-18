@@ -16,12 +16,13 @@ import { readPublicOrigin } from '@/core/lib/http/origin'
 import { consume, readIdentity } from '@/core/lib/http/rateLimit'
 import { fail, succeed } from '@/core/lib/http/response'
 import { logger } from '@/core/lib/logger'
-import { reportFailure } from '@/core/services/system/FailureReport'
+import { runWithOrigin } from '@/core/lib/http/requestOrigin'
+import { reportFailure, reportRefusal } from '@/core/services/system/FailureReport'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import { readScope } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { DEFAULT_METHOD_POLICIES } from '@/declarations/system/rateLimits'
-import type { RateLimitName } from '@/declarations/system/rateLimits'
+import { DEFAULT_METHOD_POLICIES } from '@/declarations/system/security/rateLimits'
+import type { RateLimitName } from '@/declarations/system/security/rateLimits'
 import { MEDIA_HEADERS, MEDIA_VISIBILITIES } from '@/declarations/system/storage'
 import { STREAM_HEADERS } from '@/declarations/system/streams'
 import type { MediaVisibility } from '@/declarations/system/storage'
@@ -290,17 +291,19 @@ const authenticate = async (
  */
 
 export const createPublicRoute = <T>(options: PublicRouteOptions<T>): RouteHandler => {
-  const handler: RouteHandler = async (request, context) => {
-    try {
-      await guard(request, options.rateLimit)
+  const handler: RouteHandler = (request, context) =>
+    runWithOrigin(request, async () => {
+      try {
+        await guard(request, options.rateLimit)
 
-      const routeContext = await buildContext(request, context, options)
+        const routeContext = await buildContext(request, context, options)
 
-      return succeed(await options.handler(routeContext), options.status ?? 200)
-    } catch (error) {
-      return fail(error)
-    }
-  }
+        return succeed(await options.handler(routeContext), options.status ?? 200)
+      } catch (error) {
+        await reportRefusal(request, null, error)
+        return fail(error)
+      }
+    })
 
   handler.descriptor = options.descriptor
   handler.meta = {
@@ -321,28 +324,30 @@ export const createPublicRoute = <T>(options: PublicRouteOptions<T>): RouteHandl
  */
 
 export const createProtectedRoute = <T>(options: ProtectedRouteOptions<T>): RouteHandler => {
-  const handler: RouteHandler = async (request, context) => {
-    let actorId: string | null = null
+  const handler: RouteHandler = (request, context) =>
+    runWithOrigin(request, async () => {
+      let actorId: string | null = null
 
-    try {
-      const { session, access } = await authenticate(request, options, options.permission)
-      actorId = session.id
-      const routeContext = await buildContext(request, context, options)
+      try {
+        const { session, access } = await authenticate(request, options, options.permission)
+        actorId = session.id
+        const routeContext = await buildContext(request, context, options)
 
-      return succeed(
-        await options.handler({
-          ...routeContext,
-          session,
-          access,
-          scope: () => readScope(session, access),
-        }),
-        options.status ?? 200
-      )
-    } catch (error) {
-      await reportFailure(request, actorId, error)
-      return fail(error)
-    }
-  }
+        return succeed(
+          await options.handler({
+            ...routeContext,
+            session,
+            access,
+            scope: () => readScope(session, access),
+          }),
+          options.status ?? 200
+        )
+      } catch (error) {
+        await reportFailure(request, actorId, error)
+        await reportRefusal(request, actorId, error)
+        return fail(error)
+      }
+    })
 
   handler.descriptor = options.descriptor
   handler.meta = {

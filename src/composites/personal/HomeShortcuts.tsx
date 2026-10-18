@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from '@/components/elements/navigation/AppLink'
 
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { HOME_SHORTCUTS, TRADE_SHORTCUTS } from '@/declarations/personal/shortcuts'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'

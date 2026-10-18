@@ -8,6 +8,8 @@ import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { ModWindow } from '@/composites/modview/ModWindow'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
+import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
+import { useMenu } from '@/managers/front-end'
 import { CHAT_MODES, CHAT_OPTIONS, MODVIEW_DEFAULTS } from '@/declarations/modview/registries'
 import type { ChatOptionName } from '@/declarations/modview/registries'
 import { ICONS } from '@/declarations/ui/icons'
@@ -35,6 +37,7 @@ export interface ChatWindowProps {
   gate: GateCheck
   onAct: ActRunner
   onPick: (chatter: Chatter) => void
+  onWatch: (chatter: Chatter) => void
   // Line being typed
   draft: string
   onDraft: (text: string) => void
@@ -50,6 +53,7 @@ export interface ChatWindowProps {
  * @param {GateCheck} gate - Permission check
  * @param {ActRunner} onAct - Gesture runner
  * @param {(chatter: Chatter) => void} onPick - Open a viewer card
+ * @param {(chatter: Chatter) => void} onWatch - Put a viewer under watch
  * @param {string} draft - Line being typed
  * @param {(text: string) => void} onDraft - Typing handler
  * @param {(text: string) => void} onSend - Sending handler, commands included
@@ -63,6 +67,7 @@ export const ChatWindow = ({
   gate,
   onAct,
   onPick,
+  onWatch,
   draft,
   onDraft,
   onSend,
@@ -189,6 +194,7 @@ export const ChatWindow = ({
               gate={gate}
               onAct={onAct}
               onPick={onPick}
+              onWatch={onWatch}
             />
           ))}
         </ul>
@@ -239,6 +245,7 @@ interface ChatLineProps {
   gate: GateCheck
   onAct: ActRunner
   onPick: (chatter: Chatter) => void
+  onWatch: (chatter: Chatter) => void
 }
 
 /**
@@ -247,7 +254,8 @@ interface ChatLineProps {
  * @return {JSX.Element}
  */
 
-const ChatLine = ({ message, options, gate, onAct, onPick }: ChatLineProps) => {
+const ChatLine = ({ message, options, gate, onAct, onPick, onWatch }: ChatLineProps) => {
+  const { contextMenu } = useMenu()
   const chatterId = message.author.id
   const isDeleted = Boolean(message.deletedBy)
   const isFirst = message.isFirst && options.firstMessages
@@ -300,6 +308,23 @@ const ChatLine = ({ message, options, gate, onAct, onPick }: ChatLineProps) => {
         className={MODVIEW_CHAT.name}
         style={message.author.colour ? { color: message.author.colour } : undefined}
         onClick={() => onPick(message.author)}
+        onContextMenu={contextMenu(
+          [
+            {
+              id: 'watch',
+              label: MODVIEW_WATCH_COPY.start,
+              icon: 'visible',
+              onSelect: () => onWatch(message.author),
+            },
+            {
+              id: 'dossier',
+              label: MODVIEW_WATCH_COPY.dossier,
+              icon: 'search',
+              onSelect: () => onPick(message.author),
+            },
+          ],
+          message.author.name
+        )}
       >
         {message.author.name}
       </button>

@@ -1,7 +1,7 @@
 'use client'
 
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDrawer } from '@/components/structures/FormDrawer'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
+import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'

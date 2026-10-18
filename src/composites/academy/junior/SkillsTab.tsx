@@ -4,7 +4,7 @@ import Link from '@/components/elements/navigation/AppLink'
 
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { SkillGrid } from '@/composites/academy/junior/SkillGrid'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'

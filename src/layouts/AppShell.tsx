@@ -1,8 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { WindowFrame } from '@/components/structures/WindowFrame'
-import { MobileHold } from '@/components/structures/MobileHold'
+import { WindowFrame } from '@/components/structures/page/WindowFrame'
+import { MobileHold } from '@/components/structures/overlays/MobileHold'
 import { BrandSplash } from '@/composites/splash/BrandSplash'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
@@ -17,7 +17,7 @@ import { beaconProps } from '@/declarations/ui/beacons'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import type { HeldRoutes } from '@/declarations/ui/responsive'
 import { APP_SHELL, LEFT_SIDEBAR } from '@/declarations/ui/blocks'
-import { useAutoRefresh } from '@/core/hooks/interaction/useAutoRefresh'
+import { useAutoRefresh } from '@/core/hooks/interaction/state/useAutoRefresh'
 import { RailSlotProvider, useRailSlot } from '@/managers/front-end/RailSlotManager'
 import { TourProvider } from '@/managers/front-end/TourManager'
 import type { ViewContext } from '@/types/access'
@@ -90,21 +90,21 @@ const AppShellFrame = ({
   children,
 }: Omit<AppShellProps, 'tour'>) => {
   const { session, can } = useAuthContext()
-  const { isClaimed, setSlot } = useRailSlot()
+  const { isClaimed, isBare, setSlot } = useRailSlot()
 
   useAutoRefresh()
 
   return (
     <SealProvider initialState={twoFactor} initialSeal={seal}>
       <div className={APP_SHELL.frame} data-tone={frameToneOf(viewContext.view, session?.role)}>
-        {isClaimed ? (
+        {isBare ? null : isClaimed ? (
           <aside className={LEFT_SIDEBAR.rail}>
             <div ref={setSlot} className={LEFT_SIDEBAR.slot} />
           </aside>
         ) : (
           <LeftSidebar viewContext={viewContext} unreadCount={unreadCount} />
         )}
-        <WindowFrame />
+        <WindowFrame bare={isBare} />
 
         <div className={APP_SHELL.main}>
           {session && (

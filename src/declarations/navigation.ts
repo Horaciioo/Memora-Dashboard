@@ -65,7 +65,7 @@ export const ROUTES = {
   journal: '/systeme/journaux',
   queues: '/systeme/files',
   probes: '/systeme/sondes',
-  analytics: '/systeme/ga4',
+  analytics: '/systeme/activite',
 } as const
 
 // The three faces of the rail
@@ -301,6 +301,7 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Communications',
         icon: 'communications',
         permission: Permissions.CommunicationRead,
+        maturity: 'new',
       },
     ],
   },
@@ -320,7 +321,7 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Academy',
         icon: 'academy',
         permission: Permissions.AcademyRead,
-        maturity: 'alpha',
+        maturity: 'beta',
       },
       {
         href: ROUTES.legacy,
@@ -340,6 +341,7 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Live en cours',
         icon: 'liveDot',
         permission: Permissions.LiveRead,
+        maturity: 'alpha',
         onLive: true,
       },
       {
@@ -347,7 +349,6 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Panel de sanctions',
         icon: 'liveconCrisis',
         permission: Permissions.SanctionRead,
-        maturity: 'new',
       },
     ],
   },
@@ -362,7 +363,7 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.SanctionRead,
         maturity: 'new',
       },
-      { href: ROUTES.marsha, label: 'Marsha Bots', icon: 'discord', maturity: 'beta' },
+      { href: ROUTES.marsha, label: 'Marsha Bots', icon: 'discord' },
     ],
   },
   {
@@ -435,7 +436,10 @@ export const SEGMENT_LABELS: Record<string, string> = {
   journaux: 'Journaux',
   files: 'Files de jobs',
   sondes: 'Sondes',
-  ga4: 'GA4',
+  activite: 'Activité',
+  apercu: 'Aperçu',
+  bilan: 'Bilan',
+  'bilan-createur': 'Bilan',
 }
 
 /**
@@ -453,6 +457,7 @@ export const RECORD_LABELS: Record<string, string> = {
   legacy: 'Parcours',
   recrutements: 'Session',
   youtubeurs: 'YouTubeur',
+  lives: 'Live',
 }
 
 /**
@@ -467,6 +472,20 @@ export const maturityOfPath = (pathname: string): MaturityName | null => {
     .sort((left, right) => right.href.length - left.href.length)[0]
 
   return match?.maturity ?? null
+}
+
+/**
+ * Category a path belongs to
+ * @param {string} pathname - Current path
+ * @return {string | null} - Label of the group holding the closest entry
+ */
+
+export const groupLabelOfPath = (pathname: string): string | null => {
+  const matches = NAVIGATION.flatMap((group) =>
+    group.items.map((item) => ({ href: item.href, label: group.label }))
+  ).filter((entry) => pathname === entry.href || pathname.startsWith(`${entry.href}/`))
+
+  return matches.sort((left, right) => right.href.length - left.href.length)[0]?.label ?? null
 }
 
 /**

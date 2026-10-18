@@ -4,8 +4,8 @@ import { decryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
 import { HELD_FUNCTIONS } from '@/core/services/reference/functions'
 import { notFound } from '@/core/lib/errors'
-import { isEncryptedField } from '@/declarations/system/encryption'
-import { DATA_CONTROLLER, PROCESSING_REGISTRY } from '@/declarations/system/privacy'
+import { isEncryptedField } from '@/declarations/system/security/encryption'
+import { DATA_CONTROLLER, PROCESSING_REGISTRY } from '@/declarations/system/security/privacy'
 
 /**
  * Everything the application holds about one member

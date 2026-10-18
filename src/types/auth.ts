@@ -1,4 +1,5 @@
 import type { ColorVisionMode, FontScale, ThemePreference } from '@/declarations/access/preferences'
+import type { FavoritePage } from '@/types/favorites'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import type { PermissionName } from '@/utils/constants/permissions'
 
@@ -21,6 +22,8 @@ export type Permission = PermissionName
  * @property {DisplayPreferences} display - Display preferences
  * @property {number | null} historyConsentVersion - Consent version agreed to
  * @property {string | null} seenReleaseVersion - Last note read
+ * @property {FavoritePage[]} favorites - Pages starred
+ * @property {string | null} timezone - Zone clock times read in
  * @property {Permission[]} permissions - Granted permissions
  */
 
@@ -37,7 +40,9 @@ export interface SessionUser {
   isRoot: boolean
   historyConsentVersion: number | null
   seenReleaseVersion: string | null
+  favorites: FavoritePage[]
   display: DisplayPreferences
+  timezone: string | null
   permissions: Permission[]
 }
 

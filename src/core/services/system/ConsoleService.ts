@@ -6,6 +6,8 @@ import { runtime } from '@/managers/infrastructure/Core/runtime'
 import { APP_ENVIRONMENT, ENVIRONMENT_MANIFESTS } from '@/declarations/system/environments'
 import { CONFIG_SUBJECTS } from '@/types/infrastructure'
 import type { ConfigSubject, ProbeResult } from '@/types/infrastructure'
+import { findOrphanFiles } from '@/core/services/system/FileService'
+import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 
@@ -169,13 +171,38 @@ export interface BucketUsage {
  * @property {number} entries - Objects kept
  * @property {number} bytes - Bytes kept
  * @property {BucketUsage[]} buckets - One row per bucket holding something
+ * @property {LargeFile[]} largest - Heaviest files
+ * @property {{ count: number, bytes: number }} orphans - Files nothing references
  */
 
 export interface StorageReport {
   entries: number
   bytes: number
   buckets: BucketUsage[]
+  largest: LargeFile[]
+  orphans: { count: number; bytes: number }
 }
+
+/**
+ * One heavy file
+ * @typedef {Object} LargeFile
+ * @property {string} id - Entry identifier
+ * @property {string} bucket - Bucket key
+ * @property {string} mimeType - Content type
+ * @property {number} bytes - Weight
+ * @property {string} createdAt - ISO moment
+ */
+
+export interface LargeFile {
+  id: string
+  bucket: string
+  mimeType: string
+  bytes: number
+  createdAt: string
+}
+
+// Heaviest files listed
+const LARGEST_SHOWN = 10
 
 /**
  * Measure what the store holds
@@ -183,12 +210,20 @@ export interface StorageReport {
  */
 
 export const readStorageReport = async (): Promise<StorageReport> => {
-  const rows = await prisma.storageEntry.groupBy({
-    by: ['bucket'],
-    _count: { _all: true },
-    _sum: { byteSize: true },
-    orderBy: { bucket: 'asc' },
-  })
+  const [rows, heaviest, orphans] = await Promise.all([
+    prisma.storageEntry.groupBy({
+      by: ['bucket'],
+      _count: { _all: true },
+      _sum: { byteSize: true },
+      orderBy: { bucket: 'asc' },
+    }),
+    prisma.storageEntry.findMany({
+      select: { id: true, bucket: true, mimeType: true, byteSize: true, createdAt: true },
+      orderBy: { byteSize: 'desc' },
+      take: LARGEST_SHOWN,
+    }),
+    findOrphanFiles(RETENTION_SETTINGS.orphanFileHours),
+  ])
 
   const buckets = rows.map((row) => ({
     bucket: row.bucket,
@@ -200,5 +235,16 @@ export const readStorageReport = async (): Promise<StorageReport> => {
     entries: buckets.reduce((total, entry) => total + entry.entries, 0),
     bytes: buckets.reduce((total, entry) => total + entry.bytes, 0),
     buckets,
+    largest: heaviest.map((file) => ({
+      id: file.id,
+      bucket: file.bucket,
+      mimeType: file.mimeType,
+      bytes: file.byteSize,
+      createdAt: file.createdAt.toISOString(),
+    })),
+    orphans: {
+      count: orphans.length,
+      bytes: orphans.reduce((total, entry) => total + entry.byteSize, 0),
+    },
   }
 }

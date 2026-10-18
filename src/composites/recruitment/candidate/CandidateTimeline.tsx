@@ -1,9 +1,9 @@
 'use client'
 
 import { Button } from '@/components/elements/actions/Button'
-import { ScrollCard } from '@/components/structures/ScrollCard'
-import { Timeline } from '@/components/structures/Timeline'
-import type { TimelineItem, TimelineState } from '@/components/structures/Timeline'
+import { ScrollCard } from '@/components/structures/data/ScrollCard'
+import { Timeline } from '@/components/structures/data/Timeline'
+import type { TimelineItem, TimelineState } from '@/components/structures/data/Timeline'
 import { CANDIDATE_STAGES } from '@/core/lib/recruitment/candidateTimeline'
 import type { CandidateStage } from '@/core/lib/recruitment/candidateTimeline'
 import { CANDIDATE_COPY, CANDIDATE_STAGE_COPY } from '@/declarations/recruitment/candidateCopy'

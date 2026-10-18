@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { PreferencesPanel } from '@/composites/preferences/PreferencesPanel'
 import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
 import { profileFields, readProfile } from '@/core/services/preferences/ProfileService'

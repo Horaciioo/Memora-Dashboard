@@ -1,6 +1,6 @@
 'use client'
 
-import { ErrorBoundaryScreen } from '@/components/structures/ErrorBoundaryScreen'
+import { ErrorBoundaryScreen } from '@/components/structures/page/ErrorBoundaryScreen'
 
 /**
  * Fallback of any route without a closer boundary

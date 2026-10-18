@@ -1,6 +1,6 @@
 'use client'
 
-import { SelectMenu } from '@/components/elements/forms/SelectMenu'
+import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { toOptions } from '@/core/lib/forms/options'
 import { COLOR_VISION_REGISTRY, type ColorVisionMode } from '@/declarations/access/preferences'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'

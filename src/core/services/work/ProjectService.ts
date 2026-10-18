@@ -35,11 +35,15 @@ import {
   PROJECT_SETTINGS,
 } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
+import {
+  COMMUNICATION_STATUS_OPTIONS,
+  COMMUNICATION_STATUSES,
+} from '@/declarations/work/announcements'
 import { PROJECT_COPY, PROJECT_FIELD_COPY, PROJECT_FIELD_INFO } from '@/declarations/work/copy'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import type { CommunicationEntry, ProjectDetail, ProjectSummary } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
-import type { Prisma } from '@prisma/client'
+import type { CommunicationStatus, Prisma } from '@prisma/client'
 
 // Relations every project card needs
 const PROJECT_INCLUDE = {
@@ -416,11 +420,15 @@ const toCommunication = (
   body: row.body,
   platform: toTag(row.platform),
   authorName: row.author?.displayName ?? null,
+  authorAvatar: row.author?.avatarUrl ?? null,
+  status: row.status,
   publishedAt: row.publishedAt?.toISOString() ?? null,
   values: {
     title: row.title,
     body: row.body,
     platformId: row.platformId,
+    authorId: row.authorId,
+    status: row.status,
     publishedAt: row.publishedAt ? row.publishedAt.toISOString().slice(0, 10) : null,
   },
 })
@@ -434,7 +442,7 @@ const toCommunication = (
 export const communicationFields = async (
   mentions: FieldOption[] = []
 ): Promise<FieldDefinition[]> => {
-  const platforms = await platformOptions()
+  const [platforms, members] = await Promise.all([platformOptions(), memberOptions()])
 
   return [
     {
@@ -451,6 +459,23 @@ export const communicationFields = async (
       kind: 'select',
       label: PROJECT_FIELD_COPY.communicationPlatform,
       options: platforms,
+      span: 'half',
+      group: FORM_GROUPS.essentials,
+    },
+    {
+      name: 'status',
+      kind: 'select',
+      label: PROJECT_FIELD_COPY.communicationStatus,
+      options: COMMUNICATION_STATUS_OPTIONS,
+      required: true,
+      span: 'half',
+      group: FORM_GROUPS.essentials,
+    },
+    {
+      name: 'authorId',
+      kind: 'select',
+      label: PROJECT_FIELD_COPY.communicationAuthor,
+      options: members,
       span: 'half',
       group: FORM_GROUPS.essentials,
     },
@@ -473,8 +498,29 @@ export const communicationFields = async (
 }
 
 /**
- * Write an announcement on a project
- * @param {string} projectId - Project identifier
+ * Fields an announcement form writes, shared by every surface
+ * @param {FormValues} values - Parsed body
+ * @return {Pick<Prisma.CommunicationUncheckedCreateInput, 'title' | 'body' | 'platformId' | 'status' | 'publishedAt'>} - Row data
+ */
+
+export const communicationData = (values: FormValues) => {
+  const picked = readText(values, 'status')
+  const status: CommunicationStatus =
+    picked && picked in COMMUNICATION_STATUSES ? (picked as CommunicationStatus) : 'PLANNED'
+
+  return {
+    title: readText(values, 'title') ?? '',
+    body: readText(values, 'body') ?? '',
+    platformId: readText(values, 'platformId'),
+    status,
+    // Published today unless a date says otherwise
+    publishedAt: readDate(values, 'publishedAt') ?? (status === 'PUBLISHED' ? new Date() : null),
+  }
+}
+
+/**
+ * Write an announcement, on a project or on its own
+ * @param {string | null} projectId - Project identifier, null when free
  * @param {string} authorId - Author identifier
  * @param {FormValues} values - Parsed body
  * @param {AccessScope} scope - Creator perimeter
@@ -482,7 +528,7 @@ export const communicationFields = async (
  */
 
 export const addCommunication = async (
-  projectId: string,
+  projectId: string | null,
   authorId: string,
   values: FormValues
 ): Promise<CommunicationEntry> => {
@@ -495,11 +541,8 @@ export const addCommunication = async (
   const row = await prisma.communication.create({
     data: {
       projectId,
-      authorId,
-      title: readText(values, 'title') ?? '',
-      body: readText(values, 'body') ?? '',
-      platformId: readText(values, 'platformId'),
-      publishedAt: readDate(values, 'publishedAt'),
+      authorId: readText(values, 'authorId') ?? authorId,
+      ...communicationData(values),
       position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
     },
     include: { author: true, platform: true },
@@ -537,12 +580,7 @@ export const updateCommunication = async (
 ): Promise<CommunicationEntry> => {
   const row = await prisma.communication.update({
     where: { id },
-    data: {
-      title: readText(values, 'title') ?? '',
-      body: readText(values, 'body') ?? '',
-      platformId: readText(values, 'platformId'),
-      publishedAt: readDate(values, 'publishedAt'),
-    },
+    data: { ...communicationData(values), authorId: readText(values, 'authorId') },
     include: { author: true, platform: true },
   })
 
@@ -552,12 +590,12 @@ export const updateCommunication = async (
 /**
  * Read who wrote an announcement and where
  * @param {string} id - Announcement identifier
- * @return {Promise<{ projectId: string, authorId: string | null }>} - Ownership
+ * @return {Promise<{ projectId: string | null, authorId: string | null }>} - Ownership
  */
 
 export const communicationOwner = async (
   id: string
-): Promise<{ projectId: string; authorId: string | null }> => {
+): Promise<{ projectId: string | null; authorId: string | null }> => {
   const row = await prisma.communication.findUnique({
     where: { id },
     select: { projectId: true, authorId: true },

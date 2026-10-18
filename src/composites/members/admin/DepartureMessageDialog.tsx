@@ -2,8 +2,8 @@
 
 import { Button } from '@/components/elements/actions/Button'
 import { DiscordMessage } from '@/components/elements/display/DiscordMessage'
-import { Dialog } from '@/components/structures/Dialog'
-import { useCopy } from '@/core/hooks/interaction/useCopy'
+import { Dialog } from '@/components/structures/overlays/Dialog'
+import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { DISCORD_MESSAGE } from '@/declarations/ui/variants'

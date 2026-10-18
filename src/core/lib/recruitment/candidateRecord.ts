@@ -1,6 +1,5 @@
 import type { FormValues } from '@/types/forms'
 import type { CandidateView } from '@/types/recruitment'
-import { toDateTimeInput } from '@/utils/format/dates'
 
 /**
  * Every editable field of a candidate, as the record file holds them
@@ -13,7 +12,7 @@ export const candidateRecordValues = (candidate: CandidateView): FormValues => (
   displayName: candidate.displayName,
   formId: candidate.formId,
   recruiterId: candidate.recruiter?.id ?? null,
-  interviewAt: candidate.interviewAt ? toDateTimeInput(candidate.interviewAt) : null,
+  interviewAt: candidate.interviewAt,
   observerIds: candidate.observers.map((seat) => seat.id),
   outcomeId: candidate.outcomeId,
   attended: candidate.attended,

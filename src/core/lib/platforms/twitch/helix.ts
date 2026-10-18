@@ -407,14 +407,32 @@ export const readCommunity = async (
 
 export const readStream = async (
   seat: TwitchSeat
-): Promise<{ title: string; category: string | null; startedAt: string; id: string } | null> => {
+): Promise<{
+  title: string
+  category: string | null
+  startedAt: string
+  id: string
+  viewers: number
+} | null> => {
   const answer = await runHelix<{
-    data: { id: string; title: string; game_name: string; started_at: string }[]
+    data: {
+      id: string
+      title: string
+      game_name: string
+      started_at: string
+      viewer_count: number
+    }[]
   }>(seat, { method: 'GET', path: HELIX_PATHS.streams, query: { user_id: seat.broadcasterId } })
   const row = answer?.data[0]
 
   return row
-    ? { id: row.id, title: row.title, category: row.game_name || null, startedAt: row.started_at }
+    ? {
+        id: row.id,
+        title: row.title,
+        category: row.game_name || null,
+        startedAt: row.started_at,
+        viewers: row.viewer_count ?? 0,
+      }
     : null
 }
 

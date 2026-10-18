@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { TasksBoard } from '@/composites/work/TasksBoard'
 import { busySlots, withBusy } from '@/core/services/calendar/BusyService'
 import { creatableTaskFields, listTasks, taskFields } from '@/core/services/work/TaskService'

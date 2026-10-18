@@ -6,6 +6,7 @@ import { useAuth } from '@/core/hooks/auth/useAuth'
 import { useSessionUser } from '@/core/hooks/auth/useSessionUser'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
+import { setActiveZone } from '@/utils/format/zone'
 
 /**
  * Auth context
@@ -56,6 +57,9 @@ export const AuthProvider = ({ children, initialSession }: AuthProviderProps) =>
   const session = data ?? null
   const permissions = useMemo(() => resolvePermissions(session), [session])
   const auth = useAuth()
+
+  // Every clock time reads in the member's zone
+  setActiveZone(session?.timezone)
 
   const value = useMemo<AuthContextValue>(
     () => ({

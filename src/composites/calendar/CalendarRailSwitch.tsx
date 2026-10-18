@@ -2,7 +2,7 @@
 
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
-import type { CalendarRailView } from '@/core/hooks/interaction/useCalendarRailView'
+import type { CalendarRailView } from '@/core/hooks/interaction/calendar/useCalendarRailView'
 import { cn } from '@/utils/classnames'
 
 export interface CalendarRailSwitchProps {

@@ -9,7 +9,7 @@ import { readPanel } from '@/core/services/sanctions/SanctionService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { levelOfCreator } from '@/declarations/livecon/levels'
 import { LIVE_COPY } from '@/declarations/lives/copy'
-import { MODVIEW_PAGE, PAGE_STYLES } from '@/declarations/ui/variants'
+import { MODVIEW_PAGE } from '@/declarations/ui/variants'
 import { LivePlatforms } from '@/utils/constants/lives'
 import { SanctionPanels } from '@/utils/constants/moderation'
 import { Permissions } from '@/utils/constants/permissions'
@@ -44,13 +44,13 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
   // Rungs already applied
   const memberIds = live.members.map((member) => member.id)
   const [memory, focusable] = await Promise.all([
-    readPanelMemory(live.id),
+    readPanelMemory(live.youtuber.id),
     focusableMembers(memberIds, session.role),
   ])
   const canEdit = live.permissions.includes(Permissions.LiveAnnounce) || live.isCoordinating
 
   return (
-    <div className={PAGE_STYLES.wrapper}>
+    <div className={MODVIEW_PAGE.wrapper}>
       <h1 className={MODVIEW_PAGE.title}>{`${LIVE_COPY.title} · ${live.youtuber.name}`}</h1>
       <LiveGate live={live} canEdit={canEdit}>
         <LiveModView
@@ -62,6 +62,7 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
             viewerId: session.id,
             members: live.members,
             focusable,
+            canEnd: canEdit,
             initialMemory: memory,
           }}
         />

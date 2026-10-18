@@ -162,6 +162,14 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     revokes: { [MemberRoles.Moderateur]: [Permissions.TaskCreate, Permissions.TaskUpdate] },
   },
   {
+    key: 'communications-leads-only',
+    grants: {},
+    // Announcements belong to the lead, the floor never reads them
+    revokes: {
+      [MemberRoles.Moderateur]: [Permissions.CommunicationRead, Permissions.CommunicationWrite],
+    },
+  },
+  {
     key: 'discord-no-live',
     grants: {},
     // Discord moderators have no live to follow

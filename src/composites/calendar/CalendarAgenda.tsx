@@ -1,6 +1,6 @@
 'use client'
 
-import { Glyph } from '@/components/elements/display/Glyph'
+import { Glyph } from '@/components/elements/display/glyphs/Glyph'
 import { CALENDAR_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
 import { CALENDAR_SOURCE_REGISTRY } from '@/declarations/calendar/registries'
 import { accentPaint } from '@/declarations/ui/theme'

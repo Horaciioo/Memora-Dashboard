@@ -1,8 +1,8 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { createBlock } from '@/core/services/academy/TrainingContentService'
-import { blockFields } from '@/core/services/academy/trainingContentFields'
+import { createBlock } from '@/core/services/academy/training/TrainingContentService'
+import { blockFields } from '@/core/services/academy/training/trainingContentFields'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const POST = createProtectedRoute({

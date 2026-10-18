@@ -1,7 +1,7 @@
 import { forbidden, invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { legacyFields, listTracks, openTrack } from '@/core/services/academy/LegacyService'
+import { legacyFields, listTracks, openTrack } from '@/core/services/academy/legacy/LegacyService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({

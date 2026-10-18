@@ -5,7 +5,6 @@
 
 export const MODVIEW_COPY = {
   stream: 'Flux',
-  latestVideo: 'Vidéo la plus récente',
   modActions: 'Actions de modérateur',
   automod: 'File d’attente de l’AutoMod',
   chat: 'Chat',
@@ -13,7 +12,9 @@ export const MODVIEW_COPY = {
   unbanRequests: 'Demandes de débannissement',
   sanctions: 'Panel de sanctions',
   windows: 'Fenêtres',
-  back: 'Live en cours',
+  back: 'Retourner à l’Accueil',
+  settings: 'Paramètres',
+  sidebar: 'Navigation de la Mod View',
   sanctionsOpen: 'Ouvrir le panel de sanctions',
   sanctionsClose: 'Replier le panel de sanctions',
   sanctionsEmpty: 'Aucun panel de sanctions pour ce YouTubeur et cette plateforme.',
@@ -186,8 +187,7 @@ export const MODVIEW_PANEL_COPY = {
  */
 
 export const MODVIEW_HISTORY_COPY = {
-  title: 'Historique',
-  sanctioned: 'Sanctionnés pendant ce live',
+  sanctionsTitle: 'Historique des sanctions',
   empty: 'Aucun viewer sanctionné pour l’instant.',
   past: 'Sanctions passées',
   pastEmpty: 'Aucune sanction passée sur cette chaîne.',
@@ -196,12 +196,6 @@ export const MODVIEW_HISTORY_COPY = {
   fromPanel: 'Panel',
   offPanel: 'Hors panel',
   by: 'par {name}',
-  team: 'Équipe du live',
-  inspect: 'Inspect Mod',
-  focus: 'Focus',
-  connected: 'Connectés',
-  focusOpen: 'Focus en cours',
-  focusBy: '{watcher} suit {target}',
 } as const
 
 /**

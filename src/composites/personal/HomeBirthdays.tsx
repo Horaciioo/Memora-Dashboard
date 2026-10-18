@@ -1,6 +1,6 @@
 import Link from '@/components/elements/navigation/AppLink'
 
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { ROUTES } from '@/declarations/navigation'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'

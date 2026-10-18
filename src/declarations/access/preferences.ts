@@ -1,7 +1,8 @@
 import { createRegistry } from '@/core/lib/registry'
 import type { IconName } from '@/declarations/ui/icons'
 
-export type ColorVisionMode = 'NONE' | 'PROTANOPIA' | 'DEUTERANOPIA' | 'TRITANOPIA'
+export type ColorVisionMode =
+  'NONE' | 'PROTANOPIA' | 'DEUTERANOPIA' | 'TRITANOPIA' | 'ACHROMATOPSIA'
 
 export type ThemePreference = 'SYSTEM' | 'LIGHT' | 'DARK'
 
@@ -59,6 +60,12 @@ const COLOR_VISION_MAP: Record<ColorVisionMode, ColorVisionOption> = {
     short: 'Tritanopie',
     description: 'Le bleu se confond avec le jaune.',
     attribute: 'tritanopia',
+  },
+  ACHROMATOPSIA: {
+    label: 'Achromatopsie',
+    short: 'Achromatopsie',
+    description: 'Aucune couleur, tout se lit en gris.',
+    attribute: 'achromatopsia',
   },
 }
 

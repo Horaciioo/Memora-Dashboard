@@ -5,8 +5,8 @@ node_modules
 .claude
 .env*
 logs
-tests
-fixtures
+src/tests
+src/fixtures
 deploy
 *.log
 .DS_Store

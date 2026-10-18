@@ -3,9 +3,9 @@
 import { useMemo, useState, type CSSProperties } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Textarea } from '@/components/elements/forms/Textarea'
+import { Textarea } from '@/components/elements/forms/inputs/Textarea'
 import { AbsenceCalendar, type AbsenceSpan } from '@/composites/absences/AbsenceCalendar'
-import { useAbsenceAutopilot } from '@/core/hooks/interaction/useAbsenceAutopilot'
+import { useAbsenceAutopilot } from '@/core/hooks/interaction/state/useAbsenceAutopilot'
 import { demoSpan } from '@/core/lib/absences/demo'
 import { ABSENCE_COPY, ABSENCE_FIELD_COPY } from '@/declarations/absences/copy'
 import type { AbsenceAutopilot } from '@/declarations/absences/demo'

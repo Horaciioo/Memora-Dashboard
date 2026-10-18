@@ -42,41 +42,77 @@
   color: var(--color-ink);
 }
 
-/* Open page: a white box like Notion, text left plain */
+/* Open page: grey fading right, like a chosen select option, never white */
 .nav-sheet [aria-current='page'],
 .rail-ground [aria-current='page'] {
   color: var(--page-ink);
-  background: var(--page-surface);
-  box-shadow: var(--shadow-sm);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-on-frame) 22%, transparent),
+    color-mix(in srgb, var(--color-on-frame) 12%, transparent) 55%,
+    color-mix(in srgb, var(--color-on-frame) 3%, transparent)
+  );
+  border-color: transparent;
+  background-origin: border-box;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
 }
 
-/* Dark mode: the rail stays on the pale frame, so the open page is a pale box, not a black one */
+/* Dark mode: the grey is the raised surface */
+:root.dark .nav-sheet [aria-current='page'],
 :root.dark .rail-ground [aria-current='page'] {
-  --color-ink: var(--color-on-frame);
-  --color-ink-subtle: var(--color-on-frame-subtle);
-  color: var(--color-on-frame);
-  background: var(--color-on-frame-raised);
+  background: linear-gradient(
+    to right,
+    var(--color-surface-raised),
+    color-mix(in srgb, var(--color-surface-raised) 70%, transparent) 55%,
+    color-mix(in srgb, var(--color-surface-raised) 18%, transparent)
+  );
+  background-origin: border-box;
 }
 
-/* Compact rail: glyphs only */
+/* Compact rail: glyphs only, labels fade before they leave the flow */
+.rail-fold {
+  transition:
+    opacity var(--motion-duration-fast) ease,
+    display var(--motion-duration-fast) allow-discrete;
+}
+
 .rail-ground[data-compact] .rail-fold {
   display: none;
+  opacity: 0;
 }
 
-.rail-ground[data-compact] .rail-shortcuts,
-.rail-ground[data-compact] .rail-footer-box {
+@starting-style {
+  .rail-ground:not([data-compact]) .rail-fold {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-fold {
+    transition: none;
+  }
+}
+
+.rail-ground[data-compact] .rail-shortcuts {
   flex-direction: column;
 }
 
+/* Glyphs share the width of the boxes above, groups split by a hairline */
 .rail-ground[data-compact] .rail-nav {
-  align-items: center;
-  gap: 0.75rem;
-  padding-inline: 0.75rem;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+}
+
+.rail-ground[data-compact] .rail-nav > div + div {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
 }
 
 .rail-ground[data-compact] .rail-nav a {
   justify-content: center;
-  padding-inline: 0.625rem;
+  padding: 0.625rem 0;
 }
 
 /* Rail boxes are a faint grey wash on the pale frame, no glass and no shadow */

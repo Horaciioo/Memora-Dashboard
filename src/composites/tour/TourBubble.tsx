@@ -3,7 +3,7 @@
 import { Fragment } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 
-import { useViewportSize } from '@/core/hooks/interaction/useViewportSize'
+import { useViewportSize } from '@/core/hooks/interaction/layout/useViewportSize'
 import { placeBubble } from '@/core/lib/tour/placement'
 import { TOUR_SETTINGS } from '@/declarations/configurations/settings'
 import { TOUR_COPY } from '@/declarations/tour/copy'

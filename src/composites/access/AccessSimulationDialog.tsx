@@ -1,7 +1,7 @@
 'use client'
 
 import { Status } from '@/components/elements/display/Status'
-import { Dialog } from '@/components/structures/Dialog'
+import { Dialog } from '@/components/structures/overlays/Dialog'
 import { ACCESS_COPY } from '@/declarations/access/copy'
 import { PERMISSION_SECTIONS } from '@/declarations/access/permissions'
 import { ACCESS_CONSOLE } from '@/declarations/ui/blocks'

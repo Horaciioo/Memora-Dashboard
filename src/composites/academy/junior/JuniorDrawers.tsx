@@ -1,7 +1,7 @@
 'use client'
 
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { FormDrawer } from '@/components/structures/FormDrawer'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
+import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { PARKOUR_COPY } from '@/declarations/academy/parkour'

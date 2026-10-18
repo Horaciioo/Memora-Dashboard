@@ -3,8 +3,8 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Input } from '@/components/elements/forms/Input'
-import { SelectMenu } from '@/components/elements/forms/SelectMenu'
+import { Input } from '@/components/elements/forms/inputs/Input'
+import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { toOptions } from '@/core/lib/forms/options'
 import { snowflakeOf } from '@/core/lib/discord/identifiers'
 import { DISCORD_ID_COPY } from '@/declarations/discord/copy'

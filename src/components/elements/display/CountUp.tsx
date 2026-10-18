@@ -1,6 +1,6 @@
 'use client'
 
-import { useCountUp } from '@/core/hooks/interaction/useCountUp'
+import { useCountUp } from '@/core/hooks/interaction/state/useCountUp'
 import { DATE_LOCALE } from '@/declarations/ui/dates'
 
 export interface CountUpProps {

@@ -2,8 +2,8 @@
 
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { AddRow } from '@/components/structures/AddRow'
-import { Section } from '@/components/structures/Section'
+import { AddRow } from '@/components/structures/inline/AddRow'
+import { Section } from '@/components/structures/page/Section'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'
 import { ReviewCard } from '@/composites/academy/review/ReviewCard'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'

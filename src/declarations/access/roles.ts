@@ -220,7 +220,6 @@ export const ROLE_PRESETS: Record<MemberRoleName, PermissionName[]> = {
   ],
   [MemberRoles.Moderateur]: [
     Permissions.ProjectRead,
-    Permissions.CommunicationRead,
     Permissions.TaskRead,
     Permissions.MeetingRead,
     Permissions.AbsenceCreate,

@@ -1,10 +1,11 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { readOrigin } from '@/core/lib/http/requestOrigin'
 import type { ChangeSummary } from '@/core/services/system/changes'
 import { PAGINATION_SETTINGS } from '@/declarations/configurations/settings'
-import { EVENT_ORIGINS, EVENT_TYPES } from '@/utils/constants/events'
-import type { EventOriginName, EventTypeName } from '@/utils/constants/events'
+import { EVENT_LEVELS, EVENT_ORIGINS, EVENT_TYPES, LOG_LEVELS } from '@/utils/constants/events'
+import type { EventOriginName, EventTypeName, LogLevelName } from '@/utils/constants/events'
 import type { Prisma } from '@prisma/client'
 
 /**
@@ -12,6 +13,7 @@ import type { Prisma } from '@prisma/client'
  * @typedef {Object} EventInput
  * @property {EventTypeName} eventType - Event kind
  * @property {EventOriginName} [origin] - Where it came from
+ * @property {LogLevelName} [level] - Severity
  * @property {string} [actorId] - Who did it
  * @property {string} [subjectId] - Whose file it lands on
  * @property {string} [targetType] - Target resource kind
@@ -39,6 +41,7 @@ export interface ActivityError {
 export interface EventInput {
   eventType: EventTypeName
   origin?: EventOriginName
+  level?: LogLevelName
   actorId?: string | null
   subjectId?: string | null
   targetType?: string
@@ -71,10 +74,18 @@ const toPayload = (input: EventInput): Prisma.InputJsonValue | undefined => {
  */
 
 export const recordEvent = async (input: EventInput): Promise<void> => {
+  // Request context
+  const origin = await readOrigin()
+  const level = input.level ?? EVENT_LEVELS[input.eventType] ?? 'Info'
+
   await prisma.activityLog.create({
     data: {
       eventType: EVENT_TYPES.ids[input.eventType],
       origin: EVENT_ORIGINS.ids[input.origin ?? 'User'],
+      level: LOG_LEVELS.ids[level],
+      ip: origin.ip,
+      userAgent: origin.userAgent,
+      route: origin.route,
       actorId: input.actorId ?? null,
       subjectId: input.subjectId ?? null,
       targetType: input.targetType,
@@ -91,6 +102,10 @@ export const recordEvent = async (input: EventInput): Promise<void> => {
  * @property {EventTypeName | null} event - Event kind
  * @property {string} id - Entry identifier
  * @property {string} origin - Origin label
+ * @property {LogLevelName} level - Severity
+ * @property {string | null} ip - Client address
+ * @property {string | null} userAgent - Client software
+ * @property {string | null} route - Request path
  * @property {string} summary - One line description
  * @property {string | null} actorName - Who did it
  * @property {string | null} actorAvatar - Portrait of who did it
@@ -105,6 +120,10 @@ export interface ActivityEntry {
   id: string
   event: EventTypeName | null
   origin: string
+  level: LogLevelName
+  ip: string | null
+  userAgent: string | null
+  route: string | null
   summary: string
   actorName: string | null
   actorAvatar: string | null
@@ -154,7 +173,7 @@ const readError = (payload: Prisma.JsonValue): ActivityError | null => {
 }
 
 // Row shape every reader maps from
-type ActivityRow = Prisma.ActivityLogGetPayload<{
+export type ActivityRow = Prisma.ActivityLogGetPayload<{
   include: { actor: { select: { displayName: true; avatarUrl: true } } }
 }>
 
@@ -164,10 +183,14 @@ type ActivityRow = Prisma.ActivityLogGetPayload<{
  * @return {ActivityEntry} - Journal entry
  */
 
-const toEntry = (row: ActivityRow): ActivityEntry => ({
+export const toEntry = (row: ActivityRow): ActivityEntry => ({
   id: row.id,
   event: EVENT_TYPES.byId(row.eventType)?.name ?? null,
   origin: EVENT_ORIGINS.label(row.origin),
+  level: LOG_LEVELS.byId(row.level)?.name ?? 'Info',
+  ip: row.ip,
+  userAgent: row.userAgent,
+  route: row.route,
   summary: row.summary,
   actorName: row.actor?.displayName ?? null,
   actorAvatar: row.actor?.avatarUrl ?? null,

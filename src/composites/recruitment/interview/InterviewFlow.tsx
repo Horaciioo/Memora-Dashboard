@@ -17,8 +17,8 @@ import {
   RecruitmentFileProvider,
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { useRecordFile } from '@/core/hooks/data/useRecordFile'
-import { useExercisePick } from '@/core/hooks/interaction/useExercisePick'
+import { useRecordFile } from '@/core/hooks/data/work/useRecordFile'
+import { useExercisePick } from '@/core/hooks/interaction/scenes/useExercisePick'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { candidateRecordValues } from '@/core/lib/recruitment/candidateRecord'
 import { isInterviewLocked } from '@/core/lib/recruitment/interviewLock'

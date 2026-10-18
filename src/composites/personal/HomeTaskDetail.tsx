@@ -1,5 +1,5 @@
 import { Markdown } from '@/components/elements/display/Markdown'
-import { DetailGrid } from '@/components/structures/DetailGrid'
+import { DetailGrid } from '@/components/structures/data/DetailGrid'
 import { PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
 import { DEPARTURE_TASK, TASK_LIST } from '@/declarations/ui/variants'
 import type { HomeTask } from '@/types/personal'

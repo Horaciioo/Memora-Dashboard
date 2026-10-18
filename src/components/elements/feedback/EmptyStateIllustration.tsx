@@ -1,6 +1,6 @@
 import { useId } from 'react'
 import type { FC, ReactNode } from 'react'
-import { RampStops } from '@/components/elements/display/RampStops'
+import { RampStops } from '@/components/elements/display/glyphs/RampStops'
 import { SCENE_RAMP } from '@/declarations/ui/ramps'
 
 export interface EmptyStateIllustrationProps {

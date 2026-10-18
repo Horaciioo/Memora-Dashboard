@@ -4,9 +4,12 @@ import { useRouter } from 'next/navigation'
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { useSession, type SessionState } from '@/core/hooks/data/useAcademy'
-import { useComments, type CommentsState } from '@/core/hooks/data/useComments'
-import { usePromotionActions, type PromotionActions } from '@/core/hooks/data/useParkourActions'
+import { useSession, type SessionState } from '@/core/hooks/data/academy/useAcademy'
+import { useComments, type CommentsState } from '@/core/hooks/data/work/useComments'
+import {
+  usePromotionActions,
+  type PromotionActions,
+} from '@/core/hooks/data/academy/useParkourActions'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { ROUTES } from '@/declarations/navigation'

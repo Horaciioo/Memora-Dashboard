@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { academyScope } from '@/core/services/academy/AcademyScope'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { CalendarBoard } from '@/composites/calendar/CalendarBoard'
 import {
   calendarFields,

@@ -1,5 +1,5 @@
 import { CountUp } from '@/components/elements/display/CountUp'
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
 import { releaseCategories } from '@/declarations/changelog/helpers'
 import { CHANGELOG_TAGS } from '@/declarations/changelog/releases'

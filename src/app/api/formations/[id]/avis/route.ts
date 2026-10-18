@@ -1,6 +1,6 @@
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { saveFeedback } from '@/core/services/academy/CurriculumService'
+import { saveFeedback } from '@/core/services/academy/training/CurriculumService'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 

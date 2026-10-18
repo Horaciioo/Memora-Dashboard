@@ -9,7 +9,14 @@ import type Sharding from '@/managers/infrastructure/Core/Sharding'
 import type LoggerManager from '@/managers/infrastructure/Core/LoggerManager'
 import { JOB_REGISTRY } from '@/declarations/system/jobs'
 import type { QueuesConfig } from '@/types/infrastructure'
-import type { EnqueueJobOptions, JobHandler, JobName, JobStats } from '@/types/jobs'
+import type {
+  EnqueueJobOptions,
+  JobHandler,
+  JobName,
+  JobOverview,
+  JobRun,
+  JobStats,
+} from '@/types/jobs'
 
 /**
  * Queue manager
@@ -288,6 +295,62 @@ export default class QueueManager {
 
   async getStats(): Promise<JobStats[]> {
     return Promise.all(JOB_REGISTRY.keys.map((name) => this._statsOf(name)))
+  }
+
+  /**
+   * Get latest runs and next schedule
+   * @param {JobName} name - Queue name
+   * @param {number} take - Run count
+   * @return {Promise<JobOverview>} - Overview
+   */
+
+  async getOverview(name: JobName, take: number): Promise<JobOverview> {
+    const queue = this.get(name)
+    if (!queue) return { runs: [], nextRun: null }
+
+    try {
+      const [jobs, schedulers] = await Promise.all([
+        queue.getJobs(['completed', 'failed', 'active'], 0, take - 1, false),
+        queue.getJobSchedulers(0, 0),
+      ])
+
+      const runs = jobs
+        .filter((job) => job.processedOn)
+        .map((job): JobRun => {
+          const state = job.failedReason ? 'failed' : job.finishedOn ? 'completed' : 'active'
+
+          return {
+            id: job.id ?? '',
+            state,
+            startedAt: job.processedOn ?? job.timestamp,
+            finishedAt: job.finishedOn ?? null,
+            attempts: job.attemptsMade,
+            reason: job.failedReason ?? null,
+          }
+        })
+        .sort((a, b) => b.startedAt - a.startedAt)
+
+      return { runs, nextRun: schedulers[0]?.next ?? null }
+    } catch (error) {
+      this.logger.error(`Get overview for queue ${name} failed`, error)
+
+      return { runs: [], nextRun: null }
+    }
+  }
+
+  /**
+   * Retry every failed job
+   * @param {JobName} name - Queue name
+   * @return {Promise<boolean>} - Queue was running
+   */
+
+  async retryFailed(name: JobName): Promise<boolean> {
+    const queue = this.get(name)
+    if (!queue) return false
+
+    await queue.retryJobs({ state: 'failed' })
+
+    return true
   }
 
   /**

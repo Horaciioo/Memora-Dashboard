@@ -1,14 +1,10 @@
 import type { Metadata } from 'next'
-import Link from '@/components/elements/navigation/AppLink'
-
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { LiveReportView } from '@/composites/lives/LiveReportView'
 import { readLiveReport } from '@/core/services/lives/LiveReportService'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
-import { ROUTES } from '@/declarations/navigation'
-import { BUTTON_STYLES, LIVE_REPORT, PAGE_STYLES } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
+import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { formatDay } from '@/utils/format/dates'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -23,7 +19,7 @@ export const metadata: Metadata = { title: LIVE_REPORT_COPY.title }
 
 export default async function LiveReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { session, access, scope } = await requirePermission(Permissions.LiveLogRead)
+  const { session, scope } = await requirePermission(Permissions.LiveLogRead)
   const detail = await readLiveReport(id, await scope(), session.id, session.permissions)
   const { live } = detail
   const start = live.startedAt ?? live.plannedStartAt
@@ -31,24 +27,19 @@ export default async function LiveReportPage({ params }: { params: Promise<{ id:
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader
-        eyebrow={`${live.youtuber.name} · ${formatDay(start)}`}
+        eyebrow={LIVE_REPORT_COPY.teamEyebrow
+          .replace('{name}', live.youtuber.name)
+          .replace('{day}', formatDay(start))}
         title={LIVE_REPORT_COPY.title}
       />
-      <div className={LIVE_REPORT.toolbar}>
-        {access.can(Permissions.LiveCreatorReport) && (
-          <Link
-            href={ROUTES.liveCreatorReport(id)}
-            className={cn(BUTTON_STYLES.base, BUTTON_STYLES.secondary)}
-          >
-            {LIVE_REPORT_COPY.openCreator}
-          </Link>
-        )}
-      </div>
       <LiveReportView
         report={detail.report}
+        insights={detail.insights}
+        baseline={detail.baseline}
+        stem={`${live.youtuber.name}-${live.id}`}
         log={detail.log}
         start={start}
-        end={live.endedAt ?? new Date().toISOString()}
+        end={detail.period.end}
         available={detail.available}
       />
     </div>

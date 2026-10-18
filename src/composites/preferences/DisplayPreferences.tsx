@@ -1,15 +1,10 @@
 'use client'
 
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { useAppearanceStore } from '@/core/store/appearance'
-import { useColorVisionStore } from '@/core/store/colorVision'
 import { useThemeStore } from '@/core/store/theme'
-import {
-  COLOR_VISION_REGISTRY,
-  FONT_SCALE_REGISTRY,
-  THEME_REGISTRY,
-} from '@/declarations/access/preferences'
+import { FONT_SCALE_REGISTRY, THEME_REGISTRY } from '@/declarations/access/preferences'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { PICKER_CARD } from '@/declarations/ui/variants'
@@ -19,17 +14,10 @@ import type { ReactNode } from 'react'
 // Letters of each reading size, grown card by card
 const FONT_SAMPLE = { sm: 'text-lg', md: 'text-2xl', lg: 'text-3xl' } as const
 
-// Tones a vision mode redraws, shown as its palette
-const VISION_TONES = [
-  'bg-[var(--color-success)]',
-  'bg-[var(--color-danger)]',
-  'bg-[var(--color-info)]',
-]
-
 interface PickerProps {
   title: string
   beta?: boolean
-  columns: 'three' | 'two'
+  columns: 'three' | 'wide'
   children: ReactNode
 }
 
@@ -39,7 +27,7 @@ interface PickerProps {
  * @return {JSX.Element}
  */
 
-const Picker = ({ title, beta, columns, children }: PickerProps) => (
+export const Picker = ({ title, beta, columns, children }: PickerProps) => (
   <div className={PICKER_CARD.group}>
     <p className={PICKER_CARD.title}>
       {title}
@@ -53,17 +41,14 @@ const Picker = ({ title, beta, columns, children }: PickerProps) => (
 
 /**
  * Appearance settings as cards with their own glyph
- * @param {ReactNode} [children] - Extra rows
  * @return {JSX.Element}
  */
 
-export const DisplayPreferences = ({ children }: { children?: ReactNode }) => {
+export const DisplayPreferences = () => {
   const theme = useThemeStore((state) => state.theme)
   const setTheme = useThemeStore((state) => state.setTheme)
   const fontScale = useAppearanceStore((state) => state.fontScale)
   const setFontScale = useAppearanceStore((state) => state.setFontScale)
-  const colorVisionMode = useColorVisionStore((state) => state.colorVisionMode)
-  const setColorVisionMode = useColorVisionStore((state) => state.setColorVisionMode)
 
   return (
     <Section title={PREFERENCES_COPY.displayTitle} padded>
@@ -89,7 +74,7 @@ export const DisplayPreferences = ({ children }: { children?: ReactNode }) => {
             })}
           </Picker>
 
-          <Picker title={PREFERENCES_COPY.textSizeTitle} beta columns="three">
+          <Picker title={PREFERENCES_COPY.textSizeTitle} columns="three">
             {FONT_SCALE_REGISTRY.keys.map((key) => {
               const option = FONT_SCALE_REGISTRY.get(key)
 
@@ -110,37 +95,6 @@ export const DisplayPreferences = ({ children }: { children?: ReactNode }) => {
             })}
           </Picker>
         </div>
-
-        <Picker title={PREFERENCES_COPY.colorVisionTitle} beta columns="two">
-          {COLOR_VISION_REGISTRY.keys.map((key) => {
-            const option = COLOR_VISION_REGISTRY.get(key)
-
-            return (
-              <button
-                key={key}
-                type="button"
-                aria-pressed={colorVisionMode === key}
-                onClick={() => setColorVisionMode(key)}
-                data-vision-preview={option.attribute}
-                className={cn(
-                  PICKER_CARD.option,
-                  PICKER_CARD.optionWide,
-                  colorVisionMode === key && PICKER_CARD.active
-                )}
-              >
-                <span className={PICKER_CARD.swatches} aria-hidden="true">
-                  {VISION_TONES.map((tone) => (
-                    <span key={tone} className={cn(PICKER_CARD.swatch, tone)} />
-                  ))}
-                </span>
-                <span className={PICKER_CARD.label}>{option.label}</span>
-                <span className={PICKER_CARD.description}>{option.description}</span>
-              </button>
-            )
-          })}
-        </Picker>
-
-        {children}
       </div>
       <p className={PICKER_CARD.note}>{PREFERENCES_COPY.storageNotice}</p>
     </Section>

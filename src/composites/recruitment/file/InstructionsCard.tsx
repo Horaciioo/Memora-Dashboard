@@ -1,7 +1,7 @@
 'use client'
 
-import { InlineMarkdown } from '@/components/structures/InlineMarkdown'
-import { ScrollCard } from '@/components/structures/ScrollCard'
+import { InlineMarkdown } from '@/components/structures/inline/InlineMarkdown'
+import { ScrollCard } from '@/components/structures/data/ScrollCard'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 

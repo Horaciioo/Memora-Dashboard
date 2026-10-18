@@ -6,9 +6,10 @@ import '@/styles/globals.css'
 import { ThemeScript } from '@/components/tools/ThemeScript'
 import { Providers } from '@/app/providers'
 import { getSession } from '@/core/lib/auth/getSession'
-import { NONCE_HEADER } from '@/declarations/system/securityHeaders'
+import { NONCE_HEADER } from '@/declarations/system/security/securityHeaders'
 import { APP_COMPANY, APP_DESCRIPTION, APP_FONTS, APP_NAME } from '@/declarations/app'
 import { DRAWER_DIMENSIONS, SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
+import { setActiveZone } from '@/utils/format/zone'
 
 export const metadata: Metadata = {
   title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
@@ -41,6 +42,9 @@ const SHELL_VARS = {
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const [initialSession, headerStore] = await Promise.all([getSession(), headers()])
+
+  // Server-rendered clock times read in the member's zone
+  setActiveZone(initialSession?.timezone)
   const nonce = headerStore.get(NONCE_HEADER) ?? undefined
 
   return (

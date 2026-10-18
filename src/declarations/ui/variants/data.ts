@@ -1,3 +1,11 @@
+// Ring around a picked card or entry
+const PICK_RING =
+  'ring-2 ring-[var(--color-pick)] ring-offset-1 ring-offset-[var(--color-surface-raised)]'
+
+// Bar listing what a selection can do
+const SELECTION_BAR =
+  'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-brand-400)] bg-[var(--color-brand-soft)]/60 px-3 py-2 text-sm'
+
 /**
  * Table styles
  * @type {Record<string, string>}
@@ -249,6 +257,10 @@ export const BOARD_STYLES = {
   cardOrigin: 'border-t border-[var(--color-border)] pt-2 text-xs text-[var(--color-ink-subtle)]',
   // Glyph flowing before a title
   cardGlyph: 'mr-1.5',
+  cardSelected: PICK_RING,
+  // Rectangle drawn over empty space
+  marquee:
+    'pointer-events-none fixed z-50 rounded-[var(--radius-sm)] border border-[var(--color-pick)] bg-[var(--color-pick)]/15',
 } as const
 
 /**
@@ -405,8 +417,7 @@ export const CALENDAR_STYLES = {
   entrySolid: 'text-[var(--color-on-accent)]',
   // Absences sit behind everything else
   entryMuted: 'border border-[var(--color-border)] opacity-75',
-  entrySelected:
-    'ring-2 ring-[var(--color-pick)] ring-offset-1 ring-offset-[var(--color-surface-raised)]',
+  entrySelected: PICK_RING,
   // Seat of the minute grid
   entryFill: 'h-full overflow-hidden',
   entryCompact: 'items-center py-0',
@@ -431,8 +442,7 @@ export const CALENDAR_STYLES = {
   legendRowMuted: 'opacity-40',
   legendDot: 'h-2 w-2 shrink-0 rounded-full',
   legendCount: 'tabular-nums opacity-60',
-  selectionBar:
-    'flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-brand-400)] bg-[var(--color-brand-soft)]/60 px-3 py-2 text-sm',
+  selectionBar: SELECTION_BAR,
   selectionCount: 'font-semibold tabular-nums',
   // Detail modal
   detailList: 'flex list-disc flex-col gap-1 pl-5 text-sm',
@@ -663,4 +673,77 @@ export const MEMBER_ADMIN = {
   cellNote: 'text-xs text-[var(--color-ink-subtle)]',
   // Sanction drawer fields
   form: 'flex flex-col gap-5',
+} as const
+
+/**
+ * Admin journal styles
+ * @type {Record<string, string>}
+ */
+
+export const JOURNAL_TABLE_STYLES = {
+  filters: 'flex flex-wrap items-center gap-2',
+  search: 'min-w-56 flex-1',
+  select: 'w-48',
+  list: 'flex flex-col',
+  head: 'hidden grid-cols-[11rem_6rem_12rem_10rem_1fr] gap-3 border-b border-[var(--color-border)] px-4 py-2 text-xs font-bold uppercase text-[var(--color-ink-subtle)] lg:grid',
+  row: 'border-b border-[var(--color-border)] last:border-b-0',
+  summary:
+    'grid cursor-pointer list-none grid-cols-[1fr_auto] items-baseline gap-x-3 gap-y-1 px-4 py-2.5 text-sm hover:bg-[var(--color-hover)] lg:grid-cols-[11rem_6rem_12rem_10rem_1fr]',
+  moment: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
+  cell: 'min-w-0 truncate text-[var(--color-ink)]',
+  muted: 'min-w-0 truncate text-[var(--color-ink-subtle)]',
+  detail:
+    'flex flex-col gap-2 border-t border-dashed border-[var(--color-border)] bg-[var(--color-surface-sunken)] px-4 py-3 text-xs',
+  facts: 'grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1',
+  factLabel: 'font-bold uppercase text-[var(--color-ink-subtle)]',
+  factValue: 'min-w-0 break-words text-[var(--color-ink)]',
+} as const
+
+/**
+ * Service history styles
+ * @type {Record<string, string>}
+ */
+
+export const STATUS_HISTORY_STYLES = {
+  list: 'flex flex-col divide-y divide-[var(--color-border)]',
+  service: 'flex flex-col gap-2 py-3 first:pt-0 last:pb-0',
+  head: 'flex flex-wrap items-center justify-between gap-2',
+  name: 'text-sm font-medium',
+  lead: 'text-xs text-[var(--color-ink-subtle)]',
+  meta: 'flex items-center gap-3',
+  mono: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
+  bars: 'flex h-7 gap-px',
+  bar: 'min-w-px flex-1 rounded-[2px]',
+  foot: 'flex justify-between text-xs text-[var(--color-ink-subtle)]',
+  incident: 'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-2 text-sm',
+  incidentWhen: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Colour of a day bar per health
+ * @type {Record<'up' | 'degraded' | 'down' | 'none', string>}
+ */
+
+export const STATUS_BAR_COLOURS = {
+  up: 'bg-[var(--color-success)]',
+  degraded: 'bg-[var(--color-warning)]',
+  down: 'bg-[var(--color-danger)]',
+  none: 'bg-[var(--color-border-strong)]',
+} as const
+
+/**
+ * Daily bars styles
+ * @type {Record<string, string>}
+ */
+
+export const DAILY_BARS_STYLES = {
+  chart: 'flex h-32 items-end gap-1',
+  column: 'group relative flex h-full min-w-0 flex-1 items-end',
+  bar: 'w-full rounded-t-[3px] bg-[var(--color-brand-500)] transition-colors group-hover:bg-[var(--color-brand-700)]',
+  empty: 'w-full border-b border-dashed border-[var(--color-border-strong)]',
+  axis: 'mt-1 flex justify-between text-xs tabular-nums text-[var(--color-ink-subtle)]',
+  split: 'grid gap-6 md:grid-cols-2',
+  share: 'flex items-center justify-between gap-3 py-2 text-sm',
+  track: 'h-1.5 w-24 overflow-hidden rounded-full bg-[var(--color-surface-sunken)]',
+  fill: 'h-full rounded-full bg-[var(--color-brand-500)]',
 } as const

@@ -2,7 +2,7 @@
 
 import Link from '@/components/elements/navigation/AppLink'
 
-import { useFreshRelease } from '@/core/hooks/data/useFreshRelease'
+import { useFreshRelease } from '@/core/hooks/data/system/useFreshRelease'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { RELEASE_NOTICE } from '@/declarations/ui/blocks'

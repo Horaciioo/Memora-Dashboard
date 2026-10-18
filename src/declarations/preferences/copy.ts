@@ -19,6 +19,11 @@ export const PREFERENCES_COPY = {
   textSizeTitle: 'Taille du texte',
   textSizeSample: 'Aa',
   colorVisionTitle: 'Vision des couleurs',
+  colorVisionLead:
+    'Choisis le mode qui te convient : les couleurs d’état, les fonds et le cadre de Memora se redessinent pour rester distincts.',
+  guidesSection: 'Guides',
+  colorVisionModes: 'Mode',
+  colorVisionNote: 'Chaque aperçu montre le fond du cadre et les couleurs d’état de son mode.',
   displayLead: 'Ce que tu changes ici ne concerne que toi.',
   storageNotice:
     'Ces réglages sont liés à ton compte : tu les retrouves sur n’importe quel navigateur.',

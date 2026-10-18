@@ -3,22 +3,30 @@
 import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import { AddRow } from '@/components/structures/AddRow'
+import { AddRow } from '@/components/structures/inline/AddRow'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
-import { ConfirmDialog } from '@/components/structures/ConfirmDialog'
-import { DataTable, type DataTableColumn } from '@/components/structures/DataTable'
-import { FilterBar, type FilterDefinition } from '@/components/structures/FilterBar'
-import { FormDrawer } from '@/components/structures/FormDrawer'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
+import { DataTable, type DataTableColumn } from '@/components/structures/data/DataTable'
+import { FilterBar, type FilterDefinition } from '@/components/structures/data/FilterBar'
+import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { WORK_SUBJECTS } from '@/declarations/ui/subjects'
-import { KanbanBoard, type BoardColumn, type BoardItem } from '@/components/structures/KanbanBoard'
-import { PageOptions, type PageOption } from '@/components/structures/PageOptions'
-import { Section } from '@/components/structures/Section'
-import { useBoard, type BoardEndpoints } from '@/core/hooks/data/useBoard'
-import { BOARD_FILTER_COPY } from '@/declarations/work/copy'
+import {
+  KanbanBoard,
+  type BoardColumn,
+  type BoardItem,
+} from '@/components/structures/data/KanbanBoard'
+import { BoardSelection } from '@/composites/work/BoardSelection'
+import { PageOptions, type PageOption } from '@/components/structures/page/PageOptions'
+import { Section } from '@/components/structures/page/Section'
+import { useBoard, type BoardEndpoints, type BoardEntity } from '@/core/hooks/data/work/useBoard'
+import { filledValues } from '@/core/lib/forms'
+import { useBoardSelection } from '@/core/hooks/interaction/state/useBoardSelection'
+import { BOARD_FILTER_COPY, SELECTION_COPY } from '@/declarations/work/copy'
 import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import type { IllustrationName } from '@/declarations/ui/illustrations'
 import type { MenuItem } from '@/managers/front-end'
 import type { FieldDefinition, FormValues } from '@/types/forms'
+import type { FormSubject } from '@/declarations/ui/copy/forms'
 import { WorkflowPhases } from '@/utils/constants/workflow'
 import type { WorkflowScopeName } from '@/utils/constants/workflow'
 
@@ -51,7 +59,12 @@ export interface BoardCopy {
 }
 
 export interface WorkBoardProps<T extends BoardItem> {
-  scope: WorkflowScopeName
+  // Null for a board living outside the workflows, entity and subject then stand in
+  scope: WorkflowScopeName | null
+  entity?: BoardEntity
+  subject?: FormSubject
+  // Live result drawn beside the form fields
+  aside?: { label: string; render: (values: FormValues) => ReactNode }
   endpoints: BoardEndpoints
   initialCards: T[]
   columns: BoardColumn[]
@@ -71,6 +84,12 @@ export interface WorkBoardProps<T extends BoardItem> {
   canUpdate: boolean
   canDelete: boolean
   tintByColumn?: boolean
+  // Page options drawn after the view and the finished switch
+  extraOptions?: PageOption[]
+  // Columns folded away on top of the finished ones
+  hiddenColumns?: string[]
+  // Cards the member may edit, move and drop, all by default
+  isEditable?: (card: T) => boolean
 }
 
 // Two ways of reading the same cards
@@ -81,7 +100,10 @@ const VIEWS = [
 
 /**
  * Board surface shared by projects
- * @param {WorkflowScopeName} scope - Board scope
+ * @param {WorkflowScopeName | null} scope - Board scope, null outside the workflows
+ * @param {BoardEntity} [entity] - Toast label when there is no scope
+ * @param {FormSubject} [subject] - Drawer subject when there is no scope
+ * @param {{ label: string, render: (values: FormValues) => ReactNode }} [aside] - Live result beside the fields
  * @param {BoardEndpoints} endpoints - Paths of the resource
  * @param {T[]} initialCards - Cards resolved server-side
  * @param {BoardColumn[]} columns - Columns in display order
@@ -101,11 +123,17 @@ const VIEWS = [
  * @param {boolean} canUpdate - Member may edit a card
  * @param {boolean} canDelete - Member may drop a card
  * @param {boolean} [tintByColumn] - Washes the board in the column accents
+ * @param {PageOption[]} [extraOptions] - Page options added to the view and finished ones
+ * @param {string[]} [hiddenColumns] - Columns folded away
+ * @param {(card: T) => boolean} [isEditable] - Cards the member may edit, move and drop
  * @return {JSX.Element}
  */
 
 export const WorkBoard = <T extends BoardItem>({
   scope,
+  entity,
+  subject,
+  aside,
   endpoints,
   initialCards,
   columns,
@@ -125,8 +153,11 @@ export const WorkBoard = <T extends BoardItem>({
   canUpdate,
   canDelete,
   tintByColumn,
+  extraOptions = [],
+  hiddenColumns = [],
+  isEditable,
 }: WorkBoardProps<T>) => {
-  const board = useBoard<T>(scope, endpoints, initialCards, labelOf)
+  const board = useBoard<T>(scope, endpoints, initialCards, labelOf, entity)
   const [view, setView] = useState<'board' | 'list'>('board')
   const [search, setSearch] = useState('')
   const [filterValues, setFilterValues] = useState<Record<string, string>>({})
@@ -149,24 +180,56 @@ export const WorkBoard = <T extends BoardItem>({
 
   // Done columns fold away
   const visibleColumns = useMemo(
-    () => (showDone ? columns : columns.filter((column) => !doneColumnIds.has(column.id))),
-    [columns, doneColumnIds, showDone]
+    () =>
+      columns.filter(
+        (column) =>
+          !hiddenColumns.includes(column.id) && (showDone || !doneColumnIds.has(column.id))
+      ),
+    [columns, doneColumnIds, showDone, hiddenColumns]
   )
 
   const visibleCards = useMemo(
     () =>
       board.cards.filter((card) => {
         if (!showDone && doneColumnIds.has(card.columnId ?? '')) return false
+        if (hiddenColumns.includes(card.columnId ?? '')) return false
 
         return matches(card, search.trim().toLowerCase(), filterValues)
       }),
-    [board.cards, doneColumnIds, showDone, search, filterValues, matches]
+    [board.cards, doneColumnIds, showDone, hiddenColumns, search, filterValues, matches]
   )
+
+  const selection = useBoardSelection(visibleCards)
+  const canPick = (card: T) => (canUpdate || canDelete) && (isEditable?.(card) ?? true)
+  const selected = visibleCards.filter((card) => selection.ids.includes(card.id))
+
+  // Untouched fields leave the selection alone
+  const editSelection = async (values: FormValues) => {
+    const filled = filledValues(values)
+    if (Object.keys(filled).length === 0) return true
+
+    const done = await board.updateMany(
+      selected.map((card) => ({ id: card.id, values: { ...valuesOf(card), ...filled } }))
+    )
+    if (done) selection.clear()
+
+    return done
+  }
+
+  const deleteSelection = async () => {
+    await board.removeMany(selected.map((card) => card.id))
+    selection.clear()
+  }
 
   // A card resting in a done column is finished work
   const hasContent = useMemo(
-    () => board.cards.some((card) => showDone || !doneColumnIds.has(card.columnId ?? '')),
-    [board.cards, doneColumnIds, showDone]
+    () =>
+      board.cards.some(
+        (card) =>
+          !hiddenColumns.includes(card.columnId ?? '') &&
+          (showDone || !doneColumnIds.has(card.columnId ?? ''))
+      ),
+    [board.cards, doneColumnIds, showDone, hiddenColumns]
   )
 
   const pageOptions: PageOption[] = [
@@ -175,7 +238,10 @@ export const WorkBoard = <T extends BoardItem>({
       label: PAGE_OPTIONS_COPY.view,
       value: view,
       choices: [...VIEWS],
-      onChange: (value: string) => setView(value === 'list' ? 'list' : 'board'),
+      onChange: (value: string) => {
+        selection.clear()
+        setView(value === 'list' ? 'list' : 'board')
+      },
     },
     ...(doneColumnIds.size === 0
       ? []
@@ -187,6 +253,7 @@ export const WorkBoard = <T extends BoardItem>({
             onChange: setShowDone,
           },
         ]),
+    ...extraOptions,
   ]
 
   const openCreate = (columnId?: string) => {
@@ -211,7 +278,7 @@ export const WorkBoard = <T extends BoardItem>({
           },
         ]
       : []),
-    ...(canUpdate
+    ...(canUpdate && (isEditable?.(card) ?? true)
       ? [
           {
             id: 'edit',
@@ -224,8 +291,20 @@ export const WorkBoard = <T extends BoardItem>({
           },
         ]
       : []),
+    ...(view === 'board' && canPick(card)
+      ? [
+          {
+            id: 'select',
+            label: selection.ids.includes(card.id)
+              ? SELECTION_COPY.deselect
+              : SELECTION_COPY.select,
+            icon: 'check' as const,
+            onSelect: () => selection.toggle(card.id),
+          },
+        ]
+      : []),
     ...(extraMenu?.(card) ?? []),
-    ...(canDelete
+    ...(canDelete && (isEditable?.(card) ?? true)
       ? [
           {
             id: 'delete',
@@ -281,6 +360,20 @@ export const WorkBoard = <T extends BoardItem>({
           onReset={resetFilters}
           isFiltered={isFiltered}
         />
+        {view === 'board' && selected.length > 0 && (
+          <BoardSelection
+            count={selected.length}
+            fields={fields}
+            canUpdate={canUpdate}
+            canDelete={canDelete}
+            isSaving={board.isSaving}
+            issues={board.issues}
+            clearIssues={board.clearIssues}
+            onClear={selection.clear}
+            onEdit={editSelection}
+            onDelete={deleteSelection}
+          />
+        )}
         {showEmptyState ? (
           <EmptyState {...emptyState} />
         ) : view === 'board' ? (
@@ -295,7 +388,12 @@ export const WorkBoard = <T extends BoardItem>({
             canCreate={canCreate}
             onCreate={openCreate}
             canMove={canUpdate}
+            canMoveItem={isEditable}
             tintByColumn={tintByColumn}
+            selection={selection.ids}
+            canSelectItem={canPick}
+            onToggle={(card) => selection.toggle(card.id)}
+            onSelectMany={selection.pick}
           />
         ) : (
           <DataTable
@@ -312,10 +410,11 @@ export const WorkBoard = <T extends BoardItem>({
       </Section>
 
       <FormDrawer
-        subject={WORK_SUBJECTS[scope]}
+        subject={subject ?? WORK_SUBJECTS[scope!]}
         open={isCreating}
         title={copy.add}
         fields={fields}
+        aside={aside}
         initialValues={createColumn ? { [columnField]: createColumn } : undefined}
         issues={board.issues}
         isSaving={board.isSaving}
@@ -324,10 +423,11 @@ export const WorkBoard = <T extends BoardItem>({
       />
 
       <FormDrawer
-        subject={WORK_SUBJECTS[scope]}
+        subject={subject ?? WORK_SUBJECTS[scope!]}
         open={editing !== null}
         title={editing ? `${ACTION_COPY.edit} · ${labelOf(editing)}` : ACTION_COPY.edit}
         fields={fields}
+        aside={aside}
         initialValues={editing ? valuesOf(editing) : undefined}
         recordId={editing?.id}
         issues={board.issues}

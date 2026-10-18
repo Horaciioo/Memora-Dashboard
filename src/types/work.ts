@@ -1,3 +1,5 @@
+import type { CommunicationStatus } from '@prisma/client'
+
 import type { FormValues } from '@/types/forms'
 import type { MeetingAudienceName, WorkflowPhaseName } from '@/utils/constants/workflow'
 
@@ -103,6 +105,8 @@ export interface ProjectSummary extends WorkAuthorship {
  * @property {string} body - Markdown body
  * @property {WorkTag | null} platform - Platform it is posted on
  * @property {string | null} authorName - Who wrote it
+ * @property {string | null} authorAvatar - Portrait of who wrote it
+ * @property {CommunicationStatus} status - Writing progress
  * @property {string | null} publishedAt - ISO publication date
  * @property {FormValues} values - Values feeding the edit form
  */
@@ -113,6 +117,8 @@ export interface CommunicationEntry {
   body: string
   platform: WorkTag | null
   authorName: string | null
+  authorAvatar: string | null
+  status: CommunicationStatus
   publishedAt: string | null
   values: FormValues
 }
@@ -263,31 +269,39 @@ export interface OverdueFlags {
 
 /**
  * Where an announcement was written
- * @typedef {'project' | 'departure' | 'recruitment'} AnnouncementSource
+ * @typedef {'project' | 'free' | 'departure' | 'recruitment'} AnnouncementSource
  */
 
-export type AnnouncementSource = 'project' | 'departure' | 'recruitment'
+export type AnnouncementSource = 'project' | 'free' | 'departure' | 'recruitment'
 
 /**
- * Row of the announcements page, a pointer back to where it was written
+ * Row of the announcements page, written here or a pointer back to where it was written
  * @typedef {Object} AnnouncementRow
  * @property {string} id - Row identifier, prefixed by its source
+ * @property {string} columnId - Board column, the status
  * @property {AnnouncementSource} source - Where it was written
  * @property {string} title - Announcement title
- * @property {'draft' | 'announced'} state - Written only, or posted on Discord
+ * @property {CommunicationStatus} status - Writing progress
  * @property {string} origin - Name of the project, member or session it belongs to
- * @property {string} at - ISO announcement date, creation date while a draft
+ * @property {string | null} projectId - Project it is written for
+ * @property {string | null} platformId - Platform it is posted on
+ * @property {string} at - ISO announcement date, creation date while unpublished
  * @property {WorkPerson | null} person - Who it names or who wrote it
- * @property {string} href - Page it can be edited on
+ * @property {string | null} href - Page it can be edited on, null for an announcement written here
+ * @property {FormValues | null} values - Values feeding the edit form, null when edited elsewhere
  */
 
 export interface AnnouncementRow {
   id: string
+  columnId: string
   source: AnnouncementSource
   title: string
-  state: 'draft' | 'announced'
+  status: CommunicationStatus
   origin: string
+  projectId: string | null
+  platformId: string | null
   at: string
   person: WorkPerson | null
-  href: string
+  href: string | null
+  values: FormValues | null
 }

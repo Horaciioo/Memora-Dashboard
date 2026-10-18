@@ -6,7 +6,7 @@ import { prisma } from '@/core/lib/db'
 import { invalidInput, notFound } from '@/core/lib/errors'
 import { FILE_SETTINGS } from '@/declarations/configurations/settings'
 import { FILE_COPY } from '@/declarations/ui/copy'
-import { sniffMimeType } from '@/declarations/system/signatures'
+import { sniffMimeType } from '@/declarations/system/security/signatures'
 import { STORAGE_BUCKETS } from '@/declarations/system/storage'
 import type { MediaVisibility } from '@/declarations/system/storage'
 import type { StorageBucket } from '@/types/storage'
@@ -166,6 +166,20 @@ const FILE_REFERENCE_LOOKUPS = [
     ).map((row) => row.avatarUrl),
   async (urls: string[]) =>
     (
+      await prisma.account.findMany({
+        where: { bannerUrl: { in: urls } },
+        select: { bannerUrl: true },
+      })
+    ).map((row) => row.bannerUrl),
+  async (urls: string[]) =>
+    (
+      await prisma.youtuber.findMany({
+        where: { bannerUrl: { in: urls } },
+        select: { bannerUrl: true },
+      })
+    ).map((row) => row.bannerUrl),
+  async (urls: string[]) =>
+    (
       await prisma.division.findMany({
         where: { imagePath: { in: urls } },
         select: { imagePath: true },
@@ -174,27 +188,39 @@ const FILE_REFERENCE_LOOKUPS = [
 ]
 
 /**
+ * Find the entries no record references
+ * @param {number} olderThanHours - Age before collection
+ * @return {Promise<{ id: string, byteSize: number }[]>} - Orphan entries
+ */
+
+export const findOrphanFiles = async (
+  olderThanHours: number
+): Promise<{ id: string; byteSize: number }[]> => {
+  const horizon = new Date(Date.now() - olderThanHours * 3_600_000)
+
+  const candidates = await prisma.storageEntry.findMany({
+    where: { createdAt: { lt: horizon } },
+    select: { id: true, byteSize: true },
+  })
+
+  if (candidates.length === 0) return []
+
+  const urls = candidates.map((entry) => fileUrl(entry.id))
+  const referenced = await Promise.all(FILE_REFERENCE_LOOKUPS.map((lookup) => lookup(urls)))
+
+  const kept = new Set(referenced.flat().filter((url): url is string => url !== null))
+
+  return candidates.filter((entry) => !kept.has(fileUrl(entry.id)))
+}
+
+/**
  * Drop the entries no record ever referenced
  * @param {number} olderThanHours - Age before collection
  * @return {Promise<number>} - Removed count
  */
 
 export const pruneOrphanFiles = async (olderThanHours: number): Promise<number> => {
-  const horizon = new Date(Date.now() - olderThanHours * 3_600_000)
-
-  const candidates = await prisma.storageEntry.findMany({
-    where: { createdAt: { lt: horizon } },
-    select: { id: true },
-  })
-
-  if (candidates.length === 0) return 0
-
-  const urls = candidates.map((entry) => fileUrl(entry.id))
-  const referenced = await Promise.all(FILE_REFERENCE_LOOKUPS.map((lookup) => lookup(urls)))
-
-  const kept = new Set(referenced.flat().filter((url): url is string => url !== null))
-  const removable = candidates.map((entry) => entry.id).filter((id) => !kept.has(fileUrl(id)))
-
+  const removable = (await findOrphanFiles(olderThanHours)).map((entry) => entry.id)
   if (removable.length === 0) return 0
 
   const { count } = await prisma.storageEntry.deleteMany({ where: { id: { in: removable } } })

@@ -1,8 +1,8 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { removeChoice, updateChoice } from '@/core/services/academy/TrainingContentService'
-import { choiceFields } from '@/core/services/academy/trainingContentFields'
+import { removeChoice, updateChoice } from '@/core/services/academy/training/TrainingContentService'
+import { choiceFields } from '@/core/services/academy/training/trainingContentFields'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({

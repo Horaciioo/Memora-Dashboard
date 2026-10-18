@@ -1,6 +1,6 @@
 'use client'
 
-import { useCourseContext } from '@/composites/academy/course/CourseContextProvider'
+import { useCourseContext } from '@/composites/academy/course/player/CourseContextProvider'
 import { COURSE_COPY } from '@/declarations/academy/copy'
 import type { IconName } from '@/declarations/ui/icons'
 import { isIconName } from '@/declarations/ui/icons'

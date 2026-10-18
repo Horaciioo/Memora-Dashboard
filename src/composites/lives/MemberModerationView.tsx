@@ -3,7 +3,7 @@
 import Link from '@/components/elements/navigation/AppLink'
 import { useState } from 'react'
 
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
 import {

@@ -57,6 +57,11 @@ export const DISCORD_MESSAGE = {
   hint: 'pt-2 text-xs text-[var(--discord-muted)]',
   popover:
     'mb-2 max-h-40 shrink-0 overflow-y-auto rounded-[var(--radius-md)] bg-[var(--discord-popover)] p-2 shadow-[var(--shadow-md)]',
+  // Bar laid over the message it edits, no frame and no tint
+  inlineInput:
+    'block w-full field-sizing-content resize-none bg-transparent p-0 text-body leading-[1.375rem] text-[var(--discord-text)] outline-none placeholder:text-[var(--discord-muted)]',
+  // List floating above the bar so nothing below moves
+  inlinePopover: 'absolute bottom-full left-0 z-20 mb-2 w-72',
   popoverGroup:
     'px-2 pt-2 pb-1 text-xs font-bold tracking-wide text-[var(--discord-muted)] uppercase',
   popoverItem:

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { RecruitmentsPanel } from '@/composites/recruitment/RecruitmentsPanel'
 import { listSessions, sessionFields } from '@/core/services/recruitment/RecruitmentService'
 import { requirePermission } from '@/core/wrappers/requireUser'

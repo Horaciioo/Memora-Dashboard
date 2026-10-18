@@ -1,11 +1,11 @@
-import { releasedFrom } from '@/core/services/academy/LegacyRelease'
+import { releasedFrom } from '@/core/services/academy/legacy/LegacyRelease'
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { forbidden } from '@/core/lib/errors'
 import { logger } from '@/core/lib/logger'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { syncJuniorLives } from '@/core/services/academy/LiveCountService'
+import { syncJuniorLives } from '@/core/services/academy/parkour/LiveCountService'
 import { notify } from '@/core/services/system/NotificationService'
 import { peopleInScope } from '@/core/services/work/shared'
 import type { AttendancePerson, AttendanceRoster } from '@/types/calendar'

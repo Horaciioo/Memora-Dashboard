@@ -4,9 +4,9 @@ import { prisma } from '@/core/lib/db'
 import { readAnchors } from '@/core/services/auth/LeadService'
 import { closeLivePresences } from '@/core/services/lives/PresenceService'
 import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
-import { readDate, readList, readNumberValue, readText } from '@/core/lib/forms/values'
-import { releasedFrom } from '@/core/services/academy/LegacyRelease'
-import { syncJuniorLives } from '@/core/services/academy/LiveCountService'
+import { readDate, readList, readText } from '@/core/lib/forms/values'
+import { releasedFrom } from '@/core/services/academy/legacy/LegacyRelease'
+import { syncJuniorLives } from '@/core/services/academy/parkour/LiveCountService'
 import { assertInScope, scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { syncRoster } from '@/core/services/calendar/attendance'
@@ -49,7 +49,7 @@ const PERSON = { select: { id: true, displayName: true, avatarUrl: true } } as c
 
 // Relations every live view needs
 const LIVE_SHAPE = {
-  youtuber: { select: { id: true, name: true, avatarUrl: true } },
+  youtuber: { select: { id: true, name: true, avatarUrl: true, bannerUrl: true } },
   announcedBy: PERSON,
   coordinations: { include: { account: PERSON }, orderBy: { askedAt: 'asc' } },
   members: { include: { account: PERSON }, orderBy: { convokedAt: 'asc' } },
@@ -91,7 +91,12 @@ const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): LiveVie
     title: row.title,
     platform: row.platform,
     status: row.status,
-    youtuber: { id: row.youtuber.id, name: row.youtuber.name, avatar: row.youtuber.avatarUrl },
+    youtuber: {
+      id: row.youtuber.id,
+      name: row.youtuber.name,
+      avatar: row.youtuber.avatarUrl,
+      banner: row.youtuber.bannerUrl,
+    },
     plannedStartAt: row.plannedStartAt.toISOString(),
     plannedEndAt: row.plannedEndAt?.toISOString() ?? null,
     startedAt: row.startedAt?.toISOString() ?? null,
@@ -243,10 +248,10 @@ export const liveFields = async (scope: AccessScope): Promise<FieldDefinition[]>
       span: 'half',
     },
     {
-      name: 'durationMinutes',
-      kind: 'number',
-      label: LIVE_FIELD_COPY.durationMinutes,
-      placeholder: String(LIVE_SETTINGS.defaultDurationMinutes),
+      name: 'plannedEndAt',
+      kind: 'datetime',
+      label: LIVE_FIELD_COPY.endsAt,
+      hint: LIVE_FIELD_COPY.endsAtHint,
       span: 'half',
     },
     {
@@ -320,8 +325,12 @@ export const announceLive = async (
 
   assertInScope(scope, youtuberId)
   const platform = readPlatform(values)
-  const minutes = readNumberValue(values, 'durationMinutes') ?? LIVE_SETTINGS.defaultDurationMinutes
-  const endsAt = new Date(startsAt.getTime() + minutes * MINUTE)
+  // Planned end is informative, closing the live stays manual
+  const pickedEnd = readDate(values, 'plannedEndAt')
+  const endsAt =
+    pickedEnd && pickedEnd > startsAt
+      ? pickedEnd
+      : new Date(startsAt.getTime() + LIVE_SETTINGS.defaultDurationMinutes * MINUTE)
 
   // Convened team
   const convened = await convene({
@@ -486,6 +495,7 @@ export const readBeacon = async (
     select: {
       id: true,
       status: true,
+      platform: true,
       plannedStartAt: true,
       youtuber: { select: { name: true, avatarUrl: true } },
     },
@@ -514,6 +524,7 @@ export const readBeacon = async (
       id: row.id,
       creator: row.youtuber.name,
       creatorAvatar: row.youtuber.avatarUrl,
+      platform: row.platform,
       status: row.status,
       plannedStartAt: row.plannedStartAt.toISOString(),
     })),

@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation'
 
 import { NudgeBubble } from '@/composites/notifications/NudgeBubble'
-import { useBeaconSpot } from '@/core/hooks/interaction/useBeaconSpot'
-import { useNotificationNudges } from '@/core/hooks/data/useNotificationNudges'
+import { useBeaconSpot } from '@/core/hooks/interaction/layout/useBeaconSpot'
+import { useNotificationNudges } from '@/core/hooks/data/system/useNotificationNudges'
 import { apiPatch } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { NUDGE_SETTINGS } from '@/declarations/configurations/settings'

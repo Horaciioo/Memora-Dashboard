@@ -1,6 +1,6 @@
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { Status } from '@/components/elements/display/Status'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { ModerationBoard } from '@/composites/moderation/ModerationBoard'
 import { liveconFields, listLevels, readCurrentState } from '@/core/services/livecon/LiveconService'
 import { listMeasures, panelsFor, readPanel } from '@/core/services/sanctions/SanctionService'

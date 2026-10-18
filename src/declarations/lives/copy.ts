@@ -31,9 +31,11 @@ export const LIVE_COPY = {
   urgentAnnounced: 'Live de {creator} prévu le {time}',
   urgentOpen: 'Rejoindre',
   liveBadge: 'En direct',
-  liveNow: '{creator} est {strong}, on le rejoint ?',
+  liveNow: '{creator} est {strong} sur {platform}, on le rejoint ?',
   liveNowStrong: 'actuellement en Live',
   liveJoin: 'Rejoindre le live',
+  liveSection: 'En direct',
+  upcomingSection: 'À venir',
 } as const
 
 /**
@@ -47,7 +49,8 @@ export const LIVE_FIELD_COPY = {
   title: 'Titre du live',
   titlePlaceholder: 'Ce que le live annonce',
   startsAt: 'Début prévu',
-  durationMinutes: 'Durée prévue (minutes)',
+  endsAt: 'Fin prévue',
+  endsAtHint: 'Indicative, le live se ferme à la main.',
   coordinator: 'Coordinateur du Live',
   coordinatorHint:
     'Plusieurs possibles. Chacun reçoit une demande et choisit lui-même ses horaires, ses droits courent jusqu’à la fin de son créneau.',

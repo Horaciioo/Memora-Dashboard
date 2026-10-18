@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from '@/components/elements/navigation/AppLink'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Dialog } from '@/components/structures/Dialog'
+import { Dialog } from '@/components/structures/overlays/Dialog'
 import { CHANGELOG_COPY } from '@/declarations/changelog/copy'
 import { changelogPath, groupByMonth } from '@/declarations/changelog/helpers'
 import type { ChangelogMonth } from '@/declarations/changelog/helpers'

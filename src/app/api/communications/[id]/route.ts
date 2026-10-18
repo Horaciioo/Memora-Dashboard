@@ -1,30 +1,14 @@
-import { forbidden, invalidInput } from '@/core/lib/errors'
+import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import {
   communicationFields,
-  communicationOwner,
   removeCommunication,
   updateCommunication,
 } from '@/core/services/work/ProjectService'
-import { assertProjectVisible, workViewer } from '@/core/services/work/visibility'
-import type { WorkViewer } from '@/core/services/work/visibility'
+import { assertWritable } from '@/core/services/work/AnnouncementService'
+import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
-
-/**
- * Refuse an announcement the viewer neither reaches nor wrote
- * @param {string} id - Announcement identifier
- * @param {WorkViewer} viewer - Who writes
- * @return {Promise<void>} - Throws when refused
- */
-
-const assertWritable = async (id: string, viewer: WorkViewer): Promise<void> => {
-  const owner = await communicationOwner(id)
-  await assertProjectVisible(owner.projectId, viewer)
-
-  // Others only touch their own
-  if (!viewer.seesAll && owner.authorId !== viewer.id) throw forbidden()
-}
 
 export const PATCH = createProtectedRoute({
   permission: Permissions.CommunicationWrite,

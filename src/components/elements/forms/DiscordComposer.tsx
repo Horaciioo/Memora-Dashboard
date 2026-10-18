@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
-import type { KeyboardEvent } from 'react'
+import type { KeyboardEvent, ReactNode } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { BROADCAST_MENTIONS } from '@/declarations/discord/registries'
@@ -47,6 +47,11 @@ export const mentionChoices = (options: FieldOption[]): MentionChoice[] => [
   ...BROADCAST_MENTIONS.map((token) => ({ token, display: token, option: null })),
 ]
 
+// Framed pane of the form
+const Frame = ({ children }: { children: ReactNode }) => (
+  <div className={cn(DISCORD_MESSAGE.frame, DISCORD_MESSAGE.pane)}>{children}</div>
+)
+
 export interface DiscordComposerProps {
   id: string
   value: string
@@ -54,6 +59,8 @@ export interface DiscordComposerProps {
   options: FieldOption[]
   disabled?: boolean
   maxLength?: number
+  // Drawn over the message it edits, without frame
+  inline?: boolean
 }
 
 /**
@@ -64,6 +71,7 @@ export interface DiscordComposerProps {
  * @param {FieldOption[]} options - Members
  * @param {boolean} [disabled] - Blocks the bar
  * @param {number} [maxLength] - Longest message
+ * @param {boolean} [inline] - Bare bar standing in for a message
  * @return {JSX.Element}
  */
 
@@ -74,6 +82,7 @@ export const DiscordComposer = ({
   options,
   disabled,
   maxLength,
+  inline,
 }: DiscordComposerProps) => {
   const input = useRef<HTMLTextAreaElement>(null)
   const choices = useMemo(() => mentionChoices(options), [options])
@@ -142,11 +151,17 @@ export const DiscordComposer = ({
   // Headings of the suggestion list
   let lastGroup: string | null = null
 
+  const Shell = inline ? 'div' : Frame
+
   return (
-    <div className={cn(DISCORD_MESSAGE.frame, DISCORD_MESSAGE.pane)}>
-      <div className={DISCORD_MESSAGE.composer}>
+    <Shell>
+      <div className={inline ? 'relative' : DISCORD_MESSAGE.composer}>
         {query && (
-          <div className={DISCORD_MESSAGE.popover} role="listbox" aria-labelledby={id}>
+          <div
+            className={cn(DISCORD_MESSAGE.popover, inline && DISCORD_MESSAGE.inlinePopover)}
+            role="listbox"
+            aria-labelledby={id}
+          >
             {matches.length === 0 ? (
               <p className={DISCORD_MESSAGE.popoverEmpty}>{WORK_DISCORD_COPY.noMatch}</p>
             ) : (
@@ -192,7 +207,7 @@ export const DiscordComposer = ({
         <textarea
           id={id}
           ref={input}
-          className={DISCORD_MESSAGE.input}
+          className={inline ? DISCORD_MESSAGE.inlineInput : DISCORD_MESSAGE.input}
           value={display}
           disabled={disabled}
           maxLength={maxLength}
@@ -204,8 +219,8 @@ export const DiscordComposer = ({
           onKeyDown={onKeyDown}
           onBlur={() => setQuery(null)}
         />
-        <p className={DISCORD_MESSAGE.hint}>{WORK_DISCORD_COPY.mentionHint}</p>
+        {!inline && <p className={DISCORD_MESSAGE.hint}>{WORK_DISCORD_COPY.mentionHint}</p>}
       </div>
-    </div>
+    </Shell>
   )
 }

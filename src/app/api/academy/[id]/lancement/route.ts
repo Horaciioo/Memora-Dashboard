@@ -1,6 +1,6 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
-import { launchAnyway } from '@/core/services/academy/ParkourService'
+import { launchAnyway } from '@/core/services/academy/parkour/ParkourService'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { Permissions } from '@/utils/constants/permissions'

@@ -3,9 +3,9 @@
 import { useState } from 'react'
 
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
-import { FormDrawer } from '@/components/structures/FormDrawer'
-import { useActionMenu } from '@/core/hooks/interaction/useActionMenu'
-import { useLivecon } from '@/core/hooks/data/useLivecon'
+import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
+import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
+import { useLivecon } from '@/core/hooks/data/lives/useLivecon'
 import { levelOfCreator } from '@/declarations/livecon/levels'
 import { LIVECON_COPY } from '@/declarations/livecon/copy'
 import { ICONS } from '@/declarations/ui/icons'

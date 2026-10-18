@@ -1,6 +1,6 @@
 'use client'
 
-import { CommentThread } from '@/components/structures/CommentThread'
+import { CommentThread } from '@/components/structures/data/CommentThread'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import type { CandidateView } from '@/types/recruitment'
 

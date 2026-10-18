@@ -2,8 +2,8 @@ import 'server-only'
 
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { myTrainings, resolveOwnJunior } from '@/core/services/academy/AcademyService'
-import { openDepartures, parkourStandings } from '@/core/services/academy/ParkourService'
-import type { ParkourStanding } from '@/core/services/academy/ParkourService'
+import { openDepartures, parkourStandings } from '@/core/services/academy/parkour/ParkourService'
+import type { ParkourStanding } from '@/core/services/academy/parkour/ParkourService'
 import { DECISION_PHASES, REVIEW_DUE_PHASES, reviewStageOf } from '@/core/lib/academy/parkour'
 import { DEPARTURE_COPY, PARKOUR_NAME } from '@/declarations/academy/parkour'
 import {

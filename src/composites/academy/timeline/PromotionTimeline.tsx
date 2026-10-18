@@ -4,7 +4,7 @@ import Link from '@/components/elements/navigation/AppLink'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Status } from '@/components/elements/display/Status'
-import { PeriodTimeline } from '@/components/structures/PeriodTimeline'
+import { PeriodTimeline } from '@/components/structures/data/PeriodTimeline'
 import { PromotionStepActions } from '@/composites/academy/timeline/PromotionStepActions'
 import { toPeriodGroups } from '@/composites/academy/timeline/toPeriodGroups'
 import { useSessionState } from '@/composites/academy/session/SessionFileContext'

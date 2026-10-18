@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { AbsencesPanel } from '@/composites/absences/AbsencesPanel'
 import { ABSENCE_FIELDS, listOwnAbsences } from '@/core/services/absences/AbsenceService'
 import { requireUser } from '@/core/wrappers/requireUser'

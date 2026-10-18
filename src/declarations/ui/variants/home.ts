@@ -86,7 +86,6 @@ export const HOME_HERO = {
   words: 'flex min-w-0 flex-col gap-1',
   greeting: 'truncate pr-[0.2em] text-3xl font-bold tracking-tight italic sm:text-5xl',
   hello: 'text-sm font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase italic',
-  date: 'hidden text-3xl font-bold tracking-tight text-[var(--color-ink-subtle)] italic first-letter:uppercase sm:block sm:text-5xl',
 } as const
 
 /**
@@ -98,7 +97,8 @@ export const HOME_PLAN = {
   list: 'flex flex-col',
   empty: 'text-sm text-[var(--color-ink-subtle)]',
   row: 'group flex items-center gap-3 rounded-[var(--radius-md)] px-2 py-2.5 text-sm transition-colors hover:bg-[var(--color-hover)] focus-visible:bg-[var(--color-hover)] focus-visible:outline-none',
-  when: 'w-14 shrink-0 text-xs font-bold text-[var(--color-ink-subtle)]',
+  group: 'flex flex-col pt-2 first:pt-0',
+  when: 'px-2 text-[11px] font-bold uppercase tracking-wide text-[var(--color-ink-subtle)]',
   whenExact:
     'shrink-0 text-xs font-bold tabular-nums text-[var(--color-ink)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:hidden',
   glyph: 'h-5 w-5 shrink-0',
@@ -137,7 +137,24 @@ export const HOME_CARDS = {
 
 export const HOME_LIVE = {
   list: 'flex flex-col gap-6',
-  card: 'live-card group relative isolate flex min-h-0 flex-col items-start gap-3 overflow-hidden sm:min-h-72 sm:flex-row sm:items-center sm:gap-10 rounded-[var(--radius-xl)] bg-gradient-to-br from-[var(--color-live-100)] via-[var(--color-live-300)] to-[var(--color-live-400)] px-5 py-4 text-black shadow-[var(--shadow-lg)] ring-1 ring-white/40 ring-inset sm:px-14 sm:py-14',
+  card: 'live-card group relative isolate flex min-h-0 flex-col items-start gap-3 overflow-hidden sm:min-h-72 sm:flex-row sm:items-center sm:gap-10 rounded-[var(--radius-xl)] bg-gradient-to-br px-5 py-4 text-black shadow-[var(--shadow-lg)] ring-1 ring-white/40 ring-inset sm:px-14 sm:py-14',
+  // Violet on Twitch, red on YouTube
+  tone: {
+    TWITCH:
+      'from-[var(--color-twitch-100)] via-[var(--color-twitch-300)] to-[var(--color-twitch-400)]',
+    YOUTUBE: 'from-[var(--color-live-100)] via-[var(--color-live-300)] to-[var(--color-live-400)]',
+  },
+  joinTone: {
+    TWITCH: 'text-[var(--color-twitch-100)]',
+    YOUTUBE: 'text-[var(--color-live-100)]',
+  },
+  // Deepened so the name reads on its own gradient
+  platformTone: {
+    TWITCH: 'text-[color-mix(in_oklab,var(--color-twitch-400)_45%,black)]',
+    YOUTUBE: 'text-[var(--color-youtube-ink)]',
+  },
+  platform: 'inline-flex items-center gap-[0.25em] align-middle font-bold',
+  platformGlyph: 'h-[0.85em] w-[0.85em] shrink-0',
   body: 'relative flex min-w-0 flex-1 flex-col gap-2 sm:gap-6',
   eyebrow:
     'flex items-center gap-2 text-xs sm:gap-2.5 sm:text-sm font-bold tracking-wide text-black/70 uppercase',
@@ -145,7 +162,7 @@ export const HOME_LIVE = {
   text: 'text-lg leading-tight font-semibold tracking-tight text-balance sm:text-5xl',
   strong: 'font-bold',
   actions: 'flex flex-wrap items-center gap-3 sm:pt-2',
-  join: 'inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold sm:px-7 sm:py-3.5 sm:text-base text-[var(--color-live-100)] shadow-[var(--shadow-md)] transition-transform hover:-translate-y-0.5',
+  join: 'inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold sm:px-7 sm:py-3.5 sm:text-base shadow-[var(--shadow-md)] transition-transform hover:-translate-y-0.5',
   joinGlyph: 'h-4 w-4',
   logo: 'relative hidden shrink-0 sm:block',
   logoRing: 'live-halo absolute -inset-3 rounded-full border-2 border-white/60',
@@ -178,5 +195,5 @@ export const HOME_TASKS = {
 export const HOME_BOARD = {
   card: 'card-surface grid grid-cols-1 rounded-[var(--radius-xl)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] xl:grid-cols-3',
   // The vertical divider stops short of the top and the bottom edges
-  col: 'relative flex min-w-0 flex-col border-t border-[var(--color-border)] px-5 py-6 first:border-t-0 xl:border-t-0 sm:px-8 xl:px-10 xl:py-8 xl:before:absolute xl:before:inset-y-8 xl:before:left-0 xl:before:w-px xl:before:bg-[var(--color-border)] xl:first:before:hidden',
+  col: 'relative flex min-w-0 flex-col border-t border-[var(--color-border)] px-4 py-6 first:border-t-0 xl:border-t-0 sm:px-5 xl:px-6 xl:py-8 xl:before:absolute xl:before:inset-y-8 xl:before:left-0 xl:before:w-px xl:before:bg-[var(--color-border)] xl:first:before:hidden',
 } as const

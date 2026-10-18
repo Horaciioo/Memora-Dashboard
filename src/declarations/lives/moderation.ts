@@ -29,10 +29,12 @@ export const MODERATION_KINDS: Record<ModerationKind, { label: string; icon: Ico
  */
 
 export const LIVE_REPORT_COPY = {
-  title: 'Bilan du live',
-  creatorTitle: 'Bilan pour le créateur',
-  open: 'Voir le bilan',
-  openCreator: 'Bilan créateur',
+  title: 'Bilan',
+  creatorTitle: 'Bilan',
+  teamEyebrow: 'Équipe · {name} · {day}',
+  creatorEyebrow: 'Créateur · {name} · {day}',
+  open: 'Bilan',
+  openCreator: 'Bilan {name}',
   pastTitle: 'Lives passés',
   pastEmpty: 'Aucun live terminé pour l’instant.',
   unavailable:

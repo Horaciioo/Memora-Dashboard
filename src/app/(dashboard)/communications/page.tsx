@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { AnnouncementsList } from '@/composites/work/AnnouncementsList'
-import { listAnnouncements } from '@/core/services/work/AnnouncementService'
+import { mentionOptions } from '@/core/services/work/DiscordDirectory'
+import { announcementFields, listAnnouncements } from '@/core/services/work/AnnouncementService'
+import { platformOptions, projectOptions } from '@/core/services/work/shared'
 import { workViewer } from '@/core/services/work/visibility'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -17,12 +19,29 @@ export const metadata: Metadata = { title: ANNOUNCEMENT_COPY.title }
 
 export default async function AnnouncementsPage() {
   const { session, access, scope } = await requirePermission(Permissions.CommunicationRead)
-  const rows = await listAnnouncements(workViewer(session, access), access, await scope())
+  const perimeter = await scope()
+  const viewer = workViewer(session, access)
+
+  const [rows, mentions, projects, platforms] = await Promise.all([
+    listAnnouncements(viewer, access, perimeter),
+    mentionOptions([]),
+    projectOptions(perimeter, viewer),
+    platformOptions(),
+  ])
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={ANNOUNCEMENT_COPY.title} />
-      <AnnouncementsList rows={rows} />
+      <PageHeader
+        title={ANNOUNCEMENT_COPY.title}
+        heroDescription={ANNOUNCEMENT_COPY.heroDescription}
+      />
+      <AnnouncementsList
+        initialRows={rows}
+        fields={await announcementFields(mentions, projects)}
+        platforms={platforms}
+        projects={projects}
+        canWrite={access.can(Permissions.CommunicationWrite)}
+      />
     </div>
   )
 }

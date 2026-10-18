@@ -80,7 +80,7 @@ export interface LiveView {
   title: string
   platform: LivePlatformName
   status: LiveStatusName
-  youtuber: { id: string; name: string; avatar: string | null }
+  youtuber: { id: string; name: string; avatar: string | null; banner?: string | null }
   plannedStartAt: string
   plannedEndAt: string | null
   startedAt: string | null
@@ -112,6 +112,7 @@ export interface LiveBeacon {
     id: string
     creator: string
     creatorAvatar: string | null
+    platform: LivePlatformName
     status: LiveStatusName
     plannedStartAt: string
   }[]
@@ -236,6 +237,8 @@ export interface LiveFocusView {
  * @property {string} actorName - Who did it
  * @property {string} liveTitle - Live it happened on
  * @property {boolean} fromPanel - Applied from the panel
+ * @property {string | null} offenseId - Panel offence applied
+ * @property {number | null} rung - Panel rung applied
  * @property {string} occurredAt - ISO moment
  */
 
@@ -247,6 +250,8 @@ export interface ViewerSanction {
   actorName: string
   liveTitle: string
   fromPanel: boolean
+  offenseId: string | null
+  rung: number | null
   occurredAt: string
 }
 

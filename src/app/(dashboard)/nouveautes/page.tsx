@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { PageHeader } from '@/components/structures/PageHeader'
+import { PageHeader } from '@/components/structures/page/PageHeader'
 import { ChangelogBoard } from '@/composites/changelog/ChangelogBoard'
 import { ReleaseDeck } from '@/composites/changelog/ReleaseDeck'
 import { requireUser } from '@/core/wrappers/requireUser'

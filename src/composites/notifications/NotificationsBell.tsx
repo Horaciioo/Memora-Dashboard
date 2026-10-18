@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 
-import { useNotificationFeed } from '@/core/hooks/data/useNotificationFeed'
+import { useNotificationFeed } from '@/core/hooks/data/system/useNotificationFeed'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
 import { RAIL_POPOVER } from '@/declarations/ui/blocks'

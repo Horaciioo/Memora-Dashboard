@@ -17,6 +17,8 @@ export interface DiscordMessageProps {
   author: string
   avatarUrl?: string | null
   time?: string
+  // Stands in for the content while it is edited
+  editor?: ReactNode
 }
 
 /**
@@ -49,6 +51,7 @@ const Spoiler = ({ children }: { children: ReactNode }) => {
  * @param {string} author - Name above the message
  * @param {string | null} [avatarUrl] - Portrait beside it
  * @param {string} [time] - Stamp beside the name
+ * @param {ReactNode} [editor] - Bar replacing the content
  * @return {JSX.Element}
  */
 
@@ -58,6 +61,7 @@ export const DiscordMessage = ({
   author,
   avatarUrl,
   time,
+  editor,
 }: DiscordMessageProps) => {
   const names = new Map(mentions.map((entry) => [entry.token, entry.display]))
 
@@ -168,7 +172,7 @@ export const DiscordMessage = ({
           <span className={DISCORD_MESSAGE.author}>{author}</span>
           <span className={DISCORD_MESSAGE.time}>{time ?? WORK_DISCORD_COPY.today}</span>
         </span>
-        <div className={DISCORD_MESSAGE.content}>{parseMessage(source).map(block)}</div>
+        <div className={DISCORD_MESSAGE.content}>{editor ?? parseMessage(source).map(block)}</div>
       </div>
     </div>
   )

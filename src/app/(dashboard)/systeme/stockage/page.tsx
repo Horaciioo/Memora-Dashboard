@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
-import { PageHeader } from '@/components/structures/PageHeader'
-import { Section } from '@/components/structures/Section'
+import { PageHeader } from '@/components/structures/page/PageHeader'
+import { Section } from '@/components/structures/page/Section'
 import { ConsoleMetrics } from '@/composites/system/ConsoleMetrics'
+import { LargestFiles } from '@/composites/system/LargestFiles'
 import { StoragePanel } from '@/composites/system/StoragePanel'
 import { SubjectBadges } from '@/composites/system/SubjectBadges'
 import {
@@ -38,6 +39,14 @@ export default async function StoragePage() {
             { label: SYSTEM_COPY.metricObjects, value: report.entries },
             { label: SYSTEM_COPY.metricWeight, value: formatBytes(report.bytes) },
             { label: SYSTEM_COPY.metricBuckets, value: report.buckets.length },
+            {
+              label: SYSTEM_COPY.storageOrphans,
+              value:
+                report.orphans.count === 0
+                  ? SYSTEM_COPY.storageNone
+                  : `${report.orphans.count} · ${formatBytes(report.orphans.bytes)}`,
+              hint: SYSTEM_COPY.storageOrphansHint,
+            },
           ]}
         />
       </Section>
@@ -50,6 +59,12 @@ export default async function StoragePage() {
       >
         <StoragePanel report={report} />
       </Section>
+
+      {report.largest.length > 0 && (
+        <Section title={SYSTEM_COPY.storageLargest} padded>
+          <LargestFiles files={report.largest} />
+        </Section>
+      )}
     </div>
   )
 }

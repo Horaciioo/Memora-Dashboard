@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef } from 'react'
 import type { CSSProperties } from 'react'
 
 import { SplashWord } from '@/composites/splash/SplashWord'
-import { useSplash } from '@/core/hooks/interaction/useSplash'
+import { useSplash } from '@/core/hooks/interaction/layout/useSplash'
 import { SPLASH } from '@/declarations/ui/blocks'
 import { SPLASH_COPY } from '@/declarations/ui/copy/feedback'
 import { SPLASH_EYE } from '@/declarations/ui/splash'

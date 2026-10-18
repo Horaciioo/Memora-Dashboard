@@ -11,6 +11,7 @@ services:
     environment:
       DATABASE_URL: postgresql://memora:${POSTGRES_PASSWORD}@db:5432/memora?schema=public
       REDIS_URL: redis://redis:6379
+      STATUS_URL: http://status:3001/api/status
     depends_on:
       db:
         condition: service_healthy
@@ -77,6 +78,16 @@ services:
         condition: service_healthy
     networks: [internal]
 
+  # Own container and file, keeps answering when the app is down
+  status:
+    build:
+      context: ..
+      dockerfile: status/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - status-data:/data
+    networks: [internal]
+
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -85,16 +96,18 @@ services:
       - '443:443'
     environment:
       DOMAIN: ${DOMAIN}
+      STATUS_DOMAIN: ${STATUS_DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
-    depends_on: [app]
+    depends_on: [app, status]
     networks: [internal]
 
 volumes:
   db18-data:
   redis-data:
+  status-data:
   caddy-data:
   caddy-config:
 

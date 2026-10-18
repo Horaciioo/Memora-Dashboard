@@ -1,5 +1,5 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { reorderQuestions } from '@/core/services/academy/TrainingContentService'
+import { reorderQuestions } from '@/core/services/academy/training/TrainingContentService'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({

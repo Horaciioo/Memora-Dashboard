@@ -102,4 +102,6 @@ export const PAGE_OPTIONS_COPY = {
   showFinished: 'Afficher les terminées',
   view: 'Vue',
   showHistory: 'Afficher l’historique',
+  showLegend: 'Afficher la légende',
+  showPastLives: 'Afficher les lives passés',
 } as const

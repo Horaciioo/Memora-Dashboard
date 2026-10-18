@@ -278,6 +278,26 @@ export const LIVE_SETTINGS = {
     fallback: 180,
     min: 15,
   }),
+  dossierWindowDays: readInteger(lives.dossierWindowDays, {
+    path: 'system/lives.dossierWindowDays',
+    fallback: 90,
+    min: 1,
+  }),
+  reportMaxSlices: readInteger(lives.reportMaxSlices, {
+    path: 'system/lives.reportMaxSlices',
+    fallback: 120,
+    min: 10,
+  }),
+  reportMaxHours: readInteger(lives.reportMaxHours, {
+    path: 'system/lives.reportMaxHours',
+    fallback: 24,
+    min: 1,
+  }),
+  sampleSeconds: readInteger(lives.sampleSeconds, {
+    path: 'system/lives.sampleSeconds',
+    fallback: 60,
+    min: 15,
+  }),
   viewerHistorySize: readInteger(lives.viewerHistorySize, {
     path: 'system/lives.viewerHistorySize',
     fallback: 10,

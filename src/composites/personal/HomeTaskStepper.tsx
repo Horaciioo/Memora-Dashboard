@@ -3,7 +3,7 @@
 import Link from '@/components/elements/navigation/AppLink'
 
 import { Button } from '@/components/elements/actions/Button'
-import { Drawer } from '@/components/structures/Drawer'
+import { Drawer } from '@/components/structures/overlays/Drawer'
 import { PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
 import { TASK_GROUPS } from '@/declarations/personal/groups'
 import { ICONS } from '@/declarations/ui/icons'

@@ -37,7 +37,7 @@ export const ACCESS_COPY = {
   memberAddLead: 'Seuls les modérateurs se rattachent ici, jamais un leader ni l’administration.',
   memberAddEmpty: 'Aucun modérateur à rattacher.',
   memberRemove: 'Retirer du rôle',
-  encadrementLocked: 'Seul un administrateur modifie ce niveau.',
+  encadrementLocked: 'Seul un administrateur peut modifier ce niveau.',
   addFunction: 'Ajouter une fonction',
   newFunctionName: 'Nom de la fonction',
   create: 'Créer',

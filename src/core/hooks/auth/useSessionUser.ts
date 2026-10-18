@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 import type { SessionUser } from '@/types/auth'
 
 /**
@@ -23,7 +21,6 @@ interface SessionUserResult {
  */
 
 export const useSessionUser = (initialSession?: SessionUser | null): SessionUserResult => {
-  const [data] = useState(initialSession ?? null)
-
-  return { data, isLoading: false }
+  // Follows the server, so a refresh brings new stars and settings
+  return { data: initialSession ?? null, isLoading: false }
 }

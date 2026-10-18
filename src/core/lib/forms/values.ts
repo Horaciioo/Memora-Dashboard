@@ -1,7 +1,6 @@
+import { DEFAULT_ZONE } from '@/declarations/ui/dates'
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
-
-// Minute-precision datetime with no zone
-const WALL_CLOCK_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
+import { instantToWall, isInstantText, isWallClock, wallToInstant } from '@/utils/format/zone'
 
 /**
  * Build blank values from declarations
@@ -43,7 +42,7 @@ export const valuesFrom = (
     // Dates arrive as Date objects from the database
     if (raw instanceof Date) {
       values[field.name] =
-        field.kind === 'datetime' ? raw.toISOString().slice(0, 16) : raw.toISOString().slice(0, 10)
+        field.kind === 'datetime' ? raw.toISOString() : raw.toISOString().slice(0, 10)
       continue
     }
 
@@ -109,12 +108,13 @@ export const readList = (values: FormValues, name: string): string[] => {
 }
 
 /**
- * Wall-clock minutes read as UTC
- * @param {string} text - Day or ISO minute
+ * Wall-clock minutes read in the team zone
+ * @param {string} text - Day, ISO minute or moment
  * @return {string} - Text a Date parses the same everywhere
  */
 
-const wallClock = (text: string): string => (WALL_CLOCK_PATTERN.test(text) ? `${text}Z` : text)
+const wallClock = (text: string): string =>
+  isWallClock(text) ? wallToInstant(text, DEFAULT_ZONE).toISOString() : text
 
 /**
  * Read a date value
@@ -127,7 +127,7 @@ export const readDate = (values: FormValues, name: string): Date | null => {
   const text = readText(values, name)
   if (!text) return null
 
-  // Wall-clock minutes are stored as UTC
+  // Moments arrive as instants, a stray wall clock reads in the team zone
   const parsed = new Date(wallClock(text))
   return Number.isNaN(parsed.getTime()) ? null : parsed
 }
@@ -234,3 +234,64 @@ export const presetValues = (
 
   return { ...values, ...seed }
 }
+
+/**
+ * Tell whether a field holds a moment of the day
+ * @param {FieldDefinition} field - Field declaration
+ * @return {boolean} - Datetime or timed range
+ */
+
+const isTimed = (field: FieldDefinition): boolean =>
+  field.kind === 'datetime' || (field.kind === 'daterange' && Boolean(field.withTime))
+
+/**
+ * Convert the timed values of a form
+ * @param {FieldDefinition[]} fields - Field declarations
+ * @param {FormValues} values - Form values
+ * @param {(text: string) => string} convert - Conversion of one text
+ * @return {FormValues} - Converted values
+ */
+
+const mapTimed = (
+  fields: FieldDefinition[],
+  values: FormValues,
+  convert: (text: string) => string
+): FormValues => {
+  const next = { ...values }
+
+  for (const field of fields) {
+    const value = next[field.name]
+    if (!isTimed(field)) continue
+
+    if (typeof value === 'string') next[field.name] = convert(value)
+    else if (Array.isArray(value)) next[field.name] = value.map(convert)
+  }
+
+  return next
+}
+
+/**
+ * Turn the wall clocks of a form into moments
+ * @param {FieldDefinition[]} fields - Field declarations
+ * @param {FormValues} values - Form values
+ * @param {string} [zone] - IANA zone the clocks read in
+ * @return {FormValues} - Values holding instants
+ */
+
+export const toInstantValues = (
+  fields: FieldDefinition[],
+  values: FormValues,
+  zone?: string
+): FormValues =>
+  mapTimed(fields, values, (text) =>
+    isWallClock(text) ? wallToInstant(text, zone).toISOString() : text
+  )
+
+/**
+ * Turn the moments of a field text into a wall clock
+ * @param {string} text - Moment or wall clock
+ * @return {string} - Wall clock of the active zone
+ */
+
+export const toWallText = (text: string): string =>
+  isInstantText(text) ? instantToWall(text) : text

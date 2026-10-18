@@ -1,7 +1,13 @@
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import { MemberRoles } from '@/utils/constants/hierarchy'
-import { hasEveryPermission, hasPermission } from '@/utils/constants/permissions'
+import { Permissions, hasEveryPermission, hasPermission } from '@/utils/constants/permissions'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
+
+// Closed to every role below Responsable
+const FLOOR_BLOCKED = new Set<string>([
+  Permissions.CommunicationRead,
+  Permissions.CommunicationWrite,
+])
 
 /**
  * Resolve permission helpers
@@ -10,9 +16,13 @@ import { ROLE_REGISTRY } from '@/declarations/access/roles'
  */
 
 export const resolvePermissions = (session: SessionUser | null): PermissionHelpers => {
-  const permissions = session?.permissions ?? []
   const isRoot = session?.isRoot ?? false
   const rank = session ? ROLE_REGISTRY.get(session.role).rank : 0
+  const isLead = rank >= ROLE_REGISTRY.get(MemberRoles.Responsable).rank
+  // Announcements never reach the floor, whatever a function grants
+  const permissions = (session?.permissions ?? []).filter(
+    (name) => isLead || !FLOOR_BLOCKED.has(name)
+  )
 
   return {
     // The root administrator is never gated
@@ -20,7 +30,7 @@ export const resolvePermissions = (session: SessionUser | null): PermissionHelpe
     canAny: (list) => isRoot || hasPermission(permissions, list),
     canAll: (list) => isRoot || hasEveryPermission(permissions, list),
     isAdmin: isRoot || session?.role === MemberRoles.Admin,
-    isResponsable: rank >= ROLE_REGISTRY.get(MemberRoles.Responsable).rank,
+    isResponsable: isLead,
     isRoot,
   }
 }

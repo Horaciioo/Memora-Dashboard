@@ -26,6 +26,15 @@ export interface LoginState {
   error?: string
 }
 
+// Refused attempt, kept in the journal
+const refuse = async (error: string, actorId?: string): Promise<LoginState> => {
+  await recordEvent({ eventType: 'LoginFailed', origin: 'System', actorId, summary: error }).catch(
+    () => undefined
+  )
+
+  return { error }
+}
+
 /**
  * Sign in with a Discord identifier
  * @param {LoginState} _previousState - Previous form state
@@ -40,15 +49,15 @@ export async function login(_previousState: LoginState, formData: FormData): Pro
   const headerStore = await headers()
 
   const verdict = await consume('signIn', readAddress(headerStore))
-  if (!verdict.allowed) return { error: AUTH_COPY.throttled }
+  if (!verdict.allowed) return refuse(AUTH_COPY.throttled)
 
   const discordId = normaliseDiscordId(formData.get('discordId'))
 
-  if (!isDiscordId(discordId)) return { error: AUTH_COPY.malformedId }
+  if (!isDiscordId(discordId)) return refuse(AUTH_COPY.malformedId)
 
   const account = await resolveSignInAccount(discordId)
-  if (!account) return { error: AUTH_COPY.unknownId }
-  if (isAccessClosed(account)) return { error: AUTH_COPY.revokedAccess }
+  if (!account) return refuse(AUTH_COPY.unknownId)
+  if (isAccessClosed(account)) return refuse(AUTH_COPY.revokedAccess, account.id)
 
   // Session token lands in an httpOnly cookie
   const { token, expiresAt } = await openSession(account.id, {

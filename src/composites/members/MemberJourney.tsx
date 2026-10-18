@@ -1,5 +1,5 @@
 import { Button } from '@/components/elements/actions/Button'
-import { Section } from '@/components/structures/Section'
+import { Section } from '@/components/structures/page/Section'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { STAGE_LIST } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'

@@ -2,9 +2,9 @@
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { SkeletonList } from '@/components/elements/feedback/Skeleton'
-import { useLiveRoster } from '@/core/hooks/data/useLiveRoster'
-import { useActionMenu } from '@/core/hooks/interaction/useActionMenu'
-import { useDragAndDrop } from '@/core/hooks/interaction/useDragAndDrop'
+import { useLiveRoster } from '@/core/hooks/data/lives/useLiveRoster'
+import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
+import { useDragAndDrop } from '@/core/hooks/interaction/gestures/useDragAndDrop'
 import { ATTENDANCE_STATUS_REGISTRY } from '@/declarations/calendar/registries'
 import { LIVE_ROSTER_COPY } from '@/declarations/lives/copy'
 import { ICONS } from '@/declarations/ui/icons'

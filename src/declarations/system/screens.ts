@@ -62,6 +62,5 @@ export const SYSTEM_SCREENS: SystemScreen[] = [
     label: SYSTEM_COPY.analyticsTitle,
     description: SYSTEM_COPY.analyticsLead,
     icon: 'analytics',
-    maturity: 'alpha',
   },
 ]

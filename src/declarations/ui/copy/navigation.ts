@@ -15,7 +15,6 @@ export const NAV_COPY = {
   expandRail: 'Agrandir le menu',
   historyBack: 'Page précédente',
   historyForward: 'Page suivante',
-  reloadPage: 'Actualiser',
   account: 'Mon compte',
   openMenu: 'Ouvrir le menu',
   menuTitle: 'Navigation',

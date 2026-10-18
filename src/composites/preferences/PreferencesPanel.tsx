@@ -5,14 +5,15 @@ import { CopyValue } from '@/components/elements/actions/CopyValue'
 import { Button } from '@/components/elements/actions/Button'
 import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { RoleGlyph } from '@/composites/members/MemberBadges'
-import { DetailGrid } from '@/components/structures/DetailGrid'
-import { FileTabs } from '@/components/structures/FileTabs'
-import { FormRenderer } from '@/components/structures/FormRenderer'
-import { Section } from '@/components/structures/Section'
-import { SealedValue } from '@/components/structures/SealedValue'
+import { DetailGrid } from '@/components/structures/data/DetailGrid'
+import { FileTabs } from '@/components/structures/page/FileTabs'
+import { FormRenderer } from '@/components/structures/data/FormRenderer'
+import { Section } from '@/components/structures/page/Section'
+import { SealedValue } from '@/components/structures/inline/SealedValue'
 import { ProfileCard } from '@/composites/preferences/ProfileCard'
+import { ColorVisionPreferences } from '@/composites/preferences/ColorVisionPreferences'
 import { DisplayPreferences } from '@/composites/preferences/DisplayPreferences'
-import { useProfile } from '@/core/hooks/data/useProfile'
+import { useProfile } from '@/core/hooks/data/people/useProfile'
 import { replayGuides } from '@/app/(dashboard)/parametres/actions'
 import { SENSITIVE_FIELD_REGISTRY, isSensitiveField } from '@/declarations/access/sensitive'
 import type { SensitiveFieldName } from '@/declarations/access/sensitive'
@@ -102,12 +103,14 @@ export const PreferencesPanel = ({ initialProfile, fields }: PreferencesPanelPro
   const displayTab = () => (
     <div className={TABS_STYLES.panel}>
       <div className={PREFERENCE_STYLES.stack}>
-        <DisplayPreferences>
+        <DisplayPreferences />
+        <ColorVisionPreferences />
+        <Section title={PREFERENCES_COPY.guidesSection} padded>
           <div className={GUIDES_CARD.card}>
             <ICONS.bell className={GUIDES_CARD.glyph} aria-hidden="true" />
             <div className={GUIDES_CARD.body}>
               <p className={GUIDES_CARD.title}>
-                {PREFERENCES_COPY.guidesTitle} <MaturityTag maturity="alpha" />
+                {PREFERENCES_COPY.guidesTitle} <MaturityTag maturity="beta" />
               </p>
               <p className={GUIDES_CARD.lead}>{PREFERENCES_COPY.guidesLead}</p>
               <p className={GUIDES_CARD.hint}>{PREFERENCES_COPY.guidesHint}</p>
@@ -118,7 +121,7 @@ export const PreferencesPanel = ({ initialProfile, fields }: PreferencesPanelPro
               </Button>
             </form>
           </div>
-        </DisplayPreferences>
+        </Section>
       </div>
     </div>
   )

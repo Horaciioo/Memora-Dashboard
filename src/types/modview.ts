@@ -94,6 +94,8 @@ export interface HeldMessage {
   text: string
   flagged: string[]
   category: string
+  // Platform key of the category
+  categoryKey?: string
   at: string
 }
 

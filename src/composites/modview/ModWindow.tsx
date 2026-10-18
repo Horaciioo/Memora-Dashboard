@@ -2,13 +2,17 @@
 
 import type { ReactNode } from 'react'
 
+import { WindowControls } from '@/composites/modview/workspace/WindowControls'
+import { useWindowChrome } from '@/composites/modview/workspace/WindowChrome'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_WINDOW } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
 export interface ModWindowProps {
-  title: string
+  title: ReactNode
+  // Spoken name when the title is not text
+  label?: string
   isLit?: boolean
   grow?: boolean
   // Body lays its own scroll out
@@ -20,7 +24,8 @@ export interface ModWindowProps {
 
 /**
  * One window of the Mod View
- * @param {string} title - Heading
+ * @param {ReactNode} title - Heading
+ * @param {string} [label] - Spoken name
  * @param {boolean} [isLit] - Lit by a scene
  * @param {boolean} [grow] - Fills its column
  * @param {boolean} [flush] - Body scrolls itself
@@ -31,29 +36,50 @@ export interface ModWindowProps {
 
 export const ModWindow = ({
   title,
+  label,
   isLit,
   grow,
   flush,
   actions,
   children,
   className,
-}: ModWindowProps) => (
-  <section
-    aria-label={title}
-    className={cn(
-      MODVIEW_WINDOW.root,
-      grow && MODVIEW_WINDOW.grow,
-      isLit && MODVIEW_WINDOW.lit,
-      className
-    )}
-  >
-    <header className={MODVIEW_WINDOW.head}>
-      <h3 className={MODVIEW_WINDOW.title}>{title}</h3>
-      {actions}
-    </header>
-    <div className={flush ? MODVIEW_WINDOW.flush : MODVIEW_WINDOW.body}>{children}</div>
-  </section>
-)
+}: ModWindowProps) => {
+  const chrome = useWindowChrome()
+
+  return (
+    <section
+      aria-label={label ?? (typeof title === 'string' ? title : undefined)}
+      className={cn(
+        MODVIEW_WINDOW.root,
+        grow && MODVIEW_WINDOW.grow,
+        isLit && MODVIEW_WINDOW.lit,
+        chrome && MODVIEW_WINDOW.tiled,
+        className
+      )}
+    >
+      <header
+        className={cn(MODVIEW_WINDOW.head, chrome && MODVIEW_WINDOW.headDraggable)}
+        draggable={chrome ? true : undefined}
+        onDragStart={chrome?.onDragStart}
+        onDragEnd={chrome?.onDragEnd}
+        onDoubleClick={(event) => {
+          // Only the bare heading, never a tab or a button
+          if (event.target === event.currentTarget || event.target instanceof HTMLHeadingElement) {
+            chrome?.commands.maximize()
+          }
+        }}
+      >
+        {chrome && <WindowControls chrome={chrome} title={label ?? ''} part="grip" />}
+        <h3 className={MODVIEW_WINDOW.title}>{title}</h3>
+        {actions}
+        {chrome && <WindowControls chrome={chrome} title={label ?? ''} part="buttons" />}
+      </header>
+      {!chrome?.isFolded && (
+        <div className={flush ? MODVIEW_WINDOW.flush : MODVIEW_WINDOW.body}>{children}</div>
+      )}
+    </section>
+  )
+}
 
 export interface WindowEmptyProps {
   icon: IconName

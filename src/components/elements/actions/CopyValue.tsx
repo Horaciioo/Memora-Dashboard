@@ -1,6 +1,6 @@
 'use client'
 
-import { useCopy } from '@/core/hooks/interaction/useCopy'
+import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { COPY_VALUE } from '@/declarations/ui/variants'

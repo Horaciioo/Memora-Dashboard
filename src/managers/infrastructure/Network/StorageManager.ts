@@ -3,7 +3,7 @@ import 'server-only'
 import crypto from 'crypto'
 
 import { prisma } from '@/core/lib/db'
-import { sniffMimeType } from '@/declarations/system/signatures'
+import { sniffMimeType } from '@/declarations/system/security/signatures'
 import { STORAGE_BUCKETS } from '@/declarations/system/storage'
 import type Sharding from '@/managers/infrastructure/Core/Sharding'
 import type LoggerManager from '@/managers/infrastructure/Core/LoggerManager'

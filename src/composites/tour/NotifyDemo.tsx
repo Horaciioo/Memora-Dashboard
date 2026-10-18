@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { MemoraMark } from '@/components/elements/display/MemoraMark'
+import { MemoraMark } from '@/components/elements/display/marks/MemoraMark'
 import { TOUR_SETTINGS } from '@/declarations/configurations/settings'
 import { NOTIFY_DEMO } from '@/declarations/tour/deck'
 import { TOUR_DECK } from '@/declarations/ui/variants'
@@ -53,6 +53,7 @@ export const NotifyDemo = () => {
           <Button
             variant={member.isAbsent && beat >= 2 ? 'ghost' : 'secondary'}
             disabled={member.isAbsent && isRefused}
+            className={TOUR_DECK.demoButton}
           >
             {NOTIFY_DEMO.notify}
           </Button>

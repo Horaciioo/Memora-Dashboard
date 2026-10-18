@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import Link from '@/components/elements/navigation/AppLink'
-import { AGE_POLICY, DATA_CONTROLLER, PROCESSING_REGISTRY } from '@/declarations/system/privacy'
+import {
+  AGE_POLICY,
+  DATA_CONTROLLER,
+  PROCESSING_REGISTRY,
+} from '@/declarations/system/security/privacy'
 import { ROUTES } from '@/declarations/navigation'
 import { PRIVACY_COPY } from '@/declarations/ui/copy/privacy'
 import { PRIVACY_STYLES, SIGN_IN_STYLES } from '@/declarations/ui/variants'

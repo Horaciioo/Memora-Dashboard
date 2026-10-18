@@ -1,7 +1,7 @@
 'use client'
 
-import { ScrollCard } from '@/components/structures/ScrollCard'
-import { Timeline, type TimelineItem } from '@/components/structures/Timeline'
+import { ScrollCard } from '@/components/structures/data/ScrollCard'
+import { Timeline, type TimelineItem } from '@/components/structures/data/Timeline'
 import { IntegrationLinkStep } from '@/composites/onboarding/IntegrationLinkStep'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { stepState } from '@/core/lib/recruitment/stepState'
