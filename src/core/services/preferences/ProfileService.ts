@@ -67,7 +67,6 @@ export const profileFields = (): FieldDefinition[] => [
     options: LANGUAGE_OPTIONS,
     mark: 'flag',
     maxItems: FORM_SETTINGS.tagMaxCount,
-    maturity: 'alpha',
   },
   {
     name: 'celebrateBirthday',

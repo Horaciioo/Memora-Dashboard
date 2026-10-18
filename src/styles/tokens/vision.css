@@ -64,6 +64,34 @@ html[data-color-vision='deuteranopia'],
   --color-live-400: #e58fba;
 }
 
+/* Backgrounds: the frame ramp parts by lightness, blue to reddish purple */
+html[data-color-vision='protanopia'],
+html[data-color-vision='deuteranopia'],
+[data-vision-preview='protanopia'],
+[data-vision-preview='deuteranopia'] {
+  --color-frame-mauve: #3d4fa8;
+  --color-frame-blue: #0072b2;
+  --color-frame-pink: #d58fb6;
+  --color-frame: #5a6fb8;
+  --page-wash: 26%;
+}
+
+html[data-color-vision='protanopia'] .app-tone[data-tone='junior'],
+html[data-color-vision='deuteranopia'] .app-tone[data-tone='junior'] {
+  --color-frame-pink: #d58fb6;
+  --color-frame-mauve: #b45a8e;
+  --color-frame-blue: #3d4fa8;
+  --color-frame: #b45a8e;
+}
+
+html[data-color-vision='protanopia'] .app-tone[data-tone='lead'],
+html[data-color-vision='deuteranopia'] .app-tone[data-tone='lead'] {
+  --color-frame-pink: #f0c040;
+  --color-frame-mauve: #e69f00;
+  --color-frame-blue: #c98a00;
+  --color-frame: #e69f00;
+}
+
 /* Frame of the Administration levels: orange stays, red turns reddish purple */
 html[data-color-vision='protanopia'] .app-tone[data-tone='admin'],
 html[data-color-vision='deuteranopia'] .app-tone[data-tone='admin'] {
@@ -73,15 +101,31 @@ html[data-color-vision='deuteranopia'] .app-tone[data-tone='admin'] {
   --color-frame: #b45a8e;
 }
 
-/* Blue leaves the info tone */
+/* Blue leaves the info tone and the frame ramp */
 html[data-color-vision='tritanopia'],
 [data-vision-preview='tritanopia'] {
   --color-info: #8e4354;
   --color-info-soft: #faeaec;
+  --color-frame-blue: #1b6f6a;
+  --color-frame-mauve: #8a3fa8;
+  --color-frame-pink: #cf3f5a;
+}
+
+html[data-color-vision='tritanopia'] .app-tone[data-tone='junior'] {
+  --color-frame-blue: #8a3fa8;
 }
 
 :root.dark[data-color-vision='tritanopia'],
 :root.dark [data-vision-preview='tritanopia'] {
   --color-info: #edb8c0;
   --color-info-soft: #38252a;
+}
+
+/* No hue at all: the page reads by lightness, the card previews it too */
+html[data-color-vision='achromatopsia'] {
+  filter: grayscale(1);
+}
+
+[data-vision-preview='achromatopsia'] {
+  filter: grayscale(1);
 }
