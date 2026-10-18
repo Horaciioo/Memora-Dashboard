@@ -141,6 +141,11 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
+        page: ROUTES.preferences,
+        text: 'Ajout de la section « Comptes » dans l’onglet « Sécurité » des « Paramètres » : Discord, Twitch et YouTube y sont réunis, avec « Ajouter une liaison » pour relier un compte et « Délier » pour le retirer',
+      },
+      {
+        tag: ChangelogTags.Added,
         text: 'Ajout du chemin de la page ouverte sous sa destination dans le menu de gauche, pour remonter d’un niveau en un clic',
       },
       {
