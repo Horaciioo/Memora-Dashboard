@@ -4,22 +4,25 @@ import Link from '@/components/elements/navigation/AppLink'
 import { usePathname } from 'next/navigation'
 import { ICONS } from '@/declarations/ui/icons'
 import { APP_SHELL } from '@/declarations/ui/blocks'
-import { RECORD_LABELS, SEGMENT_LABELS } from '@/declarations/navigation'
+import { RECORD_LABELS, SEGMENT_LABELS, groupLabelOfPath } from '@/declarations/navigation'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { useBreadcrumbOverrides } from '@/managers/front-end'
 
+export interface BreadcrumbsProps {
+  // Names the page on screen
+  current: string
+}
+
 /**
  * Path trail built from the current URL
- * @return {JSX.Element | null}
+ * @param {string} current - Label of the last crumb
+ * @return {JSX.Element}
  */
 
-export const Breadcrumbs = () => {
+export const Breadcrumbs = ({ current }: BreadcrumbsProps) => {
   const pathname = usePathname()
   const overrides = useBreadcrumbOverrides()
   const segments = pathname.split('/').filter((segment) => segment.length > 0)
-
-  // A single segment is a classic list page
-  if (segments.length <= 1) return null
 
   // Rebuild each ancestor path so every crumb stays clickable
   const crumbs = segments.map((segment, index) => {
@@ -32,42 +35,34 @@ export const Breadcrumbs = () => {
   })
 
   const Separator = ICONS.next
-  const Back = ICONS.back
-  const parent = crumbs[crumbs.length - 2]
+  const category = groupLabelOfPath(pathname)
 
   return (
-    <>
-      {parent && (
-        <nav aria-label={NAV_COPY.breadcrumbs} className={APP_SHELL.breadcrumbsCompact}>
-          <Link href={parent.href} className={APP_SHELL.crumbLink}>
-            <span className="flex items-center gap-1">
-              <Back className="h-3 w-3" aria-hidden="true" />
-              {parent.label}
-            </span>
-          </Link>
-        </nav>
+    <nav aria-label={NAV_COPY.breadcrumbs} className={APP_SHELL.breadcrumbs}>
+      {category && (
+        <span className={APP_SHELL.crumb}>
+          <span className={APP_SHELL.crumbCategory}>{category}</span>
+          <Separator className={APP_SHELL.crumbSeparator} aria-hidden="true" />
+        </span>
       )}
+      {crumbs.map((crumb, index) => {
+        const isLast = index === crumbs.length - 1
 
-      <nav aria-label={NAV_COPY.breadcrumbs} className={APP_SHELL.breadcrumbs}>
-        {crumbs.map((crumb, index) => {
-          const isLast = index === crumbs.length - 1
-
-          return (
-            <span key={crumb.href} className="flex items-center gap-1">
-              {index > 0 && <Separator className="h-3 w-3 opacity-60" aria-hidden="true" />}
-              {isLast ? (
-                <span className={APP_SHELL.crumbCurrent} aria-current="page">
-                  {crumb.label}
-                </span>
-              ) : (
-                <Link href={crumb.href} className={APP_SHELL.crumbLink}>
-                  {crumb.label}
-                </Link>
-              )}
-            </span>
-          )
-        })}
-      </nav>
-    </>
+        return (
+          <span key={crumb.href} className={APP_SHELL.crumb}>
+            {index > 0 && <Separator className={APP_SHELL.crumbSeparator} aria-hidden="true" />}
+            {isLast ? (
+              <span className={APP_SHELL.crumbCurrent} aria-current="page">
+                {overrides[crumb.href] ?? current}
+              </span>
+            ) : (
+              <Link href={crumb.href} className={APP_SHELL.crumbLink}>
+                {crumb.label}
+              </Link>
+            )}
+          </span>
+        )
+      })}
+    </nav>
   )
 }

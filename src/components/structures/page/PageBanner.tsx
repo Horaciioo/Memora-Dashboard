@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { Breadcrumbs } from '@/components/structures/page/Breadcrumbs'
+import { FavoriteToggle } from '@/components/structures/page/FavoriteToggle'
 import { RouteMaturity } from '@/components/structures/page/RouteMaturity'
 import { BannerHero } from '@/components/structures/page/BannerHero'
 import { BannerArt } from '@/components/structures/page/BannerArt'
@@ -41,7 +43,13 @@ export const PageBanner = ({
     <>
       <div className={PAGE_STYLES.banner}>
         <BannerArt image={image} />
-        <div id={PAGE_OPTIONS_HOST_ID} className={PAGE_STYLES.bannerOptions} />
+        <div className={PAGE_STYLES.bannerBar}>
+          <Breadcrumbs current={title} />
+          <div className={PAGE_STYLES.bannerOptions}>
+            <div id={PAGE_OPTIONS_HOST_ID} className="contents" />
+            <FavoriteToggle title={title} />
+          </div>
+        </div>
         <div className={PAGE_STYLES.bannerFoot}>
           <div className={PAGE_STYLES.bannerTitleRow}>
             <Title className={PAGE_STYLES.bannerTitle} title={title}>

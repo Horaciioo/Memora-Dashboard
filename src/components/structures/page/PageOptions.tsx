@@ -4,8 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
-import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
-import { Toggle } from '@/components/elements/forms/inputs/Toggle'
+import { PageOptionsList } from '@/components/structures/page/PageOptionsList'
 import { useBannerHost } from '@/core/hooks/interaction/layout/useBannerHost'
 import { PAGE_OPTIONS_HOST_ID } from '@/declarations/ui/banners'
 import { PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
@@ -35,8 +34,14 @@ export interface PageContent {
   render: () => ReactNode
 }
 
-// A yes/no switch, one pick among a few, or a whole block
-export type PageOption = PageToggle | PageChoice | PageContent
+export interface PageAction {
+  id: string
+  label: string
+  onSelect: () => void
+}
+
+// A yes/no switch, one pick among a few, a whole block, or a single gesture
+export type PageOption = PageToggle | PageChoice | PageContent | PageAction
 
 export interface PageOptionsProps {
   options: PageOption[]
@@ -94,39 +99,7 @@ export const PageOptions = ({ options }: PageOptionsProps) => {
       {isOpen && (
         <div role="group" aria-label={PAGE_OPTIONS_COPY.title} className={PAGE_OPTIONS.panel}>
           <p className={PAGE_OPTIONS.title}>{PAGE_OPTIONS_COPY.title}</p>
-          {options.map((option) =>
-            'render' in option ? (
-              <div key={option.id} className={PAGE_OPTIONS.content}>
-                <span className={PAGE_OPTIONS.contentTitle}>{option.label}</span>
-                {option.render()}
-              </div>
-            ) : (
-              <div
-                key={option.id}
-                className={cn(
-                  PAGE_OPTIONS.row,
-                  'choices' in option && option.choices.length > 2 && PAGE_OPTIONS.rowStacked
-                )}
-              >
-                <span>{option.label}</span>
-                {'choices' in option ? (
-                  <SegmentedControl
-                    options={option.choices}
-                    value={option.value}
-                    onChange={option.onChange}
-                    label={option.label}
-                  />
-                ) : (
-                  <Toggle
-                    bare
-                    label={option.label}
-                    checked={option.checked}
-                    onChange={option.onChange}
-                  />
-                )}
-              </div>
-            )
-          )}
+          <PageOptionsList options={options} onDone={() => setOpen(false)} />
         </div>
       )}
     </div>,
