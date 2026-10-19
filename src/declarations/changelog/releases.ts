@@ -127,6 +127,111 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.5.1',
+    date: '2026-10-19',
+    title: 'Des lives plus fluides',
+    intro:
+      'La Mod View tient mieux les gros lives, les horaires et les renforts s’organisent, et les chaînes des créateurs se saisissent plus simplement.',
+    description:
+      'Jusqu’ici, un live très actif pouvait faire ramer la Mod View, les horaires de présence n’étaient pas demandés et déclarer une chaîne obligeait à connaître le bon format de lien. Cette version fluidifie le chat en pleine affluence, ajoute les horaires, les renforts et les commentaires aux lives, et simplifie la saisie des chaînes.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        text: 'Ajout de la possibilité d’indiquer ses horaires de présence en répondant à l’appel d’un live, puis de les modifier ou de passer en « Je modère dès à présent » jusqu’à une heure choisie',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.LiveAnnounce,
+        text: 'Ajout de la possibilité d’appeler des modérateurs en renfort sur un live, qui reçoivent une alerte pour le rejoindre',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.LiveAnnounce,
+        text: 'Ajout de la possibilité de changer les Coordinateurs d’un live après son annonce',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de la section « Lives passés » dans « Live en cours », avec « Rétablir le live » quand il a été clos avant la fin prévue',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de la possibilité de laisser un commentaire sur un viewer depuis sa fiche dans la Mod View',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.LiveTerms,
+        text: 'Ajout des « Termes bloqués » dans les modes du chat de la Mod View : un volet s’ouvre sur le côté pour ajouter ou retirer un terme',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout d’une confirmation « Tu t’arrêtes là ? » quand un modérateur quitte la Mod View, pour que son temps de modération reste exact',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la « Mod View » : le chat reste fluide quand un live s’emballe, et se met en pause le temps de lire un message',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration des modes du chat : le « Mode bouclier » reste aux Administrateurs, le « Chat réservé aux abonnés » s’ouvre aux Responsables et le « Mode lent » aux Modérateurs, les Juniors voyant ces commandes grisées',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.LiveLogRead,
+        text: 'Amélioration visuelle du « Bilan » d’un live',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.home,
+        text: 'Amélioration de la file de l’« Accueil » : l’appel d’un live et la demande de Coordinateur s’y répondent directement',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.teams,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.ReferenceManage,
+        text: 'Amélioration de l’ajout d’une chaîne à un YouTubeur : le logo de la plateforme s’affiche à gauche et seul l’identifiant se saisit, le début du lien étant écrit d’avance',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des champs de date et d’heure des formulaires : les jours impossibles à choisir sont grisés',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle de tout Memora : les détails séparés par un point médian le sont désormais par des virgules',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui affichait une heure de plus que celle choisie dans les champs de date et d’heure des formulaires',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.LiveAnnounce,
+        text: 'Correction d’un bug qui mélangeait les options d’un évènement classique, comme « Visibilité » et « Membres concernés », avec celles du modèle « Live » à l’annonce d’un live, et qui le proposait à toute l’équipe',
+      },
+    ],
+  },
+  {
     version: '0.5.0',
     date: '2026-10-18',
     title: 'Encore et toujours des améliorations',
