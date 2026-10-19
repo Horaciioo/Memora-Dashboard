@@ -849,3 +849,15 @@ export const SPLASH = {
   label:
     'splash-label text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
 } as const
+
+/**
+ * Simulated view pill
+ * @type {Record<string, string>}
+ */
+
+export const SIMULATION_BLOCK = {
+  pill: 'pointer-events-auto fixed bottom-4 left-1/2 z-50 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-3 rounded-full border border-[var(--view)]/40 bg-[var(--color-surface)] py-1.5 pr-1.5 pl-4 text-xs shadow-lg',
+  text: 'min-w-0 truncate text-[var(--color-ink)]',
+  leave:
+    'shrink-0 rounded-full bg-[var(--view)]/15 px-3 py-1 font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--view)]/25 disabled:opacity-50',
+}

@@ -131,6 +131,10 @@ export const VIEW_COPY = {
   // Toast once a view is in force, its last word in bold
   switchedEmphasis: 'mise',
   switched: (name: string) => `La vue "${name}" a bien été mise.`,
+  // Simulated view, read-only
+  simulatedBanner: (name: string) => `Tu vois Memora en tant que ${name}, en lecture seule.`,
+  simulatedLeave: 'Revenir à ma vue',
+  simulatedBlocked: 'Tu es en vue simulée, repasse sur ta vue pour modifier.',
   noCreator: 'Aucun',
   activeCreator: 'YouTubeur en cours',
   adminTitle: 'Console admin',

@@ -25,6 +25,13 @@ interface NavigationViewOption {
 }
 
 const NAVIGATION_VIEW_MAP: Record<NavigationViewName, NavigationViewOption> = {
+  [NavigationViews.Junior]: {
+    label: 'Vue Junior',
+    summary: 'Le parcours d’un Junior, de la PIM à sa première modération.',
+    icon: 'academy',
+    tone: 'caution',
+    scoped: false,
+  },
   [NavigationViews.Moderation]: {
     label: 'Vue Modérateur',
     summary: 'Le quotidien de la modération, livecon et sanctions compris.',
@@ -56,17 +63,19 @@ export const NAVIGATION_VIEW_REGISTRY = createRegistry(NAVIGATION_VIEW_MAP)
  */
 
 export const VIEW_ROLES: Record<NavigationViewName, MemberRoleName> = {
+  [NavigationViews.Junior]: MemberRoles.Junior,
   [NavigationViews.Moderation]: MemberRoles.Moderateur,
   [NavigationViews.Lead]: MemberRoles.Responsable,
   [NavigationViews.Administration]: MemberRoles.Admin,
 }
 
 /**
- * Colour each view takes on the switch: blue, orange, red
+ * Colour each view takes on the switch: mauve, blue, orange, red
  * @type {Record<NavigationViewName, string>}
  */
 
 export const VIEW_TINTS: Record<NavigationViewName, string> = {
+  [NavigationViews.Junior]: 'var(--switch-mauve)',
   [NavigationViews.Moderation]: 'var(--switch-blue)',
   [NavigationViews.Lead]: 'var(--switch-orange)',
   [NavigationViews.Administration]: 'var(--switch-red)',
@@ -80,19 +89,21 @@ export const VIEW_TINTS: Record<NavigationViewName, string> = {
 export type ShellTone = 'junior' | 'moderator' | 'lead' | 'admin'
 
 /**
- * Frame tone of a view: a Junior the deep orchid, a Moderator the pink, the lead
- * view orange and the admin view red
+ * Frame tone of each view: the Junior deep orchid, the Moderator pink, lead orange, admin red
+ * @type {Record<NavigationViewName, ShellTone>}
+ */
+
+const FRAME_TONES: Record<NavigationViewName, ShellTone> = {
+  [NavigationViews.Junior]: 'junior',
+  [NavigationViews.Moderation]: 'moderator',
+  [NavigationViews.Lead]: 'lead',
+  [NavigationViews.Administration]: 'admin',
+}
+
+/**
+ * Frame tone of a view
  * @param {NavigationViewName} view - View in force
- * @param {MemberRoleName | undefined} role - Level of the signed-in member
  * @return {ShellTone} - Tone the frame takes
  */
 
-export const frameToneOf = (
-  view: NavigationViewName,
-  role: MemberRoleName | undefined
-): ShellTone => {
-  if (view === NavigationViews.Administration) return 'admin'
-  if (view === NavigationViews.Lead) return 'lead'
-
-  return role === MemberRoles.Junior ? 'junior' : 'moderator'
-}
+export const frameToneOf = (view: NavigationViewName): ShellTone => FRAME_TONES[view]

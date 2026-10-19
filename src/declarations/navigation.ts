@@ -70,8 +70,9 @@ export const ROUTES = {
   analytics: '/systeme/activite',
 } as const
 
-// The three faces of the rail
+// The four faces of the rail
 export const NavigationViews = {
+  Junior: 'JUNIOR',
   Moderation: 'MODERATION',
   Lead: 'LEAD',
   Administration: 'ADMINISTRATION',
@@ -90,6 +91,7 @@ export type NavigationViewName = (typeof NavigationViews)[keyof typeof Navigatio
  */
 
 export const NAVIGATION_VIEW_ORDER: NavigationViewName[] = [
+  NavigationViews.Junior,
   NavigationViews.Moderation,
   NavigationViews.Lead,
   NavigationViews.Administration,
@@ -240,7 +242,7 @@ export const itemInView = (
 export const NAVIGATION: NavigationGroup[] = [
   {
     label: 'Personnel',
-    from: NavigationViews.Moderation,
+    from: NavigationViews.Junior,
     items: [
       {
         href: ROUTES.dashboard,
@@ -271,7 +273,7 @@ export const NAVIGATION: NavigationGroup[] = [
   },
   {
     label: 'Pilotage',
-    from: NavigationViews.Moderation,
+    from: NavigationViews.Junior,
     items: [
       {
         href: ROUTES.members,
@@ -336,7 +338,7 @@ export const NAVIGATION: NavigationGroup[] = [
   },
   {
     label: 'Twitch',
-    from: NavigationViews.Moderation,
+    from: NavigationViews.Junior,
     items: [
       {
         href: ROUTES.lives,
@@ -356,7 +358,7 @@ export const NAVIGATION: NavigationGroup[] = [
   },
   {
     label: 'Discord',
-    from: NavigationViews.Moderation,
+    from: NavigationViews.Junior,
     items: [
       {
         href: ROUTES.discordSanctions,

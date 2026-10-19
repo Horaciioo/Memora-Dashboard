@@ -3,6 +3,7 @@ import 'server-only'
 import type { NextRequest } from 'next/server'
 
 import { getSession } from '@/core/lib/auth/getSession'
+import { isSimulated } from '@/core/lib/auth/simulation'
 import {
   forbidden,
   invalidInput,
@@ -21,6 +22,8 @@ import { reportFailure, reportRefusal } from '@/core/services/system/FailureRepo
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import { readScope } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
+import { VIEW_COPY } from '@/declarations/access/copy'
+import { SIMULATION_OPEN_PATHS, SIMULATION_SAFE_METHODS } from '@/declarations/access/simulation'
 import { DEFAULT_METHOD_POLICIES } from '@/declarations/system/security/rateLimits'
 import type { RateLimitName } from '@/declarations/system/security/rateLimits'
 import { MEDIA_HEADERS, MEDIA_VISIBILITIES } from '@/declarations/system/storage'
@@ -260,6 +263,22 @@ const assertPermission = (
 }
 
 /**
+ * Refuse a write in a simulated view
+ * @param {NextRequest} request - Incoming request
+ * @param {SessionUser} session - Signed-in member
+ * @return {void}
+ */
+
+const assertWritable = (request: NextRequest, session: SessionUser): void => {
+  if (!isSimulated(session) || SIMULATION_SAFE_METHODS.includes(request.method)) return
+
+  const { pathname } = request.nextUrl
+  if (SIMULATION_OPEN_PATHS.some((path) => pathname.startsWith(path))) return
+
+  throw forbidden(VIEW_COPY.simulatedBlocked)
+}
+
+/**
  * Resolve the session behind a guarded route
  * @param {NextRequest} request - Incoming request
  * @param {RouteOptions} options - Route options
@@ -276,6 +295,9 @@ const authenticate = async (
   if (!session) throw notAuthenticated()
 
   await guard(request, options.rateLimit, session.id)
+
+  // Simulated view reads only
+  assertWritable(request, session)
 
   // Permission gate
   const access = resolvePermissions(session)

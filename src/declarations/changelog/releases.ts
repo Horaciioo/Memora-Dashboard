@@ -127,7 +127,7 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: '0.5.1',
+    version: '0.5.2',
     date: '2026-10-19',
     title: 'Des lives plus fluides',
     intro:
@@ -178,6 +178,21 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.lives,
         permission: Permissions.LiveRead,
         text: 'Ajout d’une confirmation « Tu t’arrêtes là ? » quand un modérateur quitte la Mod View, pour que son temps de modération reste exact',
+      },
+      {
+        tag: ChangelogTags.Added,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la « Vue simulée » : en vue Junior, Modérateur ou Responsable, Memora affiche les pages et les accès de ce rôle, avec les fonctions du compte, en lecture seule',
+      },
+      {
+        tag: ChangelogTags.Added,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la « Vue Junior » dans le sélecteur de vue, pour voir le parcours d’un Junior',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Amélioration du sélecteur de vue : Memora s’ouvre désormais sur la vue du rôle de chacun',
       },
       {
         tag: ChangelogTags.Improved,
