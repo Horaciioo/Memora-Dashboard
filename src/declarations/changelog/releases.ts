@@ -248,6 +248,18 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         permission: Permissions.LiveAnnounce,
         text: 'Correction d’un bug qui mélangeait les options d’un évènement classique, comme « Visibilité » et « Membres concernés », avec celles du modèle « Live » à l’annonce d’un live, et qui le proposait à toute l’équipe',
       },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui permettait d’ouvrir la « Mod View » d’un live sans être modérateur de la chaîne du créateur',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui déformait la « Mod View » quand un message du chat très long arrivait au début d’un live',
+      },
     ],
   },
   {
