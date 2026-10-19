@@ -2,7 +2,12 @@
 
 import { refresh } from 'next/cache'
 
-import { writeActiveCreator, writeNavigationView } from '@/core/lib/auth/activeCreator'
+import {
+  readActiveCreator,
+  writeActiveCreator,
+  writeNavigationView,
+} from '@/core/lib/auth/activeCreator'
+import { simulatedRoleOf } from '@/core/lib/auth/simulation'
 import { forbidden } from '@/core/lib/errors'
 import { pickableCreators, reachableViews } from '@/core/services/auth/ViewService'
 import { requireUser } from '@/core/wrappers/requireUser'
@@ -21,6 +26,13 @@ export async function switchView(view: string): Promise<void> {
   if (!isNavigationView(view) || !reachableViews(session).includes(view)) throw forbidden()
 
   await writeNavigationView(view)
+
+  // A lower view needs a creator to look through
+  if (simulatedRoleOf(view, session.actual) && !(await readActiveCreator())) {
+    const [first] = await pickableCreators(session)
+    if (first) await writeActiveCreator(first.id)
+  }
+
   refresh()
 }
 
@@ -31,10 +43,10 @@ export async function switchView(view: string): Promise<void> {
  */
 
 export async function pickCreator(youtuberId: string | null): Promise<void> {
-  const { session, access } = await requireUser()
+  const { session } = await requireUser()
 
   if (youtuberId !== null) {
-    const creators = await pickableCreators(session, access)
+    const creators = await pickableCreators(session)
 
     // A creator outside the perimeter never becomes the one on screen
     if (!creators.some((creator) => creator.id === youtuberId)) throw forbidden()

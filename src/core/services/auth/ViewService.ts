@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { readActiveCreator, readNavigationView } from '@/core/lib/auth/activeCreator'
+import { isActualAdmin } from '@/core/lib/auth/simulation'
 import { readLedCreators } from '@/core/services/auth/LeadService'
 import { ROLE_REGISTRY, isEncadrement } from '@/declarations/access/roles'
 import { NAVIGATION_VIEW_ORDER, NavigationViews, viewDepth } from '@/declarations/navigation'
@@ -36,7 +37,7 @@ const ceilingFor = (role: MemberRoleName, isRoot: boolean): NavigationViewName =
 
   return reachable.reduce(
     (widest, view) => (viewDepth(view) > viewDepth(widest) ? view : widest),
-    NavigationViews.Moderation
+    NAVIGATION_VIEW_ORDER[0]
   )
 }
 
@@ -47,7 +48,7 @@ const ceilingFor = (role: MemberRoleName, isRoot: boolean): NavigationViewName =
  */
 
 export const reachableViews = (viewer: SessionUser): NavigationViewName[] => {
-  const ceiling = ceilingFor(viewer.role, viewer.isRoot)
+  const ceiling = ceilingFor(viewer.actual.role, viewer.actual.isRoot)
 
   return NAVIGATION_VIEW_ORDER.filter((view) => viewDepth(view) <= viewDepth(ceiling))
 }
@@ -55,18 +56,14 @@ export const reachableViews = (viewer: SessionUser): NavigationViewName[] => {
 /**
  * Pickable creators
  * @param {SessionUser} viewer - Signed-in member
- * @param {PermissionHelpers} access - Permission helpers
  * @return {Promise<CreatorLead[]>} - Pickable creators
  */
 
-export const pickableCreators = async (
-  viewer: SessionUser,
-  access: PermissionHelpers
-): Promise<CreatorLead[]> => {
+export const pickableCreators = async (viewer: SessionUser): Promise<CreatorLead[]> => {
   const select = { id: true, name: true, handle: true, accent: true, avatarUrl: true }
 
   // An administrator picks from every creator
-  if (access.isAdmin) {
+  if (isActualAdmin(viewer.actual)) {
     const rows = await prisma.youtuber.findMany({
       where: { archived: false },
       orderBy: { position: 'asc' },
@@ -81,13 +78,26 @@ export const pickableCreators = async (
 
   // Assigned creators sit in the perimeter too
   const assigned = await prisma.youtuber.findMany({
-    where: { archived: false, id: { in: viewer.youtuberIds.filter((id) => !ledIds.has(id)) } },
+    where: {
+      archived: false,
+      id: { in: viewer.actual.youtuberIds.filter((id) => !ledIds.has(id)) },
+    },
     orderBy: { position: 'asc' },
     select,
   })
 
   return [...led, ...assigned.map((row) => ({ ...row, teamId: null, teamName: null }))]
 }
+
+/**
+ * Creator picker shows
+ * @param {NavigationViewName} view - View on screen
+ * @param {NavigationViewName} own - View of the real level
+ * @return {boolean} - Picker belongs on the rail
+ */
+
+const picksCreator = (view: NavigationViewName, own: NavigationViewName): boolean =>
+  view !== own || viewDepth(view) >= viewDepth(NavigationViews.Lead)
 
 /**
  * Resolve the view
@@ -102,9 +112,10 @@ export const readViewContext = async (
 ): Promise<ViewContext> => {
   const available = reachableViews(viewer)
   const stored = await readNavigationView()
+  const own = ceilingFor(viewer.actual.role, viewer.actual.isRoot)
 
-  // A view a member no longer reaches falls back to the base one
-  const view = available.includes(stored) ? stored : NavigationViews.Moderation
+  // A view a member no longer reaches falls back to their own
+  const view = stored && available.includes(stored) ? stored : own
 
   // Lives light the Livecon entry
   const readLive = async () =>
@@ -113,7 +124,7 @@ export const readViewContext = async (
       : null
 
   const [creators, activeYoutuberId, live, overdue, mentions] = await Promise.all([
-    view === NavigationViews.Moderation ? Promise.resolve([]) : pickableCreators(viewer, access),
+    picksCreator(view, own) ? pickableCreators(viewer) : Promise.resolve([]),
     readActiveCreator(),
     readLive(),
     readOverdueFlags(viewer.id, access),
@@ -126,7 +137,7 @@ export const readViewContext = async (
     view,
     available,
     // Lightning is a responsable-and-above affordance
-    switchable: available.length > 1 && (viewer.isRoot || isEncadrement(viewer.role)),
+    switchable: available.length > 1 && (viewer.actual.isRoot || isEncadrement(viewer.actual.role)),
     creators,
     activeYoutuberId: known ? activeYoutuberId : null,
     live,

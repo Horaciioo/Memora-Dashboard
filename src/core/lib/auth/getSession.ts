@@ -4,10 +4,12 @@ import { cache } from 'react'
 import { cookies } from 'next/headers'
 
 import { prisma } from '@/core/lib/db'
-import { readActiveCreator } from '@/core/lib/auth/activeCreator'
+import { readActiveCreator, readNavigationView } from '@/core/lib/auth/activeCreator'
 import { logger } from '@/core/lib/logger'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
+import { simulatedRoleOf } from '@/core/lib/auth/simulation'
 import { resolveAccountPermissions } from '@/core/services/auth/GrantsService'
+import { simulatedCreatorIds } from '@/core/services/auth/SimulationService'
 import { touchSession } from '@/core/services/auth/SessionService'
 import { syncReferenceLibrary } from '@/core/services/reference/ReferenceSync'
 import { toFavorites } from '@/core/services/preferences/FavoriteService'
@@ -15,6 +17,7 @@ import { toDisplayPreferences } from '@/core/services/preferences/DisplayService
 import { isRootIdentity } from '@/declarations/access/identity'
 import { isAccessClosed } from '@/core/lib/auth/closed'
 import type { SessionUser } from '@/types/auth'
+import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { Account, AccountFunction, Youtuber } from '@prisma/client'
 
 // Account row a session is built from
@@ -31,27 +34,36 @@ const STAMP_INTERVAL_MS = 86_400_000
 
 export const toSessionUser = async (account: SessionAccount): Promise<SessionUser> => {
   const isRoot = isRootIdentity(account.discordId)
+  const youtuberIds = account.youtubers.map((youtuber) => youtuber.id)
+  const actual = { role: account.role, isRoot, youtuberIds }
 
   // Overwrites narrowed to a creator only land while that creator is the one being worked on
-  const activeYoutuberId = await readActiveCreator()
+  const [activeYoutuberId, view] = await Promise.all([readActiveCreator(), readNavigationView()])
+
+  // A lower view wears a plain role
+  const wearing = simulatedRoleOf(view, actual)
+  const held = wearing ? { ...account, role: wearing, functions: [] } : account
 
   return {
     id: account.id,
     discordId: account.discordId,
     displayName: account.displayName,
     avatarUrl: account.avatarUrl,
-    role: account.role,
-    status: account.status,
+    role: held.role,
+    status: wearing === MemberRoles.Junior ? MemberStatuses.Academy : account.status,
     divisionId: account.divisionId,
-    youtuberIds: account.youtubers.map((youtuber) => youtuber.id),
-    functionIds: account.functions.map((held) => held.functionId),
-    isRoot,
+    youtuberIds: wearing
+      ? await simulatedCreatorIds(account.id, actual, activeYoutuberId)
+      : youtuberIds,
+    functionIds: held.functions.map((entry) => entry.functionId),
+    isRoot: isRoot && !wearing,
+    actual,
     display: toDisplayPreferences(account),
     timezone: account.timezone,
     historyConsentVersion: account.historyConsentVersion,
     seenReleaseVersion: account.seenReleaseVersion,
     favorites: toFavorites(account.favorites),
-    permissions: await resolveAccountPermissions(account, activeYoutuberId),
+    permissions: await resolveAccountPermissions(held, activeYoutuberId, !wearing),
   }
 }
 

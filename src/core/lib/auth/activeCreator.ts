@@ -4,7 +4,7 @@ import { cache } from 'react'
 import { cookies } from 'next/headers'
 
 import { AUTH_SETTINGS } from '@/declarations/configurations/settings'
-import { NavigationViews, isNavigationView } from '@/declarations/navigation'
+import { isNavigationView } from '@/declarations/navigation'
 import type { NavigationViewName } from '@/declarations/navigation'
 import { cookieName } from '@/utils/constants/cookies'
 
@@ -65,14 +65,14 @@ export const writeActiveCreator = async (youtuberId: string | null): Promise<voi
 
 /**
  * Read the view
- * @return {Promise<NavigationViewName>} - Rail view
+ * @return {Promise<NavigationViewName | null>} - Null when none was picked
  */
 
-export const readNavigationView = cache(async (): Promise<NavigationViewName> => {
+export const readNavigationView = cache(async (): Promise<NavigationViewName | null> => {
   const store = await cookies()
   const stored = store.get(NAVIGATION_VIEW_COOKIE)?.value
 
-  return isNavigationView(stored) ? stored : NavigationViews.Moderation
+  return isNavigationView(stored) ? stored : null
 })
 
 /**

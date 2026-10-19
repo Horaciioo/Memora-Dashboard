@@ -6,6 +6,13 @@ import type { PermissionName } from '@/utils/constants/permissions'
 // Permission identifier
 export type Permission = PermissionName
 
+// Real level and creators behind a view
+export interface ActualIdentity {
+  role: MemberRoleName
+  isRoot: boolean
+  youtuberIds: string[]
+}
+
 /**
  * Signed-in member exposed to the client
  * @typedef {Object} SessionUser
@@ -19,6 +26,7 @@ export type Permission = PermissionName
  * @property {string[]} youtuberIds - Assigned YouTubers
  * @property {string[]} functionIds - Functions held
  * @property {boolean} isRoot - Root administrator
+ * @property {ActualIdentity} actual - Real identity behind a view
  * @property {DisplayPreferences} display - Display preferences
  * @property {number | null} historyConsentVersion - Consent version agreed to
  * @property {string | null} seenReleaseVersion - Last note read
@@ -38,6 +46,7 @@ export interface SessionUser {
   youtuberIds: string[]
   functionIds: string[]
   isRoot: boolean
+  actual: ActualIdentity
   historyConsentVersion: number | null
   seenReleaseVersion: string | null
   favorites: FavoritePage[]

@@ -144,12 +144,14 @@ const readFloor = async (): Promise<PermissionName[]> => {
  * Resolve every permission an account holds on one creator
  * @param {HolderAccount} account - Account row with the functions it holds
  * @param {string | null} youtuberId - Creator the perimeter is narrowed to
+ * @param {boolean} ownOverwrites - Member's own rows count
  * @return {Promise<PermissionName[]>} - Granted permissions
  */
 
 export const resolveAccountPermissions = async (
   account: HolderAccount,
-  youtuberId: string | null = null
+  youtuberId: string | null = null,
+  ownOverwrites = true
 ): Promise<PermissionName[]> => {
   const functionIds = account.functions.map((held) => held.functionId)
 
@@ -163,7 +165,9 @@ export const resolveAccountPermissions = async (
           where: { functionId: { in: functionIds }, ...layers },
         })
       : Promise.resolve([]),
-    prisma.accountPermission.findMany({ where: { accountId: account.id, ...layers } }),
+    ownOverwrites
+      ? prisma.accountPermission.findMany({ where: { accountId: account.id, ...layers } })
+      : Promise.resolve([]),
   ])
 
   const globalOf = <T extends { youtuberId: string | null }>(rows: T[]): T[] =>

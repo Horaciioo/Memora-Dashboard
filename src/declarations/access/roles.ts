@@ -59,6 +59,7 @@ const ROLE_MAP: Record<MemberRoleName, RoleOption> = {
     rank: 1,
     accent: 'info',
     icon: 'shieldOutline',
+    view: NavigationViews.Moderation,
   },
   [MemberRoles.Junior]: {
     label: 'Junior',
@@ -67,6 +68,7 @@ const ROLE_MAP: Record<MemberRoleName, RoleOption> = {
     rank: 0,
     accent: 'caution',
     icon: 'academy',
+    view: NavigationViews.Junior,
   },
 }
 
