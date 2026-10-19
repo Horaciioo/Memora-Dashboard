@@ -6,13 +6,22 @@ import type { ModViewWindow } from '@/types/modview'
  * @property {ModViewWindow} id - Window
  * @property {number} weight - Share of the column height
  * @property {boolean} isFolded - Reduced to its heading
+ * @property {boolean} [isBeside] - Shares the row of the window above
  */
 
 export interface LayoutWindow {
   id: ModViewWindow
   weight: number
   isFolded: boolean
+  isBeside?: boolean
 }
+
+/**
+ * Starting column: a window, or windows side by side
+ * @typedef {(ModViewWindow | ModViewWindow[])[]} ColumnSpec
+ */
+
+export type ColumnSpec = (ModViewWindow | ModViewWindow[])[]
 
 /**
  * One column of the workspace
@@ -55,14 +64,14 @@ export const SCALE_STEP = 1.25
 
 /**
  * Starting layout of a seat
- * @param {ModViewWindow[][]} columns - Windows per column
+ * @param {ColumnSpec[]} columns - Windows per column
  * @param {number[]} widths - Column widths
  * @param {Partial<Record<ModViewWindow, number>>} [sizes] - Height share of some windows
  * @return {ModLayout} - Layout
  */
 
 export const buildLayout = (
-  columns: ModViewWindow[][],
+  columns: ColumnSpec[],
   widths: number[],
   sizes: Partial<Record<ModViewWindow, number>> = {}
 ): ModLayout => ({
@@ -70,9 +79,71 @@ export const buildLayout = (
   columns: columns.map((windows, index) => ({
     id: `column-${index}`,
     weight: widths[index] ?? 1,
-    windows: windows.map((id) => ({ id, weight: sizes[id] ?? 1, isFolded: false })),
+    windows: windows.flatMap((entry) =>
+      [entry].flat().map((id, position) => ({
+        id,
+        weight: sizes[id] ?? 1,
+        isFolded: false,
+        isBeside: position > 0,
+      }))
+    ),
   })),
 })
+
+/**
+ * Windows sharing one row, side by side
+ * @param {LayoutWindow[]} windows - Column windows
+ * @return {LayoutWindow[][]} - Rows, top to bottom
+ */
+
+export const rowsOf = (windows: LayoutWindow[]): LayoutWindow[][] =>
+  windows.reduce<LayoutWindow[][]>((rows, entry) => {
+    if (entry.isBeside && rows.length > 0) rows.at(-1)!.push(entry)
+    else rows.push([entry])
+
+    return rows
+  }, [])
+
+/**
+ * Keep the allowed windows of a starting layout
+ * @param {ColumnSpec[]} columns - Starting columns
+ * @param {ModViewWindow[]} allowed - Windows kept
+ * @return {ColumnSpec[]} - Columns
+ */
+
+export const allowSpec = (columns: ColumnSpec[], allowed: ModViewWindow[]): ColumnSpec[] =>
+  columns.map((column) =>
+    column.flatMap((entry): ColumnSpec => {
+      const kept = [entry].flat().filter((id) => allowed.includes(id))
+      if (kept.length === 0) return []
+
+      return [kept.length === 1 ? kept[0]! : kept]
+    })
+  )
+
+/**
+ * Keep some windows, the next of a lost row head takes its place
+ * @param {LayoutWindow[]} windows - Column windows
+ * @param {(id: ModViewWindow) => boolean} keep - Windows kept
+ * @return {LayoutWindow[]} - Windows kept
+ */
+
+export const keepWindows = (
+  windows: LayoutWindow[],
+  keep: (id: ModViewWindow) => boolean
+): LayoutWindow[] => {
+  let isRowAlive = false
+
+  return windows.flatMap((entry) => {
+    if (!entry.isBeside) isRowAlive = false
+    if (!keep(entry.id)) return []
+
+    const startsRow = !isRowAlive
+    isRowAlive = true
+
+    return [{ ...entry, isBeside: !startsRow }]
+  })
+}
 
 /**
  * Drop empty columns
@@ -109,7 +180,7 @@ export const reconcileLayout = (saved: ModLayout | null, fallback: ModLayout): M
     maximized: saved.maximized && allowed.has(saved.maximized) ? saved.maximized : null,
     columns: saved.columns.map((column) => ({
       ...column,
-      windows: column.windows.filter((entry) => allowed.has(entry.id)),
+      windows: keepWindows(column.windows, (id) => allowed.has(id)),
     })),
   })
 
@@ -136,7 +207,7 @@ export const shownColumns = (
   isShown: (id: ModViewWindow) => boolean
 ): LayoutColumn[] =>
   layout.columns
-    .map((column) => ({ ...column, windows: column.windows.filter((entry) => isShown(entry.id)) }))
+    .map((column) => ({ ...column, windows: keepWindows(column.windows, isShown) }))
     .filter((column) => column.windows.length > 0)
 
 /**
@@ -147,17 +218,13 @@ export const shownColumns = (
  */
 
 const take = (layout: ModLayout, id: ModViewWindow) => {
-  let taken: LayoutWindow | null = null
+  const taken = layout.columns.flatMap((column) => column.windows).find((entry) => entry.id === id)
   const columns = layout.columns.map((column) => ({
     ...column,
-    windows: column.windows.filter((entry) => {
-      if (entry.id === id) taken = entry
-
-      return entry.id !== id
-    }),
+    windows: keepWindows(column.windows, (kept) => kept !== id),
   }))
 
-  return { layout: { ...layout, columns }, taken }
+  return { layout: { ...layout, columns }, taken: taken ? { ...taken, isBeside: false } : null }
 }
 
 /**

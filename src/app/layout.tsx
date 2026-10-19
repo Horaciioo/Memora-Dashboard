@@ -12,7 +12,7 @@ import { DRAWER_DIMENSIONS, SHELL_DIMENSIONS } from '@/declarations/ui/responsiv
 import { setActiveZone } from '@/utils/format/zone'
 
 export const metadata: Metadata = {
-  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
+  title: { default: APP_NAME, template: `%s | ${APP_NAME}` },
   description: APP_DESCRIPTION,
   applicationName: APP_NAME,
   authors: [{ name: APP_COMPANY }],

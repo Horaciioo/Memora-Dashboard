@@ -4,6 +4,7 @@ import { LiveActions } from '@/composites/lives/LiveActions'
 import type { LiveActionsProps } from '@/composites/lives/LiveActions'
 import { LiveCoordinator } from '@/composites/lives/LiveCoordinator'
 import { LiveSchedule } from '@/composites/lives/LiveSchedule'
+import { Permissions } from '@/utils/constants/permissions'
 import { LIVE_COPY } from '@/declarations/lives/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { ICONS } from '@/declarations/ui/icons'
@@ -52,7 +53,12 @@ export const LiveStage = (props: LiveActionsProps) => {
 
       <div className={LIVE_STAGE.dock}>
         <div className={cn(LIVE_BOARD.facts, LIVE_STAGE.facts)}>
-          <LiveCoordinator seats={live.coordinators} gaps={live.gaps} />
+          <LiveCoordinator
+            seats={live.coordinators}
+            gaps={live.gaps}
+            stacked
+            editLiveId={live.permissions.includes(Permissions.LiveAnnounce) ? live.id : undefined}
+          />
           <span className={LIVE_BOARD.factDivider} aria-hidden="true" />
           <LiveSchedule isLive start={live.plannedStartAt} end={live.plannedEndAt} />
         </div>

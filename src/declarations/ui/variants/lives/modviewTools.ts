@@ -1,5 +1,3 @@
-import { PROPERTY_LABEL } from '@/declarations/ui/variants/controls'
-
 /**
  * Tabs of the AutoMod window
  * @type {Record<string, string>}
@@ -44,20 +42,34 @@ export const MODVIEW_WATCH = {
 
 export const MODVIEW_SUGGEST = {
   list: 'flex flex-col gap-2',
-  card: 'flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3',
-  head: 'flex items-baseline justify-between gap-2',
-  who: 'min-w-0 truncate font-bold tracking-tight hover:underline',
-  from: PROPERTY_LABEL,
-  meta: 'text-xs text-[var(--color-ink-subtle)]',
-  offense: 'flex flex-wrap items-center gap-x-2 text-sm font-semibold',
-  step: 'text-xs font-bold text-[var(--color-ink-accent)]',
-  quote:
-    'rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-2 py-1 text-xs break-words',
+  card: 'flex flex-col gap-3 rounded-[var(--radius-lg)] bg-[var(--twitch-head)] p-4',
+  who: 'cursor-pointer font-bold uppercase hover:underline',
+  why: 'text-sm font-semibold',
+  quote: 'border-l-2 border-[var(--color-border-strong)] pl-2.5 text-sm leading-snug break-words',
+  divider: 'h-px bg-[color-mix(in_oklab,var(--color-ink)_22%,transparent)]',
+  verdictBlock: 'flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5',
+  verdict: 'text-lg leading-tight font-bold tracking-tight text-[var(--color-ink)]',
+  step: 'text-xs text-[var(--twitch-muted)] italic',
   command:
-    'rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-sunken)] px-2.5 py-2 font-[family-name:var(--font-mono)] text-xs break-words select-all',
+    'font-[family-name:var(--font-mono)] text-xs text-[var(--twitch-muted)] break-words select-all',
   none: 'text-xs text-[var(--color-ink-subtle)] italic',
-  actions: 'flex flex-wrap gap-2',
+  actions: 'grid grid-cols-3 gap-1',
+  watch: 'h-10 w-full',
+  accept: 'h-10 w-full !text-[var(--color-success)]',
+  refuse: 'h-10 w-full !text-[var(--color-danger)]',
 } as const
+
+/**
+ * Suggestion title colour by measure
+ * @type {Record<string, { text: string }>}
+ */
+
+export const MODVIEW_VERDICT: Record<string, { text: string }> = {
+  WARN: { text: 'text-[var(--color-caution)]' },
+  TIMEOUT: { text: 'text-[var(--color-apple-orange)]' },
+  BAN: { text: 'text-[var(--color-danger)]' },
+  DELETE: { text: 'text-[var(--color-info)]' },
+}
 
 /**
  * Viewer dossier in the viewer card
@@ -65,19 +77,29 @@ export const MODVIEW_SUGGEST = {
  */
 
 export const MODVIEW_DOSSIER = {
-  root: 'flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] p-3',
+  root: 'flex flex-col gap-4',
   head: 'flex items-center justify-between gap-2',
-  label: PROPERTY_LABEL,
+  label: 'text-xs font-bold tracking-wide text-[var(--color-ink-accent)] uppercase',
   note: 'text-xs text-[var(--color-ink-subtle)]',
   ladder: 'flex flex-col gap-1.5',
   ladderName: 'flex items-baseline justify-between gap-2 text-sm font-semibold',
-  ladderStep: 'text-xs font-bold text-[var(--color-ink-accent)]',
+  ladderStep: 'shrink-0 text-xs text-[var(--twitch-muted)] italic',
   dots: 'flex gap-1',
-  dot: 'h-2 flex-1 rounded-full bg-[var(--color-border)]',
+  dot: 'h-2 flex-1 rounded-full bg-[color-mix(in_oklab,var(--color-ink)_22%,transparent)]',
   dotOn: 'bg-[var(--color-danger)]',
   dotNext: 'bg-[var(--color-brand-400)]',
-  next: 'text-xs text-[var(--color-ink-subtle)]',
-  history: 'flex flex-col gap-1',
+  next: 'text-xs text-[var(--twitch-muted)]',
+  box: 'flex flex-col rounded-[var(--radius-md)] bg-[var(--twitch-head)] px-3 py-1',
+  rowTitle: 'min-w-0 text-sm font-bold',
+  rowFoot: 'flex items-center justify-between gap-2',
+  history:
+    'flex max-h-72 flex-col overflow-y-auto rounded-[var(--radius-md)] bg-[var(--twitch-head)] px-3 py-1',
+  row: 'relative flex flex-col gap-0.5 py-2.5 after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-[color-mix(in_oklab,var(--color-ink)_22%,transparent)] last:after:hidden',
+  rowHead: 'flex items-baseline justify-between gap-2',
+  rowKind: 'text-sm font-bold',
+  rowDate: 'shrink-0 text-xs text-[var(--twitch-muted)]',
+  rowReason: 'text-sm break-words',
+  rowBy: 'text-xs text-[var(--twitch-muted)] italic',
   line: 'text-xs text-[var(--color-ink-subtle)]',
   empty: 'text-xs text-[var(--color-ink-subtle)] italic',
 } as const
@@ -91,9 +113,20 @@ export const MODVIEW_TEAM = {
   list: 'flex flex-col p-2',
   member:
     'flex w-full items-center gap-3 rounded-[var(--radius-md)] px-2 py-2 text-left transition-colors hover:bg-[var(--color-hover)]',
-  memberFocus: 'bg-[var(--color-brand-100)] ring-2 ring-[var(--color-pick)]',
+  memberFocus:
+    'bg-gradient-to-r from-[var(--focus-tone)] to-[var(--focus-tone-soft)] text-white hover:bg-transparent',
   name: 'min-w-0 flex-1 truncate text-sm font-semibold',
-  tag: 'shrink-0 text-xs font-bold text-[var(--color-ink-accent)]',
+  nameCoordinator: 'text-[var(--color-gold-ink)]',
+  portrait: 'relative shrink-0',
+  badge:
+    'absolute -right-1 -bottom-1 flex size-4 items-center justify-center rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
+  badgeGlyph: 'size-3',
+  dot: 'size-2.5 shrink-0 rounded-full bg-[var(--color-success)]',
+  offline: 'cursor-not-allowed opacity-60',
+  group:
+    'px-2 pt-2 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  tag: 'shrink-0 text-xs font-bold',
+  reinforce: 'p-2',
+  planned: 'shrink-0 text-xs text-[var(--color-ink-subtle)] italic tabular-nums',
   focus: 'px-3 py-1.5 text-xs font-semibold text-[var(--color-ink-accent)]',
-  hint: 'px-3 pb-2 text-xs text-[var(--color-ink-subtle)]',
 } as const

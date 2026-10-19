@@ -6,10 +6,24 @@ import { Field } from '@/components/elements/forms/Field'
 import { FieldControl } from '@/components/elements/forms/FieldControl'
 import { HandleLookup } from '@/components/elements/forms/HandleLookup'
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
+import { toWallText } from '@/core/lib/forms/values'
 import { busyNotice, narrowOptions, visibleFields } from '@/core/lib/forms'
 import { FIELD_STYLES, FORM_GRID, FORM_ROWS } from '@/declarations/ui/variants'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
+
+/**
+ * Earliest moment a date field accepts: the field it can never precede, as a wall clock
+ * @param {FieldDefinition} field - Field declaration
+ * @param {FormValues} values - Current values
+ * @return {string | undefined} - Wall clock, none without a bound
+ */
+
+const minOf = (field: FieldDefinition, values: FormValues): string | undefined => {
+  const bound = field.notBefore ? values[field.notBefore] : null
+
+  return typeof bound === 'string' && bound !== '' ? toWallText(bound) : undefined
+}
 
 export interface FormRendererProps {
   fields: FieldDefinition[]
@@ -56,7 +70,7 @@ const resolvePrefix = (
   const source = byName.get(field.prefixFrom)
   const picked = source?.options?.find((option) => option.value === values[field.prefixFrom!])
 
-  return { ...field, prefix: picked?.prefix, lookup: picked?.value }
+  return { ...field, prefix: picked?.prefix, lookup: field.noLookup ? undefined : picked?.value }
 }
 
 /**
@@ -140,6 +154,7 @@ export const FormRenderer = ({
                   disabled={disabled}
                   invalid={Boolean(error)}
                   describedBy={error ? `${id}-error` : undefined}
+                  min={minOf(field, values)}
                   onChange={(next) => onChange(field.name, next)}
                 />
               )
@@ -193,6 +208,7 @@ export const FormRenderer = ({
                 disabled={disabled}
                 invalid={invalid}
                 describedBy={describedBy}
+                min={minOf(field, values)}
                 onChange={(next) => onChange(field.name, next)}
               />
             )

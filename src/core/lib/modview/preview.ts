@@ -11,10 +11,17 @@ import type { PermissionName } from '@/utils/constants/permissions'
 
 export type PreviewSeat = MemberRoleName | 'COORDINATOR'
 
-// Live grants as declared
-const LIVE_GRANTS =
-  GRANT_ADDITIONS.find((addition) => addition.key === 'live-modview')?.grants ?? {}
-const FLOOR = LIVE_GRANTS[MemberRoles.Moderateur] ?? []
+// Live batches as declared
+const LIVE_BATCHES = GRANT_ADDITIONS.filter((addition) =>
+  ['live-modview', 'live-chat-modes-by-seat'].includes(addition.key)
+)
+
+// Permissions a role holds, denies apart
+const grantsOf = (role: MemberRoleName): PermissionName[] =>
+  LIVE_BATCHES.flatMap((batch) => batch.grants[role] ?? [])
+const deniesOf = (role: MemberRoleName): PermissionName[] =>
+  LIVE_BATCHES.flatMap((batch) => batch.roleDenies?.[role] ?? [])
+const FLOOR = grantsOf(MemberRoles.Moderateur)
 
 /**
  * Permissions a seat holds on a live
@@ -25,5 +32,7 @@ const FLOOR = LIVE_GRANTS[MemberRoles.Moderateur] ?? []
 export const previewPermissions = (seat: PreviewSeat): PermissionName[] => {
   if (seat === 'COORDINATOR') return [...new Set([...FLOOR, ...LIVE_COORDINATOR.grants])]
 
-  return [...new Set([...FLOOR, ...(LIVE_GRANTS[seat] ?? [])])]
+  const denied = deniesOf(seat)
+
+  return [...new Set([...FLOOR, ...grantsOf(seat)])].filter((entry) => !denied.includes(entry))
 }

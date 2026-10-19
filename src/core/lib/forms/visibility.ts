@@ -1,4 +1,28 @@
-import type { FieldDefinition, FormValues } from '@/types/forms'
+import type { FieldCondition, FieldDefinition, FormValues } from '@/types/forms'
+
+/**
+ * Check one display rule
+ * @param {FieldCondition} condition - Rule
+ * @param {FormValues} values - Current values
+ * @return {boolean} - Rule holds
+ */
+
+export const holds = (condition: FieldCondition, values: FormValues): boolean => {
+  const watched = values[condition.field] ?? null
+  let match: boolean
+
+  // Presence check wins over value checks
+  if (condition.truthy !== undefined) {
+    const filled = Array.isArray(watched) ? watched.length > 0 : Boolean(watched)
+    match = condition.truthy ? filled : !filled
+  } else if (condition.oneOf) {
+    match = condition.oneOf.includes(String(watched))
+  } else {
+    match = watched === condition.equals
+  }
+
+  return (condition.negate ? !match : match) && (!condition.and || holds(condition.and, values))
+}
 
 /**
  * Check field visibility
@@ -7,22 +31,8 @@ import type { FieldDefinition, FormValues } from '@/types/forms'
  * @return {boolean} - Field shows
  */
 
-export const isFieldVisible = (field: FieldDefinition, values: FormValues): boolean => {
-  const condition = field.visibleWhen
-  if (!condition) return true
-
-  const watched = values[condition.field] ?? null
-
-  // Presence check wins over value checks
-  if (condition.truthy !== undefined) {
-    const filled = Array.isArray(watched) ? watched.length > 0 : Boolean(watched)
-    return condition.truthy ? filled : !filled
-  }
-
-  if (condition.oneOf) return condition.oneOf.includes(String(watched))
-
-  return watched === condition.equals
-}
+export const isFieldVisible = (field: FieldDefinition, values: FormValues): boolean =>
+  field.visibleWhen ? holds(field.visibleWhen, values) : true
 
 /**
  * Keep visible fields only

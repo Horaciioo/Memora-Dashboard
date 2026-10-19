@@ -269,7 +269,7 @@ export const LIVECON_SETTINGS = {
 
 /**
  * Announced lives and their Mod View
- * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, eventsubKeepaliveSeconds: number, recentEvents: number, idempotencyMinutes: number, watchLeadMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, suspensionMaxDays: number }}
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number }}
  */
 
 export const LIVE_SETTINGS = {
@@ -293,6 +293,26 @@ export const LIVE_SETTINGS = {
     fallback: 24,
     min: 1,
   }),
+  logPageSize: readInteger(lives.logPageSize, {
+    path: 'system/lives.logPageSize',
+    fallback: 10,
+    min: 5,
+  }),
+  recentHours: readInteger(lives.recentHours, {
+    path: 'system/lives.recentHours',
+    fallback: 24,
+    min: 1,
+  }),
+  prepMinutes: readInteger(lives.prepMinutes, {
+    path: 'system/lives.prepMinutes',
+    fallback: 60,
+    min: 0,
+  }),
+  presenceSuggestHours: readInteger(lives.presenceSuggestHours, {
+    path: 'system/lives.presenceSuggestHours',
+    fallback: 3,
+    min: 1,
+  }),
   sampleSeconds: readInteger(lives.sampleSeconds, {
     path: 'system/lives.sampleSeconds',
     fallback: 60,
@@ -301,6 +321,11 @@ export const LIVE_SETTINGS = {
   viewerHistorySize: readInteger(lives.viewerHistorySize, {
     path: 'system/lives.viewerHistorySize',
     fallback: 10,
+    min: 1,
+  }),
+  viewerCommentsSize: readInteger(lives.viewerCommentsSize, {
+    path: 'system/lives.viewerCommentsSize',
+    fallback: 50,
     min: 1,
   }),
   inspectSize: readInteger(lives.inspectSize, {
@@ -359,10 +384,50 @@ export const LIVE_SETTINGS = {
     min: 10,
     max: 600,
   }),
-  recentEvents: readInteger(lives.recentEvents, {
-    path: 'system/lives.recentEvents',
-    fallback: 300,
+  feedFlushMs: readInteger(lives.feedFlushMs, {
+    path: 'system/lives.feedFlushMs',
+    fallback: 100,
+    min: 16,
+    max: 1000,
+  }),
+  roomMessages: readInteger(lives.roomMessages, {
+    path: 'system/lives.roomMessages',
+    fallback: 200,
+    min: 50,
+    max: 1000,
+  }),
+  roomActs: readInteger(lives.roomActs, {
+    path: 'system/lives.roomActs',
+    fallback: 200,
     min: 20,
+    max: 2000,
+  }),
+  roomHeld: readInteger(lives.roomHeld, {
+    path: 'system/lives.roomHeld',
+    fallback: 150,
+    min: 20,
+    max: 1000,
+  }),
+  feedSlowKilobytes: readInteger(lives.feedSlowKilobytes, {
+    path: 'system/lives.feedSlowKilobytes',
+    fallback: 2048,
+    min: 256,
+  }),
+  logConcurrency: readInteger(lives.logConcurrency, {
+    path: 'system/lives.logConcurrency',
+    fallback: 4,
+    min: 1,
+    max: 16,
+  }),
+  logQueueMax: readInteger(lives.logQueueMax, {
+    path: 'system/lives.logQueueMax',
+    fallback: 5000,
+    min: 100,
+  }),
+  liveconCacheSeconds: readInteger(lives.liveconCacheSeconds, {
+    path: 'system/lives.liveconCacheSeconds',
+    fallback: 30,
+    min: 1,
   }),
   idempotencyMinutes: readInteger(lives.idempotencyMinutes, {
     path: 'system/lives.idempotencyMinutes',
@@ -397,6 +462,11 @@ export const LIVE_SETTINGS = {
   memberLives: readInteger(lives.memberLives, {
     path: 'system/lives.memberLives',
     fallback: 20,
+    min: 1,
+  }),
+  memberLivesPageSize: readInteger(lives.memberLivesPageSize, {
+    path: 'system/lives.memberLivesPageSize',
+    fallback: 5,
     min: 1,
   }),
 }

@@ -133,7 +133,7 @@ const PROCESSING_MAP = {
   moderation: {
     label: 'Tracer la modération des lives et le temps passé',
     categories:
-      'Gestes de modération, modérateur, pseudo et extrait du message visé, temps de présence dans la Mod View',
+      'Actions de Mod., modérateur, pseudo et extrait du message visé, temps de présence dans la Mod View',
     legalBasis: 'Intérêt légitime à encadrer la modération et à en rendre compte',
     retention: inDays(RETENTION_POLICIES.moderationLogs),
   },

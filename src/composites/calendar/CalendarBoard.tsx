@@ -285,6 +285,18 @@ export const CalendarBoard = ({
         (kind !== CalendarKinds.Event || entry.allDay || toDayKey(entry.startsAt) === dayKey)
     )
 
+  // A new entry lands in view, on its own day when the month cell is full
+  const revealCreated = (entry: CalendarEntry) => {
+    const dayKey = toDayKey(entry.startsAt)
+    setCursor(dayKey)
+    if (
+      unit === 'month' &&
+      entriesOf(dayKey, CalendarKinds.Event).length >= CALENDAR_SETTINGS.maxEntriesPerDay
+    ) {
+      setUnit('day')
+    }
+  }
+
   const allDayCards = (dayKey: string) =>
     entriesOf(dayKey, CalendarKinds.Event).filter((entry) => entry.allDay)
 
@@ -756,9 +768,14 @@ export const CalendarBoard = ({
         initialValues={editing?.values ?? draft ?? undefined}
         issues={calendar.issues}
         isSaving={calendar.isSaving}
-        onSubmit={(values) =>
-          editing ? calendar.update(editing.id, values) : calendar.create(values)
-        }
+        onSubmit={async (values) => {
+          if (editing) return calendar.update(editing.id, values)
+
+          const created = await calendar.create(values)
+          if (created) revealCreated(created)
+
+          return created !== null
+        }}
         onClose={() => setDialog(null)}
       />
 
@@ -828,7 +845,8 @@ export const CalendarBoard = ({
             entry={opened}
             live={openedEntry ?? opened}
             pending={calendar.isSaving}
-            onRespond={(status) => void calendar.respond(opened.id, status)}
+            onRespond={(status, hours) => void calendar.respond(opened.id, status, hours)}
+            onMove={(accountId, status) => void calendar.moveAttendee(opened.id, accountId, status)}
             onRemind={() => void calendar.remind(opened.id)}
           />
         )}

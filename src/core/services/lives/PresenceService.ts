@@ -2,6 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { isStale, tallyBeat } from '@/core/lib/lives/presence'
+import { closeLiveStints, ensureStint } from '@/core/services/lives/ModStintService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 /**
@@ -40,6 +41,8 @@ export const beatPresence = async (
     await prisma.modViewPresence.create({
       data: { liveId, accountId, openedAt: now, lastBeatAt: now },
     })
+    // Entering the Mod View starts moderating
+    await ensureStint(liveId, accountId)
     return
   }
 
@@ -65,6 +68,7 @@ export const closeLivePresences = async (liveId: string): Promise<void> => {
     where: { liveId, closedAt: null },
     data: { closedAt: new Date(), closeReason: 'LIVE_ENDED' },
   })
+  await closeLiveStints(liveId)
 }
 
 /**
@@ -90,4 +94,21 @@ export const sweepStalePresences = async (): Promise<number> => {
   )
 
   return stale.length
+}
+
+/**
+ * Members with a Mod View open on a live right now
+ * @param {string} liveId - Live
+ * @return {Promise<string[]>} - Connected accounts
+ */
+
+export const connectedMemberIds = async (liveId: string): Promise<string[]> => {
+  const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * 1000)
+  const rows = await prisma.modViewPresence.findMany({
+    where: { liveId, closedAt: null, lastBeatAt: { gte: horizon } },
+    select: { accountId: true },
+    distinct: ['accountId'],
+  })
+
+  return rows.map((row) => row.accountId)
 }

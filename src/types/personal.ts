@@ -52,6 +52,7 @@ export type HomeTaskKind =
   | 'secondPeriod'
   | 'departure'
   | 'mention'
+  | 'liveReport'
 
 /**
  * One thing the member has to do
@@ -96,6 +97,8 @@ export interface HomeTask {
  * @property {string | null} due - Relative wording of its day
  * @property {HomeAction[]} actions - What the member can do
  * @property {ReactNode} [detail] - Extra reading in the stepper
+ * @property {string} [heroTitle] - Line of the stepper card standing in for the title and the meta
+ * @property {{ title: string, backdrop: string | null, avatar: string | null, name: string }} [hero] - Stepper card standing in for the title
  */
 
 export interface HomeEntry {
@@ -109,6 +112,8 @@ export interface HomeEntry {
   due: string | null
   actions: HomeAction[]
   detail?: ReactNode
+  heroTitle?: string
+  hero?: { title: string; backdrop: string | null; avatar: string | null; name: string }
 }
 
 /**
@@ -116,7 +121,8 @@ export interface HomeEntry {
  * @typedef {Object} HomeAction
  * @property {string} id - Stable identifier
  * @property {string} label - Button text
- * @property {'primary' | 'secondary'} variant - Visual weight
+ * @property {'primary' | 'secondary' | 'danger'} variant - Visual weight
+ * @property {'save' | 'cancel' | 'neutral'} [line] - Full footer line, green, red or grey
  * @property {string} [href] - Destination when it navigates
  * @property {() => void} [onSelect] - Handler when it acts in place
  */
@@ -124,7 +130,9 @@ export interface HomeEntry {
 export interface HomeAction {
   id: string
   label: string
-  variant: 'primary' | 'secondary'
+  variant: 'primary' | 'secondary' | 'danger'
+  // Drawn as a full line of the form drawer footer
+  line?: 'save' | 'cancel' | 'neutral'
   href?: string
   onSelect?: () => void
 }

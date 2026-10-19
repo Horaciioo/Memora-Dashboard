@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { readMemberSpans } from '@/core/services/lives/ModStintService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { MemberLiveSummary, MemberModerationView } from '@/types/lives'
 
@@ -41,9 +42,19 @@ export const readMemberModeration = async (
       }),
     ])
 
-    const liveIds = [
+    const known = [
       ...new Set([...presences.map((row) => row.liveId), ...actions.map((row) => row.liveId)]),
     ]
+    const spans = await readMemberSpans(accountId, known)
+    const reinforced = new Set(
+      (
+        await prisma.liveMember.findMany({
+          where: { accountId, reinforcement: true },
+          select: { liveId: true },
+        })
+      ).map((row) => row.liveId)
+    )
+    const liveIds = [...new Set([...known, ...spans.keys()])]
     const lives = await prisma.live.findMany({
       where: { id: { in: liveIds } },
       select: {
@@ -51,7 +62,8 @@ export const readMemberModeration = async (
         platform: true,
         startedAt: true,
         plannedStartAt: true,
-        youtuber: { select: { name: true } },
+        title: true,
+        youtuber: { select: { name: true, avatarUrl: true } },
       },
     })
 
@@ -66,10 +78,14 @@ export const readMemberModeration = async (
       return {
         liveId: live.id,
         creator: live.youtuber.name,
+        creatorAvatar: live.youtuber.avatarUrl,
+        title: live.title,
         platform: live.platform,
         startedAt: (live.startedAt ?? live.plannedStartAt).toISOString(),
         activeSeconds: time?._sum.activeSeconds ?? 0,
         visibleSeconds: time?._sum.visibleSeconds ?? 0,
+        span: spans.get(live.id) ?? null,
+        isReinforcement: reinforced.has(live.id),
         kinds: [...kinds.entries()]
           .map(([kind, count]) => ({ kind, count }))
           .sort((left, right) => right.count - left.count),

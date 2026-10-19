@@ -1,4 +1,5 @@
 import { Status } from '@/components/elements/display/Status'
+import { Dotted } from '@/components/elements/display/Dotted'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { MEDIA_VISIBILITIES, STORAGE_BUCKETS } from '@/declarations/system/storage'
 import { CONSOLE_BLOCK } from '@/declarations/ui/blocks'
@@ -45,7 +46,7 @@ export const StoragePanel = ({ report }: StoragePanelProps) => {
 
             <span className={CONSOLE_BLOCK.rowStatus}>
               <span className={CONSOLE_BLOCK.rowMeta}>
-                {`${formatNumber(held?.entries ?? 0)} · ${formatBytes(held?.bytes ?? 0)}`}
+                <Dotted items={[formatNumber(held?.entries ?? 0), formatBytes(held?.bytes ?? 0)]} />
               </span>
               {meta ? (
                 <>

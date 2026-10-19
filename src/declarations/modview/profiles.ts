@@ -1,4 +1,5 @@
 import { createRegistry } from '@/core/lib/registry'
+import type { ColumnSpec } from '@/core/lib/modview/layout'
 import type { ModViewWindow } from '@/types/modview'
 
 /**
@@ -20,7 +21,7 @@ export type ModViewProfileName = (typeof ModViewProfiles)[keyof typeof ModViewPr
  * @typedef {Object} ModViewProfileOption
  * @property {string} label - Seat name
  * @property {ModViewWindow[]} windows - Windows the seat may open
- * @property {ModViewWindow[][]} columns - Starting arrangement, column by column
+ * @property {ColumnSpec[]} columns - Starting arrangement, column by column, a pair shares a row
  * @property {number[]} widths - Starting width of each column
  * @property {Partial<Record<ModViewWindow, number>>} sizes - Starting height share of a window
  * @property {ModViewWindow[]} hidden - Windows closed at first
@@ -29,7 +30,7 @@ export type ModViewProfileName = (typeof ModViewProfiles)[keyof typeof ModViewPr
 interface ModViewProfileOption {
   label: string
   windows: ModViewWindow[]
-  columns: ModViewWindow[][]
+  columns: ColumnSpec[]
   widths: number[]
   sizes: Partial<Record<ModViewWindow, number>>
   hidden: ModViewWindow[]
@@ -38,11 +39,12 @@ interface ModViewProfileOption {
 const FLOOR: ModViewWindow[] = ['stream', 'chat', 'automod', 'modActions', 'community']
 
 // The stream and the chat get the room first
-const SIZES: Partial<Record<ModViewWindow, number>> = { stream: 1.8 }
-const FLOOR_COLUMNS: ModViewWindow[][] = [
-  ['stream', 'modActions'],
+const SIZES: Partial<Record<ModViewWindow, number>> = { stream: 1.6 }
+
+// The audience is a sidebar glyph, the actions and the queue share a row under the stream
+const FLOOR_COLUMNS: ColumnSpec[] = [
+  ['stream', ['modActions', 'automod']],
   ['chat'],
-  ['automod', 'community'],
 ]
 
 const PROFILE_MAP: Record<ModViewProfileName, ModViewProfileOption> = {
@@ -50,7 +52,7 @@ const PROFILE_MAP: Record<ModViewProfileName, ModViewProfileOption> = {
     label: 'Modérateur',
     windows: FLOOR,
     columns: FLOOR_COLUMNS,
-    widths: [1.8, 1.6, 1],
+    widths: [1.7, 1],
     sizes: SIZES,
     hidden: ['community'],
   },
@@ -58,25 +60,33 @@ const PROFILE_MAP: Record<ModViewProfileName, ModViewProfileOption> = {
     label: 'Formateur',
     windows: FLOOR,
     columns: FLOOR_COLUMNS,
-    widths: [1.8, 1.6, 1],
+    widths: [1.7, 1],
     sizes: SIZES,
     hidden: ['community'],
   },
   lead: {
     label: 'Responsable',
-    windows: FLOOR,
-    columns: FLOOR_COLUMNS,
-    widths: [1.8, 1.6, 1],
+    windows: [...FLOOR, 'inspect'],
+    columns: [
+      ['stream', ['modActions', 'automod']],
+      ['chat', 'inspect'],
+    ],
+    widths: [1.7, 1],
     sizes: SIZES,
     hidden: [],
   },
   admin: {
     label: 'Admin',
-    windows: [...FLOOR, 'unbanRequests'],
-    columns: [['stream', 'modActions'], ['chat'], ['automod', 'community', 'unbanRequests']],
-    widths: [1.8, 1.6, 1],
+    windows: [...FLOOR, 'inspect', 'unbanRequests'],
+    columns: [
+      ['stream', ['modActions', 'automod']],
+      ['chat'],
+      ['inspect', 'unbanRequests'],
+    ],
+    widths: [1.7, 1, 0.8],
     sizes: SIZES,
-    hidden: [],
+    // Inspect Mod takes the place of the unban requests
+    hidden: ['unbanRequests'],
   },
 }
 

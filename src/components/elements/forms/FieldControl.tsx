@@ -32,6 +32,8 @@ export interface FieldControlProps {
   describedBy?: string
   // Long text keeps the size of its read text
   inline?: boolean
+  // Earliest moment a date field accepts, as a wall clock
+  min?: string
 }
 
 // Bucket an image field lands in when its declaration stays silent
@@ -82,6 +84,7 @@ const INPUT_TYPES: Record<string, string> = {
  * @param {boolean} [invalid] - Paints the rejection border
  * @param {string} [describedBy] - Identifier of the message describing the control
  * @param {boolean} [inline] - Bare long text
+ * @param {string} [min] - Earliest moment a date field accepts
  * @return {JSX.Element | null}
  */
 
@@ -94,6 +97,7 @@ export const FieldControl = ({
   invalid,
   describedBy,
   inline,
+  min,
 }: FieldControlProps) => {
   const { can } = useAuthContext()
 
@@ -156,6 +160,7 @@ export const FieldControl = ({
         id={id}
         label={field.label}
         value={typeof value === 'string' ? toWallText(value) : ''}
+        min={min}
         withTime={field.kind === 'datetime'}
         startsTimed={field.withTime}
         dayOnly={field.dayOnly}

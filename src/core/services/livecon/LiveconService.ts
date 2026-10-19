@@ -139,7 +139,7 @@ export const liveconFields = async (scope?: AccessScope): Promise<FieldDefinitio
       required: true,
       options: levels.map((level) => ({
         value: level.id,
-        label: `${level.level} · ${level.name}`,
+        label: `${level.level}, ${level.name}`,
         accent: level.accent ?? undefined,
       })),
       mark: 'dot',

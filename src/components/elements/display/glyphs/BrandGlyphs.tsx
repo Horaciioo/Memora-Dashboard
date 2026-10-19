@@ -447,13 +447,14 @@ export const BellGlyph = ({ className }: GlyphProps) => (
 
 /**
  * Lock
- * @param {GlyphProps} props - Sizing class
+ * @param {GlyphProps & { tone?: FrameTone }} props - Sizing class and tint
  * @return {JSX.Element}
  */
 
-export const LockGlyph = ({ className }: GlyphProps) => (
+export const LockGlyph = ({ className, tone }: GlyphProps & { tone?: FrameTone }) => (
   <Frame
     className={className}
+    tone={tone}
     render={({ fill, deep, cut }) => (
       <>
         <path

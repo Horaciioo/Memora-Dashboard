@@ -1,114 +1,76 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-
-import { Button } from '@/components/elements/actions/Button'
-import { Input } from '@/components/elements/forms/inputs/Input'
-import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { apiPost } from '@/core/lib/api/client'
-import { API_ROUTES } from '@/core/lib/api/routes'
+import { DatePicker } from '@/components/elements/forms/date/DatePicker'
+import type { CoordinationWindow } from '@/core/hooks/data/lives/useCoordinationReply'
 import { LIVE_COORDINATION_COPY } from '@/declarations/lives/copy'
+import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_COORDINATION } from '@/declarations/ui/variants'
-import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
-import type { CoordinationRequest, LiveGap } from '@/types/lives'
-import { formatClock, formatDayTime, toDateTimeInput } from '@/utils/format/dates'
-import { wallToInstant } from '@/utils/format/zone'
+import type { CoordinationRequest } from '@/types/lives'
+import { formatClock, formatDay } from '@/utils/format/dates'
 
 export interface CoordinationAnswerProps {
   request: CoordinationRequest
+  window: CoordinationWindow
+  onChange: (window: CoordinationWindow) => void
 }
 
 /**
- * Answer to one request to coordinate: two time fields starting on the whole live, accept or
- * decline
+ * Facts of one request to coordinate and the two hours offered, the answer sits in the footer
  * @param {CoordinationRequest} request - Live asking
+ * @param {CoordinationWindow} window - Hours offered
+ * @param {(window: CoordinationWindow) => void} onChange - Hours edited
  * @return {JSX.Element}
  */
 
-export const CoordinationAnswer = ({ request }: CoordinationAnswerProps) => {
-  const router = useRouter()
-  const { run, isSaving } = useMutation()
-  const { notify } = useNotifications()
-  const [from, setFrom] = useState(toDateTimeInput(request.startsAt))
-  const [to, setTo] = useState(toDateTimeInput(request.endsAt))
-
-  const answer = async (accept: boolean) => {
-    const result = await run(
-      () =>
-        apiPost<{ gaps: LiveGap[] }>(API_ROUTES.liveCoordination(request.liveId), {
-          accept,
-          startsAt: from ? wallToInstant(from).toISOString() : null,
-          endsAt: to ? wallToInstant(to).toISOString() : null,
-        }),
-      accept ? LIVE_COORDINATION_COPY.accepted : LIVE_COORDINATION_COPY.declined
-    )
-    if (!result) return
-
-    // The hole left in the live is told right away
-    if (result.gaps.length > 0) {
-      const ranges = result.gaps
-        .map((gap) =>
-          LIVE_COORDINATION_COPY.gapRange
-            .replace('{from}', formatClock(gap.from))
-            .replace('{to}', formatClock(gap.to))
-        )
-        .join(', ')
-      notify({
-        tone: 'caution',
-        title: LIVE_COORDINATION_COPY.gapAlert.replace('{ranges}', ranges),
-      })
-    }
-    router.refresh()
-  }
-
-  const lead = (
-    request.askedBy ? LIVE_COORDINATION_COPY.lead : LIVE_COORDINATION_COPY.leadAnonymous
-  )
-    .replace('{asker}', request.askedBy ?? '')
-    .replace('{creator}', request.creator)
-    .replace('{title}', request.title)
+export const CoordinationAnswer = ({ request, window, onChange }: CoordinationAnswerProps) => {
+  const facts = [
+    { icon: 'stream', text: request.title },
+    { icon: 'meetings', text: formatDay(request.startsAt) },
+    {
+      icon: 'clock',
+      text: request.endsAt
+        ? `${formatClock(request.startsAt)} → ${formatClock(request.endsAt)}`
+        : formatClock(request.startsAt),
+    },
+  ] as const
 
   return (
     <div className={LIVE_COORDINATION.answer}>
-      <p className={LIVE_COORDINATION.lead}>{lead}</p>
-      <p className={LIVE_COORDINATION.meta}>
-        {LIVE_COORDINATION_COPY.window.replace(
-          '{range}',
-          `${formatDayTime(request.startsAt)} → ${formatClock(request.endsAt)}`
-        )}
-      </p>
+      <section className={LIVE_COORDINATION.infosGroup}>
+        <h3 className={LIVE_COORDINATION.infos}>{LIVE_COORDINATION_COPY.infos}</h3>
+        <ul className={LIVE_COORDINATION.facts}>
+          {facts.map((fact) => {
+            const Glyph = ICONS[fact.icon]
+
+            return (
+              <li key={fact.icon} className={LIVE_COORDINATION.fact}>
+                <Glyph className={LIVE_COORDINATION.factGlyph} aria-hidden="true" />
+                {fact.text}
+              </li>
+            )
+          })}
+        </ul>
+      </section>
 
       <div className={LIVE_COORDINATION.times}>
-        <label className={LIVE_COORDINATION.timeField}>
-          <span className={LIVE_COORDINATION.timeLabel}>{LIVE_COORDINATION_COPY.from}</span>
-          <Input
-            type="datetime-local"
-            value={from}
-            min={toDateTimeInput(request.startsAt)}
-            max={toDateTimeInput(request.endsAt)}
-            onChange={(event) => setFrom(event.target.value)}
-          />
-        </label>
-        <label className={LIVE_COORDINATION.timeField}>
-          <span className={LIVE_COORDINATION.timeLabel}>{LIVE_COORDINATION_COPY.to}</span>
-          <Input
-            type="datetime-local"
-            value={to}
-            min={toDateTimeInput(request.startsAt)}
-            max={toDateTimeInput(request.endsAt)}
-            onChange={(event) => setTo(event.target.value)}
-          />
-        </label>
-      </div>
-
-      <div className={LIVE_COORDINATION.actions}>
-        <Button variant="primary" isLoading={isSaving} onClick={() => void answer(true)}>
-          {LIVE_COORDINATION_COPY.accept}
-        </Button>
-        <Button disabled={isSaving} onClick={() => void answer(false)}>
-          {LIVE_COORDINATION_COPY.decline}
-        </Button>
+        {(
+          [
+            { key: 'from', label: LIVE_COORDINATION_COPY.from },
+            { key: 'to', label: LIVE_COORDINATION_COPY.to },
+          ] as const
+        ).map((field) => (
+          <div key={field.key} className={LIVE_COORDINATION.timeField}>
+            <span className={LIVE_COORDINATION.timeLabel}>{field.label}</span>
+            <DatePicker
+              label={field.label}
+              withTime
+              value={window[field.key]}
+              onChange={(next) =>
+                onChange({ ...window, [field.key]: typeof next === 'string' ? next : '' })
+              }
+            />
+          </div>
+        ))}
       </div>
     </div>
   )

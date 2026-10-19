@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { parseChatCommand, rememberRung, writeRungCommand } from '@/core/lib/modview/commands'
 import type { PanelMemory } from '@/core/lib/modview/commands'
@@ -25,6 +25,7 @@ interface PendingRung {
  * @param {PermissionName[]} input.permissions - Held on this live
  * @param {PanelMemory} input.initialMemory - Rungs already applied
  * @param {string | null} input.onBehalfOfId - Member the gestures are made for
+ * @param {boolean} [input.quiet] - Locks say nothing
  * @return {Object} - State and gestures
  */
 
@@ -33,8 +34,9 @@ export const useModViewActions = (input: {
   permissions: PermissionName[]
   initialMemory: PanelMemory
   onBehalfOfId: string | null
+  quiet?: boolean
 }) => {
-  const { driver, permissions, initialMemory, onBehalfOfId } = input
+  const { driver, permissions, initialMemory, onBehalfOfId, quiet } = input
   const { state } = driver
   const [picked, setPicked] = useState<Chatter | null>(null)
   const [draft, setDraft] = useState('')
@@ -53,6 +55,13 @@ export const useModViewActions = (input: {
 
     return known
   }, [state.messages, state.held, state.community])
+
+  // Read at click time
+  const chattersRef = useRef(chatters)
+  useEffect(() => {
+    chattersRef.current = chatters
+  }, [chatters])
+  const runIntent = driver.act
 
   const findChatter = useCallback(
     (name: string) =>
@@ -74,9 +83,11 @@ export const useModViewActions = (input: {
           state.connection === 'connecting' ||
           state.readOnly === true,
         offlineReason: state.notice,
+        quiet,
       }),
     [
       permissions,
+      quiet,
       state.platform,
       state.liveconLevel,
       state.connection,
@@ -91,14 +102,15 @@ export const useModViewActions = (input: {
       if (!gate(intent).allowed) return
 
       const chatterId = 'chatterId' in intent ? intent.chatterId : null
-      void driver.act(intent, {
+      void runIntent(intent, {
         ...context,
         targetLogin:
-          context.targetLogin ?? (chatterId ? chatters.get(chatterId)?.login : undefined),
+          context.targetLogin ??
+          (chatterId ? chattersRef.current.get(chatterId)?.login : undefined),
         ...(onBehalfOfId ? { onBehalfOfId } : {}),
       })
     },
-    [driver, gate, chatters, onBehalfOfId]
+    [runIntent, gate, onBehalfOfId]
   )
 
   // The panel writes the line

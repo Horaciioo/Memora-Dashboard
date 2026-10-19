@@ -59,7 +59,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         hint:
           [row.division?.name, ...row.youtubers.map((youtuber) => youtuber.name)]
             .filter(Boolean)
-            .join(' · ') || undefined,
+            .join(', ') || undefined,
         href: ROUTES.member(row.id),
       })),
     })
@@ -87,7 +87,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         hint:
           [...row.youtubers.map((youtuber) => youtuber.name), row.state?.name]
             .filter(Boolean)
-            .join(' · ') || undefined,
+            .join(', ') || undefined,
         href: ROUTES.project(row.id),
       })),
     })
@@ -112,7 +112,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         id: row.id,
         group: 'tasks',
         label: row.title,
-        hint: [row.owner?.displayName, row.state?.name].filter(Boolean).join(' · ') || undefined,
+        hint: [row.owner?.displayName, row.state?.name].filter(Boolean).join(', ') || undefined,
         href: ROUTES.task(row.id),
       })),
     })

@@ -135,6 +135,27 @@ export function formatDayTime(date: Date | string | null | undefined): string {
 }
 
 /**
+ * Format a wall clock as written, the zone never moves it
+ * @param {string | null | undefined} wall - "YYYY-MM-DDTHH:mm"
+ * @return {string} - Day and time
+ */
+
+export function formatWallDayTime(wall: string | null | undefined): string {
+  if (!wall) return DATE_COPY.none
+
+  // A bare wall clock parses on the local clock, read back there
+  const parsed = new Date(wall)
+  const day = parsed.toLocaleDateString(DATE_LOCALE, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+  const time = parsed.toLocaleTimeString(DATE_LOCALE, { hour: '2-digit', minute: '2-digit' })
+
+  return `${day} ${DATE_COPY.at} ${time}`
+}
+
+/**
  * Format a day range
  * @param {Date | string} start - First day
  * @param {Date | string} end - Last day
@@ -253,6 +274,24 @@ export function formatClock(date: Date | string | null | undefined): string {
     minute: '2-digit',
     timeZone: getActiveZone(),
   })
+}
+
+/**
+ * Format a time of day as 20h30
+ * @param {Date | string} date - Moment
+ * @return {string} - Hour mark
+ */
+
+export function formatHourMark(date: Date | string): string {
+  const parts = new Intl.DateTimeFormat(DATE_LOCALE, {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+    timeZone: getActiveZone(),
+  }).formatToParts(new Date(date))
+  const pick = (type: string) => parts.find((part) => part.type === type)?.value ?? '00'
+
+  return `${pick('hour')}h${pick('minute')}`
 }
 
 /**

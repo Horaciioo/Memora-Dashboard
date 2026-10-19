@@ -4,6 +4,8 @@ import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { activeCoordinatorIds } from '@/core/lib/lives/coordination'
 import { livePermissions } from '@/core/lib/lives/permissions'
+import { respondToRollCall } from '@/core/services/calendar/attendance'
+import { connectedMemberIds } from '@/core/services/lives/PresenceService'
 import { syncJuniorLives } from '@/core/services/academy/parkour/LiveCountService'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -14,6 +16,13 @@ import type { LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { Permissions } from '@/utils/constants/permissions'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
+
+// Permissions that see who is connected
+const SUPERVISORS: PermissionName[] = [
+  Permissions.LiveRoster,
+  Permissions.LiveInspect,
+  Permissions.LiveFocus,
+]
 
 /**
  * Load a live inside the perimeter
@@ -62,6 +71,7 @@ export const readLiveRoster = async (
         where: { eventId: live.calendarEventId },
         select: {
           status: true,
+          availableFrom: true,
           account: {
             select: {
               id: true,
@@ -79,11 +89,24 @@ export const readLiveRoster = async (
       })
     : []
 
+  const reinforced = new Set(
+    (
+      await prisma.liveMember.findMany({
+        where: { liveId: live.id, reinforcement: true },
+        select: { accountId: true },
+      })
+    ).map((member) => member.accountId)
+  )
+
   return {
     liveId: live.id,
     // A cancelled live keeps its roll-call frozen
     canManage:
       permissions.includes(Permissions.LiveRoster) && live.status !== LiveStatuses.Cancelled,
+    // Who is in the Mod View stays with whoever supervises
+    connectedIds: SUPERVISORS.some((name) => permissions.includes(name))
+      ? await connectedMemberIds(live.id)
+      : [],
     people: rows.map((row) => ({
       id: row.account.id,
       name: row.account.displayName,
@@ -91,6 +114,11 @@ export const readLiveRoster = async (
       status: row.status as AttendanceStatusName,
       // A member changing trade counts for their PIM too
       isJunior: row.account.role === MemberRoles.Junior || row.account.academyJuniors.length > 0,
+      isReinforcement: reinforced.has(row.account.id),
+      // Planned hours stay with the Responsables
+      plannedFrom: permissions.includes(Permissions.LiveInspect)
+        ? (row.availableFrom?.toISOString() ?? null)
+        : null,
     })),
   }
 }
@@ -143,4 +171,40 @@ export const moveOnRoster = async ({
   await syncJuniorLives([accountId])
 
   return readLiveRoster(id, scope, viewerId, held)
+}
+
+/**
+ * Record the answer of the viewer to the roll-call of a live, present or only passing by
+ * @param {string} id - Live identifier
+ * @param {AccessScope} scope - Viewer perimeter
+ * @param {string} viewerId - Signed-in member
+ * @param {AttendanceStatusName} status - Present or absent
+ * @param {{ from: Date, to: Date } | null} [hours] - Hours expected to be there
+ * @return {Promise<void>} - Recorded
+ */
+
+export const answerOwnPresence = async (
+  id: string,
+  scope: AccessScope,
+  viewerId: string,
+  status: AttendanceStatusName,
+  hours: { from: Date; to: Date } | null = null
+): Promise<void> => {
+  const live = await liveInScope(id, scope)
+  if (!live.calendarEventId) throw conflict()
+
+  // A member the live did not convene takes a seat by answering
+  await prisma.eventAttendance.upsert({
+    where: { eventId_accountId: { eventId: live.calendarEventId, accountId: viewerId } },
+    create: { eventId: live.calendarEventId, accountId: viewerId },
+    update: {},
+  })
+
+  await respondToRollCall({
+    eventId: live.calendarEventId,
+    accountId: viewerId,
+    status,
+    canManage: false,
+    hours,
+  })
 }

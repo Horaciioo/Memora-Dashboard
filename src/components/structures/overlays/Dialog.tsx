@@ -1,6 +1,6 @@
 'use client'
 
-import { useId } from 'react'
+import { useId, useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { ModalHeader } from '@/components/structures/overlays/ModalHeader'
@@ -8,6 +8,15 @@ import { useFocusTrap } from '@/core/hooks/interaction/layout/useFocusTrap'
 import { useScrollLock } from '@/core/hooks/interaction/layout/useScrollLock'
 import { DIALOG_SIZES, DIALOG_STYLES, type DialogSize } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+
+// False while the server renders and during hydration, true once mounted
+const subscribeNothing = () => () => {}
+const useIsMounted = () =>
+  useSyncExternalStore(
+    subscribeNothing,
+    () => true,
+    () => false
+  )
 
 export interface DialogProps {
   open: boolean
@@ -48,8 +57,9 @@ export const Dialog = ({
   const titleId = useId()
   const descriptionId = useId()
   useScrollLock(open)
+  const isMounted = useIsMounted()
 
-  if (!open || typeof document === 'undefined') return null
+  if (!open || !isMounted) return null
 
   return createPortal(
     <div

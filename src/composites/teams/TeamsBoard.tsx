@@ -318,7 +318,7 @@ export const TeamsBoard = ({
       <FormDrawer
         subject={FORM_SUBJECTS.team}
         open={editing !== null}
-        title={editing ? `${ACTION_COPY.edit} · ${editing.name}` : ACTION_COPY.edit}
+        title={editing ? `${ACTION_COPY.edit} ${editing.name}` : ACTION_COPY.edit}
         fields={fields}
         initialValues={editing?.values}
         issues={issues}

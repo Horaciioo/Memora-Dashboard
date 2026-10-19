@@ -51,6 +51,9 @@ export const MEMBER_COPY = {
   socialNetworkInfo: 'Les réseaux proposés sont ceux déclarés dans la configuration.',
   socialHandle: 'Pseudo',
   socialHandleInfo: 'Le début du lien est fixé par le réseau, tu n’écris que la fin.',
+  absenceDeleteTitle: 'Supprimer cette absence ?',
+  absenceDeleteDescription:
+    'Elle disparaît de la fiche. Si elle est en cours, le modérateur n’est plus absent.',
   socialDeleteTitle: 'Supprimer ce réseau ?',
   socialDeleteDescription: 'Le lien disparaît de la fiche, rien d’autre n’est touché.',
   absencesEmptyTitle: 'Aucune absence',

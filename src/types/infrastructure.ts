@@ -55,12 +55,14 @@ export type Environment = (typeof ENVIRONMENTS)[number]
  * @property {string} label - Display name
  * @property {ConfigSubject[]} required - Mandatory subjects
  * @property {boolean} strict - Abort on missing
+ * @property {boolean} plainSecrets - Clear secrets tolerated
  */
 
 export interface EnvironmentManifest {
   label: string
   required: ConfigSubject[]
   strict: boolean
+  plainSecrets: boolean
 }
 
 /**

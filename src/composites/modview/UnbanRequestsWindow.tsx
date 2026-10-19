@@ -1,5 +1,6 @@
 'use client'
 
+import { DotMark } from '@/components/elements/display/Dotted'
 import { Button } from '@/components/elements/actions/Button'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
@@ -42,7 +43,8 @@ export const UnbanRequestsWindow = ({ requests, isLit, gate, onAct }: UnbanReque
               <div className={MODVIEW_FEED.main}>
                 <p>
                   <span className={MODVIEW_FEED.who}>{request.author.name}</span>
-                  {` · ${formatSince(request.at)}`}
+                  <DotMark />
+                  {formatSince(request.at)}
                 </p>
                 <p className={MODVIEW_FEED.quote}>{request.text}</p>
                 <div className={MODVIEW_FEED.actions}>

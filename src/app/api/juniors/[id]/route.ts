@@ -33,7 +33,7 @@ export const PATCH = createProtectedRoute({
         subjectId: junior.accountId,
         targetType: 'junior',
         targetId: params.id,
-        summary: `${junior.account.displayName} · ${ACADEMY_JUNIOR_STATUS_REGISTRY.label(next.status)}`,
+        summary: `${junior.account.displayName}, ${ACADEMY_JUNIOR_STATUS_REGISTRY.label(next.status)}`,
       })
     }
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { Button } from '@/components/elements/actions/Button'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -105,9 +106,12 @@ export const ObjectivesTab = () => {
                       </span>
                     )}
                     <span className="text-xs text-[var(--color-ink-subtle)]">
-                      {[objective.dueAt ? formatDay(objective.dueAt) : null, objective.authorName]
-                        .filter(Boolean)
-                        .join(' · ')}
+                      <Dotted
+                        items={[
+                          objective.dueAt ? formatDay(objective.dueAt) : null,
+                          objective.authorName,
+                        ]}
+                      />
                     </span>
                   </span>
                   <Status label={status.label} accent={status.accent} />

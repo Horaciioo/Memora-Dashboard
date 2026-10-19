@@ -242,7 +242,7 @@ export const AccessConsole = ({ initial, canManageEncadrement }: AccessConsolePr
                   },
                   {
                     value: 'members',
-                    label: `${ACCESS_COPY.tabMembers} · ${memberCount}`,
+                    label: `${ACCESS_COPY.tabMembers} ${memberCount}`,
                     icon: 'members',
                     render: () => <RoleMembersTab selection={selection} access={access} />,
                   },

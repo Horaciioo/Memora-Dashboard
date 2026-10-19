@@ -7,21 +7,41 @@ import type {
 } from '@/utils/constants/workflow'
 
 /**
+ * Hours a member expects to be available
+ * @typedef {Object} AttendanceHours
+ * @property {string} from - ISO start
+ * @property {string} to - ISO end
+ */
+
+export interface AttendanceHours {
+  from: string
+  to: string
+}
+
+/**
  * Convened member on a roll-call roster
  * @typedef {Object} AttendancePerson
+ * @property {string} id - Account identifier
  * @property {string} name - Display name
  * @property {string | null} avatar - Portrait
+ * @property {AttendanceHours | null} hours - Hours they expect to be there
+ * @property {boolean} isReinforcement - Called in on the day
  */
 
 export interface AttendancePerson {
+  id: string
   name: string
   avatar: string | null
+  hours: AttendanceHours | null
+  isReinforcement: boolean
 }
 
 /**
  * Roll-call standings attached to an entry
  * @typedef {Object} AttendanceRoster
  * @property {AttendanceStatusName | null} mine - Viewer's own answer
+ * @property {boolean} asksHours - Viewer states the hours they expect to be there
+ * @property {AttendanceHours | null} myHours - Hours the viewer gave
  * @property {boolean} canManage - Viewer runs this roll-call
  * @property {boolean} visible - Viewer may see the name lists
  * @property {{ present: number, absent: number, pending: number }} counts - Head count per answer
@@ -32,6 +52,8 @@ export interface AttendancePerson {
 
 export interface AttendanceRoster {
   mine: AttendanceStatusName | null
+  asksHours: boolean
+  myHours: AttendanceHours | null
   canManage: boolean
   visible: boolean
   counts: { present: number; absent: number; pending: number }

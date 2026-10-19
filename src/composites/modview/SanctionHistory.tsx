@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { Dotted, DotMark } from '@/components/elements/display/Dotted'
+import { Fragment, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { apiGet } from '@/core/lib/api/client'
@@ -8,6 +9,8 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { nextRung } from '@/core/lib/modview/commands'
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { MODERATION_KINDS } from '@/declarations/lives/moderation'
+import { ActSentence } from '@/composites/modview/ActSentence'
+import { MOD_ACTS } from '@/declarations/modview/registries'
 import { MODVIEW_ACT_COPY, MODVIEW_COPY, MODVIEW_HISTORY_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_HISTORY } from '@/declarations/ui/variants'
 import type { ViewerSanction } from '@/types/lives'
@@ -120,14 +123,23 @@ export const SanctionHistory = ({
 
             {lines.map((act) => (
               <p key={act.id} className={MODVIEW_HISTORY.line}>
+                <ActSentence
+                  text={MODVIEW_ACT_COPY[act.kind]}
+                  verb={MOD_ACTS.get(act.kind).verb}
+                  tone={MOD_ACTS.get(act.kind).tone}
+                />
                 {[
-                  MODVIEW_ACT_COPY[act.kind],
                   act.durationSeconds ? formatDuration(act.durationSeconds) : null,
                   MODVIEW_HISTORY_COPY.by.replace('{name}', act.moderator),
                   act.pending ? MODVIEW_COPY.pending : formatSince(act.at),
                 ]
                   .filter(Boolean)
-                  .join(' · ')}
+                  .map((part) => (
+                    <Fragment key={part}>
+                      <DotMark />
+                      {part}
+                    </Fragment>
+                  ))}
               </p>
             ))}
 
@@ -163,15 +175,17 @@ export const SanctionHistory = ({
                           ? MODVIEW_HISTORY_COPY.fromPanel
                           : MODVIEW_HISTORY_COPY.offPanel}
                       </span>{' '}
-                      {[
-                        MODERATION_KINDS[row.kind].label,
-                        row.durationSeconds ? formatDuration(row.durationSeconds) : null,
-                        row.reason,
-                        MODVIEW_HISTORY_COPY.by.replace('{name}', row.actorName),
-                        formatDayTime(row.occurredAt),
-                      ]
-                        .filter(Boolean)
-                        .join(' · ')}
+                      <Dotted
+                        items={[
+                          MODERATION_KINDS[row.kind].label,
+                          row.durationSeconds ? formatDuration(row.durationSeconds) : null,
+                          row.reason,
+                          row.actorName
+                            ? MODVIEW_HISTORY_COPY.by.replace('{name}', row.actorName)
+                            : null,
+                          formatDayTime(row.occurredAt),
+                        ]}
+                      />
                     </p>
                   ))
                 )}

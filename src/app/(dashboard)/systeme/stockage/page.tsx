@@ -44,7 +44,7 @@ export default async function StoragePage() {
               value:
                 report.orphans.count === 0
                   ? SYSTEM_COPY.storageNone
-                  : `${report.orphans.count} · ${formatBytes(report.orphans.bytes)}`,
+                  : `${report.orphans.count}, ${formatBytes(report.orphans.bytes)}`,
               hint: SYSTEM_COPY.storageOrphansHint,
             },
           ]}

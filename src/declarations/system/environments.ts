@@ -44,8 +44,16 @@ export const WELCOMES_EVERY_ACCOUNT = APP_ENVIRONMENT === 'dev' || APP_ENVIRONME
  */
 
 export const ENVIRONMENT_MANIFESTS: Record<Environment, EnvironmentManifest> = {
-  dev: { label: 'development', required: [], strict: false },
-  staging: { label: 'staging', required: [], strict: false },
-  release: { label: 'release', required: [], strict: true },
-  main: { label: 'production', required: [], strict: true },
+  dev: { label: 'development', required: [], strict: false, plainSecrets: true },
+  staging: { label: 'staging', required: ['encryption'], strict: false, plainSecrets: false },
+  release: { label: 'release', required: ['encryption'], strict: true, plainSecrets: false },
+  main: { label: 'production', required: ['encryption'], strict: true, plainSecrets: false },
 }
+
+/**
+ * Whether a secret may land in the database unencrypted
+ * @return {boolean} - Clear storage tolerated
+ */
+
+export const arePlainSecretsAllowed = (): boolean =>
+  ENVIRONMENT_MANIFESTS[APP_ENVIRONMENT].plainSecrets

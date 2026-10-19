@@ -59,7 +59,7 @@ export const POST = createProtectedRoute({
       actorId: session.id,
       targetType: key,
       targetId: row.id,
-      summary: `${referenceSection(key)?.singular ?? key} · ${row.label}`,
+      summary: `${referenceSection(key)?.singular ?? key}, ${row.label}`,
     })
 
     return row

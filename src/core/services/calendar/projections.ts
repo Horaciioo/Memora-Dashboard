@@ -241,7 +241,7 @@ export const absenceEntries = async ({
         row.status === AbsenceStatuses.Pending
           ? CALENDAR_PROJECTION_COPY.pendingAbsence
           : CALENDAR_PROJECTION_COPY.absence
-      } · ${row.account.displayName}`,
+      }, ${row.account.displayName}`,
       startsAt: row.startDate,
       endsAt: row.endDate,
       allDay: true,
@@ -432,7 +432,7 @@ export const birthdayEntries = async ({
     projected({
       source: CalendarSources.Birthday,
       id: `${occurrence.accountId}:${occurrence.day.getFullYear()}`,
-      title: `${CALENDAR_PROJECTION_COPY.birthday} · ${occurrence.displayName}`,
+      title: `${CALENDAR_PROJECTION_COPY.birthday}, ${occurrence.displayName}`,
       startsAt: occurrence.day,
       endsAt: null,
       allDay: true,
@@ -470,7 +470,7 @@ export const academySessionEntries = async ({
     projected({
       source: CalendarSources.AcademySession,
       id: row.id,
-      title: `${CALENDAR_PROJECTION_COPY.academySession} · ${row.jobFunction.name}`,
+      title: `${CALENDAR_PROJECTION_COPY.academySession}, ${row.jobFunction.name}`,
       startsAt: row.startsAt,
       endsAt: row.endsAt ?? row.startsAt,
       allDay: true,
@@ -539,7 +539,7 @@ export const recruitmentEntries = async ({
     projected({
       source: CalendarSources.RecruitmentInterview,
       id: row.id,
-      title: `${CALENDAR_PROJECTION_COPY.interview} · ${row.displayName ?? row.discordId}`,
+      title: `${CALENDAR_PROJECTION_COPY.interview}, ${row.displayName ?? row.discordId}`,
       startsAt: row.interviewAt as Date,
       endsAt: null,
       allDay: false,
@@ -613,7 +613,7 @@ export const academyZoneEntries = async (
         return projected({
           source: ZONE_SOURCES[zone.part],
           id: `${row.id}:${period.key}`,
-          title: `${label} · ${title}`,
+          title: `${label}, ${title}`,
           startsAt: zone.from,
           endsAt: zone.to ?? row.endsAt ?? to,
           allDay: true,

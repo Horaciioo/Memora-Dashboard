@@ -1,3 +1,4 @@
+import type { LiveAccess } from '@/core/lib/lives/access'
 import type { ModerationKind, ModerationOrigin, ModerationStatus } from '@prisma/client'
 import type { IconName } from '@/declarations/ui/icons'
 import type {
@@ -14,12 +15,14 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
  * @property {string} id - Account identifier
  * @property {string} name - Display name
  * @property {string | null} avatar - Avatar address
+ * @property {boolean} [isReinforcement] - Called in on the day
  */
 
 export interface LivePerson {
   id: string
   name: string
   avatar: string | null
+  isReinforcement?: boolean
 }
 
 /**
@@ -57,7 +60,9 @@ export interface LiveGap {
  * @property {string} title - Live title
  * @property {string} creator - Creator name
  * @property {string} startsAt - Live start
- * @property {string} endsAt - Live end
+ * @property {string | null} endsAt - Live end, none when not planned
+ * @property {string | null} banner - Creator backdrop
+ * @property {string | null} avatar - Creator portrait
  * @property {string | null} askedBy - Responsable who asked
  */
 
@@ -66,7 +71,9 @@ export interface CoordinationRequest {
   title: string
   creator: string
   startsAt: string
-  endsAt: string
+  endsAt: string | null
+  banner: string | null
+  avatar: string | null
   askedBy: string | null
 }
 
@@ -77,6 +84,12 @@ export interface CoordinationRequest {
 
 export interface LiveView {
   id: string
+  // Open to enter, too early, or over
+  access: LiveAccess
+  // ISO moment the doors open, before the planned start
+  opensAt: string
+  // Closed before its planned end, a Responsable or Coordinator may put it back
+  canReopen: boolean
   title: string
   platform: LivePlatformName
   status: LiveStatusName
@@ -93,6 +106,12 @@ export interface LiveView {
   isCoordinating: boolean
   // Instructions of the responsables
   instructions: string
+  // Viewer's own answer to the roll-call, none when not convened
+  myAttendance: AttendanceStatusName | null
+  // Hours the viewer gave with their Present, none when not given
+  myHours: { from: string; to: string } | null
+  // Responsables and Admins convened on it
+  responsables: LivePerson[]
   members: LivePerson[]
   liveconLevel: { level: number; name: string; icon: IconName | null; accent: string | null } | null
   // Permissions the viewer holds on this live
@@ -115,6 +134,8 @@ export interface LiveBeacon {
     platform: LivePlatformName
     status: LiveStatusName
     plannedStartAt: string
+    // Called in as reinforcement
+    isReinforcement: boolean
   }[]
   // Live on air the viewer was not told about yet
   unseenStart: { id: string; creator: string } | null
@@ -142,17 +163,63 @@ export interface LiveLogLine {
 }
 
 /**
+ * Time one member moderated a live against the hours they gave
+ * @typedef {Object} LiveSpan
+ * @property {number} seconds - Time moderated
+ * @property {string} from - ISO first start, the hours given when never there
+ * @property {string} to - ISO last end, the hours given when never there
+ * @property {{ from: string, to: string } | null} declared - Hours given on the roll-call
+ * @property {boolean} isAbsent - Gave hours and was never there during them
+ * @property {number} extraSeconds - Time moderated outside the hours given
+ */
+
+export interface LiveSpan {
+  seconds: number
+  from: string
+  to: string
+  declared: { from: string; to: string } | null
+  isAbsent: boolean
+  extraSeconds: number
+}
+
+/**
+ * Time one member moderated a live
+ * @typedef {Object} LiveModTime
+ * @property {string} accountId - Member
+ * @property {string} name - Display name
+ * @property {string | null} avatar - Avatar address
+ * @property {string | null} outside - Where they come from when not the Live team
+ * @property {{ requestedBy: string | null } | null} reinforcement - Called in on the day, and by whom
+ */
+
+export interface LiveModTime extends LiveSpan {
+  accountId: string
+  name: string
+  avatar: string | null
+  outside: string | null
+  reinforcement: { requestedBy: string | null } | null
+}
+
+/**
  * One live a member moderated
  * @typedef {Object} MemberLiveSummary
+ * @property {string | null} creatorAvatar - Creator's avatar address
+ * @property {string} title - Title of the live
+ * @property {LiveSpan | null} span - Time they moderated it
+ * @property {boolean} isReinforcement - They were called in on the day
  */
 
 export interface MemberLiveSummary {
   liveId: string
   creator: string
+  creatorAvatar: string | null
+  title: string
   platform: LivePlatformName
   startedAt: string
   activeSeconds: number
   visibleSeconds: number
+  span: LiveSpan | null
+  isReinforcement: boolean
   kinds: { kind: ModerationKind; count: number }[]
   lines: LiveLogLine[]
 }
@@ -181,6 +248,8 @@ export interface MemberModerationView {
  * @property {string | null} avatar - Avatar address
  * @property {AttendanceStatusName} status - Answer in force
  * @property {boolean} isJunior - Counted for a PIM
+ * @property {string | null} plannedFrom - ISO hour they said they would be there, for Responsables
+ * @property {boolean} isReinforcement - Called in on the day
  */
 
 export interface LiveRosterPerson {
@@ -189,6 +258,8 @@ export interface LiveRosterPerson {
   avatar: string | null
   status: AttendanceStatusName
   isJunior: boolean
+  plannedFrom: string | null
+  isReinforcement: boolean
 }
 
 /**
@@ -196,12 +267,14 @@ export interface LiveRosterPerson {
  * @typedef {Object} LiveRoster
  * @property {string} liveId - Live identifier
  * @property {boolean} canManage - Viewer may move people
+ * @property {string[]} connectedIds - Members with a Mod View open
  * @property {LiveRosterPerson[]} people - Convened members
  */
 
 export interface LiveRoster {
   liveId: string
   canManage: boolean
+  connectedIds: string[]
   people: LiveRosterPerson[]
 }
 
@@ -234,7 +307,7 @@ export interface LiveFocusView {
  * @property {ModerationKind} kind - Gesture
  * @property {number | null} durationSeconds - Timeout length
  * @property {string | null} reason - Reason
- * @property {string} actorName - Who did it
+ * @property {string | null} actorName - Who did it, hidden from a Modo for a colleague
  * @property {string} liveTitle - Live it happened on
  * @property {boolean} fromPanel - Applied from the panel
  * @property {string | null} offenseId - Panel offence applied
@@ -247,12 +320,28 @@ export interface ViewerSanction {
   kind: ModerationKind
   durationSeconds: number | null
   reason: string | null
-  actorName: string
+  actorName: string | null
   liveTitle: string
   fromPanel: boolean
   offenseId: string | null
   rung: number | null
   occurredAt: string
+}
+
+/**
+ * Private comment a member left on a viewer
+ * @typedef {Object} ViewerComment
+ * @property {string} id - Comment identifier
+ * @property {string} body - Text
+ * @property {string | null} authorName - Member who wrote it
+ * @property {string} createdAt - ISO moment
+ */
+
+export interface ViewerComment {
+  id: string
+  body: string
+  authorName: string | null
+  createdAt: string
 }
 
 /**
@@ -284,4 +373,24 @@ export interface ModeratorInspect {
     onBehalfOf: string | null
     occurredAt: string
   }[]
+}
+
+/**
+ * Note a member left on a viewer during a live
+ * @typedef {Object} LiveNote
+ * @property {string} id - Note identifier
+ * @property {string | null} authorId - Member who wrote it
+ * @property {string} authorName - Display name
+ * @property {string} viewerLogin - Viewer the note is about
+ * @property {string} body - Note text
+ * @property {string} at - ISO moment
+ */
+
+export interface LiveNote {
+  id: string
+  authorId: string | null
+  authorName: string
+  viewerLogin: string
+  body: string
+  at: string
 }

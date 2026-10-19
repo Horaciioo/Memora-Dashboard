@@ -1,10 +1,13 @@
 'use client'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { useState } from 'react'
 
+import { Pagination } from '@/components/elements/navigation/Pagination'
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { Section } from '@/components/structures/page/Section'
 import type { LiveReport } from '@/core/lib/lives/report'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_REPORT_COPY, MODERATION_KINDS } from '@/declarations/lives/moderation'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIVE_REPORT } from '@/declarations/ui/variants'
@@ -28,7 +31,13 @@ const EVERYONE = ''
 
 export const BilanLog = ({ log, moderators }: BilanLogProps) => {
   const [actor, setActor] = useState(EVERYONE)
-  const shown = actor === EVERYONE ? log : log.filter((line) => line.actorKey === actor)
+  const [page, setPage] = useState(1)
+  const filtered = actor === EVERYONE ? log : log.filter((line) => line.actorKey === actor)
+  const pages = Math.max(1, Math.ceil(filtered.length / LIVE_SETTINGS.logPageSize))
+  const shown = filtered.slice(
+    (Math.min(page, pages) - 1) * LIVE_SETTINGS.logPageSize,
+    Math.min(page, pages) * LIVE_SETTINGS.logPageSize
+  )
 
   return (
     <Section
@@ -40,7 +49,10 @@ export const BilanLog = ({ log, moderators }: BilanLogProps) => {
           <SelectMenu
             label={LIVE_REPORT_COPY.logFilter}
             value={actor}
-            onChange={setActor}
+            onChange={(next) => {
+              setActor(next)
+              setPage(1)
+            }}
             options={[
               { value: EVERYONE, label: LIVE_REPORT_COPY.logEveryone },
               ...moderators.map((row) => ({ value: row.key, label: row.name })),
@@ -82,7 +94,9 @@ export const BilanLog = ({ log, moderators }: BilanLogProps) => {
                     )}
                   </span>
                   {details.length > 0 && (
-                    <span className={LIVE_REPORT.lineDetail}>{details.join(' · ')}</span>
+                    <span className={LIVE_REPORT.lineDetail}>
+                      <Dotted items={details} />
+                    </span>
                   )}
                 </span>
               </li>
@@ -90,6 +104,7 @@ export const BilanLog = ({ log, moderators }: BilanLogProps) => {
           })}
         </ol>
       )}
+      <Pagination page={Math.min(page, pages)} totalPages={pages} onPageChange={setPage} />
     </Section>
   )
 }

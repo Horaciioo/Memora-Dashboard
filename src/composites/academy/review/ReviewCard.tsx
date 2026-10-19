@@ -1,5 +1,6 @@
 'use client'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { Status } from '@/components/elements/display/Status'
@@ -119,7 +120,7 @@ export const ReviewCard = ({ review }: ReviewCardProps) => {
       <header className={REVIEW_CARD.head}>
         <h3 className={REVIEW_CARD.title}>{ACADEMY_STAGE_REGISTRY.label(review.stage)}</h3>
         <span className={REVIEW_CARD.meta}>
-          {[review.authorName, formatDay(review.heldAt)].filter(Boolean).join(' · ')}
+          <Dotted items={[review.authorName, formatDay(review.heldAt)]} />
         </span>
         <span className={REVIEW_CARD.tags}>
           <Status label={status.label} accent={status.accent} />
@@ -164,9 +165,13 @@ export const ReviewCard = ({ review }: ReviewCardProps) => {
       {review.decidedAt && (
         <p className={REVIEW_CARD.decision}>
           <span className={REVIEW_CARD.decisionTitle}>
-            {[ACADEMY_COPY.reviewDecisionTitle, review.decidedByName, formatDay(review.decidedAt)]
-              .filter(Boolean)
-              .join(' · ')}
+            <Dotted
+              items={[
+                ACADEMY_COPY.reviewDecisionTitle,
+                review.decidedByName,
+                formatDay(review.decidedAt),
+              ]}
+            />
           </span>
           {review.decisionNote}
         </p>

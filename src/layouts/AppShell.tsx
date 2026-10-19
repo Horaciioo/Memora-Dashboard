@@ -96,7 +96,10 @@ const AppShellFrame = ({
 
   return (
     <SealProvider initialState={twoFactor} initialSeal={seal}>
-      <div className={APP_SHELL.frame} data-tone={frameToneOf(viewContext.view, session?.role)}>
+      <div
+        className={isBare ? APP_SHELL.frameBare : APP_SHELL.frame}
+        data-tone={frameToneOf(viewContext.view, session?.role)}
+      >
         {isBare ? null : isClaimed ? (
           <aside className={LEFT_SIDEBAR.rail}>
             <div ref={setSlot} className={LEFT_SIDEBAR.slot} />
@@ -104,7 +107,7 @@ const AppShellFrame = ({
         ) : (
           <LeftSidebar viewContext={viewContext} unreadCount={unreadCount} />
         )}
-        <WindowFrame bare={isBare} />
+        {!isBare && <WindowFrame />}
 
         <div className={APP_SHELL.main}>
           {session && (

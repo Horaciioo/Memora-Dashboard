@@ -501,7 +501,7 @@ export const PermissionsList: PermissionMeta[] = [
     group: PermissionGroups.Live,
     displayName: 'Mode Focus',
     description:
-      'Suivre en temps réel les gestes d’un modérateur et agir à sa place. Un Formateur ne suit que les Juniors.',
+      'Suivre en temps réel les actions de Mod. d’un modérateur et agir à sa place. Un Formateur ne suit que les Juniors.',
     important: true,
     parent: Permissions.LiveRead,
   },

@@ -34,9 +34,18 @@ export const syncRoleGrants = async (): Promise<void> => {
 
   // One transaction per batch
   for (const addition of pending) {
-    const rows = Object.entries(addition.grants).flatMap(([role, permissions]) =>
-      (permissions ?? []).map((permission) => ({ role: role as MemberRoleName, permission }))
-    )
+    const rows = [
+      ...Object.entries(addition.grants).flatMap(([role, permissions]) =>
+        (permissions ?? []).map((permission) => ({ role: role as MemberRoleName, permission }))
+      ),
+      ...Object.entries(addition.roleDenies ?? {}).flatMap(([role, permissions]) =>
+        (permissions ?? []).map((permission) => ({
+          role: role as MemberRoleName,
+          permission,
+          effect: PermissionEffects.Deny,
+        }))
+      ),
+    ]
 
     // Function grants resolved by name
     const functionNames = [

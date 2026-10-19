@@ -18,6 +18,7 @@
 @import './shell/welcome.css';
 @import './motion/feedback.css';
 @import './motion/overlays.css';
+@import './motion/focus.css';
 @import './motion/splash.css';
 @import './motion/course.css';
 @import './motion/replica.css';

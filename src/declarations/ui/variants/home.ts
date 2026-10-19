@@ -183,6 +183,7 @@ export const HOME_TASKS = {
   sentenceDone:
     'text-[var(--color-ink-subtle)] line-through decoration-2 decoration-[var(--color-ink-subtle)]/60',
   number: 'font-bold',
+  urgent: 'text-[var(--color-danger)]',
   chevron:
     'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform group-hover:translate-x-0.5',
 } as const

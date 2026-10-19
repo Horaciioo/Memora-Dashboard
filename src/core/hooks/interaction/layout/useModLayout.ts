@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
+  allowSpec,
   buildLayout,
   moveWindow,
   reconcileLayout,
@@ -19,7 +20,7 @@ import type { ModViewProfileName } from '@/declarations/modview/profiles'
 import type { ModViewWindow } from '@/types/modview'
 
 // One save per seat, kept in this browser
-const storageKey = (profile: ModViewProfileName) => `memora:modview:layout:v2:${profile}`
+const storageKey = (profile: ModViewProfileName) => `memora:modview:layout:v4:${profile}`
 
 /**
  * Saved arrangement
@@ -78,11 +79,7 @@ export const useModLayout = (profile: ModViewProfileName, available: ModViewWind
   const starting = useMemo(() => {
     const allowed = seat.windows.filter((id) => available.includes(id))
 
-    return buildLayout(
-      seat.columns.map((column) => column.filter((id) => allowed.includes(id))),
-      seat.widths,
-      seat.sizes
-    )
+    return buildLayout(allowSpec(seat.columns, allowed), seat.widths, seat.sizes)
   }, [seat, available])
 
   const [state, setState] = useState<SavedWorkspace>({ layout: starting, hidden: seat.hidden })

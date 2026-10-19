@@ -1,11 +1,13 @@
 'use client'
 
+import { DotMark } from '@/components/elements/display/Dotted'
+import { ActSentence } from '@/composites/modview/ActSentence'
 import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { memberMenu, memberNamed } from '@/composites/modview/memberMenu'
 import type { TeamTools } from '@/composites/modview/memberMenu'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
 import { useMenu } from '@/managers/front-end'
-import { MODVIEW_ACT_COPY, MODVIEW_COPY } from '@/declarations/modview/copy'
+import { MODVIEW_ACT_COPY, MODVIEW_COPY, MODVIEW_INSPECT_COPY } from '@/declarations/modview/copy'
 import { MOD_ACTS } from '@/declarations/modview/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_FEED } from '@/declarations/ui/variants'
@@ -55,17 +57,13 @@ export const ModActionsWindow = ({
         <ul className={MODVIEW_FEED.list}>
           {acts.map((act) => {
             const Icon = ICONS[MOD_ACTS.get(act.kind).icon]
+            const isFocused =
+              Boolean(focusLogin) && act.moderator.toLowerCase() === focusLogin?.toLowerCase()
 
             return (
               <li
                 key={act.id}
-                className={cn(
-                  MODVIEW_FEED.item,
-                  act.pending && MODVIEW_FEED.itemPending,
-                  focusLogin &&
-                    act.moderator.toLowerCase() === focusLogin.toLowerCase() &&
-                    MODVIEW_FEED.itemFocus
-                )}
+                className={cn(MODVIEW_FEED.item, act.pending && MODVIEW_FEED.itemPending)}
               >
                 <Icon className={MODVIEW_FEED.icon} aria-hidden="true" />
                 <div className={MODVIEW_FEED.main}>
@@ -79,9 +77,13 @@ export const ModActionsWindow = ({
                     </button>
                   )}
                   <p className={MODVIEW_FEED.line}>
-                    {MODVIEW_ACT_COPY[act.kind]}{' '}
+                    <ActSentence
+                      text={MODVIEW_ACT_COPY[act.kind]}
+                      verb={MOD_ACTS.get(act.kind).verb}
+                      tone={MOD_ACTS.get(act.kind).tone}
+                    />{' '}
                     <span
-                      className={MODVIEW_FEED.who}
+                      className={cn(MODVIEW_FEED.who, isFocused && MODVIEW_FEED.whoFocus)}
                       onContextMenu={(event) => {
                         const member = team ? memberNamed(act.moderator, team.members) : null
                         if (team && member)
@@ -90,10 +92,14 @@ export const ModActionsWindow = ({
                     >
                       {act.moderator}
                     </span>
+                    {isFocused && (
+                      <span className={MODVIEW_FEED.focusTag}>{MODVIEW_INSPECT_COPY.focusTag}</span>
+                    )}
                     {act.durationSeconds
                       ? ` ${MODVIEW_COPY.during} ${formatDuration(act.durationSeconds)}`
                       : ''}
-                    {` · ${act.pending ? MODVIEW_COPY.pending : formatSince(act.at)}`}
+                    <DotMark />
+                    {act.pending ? MODVIEW_COPY.pending : formatSince(act.at)}
                   </p>
                   {act.quote && (
                     <p className={MODVIEW_FEED.quote}>

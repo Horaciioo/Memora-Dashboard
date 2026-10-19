@@ -273,7 +273,7 @@ export const ReferenceManager = ({
       <FormDrawer
         subject={referenceSubject(section)}
         open={editing !== null}
-        title={editing ? `${ACTION_COPY.edit} · ${editing.label}` : ACTION_COPY.edit}
+        title={editing ? `${ACTION_COPY.edit} ${editing.label}` : ACTION_COPY.edit}
         fields={fields}
         initialValues={editing?.values}
         issues={issues}

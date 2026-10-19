@@ -1,5 +1,6 @@
 import Link from '@/components/elements/navigation/AppLink'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Section } from '@/components/structures/page/Section'
 import { LIVE_REPORT_COPY } from '@/declarations/lives/moderation'
@@ -36,7 +37,7 @@ export const PastLives = ({ lives, canReport, canCreatorReport }: PastLivesProps
               <div>
                 <p className={LIVE_REPORT.pastName}>{live.youtuber.name}</p>
                 <p className={LIVE_REPORT.pastMeta}>
-                  {`${formatDay(live.startedAt ?? live.plannedStartAt)} · ${live.title}`}
+                  <Dotted items={[formatDay(live.startedAt ?? live.plannedStartAt), live.title]} />
                 </p>
               </div>
             </div>

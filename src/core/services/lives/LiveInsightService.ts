@@ -34,15 +34,26 @@ const liveInScope = async (liveId: string, scope: AccessScope) => {
  * @param {string} liveId - Live the view opens on
  * @param {string} viewerId - Platform user identifier of the viewer
  * @param {AccessScope} scope - Reader perimeter
+ * @param {{ readerId: string, seesAll: boolean }} reader - Who reads, and whether every author shows
  * @return {Promise<ViewerSanction[]>} - Latest first
  */
 
 export const viewerSanctions = async (
   liveId: string,
   viewerId: string,
-  scope: AccessScope
+  scope: AccessScope,
+  reader: { readerId: string; seesAll: boolean }
 ): Promise<ViewerSanction[]> => {
   const live = await liveInScope(liveId, scope)
+
+  // A trainer reads the gestures of their own juniors, a Modo only their own
+  const juniors = reader.seesAll
+    ? []
+    : await prisma.academyJunior.findMany({
+        where: { trainerId: reader.readerId },
+        select: { accountId: true },
+      })
+  const readable = new Set([reader.readerId, ...juniors.map((junior) => junior.accountId)])
 
   const rows = await prisma.moderationAction.findMany({
     where: {
@@ -63,7 +74,10 @@ export const viewerSanctions = async (
     kind: row.kind,
     durationSeconds: row.durationSeconds,
     reason: row.reason,
-    actorName: row.actor?.displayName ?? row.actorLogin ?? '',
+    actorName:
+      reader.seesAll || (row.actorAccountId && readable.has(row.actorAccountId))
+        ? (row.actor?.displayName ?? row.actorLogin ?? '')
+        : null,
     liveTitle: row.live.title,
     fromPanel: row.offenseId !== null,
     offenseId: row.offenseId,

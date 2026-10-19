@@ -24,7 +24,8 @@ export interface CalendarDetailProps {
   // Same entry once the roster refreshed
   live: CalendarEntry
   pending: boolean
-  onRespond: (status: AttendanceStatusName) => void
+  onRespond: (status: AttendanceStatusName, hours?: { from: string; to: string }) => void
+  onMove: (accountId: string, status: AttendanceStatusName) => void
   onRemind: () => void
 }
 
@@ -36,7 +37,8 @@ const InfoIcon = ICONS.info
  * @param {CalendarEntry} entry - Opened entry
  * @param {CalendarEntry} live - Opened entry with its fresh roster
  * @param {boolean} pending - A mutation is in flight
- * @param {(status: AttendanceStatusName) => void} onRespond - Send Present or Absent
+ * @param {(status: AttendanceStatusName, hours?: { from: string, to: string }) => void} onRespond - Send Present or Absent
+ * @param {(accountId: string, status: AttendanceStatusName) => void} onMove - Move a member on the roll-call
  * @param {() => void} onRemind - Ping the no-answers now
  * @return {JSX.Element}
  */
@@ -46,6 +48,7 @@ export const CalendarDetail = ({
   live,
   pending,
   onRespond,
+  onMove,
   onRemind,
 }: CalendarDetailProps) => {
   if (entry.source === CalendarSources.Birthday) {
@@ -141,7 +144,13 @@ export const CalendarDetail = ({
       )}
 
       {live.rollCall && (
-        <AttendancePanel entry={live} pending={pending} onRespond={onRespond} onRemind={onRemind} />
+        <AttendancePanel
+          entry={live}
+          pending={pending}
+          onRespond={onRespond}
+          onMove={onMove}
+          onRemind={onRemind}
+        />
       )}
     </div>
   )

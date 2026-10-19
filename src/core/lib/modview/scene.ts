@@ -1,3 +1,4 @@
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { ChatOptionName } from '@/declarations/modview/registries'
 import type {
   ChatMessage,
@@ -61,7 +62,7 @@ export interface ModViewScene {
 }
 
 // Chat lines kept by default
-const DEFAULT_MAX_MESSAGES = 200
+const DEFAULT_MAX_MESSAGES = LIVE_SETTINGS.roomMessages
 
 /**
  * Played state of a scene
@@ -80,16 +81,20 @@ export interface SceneState {
  * @param {ChatMessage[]} messages - Chat
  * @param {(message: ChatMessage) => boolean} match - Lines to remove
  * @param {string} moderator - Who removed them
+ * @param {boolean} [isNamed] - Replaces a platform mark
  * @return {ChatMessage[]} - Chat
  */
 
 const strike = (
   messages: ChatMessage[],
   match: (message: ChatMessage) => boolean,
-  moderator: string
+  moderator: string,
+  isNamed = false
 ): ChatMessage[] =>
   messages.map((message) =>
-    match(message) && !message.deletedBy ? { ...message, deletedBy: moderator } : message
+    match(message) && (isNamed || !message.deletedBy)
+      ? { ...message, deletedBy: moderator }
+      : message
   )
 
 // Chat menu
@@ -120,13 +125,24 @@ export const applySceneEvent = (
     case 'act': {
       // A removal also greys the line in the chat
       const messages = event.deleteMessageId
-        ? strike(view.messages, (line) => line.id === event.deleteMessageId, event.act.moderator)
+        ? strike(
+            view.messages,
+            (line) => line.id === event.deleteMessageId,
+            event.act.moderator,
+            true
+          )
         : view.messages
 
-      return { ...state, view: { ...view, messages, acts: [event.act, ...view.acts] } }
+      // Bounded logs
+      const acts = [event.act, ...view.acts].slice(0, LIVE_SETTINGS.roomActs)
+
+      return { ...state, view: { ...view, messages, acts } }
     }
     case 'hold':
-      return { ...state, view: { ...view, held: [event.held, ...view.held] } }
+      return {
+        ...state,
+        view: { ...view, held: [event.held, ...view.held].slice(0, LIVE_SETTINGS.roomHeld) },
+      }
     case 'release':
       return {
         ...state,

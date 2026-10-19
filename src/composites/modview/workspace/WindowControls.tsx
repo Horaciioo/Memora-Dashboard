@@ -13,8 +13,6 @@ import { cn } from '@/utils/classnames'
 export interface WindowControlsProps {
   chrome: WindowChrome
   title: string
-  // Drag handle on the left, buttons on the right
-  part: 'grip' | 'buttons'
 }
 
 /**
@@ -67,23 +65,14 @@ export const windowMenu = (chrome: WindowChrome): MenuItem[] => [
 ]
 
 /**
- * Handle and buttons of a window heading
+ * Buttons of a window heading
  * @param {WindowControlsProps} props - Controls props
  * @return {JSX.Element}
  */
 
-export const WindowControls = ({ chrome, title, part }: WindowControlsProps) => {
-  const { contextMenu, openMenu } = useMenu()
-  const GripIcon = ICONS.drag
+export const WindowControls = ({ chrome, title }: WindowControlsProps) => {
+  const { openMenu } = useMenu()
   const FoldIcon = ICONS.expand
-
-  if (part === 'grip') {
-    return (
-      <span onContextMenu={contextMenu(windowMenu(chrome), title)}>
-        <GripIcon className={MODVIEW_WINDOW.grip} aria-hidden="true" />
-      </span>
-    )
-  }
 
   const open = (event: MouseEvent) =>
     openMenu(windowMenu(chrome), { x: event.clientX, y: event.clientY }, title)

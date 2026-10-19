@@ -6,6 +6,8 @@ import AppLink from '@/components/elements/navigation/AppLink'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { PageOptions } from '@/components/structures/page/PageOptions'
+import { LiveEndedDialog } from '@/composites/lives/LiveEndedDialog'
+import { LiveRecent } from '@/composites/lives/LiveRecent'
 import { LiveStage } from '@/composites/lives/LiveStage'
 import { LiveTile } from '@/composites/lives/LiveTile'
 import { PastLives } from '@/composites/lives/PastLives'
@@ -14,7 +16,7 @@ import { LIVE_COPY } from '@/declarations/lives/copy'
 import { LIVE_PRESET } from '@/declarations/lives/registries'
 import { ROUTES } from '@/declarations/navigation'
 import { PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
-import { BUTTON_STYLES, LIVE_BOARD } from '@/declarations/ui/variants'
+import { BUTTON_STYLES, LIVE_BOARD, LIVE_RECENT } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
 import { cn } from '@/utils/classnames'
 import { LiveStatuses } from '@/utils/constants/lives'
@@ -22,15 +24,18 @@ import { Permissions } from '@/utils/constants/permissions'
 
 export interface LivesBoardProps {
   initialLives: LiveView[]
+  initialRecent: LiveView[]
   canAnnounce: boolean
   past: LiveView[]
   canReport: boolean
   canCreatorReport: boolean
+  // Dev only: simulated live controls
 }
 
 /**
  * Open lives
  * @param {LiveView[]} initialLives - Lives resolved server-side
+ * @param {LiveView[]} initialRecent - Lives closed within the day
  * @param {boolean} canAnnounce - Viewer may announce
  * @param {LiveView[]} past - Finished lives
  * @param {boolean} canReport - Viewer reads the Bilan
@@ -40,15 +45,19 @@ export interface LivesBoardProps {
 
 export const LivesBoard = ({
   initialLives,
+  initialRecent,
   canAnnounce,
   past,
   canReport,
   canCreatorReport,
 }: LivesBoardProps) => {
-  const { lives, isSaving, move } = useLives(initialLives)
+  const { lives, recent, isSaving, endedId, dismissEnded, move, reopen } = useLives(
+    initialLives,
+    initialRecent
+  )
   const [showPast, setShowPast] = useState(false)
   const onAir = lives.filter((live) => live.status === LiveStatuses.Live)
-  const upcoming = lives.filter((live) => live.status !== LiveStatuses.Live)
+  const upcoming = lives.filter((live) => live.status === LiveStatuses.Announced)
 
   // A live is planned on the calendar
   const announceButton = (
@@ -63,20 +72,16 @@ export const LivesBoard = ({
   return (
     <div className={LIVE_BOARD.wrapper}>
       <PageOptions
-        options={
-          canReport
-            ? [
-                {
-                  id: 'past',
-                  label: PAGE_OPTIONS_COPY.showPastLives,
-                  checked: showPast,
-                  onChange: setShowPast,
-                },
-              ]
-            : []
-        }
+        options={[
+          {
+            id: 'past',
+            label: PAGE_OPTIONS_COPY.showPastLives,
+            checked: showPast,
+            onChange: setShowPast,
+          },
+        ]}
       />
-      {lives.length === 0 ? (
+      {lives.length === 0 && recent.length === 0 ? (
         <EmptyState
           figure="livecon"
           title={LIVE_COPY.emptyTitle}
@@ -87,7 +92,6 @@ export const LivesBoard = ({
         />
       ) : (
         <>
-          {canAnnounce && <div className={LIVE_BOARD.toolbar}>{announceButton}</div>}
           {[
             {
               key: 'live',
@@ -127,9 +131,25 @@ export const LivesBoard = ({
         </>
       )}
 
+      {recent.length > 0 && (
+        <section className={LIVE_BOARD.group}>
+          <h2 className={LIVE_BOARD.groupTitle}>{LIVE_COPY.recentSection}</h2>
+          <ul className={LIVE_RECENT.list}>
+            {recent.map((live) => (
+              <li key={live.id}>
+                <LiveRecent live={live} isSaving={isSaving} onReopen={() => void reopen(live.id)} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {showPast && (
         <PastLives lives={past} canReport={canReport} canCreatorReport={canCreatorReport} />
       )}
+
+
+      <LiveEndedDialog liveId={canReport ? endedId : null} onClose={dismissEnded} />
     </div>
   )
 }

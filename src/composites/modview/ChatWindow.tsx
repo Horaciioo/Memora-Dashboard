@@ -1,8 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { Toggle } from '@/components/elements/forms/inputs/Toggle'
+import { useChatPause } from '@/core/hooks/interaction/state/useChatPause'
+import { tierOf } from '@/core/lib/modview/tier'
+import { ActSentence } from '@/composites/modview/ActSentence'
 import { ChatModesMenu } from '@/composites/modview/ChatModesMenu'
 import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { ModWindow } from '@/composites/modview/ModWindow'
@@ -10,12 +14,24 @@ import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
 import { useMenu } from '@/managers/front-end'
-import { CHAT_MODES, CHAT_OPTIONS, MODVIEW_DEFAULTS } from '@/declarations/modview/registries'
+import {
+  CHAT_MODES,
+  CHAT_OPTIONS,
+  MODVIEW_DEFAULTS,
+  TIER_BADGE_ICONS,
+} from '@/declarations/modview/registries'
 import type { ChatOptionName } from '@/declarations/modview/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
-import { MODVIEW_CHAT, MODVIEW_MODES } from '@/declarations/ui/variants'
-import type { ChatBadge, ChatMessage, Chatter, ModViewState, ModViewTarget } from '@/types/modview'
+import { MODVIEW_CHAT, MODVIEW_MODES, MODVIEW_TIER } from '@/declarations/ui/variants'
+import type {
+  ChatBadge,
+  ChatMessage,
+  Chatter,
+  MemoraRank,
+  ModViewState,
+  ModViewTarget,
+} from '@/types/modview'
 import { cn } from '@/utils/classnames'
 import { formatClock } from '@/utils/format/modview'
 
@@ -27,9 +43,6 @@ const BADGE_ICONS: Record<ChatBadge, IconName> = {
   bot: 'chatBot',
   subscriber: 'modeSubscribers',
 }
-
-// Pixels from the bottom still read as following
-const FOLLOW_SLACK = 48
 
 export interface ChatWindowProps {
   state: ModViewState
@@ -44,6 +57,8 @@ export interface ChatWindowProps {
   onSend: (text: string) => void
   // Why the last line was not sent
   hint: string | null
+  // Terms drawers offered in the modes
+  hasTerms?: boolean
 }
 
 /**
@@ -58,6 +73,7 @@ export interface ChatWindowProps {
  * @param {(text: string) => void} onDraft - Typing handler
  * @param {(text: string) => void} onSend - Sending handler, commands included
  * @param {string | null} hint - Why the last line was not sent
+ * @param {boolean} [hasTerms] - Terms drawers offered
  * @return {JSX.Element}
  */
 
@@ -72,34 +88,28 @@ export const ChatWindow = ({
   onDraft,
   onSend,
   hint,
+  hasTerms,
 }: ChatWindowProps) => {
   const [menu, setMenu] = useState<'modes' | 'options' | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const [isFollowing, setFollowing] = useState(true)
   const [options, setOptions] = useState<Record<ChatOptionName, boolean>>({
     timestamps: true,
     badges: true,
     deleted: true,
     firstMessages: true,
+    hoverPause: true,
+    colouredNames: true,
   })
-  const listRef = useRef<HTMLDivElement>(null)
 
   // A scene drives the menu over the reader
   const script = state.chatScript
   const openMenu = script ? script.menu : menu
-  const shown = { ...options, ...script?.options }
-
-  // Follow the newest line unless the reader went up
-  useEffect(() => {
-    const list = listRef.current
-    if (list && isFollowing) list.scrollTop = list.scrollHeight
-  }, [state.messages, isFollowing])
-
-  const onScroll = () => {
-    const list = listRef.current
-    if (!list) return
-    setFollowing(list.scrollHeight - list.scrollTop - list.clientHeight < FOLLOW_SLACK)
-  }
+  const forced = script?.options
+  const shown = useMemo(() => ({ ...options, ...forced }), [options, forced])
+  const { listRef, lines, pause, resume, listHandlers } = useChatPause(
+    state.messages,
+    shown.hoverPause
+  )
 
   // A command is gated as the gesture it carries
   const isCommand = draft.trim().startsWith('/')
@@ -155,42 +165,39 @@ export const ChatWindow = ({
         </>
       }
     >
-      {openMenu === 'modes' && <ChatModesMenu state={state} gate={gate} onAct={onAct} />}
+      {openMenu === 'modes' && (
+        <ChatModesMenu state={state} gate={gate} onAct={onAct} hasTerms={hasTerms} />
+      )}
       {openMenu === 'options' && (
         <div className={MODVIEW_MODES.panel} role="menu" aria-label={MODVIEW_COPY.chatOptions}>
           {CHAT_OPTIONS.keys.map((key) => (
-            <button
+            <div
               key={key}
-              type="button"
-              role="menuitemcheckbox"
-              aria-checked={shown[key]}
               className={cn(MODVIEW_MODES.row, script?.lit === key && MODVIEW_MODES.rowLit)}
-              onClick={() => setOptions((current) => ({ ...current, [key]: !current[key] }))}
             >
               <span className={MODVIEW_MODES.rowLabel}>{CHAT_OPTIONS.label(key)}</span>
-              <span
-                className={cn(
-                  MODVIEW_MODES.rowState,
-                  shown[key] ? MODVIEW_MODES.on : MODVIEW_MODES.off
-                )}
-              >
-                {shown[key] ? MODVIEW_COPY.modeOn : MODVIEW_COPY.modeOff}
-              </span>
-            </button>
+              <Toggle
+                bare
+                checked={shown[key]}
+                label={CHAT_OPTIONS.label(key)}
+                onChange={(checked) => setOptions((current) => ({ ...current, [key]: checked }))}
+              />
+            </div>
           ))}
         </div>
       )}
 
-      <div className={MODVIEW_CHAT.scroller} ref={listRef} onScroll={onScroll}>
+      <div className={MODVIEW_CHAT.scroller} ref={listRef} {...listHandlers}>
         <p className={MODVIEW_CHAT.welcome}>
           {MODVIEW_COPY.welcome.replace('{channel}', state.channel.name)}
         </p>
         <ul className={MODVIEW_CHAT.list}>
-          {state.messages.map((message) => (
+          {lines.map((message) => (
             <ChatLine
               key={message.id}
               message={message}
               options={shown}
+              roster={state.roster}
               gate={gate}
               onAct={onAct}
               onPick={onPick}
@@ -200,11 +207,12 @@ export const ChatWindow = ({
         </ul>
       </div>
 
-      {!isFollowing && (
-        <button type="button" className={MODVIEW_CHAT.resume} onClick={() => setFollowing(true)}>
+      {pause === 'scroll' && (
+        <button type="button" className={MODVIEW_CHAT.resume} onClick={resume}>
           {MODVIEW_COPY.resume}
         </button>
       )}
+      {pause === 'hover' && <p className={MODVIEW_CHAT.paused}>{MODVIEW_COPY.paused}</p>}
 
       <form
         className={MODVIEW_CHAT.composer}
@@ -214,25 +222,30 @@ export const ChatWindow = ({
         }}
       >
         {hint && <p className={MODVIEW_CHAT.hint}>{hint}</p>}
-        <input
-          ref={inputRef}
-          className={MODVIEW_CHAT.input}
-          placeholder={
-            sayGate.allowed
-              ? MODVIEW_COPY.placeholder
-              : canCommand
-                ? MODVIEW_COPY.commandsOnly
-                : (sayGate.reason ?? '')
-          }
-          aria-label={MODVIEW_COPY.placeholder}
-          disabled={!sayGate.allowed && !canCommand}
-          value={draft}
-          onChange={(event) => onDraft(event.target.value)}
-        />
         <div className={MODVIEW_CHAT.composerRow}>
-          <Button type="submit" variant="primary" disabled={!sayGate.allowed || !draft.trim()}>
-            {MODVIEW_COPY.send}
-          </Button>
+          <input
+            ref={inputRef}
+            className={MODVIEW_CHAT.input}
+            placeholder={
+              sayGate.allowed
+                ? MODVIEW_COPY.placeholder
+                : canCommand
+                  ? MODVIEW_COPY.commandsOnly
+                  : (sayGate.reason ?? '')
+            }
+            aria-label={MODVIEW_COPY.placeholder}
+            disabled={!sayGate.allowed && !canCommand}
+            value={draft}
+            onChange={(event) => onDraft(event.target.value)}
+          />
+          <Button
+            type="submit"
+            variant="ghost"
+            icon="chat"
+            aria-label={MODVIEW_COPY.send}
+            title={MODVIEW_COPY.send}
+            disabled={!sayGate.allowed || !draft.trim()}
+          />
         </div>
       </form>
     </ModWindow>
@@ -242,6 +255,7 @@ export const ChatWindow = ({
 interface ChatLineProps {
   message: ChatMessage
   options: Record<ChatOptionName, boolean>
+  roster?: Record<string, MemoraRank>
   gate: GateCheck
   onAct: ActRunner
   onPick: (chatter: Chatter) => void
@@ -254,11 +268,28 @@ interface ChatLineProps {
  * @return {JSX.Element}
  */
 
-const ChatLine = ({ message, options, gate, onAct, onPick, onWatch }: ChatLineProps) => {
+const ChatRow = ({ message, options, roster, gate, onAct, onPick, onWatch }: ChatLineProps) => {
   const { contextMenu } = useMenu()
   const chatterId = message.author.id
   const isDeleted = Boolean(message.deletedBy)
   const isFirst = message.isFirst && options.firstMessages
+
+  // The rank glyph stands in for the platform mod badge
+  const tier = tierOf(message.author, roster)
+  const rankIcon = TIER_BADGE_ICONS[tier]
+  const badgeIcons = [
+    ...(rankIcon ? [rankIcon] : []),
+    ...message.author.badges
+      .filter((badge) => !(rankIcon && badge === 'moderator'))
+      .map((badge) => BADGE_ICONS[badge]),
+  ]
+  const deletedSentence = (
+    <ActSentence
+      text={MODVIEW_COPY.deletedBy.replace('{name}', message.deletedBy ?? '')}
+      verb={MODVIEW_COPY.deletedVerb}
+      tone="danger"
+    />
+  )
 
   // Three quick gestures
   const tools = [
@@ -299,14 +330,13 @@ const ChatLine = ({ message, options, gate, onAct, onPick, onWatch }: ChatLinePr
         </time>
       )}
       {options.badges &&
-        message.author.badges.map((badge) => {
-          const Badge = ICONS[BADGE_ICONS[badge]]
-          return <Badge key={badge} className={MODVIEW_CHAT.badge} aria-hidden="true" />
+        badgeIcons.map((icon) => {
+          const Badge = ICONS[icon]
+          return <Badge key={icon} className={MODVIEW_CHAT.badge} aria-hidden="true" />
         })}
       <button
         type="button"
-        className={MODVIEW_CHAT.name}
-        style={message.author.colour ? { color: message.author.colour } : undefined}
+        className={cn(MODVIEW_CHAT.name, options.colouredNames && MODVIEW_TIER[tier])}
         onClick={() => onPick(message.author)}
         onContextMenu={contextMenu(
           [
@@ -330,14 +360,14 @@ const ChatLine = ({ message, options, gate, onAct, onPick, onWatch }: ChatLinePr
       </button>
       {': '}
       {isDeleted && !options.deleted ? (
-        <span className={MODVIEW_CHAT.deleted}>{MODVIEW_COPY.deletedBy}</span>
+        <span className={MODVIEW_CHAT.deleted}>{deletedSentence}</span>
       ) : (
         <span className={cn(isDeleted && MODVIEW_CHAT.deletedText)}>
           <FlaggedText text={message.text} flagged={message.flagged} />
         </span>
       )}
       {isDeleted && options.deleted && (
-        <span className={MODVIEW_CHAT.deletedNote}>{MODVIEW_COPY.deletedBy}</span>
+        <span className={MODVIEW_CHAT.deletedNote}>{deletedSentence}</span>
       )}
 
       {!isDeleted && (
@@ -365,3 +395,6 @@ const ChatLine = ({ message, options, gate, onAct, onPick, onWatch }: ChatLinePr
     </li>
   )
 }
+
+// Only changed lines render
+const ChatLine = memo(ChatRow)

@@ -10,6 +10,7 @@ import { SCOPE_SETTINGS } from '@/declarations/configurations/settings'
 import { SCOPE_TARGETS } from '@/declarations/access/scope'
 import type { ScopeTarget } from '@/declarations/access/scope'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
+import { OPEN_LIVE_STATUSES } from '@/utils/constants/lives'
 
 /**
  * Creators a member is allowed to reach
@@ -17,12 +18,14 @@ import type { PermissionHelpers, SessionUser } from '@/types/auth'
  * @property {boolean} isGlobal - Sees every creator
  * @property {string[]} youtuberIds - Creators in perimeter
  * @property {string | null} activeYoutuberId - Creator the perimeter is narrowed to
+ * @property {string[]} [reinforcedLiveIds] - Open lives the member was called to as reinforcement
  */
 
 export interface AccessScope {
   isGlobal: boolean
   youtuberIds: string[]
   activeYoutuberId: string | null
+  reinforcedLiveIds?: string[]
 }
 
 // Teams a responsable leads widen their perimeter to the whole creator
@@ -36,6 +39,21 @@ const leadPerimeter = cache(async (accountId: string): Promise<string[]> => {
 })
 
 /**
+ * Open lives a member was called to as reinforcement, whatever their creators
+ * @param {string} accountId - Member
+ * @return {Promise<string[]>} - Live identifiers
+ */
+
+const reinforcedLives = async (accountId: string): Promise<string[]> => {
+  const rows = await prisma.liveMember.findMany({
+    where: { accountId, reinforcement: true, live: { status: { in: [...OPEN_LIVE_STATUSES] } } },
+    select: { liveId: true },
+  })
+
+  return rows.map((row) => row.liveId)
+}
+
+/**
  * Resolve the creators a member may read
  * @param {SessionUser} viewer - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
@@ -43,6 +61,25 @@ const leadPerimeter = cache(async (accountId: string): Promise<string[]> => {
  */
 
 export const readScope = async (
+  viewer: SessionUser,
+  access: PermissionHelpers
+): Promise<AccessScope> => {
+  const [base, reinforcedLiveIds] = await Promise.all([
+    readBaseScope(viewer, access),
+    reinforcedLives(viewer.id),
+  ])
+
+  return { ...base, reinforcedLiveIds }
+}
+
+/**
+ * Creators a member may read, before any reinforcement
+ * @param {SessionUser} viewer - Signed-in member
+ * @param {PermissionHelpers} access - Permission helpers
+ * @return {Promise<AccessScope>} - Perimeter
+ */
+
+const readBaseScope = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<AccessScope> => {
@@ -137,7 +174,15 @@ export const scopedWhere = <T extends object>(
           ? { OR: [{ youtuberId: null }, { youtuberId: { in: ids } }] }
           : { youtuberId: { in: ids } }
 
-  return { AND: [base, filter] } as unknown as T
+  const scoped = { AND: [base, filter] }
+
+  // A live the member was called to reinforce is theirs whatever the creator
+  const reinforced = target === 'live' ? (scope.reinforcedLiveIds ?? []) : []
+  if (reinforced.length === 0) return scoped as unknown as T
+
+  return {
+    OR: [scoped, { AND: [base, { id: { in: reinforced } }] }],
+  } as unknown as T
 }
 
 /**

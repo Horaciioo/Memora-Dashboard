@@ -1,6 +1,8 @@
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { respondToRollCall } from '@/core/services/calendar/attendance'
+import { readHours } from '@/core/lib/calendar/hours'
+import { moveOnRollCall, respondToRollCall } from '@/core/services/calendar/attendance'
+import { assertEntryAccess } from '@/core/services/calendar/CalendarService'
 import { assertRowInScope } from '@/core/services/auth/ScopeService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
@@ -21,11 +23,31 @@ export const POST = createProtectedRoute({
 
     await assertRowInScope('calendarEvent', params.id, await scope())
 
-    return respondToRollCall(
-      params.id,
-      session.id,
-      status as AttendanceStatusName,
-      access.can(Permissions.CalendarManage)
-    )
+    return respondToRollCall({
+      eventId: params.id,
+      accountId: session.id,
+      status: status as AttendanceStatusName,
+      canManage: access.can(Permissions.CalendarManage),
+      hours: readHours(raw),
+    })
+  },
+})
+
+export const PATCH = createProtectedRoute({
+  permission: Permissions.CalendarManage,
+  descriptor: { summary: 'Move a member on a roll-call', tags: ['calendar'] },
+  handler: async ({ params, raw, session, scope }) => {
+    const { accountId, status } = raw
+    if (typeof accountId !== 'string' || typeof status !== 'string') {
+      throw invalidInput([{ field: 'status', message: FORM_COPY.required }])
+    }
+    if (!Object.values(AttendanceStatuses).includes(status as AttendanceStatusName)) {
+      throw invalidInput([{ field: 'status', message: FORM_COPY.notAnOption }])
+    }
+
+    await assertEntryAccess(params.id, session.id, true)
+    await assertRowInScope('calendarEvent', params.id, await scope())
+
+    return moveOnRollCall(params.id, accountId, status as AttendanceStatusName, session.id)
   },
 })

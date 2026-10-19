@@ -81,7 +81,7 @@ export const createLinkReturnRoute = (platform: LivePlatformName): RouteHandler 
       await recordEvent({
         eventType: 'PlatformLinked',
         actorId: session.id,
-        summary: `${platformLogoOf(platform)?.label ?? platform} · ${identity.login}`,
+        summary: `${platformLogoOf(platform)?.label ?? platform}, ${identity.login}`,
       })
 
       return linkDestination(platform, LINK_RESULT.linked)

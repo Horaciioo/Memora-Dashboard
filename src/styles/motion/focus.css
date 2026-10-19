@@ -1,0 +1,99 @@
+/* Softened apple green of the Focus, one place to retune it */
+:root {
+  --focus-tone: color-mix(in srgb, var(--color-apple-green) 72%, var(--color-surface));
+  --focus-tone-soft: color-mix(in srgb, var(--color-apple-green) 36%, var(--color-surface));
+}
+
+/* Flame drawn around the page from the top, then flickering, while following a moderator */
+.focus-line {
+  fill: none;
+  stroke: url(#focus-flame);
+  stroke-width: 2px;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  vector-effect: non-scaling-stroke;
+  animation:
+    focus-draw 3.2s cubic-bezier(0.45, 0, 0.35, 1) forwards,
+    focus-heat 1.8s ease-in-out infinite alternate;
+}
+
+/* Heat bleeding inward once the line has gone round */
+.focus-glow {
+  box-shadow: inset 0 0 24px 2px color-mix(in srgb, var(--focus-tone) 22%, transparent);
+  opacity: 0;
+  animation: focus-glow-in 3.2s ease-in forwards;
+}
+
+@keyframes focus-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes focus-glow-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes focus-heat {
+  0% {
+    filter: drop-shadow(0 0 1px var(--focus-tone));
+  }
+  100% {
+    filter: drop-shadow(0 0 3px var(--focus-tone));
+  }
+}
+
+/* The box hovers above the page */
+.focus-float {
+  animation: focus-hover 3s ease-in-out infinite;
+}
+
+@keyframes focus-hover {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-float,
+  .focus-line,
+  .focus-glow {
+    animation: none;
+  }
+
+  .focus-line {
+    stroke-dashoffset: 0;
+  }
+
+  .focus-glow {
+    opacity: 1;
+  }
+}
+
+/* Creator name: gold with a band of light crossing it */
+.gold-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--color-gold-400) 30%,
+    var(--color-gold-100) 50%,
+    var(--color-gold-400) 70%
+  );
+  background-size: 250% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: gold-sweep 3.5s linear infinite;
+}
+
+@keyframes gold-sweep {
+  to {
+    background-position: -250% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gold-shimmer {
+    animation: none;
+  }
+}

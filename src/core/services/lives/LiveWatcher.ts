@@ -2,8 +2,10 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { publishLive } from '@/core/lib/lives/bus'
-import { forgetLive, keepConnection, keepRecentEvent } from '@/core/lib/lives/recent'
+import { queueLogWrite } from '@/core/lib/lives/logQueue'
+import { forgetLive, keepConnection } from '@/core/lib/lives/recent'
 import type { LiveConnection } from '@/core/lib/lives/recent'
+import { closeRoom, pushRoomEvent } from '@/core/lib/lives/room'
 import { logger } from '@/core/lib/logger'
 import { EventSubSession } from '@/core/lib/platforms/twitch/session'
 import type { TwitchSignal } from '@/core/lib/platforms/twitch/eventsub'
@@ -42,10 +44,37 @@ interface Watch {
 
 // Survives dev hot reloads
 const globalForWatcher = globalThis as unknown as {
-  liveWatcher?: { watches: Map<string, Watch>; timer: ReturnType<typeof setInterval> | null }
+  liveWatcher?: {
+    watches: Map<string, Watch>
+    timer: ReturnType<typeof setInterval> | null
+    livecon: Map<string, { level: number | null; until: number }>
+  }
 }
 
-const watcher = (globalForWatcher.liveWatcher ??= { watches: new Map(), timer: null })
+const watcher = (globalForWatcher.liveWatcher ??= {
+  watches: new Map(),
+  timer: null,
+  livecon: new Map(),
+})
+
+/**
+ * Livecon level, read once per window
+ * @param {string} youtuberId - Creator
+ * @return {Promise<number | null>} - Level number
+ */
+
+const cachedLivecon = async (youtuberId: string): Promise<number | null> => {
+  const known = watcher.livecon.get(youtuberId)
+  if (known && known.until > Date.now()) return known.level
+
+  const level = await liveconLevelOf(youtuberId)
+  watcher.livecon.set(youtuberId, {
+    level,
+    until: Date.now() + LIVE_SETTINGS.liveconCacheSeconds * 1000,
+  })
+
+  return level
+}
 
 /**
  * Tell every open Mod View of a live how the platform link stands
@@ -74,11 +103,8 @@ const handleSignal = async (liveId: string, signal: TwitchSignal): Promise<void>
 
   switch (signal.kind) {
     case 'scene':
-      await keepRecentEvent(liveId, signal.event)
-      await publishLive(LIVE_TOPICS.live(liveId), {
-        type: LIVE_STREAM_EVENTS.scene,
-        event: signal.event,
-      })
+      // Gathered then flushed
+      pushRoomEvent(liveId, signal.event)
       return
     case 'online':
       // A short cut never ends the live
@@ -168,16 +194,14 @@ const watch = async (live: {
       const entry = logEntryOf(type, event, meta)
       if (!entry) return
 
-      void liveconLevelOf(live.youtuberId)
-        .then((liveconLevel) =>
-          logPlatformGesture({
-            liveId: live.id,
-            platform: LivePlatforms.Twitch,
-            entry,
-            liveconLevel,
-          })
-        )
-        .catch(() => null)
+      queueLogWrite(async () =>
+        logPlatformGesture({
+          liveId: live.id,
+          platform: LivePlatforms.Twitch,
+          entry,
+          liveconLevel: await cachedLivecon(live.youtuberId),
+        })
+      )
     },
     onState: (state) => {
       void announceConnection(live.id, {
@@ -230,6 +254,7 @@ export const syncLiveWatches = async (): Promise<void> => {
     watcher.watches.delete(liveId)
     forgetSampling(liveId)
     await forgetLive(liveId)
+    await closeRoom(liveId)
   }
 
   // Viewer curve of the lives on air

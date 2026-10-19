@@ -1,5 +1,6 @@
 'use client'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { useState } from 'react'
 
 import { Status } from '@/components/elements/display/Status'
@@ -80,16 +81,14 @@ export const SkillGrid = ({ skills, canWrite, onGrade }: SkillGridProps) => {
                     <span className={SKILL_GRID.name}>{skill.name}</span>
                     {skill.updatedAt && (
                       <span className={SKILL_GRID.stamp}>
-                        {[formatDay(skill.updatedAt), skill.validatorName]
-                          .filter(Boolean)
-                          .join(' · ')}
+                        <Dotted items={[formatDay(skill.updatedAt), skill.validatorName]} />
                       </span>
                     )}
                     <div className={SKILL_GRID.bar}>
                       <PercentSlider
                         value={skill.percent}
                         max={ACADEMY_SETTINGS.skillMaxPercent}
-                        label={`${skill.name} · ${ACADEMY_COPY.skillPercentLabel}`}
+                        label={`${skill.name}, ${ACADEMY_COPY.skillPercentLabel}`}
                         disabled={!canWrite}
                         onCommit={(percent) => onGrade(skill.skillId, percent)}
                       />

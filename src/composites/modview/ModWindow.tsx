@@ -2,8 +2,9 @@
 
 import type { ReactNode } from 'react'
 
-import { WindowControls } from '@/composites/modview/workspace/WindowControls'
+import { WindowControls, windowMenu } from '@/composites/modview/workspace/WindowControls'
 import { useWindowChrome } from '@/composites/modview/workspace/WindowChrome'
+import { useMenu } from '@/managers/front-end'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_WINDOW } from '@/declarations/ui/variants'
@@ -45,6 +46,7 @@ export const ModWindow = ({
   className,
 }: ModWindowProps) => {
   const chrome = useWindowChrome()
+  const { contextMenu } = useMenu()
 
   return (
     <section
@@ -60,6 +62,7 @@ export const ModWindow = ({
       <header
         className={cn(MODVIEW_WINDOW.head, chrome && MODVIEW_WINDOW.headDraggable)}
         draggable={chrome ? true : undefined}
+        onContextMenu={chrome ? contextMenu(windowMenu(chrome), label ?? '') : undefined}
         onDragStart={chrome?.onDragStart}
         onDragEnd={chrome?.onDragEnd}
         onDoubleClick={(event) => {
@@ -69,10 +72,9 @@ export const ModWindow = ({
           }
         }}
       >
-        {chrome && <WindowControls chrome={chrome} title={label ?? ''} part="grip" />}
         <h3 className={MODVIEW_WINDOW.title}>{title}</h3>
         {actions}
-        {chrome && <WindowControls chrome={chrome} title={label ?? ''} part="buttons" />}
+        {chrome && <WindowControls chrome={chrome} title={label ?? ''} />}
       </header>
       {!chrome?.isFolded && (
         <div className={flush ? MODVIEW_WINDOW.flush : MODVIEW_WINDOW.body}>{children}</div>

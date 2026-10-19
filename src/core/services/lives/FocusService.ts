@@ -1,27 +1,23 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { forbidden, notFound } from '@/core/lib/errors'
+import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { activeCoordinatorIds } from '@/core/lib/lives/coordination'
 import { livePermissions } from '@/core/lib/lives/permissions'
+import { connectedMemberIds } from '@/core/services/lives/PresenceService'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { JUNIOR_FUNCTION_OF } from '@/declarations/reference/fixed'
-import { LIVE_FUNCTIONS } from '@/declarations/lives/registries'
+import { FOCUS_OFFLINE_ALLOWED } from '@/declarations/lives/registries'
 import type { LiveFocusView } from '@/types/lives'
 import { AcademyJuniorStatuses, MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import type { LivePlatformName, LiveStatusName } from '@/utils/constants/lives'
 import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
+import { AttendanceStatuses } from '@/utils/constants/workflow'
 
 // Seats that follow anyone and see every Focus
 const OVERSEERS: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Responsable]
-
-// Junior functions of the live trades
-const JUNIOR_LIVE_FUNCTIONS = LIVE_FUNCTIONS.map((name) => JUNIOR_FUNCTION_OF[name]).filter(
-  (name): name is string => Boolean(name)
-)
 
 /**
  * Load a live in the perimeter with what a Focus checks
@@ -33,7 +29,13 @@ const JUNIOR_LIVE_FUNCTIONS = LIVE_FUNCTIONS.map((name) => JUNIOR_FUNCTION_OF[na
 const liveInScope = async (liveId: string, scope: AccessScope) => {
   const live = await prisma.live.findFirst({
     where: scopedWhere('live', scope, { id: liveId }),
-    select: { id: true, status: true, coordinations: true, platform: true },
+    select: {
+      id: true,
+      status: true,
+      coordinations: true,
+      platform: true,
+      calendarEventId: true,
+    },
   })
   if (!live) throw notFound()
 
@@ -154,8 +156,20 @@ export const startFocus = async ({
     held
   )
   if (!permissions.includes(Permissions.LiveFocus) || targetId === viewerId) throw forbidden()
+  // Only a connected member can be followed
+  if (!FOCUS_OFFLINE_ALLOWED && !(await connectedMemberIds(liveId)).includes(targetId)) {
+    throw conflict()
+  }
+  // Only a member present on the roll-call can be followed
+  const answer = live.calendarEventId
+    ? await prisma.eventAttendance.findFirst({
+        where: { eventId: live.calendarEventId, accountId: targetId },
+        select: { status: true },
+      })
+    : null
+  if (answer?.status !== AttendanceStatuses.Present) throw conflict()
   if (!OVERSEERS.includes(role)) {
-    const [junior] = await focusableMembers([targetId], role)
+    const [junior] = await focusableMembers([targetId], role, viewerId)
     if (!junior) throw forbidden()
   }
 
@@ -206,26 +220,26 @@ export const platformLoginOf = async (
  * Members a viewer may follow among a live's team
  * @param {string[]} memberIds - Convened team
  * @param {MemberRoleName} role - Viewer role
+ * @param {string} viewerId - Signed-in member
  * @return {Promise<string[]>} - Members open to a Focus
  */
 
 export const focusableMembers = async (
   memberIds: string[],
-  role: MemberRoleName
+  role: MemberRoleName,
+  viewerId: string
 ): Promise<string[]> => {
   if (OVERSEERS.includes(role)) return memberIds
 
-  // A trainer only follows the juniors
-  const juniors = await prisma.account.findMany({
+  // A trainer only follows their own juniors
+  const juniors = await prisma.academyJunior.findMany({
     where: {
-      id: { in: memberIds },
-      OR: [
-        { functions: { some: { jobFunction: { name: { in: JUNIOR_LIVE_FUNCTIONS } } } } },
-        { academyJuniors: { some: { status: AcademyJuniorStatuses.Active } } },
-      ],
+      accountId: { in: memberIds },
+      trainerId: viewerId,
+      status: AcademyJuniorStatuses.Active,
     },
-    select: { id: true },
+    select: { accountId: true },
   })
 
-  return juniors.map((junior) => junior.id)
+  return juniors.map((junior) => junior.accountId)
 }

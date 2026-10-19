@@ -16,7 +16,7 @@ import {
 } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { periodLabel, toDayKey } from '@/utils/format/calendar'
-import { formatDay, formatDayRange, formatDayTime } from '@/utils/format/dates'
+import { formatDay, formatDayRange, formatWallDayTime } from '@/utils/format/dates'
 
 export interface DatePickerProps {
   id?: string
@@ -39,6 +39,8 @@ export interface DatePickerProps {
   describedBy?: string
   // Year the calendar opens on while empty
   startYear?: number
+  // Earliest moment accepted, ISO day or minute
+  min?: string
 }
 
 // Time of day a datetime lands on when the day is picked first
@@ -64,6 +66,7 @@ export const DatePicker = ({
   invalid,
   describedBy,
   startYear,
+  min,
 }: DatePickerProps) => {
   const single = typeof value === 'string' ? value : ''
   const [rangeStart = '', rangeEnd = ''] = Array.isArray(value) ? value : []
@@ -114,9 +117,14 @@ export const DatePicker = ({
     setOpen(true)
   }
 
+  // Nothing earlier than the bound can be picked
+  const minDay = min?.slice(0, 10)
+  const clamp = (moment: string) => (min && moment < min ? min : moment)
+
   // A datetime keeps the time already chosen
   const pick = (nextDay: string) => {
-    if (timed) return onChange(`${nextDay}T${time || defaultTimes[0]}`)
+    if (minDay && nextDay < minDay) return
+    if (timed) return onChange(clamp(`${nextDay}T${time || defaultTimes[0]}`))
 
     onChange(nextDay)
     if (!isWheel) close()
@@ -143,12 +151,12 @@ export const DatePicker = ({
   const triggerLabel = range
     ? startDay && endDay
       ? timed
-        ? `${formatDayTime(rangeStart)} – ${formatDayTime(rangeEnd)}`
+        ? `${formatWallDayTime(rangeStart)} – ${formatWallDayTime(rangeEnd)}`
         : formatDayRange(startDay, endDay)
       : null
     : day
       ? timed
-        ? formatDayTime(single)
+        ? formatWallDayTime(single)
         : formatDay(day)
       : null
 
@@ -207,6 +215,7 @@ export const DatePicker = ({
                 cursor={cursor}
                 onCursor={setCursor}
                 day={day}
+                minDay={minDay}
                 span={picking.span}
                 range={range}
                 isAnchored={picking.isAnchored}
@@ -252,10 +261,11 @@ export const DatePicker = ({
                 <input
                   type="time"
                   value={time}
+                  min={minDay && day === minDay ? min?.slice(11, 16) : undefined}
                   aria-label={PICKER_COPY.time}
                   className={DATE_PICKER_STYLES.time}
                   onChange={(event) =>
-                    onChange(`${day || toDayKey(new Date())}T${event.target.value}`)
+                    onChange(clamp(`${day || toDayKey(new Date())}T${event.target.value}`))
                   }
                 />
               )}

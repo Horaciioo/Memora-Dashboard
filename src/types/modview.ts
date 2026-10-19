@@ -9,6 +9,20 @@ import type { LivePlatformName } from '@/utils/constants/lives'
 export type ChatBadge = 'broadcaster' | 'moderator' | 'vip' | 'bot' | 'subscriber'
 
 /**
+ * Memora rank of a Twitch account
+ * @typedef {'admin' | 'responsable' | 'moderator'} MemoraRank
+ */
+
+export type MemoraRank = 'admin' | 'responsable' | 'moderator'
+
+/**
+ * Who a chatter is to the team, for the name colour
+ * @typedef {'creator' | MemoraRank | 'viewer'} ChatTier
+ */
+
+export type ChatTier = 'creator' | MemoraRank | 'viewer'
+
+/**
  * One person of the chat
  * @typedef {Object} Chatter
  * @property {string} id - Platform user identifier
@@ -82,6 +96,13 @@ export interface ModAct {
   // Still waiting on the platform
   pending?: boolean
 }
+
+/**
+ * Colour of an act verb
+ * @typedef {'danger' | 'caution' | 'success' | 'info'} ModActTone
+ */
+
+export type ModActTone = 'danger' | 'caution' | 'success' | 'info'
 
 /**
  * One message held by the automod
@@ -177,6 +198,8 @@ export interface ModViewState {
   notice?: string | null
   // Seen but not moderated from here
   readOnly?: boolean
+  // Memora ranks by Twitch user identifier
+  roster?: Record<string, MemoraRank>
 }
 
 /**
@@ -212,11 +235,17 @@ export type ModViewIntent =
 
 /**
  * Window of the Mod View grid
- * @typedef {'stream' | 'modActions' | 'automod' | 'chat' | 'community' | 'unbanRequests'} ModViewWindow
+ * @typedef {'stream' | 'modActions' | 'automod' | 'chat' | 'community' | 'unbanRequests' | 'inspect'} ModViewWindow
  */
 
 export type ModViewWindow =
-  'stream' | 'modActions' | 'automod' | 'chat' | 'community' | 'unbanRequests'
+  | 'stream'
+  | 'modActions'
+  | 'automod'
+  | 'chat'
+  | 'community'
+  | 'unbanRequests'
+  | 'inspect'
 
 /**
  * Part a scene may light up

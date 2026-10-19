@@ -31,12 +31,27 @@
   }
 }
 
+/* One gap everywhere: between windows, around them and beside the sidebar */
+:root {
+  --modview-gap: 0.5rem;
+}
+
 /* Mod View page drops the banner room and the width cap, it fits the screen and never scrolls */
 .shell-page:has(.modview-bleed) {
   max-width: none;
   height: 100dvh;
   gap: 0;
-  padding: 1rem;
+  padding: var(--modview-gap);
+}
+
+/* Live windows: no grey text on grey, every text takes the ink */
+.modview-bleed {
+  --color-ink-subtle: var(--color-ink);
+}
+
+/* Black ground of the live page */
+.page-wash:has(.modview-bleed) {
+  background-color: var(--twitch-ground);
 }
 
 html:has(.modview-bleed) {

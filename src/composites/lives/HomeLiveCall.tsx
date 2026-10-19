@@ -10,7 +10,43 @@ import { HOME_LIVE, LIVE_URGENT } from '@/declarations/ui/variants'
 import type { LiveBeacon } from '@/types/lives'
 import { cn } from '@/utils/classnames'
 import { LiveStatuses } from '@/utils/constants/lives'
+import type { LivePlatformName } from '@/utils/constants/lives'
 import { formatDayTime } from '@/utils/format/dates'
+
+/**
+ * Platform name with its glyph
+ * @param {LivePlatformName} platform - Platform
+ * @return {JSX.Element}
+ */
+
+const PlatformChip = ({ platform }: { platform: LivePlatformName }) => {
+  const PlatformIcon = ICONS[LIVE_PLATFORM_REGISTRY.get(platform).icon]
+
+  return (
+    <span className={cn(HOME_LIVE.platform, HOME_LIVE.platformTone[platform])}>
+      <PlatformIcon className={HOME_LIVE.platformGlyph} aria-hidden="true" />
+      {LIVE_PLATFORM_REGISTRY.label(platform)}
+    </span>
+  )
+}
+
+/**
+ * Sentence calling a member in as reinforcement
+ * @param {LivePlatformName} platform - Platform
+ * @return {JSX.Element}
+ */
+
+const ReinforceText = ({ platform }: { platform: LivePlatformName }) => {
+  const [before, after] = LIVE_COPY.reinforceNow.split('{platform}')
+
+  return (
+    <>
+      {before}
+      <PlatformChip platform={platform} />
+      {after}
+    </>
+  )
+}
 
 export interface HomeLiveCallProps {
   beacon: LiveBeacon | null
@@ -36,7 +72,6 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
           {onAir.map((live) => {
             const [before, rest] = LIVE_COPY.liveNow.split('{strong}')
             const [between, after] = rest.split('{platform}')
-            const PlatformIcon = ICONS[LIVE_PLATFORM_REGISTRY.get(live.platform).icon]
 
             return (
               <article key={live.id} className={cn(HOME_LIVE.card, HOME_LIVE.tone[live.platform])}>
@@ -46,14 +81,17 @@ export const HomeLiveCall = ({ beacon }: HomeLiveCallProps) => {
                     {LIVE_COPY.liveBadge}
                   </span>
                   <p className={HOME_LIVE.text}>
-                    {before.replace('{creator}', live.creator)}
-                    <strong className={HOME_LIVE.strong}>{LIVE_COPY.liveNowStrong}</strong>
-                    {between}
-                    <span className={cn(HOME_LIVE.platform, HOME_LIVE.platformTone[live.platform])}>
-                      <PlatformIcon className={HOME_LIVE.platformGlyph} aria-hidden="true" />
-                      {LIVE_PLATFORM_REGISTRY.label(live.platform)}
-                    </span>
-                    {after}
+                    {live.isReinforcement ? (
+                      <ReinforceText platform={live.platform} />
+                    ) : (
+                      <>
+                        {before.replace('{creator}', live.creator)}
+                        <strong className={HOME_LIVE.strong}>{LIVE_COPY.liveNowStrong}</strong>
+                        {between}
+                        <PlatformChip platform={live.platform} />
+                        {after}
+                      </>
+                    )}
                   </p>
                   <div className={HOME_LIVE.actions}>
                     <Link

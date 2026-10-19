@@ -12,6 +12,7 @@ export const TWITCH_ENDPOINTS = {
   helix: 'https://api.twitch.tv/helix',
   eventsub: 'wss://eventsub.wss.twitch.tv/ws',
   player: 'https://player.twitch.tv',
+  site: 'https://www.twitch.tv',
   images: 'https://static-cdn.jtvnw.net',
 } as const
 

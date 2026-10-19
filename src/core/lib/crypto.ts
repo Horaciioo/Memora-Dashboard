@@ -1,4 +1,6 @@
+import { systemFailure } from '@/core/lib/errors'
 import { logger } from '@/core/lib/logger'
+import { arePlainSecretsAllowed } from '@/declarations/system/environments'
 
 /**
  * Cipher the application encrypts secrets with
@@ -52,17 +54,22 @@ export const isEncryptionActive = (): boolean => cipher !== null
  */
 
 export const encryptSecret = (value: string): string => {
-  if (!cipher) {
-    // Said once per process
-    if (!warned) {
-      warned = true
-      logger.warn('[crypto] encryption is off, secrets are stored in clear')
-    }
+  if (cipher) return `${ENCRYPTED_PREFIX}${cipher.encrypt(value)}`
 
-    return `${PLAIN_PREFIX}${value}`
+  // Outside dev a missing key refuses the write
+  if (!arePlainSecretsAllowed()) {
+    logger.error('[crypto] encryption is off, a secret was refused rather than stored in clear')
+
+    throw systemFailure()
   }
 
-  return `${ENCRYPTED_PREFIX}${cipher.encrypt(value)}`
+  // Said once per process
+  if (!warned) {
+    warned = true
+    logger.warn('[crypto] encryption is off, secrets are stored in clear')
+  }
+
+  return `${PLAIN_PREFIX}${value}`
 }
 
 /**

@@ -33,7 +33,8 @@ const GENDER = 'masculine'
  * @property {(ids: string[], values: FormValues) => Promise<boolean>} updateMany - Edit a selection
  * @property {(ids: string[]) => Promise<void>} removeMany - Drop a selection
  * @property {(from: string, to: string) => Promise<void>} load - Pull another window
- * @property {(id: string, status: AttendanceStatusName) => Promise<void>} respond - Answer a roll-call
+ * @property {(id: string, status: AttendanceStatusName, hours?: { from: string, to: string }) => Promise<void>} respond - Answer a roll-call
+ * @property {(id: string, accountId: string, status: AttendanceStatusName) => Promise<void>} moveAttendee - Move a member on a roll-call
  * @property {(id: string) => Promise<void>} remind - Ping the no-answers now
  */
 
@@ -43,7 +44,7 @@ export interface CalendarCollection {
   isLoading: boolean
   issues: FieldIssue[]
   clearIssues: () => void
-  create: (values: FormValues) => Promise<boolean>
+  create: (values: FormValues) => Promise<CalendarEntry | null>
   update: (id: string, values: FormValues) => Promise<boolean>
   move: (id: string, startsAt: Date) => Promise<void>
   resize: (id: string, endsAt: Date) => Promise<void>
@@ -51,7 +52,12 @@ export interface CalendarCollection {
   updateMany: (ids: string[], values: FormValues) => Promise<boolean>
   removeMany: (ids: string[]) => Promise<void>
   load: (from: string, to: string) => Promise<void>
-  respond: (id: string, status: AttendanceStatusName) => Promise<void>
+  respond: (
+    id: string,
+    status: AttendanceStatusName,
+    hours?: { from: string; to: string }
+  ) => Promise<void>
+  moveAttendee: (id: string, accountId: string, status: AttendanceStatusName) => Promise<void>
   remind: (id: string) => Promise<void>
 }
 
@@ -89,7 +95,7 @@ export const useCalendar = (
 
       if (entry) replace(entry)
 
-      return entry !== null
+      return entry
     },
     [replace, run]
   )
@@ -216,9 +222,23 @@ export const useCalendar = (
   }, [])
 
   const respond = useCallback(
-    async (id: string, status: AttendanceStatusName) => {
+    async (id: string, status: AttendanceStatusName, hours?: { from: string; to: string }) => {
       const roster = await run(
-        () => apiPost<AttendanceRoster>(API_ROUTES.calendarEntryAttendance(id), { status }),
+        () =>
+          apiPost<AttendanceRoster>(API_ROUTES.calendarEntryAttendance(id), { status, ...hours }),
+        feedbackTitle(ENTITY, 'saved', GENDER)
+      )
+
+      if (roster) setRoster(id, roster)
+    },
+    [run, setRoster]
+  )
+
+  const moveAttendee = useCallback(
+    async (id: string, accountId: string, status: AttendanceStatusName) => {
+      const roster = await run(
+        () =>
+          apiPatch<AttendanceRoster>(API_ROUTES.calendarEntryAttendance(id), { accountId, status }),
         feedbackTitle(ENTITY, 'saved', GENDER)
       )
 
@@ -254,6 +274,7 @@ export const useCalendar = (
     removeMany,
     load,
     respond,
+    moveAttendee,
     remind,
   }
 }

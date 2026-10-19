@@ -50,12 +50,12 @@ export const BilanActivity = ({ insights, levels, start, end }: BilanActivityPro
             })),
           }))}
         />
+        <LevelFrise levels={levels} start={start} end={end} />
         {insights.viewers && (
           <p className={LIVE_REPORT.peak}>
             {BILAN_COPY.viewersPeakAt.replace('{time}', formatClock(insights.viewers.peakAt))}
           </p>
         )}
-        <LevelFrise levels={levels} start={start} end={end} />
       </Section>
 
       <Section title={BILAN_COPY.cumulativeTitle} description={BILAN_COPY.cumulativeLead} padded>

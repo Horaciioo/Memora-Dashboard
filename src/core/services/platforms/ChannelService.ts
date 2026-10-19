@@ -5,6 +5,7 @@ import { prisma } from '@/core/lib/db'
 import { parseYoutubeChannel } from '@/core/lib/platforms/youtube'
 import { PlatformError } from '@/core/lib/platforms/http'
 import { findTwitchUser } from '@/core/lib/platforms/twitch/oauth'
+import { CHANNEL_LINK_PREFIX } from '@/declarations/platforms/channels'
 import { CHANNEL_COPY } from '@/declarations/platforms/copy'
 import { isTwitchConfigured } from '@/declarations/platforms/twitch'
 import type { CreatorChannelView } from '@/types/platforms'
@@ -13,7 +14,7 @@ import type { LivePlatformName } from '@/utils/constants/lives'
 import { Prisma } from '@prisma/client'
 
 // Twitch page of a login
-const twitchUrl = (login: string) => `https://www.twitch.tv/${login}`
+const twitchUrl = (login: string) => `${CHANNEL_LINK_PREFIX[LivePlatforms.Twitch]}${login}`
 
 /**
  * Channels of a creator
@@ -46,7 +47,12 @@ export const readChannels = async (youtuberId: string): Promise<CreatorChannelVi
  */
 
 const resolveTwitch = async (login: string) => {
-  const trimmed = login.trim().replace(/^@/, '')
+  // A pasted link or a bare login
+  const trimmed = login
+    .trim()
+    .replace(/^(?:https?:\/\/)?(?:www\.)?twitch\.tv\//i, '')
+    .replace(/^@/, '')
+    .replace(/\/+$/, '')
 
   if (!isTwitchConfigured()) {
     throw invalidInput([{ field: 'value', message: CHANNEL_COPY.notConfigured }])
