@@ -130,6 +130,7 @@ export const MODVIEW_LOCK_COPY = {
   crisis: 'Désactivé en Livecon 1 : seul l’Admin parle publiquement.',
   platform: 'Indisponible sur cette plateforme.',
   offline: 'La Mod View n’est pas connectée à la plateforme.',
+  self: 'Tu ne peux pas agir sur toi-même ni sur la chaîne.',
 } as const
 
 /**
