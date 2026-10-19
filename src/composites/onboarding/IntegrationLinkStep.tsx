@@ -1,5 +1,6 @@
 'use client'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { useState } from 'react'
 
 import { Status } from '@/components/elements/display/Status'
@@ -61,7 +62,9 @@ export const IntegrationLinkStep = ({
               accent={INTEGRATION_LINK_KIND_REGISTRY.get(link.kind).accent}
             />
             <span className={INTEGRATION_STEP_STYLES.meta}>
-              {`${seats} ${INTEGRATION_LINK_COPY.usesLabel} · ${formatDay(link.expiresAt)}`}
+              <Dotted
+                items={[`${seats} ${INTEGRATION_LINK_COPY.usesLabel}`, formatDay(link.expiresAt)]}
+              />
             </span>
             {!link.usable && (
               <Status

@@ -26,7 +26,7 @@ export async function dropOtherSessions(): Promise<void> {
   await recordEvent({
     eventType: 'SessionClosed',
     actorId: session.id,
-    summary: `${PREFERENCES_COPY.closeOthers} · ${closed}`,
+    summary: `${PREFERENCES_COPY.closeOthers}, ${closed}`,
   })
 
   refresh()

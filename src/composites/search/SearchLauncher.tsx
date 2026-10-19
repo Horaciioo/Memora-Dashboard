@@ -34,7 +34,7 @@ export const SearchLauncher = ({
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       // Cmd or Ctrl plus K opens the palette from anywhere
-      if (event.key.toLowerCase() !== 'k' || !(event.metaKey || event.ctrlKey)) return
+      if (event.key?.toLowerCase() !== 'k' || !(event.metaKey || event.ctrlKey)) return
 
       event.preventDefault()
       setOpen((open) => !open)
@@ -50,7 +50,7 @@ export const SearchLauncher = ({
       <button
         type="button"
         aria-label={NAV_COPY.searchTitle}
-        title={`${NAV_COPY.searchTitle} · ${NAV_COPY.searchShortcut}`}
+        title={`${NAV_COPY.searchTitle}, ${NAV_COPY.searchShortcut}`}
         onClick={() => setOpen(true)}
         className={
           className ?? cn(BUTTON_STYLES.base, expanded ? SEARCH_LAUNCHER.bar : BUTTON_STYLES.icon)

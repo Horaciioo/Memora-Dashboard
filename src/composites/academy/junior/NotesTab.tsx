@@ -1,5 +1,6 @@
 'use client'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { Button } from '@/components/elements/actions/Button'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -77,13 +78,13 @@ export const NotesTab = () => {
                   <header className="flex flex-wrap items-center gap-2">
                     <Status label={kind.label} accent={kind.accent} />
                     <span className="text-xs text-[var(--color-ink-subtle)]">
-                      {[
-                        ACADEMY_STAGE_REGISTRY.label(note.stage),
-                        note.authorName,
-                        formatDay(note.createdAt),
-                      ]
-                        .filter(Boolean)
-                        .join(' · ')}
+                      <Dotted
+                        items={[
+                          ACADEMY_STAGE_REGISTRY.label(note.stage),
+                          note.authorName,
+                          formatDay(note.createdAt),
+                        ]}
+                      />
                     </span>
                   </header>
                   <p className="text-sm whitespace-pre-wrap">{note.body}</p>

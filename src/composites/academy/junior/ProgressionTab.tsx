@@ -55,7 +55,7 @@ export const ProgressionTab = () => {
                       !training.completedAt && training.mandatory ? ACADEMY_COPY.mandatory : null,
                     ]
                       .filter(Boolean)
-                      .join(' · ') || undefined
+                      .join(', ') || undefined
                   }
                 />
               ))}

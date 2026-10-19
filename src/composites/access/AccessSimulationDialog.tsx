@@ -33,7 +33,7 @@ export const AccessSimulationDialog = ({ simulation, onClose }: AccessSimulation
       open={simulation !== null}
       onClose={onClose}
       size="md"
-      title={simulation ? `${ACCESS_COPY.simulateTitle} · ${simulation.label}` : ''}
+      title={simulation ? `${ACCESS_COPY.simulateTitle}, ${simulation.label}` : ''}
       description={ACCESS_COPY.simulateLead}
     >
       {sections.length === 0 ? (

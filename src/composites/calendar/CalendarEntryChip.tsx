@@ -115,7 +115,7 @@ export const CalendarEntryChip = ({
     <>
       <button
         type="button"
-        title={entry.readOnly ? `${entry.title} · ${CALENDAR_COPY.readOnlyNotice}` : entry.title}
+        title={entry.readOnly ? `${entry.title}, ${CALENDAR_COPY.readOnlyNotice}` : entry.title}
         aria-pressed={selected}
         onClick={open}
         onMouseEnter={(event) => openPreview(event.currentTarget)}

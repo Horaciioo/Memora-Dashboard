@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Dotted } from '@/components/elements/display/Dotted'
 import Link from '@/components/elements/navigation/AppLink'
 import {
   AGE_POLICY,
@@ -27,7 +28,7 @@ export default function PrivacyPage() {
       <section className={PRIVACY_STYLES.section}>
         <h2 className={PRIVACY_STYLES.heading}>{PRIVACY_COPY.controllerTitle}</h2>
         <p className={PRIVACY_STYLES.card}>
-          {DATA_CONTROLLER.name} · {DATA_CONTROLLER.contact}
+          <Dotted items={[DATA_CONTROLLER.name, DATA_CONTROLLER.contact]} />
         </p>
       </section>
 

@@ -38,7 +38,7 @@ export const POST = createProtectedRoute({
       actorId: session.id,
       targetType: 'sanctions',
       targetId: youtuberId,
-      summary: `${SANCTION_PANEL_REGISTRY.label(panel)} · ${created}`,
+      summary: `${SANCTION_PANEL_REGISTRY.label(panel)}, ${created}`,
     })
 
     return readPanel(perimeter, youtuberId, panel, query.get(SANCTION_PARAMS.level))

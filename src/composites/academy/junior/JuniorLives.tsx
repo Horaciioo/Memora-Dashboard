@@ -1,5 +1,6 @@
 'use client'
 
+import { DotMark } from '@/components/elements/display/Dotted'
 import { Status } from '@/components/elements/display/Status'
 import { useJuniorState } from '@/composites/academy/junior/JuniorFileContext'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
@@ -23,7 +24,12 @@ export const JuniorLives = () => {
     <div className={ACCOMPANIED_LIVES.root}>
       <span className={ACCOMPANIED_LIVES.label}>
         {ACADEMY_COPY.livesTitle}
-        {lives.length > 0 && ` · ${ACADEMY_COPY.livesPresent(present, lives.length)}`}
+        {lives.length > 0 && (
+          <>
+            <DotMark />
+            {ACADEMY_COPY.livesPresent(present, lives.length)}
+          </>
+        )}
       </span>
       {lives.length === 0 ? (
         <p className={ACCOMPANIED_LIVES.empty}>{ACADEMY_COPY.livesEmpty}</p>

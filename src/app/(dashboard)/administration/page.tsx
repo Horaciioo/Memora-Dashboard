@@ -48,7 +48,7 @@ export default async function AdministrationPage() {
 
       <ConsoleBanner
         view={NavigationViews.Administration}
-        title={`${VIEW_COPY.environment} : ${runtime.label} · ${CONSOLE_COPY.version} ${APP_VERSION}`}
+        title={`${VIEW_COPY.environment} : ${runtime.label}, ${CONSOLE_COPY.version} ${APP_VERSION}`}
         lead={runtime.started ? undefined : VIEW_COPY.runtimeDownLead}
         aside={
           <Status

@@ -1,5 +1,6 @@
 'use client'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { Dialog } from '@/components/structures/overlays/Dialog'
@@ -87,9 +88,9 @@ export const ActivityDetail = ({ entry }: ActivityDetailProps) => {
           {error ? (
             <>
               <p className={JOURNAL_STYLES.errorMessage}>{error.message}</p>
-              <p
-                className={JOURNAL_STYLES.lineLabel}
-              >{`${ACTIVITY_COPY.errorRoute} · ${error.route}`}</p>
+              <p className={JOURNAL_STYLES.lineLabel}>
+                <Dotted items={[ACTIVITY_COPY.errorRoute, error.route]} />
+              </p>
               {error.trace && <pre className={JOURNAL_STYLES.trace}>{error.trace}</pre>}
             </>
           ) : (

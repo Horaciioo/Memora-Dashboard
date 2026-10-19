@@ -1,5 +1,6 @@
 'use client'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { useState } from 'react'
 
 import { AddRow } from '@/components/structures/inline/AddRow'
@@ -72,7 +73,7 @@ export const CommentThread = ({
             )}
           >
             <span className={COMMENT_THREAD.meta}>
-              {[comment.authorName, formatDayTime(comment.createdAt)].filter(Boolean).join(' · ')}
+              <Dotted items={[comment.authorName, formatDayTime(comment.createdAt)]} />
             </span>
             <p className={COMMENT_THREAD.body}>
               {splitMentions(comment.body).map((piece, index) =>

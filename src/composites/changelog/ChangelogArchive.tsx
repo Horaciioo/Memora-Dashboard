@@ -1,5 +1,6 @@
 'use client'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { useState } from 'react'
 import Link from '@/components/elements/navigation/AppLink'
 
@@ -52,7 +53,12 @@ export const ChangelogArchive = ({ releases, currentVersion }: ChangelogArchiveP
               <span className={CHANGELOG_BOARD.releaseBody}>
                 <span className={CHANGELOG_BOARD.releaseTitle}>{release.title}</span>
                 <span className={CHANGELOG_BOARD.releaseMeta}>
-                  {`${CHANGELOG_COPY.versionLabel(release.version)} · ${dayMonthLabel(new Date(release.date))}`}
+                  <Dotted
+                    items={[
+                      CHANGELOG_COPY.versionLabel(release.version),
+                      dayMonthLabel(new Date(release.date)),
+                    ]}
+                  />
                 </span>
               </span>
             )

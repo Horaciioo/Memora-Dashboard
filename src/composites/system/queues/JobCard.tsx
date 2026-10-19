@@ -1,4 +1,5 @@
 import { Status } from '@/components/elements/display/Status'
+import { Dotted } from '@/components/elements/display/Dotted'
 import { RetryJobButton } from '@/composites/system/queues/RetryJobButton'
 import type { JobReport } from '@/core/services/system/QueueReportService'
 import { QUEUES_COPY } from '@/declarations/system/queues'
@@ -49,7 +50,14 @@ export const JobCard = ({ job, canRetry }: JobCardProps) => {
         </span>
         {stats && (
           <span className={CONSOLE_BLOCK.rowMeta}>
-            {`${QUEUES_COPY.waiting} ${stats.waiting} · ${QUEUES_COPY.active} ${stats.active} · ${QUEUES_COPY.delayed} ${stats.delayed} · ${QUEUES_COPY.failed} ${stats.failed}`}
+            <Dotted
+              items={[
+                `${QUEUES_COPY.waiting} ${stats.waiting}`,
+                `${QUEUES_COPY.active} ${stats.active}`,
+                `${QUEUES_COPY.delayed} ${stats.delayed}`,
+                `${QUEUES_COPY.failed} ${stats.failed}`,
+              ]}
+            />
           </span>
         )}
         <span className={CONSOLE_BLOCK.rowMeta}>

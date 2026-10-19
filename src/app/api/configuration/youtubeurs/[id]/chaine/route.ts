@@ -34,7 +34,7 @@ export const POST = createProtectedRoute({
       actorId: session.id,
       targetType: 'youtuber',
       targetId: params.id,
-      summary: `${CHANNEL_COPY.channel} · ${String(raw.value)}`,
+      summary: `${CHANNEL_COPY.channel}, ${String(raw.value)}`,
     })
 
     return channels

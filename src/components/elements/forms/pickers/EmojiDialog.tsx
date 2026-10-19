@@ -32,7 +32,7 @@ const EmojiCell = ({
 }) => (
   <button
     type="button"
-    title={`${entry.fr} · ${entry.en}`}
+    title={`${entry.fr}, ${entry.en}`}
     aria-label={entry.fr}
     aria-pressed={selected}
     className={cn(EMOJI_DIALOG_STYLES.cell, selected && EMOJI_DIALOG_STYLES.cellSelected)}

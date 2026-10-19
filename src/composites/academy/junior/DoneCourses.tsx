@@ -1,4 +1,5 @@
 import { CoursePhoto } from '@/composites/academy/course/catalog/CoursePhoto'
+import { Dotted } from '@/components/elements/display/Dotted'
 import { ACADEMY_COPY, COURSE_COPY } from '@/declarations/academy/copy'
 import { COURSE_SURFACE_REGISTRY } from '@/declarations/academy/registries'
 import { ICONS } from '@/declarations/ui/icons'
@@ -30,10 +31,12 @@ export const DoneCourses = ({ courses }: { courses: CourseCard[] }) => {
               <span className={DONE_COURSES.body}>
                 <span className={DONE_COURSES.name}>{course.name}</span>
                 <span className={DONE_COURSES.meta}>
-                  {[
-                    COURSE_SURFACE_REGISTRY.get(course.surface).label,
-                    COURSE_COPY.minutes(course.minutes),
-                  ].join(' · ')}
+                  <Dotted
+                    items={[
+                      COURSE_SURFACE_REGISTRY.get(course.surface).label,
+                      COURSE_COPY.minutes(course.minutes),
+                    ]}
+                  />
                 </span>
               </span>
               <Check className={DONE_COURSES.check} aria-hidden="true" />

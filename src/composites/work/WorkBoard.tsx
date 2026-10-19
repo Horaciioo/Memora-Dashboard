@@ -425,7 +425,7 @@ export const WorkBoard = <T extends BoardItem>({
       <FormDrawer
         subject={subject ?? WORK_SUBJECTS[scope!]}
         open={editing !== null}
-        title={editing ? `${ACTION_COPY.edit} · ${labelOf(editing)}` : ACTION_COPY.edit}
+        title={editing ? `${ACTION_COPY.edit} ${labelOf(editing)}` : ACTION_COPY.edit}
         fields={fields}
         aside={aside}
         initialValues={editing ? valuesOf(editing) : undefined}

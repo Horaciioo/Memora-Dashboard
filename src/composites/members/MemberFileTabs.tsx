@@ -286,6 +286,7 @@ export const MemberFileTabs = ({
   const [pendingNote, setPendingNote] = useState<string | null>(null)
   const [editingAbsence, setEditingAbsence] = useState<MemberAbsence | null>(null)
   const [editingSocial, setEditingSocial] = useState<MemberSocial | null>(null)
+  const [pendingAbsence, setPendingAbsence] = useState<MemberAbsence | null>(null)
   const [pendingSocial, setPendingSocial] = useState<MemberSocial | null>(null)
   // Kept in sync with every inline commit
   const [identityValues, setIdentityValues] = useState<FormValues>(detail.values)
@@ -674,6 +675,8 @@ export const MemberFileTabs = ({
                     canEdit: canEditAbsence,
                     label: formatDayRange(absence.startDate, absence.endDate),
                     onEdit: () => openAbsence(absence),
+                    canRemove: canPostAbsence,
+                    onRemove: () => setPendingAbsence(absence),
                   })}
                 >
                   <CalendarIcon className={HOME_STYLES.rowGlyph} aria-hidden="true" />
@@ -856,8 +859,8 @@ export const MemberFileTabs = ({
               value={logView}
               onChange={setLogView}
               options={[
-                { value: 'activity', label: MEMBER_MODERATION_COPY.viewActivity },
                 { value: 'moderation', label: MEMBER_MODERATION_COPY.viewModeration },
+                { value: 'activity', label: MEMBER_MODERATION_COPY.viewActivity },
               ]}
             />
           </div>
@@ -974,7 +977,7 @@ export const MemberFileTabs = ({
       <FormDrawer
         subject={FORM_SUBJECTS.member}
         open={dialog === 'identity'}
-        title={`${ACTION_COPY.edit} · ${summary.displayName}`}
+        title={`${ACTION_COPY.edit} ${summary.displayName}`}
         fields={restFields}
         initialValues={identityValues}
         issues={file.issues}
@@ -1042,6 +1045,18 @@ export const MemberFileTabs = ({
           editingSocial ? file.updateSocial(editingSocial.id, values) : file.addSocial(values)
         }
         onClose={() => setDialog(null)}
+      />
+
+      <ConfirmDialog
+        open={pendingAbsence !== null}
+        title={MEMBER_COPY.absenceDeleteTitle}
+        description={MEMBER_COPY.absenceDeleteDescription}
+        pending={file.isSaving}
+        onCancel={() => setPendingAbsence(null)}
+        onConfirm={async () => {
+          await file.removeAbsence(pendingAbsence!.id)
+          setPendingAbsence(null)
+        }}
       />
 
       <ConfirmDialog
