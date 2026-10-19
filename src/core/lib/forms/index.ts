@@ -1,3 +1,4 @@
+export * from './follow'
 export * from './groups'
 export * from './options'
 export * from './parse'

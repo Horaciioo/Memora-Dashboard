@@ -315,6 +315,8 @@ export const DATE_PICKER_STYLES = {
   grid: 'grid grid-cols-7 gap-y-0.5 p-2',
   day: 'flex h-8 items-center justify-center rounded-full text-sm tabular-nums transition-colors hover:bg-[var(--color-surface)]',
   dayOutside: 'text-[var(--color-ink-subtle)]/60',
+  // Before the earliest day accepted
+  dayBarred: 'pointer-events-none opacity-30',
   dayToday: 'font-bold text-[var(--color-ink-accent)]',
   daySelected:
     'bg-[var(--color-brand-600)] text-[var(--color-on-brand)] hover:bg-[var(--color-brand-700)]',

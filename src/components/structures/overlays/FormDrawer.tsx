@@ -10,6 +10,7 @@ import {
   FORM_GROUP_ICONS,
   collectMissingRequired,
   groupFields,
+  settleFollowers,
   settleOwned,
   presetValues,
 } from '@/core/lib/forms'
@@ -60,10 +61,9 @@ export interface FormDrawerProps {
 const presetContext = (actorId: string | null): PresetContext => {
   // The clock reads in the member's zone
   const now = shiftToZone(new Date())
-  const nextHour = new Date(now)
-  nextHour.setHours(now.getHours() + 1, 0, 0, 0)
+  now.setSeconds(0, 0)
 
-  return { actorId, today: toDayKey(now), now: toFieldValue(nextHour) }
+  return { actorId, today: toDayKey(now), now: toFieldValue(now) }
 }
 
 /**
@@ -132,7 +132,12 @@ export const FormDrawer = ({
   const change = (name: string, value: FieldValue) =>
     setDraft((current) => ({
       ...current,
-      values: settleOwned(fields, { ...current.values, [name]: value }, name),
+      values: settleFollowers(
+        fields,
+        current.values,
+        settleOwned(fields, { ...current.values, [name]: value }, name),
+        name
+      ),
       missing: current.missing.filter((issue) => issue.field !== name),
     }))
 

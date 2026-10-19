@@ -14,6 +14,8 @@ export interface DayGridProps {
   onCursor: (cursor: string) => void
   // Single value
   day: string
+  // Days before it cannot be picked
+  minDay?: string
   // Highlighted span
   span: [string, string] | null
   range: boolean
@@ -35,6 +37,7 @@ export const DayGrid = ({
   cursor,
   onCursor,
   day,
+  minDay,
   span,
   range,
   onPick,
@@ -87,15 +90,18 @@ export const DayGrid = ({
           const isStart = span !== null && entry.key === span[0]
           const isEnd = span !== null && entry.key === span[1]
           const isEdge = isStart || isEnd
+          const isBarred = minDay !== undefined && entry.key < minDay
 
           return (
             <button
               key={entry.key}
               type="button"
+              disabled={isBarred}
               aria-pressed={range ? within : entry.key === day}
               className={cn(
                 DATE_PICKER_STYLES.day,
                 !entry.isCurrentMonth && DATE_PICKER_STYLES.dayOutside,
+                isBarred && DATE_PICKER_STYLES.dayBarred,
                 entry.isToday && DATE_PICKER_STYLES.dayToday,
                 !range && entry.key === day && DATE_PICKER_STYLES.daySelected,
                 within && !isEdge && DATE_PICKER_STYLES.dayInRange,

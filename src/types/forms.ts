@@ -111,6 +111,8 @@ export interface FieldAction {
  * @property {FieldValue} [equals] - Exact match
  * @property {string[]} [oneOf] - Match any
  * @property {boolean} [truthy] - Match on filled
+ * @property {boolean} [negate] - Invert the match
+ * @property {FieldCondition} [and] - Second rule that must hold too
  */
 
 export interface FieldCondition {
@@ -118,6 +120,22 @@ export interface FieldCondition {
   equals?: FieldValue
   oneOf?: string[]
   truthy?: boolean
+  negate?: boolean
+  and?: FieldCondition
+}
+
+/**
+ * Delay a date field keeps from another one
+ * @typedef {Object} FollowRule
+ * @property {string} field - Date field followed
+ * @property {number} minutes - Delay after it
+ * @property {FieldCondition} [when] - Rule only holds while this does
+ */
+
+export interface FollowRule {
+  field: string
+  minutes: number
+  when?: FieldCondition
 }
 
 /**
@@ -160,6 +178,7 @@ export interface BusySlot {
  * @property {string} [prefix] - Static text drawn before the control
  * @property {string} [prefixFrom] - Select whose chosen option hands the prefix
  * @property {string} [lookup] - Network a typed handle is checked against
+ * @property {boolean} [noLookup] - Handle never probed on a network
  * @property {string} [glyph] - Emoji field drawn beside this control
  * @property {'full' | 'half'} [span] - Grid width
  * @property {string} [group] - Category the field sits under
@@ -168,6 +187,8 @@ export interface BusySlot {
  * @property {MaturityName} [maturity] - Lifecycle tag drawn beside the label
  * @property {boolean} [adminOnly] - Only an administrator may write it
  * @property {FieldCondition} [visibleWhen] - Display rule
+ * @property {string} [notBefore] - Name of a date field this one can never precede
+ * @property {FollowRule} [follows] - Date field this one trails by a delay until edited
  * @property {string} [ownerField] - Field whose picks narrow the owned options
  * @property {boolean} [withTime] - A date or day range starts with the hour of each end, the picker can drop it
  * @property {boolean} [dayOnly] - The picker never offers an hour
@@ -199,6 +220,7 @@ export interface FieldDefinition {
   prefix?: string
   prefixFrom?: string
   lookup?: string
+  noLookup?: boolean
   glyph?: string
   span?: 'full' | 'half'
   group?: string
@@ -207,6 +229,8 @@ export interface FieldDefinition {
   maturity?: MaturityName
   adminOnly?: boolean
   visibleWhen?: FieldCondition
+  notBefore?: string
+  follows?: FollowRule
   ownerField?: string
   defaultFromOwner?: boolean
   withTime?: boolean
