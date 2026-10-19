@@ -40,9 +40,9 @@ export const toSessionUser = async (account: SessionAccount): Promise<SessionUse
   // Overwrites narrowed to a creator only land while that creator is the one being worked on
   const [activeYoutuberId, view] = await Promise.all([readActiveCreator(), readNavigationView()])
 
-  // A lower view wears a plain role
+  // A lower view swaps the role only
   const wearing = simulatedRoleOf(view, actual)
-  const held = wearing ? { ...account, role: wearing, functions: [] } : account
+  const held = wearing ? { ...account, role: wearing } : account
 
   return {
     id: account.id,
