@@ -1,5 +1,7 @@
 import type { SanctionMeasureView, SanctionRungView } from '@/types/sanctions'
 import type { Chatter, ModViewIntent } from '@/types/modview'
+import { findChatCommand } from '@/declarations/modview/commands'
+import { MODVIEW_DEFAULTS } from '@/declarations/modview/registries'
 import { SanctionKinds } from '@/utils/constants/moderation'
 
 // Seconds per duration unit
@@ -45,11 +47,8 @@ export const formatDuration = (seconds: number): string => {
 
 export type ChatCommandResult =
   | { kind: 'say'; text: string }
-  | { kind: 'intent'; intent: ModViewIntent; target: Chatter }
+  | { kind: 'intent'; intent: ModViewIntent; target: Chatter | null }
   | { kind: 'error'; reason: 'unknownCommand' | 'unknownUser' | 'badDuration' | 'missingUser' }
-
-// Commands the Mod View understands
-const COMMANDS = ['timeout', 'ban', 'unban', 'warn'] as const
 
 /**
  * Read a chat line
@@ -66,16 +65,28 @@ export const parseChatCommand = (
   if (!line.startsWith('/')) return { kind: 'say', text: line }
 
   // Command
-  const [head = '', user = '', ...rest] = line.slice(1).split(/\s+/)
-  const command = head.toLowerCase()
-  if (!(COMMANDS as readonly string[]).includes(command))
-    return { kind: 'error', reason: 'unknownCommand' }
+  const [head = '', ...args] = line.slice(1).split(/\s+/)
+  const option = findChatCommand(head)
+  if (!option) return { kind: 'error', reason: 'unknownCommand' }
+
+  // Channel modes aim at nobody
+  if (option.probe.kind === 'mode') {
+    const { mode, enabled } = option.probe
+    if (mode !== 'slow' || !enabled) return { kind: 'intent', target: null, intent: option.probe }
+
+    const seconds = args[0] ? Number(args[0]) : MODVIEW_DEFAULTS.slowMode
+    if (!Number.isInteger(seconds) || seconds < 1) return { kind: 'error', reason: 'badDuration' }
+
+    return { kind: 'intent', target: null, intent: { ...option.probe, seconds } }
+  }
+
+  const [user = '', ...rest] = args
   if (!user) return { kind: 'error', reason: 'missingUser' }
 
   const target = findChatter(user.replace(/^@/, ''))
   if (!target) return { kind: 'error', reason: 'unknownUser' }
 
-  if (command === 'timeout') {
+  if (option.name === 'timeout') {
     const [duration = '', ...words] = rest
     const seconds = parseDuration(duration)
     if (seconds === null) return { kind: 'error', reason: 'badDuration' }
@@ -88,14 +99,14 @@ export const parseChatCommand = (
   }
 
   const reason = rest.join(' ')
-  if (command === 'ban') {
+  if (option.name === 'ban') {
     return {
       kind: 'intent',
       target,
       intent: { kind: 'ban', chatterId: target.id, reason: reason || null },
     }
   }
-  if (command === 'warn') {
+  if (option.name === 'warn') {
     return { kind: 'intent', target, intent: { kind: 'warn', chatterId: target.id, reason } }
   }
 

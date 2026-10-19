@@ -99,6 +99,8 @@ export const MODVIEW_DOSSIER = {
   rowKind: 'text-sm font-bold',
   rowDate: 'shrink-0 text-xs text-[var(--twitch-muted)]',
   rowReason: 'text-sm break-words',
+  rowLine: 'text-xs text-[var(--twitch-muted)]',
+  summary: 'text-sm font-semibold',
   rowBy: 'text-xs text-[var(--twitch-muted)] italic',
   line: 'text-xs text-[var(--color-ink-subtle)]',
   empty: 'text-xs text-[var(--color-ink-subtle)] italic',
@@ -129,4 +131,60 @@ export const MODVIEW_TEAM = {
   reinforce: 'p-2',
   planned: 'shrink-0 text-xs text-[var(--color-ink-subtle)] italic tabular-nums',
   focus: 'px-3 py-1.5 text-xs font-semibold text-[var(--color-ink-accent)]',
+} as const
+
+/**
+ * Unban requests desk
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_UNBAN = {
+  // Popover from the sidebar
+  iconButton:
+    'flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] hover:bg-[var(--color-hover)]',
+  icon: 'size-4',
+  // List
+  list: 'flex min-h-0 flex-1 flex-col',
+  listHead: 'flex items-center justify-between gap-2 px-2 pb-2',
+  listCount: 'text-sm font-semibold',
+  sort: 'flex shrink-0 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] p-0.5',
+  sortButton:
+    'rounded-[var(--radius-sm)] px-2 py-1 text-xs font-bold text-[var(--color-ink-subtle)] aria-pressed:bg-[var(--color-hover)] aria-pressed:text-[var(--color-ink)]',
+  rows: 'flex min-h-0 flex-1 flex-col overflow-y-auto',
+  row: 'flex w-full items-center gap-2.5 px-2 py-2.5 text-left transition-colors hover:bg-[var(--color-hover)]',
+  rowOn: 'bg-[var(--color-hover)]',
+  rowBody: 'flex min-w-0 flex-1 flex-col',
+  rowName: 'truncate text-sm font-bold',
+  rowMeta: 'truncate text-xs text-[var(--color-ink-subtle)]',
+  empty: 'px-3 py-6 text-center text-sm text-[var(--color-ink-subtle)] italic',
+  pager:
+    'flex items-center justify-between gap-2 border-t border-[var(--color-border)] px-2 py-1.5',
+  pagerLabel: 'text-xs font-bold tabular-nums text-[var(--color-ink-subtle)]',
+  pagerButtons: 'flex items-center gap-1',
+  // Expanded desk, over the stage
+  desk: 'course-pop absolute inset-0 z-40 flex min-h-0 flex-col overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)]',
+  deskHead: 'flex items-center gap-2 bg-[var(--twitch-head)] px-3 py-2',
+  deskTitle:
+    'min-w-0 flex-1 truncate text-sm font-bold tracking-tight text-[var(--color-ink-accent)]',
+  deskBody: 'flex min-h-0 flex-1',
+  deskList: 'flex min-h-0 w-80 shrink-0 flex-col border-r border-[var(--color-border)] py-2',
+  detail: 'flex min-h-0 min-w-0 flex-1 flex-col',
+  detailScroll: 'flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4',
+  who: 'flex items-center gap-3',
+  whoName: 'text-lg font-bold',
+  whoNote: 'text-xs text-[var(--color-ink-subtle)]',
+  figures: 'grid grid-cols-2 gap-4 sm:grid-cols-4',
+  figureLabel: 'text-xs text-[var(--color-ink-subtle)]',
+  figureValue: 'text-sm font-bold',
+  tabs: 'flex items-center gap-4 border-b border-[var(--color-border)]',
+  tab: 'border-b-2 border-transparent pb-1.5 text-sm font-semibold text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)]',
+  tabOn: 'border-[var(--color-brand-600)] text-[var(--color-ink)]',
+  log: 'flex flex-col gap-1.5 text-sm',
+  logLine: 'break-words',
+  logTime: 'mr-2 font-[family-name:var(--font-mono)] text-micro text-[var(--color-ink-subtle)]',
+  comment: 'flex flex-col gap-0.5 text-sm',
+  commentHead: 'text-xs text-[var(--color-ink-subtle)]',
+  footer: 'flex flex-col gap-3 border-t border-[var(--color-border)] p-3',
+  request: 'border-l-2 border-[var(--color-ink-subtle)] pl-3 text-sm break-words',
+  actions: 'flex flex-wrap gap-2',
 } as const

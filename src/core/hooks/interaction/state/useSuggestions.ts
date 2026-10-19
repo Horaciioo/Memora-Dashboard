@@ -23,13 +23,15 @@ const SETTLING_ACTS: ModActKind[] = ['delete', 'warn', 'timeout', 'ban']
  * @param {ModViewState} state - Mod View state
  * @param {SanctionPanelView | null} panel - Panel at the level in force
  * @param {PanelMemory} memory - Rungs already applied
+ * @param {Record<string, string>} acted - Viewers sanctioned from here, with the moment
  * @return {{ suggestions: Suggestion[], dismiss: (id: string) => void }} - Suggestions
  */
 
 export const useSuggestions = (
   state: ModViewState,
   panel: SanctionPanelView | null,
-  memory: PanelMemory
+  memory: PanelMemory,
+  acted: Record<string, string> = {}
 ) => {
   const [dismissed, setDismissed] = useState<Set<string>>(new Set())
 
@@ -62,26 +64,37 @@ export const useSuggestions = (
         at: message.sentAt,
       }))
 
-    // Latest sanction per name
-    const settledAt = new Map<string, string>()
-    for (const act of state.acts) {
-      const name = act.target?.toLowerCase()
-      if (!name || !SETTLING_ACTS.includes(act.kind)) continue
-      if ((settledAt.get(name) ?? '') < act.at) settledAt.set(name, act.at)
+    // Latest sanction per identifier or name, as a timestamp
+    const settledAt = new Map<string, number>()
+    const settle = (key: string | null | undefined, at: number) => {
+      if (key && Number.isFinite(at) && (settledAt.get(key) ?? 0) < at) settledAt.set(key, at)
     }
+    for (const act of state.acts) {
+      if (!SETTLING_ACTS.includes(act.kind)) continue
+      const at = Date.parse(act.at)
+      settle(act.targetId, at)
+      settle(act.target?.toLowerCase(), at)
+    }
+    for (const [chatterId, at] of Object.entries(acted)) settle(chatterId, Date.parse(at))
 
     // Already sanctioned since
-    const isSettled = (source: SuggestionSource): boolean =>
-      [source.chatter.name, source.chatter.login].some(
-        (name) => (settledAt.get(name.toLowerCase()) ?? '') >= source.at
-      )
+    const isSettled = (source: SuggestionSource): boolean => {
+      const sentAt = Date.parse(source.at)
+      const keys = [
+        source.chatter.id,
+        source.chatter.name.toLowerCase(),
+        source.chatter.login.toLowerCase(),
+      ]
+
+      return keys.some((key) => (settledAt.get(key) ?? 0) >= sentAt)
+    }
 
     return [...held, ...flagged]
       .filter((source) => !dismissed.has(source.id) && !isSettled(source))
       .sort((left, right) => right.at.localeCompare(left.at))
       .slice(0, MAX_SUGGESTIONS)
       .map((source) => suggestFor(source, panel, memory))
-  }, [state.held, state.messages, state.acts, panel, memory, dismissed])
+  }, [state.held, state.messages, state.acts, panel, memory, dismissed, acted])
 
   const dismiss = (id: string) => setDismissed((current) => new Set([...current, id]))
 

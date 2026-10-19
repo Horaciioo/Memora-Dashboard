@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import type { PageOption } from '@/components/structures/page/PageOptions'
 import { AutoModWindow } from '@/composites/modview/AutoModWindow'
@@ -13,10 +13,12 @@ import { ModActionsWindow } from '@/composites/modview/ModActionsWindow'
 import { ModViewSidebar } from '@/composites/modview/ModViewSidebar'
 import { SanctionsDrawer } from '@/composites/modview/SanctionsDrawer'
 import { StreamWindow } from '@/composites/modview/StreamWindow'
-import { UnbanRequestsWindow } from '@/composites/modview/UnbanRequestsWindow'
+import { UnbanDesk } from '@/composites/modview/UnbanDesk'
 import { ViewerCard } from '@/composites/modview/ViewerCard'
 import { ModWorkspace } from '@/composites/modview/workspace/ModWorkspace'
 import { useLiveFocus } from '@/core/hooks/data/lives/useLiveFocus'
+import { SplitHandle } from '@/composites/modview/workspace/SplitHandle'
+import { useSideWidth } from '@/core/hooks/interaction/layout/useSideWidth'
 import { useBareShell } from '@/core/hooks/interaction/layout/useBareShell'
 import { useModLayout } from '@/core/hooks/interaction/layout/useModLayout'
 import { useModViewActions } from '@/core/hooks/interaction/state/useModViewActions'
@@ -33,7 +35,7 @@ import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
 import { MODVIEW_WINDOWS } from '@/declarations/modview/registries'
 import type { ModViewProfileName } from '@/declarations/modview/profiles'
 import type { IconName } from '@/declarations/ui/icons'
-import { MODVIEW_FRAME, MODVIEW_SPOTLIGHT } from '@/declarations/ui/variants'
+import { MODVIEW_FRAME, MODVIEW_SPOTLIGHT, MODVIEW_WORKSPACE } from '@/declarations/ui/variants'
 import type { LivePerson } from '@/types/lives'
 import type { ModViewDriver, ModViewWindow } from '@/types/modview'
 import type { SanctionPanelView } from '@/types/sanctions'
@@ -41,6 +43,12 @@ import { cn } from '@/utils/classnames'
 import { LivePlatforms } from '@/utils/constants/lives'
 import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
+
+// Room the viewer card takes in the right column, wide enough for its tabs and its messages
+const CARD_MIN_WIDTH = 384
+
+// Time the card takes to grow or shrink, as its width transition
+const CARD_TRANSITION_MS = 300
 
 /**
  * What a real live adds to the Mod View: history, team, Inspect Mod, Focus
@@ -108,8 +116,11 @@ export const ModView = ({
 }: ModViewProps) => {
   const { state, spotlight } = driver
   const isWorkspace = !embedded && !showcase && !only
+  const side = useSideWidth()
   const [inspected, setInspected] = useState<string | null>(null)
   const [actInPlace, setActInPlace] = useState(false)
+  // Unban requests desk filling the stage, with the request opened first
+  const [unbanDesk, setUnbanDesk] = useState<{ initialId: string | null } | null>(null)
   const focus = useLiveFocus(live?.id ?? null)
   const following = live
     ? focus.focuses.find((entry) => entry.watcherId === live.viewerId)
@@ -124,7 +135,7 @@ export const ModView = ({
   })
   const { gate, act, picked, setPicked, memory } = actions
   const watchlist = useWatchlist(state.messages)
-  const { suggestions, dismiss } = useSuggestions(state, panel, memory)
+  const { suggestions, dismiss } = useSuggestions(state, panel, memory, actions.acted)
 
   // Windows this platform and seat can open
   const seat = profile ?? profileOfPermissions(permissions)
@@ -146,25 +157,25 @@ export const ModView = ({
   const model = useModLayout(seat, available)
   useBareShell(isWorkspace)
 
-  // Only seats that may follow or inspect see the team
-  const team: TeamTools | undefined =
-    live && (canInspect || canFocus)
-      ? {
-          members: live.members.filter((member) => member.id !== live.viewerId),
-          canInspect,
-          canFocus: (accountId) => canFocus && live.focusable.includes(accountId),
-          followingId: following?.targetId ?? null,
-          onFocus: (accountId) => void focus.start(accountId),
-          onStopFocus: () => {
-            setActInPlace(false)
-            void focus.stop()
-          },
-          onInspect: (accountId) => {
-            setInspected(accountId)
-            if (!model.isShown('inspect')) model.toggleHidden('inspect')
-          },
-        }
-      : undefined
+  // Every seat sees the team, the gestures follow the rights
+  const team: TeamTools | undefined = live
+    ? {
+        members: live.members.filter((member) => member.id !== live.viewerId),
+        canInspect,
+        hasFocusRight: canFocus,
+        canFocus: (accountId) => canFocus && live.focusable.includes(accountId),
+        followingId: following?.targetId ?? null,
+        onFocus: (accountId) => void focus.start(accountId),
+        onStopFocus: () => {
+          setActInPlace(false)
+          void focus.stop()
+        },
+        onInspect: (accountId) => {
+          setInspected(accountId)
+          if (!model.isShown('inspect')) model.toggleHidden('inspect')
+        },
+      }
+    : undefined
 
   const lit = (target: string) => spotlight === target
   const pickByName = (name: string) => {
@@ -205,6 +216,7 @@ export const ModView = ({
         return (
           <AutoModWindow
             held={state.held}
+            acts={state.acts}
             isLit={lit('automod')}
             gate={gate}
             onAct={act}
@@ -228,6 +240,7 @@ export const ModView = ({
             onSend={actions.send}
             hint={actions.hint}
             hasTerms={isWorkspace}
+            liveId={live?.id ?? null}
           />
         )
       case 'community':
@@ -252,20 +265,30 @@ export const ModView = ({
             }}
           />
         ) : null
-      case 'unbanRequests':
-        return (
-          <UnbanRequestsWindow
-            requests={state.unbanRequests}
-            isLit={lit('unbanRequests')}
-            gate={gate}
-            onAct={act}
-          />
-        )
     }
   }
 
-  const pickedLines = picked
-    ? state.messages.filter((message) => message.author.id === picked.id)
+  // The card grows from the column it replaces and shrinks back, so the chat never jumps
+  const [shownCard, setShownCard] = useState(picked)
+  const [isCardGrown, setCardGrown] = useState(false)
+  useEffect(() => {
+    if (picked) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setShownCard(picked)
+      // One frame at the column's width, then the card takes its own
+      const frame = requestAnimationFrame(() => requestAnimationFrame(() => setCardGrown(true)))
+
+      return () => cancelAnimationFrame(frame)
+    }
+
+    setCardGrown(false)
+    const timer = setTimeout(() => setShownCard(null), CARD_TRANSITION_MS)
+
+    return () => clearTimeout(timer)
+  }, [picked])
+
+  const pickedLines = shownCard
+    ? state.messages.filter((message) => message.author.id === shownCard.id)
     : []
 
   // One switch per window in the page options
@@ -288,6 +311,28 @@ export const ModView = ({
     windowsOf(state.platform).includes(id) && (!only || only.includes(id))
 
   const grid = (ids: ModViewWindow[]) => ids.filter(shows).map((id) => windowFor(id))
+
+  const viewerCard = shownCard ? (
+    <ViewerCard
+      chatter={shownCard}
+      messages={pickedLines}
+      liveSanctions={sanctionsOn(state.acts, shownCard).length}
+      gate={gate}
+      onAct={act}
+      isDocked={isWorkspace}
+      width={
+        isWorkspace ? (isCardGrown ? Math.max(side.width, CARD_MIN_WIDTH) : side.width) : undefined
+      }
+      onClose={() => setPicked(null)}
+      isWatched={watchlist.watched.some((entry) => entry.id === shownCard.id)}
+      onWatch={() =>
+        watchlist.watched.some((entry) => entry.id === shownCard.id)
+          ? watchlist.unwatch(shownCard.id)
+          : watchlist.watch(shownCard)
+      }
+      dossier={live ? { liveId: live.id, panel, memory, onPrefill: actions.prefill } : undefined}
+    />
+  ) : null
 
   return (
     <div
@@ -313,6 +358,15 @@ export const ModView = ({
           }
           leaveLiveId={live?.id}
           endLiveId={live?.canEnd ? live.id : undefined}
+          creator={{ name: state.channel.name, avatar: state.channel.avatar }}
+          unban={
+            state.platform === LivePlatforms.Twitch
+              ? {
+                  requests: state.unbanRequests,
+                  onOpen: (requestId) => setUnbanDesk({ initialId: requestId }),
+                }
+              : undefined
+          }
           audience={{ community: state.community, onPick: setPicked }}
         />
       )}
@@ -343,35 +397,45 @@ export const ModView = ({
                 {grid(['chat'])}
               </div>
               <div className={only ? MODVIEW_FRAME.flat : MODVIEW_FRAME.column}>
-                {grid(['community', 'unbanRequests'])}
+                {grid(['community'])}
               </div>
             </div>
           )}
 
-          {picked && (
-            <ViewerCard
-              chatter={picked}
-              messages={pickedLines}
-              liveSanctions={sanctionsOn(state.acts, picked).length}
+          {!isWorkspace && viewerCard}
+
+          {isWorkspace && unbanDesk && (
+            <UnbanDesk
+              requests={state.unbanRequests}
+              initialId={unbanDesk.initialId}
+              liveId={live?.id ?? null}
+              messages={state.messages}
               gate={gate}
               onAct={act}
-              onClose={() => setPicked(null)}
-              isWatched={watchlist.watched.some((entry) => entry.id === picked.id)}
-              onWatch={() =>
-                watchlist.watched.some((entry) => entry.id === picked.id)
-                  ? watchlist.unwatch(picked.id)
-                  : watchlist.watch(picked)
-              }
-              dossier={
-                live ? { liveId: live.id, panel, memory, onPrefill: actions.prefill } : undefined
-              }
+              onBack={() => setUnbanDesk(null)}
             />
           )}
         </div>
 
+        {isWorkspace && !embedded && (
+          <div className={MODVIEW_WORKSPACE.sideHandle}>
+            <div className={MODVIEW_WORKSPACE.sideHandleGrip}>
+              <SplitHandle
+                orientation="vertical"
+                label={MODVIEW_WORKSPACE_COPY.resizeSide}
+                onMove={side.resize}
+              />
+            </div>
+          </div>
+        )}
+
+        {isWorkspace && viewerCard}
+
         {!embedded && (
           <SanctionsDrawer
             panel={panel}
+            isHidden={isWorkspace && shownCard !== null}
+            width={isWorkspace ? side.width : undefined}
             levelName={levelName}
             levelIcon={levelIcon}
             target={picked}

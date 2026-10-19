@@ -18,10 +18,10 @@ const EXCERPT_LENGTH = 160
 /**
  * Kind of a gesture
  * @param {ModViewIntent} intent - Gesture
- * @return {ModerationKind} - Kind
+ * @return {ModerationKind | null} - Kind, none for a gesture the log never keeps
  */
 
-export const kindOfIntent = (intent: ModViewIntent): ModerationKind => {
+export const kindOfIntent = (intent: ModViewIntent): ModerationKind | null => {
   switch (intent.kind) {
     case 'delete':
       return 'DELETE'
@@ -43,6 +43,9 @@ export const kindOfIntent = (intent: ModViewIntent): ModerationKind => {
       return intent.remove ? 'TERM_REMOVE' : 'TERM_ADD'
     case 'say':
       return 'MESSAGE_SEND'
+    case 'pin':
+    case 'unpin':
+      return null
   }
 }
 
@@ -88,6 +91,8 @@ export const logMemoraGesture = async (input: {
   targetLogin: string | null
 }): Promise<string | null> => {
   const { intent } = input
+  const kind = kindOfIntent(intent)
+  if (!kind) return null
 
   try {
     const row = await prisma.moderationAction.create({
@@ -99,7 +104,7 @@ export const logMemoraGesture = async (input: {
         actorLogin: input.actorLogin,
         targetPlatformUserId: targetOf(intent),
         targetLogin: input.targetLogin,
-        kind: kindOfIntent(intent),
+        kind,
         durationSeconds: intent.kind === 'timeout' ? intent.seconds : null,
         reason: 'reason' in intent ? intent.reason : null,
         liveconLevel: input.liveconLevel,

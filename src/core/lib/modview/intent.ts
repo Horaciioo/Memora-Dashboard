@@ -81,7 +81,23 @@ export const readIntent = (raw: Record<string, unknown>): ModViewIntent | null =
     }
     case 'say': {
       const text = textOf(raw.text)
-      return text ? { kind: 'say', text } : null
+      const replyToId = textOf(raw.replyToId, false)
+      return text ? { kind: 'say', text, ...(replyToId ? { replyToId } : {}) } : null
+    }
+    case 'pin': {
+      const messageId = textOf(raw.messageId)
+      const seconds = raw.seconds === undefined ? undefined : Number(raw.seconds)
+      return messageId
+        ? {
+            kind: 'pin',
+            messageId,
+            ...(seconds !== undefined && Number.isInteger(seconds) ? { seconds } : {}),
+          }
+        : null
+    }
+    case 'unpin': {
+      const messageId = textOf(raw.messageId)
+      return messageId ? { kind: 'unpin', messageId } : null
     }
     default:
       return null

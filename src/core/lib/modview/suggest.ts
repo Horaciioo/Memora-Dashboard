@@ -79,6 +79,54 @@ export const offenseForCategory = (
 }
 
 /**
+ * Offence whose examples the message looks like
+ * @param {SanctionPanelView | null} panel - Panel at the level in force
+ * @param {SuggestionSource} source - What triggered it
+ * @return {SanctionOffenseCard | null} - Offence, none when no example fits
+ */
+
+export const offenseByExamples = (
+  panel: SanctionPanelView | null,
+  source: SuggestionSource
+): SanctionOffenseCard | null => {
+  if (!panel) return null
+  const text = plain(source.text)
+  const words = source.flagged.map(plain).filter((word) => word.length > 1)
+  let best: { offense: SanctionOffenseCard; score: number } | null = null
+
+  for (const offense of panel.offenses) {
+    let score = 0
+    for (const example of offense.examples.map(plain)) {
+      if (example.length < 2) continue
+      // The whole example said again weighs more than a shared word
+      if (example.length >= 4 && text.includes(example)) score += 3
+      else if (words.some((word) => example.includes(word) || word.includes(example))) score += 2
+    }
+    if (score > 0 && (!best || score > best.score)) best = { offense, score }
+  }
+
+  return best?.offense ?? null
+}
+
+/**
+ * Offence a source stands for: the AutoMod category when it names one, else the examples
+ * @param {SanctionPanelView | null} panel - Panel at the level in force
+ * @param {SuggestionSource} source - What triggered it
+ * @return {SanctionOffenseCard | null} - Offence
+ */
+
+const offenseOf = (
+  panel: SanctionPanelView | null,
+  source: SuggestionSource
+): SanctionOffenseCard | null => {
+  const isNamed = source.categoryKey !== CHAT_FLAG_CATEGORY
+
+  return isNamed
+    ? (offenseForCategory(panel, source.categoryKey) ?? offenseByExamples(panel, source))
+    : (offenseByExamples(panel, source) ?? offenseForCategory(panel, source.categoryKey))
+}
+
+/**
  * Write the suggestion of one source: viewer, command of the rung they come to, reason
  * @param {SuggestionSource} source - What triggered it
  * @param {SanctionPanelView | null} panel - Panel at the level in force
@@ -91,7 +139,7 @@ export const suggestFor = (
   panel: SanctionPanelView | null,
   memory: PanelMemory
 ): Suggestion => {
-  const offense = offenseForCategory(panel, source.categoryKey)
+  const offense = offenseOf(panel, source)
   if (!offense)
     return { source, offense: null, rung: null, rungCount: 0, measure: null, command: null }
 

@@ -32,6 +32,10 @@ export interface SanctionsDrawerProps {
   suggest?: SuggestionListProps
   // Viewers under watch, under the offences
   watch?: WatchPanelProps
+  // A viewer card stands in its place
+  isHidden?: boolean
+  // Width of the column, in pixels
+  width?: number
 }
 
 /**
@@ -50,6 +54,8 @@ export const SanctionsDrawer = ({
   onPrefill,
   suggest,
   watch,
+  isHidden,
+  width,
 }: SanctionsDrawerProps) => {
   const [search, setSearch] = useState('')
   const [openId, setOpenId] = useState<string | null>(null)
@@ -72,7 +78,11 @@ export const SanctionsDrawer = ({
 
   return (
     <>
-      <div ref={setColumn} className={MODVIEW_SANCTIONS.column}>
+      <div
+        ref={setColumn}
+        className={cn(MODVIEW_SANCTIONS.column, isHidden && 'hidden')}
+        style={width ? { width } : undefined}
+      >
         <aside
           className={MODVIEW_SANCTIONS.root}
           style={{ flex: `${watch ? topShare : 1} 1 0%` }}
@@ -97,23 +107,16 @@ export const SanctionsDrawer = ({
             />
 
             {suggest && suggest.suggestions.length > 0 && (
-              <>
-                <div className={MODVIEW_SANCTIONS.divider} />
-                <section
-                  className={MODVIEW_SANCTIONS.suggestion}
-                  aria-label={MODVIEW_SUGGESTION_COPY.title}
-                >
-                  <h4 className={MODVIEW_SANCTIONS.suggestionTitle}>
-                    <SuggestionIcon
-                      className={MODVIEW_SANCTIONS.suggestionIcon}
-                      aria-hidden="true"
-                    />
-                    {MODVIEW_SUGGESTION_COPY.title}
-                  </h4>
-                  <SuggestionList {...suggest} />
-                </section>
-                <div className={MODVIEW_SANCTIONS.divider} />
-              </>
+              <section
+                className={MODVIEW_SANCTIONS.suggestion}
+                aria-label={MODVIEW_SUGGESTION_COPY.title}
+              >
+                <h4 className={MODVIEW_SANCTIONS.suggestionTitle}>
+                  <SuggestionIcon className={MODVIEW_SANCTIONS.suggestionIcon} aria-hidden="true" />
+                  {MODVIEW_SUGGESTION_COPY.title}
+                </h4>
+                <SuggestionList {...suggest} />
+              </section>
             )}
 
             {offenses.length === 0 && <p className={MODVIEW_SANCTIONS.empty}>{empty}</p>}
@@ -167,7 +170,7 @@ export const SanctionsDrawer = ({
           </>
         )}
       </div>
-      {opened && (
+      {opened && !isHidden && (
         <FloatingRail anchor={column}>
           <OffenseRail
             offense={opened}

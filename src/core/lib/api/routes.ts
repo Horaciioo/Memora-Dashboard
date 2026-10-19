@@ -66,6 +66,7 @@ export const API_ROUTES = {
   livesStream: '/api/lives/flux',
   live: (id: string) => `/api/lives/${id}`,
   liveModView: (id: string) => `/api/lives/${id}/modview`,
+  liveEmotes: (id: string) => `/api/lives/${id}/emotes`,
   liveFeed: (id: string) => `/api/lives/${id}/flux`,
   livePresence: (id: string) => `/api/lives/${id}/presence`,
   liveReinforcement: (id: string) => `/api/lives/${id}/renfort`,
@@ -76,6 +77,7 @@ export const API_ROUTES = {
   liveCoordination: (id: string) => `/api/lives/${id}/coordination`,
   liveInstructions: (id: string) => `/api/lives/${id}/consignes`,
   liveViewer: (id: string, viewerId: string) => `/api/lives/${id}/spectateurs/${viewerId}`,
+  liveBan: (id: string, viewerId: string) => `/api/lives/${id}/bannis/${viewerId}`,
   liveViewerComments: (id: string, viewerId: string) =>
     `/api/lives/${id}/spectateurs/${viewerId}/commentaires`,
   liveInspect: (id: string, accountId: string) => `/api/lives/${id}/moderateurs/${accountId}`,

@@ -41,6 +41,36 @@ export interface Chatter {
 }
 
 /**
+ * Piece of a message as the platform cut it
+ * @typedef {Object} ChatFragment
+ * @property {'text' | 'emote' | 'mention'} type - Nature
+ * @property {string} text - Words as typed
+ * @property {string} [emoteId] - Platform emote identifier
+ * @property {boolean} [animated] - Emote moves
+ */
+
+export interface ChatFragment {
+  type: 'text' | 'emote' | 'mention'
+  text: string
+  emoteId?: string
+  animated?: boolean
+}
+
+/**
+ * Line a message answers
+ * @typedef {Object} ChatReply
+ * @property {string} id - Parent message identifier
+ * @property {string} authorName - Parent author
+ * @property {string} text - Parent text
+ */
+
+export interface ChatReply {
+  id: string
+  authorName: string
+  text: string
+}
+
+/**
  * One chat message
  * @typedef {Object} ChatMessage
  */
@@ -50,6 +80,10 @@ export interface ChatMessage {
   author: Chatter
   text: string
   sentAt: string
+  // Text cut into words, emotes and mentions
+  fragments?: ChatFragment[]
+  // Line this one answers
+  reply?: ChatReply
   // First message of this chatter on the channel
   isFirst?: boolean
   // Removed by a moderator
@@ -89,6 +123,8 @@ export interface ModAct {
   target: string | null
   moderator: string
   at: string
+  // Platform identifier of the target
+  targetId?: string | null
   durationSeconds?: number | null
   reason?: string | null
   // Message or term the act was about
@@ -133,6 +169,100 @@ export interface UnbanRequest {
 }
 
 /**
+ * Message pinned at the top of the chat
+ * @typedef {Object} PinnedMessage
+ * @property {string} messageId - Message identifier
+ * @property {Chatter} author - Who wrote it
+ * @property {string} text - Message
+ * @property {ChatFragment[]} fragments - Message cut into pieces
+ * @property {string} pinnedBy - Who pinned it
+ * @property {string | null} endsAt - ISO end, none when it stays until the stream ends
+ */
+
+export interface PinnedMessage {
+  messageId: string
+  author: Chatter
+  text: string
+  fragments: ChatFragment[]
+  pinnedBy: string
+  endsAt: string | null
+}
+
+/**
+ * One Twitch emote a message may carry
+ * @typedef {Object} TwitchEmote
+ * @property {string} id - Emote identifier
+ * @property {string} name - Word that writes it
+ * @property {boolean} animated - Emote moves
+ * @property {'subscriptions' | 'bitstier' | 'follower' | null} kind - What unlocks it, none for a free one
+ * @property {boolean} isLocked - The member cannot use it
+ */
+
+export interface TwitchEmote {
+  id: string
+  name: string
+  animated: boolean
+  kind: 'subscriptions' | 'bitstier' | 'follower' | null
+  isLocked: boolean
+}
+
+/**
+ * Emotes offered in the chat box
+ * @typedef {Object} LiveEmotes
+ * @property {TwitchEmote[]} global - Emotes of Twitch itself
+ * @property {TwitchEmote[]} channel - Emotes of the channel
+ * @property {boolean} isVerified - What the member may use was checked
+ */
+
+export interface LiveEmotes {
+  global: TwitchEmote[]
+  channel: TwitchEmote[]
+  isVerified: boolean
+}
+
+/**
+ * Choices a moderator keeps from one live to the next
+ * @typedef {Object} ModPreferences
+ * @property {boolean} timestamps - Hour before each line
+ * @property {boolean} badges - Badges before each name
+ * @property {boolean} deleted - Text of removed lines kept
+ * @property {boolean} firstMessages - First lines framed
+ * @property {boolean} colouredNames - Names in their own colour
+ * @property {'hover' | 'alt'} pauseMode - What stands the chat still
+ * @property {'left' | 'hover'} toolsPosition - Where the gestures of a line show
+ * @property {boolean} keepResolved - Handled held messages stay in the queue
+ */
+
+export interface ModPreferences {
+  timestamps: boolean
+  badges: boolean
+  deleted: boolean
+  firstMessages: boolean
+  colouredNames: boolean
+  pauseMode: 'hover' | 'alt'
+  toolsPosition: 'left' | 'hover'
+  keepResolved: boolean
+}
+
+/**
+ * What Twitch says of a banned viewer
+ * @typedef {Object} BanDetail
+ * @property {string | null} avatar - Profile picture address
+ * @property {string | null} accountCreatedAt - ISO moment the account was made
+ * @property {string | null} bannedBy - Moderator who banned
+ * @property {string | null} bannedAt - ISO moment of the ban
+ * @property {string | null} reason - Reason given
+ */
+
+export interface BanDetail {
+  avatar: string | null
+  accountCreatedAt: string | null
+  bannedBy: string | null
+  bannedAt: string | null
+  reason: string | null
+}
+
+/**
  * Chat restrictions in force
  * @typedef {Object} ChatModes
  */
@@ -144,6 +274,8 @@ export interface ChatModes {
   emotes: boolean
   // Seconds between two messages
   slowSeconds: number | null
+  // Minutes a follower must have followed, none while the mode is off
+  followerMinutes?: number | null
 }
 
 /**
@@ -173,6 +305,8 @@ export interface ModViewState {
     avatar: string | null
     category: string | null
     categoryArt: string | null
+    // Tags the streamer gave the live
+    tags?: string[]
   }
   title: string
   embedUrl: string | null
@@ -190,6 +324,10 @@ export interface ModViewState {
     bots: Chatter[]
     viewers: Chatter[]
   }
+  // Spectators watching now
+  viewers?: number | null
+  // Message pinned at the top of the chat
+  pinned?: PinnedMessage | null
   // Livecon level in force
   liveconLevel: number | null
   // Scene-driven chat menu
@@ -231,15 +369,16 @@ export type ModViewIntent =
   | { kind: 'unbanRequest'; requestId: string; approve: boolean }
   | { kind: 'mode'; mode: ChatModeName; enabled: boolean; seconds?: number }
   | { kind: 'term'; list: 'blocked' | 'allowed'; term: string; remove: boolean }
-  | { kind: 'say'; text: string }
+  | { kind: 'say'; text: string; replyToId?: string }
+  | { kind: 'pin'; messageId: string; seconds?: number }
+  | { kind: 'unpin'; messageId: string }
 
 /**
  * Window of the Mod View grid
- * @typedef {'stream' | 'modActions' | 'automod' | 'chat' | 'community' | 'unbanRequests' | 'inspect'} ModViewWindow
+ * @typedef {'stream' | 'modActions' | 'automod' | 'chat' | 'community' | 'inspect'} ModViewWindow
  */
 
-export type ModViewWindow =
-  'stream' | 'modActions' | 'automod' | 'chat' | 'community' | 'unbanRequests' | 'inspect'
+export type ModViewWindow = 'stream' | 'modActions' | 'automod' | 'chat' | 'community' | 'inspect'
 
 /**
  * Part a scene may light up

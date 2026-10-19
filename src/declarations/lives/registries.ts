@@ -76,6 +76,7 @@ export const LIVE_COORDINATOR = {
     Permissions.LiveModeEmotes,
     Permissions.LiveModeSlow,
     Permissions.LiveTerms,
+    Permissions.LivePin,
     Permissions.LiveRoster,
   ],
 } as const

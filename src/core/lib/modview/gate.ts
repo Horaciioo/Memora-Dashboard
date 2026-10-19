@@ -58,6 +58,9 @@ const requirementOf = (intent: ModViewIntent): { permission: PermissionName; own
       }
     case 'term':
       return { permission: Permissions.LiveTerms }
+    case 'pin':
+    case 'unpin':
+      return { permission: Permissions.LivePin }
     default:
       return { permission: Permissions.LiveModerate }
   }
@@ -74,7 +77,7 @@ const exposedOn = (intent: ModViewIntent, platform: LivePlatformName): boolean =
   if (platform === LivePlatforms.Twitch) return true
 
   // YouTube has no automod queue
-  return !['automod', 'term', 'mode', 'unbanRequest', 'warn'].includes(intent.kind)
+  return !['automod', 'term', 'mode', 'unbanRequest', 'warn', 'pin', 'unpin'].includes(intent.kind)
 }
 
 /**

@@ -139,6 +139,13 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     roleDenies: { [MemberRoles.Junior]: [Permissions.LiveModeSlow, Permissions.LiveTerms] },
   },
   {
+    key: 'live-pin',
+    grants: {
+      [MemberRoles.Admin]: [Permissions.LivePin],
+      [MemberRoles.Responsable]: [Permissions.LivePin],
+    },
+  },
+  {
     key: 'live-roster-focus',
     grants: {
       [MemberRoles.Admin]: [Permissions.LiveRoster, Permissions.LiveInspect, Permissions.LiveFocus],

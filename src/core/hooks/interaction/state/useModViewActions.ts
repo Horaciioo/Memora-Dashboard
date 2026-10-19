@@ -11,6 +11,9 @@ import type { SanctionOffenseCard } from '@/types/sanctions'
 import { SanctionKinds } from '@/utils/constants/moderation'
 import type { PermissionName } from '@/utils/constants/permissions'
 
+// Gestures that settle what was suggested about a viewer
+const SETTLING_KINDS: ModViewIntent['kind'][] = ['delete', 'warn', 'timeout', 'ban']
+
 // Rung a prefilled line carries until it is sent
 interface PendingRung {
   chatterId: string
@@ -43,6 +46,8 @@ export const useModViewActions = (input: {
   const [hint, setHint] = useState<string | null>(null)
   const [pending, setPending] = useState<PendingRung | null>(null)
   const [memory, setMemory] = useState<PanelMemory>(initialMemory)
+  // Viewers sanctioned from here, with the moment
+  const [acted, setActed] = useState<Record<string, string>>({})
 
   // Every chatter on screen
   const chatters = useMemo(() => {
@@ -102,6 +107,9 @@ export const useModViewActions = (input: {
       if (!gate(intent).allowed) return
 
       const chatterId = 'chatterId' in intent ? intent.chatterId : null
+      if (chatterId && SETTLING_KINDS.includes(intent.kind)) {
+        setActed((current) => ({ ...current, [chatterId]: new Date().toISOString() }))
+      }
       void runIntent(intent, {
         ...context,
         targetLogin:
@@ -151,7 +159,7 @@ export const useModViewActions = (input: {
     setPending({ chatterId: chatter.id, offenseId: offense.id, rung })
   }
 
-  const send = (text: string) => {
+  const send = (text: string, replyToId?: string) => {
     const parsed = parseChatCommand(text, findChatter)
 
     if (parsed.kind === 'error') {
@@ -160,7 +168,7 @@ export const useModViewActions = (input: {
     }
 
     if (parsed.kind === 'say') {
-      act({ kind: 'say', text: parsed.text })
+      act({ kind: 'say', text: parsed.text, ...(replyToId ? { replyToId } : {}) })
     } else {
       const check = gate(parsed.intent)
       if (!check.allowed) {
@@ -169,9 +177,9 @@ export const useModViewActions = (input: {
       }
 
       // The rung counts only for the viewer it was written for
-      const fromPanel = pending?.chatterId === parsed.target.id ? pending : null
+      const fromPanel = parsed.target && pending?.chatterId === parsed.target.id ? pending : null
       act(parsed.intent, {
-        targetLogin: parsed.target.login,
+        ...(parsed.target ? { targetLogin: parsed.target.login } : {}),
         ...(fromPanel ? { offenseId: fromPanel.offenseId, rung: fromPanel.rung } : {}),
       })
       if (fromPanel) {
@@ -206,6 +214,7 @@ export const useModViewActions = (input: {
     draft,
     hint,
     memory,
+    acted,
     chatters,
     findChatter,
     gate,

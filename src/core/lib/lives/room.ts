@@ -22,7 +22,9 @@ const QUEUE_FACTOR = 4
  * @property {number} seq - Last flush
  */
 
-export type RoomMemory = Pick<ModViewState, 'messages' | 'acts' | 'held'> & { seq: number }
+export type RoomMemory = Pick<ModViewState, 'messages' | 'acts' | 'held' | 'pinned' | 'viewers'> & {
+  seq: number
+}
 
 /**
  * One live held in memory
@@ -34,7 +36,15 @@ interface LiveRoom {
   queue: SceneEvent[]
   timer: ReturnType<typeof setTimeout> | null
   seq: number
+  // Chatters who already spoke in this live
+  seen: Set<string>
 }
+
+// Chatters remembered per live
+const SEEN_LIMIT = 20_000
+
+// Badges of people who never "arrive"
+const REGULAR_BADGES = ['broadcaster', 'moderator', 'bot']
 
 // Survives dev hot reloads
 const globalForRooms = globalThis as unknown as { liveRooms?: Map<string, LiveRoom> }
@@ -64,6 +74,8 @@ const memoryOf = (room: LiveRoom): RoomMemory => ({
   messages: room.view.messages,
   acts: room.view.acts,
   held: room.view.held,
+  pinned: room.view.pinned,
+  viewers: room.view.viewers,
   seq: room.seq,
 })
 
@@ -89,6 +101,7 @@ const roomOf = (liveId: string): LiveRoom => {
     queue: [],
     timer: null,
     seq: Date.now(),
+    seen: new Set(),
   }
   rooms.set(liveId, room)
 
@@ -125,6 +138,24 @@ const flushRoom = async (liveId: string, room: LiveRoom): Promise<void> => {
 }
 
 /**
+ * Mark the first line of a chatter in this live
+ * @param {LiveRoom} room - Room
+ * @param {SceneEvent} event - Event
+ * @return {SceneEvent} - Event, marked when it opens a chatter's talk
+ */
+
+const markFirst = (room: LiveRoom, event: SceneEvent): SceneEvent => {
+  if (event.kind !== 'message') return event
+
+  const { author } = event.message
+  if (room.seen.has(author.id) || room.seen.size >= SEEN_LIMIT) return event
+  room.seen.add(author.id)
+  if (author.badges.some((badge) => REGULAR_BADGES.includes(badge))) return event
+
+  return { ...event, message: { ...event.message, isFirst: true } }
+}
+
+/**
  * Gather one Mod View event
  * @param {string} liveId - Live
  * @param {SceneEvent} event - Event
@@ -133,7 +164,7 @@ const flushRoom = async (liveId: string, room: LiveRoom): Promise<void> => {
 
 export const pushRoomEvent = (liveId: string, event: SceneEvent): void => {
   const room = roomOf(liveId)
-  room.queue.push(event)
+  room.queue.push(markFirst(room, event))
 
   // A stalled flush never piles up
   if (room.queue.length > LIVE_SETTINGS.roomMessages * QUEUE_FACTOR) {

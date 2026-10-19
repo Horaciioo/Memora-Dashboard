@@ -4,15 +4,17 @@ import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Tip } from '@/components/elements/feedback/Tip'
-import { FlaggedText } from '@/composites/modview/FlaggedText'
+import { ChatText } from '@/composites/modview/ChatText'
+import { WarnDialog } from '@/composites/modview/WarnDialog'
 import { ViewerDossier } from '@/composites/modview/ViewerDossier'
 import type { ViewerDossierProps } from '@/composites/modview/ViewerDossier'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { useViewerComments } from '@/core/hooks/data/lives/useViewerComments'
 import { useViewerDossier } from '@/core/hooks/data/lives/useViewerDossier'
-import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
+import { parseDuration } from '@/core/lib/modview/commands'
+import { MODVIEW_COPY, MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
-import { TIMEOUT_PRESETS } from '@/declarations/modview/registries'
+import { MODVIEW_DEFAULTS, TIMEOUT_PRESETS } from '@/declarations/modview/registries'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_USER } from '@/declarations/ui/variants'
@@ -33,6 +35,10 @@ export interface ViewerCardProps {
   onClose: () => void
   isWatched: boolean
   onWatch: () => void
+  // Sits in the right column instead of over the stage
+  isDocked?: boolean
+  // Width of the docked column, in pixels
+  width?: number
   // Dossier of a real live
   dossier?: { liveId: string } & Omit<ViewerDossierProps, 'chatter' | 'history'>
 }
@@ -52,10 +58,15 @@ export const ViewerCard = ({
   onClose,
   isWatched,
   onWatch,
+  isDocked,
+  width,
   dossier,
 }: ViewerCardProps) => {
   const [reason, setReason] = useState('')
   const [draft, setDraft] = useState('')
+  const [custom, setCustom] = useState('')
+  const [page, setPage] = useState(1)
+  const [isWarning, setWarning] = useState(false)
   const [tab, setTab] = useState<ViewerTab>('dossier')
   const { history } = useViewerDossier(dossier?.liveId ?? null, chatter.id)
   const { comments, isSaving, add } = useViewerComments(
@@ -67,6 +78,17 @@ export const ViewerCard = ({
   const lastLine = [...messages].reverse().find((message) => !message.deletedBy)
   const moderate = gate({ kind: 'ban', chatterId, reason: null })
   const motive = reason.trim() || null
+  const customSeconds = parseDuration(custom)
+  // Newest first, a few at a time
+  const pageCount = Math.max(1, Math.ceil(messages.length / MODVIEW_DEFAULTS.messagesPerPage))
+  const currentPage = Math.min(page, pageCount)
+  const pageMessages = [...messages]
+    .reverse()
+    .slice(
+      (currentPage - 1) * MODVIEW_DEFAULTS.messagesPerPage,
+      currentPage * MODVIEW_DEFAULTS.messagesPerPage
+    )
+  const DeleteIcon = ICONS.modDelete
   const TwitchIcon = ICONS.twitch
 
   // Comments need a real live to hang on
@@ -94,7 +116,11 @@ export const ViewerCard = ({
   ]
 
   return (
-    <aside className={MODVIEW_USER.panel} aria-label={MODVIEW_USER_COPY.title}>
+    <aside
+      className={isDocked ? MODVIEW_USER.docked : MODVIEW_USER.panel}
+      style={isDocked && width ? { width } : undefined}
+      aria-label={MODVIEW_USER_COPY.title}
+    >
       <header className={MODVIEW_USER.head}>
         <Button
           variant="ghost"
@@ -153,12 +179,60 @@ export const ViewerCard = ({
                 <p className={MODVIEW_USER.empty}>{MODVIEW_USER_COPY.messagesEmpty}</p>
               ) : (
                 <ul className={MODVIEW_USER.messages}>
-                  {messages.map((message) => (
-                    <li key={message.id} className={MODVIEW_USER.message}>
-                      <FlaggedText text={message.text} flagged={message.flagged} />
+                  {pageMessages.map((message) => (
+                    <li
+                      key={message.id}
+                      className={cn(MODVIEW_USER.message, MODVIEW_USER.messageRow)}
+                    >
+                      <span className={MODVIEW_USER.messageText}>
+                        <ChatText
+                          text={message.text}
+                          fragments={message.fragments}
+                          flagged={message.flagged}
+                        />
+                      </span>
+                      {!message.deletedBy && (
+                        <button
+                          type="button"
+                          className={MODVIEW_USER.messageTool}
+                          disabled={!moderate.allowed}
+                          title={moderate.reason ?? MODVIEW_USER_COPY.deleteMessage}
+                          aria-label={MODVIEW_USER_COPY.deleteMessage}
+                          onClick={() =>
+                            onAct({ kind: 'delete', messageId: message.id, chatterId })
+                          }
+                        >
+                          <DeleteIcon className="h-4 w-4" aria-hidden="true" />
+                        </button>
+                      )}
                     </li>
                   ))}
                 </ul>
+              )}
+              {pageCount > 1 && (
+                <nav className={MODVIEW_USER.pager} aria-label={MODVIEW_USER_COPY.messages}>
+                  <Button
+                    variant="ghost"
+                    icon="back"
+                    aria-label={MODVIEW_COPY.pagePrevious}
+                    title={MODVIEW_COPY.pagePrevious}
+                    disabled={currentPage <= 1}
+                    onClick={() => setPage(currentPage - 1)}
+                  />
+                  <span className={MODVIEW_USER.pagerLabel}>
+                    {MODVIEW_COPY.pageOf
+                      .replace('{page}', String(currentPage))
+                      .replace('{total}', String(pageCount))}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    icon="forward"
+                    aria-label={MODVIEW_COPY.pageNext}
+                    title={MODVIEW_COPY.pageNext}
+                    disabled={currentPage >= pageCount}
+                    onClick={() => setPage(currentPage + 1)}
+                  />
+                </nav>
               )}
             </section>
 
@@ -232,6 +306,27 @@ export const ViewerCard = ({
                 ))}
               </div>
 
+              <div className={MODVIEW_USER.custom}>
+                <input
+                  className={MODVIEW_USER.reason}
+                  placeholder={MODVIEW_USER_COPY.customDuration}
+                  aria-label={MODVIEW_USER_COPY.customDuration}
+                  value={custom}
+                  onChange={(event) => setCustom(event.target.value)}
+                />
+                <Button
+                  variant="secondary"
+                  disabled={!moderate.allowed || customSeconds === null}
+                  title={moderate.reason ?? undefined}
+                  onClick={() =>
+                    customSeconds !== null &&
+                    onAct({ kind: 'timeout', chatterId, seconds: customSeconds, reason: motive })
+                  }
+                >
+                  {MODVIEW_USER_COPY.customApply}
+                </Button>
+              </div>
+
               <div className={MODVIEW_USER.actions}>
                 <Button
                   variant="secondary"
@@ -245,9 +340,9 @@ export const ViewerCard = ({
                 </Button>
                 <Button
                   variant="secondary"
-                  disabled={!moderate.allowed || !motive}
+                  disabled={!moderate.allowed}
                   title={moderate.reason ?? undefined}
-                  onClick={() => motive && onAct({ kind: 'warn', chatterId, reason: motive })}
+                  onClick={() => setWarning(true)}
                 >
                   {MODVIEW_USER_COPY.warn}
                 </Button>
@@ -273,6 +368,14 @@ export const ViewerCard = ({
           </>
         )}
       </div>
+
+      {isWarning && (
+        <WarnDialog
+          name={chatter.name}
+          onConfirm={(reason) => onAct({ kind: 'warn', chatterId, reason })}
+          onClose={() => setWarning(false)}
+        />
+      )}
     </aside>
   )
 }

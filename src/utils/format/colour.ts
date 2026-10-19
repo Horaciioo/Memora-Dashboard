@@ -40,3 +40,27 @@ export const normaliseHex = (raw: string): string | null => {
 
 export const visionSafe = (hex: string): string =>
   `oklch(from ${hex} l c calc(h + var(--vision-shift-green) * max(0, 1 - abs(h - 140) / 45) + var(--vision-shift-red) * max(0, 1 - abs(h - 25) / 30)))`
+
+/**
+ * Lighten a chat colour until it reads on a dark ground
+ * @param {string} hex - Colour a chatter picked
+ * @return {string} - Readable CSS colour
+ */
+
+export const readableOnDark = (hex: string): string => {
+  const normal = normaliseHex(hex)
+  if (!normal) return hex
+
+  const [red = 0, green = 0, blue = 0] = [1, 3, 5].map((start) =>
+    parseInt(normal.slice(start, start + 2), 16)
+  )
+  const max = Math.max(red, green, blue) / 255
+  const min = Math.min(red, green, blue) / 255
+  const lightness = (max + min) / 2
+  if (lightness >= 0.5) return normal
+
+  // Mix with white up to the lightness Twitch's own dark theme keeps
+  const share = (0.5 - lightness) / (1 - lightness)
+
+  return `color-mix(in srgb, ${normal} ${Math.round((1 - share) * 100)}%, white)`
+}
