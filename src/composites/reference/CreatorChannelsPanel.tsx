@@ -7,6 +7,7 @@ import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { apiDelete, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { CHANNEL_LINK_PREFIX } from '@/declarations/platforms/channels'
 import { CHANNEL_COPY } from '@/declarations/platforms/copy'
 import { CHANNEL_BLOCK } from '@/declarations/ui/blocks'
 import { ACTION_COPY } from '@/declarations/ui/copy'
@@ -36,9 +37,11 @@ const CHANNEL_FIELDS: FieldDefinition[] = [
     kind: 'select',
     label: CHANNEL_COPY.platform,
     required: true,
+    mark: 'network',
     options: Object.values(LivePlatforms).map((platform) => ({
       value: platform,
       label: PLATFORM_LABELS[platform],
+      prefix: CHANNEL_LINK_PREFIX[platform],
     })),
   },
   {
@@ -46,7 +49,10 @@ const CHANNEL_FIELDS: FieldDefinition[] = [
     kind: 'text',
     label: CHANNEL_COPY.channel,
     info: CHANNEL_COPY.channelInfo,
+    placeholder: CHANNEL_COPY.channelPlaceholder,
     required: true,
+    prefixFrom: 'platform',
+    noLookup: true,
   },
 ]
 

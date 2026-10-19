@@ -54,7 +54,7 @@ export const PLATFORM_ACCOUNT_COPY = {
   relink: 'Reconnecter',
   unlink: 'Délier',
   revoked: 'Accès expiré, à reconnecter',
-  unconfigured: '{platform} · pas configuré',
+  unconfigured: '{platform}, pas configuré',
   unlinkConfirm:
     'Délier ton compte {platform} ? Memora ne pourra plus agir avec lui tant que tu ne l’auras pas relié de nouveau.',
   linked: '{platform} est lié à ton profil',
@@ -86,13 +86,13 @@ export const PLATFORM_NOTICE_COPY = {
 
 export const PLATFORM_ERROR_COPY = {
   unauthorized: 'Twitch a refusé ton accès : reconnecte ton compte dans Paramètres.',
-  forbidden: 'Ton compte Twitch n’a pas le droit de faire ce geste sur cette chaîne.',
+  forbidden: 'Ton compte Twitch n’a pas le droit de faire cette action de Mod. sur cette chaîne.',
   notFound: 'Ce message ou cet utilisateur n’existe plus sur Twitch.',
   conflict: 'C’est déjà fait sur Twitch.',
-  rateLimited: 'Trop de gestes d’un coup : Twitch demande d’attendre quelques secondes.',
+  rateLimited: 'Trop de actions de Mod. d’un coup : Twitch demande d’attendre quelques secondes.',
   unavailable: 'Twitch ne répond pas pour l’instant, réessaie dans un instant.',
-  unsupported: 'Twitch ne permet pas ce geste depuis une application.',
-  invalid: 'Twitch a refusé ce geste.',
+  unsupported: 'Twitch ne permet pas cette action de Mod. depuis une application.',
+  invalid: 'Twitch a refusé cette action de Mod.',
 } as const
 
 /**
@@ -107,8 +107,9 @@ export const CHANNEL_COPY = {
   youtube: 'YouTube',
   add: 'Ajouter une chaîne',
   platform: 'Plateforme',
-  channel: 'Chaîne',
-  channelInfo: 'Le login Twitch, ou le @pseudo / le lien de la chaîne YouTube.',
+  channel: 'Identifiant',
+  channelInfo: 'Seulement l’identifiant de la chaîne, sans le début du lien.',
+  channelPlaceholder: 'inoxtag',
   empty: 'Aucune chaîne',
   remove: 'Retirer la chaîne',
   saved: 'Chaîne enregistrée',
