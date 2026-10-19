@@ -127,6 +127,89 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.6.0',
+    date: '2026-10-20',
+    title: 'Une Mod View beaucoup plus complète',
+    intro:
+      'Le chat de la Mod View se rapproche de celui de Twitch : on y répond, on y épingle, on y choisit ses émoticônes et on y règle son affichage.',
+    description:
+      'Jusqu’ici, modérer un live depuis Memora obligeait à repasser par Twitch pour répondre, épingler ou traiter une demande de débannissement. Cette version ramène ces gestes dans la Mod View, avec des préférences d’affichage et des commandes au clavier.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout de la possibilité de répondre à un message du chat depuis la Mod View',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LivePin,
+        text: 'Ajout de la possibilité d’épingler un message du chat, qui reste affiché en haut jusqu’à ce qu’il soit désépinglé',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout du sélecteur d’« Émoticônes » dans le chat de la Mod View, avec celles de la chaîne et celles de Twitch',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Ajout de commandes tapées dans le chat de la Mod View, listées en tapant « / » : avertir, exclure, bannir, débannir et régler les modes du chat',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Ajout de la possibilité d’avertir un viewer en un clic depuis un message, en indiquant la raison',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.LiveUnbanRequest,
+        text: 'Ajout du bureau « Demandes d’annulation de bannissement » dans la Mod View, avec le détail du viewer, ses messages et les commentaires laissés sur lui',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout des « Préférences » du chat : pause au survol ou tant que Alt est maintenue, place des icônes de modération, messages traités gardés ou retirés',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.settings,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.ReferenceManage,
+        text: 'Ajout de la possibilité pour les Admins de supprimer un créateur avec toutes ses données',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration du chat de la Mod View : les liens sont cliquables, les pseudos gardent leur couleur Twitch et la largeur des colonnes se règle',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Amélioration des durées d’exclusion proposées et des modes « Mode lent » et « Followers uniquement », qui offrent les mêmes choix que Twitch',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de l’onglet du navigateur, qui porte désormais le nom du créateur du live',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de l’affichage des emojis dans tout Memora',
+      },
+    ],
+  },
+  {
     version: '0.5.2',
     date: '2026-10-19',
     title: 'Des lives plus fluides',
