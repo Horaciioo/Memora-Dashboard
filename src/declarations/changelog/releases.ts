@@ -220,6 +220,18 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui permettait de se sanctionner soi-même, ou de sanctionner la chaîne, depuis la « Mod View »',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui affichait le créateur « Déconnecté(e) » dans la fenêtre du flux alors qu’il était en direct',
+      },
+      {
+        tag: ChangelogTags.Fixed,
         text: 'Correction d’un bug qui affichait une heure de plus que celle choisie dans les champs de date et d’heure des formulaires',
       },
       {
