@@ -1,7 +1,8 @@
 import type { SceneEvent } from '@/core/lib/modview/scene'
+import { fragmentsOf } from '@/core/lib/platforms/twitch/fragments'
 import { twitchChatter } from '@/core/lib/platforms/twitch/helix'
 import { TWITCH_EVENT_COPY } from '@/declarations/platforms/copy'
-import type { ChatBadge, ModAct, ModActKind } from '@/types/modview'
+import type { ChatBadge, ChatReply, ModAct, ModActKind } from '@/types/modview'
 
 /**
  * What one notification means for Memora
@@ -78,8 +79,11 @@ const userOf = (payload: Payload, prefix: string) => ({
  * @return {string[]} - Words
  */
 
-const wordsAt = (message: string, boundaries: unknown): string[] =>
-  Array.isArray(boundaries)
+const wordsAt = (message: string, boundaries: unknown): string[] => {
+  // Twitch counts code points, never UTF-16 units
+  const points = Array.from(message)
+
+  return Array.isArray(boundaries)
     ? boundaries.flatMap((entry) => {
         const boundary = (entry as Payload).boundary
           ? child(entry as Payload, 'boundary')
@@ -87,9 +91,12 @@ const wordsAt = (message: string, boundaries: unknown): string[] =>
         const start = Number(boundary.start_pos)
         const end = Number(boundary.end_pos)
 
-        return Number.isFinite(start) && Number.isFinite(end) ? [message.slice(start, end + 1)] : []
+        return Number.isFinite(start) && Number.isFinite(end)
+          ? [points.slice(start, end + 1).join('')]
+          : []
       })
     : []
+}
 
 /**
  * Build a moderation act line
@@ -117,6 +124,27 @@ const actOf = (
 })
 
 /**
+ * Line a chat message answers
+ * @param {Payload} event - Chat message event
+ * @return {{ reply?: ChatReply }} - Reply, none when the message stands alone
+ */
+
+const replyOf = (event: Payload): { reply?: ChatReply } => {
+  const parent = child(event, 'reply')
+  const id = text(parent.parent_message_id)
+
+  return id
+    ? {
+        reply: {
+          id,
+          authorName: text(parent.parent_user_name) || text(parent.parent_user_login),
+          text: text(parent.parent_message_body),
+        },
+      }
+    : {}
+}
+
+/**
  * Translate a channel.moderate notification
  * @param {Payload} event - Event
  * @param {string} id - Notification identifier
@@ -140,6 +168,7 @@ const moderateSignals = (event: Payload, id: string, at: string): TwitchSignal[]
           kind: 'act',
           act: actOf(id, action, event, at, {
             target: target.name || target.login,
+            targetId: target.id || null,
             reason: text(detail.reason) || null,
             durationSeconds: Number.isFinite(expiresAt)
               ? Math.max(1, Math.round((expiresAt - Date.parse(at)) / 1000))
@@ -168,6 +197,7 @@ const moderateSignals = (event: Payload, id: string, at: string): TwitchSignal[]
           kind: 'act',
           act: actOf(id, 'delete', event, at, {
             target: target.name || target.login,
+            targetId: target.id || null,
             quote: text(detail.message_body) || null,
           }),
           deleteMessageId: text(detail.message_id),
@@ -183,6 +213,7 @@ const moderateSignals = (event: Payload, id: string, at: string): TwitchSignal[]
           kind: 'act',
           act: actOf(id, 'warn', event, at, {
             target: target.name || target.login,
+            targetId: target.id || null,
             reason: text(detail.reason) || null,
           }),
         }),
@@ -211,6 +242,7 @@ const moderateSignals = (event: Payload, id: string, at: string): TwitchSignal[]
           kind: 'act',
           act: actOf(id, 'unbanRequest', event, at, {
             target: target.name || target.login,
+            targetId: target.id || null,
             reason: text(detail.moderator_message) || null,
           }),
         }),
@@ -272,6 +304,11 @@ export const translateTwitchEvent = (
             ),
             text: text(child(event, 'message').text),
             sentAt: meta.at,
+            fragments: fragmentsOf(
+              child(event, 'message').fragments,
+              text(child(event, 'message').text)
+            ),
+            ...replyOf(event),
           },
         }),
       ]
@@ -299,6 +336,10 @@ export const translateTwitchEvent = (
           modes: {
             subscribers: event.subscriber_mode === true,
             followers: event.follower_mode === true,
+            followerMinutes:
+              event.follower_mode === true
+                ? Number(event.follower_mode_duration_minutes) || 0
+                : null,
             emotes: event.emote_mode === true,
             slowSeconds:
               event.slow_mode === true ? Number(event.slow_mode_wait_time_seconds) || null : null,

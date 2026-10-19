@@ -1,7 +1,17 @@
 import { PlatformError, platformRequest } from '@/core/lib/platforms/http'
 import { helixHeaders } from '@/core/lib/platforms/twitch/oauth'
 import { HELIX_PATHS, TWITCH_ENDPOINTS, TWITCH_LIMITS } from '@/declarations/platforms/twitch'
-import type { ChatBadge, ChatModes, Chatter, ModViewIntent, UnbanRequest } from '@/types/modview'
+import { fragmentsOf } from '@/core/lib/platforms/twitch/fragments'
+import type {
+  ChatBadge,
+  ChatModes,
+  BanDetail,
+  Chatter,
+  ModViewIntent,
+  PinnedMessage,
+  TwitchEmote,
+  UnbanRequest,
+} from '@/types/modview'
 
 /**
  * Who acts
@@ -156,7 +166,33 @@ export const helixCallOf = (
           broadcaster_id: seat.broadcasterId,
           sender_id: seat.moderatorId,
           message: intent.text,
+          ...(intent.replyToId ? { reply_parent_message_id: intent.replyToId } : {}),
         },
+      }
+    case 'pin':
+      return {
+        method: 'PUT',
+        path: HELIX_PATHS.pins,
+        query: {
+          ...channel,
+          message_id: intent.messageId,
+          ...(intent.seconds
+            ? {
+                duration_seconds: String(
+                  Math.min(
+                    Math.max(TWITCH_LIMITS.minPinSeconds, intent.seconds),
+                    TWITCH_LIMITS.maxPinSeconds
+                  )
+                ),
+              }
+            : {}),
+        },
+      }
+    case 'unpin':
+      return {
+        method: 'DELETE',
+        path: HELIX_PATHS.pins,
+        query: { ...channel, message_id: intent.messageId },
       }
   }
 }
@@ -174,7 +210,15 @@ const settingsOf = (intent: Extract<ModViewIntent, { kind: 'mode' }>): Record<st
     case 'followers':
       return {
         follower_mode: intent.enabled,
-        ...(intent.enabled ? { follower_mode_duration: 0 } : {}),
+        // Twitch counts the follow age in minutes
+        ...(intent.enabled
+          ? {
+              follower_mode_duration: Math.min(
+                Math.max(0, Math.round((intent.seconds ?? 0) / 60)),
+                TWITCH_LIMITS.maxFollowMinutes
+              ),
+            }
+          : {}),
       }
     case 'emotes':
       return { emote_mode: intent.enabled }
@@ -295,6 +339,7 @@ export const readChatModes = async (seat: TwitchSeat): Promise<ChatModes> => {
         slow_mode: boolean
         slow_mode_wait_time: number | null
         follower_mode: boolean
+        follower_mode_duration: number | null
         subscriber_mode: boolean
         emote_mode: boolean
       }[]
@@ -311,6 +356,7 @@ export const readChatModes = async (seat: TwitchSeat): Promise<ChatModes> => {
     shield: shield?.data[0]?.is_active ?? false,
     subscribers: row?.subscriber_mode ?? false,
     followers: row?.follower_mode ?? false,
+    followerMinutes: row?.follower_mode ? (row.follower_mode_duration ?? 0) : null,
     emotes: row?.emote_mode ?? false,
     slowSeconds: row?.slow_mode ? (row.slow_mode_wait_time ?? null) : null,
   }
@@ -323,31 +369,80 @@ export const readChatModes = async (seat: TwitchSeat): Promise<ChatModes> => {
  */
 
 export const readUnbanRequests = async (seat: TwitchSeat): Promise<UnbanRequest[]> => {
-  const answer = await runHelix<{
-    data: {
-      id: string
-      user_id: string
-      user_login: string
-      user_name: string
-      text: string
-      created_at: string
-    }[]
-  }>(seat, {
-    method: 'GET',
-    path: HELIX_PATHS.unbanRequests,
-    query: {
-      broadcaster_id: seat.broadcasterId,
-      moderator_id: seat.moderatorId,
-      status: 'pending',
-    },
-  })
+  type Row = {
+    id: string
+    user_id: string
+    user_login: string
+    user_name: string
+    text: string
+    created_at: string
+  }
+  const rows: Row[] = []
+  let cursor: string | undefined
 
-  return (answer?.data ?? []).map((row) => ({
+  // Pages of pending requests, as many as a busy channel stacks up
+  for (let page = 0; page < MAX_REQUEST_PAGES; page += 1) {
+    const answer = await runHelix<{ data: Row[]; pagination?: { cursor?: string } }>(seat, {
+      method: 'GET',
+      path: HELIX_PATHS.unbanRequests,
+      query: {
+        broadcaster_id: seat.broadcasterId,
+        moderator_id: seat.moderatorId,
+        status: 'pending',
+        first: '100',
+        ...(cursor ? { after: cursor } : {}),
+      },
+    })
+    rows.push(...(answer?.data ?? []))
+    cursor = answer?.pagination?.cursor
+    if (!cursor) break
+  }
+
+  return rows.map((row) => ({
     id: row.id,
     author: twitchChatter(row.user_id, row.user_login, row.user_name),
     text: row.text,
     at: row.created_at,
   }))
+}
+
+/**
+ * Account and ban of one viewer, as the unban desk shows them
+ * @param {TwitchSeat} seat - Seat
+ * @param {string} userId - Viewer
+ * @return {Promise<BanDetail>} - Detail, empty fields when Twitch has none
+ */
+
+export const readBanDetail = async (seat: TwitchSeat, userId: string): Promise<BanDetail> => {
+  const [user, ban] = await Promise.all([
+    runHelix<{ data: { profile_image_url?: string; created_at?: string }[] }>(seat, {
+      method: 'GET',
+      path: HELIX_PATHS.users,
+      query: { id: userId },
+    }).catch(() => null),
+    runHelix<{
+      data: {
+        created_at?: string
+        reason?: string
+        moderator_name?: string
+        moderator_login?: string
+      }[]
+    }>(seat, {
+      method: 'GET',
+      path: HELIX_PATHS.banned,
+      query: { broadcaster_id: seat.broadcasterId, user_id: userId },
+    }).catch(() => null),
+  ])
+  const account = user?.data[0]
+  const entry = ban?.data[0]
+
+  return {
+    avatar: account?.profile_image_url || null,
+    accountCreatedAt: account?.created_at ?? null,
+    bannedBy: entry?.moderator_name || entry?.moderator_login || null,
+    bannedAt: entry?.created_at ?? null,
+    reason: entry?.reason || null,
+  }
 }
 
 /**
@@ -410,6 +505,7 @@ export const readStream = async (
 ): Promise<{
   title: string
   category: string | null
+  categoryId: string | null
   startedAt: string
   id: string
   viewers: number
@@ -418,6 +514,7 @@ export const readStream = async (
     data: {
       id: string
       title: string
+      game_id: string
       game_name: string
       started_at: string
       viewer_count: number
@@ -430,10 +527,173 @@ export const readStream = async (
         id: row.id,
         title: row.title,
         category: row.game_name || null,
+        categoryId: row.game_id || null,
         startedAt: row.started_at,
         viewers: row.viewer_count ?? 0,
       }
     : null
+}
+
+/**
+ * Emotes of Twitch and of the channel, none locked yet
+ * @param {TwitchSeat} seat - Seat
+ * @return {Promise<{ global: TwitchEmote[], channel: TwitchEmote[] }>} - Emotes, the channel's empty when Twitch refuses them
+ */
+
+export const readEmotes = async (
+  seat: TwitchSeat
+): Promise<{ global: TwitchEmote[]; channel: TwitchEmote[] }> => {
+  type Row = { id: string; name: string; format?: string[]; emote_type?: string }
+  const toEmote = (row: Row): TwitchEmote => ({
+    id: row.id,
+    name: row.name,
+    animated: row.format?.includes('animated') ?? false,
+    kind:
+      row.emote_type === 'subscriptions' ||
+      row.emote_type === 'bitstier' ||
+      row.emote_type === 'follower'
+        ? row.emote_type
+        : null,
+    isLocked: false,
+  })
+  const [global, channel] = await Promise.all([
+    runHelix<{ data: Row[] }>(seat, { method: 'GET', path: HELIX_PATHS.emotesGlobal, query: {} }),
+    runHelix<{ data: Row[] }>(seat, {
+      method: 'GET',
+      path: HELIX_PATHS.emotes,
+      query: { broadcaster_id: seat.broadcasterId },
+    }).catch(() => null),
+  ])
+
+  return {
+    global: (global?.data ?? []).map(toEmote),
+    channel: (channel?.data ?? []).map(toEmote),
+  }
+}
+
+// Pages read of the pending unban requests
+const MAX_REQUEST_PAGES = 5
+
+// Pages read of the emotes a member owns
+const MAX_EMOTE_PAGES = 10
+
+/**
+ * Identifiers of the emotes the seat's account may use on the channel
+ * @param {TwitchSeat} seat - Seat
+ * @return {Promise<Set<string> | null>} - Identifiers, none when the link lacks the right to read them
+ */
+
+export const readOwnedEmoteIds = async (seat: TwitchSeat): Promise<Set<string> | null> => {
+  const owned = new Set<string>()
+  let cursor: string | undefined
+
+  try {
+    for (let page = 0; page < MAX_EMOTE_PAGES; page += 1) {
+      const answer = await runHelix<{
+        data: { id: string }[]
+        pagination?: { cursor?: string }
+      }>(seat, {
+        method: 'GET',
+        path: HELIX_PATHS.emotesUser,
+        query: {
+          user_id: seat.moderatorId,
+          broadcaster_id: seat.broadcasterId,
+          ...(cursor ? { after: cursor } : {}),
+        },
+      })
+      answer?.data.forEach((row) => owned.add(row.id))
+      cursor = answer?.pagination?.cursor
+      if (!cursor) break
+    }
+  } catch (error) {
+    // A link made before the right existed is simply not checked
+    if (error instanceof PlatformError && [400, 401, 403].includes(error.status)) return null
+    throw error
+  }
+
+  return owned
+}
+
+/**
+ * Message pinned at the top of the chat
+ * @param {TwitchSeat} seat - Seat
+ * @return {Promise<PinnedMessage | null>} - Pin, none when nothing is pinned
+ */
+
+export const readPin = async (seat: TwitchSeat): Promise<PinnedMessage | null> => {
+  const answer = await runHelix<{
+    data: {
+      message_id: string
+      sender_user_id: string
+      sender_user_login: string
+      sender_user_name: string
+      pinned_by_user_name: string
+      pinned_by_user_login: string
+      message: { text: string; fragments?: unknown }
+      ends_at: string | null
+    }[]
+  }>(seat, {
+    method: 'GET',
+    path: HELIX_PATHS.pins,
+    query: { broadcaster_id: seat.broadcasterId, moderator_id: seat.moderatorId },
+  })
+  const row = answer?.data[0]
+  if (!row) return null
+
+  return {
+    messageId: row.message_id,
+    author: twitchChatter(row.sender_user_id, row.sender_user_login, row.sender_user_name),
+    text: row.message.text,
+    fragments: fragmentsOf(row.message.fragments, row.message.text),
+    pinnedBy: row.pinned_by_user_name || row.pinned_by_user_login,
+    endsAt: row.ends_at,
+  }
+}
+
+/**
+ * Tags the streamer gave the live
+ * @param {TwitchSeat} seat - Seat
+ * @return {Promise<string[]>} - Tags
+ */
+
+export const readChannelTags = async (seat: TwitchSeat): Promise<string[]> => {
+  const answer = await runHelix<{ data: { tags?: string[] }[] }>(seat, {
+    method: 'GET',
+    path: HELIX_PATHS.channels,
+    query: { broadcaster_id: seat.broadcasterId },
+  })
+
+  return answer?.data[0]?.tags ?? []
+}
+
+// Box art kept per category, it never changes
+const boxArt = new Map<string, string | null>()
+
+// Size asked of the box art, twice what the window draws
+const BOX_ART_SIZE = '144x192'
+
+/**
+ * Cover picture of a category
+ * @param {TwitchSeat} seat - Seat
+ * @param {string} categoryId - Category identifier
+ * @return {Promise<string | null>} - Picture address, none when Twitch has none
+ */
+
+export const readCategoryArt = async (
+  seat: TwitchSeat,
+  categoryId: string
+): Promise<string | null> => {
+  if (boxArt.has(categoryId)) return boxArt.get(categoryId) ?? null
+
+  const answer = await runHelix<{ data: { box_art_url?: string }[] }>(seat, {
+    method: 'GET',
+    path: HELIX_PATHS.games,
+    query: { id: categoryId },
+  })
+  const url = answer?.data[0]?.box_art_url?.replace('{width}x{height}', BOX_ART_SIZE) ?? null
+  boxArt.set(categoryId, url)
+
+  return url
 }
 
 /**
