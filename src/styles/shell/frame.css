@@ -38,6 +38,7 @@
 
 /* Mod View page drops the banner room and the width cap, it fits the screen and never scrolls */
 .shell-page:has(.modview-bleed) {
+  min-width: 0;
   max-width: none;
   height: 100dvh;
   gap: 0;

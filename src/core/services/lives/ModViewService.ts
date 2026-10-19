@@ -73,6 +73,10 @@ const baseState = (live: LiveView): ModViewState => ({
   readOnly: false,
 })
 
+// Moderators confirmed lately, by seat
+const moderatorCache = new Map<string, number>()
+const MODERATOR_CACHE_MS = 60_000
+
 /**
  * Twitch channel of a creator
  * @param {string} youtuberId - Creator
@@ -157,6 +161,49 @@ const suspensionNotice = (endsAt: string): string =>
   MEMBER_ADMIN_COPY.suspendedNotice.replace('{date}', formatDay(endsAt))
 
 /**
+ * Whether the viewer may enter this live's Mod View: a Twitch moderator of the channel
+ * @param {string} viewerId - Member
+ * @param {LiveView} live - Live
+ * @return {Promise<{ allowed: true } | { allowed: false, notice: string }>} - Verdict
+ */
+
+export const channelAccess = async (
+  viewerId: string,
+  live: LiveView
+): Promise<{ allowed: true } | { allowed: false; notice: string }> => {
+  // Only Twitch is wired
+  if (live.platform !== LivePlatforms.Twitch) return { allowed: true }
+
+  const found = await seatOf(viewerId, live.youtuber.id)
+  if ('notice' in found) return { allowed: false, notice: found.notice }
+
+  const key = `${found.seat.moderatorId}:${found.seat.broadcasterId}`
+  if ((moderatorCache.get(key) ?? 0) > Date.now()) return { allowed: true }
+
+  try {
+    if (!(await moderatesChannel(found.seat)))
+      return { allowed: false, notice: PLATFORM_NOTICE_COPY.notModeratorDenied }
+  } catch (error) {
+    return { allowed: false, notice: (await translateRefusal(error, viewerId)).message }
+  }
+  moderatorCache.set(key, Date.now() + MODERATOR_CACHE_MS)
+
+  return { allowed: true }
+}
+
+/**
+ * Same verdict as a refusal
+ * @param {string} viewerId - Member
+ * @param {LiveView} live - Live
+ * @return {Promise<void>}
+ */
+
+export const requireChannelModerator = async (viewerId: string, live: LiveView): Promise<void> => {
+  const verdict = await channelAccess(viewerId, live)
+  if (!verdict.allowed) throw forbidden(verdict.notice)
+}
+
+/**
  * Open the Mod View of a live: what Twitch says now
  * @param {string} liveId - Live
  * @param {AccessScope} scope - Viewer's perimeter
@@ -173,6 +220,7 @@ export const openModView = async (
 ): Promise<ModViewSnapshot> => {
   const live = await readLive(liveId, scope, viewerId, held)
   if (live.access !== 'open') throw conflict()
+  await requireChannelModerator(viewerId, live)
   let state: ModViewState = { ...baseState(live), roster: await readTwitchRoster() }
 
   // The player needs no seat, only the channel
@@ -275,6 +323,7 @@ export const actOnLive = async (input: {
 }): Promise<{ done: boolean }> => {
   const live = await readLive(input.liveId, input.scope, input.viewerId, input.held)
   if (live.access !== 'open') throw conflict()
+  await requireChannelModerator(input.viewerId, live)
 
   const paused = await activeSuspension(input.viewerId)
   if (paused) throw forbidden(suspensionNotice(paused.endsAt))
