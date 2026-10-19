@@ -12,6 +12,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @property {Record<string, PermissionName[]>} [functions] - Permissions per function name
  * @property {Partial<Record<MemberRoleName, PermissionName[]>>} [revokes] - Role permissions taken back
  * @property {Record<string, PermissionName[]>} [denies] - Permissions refused per function name
+ * @property {Partial<Record<MemberRoleName, PermissionName[]>>} [roleDenies] - Permissions refused per role
  */
 
 export interface GrantAddition {
@@ -20,6 +21,7 @@ export interface GrantAddition {
   functions?: Record<string, PermissionName[]>
   revokes?: Partial<Record<MemberRoleName, PermissionName[]>>
   denies?: Record<string, PermissionName[]>
+  roleDenies?: Partial<Record<MemberRoleName, PermissionName[]>>
 }
 
 /**
@@ -126,6 +128,15 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
       // Floor role
       [MemberRoles.Moderateur]: [Permissions.LiveRead, Permissions.LiveModerate],
     },
+  },
+  {
+    key: 'live-chat-modes-by-seat',
+    grants: {
+      [MemberRoles.Responsable]: [Permissions.LiveModeSubscribers],
+      [MemberRoles.Moderateur]: [Permissions.LiveModeSlow],
+    },
+    // The Junior stands on the floor but never touches the modes
+    roleDenies: { [MemberRoles.Junior]: [Permissions.LiveModeSlow, Permissions.LiveTerms] },
   },
   {
     key: 'live-roster-focus',

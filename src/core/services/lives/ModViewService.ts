@@ -5,10 +5,11 @@ import type { AppError } from '@/core/lib/errors'
 import { prisma } from '@/core/lib/db'
 import { claimGestureKey } from '@/core/lib/lives/idempotency'
 import { isFollowing } from '@/core/services/lives/FocusService'
-import { readConnection, readRecentEvents } from '@/core/lib/lives/recent'
+import { readConnection } from '@/core/lib/lives/recent'
+import { readRoomMemory } from '@/core/lib/lives/room'
 import { logger } from '@/core/lib/logger'
 import { gateIntent } from '@/core/lib/modview/gate'
-import { applySceneEvent } from '@/core/lib/modview/scene'
+import { blankModView } from '@/core/lib/modview/feed'
 import { PlatformError } from '@/core/lib/platforms/http'
 import {
   moderatesChannel,
@@ -24,7 +25,11 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readLive } from '@/core/services/lives/LiveService'
 import { activeSuspension } from '@/core/services/members/admin/SuspensionService'
 import { logMemoraGesture, settleGesture } from '@/core/services/lives/ModerationLogService'
-import { markTwitchRevoked, readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
+import {
+  markTwitchRevoked,
+  readTwitchRoster,
+  readTwitchSeat,
+} from '@/core/services/platforms/PlatformAccountService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
@@ -39,11 +44,13 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @typedef {Object} ModViewSnapshot
  * @property {ModViewState} state - State to draw
  * @property {string | null} channelLogin - Twitch login
+ * @property {number} feedSeq - Last flush included
  */
 
 export interface ModViewSnapshot {
   state: ModViewState
   channelLogin: string | null
+  feedSeq: number
 }
 
 /**
@@ -53,25 +60,14 @@ export interface ModViewSnapshot {
  */
 
 const baseState = (live: LiveView): ModViewState => ({
-  platform: live.platform,
-  connection: 'disconnected',
-  channel: {
+  ...blankModView({
+    platform: live.platform,
     name: live.youtuber.name,
     avatar: live.youtuber.avatar,
-    category: null,
-    categoryArt: null,
-  },
-  title: live.title,
-  embedUrl: null,
-  messages: [],
-  acts: [],
-  held: [],
-  unbanRequests: [],
-  blockedTerms: [],
-  allowedTerms: [],
-  modes: { shield: false, subscribers: false, followers: false, emotes: false, slowSeconds: null },
-  community: { broadcaster: [], moderators: [], vips: [], bots: [], viewers: [] },
-  liveconLevel: live.liveconLevel?.level ?? null,
+    title: live.title,
+    liveconLevel: live.liveconLevel?.level ?? null,
+  }),
+  connection: 'disconnected',
   notice: null,
   readOnly: false,
 })
@@ -175,7 +171,8 @@ export const openModView = async (
   held: PermissionName[]
 ): Promise<ModViewSnapshot> => {
   const live = await readLive(liveId, scope, viewerId, held)
-  let state = baseState(live)
+  if (live.access !== 'open') throw conflict()
+  let state: ModViewState = { ...baseState(live), roster: await readTwitchRoster() }
 
   // A paused member only watches
   const paused = await activeSuspension(viewerId)
@@ -183,15 +180,20 @@ export const openModView = async (
     return {
       state: { ...state, notice: suspensionNotice(paused.endsAt), readOnly: true },
       channelLogin: null,
+      feedSeq: 0,
     }
   }
 
   // Only Twitch is wired
-  if (live.platform !== LivePlatforms.Twitch) return { state, channelLogin: null }
+  if (live.platform !== LivePlatforms.Twitch) return { state, channelLogin: null, feedSeq: 0 }
 
   const found = await seatOf(viewerId, live.youtuber.id)
   if ('notice' in found)
-    return { state: { ...state, notice: found.notice, readOnly: true }, channelLogin: null }
+    return {
+      state: { ...state, notice: found.notice, readOnly: true },
+      channelLogin: null,
+      feedSeq: 0,
+    }
 
   const { seat, login } = found
   try {
@@ -219,15 +221,16 @@ export const openModView = async (
     }
   } catch (error) {
     const refusal = await translateRefusal(error, viewerId)
-    return { state: { ...state, notice: refusal.message, readOnly: true }, channelLogin: login }
+    return {
+      state: { ...state, notice: refusal.message, readOnly: true },
+      channelLogin: login,
+      feedSeq: 0,
+    }
   }
 
-  // The feed kept since the session opened
-  const recent = await readRecentEvents(liveId)
-  state = recent.reduce(
-    (played, event) => applySceneEvent({ view: played, spotlight: null }, event).view,
-    state
-  )
+  // Chat kept by the live's room
+  const room = await readRoomMemory(liveId)
+  if (room) state = { ...state, messages: room.messages, acts: room.acts, held: room.held }
 
   const connection = await readConnection(liveId)
   const waiting = live.status === LiveStatuses.Announced ? PLATFORM_NOTICE_COPY.waiting : null
@@ -239,6 +242,7 @@ export const openModView = async (
       notice: state.notice ?? connection?.notice ?? waiting,
     },
     channelLogin: login,
+    feedSeq: room?.seq ?? 0,
   }
 }
 
@@ -265,6 +269,7 @@ export const actOnLive = async (input: {
   held: PermissionName[]
 }): Promise<{ done: boolean }> => {
   const live = await readLive(input.liveId, input.scope, input.viewerId, input.held)
+  if (live.access !== 'open') throw conflict()
 
   const paused = await activeSuspension(input.viewerId)
   if (paused) throw forbidden(suspensionNotice(paused.endsAt))
@@ -325,7 +330,7 @@ export const actOnLive = async (input: {
     actorId: input.viewerId,
     targetType: 'live',
     targetId: input.liveId,
-    summary: logId ? `${input.intent.kind} · ${logId}` : input.intent.kind,
+    summary: logId ? `${input.intent.kind}, ${logId}` : input.intent.kind,
   })
 
   return { done: true }

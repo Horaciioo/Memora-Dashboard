@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type { ChatMessage, Chatter } from '@/types/modview'
 
@@ -34,6 +34,12 @@ export const useWatchlist = (messages: ChatMessage[]): Watchlist => {
   const [watched, setWatched] = useState<Chatter[]>([])
   const [seen, setSeen] = useState<Set<string>>(new Set())
 
+  // Read at click time
+  const messagesRef = useRef(messages)
+  useEffect(() => {
+    messagesRef.current = messages
+  }, [messages])
+
   const lines = useMemo(() => {
     const ids = new Set(watched.map((chatter) => chatter.id))
 
@@ -42,29 +48,23 @@ export const useWatchlist = (messages: ChatMessage[]): Watchlist => {
 
   const unseen = lines.filter((line) => !seen.has(line.id)).length
 
-  // Past lines of a new viewer are not news
-  const markSeen = useCallback(
-    () => setSeen((current) => new Set([...current, ...lines.map((line) => line.id)])),
-    [lines]
-  )
+  // Lines on screen only
+  const markSeen = useCallback(() => setSeen(new Set(lines.map((line) => line.id))), [lines])
 
-  const watch = useCallback(
-    (chatter: Chatter) => {
-      setWatched((current) =>
-        current.some((entry) => entry.id === chatter.id) ? current : [...current, chatter]
-      )
-      setSeen(
-        (current) =>
-          new Set([
-            ...current,
-            ...messages
-              .filter((message) => message.author.id === chatter.id)
-              .map((message) => message.id),
-          ])
-      )
-    },
-    [messages]
-  )
+  const watch = useCallback((chatter: Chatter) => {
+    setWatched((current) =>
+      current.some((entry) => entry.id === chatter.id) ? current : [...current, chatter]
+    )
+    setSeen(
+      (current) =>
+        new Set([
+          ...current,
+          ...messagesRef.current
+            .filter((message) => message.author.id === chatter.id)
+            .map((message) => message.id),
+        ])
+    )
+  }, [])
 
   const unwatch = useCallback(
     (chatterId: string) =>

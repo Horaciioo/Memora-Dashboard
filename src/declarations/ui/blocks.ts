@@ -26,6 +26,8 @@ export const FLOATING_HINT = {
 export const APP_SHELL = {
   // Room right of the page for the rim
   frame: 'app-tone page-ground flex min-h-dvh md:pr-3',
+  // Page with no rail, no rim, nothing around it
+  frameBare: 'app-tone flex min-h-dvh bg-[var(--twitch-ground)]',
   // Window the page shows through
   window:
     'app-frame pointer-events-none fixed inset-y-3 right-3 left-[var(--shell-sidebar-w)] z-[35] transition-[left] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none hidden md:block print:hidden',

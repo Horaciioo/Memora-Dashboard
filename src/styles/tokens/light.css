@@ -35,7 +35,7 @@
   --color-on-brand: #3a1822;
   --color-brand-soft: #ffe6ed;
   /* Label over a deep solid fill */
-  --color-on-solid: #fffefb;
+  --color-on-solid: #ffffff;
 
   /* Mauve violet: the second voice of the palette */
   --color-mauve-50: #f7f3fe;
@@ -73,6 +73,8 @@
   --color-gold-100: #fff3c4;
   --color-gold-300: #fbd45a;
   --color-gold-400: #f2b705;
+  /* Gold readable as text on the page */
+  --color-gold-ink: #946a00;
   /* Same ramp as the gold, in red, for a live on air */
   --color-live-100: #ffe3e0;
   --color-live-300: #ff9c94;

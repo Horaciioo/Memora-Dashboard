@@ -27,15 +27,15 @@ const OPEN: IntentGate = { allowed: true, reason: null }
  * Lock a control behind one permission
  * @param {PermissionName} permission - Needed
  * @param {string} [owners] - Who holds it
+ * @param {boolean} [quiet] - Greyed without a word
  * @return {IntentGate} - Locked gate
  */
 
-const locked = (permission: PermissionName, owners?: string): IntentGate => ({
+const locked = (permission: PermissionName, owners?: string, quiet?: boolean): IntentGate => ({
   allowed: false,
-  reason: MODVIEW_LOCK_COPY.role.replace(
-    '{who}',
-    owners ?? PERMISSION_OWNERS[permission] ?? permission
-  ),
+  reason: quiet
+    ? null
+    : MODVIEW_LOCK_COPY.role.replace('{who}', owners ?? PERMISSION_OWNERS[permission] ?? permission),
 })
 
 /**
@@ -83,6 +83,7 @@ const exposedOn = (intent: ModViewIntent, platform: LivePlatformName): boolean =
  * @param {number | null} context.liveconLevel - Level in force
  * @param {boolean} [context.offline] - Platform not reached
  * @param {string | null} [context.offlineReason] - Why
+ * @param {boolean} [context.quiet] - Locks say nothing
  * @return {IntentGate} - Gate
  */
 
@@ -94,6 +95,7 @@ export const gateIntent = (
     liveconLevel: number | null
     offline?: boolean
     offlineReason?: string | null
+    quiet?: boolean
   }
 ): IntentGate => {
   if (context.offline) {
@@ -114,7 +116,7 @@ export const gateIntent = (
   }
 
   const { permission, owners } = requirementOf(intent)
-  if (!context.permissions.includes(permission)) return locked(permission, owners)
+  if (!context.permissions.includes(permission)) return locked(permission, owners, context.quiet)
 
   return OPEN
 }

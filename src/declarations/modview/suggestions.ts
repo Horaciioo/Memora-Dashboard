@@ -29,10 +29,11 @@ export const MODVIEW_SUGGESTION_COPY = {
   emptyTitle: 'Rien à proposer pour l’instant',
   emptyBody:
     'Quand l’AutoMod retient un message, Memora écrit ici la commande prête à coller, avec le bon pseudo et la bonne raison.',
-  step: 'Palier {n} sur {total}',
+  step: 'Palier {n} / {total}',
+  link: ':',
   level: 'Livecon {level}',
-  copy: 'Copier',
-  copied: 'Copié',
+  accept: 'Accepter',
+  refuse: 'Refuser',
   paste: 'Mettre dans le chat',
   delete: 'Supprimer le message',
   deny: 'Refuser le message',
@@ -44,3 +45,19 @@ export const MODVIEW_SUGGESTION_COPY = {
   watch: 'Surveiller',
   dossier: 'Dossier',
 } as const
+
+// Long measure words and their short forms
+const MEASURE_SHORT: [RegExp, string][] = [
+  [/avertissement/i, 'Averto'],
+  [/bannissement/i, 'Ban.'],
+  [/définitif/i, 'Déf'],
+]
+
+/**
+ * Short measure name
+ * @param {string} name - Measure name
+ * @return {string} - Short name
+ */
+
+export const shortMeasure = (name: string): string =>
+  MEASURE_SHORT.reduce((short, [word, replacement]) => short.replace(word, replacement), name)

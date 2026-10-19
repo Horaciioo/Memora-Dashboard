@@ -7,7 +7,7 @@ import { AutoModWindow } from '@/composites/modview/AutoModWindow'
 import { ChatWindow } from '@/composites/modview/ChatWindow'
 import { CommunityWindow } from '@/composites/modview/CommunityWindow'
 import { FocusBanner } from '@/composites/modview/FocusBanner'
-import { InspectCard } from '@/composites/modview/InspectCard'
+import { InspectWindow } from '@/composites/modview/InspectWindow'
 import type { TeamTools } from '@/composites/modview/memberMenu'
 import { ModActionsWindow } from '@/composites/modview/ModActionsWindow'
 import { ModViewSidebar } from '@/composites/modview/ModViewSidebar'
@@ -24,6 +24,7 @@ import { useSuggestions } from '@/core/hooks/interaction/state/useSuggestions'
 import { useWatchlist } from '@/core/hooks/interaction/state/useWatchlist'
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { windowsOf } from '@/core/lib/modview/gate'
+import { sanctionsOn } from '@/core/lib/modview/viewer'
 import { profileOfPermissions } from '@/core/lib/modview/profile'
 import type { Suggestion } from '@/core/lib/modview/suggest'
 import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
@@ -48,6 +49,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @property {string} viewerId - Signed-in member
  * @property {LivePerson[]} members - Convened team
  * @property {string[]} focusable - Members the viewer may follow
+ * @property {string[]} coordinatorIds - Members coordinating right now
  * @property {boolean} [canEnd] - Viewer may close the live
  * @property {PanelMemory} initialMemory - Rungs already applied to the creator's viewers
  */
@@ -57,8 +59,11 @@ export interface ModViewLiveTools {
   viewerId: string
   members: LivePerson[]
   focusable: string[]
+  coordinatorIds: string[]
   // Viewer may close the live
   canEnd?: boolean
+  // Junior seat, locks say nothing
+  isJunior?: boolean
   initialMemory: PanelMemory
 }
 
@@ -103,7 +108,6 @@ export const ModView = ({
 }: ModViewProps) => {
   const { state, spotlight } = driver
   const isWorkspace = !embedded && !showcase && !only
-  const [isPanelOpen, setPanelOpen] = useState(true)
   const [inspected, setInspected] = useState<string | null>(null)
   const [actInPlace, setActInPlace] = useState(false)
   const focus = useLiveFocus(live?.id ?? null)
@@ -116,6 +120,7 @@ export const ModView = ({
     permissions,
     initialMemory: live?.initialMemory ?? {},
     onBehalfOfId: following && actInPlace ? following.targetId : null,
+    quiet: live?.isJunior,
   })
   const { gate, act, picked, setPicked, memory } = actions
   const watchlist = useWatchlist(state.messages)
@@ -123,12 +128,24 @@ export const ModView = ({
 
   // Windows this platform and seat can open
   const seat = profile ?? profileOfPermissions(permissions)
-  const available = useMemo(() => windowsOf(state.platform), [state.platform])
+  const canInspect = permissions.includes(Permissions.LiveInspect)
+  const canFocus = permissions.includes(Permissions.LiveFocus)
+  // Inspect Mod only opens on a real live, for the seats holding the right
+  const available = useMemo(
+    () =>
+      windowsOf(state.platform).filter(
+        (id) =>
+          (id !== 'inspect' || (live !== undefined && canInspect)) &&
+          // The audience is a sidebar glyph on the page
+          (id !== 'community' || !isWorkspace) &&
+          // The queue is Twitch's, the watch list lives in the sanctions panel
+          (id !== 'automod' || !isWorkspace || state.platform === LivePlatforms.Twitch)
+      ),
+    [state.platform, live, canInspect, isWorkspace]
+  )
   const model = useModLayout(seat, available)
   useBareShell(isWorkspace)
 
-  const canInspect = permissions.includes(Permissions.LiveInspect)
-  const canFocus = permissions.includes(Permissions.LiveFocus)
   // Only seats that may follow or inspect see the team
   const team: TeamTools | undefined =
     live && (canInspect || canFocus)
@@ -142,7 +159,10 @@ export const ModView = ({
             setActInPlace(false)
             void focus.stop()
           },
-          onInspect: setInspected,
+          onInspect: (accountId) => {
+            setInspected(accountId)
+            if (!model.isShown('inspect')) model.toggleHidden('inspect')
+          },
         }
       : undefined
 
@@ -189,6 +209,7 @@ export const ModView = ({
             gate={gate}
             onAct={act}
             hasQueue={state.platform === LivePlatforms.Twitch}
+            hasWatch={!isWorkspace}
             watchlist={watchlist}
             onPick={setPicked}
           />
@@ -206,12 +227,31 @@ export const ModView = ({
             onDraft={actions.writeDraft}
             onSend={actions.send}
             hint={actions.hint}
+            hasTerms={isWorkspace}
           />
         )
       case 'community':
         return (
           <CommunityWindow community={state.community} spotlight={spotlight} onPick={setPicked} />
         )
+      case 'inspect':
+        return live ? (
+          <InspectWindow
+            liveId={live.id}
+            viewerId={live.viewerId}
+            members={live.members}
+            inspected={inspected}
+            onInspect={setInspected}
+            history={{
+              state,
+              panel,
+              memory,
+              liveId: live.id,
+              onPick: setPicked,
+              onPrefill: actions.prefill,
+            }}
+          />
+        ) : null
       case 'unbanRequests':
         return (
           <UnbanRequestsWindow
@@ -260,8 +300,20 @@ export const ModView = ({
       {isWorkspace && (
         <ModViewSidebar
           options={pageOptions}
-          team={team ? { tools: team, focuses: focus.focuses } : undefined}
+          team={
+            team && live
+              ? {
+                  liveId: live.id,
+                  tools: team,
+                  focuses: focus.focuses,
+                  coordinatorIds: live.coordinatorIds,
+                  canReinforce: permissions.includes(Permissions.LiveAnnounce),
+                }
+              : undefined
+          }
+          leaveLiveId={live?.id}
           endLiveId={live?.canEnd ? live.id : undefined}
+          audience={{ community: state.community, onPick: setPicked }}
         />
       )}
 
@@ -274,7 +326,6 @@ export const ModView = ({
               name={following.targetName}
               actInPlace={actInPlace}
               onActInPlace={setActInPlace}
-              onStop={() => team?.onStopFocus()}
             />
           )}
 
@@ -301,6 +352,7 @@ export const ModView = ({
             <ViewerCard
               chatter={picked}
               messages={pickedLines}
+              liveSanctions={sanctionsOn(state.acts, picked).length}
               gate={gate}
               onAct={act}
               onClose={() => setPicked(null)}
@@ -315,14 +367,6 @@ export const ModView = ({
               }
             />
           )}
-
-          {live && inspected && (
-            <InspectCard
-              liveId={live.id}
-              accountId={inspected}
-              onClose={() => setInspected(null)}
-            />
-          )}
         </div>
 
         {!embedded && (
@@ -330,20 +374,10 @@ export const ModView = ({
             panel={panel}
             levelName={levelName}
             levelIcon={levelIcon}
-            isOpen={isPanelOpen}
-            onToggle={() => setPanelOpen((open) => !open)}
             target={picked}
             memory={memory}
-            recentIds={[
-              ...new Set(Object.values(memory).flatMap((byOffense) => Object.keys(byOffense))),
-            ]}
             onPrefill={actions.prefill}
-            history={{
-              state,
-              liveId: live?.id ?? null,
-              onPick: setPicked,
-              onPrefill: actions.prefill,
-            }}
+            watch={{ watchlist, gate, onAct: act, onPick: setPicked }}
             suggest={
               isWorkspace
                 ? {

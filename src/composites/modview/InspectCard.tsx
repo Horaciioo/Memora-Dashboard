@@ -1,9 +1,11 @@
 'use client'
 
+import { Dotted } from '@/components/elements/display/Dotted'
 import { useQuery } from '@tanstack/react-query'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
+import { Tip } from '@/components/elements/feedback/Tip'
 import { SkeletonList } from '@/components/elements/feedback/Skeleton'
 import { apiGet } from '@/core/lib/api/client'
 import { QUERY_KEYS } from '@/core/lib/api/keys'
@@ -11,7 +13,9 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { ATTENDANCE_STATUS_REGISTRY } from '@/declarations/calendar/registries'
 import { MODERATION_KINDS } from '@/declarations/lives/moderation'
 import { MODVIEW_HISTORY_COPY, MODVIEW_INSPECT_COPY } from '@/declarations/modview/copy'
-import { MODVIEW_HISTORY, MODVIEW_INSPECT } from '@/declarations/ui/variants'
+import { ICONS } from '@/declarations/ui/icons'
+import type { IconName } from '@/declarations/ui/icons'
+import { MODVIEW_DOSSIER, MODVIEW_INSPECT, MODVIEW_VERDICT } from '@/declarations/ui/variants'
 import type { ModeratorInspect } from '@/types/lives'
 import { cn } from '@/utils/classnames'
 import { formatClock, formatDuration } from '@/utils/format/modview'
@@ -37,76 +41,112 @@ export const InspectCard = ({ liveId, accountId, onClose }: InspectCardProps) =>
       apiGet<ModeratorInspect>(API_ROUTES.liveInspect(liveId, accountId), signal),
   })
 
-  return (
-    <aside className={MODVIEW_INSPECT.card} aria-label={MODVIEW_INSPECT_COPY.title}>
-      {!data ? (
+  if (!data) {
+    return (
+      <div className={MODVIEW_INSPECT.body}>
         <SkeletonList shape="row" rows={4} />
-      ) : (
-        <>
-          <header className={MODVIEW_INSPECT.head}>
-            <Avatar name={data.name} src={data.avatar} size="sm" />
-            <span className={MODVIEW_INSPECT.name}>{data.name}</span>
-            <Button
-              variant="icon"
-              icon="close"
-              aria-label={MODVIEW_INSPECT_COPY.close}
-              onClick={onClose}
-            />
-          </header>
+      </div>
+    )
+  }
 
-          {data.isAbsent && <p className={MODVIEW_INSPECT.warn}>{MODVIEW_INSPECT_COPY.absent}</p>}
+  const attendance = data.attendance ? ATTENDANCE_STATUS_REGISTRY.get(data.attendance) : null
+  const AttendanceIcon = ICONS[attendance?.icon ?? 'clock']
 
-          <div className={MODVIEW_INSPECT.facts}>
-            <div className={MODVIEW_INSPECT.fact}>
-              <span className={MODVIEW_INSPECT.factLabel}>{MODVIEW_INSPECT_COPY.attendance}</span>
-              <span className={MODVIEW_INSPECT.factValue}>
-                {data.attendance
-                  ? ATTENDANCE_STATUS_REGISTRY.label(data.attendance)
-                  : MODVIEW_INSPECT_COPY.noAnswer}
-              </span>
-            </div>
-            <div className={MODVIEW_INSPECT.fact}>
-              <span className={MODVIEW_INSPECT.factLabel}>{MODVIEW_INSPECT_COPY.active}</span>
-              <span className={MODVIEW_INSPECT.factValue}>
-                {formatDuration(data.activeSeconds)}
-              </span>
-            </div>
-          </div>
+  // Glyphs over figures, the name rides in the tip
+  const figures: { icon: IconName; label: string; value: string; tone?: string }[] = [
+    {
+      icon: attendance?.icon ?? 'clock',
+      label: MODVIEW_INSPECT_COPY.attendance,
+      value: attendance?.label ?? MODVIEW_INSPECT_COPY.noAnswer,
+      tone: attendance?.tone,
+    },
+    {
+      icon: 'clock',
+      label: MODVIEW_INSPECT_COPY.active,
+      value: formatDuration(data.activeSeconds),
+    },
+    {
+      icon: 'modActions',
+      label: MODVIEW_INSPECT_COPY.gestures,
+      value: String(data.gestures.length),
+    },
+  ]
 
-          <div className={MODVIEW_INSPECT.list}>
-            <span className={MODVIEW_INSPECT.factLabel}>{MODVIEW_INSPECT_COPY.gestures}</span>
-            {data.gestures.length === 0 && (
-              <p className={MODVIEW_HISTORY.empty}>{MODVIEW_INSPECT_COPY.gesturesEmpty}</p>
-            )}
+  return (
+    <div className={MODVIEW_INSPECT.body}>
+      <header className={MODVIEW_INSPECT.head}>
+        <Button
+          variant="ghost"
+          icon="back"
+          className={MODVIEW_INSPECT.back}
+          aria-label={MODVIEW_INSPECT_COPY.back}
+          title={MODVIEW_INSPECT_COPY.back}
+          onClick={onClose}
+        />
+        <Avatar name={data.name} src={data.avatar} size="md" />
+        <h3 className={MODVIEW_INSPECT.name}>{data.name}</h3>
+        {data.isAbsent && <p className={MODVIEW_INSPECT.warn}>{MODVIEW_INSPECT_COPY.absent}</p>}
+      </header>
+
+      <div className={MODVIEW_INSPECT.stats}>
+        {figures.map(({ icon, label, value, tone }) => {
+          const Icon = icon === figures[0]!.icon && tone ? AttendanceIcon : ICONS[icon]
+
+          return (
+            <Tip key={label} label={label} className={MODVIEW_INSPECT.stat}>
+              <Icon
+                className={cn(MODVIEW_INSPECT.statIcon, tone && `text-[var(--color-${tone})]`)}
+                aria-hidden="true"
+              />
+              <span className={MODVIEW_INSPECT.statValue}>{value}</span>
+              <span className="sr-only">{label}</span>
+            </Tip>
+          )
+        })}
+      </div>
+
+      <section className={MODVIEW_INSPECT.section}>
+        <h4 className={MODVIEW_INSPECT.label}>{MODVIEW_INSPECT_COPY.gestures}</h4>
+        {data.gestures.length === 0 ? (
+          <p className={MODVIEW_INSPECT.empty}>{MODVIEW_INSPECT_COPY.gesturesEmpty}</p>
+        ) : (
+          <div className={MODVIEW_DOSSIER.history}>
             {data.gestures.map((gesture) => (
-              <p key={gesture.id} className={MODVIEW_INSPECT.line}>
-                <span
-                  className={cn(
-                    MODVIEW_HISTORY.tag,
-                    gesture.fromPanel ? MODVIEW_HISTORY.tagPanel : MODVIEW_HISTORY.tagOff
-                  )}
-                >
-                  {gesture.fromPanel
-                    ? MODVIEW_HISTORY_COPY.fromPanel
-                    : MODVIEW_HISTORY_COPY.offPanel}
-                </span>{' '}
-                {[
-                  formatClock(gesture.occurredAt),
-                  MODERATION_KINDS[gesture.kind].label,
-                  gesture.targetLogin,
-                  gesture.durationSeconds ? formatDuration(gesture.durationSeconds) : null,
-                  gesture.reason,
-                  gesture.onBehalfOf
-                    ? MODVIEW_INSPECT_COPY.onBehalf.replace('{name}', gesture.onBehalfOf)
-                    : null,
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </p>
+              <article key={gesture.id} className={MODVIEW_DOSSIER.row}>
+                <div className={MODVIEW_DOSSIER.rowHead}>
+                  <p className={cn(MODVIEW_DOSSIER.rowKind, MODVIEW_VERDICT[gesture.kind]?.text)}>
+                    <Dotted
+                      items={[
+                        MODERATION_KINDS[gesture.kind].label,
+                        gesture.durationSeconds ? formatDuration(gesture.durationSeconds) : null,
+                      ]}
+                    />
+                  </p>
+                  <time className={MODVIEW_DOSSIER.rowDate} dateTime={gesture.occurredAt}>
+                    {formatClock(gesture.occurredAt)}
+                  </time>
+                </div>
+                {gesture.targetLogin && (
+                  <p className={MODVIEW_INSPECT.target}>{gesture.targetLogin}</p>
+                )}
+                {gesture.reason && <p className={MODVIEW_DOSSIER.rowReason}>{gesture.reason}</p>}
+                <p className={MODVIEW_DOSSIER.rowBy}>
+                  <Dotted
+                    items={[
+                      gesture.fromPanel
+                        ? MODVIEW_HISTORY_COPY.fromPanel
+                        : MODVIEW_HISTORY_COPY.offPanel,
+                      gesture.onBehalfOf
+                        ? MODVIEW_INSPECT_COPY.onBehalf.replace('{name}', gesture.onBehalfOf)
+                        : null,
+                    ]}
+                  />
+                </p>
+              </article>
             ))}
           </div>
-        </>
-      )}
-    </aside>
+        )}
+      </section>
+    </div>
   )
 }

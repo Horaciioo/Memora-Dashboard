@@ -28,7 +28,7 @@
   --color-brand-800: #f8c0d0;
   --color-brand-900: #fde4ec;
   --color-brand-soft: #41202b;
-  --color-on-solid: #1e1a17;
+  --color-on-solid: #ffffff;
 
   --color-mauve-50: #1f1a2e;
   --color-mauve-100: #2a2340;
@@ -57,6 +57,8 @@
   --color-gold-100: #fff3c4;
   --color-gold-300: #fbd45a;
   --color-gold-400: #f2b705;
+  /* Gold readable as text on the page */
+  --color-gold-ink: #fbd45a;
   /* Same ramp as the gold, in red, for a live on air */
   --color-live-100: #ffe3e0;
   --color-live-300: #ff9c94;

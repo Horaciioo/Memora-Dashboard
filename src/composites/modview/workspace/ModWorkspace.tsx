@@ -7,7 +7,7 @@ import { SplitHandle } from '@/composites/modview/workspace/SplitHandle'
 import { WindowChromeProvider } from '@/composites/modview/workspace/WindowChrome'
 import type { WindowChrome } from '@/composites/modview/workspace/WindowChrome'
 import type { useModLayout } from '@/core/hooks/interaction/layout/useModLayout'
-import { SCALE_STEP, shownColumns } from '@/core/lib/modview/layout'
+import { SCALE_STEP, rowsOf, shownColumns } from '@/core/lib/modview/layout'
 import type { DropSpot } from '@/core/lib/modview/layout'
 import { MODVIEW_WORKSPACE_COPY } from '@/declarations/modview/workspace'
 import { MODVIEW_WORKSPACE } from '@/declarations/ui/variants'
@@ -41,14 +41,19 @@ const spotOver = (
   const columnIndex = layout.columns.findIndex((column) => column.windows.some((w) => w.id === id))
   const column = layout.columns[columnIndex]
   if (!column) return null
-  const index = column.windows.findIndex((entry) => entry.id === id)
+
+  // Above or below the whole row, never between two side by side
+  const rows = rowsOf(column.windows)
+  const rowIndex = rows.findIndex((row) => row.some((entry) => entry.id === id))
+  const start = rows.slice(0, rowIndex).reduce((sum, row) => sum + row.length, 0)
+  const end = start + (rows[rowIndex]?.length ?? 1)
 
   if (x < EDGE_SHARE) return { spot: { newColumnAt: columnIndex }, side: 'left' }
   if (x > 1 - EDGE_SHARE) return { spot: { newColumnAt: columnIndex + 1 }, side: 'right' }
 
   return y < 0.5
-    ? { spot: { column: column.id, index }, side: 'top' }
-    : { spot: { column: column.id, index: index + 1 }, side: 'bottom' }
+    ? { spot: { column: column.id, index: start }, side: 'top' }
+    : { spot: { column: column.id, index: end }, side: 'bottom' }
 }
 
 /**
@@ -104,8 +109,9 @@ export const ModWorkspace = ({ model, render }: ModWorkspaceProps) => {
       {columns.map((column, columnIndex) => {
         const previous = columns[columnIndex - 1]
         const hasMaximized = maximized !== null && column.windows.some((w) => w.id === maximized)
-        const weights = column.windows.filter((entry) => !entry.isFolded)
-        const totalHeight = weights.reduce((sum, entry) => sum + entry.weight, 0)
+        const rows = rowsOf(column.windows)
+        const weights = rows.filter((row) => !row.every((entry) => entry.isFolded))
+        const totalHeight = weights.reduce((sum, row) => sum + row[0]!.weight, 0)
 
         return (
           <Fragment key={column.id}>
@@ -133,13 +139,13 @@ export const ModWorkspace = ({ model, render }: ModWorkspaceProps) => {
               )}
               style={{ flex: `${maximized ? 1 : column.weight} 1 0%` }}
             >
-              {column.windows.map((entry, windowIndex) => {
-                const above = column.windows[windowIndex - 1]
-                const isAway = maximized !== null && entry.id !== maximized
-                const hint = over?.id === entry.id ? over : null
+              {rows.map((row, rowIndex) => {
+                const above = rows[rowIndex - 1]?.[0]
+                const head = row[0]!
+                const isRowFolded = row.every((entry) => entry.isFolded) && !maximized
 
                 return (
-                  <Fragment key={entry.id}>
+                  <Fragment key={head.id}>
                     {above && !maximized && (
                       <SplitHandle
                         orientation="horizontal"
@@ -147,7 +153,7 @@ export const ModWorkspace = ({ model, render }: ModWorkspaceProps) => {
                         onMove={(pixels) =>
                           model.resizeWindows(
                             above.id,
-                            entry.id,
+                            head.id,
                             (pixels / (columnRefs.current.get(column.id)?.clientHeight || 1)) *
                               totalHeight
                           )
@@ -155,42 +161,53 @@ export const ModWorkspace = ({ model, render }: ModWorkspaceProps) => {
                       />
                     )}
                     <div
-                      className={cn(
-                        MODVIEW_WORKSPACE.slot,
-                        isAway && MODVIEW_WORKSPACE.away,
-                        dragging === entry.id && MODVIEW_WORKSPACE.dragging
-                      )}
-                      style={{
-                        flex: entry.isFolded && !maximized ? '0 0 auto' : `${entry.weight} 1 0%`,
-                      }}
-                      onDragOver={(event) => {
-                        if (!dragging || dragging === entry.id) return
-                        event.preventDefault()
-                        const next = spotOver(event, entry.id, layout)
-                        if (next) setOver({ id: entry.id, ...next })
-                      }}
-                      onDrop={(event) => {
-                        event.preventDefault()
-                        drop()
-                      }}
+                      className={MODVIEW_WORKSPACE.row}
+                      style={{ flex: isRowFolded ? '0 0 auto' : `${head.weight} 1 0%` }}
                     >
-                      <WindowChromeProvider
-                        value={chromeOf(entry.id, entry.isFolded && !maximized)}
-                      >
-                        {render(entry.id)}
-                      </WindowChromeProvider>
-                      {hint && (
-                        <span
-                          className={
-                            {
-                              left: MODVIEW_WORKSPACE.dropLeft,
-                              right: MODVIEW_WORKSPACE.dropRight,
-                              top: MODVIEW_WORKSPACE.dropTop,
-                              bottom: MODVIEW_WORKSPACE.dropBottom,
-                            }[hint.side]
-                          }
-                        />
-                      )}
+                      {row.map((entry) => {
+                        const isAway = maximized !== null && entry.id !== maximized
+                        const hint = over?.id === entry.id ? over : null
+
+                        return (
+                          <div
+                            key={entry.id}
+                            className={cn(
+                              MODVIEW_WORKSPACE.slot,
+                              isAway && MODVIEW_WORKSPACE.away,
+                              dragging === entry.id && MODVIEW_WORKSPACE.dragging
+                            )}
+                            style={{ flex: '1 1 0%' }}
+                            onDragOver={(event) => {
+                              if (!dragging || dragging === entry.id) return
+                              event.preventDefault()
+                              const next = spotOver(event, entry.id, layout)
+                              if (next) setOver({ id: entry.id, ...next })
+                            }}
+                            onDrop={(event) => {
+                              event.preventDefault()
+                              drop()
+                            }}
+                          >
+                            <WindowChromeProvider
+                              value={chromeOf(entry.id, entry.isFolded && !maximized)}
+                            >
+                              {render(entry.id)}
+                            </WindowChromeProvider>
+                            {hint && (
+                              <span
+                                className={
+                                  {
+                                    left: MODVIEW_WORKSPACE.dropLeft,
+                                    right: MODVIEW_WORKSPACE.dropRight,
+                                    top: MODVIEW_WORKSPACE.dropTop,
+                                    bottom: MODVIEW_WORKSPACE.dropBottom,
+                                  }[hint.side]
+                                }
+                              />
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
                   </Fragment>
                 )

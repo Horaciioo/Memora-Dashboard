@@ -6,7 +6,7 @@ import type { PanelMemory } from '@/core/lib/modview/commands'
 import { suggestFor } from '@/core/lib/modview/suggest'
 import type { SuggestionSource } from '@/core/lib/modview/suggest'
 import { CHAT_FLAG_CATEGORY } from '@/declarations/modview/suggestions'
-import type { ModViewState } from '@/types/modview'
+import type { ModActKind, ModViewState } from '@/types/modview'
 import type { SanctionPanelView } from '@/types/sanctions'
 
 // Suggestions kept on screen
@@ -14,6 +14,9 @@ const MAX_SUGGESTIONS = 12
 
 // Chatters whose lines are never suggested
 const EXEMPT_BADGES = ['broadcaster', 'moderator', 'bot']
+
+// Acts that settle a suggestion
+const SETTLING_ACTS: ModActKind[] = ['delete', 'warn', 'timeout', 'ban']
 
 /**
  * Commands ready to paste for what the AutoMod holds and the chat flags
@@ -59,12 +62,26 @@ export const useSuggestions = (
         at: message.sentAt,
       }))
 
+    // Latest sanction per name
+    const settledAt = new Map<string, string>()
+    for (const act of state.acts) {
+      const name = act.target?.toLowerCase()
+      if (!name || !SETTLING_ACTS.includes(act.kind)) continue
+      if ((settledAt.get(name) ?? '') < act.at) settledAt.set(name, act.at)
+    }
+
+    // Already sanctioned since
+    const isSettled = (source: SuggestionSource): boolean =>
+      [source.chatter.name, source.chatter.login].some(
+        (name) => (settledAt.get(name.toLowerCase()) ?? '') >= source.at
+      )
+
     return [...held, ...flagged]
-      .filter((source) => !dismissed.has(source.id))
+      .filter((source) => !dismissed.has(source.id) && !isSettled(source))
       .sort((left, right) => right.at.localeCompare(left.at))
       .slice(0, MAX_SUGGESTIONS)
       .map((source) => suggestFor(source, panel, memory))
-  }, [state.held, state.messages, panel, memory, dismissed])
+  }, [state.held, state.messages, state.acts, panel, memory, dismissed])
 
   const dismiss = (id: string) => setDismissed((current) => new Set([...current, id]))
 

@@ -10,7 +10,10 @@ import { refreshTwitchGrant } from '@/core/lib/platforms/twitch/oauth'
 import { isTwitchConfigured } from '@/declarations/platforms/twitch'
 import { LivePlatforms } from '@/utils/constants/lives'
 import type { LivePlatformName } from '@/utils/constants/lives'
+import type { MemoraRank } from '@/types/modview'
 import type { PlatformLinkView } from '@/types/platforms'
+import { MemberRoles } from '@/utils/constants/hierarchy'
+import type { MemberRoleName } from '@/utils/constants/hierarchy'
 
 // Renew this long before expiry
 const REFRESH_MARGIN_MS = 60_000
@@ -177,4 +180,31 @@ export const unlinkPlatform = async (
   if (accessToken && linker.isConfigured()) await linker.revoke(accessToken)
 
   await prisma.platformAccount.delete({ where: { id: stored.id } })
+}
+
+// Memora rank by hierarchy level
+const RANK_OF_ROLE: Partial<Record<MemberRoleName, MemoraRank>> = {
+  [MemberRoles.Admin]: 'admin',
+  [MemberRoles.Responsable]: 'responsable',
+  [MemberRoles.Moderateur]: 'moderator',
+}
+
+/**
+ * Memora ranks of the linked Twitch accounts
+ * @return {Promise<Record<string, MemoraRank>>} - Rank by Twitch user
+ */
+
+export const readTwitchRoster = async (): Promise<Record<string, MemoraRank>> => {
+  const rows = await prisma.platformAccount.findMany({
+    where: { platform: LivePlatforms.Twitch, revokedAt: null },
+    select: { externalUserId: true, account: { select: { role: true } } },
+  })
+
+  return Object.fromEntries(
+    rows.flatMap((row) => {
+      const rank = RANK_OF_ROLE[row.account.role as MemberRoleName]
+
+      return rank ? [[row.externalUserId, rank]] : []
+    })
+  )
 }

@@ -1,8 +1,8 @@
-import { nextRung, writeRungCommand } from '@/core/lib/modview/commands'
+import { commandMeasure, nextRung, writeRungCommand } from '@/core/lib/modview/commands'
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { AUTOMOD_OFFENSES, CHAT_FLAG_CATEGORY } from '@/declarations/modview/suggestions'
 import type { Chatter } from '@/types/modview'
-import type { SanctionOffenseCard, SanctionPanelView } from '@/types/sanctions'
+import type { SanctionMeasureView, SanctionOffenseCard, SanctionPanelView } from '@/types/sanctions'
 
 /**
  * Something the AutoMod or a flag points at
@@ -35,6 +35,7 @@ export interface SuggestionSource {
  * @property {SanctionOffenseCard | null} offense - Offence of the panel
  * @property {number | null} rung - Rung proposed
  * @property {number} rungCount - Rungs of the ladder
+ * @property {SanctionMeasureView | null} measure - Heaviest command measure
  * @property {string | null} command - Line to paste
  */
 
@@ -43,6 +44,7 @@ export interface Suggestion {
   offense: SanctionOffenseCard | null
   rung: number | null
   rungCount: number
+  measure: SanctionMeasureView | null
   command: string | null
 }
 
@@ -90,7 +92,8 @@ export const suggestFor = (
   memory: PanelMemory
 ): Suggestion => {
   const offense = offenseForCategory(panel, source.categoryKey)
-  if (!offense) return { source, offense: null, rung: null, rungCount: 0, command: null }
+  if (!offense)
+    return { source, offense: null, rung: null, rungCount: 0, measure: null, command: null }
 
   // The rung after the ones already applied
   const applied = memory[source.chatter.id]?.[offense.id] ?? []
@@ -102,6 +105,7 @@ export const suggestFor = (
     offense,
     rung,
     rungCount: offense.rungs.length,
+    measure: step ? commandMeasure(step) : null,
     command: step ? writeRungCommand(step, source.chatter.login, offense.name) : null,
   }
 }
