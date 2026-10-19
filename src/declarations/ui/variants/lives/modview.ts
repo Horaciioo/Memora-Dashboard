@@ -39,7 +39,7 @@ export const MODVIEW_FRAME = {
  */
 
 export const MODVIEW_WINDOW = {
-  root: 'relative flex min-h-64 flex-col overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)] transition-[box-shadow,transform] duration-[var(--motion-duration-panel)] lg:min-h-0',
+  root: 'relative flex min-h-64 min-w-0 flex-col overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)] transition-[box-shadow,transform] duration-[var(--motion-duration-panel)] lg:min-h-0',
   grow: 'flex-1',
   // Window of the workspace: the slot sizes it
   tiled: 'h-full min-h-0',
@@ -112,7 +112,7 @@ export const MODVIEW_FEED = {
   who: 'font-semibold text-[var(--color-ink)]',
   whoLink: 'cursor-pointer font-semibold text-[var(--color-ink)] hover:underline',
   quote:
-    'mt-1 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-2 py-1 text-xs break-words',
+    'mt-1 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-2 py-1 text-xs [overflow-wrap:anywhere]',
   flagged: 'rounded-[2px] bg-[var(--twitch-flag)] px-0.5 text-inherit',
   category: `${PROPERTY_LABEL} text-[var(--color-ink-subtle)]`,
   actions: 'mt-1.5 flex flex-wrap gap-2',
@@ -151,14 +151,14 @@ export const MODVIEW_TIER: Record<ChatTier, string> = {
 export const MODVIEW_CHAT = {
   hint: 'px-3 pt-2 text-xs font-semibold text-[var(--color-danger)]',
   root: 'lg:h-full',
-  scroller: 'min-h-0 flex-1 overflow-y-auto',
+  scroller: 'min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto',
   time: 'mr-1.5 font-[family-name:var(--font-mono)] text-micro text-[var(--color-ink-subtle)]',
   deletedText: 'text-[var(--color-ink-subtle)] line-through',
   deletedNote: 'ml-1.5 text-xs text-[var(--color-ink-subtle)] italic',
   triggerLit: 'ring-2 ring-[var(--color-pick)]',
   welcome: 'px-3 pt-3 pb-1 text-sm text-[var(--color-ink-subtle)]',
   list: 'flex flex-col py-1',
-  line: 'group relative px-3 py-1 text-sm leading-relaxed break-words transition-colors hover:bg-[var(--color-hover)]',
+  line: 'group relative px-3 py-1 text-sm leading-relaxed [overflow-wrap:anywhere] transition-colors hover:bg-[var(--color-hover)]',
   lineFirst:
     'border-l-4 border-[var(--color-brand-600)] bg-[color-mix(in_oklab,var(--color-brand-600)_8%,transparent)]',
   lineLit: 'bg-[color-mix(in_oklab,var(--color-caution)_18%,transparent)]',
