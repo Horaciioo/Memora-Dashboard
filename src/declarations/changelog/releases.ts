@@ -232,6 +232,13 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Fixed,
+        page: ROUTES.teams,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.ReferenceRead,
+        text: 'Correction d’un bug qui affichait « Aucune chaîne renseignée » sur la fiche d’un YouTubeur malgré une chaîne ajoutée',
+      },
+      {
+        tag: ChangelogTags.Fixed,
         text: 'Correction d’un bug qui affichait une heure de plus que celle choisie dans les champs de date et d’heure des formulaires',
       },
       {
