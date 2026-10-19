@@ -2,13 +2,14 @@ import { releasedFrom } from '@/core/services/academy/legacy/LegacyRelease'
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { forbidden } from '@/core/lib/errors'
+import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { logger } from '@/core/lib/logger'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { syncJuniorLives } from '@/core/services/academy/parkour/LiveCountService'
 import { notify } from '@/core/services/system/NotificationService'
 import { peopleInScope } from '@/core/services/work/shared'
-import type { AttendancePerson, AttendanceRoster } from '@/types/calendar'
+import { CALENDAR_COPY } from '@/declarations/calendar/copy'
+import type { AttendanceHours, AttendancePerson, AttendanceRoster } from '@/types/calendar'
 import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
@@ -87,14 +88,67 @@ export const syncRoster = async (eventId: string, memberIds: string[]): Promise<
 }
 
 /**
+ * Hours a row carries
+ * @param {AttendanceRow} row - Roster row
+ * @return {AttendanceHours | null} - Hours given
+ */
+
+const hoursOf = (row: AttendanceRow): AttendanceHours | null =>
+  row.availableFrom && row.availableTo
+    ? { from: row.availableFrom.toISOString(), to: row.availableTo.toISOString() }
+    : null
+
+/**
+ * Events whose roll-call asks for hours: the lives
+ * @param {string[]} eventIds - Roll-call events
+ * @return {Promise<Set<string>>} - Events asking
+ */
+
+export const eventsAskingHours = async (eventIds: string[]): Promise<Set<string>> => {
+  if (eventIds.length === 0) return new Set()
+
+  const lives = await prisma.live.findMany({
+    where: { calendarEventId: { in: eventIds } },
+    select: { calendarEventId: true },
+  })
+
+  return new Set(lives.flatMap((live) => (live.calendarEventId ? [live.calendarEventId] : [])))
+}
+
+/**
+ * Members called in as reinforcement on the lives behind some events
+ * @param {string[]} eventIds - Roll-call events
+ * @return {Promise<Map<string, Set<string>>>} - Reinforcements per event
+ */
+
+export const reinforcedByEvent = async (eventIds: string[]): Promise<Map<string, Set<string>>> => {
+  if (eventIds.length === 0) return new Map()
+
+  const rows = await prisma.liveMember.findMany({
+    where: { reinforcement: true, live: { calendarEventId: { in: eventIds } } },
+    select: { accountId: true, live: { select: { calendarEventId: true } } },
+  })
+  const byEvent = new Map<string, Set<string>>()
+  for (const row of rows) {
+    const eventId = row.live.calendarEventId
+    if (eventId) byEvent.set(eventId, (byEvent.get(eventId) ?? new Set()).add(row.accountId))
+  }
+
+  return byEvent
+}
+
+/**
  * Map an account row to a roster person
- * @param {AttendanceRow['account']} account - Account row
+ * @param {AttendanceRow} row - Roster row
  * @return {AttendancePerson} - Roster person
  */
 
-const toPerson = (account: AttendanceRow['account']): AttendancePerson => ({
-  name: account.displayName,
-  avatar: account.avatarUrl,
+const toPerson = (row: AttendanceRow, reinforced: Set<string>): AttendancePerson => ({
+  id: row.accountId,
+  name: row.account.displayName,
+  avatar: row.account.avatarUrl,
+  hours: hoursOf(row),
+  isReinforcement: reinforced.has(row.accountId),
 })
 
 /**
@@ -103,6 +157,8 @@ const toPerson = (account: AttendanceRow['account']): AttendancePerson => ({
  * @param {AttendanceRow[]} input.rows - Roster rows with their account
  * @param {string} input.viewerId - Signed-in member
  * @param {boolean} input.canManage - Viewer runs the roll-call
+ * @param {boolean} input.asksHours - A live asks for hours
+ * @param {Set<string>} input.reinforced - Members called in as reinforcement
  * @return {AttendanceRoster} - Standings
  */
 
@@ -110,10 +166,14 @@ export const buildRoster = ({
   rows,
   viewerId,
   canManage,
+  asksHours,
+  reinforced,
 }: {
   rows: AttendanceRow[]
   viewerId: string
   canManage: boolean
+  asksHours: boolean
+  reinforced: Set<string>
 }): AttendanceRoster => {
   const mineRow = rows.find((row) => row.accountId === viewerId)
   const mine = (mineRow?.status as AttendanceStatusName | undefined) ?? null
@@ -121,13 +181,17 @@ export const buildRoster = ({
   const visible = canManage
 
   const bucket = (status: AttendanceStatusName): AttendancePerson[] =>
-    visible ? rows.filter((row) => row.status === status).map((row) => toPerson(row.account)) : []
+    visible
+      ? rows.filter((row) => row.status === status).map((row) => toPerson(row, reinforced))
+      : []
 
   const countOf = (status: AttendanceStatusName): number =>
     rows.filter((row) => row.status === status).length
 
   return {
     mine,
+    asksHours,
+    myHours: mineRow ? hoursOf(mineRow) : null,
     canManage,
     visible,
     counts: {
@@ -159,39 +223,109 @@ export const readRosterFor = async (
     include: { account: { select: { displayName: true, avatarUrl: true } } },
   })
 
-  return buildRoster({ rows, viewerId, canManage })
+  const asking = await eventsAskingHours([eventId])
+  const reinforced = (await reinforcedByEvent([eventId])).get(eventId) ?? new Set<string>()
+
+  return buildRoster({ rows, viewerId, canManage, asksHours: asking.has(eventId), reinforced })
+}
+
+/**
+ * Check the hours given, none when the step was skipped
+ * @param {{ from: Date, to: Date } | null} hours - Hours given
+ * @return {{ from: Date, to: Date } | null} - Hours kept
+ */
+
+const keepHours = (hours: { from: Date; to: Date } | null): { from: Date; to: Date } | null => {
+  if (hours && hours.from >= hours.to) {
+    throw invalidInput([{ field: 'from', message: CALENDAR_COPY.badHours }])
+  }
+
+  return hours
 }
 
 /**
  * Record one member's answer to a roll-call
- * @param {string} eventId - Roll-call event
- * @param {string} accountId - Answering member
- * @param {AttendanceStatusName} status - Present or absent
- * @param {boolean} canManage - Answerer also runs the roll-call
+ * @param {Object} input - Answer
+ * @param {string} input.eventId - Roll-call event
+ * @param {string} input.accountId - Answering member
+ * @param {AttendanceStatusName} input.status - Present or absent
+ * @param {boolean} input.canManage - Answerer also runs the roll-call
+ * @param {{ from: Date, to: Date } | null} [input.hours] - Hours expected to be there
  * @return {Promise<AttendanceRoster>} - Refreshed standings
  */
 
-export const respondToRollCall = async (
-  eventId: string,
-  accountId: string,
-  status: AttendanceStatusName,
+export const respondToRollCall = async ({
+  eventId,
+  accountId,
+  status,
+  canManage,
+  hours = null,
+}: {
+  eventId: string
+  accountId: string
+  status: AttendanceStatusName
   canManage: boolean
-): Promise<AttendanceRoster> => {
+  hours?: { from: Date; to: Date } | null
+}): Promise<AttendanceRoster> => {
   // Only a convened member holds a row to answer with
   const row = await prisma.eventAttendance.findUnique({
     where: { eventId_accountId: { eventId, accountId } },
   })
   if (!row) throw forbidden()
 
+  // Hours only follow a Present on a live
+  const asking = await eventsAskingHours([eventId])
+  const kept =
+    status === AttendanceStatuses.Present && asking.has(eventId) ? keepHours(hours) : null
+
   await prisma.eventAttendance.update({
     where: { id: row.id },
-    data: { status, respondedAt: new Date() },
+    data: {
+      status,
+      respondedAt: new Date(),
+      availableFrom: kept?.from ?? null,
+      availableTo: kept?.to ?? null,
+    },
   })
 
   // An answer on a past live moves a junior's count
   await syncJuniorLives([accountId])
 
   return readRosterFor(eventId, accountId, canManage)
+}
+
+/**
+ * Move one convened member to a column, as the one running the roll-call
+ * @param {string} eventId - Roll-call event
+ * @param {string} accountId - Member moved
+ * @param {AttendanceStatusName} status - Column dropped on
+ * @param {string} viewerId - Signed-in member
+ * @return {Promise<AttendanceRoster>} - Refreshed standings
+ */
+
+export const moveOnRollCall = async (
+  eventId: string,
+  accountId: string,
+  status: AttendanceStatusName,
+  viewerId: string
+): Promise<AttendanceRoster> => {
+  const row = await prisma.eventAttendance.findUnique({
+    where: { eventId_accountId: { eventId, accountId } },
+  })
+  if (!row) throw notFound()
+
+  await prisma.eventAttendance.update({
+    where: { id: row.id },
+    data: {
+      status,
+      respondedAt: row.respondedAt ?? new Date(),
+      ...(status !== AttendanceStatuses.Present && { availableFrom: null, availableTo: null }),
+    },
+  })
+
+  await syncJuniorLives([accountId])
+
+  return readRosterFor(eventId, viewerId, true)
 }
 
 /**
@@ -357,7 +491,9 @@ export const notifyConvened = async (
  * @property {string} title - Event title
  * @property {string | null} emoji - Event glyph
  * @property {string} startsAt - ISO start
+ * @property {string | null} endsAt - ISO end
  * @property {AttendanceStatusName} status - Member's current answer
+ * @property {boolean} asksHours - A live asks for hours
  */
 
 export interface PendingRollCall {
@@ -365,11 +501,13 @@ export interface PendingRollCall {
   title: string
   emoji: string | null
   startsAt: string
+  endsAt: string | null
   status: AttendanceStatusName
+  asksHours: boolean
 }
 
 /**
- * Read the roll-calls that still concern one member
+ * Read the roll-calls still waiting on one member
  * @param {string} accountId - Signed-in member
  * @return {Promise<PendingRollCall[]>} - Upcoming roll-calls
  */
@@ -379,16 +517,27 @@ export const myRollCalls = async (accountId: string): Promise<PendingRollCall[]>
   start.setHours(0, 0, 0, 0)
 
   const rows = await prisma.eventAttendance.findMany({
-    where: { accountId, event: { rollCall: true, startsAt: { gte: start } } },
-    include: { event: { select: { id: true, title: true, emoji: true, startsAt: true } } },
+    // Only the ones still waiting on an answer
+    where: {
+      accountId,
+      status: AttendanceStatuses.Pending,
+      event: { rollCall: true, startsAt: { gte: start } },
+    },
+    include: {
+      event: { select: { id: true, title: true, emoji: true, startsAt: true, endsAt: true } },
+    },
     orderBy: { event: { startsAt: 'asc' } },
   })
+
+  const asking = await eventsAskingHours(rows.map((row) => row.event.id))
 
   return rows.map((row) => ({
     eventId: row.event.id,
     title: row.event.title,
     emoji: row.event.emoji,
     startsAt: row.event.startsAt.toISOString(),
+    endsAt: row.event.endsAt?.toISOString() ?? null,
     status: row.status as AttendanceStatusName,
+    asksHours: asking.has(row.event.id),
   }))
 }

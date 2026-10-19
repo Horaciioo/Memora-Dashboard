@@ -9,6 +9,8 @@ import { toOptions } from '@/core/lib/forms/options'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import {
   buildRoster,
+  eventsAskingHours,
+  reinforcedByEvent,
   expandRoster,
   notifyConvened,
   readRosterFor,
@@ -33,6 +35,7 @@ import {
   readLiveTemplateId,
   syncLiveWithEntry,
 } from '@/core/services/lives/LiveService'
+import { assertNoLiveClash } from '@/core/services/lives/LiveClashService'
 import { peopleInScope, projectOptions, youtuberOptions } from '@/core/services/work/shared'
 import {
   AUDIENCE_KEYS,
@@ -61,10 +64,11 @@ import {
   CALENDAR_SETTINGS,
   EMOJI_SETTINGS,
   FORM_SETTINGS,
+  LIVE_SETTINGS,
 } from '@/declarations/configurations/settings'
 import { ROUTES } from '@/declarations/navigation'
 import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
-import { FORM_GROUPS } from '@/declarations/ui/copy'
+import { FORM_COPY, FORM_GROUPS } from '@/declarations/ui/copy'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { AttendanceRoster, CalendarEntry } from '@/types/calendar'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
@@ -152,6 +156,21 @@ const teamOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
 // Roll-call form fields show only once presence is asked for
 const WHEN_ROLL_CALL = { field: 'rollCall', truthy: true } as const
 
+// Plain event fields the Live model replaces with its own
+const PLAIN_EVENT_FIELDS = [
+  'emoji',
+  'description',
+  'visibility',
+  'audienceLeadsOnly',
+  'allDay',
+  'accountId',
+  'projectId',
+  'rollCall',
+  'teamIds',
+  'memberIds',
+  'remindAt',
+]
+
 /**
  * Build the calendar entry form declarations
  * @param {AccessScope} [scope] - Creator perimeter
@@ -191,7 +210,7 @@ export const calendarFields = async (
       (viewer?.isAdmin || option.value !== EventVisibilities.Admins)
   )
 
-  return [
+  const fields: FieldDefinition[] = [
     {
       name: 'emoji',
       kind: 'emoji',
@@ -284,6 +303,15 @@ export const calendarFields = async (
       kind: 'datetime',
       label: CALENDAR_FIELD_COPY.endsAt,
       info: CALENDAR_FIELD_INFO.endsAt,
+      notBefore: 'startsAt',
+      // A live ends its usual duration after it starts, until the end is edited
+      ...(liveTemplateId && {
+        follows: {
+          field: 'startsAt',
+          minutes: LIVE_SETTINGS.defaultDurationMinutes,
+          when: { field: 'templateId', oneOf: [liveTemplateId] },
+        },
+      }),
       span: 'half',
       group: FORM_GROUPS.planning,
     },
@@ -353,6 +381,20 @@ export const calendarFields = async (
       visibleWhen: WHEN_ROLL_CALL,
     },
   ]
+
+  if (!liveTemplateId) return fields
+
+  // The Live model asks its own fields and convenes its own team
+  const notLive = { field: 'templateId', oneOf: [liveTemplateId], negate: true }
+
+  return fields.map((field) =>
+    PLAIN_EVENT_FIELDS.includes(field.name)
+      ? {
+          ...field,
+          visibleWhen: field.visibleWhen ? { ...field.visibleWhen, and: notLive } : notLive,
+        }
+      : field
+  )
 }
 
 /**
@@ -507,13 +549,19 @@ const rollCallRosters = async (
     include: { account: { select: { displayName: true, avatarUrl: true } } },
   })
 
+  const asking = await eventsAskingHours(rollCalls.map((row) => row.id))
+
+  const reinforced = await reinforcedByEvent(rollCalls.map((row) => row.id))
+
   return new Map(
     rollCalls.map((row) => [
       row.id,
       buildRoster({
+        reinforced: reinforced.get(row.id) ?? new Set<string>(),
         rows: seats.filter((seat) => seat.eventId === row.id),
         viewerId,
         canManage,
+        asksHours: asking.has(row.id),
       }),
     ])
   )
@@ -654,6 +702,18 @@ const toEntryData = (values: FormValues) => ({
   trainerId: null as string | null,
 })
 
+/**
+ * Refuse an entry ending before it starts
+ * @param {ReturnType<typeof toEntryData>} data - Payload read off the form
+ * @return {void} - Throws on an end behind the start
+ */
+
+const assertEndAfterStart = (data: ReturnType<typeof toEntryData>): void => {
+  if (data.endsAt && data.endsAt < data.startsAt) {
+    throw invalidInput([{ field: 'endsAt', message: FORM_COPY.endBeforeStart }])
+  }
+}
+
 // Milliseconds in a day
 const DAY = 86_400_000
 
@@ -721,6 +781,7 @@ export const createEntry = async (
   academy: AcademyScope
 ): Promise<CalendarEntry> => {
   const base = toEntryData(values)
+  assertEndAfterStart(base)
   const { memberIds: convened, ...fixed } = await resolveAcademyEntry(
     base.templateId,
     values,
@@ -732,6 +793,7 @@ export const createEntry = async (
   // A live is checked before anything is written, and always calls the roll
   const isLive = applied.templateId !== null && applied.templateId === (await readLiveTemplateId())
   const live = isLive ? await readLiveInput(values) : null
+  if (live) await assertNoLiveClash({ ...live, startsAt: applied.startsAt, endsAt: applied.endsAt })
   const data = live ? { ...applied, rollCall: true, youtuberId: live.youtuberId } : applied
 
   const row = await prisma.calendarEvent.create({
@@ -749,12 +811,7 @@ export const createEntry = async (
       entry: row,
       live: {
         ...live,
-        pickedIds: await expandRoster(
-          data.rollCallTeamIds,
-          readList(values, 'memberIds'),
-          scope,
-          data.startsAt
-        ),
+        pickedIds: [],
       },
       actorId: ownerId,
       scope,
@@ -808,6 +865,7 @@ export const updateEntry = async (
   academy: AcademyScope
 ): Promise<CalendarEntry> => {
   const base = toEntryData(values)
+  assertEndAfterStart(base)
   const { memberIds: convened, ...fixed } = await resolveAcademyEntry(
     base.templateId,
     values,
