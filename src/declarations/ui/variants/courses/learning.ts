@@ -24,16 +24,35 @@ export const TASK_LIST = {
  */
 
 export const TASK_STEPPER = {
-  body: 'flex flex-col gap-6',
+  body: 'flex min-h-full flex-col gap-10',
   hero: 'flex flex-col items-center gap-3 rounded-[var(--radius-xl)] bg-[image:var(--gradient-soft)] px-6 py-8 text-center',
+  // Creator banner behind the card, as on a live on air
+  heroMedia:
+    'relative isolate flex-row justify-start gap-5 overflow-hidden bg-[var(--color-media-shade)] px-6 py-8 text-left text-[var(--color-on-media)] [&>*]:text-[var(--color-on-media)]',
+  heroPortrait: 'shrink-0 shadow-[var(--shadow-lg)] ring-4 ring-[var(--color-on-media)]',
+  heroBackdrop: 'absolute inset-0 -z-10 h-full w-full scale-125 object-cover blur-2xl saturate-150',
   heroGlyph: 'size-12 shrink-0 text-[var(--color-ink)]',
   heroTitle: 'text-xl leading-tight font-bold tracking-tight text-[var(--color-ink)]',
   heroMeta: 'text-sm font-medium text-[var(--color-ink-subtle)]',
   heroDue: 'rounded-full glass-soft px-3 py-1 text-xs font-semibold text-[var(--color-ink)]',
-  dots: 'flex items-center justify-center gap-1.5',
-  dot: 'h-1.5 w-1.5 rounded-full bg-[var(--color-border-strong)] transition-all',
-  dotActive: 'w-5 bg-[var(--color-ink)]',
+  // Position among the walk, then its timeline pinned to the bottom of the body
+  infosGroup: 'flex w-full flex-col gap-3 self-stretch !text-left',
+  infos: `${PROPERTY_LABEL} !text-left`,
+  facts: 'flex flex-col gap-3',
+  fact: 'flex items-center justify-start gap-3 !text-left text-sm font-semibold',
+  factGlyph: 'size-5 shrink-0 text-[var(--color-ink-subtle)]',
+  counter:
+    'border-b border-[var(--color-border)] pb-4 text-center text-sm font-semibold text-[var(--color-ink-subtle)]',
+  detail:
+    'text-center [&_*]:text-center [&_div]:items-center [&_dl]:grid-cols-1 [&_dl>div]:col-span-1',
+  timeline: 'mt-auto flex items-center justify-center gap-2.5',
+  step: 'size-2.5 shrink-0 rounded-full border border-[var(--color-border-strong)] transition-all hover:border-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  stepDone: 'border-transparent bg-[var(--color-ink-subtle)]',
+  stepActive: 'w-9 border-transparent bg-[var(--color-ink)]',
+  stepEdge: 'scale-60',
   footer: 'flex flex-col gap-2 p-2',
+  // Side by side filling the width, stacked from md
+  lines: 'flex items-stretch gap-2 p-1 md:flex-col',
   nav: 'flex items-center justify-between gap-2',
   actions: 'flex flex-wrap items-center justify-center gap-2',
 } as const

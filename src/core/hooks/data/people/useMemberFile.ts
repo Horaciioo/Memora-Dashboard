@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 
 import { apiDelete, apiPatch, apiPost, apiPut } from '@/core/lib/api/client'
@@ -18,6 +19,7 @@ import type { MemberAbsence, MemberDetail, MemberNote, MemberSocial } from '@/ty
  * @property {MemberAbsence[]} absences - Absences
  * @property {(values: FormValues) => Promise<boolean>} addAbsence - Post an absence
  * @property {(id: string, values: FormValues) => Promise<boolean>} updateAbsence - Edit dates and reason
+ * @property {(id: string) => Promise<void>} removeAbsence - Delete an absence
  * @property {PermissionLayers} overrides - Permission overwrites
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
@@ -38,6 +40,7 @@ export interface MemberFile {
   absences: MemberAbsence[]
   addAbsence: (values: FormValues) => Promise<boolean>
   updateAbsence: (id: string, values: FormValues) => Promise<boolean>
+  removeAbsence: (id: string) => Promise<void>
   overrides: PermissionLayers
   isSaving: boolean
   issues: FieldIssue[]
@@ -63,6 +66,7 @@ export const useMemberFile = (
   detail: MemberDetail,
   initialOverrides: PermissionLayers
 ): MemberFile => {
+  const router = useRouter()
   const memberId = detail.summary.id
   const [notes, setNotes] = useState(detail.notes)
   const [socials, setSocials] = useState(detail.socials)
@@ -147,6 +151,22 @@ export const useMemberFile = (
     [run]
   )
 
+  const removeAbsence = useCallback(
+    async (id: string) => {
+      const done = await run(
+        () => apiDelete<{ id: string }>(API_ROUTES.absence(id)),
+        feedbackTitle('Absence', 'deleted', 'feminine')
+      )
+
+      if (!done) return
+
+      setAbsences((current) => current.filter((entry) => entry.id !== id))
+      // Absent flag lives on the server summary
+      router.refresh()
+    },
+    [router, run]
+  )
+
   const addSocial = useCallback(
     async (values: FormValues) => {
       const name = typeof values.handle === 'string' ? values.handle : undefined
@@ -228,6 +248,7 @@ export const useMemberFile = (
     absences,
     addAbsence,
     updateAbsence,
+    removeAbsence,
     overrides,
     isSaving,
     issues,

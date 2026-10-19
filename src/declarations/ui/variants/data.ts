@@ -458,6 +458,11 @@ export const CALENDAR_STYLES = {
   rollCallGroup: 'flex flex-col gap-1.5',
   rollCallPeople: 'flex flex-col gap-1',
   rollCallPerson: 'flex items-center gap-2 text-sm',
+  rollCallDrop:
+    'rounded-[var(--radius-md)] border border-dashed border-transparent p-1.5 transition-colors',
+  rollCallOver: 'border-[var(--color-border-strong)] bg-[var(--color-hover)]',
+  rollCallMovable: 'cursor-grab active:cursor-grabbing',
+  rollCallDragged: 'opacity-40',
   // Hover preview card
   preview:
     'fixed z-[70] flex w-72 flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel p-4 text-sm shadow-[var(--shadow-md)]',
@@ -497,7 +502,7 @@ export const CALENDAR_GRID_STYLES = {
   dropTarget: 'bg-[var(--color-hover)] ring-2 ring-[var(--color-border-strong)] ring-inset',
   nowLine: 'pointer-events-none absolute inset-x-0 z-30 h-0.5 bg-[var(--color-danger)]',
   nowLabel:
-    'absolute left-1 -translate-y-1/2 rounded-full bg-[var(--color-danger)] px-1.5 py-0.5 text-micro font-bold text-[var(--color-on-brand)] tabular-nums',
+    'absolute left-1 -translate-y-1/2 rounded-full bg-[var(--color-danger)] px-1.5 py-0.5 text-micro font-bold text-[var(--color-on-solid)] tabular-nums',
   cellAdd:
     'absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover/cell:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-ink-accent)] focus-visible:opacity-100',
   cellAddIcon: 'h-4 w-4',

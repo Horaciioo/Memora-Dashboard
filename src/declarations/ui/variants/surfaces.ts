@@ -241,8 +241,13 @@ export const DRAWER_ACTIONS = {
   // Filled gestures
   line: 'flex size-11 shrink-0 items-center justify-center gap-2.5 rounded-full text-sm font-bold text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60 md:size-auto md:w-full md:rounded-[var(--radius-md)] md:px-4 md:py-3',
   lineLabel: 'hidden md:inline',
-  save: 'bg-[var(--color-success)]',
-  cancel: 'bg-[var(--color-danger)]',
+  // No glyph: the label stays, the line keeps its width on a phone
+  linePlain:
+    '!size-auto min-w-0 flex-1 !rounded-[var(--radius-md)] px-4 py-3 md:w-full md:flex-none',
+  lineLabelPlain: 'inline',
+  save: 'bg-[var(--color-success)] !text-[var(--color-on-solid)]',
+  cancel: 'bg-[var(--color-danger)] !text-[var(--color-on-solid)]',
+  neutral: 'bg-[var(--color-hover)] !text-[var(--color-ink)]',
   icon: 'h-5 w-5 shrink-0 md:h-4.5 md:w-4.5',
   divider: 'mx-1 hidden h-px bg-[var(--color-border)] md:block',
   note: 'mb-4 text-sm text-[var(--color-ink-subtle)]',
@@ -579,4 +584,16 @@ export const PAGE_OPTIONS = {
   // Many choices take the line under their label
   rowStacked:
     'flex-col items-stretch gap-2 [&_[role=group]]:w-full [&_[role=group]>button]:flex-1 [&_[role=group]>button]:px-2',
+} as const
+
+/**
+ * Items of one line split by a drawn dot
+ * @type {Record<string, string>}
+ */
+
+export const DOTTED = {
+  root: 'inline-flex flex-wrap items-center gap-x-2 gap-y-0.5',
+  dot: 'size-1 shrink-0 rounded-full bg-current opacity-40',
+  // Between two inline pieces of text
+  mark: 'mx-2 inline-block size-1 rounded-full bg-current align-middle opacity-40',
 } as const
