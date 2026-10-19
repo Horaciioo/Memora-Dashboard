@@ -1,6 +1,7 @@
 'use client'
 
 import { Avatar } from '@/components/elements/display/Avatar'
+import { ReinforcementTag } from '@/composites/lives/ReinforcementTag'
 import { SkeletonList } from '@/components/elements/feedback/Skeleton'
 import { useLiveRoster } from '@/core/hooks/data/lives/useLiveRoster'
 import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
@@ -42,9 +43,7 @@ export const LiveRosterBoard = ({ liveId }: LiveRosterBoardProps) => {
     <section className={LIVE_ROSTER.root} aria-label={LIVE_ROSTER_COPY.title}>
       <header className={LIVE_ROSTER.head}>
         <h3 className={LIVE_ROSTER.title}>{LIVE_ROSTER_COPY.title}</h3>
-        <p className={LIVE_ROSTER.lead}>
-          {roster?.canManage ? LIVE_ROSTER_COPY.leadManage : LIVE_ROSTER_COPY.lead}
-        </p>
+        {!roster?.canManage && <p className={LIVE_ROSTER.lead}>{LIVE_ROSTER_COPY.lead}</p>}
       </header>
 
       {!roster ? (
@@ -131,7 +130,8 @@ const RosterPerson = ({ person, canManage, isDragged, dragProps, onMove }: Roste
       {...(canManage ? { onContextMenu: menu.onContextMenu } : {})}
     >
       <Avatar name={person.name} src={person.avatar} size="xs" />
-      {person.name}
+      <span className={LIVE_ROSTER.name}>{person.name}</span>
+      {person.isReinforcement && <ReinforcementTag />}
       {person.isJunior && <span className={LIVE_ROSTER.junior}>{LIVE_ROSTER_COPY.junior}</span>}
     </div>
   )

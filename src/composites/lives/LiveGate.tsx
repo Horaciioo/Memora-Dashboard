@@ -1,19 +1,28 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
+import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { Avatar } from '@/components/elements/display/Avatar'
 import { Markdown } from '@/components/elements/display/Markdown'
+import { SeatNote } from '@/composites/lives/LiveCoordinator'
+import { LivePresenceChoice } from '@/composites/lives/LivePresenceChoice'
+import type { PresenceDecision } from '@/composites/lives/LivePresenceChoice'
+import { gateState } from '@/core/lib/lives/gate'
+import { Dialog } from '@/components/structures/overlays/Dialog'
 import { InlineMarkdown } from '@/components/structures/inline/InlineMarkdown'
-import { LiveRosterBoard } from '@/composites/lives/LiveRosterBoard'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { apiPatch } from '@/core/lib/api/client'
+import { apiPatch, apiPost } from '@/core/lib/api/client'
+import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_PAGE_COPY } from '@/declarations/lives/copy'
+import { ROUTES } from '@/declarations/navigation'
 import { LIVE_GATE } from '@/declarations/ui/variants'
-import type { LiveView } from '@/types/lives'
+import type { LiveCoordinatorSeat, LivePerson, LiveView } from '@/types/lives'
 
 // Opens the instructions again from inside the Mod View
 const RereadContext = createContext<(() => void) | null>(null)
@@ -25,23 +34,6 @@ const RereadContext = createContext<(() => void) | null>(null)
 
 export const useReread = (): (() => void) | null => useContext(RereadContext)
 
-// Read once per live and browser
-const readKey = (liveId: string) => `memora:live-instructions:${liveId}`
-
-/**
- * Whether the instructions of a live were already read here
- * @param {string} liveId - Live
- * @return {boolean} - Read
- */
-
-const wasRead = (liveId: string): boolean => {
-  try {
-    return window.localStorage.getItem(readKey(liveId)) !== null
-  } catch {
-    return false
-  }
-}
-
 export interface LiveGateProps {
   live: LiveView
   canEdit: boolean
@@ -50,7 +42,7 @@ export interface LiveGateProps {
 }
 
 /**
- * Instructions of the responsables and the roll-call first
+ * Recap of the live read before the Mod View
  * @param {LiveView} live - Live
  * @param {boolean} canEdit - Viewer may rewrite the instructions
  * @param {ReactNode} children - Mod View
@@ -60,19 +52,27 @@ export interface LiveGateProps {
 export const LiveGate = ({ live, canEdit, children }: LiveGateProps) => {
   const [isOpen, setOpen] = useState(false)
   const [instructions, setInstructions] = useState(live.instructions)
-  const { run } = useMutation()
+  const { run, isSaving } = useMutation()
 
-  // A member who already read them goes straight to the Mod View
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (wasRead(live.id)) setOpen(true)
-  }, [live.id])
+  const router = useRouter()
+  const client = useQueryClient()
 
-  const open = () => {
-    try {
-      window.localStorage.setItem(readKey(live.id), new Date().toISOString())
-    } catch {
-      // Read again next time
+  // Everyone says whether they stay before the Mod View
+  const [decision, setDecision] = useState<PresenceDecision | null>(null)
+  const canOpen = decision !== null || gateState(live, new Date()) === 'answered'
+
+  const open = async () => {
+    // Hours already given stand, nothing to send
+    if (decision) {
+      const hours = decision.to
+        ? { from: decision.from ?? new Date().toISOString(), to: decision.to }
+        : {}
+      const done = await run(() =>
+        apiPost(API_ROUTES.liveRoster(live.id), { status: decision.status, ...hours })
+      )
+      if (!done) return
+
+      await client.invalidateQueries({ queryKey: QUERY_KEYS.liveRoster(live.id) })
     }
     setOpen(true)
   }
@@ -95,31 +95,82 @@ export const LiveGate = ({ live, canEdit, children }: LiveGateProps) => {
     )
   }
 
+  const group = (label: string, rows: { person: LivePerson; seat?: LiveCoordinatorSeat }[]) => (
+    <section className={LIVE_GATE.group}>
+      <h3 className={LIVE_GATE.label}>{label}</h3>
+      {rows.length === 0 ? (
+        <p className={LIVE_GATE.lead}>{LIVE_PAGE_COPY.recapNobody}</p>
+      ) : (
+        <ul className={LIVE_GATE.people}>
+          {rows.map(({ person, seat }) => (
+            <li key={person.id} className={LIVE_GATE.person}>
+              <Avatar name={person.name} src={person.avatar} size="sm" />
+              <span className={LIVE_GATE.personText}>
+                <span className={LIVE_GATE.personName}>{person.name}</span>
+                {seat && <SeatNote seat={seat} />}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+
   return (
-    <div className={LIVE_GATE.root}>
-      <section className={LIVE_GATE.card}>
-        <h2 className={LIVE_GATE.title}>{LIVE_PAGE_COPY.instructionsTitle}</h2>
-        <p className={LIVE_GATE.lead}>{LIVE_PAGE_COPY.instructionsLead}</p>
-        {canEdit ? (
-          <InlineMarkdown
-            id={`live-instructions-${live.id}`}
-            value={instructions}
-            placeholder={LIVE_PAGE_COPY.instructionsEmpty}
-            maxLength={FORM_SETTINGS.markdownMaxLength}
-            onCommit={save}
-          />
-        ) : instructions ? (
-          <Markdown source={instructions} />
-        ) : (
-          <p className={LIVE_GATE.lead}>{LIVE_PAGE_COPY.instructionsEmpty}</p>
-        )}
-        <LiveRosterBoard liveId={live.id} />
-      </section>
-      <div className={LIVE_GATE.actions}>
-        <Button variant="primary" icon="forward" onClick={open}>
+    <Dialog
+      open
+      size="xl"
+      title={LIVE_PAGE_COPY.recapTitle}
+      description={LIVE_PAGE_COPY.recapLead}
+      onClose={() => router.push(ROUTES.lives)}
+      footer={
+        <Button
+          variant="primary"
+          icon="forward"
+          disabled={!canOpen}
+          isLoading={isSaving}
+          onClick={() => void open()}
+        >
           {LIVE_PAGE_COPY.open}
         </Button>
+      }
+    >
+      <div className={LIVE_GATE.body}>
+        <div className={LIVE_GATE.side}>
+          <section className={LIVE_GATE.group}>
+            <h3 className={LIVE_GATE.label}>{LIVE_PAGE_COPY.recapLive}</h3>
+            <p className={LIVE_GATE.creator}>{live.title}</p>
+          </section>
+          {group(
+            LIVE_PAGE_COPY.recapResponsables,
+            live.responsables.map((person) => ({ person }))
+          )}
+          {group(
+            LIVE_PAGE_COPY.recapCoordinators,
+            live.coordinators.map((seat) => ({ person: seat.person, seat }))
+          )}
+        </div>
+        <div className={LIVE_GATE.divider} role="separator" />
+        <section className={LIVE_GATE.instructions}>
+          <h3 className={LIVE_GATE.label}>{LIVE_PAGE_COPY.instructionsTitle}</h3>
+          <div className={LIVE_GATE.instructionsBox}>
+            {canEdit ? (
+              <InlineMarkdown
+                id={`live-instructions-${live.id}`}
+                value={instructions}
+                placeholder={LIVE_PAGE_COPY.instructionsEmpty}
+                maxLength={FORM_SETTINGS.markdownMaxLength}
+                onCommit={save}
+              />
+            ) : instructions ? (
+              <Markdown source={instructions} />
+            ) : (
+              <p className={LIVE_GATE.lead}>{LIVE_PAGE_COPY.instructionsEmpty}</p>
+            )}
+          </div>
+          <LivePresenceChoice live={live} decision={decision} onDecide={setDecision} />
+        </section>
       </div>
-    </div>
+    </Dialog>
   )
 }

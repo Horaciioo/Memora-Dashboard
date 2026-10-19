@@ -46,7 +46,7 @@ export const EVENT_TYPES = createEnumeration({
   LiveAnnounced: { id: 37, label: 'Live annoncé' },
   LiveMoved: { id: 38, label: 'Live changé de statut' },
   PlatformLinked: { id: 39, label: 'Compte de plateforme lié' },
-  ModerationActed: { id: 40, label: 'Geste de modération' },
+  ModerationActed: { id: 40, label: 'Action de Mod.' },
   LiveRosterMoved: { id: 41, label: 'Appel d’un live corrigé' },
   ParkourMoved: { id: 42, label: 'Parcours PIM' },
   LiveFocused: { id: 43, label: 'Focus sur un modérateur' },
@@ -73,6 +73,8 @@ export const EVENT_TYPES = createEnumeration({
   DataExported: { id: 64, label: 'Données exportées' },
   JobFailed: { id: 65, label: 'Tâche de fond échouée' },
   JobRetried: { id: 66, label: 'Tâche de fond relancée' },
+  LiveCoordinatorsChanged: { id: 67, label: 'Coordinateurs d’un live changés' },
+  LiveReinforced: { id: 68, label: 'Renfort appelé sur un live' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

@@ -76,3 +76,23 @@ export const activeCoordinatorIds = (seats: CoordinationSeat[], now = new Date()
         seat.status === CoordinationStatuses.Accepted && seat.endsAt !== null && seat.endsAt >= now
     )
     .map((seat) => seat.accountId)
+
+/**
+ * Members of a live's seats coordinating right now
+ * @param {{ person: { id: string }, status: CoordinationStatusName, endsAt: string | null }[]} seats - Seats of the live
+ * @param {Date} [now] - Moment checked
+ * @return {string[]} - Members whose agreed window is not over
+ */
+
+export const coordinatingNow = (
+  seats: { person: { id: string }; status: CoordinationStatusName; endsAt: string | null }[],
+  now = new Date()
+): string[] =>
+  seats
+    .filter(
+      (seat) =>
+        seat.status === CoordinationStatuses.Accepted &&
+        seat.endsAt !== null &&
+        Date.parse(seat.endsAt) >= now.getTime()
+    )
+    .map((seat) => seat.person.id)

@@ -4,6 +4,7 @@ import Link from '@/components/elements/navigation/AppLink'
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { Dialog } from '@/components/structures/overlays/Dialog'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { LiveRosterBoard } from '@/composites/lives/LiveRosterBoard'
 import { LIVE_COPY, LIVE_ROSTER_COPY } from '@/declarations/lives/copy'
@@ -64,24 +65,19 @@ export const LiveActions = ({
   return (
     <>
       <div className={cn(LIVE_BOARD.actions, className)}>
-        {isLive
-          ? !hideOpen && (
-              <Link
-                href={ROUTES.live(live.id)}
-                className={cn(BUTTON_STYLES.base, BUTTON_STYLES.primary)}
-              >
-                {LIVE_COPY.openModView}
-              </Link>
-            )
-          : canMove && (
-              <Button
-                variant="success"
-                isLoading={isSaving}
-                onClick={() => request(LiveStatuses.Live)}
-              >
-                {LIVE_COPY.start}
-              </Button>
-            )}
+        {!hideOpen && live.access === 'open' && (
+          <Link
+            href={ROUTES.live(live.id)}
+            className={cn(BUTTON_STYLES.base, BUTTON_STYLES.primary)}
+          >
+            {LIVE_COPY.openModView}
+          </Link>
+        )}
+        {!isLive && canMove && (
+          <Button variant="success" isLoading={isSaving} onClick={() => request(LiveStatuses.Live)}>
+            {LIVE_COPY.start}
+          </Button>
+        )}
         {isLive && live.permissions.includes(Permissions.LiveLogRead) && (
           <Link
             href={ROUTES.liveReport(live.id)}
@@ -90,12 +86,8 @@ export const LiveActions = ({
             {LIVE_REPORT_COPY.open}
           </Link>
         )}
-        <Button
-          variant="ghost"
-          aria-expanded={isRosterOpen}
-          onClick={() => setRosterOpen((open) => !open)}
-        >
-          {isRosterOpen ? LIVE_ROSTER_COPY.close : LIVE_ROSTER_COPY.open}
+        <Button variant="ghost" onClick={() => setRosterOpen(true)}>
+          {LIVE_ROSTER_COPY.open}
         </Button>
         {canMove && (
           <Button
@@ -106,7 +98,14 @@ export const LiveActions = ({
           </Button>
         )}
       </div>
-      {isRosterOpen && <LiveRosterBoard liveId={live.id} />}
+      <Dialog
+        open={isRosterOpen}
+        title={LIVE_ROSTER_COPY.title}
+        size="lg"
+        onClose={() => setRosterOpen(false)}
+      >
+        <LiveRosterBoard liveId={live.id} />
+      </Dialog>
       <ConfirmDialog
         open={confirming !== null}
         title={isEnding ? LIVE_COPY.end : LIVE_COPY.cancel}

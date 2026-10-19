@@ -19,6 +19,7 @@ import { peopleInScope } from '@/core/services/work/shared'
 import { publishLive } from '@/core/lib/lives/bus'
 import { activeCoordinatorIds, coordinationGaps } from '@/core/lib/lives/coordination'
 import type { CoordinationSeat } from '@/core/lib/lives/coordination'
+import { isReopenable, liveAccess } from '@/core/lib/lives/access'
 import { livePermissions } from '@/core/lib/lives/permissions'
 import { liveStartedKey } from '@/declarations/academy/welcome'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
@@ -44,9 +45,11 @@ import type { LivePlatformName, LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { Permissions } from '@/utils/constants/permissions'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
+import type { AttendanceStatusName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
-const MINUTE = 60_000
+// Roles that run a live on the floor
+const RESPONSABLE_ROLES: string[] = [MemberRoles.Responsable, MemberRoles.Admin]
 
 // Person shape every seat reads
 const PERSON = { select: { id: true, displayName: true, avatarUrl: true } } as const
@@ -56,7 +59,17 @@ const LIVE_SHAPE = {
   youtuber: { select: { id: true, name: true, avatarUrl: true, bannerUrl: true } },
   announcedBy: PERSON,
   coordinations: { include: { account: PERSON }, orderBy: { askedAt: 'asc' } },
-  members: { include: { account: PERSON }, orderBy: { convokedAt: 'asc' } },
+  calendarEvent: {
+    select: {
+      attendances: {
+        select: { accountId: true, status: true, availableFrom: true, availableTo: true },
+      },
+    },
+  },
+  members: {
+    include: { account: { select: { ...PERSON.select, role: true } } },
+    orderBy: { convokedAt: 'asc' },
+  },
   liveconEntries: {
     where: { endedAt: null },
     include: { level: true },
@@ -89,9 +102,24 @@ const toPerson = (
 const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): LiveView => {
   const entry = row.liveconEntries[0]
   const coordinatorIds = activeCoordinatorIds(row.coordinations)
+  const mySeat = row.calendarEvent?.attendances.find((seat) => seat.accountId === viewerId)
+
+  const prepMs = LIVE_SETTINGS.prepMinutes * 60_000
 
   return {
     id: row.id,
+    access: liveAccess(
+      { status: row.status, plannedStartAt: row.plannedStartAt },
+      new Date(),
+      LIVE_SETTINGS.prepMinutes
+    ),
+    opensAt: new Date(+row.plannedStartAt - prepMs).toISOString(),
+    canReopen:
+      isReopenable(row, new Date(), LIVE_SETTINGS.recentHours) &&
+      (held.includes(Permissions.LiveAnnounce) ||
+        row.coordinations.some(
+          (seat) => seat.accountId === viewerId && seat.status === CoordinationStatuses.Accepted
+        )),
     title: row.title,
     platform: row.platform,
     status: row.status,
@@ -118,9 +146,19 @@ const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): LiveVie
     })),
     isCoordinating: coordinatorIds.includes(viewerId),
     instructions: row.instructions,
-    members: row.members
-      .map((seat) => toPerson(seat.account))
-      .filter((person): person is LivePerson => person !== null),
+    myAttendance: (mySeat?.status as AttendanceStatusName | undefined) ?? null,
+    myHours:
+      mySeat?.availableFrom && mySeat.availableTo
+        ? { from: mySeat.availableFrom.toISOString(), to: mySeat.availableTo.toISOString() }
+        : null,
+    responsables: row.members
+      .filter((seat) => RESPONSABLE_ROLES.includes(seat.account.role))
+      .map((seat) => toPerson(seat.account) as LivePerson),
+    members: row.members.flatMap((seat) => {
+      const person = toPerson(seat.account)
+
+      return person ? [{ ...person, isReinforcement: seat.reinforcement }] : []
+    }),
     liveconLevel: entry
       ? {
           level: entry.level.level,
@@ -234,7 +272,7 @@ const coordinatorWhere = (youtuberId?: string): Prisma.AccountWhereInput => ({
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-const coordinatorOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
+export const coordinatorOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
   const rows = await prisma.account.findMany({
     where: { AND: [coordinatorWhere(), peopleInScope(scope)] },
     orderBy: { displayName: 'asc' },
@@ -294,7 +332,6 @@ export const liveFormFields = async (
       name: 'coordinatorIds',
       kind: 'multiselect',
       label: LIVE_FIELD_COPY.coordinator,
-      hint: LIVE_FIELD_COPY.coordinatorHint,
       options: coordinators,
       ownerField: 'youtuberId',
       mark: 'avatar',
@@ -331,7 +368,7 @@ const readPlatform = (values: FormValues): LivePlatformName => {
  * @return {Promise<void>} - Throws on a member that cannot coordinate
  */
 
-const assertCoordinators = async (youtuberId: string, picked: string[]): Promise<void> => {
+export const assertCoordinators = async (youtuberId: string, picked: string[]): Promise<void> => {
   if (picked.length === 0) return
 
   const allowed = await prisma.account.count({
@@ -407,7 +444,8 @@ export const readLiveInput = async (values: FormValues): Promise<LiveInput> => {
     youtuberId,
     platform,
     coordinatorIds,
-    pickedIds: readList(values, 'memberIds'),
+    // The creator's live team is convened, nobody else is named
+    pickedIds: [],
     instructions: readText(values, 'instructions'),
   }
 }
@@ -433,16 +471,14 @@ export const openLive = async ({
   actorId: string
   scope: AccessScope
 }): Promise<string> => {
-  // Planned end is informative, closing the live stays manual
-  const endsAt =
-    entry.endsAt ??
-    new Date(entry.startsAt.getTime() + LIVE_SETTINGS.defaultDurationMinutes * MINUTE)
+  // Planned end is the one typed, none is invented, closing the live stays manual
+  const { endsAt } = entry
 
   const convened = await convene({
     youtuberId: input.youtuberId,
     picked: input.pickedIds,
     startsAt: entry.startsAt,
-    endsAt,
+    endsAt: endsAt ?? entry.startsAt,
     scope,
   })
   const memberIds = [...new Set([...input.coordinatorIds, ...convened])]
@@ -598,6 +634,61 @@ export const listOpenLives = async (
 }
 
 /**
+ * Read the lives closed within the last day
+ * @param {AccessScope} scope - Creator perimeter
+ * @param {string} viewerId - Signed-in member
+ * @param {PermissionName[]} held - Permissions held
+ * @return {Promise<LiveView[]>} - Lives closed lately, latest first
+ */
+
+export const listRecentLives = async (
+  scope: AccessScope,
+  viewerId: string,
+  held: PermissionName[]
+): Promise<LiveView[]> => {
+  const since = new Date(Date.now() - LIVE_SETTINGS.recentHours * 3_600_000)
+  const rows = await prisma.live.findMany({
+    where: scopedWhere('live', scope, { status: LiveStatuses.Ended, endedAt: { gte: since } }),
+    include: LIVE_SHAPE,
+    orderBy: { endedAt: 'desc' },
+    take: LIVE_SETTINGS.maxOpenLives,
+  })
+
+  return rows.map((row) => toView(row, viewerId, held))
+}
+
+/**
+ * Put back a live closed by mistake
+ * @param {string} id - Live identifier
+ * @param {string} viewerId - Signed-in member
+ * @param {PermissionName[]} held - Permissions held
+ * @param {AccessScope} scope - Actor's perimeter
+ * @return {Promise<LiveView>} - Live running again
+ */
+
+export const reopenLive = async (
+  id: string,
+  viewerId: string,
+  held: PermissionName[],
+  scope: AccessScope
+): Promise<LiveView> => {
+  const live = await readLive(id, scope, viewerId, held)
+  if (!live.canReopen) throw forbidden()
+
+  await prisma.live.update({
+    where: { id },
+    data: { status: LiveStatuses.Live, endedAt: null },
+  })
+  await publishLive(LIVE_TOPICS.lives, {
+    liveId: id,
+    youtuberId: live.youtuber.id,
+    status: LiveStatuses.Live,
+  })
+
+  return readLive(id, scope, viewerId, held)
+}
+
+/**
  * Read the lives already over
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} viewerId - Signed-in member
@@ -610,10 +701,14 @@ export const listPastLives = async (
   scope: AccessScope,
   viewerId: string,
   held: PermissionName[],
-  limit: number
+  limit: number,
+  onlyCoordinated = false
 ): Promise<LiveView[]> => {
   const rows = await prisma.live.findMany({
-    where: scopedWhere('live', scope, { status: LiveStatuses.Ended }),
+    where: scopedWhere('live', scope, {
+      status: LiveStatuses.Ended,
+      ...(onlyCoordinated && { coordinations: { some: { accountId: viewerId } } }),
+    }),
     include: LIVE_SHAPE,
     orderBy: { endedAt: 'desc' },
     take: limit,
@@ -670,6 +765,7 @@ export const readBeacon = async (
       platform: true,
       plannedStartAt: true,
       youtuber: { select: { name: true, avatarUrl: true } },
+      members: { where: { accountId: viewerId, reinforcement: true }, select: { accountId: true } },
     },
     orderBy: { plannedStartAt: 'asc' },
     take: LIVE_SETTINGS.maxOpenLives,
@@ -699,6 +795,7 @@ export const readBeacon = async (
       platform: row.platform,
       status: row.status,
       plannedStartAt: row.plannedStartAt.toISOString(),
+      isReinforcement: row.members.length > 0,
     })),
   }
 }

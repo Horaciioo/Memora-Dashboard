@@ -1,9 +1,14 @@
 'use client'
 
+import { Avatar } from '@/components/elements/display/Avatar'
+import { Dotted } from '@/components/elements/display/Dotted'
 import Link from '@/components/elements/navigation/AppLink'
 import { useState } from 'react'
 
+import { Pagination } from '@/components/elements/navigation/Pagination'
 import { Section } from '@/components/structures/page/Section'
+import { ReinforcementTag } from '@/composites/lives/ReinforcementTag'
+import { ModSpan } from '@/composites/lives/ModSpan'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_PLATFORM_REGISTRY } from '@/declarations/lives/registries'
 import {
@@ -17,6 +22,9 @@ import { LIVE_REPORT, MEMBER_MODERATION } from '@/declarations/ui/variants'
 import type { MemberModerationView as View } from '@/types/lives'
 import { formatDay } from '@/utils/format/dates'
 import { formatClock, formatDuration, formatExactSpan, formatSpan } from '@/utils/format/modview'
+
+// Words around the time
+const [TIME_BEFORE, TIME_AFTER] = MEMBER_MODERATION_COPY.activeTime.split('{time}')
 
 export interface MemberModerationViewProps {
   view: View | null
@@ -33,8 +41,13 @@ export interface MemberModerationViewProps {
 
 export const MemberModerationView = ({ view, canOpenReports }: MemberModerationViewProps) => {
   const [open, setOpen] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
   if (!view) return <p className={LIVE_REPORT.notice}>{MEMBER_MODERATION_COPY.unavailable}</p>
+
+  const size = LIVE_SETTINGS.memberLivesPageSize
+  const pages = Math.max(1, Math.ceil(view.lives.length / size))
+  const current = Math.min(page, pages)
 
   return (
     <div className={MEMBER_MODERATION.stack}>
@@ -64,18 +77,10 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
           <p className={LIVE_REPORT.empty}>{MEMBER_MODERATION_COPY.empty}</p>
         ) : (
           <ul className={MEMBER_MODERATION.list}>
-            {view.lives.map((live) => {
+            {view.lives.slice((current - 1) * size, current * size).map((live) => {
               const platform = LIVE_PLATFORM_REGISTRY.get(live.platform)
               const PlatformIcon = ICONS[platform.icon]
               const isOpen = open === live.liveId
-              const summary = live.kinds.length
-                ? live.kinds
-                    .map(
-                      (entry) =>
-                        `${entry.count} ${MODERATION_KINDS[entry.kind].label.toLowerCase()}`
-                    )
-                    .join(', ')
-                : MEMBER_MODERATION_COPY.noGesture
 
               return (
                 <li key={live.liveId} className={MEMBER_MODERATION.item}>
@@ -85,18 +90,26 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
                     aria-expanded={isOpen}
                     onClick={() => setOpen(isOpen ? null : live.liveId)}
                   >
-                    <PlatformIcon className={MEMBER_MODERATION.rowIcon} aria-hidden="true" />
+                    <span className={MEMBER_MODERATION.rowAvatar}>
+                      <Avatar name={live.creator} src={live.creatorAvatar} size="md" />
+                      <PlatformIcon
+                        className={MEMBER_MODERATION.rowPlatform}
+                        aria-label={platform.label}
+                      />
+                    </span>
                     <span className={MEMBER_MODERATION.rowMain}>
                       <span className={MEMBER_MODERATION.rowTitle}>
-                        {`${live.creator} · ${formatDay(live.startedAt)}`}
+                        {live.title} {live.isReinforcement && <ReinforcementTag />}
                       </span>
-                      <span className={MEMBER_MODERATION.rowMeta}>{summary}</span>
+                      <span className={MEMBER_MODERATION.rowDate}>{formatDay(live.startedAt)}</span>
+                      {live.span && <ModSpan span={live.span} />}
                     </span>
                     <span className={MEMBER_MODERATION.rowTime}>
-                      {MEMBER_MODERATION_COPY.activeTime.replace(
-                        '{time}',
-                        formatExactSpan(live.activeSeconds)
-                      )}
+                      {TIME_BEFORE}
+                      <strong className={MEMBER_MODERATION.rowTimeValue}>
+                        {formatExactSpan(live.activeSeconds)}
+                      </strong>
+                      {TIME_AFTER}
                     </span>
                   </button>
 
@@ -130,7 +143,7 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
                                   )}
                                 </span>
                                 <span className={LIVE_REPORT.lineDetail}>
-                                  {details.join(' · ')}
+                                  <Dotted items={details} />
                                 </span>
                               </li>
                             )
@@ -152,6 +165,14 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
             })}
           </ul>
         )}
+        <Pagination
+          page={current}
+          totalPages={pages}
+          onPageChange={(next) => {
+            setPage(next)
+            setOpen(null)
+          }}
+        />
       </Section>
     </div>
   )

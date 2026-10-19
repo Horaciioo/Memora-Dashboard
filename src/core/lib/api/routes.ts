@@ -68,10 +68,16 @@ export const API_ROUTES = {
   liveModView: (id: string) => `/api/lives/${id}/modview`,
   liveFeed: (id: string) => `/api/lives/${id}/flux`,
   livePresence: (id: string) => `/api/lives/${id}/presence`,
+  liveReinforcement: (id: string) => `/api/lives/${id}/renfort`,
+  liveReopen: (id: string) => `/api/lives/${id}/retablir`,
+  liveCoordinators: (id: string) => `/api/lives/${id}/coordinateurs`,
+  liveModStop: (id: string) => `/api/lives/${id}/arret`,
   liveRoster: (id: string) => `/api/lives/${id}/appel`,
   liveCoordination: (id: string) => `/api/lives/${id}/coordination`,
   liveInstructions: (id: string) => `/api/lives/${id}/consignes`,
   liveViewer: (id: string, viewerId: string) => `/api/lives/${id}/spectateurs/${viewerId}`,
+  liveViewerComments: (id: string, viewerId: string) =>
+    `/api/lives/${id}/spectateurs/${viewerId}/commentaires`,
   liveInspect: (id: string, accountId: string) => `/api/lives/${id}/moderateurs/${accountId}`,
   liveFocus: (id: string) => `/api/lives/${id}/focus`,
   sanctions: (youtuberId: string, panel: string, levelId?: string | null, replace = false) =>

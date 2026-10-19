@@ -88,6 +88,30 @@ export const LIVE_COORDINATOR = {
 export const LIVE_FUNCTIONS: readonly string[] = ['Lives', 'Junior Lives']
 
 /**
+ * How the bilan names a moderator who is not from the Live team, by function held
+ * @type {Record<string, string>}
+ */
+
+export const LIVE_OUTSIDE_LABELS: Record<string, string> = {
+  Discord: 'Mod. Discord',
+  'Junior Discord': 'Mod. Discord',
+}
+
+/**
+ * Name given to any other moderator from outside the Live team
+ * @type {string}
+ */
+
+export const LIVE_OUTSIDE_DEFAULT = 'Hors équipe Live'
+
+/**
+ * Focus reaches disconnected members too, for the visual checks of a dev build
+ * @type {boolean}
+ */
+
+export const FOCUS_OFFLINE_ALLOWED = process.env.NODE_ENV !== 'production'
+
+/**
  * Calendar template every announced live is filed under
  * @type {string}
  */

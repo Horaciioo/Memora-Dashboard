@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiGet, apiPatch } from '@/core/lib/api/client'
 import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import type { LiveRoster } from '@/types/lives'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
@@ -27,15 +28,17 @@ export interface LiveRosterState {
 /**
  * Drive the roll-call of one live
  * @param {string} liveId - Live identifier
+ * @param {boolean} [isLive] - Poll who is connected
  * @return {LiveRosterState} - State and move
  */
 
-export const useLiveRoster = (liveId: string): LiveRosterState => {
+export const useLiveRoster = (liveId: string, isLive = false): LiveRosterState => {
   const client = useQueryClient()
   const key = QUERY_KEYS.liveRoster(liveId)
   const { data } = useQuery({
     queryKey: key,
     queryFn: ({ signal }) => apiGet<LiveRoster>(API_ROUTES.liveRoster(liveId), signal),
+    refetchInterval: isLive ? LIVE_SETTINGS.focusPollSeconds * 1000 : false,
   })
   const { isSaving, run } = useMutation()
 

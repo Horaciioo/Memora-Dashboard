@@ -174,13 +174,25 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     label: 'Mod View',
     tone: 'danger',
     verb: 'fait',
-    target: 'un geste de modération',
+    target: 'une action de Mod.',
   },
   LiveRosterMoved: {
     label: 'Appel',
     tone: 'info',
     verb: 'a corrigé',
     target: 'l’appel d’un live',
+  },
+  LiveCoordinatorsChanged: {
+    label: 'Live',
+    tone: 'info',
+    verb: 'a changé',
+    target: 'les Coordinateurs d’un live',
+  },
+  LiveReinforced: {
+    label: 'Live',
+    tone: 'info',
+    verb: 'a appelé',
+    target: 'du renfort sur un live',
   },
   ParkourMoved: {
     label: 'PIM',
