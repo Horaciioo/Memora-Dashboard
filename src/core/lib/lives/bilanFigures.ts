@@ -10,9 +10,27 @@ import { formatSpan } from '@/utils/format/modview'
  */
 
 export interface BilanFigure {
+  id: BilanFigureId
   label: string
   value: string
 }
+
+/**
+ * Every figure of a bilan
+ * @typedef {'duration' | 'actions' | 'perHour' | 'targets' | 'teamTime' | 'gap' | 'peak' | 'average' | 'per1000' | 'failure'} BilanFigureId
+ */
+
+export type BilanFigureId =
+  | 'duration'
+  | 'actions'
+  | 'perHour'
+  | 'targets'
+  | 'teamTime'
+  | 'gap'
+  | 'peak'
+  | 'average'
+  | 'per1000'
+  | 'failure'
 
 // One decimal at most
 const oneDecimal = (value: number): string => String(Math.round(value * 10) / 10)
@@ -33,12 +51,17 @@ export const bilanFigures = (
   const none = BILAN_COPY.none
 
   return [
-    { label: LIVE_REPORT_COPY.duration, value: formatSpan(durationSeconds) },
-    { label: LIVE_REPORT_COPY.actions, value: String(report.actions) },
-    { label: BILAN_COPY.perHour, value: oneDecimal(insights.perHour) },
-    { label: LIVE_REPORT_COPY.targets, value: String(report.distinctTargets) },
-    { label: LIVE_REPORT_COPY.teamTime, value: formatSpan(report.teamActiveSeconds) },
+    { id: 'duration', label: LIVE_REPORT_COPY.duration, value: formatSpan(durationSeconds) },
+    { id: 'actions', label: LIVE_REPORT_COPY.actions, value: String(report.actions) },
+    { id: 'perHour', label: BILAN_COPY.perHour, value: oneDecimal(insights.perHour) },
+    { id: 'targets', label: LIVE_REPORT_COPY.targets, value: String(report.distinctTargets) },
     {
+      id: 'teamTime',
+      label: LIVE_REPORT_COPY.teamTime,
+      value: formatSpan(report.teamActiveSeconds),
+    },
+    {
+      id: 'gap',
       label: BILAN_COPY.gap,
       value:
         insights.gapSeconds === null
@@ -46,17 +69,24 @@ export const bilanFigures = (
           : BILAN_COPY.gapValue.replace('{seconds}', String(Math.round(insights.gapSeconds))),
     },
     {
+      id: 'peak',
       label: BILAN_COPY.viewersPeak,
       value: insights.viewers ? String(insights.viewers.peak) : none,
     },
     {
+      id: 'average',
       label: BILAN_COPY.viewersAverage,
       value: insights.viewers ? String(insights.viewers.average) : none,
     },
     {
+      id: 'per1000',
       label: BILAN_COPY.per1000,
       value: insights.per1000Viewers === null ? none : oneDecimal(insights.per1000Viewers),
     },
-    { label: BILAN_COPY.failureRate, value: `${Math.round(insights.failureRate * 100)} %` },
+    {
+      id: 'failure',
+      label: BILAN_COPY.failureRate,
+      value: `${Math.round(insights.failureRate * 100)} %`,
+    },
   ]
 }

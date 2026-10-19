@@ -1,5 +1,6 @@
 'use client'
 
+import { Dotted, DotMark } from '@/components/elements/display/Dotted'
 import { useState } from 'react'
 
 import { ChartLegend } from '@/components/structures/charts/ChartLegend'
@@ -48,10 +49,12 @@ export const StackedBars = ({ columns, title, unit, axis }: StackedBarsProps) =>
           <>
             {focus.label}
             <span className={CHART.readoutMuted}>
-              {` · ${focus.segments
-                .filter((segment) => segment.value > 0)
-                .map((segment) => `${segment.value} ${segment.label.toLowerCase()}`)
-                .join(' · ')}`}
+              <DotMark />
+              <Dotted
+                items={focus.segments
+                  .filter((segment) => segment.value > 0)
+                  .map((segment) => `${segment.value} ${segment.label.toLowerCase()}`)}
+              />
             </span>
           </>
         ) : (

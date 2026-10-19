@@ -8,8 +8,10 @@ import type { LiveReport } from '@/core/lib/lives/report'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readBaseline } from '@/core/services/lives/LiveBaselineService'
 import { readLive } from '@/core/services/lives/LiveService'
+import { liveNotes } from '@/core/services/lives/ViewerCommentService'
+import { readLiveTeam } from '@/core/services/lives/ModStintService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
-import type { LiveLogLine, LiveView } from '@/types/lives'
+import type { LiveLogLine, LiveModTime, LiveNote, LiveView } from '@/types/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
 
 /**
@@ -18,6 +20,8 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @property {LiveView} live - Live
  * @property {LiveReport} report - Figures
  * @property {LiveLogLine[]} log - Latest lines
+ * @property {LiveModTime[]} team - Who moderated and for how long
+ * @property {LiveNote[]} notes - Notes left on viewers during the live
  * @property {LiveInsights} insights - Chart data
  * @property {LiveBaseline | null} baseline - Average of earlier lives
  * @property {{ start: string, end: string }} period - Span the charts cover
@@ -28,6 +32,8 @@ export interface LiveReportDetail {
   live: LiveView
   report: LiveReport
   log: LiveLogLine[]
+  team: LiveModTime[]
+  notes: LiveNote[]
   insights: LiveInsights
   baseline: LiveBaseline | null
   period: { start: string; end: string }
@@ -106,6 +112,15 @@ export const readLiveReport = async (
     readBaseline(live.youtuber.id, liveId, start).catch(() => null),
   ])
 
+  // The tables may not exist yet
+  const team = await readLiveTeam(liveId, end, live.endedAt !== null).catch(() => [])
+  const notes = await liveNotes({
+    youtuberId: live.youtuber.id,
+    platform: live.platform,
+    start,
+    end,
+  }).catch(() => [])
+
   const nameOf = (row: { actor: { displayName: string } | null; actorLogin: string | null }) =>
     row.actor?.displayName ?? row.actorLogin ?? '?'
 
@@ -154,6 +169,8 @@ export const readLiveReport = async (
     live,
     report,
     insights,
+    team,
+    notes,
     baseline,
     period: { start: start.toISOString(), end: end.toISOString() },
     available: actions !== null && presences !== null,

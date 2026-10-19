@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { DotMark } from '@/components/elements/display/Dotted'
+import { useId, useState } from 'react'
 
 import { linePath, niceCeiling } from '@/core/lib/ui/chartScale'
 import { CHART } from '@/declarations/ui/variants'
@@ -35,6 +36,7 @@ const HEIGHT = 40
 
 export const AreaChart = ({ points, title, unit, colour, axis }: AreaChartProps) => {
   const [active, setActive] = useState<number | null>(null)
+  const gradient = useId()
   const values = points.map((point) => point.value)
   const ceiling = niceCeiling(Math.max(1, ...values))
   const line = linePath(values, ceiling, WIDTH, HEIGHT)
@@ -47,7 +49,10 @@ export const AreaChart = ({ points, title, unit, colour, axis }: AreaChartProps)
         {focus ? (
           <>
             {focus.label}
-            <span className={CHART.readoutMuted}>{` · ${focus.value} ${unit}`}</span>
+            <span className={CHART.readoutMuted}>
+              <DotMark />
+              {`${focus.value} ${unit}`}
+            </span>
           </>
         ) : (
           <span className={CHART.readoutMuted}>{`${Math.max(0, ...values)} ${unit}`}</span>
@@ -70,7 +75,14 @@ export const AreaChart = ({ points, title, unit, colour, axis }: AreaChartProps)
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          <path d={`${line} L${WIDTH},${HEIGHT} L0,${HEIGHT} Z`} fill={colour} fillOpacity="0.14" />
+          {/* The fill fades out as it falls */}
+          <defs>
+            <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={colour} stopOpacity="0.38" />
+              <stop offset="100%" stopColor={colour} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={`${line} L${WIDTH},${HEIGHT} L0,${HEIGHT} Z`} fill={`url(#${gradient})`} />
           <path
             d={line}
             fill="none"

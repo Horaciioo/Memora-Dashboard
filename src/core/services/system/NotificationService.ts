@@ -253,6 +253,47 @@ export const unreadMentions = async (
 }
 
 /**
+ * Reports of closed lives the member has not opened yet
+ * @param {string} accountId - Member
+ * @return {Promise<NotificationEntry[]>} - Unopened report alerts, newest first
+ */
+
+export const unreadReports = async (accountId: string): Promise<NotificationEntry[]> => {
+  const rows = await prisma.notification.findMany({
+    where: {
+      recipientId: accountId,
+      kind: NOTIFICATION_KINDS.ids.LiveReportReady,
+      targetType: 'liveReport',
+      readAt: null,
+    },
+    include: { actor: { select: { displayName: true, avatarUrl: true } } },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+  })
+
+  return rows.map(toEntry)
+}
+
+/**
+ * Mark the report alert of one live as seen, the report being open
+ * @param {string} accountId - Member
+ * @param {string} liveId - Live whose report is open
+ * @return {Promise<void>} - Marked
+ */
+
+export const markReportRead = async (accountId: string, liveId: string): Promise<void> => {
+  await prisma.notification.updateMany({
+    where: {
+      recipientId: accountId,
+      kind: NOTIFICATION_KINDS.ids.LiveReportReady,
+      targetType: 'liveReport',
+      targetId: liveId,
+      readAt: null,
+    },
+    data: { readAt: new Date() },
+  })
+}
+
+/**
  * Mark the mentions of one record as seen, the record being open
  * @param {string} accountId - Account identifier
  * @param {NotificationTargetName} target - Kind of record

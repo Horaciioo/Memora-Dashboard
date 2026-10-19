@@ -2,7 +2,6 @@ import { Section } from '@/components/structures/page/Section'
 import { compareToBaseline } from '@/core/lib/lives/insights'
 import type { BaselineRow, LiveBaseline, LiveInsights } from '@/core/lib/lives/insights'
 import { BILAN_COPY } from '@/declarations/lives/bilan'
-import { REPORT_GROUPS, REPORT_GROUP_META } from '@/declarations/lives/reportGroups'
 import { CHART, LIVE_REPORT } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import { formatSpan } from '@/utils/format/modview'
@@ -75,7 +74,7 @@ export const BilanVersus = ({ insights, baseline, actions, durationSeconds }: Bi
               <span className={CHART.versusLabel}>
                 {ROW_LABELS[row.id]}
                 <span className={CHART.versusNote}>
-                  {` · ${BILAN_COPY.versusAverage.replace('{value}', say(row.id, row.baseline))}`}
+                  {BILAN_COPY.versusAverage.replace('{value}', say(row.id, row.baseline))}
                 </span>
               </span>
               <span className={CHART.versusTrack}>
@@ -88,28 +87,11 @@ export const BilanVersus = ({ insights, baseline, actions, durationSeconds }: Bi
                   style={{ left: `${(row.baseline / scale) * 100}%` }}
                 />
               </span>
-              <span className={cn(CHART.versusDelta, tone)}>
-                {`${say(row.id, row.current)} · ${sayChange(row.change)}`}
-              </span>
+              <span className={CHART.versusValue}>{say(row.id, row.current)}</span>
+              <span className={cn(CHART.versusDelta, tone)}>{sayChange(row.change)}</span>
             </div>
           )
         })}
-
-        <div className={CHART.versusRow}>
-          <span className={CHART.versusLabel}>{BILAN_COPY.versusMix}</span>
-          <span className={CHART.mix}>
-            {REPORT_GROUPS.map((group) => (
-              <span
-                key={group}
-                title={`${REPORT_GROUP_META[group].label} · ${Math.round(baseline.mix[group] * 100)} %`}
-                style={{
-                  width: `${baseline.mix[group] * 100}%`,
-                  backgroundColor: REPORT_GROUP_META[group].colour,
-                }}
-              />
-            ))}
-          </span>
-        </div>
       </div>
     )}
   </Section>
