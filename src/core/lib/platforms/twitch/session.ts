@@ -72,6 +72,8 @@ export class EventSubSession {
   private readonly options: EventSubOptions
   private socket: WebSocket | null = null
   private watchdog: ReturnType<typeof setTimeout> | null = null
+  // Last frame heard
+  private heardAt = 0
   private retry: ReturnType<typeof setTimeout> | null = null
   private attempts = 0
   private stopped = false
@@ -264,23 +266,46 @@ export class EventSubSession {
   }
 
   /**
-   * Restart the silence watchdog
+   * Note a frame, one timer per window
    * @return {void}
    */
 
   private arm(): void {
-    if (this.watchdog) clearTimeout(this.watchdog)
-    this.watchdog = setTimeout(
-      () => {
-        // Silence past the keepalive window means a dead socket
-        logger.warn('[eventsub] keepalive missed, reconnecting')
-        this.socket?.close()
-        this.socket = null
-        this.options.onState('disconnected')
-        this.scheduleRetry()
-      },
-      (this.options.keepaliveSeconds + KEEPALIVE_SLACK_SECONDS) * 1000
-    )
+    this.heardAt = Date.now()
+    if (!this.watchdog) this.watch(this.silenceLimit())
+  }
+
+  /**
+   * Longest silence allowed
+   * @return {number} - Milliseconds
+   */
+
+  private silenceLimit(): number {
+    return (this.options.keepaliveSeconds + KEEPALIVE_SLACK_SECONDS) * 1000
+  }
+
+  /**
+   * Check the silence after a delay
+   * @param {number} delay - Milliseconds
+   * @return {void}
+   */
+
+  private watch(delay: number): void {
+    this.watchdog = setTimeout(() => {
+      const silence = Date.now() - this.heardAt
+      if (silence < this.silenceLimit()) {
+        this.watch(this.silenceLimit() - silence)
+        return
+      }
+
+      // Silence past the keepalive window means a dead socket
+      this.watchdog = null
+      logger.warn('[eventsub] keepalive missed, reconnecting')
+      this.socket?.close()
+      this.socket = null
+      this.options.onState('disconnected')
+      this.scheduleRetry()
+    }, delay)
   }
 
   /**
