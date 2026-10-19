@@ -5,6 +5,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { AUTH_COPY } from '@/declarations/ui/copy/auth'
 import { ErrorCodes } from '@/utils/constants/errors'
 import type { AppError } from '@/core/lib/errors'
+import type { Environment } from '@/types/infrastructure'
 
 /**
  * Query key carrying why a sign-in attempt failed
@@ -78,8 +79,8 @@ export const readSignInError = (reason: string | undefined): string | null => {
   return SIGN_IN_ERROR_REGISTRY.label(reason)
 }
 
-// Branches where signing in with a bare identifier is still tolerated
-const FALLBACK_ENVIRONMENTS = ['dev', 'staging']
+// Exposed servers never accept a bare identifier
+const FALLBACK_ENVIRONMENT: Environment = 'dev'
 
 /**
  * Whether the identifier form may still open a session
@@ -87,4 +88,4 @@ const FALLBACK_ENVIRONMENTS = ['dev', 'staging']
  */
 
 export const isIdentifierSignInAllowed = (): boolean =>
-  !isDiscordConfigured() && FALLBACK_ENVIRONMENTS.includes(APP_ENVIRONMENT)
+  !isDiscordConfigured() && APP_ENVIRONMENT === FALLBACK_ENVIRONMENT

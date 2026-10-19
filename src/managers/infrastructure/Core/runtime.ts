@@ -88,6 +88,13 @@ const wireLiveBus = async (container: Sharding): Promise<void> => {
 const wireCipher = (container: Sharding): void => {
   if (!container.config.isEnabled('encryption')) return
 
+  // A switched on subject without its key must not look active
+  if (!container.encryption.isReady()) {
+    logger.error('[runtime] encryption is enabled but not ready, check ENCRYPTION_KEY')
+
+    return
+  }
+
   bindSecretCipher({
     encrypt: (value) => container.encryption.encrypt(value),
     decrypt: (value) => String(container.encryption.decrypt(value)),
