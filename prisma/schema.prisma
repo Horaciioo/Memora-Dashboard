@@ -336,6 +336,8 @@ model Account {
   quizAnswers           JuniorAnswer[]
   trainingFeedbacks     TrainingFeedback[]
   moderationActions     ModerationAction[]       @relation("ModerationActor")
+  viewerComments        ViewerComment[]          @relation("ViewerCommentAuthor")
+  modStints             LiveModStint[]           @relation("ModStintAccount")
   moderationsOnBehalf   ModerationAction[]       @relation("ModerationOnBehalf")
   focusesWatching       ModViewFocus[]           @relation("FocusWatcher")
   focusesWatched        ModViewFocus[]           @relation("FocusTarget")
@@ -598,6 +600,7 @@ model Youtuber {
   channels            YoutuberChannel[]
   discordIdentifiers  DiscordIdentifier[]
   lives               Live[]
+  viewerComments      ViewerComment[]
   sanctionOffenses    SanctionOffense[]
 
   recruitmentSessions      RecruitmentSession[]
@@ -1624,13 +1627,16 @@ model CalendarEvent {
 
 // One member's answer to a roll-call event
 model EventAttendance {
-  id          String           @id @default(cuid())
-  eventId     String
-  accountId   String
-  status      AttendanceStatus @default(PENDING)
-  respondedAt DateTime?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id            String           @id @default(cuid())
+  eventId       String
+  accountId     String
+  status        AttendanceStatus @default(PENDING)
+  respondedAt   DateTime?
+  // Hours a present moderator expects to be available
+  availableFrom DateTime?
+  availableTo   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
   event   CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
   account Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
@@ -1749,6 +1755,7 @@ model Live {
   liveconEntries LiveconEntry[]
   actions        ModerationAction[]
   presences      ModViewPresence[]
+  stints         LiveModStint[]
   focuses        ModViewFocus[]
   samples        LiveSample[]
 
@@ -1780,9 +1787,13 @@ model LiveCoordination {
 
 // Member called on one live
 model LiveMember {
-  liveId     String
-  accountId  String
-  convokedAt DateTime @default(now())
+  liveId        String
+  accountId     String
+  convokedAt    DateTime @default(now())
+  // Added by a Responsable on the day, from outside the creator's team
+  reinforcement Boolean  @default(false)
+  // Responsable who asked for the reinforcement
+  requestedById String?
 
   live    Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
@@ -1852,6 +1863,42 @@ model ModViewPresence {
   @@index([liveId, accountId])
   @@index([accountId, openedAt])
   @@map("modview_presences")
+}
+
+// Stretch a member moderated a live, open until they say they stop or the live ends
+model LiveModStint {
+  id        String    @id @default(cuid())
+  liveId    String
+  accountId String
+  startedAt DateTime  @default(now())
+  stoppedAt DateTime?
+
+  live    Live    @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  account Account @relation("ModStintAccount", fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([liveId, accountId])
+  @@index([accountId, startedAt])
+  @@map("live_mod_stints")
+}
+
+// Private comment a member leaves on a viewer of a creator's channel
+model ViewerComment {
+  id              String       @id @default(cuid())
+  youtuberId      String
+  platform        LivePlatform
+  // Platform user identifier of the viewer
+  platformUserId  String
+  viewerLogin     String
+  authorAccountId String?
+  // Encrypted at rest
+  body            String
+  createdAt       DateTime     @default(now())
+
+  youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+  author   Account? @relation("ViewerCommentAuthor", fields: [authorAccountId], references: [id], onDelete: SetNull)
+
+  @@index([youtuberId, platform, platformUserId, createdAt], map: "viewer_comments_viewer_idx")
+  @@map("viewer_comments")
 }
 
 // Viewer count read from the platform while a live runs
