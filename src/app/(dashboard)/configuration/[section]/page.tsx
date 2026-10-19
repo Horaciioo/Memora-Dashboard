@@ -61,6 +61,7 @@ export default async function ReferenceSectionPage({
         fields={editableFields}
         initialRows={rows}
         canManage={canManage}
+        canErase={access.isAdmin}
       />
     </div>
   )
