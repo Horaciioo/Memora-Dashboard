@@ -9,6 +9,7 @@ import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/marks
 import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
+import { EraseYoutuberDialog } from '@/composites/reference/EraseYoutuberDialog'
 import { DiscordIdentifierList } from '@/composites/discord/DiscordIdentifierList'
 import { AddRow } from '@/components/structures/inline/AddRow'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
@@ -36,6 +37,8 @@ export interface ReferenceManagerProps {
   fields: FieldDefinition[]
   initialRows: ReferenceRow[]
   canManage: boolean
+  // Admin may erase a creator with all their data
+  canErase?: boolean
 }
 
 // Single drop container
@@ -47,6 +50,7 @@ const CONTAINER = 'reference'
  * @param {FieldDefinition[]} fields - Field declarations
  * @param {ReferenceRow[]} initialRows - Rows resolved server-side
  * @param {boolean} canManage - Member may write
+ * @param {boolean} [canErase] - Admin may erase a creator with their data
  * @return {JSX.Element}
  */
 
@@ -55,6 +59,7 @@ export const ReferenceManager = ({
   fields,
   initialRows,
   canManage,
+  canErase = false,
 }: ReferenceManagerProps) => {
   const { rows, isSaving, issues, create, update, remove, reorder, clearIssues } = useReference(
     section.key,
@@ -113,15 +118,26 @@ export const ReferenceManager = ({
         setEditing(row)
       },
     },
-    {
-      id: 'delete',
-      label: ACTION_COPY.delete,
-      icon: 'remove',
-      danger: true,
-      separatorBefore: true,
-      disabled: !canManage || row.usage > 0,
-      onSelect: () => setPendingDeletion(row),
-    },
+    // A creator goes with everything of theirs, however much they are used
+    section.key === 'youtubeurs'
+      ? {
+          id: 'delete',
+          label: REFERENCE_COPY.eraseMenu,
+          icon: 'remove',
+          danger: true,
+          separatorBefore: true,
+          disabled: !canManage || !canErase,
+          onSelect: () => setPendingDeletion(row),
+        }
+      : {
+          id: 'delete',
+          label: ACTION_COPY.delete,
+          icon: 'remove',
+          danger: true,
+          separatorBefore: true,
+          disabled: !canManage || row.usage > 0,
+          onSelect: () => setPendingDeletion(row),
+        },
   ]
 
   const DragIcon = ICONS.drag
@@ -282,8 +298,20 @@ export const ReferenceManager = ({
         onClose={() => setEditing(null)}
       />
 
+      {pendingDeletion && section.key === 'youtubeurs' && (
+        <EraseYoutuberDialog
+          name={pendingDeletion.label}
+          isPending={isSaving}
+          onClose={() => setPendingDeletion(null)}
+          onConfirm={async () => {
+            await remove(pendingDeletion.id)
+            setPendingDeletion(null)
+          }}
+        />
+      )}
+
       <ConfirmDialog
-        open={pendingDeletion !== null}
+        open={pendingDeletion !== null && section.key !== 'youtubeurs'}
         title={REFERENCE_COPY.deleteTitle}
         description={REFERENCE_COPY.deleteDescription}
         pending={isSaving}

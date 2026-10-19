@@ -55,10 +55,13 @@ export const SuggestionList = ({
                 ? null
                 : COPY.step.replace('{n}', String(rung + 1)).replace('{total}', String(rungCount))
 
-            // Either gesture clears the box
+            // A command clears the box once sent, a removal at once
             const accept = () => {
-              if (command) onUse(suggestion)
-              else onAct(removal)
+              if (command) {
+                onUse(suggestion)
+                return
+              }
+              onAct(removal)
               onDismiss(id)
             }
             const canAccept = command ? true : removable.allowed

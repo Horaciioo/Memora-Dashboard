@@ -3,6 +3,7 @@ import { parseFormValues } from '@/core/lib/forms'
 import { stripRestricted } from '@/core/lib/forms/restrictions'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { referenceResource } from '@/core/services/reference/ReferenceService'
+import { eraseYoutuber } from '@/core/services/reference/YoutuberErasure'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { REFERENCE_COPY } from '@/declarations/reference/copy'
 import {
@@ -59,8 +60,25 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   permission: Permissions.ReferenceManage,
   descriptor: { summary: 'Drop a reference row', tags: ['reference'] },
-  handler: async ({ params, session }) => {
+  handler: async ({ params, session, access }) => {
     const key = readSection(params)
+
+    // A creator goes with everything of theirs, and only an Admin may do it
+    if (key === 'youtubeurs') {
+      if (!access.isAdmin) throw forbidden()
+      const report = await eraseYoutuber(params.id)
+
+      await recordEvent({
+        eventType: 'ReferenceChanged',
+        actorId: session.id,
+        targetType: key,
+        targetId: params.id,
+        summary: `${referenceSection(key)?.singular ?? key}, supprimé avec ses données (${report.lives} lives)`,
+      })
+
+      return { id: params.id }
+    }
+
     const resource = referenceResource(key as never)
 
     // A row still pointed at by records is never dropped

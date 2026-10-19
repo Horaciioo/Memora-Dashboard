@@ -2,6 +2,7 @@ import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { ChatOptionName } from '@/declarations/modview/registries'
 import type {
   ChatMessage,
+  ChatReply,
   ChatScript,
   Chatter,
   HeldMessage,
@@ -9,6 +10,7 @@ import type {
   ModViewIntent,
   ModViewState,
   ModViewTarget,
+  PinnedMessage,
   UnbanRequest,
 } from '@/types/modview'
 
@@ -32,7 +34,15 @@ export type SceneEvent =
   | { kind: 'terms'; list: 'blocked' | 'allowed'; add: string[]; remove: string[] }
   | { kind: 'unbanRequest'; request: UnbanRequest }
   | { kind: 'unbanResolved'; requestId: string }
-  | { kind: 'stream'; title?: string; category?: string | null }
+  | {
+      kind: 'stream'
+      title?: string
+      category?: string | null
+      categoryArt?: string | null
+      tags?: string[]
+      viewers?: number | null
+    }
+  | { kind: 'pin'; pin: PinnedMessage | null }
   | { kind: 'chatOption'; option: ChatOptionName; enabled: boolean }
 
 /**
@@ -225,12 +235,17 @@ export const applySceneEvent = (
         view: {
           ...view,
           title: event.title ?? view.title,
-          channel:
-            event.category === undefined
-              ? view.channel
-              : { ...view.channel, category: event.category },
+          viewers: event.viewers === undefined ? view.viewers : event.viewers,
+          channel: {
+            ...view.channel,
+            ...(event.category === undefined ? {} : { category: event.category }),
+            ...(event.categoryArt === undefined ? {} : { categoryArt: event.categoryArt }),
+            ...(event.tags === undefined ? {} : { tags: event.tags }),
+          },
         },
       }
+    case 'pin':
+      return { ...state, view: { ...view, pinned: event.pin } }
     case 'chatMenu':
       return {
         ...state,
@@ -263,6 +278,21 @@ export const applySceneEvent = (
 
 const nameOf = (view: ModViewState, chatterId: string): string =>
   view.messages.find((message) => message.author.id === chatterId)?.author.name ?? chatterId
+
+/**
+ * Reply field of a line answering another
+ * @param {ModViewState} view - Mod View state
+ * @param {string} [parentId] - Line answered
+ * @return {{ reply?: ChatReply }} - Reply, none when the line stands alone
+ */
+
+const replyFrom = (view: ModViewState, parentId?: string): { reply?: ChatReply } => {
+  const parent = parentId ? view.messages.find((line) => line.id === parentId) : undefined
+
+  return parent
+    ? { reply: { id: parent.id, authorName: parent.author.name, text: parent.text } }
+    : {}
+}
 
 /**
  * Play a gesture inside a scene
@@ -397,10 +427,29 @@ export const applySceneIntent = (
         }
       )
     }
+    case 'pin': {
+      const line = view.messages.find((entry) => entry.id === intent.messageId)
+      if (!line) return state
+
+      return applySceneEvent(state, {
+        kind: 'pin',
+        pin: {
+          messageId: line.id,
+          author: line.author,
+          text: line.text,
+          fragments: line.fragments ?? [{ type: 'text', text: line.text }],
+          pinnedBy: actor.name,
+          endsAt: null,
+        },
+      })
+    }
+    case 'unpin':
+      return applySceneEvent(state, { kind: 'pin', pin: null })
     case 'say':
       return applySceneEvent(state, {
         kind: 'message',
         message: {
+          ...replyFrom(view, intent.replyToId),
           id: actor.id,
           author: {
             id: actor.id,

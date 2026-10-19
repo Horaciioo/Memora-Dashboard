@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
+import { Avatar } from '@/components/elements/display/Avatar'
 import Link from '@/components/elements/navigation/AppLink'
 import { PageOptionsList } from '@/components/structures/page/PageOptionsList'
 import type { PageOption } from '@/components/structures/page/PageOptions'
@@ -13,15 +14,16 @@ import { EndLiveButton } from '@/composites/modview/EndLiveButton'
 import { TeamPanel } from '@/composites/modview/TeamPanel'
 import type { TeamTools } from '@/composites/modview/memberMenu'
 import { useOutsideDismiss } from '@/core/hooks/interaction/layout/useOutsideDismiss'
-import { MODVIEW_COPY } from '@/declarations/modview/copy'
+import { UnbanQueue } from '@/composites/modview/UnbanQueue'
+import { MODVIEW_COPY, MODVIEW_UNBAN_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_TEAM_COPY } from '@/declarations/modview/watch'
 import { ROUTES } from '@/declarations/navigation'
 import { PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import type { IconName } from '@/declarations/ui/icons'
-import { MODVIEW_SIDEBAR } from '@/declarations/ui/variants'
+import { MODVIEW_SIDEBAR, MODVIEW_UNBAN } from '@/declarations/ui/variants'
 import type { LiveFocusView } from '@/types/lives'
-import type { Chatter, ModViewState } from '@/types/modview'
+import type { Chatter, ModViewState, UnbanRequest } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 
 export interface ModViewSidebarProps {
@@ -39,11 +41,15 @@ export interface ModViewSidebarProps {
   leaveLiveId?: string
   // Live the responsables may close from here
   endLiveId?: string
+  // Unban requests, opened from their glyph, Twitch only
+  unban?: { requests: UnbanRequest[]; onOpen: (requestId: string | null) => void }
+  // Creator whose live it is, shown at the top
+  creator?: { name: string; avatar: string | null }
   // Chat audience, opened from its glyph
   audience: { community: ModViewState['community']; onPick: (chatter: Chatter) => void }
 }
 
-type SidebarPanel = 'team' | 'community' | 'settings'
+type SidebarPanel = 'team' | 'community' | 'unban' | 'settings'
 
 // Channel team stays out
 const HIDDEN_GROUPS: (keyof ModViewState['community'])[] = ['broadcaster', 'moderators']
@@ -55,6 +61,10 @@ interface PanelButtonProps {
   onToggle: () => void
   // Where the panel hangs
   anchor: 'top' | 'bottom'
+  // Wider panel, for a list with its own controls
+  isWide?: boolean
+  // Control at the far end of the title
+  action?: ReactNode
   children: ReactNode
 }
 
@@ -64,7 +74,16 @@ interface PanelButtonProps {
  * @return {JSX.Element}
  */
 
-const PanelButton = ({ icon, label, isOpen, onToggle, anchor, children }: PanelButtonProps) => {
+const PanelButton = ({
+  icon,
+  label,
+  isOpen,
+  onToggle,
+  anchor,
+  isWide,
+  action,
+  children,
+}: PanelButtonProps) => {
   const Icon = ICONS[icon]
 
   return (
@@ -81,16 +100,22 @@ const PanelButton = ({ icon, label, isOpen, onToggle, anchor, children }: PanelB
         <Icon className={MODVIEW_SIDEBAR.icon} aria-hidden="true" />
       </button>
 
+      {isOpen && <span className={MODVIEW_SIDEBAR.arrow} aria-hidden="true" />}
+
       {isOpen && (
         <div
           role="group"
           aria-label={label}
           className={cn(
             MODVIEW_SIDEBAR.panel,
-            anchor === 'top' ? MODVIEW_SIDEBAR.panelTop : MODVIEW_SIDEBAR.panelBottom
+            anchor === 'top' ? MODVIEW_SIDEBAR.panelTop : MODVIEW_SIDEBAR.panelBottom,
+            isWide ? MODVIEW_SIDEBAR.panelWide : MODVIEW_SIDEBAR.panelNormal
           )}
         >
-          <p className={MODVIEW_SIDEBAR.title}>{label}</p>
+          <div className={MODVIEW_SIDEBAR.titleRow}>
+            <p className={MODVIEW_SIDEBAR.title}>{label}</p>
+            {action}
+          </div>
           {children}
         </div>
       )}
@@ -109,6 +134,8 @@ export const ModViewSidebar = ({
   team,
   leaveLiveId,
   endLiveId,
+  creator,
+  unban,
   audience,
 }: ModViewSidebarProps) => {
   const [open, setOpen] = useState<SidebarPanel | null>(null)
@@ -116,6 +143,7 @@ export const ModViewSidebar = ({
   const [isReinforcing, setReinforcing] = useState(false)
   const rootRef = useRef<HTMLElement>(null)
   const ExitIcon = ICONS.signOut
+  const MaximizeIcon = ICONS.maximize
 
   useOutsideDismiss(open !== null, rootRef, () => setOpen(null))
 
@@ -124,6 +152,15 @@ export const ModViewSidebar = ({
   return (
     <nav ref={rootRef} className={MODVIEW_SIDEBAR.root} aria-label={MODVIEW_COPY.sidebar}>
       <div className={MODVIEW_SIDEBAR.stack}>
+        {creator && (
+          <>
+            <span className={MODVIEW_SIDEBAR.creator} title={creator.name}>
+              <Avatar name={creator.name} src={creator.avatar} size="md" />
+            </span>
+            <div className={MODVIEW_SIDEBAR.divider} role="separator" />
+          </>
+        )}
+
         {leaveLiveId ? (
           <LeaveModViewButton liveId={leaveLiveId} />
         ) : (
@@ -137,8 +174,9 @@ export const ModViewSidebar = ({
           </Link>
         )}
 
+        <div className={MODVIEW_SIDEBAR.divider} role="separator" />
         <PanelButton
-          icon="viewer"
+          icon="crowd"
           label={MODVIEW_COPY.community}
           isOpen={open === 'community'}
           onToggle={() => toggle('community')}
@@ -154,9 +192,46 @@ export const ModViewSidebar = ({
           />
         </PanelButton>
 
+        {unban && <div className={MODVIEW_SIDEBAR.divider} role="separator" />}
+
+        {unban && (
+          <PanelButton
+            icon="unbanRequest"
+            label={MODVIEW_UNBAN_COPY.title}
+            isOpen={open === 'unban'}
+            onToggle={() => toggle('unban')}
+            anchor="top"
+            isWide
+            action={
+              <button
+                type="button"
+                className={MODVIEW_UNBAN.iconButton}
+                aria-label={MODVIEW_UNBAN_COPY.expand}
+                title={MODVIEW_UNBAN_COPY.expand}
+                onClick={() => {
+                  setOpen(null)
+                  unban.onOpen(null)
+                }}
+              >
+                <MaximizeIcon className={MODVIEW_UNBAN.icon} aria-hidden="true" />
+              </button>
+            }
+          >
+            <UnbanQueue
+              requests={unban.requests}
+              onSelect={(request) => {
+                setOpen(null)
+                unban.onOpen(request.id)
+              }}
+            />
+          </PanelButton>
+        )}
+
+        {team && <div className={MODVIEW_SIDEBAR.divider} role="separator" />}
+
         {team && (
           <PanelButton
-            icon="teams"
+            icon="sword"
             label={MODVIEW_TEAM_COPY.title}
             isOpen={open === 'team'}
             onToggle={() => toggle('team')}
@@ -175,9 +250,8 @@ export const ModViewSidebar = ({
             />
           </PanelButton>
         )}
-      </div>
 
-      <div className={MODVIEW_SIDEBAR.bottom}>
+        <div className={MODVIEW_SIDEBAR.divider} role="separator" />
         <PanelButton
           icon="settings"
           label={MODVIEW_COPY.settings}
@@ -195,6 +269,7 @@ export const ModViewSidebar = ({
           </>
         )}
       </div>
+
       {team && (
         <LiveReinforcementEditor
           liveId={team.liveId}

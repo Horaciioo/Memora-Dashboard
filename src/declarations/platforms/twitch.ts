@@ -36,6 +36,13 @@ export const HELIX_PATHS = {
   vips: '/channels/vips',
   chatSettings: '/chat/settings',
   chatSend: '/chat/messages',
+  pins: '/chat/pins',
+  games: '/games',
+  banned: '/moderation/banned',
+  channels: '/channels',
+  emotes: '/chat/emotes',
+  emotesGlobal: '/chat/emotes/global',
+  emotesUser: '/chat/emotes/user',
   chatters: '/chat/chatters',
   subscriptions: '/eventsub/subscriptions',
 } as const
@@ -49,6 +56,7 @@ export const TWITCH_SCOPES: readonly string[] = [
   'user:read:chat',
   'user:write:chat',
   'user:read:moderated_channels',
+  'user:read:emotes',
   'moderator:read:chatters',
   'moderator:read:moderators',
   'moderator:read:vips',
@@ -120,6 +128,11 @@ export const TWITCH_LIMITS = {
   maxReasonLength: 500,
   // Chatters fetched per page
   chattersPage: 1000,
+  // Longest follow age asked of a chatter, in minutes
+  maxFollowMinutes: 129_600,
+  // Pin length window
+  minPinSeconds: 30,
+  maxPinSeconds: 1800,
 } as const
 
 /**

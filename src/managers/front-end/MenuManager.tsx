@@ -121,6 +121,8 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
 
     const width = window.innerWidth
     const dismiss = (event: Event) => {
+      // A feed that scrolls by itself never closes a menu
+      if (event.target instanceof Element && event.target.closest('[data-keep-menu]')) return
       // A keyboard opening is not a move away
       if (!isKeyboardShift(event, width)) closeMenu()
     }

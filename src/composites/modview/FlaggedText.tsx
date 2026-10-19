@@ -1,5 +1,4 @@
-import { Fragment } from 'react'
-
+import { LinkedText } from '@/composites/modview/LinkedText'
 import { MODVIEW_FEED } from '@/declarations/ui/variants'
 
 export interface FlaggedTextProps {
@@ -15,7 +14,7 @@ export interface FlaggedTextProps {
  */
 
 export const FlaggedText = ({ text, flagged }: FlaggedTextProps) => {
-  if (!flagged || flagged.length === 0) return <>{text}</>
+  if (!flagged || flagged.length === 0) return <LinkedText text={text} />
 
   // Split on every held word
   const escaped = flagged.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
@@ -30,7 +29,7 @@ export const FlaggedText = ({ text, flagged }: FlaggedTextProps) => {
             {part}
           </mark>
         ) : (
-          <Fragment key={index}>{part}</Fragment>
+          <LinkedText key={index} text={part} />
         )
       )}
     </>

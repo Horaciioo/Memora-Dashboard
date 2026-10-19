@@ -74,12 +74,11 @@ const PROFILE_MAP: Record<ModViewProfileName, ModViewProfileOption> = {
   },
   admin: {
     label: 'Admin',
-    windows: [...FLOOR, 'inspect', 'unbanRequests'],
-    columns: [['stream', ['modActions', 'automod']], ['chat'], ['inspect', 'unbanRequests']],
+    windows: [...FLOOR, 'inspect'],
+    columns: [['stream', ['modActions', 'automod']], ['chat'], ['inspect']],
     widths: [1.7, 1, 0.8],
     sizes: SIZES,
-    // Inspect Mod takes the place of the unban requests
-    hidden: ['unbanRequests'],
+    hidden: [],
   },
 }
 

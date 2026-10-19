@@ -3,6 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { publishLive } from '@/core/lib/lives/bus'
 import { queueLogWrite } from '@/core/lib/lives/logQueue'
+import { forgetLiveState, pollLiveState } from '@/core/services/lives/LiveStatePoller'
 import { forgetLive, keepConnection } from '@/core/lib/lives/recent'
 import type { LiveConnection } from '@/core/lib/lives/recent'
 import { closeRoom, pushRoomEvent } from '@/core/lib/lives/room'
@@ -253,6 +254,7 @@ export const syncLiveWatches = async (): Promise<void> => {
     if (current.offline) clearTimeout(current.offline)
     watcher.watches.delete(liveId)
     forgetSampling(liveId)
+    forgetLiveState(liveId)
     await forgetLive(liveId)
     await closeRoom(liveId)
   }
@@ -260,6 +262,7 @@ export const syncLiveWatches = async (): Promise<void> => {
   // Viewer curve of the lives on air
   for (const [liveId, current] of watcher.watches) {
     void sampleViewers({ liveId, ...current }).catch(() => null)
+    void pollLiveState({ liveId, ...current }).catch(() => null)
   }
 
   for (const live of lives) {

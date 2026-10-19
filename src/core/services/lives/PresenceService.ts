@@ -2,7 +2,7 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { isStale, tallyBeat } from '@/core/lib/lives/presence'
-import { closeLiveStints, ensureStint } from '@/core/services/lives/ModStintService'
+import { closeLiveStints, ensureStint, stopStintAt } from '@/core/services/lives/ModStintService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 /**
@@ -33,6 +33,8 @@ export const beatPresence = async (
       where: { id: open.id },
       data: { closedAt: open.lastBeatAt, closeReason: 'TIMEOUT' },
     })
+    // Moderating stopped where the Mod View went silent
+    await stopStintAt(liveId, accountId, open.lastBeatAt)
     open = null
   }
 
@@ -55,6 +57,9 @@ export const beatPresence = async (
       ...(beat.closing ? { closedAt: now, closeReason: 'CLOSED' as const } : {}),
     },
   })
+
+  // Closing the Mod View stops moderating
+  if (beat.closing) await stopStintAt(liveId, accountId, now)
 }
 
 /**
@@ -64,11 +69,12 @@ export const beatPresence = async (
  */
 
 export const closeLivePresences = async (liveId: string): Promise<void> => {
+  // Stretches first: they read the last beat of each member before it is closed
+  await closeLiveStints(liveId)
   await prisma.modViewPresence.updateMany({
     where: { liveId, closedAt: null },
     data: { closedAt: new Date(), closeReason: 'LIVE_ENDED' },
   })
-  await closeLiveStints(liveId)
 }
 
 /**
@@ -80,7 +86,7 @@ export const sweepStalePresences = async (): Promise<number> => {
   const horizon = new Date(Date.now() - LIVE_SETTINGS.staleSeconds * 1000)
   const stale = await prisma.modViewPresence.findMany({
     where: { closedAt: null, lastBeatAt: { lt: horizon } },
-    select: { id: true, lastBeatAt: true },
+    select: { id: true, lastBeatAt: true, liveId: true, accountId: true },
     take: 200,
   })
 
@@ -92,6 +98,9 @@ export const sweepStalePresences = async (): Promise<number> => {
       })
     )
   )
+
+  // A member who went silent stops moderating where they left
+  await Promise.all(stale.map((row) => stopStintAt(row.liveId, row.accountId, row.lastBeatAt)))
 
   return stale.length
 }

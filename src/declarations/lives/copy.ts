@@ -5,6 +5,7 @@
 
 export const LIVE_COPY = {
   title: 'Live en cours',
+  modViewTab: '{name} - Mod View',
   navLabel: 'Live en cours',
   announce: 'Annoncer un live',
   slotTaken: 'Un live est déjà prévu à ces horaires pour ce créateur.',

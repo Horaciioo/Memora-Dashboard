@@ -15,6 +15,7 @@ export const MODVIEW_WORKSPACE_COPY = {
   narrower: 'Rétrécir',
   hide: 'Masquer',
   resizeColumns: 'Ajuster la largeur',
+  resizeSide: 'Ajuster la largeur du panel de sanctions',
   resizeWindows: 'Ajuster la hauteur',
   windows: 'Fenêtres',
   reset: 'Remettre la disposition de départ',

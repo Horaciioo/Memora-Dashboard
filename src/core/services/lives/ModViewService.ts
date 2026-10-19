@@ -16,13 +16,20 @@ import {
   performOnTwitch,
   readBlockedTerms,
   readChatModes,
+  readBanDetail,
+  readCategoryArt,
+  readChannelTags,
   readCommunity,
+  readEmotes,
+  readOwnedEmoteIds,
+  readPin,
   readStream,
   readUnbanRequests,
 } from '@/core/lib/platforms/twitch/helix'
 import type { TwitchSeat } from '@/core/lib/platforms/twitch/helix'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readLive } from '@/core/services/lives/LiveService'
+import { pollLiveState } from '@/core/services/lives/LiveStatePoller'
 import { activeSuspension } from '@/core/services/members/admin/SuspensionService'
 import { logMemoraGesture, settleGesture } from '@/core/services/lives/ModerationLogService'
 import {
@@ -36,7 +43,13 @@ import { MODVIEW_LOCK_COPY } from '@/declarations/modview/copy'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
 import { formatDay } from '@/utils/format/dates'
 import type { LiveView } from '@/types/lives'
-import type { ActContext, ModViewIntent, ModViewState } from '@/types/modview'
+import type {
+  ActContext,
+  BanDetail,
+  LiveEmotes,
+  ModViewIntent,
+  ModViewState,
+} from '@/types/modview'
 import { LivePlatforms, LiveStatuses } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
 
@@ -255,12 +268,14 @@ export const openModView = async (
       state = { ...state, notice: PLATFORM_NOTICE_COPY.notModerator, readOnly: true }
     } else {
       // What Twitch says right now
-      const [modes, terms, requests, community, stream] = await Promise.all([
+      const [modes, terms, requests, community, stream, pinned, tags] = await Promise.all([
         readChatModes(seat),
         readBlockedTerms(seat),
         readUnbanRequests(seat).catch(() => []),
         readCommunity(seat).catch(() => null),
         readStream(seat),
+        readPin(seat).catch(() => null),
+        readChannelTags(seat).catch(() => []),
       ])
       state = {
         ...state,
@@ -269,7 +284,16 @@ export const openModView = async (
         unbanRequests: requests,
         community: community ? { ...state.community, ...community } : state.community,
         title: stream?.title ?? state.title,
-        channel: { ...state.channel, category: stream?.category ?? null },
+        viewers: stream?.viewers ?? null,
+        pinned,
+        channel: {
+          ...state.channel,
+          category: stream?.category ?? null,
+          tags,
+          categoryArt: stream?.categoryId
+            ? await readCategoryArt(seat, stream.categoryId).catch(() => null)
+            : null,
+        },
       }
     }
   } catch (error) {
@@ -283,7 +307,16 @@ export const openModView = async (
 
   // Chat kept by the live's room
   const room = await readRoomMemory(liveId)
-  if (room) state = { ...state, messages: room.messages, acts: room.acts, held: room.held }
+  if (room) {
+    state = {
+      ...state,
+      messages: room.messages,
+      acts: room.acts,
+      held: room.held,
+      pinned: room.pinned === undefined ? state.pinned : room.pinned,
+      viewers: room.viewers === undefined ? state.viewers : room.viewers,
+    }
+  }
 
   const connection = await readConnection(liveId)
   const waiting = live.status === LiveStatuses.Announced ? PLATFORM_NOTICE_COPY.waiting : null
@@ -384,6 +417,15 @@ export const actOnLive = async (input: {
   }
   await settleGesture(logId, true)
 
+  // The pin shows at once
+  if (input.intent.kind === 'pin' || input.intent.kind === 'unpin') {
+    void pollLiveState({
+      liveId: input.liveId,
+      holderId: input.viewerId,
+      broadcasterId: found.seat.broadcasterId,
+    }).catch(() => null)
+  }
+
   // The audit line points at the log line
   await recordEvent({
     eventType: 'ModerationActed',
@@ -394,4 +436,100 @@ export const actOnLive = async (input: {
   })
 
   return { done: true }
+}
+
+// Emotes kept per channel, they hardly ever change
+const emoteCache = new Map<
+  string,
+  { until: number; emotes: Awaited<ReturnType<typeof readEmotes>> }
+>()
+// What a member may use, kept per member and channel
+const ownedCache = new Map<string, { until: number; owned: Set<string> | null }>()
+const EMOTE_CACHE_MS = 600_000
+const OWNED_CACHE_MS = 300_000
+
+/**
+ * Emotes the chat box offers on a live, the ones the member cannot use marked locked
+ * @param {string} liveId - Live
+ * @param {AccessScope} scope - Viewer's perimeter
+ * @param {string} viewerId - Member
+ * @param {PermissionName[]} held - Permissions held
+ * @return {Promise<LiveEmotes>} - Emotes of Twitch and of the channel
+ */
+
+export const readLiveEmotes = async (
+  liveId: string,
+  scope: AccessScope,
+  viewerId: string,
+  held: PermissionName[]
+): Promise<LiveEmotes> => {
+  const live = await readLive(liveId, scope, viewerId, held)
+  if (live.access !== 'open') throw conflict()
+  if (live.platform !== LivePlatforms.Twitch) {
+    return { global: [], channel: [], isVerified: false }
+  }
+  await requireChannelModerator(viewerId, live)
+
+  const found = await seatOf(viewerId, live.youtuber.id)
+  if ('notice' in found) throw forbidden(found.notice)
+  const { seat } = found
+
+  try {
+    let base = emoteCache.get(seat.broadcasterId)
+    if (!base || base.until <= Date.now()) {
+      base = { until: Date.now() + EMOTE_CACHE_MS, emotes: await readEmotes(seat) }
+      emoteCache.set(seat.broadcasterId, base)
+    }
+
+    const ownedKey = `${seat.moderatorId}:${seat.broadcasterId}`
+    let owned = ownedCache.get(ownedKey)
+    if (!owned || owned.until <= Date.now()) {
+      owned = { until: Date.now() + OWNED_CACHE_MS, owned: await readOwnedEmoteIds(seat) }
+      ownedCache.set(ownedKey, owned)
+    }
+
+    // Without the right to read them, nothing is locked and the panel says so
+    const ids = owned.owned
+    return {
+      global: base.emotes.global,
+      channel: base.emotes.channel.map((emote) => ({
+        ...emote,
+        isLocked: ids !== null && !ids.has(emote.id),
+      })),
+      isVerified: ids !== null,
+    }
+  } catch (error) {
+    throw await translateRefusal(error, viewerId)
+  }
+}
+
+/**
+ * Account and ban of a viewer who asked to be unbanned
+ * @param {string} liveId - Live
+ * @param {AccessScope} scope - Viewer's perimeter
+ * @param {string} viewerId - Member
+ * @param {PermissionName[]} held - Permissions held
+ * @param {string} chatterId - Viewer asking
+ * @return {Promise<BanDetail>} - Detail
+ */
+
+export const readLiveBanDetail = async (
+  liveId: string,
+  scope: AccessScope,
+  viewerId: string,
+  held: PermissionName[],
+  chatterId: string
+): Promise<BanDetail> => {
+  const live = await readLive(liveId, scope, viewerId, held)
+  if (live.access !== 'open') throw conflict()
+  await requireChannelModerator(viewerId, live)
+
+  const found = await seatOf(viewerId, live.youtuber.id)
+  if ('notice' in found) throw forbidden(found.notice)
+
+  try {
+    return await readBanDetail(found.seat, chatterId)
+  } catch (error) {
+    throw await translateRefusal(error, viewerId)
+  }
 }

@@ -16,9 +16,11 @@ export const QUERY_KEYS = {
   reviewDesk: (juniorId: string) => ['academy', 'review-desk', juniorId] as const,
   blockQuiz: (blockId: string) => ['academy', 'quiz', blockId] as const,
   liveRoster: (liveId: string) => ['lives', 'roster', liveId] as const,
+  liveEmotes: (liveId: string) => ['lives', 'emotes', liveId] as const,
   liveInspect: (liveId: string, accountId: string) =>
     ['lives', 'inspect', liveId, accountId] as const,
   exerciseLinks: (candidateId: string) => ['recruitment', 'exercises', candidateId] as const,
+  liveBan: (liveId: string, viewerId: string) => ['lives', 'ban', liveId, viewerId] as const,
   liveViewer: (liveId: string, viewerId: string) => ['lives', 'viewer', liveId, viewerId] as const,
   liveViewerComments: (liveId: string, viewerId: string) =>
     ['lives', 'viewer-comments', liveId, viewerId] as const,

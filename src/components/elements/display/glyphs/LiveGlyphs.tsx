@@ -209,6 +209,28 @@ export const ModWarnGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
+ * Arrow bending back to the line it answers
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const ReplyGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    render={({ fill, lift }) => (
+      <>
+        <path
+          d="M10.5 4 3 11.5 10.5 19v-4.2c5.2 0 8.6 1.4 10.5 4.7-.6-6.4-4-11-10.5-11.8z"
+          fill={fill}
+          strokeLinejoin="round"
+        />
+        <path d="M10.5 4 3 11.5l7.5 3z" fill={lift} opacity="0.55" />
+      </>
+    )}
+  />
+)
+
+/**
  * AutoMod held shield
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
@@ -457,6 +479,74 @@ export const ViewerGlyph = ({ className }: GlyphProps) => (
         <path d="M3.5 21c.6-4.6 4-7.5 8.5-7.5s7.9 2.9 8.5 7.5z" fill={fill} />
         <circle cx="10.6" cy="6.6" r="1.8" fill={lift} opacity="0.8" />
       </>
+    )}
+  />
+)
+
+/**
+ * Two arrows pulling a window wider
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const MaximizeGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    render={({ fill, deep }) => (
+      <>
+        <path d="M14 3h7v7l-2.6-2.6-3.6 3.6-2.8-2.8 3.6-3.6z" fill={fill} />
+        <path d="M10 21H3v-7l2.6 2.6 3.6-3.6 2.8 2.8-3.6 3.6z" fill={deep} />
+      </>
+    )}
+  />
+)
+
+/**
+ * Three small people side by side
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const CrowdGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    render={({ fill, lift, deep }) => (
+      <>
+        <circle cx="4.8" cy="9.2" r="2.5" fill={deep} />
+        <path
+          d="M.6 19.6c.3-3.4 2.1-5.4 4.6-5.4.9 0 1.7.2 2.4.7-1.3 1.1-2.1 2.6-2.4 4.7z"
+          fill={deep}
+        />
+        <circle cx="19.2" cy="9.2" r="2.5" fill={deep} />
+        <path
+          d="M23.4 19.6c-.3-3.4-2.1-5.4-4.6-5.4-.9 0-1.7.2-2.4.7 1.3 1.1 2.1 2.6 2.4 4.7z"
+          fill={deep}
+        />
+        <circle cx="12" cy="7.4" r="3.4" fill={fill} />
+        <path d="M5.4 21.4c.5-4.5 3-7.2 6.6-7.2s6.1 2.7 6.6 7.2z" fill={fill} />
+        <circle cx="10.8" cy="6.2" r="1.3" fill={lift} opacity="0.8" />
+      </>
+    )}
+  />
+)
+
+/**
+ * Sword pointing up and to the right
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const SwordGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    render={({ fill, lift, deep }) => (
+      <g transform="rotate(45 12 12)">
+        <path d="M12 .8 14.6 4v11H9.4V4z" fill={fill} strokeLinejoin="round" />
+        <path d="M12 .8 12 15H9.4V4z" fill={lift} opacity="0.55" />
+        <rect x="6" y="15" width="12" height="2.6" rx="1.3" fill={deep} />
+        <rect x="10.8" y="17.6" width="2.4" height="3.6" rx="0.6" fill={fill} />
+        <circle cx="12" cy="22" r="1.5" fill={deep} />
+      </g>
     )}
   />
 )

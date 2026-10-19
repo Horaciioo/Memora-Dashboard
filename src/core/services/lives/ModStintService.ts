@@ -8,6 +8,7 @@ import {
   LIVE_OUTSIDE_DEFAULT,
   LIVE_OUTSIDE_LABELS,
 } from '@/declarations/lives/registries'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { LiveModTime, LiveSpan } from '@/types/lives'
 import { MemberRoles } from '@/utils/constants/hierarchy'
 import { LiveStatuses } from '@/utils/constants/lives'
@@ -48,16 +49,55 @@ export const stopStint = async (liveId: string, accountId: string): Promise<void
 }
 
 /**
- * End every stretch of a live that closed
+ * End the stretch of a member at the moment they left the Mod View
+ * @param {string} liveId - Live
+ * @param {string} accountId - Member
+ * @param {Date} at - When they left
+ * @return {Promise<void>} - Stopped
+ */
+
+export const stopStintAt = async (liveId: string, accountId: string, at: Date): Promise<void> => {
+  const open = await prisma.liveModStint.findMany({
+    where: { liveId, accountId, stoppedAt: null },
+    select: { id: true, startedAt: true },
+  })
+
+  // A stretch never ends before it began
+  await Promise.all(
+    open.map((stint) =>
+      prisma.liveModStint.update({
+        where: { id: stint.id },
+        data: { stoppedAt: new Date(Math.max(+stint.startedAt, +at)) },
+      })
+    )
+  )
+}
+
+/**
+ * End every stretch of a live that closed: a member who left the Mod View before the end stops
+ * where they left, not when the live ended
  * @param {string} liveId - Live
  * @return {Promise<void>} - Closed
  */
 
 export const closeLiveStints = async (liveId: string): Promise<void> => {
-  await prisma.liveModStint.updateMany({
+  const now = new Date()
+  const open = await prisma.liveModStint.findMany({
     where: { liveId, stoppedAt: null },
-    data: { stoppedAt: new Date() },
+    select: { accountId: true },
+    distinct: ['accountId'],
   })
+
+  for (const { accountId } of open) {
+    const last = await prisma.modViewPresence.findFirst({
+      where: { liveId, accountId },
+      orderBy: { lastBeatAt: 'desc' },
+      select: { lastBeatAt: true },
+    })
+    const isGone = last !== null && +now - +last.lastBeatAt > LIVE_SETTINGS.staleSeconds * 1000
+
+    await stopStintAt(liveId, accountId, isGone && last ? last.lastBeatAt : now)
+  }
 }
 
 /**

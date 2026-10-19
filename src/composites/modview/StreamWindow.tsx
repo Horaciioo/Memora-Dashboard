@@ -3,6 +3,7 @@
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
 import { useWindowChrome } from '@/composites/modview/workspace/WindowChrome'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
+import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_STREAM } from '@/declarations/ui/variants'
 import type { ModViewState } from '@/types/modview'
 
@@ -22,6 +23,7 @@ export interface StreamWindowProps {
 
 export const StreamWindow = ({ state, isLit, isTitleLit }: StreamWindowProps) => {
   const isTiled = useWindowChrome() !== null
+  const ViewerIcon = ICONS.viewer
 
   return (
     <ModWindow title={MODVIEW_COPY.stream} isLit={isLit || isTitleLit} flush={isTiled}>
@@ -53,7 +55,23 @@ export const StreamWindow = ({ state, isLit, isTitleLit }: StreamWindowProps) =>
           {state.channel.category && (
             <p className={MODVIEW_STREAM.category}>{state.channel.category}</p>
           )}
+          {(state.channel.tags?.length ?? 0) > 0 && (
+            <ul className={MODVIEW_STREAM.tags} aria-label={MODVIEW_COPY.tags}>
+              {state.channel.tags?.map((tag) => (
+                <li key={tag} className={MODVIEW_STREAM.tag}>
+                  {tag}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
+        {typeof state.viewers === 'number' && (
+          <p className={MODVIEW_STREAM.viewers} title={MODVIEW_COPY.viewers}>
+            <ViewerIcon className={MODVIEW_STREAM.viewersIcon} aria-hidden="true" />
+            <span>{state.viewers.toLocaleString('fr-FR')}</span>
+            <span className="sr-only">{MODVIEW_COPY.viewers}</span>
+          </p>
+        )}
       </div>
     </ModWindow>
   )

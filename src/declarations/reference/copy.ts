@@ -104,6 +104,12 @@ export const REFERENCE_COPY = {
   inUse: 'Impossible de supprimer : cet élément est encore utilisé.',
   deleteTitle: 'Supprimer cet élément ?',
   deleteDescription: 'Il disparaîtra des formulaires et des filtres. Cette action est définitive.',
+  eraseMenu: 'Supprimer avec toutes ses données',
+  eraseTitle: 'Supprimer {name} et toutes ses données ?',
+  eraseBody:
+    'Tout ce qui appartient à ce YouTubeur est effacé, y compris ce qui est en cours : ses lives et leurs journaux de modération, son panel de sanctions, ses commentaires sur les viewers, ses événements du calendrier, ses équipes, ses chaînes et identifiants, ses droits propres et ses recrutements. Les projets, tâches et réunions qu’il est seul à avoir sont supprimés ; ceux partagés avec un autre YouTubeur restent. Les membres ne sont jamais supprimés. Cette action est définitive.',
+  eraseType: 'Écris « {name} » pour confirmer',
+  eraseConfirm: 'Tout supprimer',
   reordered: 'Nouvel ordre enregistré.',
 } as const
 

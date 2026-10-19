@@ -8,16 +8,28 @@ import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
 import { WatchPanel } from '@/composites/modview/WatchPanel'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
+import { useModPreferences } from '@/core/hooks/interaction/state/useModPreferences'
 import type { Watchlist } from '@/core/hooks/interaction/state/useWatchlist'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
+import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_WATCH_COPY } from '@/declarations/modview/watch'
-import { MODVIEW_FEED, MODVIEW_SUGGEST, MODVIEW_TABS } from '@/declarations/ui/variants'
-import type { Chatter, HeldMessage } from '@/types/modview'
+import {
+  MODVIEW_FEED,
+  MODVIEW_MODES,
+  MODVIEW_SUGGEST,
+  MODVIEW_TABS,
+} from '@/declarations/ui/variants'
+import type { Chatter, HeldMessage, ModAct } from '@/types/modview'
 import { cn } from '@/utils/classnames'
 import { formatSince } from '@/utils/format/dates'
 
+// Resolved lines kept under the queue
+const MAX_RESOLVED = 50
+
 export interface AutoModWindowProps {
   held: HeldMessage[]
+  // Acts of the team, where the handled messages are read
+  acts: ModAct[]
   isLit: boolean
   gate: GateCheck
   onAct: ActRunner
@@ -39,6 +51,7 @@ type AutoModTab = 'queue' | 'watch'
 
 export const AutoModWindow = ({
   held,
+  acts,
   isLit,
   gate,
   onAct,
@@ -48,6 +61,7 @@ export const AutoModWindow = ({
   onPick,
 }: AutoModWindowProps) => {
   const [choice, setChoice] = useState<AutoModTab>('queue')
+  const { preferences, update } = useModPreferences()
   const tab: AutoModTab = hasQueue && (choice === 'queue' || hasWatch) ? choice : 'watch'
 
   // Looking at the tab, or leaving it, reads what is there
@@ -69,8 +83,34 @@ export const AutoModWindow = ({
       : []),
   ]
 
+  // Handled messages stay in the queue as resolved when the moderator wants it
+  const resolved = preferences.keepResolved
+    ? acts
+        .filter((act) => act.kind === 'automodApprove' || act.kind === 'automodDeny')
+        .slice(0, MAX_RESOLVED)
+    : []
+  const rows = [
+    ...held.map((entry) => ({ key: entry.id, at: entry.at, held: entry, act: null })),
+    ...resolved.map((act) => ({ key: act.id, at: act.at, held: null, act })),
+  ].sort((left, right) => Date.parse(right.at) - Date.parse(left.at))
+
+  const keepToggle = tab === 'queue' && (
+    <button
+      type="button"
+      className={MODVIEW_MODES.trigger}
+      aria-pressed={preferences.keepResolved}
+      title={
+        preferences.keepResolved ? MODVIEW_COPY.keepResolvedHint : MODVIEW_COPY.dropResolvedHint
+      }
+      onClick={() => update({ keepResolved: !preferences.keepResolved })}
+    >
+      {preferences.keepResolved ? MODVIEW_COPY.keepResolved : MODVIEW_COPY.dropResolved}
+    </button>
+  )
+
   return (
     <ModWindow
+      actions={keepToggle}
       title={
         tabs.length === 1 ? (
           tabs[0]!.label
@@ -103,7 +143,7 @@ export const AutoModWindow = ({
     >
       {tab === 'watch' ? (
         <WatchPanel watchlist={watchlist} gate={gate} onAct={onAct} onPick={onPick} />
-      ) : held.length === 0 ? (
+      ) : rows.length === 0 ? (
         <WindowEmpty
           icon="automod"
           title={MODVIEW_COPY.automodEmptyTitle}
@@ -111,7 +151,9 @@ export const AutoModWindow = ({
         />
       ) : (
         <ul className={MODVIEW_FEED.list}>
-          {held.map((entry) => {
+          {rows.map((row) => {
+            const entry = row.held
+            if (!entry) return <ResolvedLine key={row.key} act={row.act} />
             const check = gate({ kind: 'automod', heldId: entry.id, approve: true })
 
             return (
@@ -167,5 +209,37 @@ export const AutoModWindow = ({
         </ul>
       )}
     </ModWindow>
+  )
+}
+
+/**
+ * A handled message kept in the queue, as Twitch keeps it
+ * @param {ModAct} act - Accept or refusal of the held message
+ * @return {JSX.Element}
+ */
+
+const ResolvedLine = ({ act }: { act: ModAct }) => {
+  const isApproved = act.kind === 'automodApprove'
+  const StatusIcon = ICONS[isApproved ? 'check' : 'close']
+
+  return (
+    <li className={cn(MODVIEW_FEED.item, MODVIEW_FEED.itemPending)}>
+      <div className={MODVIEW_FEED.main}>
+        <span className={MODVIEW_FEED.category}>{MODVIEW_COPY.resolved}</span>
+        <p>
+          <span className={MODVIEW_FEED.who}>{act.target}</span>
+          <DotMark />
+          {formatSince(act.at)}
+        </p>
+        {act.quote && <p className={MODVIEW_FEED.quote}>{act.quote}</p>}
+        <p className={MODVIEW_FEED.line}>
+          <StatusIcon className="mr-1 inline h-4 w-4 align-[-3px]" aria-hidden="true" />
+          {(isApproved ? MODVIEW_COPY.resolvedApproved : MODVIEW_COPY.resolvedDenied).replace(
+            '{name}',
+            act.moderator
+          )}
+        </p>
+      </div>
+    </li>
   )
 }

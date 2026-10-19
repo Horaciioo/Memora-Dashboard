@@ -88,7 +88,12 @@ export const MODVIEW_STREAM = {
   art: 'h-12 w-9 shrink-0 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] object-cover',
   titleBody: 'min-w-0 flex-1',
   titleText: 'text-sm leading-snug font-semibold',
+  viewers:
+    'flex shrink-0 items-center gap-1.5 text-sm font-bold tabular-nums text-[var(--color-danger)]',
+  viewersIcon: 'h-4 w-4',
   category: 'text-xs text-[var(--color-ink-subtle)]',
+  tags: 'mt-1.5 flex flex-wrap gap-1',
+  tag: 'rounded-[var(--radius-xs)] border border-[var(--color-border)] px-1.5 py-0.5 text-xs font-semibold',
 } as const
 
 /**
@@ -159,19 +164,63 @@ export const MODVIEW_CHAT = {
   welcome: 'px-3 pt-3 pb-1 text-sm text-[var(--color-ink-subtle)]',
   list: 'flex flex-col py-1',
   line: 'group relative px-3 py-1 text-sm leading-relaxed [overflow-wrap:anywhere] transition-colors hover:bg-[var(--color-hover)]',
-  lineFirst:
-    'border-l-4 border-[var(--color-brand-600)] bg-[color-mix(in_oklab,var(--color-brand-600)_8%,transparent)]',
+  // First message of a chatter, framed
+  lineFirst: 'my-1 rounded-[var(--radius-sm)] border border-[var(--color-brand-600)]',
   lineLit: 'bg-[color-mix(in_oklab,var(--color-caution)_18%,transparent)]',
-  firstTag:
-    'mb-0.5 block text-micro font-bold tracking-wide text-[var(--color-brand-800)] uppercase',
+  firstTag: 'mb-0.5 block text-xs font-semibold text-[var(--color-brand-800)]',
   badge: 'mr-1 inline-block h-4 w-4 align-[-2px]',
   name: 'cursor-pointer font-bold hover:underline',
   deleted: 'text-[var(--color-ink-subtle)] italic',
+  // Gestures, always at the start of the line
+  tools: 'mr-1.5 inline-flex shrink-0 items-center gap-0.5 align-middle',
   // Gestures shown on hover
-  tools:
+  toolsHover:
     'absolute top-0.5 right-2 hidden items-center gap-0.5 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-0.5 shadow-[var(--shadow-sm)] group-hover:flex group-focus-within:flex',
-  tool: 'flex h-7 w-7 items-center justify-center rounded-[var(--radius-md)] hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-35',
+  tool: 'flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] opacity-80 hover:bg-[var(--color-hover)] hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-25',
   toolIcon: 'h-4 w-4',
+  link: 'text-[var(--twitch-lilac)] underline underline-offset-2 hover:text-[var(--twitch-purple)]',
+  emote: 'mx-0.5 inline-block h-7 w-auto max-w-none align-middle',
+  mention: 'font-bold text-[var(--twitch-lilac)]',
+  // Line answered, above a reply
+  replyLine:
+    'mb-0.5 block truncate text-xs text-[var(--color-ink-subtle)] before:mr-1 before:content-["↪"]',
+  replyBanner:
+    'flex items-center gap-2 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-2 py-1 text-xs text-[var(--color-ink-subtle)]',
+  replyText: 'min-w-0 flex-1 truncate',
+  replyClose:
+    'flex h-5 w-5 shrink-0 items-center justify-center rounded-[var(--radius-sm)] hover:bg-[var(--color-hover)]',
+  pinned:
+    'relative z-10 m-2 flex shrink-0 flex-col gap-0.5 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface-raised)] px-3 py-2 text-sm shadow-[var(--shadow-md)]',
+  pinnedHead:
+    'flex items-center gap-1.5 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  pinnedIcon: 'h-3.5 w-3.5',
+  pinnedBody: 'line-clamp-3 [overflow-wrap:anywhere]',
+  pinnedClear:
+    'ml-auto rounded-[var(--radius-sm)] px-1.5 py-0.5 text-micro font-bold normal-case hover:bg-[var(--color-hover)]',
+  // Emote panel above the chat box
+  emotePanel:
+    'mx-3 mb-1 flex max-h-72 flex-col gap-2 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-2 shadow-[var(--shadow-md)]',
+  emoteHead: 'flex items-center gap-2',
+  emoteSearch:
+    'min-w-0 flex-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-1 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
+  emoteScroll: 'flex min-h-0 flex-col gap-2 overflow-y-auto',
+  emoteTitle: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  emoteGrid: 'flex flex-wrap gap-0.5',
+  emoteCell:
+    'flex size-9 items-center justify-center rounded-[var(--radius-sm)] hover:bg-[var(--color-hover)]',
+  emoteLocked: 'cursor-not-allowed opacity-35 grayscale hover:bg-transparent',
+  emoteImage: 'max-h-7 max-w-7 object-contain',
+  emoteToggle:
+    'flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-sm)] hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-35',
+  emoteNote: 'text-xs text-[var(--color-ink-subtle)]',
+  menu: 'mx-3 mb-1 flex max-h-56 flex-col overflow-y-auto rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-md)]',
+  menuTitle:
+    'px-3 pt-2 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  menuItem:
+    'flex w-full items-baseline gap-2 px-3 py-1.5 text-left text-sm hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-40',
+  menuItemOn: 'bg-[var(--color-hover)]',
+  menuName: 'font-bold',
+  menuHint: 'min-w-0 truncate text-xs text-[var(--color-ink-subtle)]',
   resume:
     'absolute bottom-24 left-1/2 -translate-x-1/2 rounded-full bg-[var(--color-ink)] px-3 py-1 text-xs font-bold text-[var(--color-surface-raised)] shadow-[var(--shadow-md)]',
   // Hover pause, never in the way
@@ -183,6 +232,15 @@ export const MODVIEW_CHAT = {
   input:
     'min-w-0 flex-1 rounded-[var(--radius-sm)] border-2 border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm outline-none focus:border-[var(--color-ink-subtle)] disabled:cursor-not-allowed disabled:opacity-60',
   composerRow: 'flex items-center gap-1',
+} as const
+
+/**
+ * Warning dialog
+ * @type {Record<string, string>}
+ */
+
+export const MODVIEW_WARN = {
+  field: 'min-h-28 w-full',
 } as const
 
 /**
@@ -200,6 +258,7 @@ export const MODVIEW_MODES = {
   // Option a scene is setting
   rowLit: 'bg-[var(--color-brand-soft)] ring-2 ring-[var(--color-pick)]',
   rowIcon: 'h-5 w-5 shrink-0',
+  section: 'px-2 pt-2 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   rowLabel: 'min-w-0 flex-1 font-semibold',
   reason: 'px-2 pb-1 text-xs text-[var(--color-ink-subtle)]',
 } as const
@@ -240,13 +299,16 @@ export const MODVIEW_COMMUNITY = {
 export const MODVIEW_USER = {
   panel:
     'course-pop absolute inset-y-0 right-0 z-40 flex w-full max-w-sm flex-col overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)] shadow-[var(--shadow-md)]',
+  // Takes the column of the sanctions and the watch list, never the chat
+  docked:
+    'relative flex min-h-0 shrink-0 flex-col overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)] transition-[width] duration-300 ease-out motion-reduce:transition-none',
   close: 'absolute top-2 right-2',
   head: 'relative flex flex-col items-center gap-1.5 px-4 pt-6 pb-4 text-center',
   glyph: 'h-9 w-9',
   name: 'max-w-full truncate text-2xl font-bold tracking-tight',
   watch: 'mt-1',
-  tabs: 'flex flex-wrap items-center justify-center gap-1 px-4 pb-3',
-  tab: 'rounded-full px-3 py-1 text-xs font-bold text-[var(--twitch-muted)] transition-colors hover:text-[var(--color-ink)]',
+  tabs: 'flex flex-nowrap items-center justify-center gap-0.5 px-2 pb-3',
+  tab: 'rounded-full px-2.5 py-1 text-xs font-bold whitespace-nowrap text-[var(--twitch-muted)] transition-colors hover:text-[var(--color-ink)]',
   tabOn: 'bg-[var(--twitch-head)] text-[var(--color-ink)]',
   stats:
     'mx-4 grid auto-cols-fr grid-flow-col divide-x divide-[color-mix(in_oklab,var(--color-ink)_22%,transparent)] rounded-[var(--radius-md)] bg-[var(--twitch-head)] py-3',
@@ -268,6 +330,13 @@ export const MODVIEW_USER = {
   commentDate: 'shrink-0 text-xs text-[var(--twitch-muted)]',
   commentBody: 'text-sm break-words whitespace-pre-wrap',
   presets: 'grid grid-cols-4 gap-1.5',
+  custom: 'flex items-center gap-1.5',
+  pager: 'flex items-center justify-between gap-2',
+  pagerLabel: 'text-xs font-bold tabular-nums text-[var(--twitch-muted)]',
+  messageRow: 'flex items-start gap-2',
+  messageText: 'min-w-0 flex-1',
+  messageTool:
+    'flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-sm)] hover:bg-[var(--color-hover)] disabled:cursor-not-allowed disabled:opacity-30',
   preset:
     'rounded-[var(--radius-md)] bg-[var(--twitch-head)] py-2 text-center text-xs font-bold transition-colors hover:brightness-125 disabled:cursor-not-allowed disabled:opacity-40',
   reason:
@@ -283,7 +352,7 @@ export const MODVIEW_USER = {
 
 export const MODVIEW_SANCTIONS = {
   // Two boxes: sanctions, then Surveillance
-  column: 'flex min-h-0 w-full shrink-0 flex-col lg:w-80',
+  column: 'flex min-h-0 w-full shrink-0 flex-col lg:w-[var(--modview-side,18rem)]',
   root: 'flex min-h-0 flex-col overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)]',
   toggle:
     'bg-[var(--twitch-head)] px-3 py-2 text-sm font-bold tracking-tight text-[var(--color-ink-accent)]',
@@ -294,7 +363,7 @@ export const MODVIEW_SANCTIONS = {
   bottomTitle:
     'bg-[var(--twitch-head)] px-3 py-2 text-sm font-bold tracking-tight text-[var(--color-ink-accent)]',
   bottomBody: 'flex min-h-0 flex-1 flex-col overflow-y-auto',
-  suggestion: 'flex flex-col gap-3',
+  suggestion: 'my-3 flex flex-col gap-3',
   suggestionTitle: 'flex items-center gap-2 text-base font-bold tracking-tight',
   suggestionIcon: 'h-5 w-5 shrink-0',
   level: 'mb-3 flex items-center gap-2 text-xs font-bold tracking-wide uppercase',
@@ -318,7 +387,6 @@ export const MODVIEW_SANCTIONS = {
   headName: 'text-sm font-bold tracking-wide uppercase',
   search:
     'w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-1.5 text-sm outline-none focus:border-[var(--color-ink-subtle)]',
-  divider: 'mb-3 h-px bg-[color-mix(in_oklab,var(--color-ink)_22%,transparent)]',
   list: 'flex flex-col gap-2',
   title:
     'w-full cursor-pointer rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-3 py-2 text-left text-sm font-bold transition-colors hover:bg-[color-mix(in_oklab,var(--color-ink)_12%,var(--color-surface-sunken))]',
@@ -353,6 +421,9 @@ export const MODVIEW_WORKSPACE = {
   root: 'flex min-h-0 min-w-0 flex-1',
   column: 'flex min-h-0 min-w-0 flex-col',
   away: 'hidden',
+  // Handle between the stage and the right column, lent from the gap already there
+  sideHandle: 'relative z-10 hidden w-0 -mx-[calc(var(--modview-gap)/2)] lg:block',
+  sideHandleGrip: 'absolute inset-y-0 left-1/2 flex -translate-x-1/2',
   row: 'flex min-h-0 min-w-0 gap-[var(--modview-gap)]',
   slot: 'relative flex min-h-0 min-w-0 flex-col',
   // Handles between two columns or two windows
@@ -382,26 +453,33 @@ export const MODVIEW_WORKSPACE = {
  */
 
 export const MODVIEW_SIDEBAR = {
-  root: 'relative z-30 flex w-11 shrink-0 flex-col items-center justify-between py-1',
-  bottom: 'flex flex-col items-center gap-1',
+  root: 'relative z-30 flex w-11 shrink-0 flex-col items-center justify-center py-1',
   end: 'flex size-10 cursor-pointer items-center justify-center rounded-[var(--radius-lg)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
-  divider: 'my-1 h-px w-6 bg-[var(--color-border)]',
+  divider: 'h-px w-6 bg-[var(--color-border)]',
+  creator: 'flex size-10 items-center justify-center',
   // Leave dialog: two full width choices split by a line
   leaveChoices: 'flex w-full flex-col gap-3',
   leaveDivider: 'h-px w-full bg-[var(--color-border)]',
-  stack: 'flex flex-col items-center gap-1',
+  stack: 'flex flex-col items-center gap-3',
   group: 'relative flex flex-col items-center gap-1',
   button:
     'flex size-10 cursor-pointer items-center justify-center rounded-[var(--radius-lg)] text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]',
   buttonOpen: 'bg-[var(--color-hover)]',
   icon: 'size-5',
   panel:
-    'popover-enter glass-panel absolute left-full z-[60] ml-2 flex max-h-[80dvh] w-72 flex-col gap-1 overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
-  panelTop: 'top-0',
-  panelBottom: 'bottom-0',
+    'popover-enter glass-panel absolute left-full z-[60] ml-4 flex max-h-[70dvh] flex-col gap-1 overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] p-2 text-sm shadow-[var(--shadow-lg)]',
+  // Centred on its glyph, the arrow points at it
+  // Room for a list with its own controls
+  panelNormal: 'w-72',
+  panelWide: 'w-[28rem]',
+  panelTop: 'top-1/2 -translate-y-1/2',
+  panelBottom: 'top-1/2 -translate-y-1/2',
+  arrow:
+    'glass-panel pointer-events-none absolute top-1/2 left-full z-[60] ml-2 h-3.5 w-2 -translate-y-1/2 border-0 [clip-path:polygon(100%_0,0_50%,100%_100%)]',
   subtitle: 'px-2.5 pb-1 text-xs text-[var(--color-ink-subtle)]',
+  titleRow: 'flex items-center justify-between gap-2',
   title:
-    'px-2.5 pt-1.5 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'min-w-0 px-2.5 pt-1.5 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
 } as const
 
 /**
