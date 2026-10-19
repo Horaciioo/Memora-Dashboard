@@ -19,7 +19,32 @@ import { LivePlatforms } from '@/utils/constants/lives'
 import { SanctionPanels } from '@/utils/constants/moderation'
 import { Permissions } from '@/utils/constants/permissions'
 
-export const metadata: Metadata = { title: LIVE_COPY.title }
+/**
+ * Name the browser tab after the creator
+ * @param {Object} context - Route context
+ * @param {Promise<{ id: string }>} context.params - Live identifier
+ * @return {Promise<Metadata>} - Page metadata
+ */
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+
+  try {
+    const { session, scope } = await requirePermission(Permissions.LiveRead)
+    const { youtuber } = await readLive(id, await scope(), session.id, session.permissions)
+
+    return {
+      title: LIVE_COPY.modViewTab.replace('{name}', youtuber.name),
+    }
+  } catch {
+    // A live out of reach keeps the page's own title
+    return { title: LIVE_COPY.title }
+  }
+}
 
 /**
  * Mod View of one live
