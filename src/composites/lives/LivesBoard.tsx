@@ -148,7 +148,6 @@ export const LivesBoard = ({
         <PastLives lives={past} canReport={canReport} canCreatorReport={canCreatorReport} />
       )}
 
-
       <LiveEndedDialog liveId={canReport ? endedId : null} onClose={dismissEnded} />
     </div>
   )

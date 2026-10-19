@@ -18,7 +18,11 @@ export interface SecretCipher {
 const ENCRYPTED_PREFIX = 'enc:'
 const PLAIN_PREFIX = 'plain:'
 
-let cipher: SecretCipher | null = null
+// Shared across bundles, the startup hook and the routes load this file apart
+const globalForCipher = globalThis as unknown as { secretCipher?: SecretCipher | null }
+
+const currentCipher = (): SecretCipher | null => globalForCipher.secretCipher ?? null
+
 let warned = false
 
 /**
@@ -28,7 +32,7 @@ let warned = false
  */
 
 export const bindSecretCipher = (implementation: SecretCipher): void => {
-  cipher = implementation
+  globalForCipher.secretCipher = implementation
 }
 
 /**
@@ -37,7 +41,7 @@ export const bindSecretCipher = (implementation: SecretCipher): void => {
  */
 
 export const unbindSecretCipher = (): void => {
-  cipher = null
+  globalForCipher.secretCipher = null
 }
 
 /**
@@ -45,7 +49,7 @@ export const unbindSecretCipher = (): void => {
  * @return {boolean} - Cipher available
  */
 
-export const isEncryptionActive = (): boolean => cipher !== null
+export const isEncryptionActive = (): boolean => currentCipher() !== null
 
 /**
  * Protect one secret before it reaches the database
@@ -54,6 +58,7 @@ export const isEncryptionActive = (): boolean => cipher !== null
  */
 
 export const encryptSecret = (value: string): string => {
+  const cipher = currentCipher()
   if (cipher) return `${ENCRYPTED_PREFIX}${cipher.encrypt(value)}`
 
   // Outside dev a missing key refuses the write
@@ -87,6 +92,7 @@ export const decryptSecret = (stored: string): string | null => {
   const payload = stored.slice(ENCRYPTED_PREFIX.length)
 
   // A value written under a key that is gone cannot be recovered
+  const cipher = currentCipher()
   if (!cipher) {
     logger.warn('[crypto] an encrypted secret was read without a cipher')
 

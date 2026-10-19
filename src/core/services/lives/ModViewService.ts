@@ -32,6 +32,7 @@ import {
 } from '@/core/services/platforms/PlatformAccountService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
+import { MODVIEW_LOCK_COPY } from '@/declarations/modview/copy'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
 import { formatDay } from '@/utils/format/dates'
 import type { LiveView } from '@/types/lives'
@@ -174,28 +175,32 @@ export const openModView = async (
   if (live.access !== 'open') throw conflict()
   let state: ModViewState = { ...baseState(live), roster: await readTwitchRoster() }
 
+  // The player needs no seat, only the channel
+  const channel = live.platform === LivePlatforms.Twitch ? await channelOf(live.youtuber.id) : null
+  const channelLogin = channel && channel !== 'several' ? channel.login : null
+
   // A paused member only watches
   const paused = await activeSuspension(viewerId)
   if (paused) {
     return {
       state: { ...state, notice: suspensionNotice(paused.endsAt), readOnly: true },
-      channelLogin: null,
+      channelLogin,
       feedSeq: 0,
     }
   }
 
   // Only Twitch is wired
-  if (live.platform !== LivePlatforms.Twitch) return { state, channelLogin: null, feedSeq: 0 }
+  if (live.platform !== LivePlatforms.Twitch) return { state, channelLogin, feedSeq: 0 }
 
   const found = await seatOf(viewerId, live.youtuber.id)
   if ('notice' in found)
     return {
       state: { ...state, notice: found.notice, readOnly: true },
-      channelLogin: null,
+      channelLogin,
       feedSeq: 0,
     }
 
-  const { seat, login } = found
+  const { seat } = found
   try {
     const moderates = await moderatesChannel(seat)
     if (!moderates) {
@@ -223,7 +228,7 @@ export const openModView = async (
     const refusal = await translateRefusal(error, viewerId)
     return {
       state: { ...state, notice: refusal.message, readOnly: true },
-      channelLogin: login,
+      channelLogin,
       feedSeq: 0,
     }
   }
@@ -241,7 +246,7 @@ export const openModView = async (
       connection: connection?.state ?? 'disconnected',
       notice: state.notice ?? connection?.notice ?? waiting,
     },
-    channelLogin: login,
+    channelLogin,
     feedSeq: room?.seq ?? 0,
   }
 }
@@ -285,6 +290,12 @@ export const actOnLive = async (input: {
 
   const found = await seatOf(input.viewerId, live.youtuber.id)
   if ('notice' in found) throw forbidden(found.notice)
+
+  // Never on oneself nor on the channel
+  const target = 'chatterId' in input.intent ? input.intent.chatterId : null
+  if (target && [found.seat.moderatorId, found.seat.broadcasterId].includes(target)) {
+    throw forbidden(MODVIEW_LOCK_COPY.self)
+  }
 
   // Acting in someone's place needs a Focus open on them
   const onBehalfOfId = input.context.onBehalfOfId

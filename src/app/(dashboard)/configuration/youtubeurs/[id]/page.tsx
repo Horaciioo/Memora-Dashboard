@@ -72,10 +72,16 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
     readChannels(id),
   ])
 
+  // The channels speak for the creator
+  const eyebrow =
+    channels.length > 0
+      ? channels.map((channel) => channel.login).join(', ')
+      : (youtuber.handle ?? YOUTUBER_COPY.noHandle)
+
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader
-        eyebrow={youtuber.handle ?? YOUTUBER_COPY.noHandle}
+        eyebrow={eyebrow}
         title={youtuber.name}
         actions={
           youtuber.archived ? (

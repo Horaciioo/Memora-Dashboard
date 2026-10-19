@@ -239,13 +239,7 @@ export type ModViewIntent =
  */
 
 export type ModViewWindow =
-  | 'stream'
-  | 'modActions'
-  | 'automod'
-  | 'chat'
-  | 'community'
-  | 'unbanRequests'
-  | 'inspect'
+  'stream' | 'modActions' | 'automod' | 'chat' | 'community' | 'unbanRequests' | 'inspect'
 
 /**
  * Part a scene may light up

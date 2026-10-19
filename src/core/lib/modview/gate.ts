@@ -35,7 +35,10 @@ const locked = (permission: PermissionName, owners?: string, quiet?: boolean): I
   allowed: false,
   reason: quiet
     ? null
-    : MODVIEW_LOCK_COPY.role.replace('{who}', owners ?? PERMISSION_OWNERS[permission] ?? permission),
+    : MODVIEW_LOCK_COPY.role.replace(
+        '{who}',
+        owners ?? PERMISSION_OWNERS[permission] ?? permission
+      ),
 })
 
 /**
