@@ -42,10 +42,7 @@ const FLOOR: ModViewWindow[] = ['stream', 'chat', 'automod', 'modActions', 'comm
 const SIZES: Partial<Record<ModViewWindow, number>> = { stream: 1.6 }
 
 // The audience is a sidebar glyph, the actions and the queue share a row under the stream
-const FLOOR_COLUMNS: ColumnSpec[] = [
-  ['stream', ['modActions', 'automod']],
-  ['chat'],
-]
+const FLOOR_COLUMNS: ColumnSpec[] = [['stream', ['modActions', 'automod']], ['chat']]
 
 const PROFILE_MAP: Record<ModViewProfileName, ModViewProfileOption> = {
   moderator: {
@@ -78,11 +75,7 @@ const PROFILE_MAP: Record<ModViewProfileName, ModViewProfileOption> = {
   admin: {
     label: 'Admin',
     windows: [...FLOOR, 'inspect', 'unbanRequests'],
-    columns: [
-      ['stream', ['modActions', 'automod']],
-      ['chat'],
-      ['inspect', 'unbanRequests'],
-    ],
+    columns: [['stream', ['modActions', 'automod']], ['chat'], ['inspect', 'unbanRequests']],
     widths: [1.7, 1, 0.8],
     sizes: SIZES,
     // Inspect Mod takes the place of the unban requests
