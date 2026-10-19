@@ -19,7 +19,8 @@ import type { IconName } from '@/declarations/ui/icons'
 import type { HomeTask } from '@/types/personal'
 import { AcademyStages } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
-import { unreadMentions } from '@/core/services/system/NotificationService'
+import { unreadMentions, unreadReports } from '@/core/services/system/NotificationService'
+import { prisma } from '@/core/lib/db'
 
 /**
  * Build a task pointing at a declared destination
@@ -137,7 +138,7 @@ const managerTasks = async (
   const tasks: HomeTask[] = []
 
   for (const standing of standings) {
-    const context = `${standing.name} · ${standing.sessionName}`
+    const context = `${standing.name}, ${standing.sessionName}`
 
     if (standing.phase === 'needsTrainer') {
       tasks.push(
@@ -263,7 +264,7 @@ const reviewTasks = async (trainerId: string): Promise<HomeTask[]> => {
         title:
           PERSONAL_TASK_COPY.reviewDue[stage as keyof typeof PERSONAL_TASK_COPY.reviewDue] ??
           PERSONAL_TASK_COPY.reviewDue.REVIEW_ONE,
-        context: `${standing.name} · ${standing.sessionName}`,
+        context: `${standing.name}, ${standing.sessionName}`,
         icon: 'sheet',
         href: fileTab(standing, 'reviews'),
         description: PERSONAL_TASK_COPY.reviewDueDescription,
@@ -332,6 +333,40 @@ const mentionTasks = async (accountId: string): Promise<HomeTask[]> => {
 }
 
 /**
+ * Reports of lives the member missed, until they open them
+ * @param {string} accountId - Member
+ * @return {Promise<HomeTask[]>} - One task per report not seen
+ */
+
+const reportTasks = async (accountId: string): Promise<HomeTask[]> => {
+  const reports = (await unreadReports(accountId)).filter((report) => report.targetId)
+  if (reports.length === 0) return []
+
+  // Whoever was in the Mod View already saw how it went
+  const joined = await prisma.modViewPresence.findMany({
+    where: { accountId, liveId: { in: reports.map((report) => report.targetId as string) } },
+    select: { liveId: true },
+    distinct: ['liveId'],
+  })
+  const present = new Set(joined.map((row) => row.liveId))
+
+  return reports
+    .filter((report) => !present.has(report.targetId as string))
+    .map((report) => ({
+      key: `report:${report.targetId}`,
+      kind: 'liveReport' as const,
+      title: PERSONAL_TASK_COPY.liveReportTitle.replace('{title}', report.subject ?? ''),
+      context: '',
+      icon: 'modActions' as const,
+      href: ROUTES.liveReport(report.targetId as string),
+      description: PERSONAL_TASK_COPY.liveReportDescription,
+      guide: null,
+      destinationLabel: null,
+      dueAt: null,
+    }))
+}
+
+/**
  * Everything waiting on the signed-in member: what the parkour asks of their seat
  * @param {SessionUser} viewer - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
@@ -342,12 +377,13 @@ export const myTasks = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<HomeTask[]> => {
-  const [preparation, reviews, trainings, mentions] = await Promise.all([
+  const [preparation, reviews, trainings, mentions, reports] = await Promise.all([
     access.can(Permissions.AcademyManage) ? managerTasks(viewer, access) : Promise.resolve([]),
     reviewTasks(viewer.id),
     trainingTasks(viewer.id),
     mentionTasks(viewer.id),
+    reportTasks(viewer.id),
   ])
 
-  return [...mentions, ...preparation, ...reviews, ...trainings]
+  return [...mentions, ...reports, ...preparation, ...reviews, ...trainings]
 }

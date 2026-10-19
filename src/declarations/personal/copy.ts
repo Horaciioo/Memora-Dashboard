@@ -26,7 +26,10 @@ export const PERSONAL_COPY = {
   less: 'Réduire',
   absenceTitle: 'Absence de {name}',
   attendanceKind: 'Appel de présence',
-  attendanceAnswer: 'Répondre',
+  pimInfos: 'Infos de PIM',
+  attendanceAsked: 'Ta présence est demandée !',
+  callInfos: 'Infos de l’appel',
+  attendanceAnswered: 'Réponse enregistrée',
   allDay: 'Journée',
   birthdayOf: 'Anniversaire de {name}',
   urgentTitle: 'Urgent',
@@ -57,6 +60,9 @@ export const PERSONAL_TASK_COPY = {
   empty: 'Rien ne t’attend, tout est à jour.',
   mentionTitle: '{name} t’a mentionné',
   mentionSomeone: 'Quelqu’un',
+  liveReportTitle: 'Voir le bilan du live « {title} »',
+  liveReportDescription:
+    'Tu n’étais pas là pour ce live. Ouvre son bilan pour voir comment il s’est passé.',
   mentionDescription: 'Un commentaire du recrutement te cite. Va jeter un œil.',
   assignTrainer: 'Attribuer un Formateur',
   assignTrainerDescription:

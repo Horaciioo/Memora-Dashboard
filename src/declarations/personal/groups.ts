@@ -7,6 +7,9 @@ import type { IconName } from '@/declarations/ui/icons'
  * @property {string} other - Sentence for several, {n} stands for the count
  * @property {string} title - Title of the window walking them
  * @property {IconName} icon - Glyph
+ * @property {boolean} [pim] - A step of the PIM: its context reads as a list of facts
+ * @property {boolean} [solo] - Walked alone: no counter, no timeline, no previous or next
+ * @property {boolean} [urgent] - Reads in red, the most pressing kind
  */
 
 export interface TaskGroupOption {
@@ -14,7 +17,31 @@ export interface TaskGroupOption {
   other: string
   title: string
   icon: IconName
+  pim?: boolean
+  solo?: boolean
+  urgent?: boolean
 }
+
+/**
+ * Glyph of each fact of a PIM context, in the order it is written: person, promotion, creator
+ * @type {IconName[]}
+ */
+
+export const PIM_FACT_ICONS: IconName[] = ['members', 'academy', 'youtuber']
+
+/**
+ * Separator between the facts of a task context
+ * @type {string}
+ */
+
+export const CONTEXT_SEPARATOR = ', '
+
+/**
+ * Steps of the timeline drawn at once, the others scroll in as the walk moves
+ * @type {number}
+ */
+
+export const STEPPER_VISIBLE_STEPS = 7
 
 /**
  * Gathered task kinds, by the group key of their entries
@@ -27,6 +54,7 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     other: 'On te propose de coordonner {n} lives',
     title: 'Coordination de lives',
     icon: 'coordinator',
+    solo: true,
   },
   absence: {
     one: 'Tu as {n} absence à voir',
@@ -39,24 +67,28 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     other: 'Tu dois répondre à {n} appels de présence',
     title: 'Appels de présence',
     icon: 'meetings',
+    urgent: true,
   },
   pimStep: {
     one: 'Tu as {n} étape de PIM à valider',
     other: 'Tu as {n} étapes de PIM à valider',
     title: 'Étapes de PIM',
     icon: 'clock',
+    pim: true,
   },
   assignTrainer: {
     one: 'Tu dois attribuer {n} Formateur',
     other: 'Tu dois attribuer {n} Formateurs',
     title: 'Formateurs à attribuer',
     icon: 'tasks',
+    pim: true,
   },
   launchPim: {
     one: 'Tu peux lancer {n} PIM',
     other: 'Tu peux lancer {n} PIM',
     title: 'PIM à lancer',
     icon: 'tasks',
+    pim: true,
   },
   training: {
     one: 'Tu as {n} formation à suivre',
@@ -69,30 +101,40 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     other: 'Tu dois déclarer {n} débuts de PIM',
     title: 'Débuts de PIM à déclarer',
     icon: 'tasks',
+    pim: true,
   },
   pimReview: {
     one: 'Tu as {n} bilan de PIM à faire',
     other: 'Tu as {n} bilans de PIM à faire',
     title: 'Bilans de PIM',
     icon: 'tasks',
+    pim: true,
   },
   pimDecision: {
     one: 'Tu as {n} bilan à trancher',
     other: 'Tu as {n} bilans à trancher',
     title: 'Bilans à trancher',
     icon: 'tasks',
+    pim: true,
   },
   secondPeriod: {
     one: 'Tu peux lancer {n} période 2',
     other: 'Tu peux lancer {n} périodes 2',
     title: 'Périodes 2 à lancer',
     icon: 'tasks',
+    pim: true,
   },
   mention: {
     one: 'On t’a mentionné dans {n} commentaire',
     other: 'On t’a mentionné dans {n} commentaires',
     title: 'Mentions',
     icon: 'note',
+  },
+  liveReport: {
+    one: 'Tu as {n} bilan de live à voir',
+    other: 'Tu as {n} bilans de live à voir',
+    title: 'Bilans de live',
+    icon: 'modActions',
   },
   departure: {
     one: 'Tu as {n} départ à annoncer',
