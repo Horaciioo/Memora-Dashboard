@@ -71,6 +71,8 @@ export const PLATFORM_NOTICE_COPY = {
   notLinked: 'Lie ton compte Twitch dans Paramètres pour modérer depuis Memora.',
   revoked: 'Ton accès Twitch a expiré : reconnecte-le dans Paramètres.',
   notModerator: 'Ton compte Twitch n’est pas modérateur de cette chaîne : lecture seule.',
+  deniedTitle: 'Accès réservé aux modérateurs de la chaîne',
+  notModeratorDenied: 'Ton compte Twitch doit être modérateur de la chaîne de ce créateur pour ouvrir la Mod View.',
   noChannel: 'La chaîne Twitch de ce créateur n’est pas encore renseignée.',
   severalChannels:
     'Ce créateur a plusieurs chaînes Twitch : la modération depuis Memora attend le choix de la chaîne du live.',

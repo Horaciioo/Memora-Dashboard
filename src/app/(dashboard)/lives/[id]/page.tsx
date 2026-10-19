@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { LiveClosedNotice } from '@/composites/lives/LiveClosedNotice'
+import { LiveDeniedNotice } from '@/composites/lives/LiveDeniedNotice'
 import { LiveGate } from '@/composites/lives/LiveGate'
 import { LiveModView } from '@/composites/modview/LiveModView'
 import { coordinatingNow } from '@/core/lib/lives/coordination'
 import { focusableMembers } from '@/core/services/lives/FocusService'
 import { readPanelMemory } from '@/core/services/lives/LiveInsightService'
 import { readLive } from '@/core/services/lives/LiveService'
+import { channelAccess } from '@/core/services/lives/ModViewService'
 import { listLevels, readCurrentState } from '@/core/services/livecon/LiveconService'
 import { readPanel } from '@/core/services/sanctions/SanctionService'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -39,6 +41,17 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
       <div className={MODVIEW_PAGE.wrapper}>
         <h1 className={MODVIEW_PAGE.title}>{`${LIVE_COPY.title}, ${live.youtuber.name}`}</h1>
         <LiveClosedNotice live={live} />
+      </div>
+    )
+  }
+
+  // Only a moderator of the channel enters
+  const verdict = await channelAccess(session.id, live)
+  if (!verdict.allowed) {
+    return (
+      <div className={MODVIEW_PAGE.wrapper}>
+        <h1 className={MODVIEW_PAGE.title}>{`${LIVE_COPY.title}, ${live.youtuber.name}`}</h1>
+        <LiveDeniedNotice notice={verdict.notice} />
       </div>
     )
   }
