@@ -210,7 +210,7 @@ const pageSize = readInteger(notifications.pageSize, {
 
 /**
  * Personal notification bounds
- * @type {{ panelSize: number, pageSize: number, maxActions: number, maxMentions: number, staleMs: number }}
+ * @type {{ panelSize: number, pageSize: number, maxActions: number, maxMentions: number, mentionResults: number, mentionMatchMs: number, mentionCalmMs: number, staleMs: number }}
  */
 
 export const NOTIFICATION_SETTINGS = {
@@ -230,6 +230,21 @@ export const NOTIFICATION_SETTINGS = {
   maxMentions: readInteger(notifications.maxMentions, {
     path: 'system/notifications.maxMentions',
     fallback: 10,
+    min: 1,
+  }),
+  mentionMatchMs: readInteger(notifications.mentionMatchMs, {
+    path: 'system/notifications.mentionMatchMs',
+    fallback: 15_000,
+    min: 1000,
+  }),
+  mentionCalmMs: readInteger(notifications.mentionCalmMs, {
+    path: 'system/notifications.mentionCalmMs',
+    fallback: 10_000,
+    min: 1000,
+  }),
+  mentionResults: readInteger(notifications.mentionResults, {
+    path: 'system/notifications.mentionResults',
+    fallback: 6,
     min: 1,
   }),
   staleMs: readInteger(notifications.staleMs, {

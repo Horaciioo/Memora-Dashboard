@@ -100,7 +100,13 @@ export const NavSheet = ({
           </Link>
         </div>
         <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
-        <RailNav groups={groups} isCompact={false} isTouring={isTouring} live={viewContext.live} />
+        <RailNav
+          groups={groups}
+          isCompact={false}
+          isTouring={isTouring}
+          live={viewContext.live}
+          mentions={viewContext.mentions}
+        />
         <hr className={NAV_SHEET.divider} />
         <button
           type="button"

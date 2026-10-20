@@ -52,6 +52,7 @@ import type {
   RecruitmentSummary,
 } from '@/types/recruitment'
 import { AcademySessionStatuses, MemberRoles } from '@/utils/constants/hierarchy'
+import { COMMENT_SHAPE, toComment } from '@/core/services/academy/juniors/CommentService'
 import { sessionTitle } from '@/utils/format/academy'
 import {
   RecruitmentOwners,
@@ -103,6 +104,7 @@ export const reachableSession = async (id: string, scope: AccessScope) => {
     where: { AND: [{ id }, sessionScope(scope)] },
     select: {
       id: true,
+      name: true,
       youtuberId: true,
       functionId: true,
       academySessionId: true,
@@ -622,6 +624,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     include: {
       ...SUMMARY_INCLUDE,
       steps: { orderBy: [{ offset: 'asc' }, { position: 'asc' }] },
+      comments: { orderBy: { createdAt: 'asc' }, include: COMMENT_SHAPE },
       invite: true,
       candidates: {
         orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
@@ -689,6 +692,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
   return {
     summary: toSummary(row, await sessionNumbers(), attendedCount, recruiters),
     instructions: row.instructions,
+    comments: row.comments.map(toComment),
     candidates: row.candidates.map((candidate) => toCandidate(candidate, byDiscordId)),
     steps,
     // A session nobody configured asks the suggested pick
@@ -1182,7 +1186,7 @@ export const removeComment = async (id: string, scope: AccessScope): Promise<Can
     select: { candidateId: true },
   })
 
-  if (!row) throw notFound()
+  if (!row?.candidateId) throw notFound()
 
   await prisma.recruitmentComment.delete({ where: { id } })
 

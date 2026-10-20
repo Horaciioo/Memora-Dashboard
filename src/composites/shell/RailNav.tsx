@@ -22,6 +22,7 @@ export interface RailNavProps {
   isCompact: boolean
   isTouring: boolean
   live: ViewContext['live']
+  mentions: ViewContext['mentions']
 }
 
 /**
@@ -30,10 +31,11 @@ export interface RailNavProps {
  * @param {boolean} isCompact - Rail is folded to its glyphs
  * @param {boolean} isTouring - First visit tour is running
  * @param {ViewContext['live']} live - Open live, lights its entry
+ * @param {ViewContext['mentions']} mentions - Unseen mentions, counted on their page
  * @return {JSX.Element}
  */
 
-export const RailNav = ({ groups, isCompact, isTouring, live }: RailNavProps) => {
+export const RailNav = ({ groups, isCompact, isTouring, live, mentions }: RailNavProps) => {
   const pathname = usePathname()
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const ChevronIcon = ICONS.expand
@@ -128,6 +130,11 @@ export const RailNav = ({ groups, isCompact, isTouring, live }: RailNavProps) =>
                         >
                           {item.label}
                         </span>
+                        {mentions.some((mention) => mention.href === item.href) && (
+                          <span className={LEFT_SIDEBAR.navBadge} aria-hidden="true">
+                            {mentions.find((mention) => mention.href === item.href)?.count}
+                          </span>
+                        )}
                         {isLit && !isOnAir && (
                           <span className={LEFT_SIDEBAR.livePulse} aria-hidden="true">
                             <span className={LEFT_SIDEBAR.livePulseRing} />

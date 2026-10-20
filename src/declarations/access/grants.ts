@@ -11,6 +11,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @property {Partial<Record<MemberRoleName, PermissionName[]>>} grants - Permissions per role
  * @property {Record<string, PermissionName[]>} [functions] - Permissions per function name
  * @property {Partial<Record<MemberRoleName, PermissionName[]>>} [revokes] - Role permissions taken back
+ * @property {Record<string, PermissionName[]>} [functionRevokes] - Function permissions taken back per function name
  * @property {Record<string, PermissionName[]>} [denies] - Permissions refused per function name
  * @property {Partial<Record<MemberRoleName, PermissionName[]>>} [roleDenies] - Permissions refused per role
  */
@@ -19,6 +20,7 @@ export interface GrantAddition {
   key: string
   grants: Partial<Record<MemberRoleName, PermissionName[]>>
   functions?: Record<string, PermissionName[]>
+  functionRevokes?: Record<string, PermissionName[]>
   revokes?: Partial<Record<MemberRoleName, PermissionName[]>>
   denies?: Record<string, PermissionName[]>
   roleDenies?: Partial<Record<MemberRoleName, PermissionName[]>>
@@ -229,10 +231,16 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     functions: { Observateurs: [Permissions.RecruitmentObserve] },
   },
   {
-    key: 'trainers-calendar',
+    key: 'trainers-calendar-off',
     grants: {},
-    // They plan their own interviews and check-ins
-    functions: { Formateurs: [Permissions.CalendarManage] },
+    // Planning stays with the Responsables for now
+    functionRevokes: { Formateurs: [Permissions.CalendarManage] },
+  },
+  {
+    key: 'trainers-open-academy',
+    grants: {},
+    // Moderators holding the function open the Academy
+    functions: { Formateurs: [Permissions.AcademyRead] },
   },
   {
     key: 'leads-see-youtubers',

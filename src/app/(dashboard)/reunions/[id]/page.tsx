@@ -11,6 +11,7 @@ import {
   currentWorkViewer,
   workViewer,
 } from '@/core/services/work/visibility'
+import { MentionMarks } from '@/composites/notifications/MentionMarks'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { MEETING_COPY } from '@/declarations/work/copy'
@@ -73,6 +74,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
     <div className={PAGE_STYLES.wrapper}>
       <PageBanner title={MEETING_COPY.title} isLabel />
       <BreadcrumbLabel label={detail.summary.title} />
+      <MentionMarks target="meeting" targetId={id} />
       <MeetingFile
         detail={detail}
         meetingFields={fields}

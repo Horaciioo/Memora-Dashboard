@@ -11,11 +11,16 @@ import {
   removeEntries,
   updateEntries,
 } from '@/core/services/calendar/CalendarService'
+import { assertPlannable } from '@/core/services/calendar/academyEntries'
 import { assertLiveAccess } from '@/core/services/lives/LiveService'
 import { assertRowsInScope } from '@/core/services/auth/ScopeService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
+
+// Template named by a parsed form
+const templateOf = (values: Record<string, unknown>): string | null =>
+  typeof values.templateId === 'string' ? values.templateId : null
 
 /**
  * Read the selected identifiers off a bulk body
@@ -59,10 +64,12 @@ export const POST = createProtectedRoute({
       perimeter,
       workViewer(session, access),
       academy,
-      canAnnounceLive
+      canAnnounceLive,
+      access.isResponsable
     )
     const parsed = parseFormValues(fields, raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
+    await assertPlannable(templateOf(parsed.values), access.isResponsable)
     await assertLiveAccess({
       canAnnounce: canAnnounceLive,
       templateId: typeof parsed.values.templateId === 'string' ? parsed.values.templateId : null,
@@ -78,7 +85,11 @@ export const PATCH = createProtectedRoute({
     const perimeter = await scope()
     const ids = readIds(raw)
 
-    await assertEntriesAccess(ids, session.id, access.can(Permissions.CalendarManage))
+    await assertEntriesAccess(
+      ids,
+      session.id,
+      access.can(Permissions.CalendarManage) && access.isResponsable
+    )
     await assertRowsInScope('calendarEvent', ids, perimeter)
     await assertLiveAccess({ canAnnounce: access.can(Permissions.LiveAnnounce), entryIds: ids })
 
@@ -88,12 +99,16 @@ export const PATCH = createProtectedRoute({
         perimeter,
         workViewer(session, access),
         academyScope(session, access),
-        access.can(Permissions.LiveAnnounce)
+        access.can(Permissions.LiveAnnounce),
+        access.isResponsable
       ),
       raw,
       { enforceRequired: false }
     )
     if (!parsed.ok) throw invalidInput(parsed.issues)
+    if ('templateId' in parsed.values) {
+      await assertPlannable(templateOf(parsed.values), access.isResponsable)
+    }
 
     return updateEntries(ids, parsed.values)
   },
@@ -104,7 +119,11 @@ export const DELETE = createProtectedRoute({
   handler: async ({ raw, session, access, scope }) => {
     const ids = readIds(raw)
 
-    await assertEntriesAccess(ids, session.id, access.can(Permissions.CalendarManage))
+    await assertEntriesAccess(
+      ids,
+      session.id,
+      access.can(Permissions.CalendarManage) && access.isResponsable
+    )
     await assertRowsInScope('calendarEvent', ids, await scope())
     await assertLiveAccess({ canAnnounce: access.can(Permissions.LiveAnnounce), entryIds: ids })
     await removeEntries(ids)

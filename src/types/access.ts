@@ -177,6 +177,20 @@ export interface CreatorLead {
 }
 
 /**
+ * Unseen mention lighting a rail entry
+ * @typedef {Object} MentionBubble
+ * @property {string} href - Page whose entry lights up
+ * @property {string | null} actorName - Who wrote the latest
+ * @property {number} count - Unseen mentions on the page
+ */
+
+export interface MentionBubble {
+  href: string
+  actorName: string | null
+  count: number
+}
+
+/**
  * View context
  * @typedef {Object} ViewContext
  * @property {NavigationViewName} view - View on screen
@@ -196,6 +210,6 @@ export interface ViewContext {
   live: LiveBeacon | null
   // Pages holding a late item of the member
   overdue: OverdueFlags
-  // A recruitment comment named the member and is still unseen
-  mentioned: boolean
+  // Unseen comments that named the member, one per page
+  mentions: MentionBubble[]
 }

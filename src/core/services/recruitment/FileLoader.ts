@@ -12,7 +12,6 @@ import {
   sessionFields,
   stepFields,
 } from '@/core/services/recruitment/RecruitmentService'
-import { markMentionsRead } from '@/core/services/system/NotificationService'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import { JOURNAL_FILES } from '@/core/services/system/FileJournal'
@@ -61,9 +60,6 @@ export const loadRecruitment = async (
         })),
       }
     : read
-
-  // Opening the file is seeing what named the viewer
-  await markMentionsRead(session.id, 'recruitment', id)
 
   // An observer never writes nor reads the journal
   const allowed = (permission: Parameters<typeof access.can>[0]) =>

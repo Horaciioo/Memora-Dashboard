@@ -14,5 +14,6 @@ export const COMMENT_COPY = {
   placeholder: 'Écris ton commentaire…',
   hint: 'Markdown accepté, @ pour mentionner, Ctrl + Entrée pour publier.',
   publish: 'Publier',
+  markUnread: 'Marquer comme non lu',
   noMention: 'Personne ne correspond',
 } as const

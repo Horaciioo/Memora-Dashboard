@@ -7,6 +7,7 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { INTEGRATION_LINK_COPY } from '@/declarations/onboarding/copy'
 import { feedbackTitle } from '@/declarations/ui/copy'
+import type { CommentView } from '@/types/comments'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { IntegrationLinkView } from '@/types/onboarding'
 import type {
@@ -44,6 +45,9 @@ const INSTRUCTIONS = 'Consignes'
  * @property {(id: string, review: string) => Promise<boolean>} saveReview - Write a bilan
  * @property {(id: string, values: FormValues) => Promise<boolean>} addComment - Leave a remark
  * @property {(id: string) => Promise<void>} removeComment - Drop a remark
+ * @property {CommentView[]} comments - Remarks left on the session
+ * @property {(values: FormValues) => Promise<boolean>} addSessionComment - Leave a remark on the session
+ * @property {(id: string) => Promise<void>} removeSessionComment - Drop a session remark
  * @property {(values: FormValues) => Promise<boolean>} addStep - Add a timeline moment
  * @property {(id: string, values: FormValues) => Promise<boolean>} updateStep - Edit a timeline moment
  * @property {(id: string, done: boolean) => Promise<void>} setStepDone - Clear or reopen a moment
@@ -71,6 +75,9 @@ export interface RecruitmentFile {
   saveReview: (id: string, review: string) => Promise<boolean>
   addComment: (id: string, values: FormValues) => Promise<boolean>
   removeComment: (id: string) => Promise<void>
+  comments: CommentView[]
+  addSessionComment: (values: FormValues) => Promise<boolean>
+  removeSessionComment: (id: string) => Promise<void>
   addStep: (values: FormValues) => Promise<boolean>
   updateStep: (id: string, values: FormValues) => Promise<boolean>
   setStepDone: (id: string, done: boolean) => Promise<void>
@@ -91,6 +98,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
   const [instructions, setInstructions] = useState(detail.instructions)
   const [candidates, setCandidates] = useState(detail.candidates)
   const [steps, setSteps] = useState(detail.steps)
+  const [comments, setComments] = useState(detail.comments)
   const [link, setLink] = useState(detail.link)
   const questionKeys = detail.questionKeys
   const { isSaving, issues, clearIssues, run } = useMutation()
@@ -202,6 +210,32 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
       if (saved) mergeCandidate(saved)
     },
     [run, mergeCandidate]
+  )
+
+  const addSessionComment = useCallback(
+    async (values: FormValues) => {
+      const saved = await run(
+        () => apiPost<CommentView[]>(API_ROUTES.recruitmentComments(sessionId), values),
+        feedbackTitle(COMMENT, 'created', 'masculine')
+      )
+
+      if (saved) setComments(saved)
+
+      return saved !== null
+    },
+    [run, sessionId]
+  )
+
+  const removeSessionComment = useCallback(
+    async (id: string) => {
+      const saved = await run(
+        () => apiDelete<CommentView[]>(API_ROUTES.recruitmentComment(id)),
+        feedbackTitle(COMMENT, 'deleted', 'masculine')
+      )
+
+      if (saved) setComments(saved)
+    },
+    [run]
   )
 
   const addStep = useCallback(
@@ -352,6 +386,9 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     saveReview,
     addComment,
     removeComment,
+    comments,
+    addSessionComment,
+    removeSessionComment,
     addStep,
     updateStep,
     setStepDone,

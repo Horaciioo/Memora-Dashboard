@@ -10,6 +10,7 @@ import {
   resizeEntry,
   updateEntry,
 } from '@/core/services/calendar/CalendarService'
+import { assertPlannable } from '@/core/services/calendar/academyEntries'
 import { assertLiveAccess } from '@/core/services/lives/LiveService'
 import { assertRowInScope } from '@/core/services/auth/ScopeService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
@@ -20,7 +21,8 @@ export const PATCH = createProtectedRoute({
   descriptor: { summary: 'Edit or move a calendar entry', tags: ['calendar'] },
   handler: async ({ params, raw, session, access, scope }) => {
     const perimeter = await scope()
-    const canManage = access.can(Permissions.CalendarManage)
+    // A trainer reaches their own entries only
+    const canManage = access.can(Permissions.CalendarManage) && access.isResponsable
     await assertEntryAccess(params.id, session.id, canManage)
     await assertRowInScope('calendarEvent', params.id, perimeter)
     const canAnnounceLive = access.can(Permissions.LiveAnnounce)
@@ -48,11 +50,21 @@ export const PATCH = createProtectedRoute({
 
     const academy = academyScope(session, access)
     const parsed = parseFormValues(
-      await calendarFields(perimeter, workViewer(session, access), academy, canAnnounceLive),
+      await calendarFields(
+        perimeter,
+        workViewer(session, access),
+        academy,
+        canAnnounceLive,
+        access.isResponsable
+      ),
       raw,
       { fillMissing: true }
     )
     if (!parsed.ok) throw invalidInput(parsed.issues)
+    await assertPlannable(
+      typeof parsed.values.templateId === 'string' ? parsed.values.templateId : null,
+      access.isResponsable
+    )
     await assertLiveAccess({
       canAnnounce: canAnnounceLive,
       templateId: typeof parsed.values.templateId === 'string' ? parsed.values.templateId : null,
@@ -65,7 +77,11 @@ export const PATCH = createProtectedRoute({
 export const DELETE = createProtectedRoute({
   descriptor: { summary: 'Drop a calendar entry', tags: ['calendar'] },
   handler: async ({ params, session, access, scope }) => {
-    await assertEntryAccess(params.id, session.id, access.can(Permissions.CalendarManage))
+    await assertEntryAccess(
+      params.id,
+      session.id,
+      access.can(Permissions.CalendarManage) && access.isResponsable
+    )
     await assertRowInScope('calendarEvent', params.id, await scope())
     await assertLiveAccess({
       canAnnounce: access.can(Permissions.LiveAnnounce),

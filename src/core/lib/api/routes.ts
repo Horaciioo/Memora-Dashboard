@@ -150,6 +150,8 @@ export const API_ROUTES = {
   recruitment: (id: string) => `/api/recrutements/${id}`,
   recruitmentCandidates: (id: string) => `/api/recrutements/${id}/candidats`,
   recruitmentSteps: (id: string) => `/api/recrutements/${id}/etapes`,
+  recruitmentComments: (id: string) => `/api/recrutements/${id}/commentaires`,
+  recruitmentComment: (id: string) => `/api/commentaires-recrutement/${id}`,
   recruitmentInstructions: (id: string) => `/api/recrutements/${id}/consignes`,
   recruitmentObservers: (id: string) => `/api/recrutements/${id}/observateurs`,
   recruitmentIdentifiers: (id: string) => `/api/recrutements/${id}/identifiants`,
@@ -190,6 +192,9 @@ export const API_ROUTES = {
   meetingRequests: '/api/calendrier/demandes',
   board: '/api/tableau',
   search: '/api/recherche',
+  mentionable: '/api/mentionnables',
+  mentionsRead: '/api/mentions/lecture',
+  commentUnread: (id: string) => `/api/commentaires-non-lus/${id}`,
 } as const
 
 /**

@@ -6,6 +6,7 @@ import { TaskFile } from '@/composites/work/TaskFile'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
 import { lockTaskFields, readTask, taskFields } from '@/core/services/work/TaskService'
 import { assertTaskVisible, currentWorkViewer, workViewer } from '@/core/services/work/visibility'
+import { MentionMarks } from '@/composites/notifications/MentionMarks'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { TASK_COPY } from '@/declarations/work/copy'
@@ -66,6 +67,7 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
     <div className={PAGE_STYLES.wrapper}>
       <PageBanner title={TASK_COPY.title} isLabel />
       <BreadcrumbLabel label={task.title} />
+      <MentionMarks target="task" targetId={id} />
       <TaskFile
         task={task}
         fields={access.can(Permissions.TaskManage) ? fields : lockTaskFields(fields)}

@@ -2,7 +2,7 @@ import 'server-only'
 
 import { isReviewOpen, REVIEW_PURPOSES } from '@/core/lib/academy/reviewTemplates'
 import { prisma } from '@/core/lib/db'
-import { conflict, invalidInput } from '@/core/lib/errors'
+import { conflict, forbidden, invalidInput } from '@/core/lib/errors'
 import { readList, readText } from '@/core/lib/forms/values'
 import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
@@ -93,4 +93,26 @@ export const resolveAcademyEntry = async (
     rollCall: true,
     memberIds: [...new Set([junior.accountId, trainerId, ...responsableIds])],
   }
+}
+
+/**
+ * Refuse an entry a trainer may not plan: only the academy templates are theirs
+ * @param {string | null} templateId - Template the entry starts from
+ * @param {boolean} isLead - Member sits at responsable level or above
+ * @return {Promise<void>} - Throws when the template is not an academy one
+ */
+
+export const assertPlannable = async (
+  templateId: string | null,
+  isLead: boolean
+): Promise<void> => {
+  if (isLead) return
+
+  const template = templateId
+    ? await prisma.eventTemplate.findUnique({
+        where: { id: templateId },
+        select: { purpose: true },
+      })
+    : null
+  if (!template?.purpose) throw forbidden()
 }

@@ -2223,6 +2223,7 @@ model RecruitmentSession {
   jobFunction    JobFunction              @relation(fields: [functionId], references: [id], onDelete: Restrict)
   academySession AcademySession?          @relation(fields: [academySessionId], references: [id], onDelete: SetNull)
   candidates     RecruitmentCandidate[]
+  comments       RecruitmentComment[]
   steps          RecruitmentStep[]
   responsables   RecruitmentResponsable[]
   observers      RecruitmentObserver[]
@@ -2383,15 +2384,19 @@ model WorkComment {
 // Remark left on a candidate while their application is being weighed
 model RecruitmentComment {
   id          String   @id @default(cuid())
-  candidateId String
+  // Either an application, or a whole session when none
+  candidateId String?
+  sessionId   String?
   authorId    String?
   body        String
   createdAt   DateTime @default(now())
 
-  candidate RecruitmentCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-  author    Account?             @relation("RecruitmentCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  candidate RecruitmentCandidate? @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  session   RecruitmentSession?   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  author    Account?              @relation("RecruitmentCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
 
   @@index([candidateId, createdAt])
+  @@index([sessionId, createdAt])
   @@map("recruitment_comments")
 }
 

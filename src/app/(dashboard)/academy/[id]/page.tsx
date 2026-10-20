@@ -15,6 +15,7 @@ import { commentFields } from '@/core/lib/forms'
 import { listSessionComments } from '@/core/services/academy/juniors/CommentService'
 import { readPeriods } from '@/core/services/academy/parkour/PeriodService'
 import { REVIEW_FIELDS } from '@/core/services/academy/AcademyService'
+import { MentionMarks } from '@/composites/notifications/MentionMarks'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 
@@ -92,6 +93,7 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
     <div className={PAGE_STYLES.wrapper}>
       <PageBanner title={ACADEMY_COPY.title} isLabel />
       <BreadcrumbLabel label={sessionTitle(detail.summary)} />
+      <MentionMarks target="junior" targetId={id} />
       <SessionPanel
         detail={detail}
         activity={activity}

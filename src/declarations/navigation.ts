@@ -153,6 +153,7 @@ export const TRAININGS_DONE_PARAM = 'achevee'
  * @property {string} label - Display label
  * @property {IconName} icon - Icon key
  * @property {NavigationViewName} [from] - Narrowest view
+ * @property {NavigationViewName[]} [hiddenIn] - Views the entry is pulled from
  * @property {PermissionName} [permission] - Permission needed
  * @property {NavigationCondition} [visibleWhen] - Display rule
  * @property {MaturityName} [maturity] - Lifecycle stage shown as a tag
@@ -165,6 +166,7 @@ export interface NavigationItem {
   label: string
   icon: IconName
   from?: NavigationViewName
+  hiddenIn?: NavigationViewName[]
   permission?: PermissionName
   visibleWhen?: NavigationCondition
   maturity?: MaturityName
@@ -232,7 +234,8 @@ export const itemInView = (
   item: NavigationItem,
   group: NavigationGroup,
   view: NavigationViewName
-): boolean => viewDepth(view) >= viewDepth(item.from ?? group.from)
+): boolean =>
+  viewDepth(view) >= viewDepth(item.from ?? group.from) && !item.hiddenIn?.includes(view)
 
 /**
  * Sidebar navigation tree
@@ -307,12 +310,22 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.CommunicationRead,
         maturity: 'new',
       },
-      // The Observateurs read the sessions from the moderator view
+      // The Observateurs read the sessions from the moderator view, Programmes holds them above
       {
         href: ROUTES.recruitments,
         label: 'Recrutements',
         icon: 'recruitment',
+        hiddenIn: [NavigationViews.Lead, NavigationViews.Administration],
         permission: Permissions.RecruitmentObserve,
+        maturity: 'beta',
+      },
+      // The Formateurs open the Academy from the moderator view, Programmes holds it above
+      {
+        href: ROUTES.academy,
+        label: 'Academy',
+        icon: 'academy',
+        hiddenIn: [NavigationViews.Lead, NavigationViews.Administration],
+        permission: Permissions.AcademyRead,
         maturity: 'beta',
       },
     ],

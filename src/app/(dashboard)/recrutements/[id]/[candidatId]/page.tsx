@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageBanner } from '@/components/structures/page/PageBanner'
 import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
+import { MentionMarks } from '@/composites/notifications/MentionMarks'
 import { CandidateFile } from '@/composites/recruitment/candidate/CandidateFile'
 import { loadRecruitment } from '@/core/services/recruitment/FileLoader'
 import { readSession } from '@/core/services/recruitment/RecruitmentService'
@@ -51,6 +52,7 @@ export default async function CandidatePage({ params }: { params: CandidateParam
     <div className={PAGE_STYLES.wrapper}>
       <PageBanner title={RECRUITMENT_COPY.title} isLabel image={detail.summary.youtuberBanner} />
       <BreadcrumbLabel label={candidate.name} />
+      <MentionMarks target="recruitment" targetId={id} />
       <CandidateFile detail={detail} fields={fields} can={can} candidateId={candidatId} />
     </div>
   )

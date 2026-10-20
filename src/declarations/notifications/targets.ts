@@ -68,6 +68,19 @@ const NOTIFICATION_TARGET_MAP: Record<NotificationTargetName, NotificationTarget
 export const NOTIFICATION_TARGETS = createRegistry(NOTIFICATION_TARGET_MAP)
 
 /**
+ * Page whose rail entry lights up on an unseen mention
+ * @type {Partial<Record<NotificationTargetName, string>>}
+ */
+
+export const MENTION_PAGES: Partial<Record<NotificationTargetName, string>> = {
+  recruitment: ROUTES.recruitments,
+  project: ROUTES.projects,
+  task: ROUTES.tasks,
+  meeting: ROUTES.meetings,
+  junior: ROUTES.academy,
+}
+
+/**
  * Target identifier of a junior file
  * @param {string} sessionId - Promotion
  * @param {string} juniorId - Junior seat

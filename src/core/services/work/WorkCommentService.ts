@@ -13,6 +13,7 @@ import {
 import type { WorkViewer } from '@/core/services/work/visibility'
 import { WORK_COMMENT_KINDS } from '@/declarations/work/comments'
 import type { WorkCommentKind } from '@/declarations/work/comments'
+import type { NotificationTargetName } from '@/declarations/notifications/targets'
 import type { PermissionHelpers } from '@/types/auth'
 import type { CommentView } from '@/types/comments'
 import type { FormValues } from '@/types/forms'
@@ -119,6 +120,46 @@ export const addWorkComment = async (
   })
 
   return readComments(kind, id)
+}
+
+/**
+ * Where a mention left on a record leads
+ * @param {WorkCommentKind} kind - Record kind
+ * @param {string} id - Record identifier
+ * @return {Promise<{ target: NotificationTargetName, targetId: string, subject: string } | null>} - Page of the record
+ */
+
+export const commentMention = async (
+  kind: WorkCommentKind,
+  id: string
+): Promise<{ target: NotificationTargetName; targetId: string; subject: string } | null> => {
+  if (kind === 'project') {
+    const row = await prisma.project.findUnique({ where: { id }, select: { title: true } })
+
+    return row && { target: 'project', targetId: id, subject: row.title }
+  }
+
+  if (kind === 'task') {
+    const row = await prisma.task.findUnique({ where: { id }, select: { title: true } })
+
+    return row && { target: 'task', targetId: id, subject: row.title }
+  }
+
+  if (kind === 'meeting') {
+    const row = await prisma.meeting.findUnique({ where: { id }, select: { title: true } })
+
+    return row && { target: 'meeting', targetId: id, subject: row.title }
+  }
+
+  // A communication leads to its project
+  const row = await prisma.communication.findUnique({
+    where: { id },
+    select: { project: { select: { id: true, title: true } } },
+  })
+
+  return row?.project
+    ? { target: 'project', targetId: row.project.id, subject: row.project.title }
+    : null
 }
 
 /**

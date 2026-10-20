@@ -77,7 +77,8 @@ export default async function CalendarPage({
       perimeter,
       workViewer(session, access),
       academyScope(session, access),
-      canAnnounceLive
+      canAnnounceLive,
+      access.isResponsable
     ),
     youtuberOptions(perimeter),
   ])
