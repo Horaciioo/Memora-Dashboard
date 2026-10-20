@@ -1,24 +1,16 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { CreatorLabel } from '@/components/elements/display/RecordLabel'
-import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
 import { PageHeader } from '@/components/structures/page/PageHeader'
-import { Section } from '@/components/structures/page/Section'
-import { CreatorChannelsPanel } from '@/composites/reference/CreatorChannelsPanel'
-import { CreatorLeadsPanel } from '@/composites/reference/CreatorLeadsPanel'
-import { TeamsBoard } from '@/composites/teams/TeamsBoard'
-import { roleGroupedOptions } from '@/core/lib/forms/options'
+import { CreatorFile } from '@/composites/reference/CreatorFile'
 import { prisma } from '@/core/lib/db'
 import { readAnchors } from '@/core/services/auth/LeadService'
 import { readChannels } from '@/core/services/platforms/ChannelService'
-import { encadrementAccounts } from '@/core/services/reference/lookups'
-import { readTeamBoard, teamFields } from '@/core/services/teams/TeamService'
+import { readCreatorTeams } from '@/core/services/teams/CreatorTeamService'
 import { requirePermission } from '@/core/wrappers/requireUser'
-import { CHANNEL_COPY } from '@/declarations/platforms/copy'
-import { REFERENCE_COPY, REFERENCE_FIELD_COPY, YOUTUBER_COPY } from '@/declarations/reference/copy'
+import { REFERENCE_COPY, REFERENCE_FIELD_COPY } from '@/declarations/reference/copy'
 
-import { PAGE_STYLES, SECTION_STYLES } from '@/declarations/ui/variants'
+import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
@@ -64,70 +56,34 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
   const youtuber = await readYoutuber(id)
   if (!youtuber) notFound()
 
-  const [board, fields, anchors, candidates, channels] = await Promise.all([
-    readTeamBoard(await scope(), id),
-    teamFields(),
+  const [teams, anchors, channels] = await Promise.all([
+    readCreatorTeams(id, await scope()),
     readAnchors(id),
-    encadrementAccounts(),
     readChannels(id),
   ])
-
-  // The channels speak for the creator
-  const eyebrow =
-    channels.length > 0
-      ? channels.map((channel) => channel.login).join(', ')
-      : (youtuber.handle ?? YOUTUBER_COPY.noHandle)
 
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader
-        eyebrow={eyebrow}
         title={youtuber.name}
+        image={youtuber.bannerUrl}
         actions={
           youtuber.archived ? (
             <Status label={REFERENCE_FIELD_COPY.archivedBadge} tone="neutral" icon="hidden" />
           ) : undefined
         }
       />
-      <Section padded>
-        <div className="flex flex-wrap items-center gap-4">
-          <CreatorLabel name={youtuber.name} image={youtuber.avatarUrl} size="lg" />
-          <RecordId id={youtuber.id} className="text-[var(--color-ink-subtle)]" />
-        </div>
-      </Section>
-      <Section title={CHANNEL_COPY.title} description={CHANNEL_COPY.lead} padded>
-        <CreatorChannelsPanel
-          youtuberId={id}
-          initialChannels={channels}
-          canManage={access.isAdmin}
-        />
-      </Section>
-      <Section
-        title={REFERENCE_FIELD_COPY.leadsTitle}
-        description={REFERENCE_FIELD_COPY.leadsLead}
-        padded
-      >
-        <CreatorLeadsPanel
-          youtuberId={id}
-          initialAnchors={anchors}
-          candidates={roleGroupedOptions(candidates)}
-          teams={board.teams.map((team) => ({ value: team.id, label: team.name }))}
-          canManage={access.isAdmin}
-        />
-      </Section>
-      <Section
-        title={YOUTUBER_COPY.teamsTitle}
-        description={YOUTUBER_COPY.teamsLead}
-        bare
-        className={SECTION_STYLES.wrapper}
-      >
-        <TeamsBoard
-          initialBoard={board}
-          fields={fields}
-          canManage={access.can(Permissions.TeamManage)}
-          youtuberId={id}
-        />
-      </Section>
+      <CreatorFile
+        youtuberId={id}
+        name={youtuber.name}
+        avatarUrl={youtuber.avatarUrl}
+        bannerUrl={youtuber.bannerUrl}
+        channels={channels}
+        anchors={anchors}
+        teams={teams}
+        canManageTeams={access.can(Permissions.TeamManage)}
+        canManageCreator={access.isAdmin}
+      />
     </div>
   )
 }

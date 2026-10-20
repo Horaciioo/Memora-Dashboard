@@ -36,7 +36,6 @@ export const FORM_SUBJECTS = {
   meeting: { label: 'Réunion', gender: 'feminine', icon: 'meetings' },
   communication: { label: 'Communication', gender: 'feminine', icon: 'mail' },
   channel: { label: 'Chaîne', gender: 'feminine', icon: 'link' },
-  team: { label: 'Équipe', gender: 'feminine', icon: 'teams' },
   workflowState: { label: 'État', gender: 'masculine', icon: 'tasks' },
   topic: { label: 'Sujet', gender: 'masculine', icon: 'note' },
   integrationLink: { label: 'Lien', gender: 'masculine', icon: 'link' },

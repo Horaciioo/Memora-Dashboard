@@ -1,7 +1,8 @@
 import { forbidden } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { readAnchors, replaceAnchors } from '@/core/services/auth/LeadService'
+import { readAnchors, replaceAnchors, setLeadRole } from '@/core/services/auth/LeadService'
 import { recordEvent } from '@/core/services/system/ActivityService'
+import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
@@ -46,5 +47,25 @@ export const PUT = createProtectedRoute({
     })
 
     return anchors
+  },
+})
+
+export const PATCH = createProtectedRoute({
+  permission: Permissions.ReferenceManage,
+  descriptor: { summary: 'Change the level of an anchored responsable', tags: ['reference'] },
+  handler: async ({ params, raw, session, access }) => {
+    if (!access.isAdmin) throw forbidden()
+
+    await setLeadRole(String(raw.accountId), String(raw.role) as MemberRoleName)
+
+    await recordEvent({
+      eventType: 'LeadsAnchored',
+      actorId: session.id,
+      targetType: 'youtuber',
+      targetId: params.id,
+      summary: String(raw.role),
+    })
+
+    return readAnchors(params.id)
   },
 })

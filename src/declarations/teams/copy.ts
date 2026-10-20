@@ -5,44 +5,15 @@
 
 export const TEAM_COPY = {
   title: 'Équipes',
-  lead: 'Drag and Drop un modérateur d’une équipe à l’autre pour changer son affectation.',
-  add: 'Créer une équipe',
-  archive: 'Archiver',
-  unarchive: 'Désarchiver',
-  archived: 'Archivée',
-  showArchived: 'Voir les archivées',
-  deleteTitle: 'Supprimer cette équipe ?',
-  deleteDescription: 'Ses membres redeviennent non affectés.',
-  unassigned: 'Sans équipe',
-  noYoutuber: 'Aucun YouTubeur',
-  emptyColumn: 'Personne ici',
-  members: 'membres',
-  memberOne: 'membre',
-} as const
-
-/**
- * Labels of the team form
- * @type {Record<string, string>}
- */
-
-export const TEAM_FIELD_COPY = {
-  name: 'Nom de l’équipe',
-  summary: 'Description',
-  lead: 'Responsables',
-  admin: 'Admin',
-  youtuber: 'YouTubeur',
-  archived: 'Archiver cette équipe',
-} as const
-
-/**
- * Explanations behind each team field
- * @type {Record<string, string>}
- */
-
-export const TEAM_FIELD_INFO = {
-  name: 'Le nom de l’équipe.',
-  lead: 'Les responsables de l’équipe.',
-  admin: 'Les admins qui suivent l’équipe.',
-  youtuber: 'Le créateur sur lequel l’équipe intervient.',
-  summary: 'Le rôle de l’équipe.',
+  lead: 'Chaque équipe est une fonction. Active celles du créateur, puis clique un modérateur pour le placer.',
+  saved: 'Équipes enregistrées.',
+  enabled: 'Équipes actives',
+  enabledEmpty: 'Aucune équipe active',
+  primary: 'Fonctions principales',
+  secondary: 'Fonctions secondaires',
+  memberTeams: 'Équipes du modérateur',
+  noTeam: 'Aucune équipe',
+  noMembers: 'Aucun modérateur rattaché',
+  noMembersHint: 'Rattache un modérateur à ce YouTubeur depuis sa fiche.',
+  noFunctions: 'Active une équipe pour pouvoir y placer des modérateurs.',
 } as const

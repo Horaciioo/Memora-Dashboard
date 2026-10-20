@@ -65,6 +65,7 @@ export const REFERENCE_FIELD_COPY = {
   leadsLead:
     'Les responsables et admins de ce créateur, et l’équipe sur laquelle chacun est resserré.',
   leadsEmptyTitle: 'Aucune administration',
+  addLead: 'Ajouter un encadrant',
   leadsEmptyDescription:
     'Ajoute un responsable ou un admin pour lui ouvrir le périmètre de ce créateur.',
   leadTeam: 'Équipe',

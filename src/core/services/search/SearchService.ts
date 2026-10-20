@@ -141,7 +141,7 @@ export const search = async (term: string, session: SessionUser): Promise<Search
         id: row.id,
         group: 'meetings',
         label: row.title,
-        hint: formatDay(row.scheduledAt),
+        hint: row.scheduledAt ? formatDay(row.scheduledAt) : undefined,
         href: ROUTES.meeting(row.id),
       })),
     })
