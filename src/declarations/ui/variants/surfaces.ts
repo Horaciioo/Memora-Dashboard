@@ -252,6 +252,12 @@ export const DRAWER_ACTIONS = {
   cancel: 'bg-[var(--color-danger)] !text-[var(--color-on-solid)]',
   neutral: 'bg-[var(--color-hover)] !text-[var(--color-ink)]',
   icon: 'h-5 w-5 shrink-0 md:h-4.5 md:w-4.5',
+  // One slim row of glyphs at every width, leaves the room to a wide form
+  slimStack: 'flex items-center justify-end gap-2 p-1',
+  slimSteps: 'contents',
+  slimLine:
+    'flex size-11 shrink-0 items-center justify-center rounded-full text-[var(--color-on-brand)] transition-[filter] hover:brightness-90 disabled:pointer-events-none disabled:opacity-60',
+  slimIcon: 'h-5 w-5 shrink-0',
   divider: 'mx-1 hidden h-px bg-[var(--color-border)] md:block',
   note: 'mb-4 text-sm text-[var(--color-ink-subtle)]',
 } as const

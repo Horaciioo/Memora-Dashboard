@@ -194,6 +194,9 @@ export const FormDrawer = ({
     if (accepted) onClose()
   }
 
+  // A form with a live result needs the width, its actions shrink to glyphs
+  const isSlim = Boolean(aside)
+
   const NextIcon = ICONS.forward
   const SaveIcon = ICONS.confirm
   const CancelIcon = ICONS.close
@@ -254,9 +257,9 @@ export const FormDrawer = ({
         )
       }
       footer={
-        <div className={DRAWER_ACTIONS.stack}>
+        <div className={isSlim ? DRAWER_ACTIONS.slimStack : DRAWER_ACTIONS.stack}>
           {(previous || next) && (
-            <div className={DRAWER_ACTIONS.steps}>
+            <div className={isSlim ? DRAWER_ACTIONS.slimSteps : DRAWER_ACTIONS.steps}>
               {previous && (
                 <button
                   type="button"
@@ -288,31 +291,47 @@ export const FormDrawer = ({
                 onClick={submit}
                 disabled={isSaving}
                 aria-label={aimedPhrase(submitVerb, subject.label, subject.gender)}
-                className={cn(DRAWER_ACTIONS.line, DRAWER_ACTIONS.save)}
+                className={cn(
+                  isSlim ? DRAWER_ACTIONS.slimLine : DRAWER_ACTIONS.line,
+                  DRAWER_ACTIONS.save
+                )}
               >
                 {isSaving ? (
                   <BrandLoader variant="inline" />
                 ) : (
-                  <SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
+                  <SaveIcon
+                    className={isSlim ? DRAWER_ACTIONS.slimIcon : DRAWER_ACTIONS.icon}
+                    aria-hidden="true"
+                  />
                 )}
-                <span className={DRAWER_ACTIONS.lineLabel}>
-                  {isSaving
-                    ? ACTION_COPY.saving
-                    : aimedPhrase(submitVerb, subject.label, subject.gender)}
-                </span>
+                {!isSlim && (
+                  <span className={DRAWER_ACTIONS.lineLabel}>
+                    {isSaving
+                      ? ACTION_COPY.saving
+                      : aimedPhrase(submitVerb, subject.label, subject.gender)}
+                  </span>
+                )}
               </button>
-              <span className={DRAWER_ACTIONS.divider} aria-hidden="true" />
+              {!isSlim && <span className={DRAWER_ACTIONS.divider} aria-hidden="true" />}
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isSaving}
                 aria-label={aimedPhrase(DRAWER_COPY.cancel, subject.label, subject.gender)}
-                className={cn(DRAWER_ACTIONS.line, DRAWER_ACTIONS.cancel)}
+                className={cn(
+                  isSlim ? DRAWER_ACTIONS.slimLine : DRAWER_ACTIONS.line,
+                  DRAWER_ACTIONS.cancel
+                )}
               >
-                <CancelIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
-                <span className={DRAWER_ACTIONS.lineLabel}>
-                  {aimedPhrase(DRAWER_COPY.cancel, subject.label, subject.gender)}
-                </span>
+                <CancelIcon
+                  className={isSlim ? DRAWER_ACTIONS.slimIcon : DRAWER_ACTIONS.icon}
+                  aria-hidden="true"
+                />
+                {!isSlim && (
+                  <span className={DRAWER_ACTIONS.lineLabel}>
+                    {aimedPhrase(DRAWER_COPY.cancel, subject.label, subject.gender)}
+                  </span>
+                )}
               </button>
             </>
           )}
