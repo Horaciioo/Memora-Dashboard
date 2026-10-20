@@ -21,6 +21,7 @@ import { AcademyStages } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
 import { unreadMentions, unreadReports } from '@/core/services/system/NotificationService'
 import { prisma } from '@/core/lib/db'
+import { readScope, scopedWhere } from '@/core/services/auth/ScopeService'
 import { syncSystemTasks } from '@/core/services/personal/SystemTaskService'
 import { WorkflowPhases } from '@/utils/constants/workflow'
 
@@ -340,9 +341,28 @@ const mentionTasks = async (accountId: string): Promise<HomeTask[]> => {
  * @return {Promise<HomeTask[]>} - One task per report not seen
  */
 
-const reportTasks = async (accountId: string): Promise<HomeTask[]> => {
-  const reports = (await unreadReports(accountId)).filter((report) => report.targetId)
+const reportTasks = async (viewer: SessionUser, access: PermissionHelpers): Promise<HomeTask[]> => {
+  // A report only leads where the viewer may open it
+  if (!access.can(Permissions.LiveLogRead)) return []
+
+  const unread = (await unreadReports(viewer.id)).filter((report) => report.targetId)
+  if (unread.length === 0) return []
+
+  // A live dropped or out of perimeter has no page to land on
+  const reachable = await prisma.live.findMany({
+    where: scopedWhere('live', await readScope(viewer, access), {
+      id: { in: unread.map((report) => report.targetId as string) },
+    }),
+    select: { id: true },
+  })
+  const reachableIds = new Set(reachable.map((live) => live.id))
+
+  // One card per live
+  const reports = [...new Map(unread.map((report) => [report.targetId, report])).values()].filter(
+    (report) => reachableIds.has(report.targetId as string)
+  )
   if (reports.length === 0) return []
+  const accountId = viewer.id
 
   // Whoever was in the Mod View already saw how it went
   const joined = await prisma.modViewPresence.findMany({
@@ -423,7 +443,7 @@ export const myTasks = async (
     reviewTasks(viewer.id),
     trainingTasks(viewer.id),
     mentionTasks(viewer.id),
-    reportTasks(viewer.id),
+    reportTasks(viewer, access),
   ])
 
   const timeline = [...preparation, ...reviews, ...trainings]
