@@ -79,6 +79,8 @@ export interface WorkBoardProps<T extends BoardItem> {
   valuesOf: (card: T) => FormValues
   labelOf: (card: T) => string
   onOpen?: (card: T) => void
+  // Cards without a page of their own open their edit form on click
+  hasPage?: (card: T) => boolean
   extraMenu?: (card: T) => MenuItem[]
   canCreate: boolean
   canUpdate: boolean
@@ -124,6 +126,7 @@ const VIEWS = [
  * @param {(card: T) => FormValues} valuesOf - Values feeding the edit form
  * @param {(card: T) => string} labelOf - Display label of a card
  * @param {(card: T) => void} [onOpen] - Called on click and on Enter
+ * @param {(card: T) => boolean} [hasPage] - Card leads to a page, edit form otherwise
  * @param {(card: T) => MenuItem[]} [extraMenu] - Extra right click entries
  * @param {boolean} canCreate - Member may add a card
  * @param {boolean} canUpdate - Member may edit a card
@@ -156,6 +159,7 @@ export const WorkBoard = <T extends BoardItem>({
   valuesOf,
   labelOf,
   onOpen,
+  hasPage,
   extraMenu,
   canCreate,
   canUpdate,
@@ -298,8 +302,18 @@ export const WorkBoard = <T extends BoardItem>({
     setFilterValues({})
   }
 
+  const canEdit = (card: T): boolean => canUpdate && (isEditable?.(card) ?? true)
+
+  // A card without a page opens its form, so a click always leads somewhere
+  const openCard = (card: T) => {
+    if (onOpen && (hasPage?.(card) ?? true)) return onOpen(card)
+    if (!canEdit(card)) return
+    board.clearIssues()
+    setEditing(card)
+  }
+
   const cardMenu = (card: T): MenuItem[] => [
-    ...(onOpen
+    ...(onOpen && (hasPage?.(card) ?? true)
       ? [
           {
             id: 'open',
@@ -413,7 +427,7 @@ export const WorkBoard = <T extends BoardItem>({
             items={visibleCards}
             renderCard={renderCard}
             onMove={board.move}
-            onOpen={onOpen}
+            onOpen={onOpen ? openCard : undefined}
             cardMenu={cardMenu}
             addLabel={copy.add}
             canCreate={canCreate}
@@ -431,7 +445,7 @@ export const WorkBoard = <T extends BoardItem>({
             columns={tableColumns}
             rows={visibleCards}
             getRowId={(card) => card.id}
-            onRowOpen={onOpen}
+            onRowOpen={onOpen ? openCard : undefined}
             rowMenu={cardMenu}
           />
         )}
