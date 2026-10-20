@@ -77,7 +77,10 @@ export const listAnnouncements = async (
   const [communications, departures, sessions] = await Promise.all([
     access.can(Permissions.CommunicationRead)
       ? prisma.communication.findMany({
-          where: { OR: [{ project: projectVisibility(viewer) }, { projectId: null }] },
+          // An empty relation filter matches nothing, so an unrestricted viewer skips it
+          where: viewer.seesAll
+            ? {}
+            : { OR: [{ project: { is: projectVisibility(viewer) } }, { projectId: null }] },
           include: COMMUNICATION_INCLUDE,
         })
       : [],
