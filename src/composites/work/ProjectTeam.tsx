@@ -3,7 +3,6 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
-import { PROJECT_SETTINGS } from '@/declarations/configurations/settings'
 import { PROJECT_COPY } from '@/declarations/work/copy'
 import type { FieldOption } from '@/types/forms'
 import type { WorkPerson } from '@/types/work'
@@ -23,7 +22,6 @@ interface RosterProps {
   people: WorkPerson[]
   options: FieldOption[]
   disabled: boolean
-  full: boolean
   onChange: (ids: string[]) => void
 }
 
@@ -33,12 +31,11 @@ interface RosterProps {
  * @param {WorkPerson[]} people - Current members
  * @param {FieldOption[]} options - People that may be added
  * @param {boolean} disabled - Blocks every gesture
- * @param {boolean} full - Hides the add control once the cap is reached
  * @param {(ids: string[]) => void} onChange - Persists the new id list
  * @return {JSX.Element}
  */
 
-const Roster = ({ title, people, options, disabled, full, onChange }: RosterProps) => {
+const Roster = ({ title, people, options, disabled, onChange }: RosterProps) => {
   const ids = people.map((person) => person.id)
   const rest = options.filter((option) => !ids.includes(option.value))
 
@@ -65,19 +62,17 @@ const Roster = ({ title, people, options, disabled, full, onChange }: RosterProp
         {people.length === 0 && (
           <span className="text-sm text-[var(--color-ink-subtle)]">{PROJECT_COPY.teamEmpty}</span>
         )}
-        {!full && (
-          <SelectMenu
-            options={rest}
-            value=""
-            onChange={(id) => id && onChange([...ids, id])}
-            label={PROJECT_COPY.teamAdd}
-            placeholder={PROJECT_COPY.teamAdd}
-            mark="avatar"
-            size="compact"
-            disabled={disabled}
-            className="border-transparent bg-transparent px-1 hover:border-transparent hover:bg-transparent"
-          />
-        )}
+        <SelectMenu
+          options={rest}
+          value=""
+          onChange={(id) => id && onChange([...ids, id])}
+          label={PROJECT_COPY.teamAdd}
+          placeholder={PROJECT_COPY.teamAdd}
+          mark="avatar"
+          size="compact"
+          disabled={disabled}
+          className="border-transparent bg-transparent px-1 hover:border-transparent hover:bg-transparent"
+        />
       </div>
     </div>
   )
@@ -119,7 +114,6 @@ export const ProjectTeam = ({
         people={leads}
         options={freeLeadOptions}
         disabled={busy}
-        full={leads.length >= PROJECT_SETTINGS.leadMax}
         onChange={(ids) => void onSave({ leadIds: ids, assistantIds })}
       />
       <Roster
@@ -127,7 +121,6 @@ export const ProjectTeam = ({
         people={assistants}
         options={freeAssistantOptions}
         disabled={busy}
-        full={false}
         onChange={(ids) => void onSave({ leadIds, assistantIds: ids })}
       />
     </div>

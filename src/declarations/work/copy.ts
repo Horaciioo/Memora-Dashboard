@@ -1,6 +1,20 @@
 import type { WorkflowScopeName } from '@/utils/constants/workflow'
 
 /**
+ * Wording of the project opened for a recruitment and its academy
+ * @type {Record<string, string>}
+ */
+
+export const PROGRAM_PROJECT_COPY = {
+  titlePrefix: 'Recrutement et Academy, ',
+  recruitment: 'Recrutement',
+  academy: 'Academy',
+  launch: 'Lancer le PIM de la promotion',
+  secondPeriod: 'Lancer la période 2',
+  close: 'Clôturer la promotion',
+} as const
+
+/**
  * Copy of the project surfaces
  * @type {Record<string, string>}
  */
@@ -109,6 +123,12 @@ export const TASK_COPY = {
   deleteDescription: 'Elle disparaît du tableau définitivement.',
   missingStates: 'Crée d’abord des états de tâche dans la configuration.',
   mine: 'Mes tâches',
+  markDone: 'Marquer comme faite',
+  markUndone: 'Marquer comme à faire',
+  systemTag: 'SYSTÈME',
+  noProject: 'Aucun projet',
+  openSystem: 'Ouvrir la page concernée',
+  systemInfo: 'Tâche ouverte et tenue à jour automatiquement : tu peux seulement la cocher.',
   validate: 'Valider la tâche',
   validated: 'Tâche validée',
   all: 'Toutes',

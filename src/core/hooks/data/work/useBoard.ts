@@ -88,6 +88,12 @@ export const useBoard = <T extends BoardItem>(
   entityOverride?: BoardEntity
 ): BoardCollection<T> => {
   const [cards, setCards] = useState(initialCards)
+  // A refreshed page hands over the cards as the server now holds them
+  const [served, setServed] = useState(initialCards)
+  if (served !== initialCards) {
+    setServed(initialCards)
+    setCards(initialCards)
+  }
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   // Toast entity label

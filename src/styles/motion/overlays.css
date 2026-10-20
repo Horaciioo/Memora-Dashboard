@@ -166,3 +166,150 @@ body {
     animation: none;
   }
 }
+
+/* A board column revealed grows in and the others make room, its content shows once there */
+.board-column-grow {
+  animation: board-column-grow-down 520ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.board-column-grow > * {
+  animation: board-column-content-in 260ms ease-out 260ms both;
+}
+
+/* Folded away, the content leaves first then the column closes */
+.board-column-leave {
+  pointer-events: none;
+  animation: board-column-leave-down 520ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+.board-column-leave > * {
+  animation: board-column-content-out 200ms ease-in both;
+}
+
+@keyframes board-column-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.375rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes board-column-content-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes board-column-grow-down {
+  from {
+    max-height: 0;
+    margin-top: -0.75rem;
+    opacity: 0;
+    overflow: hidden;
+  }
+  to {
+    max-height: 200rem;
+    margin-top: 0;
+    opacity: 1;
+    overflow: visible;
+  }
+}
+
+@keyframes board-column-leave-down {
+  from {
+    max-height: 200rem;
+    margin-top: 0;
+    opacity: 1;
+    overflow: hidden;
+  }
+  to {
+    max-height: 0;
+    margin-top: -0.75rem;
+    opacity: 0;
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 48rem) {
+  .board-column-grow {
+    animation-name: board-column-grow-side;
+  }
+
+  .board-column-leave {
+    animation-name: board-column-leave-side;
+  }
+
+  /* The share of the row opens up from nothing, the others narrow along with it */
+  @keyframes board-column-grow-side {
+    from {
+      flex-grow: 0;
+      min-width: 0;
+      padding-inline: 0;
+      margin-left: -1rem;
+      opacity: 0;
+      overflow: hidden;
+    }
+    to {
+      flex-grow: 1;
+      min-width: 10rem;
+      margin-left: 0;
+      opacity: 1;
+      overflow: visible;
+    }
+  }
+
+  @keyframes board-column-leave-side {
+    from {
+      flex-grow: 1;
+      min-width: 10rem;
+      margin-left: 0;
+      opacity: 1;
+      overflow: hidden;
+    }
+    to {
+      flex-grow: 0;
+      min-width: 0;
+      padding-inline: 0;
+      margin-left: -1rem;
+      opacity: 0;
+      overflow: hidden;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board-column-grow,
+  .board-column-grow > *,
+  .board-column-leave,
+  .board-column-leave > * {
+    animation: none;
+  }
+}
+
+/* Filter dropdowns arrive one after the other */
+.filter-arrive {
+  animation: filter-arrive var(--motion-duration-slow) var(--motion-ease-out) both;
+}
+
+@keyframes filter-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-arrive {
+    animation: none;
+  }
+}

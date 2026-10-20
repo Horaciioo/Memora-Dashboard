@@ -53,6 +53,7 @@ export type HomeTaskKind =
   | 'departure'
   | 'mention'
   | 'liveReport'
+  | 'task'
 
 /**
  * One thing the member has to do

@@ -22,7 +22,6 @@ import lives from '@/configurations/system/lives.json'
 import notifications from '@/configurations/system/notifications.json'
 import pagination from '@/configurations/system/pagination.json'
 import perimeter from '@/configurations/system/perimetre.json'
-import projects from '@/configurations/system/projets.json'
 import responsive from '@/configurations/system/responsive.json'
 import sanctions from '@/configurations/system/sanctions.json'
 import search from '@/configurations/system/search.json'
@@ -784,19 +783,6 @@ export const CALENDAR_SETTINGS = {
     path: 'system/calendrier.defaultDurationMinutes',
     fallback: 60,
     min: 5,
-  }),
-}
-
-/**
- * Project team bounds
- * @type {{ leadMax: number }}
- */
-
-export const PROJECT_SETTINGS = {
-  leadMax: readInteger(projects.leadMax, {
-    path: 'system/projets.leadMax',
-    fallback: 3,
-    min: 1,
   }),
 }
 

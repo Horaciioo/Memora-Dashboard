@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { syncProgramProject } from '@/core/services/work/ProgramProjectService'
 import { decryptField, encryptField } from '@/core/lib/crypto'
 import { identifiersForCreator } from '@/core/services/discord/DiscordIdentifierService'
 import { prisma } from '@/core/lib/db'
@@ -27,7 +28,7 @@ import {
   toPerson,
   youtuberOptions,
 } from '@/core/services/work/shared'
-import { OBSERVER_FUNCTION } from '@/declarations/reference/fixed'
+import { JUNIOR_FUNCTION_OF, OBSERVER_FUNCTION } from '@/declarations/reference/fixed'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
 import { toLinkView } from '@/core/services/onboarding/IntegrationLinkService'
@@ -286,11 +287,15 @@ export const sessionFields = async (
       kind: 'select',
       label: RECRUITMENT_FIELD_COPY.jobFunction,
       required: true,
-      options: functionOptions(functions).map((option) => ({
+      // A campaign looks for a trade, the recruits join as Junior of it afterwards
+      options: functionOptions(
+        functions.filter((row) => Object.hasOwn(JUNIOR_FUNCTION_OF, row.name))
+      ).map((option) => ({
         ...option,
         owners: creatorsOfFunction.get(option.value) ?? [],
       })),
       ownerField: 'youtuberId',
+      mark: 'glyph',
       span: 'half',
     },
     {
@@ -745,6 +750,7 @@ export const createSession = async (
     where: { id: functionId },
     select: { name: true },
   })
+  if (!Object.hasOwn(JUNIOR_FUNCTION_OF, recruited.name)) throw notFound()
   const platform = platformOf(recruited.name)
 
   const templates = await prisma.recruitmentStepTemplate.findMany({
@@ -826,6 +832,8 @@ export const createSession = async (
       return rethrow(error)
     })
 
+  await syncProgramProject(row.id)
+
   return toSummary(row, await sessionNumbers(), 0)
 }
 
@@ -883,6 +891,8 @@ export const updateSession = async (
       prisma.recruitmentSession.findUniqueOrThrow({ where: { id }, include: SUMMARY_INCLUDE }),
     ])
     .catch(rethrow)
+
+  await syncProgramProject(id)
 
   const attended = await prisma.recruitmentCandidate.count({
     where: { sessionId: id, attended: true },
@@ -1247,6 +1257,7 @@ export const createStep = async (
       position: (last?.position ?? 0) + FORM_SETTINGS.positionStep,
     },
   })
+  await syncProgramProject(sessionId)
 
   return toStep(row)
 }
@@ -1295,6 +1306,7 @@ export const updateStep = async (
       required: readFlag(values, 'required'),
     },
   })
+  await syncProgramProject(row.sessionId)
 
   return toStep(row)
 }
@@ -1318,6 +1330,7 @@ export const setStepDone = async (
     where: { id },
     data: { doneAt: done ? new Date() : null },
   })
+  await syncProgramProject(row.sessionId)
 
   return toStep(row)
 }
@@ -1330,8 +1343,9 @@ export const setStepDone = async (
  */
 
 export const removeStep = async (id: string, scope: AccessScope): Promise<void> => {
-  await stepSession(id, scope)
+  const sessionId = await stepSession(id, scope)
   await prisma.recruitmentStep.delete({ where: { id } })
+  await syncProgramProject(sessionId)
 }
 
 /**

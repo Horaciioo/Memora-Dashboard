@@ -5,9 +5,9 @@ import { assertAllInScope, assertRowInScope, scopedWhere } from '@/core/services
 import { taskVisibility } from '@/core/services/work/visibility'
 import type { WorkViewer } from '@/core/services/work/visibility'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { notFound } from '@/core/lib/errors'
+import { forbidden, notFound } from '@/core/lib/errors'
 import { readDate, readText } from '@/core/lib/forms/values'
-import { emojiOrRandom, isBehindDeadline } from '@/core/lib/work'
+import { isBehindDeadline } from '@/core/lib/work'
 import {
   AUTHORSHIP_INCLUDE,
   creatorLinks,
@@ -27,12 +27,12 @@ import {
   youtuberOptions,
   YOUTUBERS_INCLUDE,
 } from '@/core/services/work/shared'
-import { EMOJI_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
+import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { TASK_FIELD_COPY, TASK_FIELD_INFO } from '@/declarations/work/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { TaskSummary } from '@/types/work'
-import { WorkflowScopes } from '@/utils/constants/workflow'
+import { WorkflowPhases, WorkflowScopes } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
 // Relations every task card needs
@@ -67,6 +67,9 @@ export const toTaskSummary = (row: TaskRow): TaskSummary => ({
   owner: toPerson(row.owner),
   dueDate: row.dueDate?.toISOString() ?? null,
   isOverdue: isBehindDeadline(row.dueDate, row.state?.phase),
+  isDone: row.state?.phase === WorkflowPhases.Done,
+  isSystem: row.systemKey !== null,
+  href: row.href,
   position: row.position,
   values: {
     title: row.title,
@@ -102,19 +105,11 @@ export const taskFields = async (
 
   return [
     {
-      name: 'emoji',
-      kind: 'emoji',
-      label: TASK_FIELD_COPY.emoji,
-      maxLength: EMOJI_SETTINGS.maxLength,
-      group: FORM_GROUPS.essentials,
-    },
-    {
       name: 'title',
       kind: 'text',
       label: TASK_FIELD_COPY.title,
       info: TASK_FIELD_INFO.title,
       required: true,
-      glyph: 'emoji',
       maxLength: FORM_SETTINGS.titleMaxLength,
       group: FORM_GROUPS.essentials,
     },
@@ -274,7 +269,6 @@ export const readTask = async (id: string): Promise<TaskSummary> => {
 
 const toTaskData = (values: FormValues) => ({
   title: readText(values, 'title') ?? '',
-  emoji: readText(values, 'emoji'),
   description: readText(values, 'description'),
   dueDate: readDate(values, 'dueDate'),
   ownerId: readText(values, 'ownerId'),
@@ -308,7 +302,6 @@ export const createTask = async (
   const row = await prisma.task.create({
     data: {
       ...data,
-      emoji: emojiOrRandom(data.emoji),
       stateId,
       youtubers: { connect: creatorLinks(youtuberIds) },
       position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
@@ -337,6 +330,18 @@ export const updateTask = async (
   actorId: string
 ): Promise<TaskSummary> => {
   await assertRowInScope('task', id, scope)
+
+  // The system keeps its own tasks, only their state moves
+  const owned = await prisma.task.findUnique({ where: { id }, select: { systemKey: true } })
+  if (owned?.systemKey) {
+    const kept = await prisma.task.update({
+      where: { id },
+      data: { stateId: readText(values, 'stateId'), updatedById: actorId },
+      include: TASK_INCLUDE,
+    })
+
+    return toTaskSummary(kept)
+  }
 
   const picked = readCreatorIds(values)
   assertAllInScope(scope, picked)
@@ -376,6 +381,7 @@ export const updateTask = async (
 
 export const removeTask = async (id: string, scope: AccessScope): Promise<void> => {
   await assertRowInScope('task', id, scope)
+  await assertHandMade(id)
 
   await prisma.task.delete({ where: { id } })
 }
@@ -404,6 +410,58 @@ export const moveTask = async (
   const row = await prisma.task.update({
     where: { id },
     data: { stateId, position: positionAt(cards, index), updatedById: actorId },
+    include: TASK_INCLUDE,
+  })
+
+  return toTaskSummary(row)
+}
+
+/**
+ * Refuse a task the system keeps by itself
+ * @param {string} id - Task identifier
+ * @return {Promise<void>} - Throws when the system owns it
+ */
+
+export const assertHandMade = async (id: string): Promise<void> => {
+  const row = await prisma.task.findUnique({ where: { id }, select: { systemKey: true } })
+  if (row?.systemKey) throw forbidden()
+}
+
+/**
+ * Tick a task done, or put it back to do
+ * @param {string} id - Task identifier
+ * @param {boolean} done - Wanted outcome
+ * @param {string} actorId - Who ticked it
+ * @return {Promise<TaskSummary>} - Updated card
+ */
+
+export const setTaskDone = async (
+  id: string,
+  done: boolean,
+  actorId: string
+): Promise<TaskSummary> => {
+  const states = await prisma.workflowState.findMany({
+    where: { scope: WorkflowScopes.Task },
+    orderBy: { position: 'asc' },
+  })
+  const target = done
+    ? states.find((state) => state.phase === WorkflowPhases.Done)
+    : (states.find((state) => state.isDefault && state.phase !== WorkflowPhases.Done) ??
+      states.find((state) => state.phase !== WorkflowPhases.Done))
+  if (!target) throw notFound()
+
+  const last = await prisma.task.aggregate({
+    where: { stateId: target.id },
+    _max: { position: true },
+  })
+
+  const row = await prisma.task.update({
+    where: { id },
+    data: {
+      stateId: target.id,
+      position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
+      updatedById: actorId,
+    },
     include: TASK_INCLUDE,
   })
 

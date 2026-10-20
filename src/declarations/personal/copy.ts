@@ -21,6 +21,7 @@ export const PERSONAL_COPY = {
   aheadTitle: 'À venir',
   aheadEmpty: 'Rien de prévu dans les semaines à venir.',
   todoTitle: 'Tes tâches',
+  allTasks: 'Voir toutes tes tâches ({n})',
   nextTitle: 'Ensuite',
   more: 'Voir la suite',
   less: 'Réduire',

@@ -33,6 +33,9 @@ export interface FilterDefinition {
   maturity?: MaturityName
 }
 
+// Pause between two dropdowns arriving
+const FILTER_STAGGER_MS = 70
+
 export interface FilterBarProps {
   searchLabel: string
   search: string
@@ -128,32 +131,38 @@ export const FilterBar = ({
       {isPanelOpen && filters.length > 0 && (
         <div className={FILTER_STYLES.panel}>
           <div className={FILTER_STYLES.options}>
-            {filters.map((filter) => {
+            {filters.map((filter, index) => {
               const id = `filter-${filter.name}`
 
               return (
-                <Field
+                // Each dropdown arrives a beat after the one before
+                <div
                   key={filter.name}
-                  id={id}
-                  label={filter.label}
-                  maturity={filter.maturity}
-                  className={FILTER_STYLES.optionField}
+                  className={cn('filter-arrive', FILTER_STYLES.optionField)}
+                  style={{ animationDelay: `${index * FILTER_STAGGER_MS}ms` }}
                 >
-                  <SelectMenu
-                    id={id}
-                    label={filter.label}
-                    options={filter.options}
-                    value={values[filter.name] ?? ''}
-                    emptyLabel={filter.allLabel}
-                    mark={filter.mark}
-                    onChange={(value) => onFilter(filter.name, value)}
-                  />
-                </Field>
+                  <Field id={id} label={filter.label} maturity={filter.maturity}>
+                    <SelectMenu
+                      id={id}
+                      label={filter.label}
+                      options={filter.options}
+                      value={values[filter.name] ?? ''}
+                      emptyLabel={filter.allLabel}
+                      mark={filter.mark}
+                      onChange={(value) => onFilter(filter.name, value)}
+                    />
+                  </Field>
+                </div>
               )
             })}
           </div>
 
-          <Button disabled={!isFiltered} onClick={onReset} className={FILTER_STYLES.reset}>
+          <Button
+            disabled={!isFiltered}
+            onClick={onReset}
+            className={cn('filter-arrive', FILTER_STYLES.reset)}
+            style={{ animationDelay: `${filters.length * FILTER_STAGGER_MS}ms` }}
+          >
             {ACTION_COPY.reset}
           </Button>
         </div>

@@ -6,7 +6,10 @@ import { OptionMark } from '@/components/elements/forms/selects/OptionMark'
 import { Status } from '@/components/elements/display/Status'
 import { CreatorLabels, ProjectLabel } from '@/components/elements/display/RecordLabel'
 import { pickedOptions } from '@/core/lib/forms/options'
+import { WorkComments } from '@/composites/work/WorkComments'
 import { OverdueMark } from '@/composites/work/OverdueMark'
+import { TaskCheck } from '@/composites/work/TaskCheck'
+import Link from '@/components/elements/navigation/AppLink'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { ActivityTimeline } from '@/components/structures/data/ActivityTimeline'
 import {
@@ -34,6 +37,7 @@ export interface TaskFileProps {
   activity: ActivityEntry[]
   canUpdate: boolean
   canReadLogs: boolean
+  viewerId: string
 }
 
 /**
@@ -43,10 +47,20 @@ export interface TaskFileProps {
  * @param {ActivityEntry[]} activity - Journal entries
  * @param {boolean} canUpdate - Member may edit the task
  * @param {boolean} canReadLogs - Member may read the journal
+ * @param {string} viewerId - Signed-in member
  * @return {JSX.Element}
  */
 
-export const TaskFile = ({ task, fields, activity, canUpdate, canReadLogs }: TaskFileProps) => {
+export const TaskFile = ({
+  task,
+  fields,
+  activity,
+  canUpdate: mayUpdate,
+  canReadLogs,
+  viewerId,
+}: TaskFileProps) => {
+  // The system keeps its own tasks, they can only be ticked
+  const canUpdate = mayUpdate && !task.isSystem
   const file = useRecordFile({
     path: API_ROUTES.task(task.id),
     scope: WorkflowScopes.Task,
@@ -66,7 +80,6 @@ export const TaskFile = ({ task, fields, activity, canUpdate, canReadLogs }: Tas
   }
 
   const titleValue = typeof file.values.title === 'string' ? file.values.title : task.title
-  const emojiValue = typeof file.values.emoji === 'string' ? file.values.emoji : task.emoji
   const descriptionValue =
     typeof file.values.description === 'string' ? file.values.description : ''
   const dueDateValue = typeof file.values.dueDate === 'string' ? file.values.dueDate : null
@@ -149,11 +162,28 @@ export const TaskFile = ({ task, fields, activity, canUpdate, canReadLogs }: Tas
     <div className="flex flex-col gap-8">
       <EditableHeading
         value={titleValue}
-        glyph={emojiValue}
+        lead={
+          <TaskCheck
+            id={task.id}
+            isDone={task.isDone}
+            enabled={mayUpdate || task.owner?.id === viewerId}
+          />
+        }
         disabled={!canUpdate}
         onCommit={(next) => file.saveField('title', next)}
-        onGlyphCommit={(next) => file.saveField('emoji', next)}
       />
+
+      {task.isSystem && (
+        <div className="flex flex-wrap items-center gap-3">
+          <Status label={TASK_COPY.systemTag} tone="danger" />
+          <span className="text-sm text-[var(--color-ink-subtle)]">{TASK_COPY.systemInfo}</span>
+          {task.href && (
+            <Link href={task.href} className="text-sm font-semibold underline">
+              {TASK_COPY.openSystem}
+            </Link>
+          )}
+        </div>
+      )}
 
       <section className={SECTION_STYLES.wrapper}>
         <h2 className={SECTION_STYLES.title}>{TASK_COPY.informations}</h2>
@@ -178,6 +208,8 @@ export const TaskFile = ({ task, fields, activity, canUpdate, canReadLogs }: Tas
           </div>
         </div>
       </section>
+
+      <WorkComments kind="task" id={task.id} label={task.title} />
 
       {canReadLogs && (
         <Section title={TASK_COPY.logsTitle} bare>

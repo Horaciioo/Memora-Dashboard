@@ -15,6 +15,13 @@
   },
   {
     "scope": "PROJECT",
+    "name": "Stand-by",
+    "accent": "warning",
+    "phase": "TODO",
+    "isDefault": false
+  },
+  {
+    "scope": "PROJECT",
     "name": "Terminé",
     "accent": "success",
     "phase": "DONE",
@@ -36,6 +43,13 @@
   },
   {
     "scope": "TASK",
+    "name": "Stand-by",
+    "accent": "warning",
+    "phase": "TODO",
+    "isDefault": false
+  },
+  {
+    "scope": "TASK",
     "name": "Terminé",
     "accent": "success",
     "phase": "DONE",
@@ -53,6 +67,13 @@
     "name": "Programmé",
     "accent": "info",
     "phase": "DOING",
+    "isDefault": false
+  },
+  {
+    "scope": "MEETING",
+    "name": "Stand-by",
+    "accent": "warning",
+    "phase": "TODO",
     "isDefault": false
   },
   {
