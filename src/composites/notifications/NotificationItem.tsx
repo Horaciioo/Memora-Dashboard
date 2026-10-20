@@ -18,6 +18,8 @@ export interface NotificationItemProps {
   onOpen: (id: string) => void
   // Dismisses the row for good
   onRemove?: (id: string) => void
+  // Turns an opened row back to unread
+  onMarkUnread?: (id: string) => void
 }
 
 /**
@@ -26,6 +28,7 @@ export interface NotificationItemProps {
  * @param {boolean} withAction - Carries the way in
  * @param {(id: string) => void} onOpen - Called once the row is settled
  * @param {(id: string) => void} [onRemove] - Dismisses the row
+ * @param {(id: string) => void} [onMarkUnread] - Turns an opened row back to unread
  * @return {JSX.Element}
  */
 
@@ -34,6 +37,7 @@ export const NotificationItem = ({
   withAction,
   onOpen,
   onRemove,
+  onMarkUnread,
 }: NotificationItemProps) => {
   const kind = entry.kind ? NOTIFICATION_KIND_REGISTRY.get(entry.kind) : null
   const target = entry.target ? NOTIFICATION_TARGETS.get(entry.target) : null
@@ -50,6 +54,7 @@ export const NotificationItem = ({
       className={cn(
         NOTIFICATION_STYLES.row,
         !entry.isRead && NOTIFICATION_STYLES.rowUnread,
+        withAction && href && NOTIFICATION_STYLES.rowLinked,
         'group/row relative'
       )}
     >
@@ -76,19 +81,28 @@ export const NotificationItem = ({
           <span className={NOTIFICATION_STYLES.moment} suppressHydrationWarning>
             {formatSince(entry.createdAt)}
           </span>
-          {withAction && href && (
-            <Link
-              href={href}
-              onClick={() => onOpen(entry.id)}
-              aria-label={NOTIFICATION_COPY.goTo.replace('{target}', target?.label ?? '')}
-              className={NOTIFICATION_STYLES.action}
+          {onMarkUnread && entry.isRead && (
+            <button
+              type="button"
+              className={NOTIFICATION_STYLES.markUnread}
+              onClick={() => onMarkUnread(entry.id)}
             >
-              {NOTIFICATION_COPY.action}
-              <ActionIcon className={NOTIFICATION_STYLES.actionIcon} aria-hidden="true" />
-            </Link>
+              {NOTIFICATION_COPY.markUnread}
+            </button>
           )}
         </div>
       </div>
+      {withAction && href && (
+        <>
+          <Link
+            href={href}
+            onClick={() => onOpen(entry.id)}
+            aria-label={NOTIFICATION_COPY.goTo.replace('{target}', target?.label ?? '')}
+            className={NOTIFICATION_STYLES.rowLink}
+          />
+          <ActionIcon className={NOTIFICATION_STYLES.rowArrow} aria-hidden="true" />
+        </>
+      )}
       {onRemove && (
         <button
           type="button"

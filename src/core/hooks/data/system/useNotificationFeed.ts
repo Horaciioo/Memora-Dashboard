@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { apiDelete, apiGet, apiPatch } from '@/core/lib/api/client'
+import { apiDelete, apiGet, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { useNotificationsStore } from '@/core/store/notifications'
@@ -18,6 +18,7 @@ import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
  * @property {boolean} isLoading - First page still in flight
  * @property {() => void} load - Fetch the page, skipped while fresh
  * @property {() => void} loadMore - Fetch the page after the last one held
+ * @property {(id: string) => void} markUnread - Turn an opened notification back to unread
  * @property {(id: string) => void} open - Mark one as read
  * @property {() => void} readAll - Mark every one as read
  * @property {(id: string) => void} remove - Delete one
@@ -32,6 +33,7 @@ export interface NotificationCollection {
   load: () => void
   loadMore: () => void
   open: (id: string) => void
+  markUnread: (id: string) => void
   readAll: () => void
   remove: (id: string) => void
   clearRead: () => void
@@ -96,6 +98,14 @@ export const useNotificationFeed = (
     [run]
   )
 
+  const markUnread = useCallback(
+    (id: string) => {
+      useNotificationsStore.getState().unsettle(id)
+      void run(() => apiPost<{ id: string }>(API_ROUTES.notificationUnread(id), {}))
+    },
+    [run]
+  )
+
   const readAll = useCallback(() => {
     useNotificationsStore.getState().settleEvery()
     void run(() => apiPatch<{ unread: number }>(API_ROUTES.notifications(), {}))
@@ -122,6 +132,7 @@ export const useNotificationFeed = (
     load,
     loadMore,
     open,
+    markUnread,
     readAll,
     remove,
     clearRead,

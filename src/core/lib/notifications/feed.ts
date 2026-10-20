@@ -39,6 +39,24 @@ export const settleEntry = (feed: NotificationFeed, id: string): NotificationFee
 }
 
 /**
+ * Turn one read notification back into an unread one
+ * @param {NotificationFeed} feed - Feed held
+ * @param {string} id - Notification identifier
+ * @return {NotificationFeed} - Feed with the entry unread
+ */
+
+export const unsettleEntry = (feed: NotificationFeed, id: string): NotificationFeed => {
+  const entry = feed.entries.find((row) => row.id === id)
+  if (!entry || !entry.isRead) return feed
+
+  return {
+    ...feed,
+    entries: feed.entries.map((row) => (row.id === id ? { ...row, isRead: false } : row)),
+    unread: feed.unread + 1,
+  }
+}
+
+/**
  * Settle every notification
  * @param {NotificationFeed} feed - Feed held
  * @return {NotificationFeed} - Feed with nothing left unread

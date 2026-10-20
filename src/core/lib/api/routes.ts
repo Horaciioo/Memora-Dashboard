@@ -180,6 +180,7 @@ export const API_ROUTES = {
       : '/api/notifications',
   notificationsStream: '/api/notifications/flux',
   notification: (id: string) => `/api/notifications/${id}`,
+  notificationUnread: (id: string) => `/api/notifications/${id}/non-lu`,
   access: '/api/acces',
   accessFunctions: '/api/acces/fonctions',
   accessFunction: (id: string) => `/api/acces/fonctions/${id}`,

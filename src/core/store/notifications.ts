@@ -10,6 +10,7 @@ import {
   refreshFeed,
   settleAll,
   settleEntry,
+  unsettleEntry,
 } from '@/core/lib/notifications/feed'
 import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
 
@@ -18,18 +19,22 @@ import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
  * @typedef {Object} NotificationsStore
  * @property {NotificationFeed} feed - Entries newest first, badge, whether older ones wait
  * @property {NotificationEntry[]} nudges - Arrived during the visit, waiting for their bubble
+ * @property {number} arrivals - New unread notifications received while the page is open
  * @property {boolean} isSeeded - Server state received once
  */
 
 interface NotificationsStore {
   feed: NotificationFeed
   nudges: NotificationEntry[]
+  // Counts each new unread notification that reached the open page
+  arrivals: number
   isSeeded: boolean
   seed: (feed: NotificationFeed) => void
   replace: (feed: NotificationFeed) => void
   receive: (entry: NotificationEntry, withBubble: boolean) => void
   settle: (id: string) => void
   settleEvery: () => void
+  unsettle: (id: string) => void
   drop: (id: string) => void
   dropOpened: () => void
   extend: (page: NotificationFeed) => void
@@ -39,6 +44,7 @@ interface NotificationsStore {
 export const useNotificationsStore = create<NotificationsStore>()((set) => ({
   feed: { entries: [], unread: 0 },
   nudges: [],
+  arrivals: 0,
   isSeeded: false,
   // A listing replaces the badge-only start, a badge-only start never empties a listing
   seed: (feed) =>
@@ -53,10 +59,15 @@ export const useNotificationsStore = create<NotificationsStore>()((set) => ({
       const feed = receiveEntry(state.feed, entry)
       if (feed === state.feed) return state
 
-      return { feed, nudges: withBubble && !entry.isRead ? [...state.nudges, entry] : state.nudges }
+      return {
+        feed,
+        nudges: withBubble && !entry.isRead ? [...state.nudges, entry] : state.nudges,
+        arrivals: entry.isRead ? state.arrivals : state.arrivals + 1,
+      }
     }),
   settle: (id) => set((state) => ({ feed: settleEntry(state.feed, id) })),
   settleEvery: () => set((state) => ({ feed: settleAll(state.feed) })),
+  unsettle: (id) => set((state) => ({ feed: unsettleEntry(state.feed, id) })),
   drop: (id) => set((state) => ({ feed: dropEntry(state.feed, id) })),
   dropOpened: () => set((state) => ({ feed: dropRead(state.feed) })),
   extend: (page) => set((state) => ({ feed: appendPage(state.feed, page) })),

@@ -101,7 +101,12 @@ export const NotificationsPanel = ({
         )}
       </div>
 
-      {entries.length > 0 && <div className={NOTIFICATION_STYLES.footer}>{seeAll}</div>}
+      {entries.length > 0 && (
+        <div className={NOTIFICATION_STYLES.footer}>
+          <span className={NOTIFICATION_STYLES.footerRule} role="separator" />
+          {seeAll}
+        </div>
+      )}
     </div>
   )
 }
