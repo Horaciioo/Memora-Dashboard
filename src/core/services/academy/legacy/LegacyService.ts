@@ -1,3 +1,4 @@
+import { syncFunctionTeams } from '@/core/services/teams/FunctionTeamService'
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
@@ -266,6 +267,7 @@ export const openTrack = async (
       update: {},
       create: { accountId, functionId: juniorId },
     })
+    await syncFunctionTeams([accountId])
   }
 
   await recordEvent({
@@ -409,6 +411,7 @@ export const decideTrack = async (
         ]
       : []),
   ])
+  await syncFunctionTeams([track.accountId])
 
   await recordEvent({
     eventType: 'LegacyChanged',

@@ -51,7 +51,7 @@ export async function generateMetadata({
 
 export default async function YoutuberPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { access, scope } = await requirePermission(Permissions.ReferenceRead)
+  const { session, access, scope } = await requirePermission(Permissions.ReferenceRead)
 
   const youtuber = await readYoutuber(id)
   if (!youtuber) notFound()
@@ -81,7 +81,7 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
         channels={channels}
         anchors={anchors}
         teams={teams}
-        canManageTeams={access.can(Permissions.TeamManage)}
+        canManageTeams={session.isRoot && access.can(Permissions.TeamManage)}
         canManageCreator={access.isAdmin}
       />
     </div>

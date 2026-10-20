@@ -1,11 +1,13 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { forbidden } from '@/core/lib/errors'
 import { assertInScope } from '@/core/services/auth/ScopeService'
+import { openCreatorFunctions } from '@/core/services/teams/FunctionTeamService'
+import { TEAM_COPY } from '@/declarations/teams/copy'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { toPerson } from '@/core/services/work/shared'
 import { ENCADREMENT_ROLES } from '@/declarations/access/roles'
-import { OBSERVER_FUNCTION } from '@/declarations/reference/fixed'
 import type { CreatorTeamData } from '@/types/teams'
 import {
   AccessCategories,
@@ -29,16 +31,6 @@ export const readCreatorTeams = async (
   scope: AccessScope
 ): Promise<CreatorTeamData> => {
   assertInScope(scope, youtuberId)
-
-  // A creator always starts with its observers team on
-  const observers = await prisma.jobFunction.findUnique({ where: { name: OBSERVER_FUNCTION } })
-  if (observers) {
-    await prisma.team.upsert({
-      where: { youtuberId_functionId: { youtuberId, functionId: observers.id } },
-      update: {},
-      create: { name: observers.name, youtuberId, functionId: observers.id },
-    })
-  }
 
   const [functions, teams, accounts] = await Promise.all([
     prisma.jobFunction.findMany({ where: TEAM_FUNCTIONS, orderBy: { position: 'asc' } }),
@@ -85,74 +77,30 @@ export const readCreatorTeams = async (
 }
 
 /**
- * Switch the teams of a creator on or off
+ * Switch the functions of a creator on or off, closing one is left to the root administrator
  * @param {string} youtuberId - Creator identifier
  * @param {string[]} functionIds - Functions kept on
  * @param {AccessScope} scope - Creator perimeter
+ * @param {boolean} isRoot - Signed-in member is the root administrator
  * @return {Promise<CreatorTeamData>} - Fresh data
  */
 
 export const setCreatorFunctions = async (
   youtuberId: string,
   functionIds: string[],
-  scope: AccessScope
+  scope: AccessScope,
+  isRoot: boolean
 ): Promise<CreatorTeamData> => {
   assertInScope(scope, youtuberId)
 
-  const functions = await prisma.jobFunction.findMany({ where: TEAM_FUNCTIONS })
-
-  // One team per function, archived when off
-  await prisma.$transaction(
-    functions.map((entry) =>
-      prisma.team.upsert({
-        where: { youtuberId_functionId: { youtuberId, functionId: entry.id } },
-        update: { archived: !functionIds.includes(entry.id) },
-        create: {
-          name: entry.name,
-          youtuberId,
-          functionId: entry.id,
-          archived: !functionIds.includes(entry.id),
-        },
-      })
-    )
-  )
-
-  return readCreatorTeams(youtuberId, scope)
-}
-
-/**
- * Set the teams one member sits in
- * @param {string} youtuberId - Creator identifier
- * @param {string} accountId - Member identifier
- * @param {string[]} functionIds - Functions of the teams to sit in
- * @param {AccessScope} scope - Creator perimeter
- * @return {Promise<CreatorTeamData>} - Fresh data
- */
-
-export const setMemberTeams = async (
-  youtuberId: string,
-  accountId: string,
-  functionIds: string[],
-  scope: AccessScope
-): Promise<CreatorTeamData> => {
-  assertInScope(scope, youtuberId)
-
-  const teams = await prisma.team.findMany({
-    where: { youtuberId, functionId: { not: null }, archived: false },
-    select: { id: true, functionId: true },
+  const open = await prisma.youtuberFunction.findMany({
+    where: { youtuberId },
+    select: { functionId: true },
   })
+  const closing = open.some((seat) => !functionIds.includes(seat.functionId))
+  if (closing && !isRoot) throw forbidden(TEAM_COPY.closeRootOnly)
 
-  const chosen = teams.filter((team) => functionIds.includes(team.functionId!))
-
-  // Replace within this creator only
-  await prisma.$transaction([
-    prisma.teamMember.deleteMany({
-      where: { accountId, teamId: { in: teams.map((team) => team.id) } },
-    }),
-    prisma.teamMember.createMany({
-      data: chosen.map((team) => ({ accountId, teamId: team.id })),
-    }),
-  ])
+  await openCreatorFunctions(youtuberId, functionIds)
 
   return readCreatorTeams(youtuberId, scope)
 }
