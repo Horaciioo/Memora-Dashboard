@@ -16,6 +16,7 @@ import { CALENDAR_DETAIL, CALENDAR_STYLES, SECTION_STYLES } from '@/declarations
 import type { CalendarEntry } from '@/types/calendar'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
 import { CalendarSources } from '@/utils/constants/workflow'
+import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { cn } from '@/utils/classnames'
 import { entrySpanParts } from '@/utils/format/entrySpan'
 
@@ -51,6 +52,8 @@ export const CalendarDetail = ({
   onMove,
   onRemind,
 }: CalendarDetailProps) => {
+  const { isAdmin } = useAuthContext()
+
   if (entry.source === CalendarSources.Birthday) {
     return <p className={CALENDAR_STYLES.detailNote}>{CALENDAR_COPY.birthdayMessage}</p>
   }
@@ -82,11 +85,13 @@ export const CalendarDetail = ({
             <VisibilityIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
             {isLeadsOnly ? AUDIENCE_COPY.leadsOnlyLabel : visibility.label}
           </span>
-          <span className={CALENDAR_STYLES.previewLine}>
-            <InfoIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
-            {FIELD_COPY.id}
-            <RecordId id={entry.id} />
-          </span>
+          {isAdmin && (
+            <span className={CALENDAR_STYLES.previewLine}>
+              <InfoIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
+              {FIELD_COPY.id}
+              <RecordId id={entry.id} />
+            </span>
+          )}
           {entry.subjectName && (
             <span className={CALENDAR_STYLES.previewLine}>
               <PersonIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
