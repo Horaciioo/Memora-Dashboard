@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { AddRow } from '@/components/structures/inline/AddRow'
@@ -90,7 +90,13 @@ export interface WorkBoardProps<T extends BoardItem> {
   hiddenColumns?: string[]
   // Cards the member may edit, move and drop, all by default
   isEditable?: (card: T) => boolean
+  isRemovable?: (card: T) => boolean
+  // Filters set when the board opens
+  initialFilters?: Record<string, string>
 }
+
+// Time a done column takes to fold away, matches the board-column animations
+const DONE_COLUMN_MS = 520
 
 // Two ways of reading the same cards
 const VIEWS = [
@@ -126,6 +132,8 @@ const VIEWS = [
  * @param {PageOption[]} [extraOptions] - Page options added to the view and finished ones
  * @param {string[]} [hiddenColumns] - Columns folded away
  * @param {(card: T) => boolean} [isEditable] - Cards the member may edit, move and drop
+ * @param {(card: T) => boolean} [isRemovable] - Cards that may be dropped
+ * @param {Record<string, string>} [initialFilters] - Filters set when the board opens
  * @return {JSX.Element}
  */
 
@@ -156,11 +164,13 @@ export const WorkBoard = <T extends BoardItem>({
   extraOptions = [],
   hiddenColumns = [],
   isEditable,
+  isRemovable,
+  initialFilters,
 }: WorkBoardProps<T>) => {
   const board = useBoard<T>(scope, endpoints, initialCards, labelOf, entity)
   const [view, setView] = useState<'board' | 'list'>('board')
   const [search, setSearch] = useState('')
-  const [filterValues, setFilterValues] = useState<Record<string, string>>({})
+  const [filterValues, setFilterValues] = useState<Record<string, string>>(initialFilters ?? {})
   const [isCreating, setCreating] = useState(false)
   const [createColumn, setCreateColumn] = useState<string | null>(null)
   const [editing, setEditing] = useState<T | null>(null)
@@ -171,6 +181,17 @@ export const WorkBoard = <T extends BoardItem>({
 
   // Finished work stays out until the page options ask for it
   const [showDone, setShowDone] = useState(false)
+  // Done columns stay drawn while they fold away
+  const [doneMounted, setDoneMounted] = useState(false)
+  const foldTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const toggleDone = (next: boolean) => {
+    setShowDone(next)
+    if (foldTimer.current) clearTimeout(foldTimer.current)
+
+    if (next) setDoneMounted(true)
+    else foldTimer.current = setTimeout(() => setDoneMounted(false), DONE_COLUMN_MS)
+  }
 
   const doneColumnIds = useMemo(
     () =>
@@ -181,22 +202,29 @@ export const WorkBoard = <T extends BoardItem>({
   // Done columns fold away
   const visibleColumns = useMemo(
     () =>
-      columns.filter(
-        (column) =>
-          !hiddenColumns.includes(column.id) && (showDone || !doneColumnIds.has(column.id))
-      ),
-    [columns, doneColumnIds, showDone, hiddenColumns]
+      columns
+        .filter(
+          (column) =>
+            !hiddenColumns.includes(column.id) && (doneMounted || !doneColumnIds.has(column.id))
+        )
+        // A revealed column grows in and a folded one shrinks away rather than popping
+        .map((column) =>
+          doneColumnIds.has(column.id)
+            ? { ...column, entering: showDone, leaving: !showDone }
+            : column
+        ),
+    [columns, doneColumnIds, showDone, doneMounted, hiddenColumns]
   )
 
   const visibleCards = useMemo(
     () =>
       board.cards.filter((card) => {
-        if (!showDone && doneColumnIds.has(card.columnId ?? '')) return false
+        if (!doneMounted && doneColumnIds.has(card.columnId ?? '')) return false
         if (hiddenColumns.includes(card.columnId ?? '')) return false
 
         return matches(card, search.trim().toLowerCase(), filterValues)
       }),
-    [board.cards, doneColumnIds, showDone, hiddenColumns, search, filterValues, matches]
+    [board.cards, doneColumnIds, doneMounted, hiddenColumns, search, filterValues, matches]
   )
 
   const selection = useBoardSelection(visibleCards)
@@ -216,8 +244,11 @@ export const WorkBoard = <T extends BoardItem>({
     return done
   }
 
+  // The system keeps some cards, they are skipped
+  const removable = selected.filter((card) => isRemovable?.(card) ?? true)
+
   const deleteSelection = async () => {
-    await board.removeMany(selected.map((card) => card.id))
+    await board.removeMany(removable.map((card) => card.id))
     selection.clear()
   }
 
@@ -227,9 +258,9 @@ export const WorkBoard = <T extends BoardItem>({
       board.cards.some(
         (card) =>
           !hiddenColumns.includes(card.columnId ?? '') &&
-          (showDone || !doneColumnIds.has(card.columnId ?? ''))
+          (doneMounted || !doneColumnIds.has(card.columnId ?? ''))
       ),
-    [board.cards, doneColumnIds, showDone, hiddenColumns]
+    [board.cards, doneColumnIds, doneMounted, hiddenColumns]
   )
 
   const pageOptions: PageOption[] = [
@@ -250,7 +281,7 @@ export const WorkBoard = <T extends BoardItem>({
             id: 'done',
             label: PAGE_OPTIONS_COPY.showFinished,
             checked: showDone,
-            onChange: setShowDone,
+            onChange: toggleDone,
           },
         ]),
     ...extraOptions,
@@ -304,7 +335,7 @@ export const WorkBoard = <T extends BoardItem>({
         ]
       : []),
     ...(extraMenu?.(card) ?? []),
-    ...(canDelete && (isEditable?.(card) ?? true)
+    ...(canDelete && (isEditable?.(card) ?? true) && (isRemovable?.(card) ?? true)
       ? [
           {
             id: 'delete',
@@ -365,7 +396,7 @@ export const WorkBoard = <T extends BoardItem>({
             count={selected.length}
             fields={fields}
             canUpdate={canUpdate}
-            canDelete={canDelete}
+            canDelete={canDelete && removable.length > 0}
             isSaving={board.isSaving}
             issues={board.issues}
             clearIssues={board.clearIssues}

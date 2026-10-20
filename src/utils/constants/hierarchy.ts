@@ -13,6 +13,13 @@ export const MemberRoles = {
 export type MemberRoleName = (typeof MemberRoles)[keyof typeof MemberRoles]
 
 /**
+ * Roles above the moderators
+ * @type {MemberRoleName[]}
+ */
+
+export const LEADERSHIP_ROLES: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Responsable]
+
+/**
  * Access console categories
  * @type {Record<string, string>}
  */
@@ -22,6 +29,8 @@ export const AccessCategories = {
   Administration: 'ADMINISTRATION',
   Responsabilite: 'RESPONSABILITE',
   Moderation: 'MODERATION',
+  Junior: 'JUNIOR',
+  JuniorResponsable: 'JUNIOR_RESPONSABLE',
 } as const
 
 export type AccessCategoryName = (typeof AccessCategories)[keyof typeof AccessCategories]

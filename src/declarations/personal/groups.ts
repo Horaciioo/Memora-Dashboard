@@ -1,4 +1,5 @@
 import type { IconName } from '@/declarations/ui/icons'
+import type { HomeTaskKind } from '@/types/personal'
 
 /**
  * How a kind of home task reads once gathered
@@ -136,6 +137,12 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     title: 'Bilans de live',
     icon: 'modActions',
   },
+  task: {
+    one: 'Tu as {n} tâche à faire',
+    other: 'Tu as {n} tâches à faire',
+    title: 'Tâches',
+    icon: 'tasks',
+  },
   departure: {
     one: 'Tu as {n} départ à annoncer',
     other: 'Tu as {n} départs à annoncer',
@@ -143,3 +150,25 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     icon: 'tasks',
   },
 }
+
+/**
+ * Kinds of home task the timeline mirrors into the task board
+ * @type {readonly HomeTaskKind[]}
+ */
+
+export const SYSTEM_TASK_KINDS: readonly HomeTaskKind[] = [
+  'assignTrainer',
+  'launchPim',
+  'declareKickoff',
+  'pimDecision',
+  'secondPeriod',
+  'pimReview',
+  'training',
+]
+
+/**
+ * Kinds of home task that also sit on the task board
+ * @type {readonly HomeTaskKind[]}
+ */
+
+export const BOARD_TASK_KINDS: readonly HomeTaskKind[] = [...SYSTEM_TASK_KINDS, 'task']

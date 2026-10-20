@@ -12,7 +12,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { FIELD_COPY } from '@/declarations/ui/copy'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
 
-import { PROJECT_COPY, BOARD_FILTER_COPY } from '@/declarations/work/copy'
+import { PROJECT_COPY, BOARD_FILTER_COPY, TASK_COPY } from '@/declarations/work/copy'
 import type { BoardColumn } from '@/components/structures/data/KanbanBoard'
 import type { DataTableColumn } from '@/components/structures/data/DataTable'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
@@ -162,6 +162,7 @@ export const ProjectsBoard = ({
       columnField="stateId"
       copy={PROJECT_COPY}
       figure="projects"
+      isRemovable={(project) => !project.isSystem}
       tableColumns={tableColumns}
       filters={[
         {
@@ -203,10 +204,15 @@ export const ProjectsBoard = ({
       canDelete={canDelete}
       tintByColumn
       renderCard={(project) => (
-        <p className={BOARD_STYLES.cardTitle}>
-          <Glyph value={project.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
-          {project.title}
-        </p>
+        <div>
+          {project.isSystem && (
+            <Status label={TASK_COPY.systemTag} tone="danger" className="mb-1 flex" />
+          )}
+          <p className={BOARD_STYLES.cardTitle}>
+            <Glyph value={project.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+            {project.title}
+          </p>
+        </div>
       )}
     />
   )

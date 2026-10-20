@@ -93,8 +93,8 @@ export const useSuggestions = (
       .filter((source) => !dismissed.has(source.id) && !isSettled(source))
       .sort((left, right) => right.at.localeCompare(left.at))
       .slice(0, MAX_SUGGESTIONS)
-      .map((source) => suggestFor(source, panel, memory))
-  }, [state.held, state.messages, state.acts, panel, memory, dismissed, acted])
+      .map((source) => suggestFor(source, panel, memory, state.acts))
+  }, [state, panel, memory, dismissed, acted])
 
   const dismiss = (id: string) => setDismissed((current) => new Set([...current, id]))
 

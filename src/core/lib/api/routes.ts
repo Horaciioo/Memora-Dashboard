@@ -1,9 +1,5 @@
 import { SANCTION_PARAMS } from '@/declarations/sanctions/params'
 
-// Narrows a board route to one creator
-const withScope = (path: string, youtuberId?: string): string =>
-  youtuberId ? `${path}?youtubeur=${encodeURIComponent(youtuberId)}` : path
-
 /**
  * Single source of every API path
  * @type {Record<string, string | ((...parts: string[]) => string)>}
@@ -25,6 +21,7 @@ export const API_ROUTES = {
   health: '/api/sante',
   twoFactor: '/api/a2f',
   twoFactorSeal: '/api/a2f/sceau',
+  creatorTeams: (id: string) => `/api/configuration/youtubeurs/${id}/equipes`,
   creatorLeads: (id: string) => `/api/configuration/youtubeurs/${id}/responsables`,
   creatorChannels: (id: string) => `/api/configuration/youtubeurs/${id}/chaine`,
   reference: (section: string) => `/api/configuration/${section}`,
@@ -54,6 +51,7 @@ export const API_ROUTES = {
   communication: (id: string) => `/api/communications/${id}`,
   tasks: '/api/taches',
   task: (id: string) => `/api/taches/${id}`,
+  taskDone: (id: string) => `/api/taches/${id}/fait`,
   meetings: '/api/reunions',
   meeting: (id: string) => `/api/reunions/${id}`,
   meetingAttendees: (id: string) => `/api/reunions/${id}/participants`,
@@ -169,10 +167,11 @@ export const API_ROUTES = {
   exercisePlay: (token: string) => `/api/exercice/${token}/lecture`,
   candidateComments: (id: string) => `/api/candidats/${id}/commentaires`,
   candidateComment: (id: string) => `/api/commentaires/${id}`,
+  workComments: (kind: string, id: string) => `/api/commentaires-travail/${kind}/${id}`,
+  workComment: (kind: string, id: string, commentId: string) =>
+    `/api/commentaires-travail/${kind}/${id}/${commentId}`,
   recruitmentStep: (id: string) => `/api/etapes-recrutement/${id}`,
   recruitmentStepStatus: (id: string) => `/api/etapes-recrutement/${id}/statut`,
-  teams: (youtuberId?: string) => withScope('/api/equipes', youtuberId),
-  team: (id: string, youtuberId?: string) => withScope(`/api/equipes/${id}`, youtuberId),
   notifications: (size?: number, after?: string) =>
     size
       ? `/api/notifications?taille=${size}${after ? `&apres=${after}` : ''}`

@@ -58,6 +58,7 @@ export type FieldPreset = 'today' | 'nextWeek' | 'actor' | 'default'
  * @property {string} [hint] - Secondary line
  * @property {string} [accent] - Colour token
  * @property {string} [image] - Portrait URL
+ * @property {string | null} [banner] - Wide banner URL
  * @property {string} [emoji] - Glyph drawn before the label
  * @property {string} [flag] - Country code of the flag it wears
  * @property {string | null} [icon] - Glyph key
@@ -75,6 +76,7 @@ export interface FieldOption {
   hint?: string
   accent?: string
   image?: string | null
+  banner?: string | null
   emoji?: string | null
   flag?: string
   icon?: string | null

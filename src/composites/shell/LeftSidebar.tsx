@@ -13,6 +13,7 @@ import { RailDeadlineBubbles } from '@/composites/shell/RailDeadlineBubbles'
 import { RailNav } from '@/composites/shell/RailNav'
 import { RailSlides } from '@/composites/shell/RailSlides'
 import { RoleSwitch } from '@/composites/shell/RoleSwitch'
+import { SimulationBanner } from '@/composites/shell/SimulationBanner'
 import { RailToolbar } from '@/composites/shell/RailToolbar'
 import { RailShortcuts } from '@/composites/shell/RailShortcuts'
 import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
@@ -176,6 +177,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
             {viewContext.switchable && !isCompact && (
               <>
                 <div className={LEFT_SIDEBAR.footerSwitch}>
+                  <SimulationBanner viewContext={viewContext} />
                   <RoleSwitch viewContext={viewContext} />
                 </div>
                 <span className={LEFT_SIDEBAR.footerRule} aria-hidden="true" />

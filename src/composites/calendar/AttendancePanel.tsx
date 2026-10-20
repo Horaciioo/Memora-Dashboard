@@ -226,15 +226,19 @@ export const AttendancePanel = ({
                                   : {})}
                               >
                                 <Avatar name={person.name} src={person.avatar} size="sm" />
-                                {person.name}
-                                {person.isReinforcement && <ReinforcementTag />}
-                                {person.hours && (
-                                  <span className={CALENDAR_STYLES.detailNote}>
-                                    {CALENDAR_COPY.hoursRange
-                                      .replace('{from}', formatClock(person.hours.from))
-                                      .replace('{to}', formatClock(person.hours.to))}
+                                <span className={CALENDAR_STYLES.rollCallName}>
+                                  <span className="flex items-center gap-2">
+                                    {person.name}
+                                    {person.isReinforcement && <ReinforcementTag />}
                                   </span>
-                                )}
+                                  {person.hours && (
+                                    <span className={CALENDAR_STYLES.rollCallHours}>
+                                      {CALENDAR_COPY.hoursRange
+                                        .replace('{from}', formatClock(person.hours.from))
+                                        .replace('{to}', formatClock(person.hours.to))}
+                                    </span>
+                                  )}
+                                </span>
                               </span>
                             ))}
                           </div>

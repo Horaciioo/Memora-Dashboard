@@ -28,6 +28,12 @@ const MEETING_AUDIENCE_MAP: Record<MeetingAudienceName, MeetingAudienceOption> =
       "La totalité de l'équipe est convoquée. Elle reçoit la notification dans leur page d’accueil.",
     icon: 'members',
   },
+  [MeetingAudiences.Administration]: {
+    label: 'L’administration entière',
+    summary:
+      "Toute l'administration est convoquée. Elle reçoit la notification dans sa page d’accueil.",
+    icon: 'lock',
+  },
   [MeetingAudiences.Discord]: {
     label: 'Équipe Discord',
     summary:

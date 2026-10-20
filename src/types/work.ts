@@ -70,6 +70,7 @@ export interface WorkAuthorship {
  * @property {string | null} deadline - ISO deadline
  * @property {boolean} isOverdue - Deadline gone by, work not done
  * @property {number} position - Order inside its column
+ * @property {boolean} isSystem - Opened by the system for a recruitment and its academy
  * @property {number} communicationCount - Announcements written
  * @property {number} taskCount - Tasks attached
  * @property {number} meetingCount - Meetings attached
@@ -91,6 +92,7 @@ export interface ProjectSummary extends WorkAuthorship {
   deadline: string | null
   isOverdue: boolean
   position: number
+  isSystem: boolean
   communicationCount: number
   taskCount: number
   meetingCount: number
@@ -138,6 +140,9 @@ export interface CommunicationEntry {
  * @property {WorkPerson | null} owner - Task owner
  * @property {string | null} dueDate - ISO due date
  * @property {boolean} isOverdue - Date gone by, work not done
+ * @property {boolean} isDone - Ticked off
+ * @property {boolean} isSystem - Opened and kept by the system
+ * @property {string | null} href - Page a system task leads to
  * @property {number} position - Order inside its column
  * @property {FormValues} values - Values feeding the edit form
  */
@@ -155,6 +160,9 @@ export interface TaskSummary extends WorkAuthorship {
   owner: WorkPerson | null
   dueDate: string | null
   isOverdue: boolean
+  isDone: boolean
+  isSystem: boolean
+  href: string | null
   position: number
   values: FormValues
 }
@@ -172,7 +180,7 @@ export interface TaskSummary extends WorkAuthorship {
  * @property {WorkTag | null} state - Workflow state
  * @property {WorkTag[]} youtubers - YouTubers concerned
  * @property {WorkTag | null} project - Project it belongs to
- * @property {string} scheduledAt - ISO date and time
+ * @property {string | null} scheduledAt - ISO date and time, none while undecided
  * @property {boolean} isOverdue - Day gone by, meeting not done
  * @property {number | null} durationMin - Length in minutes
  * @property {MeetingAudienceName} audience - Who is expected
@@ -194,7 +202,7 @@ export interface MeetingSummary extends WorkAuthorship {
   state: WorkTag | null
   youtubers: WorkTag[]
   project: WorkTag | null
-  scheduledAt: string
+  scheduledAt: string | null
   isOverdue: boolean
   durationMin: number | null
   audience: MeetingAudienceName

@@ -58,6 +58,7 @@ export default async function TasksPage() {
         canCreate={access.can(Permissions.TaskCreate)}
         canUpdate={access.can(Permissions.TaskUpdate)}
         canDelete={access.can(Permissions.TaskDelete)}
+        viewerId={session.id}
       />
     </div>
   )

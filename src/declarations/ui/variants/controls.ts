@@ -208,7 +208,7 @@ export const FILE_INPUT_STYLES = {
  */
 
 export const OPTION_MARK_STYLES = {
-  priority: 'shrink-0 text-sm leading-none font-bold tracking-tight',
+  priority: 'inline-flex shrink-0 items-center leading-none',
   emoji: 'shrink-0 text-base leading-none',
   glyph: 'h-4 w-4 shrink-0',
 } as const

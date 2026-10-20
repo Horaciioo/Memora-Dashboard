@@ -66,6 +66,12 @@ export const useRecordFile = ({
   const router = useRouter()
   // Kept in sync with every commit
   const [values, setValues] = useState<FormValues>(initialValues)
+  // A refreshed page hands over the values as the server now holds them
+  const [served, setServed] = useState(initialValues)
+  if (served !== initialValues) {
+    setServed(initialValues)
+    setValues(initialValues)
+  }
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   const commit = useCallback(

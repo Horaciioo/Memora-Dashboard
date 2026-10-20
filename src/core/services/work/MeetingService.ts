@@ -80,7 +80,7 @@ export const toMeetingSummary = (row: MeetingRow): MeetingSummary => ({
   state: toTag(row.state),
   youtubers: toCreatorTags(row.youtubers),
   project: toProjectTag(row.project),
-  scheduledAt: row.scheduledAt.toISOString(),
+  scheduledAt: row.scheduledAt?.toISOString() ?? null,
   isOverdue: isBehindDeadline(row.scheduledAt, row.state?.phase),
   durationMin: row.durationMin,
   audience: row.audience,
@@ -91,7 +91,7 @@ export const toMeetingSummary = (row: MeetingRow): MeetingSummary => ({
   values: {
     title: row.title,
     emoji: row.emoji,
-    scheduledAt: row.scheduledAt.toISOString().slice(0, 16),
+    scheduledAt: row.scheduledAt?.toISOString().slice(0, 16) ?? null,
     durationMin: row.durationMin,
     audience: row.audience,
     stateId: row.stateId,
@@ -162,8 +162,6 @@ export const meetingFields = async (
       kind: 'datetime',
       label: MEETING_FIELD_COPY.scheduledAt,
       info: MEETING_FIELD_INFO.scheduledAt,
-      preset: 'today',
-      required: true,
       span: 'half',
       group: FORM_GROUPS.essentials,
     },
@@ -373,7 +371,7 @@ export const createMeeting = async (
       emoji: emojiOrRandom(data.emoji),
       stateId,
       youtubers: { connect: creatorLinks(youtuberIds) },
-      scheduledAt: readDate(values, 'scheduledAt') ?? new Date(),
+      scheduledAt: readDate(values, 'scheduledAt'),
       position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
       createdById: actorId,
       updatedById: actorId,
@@ -409,14 +407,13 @@ export const updateMeeting = async (
     where: { id },
     select: { youtubers: { select: { id: true } } },
   })
-  const scheduledAt = readDate(values, 'scheduledAt')
 
   // Attendees are replaced wholesale
   const row = await prisma.meeting.update({
     where: { id },
     data: {
       ...toMeetingData(values),
-      scheduledAt: scheduledAt ?? undefined,
+      scheduledAt: readDate(values, 'scheduledAt'),
       updatedById: actorId,
       youtubers: {
         set: creatorLinks(

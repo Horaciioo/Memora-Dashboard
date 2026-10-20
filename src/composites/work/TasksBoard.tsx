@@ -1,11 +1,11 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Status } from '@/components/elements/display/Status'
 import { CreatorLabels, ProjectLabel } from '@/components/elements/display/RecordLabel'
-import { Glyph } from '@/components/elements/display/glyphs/Glyph'
 import { OverdueMark } from '@/composites/work/OverdueMark'
+import { TaskCheck } from '@/composites/work/TaskCheck'
 import { WorkBoard } from '@/composites/work/WorkBoard'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { ROUTES } from '@/declarations/navigation'
@@ -30,6 +30,7 @@ export interface TasksBoardProps {
   canCreate: boolean
   canUpdate: boolean
   canDelete: boolean
+  viewerId: string
 }
 
 /**
@@ -43,6 +44,7 @@ export interface TasksBoardProps {
  * @param {boolean} canCreate - Member may add a task
  * @param {boolean} canUpdate - Member may edit a task
  * @param {boolean} canDelete - Member may drop a task
+ * @param {string} viewerId - Signed-in member
  * @return {JSX.Element}
  */
 
@@ -56,8 +58,30 @@ export const TasksBoard = ({
   canCreate,
   canUpdate,
   canDelete,
+  viewerId,
 }: TasksBoardProps) => {
   const router = useRouter()
+  // The home links the tasks of the member
+  const ownerParam = useSearchParams().get('owner')
+  const initialOwner = ownerParam === 'me' ? viewerId : ownerParam
+
+  // The check leads the title, with the system tag after it
+  const titleOf = (task: TaskSummary) => (
+    <>
+      <TaskCheck
+        id={task.id}
+        isDone={task.isDone}
+        enabled={canUpdate || task.owner?.id === viewerId}
+      />
+      {task.title}
+    </>
+  )
+
+  // System tag sitting above the title
+  const systemTag = (task: TaskSummary) =>
+    task.isSystem ? (
+      <Status label={TASK_COPY.systemTag} tone="danger" className="mb-1 flex" />
+    ) : null
 
   const tableColumns: DataTableColumn<TaskSummary>[] = [
     {
@@ -65,9 +89,9 @@ export const TasksBoard = ({
       header: FIELD_COPY.title,
       sortValue: (task) => task.title.toLowerCase(),
       render: (task) => (
-        <span className="font-medium">
-          <Glyph value={task.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
-          {task.title}
+        <span className="block font-medium">
+          {systemTag(task)}
+          {titleOf(task)}
         </span>
       ),
     },
@@ -179,12 +203,23 @@ export const TasksBoard = ({
       canCreate={canCreate}
       canUpdate={canUpdate}
       canDelete={canDelete}
+      isRemovable={(task) => !task.isSystem}
+      initialFilters={initialOwner ? { owner: initialOwner } : undefined}
       tintByColumn
       renderCard={(task) => (
-        <p className={BOARD_STYLES.cardTitle}>
-          <Glyph value={task.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
-          {task.title}
-        </p>
+        <>
+          <div>
+            {systemTag(task)}
+            <p className={BOARD_STYLES.cardTitle}>{titleOf(task)}</p>
+          </div>
+          <p className={BOARD_STYLES.cardOrigin}>
+            {task.project ? (
+              <ProjectLabel title={task.project.label} emoji={task.project.emoji} />
+            ) : (
+              TASK_COPY.noProject
+            )}
+          </p>
+        </>
       )}
     />
   )

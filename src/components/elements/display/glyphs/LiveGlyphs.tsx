@@ -645,7 +645,6 @@ export const ModActionsGlyph = ({ className }: GlyphProps) => (
 export const UnbanRequestGlyph = ({ className }: GlyphProps) => (
   <Frame
     className={className}
-    tone="success"
     render={({ fill, lift, cut }) => (
       <>
         <rect x="2" y="5" width="20" height="14" rx="3" fill={fill} />

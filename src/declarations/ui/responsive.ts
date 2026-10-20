@@ -85,13 +85,10 @@ export interface HeldRoutes {
  */
 
 export const heldRoutes = (environment: Environment): HeldRoutes =>
-  // Only the dev branch exposes the trainings on a phone, and recruitments and the academy on a laptop
+  // Only the dev branch exposes the trainings on a phone
   environment === 'dev'
     ? { phone: [ROUTES.lives], laptop: [] }
-    : {
-        phone: [ROUTES.trainings, ROUTES.lives],
-        laptop: [ROUTES.academy, ROUTES.recruitments],
-      }
+    : { phone: [ROUTES.trainings, ROUTES.lives], laptop: [] }
 
 /**
  * Hold that stands for a right click on a touch screen

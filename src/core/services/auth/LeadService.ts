@@ -5,6 +5,8 @@ import { cache } from 'react'
 import { prisma } from '@/core/lib/db'
 import { forbidden } from '@/core/lib/errors'
 import { ENCADREMENT_ROLES } from '@/declarations/access/roles'
+import { isRootIdentity } from '@/declarations/access/identity'
+import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import type { CreatorLead, LeadAnchor } from '@/types/access'
 
 /**
@@ -122,4 +124,27 @@ export const replaceAnchors = async (
   ])
 
   return readAnchors(youtuberId)
+}
+
+/**
+ * Change the level of an anchored responsable
+ * @param {string} accountId - Account identifier
+ * @param {MemberRoleName} role - Wanted level, encadrement only
+ * @return {Promise<void>} - Saved
+ */
+
+export const setLeadRole = async (accountId: string, role: MemberRoleName): Promise<void> => {
+  if (!ENCADREMENT_ROLES.includes(role)) throw forbidden()
+
+  const account = await prisma.account.findUnique({
+    where: { id: accountId },
+    select: { discordId: true, role: true },
+  })
+
+  // The root keeps its level, a Moderateur is no anchor
+  if (!account || isRootIdentity(account.discordId) || !ENCADREMENT_ROLES.includes(account.role)) {
+    throw forbidden()
+  }
+
+  await prisma.account.update({ where: { id: accountId }, data: { role } })
 }

@@ -7,7 +7,7 @@ import { TASK_INCLUDE, toTaskSummary } from '@/core/services/work/TaskService'
 import { projectVisibility } from '@/core/services/work/visibility'
 import type { WorkViewer } from '@/core/services/work/visibility'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { notFound } from '@/core/lib/errors'
+import { forbidden, notFound } from '@/core/lib/errors'
 import { readDate, readList, readText } from '@/core/lib/forms/values'
 import { emojiOrRandom, isBehindDeadline } from '@/core/lib/work'
 import {
@@ -29,11 +29,7 @@ import {
   youtuberOptions,
   YOUTUBERS_INCLUDE,
 } from '@/core/services/work/shared'
-import {
-  EMOJI_SETTINGS,
-  FORM_SETTINGS,
-  PROJECT_SETTINGS,
-} from '@/declarations/configurations/settings'
+import { EMOJI_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import {
   COMMUNICATION_STATUS_OPTIONS,
@@ -81,6 +77,7 @@ const toSummary = (row: ProjectRow): ProjectSummary => ({
     .map((assistant) => toPerson(assistant.account))
     .filter((person) => person !== null),
   deadline: row.deadline?.toISOString() ?? null,
+  isSystem: row.systemKey !== null,
   isOverdue: isBehindDeadline(row.deadline, row.state?.phase),
   position: row.position,
   communicationCount: row._count.communications,
@@ -151,7 +148,6 @@ export const projectFields = async (scope?: AccessScope): Promise<FieldDefinitio
       placeholder: PROJECT_FIELD_COPY.leadsEmpty,
       options: leads,
       mark: 'avatar',
-      maxItems: PROJECT_SETTINGS.leadMax,
       span: 'half',
       group: FORM_GROUPS.assignment,
     },
@@ -263,8 +259,7 @@ const toProjectData = (values: FormValues) => ({
  * @return {string[]} - Account identifiers
  */
 
-const readLeadIds = (values: FormValues): string[] =>
-  readList(values, 'leadIds').slice(0, PROJECT_SETTINGS.leadMax)
+const readLeadIds = (values: FormValues): string[] => readList(values, 'leadIds')
 
 /**
  * Open a project
@@ -373,6 +368,11 @@ export const updateProject = async (
 
 export const removeProject = async (id: string, scope: AccessScope): Promise<void> => {
   await assertRowInScope('project', id, scope)
+
+  // The system keeps its own project
+  const row = await prisma.project.findUnique({ where: { id }, select: { systemKey: true } })
+  if (row?.systemKey) throw forbidden()
+
   await prisma.project.delete({ where: { id } })
 }
 

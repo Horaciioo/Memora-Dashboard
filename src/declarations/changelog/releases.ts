@@ -127,6 +127,59 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.6.1',
+    date: '2026-10-20',
+    title: 'Des tâches qui se commentent',
+    intro:
+      'Les tâches et les projets se commentent, une tâche se coche en un clic et la Mod View propose des sanctions plus justes.',
+    description:
+      'Échanger sur une tâche ou un projet obligeait à passer par Discord, et cocher une tâche faite demandait de l’ouvrir. Cette version ramène la discussion et la coche là où le travail se fait, et affine les sanctions suggérées pendant un live.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.tasks,
+        permission: Permissions.TaskRead,
+        text: 'Ajout de la possibilité de laisser un commentaire sur une tâche',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.projects,
+        permission: Permissions.ProjectRead,
+        text: 'Ajout de la possibilité de laisser un commentaire sur un projet',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.tasks,
+        permission: Permissions.TaskRead,
+        text: 'Ajout de la possibilité de cocher une de ses tâches comme faite depuis le tableau « Tâches » et depuis un projet',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Ajout du choix « Surveiller » dans le menu du clic droit d’un message de la Mod View, pour mettre un viewer sous surveillance',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Amélioration des suggestions de la Mod View : la sanction proposée tient compte de la gravité du message et de ce que le viewer a déjà reçu pendant le live',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.dashboard,
+        permission: Permissions.TaskRead,
+        text: 'Amélioration de la page « Accueil » : un lien mène à toutes les tâches quand elles sont trop nombreuses pour s’y afficher',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Amélioration de l’appel d’un live dans le « Calendrier » : les horaires s’affichent sous le nom de chacun',
+      },
+    ],
+  },
+  {
     version: '0.6.0',
     date: '2026-10-20',
     title: 'Une Mod View beaucoup plus complète',

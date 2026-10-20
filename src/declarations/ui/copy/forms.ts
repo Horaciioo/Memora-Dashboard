@@ -169,13 +169,6 @@ export const EMOJI_COPY = {
 } as const
 
 /**
- * Glyph Fields
- * @type {string}
- */
-
-export const PRIORITY_GLYPH = '!!'
-
-/**
  * Category labels
  * @type {Record<string, string>}
  */

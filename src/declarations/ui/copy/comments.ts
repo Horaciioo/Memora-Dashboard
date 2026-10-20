@@ -11,4 +11,8 @@ export const COMMENT_COPY = {
   deleteTitle: 'Supprimer ce commentaire ?',
   deleteDescription: 'Il ne sera plus lisible par personne.',
   field: 'Commentaire',
+  placeholder: 'Écris ton commentaire…',
+  hint: 'Markdown accepté, @ pour mentionner, Ctrl + Entrée pour publier.',
+  publish: 'Publier',
+  noMention: 'Personne ne correspond',
 } as const

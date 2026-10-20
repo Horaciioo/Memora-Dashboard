@@ -299,7 +299,10 @@ export const meetingEntries = async ({
     orderBy: { scheduledAt: 'asc' },
   })
 
-  return rows.map((row) => {
+  return rows.flatMap((row) => {
+    // The range filter already left undated meetings out
+    if (!row.scheduledAt) return []
+
     const lead = row.attendees[0]?.account ?? null
 
     return projected({

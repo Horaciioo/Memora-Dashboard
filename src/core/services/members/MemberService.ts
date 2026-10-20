@@ -3,6 +3,7 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { withoutSealedWrites } from '@/core/services/auth/SealService'
 import { activeFunctions, activeYoutubers, allDivisions } from '@/core/services/reference/lookups'
+import { ACCESS_CATEGORY_REGISTRY } from '@/declarations/access/categories'
 import { HELD_FUNCTIONS, toMemberFunctions } from '@/core/services/reference/functions'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -201,11 +202,21 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
 
   // Each kind only offers its own functions
   const optionsOf = (kind: FunctionKindName) =>
-    rowsToOptions(
-      functions.filter(
+    functions
+      .filter(
         (entry) => entry.kind === kind && (isAdmin || !LEGACY_FUNCTION_NAMES.includes(entry.name))
       )
-    )
+      .sort(
+        (left, right) =>
+          ACCESS_CATEGORY_REGISTRY.get(left.category).position -
+          ACCESS_CATEGORY_REGISTRY.get(right.category).position
+      )
+      .flatMap((entry) =>
+        rowsToOptions([entry]).map((option) => ({
+          ...option,
+          group: ACCESS_CATEGORY_REGISTRY.get(entry.category).label,
+        }))
+      )
 
   // A restricted division still shows
   const divisionOptions = rowsToOptions(divisions).map((option, index) => ({

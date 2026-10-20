@@ -72,6 +72,7 @@ export default async function TaskPage({ params }: { params: Promise<{ id: strin
         activity={activity}
         canUpdate={access.can(Permissions.TaskUpdate)}
         canReadLogs={access.can(Permissions.WorkLogRead)}
+        viewerId={session.id}
       />
     </div>
   )

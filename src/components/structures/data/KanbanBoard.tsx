@@ -22,6 +22,8 @@ import { cn } from '@/utils/classnames'
  * @property {string} label - Column label
  * @property {string | null} accent - Colour token
  * @property {WorkflowPhaseName} [phase] - Lifecycle bucket
+ * @property {boolean} [entering] - Just revealed, grows in and pushes the others
+ * @property {boolean} [leaving] - Being folded away, shrinks and lets the others spread
  */
 
 export interface BoardColumn {
@@ -29,6 +31,8 @@ export interface BoardColumn {
   label: string
   accent: string | null
   phase?: WorkflowPhaseName
+  leaving?: boolean
+  entering?: boolean
 }
 
 /**
@@ -172,7 +176,9 @@ export const KanbanBoard = <T extends BoardItem>({
             className={cn(
               BOARD_STYLES.column,
               BOARD_STYLES.columnShown,
-              tintByColumn && BOARD_STYLES.columnTint
+              tintByColumn && BOARD_STYLES.columnTint,
+              column.entering && 'board-column-grow',
+              column.leaving && 'board-column-leave'
             )}
           >
             <header className={BOARD_STYLES.columnHead}>

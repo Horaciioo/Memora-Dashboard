@@ -34,6 +34,7 @@ import { cn } from '@/utils/classnames'
 import { MEETING_COPY, MEETING_FIELD_COPY } from '@/declarations/work/copy'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import type { FieldDefinition } from '@/types/forms'
+import { WorkComments } from '@/composites/work/WorkComments'
 import type { MeetingDetail, MeetingTopicEntry } from '@/types/work'
 import { WorkflowScopes } from '@/utils/constants/workflow'
 import { formatDayTime } from '@/utils/format/dates'
@@ -133,6 +134,7 @@ export const MeetingFile = ({
   const emojiValue = textOf('emoji') ?? summary.emoji
   const stateOption = optionOf('stateId')
   const projectOption = optionOf('projectId')
+  const audienceOption = optionOf('audience')
   const youtuberOptions = pickedOptions(fieldFor('youtuberIds'), file.values.youtuberIds)
 
   const infoEntries: EditableEntry[] = [
@@ -182,6 +184,11 @@ export const MeetingFile = ({
   ]
 
   const attendeeEntries: EditableEntry[] = [
+    {
+      label: MEETING_FIELD_COPY.audience,
+      field: fieldFor('audience'),
+      display: audienceOption ? audienceOption.label : null,
+    },
     {
       label: MEETING_FIELD_COPY.leads,
       field: fieldFor('leadIds'),
@@ -331,6 +338,7 @@ export const MeetingFile = ({
       {renderAxis(OPENING_AXIS)}
       {topicsSection()}
       {CLOSING_AXES.map(renderAxis)}
+      <WorkComments kind="meeting" id={summary.id} label={summary.title} />
     </div>
   )
 

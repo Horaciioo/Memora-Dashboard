@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
-import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { AddRow } from '@/components/structures/inline/AddRow'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
@@ -18,7 +17,9 @@ import { MEMBER_COPY, MEMBER_FILTER_COPY } from '@/declarations/members/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
+import { CREATOR_GROUP } from '@/declarations/ui/blocks'
 import { GROUP_STYLES, LIST_STYLES } from '@/declarations/ui/variants'
+import { CreatorGroupBanner } from '@/composites/members/CreatorGroupBanner'
 import { MemberCard } from '@/composites/members/MemberCard'
 import { RoleGlyph } from '@/composites/members/MemberBadges'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
@@ -45,6 +46,7 @@ interface MemberGroup {
   label: string
   youtuberId: string | undefined
   image?: string | null
+  banner?: string | null
   role?: MemberRoleName
   members: MemberSummary[]
 }
@@ -81,11 +83,12 @@ export const MembersPanel = ({
   const [isCreating, setCreating] = useState(false)
   const [createYoutuberId, setCreateYoutuberId] = useState<string | undefined>(undefined)
   const [pendingDeletion, setPendingDeletion] = useState<MemberSummary | null>(null)
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  // Groups flipped from their default, role groups open and creators folded
+  const [flipped, setFlipped] = useState<Set<string>>(new Set())
   const ChevronIcon = ICONS.expand
 
   const toggleGroup = (key: string) => {
-    setCollapsed((current) => {
+    setFlipped((current) => {
       const next = new Set(current)
       if (next.has(key)) next.delete(key)
       else next.add(key)
@@ -165,6 +168,7 @@ export const MembersPanel = ({
       label: option.label,
       youtuberId: option.value as string | undefined,
       image: option.image,
+      banner: option.banner,
       members: buckets.get(option.value) ?? [],
     }))
 
@@ -279,7 +283,51 @@ export const MembersPanel = ({
           <div className={GROUP_STYLES.stack}>
             {groups.map((group, index) => {
               const key = group.key
-              const isOpen = !collapsed.has(key)
+              const isOpen = flipped.has(key) !== Boolean(group.role)
+
+              const cards = (
+                <div className={LIST_STYLES.grid}>
+                  {group.members.map((member) => (
+                    <MemberCard
+                      key={member.id}
+                      member={member}
+                      showNotesBubble={canReadNotes}
+                      canDelete={canDelete && !member.isRoot}
+                      onOpen={() => router.push(ROUTES.member(member.id))}
+                      onDelete={() => setPendingDeletion(member)}
+                    />
+                  ))}
+                  {canCreate && (
+                    <AddRow label={MEMBER_COPY.add} onClick={() => openCreate(group.youtuberId)} />
+                  )}
+                </div>
+              )
+
+              // A creator is its banner, the moderators sit in a box beneath
+              if (!group.role) {
+                return (
+                  <div key={key} className={cn(CREATOR_GROUP.root, index > 0 && 'mt-6')}>
+                    <CreatorGroupBanner
+                      name={group.label}
+                      avatarUrl={group.image}
+                      bannerUrl={group.banner}
+                      isOpen={isOpen}
+                      onToggle={() => toggleGroup(key)}
+                    />
+                    <div
+                      className={isOpen ? CREATOR_GROUP.foldOpen : CREATOR_GROUP.fold}
+                      aria-hidden={!isOpen}
+                      inert={!isOpen}
+                    >
+                      <div className={CREATOR_GROUP.foldClip}>
+                        <div className={isOpen ? CREATOR_GROUP.boxOpen : CREATOR_GROUP.box}>
+                          {cards}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
 
               return (
                 <div
@@ -292,37 +340,14 @@ export const MembersPanel = ({
                     onClick={() => toggleGroup(key)}
                     className={GROUP_STYLES.heading}
                   >
-                    {group.role ? (
-                      <RoleGlyph role={group.role} />
-                    ) : (
-                      group.youtuberId && <Avatar name={group.label} src={group.image} size="sm" />
-                    )}
+                    <RoleGlyph role={group.role} />
                     {group.label}
                     <ChevronIcon
                       className={cn(GROUP_STYLES.chevron, isOpen && GROUP_STYLES.chevronOpen)}
                       aria-hidden="true"
                     />
                   </button>
-                  {isOpen && (
-                    <div className={LIST_STYLES.grid}>
-                      {group.members.map((member) => (
-                        <MemberCard
-                          key={member.id}
-                          member={member}
-                          showNotesBubble={canReadNotes}
-                          canDelete={canDelete && !member.isRoot}
-                          onOpen={() => router.push(ROUTES.member(member.id))}
-                          onDelete={() => setPendingDeletion(member)}
-                        />
-                      ))}
-                      {canCreate && (
-                        <AddRow
-                          label={MEMBER_COPY.add}
-                          onClick={() => openCreate(group.youtuberId)}
-                        />
-                      )}
-                    </div>
-                  )}
+                  {isOpen && cards}
                 </div>
               )
             })}

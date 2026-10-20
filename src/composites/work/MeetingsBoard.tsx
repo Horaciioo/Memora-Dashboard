@@ -12,7 +12,7 @@ import { ROUTES } from '@/declarations/navigation'
 import { FIELD_COPY } from '@/declarations/ui/copy'
 import { BOARD_STYLES } from '@/declarations/ui/variants'
 
-import { BOARD_FILTER_COPY, MEETING_COPY } from '@/declarations/work/copy'
+import { BOARD_FILTER_COPY, MEETING_COPY, TASK_COPY } from '@/declarations/work/copy'
 import type { BoardColumn } from '@/components/structures/data/KanbanBoard'
 import type { DataTableColumn } from '@/components/structures/data/DataTable'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
@@ -77,11 +77,11 @@ export const MeetingsBoard = ({
     {
       key: 'scheduledAt',
       header: FIELD_COPY.date,
-      sortValue: (meeting) => meeting.scheduledAt,
+      sortValue: (meeting) => meeting.scheduledAt ?? '',
       className: 'whitespace-nowrap',
       render: (meeting) => (
         <span className="inline-flex items-center gap-2">
-          {formatDayTime(meeting.scheduledAt)}
+          {meeting.scheduledAt ? formatDayTime(meeting.scheduledAt) : null}
           {meeting.isOverdue && <OverdueMark kind="meeting" />}
         </span>
       ),
@@ -164,10 +164,19 @@ export const MeetingsBoard = ({
       canDelete={canDelete}
       tintByColumn
       renderCard={(meeting) => (
-        <p className={BOARD_STYLES.cardTitle}>
-          <Glyph value={meeting.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
-          {meeting.title}
-        </p>
+        <>
+          <p className={BOARD_STYLES.cardTitle}>
+            <Glyph value={meeting.emoji} size="row" className={BOARD_STYLES.cardGlyph} />
+            {meeting.title}
+          </p>
+          <p className={BOARD_STYLES.cardOrigin}>
+            {meeting.project ? (
+              <ProjectLabel title={meeting.project.label} emoji={meeting.project.emoji} />
+            ) : (
+              TASK_COPY.noProject
+            )}
+          </p>
+        </>
       )}
     />
   )

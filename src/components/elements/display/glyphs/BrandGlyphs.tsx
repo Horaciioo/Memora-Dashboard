@@ -2,7 +2,7 @@ import { useId } from 'react'
 import type { ReactNode } from 'react'
 import { RampStops } from '@/components/elements/display/glyphs/RampStops'
 import { visionSafe } from '@/utils/format/colour'
-import { GLYPH_TINTS, JUNIOR_TINTS, deepen, lighten } from '@/declarations/members/tints'
+import { GLYPH_TINTS, JUNIOR_TINTS, deepen } from '@/declarations/members/tints'
 import type { GlyphTint } from '@/declarations/members/tints'
 import { BRAND_RAMP } from '@/declarations/ui/ramps'
 
@@ -48,7 +48,7 @@ const FRAME_RAMPS = {
   ...GLYPH_TINTS,
   ...JUNIOR_TINTS,
   brand_MODERATOR: deepen(BRAND_RAMP),
-  brand_JUNIOR: lighten(BRAND_RAMP),
+  brand_JUNIOR: BRAND_RAMP,
 }
 
 export type FrameTone = keyof typeof FRAME_RAMPS
@@ -1599,7 +1599,7 @@ export const ModeratorGlyph = ({ className, tone = 'brand' }: TintedGlyphProps) 
 )
 
 /**
- * Junior
+ * Junior, black mortarboard with a tinted cord
  * @param {TintedGlyphProps} props - Sizing class and tint
  * @return {JSX.Element}
  */
@@ -1608,24 +1608,65 @@ export const JuniorGlyph = ({ className, tone = 'brand' }: TintedGlyphProps) => 
   <Frame
     className={className}
     tone={tone}
-    render={({ fill, lift, deep, cut }) => (
+    render={({ fill }) => (
       <>
+        <path d="M6.3 11.2v4.3c0 2.3 11.4 2.3 11.4 0v-4.3L12 13.9z" fill="#1b1b20" />
+        <path d="M2 8.6 12 13.4 22 8.6v1.7L12 15.1 2 10.3z" fill="#101013" />
+        <path d="M12 3.9 22 8.6 12 13.4 2 8.6z" fill="#2a2a30" />
+        <path d="M12 3.9 22 8.6 12 8.6z" fill="#fff" opacity="0.13" />
         <path
-          d="M12 2.4 20.2 5.6v6.3c0 5.1-3.5 8.9-8.2 10.7-4.7-1.8-8.2-5.6-8.2-10.7V5.6z"
-          fill={fill}
+          d="M12 8.6 19.6 9.9v5"
+          fill="none"
+          stroke={fill}
+          strokeWidth="0.95"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
-        <path d="M12 2.4 20.2 5.6v6.3c0 .4 0 .8-.1 1.2L12 2.4z" fill={lift} />
-        <path
-          d="M20.1 13.1c-.6 4.5-3.8 7.8-8.1 9.5v-2.2c3.4-1.6 5.9-4.3 6.6-7.8z"
-          fill={deep}
-          opacity="0.6"
-        />
-        <path d="M12 17.6v-5.4" fill="none" stroke={cut} strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M12 12.4c-.4-2.3-2-3.6-4.2-3.6.1 2.3 1.8 3.8 4.2 3.6z" fill={cut} />
-        <path d="M12 13.6c.3-2.6 2.1-4.1 4.6-4.1-.1 2.6-2 4.3-4.6 4.1z" fill={cut} />
+        <circle cx="12" cy="8.6" r="1.15" fill={fill} />
+        <path d="M19.6 14.6v4.2" stroke={fill} strokeWidth="1.5" strokeLinecap="round" />
       </>
     )}
   />
+)
+
+/**
+ * Junior Discord function
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const JuniorDiscordFunctionGlyph = ({ className }: GlyphProps) => (
+  <JuniorGlyph className={className} tone="DISCORD_JUNIOR" />
+)
+
+/**
+ * Junior Live function
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const JuniorLiveFunctionGlyph = ({ className }: GlyphProps) => (
+  <JuniorGlyph className={className} tone="LIVE_JUNIOR" />
+)
+
+/**
+ * Junior Animator function
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const JuniorAnimatorFunctionGlyph = ({ className }: GlyphProps) => (
+  <JuniorGlyph className={className} tone="ANIMATOR_JUNIOR" />
+)
+
+/**
+ * Junior lead function, burning orange
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const JuniorLeadFunctionGlyph = ({ className }: GlyphProps) => (
+  <JuniorGlyph className={className} tone="RESPONSABLE_JUNIOR" />
 )
 
 /**

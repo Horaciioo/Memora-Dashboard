@@ -198,12 +198,29 @@ export const GLYPH_TINTS = {
 } satisfies Record<string, GlyphTint>
 
 /**
- * Junior tints, much paler than the originals
+ * Junior cord tints, vivid on a black cap
  * @type {Record<string, GlyphTint>}
  */
 
 export const JUNIOR_TINTS = {
-  DISCORD_JUNIOR: lighten(BASE_TINTS.DISCORD),
-  LIVE_JUNIOR: lighten(BASE_TINTS.LIVE),
-  ANIMATOR_JUNIOR: lighten(BASE_TINTS.ANIMATOR),
+  DISCORD_JUNIOR: BASE_TINTS.DISCORD,
+  LIVE_JUNIOR: {
+    fillFrom: '#b79cff',
+    fillTo: '#7c4ddb',
+    liftFrom: '#ede4ff',
+    liftTo: '#cdb6ff',
+    deepFrom: '#6a3dc4',
+    deepTo: '#3c2180',
+    cut: '#f6f1ff',
+  },
+  ANIMATOR_JUNIOR: BASE_TINTS.ANIMATOR,
+  RESPONSABLE_JUNIOR: {
+    fillFrom: '#ff8a3d',
+    fillTo: '#ff4d00',
+    liftFrom: '#ffe1cc',
+    liftTo: '#ffb27a',
+    deepFrom: '#e03d00',
+    deepTo: '#8f2400',
+    cut: '#fff4ec',
+  },
 } satisfies Record<string, GlyphTint>

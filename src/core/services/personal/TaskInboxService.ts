@@ -21,6 +21,8 @@ import { AcademyStages } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
 import { unreadMentions, unreadReports } from '@/core/services/system/NotificationService'
 import { prisma } from '@/core/lib/db'
+import { syncSystemTasks } from '@/core/services/personal/SystemTaskService'
+import { WorkflowPhases } from '@/utils/constants/workflow'
 
 /**
  * Build a task pointing at a declared destination
@@ -367,6 +369,45 @@ const reportTasks = async (accountId: string): Promise<HomeTask[]> => {
 }
 
 /**
+ * Tasks of the task board held by the member, the ones the system opens excluded
+ * @param {string} accountId - Owner
+ * @return {Promise<HomeTask[]>} - One task per card still to do
+ */
+
+const boardTasks = async (accountId: string): Promise<HomeTask[]> => {
+  const rows = await prisma.task.findMany({
+    where: {
+      ownerId: accountId,
+      // The ones mirroring the timeline already show through it
+      NOT: { systemKey: { startsWith: `${accountId}:` } },
+      archived: false,
+      OR: [{ stateId: null }, { state: { phase: { not: WorkflowPhases.Done } } }],
+    },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      dueDate: true,
+      project: { select: { title: true } },
+    },
+    orderBy: [{ dueDate: { sort: 'asc', nulls: 'last' } }, { createdAt: 'asc' }],
+  })
+
+  return rows.map((row) => ({
+    key: `task:${row.id}`,
+    kind: 'task' as const,
+    title: row.title,
+    context: row.project?.title ?? '',
+    icon: 'tasks' as const,
+    href: ROUTES.task(row.id),
+    description: row.description,
+    guide: null,
+    destinationLabel: null,
+    dueAt: row.dueDate?.toISOString() ?? null,
+  }))
+}
+
+/**
  * Everything waiting on the signed-in member: what the parkour asks of their seat
  * @param {SessionUser} viewer - Signed-in member
  * @param {PermissionHelpers} access - Permission helpers
@@ -385,5 +426,14 @@ export const myTasks = async (
     reportTasks(viewer.id),
   ])
 
-  return [...mentions, ...reports, ...preparation, ...reviews, ...trainings]
+  const timeline = [...preparation, ...reviews, ...trainings]
+  if (!access.can(Permissions.TaskRead)) return [...mentions, ...reports, ...timeline]
+
+  // The timeline opens its tasks on the board, ticking one there takes it off the home
+  const [done, board] = await Promise.all([
+    syncSystemTasks(viewer.id, timeline),
+    boardTasks(viewer.id),
+  ])
+
+  return [...mentions, ...reports, ...timeline.filter((task) => !done.has(task.key)), ...board]
 }

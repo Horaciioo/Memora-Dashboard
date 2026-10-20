@@ -1,6 +1,9 @@
 import Link from '@/components/elements/navigation/AppLink'
 
-import { TASK_GROUPS } from '@/declarations/personal/groups'
+import { HOME_SETTINGS } from '@/declarations/configurations/settings'
+import { ROUTES } from '@/declarations/navigation'
+import { PERSONAL_COPY } from '@/declarations/personal/copy'
+import { BOARD_TASK_KINDS, TASK_GROUPS } from '@/declarations/personal/groups'
 import { cn } from '@/utils/classnames'
 import { ICONS } from '@/declarations/ui/icons'
 import { HOME_TASKS } from '@/declarations/ui/variants'
@@ -27,6 +30,11 @@ export const HomeTaskGroups = ({ entries, doneKeys, onWalk }: HomeTaskGroupsProp
   const ChevronIcon = ICONS.next
   const CheckIcon = ICONS.picked
   const groups = Object.entries(Object.groupBy(entries, (entry) => entry.group))
+  // Too many on the board: the rest is read there, on the tasks of the member
+  const onBoard = entries.filter(
+    (entry) =>
+      !doneKeys.has(entry.key) && (BOARD_TASK_KINDS as readonly string[]).includes(entry.group)
+  ).length
 
   return (
     <div className={HOME_TASKS.list}>
@@ -86,6 +94,16 @@ export const HomeTaskGroups = ({ entries, doneKeys, onWalk }: HomeTaskGroupsProp
           </button>
         )
       })}
+      {onBoard > HOME_SETTINGS.taskMax && (
+        <Link href={`${ROUTES.tasks}?owner=me`} className={HOME_TASKS.row}>
+          <span className={HOME_TASKS.body}>
+            <span className={HOME_TASKS.sentence}>
+              {PERSONAL_COPY.allTasks.replace('{n}', String(onBoard))}
+            </span>
+          </span>
+          <ChevronIcon className={HOME_TASKS.chevron} aria-hidden="true" />
+        </Link>
+      )}
     </div>
   )
 }

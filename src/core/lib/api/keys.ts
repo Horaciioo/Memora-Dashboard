@@ -20,6 +20,7 @@ export const QUERY_KEYS = {
   liveInspect: (liveId: string, accountId: string) =>
     ['lives', 'inspect', liveId, accountId] as const,
   exerciseLinks: (candidateId: string) => ['recruitment', 'exercises', candidateId] as const,
+  workComments: (kind: string, id: string) => ['work', 'comments', kind, id] as const,
   liveBan: (liveId: string, viewerId: string) => ['lives', 'ban', liveId, viewerId] as const,
   liveViewer: (liveId: string, viewerId: string) => ['lives', 'viewer', liveId, viewerId] as const,
   liveViewerComments: (liveId: string, viewerId: string) =>

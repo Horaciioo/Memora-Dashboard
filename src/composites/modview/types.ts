@@ -1,5 +1,5 @@
 import type { IntentGate } from '@/core/lib/modview/gate'
-import type { ModViewIntent } from '@/types/modview'
+import type { ActContext, ModViewIntent } from '@/types/modview'
 
 /**
  * Gate check handed to every window
@@ -10,7 +10,7 @@ export type GateCheck = (intent: ModViewIntent) => IntentGate
 
 /**
  * Gesture runner handed to every window
- * @typedef {(intent: ModViewIntent) => void} ActRunner
+ * @typedef {(intent: ModViewIntent, context?: ActContext) => void} ActRunner
  */
 
-export type ActRunner = (intent: ModViewIntent) => void
+export type ActRunner = (intent: ModViewIntent, context?: ActContext) => void

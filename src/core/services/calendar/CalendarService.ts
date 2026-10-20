@@ -546,7 +546,7 @@ const rollCallRosters = async (
 
   const seats = await prisma.eventAttendance.findMany({
     where: { eventId: { in: rollCalls.map((row) => row.id) } },
-    include: { account: { select: { displayName: true, avatarUrl: true } } },
+    include: { account: { select: { displayName: true, avatarUrl: true, role: true } } },
   })
 
   const asking = await eventsAskingHours(rollCalls.map((row) => row.id))

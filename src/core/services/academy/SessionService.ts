@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { syncProgramProjectOfAcademy } from '@/core/services/work/ProgramProjectService'
 import crypto from 'crypto'
 import { prisma } from '@/core/lib/db'
 import { OPEN_SCOPE } from '@/core/services/academy/AcademyScope'
@@ -187,6 +188,7 @@ export const updateSession = async (
 
   await ensureSessionInvite(id, data.status)
   if (launching) await launchSession(id)
+  await syncProgramProjectOfAcademy(id)
 
   return listSessions(scope)
 }
@@ -203,6 +205,7 @@ export const launchPromotion = async (id: string): Promise<void> => {
     data: { status: AcademySessionStatuses.Running },
   })
   await launchSession(id)
+  await syncProgramProjectOfAcademy(id)
 }
 
 /**

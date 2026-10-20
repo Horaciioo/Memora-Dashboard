@@ -2,16 +2,17 @@
 
 import { useState } from 'react'
 
-import { AddRow } from '@/components/structures/inline/AddRow'
+import { Button } from '@/components/elements/actions/Button'
+import { NetworkLogo } from '@/components/elements/display/marks/NetworkLogo'
 import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { apiDelete, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { CHANNEL_LINK_PREFIX } from '@/declarations/platforms/channels'
 import { CHANNEL_COPY } from '@/declarations/platforms/copy'
-import { CHANNEL_BLOCK } from '@/declarations/ui/blocks'
+import { platformLogoOf } from '@/declarations/platforms/logos'
+import { CHANNEL_BLOCK, SECURITY_LIST } from '@/declarations/ui/blocks'
 import { ACTION_COPY } from '@/declarations/ui/copy'
-import { ICONS } from '@/declarations/ui/icons'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { useMenu } from '@/managers/front-end'
 import type { FieldDefinition, FormValues } from '@/types/forms'
@@ -23,12 +24,6 @@ const PLATFORM_LABELS = {
   [LivePlatforms.Twitch]: CHANNEL_COPY.twitch,
   [LivePlatforms.YouTube]: CHANNEL_COPY.youtube,
 }
-
-// Glyph drawn for each platform
-const PLATFORM_ICONS = {
-  [LivePlatforms.Twitch]: 'twitch',
-  [LivePlatforms.YouTube]: 'youtube',
-} as const
 
 // Creation form
 const CHANNEL_FIELDS: FieldDefinition[] = [
@@ -102,14 +97,14 @@ export const CreatorChannelsPanel = ({
 
   return (
     <>
-      <div className={CHANNEL_BLOCK.list}>
+      <ul className={SECURITY_LIST.list}>
         {channels.map((channel) => {
-          const Glyph = ICONS[PLATFORM_ICONS[channel.platform]]
+          const key = channel.platform.toLowerCase()
 
           return (
-            <div
+            <li
               key={channel.id}
-              className={CHANNEL_BLOCK.card}
+              className={SECURITY_LIST.row}
               onContextMenu={
                 canManage
                   ? contextMenu(
@@ -127,36 +122,40 @@ export const CreatorChannelsPanel = ({
                   : undefined
               }
             >
-              <Glyph className={CHANNEL_BLOCK.glyph} />
-              <div className={CHANNEL_BLOCK.body}>
-                <p className={CHANNEL_BLOCK.name}>{PLATFORM_LABELS[channel.platform]}</p>
+              <NetworkLogo network={key} className={SECURITY_LIST.glyph} />
+              <div className={SECURITY_LIST.body}>
+                <p className={SECURITY_LIST.title}>{PLATFORM_LABELS[channel.platform]}</p>
                 <a
                   href={channel.url}
                   target="_blank"
                   rel="noreferrer"
-                  className={CHANNEL_BLOCK.link}
+                  className={SECURITY_LIST.link}
+                  style={{ color: platformLogoOf(key)?.paint }}
                 >
                   {channel.url}
                 </a>
               </div>
-            </div>
+            </li>
           )
         })}
-        {channels.length === 0 && !canManage && (
-          <p className={CHANNEL_BLOCK.empty}>{CHANNEL_COPY.empty}</p>
-        )}
-        {canManage && (
-          <AddRow
-            label={CHANNEL_COPY.add}
-            tile="channel"
+      </ul>
+      {channels.length === 0 && !canManage && (
+        <p className={CHANNEL_BLOCK.empty}>{CHANNEL_COPY.empty}</p>
+      )}
+      {canManage && (
+        <div className={SECURITY_LIST.footer}>
+          <Button
+            variant="secondary"
+            icon="add"
             onClick={() => {
               clearIssues()
               setAdding(true)
             }}
-            className="w-56! shrink-0"
-          />
-        )}
-      </div>
+          >
+            {CHANNEL_COPY.add}
+          </Button>
+        </div>
+      )}
 
       <FormDrawer
         subject={FORM_SUBJECTS.channel}

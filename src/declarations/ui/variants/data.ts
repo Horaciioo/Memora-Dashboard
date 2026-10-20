@@ -234,7 +234,7 @@ export const BOARD_STYLES = {
   scroller: 'flex flex-col gap-3 md:flex-row md:gap-4 md:overflow-x-auto md:pb-2',
   columnShown: 'flex',
   column:
-    'w-full shrink-0 flex-col gap-2 md:w-72 rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-2.5',
+    'w-full shrink-0 flex-col gap-2 md:max-w-96 md:min-w-40 md:flex-1 md:basis-0 md:shrink rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-2.5',
   columnArchived: 'opacity-60',
   // Column glass tinted by its classic colour
   columnTint:
@@ -458,6 +458,8 @@ export const CALENDAR_STYLES = {
   rollCallGroup: 'flex flex-col gap-1.5',
   rollCallPeople: 'flex flex-col gap-1',
   rollCallPerson: 'flex items-center gap-2 text-sm',
+  rollCallName: 'flex min-w-0 flex-col',
+  rollCallHours: 'text-xs italic text-[var(--color-ink-subtle)]',
   rollCallDrop:
     'rounded-[var(--radius-md)] border border-dashed border-transparent p-1.5 transition-colors',
   rollCallOver: 'border-[var(--color-border-strong)] bg-[var(--color-hover)]',

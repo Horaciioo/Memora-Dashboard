@@ -276,7 +276,7 @@ export const seedJournal = async (cast: Cast) => {
       targetId: meeting.id,
       summary: meeting.title,
     })
-    if (meeting.scheduledAt < now)
+    if (meeting.scheduledAt && meeting.scheduledAt < now)
       logs.push({
         event: 'MeetingUpdated',
         at: plusMinutes(meeting.scheduledAt, 120),

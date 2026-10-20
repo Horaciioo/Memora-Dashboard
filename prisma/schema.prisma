@@ -20,6 +20,8 @@ enum AccessCategory {
   ADMINISTRATION
   RESPONSABILITE
   MODERATION
+  JUNIOR
+  JUNIOR_RESPONSABLE
 }
 
 // Writing progress of an announcement
@@ -165,6 +167,7 @@ enum AttendeeKind {
 // Who a meeting is held for: the whole team, one trade's team, or a custom list of seats
 enum MeetingAudience {
   EVERYONE
+  ADMINISTRATION
   DISCORD
   TWITCH
   CUSTOM
@@ -381,6 +384,7 @@ model Account {
   recruitmentWatches    RecruitmentObserver[]    @relation("RecruitmentObserver")
   recruitmentComments   RecruitmentComment[]     @relation("RecruitmentCommentAuthor")
   academyComments       AcademyComment[]         @relation("AcademyCommentAuthor")
+  workComments          WorkComment[]            @relation("WorkCommentAuthor")
   exerciseLinks         ExerciseLink[]           @relation("ExerciseLinkCreatedBy")
 
   @@index([role])
@@ -686,6 +690,7 @@ model JobFunction {
   skills          Skill[]
   academySessions AcademySession[]
   youtubers       YoutuberFunction[]
+  teams           Team[]
 
   recruitmentSessions      RecruitmentSession[]
   recruitmentQuestions     RecruitmentQuestion[]
@@ -756,15 +761,19 @@ model Team {
   name       String
   summary    String?
   youtuberId String?
+  // Function the team stands for, set on the automatic ones
+  functionId String?
   archived   Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  youtuber Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
-  leads    TeamLead[]
-  members  TeamMember[]
-  anchors  YoutuberLead[]
+  youtuber    Youtuber?      @relation(fields: [youtuberId], references: [id], onDelete: SetNull)
+  jobFunction JobFunction?   @relation(fields: [functionId], references: [id], onDelete: SetNull)
+  leads       TeamLead[]
+  members     TeamMember[]
+  anchors     YoutuberLead[]
 
+  @@unique([youtuberId, functionId])
   @@index([youtuberId, archived])
   @@map("teams")
 }
@@ -800,20 +809,24 @@ model TeamMember {
 
 // Piece of work carried by a responsable
 model Project {
-  id          String    @id @default(cuid())
-  title       String
-  emoji       String?
-  description String?
-  stateId     String?
-  priorityId  String?
-  platformId  String?
-  deadline    DateTime?
-  createdById String?
-  updatedById String?
-  position    Int       @default(0)
-  archived    Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                   String    @id @default(cuid())
+  title                String
+  emoji                String?
+  description          String?
+  stateId              String?
+  priorityId           String?
+  platformId           String?
+  deadline             DateTime?
+  createdById          String?
+  updatedById          String?
+  position             Int       @default(0)
+  archived             Boolean   @default(false)
+  // Set on the project the system opens for a recruitment and the academy it feeds
+  systemKey            String?   @unique
+  recruitmentSessionId String?   @unique
+  academySessionId     String?   @unique
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   createdBy Account? @relation("ProjectAuthor", fields: [createdById], references: [id], onDelete: SetNull)
   updatedBy Account? @relation("ProjectEditor", fields: [updatedById], references: [id], onDelete: SetNull)
@@ -823,12 +836,16 @@ model Project {
   priority  Priority?      @relation(fields: [priorityId], references: [id], onDelete: SetNull)
   platform  Platform?      @relation(fields: [platformId], references: [id], onDelete: SetNull)
 
+  recruitmentSession RecruitmentSession? @relation(fields: [recruitmentSessionId], references: [id], onDelete: SetNull)
+  academySession     AcademySession?     @relation(fields: [academySessionId], references: [id], onDelete: SetNull)
+
   leads          ProjectLead[]
   assistants     ProjectAssistant[]
   communications Communication[]
   tasks          Task[]
   meetings       Meeting[]
   calendarEvents CalendarEvent[]
+  comments       WorkComment[]
 
   @@index([stateId, position])
   @@index([archived])
@@ -877,9 +894,10 @@ model Communication {
   createdAt   DateTime            @default(now())
   updatedAt   DateTime            @updatedAt
 
-  project  Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  author   Account?  @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  platform Platform? @relation(fields: [platformId], references: [id], onDelete: SetNull)
+  project  Project?      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author   Account?      @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  platform Platform?     @relation(fields: [platformId], references: [id], onDelete: SetNull)
+  comments WorkComment[]
 
   @@index([projectId, position])
   @@map("communications")
@@ -900,6 +918,9 @@ model Task {
   updatedById String?
   position    Int       @default(0)
   archived    Boolean   @default(false)
+  // Set on tasks the system opens and closes by itself, with the page they lead to
+  systemKey   String?   @unique
+  href        String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -911,6 +932,7 @@ model Task {
   priority  Priority?      @relation(fields: [priorityId], references: [id], onDelete: SetNull)
   youtubers Youtuber[]
   project   Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  comments  WorkComment[]
 
   @@index([stateId, position])
   @@index([ownerId])
@@ -926,7 +948,7 @@ model Meeting {
   introduction String?
   outro        String?
   minutes      String?
-  scheduledAt  DateTime
+  scheduledAt  DateTime?
   durationMin  Int?
   audience     MeetingAudience @default(CUSTOM)
   stateId      String?
@@ -947,6 +969,7 @@ model Meeting {
   attendees      MeetingAttendee[]
   topics         MeetingTopic[]
   calendarEvents CalendarEvent[]
+  comments       WorkComment[]
 
   @@index([scheduledAt])
   @@index([stateId, position])
@@ -1317,6 +1340,7 @@ model AcademySession {
   invites        IntegrationInvite[]
 
   recruitmentSession RecruitmentSession?
+  project            Project?
 
   @@index([functionId, startsAt])
   @@index([status])
@@ -2202,6 +2226,7 @@ model RecruitmentSession {
   responsables   RecruitmentResponsable[]
   observers      RecruitmentObserver[]
   invite         IntegrationInvite?
+  project        Project?
 
   @@unique([youtuberId, functionId, name])
   @@index([youtuberId, status])
@@ -2328,6 +2353,30 @@ model RecruitmentAnswer {
 
   @@unique([candidateId, questionKey])
   @@map("recruitment_answers")
+}
+
+// Remark left on a project, a task, a communication or a meeting
+model WorkComment {
+  id              String   @id @default(cuid())
+  projectId       String?
+  taskId          String?
+  communicationId String?
+  meetingId       String?
+  authorId        String?
+  body            String
+  createdAt       DateTime @default(now())
+
+  project       Project?       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task          Task?          @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  communication Communication? @relation(fields: [communicationId], references: [id], onDelete: Cascade)
+  meeting       Meeting?       @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  author        Account?       @relation("WorkCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([projectId, createdAt])
+  @@index([taskId, createdAt])
+  @@index([communicationId, createdAt])
+  @@index([meetingId, createdAt])
+  @@map("work_comments")
 }
 
 // Remark left on a candidate while their application is being weighed

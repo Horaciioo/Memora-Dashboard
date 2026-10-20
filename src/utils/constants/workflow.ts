@@ -44,6 +44,7 @@ export type AttendeeKindName = (typeof AttendeeKinds)[keyof typeof AttendeeKinds
 
 export const MeetingAudiences = {
   Everyone: 'EVERYONE',
+  Administration: 'ADMINISTRATION',
   Discord: 'DISCORD',
   Twitch: 'TWITCH',
   Custom: 'CUSTOM',

@@ -228,4 +228,15 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     // They plan their own interviews and check-ins
     functions: { Formateurs: [Permissions.CalendarManage] },
   },
+  {
+    key: 'leads-see-youtubers',
+    grants: {
+      // They read the creator files and seat their teams, never touch the administration
+      [MemberRoles.Responsable]: [
+        Permissions.ReferenceRead,
+        Permissions.TeamRead,
+        Permissions.TeamManage,
+      ],
+    },
+  },
 ]

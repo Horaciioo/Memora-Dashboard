@@ -1,5 +1,6 @@
 'use client'
 
+import { WorkComments } from '@/composites/work/WorkComments'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Status } from '@/components/elements/display/Status'
 import { OptionMark } from '@/components/elements/forms/selects/OptionMark'
@@ -167,6 +168,7 @@ export const CommunicationCard = ({
           onCommit={(next) => file.saveField('body', next)}
         />
       </div>
+      <WorkComments kind="communication" id={entry.id} label={title} />
       {canWrite && (
         <div className="flex justify-end">
           <Button variant="danger" onClick={onDelete}>

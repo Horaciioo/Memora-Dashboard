@@ -27,8 +27,10 @@ import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { InlineMarkdown } from '@/components/structures/inline/InlineMarkdown'
 import { Section } from '@/components/structures/page/Section'
 import { FileTabs } from '@/components/structures/page/FileTabs'
+import { WorkComments } from '@/composites/work/WorkComments'
 import { CommunicationCard } from '@/composites/work/CommunicationCard'
 import { announcementAside } from '@/composites/work/announcementAside'
+import { TaskCheck } from '@/composites/work/TaskCheck'
 import { ProjectTeam } from '@/composites/work/ProjectTeam'
 import { apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -284,6 +286,8 @@ export const ProjectFileTabs = ({
           />
         </div>
       </section>
+
+      <WorkComments kind="project" id={summary.id} label={summary.title} />
     </div>
   )
 
@@ -384,7 +388,7 @@ export const ProjectFileTabs = ({
   const taskLine = (task: TaskSummary) => (
     <>
       <span className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
-        <Glyph value={task.emoji} size="row" />
+        <TaskCheck id={task.id} isDone={task.isDone} enabled />
         <span
           className={cn(
             'min-w-0 flex-1 truncate font-medium',
