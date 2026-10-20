@@ -77,7 +77,7 @@ export const audienceOptions = async (scope?: AccessScope): Promise<FieldOption[
       owner: team.youtuberId ?? undefined,
       image: team.youtuber?.avatarUrl,
       icon: 'teams',
-      group: AUDIENCE_COPY.teams,
+      group: team.youtuber?.name ?? AUDIENCE_COPY.noYoutuber,
     })),
     ...sessions.map((session) => ({
       value: `${SESSION_PREFIX}${session.id}`,
