@@ -53,13 +53,18 @@ export const CALENDAR_COPY = {
   birthdayMessage: 'N’hésite pas à lui souhaiter un merveilleux anniversaire !',
   preview: 'Aperçu',
   // Roll-call
+  infoTitle: 'Informations',
+  linkCopied: 'Lien copié',
   rollCallTitle: 'Appel de présence',
   respondPresent: 'Je serai là',
   respondAbsent: 'Je ne serai pas là',
   yourAnswer: 'Ta réponse',
   yourPresence: 'Ta présence',
   // Weighted word sits between the parts
-  answeredPresent: ['Tu as ', 'répondu', ' présent !'],
+  answeredPresent: ['Tu as ', 'répondu', ' présent(e)'],
+  answeredPresentEnd: ' !',
+  // Words around the two bold hours
+  hoursSpan: [' de ', ' à '],
   answeredAbsent: ['Tu as ', 'notifié', ' ne pas être présent.'],
   changeMind: 'Je change d’avis',
   hoursTitle: 'Tes horaires',

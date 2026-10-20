@@ -805,6 +805,7 @@ export const CalendarBoard = ({
         open={dialog === 'detail' && opened !== null}
         title={opened ? [opened.emoji, opened.title].filter(Boolean).join(' ') : ''}
         description={opened ? CALENDAR_SOURCE_REGISTRY.get(opened.source).summary : undefined}
+        size={opened?.rollCall ? 'xl' : 'md'}
         onClose={() => setDialog(null)}
         footer={
           opened && (opened.href || !opened.readOnly) ? (

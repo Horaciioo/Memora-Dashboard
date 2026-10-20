@@ -66,6 +66,9 @@ const STEP = CALENDAR_SETTINGS.stepMinutes
 // Under this
 const COMPACT_MINUTES = ROW / 2
 
+// Roll-calls keep room for their words
+const ROLL_CALL_MINUTES = ROW * 1.5
+
 // Clock refresh
 const NOW_TICK_MS = 60_000
 
@@ -202,7 +205,11 @@ export const CalendarTimeGrid = ({
             return {
               entry,
               startMinute: clamp(span.startMinute),
-              endMinute: clamp(span.endMinute),
+              endMinute: clamp(
+                entry.rollCall
+                  ? Math.max(span.endMinute, span.startMinute + ROLL_CALL_MINUTES)
+                  : span.endMinute
+              ),
             }
           })
           .filter((item) => item.endMinute > item.startMinute)
@@ -380,7 +387,9 @@ export const CalendarTimeGrid = ({
                     <CalendarEntryChip
                       entry={item.entry}
                       fill
-                      compact={item.endMinute - item.startMinute <= COMPACT_MINUTES}
+                      compact={
+                        !item.entry.rollCall && item.endMinute - item.startMinute <= COMPACT_MINUTES
+                      }
                       selected={selection.includes(item.entry.id)}
                       draggable={canManage && !item.entry.readOnly}
                       onOpen={onOpen}
