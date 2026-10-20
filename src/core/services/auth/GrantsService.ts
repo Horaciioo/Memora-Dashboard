@@ -55,6 +55,7 @@ export const syncRoleGrants = async (): Promise<void> => {
     const functionNames = [
       ...Object.keys(addition.functions ?? {}),
       ...Object.keys(addition.denies ?? {}),
+      ...Object.keys(addition.functionRevokes ?? {}),
     ]
     const holders =
       functionNames.length > 0
@@ -63,17 +64,43 @@ export const syncRoleGrants = async (): Promise<void> => {
             select: { id: true, name: true },
           })
         : []
-    const functionRows = holders.flatMap((holder) => [
-      ...(addition.functions?.[holder.name] ?? []).map((permission) => ({
-        functionId: holder.id,
-        permission,
-      })),
-      ...(addition.denies?.[holder.name] ?? []).map((permission) => ({
-        functionId: holder.id,
-        permission,
-        effect: PermissionEffects.Deny,
-      })),
-    ])
+    const existing = await prisma.functionPermission.findMany({
+      where: { functionId: { in: holders.map((holder) => holder.id) }, youtuberId: null },
+      select: { functionId: true, permission: true, effect: true },
+    })
+    const isHeld = (row: { functionId: string; permission: string; effect?: string }) =>
+      existing.some(
+        (held) =>
+          held.functionId === row.functionId &&
+          held.permission === row.permission &&
+          held.effect === (row.effect ?? PermissionEffects.Allow)
+      )
+    const functionRows = holders
+      .flatMap((holder) => [
+        ...(addition.functions?.[holder.name] ?? []).map((permission) => ({
+          functionId: holder.id,
+          permission,
+        })),
+        ...(addition.denies?.[holder.name] ?? []).map((permission) => ({
+          functionId: holder.id,
+          permission,
+          effect: PermissionEffects.Deny,
+        })),
+      ])
+      // A grant already held is not written twice
+      .filter((row) => !isHeld(row))
+
+    // Function permissions taken back
+    const functionRevoked = holders.map((holder) =>
+      prisma.functionPermission.deleteMany({
+        where: {
+          functionId: holder.id,
+          permission: { in: addition.functionRevokes?.[holder.name] ?? [] },
+          effect: PermissionEffects.Allow,
+          youtuberId: null,
+        },
+      })
+    )
 
     // Global role rows only, creator overrides stay
     const revoked = Object.entries(addition.revokes ?? {}).map(([role, permissions]) =>
@@ -91,6 +118,7 @@ export const syncRoleGrants = async (): Promise<void> => {
         prisma.rolePermission.createMany({ data: rows, skipDuplicates: true }),
         prisma.functionPermission.createMany({ data: functionRows }),
         ...revoked,
+        ...functionRevoked,
         prisma.grantMigration.create({ data: { key: addition.key } }),
       ])
     } catch (error) {
