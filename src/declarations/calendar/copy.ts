@@ -86,7 +86,7 @@ export const CALENDAR_FIELD_COPY = {
   emoji: 'Émoji',
   kind: 'Type',
   template: 'Modèle',
-  subject: 'Membre concerné',
+  subject: 'Responsable',
   visibility: 'Visibilité',
   startsAt: 'Début',
   endsAt: 'Fin',
@@ -126,6 +126,8 @@ export const ACADEMY_EVENT_COPY = {
 
 export const AUDIENCE_COPY = {
   teams: 'Équipes',
+  youtuberTeam: 'Toute l’équipe de',
+  noYoutuber: 'Sans YouTubeur',
   juniorTeams: 'Équipes junior',
   leadsOnly: 'Responsables de l’équipe uniquement',
   leadsOnlyInfo: 'Seuls les responsables associés à l’équipe voient l’évènement.',
@@ -141,7 +143,7 @@ export const CALENDAR_FIELD_INFO = {
   title: 'Le nom affiché sur la case du calendrier.',
   kind: 'La nature de l’évènement, elle décide de sa couleur.',
   template: 'Un évènement préparé à l’avance : il remplit le type, la couleur et la visibilité.',
-  subject: 'Le membre que l’évènement concerne directement, s’il y en a un.',
+  subject: 'Le Responsable de l’évènement, s’il y en a un.',
   visibility:
     'Qui voit l’évènement sur son calendrier. L’administration entière, c’est celle du YouTubeur.',
   startsAt: 'Le moment où l’évènement commence.',

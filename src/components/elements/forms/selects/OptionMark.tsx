@@ -74,6 +74,11 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
     return <Avatar name={option.label} src={option.image} size={size} />
   }
 
+  // A glyph option carrying a portrait wears the portrait
+  if (mark === 'glyph' && option.image) {
+    return <Avatar name={option.label} src={option.image} size={size} />
+  }
+
   // Emblem of a hierarchy level
   if (mark === 'role') {
     const Emblem = ROLE_EMBLEMS[option.value as MemberRoleName]?.glyph

@@ -1,7 +1,8 @@
 import type { Registry } from '@/core/lib/registry'
+import { ACCESS_CATEGORY_REGISTRY } from '@/declarations/access/categories'
 import { ROLE_REGISTRY, byRoleRank } from '@/declarations/access/roles'
 import { FUNCTION_KIND_REGISTRY } from '@/declarations/reference/registries'
-import type { MemberRoleName } from '@/utils/constants/hierarchy'
+import type { AccessCategoryName, MemberRoleName } from '@/utils/constants/hierarchy'
 import type { FunctionKindName } from '@/utils/constants/workflow'
 import type { FieldDefinition, FieldOption, FieldValue } from '@/types/forms'
 
@@ -50,8 +51,8 @@ export const rowsToOptions = (
   }))
 
 /**
- * Function options headed by kind
- * @param {Array<{ id: string, name: string, kind: FunctionKindName }>} rows - Function rows
+ * Function options headed by category, principal ones before secondary ones
+ * @param {Array<{ id: string, name: string, kind: FunctionKindName, category: AccessCategoryName }>} rows - Function rows
  * @return {FieldOption[]} - Select options
  */
 
@@ -60,16 +61,27 @@ export const functionOptions = (
     id: string
     name: string
     kind: FunctionKindName
+    category: AccessCategoryName
+    position?: number
     accent?: string | null
     icon?: string | null
   }[]
 ): FieldOption[] =>
-  FUNCTION_KIND_REGISTRY.keys.flatMap((kind) =>
-    rowsToOptions(rows.filter((row) => row.kind === kind)).map((option) => ({
-      ...option,
-      group: FUNCTION_KIND_REGISTRY.get(kind).plural,
-    }))
-  )
+  [...rows]
+    .sort(
+      (left, right) =>
+        ACCESS_CATEGORY_REGISTRY.get(left.category).position -
+          ACCESS_CATEGORY_REGISTRY.get(right.category).position ||
+        FUNCTION_KIND_REGISTRY.keys.indexOf(left.kind) -
+          FUNCTION_KIND_REGISTRY.keys.indexOf(right.kind) ||
+        (left.position ?? 0) - (right.position ?? 0)
+    )
+    .flatMap((row) =>
+      rowsToOptions([row]).map((option) => ({
+        ...option,
+        group: ACCESS_CATEGORY_REGISTRY.get(row.category).label,
+      }))
+    )
 
 /**
  * Account row a people picker reads

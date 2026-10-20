@@ -118,6 +118,7 @@ export const MEMBER_FIELD_COPY = {
   primaryFunctions: 'Fonctions principales',
   secondaryFunctions: 'Fonctions secondaires',
   team: 'Équipe',
+  teamWithoutYoutuber: 'Sans YouTubeur',
   birthday: 'Date d’anniversaire',
   celebrateBirthday: 'Souhaite être fêté',
   languages: 'Langues',

@@ -81,7 +81,7 @@ const ABSENCE_STATUS_MAP: Record<AbsenceStatusName, LabelledOption> = {
 export const ABSENCE_STATUS_REGISTRY = createRegistry(ABSENCE_STATUS_MAP)
 
 const EVENT_VISIBILITY_MAP: Record<EventVisibilityName, LabelledOption> = {
-  [EventVisibilities.Everyone]: { label: 'Tout le monde', accent: 'success', icon: 'members' },
+  [EventVisibilities.Everyone]: { label: 'Tout Memora', accent: 'success', icon: 'members' },
   [EventVisibilities.Responsables]: {
     label: 'Administration entière',
     accent: 'warning',
@@ -89,6 +89,11 @@ const EVENT_VISIBILITY_MAP: Record<EventVisibilityName, LabelledOption> = {
   },
   [EventVisibilities.Admins]: { label: 'Administrateurs seuls', accent: 'danger', icon: 'crown' },
   [EventVisibilities.Team]: { label: 'Une équipe', accent: 'info', icon: 'teams' },
+  [EventVisibilities.Youtuber]: {
+    label: 'Toute l’équipe du YouTubeur',
+    accent: 'info',
+    icon: 'teams',
+  },
 }
 
 export const EVENT_VISIBILITY_REGISTRY = createRegistry(EVENT_VISIBILITY_MAP)

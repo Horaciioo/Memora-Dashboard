@@ -137,6 +137,53 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     items: [
       {
         tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarManage,
+        text: 'Ajout du choix « Toute l’équipe » du YouTubeur dans la visibilité d’un évènement, avec son logo, juste sous « Tout Memora » (anciennement « Tout le monde »)',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.teams,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.ReferenceRead,
+        text: 'Ajout de l’équipe « Observateurs » activée d’office pour chaque YouTubeur, pour choisir qui assiste aux entretiens de recrutement',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarManage,
+        text: 'Amélioration des listes d’équipes d’un évènement, rangées par YouTubeur avec son logo, et du champ « Membre concerné » devenu « Responsable »',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberUpdate,
+        text: 'Amélioration du choix d’équipe dans la fiche d’un modérateur, rangé par YouTubeur avec son logo',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.announcements,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CommunicationWrite,
+        text: 'Amélioration de la rédaction d’une annonce, dont les boutons d’enregistrement et d’annulation se réduisent à deux pastilles pour laisser toute la place au texte',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration des menus de fonctions, rangés par catégorie (Modération, Junior, Junior Responsable) puis par fonction principale et secondaire',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.announcements,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CommunicationRead,
+        text: 'Correction d’un bug où les annonces déjà écrites n’apparaissaient pas dans « Communications »',
+      },
+      {
+        tag: ChangelogTags.Added,
         page: ROUTES.tasks,
         permission: Permissions.TaskRead,
         text: 'Ajout de la possibilité de laisser un commentaire sur une tâche',
