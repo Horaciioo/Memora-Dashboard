@@ -6,6 +6,7 @@ import { readFullPerimeter, scopedWhere } from '@/core/services/auth/ScopeServic
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { toOptions } from '@/core/lib/forms/options'
+import { wholeDays } from '@/core/lib/calendar/wholeDays'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import {
   buildRoster,
@@ -490,6 +491,10 @@ const toEntry = (
   },
   roster: AttendanceRoster | null = null
 ): CalendarEntry => {
+  const bounds = row.allDay
+    ? wholeDays(row.startsAt, row.endsAt)
+    : { startsAt: row.startsAt, endsAt: row.endsAt }
+
   return {
     id: row.id,
     source: CalendarSources.Entry,
@@ -504,8 +509,9 @@ const toEntry = (
     muted: false,
     // The entry may tighten what its template allows
     visibility: row.visibility ?? row.template?.visibility ?? EventVisibilities.Everyone,
-    startsAt: row.startsAt.toISOString(),
-    endsAt: row.endsAt?.toISOString() ?? null,
+    // A whole day saved with stray hours still reads as the whole day
+    startsAt: bounds.startsAt.toISOString(),
+    endsAt: bounds.endsAt?.toISOString() ?? null,
     allDay: row.allDay,
     ownerName: row.owner?.displayName ?? null,
     subjectName: row.subject?.displayName ?? null,
@@ -770,6 +776,19 @@ const MINUTE = 60_000
  */
 
 const applyTemplate = async (data: ReturnType<typeof toEntryData>) => {
+  const filled = await fillFromTemplate(data)
+
+  // A whole day starts at midnight and ends at the last minute
+  return filled.allDay ? { ...filled, ...wholeDays(filled.startsAt, filled.endsAt) } : filled
+}
+
+/**
+ * Fill the blanks of a payload from its template
+ * @param {ReturnType<typeof toEntryData>} data - Payload read off the form
+ * @return {Promise<ReturnType<typeof toEntryData>>} - Payload the template completed
+ */
+
+const fillFromTemplate = async (data: ReturnType<typeof toEntryData>) => {
   if (!data.templateId) return data
 
   const template = await prisma.eventTemplate.findUnique({ where: { id: data.templateId } })
