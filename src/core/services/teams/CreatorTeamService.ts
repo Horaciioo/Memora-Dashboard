@@ -5,6 +5,7 @@ import { assertInScope } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { toPerson } from '@/core/services/work/shared'
 import { ENCADREMENT_ROLES } from '@/declarations/access/roles'
+import { OBSERVER_FUNCTION } from '@/declarations/reference/fixed'
 import type { CreatorTeamData } from '@/types/teams'
 import {
   AccessCategories,
@@ -28,6 +29,16 @@ export const readCreatorTeams = async (
   scope: AccessScope
 ): Promise<CreatorTeamData> => {
   assertInScope(scope, youtuberId)
+
+  // A creator always starts with its observers team on
+  const observers = await prisma.jobFunction.findUnique({ where: { name: OBSERVER_FUNCTION } })
+  if (observers) {
+    await prisma.team.upsert({
+      where: { youtuberId_functionId: { youtuberId, functionId: observers.id } },
+      update: {},
+      create: { name: observers.name, youtuberId, functionId: observers.id },
+    })
+  }
 
   const [functions, teams, accounts] = await Promise.all([
     prisma.jobFunction.findMany({ where: TEAM_FUNCTIONS, orderBy: { position: 'asc' } }),
