@@ -223,6 +223,12 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     },
   },
   {
+    key: 'observers-follow-recruitments',
+    grants: {},
+    // They read every session without touching it
+    functions: { Observateurs: [Permissions.RecruitmentObserve] },
+  },
+  {
     key: 'trainers-calendar',
     grants: {},
     // They plan their own interviews and check-ins

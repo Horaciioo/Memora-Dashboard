@@ -9,7 +9,11 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { Permissions } from '@/utils/constants/permissions'
 
 // Perimeter of an observer, the session id narrows it
-const OBSERVER_SCOPE: AccessScope = { isGlobal: true, youtuberIds: [], activeYoutuberId: null }
+export const OBSERVER_SCOPE: AccessScope = {
+  isGlobal: true,
+  youtuberIds: [],
+  activeYoutuberId: null,
+}
 
 /**
  * Guarded recruitment session
@@ -32,7 +36,11 @@ export interface RecruitmentGuard extends GuardedSession {
 export const requireRecruitment = async (sessionId: string): Promise<RecruitmentGuard> => {
   const guarded = await requireUser()
   const canRead = guarded.access.can(Permissions.RecruitmentRead)
-  const observing = !canRead && (await isObserver(sessionId, guarded.session.id))
+  // The Observateurs function opens every session, a named seat opens one
+  const observing =
+    !canRead &&
+    (guarded.access.can(Permissions.RecruitmentObserve) ||
+      (await isObserver(sessionId, guarded.session.id)))
 
   if (!canRead && !observing) forbidden()
 

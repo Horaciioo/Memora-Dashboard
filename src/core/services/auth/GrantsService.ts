@@ -1,3 +1,4 @@
+import { ensureFixedFunctions } from '@/core/services/reference/FixedFunctions'
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
@@ -31,6 +32,9 @@ export const syncRoleGrants = async (): Promise<void> => {
   const applied = await prisma.grantMigration.findMany({ select: { key: true } })
   const known = new Set(applied.map((entry) => entry.key))
   const pending = GRANT_ADDITIONS.filter((addition) => !known.has(addition.key))
+
+  // A grant by function needs the function to exist, a new one is written first
+  if (pending.length > 0) await ensureFixedFunctions()
 
   // One transaction per batch
   for (const addition of pending) {
