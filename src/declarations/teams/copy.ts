@@ -4,16 +4,21 @@
  */
 
 export const TEAM_COPY = {
-  title: 'Équipes',
-  lead: 'Chaque équipe est une fonction. Active celles du créateur, puis clique un modérateur pour le placer.',
-  saved: 'Équipes enregistrées.',
-  enabled: 'Équipes actives',
-  enabledEmpty: 'Aucune équipe active',
+  title: 'Fonctions',
+  lead: 'Toutes les fonctions sont ouvertes pour le créateur. Un modérateur rejoint celle qu’il tient, depuis sa fiche.',
+  saved: 'Fonctions enregistrées.',
+  enabled: 'Fonctions ouvertes',
+  enabledEmpty: 'Aucune fonction ouverte',
+  closeRootOnly:
+    'Seul l’administrateur principal peut fermer une fonction, et seulement à titre exceptionnel.',
+  closeWarningTitle: 'Fermer cette fonction ?',
+  closeWarningDescription:
+    'Ses membres quittent l’équipe du créateur et les recrutements ne peuvent plus la viser. À ne faire qu’à titre exceptionnel.',
   primary: 'Fonctions principales',
   secondary: 'Fonctions secondaires',
-  memberTeams: 'Équipes du modérateur',
-  noTeam: 'Aucune équipe',
+  memberTeams: 'Fonctions du modérateur',
+  noTeam: 'Aucune fonction',
   noMembers: 'Aucun modérateur rattaché',
   noMembersHint: 'Rattache un modérateur à ce YouTubeur depuis sa fiche.',
-  noFunctions: 'Active une équipe pour pouvoir y placer des modérateurs.',
+  noFunctions: 'Ouvre une fonction pour voir qui la tient.',
 } as const

@@ -307,6 +307,14 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.CommunicationRead,
         maturity: 'new',
       },
+      // The Observateurs read the sessions from the moderator view
+      {
+        href: ROUTES.recruitments,
+        label: 'Recrutements',
+        icon: 'recruitment',
+        permission: Permissions.RecruitmentObserve,
+        maturity: 'beta',
+      },
     ],
   },
   {
@@ -506,15 +514,24 @@ export const visibleNavGroups = (
   view: NavigationViewName,
   member: { status: MemberStatusName; role: MemberRoleName } | null,
   can: (permission: PermissionName) => boolean
-): NavigationGroup[] =>
-  NAVIGATION.filter((group) => groupInView(group, view))
+): NavigationGroup[] => {
+  // A page reachable through two entries shows once, under the first
+  const seen = new Set<string>()
+
+  return NAVIGATION.filter((group) => groupInView(group, view))
     .map((group) => ({
       ...group,
-      items: group.items.filter(
-        (item) =>
+      items: group.items.filter((item) => {
+        const isVisible =
           itemInView(item, group, view) &&
           (!item.permission || can(item.permission)) &&
           (!member || matchesNavigation(item.visibleWhen, member))
-      ),
+        if (!isVisible || seen.has(item.href)) return false
+
+        seen.add(item.href)
+
+        return true
+      }),
     }))
     .filter((group) => group.items.length > 0)
+}

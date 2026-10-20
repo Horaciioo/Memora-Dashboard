@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { ensureFixedFunctions } from '@/core/services/reference/FixedFunctions'
+import { openNewFunctions, syncFunctionTeams } from '@/core/services/teams/FunctionTeamService'
 import {
   LIBRARY_DISPOSITIFS,
   LIBRARY_EVENT_TEMPLATES,
@@ -29,6 +31,11 @@ const idOf = (ids: Map<string, string>, name: string | null): string | null =>
  */
 
 const writeLibrary = async (): Promise<void> => {
+  // Functions fixed in code, a new one opens everywhere and the teams follow the functions held
+  await ensureFixedFunctions()
+  await openNewFunctions()
+  await syncFunctionTeams()
+
   const [functions, dispositifRows] = await Promise.all([
     prisma.jobFunction.findMany({ select: { id: true, name: true } }),
     Promise.all(

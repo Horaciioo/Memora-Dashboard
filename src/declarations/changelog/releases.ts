@@ -136,6 +136,11 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       'Pour parler d’une tâche ou d’un projet, il fallait aller sur Discord. Cette version met la discussion et la case à cocher là où on travaille, ouvre toute seule les tâches et le projet d’un recrutement, et remet de l’ordre dans la fiche d’un YouTubeur et dans la liste des modérateurs.',
     items: [
       {
+        tag: ChangelogTags.Improved,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Amélioration globale de la gestion des rôles dans Memora',
+      },
+      {
         tag: ChangelogTags.Added,
         page: ROUTES.calendar,
         permission: Permissions.CalendarManage,

@@ -11,7 +11,7 @@ import { RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { ObserverView } from '@/types/recruitment'
-import { OBSERVER_QUOTA_MAX } from '@/utils/constants/recruitment'
+import { INTERVIEW_OBSERVERS_MAX, OBSERVER_QUOTA_MAX } from '@/utils/constants/recruitment'
 
 /**
  * Declarations of the observer form
@@ -135,13 +135,15 @@ export const removeObserver = async (id: string, scope: AccessScope): Promise<Ob
  * @param {string} candidateId - Candidate identifier
  * @param {string} accountId - Observer
  * @param {boolean} joined - Wanted state
+ * @param {boolean} canObserve - Holds the right to follow every session
  * @return {Promise<string>} - Session identifier
  */
 
 export const setObserving = async (
   candidateId: string,
   accountId: string,
-  joined: boolean
+  joined: boolean,
+  canObserve: boolean
 ): Promise<string> => {
   const candidate = await prisma.recruitmentCandidate.findUnique({
     where: { id: candidateId },
@@ -149,10 +151,11 @@ export const setObserving = async (
   })
   if (!candidate) throw notFound()
 
+  // A named seat of the session, or the Observateurs function which opens every session
   const seat = await prisma.recruitmentObserver.findUnique({
     where: { sessionId_accountId: { sessionId: candidate.sessionId, accountId } },
   })
-  if (!seat) throw forbidden()
+  if (!seat && !canObserve) throw forbidden()
 
   // Leaving always works
   if (!joined) {
@@ -167,7 +170,11 @@ export const setObserving = async (
   const sitting = await prisma.recruitmentSeat.count({ where: { candidateId, accountId } })
 
   // Quota counts other interviews only
-  if (sitting === 0 && already >= seat.quota) throw conflict()
+  if (seat && sitting === 0 && already >= seat.quota) throw conflict()
+
+  // An observer never breaks the limit of an interview, a manager does by seating them
+  const crowd = await prisma.recruitmentSeat.count({ where: { candidateId } })
+  if (sitting === 0 && crowd >= INTERVIEW_OBSERVERS_MAX) throw conflict()
 
   await prisma.recruitmentSeat.upsert({
     where: { candidateId_accountId: { candidateId, accountId } },

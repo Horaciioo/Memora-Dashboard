@@ -1,5 +1,6 @@
 import { Avatar } from '@/components/elements/display/Avatar'
 import { RoleGlyph } from '@/composites/members/MemberBadges'
+import { MEMBER_COPY } from '@/declarations/members/copy'
 import { MEMBER_BLOCK } from '@/declarations/ui/blocks'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { FIELD_COPY } from '@/declarations/ui/copy'
@@ -7,6 +8,7 @@ import { DATE_COPY } from '@/declarations/ui/dates'
 import { PROFILE_CARD } from '@/declarations/ui/variants'
 import type { ProfileDetail } from '@/types/preferences'
 import { cn } from '@/utils/classnames'
+import { MemberRoles } from '@/utils/constants/hierarchy'
 import { formatDay } from '@/utils/format/dates'
 
 export interface ProfileCardProps {
@@ -21,7 +23,12 @@ export interface ProfileCardProps {
 
 export const ProfileCard = ({ profile }: ProfileCardProps) => {
   const facts = [
-    { label: FIELD_COPY.division, value: profile.division },
+    {
+      label: FIELD_COPY.division,
+      // A junior sits in no division yet
+      value:
+        profile.division ?? (profile.role === MemberRoles.Junior ? MEMBER_COPY.unofficial : null),
+    },
     {
       label: FIELD_COPY.youtuber,
       value: profile.youtubers.length > 0 ? profile.youtubers.join(', ') : null,

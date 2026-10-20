@@ -1,3 +1,4 @@
+import { syncFunctionTeams } from '@/core/services/teams/FunctionTeamService'
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
@@ -56,6 +57,7 @@ const admittedAccount = async (
       update: {},
       create: { accountId: known.id, functionId: trainingFunctionId },
     })
+    await syncFunctionTeams([known.id])
 
     return known.id
   }
@@ -72,6 +74,7 @@ const admittedAccount = async (
     },
     select: { id: true },
   })
+  await syncFunctionTeams([account.id])
 
   return account.id
 }
@@ -241,4 +244,5 @@ export const graduateAccount = async (accountId: string, functionId: string): Pr
     }),
     prisma.account.update({ where: { id: accountId }, data: { status: MemberStatuses.Active } }),
   ])
+  await syncFunctionTeams([accountId])
 }

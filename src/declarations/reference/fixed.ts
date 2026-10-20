@@ -29,13 +29,6 @@ export interface FixedDivision {
 
 export const FIXED_DIVISIONS: readonly FixedDivision[] = [
   {
-    name: 'Junior',
-    rank: 0,
-    summary: 'Modérateurs en intégration.',
-    leadAssignable: true,
-    imagePath: null,
-  },
-  {
     name: 'Squad I',
     rank: 1,
     summary: 'Première squad.',

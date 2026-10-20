@@ -1,3 +1,4 @@
+import { syncFunctionTeams } from '@/core/services/teams/FunctionTeamService'
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
@@ -290,6 +291,7 @@ export const assignFunctionMembers = async (
     data: accountIds.map((accountId) => ({ accountId, functionId })),
     skipDuplicates: true,
   })
+  await syncFunctionTeams(accountIds)
 }
 
 /**
@@ -313,4 +315,5 @@ export const removeAccessMember = async (
   if (!account) throw notFound()
 
   await prisma.accountFunction.deleteMany({ where: { accountId, functionId } })
+  await syncFunctionTeams([accountId])
 }

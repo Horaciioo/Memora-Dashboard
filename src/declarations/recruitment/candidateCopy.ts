@@ -15,6 +15,8 @@ export const CANDIDATE_COPY = {
   nextPart: 'Partie suivante : {part}',
   observe: 'Observer cet entretien',
   observeFull: 'Ton quota d’entretiens observés est atteint.',
+  observeCrowded: 'Cet entretien a déjà ses 3 observateurs.',
+  anonymous: 'Candidat',
   observeLocked: 'Tu observes uniquement, rien ne se modifie ici.',
 } as const
 

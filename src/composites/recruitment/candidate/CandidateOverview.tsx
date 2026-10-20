@@ -1,5 +1,6 @@
 'use client'
 
+import { INTERVIEW_OBSERVERS_MAX } from '@/utils/constants/recruitment'
 import { CopyValue } from '@/components/elements/actions/CopyValue'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
@@ -58,21 +59,27 @@ export const CandidateOverview = ({
   const outcome = detail.outcomes.find((entry) => entry.id === text('outcomeId'))
   const sitting = pickedOptions(fieldFor('observerIds'), record.values.observerIds)
 
-  // Quota counts the interviews already joined elsewhere
+  // Quota counts the interviews already joined elsewhere, an interview welcomes three observers
   const sittingElsewhere =
     (seat?.used ?? 0) - (candidate.observers.some((s) => s.id === can.viewerId) ? 1 : 0)
-  const isFull = seat !== undefined && sittingElsewhere >= seat.quota && !joined
+  const isCrowded = candidate.observers.length >= INTERVIEW_OBSERVERS_MAX && !joined
+  const isFull = (seat !== undefined && sittingElsewhere >= seat.quota && !joined) || isCrowded
 
   const toggle = async (next: boolean) => {
     if (await observe(candidate.id, next)) setJoined(next)
   }
 
   const entries: EditableEntry[] = [
-    {
-      label: RECRUITMENT_FIELD_COPY.discordId,
-      field: fieldFor('discordId'),
-      display: <CopyValue value={candidate.discordId} />,
-    },
+    // An observer never reads how to reach a candidate
+    ...(can.observing
+      ? []
+      : [
+          {
+            label: RECRUITMENT_FIELD_COPY.discordId,
+            field: fieldFor('discordId'),
+            display: <CopyValue value={candidate.discordId} />,
+          },
+        ]),
     {
       label: RECRUITMENT_FIELD_COPY.displayName,
       field: fieldFor('displayName'),
@@ -104,7 +111,13 @@ export const CandidateOverview = ({
           display: (
             <ObserveCheck
               joined={joined}
-              label={isFull ? CANDIDATE_COPY.observeFull : CANDIDATE_COPY.observe}
+              label={
+                isCrowded
+                  ? CANDIDATE_COPY.observeCrowded
+                  : isFull
+                    ? CANDIDATE_COPY.observeFull
+                    : CANDIDATE_COPY.observe
+              }
               disabled={isFull || isLocked}
               onChange={(next) => void toggle(next)}
             />

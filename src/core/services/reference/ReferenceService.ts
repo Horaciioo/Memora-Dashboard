@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { openEveryFunction } from '@/core/services/teams/FunctionTeamService'
 import {
   activeFunctions,
   activeYoutubers,
@@ -147,30 +148,6 @@ const applyOrder = async (
 
 const noReorder = async (): Promise<void> => {}
 
-/**
- * Replace the functions one creator opens
- * @param {string} youtuberId - Creator identifier
- * @param {string[]} functionIds - Functions in their picked order
- * @return {Promise<void>} - Applied
- */
-
-const replaceOpenFunctions = async (youtuberId: string, functionIds: string[]): Promise<void> => {
-  const wanted = [...new Set(functionIds)]
-
-  await prisma.$transaction([
-    prisma.youtuberFunction.deleteMany({
-      where: { youtuberId, functionId: { notIn: wanted.length > 0 ? wanted : [''] } },
-    }),
-    ...wanted.map((functionId, position) =>
-      prisma.youtuberFunction.upsert({
-        where: { youtuberId_functionId: { youtuberId, functionId } },
-        update: { position },
-        create: { youtuberId, functionId, position },
-      })
-    ),
-  ])
-}
-
 const youtubers: ReferenceResource = {
   fields: async () => [
     nameField,
@@ -189,14 +166,6 @@ const youtubers: ReferenceResource = {
       label: REFERENCE_FIELD_COPY.bannerUrl,
       hint: REFERENCE_FIELD_COPY.bannerUrlHint,
       bucket: 'banners',
-    },
-    {
-      name: 'functionIds',
-      kind: 'multiselect',
-      label: REFERENCE_FIELD_COPY.functions,
-      hint: REFERENCE_FIELD_COPY.functionsHint,
-      mark: 'dot',
-      options: functionOptions(await activeFunctions()),
     },
     { name: 'archived', kind: 'toggle', label: REFERENCE_FIELD_COPY.archived },
     {
@@ -236,7 +205,6 @@ const youtubers: ReferenceResource = {
         avatarUrl: row.avatarUrl,
         bannerUrl: row.bannerUrl,
         archived: row.archived,
-        functionIds: row.functions.map((seat) => seat.functionId),
         leadIds: row.leads.map((lead) => lead.accountId),
       },
     }))
@@ -260,7 +228,8 @@ const youtubers: ReferenceResource = {
     for (const panel of SANCTION_PANEL_REGISTRY.keys) {
       if (SANCTION_PANEL_REGISTRY.get(panel).written) await instantiatePanel(row.id, panel)
     }
-    await replaceOpenFunctions(row.id, readList(values, 'functionIds'))
+    // Every function starts open
+    await openEveryFunction(row.id)
     await replaceAnchors(row.id, readList(values, 'leadIds'))
 
     return youtubers.list().then((rows) => rows.find((entry) => entry.id === row.id)!)
@@ -279,9 +248,6 @@ const youtubers: ReferenceResource = {
         },
       })
       .catch(rethrow)
-
-    // Open functions are replaced wholesale
-    if ('functionIds' in values) await replaceOpenFunctions(id, readList(values, 'functionIds'))
 
     // Anchors travel with the row
     if ('leadIds' in values) await replaceAnchors(id, readList(values, 'leadIds'))

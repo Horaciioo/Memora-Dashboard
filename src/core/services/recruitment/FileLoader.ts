@@ -1,3 +1,4 @@
+import { CANDIDATE_COPY } from '@/declarations/recruitment/candidateCopy'
 import 'server-only'
 
 import { commentFields } from '@/core/lib/forms/commentFields'
@@ -46,8 +47,20 @@ export const loadRecruitment = async (
   id: string,
   { session, access, perimeter, observing }: RecruitmentGuard
 ): Promise<LoadedRecruitment | null> => {
-  const detail = await readSession(id, perimeter).catch(() => null)
-  if (!detail) return null
+  const read = await readSession(id, perimeter).catch(() => null)
+  if (!read) return null
+
+  // An observer never gets a way to reach a candidate
+  const detail = observing
+    ? {
+        ...read,
+        candidates: read.candidates.map((candidate) => ({
+          ...candidate,
+          discordId: '',
+          name: candidate.memberName ?? candidate.displayName ?? CANDIDATE_COPY.anonymous,
+        })),
+      }
+    : read
 
   // Opening the file is seeing what named the viewer
   await markMentionsRead(session.id, 'recruitment', id)

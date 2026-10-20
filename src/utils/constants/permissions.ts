@@ -50,6 +50,7 @@ export const Permissions = {
   SanctionManage: 'sanction:manage',
   RecruitmentRead: 'recruitment:read',
   RecruitmentManage: 'recruitment:manage',
+  RecruitmentObserve: 'recruitment:observe',
   RecruitmentCandidateWrite: 'recruitment:candidate:write',
   RecruitmentInstructionWrite: 'recruitment:instruction:write',
   IntegrationManage: 'integration:manage',
@@ -534,6 +535,14 @@ export const PermissionsList: PermissionMeta[] = [
     group: PermissionGroups.Recruitment,
     displayName: 'Voir les recrutements',
     description: 'Ouvrir les sessions de recrutement, leurs candidats et leur questionnaire.',
+    important: false,
+  },
+  {
+    name: Permissions.RecruitmentObserve,
+    group: PermissionGroups.Recruitment,
+    displayName: 'Suivre les recrutements',
+    description:
+      'Voir les sessions de recrutement en lecture seule, sans journal ni coordonnées, et se placer sur les entretiens.',
     important: false,
   },
   {

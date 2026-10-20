@@ -62,5 +62,8 @@ export const AnswerAppreciations = {
 
 export type AnswerAppreciationName = (typeof AnswerAppreciations)[keyof typeof AnswerAppreciations]
 
+// Observers one interview welcomes on their own, a manager may add more
+export const INTERVIEW_OBSERVERS_MAX = 3
+
 // Interviews one observer may sit in on, at most
 export const OBSERVER_QUOTA_MAX = 10

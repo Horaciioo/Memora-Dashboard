@@ -1,9 +1,10 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { MultiSelect } from '@/components/elements/forms/selects/MultiSelect'
+import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { CreatorMemberBox } from '@/composites/reference/CreatorMemberBox'
 import { useCreatorTeams } from '@/core/hooks/data/people/useCreatorTeams'
 import { TEAM_COPY } from '@/declarations/teams/copy'
@@ -18,15 +19,17 @@ export interface CreatorTeamsPanelProps {
 }
 
 /**
- * Teams of a creator: switch them on, then seat each moderator
+ * Functions of a creator, all open, with who holds each
  * @param {string} youtuberId - Creator identifier
  * @param {CreatorTeamData} initial - Data resolved server-side
- * @param {boolean} canManage - Viewer may change teams
+ * @param {boolean} canManage - Viewer may close a function, the root administrator alone
  * @return {JSX.Element}
  */
 
 export const CreatorTeamsPanel = ({ youtuberId, initial, canManage }: CreatorTeamsPanelProps) => {
-  const { data, isSaving, setEnabled, setMemberTeams } = useCreatorTeams(initial, youtuberId)
+  const { data, isSaving, setEnabled } = useCreatorTeams(initial, youtuberId)
+  // Closing a function waits for a second look
+  const [closing, setClosing] = useState<string[] | null>(null)
 
   // Principal ones first
   const toOption = (entry: CreatorTeamData['functions'][number]): FieldOption => ({
@@ -56,7 +59,9 @@ export const CreatorTeamsPanel = ({ youtuberId, initial, canManage }: CreatorTea
           emptyLabel={TEAM_COPY.enabledEmpty}
           mark="glyph"
           disabled={isSaving}
-          onChange={setEnabled}
+          onChange={(next) =>
+            next.length < enabledIds.length ? setClosing(next) : setEnabled(next)
+          }
         />
       )}
 
@@ -72,17 +77,22 @@ export const CreatorTeamsPanel = ({ youtuberId, initial, canManage }: CreatorTea
       ) : (
         <div className={CREATOR_FILE.grid}>
           {data.members.map((member) => (
-            <CreatorMemberBox
-              key={member.person.id}
-              member={member}
-              options={seatOptions}
-              canManage={canManage}
-              isSaving={isSaving}
-              onChange={(functionIds) => setMemberTeams(member.person.id, functionIds)}
-            />
+            <CreatorMemberBox key={member.person.id} member={member} options={seatOptions} />
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={closing !== null}
+        title={TEAM_COPY.closeWarningTitle}
+        description={TEAM_COPY.closeWarningDescription}
+        pending={isSaving}
+        onConfirm={() => {
+          if (closing) setEnabled(closing)
+          setClosing(null)
+        }}
+        onCancel={() => setClosing(null)}
+      />
     </div>
   )
 }

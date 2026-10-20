@@ -11,7 +11,7 @@ export const PUT = createProtectedRoute({
       viewerId: session.id,
     })
     const joined = raw.joined === true
-    await setObserving(params.id, session.id, joined)
+    await setObserving(params.id, session.id, joined, access.can(Permissions.RecruitmentObserve))
 
     return { joined }
   },
