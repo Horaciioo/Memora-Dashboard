@@ -10,6 +10,7 @@ import { NOTIFICATION_KINDS } from '@/utils/constants/notifications'
 import type { NotificationKindName } from '@/utils/constants/notifications'
 import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
 import type { Prisma } from '@prisma/client'
+import type { MentionMark } from '@/types/mentions'
 import { readMentions } from '@/utils/format/mentions'
 
 /**
@@ -228,21 +229,21 @@ export const markRead = async (id: string, accountId: string): Promise<void> => 
 }
 
 /**
- * Mentions of a member not yet seen on one kind of record
+ * Mentions of a member not yet seen, on one kind of record or on any
  * @param {string} accountId - Account identifier
- * @param {NotificationTargetName} target - Kind of record
+ * @param {NotificationTargetName} [target] - Kind of record
  * @return {Promise<NotificationEntry[]>} - Unopened mentions, newest first
  */
 
 export const unreadMentions = async (
   accountId: string,
-  target: NotificationTargetName
+  target?: NotificationTargetName
 ): Promise<NotificationEntry[]> => {
   const rows = await prisma.notification.findMany({
     where: {
       recipientId: accountId,
       kind: NOTIFICATION_KINDS.ids.Mentioned,
-      targetType: target,
+      ...(target ? { targetType: target } : {}),
       readAt: null,
     },
     include: { actor: { select: { displayName: true, avatarUrl: true } } },
@@ -294,28 +295,38 @@ export const markReportRead = async (accountId: string, liveId: string): Promise
 }
 
 /**
- * Mark the mentions of one record as seen, the record being open
+ * Take the mentions of one record, the record being open
  * @param {string} accountId - Account identifier
  * @param {NotificationTargetName} target - Kind of record
  * @param {string} targetId - Record identifier
- * @return {Promise<void>} - Marked
+ * @return {Promise<MentionMark[]>} - Mentions that were unseen, now marked as seen
  */
 
-export const markMentionsRead = async (
+export const takeMentionMarks = async (
   accountId: string,
   target: NotificationTargetName,
   targetId: string
-): Promise<void> => {
-  await prisma.notification.updateMany({
-    where: {
-      recipientId: accountId,
-      kind: NOTIFICATION_KINDS.ids.Mentioned,
-      targetType: target,
-      targetId,
-      readAt: null,
-    },
-    data: { readAt: new Date() },
+): Promise<MentionMark[]> => {
+  const where = {
+    recipientId: accountId,
+    kind: NOTIFICATION_KINDS.ids.Mentioned,
+    targetType: target,
+    targetId,
+    readAt: null,
+  }
+
+  const rows = await prisma.notification.findMany({
+    where,
+    select: { createdAt: true, actor: { select: { displayName: true } } },
   })
+  if (rows.length === 0) return []
+
+  await prisma.notification.updateMany({ where, data: { readAt: new Date() } })
+
+  return rows.map((row) => ({
+    actorName: row.actor?.displayName ?? null,
+    at: row.createdAt.toISOString(),
+  }))
 }
 
 /**

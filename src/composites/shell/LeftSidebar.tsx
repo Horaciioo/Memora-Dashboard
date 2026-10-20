@@ -28,7 +28,11 @@ import { beaconProps } from '@/declarations/ui/beacons'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
-import { DEADLINE_NUDGE_COPY, MENTION_NUDGE_COPY } from '@/declarations/work/copy'
+import {
+  DEADLINE_NUDGE_COPY,
+  MENTION_NUDGE_COPY,
+  MENTION_NUDGE_SOMEONE,
+} from '@/declarations/work/copy'
 import { OVERDUE_ROUTES } from '@/declarations/work/registries'
 import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
@@ -88,7 +92,13 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const newsAt = shortcuts.findIndex((item) => item.href === ROUTES.changelog)
 
   const nav = (
-    <RailNav groups={groups} isCompact={isCompact} isTouring={isTouring} live={viewContext.live} />
+    <RailNav
+      groups={groups}
+      isCompact={isCompact}
+      isTouring={isTouring}
+      live={viewContext.live}
+      mentions={viewContext.mentions}
+    />
   )
 
   // Shortcuts and the release notice, in every menu but a course's
@@ -162,9 +172,10 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
             ...(Object.keys(OVERDUE_ROUTES) as (keyof typeof OVERDUE_ROUTES)[])
               .filter((flag) => viewContext.overdue[flag])
               .map((flag) => ({ href: OVERDUE_ROUTES[flag], message: DEADLINE_NUDGE_COPY[flag] })),
-            ...(viewContext.mentioned
-              ? [{ href: ROUTES.recruitments, message: MENTION_NUDGE_COPY }]
-              : []),
+            ...viewContext.mentions.map(({ href, actorName }) => ({
+              href,
+              message: MENTION_NUDGE_COPY.replace('{name}', actorName ?? MENTION_NUDGE_SOMEONE),
+            })),
           ].filter(({ href }) => isUnlocked(href))}
         />
       )}

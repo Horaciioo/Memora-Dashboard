@@ -138,6 +138,9 @@ export const LEFT_SIDEBAR = {
   livePulse: 'rail-fold relative ml-auto flex size-2.5 shrink-0',
   livePulseRing: 'live-halo absolute inset-0 rounded-full bg-[var(--color-live-400)]',
   livePulseDot: 'relative size-full rounded-full bg-[var(--color-live-400)]',
+  // Unseen mentions counted beside the page
+  navBadge:
+    'rail-fold ml-auto flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-danger)] text-xs font-bold text-[var(--color-on-solid)]',
   liveBubbleAnchor: 'fixed z-50 size-0',
   // Account footer
   footer: 'flex shrink-0 px-4 pt-3',

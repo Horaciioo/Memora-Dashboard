@@ -19,6 +19,7 @@ import {
   workViewer,
 } from '@/core/services/work/visibility'
 import { mentionOptions } from '@/core/services/work/DiscordDirectory'
+import { MentionMarks } from '@/composites/notifications/MentionMarks'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { PROJECT_COPY } from '@/declarations/work/copy'
@@ -89,6 +90,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     <div className={PAGE_STYLES.wrapper}>
       <PageBanner title={PROJECT_COPY.title} isLabel />
       <BreadcrumbLabel label={detail.summary.title} />
+      <MentionMarks target="project" targetId={id} />
       <ProjectFileTabs
         detail={detail}
         projectFields={projectForm}

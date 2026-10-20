@@ -350,7 +350,10 @@ export const DEADLINE_COPY = {
  * @type {string}
  */
 
-export const MENTION_NUDGE_COPY = 'On t’a mentionné, va jeter un œil.'
+export const MENTION_NUDGE_COPY = '{name} t’a mentionné sur un commentaire !'
+
+// Author not known
+export const MENTION_NUDGE_SOMEONE = 'Quelqu’un'
 
 /**
  * Bubble beside a page holding late items of the member

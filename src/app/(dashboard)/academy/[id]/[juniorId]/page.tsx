@@ -25,6 +25,8 @@ import { readTimeline } from '@/core/services/academy/parkour/PimTimelineService
 import { readRecordActivity } from '@/core/services/system/ActivityService'
 import { commentFields } from '@/core/lib/forms'
 import { sessionTitle } from '@/utils/format/academy'
+import { MentionMarks } from '@/composites/notifications/MentionMarks'
+import { juniorTargetId } from '@/declarations/notifications/targets'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { GUIDE_PARAMS } from '@/declarations/academy/guides'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
@@ -128,6 +130,7 @@ export default async function JuniorPage({
     <div className={PAGE_STYLES.wrapper}>
       <PageBanner title={ACADEMY_COPY.title} isLabel />
       <BreadcrumbLabel label={found.junior.displayName} />
+      <MentionMarks target="junior" targetId={juniorTargetId(found.junior.sessionId, juniorId)} />
       <JuniorFile
         rows={{
           junior: found.junior,

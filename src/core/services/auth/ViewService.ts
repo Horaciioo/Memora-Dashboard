@@ -8,7 +8,9 @@ import { NAVIGATION_VIEW_ORDER, NavigationViews, viewDepth } from '@/declaration
 import type { NavigationViewName } from '@/declarations/navigation'
 import { MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
-import type { CreatorLead, ViewContext } from '@/types/access'
+import { MENTION_PAGES } from '@/declarations/notifications/targets'
+import type { CreatorLead, MentionBubble, ViewContext } from '@/types/access'
+import type { NotificationEntry } from '@/types/notifications'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import { prisma } from '@/core/lib/db'
 import { readScope } from '@/core/services/auth/ScopeService'
@@ -128,7 +130,7 @@ export const readViewContext = async (
     readActiveCreator(),
     readLive(),
     readOverdueFlags(viewer.id, access),
-    unreadMentions(viewer.id, 'recruitment'),
+    unreadMentions(viewer.id),
   ])
 
   const known = creators.some((creator) => creator.id === activeYoutuberId)
@@ -142,8 +144,32 @@ export const readViewContext = async (
     activeYoutuberId: known ? activeYoutuberId : null,
     live,
     overdue,
-    mentioned: mentions.length > 0,
+    mentions: mentionBubbles(mentions),
   }
+}
+
+/**
+ * Pages lit by unseen mentions, once each
+ * @param {NotificationEntry[]} mentions - Unopened mentions, newest first
+ * @return {MentionBubble[]} - One bubble per page
+ */
+
+const mentionBubbles = (mentions: NotificationEntry[]): MentionBubble[] => {
+  const bubbles = new Map<string, MentionBubble>()
+
+  for (const mention of mentions) {
+    const href = mention.target ? MENTION_PAGES[mention.target] : undefined
+    if (!href) continue
+
+    const known = bubbles.get(href)
+    bubbles.set(href, {
+      href,
+      actorName: known?.actorName ?? mention.actorName,
+      count: (known?.count ?? 0) + 1,
+    })
+  }
+
+  return [...bubbles.values()]
 }
 
 /**
