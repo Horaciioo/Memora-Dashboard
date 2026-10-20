@@ -203,7 +203,7 @@ export const FormDrawer = ({
   const BackIcon = ICONS.back
 
   const section = (
-    <div key={current?.name} className={DRAWER_STYLES.section}>
+    <div key={current?.name} className={cn(DRAWER_STYLES.section, aside && 'flex flex-1 flex-col')}>
       {note && <p className={DRAWER_ACTIONS.note}>{note}</p>}
       <FormRenderer
         fields={current?.fields ?? []}
@@ -214,6 +214,7 @@ export const FormDrawer = ({
         layout={layout}
         recordId={recordId}
         single
+        fill={Boolean(aside)}
       />
     </div>
   )
@@ -340,10 +341,12 @@ export const FormDrawer = ({
     >
       {aside ? (
         <div className={DRAWER_STYLES.split}>
-          <div className={cn(showAside && 'hidden md:block')}>{section}</div>
+          <div className={cn('flex-1 flex-col', showAside ? 'hidden md:flex' : 'flex')}>
+            {section}
+          </div>
           <div className={DRAWER_STYLES.splitDivider} aria-hidden="true" />
-          <div className={cn(!showAside && 'hidden md:block')}>
-            <div className={FIELD_STYLES.wrapper}>
+          <div className={cn('flex-1 flex-col', showAside ? 'flex' : 'hidden md:flex')}>
+            <div className={cn(FIELD_STYLES.wrapper, 'flex-1')}>
               <span className={FIELD_STYLES.labelRow}>
                 <span className={FIELD_STYLES.label}>{aside.label}</span>
               </span>

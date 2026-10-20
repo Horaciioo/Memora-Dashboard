@@ -38,6 +38,8 @@ export interface FormRendererProps {
   single?: boolean
   // Record being edited
   recordId?: string | null
+  // Last field takes the height left
+  fill?: boolean
 }
 
 // Kinds kept whole in rows
@@ -94,6 +96,7 @@ const spanOf = (field: FieldDefinition, single?: boolean): string =>
  * @param {'grid' | 'rows'} [layout] - Grid or settings rows
  * @param {boolean} [single] - One field per line
  * @param {string | null} [recordId] - Record being edited
+ * @param {boolean} [fill] - Last field takes the height left
  * @return {JSX.Element}
  */
 
@@ -107,6 +110,7 @@ export const FormRenderer = ({
   layout = 'grid',
   single,
   recordId,
+  fill,
 }: FormRendererProps) => {
   const shown = visibleFields(fields, values).map((field) => narrowOptions(field, values))
   const errorOf = (name: string) => issues.find((issue) => issue.field === name)?.message
@@ -187,8 +191,8 @@ export const FormRenderer = ({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className={single ? FORM_GRID.single : FORM_GRID.split}>
+    <div className={cn('flex flex-col gap-4', fill && 'flex-1')}>
+      <div className={fill ? FORM_GRID.fill : single ? FORM_GRID.single : FORM_GRID.split}>
         {shown
           .filter((field) => !attached.has(field.name))
           .map((declared) => {
@@ -240,7 +244,11 @@ export const FormRenderer = ({
                 notice={busyNotice(raw, field.kind, field.busy, recordId)}
                 required={field.required}
                 maturity={field.maturity}
-                className={cn(spanOf(field, single), glyph && FIELD_STYLES.glyphField)}
+                className={cn(
+                  spanOf(field, single),
+                  glyph && FIELD_STYLES.glyphField,
+                  fill && field.kind === 'announcement' && 'flex-1'
+                )}
               >
                 {glyph ? (
                   <div className={FIELD_STYLES.row}>

@@ -17,6 +17,8 @@ export interface InlineAnnouncementProps {
   time?: string
   disabled?: boolean
   maxLength?: number
+  // Told whenever the bar opens or closes
+  onEditingChange?: (editing: boolean) => void
   onCommit: (value: string) => Promise<boolean>
 }
 
@@ -30,6 +32,7 @@ export interface InlineAnnouncementProps {
  * @param {string} [time] - Stamp beside the name
  * @param {boolean} [disabled] - Blocks editing
  * @param {number} [maxLength] - Longest message
+ * @param {(editing: boolean) => void} [onEditingChange] - Bar opened or closed
  * @param {(value: string) => Promise<boolean>} onCommit - Persists the new text
  * @return {JSX.Element}
  */
@@ -43,6 +46,7 @@ export const InlineAnnouncement = ({
   time,
   disabled,
   maxLength,
+  onEditingChange,
   onCommit,
 }: InlineAnnouncementProps) => {
   const [editing, setEditing] = useState(false)
@@ -53,6 +57,8 @@ export const InlineAnnouncement = ({
   useEffect(() => {
     if (editing) bar.current?.querySelector('textarea')?.focus()
   }, [editing])
+
+  useEffect(() => onEditingChange?.(editing), [editing, onEditingChange])
 
   const start = () => {
     if (disabled) return

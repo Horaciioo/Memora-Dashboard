@@ -1,7 +1,8 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
-import type { KeyboardEvent, ReactNode } from 'react'
+import type { CSSProperties, KeyboardEvent, ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { BROADCAST_MENTIONS } from '@/declarations/discord/registries'
@@ -12,7 +13,16 @@ import type { FieldOption } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import type { MentionEntry } from '@/utils/format/discord'
 import { toDisplay, toRaw } from '@/utils/format/discord'
+import { caretSpot } from '@/utils/format/caret'
 import { foldText } from '@/utils/format/strings'
+
+// Menu footprint, width and the room it needs
+const MENU_WIDTH = 288
+const MENU_ROOM = 232
+const MENU_GAP = 10
+const MENU_EDGE = 8
+// Arrow stays clear of the menu corners
+const ARROW_EDGE = 20
 
 // Longest name a mention query may run over
 const QUERY_MAX = 32
@@ -86,7 +96,12 @@ export const DiscordComposer = ({
 }: DiscordComposerProps) => {
   const input = useRef<HTMLTextAreaElement>(null)
   const choices = useMemo(() => mentionChoices(options), [options])
-  const [query, setQuery] = useState<{ sigil: string; text: string; start: number } | null>(null)
+  const [query, setQuery] = useState<{
+    sigil: string
+    text: string
+    start: number
+    menu: { style: CSSProperties; arrow: number; above: boolean }
+  } | null>(null)
   const [active, setActive] = useState(0)
 
   const display = toDisplay(value, choices)
@@ -103,15 +118,38 @@ export const DiscordComposer = ({
   }, [choices, query])
 
   // Read the mention being typed right before the caret
-  const readQuery = (text: string, caret: number) => {
-    const match = QUERY_PATTERN.exec(text.slice(0, caret))
+  const readQuery = (field: HTMLTextAreaElement) => {
+    const caret = field.selectionStart
+    const match = QUERY_PATTERN.exec(field.value.slice(0, caret))
     if (!match) return setQuery(null)
+
+    const start = caret - (match[3]?.length ?? 0) - 1
+    const spot = caretSpot(field, start)
+    // The arrow aims at the middle of the sigil
+    const centre = (spot.left + caretSpot(field, start + 1).left) / 2
+    // Opens under the sigil, above it when the screen runs out below
+    const spaceBelow = window.innerHeight - spot.top - spot.height
+    const above = spaceBelow < MENU_ROOM && spot.top > spaceBelow
+    const left = Math.min(
+      Math.max(centre - ARROW_EDGE, MENU_EDGE),
+      window.innerWidth - MENU_WIDTH - MENU_EDGE
+    )
 
     setActive(0)
     setQuery({
       sigil: match[2] ?? '@',
       text: match[3] ?? '',
-      start: caret - (match[3]?.length ?? 0) - 1,
+      start,
+      menu: {
+        above,
+        arrow: centre - left,
+        style: {
+          left,
+          ...(above
+            ? { bottom: window.innerHeight - spot.top + MENU_GAP }
+            : { top: spot.top + spot.height + MENU_GAP }),
+        },
+      },
     })
   }
 
@@ -156,54 +194,71 @@ export const DiscordComposer = ({
   return (
     <Shell>
       <div className={inline ? 'relative' : DISCORD_MESSAGE.composer}>
-        {query && (
-          <div
-            className={cn(DISCORD_MESSAGE.popover, inline && DISCORD_MESSAGE.inlinePopover)}
-            role="listbox"
-            aria-labelledby={id}
-          >
-            {matches.length === 0 ? (
-              <p className={DISCORD_MESSAGE.popoverEmpty}>{WORK_DISCORD_COPY.noMatch}</p>
-            ) : (
-              matches.map((choice, index) => {
-                const group = choice.option?.group ?? WORK_DISCORD_COPY.broadcastGroup
-                const heading = group !== lastGroup ? group : null
-                lastGroup = group
-                const paint = accentPaint(choice.option?.accent)
+        {query &&
+          createPortal(
+            <div
+              className={DISCORD_MESSAGE.menu}
+              style={query.menu.style}
+              role="listbox"
+              aria-labelledby={id}
+            >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  DISCORD_MESSAGE.menuArrow,
+                  query.menu.above ? DISCORD_MESSAGE.menuArrowBelow : DISCORD_MESSAGE.menuArrowAbove
+                )}
+                style={{ left: query.menu.arrow }}
+              />
+              <div className={DISCORD_MESSAGE.popover}>
+                {matches.length === 0 ? (
+                  <p className={DISCORD_MESSAGE.popoverEmpty}>{WORK_DISCORD_COPY.noMatch}</p>
+                ) : (
+                  matches.map((choice, index) => {
+                    const group = choice.option?.group ?? WORK_DISCORD_COPY.broadcastGroup
+                    const heading = group !== lastGroup ? group : null
+                    lastGroup = group
+                    const paint = accentPaint(choice.option?.accent)
 
-                return (
-                  <div key={choice.token}>
-                    {heading && <p className={DISCORD_MESSAGE.popoverGroup}>{heading}</p>}
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={index === active}
-                      className={cn(
-                        DISCORD_MESSAGE.popoverItem,
-                        index === active && DISCORD_MESSAGE.popoverItemActive
-                      )}
-                      onMouseEnter={() => setActive(index)}
-                      onMouseDown={(event) => {
-                        event.preventDefault()
-                        pick(choice)
-                      }}
-                    >
-                      {choice.option?.image !== undefined ? (
-                        <Avatar name={choice.option.label} src={choice.option.image} size="xs" />
-                      ) : choice.option?.accent ? (
-                        <span
-                          className={cn(DISCORD_MESSAGE.roleDot, paint.dot)}
-                          style={paint.style}
-                        />
-                      ) : null}
-                      {choice.display}
-                    </button>
-                  </div>
-                )
-              })
-            )}
-          </div>
-        )}
+                    return (
+                      <div key={choice.token}>
+                        {heading && <p className={DISCORD_MESSAGE.popoverGroup}>{heading}</p>}
+                        <button
+                          type="button"
+                          role="option"
+                          aria-selected={index === active}
+                          className={cn(
+                            DISCORD_MESSAGE.popoverItem,
+                            index === active && DISCORD_MESSAGE.popoverItemActive
+                          )}
+                          onMouseEnter={() => setActive(index)}
+                          onMouseDown={(event) => {
+                            event.preventDefault()
+                            pick(choice)
+                          }}
+                        >
+                          {choice.option?.image !== undefined ? (
+                            <Avatar
+                              name={choice.option.label}
+                              src={choice.option.image}
+                              size="xs"
+                            />
+                          ) : choice.option?.accent ? (
+                            <span
+                              className={cn(DISCORD_MESSAGE.roleDot, paint.dot)}
+                              style={paint.style}
+                            />
+                          ) : null}
+                          {choice.display}
+                        </button>
+                      </div>
+                    )
+                  })
+                )}
+              </div>
+            </div>,
+            document.body
+          )}
         <textarea
           id={id}
           ref={input}
@@ -214,7 +269,7 @@ export const DiscordComposer = ({
           placeholder={WORK_DISCORD_COPY.placeholder}
           onChange={(event) => {
             onChange(toRaw(event.target.value, choices))
-            readQuery(event.target.value, event.target.selectionStart)
+            readQuery(event.target)
           }}
           onKeyDown={onKeyDown}
           onBlur={() => setQuery(null)}

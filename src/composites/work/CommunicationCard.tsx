@@ -1,10 +1,13 @@
 'use client'
 
+import { useState } from 'react'
+
 import { WorkComments } from '@/composites/work/WorkComments'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Status } from '@/components/elements/display/Status'
 import { OptionMark } from '@/components/elements/forms/selects/OptionMark'
 import { Button } from '@/components/elements/actions/Button'
+import { cn } from '@/utils/classnames'
 import { EditableDetailGrid } from '@/components/structures/inline/EditableDetailGrid'
 import { InlineAnnouncement } from '@/components/structures/inline/InlineAnnouncement'
 import { InlineText } from '@/components/structures/inline/InlineText'
@@ -48,6 +51,8 @@ export const CommunicationCard = ({
     initialValues: entry.values,
   })
   const copy = useCopy(WORK_DISCORD_COPY.copied)
+  // The corner copy control steps aside while the message is written
+  const [isWriting, setWriting] = useState(false)
   const { contextMenu } = useMenu()
 
   const fieldFor = (name: string): FieldDefinition => fields.find((field) => field.name === name)!
@@ -153,7 +158,9 @@ export const CommunicationCard = ({
           icon="copy"
           aria-label={WORK_DISCORD_COPY.copy}
           title={WORK_DISCORD_COPY.copy}
-          className={DISCORD_MESSAGE.copyCorner}
+          className={cn(DISCORD_MESSAGE.copyCorner, isWriting && DISCORD_MESSAGE.copyCornerHidden)}
+          aria-hidden={isWriting}
+          tabIndex={isWriting ? -1 : undefined}
           onClick={() => void copy(body)}
         />
         <InlineAnnouncement
@@ -165,6 +172,7 @@ export const CommunicationCard = ({
           time={published ? formatDay(published) : undefined}
           disabled={!canWrite}
           maxLength={fieldFor('body').maxLength}
+          onEditingChange={setWriting}
           onCommit={(next) => file.saveField('body', next)}
         />
       </div>
