@@ -188,6 +188,38 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Correction d’un bug où les annonces déjà écrites n’apparaissaient pas dans « Communications »',
       },
       {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentObserve,
+        text: 'Correction d’un bug où « Recrutements » quittait la catégorie « Programmes » pour les Responsables',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CalendarManage,
+        text: 'Amélioration du détail d’un évènement du « Calendrier » : son identifiant n’est plus visible que par les Admins',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Correction d’un bug où un évènement « Toute la journée » s’enregistrait sur quelques heures, comme 5h à 7h, au lieu de couvrir la journée entière',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.dashboard,
+        permission: Permissions.CalendarRead,
+        text: 'Correction d’un bug où « Je serai là » et « Je ne serai pas là » répondaient « Cet élément n’existe plus » pour un appel de présence',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.dashboard,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.LiveLogRead,
+        text: 'Correction d’un bug où « Tu as 1 bilan de live à voir » menait à une page en erreur : la carte n’apparaît plus que pour un bilan que tu peux ouvrir',
+      },
+      {
         tag: ChangelogTags.Added,
         page: ROUTES.tasks,
         permission: Permissions.TaskRead,
@@ -212,6 +244,25 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         audience: ChangelogAudiences.Responsables,
         permission: Permissions.CommunicationRead,
         text: 'Ajout de la possibilité de commenter une annonce de la page « Communications »',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Ajout de la possibilité de laisser un commentaire sur une session de « Recrutements », dans son aperçu',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une alerte de mention : le commentaire qui te cite s’affiche en rose pastel jusqu’à ce que tu passes dessus ou que 10 secondes passent, et un « 1 » sur pastille rouge apparaît à côté de la page concernée dans le menu, avec un petit glyphe pour marquer le commentaire « comme non lu » et tout rallumer',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des mentions dans les commentaires : la liste des membres s’ouvre dès le « @ », avec leur portrait et leur division, et les noms à plusieurs mots sont repérés en entier',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des notifications de mention : elles arrivent aussi depuis les commentaires des tâches, des projets et des réunions, avec une bulle « Untel t’a mentionné sur un commentaire ! » à côté de la page',
       },
       {
         tag: ChangelogTags.Added,
