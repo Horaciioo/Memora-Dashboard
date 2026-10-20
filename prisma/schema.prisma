@@ -206,6 +206,7 @@ enum EventVisibility {
   RESPONSABLES
   ADMINS
   TEAM
+  YOUTUBER
 }
 
 // Where a member stands on a roll-call

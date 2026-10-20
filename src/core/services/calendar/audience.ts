@@ -4,6 +4,7 @@ import { prisma } from '@/core/lib/db'
 import { readFlag, readText } from '@/core/lib/forms/values'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
+import { youtuberOptions } from '@/core/services/work/shared'
 import { AUDIENCE_COPY } from '@/declarations/calendar/copy'
 import type { FieldOption, FormValues } from '@/types/forms'
 import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
@@ -14,6 +15,7 @@ import type { Prisma } from '@prisma/client'
 // Form values naming a team or a promotion
 const TEAM_PREFIX = 'team:'
 const SESSION_PREFIX = 'session:'
+const YOUTUBER_PREFIX = 'youtuber:'
 
 /**
  * Audience columns of an entry row
@@ -21,12 +23,14 @@ const SESSION_PREFIX = 'session:'
  * @property {EventVisibilityName | null} visibility - Stored level
  * @property {string | null} audienceTeamId - Team shown to
  * @property {string | null} audienceSessionId - Promotion shown to
+ * @property {string | null} youtuberId - Creator whose whole team it is shown to
  */
 
 interface AudienceColumns {
   visibility: EventVisibilityName | null
   audienceTeamId: string | null
   audienceSessionId: string | null
+  youtuberId: string | null
 }
 
 /**
@@ -36,11 +40,17 @@ interface AudienceColumns {
  */
 
 export const audienceOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
-  const [teams, sessions] = await Promise.all([
+  const [youtubers, teams, sessions] = await Promise.all([
+    youtuberOptions(scope),
     prisma.team.findMany({
       where: scope ? scopedWhere('team', scope, { archived: false }) : { archived: false },
       orderBy: { name: 'asc' },
-      select: { id: true, name: true, youtuberId: true, youtuber: { select: { name: true } } },
+      select: {
+        id: true,
+        name: true,
+        youtuberId: true,
+        youtuber: { select: { name: true, avatarUrl: true } },
+      },
     }),
     prisma.academySession.findMany({
       where: {
@@ -52,11 +62,20 @@ export const audienceOptions = async (scope?: AccessScope): Promise<FieldOption[
   ])
 
   return [
+    // The whole team of the creator comes first, under the whole of Memora
+    ...youtubers.map((youtuber) => ({
+      value: `${YOUTUBER_PREFIX}${youtuber.value}`,
+      label: `${AUDIENCE_COPY.youtuberTeam} ${youtuber.label}`,
+      image: youtuber.image,
+      icon: 'teams',
+      owner: youtuber.value,
+    })),
     ...teams.map((team) => ({
       value: `${TEAM_PREFIX}${team.id}`,
       label: team.name,
       hint: team.youtuber?.name,
       owner: team.youtuberId ?? undefined,
+      image: team.youtuber?.avatarUrl,
       icon: 'teams',
       group: AUDIENCE_COPY.teams,
     })),
@@ -77,6 +96,9 @@ export const audienceOptions = async (scope?: AccessScope): Promise<FieldOption[
  */
 
 export const audienceValue = (row: AudienceColumns): string | null => {
+  if (row.visibility === EventVisibilities.Youtuber) {
+    return row.youtuberId ? `${YOUTUBER_PREFIX}${row.youtuberId}` : EventVisibilities.Everyone
+  }
   if (row.visibility !== EventVisibilities.Team) return row.visibility
   if (row.audienceTeamId) return `${TEAM_PREFIX}${row.audienceTeamId}`
 
@@ -93,16 +115,27 @@ export const parseAudience = (values: FormValues) => {
   const picked = readText(values, 'visibility') ?? null
   const isTeam = picked?.startsWith(TEAM_PREFIX) ?? false
   const isSession = picked?.startsWith(SESSION_PREFIX) ?? false
+  const isYoutuber = picked?.startsWith(YOUTUBER_PREFIX) ?? false
 
   return {
-    visibility: (isTeam || isSession
-      ? EventVisibilities.Team
-      : picked) as EventVisibilityName | null,
+    visibility: (isYoutuber
+      ? EventVisibilities.Youtuber
+      : isTeam || isSession
+        ? EventVisibilities.Team
+        : picked) as EventVisibilityName | null,
     audienceTeamId: isTeam ? picked!.slice(TEAM_PREFIX.length) : null,
     audienceSessionId: isSession ? picked!.slice(SESSION_PREFIX.length) : null,
     audienceLeadsOnly: (isTeam || isSession) && readFlag(values, 'audienceLeadsOnly'),
   }
 }
+
+/**
+ * Whether a visibility pick stands for the whole team of a creator
+ * @param {string} value - Select value
+ * @return {boolean} - True for a creator team
+ */
+
+export const isYoutuberAudience = (value: string): boolean => value.startsWith(YOUTUBER_PREFIX)
 
 // Columns a visibility pick rewrites together
 export const AUDIENCE_KEYS = [

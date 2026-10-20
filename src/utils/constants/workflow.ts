@@ -113,6 +113,7 @@ export const EventVisibilities = {
   Responsables: 'RESPONSABLES',
   Admins: 'ADMINS',
   Team: 'TEAM',
+  Youtuber: 'YOUTUBER',
 } as const
 
 export type EventVisibilityName = (typeof EventVisibilities)[keyof typeof EventVisibilities]

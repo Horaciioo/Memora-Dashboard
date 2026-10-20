@@ -42,6 +42,7 @@ import {
   audienceClauses,
   audienceOptions,
   audienceValue,
+  isYoutuberAudience,
   parseAudience,
 } from '@/core/services/calendar/audience'
 import { workViewerOf } from '@/core/services/work/visibility'
@@ -147,10 +148,18 @@ const templateOptions = async (
 const teamOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
   const rows = await prisma.team.findMany({
     where: scope ? scopedWhere('team', scope, { archived: false }) : { archived: false },
-    orderBy: { name: 'asc' },
+    orderBy: [{ youtuber: { position: 'asc' } }, { name: 'asc' }],
+    include: { youtuber: { select: { name: true, avatarUrl: true } } },
   })
 
-  return rows.map((row) => ({ value: row.id, label: row.name }))
+  // Told apart by the creator they belong to
+  return rows.map((row) => ({
+    value: row.id,
+    label: row.name,
+    group: row.youtuber?.name ?? AUDIENCE_COPY.noYoutuber,
+    image: row.youtuber?.avatarUrl,
+    icon: 'teams',
+  }))
 }
 
 // Roll-call form fields show only once presence is asked for
@@ -207,6 +216,7 @@ export const calendarFields = async (
   const levels = toOptions(EVENT_VISIBILITY_REGISTRY).filter(
     (option) =>
       option.value !== EventVisibilities.Team &&
+      option.value !== EventVisibilities.Youtuber &&
       (viewer?.isAdmin || option.value !== EventVisibilities.Admins)
   )
 
@@ -274,7 +284,13 @@ export const calendarFields = async (
       kind: 'select',
       label: CALENDAR_FIELD_COPY.visibility,
       info: CALENDAR_FIELD_INFO.visibility,
-      options: [...levels, ...audiences],
+      // The whole of Memora, the whole team of the creator, the other levels, then the teams
+      options: [
+        ...levels.slice(0, 1),
+        ...audiences.filter((option) => isYoutuberAudience(option.value)),
+        ...levels.slice(1),
+        ...audiences.filter((option) => !isYoutuberAudience(option.value)),
+      ],
       ownerField: 'youtuberId',
       mark: 'glyph',
       span: 'half',
@@ -286,7 +302,12 @@ export const calendarFields = async (
       label: AUDIENCE_COPY.leadsOnly,
       info: AUDIENCE_COPY.leadsOnlyInfo,
       group: FORM_GROUPS.visibility,
-      visibleWhen: { field: 'visibility', oneOf: audiences.map((option) => option.value) },
+      visibleWhen: {
+        field: 'visibility',
+        oneOf: audiences
+          .filter((option) => !isYoutuberAudience(option.value))
+          .map((option) => option.value),
+      },
     },
     {
       name: 'startsAt',
@@ -356,7 +377,7 @@ export const calendarFields = async (
       label: CALENDAR_FIELD_COPY.teams,
       info: CALENDAR_FIELD_INFO.teams,
       options: teams,
-      mark: 'dot',
+      mark: 'glyph',
       group: FORM_GROUPS.assignment,
       visibleWhen: WHEN_ROLL_CALL,
     },
@@ -598,7 +619,13 @@ export const listEntries = async ({
   await sweepDueReminders()
 
   const levels = allowedVisibilities(access)
-  const audiences = access.isAdmin ? [] : await audienceClauses(viewerId)
+  const audiences = access.isAdmin
+    ? []
+    : [
+        ...(await audienceClauses(viewerId)),
+        // The whole team of a creator reads what is shown to it
+        { visibility: EventVisibilities.Youtuber, youtuberId: { in: scope.youtuberIds } },
+      ]
 
   const rows = await prisma.calendarEvent.findMany({
     where: scopedWhere('calendarEvent', scope, {

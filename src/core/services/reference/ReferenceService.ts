@@ -732,7 +732,8 @@ const eventTemplates: ReferenceResource = {
       label: REFERENCE_FIELD_COPY.visibility,
       required: true,
       options: toOptions(EVENT_VISIBILITY_REGISTRY).filter(
-        (option) => option.value !== EventVisibilities.Team
+        (option) =>
+          option.value !== EventVisibilities.Team && option.value !== EventVisibilities.Youtuber
       ),
       mark: 'glyph',
       span: 'half',
