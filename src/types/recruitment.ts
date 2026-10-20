@@ -192,6 +192,7 @@ export interface ObserverView {
  * @typedef {Object} RecruitmentDetail
  * @property {RecruitmentSummary} summary - Session header
  * @property {string} instructions - Consignes of this session
+ * @property {CommentView[]} comments - Remarks left on the whole session
  * @property {CandidateView[]} candidates - Applicants held
  * @property {RecruitmentStepView[]} steps - Timeline moments
  * @property {string[]} questionKeys - Questions picked for the interviews
@@ -203,6 +204,7 @@ export interface ObserverView {
 export interface RecruitmentDetail {
   summary: RecruitmentSummary
   instructions: string
+  comments: CommentView[]
   candidates: CandidateView[]
   steps: RecruitmentStepView[]
   questionKeys: string[]

@@ -1,5 +1,6 @@
 'use client'
 
+import { CommentThread } from '@/components/structures/data/CommentThread'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { RecordId } from '@/components/elements/display/RecordId'
@@ -15,6 +16,7 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { RECRUITMENT_ENTITY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
 import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
+import { FILE_BOX } from '@/declarations/ui/variants'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { formatDayTime } from '@/utils/format/dates'
 
@@ -28,7 +30,7 @@ const portraits = (list: { id: string; name: string; src?: string | null }[]) =>
  */
 
 export const OverviewTab = () => {
-  const { detail, fields, can } = useRecruitmentState()
+  const { detail, file, fields, can } = useRecruitmentState()
   const { summary } = detail
   const record = useRecordFile({
     path: API_ROUTES.recruitment(summary.id),
@@ -134,6 +136,20 @@ export const OverviewTab = () => {
         maxLength: fieldFor('summary').maxLength,
         onCommit: (next) => record.saveField('summary', next.trim() === '' ? null : next),
       }}
-    />
+    >
+      <div className={FILE_BOX.stack}>
+        <CommentThread
+          comments={file.comments}
+          fields={fields.comment}
+          issues={file.issues}
+          isSaving={file.isSaving}
+          canWrite={can.writeCandidates}
+          label={summary.name}
+          onOpen={file.clearIssues}
+          onAdd={file.addSessionComment}
+          onRemove={file.removeSessionComment}
+        />
+      </div>
+    </FileOverview>
   )
 }
