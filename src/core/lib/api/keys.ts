@@ -5,6 +5,7 @@
 
 export const QUERY_KEYS = {
   search: (term: string) => ['search', term] as const,
+  mentionable: (term: string) => ['mentionable', term] as const,
   notifications: (size: number) => ['notifications', size] as const,
   calendar: (from: string, to: string, sessionId?: string) =>
     ['calendar', from, to, sessionId ?? null] as const,

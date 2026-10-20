@@ -6,13 +6,14 @@ import type { KeyboardEvent } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { Textarea } from '@/components/elements/forms/inputs/Textarea'
-import { useSearch } from '@/core/hooks/data/system/useSearch'
+import { useMentionable } from '@/core/hooks/data/system/useMentionable'
 import { ACTION_COPY, COMMENT_COPY } from '@/declarations/ui/copy'
 import { COMMENT_COMPOSER } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+import { formatMention } from '@/utils/format/mentions'
 
-// Handle being typed right before the caret
-const QUERY_PATTERN = /(^|\s)@([\p{L}\p{N}._-]*)$/u
+// Handle being typed right before the caret, a bare at sign included, up to two words
+const QUERY_PATTERN = /(^|\s)@([\p{L}\p{N}._-]*(?:\s[\p{L}\p{N}._-]*)?)$/u
 
 export interface CommentComposerProps {
   maxLength?: number
@@ -45,8 +46,10 @@ export const CommentComposer = ({
   const [query, setQuery] = useState<{ text: string; start: number } | null>(null)
   const [active, setActive] = useState(0)
 
-  const { sections } = useSearch(query?.text ?? '')
-  const matches = (query ? sections.find((section) => section.group === 'members')?.hits : []) ?? []
+  const matches = useMentionable(query ? query.text : null)
+
+  // A second word that names nobody is plain prose
+  const isOpen = query !== null && (matches.length > 0 || !query.text.includes(' '))
 
   const readQuery = (text: string, caret: number) => {
     const match = QUERY_PATTERN.exec(text.slice(0, caret))
@@ -61,11 +64,11 @@ export const CommentComposer = ({
     if (!node || !query) return
 
     const caret = node.selectionStart
-    const next = `${body.slice(0, query.start)}@${name} ${body.slice(caret)}`
-    setBody(next)
+    const handle = formatMention(name)
+    setBody(`${body.slice(0, query.start)}${handle} ${body.slice(caret)}`)
     setQuery(null)
 
-    const position = query.start + name.length + 2
+    const position = query.start + handle.length + 1
     requestAnimationFrame(() => {
       node.focus()
       node.setSelectionRange(position, position)
@@ -78,7 +81,7 @@ export const CommentComposer = ({
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (query && matches.length > 0) {
+    if (isOpen && matches.length > 0) {
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         event.preventDefault()
         const step = event.key === 'ArrowDown' ? 1 : -1
@@ -88,14 +91,14 @@ export const CommentComposer = ({
       if (event.key === 'Enter' || event.key === 'Tab') {
         event.preventDefault()
         const hit = matches[active]
-        if (hit) pick(hit.label)
+        if (hit) pick(hit.name)
         return
       }
     }
 
     if (event.key === 'Escape') {
       event.stopPropagation()
-      if (query) setQuery(null)
+      if (isOpen) setQuery(null)
       else onCancel()
     }
     if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
@@ -106,7 +109,7 @@ export const CommentComposer = ({
 
   return (
     <div className={COMMENT_COMPOSER.wrapper}>
-      {query && query.text.length > 0 && (
+      {isOpen && (
         <div className={COMMENT_COMPOSER.popover} role="listbox">
           {matches.length === 0 ? (
             <p className={COMMENT_COMPOSER.empty}>{COMMENT_COPY.noMention}</p>
@@ -124,11 +127,12 @@ export const CommentComposer = ({
                 onMouseEnter={() => setActive(index)}
                 onMouseDown={(event) => {
                   event.preventDefault()
-                  pick(hit.label)
+                  pick(hit.name)
                 }}
               >
-                <Avatar name={hit.label} src={null} size="xs" />
-                {hit.label}
+                <Avatar name={hit.name} src={hit.image} size="xs" />
+                <span className="truncate">{hit.name}</span>
+                {hit.hint && <span className={COMMENT_COMPOSER.itemHint}>{hit.hint}</span>}
               </button>
             ))
           )}

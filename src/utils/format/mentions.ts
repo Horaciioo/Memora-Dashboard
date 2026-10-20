@@ -1,5 +1,8 @@
-// Handle written as an at sign followed by one or two words of a display name
-const HANDLE_PATTERN = /@([\p{L}\p{N}._-]+(?:\s+[\p{L}\p{N}._-]+)?)/gu
+// Handle as the composer writes it: bracketed whole name, or a one word name
+const HANDLE_PATTERN = /@(?:\[([^\]\n]+)\]|([\p{L}\p{N}._-]+(?:\s+[\p{L}\p{N}._-]+)?))/gu
+
+// Name made of a single word
+const SINGLE_WORD_PATTERN = /^[\p{L}\p{N}._-]+$/u
 
 // Member tag as Discord stores it
 const MEMBER_TAG_PATTERN = /<@!?(\d+)>/g
@@ -16,8 +19,17 @@ export interface Mentions {
   discordIds: string[]
 }
 
-// Handle as it is lit up when read, the first word of the name
-const LIT_PATTERN = /(@[\p{L}\p{N}._-]+)/gu
+// Handle as it is lit up when read
+const LIT_PATTERN = /(@\[[^\]\n]+\]|@[\p{L}\p{N}._-]+)/gu
+
+/**
+ * Write a member the way the readers find them back
+ * @param {string} name - Display name
+ * @return {string} - Handle, bracketed when the name holds several words
+ */
+
+export const formatMention = (name: string): string =>
+  SINGLE_WORD_PATTERN.test(name) ? `@${name}` : `@[${name}]`
 
 /**
  * Piece of a text, lit when it names someone
@@ -41,7 +53,12 @@ export const splitMentions = (body: string): MentionPiece[] =>
   body
     .split(LIT_PATTERN)
     .filter((text) => text.length > 0)
-    .map((text) => ({ text, isMention: text.startsWith('@') && text.length > 1 }))
+    .map((text) => {
+      const isMention = text.startsWith('@') && text.length > 1
+
+      // Brackets only delimit the name
+      return { text: isMention ? text.replace(/^@\[(.*)\]$/, '@$1') : text, isMention }
+    })
 
 /**
  * Collect the members a text names
@@ -62,12 +79,18 @@ export const readMentions = (body: string, limit: number): Mentions => {
 
   const handles = new Set<string>()
 
-  for (const [, handle] of plain.matchAll(HANDLE_PATTERN)) {
-    handles.add(handle!)
+  for (const [, whole, loose] of plain.matchAll(HANDLE_PATTERN)) {
+    // A bracketed name is exact
+    if (whole) {
+      handles.add(whole.trim())
+      continue
+    }
+
+    handles.add(loose!)
 
     // A two word handle also stands for the first word alone
-    const [first] = handle!.split(/\s+/)
-    if (first && first !== handle) handles.add(first)
+    const [first] = loose!.split(/\s+/)
+    if (first && first !== loose) handles.add(first)
   }
 
   return { handles: [...handles].slice(0, limit), discordIds: [...discordIds].slice(0, limit) }
