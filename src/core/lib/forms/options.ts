@@ -36,6 +36,7 @@ export const rowsToOptions = (
     name: string
     accent?: string | null
     avatarUrl?: string | null
+    bannerUrl?: string | null
     icon?: string | null
   }[]
 ): FieldOption[] =>
@@ -44,6 +45,7 @@ export const rowsToOptions = (
     label: row.name,
     accent: row.accent ?? undefined,
     image: row.avatarUrl ?? undefined,
+    banner: row.bannerUrl ?? undefined,
     icon: row.icon ?? undefined,
   }))
 

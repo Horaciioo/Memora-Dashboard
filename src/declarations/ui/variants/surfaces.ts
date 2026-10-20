@@ -44,6 +44,9 @@ export const PAGE_STYLES = {
   bannerFoot:
     'absolute inset-x-0 bottom-0 flex flex-col gap-1.5 px-5 pb-3 text-[var(--color-on-media)] sm:px-8 sm:pb-7',
   bannerTitleRow: 'flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 md:flex-nowrap',
+  // Portrait standing before the title
+  bannerLead:
+    'shrink-0 shadow-[var(--shadow-md)] ring-4 ring-[var(--color-on-media)] !size-14 md:!size-20 xl:!size-28',
   // Letters fade out towards their foot
   bannerTitle:
     'min-w-0 bg-gradient-to-b from-[var(--color-on-media)] from-20% to-[color-mix(in_srgb,var(--color-on-media)_2%,transparent)] to-100% bg-clip-text py-[0.2em] -my-[0.2em] pr-4 text-[clamp(1.5rem,8vw,2.25rem)] leading-none font-bold tracking-tight text-transparent uppercase italic sm:text-5xl md:text-6xl xl:text-8xl',

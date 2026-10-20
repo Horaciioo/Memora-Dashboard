@@ -15,6 +15,8 @@ export interface PageBannerProps {
   heroDescription?: string
   // Picture replacing the area's own
   image?: string | null
+  // Portrait standing before the title
+  lead?: ReactNode
   // Small line under the title
   children?: ReactNode
 }
@@ -26,6 +28,7 @@ export interface PageBannerProps {
  * @param {boolean} [isLabel] - The title names the area
  * @param {string} [heroDescription] - Faint line under the title
  * @param {string | null} [image] - Picture replacing the area's own
+ * @param {ReactNode} [lead] - Portrait before the title
  * @param {ReactNode} [children] - Line under the title
  * @return {JSX.Element}
  */
@@ -35,6 +38,7 @@ export const PageBanner = ({
   isLabel,
   heroDescription,
   image,
+  lead,
   children,
 }: PageBannerProps) => {
   const Title = isLabel ? 'p' : 'h1'
@@ -52,6 +56,7 @@ export const PageBanner = ({
         </div>
         <div className={PAGE_STYLES.bannerFoot}>
           <div className={PAGE_STYLES.bannerTitleRow}>
+            {lead}
             <Title className={PAGE_STYLES.bannerTitle} title={title}>
               <span className={PAGE_STYLES.bannerTitleText}>{title}</span>
             </Title>

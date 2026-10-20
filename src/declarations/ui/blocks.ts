@@ -470,6 +470,7 @@ export const TWO_FACTOR_BLOCK = {
 
 export const LEAD_BLOCK = {
   panel: 'flex flex-col gap-4',
+  row: 'flex min-w-0 items-center gap-3',
   name: 'min-w-0 flex-1 truncate text-sm font-medium',
   note: 'text-xs text-[var(--color-ink-subtle)]',
 } as const
@@ -856,8 +857,67 @@ export const SPLASH = {
  */
 
 export const SIMULATION_BLOCK = {
-  pill: 'pointer-events-auto fixed bottom-4 left-1/2 z-50 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-3 rounded-full border border-[var(--view)]/40 bg-[var(--color-surface)] py-1.5 pr-1.5 pl-4 text-xs shadow-lg',
-  text: 'min-w-0 truncate text-[var(--color-ink)]',
+  fold: 'grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-[var(--motion-duration-slow)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  foldOpen:
+    'grid grid-rows-[1fr] opacity-100 transition-[grid-template-rows,opacity] duration-[var(--motion-duration-slow)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  clip: 'min-h-0 overflow-hidden',
+  pill: 'mb-2 flex flex-col gap-2 rounded-xl border border-[var(--view)]/40 bg-[var(--view)]/10 p-3 text-xs',
+  text: 'text-[var(--color-ink)]',
   leave:
-    'shrink-0 rounded-full bg-[var(--view)]/15 px-3 py-1 font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--view)]/25 disabled:opacity-50',
+    'self-start rounded-full bg-[var(--view)]/20 px-3 py-1 font-semibold text-[var(--color-ink)] transition-colors hover:bg-[var(--view)]/30 disabled:opacity-50',
 }
+
+/**
+ * Creator file, identity box beside the teams
+ * @type {Record<string, string>}
+ */
+
+export const CREATOR_FILE = {
+  root: 'flex flex-col gap-6',
+  grid: 'grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-3',
+  column: 'flex flex-col gap-3',
+  railHead:
+    'relative isolate flex items-center gap-4 overflow-hidden bg-[var(--color-media-shade)] p-4 text-[var(--color-on-media)] md:p-5',
+  railBody: 'flex flex-col gap-6 p-4 md:p-5',
+  railPortrait: 'shrink-0 shadow-[var(--shadow-lg)] ring-4 ring-[var(--color-on-media)]',
+  railName: 'min-w-0 text-xl font-bold tracking-tight break-words',
+  box: 'flex min-w-0 flex-col rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface shadow-[var(--shadow-sm)]',
+  boxHead:
+    'flex w-full min-w-0 cursor-pointer items-center gap-3 rounded-[var(--radius-xl)] p-3 text-left transition-colors hover:bg-[var(--color-hover)]',
+  boxName: 'min-w-0 flex-1 truncate text-sm font-semibold text-[var(--color-ink)]',
+  boxMeta: 'truncate text-xs text-[var(--color-ink-subtle)]',
+  boxMetaEmpty: 'truncate text-xs text-[var(--color-ink-subtle)] italic',
+  chevron: 'size-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform',
+  chevronOpen: 'rotate-180',
+  fold: 'grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-[var(--motion-duration-slow)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  foldOpen:
+    'grid grid-rows-[1fr] opacity-100 transition-[grid-template-rows,opacity] duration-[var(--motion-duration-slow)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  foldClip: 'min-h-0 overflow-hidden',
+  foldBody: 'flex flex-col gap-2 px-3 pb-3',
+  stack: 'flex flex-col gap-4',
+  empty: 'text-sm text-[var(--color-ink-subtle)] italic',
+}
+
+/**
+ * Creator group of the moderator list: a wide banner, then the box of its moderators
+ * @type {Record<string, string>}
+ */
+
+export const CREATOR_GROUP = {
+  root: 'flex flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] shadow-[var(--shadow-md)]',
+  banner:
+    'relative isolate flex min-h-24 w-full cursor-pointer items-center gap-4 overflow-hidden bg-[var(--color-media-shade)] px-4 py-3 text-left text-[var(--color-on-media)] sm:px-6',
+  portrait: 'shrink-0 shadow-[var(--shadow-lg)] ring-2 ring-[var(--color-on-media)]',
+  name: 'min-w-0 flex-1 truncate text-xl font-bold tracking-tight sm:text-2xl',
+  chevron:
+    'size-5 shrink-0 transition-transform duration-[var(--motion-duration-slow)] ease-[var(--motion-ease-out)]',
+  chevronOpen: 'rotate-180',
+  // Rows slide, the content fades and settles a beat later
+  fold: 'grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
+  foldOpen:
+    'grid grid-rows-[1fr] transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
+  foldClip: 'min-h-0 overflow-hidden',
+  box: 'card-surface p-4 opacity-0 -translate-y-3 transition-[opacity,translate] duration-300 ease-out motion-reduce:transition-none sm:p-5',
+  boxOpen:
+    'card-surface p-4 opacity-100 translate-y-0 transition-[opacity,translate] delay-100 duration-400 ease-out motion-reduce:transition-none sm:p-5',
+} as const

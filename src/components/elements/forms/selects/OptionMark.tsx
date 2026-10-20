@@ -3,7 +3,7 @@ import { CountryFlag } from '@/components/elements/display/marks/CountryFlag'
 import { DivisionLogo } from '@/components/elements/display/marks/DivisionLogo'
 import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/marks/NetworkLogo'
 import { ROLE_EMBLEMS } from '@/declarations/members/profiles'
-import { PRIORITY_GLYPH } from '@/declarations/ui/copy'
+import { FIXED_PRIORITIES } from '@/declarations/reference/fixed'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { ACCENT_STYLES, TONES, accentVars, toTone } from '@/declarations/ui/theme'
 import { OPTION_MARK_STYLES } from '@/declarations/ui/variants'
@@ -12,6 +12,47 @@ import type { FieldOption, OptionMark as OptionMarkKind } from '@/types/forms'
 import { cn } from '@/utils/classnames'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { isHexColour } from '@/utils/format/colour'
+
+// Bars drawn, rising left to right
+const PRIORITY_BARS = [6, 10, 14] as const
+// Strength of each bar's tone
+const PRIORITY_TONES = [0.5, 0.75, 1] as const
+
+/**
+ * Bars lit for a priority, the heaviest ones all three
+ * @param {string} label - Priority name
+ * @return {number} - Lit bars
+ */
+
+const litBars = (label: string): number =>
+  Math.min(
+    PRIORITY_BARS.length,
+    FIXED_PRIORITIES.find((priority) => priority.name === label)?.weight ?? 1
+  )
+
+/**
+ * Three bars rising like a signal, lit up to the priority
+ * @param {number} lit - Bars lit
+ * @return {JSX.Element}
+ */
+
+const PriorityBars = ({ lit }: { lit: number }) => (
+  <svg viewBox="0 0 16 16" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+    {PRIORITY_BARS.map((height, index) => (
+      <rect
+        key={height}
+        x={1.5 + index * 5}
+        y={15 - height}
+        width={3.5}
+        height={height}
+        rx={1}
+        // Three tones of the accent, the unlit bars stay grey
+        fill={index < lit ? undefined : 'var(--color-border-strong)'}
+        opacity={index < lit ? PRIORITY_TONES[index] : 1}
+      />
+    ))}
+  </svg>
+)
 
 export interface OptionMarkProps {
   mark: OptionMarkKind
@@ -99,7 +140,7 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
       style={picked ? accentVars(option.accent, 'warning') : undefined}
       aria-hidden="true"
     >
-      {PRIORITY_GLYPH}
+      <PriorityBars lit={litBars(option.label)} />
     </span>
   )
 }

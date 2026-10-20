@@ -11,6 +11,8 @@ export interface PageHeaderProps {
   heroDescription?: string
   // Picture replacing the area's own
   image?: string | null
+  // Portrait standing before the title
+  lead?: ReactNode
   // Small line under the title
   note?: ReactNode
   actions?: ReactNode
@@ -22,6 +24,7 @@ export interface PageHeaderProps {
  * @param {string} title - Page title
  * @param {string} [heroDescription] - Faint line under the title
  * @param {string | null} [image] - Picture replacing the area's own
+ * @param {ReactNode} [lead] - Portrait before the title
  * @param {ReactNode} [note] - Line under the title
  * @param {ReactNode} [actions] - Controls aligned to the right
  * @return {JSX.Element}
@@ -32,12 +35,13 @@ export const PageHeader = ({
   title,
   heroDescription,
   image,
+  lead,
   note,
   actions,
 }: PageHeaderProps) => (
   <header className={PAGE_STYLES.header}>
     <BreadcrumbLabel label={title} />
-    <PageBanner title={title} heroDescription={heroDescription} image={image}>
+    <PageBanner title={title} heroDescription={heroDescription} image={image} lead={lead}>
       {note && <div className={PAGE_STYLES.bannerNote}>{note}</div>}
     </PageBanner>
     {(eyebrow || actions) && (

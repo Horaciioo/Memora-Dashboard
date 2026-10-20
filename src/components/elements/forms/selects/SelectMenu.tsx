@@ -30,6 +30,8 @@ export interface SelectMenuProps {
   emptyLabel?: string
   placeholder?: string
   mark?: OptionMarkKind
+  // Trigger shows the glyph alone
+  isMarkOnly?: boolean
   // Link pinned above the options
   action?: Omit<FieldAction, 'permission'>
   size?: SelectMenuSize
@@ -55,6 +57,7 @@ const SEARCH_THRESHOLD = 8
  * @param {string} [emptyLabel] - Label of the clearing entry
  * @param {string} [placeholder] - Text shown while nothing is chosen
  * @param {OptionMarkKind} [mark] - Glyph drawn beside every option
+ * @param {boolean} [isMarkOnly] - Trigger shows the glyph alone
  * @param {FieldAction} [action] - Link above the options
  * @param {SelectMenuSize} [size] - Size token
  * @param {boolean} [disabled] - Blocks the control
@@ -73,6 +76,7 @@ export const SelectMenu = ({
   emptyLabel,
   placeholder,
   mark,
+  isMarkOnly,
   action,
   size = 'block',
   disabled,
@@ -180,7 +184,8 @@ export const SelectMenu = ({
       aria-haspopup="listbox"
       aria-controls={listId}
       aria-expanded={isOpen}
-      aria-label={label}
+      aria-label={isMarkOnly && selected ? `${label} : ${selected.label}` : label}
+      title={isMarkOnly ? selected?.label : undefined}
       aria-describedby={describedBy}
       aria-invalid={invalid || undefined}
       onClick={() => (isOpen ? setOpen(false) : open())}
@@ -201,7 +206,9 @@ export const SelectMenu = ({
         {selected ? (
           <>
             {mark && <OptionMark mark={mark} option={selected} size={markSize} />}
-            <span className={SELECT_MENU_STYLES.optionLabel}>{selected.label}</span>
+            {!isMarkOnly && (
+              <span className={SELECT_MENU_STYLES.optionLabel}>{selected.label}</span>
+            )}
           </>
         ) : (
           <span className={SELECT_MENU_STYLES.placeholder}>
