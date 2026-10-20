@@ -1,8 +1,8 @@
-import type { TextareaHTMLAttributes } from 'react'
+import type { ComponentProps } from 'react'
 import { FIELD_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
-export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextareaProps extends ComponentProps<'textarea'> {
   invalid?: boolean
 }
 

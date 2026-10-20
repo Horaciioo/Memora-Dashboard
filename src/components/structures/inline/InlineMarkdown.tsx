@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { FocusEvent, KeyboardEvent } from 'react'
 import { Markdown } from '@/components/elements/display/Markdown'
 import { MarkdownEditor } from '@/components/elements/forms/MarkdownEditor'
@@ -39,6 +39,7 @@ export const InlineMarkdown = ({
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(value)
   const [pending, setPending] = useState(false)
+  const saving = useRef(false)
 
   const start = () => {
     if (disabled) return
@@ -53,10 +54,16 @@ export const InlineMarkdown = ({
       return
     }
 
+    // One request per edit
+    if (saving.current) return
+    saving.current = true
     setPending(true)
-    const ok = await onCommit(draft)
-    setPending(false)
-    if (ok) setEditing(false)
+    try {
+      if (await onCommit(draft)) setEditing(false)
+    } finally {
+      saving.current = false
+      setPending(false)
+    }
   }
 
   // Blur outside the editor saves

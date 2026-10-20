@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { INLINE_EDIT_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -39,6 +39,7 @@ export const InlineText = ({
 }: InlineTextProps) => {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(value)
+  const saving = useRef(false)
 
   const start = () => {
     if (disabled) return
@@ -47,8 +48,17 @@ export const InlineText = ({
   }
 
   const commit = async () => {
+    // One request per edit
+    if (saving.current) return
     const next = draft.trim()
-    if (next && next !== value) await onCommit(next)
+    if (next && next !== value) {
+      saving.current = true
+      try {
+        await onCommit(next)
+      } finally {
+        saving.current = false
+      }
+    }
     setEditing(false)
   }
 

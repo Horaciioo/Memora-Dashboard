@@ -3,18 +3,17 @@
 import { Dotted } from '@/components/elements/display/Dotted'
 import { useState } from 'react'
 
+import { CommentComposer } from '@/components/structures/data/CommentComposer'
+import { Markdown } from '@/components/elements/display/Markdown'
 import { AddRow } from '@/components/structures/inline/AddRow'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
-import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { Section } from '@/components/structures/page/Section'
 import { ACTION_COPY, COMMENT_COPY } from '@/declarations/ui/copy'
-import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { COMMENT_THREAD } from '@/declarations/ui/variants'
 import { useMenu } from '@/managers/front-end'
 import type { CommentView } from '@/types/comments'
 import type { FieldDefinition, FieldIssue, FormValues } from '@/types/forms'
 import { formatDayTime } from '@/utils/format/dates'
-import { splitMentions } from '@/utils/format/mentions'
 
 export interface CommentThreadProps {
   comments: CommentView[]
@@ -31,7 +30,7 @@ export interface CommentThreadProps {
 }
 
 /**
- * Remarks left on a record, written in a drawer and removed with a right click
+ * Remarks left on a record, written in a plain area opened in place and removed with a right click
  * @param {CommentThreadProps} props - Remarks and their mutations
  * @return {JSX.Element}
  */
@@ -75,39 +74,33 @@ export const CommentThread = ({
             <span className={COMMENT_THREAD.meta}>
               <Dotted items={[comment.authorName, formatDayTime(comment.createdAt)]} />
             </span>
-            <p className={COMMENT_THREAD.body}>
-              {splitMentions(comment.body).map((piece, index) =>
-                piece.isMention ? (
-                  <mark key={index} className={COMMENT_THREAD.mention}>
-                    {piece.text}
-                  </mark>
-                ) : (
-                  piece.text
-                )
-              )}
-            </p>
+            <Markdown source={comment.body} mentions className={COMMENT_THREAD.body} />
           </article>
         ))}
-        <AddRow
-          label={COMMENT_COPY.add}
-          disabled={!canWrite}
-          onClick={() => {
-            onOpen()
-            setAdding(true)
-          }}
-        />
-      </div>
+        {isAdding ? (
+          <CommentComposer
+            maxLength={fields.find((field) => field.name === 'body')?.maxLength}
+            isSaving={isSaving}
+            error={issues.find((issue) => issue.field === 'body')?.message}
+            onSubmit={async (body) => {
+              const added = await onAdd({ body })
+              if (added) setAdding(false)
 
-      <FormDrawer
-        subject={FORM_SUBJECTS.comment}
-        open={isAdding}
-        title={COMMENT_COPY.add}
-        fields={fields}
-        issues={issues}
-        isSaving={isSaving}
-        onSubmit={onAdd}
-        onClose={() => setAdding(false)}
-      />
+              return added
+            }}
+            onCancel={() => setAdding(false)}
+          />
+        ) : (
+          <AddRow
+            label={COMMENT_COPY.add}
+            disabled={!canWrite}
+            onClick={() => {
+              onOpen()
+              setAdding(true)
+            }}
+          />
+        )}
+      </div>
 
       <ConfirmDialog
         open={pending !== null}

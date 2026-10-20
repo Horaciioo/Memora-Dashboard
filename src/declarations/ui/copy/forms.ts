@@ -168,12 +168,6 @@ export const EMOJI_COPY = {
   suggestions: 'Fréquents',
 } as const
 
-/**
- * Glyph Fields
- * @type {string}
- */
-
-export const PRIORITY_GLYPH = '!!'
 
 /**
  * Category labels

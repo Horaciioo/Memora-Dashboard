@@ -1,6 +1,7 @@
 'use client'
 
 import { useId, useState } from 'react'
+import type { ReactNode } from 'react'
 import { Glyph } from '@/components/elements/display/glyphs/Glyph'
 import { EmojiPicker } from '@/components/elements/forms/pickers/EmojiPicker'
 import { EMOJI_COPY } from '@/declarations/ui/copy'
@@ -11,6 +12,8 @@ export interface EditableHeadingProps {
   value: string
   // Emoji of the record
   glyph?: string | null
+  // Replaces the emoji
+  lead?: ReactNode
   disabled: boolean
   onCommit: (value: string) => Promise<boolean>
   // Persists a picked glyph
@@ -20,6 +23,7 @@ export interface EditableHeadingProps {
 /**
  * Page title that swaps for an input on click
  * @param {string} value - Current title
+ * @param {ReactNode} [lead] - Stands in for the emoji
  * @param {string | null} [glyph] - Emoji of the record
  * @param {boolean} disabled - Blocks editing
  * @param {(value: string) => Promise<boolean>} onCommit - Persists the new title
@@ -30,6 +34,7 @@ export interface EditableHeadingProps {
 export const EditableHeading = ({
   value,
   glyph,
+  lead,
   disabled,
   onCommit,
   onGlyphCommit,
@@ -52,7 +57,9 @@ export const EditableHeading = ({
 
   return (
     <div className={PAGE_STYLES.heading}>
-      {onGlyphCommit && !disabled ? (
+      {lead ? (
+        lead
+      ) : onGlyphCommit && !disabled ? (
         <EmojiPicker
           id={pickerId}
           label={EMOJI_COPY.choose}
