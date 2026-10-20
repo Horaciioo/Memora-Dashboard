@@ -15,14 +15,13 @@ const ANSWERS: AttendanceStatusName[] = [AttendanceStatuses.Present, AttendanceS
 export const POST = createProtectedRoute({
   permission: Permissions.CalendarRead,
   descriptor: { summary: 'Answer a roll-call', tags: ['calendar'] },
-  handler: async ({ params, raw, session, access, scope }) => {
+  handler: async ({ params, raw, session, access }) => {
     const status = raw.status
     if (typeof status !== 'string' || !ANSWERS.includes(status as AttendanceStatusName)) {
       throw invalidInput([{ field: 'status', message: FORM_COPY.required }])
     }
 
-    await assertRowInScope('calendarEvent', params.id, await scope())
-
+    // The convened row authorises the answer, the perimeter does not apply
     return respondToRollCall({
       eventId: params.id,
       accountId: session.id,
