@@ -73,10 +73,14 @@ export const FUNCTION_TINTS: Partial<Record<string, FrameTone>> = {
   functionDiscord: 'DISCORD',
   functionLive: 'LIVE',
   functionAnimator: 'ANIMATOR',
+  functionJuniorDiscord: 'DISCORD_JUNIOR',
+  functionJuniorLive: 'LIVE_JUNIOR',
+  functionJuniorAnimator: 'ANIMATOR_JUNIOR',
+  functionJuniorLead: 'RESPONSABLE_JUNIOR',
 }
 
 /**
- * Paler tone worn by juniors
+ * Cord tone worn by juniors
  * @type {Partial<Record<FrameTone, FrameTone>>}
  */
 
@@ -102,7 +106,9 @@ export const roleTone = (member: MemberSummary): FrameTone => {
   )
   const tone = (lending?.icon && FUNCTION_TINTS[lending.icon]) || emblem.tone
 
-  return member.role === MemberRoles.Junior ? (JUNIOR_TONES[tone] ?? tone) : tone
+  if (member.role !== MemberRoles.Junior) return tone
+
+  return JUNIOR_TONES[tone] ?? tone
 }
 
 /**

@@ -43,6 +43,17 @@ const ACCESS_CATEGORY_MAP: Record<AccessCategoryName, AccessCategoryOption> = {
     tier: MemberRoles.Moderateur,
     role: MemberRoles.Moderateur,
   },
+  [AccessCategories.Junior]: {
+    label: 'Juniors',
+    position: 4,
+    tier: MemberRoles.Junior,
+    role: MemberRoles.Junior,
+  },
+  [AccessCategories.JuniorResponsable]: {
+    label: 'Juniors responsables',
+    position: 5,
+    tier: MemberRoles.Junior,
+  },
 }
 
 export const ACCESS_CATEGORY_REGISTRY = createRegistry(ACCESS_CATEGORY_MAP)
