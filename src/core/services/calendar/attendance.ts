@@ -10,7 +10,7 @@ import { notify } from '@/core/services/system/NotificationService'
 import { peopleInScope } from '@/core/services/work/shared'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import type { AttendanceHours, AttendancePerson, AttendanceRoster } from '@/types/calendar'
-import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES, LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
@@ -23,7 +23,7 @@ const NOTIFY = {
 
 // Row shape every roster reader maps from
 type AttendanceRow = Prisma.EventAttendanceGetPayload<{
-  include: { account: { select: { displayName: true; avatarUrl: true } } }
+  include: { account: { select: { displayName: true; avatarUrl: true; role: true } } }
 }>
 
 /**
@@ -57,6 +57,7 @@ export const expandRoster = async (
     where: {
       id: { in: candidates },
       status: { notIn: GONE_MEMBER_STATUSES },
+      role: { notIn: LEADERSHIP_ROLES },
       ...peopleInScope(scope),
     },
     select: { id: true },
@@ -176,17 +177,19 @@ export const buildRoster = ({
   reinforced: Set<string>
 }): AttendanceRoster => {
   const mineRow = rows.find((row) => row.accountId === viewerId)
+  // Leadership never shows on the roll-call
+  const listed = rows.filter((row) => !LEADERSHIP_ROLES.includes(row.account.role))
   const mine = (mineRow?.status as AttendanceStatusName | undefined) ?? null
   // Only the Responsables and above read who answered what
   const visible = canManage
 
   const bucket = (status: AttendanceStatusName): AttendancePerson[] =>
     visible
-      ? rows.filter((row) => row.status === status).map((row) => toPerson(row, reinforced))
+      ? listed.filter((row) => row.status === status).map((row) => toPerson(row, reinforced))
       : []
 
   const countOf = (status: AttendanceStatusName): number =>
-    rows.filter((row) => row.status === status).length
+    listed.filter((row) => row.status === status).length
 
   return {
     mine,
@@ -220,7 +223,7 @@ export const readRosterFor = async (
 ): Promise<AttendanceRoster> => {
   const rows = await prisma.eventAttendance.findMany({
     where: { eventId },
-    include: { account: { select: { displayName: true, avatarUrl: true } } },
+    include: { account: { select: { displayName: true, avatarUrl: true, role: true } } },
   })
 
   const asking = await eventsAskingHours([eventId])
