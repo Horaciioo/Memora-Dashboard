@@ -12,7 +12,6 @@ import { LeftSidebar } from '@/composites/shell/LeftSidebar'
 import { MobileTopBar } from '@/composites/shell/MobileTopBar'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
-import { SimulationBanner } from '@/composites/shell/SimulationBanner'
 import { frameToneOf } from '@/declarations/access/views'
 import { beaconProps } from '@/declarations/ui/beacons'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
@@ -120,7 +119,6 @@ const AppShellFrame = ({
         </div>
 
         <SealDialog />
-        <SimulationBanner viewContext={viewContext} />
         {session && <NudgeHost />}
         {session && <TourHost />}
         {session && can(Permissions.LiveRead) && <LiveSignalListener />}

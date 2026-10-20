@@ -9,6 +9,7 @@ import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { RailNav } from '@/composites/shell/RailNav'
 import { RailShortcuts } from '@/composites/shell/RailShortcuts'
 import { RoleSwitch } from '@/composites/shell/RoleSwitch'
+import { SimulationBanner } from '@/composites/shell/SimulationBanner'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
 import { ROUTES } from '@/declarations/navigation'
 import { NAV_SHEET, SEARCH_LAUNCHER } from '@/declarations/ui/blocks'
@@ -83,6 +84,7 @@ export const NavSheet = ({
       >
         {viewContext.switchable && (
           <div className={NAV_SHEET.switch}>
+            <SimulationBanner viewContext={viewContext} />
             <RoleSwitch viewContext={viewContext} />
           </div>
         )}
