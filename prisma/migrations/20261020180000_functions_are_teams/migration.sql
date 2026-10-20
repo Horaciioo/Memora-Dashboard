@@ -1,3 +1,13 @@
+-- The fixed functions keep the category and the kind the code gives them, whatever a database still holds
+UPDATE "job_functions" SET "category" = 'MODERATION', "kind" = 'PRIMARY'
+WHERE "name" IN ('Discord', 'Lives', 'Animateurs');
+UPDATE "job_functions" SET "category" = 'MODERATION', "kind" = 'SECONDARY'
+WHERE "name" IN ('Recruteurs', 'Formateurs', 'Observateurs');
+UPDATE "job_functions" SET "category" = 'JUNIOR', "kind" = 'PRIMARY'
+WHERE "name" IN ('Junior Discord', 'Junior Lives', 'Junior Animateurs');
+UPDATE "job_functions" SET "category" = 'JUNIOR_RESPONSABLE', "kind" = 'PRIMARY'
+WHERE "name" IN ('Junior Responsable Discord', 'Junior Responsable Lives', 'Junior Responsable Animateurs');
+
 -- Every creator opens every function, and each function that makes a team has its team switched on
 INSERT INTO "youtuber_functions" ("id", "youtuberId", "functionId", "position", "createdAt")
 SELECT 'yf-' || md5(y."id" || f."id"), y."id", f."id", f."position", NOW()
