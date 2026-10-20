@@ -203,6 +203,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Fixed,
         page: ROUTES.calendar,
+        permission: Permissions.CalendarManage,
+        text: 'Correction d’un bug où un Modérateur pouvait créer n’importe quel évènement dans le « Calendrier » : seuls les Responsables le peuvent, un Formateur se limitant aux entretiens et aux bilans de ses Juniors, sur ses propres évènements',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
         permission: Permissions.CalendarRead,
         text: 'Correction d’un bug où un évènement « Toute la journée » s’enregistrait sur quelques heures, comme 5h à 7h, au lieu de couvrir la journée entière',
       },
