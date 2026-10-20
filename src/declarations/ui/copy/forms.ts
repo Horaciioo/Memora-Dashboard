@@ -168,7 +168,6 @@ export const EMOJI_COPY = {
   suggestions: 'Fréquents',
 } as const
 
-
 /**
  * Category labels
  * @type {Record<string, string>}

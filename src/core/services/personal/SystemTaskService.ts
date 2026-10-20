@@ -89,9 +89,7 @@ export const syncSystemTasks = async (
     // Closed once the timeline no longer asks for it
     const closing = stored.filter(
       (row) =>
-        row.systemKey &&
-        !currentKeys.has(row.systemKey) &&
-        row.state?.phase !== WorkflowPhases.Done
+        row.systemKey && !currentKeys.has(row.systemKey) && row.state?.phase !== WorkflowPhases.Done
     )
     if (doneState && closing.length > 0) {
       await prisma.task.updateMany({

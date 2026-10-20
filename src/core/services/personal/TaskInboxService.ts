@@ -435,10 +435,5 @@ export const myTasks = async (
     boardTasks(viewer.id),
   ])
 
-  return [
-    ...mentions,
-    ...reports,
-    ...timeline.filter((task) => !done.has(task.key)),
-    ...board,
-  ]
+  return [...mentions, ...reports, ...timeline.filter((task) => !done.has(task.key)), ...board]
 }

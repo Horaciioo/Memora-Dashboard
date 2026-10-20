@@ -158,7 +158,8 @@ const weightOf = (kind: string, seconds: number): number => {
   if (kind === 'timeout' || kind === SanctionKinds.Timeout)
     return 2 + Math.log10(Math.max(seconds, 1)) / 10
   if (kind === 'warn' || kind === SanctionKinds.Warn) return 1
-  if (kind === 'delete' || kind === 'automodDeny' || kind === SanctionKinds.Delete) return REMOVAL_WEIGHT
+  if (kind === 'delete' || kind === 'automodDeny' || kind === SanctionKinds.Delete)
+    return REMOVAL_WEIGHT
 
   return 0
 }

@@ -29,10 +29,7 @@ import {
   youtuberOptions,
   YOUTUBERS_INCLUDE,
 } from '@/core/services/work/shared'
-import {
-  EMOJI_SETTINGS,
-  FORM_SETTINGS,
-} from '@/declarations/configurations/settings'
+import { EMOJI_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import {
   COMMUNICATION_STATUS_OPTIONS,
@@ -262,8 +259,7 @@ const toProjectData = (values: FormValues) => ({
  * @return {string[]} - Account identifiers
  */
 
-const readLeadIds = (values: FormValues): string[] =>
-  readList(values, 'leadIds')
+const readLeadIds = (values: FormValues): string[] => readList(values, 'leadIds')
 
 /**
  * Open a project
