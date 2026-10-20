@@ -127,6 +127,102 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.6.2',
+    date: '2026-10-21',
+    title: 'Memora se peaufine',
+    intro:
+      'Les notifications, l’appel de présence et le détail d’un évènement gagnent en clarté, et les liens Memora s’affichent en carte dans Discord.',
+    description:
+      'Les notifications s’empilaient sans fin, la cloche passait inaperçue et l’appel de présence se lisait mal dans un détail d’évènement trop serré. Cette version range les notifications par pages, les met en avant avec une cloche qui sonne, redessine le détail d’un évènement et donne un vrai visuel aux liens partagés dans Discord.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.notifications,
+        text: 'Ajout d’un bouton « Marquer comme non lu » sur chaque notification déjà lue de la page « Notifications »',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une carte d’aperçu pour les liens Memora : une adresse collée dans Discord s’affiche avec un visuel et un titre au lieu d’un simple lien',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Ajout d’un lien court « memora.bazalthe.com/… » dans le détail d’un évènement posé, copié d’un clic pour revenir directement sur l’évènement',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.notifications,
+        text: 'Ajout d’une cloche qui sonne quand une nouvelle notification arrive, avec une pastille rouge sur son coin tant qu’il en reste à lire',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.notifications,
+        text: 'Amélioration de la page « Notifications » : dix notifications par page, avec les boutons « Précédent » et « Suivant » pour remonter plus loin',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.notifications,
+        text: 'Amélioration de la boîte de notifications : les cinq dernières seulement, détachée de la page par une ombre et un fond assombri, avec un grand bouton « Tout voir » sur toute la largeur',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.notifications,
+        text: 'Amélioration des notifications : toute la ligne s’ouvre d’un clic à la place du bouton « Voir », et le glyphe du type se pose sur le coin de l’avatar',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle de la cloche de notifications, redessinée en trois tons',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Amélioration du détail d’un évènement : une boîte « Informations » avec la date centrée (« Du 19 oct. 2026 de 02:12 au 06:12 »), puis son type, sa source, sa visibilité, son lien et son identifiant, avec de vrais glyphes en trois tons',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CalendarManage,
+        text: 'Amélioration de l’« Appel de présence » : affiché à droite du détail et ouvert d’office, avec Présents, Absents et Sans réponse dans trois boîtes colorées, les pseudos rangés par ordre alphabétique, trois par ligne',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Amélioration de « Ta présence » : le message devient « Tu as répondu présent(e) de 02:12 à 06:12 ! » avec les heures en gras, et « Je change d’avis » passe en petit texte dessous',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Amélioration de la grille du « Calendrier » : les évènements avec appel de présence sont plus grands et ne se réduisent plus à une seule ligne',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration des fiches de session et de candidat : tous les observateurs s’affichent en avatars, sans la bulle « +5 »',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.announcements,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CommunicationWrite,
+        text: 'Amélioration de la rédaction d’une annonce : le bouton de copie s’efface pendant l’écriture, la liste des @ et # s’ouvre au-dessus ou en dessous du caractère tapé avec une flèche, et les boîtes « Annonce » et « Aperçu » descendent jusqu’en bas du formulaire',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.announcements,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CommunicationWrite,
+        text: 'Correction d’un clic sans effet sur les communications écrites dans Memora de la page « Communications » : un clic ouvre maintenant leur formulaire',
+      },
+    ],
+  },
+  {
     version: '0.6.1',
     date: '2026-10-20',
     title: 'Pas mal d’améliorations',
