@@ -23,7 +23,9 @@ export const DISCORD_MESSAGE = {
     'relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--discord-background)] text-body leading-[1.375rem] text-[var(--discord-text)]',
   // Small copy control in the top right corner of the announcement
   copyCorner:
-    'absolute top-0 right-0 z-10 flex size-10 items-center justify-center rounded-none rounded-tr-[var(--radius-lg)] rounded-bl-[var(--radius-lg)] bg-white/10 text-[var(--discord-muted)] hover:bg-white/20 hover:text-[var(--discord-heading)]',
+    'absolute top-0 right-0 z-10 flex size-10 items-center justify-center rounded-none rounded-tr-[var(--radius-lg)] rounded-bl-[var(--radius-lg)] bg-white/10 text-[var(--discord-muted)] transition-[opacity,scale] duration-[var(--motion-duration-panel)] ease-out hover:bg-white/20 hover:text-[var(--discord-heading)] motion-reduce:transition-none',
+  // Fades and shrinks away while the message is written
+  copyCornerHidden: 'pointer-events-none scale-75 opacity-0',
   message: 'flex gap-4 px-4 py-3 text-body leading-[1.375rem] text-[var(--discord-text)]',
   avatar: 'h-10 w-10 shrink-0 rounded-full bg-[var(--discord-blurple)]',
   body: 'flex min-w-0 flex-1 flex-col',
@@ -49,19 +51,24 @@ export const DISCORD_MESSAGE = {
   spoiler: 'cursor-pointer rounded-[3px] bg-[var(--discord-spoiler)] text-transparent',
   spoilerOpen: 'rounded-[3px] bg-[var(--discord-quote)]/40',
   // Message bar and preview share one height
-  pane: 'h-[22rem]',
+  pane: 'min-h-[22rem] flex-1',
   // Composer
   composer: 'relative flex min-h-0 flex-1 flex-col p-4',
   input:
     'block min-h-11 w-full flex-1 resize-none rounded-[var(--radius-md)] bg-[var(--discord-input)] px-4 py-2.5 text-[var(--discord-text)] placeholder:text-[var(--discord-muted)] focus:outline-none',
   hint: 'pt-2 text-xs text-[var(--discord-muted)]',
+  // Menu pinned to the caret, in its own box over everything
+  menu: 'fixed z-[90] w-72',
+  menuArrow:
+    'absolute size-3 -translate-x-1/2 rotate-45 border-[var(--discord-code-border)] bg-[var(--discord-popover)]',
+  // Arrow on the top edge when the menu opens below the caret
+  menuArrowAbove: '-top-1.5 border-t border-l',
+  menuArrowBelow: '-bottom-1.5 border-r border-b',
   popover:
-    'mb-2 max-h-40 shrink-0 overflow-y-auto rounded-[var(--radius-md)] bg-[var(--discord-popover)] p-2 shadow-[var(--shadow-md)]',
+    'relative max-h-52 overflow-y-auto rounded-[var(--radius-md)] border border-[var(--discord-code-border)] bg-[var(--discord-popover)] p-2 shadow-[var(--shadow-lg)]',
   // Bar laid over the message it edits, no frame and no tint
   inlineInput:
     'block w-full field-sizing-content resize-none bg-transparent p-0 text-body leading-[1.375rem] text-[var(--discord-text)] outline-none placeholder:text-[var(--discord-muted)]',
-  // List floating above the bar so nothing below moves
-  inlinePopover: 'absolute bottom-full left-0 z-20 mb-2 w-72',
   popoverGroup:
     'px-2 pt-2 pb-1 text-xs font-bold tracking-wide text-[var(--discord-muted)] uppercase',
   popoverItem:

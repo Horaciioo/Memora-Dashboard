@@ -475,6 +475,8 @@ export const HANDLE_LOOKUP_STYLES = {
 export const FORM_GRID = {
   split: `grid grid-cols-1 sm:grid-cols-2 ${PROPERTY_SPACING.rows} ${PROPERTY_SPACING.columns}`,
   single: `grid grid-cols-1 ${PROPERTY_SPACING.rows}`,
+  // Column whose last field takes the height left
+  fill: `flex flex-1 flex-col ${PROPERTY_SPACING.rows}`,
 } as const
 
 /**

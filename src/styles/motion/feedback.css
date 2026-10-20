@@ -279,3 +279,40 @@
     left: 130%;
   }
 }
+
+/* Bell ringing when a notification arrives, hinged at its crown */
+.bell-ring {
+  transform-origin: 50% 10%;
+  animation: bell-ring-swing 1.2s ease-in-out;
+}
+
+@keyframes bell-ring-swing {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  12% {
+    transform: rotate(18deg);
+  }
+  26% {
+    transform: rotate(-16deg);
+  }
+  40% {
+    transform: rotate(12deg);
+  }
+  54% {
+    transform: rotate(-8deg);
+  }
+  68% {
+    transform: rotate(4deg);
+  }
+  82% {
+    transform: rotate(-2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bell-ring {
+    animation: none;
+  }
+}

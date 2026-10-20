@@ -59,10 +59,12 @@ export const APP_SHELL = {
  */
 
 export const RAIL_POPOVER = {
-  scrim: 'fixed inset-0 z-[65]',
+  // Dims the page so the box stands out
+  scrim: 'overlay-enter fixed inset-0 z-[65] bg-[var(--color-scrim)]/40',
   panel:
     'rail-reset surface-enter fixed bottom-6 left-[calc(var(--shell-sidebar-w)+1.5rem)] z-[70] flex max-h-[calc(100dvh-3rem)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
-  bell: 'w-[26rem] max-w-[calc(100vw-var(--shell-sidebar-w)-3rem)]',
+  // Lifted off the page by a layered shadow alone, no outline
+  bell: 'w-[26rem] max-w-[calc(100vw-var(--shell-sidebar-w)-3rem)] border-transparent! shadow-[var(--shadow-lifted)]!',
   account: 'w-80',
   // Glyph above the title
   head: 'relative flex shrink-0 flex-col items-center gap-1.5 border-b border-[var(--color-border)] px-4 pt-5 pb-4 text-center',
@@ -160,7 +162,7 @@ export const LEFT_SIDEBAR = {
   footerRow: 'flex min-w-0 items-center gap-1',
   footerName: 'min-w-0 flex-1 truncate text-base font-semibold',
   footerActions: 'flex shrink-0 items-center gap-0.5',
-  footerIcon: 'size-5 shrink-0',
+  footerIcon: 'size-6 shrink-0',
   // Version under the nav
   version:
     'rail-fold mx-4 mt-2 mb-1 shrink-0 self-start rounded-[var(--radius-sm)] px-2 py-1 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',

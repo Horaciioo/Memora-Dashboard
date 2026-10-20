@@ -329,29 +329,28 @@ export const HORIZONTAL_TIMELINE_STYLES = {
 
 export const CALENDAR_DETAIL = {
   body: 'flex flex-col gap-6',
-  // Accent-tinted head: when, what
-  hero: 'flex flex-col gap-3 rounded-[var(--radius-lg)] p-4',
-  heroKind: 'text-micro font-bold tracking-wide uppercase',
   heroSpan:
-    'text-section font-medium tracking-tight text-[var(--color-ink)] first-letter:uppercase [&>strong]:font-bold',
+    'text-center text-section font-medium tracking-tight text-[var(--color-ink)] first-letter:uppercase [&>strong]:font-bold',
+  rule: 'h-px w-full bg-[var(--color-border)]',
   facts: 'flex flex-col gap-1.5 text-sm text-[var(--color-ink-subtle)]',
   section: 'flex flex-col gap-3',
-  foldToggle: 'flex w-full cursor-pointer items-center gap-2 text-left',
-  foldChevron:
-    'h-4 w-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform duration-[var(--motion-duration-slow)] ease-in-out motion-reduce:transition-none',
-  foldChevronShut: '-rotate-90',
-  // Folds open and shut on the row height itself
-  fold: 'group/fold grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-[var(--motion-duration-slow)] ease-in-out motion-reduce:transition-none',
-  foldOpen: 'grid-rows-[1fr] opacity-100',
-  // Names wait for the panel to open, then land one after the other
-  foldItem:
-    'translate-y-1 opacity-0 transition-[opacity,translate] duration-[var(--motion-duration-panel)] ease-out motion-reduce:transition-none group-data-[open=true]/fold:translate-y-0 group-data-[open=true]/fold:opacity-100 group-data-[open=true]/fold:delay-[calc(var(--motion-duration-panel)+var(--i)*70ms)]',
-  foldDivider: 'flex justify-center border-t border-[var(--color-border)] pt-4',
-  foldInner: 'min-h-0 overflow-hidden',
+  // Names land one after the other once the card is ready
+  rollItem:
+    'translate-y-1 opacity-0 transition-[opacity,translate] duration-[var(--motion-duration-panel)] ease-out motion-reduce:transition-none group-data-[ready=true]/roll:translate-y-0 group-data-[ready=true]/roll:opacity-100 group-data-[ready=true]/roll:delay-[calc(var(--i)*70ms)]',
+  // Tinted tile in the accent, like a task column
+  tile: `${BOARD_STYLES.columnTint} flex flex-col gap-3 rounded-[var(--radius-md)] p-3`,
   card: 'flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4',
   answer: 'flex flex-wrap gap-2',
-  answered: 'flex items-center gap-2 text-sm',
-  columns: 'grid grid-cols-1 gap-4 sm:grid-cols-3',
+  answered: 'flex items-center justify-center gap-2 text-center text-sm',
+  // Small way back under the answer
+  changeMind:
+    'cursor-pointer text-xs text-[var(--color-ink-subtle)] underline underline-offset-2 transition-colors hover:text-[var(--color-ink)]',
+  columns: 'flex flex-col gap-3',
+  divider: 'flex justify-center border-t border-[var(--color-border)] pt-4',
+  // Content left, divider, roll-call right
+  split: 'grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]',
+  splitDivider: 'h-px w-full bg-[var(--color-border)] md:h-auto md:w-px',
+  main: 'flex min-w-0 flex-col gap-6',
   none: 'text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 
@@ -446,23 +445,32 @@ export const CALENDAR_STYLES = {
   selectionCount: 'font-semibold tabular-nums',
   // Detail modal
   detailList: 'flex list-disc flex-col gap-1 pl-5 text-sm',
+  detailLink:
+    'min-w-0 cursor-pointer text-left font-medium break-all underline underline-offset-2 transition-colors hover:text-[var(--color-ink)]',
   detailNote: 'text-sm text-[var(--color-ink-subtle)]',
   // Roll-call panel inside the detail modal
   chipMark: 'h-3 w-3 shrink-0 opacity-80',
+  chipMarkRollCall: 'h-4 w-4 opacity-100',
+  // Roll-call cards are roomier and lifted off the grid
+  entryRollCall:
+    'flex-wrap content-start gap-x-2 gap-y-0.5 px-2.5 py-2 text-sm shadow-[var(--shadow-md)] [&>span:first-child]:font-semibold',
   rollCall:
     'flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3',
   rollCallHead: 'flex items-center gap-2 text-sm font-semibold',
   rollCallAnswer: 'flex flex-wrap gap-2',
   rollCallCounts: 'flex flex-wrap gap-1.5',
   rollCallLists: 'flex flex-col gap-3',
-  rollCallGroup: 'flex flex-col gap-1.5',
-  rollCallPeople: 'flex flex-col gap-1',
-  rollCallPerson: 'flex items-center gap-2 text-sm',
-  rollCallName: 'flex min-w-0 flex-col',
-  rollCallHours: 'text-xs italic text-[var(--color-ink-subtle)]',
-  rollCallDrop:
-    'rounded-[var(--radius-md)] border border-dashed border-transparent p-1.5 transition-colors',
-  rollCallOver: 'border-[var(--color-border-strong)] bg-[var(--color-hover)]',
+  rollCallGroup: 'flex flex-col gap-2.5 rounded-[var(--radius-md)] p-3',
+  rollCallPeople: 'grid grid-cols-2 gap-1.5 sm:grid-cols-3',
+  rollCallTitle:
+    'flex items-center gap-2 text-sm font-bold tracking-wide text-[var(--color-ink)] uppercase',
+  rollCallPerson:
+    'accent-border flex flex-col items-center gap-2 rounded-[var(--radius-md)] border bg-[var(--color-surface-raised)]/70 px-2 py-3 text-center text-sm shadow-[var(--shadow-sm)]',
+  rollCallName: 'flex min-w-0 flex-col items-center gap-1 break-words',
+  rollCallHours: 'text-xs whitespace-nowrap italic text-[var(--color-ink-subtle)]',
+  rollCallDrop: 'transition-shadow',
+  // Drop target lights up with a ring, no dashed edge
+  rollCallOver: 'ring-2 ring-[var(--color-border-strong)]',
   rollCallMovable: 'cursor-grab active:cursor-grabbing',
   rollCallDragged: 'opacity-40',
   // Hover preview card
