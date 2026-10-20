@@ -213,8 +213,8 @@ interface AttendanceStatusOption {
 }
 
 const ATTENDANCE_STATUS_MAP: Record<AttendanceStatusName, AttendanceStatusOption> = {
-  [AttendanceStatuses.Present]: { label: 'Présent', tone: 'success', icon: 'confirm' },
-  [AttendanceStatuses.Absent]: { label: 'Absent', tone: 'danger', icon: 'close' },
+  [AttendanceStatuses.Present]: { label: 'Présent', tone: 'success', icon: 'check' },
+  [AttendanceStatuses.Absent]: { label: 'Absent', tone: 'danger', icon: 'cross' },
   [AttendanceStatuses.Pending]: { label: 'Sans réponse', tone: 'neutral', icon: 'clock' },
 }
 

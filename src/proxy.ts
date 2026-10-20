@@ -6,10 +6,16 @@ import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { readPublicOrigin } from '@/core/lib/http/origin'
 import { buildContentSecurityPolicy } from '@/declarations/system/security/contentSecurityPolicy'
 import { NONCE_HEADER } from '@/declarations/system/security/securityHeaders'
+import { DEMO_EVENT_ID, EVENT_ID_PATTERN } from '@/core/lib/share/sharedEvent'
 import { ROUTES } from '@/declarations/navigation'
 
 // Paths reachable
 const PUBLIC_PATHS: string[] = [ROUTES.login, ROUTES.privacy]
+
+// Short address of an event and its card picture, read by robots that never sign in
+const SHARE_PATH = new RegExp(
+  `^/(opengraph-image.*|(${DEMO_EVENT_ID}|${EVENT_ID_PATTERN.source.slice(1, -1)})(/opengraph-image.*)?)$`
+)
 
 // Path prefixes
 const PUBLIC_PREFIXES: string[] = ['/integration', '/exercice']
@@ -63,6 +69,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // A prefix stays reachable either way
   const isOpenToEveryone =
     PUBLIC_PATHS.includes(pathname) ||
+    SHARE_PATH.test(pathname) ||
     PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(`${prefix}/`))
 
   // A stale token fails closed rather than crashing the proxy

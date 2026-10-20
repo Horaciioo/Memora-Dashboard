@@ -6,20 +6,30 @@ import '@/styles/globals.css'
 import { ThemeScript } from '@/components/tools/ThemeScript'
 import { Providers } from '@/app/providers'
 import { getSession } from '@/core/lib/auth/getSession'
+import { readPublicOrigin } from '@/core/lib/http/origin'
+import { TICKET_PALETTE } from '@/core/lib/share/ticketPalette'
 import { NONCE_HEADER } from '@/declarations/system/security/securityHeaders'
 import { APP_COMPANY, APP_DESCRIPTION, APP_FONTS, APP_NAME } from '@/declarations/app'
 import { DRAWER_DIMENSIONS, SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
 import { setActiveZone } from '@/utils/format/zone'
 
-export const metadata: Metadata = {
+/**
+ * Title, description and the card a pasted address turns into
+ * @return {Promise<Metadata>} - Site metadata
+ */
+
+export const generateMetadata = async (): Promise<Metadata> => ({
+  metadataBase: new URL(readPublicOrigin(await headers(), 'http://localhost:3000')),
   title: { default: APP_NAME, template: `%s | ${APP_NAME}` },
   description: APP_DESCRIPTION,
   applicationName: APP_NAME,
   authors: [{ name: APP_COMPANY }],
-}
+  openGraph: { type: 'website', siteName: APP_NAME, title: APP_NAME, description: APP_DESCRIPTION },
+  twitter: { card: 'summary_large_image', title: APP_NAME, description: APP_DESCRIPTION },
+})
 
 // Lets the floating mobile nav pill read env(safe-area-inset-*) under the notch/home indicator
-export const viewport: Viewport = { viewportFit: 'cover' }
+export const viewport: Viewport = { viewportFit: 'cover', themeColor: TICKET_PALETTE.accent }
 
 // Chrome dimensions
 const SHELL_VARS = {

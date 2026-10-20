@@ -164,6 +164,70 @@ export const CheckGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
+ * Two interlocked links of an address
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const ChainGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    render={({ fill, lift, deep }) => (
+      <g transform="rotate(-45 12 12)">
+        <rect
+          x="2.5"
+          y="8.5"
+          width="11"
+          height="7"
+          rx="3.5"
+          fill="none"
+          stroke={deep}
+          strokeWidth="2.6"
+        />
+        <rect
+          x="10.5"
+          y="8.5"
+          width="11"
+          height="7"
+          rx="3.5"
+          fill="none"
+          stroke={fill}
+          strokeWidth="2.8"
+        />
+        <path d="M15 9.9h3.4" fill="none" stroke={lift} strokeWidth="1" strokeLinecap="round" />
+      </g>
+    )}
+  />
+)
+
+/**
+ * Identity card of a record identifier
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const IdentifierGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    render={({ fill, lift, deep, cut }) => (
+      <>
+        <rect x="2.5" y="5" width="19" height="14" rx="3.5" fill={fill} />
+        <path d="M2.5 14h19v1.5a3.5 3.5 0 0 1-3.5 3.5H6a3.5 3.5 0 0 1-3.5-3.5z" fill={deep} />
+        <circle cx="8.5" cy="10.5" r="2" fill={lift} />
+        <path d="M5.2 15.6c.6-1.6 1.9-2.3 3.3-2.3s2.7.7 3.3 2.3z" fill={lift} />
+        <path
+          d="M14 9.5h4.5M14 12.5h3"
+          fill="none"
+          stroke={cut}
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+      </>
+    )}
+  />
+)
+
+/**
  * Accueil
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
@@ -435,11 +499,40 @@ export const SearchGlyph = ({ className }: GlyphProps) => (
 export const BellGlyph = ({ className }: GlyphProps) => (
   <Frame
     className={className}
-    render={({ fill, lift, deep }) => (
+    render={({ fill, lift, deep, cut }) => (
       <>
-        <circle cx="12" cy="3.5" r="1.6" fill={lift} />
-        <path d="M4.5 17c1.5-1 2-3 2-6a5.5 5.5 0 0 1 11 0c0 3 .5 5 2 6z" fill={fill} />
-        <path d="M9.2 18a2.9 2.9 0 0 0 5.6 0z" fill={deep} />
+        <circle cx="12" cy="3.6" r="1.6" fill={lift} />
+        <path
+          d="M12 4.9c-3.7 0-6.1 2.7-6.1 6.3 0 3.1-.7 4.5-2 5.7-.5.5-.2 1.3.5 1.3h15.2c.7 0 1-.8.5-1.3-1.3-1.2-2-2.6-2-5.7 0-3.6-2.4-6.3-6.1-6.3z"
+          fill={fill}
+        />
+        <path
+          d="M12 4.9c3.7 0 6.1 2.7 6.1 6.3 0 3.1.7 4.5 2 5.7.5.5.2 1.3-.5 1.3h-5.6c2-1.7 3-3.9 3-7.3 0-2.6-1.2-4.7-3-6z"
+          fill={deep}
+        />
+        <path
+          d="M8.1 11.4c.1-2 1.2-3.5 2.9-4.1"
+          fill="none"
+          stroke={lift}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M5.4 16.9h13.2"
+          fill="none"
+          stroke={cut}
+          strokeWidth="0.9"
+          strokeLinecap="round"
+          opacity="0.55"
+        />
+        <path d="M9.3 19.6a2.9 2.9 0 0 0 5.4 0z" fill={deep} />
+        <path
+          d="M10.4 20.1a1.8 1.8 0 0 0 .9.9"
+          fill="none"
+          stroke={lift}
+          strokeWidth="0.8"
+          strokeLinecap="round"
+        />
       </>
     )}
   />

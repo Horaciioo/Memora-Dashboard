@@ -185,7 +185,12 @@ export const buildRoster = ({
 
   const bucket = (status: AttendanceStatusName): AttendancePerson[] =>
     visible
-      ? listed.filter((row) => row.status === status).map((row) => toPerson(row, reinforced))
+      ? listed
+          .filter((row) => row.status === status)
+          .map((row) => toPerson(row, reinforced))
+          .sort((first, second) =>
+            first.name.localeCompare(second.name, 'fr', { sensitivity: 'base' })
+          )
       : []
 
   const countOf = (status: AttendanceStatusName): number =>

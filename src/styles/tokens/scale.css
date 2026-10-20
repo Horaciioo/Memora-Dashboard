@@ -35,6 +35,8 @@
   --shadow-float:
     0 0 0 1px rgb(20 20 40 / 0.1), 0 0 36px rgb(20 20 40 / 0.16), 0 14px 44px rgb(20 20 40 / 0.22),
     0 44px 110px -12px rgb(20 20 40 / 0.42);
+  /* A box standing off the page by its shadow alone, no outline */
+  --shadow-lifted: 0 10px 30px -6px rgb(20 20 40 / 0.2), 0 30px 80px -16px rgb(20 20 40 / 0.34);
   --shadow-scene: 0 18px 40px -12px rgb(190 120 135 / 0.3), 0 4px 12px rgb(20 20 40 / 0.08);
 
   /* Durations: hover, appearance, panel, long, celebration. Loops below */
@@ -63,6 +65,7 @@
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35);
   --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.55);
   --shadow-lg: 0 24px 56px -20px rgb(0 0 0 / 0.7);
+  --shadow-lifted: 0 10px 30px -6px rgb(0 0 0 / 0.5), 0 30px 80px -16px rgb(0 0 0 / 0.7);
   --shadow-page: 0 2px 6px rgb(0 0 0 / 0.45), 0 28px 64px -20px rgb(0 0 0 / 0.8);
   --shadow-float:
     0 0 0 1px rgb(245 245 247 / 0.1), 0 0 36px rgb(0 0 0 / 0.5), 0 14px 44px rgb(0 0 0 / 0.55),

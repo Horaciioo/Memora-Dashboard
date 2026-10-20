@@ -215,9 +215,23 @@ const pageSize = readInteger(notifications.pageSize, {
 
 export const NOTIFICATION_SETTINGS = {
   pageSize,
+  // Quiet time between two rings of the bell
+  ringGapMs: readInteger(notifications.ringGapMs, {
+    path: 'system/notifications.ringGapMs',
+    fallback: 30000,
+    min: 1000,
+    max: 3_600_000,
+  }),
+  // Rows per page of the notifications page
+  listSize: readInteger(notifications.listSize, {
+    path: 'system/notifications.listSize',
+    fallback: 10,
+    min: 1,
+    max: pageSize,
+  }),
   panelSize: readInteger(notifications.panelSize, {
     path: 'system/notifications.panelSize',
-    fallback: 6,
+    fallback: 5,
     min: 1,
     max: pageSize,
   }),

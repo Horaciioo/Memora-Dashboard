@@ -1,9 +1,10 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useNotificationFeed } from '@/core/hooks/data/system/useNotificationFeed'
+import { useNotificationsStore } from '@/core/store/notifications'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
 import { RAIL_POPOVER } from '@/declarations/ui/blocks'
@@ -37,6 +38,24 @@ export const NotificationsBell = ({ initialUnread, iconClassName }: Notification
   )
   const [isOpen, setOpen] = useState(false)
   const BellIcon = ICONS.bell
+
+  // Rings for a notification received while the page is open, never twice within the quiet gap
+  const [isRinging, setRinging] = useState(false)
+  const lastRing = useRef(0)
+
+  useEffect(
+    () =>
+      useNotificationsStore.subscribe((state, previous) => {
+        if (state.arrivals === previous.arrivals) return
+
+        const now = Date.now()
+        if (now - lastRing.current < NOTIFICATION_SETTINGS.ringGapMs) return
+
+        lastRing.current = now
+        setRinging(true)
+      }),
+    []
+  )
 
   const close = () => setOpen(false)
 
@@ -72,7 +91,12 @@ export const NotificationsBell = ({ initialUnread, iconClassName }: Notification
         onClick={toggle}
         className={cn(BUTTON_STYLES.base, BUTTON_STYLES.icon, NOTIFICATION_STYLES.trigger)}
       >
-        <BellIcon className={iconClassName ?? 'h-4 w-4 shrink-0'} aria-hidden="true" />
+        <span
+          className={cn('inline-flex', isRinging && 'bell-ring')}
+          onAnimationEnd={() => setRinging(false)}
+        >
+          <BellIcon className={iconClassName ?? 'h-4 w-4 shrink-0'} aria-hidden="true" />
+        </span>
         {feed.unread > 0 && <span className={NOTIFICATION_STYLES.pastille} aria-hidden="true" />}
       </button>
 
@@ -80,7 +104,7 @@ export const NotificationsBell = ({ initialUnread, iconClassName }: Notification
         <>
           <div className={RAIL_POPOVER.scrim} role="presentation" onMouseDown={close} />
           <NotificationsPanel
-            entries={feed.entries}
+            entries={feed.entries.slice(0, NOTIFICATION_SETTINGS.panelSize)}
             unread={feed.unread}
             isLoading={feed.isLoading}
             onOpen={feed.open}

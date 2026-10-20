@@ -22,7 +22,7 @@ import { formatDayTime } from '@/utils/format/dates'
 
 // Portraits drawn side by side
 const portraits = (list: { id: string; name: string; src?: string | null }[]) =>
-  list.length > 0 ? <AvatarStack size="sm" people={list} /> : null
+  list.length > 0 ? <AvatarStack size="sm" people={list} max={list.length} /> : null
 
 /**
  * Overview of a recruitment session: boxes of what it is, who carries it

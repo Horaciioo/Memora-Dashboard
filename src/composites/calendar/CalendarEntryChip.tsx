@@ -141,7 +141,8 @@ export const CalendarEntryChip = ({
                 entry.readOnly && cn(CALENDAR_STYLES.entryReadOnly, paint.border),
                 selected && CALENDAR_STYLES.entrySelected,
                 fill && CALENDAR_STYLES.entryFill,
-                compact && CALENDAR_STYLES.entryCompact
+                compact && CALENDAR_STYLES.entryCompact,
+                entry.rollCall && CALENDAR_STYLES.entryRollCall
               )
         }
         {...(draggable ? (dragProps ?? {}) : {})}
@@ -167,7 +168,11 @@ export const CalendarEntryChip = ({
             )}
             {previewable && entry.rollCall && (
               <RollCallIcon
-                className={cn(CALENDAR_STYLES.chipMark, band && 'hidden md:block')}
+                className={cn(
+                  CALENDAR_STYLES.chipMark,
+                  entry.rollCall && CALENDAR_STYLES.chipMarkRollCall,
+                  band && 'hidden md:block'
+                )}
                 aria-hidden="true"
               />
             )}

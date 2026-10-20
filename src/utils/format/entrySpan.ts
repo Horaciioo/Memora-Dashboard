@@ -33,14 +33,18 @@ export const entrySpanParts = (
       { text: sameDay ? formatDay(startsAt) : formatDayRange(startsAt, endsAt), strong: true },
     ]
   }
-  const moment = (iso: string) => `${formatDay(iso)} ${timeOf(iso)}`
-  if (endsAt === null) return [{ text: moment(startsAt), strong: true }]
+  const moment = (iso: string) => [
+    { text: formatDay(iso), strong: true },
+    { text: ' de ', strong: false },
+    { text: timeOf(iso), strong: true },
+  ]
+  if (endsAt === null) return moment(startsAt)
 
   return [
-    { text: 'De ', strong: false },
-    { text: moment(startsAt), strong: true },
-    { text: ' à ', strong: false },
-    { text: sameDay ? timeOf(endsAt) : moment(endsAt), strong: true },
+    { text: 'Du ', strong: false },
+    ...moment(startsAt),
+    { text: ' au ', strong: false },
+    ...(sameDay ? [{ text: timeOf(endsAt), strong: true }] : moment(endsAt)),
   ]
 }
 

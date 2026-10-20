@@ -7,6 +7,7 @@ export interface NotificationsListProps {
   entries: NotificationEntry[]
   onOpen: (id: string) => void
   onRemove?: (id: string) => void
+  onMarkUnread?: (id: string) => void
 }
 
 /**
@@ -14,10 +15,16 @@ export interface NotificationsListProps {
  * @param {NotificationEntry[]} entries - Notifications
  * @param {(id: string) => void} onOpen - Called once a row is settled
  * @param {(id: string) => void} [onRemove] - Dismisses a row
+ * @param {(id: string) => void} [onMarkUnread] - Turns an opened row back to unread
  * @return {JSX.Element}
  */
 
-export const NotificationsList = ({ entries, onOpen, onRemove }: NotificationsListProps) => (
+export const NotificationsList = ({
+  entries,
+  onOpen,
+  onRemove,
+  onMarkUnread,
+}: NotificationsListProps) => (
   <div className={NOTIFICATION_STYLES.list}>
     {entries.map((entry, index) => (
       <div key={entry.id}>
@@ -26,6 +33,7 @@ export const NotificationsList = ({ entries, onOpen, onRemove }: NotificationsLi
           withAction={index < NOTIFICATION_SETTINGS.maxActions}
           onOpen={onOpen}
           onRemove={onRemove}
+          onMarkUnread={onMarkUnread}
         />
         {index < entries.length - 1 && (
           <span className={NOTIFICATION_STYLES.divider} aria-hidden="true" />

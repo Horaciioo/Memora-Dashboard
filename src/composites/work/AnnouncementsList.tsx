@@ -202,6 +202,7 @@ export const AnnouncementsList = ({
       valuesOf={(row) => row.values ?? {}}
       labelOf={(row) => row.title}
       onOpen={(row) => row.href && router.push(row.href)}
+      hasPage={(row) => row.href !== null}
       canCreate={canWrite}
       canUpdate={canWrite}
       canDelete={canWrite}

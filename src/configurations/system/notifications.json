@@ -1,6 +1,8 @@
 {
-  "panelSize": 6,
+  "panelSize": 5,
   "pageSize": 40,
+  "listSize": 10,
+  "ringGapMs": 30000,
   "maxActions": 3,
   "maxMentions": 10,
   "mentionResults": 6,

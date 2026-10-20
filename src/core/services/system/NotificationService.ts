@@ -229,6 +229,20 @@ export const markRead = async (id: string, accountId: string): Promise<void> => 
 }
 
 /**
+ * Turn an opened notification back into an unread one
+ * @param {string} id - Notification identifier
+ * @param {string} accountId - Account identifier
+ * @return {Promise<void>} - Marked
+ */
+
+export const markUnread = async (id: string, accountId: string): Promise<void> => {
+  await prisma.notification.updateMany({
+    where: { id, recipientId: accountId, readAt: { not: null } },
+    data: { readAt: null },
+  })
+}
+
+/**
  * Mentions of a member not yet seen, on one kind of record or on any
  * @param {string} accountId - Account identifier
  * @param {NotificationTargetName} [target] - Kind of record

@@ -178,11 +178,11 @@ export const MATURITY_STYLES = {
  */
 
 export const NOTIFICATION_STYLES = {
-  // The pastille sits on the bell itself
+  // The unread count sits on the bell itself
   trigger: 'relative',
-  // Unread dot
+  // Small red dot on the bell corner
   pastille:
-    'pointer-events-none absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-surface-raised)]',
+    'pointer-events-none absolute top-1 right-1 size-2.5 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-surface-raised)]',
   scrim: 'fixed inset-0 z-[65]',
   panel:
     'rail-reset surface-enter fixed z-[70] flex max-h-[min(28rem,70vh)] w-[min(21rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] glass-panel shadow-[var(--shadow-lg)]',
@@ -190,16 +190,19 @@ export const NOTIFICATION_STYLES = {
     'flex shrink-0 items-center justify-between gap-2 border-b border-[var(--color-border)] px-4 py-2.5',
   title: 'text-sm font-bold',
   body: 'flex-1 overflow-y-auto p-2',
-  footer: 'shrink-0 border-t border-[var(--color-border)]',
+  footer: 'flex shrink-0 flex-col gap-3 px-3 pb-3',
+  // Rule stopping short of the box edges
+  footerRule: 'mx-3 block h-px bg-[var(--color-border)]',
   footerLink:
-    'flex w-full items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-[var(--color-ink-accent)] transition-colors hover:bg-[var(--color-surface)]',
-  footerIcon: 'h-3.5 w-3.5',
+    'flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-brand-600)] px-5 py-3 text-base font-bold text-[var(--color-on-brand)] transition-colors hover:bg-[var(--color-brand-700)]',
+  footerIcon: 'h-4 w-4',
   list: 'flex flex-col',
   // Inset rule between two rows
   divider: 'mx-4 block h-px bg-[var(--color-border)]',
   row: 'flex gap-3 rounded-[var(--radius-md)] px-2 py-2.5 transition-colors',
   rowUnread: 'bg-[var(--color-brand-soft)]/40',
-  portrait: 'relative shrink-0',
+  // Wraps the avatar exactly so the glyph sits on its bottom right corner
+  portrait: 'relative flex shrink-0 self-start',
   glyph:
     'absolute -right-1 -bottom-1 flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-[var(--color-surface-raised)]',
   glyphIcon: 'h-2.5 w-2.5',
@@ -209,12 +212,19 @@ export const NOTIFICATION_STYLES = {
   subject: 'truncate text-xs font-medium text-[var(--color-ink-subtle)]',
   foot: 'flex items-center gap-2 pt-1',
   moment: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
-  action:
-    'ml-auto inline-flex items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-2 py-0.5 text-xs font-semibold transition-colors hover:border-[var(--color-border-strong)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
-  actionIcon: 'h-3 w-3',
+  // Whole row opens its target, one invisible link laid over it
+  rowLinked: 'hover:bg-[var(--color-hover)]',
+  rowLink:
+    'absolute inset-0 z-10 rounded-[var(--radius-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  // Arrow showing on the row under the pointer, away from the remove control
+  rowArrow:
+    'pointer-events-none absolute right-3 bottom-2.5 h-4 w-4 text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover/row:opacity-100',
+  // Small way back to unread, above the row link
+  markUnread:
+    'relative z-20 cursor-pointer text-xs font-semibold text-[var(--color-ink-subtle)] underline underline-offset-2 transition-colors hover:text-[var(--color-ink)]',
   // Shows on the row under the pointer
   remove:
-    'absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-ink-subtle)] opacity-0 transition-[opacity,background-color] group-hover/row:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:opacity-100',
+    'absolute top-2 right-2 z-20 flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-ink-subtle)] opacity-0 transition-[opacity,background-color] group-hover/row:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:opacity-100',
   removeIcon: 'h-3.5 w-3.5',
   // Board toolbar and its older-entries button
   tools: 'flex flex-wrap items-center justify-between gap-3 pb-3',

@@ -130,6 +130,7 @@ export const CandidateOverview = ({
             sitting.length > 0 ? (
               <AvatarStack
                 size="sm"
+                max={sitting.length}
                 people={sitting.map((option) => ({
                   id: option.value,
                   name: option.label,
