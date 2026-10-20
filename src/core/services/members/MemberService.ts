@@ -9,6 +9,7 @@ import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { conflict, forbidden, immutable, notFound } from '@/core/lib/errors'
 import { rowsToOptions, toOptions } from '@/core/lib/forms/options'
+import { syncFunctionTeams } from '@/core/services/teams/FunctionTeamService'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
 import { activeAbsenceFilter, toAbsence } from '@/core/services/absences/AbsenceService'
 import { fileUrl } from '@/core/services/system/FileService'
@@ -189,25 +190,18 @@ export const assertMemberAssignable = async (
  */
 
 export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> => {
-  const [divisions, youtubers, functions, teams] = await Promise.all([
+  const [divisions, youtubers, functions, opened] = await Promise.all([
     allDivisions(),
     activeYoutubers(),
     activeFunctions(),
-    prisma.team.findMany({
-      where: { archived: false },
-      select: { id: true, name: true, youtuber: { select: { name: true, avatarUrl: true } } },
-      orderBy: [{ youtuber: { position: 'asc' } }, { name: 'asc' }],
-    }),
+    prisma.youtuberFunction.findMany({ select: { youtuberId: true, functionId: true } }),
   ])
 
-  // Teams are told apart by the creator they belong to
-  const teamChoices = teams.map((team) => ({
-    value: team.id,
-    label: team.name,
-    group: team.youtuber?.name ?? MEMBER_FIELD_COPY.teamWithoutYoutuber,
-    image: team.youtuber?.avatarUrl,
-    icon: 'teams',
-  }))
+  // Creators each function is open for, a moderator only offers those of their creators
+  const creatorsOf = new Map<string, string[]>()
+  for (const seat of opened) {
+    creatorsOf.set(seat.functionId, [...(creatorsOf.get(seat.functionId) ?? []), seat.youtuberId])
+  }
 
   // Each kind only offers its own functions
   const optionsOf = (kind: FunctionKindName) =>
@@ -224,6 +218,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
         rowsToOptions([entry]).map((option) => ({
           ...option,
           group: ACCESS_CATEGORY_REGISTRY.get(entry.category).label,
+          owners: creatorsOf.get(entry.id) ?? [],
         }))
       )
 
@@ -321,6 +316,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       label: MEMBER_FIELD_COPY.primaryFunctions,
       info: MEMBER_FIELD_INFO.primaryFunctions,
       options: optionsOf(FunctionKinds.Primary),
+      ownerField: 'youtuberIds',
       mark: 'glyph',
       span: 'half',
       group: FORM_GROUPS.assignment,
@@ -331,16 +327,7 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       label: MEMBER_FIELD_COPY.secondaryFunctions,
       info: MEMBER_FIELD_INFO.secondaryFunctions,
       options: optionsOf(FunctionKinds.Secondary),
-      mark: 'glyph',
-      span: 'half',
-      group: FORM_GROUPS.assignment,
-    },
-    {
-      name: 'teamIds',
-      kind: 'multiselect',
-      label: MEMBER_FIELD_COPY.team,
-      info: MEMBER_FIELD_INFO.team,
-      options: teamChoices,
+      ownerField: 'youtuberIds',
       mark: 'glyph',
       span: 'half',
       group: FORM_GROUPS.assignment,
@@ -463,21 +450,6 @@ const readKindIds = async (ids: string[], kind: FunctionKindName): Promise<strin
 }
 
 /**
- * Keep the ids that name a team
- * @param {FormValues} values - Parsed body
- * @return {Promise<string[]>} - Known team identifiers
- */
-
-const readTeamIds = async (values: FormValues): Promise<string[]> => {
-  const ids = readList(values, 'teamIds')
-  if (ids.length === 0) return []
-
-  const rows = await prisma.team.findMany({ where: { id: { in: ids } }, select: { id: true } })
-
-  return rows.map((row) => row.id)
-}
-
-/**
  * Refuse an identifier another file already holds
  * @param {string} discordId - Identifier to give
  * @param {string} [currentId] - File being edited
@@ -513,7 +485,6 @@ export const createMember = async (values: FormValues): Promise<MemberSummary> =
   const joinedAt = readDate(values, 'joinedAt')
   const youtuberIds = readList(values, 'youtuberIds')
   const functionIds = await readHeldFunctionIds(values)
-  const teamIds = await readTeamIds(values)
 
   await assertIdentifierFree(data.discordId)
 
@@ -523,10 +494,10 @@ export const createMember = async (values: FormValues): Promise<MemberSummary> =
       joinedAt: joinedAt ?? new Date(),
       youtubers: { connect: youtuberIds.map((id) => ({ id })) },
       functions: { create: functionIds.map((functionId) => ({ functionId })) },
-      teamMemberships: { create: teamIds.map((teamId) => ({ teamId })) },
     },
     include: SUMMARY_INCLUDE,
   })
+  await syncFunctionTeams([row.id])
 
   // A brand new account never carries a note or a running absence yet
   return toSummary(row, { notesCount: 0, isAbsent: false })
@@ -554,7 +525,6 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
   const joinedAt = readDate(values, 'joinedAt')
   const youtuberIds = readList(values, 'youtuberIds')
   const functionIds = await readHeldFunctionIds(values)
-  const teamIds = await readTeamIds(values)
 
   const row = await prisma.account.update({
     where: { id },
@@ -567,16 +537,13 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
         deleteMany: {},
         create: functionIds.map((functionId) => ({ functionId })),
       },
-      teamMemberships: {
-        deleteMany: {},
-        create: teamIds.map((teamId) => ({ teamId })),
-      },
     },
     include: {
       ...SUMMARY_INCLUDE,
       _count: { select: { notesReceived: true, absences: { where: activeAbsenceFilter() } } },
     },
   })
+  await syncFunctionTeams([id])
 
   return toSummary(row, { notesCount: row._count.notesReceived, isAbsent: row._count.absences > 0 })
 }
@@ -694,7 +661,6 @@ export const readMember = async (id: string, canReadNotes = false): Promise<Memb
       secondaryFunctionIds: row.functions
         .filter((held) => held.jobFunction.kind === FunctionKinds.Secondary)
         .map((held) => held.functionId),
-      teamIds: row.teamMemberships.map((membership) => membership.teamId),
       timezone: row.timezone,
       birthday: row.birthday ? row.birthday.toISOString().slice(0, 10) : null,
       joinedAt: row.joinedAt.toISOString().slice(0, 10),

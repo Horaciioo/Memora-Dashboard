@@ -92,11 +92,11 @@ export const MEMBER_COPY = {
   journeyLead: 'Du recrutement au rôle de Responsable, ce qu’il a traversé et où il en est.',
   stageRecruitment: 'Recrutement',
   stageAcademy: 'Academy',
-  boxMissions: 'Missions',
-  boxTeam: 'Place dans l’équipe',
+  boxInformation: 'Informations',
   boxPresence: 'Ancienneté et langues',
   railPinned: 'Note épinglée',
   noFunction: 'Aucune fonction',
+  unofficial: 'Non officiel',
   administration: 'Administration',
   absentHint: '{name} est actuellement en absence.',
 } as const

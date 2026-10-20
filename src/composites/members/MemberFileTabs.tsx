@@ -53,7 +53,7 @@ import { useMemberAdmin } from '@/core/hooks/data/people/useMemberAdmin'
 import { DepartureKinds } from '@/utils/constants/hierarchy'
 import type { DepartureKindName } from '@/utils/constants/hierarchy'
 import { MemberAccessPanel } from '@/composites/members/MemberAccessPanel'
-import { MemberRoles } from '@/utils/constants/hierarchy'
+import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
 import { useEditGestures } from '@/core/hooks/interaction/gestures/useEditGestures'
 import { useMenu, type MenuItem } from '@/managers/front-end'
@@ -138,7 +138,6 @@ const ASSIGNMENT_FIELD_NAMES = [
   'divisionId',
   'primaryFunctionIds',
   'secondaryFunctionIds',
-  'teamIds',
   'joinedAt',
   'leftAt',
 ]
@@ -157,6 +156,32 @@ const optionLabel = (field: FieldDefinition, value: FieldValue): ReactNode => {
 }
 
 /**
+ * One select value drawn with its mark, the logo of a division
+ * @param {FieldDefinition} field - Field carrying the options
+ * @param {FieldValue} value - Stored value
+ * @param {OptionMarkKind} mark - Mark drawn before the label
+ * @return {ReactNode} - Marked label
+ */
+
+const optionWithMark = (
+  field: FieldDefinition,
+  value: FieldValue,
+  mark: OptionMarkKind
+): ReactNode => {
+  if (typeof value !== 'string' || value === '') return null
+
+  const option = field.options?.find((entry) => entry.value === value)
+  if (!option) return null
+
+  return (
+    <span className={MEMBER_BLOCK.mark}>
+      <OptionMark mark={mark} option={option} />
+      {option.label}
+    </span>
+  )
+}
+
+/**
  * Label of one stored entry
  * @param {FieldDefinition} field - Field carrying the options
  * @param {string} value - Stored entry
@@ -165,23 +190,6 @@ const optionLabel = (field: FieldDefinition, value: FieldValue): ReactNode => {
 
 const optionText = (field: FieldDefinition, value: string): string =>
   field.options?.find((option) => option.value === value)?.label ?? value
-
-/**
- * Labels of every selected value of a multiselect field
- * @param {FieldDefinition} field - Field carrying the options
- * @param {FieldValue} value - Stored value
- * @return {ReactNode} - Matching option labels
- */
-
-const optionLabels = (field: FieldDefinition, value: FieldValue): ReactNode => {
-  if (!Array.isArray(value) || value.length === 0) return null
-
-  const labels = value
-    .map((entry) => field.options?.find((option) => option.value === entry)?.label)
-    .filter((label): label is string => Boolean(label))
-
-  return labels.length > 0 ? labels.join(', ') : null
-}
 
 /**
  * Every selected option of a multiselect field, one row per group with a divider between rows
@@ -396,26 +404,28 @@ export const MemberFileTabs = ({
     {
       label: MEMBER_FIELD_COPY.youtuber,
       field: fieldFor('youtuberIds'),
-      display: optionLabels(fieldFor('youtuberIds'), identityValues.youtuberIds),
+      display: optionMarks(fieldFor('youtuberIds'), identityValues.youtuberIds, 'avatar'),
     },
     {
       label: FIELD_COPY.division,
       field: fieldFor('divisionId'),
-      display: optionLabel(fieldFor('divisionId'), identityValues.divisionId),
-    },
-    {
-      label: MEMBER_FIELD_COPY.dispositif,
-      display: summary.academyDispositif?.label ?? null,
+      display:
+        optionWithMark(fieldFor('divisionId'), identityValues.divisionId, 'division') ??
+        // A junior sits in no division yet
+        (summary.role === MemberRoles.Junior || summary.status === MemberStatuses.Academy
+          ? MEMBER_COPY.unofficial
+          : null),
     },
     {
       label: MEMBER_FIELD_COPY.primaryFunctions,
       field: fieldFor('primaryFunctionIds'),
-      display: optionMarks(
-        fieldFor('primaryFunctionIds'),
-        identityValues.primaryFunctionIds,
-        'glyph',
-        functionRow
-      ),
+      display:
+        optionMarks(
+          fieldFor('primaryFunctionIds'),
+          identityValues.primaryFunctionIds,
+          'glyph',
+          functionRow
+        ) ?? (LEAD_ROLES.includes(summary.role) ? MEMBER_COPY.administration : null),
     },
     {
       label: MEMBER_FIELD_COPY.secondaryFunctions,
@@ -437,13 +447,6 @@ export const MemberFileTabs = ({
         typeof identityValues.leftAt === 'string' && identityValues.leftAt
           ? formatDay(identityValues.leftAt)
           : null,
-    },
-    {
-      label: FIELD_COPY.team,
-      field: fieldFor('teamIds'),
-      display:
-        optionLabels(fieldFor('teamIds'), identityValues.teamIds) ??
-        (LEAD_ROLES.includes(summary.role) ? MEMBER_COPY.administration : null),
     },
   ]
 
@@ -487,16 +490,12 @@ export const MemberFileTabs = ({
   // Boxes of the file tab, each answering one question
   const boxes: { title: string; labels: string[] }[] = [
     {
-      title: MEMBER_COPY.boxMissions,
+      title: MEMBER_COPY.boxInformation,
       labels: [
         MEMBER_FIELD_COPY.primaryFunctions,
         MEMBER_FIELD_COPY.secondaryFunctions,
-        MEMBER_FIELD_COPY.youtuber,
+        FIELD_COPY.division,
       ],
-    },
-    {
-      title: MEMBER_COPY.boxTeam,
-      labels: [FIELD_COPY.team, FIELD_COPY.division, MEMBER_FIELD_COPY.dispositif],
     },
     {
       title: MEMBER_COPY.boxPresence,
