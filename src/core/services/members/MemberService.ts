@@ -195,10 +195,19 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
     activeFunctions(),
     prisma.team.findMany({
       where: { archived: false },
-      select: { id: true, name: true },
-      orderBy: { name: 'asc' },
+      select: { id: true, name: true, youtuber: { select: { name: true, avatarUrl: true } } },
+      orderBy: [{ youtuber: { position: 'asc' } }, { name: 'asc' }],
     }),
   ])
+
+  // Teams are told apart by the creator they belong to
+  const teamChoices = teams.map((team) => ({
+    value: team.id,
+    label: team.name,
+    group: team.youtuber?.name ?? MEMBER_FIELD_COPY.teamWithoutYoutuber,
+    image: team.youtuber?.avatarUrl,
+    icon: 'teams',
+  }))
 
   // Each kind only offers its own functions
   const optionsOf = (kind: FunctionKindName) =>
@@ -331,7 +340,8 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       kind: 'multiselect',
       label: MEMBER_FIELD_COPY.team,
       info: MEMBER_FIELD_INFO.team,
-      options: rowsToOptions(teams),
+      options: teamChoices,
+      mark: 'glyph',
       span: 'half',
       group: FORM_GROUPS.assignment,
     },
