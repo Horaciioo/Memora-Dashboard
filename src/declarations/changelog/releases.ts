@@ -201,10 +201,16 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Amélioration du détail d’un évènement du « Calendrier » : son identifiant n’est plus visible que par les Admins',
       },
       {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.academy,
+        permission: Permissions.AcademyRead,
+        text: 'Amélioration de l’accès à « Academy » : les Formateurs l’ouvrent désormais depuis le menu',
+      },
+      {
         tag: ChangelogTags.Fixed,
         page: ROUTES.calendar,
         permission: Permissions.CalendarManage,
-        text: 'Correction d’un bug où un Modérateur pouvait créer n’importe quel évènement dans le « Calendrier » : seuls les Responsables le peuvent, un Formateur se limitant aux entretiens et aux bilans de ses Juniors, sur ses propres évènements',
+        text: 'Correction d’un bug où un Modérateur pouvait créer n’importe quel évènement dans le « Calendrier » : seuls les Responsables le peuvent, et les Formateurs ne planifient plus dans le « Calendrier » pour le moment',
       },
       {
         tag: ChangelogTags.Fixed,
