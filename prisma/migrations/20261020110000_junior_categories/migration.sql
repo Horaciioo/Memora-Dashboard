@@ -1,0 +1,3 @@
+-- AlterEnum
+ALTER TYPE "AccessCategory" ADD VALUE 'JUNIOR';
+ALTER TYPE "AccessCategory" ADD VALUE 'JUNIOR_RESPONSABLE';
