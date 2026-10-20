@@ -140,6 +140,9 @@ const asRecord = (value: unknown): Record<string, unknown> | null =>
     ? (value as Record<string, unknown>)
     : null
 
+// Mod actions live in the reports
+const NOT_MOD_ACTION = { eventType: { not: EVENT_TYPES.ids.ModerationActed } }
+
 /**
  * Read the change description off a stored payload
  * @param {Prisma.JsonValue} payload - Stored payload
@@ -213,7 +216,7 @@ export const readMemberActivity = async (
   take: number = PAGINATION_SETTINGS.defaultPerPage
 ): Promise<ActivityEntry[]> => {
   const rows = await prisma.activityLog.findMany({
-    where: { OR: [{ subjectId: accountId }, { actorId: accountId }] },
+    where: { AND: [{ OR: [{ subjectId: accountId }, { actorId: accountId }] }, NOT_MOD_ACTION] },
     include: { actor: { select: { displayName: true, avatarUrl: true } } },
     orderBy: { createdAt: 'desc' },
     take,
@@ -234,7 +237,7 @@ export const readActivityWhere = async (
   take: number = PAGINATION_SETTINGS.defaultPerPage
 ): Promise<ActivityEntry[]> => {
   const rows = await prisma.activityLog.findMany({
-    where,
+    where: { AND: [where, NOT_MOD_ACTION] },
     include: { actor: { select: { displayName: true, avatarUrl: true } } },
     orderBy: { createdAt: 'desc' },
     take,
@@ -267,6 +270,7 @@ export const readRecentActivity = async (
   take: number = PAGINATION_SETTINGS.defaultPerPage
 ): Promise<ActivityEntry[]> => {
   const rows = await prisma.activityLog.findMany({
+    where: NOT_MOD_ACTION,
     include: { actor: { select: { displayName: true, avatarUrl: true } } },
     orderBy: { createdAt: 'desc' },
     take,

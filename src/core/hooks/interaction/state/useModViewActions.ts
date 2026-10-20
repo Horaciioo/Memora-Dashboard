@@ -110,6 +110,10 @@ export const useModViewActions = (input: {
       if (chatterId && SETTLING_KINDS.includes(intent.kind)) {
         setActed((current) => ({ ...current, [chatterId]: new Date().toISOString() }))
       }
+      if (chatterId && context.offenseId && context.rung !== undefined) {
+        const { offenseId, rung } = context
+        setMemory((current) => rememberRung(current, chatterId, offenseId, rung))
+      }
       void runIntent(intent, {
         ...context,
         targetLogin:

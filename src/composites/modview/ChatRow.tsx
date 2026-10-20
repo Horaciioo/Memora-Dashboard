@@ -142,7 +142,7 @@ const ChatLineBody = ({
     </span>
   )
 
-  // Right click on the line: pin it, answer it
+  // Right click on the line: answer, watch, pin
   const pin = gate({ kind: 'pin', messageId: message.id })
   const pinItem: MenuItem[] = pin.allowed
     ? [
@@ -165,6 +165,12 @@ const ChatLineBody = ({
             onSelect: () => onReply(message),
           },
         ]),
+    {
+      id: 'watch',
+      label: MODVIEW_WATCH_COPY.watch,
+      icon: 'visible' as const,
+      onSelect: () => onWatch(message.author),
+    },
     ...(isDeleted ? [] : pinItem),
   ]
 

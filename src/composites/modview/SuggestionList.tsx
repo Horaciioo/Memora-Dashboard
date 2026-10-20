@@ -61,7 +61,7 @@ export const SuggestionList = ({
                 onUse(suggestion)
                 return
               }
-              onAct(removal)
+              onAct(removal, offense && rung !== null ? { offenseId: offense.id, rung } : {})
               onDismiss(id)
             }
             const canAccept = command ? true : removable.allowed

@@ -37,7 +37,6 @@ import {
   readTwitchRoster,
   readTwitchSeat,
 } from '@/core/services/platforms/PlatformAccountService'
-import { recordEvent } from '@/core/services/system/ActivityService'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MODVIEW_LOCK_COPY } from '@/declarations/modview/copy'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
@@ -425,15 +424,6 @@ export const actOnLive = async (input: {
       broadcasterId: found.seat.broadcasterId,
     }).catch(() => null)
   }
-
-  // The audit line points at the log line
-  await recordEvent({
-    eventType: 'ModerationActed',
-    actorId: input.viewerId,
-    targetType: 'live',
-    targetId: input.liveId,
-    summary: logId ? `${input.intent.kind}, ${logId}` : input.intent.kind,
-  })
 
   return { done: true }
 }
