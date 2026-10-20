@@ -319,6 +319,15 @@ export const NAVIGATION: NavigationGroup[] = [
         permission: Permissions.RecruitmentObserve,
         maturity: 'beta',
       },
+      // The Formateurs open the Academy from the moderator view, Programmes holds it above
+      {
+        href: ROUTES.academy,
+        label: 'Academy',
+        icon: 'academy',
+        hiddenIn: [NavigationViews.Lead, NavigationViews.Administration],
+        permission: Permissions.AcademyRead,
+        maturity: 'beta',
+      },
     ],
   },
   {
