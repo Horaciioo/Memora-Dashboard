@@ -1,6 +1,6 @@
 {
   "name": "memora-dashboard",
-  "version": "0.6.3-snapshot.1",
+  "version": "0.6.3-snapshot.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
