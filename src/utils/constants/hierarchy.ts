@@ -5,6 +5,7 @@
 
 export const MemberRoles = {
   Admin: 'ADMIN',
+  Employe: 'EMPLOYE',
   Responsable: 'RESPONSABLE',
   Moderateur: 'MODERATEUR',
   Junior: 'JUNIOR',
@@ -13,11 +14,18 @@ export const MemberRoles = {
 export type MemberRoleName = (typeof MemberRoles)[keyof typeof MemberRoles]
 
 /**
+ * Roles holding every right but the system
+ * @type {MemberRoleName[]}
+ */
+
+export const ADMIN_ROLES: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Employe]
+
+/**
  * Roles above the moderators
  * @type {MemberRoleName[]}
  */
 
-export const LEADERSHIP_ROLES: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Responsable]
+export const LEADERSHIP_ROLES: MemberRoleName[] = [...ADMIN_ROLES, MemberRoles.Responsable]
 
 /**
  * Access console categories
@@ -26,6 +34,7 @@ export const LEADERSHIP_ROLES: MemberRoleName[] = [MemberRoles.Admin, MemberRole
 
 export const AccessCategories = {
   Leader: 'LEADER',
+  Employe: 'EMPLOYE',
   Administration: 'ADMINISTRATION',
   Responsabilite: 'RESPONSABILITE',
   Moderation: 'MODERATION',

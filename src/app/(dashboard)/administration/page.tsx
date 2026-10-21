@@ -12,13 +12,12 @@ import { readAudience } from '@/core/services/system/AudienceService'
 import { readDataReport, readRuntimeReport } from '@/core/services/system/ConsoleService'
 import { readQueueReport } from '@/core/services/system/QueueReportService'
 import { readStatusReport } from '@/core/services/system/StatusService'
-import { requirePermission } from '@/core/wrappers/requireUser'
+import { requireSystem } from '@/core/wrappers/requireUser'
 import { VIEW_COPY } from '@/declarations/access/copy'
 import { APP_VERSION } from '@/declarations/app'
 import { NavigationViews } from '@/declarations/navigation'
 import { CONSOLE_COPY } from '@/declarations/system/monitoring/console'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
-import { Permissions } from '@/utils/constants/permissions'
 import { formatDayTime } from '@/utils/format/dates'
 
 export const metadata: Metadata = { title: VIEW_COPY.adminTitle }
@@ -29,7 +28,7 @@ export const metadata: Metadata = { title: VIEW_COPY.adminTitle }
  */
 
 export default async function AdministrationPage() {
-  const { scope } = await requirePermission(Permissions.AccessManage)
+  const { scope } = await requireSystem()
 
   const [data, status, pulse, audience, queues] = await Promise.all([
     readDataReport(await scope()),

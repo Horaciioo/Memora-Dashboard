@@ -33,6 +33,11 @@ export interface GrantAddition {
 
 export const GRANT_ADDITIONS: readonly GrantAddition[] = [
   { key: 'initial-role-presets', grants: ROLE_PRESETS },
+  // Databases born before the level carry no row for it
+  {
+    key: 'employee-role',
+    grants: { [MemberRoles.Employe]: ROLE_PRESETS[MemberRoles.Employe] },
+  },
   {
     key: 'work-visibility',
     grants: {

@@ -17,7 +17,7 @@ import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { BoardColumn } from '@/components/structures/data/KanbanBoard'
 import type { FieldOption, FormValues } from '@/types/forms'
 import type { WorkAuthorship, WorkPerson, WorkTag } from '@/types/work'
-import { GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
+import { GONE_MEMBER_STATUSES, LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { WorkflowPhases } from '@/utils/constants/workflow'
 import type { WorkflowPhaseName, WorkflowScopeName } from '@/utils/constants/workflow'
@@ -34,7 +34,7 @@ export const peopleInScope = (scope?: AccessScope): Prisma.AccountWhereInput =>
     ? {}
     : {
         OR: [
-          { role: { in: [MemberRoles.Admin, MemberRoles.Responsable] } },
+          { role: { in: LEADERSHIP_ROLES } },
           { youtubers: { some: { id: { in: scope.youtuberIds } } } },
         ],
       }
@@ -323,7 +323,7 @@ export const teamOptions = async ({
 
 export const leadOptions = async (
   scope?: AccessScope,
-  roles: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Responsable]
+  roles: MemberRoleName[] = LEADERSHIP_ROLES
 ): Promise<FieldOption[]> => {
   const rows = await prisma.account.findMany({
     where: {

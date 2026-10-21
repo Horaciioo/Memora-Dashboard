@@ -92,6 +92,7 @@ import {
   CodeBlockGlyph,
   CodeGlyph,
   ConfirmGlyph,
+  BriefcaseGlyph,
   CrownGlyph,
   DangerGlyph,
   DivisionGlyph,
@@ -283,6 +284,7 @@ export const ICONS = {
   shieldOutline: ShieldOutlineGlyph,
   flame: FlameGlyph,
   crown: CrownGlyph,
+  briefcase: BriefcaseGlyph,
   // Same flame as the Responsable role
   legacy: ResponsableGlyph,
   // One per fixed function

@@ -6,12 +6,11 @@ import { JobCard } from '@/composites/system/queues/JobCard'
 import { SubjectBadges } from '@/composites/system/SubjectBadges'
 import { readQueueReport } from '@/core/services/system/QueueReportService'
 import { readRuntimeReport, subjectState } from '@/core/services/system/ConsoleService'
-import { requirePermission } from '@/core/wrappers/requireUser'
+import { requireSystem } from '@/core/wrappers/requireUser'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { QUEUES_COPY } from '@/declarations/system/queues'
 import { CONSOLE_BLOCK } from '@/declarations/ui/blocks'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
-import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: SYSTEM_COPY.queuesTitle }
 
@@ -21,7 +20,7 @@ export const metadata: Metadata = { title: SYSTEM_COPY.queuesTitle }
  */
 
 export default async function QueuesPage() {
-  const { access } = await requirePermission(Permissions.AccessManage)
+  const { access } = await requireSystem()
 
   const [report, runtime] = await Promise.all([
     readQueueReport(),

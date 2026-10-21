@@ -269,7 +269,7 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'academy',
         permission: Permissions.AcademyTrainingComplete,
         // Juniors train
-        visibleWhen: { statuses: ['ACADEMY'], roles: ['ADMIN', 'RESPONSABLE'] },
+        visibleWhen: { statuses: ['ACADEMY'], roles: ['ADMIN', 'EMPLOYE', 'RESPONSABLE'] },
         maturity: 'alpha',
       },
     ],
@@ -408,6 +408,8 @@ export const NAVIGATION: NavigationGroup[] = [
         icon: 'system',
         from: NavigationViews.Administration,
         permission: Permissions.AccessManage,
+        // The employee never sees the system
+        visibleWhen: { roles: ['ADMIN'] },
       },
     ],
   },

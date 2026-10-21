@@ -6,11 +6,10 @@ import { DailyBars } from '@/composites/system/audience/DailyBars'
 import { ShareList } from '@/composites/system/audience/ShareList'
 import { ConsoleMetrics } from '@/composites/system/ConsoleMetrics'
 import { readAudience } from '@/core/services/system/AudienceService'
-import { requirePermission } from '@/core/wrappers/requireUser'
+import { requireSystem } from '@/core/wrappers/requireUser'
 import { AUDIENCE_COPY } from '@/declarations/system/monitoring/activity'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { DAILY_BARS_STYLES, PAGE_STYLES } from '@/declarations/ui/variants'
-import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: SYSTEM_COPY.analyticsTitle }
 
@@ -20,7 +19,7 @@ export const metadata: Metadata = { title: SYSTEM_COPY.analyticsTitle }
  */
 
 export default async function ActivityPage() {
-  await requirePermission(Permissions.AccessManage)
+  await requireSystem()
 
   const audience = await readAudience()
 

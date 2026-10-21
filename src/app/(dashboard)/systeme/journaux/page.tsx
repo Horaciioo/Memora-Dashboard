@@ -10,14 +10,13 @@ import { JournalPager } from '@/composites/system/journal/JournalPager'
 import { JournalRow } from '@/composites/system/journal/JournalRow'
 import { parseActivityFilters } from '@/core/lib/system/activityFilters'
 import { readActivityPage, readActivityStats } from '@/core/services/system/ActivityQueryService'
-import { requirePermission } from '@/core/wrappers/requireUser'
+import { requireSystem } from '@/core/wrappers/requireUser'
 import { ROUTES } from '@/declarations/navigation'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 import { JOURNAL_COPY } from '@/declarations/system/monitoring/journal'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { JOURNAL_TABLE_STYLES, PAGE_STYLES } from '@/declarations/ui/variants'
 import { formatDayTime } from '@/utils/format/dates'
-import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: SYSTEM_COPY.journalTitle }
 
@@ -32,7 +31,7 @@ interface JournalPageProps {
  */
 
 export default async function JournalPage({ searchParams }: JournalPageProps) {
-  await requirePermission(Permissions.AccessManage)
+  await requireSystem()
 
   const filters = parseActivityFilters(
     new URLSearchParams(

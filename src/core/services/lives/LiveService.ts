@@ -31,7 +31,7 @@ import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import type { LiveBeacon, LivePerson, LiveView } from '@/types/lives'
 import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
-import { GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
+import { ADMIN_ROLES, GONE_MEMBER_STATUSES, LEADERSHIP_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
 import {
   CoordinationStatuses,
   LivePlatforms,
@@ -46,7 +46,7 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
 // Roles that run a live on the floor
-const RESPONSABLE_ROLES: string[] = [MemberRoles.Responsable, MemberRoles.Admin]
+const RESPONSABLE_ROLES: string[] = LEADERSHIP_ROLES
 
 // Person shape every seat reads
 const PERSON = { select: { id: true, displayName: true, avatarUrl: true } } as const
@@ -265,7 +265,7 @@ const coordinatorWhere = (youtuberId?: string): Prisma.AccountWhereInput => ({
   status: { notIn: GONE_MEMBER_STATUSES },
   OR: [
     holderWhere(youtuberId),
-    { role: MemberRoles.Admin },
+    { role: { in: ADMIN_ROLES } },
     {
       role: MemberRoles.Responsable,
       ...(youtuberId && { youtubers: { some: { id: youtuberId } } }),
@@ -276,6 +276,7 @@ const coordinatorWhere = (youtuberId?: string): Prisma.AccountWhereInput => ({
 // Order the picker lists them in: Coordinators, Responsables, Admins, anyone already seated
 const COORDINATOR_RANKS: Record<string, number> = {
   [MemberRoles.Responsable]: 1,
+  [MemberRoles.Employe]: 2,
   [MemberRoles.Admin]: 2,
 }
 
@@ -303,7 +304,7 @@ export const coordinatorOptions = async (
 
   // An Admin stays an Admin, the function never moves one up
   const holds = (row: (typeof rows)[number]) =>
-    row.role !== MemberRoles.Admin &&
+    !ADMIN_ROLES.includes(row.role) &&
     row.functions.some((held) => held.jobFunction.name === COORDINATOR_FUNCTION)
   const rankOf = (row: (typeof rows)[number]) =>
     holds(row) ? 0 : (COORDINATOR_RANKS[row.role] ?? 3)
@@ -320,7 +321,7 @@ export const coordinatorOptions = async (
       group: holds(row) ? LIVE_FIELD_COPY.coordinatorGroup : ROLE_REGISTRY.get(row.role).plural,
       // An Admin is proposed whichever creator is picked
       owners:
-        row.role === MemberRoles.Admin ? undefined : row.youtubers.map((youtuber) => youtuber.id),
+        ADMIN_ROLES.includes(row.role) ? undefined : row.youtubers.map((youtuber) => youtuber.id),
       hint: toMemberFunctions(row.functions)[0]?.label ?? ROLE_REGISTRY.label(row.role),
     }))
 }
@@ -344,7 +345,7 @@ const coordinatorPicks = async (coordinators: FieldOption[]): Promise<Record<str
         AND: [
           holderWhere(youtuberId),
           // Admins are never asked on their own
-          { role: { not: MemberRoles.Admin } },
+          { role: { notIn: ADMIN_ROLES } },
           { absences: { none: activeAbsenceFilter() } },
         ],
       },

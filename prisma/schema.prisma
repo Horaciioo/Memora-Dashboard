@@ -9,6 +9,7 @@ datasource db {
 // Hierarchy level, drives the permission matrix
 enum MemberRole {
   ADMIN
+  EMPLOYE
   RESPONSABLE
   MODERATEUR
   JUNIOR
@@ -17,6 +18,7 @@ enum MemberRole {
 // Rail section of the access console, grouping the roles and the functions under one heading
 enum AccessCategory {
   LEADER
+  EMPLOYE
   ADMINISTRATION
   RESPONSABILITE
   MODERATION

@@ -9,7 +9,7 @@ import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { FOCUS_OFFLINE_ALLOWED } from '@/declarations/lives/registries'
 import type { LiveFocusView } from '@/types/lives'
-import { AcademyJuniorStatuses, MemberRoles } from '@/utils/constants/hierarchy'
+import { AcademyJuniorStatuses, LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import type { LivePlatformName, LiveStatusName } from '@/utils/constants/lives'
 import { Permissions } from '@/utils/constants/permissions'
@@ -17,7 +17,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 
 // Seats that follow anyone and see every Focus
-const OVERSEERS: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Responsable]
+const OVERSEERS: MemberRoleName[] = LEADERSHIP_ROLES
 
 /**
  * Load a live in the perimeter with what a Focus checks

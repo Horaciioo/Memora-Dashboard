@@ -50,7 +50,7 @@ import { DepartureMessageDialog } from '@/composites/members/admin/DepartureMess
 import { SanctionDrawer } from '@/composites/members/admin/SanctionDrawer'
 import type { SanctionInput } from '@/composites/members/admin/SanctionDrawer'
 import { useMemberAdmin } from '@/core/hooks/data/people/useMemberAdmin'
-import { DepartureKinds } from '@/utils/constants/hierarchy'
+import { DepartureKinds, LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import type { DepartureKindName } from '@/utils/constants/hierarchy'
 import { MemberAccessPanel } from '@/composites/members/MemberAccessPanel'
 import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
@@ -111,7 +111,7 @@ const ExternalIcon = ICONS.forward
 const CalendarIcon = ICONS.meetings
 
 // Roles that sit in the Administration
-const LEAD_ROLES: string[] = [MemberRoles.Admin, MemberRoles.Responsable]
+const LEAD_ROLES: string[] = LEADERSHIP_ROLES
 
 const CONTACT_FIELD_NAMES = ['discordId', 'birthday', 'languages', 'timezone']
 

@@ -10,7 +10,7 @@ import { openMeetingForEntry } from '@/core/services/work/MeetingService'
 import { defaultState } from '@/core/services/work/shared'
 import { ANNUAL_REVIEW_COPY } from '@/declarations/calendar/copy'
 import { ROUTES } from '@/declarations/navigation'
-import { GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
+import { ADMIN_ROLES, GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
 import {
   AttendanceStatuses,
   AttendeeKinds,
@@ -69,7 +69,7 @@ export const openAnnualSlots = async (
     prisma.teamLead.count({ where: { teamId: input.teamId, accountId: actorId } }),
     prisma.account.findUniqueOrThrow({ where: { id: actorId }, select: { role: true } }),
   ])
-  if (led === 0 && actor.role !== MemberRoles.Admin) throw forbidden()
+  if (led === 0 && !ADMIN_ROLES.includes(actor.role)) throw forbidden()
 
   if (!input.endsAt || input.endsAt <= input.startsAt) {
     throw invalidInput([{ field: 'endsAt', message: ANNUAL_REVIEW_COPY.badRange }])

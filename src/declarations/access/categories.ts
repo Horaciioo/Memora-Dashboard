@@ -26,32 +26,38 @@ const ACCESS_CATEGORY_MAP: Record<AccessCategoryName, AccessCategoryOption> = {
     tier: MemberRoles.Admin,
     role: MemberRoles.Admin,
   },
+  [AccessCategories.Employe]: {
+    label: 'Employés',
+    position: 1,
+    tier: MemberRoles.Employe,
+    role: MemberRoles.Employe,
+  },
   [AccessCategories.Administration]: {
     label: 'Administration',
-    position: 1,
+    position: 2,
     tier: MemberRoles.Responsable,
     role: MemberRoles.Responsable,
   },
   [AccessCategories.Responsabilite]: {
     label: 'Responsabilité',
-    position: 2,
+    position: 3,
     tier: MemberRoles.Responsable,
   },
   [AccessCategories.Moderation]: {
     label: 'Modérateurs',
-    position: 3,
+    position: 4,
     tier: MemberRoles.Moderateur,
     role: MemberRoles.Moderateur,
   },
   [AccessCategories.Junior]: {
     label: 'Juniors',
-    position: 4,
+    position: 5,
     tier: MemberRoles.Junior,
     role: MemberRoles.Junior,
   },
   [AccessCategories.JuniorResponsable]: {
     label: 'Juniors responsables',
-    position: 5,
+    position: 6,
     tier: MemberRoles.Junior,
   },
 }

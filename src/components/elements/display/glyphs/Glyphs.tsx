@@ -574,6 +574,20 @@ export const CrownGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
+ * Briefcase line glyph
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const BriefcaseGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={2}>
+    <rect x="3.5" y="8" width="17" height="11.5" rx="2.5" />
+    <path d="M9 8V6.5A1.5 1.5 0 0 1 10.5 5h3A1.5 1.5 0 0 1 15 6.5V8" />
+    <path d="M3.5 13h17" />
+  </Stroke>
+)
+
+/**
  * Figure going up
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}

@@ -8,8 +8,8 @@ export const POST = createProtectedRoute({
   permission: Permissions.AccessManage,
   descriptor: { summary: 'Retry the failed runs of one background job', tags: ['system'] },
   handler: async ({ params, session, access }) => {
-    // Admins only
-    if (!access.isAdmin) throw forbidden()
+    // System holders only
+    if (!access.isSystem) throw forbidden()
     if (!JOB_REGISTRY.has(params.job)) throw notFound()
 
     await retryFailedJobs(params.job, session.id)

@@ -38,9 +38,18 @@ const ROLE_MAP: Record<MemberRoleName, RoleOption> = {
     label: 'Admin',
     plural: 'Admins',
     summary: 'Pilote les responsables et fait la passerelle avec les YouTubeurs.',
-    rank: 3,
+    rank: 4,
     accent: 'authorityAdmin',
     icon: 'crown',
+    view: NavigationViews.Administration,
+  },
+  [MemberRoles.Employe]: {
+    label: 'Employé',
+    plural: 'Employés',
+    summary: 'Tous les droits de l’Admin, sauf le Système, sur tous les YouTubeurs.',
+    rank: 3,
+    accent: 'authorityAdmin',
+    icon: 'briefcase',
     view: NavigationViews.Administration,
   },
   [MemberRoles.Responsable]: {
@@ -175,6 +184,7 @@ const ALL_PERMISSIONS: PermissionName[] = PermissionsList.map((entry) => entry.n
 
 export const ROLE_PRESETS: Record<MemberRoleName, PermissionName[]> = {
   [MemberRoles.Admin]: ALL_PERMISSIONS,
+  [MemberRoles.Employe]: ALL_PERMISSIONS,
   [MemberRoles.Responsable]: [
     Permissions.MemberRead,
     Permissions.MemberCreate,

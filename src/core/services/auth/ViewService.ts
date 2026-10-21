@@ -6,7 +6,7 @@ import { readLedCreators } from '@/core/services/auth/LeadService'
 import { ROLE_REGISTRY, isEncadrement } from '@/declarations/access/roles'
 import { NAVIGATION_VIEW_ORDER, NavigationViews, viewDepth } from '@/declarations/navigation'
 import type { NavigationViewName } from '@/declarations/navigation'
-import { MemberRoles } from '@/utils/constants/hierarchy'
+import { ADMIN_ROLES } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { MENTION_PAGES } from '@/declarations/notifications/targets'
 import type { CreatorLead, MentionBubble, ViewContext } from '@/types/access'
@@ -178,4 +178,4 @@ const mentionBubbles = (mentions: NotificationEntry[]): MentionBubble[] => {
  * @return {boolean} - Sits at admin level
  */
 
-export const isAdminRole = (role: MemberRoleName): boolean => role === MemberRoles.Admin
+export const isAdminRole = (role: MemberRoleName): boolean => ADMIN_ROLES.includes(role)

@@ -2,7 +2,7 @@ import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { VIEW_ROLES } from '@/declarations/access/views'
 import type { NavigationViewName } from '@/declarations/navigation'
 import type { ActualIdentity, SessionUser } from '@/types/auth'
-import { MemberRoles } from '@/utils/constants/hierarchy'
+import { ADMIN_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 
 /**
@@ -49,4 +49,4 @@ export const isSimulated = (session: SessionUser): boolean =>
  */
 
 export const isActualAdmin = ({ role, isRoot }: ActualIdentity): boolean =>
-  isRoot || role === MemberRoles.Admin
+  isRoot || ADMIN_ROLES.includes(role)

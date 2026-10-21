@@ -6,12 +6,11 @@ import { StatusPanel } from '@/composites/system/status/StatusPanel'
 import { RuntimePanel } from '@/composites/system/RuntimePanel'
 import { readRuntimeReport } from '@/core/services/system/ConsoleService'
 import { readStatusReport } from '@/core/services/system/StatusService'
-import { requirePermission } from '@/core/wrappers/requireUser'
+import { requireSystem } from '@/core/wrappers/requireUser'
 import { VIEW_COPY } from '@/declarations/access/copy'
 import { CONSOLE_COPY } from '@/declarations/system/monitoring/console'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
-import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: SYSTEM_COPY.probesTitle }
 
@@ -21,7 +20,7 @@ export const metadata: Metadata = { title: SYSTEM_COPY.probesTitle }
  */
 
 export default async function ProbesPage() {
-  await requirePermission(Permissions.AccessManage)
+  await requireSystem()
 
   const runtime = readRuntimeReport()
   const status = await readStatusReport()
