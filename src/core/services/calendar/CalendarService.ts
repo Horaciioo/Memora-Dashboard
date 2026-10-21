@@ -38,6 +38,8 @@ import {
   withTemplatePlatform,
   syncLiveWithEntry,
 } from '@/core/services/lives/LiveService'
+import { LIVE_FIELD_COPY } from '@/declarations/lives/copy'
+import { LIVE_PLATFORMS_SOON } from '@/declarations/lives/registries'
 import { assertNoLiveClash } from '@/core/services/lives/LiveClashService'
 import { peopleInScope, projectOptions, youtuberOptions } from '@/core/services/work/shared'
 import {
@@ -159,6 +161,9 @@ const templateOptions = async (
     where: { archived: false },
     orderBy: [{ position: 'asc' }, { name: 'asc' }],
   })
+  // A live on a platform Memora cannot hold yet is shown but shut
+  const soon = (platform: string | null) =>
+    platform !== null && LIVE_PLATFORMS_SOON.some((name) => name === platform)
 
   // One heading per theme, the shape of each model shows in a tag under the pointer
   const themes = [
@@ -179,13 +184,18 @@ const templateOptions = async (
         // Only offered under the type it belongs to
         owner: row.kind,
         // A model tied to recruitments or the academy waits for one to run
-        hint: row.linksTo && !running[row.linksTo] ? CALENDAR_FIELD_INFO.noSession : undefined,
+        hint: soon(row.platform)
+          ? LIVE_FIELD_COPY.platformSoon
+          : row.linksTo && !running[row.linksTo]
+            ? CALENDAR_FIELD_INFO.noSession
+            : undefined,
         slot:
           row.weekday && row.startTime
             ? { weekday: row.weekday, time: row.startTime, minutes: row.defaultMinutes }
             : undefined,
         // A check-in nobody is left to be planned for is shown but shut
         disabled:
+          soon(row.platform) ||
           Boolean(row.linksTo && !running[row.linksTo]) ||
           isTemplateGreyed(academy, row.id) ||
           (live.templateIds.includes(row.id) && !live.allowed) ||
