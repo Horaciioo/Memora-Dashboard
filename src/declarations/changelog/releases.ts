@@ -127,6 +127,98 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.6.3',
+    date: '2026-10-21',
+    title: 'Le calendrier s’organise',
+    intro:
+      'Le calendrier gagne des modèles d’évènements, des bilans annuels à réserver et des filtres plus clairs.',
+    description:
+      'Poser un évènement demandait de tout remplir à la main, les bilans annuels se géraient hors de Memora et le panneau de filtres du calendrier mélangeait tout. Cette version propose des modèles prêts à l’emploi, organise les bilans annuels par créneaux de 15 minutes et sépare clairement les filtres par type et par calendrier.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Bilans annuels » : un Responsable ouvre les créneaux de 15 minutes de son équipe, chaque modérateur en prend un, le place ou l’annule, et un projet avec ses tâches de préparation se crée en même temps',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CalendarManage,
+        text: 'Ajout de la possibilité de placer un modérateur sur un créneau de « Bilans annuels » et de supprimer d’un clic tous les créneaux non pris depuis le titre de la période',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.meetings,
+        permission: Permissions.MeetingRead,
+        text: 'Ajout d’un petit calendrier du mois sur la fiche d’un bilan annuel de la page « Réunions », avec le nombre de créneaux pris chaque jour',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Ajout de modèles d’évènements classés par catégorie (Réunions, Lives, Academy, Recrutement, Technique) dans le formulaire « Calendrier », avec les champs inutiles masqués selon le modèle choisi',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Ajout des modèles « Live YouTube » et « Live Twitch » : les deux coordinateurs les moins récents et présents sont proposés, et le live s’ouvre depuis son évènement',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Ajout des modèles de réunions d’équipe, « Réunion Marsha » et « Administration entière », avec leur public déjà convoqué',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CalendarManage,
+        text: 'Ajout des modèles « Zone de recrutement », « Zone Academy », des entrevues et des « Bilans de fin de période », liés aux sessions en cours et créés sept jours avant la fin d’une période',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Ajout d’un choix d’émoji dans la boîte du titre d’un évènement, tiré au hasard quand aucun n’est choisi',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Amélioration du panneau de filtres du « Calendrier » : un onglet « Types » pour afficher ou masquer les zones, les périodes et les évènements, et un onglet « Filtres » pour les calendriers (Lives, Bilans annuels, Réunions, Academy…) et les YouTubeurs, avec une coche verte sur ce qui est affiché',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Amélioration visuelle du « Calendrier » : des cartes pleines teintées avec l’heure en petit au-dessus, des zones dont le titre géant apparaît au survol derrière les cartes, et des périodes dessinées en grands cadres arrondis autour de leurs évènements',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Amélioration du formulaire d’évènement : l’option « Toute la journée » grise les heures avec une bulle explicative instantanée, et un champ grisé dit pourquoi au survol',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Amélioration de l’appel de présence : une liste plus compacte avec l’avatar et le nom de chacun, et une phrase de sollicitation qui met le jour et l’heure en gras',
+      },
+    ],
+    comments: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.calendar,
+        text: 'Les bilans annuels remplacent la gestion à la main : un Responsable ouvre les créneaux, ses modérateurs réservent, et tout se retrouve dans « Réunions » et dans le calendrier.',
+      },
+    ],
+  },
+  {
     version: '0.6.2',
     date: '2026-10-21',
     title: 'Memora se peaufine',
