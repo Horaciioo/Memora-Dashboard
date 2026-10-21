@@ -222,7 +222,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.calendar,
         permission: Permissions.CalendarRead,
-        text: 'Ajout des modèles « Live YouTube » et « Live Twitch » : la plateforme vient du modèle, les deux coordinateurs qui ont coordonné le moins récemment et qui ne sont pas absents sont proposés',
+        text: 'Ajout des modèles « Live YouTube » et « Live Twitch » : la plateforme vient du modèle, « Live YouTube » reste grisé tant que les Lives YouTube ne sont pas disponibles, et les deux Coordinateurs de Live qui ont coordonné le moins récemment et qui ne sont pas absents sont proposés',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberUpdate,
+        text: 'Ajout de la fonction secondaire « Coordinateur de Live » : ses porteurs sont proposés en premier pour coordonner un Live, avant les Responsables puis les Administrateurs',
       },
       {
         tag: ChangelogTags.Added,
@@ -298,7 +305,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Improved,
         page: ROUTES.calendar,
         permission: Permissions.CalendarRead,
-        text: 'Amélioration des zones du « Calendrier » : toujours sur la journée entière, avec un grand titre très pâle qui n’apparaît qu’au survol, derrière les cartes, sans être coupé ni répété',
+        text: 'Amélioration des zones du « Calendrier » : toujours sur la journée entière, avec un grand titre très pâle qui n’apparaît qu’au survol, derrière les cartes, sans être coupé ni répété, et les titres de plusieurs zones sur les mêmes jours réunis par « & »',
       },
       {
         tag: ChangelogTags.Improved,
