@@ -171,6 +171,7 @@ enum MeetingAudience {
   DISCORD
   TWITCH
   CUSTOM
+  TEAM
 }
 
 // Review outcome of an absence request
@@ -1571,20 +1572,39 @@ enum EventPurpose {
 
 // Pre-designed entry the calendar form starts from, declared from the admin console
 model EventTemplate {
-  id             String          @id @default(cuid())
-  name           String          @unique
-  kind           CalendarKind    @default(EVENT)
-  summary        String?
-  body           String?
-  accent         String?
-  visibility     EventVisibility @default(EVERYONE)
-  defaultMinutes Int?
-  purpose        EventPurpose?   @unique
-  allDay         Boolean         @default(false)
-  position       Int             @default(0)
-  archived       Boolean         @default(false)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id              String           @id @default(cuid())
+  name            String           @unique
+  kind            CalendarKind     @default(EVENT)
+  summary         String?
+  body            String?
+  accent          String?
+  visibility      EventVisibility  @default(EVERYONE)
+  defaultMinutes  Int?
+  purpose         EventPurpose?    @unique
+  allDay          Boolean          @default(false)
+  // Glyph drawn beside the model
+  icon            String?
+  // Theme the picker files it under
+  category        String?
+  // RECRUITMENT or ACADEMY: offered only while such a session runs
+  linksTo         String?
+  // Length of the slots a model opens, the annual reviews
+  slotMinutes     Int?
+  // Presence is always asked
+  rollCall        Boolean          @default(false)
+  // A card on the Réunions page is filed under this audience
+  meetingAudience MeetingAudience?
+  // A live model opens a live on this platform
+  platform        LivePlatform?
+  // Function whose team a team meeting convenes
+  functionName    String?
+  // Weekday (1 = Monday) and wall clock a model proposes
+  weekday         Int?
+  startTime       String?
+  position        Int              @default(0)
+  archived        Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   events CalendarEvent[]
 
