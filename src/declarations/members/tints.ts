@@ -38,15 +38,15 @@ const BASE_TINTS = {
     deepTo: '#173f94',
     cut: '#f4f9ff',
   },
-  // Live
+  // Live, the green of the Twitch moderator sword
   LIVE: {
-    fillFrom: '#7dd8f5',
-    fillTo: '#0aa0d6',
-    liftFrom: '#e0f6fd',
-    liftTo: '#a5e4f8',
-    deepFrom: '#0786b8',
-    deepTo: '#0a4e6e',
-    cut: '#f1fbfe',
+    fillFrom: '#6ee36a',
+    fillTo: '#00ad03',
+    liftFrom: '#e7ffe5',
+    liftTo: '#b2f7ae',
+    deepFrom: '#008f06',
+    deepTo: '#004d0c',
+    cut: '#f3fff2',
   },
   ANIMATOR: {
     fillFrom: '#f5c451',
@@ -83,6 +83,44 @@ const BASE_TINTS = {
     deepFrom: '#5a4bb8',
     deepTo: '#352c78',
     cut: '#f6f4ff',
+  },
+  // Employee, indigo between the red admin and the orange responsable
+  EMPLOYE: {
+    fillFrom: '#a5b4fc',
+    fillTo: '#4f46e5',
+    liftFrom: '#e0e7ff',
+    liftTo: '#c7d2fe',
+    deepFrom: '#4338ca',
+    deepTo: '#312e81',
+    cut: '#eef2ff',
+  },
+  // Division escutcheons, orchid for Junior, violet for the squads, gold for the responsables
+  DIVISION_JUNIOR: {
+    fillFrom: '#d9bff7',
+    fillTo: '#8e5bd4',
+    liftFrom: '#f3ebfd',
+    liftTo: '#dfcbf8',
+    deepFrom: '#7a46c2',
+    deepTo: '#40226f',
+    cut: '#faf5ff',
+  },
+  DIVISION: {
+    fillFrom: '#8b7cf6',
+    fillTo: '#5b46d6',
+    liftFrom: '#e4e0ff',
+    liftTo: '#b6acfa',
+    deepFrom: '#4c37b8',
+    deepTo: '#2b1f78',
+    cut: '#f5f3ff',
+  },
+  DIVISION_LEAD: {
+    fillFrom: '#fcd34d',
+    fillTo: '#ea580c',
+    liftFrom: '#fff7ed',
+    liftTo: '#fdba74',
+    deepFrom: '#d9480f',
+    deepTo: '#7c2d12',
+    cut: '#fffbeb',
   },
   RESPONSABLE: {
     fillFrom: '#fb923c',

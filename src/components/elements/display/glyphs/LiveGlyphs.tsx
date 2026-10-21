@@ -75,7 +75,7 @@ export const TwitchGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * YouTube play badge
+ * YouTube play button, raised on a dark plinth
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -84,11 +84,40 @@ export const YoutubeGlyph = ({ className }: GlyphProps) => (
   <Frame
     className={className}
     tone="YOUTUBE"
-    render={({ fill, lift, cut }) => (
+    render={({ fill, lift, deep, cut }) => (
       <>
-        <rect x="2" y="5" width="20" height="14" rx="4.5" fill={fill} />
-        <path d="M2 9.5a4.5 4.5 0 0 1 4.5-4.5h11A4.5 4.5 0 0 1 22 9.5z" fill={lift} opacity="0.5" />
-        <path d="M10 8.8v6.4l5.4-3.2z" fill={cut} />
+        <rect x="1.8" y="6.4" width="20.4" height="14" rx="5.2" fill={deep} />
+        <rect x="1.8" y="3.8" width="20.4" height="14.6" rx="5.2" fill={fill} />
+        <path
+          d="M1.8 9A5.2 5.2 0 0 1 7 3.8h10A5.2 5.2 0 0 1 22.2 9v.8C17 8 7 8 1.8 9.8z"
+          fill={lift}
+          opacity="0.55"
+        />
+        <path
+          d="M10.2 7.9v6.8l6.2-3.4z"
+          fill={deep}
+          stroke={deep}
+          strokeWidth="1.4"
+          strokeLinejoin="round"
+          opacity="0.45"
+          transform="translate(.5 .7)"
+        />
+        <path
+          d="M10.2 7.9v6.8l6.2-3.4z"
+          fill={cut}
+          stroke={cut}
+          strokeWidth="1.4"
+          strokeLinejoin="round"
+        />
+        <ellipse
+          cx="5.6"
+          cy="7.4"
+          rx="1.6"
+          ry="0.8"
+          transform="rotate(-25 5.6 7.4)"
+          fill="white"
+          opacity="0.8"
+        />
       </>
     )}
   />
