@@ -12,7 +12,6 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { syncRoster } from '@/core/services/calendar/attendance'
 import { notify } from '@/core/services/system/NotificationService'
 import { recordEvent } from '@/core/services/system/ActivityService'
-import { roleGroupedOptions } from '@/core/lib/forms/options'
 import { HELD_FUNCTIONS, toMemberFunctions } from '@/core/services/reference/functions'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { peopleInScope } from '@/core/services/work/shared'
@@ -25,7 +24,8 @@ import { liveStartedKey } from '@/declarations/academy/welcome'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
 import { FORM_SETTINGS, LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_FIELD_COPY, LIVE_INSTRUCTIONS_DEFAULT } from '@/declarations/lives/copy'
-import { LIVE_FUNCTIONS } from '@/declarations/lives/registries'
+import { LIVE_FUNCTIONS, LIVE_PLATFORMS_SOON } from '@/declarations/lives/registries'
+import { COORDINATOR_FUNCTION } from '@/declarations/reference/fixed'
 import { isIconName } from '@/declarations/ui/icons'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
@@ -243,52 +243,93 @@ const convene = async ({
 }
 
 /**
- * Who may coordinate a live: the live team of the creator, never a Junior, plus its Responsables and every Admin
+ * Holders of the Coordinator function, never a Junior
+ * @param {string} [youtuberId] - Creator the live is for, every creator when absent
+ * @return {Prisma.AccountWhereInput} - Account filter
+ */
+
+const holderWhere = (youtuberId?: string): Prisma.AccountWhereInput => ({
+  status: { notIn: GONE_MEMBER_STATUSES },
+  role: { not: MemberRoles.Junior },
+  functions: { some: { jobFunction: { name: COORDINATOR_FUNCTION } } },
+  ...(youtuberId && { youtubers: { some: { id: youtuberId } } }),
+})
+
+/**
+ * Who may coordinate a live: the Coordinators, the Responsables of the creator and every Admin
  * @param {string} [youtuberId] - Creator the live is for, every creator when absent
  * @return {Prisma.AccountWhereInput} - Account filter
  */
 
 const coordinatorWhere = (youtuberId?: string): Prisma.AccountWhereInput => ({
   status: { notIn: GONE_MEMBER_STATUSES },
-  role: { not: MemberRoles.Junior },
   OR: [
+    holderWhere(youtuberId),
     { role: MemberRoles.Admin },
     {
+      role: MemberRoles.Responsable,
       ...(youtuberId && { youtubers: { some: { id: youtuberId } } }),
-      OR: [
-        { role: MemberRoles.Responsable },
-        { functions: { some: { jobFunction: { name: { in: [...LIVE_FUNCTIONS] } } } } },
-      ],
     },
   ],
 })
 
+// Order the picker lists them in: Coordinators, Responsables, Admins, anyone already seated
+const COORDINATOR_RANKS: Record<string, number> = {
+  [MemberRoles.Responsable]: 1,
+  [MemberRoles.Admin]: 2,
+}
+
 /**
  * Members offered as Coordinators, each tied to the creators they cover
  * @param {AccessScope} [scope] - Creator perimeter
+ * @param {string[]} [seated] - Members already asked, kept in the list so editing never drops them
  * @return {Promise<FieldOption[]>} - Select options
  */
 
-export const coordinatorOptions = async (scope?: AccessScope): Promise<FieldOption[]> => {
+export const coordinatorOptions = async (
+  scope?: AccessScope,
+  seated: string[] = []
+): Promise<FieldOption[]> => {
   const rows = await prisma.account.findMany({
-    where: { AND: [coordinatorWhere(), peopleInScope(scope)] },
+    where: {
+      AND: [
+        { OR: [coordinatorWhere(), ...(seated.length > 0 ? [{ id: { in: seated } }] : [])] },
+        peopleInScope(scope),
+      ],
+    },
     orderBy: { displayName: 'asc' },
     include: { ...HELD_FUNCTIONS, youtubers: { select: { id: true } } },
   })
 
-  return roleGroupedOptions(rows, (row) => ({
-    // An Admin is proposed whichever creator is picked
-    owners:
-      row.role === MemberRoles.Admin ? undefined : row.youtubers.map((youtuber) => youtuber.id),
-    hint: toMemberFunctions(row.functions)[0]?.label ?? ROLE_REGISTRY.label(row.role),
-  }))
+  // An Admin stays an Admin, the function never moves one up
+  const holds = (row: (typeof rows)[number]) =>
+    row.role !== MemberRoles.Admin &&
+    row.functions.some((held) => held.jobFunction.name === COORDINATOR_FUNCTION)
+  const rankOf = (row: (typeof rows)[number]) =>
+    holds(row) ? 0 : (COORDINATOR_RANKS[row.role] ?? 3)
+
+  return [...rows]
+    .sort(
+      (left, right) =>
+        rankOf(left) - rankOf(right) || left.displayName.localeCompare(right.displayName, 'fr')
+    )
+    .map((row) => ({
+      value: row.id,
+      label: row.displayName,
+      image: row.avatarUrl,
+      group: holds(row) ? LIVE_FIELD_COPY.coordinatorGroup : ROLE_REGISTRY.get(row.role).plural,
+      // An Admin is proposed whichever creator is picked
+      owners:
+        row.role === MemberRoles.Admin ? undefined : row.youtubers.map((youtuber) => youtuber.id),
+      hint: toMemberFunctions(row.functions)[0]?.label ?? ROLE_REGISTRY.label(row.role),
+    }))
 }
 
 // Coordinators proposed for each live
 const PROPOSED_COORDINATORS = 2
 
 /**
- * Members proposed as Coordinators for each creator: the live team members who coordinated the least recently, nobody absent
+ * Members proposed as Coordinators for each creator: the holders of the function who coordinated the least recently, nobody absent
  * @param {FieldOption[]} coordinators - Members offered, tied to the creators they cover
  * @return {Promise<Record<string, string[]>>} - Proposed member identifiers by creator
  */
@@ -298,18 +339,18 @@ const coordinatorPicks = async (coordinators: FieldOption[]): Promise<Record<str
   const picks: Record<string, string[]> = {}
 
   for (const youtuberId of youtuberIds) {
-    const members = await prisma.teamMember.findMany({
+    const members = await prisma.account.findMany({
       where: {
-        team: { youtuberId, archived: false, jobFunction: { name: { in: [...LIVE_FUNCTIONS] } } },
-        account: {
-          status: { notIn: GONE_MEMBER_STATUSES },
-          role: { not: MemberRoles.Junior },
-          absences: { none: activeAbsenceFilter() },
-        },
+        AND: [
+          holderWhere(youtuberId),
+          // Admins are never asked on their own
+          { role: { not: MemberRoles.Admin } },
+          { absences: { none: activeAbsenceFilter() } },
+        ],
       },
-      select: { accountId: true },
+      select: { id: true },
     })
-    const ids = [...new Set(members.map((member) => member.accountId))]
+    const ids = members.map((member) => member.id)
     if (ids.length === 0) continue
 
     const last = await prisma.liveCoordination.groupBy({
@@ -347,7 +388,9 @@ export const readLiveTemplates = async (): Promise<Map<string, LivePlatformName>
  */
 
 export const readLiveTemplateId = async (): Promise<string | null> =>
-  [...(await readLiveTemplates()).keys()][0] ?? null
+  [...(await readLiveTemplates())].find(
+    ([, platform]) => !LIVE_PLATFORMS_SOON.includes(platform)
+  )?.[0] ?? null
 
 /**
  * Hand a live entry the platform of its template
@@ -386,7 +429,7 @@ export const liveFormFields = async (
       label: LIVE_FIELD_COPY.coordinator,
       options: coordinators,
       ownerField: 'youtuberId',
-      // Two members of the live team who coordinated the least recently, nobody absent
+      // Two holders of the Coordinator function who coordinated the least recently, nobody absent
       defaultPicks: await coordinatorPicks(coordinators),
       mark: 'avatar',
       visibleWhen,
@@ -410,7 +453,13 @@ export const liveFormFields = async (
 
 const readPlatform = (values: FormValues): LivePlatformName => {
   const raw = readText(values, 'platform')
-  if (raw === LivePlatforms.Twitch || raw === LivePlatforms.YouTube) return raw
+  if (raw === LivePlatforms.Twitch || raw === LivePlatforms.YouTube) {
+    if (LIVE_PLATFORMS_SOON.includes(raw)) {
+      throw invalidInput([{ field: 'templateId', message: LIVE_FIELD_COPY.platformSoon }])
+    }
+
+    return raw
+  }
 
   throw invalidInput([{ field: 'platform', message: FORM_COPY.required }])
 }

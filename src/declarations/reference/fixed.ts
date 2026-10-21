@@ -76,6 +76,8 @@ export interface FixedFunction {
 // Secondary functions that open a team picker
 export const OBSERVER_FUNCTION = 'Observateurs'
 export const TRAINER_FUNCTION = 'Formateurs'
+// Holders may be asked to coordinate a live
+export const COORDINATOR_FUNCTION = 'Coordinateur de Live'
 
 /**
  * Functions
@@ -163,6 +165,15 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     accent: '#8b7fd6',
     category: 'MODERATION',
     summary: 'Assiste aux entretiens de recrutement.',
+  },
+  {
+    name: COORDINATOR_FUNCTION,
+    kind: 'SECONDARY',
+    position: 13,
+    icon: 'coordinator',
+    accent: '#d97706',
+    category: 'MODERATION',
+    summary: 'Peut être choisi pour coordonner un live.',
   },
   {
     name: 'Junior Responsable Discord',
