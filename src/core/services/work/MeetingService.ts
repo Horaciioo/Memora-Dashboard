@@ -33,8 +33,20 @@ import { MEETING_FIELD_COPY, MEETING_FIELD_INFO } from '@/declarations/work/copy
 import { MEETING_AUDIENCE_REGISTRY } from '@/declarations/work/registries'
 import { toOptions } from '@/core/lib/forms/options'
 import type { FieldDefinition, FormValues } from '@/types/forms'
-import type { MeetingDetail, MeetingSummary, MeetingTopicEntry, WorkPerson } from '@/types/work'
-import { AttendeeKinds, MeetingAudiences, WorkflowScopes } from '@/utils/constants/workflow'
+import type {
+  MeetingCalendarView,
+  MeetingDetail,
+  MeetingSummary,
+  MeetingTopicEntry,
+  WorkPerson,
+} from '@/types/work'
+import {
+  AttendeeKinds,
+  CalendarKinds,
+  MeetingAudiences,
+  WorkflowScopes,
+} from '@/utils/constants/workflow'
+import { instantToWall } from '@/utils/format/zone'
 import type { AttendeeKindName, MeetingAudienceName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
 
@@ -384,6 +396,71 @@ export const createMeeting = async (
 }
 
 /**
+ * Card of a calendar entry on the Réunions page
+ * @typedef {Object} EntryMeeting
+ * @property {string} title - Entry title
+ * @property {string | null} emoji - Entry emoji
+ * @property {Date} startsAt - Start of the entry
+ * @property {Date | null} endsAt - End of the entry
+ * @property {MeetingAudienceName} audience - Audience of the card
+ * @property {string | null} youtuberId - Creator it concerns
+ * @property {string[]} leadIds - Members running it
+ * @property {string[]} participantIds - Members convened
+ * @property {string} actorId - Who planned it
+ */
+
+export interface EntryMeeting {
+  title: string
+  emoji: string | null
+  startsAt: Date
+  endsAt: Date | null
+  audience: MeetingAudienceName
+  youtuberId: string | null
+  leadIds: string[]
+  participantIds: string[]
+  actorId: string
+}
+
+/**
+ * File a meeting on the Réunions page for a calendar entry
+ * @param {EntryMeeting} entry - Entry to file
+ * @return {Promise<string>} - Meeting identifier
+ */
+
+export const openMeetingForEntry = async (entry: EntryMeeting): Promise<string> => {
+  const stateId = await defaultState(WorkflowScopes.Meeting)
+  const last = await prisma.meeting.aggregate({ where: { stateId }, _max: { position: true } })
+  const leads = [...new Set(entry.leadIds)]
+  const participants = [...new Set(entry.participantIds)].filter((id) => !leads.includes(id))
+
+  const row = await prisma.meeting.create({
+    data: {
+      title: entry.title,
+      emoji: entry.emoji,
+      scheduledAt: entry.startsAt,
+      durationMin: entry.endsAt
+        ? Math.round((entry.endsAt.getTime() - entry.startsAt.getTime()) / 60_000)
+        : null,
+      audience: entry.audience,
+      stateId,
+      youtubers: { connect: creatorLinks(entry.youtuberId ? [entry.youtuberId] : []) },
+      position: (last._max.position ?? 0) + FORM_SETTINGS.positionStep,
+      createdById: entry.actorId,
+      updatedById: entry.actorId,
+      attendees: {
+        create: [
+          ...leads.map((accountId) => ({ accountId, kind: AttendeeKinds.Lead })),
+          ...participants.map((accountId) => ({ accountId, kind: AttendeeKinds.Participant })),
+        ],
+      },
+    },
+    select: { id: true },
+  })
+
+  return row.id
+}
+
+/**
  * Edit a meeting
  * @param {string} id - Meeting identifier
  * @param {FormValues} values - Parsed body
@@ -399,6 +476,21 @@ export const updateMeeting = async (
   actorId: string
 ): Promise<MeetingSummary> => {
   await assertRowInScope('meeting', id, scope)
+
+  // The card of a series of annual reviews is filled in by the system, only its date can change
+  const linked = await prisma.meeting.findUnique({
+    where: { id },
+    select: { project: { select: { systemKey: true } } },
+  })
+  if (linked?.project?.systemKey?.startsWith('annual-reviews:')) {
+    const row = await prisma.meeting.update({
+      where: { id },
+      data: { scheduledAt: readDate(values, 'scheduledAt'), updatedById: actorId },
+      include: MEETING_INCLUDE,
+    })
+
+    return toMeetingSummary(row)
+  }
 
   const picked = readCreatorIds(values)
   assertAllInScope(scope, picked)
@@ -504,6 +596,61 @@ export const readMeeting = async (id: string): Promise<MeetingDetail> => {
   })
 
   return { summary: toMeetingSummary(row), topics: topics.map(toTopic) }
+}
+
+/**
+ * Read where a meeting sits on the calendar, none when it was never put there
+ * @param {string} meetingId - Meeting identifier
+ * @return {Promise<MeetingCalendarView | null>} - One entry, or a period with the slots of each day
+ */
+
+export const readMeetingCalendar = async (
+  meetingId: string
+): Promise<MeetingCalendarView | null> => {
+  const linked = await prisma.calendarEvent.findMany({
+    where: { meetingId },
+    orderBy: { startsAt: 'asc' },
+    select: { id: true, title: true, kind: true, startsAt: true, endsAt: true, projectId: true },
+  })
+  const first = linked[0]
+  if (!first) return null
+
+  // A period carries the slots filed under its project
+  const period = linked.find((entry) => entry.kind === CalendarKinds.Period && entry.projectId)
+  if (!period?.projectId) {
+    return {
+      shape: 'single',
+      title: first.title,
+      startsAt: first.startsAt.toISOString(),
+      endsAt: first.endsAt?.toISOString() ?? null,
+      entryId: first.id,
+      days: [],
+    }
+  }
+
+  const slots = await prisma.calendarEvent.findMany({
+    where: { projectId: period.projectId, kind: CalendarKinds.Event },
+    select: { startsAt: true, accountId: true },
+  })
+  const perDay = new Map<string, { taken: number; total: number }>()
+  for (const slot of slots) {
+    const day = instantToWall(slot.startsAt).slice(0, 10)
+    const count = perDay.get(day) ?? { taken: 0, total: 0 }
+    count.total += 1
+    if (slot.accountId) count.taken += 1
+    perDay.set(day, count)
+  }
+
+  return {
+    shape: 'series',
+    title: period.title,
+    startsAt: period.startsAt.toISOString(),
+    endsAt: period.endsAt?.toISOString() ?? null,
+    entryId: period.id,
+    days: [...perDay.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([day, count]) => ({ day, ...count })),
+  }
 }
 
 /**

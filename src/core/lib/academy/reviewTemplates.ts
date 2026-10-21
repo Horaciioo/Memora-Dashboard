@@ -54,6 +54,25 @@ export const isReviewOpen = (purpose: EventPurposeName, junior: ReviewTemplateJu
   )
 }
 
+// Days before the end of a period a check-in is declared
+export const DECLARED_DAYS_BEFORE = 7
+
+/**
+ * Day a check-in opens to be declared: a week before the period of the junior ends
+ * @param {EventPurposeName} purpose - Template purpose
+ * @param {{ dueOne: Date | null, dueFinal: Date | null }} junior - End of each period of the junior
+ * @return {Date | null} - First day, none when the end is not known yet
+ */
+
+export const reviewOpensAt = (
+  purpose: EventPurposeName,
+  junior: { dueOne: Date | null; dueFinal: Date | null }
+): Date | null => {
+  const due = purpose === EventPurposes.ReviewOne ? junior.dueOne : junior.dueFinal
+
+  return due ? new Date(due.getTime() - DECLARED_DAYS_BEFORE * 86_400_000) : null
+}
+
 /**
  * Purposes drawn as check-ins
  * @type {EventPurposeName[]}

@@ -2,9 +2,15 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageBanner } from '@/components/structures/page/PageBanner'
 import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
+import { MeetingCalendar } from '@/composites/work/MeetingCalendar'
 import { MeetingFile } from '@/composites/work/MeetingFile'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
-import { meetingFields, readMeeting, topicFields } from '@/core/services/work/MeetingService'
+import {
+  meetingFields,
+  readMeeting,
+  readMeetingCalendar,
+  topicFields,
+} from '@/core/services/work/MeetingService'
 import { redactMeeting } from '@/core/services/work/redaction'
 import {
   assertMeetingVisible,
@@ -65,9 +71,10 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
 
   const detail = redactMeeting(found, access)
 
-  const [fields, activity] = await Promise.all([
+  const [fields, activity, calendar] = await Promise.all([
     meetingFields(perimeter, viewer),
     access.can(Permissions.WorkLogRead) ? readRecordActivity('meeting', id) : Promise.resolve([]),
+    readMeetingCalendar(id),
   ])
 
   return (
@@ -84,6 +91,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ id: st
         canReadContent={access.can(Permissions.MeetingContentRead)}
         canReadLogs={access.can(Permissions.WorkLogRead)}
       />
+      {calendar && <MeetingCalendar view={calendar} />}
     </div>
   )
 }

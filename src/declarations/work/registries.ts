@@ -48,6 +48,11 @@ const MEETING_AUDIENCE_MAP: Record<MeetingAudienceName, MeetingAudienceOption> =
     icon: 'functionLive',
     functionName: 'Lives',
   },
+  [MeetingAudiences.Team]: {
+    label: 'L’équipe concernée',
+    summary: 'Seule l’équipe concernée est attendue, elle n’apparaît que chez elle.',
+    icon: 'teams',
+  },
   [MeetingAudiences.Custom]: {
     label: 'Personnalisé',
     summary: 'Seules les personnes nommées sont attendues, elle n’apparaît que chez elles.',

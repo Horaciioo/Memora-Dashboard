@@ -93,6 +93,8 @@ export interface WorkBoardProps<T extends BoardItem> {
   // Cards the member may edit, move and drop, all by default
   isEditable?: (card: T) => boolean
   isRemovable?: (card: T) => boolean
+  // Extra line on the confirmation of a card that takes other things down with it
+  deleteNote?: (card: T) => string | null
   // Filters set when the board opens
   initialFilters?: Record<string, string>
 }
@@ -136,6 +138,7 @@ const VIEWS = [
  * @param {string[]} [hiddenColumns] - Columns folded away
  * @param {(card: T) => boolean} [isEditable] - Cards the member may edit, move and drop
  * @param {(card: T) => boolean} [isRemovable] - Cards that may be dropped
+ * @param {(card: T) => string | null} [deleteNote] - Warning added to the confirmation of a card
  * @param {Record<string, string>} [initialFilters] - Filters set when the board opens
  * @return {JSX.Element}
  */
@@ -169,6 +172,7 @@ export const WorkBoard = <T extends BoardItem>({
   hiddenColumns = [],
   isEditable,
   isRemovable,
+  deleteNote,
   initialFilters,
 }: WorkBoardProps<T>) => {
   const board = useBoard<T>(scope, endpoints, initialCards, labelOf, entity)
@@ -484,7 +488,12 @@ export const WorkBoard = <T extends BoardItem>({
       <ConfirmDialog
         open={pendingDeletion !== null}
         title={copy.deleteTitle}
-        description={copy.deleteDescription}
+        description={[
+          copy.deleteDescription,
+          pendingDeletion ? deleteNote?.(pendingDeletion) : null,
+        ]
+          .filter(Boolean)
+          .join(' ')}
         pending={board.isSaving}
         onCancel={() => setPendingDeletion(null)}
         onConfirm={async () => {
