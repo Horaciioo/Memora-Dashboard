@@ -342,6 +342,82 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         permission: Permissions.CalendarManage,
         text: 'Amélioration de la modification d’une période : les nouveaux jours et les nouvelles heures s’appliquent vraiment',
       },
+
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.CalendarManage,
+        text: 'Correction d’un bug qui effaçait le titre, le projet et les dates d’une période du « Calendrier » quand on la modifiait',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Correction d’un bug qui laissait les bulles du « Calendrier » coupées par le cadre qui les contient',
+      },
+
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.meetings,
+        permission: Permissions.MeetingRead,
+        text: 'Correction d’un bug qui effaçait le titre de la fiche d’un bilan annuel dans « Réunions » après une modification',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Correction d’un bug qui rendait invisible le grand titre d’une zone du « Calendrier » au survol, caché derrière son fond',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Correction d’un bug qui coupait ou répétait le titre d’une zone du « Calendrier » quand elle s’étendait sur plusieurs semaines',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Correction d’un bug qui laissait voir à travers les cartes du « Calendrier » ce qu’elles recouvraient, par manque d’opacité',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Correction d’un bug qui laissait déborder les titres longs hors des cartes du « Calendrier » au lieu de passer à la ligne',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Correction d’un bug qui laissait un créneau de « Bilans annuels » déjà pris par quelqu’un d’autre visible et réservable',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Correction d’un bug qui ralentissait fortement le « Calendrier » quand une période de « Bilans annuels » comptait beaucoup de créneaux',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.projects,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.ProjectDelete,
+        text: 'Correction d’un bug qui laissait la fiche, les créneaux et les tâches d’un bilan annuel après la suppression de son projet',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.meetings,
+        permission: Permissions.MeetingRead,
+        text: 'Correction d’un bug qui permettait de modifier d’autres champs que la date sur la fiche de réunion d’un bilan annuel',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        permission: Permissions.CalendarRead,
+        text: 'Correction d’un bug qui laissait la bulle de « Toute la journée » arriver en retard et rester coupée par le formulaire',
+      },
     ],
     comments: [
       {
