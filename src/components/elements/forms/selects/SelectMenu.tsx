@@ -285,6 +285,7 @@ export const SelectMenu = ({
                       role="option"
                       aria-selected={isSelected}
                       aria-disabled={entry.disabled || undefined}
+                      title={entry.disabled ? entry.hint : undefined}
                       ref={index === activeIndex ? activeRef : undefined}
                       onMouseEnter={() => setActiveIndex(index)}
                       onClick={(event: MouseEvent<HTMLButtonElement>) =>

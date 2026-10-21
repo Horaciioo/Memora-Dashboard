@@ -57,7 +57,9 @@ export const LIVE_FIELD_COPY = {
   platform: 'Plateforme',
   coordinator: 'Coordinateur du Live',
   coordinatorRefused:
-    'Seuls l’équipe Lives du YouTubeur (hors Junior), ses Responsables et les Administrateurs peuvent coordonner.',
+    'Seuls les Coordinateurs de Live, les Responsables du YouTubeur et les Administrateurs peuvent coordonner.',
+  coordinatorGroup: 'Coordinateurs de Live',
+  platformSoon: 'Les Lives YouTube ne sont pas encore disponibles sur Memora !',
   instructions: 'Consignes',
   instructionsHint:
     'Ce que l’équipe lit avant d’ouvrir la Mod View. Modifiables jusqu’à la fin du live.',

@@ -43,7 +43,10 @@ export const readCoordinatorChoices = async (
   scope: AccessScope
 ): Promise<{ options: FieldOption[]; selected: string[] }> => {
   const live = await openLiveInScope(liveId, scope)
-  const options = await coordinatorOptions(scope)
+  const options = await coordinatorOptions(
+    scope,
+    live.coordinations.map((seat) => seat.accountId)
+  )
 
   return {
     // An Admin is offered on every creator

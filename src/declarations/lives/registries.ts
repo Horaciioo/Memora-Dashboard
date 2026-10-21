@@ -36,6 +36,13 @@ const LIVE_PLATFORM_MAP: Record<LivePlatformName, LivePlatformOption> = {
 export const LIVE_PLATFORM_REGISTRY = createRegistry(LIVE_PLATFORM_MAP)
 
 /**
+ * Platforms whose lives Memora cannot hold yet
+ * @type {readonly LivePlatformName[]}
+ */
+
+export const LIVE_PLATFORMS_SOON: readonly LivePlatformName[] = [LivePlatforms.YouTube]
+
+/**
  * How a live status reads on screen
  * @typedef {Object} LiveStatusOption
  * @property {string} label - Status name

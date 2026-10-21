@@ -54,18 +54,18 @@ export const ZoneTitleLayer = ({
 
         return (
           <span
-            key={spot.zone.id}
+            key={spot.ids.join('+')}
             className={cn(
               CALENDAR_STYLES.zoneTitleSlot,
-              !shownIds.includes(spot.zone.id) && 'opacity-0'
+              !spot.ids.some((id) => shownIds.includes(id)) && 'opacity-0'
             )}
             style={{ gridColumn: `${spot.from + 1} / ${spot.to + 2}`, gridRow: 1, ...paint.style }}
           >
             <span
               className={cn(CALENDAR_STYLES.zoneTitle, paint.text)}
-              style={{ fontSize: zoneTitleSize(spot.zone.title, cap) }}
+              style={{ fontSize: zoneTitleSize(spot.title, cap) }}
             >
-              {spot.zone.title}
+              {spot.title}
             </span>
           </span>
         )

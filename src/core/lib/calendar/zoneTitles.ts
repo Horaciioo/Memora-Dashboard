@@ -7,6 +7,8 @@ import type { CalendarEntry } from '@/types/calendar'
  * @property {number} row - Index of the row it sits in
  * @property {number} from - First column, from zero
  * @property {number} to - Last column
+ * @property {string[]} ids - Every zone the title names
+ * @property {string} title - Titles of the zones sharing these days, joined
  */
 
 export interface ZoneTitleSpot {
@@ -14,6 +16,8 @@ export interface ZoneTitleSpot {
   row: number
   from: number
   to: number
+  ids: string[]
+  title: string
 }
 
 /**
@@ -38,7 +42,15 @@ export const zoneTitleSpots = (
       for (const zone of here) {
         const run = open.get(zone.id)
         if (run) run.to = column
-        else open.set(zone.id, { zone, row: rowIndex, from: column, to: column })
+        else
+          open.set(zone.id, {
+            zone,
+            row: rowIndex,
+            from: column,
+            to: column,
+            ids: [zone.id],
+            title: zone.title,
+          })
       }
 
       // A zone that stopped closes its run
@@ -53,7 +65,31 @@ export const zoneTitleSpots = (
     for (const run of open.values()) keepWidest(best, run)
   })
 
-  return [...best.values()]
+  return mergeSpots([...best.values()])
+}
+
+/**
+ * Join the titles of zones sharing days into one, so they never print over each other
+ * @param {ZoneTitleSpot[]} spots - One title per zone
+ * @return {ZoneTitleSpot[]} - One title per cluster of zones
+ */
+
+const mergeSpots = (spots: ZoneTitleSpot[]): ZoneTitleSpot[] => {
+  const merged: ZoneTitleSpot[] = []
+
+  for (const spot of [...spots].sort((a, b) => a.row - b.row || a.from - b.from)) {
+    const last = merged.at(-1)
+
+    if (last && last.row === spot.row && spot.from <= last.to) {
+      last.to = Math.max(last.to, spot.to)
+      last.ids.push(...spot.ids)
+      last.title = `${last.title} & ${spot.title}`
+    } else {
+      merged.push({ ...spot, ids: [...spot.ids] })
+    }
+  }
+
+  return merged
 }
 
 /**

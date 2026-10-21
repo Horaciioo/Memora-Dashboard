@@ -217,7 +217,11 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
       .flatMap((entry) =>
         rowsToOptions([entry]).map((option) => ({
           ...option,
-          group: ACCESS_CATEGORY_REGISTRY.get(entry.category).label,
+          // Secondary functions share one category, no heading
+          group:
+            kind === FunctionKinds.Secondary
+              ? undefined
+              : ACCESS_CATEGORY_REGISTRY.get(entry.category).label,
           owners: creatorsOf.get(entry.id) ?? [],
         }))
       )

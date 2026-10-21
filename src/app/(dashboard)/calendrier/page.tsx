@@ -17,6 +17,7 @@ import { CALENDAR_LAYER_REGISTRY } from '@/declarations/calendar/registries'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
+import { CalendarKinds } from '@/utils/constants/workflow'
 import { gridRange, monthGrid, toDayKey } from '@/utils/format/calendar'
 
 export const metadata: Metadata = { title: CALENDAR_COPY.title }
@@ -104,7 +105,9 @@ export default async function CalendarPage({
         canManage={access.can(Permissions.CalendarManage)}
         focusEntryId={focusEntry ? focusEntryId : undefined}
         onlyLayer={onlyLayer}
-        startWith={liveTemplateId ? { templateId: liveTemplateId } : undefined}
+        startWith={
+          liveTemplateId ? { kind: CalendarKinds.Event, templateId: liveTemplateId } : undefined
+        }
       />
     </div>
   )
