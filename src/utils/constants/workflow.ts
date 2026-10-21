@@ -48,6 +48,7 @@ export const MeetingAudiences = {
   Discord: 'DISCORD',
   Twitch: 'TWITCH',
   Custom: 'CUSTOM',
+  Team: 'TEAM',
 } as const
 
 export type MeetingAudienceName = (typeof MeetingAudiences)[keyof typeof MeetingAudiences]
@@ -172,7 +173,9 @@ export type CalendarSourceName = (typeof CalendarSources)[keyof typeof CalendarS
 
 export const CalendarLayers = {
   Events: 'EVENTS',
+  Lives: 'LIVES',
   Meetings: 'MEETINGS',
+  Annual: 'ANNUAL',
   Absences: 'ABSENCES',
   Birthdays: 'BIRTHDAYS',
   Academy: 'ACADEMY',
