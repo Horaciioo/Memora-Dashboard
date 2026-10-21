@@ -167,7 +167,14 @@ export const HomeQueue = ({
       meta: `${PERSONAL_COPY.attendanceKind}, ${formatDayTime(call.startsAt)}`,
       note: null,
       due: formatRelativeDay(call.startsAt),
-      heroTitle: PERSONAL_COPY.attendanceAsked,
+      heroTitle: (
+        <span className="font-medium [&>strong]:font-extrabold">
+          {PERSONAL_COPY.attendanceAskedBefore}
+          <strong>{PERSONAL_COPY.attendanceAskedStrong}</strong>
+          {PERSONAL_COPY.attendanceAskedAfter.replace('{day}', formatDay(call.startsAt))}
+          <strong>{formatClock(call.startsAt)}</strong> ?
+        </span>
+      ),
       detail: (
         <HomeFacts
           title={PERSONAL_COPY.callInfos}

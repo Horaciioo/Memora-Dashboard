@@ -43,7 +43,8 @@ export const CALENDAR_COPY = {
   readOnlyNotice: 'Cet élément vient d’un autre écran, il se modifie là-bas.',
   // Sidebar
   sidebarToggle: 'Calendriers et filtres',
-  sidebarLayers: 'Calendriers',
+  sidebarLayers: 'Filtres',
+  sidebarTypes: 'Types',
   sidebarCreators: 'YouTubeurs',
   search: 'Rechercher un event…',
   meetingTopicsTitle: 'Sujets prévus',
@@ -65,6 +66,10 @@ export const CALENDAR_COPY = {
   answeredPresentEnd: ' !',
   // Words around the two bold hours
   hoursSpan: [' de ', ' à '],
+  // A live sends the member to its page once they said they come
+  answeredLive: ['Tu as ', 'notifié', ' être présent'],
+  liveLink: 'Le lien : ',
+  liveLinkLabel: 'Live en cours',
   answeredAbsent: ['Tu as ', 'notifié', ' ne pas être présent.'],
   changeMind: 'Je change d’avis',
   hoursTitle: 'Tes horaires',
@@ -106,6 +111,13 @@ export const CALENDAR_FIELD_COPY = {
   remindAtHint: 'Laisse vide pour un rappel la veille en fin de journée.',
   requestSubject: 'Sujet',
   requestDay: 'Jour souhaité',
+  session: 'Session',
+  slotDays: 'Jours',
+  slotMembers: 'Modérateurs concernés',
+  slotTeam: 'Équipe concernée',
+  slotFrom: 'Ouverture',
+  slotTo: 'Fermeture',
+  recruitmentSession: 'Recrutement',
   junior: 'Junior',
   trainer: 'Formateur',
   responsables: 'Responsables',
@@ -117,10 +129,13 @@ export const CALENDAR_FIELD_COPY = {
  */
 
 export const ACADEMY_EVENT_COPY = {
+  sessionInfo: 'La Session du Junior : les Formateurs et les Juniors proposés en dépendent.',
   juniorInfo: 'Le Junior que l’évènement concerne, il en est convoqué.',
   trainerInfo: 'Le Formateur qui reçoit le Junior, toi par défaut.',
   responsablesInfo: 'Les Responsables du YouTubeur qui ne sont pas absents.',
   reviewDone: 'Bilan déjà réalisé',
+  reviewOpensOn: 'Ouvert à partir du {date}',
+  reviewNotYet: 'Ce bilan se déclare la semaine qui précède la fin de la période.',
   reviewWaitsFirst: 'Le bilan de la période 1 passe d’abord',
 } as const
 
@@ -151,7 +166,21 @@ export const CALENDAR_FIELD_INFO = {
   subject: 'Le Responsable de l’évènement, s’il y en a un.',
   visibility:
     'Qui voit l’évènement sur son calendrier. L’administration entière, c’est celle du YouTubeur.',
+  slotDays:
+    'Du premier au dernier jour, le dimanche est laissé de côté. Chaque jour est coupé en créneaux de 15 minutes.',
+  slotAudience: 'Seule l’équipe concernée voit ces créneaux !',
+  slotMembers: 'Chaque Modérateur de l’équipe reçoit son bilan annuel à programmer !',
+  slotTeam: 'L’équipe dont les Modérateurs passent leur bilan annuel.',
+  slotTeamSole: 'Tu ne gères que cette équipe !',
+  teamOnly: 'Tu ne peux que choisir ton équipe !',
+  fixedAudience: 'Ce modèle fixe qui est concerné !',
+  fixedLead: '{name} dirige cette réunion !',
+  noSession: 'Aucune session en cours pour ce modèle.',
+  recruitmentSession:
+    'Les dates du Recrutement qui en dépendent : les changer ici les change sur la page Recrutement.',
+  zoneSession: 'La Session de l’Academy dont la zone suit la Timeline.',
   startsAt: 'Le moment où l’évènement commence.',
+  templateNeedsKind: 'Un type doit d’abord être choisi !',
   endsAt: 'Le moment où il se termine. Vide, il dure une heure.',
   youtuber: 'Le créateur concerné par l’évènement.',
   project: 'Le projet lié à l’évènement, s’il y en a un.',
@@ -177,7 +206,76 @@ export const CALENDAR_PROJECTION_COPY = {
   trainingsZone: 'Formations',
   reviewsZone: 'Bilans',
   interview: 'Entretien',
+  writtenPhase: 'Période d’entretiens écrits',
+  oralPhase: 'Période d’entretiens oraux',
 } as const
+
+/**
+ * Wording of the annual reviews
+ * @type {Record<string, string>}
+ */
+
+export const ANNUAL_REVIEW_COPY = {
+  title: 'Bilans annuels',
+  taskTitle: 'Tu as ton bilan annuel à programmer !',
+  taskBody: 'Clique sur un créneau libre du calendrier pour le prendre.',
+  questionsTitle: 'Prépare les questions du bilan annuel',
+  questionsBody: 'Rédige les questions que tu poseras aux Modérateurs pendant leurs bilans.',
+  eventTitle: 'Bilan annuel non posé',
+  takenTitle: 'Bilan annuel de {name}',
+  projectCreated: 'Le projet a bien été créé',
+  slotPresent: '{name} a répondu présent !',
+  slotAbsent: '{name} a répondu absent.',
+  slotPending: '{name} n’a pas encore répondu.',
+  noSlotYet: 'Aucun créneau n’a encore été pris.',
+  slotTaken: 'Créneau déjà réservé',
+  slotRaced: 'Ce créneau vient d’être pris, choisis-en un autre.',
+  takeSlot: 'Prendre ce créneau',
+  inCalendar: 'Dans le calendrier',
+  periodCalendar: 'Calendrier de la période',
+  seeInCalendar: 'Voir dans le calendrier',
+  slotsCount: '{taken}/{total}',
+  openOne: '1 créneau libre',
+  openMany: '{n} créneaux libres',
+  pickSlot: 'Choisis l’heure',
+  clearOpen: 'Supprimer tous les créneaux non pris.',
+  clearOpenTitle: 'Supprimer les créneaux non pris ?',
+  clearOpenLead:
+    'Les créneaux déjà pris restent. Ceux qui sont libres disparaissent du calendrier.',
+  clearOpenDone: 'Les créneaux non pris sont supprimés',
+  placeTitle: 'Placer un Modérateur',
+  placeVerb: 'Le placer',
+  placeChoose: 'Choisir un Modérateur',
+  placed: 'Le Modérateur est placé, il doit confirmer sa présence',
+  cancelSlot: 'Annuler ce créneau',
+  cancelTitle: 'Annuler ce créneau ?',
+  cancelLead: 'Veux-tu plutôt le reporter sur un autre créneau libre ?',
+  postpone: 'Le reporter',
+  cancelAnyway: 'Annuler quand même',
+  keep: 'Garder',
+  chooseSlot: 'Choisir un créneau libre',
+  noOpenSlot: 'Aucun autre créneau libre.',
+  cancelled: 'Créneau annulé, le Modérateur est prévenu',
+  postponed: 'Créneau reporté, le Modérateur doit confirmer',
+  reminderTitle: 'Plus que 2 jours pour choisir ton bilan annuel !',
+  slotTakenToast: 'Créneau pris, tes Responsables sont prévenus',
+  notInTeam: 'Ce créneau est réservé aux Modérateurs de l’équipe concernée.',
+  notModerator: 'Seuls les Modérateurs prennent un créneau ici.',
+  badRange: 'Choisis une fin après le début, avec des jours du lundi au samedi.',
+} as const
+
+/**
+ * Themes the model picker files the models under, in order
+ * @type {readonly string[]}
+ */
+
+export const TEMPLATE_CATEGORIES: readonly string[] = [
+  'Réunions',
+  'Lives',
+  'Academy',
+  'Recrutement',
+  'Technique',
+]
 
 /**
  * Weekday abbreviations

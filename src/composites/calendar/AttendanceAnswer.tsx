@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import AppLink from '@/components/elements/navigation/AppLink'
 import { AttendanceHoursDialog } from '@/composites/calendar/AttendanceHoursDialog'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { ICONS } from '@/declarations/ui/icons'
@@ -40,7 +41,13 @@ export const AttendanceAnswer = ({ entry, pending, onRespond }: AttendanceAnswer
   const AnswerIcon = ICONS[isPresent ? 'check' : 'cross']
   // Green once present, red once absent, grey before an answer
   const answerTone = isAnswered ? (isPresent ? 'success' : 'danger') : 'neutral'
-  const answerCopy = isPresent ? CALENDAR_COPY.answeredPresent : CALENDAR_COPY.answeredAbsent
+  // A live names where to go once they come
+  const hasLiveLink = isPresent && roster.asksHours && entry.href !== null
+  const answerCopy = isPresent
+    ? hasLiveLink
+      ? CALENDAR_COPY.answeredLive
+      : CALENDAR_COPY.answeredPresent
+    : CALENDAR_COPY.answeredAbsent
 
   // Leaving the answer view closes the change view
   const answer = (status: AttendanceStatusName, hours?: { from: string; to: string }) => {
@@ -78,9 +85,20 @@ export const AttendanceAnswer = ({ entry, pending, onRespond }: AttendanceAnswer
                         <strong>{formatClock(roster.myHours.to)}</strong>
                       </>
                     )}
-                    {isPresent && CALENDAR_COPY.answeredPresentEnd}
+                    {isPresent && (hasLiveLink ? '.' : CALENDAR_COPY.answeredPresentEnd)}
                   </span>
                 </p>
+                {hasLiveLink && entry.href && (
+                  <p className={CALENDAR_DETAIL.answered}>
+                    {CALENDAR_COPY.liveLink}
+                    <AppLink
+                      href={entry.href}
+                      className="font-semibold underline underline-offset-2"
+                    >
+                      {CALENDAR_COPY.liveLinkLabel}
+                    </AppLink>
+                  </p>
+                )}
                 <button
                   type="button"
                   className={CALENDAR_DETAIL.changeMind}

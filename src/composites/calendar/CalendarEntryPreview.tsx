@@ -5,10 +5,8 @@ import { createPortal } from 'react-dom'
 import { Glyph } from '@/components/elements/display/glyphs/Glyph'
 import { CALENDAR_SOURCE_REGISTRY } from '@/declarations/calendar/registries'
 import { ICONS } from '@/declarations/ui/icons'
-import { accentPaint } from '@/declarations/ui/theme'
 import { CALENDAR_STYLES } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
-import { cn } from '@/utils/classnames'
 import { entrySpan } from '@/utils/format/entrySpan'
 
 export interface CalendarEntryPreviewProps {
@@ -20,7 +18,7 @@ export interface CalendarEntryPreviewProps {
 const CARD_WIDTH = 288
 
 // Gap between the chip and the card
-const OFFSET = 8
+const OFFSET = 14
 
 /**
  * Floating read-only glance at a calendar entry
@@ -36,12 +34,14 @@ export const CalendarEntryPreview = ({ entry, anchor }: CalendarEntryPreviewProp
   const PersonIcon = ICONS.members
   const source = CALENDAR_SOURCE_REGISTRY.get(entry.source)
   const SourceIcon = ICONS[source.icon]
-  const paint = accentPaint(entry.accent, entry.muted ? 'neutral' : 'brand')
 
   // Sit above the chip by default
   const left = Math.max(8, Math.min(anchor.left, window.innerWidth - CARD_WIDTH - 8))
   const above = anchor.top > 220
   const top = above ? anchor.top - OFFSET : anchor.bottom + OFFSET
+
+  // Tip lands on the middle of the chip
+  const tip = Math.max(16, Math.min(anchor.left + anchor.width / 2 - left, CARD_WIDTH - 16))
 
   return createPortal(
     <div
@@ -50,12 +50,10 @@ export const CalendarEntryPreview = ({ entry, anchor }: CalendarEntryPreviewProp
       style={{ left, top, transform: above ? 'translateY(-100%)' : undefined }}
     >
       <span className={CALENDAR_STYLES.previewHead}>
-        <span className={cn('inline-flex', paint.text)} style={paint.style}>
-          <span className={CALENDAR_STYLES.previewBullet} aria-hidden="true" />
-        </span>
         <Glyph value={entry.emoji} size="chip" />
         <span className={CALENDAR_STYLES.previewTitle}>{entry.title}</span>
       </span>
+      <span className={CALENDAR_STYLES.previewRule} aria-hidden="true" />
       <div className={CALENDAR_STYLES.previewMeta}>
         <span className={CALENDAR_STYLES.previewLine}>
           <ClockIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
@@ -72,6 +70,11 @@ export const CalendarEntryPreview = ({ entry, anchor }: CalendarEntryPreviewProp
           {source.label}
         </span>
       </div>
+      <span
+        className={CALENDAR_STYLES.previewArrow}
+        style={{ left: tip - 8, ...(above ? { bottom: -8 } : { top: -8 }) }}
+        aria-hidden="true"
+      />
     </div>,
     document.body
   )

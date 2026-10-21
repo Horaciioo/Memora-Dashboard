@@ -2,9 +2,17 @@
 
 import { RecordId } from '@/components/elements/display/RecordId'
 import { Markdown } from '@/components/elements/display/Markdown'
+import { Button } from '@/components/elements/actions/Button'
+import { AnnualSlotAdmin } from '@/composites/calendar/AnnualSlotAdmin'
+import type { AnnualSlotAdminProps } from '@/composites/calendar/AnnualSlotAdmin'
 import { AttendanceAnswer } from '@/composites/calendar/AttendanceAnswer'
 import { AttendanceRoster } from '@/composites/calendar/AttendanceRoster'
-import { AUDIENCE_COPY, CALENDAR_COPY, CALENDAR_FIELD_COPY } from '@/declarations/calendar/copy'
+import {
+  ANNUAL_REVIEW_COPY,
+  AUDIENCE_COPY,
+  CALENDAR_COPY,
+  CALENDAR_FIELD_COPY,
+} from '@/declarations/calendar/copy'
 import {
   CALENDAR_KIND_REGISTRY,
   CALENDAR_SOURCE_REGISTRY,
@@ -18,6 +26,7 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
 import { CalendarKinds, CalendarSources } from '@/utils/constants/workflow'
 import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
+import { formatClock } from '@/utils/format/dates'
 import { entrySpanParts } from '@/utils/format/entrySpan'
 
 export interface CalendarDetailProps {
@@ -28,6 +37,13 @@ export interface CalendarDetailProps {
   onRespond: (status: AttendanceStatusName, hours?: { from: string; to: string }) => void
   onMove: (accountId: string, status: AttendanceStatusName) => void
   onRemind: () => void
+  // Takes an open slot of the annual reviews, offered to the Moderators
+  onTakeSlot?: () => void
+  // What a Responsable does with a slot of the annual reviews
+  slotAdmin?: Omit<AnnualSlotAdminProps, 'entry' | 'pending'>
+  // Slots a stretch of open slots stands for, and what opens one of them
+  slotRange?: CalendarEntry[]
+  onPickSlot?: (slot: CalendarEntry) => void
 }
 
 const PersonIcon = ICONS.members
@@ -43,6 +59,10 @@ const IdentifierIcon = ICONS.identifier
  * @param {(status: AttendanceStatusName, hours?: { from: string, to: string }) => void} onRespond - Send Present or Absent
  * @param {(accountId: string, status: AttendanceStatusName) => void} onMove - Move a member on the roll-call
  * @param {() => void} onRemind - Ping the no-answers now
+ * @param {() => void} [onTakeSlot] - Take an open slot
+ * @param {Omit<AnnualSlotAdminProps, 'entry' | 'pending'>} [slotAdmin] - Responsable tools on a slot
+ * @param {CalendarEntry[]} [slotRange] - Slots of a stretch of open slots
+ * @param {(slot: CalendarEntry) => void} [onPickSlot] - Open one of them
  * @return {JSX.Element}
  */
 
@@ -53,6 +73,10 @@ export const CalendarDetail = ({
   onRespond,
   onMove,
   onRemind,
+  onTakeSlot,
+  slotAdmin,
+  slotRange,
+  onPickSlot,
 }: CalendarDetailProps) => {
   const { isAdmin } = useAuthContext()
   const copy = useCopy(CALENDAR_COPY.linkCopied)
@@ -100,7 +124,7 @@ export const CalendarDetail = ({
               <VisibilityIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
               {isLeadsOnly ? AUDIENCE_COPY.leadsOnlyLabel : visibility.label}
             </span>
-            {entry.source === CalendarSources.Entry && (
+            {entry.source === CalendarSources.Entry && entry.slot !== 'range' && (
               <span className={CALENDAR_STYLES.previewLine}>
                 <LinkIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
                 <button
@@ -112,7 +136,7 @@ export const CalendarDetail = ({
                 </button>
               </span>
             )}
-            {isAdmin && (
+            {isAdmin && entry.slot !== 'range' && (
               <span className={CALENDAR_STYLES.previewLine}>
                 <IdentifierIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
                 {FIELD_COPY.id}
@@ -125,7 +149,7 @@ export const CalendarDetail = ({
                 {entry.subjectName}
               </span>
             )}
-            {entry.readOnly && (
+            {entry.readOnly && entry.slot !== 'range' && (
               <span className={CALENDAR_STYLES.previewLine}>
                 <InfoIcon className={CALENDAR_STYLES.previewIcon} aria-hidden="true" />
                 {CALENDAR_COPY.readOnlyNotice}
@@ -178,12 +202,84 @@ export const CalendarDetail = ({
     </div>
   )
 
-  if (!live.rollCall) return <div className={CALENDAR_DETAIL.body}>{main}</div>
+  // An open slot of the annual reviews is taken from here
+  const take =
+    live.slot === 'open' && onTakeSlot ? (
+      <section className={CALENDAR_DETAIL.section}>
+        <Button variant="primary" disabled={pending} onClick={onTakeSlot}>
+          {ANNUAL_REVIEW_COPY.takeSlot}
+        </Button>
+      </section>
+    ) : slotAdmin && live.slot ? (
+      <AnnualSlotAdmin entry={live} pending={pending} {...slotAdmin} />
+    ) : null
+
+  // A stretch of open slots: the hours to pick from, each one opens its own slot
+  if (live.slot === 'range') {
+    return (
+      <div className={CALENDAR_DETAIL.split}>
+        <div className={CALENDAR_DETAIL.main}>{main}</div>
+        <div className={CALENDAR_DETAIL.splitDivider} role="separator" />
+        <section className={CALENDAR_DETAIL.section}>
+          <h3 className={SECTION_STYLES.title}>{ANNUAL_REVIEW_COPY.pickSlot}</h3>
+          <div className={CALENDAR_DETAIL.slotPicks}>
+            {(slotRange ?? []).map((slot) => (
+              <button
+                key={slot.id}
+                type="button"
+                className={CALENDAR_DETAIL.slotPick}
+                onClick={() => onPickSlot?.(slot)}
+              >
+                {formatClock(slot.startsAt)}
+              </button>
+            ))}
+          </div>
+        </section>
+      </div>
+    )
+  }
+
+  // A slot of the annual reviews concerns one member: their state, no roll-call panel
+  if (live.slot) {
+    const roster = live.attendance
+    const person = roster ? [...roster.present, ...roster.absent, ...roster.pending][0] : null
+    const name = person?.name ?? live.subjectName
+    const state = roster
+      ? roster.present.length > 0
+        ? ANNUAL_REVIEW_COPY.slotPresent
+        : roster.absent.length > 0
+          ? ANNUAL_REVIEW_COPY.slotAbsent
+          : ANNUAL_REVIEW_COPY.slotPending
+      : ANNUAL_REVIEW_COPY.slotPresent
+
+    return (
+      <div className={CALENDAR_DETAIL.body}>
+        {main}
+        {live.slot === 'taken' && name && roster?.mine == null && (
+          <p className={CALENDAR_DETAIL.answered}>{state.replace('{name}', name)}</p>
+        )}
+        {roster?.mine != null && (
+          <AttendanceAnswer entry={live} pending={pending} onRespond={onRespond} />
+        )}
+        {take}
+      </div>
+    )
+  }
+
+  if (!live.rollCall) {
+    return (
+      <div className={CALENDAR_DETAIL.body}>
+        {main}
+        {take}
+      </div>
+    )
+  }
 
   return (
     <div className={CALENDAR_DETAIL.split}>
       <div className={CALENDAR_DETAIL.main}>
         {main}
+        {take}
         <AttendanceAnswer entry={live} pending={pending} onRespond={onRespond} />
       </div>
       <div className={CALENDAR_DETAIL.splitDivider} role="separator" />

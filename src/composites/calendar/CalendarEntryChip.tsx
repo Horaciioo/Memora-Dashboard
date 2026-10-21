@@ -6,7 +6,7 @@ import type { MouseEvent } from 'react'
 import { CalendarEntryPreview } from '@/composites/calendar/CalendarEntryPreview'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { ICONS } from '@/declarations/ui/icons'
-import { accentPaint } from '@/declarations/ui/theme'
+import { ACCENT_STYLES, accentPaint } from '@/declarations/ui/theme'
 import { CALENDAR_STYLES } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
 import { cn } from '@/utils/classnames'
@@ -73,7 +73,14 @@ export const CalendarEntryChip = ({
   timeLabel,
 }: CalendarEntryChipProps) => {
   // An entry wears the colour of its creator
-  const paint = accentPaint(entry.accent, entry.muted ? 'neutral' : 'brand')
+  // Annual review slots: grey while nobody took them, pink once someone did
+  const isFree = entry.slot === 'open' || entry.slot === 'range'
+  const paint = accentPaint(
+    entry.slot === 'taken' || isFree ? null : entry.accent,
+    entry.muted || isFree ? 'neutral' : 'brand'
+  )
+  // A stored colour is laid on the surface so nothing shows through
+  const opaque = paint.soft === ACCENT_STYLES.soft ? 'accent-paper' : paint.soft
   const [anchor, setAnchor] = useState<DOMRect | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const RollCallIcon = ICONS.meetings
@@ -115,7 +122,9 @@ export const CalendarEntryChip = ({
     <>
       <button
         type="button"
-        title={entry.readOnly ? `${entry.title}, ${CALENDAR_COPY.readOnlyNotice}` : entry.title}
+        aria-label={
+          entry.readOnly ? `${entry.title}, ${CALENDAR_COPY.readOnlyNotice}` : entry.title
+        }
         aria-pressed={selected}
         onClick={open}
         onMouseEnter={(event) => openPreview(event.currentTarget)}
@@ -127,7 +136,9 @@ export const CalendarEntryChip = ({
           line && !band
             ? cn(
                 CALENDAR_STYLES.line,
-                entry.muted && CALENDAR_STYLES.lineMuted,
+                entry.muted
+                  ? cn(CALENDAR_STYLES.entryMuted, opaque, paint.text)
+                  : cn(opaque, CALENDAR_STYLES.entryTint),
                 entry.readOnly && 'cursor-pointer',
                 selected && CALENDAR_STYLES.entrySelected
               )
@@ -135,12 +146,16 @@ export const CalendarEntryChip = ({
                 band ? CALENDAR_STYLES.bar : CALENDAR_STYLES.entry,
                 band && (opensBand ? CALENDAR_STYLES.barStart : CALENDAR_STYLES.barRunsIn),
                 band && (closesBand ? CALENDAR_STYLES.barEnd : CALENDAR_STYLES.barRunsOut),
-                entry.muted
-                  ? cn(CALENDAR_STYLES.entryMuted, paint.soft, paint.text)
-                  : cn(paint.solid, CALENDAR_STYLES.entrySolid),
-                entry.readOnly && cn(CALENDAR_STYLES.entryReadOnly, paint.border),
+                // A period is a translucent tinted box with a coloured dashed edge
+                band
+                  ? cn(paint.soft, paint.border)
+                  : entry.muted
+                    ? cn(CALENDAR_STYLES.entryMuted, opaque, paint.text)
+                    : cn(opaque, CALENDAR_STYLES.entryTint),
+                entry.readOnly && !band && cn(CALENDAR_STYLES.entryReadOnly, paint.border),
                 selected && CALENDAR_STYLES.entrySelected,
                 fill && CALENDAR_STYLES.entryFill,
+                !compact && !band && !entry.rollCall && CALENDAR_STYLES.entryStacked,
                 compact && CALENDAR_STYLES.entryCompact,
                 entry.rollCall && CALENDAR_STYLES.entryRollCall
               )
@@ -149,9 +164,6 @@ export const CalendarEntryChip = ({
       >
         {line && !band ? (
           <>
-            <span className={cn('inline-flex', paint.text)} style={paint.style}>
-              <span className={CALENDAR_STYLES.lineBullet} aria-hidden="true" />
-            </span>
             {!entry.allDay && (
               <span className={CALENDAR_STYLES.lineTime}>
                 {timeLabel ?? timeOf(entry.startsAt)}

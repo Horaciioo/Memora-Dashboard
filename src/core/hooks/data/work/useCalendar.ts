@@ -7,7 +7,8 @@ import { apiDelete, apiGet, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { CALENDAR_COPY } from '@/declarations/calendar/copy'
+import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
+import { ANNUAL_REVIEW_COPY, CALENDAR_COPY } from '@/declarations/calendar/copy'
 import { feedbackTitle } from '@/declarations/ui/copy'
 import type { AttendanceRoster, CalendarEntry } from '@/types/calendar'
 import type { FieldIssue, FormValues } from '@/types/forms'
@@ -16,6 +17,12 @@ import type { AttendanceStatusName } from '@/utils/constants/workflow'
 // Toast entity label
 const ENTITY = 'Évènement'
 const GENDER = 'masculine'
+
+// What a slot gesture hands back: entries changed, open slots that went
+interface SlotResult {
+  entries: CalendarEntry[]
+  removed: string[]
+}
 
 /**
  * Calendar state and mutations
@@ -30,6 +37,10 @@ const GENDER = 'masculine'
  * @property {(id: string, startsAt: Date) => Promise<void>} move - Drag an entry elsewhere
  * @property {(id: string, endsAt: Date) => Promise<void>} resize - Stretch an entry
  * @property {(id: string) => Promise<void>} remove - Drop an entry
+ * @property {(id: string) => Promise<void>} takeSlot - Take an open slot of the annual reviews
+ * @property {(id: string) => Promise<void>} clearOpenSlots - Remove the slots of a series nobody took
+ * @property {(id: string, accountId: string) => Promise<void>} placeSlot - Place a Moderator on an open slot
+ * @property {(id: string, moveTo: string | null) => Promise<void>} cancelSlot - Cancel a taken slot, or move it
  * @property {(ids: string[], values: FormValues) => Promise<boolean>} updateMany - Edit a selection
  * @property {(ids: string[]) => Promise<void>} removeMany - Drop a selection
  * @property {(from: string, to: string) => Promise<void>} load - Pull another window
@@ -49,6 +60,10 @@ export interface CalendarCollection {
   move: (id: string, startsAt: Date) => Promise<void>
   resize: (id: string, endsAt: Date) => Promise<void>
   remove: (id: string) => Promise<void>
+  takeSlot: (id: string) => Promise<void>
+  clearOpenSlots: (id: string) => Promise<void>
+  placeSlot: (id: string, accountId: string) => Promise<void>
+  cancelSlot: (id: string, moveTo: string | null) => Promise<void>
   updateMany: (ids: string[], values: FormValues) => Promise<boolean>
   removeMany: (ids: string[]) => Promise<void>
   load: (from: string, to: string) => Promise<void>
@@ -75,6 +90,7 @@ export const useCalendar = (
   const [entries, setEntries] = useState(initialEntries)
   const queryClient = useQueryClient()
   const { isSaving, issues, clearIssues, run } = useMutation()
+  const { notify } = useNotifications()
   const [isLoading, setLoading] = useState(false)
 
   const replace = useCallback((entry: CalendarEntry) => {
@@ -93,9 +109,70 @@ export const useCalendar = (
         feedbackTitle(ENTITY, 'created', GENDER, name)
       )
 
-      if (entry) replace(entry)
+      if (entry) {
+        replace(entry)
+        // A model that opens several entries brings them along, with a message
+        entry.siblings?.forEach(replace)
+        if (entry.notice) notify({ tone: 'success', title: entry.notice })
+      }
 
       return entry
+    },
+    [notify, replace, run]
+  )
+
+  // Entries a slot gesture changed, and the open slots it made useless
+  const applySlots = useCallback(
+    (result: SlotResult | null) => {
+      if (!result) return
+      result.entries.forEach(replace)
+      if (result.removed.length > 0) {
+        setEntries((current) => current.filter((row) => !result.removed.includes(row.id)))
+      }
+    },
+    [replace]
+  )
+
+  const clearOpenSlots = useCallback(
+    async (id: string) => {
+      const result = await run(
+        () => apiPost<{ removed: string[] }>(API_ROUTES.calendarSlotClear(id), {}),
+        ANNUAL_REVIEW_COPY.clearOpenDone
+      )
+      if (result) setEntries((current) => current.filter((row) => !result.removed.includes(row.id)))
+    },
+    [run]
+  )
+
+  const takeSlot = useCallback(
+    async (id: string) => {
+      const result = await run(
+        () => apiPost<SlotResult>(API_ROUTES.calendarSlot(id), {}),
+        ANNUAL_REVIEW_COPY.slotTakenToast
+      )
+      applySlots(result)
+    },
+    [applySlots, run]
+  )
+
+  const placeSlot = useCallback(
+    async (id: string, accountId: string) => {
+      const result = await run(
+        () => apiPost<SlotResult>(API_ROUTES.calendarSlot(id), { accountId }),
+        ANNUAL_REVIEW_COPY.placed
+      )
+      applySlots(result)
+    },
+    [applySlots, run]
+  )
+
+  const cancelSlot = useCallback(
+    async (id: string, moveTo: string | null) => {
+      const changed = await run(
+        () => apiPost<CalendarEntry[]>(API_ROUTES.calendarSlotCancel(id), { moveTo }),
+        moveTo ? ANNUAL_REVIEW_COPY.postponed : ANNUAL_REVIEW_COPY.cancelled
+      )
+      changed?.forEach(replace)
     },
     [replace, run]
   )
@@ -108,7 +185,14 @@ export const useCalendar = (
         feedbackTitle(ENTITY, 'saved', GENDER, name)
       )
 
-      if (entry) replace(entry)
+      if (entry) {
+        replace(entry)
+        // Reshaping a series makes and drops slots with it
+        entry.siblings?.forEach(replace)
+        if (entry.dropped?.length) {
+          setEntries((current) => current.filter((row) => !entry.dropped?.includes(row.id)))
+        }
+      }
 
       return entry !== null
     },
@@ -266,6 +350,10 @@ export const useCalendar = (
     issues,
     clearIssues,
     create,
+    takeSlot,
+    clearOpenSlots,
+    placeSlot,
+    cancelSlot,
     update,
     move,
     resize,

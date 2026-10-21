@@ -2,6 +2,7 @@ import { createRegistry } from '@/core/lib/registry'
 import type { Tone } from '@/declarations/ui/theme'
 import type { IconName } from '@/declarations/ui/icons'
 import { Permissions } from '@/utils/constants/permissions'
+import type { CalendarEntry } from '@/types/calendar'
 import type { PermissionName } from '@/utils/constants/permissions'
 import {
   AttendanceStatuses,
@@ -38,14 +39,14 @@ const CALENDAR_KIND_MAP: Record<CalendarKindName, CalendarLegendOption> = {
   [CalendarKinds.Zone]: {
     label: 'Zone',
     plural: 'Zones',
-    summary: 'Un fond posé sur une plage de jours.',
+    summary: 'Un fond posé sur une plage de jours, son titre apparaît au survol.',
     accent: 'neutral',
     icon: 'sheet',
   },
   [CalendarKinds.Period]: {
     label: 'Période',
     plural: 'Périodes',
-    summary: 'Une barre courant d’un jour à un autre.',
+    summary: 'Un grand cadre arrondi qui entoure ce qu’elle contient.',
     accent: 'info',
     icon: 'clock',
   },
@@ -148,6 +149,18 @@ const CALENDAR_LAYER_MAP: Record<CalendarLayerName, CalendarLayerOption> = {
     sources: [CalendarSources.Entry],
     permission: null,
   },
+  [CalendarLayers.Lives]: {
+    label: 'Lives',
+    icon: 'liveDot',
+    sources: [],
+    permission: null,
+  },
+  [CalendarLayers.Annual]: {
+    label: 'Bilans annuels',
+    icon: 'objective',
+    sources: [],
+    permission: null,
+  },
   [CalendarLayers.Meetings]: {
     label: 'Réunions',
     icon: 'meetings',
@@ -167,7 +180,7 @@ const CALENDAR_LAYER_MAP: Record<CalendarLayerName, CalendarLayerOption> = {
     permission: Permissions.MemberRead,
   },
   [CalendarLayers.Academy]: {
-    label: 'Marsha Academy',
+    label: 'Academy',
     icon: 'academy',
     sources: [
       CalendarSources.AcademySession,
@@ -197,6 +210,27 @@ export const layerOfSource = (source: CalendarSourceName): CalendarLayerName =>
   CALENDAR_LAYER_REGISTRY.keys.find((layer) =>
     CALENDAR_LAYER_MAP[layer].sources.includes(source)
   ) as CalendarLayerName
+
+/**
+ * Calendar an entry is shown in: its source, refined by what a model made of it
+ * @param {Pick<CalendarEntry, 'source' | 'slot' | 'category'>} entry - Entry on screen
+ * @return {CalendarLayerName} - Layer gathering it
+ */
+
+export const layerOfEntry = (
+  entry: Pick<CalendarEntry, 'source' | 'slot' | 'category'>
+): CalendarLayerName => {
+  // The slots and the period of the annual reviews are a calendar of their own
+  if (entry.slot) return CalendarLayers.Annual
+  if (entry.source === CalendarSources.Entry && entry.category === 'Lives') {
+    return CalendarLayers.Lives
+  }
+  if (entry.source === CalendarSources.Entry && entry.category === 'Réunions') {
+    return CalendarLayers.Meetings
+  }
+
+  return layerOfSource(entry.source)
+}
 
 /**
  * Roll-call answer as it reads on screen
