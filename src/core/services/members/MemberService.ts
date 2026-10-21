@@ -90,7 +90,6 @@ const toSummary = (row: SummaryRow, extras: SummaryExtras): MemberSummary => ({
     ? {
         id: row.division.id,
         label: row.division.name,
-        imagePath: row.division.imagePath,
       }
     : null,
   youtubers: row.youtubers.map((youtuber) => ({

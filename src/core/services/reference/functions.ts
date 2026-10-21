@@ -31,7 +31,7 @@ export const toMemberFunctions = (rows: { jobFunction: JobFunction }[]): MemberF
   rows
     .map((row) => row.jobFunction)
     .sort(byHierarchy)
-    .map((row) => ({ id: row.id, label: row.name, kind: row.kind, icon: row.icon }))
+    .map((row) => ({ id: row.id, label: row.name, kind: row.kind, icon: row.icon, position: row.position }))
 
 /**
  * Names of the held functions of one kind
