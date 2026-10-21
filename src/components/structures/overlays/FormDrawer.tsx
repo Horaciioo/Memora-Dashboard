@@ -10,6 +10,11 @@ import {
   FORM_GROUP_ICONS,
   collectMissingRequired,
   groupFields,
+  settleAllDay,
+  settleLocked,
+  settleDerived,
+  settleSets,
+  settleSlot,
   settleFollowers,
   settleOwned,
   presetValues,
@@ -132,11 +137,29 @@ export const FormDrawer = ({
   const change = (name: string, value: FieldValue) =>
     setDraft((current) => ({
       ...current,
-      values: settleFollowers(
+      values: settleDerived(
         fields,
-        current.values,
-        settleOwned(fields, { ...current.values, [name]: value }, name),
-        name
+        settleLocked(
+          fields,
+          settleAllDay(
+            fields,
+            settleFollowers(
+              fields,
+              current.values,
+              settleSets(
+                fields,
+                settleSlot(
+                  fields,
+                  settleOwned(fields, { ...current.values, [name]: value }, name),
+                  name
+                ),
+                name
+              ),
+              name
+            ),
+            name
+          )
+        )
       ),
       missing: current.missing.filter((issue) => issue.field !== name),
     }))

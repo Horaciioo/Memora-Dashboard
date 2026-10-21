@@ -172,6 +172,9 @@ export interface PresetContext {
  */
 
 const presetOf = (field: FieldDefinition, context: PresetContext): FieldValue | undefined => {
+  // A fixed start value
+  if (field.initial !== undefined) return field.initial
+
   // Clock presets
   if (field.preset === 'today') {
     if (field.kind === 'datetime') return context.now
@@ -191,6 +194,11 @@ const presetOf = (field: FieldDefinition, context: PresetContext): FieldValue | 
       `${day.toISOString().slice(0, 10)}${field.withTime ? `T${hour}` : ''}`
 
     return [at(monday, opens), at(sunday, closes)]
+  }
+
+  // The only option offered, when there is just one
+  if (field.preset === 'sole') {
+    return field.options?.length === 1 ? field.options[0]?.value : undefined
   }
 
   // Actor

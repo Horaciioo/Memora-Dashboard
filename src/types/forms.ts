@@ -22,6 +22,7 @@ export type FieldKind =
   | 'number'
   | 'date'
   | 'datetime'
+  | 'time'
   | 'daterange'
   | 'select'
   | 'multiselect'
@@ -48,7 +49,7 @@ export type OptionMark =
  * @type {'today' | 'nextWeek' | 'actor' | 'default'}
  */
 
-export type FieldPreset = 'today' | 'nextWeek' | 'actor' | 'default'
+export type FieldPreset = 'today' | 'nextWeek' | 'actor' | 'default' | 'sole'
 
 /**
  * Choice offered by a select field
@@ -68,6 +69,10 @@ export type FieldPreset = 'today' | 'nextWeek' | 'actor' | 'default'
  * @property {boolean} [disabled] - Shown but not selectable
  * @property {string} [owner] - Value of the owner field it belongs to
  * @property {string[]} [owners] - Several owner values it belongs to
+ * @property {OptionDates} [dates] - Days the option stands for, filled into the date fields once picked
+ * @property {Record<string, string>} [sets] - Values other fields take once the option is picked
+ * @property {string} [alsoOwner] - Value of the second owner field it belongs to
+ * @property {OptionSlot} [slot] - Moment the option proposes for the date fields
  */
 
 export interface FieldOption {
@@ -88,6 +93,36 @@ export interface FieldOption {
   disabled?: boolean
   owner?: string
   owners?: string[]
+  slot?: OptionSlot
+  alsoOwner?: string
+  dates?: OptionDates
+  sets?: Record<string, string>
+}
+
+/**
+ * Days an option stands for
+ * @typedef {Object} OptionDates
+ * @property {string} startsAt - ISO first moment
+ * @property {string | null} endsAt - ISO last moment
+ */
+
+export interface OptionDates {
+  startsAt: string
+  endsAt: string | null
+}
+
+/**
+ * Moment an option proposes once picked
+ * @typedef {Object} OptionSlot
+ * @property {number} weekday - Day it falls on, 1 for Monday
+ * @property {string} time - Wall clock it starts at
+ * @property {number | null} minutes - Length proposed
+ */
+
+export interface OptionSlot {
+  weekday: number
+  time: string
+  minutes: number | null
 }
 
 /**
@@ -159,6 +194,44 @@ export interface BusySlot {
 }
 
 /**
+ * Rule greying a field
+ * @typedef {Object} FrozenRule
+ * @property {FieldCondition} when - Rule under which the field is greyed
+ * @property {string} hint - Explanation shown on hover
+ */
+
+export interface FrozenRule {
+  when: FieldCondition
+  hint: string
+}
+
+/**
+ * Value a field takes from the pair of fields it follows
+ * @typedef {Object} ValueFrom
+ * @property {[string, string]} fields - Names of the two fields read
+ * @property {Record<string, string | string[]>} map - Value by `first|second`
+ * @property {boolean} [onlyIfEmpty] - Never replaces a value already there
+ */
+
+export interface ValueFrom {
+  fields: [string, string]
+  map: Record<string, string | string[]>
+  onlyIfEmpty?: boolean
+}
+
+/**
+ * Field that must be filled before another one opens
+ * @typedef {Object} FieldNeed
+ * @property {string} field - Name of the field
+ * @property {string} hint - Explanation shown on the greyed field
+ */
+
+export interface FieldNeed {
+  field: string
+  hint: string
+}
+
+/**
  * Single declaration driving validation and rendering
  * @typedef {Object} FieldDefinition
  * @property {string} name - Value key
@@ -168,6 +241,7 @@ export interface BusySlot {
  * @property {string} [hint] - Helper line
  * @property {string} [info] - Explanation behind the info glyph
  * @property {FieldPreset} [preset] - Blank form start value
+ * @property {string} [initial] - Fixed start value of a blank form
  * @property {FieldAction} [action] - Link above the options
  * @property {boolean} [required] - Must be filled
  * @property {boolean} [readOnly] - Rendered disabled
@@ -190,11 +264,20 @@ export interface BusySlot {
  * @property {boolean} [adminOnly] - Only an administrator may write it
  * @property {FieldCondition} [visibleWhen] - Display rule
  * @property {string} [notBefore] - Name of a date field this one can never precede
+ * @property {FrozenRule[]} [frozen] - Rules under which the field is greyed with an explanation, it keeps the value it was handed
+ * @property {ValueFrom | ValueFrom[]} [valueFrom] - Value the field takes from two others, one rule per pair
+ * @property {FieldNeed} [needs] - Another field that must be filled first, this one is greyed and explains why until then
+ * @property {string} [slotFor] - Date field an option's slot fills, its end follows after the option's length
+ * @property {FieldCondition} [lockedOnWhen] - Toggle forced on and frozen while this rule holds
+ * @property {string} [hoursOffWhen] - Toggle that, once on, drops the hour of this date field
  * @property {FollowRule} [follows] - Date field this one trails by a delay until edited
  * @property {string} [ownerField] - Field whose picks narrow the owned options
  * @property {boolean} [withTime] - A date or day range starts with the hour of each end, the picker can drop it
  * @property {boolean} [dayOnly] - The picker never offers an hour
  * @property {[string, string]} [defaultTimes] - Hours a timed range starts and ends on
+ * @property {string} [alsoOwnedBy] - Second field whose pick narrows the owned options too
+ * @property {Record<string, string[]>} [defaultPicks] - Options picked once an owner is chosen, by owner value
+ * @property {boolean} [excludeOwned] - Options belonging to the picked owners are left out instead of kept
  * @property {boolean} [defaultFromOwner] - Every reachable option is picked once the owner changes
  * @property {boolean} [binary] - A toggle drawn as a plain check/cross
  * @property {BusySlot[]} [busy] - Events a date field warns about
@@ -208,6 +291,7 @@ export interface FieldDefinition {
   hint?: string
   info?: string
   preset?: FieldPreset
+  initial?: string
   action?: FieldAction
   required?: boolean
   readOnly?: boolean
@@ -232,8 +316,17 @@ export interface FieldDefinition {
   adminOnly?: boolean
   visibleWhen?: FieldCondition
   notBefore?: string
+  frozen?: FrozenRule[]
+  valueFrom?: ValueFrom | ValueFrom[]
+  needs?: FieldNeed
+  slotFor?: string
+  lockedOnWhen?: FieldCondition
+  hoursOffWhen?: string
   follows?: FollowRule
   ownerField?: string
+  alsoOwnedBy?: string
+  defaultPicks?: Record<string, string[]>
+  excludeOwned?: boolean
   defaultFromOwner?: boolean
   withTime?: boolean
   dayOnly?: boolean

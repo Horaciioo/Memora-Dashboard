@@ -1,5 +1,8 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
+import { Tip } from '@/components/elements/feedback/Tip'
 import { InfoHint } from '@/components/elements/feedback/InfoHint'
 import { EmojiPicker } from '@/components/elements/forms/pickers/EmojiPicker'
 import { Field } from '@/components/elements/forms/Field'
@@ -7,7 +10,7 @@ import { FieldControl } from '@/components/elements/forms/FieldControl'
 import { HandleLookup } from '@/components/elements/forms/HandleLookup'
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { toWallText } from '@/core/lib/forms/values'
-import { busyNotice, narrowOptions, visibleFields } from '@/core/lib/forms'
+import { busyNotice, holds, isLockedOn, narrowOptions, visibleFields } from '@/core/lib/forms'
 import { FIELD_STYLES, FORM_GRID, FORM_ROWS } from '@/declarations/ui/variants'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
 import { cn } from '@/utils/classnames'
@@ -23,6 +26,54 @@ const minOf = (field: FieldDefinition, values: FormValues): string | undefined =
   const bound = field.notBefore ? values[field.notBefore] : null
 
   return typeof bound === 'string' && bound !== '' ? toWallText(bound) : undefined
+}
+
+/**
+ * Tell whether the flag a date field depends on drops its hour
+ * @param {FieldDefinition} field - Field declaration
+ * @param {FormValues} values - Current values
+ * @return {boolean} - Flag on
+ */
+
+const locked = (field: FieldDefinition, values: FormValues): boolean =>
+  Boolean(field.hoursOffWhen) && values[field.hoursOffWhen as string] === true
+
+/**
+ * Reason a field is greyed: it waits for another one, or a rule froze it
+ * @param {FieldDefinition} field - Field declaration
+ * @param {FormValues} values - Current values
+ * @return {string | null} - Explanation shown on hover, none while the field is free
+ */
+
+const blockedBy = (field: FieldDefinition, values: FormValues): string | null => {
+  if (field.needs) {
+    const needed = values[field.needs.field]
+    if (needed === null || needed === undefined || needed === '' || needed === false) {
+      return field.needs.hint
+    }
+  }
+
+  return field.frozen?.find((rule) => holds(rule.when, values))?.hint ?? null
+}
+
+/**
+ * Wrap a greyed control in the bubble telling why
+ * @param {ReactNode} control - Control drawn
+ * @param {FieldDefinition} field - Field declaration
+ * @param {FormValues} values - Current values
+ * @return {ReactNode} - Control, with its bubble while it is greyed
+ */
+
+const gated = (control: ReactNode, field: FieldDefinition, values: FormValues): ReactNode => {
+  const reason = blockedBy(field, values)
+
+  return reason ? (
+    <Tip label={reason} floating className="w-full">
+      {control}
+    </Tip>
+  ) : (
+    control
+  )
 }
 
 export interface FormRendererProps {
@@ -155,10 +206,11 @@ export const FormRenderer = ({
                   id={id}
                   field={field}
                   value={raw}
-                  disabled={disabled}
+                  disabled={disabled || blockedBy(field, values) !== null}
                   invalid={Boolean(error)}
                   describedBy={error ? `${id}-error` : undefined}
                   min={minOf(field, values)}
+                  hoursLocked={locked(field, values)}
                   onChange={(next) => onChange(field.name, next)}
                 />
               )
@@ -168,13 +220,13 @@ export const FormRenderer = ({
                 {isBlock ? (
                   <div className={FORM_ROWS.block}>
                     {caption}
-                    {control}
+                    {gated(control, field, values)}
                   </div>
                 ) : (
                   <div className={FORM_ROWS.line}>
                     {caption}
                     <div className={field.kind === 'toggle' ? undefined : FORM_ROWS.control}>
-                      {control}
+                      {gated(control, field, values)}
                     </div>
                   </div>
                 )}
@@ -209,10 +261,11 @@ export const FormRenderer = ({
                 id={id}
                 field={field}
                 value={raw}
-                disabled={disabled}
+                disabled={disabled || blockedBy(field, values) !== null}
                 invalid={invalid}
                 describedBy={describedBy}
                 min={minOf(field, values)}
+                hoursLocked={locked(field, values)}
                 onChange={(next) => onChange(field.name, next)}
               />
             )
@@ -227,7 +280,7 @@ export const FormRenderer = ({
                     onChange={(checked) => onChange(field.name, checked)}
                     label={field.label}
                     binary={field.binary}
-                    disabled={disabled || field.readOnly}
+                    disabled={disabled || field.readOnly || isLockedOn(field, values)}
                   />
                 </div>
               )
@@ -246,24 +299,27 @@ export const FormRenderer = ({
                 maturity={field.maturity}
                 className={cn(
                   spanOf(field, single),
-                  glyph && FIELD_STYLES.glyphField,
                   fill && field.kind === 'announcement' && 'flex-1'
                 )}
               >
                 {glyph ? (
-                  <div className={FIELD_STYLES.row}>
-                    <EmojiPicker
-                      id={`${idPrefix}-${glyph.name}`}
-                      label={glyph.label}
-                      value={typeof values[glyph.name] === 'string' ? `${values[glyph.name]}` : ''}
-                      disabled={disabled || glyph.readOnly}
-                      invalid={Boolean(errorOf(glyph.name))}
-                      onChange={(next) => onChange(glyph.name, next)}
-                    />
-                    <div className={FIELD_STYLES.rowControl}>{control}</div>
+                  <div className={FIELD_STYLES.glyphInside}>
+                    {gated(control, field, values)}
+                    <div className={FIELD_STYLES.glyphSeat}>
+                      <EmojiPicker
+                        id={`${idPrefix}-${glyph.name}`}
+                        label={glyph.label}
+                        value={
+                          typeof values[glyph.name] === 'string' ? `${values[glyph.name]}` : ''
+                        }
+                        disabled={disabled || glyph.readOnly}
+                        invalid={Boolean(errorOf(glyph.name))}
+                        onChange={(next) => onChange(glyph.name, next)}
+                      />
+                    </div>
                   </div>
                 ) : (
-                  control
+                  gated(control, field, values)
                 )}
                 {field.lookup && typeof raw === 'string' && (
                   <HandleLookup

@@ -117,8 +117,10 @@ export const FIELD_STYLES = {
   // Control sharing its line with the glyph picker
   row: 'flex min-w-0 items-center gap-2',
   rowControl: 'min-w-0 flex-1',
-  // Label and messages sit above the input
-  glyphField: '[&>label]:pl-11 [&>p]:pl-11',
+  // Glyph picker sits inside the box, at its far end
+  glyphInside: 'relative [&_input]:pr-12',
+  glyphSeat:
+    'absolute top-1/2 right-1.5 -translate-y-1/2 [&_button]:h-8 [&_button]:w-8 [&_button]:border-0 [&_button]:bg-transparent [&_button]:shadow-none',
   // Static prefix welded to the left of a control
   prefixRow:
     'flex min-w-0 items-stretch rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] transition-colors focus-within:border-[var(--color-field-border-strong)]',
@@ -227,7 +229,7 @@ export const SELECT_MENU_STYLES = {
   placeholder: `truncate ${EMPTY_VALUE}`,
   // Category heading inside the list
   group:
-    'px-2.5 pt-3 pb-1 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'px-2.5 pt-5 pb-1.5 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   chevron: 'h-4 w-4 shrink-0 text-[var(--color-on-field-subtle)] transition-transform',
   chevronOpen: 'rotate-180',
   panel:

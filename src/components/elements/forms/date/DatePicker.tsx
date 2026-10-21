@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { DateWheel } from '@/components/elements/forms/date/DateWheel'
 import { DayGrid } from '@/components/elements/forms/date/DayGrid'
 import { useRangePick } from '@/components/elements/forms/date/useRangePick'
+import { Tip } from '@/components/elements/feedback/Tip'
 import { FloatingLayer } from '@/components/structures/overlays/FloatingLayer'
 import { useAnchoredPanel } from '@/core/hooks/interaction/layout/useAnchoredPanel'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
@@ -41,6 +42,8 @@ export interface DatePickerProps {
   startYear?: number
   // Earliest moment accepted, ISO day or minute
   min?: string
+  // The hour is frozen off, the day alone counts
+  hoursLocked?: boolean
 }
 
 // Time of day a datetime lands on when the day is picked first
@@ -67,6 +70,7 @@ export const DatePicker = ({
   describedBy,
   startYear,
   min,
+  hoursLocked,
 }: DatePickerProps) => {
   const single = typeof value === 'string' ? value : ''
   const [rangeStart = '', rangeEnd = ''] = Array.isArray(value) ? value : []
@@ -84,7 +88,9 @@ export const DatePicker = ({
   // The hour shows once forced, once the value has one, or once asked for
   const [wantTime, setWantTime] = useState(Boolean(startsTimed))
   const hasValue = range ? startDay !== '' : day !== ''
-  const timed = Boolean(withTime) || (hasValue ? (range ? startStamp : clock) !== '' : wantTime)
+  const timed =
+    !hoursLocked &&
+    (Boolean(withTime) || (hasValue ? (range ? startStamp : clock) !== '' : wantTime))
   const stamp = (target: string, clockValue: string, on = timed) =>
     on ? `${target}T${clockValue}` : target
 
@@ -257,6 +263,17 @@ export const DatePicker = ({
                   </button>
                 </>
               )}
+              {hoursLocked && !range && (
+                <Tip label={PICKER_COPY.allDayLocked} floating>
+                  <input
+                    type="time"
+                    value=""
+                    disabled
+                    aria-label={PICKER_COPY.time}
+                    className={cn(DATE_PICKER_STYLES.time, 'cursor-not-allowed opacity-50')}
+                  />
+                </Tip>
+              )}
               {timed && !range && (
                 <input
                   type="time"
@@ -269,7 +286,7 @@ export const DatePicker = ({
                   }
                 />
               )}
-              {!withTime && !dayOnly && (
+              {!withTime && !dayOnly && !hoursLocked && (
                 <button
                   type="button"
                   aria-pressed={timed}

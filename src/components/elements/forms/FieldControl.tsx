@@ -34,6 +34,8 @@ export interface FieldControlProps {
   inline?: boolean
   // Earliest moment a date field accepts, as a wall clock
   min?: string
+  // Hour locked off, the day alone counts
+  hoursLocked?: boolean
 }
 
 // Bucket an image field lands in when its declaration stays silent
@@ -60,7 +62,7 @@ const DATE_KINDS = ['date', 'datetime']
  * @type {string[]}
  */
 
-const SIMPLE_KINDS = ['text', 'number', 'url', 'discord']
+const SIMPLE_KINDS = ['text', 'number', 'url', 'discord', 'time']
 
 /**
  * Native input type per field kind
@@ -72,6 +74,7 @@ const INPUT_TYPES: Record<string, string> = {
   number: 'number',
   url: 'url',
   discord: 'text',
+  time: 'time',
 }
 
 /**
@@ -85,6 +88,7 @@ const INPUT_TYPES: Record<string, string> = {
  * @param {string} [describedBy] - Identifier of the message describing the control
  * @param {boolean} [inline] - Bare long text
  * @param {string} [min] - Earliest moment a date field accepts
+ * @param {boolean} [hoursLocked] - Hour of a date field frozen
  * @return {JSX.Element | null}
  */
 
@@ -98,6 +102,7 @@ export const FieldControl = ({
   describedBy,
   inline,
   min,
+  hoursLocked,
 }: FieldControlProps) => {
   const { can } = useAuthContext()
 
@@ -161,6 +166,7 @@ export const FieldControl = ({
         label={field.label}
         value={typeof value === 'string' ? toWallText(value) : ''}
         min={min}
+        hoursLocked={hoursLocked}
         withTime={field.kind === 'datetime'}
         startsTimed={field.withTime}
         dayOnly={field.dayOnly}
