@@ -234,7 +234,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.calendar,
         permission: Permissions.CalendarManage,
-        text: 'Ajout des modèles « Réunion d’équipe Lives » (samedi 18 h 30) et « Réunion d’équipe Discord » (samedi 17 h 30) : l’équipe et ses Responsables sont convoqués, la visibilité reste celle de l’équipe, et « Membres en plus » propose les membres d’autres équipes et les YouTubeurs selon tes droits',
+        text: 'Ajout des modèles « Réunion d’équipe Lives » (samedi 18 h 30) et « Réunion d’équipe Discord » (samedi 17 h 30) : l’équipe et ses Responsables sont convoqués, la visibilité reste celle de l’équipe, et « Membres en plus » propose les membres d’autres équipes et les YouTubeurs selon les droits de chacun',
       },
       {
         tag: ChangelogTags.Added,
