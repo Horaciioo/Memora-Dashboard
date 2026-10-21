@@ -8,10 +8,9 @@ import type { FunctionKindName } from '@/utils/constants/workflow'
  * Division every member can be ranked in
  * @typedef {Object} FixedDivision
  * @property {string} name - Display name
- * @property {number} rank - Unique rank
+ * @property {number} rank - Unique rank, also the chevrons on its emblem
  * @property {string} summary - Supporting line
  * @property {boolean} leadAssignable - A responsable may assign it
- * @property {string | null} imagePath - Official logo under public
  */
 
 export interface FixedDivision {
@@ -19,7 +18,6 @@ export interface FixedDivision {
   rank: number
   summary: string
   leadAssignable: boolean
-  imagePath: string | null
 }
 
 /**
@@ -28,27 +26,10 @@ export interface FixedDivision {
  */
 
 export const FIXED_DIVISIONS: readonly FixedDivision[] = [
-  {
-    name: 'Squad I',
-    rank: 1,
-    summary: 'Première squad.',
-    leadAssignable: true,
-    imagePath: '/divisions/marshaSquad1.png',
-  },
-  {
-    name: 'Squad II',
-    rank: 2,
-    summary: 'Deuxième squad.',
-    leadAssignable: true,
-    imagePath: '/divisions/marshaSquad2.png',
-  },
-  {
-    name: 'Squad III',
-    rank: 3,
-    summary: 'Troisième squad.',
-    leadAssignable: false,
-    imagePath: '/divisions/marshaSquad3.png',
-  },
+  { name: 'Division 1', rank: 1, summary: 'Première division.', leadAssignable: true },
+  { name: 'Division 2', rank: 2, summary: 'Deuxième division.', leadAssignable: true },
+  { name: 'Division 3', rank: 3, summary: 'Troisième division.', leadAssignable: false },
+  { name: 'Division 4', rank: 4, summary: 'Division des responsables.', leadAssignable: false },
 ]
 
 /**

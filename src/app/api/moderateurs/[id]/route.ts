@@ -21,7 +21,7 @@ export const GET = createProtectedRoute({
   permission: Permissions.MemberRead,
   descriptor: { summary: 'Read a moderator file', tags: ['members'] },
   handler: async ({ params, access, session, scope }) => {
-    if (!access.isResponsable || params.id === session.id) throw notFound()
+    if (!access.isResponsable || (params.id === session.id && !access.isAdmin)) throw notFound()
     await assertAccountInScope(params.id, await scope(), session.id)
 
     const detail = await readMember(params.id, access.can(Permissions.MemberNoteRead))

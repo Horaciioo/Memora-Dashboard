@@ -127,6 +127,50 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.7.0',
+    date: '2026-10-21',
+    title: 'Le rôle Employé arrive',
+    intro:
+      'Memora accueille un nouveau rôle, une quatrième division et des icônes entièrement redessinées.',
+    description:
+      'Il manquait un niveau entre l’Admin et les Responsables, la liste des Modérateurs mélangeait l’encadrement et les modérateurs, et les icônes de rôles, de fonctions et de divisions n’étaient pas toutes à la hauteur. Cette version ajoute le rôle Employé, range chaque YouTubeur par Administration puis par fonction, et redessine les icônes.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Ajout d’un nouveau rôle « Employé » : placé entre Admin et Responsable, il voit tous les YouTubeurs et dispose des mêmes droits qu’un Admin, sauf l’accès à « Système ».',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Ajout de la possibilité, pour un Admin ou un Employé, d’ouvrir sa propre fiche dans « Modérateurs » et de la modifier.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une quatrième division, « Division 4 », réservée aux Responsables, avec son emblème doré.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Amélioration de la page « Modérateurs » : chaque YouTubeur sépare l’« Administration », avec l’Admin en premier puis les Responsables, des modérateurs, rangés par fonction puis par ordre alphabétique.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle des icônes de rôles et de fonctions : Admin, Employé et Modérateur, Discord, Lives et YouTube sont redessinés, avec une couronne qui scintille et une flamme qui crépite.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle des divisions : « Squad I », « Squad II » et « Squad III » deviennent « Division 1 », « Division 2 » et « Division 3 », chacune avec un écusson qui gagne un chevron.',
+      },
+    ],
+  },
+  {
     version: '0.6.3',
     date: '2026-10-21',
     title: 'Le calendrier s’organise',

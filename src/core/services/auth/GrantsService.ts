@@ -7,7 +7,7 @@ import type { PermissionGroup, PermissionOverwrite } from '@/core/lib/permission
 import { GRANT_ADDITIONS } from '@/declarations/access/grants'
 import { ACCESS_CATEGORY_REGISTRY } from '@/declarations/access/categories'
 import { FLOOR_ROLE, ROLE_PRESETS } from '@/declarations/access/roles'
-import { MemberRoles } from '@/utils/constants/hierarchy'
+import { ADMIN_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
 import type { AccessCategoryName, MemberRoleName } from '@/utils/constants/hierarchy'
 import { PermissionEffects } from '@/utils/constants/workflow'
 import type { FunctionKindName } from '@/utils/constants/workflow'
@@ -20,6 +20,15 @@ export type HolderAccount = Account & { functions: { functionId: string }[] }
 
 // Applied once per process
 let synced = false
+
+/**
+ * Levels a batch aimed at one role lands on, the employee follows the admin
+ * @param {MemberRoleName} role - Level the batch names
+ * @return {MemberRoleName[]} - Levels receiving it
+ */
+
+const withEmployee = (role: MemberRoleName): MemberRoleName[] =>
+  role === MemberRoles.Admin ? [...ADMIN_ROLES] : [role]
 
 /**
  * Land every grant batch the database has not seen yet
@@ -40,14 +49,18 @@ export const syncRoleGrants = async (): Promise<void> => {
   for (const addition of pending) {
     const rows = [
       ...Object.entries(addition.grants).flatMap(([role, permissions]) =>
-        (permissions ?? []).map((permission) => ({ role: role as MemberRoleName, permission }))
+        withEmployee(role as MemberRoleName).flatMap((holder) =>
+          (permissions ?? []).map((permission) => ({ role: holder, permission }))
+        )
       ),
       ...Object.entries(addition.roleDenies ?? {}).flatMap(([role, permissions]) =>
-        (permissions ?? []).map((permission) => ({
-          role: role as MemberRoleName,
-          permission,
-          effect: PermissionEffects.Deny,
-        }))
+        withEmployee(role as MemberRoleName).flatMap((holder) =>
+          (permissions ?? []).map((permission) => ({
+            role: holder,
+            permission,
+            effect: PermissionEffects.Deny,
+          }))
+        )
       ),
     ]
 
@@ -106,7 +119,7 @@ export const syncRoleGrants = async (): Promise<void> => {
     const revoked = Object.entries(addition.revokes ?? {}).map(([role, permissions]) =>
       prisma.rolePermission.deleteMany({
         where: {
-          role: role as MemberRoleName,
+          role: { in: withEmployee(role as MemberRoleName) },
           permission: { in: permissions ?? [] },
           youtuberId: null,
         },
@@ -375,6 +388,7 @@ export const readRoleGrants = async (
   const rows = await prisma.rolePermission.findMany({ where: { youtuberId } })
   const grants: Record<MemberRoleName, PermissionOverwrite[]> = {
     [MemberRoles.Admin]: [],
+    [MemberRoles.Employe]: [],
     [MemberRoles.Responsable]: [],
     [MemberRoles.Moderateur]: [],
     [MemberRoles.Junior]: [],

@@ -88,7 +88,7 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
 
   // Official logo of a division
   if (mark === 'division') {
-    return <DivisionLogo label={option.label} src={option.image} className="h-5 w-5" />
+    return <DivisionLogo label={option.label} className="h-5 w-5" />
   }
 
   // Official logo of a network

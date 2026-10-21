@@ -58,6 +58,18 @@ export const requirePermission = async (
 }
 
 /**
+ * Require the system, held by the admin level alone
+ * @return {Promise<GuardedSession>} - Session and helpers
+ */
+
+export const requireSystem = async (): Promise<GuardedSession> => {
+  const guarded = await requireUser()
+  if (!guarded.access.isSystem) forbidden()
+
+  return guarded
+}
+
+/**
  * Require a membership status on a server component
  * @param {MemberStatusName | MemberStatusName[]} status - Statuses the page is meant for
  * @return {Promise<GuardedSession>} - Session and helpers

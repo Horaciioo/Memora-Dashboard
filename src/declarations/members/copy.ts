@@ -98,6 +98,7 @@ export const MEMBER_COPY = {
   noFunction: 'Aucune fonction',
   unofficial: 'Non officiel',
   administration: 'Administration',
+  moderators: 'Modérateurs',
   absentHint: '{name} est actuellement en absence.',
 } as const
 

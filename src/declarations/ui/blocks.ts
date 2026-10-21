@@ -925,4 +925,8 @@ export const CREATOR_GROUP = {
   box: 'card-surface p-4 opacity-0 -translate-y-3 transition-[opacity,translate] duration-300 ease-out motion-reduce:transition-none sm:p-5',
   boxOpen:
     'card-surface p-4 opacity-100 translate-y-0 transition-[opacity,translate] delay-100 duration-400 ease-out motion-reduce:transition-none sm:p-5',
+  // Sections inside a box
+  sections: 'flex flex-col gap-5',
+  section: 'flex flex-col gap-3',
+  sectionHeading: 'text-xs font-bold tracking-wider text-[var(--color-ink-subtle)] uppercase',
 } as const

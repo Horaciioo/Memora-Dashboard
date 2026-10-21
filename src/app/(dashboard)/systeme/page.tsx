@@ -2,14 +2,13 @@ import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/page/PageHeader'
 import { Section } from '@/components/structures/page/Section'
 import { ConsoleRow } from '@/composites/system/ConsoleRow'
-import { requirePermission } from '@/core/wrappers/requireUser'
+import { requireSystem } from '@/core/wrappers/requireUser'
 import { VIEW_COPY } from '@/declarations/access/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { SYSTEM_SCREENS } from '@/declarations/system/screens'
 import { GROUP_STYLES, HOME_STYLES, PAGE_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
-import { Permissions } from '@/utils/constants/permissions'
 
 export const metadata: Metadata = { title: SYSTEM_COPY.title }
 
@@ -19,7 +18,7 @@ export const metadata: Metadata = { title: SYSTEM_COPY.title }
  */
 
 export default async function SystemPage() {
-  await requirePermission(Permissions.AccessManage)
+  await requireSystem()
 
   return (
     <div className={PAGE_STYLES.wrapper}>

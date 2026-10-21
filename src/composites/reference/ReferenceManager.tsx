@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { DivisionLogo } from '@/components/elements/display/marks/DivisionLogo'
-import { divisionLogo } from '@/declarations/members/profiles'
+import { divisionTier } from '@/declarations/members/divisions'
 import { NetworkLogo, hasNetworkLogo } from '@/components/elements/display/marks/NetworkLogo'
 import { Status } from '@/components/elements/display/Status'
 import { Button } from '@/components/elements/actions/Button'
@@ -208,8 +208,8 @@ export const ReferenceManager = ({
             {row.image !== undefined &&
               (section.key === 'reseaux-sociaux' && hasNetworkLogo(row.label) ? (
                 <NetworkLogo network={row.label} className="h-8 w-8" />
-              ) : section.key === 'divisions' && divisionLogo(row.label, row.image) ? (
-                <DivisionLogo label={row.label} src={row.image} className="h-9 w-9" />
+              ) : section.key === 'divisions' && divisionTier(row.label) !== null ? (
+                <DivisionLogo label={row.label} className="h-9 w-9" />
               ) : (
                 <Avatar name={row.label} src={row.image} size="md" />
               ))}

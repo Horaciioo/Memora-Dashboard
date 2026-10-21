@@ -76,8 +76,8 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
   const { id } = await params
   const { session, access, scope } = await requirePermission(Permissions.MemberRead)
 
-  // Only responsables open a file, never one's own
-  if (!access.isResponsable || id === session.id) forbidden()
+  // Responsables open a file, only the admin level its own
+  if (!access.isResponsable || (id === session.id && !access.isAdmin)) forbidden()
 
   const canManageAccess = access.can(Permissions.AccessManage)
   const canReadLogs = access.can(Permissions.MemberLogRead)

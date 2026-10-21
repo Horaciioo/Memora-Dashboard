@@ -29,6 +29,7 @@ export interface MemberTag {
  * @property {string} label - Function name
  * @property {FunctionKindName} kind - Principal or secondary
  * @property {string | null} icon - Glyph key
+ * @property {number} position - Rank among the functions
  */
 
 export interface MemberFunction {
@@ -36,6 +37,7 @@ export interface MemberFunction {
   label: string
   kind: FunctionKindName
   icon: string | null
+  position: number
 }
 
 /**
@@ -43,13 +45,11 @@ export interface MemberFunction {
  * @typedef {Object} MemberDivision
  * @property {string} id - Division identifier
  * @property {string} label - Division name
- * @property {string | null} imagePath - Visual standing beside the portrait
  */
 
 export interface MemberDivision {
   id: string
   label: string
-  imagePath: string | null
 }
 
 /**

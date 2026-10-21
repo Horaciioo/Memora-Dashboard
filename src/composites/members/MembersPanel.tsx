@@ -12,6 +12,7 @@ import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/page/Section'
 import { useMembers } from '@/core/hooks/data/people/useMembers'
 import { toOptions } from '@/core/lib/forms/options'
+import { arrangeMembers, isListedRole } from '@/core/lib/members/arrange'
 import { ROLE_REGISTRY, MEMBER_STATUS_REGISTRY } from '@/declarations/access/roles'
 import { MEMBER_COPY, MEMBER_FILTER_COPY } from '@/declarations/members/copy'
 import { ROUTES } from '@/declarations/navigation'
@@ -39,6 +40,23 @@ export interface MembersPanelProps {
   canDelete: boolean
   canReadNotes: boolean
 }
+
+/**
+ * Members of one role in the order the list reads them
+ * @param {MemberSummary[]} list - Members sharing a role
+ * @return {MemberSummary[]} - Ordered members
+ */
+
+const inReadingOrder = (list: MemberSummary[]): MemberSummary[] => {
+  const { administration, moderators } = arrangeMembers(list)
+
+  return [...administration, ...moderators]
+}
+
+// Roles the list shows
+const listedRoles = toOptions(ROLE_REGISTRY).filter((option) =>
+  isListedRole(option.value as MemberRoleName)
+)
 
 // One box of the list
 interface MemberGroup {
@@ -104,6 +122,9 @@ export const MembersPanel = ({
     const term = search.trim().toLowerCase()
 
     return members.filter((member) => {
+      // The employees hold every access without sitting in the list
+      if (!isListedRole(member.role)) return false
+
       // Free text runs on the name and on the Discord identifier
       if (
         term.length > 0 &&
@@ -137,13 +158,13 @@ export const MembersPanel = ({
   const groups = useMemo((): MemberGroup[] => {
     // Narrowed to one creator
     if (creatorId) {
-      return toOptions(ROLE_REGISTRY)
+      return listedRoles
         .map((option) => ({
           key: option.value,
           label: option.label,
           role: option.value as MemberRoleName,
           youtuberId: creatorId,
-          members: visibleMembers.filter((member) => member.role === option.value),
+          members: inReadingOrder(visibleMembers.filter((member) => member.role === option.value)),
         }))
         .filter((group) => group.members.length > 0)
     }
@@ -193,7 +214,7 @@ export const MembersPanel = ({
       name: 'role',
       label: MEMBER_FILTER_COPY.role,
       allLabel: MEMBER_FILTER_COPY.allRoles,
-      options: toOptions(ROLE_REGISTRY),
+      options: listedRoles,
       mark: 'glyph',
     },
     {
@@ -285,9 +306,9 @@ export const MembersPanel = ({
               const key = group.key
               const isOpen = flipped.has(key) !== Boolean(group.role)
 
-              const cards = (
+              const renderCards = (list: MemberSummary[], withAdd: boolean) => (
                 <div className={LIST_STYLES.grid}>
-                  {group.members.map((member) => (
+                  {list.map((member) => (
                     <MemberCard
                       key={member.id}
                       member={member}
@@ -297,9 +318,30 @@ export const MembersPanel = ({
                       onDelete={() => setPendingDeletion(member)}
                     />
                   ))}
-                  {canCreate && (
+                  {withAdd && canCreate && (
                     <AddRow label={MEMBER_COPY.add} onClick={() => openCreate(group.youtuberId)} />
                   )}
+                </div>
+              )
+
+              // A creator box splits into the Administration and the moderators
+              const { administration, moderators } = arrangeMembers(group.members)
+              const sections = [
+                { key: 'administration', label: MEMBER_COPY.administration, list: administration },
+                { key: 'moderators', label: MEMBER_COPY.moderators, list: moderators },
+              ].filter((section) => section.list.length > 0)
+
+              const cards = group.role ? (
+                renderCards(group.members, true)
+              ) : (
+                <div className={CREATOR_GROUP.sections}>
+                  {sections.map((section) => (
+                    <div key={section.key} className={CREATOR_GROUP.section}>
+                      <h3 className={CREATOR_GROUP.sectionHeading}>{section.label}</h3>
+                      {renderCards(section.list, section.key === 'moderators')}
+                    </div>
+                  ))}
+                  {moderators.length === 0 && renderCards([], true)}
                 </div>
               )
 

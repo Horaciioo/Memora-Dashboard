@@ -10,12 +10,12 @@ import {
 } from '@/declarations/lives/registries'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { LiveModTime, LiveSpan } from '@/types/lives'
-import { MemberRoles } from '@/utils/constants/hierarchy'
+import { LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import { LiveStatuses } from '@/utils/constants/lives'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 
 // Roles that supervise lives
-const LEAD_ROLES: string[] = [MemberRoles.Admin, MemberRoles.Responsable]
+const LEAD_ROLES: string[] = LEADERSHIP_ROLES
 
 /**
  * Open a stretch unless one already runs

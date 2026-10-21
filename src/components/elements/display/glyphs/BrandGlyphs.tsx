@@ -2,7 +2,9 @@ import { useId } from 'react'
 import type { ReactNode } from 'react'
 import { RampStops } from '@/components/elements/display/glyphs/RampStops'
 import { visionSafe } from '@/utils/format/colour'
-import { GLYPH_TINTS, JUNIOR_TINTS, deepen } from '@/declarations/members/tints'
+import { DIVISION_TIERS } from '@/declarations/members/divisions'
+import type { DivisionTier } from '@/declarations/members/divisions'
+import { GLYPH_TINTS, JUNIOR_TINTS } from '@/declarations/members/tints'
 import type { GlyphTint } from '@/declarations/members/tints'
 import { BRAND_RAMP } from '@/declarations/ui/ramps'
 
@@ -47,7 +49,6 @@ const FRAME_RAMPS = {
   // Role and function tints
   ...GLYPH_TINTS,
   ...JUNIOR_TINTS,
-  brand_MODERATOR: deepen(BRAND_RAMP),
   brand_JUNIOR: BRAND_RAMP,
 }
 
@@ -1518,24 +1519,44 @@ export const PencilGlyph = ({ className }: GlyphProps) => (
   />
 )
 
+// Discord logo outline, eye holes included
+const DISCORD_LOGO =
+  'M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z'
+
 /**
- * Discord
+ * Discord logo in three tones, clear eyes and a light volume
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
 
-export const DiscordGlyph = ({ className }: GlyphProps) => (
-  <Frame
-    className={className}
-    tone="DISCORD"
-    render={({ fill }) => (
-      <path
-        d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .079.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"
-        fill={fill}
-      />
-    )}
-  />
-)
+export const DiscordGlyph = ({ className }: GlyphProps) => {
+  const clip = useId()
+
+  return (
+    <Frame
+      className={className}
+      tone="DISCORD"
+      render={({ fill, lift, deep, cut }) => (
+        <>
+          <defs>
+            <clipPath id={clip}>
+              <path d={DISCORD_LOGO} />
+            </clipPath>
+          </defs>
+          <g transform="translate(1.4 1.6) scale(.88)">
+            <path d={DISCORD_LOGO} fill={fill} />
+            <g clipPath={`url(#${clip})`}>
+              <path d="M0 0H24V8.4C15 5.4 7 6.4 0 11.6z" fill={lift} opacity="0.5" />
+              <path d="M0 17.8C8 20.6 16 20.6 24 17.4V24H0z" fill={deep} opacity="0.55" />
+            </g>
+            <ellipse cx="8.02" cy="12.91" rx="2.1" ry="2.35" fill={cut} />
+            <ellipse cx="15.99" cy="12.91" rx="2.1" ry="2.35" fill={cut} />
+          </g>
+        </>
+      )}
+    />
+  )
+}
 
 /**
  * Glossary
@@ -1657,32 +1678,56 @@ interface TintedGlyphProps extends GlyphProps {
 }
 
 /**
- * Moderator
+ * Moderator, bevelled shield with a raised check
  * @param {TintedGlyphProps} props - Sizing class and tint
  * @return {JSX.Element}
  */
 
-export const ModeratorGlyph = ({ className, tone = 'brand' }: TintedGlyphProps) => (
+export const ModeratorGlyph = ({ className, tone = 'DIVISION' }: TintedGlyphProps) => (
   <Frame
     className={className}
     tone={tone}
     render={({ fill, lift, deep, cut }) => (
       <>
         <path
-          d="M12 2.4 20.2 5.6v6.3c0 5.1-3.5 8.9-8.2 10.7-4.7-1.8-8.2-5.6-8.2-10.7V5.6z"
-          fill={fill}
-        />
-        <path d="M12 2.4 20.2 5.6v6.3c0 .4 0 .8-.1 1.2L12 2.4z" fill={lift} />
-        <path
-          d="M20.1 13.1c-.6 4.5-3.8 7.8-8.1 9.5v-2.2c3.4-1.6 5.9-4.3 6.6-7.8z"
+          d="M3.6 4.9Q7.8 5.3 12 2.2q4.2 3.1 8.4 2.7v6.7C20.4 16.6 16.8 20.2 12 22 7.2 20.2 3.6 16.6 3.6 11.6z"
           fill={deep}
-          opacity="0.6"
+          stroke={deep}
+          strokeWidth="0.8"
+          strokeLinejoin="round"
         />
         <path
-          d="m8.4 12.2 2.6 2.6 4.6-5.4"
+          d="M5.1 6.4Q8.5 6.6 12 4.2q3.5 2.4 6.9 2.2v5.1c0 4-2.9 7-6.9 8.6-4-1.6-6.9-4.6-6.9-8.6z"
+          fill={fill}
+          stroke={fill}
+          strokeWidth="0.6"
+          strokeLinejoin="round"
+        />
+        <path d="M12 4.2Q8.5 6.6 5.1 6.4v5.1c0 4 2.9 7 6.9 8.6z" fill={lift} opacity="0.5" />
+        <path d="M12 4.2q3.5 2.4 6.9 2.2v5.1c0 4-2.9 7-6.9 8.6z" fill={deep} opacity="0.3" />
+        <path
+          d="M6.4 7.7Q9 7.6 12 5.5"
+          fill="none"
+          stroke="white"
+          strokeWidth="0.7"
+          strokeLinecap="round"
+          opacity="0.7"
+        />
+        <path
+          d="m8.6 12.1 2.4 2.5 4.5-5.2"
+          fill="none"
+          stroke={deep}
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          opacity="0.55"
+          transform="translate(.4 .6)"
+        />
+        <path
+          d="m8.6 12.1 2.4 2.5 4.5-5.2"
           fill="none"
           stroke={cut}
-          strokeWidth="2.2"
+          strokeWidth="2.4"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -1763,35 +1808,17 @@ export const JuniorLeadFunctionGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Discord moderator function
+ * Discord moderator function, the Discord logo
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
 
 export const DiscordFunctionGlyph = ({ className }: GlyphProps) => (
-  <Frame
-    className={className}
-    tone="DISCORD"
-    render={({ fill, lift, cut }) => (
-      <>
-        <path
-          d="M9 3.2h9.5A2.5 2.5 0 0 1 21 5.7v5.5a2.5 2.5 0 0 1-2.5 2.5H18v2.6l-3-2.6H9a2.5 2.5 0 0 1-2.5-2.5V5.7A2.5 2.5 0 0 1 9 3.2z"
-          fill={lift}
-        />
-        <path
-          d="M5.5 8.4H15a2.5 2.5 0 0 1 2.5 2.5v5.5a2.5 2.5 0 0 1-2.5 2.5H9.5l-3.6 2.8v-2.8h-.4A2.5 2.5 0 0 1 3 16.4v-5.5a2.5 2.5 0 0 1 2.5-2.5z"
-          fill={fill}
-        />
-        <circle cx="7.2" cy="13.7" r="1" fill={cut} />
-        <circle cx="10.25" cy="13.7" r="1" fill={cut} />
-        <circle cx="13.3" cy="13.7" r="1" fill={cut} />
-      </>
-    )}
-  />
+  <DiscordGlyph className={className} />
 )
 
 /**
- * Live moderator function
+ * Live moderator function, a green sword like the Twitch moderator badge
  * @param {GlyphProps} props - Sizing class
  * @return {JSX.Element}
  */
@@ -1800,19 +1827,39 @@ export const LiveFunctionGlyph = ({ className }: GlyphProps) => (
   <Frame
     className={className}
     tone="LIVE"
-    render={({ fill, lift, deep, cut }) => (
+    render={({ fill, lift, deep }) => (
       <>
-        <path d="M12 17.4V21M8.6 21h6.8" stroke={deep} strokeWidth="2" strokeLinecap="round" />
-        <rect x="2.5" y="4" width="19" height="13.4" rx="3" fill={fill} />
-        <path d="M5.5 4h13a3 3 0 0 1 3 3v.8h-19V7a3 3 0 0 1 3-3z" fill={lift} opacity="0.55" />
-        <path
-          d="M10.2 8.6v5.4l4.5-2.7z"
-          fill={cut}
-          stroke={cut}
-          strokeWidth="1.4"
-          strokeLinejoin="round"
-        />
-        <circle cx="18.3" cy="6.9" r="1.1" fill={deep} />
+        <g transform="rotate(45 12 12)">
+          <path
+            d="M12 .6 14.2 3.2v11.4H9.8V3.2z"
+            fill={fill}
+            stroke={fill}
+            strokeWidth="0.5"
+            strokeLinejoin="round"
+          />
+          <path d="M12 .6 9.8 3.2v11.4H12z" fill={lift} opacity="0.8" />
+          <path
+            d="M12 4.2v9.2"
+            stroke={deep}
+            strokeWidth="0.5"
+            strokeLinecap="round"
+            opacity="0.5"
+          />
+          <rect x="5.6" y="14.2" width="12.8" height="2.6" rx="1.3" fill={deep} />
+          <path
+            d="M6.8 14.9h10.4"
+            stroke={lift}
+            strokeWidth="0.6"
+            strokeLinecap="round"
+            opacity="0.7"
+          />
+          <circle cx="5.9" cy="15.5" r="1.3" fill={fill} />
+          <circle cx="18.1" cy="15.5" r="1.3" fill={fill} />
+          <rect x="10.8" y="16.8" width="2.4" height="4" rx="0.8" fill={fill} />
+          <path d="M10.8 18.2h2.4M10.8 19.7h2.4" stroke={deep} strokeWidth="0.5" opacity="0.6" />
+          <circle cx="12" cy="21.8" r="1.5" fill={deep} />
+          <circle cx="11.5" cy="21.3" r="0.45" fill={lift} />
+        </g>
       </>
     )}
   />
@@ -1964,8 +2011,15 @@ export const AnimatorFunctionGlyph = ({ className }: GlyphProps) => (
   />
 )
 
+// Embers popping beside the flame: x, y, radius, beat
+const FLAME_EMBERS: [number, number, number, number][] = [
+  [19.8, 5.4, 0.55, 0],
+  [4.2, 3.8, 0.45, 1],
+  [15.4, 1.8, 0.5, 2],
+]
+
 /**
- * Responsable
+ * Responsable, a flame that flickers and throws embers
  * @param {TintedGlyphProps} props - Sizing class and tint
  * @return {JSX.Element}
  */
@@ -1976,61 +2030,167 @@ export const ResponsableGlyph = ({ className, tone = 'RESPONSABLE' }: TintedGlyp
     tone={tone}
     render={({ fill, lift, deep, cut }) => (
       <>
-        <path
-          d="M5.4 5.6c-1.4 1.5-1.9 3.3-1.2 5 .4-.9 1.1-1.5 2-1.8-.6-1-.9-2.1-.8-3.2z"
-          fill={fill}
-        />
-        <path
-          d="M12 1.6c.6 2.6 3.2 4.3 4.9 6.8 1.3 1.9 2.4 3.9 2.4 6.5 0 4.2-3.2 7.5-7.3 7.5s-7.3-3.3-7.3-7.3c0-2.5 1.1-4.5 2.5-6 .2 1.4.9 2.5 1.9 3-.3-3.7 1.1-7.7 2.9-10.5z"
-          fill={fill}
-        />
-        <path
-          d="M16.9 8.4c1.3 1.9 2.4 3.9 2.4 6.5 0 4.2-3.2 7.5-7.3 7.5 3-1 5.3-3.8 5.3-7.2 0-2.4-.7-4.6-.4-6.8z"
-          fill={deep}
-          opacity="0.55"
-        />
-        <path
-          d="M12 8.2c.5 2 2.6 3.4 3.6 5.4.5 1 .8 1.9.8 3 0 2.7-2 4.7-4.4 4.7s-4.4-2-4.4-4.5c0-1.5.7-2.7 1.7-3.6.2.9.7 1.5 1.3 1.8-.2-2.3.3-4.8 1.4-6.8z"
-          fill={lift}
-        />
-        <path
-          d="M12 13.2c.4 1.4 1.8 2.4 2.2 3.9.2.6.2 1.2.1 1.7-.3 1.2-1.2 2-2.3 2-1.3 0-2.3-1-2.3-2.3 0-1.1.6-1.9 1.3-2.5.1.6.4 1 .7 1.2-.2-1.4-.2-2.8.3-4z"
-          fill={cut}
-        />
+        <g className="glyph-flicker">
+          <path
+            d="M5.4 5.6c-1.4 1.5-1.9 3.3-1.2 5 .4-.9 1.1-1.5 2-1.8-.6-1-.9-2.1-.8-3.2z"
+            fill={fill}
+          />
+          <path
+            d="M12 1.6c.6 2.6 3.2 4.3 4.9 6.8 1.3 1.9 2.4 3.9 2.4 6.5 0 4.2-3.2 7.5-7.3 7.5s-7.3-3.3-7.3-7.3c0-2.5 1.1-4.5 2.5-6 .2 1.4.9 2.5 1.9 3-.3-3.7 1.1-7.7 2.9-10.5z"
+            fill={fill}
+          />
+          <path
+            d="M16.9 8.4c1.3 1.9 2.4 3.9 2.4 6.5 0 4.2-3.2 7.5-7.3 7.5 3-1 5.3-3.8 5.3-7.2 0-2.4-.7-4.6-.4-6.8z"
+            fill={deep}
+            opacity="0.55"
+          />
+        </g>
+        <g className="glyph-flicker" data-beat="1">
+          <path
+            d="M12 8.2c.5 2 2.6 3.4 3.6 5.4.5 1 .8 1.9.8 3 0 2.7-2 4.7-4.4 4.7s-4.4-2-4.4-4.5c0-1.5.7-2.7 1.7-3.6.2.9.7 1.5 1.3 1.8-.2-2.3.3-4.8 1.4-6.8z"
+            fill={lift}
+          />
+          <path
+            d="M12 13.2c.4 1.4 1.8 2.4 2.2 3.9.2.6.2 1.2.1 1.7-.3 1.2-1.2 2-2.3 2-1.3 0-2.3-1-2.3-2.3 0-1.1.6-1.9 1.3-2.5.1.6.4 1 .7 1.2-.2-1.4-.2-2.8.3-4z"
+            fill={cut}
+          />
+        </g>
+        {FLAME_EMBERS.map(([x, y, r, beat]) => (
+          <circle
+            key={`${x}-${y}`}
+            className="glyph-ember"
+            data-beat={beat}
+            cx={x}
+            cy={y}
+            r={r}
+            fill={lift}
+          />
+        ))}
       </>
     )}
   />
 )
 
+// Crown silhouette, five rounded spikes over a wide curved band
+const CROWN_BODY =
+  'M4.3 19.6 3.1 9l.8-.8Q5.4 16 6.9 7.2h1.6Q9.5 14 10.8 5.6h2.4q1.3 8.4 2.3 1.6h1.6q1.5 8.8 3 1l.8.8-1.2 10.6C15.6 21 8.4 21 4.3 19.6z'
+const CROWN_TIPS: [number, number, number][] = [
+  [3.4, 7.2, 1.8],
+  [20.6, 7.2, 1.8],
+  [7.7, 5.2, 1.65],
+  [16.3, 5.2, 1.65],
+  [12, 3.3, 2.15],
+]
+
+// Sparkles beside the crown: x, y, size, beat
+const CROWN_SPARKLES: [number, number, number, number][] = [
+  [3, 4.4, 1, 0],
+  [21.2, 14.6, 0.78, 1],
+  [20.4, 3.2, 0.5, 2],
+]
+
 /**
- * Administrator
+ * Glossy pearl on a crown spike
+ * @param {Paints} paints - Ramp paints
+ * @param {number[]} tip - Centre x, centre y and radius
+ * @param {number} beat - Order the gloss pulses in
+ * @return {JSX.Element}
+ */
+
+const pearl = ({ lift, deep }: Paints, [x, y, r]: number[], beat: number) => (
+  <g key={`${x}-${y}`}>
+    <circle cx={x} cy={y} r={r} fill={lift} stroke={deep} strokeWidth="0.7" />
+    <ellipse
+      cx={x - r * 0.35}
+      cy={y - r * 0.4}
+      rx={r * 0.32}
+      ry={r * 0.24}
+      transform={`rotate(-35 ${x - r * 0.35} ${y - r * 0.4})`}
+      className="glyph-gloss"
+      data-beat={beat % 3}
+      fill="white"
+      opacity="0.95"
+    />
+  </g>
+)
+
+/**
+ * Admin crown, cartoon pearls and a few sparkles that twinkle
  * @param {TintedGlyphProps} props - Sizing class and tint
  * @return {JSX.Element}
  */
 
-export const AdminGlyph = ({ className, tone = 'ADMIN' }: TintedGlyphProps) => (
-  <Frame
-    className={className}
-    tone={tone}
-    render={({ fill, lift, deep, cut }) => (
-      <>
-        <path d="M3.4 8.6 7.8 12.2 12 5.2l4.2 7 4.4-3.6-1.7 9.6H5.1z" fill={fill} />
-        <path
-          d="M12 5.2 7.8 12.2 3.4 8.6l1.2 6.8c2.4-1.6 4.9-5.5 7.4-10.2z"
-          fill={lift}
-          opacity="0.55"
-        />
-        <path d="M5 17.6h14v2.1a1.1 1.1 0 0 1-1.1 1.1H6.1A1.1 1.1 0 0 1 5 19.7z" fill={deep} />
-        <circle cx="3.4" cy="8.2" r="1.4" fill={lift} />
-        <circle cx="12" cy="4.6" r="1.6" fill={lift} />
-        <circle cx="20.6" cy="8.2" r="1.4" fill={lift} />
-        <path d="m12 12.4 1.5 1.8-1.5 1.8-1.5-1.8z" fill={cut} />
-        <circle cx="8.4" cy="19.2" r="0.7" fill={cut} />
-        <circle cx="15.6" cy="19.2" r="0.7" fill={cut} />
-      </>
-    )}
-  />
-)
+export const AdminGlyph = ({ className, tone = 'ADMIN' }: TintedGlyphProps) => {
+  const clip = useId()
+
+  return (
+    <Frame
+      className={className}
+      tone={tone}
+      render={(paints) => {
+        const { fill, lift, deep } = paints
+
+        return (
+          <>
+            <g transform="translate(12 13.4) scale(.8) translate(-12 -12)">
+              <path
+                d={CROWN_BODY}
+                fill={fill}
+                stroke={deep}
+                strokeWidth="0.75"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M19.7 19.6C15.6 21 8.4 21 4.3 19.6 9 19.4 17 18.6 20.4 14.6z"
+                fill={deep}
+                opacity="0.5"
+              />
+              <path
+                d="M11.4 7.4C11.4 10 11 12.2 10.2 13.4"
+                fill="none"
+                stroke={lift}
+                strokeWidth="1.1"
+                strokeLinecap="round"
+                opacity="0.85"
+              />
+              {CROWN_TIPS.map((tip, index) => pearl(paints, tip, index))}
+              <ellipse
+                cx="6.6"
+                cy="16.4"
+                rx="1.5"
+                ry="1.05"
+                transform="rotate(-20 6.6 16.4)"
+                fill="white"
+                opacity="0.9"
+              />
+              <circle cx="9" cy="15.6" r="0.48" fill="white" opacity="0.9" />
+              <defs>
+                <clipPath id={clip}>
+                  <path d={CROWN_BODY} />
+                </clipPath>
+              </defs>
+              <g clipPath={`url(#${clip})`}>
+                <path className="glyph-shine" d="M2 0h3.6L1.6 24H-2z" fill="white" />
+              </g>
+            </g>
+            {CROWN_SPARKLES.map(([x, y, size, beat]) => (
+              <g key={`${x}-${y}`} className="glyph-twinkle" data-beat={beat}>
+                <path
+                  transform={`translate(${x} ${y}) scale(${size})`}
+                  d="M0-2.4Q.4-.4 2.4 0 .4.4 0 2.4-.4.4-2.4 0-.4-.4 0-2.4z"
+                  fill={lift}
+                  stroke={deep}
+                  strokeWidth="0.35"
+                  strokeLinejoin="round"
+                />
+              </g>
+            ))}
+          </>
+        )
+      }}
+    />
+  )
+}
 
 /**
  * Livecon 3
@@ -2111,6 +2271,151 @@ export const LiveconCrisisGlyph = ({ className }: GlyphProps) => (
         <circle cx="12" cy="12" r="5.2" fill={deep} opacity="0.35" />
         <path d="M12 8v5" fill="none" stroke={cut} strokeWidth="2.4" strokeLinecap="round" />
         <circle cx="12" cy="16" r="1.3" fill={cut} />
+      </>
+    )}
+  />
+)
+
+// Shield outline, inner face and double rim
+const SHIELD_RIM = 'M12 1.6 21.2 4.4V12.2c0 5.2-3.7 8.6-9.2 10.6C6.5 20.8 2.8 17.4 2.8 12.2V4.4z'
+const SHIELD_FACE = 'M12 3.4 19.4 5.7V12c0 4.3-3 7.2-7.4 8.9C7.6 19.2 4.6 16.3 4.6 12V5.7z'
+const SHIELD_GILT = 'M12 .6 22 3.7V12.2c0 5.6-4 9.3-10 11.4C6 21.5 2 17.8 2 12.2V3.7z'
+
+// Chevron half-width and spacing per count
+const CHEVRON_SIZES: Record<number, [number, number, number]> = {
+  1: [5.2, 0, 2.2],
+  2: [4.8, 3.6, 2.2],
+  3: [4.4, 3.2, 1.9],
+  4: [4, 2.8, 1.6],
+}
+
+/**
+ * Chevron strokes stacked like galons
+ * @param {DivisionTier} tier - Tier drawn
+ * @param {Paints} paints - Ramp paints
+ * @return {JSX.Element[]} - Strokes
+ */
+
+const galons = ({ chevrons, hollow }: DivisionTier, { cut, deep }: Paints) => {
+  const [half, gap, width] = CHEVRON_SIZES[chevrons]
+
+  return Array.from({ length: chevrons }, (_, index) => {
+    const y = 13.2 + (index - (chevrons - 1) / 2) * gap
+    const d = `M${12 - half} ${y + half / 2}L12 ${y - half / 2}L${12 + half} ${y + half / 2}`
+    const stroke = { fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' } as const
+
+    // Hollow: the face shows through the outline
+    return hollow ? (
+      <g key={index}>
+        <path d={d} {...stroke} stroke={cut} strokeWidth={width + 0.5} />
+        <path d={d} {...stroke} stroke={deep} strokeWidth={width - 1} opacity="0.55" />
+      </g>
+    ) : (
+      <g key={index}>
+        <path
+          d={d}
+          {...stroke}
+          stroke={deep}
+          strokeWidth={width}
+          opacity="0.85"
+          transform="translate(.45 .65)"
+        />
+        <path d={d} {...stroke} stroke={cut} strokeWidth={width} />
+        <path
+          d={d}
+          {...stroke}
+          stroke="white"
+          strokeWidth={width * 0.32}
+          opacity="0.8"
+          transform="translate(-.2 -.25)"
+        />
+      </g>
+    )
+  })
+}
+
+/**
+ * Escutcheon of a division, one more galon at each rank
+ * @param {Object} props - Sizing class and tier index
+ * @return {JSX.Element}
+ */
+
+export const DivisionCrest = ({ className, tier }: GlyphProps & { tier: number }) => {
+  const config = DIVISION_TIERS[tier]
+
+  return (
+    <Frame
+      className={className}
+      tone={config.tone}
+      render={(paints) => {
+        const { fill, lift, deep, cut } = paints
+
+        return (
+          <>
+            {config.double && (
+              <path
+                d={SHIELD_GILT}
+                fill="none"
+                stroke={lift}
+                strokeWidth="0.8"
+                strokeLinejoin="round"
+              />
+            )}
+            <path d={SHIELD_RIM} fill={deep} stroke={deep} strokeWidth="1" strokeLinejoin="round" />
+            <path
+              d={SHIELD_FACE}
+              fill={fill}
+              stroke={fill}
+              strokeWidth="0.6"
+              strokeLinejoin="round"
+            />
+            <path d="M12 3.4 4.6 5.7V12c0 4.3 3 7.2 7.4 8.9z" fill={lift} opacity="0.4" />
+            <path d="M12 3.4 19.4 5.7V12c0 4.3-3 7.2-7.4 8.9z" fill={deep} opacity="0.28" />
+            <path
+              d="M5.4 6.4 12 4.3l6.6 2.1"
+              fill="none"
+              stroke={cut}
+              strokeWidth="0.6"
+              strokeLinecap="round"
+              opacity="0.7"
+            />
+            {galons(config, paints)}
+          </>
+        )
+      }}
+    />
+  )
+}
+
+/**
+ * Briefcase of the employee
+ * @param {TintedGlyphProps} props - Sizing class and tint
+ * @return {JSX.Element}
+ */
+
+export const EmployeGlyph = ({ className, tone = 'EMPLOYE' }: TintedGlyphProps) => (
+  <Frame
+    className={className}
+    tone={tone}
+    render={({ fill, lift, deep, cut }) => (
+      <>
+        <path
+          d="M8.9 8.4V6.4a1.9 1.9 0 0 1 1.9-1.9h2.4a1.9 1.9 0 0 1 1.9 1.9v2"
+          fill="none"
+          stroke={deep}
+          strokeWidth="1.9"
+          strokeLinecap="round"
+        />
+        <rect x="2.8" y="7.8" width="18.4" height="13.2" rx="3" fill={fill} />
+        <path
+          d="M5.8 7.8h6.6c-2 2.2-3.2 4.6-3.6 7H2.8v-4a3 3 0 0 1 3-3z"
+          fill={lift}
+          opacity="0.5"
+        />
+        <path d="M2.8 13.6h18.4V18a3 3 0 0 1-3 3H5.8a3 3 0 0 1-3-3z" fill={deep} />
+        <path d="M2.8 13.6h18.4" stroke={cut} strokeWidth="0.6" opacity="0.5" />
+        <rect x="10.2" y="11.9" width="3.6" height="3.6" rx="1" fill={cut} />
+        <circle cx="12" cy="13.7" r="0.7" fill={deep} />
       </>
     )}
   />

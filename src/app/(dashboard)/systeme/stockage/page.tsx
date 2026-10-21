@@ -10,10 +10,9 @@ import {
   readStorageReport,
   subjectState,
 } from '@/core/services/system/ConsoleService'
-import { requirePermission } from '@/core/wrappers/requireUser'
+import { requireSystem } from '@/core/wrappers/requireUser'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
-import { Permissions } from '@/utils/constants/permissions'
 import { formatBytes } from '@/utils/format/numbers'
 
 export const metadata: Metadata = { title: SYSTEM_COPY.storageTitle }
@@ -24,7 +23,7 @@ export const metadata: Metadata = { title: SYSTEM_COPY.storageTitle }
  */
 
 export default async function StoragePage() {
-  await requirePermission(Permissions.AccessManage)
+  await requireSystem()
 
   const report = await readStorageReport()
   const runtime = readRuntimeReport()
