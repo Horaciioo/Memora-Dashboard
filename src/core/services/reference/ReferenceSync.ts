@@ -10,6 +10,7 @@ import {
   LIBRARY_PLATFORMS,
   LIBRARY_SKILL_CATEGORIES,
   LIBRARY_STATES,
+  RETIRED_EVENT_TEMPLATES,
 } from '@/declarations/reference/library'
 
 // Collections written once per server process
@@ -112,6 +113,16 @@ const writeLibrary = async (): Promise<void> => {
       visibility: entry.visibility,
       defaultMinutes: entry.defaultMinutes,
       allDay: entry.allDay,
+      icon: entry.icon ?? null,
+      category: entry.category ?? null,
+      linksTo: entry.linksTo ?? null,
+      slotMinutes: entry.slotMinutes ?? null,
+      rollCall: entry.rollCall ?? false,
+      meetingAudience: entry.meetingAudience ?? null,
+      platform: entry.platform ?? null,
+      functionName: entry.functionName ?? null,
+      weekday: entry.weekday ?? null,
+      startTime: entry.startTime ?? null,
       position,
     }
 
@@ -122,6 +133,12 @@ const writeLibrary = async (): Promise<void> => {
       create: { name: entry.name, purpose: entry.purpose, ...data },
     })
   }
+
+  // Retired models leave the form, the entries filed under them stay
+  await prisma.eventTemplate.updateMany({
+    where: { name: { in: [...RETIRED_EVENT_TEMPLATES] } },
+    data: { archived: true },
+  })
 
   // Skill families then their skills
   for (const [categoryPosition, category] of LIBRARY_SKILL_CATEGORIES.entries()) {

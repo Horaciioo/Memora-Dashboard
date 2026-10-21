@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { endOfDay, startOfDay } from '@/utils/format/days'
+import { addDays, endOfDay, startOfDay } from '@/utils/format/days'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { meetingVisibility } from '@/core/services/work/visibility'
@@ -140,7 +140,7 @@ export const creatorId = (member: ProjectedMember | null | undefined): string | 
  * @return {CalendarEntry} - Projected entry
  */
 
-const projected = ({
+export const projected = ({
   source,
   id,
   title,
@@ -521,22 +521,46 @@ export const recruitmentEntries = async ({
     }),
   ])
 
-  const campaigns = sessions.map((row) =>
-    projected({
-      source: CalendarSources.Recruitment,
-      id: row.id,
-      title: row.name,
-      startsAt: row.opensAt as Date,
-      endsAt: row.closesAt ?? (row.opensAt as Date),
-      allDay: true,
-      kind: CalendarKinds.Period,
-      accent: row.youtuber.accent,
-      youtuberId: row.youtuberId,
-      description: row.summary,
-      subjectName: null,
-      href: ROUTES.recruitment(row.id),
-    })
-  )
+  // The first week reads the written interviews, the rest of the campaign the oral ones
+  const campaigns = sessions.flatMap((row) => {
+    const opensAt = row.opensAt as Date
+    const writtenEnd = endOfDay(addDays(opensAt, WRITTEN_PHASE_DAYS - 1))
+    const hasOral = row.closesAt !== null && row.closesAt > writtenEnd
+    const phase = (key: string, label: string, startsAt: Date, endsAt: Date) =>
+      projected({
+        source: CalendarSources.Recruitment,
+        id: `${row.id}:${key}`,
+        title: `${label}, ${row.name}`,
+        startsAt,
+        endsAt,
+        allDay: true,
+        kind: CalendarKinds.Zone,
+        accent: row.youtuber.accent,
+        youtuberId: row.youtuberId,
+        description: row.summary,
+        subjectName: null,
+        href: ROUTES.recruitment(row.id),
+      })
+
+    return [
+      phase(
+        'written',
+        CALENDAR_PROJECTION_COPY.writtenPhase,
+        opensAt,
+        hasOral ? writtenEnd : (row.closesAt ?? writtenEnd)
+      ),
+      ...(hasOral
+        ? [
+            phase(
+              'oral',
+              CALENDAR_PROJECTION_COPY.oralPhase,
+              startOfDay(addDays(opensAt, WRITTEN_PHASE_DAYS)),
+              row.closesAt as Date
+            ),
+          ]
+        : []),
+    ]
+  })
 
   const interviews = candidates.map((row) =>
     projected({
@@ -556,6 +580,9 @@ export const recruitmentEntries = async ({
 
   return [...campaigns, ...interviews]
 }
+
+// Days the written interviews run from the opening of a campaign
+const WRITTEN_PHASE_DAYS = 7
 
 // Source each part of a period is drawn from
 const ZONE_SOURCES = {
@@ -615,7 +642,7 @@ export const academyZoneEntries = async (
 
         return projected({
           source: ZONE_SOURCES[zone.part],
-          id: `${row.id}:${period.key}`,
+          id: `${row.id}:${period.key}:${zone.part}`,
           title: `${label}, ${title}`,
           startsAt: zone.from,
           endsAt: zone.to ?? row.endsAt ?? to,

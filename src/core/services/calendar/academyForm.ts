@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { isReviewOpen, REVIEW_PURPOSES } from '@/core/lib/academy/reviewTemplates'
+import { isReviewOpen, REVIEW_PURPOSES, reviewOpensAt } from '@/core/lib/academy/reviewTemplates'
 import { prisma } from '@/core/lib/db'
 import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import { sessionNumbers } from '@/core/services/academy/AcademyService'
@@ -14,12 +14,12 @@ import {
   AcademyJuniorStatuses,
   AcademySessionStatuses,
   AcademyStages,
-  MemberRoles,
 } from '@/utils/constants/hierarchy'
 import type { AcademyStageName, ReviewStatusName } from '@/utils/constants/hierarchy'
 import { EventPurposes } from '@/utils/constants/workflow'
 import type { EventPurposeName } from '@/utils/constants/workflow'
 import { sessionTitle } from '@/utils/format/academy'
+import { formatDay } from '@/utils/format/dates'
 
 /**
  * Junior as the calendar form offers them
@@ -30,6 +30,11 @@ export interface FormJunior {
   id: string
   name: string
   avatar: string | null
+  sessionId: string
+  trainerId: string | null
+  // End of each period of the junior
+  dueOne: Date | null
+  dueFinal: Date | null
   promotion: string
   stage: AcademyStageName
   reviews: { stage: AcademyStageName; status: ReviewStatusName }[]
@@ -85,6 +90,10 @@ export const readAcademyForm = async (scope: AcademyScope): Promise<AcademyFormC
       id: row.id,
       name: row.account.displayName,
       avatar: row.account.avatarUrl,
+      sessionId: row.sessionId,
+      trainerId: row.trainerId,
+      dueOne: row.reviewOneDueAt,
+      dueFinal: row.reviewFinalDueAt,
       promotion: sessionTitle({
         function: row.session.jobFunction,
         number: numbers.get(row.sessionId) ?? 1,
@@ -99,6 +108,20 @@ export const readAcademyForm = async (scope: AcademyScope): Promise<AcademyFormC
 }
 
 /**
+ * Whether a check-in is still before the week it is declared in
+ * @param {EventPurposeName} purpose - Template purpose
+ * @param {FormJunior} junior - Junior read
+ * @return {boolean} - The period of the junior ends in more than a week
+ */
+
+const isBeforeWindow = (purpose: EventPurposeName, junior: FormJunior): boolean => {
+  if (!REVIEW_PURPOSES.includes(purpose)) return false
+  const opensAt = reviewOpensAt(purpose, junior)
+
+  return opensAt !== null && opensAt.getTime() > Date.now()
+}
+
+/**
  * Whether a template has no junior left to be planned for
  * @param {AcademyFormContext} context - Templates and juniors
  * @param {string} templateId - Template identifier
@@ -109,7 +132,9 @@ export const isTemplateGreyed = (context: AcademyFormContext, templateId: string
   const purpose = context.purposes.get(templateId)
   if (!purpose || !REVIEW_PURPOSES.includes(purpose)) return false
 
-  return !context.juniors.some((junior) => isReviewOpen(purpose, junior))
+  return !context.juniors.some(
+    (junior) => isReviewOpen(purpose, junior) && !isBeforeWindow(purpose, junior)
+  )
 }
 
 /**
@@ -134,15 +159,24 @@ const closedHint = (purpose: EventPurposeName, junior: FormJunior): string =>
 const juniorOptions = (context: AcademyFormContext): FieldOption[] =>
   [...context.purposes].flatMap(([templateId, purpose]) =>
     context.juniors.map((junior) => {
-      const open = isReviewOpen(purpose, junior)
+      const early = REVIEW_PURPOSES.includes(purpose) && isBeforeWindow(purpose, junior)
+      const open = isReviewOpen(purpose, junior) && !early
+      const opensAt = reviewOpensAt(purpose, junior)
 
       return {
         value: junior.id,
         label: junior.name,
         image: junior.avatar,
-        hint: open ? junior.promotion : closedHint(purpose, junior),
+        hint: open
+          ? junior.promotion
+          : early && opensAt
+            ? ACADEMY_EVENT_COPY.reviewOpensOn.replace('{date}', formatDay(opensAt))
+            : closedHint(purpose, junior),
         disabled: !open,
         owner: templateId,
+        alsoOwner: junior.sessionId,
+        // Picking the junior hands over their own trainer
+        sets: junior.trainerId ? { trainerId: junior.trainerId } : undefined,
       }
     })
   )
@@ -170,20 +204,45 @@ export const academyFields = async (
 ): Promise<FieldDefinition[]> => {
   if (context.purposes.size === 0) return []
 
-  const [trainers, responsables, actor] = await Promise.all([
+  const [trainers, actor, sessions, seats, numbers] = await Promise.all([
     teamOptions({ functionName: TRAINER_FUNCTION }),
-    teamOptions({ role: MemberRoles.Responsable }),
     prisma.account.findUnique({
       where: { id: actorId },
       select: { displayName: true, avatarUrl: true },
     }),
+    // Promotions still to come or under way, never the closed ones
+    prisma.academySession.findMany({
+      where: {
+        status: { notIn: [AcademySessionStatuses.Closed, AcademySessionStatuses.Archived] },
+      },
+      orderBy: { startsAt: 'desc' },
+      select: { id: true, jobFunction: { select: { name: true } } },
+    }),
+    prisma.academySessionTrainer.findMany({ select: { sessionId: true, accountId: true } }),
+    sessionNumbers(),
   ])
+
+  // A trainer is offered under the promotions they train
+  const sessionsOf = new Map<string, string[]>()
+  for (const seat of seats) {
+    sessionsOf.set(seat.accountId, [...(sessionsOf.get(seat.accountId) ?? []), seat.sessionId])
+  }
+  const trainersOfSession = trainers.map((option) => ({
+    ...option,
+    owners: sessionsOf.get(option.value) ?? [],
+  }))
 
   // The author is always a choice, whatever function they hold
   const authors =
     actor && !trainers.some((option) => option.value === actorId)
-      ? [{ value: actorId, label: actor.displayName, image: actor.avatarUrl }, ...trainers]
-      : trainers
+      ? [{ value: actorId, label: actor.displayName, image: actor.avatarUrl }, ...trainersOfSession]
+      : trainersOfSession
+
+  const sessionChoices: FieldOption[] = sessions.map((session) => ({
+    value: session.id,
+    label: sessionTitle({ function: session.jobFunction, number: numbers.get(session.id) ?? 1 }),
+    icon: 'academy',
+  }))
 
   const interviews = templatesOf(context, [
     EventPurposes.TrainerInterview,
@@ -192,12 +251,25 @@ export const academyFields = async (
 
   return [
     {
+      name: 'sessionId',
+      kind: 'select',
+      label: CALENDAR_FIELD_COPY.session,
+      info: ACADEMY_EVENT_COPY.sessionInfo,
+      options: sessionChoices,
+      preset: 'sole',
+      mark: 'glyph',
+      span: 'half',
+      group: FORM_GROUPS.assignment,
+      visibleWhen: { field: 'templateId', oneOf: interviews },
+    },
+    {
       name: 'juniorId',
       kind: 'select',
       label: CALENDAR_FIELD_COPY.junior,
       info: ACADEMY_EVENT_COPY.juniorInfo,
       options: juniorOptions(context),
       ownerField: 'templateId',
+      alsoOwnedBy: 'sessionId',
       mark: 'avatar',
       span: 'half',
       group: FORM_GROUPS.assignment,
@@ -209,25 +281,12 @@ export const academyFields = async (
       label: CALENDAR_FIELD_COPY.trainer,
       info: ACADEMY_EVENT_COPY.trainerInfo,
       options: authors,
+      ownerField: 'sessionId',
       preset: 'actor',
       mark: 'avatar',
       span: 'half',
       group: FORM_GROUPS.assignment,
       visibleWhen: { field: 'templateId', oneOf: interviews },
-    },
-    {
-      name: 'responsableIds',
-      kind: 'multiselect',
-      label: CALENDAR_FIELD_COPY.responsables,
-      info: ACADEMY_EVENT_COPY.responsablesInfo,
-      options: responsables,
-      ownerField: 'youtuberId',
-      mark: 'avatar',
-      group: FORM_GROUPS.assignment,
-      visibleWhen: {
-        field: 'templateId',
-        oneOf: templatesOf(context, [EventPurposes.PanelInterview]),
-      },
     },
   ]
 }

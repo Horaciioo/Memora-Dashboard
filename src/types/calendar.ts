@@ -73,6 +73,7 @@ export interface AttendanceRoster {
  * @property {string | null} description - Supporting text
  * @property {string | null} templateId - Template it was started from
  * @property {string | null} templateName - Template label
+ * @property {string | null} [category] - Theme of the template it was started from
  * @property {string | null} accent - Colour of the creator it belongs to
  * @property {string | null} youtuberId - Creator it belongs to
  * @property {boolean} muted - Drawn in retreat
@@ -90,6 +91,10 @@ export interface AttendanceRoster {
  * @property {boolean} rollCall - Asks its convened members to confirm presence
  * @property {AttendanceRoster | null} attendance - Roll-call standings
  * @property {FormValues} values - Values feeding the edit form
+ * @property {'open' | 'taken' | 'series' | 'range' | null} [slot] - Slot of the annual reviews, open until a Moderator takes it, or the period holding them
+ * @property {string} [notice] - Message shown once after the entry was created
+ * @property {CalendarEntry[]} [siblings] - Other entries created together with it
+ * @property {string[]} [dropped] - Entries removed together with this change
  */
 
 export interface CalendarEntry {
@@ -101,6 +106,7 @@ export interface CalendarEntry {
   description: string | null
   templateId: string | null
   templateName: string | null
+  category?: string | null
   accent: string | null
   youtuberId: string | null
   muted: boolean
@@ -118,6 +124,10 @@ export interface CalendarEntry {
   rollCall: boolean
   attendance: AttendanceRoster | null
   values: FormValues
+  slot?: 'open' | 'taken' | 'series' | 'range' | null
+  notice?: string
+  siblings?: CalendarEntry[]
+  dropped?: string[]
 }
 
 /**

@@ -113,13 +113,6 @@ export const LIVE_OUTSIDE_DEFAULT = 'Hors équipe Live'
 export const FOCUS_OFFLINE_ALLOWED = process.env.NODE_ENV !== 'production'
 
 /**
- * Calendar template every announced live is filed under
- * @type {string}
- */
-
-export const LIVE_EVENT_TEMPLATE = 'Live'
-
-/**
  * Calendar preset opening the form on the Live template
  * @type {string}
  */
