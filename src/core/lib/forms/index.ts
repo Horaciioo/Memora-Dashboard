@@ -1,4 +1,6 @@
+export * from './allDay'
 export * from './follow'
+export * from './slot'
 export * from './groups'
 export * from './options'
 export * from './parse'

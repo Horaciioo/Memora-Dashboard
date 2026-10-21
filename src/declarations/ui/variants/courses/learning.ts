@@ -32,7 +32,8 @@ export const TASK_STEPPER = {
   heroPortrait: 'shrink-0 shadow-[var(--shadow-lg)] ring-4 ring-[var(--color-on-media)]',
   heroBackdrop: 'absolute inset-0 -z-10 h-full w-full scale-125 object-cover blur-2xl saturate-150',
   heroGlyph: 'size-12 shrink-0 text-[var(--color-ink)]',
-  heroTitle: 'text-xl leading-tight font-bold tracking-tight text-[var(--color-ink)]',
+  heroTitle:
+    'text-xl leading-tight font-bold tracking-tight text-[var(--color-ink)] [&>strong]:font-extrabold',
   heroMeta: 'text-sm font-medium text-[var(--color-ink-subtle)]',
   heroDue: 'rounded-full glass-soft px-3 py-1 text-xs font-semibold text-[var(--color-ink)]',
   // Position among the walk, then its timeline pinned to the bottom of the body

@@ -16,6 +16,7 @@ const KIND_SCHEMAS: Record<FieldKind, JsonSchema> = {
   number: { type: 'number' },
   date: { type: 'string', format: 'date' },
   datetime: { type: 'string', format: 'date-time' },
+  time: { type: 'string', pattern: '^([01]\\d|2[0-3]):[0-5]\\d$' },
   daterange: { type: 'array', items: { type: 'string', format: 'date' }, maxItems: 2 },
   select: { type: 'string' },
   multiselect: { type: 'array', items: { type: 'string' } },

@@ -13,6 +13,11 @@ import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/page/Section'
 import { CalendarDetail } from '@/composites/calendar/CalendarDetail'
 import { CalendarAgenda } from '@/composites/calendar/CalendarAgenda'
+import { groupOpenSlots } from '@/core/lib/calendar/slotRanges'
+import { PeriodFrameLayer } from '@/composites/calendar/PeriodFrameLayer'
+import { periodRuns } from '@/core/lib/calendar/periodRuns'
+import { ZoneTitleLayer } from '@/composites/calendar/ZoneTitleLayer'
+import { chunkDays, zoneTitleSpots } from '@/core/lib/calendar/zoneTitles'
 import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
 import { CalendarSidebar } from '@/composites/calendar/CalendarSidebar'
 import { MeetingRequest } from '@/composites/calendar/MeetingRequest'
@@ -32,7 +37,7 @@ import { CALENDAR_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
 import {
   CALENDAR_LAYER_REGISTRY,
   CALENDAR_SOURCE_REGISTRY,
-  layerOfSource,
+  layerOfEntry,
 } from '@/declarations/calendar/registries'
 import { CALENDAR_SETTINGS } from '@/declarations/configurations/settings'
 import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
@@ -151,6 +156,8 @@ export const CalendarBoard = ({
   const {
     hiddenLayers,
     hiddenCreators,
+    hiddenKinds,
+    toggleKind,
     toggleLayer,
     setHiddenLayers,
     toggleCreator,
@@ -187,6 +194,8 @@ export const CalendarBoard = ({
   const [draft, setDraft] = useState<FormValues | null>(startWith ?? null)
   const [opened, setOpened] = useState<CalendarEntry | null>(linked)
   const [selection, setSelection] = useState<string[]>([])
+  // Day under the pointer, its zones show their titles
+  const [hoverDay, setHoverDay] = useState<string | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<CalendarEntry[] | null>(null)
 
   const days = useMemo(() => unitGrid(cursor, unit), [cursor, unit])
@@ -214,6 +223,8 @@ export const CalendarBoard = ({
     layers,
     hiddenLayers,
     onToggleLayer: toggleLayer,
+    hiddenKinds,
+    onToggleKind: toggleKind,
     youtubers,
     hiddenCreators,
     onToggleCreator: toggleCreator,
@@ -242,17 +253,21 @@ export const CalendarBoard = ({
   }, [range.from, range.to])
 
   // A switched off calendar or creator stays out of the grid
-  const visible = useMemo(() => {
+  const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
 
     return calendar.entries.filter((entry) => {
       if (entry.id === focusEntryId) return true
-      if (hiddenLayers.includes(layerOfSource(entry.source))) return false
+      if (hiddenLayers.includes(layerOfEntry(entry))) return false
+      if (hiddenKinds.includes(entry.kind)) return false
       if (entry.youtuberId && hiddenCreators.includes(entry.youtuberId)) return false
 
       return term.length === 0 || entry.title.toLowerCase().includes(term)
     })
-  }, [calendar.entries, hiddenLayers, hiddenCreators, search, focusEntryId])
+  }, [calendar.entries, hiddenLayers, hiddenKinds, hiddenCreators, search, focusEntryId])
+
+  // Open slots of the annual reviews are folded into stretches, hundreds of quarters stay light
+  const visible = useMemo(() => groupOpenSlots(filtered), [filtered])
 
   // The open detail stays in step with roster updates
   const openedEntry = opened
@@ -284,6 +299,27 @@ export const CalendarBoard = ({
         // A card belongs to the day it opens on
         (kind !== CalendarKinds.Event || entry.allDay || toDayKey(entry.startsAt) === dayKey)
     )
+
+  // Each zone names itself once, across the widest run of days it fills
+  const dayRows = unit === 'month' ? chunkDays(days) : [days]
+  const titleSpots = zoneTitleSpots(
+    dayRows.map((row) => row.map((day) => day.key)),
+    (dayKey) => entriesOf(dayKey, CalendarKinds.Zone)
+  )
+
+  // Periods of several days are framed around what they hold
+  const periodsOn = (dayKey: string) =>
+    entriesOf(dayKey, CalendarKinds.Period).filter((entry) => !isSingleDay(entry))
+  const runs = periodRuns(
+    dayRows.map((row) => row.map((day) => day.key)),
+    periodsOn,
+    (entry) => toDayKey(entry.startsAt),
+    (entry) => lastDayKey(entry.startsAt, entry.endsAt)
+  )
+
+  const hoveredZones = hoverDay
+    ? entriesOf(hoverDay, CalendarKinds.Zone).map((zone) => zone.id)
+    : []
 
   // A new entry lands in view, on its own day when the month cell is full
   const revealCreated = (entry: CalendarEntry) => {
@@ -365,10 +401,17 @@ export const CalendarBoard = ({
     setDialog('detail')
   }
 
-  const selected = useMemo(
-    () => calendar.entries.filter((entry) => selection.includes(entry.id)),
-    [calendar.entries, selection]
-  )
+  // A stretch of open slots stands for each of its slots
+  const selected = useMemo(() => {
+    const picked = visible.filter((entry) => selection.includes(entry.id))
+    const ids = new Set(
+      picked.flatMap((entry) =>
+        entry.slot === 'range' ? (entry.values.rangeIds as string[]) : [entry.id]
+      )
+    )
+
+    return calendar.entries.filter((entry) => ids.has(entry.id))
+  }, [calendar.entries, selection, visible])
 
   const bulkFields = useMemo(
     () => fields.filter((field) => BULK_FIELD_NAMES.includes(field.name)),
@@ -438,19 +481,21 @@ export const CalendarBoard = ({
       // A single day reads as a bullet line
       if (isSingleDay(entry)) return unit === 'month' ? null : renderCard(entry, dayKey, true)
 
+      // The frame draws it from a desktop up, a phone keeps the thin line
       return (
-        <CalendarEntryChip
-          key={entry.id}
-          entry={entry}
-          band
-          opensBand={toDayKey(entry.startsAt) === dayKey}
-          closesBand={lastDayKey(entry.startsAt, entry.endsAt) === dayKey}
-          titled={weekdayOf(dayKey) === 0}
-          selected={selection.includes(entry.id)}
-          draggable={canManage && !entry.readOnly}
-          onOpen={openEntry}
-          dragProps={itemProps({ id: entry.id, from: dayKey })}
-        />
+        <div key={entry.id} className="md:hidden">
+          <CalendarEntryChip
+            entry={entry}
+            band
+            opensBand={toDayKey(entry.startsAt) === dayKey}
+            closesBand={lastDayKey(entry.startsAt, entry.endsAt) === dayKey}
+            titled={weekdayOf(dayKey) === 0}
+            selected={selection.includes(entry.id)}
+            draggable={canManage && !entry.readOnly}
+            onOpen={openEntry}
+            dragProps={itemProps({ id: entry.id, from: dayKey })}
+          />
+        </div>
       )
     })
 
@@ -635,7 +680,12 @@ export const CalendarBoard = ({
                     <div className={cn(CALENDAR_STYLES.allDay, columns, 'hidden md:grid')}>
                       <span className={CALENDAR_STYLES.allDayLabel}>{CALENDAR_COPY.allDayRow}</span>
                       {days.map((day) => (
-                        <div key={day.key} className={CALENDAR_STYLES.allDayCell}>
+                        <div
+                          key={day.key}
+                          className={CALENDAR_STYLES.allDayCell}
+                          onMouseEnter={() => setHoverDay(day.key)}
+                          onMouseLeave={() => setHoverDay(null)}
+                        >
                           {renderZoneLabels(day.key)}
                           {renderBands(day.key)}
                           {allDayCards(day.key).map((entry) => renderCard(entry, day.key, true))}
@@ -666,83 +716,119 @@ export const CalendarBoard = ({
                         void calendar.move(entry.id, atMinute(dayKey, startMinute))
                       }
                       onOpen={openEntry}
-                      renderZones={renderZones}
+                      onHoverDay={setHoverDay}
+                      zoneTitles={
+                        <>
+                          <ZoneTitleLayer
+                            spots={titleSpots}
+                            bands={days.map((day) => renderZones(day.key))}
+                            shownIds={hoveredZones}
+                            columns={days.length}
+                            className="inset-y-0 right-0 left-16"
+                          />
+                          <PeriodFrameLayer
+                            runs={runs}
+                            columns={days.length}
+                            onOpen={(entry) => openEntry(entry, false)}
+                            className="inset-y-0 right-0 left-16"
+                          />
+                        </>
+                      }
                     />
                   </>
                 ) : (
-                  <div className={CALENDAR_STYLES.month}>
-                    {days.map((day) => {
-                      // Lines of the day
-                      const cards = [
-                        ...entriesOf(day.key, CalendarKinds.Period).filter(isSingleDay),
-                        ...entriesOf(day.key, CalendarKinds.Event),
-                      ].sort((left, right) => left.startsAt.localeCompare(right.startsAt))
-                      const shown = cards.slice(0, CALENDAR_SETTINGS.maxEntriesPerDay)
-                      const hiddenCount = cards.length - shown.length
+                  <div className={CALENDAR_STYLES.month} onMouseLeave={() => setHoverDay(null)}>
+                    {dayRows.map((week, weekIndex) => (
+                      <div key={week[0]?.key} className={CALENDAR_STYLES.monthWeek}>
+                        <ZoneTitleLayer
+                          spots={titleSpots.filter((spot) => spot.row === weekIndex)}
+                          bands={week.map((day) => renderZones(day.key))}
+                          shownIds={hoveredZones}
+                          columns={week.length}
+                          cap="5rem"
+                          className="inset-0"
+                        />
+                        <PeriodFrameLayer
+                          runs={runs.filter((run) => run.row === weekIndex)}
+                          columns={week.length}
+                          onOpen={(entry) => openEntry(entry, false)}
+                          className="inset-0"
+                        />
+                        {week.map((day) => {
+                          // Lines of the day
+                          const cards = [
+                            ...entriesOf(day.key, CalendarKinds.Period).filter(isSingleDay),
+                            ...entriesOf(day.key, CalendarKinds.Event),
+                          ].sort((left, right) => left.startsAt.localeCompare(right.startsAt))
+                          const shown = cards.slice(0, CALENDAR_SETTINGS.maxEntriesPerDay)
+                          const hiddenCount = cards.length - shown.length
 
-                      return (
-                        <div
-                          key={day.key}
-                          className={cn(
-                            CALENDAR_STYLES.day,
-                            !day.isCurrentMonth && CALENDAR_STYLES.dayOutside,
-                            covers(day.key) && CALENDAR_STYLES.dayDrafted,
-                            over === day.key && 'is-drop-target'
-                          )}
-                          {...(canManage ? containerProps(day.key) : {})}
-                          {...slotProps(day.key)}
-                          onClick={isMobile ? () => setCursor(day.key) : undefined}
-                        >
-                          {renderZones(day.key)}
-                          <button
-                            type="button"
-                            onClick={() => (isMobile ? setCursor(day.key) : openDay(day.key))}
-                            className={cn(
-                              CALENDAR_STYLES.dayNumber,
-                              CALENDAR_STYLES.dayNumberButton,
-                              !day.isCurrentMonth && CALENDAR_STYLES.dayNumberOutside,
-                              day.isToday && CALENDAR_STYLES.dayNumberToday,
-                              isMobile && day.key === cursor && CALENDAR_STYLES.dayNumberPicked
-                            )}
-                          >
-                            {day.dayOfMonth}
-                          </button>
-                          {canManage && (
-                            <button
-                              type="button"
-                              aria-label={CALENDAR_COPY.add}
-                              className={CALENDAR_STYLES.dayAdd}
-                              onClick={() =>
-                                openForm(null, {
-                                  startsAt: toFieldValue(
-                                    dayBounds(
-                                      day.key,
-                                      CALENDAR_SETTINGS.dayStartHour,
-                                      CALENDAR_SETTINGS.dayEndHour
-                                    ).startsAt
-                                  ),
-                                })
-                              }
+                          return (
+                            <div
+                              key={day.key}
+                              className={cn(
+                                CALENDAR_STYLES.day,
+                                !day.isCurrentMonth && CALENDAR_STYLES.dayOutside,
+                                covers(day.key) && CALENDAR_STYLES.dayDrafted,
+                                periodsOn(day.key).length > 0 && CALENDAR_STYLES.periodRoom,
+                                over === day.key && 'is-drop-target'
+                              )}
+                              {...(canManage ? containerProps(day.key) : {})}
+                              {...slotProps(day.key)}
+                              onMouseEnter={() => setHoverDay(day.key)}
+                              onClick={isMobile ? () => setCursor(day.key) : undefined}
                             >
-                              <DayAddIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                            </button>
-                          )}
-                          {renderZoneLabels(day.key)}
-                          {renderBands(day.key)}
-                          {shown.map((entry) => renderCard(entry, day.key, true))}
-                          {hiddenCount > 0 && (
-                            <button
-                              type="button"
-                              onClick={() => openDay(day.key)}
-                              className={CALENDAR_STYLES.overflow}
-                            >
-                              {`+${hiddenCount}`}
-                              <span className="hidden sm:inline"> {CALENDAR_COPY.more}</span>
-                            </button>
-                          )}
-                        </div>
-                      )
-                    })}
+                              <button
+                                type="button"
+                                onClick={() => (isMobile ? setCursor(day.key) : openDay(day.key))}
+                                className={cn(
+                                  CALENDAR_STYLES.dayNumber,
+                                  CALENDAR_STYLES.dayNumberButton,
+                                  !day.isCurrentMonth && CALENDAR_STYLES.dayNumberOutside,
+                                  day.isToday && CALENDAR_STYLES.dayNumberToday,
+                                  isMobile && day.key === cursor && CALENDAR_STYLES.dayNumberPicked
+                                )}
+                              >
+                                {day.dayOfMonth}
+                              </button>
+                              {canManage && (
+                                <button
+                                  type="button"
+                                  aria-label={CALENDAR_COPY.add}
+                                  className={CALENDAR_STYLES.dayAdd}
+                                  onClick={() =>
+                                    openForm(null, {
+                                      startsAt: toFieldValue(
+                                        dayBounds(
+                                          day.key,
+                                          CALENDAR_SETTINGS.dayStartHour,
+                                          CALENDAR_SETTINGS.dayEndHour
+                                        ).startsAt
+                                      ),
+                                    })
+                                  }
+                                >
+                                  <DayAddIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                                </button>
+                              )}
+                              {renderZoneLabels(day.key)}
+                              {renderBands(day.key)}
+                              {shown.map((entry) => renderCard(entry, day.key, true))}
+                              {hiddenCount > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => openDay(day.key)}
+                                  className={CALENDAR_STYLES.overflow}
+                                >
+                                  {`+${hiddenCount}`}
+                                  <span className="hidden sm:inline"> {CALENDAR_COPY.more}</span>
+                                </button>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -793,7 +879,10 @@ export const CalendarBoard = ({
           )
           if (Object.keys(filled).length === 0) return true
 
-          const done = await calendar.updateMany(selection, filled)
+          const done = await calendar.updateMany(
+            selected.map((entry) => entry.id),
+            filled
+          )
           if (done) setSelection([])
 
           return done
@@ -805,7 +894,9 @@ export const CalendarBoard = ({
         open={dialog === 'detail' && opened !== null}
         title={opened ? [opened.emoji, opened.title].filter(Boolean).join(' ') : ''}
         description={opened ? CALENDAR_SOURCE_REGISTRY.get(opened.source).summary : undefined}
-        size={opened?.rollCall ? 'xl' : 'md'}
+        size={
+          opened?.slot === 'range' ? 'xl' : opened?.slot ? 'sm' : opened?.rollCall ? 'xl' : 'md'
+        }
         onClose={() => setDialog(null)}
         footer={
           opened && (opened.href || !opened.readOnly) ? (
@@ -849,6 +940,26 @@ export const CalendarBoard = ({
             onRespond={(status, hours) => void calendar.respond(opened.id, status, hours)}
             onMove={(accountId, status) => void calendar.moveAttendee(opened.id, accountId, status)}
             onRemind={() => void calendar.remind(opened.id)}
+            onTakeSlot={!canManage ? () => void calendar.takeSlot(opened.id) : undefined}
+            slotRange={calendar.entries.filter((slot) =>
+              ((opened.values.rangeIds as string[] | undefined) ?? []).includes(slot.id)
+            )}
+            onPickSlot={(slot) => openEntry(slot, false)}
+            slotAdmin={
+              canManage
+                ? {
+                    openSlots: calendar.entries.filter(
+                      (slot) =>
+                        slot.slot === 'open' &&
+                        slot.id !== opened.id &&
+                        slot.values.projectId === opened.values.projectId
+                    ),
+                    onPlace: (accountId) => void calendar.placeSlot(opened.id, accountId),
+                    onCancel: (moveTo) => void calendar.cancelSlot(opened.id, moveTo),
+                    onClearOpen: () => void calendar.clearOpenSlots(opened.id),
+                  }
+                : undefined
+            }
           />
         )}
       </Dialog>

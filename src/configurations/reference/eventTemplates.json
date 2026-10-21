@@ -1,48 +1,121 @@
 [
   {
-    "name": "Live",
+    "name": "Live YouTube",
     "kind": "EVENT",
-    "summary": "Live programmé du créateur.",
-    "accent": "#d98ba6",
+    "summary": "Live programmé du créateur sur YouTube.",
+    "accent": "#e5484d",
     "visibility": "EVERYONE",
     "defaultMinutes": 180,
-    "allDay": false
+    "allDay": false,
+    "icon": "youtube",
+    "platform": "YOUTUBE",
+    "category": "Lives"
   },
   {
-    "name": "Réunion d’équipe",
+    "name": "Live Twitch",
     "kind": "EVENT",
-    "summary": "Réunion en vocal.",
+    "summary": "Live programmé du créateur sur Twitch.",
+    "accent": "#8a63d2",
+    "visibility": "EVERYONE",
+    "defaultMinutes": 180,
+    "allDay": false,
+    "icon": "twitch",
+    "platform": "TWITCH",
+    "category": "Lives"
+  },
+  {
+    "name": "Réunion d’équipe Lives",
+    "kind": "EVENT",
+    "summary": "Réunion de l’équipe Lives du créateur, avec ses Responsables.",
     "accent": "#6a9bd1",
+    "visibility": "RESPONSABLES",
+    "defaultMinutes": 60,
+    "allDay": false,
+    "icon": "functionLive",
+    "rollCall": true,
+    "functionName": "Lives",
+    "weekday": 6,
+    "startTime": "18:30",
+    "category": "Réunions",
+    "meetingAudience": "TWITCH"
+  },
+  {
+    "name": "Réunion d’équipe Discord",
+    "kind": "EVENT",
+    "summary": "Réunion de l’équipe Discord du créateur, avec ses Responsables.",
+    "accent": "#7a8fd6",
+    "visibility": "RESPONSABLES",
+    "defaultMinutes": 60,
+    "allDay": false,
+    "icon": "functionDiscord",
+    "rollCall": true,
+    "functionName": "Discord",
+    "weekday": 6,
+    "startTime": "17:30",
+    "category": "Réunions",
+    "meetingAudience": "DISCORD"
+  },
+  {
+    "name": "Réunion Marsha",
+    "kind": "EVENT",
+    "summary": "Réunion de tout Memora, présence obligatoire.",
+    "accent": "#d98ba6",
     "visibility": "EVERYONE",
     "defaultMinutes": 60,
-    "allDay": false
+    "allDay": false,
+    "icon": "crown",
+    "rollCall": true,
+    "category": "Réunions",
+    "meetingAudience": "EVERYONE"
   },
   {
-    "name": "Événement communautaire",
+    "name": "Administration entière",
+    "kind": "EVENT",
+    "summary": "Réunion de tous les Responsables.",
+    "accent": "#e9a15c",
+    "visibility": "RESPONSABLES",
+    "defaultMinutes": 60,
+    "allDay": false,
+    "icon": "shield",
+    "rollCall": true,
+    "category": "Réunions",
+    "meetingAudience": "ADMINISTRATION"
+  },
+  {
+    "name": "Bilans annuels",
     "kind": "PERIOD",
-    "summary": "Plusieurs jours d’événement.",
-    "accent": "#e3c25a",
+    "summary": "Une période de créneaux que chaque Modérateur choisit.",
+    "accent": "#6fc0b5",
     "visibility": "EVERYONE",
     "defaultMinutes": null,
-    "allDay": true
+    "allDay": true,
+    "icon": "objective",
+    "category": "Réunions",
+    "slotMinutes": 15
   },
   {
-    "name": "Période de recrutement",
+    "name": "Zone de recrutement",
     "kind": "ZONE",
     "summary": "Fenêtre de candidatures.",
     "accent": "#6fc0b5",
     "visibility": "RESPONSABLES",
     "defaultMinutes": null,
-    "allDay": true
+    "allDay": true,
+    "icon": "recruitment",
+    "category": "Recrutement",
+    "linksTo": "RECRUITMENT"
   },
   {
-    "name": "Point responsables",
-    "kind": "EVENT",
-    "summary": "Réservé aux responsables.",
-    "accent": "#e9a15c",
+    "name": "Zone Academy",
+    "kind": "ZONE",
+    "summary": "Un fond posé sur une plage de jours de l’Academy.",
+    "accent": "#7a8fd6",
     "visibility": "RESPONSABLES",
-    "defaultMinutes": 45,
-    "allDay": false
+    "defaultMinutes": null,
+    "allDay": true,
+    "icon": "academy",
+    "category": "Academy",
+    "linksTo": "ACADEMY"
   },
   {
     "name": "Maintenance Discord",
@@ -51,7 +124,9 @@
     "accent": "#9fa8b3",
     "visibility": "ADMINS",
     "defaultMinutes": 120,
-    "allDay": false
+    "allDay": false,
+    "icon": "settings",
+    "category": "Technique"
   },
   {
     "name": "Entrevue Junior <> Formateurs",
@@ -61,7 +136,10 @@
     "accent": "#6a9bd1",
     "visibility": "RESPONSABLES",
     "defaultMinutes": 30,
-    "allDay": false
+    "allDay": false,
+    "icon": "functionTrainer",
+    "category": "Academy",
+    "linksTo": "ACADEMY"
   },
   {
     "name": "Entrevue Junior <> Formateurs <> Responsables",
@@ -71,26 +149,35 @@
     "accent": "#e3c25a",
     "visibility": "RESPONSABLES",
     "defaultMinutes": 45,
-    "allDay": false
+    "allDay": false,
+    "icon": "teams",
+    "category": "Academy",
+    "linksTo": "ACADEMY"
   },
   {
     "name": "Bilan de fin de période 1",
     "purpose": "REVIEW_ONE",
-    "kind": "EVENT",
+    "kind": "PERIOD",
     "summary": "Bilan vocal qui clôt la période 1.",
     "accent": "#6fc0b5",
     "visibility": "RESPONSABLES",
-    "defaultMinutes": 60,
-    "allDay": false
+    "defaultMinutes": null,
+    "allDay": true,
+    "icon": "objective",
+    "category": "Academy",
+    "linksTo": "ACADEMY"
   },
   {
     "name": "Bilan de fin de période 2",
     "purpose": "REVIEW_FINAL",
-    "kind": "EVENT",
+    "kind": "PERIOD",
     "summary": "Bilan vocal qui clôt la période 2.",
     "accent": "#d98ba6",
     "visibility": "RESPONSABLES",
-    "defaultMinutes": 60,
-    "allDay": false
+    "defaultMinutes": null,
+    "allDay": true,
+    "icon": "academy",
+    "category": "Academy",
+    "linksTo": "ACADEMY"
   }
 ]

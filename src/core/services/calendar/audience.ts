@@ -130,6 +130,27 @@ export const parseAudience = (values: FormValues) => {
 }
 
 /**
+ * Form value standing for the whole team of a creator
+ * @param {string} youtuberId - Creator identifier
+ * @return {string} - Select value
+ */
+
+export const youtuberAudienceValue = (youtuberId: string): string =>
+  `${YOUTUBER_PREFIX}${youtuberId}`
+
+/**
+ * Creator whose whole team the visibility pick stands for
+ * @param {FormValues} values - Parsed body
+ * @return {string | null} - Creator identifier, none for any other pick
+ */
+
+export const audienceYoutuberId = (values: FormValues): string | null => {
+  const picked = readText(values, 'visibility') ?? ''
+
+  return picked.startsWith(YOUTUBER_PREFIX) ? picked.slice(YOUTUBER_PREFIX.length) : null
+}
+
+/**
  * Whether a visibility pick stands for the whole team of a creator
  * @param {string} value - Select value
  * @return {boolean} - True for a creator team

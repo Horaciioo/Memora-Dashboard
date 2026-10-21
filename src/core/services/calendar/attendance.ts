@@ -27,11 +27,30 @@ type AttendanceRow = Prisma.EventAttendanceGetPayload<{
 }>
 
 /**
+ * Who a roll-call convenes besides the teams and members named on the form
+ * @typedef {Object} RosterAudience
+ * @property {boolean} [everyone] - Whole perimeter
+ * @property {string | null} [youtuberId] - Whole team of a creator
+ * @property {boolean} [responsables] - Every Responsable and Administrator
+ * @property {{ youtuberId: string | null, functionName: string } | null} [team] - Team of a creator for a function, with its Responsables
+ * @property {boolean} [includeLeadership] - Responsables and Administrators are convened too
+ */
+
+export interface RosterAudience {
+  everyone?: boolean
+  youtuberId?: string | null
+  responsables?: boolean
+  team?: { youtuberId: string | null; functionName: string } | null
+  includeLeadership?: boolean
+}
+
+/**
  * Read the members a roll-call convenes
  * @param {string[]} teamIds - Convened teams
  * @param {string[]} memberIds - Members named on top of the teams
  * @param {AccessScope} scope - Creator perimeter
  * @param {Date} startsAt - Start of the event
+ * @param {RosterAudience} [audience] - Who is convened on top of the named members
  * @return {Promise<string[]>} - Account identifiers
  */
 
@@ -39,8 +58,13 @@ export const expandRoster = async (
   teamIds: string[],
   memberIds: string[],
   scope: AccessScope,
-  startsAt: Date
+  startsAt: Date,
+  audience: RosterAudience = {}
 ): Promise<string[]> => {
+  const { everyone = false, youtuberId = null, responsables = false, team = null } = audience
+  // A model that always calls the roll convenes the Responsables too
+  const includeLeadership = audience.includeLeadership ?? false
+
   // Team members joined to the named ones
   const fromTeams = teamIds.length
     ? await prisma.teamMember.findMany({
@@ -49,16 +73,52 @@ export const expandRoster = async (
       })
     : []
 
-  const candidates = [...new Set([...fromTeams.map((row) => row.accountId), ...memberIds])]
-  if (candidates.length === 0) return []
+  // A creator's whole team is convened without being named
+  const fromCreator = youtuberId
+    ? await prisma.account.findMany({
+        where: { youtubers: { some: { id: youtuberId } } },
+        select: { id: true },
+      })
+    : []
+
+  // A team meeting convenes the team of the creator for a function, its Responsables with it
+  const fromFunctionTeam = team
+    ? await prisma.team.findFirst({
+        where: { youtuberId: team.youtuberId, jobFunction: { name: team.functionName } },
+        select: {
+          members: { select: { accountId: true } },
+          leads: { select: { accountId: true } },
+        },
+      })
+    : null
+
+  // Every Responsable and Administrator
+  const fromLeadership = responsables
+    ? await prisma.account.findMany({
+        where: { role: { in: LEADERSHIP_ROLES } },
+        select: { id: true },
+      })
+    : []
+
+  const candidates = [
+    ...new Set([
+      ...fromTeams.map((row) => row.accountId),
+      ...fromCreator.map((row) => row.id),
+      ...(fromFunctionTeam?.members.map((row) => row.accountId) ?? []),
+      ...(fromFunctionTeam?.leads.map((row) => row.accountId) ?? []),
+      ...fromLeadership.map((row) => row.id),
+      ...memberIds,
+    ]),
+  ]
+  if (candidates.length === 0 && !everyone) return []
 
   // Keep only members still around and inside the perimeter
   const accounts = await prisma.account.findMany({
     where: {
-      id: { in: candidates },
+      ...(everyone ? {} : { id: { in: candidates } }),
       status: { notIn: GONE_MEMBER_STATUSES },
-      role: { notIn: LEADERSHIP_ROLES },
-      ...peopleInScope(scope),
+      ...(includeLeadership ? {} : { role: { notIn: LEADERSHIP_ROLES } }),
+      ...(includeLeadership ? {} : peopleInScope(scope)),
     },
     select: { id: true },
   })

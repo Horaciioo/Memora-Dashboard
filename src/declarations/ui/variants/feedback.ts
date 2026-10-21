@@ -274,6 +274,9 @@ export const TIP = {
   pop: 'pointer-events-none invisible absolute bottom-[calc(100%+0.5rem)] left-1/2 z-[60] -translate-x-1/2 translate-y-1 rounded-[var(--radius-sm)] bg-[var(--color-ink)] px-2 py-1 text-xs leading-none font-semibold tracking-normal whitespace-nowrap text-[var(--color-surface-raised)] normal-case opacity-0 shadow-[var(--shadow-md)] transition-[opacity,transform,visibility] duration-75 group-focus-within/tip:visible group-focus-within/tip:translate-y-0 group-focus-within/tip:opacity-100 group-hover/tip:visible group-hover/tip:translate-y-0 group-hover/tip:opacity-100 motion-reduce:transition-none [@media(hover:none)]:hidden',
   arrow:
     'absolute top-full left-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[var(--color-ink)]',
+  // Same bubble drawn on the body, centred above its anchor
+  floating:
+    'pointer-events-none fixed z-[90] -translate-x-1/2 -translate-y-full rounded-[var(--radius-sm)] bg-[var(--color-ink)] px-2 py-1 text-xs leading-none font-semibold tracking-normal whitespace-nowrap text-[var(--color-surface-raised)] normal-case shadow-[var(--shadow-md)]',
 } as const
 
 /**

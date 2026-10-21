@@ -127,10 +127,10 @@ export const AttendanceRoster = ({ entry, pending, onMove, onRemind }: Attendanc
                         style={{ '--i': starts[group] + index + 1 } as CSSProperties}
                         {...(roster.canManage ? itemProps({ id: person.id, from: status }) : {})}
                       >
-                        <Avatar name={person.name} src={person.avatar} size="sm" />
+                        <Avatar name={person.name} src={person.avatar} size="xs" />
                         <span className={CALENDAR_STYLES.rollCallName}>
-                          <span className="flex flex-col items-center gap-1 font-medium">
-                            {person.name}
+                          <span className="flex max-w-full items-center gap-1 font-medium">
+                            <span className="min-w-0 break-words">{person.name}</span>
                             {person.isReinforcement && <ReinforcementTag />}
                           </span>
                           {person.hours && (

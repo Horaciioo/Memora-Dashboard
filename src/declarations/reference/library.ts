@@ -68,6 +68,16 @@ export interface LibraryNetwork {
  * @property {number | null} defaultMinutes - Usual length
  * @property {boolean} allDay - Spans whole days
  * @property {EventPurposeName} [purpose] - What the academy reads it as
+ * @property {string} [icon] - Glyph key
+ * @property {'RECRUITMENT' | 'ACADEMY'} [linksTo] - Session kind the model needs
+ * @property {number} [slotMinutes] - Length of the slots the model opens
+ * @property {string} [category] - Theme the picker files it under
+ * @property {boolean} [rollCall] - Presence is always asked
+ * @property {'EVERYONE' | 'ADMINISTRATION' | 'DISCORD' | 'TWITCH'} [meetingAudience] - Audience of the card filed on the Réunions page
+ * @property {'TWITCH' | 'YOUTUBE'} [platform] - Platform a live model opens on
+ * @property {string} [functionName] - Function whose team a team meeting convenes
+ * @property {number} [weekday] - Day proposed, 1 for Monday
+ * @property {string} [startTime] - Wall clock proposed
  */
 
 export interface LibraryEventTemplate {
@@ -79,6 +89,16 @@ export interface LibraryEventTemplate {
   defaultMinutes: number | null
   allDay: boolean
   purpose?: EventPurposeName
+  icon?: string
+  linksTo?: 'RECRUITMENT' | 'ACADEMY'
+  slotMinutes?: number
+  category?: string
+  rollCall?: boolean
+  meetingAudience?: 'EVERYONE' | 'ADMINISTRATION' | 'DISCORD' | 'TWITCH'
+  platform?: 'TWITCH' | 'YOUTUBE'
+  functionName?: string
+  weekday?: number
+  startTime?: string
 }
 
 /**
@@ -152,6 +172,19 @@ export const LIBRARY_PLATFORMS = platforms as readonly LibraryPlatform[]
  */
 
 export const LIBRARY_EVENT_TEMPLATES = eventTemplates as readonly LibraryEventTemplate[]
+
+/**
+ * Models the library no longer carries, archived on the next sync
+ * @type {readonly string[]}
+ */
+
+export const RETIRED_EVENT_TEMPLATES: readonly string[] = [
+  'Live',
+  'Période de recrutement',
+  'Événement communautaire',
+  'Point responsables',
+  'Réunion d’équipe',
+]
 
 /**
  * Tracks

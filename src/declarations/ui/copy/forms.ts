@@ -15,6 +15,7 @@ export const FORM_COPY = {
   tooManyItems: 'Il y a trop d’entrées.',
   notANumber: 'Entre un nombre.',
   notADate: 'Entre une date valable.',
+  notATime: 'Entre une heure valable.',
   notAUrl: 'Ce lien n’a pas l’air correct.',
   notADiscordId: 'Un identifiant Discord ne contient que des chiffres.',
   notAnOption: 'Cette valeur n’est pas proposée.',
@@ -130,6 +131,7 @@ export const PICKER_COPY = {
   start: 'de début',
   end: 'de fin',
   done: 'Valider',
+  allDayLocked: 'L’évènement dure toute la journée !',
 } as const
 
 /**
@@ -180,7 +182,7 @@ export const FORM_GROUPS = {
   details: 'Compléments',
   identity: 'Identité',
   contact: 'Contact',
-  visibility: 'Visibilité',
+  visibility: 'Concernés',
   encadrement: 'Encadrement',
   message: 'Message',
 } as const

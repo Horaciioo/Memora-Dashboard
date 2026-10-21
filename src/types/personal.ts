@@ -98,7 +98,7 @@ export interface HomeTask {
  * @property {string | null} due - Relative wording of its day
  * @property {HomeAction[]} actions - What the member can do
  * @property {ReactNode} [detail] - Extra reading in the stepper
- * @property {string} [heroTitle] - Line of the stepper card standing in for the title and the meta
+ * @property {ReactNode} [heroTitle] - Line of the stepper card standing in for the title and the meta
  * @property {{ title: string, backdrop: string | null, avatar: string | null, name: string }} [hero] - Stepper card standing in for the title
  */
 
@@ -113,7 +113,7 @@ export interface HomeEntry {
   due: string | null
   actions: HomeAction[]
   detail?: ReactNode
-  heroTitle?: string
+  heroTitle?: ReactNode
   hero?: { title: string; backdrop: string | null; avatar: string | null; name: string }
 }
 

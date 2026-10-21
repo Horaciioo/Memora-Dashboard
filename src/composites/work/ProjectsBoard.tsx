@@ -162,7 +162,8 @@ export const ProjectsBoard = ({
       columnField="stateId"
       copy={PROJECT_COPY}
       figure="projects"
-      isRemovable={(project) => !project.isSystem}
+      isRemovable={(project) => !project.isSystem || project.isSeries}
+      deleteNote={(project) => (project.isSeries ? PROJECT_COPY.deleteSeriesNote : null)}
       tableColumns={tableColumns}
       filters={[
         {

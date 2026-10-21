@@ -25,15 +25,12 @@ import { liveStartedKey } from '@/declarations/academy/welcome'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
 import { FORM_SETTINGS, LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_FIELD_COPY, LIVE_INSTRUCTIONS_DEFAULT } from '@/declarations/lives/copy'
-import {
-  LIVE_EVENT_TEMPLATE,
-  LIVE_FUNCTIONS,
-  LIVE_PLATFORM_REGISTRY,
-} from '@/declarations/lives/registries'
+import { LIVE_FUNCTIONS } from '@/declarations/lives/registries'
 import { isIconName } from '@/declarations/ui/icons'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import type { LiveBeacon, LivePerson, LiveView } from '@/types/lives'
+import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
 import { GONE_MEMBER_STATUSES, MemberRoles } from '@/utils/constants/hierarchy'
 import {
   CoordinationStatuses,
@@ -287,53 +284,110 @@ export const coordinatorOptions = async (scope?: AccessScope): Promise<FieldOpti
   }))
 }
 
+// Coordinators proposed for each live
+const PROPOSED_COORDINATORS = 2
+
 /**
- * Calendar template every live is filed under
- * @return {Promise<string | null>} - Template identifier
+ * Members proposed as Coordinators for each creator: the live team members who coordinated the least recently, nobody absent
+ * @param {FieldOption[]} coordinators - Members offered, tied to the creators they cover
+ * @return {Promise<Record<string, string[]>>} - Proposed member identifiers by creator
  */
 
-export const readLiveTemplateId = async (): Promise<string | null> => {
-  const template = await prisma.eventTemplate.findUnique({
-    where: { name: LIVE_EVENT_TEMPLATE },
-    select: { id: true },
+const coordinatorPicks = async (coordinators: FieldOption[]): Promise<Record<string, string[]>> => {
+  const youtuberIds = [...new Set(coordinators.flatMap((option) => option.owners ?? []))]
+  const picks: Record<string, string[]> = {}
+
+  for (const youtuberId of youtuberIds) {
+    const members = await prisma.teamMember.findMany({
+      where: {
+        team: { youtuberId, archived: false, jobFunction: { name: { in: [...LIVE_FUNCTIONS] } } },
+        account: {
+          status: { notIn: GONE_MEMBER_STATUSES },
+          role: { not: MemberRoles.Junior },
+          absences: { none: activeAbsenceFilter() },
+        },
+      },
+      select: { accountId: true },
+    })
+    const ids = [...new Set(members.map((member) => member.accountId))]
+    if (ids.length === 0) continue
+
+    const last = await prisma.liveCoordination.groupBy({
+      by: ['accountId'],
+      where: { accountId: { in: ids } },
+      _max: { askedAt: true },
+    })
+    const askedAt = new Map(last.map((row) => [row.accountId, row._max.askedAt?.getTime() ?? 0]))
+
+    picks[youtuberId] = ids
+      .sort((left, right) => (askedAt.get(left) ?? 0) - (askedAt.get(right) ?? 0))
+      .slice(0, PROPOSED_COORDINATORS)
+  }
+
+  return picks
+}
+
+/**
+ * Calendar templates a live is filed under, one per platform
+ * @return {Promise<Map<string, LivePlatformName>>} - Platform of each live template
+ */
+
+export const readLiveTemplates = async (): Promise<Map<string, LivePlatformName>> => {
+  const rows = await prisma.eventTemplate.findMany({
+    where: { platform: { not: null }, archived: false },
+    select: { id: true, platform: true },
   })
 
-  return template?.id ?? null
+  return new Map(rows.map((row) => [row.id, row.platform as LivePlatformName]))
+}
+
+/**
+ * Template the Live button of "Live en cours" opens the form on
+ * @return {Promise<string | null>} - First live template
+ */
+
+export const readLiveTemplateId = async (): Promise<string | null> =>
+  [...(await readLiveTemplates()).keys()][0] ?? null
+
+/**
+ * Hand a live entry the platform of its template
+ * @param {FormValues} values - Parsed body
+ * @param {Map<string, LivePlatformName>} templates - Live templates
+ * @return {FormValues} - Values holding the platform
+ */
+
+export const withTemplatePlatform = (
+  values: FormValues,
+  templates: Map<string, LivePlatformName>
+): FormValues => {
+  const platform = templates.get(readText(values, 'templateId') ?? '')
+
+  return platform ? { ...values, platform } : values
 }
 
 /**
  * Live fields the calendar form shows once the Live template is picked
  * @param {AccessScope} [scope] - Creator perimeter
- * @param {string | null} templateId - Live template
+ * @param {string[]} templateIds - Live templates
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
 export const liveFormFields = async (
   scope: AccessScope | undefined,
-  templateId: string | null
+  templateIds: string[]
 ): Promise<FieldDefinition[]> => {
   const coordinators = await coordinatorOptions(scope)
-  const visibleWhen = { field: 'templateId', oneOf: templateId ? [templateId] : [] }
+  const visibleWhen = { field: 'templateId', oneOf: templateIds }
 
   return [
-    {
-      name: 'platform',
-      kind: 'select',
-      label: LIVE_FIELD_COPY.platform,
-      options: LIVE_PLATFORM_REGISTRY.keys.map((key) => ({
-        value: key,
-        label: LIVE_PLATFORM_REGISTRY.label(key),
-        icon: LIVE_PLATFORM_REGISTRY.get(key).icon,
-      })),
-      mark: 'glyph',
-      visibleWhen,
-    },
     {
       name: 'coordinatorIds',
       kind: 'multiselect',
       label: LIVE_FIELD_COPY.coordinator,
       options: coordinators,
       ownerField: 'youtuberId',
+      // Two members of the live team who coordinated the least recently, nobody absent
+      defaultPicks: await coordinatorPicks(coordinators),
       mark: 'avatar',
       visibleWhen,
     },
@@ -399,11 +453,11 @@ export const assertLiveAccess = async ({
 }): Promise<void> => {
   if (canAnnounce) return
 
-  const [liveTemplateId, lives] = await Promise.all([
-    templateId ? readLiveTemplateId() : null,
+  const [liveTemplates, lives] = await Promise.all([
+    templateId ? readLiveTemplates() : null,
     entryIds.length > 0 ? prisma.live.count({ where: { calendarEventId: { in: entryIds } } }) : 0,
   ])
-  if ((templateId && templateId === liveTemplateId) || lives > 0) throw forbidden()
+  if ((templateId && liveTemplates?.has(templateId)) || lives > 0) throw forbidden()
 }
 
 /**

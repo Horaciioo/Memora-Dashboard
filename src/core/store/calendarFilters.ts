@@ -4,7 +4,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 import { CalendarLayers } from '@/utils/constants/workflow'
-import type { CalendarLayerName } from '@/utils/constants/workflow'
+import type { CalendarKindName, CalendarLayerName } from '@/utils/constants/workflow'
 import type { CalendarUnit } from '@/utils/format/calendar'
 
 /**
@@ -12,6 +12,7 @@ import type { CalendarUnit } from '@/utils/format/calendar'
  * @typedef {Object} CalendarFiltersStore
  * @property {CalendarLayerName[]} hiddenLayers - Calendars switched off
  * @property {string[]} hiddenCreators - Creators switched off
+ * @property {CalendarKindName[]} hiddenKinds - Shapes switched off: zones, periods or entries
  * @property {CalendarUnit} unit - Span the grid was left on
  * @property {(unit: CalendarUnit) => void} setUnit - Change the span
  * @property {(layers: CalendarLayerName[]) => void} setHiddenLayers - Replace the switched off calendars
@@ -22,6 +23,8 @@ import type { CalendarUnit } from '@/utils/format/calendar'
 interface CalendarFiltersStore {
   hiddenLayers: CalendarLayerName[]
   hiddenCreators: string[]
+  hiddenKinds: CalendarKindName[]
+  toggleKind: (kind: CalendarKindName) => void
   unit: CalendarUnit
   setUnit: (unit: CalendarUnit) => void
   setHiddenLayers: (layers: CalendarLayerName[]) => void
@@ -39,6 +42,8 @@ export const useCalendarFiltersStore = create<CalendarFiltersStore>()(
       // Absences stay out of the way until asked for
       hiddenLayers: [CalendarLayers.Absences],
       hiddenCreators: [],
+      hiddenKinds: [],
+      toggleKind: (kind) => set((state) => ({ hiddenKinds: flip(state.hiddenKinds, kind) })),
       unit: 'month',
       setUnit: (unit) => set({ unit }),
       setHiddenLayers: (layers) => set({ hiddenLayers: layers }),
@@ -50,7 +55,11 @@ export const useCalendarFiltersStore = create<CalendarFiltersStore>()(
     {
       name: 'calendarFilters',
       skipHydration: true,
-      partialize: ({ hiddenLayers, hiddenCreators }) => ({ hiddenLayers, hiddenCreators }),
+      partialize: ({ hiddenLayers, hiddenCreators, hiddenKinds }) => ({
+        hiddenLayers,
+        hiddenCreators,
+        hiddenKinds,
+      }),
     }
   )
 )

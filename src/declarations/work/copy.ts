@@ -30,6 +30,8 @@ export const PROJECT_COPY = {
   deleteTitle: 'Souhaite-tu supprimer ce projet ?',
   deleteDescription:
     'Les annonces seront également supprimées. Ses tâches et réunions sont quant à elles détachées.',
+  deleteSeriesNote:
+    'Cette série de bilans annuels emporte aussi sa période, tous ses créneaux, sa fiche Réunions et les tâches qui en dépendent : tout sera supprimé.',
   missingStates: 'Crée d’abord des états de projet dans la configuration.',
   tabOverview: 'Aperçu',
   tabCommunication: 'Communication',

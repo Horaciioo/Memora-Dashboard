@@ -50,8 +50,10 @@ export interface CalendarTimeGridProps {
   onSelectMany: (ids: string[]) => void
   onMove: (entry: CalendarEntry, dayKey: string, startMinute: number) => void
   onOpen: (entry: CalendarEntry, additive: boolean) => void
-  // Background of a day
-  renderZones: (dayKey: string) => ReactNode
+  // Zone titles laid across the days, behind the boxes
+  zoneTitles?: ReactNode
+  // Day under the pointer
+  onHoverDay?: (dayKey: string | null) => void
   // All-day entries of the agenda
   agendaExtras?: (dayKey: string) => CalendarEntry[]
 }
@@ -157,7 +159,8 @@ export const CalendarTimeGrid = ({
   onSelectMany,
   onMove,
   onOpen,
-  renderZones,
+  zoneTitles,
+  onHoverDay,
   agendaExtras,
 }: CalendarTimeGridProps) => {
   const [drawn, setDrawn] = useState<{
@@ -311,7 +314,9 @@ export const CalendarTimeGrid = ({
           setDropDay(point.day)
         }}
         onDrop={dropEntry}
+        onMouseLeave={() => onHoverDay?.(null)}
       >
+        {zoneTitles}
         <div className={CALENDAR_GRID_STYLES.hourColumn}>
           {rows.map((minute) => (
             <div
@@ -333,14 +338,13 @@ export const CalendarTimeGrid = ({
             <div
               key={day.key}
               data-grid-day={day.key}
+              onMouseEnter={() => onHoverDay?.(day.key)}
               className={cn(
                 CALENDAR_GRID_STYLES.dayColumn,
                 isToday && CALENDAR_GRID_STYLES.dayColumnToday,
                 dropDay === day.key && CALENDAR_GRID_STYLES.dropTarget
               )}
             >
-              {renderZones(day.key)}
-
               {rows.map((minute) => (
                 <div
                   key={minute}

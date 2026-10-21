@@ -71,6 +71,7 @@ export interface WorkAuthorship {
  * @property {boolean} isOverdue - Deadline gone by, work not done
  * @property {number} position - Order inside its column
  * @property {boolean} isSystem - Opened by the system for a recruitment and its academy
+ * @property {boolean} isSeries - Opened for a series of annual reviews, deleted with everything it made
  * @property {number} communicationCount - Announcements written
  * @property {number} taskCount - Tasks attached
  * @property {number} meetingCount - Meetings attached
@@ -93,6 +94,7 @@ export interface ProjectSummary extends WorkAuthorship {
   isOverdue: boolean
   position: number
   isSystem: boolean
+  isSeries: boolean
   communicationCount: number
   taskCount: number
   meetingCount: number
@@ -243,6 +245,26 @@ export interface MeetingTopicEntry {
 export interface MeetingDetail {
   summary: MeetingSummary
   topics: MeetingTopicEntry[]
+}
+
+/**
+ * Where a meeting sits on the calendar: one entry, or a period with its slots
+ * @typedef {Object} MeetingCalendarView
+ * @property {'single' | 'series'} shape - One entry, or a period holding several
+ * @property {string} title - Entry or period title
+ * @property {string} startsAt - ISO first moment
+ * @property {string | null} endsAt - ISO last moment
+ * @property {string | null} entryId - The entry, for a single one
+ * @property {{ day: string, taken: number, total: number }[]} days - Slots of each day, for a period
+ */
+
+export interface MeetingCalendarView {
+  shape: 'single' | 'series'
+  title: string
+  startsAt: string
+  endsAt: string | null
+  entryId: string | null
+  days: { day: string; taken: number; total: number }[]
 }
 
 /**

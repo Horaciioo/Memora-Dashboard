@@ -52,11 +52,46 @@ export const visibleFields = (fields: FieldDefinition[], values: FormValues): Fi
  */
 
 export const narrowOptions = (field: FieldDefinition, values: FormValues): FieldDefinition => {
+  if (!field.options) return field
+
+  const narrowed = narrowByOwner(field, values)
+  const second = field.alsoOwnedBy ? values[field.alsoOwnedBy] : null
+  if (!narrowed.options || typeof second !== 'string' || second === '') return narrowed
+
+  // Options tied to a second owner show only under the one picked
+  return {
+    ...narrowed,
+    options: narrowed.options.filter(
+      (option) => option.alsoOwner === undefined || option.alsoOwner === second
+    ),
+  }
+}
+
+/**
+ * Narrow owned options to the owners picked in the first owner field
+ * @param {FieldDefinition} field - Field declaration
+ * @param {FormValues} values - Current values
+ * @return {FieldDefinition} - Field with its reachable options
+ */
+
+const narrowByOwner = (field: FieldDefinition, values: FormValues): FieldDefinition => {
   if (!field.ownerField || !field.options) return field
 
   const picked = values[field.ownerField]
   const owners = Array.isArray(picked) ? picked : picked ? [String(picked)] : []
   if (owners.length === 0) return field
+
+  // Inverse reading, whoever belongs to the owners is already covered
+  if (field.excludeOwned) {
+    return {
+      ...field,
+      options: field.options.filter(
+        (option) =>
+          !(option.owner !== undefined && owners.includes(option.owner)) &&
+          !option.owners?.some((owner) => owners.includes(owner))
+      ),
+    }
+  }
 
   return {
     ...field,
@@ -103,7 +138,7 @@ export const settleOwned = (
   const next = { ...values }
 
   for (const field of fields) {
-    if (field.ownerField !== owner || !field.options) continue
+    if ((field.ownerField !== owner && field.alsoOwnedBy !== owner) || !field.options) continue
 
     const reachable = new Set(
       (narrowOptions(field, next).options ?? [])
@@ -113,7 +148,11 @@ export const settleOwned = (
     const current = next[field.name]
 
     if (field.defaultFromOwner) next[field.name] = values[owner] ? [...reachable] : []
-    else if (Array.isArray(current))
+    else if (field.defaultPicks && field.ownerField === owner) {
+      // The picks proposed for the owner just chosen, the ones still reachable
+      const proposed = field.defaultPicks[String(values[owner] ?? '')] ?? []
+      next[field.name] = proposed.filter((value) => reachable.has(value))
+    } else if (Array.isArray(current))
       next[field.name] = current.filter((value) => reachable.has(value))
     else if (typeof current === 'string' && !reachable.has(current)) next[field.name] = null
   }

@@ -13,6 +13,11 @@
   background-color: color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
+/* The tint laid on the page surface, nothing shows through it */
+.accent-paper {
+  background-color: color-mix(in srgb, var(--accent) 15%, var(--color-surface-raised));
+}
+
 /* Faintest wash, for a backdrop sitting under an already tinted surface */
 .accent-wash {
   background-color: color-mix(in srgb, var(--accent) 7%, transparent);
@@ -34,6 +39,10 @@
 
 :root.dark .accent-tint {
   background-color: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+:root.dark .accent-paper {
+  background-color: color-mix(in srgb, var(--accent) 28%, var(--color-surface-raised));
 }
 
 :root.dark .accent-wash {

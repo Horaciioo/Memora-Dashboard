@@ -104,6 +104,13 @@ const parseField = (field: FieldDefinition, raw: unknown, issues: FieldIssue[]):
     return parsed
   }
 
+  // A wall clock
+  if (field.kind === 'time') {
+    const text = toText(raw)
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(text)) return reject(FORM_COPY.notATime)
+    return text
+  }
+
   // Date fields keep their ISO form
   if (field.kind === 'date' || field.kind === 'datetime') {
     const text = toText(raw)

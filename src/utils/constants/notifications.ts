@@ -40,6 +40,9 @@ export const NOTIFICATION_KINDS = createEnumeration({
   LiveCoordinatorGap: { id: 31, label: 'Coordinateur manquant' },
   MeetingRequested: { id: 32, label: 'Rendez-vous demandé' },
   HurdleShared: { id: 33, label: 'Difficulté confiée' },
+  AnnualSlotTaken: { id: 34, label: 'Créneau de bilan annuel pris' },
+  AnnualReviewReminder: { id: 35, label: 'Bilan annuel à programmer' },
+  AnnualSlotCancelled: { id: 36, label: 'Créneau de bilan annuel annulé' },
 })
 
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids

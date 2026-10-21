@@ -269,3 +269,17 @@ export const RailCommunicationsGlyph = ({ className }: GlyphProps) => (
     <path d="m19.5 12.5-6 6-.8 3 3-.8 6-6a1.4 1.4 0 0 0-2.2-2.2z" />
   </Stroke>
 )
+
+/**
+ * Annual review line glyph, a sheet ticked off
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const RailReviewGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={1.6}>
+    <path d="M9 4.5h6M9.5 3h5a1 1 0 0 1 1 1v1.5h-7V4a1 1 0 0 1 1-1z" />
+    <path d="M15.5 4.5H17a2.5 2.5 0 0 1 2.5 2.5v11A2.5 2.5 0 0 1 17 20.5H7A2.5 2.5 0 0 1 4.5 18V7A2.5 2.5 0 0 1 7 4.5h1.5" />
+    <path d="m8.5 13 2.4 2.4 4.6-4.9" />
+  </Stroke>
+)

@@ -146,6 +146,9 @@ export const CALENDAR_SIDEBAR = {
   rowLabel: 'min-w-0 flex-1 truncate',
   mark: 'flex size-6 shrink-0 items-center justify-center',
   markOff: 'opacity-45 grayscale',
+  // A selected row fades from a light green wash into the ground
+  rowOn:
+    'bg-[linear-gradient(90deg,color-mix(in_srgb,var(--color-success)_16%,transparent),transparent)] font-semibold text-[var(--color-ink)]',
   // A switched off row reads in retreat
   rowOff: 'text-[var(--color-ink-subtle)]',
   rowGlyph: 'size-5 shrink-0 opacity-70',
@@ -328,6 +331,9 @@ export const HORIZONTAL_TIMELINE_STYLES = {
  */
 
 export const CALENDAR_DETAIL = {
+  slotPicks: 'grid grid-cols-3 gap-2 sm:grid-cols-4',
+  slotPick:
+    'cursor-pointer rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-3 py-1.5 text-sm font-semibold tabular-nums transition-colors hover:bg-[var(--color-hover)]',
   body: 'flex flex-col gap-6',
   heroSpan:
     'text-center text-section font-medium tracking-tight text-[var(--color-ink)] first-letter:uppercase [&>strong]:font-bold',
@@ -376,12 +382,14 @@ export const CALENDAR_STYLES = {
   columnsWeek: 'grid-cols-[4rem_repeat(7,minmax(0,1fr))]',
   weekday: 'px-2 py-2 text-center',
   weekdayHead: 'flex flex-col items-center gap-1',
-  month: 'grid grid-cols-7',
+  month: 'flex flex-col',
+  // One week of the month, titles lie over its seven days
+  monthWeek: 'relative grid grid-cols-7',
   day: 'group relative flex min-h-16 flex-col gap-1 overflow-hidden md:touch-none border-r border-b border-[var(--color-border)] p-0.5 last:border-r-0 sm:p-1.5 md:min-h-28',
   dayOutside: 'bg-[var(--color-surface)]/50',
   dayDrafted: 'ring-2 ring-[var(--color-pick)] ring-inset',
   dayNumber:
-    'relative mx-auto flex h-6 w-6 items-center justify-center text-xs font-semibold tabular-nums',
+    'relative z-[2] mx-auto flex h-6 w-6 items-center justify-center text-xs font-semibold tabular-nums',
   dayNumberButton: 'cursor-pointer transition-colors hover:bg-[var(--color-hover)] rounded-full',
   dayNumberToday: 'rounded-full bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
   // Day on screen below the month of a phone
@@ -391,31 +399,50 @@ export const CALENDAR_STYLES = {
     'absolute top-1 right-1 z-20 flex h-5 w-5 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   zoneLayer: 'pointer-events-none absolute inset-0 flex flex-col',
   zoneBand: 'flex-1',
+  // Titles laid over the days a zone covers, under every box
+  zoneTitleLayer: 'pointer-events-none absolute grid',
+  zoneTitleSlot:
+    'flex items-center justify-center overflow-hidden transition-opacity duration-150 [container-type:inline-size]',
+  zoneTitle:
+    'max-w-full px-2 text-center leading-[0.95] font-black tracking-tight uppercase opacity-10 [text-wrap:balance] [overflow-wrap:anywhere]',
   zoneLabel:
-    'relative truncate rounded-[var(--radius-sm)] px-1.5 py-0.5 text-micro font-semibold tracking-wide uppercase',
-  bar: 'relative flex h-2 min-h-2 cursor-grab items-center gap-1.5 px-0 py-0 text-left text-xs md:h-auto md:min-h-6 md:px-1.5 md:py-0.5 transition-[filter] hover:brightness-95 active:cursor-grabbing',
-  barStart: 'ml-0 rounded-l-[var(--radius-sm)]',
-  barEnd: 'mr-0 rounded-r-[var(--radius-sm)]',
-  barRunsIn: '-ml-0.5 sm:-ml-1.5',
-  barRunsOut: '-mr-0.5 sm:-mr-1.5',
+    'relative z-[2] truncate rounded-[var(--radius-sm)] px-1.5 py-0.5 text-micro font-semibold tracking-wide uppercase',
+  // Frames laid around the entries of a period, behind them
+  periodLayer: 'pointer-events-none absolute grid',
+  periodSlot: 'relative m-px flex min-w-0 items-start justify-center',
+  periodFrame:
+    'pointer-events-none absolute inset-0 rounded-[1.25rem] border-2 shadow-[var(--shadow-lg),0_1.25rem_2.5rem_-0.5rem_rgb(0_0_0/0.18)]',
+  // Title straddling the top edge, wide letters, heavy weight
+  periodLegend:
+    'pointer-events-auto absolute top-0 left-1/2 z-[3] max-w-[90%] -translate-x-1/2 -translate-y-1/2 cursor-pointer truncate rounded-full bg-[var(--color-surface-raised)] px-5 py-1 text-xs font-black tracking-[0.4em] whitespace-nowrap uppercase shadow-[var(--shadow-md)]',
+  // Room a day keeps under the title of a period
+  periodRoom: 'md:pt-6',
+  // A period: one continuous box, a little taller than an entry, behind the entries, its tint lets the zone through
+  bar: 'relative z-[1] flex h-2 min-h-2 cursor-grab items-center gap-1.5 border-y-2 border-dashed px-0 py-0 text-left text-xs text-[var(--color-ink)] md:h-auto md:min-h-11 md:px-2 md:py-1 transition-[filter] hover:brightness-95 active:cursor-grabbing',
+  barStart: 'ml-0 rounded-l-[var(--radius-md)] border-l-2',
+  barEnd: 'mr-0 rounded-r-[var(--radius-md)] border-r-2',
+  // Reaches over the border and padding of the cell, no seam between two days
+  barRunsIn: '-ml-0.5 sm:-ml-[calc(0.375rem+1px)]',
+  barRunsOut: '-mr-0.5 sm:-mr-[calc(0.375rem+1px)]',
   // A band shows no words on a phone
   barTitle: 'hidden min-w-0 flex-1 font-medium break-words md:block',
   entry:
-    'relative flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
+    'relative z-[2] flex w-full cursor-grab items-start gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
   // Month entry
-  line: 'relative flex w-full cursor-grab items-center justify-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-left sm:justify-start text-xs transition-colors hover:bg-[var(--color-hover)] active:cursor-grabbing',
-  lineBullet: 'h-2 w-2 shrink-0 rounded-full bg-current',
-  // Phones keep the bullet alone
-  lineTime: 'hidden shrink-0 tabular-nums text-[var(--color-ink-subtle)] sm:inline',
-  lineTitle: 'hidden min-w-0 flex-1 truncate font-semibold sm:block',
-  lineMuted: 'text-[var(--color-ink-subtle)]',
-  entryTime: 'shrink-0 tabular-nums opacity-70',
+  line: 'relative z-[2] flex min-h-2 w-full cursor-grab flex-col items-start gap-0.5 rounded-[var(--radius-sm)] px-1.5 py-0.5 text-left text-xs transition-[filter] hover:brightness-95 active:cursor-grabbing',
+  // Phones keep the coloured box alone
+  lineTime:
+    'hidden shrink-0 text-micro leading-none font-extrabold tabular-nums text-[var(--color-ink)] sm:block',
+  lineTitle: 'hidden min-w-0 flex-1 font-medium break-words sm:block',
+  entryTime: 'shrink-0 text-micro leading-none font-extrabold tabular-nums text-[var(--color-ink)]',
+  // Time sits above the title
+  entryStacked: 'flex-col gap-0.5',
   // A long title wraps onto the next line rather than losing its end
   entryTitle: 'min-w-0 flex-1 font-medium break-words',
-  // Full-colour fill
-  entrySolid: 'text-[var(--color-on-accent)]',
+  // Soft tint, no edge, a light shadow lifts it
+  entryTint: 'text-[var(--color-ink)] shadow-[var(--shadow-sm)] hover:shadow-[var(--shadow-md)]',
   // Absences sit behind everything else
-  entryMuted: 'border border-[var(--color-border)] opacity-75',
+  entryMuted: 'border border-[var(--color-border)]',
   entrySelected: PICK_RING,
   // Seat of the minute grid
   entryFill: 'h-full overflow-hidden',
@@ -424,7 +451,7 @@ export const CALENDAR_STYLES = {
   handle:
     'absolute inset-x-0 bottom-0 h-1.5 cursor-ns-resize rounded-b-[var(--radius-sm)] opacity-0 transition-opacity group-hover/entry:opacity-100',
   overflow:
-    'relative rounded-[var(--radius-sm)] px-1.5 text-left text-xs text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+    'relative z-[2] rounded-[var(--radius-sm)] px-1.5 text-left text-xs text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   week: 'grid',
   hour: 'border-r border-b border-[var(--color-border)] px-2 py-1 text-right text-xs text-[var(--color-ink-subtle)] tabular-nums',
   slot: 'relative flex min-h-12 flex-col md:touch-none gap-1 border-r border-b border-[var(--color-border)] p-1 last:border-r-0',
@@ -460,28 +487,32 @@ export const CALENDAR_STYLES = {
   rollCallAnswer: 'flex flex-wrap gap-2',
   rollCallCounts: 'flex flex-wrap gap-1.5',
   rollCallLists: 'flex flex-col gap-3',
-  rollCallGroup: 'flex flex-col gap-2.5 rounded-[var(--radius-md)] p-3',
-  rollCallPeople: 'grid grid-cols-2 gap-1.5 sm:grid-cols-3',
+  rollCallGroup: 'flex flex-col gap-2 rounded-[var(--radius-md)] p-2.5',
+  rollCallPeople: 'grid grid-cols-2 gap-x-2 gap-y-1 sm:grid-cols-3',
   rollCallTitle:
     'flex items-center gap-2 text-sm font-bold tracking-wide text-[var(--color-ink)] uppercase',
   rollCallPerson:
-    'accent-border flex flex-col items-center gap-2 rounded-[var(--radius-md)] border bg-[var(--color-surface-raised)]/70 px-2 py-3 text-center text-sm shadow-[var(--shadow-sm)]',
-  rollCallName: 'flex min-w-0 flex-col items-center gap-1 break-words',
+    'flex min-w-0 items-center gap-1.5 rounded-[var(--radius-sm)] px-1 py-0.5 text-xs',
+  rollCallName: 'flex min-w-0 flex-col items-start leading-tight',
   rollCallHours: 'text-xs whitespace-nowrap italic text-[var(--color-ink-subtle)]',
   rollCallDrop: 'transition-shadow',
   // Drop target lights up with a ring, no dashed edge
   rollCallOver: 'ring-2 ring-[var(--color-border-strong)]',
   rollCallMovable: 'cursor-grab active:cursor-grabbing',
   rollCallDragged: 'opacity-40',
-  // Hover preview card
+  // Hover preview card, raised bubble like a late-item notification
   preview:
-    'fixed z-[70] flex w-72 flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel p-4 text-sm shadow-[var(--shadow-md)]',
+    'fixed z-[70] flex w-72 flex-col gap-3 rounded-[var(--radius-lg)] bg-[var(--color-surface-raised)] p-4 text-sm text-[var(--color-ink)] [filter:drop-shadow(0_0_0.5px_rgb(0_0_0/0.3))_drop-shadow(0_0.5rem_1rem_rgb(0_0_0/0.14))]',
   previewHead: 'flex items-center gap-2 font-bold',
-  previewBullet: 'h-2 w-2 shrink-0 rounded-full bg-current',
-  previewLine: 'flex items-center gap-2',
+  // Short rule under the title, clear of the card edges
+  previewRule: 'mx-2 h-px bg-[var(--color-border)]',
+  // Tip aimed at the entry
+  previewArrow:
+    'pointer-events-none absolute h-4 w-4 rotate-45 rounded-[3px] bg-[var(--color-surface-raised)]',
+  previewLine: 'flex items-start gap-2',
   detailMeta: 'flex flex-col gap-2 text-sm text-[var(--color-ink-subtle)]',
-  previewIcon: 'h-4 w-4 shrink-0',
-  previewTitle: 'truncate',
+  previewIcon: 'mt-0.5 h-4 w-4 shrink-0',
+  previewTitle: 'min-w-0 break-words',
   previewMeta: 'flex flex-col gap-2 text-sm text-[var(--color-ink-subtle)]',
 } as const
 
@@ -762,3 +793,28 @@ export const DAILY_BARS_STYLES = {
   track: 'h-1.5 w-24 overflow-hidden rounded-full bg-[var(--color-surface-sunken)]',
   fill: 'h-full rounded-full bg-[var(--color-brand-500)]',
 } as const
+
+/**
+ * Calendar shown under a meeting
+ * @type {Record<string, string>}
+ */
+
+export const MEETING_CALENDAR = {
+  card: 'flex flex-wrap items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-sm',
+  cardWhen: 'min-w-0 flex-1 font-semibold first-letter:uppercase',
+  // One month, as wide as the boxes above
+  panel:
+    'flex w-full flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 shadow-[var(--shadow-sm)]',
+  head: 'flex items-center justify-between gap-2',
+  title: 'text-sm font-bold tracking-wide uppercase',
+  steps: 'flex items-center gap-1',
+  step: 'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-base transition-colors hover:bg-[var(--color-hover)]',
+  grid: 'grid grid-cols-7 gap-1',
+  weekday:
+    'pb-1 text-center text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  day: 'flex h-11 cursor-pointer flex-col items-center justify-center gap-px rounded-[var(--radius-sm)] text-xs tabular-nums transition-colors hover:bg-[var(--color-hover)]',
+  dayOutside: 'text-[var(--color-ink-subtle)] opacity-40',
+  dayInPeriod: 'bg-[var(--color-brand-soft)] font-semibold',
+  dayToday: 'ring-2 ring-[var(--color-pick)] ring-inset',
+  dayCount: 'text-[0.625rem] leading-none font-bold text-[var(--color-ink-subtle)]',
+}

@@ -23,6 +23,7 @@ import {
   RailSparkGlyph,
   RailBirthdayGlyph,
   RailCommunicationsGlyph,
+  RailReviewGlyph,
 } from '@/components/elements/display/glyphs/RailGlyphs'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 
@@ -53,6 +54,7 @@ export const RAIL_ICONS: Partial<Record<IconName, ComponentType<GlyphProps>>> = 
   spark: RailSparkGlyph,
   birthday: RailBirthdayGlyph,
   communications: RailCommunicationsGlyph,
+  objective: RailReviewGlyph,
   star: FavoriteStar,
 }
 

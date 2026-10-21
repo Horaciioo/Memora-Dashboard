@@ -78,6 +78,7 @@ const toSummary = (row: ProjectRow): ProjectSummary => ({
     .filter((person) => person !== null),
   deadline: row.deadline?.toISOString() ?? null,
   isSystem: row.systemKey !== null,
+  isSeries: row.systemKey?.startsWith('annual-reviews:') ?? false,
   isOverdue: isBehindDeadline(row.deadline, row.state?.phase),
   position: row.position,
   communicationCount: row._count.communications,
@@ -369,9 +370,24 @@ export const updateProject = async (
 export const removeProject = async (id: string, scope: AccessScope): Promise<void> => {
   await assertRowInScope('project', id, scope)
 
-  // The system keeps its own project
+  // The system keeps its own project, but a series of annual reviews goes with everything it made
   const row = await prisma.project.findUnique({ where: { id }, select: { systemKey: true } })
-  if (row?.systemKey) throw forbidden()
+  const isSeries = row?.systemKey?.startsWith('annual-reviews:') ?? false
+  if (row?.systemKey && !isSeries) throw forbidden()
+
+  if (isSeries) {
+    await prisma.calendarEvent.deleteMany({ where: { projectId: id } })
+    await prisma.meeting.deleteMany({ where: { projectId: id } })
+    await prisma.task.deleteMany({
+      where: {
+        OR: [
+          { systemKey: { startsWith: `annual-slot:${id}:` } },
+          { systemKey: { startsWith: `annual-questions:${id}:` } },
+          { systemKey: { startsWith: `annual-reminder:${id}:` } },
+        ],
+      },
+    })
+  }
 
   await prisma.project.delete({ where: { id } })
 }

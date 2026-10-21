@@ -1,6 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { readHours } from '@/core/lib/calendar/hours'
+import { closeSeriesIfComplete } from '@/core/services/calendar/AnnualSlotService'
 import { moveOnRollCall, respondToRollCall } from '@/core/services/calendar/attendance'
 import { assertEntryAccess } from '@/core/services/calendar/CalendarService'
 import { assertRowInScope } from '@/core/services/auth/ScopeService'
@@ -22,13 +23,17 @@ export const POST = createProtectedRoute({
     }
 
     // The convened row authorises the answer, the perimeter does not apply
-    return respondToRollCall({
+    const roster = await respondToRollCall({
       eventId: params.id,
       accountId: session.id,
       status: status as AttendanceStatusName,
       canManage: access.can(Permissions.CalendarManage),
       hours: readHours(raw),
     })
+    // The last Moderator to say they come closes the slots nobody took
+    await closeSeriesIfComplete(params.id)
+
+    return roster
   },
 })
 

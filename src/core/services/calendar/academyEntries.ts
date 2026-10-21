@@ -1,11 +1,12 @@
 import 'server-only'
 
-import { isReviewOpen, REVIEW_PURPOSES } from '@/core/lib/academy/reviewTemplates'
+import { isReviewOpen, REVIEW_PURPOSES, reviewOpensAt } from '@/core/lib/academy/reviewTemplates'
 import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, invalidInput } from '@/core/lib/errors'
-import { readList, readText } from '@/core/lib/forms/values'
+import { readText } from '@/core/lib/forms/values'
 import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
+import { ACADEMY_EVENT_COPY } from '@/declarations/calendar/copy'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FormValues } from '@/types/forms'
 import type { AcademyStageName, ReviewStatusName } from '@/utils/constants/hierarchy'
@@ -79,13 +80,27 @@ export const resolveAcademyEntry = async (
     })
     if (!open) throw conflict(ACADEMY_COPY.reviewNotPlannable)
 
+    // Declared during the week before the end of the period, not earlier
+    const opensAt = reviewOpensAt(template.purpose, {
+      dueOne: junior.reviewOneDueAt,
+      dueFinal: junior.reviewFinalDueAt,
+    })
+    if (opensAt && opensAt.getTime() > Date.now()) throw conflict(ACADEMY_EVENT_COPY.reviewNotYet)
+
     return { ...patch, trainerId: junior.trainerId, memberIds: null }
   }
 
-  // An interview convenes the junior, their trainer and the responsables
+  // An interview is planned within a promotion, the junior must belong to it
+  const sessionId = readText(values, 'sessionId')
+  if (!sessionId) throw invalidInput([{ field: 'sessionId', message: FORM_COPY.required }])
+  if (sessionId !== junior.sessionId) {
+    throw invalidInput([{ field: 'juniorId', message: FORM_COPY.notAnOption }])
+  }
+
+  // An interview convenes the junior, their trainer and, with responsables, the leads of the creator's teams
   const trainerId = readText(values, 'trainerId') ?? actorId
   const responsableIds =
-    template.purpose === EventPurposes.PanelInterview ? readList(values, 'responsableIds') : []
+    template.purpose === EventPurposes.PanelInterview ? await sessionResponsables(sessionId) : []
 
   return {
     ...patch,
@@ -93,6 +108,28 @@ export const resolveAcademyEntry = async (
     rollCall: true,
     memberIds: [...new Set([junior.accountId, trainerId, ...responsableIds])],
   }
+}
+
+/**
+ * Responsables of the teams of the creator a promotion recruits for
+ * @param {string} sessionId - Promotion identifier
+ * @return {Promise<string[]>} - Account identifiers
+ */
+
+const sessionResponsables = async (sessionId: string): Promise<string[]> => {
+  const session = await prisma.academySession.findUnique({
+    where: { id: sessionId },
+    select: { recruitmentSession: { select: { youtuberId: true } } },
+  })
+  const youtuberId = session?.recruitmentSession?.youtuberId
+  if (!youtuberId) return []
+
+  const leads = await prisma.teamLead.findMany({
+    where: { team: { youtuberId, archived: false } },
+    select: { accountId: true },
+  })
+
+  return [...new Set(leads.map((lead) => lead.accountId))]
 }
 
 /**
