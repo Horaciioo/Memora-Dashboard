@@ -132,7 +132,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     title: 'Memora Play est là !',
     intro: 'Memora ouvre sa salle de jeux : retrouve les autres membres pour une partie.',
     description:
-      'Memora n’offrait aucun moment de détente entre deux lives, et rien ne rapprochait les équipes en dehors du travail. Cette version ajoute « Memora Play », avec deux jeux, un chat de partie, des niveaux, un classement et des trophées, et corrige la frise des candidats dans les « Recrutements ».',
+      'Memora n’offrait aucun moment de détente entre deux lives, et rien ne rapprochait les équipes en dehors du travail. Cette version ajoute « Memora Play », avec trois jeux, un chat de partie, des niveaux, un classement et des trophées, et corrige la frise des candidats dans les « Recrutements ».',
     items: [
       {
         tag: ChangelogTags.Added,
@@ -151,6 +151,30 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
         text: 'Ajout du jeu « Bomb Party » : une syllabe, un mot, et la bombe passe au joueur suivant avant d’exploser.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout du jeu « Golf » : un parcours en 3D où tout le monde joue en même temps, on tire la balle vers l’arrière pour viser et le moins de coups gagne.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de sept pouvoirs dans le « Golf », gagnés en roulant sur les orbes : Tornade, Murs collants, Balle géante, Balle mini, Anti-collision, Bumper et Balle fantôme, en vert pour les bonus et en rouge pour les malus.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de deux parcours dans le « Golf », « La Prairie » avec neuf trous et « Le Canyon » avec six trous, ou un parcours tiré au hasard.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité de régler une partie de « Golf » : nombre de trous, temps par trou, coups au maximum, collisions entre balles et pouvoirs disponibles.',
       },
       {
         tag: ChangelogTags.Added,
@@ -181,6 +205,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Improved,
         text: 'Amélioration de la barre latérale : le raccourci « Play » brille en doré pour se repérer d’un coup d’œil.',
         permission: Permissions.PlayAccess,
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du podium de fin de « Bomb Party » : le nom de chaque joueur s’affiche sous sa photo.',
       },
       {
         tag: ChangelogTags.Improved,
