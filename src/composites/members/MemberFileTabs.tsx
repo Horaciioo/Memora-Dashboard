@@ -300,7 +300,8 @@ export const MemberFileTabs = ({
   const [identityValues, setIdentityValues] = useState<FormValues>(detail.values)
 
   const { summary } = detail
-  const isLocked = summary.isRoot
+  // The root account is edited by its own holder only
+  const isLocked = summary.isRoot && !session?.isRoot
   const canEdit = canUpdate && !isLocked
 
   const fieldByName = new Map(memberFields.map((field) => [field.name, field]))

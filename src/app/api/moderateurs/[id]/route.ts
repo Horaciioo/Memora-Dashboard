@@ -61,7 +61,7 @@ export const PATCH = createProtectedRoute({
       params.id
     )
 
-    const member = await updateMember(params.id, parsed.values)
+    const member = await updateMember(params.id, parsed.values, session.isRoot)
 
     // Journal only a real change
     const change = summariseChange(
