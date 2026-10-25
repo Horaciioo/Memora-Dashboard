@@ -1,3 +1,4 @@
+import { ACTIVITY_COPY } from '@/declarations/activity/copy'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { parseActivityFilters } from '@/core/lib/system/activityFilters'
 import { readActivityExport } from '@/core/services/system/ActivityQueryService'
@@ -15,7 +16,7 @@ export const GET = createProtectedRoute({
     await recordEvent({
       eventType: 'DataExported',
       actorId: session.id,
-      summary: `Export du journal, ${entries.length} entrées`,
+      summary: ACTIVITY_COPY.journalExport.replace('{count}', String(entries.length)),
     })
 
     return entries
