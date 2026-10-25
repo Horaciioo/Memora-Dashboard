@@ -1749,6 +1749,8 @@ export const updateEntry = async (
   // The card of the Réunions page follows its entry
   await syncMeetingCard(row)
 
+  // A live keeps the team it convened, its audience never widens the roll
+  if (isLive) return toEntry(row, await readRosterFor(id, viewerId, canManage))
   if (!data.rollCall) return toEntry(row)
 
   // Members the old audience brought
