@@ -11,7 +11,6 @@ import { TICKET_PALETTE } from '@/core/lib/share/ticketPalette'
 import { NONCE_HEADER } from '@/declarations/system/security/securityHeaders'
 import { APP_COMPANY, APP_DESCRIPTION, APP_FONTS, APP_NAME } from '@/declarations/app'
 import { DRAWER_DIMENSIONS, SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
-import { setActiveZone } from '@/utils/format/zone'
 
 /**
  * Title, description and the card a pasted address turns into
@@ -53,8 +52,6 @@ const SHELL_VARS = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const [initialSession, headerStore] = await Promise.all([getSession(), headers()])
 
-  // Server-rendered clock times read in the member's zone
-  setActiveZone(initialSession?.timezone)
   const nonce = headerStore.get(NONCE_HEADER) ?? undefined
 
   return (

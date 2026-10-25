@@ -5,6 +5,7 @@ import { AsyncLocalStorage } from 'node:async_hooks'
 import type { NextRequest } from 'next/server'
 
 import { readAddress } from '@/core/lib/http/rateLimit'
+import { runInRequestZone } from '@/core/lib/http/requestZone'
 
 /**
  * Where a request came from
@@ -43,7 +44,7 @@ export const runWithOrigin = <T>(request: NextRequest, run: () => Promise<T>): P
       ip: clip(readAddress(request.headers)),
       userAgent: clip(request.headers.get('user-agent')),
     },
-    run
+    () => runInRequestZone(run)
   )
 
 /**

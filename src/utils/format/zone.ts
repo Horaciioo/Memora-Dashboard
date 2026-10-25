@@ -9,8 +9,11 @@ const INSTANT_PATTERN = /(Z|[+-]\d{2}:?\d{2})$/
 // One formatter per zone
 const formatters = new Map<string, Intl.DateTimeFormat>()
 
-// Zone every clock time reads in
+// Browser zone, one member
 let activeZone = DEFAULT_ZONE
+
+// Per-request zone on the server
+let zoneReader: (() => string | null) | null = null
 
 /**
  * Check a zone name
@@ -44,7 +47,17 @@ export const setActiveZone = (zone: string | null | undefined): void => {
  * @return {string} - IANA zone
  */
 
-export const getActiveZone = (): string => activeZone
+export const getActiveZone = (): string => zoneReader?.() ?? activeZone
+
+/**
+ * Plug the server zone source
+ * @param {() => string | null} reader - Request zone
+ * @return {void}
+ */
+
+export const bindZoneReader = (reader: () => string | null): void => {
+  zoneReader = reader
+}
 
 /**
  * Formatter splitting a moment into zone fields
@@ -101,7 +114,7 @@ const wallAsUtc = (time: number, zone: string): number => {
  * @return {string} - "YYYY-MM-DDTHH:mm"
  */
 
-export const instantToWall = (value: Date | string, zone: string = activeZone): string => {
+export const instantToWall = (value: Date | string, zone: string = getActiveZone()): string => {
   const time = new Date(value).getTime()
   if (Number.isNaN(time)) return ''
 
@@ -115,7 +128,7 @@ export const instantToWall = (value: Date | string, zone: string = activeZone): 
  * @return {Date} - Moment
  */
 
-export const wallToInstant = (wall: string, zone: string = activeZone): Date => {
+export const wallToInstant = (wall: string, zone: string = getActiveZone()): Date => {
   const target = Date.parse(`${wall.slice(0, 16)}:00Z`)
   if (Number.isNaN(target)) return new Date(Number.NaN)
 
@@ -153,7 +166,7 @@ export const isWallClock = (value: unknown): value is string =>
  * @return {Date} - Shifted date, for reading only
  */
 
-export const shiftToZone = (value: Date | string, zone: string = activeZone): Date => {
+export const shiftToZone = (value: Date | string, zone: string = getActiveZone()): Date => {
   const wall = WALL_PATTERN.exec(instantToWall(value, zone))
   if (!wall) return new Date(value)
 

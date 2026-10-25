@@ -3,13 +3,7 @@ import React, { ReactNode } from 'react'
 import { DATE_COPY, DATE_LOCALE, MONTH_LABELS } from '@/declarations/ui/dates'
 import { timeLabel } from '@/utils/format/days'
 import { getActiveZone, instantToWall, shiftToZone } from '@/utils/format/zone'
-
-// Milliseconds in one day
-const DAY_MS = 86_400_000
-
-// Milliseconds in one minute and one hour
-const MINUTE_MS = 60_000
-const HOUR_MS = 3_600_000
+import { DAY_MS, HOUR_MS, MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Format custom date
@@ -177,7 +171,8 @@ export function countDays(start: Date | string, end: Date | string): number {
   const from = new Date(start).setHours(0, 0, 0, 0)
   const to = new Date(end).setHours(0, 0, 0, 0)
 
-  return Math.floor((to - from) / DAY_MS) + 1
+  // Daylight saving shifts an hour
+  return Math.round((to - from) / DAY_MS) + 1
 }
 
 /**

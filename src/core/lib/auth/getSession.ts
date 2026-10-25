@@ -4,8 +4,10 @@ import { cache } from 'react'
 import { cookies } from 'next/headers'
 
 import { prisma } from '@/core/lib/db'
+import { digestSessionToken } from '@/core/lib/auth/sessionDigest'
 import { readActiveCreator, readNavigationView } from '@/core/lib/auth/activeCreator'
 import { logger } from '@/core/lib/logger'
+import { holdRequestZone } from '@/core/lib/http/requestZone'
 import { SESSION_COOKIE } from '@/core/lib/auth/session'
 import { simulatedRoleOf } from '@/core/lib/auth/simulation'
 import { resolveAccountPermissions } from '@/core/services/auth/GrantsService'
@@ -19,12 +21,13 @@ import { isAccessClosed } from '@/core/lib/auth/closed'
 import type { SessionUser } from '@/types/auth'
 import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { Account, AccountFunction, Youtuber } from '@prisma/client'
+import { DAY_MS } from '@/utils/constants/time'
 
 // Account row a session is built from
 type SessionAccount = Account & { youtubers: Youtuber[]; functions: AccountFunction[] }
 
 // A session records its use at most once a day
-const STAMP_INTERVAL_MS = 86_400_000
+const STAMP_INTERVAL_MS = DAY_MS
 
 /**
  * Map an account row to its session shape
@@ -78,7 +81,7 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
   if (!token) return null
 
   const session = await prisma.session.findUnique({
-    where: { token },
+    where: { token: digestSessionToken(token) },
     include: { account: { include: { youtubers: true, functions: true } } },
   })
   if (!session || session.expiresAt < new Date()) return null
@@ -96,6 +99,9 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
     void touchSession(token).catch(() => undefined)
   }
 
+  // Clock times read in the member zone
+  holdRequestZone(session.account.timezone)
+
   return toSessionUser(session.account)
 })
 
@@ -107,7 +113,7 @@ export const getSession = cache(async (): Promise<SessionUser | null> => {
 
 export const isSessionTokenValid = cache(async (token: string): Promise<boolean> => {
   const session = await prisma.session.findUnique({
-    where: { token },
+    where: { token: digestSessionToken(token) },
     select: { expiresAt: true, account: { select: { status: true, frozenAt: true } } },
   })
   if (!session || session.expiresAt < new Date()) return false
