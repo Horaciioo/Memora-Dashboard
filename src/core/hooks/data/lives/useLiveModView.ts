@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 
 import { useLiveFeed } from '@/core/hooks/data/lives/useLiveFeed'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
@@ -64,11 +64,24 @@ export const useLiveModView = (live: LiveView): ModViewDriver => {
   )
   useLiveFeed(live.id, setState, shape)
 
+  // Gestures still on their way, a second click on the same one is dropped
+  const inFlight = useRef(new Set<string>())
   const act = useCallback(
     async (intent: ModViewIntent, context?: ActContext) => {
-      await run(() =>
-        apiPost(API_ROUTES.liveModView(live.id), { intent, context, key: crypto.randomUUID() })
-      )
+      const signature = JSON.stringify(intent)
+      // Already on its way, not refused
+      if (inFlight.current.has(signature)) return true
+
+      inFlight.current.add(signature)
+      try {
+        const done = await run(() =>
+          apiPost(API_ROUTES.liveModView(live.id), { intent, context, key: crypto.randomUUID() })
+        )
+
+        return done !== null
+      } finally {
+        inFlight.current.delete(signature)
+      }
     },
     [live.id, run]
   )

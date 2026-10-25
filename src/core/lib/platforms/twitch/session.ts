@@ -6,6 +6,7 @@ import { runHelix } from '@/core/lib/platforms/twitch/helix'
 import {
   HELIX_PATHS,
   TWITCH_ENDPOINTS,
+  TWITCH_SEAT_REVOCATIONS,
   TWITCH_SUBSCRIPTIONS,
 } from '@/declarations/platforms/twitch'
 
@@ -107,8 +108,19 @@ export class EventSubSession {
     this.stopped = true
     this.clearTimers()
     this.socket?.close()
+    this.pending?.close()
     this.socket = null
+    this.pending = null
     this.options.onState('disconnected')
+  }
+
+  /**
+   * Whether the session gave up or was closed
+   * @return {boolean} - Stopped
+   */
+
+  get isStopped(): boolean {
+    return this.stopped
   }
 
   /**
@@ -200,9 +212,13 @@ export class EventSubSession {
         this.options.onNotification?.(subscriptionType, event, meta)
         return
       }
-      case 'revocation':
+      case 'revocation': {
+        const status = frame.payload?.subscription?.status ?? ''
         logger.warn('[eventsub] subscription revoked', frame.payload?.subscription?.type ?? '')
+        // The seat lost its rights, another one takes over
+        if (TWITCH_SEAT_REVOCATIONS.includes(status)) this.stop()
         return
+      }
       default:
         return
     }
@@ -249,6 +265,9 @@ export class EventSubSession {
       const status = result.reason instanceof PlatformError ? result.reason.status : 0
       logger.warn(`[eventsub] ${TWITCH_SUBSCRIPTIONS[index]?.type} not subscribed (${status})`)
     })
+
+    // A seat refused everywhere hears nothing, another one takes over
+    if (results.every((result) => result.status === 'rejected')) this.stop()
   }
 
   /**

@@ -16,6 +16,33 @@ import { Prisma } from '@prisma/client'
 // Twitch page of a login
 const twitchUrl = (login: string) => `${CHANNEL_LINK_PREFIX[LivePlatforms.Twitch]}${login}`
 
+// Rows enough to tell one channel from several
+const SEVERAL = 2
+
+/**
+ * The one channel a live follows, never a guess between several
+ * @param {T[]} channels - Channels of one platform
+ * @return {T | 'several' | null} - Channel, or none
+ */
+
+export const soleChannel = <T>(channels: T[]): T | 'several' | null =>
+  channels.length >= SEVERAL ? 'several' : (channels[0] ?? null)
+
+/**
+ * Twitch channel of a creator
+ * @param {string} youtuberId - Creator
+ * @return {Promise<{ externalId: string, login: string | null } | 'several' | null>} - Channel, or none
+ */
+
+export const twitchChannelOf = async (youtuberId: string) =>
+  soleChannel(
+    await prisma.youtuberChannel.findMany({
+      where: { youtuberId, platform: LivePlatforms.Twitch },
+      select: { externalId: true, login: true },
+      take: SEVERAL,
+    })
+  )
+
 /**
  * Channels of a creator
  * @param {string} youtuberId - Creator
@@ -47,12 +74,12 @@ export const readChannels = async (youtuberId: string): Promise<CreatorChannelVi
  */
 
 const resolveTwitch = async (login: string) => {
-  // A pasted link or a bare login
-  const trimmed = login
+  // A pasted link or a bare login, the first path segment is the channel
+  const [trimmed = ''] = login
     .trim()
     .replace(/^(?:https?:\/\/)?(?:www\.)?twitch\.tv\//i, '')
     .replace(/^@/, '')
-    .replace(/\/+$/, '')
+    .split('/')
 
   if (!isTwitchConfigured()) {
     throw invalidInput([{ field: 'value', message: CHANNEL_COPY.notConfigured }])

@@ -25,13 +25,17 @@ const LEAD_ROLES: string[] = LEADERSHIP_ROLES
  */
 
 export const ensureStint = async (liveId: string, accountId: string): Promise<void> => {
-  const open = await prisma.liveModStint.findFirst({
-    where: { liveId, accountId, stoppedAt: null },
-    select: { id: true },
-  })
-  if (open) return
+  // Two tabs never open two stretches
+  await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`stint:${liveId}:${accountId}`}))`
+    const open = await tx.liveModStint.findFirst({
+      where: { liveId, accountId, stoppedAt: null },
+      select: { id: true },
+    })
+    if (open) return
 
-  await prisma.liveModStint.create({ data: { liveId, accountId } })
+    await tx.liveModStint.create({ data: { liveId, accountId } })
+  })
 }
 
 /**
@@ -87,16 +91,19 @@ export const closeLiveStints = async (liveId: string): Promise<void> => {
     select: { accountId: true },
     distinct: ['accountId'],
   })
+  // Last beat of every member in one read
+  const beats = await prisma.modViewPresence.groupBy({
+    by: ['accountId'],
+    where: { liveId, accountId: { in: open.map((row) => row.accountId) } },
+    _max: { lastBeatAt: true },
+  })
+  const lastBeat = new Map(beats.map((row) => [row.accountId, row._max.lastBeatAt]))
 
   for (const { accountId } of open) {
-    const last = await prisma.modViewPresence.findFirst({
-      where: { liveId, accountId },
-      orderBy: { lastBeatAt: 'desc' },
-      select: { lastBeatAt: true },
-    })
-    const isGone = last !== null && +now - +last.lastBeatAt > LIVE_SETTINGS.staleSeconds * 1000
+    const last = lastBeat.get(accountId) ?? null
+    const isGone = last !== null && +now - +last > LIVE_SETTINGS.staleSeconds * 1000
 
-    await stopStintAt(liveId, accountId, isGone && last ? last.lastBeatAt : now)
+    await stopStintAt(liveId, accountId, isGone && last ? last : now)
   }
 }
 

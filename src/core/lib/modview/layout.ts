@@ -165,6 +165,38 @@ const prune = (layout: ModLayout): ModLayout => ({
 export const windowsOfLayout = (layout: ModLayout): ModViewWindow[] =>
   layout.columns.flatMap((column) => column.windows.map((entry) => entry.id))
 
+// Share that can size a flex track
+const isWeight = (value: unknown): boolean =>
+  typeof value === 'number' && Number.isFinite(value) && value > 0
+
+/**
+ * Whether a value read back from storage is a usable layout
+ * @param {unknown} value - Stored value
+ * @return {boolean} - Usable layout
+ */
+
+export const isLayout = (value: unknown): value is ModLayout => {
+  if (!value || typeof value !== 'object') return false
+  const { columns, maximized } = value as Partial<ModLayout>
+
+  return (
+    (maximized === null || typeof maximized === 'string') &&
+    Array.isArray(columns) &&
+    columns.every(
+      (column) =>
+        typeof column?.id === 'string' &&
+        isWeight(column.weight) &&
+        Array.isArray(column.windows) &&
+        column.windows.every(
+          (entry) =>
+            typeof entry?.id === 'string' &&
+            isWeight(entry.weight) &&
+            typeof entry.isFolded === 'boolean'
+        )
+    )
+  )
+}
+
 /**
  * Line a saved layout up with the windows a seat may open
  * @param {ModLayout | null} saved - Saved layout

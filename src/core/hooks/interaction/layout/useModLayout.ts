@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   allowSpec,
   buildLayout,
+  isLayout,
   moveWindow,
   reconcileLayout,
   resizeColumns,
@@ -43,10 +44,11 @@ interface SavedWorkspace {
 const readSave = (profile: ModViewProfileName): SavedWorkspace | null => {
   try {
     const raw = window.localStorage.getItem(storageKey(profile))
-    const parsed: unknown = raw ? JSON.parse(raw) : null
-    if (!parsed || typeof parsed !== 'object' || !('layout' in parsed)) return null
+    const parsed = (raw ? JSON.parse(raw) : null) as Partial<SavedWorkspace> | null
+    // A damaged save is dropped, never drawn
+    if (!isLayout(parsed?.layout) || !Array.isArray(parsed.hidden)) return null
 
-    return parsed as SavedWorkspace
+    return { layout: parsed.layout, hidden: parsed.hidden.filter((id) => typeof id === 'string') }
   } catch {
     return null
   }

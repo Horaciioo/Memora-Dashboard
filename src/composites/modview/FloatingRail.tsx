@@ -4,14 +4,16 @@ import { useLayoutEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
+import { MODVIEW_SIDE_WIDTH } from '@/declarations/ui/variants'
+
 export interface FloatingRailProps {
   // Element the rail sits next to
   anchor: HTMLElement | null
   children: ReactNode
 }
 
-// Rail width in px, as w-72
-const RAIL_WIDTH = 288
+// Rail as wide as the side column
+const RAIL_WIDTH = MODVIEW_SIDE_WIDTH.start
 
 // Gap between anchor and rail
 const RAIL_GAP = 8

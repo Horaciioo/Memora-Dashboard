@@ -2,8 +2,7 @@ import 'server-only'
 
 import { conflict, forbidden, notFound, rateLimited, systemFailure } from '@/core/lib/errors'
 import type { AppError } from '@/core/lib/errors'
-import { prisma } from '@/core/lib/db'
-import { claimGestureKey } from '@/core/lib/lives/idempotency'
+import { claimGestureKey, releaseGestureKey } from '@/core/lib/lives/idempotency'
 import { isFollowing } from '@/core/services/lives/FocusService'
 import { readConnection } from '@/core/lib/lives/recent'
 import { readRoomMemory } from '@/core/lib/lives/room'
@@ -32,11 +31,13 @@ import { readLive } from '@/core/services/lives/LiveService'
 import { pollLiveState } from '@/core/services/lives/LiveStatePoller'
 import { activeSuspension } from '@/core/services/members/admin/SuspensionService'
 import { logMemoraGesture, settleGesture } from '@/core/services/lives/ModerationLogService'
+import { twitchChannelOf } from '@/core/services/platforms/ChannelService'
 import {
   markTwitchRevoked,
   readTwitchRoster,
   readTwitchSeat,
 } from '@/core/services/platforms/PlatformAccountService'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MODVIEW_LOCK_COPY } from '@/declarations/modview/copy'
 import { PLATFORM_ERROR_COPY, PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
@@ -87,39 +88,54 @@ const baseState = (live: LiveView): ModViewState => ({
 
 // Moderators confirmed lately, by seat
 const moderatorCache = new Map<string, number>()
-const MODERATOR_CACHE_MS = 60_000
+
+// Entries one cache holds at most
+const CACHE_LIMIT = 500
 
 /**
- * Twitch channel of a creator
- * @param {string} youtuberId - Creator
- * @return {Promise<{ externalId: string, login: string | null } | 'several' | null>} - Channel, or none
+ * Make room in a cache: expired entries go, then the oldest
+ * @param {Map<string, V>} cache - Cache
+ * @param {(value: V) => number} expiry - When an entry expires, epoch ms
+ * @return {void}
  */
 
-const channelOf = async (youtuberId: string) => {
-  const channels = await prisma.youtuberChannel.findMany({
-    where: { youtuberId, platform: LivePlatforms.Twitch },
-    select: { externalId: true, login: true },
-    take: 2,
-  })
+const pruneCache = <V>(cache: Map<string, V>, expiry: (value: V) => number): void => {
+  if (cache.size < CACHE_LIMIT) return
 
-  // A live names no channel, guessing would moderate the wrong one
-  return channels.length > 1 ? 'several' : (channels[0] ?? null)
+  const now = Date.now()
+  for (const [key, value] of cache) if (expiry(value) <= now) cache.delete(key)
+  for (const key of cache.keys()) {
+    if (cache.size < CACHE_LIMIT) break
+    cache.delete(key)
+  }
+}
+
+/**
+ * Seat of a member on a channel
+ * @typedef {Object} SeatFound
+ * @property {TwitchSeat} seat - Token and channel
+ * @property {string | null} login - Channel login
+ * @property {string} memberLogin - Member's login
+ */
+
+interface SeatFound {
+  seat: TwitchSeat
+  login: string | null
+  memberLogin: string
 }
 
 /**
  * The viewer's seat on the live's channel
  * @param {string} viewerId - Member
  * @param {string} youtuberId - Creator
- * @return {Promise<{ seat: TwitchSeat, login: string | null, memberLogin: string } | { notice: string }>} - Seat or notice
+ * @return {Promise<SeatFound | { notice: string }>} - Seat or notice
  */
 
 const seatOf = async (
   viewerId: string,
   youtuberId: string
-): Promise<
-  { seat: TwitchSeat; login: string | null; memberLogin: string } | { notice: string }
-> => {
-  const channel = await channelOf(youtuberId)
+): Promise<SeatFound | { notice: string }> => {
+  const channel = await twitchChannelOf(youtuberId)
   if (!channel) return { notice: PLATFORM_NOTICE_COPY.noChannel }
   if (channel === 'several') return { notice: PLATFORM_NOTICE_COPY.severalChannels }
 
@@ -136,6 +152,17 @@ const seatOf = async (
     memberLogin: lookup.login,
   }
 }
+
+/**
+ * Seconds until Twitch takes calls again
+ * @param {PlatformError} error - Rate limit refusal
+ * @return {number} - Wait, the setting when Twitch gave none
+ */
+
+const retryAfter = (error: PlatformError): number =>
+  error.resetAt
+    ? Math.max(1, Math.ceil((error.resetAt - Date.now()) / 1000))
+    : LIVE_SETTINGS.rateLimitRetrySeconds
 
 /**
  * Translate a Twitch refusal into what the member reads
@@ -156,7 +183,7 @@ const translateRefusal = async (error: unknown, viewerId: string): Promise<AppEr
   if (error.status === 403) return forbidden(PLATFORM_ERROR_COPY.forbidden)
   if (error.status === 404) return notFound(PLATFORM_ERROR_COPY.notFound)
   if (error.status === 409) return conflict(PLATFORM_ERROR_COPY.conflict)
-  if (error.status === 429) return rateLimited(5, PLATFORM_ERROR_COPY.rateLimited)
+  if (error.status === 429) return rateLimited(retryAfter(error), PLATFORM_ERROR_COPY.rateLimited)
   if (error.status === 400) return conflict(PLATFORM_ERROR_COPY.invalid)
 
   logger.warn('[modview] twitch unavailable', error.status)
@@ -175,22 +202,24 @@ const suspensionNotice = (endsAt: string): string =>
 /**
  * Whether the viewer may enter this live's Mod View: a Twitch moderator of the channel
  * @param {string} viewerId - Member
- * @param {LiveView} live - Live
- * @return {Promise<{ allowed: true } | { allowed: false, notice: string }>} - Verdict
+ * @param {Object} live - Live
+ * @param {string} live.platform - Platform
+ * @param {{ id: string }} live.youtuber - Creator
+ * @return {Promise<{ allowed: true, found: SeatFound | null } | { allowed: false, notice: string }>} - Verdict, with the seat it read
  */
 
 export const channelAccess = async (
   viewerId: string,
-  live: LiveView
-): Promise<{ allowed: true } | { allowed: false; notice: string }> => {
+  live: Pick<LiveView, 'platform'> & { youtuber: { id: string } }
+): Promise<{ allowed: true; found: SeatFound | null } | { allowed: false; notice: string }> => {
   // Only Twitch is wired
-  if (live.platform !== LivePlatforms.Twitch) return { allowed: true }
+  if (live.platform !== LivePlatforms.Twitch) return { allowed: true, found: null }
 
   const found = await seatOf(viewerId, live.youtuber.id)
   if ('notice' in found) return { allowed: false, notice: found.notice }
 
   const key = `${found.seat.moderatorId}:${found.seat.broadcasterId}`
-  if ((moderatorCache.get(key) ?? 0) > Date.now()) return { allowed: true }
+  if ((moderatorCache.get(key) ?? 0) > Date.now()) return { allowed: true, found }
 
   try {
     if (!(await moderatesChannel(found.seat)))
@@ -198,21 +227,27 @@ export const channelAccess = async (
   } catch (error) {
     return { allowed: false, notice: (await translateRefusal(error, viewerId)).message }
   }
-  moderatorCache.set(key, Date.now() + MODERATOR_CACHE_MS)
+  pruneCache(moderatorCache, (until) => until)
+  moderatorCache.set(key, Date.now() + LIVE_SETTINGS.moderatorCacheSeconds * 1000)
 
-  return { allowed: true }
+  return { allowed: true, found }
 }
 
 /**
  * Same verdict as a refusal
  * @param {string} viewerId - Member
  * @param {LiveView} live - Live
- * @return {Promise<void>}
+ * @return {Promise<SeatFound | null>} - Seat on a Twitch live
  */
 
-export const requireChannelModerator = async (viewerId: string, live: LiveView): Promise<void> => {
+export const requireChannelModerator = async (
+  viewerId: string,
+  live: LiveView
+): Promise<SeatFound | null> => {
   const verdict = await channelAccess(viewerId, live)
   if (!verdict.allowed) throw forbidden(verdict.notice)
+
+  return verdict.found
 }
 
 /**
@@ -232,12 +267,12 @@ export const openModView = async (
 ): Promise<ModViewSnapshot> => {
   const live = await readLive(liveId, scope, viewerId, held)
   if (live.access !== 'open') throw conflict()
-  await requireChannelModerator(viewerId, live)
+  // Seat read once, a Twitch live always has one past this check
+  const found = await requireChannelModerator(viewerId, live)
   let state: ModViewState = { ...baseState(live), roster: await readTwitchRoster() }
 
   // The player needs no seat, only the channel
-  const channel = live.platform === LivePlatforms.Twitch ? await channelOf(live.youtuber.id) : null
-  const channelLogin = channel && channel !== 'several' ? channel.login : null
+  const channelLogin = found?.login ?? null
 
   // A paused member only watches
   const paused = await activeSuspension(viewerId)
@@ -250,50 +285,37 @@ export const openModView = async (
   }
 
   // Only Twitch is wired
-  if (live.platform !== LivePlatforms.Twitch) return { state, channelLogin, feedSeq: 0 }
-
-  const found = await seatOf(viewerId, live.youtuber.id)
-  if ('notice' in found)
-    return {
-      state: { ...state, notice: found.notice, readOnly: true },
-      channelLogin,
-      feedSeq: 0,
-    }
+  if (!found) return { state, channelLogin, feedSeq: 0 }
 
   const { seat } = found
   try {
-    const moderates = await moderatesChannel(seat)
-    if (!moderates) {
-      state = { ...state, notice: PLATFORM_NOTICE_COPY.notModerator, readOnly: true }
-    } else {
-      // What Twitch says right now
-      const [modes, terms, requests, community, stream, pinned, tags] = await Promise.all([
-        readChatModes(seat),
-        readBlockedTerms(seat),
-        readUnbanRequests(seat).catch(() => []),
-        readCommunity(seat).catch(() => null),
-        readStream(seat),
-        readPin(seat).catch(() => null),
-        readChannelTags(seat).catch(() => []),
-      ])
-      state = {
-        ...state,
-        modes,
-        blockedTerms: terms.map((term) => term.text),
-        unbanRequests: requests,
-        community: community ? { ...state.community, ...community } : state.community,
-        title: stream?.title ?? state.title,
-        viewers: stream?.viewers ?? null,
-        pinned,
-        channel: {
-          ...state.channel,
-          category: stream?.category ?? null,
-          tags,
-          categoryArt: stream?.categoryId
-            ? await readCategoryArt(seat, stream.categoryId).catch(() => null)
-            : null,
-        },
-      }
+    // What Twitch says right now
+    const [modes, terms, requests, community, stream, pinned, tags] = await Promise.all([
+      readChatModes(seat),
+      readBlockedTerms(seat),
+      readUnbanRequests(seat).catch(() => []),
+      readCommunity(seat).catch(() => null),
+      readStream(seat),
+      readPin(seat).catch(() => null),
+      readChannelTags(seat).catch(() => []),
+    ])
+    state = {
+      ...state,
+      modes,
+      blockedTerms: terms.map((term) => term.text),
+      unbanRequests: requests,
+      community: community ? { ...state.community, ...community } : state.community,
+      title: stream?.title ?? state.title,
+      viewers: stream?.viewers ?? null,
+      pinned,
+      channel: {
+        ...state.channel,
+        category: stream?.category ?? null,
+        tags,
+        categoryArt: stream?.categoryId
+          ? await readCategoryArt(seat, stream.categoryId).catch(() => null)
+          : null,
+      },
     }
   } catch (error) {
     const refusal = await translateRefusal(error, viewerId)
@@ -355,7 +377,7 @@ export const actOnLive = async (input: {
 }): Promise<{ done: boolean }> => {
   const live = await readLive(input.liveId, input.scope, input.viewerId, input.held)
   if (live.access !== 'open') throw conflict()
-  await requireChannelModerator(input.viewerId, live)
+  const found = await requireChannelModerator(input.viewerId, live)
 
   const paused = await activeSuspension(input.viewerId)
   if (paused) throw forbidden(suspensionNotice(paused.endsAt))
@@ -367,10 +389,7 @@ export const actOnLive = async (input: {
     liveconLevel: live.liveconLevel?.level ?? null,
   })
   if (!gate.allowed) throw forbidden(gate.reason ?? undefined)
-  if (live.platform !== LivePlatforms.Twitch) throw forbidden(PLATFORM_ERROR_COPY.unsupported)
-
-  const found = await seatOf(input.viewerId, live.youtuber.id)
-  if ('notice' in found) throw forbidden(found.notice)
+  if (!found) throw forbidden(PLATFORM_ERROR_COPY.unsupported)
 
   // Never on oneself nor on the channel
   const target = 'chatterId' in input.intent ? input.intent.chatterId : null
@@ -385,8 +404,8 @@ export const actOnLive = async (input: {
   }
 
   // A double click lands once
-  if (!(await claimGestureKey(`${input.liveId}:${input.viewerId}:${input.key}`)))
-    return { done: false }
+  const gestureKey = `${input.liveId}:${input.viewerId}:${input.key}`
+  if (!(await claimGestureKey(gestureKey))) return { done: false }
 
   // Written before the call
   const logId = await logMemoraGesture({
@@ -407,6 +426,8 @@ export const actOnLive = async (input: {
   try {
     await performOnTwitch(input.intent, found.seat)
   } catch (error) {
+    // A failed gesture may be retried
+    await releaseGestureKey(gestureKey)
     await settleGesture(
       logId,
       false,
@@ -435,8 +456,6 @@ const emoteCache = new Map<
 >()
 // What a member may use, kept per member and channel
 const ownedCache = new Map<string, { until: number; owned: Set<string> | null }>()
-const EMOTE_CACHE_MS = 600_000
-const OWNED_CACHE_MS = 300_000
 
 /**
  * Emotes the chat box offers on a live, the ones the member cannot use marked locked
@@ -455,26 +474,29 @@ export const readLiveEmotes = async (
 ): Promise<LiveEmotes> => {
   const live = await readLive(liveId, scope, viewerId, held)
   if (live.access !== 'open') throw conflict()
-  if (live.platform !== LivePlatforms.Twitch) {
-    return { global: [], channel: [], isVerified: false }
-  }
-  await requireChannelModerator(viewerId, live)
-
-  const found = await seatOf(viewerId, live.youtuber.id)
-  if ('notice' in found) throw forbidden(found.notice)
+  const found = await requireChannelModerator(viewerId, live)
+  if (!found) return { global: [], channel: [], isVerified: false }
   const { seat } = found
 
   try {
     let base = emoteCache.get(seat.broadcasterId)
     if (!base || base.until <= Date.now()) {
-      base = { until: Date.now() + EMOTE_CACHE_MS, emotes: await readEmotes(seat) }
+      base = {
+        until: Date.now() + LIVE_SETTINGS.emoteCacheSeconds * 1000,
+        emotes: await readEmotes(seat),
+      }
+      pruneCache(emoteCache, (entry) => entry.until)
       emoteCache.set(seat.broadcasterId, base)
     }
 
     const ownedKey = `${seat.moderatorId}:${seat.broadcasterId}`
     let owned = ownedCache.get(ownedKey)
     if (!owned || owned.until <= Date.now()) {
-      owned = { until: Date.now() + OWNED_CACHE_MS, owned: await readOwnedEmoteIds(seat) }
+      owned = {
+        until: Date.now() + LIVE_SETTINGS.ownedEmoteCacheSeconds * 1000,
+        owned: await readOwnedEmoteIds(seat),
+      }
+      pruneCache(ownedCache, (entry) => entry.until)
       ownedCache.set(ownedKey, owned)
     }
 
@@ -512,10 +534,8 @@ export const readLiveBanDetail = async (
 ): Promise<BanDetail> => {
   const live = await readLive(liveId, scope, viewerId, held)
   if (live.access !== 'open') throw conflict()
-  await requireChannelModerator(viewerId, live)
-
-  const found = await seatOf(viewerId, live.youtuber.id)
-  if ('notice' in found) throw forbidden(found.notice)
+  const found = await requireChannelModerator(viewerId, live)
+  if (!found) throw forbidden(PLATFORM_ERROR_COPY.unsupported)
 
   try {
     return await readBanDetail(found.seat, chatterId)

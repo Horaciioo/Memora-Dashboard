@@ -8,6 +8,14 @@ const globalForKeys = globalThis as unknown as { liveActKeys?: Map<string, numbe
 
 const keys = (globalForKeys.liveActKeys ??= new Map())
 
+// Shared store and its key
+const sharedKey = (key: string) => {
+  const container = runtime()
+  const cache = container?.redis.isReady() ? container.redis.cache : null
+
+  return cache ? { cache, name: `${container!.redis.prefix}gesture:${key}` } : null
+}
+
 /**
  * Claim a gesture key once: a double click finds it taken
  * @param {string} key - Gesture key
@@ -16,17 +24,10 @@ const keys = (globalForKeys.liveActKeys ??= new Map())
 
 export const claimGestureKey = async (key: string): Promise<boolean> => {
   const ttlSeconds = LIVE_SETTINGS.idempotencyMinutes * 60
-  const container = runtime()
-  const cache = container?.redis.isReady() ? container.redis.cache : null
+  const shared = sharedKey(key)
 
-  if (cache) {
-    const claimed = await cache.set(
-      `${container!.redis.prefix}gesture:${key}`,
-      '1',
-      'EX',
-      ttlSeconds,
-      'NX'
-    )
+  if (shared) {
+    const claimed = await shared.cache.set(shared.name, '1', 'EX', ttlSeconds, 'NX')
 
     return claimed === 'OK'
   }
@@ -39,4 +40,16 @@ export const claimGestureKey = async (key: string): Promise<boolean> => {
   keys.set(key, now + ttlSeconds * 1000)
 
   return true
+}
+
+/**
+ * Free a key after a failure
+ * @param {string} key - Gesture key
+ * @return {Promise<void>} - Freed
+ */
+
+export const releaseGestureKey = async (key: string): Promise<void> => {
+  const shared = sharedKey(key)
+  if (shared) await shared.cache.del(shared.name)
+  keys.delete(key)
 }

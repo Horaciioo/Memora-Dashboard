@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { isOpenLive } from '@/core/lib/lives/permissions'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { activeCoordinatorIds } from '@/core/lib/lives/coordination'
 import { livePermissions } from '@/core/lib/lives/permissions'
@@ -59,7 +60,11 @@ export const readLiveRoster = async (
   const live = await liveInScope(id, scope)
   const permissions = livePermissions(
     {
-      coordinatorIds: activeCoordinatorIds(live.coordinations),
+      coordinatorIds: activeCoordinatorIds(
+        live.coordinations,
+        new Date(),
+        live.status as LiveStatusName
+      ),
       status: live.status as LiveStatusName,
     },
     viewerId,
@@ -191,7 +196,8 @@ export const answerOwnPresence = async (
   hours: { from: Date; to: Date } | null = null
 ): Promise<void> => {
   const live = await liveInScope(id, scope)
-  if (!live.calendarEventId) throw conflict()
+  // Seats only while the live is open
+  if (!live.calendarEventId || !isOpenLive(live.status as LiveStatusName)) throw conflict()
 
   // A member the live did not convene takes a seat by answering
   await prisma.eventAttendance.upsert({

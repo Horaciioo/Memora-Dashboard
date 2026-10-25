@@ -22,6 +22,6 @@ export const GET = createStreamRoute({
     await requireChannelModerator(session.id, live)
 
     // First bytes at once
-    return openStream(request, LIVE_TOPICS.live(params.id), ': open\n\n')
+    return openStream(request, LIVE_TOPICS.live(params.id), { opening: ': open\n\n' })
   },
 })

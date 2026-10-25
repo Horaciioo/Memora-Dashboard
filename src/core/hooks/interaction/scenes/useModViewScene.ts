@@ -79,6 +79,8 @@ export const useModViewScene = (
       setState((current) =>
         applySceneIntent(current, intent, { name: actorName, at: new Date().toISOString(), id })
       )
+
+      return true
     },
     [actorName]
   )

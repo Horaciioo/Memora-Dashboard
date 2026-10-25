@@ -1,6 +1,9 @@
 // Shorthand and full length hexadecimal notations
 const HEX_PATTERN = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i
 
+// Lowest OKLCH lightness a name keeps on a dark ground
+const READABLE_LIGHTNESS = 0.7
+
 /**
  * Tell a stored accent apart from a tone key
  * @param {string | null | undefined} raw - Stored accent
@@ -49,18 +52,7 @@ export const visionSafe = (hex: string): string =>
 
 export const readableOnDark = (hex: string): string => {
   const normal = normaliseHex(hex)
-  if (!normal) return hex
 
-  const [red = 0, green = 0, blue = 0] = [1, 3, 5].map((start) =>
-    parseInt(normal.slice(start, start + 2), 16)
-  )
-  const max = Math.max(red, green, blue) / 255
-  const min = Math.min(red, green, blue) / 255
-  const lightness = (max + min) / 2
-  if (lightness >= 0.5) return normal
-
-  // Mix with white up to the lightness Twitch's own dark theme keeps
-  const share = (0.5 - lightness) / (1 - lightness)
-
-  return `color-mix(in srgb, ${normal} ${Math.round((1 - share) * 100)}%, white)`
+  // Perceived lightness raised to a floor, pure blue included
+  return normal ? `oklch(from ${normal} max(l, ${READABLE_LIGHTNESS}) c h)` : hex
 }

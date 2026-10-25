@@ -8,6 +8,7 @@ import {
   TWITCH_ENDPOINTS,
   TWITCH_SCOPES,
 } from '@/declarations/platforms/twitch'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 // Shared shapes of a platform link
 export type TwitchGrant = PlatformGrant
@@ -151,7 +152,7 @@ let appToken: { value: string; expiresAt: number } | null = null
  */
 
 export const readTwitchAppToken = async (): Promise<string> => {
-  if (appToken && appToken.expiresAt - Date.now() > 60_000) return appToken.value
+  if (appToken && appToken.expiresAt - Date.now() > MINUTE_MS) return appToken.value
 
   const { clientId, clientSecret } = requireCredentials()
   const response = await fetch(TWITCH_ENDPOINTS.token, {
@@ -180,15 +181,19 @@ export const readTwitchAppToken = async (): Promise<string> => {
 }
 
 /**
- * Find a Twitch user by login
- * @param {string} login - Login
+ * Find a Twitch user by login, or by identifier
+ * @param {string} value - Login or identifier
+ * @param {'login' | 'id'} [by] - What the value is
  * @return {Promise<TwitchIdentity | null>} - User
  */
 
-export const findTwitchUser = async (login: string): Promise<TwitchIdentity | null> => {
+export const findTwitchUser = async (
+  value: string,
+  by: 'login' | 'id' = 'login'
+): Promise<TwitchIdentity | null> => {
   const token = await readTwitchAppToken()
   const url = new URL(`${TWITCH_ENDPOINTS.helix}${HELIX_PATHS.users}`)
-  url.search = new URLSearchParams({ login: login.trim().toLowerCase() }).toString()
+  url.search = new URLSearchParams({ [by]: value.trim().toLowerCase() }).toString()
 
   const answer = await platformRequest<{
     data: { id: string; login: string; display_name: string }[]

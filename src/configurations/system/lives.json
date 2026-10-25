@@ -17,7 +17,8 @@
   "logQueueMax": 5000,
   "liveconCacheSeconds": 30,
   "idempotencyMinutes": 10,
-  "watchLeadMinutes": 90,
+  "watchLeadMinutes": 120,
+  "watchTrailMinutes": 120,
   "reportBucketMinutes": 5,
   "reportMaxSlices": 120,
   "reportMaxHours": 24,
@@ -36,5 +37,11 @@
   "viewerCommentsSize": 50,
   "inspectSize": 30,
   "focusPollSeconds": 10,
+  "moderatorCacheSeconds": 60,
+  "emoteCacheSeconds": 600,
+  "ownedEmoteCacheSeconds": 300,
+  "memoryHours": 24,
+  "memoryShareSeconds": 3,
+  "rateLimitRetrySeconds": 5,
   "suspensionMaxDays": 365
 }

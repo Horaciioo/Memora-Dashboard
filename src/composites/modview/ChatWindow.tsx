@@ -8,6 +8,7 @@ import { ChatModesMenu } from '@/composites/modview/ChatModesMenu'
 import { ChatRow } from '@/composites/modview/ChatRow'
 import { ModWindow } from '@/composites/modview/ModWindow'
 import { PinnedBar } from '@/composites/modview/PinnedBar'
+import { PreferenceChoices } from '@/composites/modview/PreferenceChoices'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
 import { useLiveEmotes } from '@/core/hooks/data/lives/useLiveEmotes'
 import { useChatPause } from '@/core/hooks/interaction/state/useChatPause'
@@ -21,7 +22,6 @@ import {
   PAUSE_MODES,
   TOOLS_POSITIONS,
 } from '@/declarations/modview/registries'
-import { ICONS } from '@/declarations/ui/icons'
 import { MODVIEW_CHAT, MODVIEW_MODES } from '@/declarations/ui/variants'
 import type { ChatMessage, Chatter, ModViewState, ModViewTarget } from '@/types/modview'
 import { cn } from '@/utils/classnames'
@@ -97,7 +97,6 @@ export const ChatWindow = ({
   const activeModes = CHAT_MODES.keys.filter((mode) =>
     mode === 'slow' ? state.modes.slowSeconds !== null : state.modes[mode]
   ).length
-  const CheckIcon = ICONS.check
 
   return (
     <ModWindow
@@ -151,39 +150,20 @@ export const ChatWindow = ({
             </div>
           ))}
 
-          <p className={MODVIEW_MODES.section}>{MODVIEW_COPY.preferencesPause}</p>
-          {PAUSE_MODES.keys.map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              role="menuitemradio"
-              aria-checked={preferences.pauseMode === mode}
-              className={MODVIEW_MODES.row}
-              onClick={() => update({ pauseMode: mode })}
-            >
-              <span className={MODVIEW_MODES.rowLabel}>{PAUSE_MODES.label(mode)}</span>
-              {preferences.pauseMode === mode && (
-                <CheckIcon className={MODVIEW_MODES.rowIcon} aria-hidden="true" />
-              )}
-            </button>
-          ))}
-
-          <p className={MODVIEW_MODES.section}>{MODVIEW_COPY.preferencesTools}</p>
-          {TOOLS_POSITIONS.keys.map((position) => (
-            <button
-              key={position}
-              type="button"
-              role="menuitemradio"
-              aria-checked={preferences.toolsPosition === position}
-              className={MODVIEW_MODES.row}
-              onClick={() => update({ toolsPosition: position })}
-            >
-              <span className={MODVIEW_MODES.rowLabel}>{TOOLS_POSITIONS.label(position)}</span>
-              {preferences.toolsPosition === position && (
-                <CheckIcon className={MODVIEW_MODES.rowIcon} aria-hidden="true" />
-              )}
-            </button>
-          ))}
+          <PreferenceChoices
+            title={MODVIEW_COPY.preferencesPause}
+            keys={PAUSE_MODES.keys}
+            value={preferences.pauseMode}
+            label={PAUSE_MODES.label}
+            onPick={(mode) => update({ pauseMode: mode })}
+          />
+          <PreferenceChoices
+            title={MODVIEW_COPY.preferencesTools}
+            keys={TOOLS_POSITIONS.keys}
+            value={preferences.toolsPosition}
+            label={TOOLS_POSITIONS.label}
+            onPick={(position) => update({ toolsPosition: position })}
+          />
         </div>
       )}
 

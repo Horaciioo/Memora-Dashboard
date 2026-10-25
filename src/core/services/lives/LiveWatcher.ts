@@ -15,17 +15,16 @@ import { liveconLevelOf, logPlatformGesture } from '@/core/services/lives/Modera
 import { logEntryOf } from '@/core/lib/platforms/twitch/logEntry'
 import { forgetSampling, sampleViewers } from '@/core/services/lives/LiveSampler'
 import { sweepStalePresences } from '@/core/services/lives/PresenceService'
+import { soleChannel } from '@/core/services/platforms/ChannelService'
 import { readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_STREAM_EVENTS, LIVE_TOPICS } from '@/declarations/lives/topics'
 import { PLATFORM_NOTICE_COPY } from '@/declarations/platforms/copy'
 import { isTwitchConfigured } from '@/declarations/platforms/twitch'
-import {
-  CoordinationStatuses,
-  LivePlatforms,
-  LiveStatuses,
-  OPEN_LIVE_STATUSES,
-} from '@/utils/constants/lives'
+import { runtime } from '@/managers/infrastructure/Core/runtime'
+import { CoordinationStatuses, LivePlatforms, LiveStatuses } from '@/utils/constants/lives'
+import type { LiveStatusName } from '@/utils/constants/lives'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * One live being watched
@@ -34,6 +33,7 @@ import {
  * @property {string} holderId - Member whose token carries it
  * @property {string} broadcasterId - Channel
  * @property {ReturnType<typeof setTimeout> | null} offline - Pending end after an offline
+ * @property {LiveStatusName} status - Status read at the last sync
  */
 
 interface Watch {
@@ -41,6 +41,7 @@ interface Watch {
   holderId: string
   broadcasterId: string
   offline: ReturnType<typeof setTimeout> | null
+  status: LiveStatusName
 }
 
 // Survives dev hot reloads
@@ -49,6 +50,9 @@ const globalForWatcher = globalThis as unknown as {
     watches: Map<string, Watch>
     timer: ReturnType<typeof setInterval> | null
     livecon: Map<string, { level: number | null; until: number }>
+    // Members whose seat failed to carry a live
+    refused: Map<string, Set<string>>
+    syncing?: boolean
   }
 }
 
@@ -56,6 +60,8 @@ const watcher = (globalForWatcher.liveWatcher ??= {
   watches: new Map(),
   timer: null,
   livecon: new Map(),
+  refused: new Map(),
+  syncing: false,
 })
 
 /**
@@ -117,13 +123,10 @@ const handleSignal = async (liveId: string, signal: TwitchSignal): Promise<void>
       return
     case 'offline':
       if (!watch || watch.offline) return
-      watch.offline = setTimeout(
-        () => {
-          watch.offline = null
-          void moveLiveFromPlatform(liveId, LiveStatuses.Ended)
-        },
-        LIVE_SETTINGS.endGraceMinutes * 60 * 1000
-      )
+      watch.offline = setTimeout(() => {
+        watch.offline = null
+        void moveLiveFromPlatform(liveId, LiveStatuses.Ended)
+      }, LIVE_SETTINGS.endGraceMinutes * MINUTE_MS)
       return
   }
 }
@@ -137,19 +140,23 @@ const handleSignal = async (liveId: string, signal: TwitchSignal): Promise<void>
 const watch = async (live: {
   id: string
   youtuberId: string
+  status: LiveStatusName
   coordinatorIds: string[]
   announcedById: string | null
   members: { accountId: string }[]
   youtuber: { channels: { externalId: string }[] }
 }): Promise<void> => {
-  const broadcasterId = live.youtuber.channels[0]?.externalId
-  if (!broadcasterId) {
+  // Same rule as the Mod View, never a guess between channels
+  const channel = soleChannel(live.youtuber.channels)
+  if (!channel || channel === 'several') {
     await announceConnection(live.id, {
       state: 'disconnected',
-      notice: PLATFORM_NOTICE_COPY.noChannel,
+      notice: channel ? PLATFORM_NOTICE_COPY.severalChannels : PLATFORM_NOTICE_COPY.noChannel,
     })
     return
   }
+  const broadcasterId = channel.externalId
+  const refused = watcher.refused.get(live.id)
 
   // The coordinator first
   const candidates = [
@@ -163,6 +170,7 @@ const watch = async (live: {
   ]
   let holderId: string | null = null
   for (const candidate of candidates) {
+    if (refused?.has(candidate)) continue
     const seat = await readTwitchSeat(candidate).catch(() => null)
     if (seat?.ok) {
       holderId = candidate
@@ -212,8 +220,45 @@ const watch = async (live: {
     },
   })
 
-  watcher.watches.set(live.id, { session, holderId: holder, broadcasterId, offline: null })
+  watcher.watches.set(live.id, {
+    session,
+    holderId: holder,
+    broadcasterId,
+    offline: null,
+    status: live.status,
+  })
   session.start()
+}
+
+/**
+ * Read the stream of a watched live: room, viewer curve, and the start or end a lost signal missed
+ * @param {string} liveId - Live
+ * @param {Watch} current - Watch
+ * @return {Promise<void>} - Followed
+ */
+
+const followStream = async (liveId: string, current: Watch): Promise<void> => {
+  const stream = await pollLiveState({ liveId, ...current })
+  // No answer says nothing
+  if (stream === undefined) return
+
+  if (stream) {
+    await sampleViewers(liveId, stream.viewers)
+    // Started before the watch or while the signal was lost
+    if (current.status === LiveStatuses.Announced) {
+      await handleSignal(liveId, {
+        kind: 'online',
+        streamId: stream.id,
+        startedAt: stream.startedAt,
+      })
+    }
+    return
+  }
+
+  // Offline with no end pending, a restart lost the timer
+  if (current.status === LiveStatuses.Live && !current.offline) {
+    await handleSignal(liveId, { kind: 'offline' })
+  }
 }
 
 /**
@@ -222,15 +267,38 @@ const watch = async (live: {
  */
 
 export const syncLiveWatches = async (): Promise<void> => {
+  // One tick at a time
+  if (watcher.syncing) return
+  watcher.syncing = true
+
+  try {
+    await syncOnce()
+  } finally {
+    watcher.syncing = false
+  }
+}
+
+// One pass over the open lives
+const syncOnce = async (): Promise<void> => {
   const lives = await prisma.live.findMany({
     where: {
       platform: LivePlatforms.Twitch,
-      status: { in: [...OPEN_LIVE_STATUSES] },
-      plannedStartAt: { lte: new Date(Date.now() + LIVE_SETTINGS.watchLeadMinutes * 60 * 1000) },
+      // A running live stays watched, an announced one from 2 h before to 2 h after its start
+      OR: [
+        { status: LiveStatuses.Live },
+        {
+          status: LiveStatuses.Announced,
+          plannedStartAt: {
+            gte: new Date(Date.now() - LIVE_SETTINGS.watchTrailMinutes * MINUTE_MS),
+            lte: new Date(Date.now() + LIVE_SETTINGS.watchLeadMinutes * MINUTE_MS),
+          },
+        },
+      ],
     },
     select: {
       id: true,
       youtuberId: true,
+      status: true,
       coordinations: {
         where: { status: CoordinationStatuses.Accepted },
         select: { accountId: true },
@@ -243,32 +311,87 @@ export const syncLiveWatches = async (): Promise<void> => {
         },
       },
     },
+    // Newest first when over the cap
+    orderBy: { plannedStartAt: 'desc' },
     take: LIVE_SETTINGS.maxOpenLives,
   })
-  const open = new Set(lives.map((live) => live.id))
+  const open = new Map(lives.map((live) => [live.id, live]))
 
-  // Closed lives let go of their session
   for (const [liveId, current] of watcher.watches) {
-    if (open.has(liveId)) continue
-    current.session.stop()
-    if (current.offline) clearTimeout(current.offline)
-    watcher.watches.delete(liveId)
-    forgetSampling(liveId)
-    forgetLiveState(liveId)
-    await forgetLive(liveId)
-    await closeRoom(liveId)
-  }
+    const live = open.get(liveId)
 
-  // Viewer curve of the lives on air
-  for (const [liveId, current] of watcher.watches) {
-    void sampleViewers({ liveId, ...current }).catch(() => null)
-    void pollLiveState({ liveId, ...current }).catch(() => null)
+    // Closed lives let go of their session
+    if (!live) {
+      current.session.stop()
+      if (current.offline) clearTimeout(current.offline)
+      watcher.watches.delete(liveId)
+      watcher.refused.delete(liveId)
+      forgetSampling(liveId)
+      forgetLiveState(liveId)
+      await forgetLive(liveId)
+      await closeRoom(liveId)
+      continue
+    }
+
+    // A seat that gave up hands the live to the next member below
+    if (current.session.isStopped) {
+      if (current.offline) clearTimeout(current.offline)
+      watcher.watches.delete(liveId)
+      watcher.refused.set(
+        liveId,
+        new Set([...(watcher.refused.get(liveId) ?? []), current.holderId])
+      )
+      continue
+    }
+
+    current.status = live.status as LiveStatusName
+    void followStream(liveId, current).catch(() => null)
   }
 
   for (const live of lives) {
     if (watcher.watches.has(live.id)) continue
-    await watch({ ...live, coordinatorIds: live.coordinations.map((seat) => seat.accountId) })
+    await watch({
+      ...live,
+      status: live.status as LiveStatusName,
+      coordinatorIds: live.coordinations.map((seat) => seat.accountId),
+    })
   }
+}
+
+// This instance, for the watching lease
+const INSTANCE_ID = crypto.randomUUID()
+
+/**
+ * Whether this instance watches the lives: with several instances, only the one holding the
+ * Redis lease does, the lease renewed at each pass. Without Redis, the only instance does
+ * @return {Promise<boolean>} - Lease held
+ */
+
+const holdsWatchLease = async (): Promise<boolean> => {
+  const container = runtime()
+  const cache = container?.redis.isReady() ? container.redis.cache : null
+  if (!cache) return true
+
+  const key = `${container!.redis.prefix}${LIVE_TOPICS.watchLease}`
+  const ttl = LIVE_SETTINGS.watchSyncSeconds * 3
+  if ((await cache.set(key, INSTANCE_ID, 'EX', ttl, 'NX')) === 'OK') return true
+  if ((await cache.get(key)) !== INSTANCE_ID) return false
+
+  await cache.expire(key, ttl)
+  return true
+}
+
+/**
+ * Drop every session and pending end, the watching moved to another instance
+ * @return {void}
+ */
+
+const releaseWatches = (): void => {
+  for (const current of watcher.watches.values()) {
+    if (current.offline) clearTimeout(current.offline)
+    current.session.stop()
+  }
+  watcher.watches.clear()
 }
 
 /**
@@ -281,16 +404,20 @@ export const startLiveWatcher = (): void => {
   // A build never holds platform sessions
   if (process.env.NEXT_PHASE === 'phase-production-build') return
 
-  const tick = () => {
-    void syncLiveWatches().catch((error: unknown) =>
+  const tick = async () => {
+    if (!(await holdsWatchLease())) return releaseWatches()
+
+    await syncLiveWatches()
+    // Silent tabs closed at their last beat
+    await sweepStalePresences().catch(() => null)
+  }
+  const run = () =>
+    void tick().catch((error: unknown) =>
       logger.warn('[watcher] sync failed', error instanceof Error ? error.message : '')
     )
-    // Silent tabs closed at their last beat
-    void sweepStalePresences().catch(() => null)
-  }
 
-  tick()
-  watcher.timer = setInterval(tick, LIVE_SETTINGS.watchSyncSeconds * 1000)
+  run()
+  watcher.timer = setInterval(run, LIVE_SETTINGS.watchSyncSeconds * 1000)
   logger.info('[watcher] watching open Twitch lives')
 }
 
@@ -302,6 +429,5 @@ export const startLiveWatcher = (): void => {
 export const stopLiveWatcher = (): void => {
   if (watcher.timer) clearInterval(watcher.timer)
   watcher.timer = null
-  for (const current of watcher.watches.values()) current.session.stop()
-  watcher.watches.clear()
+  releaseWatches()
 }

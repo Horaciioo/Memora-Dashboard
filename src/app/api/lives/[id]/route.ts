@@ -5,6 +5,7 @@ import { recordEvent } from '@/core/services/system/ActivityService'
 import { LIVE_STATUS_REGISTRY } from '@/declarations/lives/registries'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
+import { LiveStatuses } from '@/utils/constants/lives'
 import type { LiveStatusName } from '@/utils/constants/lives'
 
 export const GET = createProtectedRoute({
@@ -17,16 +18,17 @@ export const GET = createProtectedRoute({
 export const PATCH = createProtectedRoute({
   permission: Permissions.LiveRead,
   descriptor: { summary: 'Start, end or cancel a live', tags: ['lives'] },
-  handler: async ({ params, raw, session, scope }) => {
+  handler: async ({ params, raw, session, access, scope }) => {
     const status = String(raw.status ?? '')
     if (!LIVE_STATUS_REGISTRY.has(status)) {
       throw invalidInput([{ field: 'status', message: FORM_COPY.notAnOption }])
     }
 
-    // Announcers move a live by hand
+    // Announcers move a live, coordinators only start or end it
     const perimeter = await scope()
     const live = await readLive(params.id, perimeter, session.id, session.permissions)
-    if (!session.permissions.includes(Permissions.LiveAnnounce) && !live.isCoordinating) {
+    const canAnnounce = access.can(Permissions.LiveAnnounce)
+    if (!canAnnounce && (!live.isCoordinating || status === LiveStatuses.Cancelled)) {
       throw forbidden()
     }
 

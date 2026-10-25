@@ -10,6 +10,9 @@ import {
 import { readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
 import type { PinnedMessage } from '@/types/modview'
 
+// Stream as Twitch answers it
+export type LiveStream = NonNullable<Awaited<ReturnType<typeof readStream>>>
+
 // What each live last told its room
 const lastTold = new Map<
   string,
@@ -36,16 +39,16 @@ const pinKey = (pin: PinnedMessage | null): string | null =>
  * @param {string} input.liveId - Live
  * @param {string} input.holderId - Member whose token reads
  * @param {string} input.broadcasterId - Channel
- * @return {Promise<void>} - Told
+ * @return {Promise<LiveStream | null | undefined>} - Stream read, null offline, undefined unanswered
  */
 
 export const pollLiveState = async (input: {
   liveId: string
   holderId: string
   broadcasterId: string
-}): Promise<void> => {
+}): Promise<LiveStream | null | undefined> => {
   const seat = await readTwitchSeat(input.holderId).catch(() => null)
-  if (!seat?.ok) return
+  if (!seat?.ok) return undefined
 
   const holder = {
     accessToken: seat.accessToken,
@@ -93,6 +96,8 @@ export const pollLiveState = async (input: {
   }
 
   lastTold.set(input.liveId, { viewers, pin: key, category, tags: tagsKey })
+
+  return stream
 }
 
 /**

@@ -112,6 +112,13 @@ export const TWITCH_SUBSCRIPTIONS: readonly TwitchSubscription[] = [
   { type: 'stream.offline', version: '1', holder: 'none' },
 ]
 
+// Revocations that mean the watching seat lost its rights
+export const TWITCH_SEAT_REVOCATIONS: readonly string[] = [
+  'authorization_revoked',
+  'moderator_removed',
+  'user_removed',
+]
+
 /**
  * Limits of the platform
  * @type {Record<string, number>}

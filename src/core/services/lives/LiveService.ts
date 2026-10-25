@@ -24,14 +24,23 @@ import { liveStartedKey } from '@/declarations/academy/welcome'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
 import { FORM_SETTINGS, LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_FIELD_COPY, LIVE_INSTRUCTIONS_DEFAULT } from '@/declarations/lives/copy'
-import { LIVE_FUNCTIONS, LIVE_PLATFORMS_SOON } from '@/declarations/lives/registries'
+import {
+  DISCORD_FUNCTIONS,
+  LIVE_FUNCTIONS,
+  LIVE_PLATFORMS_SOON,
+} from '@/declarations/lives/registries'
 import { COORDINATOR_FUNCTION } from '@/declarations/reference/fixed'
 import { isIconName } from '@/declarations/ui/icons'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import type { LiveBeacon, LivePerson, LiveView } from '@/types/lives'
 import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
-import { ADMIN_ROLES, GONE_MEMBER_STATUSES, LEADERSHIP_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
+import {
+  ADMIN_ROLES,
+  GONE_MEMBER_STATUSES,
+  LEADERSHIP_ROLES,
+  MemberRoles,
+} from '@/utils/constants/hierarchy'
 import {
   CoordinationStatuses,
   LivePlatforms,
@@ -41,9 +50,9 @@ import {
 import type { LivePlatformName, LiveStatusName } from '@/utils/constants/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { Permissions } from '@/utils/constants/permissions'
-import { AbsenceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
+import { HOUR_MS, MINUTE_MS } from '@/utils/constants/time'
 
 // Roles that run a live on the floor
 const RESPONSABLE_ROLES: string[] = LEADERSHIP_ROLES
@@ -98,10 +107,14 @@ const toPerson = (
 
 const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): LiveView => {
   const entry = row.liveconEntries[0]
-  const coordinatorIds = activeCoordinatorIds(row.coordinations)
+  const coordinatorIds = activeCoordinatorIds(
+    row.coordinations,
+    new Date(),
+    row.status as LiveStatusName
+  )
   const mySeat = row.calendarEvent?.attendances.find((seat) => seat.accountId === viewerId)
 
-  const prepMs = LIVE_SETTINGS.prepMinutes * 60_000
+  const prepMs = LIVE_SETTINGS.prepMinutes * MINUTE_MS
 
   return {
     id: row.id,
@@ -182,9 +195,7 @@ const absentOver = async (accountIds: string[], startsAt: Date, endsAt: Date) =>
   const rows = await prisma.absence.findMany({
     where: {
       accountId: { in: accountIds },
-      status: AbsenceStatuses.Approved,
-      startDate: { lte: endsAt },
-      endDate: { gte: startsAt },
+      ...activeAbsenceFilter(startsAt, endsAt),
     },
     select: { accountId: true },
   })
@@ -248,9 +259,16 @@ const convene = async ({
  * @return {Prisma.AccountWhereInput} - Account filter
  */
 
+// Discord only, no live trade
+const DISCORD_ONLY: Prisma.AccountWhereInput = {
+  functions: { some: { jobFunction: { name: { in: DISCORD_FUNCTIONS } } } },
+  NOT: { functions: { some: { jobFunction: { name: { in: [...LIVE_FUNCTIONS] } } } } },
+}
+
 const holderWhere = (youtuberId?: string): Prisma.AccountWhereInput => ({
   status: { notIn: GONE_MEMBER_STATUSES },
   role: { not: MemberRoles.Junior },
+  NOT: DISCORD_ONLY,
   functions: { some: { jobFunction: { name: COORDINATOR_FUNCTION } } },
   ...(youtuberId && { youtubers: { some: { id: youtuberId } } }),
 })
@@ -268,6 +286,7 @@ const coordinatorWhere = (youtuberId?: string): Prisma.AccountWhereInput => ({
     { role: { in: ADMIN_ROLES } },
     {
       role: MemberRoles.Responsable,
+      NOT: DISCORD_ONLY,
       ...(youtuberId && { youtubers: { some: { id: youtuberId } } }),
     },
   ],
@@ -320,8 +339,9 @@ export const coordinatorOptions = async (
       image: row.avatarUrl,
       group: holds(row) ? LIVE_FIELD_COPY.coordinatorGroup : ROLE_REGISTRY.get(row.role).plural,
       // An Admin is proposed whichever creator is picked
-      owners:
-        ADMIN_ROLES.includes(row.role) ? undefined : row.youtubers.map((youtuber) => youtuber.id),
+      owners: ADMIN_ROLES.includes(row.role)
+        ? undefined
+        : row.youtubers.map((youtuber) => youtuber.id),
       hint: toMemberFunctions(row.functions)[0]?.label ?? ROLE_REGISTRY.label(row.role),
     }))
 }
@@ -708,6 +728,12 @@ export const syncLiveWithEntry = async (
  */
 
 export const cancelLivesOfEntries = async (entryIds: string[]): Promise<void> => {
+  // A running live keeps its roll-call
+  const running = await prisma.live.count({
+    where: { calendarEventId: { in: entryIds }, status: LiveStatuses.Live },
+  })
+  if (running > 0) throw conflict(LIVE_FIELD_COPY.runningEntry)
+
   await prisma.live.updateMany({
     where: { calendarEventId: { in: entryIds }, status: LiveStatuses.Announced },
     data: { status: LiveStatuses.Cancelled },
@@ -750,7 +776,7 @@ export const listRecentLives = async (
   viewerId: string,
   held: PermissionName[]
 ): Promise<LiveView[]> => {
-  const since = new Date(Date.now() - LIVE_SETTINGS.recentHours * 3_600_000)
+  const since = new Date(Date.now() - LIVE_SETTINGS.recentHours * HOUR_MS)
   const rows = await prisma.live.findMany({
     where: scopedWhere('live', scope, { status: LiveStatuses.Ended, endedAt: { gte: since } }),
     include: LIVE_SHAPE,
@@ -759,6 +785,25 @@ export const listRecentLives = async (
   })
 
   return rows.map((row) => toView(row, viewerId, held))
+}
+
+/**
+ * Give the calendar entry back the planned end the closing replaced
+ * @param {string} id - Live identifier
+ * @return {Promise<void>} - Restored
+ */
+
+const restorePlannedEnd = async (id: string): Promise<void> => {
+  const row = await prisma.live.findUnique({
+    where: { id },
+    select: { calendarEventId: true, plannedEndAt: true },
+  })
+  if (!row?.calendarEventId || !row.plannedEndAt) return
+
+  await prisma.calendarEvent.update({
+    where: { id: row.calendarEventId },
+    data: { endsAt: row.plannedEndAt },
+  })
 }
 
 /**
@@ -779,10 +824,14 @@ export const reopenLive = async (
   const live = await readLive(id, scope, viewerId, held)
   if (!live.canReopen) throw forbidden()
 
-  await prisma.live.update({
-    where: { id },
+  // Only an ended live reopens
+  const reopened = await prisma.live.updateMany({
+    where: { id, status: LiveStatuses.Ended },
     data: { status: LiveStatuses.Live, endedAt: null },
   })
+  if (reopened.count === 0) throw conflict()
+  await restorePlannedEnd(id)
+  await syncJuniorLives(live.members.map((member) => member.id))
   await publishLive(LIVE_TOPICS.lives, {
     liveId: id,
     youtuberId: live.youtuber.id,
@@ -846,6 +895,23 @@ export const readLive = async (
 }
 
 /**
+ * Status of one live, without the rest a heartbeat never reads
+ * @param {string} id - Live identifier
+ * @param {AccessScope} scope - Creator perimeter
+ * @return {Promise<LiveStatusName>} - Status
+ */
+
+export const readLiveStatus = async (id: string, scope: AccessScope): Promise<LiveStatusName> => {
+  const row = await prisma.live.findFirst({
+    where: scopedWhere('live', scope, { id }),
+    select: { status: true },
+  })
+  if (!row) throw notFound()
+
+  return row.status as LiveStatusName
+}
+
+/**
  * Read what the rail and the home show
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} viewerId - Signed-in member
@@ -904,6 +970,29 @@ export const readBeacon = async (
   }
 }
 
+// Calendar follows the real end
+const syncEntryWithStatus = async (
+  entryId: string | null,
+  next: LiveStatusName,
+  now: Date
+): Promise<void> => {
+  if (!entryId) return
+
+  // Cancelled: no roll-call left
+  if (next === LiveStatuses.Cancelled) {
+    await prisma.calendarEvent.update({
+      where: { id: entryId },
+      data: { rollCall: false, remindAt: null },
+    })
+  }
+  if (next === LiveStatuses.Ended) {
+    await prisma.calendarEvent.updateMany({
+      where: { id: entryId, startsAt: { lt: now } },
+      data: { endsAt: now },
+    })
+  }
+}
+
 /**
  * Move a live to its next status
  * @param {Object} live - Live row
@@ -918,6 +1007,7 @@ const applyLiveStatus = async (
     id: string
     youtuberId: string
     title: string
+    calendarEventId: string | null
     status: LiveStatusName
     coordinations: CoordinationSeat[]
     members: { accountId: string }[]
@@ -935,9 +1025,10 @@ const applyLiveStatus = async (
   }
   if (!allowed[live.status].includes(next)) throw conflict()
 
+  // Only from the status read
   const now = new Date()
-  await prisma.live.update({
-    where: { id: live.id },
+  const moved = await prisma.live.updateMany({
+    where: { id: live.id, status: live.status },
     data: {
       status: next,
       startedAt: next === LiveStatuses.Live ? now : undefined,
@@ -945,6 +1036,8 @@ const applyLiveStatus = async (
       ...(streamExternalId ? { streamExternalId } : {}),
     },
   })
+  if (moved.count === 0) throw conflict()
+  await syncEntryWithStatus(live.calendarEventId, next, now)
 
   await publishLive(LIVE_TOPICS.lives, {
     liveId: live.id,

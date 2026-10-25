@@ -3,9 +3,16 @@ import type { Chatter, ModViewIntent } from '@/types/modview'
 import { findChatCommand } from '@/declarations/modview/commands'
 import { MODVIEW_DEFAULTS } from '@/declarations/modview/registries'
 import { SanctionKinds } from '@/utils/constants/moderation'
+import { DAY_SECONDS, HOUR_SECONDS, WEEK_SECONDS } from '@/utils/constants/time'
 
 // Seconds per duration unit
-const UNITS: Record<string, number> = { s: 1, m: 60, h: 3600, d: 86_400, w: 604_800 }
+const UNITS: Record<string, number> = {
+  s: 1,
+  m: 60,
+  h: HOUR_SECONDS,
+  d: DAY_SECONDS,
+  w: WEEK_SECONDS,
+}
 
 // Largest unit first
 const UNITS_DESC = Object.entries(UNITS).sort(([, a], [, b]) => b - a)
@@ -176,6 +183,28 @@ export const rememberRung = (
   if (applied.includes(rung)) return memory
 
   return { ...memory, [chatterId]: { ...viewer, [offenseId]: [...applied, rung] } }
+}
+
+/**
+ * Forget a rung Twitch refused
+ * @param {PanelMemory} memory - Rungs applied
+ * @param {string} chatterId - Viewer
+ * @param {string} offenseId - Offence
+ * @param {number} rung - Rung refused
+ * @return {PanelMemory} - Memory
+ */
+
+export const forgetRung = (
+  memory: PanelMemory,
+  chatterId: string,
+  offenseId: string,
+  rung: number
+): PanelMemory => {
+  const viewer = memory[chatterId] ?? {}
+  const applied = viewer[offenseId] ?? []
+  if (!applied.includes(rung)) return memory
+
+  return { ...memory, [chatterId]: { ...viewer, [offenseId]: applied.filter((n) => n !== rung) } }
 }
 
 /**
