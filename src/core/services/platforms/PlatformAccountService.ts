@@ -186,7 +186,7 @@ export const unlinkPlatform = async (
 // Memora rank by hierarchy level
 const RANK_OF_ROLE: Partial<Record<MemberRoleName, MemoraRank>> = {
   [MemberRoles.Admin]: 'admin',
-  [MemberRoles.Employe]: 'admin',
+  [MemberRoles.Employe]: 'responsable',
   [MemberRoles.Responsable]: 'responsable',
   [MemberRoles.Moderateur]: 'moderator',
 }

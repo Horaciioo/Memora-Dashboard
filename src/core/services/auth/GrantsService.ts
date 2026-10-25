@@ -7,7 +7,7 @@ import type { PermissionGroup, PermissionOverwrite } from '@/core/lib/permission
 import { GRANT_ADDITIONS } from '@/declarations/access/grants'
 import { ACCESS_CATEGORY_REGISTRY } from '@/declarations/access/categories'
 import { FLOOR_ROLE, ROLE_PRESETS } from '@/declarations/access/roles'
-import { ADMIN_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
+import { MemberRoles } from '@/utils/constants/hierarchy'
 import type { AccessCategoryName, MemberRoleName } from '@/utils/constants/hierarchy'
 import { PermissionEffects } from '@/utils/constants/workflow'
 import type { FunctionKindName } from '@/utils/constants/workflow'
@@ -22,13 +22,13 @@ export type HolderAccount = Account & { functions: { functionId: string }[] }
 let synced = false
 
 /**
- * Levels a batch aimed at one role lands on, the employee follows the admin
+ * Levels a batch aimed at one role lands on, the employee follows the Responsable
  * @param {MemberRoleName} role - Level the batch names
  * @return {MemberRoleName[]} - Levels receiving it
  */
 
 const withEmployee = (role: MemberRoleName): MemberRoleName[] =>
-  role === MemberRoles.Admin ? [...ADMIN_ROLES] : [role]
+  role === MemberRoles.Responsable ? [MemberRoles.Responsable, MemberRoles.Employe] : [role]
 
 /**
  * Land every grant batch the database has not seen yet

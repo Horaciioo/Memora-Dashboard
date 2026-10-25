@@ -85,8 +85,8 @@ const readBaseScope = async (
 ): Promise<AccessScope> => {
   const active = await readActiveCreator()
 
-  // An administrator always stays global
-  if (access.isAdmin) return { isGlobal: true, youtuberIds: [], activeYoutuberId: active }
+  // An administrator or an employee always stays global
+  if (access.isGlobal) return { isGlobal: true, youtuberIds: [], activeYoutuberId: active }
 
   if (!access.isResponsable) {
     return { isGlobal: false, youtuberIds: viewer.youtuberIds, activeYoutuberId: null }

@@ -36,7 +36,7 @@ import type { FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import type { LiveBeacon, LivePerson, LiveView } from '@/types/lives'
 import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
 import {
-  ADMIN_ROLES,
+  GLOBAL_ROLES,
   GONE_MEMBER_STATUSES,
   LEADERSHIP_ROLES,
   MemberRoles,
@@ -283,7 +283,7 @@ const coordinatorWhere = (youtuberId?: string): Prisma.AccountWhereInput => ({
   status: { notIn: GONE_MEMBER_STATUSES },
   OR: [
     holderWhere(youtuberId),
-    { role: { in: ADMIN_ROLES } },
+    { role: { in: GLOBAL_ROLES } },
     {
       role: MemberRoles.Responsable,
       NOT: DISCORD_ONLY,
@@ -323,7 +323,7 @@ export const coordinatorOptions = async (
 
   // An Admin stays an Admin, the function never moves one up
   const holds = (row: (typeof rows)[number]) =>
-    !ADMIN_ROLES.includes(row.role) &&
+    !GLOBAL_ROLES.includes(row.role) &&
     row.functions.some((held) => held.jobFunction.name === COORDINATOR_FUNCTION)
   const rankOf = (row: (typeof rows)[number]) =>
     holds(row) ? 0 : (COORDINATOR_RANKS[row.role] ?? 3)
@@ -339,7 +339,7 @@ export const coordinatorOptions = async (
       image: row.avatarUrl,
       group: holds(row) ? LIVE_FIELD_COPY.coordinatorGroup : ROLE_REGISTRY.get(row.role).plural,
       // An Admin is proposed whichever creator is picked
-      owners: ADMIN_ROLES.includes(row.role)
+      owners: GLOBAL_ROLES.includes(row.role)
         ? undefined
         : row.youtubers.map((youtuber) => youtuber.id),
       hint: toMemberFunctions(row.functions)[0]?.label ?? ROLE_REGISTRY.label(row.role),
@@ -365,7 +365,7 @@ const coordinatorPicks = async (coordinators: FieldOption[]): Promise<Record<str
         AND: [
           holderWhere(youtuberId),
           // Admins are never asked on their own
-          { role: { notIn: ADMIN_ROLES } },
+          { role: { notIn: GLOBAL_ROLES } },
           { absences: { none: activeAbsenceFilter() } },
         ],
       },

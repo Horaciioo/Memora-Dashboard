@@ -1,5 +1,5 @@
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
-import { ADMIN_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
+import { ADMIN_ROLES, GLOBAL_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
 import { Permissions, hasEveryPermission, hasPermission } from '@/utils/constants/permissions'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 
@@ -29,8 +29,9 @@ export const resolvePermissions = (session: SessionUser | null): PermissionHelpe
     can: (permission) => isRoot || hasPermission(permissions, permission),
     canAny: (list) => isRoot || hasPermission(permissions, list),
     canAll: (list) => isRoot || hasEveryPermission(permissions, list),
-    // The employee holds every right but the system
     isAdmin: isRoot || (session !== null && ADMIN_ROLES.includes(session.role)),
+    // The employee holds the Responsable rights over every creator
+    isGlobal: isRoot || (session !== null && GLOBAL_ROLES.includes(session.role)),
     isSystem: isRoot || session?.role === MemberRoles.Admin,
     isResponsable: isLead,
     isRoot,

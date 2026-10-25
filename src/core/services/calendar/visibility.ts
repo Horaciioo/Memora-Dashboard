@@ -36,7 +36,7 @@ export const readCalendarScope = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<AccessScope> =>
-  access.isAdmin
+  access.isGlobal
     ? { isGlobal: true, youtuberIds: [], activeYoutuberId: null }
     : {
         isGlobal: false,
@@ -69,12 +69,13 @@ const allowedVisibilities = (access: PermissionHelpers): EventVisibilityName[] =
     : [EventVisibilities.Everyone]
 }
 
-// Team entries of the creators a Responsable leads
+// Team entries of the creators a Responsable leads, every team for a global reader
 const leadershipClauses = async (
   access: PermissionHelpers,
   scope: AccessScope
 ): Promise<Prisma.CalendarEventWhereInput[]> => {
-  if (!access.isResponsable || scope.isGlobal) return []
+  if (!access.isResponsable) return []
+  if (scope.isGlobal) return [{ visibility: EventVisibilities.Team }]
 
   const teams = await prisma.team.findMany({
     where: { youtuberId: { in: scope.youtuberIds } },
