@@ -6,12 +6,14 @@ import { formatNumber } from '@/utils/format/numbers'
  * @typedef {Object} ConsoleMetric
  * @property {string} label - What is counted
  * @property {number | string} value - Count
+ * @property {string} [max] - Ceiling the value is read against, shown small after it
  * @property {string} [hint] - Supporting line
  */
 
 export interface ConsoleMetric {
   label: string
   value: number | string
+  max?: string
   hint?: string
 }
 
@@ -32,6 +34,7 @@ export const ConsoleMetrics = ({ metrics }: ConsoleMetricsProps) => (
         <span className={CONSOLE_BLOCK.tileLabel}>{metric.label}</span>
         <span className={CONSOLE_BLOCK.tileValue}>
           {typeof metric.value === 'number' ? formatNumber(metric.value) : metric.value}
+          {metric.max && <span className={CONSOLE_BLOCK.tileMax}>{` / ${metric.max}`}</span>}
         </span>
         {metric.hint && <span className={CONSOLE_BLOCK.tileHint}>{metric.hint}</span>}
       </div>

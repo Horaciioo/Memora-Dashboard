@@ -60,3 +60,10 @@ export const DAY_MS = DAY_SECONDS * SECOND_MS
  */
 
 export const WEEK_MS = WEEK_SECONDS * SECOND_MS
+
+/**
+ * Microseconds in a millisecond
+ * @type {number}
+ */
+
+export const MICROSECONDS_PER_MS = 1000

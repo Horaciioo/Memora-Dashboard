@@ -51,7 +51,7 @@ export const JOURNAL_LIMITS = {
  */
 
 export const JOURNAL_COPY = {
-  title: 'Journaux',
+  title: 'Logs',
   searchPlaceholder: 'Rechercher un texte, une adresse, une route…',
   searchLabel: 'Recherche',
   levelLabel: 'Niveau',

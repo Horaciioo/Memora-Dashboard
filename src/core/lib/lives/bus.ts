@@ -93,3 +93,11 @@ export const subscribeLive = (topic: string, listener: (payload: unknown) => voi
     bus.local.off(topic, listener)
   }
 }
+
+/**
+ * Count the listeners open on this instance, one per connected reader
+ * @return {number} - Open listeners
+ */
+
+export const liveListenerCount = (): number =>
+  bus.local.eventNames().reduce((total, topic) => total + bus.local.listenerCount(topic), 0)

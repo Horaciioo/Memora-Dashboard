@@ -79,6 +79,7 @@ import {
   LiveconCalmGlyph,
   LiveconWatchGlyph,
   LiveconCrisisGlyph,
+  EmployeGlyph,
 } from '@/components/elements/display/glyphs/BrandGlyphs'
 import {
   AddGlyph,
@@ -285,6 +286,8 @@ export const ICONS = {
   flame: FlameGlyph,
   crown: CrownGlyph,
   briefcase: BriefcaseGlyph,
+  // Three-tone briefcase of the Employé role
+  employee: EmployeGlyph,
   // Same flame as the Responsable role
   legacy: ResponsableGlyph,
   // One per fixed function

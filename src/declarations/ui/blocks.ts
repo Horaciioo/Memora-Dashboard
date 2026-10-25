@@ -512,6 +512,7 @@ export const CONSOLE_BLOCK = {
   tile: 'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4',
   tileLabel: 'text-xs font-medium tracking-wide text-[var(--color-ink-subtle)] uppercase',
   tileValue: 'font-[family-name:var(--font-display)] text-2xl leading-none',
+  tileMax: 'font-sans text-sm text-[var(--color-ink-subtle)]',
   tileHint: 'text-xs text-[var(--color-ink-subtle)]',
   rows: 'flex flex-col divide-y divide-[var(--color-border)]',
   row: 'flex flex-wrap items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0',

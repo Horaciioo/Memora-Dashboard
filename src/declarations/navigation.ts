@@ -64,10 +64,12 @@ export const ROUTES = {
   settingsRecord: (section: string, id: string) => `/configuration/${section}/${id}`,
   system: '/systeme',
   storage: '/systeme/stockage',
-  journal: '/systeme/journaux',
+  journal: '/systeme/logs',
   queues: '/systeme/files',
   probes: '/systeme/sondes',
   analytics: '/systeme/activite',
+  health: '/systeme/sante',
+  privileged: '/systeme/employes',
 } as const
 
 // The four faces of the rail
@@ -460,10 +462,12 @@ export const SEGMENT_LABELS: Record<string, string> = {
   acces: 'Accès',
   systeme: 'Système',
   stockage: 'Stockage',
-  journaux: 'Journaux',
+  logs: 'Logs',
   files: 'Files de jobs',
   sondes: 'Sondes',
   activite: 'Activité',
+  sante: 'Santé',
+  employes: 'Employés',
   apercu: 'Aperçu',
   bilan: 'Bilan',
   'bilan-createur': 'Bilan',
