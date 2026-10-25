@@ -93,6 +93,7 @@ export const RECRUITMENT_COPY = {
   instructionsEdit: 'Modifier les consignes',
   instructionsEmptyTitle: 'Aucune consigne',
   instructionsEmptyDescription: 'Écris ce que les recruteurs doivent savoir avant les entretiens.',
+  instructionsNone: 'Aucune consigne n’a été communiquée pour le moment.',
   instructionsLocked: 'Seuls les responsables écrivent les consignes.',
 } as const
 
@@ -186,6 +187,7 @@ export const PLANNING_COPY = {
   restore: 'Restaurer l’annonce générique',
   copyImage: 'Copier l’image',
   textCopied: 'Annonce copiée',
+  announcementCopied: 'Annonce et image copiées',
   imageCopied: 'Image copiée, colle-la sous l’annonce',
   imageFailed: 'Image impossible à copier',
   previewTitle: 'Annonce',

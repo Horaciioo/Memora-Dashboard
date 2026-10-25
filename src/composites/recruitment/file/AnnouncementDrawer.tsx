@@ -62,6 +62,7 @@ export const AnnouncementDrawer = ({
   const { notify } = useNotifications()
   const { session } = useAuthContext()
   const copyText = useCopy(PLANNING_COPY.textCopied)
+  const hasPicture = withImage && plan.count > 0
   const raw = toRaw(text, entries)
   const unknown = unknownTokens(text, entries)
 
@@ -76,6 +77,23 @@ export const AnnouncementDrawer = ({
     }
   }
 
+  // Wording and picture in one clipboard item, wording alone when the picture fails
+  const copyAnnouncement = async () => {
+    if (!hasPicture) return copyText(raw)
+
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'text/plain': new Blob([raw], { type: 'text/plain' }),
+          'image/png': renderPlanningPng(plan),
+        }),
+      ])
+      notify({ tone: 'success', title: PLANNING_COPY.announcementCopied })
+    } catch {
+      await copyText(raw)
+    }
+  }
+
   return (
     <Drawer
       open={open}
@@ -85,7 +103,7 @@ export const AnnouncementDrawer = ({
       title={PLANNING_COPY.previewTitle}
       footer={
         <div className={ANNOUNCEMENT_DRAWER.actions}>
-          <Button icon="copy" variant="primary" onClick={() => void copyText(raw)}>
+          <Button icon="copy" variant="primary" onClick={() => void copyAnnouncement()}>
             {PLANNING_COPY.copyText}
           </Button>
           <Button
