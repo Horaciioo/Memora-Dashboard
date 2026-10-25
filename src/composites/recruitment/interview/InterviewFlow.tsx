@@ -30,7 +30,6 @@ import { cn } from '@/utils/classnames'
 import { INTERVIEW, QUESTION_BODY, TOUR_CHAT } from '@/declarations/ui/variants'
 import type { RecruitmentDetail, RecruitmentFields, RecruitmentRights } from '@/types/recruitment'
 
-
 /**
  * The interview as pages: an introduction, then one page per part, then the deliberation
  * @param {Object} props - Component props
