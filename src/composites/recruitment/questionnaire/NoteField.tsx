@@ -6,6 +6,7 @@ import { ICONS } from '@/declarations/ui/icons'
 import { QUESTIONNAIRE_COPY } from '@/declarations/recruitment/questionnaireCopy'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { INTERVIEW } from '@/declarations/ui/variants'
+import { isTouchDevice } from '@/core/lib/ui/touch'
 
 // Wait after the last key before saving
 const SAVE_DELAY_MS = 700
@@ -85,7 +86,7 @@ export const NoteField = ({ value, disabled, onSave }: NoteFieldProps) => {
         <Cross className="size-4" aria-hidden="true" />
       </button>
       <textarea
-        autoFocus={value.length === 0}
+        autoFocus={value.length === 0 && !isTouchDevice()}
         value={draft}
         disabled={disabled}
         maxLength={FORM_SETTINGS.markdownMaxLength}

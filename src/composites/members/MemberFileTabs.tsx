@@ -874,7 +874,8 @@ export const MemberFileTabs = ({
 
   return (
     <div className={MEMBER_FILE.layout}>
-      <div className={MEMBER_FILE.railStack}>
+      {/* On a phone the identity box belongs to the overview alone */}
+      <div className={cn(MEMBER_FILE.railStack, tab !== 'overview' && 'hidden md:flex')}>
         {rail}
         {adminState && !admin.state.isGone && (
           <Button

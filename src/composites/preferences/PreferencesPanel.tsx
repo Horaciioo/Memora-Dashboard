@@ -59,6 +59,7 @@ export const PreferencesPanel = ({
   const { profile, isSaving, issues, save } = useProfile(initialProfile)
   const { factor } = useSeal()
   const [draft, setDraft] = useState<FormValues>(initialProfile.values)
+  const [tab, setTab] = useState('information')
 
   const change = (name: string, value: FieldValue) =>
     setDraft((current) => ({ ...current, [name]: value }))
@@ -172,9 +173,14 @@ export const PreferencesPanel = ({
 
   return (
     <div className={PREFERENCE_STYLES.layout}>
-      <ProfileCard profile={profile} />
+      {/* On a phone the identity box belongs to the first tab alone */}
+      <div className={tab === 'information' ? 'contents' : 'hidden md:contents'}>
+        <ProfileCard profile={profile} />
+      </div>
       <FileTabs
         label={PREFERENCES_COPY.title}
+        value={tab}
+        onChange={setTab}
         tabs={[
           {
             value: 'information',
