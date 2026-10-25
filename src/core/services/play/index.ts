@@ -22,9 +22,11 @@ export {
 export { currentSessionId, loadSession, requireSeat } from '@/core/services/play/PlaySessionService'
 export {
   adjustPlayXp,
+  correctPlayStats,
   readPlayAdmin,
   removeFromPlay,
   resetPlayGame,
+  setPlayBan,
   setPlayLevel,
 } from '@/core/services/play/PlayAdminService'
 export { readPlayActivity } from '@/core/services/play/PlayJournalService'

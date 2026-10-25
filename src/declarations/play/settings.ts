@@ -118,6 +118,11 @@ export const PLAY_SETTINGS = {
       fallback: 10000,
       min: 1,
     }),
+    maxCounter: readInteger(admin.maxCounter, {
+      path: 'play/play.admin.maxCounter',
+      fallback: 100000,
+      min: 1,
+    }),
   },
   leaderboardSize: readInteger(play.leaderboardSize, {
     path: 'play/play.leaderboardSize',

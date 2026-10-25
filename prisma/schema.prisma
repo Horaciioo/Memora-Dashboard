@@ -382,6 +382,7 @@ model Account {
   playTournamentsHosted PlayTournament[]         @relation("PlayTournamentHost")
   playSeats             PlaySeat[]
   playStats             PlayGameStat[]
+  playProfile           PlayProfile?
   baccalaureatAnswers   BaccalaureatAnswer[]
   baccalaureatVotes     BaccalaureatVote[]
   activityAsSubject     ActivityLog[]            @relation("LogSubject")
@@ -2689,6 +2690,21 @@ model PlayGameStat {
   @@unique([accountId, game])
   @@index([game, xp])
   @@map("play_game_stats")
+}
+
+// Global side of a player, outside any game
+model PlayProfile {
+  accountId  String    @id
+  // XP given on the global line alone
+  bonusXp    Int       @default(0)
+  bannedAt   DateTime?
+  banReason  String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("play_profiles")
 }
 
 // One letter of a Baccalaureat game, its phases read from the dates

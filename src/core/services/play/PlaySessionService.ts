@@ -10,6 +10,7 @@ import { PLAY_ENGINES } from '@/core/engines/play'
 import type { PlayEngine } from '@/core/engines/play'
 import { isPresent, SESSION_INCLUDE } from '@/core/lib/play/session'
 import type { LoadedSeat, LoadedSession } from '@/core/lib/play/session'
+import { isPlayBanned } from '@/core/services/play/ProfileService'
 import type { PlayGameName } from '@/utils/constants/play'
 
 // Client inside or outside a transaction
@@ -118,6 +119,7 @@ export const ensureFree = async (
   accountId: string,
   sessionId?: string
 ): Promise<void> => {
+  if (await isPlayBanned(accountId, tx)) throw forbidden(PLAY_ERRORS.banned)
   const current = await currentSessionId(accountId, tx)
   if (current && current !== sessionId) throw conflict(PLAY_ERRORS.alreadyPlaying)
 }

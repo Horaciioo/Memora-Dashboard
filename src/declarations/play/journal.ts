@@ -6,6 +6,13 @@
 export const PLAY_TARGET = 'play'
 
 /**
+ * Name of the global line in the journal
+ * @type {string}
+ */
+
+export const PLAY_GLOBAL_LABEL = 'le global'
+
+/**
  * Journal lines of Play
  * @type {Record<string, string>}
  */
@@ -21,7 +28,11 @@ export const PLAY_JOURNAL = {
   xpAdded: '{amount} XP ajoutés sur {game}',
   xpRemoved: '{amount} XP retirés sur {game}',
   levelSet: 'Niveau {level} fixé sur {game}',
-  reset: 'Progression {game} remise à zéro',
+  reset: 'Progression remise à zéro sur {game}',
+  wiped: 'Toute la progression Play remise à zéro',
+  statsSet: 'Stats {game} corrigées : {wins} V, {draws} É, {losses} D',
+  banned: 'Accès à Play retiré : {reason}',
+  unbanned: 'Accès à Play rendu',
   removed: 'Sorti de sa partie de {game} par l’Administration',
 } as const
 

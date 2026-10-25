@@ -22,6 +22,7 @@
   "seatColors": 12,
   "leaderboardSize": 20,
   "admin": {
-    "maxXpChange": 10000
+    "maxXpChange": 10000,
+    "maxCounter": 100000
   }
 }

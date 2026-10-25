@@ -5,6 +5,7 @@ import { prisma } from '@/core/lib/db'
 import { levelOf } from '@/core/lib/play'
 import { PLAY_GAMES, PLAY_SETTINGS } from '@/declarations/play'
 import type { PlayPresence } from '@/types/play'
+import type { Prisma } from '@prisma/client'
 import type { PlayGameName } from '@/utils/constants/play'
 
 // Counters summed into the global line
@@ -36,13 +37,19 @@ const winRate = ({ wins, played }: { wins: number; played: number }): number =>
  */
 
 export const readPlayProfile = async (accountId: string) => {
-  const stats = await prisma.playGameStat.findMany({ where: { accountId } })
+  const [stats, profile] = await Promise.all([
+    prisma.playGameStat.findMany({ where: { accountId } }),
+    prisma.playProfile.findUnique({ where: { accountId } }),
+  ])
   const byGame = new Map(stats.map((stat) => [stat.game, stat]))
 
   // Global line, sums and best streak
   const totals = Object.fromEntries(
     TOTAL_FIELDS.map((field) => [field, stats.reduce((sum, stat) => sum + stat[field], 0)])
   ) as Record<(typeof TOTAL_FIELDS)[number], number>
+  // Global XP also holds its own bonus
+  const bonusXp = profile?.bonusXp ?? 0
+  totals.xp = Math.max(0, totals.xp + bonusXp)
 
   return {
     global: {
@@ -50,7 +57,11 @@ export const readPlayProfile = async (accountId: string) => {
       bestStreak: Math.max(0, ...stats.map((stat) => stat.bestStreak)),
       winRate: winRate(totals),
       level: levelOf(totals.xp),
+      bonusXp,
     },
+    ban: profile?.bannedAt
+      ? { since: profile.bannedAt.toISOString(), reason: profile.banReason }
+      : null,
     games: PLAY_GAMES.keys.map((game) => {
       const stat = byGame.get(game)
 
@@ -118,3 +129,19 @@ export const readPlayPresence = async (accountId: string): Promise<PlayPresence 
     seat && { sessionId: seat.session.id, game: seat.session.game, status: seat.session.status }
   )
 }
+
+/**
+ * Whether a member is kept out of Play
+ * @param {string} accountId - Member
+ * @param {Prisma.TransactionClient} [client] - Transaction
+ * @return {Promise<boolean>} - Banned
+ */
+
+export const isPlayBanned = async (
+  accountId: string,
+  client: Prisma.TransactionClient = prisma
+): Promise<boolean> =>
+  Boolean(
+    (await client.playProfile.findUnique({ where: { accountId }, select: { bannedAt: true } }))
+      ?.bannedAt
+  )

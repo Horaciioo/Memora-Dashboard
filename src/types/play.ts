@@ -84,6 +84,25 @@ export interface PlayTotalsView {
   wins: number
   draws: number
   losses: number
+  streak?: number
+  winRate?: number
+}
+
+/**
+ * Levels and stats of a player
+ * @typedef {Object} PlayProfileView
+ */
+
+export interface PlayProfileView {
+  global: PlayTotalsView & {
+    bonusXp: number
+    bestStreak: number
+    winRate: number
+    playSeconds: number
+  }
+  ban: { since: string; reason: string | null } | null
+  games: (PlayTotalsView & { game: PlayGameName })[]
+  maxLevel: number
 }
 
 /**
@@ -91,9 +110,6 @@ export interface PlayTotalsView {
  * @typedef {Object} PlayAdminState
  */
 
-export interface PlayAdminState {
-  global: PlayTotalsView
-  games: (PlayTotalsView & { game: PlayGameName })[]
+export interface PlayAdminState extends PlayProfileView {
   presence: PlayPresence | null
-  maxLevel: number
 }

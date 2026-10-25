@@ -2,7 +2,7 @@ import 'server-only'
 
 import { readActivityWhere, recordEvent } from '@/core/services/system/ActivityService'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
-import { fillPlayMessage, PLAY_GAMES, PLAY_TARGET } from '@/declarations/play'
+import { fillPlayMessage, PLAY_GAMES, PLAY_GLOBAL_LABEL, PLAY_TARGET } from '@/declarations/play'
 import type { EventTypeName } from '@/utils/constants/events'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -12,7 +12,7 @@ import type { PlayGameName } from '@/utils/constants/play'
  * @property {EventTypeName} eventType - Event kind
  * @property {string} subjectId - Member it lands on
  * @property {string | null} [actorId] - Who did it, the member by default
- * @property {PlayGameName} game - Game
+ * @property {PlayGameName} [game] - Game, the global line when absent
  * @property {string} template - Journal line
  * @property {Record<string, number | string>} [values] - Placeholders
  * @property {string} [sessionId] - Game played
@@ -22,7 +22,7 @@ export interface PlayJournalInput {
   eventType: EventTypeName
   subjectId: string
   actorId?: string | null
-  game: PlayGameName
+  game?: PlayGameName
   template: string
   values?: Record<string, number | string>
   sessionId?: string
@@ -44,7 +44,7 @@ export const journalPlay = async (...inputs: PlayJournalInput[]): Promise<void> 
         targetType: PLAY_TARGET,
         targetId: input.sessionId,
         summary: fillPlayMessage(input.template, {
-          game: PLAY_GAMES.label(input.game),
+          game: input.game ? PLAY_GAMES.label(input.game) : PLAY_GLOBAL_LABEL,
           ...input.values,
         }),
       })
