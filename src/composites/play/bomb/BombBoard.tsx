@@ -46,9 +46,7 @@ export const BombBoard = ({ sessionId, board, faces, viewerId, isSeated }: BombB
 
   return (
     <div className={BOMB_BOARD.board}>
-      {countdown > 0 && (
-        <PlayCountdown seconds={countdown} figureClassName={BOMB_BOARD.figure} />
-      )}
+      {countdown > 0 && <PlayCountdown seconds={countdown} figureClassName={BOMB_BOARD.figure} />}
 
       <BombLetters alphabet={board.settings.bonusAlphabet} gathered={reader?.letters ?? []} />
 

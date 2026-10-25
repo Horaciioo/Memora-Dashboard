@@ -25,9 +25,17 @@ export const PlayPlayerHero = ({ totals, player, subtitle }: PlayPlayerHeroProps
   const { tier, next } = tierOf(level.level)
 
   return (
-    <section className={PLAY_PLAYER.hero} style={{ '--tier': `var(${tier.tone})` } as CSSProperties}>
+    <section
+      className={PLAY_PLAYER.hero}
+      style={{ '--tier': `var(${tier.tone})` } as CSSProperties}
+    >
       <div className={PLAY_PLAYER.top}>
-        <Avatar name={player.name} src={player.avatarUrl} size="xl" className={PLAY_PLAYER.avatar} />
+        <Avatar
+          name={player.name}
+          src={player.avatarUrl}
+          size="xl"
+          className={PLAY_PLAYER.avatar}
+        />
         <div className={PLAY_PLAYER.who}>
           <h1 className={PLAY_PLAYER.name}>{player.name}</h1>
           <p className={PLAY_PLAYER.tier}>
@@ -51,7 +59,8 @@ export const PlayPlayerHero = ({ totals, player, subtitle }: PlayPlayerHeroProps
               next: level.level + 1,
             })
           : PLAY_HUB_COPY.maxed}
-        {next && ` - ${fillPlayMessage(PLAY_HUB_COPY.toTier, { tier: next.label, level: next.from })}`}
+        {next &&
+          ` - ${fillPlayMessage(PLAY_HUB_COPY.toTier, { tier: next.label, level: next.from })}`}
       </p>
       <dl className={PLAY_PLAYER.figures}>
         {figuresOf(totals).map((figure) => (

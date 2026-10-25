@@ -17,7 +17,11 @@ import { ICONS } from '@/declarations/ui/icons'
  * @return {JSX.Element}
  */
 
-export const PlayChatBubble = ({ chat }: { chat: Omit<ComponentProps<typeof PlayChat>, 'isSide' | 'onFold'> }) => {
+export const PlayChatBubble = ({
+  chat,
+}: {
+  chat: Omit<ComponentProps<typeof PlayChat>, 'isSide' | 'onFold'>
+}) => {
   const [isOpen, setOpen] = useState(true)
   const [isFolding, setFolding] = useState(false)
   const [height, setHeight] = useState<number | null>(null)

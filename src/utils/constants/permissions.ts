@@ -691,7 +691,8 @@ export const PermissionsList: PermissionMeta[] = [
     name: Permissions.PlayManage,
     group: PermissionGroups.Play,
     displayName: 'Gérer la progression Play',
-    description: 'Passer de l’XP, fixer un niveau, remettre à zéro ou sortir un modérateur de sa partie.',
+    description:
+      'Passer de l’XP, fixer un niveau, remettre à zéro ou sortir un modérateur de sa partie.',
     important: true,
     parent: Permissions.PlayAccess,
   },
