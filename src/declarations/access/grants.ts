@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import { ROLE_PRESETS } from '@/declarations/access/roles'
 import { MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
@@ -199,8 +200,29 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     grants: {},
     // Discord moderators have no live to follow
     denies: {
-      Discord: [Permissions.LiveRead, Permissions.LiveModerate, Permissions.LiveLogRead],
-      'Junior Discord': [Permissions.LiveRead, Permissions.LiveModerate, Permissions.LiveLogRead],
+      [FunctionNames.Discord]: [
+        Permissions.LiveRead,
+        Permissions.LiveModerate,
+        Permissions.LiveLogRead,
+      ],
+      [FunctionNames.JuniorDiscord]: [
+        Permissions.LiveRead,
+        Permissions.LiveModerate,
+        Permissions.LiveLogRead,
+      ],
+    },
+    // Lives as a second trade wins
+    functions: {
+      [FunctionNames.Lives]: [
+        Permissions.LiveRead,
+        Permissions.LiveModerate,
+        Permissions.LiveLogRead,
+      ],
+      [FunctionNames.JuniorLives]: [
+        Permissions.LiveRead,
+        Permissions.LiveModerate,
+        Permissions.LiveLogRead,
+      ],
     },
   },
   {
@@ -208,8 +230,8 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     grants: {},
     // Only trainers and recruiters open these pages
     functions: {
-      Formateurs: [Permissions.AcademyRead],
-      Recruteurs: [Permissions.RecruitmentRead],
+      [FunctionNames.Trainers]: [Permissions.AcademyRead],
+      [FunctionNames.Recruiters]: [Permissions.RecruitmentRead],
     },
     revokes: { [MemberRoles.Moderateur]: [Permissions.AcademyRead, Permissions.RecruitmentRead] },
   },
@@ -218,7 +240,7 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     grants: {},
     // They do their work without any Responsable access
     functions: {
-      Formateurs: [
+      [FunctionNames.Trainers]: [
         Permissions.AcademyReviewRead,
         Permissions.AcademyReviewWrite,
         Permissions.AcademySkillWrite,
@@ -226,7 +248,7 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
         Permissions.AcademyNoteWrite,
         Permissions.AcademyObjectiveWrite,
       ],
-      Recruteurs: [Permissions.RecruitmentCandidateWrite],
+      [FunctionNames.Recruiters]: [Permissions.RecruitmentCandidateWrite],
     },
   },
   {

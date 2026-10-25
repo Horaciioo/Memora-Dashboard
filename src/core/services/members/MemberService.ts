@@ -20,7 +20,7 @@ import { FORM_SETTINGS, PAGINATION_SETTINGS } from '@/declarations/configuration
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { MEMBER_COPY, MEMBER_FIELD_COPY, MEMBER_FIELD_INFO } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
-import { LEGACY_FUNCTION_OF } from '@/declarations/reference/fixed'
+import { LEAD_DIVISION_RANK, LEGACY_FUNCTION_OF } from '@/declarations/reference/fixed'
 import { LANGUAGE_OPTIONS, timezoneOptions } from '@/declarations/system/locales'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence, MemberDetail, MemberSummary } from '@/types/members'
@@ -138,19 +138,60 @@ export const BELOW_LEAD_ROLES: MemberRoleName[] = [MemberRoles.Moderateur, Membe
 const LEGACY_FUNCTION_NAMES = Object.values(LEGACY_FUNCTION_OF)
 
 /**
+ * Who hands out roles
+ * @typedef {Object} RoleActor
+ * @property {string} id - Member identifier
+ * @property {MemberRoleName} role - Held role
+ * @property {boolean} isAdmin - Admin level
+ * @property {boolean} isSystem - System holder
+ */
+
+export interface RoleActor {
+  id: string
+  role: MemberRoleName
+  isAdmin: boolean
+  isSystem: boolean
+}
+
+// Employé stays below their own rank
+const assertBelowActor = async (
+  values: FormValues,
+  actor: RoleActor,
+  currentId?: string
+): Promise<void> => {
+  const rankOf = (role: MemberRoleName) => ROLE_REGISTRY.get(role).rank
+  const ceiling = rankOf(actor.role)
+  const current = currentId
+    ? await prisma.account.findUnique({ where: { id: currentId }, select: { role: true } })
+    : null
+  const asked = (readText(values, 'role') ??
+    current?.role ??
+    MemberRoles.Moderateur) as MemberRoleName
+
+  // Own role never moves
+  if (currentId === actor.id) {
+    if (current && asked !== current.role) throw forbidden()
+    return
+  }
+  if (current && rankOf(current.role) >= ceiling) throw forbidden()
+  if (rankOf(asked) >= ceiling) throw forbidden()
+}
+
+/**
  * Reject a role or a Junior Responsable function beyond what the viewer may hand out
  * @param {FormValues} values - Parsed body
- * @param {boolean} isAdmin - Viewer sits at admin level
+ * @param {RoleActor} actor - Who edits
  * @param {string} [currentId] - Member being edited
  * @return {Promise<void>} - Throws on an out-of-reach change
  */
 
 export const assertMemberAssignable = async (
   values: FormValues,
-  isAdmin: boolean,
+  actor: RoleActor,
   currentId?: string
 ): Promise<void> => {
-  if (isAdmin) return
+  if (actor.isSystem) return
+  if (actor.isAdmin) return assertBelowActor(values, actor, currentId)
 
   const current = currentId
     ? await prisma.account.findUnique({
@@ -420,6 +461,20 @@ const toAccountData = (values: FormValues) => ({
 })
 
 /**
+ * Seat a responsable in the last division when none is chosen
+ * @param {ReturnType<typeof toAccountData>} data - Database payload
+ * @return {Promise<ReturnType<typeof toAccountData>>} - Payload with its division
+ */
+
+const withLeadDivision = async (data: ReturnType<typeof toAccountData>) => {
+  if (data.role !== MemberRoles.Responsable || data.divisionId) return data
+
+  const division = (await allDivisions()).find((entry) => entry.rank === LEAD_DIVISION_RANK)
+
+  return { ...data, divisionId: division?.id ?? null }
+}
+
+/**
  * Read the functions a member should hold
  * @param {FormValues} values - Parsed body
  * @return {Promise<string[]>} - Function identifiers to hold
@@ -484,7 +539,7 @@ export const assertIdentifierFree = async (
  */
 
 export const createMember = async (values: FormValues): Promise<MemberSummary> => {
-  const data = toAccountData(values)
+  const data = await withLeadDivision(toAccountData(values))
   const joinedAt = readDate(values, 'joinedAt')
   const youtuberIds = readList(values, 'youtuberIds')
   const functionIds = await readHeldFunctionIds(values)
@@ -520,7 +575,7 @@ export const updateMember = async (id: string, values: FormValues): Promise<Memb
   // The root administrator keeps its identifier and its level
   if (isRootIdentity(current.discordId)) throw immutable(MEMBER_COPY.rootLocked)
 
-  const data = await withoutSealedWrites(toAccountData(values))
+  const data = await withoutSealedWrites(await withLeadDivision(toAccountData(values)))
   if (data.discordId && data.discordId !== current.discordId) {
     await assertIdentifierFree(data.discordId, id)
   }

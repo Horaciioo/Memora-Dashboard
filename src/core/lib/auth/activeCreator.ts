@@ -7,6 +7,7 @@ import { AUTH_SETTINGS } from '@/declarations/configurations/settings'
 import { isNavigationView } from '@/declarations/navigation'
 import type { NavigationViewName } from '@/declarations/navigation'
 import { cookieName } from '@/utils/constants/cookies'
+import { DAY_SECONDS } from '@/utils/constants/time'
 
 /**
  * Creator cookie name
@@ -15,15 +16,15 @@ import { cookieName } from '@/utils/constants/cookies'
 
 export const ACTIVE_CREATOR_COOKIE = cookieName('activeYoutuber')
 
+// Creator picked for a lower view
+const AUTO_CREATOR_COOKIE = cookieName('activeYoutuberAuto')
+
 /**
  * View cookie name
  * @type {string}
  */
 
 export const NAVIGATION_VIEW_COOKIE = cookieName('navigationView')
-
-// Days in one session
-const DAY_SECONDS = 86_400
 
 // Shared shape
 const COOKIE_OPTIONS = {
@@ -48,11 +49,19 @@ export const readActiveCreator = cache(async (): Promise<string | null> => {
 /**
  * Pin the creator
  * @param {string | null} youtuberId - Creator identifier
+ * @param {boolean} [isAuto] - Picked by a view
  * @return {Promise<void>} - Written
  */
 
-export const writeActiveCreator = async (youtuberId: string | null): Promise<void> => {
+export const writeActiveCreator = async (
+  youtuberId: string | null,
+  isAuto = false
+): Promise<void> => {
   const store = await cookies()
+
+  // A hand pick is kept on return
+  if (isAuto) store.set(AUTO_CREATOR_COOKIE, '1', COOKIE_OPTIONS)
+  else store.delete(AUTO_CREATOR_COOKIE)
 
   if (youtuberId === null) {
     store.delete(ACTIVE_CREATOR_COOKIE)
@@ -61,6 +70,16 @@ export const writeActiveCreator = async (youtuberId: string | null): Promise<voi
   }
 
   store.set(ACTIVE_CREATOR_COOKIE, youtuberId, COOKIE_OPTIONS)
+}
+
+/**
+ * Drop a creator a view picked
+ * @return {Promise<void>} - Dropped
+ */
+
+export const dropAutoCreator = async (): Promise<void> => {
+  const store = await cookies()
+  if (store.get(AUTO_CREATOR_COOKIE)) await writeActiveCreator(null)
 }
 
 /**

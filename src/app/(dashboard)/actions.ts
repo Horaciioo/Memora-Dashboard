@@ -3,6 +3,7 @@
 import { refresh } from 'next/cache'
 
 import {
+  dropAutoCreator,
   readActiveCreator,
   writeActiveCreator,
   writeNavigationView,
@@ -28,10 +29,13 @@ export async function switchView(view: string): Promise<void> {
   await writeNavigationView(view)
 
   // A lower view needs a creator to look through
-  if (simulatedRoleOf(view, session.actual) && !(await readActiveCreator())) {
+  const isLower = Boolean(simulatedRoleOf(view, session.actual))
+  if (isLower && !(await readActiveCreator())) {
     const [first] = await pickableCreators(session)
-    if (first) await writeActiveCreator(first.id)
+    if (first) await writeActiveCreator(first.id, true)
   }
+  // Back home, the borrowed creator goes
+  if (!isLower) await dropAutoCreator()
 
   refresh()
 }

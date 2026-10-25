@@ -101,14 +101,29 @@ export const departMember = async (
   const now = new Date()
   const trades = tradesOf(row)
 
-  // Lives still to come no longer count on them
+  // Nothing still to come counts on them
+  const creators = await prisma.youtuber.findMany({
+    where: { accounts: { some: { id } } },
+    select: { id: true },
+  })
   await prisma.$transaction([
     prisma.liveMember.deleteMany({
       where: { accountId: id, live: { status: LiveStatuses.Announced } },
     }),
-    prisma.eventAttendance.deleteMany({
-      where: { accountId: id, event: { live: { status: LiveStatuses.Announced } } },
+    prisma.liveCoordination.deleteMany({
+      where: { accountId: id, live: { status: LiveStatuses.Announced } },
     }),
+    prisma.eventAttendance.deleteMany({
+      where: {
+        accountId: id,
+        OR: [
+          { event: { live: { status: LiveStatuses.Announced } } },
+          { event: { startsAt: { gte: now }, live: null } },
+        ],
+      },
+    }),
+    prisma.teamMember.deleteMany({ where: { accountId: id } }),
+    prisma.teamLead.deleteMany({ where: { accountId: id } }),
     prisma.legacyTrack.updateMany({
       where: { accountId: id, status: LegacyStatuses.Running },
       data: { status: LegacyStatuses.Cancelled },
@@ -152,8 +167,13 @@ export const departMember = async (
     },
   })
 
+  // Responsables of their creators only
   const responsables = await prisma.account.findMany({
-    where: { role: MemberRoles.Responsable, status: { notIn: GONE_MEMBER_STATUSES } },
+    where: {
+      role: MemberRoles.Responsable,
+      status: { notIn: GONE_MEMBER_STATUSES },
+      youtubers: { some: { id: { in: creators.map((creator) => creator.id) } } },
+    },
     select: { id: true },
   })
 
