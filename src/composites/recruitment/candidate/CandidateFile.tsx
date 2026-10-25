@@ -12,14 +12,10 @@ import {
   RecruitmentFileProvider,
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { useRecordFile } from '@/core/hooks/data/work/useRecordFile'
-import { API_ROUTES } from '@/core/lib/api/routes'
-import { candidateRecordValues } from '@/core/lib/recruitment/candidateRecord'
+import { useCandidateRecord } from '@/core/hooks/data/recruitment/useCandidateRecord'
 import { candidateStates } from '@/core/lib/recruitment/candidateTimeline'
 import { ROUTES } from '@/declarations/navigation'
 import type { RecruitmentDetail, RecruitmentFields, RecruitmentRights } from '@/types/recruitment'
-
-const CANDIDATE_ENTITY = { label: 'Candidat', gender: 'masculine' } as const
 
 /**
  * Body of the open candidate: head, corner timeline, fields, interview and remarks
@@ -32,11 +28,7 @@ const CandidateBody = ({ candidateId }: { candidateId: string }) => {
   const router = useRouter()
   const { detail, file, can } = useRecruitmentState()
   const candidate = file.candidates.find((entry) => entry.id === candidateId)!
-  const record = useRecordFile({
-    path: API_ROUTES.candidate(candidate.id),
-    entity: CANDIDATE_ENTITY,
-    initialValues: candidateRecordValues(candidate),
-  })
+  const record = useCandidateRecord(candidate)
 
   const attended = record.values.attended === true
   const states = candidateStates(
