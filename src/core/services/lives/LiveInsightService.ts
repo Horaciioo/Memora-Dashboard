@@ -3,6 +3,7 @@ import 'server-only'
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { rememberRung } from '@/core/lib/modview/commands'
 import { prisma } from '@/core/lib/db'
+import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
 import { notFound } from '@/core/lib/errors'
 import { logger } from '@/core/lib/logger'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
@@ -10,7 +11,7 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { ModeratorInspect, ViewerSanction } from '@/types/lives'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
-import { AbsenceStatuses } from '@/utils/constants/workflow'
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * Load a live in the perimeter
@@ -116,9 +117,7 @@ export const inspectModerator = async (
     prisma.absence.count({
       where: {
         accountId,
-        status: AbsenceStatuses.Approved,
-        startDate: { lte: now },
-        endDate: { gte: now },
+        ...activeAbsenceFilter(now),
       },
     }),
     prisma.modViewPresence.aggregate({
@@ -162,7 +161,7 @@ export const inspectModerator = async (
 
 export const readPanelMemory = async (youtuberId: string): Promise<PanelMemory> => {
   try {
-    const since = new Date(Date.now() - LIVE_SETTINGS.dossierWindowDays * 86_400_000)
+    const since = new Date(Date.now() - LIVE_SETTINGS.dossierWindowDays * DAY_MS)
     const rows = await prisma.moderationAction.findMany({
       where: {
         live: { youtuberId },

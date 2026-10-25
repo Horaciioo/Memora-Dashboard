@@ -1,6 +1,7 @@
 import { heatRows, repeatTargets, topReasons } from './breakdowns'
 import { buildSlices, cumulate } from './series'
 import type { InsightAction, InsightSample, LiveInsights } from './types'
+import { HOUR_MS, MINUTE_MS } from '@/utils/constants/time'
 
 export { compareToBaseline } from './compare'
 export type { BaselineRow } from './compare'
@@ -81,7 +82,7 @@ const levelRows = (
       actions: 0,
       perHour: 0,
     }
-    row.minutes += Math.max(0, to - from) / 60000
+    row.minutes += Math.max(0, to - from) / MINUTE_MS
     row.actions += done.filter(
       (action) => action.occurredAt.getTime() >= from && action.occurredAt.getTime() < to
     ).length
@@ -119,8 +120,8 @@ export const buildInsights = (input: {
 }): LiveInsights => {
   const done = input.actions.filter((action) => action.succeeded)
   const slices = buildSlices(input)
-  const bucketMs = input.bucketMinutes * 60 * 1000
-  const hours = Math.max((input.end.getTime() - input.start.getTime()) / 3600000, 1 / 60)
+  const bucketMs = input.bucketMinutes * MINUTE_MS
+  const hours = Math.max((input.end.getTime() - input.start.getTime()) / HOUR_MS, 1 / 60)
   const viewers = viewerFigures(input.samples)
 
   const sliceOf = (action: InsightAction) =>

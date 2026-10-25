@@ -7,9 +7,10 @@ import type { DiscordIdentifierView } from '@/types/discord'
 import { DiscordIdKinds } from '@/utils/constants/discord'
 import type { DiscordIdKindName } from '@/utils/constants/discord'
 import type { DiscordIdentifier } from '@prisma/client'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 // Collection runs at most this often
-const COLLECT_INTERVAL_MS = 60_000
+const COLLECT_INTERVAL_MS = MINUTE_MS
 
 let lastCollected = 0
 

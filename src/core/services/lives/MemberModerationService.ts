@@ -4,6 +4,7 @@ import { prisma } from '@/core/lib/db'
 import { readMemberSpans } from '@/core/services/lives/ModStintService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { MemberLiveSummary, MemberModerationView } from '@/types/lives'
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * Moderation history of one member: time in the Mod View and gestures
@@ -14,7 +15,7 @@ import type { MemberLiveSummary, MemberModerationView } from '@/types/lives'
 export const readMemberModeration = async (
   accountId: string
 ): Promise<MemberModerationView | null> => {
-  const since = new Date(Date.now() - LIVE_SETTINGS.hoursWindowDays * 24 * 60 * 60 * 1000)
+  const since = new Date(Date.now() - LIVE_SETTINGS.hoursWindowDays * DAY_MS)
 
   try {
     // Lives the member was in

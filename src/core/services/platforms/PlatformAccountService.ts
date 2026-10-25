@@ -14,9 +14,10 @@ import type { MemoraRank } from '@/types/modview'
 import type { PlatformLinkView } from '@/types/platforms'
 import { MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 // Renew this long before expiry
-const REFRESH_MARGIN_MS = 60_000
+const REFRESH_MARGIN_MS = MINUTE_MS
 
 /**
  * A usable Twitch seat

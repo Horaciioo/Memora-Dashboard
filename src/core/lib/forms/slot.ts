@@ -1,8 +1,6 @@
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import { instantToWall, wallToInstant } from '@/utils/format/zone'
-
-// Milliseconds in a minute
-const MINUTE = 60_000
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Next day of a weekday at a wall clock, today when it is still ahead
@@ -70,7 +68,7 @@ export const settleSlot = (
   const end = fields.find((entry) => entry.notBefore === field.slotFor)
 
   return slot.minutes && end
-    ? { ...next, [end.name]: new Date(startsAt.getTime() + slot.minutes * MINUTE).toISOString() }
+    ? { ...next, [end.name]: new Date(startsAt.getTime() + slot.minutes * MINUTE_MS).toISOString() }
     : next
 }
 

@@ -64,11 +64,9 @@ import type {
   RecruitmentPlatformName,
   RecruitmentStatusName,
 } from '@/utils/constants/recruitment'
+import { DAY_MS } from '@/utils/constants/time'
 
 const { shortTextMaxLength, longTextMaxLength, markdownMaxLength, noteMaxLength } = FORM_SETTINGS
-
-// A day of milliseconds
-const DAY_IN_MS = 24 * 60 * 60 * 1000
 
 /**
  * Reject a duplicate session name or a candidate already held
@@ -239,7 +237,9 @@ const toSummary = (
       functionId: row.functionId,
       status: row.status,
       summary: row.summary,
-      period: row.opensAt ? [minuteOf(row.opensAt), minuteOf(row.closesAt ?? row.opensAt)] : null,
+      period: row.opensAt
+        ? [row.opensAt.toISOString(), (row.closesAt ?? row.opensAt).toISOString()]
+        : null,
       responsableIds: responsables.map((seat) => seat.id),
       observerIds: row.observers.map((seat) => seat.accountId),
     },
@@ -714,14 +714,6 @@ const platformOf = (functionName: string): RecruitmentPlatformName =>
   PLATFORM_OF_TRADE[tradeOfFunction(functionName)] ?? RecruitmentPlatforms.Discord
 
 /**
- * Wall-clock minute of a stored date
- * @param {Date} date - Stored date
- * @return {string} - ISO minute
- */
-
-const minuteOf = (date: Date): string => date.toISOString().slice(0, 16)
-
-/**
  * Opening and closing days of a submitted period
  * @param {FormValues} values - Parsed body
  * @return {{ opensAt: Date | null, closesAt: Date | null }} - Days
@@ -807,9 +799,7 @@ export const createSession = async (
               owner: template.owner,
               offset: template.offset,
               // A step only lands on a day once the session knows when it opens
-              scheduledAt: opensAt
-                ? new Date(opensAt.getTime() + template.offset * DAY_IN_MS)
-                : null,
+              scheduledAt: opensAt ? new Date(opensAt.getTime() + template.offset * DAY_MS) : null,
               required: template.required,
               position: index * FORM_SETTINGS.positionStep,
             })),
@@ -819,7 +809,7 @@ export const createSession = async (
               notes: INTEGRATION_STEP.description,
               owner: INTEGRATION_STEP.owner,
               offset: closingOffset,
-              scheduledAt: opensAt ? new Date(opensAt.getTime() + closingOffset * DAY_IN_MS) : null,
+              scheduledAt: opensAt ? new Date(opensAt.getTime() + closingOffset * DAY_MS) : null,
               required: INTEGRATION_STEP.required,
               emitsInvite: true,
               position: templates.length * FORM_SETTINGS.positionStep,
@@ -1256,7 +1246,7 @@ export const createStep = async (
       // An explicit day wins
       scheduledAt:
         scheduledAt ??
-        (session.opensAt ? new Date(session.opensAt.getTime() + offset * DAY_IN_MS) : null),
+        (session.opensAt ? new Date(session.opensAt.getTime() + offset * DAY_MS) : null),
       required: readFlag(values, 'required'),
       position: (last?.position ?? 0) + FORM_SETTINGS.positionStep,
     },

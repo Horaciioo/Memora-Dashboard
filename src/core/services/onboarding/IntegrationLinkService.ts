@@ -14,12 +14,10 @@ import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { IntegrationLinkView } from '@/types/onboarding'
 import { IntegrationLinkKinds } from '@/utils/constants/integration'
 import type { IntegrationLinkKindName } from '@/utils/constants/integration'
+import { DAY_MS } from '@/utils/constants/time'
 
 // Entropy of a public token
 const TOKEN_BYTES = 24
-
-// A day
-const DAY_IN_MS = 86_400_000
 
 /**
  * Map a link row to its display shape
@@ -117,7 +115,7 @@ export const emitLink = async (
   const kind = (readText(values, 'kind') ?? IntegrationLinkKinds.Account) as IntegrationLinkKindName
   const expiresAt =
     readDate(values, 'expiresAt') ??
-    new Date(Date.now() + ACADEMY_SETTINGS.inviteExpiryDays * DAY_IN_MS)
+    new Date(Date.now() + ACADEMY_SETTINGS.inviteExpiryDays * DAY_MS)
 
   // The campaign names the creator
   const data = {

@@ -49,6 +49,7 @@ import {
 import { instantToWall } from '@/utils/format/zone'
 import type { AttendeeKindName, MeetingAudienceName } from '@/utils/constants/workflow'
 import type { Prisma } from '@prisma/client'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 // Relations every meeting card needs
 export const MEETING_INCLUDE = {
@@ -103,7 +104,7 @@ export const toMeetingSummary = (row: MeetingRow): MeetingSummary => ({
   values: {
     title: row.title,
     emoji: row.emoji,
-    scheduledAt: row.scheduledAt?.toISOString().slice(0, 16) ?? null,
+    scheduledAt: row.scheduledAt?.toISOString() ?? null,
     durationMin: row.durationMin,
     audience: row.audience,
     stateId: row.stateId,
@@ -439,7 +440,7 @@ export const openMeetingForEntry = async (entry: EntryMeeting): Promise<string> 
       emoji: entry.emoji,
       scheduledAt: entry.startsAt,
       durationMin: entry.endsAt
-        ? Math.round((entry.endsAt.getTime() - entry.startsAt.getTime()) / 60_000)
+        ? Math.round((entry.endsAt.getTime() - entry.startsAt.getTime()) / MINUTE_MS)
         : null,
       audience: entry.audience,
       stateId,

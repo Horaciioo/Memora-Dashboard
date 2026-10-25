@@ -5,6 +5,7 @@ import { emptyCounts } from '@/core/lib/lives/insights/series'
 import type { LiveBaseline } from '@/core/lib/lives/insights'
 import { GROUP_OF_KIND, REPORT_GROUPS } from '@/declarations/lives/reportGroups'
 import { LiveStatuses } from '@/utils/constants/lives'
+import { HOUR_SECONDS } from '@/utils/constants/time'
 
 // Lives averaged
 const BASELINE_LIVES = 5
@@ -69,7 +70,7 @@ export const readBaseline = async (
   return {
     lives: lives.length,
     actions: Math.round(total / lives.length),
-    perHour: seconds > 0 ? (total / seconds) * 3600 : 0,
+    perHour: seconds > 0 ? (total / seconds) * HOUR_SECONDS : 0,
     durationSeconds: Math.round(seconds / lives.length),
     averageViewers: mean(viewers.map((row) => row._avg.viewers ?? 0)),
     peakViewers: mean(viewers.map((row) => row._max.viewers ?? 0)),

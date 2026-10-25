@@ -5,6 +5,7 @@ import type { StatusState } from '../../../../status/history.ts'
 import { HEALTH_LEVELS, SETTINGS } from '../../../../status/declarations.ts'
 import type { Health } from '../../../../status/declarations.ts'
 import { STATUS_LINK } from '@/declarations/system/monitoring/status'
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * One watched service
@@ -61,7 +62,7 @@ const OFFLINE: StatusReport = {
 const lastDays = (): string[] =>
   Array.from({ length: SETTINGS.historyDays }, (_, index) =>
     new Intl.DateTimeFormat('en-CA', { timeZone: SETTINGS.timeZone }).format(
-      new Date(Date.now() - (SETTINGS.historyDays - 1 - index) * 86_400_000)
+      new Date(Date.now() - (SETTINGS.historyDays - 1 - index) * DAY_MS)
     )
   )
 

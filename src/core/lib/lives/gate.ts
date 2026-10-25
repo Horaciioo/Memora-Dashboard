@@ -1,4 +1,5 @@
 import { AttendanceStatuses } from '@/utils/constants/workflow'
+import { HOUR_MS } from '@/utils/constants/time'
 
 /**
  * Where a member stands against the hours they gave
@@ -35,7 +36,7 @@ export const gateState = (
  */
 
 export const suggestedUntil = (now: Date, plannedEnd: Date | null, hoursAhead: number): Date => {
-  const hour = 3_600_000
+  const hour = HOUR_MS
   const round = new Date(Math.round((+now + hoursAhead * hour) / hour) * hour)
 
   return plannedEnd && plannedEnd < round ? plannedEnd : round

@@ -1,4 +1,5 @@
 import type { ModerationKind } from '@prisma/client'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * One log line the report reads
@@ -111,7 +112,7 @@ export const buildLiveReport = (input: {
   })
 
   // Slices from the start
-  const bucketMs = input.bucketMinutes * 60 * 1000
+  const bucketMs = input.bucketMinutes * MINUTE_MS
   const slices = Math.max(1, Math.ceil((input.end.getTime() - input.start.getTime()) / bucketMs))
   const counts = new Array<number>(slices).fill(0)
   done.forEach((action) => {

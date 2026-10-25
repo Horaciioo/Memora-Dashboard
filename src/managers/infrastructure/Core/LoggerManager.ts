@@ -12,6 +12,7 @@ import type Sharding from '@/managers/infrastructure/Core/Sharding'
 import type TelemetryManager from '@/managers/infrastructure/Monitoring/TelemetryManager'
 import { LOG_LEVELS } from '@/types/infrastructure'
 import type { LoggerConfig, LogLevel } from '@/types/infrastructure'
+import { DAY_MS } from '@/utils/constants/time'
 
 // Latest log file path
 const LATEST_FILE = 'latest.log'
@@ -193,7 +194,7 @@ export default class LoggerManager {
   private async _prune(): Promise<void> {
     if (!this._directory) return
 
-    const horizon = Date.now() - this.config.archive.retentionDays * 86400000
+    const horizon = Date.now() - this.config.archive.retentionDays * DAY_MS
 
     // Walk year folders
     const years = await fs.readdir(this._directory, { withFileTypes: true }).catch(() => [])

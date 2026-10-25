@@ -1,3 +1,5 @@
+import { HOUR_MS } from '@/utils/constants/time'
+
 /**
  * Hour mark along the live
  * @typedef {Object} TimeTick
@@ -12,8 +14,6 @@ export interface TimeTick {
 
 // Marks wanted at most
 const MAX_TICKS = 9
-const HOUR_MS = 3_600_000
-
 /**
  * Round-hour marks inside a span, spaced so they never crowd
  * @param {number} start - Span start, epoch ms

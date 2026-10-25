@@ -1,5 +1,6 @@
 import { GROUP_OF_KIND, REPORT_GROUPS } from '@/declarations/lives/reportGroups'
 import type { GroupCounts, InsightAction, InsightSample, InsightSlice } from './types'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Empty counts
@@ -39,7 +40,7 @@ export const buildSlices = (input: {
   end: Date
   bucketMinutes: number
 }): InsightSlice[] => {
-  const bucketMs = input.bucketMinutes * 60 * 1000
+  const bucketMs = input.bucketMinutes * MINUTE_MS
   const count = Math.max(1, Math.ceil((input.end.getTime() - input.start.getTime()) / bucketMs))
   const slices: InsightSlice[] = Array.from({ length: count }, (_, index) => ({
     at: new Date(input.start.getTime() + index * bucketMs).toISOString(),

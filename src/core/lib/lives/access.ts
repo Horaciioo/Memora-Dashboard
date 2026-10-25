@@ -1,5 +1,6 @@
 import { LiveStatuses } from '@/utils/constants/lives'
 import type { LiveStatusName } from '@/utils/constants/lives'
+import { HOUR_MS, MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Whether a live may be entered
@@ -26,7 +27,7 @@ export const liveAccess = (
   if (live.status === LiveStatuses.Ended || live.status === LiveStatuses.Cancelled) return 'over'
   if (live.status === LiveStatuses.Live) return 'open'
 
-  return +now >= +live.plannedStartAt - prepMinutes * 60_000 ? 'open' : 'early'
+  return +now >= +live.plannedStartAt - prepMinutes * MINUTE_MS ? 'open' : 'early'
 }
 
 /**
@@ -49,4 +50,4 @@ export const isReopenable = (
   live.endedAt !== null &&
   live.plannedEndAt !== null &&
   +live.endedAt < +live.plannedEndAt &&
-  +now - +live.endedAt < recentHours * 3_600_000
+  +now - +live.endedAt < recentHours * HOUR_MS

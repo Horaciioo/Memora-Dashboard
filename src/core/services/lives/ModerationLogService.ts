@@ -8,6 +8,7 @@ import type { PlatformLogEntry } from '@/core/lib/platforms/twitch/logEntry'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 import type { ModViewIntent } from '@/types/modview'
 import type { LivePlatformName } from '@/utils/constants/lives'
+import { DAY_MS } from '@/utils/constants/time'
 
 // Seconds a Memora gesture waits for its echo from the platform
 const ECHO_WINDOW_SECONDS = 90
@@ -260,7 +261,7 @@ export const logPlatformGesture = async (input: {
  */
 
 export const purgeModerationLog = async (): Promise<number> => {
-  const before = new Date(Date.now() - RETENTION_SETTINGS.moderationLogDays * 24 * 60 * 60 * 1000)
+  const before = new Date(Date.now() - RETENTION_SETTINGS.moderationLogDays * DAY_MS)
   const [actions, presences] = await Promise.all([
     prisma.moderationAction.deleteMany({ where: { occurredAt: { lt: before } } }),
     prisma.modViewPresence.deleteMany({ where: { openedAt: { lt: before } } }),

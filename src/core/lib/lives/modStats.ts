@@ -1,6 +1,7 @@
 import type { ModerationKind } from '@prisma/client'
 
 import type { LiveLogLine, LiveModTime } from '@/types/lives'
+import { HOUR_SECONDS, MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Figures of the actions of one moderator, or of the whole team
@@ -65,7 +66,7 @@ export const modStats = (
   gaps.sort((left, right) => left - right)
 
   // Slices from the live start
-  const bucketMs = frame.bucketMinutes * 60_000
+  const bucketMs = frame.bucketMinutes * MINUTE_MS
   const slices = Math.max(1, Math.ceil((+frame.end - +frame.start) / bucketMs))
   const counts = new Array<number>(slices).fill(0)
   times.forEach((time) => {
@@ -77,7 +78,7 @@ export const modStats = (
     actions: done.length,
     failed: lines.filter((line) => line.status === 'FAILED').length,
     targets: new Set(done.flatMap((line) => (line.targetLogin ? [line.targetLogin] : []))).size,
-    perHour: frame.seconds > 0 ? done.length / (frame.seconds / 3600) : 0,
+    perHour: frame.seconds > 0 ? done.length / (frame.seconds / HOUR_SECONDS) : 0,
     gapSeconds: gaps.length > 0 ? gaps[Math.floor(gaps.length / 2)] : null,
     firstAt: times.length > 0 ? new Date(times[0]).toISOString() : null,
     lastAt: times.length > 0 ? new Date(times[times.length - 1]).toISOString() : null,
