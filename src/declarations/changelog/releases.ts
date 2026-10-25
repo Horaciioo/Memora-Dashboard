@@ -140,14 +140,14 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.members,
         audience: ChangelogAudiences.Responsables,
         permission: Permissions.MemberRead,
-        text: 'Ajout d’un nouveau rôle « Employé » : placé entre Admin et Responsable, il voit tous les YouTubeurs et dispose des mêmes droits qu’un Admin, sauf l’accès à « Système ».',
+        text: 'Ajout d’un nouveau rôle « Employé » : placé entre Admin et Responsable, il dispose des droits d’un Responsable et voit tous les YouTubeurs, même les nouveaux.',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.members,
         audience: ChangelogAudiences.Responsables,
         permission: Permissions.MemberRead,
-        text: 'Ajout de la possibilité, pour un Admin ou un Employé, d’ouvrir sa propre fiche dans « Modérateurs » et de la modifier.',
+        text: 'Ajout de la possibilité, pour un Admin, d’ouvrir sa propre fiche dans « Modérateurs » et de la modifier.',
       },
       {
         tag: ChangelogTags.Added,
