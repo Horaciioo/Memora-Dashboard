@@ -1,0 +1,5 @@
+export * from '@/core/lib/play/baccalaureat/letters'
+export * from '@/core/lib/play/baccalaureat/phase'
+export * from '@/core/lib/play/baccalaureat/scoring'
+export * from '@/core/lib/play/baccalaureat/words'
+export * from '@/core/lib/play/baccalaureat/settings'

@@ -280,4 +280,9 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
       ],
     },
   },
+  {
+    key: 'memora-play',
+    // Everyone opening Memora plays
+    grants: { [MemberRoles.Moderateur]: [Permissions.PlayAccess] },
+  },
 ]

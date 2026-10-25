@@ -1,0 +1,5 @@
+export * from '@/declarations/play/baccalaureat/categories'
+export * from '@/declarations/play/copy'
+export * from '@/declarations/play/games'
+export * from '@/declarations/play/settings'
+export * from '@/declarations/play/topics'
