@@ -687,3 +687,38 @@
     linear-gradient(#000 0 0) content-box exclude,
     linear-gradient(#000 0 0);
 }
+
+/* Golf hub ground: dusk over a rolling green */
+.play-room:has(.play-turf) {
+  background:
+    radial-gradient(
+      80rem 30rem at 50% 118%,
+      color-mix(in srgb, var(--play-golf) 70%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      44rem 22rem at 12% -6%,
+      color-mix(in srgb, var(--play-golf-glow) 22%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-night) 0%, var(--play-golf-deep) 100%);
+}
+
+.play-room:has(.play-turf) .play-floor {
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--play-golf-glow) 26%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--play-golf-glow) 26%, transparent) 1px,
+      transparent 1px
+    );
+}
+
+/* Countdown in the golf green */
+.play-figure-golf {
+  color: var(--play-golf-glow);
+  --play-key: var(--play-golf);
+}

@@ -12,7 +12,7 @@ import type { GlyphProps } from '@/components/elements/display/glyphs/Glyphs'
  * @return {JSX.Element}
  */
 
-const Duo = ({
+export const Duo = ({
   className,
   tint,
   children,

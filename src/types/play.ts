@@ -28,12 +28,14 @@ export interface EngineSession {
  * @property {boolean} changed - Players must refresh
  * @property {boolean} finished - Game over
  * @property {Date | null} deadline - Next timed move
+ * @property {boolean} [isBoardOnly] - Only the board moved
  */
 
 export interface EngineStep {
   changed: boolean
   finished: boolean
   deadline: Date | null
+  isBoardOnly?: boolean
 }
 
 /**

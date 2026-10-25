@@ -46,6 +46,7 @@ export const API_ROUTES = {
   playStart: (id: string) => `/api/play/parties/${id}/lancer`,
   playCancel: (id: string) => `/api/play/parties/${id}/annuler`,
   playAct: (id: string) => `/api/play/parties/${id}/actions`,
+  playBoard: (id: string) => `/api/play/parties/${id}/plateau`,
   playKick: (id: string) => `/api/play/parties/${id}/expulser`,
   playSeatRole: (id: string) => `/api/play/parties/${id}/place`,
   playMessages: (id: string) => `/api/play/parties/${id}/messages`,

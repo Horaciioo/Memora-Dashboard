@@ -74,3 +74,49 @@ export const PlayMessageKinds = {
 } as const
 
 export type PlayMessageKindName = (typeof PlayMessageKinds)[keyof typeof PlayMessageKinds]
+
+/**
+ * Golf powers
+ * @type {Record<string, string>}
+ */
+
+export const GolfPowers = {
+  Tornado: 'tornado',
+  Sticky: 'sticky',
+  Giant: 'giant',
+  Mini: 'mini',
+  AntiCollision: 'antiCollision',
+  Bumper: 'bumper',
+  Ghost: 'ghost',
+} as const
+
+export type GolfPowerName = (typeof GolfPowers)[keyof typeof GolfPowers]
+
+/**
+ * Stage of a golf hole
+ * @type {Record<string, string>}
+ */
+
+export const GolfPhases = {
+  Countdown: 'countdown',
+  Playing: 'playing',
+  Closed: 'closed',
+  Over: 'over',
+} as const
+
+export type GolfPhaseName = (typeof GolfPhases)[keyof typeof GolfPhases]
+
+/**
+ * Ground under a golf ball
+ * @type {Record<string, string>}
+ */
+
+export const GolfSurfaces = {
+  Grass: 'grass',
+  Sand: 'sand',
+  Ice: 'ice',
+  Boost: 'boost',
+  Water: 'water',
+} as const
+
+export type GolfSurfaceName = (typeof GolfSurfaces)[keyof typeof GolfSurfaces]

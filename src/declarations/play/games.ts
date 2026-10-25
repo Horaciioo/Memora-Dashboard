@@ -1,6 +1,8 @@
 import { createRegistry } from '@/core/lib/registry'
 import { BOMB_EMBERS } from '@/declarations/play/bomb/copy'
 import { BOMB_SETTINGS } from '@/declarations/play/bomb/settings'
+import { GOLF_TURF } from '@/declarations/play/golf/copy'
+import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { PLAY_PAPER } from '@/declarations/play/paper'
 import { BACCALAUREAT_SETTINGS } from '@/declarations/play/settings'
 import { PlayGames } from '@/utils/constants/play'
@@ -59,10 +61,10 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     tone: '--play-golf',
     logo: 'playGolf',
     backdrop: 'turf',
-    ground: null,
-    minPlayers: 1,
-    maxPlayers: 8,
-    playable: false,
+    ground: GOLF_TURF.ground,
+    minPlayers: GOLF_SETTINGS.minPlayers,
+    maxPlayers: GOLF_SETTINGS.maxPlayers,
+    playable: true,
   },
   [PlayGames.Bomb]: {
     label: 'Bomb Party',

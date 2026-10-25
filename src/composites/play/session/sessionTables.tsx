@@ -4,6 +4,9 @@ import { BaccalaureatBoard } from '@/composites/play/baccalaureat/BaccalaureatBo
 import type { BacBoardView } from '@/composites/play/baccalaureat/types'
 import { BombBoard } from '@/composites/play/bomb/BombBoard'
 import type { BombBoardView } from '@/composites/play/bomb/types'
+import { GolfBoard } from '@/composites/play/golf/GolfBoard'
+import { GolfFeed } from '@/composites/play/golf/GolfFeed'
+import type { GolfBoardView } from '@/core/lib/play/golf'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { BacSessionProgress } from '@/composites/play/session/BacSessionProgress'
 import { PlaySessionFeed } from '@/composites/play/session/PlaySessionFeed'
@@ -96,6 +99,35 @@ export const PLAY_SESSION_TABLES: Partial<
         <PlaySessionFeed
           feed={bomb.feed}
           copy={BOMB_FEED_COPY}
+          players={[...seats, ...spectators]}
+        />
+      ),
+    }
+  },
+  [PlayGames.Golf]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+    const golf = board as GolfBoardView
+
+    return {
+      board: (
+        <GolfBoard
+          sessionId={sessionId}
+          board={golf}
+          faces={seats.map(({ id, name, avatarUrl, color }) => ({
+            accountId: id,
+            name,
+            avatarUrl,
+            color: color ?? '',
+          }))}
+          viewerId={viewerId}
+          isSeated={me.isSeated}
+        />
+      ),
+      // Client element, keyed in the side column
+      feed: (
+        <GolfFeed
+          key={sessionId}
+          sessionId={sessionId}
+          board={golf}
           players={[...seats, ...spectators]}
         />
       ),

@@ -17,4 +17,6 @@ export const PLAY_TOPICS = {
 export const PLAY_STREAM_EVENTS = {
   // Something moved, read the game again
   changed: 'changed',
+  // Only the board moved
+  moved: 'moved',
 } as const

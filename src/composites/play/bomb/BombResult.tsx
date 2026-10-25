@@ -1,15 +1,7 @@
-import { Avatar } from '@/components/elements/display/Avatar'
-import { PlayConfetti } from '@/composites/play/baccalaureat/PlayConfetti'
+import { PlayPodium } from '@/composites/play/results/PlayPodium'
 import type { BombFace } from '@/composites/play/bomb/types'
 import { BOMB_BOARD_COPY, fillPlayMessage } from '@/declarations/play'
-import { ICONS } from '@/declarations/ui/icons'
-import { BAC_BOARD, BAC_PODIUM_BLOCKS, BOMB_BOARD } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
-
-// Places on the podium, the winner in the middle
-const PODIUM_ORDER = [2, 1, 3]
-const PODIUM_SIZE = PODIUM_ORDER.length
-const WINNER = 1
+import { BOMB_BOARD } from '@/declarations/ui/variants'
 
 /**
  * Survivors first, then the latest out
@@ -34,47 +26,16 @@ const rankSeats = (seats: BombFace[]): BombFace[] =>
 
 export const BombResult = ({ seats }: { seats: BombFace[] }) => {
   const ranked = rankSeats(seats)
-  const winner = ranked.find((seat) => !seat.isOut && !seat.hasLeft)
-  const CrownIcon = ICONS.playCrown
 
   return (
     <div className={BOMB_BOARD.result}>
-      {winner && <PlayConfetti />}
-      <div className={BAC_BOARD.podium}>
-        {PODIUM_ORDER.map((place) => {
-          const seat = ranked[place - 1]
-          if (!seat) return null
-
-          return (
-            <div key={place} className={BAC_BOARD.podiumPlace}>
-              <div className={BAC_BOARD.podiumFace}>
-                {place === WINNER && winner && (
-                  <CrownIcon className={BAC_BOARD.podiumCrown} aria-hidden="true" />
-                )}
-                <Avatar name={seat.name} src={seat.avatarUrl} size="lg" />
-              </div>
-              <span className={BAC_BOARD.podiumPoints}>
-                {fillPlayMessage(BOMB_BOARD_COPY.words, { count: seat.words })}
-              </span>
-              <div className={cn(BAC_BOARD.podiumBlock, BAC_PODIUM_BLOCKS[place])}>{place}</div>
-            </div>
-          )
-        })}
-      </div>
-      {ranked.length > PODIUM_SIZE && (
-        <ol className={BAC_BOARD.ranks}>
-          {ranked.slice(PODIUM_SIZE).map((seat, index) => (
-            <li key={seat.accountId} className={BAC_BOARD.rank}>
-              <span className={BAC_BOARD.rankIndex}>{index + PODIUM_SIZE + 1}</span>
-              <Avatar name={seat.name} src={seat.avatarUrl} size="sm" />
-              <span className={BAC_BOARD.rankName}>{seat.name}</span>
-              <span className={BAC_BOARD.rankPoints}>
-                {fillPlayMessage(BOMB_BOARD_COPY.words, { count: seat.words })}
-              </span>
-            </li>
-          ))}
-        </ol>
-      )}
+      <PlayPodium
+        hasWinner={ranked.some((seat) => !seat.isOut && !seat.hasLeft)}
+        ranked={ranked.map((seat) => ({
+          ...seat,
+          note: fillPlayMessage(BOMB_BOARD_COPY.words, { count: seat.words }),
+        }))}
+      />
     </div>
   )
 }

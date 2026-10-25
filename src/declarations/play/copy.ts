@@ -44,6 +44,12 @@ export const PLAY_ERRORS = {
   tooLate: 'La bombe a explosé avant ton mot.',
   emptyWord: 'Écris un mot.',
   bonusEmpty: 'Garde au moins une lettre bonus.',
+  badStroke: 'Ce tir n’est pas valable.',
+  holeClosed: 'Le trou n’est pas ouvert.',
+  holeDone: 'Tu as fini ce trou.',
+  ballRolling: 'Ta balle roule encore.',
+  noPower: 'Tu n’as aucun pouvoir en main.',
+  badSpot: 'Pose-le sur le parcours, loin du départ et du trou.',
 } as const
 
 /**

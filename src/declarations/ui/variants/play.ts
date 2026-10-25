@@ -648,7 +648,7 @@ const SETUP_FIRE =
  * @return {Record<string, string>} - Classes
  */
 
-const setupStyles = (picked: string) =>
+export const setupStyles = (picked: string) =>
   ({
     body: `flex flex-col ${PROPERTY_SPACING.rows}`,
     head: 'flex items-center justify-between gap-4',
@@ -732,4 +732,8 @@ export const PLAY_FEED_VERBS: Record<string, string> = {
   LIFE: 'text-[var(--play-gold-ink)]',
   finished: 'text-[var(--play-blue-ink)]',
   stopped: 'text-[var(--play-heart)]',
+  HOLED: 'text-[var(--play-golf-glow)]',
+  ACE: 'text-[var(--play-gold-ink)]',
+  POWER: 'text-[var(--play-blue-ink)]',
+  FALL: 'text-[var(--play-heart)]',
 }

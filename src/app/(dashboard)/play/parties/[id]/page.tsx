@@ -67,10 +67,11 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
   // Started game with its own table
   const drawTable = PLAY_SESSION_TABLES[game.game]
   if (!isLobby && game.board !== null && drawTable) {
-    const faceOf = ({ accountId, name, avatarUrl }: (typeof game.seats)[number]) => ({
+    const faceOf = ({ accountId, name, avatarUrl, color }: (typeof game.seats)[number]) => ({
       id: accountId,
       name,
       avatarUrl,
+      color,
     })
     const players = game.seats.filter((seat) => !seat.hasLeft).map(faceOf)
     const spectators = (
