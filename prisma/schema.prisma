@@ -387,6 +387,8 @@ model Account {
   baccalaureatVotes     BaccalaureatVote[]
   bombPlayers           BombPlayer[]
   bombMoves             BombMove[]
+  golfPlayers           GolfPlayer[]
+  golfMoves             GolfMove[]
   playMessages          PlayMessage[]
   playInvitesSent       PlayInvite[]             @relation("PlayInviteFrom")
   playInvitesReceived   PlayInvite[]             @relation("PlayInviteTo")
@@ -2635,17 +2637,20 @@ model PlaySession {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  host       Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
-  tournament PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
-  rematchOf  PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
-  rematch    PlaySession?        @relation("PlayRematch")
-  seats      PlaySeat[]
-  bacRounds  BaccalaureatRound[]
-  bombGame   BombGame?
-  bombSeats  BombPlayer[]
-  bombMoves  BombMove[]
-  messages   PlayMessage[]
-  invites    PlayInvite[]
+  host        Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
+  tournament  PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  rematchOf   PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
+  rematch     PlaySession?        @relation("PlayRematch")
+  seats       PlaySeat[]
+  bacRounds   BaccalaureatRound[]
+  bombGame    BombGame?
+  bombSeats   BombPlayer[]
+  bombMoves   BombMove[]
+  golfGame    GolfGame?
+  golfPlayers GolfPlayer[]
+  golfMoves   GolfMove[]
+  messages    PlayMessage[]
+  invites     PlayInvite[]
 
   @@index([status, game])
   @@index([tournamentId, tournamentIndex])
@@ -2891,4 +2896,80 @@ model BombMove {
   @@unique([sessionId, word])
   @@index([sessionId, createdAt])
   @@map("play_bomb_moves")
+}
+
+// Golf table: the hole in play, its clock and what lies on the course
+model GolfGame {
+  sessionId String    @id
+  hole      Int       @default(0)
+  // Strokes open from then
+  startsAt  DateTime
+  endsAt    DateTime
+  // Hole over, scorecard on screen
+  closedAt  DateTime?
+  // Server ms each orb comes back
+  orbs      Json      @default("[]")
+  // Bumpers and tornados laid by players
+  hazards   Json      @default("[]")
+  // Bumped on every move, the newest board wins
+  rev       Int       @default(0)
+  updatedAt DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_golf_games")
+}
+
+// A ball on the course, its card and its powers
+model GolfPlayer {
+  id        String    @id @default(cuid())
+  sessionId String
+  accountId String
+  x         Float
+  z         Float
+  // Still rolling until then
+  restsAt   DateTime
+  strokes   Int       @default(0)
+  holedAt   DateTime?
+  // Strokes of each finished hole
+  card      Int[]     @default([])
+  // Power in hand
+  power     String?
+  effects   Json      @default("[]")
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@map("play_golf_players")
+}
+
+// What happened on the course
+enum GolfMoveKind {
+  SHOT
+  HOLED
+  POWER
+  FALL
+}
+
+// A stroke and its tracks, a ball holed, a power played or a fall
+model GolfMove {
+  id        String       @id @default(cuid())
+  sessionId String
+  accountId String
+  kind      GolfMoveKind
+  hole      Int
+  // Strokes once holed
+  strokes   Int?
+  power     String?
+  // Tracks of a stroke, replayed by every screen
+  path      Json?
+  createdAt DateTime     @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@index([sessionId, kind])
+  @@map("play_golf_moves")
 }
