@@ -3,6 +3,7 @@ import 'server-only'
 import crypto from 'crypto'
 
 import { prisma } from '@/core/lib/db'
+import { digestSessionToken } from '@/core/lib/auth/sessionDigest'
 import { notFound } from '@/core/lib/errors'
 import { AUTH_SETTINGS } from '@/declarations/configurations/settings'
 import { discordAvatarUrl, discordBannerUrl } from '@/declarations/access/discord'
@@ -11,9 +12,7 @@ import type { DiscordIdentity } from '@/core/services/auth/DiscordService'
 import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { AccountSession } from '@/types/preferences'
 import type { Account } from '@prisma/client'
-
-// Milliseconds in one day
-const DAY_MS = 86_400_000
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * Where a session was opened from
@@ -123,9 +122,10 @@ export const openSession = async (
   const token = createToken()
   const expiresAt = new Date(Date.now() + AUTH_SETTINGS.sessionDays * DAY_MS)
 
+  // Only the digest is stored
   await prisma.session.create({
     data: {
-      token,
+      token: digestSessionToken(token),
       accountId,
       userAgent: origin.userAgent,
       address: origin.address,
@@ -145,7 +145,7 @@ export const openSession = async (
  */
 
 export const closeSession = async (token: string): Promise<void> => {
-  await prisma.session.deleteMany({ where: { token } })
+  await prisma.session.deleteMany({ where: { token: digestSessionToken(token) } })
 }
 
 /**
@@ -170,7 +170,7 @@ export const readSessions = async (
     createdAt: row.createdAt.toISOString(),
     lastUsedAt: row.lastUsedAt.toISOString(),
     expiresAt: row.expiresAt.toISOString(),
-    isCurrent: currentToken !== undefined && row.token === currentToken,
+    isCurrent: currentToken !== undefined && row.token === digestSessionToken(currentToken),
   }))
 }
 
@@ -201,7 +201,7 @@ export const revokeOtherSessions = async (
   if (currentToken.length === 0) throw notFound()
 
   const { count } = await prisma.session.deleteMany({
-    where: { accountId, token: { not: currentToken } },
+    where: { accountId, token: { not: digestSessionToken(currentToken) } },
   })
 
   return count
@@ -217,7 +217,7 @@ export const touchSession = async (token: string): Promise<void> => {
   const horizon = new Date(Date.now() - DAY_MS)
 
   await prisma.session.updateMany({
-    where: { token, lastUsedAt: { lt: horizon } },
+    where: { token: digestSessionToken(token), lastUsedAt: { lt: horizon } },
     data: { lastUsedAt: new Date() },
   })
 }
