@@ -6,15 +6,11 @@ import { isOpenLive } from '@/core/lib/lives/permissions'
 import { apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { LiveView } from '@/types/lives'
 import { LIVE_COPY } from '@/declarations/lives/copy'
 import { LiveStatuses } from '@/utils/constants/lives'
 import type { LiveStatusName } from '@/utils/constants/lives'
-
-// Toast entity label
-const ENTITY = 'Live'
-const GENDER = 'masculine'
 
 /**
  * Live state and mutations
@@ -55,7 +51,7 @@ export const useLives = (initialLives: LiveView[], initialRecent: LiveView[]): L
     async (id: string, status: LiveStatusName) => {
       const live = await run(
         () => apiPatch<LiveView>(API_ROUTES.live(id), { status }),
-        feedbackTitle(ENTITY, 'saved', GENDER)
+        entityFeedback('live', 'saved')
       )
       if (!live) return false
 

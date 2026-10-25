@@ -5,12 +5,9 @@ import { useCallback, useState } from 'react'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { DiscordIdentifierView } from '@/types/discord'
 import type { FormValues } from '@/types/forms'
-
-// Toast entity label
-const IDENTIFIER = 'Identifiant Discord'
 
 /**
  * Identifiers a session announcement names
@@ -44,7 +41,7 @@ export const useDiscordIdentifiers = (
     async (values: FormValues) => {
       const saved = await run(
         () => apiPost<DiscordIdentifierView>(API_ROUTES.recruitmentIdentifiers(sessionId), values),
-        feedbackTitle(IDENTIFIER, 'created', 'masculine')
+        entityFeedback('discordIdentifier', 'created')
       )
 
       if (saved) setIdentifiers((current) => [...current, saved])

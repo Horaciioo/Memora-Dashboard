@@ -6,7 +6,7 @@ import { apiDelete, apiGet, apiPatch } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { ProfileDetail } from '@/types/preferences'
 
@@ -44,7 +44,7 @@ export const useProfile = (initialProfile: ProfileDetail): ProfileState => {
     async (values: FormValues) => {
       const next = await run(
         () => apiPatch<ProfileDetail>(API_ROUTES.profile, values),
-        feedbackTitle('Profil', 'saved', 'masculine')
+        entityFeedback('profile', 'saved')
       )
 
       if (next) setProfile(next)

@@ -6,7 +6,7 @@ import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useSyncedState } from '@/core/hooks/interaction/state/useSyncedState'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { JuniorView, MyTrainingAction, MyTrainingView, SessionSummary } from '@/types/academy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 
@@ -46,7 +46,7 @@ export const useSessions = (initialSessions: SessionSummary[]): SessionCollectio
     async (values: FormValues) => {
       const next = await run(
         () => apiPost<SessionSummary[]>(API_ROUTES.academy, values),
-        feedbackTitle('Session', 'created', 'feminine')
+        entityFeedback('session', 'created')
       )
 
       if (next) setSessions(next)
@@ -60,7 +60,7 @@ export const useSessions = (initialSessions: SessionSummary[]): SessionCollectio
     async (id: string, values: FormValues) => {
       const next = await run(
         () => apiPatch<SessionSummary[]>(API_ROUTES.session(id), values),
-        feedbackTitle('Session', 'saved', 'feminine')
+        entityFeedback('session', 'saved')
       )
 
       if (next) setSessions(next)
@@ -74,7 +74,7 @@ export const useSessions = (initialSessions: SessionSummary[]): SessionCollectio
     async (id: string) => {
       const next = await run(
         () => apiDelete<SessionSummary[]>(API_ROUTES.session(id)),
-        feedbackTitle('Session', 'deleted', 'feminine')
+        entityFeedback('session', 'deleted')
       )
 
       if (next) setSessions(next)
@@ -122,7 +122,7 @@ export const useSession = (sessionId: string, initialJuniors: JuniorView[]): Ses
     async (values: FormValues) => {
       const next = await run(
         () => apiPost<JuniorView[]>(API_ROUTES.sessionJuniors(sessionId), values),
-        feedbackTitle('Junior', 'created', 'masculine')
+        entityFeedback('junior', 'created')
       )
 
       if (next) setJuniors(next)
@@ -137,7 +137,7 @@ export const useSession = (sessionId: string, initialJuniors: JuniorView[]): Ses
       const name = juniors.find((junior) => junior.id === id)?.displayName
       const next = await run(
         () => apiPatch<JuniorView[]>(API_ROUTES.junior(id), values),
-        feedbackTitle('Junior', 'saved', 'masculine', name)
+        entityFeedback('junior', 'saved', name)
       )
 
       if (next) setJuniors(next)
@@ -152,7 +152,7 @@ export const useSession = (sessionId: string, initialJuniors: JuniorView[]): Ses
       const name = juniors.find((junior) => junior.id === id)?.displayName
       const next = await run(
         () => apiDelete<JuniorView[]>(API_ROUTES.junior(id)),
-        feedbackTitle('Junior', 'deleted', 'masculine', name)
+        entityFeedback('junior', 'deleted', name)
       )
 
       if (next) setJuniors(next)
@@ -200,7 +200,7 @@ export const useMyTrainings = (initialTrainings: MyTrainingView[]): MyTrainingsS
       const name = trainings.find((training) => training.id === id)?.name
       const next = await run(
         () => apiPatch<MyTrainingView[]>(API_ROUTES.myTrainingProgress(id), { action }),
-        action === 'complete' ? feedbackTitle('Formation', 'saved', 'feminine', name) : undefined
+        action === 'complete' ? entityFeedback('training', 'saved', name) : undefined
       )
 
       if (next) setTrainings(next)

@@ -5,13 +5,9 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { CommunicationEntry } from '@/types/work'
-
-// Toast entity label
-const ENTITY = 'Annonce'
-const GENDER = 'feminine'
 
 /**
  * Announcement state and mutations
@@ -52,7 +48,7 @@ export const useCommunications = (
       const name = typeof values.title === 'string' ? values.title : undefined
       const entry = await run(
         () => apiPost<CommunicationEntry>(API_ROUTES.projectCommunications(projectId), values),
-        feedbackTitle(ENTITY, 'created', GENDER, name)
+        entityFeedback('announcement', 'created', name)
       )
 
       if (entry) setEntries((current) => [entry, ...current])
@@ -67,7 +63,7 @@ export const useCommunications = (
       const name = entries.find((row) => row.id === id)?.title
       const done = await run(
         () => apiDelete<{ id: string }>(API_ROUTES.communication(id)),
-        feedbackTitle(ENTITY, 'deleted', GENDER, name)
+        entityFeedback('announcement', 'deleted', name)
       )
 
       if (done) setEntries((current) => current.filter((row) => row.id !== id))
