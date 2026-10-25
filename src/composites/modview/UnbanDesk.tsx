@@ -173,7 +173,7 @@ export const UnbanDesk = ({
                     {comments?.map((comment) => (
                       <li key={comment.id} className={MODVIEW_UNBAN.comment}>
                         <span className={MODVIEW_UNBAN.commentHead}>
-                          {`${comment.authorName ?? ''} · ${formatDayTime(comment.createdAt)}`}
+                          {`${comment.authorName ?? ''} - ${formatDayTime(comment.createdAt)}`}
                         </span>
                         <span>{comment.body}</span>
                       </li>

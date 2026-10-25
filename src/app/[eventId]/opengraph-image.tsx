@@ -96,7 +96,7 @@ export default async function TicketImage({ params }: { params: Promise<{ eventI
             }}
           >
             <div style={{ fontSize: 28, fontWeight: 700, color: palette.accent, letterSpacing: 4 }}>
-              {`${SHARE_COPY.site.toUpperCase()} · ${SHARE_COPY.eventKind.toUpperCase()}`}
+              {`${SHARE_COPY.site.toUpperCase()} - ${SHARE_COPY.eventKind.toUpperCase()}`}
             </div>
             <div style={{ fontSize: 68, fontWeight: 700, lineHeight: 1.1 }}>{event.title}</div>
             <div style={{ fontSize: 36, fontWeight: 500, color: palette.subtle }}>

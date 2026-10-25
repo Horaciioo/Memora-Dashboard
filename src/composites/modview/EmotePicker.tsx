@@ -63,7 +63,7 @@ export const EmotePicker = ({ emotes, onPick }: EmotePickerProps) => {
       type="button"
       className={cn(MODVIEW_CHAT.emoteCell, emote.isLocked && MODVIEW_CHAT.emoteLocked)}
       disabled={emote.isLocked}
-      title={emote.isLocked ? `${emote.name} · ${lockReason(emote)}` : emote.name}
+      title={emote.isLocked ? `${emote.name} - ${lockReason(emote)}` : emote.name}
       aria-label={emote.name}
       // The box keeps focus
       onMouseDown={(event) => event.preventDefault()}
