@@ -1,0 +1,84 @@
+/* Memora Play palette, outside the Memora pink */
+:root {
+  --play-baccalaureat: #3b6fd8;
+  --play-baccalaureat-deep: #1c3b8f;
+  --play-baccalaureat-glow: #8fb4ff;
+  --play-golf: #3f9d5c;
+  --play-golf-deep: #1d5b33;
+  --play-golf-glow: #a6e8a0;
+  --play-bomb: #e0743a;
+  --play-bomb-deep: #7a2a12;
+  --play-bomb-glow: #ffd08a;
+  /* The drawn bomb: iron shell, brass cap, cord, spark */
+  --play-bomb-shell: #2a2236;
+  --play-bomb-shell-deep: #07050c;
+  --play-bomb-shine: rgb(255 255 255 / 0.4);
+  --play-bomb-cap: #6d6578;
+  --play-bomb-cap-deep: #34303d;
+  --play-bomb-cord: #d8b77a;
+  --play-heart: #ff4d5e;
+  /* Ember night of the bomb hub */
+  --play-ember-night: #160906;
+  --play-ember-dusk: #3a1206;
+  --play-ludo: #c9425a;
+  --play-ludo-deep: #6b1631;
+  --play-ludo-glow: #ffb0c0;
+  --play-mystery: #3b2f7a;
+  --play-mystery-deep: #17112f;
+  --play-mystery-glow: #8b7fd6;
+  --play-seat-1: #e5484d;
+  --play-seat-2: #f76b15;
+  --play-seat-3: #ffc53d;
+  --play-seat-4: #46a758;
+  --play-seat-5: #12a594;
+  --play-seat-6: #00a2c7;
+  --play-seat-7: #3e63dd;
+  --play-seat-8: #6e56cf;
+  --play-seat-9: #ab4aba;
+  --play-seat-10: #d6409f;
+  --play-seat-11: #978365;
+  --play-seat-12: #8d8d86;
+  /* Arcade room, the same in light and dark */
+  --play-night: #0e0a24;
+  --play-dusk: #1d1250;
+  --play-haze: #3a1d7a;
+  --play-on-art: #ffffff;
+  --play-panel: rgb(30 34 44 / 0.72);
+  --play-panel-strong: rgb(44 49 62 / 0.82);
+  /* Frosted glass of the dock */
+  --play-glass: rgb(26 30 40 / 0.78);
+  --play-glass-solid: var(--play-night);
+  --play-line: rgb(255 255 255 / 0.08);
+  --play-ink: #ffffff;
+  --play-ink-soft: rgb(236 232 255 / 0.68);
+  --play-ink-faint: rgb(236 232 255 / 0.42);
+  --play-key: var(--color-brand-500);
+  --play-key-deep: #b9466d;
+  --play-key-ink: var(--play-on-art);
+  --play-core: var(--play-night);
+  --play-track: rgb(0 0 0 / 0.35);
+  --play-chip: rgb(0 0 0 / 0.35);
+  --play-ring: var(--play-dusk);
+  --play-gold: #ffcf4a;
+  --play-gold-deep: #b37a00;
+  /* Gold and blue as text */
+  --play-gold-ink: var(--play-gold);
+  --play-blue-ink: #8fb4ff;
+  --play-accent: var(--play-gold-ink);
+  /* Squared notebook */
+  --play-paper: #ffffff;
+  --play-paper-line: #d6e1f5;
+  /* Session side column, open and folded; bar height above it */
+  --play-side-open: 22rem;
+  --play-side-folded: 3.5rem;
+  --play-bar-h: 3.5rem;
+  /* One square of the notebook */
+  --play-paper-cell: 1.5rem;
+  /* Rank bands */
+  --play-tier-bronze: #d08a52;
+  --play-tier-silver: #c7d0dc;
+  --play-tier-gold: #ffcf4a;
+  --play-tier-platinum: #7fe3d6;
+  --play-tier-diamond: #8fb4ff;
+  --play-tier-legend: #ff7ab0;
+}

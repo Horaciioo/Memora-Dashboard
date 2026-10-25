@@ -37,6 +37,7 @@ const PERMISSION_GROUP_MAP: Record<PermissionGroup, PermissionGroupOption> = {
   [PermissionGroups.Teams]: { label: 'Équipes', position: 12 },
   [PermissionGroups.Configuration]: { label: 'Configuration', position: 13 },
   [PermissionGroups.Access]: { label: 'Accès & console', position: 14 },
+  [PermissionGroups.Play]: { label: 'Memora Play', position: 15 },
 }
 
 export const PERMISSION_GROUP_REGISTRY = createRegistry(PERMISSION_GROUP_MAP)

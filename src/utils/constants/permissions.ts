@@ -74,6 +74,8 @@ export const Permissions = {
   ReferenceRead: 'reference:read',
   ReferenceManage: 'reference:manage',
   AccessManage: 'access:manage',
+  PlayAccess: 'play:access',
+  PlayManage: 'play:manage',
 } as const
 
 export type PermissionName = (typeof Permissions)[keyof typeof Permissions]
@@ -119,6 +121,7 @@ export const PermissionGroups = {
   Teams: 'teams',
   Configuration: 'configuration',
   Access: 'access',
+  Play: 'play',
 } as const
 
 export type PermissionGroup = (typeof PermissionGroups)[keyof typeof PermissionGroups]
@@ -676,6 +679,22 @@ export const PermissionsList: PermissionMeta[] = [
     description: 'Ouvrir un parcours, noter chaque module et suivre la progression.',
     important: true,
     parent: Permissions.LegacyRead,
+  },
+  {
+    name: Permissions.PlayAccess,
+    group: PermissionGroups.Play,
+    displayName: 'Jouer à Memora Play',
+    description: 'Ouvrir Memora Play, créer et rejoindre des parties.',
+    important: false,
+  },
+  {
+    name: Permissions.PlayManage,
+    group: PermissionGroups.Play,
+    displayName: 'Gérer la progression Play',
+    description:
+      'Passer de l’XP, fixer un niveau, remettre à zéro ou sortir un modérateur de sa partie.',
+    important: true,
+    parent: Permissions.PlayAccess,
   },
   {
     name: Permissions.TeamRead,

@@ -4,7 +4,7 @@
  */
 
 export const PERSONAL_COPY = {
-  title: 'Ton Accueil',
+  title: 'Accueil',
   heroDescription: 'Ton hub personnel',
   greeting: 'Salut, {name}',
   hello: 'On bosse sur quoi aujourd’hui ?',
@@ -58,6 +58,9 @@ export const PERSONAL_COPY = {
 export const PERSONAL_TASK_COPY = {
   title: 'À faire',
   empty: 'Rien ne t’attend, tout est à jour.',
+  firstGameTitle: 'Joue à ta 1ère partie de Bac',
+  firstGameDescription:
+    'Lance ou rejoins une partie de Baccalauréat dans Memora Play. Victoire, égalité ou défaite : ton XP est doublée pour cette première partie.',
   mentionTitle: '{name} t’a mentionné',
   mentionSomeone: 'Quelqu’un',
   liveReportTitle: 'Voir le bilan du live « {title} »',

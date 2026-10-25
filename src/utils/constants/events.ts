@@ -75,6 +75,11 @@ export const EVENT_TYPES = createEnumeration({
   JobRetried: { id: 66, label: 'Tâche de fond relancée' },
   LiveCoordinatorsChanged: { id: 67, label: 'Coordinateurs d’un live changés' },
   LiveReinforced: { id: 68, label: 'Renfort appelé sur un live' },
+  PlayJoined: { id: 69, label: 'Partie Play rejointe' },
+  PlayLeft: { id: 70, label: 'Partie Play quittée' },
+  PlayKicked: { id: 71, label: 'Retiré d’une partie Play' },
+  PlayFinished: { id: 72, label: 'Partie Play terminée' },
+  PlayAdjusted: { id: 73, label: 'Progression Play modifiée' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

@@ -127,6 +127,75 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.8.0',
+    date: '2026-10-25',
+    title: 'Memora Play est là !',
+    intro: 'Memora ouvre sa salle de jeux : retrouve les autres membres pour une partie.',
+    description:
+      'Memora n’offrait aucun moment de détente entre deux lives, et rien ne rapprochait les équipes en dehors du travail. Cette version ajoute « Memora Play », avec deux jeux, un chat de partie, des niveaux, un classement et des trophées, et corrige la frise des candidats dans les « Recrutements ».',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Memora Play » : une salle de jeux pour créer une partie, la rejoindre depuis le salon et inviter les autres membres.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout du jeu « Baccalauréat » : une lettre, des catégories, le plus rapide gagne, avec jokers, mode flash, tournois, spectateurs et revanche.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout du jeu « Bomb Party » : une syllabe, un mot, et la bombe passe au joueur suivant avant d’exploser.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’un chat dans chaque partie et d’invitations, comme joueur ou comme spectateur, qui apparaissent en bas de l’écran.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de l’expérience dans « Memora Play » : des niveaux de Bronze à Légende, un classement par jeu, des trophées et des statistiques détaillées par joueur.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.preferences,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’un onglet « Memora Play » dans les « Préférences », avec son niveau, ses statistiques et ses trophées.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.PlayManage,
+        text: 'Ajout de la possibilité, depuis la fiche d’un modérateur, de lui donner de l’expérience, de fixer son niveau, de remettre ses statistiques à zéro ou de le sortir de sa partie.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la barre latérale : le raccourci « Play » brille en doré pour se repérer d’un coup d’œil.',
+        permission: Permissions.PlayAccess,
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.home,
+        text: 'Amélioration de l’« Accueil » : la page « Ton Accueil » est renommée « Accueil ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Correction d’un bug qui empêchait de décocher une étape de la frise d’un candidat ou de cocher l’étape « Entretien » à la main.',
+      },
+    ],
+  },
+  {
     version: '0.7.0',
     date: '2026-10-21',
     title: 'Une flopée de correctifs !',

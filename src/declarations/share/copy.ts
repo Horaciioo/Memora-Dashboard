@@ -13,7 +13,7 @@ export const SHARE_COPY = {
   scopeAll: 'Tout Memora',
   // Showcase ticket
   demoTitle: 'Live spécial abonnés, Michou',
-  demoWhen: 'Mer. 21 oct. · 20:00 → 23:00',
+  demoWhen: 'Mer. 21 oct. - 20:00 → 23:00',
   demoMonth: 'Oct.',
   demoDay: '21',
   demoWeekday: 'Mer.',

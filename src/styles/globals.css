@@ -6,6 +6,8 @@
 @import './tokens/gradients.css';
 @import './tokens/external.css';
 @import './tokens/vision.css';
+@import './tokens/play.css';
+@import './play/arcade.css';
 @import './base/root.css';
 @import './base/motion.css';
 @import './base/theme.css';

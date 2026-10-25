@@ -208,15 +208,24 @@ export const toEntry = (row: ActivityRow): ActivityEntry => ({
  * Read the journal of one member
  * @param {string} accountId - Account identifier
  * @param {number} [take] - Entry count
+ * @param {string[]} [skippedTargets] - Target kinds read elsewhere
  * @return {Promise<ActivityEntry[]>} - Journal entries
  */
 
 export const readMemberActivity = async (
   accountId: string,
-  take: number = PAGINATION_SETTINGS.defaultPerPage
+  take: number = PAGINATION_SETTINGS.defaultPerPage,
+  skippedTargets: string[] = []
 ): Promise<ActivityEntry[]> => {
   const rows = await prisma.activityLog.findMany({
-    where: { AND: [{ OR: [{ subjectId: accountId }, { actorId: accountId }] }, NOT_MOD_ACTION] },
+    where: {
+      AND: [
+        { OR: [{ subjectId: accountId }, { actorId: accountId }] },
+        NOT_MOD_ACTION,
+        // Null targets stay in
+        { OR: [{ targetType: null }, { targetType: { notIn: skippedTargets } }] },
+      ],
+    },
     include: { actor: { select: { displayName: true, avatarUrl: true } } },
     orderBy: { createdAt: 'desc' },
     take,

@@ -194,6 +194,16 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     verb: 'a appelé',
     target: 'du renfort sur un live',
   },
+  PlayJoined: { label: 'Play', tone: 'info', verb: 'a rejoint', target: 'une partie' },
+  PlayLeft: { label: 'Play', tone: 'neutral', verb: 'a quitté', target: 'une partie' },
+  PlayKicked: {
+    label: 'Play',
+    tone: 'warning',
+    verb: 'a retiré',
+    target: 'un joueur d’une partie',
+  },
+  PlayFinished: { label: 'Play', tone: 'success', verb: 'a terminé', target: 'une partie' },
+  PlayAdjusted: { label: 'Play', tone: 'brand', verb: 'a modifié', target: 'une progression Play' },
   ParkourMoved: {
     label: 'PIM',
     tone: 'brand',

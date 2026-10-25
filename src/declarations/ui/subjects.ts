@@ -30,6 +30,7 @@ export const FORM_SUBJECTS = {
   question: { label: 'Question', gender: 'feminine', icon: 'help' },
   choice: { label: 'Réponse', gender: 'feminine', icon: 'checkbox' },
   member: { label: 'Modérateur', gender: 'masculine', icon: 'members' },
+  playStats: { label: 'Progression Play', gender: 'feminine', icon: 'play' },
   social: { label: 'Réseau', gender: 'masculine', icon: 'link' },
   project: { label: 'Projet', gender: 'masculine', icon: 'projects' },
   task: { label: 'Tâche', gender: 'feminine', icon: 'tasks' },

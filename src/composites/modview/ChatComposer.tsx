@@ -91,7 +91,7 @@ export const ChatComposer = ({
         entries: commands.map<MenuEntry>((option) => ({
           key: option.name,
           label: `/${option.name}`,
-          hint: [option.usage, option.description].filter(Boolean).join(' · '),
+          hint: [option.usage, option.description].filter(Boolean).join(' - '),
           locked: gate(option.probe).allowed ? null : (gate(option.probe).reason ?? ''),
           apply: () => `/${option.name} `,
         })),

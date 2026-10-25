@@ -18,6 +18,8 @@ import { BELOW_LEAD_ROLES, memberFields, readMember } from '@/core/services/memb
 import { readAdminState } from '@/core/services/members/admin'
 import { findCandidateFile } from '@/core/services/recruitment/RecruitmentService'
 import { readMemberActivity } from '@/core/services/system/ActivityService'
+import { readPlayActivity, readPlayAdmin, readPlayPresence } from '@/core/services/play'
+import { PLAY_TARGET } from '@/declarations/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -116,9 +118,12 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     socialFields,
     moderation,
     adminState,
+    playPresence,
+    playActivity,
+    playAdmin,
   ] = await Promise.all([
     memberFields(access.isAdmin),
-    canReadLogs ? readMemberActivity(id) : Promise.resolve([]),
+    canReadLogs ? readMemberActivity(id, undefined, [PLAY_TARGET]) : Promise.resolve([]),
     canManageAccess ? readOverrides(id) : Promise.resolve({}),
     canManageAccess ? readMemberBaselines(id, detail.summary.youtubers) : Promise.resolve({}),
     access.can(Permissions.RecruitmentRead)
@@ -131,6 +136,9 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     socialFormFields(),
     canReadModeration ? readMemberModeration(id) : Promise.resolve(undefined),
     canLead ? readAdminState(id) : Promise.resolve(null),
+    readPlayPresence(id),
+    canReadLogs ? readPlayActivity(id) : Promise.resolve([]),
+    canLead && access.can(Permissions.PlayManage) ? readPlayAdmin(id) : Promise.resolve(null),
   ])
 
   // Sensitive values never leave the server while the window is shut
@@ -162,6 +170,9 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
         canOpenReports={access.can(Permissions.LiveLogRead)}
         adminState={adminState}
         canDelete={access.can(Permissions.MemberDelete)}
+        playPresence={playPresence}
+        playActivity={playActivity}
+        playAdmin={playAdmin}
       />
     </div>
   )

@@ -34,6 +34,18 @@ export const BUTTON_STYLES = {
   // 44px hit area on touch
   icon: 'h-9 w-9 min-h-11 min-w-11 rounded-full p-0 text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] md:min-h-0 md:min-w-0',
   link: 'min-h-0 p-0 text-[var(--color-ink-accent)] underline-offset-2 hover:underline',
+  // Memora Play keys, painted in play/arcade.css
+  arcade: 'play-key px-5 py-3 text-base! font-bold!',
+  arcadeGhost: 'play-key play-key-ghost px-5 py-3 text-base! font-bold!',
+  // Compact keys of the dock bubbles
+  arcadeSmall: 'play-key px-3.5 py-1.5 text-sm! font-bold!',
+  arcadeGhostSmall: 'play-key play-key-ghost px-3.5 py-1.5 text-sm! font-bold!',
+  // No fill, no depth: text on the room
+  arcadeText:
+    'rounded-full px-5 py-3 text-base! font-bold! text-[var(--play-ink-soft)] hover:bg-[var(--play-chip)] hover:text-[var(--play-ink)]',
+  arcadeHero: 'play-key play-key-hero px-6 py-4 text-lg! font-extrabold!',
+  arcadeOrange: 'play-key play-key-orange px-5 py-3 text-base! font-bold!',
+  arcadeDanger: 'play-key play-key-danger px-5 py-3 text-base! font-bold!',
   // Square footprint for a label-less button
   square: 'h-9 w-9 min-h-11 min-w-11 shrink-0 p-0 md:min-h-0 md:min-w-0',
 } as const

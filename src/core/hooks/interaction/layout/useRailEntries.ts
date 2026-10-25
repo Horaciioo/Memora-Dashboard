@@ -1,8 +1,7 @@
 'use client'
 
-import { ROUTES, visibleNavGroups } from '@/declarations/navigation'
+import { visibleNavGroups } from '@/declarations/navigation'
 import { FAVORITE_COPY } from '@/declarations/ui/favorites'
-import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { useTour } from '@/managers/front-end/TourManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'
@@ -20,10 +19,9 @@ export const useRailEntries = (viewContext: ViewContext) => {
 
   const entries = visibleNavGroups(viewContext.view, session, can)
   // Shortcuts leave the groups too
-  const shortcuts = [
-    ...entries.flatMap((group) => group.items).filter((item) => item.quick),
-    { href: ROUTES.preferences, label: NAV_COPY.preferences, icon: 'settings' as const },
-  ].filter((item) => isUnlocked(item.href))
+  const shortcuts = entries
+    .flatMap((group) => group.items)
+    .filter((item) => item.quick && isUnlocked(item.href))
   const groups = entries
     .map((group) => ({
       ...group,

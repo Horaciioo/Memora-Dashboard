@@ -7,6 +7,23 @@
   box-shadow: var(--glass-shadow);
 }
 
+/* Frosted soft grey over a blurred backdrop, the navbar and Play floats */
+.mist {
+  background: var(--mist-fill);
+  -webkit-backdrop-filter: blur(var(--mist-blur)) saturate(var(--mist-saturate));
+  backdrop-filter: blur(var(--mist-blur)) saturate(var(--mist-saturate));
+  border-color: var(--mist-line);
+  box-shadow: var(--mist-shadow);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .mist {
+    background: var(--color-surface-raised);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 /* Soft card on the page, no blur so long lists stay smooth, in a layer so a hover or tint still wins */
 @layer components {
   .card-surface {

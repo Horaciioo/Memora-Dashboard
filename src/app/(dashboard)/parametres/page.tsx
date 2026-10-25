@@ -4,6 +4,7 @@ import { PreferencesPanel } from '@/composites/preferences/PreferencesPanel'
 import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
 import { profileFields, readProfile } from '@/core/services/preferences/ProfileService'
 import { listPlatformLinks } from '@/core/services/platforms/PlatformAccountService'
+import { readPlayProfile } from '@/core/services/play'
 import { requireUser } from '@/core/wrappers/requireUser'
 import { LINK_PARAMS, LINK_RESULT } from '@/declarations/platforms/link'
 import { isTwitchConfigured } from '@/declarations/platforms/twitch'
@@ -12,6 +13,7 @@ import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 import { LivePlatforms } from '@/utils/constants/lives'
 import type { LivePlatformName } from '@/utils/constants/lives'
+import { Permissions } from '@/utils/constants/permissions'
 
 export interface PreferencesPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
@@ -43,13 +45,14 @@ export const metadata: Metadata = { title: PREFERENCES_COPY.title }
  */
 
 export default async function PreferencesPage({ searchParams }: PreferencesPageProps) {
-  const { session } = await requireUser()
+  const { session, access } = await requireUser()
   const query = await searchParams
 
-  const [profile, seal, links] = await Promise.all([
+  const [profile, seal, links, play] = await Promise.all([
     readProfile(session.id),
     readSealState(),
     listPlatformLinks(session.id),
+    access.can(Permissions.PlayAccess) ? readPlayProfile(session.id) : null,
   ])
 
   // A member's own contact details are sealed just like anyone else's
@@ -67,6 +70,7 @@ export default async function PreferencesPage({ searchParams }: PreferencesPageP
           [LivePlatforms.YouTube]: isYoutubeConfigured(),
         }}
         returned={returnedLink(query)}
+        play={play}
       />
     </div>
   )

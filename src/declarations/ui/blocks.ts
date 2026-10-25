@@ -214,7 +214,7 @@ export const NAV_SHEET = {
  */
 
 export const TOP_BAR = {
-  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 bg-[var(--color-page)] px-3 md:hidden print:hidden',
+  bar: 'mist sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 border-b px-3 md:hidden print:hidden',
   menuButton:
     'flex size-11 items-center justify-center rounded-full text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
   menuIcon: 'size-6',

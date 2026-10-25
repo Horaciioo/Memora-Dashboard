@@ -36,7 +36,13 @@ export const Button = ({
   const Trailing = noLabel && iconAfter ? ICONS[iconAfter] : null
   const isGlyphOnly = Boolean(Leading || Trailing)
   // Coloured fills carry the white mark as is
-  const onFill = variant === 'primary' || variant === 'success' || variant === 'danger'
+  const onFill =
+    variant === 'primary' ||
+    variant === 'success' ||
+    variant === 'danger' ||
+    variant === 'arcade' ||
+    variant === 'arcadeOrange' ||
+    variant === 'arcadeDanger'
 
   return (
     <button

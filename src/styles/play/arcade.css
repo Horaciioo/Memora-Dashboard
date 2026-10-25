@@ -1,0 +1,689 @@
+/* Memora Play room: night sky, neon haze, a floor grid running to the horizon, whatever the theme */
+.play-sky,
+.play-room {
+  background:
+    radial-gradient(
+      60rem 28rem at 12% -6%,
+      color-mix(in srgb, var(--play-key) 34%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      48rem 30rem at 92% 4%,
+      color-mix(in srgb, var(--play-baccalaureat) 40%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-night) 0%, var(--play-dusk) 55%, var(--play-haze) 100%);
+  color: var(--play-ink);
+}
+
+/* Starfield, two layers of dots */
+.play-room::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 20% 30%, rgb(255 255 255 / 0.7), transparent),
+    radial-gradient(1px 1px at 70% 12%, rgb(255 255 255 / 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 40% 60%, rgb(255 255 255 / 0.45), transparent),
+    radial-gradient(1px 1px at 85% 45%, rgb(255 255 255 / 0.6), transparent),
+    radial-gradient(1.5px 1.5px at 8% 75%, rgb(255 255 255 / 0.4), transparent);
+  background-size: 22rem 22rem;
+  opacity: 0.6;
+}
+
+/* Perspective floor */
+.play-floor {
+  position: fixed;
+  inset-inline: -50%;
+  bottom: -2rem;
+  height: 42vh;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--play-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--play-line) 1px, transparent 1px);
+  background-size: 4rem 4rem;
+  transform: perspective(28rem) rotateX(62deg);
+  transform-origin: bottom;
+  mask-image: linear-gradient(to top, black 10%, transparent 85%);
+}
+
+/* Chunky key with its own depth */
+.play-key {
+  border-radius: 1rem;
+  background: var(--play-key);
+  color: var(--play-key-ink);
+  box-shadow:
+    0 0.3rem 0 var(--play-key-deep),
+    inset 0 1px 0 rgb(255 255 255 / 0.45);
+  transition:
+    transform var(--motion-duration-fast) ease-out,
+    box-shadow var(--motion-duration-fast) ease-out;
+}
+
+.play-key:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0.4rem 0 var(--play-key-deep),
+    inset 0 1px 0 rgb(255 255 255 / 0.45);
+}
+
+.play-key:active {
+  transform: translateY(0.25rem);
+  box-shadow: 0 0.05rem 0 var(--play-key-deep);
+}
+
+.play-key-ghost {
+  background: var(--play-panel-strong);
+  color: var(--play-ink);
+  box-shadow:
+    0 0.25rem 0 rgb(0 0 0 / 0.35),
+    inset 0 0 0 1px var(--play-line);
+}
+
+.play-key-ghost:hover {
+  box-shadow:
+    0 0.35rem 0 rgb(0 0 0 / 0.35),
+    inset 0 0 0 1px var(--play-line);
+}
+
+/* Hero key, same depth, just larger */
+.play-key-hero:disabled {
+  background: var(--play-panel-strong);
+  color: var(--play-ink-faint);
+  box-shadow: inset 0 0 0 1px var(--play-line);
+}
+
+/* Invite key, orange with the same depth */
+.play-key-orange {
+  background: var(--play-bomb);
+  color: var(--play-on-art);
+  box-shadow:
+    0 0.3rem 0 var(--play-bomb-deep),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+.play-key-orange:hover {
+  box-shadow:
+    0 0.4rem 0 var(--play-bomb-deep),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+.play-key-orange:active {
+  box-shadow: 0 0.05rem 0 var(--play-bomb-deep);
+}
+
+/* Destructive key, same depth as the others */
+.play-key-danger {
+  background: var(--color-danger);
+  color: var(--color-on-solid);
+  box-shadow:
+    0 0.3rem 0 color-mix(in srgb, var(--color-danger) 62%, black),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+.play-key-danger:hover {
+  box-shadow:
+    0 0.4rem 0 color-mix(in srgb, var(--color-danger) 62%, black),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+.play-key-danger:active {
+  box-shadow: 0 0.05rem 0 color-mix(in srgb, var(--color-danger) 62%, black);
+}
+
+/* Game card lifts and its art drifts */
+.play-card {
+  transition:
+    transform var(--motion-duration-panel) var(--motion-ease-out),
+    box-shadow var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+.play-card:hover {
+  transform: translateY(-0.35rem) rotate(-0.4deg);
+}
+
+.play-card .play-art {
+  transition: transform 900ms var(--motion-ease-out);
+}
+
+.play-card:hover .play-art {
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-key,
+  .play-card,
+  .play-card .play-art {
+    transition: none;
+  }
+
+  .play-card:hover,
+  .play-card:hover .play-art {
+    transform: none;
+  }
+}
+
+/* Play boxes worn by the classic Memora pages, outside the room: these follow the theme */
+.play-classic {
+  --play-ink: var(--color-ink);
+  --play-ink-soft: var(--color-ink-subtle);
+  --play-ink-faint: var(--color-ink-subtle);
+  --play-panel: var(--color-surface);
+  --play-panel-strong: var(--color-surface);
+  --play-line: var(--color-border);
+  --play-core: var(--color-surface-sunken);
+  --play-track: var(--color-track-off);
+  --play-chip: var(--color-surface-sunken);
+  --play-accent: var(--color-ink-accent);
+}
+
+/* A hub on squared paper: dark ink, no sky */
+.play-room:has(.play-paper) {
+  --play-ink: var(--play-night);
+  --play-ink-soft: rgb(14 10 36 / 0.66);
+  --play-ink-faint: rgb(14 10 36 / 0.45);
+  --play-panel: var(--play-paper);
+  --play-panel-strong: var(--play-paper);
+  --play-line: rgb(14 10 36 / 0.12);
+  --play-core: #f3f1fa;
+  --play-track: rgb(14 10 36 / 0.1);
+  --play-chip: rgb(14 10 36 / 0.06);
+  --play-glass: rgb(255 255 255 / 0.78);
+  --play-glass-solid: var(--play-paper);
+  --play-ring: var(--play-paper);
+  --play-gold-ink: #86560a;
+  --play-blue-ink: #2f5fc2;
+  background-color: var(--play-paper);
+  background-image:
+    radial-gradient(
+      circle at 50% 50%,
+      #c9d0de 0 0.4rem,
+      #aab3c5 0.4rem 0.5rem,
+      transparent 0.54rem
+    ),
+    linear-gradient(var(--play-paper-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--play-paper-line) 1px, transparent 1px);
+  background-size:
+    2rem 6rem,
+    var(--play-paper-cell) var(--play-paper-cell),
+    var(--play-paper-cell) var(--play-paper-cell);
+  background-repeat: repeat-y, repeat, repeat;
+}
+
+.play-room:has(.play-paper)::before,
+.play-room:has(.play-paper) .play-floor {
+  display: none;
+}
+
+/* Frosted glass, opaque enough to read what sits on it */
+.play-glass {
+  background: var(--play-glass);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    inset 0 0 0 1px rgb(255 255 255 / 0.12),
+    0 0.75rem 2rem rgb(0 0 0 / 0.28);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .play-glass {
+    background: var(--play-glass-solid, var(--play-night));
+    backdrop-filter: none;
+  }
+}
+
+/* Dock bubble grows from the bottom, its content rising after it */
+.play-rise {
+  transform-origin: bottom center;
+  animation: play-rise var(--motion-duration-panel) var(--motion-ease-out) backwards;
+}
+
+.play-rise-item {
+  animation: play-rise-content var(--motion-duration-panel) var(--motion-ease-out) 80ms backwards;
+}
+
+.play-rise-item + .play-rise-item {
+  animation-delay: 160ms;
+}
+
+/* Thought bubbles pop from the key upwards */
+.play-pop {
+  animation: play-pop 220ms var(--motion-ease-out) backwards;
+}
+
+@keyframes play-rise {
+  from {
+    scale: 1 0.4;
+    opacity: 0;
+  }
+  to {
+    scale: 1 1;
+    opacity: 1;
+  }
+}
+
+@keyframes play-rise-content {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes play-pop {
+  from {
+    scale: 0;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+/* Side chat slides in from the right edge, and back out when folded */
+.play-side-in {
+  animation: play-side-in 300ms var(--motion-ease-out) backwards;
+}
+
+.play-side-out {
+  animation: play-side-out 220ms ease-in forwards;
+}
+
+@keyframes play-side-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@keyframes play-side-out {
+  to {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@media (min-width: 64rem) {
+  @keyframes play-side-in {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes play-side-out {
+    to {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-rise,
+  .play-rise-item,
+  .play-side-in,
+  .play-side-out,
+  .play-pop {
+    animation: none;
+  }
+}
+
+/* Chunky 3D figure, stacked shadows for depth */
+.play-figure {
+  color: var(--play-ink);
+  text-shadow:
+    0 1px 0 color-mix(in srgb, var(--play-key) 80%, black),
+    0 2px 0 color-mix(in srgb, var(--play-key) 75%, black),
+    0 3px 0 color-mix(in srgb, var(--play-key) 70%, black),
+    0 4px 0 color-mix(in srgb, var(--play-key) 65%, black),
+    0 5px 0 color-mix(in srgb, var(--play-key) 60%, black),
+    0 6px 0 color-mix(in srgb, var(--play-key) 55%, black),
+    0 0.6rem 1.2rem rgb(0 0 0 / 0.35);
+}
+
+/* Countdown in the game blue */
+.play-figure-blue {
+  color: var(--play-baccalaureat-glow);
+  --play-key: var(--play-baccalaureat);
+}
+
+/* Each new number drops in and settles */
+.play-tick {
+  animation: play-tick 700ms var(--motion-ease-out) both;
+}
+
+@keyframes play-tick {
+  0% {
+    opacity: 0;
+    scale: 2.2;
+    rotate: -12deg;
+  }
+  45% {
+    opacity: 1;
+    scale: 0.92;
+    rotate: 3deg;
+  }
+  100% {
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-tick {
+    animation: none;
+  }
+}
+
+/* A word written in blue pen, its baseline on a line of the squares */
+.play-pen {
+  align-self: end;
+  justify-self: start;
+  grid-column: var(--col);
+  grid-row: var(--row);
+  translate: 0 0.2em;
+  rotate: var(--tilt);
+  transform-origin: left bottom;
+  font-size: calc(var(--play-paper-cell) * 0.95);
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--play-blue-ink);
+  opacity: 0.78;
+}
+
+/* The STOP shout lands hard */
+.play-stop {
+  animation: play-stop 520ms var(--motion-ease-spring) both;
+}
+
+@keyframes play-stop {
+  0% {
+    opacity: 0;
+    scale: 2.4;
+    rotate: -8deg;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+
+/* Confetti pieces fall once, each with its own drift and spin */
+.play-confetti {
+  left: var(--x);
+  width: var(--w);
+  height: var(--h);
+  background: var(--tone);
+  border-radius: 2px;
+  animation: play-confetti var(--dur) var(--delay) cubic-bezier(0.2, 0.6, 0.35, 1) both;
+}
+
+@keyframes play-confetti {
+  from {
+    transform: translate3d(0, -12vh, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(var(--drift), 112vh, 0) rotate(var(--spin));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-stop {
+    animation: none;
+  }
+}
+
+/* Bomb Party ground: ember night, a fire glow rising from the floor */
+.play-room:has(.play-fuse) {
+  background:
+    radial-gradient(
+      70rem 34rem at 50% 115%,
+      color-mix(in srgb, var(--play-bomb) 55%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      40rem 24rem at 88% -8%,
+      color-mix(in srgb, var(--play-bomb-glow) 18%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-ember-night) 0%, var(--play-ember-dusk) 100%);
+}
+
+.play-room:has(.play-fuse) .play-floor {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--play-bomb) 30%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--play-bomb) 30%, transparent) 1px,
+      transparent 1px
+    );
+}
+
+/* A syllable rises like an ember, glows, then burns out */
+.play-ember {
+  position: absolute;
+  bottom: -4rem;
+  left: var(--x);
+  font-size: var(--size);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--play-bomb-glow);
+  text-shadow:
+    0 0 0.4em var(--play-bomb),
+    0 0 1.2em var(--play-bomb-deep);
+  opacity: 0;
+  animation: play-ember var(--rise) linear var(--delay) infinite;
+}
+
+@keyframes play-ember {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  12% {
+    opacity: 0.75;
+  }
+  45% {
+    opacity: 0.45;
+  }
+  55% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift), -115vh, 0) scale(0.55);
+  }
+}
+
+/* Countdown in the fire orange */
+.play-figure-fire {
+  color: var(--play-bomb-glow);
+  --play-key: var(--play-bomb);
+}
+
+/* Table sized from its own width */
+.play-bomb-table {
+  container-type: inline-size;
+  --play-orbit: 40cqi;
+  --play-arrow-reach: 27cqi;
+}
+
+/* Seat on the orbit, kept upright */
+.play-bomb-seat {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  transform: rotate(var(--angle)) translateY(calc(-1 * var(--play-orbit)))
+    rotate(calc(-1 * var(--angle)));
+}
+
+/* White glint inside a full heart */
+.play-heart-shine::after {
+  content: '';
+  position: absolute;
+  top: 28%;
+  left: 24%;
+  width: 24%;
+  height: 16%;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.85);
+  rotate: -35deg;
+  filter: blur(0.4px);
+}
+
+/* Arrow from the bomb to the player on turn */
+.play-bomb-arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  rotate: var(--angle);
+  transition: rotate 380ms var(--motion-ease-out);
+}
+
+.play-bomb-arrow::after {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: calc(-1 * var(--play-arrow-reach));
+  width: 2rem;
+  height: 2.4rem;
+  background: linear-gradient(var(--play-bomb-glow), var(--play-bomb));
+  clip-path: polygon(50% 0, 100% 100%, 50% 78%, 0 100%);
+  filter: drop-shadow(0 0 0.5rem var(--play-bomb));
+}
+
+/* The bomb breathes, faster on the edge */
+.play-bomb {
+  animation: play-bomb-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes play-bomb-breathe {
+  50% {
+    scale: 1.04;
+  }
+}
+
+/* Spark flickers at the cord tip */
+.play-bomb-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: play-bomb-spark 180ms steps(2) infinite alternate;
+}
+
+@keyframes play-bomb-spark {
+  from {
+    opacity: 1;
+    scale: 1;
+  }
+  to {
+    opacity: 0.7;
+    scale: 1.25;
+    rotate: 25deg;
+  }
+}
+
+/* Blast: a flash ring and a kick */
+.play-bomb-blast {
+  animation: play-bomb-kick 520ms var(--motion-ease-out);
+}
+
+.play-bomb-blast::after {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    var(--play-bomb-glow) 0%,
+    var(--play-bomb) 35%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: play-bomb-flash 900ms var(--motion-ease-out) forwards;
+}
+
+@keyframes play-bomb-kick {
+  30% {
+    scale: 1.18;
+    rotate: -6deg;
+  }
+  60% {
+    scale: 0.94;
+    rotate: 4deg;
+  }
+}
+
+@keyframes play-bomb-flash {
+  from {
+    opacity: 1;
+    scale: 0.4;
+  }
+  to {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+
+/* The player hit shakes */
+.play-bomb-shake {
+  animation: play-bomb-shake 480ms ease-in-out;
+}
+
+@keyframes play-bomb-shake {
+  20%,
+  60% {
+    translate: calc(-50% - 6px) -50%;
+  }
+  40%,
+  80% {
+    translate: calc(-50% + 6px) -50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-ember,
+  .play-bomb,
+  .play-bomb-spark,
+  .play-bomb-blast,
+  .play-bomb-blast::after,
+  .play-bomb-shake {
+    animation: none;
+  }
+
+  .play-bomb-arrow {
+    transition: none;
+  }
+}
+
+/* Selected row, outline fading from grey to white */
+.play-pick {
+  position: relative;
+}
+
+.play-pick::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgb(120 120 135 / 0.7), rgb(255 255 255 / 0.95));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}

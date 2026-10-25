@@ -378,6 +378,18 @@ model Account {
   livesAnnounced        Live[]                   @relation("LiveAnnouncer")
   liveCoordinations     LiveCoordination[]
   liveSeats             LiveMember[]
+  playSessionsHosted    PlaySession[]            @relation("PlaySessionHost")
+  playTournamentsHosted PlayTournament[]         @relation("PlayTournamentHost")
+  playSeats             PlaySeat[]
+  playStats             PlayGameStat[]
+  playProfile           PlayProfile?
+  baccalaureatAnswers   BaccalaureatAnswer[]
+  baccalaureatVotes     BaccalaureatVote[]
+  bombPlayers           BombPlayer[]
+  bombMoves             BombMove[]
+  playMessages          PlayMessage[]
+  playInvitesSent       PlayInvite[]             @relation("PlayInviteFrom")
+  playInvitesReceived   PlayInvite[]             @relation("PlayInviteTo")
   activityAsSubject     ActivityLog[]            @relation("LogSubject")
   activityAsActor       ActivityLog[]            @relation("LogActor")
   notificationsReceived Notification[]           @relation("NotificationRecipient")
@@ -2564,4 +2576,319 @@ model LegacyModuleResult {
 
   @@unique([trackId, moduleKey])
   @@map("legacy_module_results")
+}
+
+// Games of Memora Play
+enum PlayGame {
+  BACCALAUREAT
+  GOLF
+  BOMB
+  LUDO
+}
+
+// Life of a game or a tournament
+enum PlaySessionStatus {
+  LOBBY
+  RUNNING
+  FINISHED
+  ABANDONED
+}
+
+// How a player ended a game
+enum PlayOutcome {
+  WIN
+  DRAW
+  LOSS
+}
+
+// Several games chained under one cumulated ranking
+model PlayTournament {
+  id         String            @id @default(cuid())
+  game       PlayGame
+  hostId     String
+  gamesCount Int
+  status     PlaySessionStatus @default(RUNNING)
+  finishedAt DateTime?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  host     Account       @relation("PlayTournamentHost", fields: [hostId], references: [id], onDelete: Cascade)
+  sessions PlaySession[]
+
+  @@map("play_tournaments")
+}
+
+// One game, from its lobby to its end
+model PlaySession {
+  id              String            @id @default(cuid())
+  game            PlayGame
+  status          PlaySessionStatus @default(LOBBY)
+  hostId          String
+  tournamentId    String?
+  tournamentIndex Int?
+  // Game this one replays with the same table
+  rematchOfId     String?           @unique
+  // Choices of the host, shaped by the game
+  settings        Json
+  startedAt       DateTime?
+  finishedAt      DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  host       Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
+  tournament PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  rematchOf  PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
+  rematch    PlaySession?        @relation("PlayRematch")
+  seats      PlaySeat[]
+  bacRounds  BaccalaureatRound[]
+  bombGame   BombGame?
+  bombSeats  BombPlayer[]
+  bombMoves  BombMove[]
+  messages   PlayMessage[]
+  invites    PlayInvite[]
+
+  @@index([status, game])
+  @@index([tournamentId, tournamentIndex])
+  @@map("play_sessions")
+}
+
+// A player's place in a game, kept until they leave on purpose
+model PlaySeat {
+  id        String       @id @default(cuid())
+  sessionId String
+  accountId String
+  color     String
+  score     Int          @default(0)
+  rank      Int?
+  outcome   PlayOutcome?
+  xp        Int          @default(0)
+  joinedAt  DateTime     @default(now())
+  leftAt    DateTime?
+  kickedAt  DateTime?
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@index([accountId, leftAt])
+  @@map("play_seats")
+}
+
+// What a chat line says: a written text, or a table event
+enum PlayMessageKind {
+  TEXT
+  JOINED
+  LEFT
+  KICKED
+}
+
+// Line of a game chat, written by a player or posted by the table
+model PlayMessage {
+  id        String          @id @default(cuid())
+  sessionId String
+  accountId String
+  kind      PlayMessageKind @default(TEXT)
+  body      String
+  createdAt DateTime        @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@map("play_messages")
+}
+
+// Seat offered at a game
+enum PlayInviteRole {
+  PLAYER
+  SPECTATOR
+}
+
+// Someone called to a game, as a player or to watch
+model PlayInvite {
+  id         String         @id @default(cuid())
+  sessionId  String
+  inviterId  String
+  // Null calls all of Memora
+  inviteeId  String?
+  role       PlayInviteRole
+  answeredAt DateTime?
+  createdAt  DateTime       @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  inviter Account     @relation("PlayInviteFrom", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee Account?    @relation("PlayInviteTo", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, inviteeId])
+  @@index([inviteeId, answeredAt])
+  @@map("play_invites")
+}
+
+// Totals of one player on one game, the global ones are their sum
+model PlayGameStat {
+  id                String   @id @default(cuid())
+  accountId         String
+  game              PlayGame
+  xp                Int      @default(0)
+  played            Int      @default(0)
+  wins              Int      @default(0)
+  draws             Int      @default(0)
+  losses            Int      @default(0)
+  abandons          Int      @default(0)
+  streak            Int      @default(0)
+  bestStreak        Int      @default(0)
+  playSeconds       Int      @default(0)
+  tournamentsPlayed Int      @default(0)
+  tournamentsWon    Int      @default(0)
+  // Counters proper to the game
+  extra             Json     @default("{}")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, game])
+  @@index([game, xp])
+  @@map("play_game_stats")
+}
+
+// Global side of a player, outside any game
+model PlayProfile {
+  accountId String    @id
+  // XP given on the global line alone
+  bonusXp   Int       @default(0)
+  bannedAt  DateTime?
+  banReason String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("play_profiles")
+}
+
+// One letter of a Baccalaureat game, its phases read from the dates
+model BaccalaureatRound {
+  id           String    @id @default(cuid())
+  sessionId    String
+  index        Int
+  letter       String
+  startsAt     DateTime
+  endsAt       DateTime
+  stoppedById  String?
+  // Player who spent their letter joker here
+  rerolledById String?
+  // Speed bonus paid to the stopper
+  bonus        Int       @default(0)
+  closedAt     DateTime?
+  reviewEndsAt DateTime?
+  scoredAt     DateTime?
+  createdAt    DateTime  @default(now())
+
+  session PlaySession          @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  answers BaccalaureatAnswer[]
+
+  @@unique([sessionId, index])
+  @@map("play_baccalaureat_rounds")
+}
+
+// One word written for one category
+model BaccalaureatAnswer {
+  id        String   @id @default(cuid())
+  roundId   String
+  accountId String
+  category  String
+  word      String
+  // Null until the review ends
+  valid     Boolean?
+  points    Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  round   BaccalaureatRound  @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  account Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  votes   BaccalaureatVote[]
+
+  @@unique([roundId, accountId, category])
+  @@map("play_baccalaureat_answers")
+}
+
+// A player's verdict on someone else's word
+model BaccalaureatVote {
+  id       String  @id @default(cuid())
+  answerId String
+  voterId  String
+  accepted Boolean
+
+  answer BaccalaureatAnswer @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  voter  Account            @relation(fields: [voterId], references: [id], onDelete: Cascade)
+
+  @@unique([answerId, voterId])
+  @@map("play_baccalaureat_votes")
+}
+
+// Bomb Party table: the bomb, its prompt and whose turn it is
+model BombGame {
+  sessionId  String    @id
+  prompt     String
+  // Turns the prompt survived unsolved
+  promptAge  Int       @default(0)
+  turnId     String
+  startsAt   DateTime
+  // Hidden fuse, never sent to players
+  explodesAt DateTime
+  // What the player on turn is typing
+  draft      String    @default("")
+  missWord   String?
+  missReason String?
+  blastAt    DateTime?
+  blastId    String?
+  updatedAt  DateTime  @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_bomb_games")
+}
+
+// A player around the bomb, lives and bonus letters
+model BombPlayer {
+  id           String    @id @default(cuid())
+  sessionId    String
+  accountId    String
+  order        Int
+  lives        Int
+  // Bonus letters gathered toward the next heart
+  letters      String    @default("")
+  eliminatedAt DateTime?
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@map("play_bomb_players")
+}
+
+// What happened at the table
+enum BombMoveKind {
+  WORD
+  BLAST
+  LIFE
+}
+
+// One word played, one blast or one heart won
+model BombMove {
+  id        String       @id @default(cuid())
+  sessionId String
+  accountId String
+  kind      BombMoveKind
+  // Comparable form, once per game
+  word      String?
+  prompt    String
+  createdAt DateTime     @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, word])
+  @@index([sessionId, createdAt])
+  @@map("play_bomb_moves")
 }

@@ -1,0 +1,29 @@
+{
+  "xp": {
+    "win": 150,
+    "draw": 100,
+    "loss": 50,
+    "firstGameMultiplier": 2
+  },
+  "levels": {
+    "max": 100,
+    "base": 40,
+    "growth": 1
+  },
+  "tournament": {
+    "minGames": 2,
+    "maxGames": 9,
+    "bonusPerGame": 0.5
+  },
+  "rewards": {
+    "minPlayers": 1,
+    "minSeconds": 60
+  },
+  "lobbyIdleMinutes": 30,
+  "seatColors": 12,
+  "leaderboardSize": 20,
+  "admin": {
+    "maxXpChange": 10000,
+    "maxCounter": 100000
+  }
+}

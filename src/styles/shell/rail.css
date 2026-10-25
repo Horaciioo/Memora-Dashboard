@@ -115,21 +115,32 @@
   padding: 0.625rem 0;
 }
 
-/* Rail boxes are a faint grey wash on the pale frame, no glass and no shadow */
-.rail-ground .glass-panel:not(.fixed, [aria-current='page']) {
-  background: var(--color-on-frame-wash);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  border-color: var(--color-border);
+/* A pale veil on the frame, no blur so fixed bubbles keep the viewport; its boxes are frosted */
+.rail-ground {
+  background: var(--mist-veil);
+}
+
+.rail-ground .glass-panel:not(.fixed, .shortcut-fresh, [aria-current='page']) {
+  background: var(--mist-fill);
+  -webkit-backdrop-filter: blur(var(--mist-blur)) saturate(var(--mist-saturate));
+  backdrop-filter: blur(var(--mist-blur)) saturate(var(--mist-saturate));
+  border-color: transparent;
   box-shadow: none;
 }
 
-.rail-ground .glass-panel:not(.fixed, [aria-current='page']):hover {
-  background: color-mix(in srgb, var(--color-on-frame) 9%, transparent);
+.rail-ground .glass-panel:not(.fixed, .shortcut-fresh, [aria-current='page']):hover {
+  background: color-mix(in srgb, var(--mist-fill), var(--color-on-frame) 8%);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .rail-ground .glass-panel:not(.fixed, .shortcut-fresh, [aria-current='page']) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
 /* Unread note: gold box, white glyph, a band of light crossing it on its own */
-.shortcut-fresh {
+.rail-shortcuts .shortcut-fresh {
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -143,7 +154,7 @@
   color: white;
 }
 
-.shortcut-fresh:hover {
+.rail-shortcuts .shortcut-fresh:hover {
   color: white;
 }
 

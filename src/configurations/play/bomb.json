@@ -1,0 +1,27 @@
+{
+  "minPlayers": 1,
+  "maxPlayers": 12,
+  "countdownSeconds": 5,
+  "lives": {
+    "start": { "default": 2, "min": 1, "max": 10 },
+    "max": { "default": 3, "min": 1, "max": 10 }
+  },
+  "minTurnSeconds": { "default": 5, "min": 1, "max": 20 },
+  "promptAge": { "default": 2, "min": 1, "max": 20 },
+  "fuseSeconds": { "min": 10, "max": 30 },
+  "difficulties": {
+    "beginner": 500,
+    "medium": 300,
+    "hard": 100
+  },
+  "difficulty": "beginner",
+  "customWordsPerPrompt": { "default": 200, "min": 1, "max": 5000 },
+  "customWordsStep": 50,
+  "promptLengths": [2, 3],
+  "bonusAlphabet": "ABCDEFGHIJLMNOPQRSTUV",
+  "alphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "wordLength": 30,
+  "typingPaceMs": 200,
+  "feedSize": 40,
+  "blastFlashMs": 1600
+}
