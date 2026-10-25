@@ -1,6 +1,6 @@
 import { createStreamRoute } from '@/core/lib/http/route'
 import { liveStreamOf } from '@/core/lib/lives/stream'
-import { ACCESS_SIGNAL } from '@/declarations/access/signal'
+import { ACCESS_SIGNAL } from '@/declarations/system/signals'
 
 // Event alone, nothing private crosses it
 const openStream = liveStreamOf(() => `event: ${ACCESS_SIGNAL.event}\ndata: {}\n\n`)

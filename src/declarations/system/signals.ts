@@ -1,27 +1,45 @@
 /**
- * Access change signal
- * @type {{ topic: string, event: string, settleMs: number, writes: ReadonlySet<string>, watched: Record<string, readonly string[] | true> }}
+ * Write signal
+ * @typedef {Object} ChangeSignal
+ * @property {string} topic - Bus topic
+ * @property {string} event - Stream event name
+ * @property {number} settleMs - Writes landing together send one signal
+ * @property {ReadonlySet<string>} writes - Operations raising it
+ * @property {Record<string, readonly string[] | true>} watched - Models raising it, true for any write, else the fields that matter
  */
 
-export const ACCESS_SIGNAL = {
-  // Bus topic and stream event name
+export interface ChangeSignal {
+  topic: string
+  event: string
+  settleMs: number
+  writes: ReadonlySet<string>
+  watched: Record<string, readonly string[] | true>
+}
+
+// Operations that create rows
+const CREATIONS = ['create', 'createMany', 'createManyAndReturn']
+
+// Operations that change data
+const WRITES = [
+  ...CREATIONS,
+  'update',
+  'updateMany',
+  'updateManyAndReturn',
+  'upsert',
+  'delete',
+  'deleteMany',
+]
+
+/**
+ * Access change signal, raised by any write that moves what a member can see
+ * @type {ChangeSignal}
+ */
+
+export const ACCESS_SIGNAL: ChangeSignal = {
   topic: 'access:changed',
   event: 'access',
-  // Writes landing together send one signal
   settleMs: 400,
-  // Operations that change data
-  writes: new Set([
-    'create',
-    'createMany',
-    'createManyAndReturn',
-    'update',
-    'updateMany',
-    'updateManyAndReturn',
-    'upsert',
-    'delete',
-    'deleteMany',
-  ]),
-  // Models that move what a member can see, true for any write, else the fields that matter
+  writes: new Set(WRITES),
   watched: {
     RolePermission: true,
     FunctionPermission: true,
@@ -30,4 +48,24 @@ export const ACCESS_SIGNAL = {
     JobFunction: true,
     Account: ['role', 'status', 'frozenAt', 'divisionId', 'youtubers', 'functions', 'permissions'],
   },
-} as const
+}
+
+/**
+ * Logs signal, raised each time a fact is written to the journal
+ * @type {ChangeSignal}
+ */
+
+export const JOURNAL_SIGNAL: ChangeSignal = {
+  topic: 'journal:written',
+  event: 'journal',
+  settleMs: 1000,
+  writes: new Set(CREATIONS),
+  watched: { ActivityLog: true },
+}
+
+/**
+ * Every signal the database client raises
+ * @type {ChangeSignal[]}
+ */
+
+export const CHANGE_SIGNALS: ChangeSignal[] = [ACCESS_SIGNAL, JOURNAL_SIGNAL]

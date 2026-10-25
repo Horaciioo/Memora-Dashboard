@@ -2,7 +2,7 @@
 
 import { useSignalRefresh } from '@/core/hooks/interaction/state/useSignalRefresh'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { ACCESS_SIGNAL } from '@/declarations/access/signal'
+import { ACCESS_SIGNAL } from '@/declarations/system/signals'
 
 /**
  * Re-render the server views when access rights change

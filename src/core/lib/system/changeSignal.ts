@@ -3,37 +3,43 @@ import 'server-only'
 import { Prisma } from '@prisma/client'
 
 import { publishLive } from '@/core/lib/lives/bus'
-import { ACCESS_SIGNAL } from '@/declarations/access/signal'
+import { CHANGE_SIGNALS } from '@/declarations/system/signals'
+import type { ChangeSignal } from '@/declarations/system/signals'
 
-// Pending send
-let timer: ReturnType<typeof setTimeout> | null = null
+// Pending send of each signal
+const timers = new Map<string, ReturnType<typeof setTimeout>>()
 
 /**
- * Tell every open session to re-read its access
+ * Tell every open session a signal was raised, writes landing together send one
+ * @param {ChangeSignal} signal - Signal raised
  * @return {void}
  */
 
-export const announceAccessChange = (): void => {
-  if (timer) return
+export const announceChange = (signal: ChangeSignal): void => {
+  if (timers.has(signal.topic)) return
 
-  timer = setTimeout(() => {
-    timer = null
-    publishLive(ACCESS_SIGNAL.topic, {}).catch(() => undefined)
-  }, ACCESS_SIGNAL.settleMs)
+  timers.set(
+    signal.topic,
+    setTimeout(() => {
+      timers.delete(signal.topic)
+      publishLive(signal.topic, {}).catch(() => undefined)
+    }, signal.settleMs)
+  )
 }
 
 /**
- * Check a write moves access
+ * Check a write raises a signal
+ * @param {ChangeSignal} signal - Signal checked
  * @param {string} model - Model name
  * @param {string} operation - Operation name
  * @param {unknown} args - Operation arguments
- * @return {boolean} - Access moves
+ * @return {boolean} - Signal raised
  */
 
-const movesAccess = (model: string, operation: string, args: unknown): boolean => {
-  if (!ACCESS_SIGNAL.writes.has(operation)) return false
+const raises = (signal: ChangeSignal, model: string, operation: string, args: unknown): boolean => {
+  if (!signal.writes.has(operation)) return false
 
-  const fields = (ACCESS_SIGNAL.watched as Record<string, readonly string[] | true>)[model]
+  const fields = signal.watched[model]
   if (!fields) return false
   if (fields === true) return true
 
@@ -45,17 +51,20 @@ const movesAccess = (model: string, operation: string, args: unknown): boolean =
 }
 
 /**
- * Client extension raising the signal after any write that moves access
+ * Client extension raising the signals after any write that moves them
  * @type {ReturnType<typeof Prisma.defineExtension>}
  */
 
-export const accessSignalExtension = Prisma.defineExtension({
-  name: 'access-signal',
+export const changeSignalExtension = Prisma.defineExtension({
+  name: 'change-signal',
   query: {
     $allModels: {
       async $allOperations({ model, operation, args, query }) {
         const result = await query(args)
-        if (movesAccess(model, operation, args)) announceAccessChange()
+
+        for (const signal of CHANGE_SIGNALS) {
+          if (raises(signal, model, operation, args)) announceChange(signal)
+        }
 
         return result
       },
