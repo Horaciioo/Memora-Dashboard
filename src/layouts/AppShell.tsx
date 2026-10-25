@@ -5,6 +5,7 @@ import { WindowFrame } from '@/components/structures/page/WindowFrame'
 import { MobileHold } from '@/components/structures/overlays/MobileHold'
 import { BrandSplash } from '@/composites/splash/BrandSplash'
 import { NudgeHost } from '@/composites/notifications/NudgeHost'
+import { AccessSignalListener } from '@/composites/access/AccessSignalListener'
 import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
 import { TourHost } from '@/composites/tour/TourHost'
@@ -121,6 +122,7 @@ const AppShellFrame = ({
         <SealDialog />
         {session && <NudgeHost />}
         {session && <TourHost />}
+        {session && <AccessSignalListener />}
         {session && can(Permissions.LiveRead) && <LiveSignalListener />}
       </div>
     </SealProvider>

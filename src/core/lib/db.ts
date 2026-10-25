@@ -3,6 +3,8 @@ import 'server-only'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
 
+import { accessSignalExtension } from '@/core/lib/access/signal'
+
 // Survives dev hot reloads
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
 
@@ -12,7 +14,9 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
  */
 
 const createClient = (): PrismaClient =>
-  new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }) })
+  new PrismaClient({
+    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+  }).$extends(accessSignalExtension) as unknown as PrismaClient
 
 /**
  * Prisma client

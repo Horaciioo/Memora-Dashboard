@@ -182,6 +182,7 @@ export const API_ROUTES = {
   notification: (id: string) => `/api/notifications/${id}`,
   notificationUnread: (id: string) => `/api/notifications/${id}/non-lu`,
   access: '/api/acces',
+  accessStream: '/api/acces/flux',
   accessFunctions: '/api/acces/fonctions',
   accessFunction: (id: string) => `/api/acces/fonctions/${id}`,
   accessMembers: '/api/acces/membres',
