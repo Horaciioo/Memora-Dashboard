@@ -2,7 +2,8 @@
   "xp": {
     "win": 150,
     "draw": 100,
-    "loss": 50
+    "loss": 50,
+    "firstGameMultiplier": 2
   },
   "levels": {
     "max": 100,

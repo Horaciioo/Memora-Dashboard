@@ -75,6 +75,11 @@ export const PLAY_SETTINGS = {
     win: readInteger(xp.win, { path: 'play/play.xp.win', fallback: 150, min: 0 }),
     draw: readInteger(xp.draw, { path: 'play/play.xp.draw', fallback: 100, min: 0 }),
     loss: readInteger(xp.loss, { path: 'play/play.xp.loss', fallback: 50, min: 0 }),
+    firstGameMultiplier: readNumber(xp.firstGameMultiplier, {
+      path: 'play/play.xp.firstGameMultiplier',
+      fallback: 2,
+      min: 1,
+    }),
   },
   levels: {
     max: readInteger(levels.max, { path: 'play/play.levels.max', fallback: 100, min: 1 }),

@@ -24,6 +24,7 @@ import { prisma } from '@/core/lib/db'
 import { readScope, scopedWhere } from '@/core/services/auth/ScopeService'
 import { syncSystemTasks } from '@/core/services/personal/SystemTaskService'
 import { WorkflowPhases } from '@/utils/constants/workflow'
+import { PlayGames } from '@/utils/constants/play'
 
 /**
  * Build a task pointing at a declared destination
@@ -389,6 +390,36 @@ const reportTasks = async (viewer: SessionUser, access: PermissionHelpers): Prom
 }
 
 /**
+ * First Baccalaureat game, until one is played
+ * @param {string} accountId - Member
+ * @param {PermissionHelpers} access - Permission helpers
+ * @return {Promise<HomeTask[]>} - The task, or none
+ */
+
+const playTasks = async (accountId: string, access: PermissionHelpers): Promise<HomeTask[]> => {
+  if (!access.can(Permissions.PlayAccess)) return []
+  const played = await prisma.playGameStat.count({
+    where: { accountId, game: PlayGames.Baccalaureat, played: { gt: 0 } },
+  })
+  if (played) return []
+
+  return [
+    {
+      key: 'play:first-baccalaureat',
+      kind: 'play',
+      title: PERSONAL_TASK_COPY.firstGameTitle,
+      context: '',
+      icon: 'play',
+      href: ROUTES.play,
+      description: PERSONAL_TASK_COPY.firstGameDescription,
+      guide: null,
+      destinationLabel: null,
+      dueAt: null,
+    },
+  ]
+}
+
+/**
  * Tasks of the task board held by the member, the ones the system opens excluded
  * @param {string} accountId - Owner
  * @return {Promise<HomeTask[]>} - One task per card still to do
@@ -438,16 +469,17 @@ export const myTasks = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<HomeTask[]> => {
-  const [preparation, reviews, trainings, mentions, reports] = await Promise.all([
+  const [preparation, reviews, trainings, mentions, reports, play] = await Promise.all([
     access.can(Permissions.AcademyManage) ? managerTasks(viewer, access) : Promise.resolve([]),
     reviewTasks(viewer.id),
     trainingTasks(viewer.id),
     mentionTasks(viewer.id),
     reportTasks(viewer, access),
+    playTasks(viewer.id, access),
   ])
 
   const timeline = [...preparation, ...reviews, ...trainings]
-  if (!access.can(Permissions.TaskRead)) return [...mentions, ...reports, ...timeline]
+  if (!access.can(Permissions.TaskRead)) return [...mentions, ...reports, ...timeline, ...play]
 
   // The timeline opens its tasks on the board, ticking one there takes it off the home
   const [done, board] = await Promise.all([
@@ -455,5 +487,11 @@ export const myTasks = async (
     boardTasks(viewer.id),
   ])
 
-  return [...mentions, ...reports, ...timeline.filter((task) => !done.has(task.key)), ...board]
+  return [
+    ...mentions,
+    ...reports,
+    ...timeline.filter((task) => !done.has(task.key)),
+    ...board,
+    ...play,
+  ]
 }

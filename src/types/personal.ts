@@ -53,6 +53,7 @@ export type HomeTaskKind =
   | 'departure'
   | 'mention'
   | 'liveReport'
+  | 'play'
   | 'task'
 
 /**

@@ -49,9 +49,28 @@ const writeResults = async (
 
   // Tournament games pay at the end of the tournament
   const pays = !session.tournamentId && isRewarded(session, seconds)
+  // A first game on this game pays more
+  const veterans = new Set(
+    (
+      await tx.playGameStat.findMany({
+        where: {
+          game: session.game,
+          played: { gt: 0 },
+          accountId: { in: standings.map((entry) => entry.accountId) },
+        },
+        select: { accountId: true },
+      })
+    ).map((stat) => stat.accountId)
+  )
   const results = standings.map((standing) => ({
     ...standing,
-    xp: pays && !gone.has(standing.accountId) ? outcomeXp(standing.outcome) : 0,
+    xp:
+      pays && !gone.has(standing.accountId)
+        ? Math.round(
+            outcomeXp(standing.outcome) *
+              (veterans.has(standing.accountId) ? 1 : PLAY_SETTINGS.xp.firstGameMultiplier)
+          )
+        : 0,
   }))
 
   for (const result of results) {
