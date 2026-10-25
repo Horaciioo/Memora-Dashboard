@@ -2,12 +2,8 @@ import type { Metadata } from 'next'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import { PageHeader } from '@/components/structures/page/PageHeader'
 import { CalendarBoard } from '@/composites/calendar/CalendarBoard'
-import {
-  calendarFields,
-  getEntry,
-  listEntries,
-  readCalendarScope,
-} from '@/core/services/calendar/CalendarService'
+import { calendarFields, getEntry, listEntries } from '@/core/services/calendar/CalendarService'
+import { readCalendarScope } from '@/core/services/calendar/visibility'
 import { readLiveTemplateId } from '@/core/services/lives/LiveService'
 import { LIVE_PRESET } from '@/declarations/lives/registries'
 import { youtuberOptions } from '@/core/services/work/shared'
@@ -88,17 +84,11 @@ export default async function CalendarPage({
   const liveTemplateId =
     canAnnounceLive && preset === LIVE_PRESET ? await readLiveTemplateId() : null
 
-  // The linked entry joins the window when the visibility filter left it out
-  const entries =
-    focusEntry && !window.some((entry) => entry.id === focusEntry.id)
-      ? [...window, focusEntry]
-      : window
-
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={CALENDAR_COPY.title} />
       <CalendarBoard
-        initialEntries={entries}
+        initialEntries={window}
         youtubers={youtubers}
         fields={fields}
         anchor={anchor}

@@ -1,12 +1,12 @@
 import {
   AGENDA_GRID_DAYS,
+  THREE_DAYS_GRID,
   MONTH_GRID_DAYS,
   WEEK_GRID_DAYS,
   addDays,
   addMonths,
   atTime,
   dayMonthLabel,
-  endOfDay,
   formatDayKey,
   isSameDay,
   monthLabel,
@@ -16,7 +16,7 @@ import {
   startOfWeek,
   timeLabel,
 } from '@/utils/format/days'
-import { isInstantText, shiftToZone } from '@/utils/format/zone'
+import { isInstantText, shiftToZone, wallToInstant } from '@/utils/format/zone'
 
 /**
  * One day of a rendered grid
@@ -36,10 +36,10 @@ export interface CalendarDay {
 
 /**
  * Span the grid draws at once
- * @type {'day' | 'week' | 'month' | 'agenda'}
+ * @type {'day' | 'threeDays' | 'week' | 'month' | 'agenda'}
  */
 
-export type CalendarUnit = 'day' | 'week' | 'month' | 'agenda'
+export type CalendarUnit = 'day' | 'threeDays' | 'week' | 'month' | 'agenda'
 
 /**
  * Read a moment on the clock of the member's zone
@@ -120,6 +120,23 @@ export const dayGrid = (anchor: string): CalendarDay[] => {
 }
 
 /**
+ * Build the three days a phone reads side by side
+ * @param {string} anchor - ISO day opening the run
+ * @return {CalendarDay[]} - Days in display order
+ */
+
+export const threeDaysGrid = (anchor: string): CalendarDay[] => {
+  const start = parseDay(anchor)
+  const today = new Date()
+
+  return Array.from({ length: THREE_DAYS_GRID }, (_, index) => {
+    const day = addDays(start, index)
+
+    return { ...toCalendarDay(day, day.getMonth(), today), isCurrentMonth: true }
+  })
+}
+
+/**
  * Build the run of days a planning lists
  * @param {string} anchor - ISO day the planning opens on
  * @return {CalendarDay[]} - Days in display order
@@ -146,6 +163,7 @@ export const agendaGrid = (anchor: string): CalendarDay[] => {
 export const unitGrid = (anchor: string, unit: CalendarUnit): CalendarDay[] => {
   if (unit === 'month') return monthGrid(anchor)
   if (unit === 'agenda') return agendaGrid(anchor)
+  if (unit === 'threeDays') return threeDaysGrid(anchor)
 
   return unit === 'week' ? weekGrid(anchor) : dayGrid(anchor)
 }
@@ -165,8 +183,13 @@ export const weekdayOf = (dayKey: string): number => (parseDay(dayKey).getDay() 
  */
 
 export const gridRange = (days: CalendarDay[]): { from: string; to: string } => ({
-  from: startOfDay(parseDay(days[0].key)).toISOString(),
-  to: endOfDay(parseDay(days[days.length - 1].key)).toISOString(),
+  // Bounds on the member clock
+  from: wallToInstant(`${days[0].key}T00:00`).toISOString(),
+  to: new Date(
+    wallToInstant(
+      `${formatDayKey(addDays(parseDay(days[days.length - 1].key), 1))}T00:00`
+    ).getTime() - 1
+  ).toISOString(),
 })
 
 /**
@@ -181,7 +204,12 @@ export const shiftAnchor = (anchor: string, unit: CalendarUnit, amount: number):
   const day = parseDay(anchor)
   if (unit === 'month') return formatDayKey(addMonths(day, amount))
 
-  const step = { day: 1, week: WEEK_GRID_DAYS, agenda: AGENDA_GRID_DAYS }[unit]
+  const step = {
+    day: 1,
+    threeDays: THREE_DAYS_GRID,
+    week: WEEK_GRID_DAYS,
+    agenda: AGENDA_GRID_DAYS,
+  }[unit]
 
   return formatDayKey(addDays(day, amount * step))
 }
@@ -199,8 +227,10 @@ export const periodLabel = (anchor: string, unit: CalendarUnit): string => {
   if (unit === 'month') return monthLabel(day)
   if (unit === 'day') return dayMonthLabel(day, true)
 
-  const start = unit === 'agenda' ? day : startOfWeek(day)
-  const length = unit === 'agenda' ? AGENDA_GRID_DAYS : WEEK_GRID_DAYS
+  const start = unit === 'agenda' || unit === 'threeDays' ? day : startOfWeek(day)
+  const length = { agenda: AGENDA_GRID_DAYS, threeDays: THREE_DAYS_GRID, week: WEEK_GRID_DAYS }[
+    unit
+  ]
 
   return `${dayMonthLabel(start)} – ${dayMonthLabel(addDays(start, length - 1), true)}`
 }

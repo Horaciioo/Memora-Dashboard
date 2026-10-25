@@ -133,6 +133,7 @@ export const CALENDAR_SOURCE_REGISTRY = createRegistry(CALENDAR_SOURCE_MAP)
  * @property {IconName} icon - Glyph drawn beside it
  * @property {CalendarSourceName[]} sources - Sources it gathers
  * @property {PermissionName | null} permission - Needed to see the calendar at all
+ * @property {Tone} mobileTone - Colour its entries wear on a phone, five in all
  */
 
 interface CalendarLayerOption {
@@ -140,6 +141,7 @@ interface CalendarLayerOption {
   icon: IconName
   sources: CalendarSourceName[]
   permission: PermissionName | null
+  mobileTone: Tone
 }
 
 const CALENDAR_LAYER_MAP: Record<CalendarLayerName, CalendarLayerOption> = {
@@ -148,36 +150,42 @@ const CALENDAR_LAYER_MAP: Record<CalendarLayerName, CalendarLayerOption> = {
     icon: 'spark',
     sources: [CalendarSources.Entry],
     permission: null,
+    mobileTone: 'info',
   },
   [CalendarLayers.Lives]: {
     label: 'Lives',
     icon: 'liveDot',
     sources: [],
     permission: null,
+    mobileTone: 'brand',
   },
   [CalendarLayers.Annual]: {
     label: 'Bilans annuels',
     icon: 'objective',
     sources: [],
     permission: null,
+    mobileTone: 'success',
   },
   [CalendarLayers.Meetings]: {
     label: 'Réunions',
     icon: 'meetings',
     sources: [CalendarSources.Meeting],
     permission: Permissions.MeetingRead,
+    mobileTone: 'info',
   },
   [CalendarLayers.Absences]: {
     label: 'Absences',
     icon: 'absences',
     sources: [CalendarSources.Absence],
     permission: Permissions.AbsenceRead,
+    mobileTone: 'neutral',
   },
   [CalendarLayers.Birthdays]: {
     label: 'Anniversaires',
     icon: 'birthday',
     sources: [CalendarSources.Birthday],
     permission: Permissions.MemberRead,
+    mobileTone: 'warning',
   },
   [CalendarLayers.Academy]: {
     label: 'Academy',
@@ -189,12 +197,14 @@ const CALENDAR_LAYER_MAP: Record<CalendarLayerName, CalendarLayerOption> = {
       CalendarSources.AcademyReviews,
     ],
     permission: Permissions.AcademyRead,
+    mobileTone: 'success',
   },
   [CalendarLayers.Recruitment]: {
     label: 'Recrutements',
     icon: 'recruitment',
     sources: [CalendarSources.Recruitment, CalendarSources.RecruitmentInterview],
     permission: Permissions.RecruitmentRead,
+    mobileTone: 'success',
   },
 }
 
@@ -210,6 +220,16 @@ export const layerOfSource = (source: CalendarSourceName): CalendarLayerName =>
   CALENDAR_LAYER_REGISTRY.keys.find((layer) =>
     CALENDAR_LAYER_MAP[layer].sources.includes(source)
   ) as CalendarLayerName
+
+/**
+ * Colour an entry wears on a phone, set by its calendar alone
+ * @param {Pick<CalendarEntry, 'source' | 'slot' | 'category'>} entry - Entry on screen
+ * @return {Tone} - Tone of its calendar
+ */
+
+export const mobileToneOfEntry = (
+  entry: Pick<CalendarEntry, 'source' | 'slot' | 'category'>
+): Tone => CALENDAR_LAYER_REGISTRY.get(layerOfEntry(entry)).mobileTone
 
 /**
  * Calendar an entry is shown in: its source, refined by what a model made of it

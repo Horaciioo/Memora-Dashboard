@@ -166,6 +166,13 @@ export const WEEK_GRID_DAYS = WEEK_LENGTH
 export const AGENDA_GRID_DAYS = 28
 
 /**
+ * Days a three day view draws
+ * @type {number}
+ */
+
+export const THREE_DAYS_GRID = 3
+
+/**
  * Name the month and year of a date
  * @param {Date} date - Date to name
  * @return {string} - Month and year
