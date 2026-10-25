@@ -133,7 +133,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     intro:
       'Memora accueille un nouveau rôle, une quatrième division et des icônes entièrement redessinées.',
     description:
-      'Il manquait un niveau entre l’Admin et les Responsables, la liste des Modérateurs mélangeait l’encadrement et les modérateurs, et les icônes de rôles, de fonctions et de divisions n’étaient pas toutes à la hauteur. Cette version ajoute le rôle Employé, range chaque YouTubeur par Administration puis par fonction, et redessine les icônes.',
+      'Il manquait un niveau entre l’Admin et les Responsables, la liste des Modérateurs mélangeait l’encadrement et les modérateurs, et les icônes de rôles, de fonctions et de divisions n’étaient pas toutes à la hauteur. Cette version ajoute le rôle Employé, range chaque YouTubeur par Administration puis par fonction, redessine les icônes et corrige plusieurs bugs des Lives et du Calendrier.',
     items: [
       {
         tag: ChangelogTags.Added,
@@ -167,6 +167,81 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Improved,
         text: 'Amélioration visuelle des divisions : « Squad I », « Squad II » et « Squad III » deviennent « Division 1 », « Division 2 » et « Division 3 », chacune avec un écusson qui gagne un chevron.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        text: 'Amélioration du « Calendrier » sur téléphone : une vue sur trois jours, une barre de navigation par mois et des évènements colorés selon leur calendrier.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la barre du haut sur téléphone : le fil de navigation de la page et ses options s’y affichent, à côté du menu.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des formulaires sur téléphone : le clavier ne s’ouvre plus tout seul à l’ouverture d’une fenêtre.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui comptait du temps de modération à des membres qui ne modéraient pas la chaîne du « Live ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Correction d’un bug qui laissait le « Panel de sanctions » proposer le mauvais palier quand Twitch refusait une sanction.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui gardait l’heure de fin dans le « Calendrier » après la réouverture d’un « Live ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui ouvrait parfois deux temps de modération pour la même personne avec deux onglets ouverts.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui pouvait vider le chat de la « Mod View » après deux reconnexions rapprochées.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Correction d’un bug qui affichait une attente trop courte quand Twitch limitait les actions de modération.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui ne démarrait pas automatiquement un « Live » lancé plus de 90 minutes avant l’heure prévue : il est désormais suivi de 2 heures avant à 2 heures après.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Correction d’un bug qui enregistrait parfois un mauvais pseudo sur un commentaire laissé à un viewer.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Correction d’un bug qui laissait une note privée lisible dans le journal d’activité.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        text: 'Correction de plusieurs bugs du « Calendrier » sur les heures d’appel, les bilans annuels et les évènements d’équipe.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui affichait certaines heures dans le mauvais fuseau horaire.',
       },
     ],
   },
