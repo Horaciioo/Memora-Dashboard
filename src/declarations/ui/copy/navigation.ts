@@ -6,6 +6,7 @@
 export const NAV_COPY = {
   breadcrumbs: 'Fil d’Ariane',
   crumbRecord: 'Fiche',
+  crumbFold: 'Pages précédentes',
   sidebar: 'Navigation principale',
   collapseRail: 'Réduire le menu',
   viewSwitch: 'Niveau de vue',

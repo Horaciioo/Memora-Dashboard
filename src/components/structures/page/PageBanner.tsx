@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
 import { Breadcrumbs } from '@/components/structures/page/Breadcrumbs'
-import { FavoriteToggle } from '@/components/structures/page/FavoriteToggle'
+import { BannerTools } from '@/components/structures/page/BannerTools'
 import { RouteMaturity } from '@/components/structures/page/RouteMaturity'
 import { BannerHero } from '@/components/structures/page/BannerHero'
 import { BannerArt } from '@/components/structures/page/BannerArt'
-import { PAGE_OPTIONS_HOST_ID, PAGE_TABS_HOST_ID } from '@/declarations/ui/banners'
+import { PAGE_TABS_HOST_ID } from '@/declarations/ui/banners'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
 
 export interface PageBannerProps {
@@ -49,10 +49,7 @@ export const PageBanner = ({
         <BannerArt image={image} />
         <div className={PAGE_STYLES.bannerBar}>
           <Breadcrumbs current={title} />
-          <div className={PAGE_STYLES.bannerOptions}>
-            <div id={PAGE_OPTIONS_HOST_ID} className="contents" />
-            <FavoriteToggle title={title} />
-          </div>
+          <BannerTools title={title} />
         </div>
         <div className={PAGE_STYLES.bannerFoot}>
           <div className={PAGE_STYLES.bannerTitleRow}>

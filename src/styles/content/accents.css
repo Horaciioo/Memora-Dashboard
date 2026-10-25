@@ -61,3 +61,17 @@
   --color-brand-600: var(--color-danger);
   --color-brand-800: color-mix(in oklab, var(--color-danger) 80%, var(--color-ink));
 }
+
+/* A phone paints every calendar entry in the solid colour of its calendar, white words on top */
+@media (width < 48rem) {
+  .chip-solid {
+    background-color: var(--accent-mobile);
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--color-on-solid);
+  }
+
+  .chip-solid span {
+    color: inherit;
+  }
+}

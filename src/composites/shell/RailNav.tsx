@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { Fragment, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { LiveStartedBubble } from '@/composites/lives/LiveStartedBubble'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { RailSubPages } from '@/composites/shell/RailSubPages'
 import { FAVORITE_COPY } from '@/declarations/ui/favorites'
 import { visibleNavGroups } from '@/declarations/navigation'
@@ -37,6 +38,8 @@ export interface RailNavProps {
 
 export const RailNav = ({ groups, isCompact, isTouring, live, mentions }: RailNavProps) => {
   const pathname = usePathname()
+  // Bubbles beside the pages never open on a phone
+  const isMobile = useIsMobileShell()
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const ChevronIcon = ICONS.expand
   // Live entry, light runs until opened
@@ -154,7 +157,8 @@ export const RailNav = ({ groups, isCompact, isTouring, live, mentions }: RailNa
       })}
 
       {/* Out of the folds, which clip */}
-      {live?.unseenStart &&
+      {!isMobile &&
+        live?.unseenStart &&
         liveAnchor &&
         createPortal(
           <div

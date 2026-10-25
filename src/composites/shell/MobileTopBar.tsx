@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { AccountSheet } from '@/composites/shell/AccountSheet'
 import { NavSheet } from '@/composites/shell/NavSheet'
+import { TOP_BAR_CRUMBS_HOST_ID, TOP_BAR_TOOLS_HOST_ID } from '@/declarations/ui/banners'
 import { TOP_BAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { ICONS } from '@/declarations/ui/icons'
@@ -38,6 +39,9 @@ export const MobileTopBar = ({ session, viewContext, unreadCount }: MobileTopBar
       >
         <MenuIcon className={TOP_BAR.menuIcon} aria-hidden="true" />
       </button>
+      {/* The page trail lands here, carried by the page banner */}
+      <div id={TOP_BAR_CRUMBS_HOST_ID} className={TOP_BAR.crumbsHost} />
+      <div id={TOP_BAR_TOOLS_HOST_ID} className={TOP_BAR.toolsHost} />
 
       <NavSheet
         open={isMenuOpen}
