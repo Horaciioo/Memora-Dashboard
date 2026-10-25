@@ -2,18 +2,50 @@
   "minPlayers": 2,
   "maxPlayers": 6,
   "countdownSeconds": 5,
-  "roundSeconds": { "default": 120, "min": 30, "max": 600 },
-  "rounds": { "default": 5, "min": 1, "max": 26 },
-  "categories": { "default": 6, "min": 3, "max": 12 },
+  "roundSeconds": {
+    "default": 120,
+    "min": 30,
+    "max": 600
+  },
+  "rounds": {
+    "default": 5,
+    "min": 1,
+    "max": 26
+  },
+  "categories": {
+    "default": 6,
+    "min": 3,
+    "max": 12
+  },
   "customCategories": 4,
   "categoryLength": 32,
   "wordLength": 40,
-  "stop": { "enabled": true, "graceSeconds": 10 },
+  "stop": {
+    "enabled": true,
+    "graceSeconds": 10
+  },
   "submitGraceSeconds": 2,
   "reviewSeconds": 60,
   "rejectShare": 0.5,
-  "points": { "solo": 15, "unique": 10, "shared": 5 },
+  "points": {
+    "solo": 15,
+    "unique": 10,
+    "shared": 5,
+    "stopBonus": 5
+  },
   "letters": "ABCDEFGHIJLMNOPRSTV",
   "alphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  "defaultCategories": ["firstName", "country", "city", "animal", "job", "fruitVegetable"]
+  "defaultCategories": [
+    "firstName",
+    "country",
+    "city",
+    "animal",
+    "job",
+    "fruitVegetable"
+  ],
+  "jokersPerPlayer": 1,
+  "flash": {
+    "roundSeconds": 30,
+    "pack": "flash"
+  }
 }

@@ -4,6 +4,7 @@ import { invalidInput } from '@/core/lib/errors'
 import { readBodyInteger, readBodyList } from '@/core/lib/play'
 import {
   BACCALAUREAT_CATEGORIES,
+  BACCALAUREAT_PACKS,
   BACCALAUREAT_SETTINGS,
   PLAY_ERRORS,
   fillPlayMessage,
@@ -33,6 +34,7 @@ export interface BaccalaureatGameSettings {
   rounds: number
   roundSeconds: number
   stop: boolean
+  flash: boolean
 }
 
 // Prefix of host-written categories
@@ -95,6 +97,7 @@ export const baccalaureatDefaults = (): BaccalaureatGameSettings => ({
   rounds: BACCALAUREAT_SETTINGS.rounds.initial,
   roundSeconds: BACCALAUREAT_SETTINGS.roundSeconds.initial,
   stop: BACCALAUREAT_SETTINGS.stop.enabled,
+  flash: false,
 })
 
 /**
@@ -147,6 +150,25 @@ const readCategories = (
 }
 
 /**
+ * Body with a pack spread into categories
+ * @param {Record<string, unknown>} raw - Body
+ * @param {boolean} isFlash - Flash mode asked
+ * @return {Record<string, unknown>} - Body to read
+ */
+
+const withPack = (raw: Record<string, unknown>, isFlash: boolean): Record<string, unknown> => {
+  const name = isFlash ? BACCALAUREAT_SETTINGS.flash.pack : raw.pack
+  if (typeof name !== 'string' || !Object.hasOwn(BACCALAUREAT_PACKS, name) || raw.categories)
+    return raw
+
+  return {
+    ...raw,
+    categories: [...BACCALAUREAT_PACKS[name as keyof typeof BACCALAUREAT_PACKS].categories],
+    customCategories: [],
+  }
+}
+
+/**
  * Settings asked by the host
  * @param {Record<string, unknown>} raw - Body
  * @param {Prisma.JsonValue} stored - Current settings
@@ -174,16 +196,20 @@ export const readBaccalaureatSettings = (
     : current.letters
   if (letters.length < rounds) refuse('letters', PLAY_ERRORS.letterCount)
 
+  // Flash mode, short and light
+  const flash = typeof raw.flash === 'boolean' ? raw.flash : current.flash
+  const askedSeconds =
+    raw.flash === true
+      ? BACCALAUREAT_SETTINGS.flash.roundSeconds
+      : readBodyInteger(raw, 'roundSeconds')
+
   const settings: BaccalaureatGameSettings = {
-    categories: readCategories(raw, current.categories),
+    categories: readCategories(withPack(raw, raw.flash === true), current.categories),
     letters,
     rounds,
-    roundSeconds: within(
-      readBodyInteger(raw, 'roundSeconds'),
-      current.roundSeconds,
-      BACCALAUREAT_SETTINGS.roundSeconds
-    ),
+    roundSeconds: within(askedSeconds, current.roundSeconds, BACCALAUREAT_SETTINGS.roundSeconds),
     stop: typeof raw.stop === 'boolean' ? raw.stop : current.stop,
+    flash,
   }
 
   return settings as unknown as Prisma.InputJsonObject

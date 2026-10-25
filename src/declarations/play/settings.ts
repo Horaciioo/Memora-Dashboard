@@ -2,6 +2,7 @@ import baccalaureat from '@/configurations/play/baccalaureat.json'
 import play from '@/configurations/play/play.json'
 import {
   readBoolean,
+  readChoice,
   readInteger,
   readNode,
   readNumber,
@@ -9,6 +10,7 @@ import {
   readStringList,
 } from '@/declarations/configurations/readers'
 import { BACCALAUREAT_CATEGORIES } from '@/declarations/play/baccalaureat/categories'
+import { BACCALAUREAT_PACKS } from '@/declarations/play/baccalaureat/packs'
 
 /**
  * Setting the host picks inside bounds
@@ -53,6 +55,7 @@ const tournament = readNode(play.tournament, 'play/play.tournament')
 const rewards = readNode(play.rewards, 'play/play.rewards')
 const stop = readNode(baccalaureat.stop, 'play/baccalaureat.stop')
 const points = readNode(baccalaureat.points, 'play/baccalaureat.points')
+const flash = readNode(baccalaureat.flash, 'play/baccalaureat.flash')
 
 // Tournament game bounds
 const minGames = readInteger(tournament.minGames, {
@@ -74,8 +77,8 @@ export const PLAY_SETTINGS = {
   },
   levels: {
     max: readInteger(levels.max, { path: 'play/play.levels.max', fallback: 100, min: 1 }),
-    base: readInteger(levels.base, { path: 'play/play.levels.base', fallback: 80, min: 1 }),
-    growth: readNumber(levels.growth, { path: 'play/play.levels.growth', fallback: 1.15, min: 1 }),
+    base: readInteger(levels.base, { path: 'play/play.levels.base', fallback: 40, min: 1 }),
+    growth: readNumber(levels.growth, { path: 'play/play.levels.growth', fallback: 1, min: 1 }),
   },
   tournament: {
     minGames,
@@ -210,6 +213,28 @@ export const BACCALAUREAT_SETTINGS = {
       path: 'play/baccalaureat.points.shared',
       fallback: 5,
       min: 0,
+    }),
+    stopBonus: readInteger(points.stopBonus, {
+      path: 'play/baccalaureat.points.stopBonus',
+      fallback: 5,
+      min: 0,
+    }),
+  },
+  jokersPerPlayer: readInteger(baccalaureat.jokersPerPlayer, {
+    path: 'play/baccalaureat.jokersPerPlayer',
+    fallback: 1,
+    min: 0,
+  }),
+  flash: {
+    roundSeconds: readInteger(flash.roundSeconds, {
+      path: 'play/baccalaureat.flash.roundSeconds',
+      fallback: 30,
+      min: 1,
+    }),
+    pack: readChoice(flash.pack, {
+      path: 'play/baccalaureat.flash.pack',
+      fallback: 'flash',
+      allowed: Object.keys(BACCALAUREAT_PACKS) as (keyof typeof BACCALAUREAT_PACKS)[],
     }),
   },
   alphabet: [...alphabet.toUpperCase()],

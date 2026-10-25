@@ -2,6 +2,7 @@ import 'server-only'
 
 import {
   BACCALAUREAT_CATEGORIES,
+  BACCALAUREAT_PACKS,
   BACCALAUREAT_SETTINGS,
   PLAY_GAMES,
   PLAY_SETTINGS,
@@ -22,10 +23,10 @@ export const readCatalog = () => ({
   })),
   tournament: PLAY_SETTINGS.tournament,
   baccalaureat: {
-    categories: Object.entries(BACCALAUREAT_CATEGORIES).map(([id, entry]) => ({
-      id,
-      label: entry.label,
-    })),
+    categories: Object.entries(BACCALAUREAT_CATEGORIES).map(([id, entry]) => ({ id, ...entry })),
+    packs: Object.entries(BACCALAUREAT_PACKS).map(([id, entry]) => ({ id, ...entry })),
+    flash: BACCALAUREAT_SETTINGS.flash,
+    jokersPerPlayer: BACCALAUREAT_SETTINGS.jokersPerPlayer,
     alphabet: BACCALAUREAT_SETTINGS.alphabet,
     rounds: BACCALAUREAT_SETTINGS.rounds,
     roundSeconds: BACCALAUREAT_SETTINGS.roundSeconds,

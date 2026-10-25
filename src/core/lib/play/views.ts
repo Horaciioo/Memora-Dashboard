@@ -1,8 +1,6 @@
-import 'server-only'
-
 import { PLAY_GAMES } from '@/declarations/play'
-import { isPresent } from '@/core/services/play/lookups'
-import type { LoadedSession } from '@/core/services/play/lookups'
+import { isPresent } from '@/core/lib/play/session'
+import type { LoadedSession } from '@/core/lib/play/session'
 
 /**
  * Game as its players read it
@@ -26,6 +24,7 @@ export const toSessionView = (session: LoadedSession, viewerId: string, board: u
     minPlayers: meta.minPlayers,
     startedAt: session.startedAt,
     finishedAt: session.finishedAt,
+    rematchId: session.rematch?.id ?? null,
     tournament: session.tournament && {
       id: session.tournament.id,
       index: session.tournamentIndex ?? 0,
@@ -48,6 +47,8 @@ export const toSessionView = (session: LoadedSession, viewerId: string, board: u
       })),
     me: {
       isSeated: Boolean(seat && isPresent(seat)),
+      // Readers without a seat only watch
+      isSpectator: !seat || !isPresent(seat),
       isHost: session.hostId === viewerId,
       isKicked: Boolean(seat?.kickedAt),
     },

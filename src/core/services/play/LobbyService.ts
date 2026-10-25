@@ -9,17 +9,17 @@ import { clearDeadline } from '@/core/lib/play/timers'
 import { signalPlay } from '@/core/lib/play/signal'
 import { PLAY_ERRORS, PLAY_GAMES, PLAY_SETTINGS } from '@/declarations/play'
 import {
+  cloneTable,
   currentSessionId,
   engineOf,
   ensureFree,
-  isPresent,
   lockSession,
   requireHost,
   requireSeat,
-  SESSION_INCLUDE,
-} from '@/core/services/play/lookups'
-import type { LoadedSession } from '@/core/services/play/lookups'
-import { toLobbyCard } from '@/core/services/play/views'
+} from '@/core/services/play/PlaySessionService'
+import { isPresent, SESSION_INCLUDE } from '@/core/lib/play/session'
+import type { LoadedSession } from '@/core/lib/play/session'
+import { toLobbyCard } from '@/core/lib/play/views'
 import { PlayStatuses } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 import { MINUTE_MS } from '@/utils/constants/time'
@@ -104,16 +104,26 @@ export const listLobbies = async (accountId: string, game?: string | null) => {
     data: { status: PlayStatuses.Abandoned },
   })
 
-  const [lobbies, current] = await Promise.all([
+  // Running games welcome spectators
+  const [lobbies, running, current] = await Promise.all([
     prisma.playSession.findMany({
       where: { status: PlayStatuses.Lobby, ...(game && { game: gameNamed(game) }) },
       orderBy: { createdAt: 'desc' },
       include: SESSION_INCLUDE,
     }),
+    prisma.playSession.findMany({
+      where: { status: PlayStatuses.Running, ...(game && { game: gameNamed(game) }) },
+      orderBy: { startedAt: 'desc' },
+      include: SESSION_INCLUDE,
+    }),
     currentSessionId(accountId),
   ])
 
-  return { lobbies: lobbies.map(toLobbyCard), currentId: current }
+  return {
+    lobbies: lobbies.map(toLobbyCard),
+    running: running.map(toLobbyCard),
+    currentId: current,
+  }
 }
 
 /**
@@ -275,4 +285,31 @@ export const updateSettings = async (
     })
   })
   await signalPlay(sessionId)
+}
+
+/**
+ * Host replays a finished game with the same table
+ * @param {string} sessionId - Finished game
+ * @param {string} hostId - Host
+ * @return {Promise<{ id: string }>} - New lobby
+ */
+
+export const rematchSession = async (sessionId: string, hostId: string) => {
+  const id = await prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, sessionId)
+    requireHost(session, hostId)
+    if (session.status !== PlayStatuses.Finished) throw conflict(PLAY_ERRORS.notFinished)
+    if (session.tournamentId) throw conflict(PLAY_ERRORS.rematchTournament)
+
+    // One rematch per game
+    const known = await tx.playSession.findUnique({
+      where: { rematchOfId: sessionId },
+      select: { id: true },
+    })
+
+    return known?.id ?? cloneTable(tx, session, { rematchOfId: sessionId })
+  })
+  await signalPlay(sessionId, true)
+
+  return { id }
 }

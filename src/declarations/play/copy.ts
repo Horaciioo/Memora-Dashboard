@@ -27,6 +27,11 @@ export const PLAY_ERRORS = {
   ownAnswer: 'Tu ne votes pas sur tes propres mots.',
   stopIncomplete: 'Remplis toutes les catégories avant de dire stop.',
   stopDisabled: 'Le stop est désactivé dans cette partie.',
+  notCountdown: 'Le joker se joue pendant le compte à rebours.',
+  noJoker: 'Tu as déjà utilisé ton joker.',
+  jokerTaken: 'Quelqu’un a déjà changé cette lettre.',
+  notFinished: 'La partie n’est pas terminée.',
+  rematchTournament: 'Un tournoi enchaîne déjà ses parties.',
   notScored: 'La manche n’est pas encore comptée.',
 } as const
 

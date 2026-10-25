@@ -2620,6 +2620,8 @@ model PlaySession {
   hostId          String
   tournamentId    String?
   tournamentIndex Int?
+  // Game this one replays with the same table
+  rematchOfId     String?           @unique
   // Choices of the host, shaped by the game
   settings        Json
   startedAt       DateTime?
@@ -2629,6 +2631,8 @@ model PlaySession {
 
   host       Account             @relation("PlaySessionHost", fields: [hostId], references: [id], onDelete: Cascade)
   tournament PlayTournament?     @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  rematchOf  PlaySession?        @relation("PlayRematch", fields: [rematchOfId], references: [id], onDelete: SetNull)
+  rematch    PlaySession?        @relation("PlayRematch")
   seats      PlaySeat[]
   bacRounds  BaccalaureatRound[]
 
@@ -2696,6 +2700,10 @@ model BaccalaureatRound {
   startsAt     DateTime
   endsAt       DateTime
   stoppedById  String?
+  // Player who spent their letter joker here
+  rerolledById String?
+  // Speed bonus paid to the stopper
+  bonus        Int       @default(0)
   closedAt     DateTime?
   reviewEndsAt DateTime?
   scoredAt     DateTime?

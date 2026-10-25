@@ -172,3 +172,48 @@ export const closeRound = async (roundId: string): Promise<Date | null> => {
 
   return count > 0 ? reviewEndsAt : null
 }
+
+/**
+ * Spend a letter joker during the countdown
+ * @param {EngineSession} session - Game
+ * @param {string} accountId - Player
+ * @return {Promise<EngineStep>} - Step
+ */
+
+export const rerollLetter = async (
+  session: EngineSession,
+  accountId: string
+): Promise<EngineStep> => {
+  const round = await latestRound(session.id)
+  if (!round || roundPhase(round) !== BaccalaureatPhases.Countdown)
+    throw conflict(PLAY_ERRORS.notCountdown)
+
+  const spent = await prisma.baccalaureatRound.count({
+    where: { sessionId: session.id, rerolledById: accountId },
+  })
+  if (spent >= BACCALAUREAT_SETTINGS.jokersPerPlayer) throw conflict(PLAY_ERRORS.noJoker)
+
+  // New letter, countdown restarts
+  const settings = baccalaureatSettingsOf(session.settings)
+  const drawn = await prisma.baccalaureatRound.findMany({
+    where: { sessionId: session.id },
+    select: { letter: true },
+  })
+  const startsAt = after(new Date(), BACCALAUREAT_SETTINGS.countdownSeconds)
+  const endsAt = after(startsAt, settings.roundSeconds)
+  const { count } = await prisma.baccalaureatRound.updateMany({
+    where: { id: round.id, rerolledById: null },
+    data: {
+      rerolledById: accountId,
+      letter: drawLetter(
+        settings.letters,
+        drawn.map((entry) => entry.letter)
+      ),
+      startsAt,
+      endsAt,
+    },
+  })
+  if (!count) throw conflict(PLAY_ERRORS.jokerTaken)
+
+  return { changed: true, finished: false, deadline: closingAt({ endsAt }) }
+}

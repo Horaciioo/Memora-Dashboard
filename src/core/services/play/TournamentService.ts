@@ -6,39 +6,10 @@ import { prisma } from '@/core/lib/db'
 import { rankScores, tournamentXp } from '@/core/lib/play'
 import { PLAY_SETTINGS } from '@/declarations/play'
 import { recordResults } from '@/core/services/play/StatService'
-import { isPresent, loadSession } from '@/core/services/play/lookups'
-import type { LoadedSession } from '@/core/services/play/lookups'
+import { cloneTable, loadSession } from '@/core/services/play/PlaySessionService'
+import { isPresent } from '@/core/lib/play/session'
+import type { LoadedSession } from '@/core/lib/play/session'
 import { PlayOutcomes, PlayStatuses } from '@/utils/constants/play'
-
-/**
- * Open the next game with the same table
- * @param {Prisma.TransactionClient} tx - Transaction
- * @param {LoadedSession} session - Game just finished
- * @return {Promise<string>} - Next game
- */
-
-const openNextGame = async (
-  tx: Prisma.TransactionClient,
-  session: LoadedSession
-): Promise<string> => {
-  const present = session.seats.filter(isPresent)
-  const hostId = present.some((seat) => seat.accountId === session.hostId)
-    ? session.hostId
-    : (present[0]?.accountId ?? session.hostId)
-
-  const next = await tx.playSession.create({
-    data: {
-      game: session.game,
-      hostId,
-      settings: session.settings as Prisma.InputJsonValue,
-      tournamentId: session.tournamentId,
-      tournamentIndex: (session.tournamentIndex ?? 0) + 1,
-      seats: { create: present.map((seat) => ({ accountId: seat.accountId, color: seat.color })) },
-    },
-  })
-
-  return next.id
-}
 
 /**
  * Rank the tournament and pay its players
@@ -102,7 +73,12 @@ export const advanceTournament = async (sessionId: string): Promise<string | nul
 
     const isLast = (session.tournamentIndex ?? 0) + 1 >= tournament.gamesCount
     const hasTable = session.seats.some(isPresent)
-    if (!isLast && hasTable) return openNextGame(tx, session)
+    if (!isLast && hasTable) {
+      return cloneTable(tx, session, {
+        tournamentId: session.tournamentId,
+        tournamentIndex: (session.tournamentIndex ?? 0) + 1,
+      })
+    }
 
     await closeTournament(tx, session)
 

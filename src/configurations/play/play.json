@@ -1,8 +1,23 @@
 {
-  "xp": { "win": 150, "draw": 100, "loss": 50 },
-  "levels": { "max": 100, "base": 80, "growth": 1.15 },
-  "tournament": { "minGames": 2, "maxGames": 7, "bonusPerGame": 0.5 },
-  "rewards": { "minPlayers": 2, "minSeconds": 60 },
+  "xp": {
+    "win": 150,
+    "draw": 100,
+    "loss": 50
+  },
+  "levels": {
+    "max": 100,
+    "base": 40,
+    "growth": 1
+  },
+  "tournament": {
+    "minGames": 2,
+    "maxGames": 7,
+    "bonusPerGame": 0.5
+  },
+  "rewards": {
+    "minPlayers": 2,
+    "minSeconds": 60
+  },
   "lobbyIdleMinutes": 30,
   "seatColors": 12,
   "leaderboardSize": 20

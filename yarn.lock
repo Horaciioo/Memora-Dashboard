@@ -3226,6 +3226,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"an-array-of-french-words@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "an-array-of-french-words@npm:2.0.0"
+  bin:
+    an-array-of-french-words: cli.js
+    mots: cli.js
+  checksum: 10c0/d01f4fef3bae9b8c7b2fb91178b6505789bf930fedb079b2c1f2b391084432c49f4489a922c6ff87cc47ff8fdc36f45740d73ce9608caf6838ba06b86528cc44
+  languageName: node
+  linkType: hard
+
 "ansi-styles@npm:^4.1.0":
   version: 4.3.0
   resolution: "ansi-styles@npm:4.3.0"
@@ -6226,6 +6236,7 @@ __metadata:
     "@types/react-dom": "npm:^19"
     "@types/three": "npm:^0.186.0"
     "@vitest/coverage-v8": "npm:^4.1.11"
+    an-array-of-french-words: "npm:^2.0.0"
     bullmq: "npm:^6.1.2"
     clsx: "npm:^2.1.1"
     country-flag-icons: "npm:^1.6.20"

@@ -10,15 +10,14 @@ import { finishSession } from '@/core/services/play/RewardService'
 import { tournamentStandings } from '@/core/services/play/TournamentService'
 import {
   engineOf,
-  isPresent,
   loadSession,
   lockSession,
   requireHost,
   requireSeat,
-  toEngineSession,
-} from '@/core/services/play/lookups'
-import type { LoadedSession } from '@/core/services/play/lookups'
-import { toSessionView } from '@/core/services/play/views'
+} from '@/core/services/play/PlaySessionService'
+import { isPresent, toEngineSession } from '@/core/lib/play/session'
+import type { LoadedSession } from '@/core/lib/play/session'
+import { toSessionView } from '@/core/lib/play/views'
 import { PlayStatuses } from '@/utils/constants/play'
 
 /**

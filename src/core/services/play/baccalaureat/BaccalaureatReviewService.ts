@@ -5,12 +5,13 @@ import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { readBodyText } from '@/core/lib/play'
 import {
   BaccalaureatPhases,
+  baccalaureatSettingsOf,
   fitsLetter,
   keepsAnswer,
   roundPhase,
   scoreAnswers,
 } from '@/core/lib/play/baccalaureat'
-import { PLAY_ERRORS } from '@/declarations/play'
+import { BACCALAUREAT_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
 import type { EngineSession, EngineStep } from '@/types/play'
 import { latestRound } from '@/core/services/play/baccalaureat/BaccalaureatRoundService'
 
@@ -92,10 +93,21 @@ export const scoreRound = async (session: EngineSession, roundId: string): Promi
       })
     }
 
+    // Stopper paid when every word holds
+    const stopperWords = judged.filter((answer) => answer.accountId === round.stoppedById)
+    const categories = baccalaureatSettingsOf(session.settings).categories.length
+    const bonus =
+      stopperWords.length >= categories && stopperWords.every((answer) => answer.valid)
+        ? BACCALAUREAT_SETTINGS.points.stopBonus
+        : 0
+    if (bonus) await tx.baccalaureatRound.update({ where: { id: roundId }, data: { bonus } })
+
     // Seat totals
     const earned = Map.groupBy(judged, (answer) => answer.accountId)
     for (const [accountId, answers] of earned) {
-      const total = answers.reduce((sum, answer) => sum + (points.get(answer.id) ?? 0), 0)
+      const total =
+        answers.reduce((sum, answer) => sum + (points.get(answer.id) ?? 0), 0) +
+        (accountId === round.stoppedById ? bonus : 0)
       if (total) {
         await tx.playSeat.updateMany({
           where: { sessionId: session.id, accountId },

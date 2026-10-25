@@ -1,9 +1,31 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { BaccalaureatPhases, roundPhase } from '@/core/lib/play/baccalaureat'
+import {
+  BaccalaureatPhases,
+  baccalaureatSettingsOf,
+  isCustomCategory,
+  roundPhase,
+} from '@/core/lib/play/baccalaureat'
+import { lookUpWords } from '@/core/lib/play/baccalaureat/dictionary'
+import { baccalaureatRecap } from '@/core/services/play/baccalaureat/BaccalaureatRecapService'
+import {
+  BACCALAUREAT_CATEGORIES,
+  BACCALAUREAT_SETTINGS,
+  isBaccalaureatCategory,
+} from '@/declarations/play'
 import type { EngineSession } from '@/types/play'
-import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
+
+/**
+ * Category worth a dictionary hint
+ * @param {string} category - Category id
+ * @return {boolean} - Hinted
+ */
+
+const usesDictionary = (category: string): boolean =>
+  isBaccalaureatCategory(category)
+    ? BACCALAUREAT_CATEGORIES[category].dictionary
+    : isCustomCategory(category)
 
 // Answer fields shown on the board
 const ANSWER_SELECT = {
@@ -29,7 +51,15 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
     prisma.baccalaureatRound.findMany({
       where: { sessionId: session.id },
       orderBy: { index: 'asc' },
-      select: { id: true, index: true, letter: true, scoredAt: true },
+      select: {
+        id: true,
+        index: true,
+        letter: true,
+        scoredAt: true,
+        stoppedById: true,
+        bonus: true,
+        rerolledById: true,
+      },
     }),
     prisma.baccalaureatAnswer.groupBy({
       by: ['roundId', 'accountId'],
@@ -46,16 +76,21 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
       })
     : null
   const phase = round ? roundPhase(round) : null
+  const isComplete = phase === BaccalaureatPhases.Scored && rounds.length >= settings.rounds
 
   // Drafts stay private while writing
   const isOpen = phase === BaccalaureatPhases.Countdown || phase === BaccalaureatPhases.Writing
-  const answers = (round?.answers ?? [])
-    .filter((answer) => !isOpen || answer.accountId === viewerId)
-    .map(({ votes, ...answer }) => ({
-      ...answer,
-      rejects: votes.filter((vote) => !vote.accepted).length,
-      myVote: votes.find((vote) => vote.voterId === viewerId)?.accepted ?? null,
-    }))
+  const shown = (round?.answers ?? []).filter((answer) => !isOpen || answer.accountId === viewerId)
+
+  // Dictionary hints once words are out
+  const hinted = shown.filter((answer) => !isOpen && usesDictionary(answer.category))
+  const hints = await lookUpWords(hinted.map((answer) => answer.word))
+  const answers = shown.map(({ votes, ...answer }) => ({
+    ...answer,
+    inDictionary: hints.get(answer.word) ?? null,
+    rejects: votes.filter((vote) => !vote.accepted).length,
+    myVote: votes.find((vote) => vote.voterId === viewerId)?.accepted ?? null,
+  }))
 
   return {
     settings,
@@ -64,12 +99,28 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
       index: entry.index,
       letter: entry.letter,
       isScored: Boolean(entry.scoredAt),
+      bonus: entry.bonus,
+      stoppedById: entry.stoppedById,
       points: Object.fromEntries(
         totals
           .filter((total) => total.roundId === entry.id)
-          .map((total) => [total.accountId, total._sum.points ?? 0])
+          .map((total) => [
+            total.accountId,
+            (total._sum.points ?? 0) + (total.accountId === entry.stoppedById ? entry.bonus : 0),
+          ])
       ),
     })),
+    jokersLeft: Math.max(
+      0,
+      BACCALAUREAT_SETTINGS.jokersPerPlayer -
+        rounds.filter((entry) => entry.rerolledById === viewerId).length
+    ),
+    recap: isComplete
+      ? await baccalaureatRecap(
+          session.id,
+          new Map(settings.categories.map((entry) => [entry.id, entry.label]))
+        )
+      : null,
     round: round && {
       index: round.index,
       letter: round.letter,
@@ -78,6 +129,8 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
       endsAt: round.endsAt,
       reviewEndsAt: round.reviewEndsAt,
       stoppedById: round.stoppedById,
+      rerolledById: round.rerolledById,
+      bonus: round.bonus,
       answers,
     },
     serverTime: new Date(),

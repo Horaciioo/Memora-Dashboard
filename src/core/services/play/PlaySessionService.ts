@@ -6,38 +6,14 @@ import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { PLAY_ERRORS, PLAY_GAMES } from '@/declarations/play'
 import { PLAY_ENGINES } from '@/core/engines/play'
-import type { EngineSession, PlayEngine } from '@/core/engines/play'
+import type { PlayEngine } from '@/core/engines/play'
+import { isPresent, SESSION_INCLUDE } from '@/core/lib/play/session'
+import type { LoadedSeat, LoadedSession } from '@/core/lib/play/session'
 import { PLAY_OPEN_STATUSES } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
 // Client inside or outside a transaction
 type PlayClient = PrismaClient | Prisma.TransactionClient
-
-/**
- * Game with its seats and players
- * @type {Prisma.PlaySessionInclude}
- */
-
-export const SESSION_INCLUDE = {
-  seats: {
-    orderBy: { joinedAt: 'asc' },
-    include: { account: { select: { id: true, displayName: true, avatarUrl: true } } },
-  },
-  tournament: true,
-} as const satisfies Prisma.PlaySessionInclude
-
-export type LoadedSession = Prisma.PlaySessionGetPayload<{ include: typeof SESSION_INCLUDE }>
-
-export type LoadedSeat = LoadedSession['seats'][number]
-
-/**
- * Seat still held
- * @param {{ leftAt: Date | null, kickedAt: Date | null }} seat - Seat
- * @return {boolean} - Present
- */
-
-export const isPresent = (seat: { leftAt: Date | null; kickedAt: Date | null }): boolean =>
-  !seat.leftAt && !seat.kickedAt
 
 /**
  * Read a game
@@ -84,19 +60,6 @@ export const engineOf = (game: PlayGameName): PlayEngine => {
 
   return engine
 }
-
-/**
- * Engine view of a game
- * @param {LoadedSession} session - Game
- * @return {EngineSession} - Engine input
- */
-
-export const toEngineSession = (session: LoadedSession): EngineSession => ({
-  id: session.id,
-  hostId: session.hostId,
-  settings: session.settings,
-  players: session.seats.filter(isPresent).map((seat) => seat.accountId),
-})
 
 /**
  * Seat of a present player
@@ -162,4 +125,38 @@ export const ensureFree = async (
 ): Promise<void> => {
   const current = await currentSessionId(accountId, tx)
   if (current && current !== sessionId) throw conflict(PLAY_ERRORS.alreadyPlaying)
+}
+
+/**
+ * New lobby with the same table and settings
+ * @param {Prisma.TransactionClient} tx - Transaction
+ * @param {LoadedSession} session - Game replayed
+ * @param {Prisma.PlaySessionUncheckedCreateInput} link - Tournament or rematch link
+ * @return {Promise<string>} - New game
+ */
+
+export const cloneTable = async (
+  tx: Prisma.TransactionClient,
+  session: LoadedSession,
+  link: Pick<
+    Prisma.PlaySessionUncheckedCreateInput,
+    'tournamentId' | 'tournamentIndex' | 'rematchOfId'
+  >
+): Promise<string> => {
+  const present = session.seats.filter(isPresent)
+  const hostId = present.some((seat) => seat.accountId === session.hostId)
+    ? session.hostId
+    : (present[0]?.accountId ?? session.hostId)
+
+  const next = await tx.playSession.create({
+    data: {
+      ...link,
+      game: session.game,
+      hostId,
+      settings: session.settings as Prisma.InputJsonValue,
+      seats: { create: present.map((seat) => ({ accountId: seat.accountId, color: seat.color })) },
+    },
+  })
+
+  return next.id
 }
