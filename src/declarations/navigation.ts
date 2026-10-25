@@ -57,6 +57,8 @@ export const ROUTES = {
   administration: '/administration',
   maturity: '/maturite',
   changelog: '/nouveautes',
+  play: '/play',
+  playSession: (id: string) => `/play/parties/${id}`,
   preferences: '/parametres',
   settings: '/configuration',
   teams: '/configuration/youtubeurs',
@@ -258,6 +260,13 @@ export const NAVIGATION: NavigationGroup[] = [
       },
       { href: ROUTES.absences, label: 'Absences', icon: 'absences', maturity: 'new' },
       { href: ROUTES.changelog, label: 'Nouveautés', icon: 'news', quick: true },
+      {
+        href: ROUTES.play,
+        label: 'Play',
+        icon: 'play',
+        permission: Permissions.PlayAccess,
+        maturity: 'alpha',
+      },
       {
         href: ROUTES.calendar,
         label: 'Calendrier',
