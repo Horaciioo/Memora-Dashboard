@@ -166,7 +166,7 @@ export const seedPipeline = async (reference: Reference, cast: Cast) => {
             ? day(seed.opens! + closingOffset + 40)
             : null,
         status: seed.promotion,
-        summary: `Promotion ${jobFunction.name} · ${creator.name}`,
+        summary: `Promotion ${jobFunction.name}, ${creator.name}`,
         createdAt: opensAt ?? day(-3),
         trainers: {
           create: sessionTrainers.map((person) => ({

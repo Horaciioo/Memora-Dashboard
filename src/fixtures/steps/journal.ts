@@ -363,7 +363,7 @@ export const seedJournal = async (cast: Cast) => {
       actorId: entry.actorId,
       targetType: 'livecon',
       targetId: entry.youtuberId ?? undefined,
-      summary: `${entry.youtuber?.name ?? ''} · ${entry.level.name}`,
+      summary: `${entry.youtuber?.name ?? ''}, ${entry.level.name}`,
     })
   }
 
@@ -536,7 +536,7 @@ export const seedJournal = async (cast: Cast) => {
           at,
           actorId: cast.root.id,
           targetType: 'plateformes',
-          summary: 'Plateforme · Twitch',
+          summary: 'Plateforme, Twitch',
         },
         {
           event: 'PermissionChanged',

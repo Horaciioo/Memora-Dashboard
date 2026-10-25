@@ -8,6 +8,31 @@ try {
   // No .env file
 }
 
+/**
+ * Refuse to run anywhere but a development database on this machine
+ * @return {void} - Throws otherwise
+ */
+
+const assertDevOnly = (): void => {
+  const environment = process.env.APP_ENV?.trim()
+  const host = (() => {
+    try {
+      return new URL(process.env.DATABASE_URL ?? '').hostname
+    } catch {
+      return ''
+    }
+  })()
+  const isLocal = ['localhost', '127.0.0.1', '::1', '[::1]'].includes(host)
+
+  if (process.env.NODE_ENV === 'production' || (environment && environment !== 'dev') || !isLocal) {
+    throw new Error(
+      'Les données factices ne se créent qu’en dev, sur une base locale : opération refusée.'
+    )
+  }
+}
+
+assertDevOnly()
+
 export const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 })
