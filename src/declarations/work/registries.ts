@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import { createRegistry } from '@/core/lib/registry'
 import type { IconName } from '@/declarations/ui/icons'
 import { ROUTES } from '@/declarations/navigation'
@@ -39,14 +40,14 @@ const MEETING_AUDIENCE_MAP: Record<MeetingAudienceName, MeetingAudienceOption> =
     summary:
       "Seule l'équipe Discord sera concernée et notifiée dans leur page d'Accueil respective.",
     icon: 'functionDiscord',
-    functionName: 'Discord',
+    functionName: FunctionNames.Discord,
   },
   [MeetingAudiences.Twitch]: {
     label: 'Équipe Twitch',
     summary:
       "Seule l'équipe Twitch sera concernée et notifiée dans leur page d'Accueil respective.",
     icon: 'functionLive',
-    functionName: 'Lives',
+    functionName: FunctionNames.Lives,
   },
   [MeetingAudiences.Team]: {
     label: 'L’équipe concernée',

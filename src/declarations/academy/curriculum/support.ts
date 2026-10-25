@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import {
   DELTA_RUNS,
   FOXTROT_NODES,
@@ -29,7 +30,7 @@ export const SUPPORT_TICKETS: Course = {
   summary: 'Prendre en charge un Ticket du début à la fin, comme nous le voulons.',
   track: 'indispensable',
   surface: 'discord',
-  functions: ['Discord', 'Lives'],
+  functions: [FunctionNames.Discord, FunctionNames.Lives],
   minutes: 25,
   intro: {
     objective:

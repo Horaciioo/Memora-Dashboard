@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import { GUIDE_BEACONS } from '@/declarations/academy/guides'
 import { ROUTES } from '@/declarations/navigation'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
@@ -158,10 +159,10 @@ export const TOUR_PAGES: TourPage[] = [
     ],
   },
   { route: ROUTES.sanctions, steps: SANCTION_STEPS },
-  { route: ROUTES.discordSanctions, functions: ['Discord'], steps: SANCTION_STEPS },
+  { route: ROUTES.discordSanctions, functions: [FunctionNames.Discord], steps: SANCTION_STEPS },
   {
     route: ROUTES.marsha,
-    functions: ['Discord'],
+    functions: [FunctionNames.Discord],
     steps: [
       {
         beacon: TOUR_BEACONS.marshaFamilies,

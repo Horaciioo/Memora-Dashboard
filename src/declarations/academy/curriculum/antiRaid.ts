@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import type { Course } from '@/declarations/academy/curriculum/types'
 
 /**
@@ -12,7 +13,7 @@ export const ANTI_RAID: Course = {
     'Reconnaître un raid, choisir le bon mode anti-raid et agir dans l’ordre sans rien oublier.',
   track: 'secondary',
   surface: 'discord',
-  functions: ['Discord'],
+  functions: [FunctionNames.Discord],
   minutes: 25,
   chapters: [
     {

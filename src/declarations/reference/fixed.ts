@@ -26,11 +26,18 @@ export interface FixedDivision {
  */
 
 export const FIXED_DIVISIONS: readonly FixedDivision[] = [
-  { name: 'Division 1', rank: 1, summary: 'Première division.', leadAssignable: true },
-  { name: 'Division 2', rank: 2, summary: 'Deuxième division.', leadAssignable: true },
-  { name: 'Division 3', rank: 3, summary: 'Troisième division.', leadAssignable: false },
-  { name: 'Division 4', rank: 4, summary: 'Division des responsables.', leadAssignable: false },
+  { name: 'Division I', rank: 1, summary: 'Première division.', leadAssignable: true },
+  { name: 'Division II', rank: 2, summary: 'Deuxième division.', leadAssignable: true },
+  { name: 'Division III', rank: 3, summary: 'Troisième division.', leadAssignable: false },
+  { name: 'Division IV', rank: 4, summary: 'Division des responsables.', leadAssignable: false },
 ]
+
+/**
+ * Rank of the division every responsable sits in
+ * @type {number}
+ */
+
+export const LEAD_DIVISION_RANK = Math.max(...FIXED_DIVISIONS.map((division) => division.rank))
 
 /**
  * Function a member holds under their role
@@ -54,11 +61,29 @@ export interface FixedFunction {
   summary: string
 }
 
+/**
+ * Function names
+ * @type {Record<string, string>}
+ */
+
+export const FunctionNames = {
+  Discord: 'Discord',
+  Lives: 'Lives',
+  Animators: 'Animateurs',
+  JuniorDiscord: 'Junior Discord',
+  JuniorLives: 'Junior Lives',
+  JuniorAnimators: 'Junior Animateurs',
+  Recruiters: 'Recruteurs',
+  Trainers: 'Formateurs',
+  Observers: 'Observateurs',
+  Coordinator: 'Coordinateur de Live',
+} as const
+
 // Secondary functions that open a team picker
-export const OBSERVER_FUNCTION = 'Observateurs'
-export const TRAINER_FUNCTION = 'Formateurs'
+export const OBSERVER_FUNCTION = FunctionNames.Observers
+export const TRAINER_FUNCTION = FunctionNames.Trainers
 // Holders may be asked to coordinate a live
-export const COORDINATOR_FUNCTION = 'Coordinateur de Live'
+export const COORDINATOR_FUNCTION = FunctionNames.Coordinator
 
 /**
  * Functions
@@ -67,7 +92,7 @@ export const COORDINATOR_FUNCTION = 'Coordinateur de Live'
 
 export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
   {
-    name: 'Discord',
+    name: FunctionNames.Discord,
     kind: 'PRIMARY',
     position: 1,
     icon: 'functionDiscord',
@@ -76,7 +101,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     summary: 'Modère les serveurs Discord.',
   },
   {
-    name: 'Lives',
+    name: FunctionNames.Lives,
     kind: 'PRIMARY',
     position: 2,
     icon: 'functionLive',
@@ -85,7 +110,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     summary: 'Modère le chat des lives.',
   },
   {
-    name: 'Animateurs',
+    name: FunctionNames.Animators,
     kind: 'PRIMARY',
     position: 3,
     icon: 'functionAnimator',
@@ -94,7 +119,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     summary: 'Anime la communauté.',
   },
   {
-    name: 'Junior Discord',
+    name: FunctionNames.JuniorDiscord,
     kind: 'PRIMARY',
     position: 4,
     icon: 'functionJuniorDiscord',
@@ -103,7 +128,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     summary: 'Se forme à la modération Discord pendant sa PIM.',
   },
   {
-    name: 'Junior Lives',
+    name: FunctionNames.JuniorLives,
     kind: 'PRIMARY',
     position: 5,
     icon: 'functionJuniorLive',
@@ -112,7 +137,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     summary: 'Se forme à la modération des lives pendant sa PIM.',
   },
   {
-    name: 'Junior Animateurs',
+    name: FunctionNames.JuniorAnimators,
     kind: 'PRIMARY',
     position: 6,
     icon: 'functionJuniorAnimator',
@@ -121,7 +146,7 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
     summary: 'Se forme à l’animation pendant sa PIM.',
   },
   {
-    name: 'Recruteurs',
+    name: FunctionNames.Recruiters,
     kind: 'SECONDARY',
     position: 7,
     icon: 'functionRecruiter',
@@ -191,9 +216,9 @@ export const FIXED_FUNCTIONS: readonly FixedFunction[] = [
  */
 
 export const JUNIOR_FUNCTION_OF: Readonly<Record<string, string>> = {
-  Discord: 'Junior Discord',
-  Lives: 'Junior Lives',
-  Animateurs: 'Junior Animateurs',
+  [FunctionNames.Discord]: FunctionNames.JuniorDiscord,
+  [FunctionNames.Lives]: FunctionNames.JuniorLives,
+  [FunctionNames.Animators]: FunctionNames.JuniorAnimators,
 }
 
 /**
@@ -202,9 +227,9 @@ export const JUNIOR_FUNCTION_OF: Readonly<Record<string, string>> = {
  */
 
 export const LEGACY_FUNCTION_OF: Readonly<Record<string, string>> = {
-  Discord: 'Junior Responsable Discord',
-  Lives: 'Junior Responsable Lives',
-  Animateurs: 'Junior Responsable Animateurs',
+  [FunctionNames.Discord]: 'Junior Responsable Discord',
+  [FunctionNames.Lives]: 'Junior Responsable Lives',
+  [FunctionNames.Animators]: 'Junior Responsable Animateurs',
 }
 
 /**
@@ -235,15 +260,27 @@ export interface FixedPriority {
 }
 
 /**
+ * Priority names
+ * @type {Record<string, string>}
+ */
+
+export const PriorityNames = {
+  Low: 'Basse',
+  Normal: 'Normale',
+  High: 'Haute',
+  Urgent: 'Urgente',
+} as const
+
+/**
  * Priorities
  * @type {readonly FixedPriority[]}
  */
 
 export const FIXED_PRIORITIES: readonly FixedPriority[] = [
-  { name: 'Basse', weight: 1, accent: 'neutral', isDefault: false },
-  { name: 'Normale', weight: 2, accent: 'info', isDefault: true },
-  { name: 'Haute', weight: 3, accent: 'warning', isDefault: false },
-  { name: 'Urgente', weight: 4, accent: 'danger', isDefault: false },
+  { name: PriorityNames.Low, weight: 1, accent: 'neutral', isDefault: false },
+  { name: PriorityNames.Normal, weight: 2, accent: 'info', isDefault: true },
+  { name: PriorityNames.High, weight: 3, accent: 'warning', isDefault: false },
+  { name: PriorityNames.Urgent, weight: 4, accent: 'danger', isDefault: false },
 ]
 
 /**

@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import type { Course } from '@/declarations/academy/curriculum/types'
 
 /**
@@ -12,7 +13,7 @@ export const MARSHA_BOT: Course = {
     'Lire, écrire et enchaîner les commandes de Marsha pour sanctionner vite, juste et avec preuve.',
   track: 'indispensable',
   surface: 'discord',
-  functions: ['Discord'],
+  functions: [FunctionNames.Discord],
   minutes: 40,
   chapters: [
     {
