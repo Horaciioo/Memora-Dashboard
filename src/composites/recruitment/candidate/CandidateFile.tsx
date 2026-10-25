@@ -68,7 +68,7 @@ const CandidateBody = ({ candidateId }: { candidateId: string }) => {
             }
             onToggle={
               can.writeCandidates
-                ? (stage) => void file.markStage(candidate.id, stage, states[stage] !== 'done')
+                ? (stage) => void file.markStage(candidate.id, stage, states[stage] === 'upcoming')
                 : undefined
             }
           />

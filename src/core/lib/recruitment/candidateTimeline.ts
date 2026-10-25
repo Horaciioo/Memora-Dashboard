@@ -42,7 +42,7 @@ export const candidateStates = (
 ): Record<CandidateStage, TimelineState> => {
   const slotted = progress.interviewAt !== null
 
-  // Set by the interview page itself, never by a hand tick
+  // Set by the interview page or a tick, only a clear removes it
   const started = marks.interviewing === true
   const decided = outcomes.find((outcome) => outcome.id === progress.outcomeId)?.isTerminal ?? false
 
@@ -60,13 +60,11 @@ export const candidateStates = (
   return Object.fromEntries(
     CANDIDATE_STAGES.map((stage) => [
       stage,
-      stage === 'interviewing'
-        ? derived[stage]
-        : marks[stage] === true
-          ? 'done'
-          : marks[stage] === false && derived[stage] === 'done'
-            ? 'upcoming'
-            : derived[stage],
+      marks[stage] === true && stage !== 'interviewing'
+        ? 'done'
+        : marks[stage] === false && derived[stage] !== 'upcoming'
+          ? 'upcoming'
+          : derived[stage],
     ])
   ) as Record<CandidateStage, TimelineState>
 }

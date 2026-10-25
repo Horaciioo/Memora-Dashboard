@@ -39,8 +39,7 @@ export const CandidateTimeline = ({
     id: stage,
     state: states[stage],
     title: CANDIDATE_STAGE_COPY[stage],
-    // The interview page drives its own moment
-    onSelect: onToggle && stage !== 'interviewing' ? () => onToggle(stage) : undefined,
+    onSelect: onToggle ? () => onToggle(stage) : undefined,
     children:
       stage === 'interviewing' && states.interviewing === 'done' ? (
         <Button onClick={onReview} className="self-start">
