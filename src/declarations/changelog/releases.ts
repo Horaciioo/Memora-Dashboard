@@ -274,6 +274,11 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        text: 'Correction d’un bug qui ajoutait tous les membres à l’« Appel de présence » d’un live quand on en modifiait le titre depuis le « Calendrier ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
         text: 'Correction d’un bug qui affichait certaines heures dans le mauvais fuseau horaire.',
       },
     ],
