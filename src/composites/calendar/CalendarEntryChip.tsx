@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import type { MouseEvent } from 'react'
+import type { CSSProperties, MouseEvent } from 'react'
 
 import { CalendarEntryPreview } from '@/composites/calendar/CalendarEntryPreview'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
+import { mobileToneOfEntry } from '@/declarations/calendar/registries'
 import { ICONS } from '@/declarations/ui/icons'
-import { ACCENT_STYLES, accentPaint } from '@/declarations/ui/theme'
+import { ACCENT_STYLES, accentColour, accentPaint } from '@/declarations/ui/theme'
 import { CALENDAR_STYLES } from '@/declarations/ui/variants'
 import type { CalendarEntry } from '@/types/calendar'
 import { cn } from '@/utils/classnames'
@@ -131,10 +132,16 @@ export const CalendarEntryChip = ({
         onMouseLeave={closePreview}
         onFocus={(event) => openPreview(event.currentTarget)}
         onBlur={closePreview}
-        style={paint.style}
+        style={
+          {
+            ...paint.style,
+            '--accent-mobile': accentColour(mobileToneOfEntry(entry)),
+          } as CSSProperties
+        }
         className={
           line && !band
             ? cn(
+                'chip-solid',
                 CALENDAR_STYLES.line,
                 entry.muted
                   ? cn(CALENDAR_STYLES.entryMuted, opaque, paint.text)
@@ -143,6 +150,7 @@ export const CalendarEntryChip = ({
                 selected && CALENDAR_STYLES.entrySelected
               )
             : cn(
+                'chip-solid',
                 band ? CALENDAR_STYLES.bar : CALENDAR_STYLES.entry,
                 band && (opensBand ? CALENDAR_STYLES.barStart : CALENDAR_STYLES.barRunsIn),
                 band && (closesBand ? CALENDAR_STYLES.barEnd : CALENDAR_STYLES.barRunsOut),

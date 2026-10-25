@@ -63,6 +63,7 @@ export const LIVE_FIELD_COPY = {
   instructions: 'Consignes',
   instructionsHint:
     'Ce que l’équipe lit avant d’ouvrir la Mod View. Modifiables jusqu’à la fin du live.',
+  runningEntry: 'Ce live est en cours : termine-le avant de supprimer son évènement.',
 } as const
 
 /**

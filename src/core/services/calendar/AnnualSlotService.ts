@@ -1,9 +1,11 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { PriorityNames } from '@/declarations/reference/fixed'
 import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { openDays, slotClocks } from '@/core/lib/calendar/annualSlots'
 import { emojiOrRandom } from '@/core/lib/work'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { syncRoster } from '@/core/services/calendar/attendance'
 import { notify } from '@/core/services/system/NotificationService'
 import { openMeetingForEntry } from '@/core/services/work/MeetingService'
@@ -22,9 +24,10 @@ import {
 } from '@/utils/constants/workflow'
 import { formatDayTime } from '@/utils/format/dates'
 import { instantToWall, wallToInstant } from '@/utils/format/zone'
+import { DAY_MS, MINUTE_MS } from '@/utils/constants/time'
 
 // Priority and platform every project of the annual reviews starts with
-const PROJECT_PRIORITY = 'Normale'
+const PROJECT_PRIORITY = PriorityNames.Normal
 const PROJECT_PLATFORM = 'Discord'
 
 // Key every project of the annual reviews is filed under, followed by its number
@@ -126,7 +129,7 @@ export const openAnnualSlots = async (
         visibility: EventVisibilities.Team,
         audienceTeamId: input.teamId,
         startsAt,
-        endsAt: new Date(startsAt.getTime() + step * 60_000),
+        endsAt: new Date(startsAt.getTime() + step * MINUTE_MS),
         projectId: project.id,
         ownerId: actorId,
       }
@@ -342,7 +345,10 @@ const giveSlot = async (
     where: { id: eventId },
     include: { template: { select: { slotMinutes: true } } },
   })
-  if (!slot?.template?.slotMinutes || !slot.projectId) throw notFound()
+  // The period band is never a slot
+  if (!slot?.template?.slotMinutes || !slot.projectId || slot.kind !== CalendarKinds.Event) {
+    throw notFound()
+  }
 
   const moderator = await prisma.account.findUniqueOrThrow({
     where: { id: accountId },
@@ -361,13 +367,6 @@ const giveSlot = async (
     if (member === 0) throw forbidden(ANNUAL_REVIEW_COPY.notInTeam)
   }
 
-  // A Moderator holds one slot of a series at a time, the first one is freed
-  const held = await prisma.calendarEvent.findMany({
-    where: { projectId: slot.projectId, accountId },
-    select: { id: true },
-  })
-  for (const entry of held) await freeSlot(entry.id)
-
   // Two Moderators on one slot: only the first write wins
   const title = ANNUAL_REVIEW_COPY.takenTitle.replace('{name}', moderator.displayName)
   const taken = await prisma.calendarEvent.updateMany({
@@ -375,6 +374,13 @@ const giveSlot = async (
     data: { accountId, title },
   })
   if (taken.count === 0) throw conflict(ANNUAL_REVIEW_COPY.slotRaced)
+
+  // One slot per series, freed once the new one holds
+  const held = await prisma.calendarEvent.findMany({
+    where: { projectId: slot.projectId, accountId, id: { not: eventId } },
+    select: { id: true },
+  })
+  for (const entry of held) await freeSlot(entry.id)
 
   const leads = await leadsOf(accountId)
 
@@ -418,6 +424,30 @@ const everyResponsable = async (): Promise<string[]> =>
       select: { id: true },
     })
   ).map((row) => row.id)
+
+/**
+ * Guard a series by its team creator
+ * @param {string} eventId - Any entry of the series
+ * @param {AccessScope} scope - Creator perimeter
+ * @return {Promise<void>} - Throws out of perimeter
+ */
+
+export const assertSeriesInScope = async (eventId: string, scope: AccessScope): Promise<void> => {
+  if (scope.isGlobal) return
+
+  const entry = await prisma.calendarEvent.findUnique({
+    where: { id: eventId },
+    select: { audienceTeamId: true },
+  })
+  if (!entry) throw notFound()
+  if (!entry.audienceTeamId) return
+
+  const team = await prisma.team.findUnique({
+    where: { id: entry.audienceTeamId },
+    select: { youtuberId: true },
+  })
+  if (team?.youtuberId && !scope.youtuberIds.includes(team.youtuberId)) throw notFound()
+}
 
 /**
  * Take an open slot as a Moderator
@@ -572,14 +602,16 @@ export const cancelSlot = async (
   }
 
   const accountId = slot.accountId
-  await freeSlot(eventId)
 
+  // Moving frees the old slot itself
   if (moveTo) {
     await giveSlot(moveTo, accountId, actorId)
     await syncSeriesMeeting(eventId)
 
     return [eventId, moveTo]
   }
+
+  await freeSlot(eventId)
 
   // Cancelled: the Moderator is told and has to choose again
   await syncSeriesMeeting(eventId)
@@ -654,7 +686,7 @@ export const sweepAnnualReminders = async (): Promise<void> => {
   for (const row of series) {
     const last = row._max.startsAt
     if (!row.projectId || !last) continue
-    if (now < new Date(last.getTime() - REMINDER_DAYS * 86_400_000) || now >= last) continue
+    if (now < new Date(last.getTime() - REMINDER_DAYS * DAY_MS) || now >= last) continue
 
     const teamId = (
       await prisma.calendarEvent.findFirst({
@@ -849,7 +881,7 @@ export const reshapeSeries = async (
         visibility: period.visibility,
         audienceTeamId: period.audienceTeamId,
         startsAt: slot,
-        endsAt: new Date(slot.getTime() + step * 60_000),
+        endsAt: new Date(slot.getTime() + step * MINUTE_MS),
         projectId: period.projectId,
         ownerId: period.ownerId,
       },

@@ -15,6 +15,8 @@ const { version } = JSON.parse(
 const deployedBranch = process.env.APP_ENV || ''
 
 const nextConfig: NextConfig = {
+  // No framework banner
+  poweredByHeader: false,
   // Second dev server
   distDir: process.env.NEXT_DIST_DIR || '.next',
   // Exposed to the browser

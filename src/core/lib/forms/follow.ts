@@ -1,8 +1,6 @@
 import { holds } from '@/core/lib/forms/visibility'
 import type { FieldDefinition, FormValues } from '@/types/forms'
-
-// Milliseconds in a minute
-const MINUTE = 60_000
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Settle the date fields trailing a field that just changed: they move along while untouched
@@ -27,7 +25,7 @@ export const settleFollowers = (
     const rule = field.follows
     if (rule?.field !== changed || (rule.when && !holds(rule.when, after))) continue
 
-    const delay = rule.minutes * MINUTE
+    const delay = rule.minutes * MINUTE_MS
     const previous = Date.parse(String(before[changed] ?? ''))
     const current = Date.parse(String(after[field.name] ?? ''))
 

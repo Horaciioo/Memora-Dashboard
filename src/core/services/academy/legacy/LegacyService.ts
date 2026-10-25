@@ -17,8 +17,7 @@ import type { LegacyModuleView, LegacyTrackDetail, LegacyTrackSummary } from '@/
 import { LegacyStatuses, MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 import type { LegacyStatusName } from '@/utils/constants/hierarchy'
 import type { Prisma } from '@prisma/client'
-
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000
+import { WEEK_MS } from '@/utils/constants/time'
 
 // Everything a track view reads
 const TRACK_INCLUDE = {

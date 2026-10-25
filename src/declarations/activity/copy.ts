@@ -4,6 +4,9 @@
  */
 
 export const ACTIVITY_COPY = {
+  journalExport: 'Export du journal, {count} entrées',
+  personalExport: 'Export des données personnelles',
+  referenceDropped: '{section}, supprimé avec ses données ({lives} lives)',
   did: 'a',
   system: 'Le système',
   showDetail: 'Voir le détail',

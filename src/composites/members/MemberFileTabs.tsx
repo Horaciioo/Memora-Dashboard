@@ -300,7 +300,8 @@ export const MemberFileTabs = ({
   const [identityValues, setIdentityValues] = useState<FormValues>(detail.values)
 
   const { summary } = detail
-  const isLocked = summary.isRoot
+  // The root account is edited by its own holder only
+  const isLocked = summary.isRoot && !session?.isRoot
   const canEdit = canUpdate && !isLocked
 
   const fieldByName = new Map(memberFields.map((field) => [field.name, field]))
@@ -874,7 +875,8 @@ export const MemberFileTabs = ({
 
   return (
     <div className={MEMBER_FILE.layout}>
-      <div className={MEMBER_FILE.railStack}>
+      {/* On a phone the identity box belongs to the overview alone */}
+      <div className={cn(MEMBER_FILE.railStack, tab !== 'overview' && 'hidden md:flex')}>
         {rail}
         {adminState && !admin.state.isGone && (
           <Button

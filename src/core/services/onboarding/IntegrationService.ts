@@ -549,9 +549,60 @@ export const submitIntegration = async (
     throw invalidInput([{ field: 'dispositifId', message: FORM_COPY.required }])
   }
 
-  // The seat is taken before anything is written
-  await claimSeat(invite)
+  // One submission per claim
+  const locked = await prisma.integrationClaim.updateMany({
+    where: { id: claim.id, submittedAt: null },
+    data: { submittedAt: new Date() },
+  })
+  if (locked.count === 0) throw conflict()
 
+  let isSeated = false
+  try {
+    // The seat is taken before anything is written
+    await claimSeat(invite)
+    isSeated = true
+
+    return await fileIntegration({ invite, claim, mode, values, displayName, dispositifId })
+  } catch (error) {
+    // A failed submission gives both back
+    await prisma.integrationClaim.update({ where: { id: claim.id }, data: { submittedAt: null } })
+    if (isSeated) {
+      await prisma.integrationInvite.update({
+        where: { id: invite.id },
+        data: { uses: { decrement: 1 } },
+      })
+    }
+    throw error
+  }
+}
+
+/**
+ * Write what a submission creates
+ * @param {Object} input - Submission
+ * @param {LiveInvite} input.invite - Link
+ * @param {IntegrationClaimView} input.claim - Locked claim
+ * @param {Object} input.mode - Link kind
+ * @param {FormValues} input.values - Parsed body
+ * @param {string} input.displayName - Chosen name
+ * @param {string | null} input.dispositifId - Academy track
+ * @return {Promise<IntegrationOutcome>} - What was created
+ */
+
+const fileIntegration = async ({
+  invite,
+  claim,
+  mode,
+  values,
+  displayName,
+  dispositifId,
+}: {
+  invite: LiveInvite
+  claim: IntegrationClaimView
+  mode: ReturnType<typeof INTEGRATION_LINK_KIND_REGISTRY.get>
+  values: FormValues
+  displayName: string
+  dispositifId: string | null
+}): Promise<IntegrationOutcome> => {
   // An admitted candidate confirms the file the recruitment pre-generated
   if (claim.admission && invite.session && dispositifId) {
     return confirmAdmission(claim, claim.admission, invite.session, dispositifId, values)
@@ -572,51 +623,54 @@ export const submitIntegration = async (
     Promise.resolve(buildConstraints(values)),
   ])
 
-  const account = await prisma.account.create({
-    data: {
-      discordId: claim.discordId,
-      discordUsername: claim.displayName,
-      discordAvatarHash: claim.avatarHash,
-      discordSyncedAt: new Date(),
-      avatarUrl: claim.avatarUrl,
-      displayName,
-      birthday: readDate(values, 'birthday'),
-      celebrateBirthday: readFlag(values, 'celebrateBirthday'),
-      languages: readList(values, 'languages'),
-      theme: readPreference(values, 'theme', THEME_REGISTRY),
-      fontScale: readPreference(values, 'fontScale', FONT_SCALE_REGISTRY),
-      colorVision: readFlag(values, 'hasColorVision')
-        ? readPreference(values, 'colorVision', COLOR_VISION_REGISTRY)
-        : null,
-      // The arrival date is the day the form was sent
-      joinedAt: invite.createdAt,
-      role: MemberRoles.Moderateur,
-      status: mode.awaitsApproval ? MemberStatuses.Pending : MemberStatuses.Academy,
-      ...(invite.functionId ? { functions: { create: { functionId: invite.functionId } } } : {}),
-      historyConsentAt: new Date(),
-      historyConsentVersion: HISTORY_CONSENT.version,
-      ...(invite.youtuberId ? { youtubers: { connect: { id: invite.youtuberId } } } : {}),
-      ...(socialLinks.length > 0 ? { socialLinks: { create: socialLinks } } : {}),
-      ...(constraints.length > 0 ? { constraints: { create: constraints } } : {}),
-    },
-  })
-
-  await prisma.integrationClaim.update({
-    where: { id: claim.id },
-    data: { submittedAt: new Date(), accountId: account.id },
-  })
-
-  // The academy mode also opens the junior file and its timeline
-  if (mode.enrolsAcademy && invite.session && dispositifId) {
-    await prisma.academyJunior.create({
+  // All or nothing
+  return prisma.$transaction(async (tx) => {
+    const account = await tx.account.create({
       data: {
-        sessionId: invite.session.id,
-        accountId: account.id,
-        dispositifId,
-        status: AcademyJuniorStatuses.Active,
+        discordId: claim.discordId,
+        discordUsername: claim.displayName,
+        discordAvatarHash: claim.avatarHash,
+        discordSyncedAt: new Date(),
+        avatarUrl: claim.avatarUrl,
+        displayName,
+        birthday: readDate(values, 'birthday'),
+        celebrateBirthday: readFlag(values, 'celebrateBirthday'),
+        languages: readList(values, 'languages'),
+        theme: readPreference(values, 'theme', THEME_REGISTRY),
+        fontScale: readPreference(values, 'fontScale', FONT_SCALE_REGISTRY),
+        colorVision: readFlag(values, 'hasColorVision')
+          ? readPreference(values, 'colorVision', COLOR_VISION_REGISTRY)
+          : null,
+        // The arrival date is the day the form was sent
+        joinedAt: invite.createdAt,
+        role: MemberRoles.Moderateur,
+        status: mode.awaitsApproval ? MemberStatuses.Pending : MemberStatuses.Academy,
+        ...(invite.functionId ? { functions: { create: { functionId: invite.functionId } } } : {}),
+        historyConsentAt: new Date(),
+        historyConsentVersion: HISTORY_CONSENT.version,
+        ...(invite.youtuberId ? { youtubers: { connect: { id: invite.youtuberId } } } : {}),
+        ...(socialLinks.length > 0 ? { socialLinks: { create: socialLinks } } : {}),
+        ...(constraints.length > 0 ? { constraints: { create: constraints } } : {}),
       },
     })
-  }
 
-  return { accountId: account.id, displayName, awaitsApproval: mode.awaitsApproval }
+    await tx.integrationClaim.update({
+      where: { id: claim.id },
+      data: { submittedAt: new Date(), accountId: account.id },
+    })
+
+    // The academy mode also opens the junior file and its timeline
+    if (mode.enrolsAcademy && invite.session && dispositifId) {
+      await tx.academyJunior.create({
+        data: {
+          sessionId: invite.session.id,
+          accountId: account.id,
+          dispositifId,
+          status: AcademyJuniorStatuses.Active,
+        },
+      })
+    }
+
+    return { accountId: account.id, displayName, awaitsApproval: mode.awaitsApproval }
+  })
 }

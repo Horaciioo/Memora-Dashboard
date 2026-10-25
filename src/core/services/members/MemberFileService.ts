@@ -8,10 +8,14 @@ import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { readFlag, readText } from '@/core/lib/forms/values'
 import { layerKey } from '@/core/lib/permissions'
 import type { PermissionLayers, PermissionOverwrite } from '@/core/lib/permissions'
+import { assertAccountInScope } from '@/core/services/auth/ScopeService'
+import type { AccessScope } from '@/core/services/auth/ScopeService'
+import type { RoleActor } from '@/core/services/members/MemberService'
+import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
-import type { PermissionHelpers } from '@/types/auth'
+import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberNote, MemberSocial } from '@/types/members'
 import { Permissions, isPermissionName } from '@/utils/constants/permissions'
@@ -56,6 +60,35 @@ export const toMemberNote = (note: NoteRow): MemberNote => ({
 })
 
 /**
+ * Who writes notes
+ * @typedef {Object} NoteWriter
+ * @property {RoleActor} actor - Writer
+ * @property {AccessScope} scope - Creator perimeter
+ */
+
+export interface NoteWriter {
+  actor: RoleActor
+  scope: AccessScope
+}
+
+/**
+ * Note writer of a request
+ * @param {SessionUser} session - Signed-in member
+ * @param {PermissionHelpers} access - Permission helpers
+ * @param {AccessScope} scope - Creator perimeter
+ * @return {NoteWriter} - Note writer
+ */
+
+export const noteWriter = (
+  session: SessionUser,
+  access: PermissionHelpers,
+  scope: AccessScope
+): NoteWriter => ({
+  actor: { id: session.id, role: session.role, isAdmin: access.isAdmin, isSystem: access.isSystem },
+  scope,
+})
+
+/**
  * Add a private note to a member
  * @param {string} accountId - Account identifier
  * @param {string} authorId - Author identifier
@@ -82,13 +115,54 @@ export const addNote = async (
 }
 
 /**
+ * Guard a note subject
+ * @param {string} accountId - Note subject
+ * @param {NoteWriter} writer - Who writes
+ * @return {Promise<void>} - Throws out of reach
+ */
+
+export const assertNoteSubject = async (
+  accountId: string,
+  { actor, scope }: NoteWriter
+): Promise<void> => {
+  // Nobody reads notes about themselves
+  if (accountId === actor.id) throw notFound()
+  await assertAccountInScope(accountId, scope, actor.id)
+  if (actor.isSystem) return
+
+  // Only lower ranks
+  const subject = await prisma.account.findUnique({
+    where: { id: accountId },
+    select: { role: true },
+  })
+  if (!subject) throw notFound()
+  if (ROLE_REGISTRY.get(subject.role).rank >= ROLE_REGISTRY.get(actor.role).rank) throw notFound()
+}
+
+// Note subject, guarded
+const reachNote = async (noteId: string, writer: NoteWriter): Promise<void> => {
+  const note = await prisma.accountNote.findUnique({
+    where: { id: noteId },
+    select: { accountId: true },
+  })
+  if (!note) throw notFound()
+  await assertNoteSubject(note.accountId, writer)
+}
+
+/**
  * Pin or unpin a note
  * @param {string} noteId - Note identifier
  * @param {boolean} pinned - Wanted state
+ * @param {NoteWriter} writer - Who writes
  * @return {Promise<MemberNote>} - Updated note
  */
 
-export const pinNote = async (noteId: string, pinned: boolean): Promise<MemberNote> => {
+export const pinNote = async (
+  noteId: string,
+  pinned: boolean,
+  writer: NoteWriter
+): Promise<MemberNote> => {
+  await reachNote(noteId, writer)
   const note = await prisma.accountNote.update({
     where: { id: noteId },
     data: { pinned },
@@ -101,10 +175,12 @@ export const pinNote = async (noteId: string, pinned: boolean): Promise<MemberNo
 /**
  * Drop a private note
  * @param {string} noteId - Note identifier
+ * @param {NoteWriter} writer - Who writes
  * @return {Promise<void>} - Removed
  */
 
-export const removeNote = async (noteId: string): Promise<void> => {
+export const removeNote = async (noteId: string, writer: NoteWriter): Promise<void> => {
+  await reachNote(noteId, writer)
   await prisma.accountNote.delete({ where: { id: noteId } })
 }
 

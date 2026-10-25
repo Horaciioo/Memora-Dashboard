@@ -6,7 +6,7 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost, apiPut } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { PermissionLayers, PermissionOverwrite } from '@/core/lib/permissions'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { MemberAbsence, MemberDetail, MemberNote, MemberSocial } from '@/types/members'
@@ -78,7 +78,7 @@ export const useMemberFile = (
     async (values: FormValues) => {
       const note = await run(
         () => apiPost<MemberNote>(API_ROUTES.memberNotes(memberId), values),
-        feedbackTitle('Note', 'created', 'feminine')
+        entityFeedback('note', 'created')
       )
 
       // Pinned remarks always stay on top of the list
@@ -104,7 +104,7 @@ export const useMemberFile = (
     async (id: string) => {
       const done = await run(
         () => apiDelete<{ id: string }>(API_ROUTES.note(id)),
-        feedbackTitle('Note', 'deleted', 'feminine')
+        entityFeedback('note', 'deleted')
       )
 
       if (done) setNotes((current) => current.filter((entry) => entry.id !== id))
@@ -116,7 +116,7 @@ export const useMemberFile = (
     async (values: FormValues) => {
       const absence = await run(
         () => apiPost<MemberAbsence>(API_ROUTES.memberAbsences(memberId), values),
-        feedbackTitle('Absence', 'created', 'feminine')
+        entityFeedback('absence', 'created')
       )
 
       // Newest first
@@ -135,7 +135,7 @@ export const useMemberFile = (
     async (id: string, values: FormValues) => {
       const absence = await run(
         () => apiPatch<MemberAbsence>(API_ROUTES.absence(id), values),
-        feedbackTitle('Absence', 'saved', 'feminine')
+        entityFeedback('absence', 'saved')
       )
 
       if (absence) {
@@ -155,7 +155,7 @@ export const useMemberFile = (
     async (id: string) => {
       const done = await run(
         () => apiDelete<{ id: string }>(API_ROUTES.absence(id)),
-        feedbackTitle('Absence', 'deleted', 'feminine')
+        entityFeedback('absence', 'deleted')
       )
 
       if (!done) return
@@ -172,7 +172,7 @@ export const useMemberFile = (
       const name = typeof values.handle === 'string' ? values.handle : undefined
       const social = await run(
         () => apiPost<MemberSocial>(API_ROUTES.memberSocials(memberId), values),
-        feedbackTitle('Réseau', 'created', 'masculine', name)
+        entityFeedback('network', 'created', name)
       )
 
       if (social) setSocials((current) => [...current, social])
@@ -187,7 +187,7 @@ export const useMemberFile = (
       const name = typeof values.handle === 'string' ? values.handle : undefined
       const social = await run(
         () => apiPatch<MemberSocial>(API_ROUTES.social(id), values),
-        feedbackTitle('Réseau', 'saved', 'masculine', name)
+        entityFeedback('network', 'saved', name)
       )
 
       if (social) {
@@ -204,7 +204,7 @@ export const useMemberFile = (
       const name = socials.find((entry) => entry.id === id)?.handle
       const done = await run(
         () => apiDelete<{ id: string }>(API_ROUTES.social(id)),
-        feedbackTitle('Réseau', 'deleted', 'masculine', name)
+        entityFeedback('network', 'deleted', name)
       )
 
       if (done) setSocials((current) => current.filter((entry) => entry.id !== id))
@@ -220,7 +220,7 @@ export const useMemberFile = (
             overrides: next,
             youtuberId,
           }),
-        feedbackTitle('Permissions', 'saved', 'feminine', undefined, true)
+        entityFeedback('permissions', 'saved', undefined, true)
       )
 
       if (stored) setOverrides(stored)
@@ -234,7 +234,7 @@ export const useMemberFile = (
     async (values: FormValues) => {
       const saved = await run(
         () => apiPatch(API_ROUTES.member(memberId), values),
-        feedbackTitle('Fiche', 'saved', 'feminine', detail.summary.displayName)
+        entityFeedback('file', 'saved', detail.summary.displayName)
       )
 
       return saved !== null

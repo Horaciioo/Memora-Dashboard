@@ -18,6 +18,7 @@ import type { SelectMenuSize } from '@/declarations/ui/variants'
 import { useHints } from '@/managers/front-end'
 import type { FieldAction, FieldOption, OptionMark as OptionMarkKind } from '@/types/forms'
 import { cn } from '@/utils/classnames'
+import { isTouchDevice } from '@/core/lib/ui/touch'
 
 export interface SelectMenuProps {
   id?: string
@@ -241,7 +242,7 @@ export const SelectMenu = ({
           >
             {hasSearch && (
               <input
-                autoFocus
+                autoFocus={!isTouchDevice()}
                 value={query}
                 placeholder={PICKER_COPY.searchOption}
                 aria-label={PICKER_COPY.searchOption}

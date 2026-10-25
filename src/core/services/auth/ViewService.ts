@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { readActiveCreator, readNavigationView } from '@/core/lib/auth/activeCreator'
-import { isActualAdmin } from '@/core/lib/auth/simulation'
+import { isActualGlobal } from '@/core/lib/auth/simulation'
 import { readLedCreators } from '@/core/services/auth/LeadService'
 import { ROLE_REGISTRY, isEncadrement } from '@/declarations/access/roles'
 import { NAVIGATION_VIEW_ORDER, NavigationViews, viewDepth } from '@/declarations/navigation'
@@ -65,7 +65,7 @@ export const pickableCreators = async (viewer: SessionUser): Promise<CreatorLead
   const select = { id: true, name: true, handle: true, accent: true, avatarUrl: true }
 
   // An administrator picks from every creator
-  if (isActualAdmin(viewer.actual)) {
+  if (isActualGlobal(viewer.actual)) {
     const rows = await prisma.youtuber.findMany({
       where: { archived: false },
       orderBy: { position: 'asc' },

@@ -1,5 +1,6 @@
 import { createRegistry } from '@/core/lib/registry'
 import { readRateLimitWindow } from '@/declarations/configurations/settings'
+import { DAY_SECONDS, HOUR_SECONDS } from '@/utils/constants/time'
 
 /**
  * What a policy counts against
@@ -49,12 +50,12 @@ const policy = (
 
 const RATE_LIMIT_MAP = {
   signIn: policy('signIn', 'Sign in', RATE_LIMIT_SCOPES.Address, 300, 10),
-  admission: policy('admission', 'Admission', RATE_LIMIT_SCOPES.Address, 3600, 5),
+  admission: policy('admission', 'Admission', RATE_LIMIT_SCOPES.Address, HOUR_SECONDS, 5),
   mutation: policy('mutation', 'Write', RATE_LIMIT_SCOPES.Account, 60, 60),
   read: policy('read', 'Read', RATE_LIMIT_SCOPES.Account, 60, 300),
-  upload: policy('upload', 'Upload', RATE_LIMIT_SCOPES.Account, 3600, 40),
+  upload: policy('upload', 'Upload', RATE_LIMIT_SCOPES.Account, HOUR_SECONDS, 40),
   search: policy('search', 'Search', RATE_LIMIT_SCOPES.Account, 60, 120),
-  export: policy('export', 'Export', RATE_LIMIT_SCOPES.Account, 86400, 5),
+  export: policy('export', 'Export', RATE_LIMIT_SCOPES.Account, DAY_SECONDS, 5),
   twoFactor: policy('twoFactor', 'Second factor', RATE_LIMIT_SCOPES.Account, 300, 10),
   lookup: policy('lookup', 'Account lookup', RATE_LIMIT_SCOPES.Address, 60, 30),
   // A busy live calls for many gestures a minute

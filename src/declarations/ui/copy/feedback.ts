@@ -91,3 +91,71 @@ export const feedbackTitle = (
 
   return { title, emphasis }
 }
+
+/**
+ * Toast entity
+ * @typedef {Object} FeedbackEntity
+ * @property {string} label - Entity label
+ * @property {FeedbackGender} gender - Agreement
+ */
+
+export interface FeedbackEntity {
+  label: string
+  gender: FeedbackGender
+}
+
+/**
+ * Toast entities
+ * @type {Record<string, FeedbackEntity>}
+ */
+
+export const FEEDBACK_ENTITIES = {
+  absence: { label: 'Absence', gender: 'feminine' },
+  announcement: { label: 'Annonce', gender: 'feminine' },
+  candidate: { label: 'Candidat', gender: 'masculine' },
+  comment: { label: 'Commentaire', gender: 'masculine' },
+  discordIdentifier: { label: 'Identifiant Discord', gender: 'masculine' },
+  event: { label: 'Évènement', gender: 'masculine' },
+  file: { label: 'Fiche', gender: 'feminine' },
+  goal: { label: 'Objectif', gender: 'masculine' },
+  instructions: { label: 'Consignes', gender: 'feminine' },
+  junior: { label: 'Junior', gender: 'masculine' },
+  live: { label: 'Live', gender: 'masculine' },
+  livecon: { label: 'Livecon', gender: 'masculine' },
+  member: { label: 'Modérateur', gender: 'masculine' },
+  network: { label: 'Réseau', gender: 'masculine' },
+  note: { label: 'Note', gender: 'feminine' },
+  observer: { label: 'Observateur', gender: 'masculine' },
+  permissions: { label: 'Permissions', gender: 'feminine' },
+  profile: { label: 'Profil', gender: 'masculine' },
+  recruitment: { label: 'Session de recrutement', gender: 'feminine' },
+  review: { label: 'Bilan', gender: 'masculine' },
+  session: { label: 'Session', gender: 'feminine' },
+  step: { label: 'Étape', gender: 'feminine' },
+  training: { label: 'Formation', gender: 'feminine' },
+} as const satisfies Record<string, FeedbackEntity>
+
+export type FeedbackEntityName = keyof typeof FEEDBACK_ENTITIES
+
+/**
+ * Toast of a known entity
+ * @param {FeedbackEntityName} entity - Entity key
+ * @param {FeedbackVerb} verb - Mutation kind
+ * @param {string} [name] - Record name
+ * @param {boolean} [plural] - Several records
+ * @return {FeedbackTitle} - Sentence and its emphasis
+ */
+
+export const entityFeedback = (
+  entity: FeedbackEntityName,
+  verb: FeedbackVerb,
+  name?: string,
+  plural?: boolean
+): FeedbackTitle =>
+  feedbackTitle(
+    FEEDBACK_ENTITIES[entity].label,
+    verb,
+    FEEDBACK_ENTITIES[entity].gender,
+    name,
+    plural
+  )

@@ -23,6 +23,8 @@ import { resolvePermissions } from '@/core/services/auth/PermissionsService'
 import { readScope } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { VIEW_COPY } from '@/declarations/access/copy'
+import { FILE_SETTINGS } from '@/declarations/configurations/settings'
+import { FILE_COPY } from '@/declarations/ui/copy/forms'
 import { SIMULATION_OPEN_PATHS, SIMULATION_SAFE_METHODS } from '@/declarations/access/simulation'
 import { DEFAULT_METHOD_POLICIES } from '@/declarations/system/security/rateLimits'
 import type { RateLimitName } from '@/declarations/system/security/rateLimits'
@@ -195,6 +197,11 @@ const guard = async (
 
 const readBody = async (request: NextRequest): Promise<Record<string, unknown>> => {
   if (request.method === 'GET' || request.method === 'HEAD') return {}
+
+  // Oversized bodies never load
+  if (Number(request.headers.get('content-length') ?? 0) > FILE_SETTINGS.bodyMaxBytes) {
+    throw invalidInput([{ field: 'file', message: FILE_COPY.tooLarge }])
+  }
 
   const contentType = request.headers.get('content-type') ?? ''
 

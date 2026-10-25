@@ -314,6 +314,7 @@ export const ModView = ({
 
   const viewerCard = shownCard ? (
     <ViewerCard
+      key={shownCard.id}
       chatter={shownCard}
       messages={pickedLines}
       liveSanctions={sanctionsOn(state.acts, shownCard).length}

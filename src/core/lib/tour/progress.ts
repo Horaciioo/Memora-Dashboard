@@ -1,6 +1,7 @@
 import { NAVIGATION, ROUTES } from '@/declarations/navigation'
 import type { NavigationGroup } from '@/declarations/navigation'
 import { TOUR_PAGES } from '@/declarations/tour/pages'
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * Routes a member can open, the settings page always among them
@@ -59,7 +60,7 @@ export const unlockedRoutes = (routes: string[], seen: string[]): string[] => {
  */
 
 export const isNewcomer = (joinedAt: Date, now: Date, days: number): boolean =>
-  now.getTime() - joinedAt.getTime() <= days * 86_400_000
+  now.getTime() - joinedAt.getTime() <= days * DAY_MS
 
 /**
  * Name of a page as the rail writes it

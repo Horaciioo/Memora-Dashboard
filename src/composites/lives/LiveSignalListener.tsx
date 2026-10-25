@@ -1,8 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-
+import { useSignalRefresh } from '@/core/hooks/interaction/state/useSignalRefresh'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { LIVE_STREAM_EVENTS } from '@/declarations/lives/topics'
 
@@ -12,20 +10,7 @@ import { LIVE_STREAM_EVENTS } from '@/declarations/lives/topics'
  */
 
 export const LiveSignalListener = () => {
-  const router = useRouter()
-
-  useEffect(() => {
-    // The browser reconnects on its own after a drop
-    const source = new EventSource(API_ROUTES.livesStream)
-    const refresh = () => router.refresh()
-
-    source.addEventListener(LIVE_STREAM_EVENTS.status, refresh)
-
-    return () => {
-      source.removeEventListener(LIVE_STREAM_EVENTS.status, refresh)
-      source.close()
-    }
-  }, [router])
+  useSignalRefresh(API_ROUTES.livesStream, LIVE_STREAM_EVENTS.status)
 
   return null
 }

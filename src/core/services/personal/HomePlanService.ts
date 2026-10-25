@@ -1,6 +1,7 @@
 import 'server-only'
 
-import { listEntries, readCalendarScope } from '@/core/services/calendar/CalendarService'
+import { listEntries } from '@/core/services/calendar/CalendarService'
+import { readCalendarScope } from '@/core/services/calendar/visibility'
 import { HOME_SETTINGS } from '@/declarations/configurations/settings'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { HomePlanned } from '@/types/personal'

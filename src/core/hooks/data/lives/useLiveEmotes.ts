@@ -5,10 +5,8 @@ import { useQuery } from '@tanstack/react-query'
 import { apiGet } from '@/core/lib/api/client'
 import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { LiveEmotes } from '@/types/modview'
-
-// Emotes hardly ever change during a live
-const STALE_MS = 600_000
 
 /**
  * Emotes of Twitch and of the live's channel
@@ -21,7 +19,8 @@ export const useLiveEmotes = (liveId: string | null) => {
     queryKey: QUERY_KEYS.liveEmotes(liveId ?? ''),
     queryFn: ({ signal }) => apiGet<LiveEmotes>(API_ROUTES.liveEmotes(liveId ?? ''), signal),
     enabled: liveId !== null,
-    staleTime: STALE_MS,
+    // Kept as long as the server keeps them
+    staleTime: LIVE_SETTINGS.emoteCacheSeconds * 1000,
     retry: false,
   })
 

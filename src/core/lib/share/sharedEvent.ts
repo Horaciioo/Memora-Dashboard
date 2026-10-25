@@ -26,10 +26,10 @@ export interface SharedEvent {
 
 // Made up ticket shown on the showcase link
 const DEMO_EVENT: SharedEvent = {
-  title: 'Live spécial abonnés, Michou',
-  when: 'Mer. 21 oct. · 20:00 → 23:00',
-  date: { month: 'Oct.', day: '21', weekday: 'Mer.' },
-  hours: '20:00 → 23:00',
+  title: SHARE_COPY.demoTitle,
+  when: SHARE_COPY.demoWhen,
+  date: { month: SHARE_COPY.demoMonth, day: SHARE_COPY.demoDay, weekday: SHARE_COPY.demoWeekday },
+  hours: SHARE_COPY.demoHours,
   scope: SHARE_COPY.scopeAll,
 }
 

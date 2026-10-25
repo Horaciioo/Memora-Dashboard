@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { LiveconStateView } from '@/types/livecon'
 
@@ -41,7 +41,7 @@ export const useLivecon = (initialState: LiveconStateView[]): LiveconCollection 
     async (values: FormValues) => {
       const next = await run(
         () => apiPost<LiveconStateView[]>(API_ROUTES.livecon, values),
-        feedbackTitle('Livecon', 'saved', 'masculine')
+        entityFeedback('livecon', 'saved')
       )
 
       if (next) setState(next)

@@ -75,7 +75,8 @@ export interface DisplayPreferences {
  * @property {(permission: Permission) => boolean} can - Holds a permission
  * @property {(permissions: Permission[]) => boolean} canAny - Holds any permission
  * @property {(permissions: Permission[]) => boolean} canAll - Holds every permission
- * @property {boolean} isAdmin - Sits at the admin level or the employee level
+ * @property {boolean} isAdmin - Sits at the admin level
+ * @property {boolean} isGlobal - Reaches every creator, the admin and employee levels
  * @property {boolean} isSystem - Holds the system, the admin level only
  * @property {boolean} isResponsable - Sits at responsable level or above
  * @property {boolean} isRoot - Root administrator
@@ -86,6 +87,7 @@ export interface PermissionHelpers {
   canAny: (permissions: Permission[]) => boolean
   canAll: (permissions: Permission[]) => boolean
   isAdmin: boolean
+  isGlobal: boolean
   isSystem: boolean
   isResponsable: boolean
   isRoot: boolean

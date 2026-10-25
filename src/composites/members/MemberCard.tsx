@@ -1,11 +1,12 @@
 'use client'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { FunctionEmblems } from '@/composites/members/MemberBadges'
+import { FunctionEmblems, RoleGlyph } from '@/composites/members/MemberBadges'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { LIST_STYLES } from '@/declarations/ui/variants'
+import { LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import { useMenu } from '@/managers/front-end'
 import type { MemberSummary } from '@/types/members'
 import { cn } from '@/utils/classnames'
@@ -96,11 +97,19 @@ export const MemberCard = ({
         </span>
       </span>
       <span className={LIST_STYLES.cardExtra}>
-        <FunctionEmblems
-          member={member}
-          className={cn('gap-1', member.isAbsent && LIST_STYLES.cardAbsentEmblems)}
-          glyphClassName="h-5 w-5"
-        />
+        {LEADERSHIP_ROLES.includes(member.role) ? (
+          <RoleGlyph
+            role={member.role}
+            className={member.isAbsent ? LIST_STYLES.cardAbsentEmblems : undefined}
+            glyphClassName="h-5 w-5"
+          />
+        ) : (
+          <FunctionEmblems
+            member={member}
+            className={cn('gap-1', member.isAbsent && LIST_STYLES.cardAbsentEmblems)}
+            glyphClassName="h-5 w-5"
+          />
+        )}
       </span>
     </div>
   )

@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { DragEvent, PointerEvent, ReactNode } from 'react'
 
 import { CalendarEntryChip } from '@/composites/calendar/CalendarEntryChip'
 import { CALENDAR_COPY, WEEKDAY_LABELS } from '@/declarations/calendar/copy'
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { CALENDAR_SETTINGS } from '@/declarations/configurations/settings'
 import { ICONS } from '@/declarations/ui/icons'
 import { CALENDAR_GRID_STYLES } from '@/declarations/ui/variants'
@@ -13,6 +14,7 @@ import { cn } from '@/utils/classnames'
 import type { CalendarDay } from '@/utils/format/calendar'
 import { minuteLabel, minutesLabel, spanOnDay, toDayKey, weekdayOf } from '@/utils/format/calendar'
 import { placeInLanes } from '@/utils/lanes'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Drawn rectangle
@@ -54,8 +56,6 @@ export interface CalendarTimeGridProps {
   zoneTitles?: ReactNode
   // Day under the pointer
   onHoverDay?: (dayKey: string | null) => void
-  // All-day entries of the agenda
-  agendaExtras?: (dayKey: string) => CalendarEntry[]
 }
 
 // Grid window
@@ -72,12 +72,19 @@ const COMPACT_MINUTES = ROW / 2
 const ROLL_CALL_MINUTES = ROW * 1.5
 
 // Clock refresh
-const NOW_TICK_MS = 60_000
+const NOW_TICK_MS = MINUTE_MS
 
 // Minute to height share
 const topPercent = (minute: number): number => ((minute - DAY_START) / DAY_SPAN) * 100
 const spanPercent = (minutes: number): number => (minutes / DAY_SPAN) * 100
 const clamp = (minute: number): number => Math.min(Math.max(minute, DAY_START), DAY_END)
+
+// Off-window entries pin to an edge
+const fitInWindow = (start: number, end: number): { startMinute: number; endMinute: number } => {
+  const startMinute = Math.min(clamp(start), DAY_END - COMPACT_MINUTES)
+
+  return { startMinute, endMinute: Math.max(clamp(end), startMinute + COMPACT_MINUTES) }
+}
 
 // Step snap
 const snap = (minute: number): number => clamp(Math.round(minute / STEP) * STEP)
@@ -161,7 +168,6 @@ export const CalendarTimeGrid = ({
   onOpen,
   zoneTitles,
   onHoverDay,
-  agendaExtras,
 }: CalendarTimeGridProps) => {
   const [drawn, setDrawn] = useState<{
     anchor: { day: string; minute: number }
@@ -171,6 +177,8 @@ export const CalendarTimeGrid = ({
   const [dropDay, setDropDay] = useState<string | null>(null)
   const [now, setNow] = useState(() => new Date())
   const AddIcon = ICONS.add
+  const isMobile = useIsMobileShell()
+  const openingRef = useRef<HTMLDivElement | null>(null)
 
   // Moving clock
   useEffect(() => {
@@ -202,25 +210,36 @@ export const CalendarTimeGrid = ({
               toDayKey(entry.startsAt) <= day.key &&
               (entry.endsAt ? toDayKey(entry.endsAt) : toDayKey(entry.startsAt)) >= day.key
           )
-          .map((entry) => {
+          .flatMap((entry) => {
             const span = spanOnDay(entry.startsAt, entry.endsAt, day.key, ROW)
+            // Ended at midnight
+            if (toDayKey(entry.startsAt) < day.key && span.endMinute <= 1) return []
+            const end = entry.rollCall
+              ? Math.max(span.endMinute, span.startMinute + ROLL_CALL_MINUTES)
+              : span.endMinute
 
-            return {
-              entry,
-              startMinute: clamp(span.startMinute),
-              endMinute: clamp(
-                entry.rollCall
-                  ? Math.max(span.endMinute, span.startMinute + ROLL_CALL_MINUTES)
-                  : span.endMinute
-              ),
-            }
+            return [{ entry, ...fitInWindow(span.startMinute, end) }]
           })
-          .filter((item) => item.endMinute > item.startMinute)
       )
     }
 
     return buckets
   }, [days, entries])
+
+  // A phone opens on the hour that matters: an hour before now, else before the first entry
+  const firstDay = days[0]?.key
+  useEffect(() => {
+    if (!isMobile) return
+
+    openingRef.current?.scrollIntoView({ block: 'start' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile, firstDay, days.length])
+
+  const startOf = (dayKey: string) => (byDay.get(dayKey) ?? []).map((item) => item.startMinute)
+  const openingMinute = days.some((day) => day.key === todayKey)
+    ? nowMinute
+    : Math.min(...days.flatMap((day) => startOf(day.key)), DAY_START + 2 * ROW)
+  const openingTop = topPercent(clamp(openingMinute - ROW))
 
   const startDrawing = (event: PointerEvent<HTMLDivElement>) => {
     if (!canManage || event.button !== 0) return
@@ -275,7 +294,7 @@ export const CalendarTimeGrid = ({
     // Length kept
     if (dragged && point) {
       const length = dragged.endsAt
-        ? (new Date(dragged.endsAt).getTime() - new Date(dragged.startsAt).getTime()) / 60_000
+        ? (new Date(dragged.endsAt).getTime() - new Date(dragged.startsAt).getTime()) / MINUTE_MS
         : ROW
       const startMinute = Math.max(
         Math.min(snap(point.minute), DAY_END - Math.min(length, DAY_SPAN)),
@@ -317,6 +336,12 @@ export const CalendarTimeGrid = ({
         onMouseLeave={() => onHoverDay?.(null)}
       >
         {zoneTitles}
+        <div
+          ref={openingRef}
+          aria-hidden="true"
+          className={CALENDAR_GRID_STYLES.opening}
+          style={{ top: `${openingTop}%` }}
+        />
         <div className={CALENDAR_GRID_STYLES.hourColumn}>
           {rows.map((minute) => (
             <div
@@ -432,78 +457,6 @@ export const CalendarTimeGrid = ({
                   <span className={CALENDAR_GRID_STYLES.nowLabel}>{minuteLabel(nowMinute)}</span>
                 </div>
               )}
-            </div>
-          )
-        })}
-      </div>
-
-      <div className={CALENDAR_GRID_STYLES.agenda}>
-        {days.map((day) => {
-          const items = [...(byDay.get(day.key) ?? [])].sort(
-            (first, second) => first.startMinute - second.startMinute
-          )
-          const extras = agendaExtras?.(day.key) ?? []
-
-          return (
-            <div
-              key={day.key}
-              className={cn(
-                CALENDAR_GRID_STYLES.agendaDay,
-                items.length + extras.length === 0 && CALENDAR_GRID_STYLES.agendaDayEmpty
-              )}
-            >
-              <div className={CALENDAR_GRID_STYLES.agendaHead}>
-                <span className={CALENDAR_GRID_STYLES.agendaDayName}>
-                  {WEEKDAY_LABELS[weekdayOf(day.key)]}
-                </span>
-                <span
-                  className={
-                    day.key === todayKey
-                      ? CALENDAR_GRID_STYLES.agendaToday
-                      : CALENDAR_GRID_STYLES.agendaDayName
-                  }
-                >
-                  {day.dayOfMonth}
-                </span>
-                {canManage && (
-                  <button
-                    type="button"
-                    aria-label={`${CALENDAR_COPY.add}, ${WEEKDAY_LABELS[weekdayOf(day.key)]}`}
-                    className={CALENDAR_GRID_STYLES.agendaAdd}
-                    onClick={() =>
-                      clickDay(
-                        day.key,
-                        day.key === todayKey
-                          ? Math.min(rowOf(nowMinute) + ROW, DAY_END - ROW)
-                          : DAY_START
-                      )
-                    }
-                  >
-                    <AddIcon className={CALENDAR_GRID_STYLES.cellAddIcon} aria-hidden="true" />
-                  </button>
-                )}
-              </div>
-
-              {extras.map((entry) => (
-                <CalendarEntryChip
-                  key={entry.id}
-                  entry={entry}
-                  selected={selection.includes(entry.id)}
-                  draggable={false}
-                  onOpen={onOpen}
-                />
-              ))}
-
-              {items.map((item) => (
-                <CalendarEntryChip
-                  key={item.entry.id}
-                  entry={item.entry}
-                  selected={selection.includes(item.entry.id)}
-                  draggable={false}
-                  onOpen={onOpen}
-                  timeLabel={minuteLabel(item.startMinute)}
-                />
-              ))}
             </div>
           )
         })}

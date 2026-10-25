@@ -11,6 +11,16 @@ export function formatNumber(num: number): string {
 }
 
 /**
+ * Format a ratio as a percentage
+ * @param {number} ratio - Ratio, one for the whole
+ * @return {string} - Rounded percentage
+ */
+
+export function formatPercent(ratio: number): string {
+  return ratio.toLocaleString(DATE_LOCALE, { style: 'percent', maximumFractionDigits: 0 })
+}
+
+/**
  * Format with K
  * @param {number} num - Number
  * @return {string} - Number with units

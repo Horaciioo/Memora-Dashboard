@@ -1,3 +1,4 @@
+import { ACTIVITY_COPY } from '@/declarations/activity/copy'
 import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { stripRestricted } from '@/core/lib/forms/restrictions'
@@ -73,7 +74,9 @@ export const DELETE = createProtectedRoute({
         actorId: session.id,
         targetType: key,
         targetId: params.id,
-        summary: `${referenceSection(key)?.singular ?? key}, supprimé avec ses données (${report.lives} lives)`,
+        summary: ACTIVITY_COPY.referenceDropped
+          .replace('{section}', referenceSection(key)?.singular ?? key)
+          .replace('{lives}', String(report.lives)),
       })
 
       return { id: params.id }

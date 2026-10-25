@@ -1,10 +1,8 @@
 import { MODVIEW_DURATION_COPY, MODVIEW_SPAN_COPY } from '@/declarations/modview/copy'
 import { DATE_LOCALE } from '@/declarations/ui/dates'
+import { DAY_SECONDS, HOUR_SECONDS } from '@/utils/constants/time'
 
 const MINUTE = 60
-const HOUR = 3600
-const DAY = 86_400
-
 /**
  * Say a timeout length in words
  * @param {number} seconds - Length
@@ -12,11 +10,11 @@ const DAY = 86_400
  */
 
 export const formatDuration = (seconds: number): string => {
-  if (seconds >= DAY && seconds % DAY === 0) {
-    return MODVIEW_DURATION_COPY.days.replace('{count}', String(seconds / DAY))
+  if (seconds >= DAY_SECONDS && seconds % DAY_SECONDS === 0) {
+    return MODVIEW_DURATION_COPY.days.replace('{count}', String(seconds / DAY_SECONDS))
   }
-  if (seconds >= HOUR && seconds % HOUR === 0) {
-    return MODVIEW_DURATION_COPY.hours.replace('{count}', String(seconds / HOUR))
+  if (seconds >= HOUR_SECONDS && seconds % HOUR_SECONDS === 0) {
+    return MODVIEW_DURATION_COPY.hours.replace('{count}', String(seconds / HOUR_SECONDS))
   }
   if (seconds >= MINUTE && seconds % MINUTE === 0) {
     return MODVIEW_DURATION_COPY.minutes.replace('{count}', String(seconds / MINUTE))
@@ -41,8 +39,8 @@ export const formatClock = (iso: string): string =>
  */
 
 export const formatSpan = (seconds: number): string => {
-  const hours = Math.floor(seconds / HOUR)
-  const minutes = Math.floor((seconds % HOUR) / MINUTE)
+  const hours = Math.floor(seconds / HOUR_SECONDS)
+  const minutes = Math.floor((seconds % HOUR_SECONDS) / MINUTE)
 
   if (hours > 0) {
     return MODVIEW_SPAN_COPY.hours
@@ -65,8 +63,8 @@ export const formatExactSpan = (seconds: number): string => {
   if (total < MINUTE) return MODVIEW_SPAN_COPY.underMinute
 
   return [
-    [Math.floor(total / HOUR), MODVIEW_SPAN_COPY.unitHour],
-    [Math.floor((total % HOUR) / MINUTE), MODVIEW_SPAN_COPY.unitMinute],
+    [Math.floor(total / HOUR_SECONDS), MODVIEW_SPAN_COPY.unitHour],
+    [Math.floor((total % HOUR_SECONDS) / MINUTE), MODVIEW_SPAN_COPY.unitMinute],
     [total % MINUTE, MODVIEW_SPAN_COPY.unitSecond],
   ]
     .filter(([count]) => count !== 0)

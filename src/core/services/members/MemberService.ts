@@ -20,7 +20,7 @@ import { FORM_SETTINGS, PAGINATION_SETTINGS } from '@/declarations/configuration
 import { FORM_GROUPS } from '@/declarations/ui/copy'
 import { MEMBER_COPY, MEMBER_FIELD_COPY, MEMBER_FIELD_INFO } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
-import { LEGACY_FUNCTION_OF } from '@/declarations/reference/fixed'
+import { LEAD_DIVISION_RANK, LEGACY_FUNCTION_OF } from '@/declarations/reference/fixed'
 import { LANGUAGE_OPTIONS, timezoneOptions } from '@/declarations/system/locales'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence, MemberDetail, MemberSummary } from '@/types/members'
@@ -138,19 +138,35 @@ export const BELOW_LEAD_ROLES: MemberRoleName[] = [MemberRoles.Moderateur, Membe
 const LEGACY_FUNCTION_NAMES = Object.values(LEGACY_FUNCTION_OF)
 
 /**
+ * Who hands out roles
+ * @typedef {Object} RoleActor
+ * @property {string} id - Member identifier
+ * @property {MemberRoleName} role - Held role
+ * @property {boolean} isAdmin - Admin level
+ * @property {boolean} isSystem - System holder
+ */
+
+export interface RoleActor {
+  id: string
+  role: MemberRoleName
+  isAdmin: boolean
+  isSystem: boolean
+}
+
+/**
  * Reject a role or a Junior Responsable function beyond what the viewer may hand out
  * @param {FormValues} values - Parsed body
- * @param {boolean} isAdmin - Viewer sits at admin level
+ * @param {RoleActor} actor - Who edits
  * @param {string} [currentId] - Member being edited
  * @return {Promise<void>} - Throws on an out-of-reach change
  */
 
 export const assertMemberAssignable = async (
   values: FormValues,
-  isAdmin: boolean,
+  actor: RoleActor,
   currentId?: string
 ): Promise<void> => {
-  if (isAdmin) return
+  if (actor.isSystem) return
 
   const current = currentId
     ? await prisma.account.findUnique({
@@ -379,15 +395,18 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
  * Read every moderator, a Responsable only reads those below them
  * @param {AccessScope} scope - Perimeter
  * @param {boolean} [isAdmin] - Viewer sits at admin level
+ * @param {MemberRoleName[]} [roles] - Only these levels, whoever asks
  * @return {Promise<MemberSummary[]>} - List rows
  */
 
 export const listMembers = async (
   scope: AccessScope,
-  isAdmin = false
+  isAdmin = false,
+  roles?: MemberRoleName[]
 ): Promise<MemberSummary[]> => {
+  const levels = roles ?? (isAdmin ? null : BELOW_LEAD_ROLES)
   const rows = await prisma.account.findMany({
-    where: scopedWhere('account', scope, isAdmin ? {} : { role: { in: BELOW_LEAD_ROLES } }),
+    where: scopedWhere('account', scope, levels ? { role: { in: levels } } : {}),
     include: {
       ...SUMMARY_INCLUDE,
       _count: { select: { notesReceived: true, absences: { where: activeAbsenceFilter() } } },
@@ -418,6 +437,20 @@ const toAccountData = (values: FormValues) => ({
   languages: readList(values, 'languages'),
   celebrateBirthday: readFlag(values, 'celebrateBirthday'),
 })
+
+/**
+ * Seat a responsable in the last division when none is chosen
+ * @param {ReturnType<typeof toAccountData>} data - Database payload
+ * @return {Promise<ReturnType<typeof toAccountData>>} - Payload with its division
+ */
+
+const withLeadDivision = async (data: ReturnType<typeof toAccountData>) => {
+  if (data.role !== MemberRoles.Responsable || data.divisionId) return data
+
+  const division = (await allDivisions()).find((entry) => entry.rank === LEAD_DIVISION_RANK)
+
+  return { ...data, divisionId: division?.id ?? null }
+}
 
 /**
  * Read the functions a member should hold
@@ -484,7 +517,7 @@ export const assertIdentifierFree = async (
  */
 
 export const createMember = async (values: FormValues): Promise<MemberSummary> => {
-  const data = toAccountData(values)
+  const data = await withLeadDivision(toAccountData(values))
   const joinedAt = readDate(values, 'joinedAt')
   const youtuberIds = readList(values, 'youtuberIds')
   const functionIds = await readHeldFunctionIds(values)
@@ -510,17 +543,27 @@ export const createMember = async (values: FormValues): Promise<MemberSummary> =
  * Edit a moderator
  * @param {string} id - Account identifier
  * @param {FormValues} values - Parsed body
+ * @param {boolean} [byRoot] - The root administrator edits
  * @return {Promise<MemberSummary>} - Updated row
  */
 
-export const updateMember = async (id: string, values: FormValues): Promise<MemberSummary> => {
+export const updateMember = async (
+  id: string,
+  values: FormValues,
+  byRoot = false
+): Promise<MemberSummary> => {
   const current = await prisma.account.findUnique({ where: { id } })
   if (!current) throw notFound()
 
-  // The root administrator keeps its identifier and its level
-  if (isRootIdentity(current.discordId)) throw immutable(MEMBER_COPY.rootLocked)
+  // The root administrator is edited by nobody but itself, and keeps its identifier and its level
+  const isRootTarget = isRootIdentity(current.discordId)
+  if (isRootTarget && !byRoot) throw immutable(MEMBER_COPY.rootLocked)
 
-  const data = await withoutSealedWrites(toAccountData(values))
+  const kept = isRootTarget ? { discordId: current.discordId, role: current.role } : {}
+  const data = {
+    ...(await withoutSealedWrites(await withLeadDivision(toAccountData(values)))),
+    ...kept,
+  }
   if (data.discordId && data.discordId !== current.discordId) {
     await assertIdentifierFree(data.discordId, id)
   }

@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import { createRegistry } from '@/core/lib/registry'
 import { DEFAULT_ZONE } from '@/declarations/ui/dates'
 import type { IconName } from '@/declarations/ui/icons'
@@ -93,7 +94,10 @@ export const LIVE_COORDINATOR = {
  * @type {readonly string[]}
  */
 
-export const LIVE_FUNCTIONS: readonly string[] = ['Lives', 'Junior Lives']
+export const LIVE_FUNCTIONS: readonly string[] = [FunctionNames.Lives, FunctionNames.JuniorLives]
+
+// Discord trade only
+export const DISCORD_FUNCTIONS: string[] = [FunctionNames.Discord, FunctionNames.JuniorDiscord]
 
 /**
  * How the bilan names a moderator who is not from the Live team, by function held
@@ -101,8 +105,8 @@ export const LIVE_FUNCTIONS: readonly string[] = ['Lives', 'Junior Lives']
  */
 
 export const LIVE_OUTSIDE_LABELS: Record<string, string> = {
-  Discord: 'Mod. Discord',
-  'Junior Discord': 'Mod. Discord',
+  [FunctionNames.Discord]: 'Mod. Discord',
+  [FunctionNames.JuniorDiscord]: 'Mod. Discord',
 }
 
 /**

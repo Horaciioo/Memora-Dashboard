@@ -2,8 +2,7 @@ import { AGENDA_SETTINGS } from '@/declarations/configurations/settings'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { BusySlot, FieldKind, FieldValue } from '@/types/forms'
 import { addDays, startOfDay } from '@/utils/format/days'
-
-const MINUTE_MS = 60_000
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * End of a slot

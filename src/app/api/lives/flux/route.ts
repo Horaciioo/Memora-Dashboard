@@ -12,5 +12,14 @@ export const GET = createStreamRoute({
   permission: Permissions.LiveRead,
   rateLimit: false,
   descriptor: { summary: 'Follow live status changes', tags: ['lives'] },
-  open: async ({ request }) => openStream(request, LIVE_TOPICS.lives),
+  open: async ({ request, scope }) => {
+    const perimeter = await scope()
+
+    // Only lives of the perimeter
+    return openStream(request, LIVE_TOPICS.lives, {
+      accept: (payload) =>
+        perimeter.isGlobal ||
+        perimeter.youtuberIds.includes((payload as { youtuberId?: string }).youtuberId ?? ''),
+    })
+  },
 })

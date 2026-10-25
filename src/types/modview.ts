@@ -408,12 +408,12 @@ export interface ActContext {
  * Source feeding the Mod View
  * @typedef {Object} ModViewDriver
  * @property {ModViewState} state - Current state
- * @property {(intent: ModViewIntent, context?: ActContext) => Promise<void>} act - Carry out a gesture
+ * @property {(intent: ModViewIntent, context?: ActContext) => Promise<boolean>} act - Carry out a gesture, false when refused
  * @property {ModViewTarget | null} spotlight - Part lit by a scene
  */
 
 export interface ModViewDriver {
   state: ModViewState
-  act: (intent: ModViewIntent, context?: ActContext) => Promise<void>
+  act: (intent: ModViewIntent, context?: ActContext) => Promise<boolean>
   spotlight: ModViewTarget | null
 }

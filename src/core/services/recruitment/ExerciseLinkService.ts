@@ -12,12 +12,10 @@ import { WRITTEN_CONTEXT_BY_KEY } from '@/declarations/recruitment/questionnaire
 import type { IntegrationCreator } from '@/types/onboarding'
 import type { ExerciseLinkView } from '@/types/recruitment'
 import type { RecruitmentPlatformName } from '@/utils/constants/recruitment'
+import { MINUTE_MS } from '@/utils/constants/time'
 
 // Entropy of a public token
 const TOKEN_BYTES = 24
-
-// A minute
-const MINUTE_IN_MS = 60_000
 
 // Latest links shown to the recruiter
 const LISTED_LINKS = 6
@@ -118,7 +116,7 @@ export const createLinks = async (
   if (contextKeys.some((key) => !WRITTEN_CONTEXT_BY_KEY.has(key))) throw notFound()
 
   const now = new Date()
-  const expiresAt = new Date(now.getTime() + EXERCISE_SETTINGS.linkTtlMinutes * MINUTE_IN_MS)
+  const expiresAt = new Date(now.getTime() + EXERCISE_SETTINGS.linkTtlMinutes * MINUTE_MS)
 
   // Old links die with the new ones
   await prisma.exerciseLink.updateMany({

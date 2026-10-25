@@ -6,9 +6,7 @@ import { AcademyJuniorStatuses, AcademySessionStatuses } from '@/utils/constants
 import type { AcademyStageName, ReviewStatusName } from '@/utils/constants/hierarchy'
 import { CalendarKinds, EventPurposes } from '@/utils/constants/workflow'
 import type { EventPurposeName } from '@/utils/constants/workflow'
-
-// Milliseconds in a day
-const DAY = 86_400_000
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * Declare the check-ins of the periods about to end, one week ahead, for the trainers and responsables
@@ -16,7 +14,7 @@ const DAY = 86_400_000
  */
 
 export const openDueReviews = async (): Promise<void> => {
-  const horizon = new Date(Date.now() + DECLARED_DAYS_BEFORE * DAY)
+  const horizon = new Date(Date.now() + DECLARED_DAYS_BEFORE * DAY_MS)
 
   const templates = await prisma.eventTemplate.findMany({
     where: {
@@ -75,7 +73,7 @@ export const openDueReviews = async (): Promise<void> => {
           allDay: true,
           templateId: template.id,
           visibility: template.visibility,
-          startsAt: new Date(dueAt.getTime() - DECLARED_DAYS_BEFORE * DAY),
+          startsAt: new Date(dueAt.getTime() - DECLARED_DAYS_BEFORE * DAY_MS),
           endsAt: dueAt,
           ownerId: junior.trainerId,
           trainerId: junior.trainerId,

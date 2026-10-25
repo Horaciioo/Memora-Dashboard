@@ -44,7 +44,7 @@ export const APP_SHELL = {
   content:
     'shell-page mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-[calc(var(--banner-h)+2.5rem)] print:max-w-none print:p-0',
   // Trail on the photograph, the foot of the path stays whole
-  breadcrumbs: 'flex min-w-0 items-center gap-1 text-sm font-medium',
+  breadcrumbs: 'hidden min-w-0 items-center gap-1 text-sm font-medium md:flex',
   crumb: 'flex min-w-0 items-center gap-1',
   crumbSeparator: 'size-3 shrink-0 opacity-60',
   crumbLink:
@@ -214,10 +214,24 @@ export const NAV_SHEET = {
  */
 
 export const TOP_BAR = {
-  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center justify-between gap-2 bg-[var(--color-page)] px-3 md:hidden print:hidden',
+  bar: 'sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 bg-[var(--color-page)] px-3 md:hidden print:hidden',
   menuButton:
     'flex size-11 items-center justify-center rounded-full text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
   menuIcon: 'size-6',
+  // Where the page trail lands, beside the menu
+  crumbsHost: 'flex min-w-0 flex-1 items-center',
+  crumbs: 'flex min-w-0 flex-1 items-center gap-1 text-sm font-medium',
+  // Page options and star, at the right of the bar
+  toolsHost: 'flex shrink-0 items-center',
+  crumbFold:
+    'flex size-7 shrink-0 items-center justify-center rounded-full text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)]',
+  // Pages behind the fold, in a box under the bar
+  crumbList:
+    'fixed inset-x-3 top-[calc(var(--shell-top-bar-h)+0.25rem)] z-40 flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+  crumbRow:
+    'flex min-h-11 items-center gap-2 px-4 text-sm font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
+  crumbRowStatic: 'flex min-h-11 items-center gap-2 px-4 text-sm text-[var(--color-ink-subtle)]',
+  crumbScrim: 'fixed inset-0 z-30',
 } as const
 
 /**
@@ -498,6 +512,7 @@ export const CONSOLE_BLOCK = {
   tile: 'flex flex-col gap-1 rounded-[var(--radius-lg)] border border-[var(--color-border)] card-surface p-4',
   tileLabel: 'text-xs font-medium tracking-wide text-[var(--color-ink-subtle)] uppercase',
   tileValue: 'font-[family-name:var(--font-display)] text-2xl leading-none',
+  tileMax: 'font-sans text-sm text-[var(--color-ink-subtle)]',
   tileHint: 'text-xs text-[var(--color-ink-subtle)]',
   rows: 'flex flex-col divide-y divide-[var(--color-border)]',
   row: 'flex flex-wrap items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0',

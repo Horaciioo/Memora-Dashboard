@@ -1,5 +1,5 @@
-import { CoordinationStatuses } from '@/utils/constants/lives'
-import type { CoordinationStatusName } from '@/utils/constants/lives'
+import { CoordinationStatuses, LiveStatuses } from '@/utils/constants/lives'
+import type { CoordinationStatusName, LiveStatusName } from '@/utils/constants/lives'
 
 /**
  * One member's place in the coordination of a live
@@ -66,33 +66,22 @@ export const coordinationGaps = (
  * Members who hold the coordinator rights right now
  * @param {CoordinationSeat[]} seats - Every answer
  * @param {Date} [now] - Moment checked
- * @return {string[]} - Accounts whose agreed window is not over
+ * @param {LiveStatusName} [status] - Live status
+ * @return {string[]} - Accounts coordinating
  */
 
-export const activeCoordinatorIds = (seats: CoordinationSeat[], now = new Date()): string[] =>
-  seats
-    .filter(
-      (seat) =>
-        seat.status === CoordinationStatuses.Accepted && seat.endsAt !== null && seat.endsAt >= now
-    )
-    .map((seat) => seat.accountId)
+export const activeCoordinatorIds = (
+  seats: CoordinationSeat[],
+  now = new Date(),
+  status?: LiveStatusName
+): string[] => {
+  const accepted = seats.filter(
+    (seat): seat is CoordinationSeat & { endsAt: Date } =>
+      seat.status === CoordinationStatuses.Accepted && seat.endsAt !== null
+  )
+  const lastEnd = Math.max(...accepted.map((seat) => seat.endsAt.getTime()))
+  // An overrunning live keeps its last coordinators
+  const until = status === LiveStatuses.Live ? Math.min(now.getTime(), lastEnd) : now.getTime()
 
-/**
- * Members of a live's seats coordinating right now
- * @param {{ person: { id: string }, status: CoordinationStatusName, endsAt: string | null }[]} seats - Seats of the live
- * @param {Date} [now] - Moment checked
- * @return {string[]} - Members whose agreed window is not over
- */
-
-export const coordinatingNow = (
-  seats: { person: { id: string }; status: CoordinationStatusName; endsAt: string | null }[],
-  now = new Date()
-): string[] =>
-  seats
-    .filter(
-      (seat) =>
-        seat.status === CoordinationStatuses.Accepted &&
-        seat.endsAt !== null &&
-        Date.parse(seat.endsAt) >= now.getTime()
-    )
-    .map((seat) => seat.person.id)
+  return accepted.filter((seat) => seat.endsAt.getTime() >= until).map((seat) => seat.accountId)
+}

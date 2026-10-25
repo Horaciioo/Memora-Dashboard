@@ -179,9 +179,13 @@ export const removeWorkComment = async (
 ): Promise<CommentView[]> => {
   await assertReachable(kind, id, viewer)
 
-  // The remark must sit on this record
+  // The remark must sit on this record, own unless admin
   const { count } = await prisma.workComment.deleteMany({
-    where: { id: commentId, [WORK_COMMENT_KINDS[kind].column]: id },
+    where: {
+      id: commentId,
+      [WORK_COMMENT_KINDS[kind].column]: id,
+      ...(viewer.isAdmin ? {} : { authorId: viewer.id }),
+    },
   })
   if (count === 0) throw notFound()
 

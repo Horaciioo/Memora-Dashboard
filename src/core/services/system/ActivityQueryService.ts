@@ -7,9 +7,7 @@ import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import { JOURNAL_LIMITS, JOURNAL_PERIODS } from '@/declarations/system/monitoring/journal'
 import { EVENT_ORIGINS, EVENT_TYPES, LOG_LEVELS } from '@/utils/constants/events'
 import type { Prisma } from '@prisma/client'
-
-// Milliseconds in one hour
-const HOUR_MS = 3_600_000
+import { HOUR_MS } from '@/utils/constants/time'
 
 // Actor columns every read needs
 const WITH_ACTOR = { actor: { select: { displayName: true, avatarUrl: true } } } as const

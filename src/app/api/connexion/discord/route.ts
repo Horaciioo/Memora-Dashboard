@@ -1,5 +1,7 @@
 import { cookies } from 'next/headers'
 
+import { EXERCISE_TICKET_COOKIE } from '@/core/lib/auth/exerciseTicket'
+import { INTEGRATION_TICKET_COOKIE } from '@/core/lib/auth/integrationTicket'
 import { createHandshake, packHandshake } from '@/core/lib/auth/oauthState'
 import { OAUTH_STATE_COOKIE } from '@/core/lib/auth/session'
 import { createRedirectRoute } from '@/core/lib/http/route'
@@ -16,13 +18,13 @@ export const GET = createRedirectRoute({
   descriptor: { summary: 'Start the Discord sign-in flow', tags: ['auth'] },
   onFailure: signInFailure,
   handler: async ({ query }) => {
-    const asked = query.get(RETURN_PARAM)
-
     // Only a same-origin path is ever followed back
-    const returnTo = asked?.startsWith('/') && !asked.startsWith('//') ? asked : undefined
-    const handshake = createHandshake(returnTo)
+    const handshake = createHandshake(query.get(RETURN_PARAM) ?? undefined)
 
     const cookieStore = await cookies()
+    // A plain sign-in leaves other flows
+    cookieStore.delete(EXERCISE_TICKET_COOKIE)
+    cookieStore.delete(INTEGRATION_TICKET_COOKIE)
     cookieStore.set(OAUTH_STATE_COOKIE, packHandshake(handshake), {
       httpOnly: true,
       sameSite: 'lax',

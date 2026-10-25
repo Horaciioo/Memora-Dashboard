@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/structures/page/PageHeader'
 import { Section } from '@/components/structures/page/Section'
 import { ConsoleMetrics } from '@/composites/system/ConsoleMetrics'
 import { JournalFilters } from '@/composites/system/journal/JournalFilters'
+import { JournalSignalListener } from '@/composites/system/journal/JournalSignalListener'
 import { JournalPager } from '@/composites/system/journal/JournalPager'
 import { JournalRow } from '@/composites/system/journal/JournalRow'
 import { parseActivityFilters } from '@/core/lib/system/activityFilters'
@@ -44,6 +45,7 @@ export default async function JournalPage({ searchParams }: JournalPageProps) {
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={SYSTEM_COPY.journalTitle} />
+      <JournalSignalListener />
 
       <ConsoleMetrics
         metrics={[

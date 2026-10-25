@@ -3,17 +3,19 @@ import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import {
-  assertEntriesAccess,
   calendarFields,
   createEntry,
   listEntries,
-  readCalendarScope,
   removeEntries,
   updateEntries,
 } from '@/core/services/calendar/CalendarService'
 import { assertPlannable } from '@/core/services/calendar/academyEntries'
 import { assertLiveAccess } from '@/core/services/lives/LiveService'
-import { assertRowsInScope } from '@/core/services/auth/ScopeService'
+import {
+  assertEntriesReachable,
+  calendarViewer,
+  readCalendarScope,
+} from '@/core/services/calendar/visibility'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
@@ -56,8 +58,9 @@ export const POST = createProtectedRoute({
   permission: Permissions.CalendarManage,
   status: 201,
   descriptor: { summary: 'Post an entry on the calendar', tags: ['calendar'] },
-  handler: async ({ raw, session, access, scope }) => {
-    const perimeter = await scope()
+  handler: async ({ raw, session, access }) => {
+    // Same perimeter as the page
+    const perimeter = await readCalendarScope(session, access)
     const academy = academyScope(session, access)
     const canAnnounceLive = access.can(Permissions.LiveAnnounce)
     const fields = await calendarFields(
@@ -81,24 +84,22 @@ export const POST = createProtectedRoute({
 
 export const PATCH = createProtectedRoute({
   descriptor: { summary: 'Edit a whole selection at once', tags: ['calendar'] },
-  handler: async ({ raw, session, access, scope }) => {
-    const perimeter = await scope()
+  handler: async ({ raw, session, access }) => {
+    const viewer = await calendarViewer(session, access)
+    const perimeter = viewer.scope
     const ids = readIds(raw)
+    const canManage = access.can(Permissions.CalendarManage) && access.isResponsable
 
-    await assertEntriesAccess(
-      ids,
-      session.id,
-      access.can(Permissions.CalendarManage) && access.isResponsable
-    )
-    await assertRowsInScope('calendarEvent', ids, perimeter)
+    await assertEntriesReachable(ids, viewer, canManage)
     await assertLiveAccess({ canAnnounce: access.can(Permissions.LiveAnnounce), entryIds: ids })
 
     // Only the keys actually sent are validated
+    const academy = academyScope(session, access)
     const parsed = parseFormValues(
       await calendarFields(
         perimeter,
         workViewer(session, access),
-        academyScope(session, access),
+        academy,
         access.can(Permissions.LiveAnnounce),
         access.isResponsable
       ),
@@ -110,21 +111,25 @@ export const PATCH = createProtectedRoute({
       await assertPlannable(templateOf(parsed.values), access.isResponsable)
     }
 
-    return updateEntries(ids, parsed.values)
+    return updateEntries(ids, parsed.values, {
+      scope: perimeter,
+      viewerId: session.id,
+      canManage,
+      academy,
+    })
   },
 })
 
 export const DELETE = createProtectedRoute({
   descriptor: { summary: 'Drop a whole selection at once', tags: ['calendar'] },
-  handler: async ({ raw, session, access, scope }) => {
+  handler: async ({ raw, session, access }) => {
     const ids = readIds(raw)
 
-    await assertEntriesAccess(
+    await assertEntriesReachable(
       ids,
-      session.id,
+      await calendarViewer(session, access),
       access.can(Permissions.CalendarManage) && access.isResponsable
     )
-    await assertRowsInScope('calendarEvent', ids, await scope())
     await assertLiveAccess({ canAnnounce: access.can(Permissions.LiveAnnounce), entryIds: ids })
     await removeEntries(ids)
 

@@ -62,8 +62,6 @@ export const HOME_STYLES = {
 export const HOME_FLOW = {
   // Reaches into the shell gutters, a little further where the shell caps its width
   page: 'flex flex-col gap-8 md:gap-10 md:-mx-5 min-[1700px]:-mx-10',
-  rest: 'flex items-center justify-center gap-3 py-4 text-sm font-semibold text-[var(--color-ink-subtle)]',
-  restMark: 'h-6 w-6 shrink-0',
   // Latest note, one gold line
   news: 'group/news relative isolate flex items-center gap-4 overflow-hidden rounded-[var(--radius-lg)] bg-gradient-to-br from-[var(--color-gold-100)] via-[var(--color-gold-300)] to-[var(--color-gold-400)] px-4 py-3 text-black shadow-[var(--shadow-md)] ring-1 ring-white/40 ring-inset transition-shadow hover:shadow-[var(--shadow-lg)]',
   newsSheen:

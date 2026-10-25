@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import type { RefObject } from 'react'
+import { isTextEntry, isTouchDevice } from '@/core/lib/ui/touch'
 
 // Anything reachable with the tab key
 const FOCUSABLE =
@@ -35,7 +36,11 @@ export const useFocusTrap = (
     opened.push(token)
 
     const container = containerRef.current
-    const first = container?.querySelector<HTMLElement>(FOCUSABLE)
+    // A finger never gets the keyboard unasked, so a field is not the first thing focused
+    const candidates = [...(container?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [])]
+    const first = isTouchDevice()
+      ? candidates.find((element) => !isTextEntry(element))
+      : candidates[0]
     first?.focus()
 
     const onKeyDown = (event: KeyboardEvent) => {

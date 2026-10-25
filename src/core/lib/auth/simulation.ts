@@ -2,7 +2,7 @@ import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { VIEW_ROLES } from '@/declarations/access/views'
 import type { NavigationViewName } from '@/declarations/navigation'
 import type { ActualIdentity, SessionUser } from '@/types/auth'
-import { ADMIN_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
+import { GLOBAL_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 
 /**
@@ -43,10 +43,10 @@ export const isSimulated = (session: SessionUser): boolean =>
   session.role !== session.actual.role || session.isRoot !== session.actual.isRoot
 
 /**
- * Check an administrator level
+ * Check a level reaching every creator
  * @param {ActualIdentity} actual - Real identity
- * @return {boolean} - Real administrator
+ * @return {boolean} - Reaches every creator
  */
 
-export const isActualAdmin = ({ role, isRoot }: ActualIdentity): boolean =>
-  isRoot || ADMIN_ROLES.includes(role)
+export const isActualGlobal = ({ role, isRoot }: ActualIdentity): boolean =>
+  isRoot || GLOBAL_ROLES.includes(role)

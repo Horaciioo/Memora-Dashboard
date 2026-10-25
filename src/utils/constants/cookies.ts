@@ -11,6 +11,7 @@ export const CookieKeys = {
   exerciseClaim: 'exercise_claim',
   navigationView: 'navigation_view',
   activeYoutuber: 'active_youtuber',
+  activeYoutuberAuto: 'active_youtuber_auto',
 } as const
 
 export type CookieKey = keyof typeof CookieKeys

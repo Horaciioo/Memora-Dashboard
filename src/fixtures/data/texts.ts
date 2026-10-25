@@ -209,15 +209,19 @@ export const EVENT_TEMPLATES: {
   visibility: 'EVERYONE' | 'RESPONSABLES' | 'ADMINS'
   defaultMinutes: number | null
   allDay: boolean
+  platform?: 'TWITCH' | 'YOUTUBE'
+  icon?: string
 }[] = [
   {
-    name: 'Live',
+    name: 'Live YouTube',
     kind: 'EVENT',
-    summary: 'Live programmé du créateur.',
-    accent: '#c2548a',
+    summary: 'Live programmé du créateur sur YouTube.',
+    accent: '#e5484d',
     visibility: 'EVERYONE',
     defaultMinutes: 180,
     allDay: false,
+    platform: 'YOUTUBE',
+    icon: 'youtube',
   },
   {
     name: 'Réunion d’équipe',
@@ -238,7 +242,7 @@ export const EVENT_TEMPLATES: {
     allDay: true,
   },
   {
-    name: 'Période de recrutement',
+    name: 'Zone de recrutement',
     kind: 'ZONE',
     summary: 'Fenêtre de candidatures.',
     accent: '#0d9488',

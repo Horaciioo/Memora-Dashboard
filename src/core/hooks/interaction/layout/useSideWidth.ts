@@ -2,15 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import { MODVIEW_SIDE_WIDTH } from '@/declarations/ui/variants'
+
 // One save per browser
 const STORAGE_KEY = 'memora:modview:side-width:v1'
 
-// Width it starts at, as w-72, and the most it ever gets
-const DEFAULT_WIDTH = 288
-const MAX_WIDTH = DEFAULT_WIDTH
-
-// Narrowest it gets: the chat wins a little room, no more
-const MIN_WIDTH = 208
+// Starts at its widest
+const { start: MAX_WIDTH, min: MIN_WIDTH } = MODVIEW_SIDE_WIDTH
 
 const clamp = (width: number): number => Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, width))
 
@@ -20,7 +18,7 @@ const clamp = (width: number): number => Math.min(MAX_WIDTH, Math.max(MIN_WIDTH,
  */
 
 export const useSideWidth = () => {
-  const [width, setWidth] = useState(DEFAULT_WIDTH)
+  const [width, setWidth] = useState<number>(MAX_WIDTH)
 
   // The save of this browser takes over once mounted
   useEffect(() => {

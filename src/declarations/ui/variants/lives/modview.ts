@@ -18,7 +18,7 @@ export const MODVIEW_FRAME = {
     'flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-lg)] bg-[var(--color-surface-sunken)] px-3 py-1.5 text-xs font-bold tracking-wide uppercase',
   livecon: 'flex items-center gap-1.5 text-xs font-bold tracking-wide uppercase',
   liveconIcon: 'h-5 w-5',
-  body: 'flex min-h-0 flex-1 gap-[var(--modview-gap)]',
+  body: 'flex min-h-0 min-w-0 flex-1 gap-[var(--modview-gap)]',
   rail: 'hidden w-12 shrink-0 flex-col items-center gap-1.5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-2 shadow-[var(--shadow-sm)] md:flex',
   railButton:
     'flex h-9 w-9 items-center justify-center rounded-[var(--radius-lg)] transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
@@ -39,7 +39,8 @@ export const MODVIEW_FRAME = {
  */
 
 export const MODVIEW_WINDOW = {
-  root: 'relative flex min-h-64 min-w-0 flex-col overflow-hidden rounded-[var(--radius-sm)] bg-[var(--twitch-background)] transition-[box-shadow,transform] duration-[var(--motion-duration-panel)] lg:min-h-0',
+  // Width ignores the content
+  root: 'relative flex min-h-64 min-w-0 flex-col overflow-hidden contain-inline-size rounded-[var(--radius-sm)] bg-[var(--twitch-background)] transition-[box-shadow,transform] duration-[var(--motion-duration-panel)] lg:min-h-0',
   grow: 'flex-1',
   // Window of the workspace: the slot sizes it
   tiled: 'h-full min-h-0',
@@ -71,7 +72,7 @@ export const MODVIEW_WINDOW = {
 
 export const MODVIEW_SPOTLIGHT = {
   veil: 'pointer-events-none absolute inset-0 z-10 rounded-[var(--radius-xl)] bg-[var(--color-scrim)] backdrop-blur-[1.5px] transition-opacity duration-[var(--motion-duration-panel)]',
-  stage: 'relative flex min-h-0 flex-1 flex-col overflow-hidden',
+  stage: 'relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden',
 } as const
 
 /**
@@ -401,6 +402,9 @@ export const MODVIEW_SANCTIONS = {
 
 // Share the offences keep when the history is dragged
 export const MODVIEW_SANCTIONS_SPLIT = { min: 0.2, max: 0.8 } as const
+
+// Side column in px: starts and caps as w-72, the chat wins a little room at most
+export const MODVIEW_SIDE_WIDTH = { start: 288, min: 208 } as const
 
 /**
  * Preview page around the Mod View

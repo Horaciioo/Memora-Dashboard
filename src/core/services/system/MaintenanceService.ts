@@ -7,9 +7,7 @@ import { purgeModerationLog } from '@/core/services/lives/ModerationLogService'
 import { pruneOrphanFiles } from '@/core/services/system/FileService'
 import { RETENTION_SETTINGS } from '@/declarations/configurations/settings'
 import { RETENTION_POLICIES } from '@/declarations/system/security/privacy'
-
-// Milliseconds in one day
-const DAY_MS = 86_400_000
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * What one maintenance pass removed

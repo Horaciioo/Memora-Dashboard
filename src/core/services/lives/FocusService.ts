@@ -149,7 +149,11 @@ export const startFocus = async ({
   const live = await liveInScope(liveId, scope)
   const permissions = livePermissions(
     {
-      coordinatorIds: activeCoordinatorIds(live.coordinations),
+      coordinatorIds: activeCoordinatorIds(
+        live.coordinations,
+        new Date(),
+        live.status as LiveStatusName
+      ),
       status: live.status as LiveStatusName,
     },
     viewerId,

@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import { createRegistry } from '@/core/lib/registry'
 import type { IconName } from '@/declarations/ui/icons'
 import { SanctionGravities, SanctionKinds, SanctionPanels } from '@/utils/constants/moderation'
@@ -77,7 +78,7 @@ interface SanctionPanelOption {
 const SANCTION_PANEL_MAP: Record<SanctionPanelName, SanctionPanelOption> = {
   [SanctionPanels.Twitch]: {
     label: 'Twitch',
-    functionName: 'Lives',
+    functionName: FunctionNames.Lives,
     icon: 'functionLive',
     userPlaceholder: '<pseudo>',
     durationFormat: 'seconds',
@@ -111,7 +112,7 @@ const SANCTION_PANEL_MAP: Record<SanctionPanelName, SanctionPanelOption> = {
   },
   [SanctionPanels.Youtube]: {
     label: 'YouTube',
-    functionName: 'Lives',
+    functionName: FunctionNames.Lives,
     icon: 'youtuber',
     userPlaceholder: '<pseudo>',
     durationFormat: 'seconds',
@@ -120,7 +121,7 @@ const SANCTION_PANEL_MAP: Record<SanctionPanelName, SanctionPanelOption> = {
   },
   [SanctionPanels.Discord]: {
     label: 'Discord',
-    functionName: 'Discord',
+    functionName: FunctionNames.Discord,
     icon: 'functionDiscord',
     userPlaceholder: 'ID',
     durationFormat: 'marsha',

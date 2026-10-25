@@ -22,7 +22,7 @@ const SUBJECT_MAP: Record<ConfigSubject, SubjectOption> = {
   storage: { label: 'Stockage', icon: 'storage' },
   encryption: { label: 'Chiffrement', icon: 'key' },
   telemetry: { label: 'Télémétrie', icon: 'metrics' },
-  logger: { label: 'Journaux', icon: 'sheet' },
+  logger: { label: 'Logs', icon: 'sheet' },
   uptime: { label: 'Sondes', icon: 'scan' },
 }
 

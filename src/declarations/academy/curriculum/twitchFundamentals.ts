@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import { VOICE_CHANNELS } from '@/declarations/academy/curriculum/scenes/voiceScenes'
 import {
   ACTIONS_SCENE,
@@ -28,7 +29,7 @@ export const TWITCH_FUNDAMENTALS: Course = {
     'Nos méthodologies d’application, notre politique de Modération et les bases de la Vue Modérateur.',
   track: 'indispensable',
   surface: 'twitch',
-  functions: ['Lives'],
+  functions: [FunctionNames.Lives],
   minutes: 35,
   maturity: 'new',
   intro: {

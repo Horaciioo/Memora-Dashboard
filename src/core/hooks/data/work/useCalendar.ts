@@ -1,7 +1,7 @@
 'use client'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 import { apiDelete, apiGet, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
@@ -9,14 +9,10 @@ import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
 import { ANNUAL_REVIEW_COPY, CALENDAR_COPY } from '@/declarations/calendar/copy'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { AttendanceRoster, CalendarEntry } from '@/types/calendar'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
-
-// Toast entity label
-const ENTITY = 'Évènement'
-const GENDER = 'masculine'
 
 // What a slot gesture hands back: entries changed, open slots that went
 interface SlotResult {
@@ -89,9 +85,22 @@ export const useCalendar = (
 ): CalendarCollection => {
   const [entries, setEntries] = useState(initialEntries)
   const queryClient = useQueryClient()
-  const { isSaving, issues, clearIssues, run } = useMutation()
+  const { isSaving, issues, clearIssues, run: runMutation } = useMutation()
   const { notify } = useNotifications()
   const [isLoading, setLoading] = useState(false)
+  // Latest window asked
+  const loadTicket = useRef(0)
+  // Writes sent so far
+  const writeCount = useRef(0)
+
+  // Every write is counted
+  const run = useCallback<typeof runMutation>(
+    (action, successTitle) => {
+      writeCount.current++
+      return runMutation(action, successTitle)
+    },
+    [runMutation]
+  )
 
   const replace = useCallback((entry: CalendarEntry) => {
     setEntries((current) => {
@@ -106,7 +115,7 @@ export const useCalendar = (
       const name = typeof values.title === 'string' ? values.title : undefined
       const entry = await run(
         () => apiPost<CalendarEntry>(API_ROUTES.calendarEntries, values),
-        feedbackTitle(ENTITY, 'created', GENDER, name)
+        entityFeedback('event', 'created', name)
       )
 
       if (entry) {
@@ -182,7 +191,7 @@ export const useCalendar = (
       const name = typeof values.title === 'string' ? values.title : undefined
       const entry = await run(
         () => apiPatch<CalendarEntry>(API_ROUTES.calendarEntry(id), values),
-        feedbackTitle(ENTITY, 'saved', GENDER, name)
+        entityFeedback('event', 'saved', name)
       )
 
       if (entry) {
@@ -202,7 +211,7 @@ export const useCalendar = (
   const move = useCallback(
     async (id: string, startsAt: Date) => {
       // Optimistic
-      const previous = entries
+      const original = entries.find((row) => row.id === id)
       // Length kept
       setEntries((current) =>
         current.map((row) => {
@@ -222,7 +231,10 @@ export const useCalendar = (
       )
 
       if (entry) replace(entry)
-      else setEntries(previous)
+      // Undo this row only
+      else if (original) {
+        setEntries((current) => current.map((row) => (row.id === id ? original : row)))
+      }
     },
     [entries, replace, run]
   )
@@ -242,7 +254,7 @@ export const useCalendar = (
     async (ids: string[], values: FormValues) => {
       const updated = await run(
         () => apiPatch<CalendarEntry[]>(API_ROUTES.calendarEntries, { ids, ...values }),
-        feedbackTitle(ENTITY, 'saved', GENDER)
+        entityFeedback('event', 'saved')
       )
 
       if (updated) {
@@ -259,7 +271,7 @@ export const useCalendar = (
     async (ids: string[]) => {
       const done = await run(
         () => apiDelete<{ ids: string[] }>(API_ROUTES.calendarEntries, { ids }),
-        feedbackTitle(ENTITY, 'deleted', GENDER)
+        entityFeedback('event', 'deleted')
       )
 
       if (done) setEntries((current) => current.filter((row) => !ids.includes(row.id)))
@@ -270,16 +282,27 @@ export const useCalendar = (
   const load = useCallback(
     async (from: string, to: string) => {
       // A window read never raises a toast
+      const ticket = ++loadTicket.current
       setLoading(true)
-      const next = await queryClient
-        .fetchQuery({
-          queryKey: QUERY_KEYS.calendar(from, to, sessionId),
-          queryFn: ({ signal }) =>
-            apiGet<CalendarEntry[]>(API_ROUTES.calendar(from, to, sessionId), signal),
-          // Local writes outdate it
-          staleTime: 0,
-        })
-        .catch(() => null)
+      let next: CalendarEntry[] | null
+      let writes: number
+
+      // Read again after a write
+      do {
+        writes = writeCount.current
+        next = await queryClient
+          .fetchQuery({
+            queryKey: QUERY_KEYS.calendar(from, to, sessionId),
+            queryFn: ({ signal }) =>
+              apiGet<CalendarEntry[]>(API_ROUTES.calendar(from, to, sessionId), signal),
+            // Local writes outdate it
+            staleTime: 0,
+          })
+          .catch(() => null)
+        // A newer window wins
+        if (ticket !== loadTicket.current) return
+      } while (writes !== writeCount.current)
+
       setLoading(false)
       if (next) setEntries(next)
     },
@@ -291,7 +314,7 @@ export const useCalendar = (
       const name = entries.find((row) => row.id === id)?.title
       const done = await run(
         () => apiDelete<{ id: string }>(API_ROUTES.calendarEntry(id)),
-        feedbackTitle(ENTITY, 'deleted', GENDER, name)
+        entityFeedback('event', 'deleted', name)
       )
 
       if (done) setEntries((current) => current.filter((row) => row.id !== id))
@@ -310,7 +333,7 @@ export const useCalendar = (
       const roster = await run(
         () =>
           apiPost<AttendanceRoster>(API_ROUTES.calendarEntryAttendance(id), { status, ...hours }),
-        feedbackTitle(ENTITY, 'saved', GENDER)
+        entityFeedback('event', 'saved')
       )
 
       if (roster) setRoster(id, roster)
@@ -323,7 +346,7 @@ export const useCalendar = (
       const roster = await run(
         () =>
           apiPatch<AttendanceRoster>(API_ROUTES.calendarEntryAttendance(id), { accountId, status }),
-        feedbackTitle(ENTITY, 'saved', GENDER)
+        entityFeedback('event', 'saved')
       )
 
       if (roster) setRoster(id, roster)

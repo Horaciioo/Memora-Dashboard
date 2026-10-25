@@ -6,7 +6,7 @@ import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useSyncedState } from '@/core/hooks/interaction/state/useSyncedState'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type {
   AcademyReviewView,
   JuniorNoteView,
@@ -138,7 +138,7 @@ export const useJuniorFile = (
     async (values: FormValues) => {
       const next = await run(
         () => apiPatch<JuniorView[]>(API_ROUTES.junior(junior.id), values),
-        feedbackTitle('Fiche', 'saved', 'feminine', junior.displayName)
+        entityFeedback('file', 'saved', junior.displayName)
       )
 
       return pickSelf(next, junior.id)
@@ -161,7 +161,7 @@ export const useJuniorFile = (
     async (values: FormValues) => {
       const next = await run(
         () => apiPost<JuniorNoteView[]>(API_ROUTES.juniorNotes(junior.id), values),
-        feedbackTitle('Note', 'created', 'feminine')
+        entityFeedback('note', 'created')
       )
 
       if (next) setNotes(next)
@@ -175,7 +175,7 @@ export const useJuniorFile = (
     async (id: string, values: FormValues) => {
       const next = await run(
         () => apiPatch<JuniorNoteView[]>(API_ROUTES.juniorNote(id), values),
-        feedbackTitle('Note', 'saved', 'feminine')
+        entityFeedback('note', 'saved')
       )
 
       if (next) setNotes(next)
@@ -189,7 +189,7 @@ export const useJuniorFile = (
     async (id: string) => {
       const next = await run(
         () => apiDelete<JuniorNoteView[]>(API_ROUTES.juniorNote(id)),
-        feedbackTitle('Note', 'deleted', 'feminine')
+        entityFeedback('note', 'deleted')
       )
 
       if (next) setNotes(next)
@@ -201,7 +201,7 @@ export const useJuniorFile = (
     async (values: FormValues) => {
       const next = await run(
         () => apiPost<JuniorObjectiveView[]>(API_ROUTES.juniorObjectives(junior.id), values),
-        feedbackTitle('Objectif', 'created', 'masculine')
+        entityFeedback('goal', 'created')
       )
 
       if (next) setObjectives(next)
@@ -215,7 +215,7 @@ export const useJuniorFile = (
     async (id: string, values: FormValues) => {
       const next = await run(
         () => apiPatch<JuniorObjectiveView[]>(API_ROUTES.objective(id), values),
-        feedbackTitle('Objectif', 'saved', 'masculine')
+        entityFeedback('goal', 'saved')
       )
 
       if (next) setObjectives(next)
@@ -229,7 +229,7 @@ export const useJuniorFile = (
     async (id: string) => {
       const next = await run(
         () => apiDelete<JuniorObjectiveView[]>(API_ROUTES.objective(id)),
-        feedbackTitle('Objectif', 'deleted', 'masculine')
+        entityFeedback('goal', 'deleted')
       )
 
       if (next) setObjectives(next)
@@ -252,7 +252,7 @@ export const useJuniorFile = (
     async (values: FormValues) => {
       const next = await run(
         () => apiPost<AcademyReviewView[]>(API_ROUTES.juniorReviews(junior.id), values),
-        feedbackTitle('Bilan', 'created', 'masculine')
+        entityFeedback('review', 'created')
       )
 
       if (next) setReviews(next)
@@ -266,7 +266,7 @@ export const useJuniorFile = (
     async (id: string, values: FormValues) => {
       const next = await run(
         () => apiPatch<AcademyReviewView[]>(API_ROUTES.review(id), values),
-        feedbackTitle('Bilan', 'saved', 'masculine')
+        entityFeedback('review', 'saved')
       )
 
       if (next) setReviews(next)
@@ -280,7 +280,7 @@ export const useJuniorFile = (
     async (id: string) => {
       const next = await run(
         () => apiDelete<AcademyReviewView[]>(API_ROUTES.review(id)),
-        feedbackTitle('Bilan', 'deleted', 'masculine')
+        entityFeedback('review', 'deleted')
       )
 
       if (next) setReviews(next)
@@ -292,7 +292,7 @@ export const useJuniorFile = (
     async (id: string) => {
       const next = await run(
         () => apiPost<AcademyReviewView[]>(API_ROUTES.reviewSubmit(id), {}),
-        feedbackTitle('Bilan', 'saved', 'masculine')
+        entityFeedback('review', 'saved')
       )
 
       if (next) setReviews(next)
@@ -310,7 +310,7 @@ export const useJuniorFile = (
             deadlineAt: input.deadlineAt,
             decisionNote: input.decisionNote,
           }),
-        feedbackTitle('Bilan', 'saved', 'masculine')
+        entityFeedback('review', 'saved')
       )
 
       if (next) setReviews(next)

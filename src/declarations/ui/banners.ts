@@ -143,5 +143,11 @@ export const bannerFor = (pathname: string): BannerScene => {
 // Slot of the banner the page options are carried into
 export const PAGE_OPTIONS_HOST_ID = 'page-options-host'
 
+// Slot of the mobile top bar the page trail is carried into
+export const TOP_BAR_CRUMBS_HOST_ID = 'top-bar-crumbs-host'
+
+// Slot of the mobile top bar the page options and star are carried into
+export const TOP_BAR_TOOLS_HOST_ID = 'top-bar-tools-host'
+
 // Slot under the banner the tab strip is carried into
 export const PAGE_TABS_HOST_ID = 'page-tabs-host'

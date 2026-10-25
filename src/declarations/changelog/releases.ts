@@ -129,29 +129,29 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
     version: '0.7.0',
     date: '2026-10-21',
-    title: 'Le rôle Employé arrive',
+    title: 'Une flopée de correctifs !',
     intro:
       'Memora accueille un nouveau rôle, une quatrième division et des icônes entièrement redessinées.',
     description:
-      'Il manquait un niveau entre l’Admin et les Responsables, la liste des Modérateurs mélangeait l’encadrement et les modérateurs, et les icônes de rôles, de fonctions et de divisions n’étaient pas toutes à la hauteur. Cette version ajoute le rôle Employé, range chaque YouTubeur par Administration puis par fonction, et redessine les icônes.',
+      'Il manquait un niveau entre l’Admin et les Responsables, la liste des Modérateurs mélangeait l’encadrement et les modérateurs, et les icônes de rôles, de fonctions et de divisions n’étaient pas toutes à la hauteur. Cette version ajoute le rôle Employé, range chaque YouTubeur par Administration puis par fonction, redessine les icônes et corrige plusieurs bugs des Lives et du Calendrier.',
     items: [
       {
         tag: ChangelogTags.Added,
         page: ROUTES.members,
         audience: ChangelogAudiences.Responsables,
         permission: Permissions.MemberRead,
-        text: 'Ajout d’un nouveau rôle « Employé » : placé entre Admin et Responsable, il voit tous les YouTubeurs et dispose des mêmes droits qu’un Admin, sauf l’accès à « Système ».',
+        text: 'Ajout d’un nouveau rôle « Employé » : placé entre Admin et Responsable, il dispose des droits d’un Responsable et voit tous les YouTubeurs, même les nouveaux.',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.members,
         audience: ChangelogAudiences.Responsables,
         permission: Permissions.MemberRead,
-        text: 'Ajout de la possibilité, pour un Admin ou un Employé, d’ouvrir sa propre fiche dans « Modérateurs » et de la modifier.',
+        text: 'Ajout de la possibilité, pour un Admin, d’ouvrir sa propre fiche dans « Modérateurs » et de la modifier.',
       },
       {
         tag: ChangelogTags.Added,
-        text: 'Ajout d’une quatrième division, « Division 4 », réservée aux Responsables, avec son emblème doré.',
+        text: 'Ajout d’une quatrième division, « Division IV », réservée aux Responsables, avec son emblème doré.',
       },
       {
         tag: ChangelogTags.Improved,
@@ -161,12 +161,120 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Amélioration de la page « Modérateurs » : chaque YouTubeur sépare l’« Administration », avec l’Admin en premier puis les Responsables, des modérateurs, rangés par fonction puis par ordre alphabétique.',
       },
       {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la mise à jour en direct des accès : un changement de rôle, de fonction, de division ou de droit s’applique sans recharger la page.',
+      },
+      {
         tag: ChangelogTags.Improved,
         text: 'Amélioration visuelle des icônes de rôles et de fonctions : Admin, Employé et Modérateur, Discord, Lives et YouTube sont redessinés, avec une couronne qui scintille et une flamme qui crépite.',
       },
       {
         tag: ChangelogTags.Improved,
-        text: 'Amélioration visuelle des divisions : « Squad I », « Squad II » et « Squad III » deviennent « Division 1 », « Division 2 » et « Division 3 », chacune avec un écusson qui gagne un chevron.',
+        text: 'Amélioration visuelle des divisions : « Squad I », « Squad II » et « Squad III » deviennent « Division I », « Division II » et « Division III », chacune avec un écusson qui gagne un chevron.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Amélioration de la page « Modérateurs » : la carte d’un Admin, d’un Employé ou d’un Responsable affiche l’emblème de son rôle plutôt que ceux de ses fonctions.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Amélioration des divisions : tous les Responsables rejoignent la « Division IV ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration des « Recrutements » : le bouton « Copier » de l’annonce copie le texte et l’image du planning en une seule fois.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentObserve,
+        text: 'Amélioration des « Recrutements » : une session sans consigne affiche « Aucune consigne n’a été communiquée pour le moment » aux membres qui ne peuvent pas en écrire.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.home,
+        text: 'Amélioration de l’« Accueil » : une liste « Tes tâches » vide affiche une simple phrase.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        text: 'Amélioration du « Calendrier » sur téléphone : une vue sur trois jours, une barre de navigation par mois et des évènements colorés selon leur calendrier.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la barre du haut sur téléphone : le fil de navigation de la page et ses options s’y affichent, à côté du menu.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des formulaires sur téléphone : le clavier ne s’ouvre plus tout seul à l’ouverture d’une fenêtre.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui comptait du temps de modération à des membres qui ne modéraient pas la chaîne du « Live ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Correction d’un bug qui laissait le « Panel de sanctions » proposer le mauvais palier quand Twitch refusait une sanction.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui gardait l’heure de fin dans le « Calendrier » après la réouverture d’un « Live ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui ouvrait parfois deux temps de modération pour la même personne avec deux onglets ouverts.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui pouvait vider le chat de la « Mod View » après deux reconnexions rapprochées.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Correction d’un bug qui affichait une attente trop courte quand Twitch limitait les actions de modération.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui ne démarrait pas automatiquement un « Live » lancé plus de 90 minutes avant l’heure prévue : il est désormais suivi de 2 heures avant à 2 heures après.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Correction d’un bug qui enregistrait parfois un mauvais pseudo sur un commentaire laissé à un viewer.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Correction d’un bug qui laissait une note privée lisible dans le journal d’activité.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.calendar,
+        text: 'Correction de plusieurs bugs du « Calendrier » sur les heures d’appel, les bilans annuels et les évènements d’équipe.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui affichait certaines heures dans le mauvais fuseau horaire.',
       },
     ],
   },

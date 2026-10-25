@@ -6,7 +6,7 @@ import { apiDelete, apiPatch, apiPost, apiPut } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { INTEGRATION_LINK_COPY } from '@/declarations/onboarding/copy'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { CommentView } from '@/types/comments'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { IntegrationLinkView } from '@/types/onboarding'
@@ -17,13 +17,6 @@ import type {
   RecruitmentStepView,
 } from '@/types/recruitment'
 import { BLANK_ANSWER } from '@/core/lib/recruitment/questionnaire'
-
-// Toast entity labels
-const CANDIDATE = 'Candidat'
-const STEP = 'Étape'
-const COMMENT = 'Commentaire'
-const REVIEW = 'Bilan'
-const INSTRUCTIONS = 'Consignes'
 
 /**
  * One recruitment session file
@@ -125,7 +118,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
       const name = typeof values.discordId === 'string' ? values.discordId : undefined
       const saved = await run(
         () => apiPost<CandidateView>(API_ROUTES.recruitmentCandidates(sessionId), values),
-        feedbackTitle(CANDIDATE, 'created', 'masculine', name)
+        entityFeedback('candidate', 'created', name)
       )
 
       if (saved) mergeCandidate(saved)
@@ -139,7 +132,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     async (id: string, values: FormValues) => {
       const saved = await run(
         () => apiPatch<CandidateView>(API_ROUTES.candidate(id), values),
-        feedbackTitle(CANDIDATE, 'saved', 'masculine')
+        entityFeedback('candidate', 'saved')
       )
 
       if (saved) mergeCandidate(saved)
@@ -153,7 +146,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     async (id: string) => {
       const dropped = await run(
         () => apiDelete<null>(API_ROUTES.candidate(id)),
-        feedbackTitle(CANDIDATE, 'deleted', 'masculine')
+        entityFeedback('candidate', 'deleted')
       )
 
       if (dropped !== null) setCandidates((current) => current.filter((entry) => entry.id !== id))
@@ -176,7 +169,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     async (id: string, review: string) => {
       const saved = await run(
         () => apiPut<CandidateView>(API_ROUTES.candidateReview(id), { review }),
-        feedbackTitle(REVIEW, 'saved', 'masculine')
+        entityFeedback('review', 'saved')
       )
 
       if (saved) mergeCandidate(saved)
@@ -190,7 +183,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     async (id: string, values: FormValues) => {
       const saved = await run(
         () => apiPost<CandidateView>(API_ROUTES.candidateComments(id), values),
-        feedbackTitle(COMMENT, 'created', 'masculine')
+        entityFeedback('comment', 'created')
       )
 
       if (saved) mergeCandidate(saved)
@@ -204,7 +197,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     async (id: string) => {
       const saved = await run(
         () => apiDelete<CandidateView>(API_ROUTES.candidateComment(id)),
-        feedbackTitle(COMMENT, 'deleted', 'masculine')
+        entityFeedback('comment', 'deleted')
       )
 
       if (saved) mergeCandidate(saved)
@@ -216,7 +209,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     async (values: FormValues) => {
       const saved = await run(
         () => apiPost<CommentView[]>(API_ROUTES.recruitmentComments(sessionId), values),
-        feedbackTitle(COMMENT, 'created', 'masculine')
+        entityFeedback('comment', 'created')
       )
 
       if (saved) setComments(saved)
@@ -230,7 +223,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     async (id: string) => {
       const saved = await run(
         () => apiDelete<CommentView[]>(API_ROUTES.recruitmentComment(id)),
-        feedbackTitle(COMMENT, 'deleted', 'masculine')
+        entityFeedback('comment', 'deleted')
       )
 
       if (saved) setComments(saved)
@@ -243,7 +236,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
       const name = typeof values.title === 'string' ? values.title : undefined
       const saved = await run(
         () => apiPost<RecruitmentStepView>(API_ROUTES.recruitmentSteps(sessionId), values),
-        feedbackTitle(STEP, 'created', 'feminine', name)
+        entityFeedback('step', 'created', name)
       )
 
       if (saved) mergeStep(saved)
@@ -257,7 +250,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     async (id: string, values: FormValues) => {
       const saved = await run(
         () => apiPatch<RecruitmentStepView>(API_ROUTES.recruitmentStep(id), values),
-        feedbackTitle(STEP, 'saved', 'feminine')
+        entityFeedback('step', 'saved')
       )
 
       if (saved) mergeStep(saved)
@@ -282,7 +275,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     async (id: string) => {
       const dropped = await run(
         () => apiDelete<null>(API_ROUTES.recruitmentStep(id)),
-        feedbackTitle(STEP, 'deleted', 'feminine')
+        entityFeedback('step', 'deleted')
       )
 
       if (dropped !== null) setSteps((current) => current.filter((entry) => entry.id !== id))
@@ -294,7 +287,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     async (next: string) => {
       const saved = await run(
         () => apiPut<string>(API_ROUTES.recruitmentInstructions(sessionId), { instructions: next }),
-        feedbackTitle(INSTRUCTIONS, 'saved', 'feminine', undefined, true)
+        entityFeedback('instructions', 'saved', undefined, true)
       )
 
       if (saved !== null) setInstructions(saved)

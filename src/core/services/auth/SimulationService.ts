@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { isActualAdmin } from '@/core/lib/auth/simulation'
+import { isActualGlobal } from '@/core/lib/auth/simulation'
 import { readLedCreators } from '@/core/services/auth/LeadService'
 import type { ActualIdentity } from '@/types/auth'
 
@@ -20,8 +20,8 @@ export const simulatedCreatorIds = async (
   if (!active) return actual.youtuberIds
 
   // Only a creator the member truly reaches
-  const led = isActualAdmin(actual) ? [] : await readLedCreators(accountId)
+  const led = isActualGlobal(actual) ? [] : await readLedCreators(accountId)
   const reachable = [...actual.youtuberIds, ...led.map((creator) => creator.id)]
 
-  return isActualAdmin(actual) || reachable.includes(active) ? [active] : actual.youtuberIds
+  return isActualGlobal(actual) || reachable.includes(active) ? [active] : actual.youtuberIds
 }

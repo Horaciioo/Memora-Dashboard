@@ -45,6 +45,13 @@ export const SHELL_DIMENSIONS = {
 } as const
 
 /**
+ * Characters a trail may span in the top bar before it folds to its last page
+ * @type {number}
+ */
+
+export const BREADCRUMB_FULL_CHARS = RESPONSIVE_SETTINGS.breadcrumbFullChars
+
+/**
  * Page drawer footprint
  * @type {{ width: number, heightShare: number, minHeight: number, gap: number }}
  */

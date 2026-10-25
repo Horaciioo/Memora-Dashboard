@@ -26,9 +26,8 @@ import { DEPARTURE_COPY } from '@/declarations/academy/parkour'
 import { LIVE_COORDINATION_COPY } from '@/declarations/lives/copy'
 import { PERSONAL_COPY, PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
 import { TASK_GROUPS } from '@/declarations/personal/groups'
-import { ICONS } from '@/declarations/ui/icons'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
-import { HOME_FLOW } from '@/declarations/ui/variants'
+import { HOME_PLAN } from '@/declarations/ui/variants'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { CoordinationRequest } from '@/types/lives'
 import type { MemberAbsence } from '@/types/members'
@@ -289,8 +288,6 @@ export const HomeQueue = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requests, rollCalls, tasks, coordination, windows])
 
-  const CheckIcon = ICONS.picked
-
   // A task treated here stays on the list, struck through, until the page is left
   const [seen, setSeen] = useState<HomeEntry[]>(entries)
   const fresh = entries.filter((entry) => !seen.some((known) => known.key === entry.key))
@@ -306,10 +303,7 @@ export const HomeQueue = ({
     <>
       <Section title={PERSONAL_COPY.todoTitle} bare>
         {seen.length === 0 && entries.length === 0 ? (
-          <div className={HOME_FLOW.rest}>
-            <CheckIcon className={HOME_FLOW.restMark} aria-hidden="true" />
-            <p>{PERSONAL_COPY.calmTodoTitle}</p>
-          </div>
+          <p className={HOME_PLAN.empty}>{PERSONAL_COPY.todoEmpty}</p>
         ) : (
           <HomeTaskGroups
             entries={[...seen.filter((known) => doneKeys.has(known.key)), ...entries]}

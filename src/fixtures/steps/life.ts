@@ -198,7 +198,7 @@ export const seedLivecon = async (reference: Reference, cast: Cast) => {
 export const seedCalendar = async (reference: Reference, cast: Cast, work: Work) => {
   const template = (name: string) =>
     reference.templates.find((entry) => entry.name === name) ?? null
-  const live = template('Live')
+  const live = template('Live YouTube')
   const rollCalls: { id: string; attendeeIds: string[] }[] = []
 
   // Three to four lives a week per creator
@@ -215,7 +215,7 @@ export const seedCalendar = async (reference: Reference, cast: Cast, work: Work)
       await prisma.calendarEvent.create({
         data: {
           id: fx('event'),
-          title: `${title} · ${creator.name}`,
+          title: `${title}, ${creator.name}`,
           emoji,
           kind: 'EVENT',
           templateId: live?.id ?? null,
@@ -240,7 +240,7 @@ export const seedCalendar = async (reference: Reference, cast: Cast, work: Work)
     await prisma.calendarEvent.create({
       data: {
         id: fx('event'),
-        title: project ? project.title : `Semaine spéciale · ${creator.name}`,
+        title: project ? project.title : `Semaine spéciale, ${creator.name}`,
         emoji: '🎉',
         description: 'Programme détaillé dans le salon annonces.',
         kind: 'PERIOD',
@@ -258,7 +258,7 @@ export const seedCalendar = async (reference: Reference, cast: Cast, work: Work)
   }
 
   // Recruitment windows
-  const recruitment = template('Période de recrutement')
+  const recruitment = template('Zone de recrutement')
   for (const offset of [-150, -80, -20, 25]) {
     await prisma.calendarEvent.create({
       data: {

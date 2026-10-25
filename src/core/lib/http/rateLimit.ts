@@ -16,13 +16,25 @@ export interface RateLimitVerdict {
 }
 
 /**
+ * Counted attempt
+ * @typedef {Object} RateLimitHit
+ * @property {number} count - Attempts in window
+ * @property {number} resetSeconds - Window time left
+ */
+
+export interface RateLimitHit {
+  count: number
+  resetSeconds: number
+}
+
+/**
  * Counter backing the limiter
  * @typedef {Object} RateLimitStore
- * @property {(key: string, windowSeconds: number) => Promise<number>} hit - Count one attempt
+ * @property {(key: string, windowSeconds: number) => Promise<RateLimitHit>} hit - Count one attempt
  */
 
 export interface RateLimitStore {
-  hit: (key: string, windowSeconds: number) => Promise<number>
+  hit: (key: string, windowSeconds: number) => Promise<RateLimitHit>
 }
 
 interface MemoryWindow {
@@ -65,12 +77,12 @@ const memoryStore: RateLimitStore = {
     if (!current || current.expiresAt <= now) {
       windows.set(key, { count: 1, expiresAt: now + windowSeconds * 1000 })
 
-      return 1
+      return { count: 1, resetSeconds: windowSeconds }
     }
 
     current.count += 1
 
-    return current.count
+    return { count: current.count, resetSeconds: Math.ceil((current.expiresAt - now) / 1000) }
   },
 }
 
@@ -120,17 +132,21 @@ export const consume = async (name: RateLimitName, identity: string): Promise<Ra
     return { allowed: true, remaining: policy.max, retryAfterSeconds: 0 }
   }
 
-  const count = await bound.hit(keyOf(name, identity), policy.windowSeconds)
+  // Shared store down, count locally
+  const key = keyOf(name, identity)
+  const { count, resetSeconds } = await bound
+    .hit(key, policy.windowSeconds)
+    .catch(() => memoryStore.hit(key, policy.windowSeconds))
 
   return {
     allowed: count <= policy.max,
     remaining: Math.max(0, policy.max - count),
-    retryAfterSeconds: count <= policy.max ? 0 : policy.windowSeconds,
+    retryAfterSeconds: count <= policy.max ? 0 : resetSeconds,
   }
 }
 
-// Headers a proxy sets
-const ADDRESS_HEADERS = ['x-real-ip', 'cf-connecting-ip', 'x-forwarded-for'] as const
+// Headers the proxy rewrites
+const ADDRESS_HEADERS = ['x-real-ip', 'x-forwarded-for'] as const
 
 /**
  * Read the caller address behind a proxy

@@ -1,10 +1,20 @@
 {$DOMAIN} {
 	encode zstd gzip
 
+	# Bodies stay small
+	request_body {
+		max_size 8MB
+	}
+
 	# Streams stay open, nothing buffered
 	reverse_proxy app:3000 {
 		flush_interval -1
+		# Client address set here only
+		header_up X-Real-IP {client_ip}
+		header_up -Cf-Connecting-Ip
 	}
+
+	header -Server
 }
 
 # Independent of the app, answers while it is down

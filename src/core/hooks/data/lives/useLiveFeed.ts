@@ -33,6 +33,20 @@ interface FeedCursor {
 }
 
 /**
+ * Data of a server event, none when unreadable
+ * @param {Event} message - Event
+ * @return {T | null} - Data
+ */
+
+const readEvent = <T>(message: Event): T | null => {
+  try {
+    return JSON.parse((message as MessageEvent<string>).data) as T
+  } catch {
+    return null
+  }
+}
+
+/**
  * Live feed of a Mod View
  * @param {string} liveId - Live
  * @param {Dispatch<SetStateAction<ModViewState>>} setState - State setter
@@ -47,19 +61,21 @@ export const useLiveFeed = (
 ): void => {
   const cursor = useRef<FeedCursor>({ seq: 0, queue: [], replay: null, frame: null })
 
-  // Batches heard meanwhile join the snapshot
+  // Batches heard meanwhile join the snapshot, only the latest load lands
   const load = useCallback(() => {
-    cursor.current.replay = []
+    const replay: FeedBatch[] = []
+    cursor.current.replay = replay
 
     return apiGet<FeedSnapshot>(API_ROUTES.liveModView(liveId))
       .then((snapshot) => {
-        const caught = freshEvents(cursor.current.replay ?? [], snapshot.feedSeq)
+        if (cursor.current.replay !== replay) return
+        const caught = freshEvents(replay, snapshot.feedSeq)
         cursor.current.seq = caught.seq
         setState(applySceneBatch(shape(snapshot), caught.events))
       })
       .catch(() => null)
       .finally(() => {
-        cursor.current.replay = null
+        if (cursor.current.replay === replay) cursor.current.replay = null
       })
   }, [liveId, setState, shape])
 
@@ -83,7 +99,8 @@ export const useLiveFeed = (
     const feed = cursor.current
 
     source.addEventListener(LIVE_STREAM_EVENTS.batch, (message) => {
-      const batch = JSON.parse((message as MessageEvent<string>).data) as FeedBatch
+      const batch = readEvent<FeedBatch>(message)
+      if (!batch) return
       feed.replay?.push(batch)
       feed.queue.push(batch)
       feed.frame ??= requestAnimationFrame(flush)
@@ -91,10 +108,8 @@ export const useLiveFeed = (
       if (feed.queue.length > HIDDEN_QUEUE) flush()
     })
     source.addEventListener(LIVE_STREAM_EVENTS.connection, (message) => {
-      const link = JSON.parse((message as MessageEvent<string>).data) as {
-        state: ModViewConnection
-        notice: string | null
-      }
+      const link = readEvent<{ state: ModViewConnection; notice: string | null }>(message)
+      if (!link) return
       setState((current) => ({
         ...current,
         connection: link.state,

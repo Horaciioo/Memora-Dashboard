@@ -33,7 +33,7 @@ export const PAGE_STYLES = {
     'relative -mx-4 -mt-6 h-[var(--banner-h)] sm:-mx-6 sm:-mt-8 md:absolute md:inset-x-0 md:top-0 md:m-0 print:hidden',
   // Bar on the page colour across the top of the banner, clear of the window rim
   bannerBar:
-    'absolute inset-x-0 top-0 z-10 flex h-11 items-center justify-between gap-3 bg-[var(--color-page)] px-5 text-[var(--color-ink)] sm:px-6 md:h-14 md:pt-3',
+    'absolute inset-x-0 top-0 z-10 hidden h-11 items-center justify-between gap-3 bg-[var(--color-page)] px-5 text-[var(--color-ink)] sm:px-6 md:flex md:h-14 md:pt-3',
   // Slot the page options are carried into
   bannerOptions: 'flex shrink-0 items-center gap-0.5',
   barButton:
@@ -117,7 +117,8 @@ export const STATUS_STYLES = {
 export const RECORD_LABEL = {
   row: 'inline-flex min-w-0 items-center gap-2 align-middle',
   group: 'inline-flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 align-middle',
-  name: 'truncate',
+  // A long title takes two lines on a phone
+  name: 'line-clamp-2 break-words md:block md:truncate',
   emoji: 'shrink-0 text-base leading-none',
 } as const
 

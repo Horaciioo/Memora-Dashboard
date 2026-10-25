@@ -1,11 +1,13 @@
 import 'server-only'
 
+import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
 import { runtime } from '@/managers/infrastructure/Core/runtime'
 import type { ModViewConnection } from '@/types/modview'
+import { HOUR_SECONDS } from '@/utils/constants/time'
 
-// A live's memory outlives it by a day at most
-const RECENT_TTL_SECONDS = 86400
+// A live's memory outlives it this long at most
+const RECENT_TTL_SECONDS = LIVE_SETTINGS.memoryHours * HOUR_SECONDS
 
 // Survives dev hot reloads
 const globalForRecent = globalThis as unknown as {

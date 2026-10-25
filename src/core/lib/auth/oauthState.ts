@@ -24,6 +24,27 @@ export interface OauthHandshake {
 
 const randomToken = (bytes: number): string => crypto.randomBytes(bytes).toString('base64url')
 
+// Origin-free base for path checks
+const PATH_BASE = 'https://memora.invalid'
+
+/**
+ * Keep a same-origin path only
+ * @param {unknown} asked - Requested path
+ * @return {string | undefined} - Safe path
+ */
+
+export const sameOriginPath = (asked: unknown): string | undefined => {
+  if (typeof asked !== 'string' || !asked.startsWith('/')) return undefined
+
+  try {
+    const url = new URL(asked, PATH_BASE)
+    // Backslashes and // escape the origin
+    return url.origin === PATH_BASE ? `${url.pathname}${url.search}${url.hash}` : undefined
+  } catch {
+    return undefined
+  }
+}
+
 /**
  * Open a handshake for one sign-in attempt
  * @param {string} [returnTo] - Path asked for before signing in
@@ -33,7 +54,7 @@ const randomToken = (bytes: number): string => crypto.randomBytes(bytes).toStrin
 export const createHandshake = (returnTo?: string): OauthHandshake => ({
   state: randomToken(DISCORD_PKCE.stateBytes),
   codeVerifier: randomToken(DISCORD_PKCE.verifierBytes),
-  ...(returnTo ? { returnTo } : {}),
+  ...(sameOriginPath(returnTo) ? { returnTo: sameOriginPath(returnTo) } : {}),
 })
 
 /**
@@ -70,7 +91,9 @@ export const unpackHandshake = (packed: string | undefined): OauthHandshake | nu
     const { state, codeVerifier, returnTo } = parsed as Record<string, unknown>
     if (typeof state !== 'string' || typeof codeVerifier !== 'string') return null
 
-    return { state, codeVerifier, ...(typeof returnTo === 'string' ? { returnTo } : {}) }
+    const safe = sameOriginPath(returnTo)
+
+    return { state, codeVerifier, ...(safe ? { returnTo: safe } : {}) }
   } catch {
     return null
   }

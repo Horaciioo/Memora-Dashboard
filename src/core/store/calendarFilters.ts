@@ -18,6 +18,7 @@ import type { CalendarUnit } from '@/utils/format/calendar'
  * @property {(layers: CalendarLayerName[]) => void} setHiddenLayers - Replace the switched off calendars
  * @property {(layer: CalendarLayerName) => void} toggleLayer - Flip a calendar
  * @property {(creatorId: string) => void} toggleCreator - Flip a creator
+ * @property {(creatorIds: string[]) => void} setHiddenCreators - Replace the switched off creators
  */
 
 interface CalendarFiltersStore {
@@ -30,6 +31,7 @@ interface CalendarFiltersStore {
   setHiddenLayers: (layers: CalendarLayerName[]) => void
   toggleLayer: (layer: CalendarLayerName) => void
   toggleCreator: (creatorId: string) => void
+  setHiddenCreators: (creatorIds: string[]) => void
 }
 
 // Adds or drops one entry
@@ -50,6 +52,7 @@ export const useCalendarFiltersStore = create<CalendarFiltersStore>()(
       toggleLayer: (layer) => set((state) => ({ hiddenLayers: flip(state.hiddenLayers, layer) })),
       toggleCreator: (creatorId) =>
         set((state) => ({ hiddenCreators: flip(state.hiddenCreators, creatorId) })),
+      setHiddenCreators: (creatorIds) => set({ hiddenCreators: creatorIds }),
     }),
     // Read after mount, the span always opens on the month
     {

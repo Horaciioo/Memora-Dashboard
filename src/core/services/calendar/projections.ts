@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { activeAbsenceFilter } from '@/core/services/absences/AbsenceService'
 import { addDays, endOfDay, startOfDay } from '@/utils/format/days'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
@@ -26,6 +27,7 @@ import {
 } from '@/utils/constants/workflow'
 import { byHierarchy } from '@/core/services/reference/functions'
 import type { CalendarKindName, CalendarSourceName } from '@/utils/constants/workflow'
+import { DAY_MS, MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Window a projection is read for
@@ -43,10 +45,6 @@ export interface ProjectionContext {
   scope: AccessScope
   viewer: WorkViewer
 }
-
-// Milliseconds in one day and one minute
-const DAY_MS = 86_400_000
-const MINUTE_MS = 60_000
 
 // The creator a member works for carries the colour of everything they appear in
 const FUNCTION_SHAPE = {
@@ -228,7 +226,7 @@ export const absenceEntries = async ({
     : [AbsenceStatuses.Approved]
 
   const rows = await prisma.absence.findMany({
-    where: { status: { in: statuses }, startDate: { lte: to }, endDate: { gte: from } },
+    where: { ...activeAbsenceFilter(from, to), status: { in: statuses } },
     include: { account: FUNCTION_SHAPE },
     orderBy: { startDate: 'asc' },
   })

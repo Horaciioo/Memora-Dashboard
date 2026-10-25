@@ -3,7 +3,7 @@ import { LiveClosedNotice } from '@/composites/lives/LiveClosedNotice'
 import { LiveDeniedNotice } from '@/composites/lives/LiveDeniedNotice'
 import { LiveGate } from '@/composites/lives/LiveGate'
 import { LiveModView } from '@/composites/modview/LiveModView'
-import { coordinatingNow } from '@/core/lib/lives/coordination'
+import { activeCoordinatorIds } from '@/core/lib/lives/coordination'
 import { focusableMembers } from '@/core/services/lives/FocusService'
 import { readPanelMemory } from '@/core/services/lives/LiveInsightService'
 import { readLive } from '@/core/services/lives/LiveService'
@@ -113,7 +113,16 @@ export default async function LivePage({ params }: { params: Promise<{ id: strin
             viewerId: session.id,
             members: live.members,
             focusable,
-            coordinatorIds: coordinatingNow(live.coordinators),
+            coordinatorIds: activeCoordinatorIds(
+              live.coordinators.map((seat) => ({
+                accountId: seat.person.id,
+                status: seat.status,
+                startsAt: null,
+                endsAt: seat.endsAt ? new Date(seat.endsAt) : null,
+              })),
+              new Date(),
+              live.status
+            ),
             canEnd: canEdit,
             isJunior: session.role === MemberRoles.Junior,
             initialMemory: memory,

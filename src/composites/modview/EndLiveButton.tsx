@@ -10,7 +10,7 @@ import { apiPatch } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { LIVE_COPY } from '@/declarations/lives/copy'
 import { ROUTES } from '@/declarations/navigation'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import { LockGlyph } from '@/components/elements/display/glyphs/BrandGlyphs'
 import { MODVIEW_SIDEBAR } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
@@ -35,7 +35,7 @@ export const EndLiveButton = ({ liveId }: EndLiveButtonProps) => {
   const end = async () => {
     const ended = await run(
       () => apiPatch<LiveView>(API_ROUTES.live(liveId), { status: LiveStatuses.Ended }),
-      feedbackTitle('Live', 'saved', 'masculine')
+      entityFeedback('live', 'saved')
     )
     setConfirming(false)
     if (ended) setEnded(true)

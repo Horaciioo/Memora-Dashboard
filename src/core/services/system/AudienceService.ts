@@ -4,9 +4,7 @@ import { prisma } from '@/core/lib/db'
 import { AUDIENCE_COPY, AUDIENCE_WINDOWS } from '@/declarations/system/monitoring/activity'
 import { EVENT_ORIGINS, EVENT_TYPES } from '@/utils/constants/events'
 import { readDevice } from '@/utils/format/device'
-
-// Milliseconds in one day
-const DAY_MS = 86_400_000
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * Members active on one day

@@ -62,7 +62,7 @@ const PIM_PERIOD_MAP: Record<PimPeriodName, PimPeriodOption> = {
   },
   official: {
     label: 'Officialisation',
-    lead: 'Modérateur, Division 1.',
+    lead: 'Modérateur, Division I.',
     icon: 'star',
     tone: 'success',
     hasTrainings: false,
@@ -249,7 +249,7 @@ export const PARKOUR_MILESTONES: readonly ParkourMilestone[] = [
     period: 'official',
     icon: 'star',
     label: 'Officialisation',
-    lead: 'Modérateur, Division 1.',
+    lead: 'Modérateur, Division I.',
     owner: null,
     phases: ['graduated', 'dismissed', 'resigned'],
   },

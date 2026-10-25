@@ -297,7 +297,7 @@ export const LIVECON_SETTINGS = {
 
 /**
  * Announced lives and their Mod View
- * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number }}
+ * @type {{ defaultDurationMinutes: number, endGraceMinutes: number, streamKeepAliveSeconds: number, heartbeatSeconds: number, idleSeconds: number, staleSeconds: number, maxOpenLives: number, watchSyncSeconds: number, eventsubKeepaliveSeconds: number, feedFlushMs: number, roomMessages: number, roomActs: number, roomHeld: number, feedSlowKilobytes: number, logConcurrency: number, logQueueMax: number, liveconCacheSeconds: number, idempotencyMinutes: number, watchLeadMinutes: number, watchTrailMinutes: number, reportBucketMinutes: number, logLines: number, pastLives: number, hoursWindowDays: number, memberLives: number, memberLivesPageSize: number, suspensionMaxDays: number, moderatorCacheSeconds: number, emoteCacheSeconds: number, ownedEmoteCacheSeconds: number, memoryHours: number, memoryShareSeconds: number, rateLimitRetrySeconds: number }}
  */
 
 export const LIVE_SETTINGS = {
@@ -370,6 +370,36 @@ export const LIVE_SETTINGS = {
     path: 'system/lives.focusPollSeconds',
     fallback: 10,
     min: 2,
+  }),
+  moderatorCacheSeconds: readInteger(lives.moderatorCacheSeconds, {
+    path: 'system/lives.moderatorCacheSeconds',
+    fallback: 60,
+    min: 0,
+  }),
+  emoteCacheSeconds: readInteger(lives.emoteCacheSeconds, {
+    path: 'system/lives.emoteCacheSeconds',
+    fallback: 600,
+    min: 0,
+  }),
+  ownedEmoteCacheSeconds: readInteger(lives.ownedEmoteCacheSeconds, {
+    path: 'system/lives.ownedEmoteCacheSeconds',
+    fallback: 300,
+    min: 0,
+  }),
+  memoryHours: readInteger(lives.memoryHours, {
+    path: 'system/lives.memoryHours',
+    fallback: 24,
+    min: 1,
+  }),
+  memoryShareSeconds: readInteger(lives.memoryShareSeconds, {
+    path: 'system/lives.memoryShareSeconds',
+    fallback: 3,
+    min: 1,
+  }),
+  rateLimitRetrySeconds: readInteger(lives.rateLimitRetrySeconds, {
+    path: 'system/lives.rateLimitRetrySeconds',
+    fallback: 5,
+    min: 1,
   }),
   endGraceMinutes: readInteger(lives.endGraceMinutes, {
     path: 'system/lives.endGraceMinutes',
@@ -464,7 +494,12 @@ export const LIVE_SETTINGS = {
   }),
   watchLeadMinutes: readInteger(lives.watchLeadMinutes, {
     path: 'system/lives.watchLeadMinutes',
-    fallback: 90,
+    fallback: 120,
+    min: 0,
+  }),
+  watchTrailMinutes: readInteger(lives.watchTrailMinutes, {
+    path: 'system/lives.watchTrailMinutes',
+    fallback: 120,
     min: 0,
   }),
   reportBucketMinutes: readInteger(lives.reportBucketMinutes, {
@@ -539,13 +574,18 @@ export const SCOPE_SETTINGS = {
 
 /**
  * Upload bounds of the file field
- * @type {{ maxBytes: number, allowedTypes: string[] }}
+ * @type {{ maxBytes: number, bodyMaxBytes: number, allowedTypes: string[] }}
  */
 
 export const FILE_SETTINGS = {
   maxBytes: readInteger(files.maxBytes, {
     path: 'system/fichiers.maxBytes',
     fallback: 2_097_152,
+    min: 1,
+  }),
+  bodyMaxBytes: readInteger(files.bodyMaxBytes, {
+    path: 'system/fichiers.bodyMaxBytes',
+    fallback: 4_194_304,
     min: 1,
   }),
   allowedTypes: readStringList(files.allowedTypes, {
@@ -778,6 +818,11 @@ export const CALENDAR_SETTINGS = {
     fallback: 3,
     min: 1,
   }),
+  maxEntriesPerDayMobile: readInteger(calendar.maxEntriesPerDayMobile, {
+    path: 'system/calendrier.maxEntriesPerDayMobile',
+    fallback: 4,
+    min: 1,
+  }),
   rollCallReminderLeadDays: readInteger(calendar.rollCallReminderLeadDays, {
     path: 'system/calendrier.rollCallReminderLeadDays',
     fallback: 1,
@@ -855,7 +900,7 @@ const responsiveToastVisible = readNode(
 
 /**
  * Breakpoint and shell chrome bounds
- * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl' | '2xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, sidebarWidth: number, sidebarCompactWidth: number, bannerHeight: number, bannerHeightMobile: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, longPressMs: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
+ * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl' | '2xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, sidebarWidth: number, sidebarCompactWidth: number, bannerHeight: number, bannerHeightMobile: number, breadcrumbFullChars: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, longPressMs: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
  */
 
 export const RESPONSIVE_SETTINGS = {
@@ -895,6 +940,11 @@ export const RESPONSIVE_SETTINGS = {
     path: 'system/responsive.shell.bannerHeightMobile',
     fallback: 144,
     min: 96,
+  }),
+  breadcrumbFullChars: readInteger(responsive.breadcrumbFullChars, {
+    path: 'system/responsive.breadcrumbFullChars',
+    fallback: 24,
+    min: 8,
   }),
   toastVisibleMobile: readInteger(responsiveToastVisible.mobile, {
     path: 'system/responsive.toast.maxVisible.mobile',

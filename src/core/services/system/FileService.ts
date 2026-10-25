@@ -11,6 +11,7 @@ import { STORAGE_BUCKETS } from '@/declarations/system/storage'
 import type { MediaVisibility } from '@/declarations/system/storage'
 import type { StorageBucket } from '@/types/storage'
 import type { PermissionName } from '@/utils/constants/permissions'
+import { HOUR_MS } from '@/utils/constants/time'
 
 /**
  * Stored file
@@ -166,6 +167,13 @@ const FILE_REFERENCE_LOOKUPS = [
     ).map((row) => row.avatarUrl),
   async (urls: string[]) =>
     (
+      await prisma.socialNetwork.findMany({
+        where: { avatarUrl: { in: urls } },
+        select: { avatarUrl: true },
+      })
+    ).map((row) => row.avatarUrl),
+  async (urls: string[]) =>
+    (
       await prisma.account.findMany({
         where: { bannerUrl: { in: urls } },
         select: { bannerUrl: true },
@@ -196,7 +204,7 @@ const FILE_REFERENCE_LOOKUPS = [
 export const findOrphanFiles = async (
   olderThanHours: number
 ): Promise<{ id: string; byteSize: number }[]> => {
-  const horizon = new Date(Date.now() - olderThanHours * 3_600_000)
+  const horizon = new Date(Date.now() - olderThanHours * HOUR_MS)
 
   const candidates = await prisma.storageEntry.findMany({
     where: { createdAt: { lt: horizon } },

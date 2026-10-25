@@ -3,7 +3,6 @@ import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { academyScope } from '@/core/services/academy/AcademyScope'
 import {
-  assertEntryAccess,
   calendarFields,
   moveEntry,
   removeEntry,
@@ -12,19 +11,19 @@ import {
 } from '@/core/services/calendar/CalendarService'
 import { assertPlannable } from '@/core/services/calendar/academyEntries'
 import { assertLiveAccess } from '@/core/services/lives/LiveService'
-import { assertRowInScope } from '@/core/services/auth/ScopeService'
+import { assertEntriesReachable, calendarViewer } from '@/core/services/calendar/visibility'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { workViewer } from '@/core/services/work/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
   descriptor: { summary: 'Edit or move a calendar entry', tags: ['calendar'] },
-  handler: async ({ params, raw, session, access, scope }) => {
-    const perimeter = await scope()
+  handler: async ({ params, raw, session, access }) => {
+    const viewer = await calendarViewer(session, access)
+    const perimeter = viewer.scope
     // A trainer reaches their own entries only
     const canManage = access.can(Permissions.CalendarManage) && access.isResponsable
-    await assertEntryAccess(params.id, session.id, canManage)
-    await assertRowInScope('calendarEvent', params.id, perimeter)
+    await assertEntriesReachable([params.id], viewer, canManage)
     const canAnnounceLive = access.can(Permissions.LiveAnnounce)
     await assertLiveAccess({ canAnnounce: canAnnounceLive, entryIds: [params.id] })
 
@@ -76,13 +75,12 @@ export const PATCH = createProtectedRoute({
 
 export const DELETE = createProtectedRoute({
   descriptor: { summary: 'Drop a calendar entry', tags: ['calendar'] },
-  handler: async ({ params, session, access, scope }) => {
-    await assertEntryAccess(
-      params.id,
-      session.id,
+  handler: async ({ params, session, access }) => {
+    await assertEntriesReachable(
+      [params.id],
+      await calendarViewer(session, access),
       access.can(Permissions.CalendarManage) && access.isResponsable
     )
-    await assertRowInScope('calendarEvent', params.id, await scope())
     await assertLiveAccess({
       canAnnounce: access.can(Permissions.LiveAnnounce),
       entryIds: [params.id],

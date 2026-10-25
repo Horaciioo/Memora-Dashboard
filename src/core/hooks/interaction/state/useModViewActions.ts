@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { parseChatCommand, rememberRung, writeRungCommand } from '@/core/lib/modview/commands'
+import {
+  forgetRung,
+  parseChatCommand,
+  rememberRung,
+  writeRungCommand,
+} from '@/core/lib/modview/commands'
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import { gateIntent } from '@/core/lib/modview/gate'
 import { MODVIEW_COMMAND_COPY, MODVIEW_PANEL_COPY } from '@/declarations/modview/copy'
@@ -19,6 +24,29 @@ interface PendingRung {
   chatterId: string
   offenseId: string
   rung: number
+}
+
+/**
+ * Take back a sanction mark Twitch refused, unless a later gesture replaced it
+ * @param {Record<string, string>} acted - Marks
+ * @param {string} chatterId - Viewer
+ * @param {string} stamp - Mark refused
+ * @param {string | undefined} before - Mark it replaced
+ * @return {Record<string, string>} - Marks
+ */
+
+const undoActed = (
+  acted: Record<string, string>,
+  chatterId: string,
+  stamp: string,
+  before: string | undefined
+): Record<string, string> => {
+  if (acted[chatterId] !== stamp) return acted
+  const rest = { ...acted }
+  if (before) rest[chatterId] = before
+  else delete rest[chatterId]
+
+  return rest
 }
 
 /**
@@ -106,23 +134,34 @@ export const useModViewActions = (input: {
     (intent: ModViewIntent, context: ActContext = {}) => {
       if (!gate(intent).allowed) return
 
+      // Shown at once, taken back if Twitch refuses
       const chatterId = 'chatterId' in intent ? intent.chatterId : null
-      if (chatterId && SETTLING_KINDS.includes(intent.kind)) {
-        setActed((current) => ({ ...current, [chatterId]: new Date().toISOString() }))
-      }
-      if (chatterId && context.offenseId && context.rung !== undefined) {
-        const { offenseId, rung } = context
-        setMemory((current) => rememberRung(current, chatterId, offenseId, rung))
-      }
+      const stamp = new Date().toISOString()
+      const settles = chatterId !== null && SETTLING_KINDS.includes(intent.kind)
+      const before = chatterId ? acted[chatterId] : undefined
+      if (settles) setActed((current) => ({ ...current, [chatterId]: stamp }))
+
+      const { offenseId, rung } = context
+      const isNewRung =
+        chatterId !== null &&
+        offenseId !== undefined &&
+        rung !== undefined &&
+        !(memory[chatterId]?.[offenseId] ?? []).includes(rung)
+      if (isNewRung) setMemory((current) => rememberRung(current, chatterId, offenseId, rung))
+
       void runIntent(intent, {
         ...context,
         targetLogin:
           context.targetLogin ??
           (chatterId ? chattersRef.current.get(chatterId)?.login : undefined),
         ...(onBehalfOfId ? { onBehalfOfId } : {}),
+      }).then((done) => {
+        if (done || !chatterId) return
+        if (settles) setActed((current) => undoActed(current, chatterId, stamp, before))
+        if (isNewRung) setMemory((current) => forgetRung(current, chatterId, offenseId, rung))
       })
     },
-    [runIntent, gate, onBehalfOfId]
+    [runIntent, gate, onBehalfOfId, acted, memory]
   )
 
   // The panel writes the line
@@ -148,7 +187,6 @@ export const useModViewActions = (input: {
           { kind: 'delete', messageId: lastLine.id, chatterId: chatter.id },
           { offenseId: offense.id, rung, targetLogin: chatter.login }
         )
-        setMemory((current) => rememberRung(current, chatter.id, offense.id, rung))
         setHint(null)
         return
       }
@@ -180,17 +218,12 @@ export const useModViewActions = (input: {
         return
       }
 
-      // The rung counts only for the viewer it was written for
+      // The rung counts only for the viewer it was written for, act keeps it
       const fromPanel = parsed.target && pending?.chatterId === parsed.target.id ? pending : null
       act(parsed.intent, {
         ...(parsed.target ? { targetLogin: parsed.target.login } : {}),
         ...(fromPanel ? { offenseId: fromPanel.offenseId, rung: fromPanel.rung } : {}),
       })
-      if (fromPanel) {
-        setMemory((current) =>
-          rememberRung(current, fromPanel.chatterId, fromPanel.offenseId, fromPanel.rung)
-        )
-      }
     }
 
     setDraft('')

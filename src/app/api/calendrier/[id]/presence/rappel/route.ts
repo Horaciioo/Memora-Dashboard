@@ -2,17 +2,15 @@ import { notFound } from '@/core/lib/errors'
 import { prisma } from '@/core/lib/db'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { readRosterFor, remindPending } from '@/core/services/calendar/attendance'
-import { assertEntryAccess } from '@/core/services/calendar/CalendarService'
-import { assertRowInScope } from '@/core/services/auth/ScopeService'
+import { assertEntriesReachable, calendarViewer } from '@/core/services/calendar/visibility'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const POST = createProtectedRoute({
   permission: Permissions.CalendarManage,
   descriptor: { summary: 'Ping the roll-call no-answers now', tags: ['calendar'] },
-  handler: async ({ params, session, access, scope }) => {
+  handler: async ({ params, session, access }) => {
     const canManage = access.can(Permissions.CalendarManage)
-    await assertEntryAccess(params.id, session.id, canManage)
-    await assertRowInScope('calendarEvent', params.id, await scope())
+    await assertEntriesReachable([params.id], await calendarViewer(session, access), canManage)
 
     const event = await prisma.calendarEvent.findUnique({
       where: { id: params.id },

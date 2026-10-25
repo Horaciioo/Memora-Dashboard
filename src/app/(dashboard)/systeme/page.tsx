@@ -3,10 +3,9 @@ import { PageHeader } from '@/components/structures/page/PageHeader'
 import { Section } from '@/components/structures/page/Section'
 import { ConsoleRow } from '@/composites/system/ConsoleRow'
 import { requireSystem } from '@/core/wrappers/requireUser'
-import { VIEW_COPY } from '@/declarations/access/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
-import { SYSTEM_SCREENS } from '@/declarations/system/screens'
+import { SYSTEM_GROUPS, systemScreensOfGroup } from '@/declarations/system/screens'
 import { GROUP_STYLES, HOME_STYLES, PAGE_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -25,19 +24,20 @@ export default async function SystemPage() {
       <PageHeader title={SYSTEM_COPY.title} />
 
       <div className={cn(GROUP_STYLES.spaced, 'mx-auto w-full max-w-3xl')}>
-        <Section bare>
-          <div className={HOME_STYLES.rows}>
-            <ConsoleRow href={ROUTES.administration} icon="console" label={VIEW_COPY.adminTitle} />
-            {SYSTEM_SCREENS.map((screen) => (
-              <ConsoleRow
-                key={screen.route}
-                href={ROUTES[screen.route]}
-                icon={screen.icon}
-                label={screen.label}
-              />
-            ))}
-          </div>
-        </Section>
+        {SYSTEM_GROUPS.map((group) => (
+          <Section key={group.key} title={group.label} bare>
+            <div className={HOME_STYLES.rows}>
+              {systemScreensOfGroup(group.key).map((screen) => (
+                <ConsoleRow
+                  key={screen.route}
+                  href={ROUTES[screen.route]}
+                  icon={screen.icon}
+                  label={screen.label}
+                />
+              ))}
+            </div>
+          </Section>
+        ))}
       </div>
     </div>
   )

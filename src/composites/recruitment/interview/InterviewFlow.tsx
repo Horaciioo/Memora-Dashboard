@@ -17,10 +17,8 @@ import {
   RecruitmentFileProvider,
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { useRecordFile } from '@/core/hooks/data/work/useRecordFile'
+import { useCandidateRecord } from '@/core/hooks/data/recruitment/useCandidateRecord'
 import { useExercisePick } from '@/core/hooks/interaction/scenes/useExercisePick'
-import { API_ROUTES } from '@/core/lib/api/routes'
-import { candidateRecordValues } from '@/core/lib/recruitment/candidateRecord'
 import { isInterviewLocked } from '@/core/lib/recruitment/interviewLock'
 import { offeredExercises } from '@/core/lib/recruitment/exercises'
 import { groupByPart, playedSibling } from '@/core/lib/recruitment/questionnaire'
@@ -32,7 +30,6 @@ import { cn } from '@/utils/classnames'
 import { INTERVIEW, QUESTION_BODY, TOUR_CHAT } from '@/declarations/ui/variants'
 import type { RecruitmentDetail, RecruitmentFields, RecruitmentRights } from '@/types/recruitment'
 
-const CANDIDATE_ENTITY = { label: 'Candidat', gender: 'masculine' } as const
 
 /**
  * The interview as pages: an introduction, then one page per part, then the deliberation
@@ -52,11 +49,7 @@ const InterviewBody = ({
   const router = useRouter()
   const { detail, file, can, questionnaire } = useRecruitmentState()
   const candidate = file.candidates.find((entry) => entry.id === candidateId)!
-  const record = useRecordFile({
-    path: API_ROUTES.candidate(candidate.id),
-    entity: CANDIDATE_ENTITY,
-    initialValues: candidateRecordValues(candidate),
-  })
+  const record = useCandidateRecord(candidate)
   // A finished interview only opens to a manager or its recruiter
   const isLocked = isInterviewLocked(candidate.attended, candidate.recruiter?.id ?? null, can)
   const isReadOnly = isLocked || !can.writeCandidates

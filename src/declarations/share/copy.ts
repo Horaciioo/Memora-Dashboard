@@ -11,4 +11,11 @@ export const SHARE_COPY = {
   alt: 'Billet d’un évènement Memora',
   redirecting: 'Redirection vers Memora…',
   scopeAll: 'Tout Memora',
+  // Showcase ticket
+  demoTitle: 'Live spécial abonnés, Michou',
+  demoWhen: 'Mer. 21 oct. · 20:00 → 23:00',
+  demoMonth: 'Oct.',
+  demoDay: '21',
+  demoWeekday: 'Mer.',
+  demoHours: '20:00 → 23:00',
 } as const

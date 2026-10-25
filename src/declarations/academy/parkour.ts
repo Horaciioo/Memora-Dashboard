@@ -133,7 +133,7 @@ export const PARKOUR_PHASES: Record<ParkourPhase, ParkourPhaseOption> = {
   },
   graduated: {
     label: 'Officialisé',
-    lead: 'PIM réussie : Modérateur, Division 1.',
+    lead: 'PIM réussie : Modérateur, Division I.',
     tone: 'success',
     icon: 'confirm',
   },

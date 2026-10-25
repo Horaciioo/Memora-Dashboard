@@ -5,13 +5,9 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { RecruitmentSummary } from '@/types/recruitment'
-
-// Toast entity label
-const ENTITY = 'Session de recrutement'
-const GENDER = 'feminine'
 
 /**
  * Recruitment session list state and mutations
@@ -50,7 +46,7 @@ export const useRecruitments = (initialSessions: RecruitmentSummary[]): Recruitm
       const name = typeof values.name === 'string' ? values.name : undefined
       const created = await run(
         () => apiPost<RecruitmentSummary>(API_ROUTES.recruitments, values),
-        feedbackTitle(ENTITY, 'created', GENDER, name)
+        entityFeedback('recruitment', 'created', name)
       )
 
       if (created) setSessions((current) => [created, ...current])
@@ -65,7 +61,7 @@ export const useRecruitments = (initialSessions: RecruitmentSummary[]): Recruitm
       const name = typeof values.name === 'string' ? values.name : undefined
       const saved = await run(
         () => apiPatch<RecruitmentSummary>(API_ROUTES.recruitment(id), values),
-        feedbackTitle(ENTITY, 'saved', GENDER, name)
+        entityFeedback('recruitment', 'saved', name)
       )
 
       if (saved) {
@@ -81,7 +77,7 @@ export const useRecruitments = (initialSessions: RecruitmentSummary[]): Recruitm
     async (id: string) => {
       const dropped = await run(
         () => apiDelete<null>(API_ROUTES.recruitment(id)),
-        feedbackTitle(ENTITY, 'deleted', GENDER)
+        entityFeedback('recruitment', 'deleted')
       )
 
       if (dropped !== null) {

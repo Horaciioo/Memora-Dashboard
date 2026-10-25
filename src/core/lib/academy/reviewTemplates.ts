@@ -2,6 +2,7 @@ import { AcademyStages, ReviewStatuses } from '@/utils/constants/hierarchy'
 import type { AcademyStageName, ReviewStatusName } from '@/utils/constants/hierarchy'
 import { EventPurposes } from '@/utils/constants/workflow'
 import type { EventPurposeName } from '@/utils/constants/workflow'
+import { DAY_MS } from '@/utils/constants/time'
 
 /**
  * Junior as the review templates read them
@@ -70,7 +71,7 @@ export const reviewOpensAt = (
 ): Date | null => {
   const due = purpose === EventPurposes.ReviewOne ? junior.dueOne : junior.dueFinal
 
-  return due ? new Date(due.getTime() - DECLARED_DAYS_BEFORE * 86_400_000) : null
+  return due ? new Date(due.getTime() - DECLARED_DAYS_BEFORE * DAY_MS) : null
 }
 
 /**

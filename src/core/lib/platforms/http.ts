@@ -10,12 +10,15 @@ import { TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
 export class PlatformError extends Error {
   readonly status: number
   readonly detail: string
+  // When a rate limit lifts, epoch ms
+  readonly resetAt: number | null
 
-  constructor(status: number, detail: string) {
+  constructor(status: number, detail: string, resetAt: number | null = null) {
     super(`platform answered ${status}`)
     this.name = 'PlatformError'
     this.status = status
     this.detail = detail
+    this.resetAt = resetAt
   }
 }
 
@@ -91,7 +94,7 @@ const awaitRefill = async (key: string): Promise<void> => {
 
   const delay = bucket.resetAt - Date.now()
   if (delay <= 0) return
-  if (delay > MAX_REFILL_WAIT_MS) throw new PlatformError(429, 'rate limited')
+  if (delay > MAX_REFILL_WAIT_MS) throw new PlatformError(429, 'rate limited', bucket.resetAt)
 
   await wait(delay)
 }
@@ -145,7 +148,12 @@ export const platformRequest = async <T>(request: PlatformRequest): Promise<T | 
 
     if (!response.ok) {
       const payload = (await response.json().catch(() => null)) as { message?: string } | null
-      throw new PlatformError(response.status, payload?.message ?? response.statusText)
+      const reset = Number(response.headers.get('ratelimit-reset')) * 1000
+      throw new PlatformError(
+        response.status,
+        payload?.message ?? response.statusText,
+        reset > 0 ? reset : null
+      )
     }
 
     if (response.status === 204) return null

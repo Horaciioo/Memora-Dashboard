@@ -32,7 +32,12 @@ export const POST = createProtectedRoute({
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     await assertDivisionAssignable(parsed.values, access.isAdmin)
-    await assertMemberAssignable(parsed.values, access.isAdmin)
+    await assertMemberAssignable(parsed.values, {
+      id: session.id,
+      role: session.role,
+      isAdmin: access.isAdmin,
+      isSystem: access.isSystem,
+    })
 
     const member = await createMember(parsed.values)
 

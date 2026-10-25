@@ -11,12 +11,14 @@ import {
   PAGINATION_SETTINGS,
 } from '@/declarations/configurations/settings'
 import { ABSENCE_COPY, ABSENCE_FIELD_COPY, ABSENCE_FIELD_INFO } from '@/declarations/absences/copy'
+import { DEFAULT_ZONE } from '@/declarations/ui/dates'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import type { AbsenceStatusName } from '@/utils/constants/workflow'
 import { countDays } from '@/utils/format/dates'
+import { instantToWall } from '@/utils/format/zone'
 import type { Prisma } from '@prisma/client'
 
 // Relations every absence row needs
@@ -28,15 +30,29 @@ const ABSENCE_INCLUDE = {
 type AbsenceRow = Prisma.AbsenceGetPayload<{ include: typeof ABSENCE_INCLUDE }>
 
 /**
- * Filter matching an absence covering the current instant
- * @return {Prisma.AbsenceWhereInput} - Where clause
+ * Team day of a moment
+ * @param {Date} [moment] - Instant
+ * @return {Date} - Day as stored
  */
 
-export const activeAbsenceFilter = (): Prisma.AbsenceWhereInput => {
-  const now = new Date()
+export const absenceDay = (moment: Date = new Date()): Date =>
+  new Date(`${instantToWall(moment, DEFAULT_ZONE).slice(0, 10)}T00:00:00.000Z`)
 
-  return { status: AbsenceStatuses.Approved, startDate: { lte: now }, endDate: { gte: now } }
-}
+/**
+ * Approved absences over a window
+ * @param {Date} [from] - Window start
+ * @param {Date} [to] - Window end
+ * @return {Prisma.AbsenceWhereInput} - Absence clause
+ */
+
+export const activeAbsenceFilter = (
+  from: Date = new Date(),
+  to: Date = from
+): Prisma.AbsenceWhereInput => ({
+  status: AbsenceStatuses.Approved,
+  startDate: { lte: absenceDay(to) },
+  endDate: { gte: absenceDay(from) },
+})
 
 /**
  * Creators a reviewer answers for
@@ -327,8 +343,7 @@ export const updateAbsence = async (
   if (!(await canReviewAbsence(reviewerId, current.accountId, isAdmin))) throw forbidden()
 
   // Only a current absence can move
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  const today = absenceDay()
 
   if (
     current.status === AbsenceStatuses.Refused ||
@@ -342,7 +357,13 @@ export const updateAbsence = async (
 
   const row = await prisma.absence.update({
     where: { id },
-    data: { startDate, endDate, dayCount, reason: encryptField(readText(values, 'reason')) },
+    data: {
+      startDate,
+      endDate,
+      dayCount,
+      // Unsent reason stays
+      ...('reason' in values ? { reason: encryptField(readText(values, 'reason')) } : {}),
+    },
     include: ABSENCE_INCLUDE,
   })
 

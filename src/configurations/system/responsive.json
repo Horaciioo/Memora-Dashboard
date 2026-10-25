@@ -20,6 +20,7 @@
       "desktop": 3
     }
   },
+  "breadcrumbFullChars": 24,
   "touchTargetMin": 44,
   "longPressMs": 450,
   "drawer": {

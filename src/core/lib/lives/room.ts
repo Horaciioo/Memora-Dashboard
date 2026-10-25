@@ -9,9 +9,10 @@ import { LIVE_STREAM_EVENTS, LIVE_TOPICS } from '@/declarations/lives/topics'
 import { runtime } from '@/managers/infrastructure/Core/runtime'
 import type { ModViewState } from '@/types/modview'
 import { LivePlatforms } from '@/utils/constants/lives'
+import { HOUR_SECONDS } from '@/utils/constants/time'
 
-// A live's memory outlives it by a day at most
-const ROOM_TTL_SECONDS = 86400
+// A live's memory outlives it this long at most
+const ROOM_TTL_SECONDS = LIVE_SETTINGS.memoryHours * HOUR_SECONDS
 
 // Burst kept before a flush
 const QUEUE_FACTOR = 4
@@ -38,6 +39,8 @@ interface LiveRoom {
   seq: number
   // Chatters who already spoke in this live
   seen: Set<string>
+  // Pending write of the shared memory
+  shareTimer: ReturnType<typeof setTimeout> | null
 }
 
 // Chatters remembered per live
@@ -102,6 +105,7 @@ const roomOf = (liveId: string): LiveRoom => {
     timer: null,
     seq: Date.now(),
     seen: new Set(),
+    shareTimer: null,
   }
   rooms.set(liveId, room)
 
@@ -129,7 +133,21 @@ const flushRoom = async (liveId: string, room: LiveRoom): Promise<void> => {
     events,
   })
 
-  // Other instances read it
+  // Other instances read it, a few seconds late at most
+  room.shareTimer ??= setTimeout(() => {
+    room.shareTimer = null
+    void shareMemory(liveId, room)
+  }, LIVE_SETTINGS.memoryShareSeconds * 1000)
+}
+
+/**
+ * Write a room's memory to Redis
+ * @param {string} liveId - Live
+ * @param {LiveRoom} room - Room
+ * @return {Promise<void>} - Written
+ */
+
+const shareMemory = async (liveId: string, room: LiveRoom): Promise<void> => {
   const redis = shared(liveId)
   if (!redis) return
   await redis.cache
@@ -208,6 +226,7 @@ export const readRoomMemory = async (liveId: string): Promise<RoomMemory | null>
 export const closeRoom = async (liveId: string): Promise<void> => {
   const room = rooms.get(liveId)
   if (room?.timer) clearTimeout(room.timer)
+  if (room?.shareTimer) clearTimeout(room.shareTimer)
   rooms.delete(liveId)
 
   const redis = shared(liveId)

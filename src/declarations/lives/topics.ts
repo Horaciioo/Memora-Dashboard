@@ -13,6 +13,8 @@ export const LIVE_TOPICS = {
   room: (id: string) => `live:${id}:room`,
   // Platform connection of a live
   connection: (id: string) => `live:${id}:connection`,
+  // Instance that watches the lives
+  watchLease: 'lives:watcher',
 }
 
 /**

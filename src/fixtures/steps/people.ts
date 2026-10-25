@@ -9,6 +9,7 @@ import {
   TIMEZONES,
   type FunctionKey,
 } from '../data/roster.ts'
+import { LEAD_DIVISION_RANK } from '../../declarations/reference/fixed.ts'
 import { MEMBER_NOTES } from '../data/texts.ts'
 import { memberPortrait, storeImage } from './images.ts'
 import type { Reference } from './reference.ts'
@@ -210,7 +211,7 @@ export const seedPeople = async (reference: Reference): Promise<Cast> => {
           functions: seed.functions,
           joinedAt: day(-seed.seniority),
           leftAt: null,
-          divisionRank: 3,
+          divisionRank: LEAD_DIVISION_RANK,
         },
         reference,
         index++
@@ -306,7 +307,7 @@ const seedTeams = async (
       await prisma.team.create({
         data: {
           id,
-          name: `${name} · ${creator.name}`,
+          name: `${name}, ${creator.name}`,
           summary,
           leads: { create: lead ? [{ accountId: lead.id }] : [] },
           youtuberId: creator.id,

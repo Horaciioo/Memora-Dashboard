@@ -18,7 +18,11 @@ export const InstructionsCard = () => {
       <InlineMarkdown
         id="recruitment-instructions"
         value={file.instructions}
-        placeholder={RECRUITMENT_COPY.instructionsPlaceholder}
+        placeholder={
+          can.writeInstructions
+            ? RECRUITMENT_COPY.instructionsPlaceholder
+            : RECRUITMENT_COPY.instructionsNone
+        }
         disabled={!can.writeInstructions}
         maxLength={fields.instruction[0]?.maxLength}
         onCommit={file.saveInstructions}

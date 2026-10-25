@@ -5,12 +5,9 @@ import { useCallback, useState } from 'react'
 import { apiDelete, apiPatch, apiPost, apiPut } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import type { ObserverView } from '@/types/recruitment'
-
-// Toast entity label
-const OBSERVER = 'Observateur'
 
 /**
  * Observers of one session
@@ -51,7 +48,7 @@ export const useObservers = (sessionId: string, initial: ObserverView[]): Observ
     async (values: FormValues) => {
       const saved = await run(
         () => apiPost<ObserverView[]>(API_ROUTES.recruitmentObservers(sessionId), values),
-        feedbackTitle(OBSERVER, 'created', 'masculine')
+        entityFeedback('observer', 'created')
       )
 
       if (saved) setObservers(saved)
@@ -65,7 +62,7 @@ export const useObservers = (sessionId: string, initial: ObserverView[]): Observ
     async (id: string, values: FormValues) => {
       const saved = await run(
         () => apiPatch<ObserverView[]>(API_ROUTES.observer(id), values),
-        feedbackTitle(OBSERVER, 'saved', 'masculine')
+        entityFeedback('observer', 'saved')
       )
 
       if (saved) setObservers(saved)
@@ -79,7 +76,7 @@ export const useObservers = (sessionId: string, initial: ObserverView[]): Observ
     async (id: string) => {
       const saved = await run(
         () => apiDelete<ObserverView[]>(API_ROUTES.observer(id)),
-        feedbackTitle(OBSERVER, 'deleted', 'masculine')
+        entityFeedback('observer', 'deleted')
       )
 
       if (saved) setObservers(saved)

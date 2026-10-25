@@ -1,3 +1,4 @@
+import { FunctionNames } from '@/declarations/reference/fixed'
 import type { Course } from '@/declarations/academy/curriculum/types'
 
 /**
@@ -12,7 +13,7 @@ export const LEGACY_DISCORD: Course = {
     'Superviser la modération du serveur avec Marsha : historique, corrections et préparation aux crises.',
   track: 'legacy',
   surface: 'discord',
-  functions: ['Discord'],
+  functions: [FunctionNames.Discord],
   minutes: 35,
   chapters: [
     {
@@ -159,7 +160,7 @@ export const LEGACY_LIVES: Course = {
     'Décider du livecon, briefer l’équipe avant un live et ajuster le panel à l’ambiance du chat.',
   track: 'legacy',
   surface: 'lives',
-  functions: ['Lives'],
+  functions: [FunctionNames.Lives],
   minutes: 35,
   chapters: [
     {
@@ -309,7 +310,7 @@ export const LEGACY_ANIMATORS: Course = {
     'Préparer, animer et clore un évènement en répartissant les rôles et en tirant les leçons.',
   track: 'legacy',
   surface: 'general',
-  functions: ['Animateurs'],
+  functions: [FunctionNames.Animators],
   minutes: 35,
   chapters: [
     {

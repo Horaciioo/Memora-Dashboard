@@ -12,9 +12,21 @@ const KEEP_ALIVE = encoder.encode(': keep-alive\n\n')
 const HIGH_WATER_BYTES = 64 * 1024
 
 /**
+ * Opening of one stream
+ * @typedef {Object} StreamOptions
+ * @property {string} [opening] - First bytes
+ * @property {(payload: unknown) => boolean} [accept] - Signals let through
+ */
+
+export interface StreamOptions {
+  opening?: string
+  accept?: (payload: unknown) => boolean
+}
+
+/**
  * Event stream factory, one frame per signal
  * @param {(payload: unknown) => string} write - Frame text
- * @return {(request: Request, topic: string, opening?: string) => ReadableStream<Uint8Array>} - Opener
+ * @return {(request: Request, topic: string, options?: StreamOptions) => ReadableStream<Uint8Array>} - Opener
  */
 
 export const liveStreamOf = (write: (payload: unknown) => string) => {
@@ -31,18 +43,25 @@ export const liveStreamOf = (write: (payload: unknown) => string) => {
     return frame
   }
 
-  return (request: Request, topic: string, opening?: string): ReadableStream<Uint8Array> => {
-    let release = () => {}
+  return (
+    request: Request,
+    topic: string,
+    { opening, accept = () => true }: StreamOptions = {}
+  ): ReadableStream<Uint8Array> => {
+    let stop = () => {}
 
     return new ReadableStream<Uint8Array>(
       {
         start: (controller) => {
           let isOpen = true
+          let release = () => {}
           const lag = -LIVE_SETTINGS.feedSlowKilobytes * 1024
-          const end = (failed: boolean) => {
+          const end = (failed: boolean, closes = true) => {
             if (!isOpen) return
             isOpen = false
             release()
+            // A cancelled stream is already closed
+            if (!closes) return
             if (failed) controller.error(new Error('slow reader'))
             else controller.close()
           }
@@ -52,9 +71,12 @@ export const liveStreamOf = (write: (payload: unknown) => string) => {
             if ((controller.desiredSize ?? 0) < lag) end(true)
             else controller.enqueue(chunk)
           }
+          stop = () => end(false, false)
 
           if (opening) send(encoder.encode(opening))
-          const unsubscribe = subscribeLive(topic, (payload) => send(frameOf(payload)))
+          const unsubscribe = subscribeLive(topic, (payload) => {
+            if (accept(payload)) send(frameOf(payload))
+          })
           const keepAlive = setInterval(
             () => send(KEEP_ALIVE),
             LIVE_SETTINGS.streamKeepAliveSeconds * 1000
@@ -66,9 +88,10 @@ export const liveStreamOf = (write: (payload: unknown) => string) => {
           }
 
           // Browser gone
-          request.signal.addEventListener('abort', () => end(false))
+          if (request.signal.aborted) end(false)
+          else request.signal.addEventListener('abort', () => end(false))
         },
-        cancel: () => release(),
+        cancel: () => stop(),
       },
       new ByteLengthQueuingStrategy({ highWaterMark: HIGH_WATER_BYTES })
     )

@@ -391,7 +391,7 @@ export const ProjectFileTabs = ({
         <TaskCheck id={task.id} isDone={task.isDone} enabled />
         <span
           className={cn(
-            'min-w-0 flex-1 truncate font-medium',
+            'line-clamp-2 min-w-0 flex-1 font-medium break-words md:truncate',
             isValidated(task) && 'text-[var(--color-ink-subtle)] line-through'
           )}
         >
@@ -418,7 +418,9 @@ export const ProjectFileTabs = ({
   const meetingLine = (meeting: MeetingSummary) => (
     <>
       <Glyph value={meeting.emoji} size="row" />
-      <span className="min-w-0 flex-1 truncate font-medium">{meeting.title}</span>
+      <span className="line-clamp-2 min-w-0 flex-1 font-medium break-words md:truncate">
+        {meeting.title}
+      </span>
       <span className={cn('text-xs text-[var(--color-ink-subtle)]', LIST_STYLES.desktopOnly)}>
         {formatDayTime(meeting.scheduledAt)}
       </span>

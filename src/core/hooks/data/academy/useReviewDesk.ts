@@ -9,7 +9,7 @@ import { QUERY_KEYS } from '@/core/lib/api/keys'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import type { ReviewDecisionInput } from '@/core/hooks/data/academy/useJuniorFile'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { AcademyReviewView, JuniorSkillView } from '@/types/academy'
 import type { FieldIssue, FormValues } from '@/types/forms'
 import { ReviewStatuses } from '@/utils/constants/hierarchy'
@@ -114,7 +114,7 @@ export const useReviewDesk = (juniorId: string): ReviewDesk => {
 
       const submitted = await run(
         () => apiPost<AcademyReviewView[]>(API_ROUTES.reviewSubmit(current.id), {}),
-        feedbackTitle('Bilan', 'saved', 'masculine')
+        entityFeedback('review', 'saved')
       )
       if (submitted) keep({ reviews: submitted })
       router.refresh()
@@ -134,7 +134,7 @@ export const useReviewDesk = (juniorId: string): ReviewDesk => {
             deadlineAt: input.deadlineAt,
             decisionNote: input.decisionNote,
           }),
-        feedbackTitle('Bilan', 'saved', 'masculine')
+        entityFeedback('review', 'saved')
       )
       if (next) keep({ reviews: next })
       router.refresh()

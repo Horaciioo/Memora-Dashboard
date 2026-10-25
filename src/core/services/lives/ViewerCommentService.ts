@@ -4,12 +4,14 @@ import { decryptField, encryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
 import { notFound } from '@/core/lib/errors'
 import { readRequiredText, readText } from '@/core/lib/forms/values'
+import { findTwitchUser } from '@/core/lib/platforms/twitch/oauth'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { FORM_SETTINGS, LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import { MODVIEW_USER_COPY } from '@/declarations/modview/copy'
 import type { FieldDefinition, FormValues } from '@/types/forms'
 import type { LiveNote, ViewerComment } from '@/types/lives'
+import { LivePlatforms } from '@/utils/constants/lives'
 
 /**
  * Declarations of the viewer comment form
@@ -106,12 +108,17 @@ export const addViewerComment = async (input: {
   scope: AccessScope
 }): Promise<ViewerComment> => {
   const channel = await channelOf(input.liveId, input.scope)
+  // On Twitch the login comes from Twitch, never from the browser
+  const login =
+    channel.platform === LivePlatforms.Twitch
+      ? (await findTwitchUser(input.viewerId, 'id').catch(() => null))?.login
+      : readText(input.values, 'login')
 
   const row = await prisma.viewerComment.create({
     data: {
       ...channel,
       platformUserId: input.viewerId,
-      viewerLogin: readText(input.values, 'login') ?? input.viewerId,
+      viewerLogin: login ?? input.viewerId,
       authorAccountId: input.authorId,
       body: encryptField(readRequiredText(input.values, 'body')) ?? '',
     },

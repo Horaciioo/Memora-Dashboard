@@ -50,9 +50,18 @@ export const PATCH = createProtectedRoute({
       before.summary.division?.id ?? null
     )
 
-    await assertMemberAssignable(parsed.values, access.isAdmin, params.id)
+    await assertMemberAssignable(
+      parsed.values,
+      {
+        id: session.id,
+        role: session.role,
+        isAdmin: access.isAdmin,
+        isSystem: access.isSystem,
+      },
+      params.id
+    )
 
-    const member = await updateMember(params.id, parsed.values)
+    const member = await updateMember(params.id, parsed.values, session.isRoot)
 
     // Journal only a real change
     const change = summariseChange(

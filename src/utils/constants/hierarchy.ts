@@ -14,18 +14,25 @@ export const MemberRoles = {
 export type MemberRoleName = (typeof MemberRoles)[keyof typeof MemberRoles]
 
 /**
- * Roles holding every right but the system
+ * Roles holding every right
  * @type {MemberRoleName[]}
  */
 
-export const ADMIN_ROLES: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Employe]
+export const ADMIN_ROLES: MemberRoleName[] = [MemberRoles.Admin]
+
+/**
+ * Roles reaching every creator, the new ones included
+ * @type {MemberRoleName[]}
+ */
+
+export const GLOBAL_ROLES: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Employe]
 
 /**
  * Roles above the moderators
  * @type {MemberRoleName[]}
  */
 
-export const LEADERSHIP_ROLES: MemberRoleName[] = [...ADMIN_ROLES, MemberRoles.Responsable]
+export const LEADERSHIP_ROLES: MemberRoleName[] = [...GLOBAL_ROLES, MemberRoles.Responsable]
 
 /**
  * Access console categories

@@ -13,6 +13,7 @@ import { readLiveTeam } from '@/core/services/lives/ModStintService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 import type { LiveLogLine, LiveModTime, LiveNote, LiveView } from '@/types/lives'
 import type { PermissionName } from '@/utils/constants/permissions'
+import { HOUR_MS, MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Report of a live and its log
@@ -58,14 +59,14 @@ export const readLiveReport = async (
   const live = await readLive(liveId, scope, viewerId, held)
   const start = new Date(live.startedAt ?? live.plannedStartAt)
   // A live left open for days stops at the report ceiling
-  const ceiling = new Date(start.getTime() + LIVE_SETTINGS.reportMaxHours * 3_600_000)
+  const ceiling = new Date(start.getTime() + LIVE_SETTINGS.reportMaxHours * HOUR_MS)
   const end = live.endedAt
     ? new Date(Math.min(Date.parse(live.endedAt), +ceiling))
     : new Date(Math.min(Date.now(), +ceiling))
   // Wider slices keep the charts readable on a long live
   const bucketMinutes = Math.max(
     LIVE_SETTINGS.reportBucketMinutes,
-    Math.ceil((end.getTime() - start.getTime()) / 60_000 / LIVE_SETTINGS.reportMaxSlices)
+    Math.ceil((end.getTime() - start.getTime()) / MINUTE_MS / LIVE_SETTINGS.reportMaxSlices)
   )
 
   // Levels tied to the live

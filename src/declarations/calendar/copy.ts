@@ -19,6 +19,11 @@ export const CALENDAR_COPY = {
   agenda: 'Planning',
   agendaEmpty: 'Rien de prévu sur cette période.',
   day: 'Jour',
+  threeDays: '3 jours',
+  viewsTitle: 'Affichage',
+  creatorPicker: 'YouTubeur affiché',
+  allCreators: 'Tous',
+  moreEntries: 'Voir la journée',
   // Pointer mode
   gridMode: 'Geste sur la grille',
   modeDraw: 'Tracer',
@@ -145,6 +150,10 @@ export const ACADEMY_EVENT_COPY = {
  */
 
 export const AUDIENCE_COPY = {
+  // Under a fixed audience
+  everyoneHint: 'Tout Memora est concerné !',
+  responsablesHint: 'Seuls les Responsables sont concernés !',
+  adminsHint: 'Réservé aux Administrateurs !',
   teams: 'Équipes',
   youtuberTeam: 'Toute l’équipe de',
   noYoutuber: 'Sans YouTubeur',

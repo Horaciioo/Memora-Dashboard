@@ -5,12 +5,9 @@ import { useCallback } from 'react'
 import { apiDelete, apiPost } from '@/core/lib/api/client'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { useSyncedState } from '@/core/hooks/interaction/state/useSyncedState'
-import { feedbackTitle } from '@/declarations/ui/copy'
+import { entityFeedback } from '@/declarations/ui/copy'
 import type { CommentView } from '@/types/comments'
 import type { FieldIssue, FormValues } from '@/types/forms'
-
-// Wording of the toasts
-const COMMENT = 'Commentaire'
 
 /**
  * Remarks of one record and their mutations
@@ -52,7 +49,7 @@ export const useComments = (
     async (values: FormValues) => {
       const next = await run(
         () => apiPost<CommentView[]>(addPath, values),
-        feedbackTitle(COMMENT, 'created', 'masculine')
+        entityFeedback('comment', 'created')
       )
       if (next) setComments(next)
 
@@ -65,7 +62,7 @@ export const useComments = (
     async (id: string) => {
       const next = await run(
         () => apiDelete<CommentView[]>(removePath(id)),
-        feedbackTitle(COMMENT, 'deleted', 'masculine')
+        entityFeedback('comment', 'deleted')
       )
       if (next) setComments(next)
     },

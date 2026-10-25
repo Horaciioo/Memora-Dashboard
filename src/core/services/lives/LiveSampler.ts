@@ -1,8 +1,6 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { readStream } from '@/core/lib/platforms/twitch/helix'
-import { readTwitchSeat } from '@/core/services/platforms/PlatformAccountService'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
 
 // Last sample per live
@@ -10,37 +8,18 @@ const lastSampled = new Map<string, number>()
 
 /**
  * Keep the viewer count of a live
- * @param {Object} input - Live coordinates
- * @param {string} input.liveId - Live
- * @param {string} input.holderId - Member whose token reads
- * @param {string} input.broadcasterId - Channel
+ * @param {string} liveId - Live
+ * @param {number} viewers - Spectators read with the stream
  * @return {Promise<void>} - Sampled
  */
 
-export const sampleViewers = async (input: {
-  liveId: string
-  holderId: string
-  broadcasterId: string
-}): Promise<void> => {
+export const sampleViewers = async (liveId: string, viewers: number): Promise<void> => {
   // One sample per interval
   const now = Date.now()
-  if (now - (lastSampled.get(input.liveId) ?? 0) < LIVE_SETTINGS.sampleSeconds * 1000) return
-  lastSampled.set(input.liveId, now)
+  if (now - (lastSampled.get(liveId) ?? 0) < LIVE_SETTINGS.sampleSeconds * 1000) return
+  lastSampled.set(liveId, now)
 
-  const seat = await readTwitchSeat(input.holderId).catch(() => null)
-  if (!seat?.ok) return
-
-  // Offline channels answer nothing
-  const stream = await readStream({
-    accessToken: seat.accessToken,
-    moderatorId: seat.moderatorId,
-    broadcasterId: input.broadcasterId,
-  }).catch(() => null)
-  if (!stream) return
-
-  await prisma.liveSample
-    .create({ data: { liveId: input.liveId, viewers: stream.viewers } })
-    .catch(() => null)
+  await prisma.liveSample.create({ data: { liveId, viewers } }).catch(() => null)
 }
 
 /**

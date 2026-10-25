@@ -32,11 +32,15 @@ const minOf = (field: FieldDefinition, values: FormValues): string | undefined =
  * Tell whether the flag a date field depends on drops its hour
  * @param {FieldDefinition} field - Field declaration
  * @param {FormValues} values - Current values
+ * @param {FieldDefinition[]} shown - Visible fields
  * @return {boolean} - Flag on
  */
 
-const locked = (field: FieldDefinition, values: FormValues): boolean =>
-  Boolean(field.hoursOffWhen) && values[field.hoursOffWhen as string] === true
+const locked = (field: FieldDefinition, values: FormValues, shown: FieldDefinition[]): boolean =>
+  Boolean(field.hoursOffWhen) &&
+  values[field.hoursOffWhen as string] === true &&
+  // A hidden flag never locks
+  shown.some((candidate) => candidate.name === field.hoursOffWhen)
 
 /**
  * Reason a field is greyed: it waits for another one, or a rule froze it
@@ -210,7 +214,7 @@ export const FormRenderer = ({
                   invalid={Boolean(error)}
                   describedBy={error ? `${id}-error` : undefined}
                   min={minOf(field, values)}
-                  hoursLocked={locked(field, values)}
+                  hoursLocked={locked(field, values, shown)}
                   onChange={(next) => onChange(field.name, next)}
                 />
               )
@@ -265,7 +269,7 @@ export const FormRenderer = ({
                 invalid={invalid}
                 describedBy={describedBy}
                 min={minOf(field, values)}
-                hoursLocked={locked(field, values)}
+                hoursLocked={locked(field, values, shown)}
                 onChange={(next) => onChange(field.name, next)}
               />
             )
