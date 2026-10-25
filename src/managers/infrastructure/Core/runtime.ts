@@ -35,12 +35,19 @@ const wireRateLimiter = (container: Sharding): void => {
   bindRateLimitStore({
     hit: async (key, windowSeconds) => {
       const namespaced = namespace ? `${namespace}:${key}` : key
-      const count = await cache.incr(namespaced)
+      // Count and lifetime together
+      const replies = await cache
+        .multi()
+        .incr(namespaced)
+        .expire(namespaced, windowSeconds, 'NX')
+        .ttl(namespaced)
+        .exec()
+      const [counted, , left] = (replies ?? []).map(([error, value]) => {
+        if (error) throw error
+        return Number(value)
+      })
 
-      // Only the first hit of a window carries its lifetime
-      if (count === 1) await cache.expire(namespaced, windowSeconds)
-
-      return count
+      return { count: counted ?? 0, resetSeconds: left && left > 0 ? left : windowSeconds }
     },
   })
 

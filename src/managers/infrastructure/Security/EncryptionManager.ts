@@ -12,6 +12,9 @@ const FORMAT_VERSION = 0x02
 // Block ciphers take a full block as their vector
 const BLOCK_IV_LENGTH = 16
 
+// Full GCM tag only
+const AUTH_TAG_LENGTH = 16
+
 /**
  * Derived legacy key
  * @typedef {Object} DerivedLegacyKey
@@ -160,6 +163,62 @@ export default class EncryptionManager {
 
   private _isAuthenticated(algorithm: string): boolean {
     return algorithm.includes('gcm') || algorithm.includes('ccm')
+  }
+
+  /**
+   * Open one payload
+   * @param {Object} input - Payload parts
+   * @param {Buffer} input.key - Key
+   * @param {string} input.algorithm - Algorithm
+   * @param {Buffer} input.iv - Vector
+   * @param {string} input.authTag - Tag, empty unauthenticated
+   * @param {string} input.data - Ciphertext
+   * @return {string} - Plaintext
+   * @private
+   */
+
+  private _open(input: {
+    key: Buffer
+    algorithm: string
+    iv: Buffer
+    authTag: string
+    data: string
+  }): string {
+    const authenticated = Boolean(input.authTag) && this._isAuthenticated(input.algorithm)
+    const decipher = authenticated
+      ? crypto.createDecipheriv(input.algorithm as crypto.CipherGCMTypes, input.key, input.iv, {
+          authTagLength: AUTH_TAG_LENGTH,
+        })
+      : crypto.createDecipheriv(input.algorithm, input.key, input.iv)
+
+    // Tag checked on final
+    if (authenticated) {
+      ;(decipher as crypto.DecipherGCM).setAuthTag(Buffer.from(input.authTag, 'base64'))
+    }
+
+    return decipher.update(input.data, 'base64', 'utf8') + decipher.final('utf8')
+  }
+
+  /**
+   * Try current then rotated keys
+   * @param {(key: Buffer) => string} open - Opener
+   * @return {string} - Plaintext
+   * @private
+   */
+
+  private _openWithAnyKey(open: (key: Buffer) => string): string {
+    try {
+      return open(this._key as Buffer)
+    } catch (error) {
+      for (const legacyKey of this._legacyKeys) {
+        try {
+          return open(legacyKey.key)
+        } catch {
+          // Next key
+        }
+      }
+      throw error
+    }
   }
 
   /**
@@ -320,18 +379,10 @@ export default class EncryptionManager {
       // Get algorithm
       const algorithm = authTagBase64 ? this._algorithm : 'aes-256-cbc'
 
-      // Create decipher
-      const decipher = crypto.createDecipheriv(algorithm, this._key as Buffer, iv)
-
-      // Set auth tag
-      if (authTagBase64 && this._isAuthenticated(algorithm)) {
-        ;(decipher as crypto.DecipherGCM).setAuthTag(Buffer.from(authTagBase64, 'base64'))
-      }
-
-      // Decrypt
-      let decrypted = decipher.update(encryptedData, 'base64', 'utf8')
-
-      decrypted += decipher.final('utf8')
+      // Current key, then rotated ones
+      const decrypted = this._openWithAnyKey((key) =>
+        this._open({ key, algorithm, iv, authTag: authTagBase64, data: encryptedData })
+      )
 
       // Parse if requested
       if (options.parse) return JSON.parse(decrypted)
@@ -498,22 +549,14 @@ export default class EncryptionManager {
         config.shared.iterations
       )
 
-      // Create decipher
-      const decipher = crypto.createDecipheriv(
-        algorithm,
-        keyBuffer,
-        Buffer.from(ivBase64, 'base64')
-      )
-
-      // Set auth tag
-      if (authTagBase64 && this._isAuthenticated(algorithm)) {
-        ;(decipher as crypto.DecipherGCM).setAuthTag(Buffer.from(authTagBase64, 'base64'))
-      }
-
       // Decrypt
-      let decrypted = decipher.update(encryptedData, 'base64', 'utf8')
-
-      decrypted += decipher.final('utf8')
+      const decrypted = this._open({
+        key: keyBuffer,
+        algorithm,
+        iv: Buffer.from(ivBase64, 'base64'),
+        authTag: authTagBase64,
+        data: encryptedData,
+      })
 
       // Parse if requested
       if (options.parse) return JSON.parse(decrypted)

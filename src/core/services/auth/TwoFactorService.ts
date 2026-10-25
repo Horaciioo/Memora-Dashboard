@@ -4,6 +4,7 @@ import { cache } from 'react'
 import { renderSVG } from 'uqr'
 
 import { prisma } from '@/core/lib/db'
+import { digestSessionToken } from '@/core/lib/auth/sessionDigest'
 import { decryptSecret, encryptSecret } from '@/core/lib/crypto'
 import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import {
@@ -17,9 +18,7 @@ import { APP_NAME } from '@/declarations/app'
 import { TWO_FACTOR_SETTINGS } from '@/declarations/configurations/settings'
 import { TWO_FACTOR_COPY } from '@/declarations/access/copy'
 import type { TwoFactorEnrolment, TwoFactorState } from '@/types/security'
-
-// Milliseconds in one minute
-const MINUTE_MS = 60_000
+import { MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Read a credential
@@ -144,14 +143,18 @@ export const assertCode = async (accountId: string, code: string): Promise<void>
     credential.lastStep ? Number(credential.lastStep) : undefined
   )
 
-  // The spent step is recorded so the same code never opens twice
+  // A step is spent once, even concurrently
   if (step !== null) {
-    await prisma.twoFactorCredential.update({
-      where: { id: credential.id },
+    const { count } = await prisma.twoFactorCredential.updateMany({
+      where: {
+        id: credential.id,
+        OR: [{ lastStep: null }, { lastStep: { lt: BigInt(step) } }],
+      },
       data: { lastStep: BigInt(step) },
     })
+    if (count === 1) return
 
-    return
+    throw invalidInput([{ field: 'code', message: TWO_FACTOR_COPY.wrongCode }])
   }
 
   const spent = await spendRecoveryCode(credential.id, code)
@@ -210,7 +213,10 @@ export const dropEnrolment = async (accountId: string, code: string): Promise<vo
 
 export const unsealSession = async (token: string): Promise<string> => {
   const unsealedAt = new Date()
-  await prisma.session.updateMany({ where: { token }, data: { unsealedAt } })
+  await prisma.session.updateMany({
+    where: { token: digestSessionToken(token) },
+    data: { unsealedAt },
+  })
 
   return new Date(
     unsealedAt.getTime() + TWO_FACTOR_SETTINGS.unlockMinutes * MINUTE_MS
@@ -224,7 +230,10 @@ export const unsealSession = async (token: string): Promise<string> => {
  */
 
 export const sealSession = async (token: string): Promise<void> => {
-  await prisma.session.updateMany({ where: { token }, data: { unsealedAt: null } })
+  await prisma.session.updateMany({
+    where: { token: digestSessionToken(token) },
+    data: { unsealedAt: null },
+  })
 }
 
 /**
@@ -235,7 +244,7 @@ export const sealSession = async (token: string): Promise<void> => {
 
 export const readUnlockWindow = cache(async (token: string): Promise<string | null> => {
   const session = await prisma.session.findUnique({
-    where: { token },
+    where: { token: digestSessionToken(token) },
     select: { unsealedAt: true },
   })
   if (!session?.unsealedAt) return null
