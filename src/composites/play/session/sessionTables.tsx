@@ -1,0 +1,104 @@
+import type { ReactNode } from 'react'
+
+import { BaccalaureatBoard } from '@/composites/play/baccalaureat/BaccalaureatBoard'
+import type { BacBoardView } from '@/composites/play/baccalaureat/types'
+import { BombBoard } from '@/composites/play/bomb/BombBoard'
+import type { BombBoardView } from '@/composites/play/bomb/types'
+import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
+import { BacSessionProgress } from '@/composites/play/session/BacSessionProgress'
+import { PlaySessionFeed } from '@/composites/play/session/PlaySessionFeed'
+import { BAC_FEED_COPY, BOMB_FEED_COPY } from '@/declarations/play'
+import { PlayGames } from '@/utils/constants/play'
+import type { PlayGameName } from '@/utils/constants/play'
+
+/**
+ * What a running table is drawn from
+ * @typedef {Object} PlayTableInput
+ */
+
+export interface PlayTableInput {
+  sessionId: string
+  board: unknown
+  players: PlayFace[]
+  // Seated once, gone or not
+  seats: PlayFace[]
+  spectators: PlayFace[]
+  viewerId: string
+  me: { isSeated: boolean; isHost: boolean }
+}
+
+/**
+ * Board and feed of a running game
+ * @typedef {Object} PlayTable
+ */
+
+export interface PlayTable {
+  board: ReactNode
+  feed: ReactNode
+}
+
+/**
+ * Faces as a board names them
+ * @param {PlayFace[]} faces - Faces
+ * @return {object[]} - Board players
+ */
+
+const asPlayers = (faces: PlayFace[]) =>
+  faces.map(({ id, name, avatarUrl }) => ({ accountId: id, name, avatarUrl }))
+
+/**
+ * Running table per game
+ * @type {Partial<Record<PlayGameName, (input: PlayTableInput) => PlayTable>>}
+ */
+
+export const PLAY_SESSION_TABLES: Partial<
+  Record<PlayGameName, (input: PlayTableInput) => PlayTable>
+> = {
+  [PlayGames.Baccalaureat]: ({ sessionId, board, players, spectators, viewerId, me }) => {
+    const bac = board as BacBoardView
+
+    return {
+      board: (
+        <>
+          <BaccalaureatBoard
+            sessionId={sessionId}
+            board={bac}
+            players={asPlayers(players)}
+            viewerId={viewerId}
+            me={me}
+          />
+          {!bac.recap && <BacSessionProgress players={players} done={bac.done} />}
+        </>
+      ),
+      feed: (
+        <PlaySessionFeed
+          feed={bac.feed}
+          copy={BAC_FEED_COPY}
+          players={[...players, ...spectators]}
+        />
+      ),
+    }
+  },
+  [PlayGames.Bomb]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+    const bomb = board as BombBoardView
+
+    return {
+      board: (
+        <BombBoard
+          sessionId={sessionId}
+          board={bomb}
+          faces={asPlayers(seats)}
+          viewerId={viewerId}
+          isSeated={me.isSeated}
+        />
+      ),
+      feed: (
+        <PlaySessionFeed
+          feed={bomb.feed}
+          copy={BOMB_FEED_COPY}
+          players={[...seats, ...spectators]}
+        />
+      ),
+    }
+  },
+}

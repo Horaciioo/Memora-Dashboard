@@ -9,6 +9,7 @@ import {
 } from '@/core/lib/play/baccalaureat'
 import { lookUpWords } from '@/core/lib/play/baccalaureat/dictionary'
 import { baccalaureatRecap } from '@/core/services/play/baccalaureat/BaccalaureatRecapService'
+import { after } from '@/core/lib/play/clock'
 import {
   BACCALAUREAT_CATEGORIES,
   BACCALAUREAT_SETTINGS,
@@ -39,6 +40,86 @@ const ANSWER_SELECT = {
 } as const
 
 /**
+ * One line of the session feed
+ * @typedef {Object} BacFeedEntry
+ */
+
+export interface BacFeedEntry {
+  id: string
+  kind: 'letter' | 'finished' | 'stopped' | 'closed' | 'scored'
+  accountId: string | null
+  at: Date
+  values: { index: number; letter: string }
+}
+
+/**
+ * Feed of a game, read from its rounds, newest first
+ * @param {object[]} rounds - Rounds with their dates
+ * @param {object[]} totals - Answers per round and player
+ * @param {number} categories - Fields to fill
+ * @return {BacFeedEntry[]} - Lines
+ */
+
+const sessionFeed = (
+  rounds: {
+    id: string
+    index: number
+    letter: string
+    startsAt: Date
+    endsAt: Date
+    closedAt: Date | null
+    scoredAt: Date | null
+    stoppedById: string | null
+  }[],
+  totals: {
+    roundId: string
+    accountId: string
+    _count: { _all: number }
+    _max: { updatedAt: Date | null }
+  }[],
+  categories: number
+): BacFeedEntry[] => {
+  const now = new Date()
+  const line = (
+    round: (typeof rounds)[number],
+    kind: BacFeedEntry['kind'],
+    at: Date,
+    accountId: string | null = null
+  ): BacFeedEntry => ({
+    id: `${round.id}-${kind}-${accountId ?? ''}`,
+    kind,
+    accountId,
+    at,
+    values: { index: round.index + 1, letter: round.letter },
+  })
+
+  return rounds
+    .filter((round) => round.startsAt <= now)
+    .flatMap((round) => [
+      line(round, 'letter', round.startsAt),
+      ...totals
+        .filter((total) => total.roundId === round.id && total._count._all >= categories)
+        .map((total) =>
+          line(round, 'finished', total._max.updatedAt ?? round.startsAt, total.accountId)
+        ),
+      // Stop shortens the clock to the grace period
+      ...(round.stoppedById
+        ? [
+            line(
+              round,
+              'stopped',
+              after(round.endsAt, -BACCALAUREAT_SETTINGS.stop.graceSeconds),
+              round.stoppedById
+            ),
+          ]
+        : []),
+      ...(round.closedAt ? [line(round, 'closed', round.closedAt)] : []),
+      ...(round.scoredAt ? [line(round, 'scored', round.scoredAt)] : []),
+    ])
+    .sort((left, right) => right.at.getTime() - left.at.getTime())
+}
+
+/**
  * Board of a Baccalaureat game
  * @param {EngineSession} session - Game
  * @param {string} viewerId - Reader
@@ -55,6 +136,9 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
         id: true,
         index: true,
         letter: true,
+        startsAt: true,
+        endsAt: true,
+        closedAt: true,
         scoredAt: true,
         stoppedById: true,
         bonus: true,
@@ -65,6 +149,8 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
       by: ['roundId', 'accountId'],
       where: { round: { sessionId: session.id } },
       _sum: { points: true },
+      _count: { _all: true },
+      _max: { updatedAt: true },
     }),
   ])
 
@@ -92,8 +178,17 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
     myVote: votes.find((vote) => vote.voterId === viewerId)?.accepted ?? null,
   }))
 
+  // Players done with the latest round
+  const done = totals
+    .filter(
+      (total) => total.roundId === latest?.id && total._count._all >= settings.categories.length
+    )
+    .map((total) => total.accountId)
+
   return {
     settings,
+    done,
+    feed: sessionFeed(rounds, totals, settings.categories.length),
     roundsTotal: settings.rounds,
     history: rounds.map((entry) => ({
       index: entry.index,

@@ -60,20 +60,6 @@ export const FlashGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
- * Gamepad
- * @param {GlyphProps} props - Sizing and colour class
- * @return {JSX.Element}
- */
-
-export const PlayGlyph = ({ className }: GlyphProps) => (
-  <Stroke className={className}>
-    <path d="M7.5 7h9a5 5 0 0 1 4.9 6l-.6 3a2.6 2.6 0 0 1-4.5 1.2L14.7 15H9.3l-1.6 2.2a2.6 2.6 0 0 1-4.5-1.2l-.6-3a5 5 0 0 1 4.9-6z" />
-    <path d="M8 10v3M6.5 11.5h3" />
-    <path d="M15.5 11h.01M17.5 12.5h.01" />
-  </Stroke>
-)
-
-/**
  * Next
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}
@@ -275,6 +261,18 @@ export const CloseGlyph = ({ className }: GlyphProps) => (
 export const ConfirmGlyph = ({ className }: GlyphProps) => (
   <Stroke className={className} width={2.4}>
     <path d="M5 12.5 9.5 17 19 7" />
+  </Stroke>
+)
+
+/**
+ * Medium dash, still going
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const DashGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={2.4}>
+    <path d="M8 12h8" />
   </Stroke>
 )
 
@@ -692,5 +690,32 @@ export const VoiceGlyph = ({ className }: GlyphProps) => (
   <Stroke className={className} width={2}>
     <path d="M4 10v4h3.5L12 18V6L7.5 10H4z" />
     <path d="M15.5 9a4 4 0 010 6M18 6.5a7.5 7.5 0 010 11" />
+  </Stroke>
+)
+
+/**
+ * Trophy cup line glyph
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const TrophyGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={2}>
+    <path d="M7 4h10v5a5 5 0 0 1-10 0Z" />
+    <path d="M7 6H4.5a2.5 2.5 0 0 0 3 3.5M17 6h2.5a2.5 2.5 0 0 1-3 3.5" />
+    <path d="M12 14v3M8.5 20h7M9.5 17h5v3h-5Z" />
+  </Stroke>
+)
+
+/**
+ * Rising bars line glyph
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const StatsGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={2}>
+    <path d="M4 20h16" />
+    <path d="M6.5 20v-6M11 20V9M15.5 20v-8M20 20V5" />
   </Stroke>
 )

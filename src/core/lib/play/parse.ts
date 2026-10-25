@@ -69,3 +69,17 @@ export const readBodyMap = (
     Object.entries(value).filter((entry): entry is [string, string] => typeof entry[1] === 'string')
   )
 }
+
+/**
+ * Clamp into a range
+ * @param {number | undefined} value - Asked value
+ * @param {number} fallback - Current value
+ * @param {{ min: number, max: number }} range - Bounds
+ * @return {number} - Bounded value
+ */
+
+export const clampToRange = (
+  value: number | undefined,
+  fallback: number,
+  range: { min: number; max: number }
+): number => Math.min(range.max, Math.max(range.min, value ?? fallback))

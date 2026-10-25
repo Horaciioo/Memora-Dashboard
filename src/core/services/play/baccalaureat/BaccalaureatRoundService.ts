@@ -3,11 +3,11 @@ import 'server-only'
 import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { readBodyMap } from '@/core/lib/play'
+import { after } from '@/core/lib/play/clock'
 import { BaccalaureatPhases, drawLetter, roundPhase } from '@/core/lib/play/baccalaureat'
 import { BACCALAUREAT_SETTINGS, PLAY_ERRORS } from '@/declarations/play'
 import type { EngineSession, EngineStep } from '@/types/play'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
-import { SECOND_MS } from '@/utils/constants/time'
 
 /**
  * Latest round of a game
@@ -17,16 +17,6 @@ import { SECOND_MS } from '@/utils/constants/time'
 
 export const latestRound = (sessionId: string) =>
   prisma.baccalaureatRound.findFirst({ where: { sessionId }, orderBy: { index: 'desc' } })
-
-/**
- * Moment past a delay
- * @param {Date} from - Start
- * @param {number} seconds - Delay
- * @return {Date} - Later moment
- */
-
-export const after = (from: Date, seconds: number): Date =>
-  new Date(from.getTime() + seconds * SECOND_MS)
 
 /**
  * Deadline of a round still open
@@ -113,6 +103,8 @@ export const writeAnswers = async (
     }))
   const filled = answers.filter((answer) => answer.word)
   const cleared = answers.filter((answer) => !answer.word).map((answer) => answer.category)
+  const where = { roundId: round.id, accountId }
+  const before = await prisma.baccalaureatAnswer.count({ where })
 
   await prisma.$transaction([
     prisma.baccalaureatAnswer.deleteMany({
@@ -127,8 +119,18 @@ export const writeAnswers = async (
     ),
   ])
 
-  // Drafts stay private, nobody refreshes
-  return { changed: false, finished: false, deadline: null }
+  // Drafts stay private, the table only hears a player finish or reopen
+  const count = await prisma.baccalaureatAnswer.count({ where })
+  const changed = before >= known.size !== count >= known.size
+
+  // First one done stops the round on their behalf
+  const settings = baccalaureatSettingsOf(session.settings)
+  if (changed && count >= known.size && settings.stop && settings.autoStop) {
+    const stopped = await stopRound(round.id, accountId)
+    if (stopped) return stopped
+  }
+
+  return { changed, finished: false, deadline: null }
 }
 
 /**
@@ -146,14 +148,26 @@ export const callStop = async (session: EngineSession, accountId: string): Promi
   const filled = await prisma.baccalaureatAnswer.count({ where: { roundId: round.id, accountId } })
   if (filled < settings.categories.length) throw conflict(PLAY_ERRORS.stopIncomplete)
 
-  // First stop wins, the others see the shortened clock
+  return (
+    (await stopRound(round.id, accountId)) ?? { changed: false, finished: false, deadline: null }
+  )
+}
+
+/**
+ * Shorten the clock of a round, first stop wins
+ * @param {string} roundId - Round
+ * @param {string} accountId - Stopper
+ * @return {Promise<EngineStep | null>} - Step, null when already stopped
+ */
+
+const stopRound = async (roundId: string, accountId: string): Promise<EngineStep | null> => {
   const endsAt = after(new Date(), BACCALAUREAT_SETTINGS.stop.graceSeconds)
   const { count } = await prisma.baccalaureatRound.updateMany({
-    where: { id: round.id, stoppedById: null, endsAt: { gt: endsAt } },
+    where: { id: roundId, stoppedById: null, endsAt: { gt: endsAt } },
     data: { stoppedById: accountId, endsAt },
   })
 
-  return { changed: count > 0, finished: false, deadline: count > 0 ? closingAt({ endsAt }) : null }
+  return count > 0 ? { changed: true, finished: false, deadline: closingAt({ endsAt }) } : null
 }
 
 /**

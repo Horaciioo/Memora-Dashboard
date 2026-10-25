@@ -48,3 +48,29 @@ export const PlayOutcomes = {
 } as const
 
 export type PlayOutcomeName = (typeof PlayOutcomes)[keyof typeof PlayOutcomes]
+
+/**
+ * Seats an invitation offers
+ * @type {Record<string, string>}
+ */
+
+export const PlayInviteRoles = {
+  Player: 'PLAYER',
+  Spectator: 'SPECTATOR',
+} as const
+
+export type PlayInviteRoleName = (typeof PlayInviteRoles)[keyof typeof PlayInviteRoles]
+
+/**
+ * What a chat line is
+ * @type {Record<string, string>}
+ */
+
+export const PlayMessageKinds = {
+  Text: 'TEXT',
+  Joined: 'JOINED',
+  Left: 'LEFT',
+  Kicked: 'KICKED',
+} as const
+
+export type PlayMessageKindName = (typeof PlayMessageKinds)[keyof typeof PlayMessageKinds]

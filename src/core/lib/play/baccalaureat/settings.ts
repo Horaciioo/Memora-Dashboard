@@ -1,7 +1,7 @@
 import type { Prisma } from '@prisma/client'
 
 import { invalidInput } from '@/core/lib/errors'
-import { readBodyInteger, readBodyList } from '@/core/lib/play'
+import { clampToRange, readBodyInteger, readBodyList } from '@/core/lib/play'
 import {
   BACCALAUREAT_CATEGORIES,
   BACCALAUREAT_PACKS,
@@ -34,6 +34,8 @@ export interface BaccalaureatGameSettings {
   rounds: number
   roundSeconds: number
   stop: boolean
+  // Stop called for the first player done
+  autoStop: boolean
   flash: boolean
 }
 
@@ -71,20 +73,6 @@ const refuse = (field: string, message: string): never => {
 }
 
 /**
- * Clamp into a range
- * @param {number | undefined} value - Asked value
- * @param {number} fallback - Current value
- * @param {{ min: number, max: number }} range - Bounds
- * @return {number} - Bounded value
- */
-
-const within = (
-  value: number | undefined,
-  fallback: number,
-  range: { min: number; max: number }
-): number => Math.min(range.max, Math.max(range.min, value ?? fallback))
-
-/**
  * Default Baccalaureat choices
  * @return {BaccalaureatGameSettings} - Settings
  */
@@ -97,6 +85,7 @@ export const baccalaureatDefaults = (): BaccalaureatGameSettings => ({
   rounds: BACCALAUREAT_SETTINGS.rounds.initial,
   roundSeconds: BACCALAUREAT_SETTINGS.roundSeconds.initial,
   stop: BACCALAUREAT_SETTINGS.stop.enabled,
+  autoStop: false,
   flash: false,
 })
 
@@ -183,7 +172,7 @@ export const readBaccalaureatSettings = (
     ...baccalaureatDefaults(),
     ...(stored as Partial<BaccalaureatGameSettings> | null),
   }
-  const rounds = within(
+  const rounds = clampToRange(
     readBodyInteger(raw, 'rounds'),
     current.rounds,
     BACCALAUREAT_SETTINGS.rounds
@@ -207,8 +196,13 @@ export const readBaccalaureatSettings = (
     categories: readCategories(withPack(raw, raw.flash === true), current.categories),
     letters,
     rounds,
-    roundSeconds: within(askedSeconds, current.roundSeconds, BACCALAUREAT_SETTINGS.roundSeconds),
+    roundSeconds: clampToRange(
+      askedSeconds,
+      current.roundSeconds,
+      BACCALAUREAT_SETTINGS.roundSeconds
+    ),
     stop: typeof raw.stop === 'boolean' ? raw.stop : current.stop,
+    autoStop: typeof raw.autoStop === 'boolean' ? raw.autoStop : current.autoStop,
     flash,
   }
 

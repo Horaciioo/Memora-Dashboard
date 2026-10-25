@@ -17,6 +17,8 @@ import { SimulationBanner } from '@/composites/shell/SimulationBanner'
 import { RailToolbar } from '@/composites/shell/RailToolbar'
 import { RailShortcuts } from '@/composites/shell/RailShortcuts'
 import { ReleaseNotice } from '@/composites/changelog/ReleaseNotice'
+import { PlayNotice } from '@/composites/play/hub/PlayNotice'
+import { usePlayNotice } from '@/core/hooks/interaction/layout/usePlayNotice'
 import { useCalendarRail } from '@/core/hooks/interaction/calendar/useCalendarRail'
 import { useCalendarRailView } from '@/core/hooks/interaction/calendar/useCalendarRailView'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
@@ -90,6 +92,12 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
 
   const { shortcuts, groups } = useRailEntries(viewContext)
   const newsAt = shortcuts.findIndex((item) => item.href === ROUTES.changelog)
+  const playAt = shortcuts.findIndex((item) => item.href === ROUTES.play)
+  // One bubble at a time, Play first until it is dismissed
+  const [isPlayDismissed] = usePlayNotice()
+  const hasPlayNotice = playAt >= 0 && !isPlayDismissed
+  // Pointer under the middle of a box
+  const pointAt = (index: number) => (index + 0.5) / shortcuts.length
 
   const nav = (
     <RailNav
@@ -106,8 +114,9 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
     <>
       <RailShortcuts items={shortcuts} isUnlocking={isTouring} />
       {/* Hangs under the news shortcut it announces */}
-      {!isCompact && !isCalendarMenu && (
-        <ReleaseNotice pointedAt={newsAt >= 0 ? (newsAt + 0.5) / shortcuts.length : undefined} />
+      {!isCompact && !isCalendarMenu && hasPlayNotice && <PlayNotice pointedAt={pointAt(playAt)} />}
+      {!isCompact && !isCalendarMenu && !hasPlayNotice && (
+        <ReleaseNotice pointedAt={newsAt >= 0 ? pointAt(newsAt) : undefined} />
       )}
     </>
   )

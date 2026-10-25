@@ -6,7 +6,9 @@ import {
   BACCALAUREAT_SETTINGS,
   PLAY_GAMES,
   PLAY_SETTINGS,
+  playGameOfSlug,
 } from '@/declarations/play'
+import type { PlayGameName } from '@/utils/constants/play'
 import { PLAY_ENGINES } from '@/core/engines/play'
 
 /**
@@ -35,3 +37,17 @@ export const readCatalog = () => ({
     countdownSeconds: BACCALAUREAT_SETTINGS.countdownSeconds,
   },
 })
+
+/**
+ * Shipped game behind a URL segment
+ * @param {string} slug - URL segment
+ * @return {PlayGameName | null} - Game, or nothing for a secret one
+ */
+
+export const openGameOfSlug = (slug: string): PlayGameName | null => {
+  const game = playGameOfSlug(slug)
+
+  return game && readCatalog().games.some((entry) => entry.game === game && entry.playable)
+    ? game
+    : null
+}

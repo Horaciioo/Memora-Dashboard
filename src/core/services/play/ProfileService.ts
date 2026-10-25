@@ -3,8 +3,14 @@ import 'server-only'
 import { openSeatOf } from '@/core/lib/play/session'
 import { prisma } from '@/core/lib/db'
 import { levelOf } from '@/core/lib/play'
-import { PLAY_GAMES, PLAY_SETTINGS } from '@/declarations/play'
-import type { PlayPresence } from '@/types/play'
+import {
+  PLAY_GAMES,
+  PLAY_LEADER_KEYS,
+  PLAY_LEADER_METRICS,
+  PLAY_SETTINGS,
+} from '@/declarations/play'
+import type { PlayLeaderMetric } from '@/declarations/play'
+import type { PlayLeader, PlayPresence } from '@/types/play'
 import type { Prisma } from '@prisma/client'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -88,15 +94,16 @@ export const readPlayProfile = async (accountId: string) => {
 }
 
 /**
- * Best players of one game
+ * Best players of one game by one measure
  * @param {PlayGameName} game - Game
- * @return {Promise<object[]>} - Leaders
+ * @param {PlayLeaderMetric} metric - Ranking measure
+ * @return {Promise<PlayLeader[]>} - Leaders
  */
 
-export const readLeaderboard = async (game: PlayGameName) => {
+const leadersBy = async (game: PlayGameName, metric: PlayLeaderMetric): Promise<PlayLeader[]> => {
   const leaders = await prisma.playGameStat.findMany({
     where: { game, played: { gt: 0 } },
-    orderBy: [{ xp: 'desc' }, { wins: 'desc' }],
+    orderBy: PLAY_LEADER_METRICS[metric].sort.map((field) => ({ [field]: 'desc' as const })),
     take: PLAY_SETTINGS.leaderboardSize,
     include: { account: { select: { displayName: true, avatarUrl: true } } },
   })
@@ -111,6 +118,22 @@ export const readLeaderboard = async (game: PlayGameName) => {
     wins: entry.wins,
     played: entry.played,
   }))
+}
+
+/**
+ * Best players of one game, one list per measure
+ * @param {PlayGameName} game - Game
+ * @return {Promise<Record<PlayLeaderMetric, PlayLeader[]>>} - Leaders
+ */
+
+export const readLeaderboards = async (
+  game: PlayGameName
+): Promise<Record<PlayLeaderMetric, PlayLeader[]>> => {
+  const lists = await Promise.all(PLAY_LEADER_KEYS.map((metric) => leadersBy(game, metric)))
+
+  return Object.fromEntries(
+    PLAY_LEADER_KEYS.map((metric, index) => [metric, lists[index]])
+  ) as Record<PlayLeaderMetric, PlayLeader[]>
 }
 
 /**
@@ -145,3 +168,22 @@ export const isPlayBanned = async (
     (await client.playProfile.findUnique({ where: { accountId }, select: { bannedAt: true } }))
       ?.bannedAt
   )
+
+/**
+ * Another player's name and stats
+ * @param {string} accountId - Player
+ * @return {Promise<object | null>} - Player and profile, null when gone
+ */
+
+export const readPlayPlayer = async (accountId: string) => {
+  const account = await prisma.account.findUnique({
+    where: { id: accountId },
+    select: { displayName: true, avatarUrl: true, anonymisedAt: true },
+  })
+  if (!account || account.anonymisedAt) return null
+
+  return {
+    player: { name: account.displayName, avatarUrl: account.avatarUrl },
+    profile: await readPlayProfile(accountId),
+  }
+}

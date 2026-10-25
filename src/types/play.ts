@@ -1,4 +1,9 @@
-import type { PlayGameName, PlayStatusName } from '@/utils/constants/play'
+import type {
+  PlayGameName,
+  PlayInviteRoleName,
+  PlayMessageKindName,
+  PlayStatusName,
+} from '@/utils/constants/play'
 import type { Prisma } from '@prisma/client'
 
 /**
@@ -89,19 +94,29 @@ export interface PlayTotalsView {
 }
 
 /**
+ * Counters every stat tile reads
+ * @typedef {Object} PlayTileTotals
+ */
+
+export interface PlayTileTotals extends PlayTotalsView {
+  bestStreak: number
+  playSeconds: number
+  tournamentsWon: number
+}
+
+/**
  * Levels and stats of a player
  * @typedef {Object} PlayProfileView
  */
 
 export interface PlayProfileView {
-  global: PlayTotalsView & {
+  global: PlayTileTotals & {
     bonusXp: number
-    bestStreak: number
     winRate: number
-    playSeconds: number
+    tournamentsPlayed: number
   }
   ban: { since: string; reason: string | null } | null
-  games: (PlayTotalsView & { game: PlayGameName })[]
+  games: (PlayTileTotals & { game: PlayGameName })[]
   maxLevel: number
 }
 
@@ -112,4 +127,59 @@ export interface PlayProfileView {
 
 export interface PlayAdminState extends PlayProfileView {
   presence: PlayPresence | null
+}
+
+/**
+ * Invitation waiting for a member
+ * @typedef {Object} PlayInviteView
+ */
+
+export interface PlayInviteView {
+  id: string
+  sessionId: string
+  game: PlayGameName
+  role: PlayInviteRoleName
+  isEveryone: boolean
+  inviter: { name: string; avatarUrl: string | null }
+  createdAt: string
+}
+
+/**
+ * Row of a game ranking
+ * @typedef {Object} PlayLeader
+ */
+
+export interface PlayLeader {
+  rank: number
+  accountId: string
+  name: string
+  avatarUrl: string | null
+  xp: number
+  level: number
+  wins: number
+  played: number
+}
+
+/**
+ * One line of a game chat
+ * @typedef {Object} PlayMessageView
+ */
+
+export interface PlayMessageView {
+  id: string
+  kind: PlayMessageKindName
+  body: string
+  createdAt: string
+  author: { id: string; name: string; avatarUrl: string | null }
+}
+
+/**
+ * Member who can be called to a game
+ * @typedef {Object} PlayCandidate
+ */
+
+export interface PlayCandidate {
+  id: string
+  displayName: string
+  avatarUrl: string | null
 }

@@ -12,11 +12,11 @@
   },
   "tournament": {
     "minGames": 2,
-    "maxGames": 7,
+    "maxGames": 9,
     "bonusPerGame": 0.5
   },
   "rewards": {
-    "minPlayers": 2,
+    "minPlayers": 1,
     "minSeconds": 60
   },
   "lobbyIdleMinutes": 30,

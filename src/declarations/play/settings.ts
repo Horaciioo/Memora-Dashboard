@@ -34,7 +34,7 @@ export interface PlayRange {
  * @return {PlayRange} - Bounded range
  */
 
-const readRange = (value: unknown, path: string, fallback: PlayRange): PlayRange => {
+export const readRange = (value: unknown, path: string, fallback: PlayRange): PlayRange => {
   const node = readNode(value, path)
   const min = readInteger(node.min, { path: `${path}.min`, fallback: fallback.min, min: 1 })
   const max = readInteger(node.max, { path: `${path}.max`, fallback: fallback.max, min })
@@ -57,6 +57,7 @@ const admin = readNode(play.admin, 'play/play.admin')
 const stop = readNode(baccalaureat.stop, 'play/baccalaureat.stop')
 const points = readNode(baccalaureat.points, 'play/baccalaureat.points')
 const flash = readNode(baccalaureat.flash, 'play/baccalaureat.flash')
+const bacTournament = readNode(baccalaureat.tournament, 'play/baccalaureat.tournament')
 
 // Tournament game bounds
 const minGames = readInteger(tournament.minGames, {
@@ -90,7 +91,7 @@ export const PLAY_SETTINGS = {
     minGames,
     maxGames: readInteger(tournament.maxGames, {
       path: 'play/play.tournament.maxGames',
-      fallback: 7,
+      fallback: 9,
       min: minGames,
     }),
     bonusPerGame: readNumber(tournament.bonusPerGame, {
@@ -253,6 +254,34 @@ export const BACCALAUREAT_SETTINGS = {
       path: 'play/baccalaureat.flash.pack',
       fallback: 'flash',
       allowed: Object.keys(BACCALAUREAT_PACKS) as (keyof typeof BACCALAUREAT_PACKS)[],
+    }),
+  },
+  // Round clocks offered at setup
+  roundPresets: (Array.isArray(baccalaureat.roundSeconds.presets)
+    ? baccalaureat.roundSeconds.presets
+    : [60, 120, 180]
+  ).map((seconds, index) =>
+    readInteger(seconds, {
+      path: `play/baccalaureat.roundSeconds.presets.${index}`,
+      fallback: 120,
+      min: 1,
+    })
+  ),
+  // Tournament lengths offered, rounds per game
+  tournament: {
+    games: (Array.isArray(bacTournament.games) ? bacTournament.games : [3, 6, 9]).map(
+      (games, index) =>
+        readInteger(games, {
+          path: `play/baccalaureat.tournament.games.${index}`,
+          fallback: 3,
+          min: minGames,
+          max: PLAY_SETTINGS.tournament.maxGames,
+        })
+    ),
+    rounds: readInteger(bacTournament.rounds, {
+      path: 'play/baccalaureat.tournament.rounds',
+      fallback: 3,
+      min: 1,
     }),
   },
   alphabet: [...alphabet.toUpperCase()],

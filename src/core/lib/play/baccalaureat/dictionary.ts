@@ -1,19 +1,7 @@
 import 'server-only'
 
+import { frenchWords } from '@/core/lib/play/dictionary'
 import { normalizeWord } from '@/core/lib/play/baccalaureat/words'
-
-// Loaded on the first review only
-let words: Promise<Set<string>> | null = null
-
-/**
- * French words, comparable form
- * @return {Promise<Set<string>>} - Word set
- */
-
-const dictionary = (): Promise<Set<string>> =>
-  (words ??= import('an-array-of-french-words/index.json').then(
-    (module) => new Set(module.default.map(normalizeWord))
-  ))
 
 /**
  * Dictionary hint per word, never a verdict
@@ -22,7 +10,7 @@ const dictionary = (): Promise<Set<string>> =>
  */
 
 export const lookUpWords = async (list: string[]): Promise<Map<string, boolean>> => {
-  const known = await dictionary()
+  const known = await frenchWords()
 
   return new Map(list.map((word) => [word, known.has(normalizeWord(word))]))
 }

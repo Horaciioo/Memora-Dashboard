@@ -35,6 +35,15 @@ export const PLAY_ERRORS = {
   notFinished: 'La partie n’est pas terminée.',
   rematchTournament: 'Un tournoi enchaîne déjà ses parties.',
   notScored: 'La manche n’est pas encore comptée.',
+  emptyMessage: 'Écris un message.',
+  longMessage: 'Ton message dépasse {max} caractères.',
+  inviteRole: 'Choisis joueur ou spectateur.',
+  inviteMissing: 'Cette invitation n’existe plus.',
+  sessionClosed: 'Cette partie est terminée.',
+  notYourTurn: 'Ce n’est pas ton tour.',
+  tooLate: 'La bombe a explosé avant ton mot.',
+  emptyWord: 'Écris un mot.',
+  bonusEmpty: 'Garde au moins une lettre bonus.',
 } as const
 
 /**

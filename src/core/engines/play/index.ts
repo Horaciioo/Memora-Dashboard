@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { BACCALAUREAT_ENGINE } from '@/core/engines/play/BaccalaureatEngine'
+import { BOMB_ENGINE } from '@/core/engines/play/BombEngine'
 import type { PlayEngine } from '@/types/play'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -12,6 +13,7 @@ import type { PlayGameName } from '@/utils/constants/play'
 
 export const PLAY_ENGINES: Partial<Record<PlayGameName, PlayEngine>> = {
   [PlayGames.Baccalaureat]: BACCALAUREAT_ENGINE,
+  [PlayGames.Bomb]: BOMB_ENGINE,
 }
 
 export type { EngineSession, EngineStep, PlayEngine } from '@/types/play'

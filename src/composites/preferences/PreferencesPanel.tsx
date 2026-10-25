@@ -10,6 +10,7 @@ import { FileTabs } from '@/components/structures/page/FileTabs'
 import { FormRenderer } from '@/components/structures/data/FormRenderer'
 import { Section } from '@/components/structures/page/Section'
 import { SealedValue } from '@/components/structures/inline/SealedValue'
+import { PlayStatsBoard } from '@/composites/play/member/PlayStatsBoard'
 import { AccountsSection } from '@/composites/preferences/AccountsSection'
 import { ProfileCard } from '@/composites/preferences/ProfileCard'
 import { ColorVisionPreferences } from '@/composites/preferences/ColorVisionPreferences'
@@ -28,6 +29,7 @@ import { GUIDES_CARD, PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/v
 
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { PlatformLinkView } from '@/types/platforms'
+import type { PlayProfileView } from '@/types/play'
 import type { ProfileDetail } from '@/types/preferences'
 import type { LivePlatformName } from '@/utils/constants/lives'
 
@@ -37,6 +39,8 @@ export interface PreferencesPanelProps {
   links: PlatformLinkView[]
   available: Record<LivePlatformName, boolean>
   returned: { platform: LivePlatformName; result: string } | null
+  // Memora Play stats, for members it opens to
+  play: PlayProfileView | null
 }
 
 /**
@@ -46,6 +50,7 @@ export interface PreferencesPanelProps {
  * @param {PlatformLinkView[]} links - Linked platform accounts
  * @param {Record<LivePlatformName, boolean>} available - Platforms that can be linked here
  * @param {{ platform: LivePlatformName, result: string } | null} returned - Link just ended
+ * @param {PlayProfileView | null} play - Memora Play stats
  * @return {JSX.Element}
  */
 
@@ -55,6 +60,7 @@ export const PreferencesPanel = ({
   links,
   available,
   returned,
+  play,
 }: PreferencesPanelProps) => {
   const { profile, isSaving, issues, save } = useProfile(initialProfile)
   const { factor } = useSeal()
@@ -200,6 +206,23 @@ export const PreferencesPanel = ({
             icon: 'shield',
             render: securityTab,
           },
+          ...(play
+            ? [
+                {
+                  value: 'play',
+                  label: PREFERENCES_COPY.tabPlay,
+                  icon: 'play' as const,
+                  render: () => (
+                    <div className={TABS_STYLES.panel}>
+                      <PlayStatsBoard
+                        state={play}
+                        player={{ name: profile.displayName, avatarUrl: profile.avatarUrl }}
+                      />
+                    </div>
+                  ),
+                },
+              ]
+            : []),
         ]}
       />
     </div>

@@ -79,3 +79,12 @@ export const outcomeXp = (outcome: PlayOutcomeName): number => OUTCOME_XP[outcom
 
 export const tournamentXp = (outcome: PlayOutcomeName, games: number): number =>
   Math.round(OUTCOME_XP[outcome] * (games + PLAY_SETTINGS.tournament.bonusPerGame * (games - 1)))
+
+/**
+ * Share of a level already paid
+ * @param {PlayLevel} level - Level standing
+ * @return {number} - Percent
+ */
+
+export const levelShare = ({ into, needed }: PlayLevel): number =>
+  needed ? Math.min(100, (into / needed) * 100) : 100

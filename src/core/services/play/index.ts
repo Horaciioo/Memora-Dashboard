@@ -1,4 +1,4 @@
-export { readCatalog } from '@/core/services/play/CatalogService'
+export { openGameOfSlug, readCatalog } from '@/core/services/play/CatalogService'
 export {
   actInSession,
   readSession,
@@ -6,6 +6,7 @@ export {
   startSession,
 } from '@/core/services/play/GameService'
 export {
+  cancelSession,
   createSession,
   joinSession,
   kickPlayer,
@@ -15,7 +16,8 @@ export {
   updateSettings,
 } from '@/core/services/play/LobbyService'
 export {
-  readLeaderboard,
+  readLeaderboards,
+  readPlayPlayer,
   readPlayPresence,
   readPlayProfile,
 } from '@/core/services/play/ProfileService'
@@ -30,3 +32,11 @@ export {
   setPlayLevel,
 } from '@/core/services/play/PlayAdminService'
 export { readPlayActivity } from '@/core/services/play/PlayJournalService'
+export { announceInChat, listMessages, postMessage } from '@/core/services/play/PlayChatService'
+export {
+  answerInvite,
+  inviteCandidates,
+  inviteToSession,
+  listInvites,
+} from '@/core/services/play/PlayInviteService'
+export { listSpectators, setSeatRole } from '@/core/services/play/PlaySeatService'

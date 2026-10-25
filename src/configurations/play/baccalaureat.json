@@ -1,11 +1,12 @@
 {
-  "minPlayers": 2,
+  "minPlayers": 1,
   "maxPlayers": 6,
   "countdownSeconds": 5,
   "roundSeconds": {
     "default": 120,
     "min": 30,
-    "max": 600
+    "max": 600,
+    "presets": [60, 90, 120, 180, 300]
   },
   "rounds": {
     "default": 5,
@@ -35,15 +36,12 @@
   },
   "letters": "ABCDEFGHIJLMNOPRSTV",
   "alphabet": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  "defaultCategories": [
-    "firstName",
-    "country",
-    "city",
-    "animal",
-    "job",
-    "fruitVegetable"
-  ],
+  "defaultCategories": ["firstName", "country", "city", "animal", "job", "fruitVegetable"],
   "jokersPerPlayer": 1,
+  "tournament": {
+    "games": [3, 6, 9],
+    "rounds": 3
+  },
   "flash": {
     "roundSeconds": 30,
     "pack": "flash"

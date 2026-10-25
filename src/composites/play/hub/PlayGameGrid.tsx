@@ -1,54 +1,48 @@
-'use client'
-
-import { Button } from '@/components/elements/actions/Button'
-import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
-import { fillPlayMessage, PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
-import { PLAY_HUB } from '@/declarations/ui/variants'
+import { PlayGameCard } from '@/composites/play/hub/PlayGameCard'
+import { PLAY_CROSS } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
 
+// Quarters around the featured one, in reading order
+const QUARTERS = [PLAY_CROSS.topRight, PLAY_CROSS.bottomLeft, PLAY_CROSS.bottomRight]
+
 export interface PlayGameGridProps {
   games: { game: PlayGameName; playable: boolean }[]
-  // Busy players cannot open another table
-  isLocked: boolean
+  // Games with a table waiting
+  waiting: PlayGameName[]
 }
 
 /**
- * One card per game, opening a table
- * @param {PlayGameGridProps} props - Catalogue
+ * Games on a cross: the featured one top left, the rest shared by the three other quarters
+ * @param {PlayGameGridProps} props - Catalogue and waiting tables
  * @return {JSX.Element}
  */
 
-export const PlayGameGrid = ({ games, isLocked }: PlayGameGridProps) => {
-  const moves = usePlayMoves()
+export const PlayGameGrid = ({ games, waiting }: PlayGameGridProps) => {
+  const [featured, ...rest] = [...games].sort(
+    (left, right) => Number(right.playable) - Number(left.playable)
+  )
+  const card = (entry: PlayGameGridProps['games'][number]) => (
+    <PlayGameCard
+      key={entry.game}
+      {...entry}
+      isWaiting={waiting.includes(entry.game)}
+      className={PLAY_CROSS.card}
+    />
+  )
 
   return (
-    <div className={PLAY_HUB.games}>
-      {games.map(({ game, playable }) => {
-        const meta = PLAY_GAMES.get(game)
-
-        return (
-          <article key={game} className={cn(PLAY_HUB.game, !playable && PLAY_HUB.gameOff)}>
-            <span className={PLAY_HUB.gameMark} style={{ background: `var(${meta.tone})` }} />
-            <div>
-              <h3 className={PLAY_HUB.gameName}>{meta.label}</h3>
-              <p className={PLAY_HUB.gameFacts}>
-                {fillPlayMessage(PLAY_HUB_COPY.players, {
-                  players: meta.minPlayers,
-                  max: meta.maxPlayers,
-                })}
-              </p>
-            </div>
-            <Button
-              disabled={!playable || isLocked}
-              isLoading={moves.isSaving}
-              onClick={() => void moves.create(game)}
-            >
-              {playable ? PLAY_HUB_COPY.create : PLAY_HUB_COPY.soon}
-            </Button>
-          </article>
-        )
-      })}
+    <div className={PLAY_CROSS.cross}>
+      <span className={PLAY_CROSS.lineV} aria-hidden="true" />
+      <span className={PLAY_CROSS.lineH} aria-hidden="true" />
+      {featured && (
+        <div className={cn(PLAY_CROSS.quarter, PLAY_CROSS.featured)}>{card(featured)}</div>
+      )}
+      {QUARTERS.map((quarter, slot) => (
+        <div key={quarter} className={cn(PLAY_CROSS.quarter, quarter)}>
+          {rest.filter((_, index) => index % QUARTERS.length === slot).map(card)}
+        </div>
+      ))}
     </div>
   )
 }

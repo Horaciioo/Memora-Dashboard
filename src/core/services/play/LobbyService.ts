@@ -8,6 +8,7 @@ import { pickSeatColor, readBodyInteger, readBodyText } from '@/core/lib/play'
 import { clearDeadline } from '@/core/lib/play/timers'
 import { signalPlay } from '@/core/lib/play/signal'
 import { PLAY_ERRORS, PLAY_GAMES, PLAY_JOURNAL, PLAY_SETTINGS } from '@/declarations/play'
+import { announceInChat } from '@/core/services/play/PlayChatService'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
 import {
   cloneTable,
@@ -21,7 +22,7 @@ import {
 import { isPresent, SESSION_INCLUDE } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { toLobbyCard } from '@/core/lib/play/views'
-import { PlayStatuses } from '@/utils/constants/play'
+import { PlayMessageKinds, PlayStatuses } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 import { MINUTE_MS } from '@/utils/constants/time'
 
@@ -84,6 +85,7 @@ export const createSession = async (accountId: string, raw: Record<string, unkno
       select: { id: true },
     })
   })
+  await announceInChat(session.id, accountId, PlayMessageKinds.Joined)
   await signalPlay(session.id, true)
   await journalPlay({
     eventType: 'PlayJoined',
@@ -166,6 +168,7 @@ export const joinSession = async (sessionId: string, accountId: string): Promise
   })
   if (!joined) return
 
+  await announceInChat(sessionId, accountId, PlayMessageKinds.Joined)
   await signalPlay(sessionId, true)
   await journalPlay({
     eventType: 'PlayJoined',
@@ -254,6 +257,7 @@ export const leaveSession = async (
 
     return session.game
   })
+  await announceInChat(sessionId, accountId, PlayMessageKinds.Left)
   await signalPlay(sessionId, true)
   if (!quiet) {
     await journalPlay({
@@ -295,6 +299,7 @@ export const kickPlayer = async (
 
     return session.game
   })
+  await announceInChat(sessionId, accountId, PlayMessageKinds.Kicked)
   await signalPlay(sessionId, true)
   await journalPlay({
     eventType: 'PlayKicked',
@@ -304,6 +309,33 @@ export const kickPlayer = async (
     template: PLAY_JOURNAL.kicked,
     sessionId,
   })
+}
+
+/**
+ * Host closes a lobby before it starts
+ * @param {string} sessionId - Game
+ * @param {string} hostId - Host
+ * @return {Promise<void>} - Closed
+ */
+
+export const cancelSession = async (sessionId: string, hostId: string): Promise<void> => {
+  await prisma.$transaction(async (tx) => {
+    const session = await lockSession(tx, sessionId)
+    requireHost(session, hostId)
+    if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
+
+    await tx.playSession.update({
+      where: { id: sessionId },
+      data: { status: PlayStatuses.Abandoned },
+    })
+    if (session.tournamentId) {
+      await tx.playTournament.update({
+        where: { id: session.tournamentId },
+        data: { status: PlayStatuses.Abandoned },
+      })
+    }
+  })
+  await signalPlay(sessionId, true)
 }
 
 /**

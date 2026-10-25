@@ -1,11 +1,14 @@
 'use client'
 
+import { PlayCurrentGame } from '@/composites/play/brand/PlayCurrentGame'
 import { Button } from '@/components/elements/actions/Button'
 import { Avatar } from '@/components/elements/display/Avatar'
+import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { ROUTES } from '@/declarations/navigation'
-import { fillPlayMessage, PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
+import { fillPlayMessage, PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_HUB } from '@/declarations/ui/variants'
+import type { PlayPresence } from '@/types/play'
 import type { PlayGameName } from '@/utils/constants/play'
 import { useRouter } from 'next/navigation'
 
@@ -30,6 +33,8 @@ export interface PlayLobbyListProps {
   isRunning?: boolean
   isLocked: boolean
   empty: string
+  // Game the reader sits in, listed first like in the feed
+  presence?: PlayPresence | null
 }
 
 /**
@@ -38,21 +43,53 @@ export interface PlayLobbyListProps {
  * @return {JSX.Element}
  */
 
-export const PlayLobbyList = ({ lobbies, isRunning, isLocked, empty }: PlayLobbyListProps) => {
+export const PlayLobbyList = ({
+  lobbies,
+  isRunning,
+  isLocked,
+  empty,
+  presence,
+}: PlayLobbyListProps) => {
   const router = useRouter()
   const moves = usePlayMoves()
 
-  if (!lobbies.length) return <p className={PLAY_HUB.empty}>{empty}</p>
+  const others = lobbies.filter((lobby) => lobby.id !== presence?.sessionId)
+  const resume = presence && (
+    <div className={PLAY_HUB.row}>
+      <PlayGameLogo game={presence.game} className={PLAY_HUB.rowLogo} />
+      <div className={PLAY_HUB.rowText}>
+        <span className={PLAY_HUB.rowTitle}>
+          <PlayCurrentGame game={presence.game} />
+        </span>
+      </div>
+      <div className={PLAY_HUB.rowActions}>
+        <Button
+          variant="arcadeGhostSmall"
+          isLoading={moves.isSaving}
+          onClick={() => void moves.leave(presence.sessionId)}
+        >
+          {PLAY_HUB_COPY.leave}
+        </Button>
+        <Button
+          variant="arcadeSmall"
+          onClick={() => router.push(ROUTES.playSession(presence.sessionId))}
+        >
+          {PLAY_HUB_COPY.resume}
+        </Button>
+      </div>
+    </div>
+  )
+
+  if (!others.length && !resume) return <p className={PLAY_HUB.empty}>{empty}</p>
 
   return (
     <div className={PLAY_HUB.list}>
-      {lobbies.map((lobby) => (
+      {resume}
+      {others.map((lobby) => (
         <div key={lobby.id} className={PLAY_HUB.row}>
           <Avatar name={lobby.hostName ?? ''} src={lobby.hostAvatarUrl} />
           <div className={PLAY_HUB.rowText}>
             <span className={PLAY_HUB.rowTitle}>
-              {PLAY_GAMES.label(lobby.game)}
-              {' · '}
               {fillPlayMessage(PLAY_HUB_COPY.hostedBy, { host: lobby.hostName ?? '' })}
             </span>
             <span className={PLAY_HUB.rowNote}>
@@ -61,15 +98,16 @@ export const PlayLobbyList = ({ lobbies, isRunning, isLocked, empty }: PlayLobby
                 max: lobby.maxPlayers,
               })}
               {lobby.gamesCount &&
-                ` · ${fillPlayMessage(PLAY_HUB_COPY.tournament, { games: lobby.gamesCount })}`}
+                ` - ${fillPlayMessage(PLAY_HUB_COPY.tournament, { games: lobby.gamesCount })}`}
             </span>
           </div>
           {isRunning ? (
-            <Button variant="secondary" onClick={() => router.push(ROUTES.playSession(lobby.id))}>
+            <Button variant="arcadeGhost" onClick={() => router.push(ROUTES.playSession(lobby.id))}>
               {PLAY_HUB_COPY.watch}
             </Button>
           ) : (
             <Button
+              variant="arcade"
               disabled={isLocked || lobby.players >= lobby.maxPlayers}
               isLoading={moves.isSaving}
               onClick={() => void moves.join(lobby.id)}

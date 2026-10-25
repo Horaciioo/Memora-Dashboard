@@ -44,9 +44,20 @@ export const lockSession = async (
   tx: Prisma.TransactionClient,
   id: string
 ): Promise<LoadedSession> => {
-  await tx.$queryRaw`SELECT id FROM play_sessions WHERE id = ${id} FOR UPDATE`
+  await holdSession(tx, id)
 
   return loadSession(id, tx)
+}
+
+/**
+ * Hold a game row until commit
+ * @param {Prisma.TransactionClient} tx - Transaction
+ * @param {string} id - Game
+ * @return {Promise<void>} - Held
+ */
+
+export const holdSession = async (tx: Prisma.TransactionClient, id: string): Promise<void> => {
+  await tx.$queryRaw`SELECT id FROM play_sessions WHERE id = ${id} FOR UPDATE`
 }
 
 /**

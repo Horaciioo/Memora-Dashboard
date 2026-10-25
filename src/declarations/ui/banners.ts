@@ -120,7 +120,6 @@ export const BANNER_ROUTES: readonly { prefix: string; scene: string }[] = [
   { prefix: '/notifications', scene: 'comfort' },
   { prefix: '/parametres', scene: 'comfort' },
   { prefix: '/nouveautes', scene: 'comfort' },
-  { prefix: '/play', scene: 'comfort' },
   { prefix: '/configuration', scene: 'system' },
   { prefix: '/systeme', scene: 'system' },
   { prefix: '/administration', scene: 'system' },

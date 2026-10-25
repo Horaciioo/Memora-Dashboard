@@ -119,7 +119,17 @@ export const startSession = async (sessionId: string, hostId: string): Promise<v
     return locked
   })
 
-  await applyStep(sessionId, await engineOf(session.game).start(toEngineSession(session)))
+  // A table that failed to open goes back to the lobby, never stuck running
+  try {
+    await applyStep(sessionId, await engineOf(session.game).start(toEngineSession(session)))
+  } catch (error) {
+    await prisma.playSession.update({
+      where: { id: sessionId },
+      data: { status: PlayStatuses.Lobby, startedAt: null },
+    })
+    await signalPlay(sessionId, false)
+    throw error
+  }
   await signalPlay(sessionId, true)
 }
 
