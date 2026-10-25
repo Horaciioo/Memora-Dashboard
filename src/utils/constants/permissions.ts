@@ -75,6 +75,7 @@ export const Permissions = {
   ReferenceManage: 'reference:manage',
   AccessManage: 'access:manage',
   PlayAccess: 'play:access',
+  PlayManage: 'play:manage',
 } as const
 
 export type PermissionName = (typeof Permissions)[keyof typeof Permissions]
@@ -685,6 +686,14 @@ export const PermissionsList: PermissionMeta[] = [
     displayName: 'Jouer à Memora Play',
     description: 'Ouvrir Memora Play, créer et rejoindre des parties.',
     important: false,
+  },
+  {
+    name: Permissions.PlayManage,
+    group: PermissionGroups.Play,
+    displayName: 'Gérer la progression Play',
+    description: 'Passer de l’XP, fixer un niveau, remettre à zéro ou sortir un modérateur de sa partie.',
+    important: true,
+    parent: Permissions.PlayAccess,
   },
   {
     name: Permissions.TeamRead,

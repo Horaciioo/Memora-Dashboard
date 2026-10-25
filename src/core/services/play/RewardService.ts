@@ -4,7 +4,9 @@ import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { outcomeXp, rankScores } from '@/core/lib/play'
-import { PLAY_SETTINGS } from '@/declarations/play'
+import { PLAY_JOURNAL, PLAY_OUTCOME_LABELS, PLAY_SETTINGS } from '@/declarations/play'
+import { journalPlay } from '@/core/services/play/PlayJournalService'
+import type { PlayJournalInput } from '@/core/services/play/PlayJournalService'
 import { recordResults } from '@/core/services/play/StatService'
 import { advanceTournament } from '@/core/services/play/TournamentService'
 import { engineOf, loadSession } from '@/core/services/play/PlaySessionService'
@@ -29,14 +31,14 @@ const isRewarded = (session: LoadedSession, seconds: number): boolean =>
  * @param {Prisma.TransactionClient} tx - Transaction
  * @param {LoadedSession} session - Game
  * @param {Map<string, Record<string, number>>} extra - Game counters
- * @return {Promise<void>} - Written
+ * @return {Promise<PlayJournalInput[]>} - Journal lines
  */
 
 const writeResults = async (
   tx: Prisma.TransactionClient,
   session: LoadedSession,
   extra: Map<string, Record<string, number>>
-): Promise<void> => {
+): Promise<PlayJournalInput[]> => {
   const finishedAt = new Date()
   const seconds = Math.round(
     (finishedAt.getTime() - (session.startedAt ?? finishedAt).getTime()) / SECOND_MS
@@ -71,6 +73,17 @@ const writeResults = async (
       extra: extra.get(result.accountId),
     }))
   )
+
+  // One journal line per player
+  return results.map((result) => ({
+    eventType: 'PlayFinished',
+    subjectId: result.accountId,
+    actorId: null,
+    game: session.game,
+    sessionId: session.id,
+    template: gone.has(result.accountId) ? PLAY_JOURNAL.abandoned : PLAY_JOURNAL.finished,
+    values: { outcome: PLAY_OUTCOME_LABELS[result.outcome], xp: result.xp },
+  }))
 }
 
 /**
@@ -83,20 +96,21 @@ export const finishSession = async (sessionId: string): Promise<boolean> => {
   const session = await loadSession(sessionId)
   const extra = await engineOf(session.game).extraStats(sessionId)
 
-  const closed = await prisma.$transaction(async (tx) => {
+  const lines = await prisma.$transaction(async (tx) => {
     // Claim the end
     const { count } = await tx.playSession.updateMany({
       where: { id: sessionId, status: PlayStatuses.Running },
       data: { status: PlayStatuses.Finished, finishedAt: new Date() },
     })
-    if (!count) return false
+    if (!count) return null
 
-    await writeResults(tx, await loadSession(sessionId, tx), extra)
-
-    return true
+    return writeResults(tx, await loadSession(sessionId, tx), extra)
   })
+  if (!lines) return false
 
-  if (closed && session.tournamentId) await advanceTournament(sessionId)
+  await journalPlay(...lines)
 
-  return closed
+  if (session.tournamentId) await advanceTournament(sessionId)
+
+  return true
 }

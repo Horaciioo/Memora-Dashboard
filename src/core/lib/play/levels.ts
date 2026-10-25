@@ -33,6 +33,17 @@ export const xpToNext = (level: number): number =>
   Math.round(PLAY_SETTINGS.levels.base * level ** PLAY_SETTINGS.levels.growth)
 
 /**
+ * Total XP opening a level
+ * @param {number} level - Target level
+ * @return {number} - XP from zero
+ */
+
+export const xpForLevel = (level: number): number =>
+  Array.from({ length: Math.min(level, PLAY_SETTINGS.levels.max) - 1 }, (_, index) =>
+    xpToNext(index + 1)
+  ).reduce((sum, step) => sum + step, 0)
+
+/**
  * Level reached with some XP
  * @param {number} xp - Total XP
  * @return {PlayLevel} - Level standing

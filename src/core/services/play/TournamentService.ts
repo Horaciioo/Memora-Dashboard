@@ -4,7 +4,9 @@ import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { rankScores, tournamentXp } from '@/core/lib/play'
-import { PLAY_SETTINGS } from '@/declarations/play'
+import { PLAY_JOURNAL, PLAY_OUTCOME_LABELS, PLAY_SETTINGS } from '@/declarations/play'
+import { journalPlay } from '@/core/services/play/PlayJournalService'
+import type { PlayJournalInput } from '@/core/services/play/PlayJournalService'
 import { recordResults } from '@/core/services/play/StatService'
 import { cloneTable, loadSession } from '@/core/services/play/PlaySessionService'
 import { isPresent } from '@/core/lib/play/session'
@@ -15,13 +17,13 @@ import { PlayOutcomes, PlayStatuses } from '@/utils/constants/play'
  * Rank the tournament and pay its players
  * @param {Prisma.TransactionClient} tx - Transaction
  * @param {LoadedSession} last - Last game
- * @return {Promise<void>} - Written
+ * @return {Promise<PlayJournalInput[]>} - Journal lines
  */
 
 const closeTournament = async (
   tx: Prisma.TransactionClient,
   last: LoadedSession
-): Promise<void> => {
+): Promise<PlayJournalInput[]> => {
   const tournament = last.tournament!
   const seats = await tx.playSeat.findMany({
     where: { session: { tournamentId: tournament.id }, kickedAt: null },
@@ -38,25 +40,38 @@ const closeTournament = async (
     )
   )
   const pays = totals.size - gone.size >= PLAY_SETTINGS.rewards.minPlayers
+  const results = rankScores(totals, gone).map((standing) => ({
+    ...standing,
+    xp:
+      pays && !gone.has(standing.accountId)
+        ? tournamentXp(standing.outcome, tournament.gamesCount)
+        : 0,
+  }))
 
   await recordResults(
     tx,
     last.game,
-    rankScores(totals, gone).map((standing) => ({
-      accountId: standing.accountId,
+    results.map((result) => ({
+      accountId: result.accountId,
       outcome: null,
-      xp:
-        pays && !gone.has(standing.accountId)
-          ? tournamentXp(standing.outcome, tournament.gamesCount)
-          : 0,
+      xp: result.xp,
       seconds: 0,
-      tournament: { won: !gone.has(standing.accountId) && standing.outcome === PlayOutcomes.Win },
+      tournament: { won: !gone.has(result.accountId) && result.outcome === PlayOutcomes.Win },
     }))
   )
   await tx.playTournament.update({
     where: { id: tournament.id },
     data: { status: PlayStatuses.Finished, finishedAt: new Date() },
   })
+
+  return results.map((result) => ({
+    eventType: 'PlayFinished',
+    subjectId: result.accountId,
+    actorId: null,
+    game: last.game,
+    template: PLAY_JOURNAL.tournament,
+    values: { outcome: PLAY_OUTCOME_LABELS[result.outcome], xp: result.xp },
+  }))
 }
 
 /**
@@ -65,25 +80,28 @@ const closeTournament = async (
  * @return {Promise<string | null>} - Next game
  */
 
-export const advanceTournament = async (sessionId: string): Promise<string | null> =>
-  prisma.$transaction(async (tx) => {
+export const advanceTournament = async (sessionId: string): Promise<string | null> => {
+  const { next, lines } = await prisma.$transaction(async (tx) => {
     const session = await loadSession(sessionId, tx)
     const tournament = session.tournament
-    if (!tournament || tournament.status !== PlayStatuses.Running) return null
+    if (!tournament || tournament.status !== PlayStatuses.Running) return { next: null, lines: [] }
 
     const isLast = (session.tournamentIndex ?? 0) + 1 >= tournament.gamesCount
-    const hasTable = session.seats.some(isPresent)
-    if (!isLast && hasTable) {
-      return cloneTable(tx, session, {
+    if (!isLast && session.seats.some(isPresent)) {
+      const id = await cloneTable(tx, session, {
         tournamentId: session.tournamentId,
         tournamentIndex: (session.tournamentIndex ?? 0) + 1,
       })
+
+      return { next: id, lines: [] }
     }
 
-    await closeTournament(tx, session)
-
-    return null
+    return { next: null, lines: await closeTournament(tx, session) }
   })
+  await journalPlay(...lines)
+
+  return next
+}
 
 /**
  * Standings of a tournament so far

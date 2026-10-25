@@ -1,3 +1,4 @@
+import type { PlayGameName, PlayStatusName } from '@/utils/constants/play'
 import type { Prisma } from '@prisma/client'
 
 /**
@@ -47,4 +48,52 @@ export interface PlayEngine {
   settle: (session: EngineSession) => Promise<EngineStep>
   view: (session: EngineSession, viewerId: string) => Promise<unknown>
   extraStats: (sessionId: string) => Promise<Map<string, Record<string, number>>>
+}
+
+/**
+ * Game a member sits in
+ * @typedef {Object} PlayPresence
+ */
+
+export interface PlayPresence {
+  sessionId: string
+  game: PlayGameName
+  status: PlayStatusName
+}
+
+/**
+ * Level standing
+ * @typedef {Object} PlayLevelView
+ */
+
+export interface PlayLevelView {
+  level: number
+  into: number
+  needed: number | null
+}
+
+/**
+ * Totals of one game or of all
+ * @typedef {Object} PlayTotalsView
+ */
+
+export interface PlayTotalsView {
+  xp: number
+  level: PlayLevelView
+  played: number
+  wins: number
+  draws: number
+  losses: number
+}
+
+/**
+ * Play side of the Admin tab
+ * @typedef {Object} PlayAdminState
+ */
+
+export interface PlayAdminState {
+  global: PlayTotalsView
+  games: (PlayTotalsView & { game: PlayGameName })[]
+  presence: PlayPresence | null
+  maxLevel: number
 }

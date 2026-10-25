@@ -7,6 +7,8 @@ import { MEMBER_FILE } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 import { HOME_STYLES, TASK_LIST } from '@/declarations/ui/variants'
 import type { MemberAbsence } from '@/types/members'
+import { playPresenceLabel } from '@/core/lib/play/presence'
+import type { PlayPresence } from '@/types/play'
 import { cn } from '@/utils/classnames'
 import { absenceReasonText } from '@/utils/format/absences'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
@@ -19,6 +21,7 @@ export interface MemberOverviewProps {
   absences: MemberAbsence[]
   activity: ActivityEntry[]
   canReadLogs: boolean
+  playPresence: PlayPresence | null
   onNavigate: (tab: string) => void
 }
 
@@ -28,6 +31,7 @@ export interface MemberOverviewProps {
  * @param {MemberAbsence[]} absences - Time off
  * @param {ActivityEntry[]} activity - Journal entries
  * @param {boolean} canReadLogs - Viewer may read the journal
+ * @param {PlayPresence | null} playPresence - Game they sit in
  * @param {(tab: string) => void} onNavigate - Opens another tab
  * @return {JSX.Element}
  */
@@ -36,9 +40,11 @@ export const MemberOverview = ({
   absences,
   activity,
   canReadLogs,
+  playPresence,
   onNavigate,
 }: MemberOverviewProps) => {
   const Chevron = ICONS.next
+  const PlayIcon = ICONS.play
   const today = new Date().toISOString().slice(0, 10)
   const approved = absences
     .filter((absence) => absence.status === AbsenceStatuses.Approved)
@@ -87,6 +93,17 @@ export const MemberOverview = ({
           </span>
           <Chevron className={TASK_LIST.chevron} aria-hidden="true" />
         </button>
+        {playPresence && (
+          <div className={HOME_STYLES.line}>
+            <PlayIcon
+              className={cn(HOME_STYLES.chipIcon, 'shrink-0 text-[var(--color-ink-accent)]')}
+              aria-hidden="true"
+            />
+            <span className={TASK_LIST.body}>
+              <span className={TASK_LIST.title}>{playPresenceLabel(playPresence)}</span>
+            </span>
+          </div>
+        )}
       </Section>
 
       {canReadLogs && activity.length > 0 && (

@@ -285,4 +285,12 @@ export const GRANT_ADDITIONS: readonly GrantAddition[] = [
     // Everyone opening Memora plays
     grants: { [MemberRoles.Moderateur]: [Permissions.PlayAccess] },
   },
+  {
+    key: 'memora-play-manage',
+    // Leads steer the progression of those below
+    grants: {
+      [MemberRoles.Admin]: [Permissions.PlayManage],
+      [MemberRoles.Responsable]: [Permissions.PlayManage],
+    },
+  },
 ]

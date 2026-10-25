@@ -46,6 +46,9 @@ import { MemberOverview } from '@/composites/members/MemberOverview'
 import { NoteStamp } from '@/composites/members/NoteStamp'
 import { MemberRail } from '@/composites/members/MemberRail'
 import { MemberAdminTab } from '@/composites/members/admin/MemberAdminTab'
+import { PlayAdminPanel } from '@/composites/play/member/PlayAdminPanel'
+import { PLAY_MEMBER_COPY } from '@/declarations/play/admin'
+import type { PlayAdminState, PlayPresence } from '@/types/play'
 import { DepartureMessageDialog } from '@/composites/members/admin/DepartureMessageDialog'
 import { SanctionDrawer } from '@/composites/members/admin/SanctionDrawer'
 import type { SanctionInput } from '@/composites/members/admin/SanctionDrawer'
@@ -96,6 +99,29 @@ export interface MemberFileTabsProps {
   // Heavy gestures, Responsables only
   adminState: MemberAdminState | null
   canDelete: boolean
+  // Memora Play
+  playPresence: PlayPresence | null
+  playActivity: ActivityEntry[]
+  playAdmin: PlayAdminState | null
+}
+
+// Views of the logs tab
+type LogView = 'activity' | 'moderation' | 'play'
+
+// Empty state of a journal view
+type LogEmpty = { title: string; description: string }
+
+// Views of the Admin tab
+type AdminView = 'admin' | 'play'
+
+// Empty journal copy
+const MEMBER_LOG_EMPTY: LogEmpty = {
+  title: MEMBER_COPY.logsEmptyTitle,
+  description: MEMBER_COPY.logsEmptyDescription,
+}
+const PLAY_LOG_EMPTY: LogEmpty = {
+  title: PLAY_MEMBER_COPY.logsEmptyTitle,
+  description: PLAY_MEMBER_COPY.logsEmptyDescription,
 }
 
 // Before the server state is known
@@ -281,6 +307,9 @@ export const MemberFileTabs = ({
   canOpenReports,
   adminState,
   canDelete,
+  playPresence,
+  playActivity,
+  playAdmin,
 }: MemberFileTabsProps) => {
   const router = useRouter()
   const file = useMemberFile(detail, overrides)
@@ -289,7 +318,10 @@ export const MemberFileTabs = ({
   const gestures = useEditGestures()
   const { factor, promptUnlock } = useSeal()
   const [tab, setTab] = useState('overview')
-  const [logView, setLogView] = useState<'activity' | 'moderation'>('moderation')
+  const [logView, setLogView] = useState<LogView>(
+    moderation === undefined ? 'activity' : 'moderation'
+  )
+  const [adminView, setAdminView] = useState<AdminView>(adminState ? 'admin' : 'play')
   const [dialog, setDialog] = useState<'identity' | 'note' | 'socials' | 'absence' | null>(null)
   const [pendingNote, setPendingNote] = useState<string | null>(null)
   const [editingAbsence, setEditingAbsence] = useState<MemberAbsence | null>(null)
@@ -568,6 +600,7 @@ export const MemberFileTabs = ({
       absences={file.absences}
       activity={activity}
       canReadLogs={canReadLogs}
+      playPresence={playPresence}
       onNavigate={setTab}
     />
   )
@@ -780,28 +813,28 @@ export const MemberFileTabs = ({
     />
   )
 
-  const activityLog = () => (
+  const activityLog = (entries = activity, empty = MEMBER_LOG_EMPTY) => (
     <Section
       title={MEMBER_COPY.tabLogs}
       maturity="beta"
-      raised={activity.length > 0}
-      bare={activity.length === 0}
+      raised={entries.length > 0}
+      bare={entries.length === 0}
     >
-      {activity.length === 0 ? (
+      {entries.length === 0 ? (
         <EmptyState
           figure="notes"
-          title={MEMBER_COPY.logsEmptyTitle}
-          description={MEMBER_COPY.logsEmptyDescription}
-          action={<Status label={MEMBER_COPY.logsEmptyTitle} tone="neutral" />}
+          title={empty.title}
+          description={empty.description}
+          action={<Status label={empty.title} tone="neutral" />}
         />
       ) : (
-        <ActivityTimeline entries={activity} />
+        <ActivityTimeline entries={entries} />
       )}
     </Section>
   )
 
   // Activity and moderation are two views of the same tab
-  const adminTab = () =>
+  const memberAdminTab = () =>
     adminState && (
       <MemberAdminTab
         admin={admin}
@@ -847,31 +880,66 @@ export const MemberFileTabs = ({
       />
     )
 
-  const logsTab = () =>
-    moderation === undefined ? (
-      activityLog()
-    ) : (
-      <div className={MEMBER_MODERATION.stack}>
-        {canReadLogs && (
-          <div className={MEMBER_MODERATION.switch}>
-            <SegmentedControl
-              label={MEMBER_MODERATION_COPY.views}
-              value={logView}
-              onChange={setLogView}
-              options={[
-                { value: 'moderation', label: MEMBER_MODERATION_COPY.viewModeration },
-                { value: 'activity', label: MEMBER_MODERATION_COPY.viewActivity },
-              ]}
-            />
-          </div>
-        )}
-        {canReadLogs && logView === 'activity' ? (
-          activityLog()
-        ) : (
-          <MemberModerationView view={moderation} canOpenReports={canOpenReports} />
-        )}
-      </div>
-    )
+  // Views of the logs tab the viewer may open
+  const logViews: { value: LogView; label: string }[] = [
+    ...(moderation !== undefined
+      ? [{ value: 'moderation' as const, label: MEMBER_MODERATION_COPY.viewModeration }]
+      : []),
+    ...(canReadLogs
+      ? [
+          { value: 'activity' as const, label: MEMBER_MODERATION_COPY.viewActivity },
+          { value: 'play' as const, label: PLAY_MEMBER_COPY.logsView },
+        ]
+      : []),
+  ]
+  const logContent: Record<LogView, () => ReactNode> = {
+    moderation: () =>
+      moderation !== undefined && (
+        <MemberModerationView view={moderation} canOpenReports={canOpenReports} />
+      ),
+    activity: () => activityLog(),
+    play: () => activityLog(playActivity, PLAY_LOG_EMPTY),
+  }
+
+  const logsTab = () => (
+    <div className={MEMBER_MODERATION.stack}>
+      {logViews.length > 1 && (
+        <div className={MEMBER_MODERATION.switch}>
+          <SegmentedControl
+            label={MEMBER_MODERATION_COPY.views}
+            value={logView}
+            onChange={setLogView}
+            options={logViews}
+          />
+        </div>
+      )}
+      {logContent[logView]()}
+    </div>
+  )
+
+  // Administration and Play are two views of the Admin tab
+  const adminTab = () => (
+    <div className={MEMBER_MODERATION.stack}>
+      {adminState && playAdmin && (
+        <div className={MEMBER_MODERATION.switch}>
+          <SegmentedControl
+            label={PLAY_MEMBER_COPY.view}
+            value={adminView}
+            onChange={setAdminView}
+            options={[
+              { value: 'admin', label: PLAY_MEMBER_COPY.viewAdmin },
+              { value: 'play', label: PLAY_MEMBER_COPY.viewPlay },
+            ]}
+          />
+        </div>
+      )}
+      {adminView === 'play' && playAdmin ? (
+        <PlayAdminPanel memberId={detail.summary.id} initial={playAdmin} />
+      ) : (
+        memberAdminTab()
+      )}
+    </div>
+  )
 
   return (
     <div className={MEMBER_FILE.layout}>
@@ -946,7 +1014,7 @@ export const MemberFileTabs = ({
               value: 'admin',
               label: MEMBER_ADMIN_COPY.tab,
               icon: 'shield',
-              visible: adminState !== null,
+              visible: adminState !== null || playAdmin !== null,
               render: adminTab,
             },
             {

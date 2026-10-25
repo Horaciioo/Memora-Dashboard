@@ -7,7 +7,8 @@ import { conflict, forbidden, notFound } from '@/core/lib/errors'
 import { pickSeatColor, readBodyInteger, readBodyText } from '@/core/lib/play'
 import { clearDeadline } from '@/core/lib/play/timers'
 import { signalPlay } from '@/core/lib/play/signal'
-import { PLAY_ERRORS, PLAY_GAMES, PLAY_SETTINGS } from '@/declarations/play'
+import { PLAY_ERRORS, PLAY_GAMES, PLAY_JOURNAL, PLAY_SETTINGS } from '@/declarations/play'
+import { journalPlay } from '@/core/services/play/PlayJournalService'
 import {
   cloneTable,
   currentSessionId,
@@ -84,6 +85,13 @@ export const createSession = async (accountId: string, raw: Record<string, unkno
     })
   })
   await signalPlay(session.id, true)
+  await journalPlay({
+    eventType: 'PlayJoined',
+    subjectId: accountId,
+    game,
+    template: PLAY_JOURNAL.hosted,
+    sessionId: session.id,
+  })
 
   return session
 }
@@ -134,11 +142,11 @@ export const listLobbies = async (accountId: string, game?: string | null) => {
  */
 
 export const joinSession = async (sessionId: string, accountId: string): Promise<void> => {
-  await prisma.$transaction(async (tx) => {
+  const joined = await prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, sessionId)
     const seat = session.seats.find((entry) => entry.accountId === accountId)
     if (seat?.kickedAt) throw forbidden(PLAY_ERRORS.kicked)
-    if (seat && isPresent(seat)) return
+    if (seat && isPresent(seat)) return null
     if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
 
     const present = session.seats.filter(isPresent)
@@ -153,8 +161,19 @@ export const joinSession = async (sessionId: string, accountId: string): Promise
       update: { leftAt: null, color, joinedAt: new Date() },
     })
     await touch(tx, sessionId)
+
+    return session.game
   })
+  if (!joined) return
+
   await signalPlay(sessionId, true)
+  await journalPlay({
+    eventType: 'PlayJoined',
+    subjectId: accountId,
+    game: joined,
+    template: PLAY_JOURNAL.joined,
+    sessionId,
+  })
 }
 
 /**
@@ -214,11 +233,16 @@ const afterDeparture = async (
  * Leave a game on purpose
  * @param {string} sessionId - Game
  * @param {string} accountId - Player
+ * @param {{ quiet?: boolean }} [options] - Skip the journal line
  * @return {Promise<void>} - Left
  */
 
-export const leaveSession = async (sessionId: string, accountId: string): Promise<void> => {
-  await prisma.$transaction(async (tx) => {
+export const leaveSession = async (
+  sessionId: string,
+  accountId: string,
+  { quiet = false }: { quiet?: boolean } = {}
+): Promise<void> => {
+  const game = await prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, sessionId)
     requireSeat(session, accountId)
 
@@ -227,8 +251,19 @@ export const leaveSession = async (sessionId: string, accountId: string): Promis
       data: { leftAt: new Date() },
     })
     await afterDeparture(tx, session, accountId)
+
+    return session.game
   })
   await signalPlay(sessionId, true)
+  if (!quiet) {
+    await journalPlay({
+      eventType: 'PlayLeft',
+      subjectId: accountId,
+      game,
+      template: PLAY_JOURNAL.left,
+      sessionId,
+    })
+  }
 }
 
 /**
@@ -246,7 +281,7 @@ export const kickPlayer = async (
 ): Promise<void> => {
   if (hostId === accountId) throw conflict(PLAY_ERRORS.selfKick)
 
-  await prisma.$transaction(async (tx) => {
+  const game = await prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, sessionId)
     requireHost(session, hostId)
     requireSeat(session, accountId)
@@ -257,8 +292,18 @@ export const kickPlayer = async (
       data: { leftAt: now, kickedAt: now },
     })
     await afterDeparture(tx, session, accountId)
+
+    return session.game
   })
   await signalPlay(sessionId, true)
+  await journalPlay({
+    eventType: 'PlayKicked',
+    subjectId: accountId,
+    actorId: hostId,
+    game,
+    template: PLAY_JOURNAL.kicked,
+    sessionId,
+  })
 }
 
 /**

@@ -20,5 +20,8 @@
   },
   "lobbyIdleMinutes": 30,
   "seatColors": 12,
-  "leaderboardSize": 20
+  "leaderboardSize": 20,
+  "admin": {
+    "maxXpChange": 10000
+  }
 }

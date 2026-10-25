@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { openSeatOf } from '@/core/lib/play/session'
 import type { Prisma, PrismaClient } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
@@ -9,7 +10,6 @@ import { PLAY_ENGINES } from '@/core/engines/play'
 import type { PlayEngine } from '@/core/engines/play'
 import { isPresent, SESSION_INCLUDE } from '@/core/lib/play/session'
 import type { LoadedSeat, LoadedSession } from '@/core/lib/play/session'
-import { PLAY_OPEN_STATUSES } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
 // Client inside or outside a transaction
@@ -98,12 +98,7 @@ export const currentSessionId = async (
   client: PlayClient = prisma
 ): Promise<string | null> => {
   const seat = await client.playSeat.findFirst({
-    where: {
-      accountId,
-      leftAt: null,
-      kickedAt: null,
-      session: { status: { in: [...PLAY_OPEN_STATUSES] } },
-    },
+    where: openSeatOf(accountId),
     select: { sessionId: true },
   })
 

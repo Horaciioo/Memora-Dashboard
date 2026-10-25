@@ -53,6 +53,7 @@ const xp = readNode(play.xp, 'play/play.xp')
 const levels = readNode(play.levels, 'play/play.levels')
 const tournament = readNode(play.tournament, 'play/play.tournament')
 const rewards = readNode(play.rewards, 'play/play.rewards')
+const admin = readNode(play.admin, 'play/play.admin')
 const stop = readNode(baccalaureat.stop, 'play/baccalaureat.stop')
 const points = readNode(baccalaureat.points, 'play/baccalaureat.points')
 const flash = readNode(baccalaureat.flash, 'play/baccalaureat.flash')
@@ -111,6 +112,13 @@ export const PLAY_SETTINGS = {
     min: 1,
   }),
   seatColors: readInteger(play.seatColors, { path: 'play/play.seatColors', fallback: 12, min: 2 }),
+  admin: {
+    maxXpChange: readInteger(admin.maxXpChange, {
+      path: 'play/play.admin.maxXpChange',
+      fallback: 10000,
+      min: 1,
+    }),
+  },
   leaderboardSize: readInteger(play.leaderboardSize, {
     path: 'play/play.leaderboardSize',
     fallback: 20,

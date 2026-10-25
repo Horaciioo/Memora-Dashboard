@@ -60,6 +60,20 @@ export const FlashGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
+ * Gamepad
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const PlayGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className}>
+    <path d="M7.5 7h9a5 5 0 0 1 4.9 6l-.6 3a2.6 2.6 0 0 1-4.5 1.2L14.7 15H9.3l-1.6 2.2a2.6 2.6 0 0 1-4.5-1.2l-.6-3a5 5 0 0 1 4.9-6z" />
+    <path d="M8 10v3M6.5 11.5h3" />
+    <path d="M15.5 11h.01M17.5 12.5h.01" />
+  </Stroke>
+)
+
+/**
  * Next
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}

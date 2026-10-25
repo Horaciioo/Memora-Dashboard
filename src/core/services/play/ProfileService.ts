@@ -1,8 +1,10 @@
 import 'server-only'
 
+import { openSeatOf } from '@/core/lib/play/session'
 import { prisma } from '@/core/lib/db'
 import { levelOf } from '@/core/lib/play'
 import { PLAY_GAMES, PLAY_SETTINGS } from '@/declarations/play'
+import type { PlayPresence } from '@/types/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
 // Counters summed into the global line
@@ -98,4 +100,21 @@ export const readLeaderboard = async (game: PlayGameName) => {
     wins: entry.wins,
     played: entry.played,
   }))
+}
+
+/**
+ * Game a member sits in right now
+ * @param {string} accountId - Member
+ * @return {Promise<PlayPresence | null>} - Game and its stage
+ */
+
+export const readPlayPresence = async (accountId: string): Promise<PlayPresence | null> => {
+  const seat = await prisma.playSeat.findFirst({
+    where: openSeatOf(accountId),
+    select: { session: { select: { id: true, game: true, status: true } } },
+  })
+
+  return (
+    seat && { sessionId: seat.session.id, game: seat.session.game, status: seat.session.status }
+  )
 }

@@ -14,5 +14,17 @@ export {
   rematchSession,
   updateSettings,
 } from '@/core/services/play/LobbyService'
-export { readLeaderboard, readPlayProfile } from '@/core/services/play/ProfileService'
+export {
+  readLeaderboard,
+  readPlayPresence,
+  readPlayProfile,
+} from '@/core/services/play/ProfileService'
 export { currentSessionId, loadSession, requireSeat } from '@/core/services/play/PlaySessionService'
+export {
+  adjustPlayXp,
+  readPlayAdmin,
+  removeFromPlay,
+  resetPlayGame,
+  setPlayLevel,
+} from '@/core/services/play/PlayAdminService'
+export { readPlayActivity } from '@/core/services/play/PlayJournalService'
