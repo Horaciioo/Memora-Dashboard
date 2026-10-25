@@ -2,7 +2,8 @@ import { releasedFrom } from '@/core/services/academy/legacy/LegacyRelease'
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
+import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
+import { isOpenLive } from '@/core/lib/lives/permissions'
 import { logger } from '@/core/lib/logger'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { syncJuniorLives } from '@/core/services/academy/parkour/LiveCountService'
@@ -13,6 +14,7 @@ import type { AttendanceHours, AttendancePerson, AttendanceRoster } from '@/type
 import { GONE_MEMBER_STATUSES, LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
 import type { AttendanceStatusName } from '@/utils/constants/workflow'
+import type { LiveStatusName } from '@/utils/constants/lives'
 import type { Prisma } from '@prisma/client'
 
 // Roll-call notification always points back at the calendar
@@ -43,6 +45,18 @@ export interface RosterAudience {
   team?: { youtuberId: string | null; functionName: string } | null
   includeLeadership?: boolean
 }
+
+/**
+ * Live team of a creator function
+ * @param {string | null} youtuberId - Creator identifier
+ * @param {string} functionName - Function name
+ * @return {Prisma.TeamWhereInput} - Team clause
+ */
+
+export const functionTeamWhere = (
+  youtuberId: string | null,
+  functionName: string
+): Prisma.TeamWhereInput => ({ youtuberId, archived: false, jobFunction: { name: functionName } })
 
 /**
  * Read the members a roll-call convenes
@@ -84,7 +98,7 @@ export const expandRoster = async (
   // A team meeting convenes the team of the creator for a function, its Responsables with it
   const fromFunctionTeam = team
     ? await prisma.team.findFirst({
-        where: { youtuberId: team.youtuberId, jobFunction: { name: team.functionName } },
+        where: functionTeamWhere(team.youtuberId, team.functionName),
         select: {
           members: { select: { accountId: true } },
           leads: { select: { accountId: true } },
@@ -115,10 +129,17 @@ export const expandRoster = async (
   // Keep only members still around and inside the perimeter
   const accounts = await prisma.account.findMany({
     where: {
-      ...(everyone ? {} : { id: { in: candidates } }),
+      ...(everyone ? { frozenAt: null } : { id: { in: candidates } }),
       status: { notIn: GONE_MEMBER_STATUSES },
-      ...(includeLeadership ? {} : { role: { notIn: LEADERSHIP_ROLES } }),
-      ...(includeLeadership ? {} : peopleInScope(scope)),
+      // Everyone means every account
+      AND:
+        includeLeadership || everyone
+          ? []
+          : [
+              // Named Responsables still come
+              { OR: [{ role: { notIn: LEADERSHIP_ROLES } }, { id: { in: memberIds } }] },
+              peopleInScope(scope),
+            ],
     },
     select: { id: true },
   })
@@ -145,6 +166,29 @@ export const syncRoster = async (eventId: string, memberIds: string[]): Promise<
   await prisma.eventAttendance.createMany({
     data: memberIds.map((accountId) => ({ eventId, accountId })),
     skipDuplicates: true,
+  })
+}
+
+/**
+ * Drop the unanswered rows left out
+ * @param {string} eventId - Roll-call event
+ * @param {string[]} keptIds - Convened accounts
+ * @return {Promise<void>} - Pruned
+ */
+
+export const pruneRoster = async (eventId: string, keptIds: string[]): Promise<void> => {
+  // Live crew stays convened
+  const crew = await prisma.liveMember.findMany({
+    where: { live: { calendarEventId: eventId } },
+    select: { accountId: true },
+  })
+
+  await prisma.eventAttendance.deleteMany({
+    where: {
+      eventId,
+      status: AttendanceStatuses.Pending,
+      accountId: { notIn: [...keptIds, ...crew.map((row) => row.accountId)] },
+    },
   })
 }
 
@@ -340,6 +384,13 @@ export const respondToRollCall = async ({
     where: { eventId_accountId: { eventId, accountId } },
   })
   if (!row) throw forbidden()
+
+  // A closed live keeps its answers
+  const live = await prisma.live.findUnique({
+    where: { calendarEventId: eventId },
+    select: { status: true },
+  })
+  if (live && !canManage && !isOpenLive(live.status as LiveStatusName)) throw conflict()
 
   // Hours only follow a Present on a live
   const asking = await eventsAskingHours([eventId])

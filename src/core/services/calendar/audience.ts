@@ -158,14 +158,6 @@ export const audienceYoutuberId = (values: FormValues): string | null => {
 
 export const isYoutuberAudience = (value: string): boolean => value.startsWith(YOUTUBER_PREFIX)
 
-// Columns a visibility pick rewrites together
-export const AUDIENCE_KEYS = [
-  'visibility',
-  'audienceTeamId',
-  'audienceSessionId',
-  'audienceLeadsOnly',
-] as const
-
 /**
  * Clauses opening the entries bound to a viewer's own teams
  * @param {string} viewerId - Signed-in member identifier
@@ -176,9 +168,9 @@ export const audienceClauses = async (
   viewerId: string
 ): Promise<Prisma.CalendarEventWhereInput[]> => {
   const [teams, trained, followed] = await Promise.all([
+    // Archived teams keep their past
     prisma.team.findMany({
       where: {
-        archived: false,
         OR: [
           { leads: { some: { accountId: viewerId } } },
           { members: { some: { accountId: viewerId } } },

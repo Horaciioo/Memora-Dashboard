@@ -3,8 +3,7 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { readHours } from '@/core/lib/calendar/hours'
 import { closeSeriesIfComplete } from '@/core/services/calendar/AnnualSlotService'
 import { moveOnRollCall, respondToRollCall } from '@/core/services/calendar/attendance'
-import { assertEntryAccess } from '@/core/services/calendar/CalendarService'
-import { assertRowInScope } from '@/core/services/auth/ScopeService'
+import { assertEntriesReachable, calendarViewer } from '@/core/services/calendar/visibility'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
 import { AttendanceStatuses } from '@/utils/constants/workflow'
@@ -40,7 +39,7 @@ export const POST = createProtectedRoute({
 export const PATCH = createProtectedRoute({
   permission: Permissions.CalendarManage,
   descriptor: { summary: 'Move a member on a roll-call', tags: ['calendar'] },
-  handler: async ({ params, raw, session, scope }) => {
+  handler: async ({ params, raw, session, access }) => {
     const { accountId, status } = raw
     if (typeof accountId !== 'string' || typeof status !== 'string') {
       throw invalidInput([{ field: 'status', message: FORM_COPY.required }])
@@ -49,8 +48,7 @@ export const PATCH = createProtectedRoute({
       throw invalidInput([{ field: 'status', message: FORM_COPY.notAnOption }])
     }
 
-    await assertEntryAccess(params.id, session.id, true)
-    await assertRowInScope('calendarEvent', params.id, await scope())
+    await assertEntriesReachable([params.id], await calendarViewer(session, access), true)
 
     return moveOnRollCall(params.id, accountId, status as AttendanceStatusName, session.id)
   },

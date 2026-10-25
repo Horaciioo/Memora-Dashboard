@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { PriorityNames } from '@/declarations/reference/fixed'
 import { logger } from '@/core/lib/logger'
 import { defaultState } from '@/core/services/work/shared'
 import { PROGRAM_PROJECT_COPY } from '@/declarations/work/copy'
@@ -9,7 +10,7 @@ import { AcademySessionStatuses } from '@/utils/constants/hierarchy'
 import { WorkflowPhases, WorkflowScopes } from '@/utils/constants/workflow'
 
 // Priority the project opens with, the team may change it afterwards
-const OPENING_PRIORITY = 'Urgente'
+const OPENING_PRIORITY = PriorityNames.Urgent
 
 interface ProgramTask {
   key: string

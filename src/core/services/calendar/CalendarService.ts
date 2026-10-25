@@ -2,9 +2,9 @@ import 'server-only'
 
 import { roleGroupedOptions } from '@/core/lib/forms/options'
 import { prisma } from '@/core/lib/db'
-import { readFullPerimeter, scopedWhere } from '@/core/services/auth/ScopeService'
+import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { forbidden, invalidInput, notFound } from '@/core/lib/errors'
+import { invalidInput, notFound } from '@/core/lib/errors'
 import { toOptions } from '@/core/lib/forms/options'
 import { wholeDays } from '@/core/lib/calendar/wholeDays'
 import { readDate, readFlag, readList, readText } from '@/core/lib/forms/values'
@@ -13,7 +13,9 @@ import {
   eventsAskingHours,
   reinforcedByEvent,
   expandRoster,
+  functionTeamWhere,
   notifyConvened,
+  pruneRoster,
   readRosterFor,
   sweepDueReminders,
   syncRoster,
@@ -40,11 +42,9 @@ import {
 } from '@/core/services/lives/LiveService'
 import { LIVE_FIELD_COPY } from '@/declarations/lives/copy'
 import { LIVE_PLATFORMS_SOON } from '@/declarations/lives/registries'
-import { assertNoLiveClash } from '@/core/services/lives/LiveClashService'
+import { assertLiveSlotFree, assertNoLiveClash } from '@/core/services/lives/LiveClashService'
 import { peopleInScope, projectOptions, youtuberOptions } from '@/core/services/work/shared'
 import {
-  AUDIENCE_KEYS,
-  audienceClauses,
   audienceOptions,
   audienceValue,
   isYoutuberAudience,
@@ -52,6 +52,7 @@ import {
   audienceYoutuberId,
   youtuberAudienceValue,
 } from '@/core/services/calendar/audience'
+import { visibleWhere } from '@/core/services/calendar/visibility'
 import { logger } from '@/core/lib/logger'
 import { emojiOrRandom } from '@/core/lib/work'
 import { projected } from '@/core/services/calendar/projections'
@@ -92,7 +93,7 @@ import {
 import { ROUTES } from '@/declarations/navigation'
 import { EVENT_VISIBILITY_REGISTRY } from '@/declarations/reference/registries'
 import { FORM_COPY, FORM_GROUPS } from '@/declarations/ui/copy'
-import type { PermissionHelpers, SessionUser } from '@/types/auth'
+import type { PermissionHelpers } from '@/types/auth'
 import type { AttendanceRoster, CalendarEntry } from '@/types/calendar'
 import type { FieldCondition, FieldDefinition, FieldOption, FormValues } from '@/types/forms'
 import {
@@ -104,6 +105,7 @@ import { RecruitmentStatuses } from '@/utils/constants/recruitment'
 import { Permissions } from '@/utils/constants/permissions'
 import { CalendarKinds, CalendarSources, EventVisibilities } from '@/utils/constants/workflow'
 import type { CalendarKindName, EventVisibilityName } from '@/utils/constants/workflow'
+import { DAY_MS, MINUTE_MS } from '@/utils/constants/time'
 
 /**
  * Read the members an entry may be attached to
@@ -244,9 +246,9 @@ const WHEN_MEMBERS_BY_HAND: FieldCondition = {
 
 // Words under the audience a model fixes
 const VISIBILITY_HINTS: Record<string, string> = {
-  [EventVisibilities.Everyone]: 'Tout Memora est concerné !',
-  [EventVisibilities.Responsables]: 'Seuls les Responsables sont concernés !',
-  [EventVisibilities.Admins]: 'Réservé aux Administrateurs !',
+  [EventVisibilities.Everyone]: AUDIENCE_COPY.everyoneHint,
+  [EventVisibilities.Responsables]: AUDIENCE_COPY.responsablesHint,
+  [EventVisibilities.Admins]: AUDIENCE_COPY.adminsHint,
 }
 
 // Fields a model opening slots has no use for
@@ -856,20 +858,6 @@ export const calendarFields = async (
 const andAlso = (condition: FieldCondition | undefined, extra: FieldCondition): FieldCondition =>
   condition ? { ...condition, and: andAlso(condition.and, extra) } : extra
 
-/**
- * Read the visibility levels a member is allowed to see
- * @param {PermissionHelpers} access - Permission helpers
- * @return {EventVisibilityName[]} - Allowed levels
- */
-
-const allowedVisibilities = (access: PermissionHelpers): EventVisibilityName[] => {
-  if (access.isAdmin) return EVENT_VISIBILITY_REGISTRY.keys
-
-  return access.isResponsable
-    ? [EventVisibilities.Everyone, EventVisibilities.Responsables]
-    : [EventVisibilities.Everyone]
-}
-
 // Everything an entry row needs to become a view
 const ENTRY_SHAPE = {
   template: true,
@@ -1001,14 +989,14 @@ const toEntry = (
         : {}),
       visibility: audienceValue(row),
       audienceLeadsOnly: row.audienceLeadsOnly,
-      startsAt: row.startsAt.toISOString().slice(0, 16),
-      endsAt: row.endsAt ? row.endsAt.toISOString().slice(0, 16) : null,
+      startsAt: row.startsAt.toISOString(),
+      endsAt: row.endsAt?.toISOString() ?? null,
       allDay: row.allDay,
       youtuberId: row.youtuberId,
       projectId: row.projectId,
       description: row.description,
       rollCall: row.rollCall,
-      remindAt: row.remindAt ? row.remindAt.toISOString().slice(0, 16) : null,
+      remindAt: row.remindAt?.toISOString() ?? null,
       teamIds: row.rollCallTeamIds,
       memberIds: row.attendances.map((seat) => seat.accountId),
       sessionId: row.sessionId,
@@ -1096,15 +1084,6 @@ export const listEntries = async ({
   await sweepAnnualReminders().catch((error: unknown) => logger.error('calendar.annual', error))
   await syncAnnualProjectStates().catch((error: unknown) => logger.error('calendar.annual', error))
 
-  const levels = allowedVisibilities(access)
-  const audiences = access.isAdmin
-    ? []
-    : [
-        ...(await audienceClauses(viewerId)),
-        // The whole team of a creator reads what is shown to it
-        { visibility: EventVisibilities.Youtuber, youtuberId: { in: scope.youtuberIds } },
-      ]
-
   const rows = await prisma.calendarEvent.findMany({
     where: scopedWhere('calendarEvent', scope, {
       startsAt: { lte: to },
@@ -1114,18 +1093,7 @@ export const listEntries = async ({
           // A band or a zone is still on screen when it merely overlaps the window
           OR: [{ endsAt: { gte: from } }, { endsAt: null, startsAt: { gte: from } }],
         },
-        {
-          OR: [
-            // Someone always sees what they posted themselves
-            { ownerId: viewerId },
-            // A convened member always sees their own roll-call
-            { attendances: { some: { accountId: viewerId } } },
-            { visibility: { in: levels } },
-            ...audiences,
-            { visibility: null, template: { visibility: { in: levels } } },
-            { visibility: null, templateId: null },
-          ],
-        },
+        await visibleWhere({ viewerId, access, scope }),
       ],
     }),
     include: ENTRY_SHAPE,
@@ -1212,25 +1180,6 @@ export const getEntries = async (
 }
 
 /**
- * Perimeter the calendar reads through
- * @param {SessionUser} viewer - Signed-in member
- * @param {PermissionHelpers} access - Permission helpers
- * @return {Promise<AccessScope>} - Perimeter without the active creator
- */
-
-export const readCalendarScope = async (
-  viewer: SessionUser,
-  access: PermissionHelpers
-): Promise<AccessScope> =>
-  access.isAdmin
-    ? { isGlobal: true, youtuberIds: [], activeYoutuberId: null }
-    : {
-        isGlobal: false,
-        youtuberIds: await readFullPerimeter(viewer, access),
-        activeYoutuberId: null,
-      }
-
-/**
  * Turn parsed values into an entry payload
  * @param {FormValues} values - Parsed body
  * @return {object} - Database payload
@@ -1246,8 +1195,12 @@ const toEntryData = (values: FormValues) => ({
   ...parseAudience(values),
   startsAt: readDate(values, 'startsAt') ?? new Date(),
   endsAt: readDate(values, 'endsAt'),
-  allDay: readFlag(values, 'allDay'),
-  youtuberId: readText(values, 'youtuberId'),
+  // Zones and periods span whole days
+  allDay:
+    readFlag(values, 'allDay') ||
+    [CalendarKinds.Zone, CalendarKinds.Period].some((kind) => kind === readText(values, 'kind')),
+  // A creator team names its creator
+  youtuberId: audienceYoutuberId(values) ?? readText(values, 'youtuberId'),
   projectId: readText(values, 'projectId'),
   rollCall: readFlag(values, 'rollCall'),
   remindAt: readDate(values, 'remindAt'),
@@ -1269,8 +1222,21 @@ const assertEndAfterStart = (data: ReturnType<typeof toEntryData>): void => {
   }
 }
 
-// Milliseconds in a day
-const DAY = 86_400_000
+/**
+ * Who writes entries
+ * @typedef {Object} EntryWriter
+ * @property {AccessScope} scope - Creator perimeter
+ * @property {string} viewerId - Member identifier
+ * @property {boolean} canManage - Manage permission
+ * @property {AcademyScope} academy - Plannable juniors
+ */
+
+export interface EntryWriter {
+  scope: AccessScope
+  viewerId: string
+  canManage: boolean
+  academy: AcademyScope
+}
 
 /**
  * Settle when the reminder fires
@@ -1282,14 +1248,21 @@ const DAY = 86_400_000
 const resolveRemindAt = (startsAt: Date, remindAt: Date | null): Date | null => {
   if (remindAt) return remindAt
 
-  const at = new Date(startsAt.getTime() - CALENDAR_SETTINGS.rollCallReminderLeadDays * DAY)
-  at.setHours(CALENDAR_SETTINGS.rollCallReminderHour, 0, 0, 0)
+  // Reminder hour on the team clock
+  const day = instantToWall(
+    new Date(startsAt.getTime() - CALENDAR_SETTINGS.rollCallReminderLeadDays * DAY_MS)
+  ).slice(0, 10)
+  const hour = String(CALENDAR_SETTINGS.rollCallReminderHour).padStart(2, '0')
+  const at = wallToInstant(`${day}T${hour}:00`)
 
   return at.getTime() <= Date.now() ? null : at
 }
 
-// Minutes are stored on the template
-const MINUTE = 60_000
+// Rescheduled reminders fire again
+const rearm = (remindAt: Date | null, current: { remindAt: Date | null } | null) =>
+  remindAt?.getTime() === current?.remindAt?.getTime()
+    ? { remindAt }
+    : { remindAt, remindedAt: null }
 
 /**
  * Fill what a form left blank with what its template already declares
@@ -1347,7 +1320,7 @@ const fillFromTemplate = async (data: ReturnType<typeof toEntryData>) => {
   const team =
     template.functionName && data.youtuberId
       ? await prisma.team.findFirst({
-          where: { youtuberId: data.youtuberId, jobFunction: { name: template.functionName } },
+          where: functionTeamWhere(data.youtuberId, template.functionName),
           select: { id: true, leads: { select: { accountId: true }, take: 1 } },
         })
       : null
@@ -1366,7 +1339,7 @@ const fillFromTemplate = async (data: ReturnType<typeof toEntryData>) => {
     endsAt:
       data.endsAt ??
       (template.defaultMinutes && !allDay
-        ? new Date(data.startsAt.getTime() + template.defaultMinutes * MINUTE)
+        ? new Date(data.startsAt.getTime() + template.defaultMinutes * MINUTE_MS)
         : null),
     ...(team && {
       visibility: EventVisibilities.Team,
@@ -1693,7 +1666,7 @@ const fileMeeting = async (
   // A team meeting is run by the Responsables of the team, the others by the root administrator
   const team = template.functionName
     ? await prisma.team.findFirst({
-        where: { youtuberId: row.youtuberId, jobFunction: { name: template.functionName } },
+        where: functionTeamWhere(row.youtuberId, template.functionName),
         select: { leads: { select: { accountId: true } } },
       })
     : null
@@ -1723,7 +1696,7 @@ const fileMeeting = async (
 /**
  * Edit an entry
  * @param {string} id - Entry identifier
- * @param {FormValues} values - Parsed body
+ * @param {FormValues} sent - Parsed body
  * @param {AccessScope} scope - Creator perimeter
  * @param {string} viewerId - Signed-in member identifier
  * @param {boolean} canManage - Viewer holds the manage permission
@@ -1733,21 +1706,21 @@ const fileMeeting = async (
 
 export const updateEntry = async (
   id: string,
-  values: FormValues,
+  sent: FormValues,
   scope: AccessScope,
   viewerId: string,
   canManage: boolean,
   academy: AcademyScope
 ): Promise<CalendarEntry> => {
   // A series of slots is reshaped through its days and hours, the entry itself holds none of the usual fields
-  const stored = await prisma.calendarEvent.findUnique({
-    where: { id },
-    include: { template: { select: { slotMinutes: true } } },
-  })
-  if (stored?.template?.slotMinutes && stored.kind === CalendarKinds.Period) {
-    return reshapeEntry(id, values)
+  const stored = await prisma.calendarEvent.findUnique({ where: { id }, include: ENTRY_SHAPE })
+  if (!stored) throw notFound()
+  if (stored.template?.slotMinutes && stored.kind === CalendarKinds.Period) {
+    return reshapeEntry(id, sent)
   }
 
+  // Hidden fields keep their value
+  const values: FormValues = { ...toEntry(stored).values, ...sent }
   const base = toEntryData(values)
   assertEndAfterStart(base)
   const { memberIds: convened, ...fixed } = await resolveAcademyEntry(
@@ -1756,28 +1729,43 @@ export const updateEntry = async (
     viewerId,
     academy
   )
-  const data = await applyTemplate({ ...base, ...fixed })
+  const applied = await applyTemplate({ ...base, ...fixed })
+  // A live always calls the roll
+  const liveTemplates = await readLiveTemplates()
+  const isLive = applied.templateId !== null && liveTemplates.has(applied.templateId)
+  const data = isLive ? { ...applied, rollCall: true } : applied
+  if (isLive) await assertLiveSlotFree(id, data.startsAt, data.endsAt)
 
   const row = await prisma.calendarEvent.update({
     where: { id },
     data: {
       ...data,
-      remindAt: data.rollCall ? resolveRemindAt(data.startsAt, data.remindAt) : null,
+      ...rearm(data.rollCall ? resolveRemindAt(data.startsAt, data.remindAt) : null, stored),
     },
     include: ENTRY_SHAPE,
   })
-  await syncLiveWithEntry(id, withTemplatePlatform(values, await readLiveTemplates()), viewerId)
+  await syncLiveWithEntry(id, withTemplatePlatform(values, liveTemplates), viewerId)
 
   // The card of the Réunions page follows its entry
   await syncMeetingCard(row)
 
   if (!data.rollCall) return toEntry(row)
 
-  // Widen the roster
+  // Members the old audience brought
   const known = new Set(row.attendances.map((seat) => seat.accountId))
+  const formerAudience = stored.rollCall
+    ? new Set(
+        await expandRoster(stored.rollCallTeamIds, [], scope, stored.startsAt, {
+          everyone: stored.visibility === EventVisibilities.Everyone,
+          youtuberId: audienceYoutuberId(toEntry(stored).values),
+          ...(await templateAudience(stored.templateId, stored.youtuberId)),
+        })
+      )
+    : new Set<string>()
+  const named = readList(values, 'memberIds').filter((memberId) => !formerAudience.has(memberId))
   const memberIds = await expandRoster(
     data.rollCallTeamIds,
-    convened ?? readList(values, 'memberIds'),
+    convened ?? named,
     scope,
     data.startsAt,
     {
@@ -1787,6 +1775,7 @@ export const updateEntry = async (
     }
   )
   await syncRoster(id, memberIds)
+  await pruneRoster(id, memberIds)
   await notifyConvened(
     { id, title: row.title, ownerId: row.ownerId },
     memberIds.filter((memberId) => !known.has(memberId))
@@ -1811,10 +1800,12 @@ export const moveEntry = async (id: string, startsAt: Date): Promise<CalendarEnt
   // Dragging never stretches an entry
   const shift = startsAt.getTime() - current.startsAt.getTime()
   const endsAt = current.endsAt ? new Date(current.endsAt.getTime() + shift) : null
+  const remindAt = current.remindAt ? new Date(current.remindAt.getTime() + shift) : null
+  await assertLiveSlotFree(id, startsAt, endsAt)
 
   const row = await prisma.calendarEvent.update({
     where: { id },
-    data: { startsAt, endsAt },
+    data: { startsAt, endsAt, ...rearm(remindAt, current) },
     include: ENTRY_SHAPE,
   })
   await syncLiveWithEntry(id)
@@ -1853,7 +1844,7 @@ const syncMeetingCard = async (row: {
       scheduledAt: row.startsAt,
       durationMin:
         row.endsAt && !row.allDay
-          ? Math.round((row.endsAt.getTime() - row.startsAt.getTime()) / 60_000)
+          ? Math.round((row.endsAt.getTime() - row.startsAt.getTime()) / MINUTE_MS)
           : null,
     },
   })
@@ -1888,7 +1879,10 @@ const dropMeetingCards = async (ids: string[]): Promise<void> => {
 export const resizeEntry = async (id: string, endsAt: Date): Promise<CalendarEntry> => {
   const current = await prisma.calendarEvent.findUnique({ where: { id } })
   if (!current) throw notFound()
-  if (endsAt <= current.startsAt) throw notFound()
+  if (endsAt <= current.startsAt) {
+    throw invalidInput([{ field: 'endsAt', message: FORM_COPY.endBeforeStart }])
+  }
+  await assertLiveSlotFree(id, current.startsAt, endsAt)
 
   const row = await prisma.calendarEvent.update({
     where: { id },
@@ -1914,38 +1908,30 @@ export const removeEntry = async (id: string): Promise<void> => {
 }
 
 /**
- * Apply one change to a whole selection
+ * Edit a whole selection
  * @param {string[]} ids - Selected entries
- * @param {FormValues} values - Parsed body
+ * @param {FormValues} values - Keys sent
+ * @param {EntryWriter} writer - Who edits
  * @return {Promise<CalendarEntry[]>} - Updated entries
  */
 
 export const updateEntries = async (
   ids: string[],
-  values: FormValues
+  values: FormValues,
+  { scope, viewerId, canManage, academy }: EntryWriter
 ): Promise<CalendarEntry[]> => {
   // A live is posted one at a time, it needs its platform and its Coordinators
   if ((await readLiveTemplates()).has(readText(values, 'templateId') ?? '')) {
     throw invalidInput([{ field: 'templateId', message: CALENDAR_FIELD_INFO.liveAlone }])
   }
 
-  // Only the keys actually sent are written
-  const data = Object.fromEntries(
-    Object.entries(toEntryData(values)).filter(
-      ([key]) =>
-        key in values ||
-        (AUDIENCE_KEYS.some((audienceKey) => audienceKey === key) && 'visibility' in values)
-    )
-  )
+  // Same path as one edit
+  const entries: CalendarEntry[] = []
+  for (const id of ids) {
+    entries.push(await updateEntry(id, values, scope, viewerId, canManage, academy))
+  }
 
-  await prisma.calendarEvent.updateMany({ where: { id: { in: ids } }, data })
-
-  const rows = await prisma.calendarEvent.findMany({
-    where: { id: { in: ids } },
-    include: ENTRY_SHAPE,
-  })
-
-  return rows.map((row) => toEntry(row))
+  return entries
 }
 
 /**
@@ -1958,47 +1944,6 @@ export const removeEntries = async (ids: string[]): Promise<void> => {
   await cancelLivesOfEntries(ids)
   await dropMeetingCards(ids)
   await prisma.calendarEvent.deleteMany({ where: { id: { in: ids } } })
-}
-
-/**
- * Guard a write
- * @param {string} id - Entry identifier
- * @param {string} viewerId - Signed-in member identifier
- * @param {boolean} canManage - Member holds the manage permission
- * @return {Promise<void>} - Throws when neither owner nor manager
- */
-
-export const assertEntryAccess = async (
-  id: string,
-  viewerId: string,
-  canManage: boolean
-): Promise<void> => {
-  if (canManage) return
-
-  const row = await prisma.calendarEvent.findUnique({ where: { id }, select: { ownerId: true } })
-  if (!row) throw notFound()
-  if (row.ownerId !== viewerId) throw forbidden()
-}
-
-/**
- * Guard a bulk write
- * @param {string[]} ids - Selected entries
- * @param {string} viewerId - Signed-in member identifier
- * @param {boolean} canManage - Member holds the manage permission
- * @return {Promise<void>} - Throws on the first entry out of reach
- */
-
-export const assertEntriesAccess = async (
-  ids: string[],
-  viewerId: string,
-  canManage: boolean
-): Promise<void> => {
-  if (canManage) return
-
-  const reachable = await prisma.calendarEvent.count({
-    where: { id: { in: ids }, ownerId: viewerId },
-  })
-  if (reachable !== ids.length) throw forbidden()
 }
 
 /**
@@ -2017,7 +1962,10 @@ export const getEntry = async (
   scope: AccessScope
 ): Promise<CalendarEntry | null> => {
   const row = await prisma.calendarEvent.findFirst({
-    where: scopedWhere('calendarEvent', scope, { id }),
+    where: scopedWhere('calendarEvent', scope, {
+      id,
+      AND: [await visibleWhere({ viewerId, access, scope })],
+    }),
     include: ENTRY_SHAPE,
   })
   if (!row) return null
