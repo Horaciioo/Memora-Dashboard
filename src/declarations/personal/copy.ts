@@ -4,7 +4,7 @@
  */
 
 export const PERSONAL_COPY = {
-  title: 'Ton Accueil',
+  title: 'Accueil',
   heroDescription: 'Ton hub personnel',
   greeting: 'Salut, {name}',
   hello: 'On bosse sur quoi aujourd’hui ?',
