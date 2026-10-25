@@ -129,7 +129,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
     version: '0.7.0',
     date: '2026-10-21',
-    title: 'Le rôle Employé arrive',
+    title: 'Une flopée de correctifs !',
     intro:
       'Memora accueille un nouveau rôle, une quatrième division et des icônes entièrement redessinées.',
     description:
@@ -151,7 +151,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
-        text: 'Ajout d’une quatrième division, « Division 4 », réservée aux Responsables, avec son emblème doré.',
+        text: 'Ajout d’une quatrième division, « Division IV », réservée aux Responsables, avec son emblème doré.',
       },
       {
         tag: ChangelogTags.Improved,
@@ -161,12 +161,45 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Amélioration de la page « Modérateurs » : chaque YouTubeur sépare l’« Administration », avec l’Admin en premier puis les Responsables, des modérateurs, rangés par fonction puis par ordre alphabétique.',
       },
       {
+        tag: ChangelogTags.Added,
+        text: 'Ajout de la mise à jour en direct des accès : un changement de rôle, de fonction, de division ou de droit s’applique sans recharger la page.',
+      },
+      {
         tag: ChangelogTags.Improved,
         text: 'Amélioration visuelle des icônes de rôles et de fonctions : Admin, Employé et Modérateur, Discord, Lives et YouTube sont redessinés, avec une couronne qui scintille et une flamme qui crépite.',
       },
       {
         tag: ChangelogTags.Improved,
-        text: 'Amélioration visuelle des divisions : « Squad I », « Squad II » et « Squad III » deviennent « Division 1 », « Division 2 » et « Division 3 », chacune avec un écusson qui gagne un chevron.',
+        text: 'Amélioration visuelle des divisions : « Squad I », « Squad II » et « Squad III » deviennent « Division I », « Division II » et « Division III », chacune avec un écusson qui gagne un chevron.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.MemberRead,
+        text: 'Amélioration de la page « Modérateurs » : la carte d’un Admin, d’un Employé ou d’un Responsable affiche l’emblème de son rôle plutôt que ceux de ses fonctions.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Amélioration des divisions : tous les Responsables rejoignent la « Division IV ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration des « Recrutements » : le bouton « Copier » de l’annonce copie le texte et l’image du planning en une seule fois.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentObserve,
+        text: 'Amélioration des « Recrutements » : une session sans consigne affiche « Aucune consigne n’a été communiquée pour le moment » aux membres qui ne peuvent pas en écrire.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.home,
+        text: 'Amélioration de l’« Accueil » : une liste « Tes tâches » vide affiche une simple phrase.',
       },
       {
         tag: ChangelogTags.Improved,
