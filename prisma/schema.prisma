@@ -2950,8 +2950,8 @@ model GolfPlayer {
   holedAt   DateTime?
   // Strokes of each finished hole
   card      Int[]     @default([])
-  // Power in hand
-  power     String?
+  // Powers in hand, oldest first
+  powers    String[]  @default([])
   effects   Json      @default("[]")
 
   session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
