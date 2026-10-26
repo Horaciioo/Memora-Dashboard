@@ -11,19 +11,19 @@ import { cn } from '@/utils/classnames'
 export interface GolfScorecardProps {
   players: GolfPlayerState[]
   faces: GolfFace[]
-  pars: number[]
+  holes: number
   viewerId: string
 }
 
 /**
  * Strokes of every player hole by hole, fewest first
- * @param {GolfScorecardProps} props - Cards and pars
+ * @param {GolfScorecardProps} props - Cards
  * @return {JSX.Element}
  */
 
-export const GolfScorecard = ({ players, faces, pars, viewerId }: GolfScorecardProps) => {
+export const GolfScorecard = ({ players, faces, holes, viewerId }: GolfScorecardProps) => {
   const ranked = rankCards(players)
-  const parTotal = pars.reduce((sum, par) => sum + par, 0)
+  const columns = Array.from({ length: holes }, (_, index) => index)
 
   return (
     <div className={GOLF_SCORECARD.scroll}>
@@ -31,7 +31,7 @@ export const GolfScorecard = ({ players, faces, pars, viewerId }: GolfScorecardP
         <thead>
           <tr>
             <th className={GOLF_SCORECARD.headCell}>{GOLF_BOARD_COPY.player}</th>
-            {pars.map((_, index) => (
+            {columns.map((index) => (
               <th key={index} className={GOLF_SCORECARD.headCell}>
                 {index + 1}
               </th>
@@ -40,15 +40,6 @@ export const GolfScorecard = ({ players, faces, pars, viewerId }: GolfScorecardP
           </tr>
         </thead>
         <tbody>
-          <tr className={GOLF_SCORECARD.parRow}>
-            <td className={GOLF_SCORECARD.name}>{GOLF_BOARD_COPY.parRow}</td>
-            {pars.map((par, index) => (
-              <td key={index} className={GOLF_SCORECARD.cell}>
-                {par}
-              </td>
-            ))}
-            <td className={GOLF_SCORECARD.total}>{parTotal}</td>
-          </tr>
           {ranked.map((player) => {
             const face = faces.find((entry) => entry.accountId === player.accountId)
 
@@ -64,7 +55,7 @@ export const GolfScorecard = ({ players, faces, pars, viewerId }: GolfScorecardP
                   <Avatar name={face?.name ?? ''} src={face?.avatarUrl ?? null} size="xs" />
                   {face?.name}
                 </td>
-                {pars.map((par, index) => {
+                {columns.map((index) => {
                   const strokes = player.card[index]
 
                   return (
@@ -72,9 +63,7 @@ export const GolfScorecard = ({ players, faces, pars, viewerId }: GolfScorecardP
                       key={index}
                       className={cn(
                         GOLF_SCORECARD.cell,
-                        strokes === undefined && GOLF_SCORECARD.cellPending,
-                        strokes !== undefined && strokes < par && GOLF_SCORECARD.cellUnder,
-                        strokes !== undefined && strokes > par && GOLF_SCORECARD.cellOver
+                        strokes === undefined && GOLF_SCORECARD.cellPending
                       )}
                     >
                       {strokes ?? GOLF_BOARD_COPY.pending}

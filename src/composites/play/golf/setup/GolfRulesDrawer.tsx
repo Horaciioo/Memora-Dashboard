@@ -7,6 +7,14 @@ import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_RULES_COPY, GOLF_SETUP_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_COURSES, GOLF_RANDOM_COURSE } from '@/declarations/play/golf/courses'
 import { GOLF_POWERS } from '@/declarations/play/golf/powers'
+import { GolfModes } from '@/utils/constants/play'
+
+// Label of each format played on one map
+const MODE_LABELS = {
+  [GolfModes.Casual]: GOLF_SETUP_COPY.modeCasual,
+  [GolfModes.Tournament]: GOLF_SETUP_COPY.modeTournament,
+  [GolfModes.Chaos]: GOLF_SETUP_COPY.modeChaos,
+}
 
 export interface GolfRulesDrawerProps {
   open: boolean
@@ -23,6 +31,13 @@ export interface GolfRulesDrawerProps {
 export const GolfRulesDrawer = ({ open, onClose, settings }: GolfRulesDrawerProps) => {
   const rows = [
     { label: GOLF_RULES_COPY.victory, value: GOLF_RULES_COPY.victoryValue },
+    {
+      label: GOLF_RULES_COPY.mode,
+      value:
+        settings.mode === GolfModes.Tournament
+          ? fillPlayMessage(GOLF_SETUP_COPY.mapsCount, { count: settings.maps })
+          : MODE_LABELS[settings.mode],
+    },
     {
       label: GOLF_RULES_COPY.course,
       value:
@@ -45,7 +60,9 @@ export const GolfRulesDrawer = ({ open, onClose, settings }: GolfRulesDrawerProp
     },
     {
       label: GOLF_RULES_COPY.maxStrokes,
-      value: fillPlayMessage(GOLF_SETUP_COPY.strokes, { count: settings.maxStrokes }),
+      value: settings.unlimitedStrokes
+        ? GOLF_SETUP_COPY.unlimited
+        : fillPlayMessage(GOLF_SETUP_COPY.strokes, { count: settings.maxStrokes }),
     },
     {
       label: GOLF_RULES_COPY.collisions,

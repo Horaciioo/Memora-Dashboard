@@ -11,6 +11,7 @@ import {
   simulateShot,
   spendShot,
   strokeBalls,
+  strokeCeiling,
 } from '@/core/lib/play/golf'
 import type { GolfShotInput, GolfShotResult } from '@/core/lib/play/golf'
 import { boardStep, closeHole } from '@/core/services/play/golf/GolfTableService'
@@ -58,7 +59,8 @@ const ballsOf = (table: GolfTable, shooter: GolfPlayer): GolfShotInput['balls'] 
   strokeBalls(
     presentPlayers(table).map((player) => ({
       ...player,
-      isDone: isHoleDone(player, table.settings.maxStrokes),
+      hand: player.powers,
+      isDone: isHoleDone(player, strokeCeiling(table.settings)),
       restsAt: player.restsAt.getTime(),
       effects: effectsOf(player.effects),
     })),
@@ -127,6 +129,7 @@ const writeMoves = async (
     frames: result.frames,
     paths: result.paths,
     events: result.events,
+    flashId: result.flashId,
   }
   const base = { sessionId: session.id, hole: game.hole, createdAt: now }
   // Holes and falls told once the ball stops

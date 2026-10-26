@@ -4,7 +4,14 @@ import type { GolfGame, GolfPlayer, Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { conflict, notFound } from '@/core/lib/errors'
-import { compileHole, golfPhase, golfSettingsOf, holesOf, isHoleDone } from '@/core/lib/play/golf'
+import {
+  golfPhase,
+  golfSettingsOf,
+  holeFor,
+  holesOf,
+  isHoleDone,
+  strokeCeiling,
+} from '@/core/lib/play/golf'
 import type {
   GolfEffect,
   GolfGameSettings,
@@ -22,7 +29,7 @@ import { GolfPhases } from '@/utils/constants/play'
  * @typedef {Object} GolfTrack
  */
 
-export type GolfTrack = Pick<GolfShotResult, 'frameMs' | 'frames' | 'paths' | 'events'>
+export type GolfTrack = Pick<GolfShotResult, 'frameMs' | 'frames' | 'paths' | 'events' | 'flashId'>
 
 /**
  * Locked course of a game
@@ -94,7 +101,7 @@ export const presentPlayers = (table: Pick<GolfTable, 'players' | 'session'>): G
  */
 
 export const isEveryoneDone = (table: GolfTable): boolean =>
-  presentPlayers(table).every((player) => isHoleDone(player, table.settings.maxStrokes))
+  presentPlayers(table).every((player) => isHoleDone(player, strokeCeiling(table.settings)))
 
 /**
  * Ball the player may hit now
@@ -113,7 +120,7 @@ export const requireBall = (table: GolfTable, accountId: string): GolfPlayer => 
     throw conflict(PLAY_ERRORS.holeClosed)
   }
   const player = presentPlayers(table).find((entry) => entry.accountId === accountId)
-  if (!player || isHoleDone(player, settings.maxStrokes)) throw conflict(PLAY_ERRORS.holeDone)
+  if (!player || isHoleDone(player, strokeCeiling(settings))) throw conflict(PLAY_ERRORS.holeDone)
 
   return player
 }
@@ -145,7 +152,7 @@ export const withGolf = <T>(
       settings,
       game,
       players,
-      hole: compileHole(layouts[Math.min(game.hole, layouts.length - 1)]),
+      hole: holeFor(layouts[Math.min(game.hole, layouts.length - 1)], settings),
       holes: layouts.length,
       now: new Date(),
     })

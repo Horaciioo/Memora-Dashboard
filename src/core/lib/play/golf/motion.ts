@@ -1,10 +1,13 @@
 import type { GolfShotState } from '@/core/lib/play/golf/board'
 import { pathAt } from '@/core/lib/play/golf/frames'
-import type { GolfShotEvent, GolfShotResult } from '@/core/lib/play/golf/types'
+import type { GolfEventKind, GolfShotEvent, GolfShotResult } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 // Key of a track still predicted on this screen
 const LOCAL_KEY = 'local'
+
+// Pulse key of a ball holed
+export const CUP_PULSE = 'cup'
 
 /**
  * Track one ball is replaying
@@ -26,6 +29,8 @@ export interface GolfMotionTrack {
   played: number
   // Ball hit, its track carries the sounds
   isLead: boolean
+  // Ball sent off by a flash
+  isFlash: boolean
 }
 
 /**
@@ -37,7 +42,7 @@ export interface GolfMotion {
   tracks: Map<string, GolfMotionTrack>
   // Shots already handled
   seen: Set<string>
-  // Local ms each bumper was last hit
+  // Local ms each bumper or boost was last hit
   pulses: Map<string, number>
 }
 
@@ -51,6 +56,14 @@ export const createMotion = (): GolfMotion => ({
   seen: new Set(),
   pulses: new Map(),
 })
+
+/**
+ * Track predicted here, the board not caught up yet
+ * @param {GolfMotionTrack} track - Track
+ * @return {boolean} - Predicted
+ */
+
+export const isLocalTrack = (track: GolfMotionTrack): boolean => track.key === LOCAL_KEY
 
 /**
  * Fractional frame of a track
@@ -76,11 +89,13 @@ export const isTrackOver = (track: GolfMotionTrack, now: number): boolean =>
  * Spot of a ball on its track
  * @param {GolfMotionTrack} track - Track
  * @param {number} now - Local ms
- * @return {{ x: number, z: number }} - Metres
+ * @return {{ x: number, y: number, z: number }} - Metres
  */
 
-export const trackSpot = (track: GolfMotionTrack, now: number): { x: number; z: number } =>
-  pathAt(track.path, frameOf(track, now))
+export const trackSpot = (
+  track: GolfMotionTrack,
+  now: number
+): { x: number; y: number; z: number } => pathAt(track.path, frameOf(track, now))
 
 /**
  * Events reached since the last call
@@ -125,7 +140,7 @@ export const reachedEvent = (
 /**
  * Tracks of a stroke for every ball it moved
  * @param {GolfMotion} motion - Motion
- * @param {Pick<GolfShotResult, 'paths' | 'frameMs' | 'frames' | 'events'>} track - Stroke
+ * @param {Pick<GolfShotResult, 'paths' | 'frameMs' | 'frames' | 'events' | 'flashId'>} track - Stroke
  * @param {Object} timing - Start and ball hit
  * @return {void}
  */
@@ -137,7 +152,8 @@ const startTracks = (
     frameMs,
     frames,
     events,
-  }: Pick<GolfShotResult, 'paths' | 'frameMs' | 'frames' | 'events'>,
+    flashId,
+  }: Pick<GolfShotResult, 'paths' | 'frameMs' | 'frames' | 'events' | 'flashId'>,
   timing: Pick<GolfMotionTrack, 'key' | 'startedAt' | 'serverStart'> & { leadId: string }
 ): void => {
   const { leadId, ...start } = timing
@@ -149,12 +165,13 @@ const startTracks = (
     events,
     played: 0,
     isLead: false,
+    isFlash: false,
   }
   // Sounds already behind are skipped
   const frame = frameOf(track, performance.now())
   while (track.played < events.length && events[track.played].f < frame) track.played += 1
   for (const [id, path] of Object.entries(paths)) {
-    motion.tracks.set(id, { ...track, path, isLead: id === leadId })
+    motion.tracks.set(id, { ...track, path, isLead: id === leadId, isFlash: id === flashId })
   }
 }
 
@@ -225,4 +242,32 @@ export const syncShots = (
       leadId: shot.accountId,
     })
   }
+}
+
+/**
+ * Latest event of a ball within a window
+ * @param {GolfMotionTrack} track - Track
+ * @param {string} id - Ball
+ * @param {GolfEventKind[]} kinds - Kinds sought
+ * @param {number} now - Local ms
+ * @param {number} windowMs - Look-back
+ * @return {{ event: GolfShotEvent, ageMs: number } | undefined} - Event and age
+ */
+
+export const recentEvent = (
+  track: GolfMotionTrack,
+  id: string,
+  kinds: GolfEventKind[],
+  now: number,
+  windowMs: number
+): { event: GolfShotEvent; ageMs: number } | undefined => {
+  const frame = frameOf(track, now)
+  for (let index = track.events.length - 1; index >= 0; index -= 1) {
+    const event = track.events[index]
+    if (event.id !== id || !kinds.includes(event.kind) || event.f > frame) continue
+    const ageMs = (frame - event.f) * track.frameMs
+    return ageMs <= windowMs ? { event, ageMs } : undefined
+  }
+
+  return undefined
 }

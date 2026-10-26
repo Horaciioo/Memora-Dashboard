@@ -14,10 +14,14 @@ export interface GolfRig {
   // Look direction, zero toward +z
   yaw: number
   distance: number
+  // Height angle above the ground
+  pitch: number
   isOverview: boolean
   // Held keys, turn and zoom
   turn: number
   zoom: number
+  // Held keys, climb
+  climb: number
   // Smoothed point looked at
   target: Vector3
   // Ball drawn spots, by player
@@ -42,9 +46,11 @@ export const teeYaw = (hole: GolfHole): number =>
 export const createRig = (hole: GolfHole): GolfRig => ({
   yaw: teeYaw(hole),
   distance: camera.distance,
+  pitch: camera.pitch,
   isOverview: false,
   turn: 0,
   zoom: 0,
+  climb: 0,
   target: new Vector3(hole.tee[0], 0, hole.tee[1]),
   spots: new Map(),
 })
@@ -95,3 +101,12 @@ export const cameraSpot = (
 
 export const clampDistance = (distance: number): number =>
   Math.min(camera.maxDistance, Math.max(camera.minDistance, distance))
+
+/**
+ * Height angle kept above the ground and below the zenith
+ * @param {number} pitch - Asked angle
+ * @return {number} - Bounded angle
+ */
+
+export const clampPitch = (pitch: number): number =>
+  Math.min(camera.maxPitch, Math.max(camera.minPitch, pitch))

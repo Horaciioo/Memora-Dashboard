@@ -10,6 +10,7 @@ import {
   holesOf,
   isEffectActive,
   isHoleDone,
+  strokeCeiling,
 } from '@/core/lib/play/golf'
 import { effectsOf, hazardsOf, orbsOf } from '@/core/services/play/golf/lookups'
 import type { GolfTrack } from '@/core/services/play/golf/lookups'
@@ -47,6 +48,7 @@ export const golfView = async (session: EngineSession) => {
         createdAt: true,
         strokes: true,
         power: true,
+        hole: true,
       },
     }),
   ])
@@ -81,10 +83,10 @@ export const golfView = async (session: EngineSession) => {
       restsAt: player.restsAt,
       strokes: player.strokes,
       isHoled: Boolean(player.holedAt),
-      isDone: isHoleDone(player, settings.maxStrokes),
+      isDone: isHoleDone(player, strokeCeiling(settings)),
       card: player.card,
       total: cardTotal(player.card),
-      power: player.power as GolfPowerName | null,
+      hand: player.powers.filter((power): power is GolfPowerName => GOLF_POWERS.has(power)),
       effects: effectsOf(player.effects).filter((effect) => isEffectActive(effect, at)),
       powers: [...activePowers(effectsOf(player.effects), at)],
       hasLeft: !present.has(player.accountId),
@@ -100,6 +102,9 @@ export const golfView = async (session: EngineSession) => {
       kind: move.strokes === 1 ? 'ACE' : move.kind,
       accountId: move.accountId,
       at: move.createdAt,
+      hole: move.hole,
+      // Key for the power sound
+      power: move.power && GOLF_POWERS.has(move.power) ? move.power : null,
       values: {
         count: move.strokes ?? 0,
         power: move.power && GOLF_POWERS.has(move.power) ? GOLF_POWERS.label(move.power) : '',

@@ -1,12 +1,12 @@
 'use client'
 
-import { Button } from '@/components/elements/actions/Button'
+import { GolfEmptyOrb, GolfPowerOrb } from '@/composites/play/golf/GolfPowerOrb'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
 import { activePowers } from '@/core/lib/play/golf'
 import type { GolfPlayerState } from '@/core/lib/play/golf'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_POWERS } from '@/declarations/play/golf/powers'
-import { ICONS } from '@/declarations/ui/icons'
+import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GOLF_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { GolfPowerName } from '@/utils/constants/play'
@@ -17,78 +17,90 @@ export interface GolfPowerSlotProps {
   serverTime: number
   canUse: boolean
   isSaving: boolean
-  onUse: (power: GolfPowerName) => void
+  onUse: (power: GolfPowerName, slot: number) => void
 }
 
 /**
- * Power in hand, green bonus or red malus, with the effects worn
+ * One case of the hand, empty or holding a power
+ * @param {Object} props - Power, slot and gesture
+ * @return {JSX.Element}
+ */
+
+const GolfHandCase = ({
+  power,
+  slot,
+  canUse,
+  isSaving,
+  onUse,
+}: Omit<GolfPowerSlotProps, 'me' | 'serverTime'> & {
+  power: GolfPowerName | null
+  slot: number
+}) => {
+  const meta = power ? GOLF_POWERS.get(power) : null
+
+  if (!power || !meta) {
+    return (
+      <div className={cn(GOLF_BOARD.slot, GOLF_BOARD.slotEmpty)} title={GOLF_BOARD_COPY.noPower}>
+        <GolfEmptyOrb className={GOLF_BOARD.slotOrb} />
+      </div>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      className={GOLF_BOARD.slot}
+      disabled={!canUse || isSaving}
+      aria-label={`${GOLF_BOARD_COPY.use} ${meta.label}`}
+      onClick={() => onUse(power, slot)}
+    >
+      <GolfPowerOrb power={power} hasKind className={GOLF_BOARD.slotOrb} />
+      <span className={GOLF_BOARD.slotTip} role="tooltip">
+        <span
+          className={cn(GOLF_BOARD.slotKind, meta.isBonus ? GOLF_BOARD.bonus : GOLF_BOARD.malus)}
+        >
+          {meta.isBonus ? GOLF_BOARD_COPY.bonus : GOLF_BOARD_COPY.malus}
+        </span>
+        <span className={GOLF_BOARD.slotName}>{meta.label}</span>
+        <span className={GOLF_BOARD.slotEffect}>{meta.effect}</span>
+      </span>
+    </button>
+  )
+}
+
+/**
+ * Hand of three cases, effects worn
  * @param {GolfPowerSlotProps} props - Player and gesture
  * @return {JSX.Element}
  */
 
 export const GolfPowerSlot = ({ me, serverTime, canUse, isSaving, onUse }: GolfPowerSlotProps) => {
   const serverNow = useServerNow(new Date(serverTime))
-  const power = me.power && GOLF_POWERS.has(me.power) ? me.power : null
-  const meta = power ? GOLF_POWERS.get(power) : null
-  const Icon = ICONS[meta?.icon ?? 'golfStroke']
+  const cases = Array.from({ length: GOLF_SETTINGS.hand }, (_, slot) => me.hand[slot] ?? null)
   const worn = [...activePowers(me.effects, serverNow)]
 
   return (
-    <div className={GOLF_BOARD.holeBlock}>
+    <div className={GOLF_BOARD.handBox}>
       {worn.length > 0 && (
         <div className={GOLF_BOARD.effects} aria-label={GOLF_BOARD_COPY.onYou}>
-          {worn.map((entry) => {
-            const WornIcon = ICONS[GOLF_POWERS.get(entry).icon]
-
-            return (
-              <span
-                key={entry}
-                title={GOLF_POWERS.label(entry)}
-                className={cn(
-                  GOLF_BOARD.effect,
-                  GOLF_POWERS.get(entry).isBonus ? GOLF_BOARD.bonus : GOLF_BOARD.malus
-                )}
-              >
-                <WornIcon className={GOLF_BOARD.effectIcon} aria-hidden="true" />
-              </span>
-            )
-          })}
+          {worn.map((entry) => (
+            <span key={entry} title={GOLF_POWERS.label(entry)}>
+              <GolfPowerOrb power={entry} className={GOLF_BOARD.effect} />
+            </span>
+          ))}
         </div>
       )}
-      <div className={cn(GOLF_BOARD.slot, !meta && GOLF_BOARD.slotEmpty)}>
-        <span
-          className={cn(
-            GOLF_BOARD.slotIcon,
-            meta ? (meta.isBonus ? GOLF_BOARD.bonus : GOLF_BOARD.malus) : GOLF_BOARD.slotIconEmpty
-          )}
-        >
-          <Icon className={GOLF_BOARD.slotGlyph} aria-hidden="true" />
-        </span>
-        <span className={GOLF_BOARD.slotText}>
-          <span className={GOLF_BOARD.caption}>
-            {meta
-              ? meta.isBonus
-                ? GOLF_BOARD_COPY.bonus
-                : GOLF_BOARD_COPY.malus
-              : GOLF_BOARD_COPY.power}
-          </span>
-          {meta ? (
-            <span className={GOLF_BOARD.slotName}>{meta.label}</span>
-          ) : (
-            <span className={GOLF_BOARD.slotHint}>{GOLF_BOARD_COPY.noPower}</span>
-          )}
-        </span>
-        {power && (
-          <Button
-            variant="arcadeSmall"
-            className={GOLF_BOARD.slotUse}
-            disabled={!canUse}
-            isLoading={isSaving}
-            onClick={() => onUse(power)}
-          >
-            {GOLF_BOARD_COPY.use}
-          </Button>
-        )}
+      <div className={GOLF_BOARD.hand}>
+        {cases.map((power, slot) => (
+          <GolfHandCase
+            key={slot}
+            power={power}
+            slot={slot}
+            canUse={canUse}
+            isSaving={isSaving}
+            onUse={onUse}
+          />
+        ))}
       </div>
     </div>
   )

@@ -2,9 +2,10 @@ import { Plane, Raycaster, Vector2, Vector3 } from 'three'
 import type { Camera, Group } from 'three'
 import type { RefObject } from 'react'
 
-import { clampDistance } from '@/composites/play/golf/scene/rig'
+import { clampDistance, clampPitch } from '@/composites/play/golf/scene/rig'
 import type { GolfRig } from '@/composites/play/golf/scene/rig'
-import { shotVector } from '@/core/lib/play/golf'
+import { isAimHidden, shotVector, swayedAngle } from '@/core/lib/play/golf'
+import type { GolfPowerName } from '@/utils/constants/play'
 import { useGolfAimStore } from '@/core/store/golfAim'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
@@ -26,6 +27,8 @@ export interface GolfPointerInput {
   // Own ball can be hit now
   canShoot: () => boolean
   isPlacing: boolean
+  // Powers on the own ball now
+  powers: () => Set<GolfPowerName>
   onShoot: (angle: number, power: number) => void
   onPlace: (x: number, z: number) => void
 }
@@ -36,8 +39,10 @@ export interface GolfPointerInput {
  */
 
 export interface GolfPointerState {
-  // Pull being aimed
-  shot: { angle: number; power: number } | null
+  // Pull being aimed, sway clock in ms
+  shot: { angle: number; power: number; since: number } | null
+  // Ground point held, the rubber band end
+  grip: Vector3 | null
   // Lawn spot under the pointer while placing
   spot: Vector3 | null
 }
@@ -103,9 +108,25 @@ const pull = (context: PointerContext, event: PointerEvent): void => {
   const found = pointAtBall(context, event)
   if (!found) return
   const { angle, length } = shotVector(found.ball.x - found.point.x, found.ball.z - found.point.z)
-  context.state.shot = { angle, power: Math.min(1, length / aim.pullMeters) }
-  useGolfAimStore.getState().setPower(context.state.shot.power)
+  const since = context.state.shot?.since ?? performance.now()
+  context.state.shot = { angle, power: Math.min(1, length / aim.pullMeters), since }
+  context.state.grip = found.point
+  // Blind aim shows no gauge
+  const isHidden = isAimHidden(context.input.current.powers())
+  useGolfAimStore.getState().setPower(isHidden ? null : context.state.shot.power)
 }
+
+/**
+ * Angle the ball leaves on, swayed now
+ * @param {NonNullable<GolfPointerState['shot']>} shot - Pull
+ * @param {Set<GolfPowerName>} powers - Powers on the ball
+ * @return {number} - Angle
+ */
+
+export const aimedAngle = (
+  shot: NonNullable<GolfPointerState['shot']>,
+  powers: Set<GolfPowerName>
+): number => swayedAngle(shot.angle, shot.power, (performance.now() - shot.since) / 1000, powers)
 
 /**
  * Drop the pull being aimed
@@ -115,6 +136,7 @@ const pull = (context: PointerContext, event: PointerEvent): void => {
 
 export const cancelAim = (state: GolfPointerState): void => {
   state.shot = null
+  state.grip = null
   useGolfAimStore.getState().setPower(null)
 }
 
@@ -161,7 +183,10 @@ const onMove = (context: PointerContext, event: PointerEvent): void => {
   const last = context.pointers.get(event.pointerId)
   if (!last) return
   if (context.mode === 'aim') pull(context, event)
-  if (context.mode === 'turn') rig.yaw += (event.clientX - last.x) * camera.dragTurn
+  if (context.mode === 'turn') {
+    rig.yaw += (event.clientX - last.x) * camera.dragTurn
+    rig.pitch = clampPitch(rig.pitch + (event.clientY - last.y) * camera.dragPitch)
+  }
   last.set(event.clientX, event.clientY)
   if (context.mode !== 'pinch' || context.pointers.size < 2) return
   const [first, second] = [...context.pointers.values()]
@@ -183,7 +208,7 @@ const onUp = (context: PointerContext, event: PointerEvent): void => {
   const { shot, spot } = context.state
   const moved = context.downAt.distanceTo(new Vector2(event.clientX, event.clientY))
   if (context.mode === 'aim' && shot && shot.power >= physics.minPower)
-    onShoot(shot.angle, shot.power)
+    onShoot(aimedAngle(shot, context.input.current.powers()), shot.power)
   if (context.mode !== 'aim' && moved < GOLF_SCENE.aim.clickPixels && isPlacing && spot) {
     onPlace(spot.x, spot.z)
   }

@@ -1,13 +1,13 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Vector3 } from 'three'
 
-import { cameraSpot, clampDistance, overviewOf } from '@/composites/play/golf/scene/rig'
+import { cameraSpot, clampDistance, clampPitch, overviewOf } from '@/composites/play/golf/scene/rig'
 import type { GolfRig } from '@/composites/play/golf/scene/rig'
-import type { GolfHole } from '@/core/lib/play/golf'
+import type { GolfHole, GolfPoint } from '@/core/lib/play/golf'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 const { camera } = GOLF_SETTINGS
@@ -18,6 +18,8 @@ const { camera } = GOLF_SETTINGS
  * @param {RefObject<GolfRig>} props.rigRef - Shared rig
  * @param {GolfHole} props.hole - Hole
  * @param {string | null} props.focusId - Ball followed
+ * @param {string} props.map - Map of the hole
+ * @param {GolfPoint} props.origin - Hole spot on its map
  * @return {null}
  */
 
@@ -25,27 +27,51 @@ export const GolfCameraRig = ({
   rigRef,
   hole,
   focusId,
+  map,
+  origin,
 }: {
   rigRef: RefObject<GolfRig>
   hole: GolfHole
   focusId: string | null
+  map: string
+  origin: GolfPoint
 }) => {
+  const before = useRef({ map, origin })
+  // Map shift still to apply to the view
+  const shift = useRef<GolfPoint>([0, 0])
+
+  // Same map: the view keeps its spot and flies to the next hole
+  useEffect(() => {
+    const last = before.current
+    before.current = { map, origin }
+    if (last.map !== map) return
+    shift.current = [origin[0] - last.origin[0], origin[1] - last.origin[1]]
+  }, [map, origin])
   const overview = useMemo(() => overviewOf(hole), [hole])
   const tee = useMemo(() => new Vector3(hole.tee[0], 0, hole.tee[1]), [hole])
   const spot = useRef(new Vector3())
 
   useFrame(({ camera: view }, delta) => {
     const rig = rigRef.current
+    const [dx, dz] = shift.current
+    if (dx || dz) {
+      view.position.x -= dx
+      view.position.z -= dz
+      rig.target.x -= dx
+      rig.target.z -= dz
+      shift.current = [0, 0]
+    }
     // Held keys turn and zoom
     rig.yaw += rig.turn * camera.turnSpeed * delta
     rig.distance = clampDistance(rig.distance * Math.exp(rig.zoom * camera.keyZoom * delta))
+    rig.pitch = clampPitch(rig.pitch + rig.climb * camera.keyPitch * delta)
 
     const followed = focusId ? rig.spots.get(focusId) : undefined
     const focus = rig.isOverview ? overview.center : (followed ?? tee)
     const blend = 1 - Math.exp(-camera.follow * delta)
     rig.target.lerp(focus, blend)
     const distance = rig.isOverview ? overview.reach * camera.overviewReach : rig.distance
-    const pitch = rig.isOverview ? camera.overviewPitch : camera.pitch
+    const pitch = rig.isOverview ? camera.overviewPitch : rig.pitch
     view.position.lerp(cameraSpot(rig.target, rig.yaw, distance, pitch, spot.current), blend)
     view.lookAt(rig.target)
   })

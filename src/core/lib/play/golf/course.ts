@@ -56,7 +56,6 @@ export const compileHole = (layout: GolfHoleLayout): GolfHole => {
   }))
   const margin = GOLF_SETTINGS.physics.worldMargin
   const hole: GolfHole = {
-    par: layout.par,
     tee: layout.tee,
     cup: layout.cup,
     pads,
@@ -77,6 +76,38 @@ export const compileHole = (layout: GolfHoleLayout): GolfHole => {
       floor: floorAt(at),
     })),
     orbs: layout.orbs ?? [],
+    portals: (layout.portals ?? []).map(({ from, to, heading }, index) => ({
+      id: `portal-${index}`,
+      from,
+      to,
+      heading: heading ?? null,
+    })),
+    vortexes: (layout.vortexes ?? []).map(({ at, radius }, index) => ({
+      id: `vortex-${index}`,
+      x: at[0],
+      z: at[1],
+      r: radius,
+    })),
+    fans: (layout.fans ?? []).map(({ at, size, push }) => {
+      const length = Math.hypot(push[0], push[1]) || 1
+
+      return {
+        x0: at[0],
+        x1: at[0] + size[0],
+        z0: at[1],
+        z1: at[1] + size[1],
+        push: [push[0] / length, push[1] / length] as const,
+      }
+    }),
+    totems: (layout.totems ?? []).map(({ at, radius, period, phase = 0 }, index) => ({
+      id: `totem-${index}`,
+      x: at[0],
+      z: at[1],
+      r: radius,
+      period,
+      phase,
+      floor: floorAt(at),
+    })),
     bounds: {
       x0: Math.min(...pads.map((pad) => pad.x0)) - margin,
       x1: Math.max(...pads.map((pad) => pad.x1)) + margin,

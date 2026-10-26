@@ -16,7 +16,7 @@ import type { GolfPointerInput, GolfPointerState } from '@/composites/play/golf/
 export const useGolfPointer = (input: GolfPointerInput): RefObject<GolfPointerState> => {
   const { gl, camera } = useThree()
   const latest = useRef(input)
-  const state = useRef<GolfPointerState>({ shot: null, spot: null })
+  const state = useRef<GolfPointerState>({ shot: null, grip: null, spot: null })
   useEffect(() => {
     latest.current = input
   })

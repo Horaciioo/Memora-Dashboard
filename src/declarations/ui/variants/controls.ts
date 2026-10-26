@@ -53,6 +53,14 @@ export const BUTTON_STYLES = {
 export type ButtonVariant = keyof Omit<typeof BUTTON_STYLES, 'base'>
 
 /**
+ * Play key, locked quietly while it works
+ * @param {ButtonVariant} variant - Button variant
+ * @return {boolean} - Arcade key
+ */
+
+export const isArcadeVariant = (variant: ButtonVariant): boolean => variant.startsWith('arcade')
+
+/**
  * Segmented styles
  * @type {Record<string, string>}
  */

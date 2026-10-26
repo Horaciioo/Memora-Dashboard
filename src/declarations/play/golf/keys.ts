@@ -8,6 +8,8 @@ export const GOLF_KEYS = {
   right: ['ArrowRight', 'KeyD'],
   zoomIn: ['ArrowUp', 'KeyW'],
   zoomOut: ['ArrowDown', 'KeyS'],
+  pitchUp: ['KeyE', 'PageUp'],
+  pitchDown: ['KeyQ', 'PageDown'],
   overview: ['Space'],
   cancel: ['Escape'],
 } as const

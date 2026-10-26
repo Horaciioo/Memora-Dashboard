@@ -18,13 +18,14 @@ export const useServerAlarm = (
   const [woke, setWoke] = useState(since)
 
   useEffect(() => {
-    // Next moment still ahead
-    const now = Date.now() + offset
+    // Next moment not reached by the clock given, even if a timer fired a hair early
+    const shown = Math.max(woke, since) + offset
     const next = moments
-      .filter((at): at is number => at !== null && at > now)
+      .filter((at): at is number => at !== null && at > shown)
       .sort((left, right) => left - right)[0]
     if (next === undefined) return
-    const timer = window.setTimeout(() => setWoke(Date.now()), next - now + 1)
+    const delay = Math.max(0, next - (Date.now() + offset) + 1)
+    const timer = window.setTimeout(() => setWoke(Date.now()), delay)
 
     return () => window.clearTimeout(timer)
   })

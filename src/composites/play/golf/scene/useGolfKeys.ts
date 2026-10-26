@@ -26,7 +26,7 @@ const isWriting = (target: EventTarget | null): boolean =>
 const isKey = (keys: readonly string[], event: KeyboardEvent): boolean => keys.includes(event.code)
 
 /**
- * Keyboard of the course: turn, zoom, overview and cancel, never while writing
+ * Keyboard of the course: turn, zoom, tilt, overview and cancel, never while writing
  * @param {RefObject<GolfRig>} rigRef - Camera rig
  * @param {Object} handlers - Gestures
  * @param {() => void} handlers.onOverview - Toggle the overview
@@ -52,6 +52,8 @@ export const useGolfKeys = (
       else if (isKey(GOLF_KEYS.right, event)) rig.turn = -sign
       else if (isKey(GOLF_KEYS.zoomIn, event)) rig.zoom = -sign
       else if (isKey(GOLF_KEYS.zoomOut, event)) rig.zoom = sign
+      else if (isKey(GOLF_KEYS.pitchUp, event)) rig.climb = sign
+      else if (isKey(GOLF_KEYS.pitchDown, event)) rig.climb = -sign
       else if (isDown && isKey(GOLF_KEYS.overview, event)) latest.current.onOverview()
       else if (isDown && isKey(GOLF_KEYS.cancel, event)) latest.current.onCancel()
       else return

@@ -8,7 +8,7 @@ import { BOMB_BOARD, GOLF_SCORECARD } from '@/declarations/ui/variants'
 
 /**
  * End of the course: fewest strokes on the podium, the full scorecard below
- * @param {GolfScorecardProps} props - Cards and pars
+ * @param {GolfScorecardProps} props - Cards
  * @return {JSX.Element}
  */
 

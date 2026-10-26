@@ -1,6 +1,6 @@
 import type { GolfBody } from '@/core/lib/play/golf/body'
 import { wake } from '@/core/lib/play/golf/body'
-import type { GolfCircle, GolfSpinner, GolfWall } from '@/core/lib/play/golf/types'
+import type { GolfCircle, GolfSpinner, GolfTotem, GolfWall } from '@/core/lib/play/golf/types'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 // Below this a contact has no direction
@@ -106,6 +106,31 @@ export const collideBumper = (body: GolfBody, bumper: GolfCircle & { floor: numb
   }
 
   return impact
+}
+
+/**
+ * Totem standing up at this moment
+ * @param {GolfTotem} totem - Totem
+ * @param {number} seconds - Hole clock
+ * @return {boolean} - Up
+ */
+
+export const isTotemUp = (totem: GolfTotem, seconds: number): boolean =>
+  Math.sin((2 * Math.PI * seconds) / totem.period + totem.phase) > 0
+
+/**
+ * Ball against a totem while it stands
+ * @param {GolfBody} body - Ball
+ * @param {GolfTotem} totem - Totem
+ * @param {number} seconds - Hole clock
+ * @return {number} - Impact speed
+ */
+
+export const collideTotem = (body: GolfBody, totem: GolfTotem, seconds: number): number => {
+  if (!isTotemUp(totem, seconds)) return 0
+  if (Math.abs(body.y - totem.floor) > GOLF_SETTINGS.render.blockHeight) return 0
+
+  return bounceOff(body, totem, body.radius + totem.r, GOLF_SETTINGS.obstacles.totemBounce)
 }
 
 /**

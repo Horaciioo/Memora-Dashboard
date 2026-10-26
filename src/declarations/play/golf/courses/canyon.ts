@@ -7,108 +7,121 @@ import { GolfSurfaces } from '@/utils/constants/play'
  */
 
 export const CANYON_HOLES: GolfHoleLayout[] = [
-  // Shortcut along the water
+  // Ford: thin bridge over the river or round the bank
   {
-    par: 3,
     tee: [0, 0],
-    cup: [2.5, 10.5],
+    cup: [12.5, 1],
     pads: [
-      { at: [-1.5, -1.5], size: [3, 6] },
-      { at: [1.5, 2], size: [2.5, 6], surface: GolfSurfaces.Water },
-      { at: [-1.5, 4.5], size: [3, 3.5] },
-      { at: [-1.5, 8], size: [5.5, 4] },
+      { at: [-1.5, -2], size: [3.5, 6.5] },
+      { at: [2, -2], size: [3, 4] },
+      { at: [5, -0.5], size: [4, 1] },
+      { at: [5, 0.5], size: [4, 1.5], surface: GolfSurfaces.Water },
+      { at: [5, -2], size: [4, 1.5], surface: GolfSurfaces.Water },
+      { at: [2, 2.5], size: [7, 2] },
+      { at: [9, -2], size: [5, 6.5] },
     ],
-    orbs: [[0, 6]],
+    bumpers: [{ at: [11, 3], radius: 0.35 }],
+    orbs: [[7, 0]],
   },
-  // Narrow bridge to the island
+  // Jump the gap, or the long plank on the side
   {
-    par: 3,
     tee: [0, 0],
-    cup: [0, 11],
+    cup: [1.5, 16.5],
     pads: [
-      { at: [-1.5, -1.5], size: [3, 5] },
-      { at: [-0.6, 3.5], size: [1.2, 5], open: 'ew' },
-      { at: [-2.5, 8.5], size: [5, 5], open: 'new' },
+      { at: [-1.5, -1.5], size: [3, 7.5] },
+      { at: [-1.5, 6], size: [3, 3], rise: { axis: 'z', to: 0.6 }, open: 'n' },
+      { at: [1.5, 3], size: [3.5, 2] },
+      { at: [4, 5], size: [1, 6.4], open: 'ew' },
+      { at: [-3, 11.4], size: [8, 6.6], open: 's' },
     ],
+    blocks: [{ at: [-1, 14.2], size: [2, 0.4] }],
     orbs: [
-      [-0.9, 1.5],
-      [0.9, 1.5],
+      [0, 3],
+      [4.5, 8.2],
     ],
   },
-  // Switchback down the cliffs
+  // Switchbacks down, ice on the middle shelf
   {
-    par: 4,
     tee: [0, 0],
-    cup: [0.5, 12.3],
+    cup: [-0.5, 15],
     pads: [
-      { at: [-1.5, -1.5], size: [3, 5], height: 1.2 },
-      { at: [1.5, 0.5], size: [5, 3], height: 1.2, rise: { axis: 'x', to: 0.4 } },
-      { at: [6.5, -1.5], size: [3, 8], height: 0.4 },
-      {
-        at: [6.5, 6.5],
-        size: [3, 4],
-        height: 0.4,
-        rise: { axis: 'z', to: 0 },
-        surface: GolfSurfaces.Ice,
-      },
-      { at: [-1, 10.5], size: [10.5, 3.5] },
+      { at: [-1.5, -1.5], size: [3, 8.5], height: 1.6 },
+      { at: [1.5, 4], size: [7.5, 3], height: 1.6 },
+      { at: [9, 4], size: [3, 3], height: 1.6, rise: { axis: 'x', to: 0.8 } },
+      { at: [9, 7], size: [3, 6], height: 0.8 },
+      { at: [7, 10], size: [2, 3], height: 0.8 },
+      { at: [4, 10], size: [3, 3], height: 0.8, surface: GolfSurfaces.Ice },
+      { at: [1, 10], size: [3, 3], height: 0.8 },
+      { at: [-2, 9], size: [3, 8] },
     ],
-    spinners: [{ at: [4.2, 12.25], length: 2.4, speed: 2.2 }],
-    orbs: [[8, 2]],
+    bumpers: [{ at: [-0.5, 13.2], radius: 0.35 }],
+    orbs: [
+      [0, 5],
+      [10.5, 9],
+      [5.5, 11.5],
+    ],
   },
-  // Pinball table
+  // Off the mesa over the pond, or down the ramp
   {
-    par: 3,
     tee: [0, 0],
-    cup: [0, 11.5],
-    pads: [{ at: [-4, -1.5], size: [8, 14.5] }],
+    cup: [0, 13.8],
+    pads: [
+      { at: [-2, -1.5], size: [4, 7.5], height: 1.5, open: 'n' },
+      { at: [2, 1], size: [3, 3], height: 1.5, rise: { axis: 'x', to: 0 } },
+      { at: [5, 1], size: [3, 14] },
+      { at: [-4, 6], size: [8, 3], surface: GolfSurfaces.Water },
+      { at: [-4, 9], size: [9, 6] },
+    ],
+    blocks: [{ at: [-2.5, 11.5], size: [5, 0.4] }],
+    bumpers: [{ at: [3, 12], radius: 0.35 }],
+    orbs: [
+      [3.5, 2.5],
+      [6.5, 8],
+    ],
+  },
+  // Narrow gorge, pools to slip past and a bar
+  {
+    tee: [0, 0],
+    cup: [-7.5, 15.5],
+    pads: [
+      { at: [-1.5, -1.5], size: [5.5, 3] },
+      { at: [4, -1.5], size: [3, 4.5] },
+      { at: [4, 3], size: [1.5, 3], surface: GolfSurfaces.Water },
+      { at: [5.5, 3], size: [1.5, 3] },
+      { at: [4, 6], size: [3, 4] },
+      { at: [-6, 7], size: [10, 3] },
+      { at: [-9, 7], size: [3, 4] },
+      { at: [-9, 11], size: [1.5, 2], surface: GolfSurfaces.Water },
+      { at: [-7.5, 11], size: [1.5, 2] },
+      { at: [-9, 13], size: [3, 4] },
+    ],
+    spinners: [{ at: [-1, 8.5], length: 2.6, speed: 2.2 }],
+    orbs: [
+      [2, 0],
+      [5.5, 8.5],
+      [-4, 8.5],
+    ],
+  },
+  // Two jumps and a boost
+  {
+    tee: [0, 0],
+    cup: [20, 16.5],
+    pads: [
+      { at: [-1.5, -1.5], size: [3, 6.5] },
+      { at: [-1.5, 5], size: [3, 4], surface: GolfSurfaces.Boost, push: [0, 1] },
+      { at: [-1.5, 9], size: [3, 2], rise: { axis: 'z', to: 0.6 }, open: 'n' },
+      { at: [-3, 13.5], size: [6, 5.5], open: 's' },
+      { at: [3, 15], size: [9, 3] },
+      { at: [12, 15], size: [2, 3], rise: { axis: 'x', to: 0.6 }, open: 'e' },
+      { at: [16.2, 13], size: [5.8, 7], open: 'w' },
+    ],
     bumpers: [
-      { at: [-2, 4], radius: 0.4 },
-      { at: [0, 5.5], radius: 0.4 },
-      { at: [2, 4], radius: 0.4 },
-      { at: [-1, 8], radius: 0.35 },
-      { at: [1, 8], radius: 0.35 },
-      { at: [-2.6, 10], radius: 0.35 },
-      { at: [2.6, 10], radius: 0.35 },
+      { at: [18.5, 15], radius: 0.35 },
+      { at: [18.5, 18], radius: 0.35 },
     ],
     orbs: [
-      [-3, 2],
-      [3, 2],
-    ],
-  },
-  // Twin bars then the open plateau
-  {
-    par: 4,
-    tee: [0, 0],
-    cup: [0, 14.5],
-    pads: [
-      { at: [-1.5, -1.5], size: [3, 9] },
-      { at: [-1.5, 7.5], size: [3, 3], rise: { axis: 'z', to: 0.8 } },
-      { at: [-3, 10.5], size: [6, 6], height: 0.8, open: 'n' },
-    ],
-    blocks: [{ at: [-0.9, 12.6], size: [1.8, 0.4] }],
-    spinners: [
-      { at: [0, 2.5], length: 2.6, speed: 2.5 },
-      { at: [0, 5.5], length: 2.6, speed: -2.5, phase: 0.8 },
-    ],
-    orbs: [[-2, 13]],
-  },
-  // Off the ledge, around the pond
-  {
-    par: 4,
-    tee: [0, 0],
-    cup: [0, 14],
-    pads: [
-      { at: [-1.5, -1.5], size: [3, 8], height: 1.5 },
-      { at: [-4, 6.5], size: [8, 2], height: 0.5 },
-      { at: [-4, 8.5], size: [2.5, 3], height: 0.5 },
-      { at: [-1.5, 8.5], size: [3, 3], height: 0.5, surface: GolfSurfaces.Water },
-      { at: [1.5, 8.5], size: [2.5, 3], height: 0.5 },
-      { at: [-4, 11.5], size: [8, 4], height: 0.5 },
-    ],
-    orbs: [
-      [-2.75, 10],
-      [2.75, 10],
+      [0, 3],
+      [7, 16.5],
     ],
   },
 ]

@@ -1,11 +1,13 @@
 import type { GolfBody } from '@/core/lib/play/golf/body'
-import { halt, isInPlay } from '@/core/lib/play/golf/body'
+import { halt, isInPlay, speedOf } from '@/core/lib/play/golf/body'
 import {
   collideBalls,
   collideBumper,
   collideSpinner,
+  collideTotem,
   collideWall,
 } from '@/core/lib/play/golf/collide'
+import { boostId } from '@/core/lib/play/golf/terrain'
 import type { GolfWorld } from '@/core/lib/play/golf/world'
 import { pairKey } from '@/core/lib/play/golf/world'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
@@ -24,7 +26,11 @@ const hitWalls = (world: GolfWorld, body: GolfBody): void => {
     const impact = collideWall(body, wall)
     if (!impact) continue
     if (impact > physics.hitSound) world.emit('wall', body.id, impact)
-    if (body.isSticky) return halt(body)
+    if (!body.isSticky) continue
+    // Stuck, still falling when flying
+    body.vx = 0
+    body.vz = 0
+    if (!body.isAirborne) return halt(body)
   }
 }
 
@@ -48,6 +54,20 @@ const hitBumpers = (world: GolfWorld, body: GolfBody): void => {
 }
 
 /**
+ * Boost slab a ball just rolled onto
+ * @param {GolfWorld} world - Simulation
+ * @param {GolfBody} body - Body
+ * @return {void}
+ */
+
+const hitBoosts = (world: GolfWorld, body: GolfBody): void => {
+  const pad = body.pad?.push && !body.isAirborne ? body.pad : null
+  if (world.boosting.get(body.id) === pad) return
+  world.boosting.set(body.id, pad)
+  if (pad) world.emit('boost', boostId(world.input.hole.pads.indexOf(pad)), speedOf(body))
+}
+
+/**
  * Turning bars
  * @param {GolfWorld} world - Simulation
  * @param {GolfBody} body - Body
@@ -59,6 +79,21 @@ const hitSpinners = (world: GolfWorld, body: GolfBody, seconds: number): void =>
   for (const spinner of world.input.hole.spinners) {
     const impact = collideSpinner(body, spinner, seconds)
     if (impact > physics.hitSound) world.emit('spinner', body.id, impact)
+  }
+}
+
+/**
+ * Totems standing up
+ * @param {GolfWorld} world - Simulation
+ * @param {GolfBody} body - Body
+ * @param {number} seconds - Hole clock
+ * @return {void}
+ */
+
+const hitTotems = (world: GolfWorld, body: GolfBody, seconds: number): void => {
+  for (const totem of world.input.hole.totems) {
+    const impact = collideTotem(body, totem, seconds)
+    if (impact > physics.hitSound) world.emit('totem', totem.id, impact)
   }
 }
 
@@ -108,7 +143,9 @@ export const contactsOf = (world: GolfWorld, at: number): void => {
     hitWalls(world, body)
     if (!body.isMoving) continue
     hitBumpers(world, body)
+    hitBoosts(world, body)
     hitSpinners(world, body, seconds)
+    hitTotems(world, body, seconds)
   }
   if (world.input.collisions) hitBalls(world)
 }

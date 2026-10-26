@@ -93,6 +93,8 @@ const wallOn = (pad: GolfPad, side: PadSide, [from, to]: Span, cliff: number | n
     kind: cliff === null ? 'rail' : 'cliff',
     nx: side.normal[0],
     nz: side.normal[1],
+    cutA: from - side.span[0] > EPSILON,
+    cutB: side.span[1] - to > EPSILON,
   }
 }
 

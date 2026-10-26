@@ -50,6 +50,7 @@ export const PLAY_ERRORS = {
   ballRolling: 'Ta balle roule encore.',
   noPower: 'Tu n’as aucun pouvoir en main.',
   badSpot: 'Pose-le sur le parcours, loin du départ et du trou.',
+  badTarget: 'Choisis un joueur encore en jeu, balle arrêtée.',
 } as const
 
 /**

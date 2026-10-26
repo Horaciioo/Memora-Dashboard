@@ -4,6 +4,7 @@ import { canRest, pushBody } from '@/core/lib/play/golf/forces'
 import { pathPoint } from '@/core/lib/play/golf/frames'
 import { contactsOf } from '@/core/lib/play/golf/contacts'
 import { settleGround } from '@/core/lib/play/golf/ground'
+import { isIced } from '@/core/lib/play/golf/obstacles'
 import type { GolfWorld } from '@/core/lib/play/golf/world'
 import { createWorld } from '@/core/lib/play/golf/world'
 import type { GolfShotInput, GolfShotResult } from '@/core/lib/play/golf/types'
@@ -35,7 +36,7 @@ const substepsOf = (moving: GolfBody[], dt: number): number => {
  */
 
 const record = (world: GolfWorld): void => {
-  for (const body of world.bodies) body.path.push(...pathPoint(body.x, body.z))
+  for (const body of world.bodies) body.path.push(...pathPoint(body.x, body.y, body.z))
   world.frames += 1
 }
 
@@ -49,7 +50,7 @@ const record = (world: GolfWorld): void => {
 const advance = (world: GolfWorld, step: number): void => {
   const dt = 1 / physics.stepHz
   const at = world.input.at + step * dt * 1000
-  const context = { hazards: world.hazards, cup: world.input.hole.cup, at }
+  const context = { hazards: world.hazards, hole: world.input.hole, at }
   const moving = world.bodies.filter((body) => body.isMoving)
   for (const body of moving) pushBody(body, context, dt)
 
@@ -62,14 +63,17 @@ const advance = (world: GolfWorld, step: number): void => {
       body.z += (body.vz * dt) / substeps
     }
     contactsOf(world, at)
-    for (const body of world.bodies) if (body.isMoving) settleGround(world, body, at)
+    for (const body of world.bodies) {
+      if (body.isMoving) settleGround(world, body, { at, dt: dt / substeps })
+    }
   }
 
   // Slow bodies come to rest
+  const iced = isIced(world.hazards, at)
   for (const body of world.bodies) {
-    if (body.isMoving && canRest(body)) {
+    if (body.isMoving && canRest(body, iced)) {
       halt(body)
-      settleGround(world, body, at, true)
+      settleGround(world, body, { at, dt: 0 }, true)
     }
   }
 }
@@ -112,6 +116,12 @@ export const simulateShot = (input: GolfShotInput): GolfShotResult => {
     const speed = Math.min(1, Math.max(0, input.power)) * physics.maxSpeed * shooter.powerScale
     shooter.vx = Math.sin(input.angle) * speed
     shooter.vz = Math.cos(input.angle) * speed
+    // Lob leaves the ground
+    if (shooter.isLob) {
+      shooter.vy = speed * GOLF_SETTINGS.powers.lob.lift
+      shooter.isAirborne = true
+      shooter.pad = null
+    }
     wake(shooter)
     world.emit('hit', shooter.id, speed)
   }
@@ -136,5 +146,6 @@ export const simulateShot = (input: GolfShotInput): GolfShotResult => {
     events: world.events,
     bumperHits: world.bumperHits,
     pickups: world.pickups,
+    flashId: shooter?.isFlash ? shooter.id : null,
   }
 }

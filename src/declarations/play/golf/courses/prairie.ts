@@ -2,156 +2,114 @@ import type { GolfHoleLayout } from '@/core/lib/play/golf/types'
 import { GolfSurfaces } from '@/utils/constants/play'
 
 /**
- * La Prairie, nine holes to learn the swing then the powers
+ * La Prairie, six holes to learn the swing then the powers
  * @type {GolfHoleLayout[]}
  */
 
 export const PRAIRIE_HOLES: GolfHoleLayout[] = [
-  // Straight warm up
+  // S bend
   {
-    par: 2,
     tee: [0, 0],
-    cup: [0, 10],
-    pads: [{ at: [-1.5, -1.5], size: [3, 13] }],
-    orbs: [[0, 5]],
-  },
-  // Dogleg right, a bumper in the bend
-  {
-    par: 3,
-    tee: [0, 0],
-    cup: [8, 7],
+    cup: [9, 13],
     pads: [
-      { at: [-1.5, -1.5], size: [3, 10] },
-      { at: [1.5, 5.5], size: [8, 3] },
+      { at: [-1.5, -1.5], size: [3, 9] },
+      { at: [1.5, 4.5], size: [6, 3] },
+      { at: [7.5, 4.5], size: [3, 10] },
     ],
-    bumpers: [{ at: [-0.6, 7.6], radius: 0.4 }],
-    orbs: [[4.5, 7]],
+    bumpers: [{ at: [9, 8.5], radius: 0.4 }],
+    orbs: [[4.5, 6]],
   },
-  // Up the ramp to the plateau
+  // Ramp to a plateau open at the back
   {
-    par: 3,
     tee: [0, 0],
-    cup: [1.4, 12.4],
+    cup: [15.5, 0],
     pads: [
-      { at: [-1.5, -1.5], size: [3, 6] },
-      { at: [-1.5, 4.5], size: [3, 4], rise: { axis: 'z', to: 0.8 } },
-      { at: [-2.5, 8.5], size: [5, 5], height: 0.8 },
+      { at: [-1.5, -1.5], size: [10, 3] },
+      { at: [8.5, -1.5], size: [3, 3], rise: { axis: 'x', to: 0.8 } },
+      { at: [11.5, -3.5], size: [6, 7], height: 0.8, open: 'e' },
     ],
-    blocks: [{ at: [-0.4, 10.6], size: [2.9, 0.5] }],
-    orbs: [
-      [-1.6, 10],
-      [1.6, 10],
-    ],
-  },
-  // Through the turning bar
-  {
-    par: 3,
-    tee: [0, 0],
-    cup: [0, 11.5],
-    pads: [{ at: [-2, -1.5], size: [4, 14.5] }],
-    spinners: [{ at: [0, 6], length: 3.2, speed: 1.6 }],
-    blocks: [
-      { at: [-2, 9], size: [1.1, 0.5] },
-      { at: [0.9, 9], size: [1.1, 0.5] },
-    ],
-    orbs: [[0, 3]],
-  },
-  // The bridge without rails
-  {
-    par: 3,
-    tee: [0, 0],
-    cup: [8, 11],
-    pads: [
-      { at: [-1.5, -1.5], size: [3, 8.3] },
-      { at: [1.5, 5.2], size: [5, 1.6], open: 'ns' },
-      { at: [6.5, 3.5], size: [3, 9] },
-    ],
-    orbs: [[4, 6]],
-  },
-  // Sand on both sides, bumpers before the cup
-  {
-    par: 3,
-    tee: [0, 0],
-    cup: [0, 11.3],
-    pads: [
-      { at: [-3, -1.5], size: [6, 5] },
-      { at: [-3, 3.5], size: [2, 4], surface: GolfSurfaces.Sand },
-      { at: [-1, 3.5], size: [2, 4] },
-      { at: [1, 3.5], size: [2, 4], surface: GolfSurfaces.Sand },
-      { at: [-3, 7.5], size: [6, 5] },
-    ],
+    blocks: [{ at: [13.6, -0.7], size: [0.5, 1.4] }],
     bumpers: [
-      { at: [-1.1, 9.6], radius: 0.35 },
-      { at: [0, 9.6], radius: 0.35 },
-      { at: [1.1, 9.6], radius: 0.35 },
+      { at: [15.5, 2], radius: 0.35 },
+      { at: [15.5, -2], radius: 0.35 },
     ],
+    orbs: [[5, 0]],
+  },
+  // Fork round the pond, grass and bumper or slow sand
+  {
+    tee: [0, 0],
+    cup: [0, 15.5],
+    pads: [
+      { at: [-3, -1.5], size: [6, 5.5] },
+      { at: [-3, 4], size: [2, 8] },
+      { at: [-1, 4], size: [2, 8], surface: GolfSurfaces.Water },
+      { at: [1, 4], size: [2, 8], surface: GolfSurfaces.Sand },
+      { at: [-3, 12], size: [6, 5] },
+    ],
+    blocks: [{ at: [-0.75, 13.4], size: [1.5, 0.4] }],
+    bumpers: [{ at: [-2, 8], radius: 0.35 }],
     orbs: [
-      [-2, 1.5],
-      [2, 1.5],
+      [-2, 5],
+      [2, 5],
     ],
   },
-  // Ice slide down to the green
+  // West past the mill, north through the gate
   {
-    par: 3,
     tee: [0, 0],
-    cup: [0, 12],
+    cup: [-11.5, 7.5],
     pads: [
-      { at: [-1.5, -1.5], size: [3, 4], height: 1 },
-      {
-        at: [-1.5, 2.5],
-        size: [3, 5],
-        height: 1,
-        rise: { axis: 'z', to: 0 },
-        surface: GolfSurfaces.Ice,
-      },
-      { at: [-3, 7.5], size: [6, 6] },
+      { at: [-10, -1.5], size: [11.5, 3] },
+      { at: [-13, -1.5], size: [3, 10.5] },
     ],
-    blocks: [{ at: [-0.5, 9.4], size: [1, 1] }],
-    orbs: [
-      [-2, 10],
-      [2, 10],
-    ],
-  },
-  // Drop from the ledge into the maze
-  {
-    par: 3,
-    tee: [0, 0],
-    cup: [2.6, 12.4],
-    pads: [
-      { at: [-1.5, -1.5], size: [3, 7], height: 0.6 },
-      { at: [-4, 5.5], size: [8, 8] },
-    ],
-    blocks: [
-      { at: [-4, 8.2], size: [5, 0.5] },
-      { at: [-1, 10.6], size: [5, 0.5] },
-    ],
-    orbs: [[-2.8, 12]],
-  },
-  // Grand finale, bars on the plateau
-  {
-    par: 4,
-    tee: [0, 0],
-    cup: [0, 18],
-    pads: [
-      { at: [-1.5, -1.5], size: [3, 6] },
-      { at: [-1.5, 4.5], size: [3, 3], rise: { axis: 'z', to: 0.6 } },
-      { at: [-4, 7.5], size: [8, 4], height: 0.6 },
-      { at: [-1.5, 11.5], size: [3, 4], height: 0.6, surface: GolfSurfaces.Boost, push: [0, 1] },
-      { at: [-3, 15.5], size: [6, 4], height: 0.6 },
-    ],
-    blocks: [{ at: [-0.8, 8.4], size: [1.6, 2.2] }],
     spinners: [
-      { at: [-2, 9.5], length: 2.4, speed: 2 },
-      { at: [2, 9.5], length: 2.4, speed: -2 },
+      { at: [-5, 0], length: 2.6, speed: 1.8 },
+      { at: [-11.5, 3.5], length: 2.6, speed: -2 },
+    ],
+    blocks: [
+      { at: [-13, 5.5], size: [1, 0.4] },
+      { at: [-11, 5.5], size: [1, 0.4] },
+    ],
+    orbs: [[-2.5, 0]],
+  },
+  // Terraces down, sand on the landing
+  {
+    tee: [0, 0],
+    cup: [-4.5, 18.5],
+    pads: [
+      { at: [-2, -1.5], size: [4, 7.5], height: 1.2 },
+      { at: [-6, 6], size: [4, 4], height: 0.6 },
+      { at: [-2, 6], size: [4, 4], height: 0.6, surface: GolfSurfaces.Sand },
+      { at: [-6, 10], size: [3, 10] },
     ],
     bumpers: [
-      { at: [-1.8, 17.2], radius: 0.35 },
-      { at: [1.8, 17.2], radius: 0.35 },
+      { at: [-4, 14], radius: 0.35 },
+      { at: [-5, 16.5], radius: 0.35 },
     ],
     orbs: [
-      [0, 2],
-      [-3.2, 8.2],
-      [3.2, 8.2],
+      [0, 3],
+      [-4.5, 12],
+    ],
+  },
+  // The loop round the garden, up to the high green
+  {
+    tee: [0, 0],
+    cup: [4, 5],
+    pads: [
+      { at: [-1.5, -1.5], size: [3, 13.5] },
+      { at: [-1.5, 12], size: [12, 3] },
+      { at: [10.5, 3], size: [3, 12] },
+      { at: [6.5, 3], size: [4, 3], height: 0.8, rise: { axis: 'x', to: 0 } },
+      { at: [2.5, 2], size: [4, 6], height: 0.8 },
+    ],
+    blocks: [{ at: [4, 12.9], size: [0.5, 1.2] }],
+    bumpers: [
+      { at: [3.3, 3], radius: 0.3 },
+      { at: [3.3, 7], radius: 0.3 },
+    ],
+    orbs: [
+      [0, 6],
+      [6, 13.5],
+      [12, 9],
     ],
   },
 ]

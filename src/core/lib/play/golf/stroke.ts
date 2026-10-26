@@ -1,4 +1,5 @@
 import type { GolfBallInput, GolfEffect } from '@/core/lib/play/golf/types'
+import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 /**
  * Ball as both the server and the screens know it
@@ -14,7 +15,8 @@ export interface GolfStrokeBall {
   // Server ms it stops
   restsAt: number
   effects: GolfEffect[]
-  power: string | null
+  // Powers in hand
+  hand: string[]
 }
 
 /**
@@ -42,5 +44,5 @@ export const strokeBalls = (
       x: ball.x,
       z: ball.z,
       effects: ball.effects,
-      canPick: hasOrbs && !ball.power,
+      canPick: hasOrbs && ball.hand.length < GOLF_SETTINGS.hand,
     }))

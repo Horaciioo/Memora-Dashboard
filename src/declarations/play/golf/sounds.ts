@@ -1,45 +1,66 @@
 import type { GolfEventKind } from '@/core/lib/play/golf/types'
-import type { PlayTone } from '@/core/lib/play/sounds'
+import type { GolfPowerName } from '@/utils/constants/play'
+
+// Sound folders, credits in CREDITS.md
+const EFFECTS = '/play/sons/effets'
 
 /**
- * Synthesised sounds of the golf course, made here and free of rights
- * @type {Record<GolfEventKind | 'power' | 'start', PlayTone[]>}
+ * Effect file per game moment
+ * @type {Record<string, string>}
  */
 
-export const GOLF_SOUNDS: Record<GolfEventKind | 'power' | 'start', PlayTone[]> = {
-  hit: [
-    { wave: 'noise', from: 0, seconds: 0.05, gain: 0.5, filter: 2400 },
-    { wave: 'sine', from: 900, to: 380, seconds: 0.08, gain: 0.55 },
-  ],
-  wall: [{ wave: 'triangle', from: 320, to: 170, seconds: 0.08, gain: 0.45 }],
-  ball: [{ wave: 'sine', from: 1300, to: 760, seconds: 0.06, gain: 0.5 }],
-  bumper: [
-    { wave: 'square', from: 420, to: 900, seconds: 0.14, gain: 0.18 },
-    { wave: 'sine', from: 260, to: 620, seconds: 0.16, gain: 0.4 },
-  ],
-  spinner: [{ wave: 'triangle', from: 240, to: 150, seconds: 0.1, gain: 0.4 }],
-  cup: [
-    { wave: 'noise', from: 0, seconds: 0.06, gain: 0.25, filter: 1200 },
-    { wave: 'sine', from: 660, seconds: 0.1, delay: 0.08, gain: 0.4 },
-    { wave: 'sine', from: 880, seconds: 0.12, delay: 0.18, gain: 0.4 },
-    { wave: 'sine', from: 1320, seconds: 0.3, delay: 0.3, gain: 0.35 },
-  ],
-  lip: [{ wave: 'sine', from: 520, to: 300, seconds: 0.12, gain: 0.4 }],
-  fall: [{ wave: 'sine', from: 700, to: 110, seconds: 0.6, gain: 0.35 }],
-  splash: [
-    { wave: 'noise', from: 0, seconds: 0.45, gain: 0.45, filter: 900 },
-    { wave: 'sine', from: 300, to: 120, seconds: 0.2, gain: 0.3 },
-  ],
-  orb: [
-    { wave: 'sine', from: 880, to: 1760, seconds: 0.16, gain: 0.35 },
-    { wave: 'triangle', from: 1320, seconds: 0.14, delay: 0.09, gain: 0.3 },
-  ],
-  power: [
-    { wave: 'square', from: 440, to: 660, seconds: 0.1, gain: 0.15 },
-    { wave: 'sine', from: 880, seconds: 0.18, delay: 0.1, gain: 0.35 },
-  ],
-  start: [
-    { wave: 'sine', from: 523, seconds: 0.12, gain: 0.35 },
-    { wave: 'sine', from: 784, seconds: 0.22, delay: 0.12, gain: 0.35 },
-  ],
+export const GOLF_SOUNDS = {
+  hit: `${EFFECTS}/tir.mp3`,
+  wall: `${EFFECTS}/rebond.mp3`,
+  ball: `${EFFECTS}/collision.mp3`,
+  bumper: `${EFFECTS}/bumper.mp3`,
+  spinner: `${EFFECTS}/tourniquet.mp3`,
+  cup: `${EFFECTS}/trou.mp3`,
+  land: `${EFFECTS}/atterrissage.mp3`,
+  lip: `${EFFECTS}/bord.mp3`,
+  fall: `${EFFECTS}/sortie.mp3`,
+  splash: `${EFFECTS}/eau.mp3`,
+  orb: `${EFFECTS}/case.mp3`,
+  portal: `${EFFECTS}/teleporteur.mp3`,
+  vortex: `${EFFECTS}/trou-noir.mp3`,
+  totem: `${EFFECTS}/totem.mp3`,
+  power: `${EFFECTS}/activation.mp3`,
+  reveal: `${EFFECTS}/revelation.mp3`,
+  ended: `${EFFECTS}/fin-effet.mp3`,
+  ready: `${EFFECTS}/pret.mp3`,
+  clock: `${EFFECTS}/chrono.mp3`,
+  tornado: `${EFFECTS}/tornade.mp3`,
+  gust: `${EFFECTS}/bourrasque.mp3`,
+  fart: `${EFFECTS}/pet.mp3`,
+  ice: `${EFFECTS}/glace.mp3`,
+  voteChoice: `${EFFECTS}/vote-choix.mp3`,
+  voteHop: `${EFFECTS}/vote-rebond.mp3`,
+  voteConfirm: `${EFFECTS}/vote-valide.mp3`,
+  voteBack: `${EFFECTS}/vote-retour.mp3`,
+  voteSwitch: `${EFFECTS}/vote-transition.mp3`,
+} as const satisfies Record<Exclude<GolfEventKind, 'boost'>, string> & Record<string, string>
+
+export type GolfSoundName = keyof typeof GOLF_SOUNDS
+
+/**
+ * Own sound of some powers
+ * @type {Partial<Record<GolfPowerName, GolfSoundName>>}
+ */
+
+export const GOLF_POWER_SOUNDS: Partial<Record<GolfPowerName, GolfSoundName>> = {
+  tornado: 'tornado',
+  gust: 'gust',
+  fart: 'fart',
+  ice: 'ice',
+}
+
+/**
+ * Sound levels, zero to one
+ * @type {Object}
+ */
+
+export const GOLF_MIX = {
+  // Starting master volume
+  volume: 0.8,
+  volumeStep: 0.05,
 }

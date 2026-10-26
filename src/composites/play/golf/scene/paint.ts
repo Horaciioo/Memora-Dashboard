@@ -4,6 +4,7 @@ import {
   GOLF_COURSE_PAINT,
   GOLF_PAINT_PREFIX,
   GOLF_SHARED_PAINT,
+  GOLF_TURF_PAINT,
 } from '@/declarations/play/golf/paint'
 import type { GolfPaintKey } from '@/declarations/play/golf/paint'
 
@@ -27,11 +28,16 @@ const colorOf = (style: CSSStyleDeclaration, token: string): Color =>
 
 export const readPaint = (coursePaint: string): GolfPaint => {
   const style = getComputedStyle(document.documentElement)
-
-  return Object.fromEntries([
+  const paint = Object.fromEntries([
     ...GOLF_COURSE_PAINT.map((key) => [key, colorOf(style, `${coursePaint}-${key}`)]),
     ...GOLF_SHARED_PAINT.map((key) => [key, colorOf(style, `${GOLF_PAINT_PREFIX}-${key}`)]),
   ]) as GolfPaint
+
+  // Obstacles and bumpers wear the turf
+  for (const [key, { toward, amount }] of Object.entries(GOLF_TURF_PAINT))
+    paint[key as keyof typeof GOLF_TURF_PAINT] = paint.turf.clone().lerp(paint[toward], amount)
+
+  return paint
 }
 
 /**

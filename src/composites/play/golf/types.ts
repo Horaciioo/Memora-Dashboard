@@ -18,3 +18,11 @@ export interface GolfFace {
  */
 
 export const seatPaint = (color: string): string => `var(--play-${color})`
+
+/**
+ * Power orb tone as a style value
+ * @param {string} power - Power key
+ * @return {string} - CSS variable
+ */
+
+export const powerPaint = (power: string): string => `var(--play-power-${power})`

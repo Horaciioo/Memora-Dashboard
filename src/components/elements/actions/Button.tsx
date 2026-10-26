@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes } from 'react'
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
-import { BUTTON_STYLES, type ButtonVariant } from '@/declarations/ui/variants'
+import { BUTTON_STYLES, isArcadeVariant, type ButtonVariant } from '@/declarations/ui/variants'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
 
@@ -35,14 +35,10 @@ export const Button = ({
   const Leading = noLabel && icon ? ICONS[icon] : null
   const Trailing = noLabel && iconAfter ? ICONS[iconAfter] : null
   const isGlyphOnly = Boolean(Leading || Trailing)
+  // Arcade keys dim instead of showing the mark
+  const showsMark = isLoading && !isArcadeVariant(variant)
   // Coloured fills carry the white mark as is
-  const onFill =
-    variant === 'primary' ||
-    variant === 'success' ||
-    variant === 'danger' ||
-    variant === 'arcade' ||
-    variant === 'arcadeOrange' ||
-    variant === 'arcadeDanger'
+  const onFill = variant === 'primary' || variant === 'success' || variant === 'danger'
 
   return (
     <button
@@ -52,14 +48,14 @@ export const Button = ({
         BUTTON_STYLES[variant],
         isGlyphOnly && variant !== 'icon' && BUTTON_STYLES.square,
         // Stays fully lit while it works
-        isLoading && 'disabled:opacity-100',
+        showsMark && 'disabled:opacity-100',
         className
       )}
       {...props}
       disabled={isLoading || props.disabled}
       aria-busy={isLoading || undefined}
     >
-      {isLoading ? (
+      {showsMark ? (
         <BrandLoader variant={onFill ? 'inline' : 'ink'} />
       ) : (
         Leading && <Leading className="h-4 w-4 shrink-0" aria-hidden="true" />

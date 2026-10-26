@@ -2,6 +2,8 @@
 
 import { Button } from '@/components/elements/actions/Button'
 import { GolfAimGauge } from '@/composites/play/golf/hud/GolfAimGauge'
+import { GolfPanel } from '@/composites/play/golf/hud/GolfPanel'
+import type { GolfPanelProps } from '@/composites/play/golf/hud/GolfPanel'
 import { GolfPowerSlot } from '@/composites/play/golf/hud/GolfPowerSlot'
 import type { GolfPowerSlotProps } from '@/composites/play/golf/hud/GolfPowerSlot'
 import { fillPlayMessage } from '@/declarations/play/copy'
@@ -14,24 +16,18 @@ export interface GolfFooterProps {
   // Own power slot, none for spectators
   slot: GolfPowerSlotProps | null
   status: string
-  maxStrokes: number
+  panel: GolfPanelProps
   placing: GolfPowerName | null
   onCancelPlace: () => void
 }
 
 /**
- * Bottom of the course: power in hand, aim gauge or status, strokes of the hole
+ * Bottom of the course: score card, aim gauge or status, power hand
  * @param {GolfFooterProps} props - Player and gestures
  * @return {JSX.Element}
  */
 
-export const GolfFooter = ({
-  slot,
-  status,
-  maxStrokes,
-  placing,
-  onCancelPlace,
-}: GolfFooterProps) => (
+export const GolfFooter = ({ slot, status, panel, placing, onCancelPlace }: GolfFooterProps) => (
   <>
     {placing && (
       <div className={GOLF_BOARD.placing}>
@@ -42,21 +38,11 @@ export const GolfFooter = ({
       </div>
     )}
     <div className={GOLF_BOARD.bottom}>
-      {slot ? <GolfPowerSlot {...slot} /> : <span />}
+      <GolfPanel {...panel} />
       <div className={GOLF_BOARD.middle}>
         <GolfAimGauge>{status && <p className={GOLF_BOARD.status}>{status}</p>}</GolfAimGauge>
       </div>
-      {slot && (
-        <div className={GOLF_BOARD.strokes}>
-          <span className={GOLF_BOARD.caption}>{GOLF_BOARD_COPY.strokes}</span>
-          <span className={GOLF_BOARD.figure}>{slot.me.strokes}</span>
-          <span className={GOLF_BOARD.caption}>
-            {fillPlayMessage(GOLF_BOARD_COPY.strokesLeft, {
-              count: Math.max(0, maxStrokes - slot.me.strokes),
-            })}
-          </span>
-        </div>
-      )}
+      {slot ? <GolfPowerSlot {...slot} /> : <span />}
     </div>
   </>
 )

@@ -6,31 +6,31 @@ import { useFrame } from '@react-three/fiber'
 import { DoubleSide } from 'three'
 import type { Group, Mesh } from 'three'
 
+import { patchTexture, sandTexture } from '@/composites/play/golf/scene/textures'
+import { holeSeed, seededRandom } from '@/composites/play/golf/scene/random'
+import { GolfIce } from '@/composites/play/golf/scene/GolfIce'
+import { GolfWater } from '@/composites/play/golf/scene/GolfWater'
 import { courseGeometry } from '@/composites/play/golf/scene/geometry'
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
 import { floorHeight } from '@/core/lib/play/golf'
-import type { GolfHole } from '@/core/lib/play/golf'
+import type { GolfHazard, GolfHole } from '@/core/lib/play/golf'
 import { GOLF_SCENE } from '@/declarations/play/golf/scene'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfSurfaces } from '@/utils/constants/play'
 import type { GolfSurfaceName } from '@/utils/constants/play'
 
-const { physics, render } = GOLF_SETTINGS
-const { cup, pole, flag, chevron, water, roughness } = GOLF_SCENE
-
-// Lying flat on the ground
-const FLAT: [number, number, number] = [-Math.PI / 2, 0, 0]
+const { render } = GOLF_SETTINGS
+const { cup, pole, flag, sink } = GOLF_SCENE
 
 // Surfaces that are not lawn
 const SURFACE_PAINT: Partial<Record<GolfSurfaceName, keyof GolfPaint>> = {
   [GolfSurfaces.Sand]: 'sand',
   [GolfSurfaces.Ice]: 'ice',
   [GolfSurfaces.Boost]: 'boost',
-  [GolfSurfaces.Water]: 'water',
 }
 
 /**
- * Cup, rim and waving flag
+ * Waving flag of the cup
  * @param {Object} props - Hole and colours
  * @param {GolfHole} props.hole - Hole
  * @param {GolfPaint} props.paint - Colours
@@ -48,67 +48,31 @@ const GolfCup = ({ hole, paint }: { hole: GolfHole; paint: GolfPaint }) => {
 
   return (
     <group position={[hole.cup[0], floor, hole.cup[1]]}>
-      <mesh position={[0, cup.lift, 0]} rotation={FLAT}>
-        <circleGeometry args={[physics.cupRadius, cup.segments]} />
-        <meshBasicMaterial color={paint.cup} />
-      </mesh>
-      <mesh position={[0, cup.lift * 1.5, 0]} rotation={FLAT}>
-        <ringGeometry args={[physics.cupRadius, physics.cupRadius * cup.rim, cup.segments]} />
-        <meshStandardMaterial color={paint.pole} />
-      </mesh>
-      <mesh position={[0, render.flagHeight / 2, 0]}>
-        <cylinderGeometry args={[pole.radius, pole.radius, render.flagHeight, pole.segments]} />
-        <meshStandardMaterial color={paint.pole} />
+      {/* Pole stands on the pit floor */}
+      <mesh position={[0, (render.flagHeight - sink.depth) / 2, 0]} castShadow>
+        <cylinderGeometry
+          args={[pole.radius, pole.radius, render.flagHeight + sink.depth, pole.segments]}
+        />
+        <meshToonMaterial color={paint.pole} />
       </mesh>
       <group ref={banner} position={[0, render.flagHeight - flag.drop, 0]}>
-        <mesh position={[flag.width / 2, 0, 0]}>
+        <mesh position={[flag.width / 2, 0, 0]} castShadow>
           <planeGeometry args={[flag.width, flag.height]} />
-          <meshStandardMaterial color={paint.flag} side={DoubleSide} />
+          <meshToonMaterial color={paint.flag} side={DoubleSide} />
         </mesh>
       </group>
     </group>
   )
 }
 
-/**
- * Chevrons pointing the way on boost slabs
- * @param {Object} props - Hole and colours
- * @param {GolfHole} props.hole - Hole
- * @param {GolfPaint} props.paint - Colours
- * @return {JSX.Element}
- */
-
-const GolfBoosts = ({ hole, paint }: { hole: GolfHole; paint: GolfPaint }) => (
-  <>
-    {hole.pads.flatMap((pad, padIndex) => {
-      if (!pad.push) return []
-      const [px, pz] = pad.push
-      const x = (pad.x0 + pad.x1) / 2
-      const z = (pad.z0 + pad.z1) / 2
-
-      return [-1, 0, 1].map((step) => (
-        <mesh
-          key={`${padIndex}:${step}`}
-          position={[
-            x + px * step,
-            (floorHeight(hole, x + px * step, z + pz * step) ?? 0) + chevron.lift,
-            z + pz * step,
-          ]}
-          rotation={[-Math.PI / 2, 0, Math.atan2(-pz, px)]}
-        >
-          <circleGeometry args={[chevron.radius, 3]} />
-          <meshBasicMaterial color={paint.pole} transparent opacity={chevron.opacity} />
-        </mesh>
-      ))
-    })}
-  </>
-)
-
 export interface GolfCourseProps {
   hole: GolfHole
   paint: GolfPaint
   // Lawn group, aimed at by placements
   lawnRef: Ref<Group>
+  // Ice laid over the played hole, with the server clock
+  ice?: GolfHazard | null
+  serverNow?: () => number
 }
 
 /**
@@ -117,16 +81,44 @@ export interface GolfCourseProps {
  * @return {JSX.Element}
  */
 
-export const GolfCourse = ({ hole, paint, lawnRef }: GolfCourseProps) => {
+export const GolfCourse = ({ hole, paint, lawnRef, ice, serverNow }: GolfCourseProps) => {
   const geometry = useMemo(() => courseGeometry(hole), [hole])
+  // Floors the ice can cover
+  const iceTops = useMemo(
+    () =>
+      geometry.tops
+        .filter(({ surface }) => surface !== GolfSurfaces.Water)
+        .map(({ geometry }) => geometry),
+    [geometry]
+  )
+  // Cubic colour patches of the walls
+  const patches = useMemo(() => patchTexture(seededRandom(holeSeed(hole))), [hole])
+  useEffect(() => () => patches.dispose(), [patches])
+  // Grain of the sand
+  const grain = useMemo(() => sandTexture(seededRandom(holeSeed(hole))), [hole])
+  useEffect(() => () => grain.dispose(), [grain])
+  // Funnel and wall, the lawn in shade
+  const shades = useMemo(
+    () => ({
+      funnel: paint.turf.clone().lerp(paint.shade, cup.shade.funnel),
+      wall: paint.turf.clone().lerp(paint.shade, cup.shade.wall),
+    }),
+    [paint]
+  )
 
   // GPU memory freed with the hole
   useEffect(
     () => () => {
       for (const top of geometry.tops) top.geometry.dispose()
       geometry.sides.dispose()
+      geometry.underside.dispose()
       geometry.rails.dispose()
+      geometry.railSides.dispose()
       geometry.blocks.dispose()
+      geometry.blockTops.dispose()
+      geometry.pit?.funnel.dispose()
+      geometry.pit?.wall.dispose()
+      geometry.pit?.floor.dispose()
     },
     [geometry]
   )
@@ -135,41 +127,56 @@ export const GolfCourse = ({ hole, paint, lawnRef }: GolfCourseProps) => {
     <group>
       <group ref={lawnRef}>
         {geometry.tops.map(({ surface, geometry: top }) => {
+          if (surface === GolfSurfaces.Water)
+            return <GolfWater key={surface} geometry={top} paint={paint} />
           const tint = SURFACE_PAINT[surface]
-          const isWater = surface === GolfSurfaces.Water
 
           return (
-            <mesh key={surface} geometry={top} position={[0, isWater ? -water.sink : 0, 0]}>
-              {tint ? (
-                <meshStandardMaterial
-                  color={paint[tint]}
-                  side={DoubleSide}
-                  transparent={isWater}
-                  opacity={isWater ? water.opacity : 1}
-                  roughness={surface === GolfSurfaces.Ice ? roughness.ice : roughness.surface}
-                />
-              ) : (
-                <meshStandardMaterial
-                  color={paint.turf}
-                  side={DoubleSide}
-                  roughness={roughness.turf}
-                />
-              )}
+            <mesh key={surface} geometry={top} receiveShadow>
+              <meshToonMaterial
+                color={tint ? paint[tint] : paint.turf}
+                map={surface === GolfSurfaces.Sand ? grain : null}
+                side={DoubleSide}
+              />
             </mesh>
           )
         })}
       </group>
-      <mesh geometry={geometry.sides}>
-        <meshStandardMaterial color={paint.side} side={DoubleSide} roughness={roughness.side} />
+      {ice && serverNow && (
+        <GolfIce hole={hole} paint={paint} tops={iceTops} hazard={ice} serverNow={serverNow} />
+      )}
+      <mesh geometry={geometry.sides} receiveShadow>
+        <meshToonMaterial color={paint.side} map={patches} side={DoubleSide} />
       </mesh>
-      <mesh geometry={geometry.rails}>
-        <meshStandardMaterial color={paint.rail} side={DoubleSide} roughness={roughness.rail} />
+      <mesh geometry={geometry.underside}>
+        <meshToonMaterial color={paint.side} map={patches} side={DoubleSide} />
       </mesh>
-      <mesh geometry={geometry.blocks}>
-        <meshStandardMaterial color={paint.block} side={DoubleSide} roughness={roughness.block} />
+      <mesh geometry={geometry.railSides} castShadow receiveShadow>
+        <meshToonMaterial color={paint.side} map={patches} side={DoubleSide} />
       </mesh>
+      <mesh geometry={geometry.rails} castShadow receiveShadow>
+        <meshToonMaterial color={paint.wall} side={DoubleSide} />
+      </mesh>
+      <mesh geometry={geometry.blocks} castShadow receiveShadow>
+        <meshToonMaterial color={paint.obstacle} side={DoubleSide} />
+      </mesh>
+      <mesh geometry={geometry.blockTops} receiveShadow>
+        <meshToonMaterial color={paint['obstacle-top']} side={DoubleSide} />
+      </mesh>
+      {geometry.pit && (
+        <>
+          <mesh geometry={geometry.pit.funnel} receiveShadow>
+            <meshToonMaterial color={shades.funnel} side={DoubleSide} />
+          </mesh>
+          <mesh geometry={geometry.pit.wall} receiveShadow>
+            <meshToonMaterial color={shades.wall} side={DoubleSide} />
+          </mesh>
+          <mesh geometry={geometry.pit.floor}>
+            <meshBasicMaterial color={paint.cup} side={DoubleSide} />
+          </mesh>
+        </>
+      )}
       <GolfCup hole={hole} paint={paint} />
-      <GolfBoosts hole={hole} paint={paint} />
     </group>
   )
 }

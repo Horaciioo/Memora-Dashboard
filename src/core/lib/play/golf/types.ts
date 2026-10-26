@@ -32,7 +32,6 @@ export interface GolfPadLayout {
  */
 
 export interface GolfHoleLayout {
-  par: number
   tee: GolfPoint
   cup: GolfPoint
   pads: GolfPadLayout[]
@@ -40,6 +39,13 @@ export interface GolfHoleLayout {
   bumpers?: { at: GolfPoint; radius: number }[]
   spinners?: { at: GolfPoint; length: number; speed: number; phase?: number }[]
   orbs?: GolfPoint[]
+  // Ring in, ring out, exit heading in radians
+  portals?: { from: GolfPoint; to: GolfPoint; heading?: number }[]
+  vortexes?: { at: GolfPoint; radius: number }[]
+  // Blowing zone, push is the wind direction
+  fans?: { at: GolfPoint; size: GolfPoint; push: GolfPoint }[]
+  // Post rising every period seconds
+  totems?: { at: GolfPoint; radius: number; period: number; phase?: number }[]
 }
 
 /**
@@ -80,6 +86,9 @@ export interface GolfWall {
   // Outward of the slab guarded
   nx: number
   nz: number
+  // End opening onto a neighbour, no corner to close
+  cutA?: boolean
+  cutB?: boolean
 }
 
 /**
@@ -110,6 +119,44 @@ export interface GolfSpinner {
 }
 
 /**
+ * Pair of rings, the ball comes out of the second
+ * @typedef {Object} GolfPortal
+ */
+
+export interface GolfPortal {
+  id: string
+  from: GolfPoint
+  to: GolfPoint
+  // Exit heading, the entry heading kept when null
+  heading: number | null
+}
+
+/**
+ * Blowing zone
+ * @typedef {Object} GolfFan
+ */
+
+export interface GolfFan {
+  x0: number
+  x1: number
+  z0: number
+  z1: number
+  // Unit wind
+  push: GolfPoint
+}
+
+/**
+ * Post up half the time
+ * @typedef {Object} GolfTotem
+ */
+
+export interface GolfTotem extends GolfCircle {
+  period: number
+  phase: number
+  floor: number
+}
+
+/**
  * Rectangle box obstacle
  * @typedef {Object} GolfBlock
  */
@@ -128,7 +175,6 @@ export interface GolfBlock {
  */
 
 export interface GolfHole {
-  par: number
   tee: GolfPoint
   cup: GolfPoint
   pads: GolfPad[]
@@ -137,6 +183,10 @@ export interface GolfHole {
   bumpers: GolfCircle[]
   spinners: GolfSpinner[]
   orbs: GolfPoint[]
+  portals: GolfPortal[]
+  vortexes: GolfCircle[]
+  fans: GolfFan[]
+  totems: GolfTotem[]
   bounds: { x0: number; x1: number; z0: number; z1: number }
 }
 
@@ -167,6 +217,11 @@ export interface GolfHazard {
   ownerId: string
   until?: number
   lives?: number
+  // Server ms laid, drifting ones move from there
+  laidAt?: number
+  // Drift or wind, metres per second or unit
+  vx?: number
+  vz?: number
 }
 
 /**
@@ -206,7 +261,21 @@ export interface GolfShotInput {
 
 // What a shot can make heard or seen
 export type GolfEventKind =
-  'hit' | 'wall' | 'ball' | 'bumper' | 'spinner' | 'cup' | 'lip' | 'fall' | 'splash' | 'orb'
+  | 'hit'
+  | 'wall'
+  | 'ball'
+  | 'bumper'
+  | 'boost'
+  | 'spinner'
+  | 'cup'
+  | 'lip'
+  | 'fall'
+  | 'splash'
+  | 'orb'
+  | 'land'
+  | 'portal'
+  | 'vortex'
+  | 'totem'
 
 /**
  * Moment of a shot
@@ -248,4 +317,6 @@ export interface GolfShotResult {
   events: GolfShotEvent[]
   bumperHits: Record<string, number>
   pickups: { id: string; orb: number; at: number }[]
+  // Ball sent off by a flash
+  flashId: string | null
 }

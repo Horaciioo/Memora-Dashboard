@@ -39,6 +39,14 @@ export const padHeight = (pad: GolfPad, x: number, z: number): number =>
   pad.h + pad.gx * (x - pad.x0) + pad.gz * (z - pad.z0)
 
 /**
+ * Event and pulse key of a boost slab
+ * @param {number} index - Slab index
+ * @return {string} - Key
+ */
+
+export const boostId = (index: number): string => `boost:${index}`
+
+/**
  * Slab holding a point
  * @param {GolfPad} pad - Slab
  * @param {number} x - Point x
@@ -71,4 +79,22 @@ export const padUnder = (pads: GolfPad[], x: number, z: number, y = Infinity): G
   }
 
   return best
+}
+
+/**
+ * Slab drawn by area, the bigger the likelier
+ * @param {GolfPad[]} pads - Slabs
+ * @param {number} unit - Draw in [0, 1)
+ * @return {GolfPad} - Slab
+ */
+
+export const padByArea = (pads: GolfPad[], unit: number): GolfPad => {
+  const areaOf = (pad: GolfPad) => (pad.x1 - pad.x0) * (pad.z1 - pad.z0)
+  let left = unit * pads.reduce((sum, pad) => sum + areaOf(pad), 0)
+  for (const pad of pads) {
+    left -= areaOf(pad)
+    if (left <= 0) return pad
+  }
+
+  return pads[pads.length - 1]
 }

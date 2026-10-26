@@ -4,6 +4,7 @@ import type {
   GolfCircle,
   GolfEventKind,
   GolfHazard,
+  GolfPad,
   GolfShotInput,
   GolfShotResult,
 } from '@/core/lib/play/golf/types'
@@ -36,8 +37,12 @@ export interface GolfWorld {
   bumpers: GolfBumper[]
   orbs: number[]
   cupFloor: number
+  // Lost below this height
+  voidFloor: number
   // Pairs overlapping at the start, ignored until apart
   exempt: Set<string>
+  // Boost slab each ball rolls on
+  boosting: Map<string, GolfPad | null>
   frames: number
   events: GolfShotResult['events']
   bumperHits: Record<string, number>
@@ -120,7 +125,9 @@ export const createWorld = (input: GolfShotInput, bodies: GolfBody[]): GolfWorld
     bumpers: bumpersOf(input, hazards),
     orbs: [...input.orbs],
     cupFloor: floorHeight(input.hole, input.hole.cup[0], input.hole.cup[1]) ?? 0,
+    voidFloor: Math.min(...input.hole.pads.map((pad) => pad.h)) - GOLF_SETTINGS.physics.voidDepth,
     exempt: overlapping(bodies),
+    boosting: new Map(),
     frames: 0,
     events: [],
     bumperHits: {},

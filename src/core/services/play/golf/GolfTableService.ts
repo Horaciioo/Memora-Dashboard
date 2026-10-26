@@ -2,7 +2,14 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { after } from '@/core/lib/play/clock'
-import { cardTotal, drawCourse, golfSettingsOf, holeScore, holesOf } from '@/core/lib/play/golf'
+import {
+  cardTotal,
+  drawCourse,
+  golfSettingsOf,
+  holeScore,
+  holesOf,
+  strokeCeiling,
+} from '@/core/lib/play/golf'
 import { IDLE_STEP } from '@/core/engines/play/steps'
 import { asJson, isEveryoneDone, withGolf } from '@/core/services/play/golf/lookups'
 import type { GolfTable } from '@/core/services/play/golf/lookups'
@@ -83,7 +90,7 @@ export const closeHole = async (table: GolfTable): Promise<EngineStep> => {
   for (const player of players) {
     await tx.golfPlayer.update({
       where: { id: player.id },
-      data: { card: { push: holeScore(player, settings.maxStrokes) } },
+      data: { card: { push: holeScore(player, strokeCeiling(settings)) } },
     })
   }
   await tx.golfGame.update({

@@ -1,13 +1,23 @@
 'use client'
 
+import type { CSSProperties } from 'react'
+
+import { GolfPowerOrb } from '@/composites/play/golf/GolfPowerOrb'
+import { powerPaint } from '@/composites/play/golf/types'
+import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_POWERS } from '@/declarations/play/golf/powers'
-import { ICONS } from '@/declarations/ui/icons'
-import { GOLF_BOARD, GOLF_SETUP } from '@/declarations/ui/variants'
+import { GOLF_SETUP } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { GolfPowerName } from '@/utils/constants/play'
 
+// Powers grouped by kind, bonus first
+const KINDS = [
+  { isBonus: true, title: GOLF_BOARD_COPY.bonus },
+  { isBonus: false, title: GOLF_BOARD_COPY.malus },
+]
+
 /**
- * Powers the orbs may give, each one on or off
+ * Powers the orbs may give, by kind, each one on or off
  * @param {Object} props - Picker
  * @param {GolfPowerName[]} props.value - Powers on
  * @param {(powers: GolfPowerName[]) => void} props.onChange - New pick
@@ -20,35 +30,52 @@ export const GolfPowerPicker = ({
 }: {
   value: GolfPowerName[]
   onChange: (powers: GolfPowerName[]) => void
-}) => (
-  <div className={GOLF_SETUP.powers}>
-    {GOLF_POWERS.keys.map((power) => {
-      const meta = GOLF_POWERS.get(power)
-      const Icon = ICONS[meta.icon]
-      const isOn = value.includes(power)
-      // Registry order kept
-      const flip = () =>
-        onChange(GOLF_POWERS.keys.filter((key) => (key === power ? !isOn : value.includes(key))))
+}) => {
+  return (
+    <div className={GOLF_SETUP.powers}>
+      {KINDS.map(({ isBonus, title }) => (
+        <section key={title} className={GOLF_SETUP.powerGroup}>
+          <h3 className={GOLF_SETUP.powerGroupTitle}>{title}</h3>
+          <div className={GOLF_SETUP.powerList}>
+            {GOLF_POWERS.keys
+              .filter((power) => GOLF_POWERS.get(power).isBonus === isBonus)
+              .map((power) => {
+                const meta = GOLF_POWERS.get(power)
+                const isOn = value.includes(power)
+                // Registry order kept
+                const flip = () =>
+                  onChange(
+                    GOLF_POWERS.keys.filter((key) => (key === power ? !isOn : value.includes(key)))
+                  )
 
-      return (
-        <button
-          key={power}
-          type="button"
-          aria-pressed={isOn}
-          className={cn(GOLF_SETUP.power, isOn ? GOLF_SETUP.powerOn : GOLF_SETUP.powerOff)}
-          onClick={flip}
-        >
-          <span
-            className={cn(GOLF_SETUP.powerIcon, meta.isBonus ? GOLF_BOARD.bonus : GOLF_BOARD.malus)}
-          >
-            <Icon className={GOLF_SETUP.powerGlyph} aria-hidden="true" />
-          </span>
-          <span className={GOLF_SETUP.powerText}>
-            <span className={GOLF_SETUP.powerName}>{meta.label}</span>
-            <span className={GOLF_SETUP.powerEffect}>{meta.effect}</span>
-          </span>
-        </button>
-      )
-    })}
-  </div>
-)
+                return (
+                  <button
+                    key={power}
+                    type="button"
+                    aria-pressed={isOn}
+                    className={cn(GOLF_SETUP.power, !isOn && GOLF_SETUP.powerOff)}
+                    style={{ '--power': powerPaint(power) } as CSSProperties}
+                    onClick={flip}
+                  >
+                    <GolfPowerOrb power={power} className={GOLF_SETUP.powerOrb} />
+                    <span className={GOLF_SETUP.powerText}>
+                      <span
+                        className={cn(
+                          GOLF_SETUP.powerKind,
+                          isBonus ? GOLF_SETUP.powerKindBonus : GOLF_SETUP.powerKindMalus
+                        )}
+                      >
+                        {title}
+                      </span>
+                      <span className={GOLF_SETUP.powerName}>{meta.label}</span>
+                      <span className={GOLF_SETUP.powerEffect}>{meta.effect}</span>
+                    </span>
+                  </button>
+                )
+              })}
+          </div>
+        </section>
+      ))}
+    </div>
+  )
+}
