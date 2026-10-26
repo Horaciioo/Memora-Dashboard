@@ -7,10 +7,24 @@ import { BacRulesDrawer } from '@/composites/play/baccalaureat/BacRulesDrawer'
 import { BacSetupDrawer } from '@/composites/play/baccalaureat/BacSetupDrawer'
 import { BombRulesDrawer } from '@/composites/play/bomb/BombRulesDrawer'
 import { BombSetupDrawer } from '@/composites/play/bomb/BombSetupDrawer'
+import { GolfRulesDrawer } from '@/composites/play/golf/setup/GolfRulesDrawer'
+import { GolfSetupDrawer } from '@/composites/play/golf/setup/GolfSetupDrawer'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
+import { golfSettingsOf } from '@/core/lib/play/golf/settings'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
+
+/**
+ * Rules of a lobby
+ * @typedef {Object} PlayRulesValue
+ */
+
+export interface PlayRulesValue {
+  settings: Prisma.JsonValue
+  // Games in a tournament, null for a single game
+  tournamentGames: number | null
+}
 
 /**
  * What every setup drawer takes
@@ -21,7 +35,11 @@ export interface PlaySetupProps {
   open: boolean
   isSaving: boolean
   onClose: () => void
-  onCreate: (setup: object) => void
+  onSubmit: (setup: object) => void
+  // Rules being edited, none for a new game
+  current?: PlayRulesValue
+  // Who sets the game up
+  player?: { name: string; avatarUrl: string | null }
 }
 
 /**
@@ -29,12 +47,9 @@ export interface PlaySetupProps {
  * @typedef {Object} PlayRulesProps
  */
 
-export interface PlayRulesProps {
+export interface PlayRulesProps extends PlayRulesValue {
   open: boolean
   onClose: () => void
-  settings: Prisma.JsonValue
-  // Games in a tournament, null for a single game
-  tournamentGames: number | null
 }
 
 /**
@@ -45,6 +60,7 @@ export interface PlayRulesProps {
 export const PLAY_SETUP_DRAWERS: Partial<Record<PlayGameName, ComponentType<PlaySetupProps>>> = {
   [PlayGames.Baccalaureat]: BacSetupDrawer,
   [PlayGames.Bomb]: BombSetupDrawer,
+  [PlayGames.Golf]: GolfSetupDrawer,
 }
 
 /**
@@ -58,5 +74,8 @@ export const PLAY_RULES_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   ),
   [PlayGames.Bomb]: ({ open, onClose, settings }) => (
     <BombRulesDrawer open={open} onClose={onClose} settings={bombSettingsOf(settings)} />
+  ),
+  [PlayGames.Golf]: ({ open, onClose, settings }) => (
+    <GolfRulesDrawer open={open} onClose={onClose} settings={golfSettingsOf(settings)} />
   ),
 }

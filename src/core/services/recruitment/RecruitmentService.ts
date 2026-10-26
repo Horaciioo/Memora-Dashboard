@@ -9,6 +9,7 @@ import { activeFunctions } from '@/core/services/reference/lookups'
 import { sessionNumbers } from '@/core/services/academy/AcademyService'
 import { syncAdmission } from '@/core/services/academy/AdmissionService'
 import { conflict, notFound } from '@/core/lib/errors'
+import { canMoveStep, STEP_ORDER } from '@/core/lib/recruitment/stepState'
 import type { CommentView } from '@/types/comments'
 import {
   readDate,
@@ -28,7 +29,11 @@ import {
   toPerson,
   youtuberOptions,
 } from '@/core/services/work/shared'
-import { JUNIOR_FUNCTION_OF, OBSERVER_FUNCTION } from '@/declarations/reference/fixed'
+import {
+  JUNIOR_FUNCTION_OF,
+  OBSERVER_FUNCTION,
+  RECRUITER_FUNCTION,
+} from '@/declarations/reference/fixed'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
 import { toLinkView } from '@/core/services/onboarding/IntegrationLinkService'
@@ -174,6 +179,7 @@ const SUMMARY_INCLUDE = {
   jobFunction: true,
   academySession: { include: { jobFunction: true } },
   responsables: { include: { account: true } },
+  recruiters: { include: { account: true } },
   observers: true,
   _count: { select: { candidates: true } },
 } as const
@@ -188,26 +194,37 @@ type SummaryRow = Awaited<
 >[number]
 
 /**
+ * Reference to a member
+ * @param {{ id: string; displayName: string; avatarUrl: string | null }} account - Member row
+ * @return {RecruitmentRef} - Reference
+ */
+
+const toPersonRef = (account: {
+  id: string
+  displayName: string
+  avatarUrl: string | null
+}): RecruitmentRef => ({
+  id: account.id,
+  label: account.displayName,
+  accent: null,
+  image: account.avatarUrl,
+})
+
+/**
  * Map a session row to its summary
  * @param {SummaryRow} row - Session row
  * @param {Map<string, number>} numbers - Promotion ranks
  * @param {number} interviewedCount - Applicants who attended
- * @param {RecruitmentRef[]} [recruiters] - Moderators leading interviews
  * @return {RecruitmentSummary} - Session header
  */
 
 const toSummary = (
   row: SummaryRow,
   numbers: Map<string, number>,
-  interviewedCount: number,
-  recruiters: RecruitmentRef[] = []
+  interviewedCount: number
 ): RecruitmentSummary => {
-  const responsables = row.responsables.map(({ account }) => ({
-    id: account.id,
-    label: account.displayName,
-    accent: null,
-    image: account.avatarUrl,
-  }))
+  const responsables = row.responsables.map(({ account }) => toPersonRef(account))
+  const recruiters = row.recruiters.map(({ account }) => toPersonRef(account))
 
   return {
     id: row.id,
@@ -217,7 +234,6 @@ const toSummary = (
     youtuber: toRef(row.youtuber),
     jobFunction: toRef(row.jobFunction),
     responsables,
-    recruiters,
     platform: row.platform,
     academySessionId: row.academySessionId,
     promotionTitle: row.academySession
@@ -241,6 +257,7 @@ const toSummary = (
         ? [row.opensAt.toISOString(), (row.closesAt ?? row.opensAt).toISOString()]
         : null,
       responsableIds: responsables.map((seat) => seat.id),
+      recruiterIds: recruiters.map((seat) => seat.id),
       observerIds: row.observers.map((seat) => seat.accountId),
     },
   }
@@ -257,10 +274,11 @@ export const sessionFields = async (
   scope: AccessScope,
   youtuberId?: string
 ): Promise<FieldDefinition[]> => {
-  const [creators, functions, responsables, observers, links] = await Promise.all([
+  const [creators, functions, responsables, recruiters, observers, links] = await Promise.all([
     youtuberOptions(scope),
     activeFunctions(),
     teamOptions({ role: MemberRoles.Responsable, youtuberId }),
+    teamOptions({ functionName: RECRUITER_FUNCTION, youtuberId }),
     teamOptions({ functionName: OBSERVER_FUNCTION, youtuberId }),
     prisma.youtuberFunction.findMany({ select: { youtuberId: true, functionId: true } }),
   ])
@@ -329,6 +347,14 @@ export const sessionFields = async (
       options: responsables,
       ownerField: 'youtuberId',
       defaultFromOwner: true,
+      mark: 'avatar',
+    },
+    {
+      name: 'recruiterIds',
+      kind: 'multiselect',
+      label: RECRUITMENT_FIELD_COPY.recruiters,
+      options: recruiters,
+      ownerField: 'youtuberId',
       mark: 'avatar',
     },
     {
@@ -623,7 +649,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     where: { AND: [{ id }, sessionScope(scope)] },
     include: {
       ...SUMMARY_INCLUDE,
-      steps: { orderBy: [{ offset: 'asc' }, { position: 'asc' }] },
+      steps: { orderBy: [...STEP_ORDER] },
       comments: { orderBy: { createdAt: 'asc' }, include: COMMENT_SHAPE },
       invite: true,
       candidates: {
@@ -675,22 +701,8 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     isTerminal: outcome.isTerminal,
   }))
 
-  // Every moderator who leads an interview, once
-  const recruiters = [
-    ...new Map(
-      row.candidates.flatMap((candidate) =>
-        candidate.recruiter ? [[candidate.recruiter.id, candidate.recruiter] as const] : []
-      )
-    ).values(),
-  ].map((account) => ({
-    id: account.id,
-    label: account.displayName,
-    accent: null,
-    image: account.avatarUrl,
-  }))
-
   return {
-    summary: toSummary(row, await sessionNumbers(), attendedCount, recruiters),
+    summary: toSummary(row, await sessionNumbers(), attendedCount),
     instructions: row.instructions,
     comments: row.comments.map(toComment),
     candidates: row.candidates.map((candidate) => toCandidate(candidate, byDiscordId)),
@@ -751,7 +763,7 @@ export const createSession = async (
 
   const templates = await prisma.recruitmentStepTemplate.findMany({
     where: trameFilter(youtuberId, functionId),
-    orderBy: [{ offset: 'asc' }, { position: 'asc' }],
+    orderBy: [...STEP_ORDER],
   })
 
   const closingOffset = templates.reduce((last, template) => Math.max(last, template.offset), 0)
@@ -786,6 +798,9 @@ export const createSession = async (
         closesAt,
         responsables: {
           create: readList(values, 'responsableIds').map((accountId) => ({ accountId })),
+        },
+        recruiters: {
+          create: readList(values, 'recruiterIds').map((accountId) => ({ accountId })),
         },
         observers: {
           create: readList(values, 'observerIds').map((accountId) => ({ accountId })),
@@ -857,8 +872,8 @@ export const updateSession = async (
   })
   const keptIds = new Set(kept.map((seat) => seat.accountId))
 
-  // The responsable seats are replaced wholesale
-  const [, , , , , , row] = await prisma
+  // The responsable and recruiter seats are replaced wholesale
+  const [, , , , , , , , row] = await prisma
     .$transaction([
       prisma.recruitmentSession.update({
         where: { id },
@@ -872,6 +887,10 @@ export const updateSession = async (
       prisma.recruitmentResponsable.deleteMany({ where: { sessionId: id } }),
       prisma.recruitmentResponsable.createMany({
         data: readList(values, 'responsableIds').map((accountId) => ({ sessionId: id, accountId })),
+      }),
+      prisma.recruitmentRecruiter.deleteMany({ where: { sessionId: id } }),
+      prisma.recruitmentRecruiter.createMany({
+        data: readList(values, 'recruiterIds').map((accountId) => ({ sessionId: id, accountId })),
       }),
       prisma.recruitmentSeat.deleteMany({
         where: { accountId: { notIn: observerIds }, candidate: { sessionId: id } },
@@ -1318,7 +1337,15 @@ export const setStepDone = async (
   done: boolean,
   scope: AccessScope
 ): Promise<RecruitmentStepView> => {
-  await stepSession(id, scope)
+  const sessionId = await stepSession(id, scope)
+
+  // Steps are cleared one after the other
+  const steps = await prisma.recruitmentStep.findMany({
+    where: { sessionId },
+    orderBy: [...STEP_ORDER],
+    select: { id: true, doneAt: true },
+  })
+  if (!canMoveStep(steps, id, done)) throw conflict()
 
   const row = await prisma.recruitmentStep.update({
     where: { id },

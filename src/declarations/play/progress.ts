@@ -21,12 +21,11 @@ export interface PlayTier {
  */
 
 export const PLAY_TIERS: PlayTier[] = [
-  { label: 'Bronze', from: 1, tone: '--play-tier-bronze' },
-  { label: 'Argent', from: 10, tone: '--play-tier-silver' },
-  { label: 'Or', from: 25, tone: '--play-tier-gold' },
-  { label: 'Platine', from: 45, tone: '--play-tier-platinum' },
-  { label: 'Diamant', from: 70, tone: '--play-tier-diamond' },
-  { label: 'Légende', from: 100, tone: '--play-tier-legend' },
+  { label: 'Découverte', from: 1, tone: '--play-tier-discovery' },
+  { label: 'En progression', from: 10, tone: '--play-tier-progress' },
+  { label: 'Maîtrisé', from: 30, tone: '--play-tier-mastered' },
+  { label: 'Expert', from: 60, tone: '--play-tier-expert' },
+  { label: 'Légendaire', from: 100, tone: '--play-tier-legend' },
 ]
 
 /**

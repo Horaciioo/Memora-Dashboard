@@ -4,6 +4,7 @@ import { INTERVIEW_OBSERVERS_MAX } from '@/utils/constants/recruitment'
 import { CopyValue } from '@/components/elements/actions/CopyValue'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
+import { RevealMark } from '@/components/elements/display/marks/RevealMark'
 import { Status } from '@/components/elements/display/Status'
 import type { EditableEntry } from '@/components/structures/inline/EditableDetailGrid'
 import { FileOverview } from '@/components/structures/page/FileOverview'
@@ -55,7 +56,12 @@ export const CandidateOverview = ({
   const fieldFor = (name: string) => fields.candidate.find((field) => field.name === name)!
   const text = (name: string) =>
     typeof record.values[name] === 'string' ? (record.values[name] as string) : ''
-  const recruiter = pickedOptions(fieldFor('recruiterId'), record.values.recruiterId)[0]
+  // Falls back on the saved recruiter when the options leave them out
+  const recruiter =
+    pickedOptions(fieldFor('recruiterId'), record.values.recruiterId)[0] ??
+    (candidate.recruiter && candidate.recruiter.id === record.values.recruiterId
+      ? candidate.recruiter
+      : undefined)
   const outcome = detail.outcomes.find((entry) => entry.id === text('outcomeId'))
   const sitting = pickedOptions(fieldFor('observerIds'), record.values.observerIds)
 
@@ -118,7 +124,7 @@ export const CandidateOverview = ({
                     ? CANDIDATE_COPY.observeFull
                     : CANDIDATE_COPY.observe
               }
-              disabled={isFull || isLocked}
+              disabled={isFull}
               onChange={(next) => void toggle(next)}
             />
           ),
@@ -142,8 +148,15 @@ export const CandidateOverview = ({
     {
       label: RECRUITMENT_FIELD_COPY.attended,
       field: fieldFor('attended'),
-      display:
-        record.values.attended === true ? RECRUITMENT_COPY.attended : RECRUITMENT_COPY.missed,
+      display: (
+        <RevealMark
+          icon={record.values.attended === true ? 'success' : 'failure'}
+          tone={record.values.attended === true ? 'success' : 'danger'}
+          label={
+            record.values.attended === true ? RECRUITMENT_COPY.attended : RECRUITMENT_COPY.missed
+          }
+        />
+      ),
     },
   ]
 

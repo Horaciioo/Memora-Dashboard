@@ -1,0 +1,5 @@
+export { openCourse, settleCourse } from '@/core/services/play/golf/GolfTableService'
+export { playShot } from '@/core/services/play/golf/GolfShotService'
+export { playPower } from '@/core/services/play/golf/GolfPowerService'
+export { golfView } from '@/core/services/play/golf/GolfViewService'
+export { golfStats } from '@/core/services/play/golf/GolfStatsService'

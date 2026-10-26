@@ -64,13 +64,20 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
     invite: canInvite ? { candidates, canSeat: isLobby } : null,
   }
 
+  // Finished single games can be replayed
+  const replay =
+    game.status === PlayStatuses.Finished && !game.tournament
+      ? { isHost: game.me.isHost, isSeated: game.me.isSeated, rematch: game.rematch }
+      : null
+
   // Started game with its own table
   const drawTable = PLAY_SESSION_TABLES[game.game]
   if (!isLobby && game.board !== null && drawTable) {
-    const faceOf = ({ accountId, name, avatarUrl }: (typeof game.seats)[number]) => ({
+    const faceOf = ({ accountId, name, avatarUrl, color }: (typeof game.seats)[number]) => ({
       id: accountId,
       name,
       avatarUrl,
+      color,
     })
     const players = game.seats.filter((seat) => !seat.hasLeft).map(faceOf)
     const spectators = (
@@ -106,6 +113,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
           me={game.me}
           chat={chat}
           feed={table.feed}
+          replay={replay}
         >
           {table.board}
         </PlaySessionRoom>

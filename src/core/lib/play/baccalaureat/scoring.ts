@@ -18,13 +18,24 @@ export interface JudgedAnswer {
 }
 
 /**
+ * Points of a word written by several
+ * @return {number} - Unique points split
+ */
+
+export const sharedPoints = (): number => {
+  const { unique, sharedDivisor } = BACCALAUREAT_SETTINGS.points
+
+  return Math.floor(unique / sharedDivisor)
+}
+
+/**
  * Points of every answer of a round
  * @param {JudgedAnswer[]} answers - Judged answers
  * @return {Map<string, number>} - Points per answer
  */
 
 export const scoreAnswers = (answers: JudgedAnswer[]): Map<string, number> => {
-  const { solo, unique, shared } = BACCALAUREAT_SETTINGS.points
+  const { solo, unique } = BACCALAUREAT_SETTINGS.points
   const valid = answers.filter((answer) => answer.valid)
   const byCategory = Map.groupBy(valid, (answer) => answer.category)
 
@@ -35,7 +46,7 @@ export const scoreAnswers = (answers: JudgedAnswer[]): Map<string, number> => {
       // Same word, same category
       const peers = byCategory.get(answer.category) ?? []
       const twins = peers.filter((peer) => normalizeWord(peer.word) === normalizeWord(answer.word))
-      const points = peers.length === 1 ? solo : twins.length === 1 ? unique : shared
+      const points = peers.length === 1 ? solo : twins.length === 1 ? unique : sharedPoints()
 
       return [answer.id, points]
     })

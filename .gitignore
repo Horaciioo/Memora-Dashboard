@@ -45,3 +45,7 @@ vitest.config.mts
 
 # internal tooling notes, never public
 /.claude/
+
+# reference captures (Discord Putt Party, Ludo), never shipped
+/public/examples-putt-party
+/public/examples-ludo

@@ -76,6 +76,9 @@ export const BombTable = ({
               <BombHearts lives={seat.lives} max={maxLives} />
             )}
             <Avatar name={seat.name} src={seat.avatarUrl} size="md" />
+            {!(isTurn && (draft || miss)) && seat.lastWord && (
+              <span className={BOMB_BOARD.lastWord}>{seat.lastWord}</span>
+            )}
             {isTurn && (draft || miss) && (
               <span className={cn(BOMB_BOARD.draft, miss && BOMB_BOARD.draftMiss)}>
                 {miss?.word ?? draft}

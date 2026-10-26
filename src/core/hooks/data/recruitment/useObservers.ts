@@ -42,6 +42,12 @@ export interface Observers {
 
 export const useObservers = (sessionId: string, initial: ObserverView[]): Observers => {
   const [observers, setObservers] = useState(initial)
+  // A refreshed page hands over the seats as the server now holds them
+  const [served, setServed] = useState(initial)
+  if (served !== initial) {
+    setServed(initial)
+    setObservers(initial)
+  }
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   const add = useCallback(

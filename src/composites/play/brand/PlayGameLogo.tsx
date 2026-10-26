@@ -30,11 +30,43 @@ const MARKS: Record<string, ReactNode> = {
   ),
   playGolf: (
     <>
-      <ellipse cx="32" cy="48" rx="18" ry="6" fill="white" opacity="0.3" />
-      <ellipse cx="32" cy="48" rx="5" ry="2" {...tint('--play-golf-deep')} />
-      <path d="M33 48V12" stroke="white" strokeWidth="3" strokeLinecap="round" />
-      <path d="M34 12h16l-5 6 5 6H34z" {...tint('--play-gold')} />
-      <circle cx="20" cy="42" r="5" fill="white" />
+      <ellipse
+        className="play-bounce-shadow"
+        cx="32"
+        cy="55"
+        rx="15"
+        ry="4"
+        fill="black"
+        opacity="0.28"
+      />
+      <g className="play-bounce">
+        <circle cx="32" cy="28" r="17" fill="white" />
+        <circle
+          cx="32"
+          cy="28"
+          r="17"
+          fill="none"
+          stroke="black"
+          strokeOpacity="0.14"
+          strokeWidth="2"
+        />
+        <g fill="black" opacity="0.13">
+          <circle cx="26" cy="30" r="1.9" />
+          <circle cx="34" cy="34" r="1.9" />
+          <circle cx="38" cy="26" r="1.9" />
+          <circle cx="30" cy="38" r="1.7" />
+          <circle cx="40" cy="33" r="1.5" />
+        </g>
+        <ellipse cx="25" cy="20" rx="5" ry="3" fill="white" transform="rotate(-35 25 20)" />
+        <path
+          d="M23 18a11 11 0 0 1 6-4"
+          stroke="black"
+          strokeOpacity="0.1"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+        />
+      </g>
     </>
   ),
   playBomb: (
@@ -79,7 +111,7 @@ const MARKS: Record<string, ReactNode> = {
 }
 
 // Logos drawn bare, without their tile
-const BARE = new Set(['playBaccalaureat', 'playBomb'])
+const BARE = new Set(['playBaccalaureat', 'playBomb', 'playGolf'])
 
 // Game not announced yet
 const MYSTERY = {

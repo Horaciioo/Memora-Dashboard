@@ -27,8 +27,19 @@ export const generateMetadata = async (): Promise<Metadata> => ({
   twitter: { card: 'summary_large_image', title: APP_NAME, description: APP_DESCRIPTION },
 })
 
-// Lets the floating mobile nav pill read env(safe-area-inset-*) under the notch/home indicator
-export const viewport: Viewport = { viewportFit: 'cover', themeColor: TICKET_PALETTE.accent }
+// Link preview crawlers, the only readers of the card colour
+const PREVIEW_BOTS = /discordbot|twitterbot|slackbot|facebookexternalhit|telegrambot|whatsapp/i
+
+/**
+ * Safe-area fit for the floating mobile nav pill, the card colour for crawlers only: browsers tint their toolbar with it
+ * @return {Promise<Viewport>} - Viewport
+ */
+
+export const generateViewport = async (): Promise<Viewport> => {
+  const isPreview = PREVIEW_BOTS.test((await headers()).get('user-agent') ?? '')
+
+  return { viewportFit: 'cover', ...(isPreview && { themeColor: TICKET_PALETTE.accent }) }
+}
 
 // Chrome dimensions
 const SHELL_VARS = {

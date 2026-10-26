@@ -73,9 +73,9 @@ const minGames = readInteger(tournament.minGames, {
 
 export const PLAY_SETTINGS = {
   xp: {
-    win: readInteger(xp.win, { path: 'play/play.xp.win', fallback: 150, min: 0 }),
-    draw: readInteger(xp.draw, { path: 'play/play.xp.draw', fallback: 100, min: 0 }),
-    loss: readInteger(xp.loss, { path: 'play/play.xp.loss', fallback: 50, min: 0 }),
+    win: readInteger(xp.win, { path: 'play/play.xp.win', fallback: 80, min: 0 }),
+    draw: readInteger(xp.draw, { path: 'play/play.xp.draw', fallback: 40, min: 0 }),
+    loss: readInteger(xp.loss, { path: 'play/play.xp.loss', fallback: 20, min: 0 }),
     firstGameMultiplier: readNumber(xp.firstGameMultiplier, {
       path: 'play/play.xp.firstGameMultiplier',
       fallback: 2,
@@ -83,9 +83,9 @@ export const PLAY_SETTINGS = {
     }),
   },
   levels: {
-    max: readInteger(levels.max, { path: 'play/play.levels.max', fallback: 100, min: 1 }),
-    base: readInteger(levels.base, { path: 'play/play.levels.base', fallback: 40, min: 1 }),
-    growth: readNumber(levels.growth, { path: 'play/play.levels.growth', fallback: 1, min: 1 }),
+    max: readInteger(levels.max, { path: 'play/play.levels.max', fallback: 150000, min: 1 }),
+    base: readInteger(levels.base, { path: 'play/play.levels.base', fallback: 320, min: 1 }),
+    step: readInteger(levels.step, { path: 'play/play.levels.step', fallback: 32, min: 0 }),
   },
   tournament: {
     minGames,
@@ -117,7 +117,7 @@ export const PLAY_SETTINGS = {
     fallback: 30,
     min: 1,
   }),
-  seatColors: readInteger(play.seatColors, { path: 'play/play.seatColors', fallback: 12, min: 2 }),
+  seatColors: readInteger(play.seatColors, { path: 'play/play.seatColors', fallback: 15, min: 2 }),
   admin: {
     maxXpChange: readInteger(admin.maxXpChange, {
       path: 'play/play.admin.maxXpChange',
@@ -199,11 +199,6 @@ export const BACCALAUREAT_SETTINGS = {
   }),
   stop: {
     enabled: readBoolean(stop.enabled, { path: 'play/baccalaureat.stop.enabled', fallback: true }),
-    graceSeconds: readInteger(stop.graceSeconds, {
-      path: 'play/baccalaureat.stop.graceSeconds',
-      fallback: 10,
-      min: 0,
-    }),
   },
   submitGraceSeconds: readInteger(baccalaureat.submitGraceSeconds, {
     path: 'play/baccalaureat.submitGraceSeconds',
@@ -228,10 +223,10 @@ export const BACCALAUREAT_SETTINGS = {
       fallback: 10,
       min: 0,
     }),
-    shared: readInteger(points.shared, {
-      path: 'play/baccalaureat.points.shared',
-      fallback: 5,
-      min: 0,
+    sharedDivisor: readInteger(points.sharedDivisor, {
+      path: 'play/baccalaureat.points.sharedDivisor',
+      fallback: 2,
+      min: 1,
     }),
     stopBonus: readInteger(points.stopBonus, {
       path: 'play/baccalaureat.points.stopBonus',

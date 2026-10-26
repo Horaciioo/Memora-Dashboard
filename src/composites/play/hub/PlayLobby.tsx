@@ -4,8 +4,8 @@ import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { PLAY_RULES_DRAWERS } from '@/composites/play/registry'
-import type { PlayRulesProps } from '@/composites/play/registry'
+import { PLAY_RULES_DRAWERS, PLAY_SETUP_DRAWERS } from '@/composites/play/registry'
+import type { PlayRulesValue } from '@/composites/play/registry'
 import { PlayInviteSlot } from '@/composites/play/session/PlayInviteSlot'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { usePlayPeopleMenu } from '@/core/hooks/interaction/state/usePlayPeopleMenu'
@@ -42,7 +42,7 @@ export interface PlayLobbyProps {
   viewerId: string
   me: { isSeated: boolean; isHost: boolean; isSpectator: boolean }
   game: PlayGameName
-  rules: Pick<PlayRulesProps, 'settings' | 'tournamentGames'>
+  rules: PlayRulesValue
 }
 
 /**
@@ -76,6 +76,10 @@ export const PlayLobby = ({
   const present = seats.filter((seat) => !seat.hasLeft)
   const isLobby = status === PlayStatuses.Lobby
   const Rules = PLAY_RULES_DRAWERS[game]
+  const Setup = PLAY_SETUP_DRAWERS[game]
+  // The host edits, the others read
+  const canEdit = isLobby && me.isHost && Boolean(Setup)
+  const closeRules = () => setRulesOpen(false)
 
   return (
     <div className={PLAY_ROOM.middle} data-play-box>
@@ -136,7 +140,7 @@ export const PlayLobby = ({
           )}
           {isLobby && (me.isHost || me.isSpectator) && <div className={PLAY_ROOM.divider} />}
           <div className={PLAY_ROOM.secondary}>
-            {isLobby && Rules && (
+            {isLobby && (Rules || canEdit) && (
               <Button variant="arcadeGhost" onClick={() => setRulesOpen(true)}>
                 {me.isHost ? PLAY_HUB_COPY.rulesHost : PLAY_HUB_COPY.rules}
               </Button>
@@ -170,7 +174,20 @@ export const PlayLobby = ({
         {!isLobby && me.isSpectator && <p className={PLAY_ROOM.note}>{PLAY_HUB_COPY.spectating}</p>}
       </section>
 
-      {Rules && <Rules open={isRulesOpen} onClose={() => setRulesOpen(false)} {...rules} />}
+      {canEdit && Setup && isRulesOpen ? (
+        <Setup
+          open
+          isSaving={moves.isSaving}
+          current={rules}
+          player={seats.find((seat) => seat.accountId === viewerId)}
+          onClose={closeRules}
+          onSubmit={(setup) =>
+            void moves.rules(id, setup).then((isSaved) => isSaved && closeRules())
+          }
+        />
+      ) : (
+        Rules && <Rules open={isRulesOpen} onClose={closeRules} {...rules} />
+      )}
     </div>
   )
 }

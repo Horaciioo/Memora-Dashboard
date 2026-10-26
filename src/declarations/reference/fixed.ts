@@ -80,6 +80,7 @@ export const FunctionNames = {
 } as const
 
 // Secondary functions that open a team picker
+export const RECRUITER_FUNCTION = FunctionNames.Recruiters
 export const OBSERVER_FUNCTION = FunctionNames.Observers
 export const TRAINER_FUNCTION = FunctionNames.Trainers
 // Holders may be asked to coordinate a live

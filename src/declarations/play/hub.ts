@@ -4,6 +4,8 @@
  */
 
 export const PLAY_HUB_COPY = {
+  rewardXp: 'XP',
+  rewardLevel: 'Niveau supérieur',
   pageTitle: 'Play',
   backToDashboard: 'Retourner à Memora Dashboard',
   back: 'Retour',
@@ -16,6 +18,7 @@ export const PLAY_HUB_COPY = {
   sectionTrophies: 'Trophées',
   sectionGamesLevels: 'Niveau par jeu',
   featured: 'À la une',
+  play: 'Jouer',
   mystery: '? ? ?',
   mysteryTagline: 'Un nouveau jeu se prépare…',
   players: '{players} / {max} joueurs',
@@ -84,9 +87,14 @@ export const PLAY_HUB_COPY = {
   start: 'Lancer la partie',
   playersTitle: 'Joueurs',
   rules: 'Voir les règles',
-  rulesHost: 'Revoir les règles',
+  rulesHost: 'Modifier les règles',
+  saveRules: 'Enregistrer',
+  rulesSaved: 'Règles mises à jour',
   cancel: 'Annuler la partie',
   cancelled: 'Partie annulée',
+  replay: 'Rejouer',
+  replayed: 'Nouvelle partie prête',
+  replayJoin: 'Rejoindre la nouvelle partie',
   close: 'Fermer',
   leaderMetric: 'Classer par',
   leave: 'Quitter',

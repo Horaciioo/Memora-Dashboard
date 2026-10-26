@@ -4,12 +4,12 @@
   background:
     radial-gradient(
       60rem 28rem at 12% -6%,
-      color-mix(in srgb, var(--play-key) 34%, transparent),
+      color-mix(in srgb, var(--play-aurora) 38%, transparent),
       transparent 70%
     ),
     radial-gradient(
       48rem 30rem at 92% 4%,
-      color-mix(in srgb, var(--play-baccalaureat) 40%, transparent),
+      color-mix(in srgb, var(--play-baccalaureat) 36%, transparent),
       transparent 70%
     ),
     linear-gradient(180deg, var(--play-night) 0%, var(--play-dusk) 55%, var(--play-haze) 100%);
@@ -140,7 +140,16 @@
 }
 
 .play-card:hover {
-  transform: translateY(-0.35rem) rotate(-0.4deg);
+  transform: translateY(-0.6rem) scale(1.02) rotate(-0.6deg);
+  box-shadow: 0 1.5rem 3rem -1rem rgb(0 0 0 / 0.55);
+}
+
+.play-card:hover .play-card-play {
+  transform: translateY(-0.15rem);
+}
+
+.play-card-play {
+  transition: transform var(--motion-duration-panel) var(--motion-ease-out);
 }
 
 .play-card .play-art {
@@ -225,6 +234,458 @@
     inset 0 1px 0 rgb(255 255 255 / 0.22),
     inset 0 0 0 1px rgb(255 255 255 / 0.12),
     0 0.75rem 2rem rgb(0 0 0 / 0.28);
+}
+
+@layer components {
+  /* Golf HUD takes the tones of the map: the stage sets hud, shadow and accent */
+  .golf-hud-theme {
+    --play-golf-hud-light: color-mix(in srgb, var(--play-golf-hud) 70%, white);
+    --play-golf-hud-deep: color-mix(in srgb, var(--play-golf-hud) 70%, black);
+    --play-golf-hud-value: color-mix(in srgb, var(--play-golf-hud-accent) 55%, white);
+    --play-golf-card: color-mix(in srgb, var(--play-golf-hud) 45%, black);
+    --play-golf-card-row: color-mix(in srgb, var(--play-golf-hud) 16%, white);
+    --play-golf-card-line: color-mix(in srgb, var(--play-golf-hud) 55%, white);
+    --play-golf-card-ink: color-mix(in srgb, var(--play-golf-hud) 40%, black);
+  }
+
+  /* Golf block: Putt Party slab, flat magenta, stepped pixel corners, hard cyan drop */
+  .golf-block {
+    --play-ink: var(--play-golf-hud-ink);
+    --play-ink-soft: var(--play-golf-hud-value);
+    --play-ink-faint: var(--play-golf-hud-faint);
+    --play-line: var(--play-golf-hud-line);
+    --play-chip: var(--play-golf-hud-deep);
+    --play-track: var(--play-golf-hud-deep);
+    --play-accent: var(--play-golf-hud-value);
+    --play-golf-glow: var(--play-golf-hud-value);
+    background: var(--play-golf-hud);
+    border-radius: 0;
+    clip-path: polygon(
+      0 0.5rem,
+      0.25rem 0.5rem,
+      0.25rem 0.25rem,
+      0.5rem 0.25rem,
+      0.5rem 0,
+      calc(100% - 0.5rem) 0,
+      calc(100% - 0.5rem) 0.25rem,
+      calc(100% - 0.25rem) 0.25rem,
+      calc(100% - 0.25rem) 0.5rem,
+      100% 0.5rem,
+      100% calc(100% - 0.5rem),
+      calc(100% - 0.25rem) calc(100% - 0.5rem),
+      calc(100% - 0.25rem) calc(100% - 0.25rem),
+      calc(100% - 0.5rem) calc(100% - 0.25rem),
+      calc(100% - 0.5rem) 100%,
+      0.5rem 100%,
+      0.5rem calc(100% - 0.25rem),
+      0.25rem calc(100% - 0.25rem),
+      0.25rem calc(100% - 0.5rem),
+      0 calc(100% - 0.5rem)
+    );
+    box-shadow:
+      inset 0 0.3rem 0 var(--play-golf-hud-light),
+      inset 0 -0.35rem 0 var(--play-golf-hud-deep);
+  }
+
+  /* Dark pixel plate of the vote screens */
+  .golf-plate {
+    background: rgb(30 22 40 / 0.8);
+    clip-path: polygon(
+      0 0.5rem,
+      0.25rem 0.5rem,
+      0.25rem 0.25rem,
+      0.5rem 0.25rem,
+      0.5rem 0,
+      calc(100% - 0.5rem) 0,
+      calc(100% - 0.5rem) 0.25rem,
+      calc(100% - 0.25rem) 0.25rem,
+      calc(100% - 0.25rem) 0.5rem,
+      100% 0.5rem,
+      100% calc(100% - 0.5rem),
+      calc(100% - 0.25rem) calc(100% - 0.5rem),
+      calc(100% - 0.25rem) calc(100% - 0.25rem),
+      calc(100% - 0.5rem) calc(100% - 0.25rem),
+      calc(100% - 0.5rem) 100%,
+      0.5rem 100%,
+      0.5rem calc(100% - 0.25rem),
+      0.25rem calc(100% - 0.25rem),
+      0.25rem calc(100% - 0.5rem),
+      0 calc(100% - 0.5rem)
+    );
+  }
+
+  /* Pixel slab sits on a hard cyan offset */
+  .golf-block-drop {
+    filter: drop-shadow(0.3rem 0.3rem 0 var(--play-golf-hud-shadow));
+  }
+
+  /* Power orb: a cube lit from above, one tone per power */
+  .golf-orb {
+    --orb-top: color-mix(in srgb, var(--power) 55%, white);
+    --orb-side: color-mix(in srgb, var(--power) 66%, black);
+    background: conic-gradient(
+      from 300deg at 50% 50%,
+      var(--orb-top) 0 120deg,
+      var(--orb-side) 120deg 240deg,
+      var(--power) 240deg 360deg
+    );
+    clip-path: polygon(50% 0, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
+  }
+
+  /* Hard pixel drop under an orb */
+  .golf-orb-drop {
+    filter: drop-shadow(0.15rem 0.2rem 0 rgb(0 0 0 / 0.28));
+  }
+
+  /* Flash cycles through the rainbow */
+  .golf-orb[data-power='flash'] {
+    animation: golf-orb-rainbow 2.4s linear infinite;
+  }
+
+  /* Inner chip of a block, square-ish too */
+  .golf-chip {
+    border-radius: 0;
+    box-shadow:
+      inset 0 -0.2rem 0 rgb(0 0 0 / 0.22),
+      inset 0 2px 0 rgb(255 255 255 / 0.3);
+  }
+}
+
+/* Trophy gleam: glow, sheen sweep, twinkling stars */
+.golf-trophy {
+  filter: drop-shadow(0 0 0.5rem color-mix(in srgb, var(--play-golf-gold) 65%, transparent));
+  animation: golf-glow 2.4s ease-in-out infinite alternate;
+}
+
+.golf-trophy-sheen {
+  animation: golf-sheen 3.2s ease-in-out infinite;
+}
+
+.golf-trophy-star {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: golf-twinkle 1.8s ease-in-out infinite backwards;
+}
+
+@keyframes golf-glow {
+  to {
+    filter: drop-shadow(0 0 1rem color-mix(in srgb, var(--play-golf-gold) 95%, transparent));
+  }
+}
+
+@keyframes golf-sheen {
+  0% {
+    translate: -30px 0;
+  }
+  45%,
+  100% {
+    translate: 100px 0;
+  }
+}
+
+@keyframes golf-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    scale: 0.3;
+  }
+  50% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* Vote: cards pop in one by one, leave on a pick, the band and titles wipe in */
+.golf-vote-card {
+  animation: golf-vote-in 460ms cubic-bezier(0.3, 1.4, 0.5, 1) calc(var(--i, 0) * 70ms) both;
+}
+
+.golf-vote-leave .golf-vote-card {
+  animation: golf-vote-out 380ms ease-in both;
+}
+
+.golf-vote-leave .golf-vote-card[data-picked='true'] {
+  animation-name: golf-vote-pick;
+}
+
+.golf-vote-band {
+  transform-origin: center;
+  animation: golf-vote-band 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.golf-vote-title {
+  animation: golf-vote-title 480ms cubic-bezier(0.3, 1.3, 0.5, 1) both;
+}
+
+.golf-vote-slide {
+  animation: golf-vote-slide 520ms cubic-bezier(0.3, 0.6, 0.35, 1) both;
+}
+
+.golf-vote-arc {
+  transform-origin: bottom center;
+  animation: golf-vote-arc 520ms ease-out both;
+}
+
+.golf-vote-float {
+  animation: golf-vote-float 1.8s ease-in-out 520ms infinite;
+}
+
+@keyframes golf-vote-in {
+  from {
+    opacity: 0;
+    translate: 0 2.5rem;
+    scale: 0.5;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@keyframes golf-vote-out {
+  to {
+    opacity: 0;
+    translate: 0 2rem;
+    scale: 0.6;
+  }
+}
+
+@keyframes golf-vote-pick {
+  30% {
+    scale: 1.12;
+  }
+  to {
+    opacity: 0;
+    translate: 0 -1rem;
+    scale: 1.5;
+  }
+}
+
+@keyframes golf-vote-band {
+  from {
+    opacity: 0;
+    scale: 1 0.08;
+  }
+  to {
+    opacity: 1;
+    scale: 1 1;
+  }
+}
+
+@keyframes golf-vote-title {
+  from {
+    opacity: 0;
+    translate: 0 -1.5rem;
+    scale: 0.8;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@keyframes golf-vote-slide {
+  from {
+    translate: calc(var(--hops) * (var(--vote-card) + var(--vote-gap))) 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes golf-vote-arc {
+  0% {
+    translate: 0 0;
+    scale: 1 1;
+  }
+  38% {
+    translate: 0 -3.4rem;
+    scale: 0.94 1.08;
+  }
+  68% {
+    translate: 0 0;
+    scale: 1.14 0.84;
+  }
+  82% {
+    translate: 0 -0.7rem;
+    scale: 1 1;
+  }
+  100% {
+    translate: 0 0;
+    scale: 1 1;
+  }
+}
+
+@keyframes golf-vote-float {
+  50% {
+    translate: 0 -0.45rem;
+  }
+}
+
+/* Frost on the screen edges while the course is iced */
+.golf-frost {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 52%,
+    color-mix(in srgb, var(--play-golf-ice) 40%, transparent) 82%,
+    color-mix(in srgb, var(--play-golf-frost) 78%, transparent) 100%
+  );
+  box-shadow: inset 0 0 4rem 0.4rem color-mix(in srgb, var(--play-golf-ice-deep) 55%, transparent);
+  animation: golf-frost-in 900ms ease-out both;
+}
+
+.golf-frost-melt {
+  animation: golf-frost-out 3s ease-in both;
+}
+
+@keyframes golf-frost-in {
+  from {
+    opacity: 0;
+    scale: 1.15;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes golf-frost-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Victory of a holed ball: white flash, turning rays, trophy slam, flying squares */
+.golf-cheer-flash {
+  animation: golf-cheer-flash 700ms ease-out both;
+}
+
+.golf-cheer-rays {
+  background: repeating-conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--play-golf-gold-light) 60%, transparent) 0 7deg,
+    transparent 7deg 22deg
+  );
+  mask-image: radial-gradient(circle, black 0 20%, transparent 68%);
+  animation:
+    golf-cheer-rays var(--cheer-ms) linear both,
+    golf-cheer-life var(--cheer-ms) ease-out both;
+}
+
+.golf-cheer-card {
+  animation: golf-cheer-card var(--cheer-ms) var(--motion-ease-out) both;
+}
+
+.golf-cheer-spark {
+  animation: golf-cheer-spark 1100ms var(--motion-ease-out) var(--delay) both;
+}
+
+@keyframes golf-cheer-flash {
+  from {
+    opacity: 0.75;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes golf-cheer-rays {
+  to {
+    rotate: 50deg;
+  }
+}
+
+@keyframes golf-cheer-life {
+  0% {
+    opacity: 0;
+    scale: 0.3;
+  }
+  15%,
+  70% {
+    opacity: 1;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.2;
+  }
+}
+
+@keyframes golf-cheer-card {
+  0% {
+    opacity: 0;
+    scale: 0.2;
+    rotate: -10deg;
+    translate: 0 3rem;
+  }
+  12% {
+    opacity: 1;
+    scale: 1.18;
+    rotate: 4deg;
+    translate: 0 0;
+  }
+  20% {
+    scale: 0.95;
+    rotate: -2deg;
+  }
+  28%,
+  86% {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.08;
+    translate: 0 -1.5rem;
+  }
+}
+
+@keyframes golf-cheer-spark {
+  0% {
+    opacity: 1;
+    scale: 0;
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 1;
+    translate: var(--dx) var(--dy);
+    rotate: 140deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .golf-trophy,
+  .golf-trophy-sheen,
+  .golf-trophy-star,
+  .golf-vote-card,
+  .golf-vote-band,
+  .golf-vote-title,
+  .golf-vote-slide,
+  .golf-vote-arc,
+  .golf-vote-float,
+  .golf-frost,
+  .golf-frost-melt,
+  .golf-cheer-flash,
+  .golf-cheer-rays,
+  .golf-cheer-card,
+  .golf-cheer-spark {
+    animation: none;
+  }
+
+  .golf-trophy-star {
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -376,6 +837,117 @@
 
 @media (prefers-reduced-motion: reduce) {
   .play-tick {
+    animation: none;
+  }
+}
+
+/* XP won floats up and fades the higher it goes */
+.play-xp {
+  animation: play-xp 2600ms ease-out both;
+  translate: -50% 0;
+}
+
+@keyframes play-xp {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.7);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(-1rem) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-9rem) scale(1);
+  }
+}
+
+/* Level up bursts in, holds, then fades */
+.play-level {
+  animation: play-level 3200ms var(--motion-ease-out) both;
+}
+
+@keyframes play-level {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-10deg);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1.25) rotate(3deg);
+  }
+  30% {
+    transform: scale(1) rotate(0deg);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.1) translateY(-2rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-xp,
+  .play-level {
+    animation-duration: 1ms;
+  }
+}
+
+/* Power icon spins up and fades out */
+.golf-cue {
+  animation: golf-cue 1600ms var(--motion-ease-out) both;
+}
+
+.golf-cue > :nth-child(2) {
+  animation: golf-cue-spin 1600ms var(--motion-ease-out) both;
+}
+
+@keyframes golf-cue {
+  0% {
+    opacity: 0;
+    translate: 0 1.5rem;
+    scale: 0.6;
+  }
+  20% {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -1.5rem;
+  }
+}
+
+@keyframes golf-cue-spin {
+  from {
+    rotate: y 0deg;
+  }
+  to {
+    rotate: y 720deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .golf-cue,
+  .golf-cue > :nth-child(2) {
+    animation: none;
+  }
+}
+
+@keyframes golf-orb-rainbow {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .golf-orb[data-power='flash'] {
     animation: none;
   }
 }
@@ -686,4 +1258,124 @@
   mask:
     linear-gradient(#000 0 0) content-box exclude,
     linear-gradient(#000 0 0);
+}
+
+/* Golf hub ground: dusk over a rolling green */
+.play-room:has(.play-turf) {
+  background:
+    radial-gradient(
+      80rem 30rem at 50% 118%,
+      color-mix(in srgb, var(--play-golf) 70%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      44rem 22rem at 12% -6%,
+      color-mix(in srgb, var(--play-golf-glow) 22%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-night) 0%, var(--play-golf-deep) 100%);
+}
+
+.play-room:has(.play-turf) .play-floor {
+  background-image:
+    linear-gradient(
+      color-mix(in srgb, var(--play-golf-glow) 26%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--play-golf-glow) 26%, transparent) 1px,
+      transparent 1px
+    );
+}
+
+/* Golf hub panorama: next course fades in over the last */
+.golf-panorama-in {
+  animation: golf-panorama-in var(--panorama-fade, 1800ms) ease-in-out backwards;
+}
+
+@keyframes golf-panorama-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Countdown in the golf green */
+.play-figure-golf {
+  color: var(--play-golf-glow);
+  --play-key: var(--play-golf);
+}
+
+/* Golf logo: a ball hopping on the spot, its shadow breathing */
+.play-bounce,
+.play-bounce-shadow {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.play-bounce {
+  animation: play-bounce 1.1s infinite;
+}
+
+.play-bounce-shadow {
+  transform-origin: center;
+  animation: play-bounce-shadow 1.1s infinite;
+}
+
+@keyframes play-bounce {
+  0%,
+  100% {
+    transform: translateY(-13px);
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+
+  50% {
+    transform: translateY(0) scale(1.1, 0.9);
+    animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1);
+  }
+}
+
+@keyframes play-bounce-shadow {
+  0%,
+  100% {
+    transform: scale(0.7);
+    opacity: 0.14;
+  }
+
+  50% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-bounce,
+  .play-bounce-shadow {
+    animation: none;
+  }
+}
+
+/* Big bomb of the hub, its spark breathing */
+.play-bomb-banner {
+  opacity: 0.55;
+}
+
+.play-bomb-spark-glow {
+  filter: drop-shadow(0 0 0.6rem var(--play-bomb-glow));
+  animation: play-bomb-breath 1.6s ease-in-out infinite;
+}
+
+@keyframes play-bomb-breath {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-bomb-spark-glow {
+    animation: none;
+  }
 }

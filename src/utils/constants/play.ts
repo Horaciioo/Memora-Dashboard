@@ -74,3 +74,73 @@ export const PlayMessageKinds = {
 } as const
 
 export type PlayMessageKindName = (typeof PlayMessageKinds)[keyof typeof PlayMessageKinds]
+
+/**
+ * Golf powers
+ * @type {Record<string, string>}
+ */
+
+export const GolfPowers = {
+  Tornado: 'tornado',
+  Sticky: 'sticky',
+  Ice: 'ice',
+  Giant: 'giant',
+  Mini: 'mini',
+  AntiCollision: 'antiCollision',
+  Bumper: 'bumper',
+  Ghost: 'ghost',
+  Gust: 'gust',
+  Fart: 'fart',
+  Turbo: 'turbo',
+  Flash: 'flash',
+  Steady: 'steady',
+  Twist: 'twist',
+  Mirror: 'mirror',
+  Blind: 'blind',
+  Lob: 'lob',
+  Swap: 'swap',
+} as const
+
+export type GolfPowerName = (typeof GolfPowers)[keyof typeof GolfPowers]
+
+/**
+ * Golf formats: one map, a run of maps, or a wild map
+ * @type {Record<string, string>}
+ */
+
+export const GolfModes = {
+  Casual: 'casual',
+  Tournament: 'tournament',
+  Chaos: 'chaos',
+} as const
+
+export type GolfModeName = (typeof GolfModes)[keyof typeof GolfModes]
+
+/**
+ * Stage of a golf hole
+ * @type {Record<string, string>}
+ */
+
+export const GolfPhases = {
+  Countdown: 'countdown',
+  Playing: 'playing',
+  Closed: 'closed',
+  Over: 'over',
+} as const
+
+export type GolfPhaseName = (typeof GolfPhases)[keyof typeof GolfPhases]
+
+/**
+ * Ground under a golf ball
+ * @type {Record<string, string>}
+ */
+
+export const GolfSurfaces = {
+  Grass: 'grass',
+  Sand: 'sand',
+  Ice: 'ice',
+  Boost: 'boost',
+  Water: 'water',
+} as const
+
+export type GolfSurfaceName = (typeof GolfSurfaces)[keyof typeof GolfSurfaces]

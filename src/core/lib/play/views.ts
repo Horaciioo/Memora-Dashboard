@@ -1,6 +1,7 @@
 import { PLAY_GAMES } from '@/declarations/play'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
+import { PLAY_OPEN_STATUSES } from '@/utils/constants/play'
 
 /**
  * Game as its players read it
@@ -24,7 +25,10 @@ export const toSessionView = (session: LoadedSession, viewerId: string, board: u
     minPlayers: meta.minPlayers,
     startedAt: session.startedAt,
     finishedAt: session.finishedAt,
-    rematchId: session.rematch?.id ?? null,
+    rematch: session.rematch && {
+      id: session.rematch.id,
+      isOpen: PLAY_OPEN_STATUSES.includes(session.rematch.status),
+    },
     tournament: session.tournament && {
       id: session.tournament.id,
       index: session.tournamentIndex ?? 0,

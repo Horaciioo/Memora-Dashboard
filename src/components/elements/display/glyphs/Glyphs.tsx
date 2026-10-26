@@ -708,6 +708,19 @@ export const TrophyGlyph = ({ className }: GlyphProps) => (
 )
 
 /**
+ * Settings gear line glyph
+ * @param {GlyphProps} props - Sizing and colour class
+ * @return {JSX.Element}
+ */
+
+export const SettingsLineGlyph = ({ className }: GlyphProps) => (
+  <Stroke className={className} width={2}>
+    <path d="M12 2.5c.7 0 1.3.5 1.5 1.2l.3 1.3c.6.2 1.1.5 1.6.9l1.2-.5a1.6 1.6 0 0 1 2 .7l.9 1.5c.4.6.2 1.5-.4 2l-1 .8c.1.6.1 1.2 0 1.8l1 .8c.6.5.8 1.4.4 2l-.9 1.5a1.6 1.6 0 0 1-2 .7l-1.2-.5c-.5.4-1 .7-1.6.9l-.3 1.3c-.2.7-.8 1.2-1.5 1.2s-1.3-.5-1.5-1.2l-.3-1.3c-.6-.2-1.1-.5-1.6-.9l-1.2.5a1.6 1.6 0 0 1-2-.7l-.9-1.5c-.4-.6-.2-1.5.4-2l1-.8a6.6 6.6 0 0 1 0-1.8l-1-.8c-.6-.5-.8-1.4-.4-2l.9-1.5a1.6 1.6 0 0 1 2-.7l1.2.5c.5-.4 1-.7 1.6-.9l.3-1.3c.2-.7.8-1.2 1.5-1.2z" />
+    <circle cx="12" cy="12" r="2.8" />
+  </Stroke>
+)
+
+/**
  * Rising bars line glyph
  * @param {GlyphProps} props - Sizing and colour class
  * @return {JSX.Element}

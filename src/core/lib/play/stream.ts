@@ -8,6 +8,9 @@ import { PLAY_STREAM_EVENTS } from '@/declarations/play/topics'
  * @type {ReturnType<typeof liveStreamOf>}
  */
 
-export const playStream = liveStreamOf(
-  (payload) => `event: ${PLAY_STREAM_EVENTS.changed}\ndata: ${JSON.stringify(payload)}\n\n`
-)
+export const playStream = liveStreamOf((payload) => {
+  const type = (payload as { type?: unknown } | null)?.type
+  const event = type === PLAY_STREAM_EVENTS.moved ? type : PLAY_STREAM_EVENTS.changed
+
+  return `event: ${event}\ndata: ${JSON.stringify(payload)}\n\n`
+})

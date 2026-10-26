@@ -26,6 +26,7 @@ export interface BacWritingProps {
 
 export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingProps) => {
   const { act, isSaving } = usePlayAct(sessionId)
+  const drafts = usePlayAct(sessionId)
   const [words, setWords] = useState<Record<string, string>>(() =>
     Object.fromEntries(round.answers.map((answer) => [answer.category, answer.word]))
   )
@@ -36,7 +37,7 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
     if (!isSeated) return
     if (pending.current) window.clearTimeout(pending.current)
     pending.current = window.setTimeout(
-      () => void act({ type: 'write', answers: words }, { quiet: true }),
+      () => void drafts.act({ type: 'write', answers: words }, { quiet: true }),
       SAVE_DELAY_MS
     )
 
@@ -46,9 +47,10 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [words, isSeated])
 
+  const isStopped = Boolean(round.stoppedById)
   const isFull = settings.categories.every((entry) => words[entry.id]?.trim())
   const stop = async () => {
-    await act({ type: 'write', answers: words }, { quiet: true })
+    await drafts.act({ type: 'write', answers: words }, { quiet: true })
     await act({ type: 'stop' })
   }
 
@@ -61,7 +63,7 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
             <input
               className={BAC_BOARD.input}
               value={words[entry.id] ?? ''}
-              disabled={!isSeated}
+              disabled={!isSeated || isStopped}
               autoComplete="off"
               placeholder={fillPlayMessage(BAC_BOARD_COPY.wordPlaceholder, {
                 letter: round.letter,
@@ -73,7 +75,7 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
           </label>
         ))}
       </div>
-      {isSeated && settings.stop && !round.stoppedById && (
+      {isSeated && settings.stop && !isStopped && (
         <div className={BAC_BOARD.actions}>
           <Button
             variant="arcade"

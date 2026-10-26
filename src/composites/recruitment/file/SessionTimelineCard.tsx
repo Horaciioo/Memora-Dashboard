@@ -8,7 +8,6 @@ import { stepState } from '@/core/lib/recruitment/stepState'
 import { INTEGRATION_LINK_COPY } from '@/declarations/onboarding/copy'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { useMenu } from '@/managers/front-end'
-import { formatDay } from '@/utils/format/dates'
 
 /**
  * Timeline of the session, level with the first box: right click edits a step
@@ -16,7 +15,7 @@ import { formatDay } from '@/utils/format/dates'
  */
 
 export const SessionTimelineCard = () => {
-  const { file, fields, can, stepMenu } = useRecruitmentState()
+  const { file, fields, can, stepMenu, toggleStep, isStepMovable } = useRecruitmentState()
   const { contextMenu } = useMenu()
   const nextId = file.steps.find((step) => step.doneAt === null)?.id
 
@@ -25,8 +24,7 @@ export const SessionTimelineCard = () => {
     state: stepState(step, nextId),
     // Old rows keep their stored title
     title: step.emitsInvite ? INTEGRATION_LINK_COPY.emit : step.title,
-    lead: step.scheduledAt ? formatDay(step.scheduledAt) : undefined,
-    onSelect: can.manage ? () => void file.setStepDone(step.id, step.doneAt === null) : undefined,
+    onSelect: isStepMovable(step) ? () => toggleStep(step) : undefined,
     onContextMenu: contextMenu(stepMenu(step), step.title),
     children: step.emitsInvite && (
       <IntegrationLinkStep

@@ -42,6 +42,10 @@ export interface EditableDetailGridProps {
 // Kinds that save themselves as soon as a choice is made
 const AUTO_SAVE_KINDS = ['select', 'date', 'datetime', 'daterange', 'multiselect', 'tags', 'image']
 
+// Timed pickers wait for the panel to close, so editing the hour doesn't save mid-way
+const isDeferred = (field: FieldDefinition) =>
+  field.kind === 'datetime' || (field.kind === 'date' && Boolean(field.withTime))
+
 // Kinds opening a panel on entry
 const OPEN_KINDS = ['select', 'date', 'datetime', 'daterange', 'multiselect']
 
@@ -87,31 +91,6 @@ export const EditableDetailGrid = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editing])
 
-  // Pickers live in a layer outside the cell
-  useEffect(() => {
-    const field = entries.find((entry) => entry.field?.name === editing)?.field
-    if (!field || !AUTO_SAVE_KINDS.includes(field.kind)) return
-
-    const onPress = (event: PointerEvent) => {
-      const target = event.target as Element | null
-      if (cellRef.current?.contains(target)) return
-      if (target?.closest('[role="listbox"], [role="dialog"]')) return
-
-      setEditing(null)
-    }
-
-    document.addEventListener('pointerdown', onPress)
-
-    return () => document.removeEventListener('pointerdown', onPress)
-  }, [editing, entries])
-
-  const startEditing = (field: FieldDefinition) => {
-    if (disabled || field.readOnly) return
-
-    setEditing(field.name)
-    setDraft(values[field.name] ?? null)
-  }
-
   const commit = async (name: string, value: FieldValue, closeAfter: boolean) => {
     // Nothing moved
     if (isSameValue(values[name], value)) {
@@ -125,6 +104,40 @@ export const EditableDetailGrid = ({
     setPending(false)
 
     if (ok && closeAfter) setEditing(null)
+  }
+
+  // Pickers live in a layer outside the cell
+  useEffect(() => {
+    const field = entries.find((entry) => entry.field?.name === editing)?.field
+    if (!field || !AUTO_SAVE_KINDS.includes(field.kind)) return
+
+    const onPress = (event: PointerEvent) => {
+      const target = event.target as Element | null
+      if (cellRef.current?.contains(target)) return
+      if (target?.closest('[role="listbox"], [role="dialog"]')) return
+
+      if (isDeferred(field)) void commit(field.name, draft, true)
+      else setEditing(null)
+    }
+
+    document.addEventListener('pointerdown', onPress)
+
+    return () => document.removeEventListener('pointerdown', onPress)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editing, entries, draft, values])
+
+  const startEditing = (field: FieldDefinition) => {
+    if (disabled || field.readOnly) return
+
+    // A toggle flips on the spot, its read rendering stays
+    if (field.kind === 'toggle') {
+      void commit(field.name, !values[field.name], false)
+
+      return
+    }
+
+    setEditing(field.name)
+    setDraft(values[field.name] ?? null)
   }
 
   return (
@@ -149,7 +162,8 @@ export const EditableDetailGrid = ({
 
         const id = `inline-${field.name}`
         const isEditing = editing === field.name
-        const autoSaves = AUTO_SAVE_KINDS.includes(field.kind)
+        const deferred = isDeferred(field)
+        const autoSaves = AUTO_SAVE_KINDS.includes(field.kind) && !deferred
         const error = errorOf(field.name)
         // A locked entry keeps its read rendering
         const isLocked = Boolean(disabled) || Boolean(field.readOnly)
@@ -157,7 +171,7 @@ export const EditableDetailGrid = ({
         const onBlur = (event: FocusEvent<HTMLElement>) => {
           if (event.currentTarget.contains(event.relatedTarget as Node)) return
           // A picker taking the focus must not unmount its own control
-          if (autoSaves) return
+          if (autoSaves || deferred) return
           void commit(field.name, draft, true)
         }
 

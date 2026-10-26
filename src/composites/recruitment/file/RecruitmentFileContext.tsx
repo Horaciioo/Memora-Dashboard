@@ -12,6 +12,7 @@ import {
   useRecruitmentFile,
   type RecruitmentFile,
 } from '@/core/hooks/data/recruitment/useRecruitmentFile'
+import { canMoveStep } from '@/core/lib/recruitment/stepState'
 import { ROUTES } from '@/declarations/navigation'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { QUESTIONNAIRE_COPY } from '@/declarations/recruitment/questionnaireCopy'
@@ -49,6 +50,8 @@ export interface RecruitmentFileState {
   editingStep: RecruitmentStepView | null
   pendingCandidate: CandidateView | null
   pendingStep: RecruitmentStepView | null
+  advancingStep: RecruitmentStepView | null
+  setAdvancingStep: (step: RecruitmentStepView | null) => void
   setPendingCandidate: (candidate: CandidateView | null) => void
   setPendingStep: (step: RecruitmentStepView | null) => void
   openCandidate: (id: string) => void
@@ -56,6 +59,9 @@ export interface RecruitmentFileState {
   stepForm: (step: RecruitmentStepView | null) => void
   candidateMenu: (candidate: CandidateView) => MenuItem[]
   stepMenu: (step: RecruitmentStepView) => MenuItem[]
+  // Clearing asks first, reopening goes straight
+  toggleStep: (step: RecruitmentStepView) => void
+  isStepMovable: (step: RecruitmentStepView) => boolean
 }
 
 const FileContext = createContext<RecruitmentFileState | null>(null)
@@ -103,6 +109,7 @@ export const RecruitmentFileProvider = ({
   const [editingStep, setEditingStep] = useState<RecruitmentStepView | null>(null)
   const [pendingCandidate, setPendingCandidate] = useState<CandidateView | null>(null)
   const [pendingStep, setPendingStep] = useState<RecruitmentStepView | null>(null)
+  const [advancingStep, setAdvancingStep] = useState<RecruitmentStepView | null>(null)
 
   const openCandidate = (id: string) => router.push(ROUTES.candidate(detail.summary.id, id))
 
@@ -119,6 +126,15 @@ export const RecruitmentFileProvider = ({
   const stepForm = (step: RecruitmentStepView | null) => {
     setEditingStep(step)
     openDialog('step')
+  }
+
+  // Only the next step is cleared, only the last one reopens
+  const isStepMovable = (step: RecruitmentStepView) =>
+    can.manage && canMoveStep(file.steps, step.id, step.doneAt === null)
+
+  const toggleStep = (step: RecruitmentStepView) => {
+    if (step.doneAt === null) setAdvancingStep(step)
+    else void file.setStepDone(step.id, false)
   }
 
   const candidateMenu = (candidate: CandidateView): MenuItem[] => [
@@ -165,8 +181,8 @@ export const RecruitmentFileProvider = ({
       id: 'done',
       label: step.doneAt ? RECRUITMENT_COPY.stepUndone : RECRUITMENT_COPY.stepDone,
       icon: 'confirm',
-      disabled: !can.manage,
-      onSelect: () => void file.setStepDone(step.id, step.doneAt === null),
+      disabled: !isStepMovable(step),
+      onSelect: () => toggleStep(step),
     },
     {
       id: 'edit',
@@ -198,6 +214,8 @@ export const RecruitmentFileProvider = ({
     editingStep,
     pendingCandidate,
     pendingStep,
+    advancingStep,
+    setAdvancingStep,
     setPendingCandidate,
     setPendingStep,
     openCandidate,
@@ -205,6 +223,8 @@ export const RecruitmentFileProvider = ({
     stepForm,
     candidateMenu,
     stepMenu,
+    toggleStep,
+    isStepMovable,
   }
 
   return <FileContext.Provider value={state}>{children}</FileContext.Provider>

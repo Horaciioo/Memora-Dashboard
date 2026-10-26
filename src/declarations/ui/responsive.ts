@@ -92,10 +92,10 @@ export interface HeldRoutes {
  */
 
 export const heldRoutes = (environment: Environment): HeldRoutes =>
-  // Only the dev branch exposes the trainings on a phone
+  // Only the dev branch exposes the trainings and Play on a phone
   environment === 'dev'
     ? { phone: [ROUTES.lives], laptop: [] }
-    : { phone: [ROUTES.trainings, ROUTES.lives], laptop: [] }
+    : { phone: [ROUTES.trainings, ROUTES.lives, ROUTES.play], laptop: [] }
 
 /**
  * Hold that stands for a right click on a touch screen

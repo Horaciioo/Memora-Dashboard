@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
 import {
   SetupChips,
@@ -9,7 +10,7 @@ import {
   SetupSection,
   SetupStepper,
 } from '@/composites/play/setup/PlaySetupFields'
-import { bombDefaults } from '@/core/lib/play/bomb/settings'
+import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
 import type { BombGameSettings } from '@/core/lib/play/bomb/settings'
 import { BOMB_SETTINGS, BOMB_SETUP_COPY, fillPlayMessage, PLAY_ERRORS } from '@/declarations/play'
 import type { BombDifficulty } from '@/declarations/play'
@@ -31,21 +32,16 @@ const DIFFICULTIES: { value: BombDifficulty; label: string }[] = [
   { value: 'custom', label: BOMB_SETUP_COPY.custom },
 ]
 
-export interface BombSetupDrawerProps {
-  open: boolean
-  isSaving: boolean
-  onClose: () => void
-  onCreate: (setup: { settings: BombGameSettings }) => void
-}
-
 /**
  * Rules picked before a Bomb Party game opens, as on jklm
- * @param {BombSetupDrawerProps} props - Drawer state and handlers
+ * @param {PlaySetupProps} props - Drawer state and handlers
  * @return {JSX.Element}
  */
 
-export const BombSetupDrawer = ({ open, isSaving, onClose, onCreate }: BombSetupDrawerProps) => {
-  const [settings, setSettings] = useState<BombGameSettings>(bombDefaults)
+export const BombSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: PlaySetupProps) => {
+  const [settings, setSettings] = useState<BombGameSettings>(() =>
+    bombSettingsOf(current?.settings ?? null)
+  )
   const set =
     <K extends keyof BombGameSettings>(key: K) =>
     (value: BombGameSettings[K]) =>
@@ -56,11 +52,12 @@ export const BombSetupDrawer = ({ open, isSaving, onClose, onCreate }: BombSetup
     <PlaySetupDrawer
       open={open}
       isSaving={isSaving}
-      canCreate={settings.bonusAlphabet.length > 0}
+      isEditing={Boolean(current)}
+      canSubmit={settings.bonusAlphabet.length > 0}
       copy={BOMB_SETUP_COPY}
       tabs={TABS}
       onClose={onClose}
-      onCreate={() => onCreate({ settings })}
+      onSubmit={() => onSubmit({ settings })}
     >
       {(tab) => (
         <div className={BOMB_SETUP.body}>

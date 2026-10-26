@@ -154,14 +154,14 @@ export const callStop = async (session: EngineSession, accountId: string): Promi
 }
 
 /**
- * Shorten the clock of a round, first stop wins
+ * End the clock of a round, first stop wins
  * @param {string} roundId - Round
  * @param {string} accountId - Stopper
  * @return {Promise<EngineStep | null>} - Step, null when already stopped
  */
 
 const stopRound = async (roundId: string, accountId: string): Promise<EngineStep | null> => {
-  const endsAt = after(new Date(), BACCALAUREAT_SETTINGS.stop.graceSeconds)
+  const endsAt = new Date()
   const { count } = await prisma.baccalaureatRound.updateMany({
     where: { id: roundId, stoppedById: null, endsAt: { gt: endsAt } },
     data: { stoppedById: accountId, endsAt },

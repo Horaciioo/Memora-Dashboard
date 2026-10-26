@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
+import { listenStream } from '@/core/lib/api/eventStreams'
+
 /**
  * Re-render the server views each time a stream raises an event
  * @param {string} url - Stream route
@@ -13,16 +15,5 @@ import { useEffect } from 'react'
 export const useSignalRefresh = (url: string, event: string): void => {
   const router = useRouter()
 
-  useEffect(() => {
-    // The browser reconnects on its own after a drop
-    const source = new EventSource(url)
-    const refresh = () => router.refresh()
-
-    source.addEventListener(event, refresh)
-
-    return () => {
-      source.removeEventListener(event, refresh)
-      source.close()
-    }
-  }, [router, url, event])
+  useEffect(() => listenStream(url, event, () => router.refresh()), [router, url, event])
 }

@@ -417,7 +417,11 @@ export const STAGE_LIST = {
 export const STAGE_COMPACT = {
   root: 'opacity-80',
   stage: 'relative flex gap-2.5 pb-3 last:pb-0',
-  stageRail: 'absolute top-6 bottom-0.5 left-2 w-px -translate-x-1/2 bg-[var(--color-border)]',
+  stageRail:
+    'absolute top-6 bottom-1 left-2 w-0 -translate-x-1/2 border-l border-dashed border-[var(--color-border-strong)]',
+  stageRailDone: 'border-[var(--color-success)]/50',
+  // Room a list takes when it does not fill its card
+  stageSpaced: 'pb-8',
   stageChip: 'z-10 flex h-4 w-4 shrink-0 items-center justify-center',
   stageGlyph: 'h-4 w-4',
   stageTitle: 'text-sm leading-4 font-semibold',

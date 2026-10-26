@@ -12,6 +12,8 @@ export interface PlayFace {
   id: string
   name: string
   avatarUrl: string | null
+  // Seat colour key
+  color?: string
 }
 
 /**

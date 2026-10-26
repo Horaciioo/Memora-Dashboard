@@ -123,9 +123,8 @@ export const WeekPlanning = ({ plan, palette }: WeekPlanningProps) => {
                     fill={palette.accent}
                     fillOpacity={0.14}
                   />
-                  <rect x={x} y={y} width={4} height={eventHeight} rx={2} fill={palette.accent} />
                   <text
-                    x={x + eventInset + 4}
+                    x={x + eventInset}
                     y={y + eventHeight / 2}
                     dominantBaseline="central"
                     fontSize={PLANNING_LAYOUT.eventSize}

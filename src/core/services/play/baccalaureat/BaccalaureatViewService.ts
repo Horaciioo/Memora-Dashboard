@@ -9,7 +9,6 @@ import {
 } from '@/core/lib/play/baccalaureat'
 import { lookUpWords } from '@/core/lib/play/baccalaureat/dictionary'
 import { baccalaureatRecap } from '@/core/services/play/baccalaureat/BaccalaureatRecapService'
-import { after } from '@/core/lib/play/clock'
 import {
   BACCALAUREAT_CATEGORIES,
   BACCALAUREAT_SETTINGS,
@@ -102,17 +101,8 @@ const sessionFeed = (
         .map((total) =>
           line(round, 'finished', total._max.updatedAt ?? round.startsAt, total.accountId)
         ),
-      // Stop shortens the clock to the grace period
-      ...(round.stoppedById
-        ? [
-            line(
-              round,
-              'stopped',
-              after(round.endsAt, -BACCALAUREAT_SETTINGS.stop.graceSeconds),
-              round.stoppedById
-            ),
-          ]
-        : []),
+      // Stop ends the clock
+      ...(round.stoppedById ? [line(round, 'stopped', round.endsAt, round.stoppedById)] : []),
       ...(round.closedAt ? [line(round, 'closed', round.closedAt)] : []),
       ...(round.scoredAt ? [line(round, 'scored', round.scoredAt)] : []),
     ])

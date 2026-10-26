@@ -53,6 +53,15 @@ const tournamentLength = (raw: Record<string, unknown>): number | null => {
 }
 
 /**
+ * Settings object of a body
+ * @param {Record<string, unknown>} raw - Body
+ * @return {Record<string, unknown>} - Asked settings
+ */
+
+const settingsOf = (raw: Record<string, unknown>): Record<string, unknown> =>
+  (raw.settings ?? {}) as Record<string, unknown>
+
+/**
  * Open a lobby, its creator hosting
  * @param {string} accountId - Host
  * @param {Record<string, unknown>} raw - Body with game, settings and games
@@ -61,10 +70,7 @@ const tournamentLength = (raw: Record<string, unknown>): number | null => {
 
 export const createSession = async (accountId: string, raw: Record<string, unknown>) => {
   const game = gameNamed(readBodyText(raw, 'game', PLAY_ERRORS.unknownGame))
-  const settings = engineOf(game).readSettings(
-    (raw.settings ?? {}) as Record<string, unknown>,
-    null
-  )
+  const settings = engineOf(game).readSettings(settingsOf(raw), null)
   const games = tournamentLength(raw)
 
   const session = await prisma.$transaction(async (tx) => {
@@ -339,10 +345,53 @@ export const cancelSession = async (sessionId: string, hostId: string): Promise<
 }
 
 /**
- * Host changes the lobby settings
+ * Tournament change a lobby edit asks for
+ * @param {Prisma.TransactionClient} tx - Transaction
+ * @param {LoadedSession} session - Lobby
+ * @param {Record<string, unknown>} raw - Body with games
+ * @return {Promise<Prisma.PlaySessionUncheckedUpdateInput>} - Link to write
+ */
+
+const tournamentLink = async (
+  tx: Prisma.TransactionClient,
+  session: LoadedSession,
+  raw: Record<string, unknown>
+): Promise<Prisma.PlaySessionUncheckedUpdateInput> => {
+  // Only a first game, only when asked
+  if (!('games' in raw) || (session.tournamentIndex ?? 0) > 0) return {}
+
+  const games = tournamentLength(raw)
+  const known = session.tournament
+
+  // Longer or shorter tournament
+  if (known && games) {
+    await tx.playTournament.update({ where: { id: known.id }, data: { gamesCount: games } })
+    return {}
+  }
+
+  // Back to a single game
+  if (known) {
+    await tx.playTournament.update({
+      where: { id: known.id },
+      data: { status: PlayStatuses.Abandoned },
+    })
+    return { tournamentId: null, tournamentIndex: null }
+  }
+
+  // New tournament around this game
+  if (!games) return {}
+  const created = await tx.playTournament.create({
+    data: { game: session.game, hostId: session.hostId, gamesCount: games },
+  })
+
+  return { tournamentId: created.id, tournamentIndex: 0 }
+}
+
+/**
+ * Host changes the lobby rules
  * @param {string} sessionId - Game
  * @param {string} hostId - Host
- * @param {Record<string, unknown>} raw - Asked settings
+ * @param {Record<string, unknown>} raw - Body with settings and games
  * @return {Promise<void>} - Saved
  */
 
@@ -358,7 +407,10 @@ export const updateSettings = async (
 
     await tx.playSession.update({
       where: { id: sessionId },
-      data: { settings: engineOf(session.game).readSettings(raw, session.settings) },
+      data: {
+        settings: engineOf(session.game).readSettings(settingsOf(raw), session.settings),
+        ...(await tournamentLink(tx, session, raw)),
+      },
     })
   })
   await signalPlay(sessionId)

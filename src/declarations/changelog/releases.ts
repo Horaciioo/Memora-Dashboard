@@ -128,11 +128,12 @@ export interface ChangelogRelease {
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
     version: '0.8.0',
-    date: '2026-10-25',
+    date: '2026-10-26',
     title: 'Memora Play est là !',
-    intro: 'Memora ouvre sa salle de jeux : retrouve les autres membres pour une partie.',
+    intro:
+      'Memora ouvre sa salle de jeux : retrouve les autres membres pour une partie de Golf, de Baccalauréat ou de Bomb Party.',
     description:
-      'Memora n’offrait aucun moment de détente entre deux lives, et rien ne rapprochait les équipes en dehors du travail. Cette version ajoute « Memora Play », avec deux jeux, un chat de partie, des niveaux, un classement et des trophées, et corrige la frise des candidats dans les « Recrutements ».',
+      'Memora n’offrait aucun moment de détente entre deux lives, et rien ne rapprochait les équipes en dehors du travail. Cette version ajoute « Memora Play », avec trois jeux, un chat de partie, des niveaux, un classement et des trophées, puis fait du « Golf » un vrai jeu de société en 3D. Elle précise aussi les « Recrutements » : recruteurs d’une session, étapes validées dans l’ordre et annonce copiée en deux temps.',
     items: [
       {
         tag: ChangelogTags.Added,
@@ -156,13 +157,79 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
+        text: 'Ajout du jeu « Golf » : un parcours en 3D où jusqu’à quinze joueurs jouent en même temps, on tire la balle vers l’arrière pour viser et le moins de coups gagne.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de trois formats dans le « Golf », choisis au lancement : « Casual » sur un parcours, « Tournoi » sur plusieurs parcours aux scores additionnés, et « Chaos jubilatoire » avec trois fois plus d’orbes et deux fois plus de malus.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de cinq parcours de six trous dans le « Golf » : « La Prairie », « Le Canyon », « Les Tropiques », « L’Espace » et « La Plage », ou un parcours tiré au hasard.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’obstacles sur les parcours du « Golf » : ventilateurs, portails, trous noirs, totems, eau et glace.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de dix-huit pouvoirs dans le « Golf », gagnés en roulant sur les orbes et gardés en main, trois au plus : Tornade, Murs collants, Glace, Balle géante, Balle mini, Anti-collision, Bumper, Balle fantôme, Ventilos, Pet cosmique, Turbo farceur, Flash, Main sûre, Flèche tordue, Miroir, À l’aveugle, Lob et Échange, en vert pour les bonus et en rouge pour les malus.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité de régler une partie de « Golf » : format, nombre de trous, temps par trou, coups limités ou illimités, collisions entre balles et pouvoirs disponibles.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout, pendant une partie de « Golf », d’un journal des derniers événements, du tableau des coups de chaque joueur sur le trou en cours et d’un classement trou par trou.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de réglages d’affichage dans le « Golf » : son et volume, sillage des balles, brume, particules et mode léger.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de bruitages et d’animations dans le « Golf » : tir, rebonds, pouvoirs, trou rentré, et un podium avec trophée pour les gagnants.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
         text: 'Ajout d’un chat dans chaque partie et d’invitations, comme joueur ou comme spectateur, qui apparaissent en bas de l’écran.',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
-        text: 'Ajout de l’expérience dans « Memora Play » : des niveaux de Bronze à Légende, un classement par jeu, des trophées et des statistiques détaillées par joueur.',
+        text: 'Ajout de la possibilité de rejouer : à la fin d’une partie simple, l’hôte ouvre une nouvelle partie en un clic et les autres joueurs la rejoignent.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité, pour l’hôte, de modifier les règles d’une partie tant qu’elle n’a pas commencé.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de l’expérience dans « Memora Play » : des niveaux de Découverte à Légendaire, un classement par jeu, des trophées et des statistiques détaillées par joueur, avec l’XP gagnée qui s’envole en fin de partie.',
       },
       {
         tag: ChangelogTags.Added,
@@ -178,14 +245,82 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Ajout de la possibilité, depuis la fiche d’un modérateur, de lui donner de l’expérience, de fixer son niveau, de remettre ses statistiques à zéro ou de le sortir de sa partie.',
       },
       {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.RecruitmentManage,
+        text: 'Ajout de la possibilité de choisir les « Recruteurs » d’une session, parmi les modérateurs qui ont cette fonction, à côté des responsables et des observateurs.',
+      },
+      {
         tag: ChangelogTags.Improved,
         text: 'Amélioration de la barre latérale : le raccourci « Play » brille en doré pour se repérer d’un coup d’œil.',
         permission: Permissions.PlayAccess,
       },
       {
         tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle de la barre latérale : le voile pâle derrière le cadre disparaît, la barre et la page partagent le même fond.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration visuelle de la page « Play » : les jeux s’affichent en grandes affiches, chacune avec son bouton « Jouer ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du podium de fin de « Bomb Party » : le nom de chaque joueur s’affiche sous sa photo.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de « Bomb Party » : le dernier mot proposé par chaque joueur reste affiché sous son nom.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du « Baccalauréat » : le bouton « Stop » termine la manche tout de suite, sans les dix secondes de grâce.',
+      },
+      {
+        tag: ChangelogTags.Improved,
         page: ROUTES.home,
         text: 'Amélioration de l’« Accueil » : la page « Ton Accueil » est renommée « Accueil ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration des « Recrutements » : le bouton de l’annonce copie d’abord le texte, puis l’image du planning au clic suivant, pour que Discord garde les deux.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration visuelle des frises des « Recrutements » : le trait entre deux étapes est en pointillés et passe au vert quand l’étape est faite.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration de la fiche d’un candidat : sa présence s’affiche avec une coche verte ou une croix rouge.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        audience: ChangelogAudiences.Responsables,
+        permission: Permissions.RecruitmentManage,
+        text: 'Amélioration des « Recrutements » : valider une étape de la frise d’une session demande une confirmation, et les étapes se valident dans l’ordre, seule la suivante se coche et seule la dernière se rouvre.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui enregistrait une date avec heure dès que l’heure changeait, avant la fin de la saisie.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui teintait la barre du navigateur aux couleurs de la carte de partage de Memora.',
       },
       {
         tag: ChangelogTags.Fixed,

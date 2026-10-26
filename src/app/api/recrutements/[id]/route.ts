@@ -19,7 +19,7 @@ export const PATCH = createProtectedRoute({
   handler: async ({ params, raw, session, scope }) => {
     const perimeter = await scope()
     const fields = await sessionFields(perimeter)
-    const parsed = parseFormValues(fields, raw, { fillMissing: true })
+    const parsed = parseFormValues(fields, raw, { fillMissing: true, enforceRequired: false })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     const before = await readSession(params.id, perimeter)
