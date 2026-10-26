@@ -22,8 +22,7 @@
   "categoryLength": 32,
   "wordLength": 40,
   "stop": {
-    "enabled": true,
-    "graceSeconds": 10
+    "enabled": true
   },
   "submitGraceSeconds": 2,
   "reviewSeconds": 60,
@@ -31,7 +30,7 @@
   "points": {
     "solo": 15,
     "unique": 10,
-    "shared": 5,
+    "sharedDivisor": 2,
     "stopBonus": 5
   },
   "letters": "ABCDEFGHIJLMNOPRSTV",

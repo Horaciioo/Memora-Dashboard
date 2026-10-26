@@ -15,7 +15,7 @@ import type { EngineSession } from '@/types/play'
 
 export const bombView = async (session: EngineSession, viewerId: string) => {
   const where = { sessionId: session.id }
-  const [table, seats, moves, words] = await Promise.all([
+  const [table, seats, moves, words, lasts] = await Promise.all([
     prisma.bombGame.findUnique({ where }),
     prisma.bombPlayer.findMany({ where, orderBy: { order: 'asc' } }),
     prisma.bombMove.findMany({
@@ -24,6 +24,12 @@ export const bombView = async (session: EngineSession, viewerId: string) => {
       take: BOMB_SETTINGS.feedSize,
     }),
     prisma.bombMove.groupBy({ by: ['accountId'], where: { ...where, kind: 'WORD' }, _count: true }),
+    prisma.bombMove.findMany({
+      where: { ...where, kind: 'WORD' },
+      orderBy: { createdAt: 'desc' },
+      distinct: ['accountId'],
+      select: { accountId: true, word: true },
+    }),
   ])
   const present = new Set(session.players)
   const alive = seats.filter((seat) => seat.lives > 0 && present.has(seat.accountId))
@@ -49,6 +55,7 @@ export const bombView = async (session: EngineSession, viewerId: string) => {
       isOut: seat.lives <= 0,
       eliminatedAt: seat.eliminatedAt,
       hasLeft: !present.has(seat.accountId),
+      lastWord: lasts.find((entry) => entry.accountId === seat.accountId)?.word ?? null,
       words: words.find((entry) => entry.accountId === seat.accountId)?._count ?? 0,
     })),
     feed: moves.map((move) => ({

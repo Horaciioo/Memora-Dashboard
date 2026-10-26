@@ -19,5 +19,10 @@ export const normalizeWord = (word: string): string =>
  * @return {boolean} - Fits the letter
  */
 
-export const fitsLetter = (word: string, letter: string): boolean =>
-  normalizeWord(word).startsWith(normalizeWord(letter))
+export const fitsLetter = (word: string, letter: string): boolean => {
+  const written = normalizeWord(word)
+  const opening = normalizeWord(letter)
+
+  // The letter alone is no word
+  return written.length > opening.length && written.startsWith(opening)
+}

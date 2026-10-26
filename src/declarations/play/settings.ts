@@ -199,11 +199,6 @@ export const BACCALAUREAT_SETTINGS = {
   }),
   stop: {
     enabled: readBoolean(stop.enabled, { path: 'play/baccalaureat.stop.enabled', fallback: true }),
-    graceSeconds: readInteger(stop.graceSeconds, {
-      path: 'play/baccalaureat.stop.graceSeconds',
-      fallback: 10,
-      min: 0,
-    }),
   },
   submitGraceSeconds: readInteger(baccalaureat.submitGraceSeconds, {
     path: 'play/baccalaureat.submitGraceSeconds',
@@ -228,10 +223,10 @@ export const BACCALAUREAT_SETTINGS = {
       fallback: 10,
       min: 0,
     }),
-    shared: readInteger(points.shared, {
-      path: 'play/baccalaureat.points.shared',
-      fallback: 5,
-      min: 0,
+    sharedDivisor: readInteger(points.sharedDivisor, {
+      path: 'play/baccalaureat.points.sharedDivisor',
+      fallback: 2,
+      min: 1,
     }),
     stopBonus: readInteger(points.stopBonus, {
       path: 'play/baccalaureat.points.stopBonus',

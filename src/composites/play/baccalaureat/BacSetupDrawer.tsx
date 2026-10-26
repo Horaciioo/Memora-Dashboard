@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { InfoHint } from '@/components/elements/feedback/InfoHint'
 import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { clockLabel } from '@/composites/play/baccalaureat/clockLabel'
+import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
 import {
   SetupChips,
@@ -12,6 +13,7 @@ import {
   SetupSection,
   SetupStepper,
 } from '@/composites/play/setup/PlaySetupFields'
+import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 import { BAC_SETUP_COPY, BACCALAUREAT_SETTINGS, fillPlayMessage } from '@/declarations/play'
 import { BAC_SETUP, FIELD_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -45,36 +47,31 @@ export interface BacSetup {
     roundSeconds: number
     rounds: number
   }
-  games?: number
-}
-
-export interface BacSetupDrawerProps {
-  open: boolean
-  isSaving: boolean
-  onClose: () => void
-  onCreate: (setup: BacSetup) => void
+  games: number
 }
 
 /**
  * Rules picked before a Baccalaureat game opens, one tab per theme
- * @param {BacSetupDrawerProps} props - Drawer state and handlers
+ * @param {PlaySetupProps} props - Drawer state and handlers
  * @return {JSX.Element}
  */
 
-export const BacSetupDrawer = ({ open, isSaving, onClose, onCreate }: BacSetupDrawerProps) => {
+export const BacSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: PlaySetupProps) => {
   const { alphabet, rounds: range, tournament } = BACCALAUREAT_SETTINGS
-  const [letters, setLetters] = useState<string[]>(BACCALAUREAT_SETTINGS.letters)
-  const [stop, setStop] = useState(BACCALAUREAT_SETTINGS.stop.enabled)
-  const [autoStop, setAutoStop] = useState(false)
-  const [seconds, setSeconds] = useState(BACCALAUREAT_SETTINGS.roundSeconds.initial)
-  const [rounds, setRounds] = useState(range.initial)
-  const [games, setGames] = useState(NO_TOURNAMENT)
+  // Rules on screen, stored ones when editing
+  const start = baccalaureatSettingsOf(current?.settings ?? null)
+  const [letters, setLetters] = useState<string[]>(start.letters)
+  const [stop, setStop] = useState(start.stop)
+  const [autoStop, setAutoStop] = useState(start.autoStop)
+  const [seconds, setSeconds] = useState(start.roundSeconds)
+  const [rounds, setRounds] = useState(start.rounds)
+  const [games, setGames] = useState(current?.tournamentGames ?? NO_TOURNAMENT)
 
   const isTournament = games !== NO_TOURNAMENT
   const played = isTournament ? tournament.rounds : rounds
   const isShort = letters.length < played
-  const create = () =>
-    onCreate({
+  const submit = () =>
+    onSubmit({
       settings: {
         letters,
         stop,
@@ -82,8 +79,8 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onCreate }: BacSetupDr
         roundSeconds: seconds,
         rounds: played,
       },
-      ...(isTournament && { games }),
-    })
+      games,
+    } satisfies BacSetup)
   const tournaments = [
     {
       games: NO_TOURNAMENT,
@@ -101,11 +98,12 @@ export const BacSetupDrawer = ({ open, isSaving, onClose, onCreate }: BacSetupDr
     <PlaySetupDrawer
       open={open}
       isSaving={isSaving}
-      canCreate={!isShort}
+      isEditing={Boolean(current)}
+      canSubmit={!isShort}
       copy={BAC_SETUP_COPY}
       tabs={TABS}
       onClose={onClose}
-      onCreate={create}
+      onSubmit={submit}
     >
       {(tab) => (
         <div className={BAC_SETUP.body}>

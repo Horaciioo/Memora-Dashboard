@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { BACCALAUREAT_SETTINGS } from '@/declarations/play'
+import { sharedPoints } from '@/core/lib/play/baccalaureat'
 import { isCustomCategory } from '@/core/lib/play/baccalaureat/settings'
 
 // Counter keys of the Baccalaureat
@@ -42,8 +42,7 @@ export const baccalaureatStats = async (
   // Valid words and their points
   for (const answer of answers) {
     add(answer.accountId, STAT_KEYS.words, 1)
-    if (answer.points !== BACCALAUREAT_SETTINGS.points.shared)
-      add(answer.accountId, STAT_KEYS.soloOrUnique, 1)
+    if (answer.points !== sharedPoints()) add(answer.accountId, STAT_KEYS.soloOrUnique, 1)
     if (!isCustomCategory(answer.category))
       add(answer.accountId, STAT_KEYS.category(answer.category), answer.points)
   }
