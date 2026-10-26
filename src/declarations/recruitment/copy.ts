@@ -109,6 +109,7 @@ export const RECRUITMENT_FIELD_COPY = {
   platform: 'Plateforme',
   status: 'État',
   responsables: 'Responsables',
+  recruiters: 'Recruteurs',
   observers: 'Observateurs',
   summary: 'Résumé',
   period: 'Période',

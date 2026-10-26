@@ -1,6 +1,9 @@
 'use client'
 
 import { CommentThread } from '@/components/structures/data/CommentThread'
+import { Section } from '@/components/structures/page/Section'
+import { ObserversBox } from '@/composites/recruitment/file/ObserversBox'
+import { OBSERVER_COPY } from '@/declarations/recruitment/candidateCopy'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { RecordId } from '@/components/elements/display/RecordId'
@@ -47,8 +50,19 @@ export const OverviewTab = () => {
     summary.jobFunction.icon && isIconName(summary.jobFunction.icon)
       ? ICONS[summary.jobFunction.icon]
       : null
-  const responsables = pickedOptions(fieldFor('responsableIds'), record.values.responsableIds)
-  const observers = pickedOptions(fieldFor('observerIds'), record.values.observerIds)
+
+  // One editable row of portraits per team field
+  const teamEntry = (label: string, name: string): EditableEntry => ({
+    label,
+    field: fieldFor(name),
+    display: portraits(
+      pickedOptions(fieldFor(name), record.values[name]).map((option) => ({
+        id: option.value,
+        name: option.label,
+        src: option.image,
+      }))
+    ),
+  })
 
   const range = Array.isArray(record.values.period) ? record.values.period : null
   const period = range ? `${formatDayTime(range[0])} – ${formatDayTime(range[1])}` : null
@@ -79,38 +93,10 @@ export const OverviewTab = () => {
   ]
 
   const team: EditableEntry[] = [
-    {
-      label: SESSION_FILE_COPY.responsables,
-      field: fieldFor('responsableIds'),
-      display: portraits(
-        responsables.map((option) => ({ id: option.value, name: option.label, src: option.image }))
-      ),
-    },
-    {
-      label: SESSION_FILE_COPY.recruiters,
-      display: portraits(
-        summary.recruiters.map((person) => ({
-          id: person.id,
-          name: person.label,
-          src: person.image,
-        }))
-      ),
-    },
-    ...(can.observing
-      ? []
-      : [
-          {
-            label: SESSION_FILE_COPY.observers,
-            field: fieldFor('observerIds'),
-            display: portraits(
-              observers.map((option) => ({
-                id: option.value,
-                name: option.label,
-                src: option.image,
-              }))
-            ),
-          },
-        ]),
+    teamEntry(SESSION_FILE_COPY.responsables, 'responsableIds'),
+    teamEntry(SESSION_FILE_COPY.recruiters, 'recruiterIds'),
+    // An observer never reads who else sits in
+    ...(can.observing ? [] : [teamEntry(SESSION_FILE_COPY.observers, 'observerIds')]),
   ]
 
   const groups: FileOverviewGroup[] = [
@@ -138,6 +124,12 @@ export const OverviewTab = () => {
       }}
     >
       <div className={FILE_BOX.stack}>
+        {/* Seats and quotas, an observer never reads who else sits in */}
+        {!can.observing && (
+          <Section title={OBSERVER_COPY.title} padded>
+            <ObserversBox />
+          </Section>
+        )}
         <CommentThread
           comments={file.comments}
           fields={fields.comment}

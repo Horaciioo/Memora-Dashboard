@@ -37,7 +37,6 @@ export interface RecruitmentRef {
  * @property {RecruitmentRef} youtuber - Creator recruited for
  * @property {RecruitmentRef} jobFunction - Post recruited for
  * @property {RecruitmentRef[]} responsables - Moderators carrying the session
- * @property {RecruitmentRef[]} recruiters - Moderators leading interviews
  * @property {RecruitmentPlatformName} platform - Platform the script is written for
  * @property {string | null} academySessionId - Promotion this campaign feeds
  * @property {string | null} promotionTitle - Name of that promotion
@@ -57,7 +56,6 @@ export interface RecruitmentSummary {
   youtuber: RecruitmentRef
   jobFunction: RecruitmentRef
   responsables: RecruitmentRef[]
-  recruiters: RecruitmentRef[]
   platform: RecruitmentPlatformName
   academySessionId: string | null
   promotionTitle: string | null

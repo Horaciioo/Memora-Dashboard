@@ -124,16 +124,17 @@ export const roleGroupedOptions = <TRow extends PersonRow>(
     }))
 
 /**
- * Options a multiselect value points at
- * @param {FieldDefinition} field - Multiselect declaration
- * @param {FieldValue | undefined} value - Picked identifiers
+ * Options a select or multiselect value points at
+ * @param {FieldDefinition} field - Select declaration
+ * @param {FieldValue | undefined} value - Picked identifier or identifiers
  * @return {FieldOption[]} - Picked options in the field order
  */
 
 export const pickedOptions = (
   field: FieldDefinition,
   value: FieldValue | undefined
-): FieldOption[] =>
-  Array.isArray(value)
-    ? (field.options?.filter((option) => value.includes(option.value)) ?? [])
-    : []
+): FieldOption[] => {
+  const picked = Array.isArray(value) ? value : typeof value === 'string' ? [value] : []
+
+  return field.options?.filter((option) => picked.includes(option.value)) ?? []
+}
