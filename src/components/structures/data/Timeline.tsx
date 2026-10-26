@@ -110,6 +110,7 @@ export const Timeline = ({ items, label, compact, fill }: TimelineProps) => (
           onContextMenu={item.onContextMenu}
           className={cn(
             compact ? STAGE_COMPACT.stage : STAGE_LIST.stage,
+            compact && !fill && STAGE_COMPACT.stageSpaced,
             fill && 'flex-1 last:flex-none'
           )}
         >
@@ -118,7 +119,8 @@ export const Timeline = ({ items, label, compact, fill }: TimelineProps) => (
               aria-hidden="true"
               className={cn(
                 compact ? STAGE_COMPACT.stageRail : STAGE_LIST.stageRail,
-                item.state === 'done' && STAGE_LIST.stageRailDone
+                item.state === 'done' &&
+                  (compact ? STAGE_COMPACT.stageRailDone : STAGE_LIST.stageRailDone)
               )}
             />
           )}

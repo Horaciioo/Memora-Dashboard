@@ -84,6 +84,19 @@ export const RecruitmentDrawers = () => {
       />
 
       <ConfirmDialog
+        open={state.advancingStep !== null}
+        tone="brand"
+        title={RECRUITMENT_COPY.stepAdvanceTitle}
+        description={RECRUITMENT_COPY.stepAdvanceDescription}
+        pending={file.isSaving}
+        onCancel={() => state.setAdvancingStep(null)}
+        onConfirm={async () => {
+          await file.setStepDone(state.advancingStep!.id, true)
+          state.setAdvancingStep(null)
+        }}
+      />
+
+      <ConfirmDialog
         open={state.pendingStep !== null}
         title={RECRUITMENT_COPY.stepDeleteTitle}
         description={RECRUITMENT_COPY.stepDeleteDescription}

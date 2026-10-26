@@ -72,6 +72,8 @@ export const RECRUITMENT_COPY = {
   stepDone: 'Marquer faite',
   stepDoneBadge: 'Faite',
   stepUndone: 'Rouvrir',
+  stepAdvanceTitle: 'Valider l’étape ?',
+  stepAdvanceDescription: 'Es-tu sûr de vouloir passer à l’étape suivante ?',
   stepDeleteTitle: 'Supprimer cette étape ?',
   stepDeleteDescription: 'Elle disparaît de la timeline de cette session.',
   stepsEmptyTitle: 'Aucune étape',
