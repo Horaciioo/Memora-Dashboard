@@ -190,7 +190,7 @@ export const PLANNING_COPY = {
   restore: 'Restaurer l’annonce générique',
   copyImage: 'Copier l’image',
   textCopied: 'Annonce copiée',
-  announcementCopied: 'Annonce et image copiées',
+  textCopiedNext: 'Annonce copiée, colle-la puis copie l’image',
   imageCopied: 'Image copiée, colle-la sous l’annonce',
   imageFailed: 'Image impossible à copier',
   previewTitle: 'Annonce',

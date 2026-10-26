@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import { Button } from '@/components/elements/actions/Button'
 import { DiscordMessage } from '@/components/elements/display/DiscordMessage'
 import { Textarea } from '@/components/elements/forms/inputs/Textarea'
@@ -61,38 +63,29 @@ export const AnnouncementDrawer = ({
 }: AnnouncementDrawerProps) => {
   const { notify } = useNotifications()
   const { session } = useAuthContext()
-  const copyText = useCopy(PLANNING_COPY.textCopied)
+  const [step, setStep] = useState<'text' | 'image'>('text')
   const hasPicture = withImage && plan.count > 0
+  const copyText = useCopy(hasPicture ? PLANNING_COPY.textCopiedNext : PLANNING_COPY.textCopied)
   const raw = toRaw(text, entries)
   const unknown = unknownTokens(text, entries)
 
-  // Picture straight onto the clipboard
+  // A clipboard hands one thing to Discord, so the wording goes first and the picture second
   const copyImage = async () => {
     try {
-      const png = renderPlanningPng(plan)
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })])
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': renderPlanningPng(plan) })])
       notify({ tone: 'success', title: PLANNING_COPY.imageCopied })
+      setStep('text')
     } catch {
       notify({ tone: 'danger', title: PLANNING_COPY.imageFailed })
     }
   }
 
-  // Wording and picture in one clipboard item, wording alone when the picture fails
   const copyAnnouncement = async () => {
-    if (!hasPicture) return copyText(raw)
-
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          'text/plain': new Blob([raw], { type: 'text/plain' }),
-          'image/png': renderPlanningPng(plan),
-        }),
-      ])
-      notify({ tone: 'success', title: PLANNING_COPY.announcementCopied })
-    } catch {
-      await copyText(raw)
-    }
+    await copyText(raw)
+    if (hasPicture) setStep('image')
   }
+
+  const isImageStep = hasPicture && step === 'image'
 
   return (
     <Drawer
@@ -103,8 +96,12 @@ export const AnnouncementDrawer = ({
       title={PLANNING_COPY.previewTitle}
       footer={
         <div className={ANNOUNCEMENT_DRAWER.actions}>
-          <Button icon="copy" variant="primary" onClick={() => void copyAnnouncement()}>
-            {PLANNING_COPY.copyText}
+          <Button
+            icon="copy"
+            variant="primary"
+            onClick={() => void (isImageStep ? copyImage() : copyAnnouncement())}
+          >
+            {isImageStep ? PLANNING_COPY.copyImage : PLANNING_COPY.copyText}
           </Button>
           <Button
             icon="discordAnnounce"
@@ -113,11 +110,6 @@ export const AnnouncementDrawer = ({
           >
             {ANNOUNCEMENT_COPY.markAnnounced}
           </Button>
-          {withImage && (
-            <Button icon="copy" disabled={plan.count === 0} onClick={copyImage}>
-              {PLANNING_COPY.copyImage}
-            </Button>
-          )}
         </div>
       }
     >
