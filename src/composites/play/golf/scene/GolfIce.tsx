@@ -3,7 +3,12 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Object3D, Vector2 } from 'three'
-import type { BufferGeometry, Group, InstancedMesh, WebGLProgramParametersWithUniforms } from 'three'
+import type {
+  BufferGeometry,
+  Group,
+  InstancedMesh,
+  WebGLProgramParametersWithUniforms,
+} from 'three'
 
 import type { GolfPaint } from '@/composites/play/golf/scene/paint'
 import { holeSeed, seededRandom } from '@/composites/play/golf/scene/random'
