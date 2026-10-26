@@ -16,6 +16,17 @@ import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
 /**
+ * Rules of a lobby
+ * @typedef {Object} PlayRulesValue
+ */
+
+export interface PlayRulesValue {
+  settings: Prisma.JsonValue
+  // Games in a tournament, null for a single game
+  tournamentGames: number | null
+}
+
+/**
  * What every setup drawer takes
  * @typedef {Object} PlaySetupProps
  */
@@ -24,7 +35,11 @@ export interface PlaySetupProps {
   open: boolean
   isSaving: boolean
   onClose: () => void
-  onCreate: (setup: object) => void
+  onSubmit: (setup: object) => void
+  // Rules being edited, none for a new game
+  current?: PlayRulesValue
+  // Who sets the game up
+  player?: { name: string; avatarUrl: string | null }
 }
 
 /**
@@ -32,12 +47,9 @@ export interface PlaySetupProps {
  * @typedef {Object} PlayRulesProps
  */
 
-export interface PlayRulesProps {
+export interface PlayRulesProps extends PlayRulesValue {
   open: boolean
   onClose: () => void
-  settings: Prisma.JsonValue
-  // Games in a tournament, null for a single game
-  tournamentGames: number | null
 }
 
 /**

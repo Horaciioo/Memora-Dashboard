@@ -18,7 +18,7 @@ export const PLAY_CONFETTI = {
     '--play-baccalaureat-glow',
     '--play-gold',
     '--play-tier-legend',
-    '--play-tier-platinum',
+    '--play-tier-progress',
     '--play-golf-glow',
     '--play-bomb-glow',
   ],

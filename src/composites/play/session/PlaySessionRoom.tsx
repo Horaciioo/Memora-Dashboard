@@ -10,6 +10,8 @@ import { BacSessionCrowd } from '@/composites/play/session/BacSessionCrowd'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlayChat } from '@/composites/play/session/PlayChat'
 import type { PlayChatProps } from '@/composites/play/session/PlayChat'
+import { PlayReplay } from '@/composites/play/session/PlayReplay'
+import type { PlayReplayState } from '@/composites/play/session/PlayReplay'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { ROUTES } from '@/declarations/navigation'
 import { BAC_SESSION_COPY, PLAY_HUB_COPY } from '@/declarations/play'
@@ -29,6 +31,8 @@ export interface PlaySessionRoomProps {
   chat: Omit<PlayChatProps, 'onFold' | 'isSide'>
   // Feed window under the chat
   feed: ReactNode
+  // Offer once the game is over
+  replay: PlayReplayState | null
   // The game table
   children: ReactNode
 }
@@ -49,6 +53,7 @@ export const PlaySessionRoom = ({
   me,
   chat,
   feed,
+  replay,
   children,
 }: PlaySessionRoomProps) => {
   const moves = usePlayMoves()
@@ -72,6 +77,9 @@ export const PlaySessionRoom = ({
               <BackIcon className={BAC_SESSION.exitIcon} aria-hidden="true" />
               {PLAY_HUB_COPY.backToHub}
             </AppLink>
+            {replay && (
+              <PlayReplay sessionId={chat.sessionId} className={BAC_SESSION.exit} {...replay} />
+            )}
             {me.isSeated && (
               <Button
                 variant="arcadeDanger"

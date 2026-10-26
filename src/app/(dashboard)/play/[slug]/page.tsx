@@ -3,6 +3,7 @@ import type { ComponentType } from 'react'
 import { notFound } from 'next/navigation'
 
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
+import { GolfPanorama } from '@/composites/play/golf/panorama/GolfPanorama'
 import { PlayCallouts } from '@/composites/play/hub/PlayCallouts'
 import { PlayHubMenu } from '@/composites/play/hub/PlayHubMenu'
 import { PlayLeaderboard } from '@/composites/play/hub/PlayLeaderboard'
@@ -21,6 +22,7 @@ import {
   readPlayProfile,
 } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
+import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import {
   BOMB_EMBERS,
   fillPlayMessage,
@@ -37,6 +39,7 @@ import { Permissions } from '@/utils/constants/permissions'
 const GROUND_LAYERS: Record<string, ComponentType> = {
   [PLAY_PAPER.ground]: PlayPaperWords,
   [BOMB_EMBERS.ground]: PlayEmbers,
+  [GOLF_TURF.ground]: GolfPanorama,
 }
 
 interface PlayGamePageProps {
@@ -87,6 +90,7 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
 
       <PlayHubMenu
         game={game}
+        player={player}
         canCreate={!isLocked}
         lockedReason={
           presence ? PLAY_HUB_COPY.alreadyInGame : profile.ban ? PLAY_HUB_COPY.banned : null

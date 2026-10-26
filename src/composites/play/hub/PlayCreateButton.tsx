@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { Tip } from '@/components/elements/feedback/Tip'
 import { PLAY_SETUP_DRAWERS } from '@/composites/play/registry'
+import type { PlaySetupProps } from '@/composites/play/registry'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { PLAY_HUB } from '@/declarations/ui/variants'
@@ -16,6 +17,8 @@ export interface PlayCreateButtonProps {
   disabled: boolean
   // Said on hover while locked
   lockedReason?: string | null
+  // Who sets the game up
+  player?: PlaySetupProps['player']
   className?: string
 }
 
@@ -29,6 +32,7 @@ export const PlayCreateButton = ({
   game,
   disabled,
   lockedReason,
+  player,
   className,
 }: PlayCreateButtonProps) => {
   const moves = usePlayMoves()
@@ -61,8 +65,9 @@ export const PlayCreateButton = ({
         <Setup
           open={isSetupOpen}
           isSaving={moves.isSaving}
+          player={player}
           onClose={() => setSetupOpen(false)}
-          onCreate={(setup) => void moves.create(game, { ...setup })}
+          onSubmit={(setup) => void moves.create(game, { ...setup })}
         />
       )}
     </>

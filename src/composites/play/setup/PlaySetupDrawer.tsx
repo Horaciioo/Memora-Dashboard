@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { Tabs } from '@/components/elements/navigation/Tabs'
 import type { TabItem } from '@/components/elements/navigation/Tabs'
 import { Drawer } from '@/components/structures/overlays/Drawer'
+import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { DRAWER_ACTIONS, DRAWER_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -26,12 +26,16 @@ export interface PlaySetupCopy {
 export interface PlaySetupDrawerProps {
   open: boolean
   isSaving: boolean
+  // Rules of a waiting game, not a new one
+  isEditing: boolean
   // Choices hold, the game may open
-  canCreate: boolean
+  canSubmit: boolean
+  // Words of the last button when a step follows
+  submitLabel?: string
   copy: PlaySetupCopy
   tabs: TabItem[]
   onClose: () => void
-  onCreate: () => void
+  onSubmit: () => void
   // Body of the tab on screen
   children: (tab: string) => ReactNode
 }
@@ -68,7 +72,7 @@ const FooterLine = ({
 )
 
 /**
- * Drawer of a new game: tabs on top, ‹ › steps, then create and cancel on the last tab
+ * Drawer of a game's rules: tabs on top, ‹ › steps, then create and cancel on the last tab
  * @param {PlaySetupDrawerProps} props - Drawer state, tabs and body
  * @return {JSX.Element}
  */
@@ -76,11 +80,13 @@ const FooterLine = ({
 export const PlaySetupDrawer = ({
   open,
   isSaving,
-  canCreate,
+  isEditing,
+  canSubmit,
+  submitLabel,
   copy,
   tabs,
   onClose,
-  onCreate,
+  onSubmit,
   children,
 }: PlaySetupDrawerProps) => {
   const [tab, setTab] = useState(tabs[0].value)
@@ -99,7 +105,7 @@ export const PlaySetupDrawer = ({
     <Drawer
       open={open}
       onClose={onClose}
-      title={copy.title}
+      title={isEditing ? PLAY_HUB_COPY.rulesHost : copy.title}
       icon="play"
       subheader={
         <div className={DRAWER_STYLES.subheaderRow}>
@@ -137,13 +143,13 @@ export const PlaySetupDrawer = ({
           {isLast && (
             <>
               <FooterLine
-                label={copy.create}
-                disabled={isSaving || !canCreate}
+                label={submitLabel ?? (isEditing ? PLAY_HUB_COPY.saveRules : copy.create)}
+                disabled={isSaving || !canSubmit}
                 tone={DRAWER_ACTIONS.save}
-                onClick={onCreate}
+                onClick={onSubmit}
                 icon={
-                  isSaving ? (
-                    <BrandLoader variant="inline" />
+                  submitLabel ? (
+                    <NextIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
                   ) : (
                     <SaveIcon className={DRAWER_ACTIONS.icon} aria-hidden="true" />
                   )

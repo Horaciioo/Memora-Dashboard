@@ -49,6 +49,15 @@ const NOTE = 'text-xs font-semibold tabular-nums text-[var(--play-ink-soft)]'
  * @type {Record<string, string>}
  */
 
+export const PLAY_REWARD = {
+  layer: 'pointer-events-none fixed inset-0 z-[60] grid place-items-center',
+  xp: 'play-xp fixed bottom-44 left-1/2 text-4xl font-extrabold tracking-tight text-[var(--play-ink)] [text-shadow:0_2px_0_rgb(0_0_0/0.25)]',
+  level: 'play-level flex flex-col items-center gap-1',
+  levelCaption: 'text-sm font-extrabold tracking-widest text-[var(--play-golf-glow)] uppercase',
+  levelNumber:
+    'text-8xl font-extrabold text-[var(--play-ink)] [text-shadow:0_4px_0_rgb(0_0_0/0.25)]',
+} as const
+
 export const PLAY_SHELL = {
   room: 'play-room fixed inset-0 z-40 flex flex-col overflow-hidden',
   floor: 'play-floor',
@@ -85,23 +94,14 @@ export const PLAY_HUB = {
   // Game cards
   games: 'grid gap-5 sm:grid-cols-2 2xl:grid-cols-4',
   main: 'flex min-w-0 flex-col gap-10',
-  card: `play-card relative flex h-64 flex-col justify-end overflow-hidden rounded-[1.75rem] text-[var(--play-on-art)] ${LIFT} ring-1 ring-white/15`,
+  card: `play-card relative flex aspect-[3/4] min-h-96 flex-col justify-end overflow-hidden rounded-[2rem] text-[var(--play-on-art)] ${LIFT} ring-2 ring-white/20`,
   cardShade:
-    'absolute inset-0 bg-linear-to-t from-[var(--play-night)] via-[var(--play-night)]/35 to-transparent',
+    'absolute inset-0 bg-linear-to-t from-[var(--play-night)] from-5% via-[var(--play-night)]/55 via-35% to-transparent to-65%',
   cardLink:
-    'absolute inset-0 z-10 rounded-[1.75rem] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
-  cardBody: 'relative flex items-end gap-3 p-4',
-  cardLogo: 'size-14',
-  cardText: 'flex min-w-0 flex-1 flex-col gap-1',
-  cardName: 'truncate text-xl font-extrabold tracking-tight',
-  cardTagline: 'line-clamp-2 text-xs text-[var(--play-on-art)]/80',
-  cardMeta: 'flex flex-wrap items-center gap-2 pt-2 text-xs font-bold',
-  chip: 'rounded-full bg-black/40 px-2.5 py-1 text-[var(--play-on-art)]',
-  ribbon:
-    'absolute top-4 left-4 rounded-full px-3 py-1 text-xs font-extrabold tracking-wide uppercase',
-  ribbonLive:
-    'bg-[var(--play-gold)] text-[var(--play-night)] shadow-[0_0.2rem_0_var(--play-gold-deep)]',
-  ribbonMuted: 'bg-black/60 text-[var(--play-on-art)]',
+    'absolute inset-0 z-10 rounded-[2rem] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-[var(--play-key)]',
+  cardBody: 'relative flex flex-col items-center gap-2 p-7 text-center',
+  cardName: 'truncate text-3xl font-extrabold tracking-tight uppercase',
+  cardTagline: 'line-clamp-3 text-sm text-[var(--play-on-art)]/85',
   skeleton:
     'animate-pulse rounded-[1.75rem] bg-[var(--play-panel-strong)] motion-reduce:animate-none',
   // Game hub, centred and fitted to the room: logo | divider | actions, never scrolling
@@ -143,6 +143,8 @@ export const PLAY_HUB = {
   // Syllables rising like embers
   embers: 'pointer-events-none fixed inset-0 z-0 overflow-hidden',
   ember: 'play-ember',
+  // Big bomb behind the hub
+  bombBanner: 'play-bomb-banner absolute -right-24 -bottom-24 w-[46rem] max-w-[90vw]',
   // Tables
   list: 'flex flex-col gap-2',
   row: `${PANEL} flex items-center gap-3 px-3 py-3`,
@@ -286,26 +288,14 @@ export const PLAY_NOTICE = {
 } as const
 
 /**
- * Game choice laid on a cross, the featured game top left
+ * Game choice laid as a row of tall posters
  * @type {Record<string, string>}
  */
 
 export const PLAY_CROSS = {
-  cross:
-    'mx-auto grid w-full max-w-3xl gap-5 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:grid-rows-[auto_auto_auto] lg:gap-6',
-  // Two dividers crossing
-  lineV:
-    'hidden w-0.5 rounded-full bg-[var(--play-ink-faint)] lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:block',
-  lineH:
-    'hidden h-0.5 rounded-full bg-[var(--play-ink-faint)] lg:col-span-3 lg:col-start-1 lg:row-start-2 lg:block',
-  // Whole cross centred in the room
   stage: 'flex min-h-[calc(100dvh-14rem)] items-center justify-center',
-  quarter: 'flex min-w-0 flex-col justify-center gap-5',
-  featured: 'lg:col-start-1 lg:row-start-1',
-  topRight: 'lg:col-start-3 lg:row-start-1',
-  bottomLeft: 'lg:col-start-1 lg:row-start-3',
-  bottomRight: 'lg:col-start-3 lg:row-start-3',
-  card: 'h-44',
+  cross: 'mx-auto grid w-full max-w-7xl gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6',
+  card: '',
 } as const
 
 // Bubble opened by the dock
@@ -546,6 +536,9 @@ export const BOMB_BOARD = {
   draft:
     'max-w-36 truncate rounded-lg bg-[var(--play-chip)] px-2 py-0.5 text-sm font-extrabold tracking-wide text-[var(--play-ink)] uppercase',
   draftMiss: 'text-[var(--color-danger)] line-through',
+  // Last word a player got through, kept until the next one
+  lastWord:
+    'max-w-36 truncate rounded-lg bg-[var(--play-chip)] px-2 py-0.5 text-sm font-extrabold tracking-wide text-[var(--play-ink-soft)] uppercase',
   missReason: 'text-[0.7rem] font-bold text-[var(--color-danger)]',
   lead: 'text-center text-sm text-[var(--play-ink-soft)]',
   leadPrompt: 'font-black tracking-wider text-[var(--play-bomb-glow)] uppercase',
@@ -557,14 +550,14 @@ export const BOMB_BOARD = {
 } as const
 
 /**
- * Podium block by place, height and tier colour
+ * Podium block by place
  * @type {Record<number, string>}
  */
 
 export const BAC_PODIUM_BLOCKS: Record<number, string> = {
-  1: 'h-32 bg-[var(--play-tier-gold)]',
-  2: 'h-24 bg-[var(--play-tier-silver)]',
-  3: 'h-16 bg-[var(--play-tier-bronze)]',
+  1: 'h-32 bg-[var(--play-medal-first)]',
+  2: 'h-24 bg-[var(--play-medal-second)]',
+  3: 'h-16 bg-[var(--play-medal-third)]',
 }
 
 /**

@@ -23,14 +23,16 @@ const OUTCOME_XP: Record<PlayOutcomeName, number> = {
   [PlayOutcomes.Loss]: PLAY_SETTINGS.xp.loss,
 }
 
+// Ladder shape
+const { base: BASE, step: STEP, max: MAX_LEVEL } = PLAY_SETTINGS.levels
+
 /**
  * XP from one level to the next
  * @param {number} level - Starting level
  * @return {number} - XP needed
  */
 
-export const xpToNext = (level: number): number =>
-  Math.round(PLAY_SETTINGS.levels.base * level ** PLAY_SETTINGS.levels.growth)
+export const xpToNext = (level: number): number => BASE + STEP * (level - 1)
 
 /**
  * Total XP opening a level
@@ -38,10 +40,12 @@ export const xpToNext = (level: number): number =>
  * @return {number} - XP from zero
  */
 
-export const xpForLevel = (level: number): number =>
-  Array.from({ length: Math.min(level, PLAY_SETTINGS.levels.max) - 1 }, (_, index) =>
-    xpToNext(index + 1)
-  ).reduce((sum, step) => sum + step, 0)
+export const xpForLevel = (level: number): number => {
+  const climbs = Math.min(level, MAX_LEVEL) - 1
+
+  // Arithmetic series of steps
+  return climbs * BASE + (STEP * climbs * (climbs - 1)) / 2
+}
 
 /**
  * Level reached with some XP
@@ -50,16 +54,18 @@ export const xpForLevel = (level: number): number =>
  */
 
 export const levelOf = (xp: number): PlayLevel => {
-  let level = 1
-  let into = Math.max(0, xp)
+  const total = Math.max(0, xp)
+  const ceiling = xpForLevel(MAX_LEVEL)
+  if (total >= ceiling) return { level: MAX_LEVEL, into: total - ceiling, needed: null }
 
-  // Climb while the next step is paid
-  while (level < PLAY_SETTINGS.levels.max && into >= xpToNext(level)) {
-    into -= xpToNext(level)
-    level += 1
-  }
+  // Solve the series, then settle rounding
+  const half = BASE - STEP / 2
+  let level =
+    1 + Math.floor(STEP ? (Math.sqrt(half ** 2 + 2 * STEP * total) - half) / STEP : total / BASE)
+  while (xpForLevel(level) > total) level -= 1
+  while (xpForLevel(level + 1) <= total) level += 1
 
-  return { level, into, needed: level < PLAY_SETTINGS.levels.max ? xpToNext(level) : null }
+  return { level, into: total - xpForLevel(level), needed: xpToNext(level) }
 }
 
 /**

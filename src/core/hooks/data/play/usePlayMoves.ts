@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 
-import { apiPost } from '@/core/lib/api/client'
+import { apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { ROUTES } from '@/declarations/navigation'
@@ -23,11 +23,13 @@ export const usePlayMoves = () => {
     action: () => Promise<T>,
     done: string,
     to: ((result: T) => string) | null
-  ) => {
+  ): Promise<boolean> => {
     const result = await run(action, done)
-    if (result === null) return
+    if (result === null) return false
     if (to) router.push(to(result))
     else router.refresh()
+
+    return true
   }
 
   return {
@@ -46,6 +48,14 @@ export const usePlayMoves = () => {
       ),
     start: (id: string) =>
       go(() => apiPost(API_ROUTES.playStart(id), {}), PLAY_HUB_COPY.started, null),
+    rules: (id: string, setup: object) =>
+      go(() => apiPatch(API_ROUTES.playSession(id), setup), PLAY_HUB_COPY.rulesSaved, null),
+    replay: (id: string) =>
+      go(
+        () => apiPost<{ id: string }>(API_ROUTES.playRematch(id), {}),
+        PLAY_HUB_COPY.replayed,
+        (next) => ROUTES.playSession(next.id)
+      ),
     cancel: (id: string, gameSlug: string) =>
       go(
         () => apiPost(API_ROUTES.playCancel(id), {}),

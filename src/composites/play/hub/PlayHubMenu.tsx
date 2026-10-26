@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayCreateButton } from '@/composites/play/hub/PlayCreateButton'
+import type { PlayCreateButtonProps } from '@/composites/play/hub/PlayCreateButton'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
@@ -35,6 +36,8 @@ export interface PlayHubMenuProps {
   titles?: Partial<Record<PlayHubView, string>>
   // Logo side of the divider
   identity: ReactNode
+  // Who creates games
+  player?: PlayCreateButtonProps['player']
 }
 
 /**
@@ -50,6 +53,7 @@ export const PlayHubMenu = ({
   panels,
   titles,
   identity,
+  player,
 }: PlayHubMenuProps) => {
   const [view, setView] = useState<PlayHubView | null>(null)
   const CloseIcon = ICONS.playClose
@@ -86,6 +90,7 @@ export const PlayHubMenu = ({
               game={game}
               disabled={!canCreate}
               lockedReason={lockedReason}
+              player={player}
               className={PLAY_HUB.hubButton}
             />
             {GAME_VIEWS.map(viewButton)}

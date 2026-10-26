@@ -14,7 +14,7 @@ export const SESSION_INCLUDE = {
     include: { account: { select: { id: true, displayName: true, avatarUrl: true } } },
   },
   tournament: true,
-  rematch: { select: { id: true } },
+  rematch: { select: { id: true, status: true } },
 } as const satisfies Prisma.PlaySessionInclude
 
 export type LoadedSession = Prisma.PlaySessionGetPayload<{ include: typeof SESSION_INCLUDE }>
