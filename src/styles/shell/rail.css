@@ -115,11 +115,7 @@
   padding: 0.625rem 0;
 }
 
-/* A pale veil on the frame, no blur so fixed bubbles keep the viewport; its boxes are frosted */
-.rail-ground {
-  background: var(--mist-veil);
-}
-
+/* The rail shows the page ground as is, no veil, so both read as one; its boxes are frosted */
 .rail-ground .glass-panel:not(.fixed, .shortcut-fresh, [aria-current='page']) {
   background: var(--mist-fill);
   -webkit-backdrop-filter: blur(var(--mist-blur)) saturate(var(--mist-saturate));
