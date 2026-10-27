@@ -22,7 +22,12 @@ export {
   readPlayPresence,
   readPlayProfile,
 } from '@/core/services/play/ProfileService'
-export { currentSessionId, loadSession, requireSeat } from '@/core/services/play/PlaySessionService'
+export {
+  currentSessionId,
+  loadSession,
+  openSessionIds,
+  requireSeat,
+} from '@/core/services/play/PlaySessionService'
 export {
   adjustPlayXp,
   correctPlayStats,

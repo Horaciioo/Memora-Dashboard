@@ -11,7 +11,6 @@ export const PLAY_ERRORS = {
   sessionMissing: 'Cette partie n’existe plus.',
   notSeated: 'Tu ne fais pas partie de cette partie.',
   notHost: 'Seul l’hôte peut faire ça.',
-  alreadyPlaying: 'Tu es déjà dans une autre partie, quitte-la d’abord.',
   full: 'La partie est complète.',
   notInLobby: 'La partie a déjà commencé.',
   notRunning: 'La partie n’est pas en cours.',

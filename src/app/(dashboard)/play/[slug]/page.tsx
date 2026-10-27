@@ -75,13 +75,13 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
   const [profile, tables, presence, leaders] = await Promise.all([
     readPlayProfile(session.id),
     listLobbies(session.id, game),
-    readPlayPresence(session.id),
+    readPlayPresence(session.id, game),
     readLeaderboards(game),
   ])
   const meta = PLAY_GAMES.get(game)
   const totals = profile.games.find((entry) => entry.game === game)
   if (!totals) notFound()
-  const isLocked = Boolean(presence || profile.ban)
+  const isLocked = Boolean(profile.ban)
   const player = { name: session.displayName, avatarUrl: session.avatarUrl }
   const GroundLayer = meta.ground ? GROUND_LAYERS[meta.ground] : undefined
 
@@ -94,9 +94,7 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
       <PlayHubMenu
         game={game}
         canCreate={!isLocked}
-        lockedReason={
-          presence ? PLAY_HUB_COPY.alreadyInGame : profile.ban ? PLAY_HUB_COPY.banned : null
-        }
+        lockedReason={profile.ban ? PLAY_HUB_COPY.banned : null}
         identity={
           <div className={PLAY_HUB.hubIdentity}>
             <h1 className={PLAY_HUB.srOnly}>{meta.label}</h1>

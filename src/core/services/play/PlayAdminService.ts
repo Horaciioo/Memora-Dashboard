@@ -7,7 +7,7 @@ import { loadTarget } from '@/core/services/members/admin'
 import type { AdminActor } from '@/core/services/members/admin'
 import { leaveSession } from '@/core/services/play/LobbyService'
 import { journalPlay } from '@/core/services/play/PlayJournalService'
-import { currentSessionId } from '@/core/services/play/PlaySessionService'
+import { openSessionIds } from '@/core/services/play/PlaySessionService'
 import { readPlayPresence, readPlayProfile } from '@/core/services/play/ProfileService'
 import { PLAY_ERRORS, PLAY_GAMES, PLAY_JOURNAL, PLAY_SETTINGS } from '@/declarations/play'
 import { PLAY_ADMIN_TARGETS } from '@/declarations/play/admin'
@@ -255,22 +255,24 @@ export const resetPlayGame = async (
 
 export const removeFromPlay = async (actor: AdminActor, accountId: string) => {
   await loadTarget(accountId, actor)
-  const sessionId = await currentSessionId(accountId)
-  if (!sessionId) throw notFound(PLAY_ERRORS.notSeated)
+  const sessionIds = await openSessionIds(accountId)
+  if (!sessionIds.length) throw notFound(PLAY_ERRORS.notSeated)
 
-  const session = await prisma.playSession.findUniqueOrThrow({
-    where: { id: sessionId },
-    select: { game: true },
-  })
-  await leaveSession(sessionId, accountId)
-  await journalPlay({
-    eventType: 'PlayKicked',
-    subjectId: accountId,
-    actorId: actor.id,
-    game: session.game,
-    template: PLAY_JOURNAL.removed,
-    sessionId,
-  })
+  for (const sessionId of sessionIds) {
+    const session = await prisma.playSession.findUniqueOrThrow({
+      where: { id: sessionId },
+      select: { game: true },
+    })
+    await leaveSession(sessionId, accountId)
+    await journalPlay({
+      eventType: 'PlayKicked',
+      subjectId: accountId,
+      actorId: actor.id,
+      game: session.game,
+      template: PLAY_JOURNAL.removed,
+      sessionId,
+    })
+  }
 
   return readPlayAdmin(accountId)
 }
@@ -346,15 +348,15 @@ export const setPlayBan = async (
     update: ban,
   })
   // A banned player leaves the table
-  const sessionId = reason ? await currentSessionId(accountId) : null
-  if (sessionId) await leaveSession(sessionId, accountId)
+  const sessionIds = reason ? await openSessionIds(accountId) : []
+  for (const sessionId of sessionIds) await leaveSession(sessionId, accountId)
   await journalPlay({
     eventType: 'PlayAdjusted',
     subjectId: accountId,
     actorId: actor.id,
     template: reason ? PLAY_JOURNAL.banned : PLAY_JOURNAL.unbanned,
     values: reason ? { reason } : {},
-    sessionId: sessionId ?? undefined,
+    sessionId: sessionIds[0],
   })
 
   return readPlayAdmin(accountId)

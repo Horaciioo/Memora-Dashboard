@@ -28,7 +28,6 @@ export const PLAY_HUB_COPY = {
   hostedBy: 'Partie de {host}',
   enter: 'Entrer dans le hub',
   create: 'Créer une partie',
-  alreadyInGame: 'Tu te trouves déjà dans une partie !',
   // Hub menu
   menuLobbies: 'Rejoindre une partie',
   menuRunning: 'Regarder une partie',

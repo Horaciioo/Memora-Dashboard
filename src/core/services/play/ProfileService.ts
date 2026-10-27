@@ -137,14 +137,19 @@ export const readLeaderboards = async (
 }
 
 /**
- * Game a member sits in right now
+ * Latest game a member sits in right now
  * @param {string} accountId - Member
+ * @param {PlayGameName} [game] - Only this game
  * @return {Promise<PlayPresence | null>} - Game and its stage
  */
 
-export const readPlayPresence = async (accountId: string): Promise<PlayPresence | null> => {
+export const readPlayPresence = async (
+  accountId: string,
+  game?: PlayGameName
+): Promise<PlayPresence | null> => {
   const seat = await prisma.playSeat.findFirst({
-    where: openSeatOf(accountId),
+    where: openSeatOf(accountId, game),
+    orderBy: { session: { updatedAt: 'desc' } },
     select: { session: { select: { id: true, game: true, status: true } } },
   })
 
