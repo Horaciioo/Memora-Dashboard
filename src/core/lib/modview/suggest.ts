@@ -1,6 +1,11 @@
 import { commandMeasure, nextRung, writeRungCommand } from '@/core/lib/modview/commands'
 import type { PanelMemory } from '@/core/lib/modview/commands'
-import { AUTOMOD_OFFENSES, CHAT_FLAG_CATEGORY } from '@/declarations/modview/suggestions'
+import {
+  COMMON_WORDS,
+  NAME_WEIGHT,
+  PHRASE_WEIGHT,
+  WORD_STEM,
+} from '@/declarations/modview/suggestions'
 import type { Chatter, ModAct } from '@/types/modview'
 import type {
   SanctionMeasureView,
@@ -63,74 +68,98 @@ const plain = (name: string): string =>
     .toLowerCase()
     .trim()
 
-/**
- * Offence of the panel an AutoMod category points at
- * @param {SanctionPanelView | null} panel - Panel at the level in force
- * @param {string} categoryKey - Platform key
- * @return {SanctionOffenseCard | null} - Offence
- */
+const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
-export const offenseForCategory = (
-  panel: SanctionPanelView | null,
-  categoryKey: string
-): SanctionOffenseCard | null => {
-  if (!panel) return null
-  const wanted = AUTOMOD_OFFENSES[categoryKey] ?? AUTOMOD_OFFENSES[CHAT_FLAG_CATEGORY] ?? []
+// Words of a text, the common ones dropped
+const wordsOf = (text: string): string[] =>
+  plain(text)
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((word) => word.length >= 3 && !COMMON_WORDS.has(word))
 
-  for (const name of wanted) {
-    const exact = panel.offenses.find((offense) => plain(offense.name) === plain(name))
-    if (exact) return exact
-  }
-
-  return null
-}
+// Same word, or same start for the long ones
+const isSame = (left: string, right: string): boolean =>
+  left === right ||
+  (Math.min(left.length, right.length) >= WORD_STEM &&
+    left.slice(0, WORD_STEM) === right.slice(0, WORD_STEM))
 
 /**
- * Offence whose examples the message looks like
+ * Offence whose detection words the message holds, the one with the most words first
  * @param {SanctionPanelView | null} panel - Panel at the level in force
  * @param {SuggestionSource} source - What triggered it
- * @return {SanctionOffenseCard | null} - Offence, none when no example fits
+ * @return {SanctionOffenseCard | null} - Offence, none when no detection word appears
  */
 
-export const offenseByExamples = (
+export const offenseByKeywords = (
   panel: SanctionPanelView | null,
   source: SuggestionSource
 ): SanctionOffenseCard | null => {
   if (!panel) return null
-  const text = plain(source.text)
-  const words = source.flagged.map(plain).filter((word) => word.length > 1)
-  let best: { offense: SanctionOffenseCard; score: number } | null = null
+
+  const text = plain(`${source.text} ${source.flagged.join(' ')}`)
+  let best: { offense: SanctionOffenseCard; hits: number } | null = null
 
   for (const offense of panel.offenses) {
-    let score = 0
-    for (const example of offense.examples.map(plain)) {
-      if (example.length < 2) continue
-      // The whole example said again weighs more than a shared word
-      if (example.length >= 4 && text.includes(example)) score += 3
-      else if (words.some((word) => example.includes(word) || word.includes(example))) score += 2
-    }
-    if (score > 0 && (!best || score > best.score)) best = { offense, score }
+    const hits = offense.keywords.filter((keyword) => {
+      const word = plain(keyword)
+      if (!word) return false
+
+      // A whole word or phrase, plural tolerated
+      const edge = '[^\\p{L}\\p{N}]'
+      return new RegExp(`(^|${edge})${escapeRegex(word)}s?(${edge}|$)`, 'u').test(text)
+    }).length
+
+    if (hits > 0 && (!best || hits > best.hits)) best = { offense, hits }
   }
 
   return best?.offense ?? null
 }
 
 /**
- * Offence a source stands for: the AutoMod category when it names one, else the examples
+ * Offence of the panel the message reads like, from the names and examples written in it, for offences without detection words
+ * A word only one offence uses weighs more than one they share
  * @param {SanctionPanelView | null} panel - Panel at the level in force
  * @param {SuggestionSource} source - What triggered it
- * @return {SanctionOffenseCard | null} - Offence
+ * @return {SanctionOffenseCard | null} - Offence, none when nothing in the panel resembles it
  */
 
-const offenseOf = (
+export const offenseByText = (
   panel: SanctionPanelView | null,
   source: SuggestionSource
 ): SanctionOffenseCard | null => {
-  const isNamed = source.categoryKey !== CHAT_FLAG_CATEGORY
+  if (!panel) return null
 
-  return isNamed
-    ? (offenseForCategory(panel, source.categoryKey) ?? offenseByExamples(panel, source))
-    : (offenseByExamples(panel, source) ?? offenseForCategory(panel, source.categoryKey))
+  const message = [...wordsOf(source.text), ...source.flagged.flatMap(wordsOf)]
+  const text = plain(source.text)
+  const vocabulary = panel.offenses.map((offense) => ({
+    offense,
+    name: wordsOf(offense.name),
+    examples: offense.examples.flatMap(wordsOf),
+  }))
+
+  // Offences that use a word, to weigh it
+  const spread = (word: string): number =>
+    Math.max(
+      1,
+      vocabulary.filter((entry) =>
+        [...entry.name, ...entry.examples].some((other) => isSame(other, word))
+      ).length
+    )
+
+  let best: { offense: SanctionOffenseCard; score: number } | null = null
+
+  for (const entry of vocabulary) {
+    let score = 0
+    for (const word of message) {
+      if (entry.name.some((other) => isSame(other, word))) score += NAME_WEIGHT / spread(word)
+      if (entry.examples.some((other) => isSame(other, word))) score += 1 / spread(word)
+    }
+    for (const example of entry.offense.examples.map(plain)) {
+      if (example.length >= 4 && text.includes(example)) score += PHRASE_WEIGHT
+    }
+    if (score > 0 && (!best || score > best.score)) best = { offense: entry.offense, score }
+  }
+
+  return best?.offense ?? null
 }
 
 // Weight of the lightest gesture each gravity deserves: warning, then timeout
@@ -228,7 +257,7 @@ export const suggestFor = (
   memory: PanelMemory,
   acts: ModAct[] = []
 ): Suggestion => {
-  const offense = offenseOf(panel, source)
+  const offense = offenseByKeywords(panel, source) ?? offenseByText(panel, source)
   if (!offense)
     return { source, offense: null, rung: null, rungCount: 0, measure: null, command: null }
 

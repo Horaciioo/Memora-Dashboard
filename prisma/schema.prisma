@@ -2146,6 +2146,8 @@ model SanctionOffense {
   // What looks close but is left alone, one case per line
   toleratedExample String?
   warningExample   String?
+  // Words the Mod View suggestion looks for, one per line
+  keywords         String?
   accent           String?
   position         Int           @default(0)
   archived         Boolean       @default(false)

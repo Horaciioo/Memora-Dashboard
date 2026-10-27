@@ -1,22 +1,52 @@
-/**
- * Offences of the panel each AutoMod category points at, best match first
- * @type {Record<string, string[]>}
- */
-
-export const AUTOMOD_OFFENSES: Record<string, string[]> = {
-  aggression: ['Insulte grave → viewer', 'Message inapproprié', 'Grossièreté'],
-  bullying: ['Participation volontaire à un harcèlement', 'Insulte grave → viewer'],
-  disability: ['Message inapproprié', 'Insulte grave → viewer'],
-  sexuality: ['Propos sexuels', 'Message inapproprié'],
-  misogyny: ['Sexisme & machisme', 'Message inapproprié'],
-  race_ethnicity_or_religion: ['Propos extrêmes', 'Message inapproprié'],
-  sex_based_terms: ['Propos sexuels', 'Message inapproprié'],
-  swearing: ['Grossièreté', 'Message inapproprié'],
-  blocked_term: ['Message inapproprié', 'Grossièreté'],
-}
-
 // Category used for a flagged chat line
 export const CHAT_FLAG_CATEGORY = 'blocked_term'
+
+/**
+ * Words too common to tell two offences apart
+ * @type {Set<string>}
+ */
+
+export const COMMON_WORDS = new Set([
+  'les',
+  'des',
+  'une',
+  'que',
+  'qui',
+  'pas',
+  'pour',
+  'dans',
+  'sur',
+  'avec',
+  'est',
+  'sont',
+  'mon',
+  'ton',
+  'son',
+  'ces',
+  'tes',
+  'mes',
+  'ses',
+  'vous',
+  'nous',
+  'tout',
+  'plus',
+  'mais',
+  'comme',
+  'creator',
+  'viewer',
+  'the',
+  'you',
+  'and',
+])
+
+// Letters two words share to count as the same word, so plurals and conjugations match
+export const WORD_STEM = 5
+
+// Weight of a word of the offence name against one of its examples
+export const NAME_WEIGHT = 2
+
+// Weight of a whole example said again
+export const PHRASE_WEIGHT = 4
 
 /**
  * Copy of the Suggestion window

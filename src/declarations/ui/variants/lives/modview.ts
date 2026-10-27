@@ -403,8 +403,8 @@ export const MODVIEW_SANCTIONS = {
 // Share the offences keep when the history is dragged
 export const MODVIEW_SANCTIONS_SPLIT = { min: 0.2, max: 0.8 } as const
 
-// Side column in px: starts and caps as w-72, the chat wins a little room at most
-export const MODVIEW_SIDE_WIDTH = { start: 288, min: 208 } as const
+// Side column in px: starts as w-72, stretched or narrowed by hand between min and max
+export const MODVIEW_SIDE_WIDTH = { start: 288, min: 208, max: 640 } as const
 
 /**
  * Preview page around the Mod View

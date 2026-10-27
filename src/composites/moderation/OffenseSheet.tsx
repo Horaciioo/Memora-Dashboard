@@ -388,6 +388,20 @@ export const OffenseSheet = ({
               </div>
             </div>
           )}
+
+          {(offense.keywords || canManage) && (
+            <div className={OFFENSE_SHEET.block}>
+              <span className={OFFENSE_SHEET.label}>{SANCTION_COPY.keywordsTitle}</span>
+              <InlineArea
+                id="offense-keywords"
+                value={offense.keywords ?? ''}
+                placeholder={SANCTION_COPY.keywordsEmpty}
+                disabled={!canManage}
+                maxLength={FORM_SETTINGS.longTextMaxLength}
+                onCommit={saveField('keywords')}
+              />
+            </div>
+          )}
         </div>
 
         <div className={OFFENSE_SHEET.divider} aria-hidden="true" />
