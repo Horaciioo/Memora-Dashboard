@@ -1,6 +1,7 @@
 'use client'
 
 import type { BacBoardView, BacPlayer, BacRoundView } from '@/composites/play/baccalaureat/types'
+import { BacVote } from '@/composites/play/baccalaureat/BacVote'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { BAC_BOARD_COPY, fillPlayMessage } from '@/declarations/play'
 import { BAC_BOARD } from '@/declarations/ui/variants'
@@ -68,31 +69,24 @@ export const BacReview = ({
                       {fillPlayMessage(BAC_BOARD_COPY.points, { points: answer.points })}
                     </span>
                   )}
-                  {answer && !isScored && answer.rejects > 0 && (
-                    <span className={BAC_BOARD.answerNote}>
-                      {fillPlayMessage(BAC_BOARD_COPY.rejects, { count: answer.rejects })}
-                    </span>
-                  )}
-                  {answer && !isScored && canVote && !isMine && (
+                  {answer && !isScored && (
                     <>
-                      <button
-                        type="button"
+                      <BacVote
+                        label={BAC_BOARD_COPY.accept}
+                        voterIds={answer.acceptedBy}
+                        players={players}
+                        isMine={answer.myVote === true}
                         disabled={isSaving}
-                        aria-pressed={answer.myVote === true}
-                        className={cn(BAC_BOARD.vote, answer.myVote === true && BAC_BOARD.voteOn)}
-                        onClick={() => vote(answer.id, true)}
-                      >
-                        {BAC_BOARD_COPY.accept}
-                      </button>
-                      <button
-                        type="button"
+                        onVote={canVote && !isMine ? () => vote(answer.id, true) : undefined}
+                      />
+                      <BacVote
+                        label={BAC_BOARD_COPY.reject}
+                        voterIds={answer.rejectedBy}
+                        players={players}
+                        isMine={answer.myVote === false}
                         disabled={isSaving}
-                        aria-pressed={answer.myVote === false}
-                        className={cn(BAC_BOARD.vote, answer.myVote === false && BAC_BOARD.voteOn)}
-                        onClick={() => vote(answer.id, false)}
-                      >
-                        {BAC_BOARD_COPY.reject}
-                      </button>
+                        onVote={canVote && !isMine ? () => vote(answer.id, false) : undefined}
+                      />
                     </>
                   )}
                 </div>

@@ -12,6 +12,7 @@ import { BacWriting } from '@/composites/play/baccalaureat/BacWriting'
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
 import { secondsTo } from '@/composites/play/baccalaureat/types'
 import type { BacBoardView, BacPlayer } from '@/composites/play/baccalaureat/types'
+import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
 import { BaccalaureatPhases } from '@/core/lib/play/baccalaureat/phase'
@@ -31,18 +32,19 @@ export interface BaccalaureatBoardProps {
 }
 
 /**
- * Baccalaureat screen: countdown, writing, review, scores, final ranking
+ * Baccalaureat screen: countdown, writing, review, scores, final ranking, moved with each pushed board
  * @param {BaccalaureatBoardProps} props - Board and table
  * @return {JSX.Element | null}
  */
 
 export const BaccalaureatBoard = ({
   sessionId,
-  board,
+  board: initial,
   players,
   viewerId,
   me,
 }: BaccalaureatBoardProps) => {
+  const board = usePlainBoard(sessionId, initial)
   const router = useRouter()
   const now = useServerNow(board.serverTime)
   const { act, isSaving } = usePlayAct(sessionId)
@@ -109,7 +111,11 @@ export const BaccalaureatBoard = ({
     return (
       <div className={BAC_BOARD.board}>
         {header}
-        <PlayCountdown seconds={left ?? 0} lead={BAC_BOARD_COPY.getReady}>
+        <PlayCountdown
+          seconds={left ?? 0}
+          lead={BAC_BOARD_COPY.getReady}
+          className={BAC_BOARD.inline}
+        >
           {me.isSeated && board.jokersLeft > 0 && !round.rerolledById && (
             <Button
               variant="arcadeGhost"

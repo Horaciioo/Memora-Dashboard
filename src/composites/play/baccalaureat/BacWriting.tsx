@@ -37,7 +37,7 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
     if (!isSeated) return
     if (pending.current) window.clearTimeout(pending.current)
     pending.current = window.setTimeout(
-      () => void drafts.act({ type: 'write', answers: words }, { quiet: true }),
+      () => void drafts.act({ type: 'write', answers: words }),
       SAVE_DELAY_MS
     )
 
@@ -50,7 +50,7 @@ export const BacWriting = ({ sessionId, round, settings, isSeated }: BacWritingP
   const isStopped = Boolean(round.stoppedById)
   const isFull = settings.categories.every((entry) => words[entry.id]?.trim())
   const stop = async () => {
-    await drafts.act({ type: 'write', answers: words }, { quiet: true })
+    await drafts.act({ type: 'write', answers: words })
     await act({ type: 'stop' })
   }
 

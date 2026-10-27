@@ -17,7 +17,6 @@ export const BAC_BOARD_COPY = {
   reviewLead: 'Refuse les mots qui ne tiennent pas la route.',
   accept: 'Valider',
   reject: 'Refuser',
-  rejects: '{count} refus',
   empty: 'Rien écrit',
   count: 'Compter les points',
   scores: 'Scores',
