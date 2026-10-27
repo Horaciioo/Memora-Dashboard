@@ -47,11 +47,12 @@ export const LUDO_CORNER_COPY: Record<LudoCornerName, string> = {
  */
 
 export const LUDO_FEED_COPY = {
-  CAPTURE: 'a mangé un pion {colour}',
-  HOME: 'a ramené un pion à la maison',
-  SKIP: 'a laissé filer le temps',
-  PENALTY: 'a fait trois six de suite',
-  FINISH: 'a fini {place}',
+  CAPTURE: 'a *mangé* {victim}',
+  EXIT: 'a *sorti* un pion',
+  HOME: 'a *terminé* un de ses pions',
+  SKIP: 'a *laissé filer* le temps',
+  PENALTY: 'a *fait* trois six de suite',
+  FINISH: 'a *fini* {place}',
 } as const
 
 /**
@@ -107,10 +108,6 @@ export const LUDO_RULE_COPY = {
   forcedCapture: {
     label: 'Prise obligatoire',
     hint: 'Si un pion peut en manger un autre, il doit le faire.',
-  },
-  barriers: {
-    label: 'Barrières',
-    hint: 'Deux pions de la même couleur sur une case forment un mur infranchissable.',
   },
   safeSquares: {
     label: 'Cases protégées',

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import type { CSSProperties } from 'react'
 
 import { PlayCountdown } from '@/composites/play/baccalaureat/PlayCountdown'
@@ -22,9 +23,13 @@ import { LUDO_BOARD_COPY } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { LUDO_BOARD } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 import { SECOND_MS } from '@/utils/constants/time'
 
 const CORNER_COUNT = LUDO_CORNERS.length
+
+// Longest wait for the board pushed after a move, in milliseconds
+const PUSH_WAIT_MS = 3000
 
 /**
  * Seat with its face
@@ -96,6 +101,13 @@ export const LudoBoard = ({
   const now = useServerNow(initial.serverTime)
   const motion = useLudoMotion(board, viewerId)
   const { act, isSaving } = usePlayAct(sessionId)
+  // Revision a move was sent on: the board stays shut until a newer one is pushed
+  const [sentRev, setSentRev] = useState<number | null>(null)
+  const send = async (body: Record<string, unknown>) => {
+    setSentRev(board.rev)
+    if (await act(body)) window.setTimeout(() => setSentRev(null), PUSH_WAIT_MS)
+    else setSentRev(null)
+  }
   useLudoCues({ board, motion, now })
 
   const seats = seatsOf(board, faces)
@@ -105,7 +117,7 @@ export const LudoBoard = ({
   const me = seats.find((seat) => seat.accountId === viewerId)
   const turns = me ? (LUDO_VIEWER_CORNER - me.corner + CORNER_COUNT) % CORNER_COUNT : 0
   const countdown = secondsTo(new Date(board.startsAt), now)
-  const isStill = !motion.isBusy && !isSaving && countdown === 0
+  const isStill = !motion.isBusy && !isSaving && sentRev !== board.rev && countdown === 0
   const msLeft = Math.max(0, board.turnEndsAt - now)
   const isRoll = board.dice === null
   const row = {
@@ -122,7 +134,7 @@ export const LudoBoard = ({
         face={motion.dice}
         isRolling={motion.isRolling}
         canRoll={board.isMyTurn && isRoll && isStill}
-        onRoll={() => void act({ type: 'roll' })}
+        onRoll={() => void send({ type: 'roll' })}
       />
     ),
   }
@@ -131,7 +143,13 @@ export const LudoBoard = ({
 
   return (
     <div className={LUDO_BOARD.board}>
-      {countdown > 0 && <PlayCountdown seconds={countdown} lead={LUDO_BOARD_COPY.starting} />}
+      {countdown > 0 && (
+        <PlayCountdown
+          seconds={countdown}
+          total={LUDO_SETTINGS.countdownSeconds}
+          lead={LUDO_BOARD_COPY.starting}
+        />
+      )}
       <LudoPlates {...row} />
 
       <div className={LUDO_BOARD.frame}>
@@ -148,11 +166,14 @@ export const LudoBoard = ({
             viewerId={viewerId}
             movable={isStill ? board.movable : []}
             hop={motion.hop}
-            onPick={(pawn) => void act({ type: 'move', pawn })}
+            onPick={(pawn) => void send({ type: 'move', pawn })}
           />
         </div>
       </div>
-      <p className={LUDO_BOARD.status} aria-live="polite">
+      <p
+        className={cn(LUDO_BOARD.status, board.isMyTurn && LUDO_BOARD.statusCall)}
+        aria-live="polite"
+      >
         {statusOf(board, holder?.name ?? '')}
       </p>
 

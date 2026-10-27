@@ -36,7 +36,6 @@ export interface LudoPlan {
   isExit: boolean
   isHome: boolean
   isSafe: boolean
-  isBarrier: boolean
 }
 
 // Weight of each gain when the move is picked for a player
@@ -61,36 +60,6 @@ const rivalsOn = (seats: LudoSeat[], moverId: string, square: number): LudoTaken
       )
     )
     .filter((group) => group.length > 0)
-
-/**
- * Rival wall across the way
- * @param {Object} input - Path
- * @param {LudoSeat[]} input.seats - Board
- * @param {LudoSeat} input.mover - Player moving
- * @param {number} input.first - First step crossed
- * @param {number} input.last - Landing step
- * @return {boolean} - Blocked
- */
-
-const isWalled = ({
-  seats,
-  mover,
-  first,
-  last,
-}: {
-  seats: LudoSeat[]
-  mover: LudoSeat
-  first: number
-  last: number
-}): boolean => {
-  for (let step = first; step <= last; step += 1) {
-    if (!isOnTrack(step)) break
-    const groups = rivalsOn(seats, mover.accountId, squareOf(mover.corner, step))
-    if (groups.some((group) => group.length > 1)) return true
-  }
-
-  return false
-}
 
 /**
  * Plan of one pawn, null when the die forbids it
@@ -126,8 +95,7 @@ const planOf = ({
   if (reach > GOAL_STEP && settings.rules.exactFinish) return null
   const to = Math.min(reach, GOAL_STEP)
 
-  const { barriers, safeSquares } = settings.rules
-  if (barriers && isWalled({ seats, mover, first: isExit ? 0 : from + 1, last: to })) return null
+  const { safeSquares } = settings.rules
 
   // Who stands on the landing square
   const square = isOnTrack(to) ? squareOf(mover.corner, to) : null
@@ -137,6 +105,9 @@ const planOf = ({
     ? mover.pawns.filter((step, index) => index !== pawn && step === to).length
     : 0
 
+  // Never two pawns on one square: a mate, or a rival a safe square would spare
+  if (mates > 0 || (safeSquares && isSafe && rivals.length > 0)) return null
+
   return {
     pawn,
     from,
@@ -145,7 +116,6 @@ const planOf = ({
     isExit,
     isHome: to === GOAL_STEP,
     isSafe: safeSquares && isSafe,
-    isBarrier: barriers && mates > 0,
   }
 }
 

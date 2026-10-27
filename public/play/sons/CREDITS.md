@@ -9,6 +9,9 @@ donnée ici par courtoisie.
 Vingt-six effets sont synthétisés pour Memora (ondes carrées et triangle, bruit filtré, style
 arcade 8 bits), sans échantillon extérieur. Versés au domaine public (CC0 1.0).
 
+`decompte.mp3` et `depart.mp3` (décompte avant une partie) sont synthétisés de la même façon, en
+sinus graves.
+
 Deux effets viennent d'échantillons CC0 d'OpenGameArt, découpés, assemblés et normalisés :
 
 - `pet.mp3` : deux extraits de « Gastric Distress » par LFA,
@@ -22,13 +25,13 @@ https://kenney.nl/assets/interface-sounds
 
 ## Ludo (`ludo/`)
 
+`ton-tour.mp3` (deux notes douces qui montent) et `etoile.mp3` (un « ding » rond) : synthétisés, timbre
+de marimba.
+`lancer-1..3.mp3` : dé dur qui cogne sur une table en bois, trois prises synthétisées (claquement, résonance, rebonds amortis).
+
 Échantillons CC0 de Kenney, convertis en mp3 mono, début de silence coupé, volume normalisé :
 
-- « Casino Audio », https://kenney.nl/assets/casino-audio : `lancer-1..3.mp3` (die-throw-1..3),
-  `pas-1..3.mp3` (chip-lay-1..3), `barriere.mp3` (chips-stack-1).
-- « Interface Sounds », https://kenney.nl/assets/interface-sounds : `sortie.mp3` (maximize_008),
-  `six.mp3` (maximize_006), `ton-tour.mp3` (confirmation_001), `etoile.mp3` (glass_001),
-  `bloque.mp3` (error_006), `penalite.mp3` (error_003), `chrono.mp3` (tick_001).
+- « Interface Sounds », https://kenney.nl/assets/interface-sounds : `bloque.mp3` (error_006), `penalite.mp3` (error_003), `chrono.mp3` (tick_001).
 - « Music Jingles », https://kenney.nl/assets/music-jingles : `arrivee.mp3` (jingles_PIZZI02),
   `victoire.mp3` (jingles_STEEL02).
 - `capture.mp3` : chips-collide-1 (« Casino Audio »), impactPunch_medium_000 (« Impact Sounds »,

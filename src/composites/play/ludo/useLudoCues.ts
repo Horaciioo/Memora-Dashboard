@@ -27,19 +27,24 @@ export const useLudoCues = ({
   motion: LudoMotion
   now: number
 }): void => {
-  const called = useRef<string | null>(null)
+  const called = useRef<number | null>(null)
+  const turns = useRef(0)
   const ticked = useRef<number | null>(null)
   const isStill = !motion.isBusy && !board.isOver && now >= board.startsAt
   const isMyRoll = isStill && board.isMyTurn && board.dice === null
   const secondsLeft = Math.ceil((board.turnEndsAt - now) / SECOND_MS)
 
-  // Chime when the die comes to the viewer
+  // A new holder of the die starts a new turn, bonus throws stay in the same one
   useEffect(() => {
-    const key = `${board.rev}:${board.turnId}`
-    if (!isMyRoll || called.current === key) return
-    called.current = key
+    turns.current += 1
+  }, [board.turnId])
+
+  // Chime once when the turn comes to the viewer
+  useEffect(() => {
+    if (!isMyRoll || called.current === turns.current) return
+    called.current = turns.current
     playLudoSound('turn')
-  }, [isMyRoll, board.rev, board.turnId])
+  }, [isMyRoll, board.turnId])
 
   // Tick of the last seconds
   useEffect(() => {

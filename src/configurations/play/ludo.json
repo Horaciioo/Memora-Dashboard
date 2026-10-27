@@ -1,7 +1,7 @@
 {
   "minPlayers": 1,
   "maxPlayers": 4,
-  "countdownSeconds": 3,
+  "countdownSeconds": 5,
   "pawns": { "default": 4, "min": 1, "max": 4 },
   "turnSeconds": { "default": 20, "min": 10, "max": 60 },
   "turnStep": 5,
@@ -18,13 +18,12 @@
     "captureReplay": true,
     "homeReplay": true,
     "forcedCapture": false,
-    "barriers": false,
     "safeSquares": true,
     "exactFinish": true
   },
   "maxSixes": 3,
   "graceSeconds": 1,
-  "stepMs": 170,
+  "stepMs": 280,
   "rollMs": 700,
   "shuffleMs": 80,
   "alertSeconds": 5,
