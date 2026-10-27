@@ -14,7 +14,8 @@ import {
   cloneTable,
   currentSessionId,
   engineOf,
-  ensureFree,
+  ensureAllowed,
+  openSessionIds,
   lockSession,
   requireHost,
   requireSeat,
@@ -74,7 +75,7 @@ export const createSession = async (accountId: string, raw: Record<string, unkno
   const games = tournamentLength(raw)
 
   const session = await prisma.$transaction(async (tx) => {
-    await ensureFree(tx, accountId)
+    await ensureAllowed(tx, accountId)
     const tournament = games
       ? await tx.playTournament.create({ data: { game, hostId: accountId, gamesCount: games } })
       : null
@@ -91,6 +92,7 @@ export const createSession = async (accountId: string, raw: Record<string, unkno
       select: { id: true },
     })
   })
+  await closeOtherTables(accountId, game, session.id)
   await announceInChat(session.id, accountId, PlayMessageKinds.Joined)
   await signalPlay(session.id, true)
   await journalPlay({
@@ -132,7 +134,7 @@ export const listLobbies = async (accountId: string, game?: string | null) => {
       orderBy: { startedAt: 'desc' },
       include: SESSION_INCLUDE,
     }),
-    currentSessionId(accountId),
+    currentSessionId(accountId, game ? gameNamed(game) : undefined),
   ])
 
   return {
@@ -159,7 +161,7 @@ export const joinSession = async (sessionId: string, accountId: string): Promise
 
     const present = session.seats.filter(isPresent)
     if (present.length >= PLAY_GAMES.get(session.game).maxPlayers) throw conflict(PLAY_ERRORS.full)
-    await ensureFree(tx, accountId, sessionId)
+    await ensureAllowed(tx, accountId)
 
     // Back in the lobby, or a new seat
     const color = pickSeatColor(present.map((entry) => entry.color))
@@ -174,6 +176,7 @@ export const joinSession = async (sessionId: string, accountId: string): Promise
   })
   if (!joined) return
 
+  await closeOtherTables(accountId, joined, sessionId)
   await announceInChat(sessionId, accountId, PlayMessageKinds.Joined)
   await signalPlay(sessionId, true)
   await journalPlay({
@@ -274,6 +277,23 @@ export const leaveSession = async (
       sessionId,
     })
   }
+}
+
+/**
+ * One table per game: the player's other open tables of that game close behind them
+ * @param {string} accountId - Player
+ * @param {PlayGameName} game - Game just joined or opened
+ * @param {string} keepId - Table kept
+ * @return {Promise<void>} - Left
+ */
+
+export const closeOtherTables = async (
+  accountId: string,
+  game: PlayGameName,
+  keepId: string
+): Promise<void> => {
+  const older = (await openSessionIds(accountId, game)).filter((id) => id !== keepId)
+  for (const id of older) await leaveSession(id, accountId)
 }
 
 /**

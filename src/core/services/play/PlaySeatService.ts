@@ -6,8 +6,9 @@ import { pickSeatColor, readBodyText } from '@/core/lib/play'
 import { isPresent } from '@/core/lib/play/session'
 import { signalPlay } from '@/core/lib/play/signal'
 import { watchersOf } from '@/core/lib/play/watchers'
+import { closeOtherTables } from '@/core/services/play/LobbyService'
 import {
-  ensureFree,
+  ensureAllowed,
   lockSession,
   requireHost,
   requireSeat,
@@ -32,6 +33,7 @@ export const setSeatRole = async (
   const accountId = readBodyText(raw, 'accountId', PLAY_ERRORS.notSeated)
   if (accountId === hostId) throw conflict(PLAY_ERRORS.selfKick)
 
+  let seated: string | null = null
   await prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, sessionId)
     requireHost(session, hostId)
@@ -51,14 +53,16 @@ export const setSeatRole = async (
       if (present.length >= PLAY_GAMES.get(session.game).maxPlayers) {
         throw conflict(PLAY_ERRORS.full)
       }
-      await ensureFree(tx, accountId, sessionId)
+      await ensureAllowed(tx, accountId)
       await tx.playSeat.update({
         where: { sessionId_accountId: { sessionId, accountId } },
         data: { leftAt: null, color: pickSeatColor(present.map((entry) => entry.color)) },
       })
+      seated = session.game
     }
     await tx.playSession.update({ where: { id: sessionId }, data: { updatedAt: new Date() } })
   })
+  if (seated) await closeOtherTables(accountId, seated, sessionId)
   await signalPlay(sessionId, true)
 }
 

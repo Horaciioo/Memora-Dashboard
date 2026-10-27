@@ -46,7 +46,6 @@ export const LUDO_SLOTS = [
 export const LUDO_PLATE = {
   plate: 'flex min-w-0 flex-col gap-1.5 transition-opacity duration-[var(--motion-duration-panel)]',
   plateRight: 'ludo-plate-right items-end',
-  turn: 'ludo-plate-turn',
   off: 'opacity-45 grayscale',
   row: 'flex items-center gap-3',
   rowRight: 'flex-row-reverse',

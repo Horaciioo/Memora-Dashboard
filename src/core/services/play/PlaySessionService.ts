@@ -99,40 +99,51 @@ export const requireHost = (session: LoadedSession, accountId: string): void => 
 }
 
 /**
- * Open game a player sits in
+ * Open games a player sits in, latest first
  * @param {string} accountId - Player
+ * @param {PlayGameName} [game] - Only this game
  * @param {PlayClient} [client] - Database client
+ * @return {Promise<string[]>} - Games
+ */
+
+export const openSessionIds = async (
+  accountId: string,
+  game?: PlayGameName,
+  client: PlayClient = prisma
+): Promise<string[]> => {
+  const seats = await client.playSeat.findMany({
+    where: openSeatOf(accountId, game),
+    orderBy: { session: { updatedAt: 'desc' } },
+    select: { sessionId: true },
+  })
+
+  return seats.map((seat) => seat.sessionId)
+}
+
+/**
+ * Latest open game a player sits in
+ * @param {string} accountId - Player
+ * @param {PlayGameName} [game] - Only this game
  * @return {Promise<string | null>} - Game
  */
 
 export const currentSessionId = async (
   accountId: string,
-  client: PlayClient = prisma
-): Promise<string | null> => {
-  const seat = await client.playSeat.findFirst({
-    where: openSeatOf(accountId),
-    select: { sessionId: true },
-  })
-
-  return seat?.sessionId ?? null
-}
+  game?: PlayGameName
+): Promise<string | null> => (await openSessionIds(accountId, game))[0] ?? null
 
 /**
- * Refuse a second open game
+ * Refuse a banned player
  * @param {Prisma.TransactionClient} tx - Transaction
  * @param {string} accountId - Player
- * @param {string} [sessionId] - Game being joined
- * @return {Promise<void>} - Throws when busy
+ * @return {Promise<void>} - Throws when banned
  */
 
-export const ensureFree = async (
+export const ensureAllowed = async (
   tx: Prisma.TransactionClient,
-  accountId: string,
-  sessionId?: string
+  accountId: string
 ): Promise<void> => {
   if (await isPlayBanned(accountId, tx)) throw forbidden(PLAY_ERRORS.banned)
-  const current = await currentSessionId(accountId, tx)
-  if (current && current !== sessionId) throw conflict(PLAY_ERRORS.alreadyPlaying)
 }
 
 /**

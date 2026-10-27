@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client'
 
 import type { EngineSession } from '@/types/play'
 import { PLAY_OPEN_STATUSES } from '@/utils/constants/play'
+import type { PlayGameName } from '@/utils/constants/play'
 
 /**
  * Game with its seats and players
@@ -46,13 +47,14 @@ export const toEngineSession = (session: LoadedSession): EngineSession => ({
 /**
  * Seat still held in an open game
  * @param {string} accountId - Player
+ * @param {PlayGameName} [game] - Only this game
  * @return {Prisma.PlaySeatWhereInput} - Filter
  */
 
-export const openSeatOf = (accountId: string) =>
+export const openSeatOf = (accountId: string, game?: PlayGameName) =>
   ({
     accountId,
     leftAt: null,
     kickedAt: null,
-    session: { status: { in: [...PLAY_OPEN_STATUSES] } },
+    session: { status: { in: [...PLAY_OPEN_STATUSES] }, ...(game && { game }) },
   }) satisfies Prisma.PlaySeatWhereInput

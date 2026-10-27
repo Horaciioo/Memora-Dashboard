@@ -8,6 +8,8 @@ const LUDO = '/play/sons/ludo'
 
 export const LUDO_SOUNDS = {
   turn: `${LUDO}/ton-tour.mp3`,
+  six: `${LUDO}/six.mp3`,
+  exit: `${LUDO}/sortie.mp3`,
   eat: `${LUDO}/miam.mp3`,
   eaten: `${LUDO}/aie.mp3`,
   star: `${LUDO}/etoile.mp3`,
@@ -28,6 +30,7 @@ export type LudoSoundName = keyof typeof LUDO_SOUNDS
 
 export const LUDO_TAKES = {
   roll: [`${LUDO}/lancer-1.mp3`, `${LUDO}/lancer-2.mp3`, `${LUDO}/lancer-3.mp3`],
+  step: [`${LUDO}/pas-1.mp3`, `${LUDO}/pas-2.mp3`, `${LUDO}/pas-3.mp3`],
 } as const
 
 export type LudoTakeName = keyof typeof LUDO_TAKES
@@ -38,6 +41,7 @@ export type LudoTakeName = keyof typeof LUDO_TAKES
  */
 
 export const LUDO_MIX = {
+  step: 0.55,
   roll: 0.9,
   clock: 0.5,
 }

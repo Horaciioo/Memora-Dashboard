@@ -413,6 +413,18 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Correction d’un bug qui faisait vibrer un bumper du « Golf » après la fin de son rebond.',
       },
       {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui empêchait de quitter le plein écran sur le podium du « Golf ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui faisait flotter de haut en bas l’avatar du joueur dont c’est le tour dans le « Ludo ».',
+      },
+      {
         tag: ChangelogTags.Added,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
@@ -431,6 +443,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Ajout d’un décompte sonore avant le départ d’une partie.',
       },
       {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité de jouer plusieurs parties en même temps, à condition que ce soit des jeux différents : lancer une nouvelle partie d’un jeu ferme ta précédente partie de ce jeu.',
+      },
+      {
         tag: ChangelogTags.Improved,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
@@ -446,7 +464,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Improved,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
-        text: 'Amélioration du confort dans le « Ludo » : pions qui avancent à un rythme plus posé, journal des événements plus lisible et nouveaux bruitages de dé.',
+        text: 'Amélioration du confort dans le « Ludo » : pions qui avancent à un rythme plus posé, journal des événements plus lisible, nouveaux bruitages de dé et bruit de pion posé sur la table à chaque case, avec les sons du six et de la sortie d’un pion.',
       },
       {
         tag: ChangelogTags.Improved,

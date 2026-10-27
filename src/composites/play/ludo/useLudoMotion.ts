@@ -205,6 +205,7 @@ const playLine = async ({
     playLudoTake('roll', LUDO_MIX.roll)
     await wait(rollMs)
     setMotion((current) => ({ ...current, isRolling: false }))
+    if (line.dice === 6) playLudoSound('six')
     const isStuck = next ? !['MOVE', 'PENALTY'].includes(next.kind) : board.dice === null
     if (isStuck) playLudoSound('blocked')
     return
@@ -219,6 +220,7 @@ const playLine = async ({
         ...current,
         hop: { accountId: line.accountId, pawn, key: line.rev },
       }))
+      playLudoSound('exit')
       await wait(stepMs * BEATS.exit)
     } else {
       for (let step = from + 1; step <= to; step += 1) {
@@ -228,6 +230,7 @@ const playLine = async ({
           hop: { accountId: line.accountId, pawn, key: step },
           walking: step < to ? { accountId: line.accountId, pawn } : null,
         }))
+        playLudoTake('step', LUDO_MIX.step)
         await wait(stepMs)
       }
     }
