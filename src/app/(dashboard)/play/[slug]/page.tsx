@@ -93,7 +93,6 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
 
       <PlayHubMenu
         game={game}
-        player={player}
         canCreate={!isLocked}
         lockedReason={
           presence ? PLAY_HUB_COPY.alreadyInGame : profile.ban ? PLAY_HUB_COPY.banned : null

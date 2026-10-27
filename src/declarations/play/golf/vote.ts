@@ -32,13 +32,25 @@ export const GOLF_MODE_ICONS: Record<GolfModeName, IconName> = {
  */
 
 export const GOLF_VOTE_TIMING = {
-  // Confirm sound before the cards leave
-  confirm: 140,
-  // Cards leaving
-  exit: 380,
+  // Time to vote on each step
+  limit: 15_000,
   // Avatar lands on its card
-  land: 330,
+  land: 520,
 } as const
+
+/**
+ * Actions of the vote, as the route reads them
+ * @type {Record<string, string>}
+ */
+
+export const GolfVoteActions = {
+  Open: 'open',
+  Pick: 'pick',
+  Close: 'close',
+  Cancel: 'cancel',
+} as const
+
+export type GolfVoteAction = (typeof GolfVoteActions)[keyof typeof GolfVoteActions]
 
 /**
  * Words of the vote screens
@@ -47,7 +59,7 @@ export const GOLF_VOTE_TIMING = {
 
 export const GOLF_VOTE_COPY = {
   modeTitle: 'Format',
-  modeLead: 'Choisis comment se joue la partie.',
+  modeLead: 'Choisis le type de la partie.',
   roundsTitle: 'Parcours',
   roundsLead: 'Combien de parcours dans le tournoi ?',
   roundsHint: '{count} parcours de six trous, les scores s’additionnent.',
@@ -61,4 +73,5 @@ export const GOLF_VOTE_COPY = {
   confirm: 'Valider',
   back: 'Retour',
   you: 'Toi',
+  timer: 'Temps restant',
 } as const

@@ -9,6 +9,7 @@ import { BombRulesDrawer } from '@/composites/play/bomb/BombRulesDrawer'
 import { BombSetupDrawer } from '@/composites/play/bomb/BombSetupDrawer'
 import { GolfRulesDrawer } from '@/composites/play/golf/setup/GolfRulesDrawer'
 import { GolfSetupDrawer } from '@/composites/play/golf/setup/GolfSetupDrawer'
+import { GolfStartVote } from '@/composites/play/golf/vote/GolfStartVote'
 import { LudoRulesDrawer } from '@/composites/play/ludo/LudoRulesDrawer'
 import { LudoSetupDrawer } from '@/composites/play/ludo/LudoSetupDrawer'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
@@ -41,8 +42,22 @@ export interface PlaySetupProps {
   onSubmit: (setup: object) => void
   // Rules being edited, none for a new game
   current?: PlayRulesValue
-  // Who sets the game up
-  player?: { name: string; avatarUrl: string | null }
+}
+
+/**
+ * What every start vote takes, asked of the host when the game launches
+ * @typedef {Object} PlayVoteProps
+ */
+
+export interface PlayVoteProps {
+  sessionId: string
+  settings: Prisma.JsonValue
+  // Server ms at the page render
+  serverTime: number
+  viewerId: string
+  hostId: string
+  // Players of the table by account
+  faces: Record<string, { name: string; avatarUrl: string | null }>
 }
 
 /**
@@ -65,6 +80,15 @@ export const PLAY_SETUP_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   [PlayGames.Bomb]: BombSetupDrawer,
   [PlayGames.Golf]: GolfSetupDrawer,
   [PlayGames.Ludo]: LudoSetupDrawer,
+}
+
+/**
+ * Vote opened when the host launches, none starts straight away
+ * @type {Partial<Record<PlayGameName, ComponentType<PlayVoteProps>>>}
+ */
+
+export const PLAY_START_VOTES: Partial<Record<PlayGameName, ComponentType<PlayVoteProps>>> = {
+  [PlayGames.Golf]: GolfStartVote,
 }
 
 /**

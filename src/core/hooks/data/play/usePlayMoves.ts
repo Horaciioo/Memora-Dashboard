@@ -8,6 +8,7 @@ import { queuePlayRefresh } from '@/core/hooks/data/play/usePlayRefresh'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_HUB_COPY } from '@/declarations/play/hub'
+import { GolfVoteActions } from '@/declarations/play/golf/vote'
 import type { PlayInviteRoleName } from '@/utils/constants/play'
 
 /**
@@ -49,6 +50,11 @@ export const usePlayMoves = () => {
       ),
     start: (id: string) =>
       go(() => apiPost(API_ROUTES.playStart(id), {}), PLAY_HUB_COPY.started, null),
+    openVote: (id: string) =>
+      run(() => apiPost(API_ROUTES.playVote(id), { action: GolfVoteActions.Open })),
+    // Quiet, the signal it raises refreshes the page
+    vote: (id: string, payload: Record<string, unknown>) =>
+      run(() => apiPost(API_ROUTES.playVote(id), payload)),
     rules: (id: string, setup: object) =>
       go(() => apiPatch(API_ROUTES.playSession(id), setup), PLAY_HUB_COPY.rulesSaved, null),
     replay: (id: string) =>

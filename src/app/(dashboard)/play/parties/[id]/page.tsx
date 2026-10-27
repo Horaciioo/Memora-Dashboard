@@ -155,6 +155,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
               viewerId={session.id}
               me={game.me}
               game={game.game}
+              serverTime={game.serverTime}
               rules={{
                 settings: game.settings,
                 tournamentGames: game.tournament?.gamesCount ?? null,
