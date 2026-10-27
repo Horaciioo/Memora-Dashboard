@@ -1,3 +1,4 @@
+import { execFile } from 'node:child_process'
 import { createServer } from 'node:http'
 import { parseArgs } from 'node:util'
 
@@ -59,7 +60,15 @@ server.on('upgrade', (request, socket, head) => {
 })
 
 server.listen(port, hostname, () => {
-  console.log(`> Memora on http://${hostname}:${port} (${dev ? 'dev' : 'production'})`)
+  const url = `http://${hostname}:${port}`
+  console.log(`> Memora on ${url} (${dev ? 'dev' : 'production'})`)
+  if (dev && process.platform === 'darwin' && !process.env.NO_BROWSER) {
+    // Clipboard + Chrome, dev only
+    const copy = execFile('pbcopy')
+    copy.on('error', () => {})
+    copy.stdin?.end(url)
+    execFile('open', ['-a', 'Google Chrome', url], () => {})
+  }
 })
 
 // Docker stops with SIGTERM
