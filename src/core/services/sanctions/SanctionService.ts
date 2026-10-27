@@ -115,6 +115,13 @@ export const offenseFields = (): FieldDefinition[] => [
     label: SANCTION_FIELD_COPY.warningExample,
     maxLength: FORM_SETTINGS.longTextMaxLength,
   },
+  {
+    name: 'keywords',
+    kind: 'textarea',
+    label: SANCTION_FIELD_COPY.keywords,
+    hint: SANCTION_FIELD_COPY.keywordsHint,
+    maxLength: FORM_SETTINGS.longTextMaxLength,
+  },
 ]
 
 /**
@@ -172,6 +179,7 @@ export const readPanel = async (
       rungCount: tiers.length,
       rungs: tiers.map(toRung),
       examples: toLines(row.example),
+      keywords: toLines(row.keywords),
     }
   })
 
@@ -210,6 +218,7 @@ export const readOffense = async (
     examples: toLines(row.example),
     tolerated: toLines(row.toleratedExample),
     warningExample: row.warningExample,
+    keywords: row.keywords,
     gravities: Object.fromEntries(row.levels.map((entry) => [entry.levelId, entry.gravity])),
     ladders,
   }
@@ -241,6 +250,7 @@ export const updateOffense = async (
       ...(given('example') && { example: readText(values, 'example') }),
       ...(given('toleratedExample') && { toleratedExample: readText(values, 'toleratedExample') }),
       ...(given('warningExample') && { warningExample: readText(values, 'warningExample') }),
+      ...(given('keywords') && { keywords: readText(values, 'keywords') }),
     },
   })
 

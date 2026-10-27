@@ -37,10 +37,11 @@ import type { ModViewProfileName } from '@/declarations/modview/profiles'
 import type { IconName } from '@/declarations/ui/icons'
 import { MODVIEW_FRAME, MODVIEW_SPOTLIGHT, MODVIEW_WORKSPACE } from '@/declarations/ui/variants'
 import type { LivePerson } from '@/types/lives'
-import type { ModViewDriver, ModViewWindow } from '@/types/modview'
+import type { ActContext, ModViewDriver, ModViewIntent, ModViewWindow } from '@/types/modview'
 import type { SanctionPanelView } from '@/types/sanctions'
 import { cn } from '@/utils/classnames'
 import { LivePlatforms } from '@/utils/constants/lives'
+import { SanctionKinds } from '@/utils/constants/moderation'
 import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 
@@ -49,6 +50,13 @@ const CARD_MIN_WIDTH = 384
 
 // Time the card takes to grow or shrink, as its width transition
 const CARD_TRANSITION_MS = 300
+
+// Panel measure a gesture carries out
+const SUGGESTED_KIND: Partial<Record<ModViewIntent['kind'], string>> = {
+  warn: SanctionKinds.Warn,
+  timeout: SanctionKinds.Timeout,
+  ban: SanctionKinds.Ban,
+}
 
 /**
  * What a real live adds to the Mod View: history, team, Inspect Mod, Focus
@@ -133,9 +141,32 @@ export const ModView = ({
     onBehalfOfId: following && actInPlace ? following.targetId : null,
     quiet: live?.isJunior,
   })
-  const { gate, act, picked, setPicked, memory } = actions
+  const { gate, picked, setPicked, memory } = actions
   const watchlist = useWatchlist(state.messages)
   const { suggestions, dismiss } = useSuggestions(state, panel, memory, actions.acted)
+
+  // A sanction by hand counts on the rung the viewer's suggestion stood for
+  const act = (intent: ModViewIntent, context: ActContext = {}) => {
+    const chatterId = 'chatterId' in intent ? intent.chatterId : null
+    const kind = SUGGESTED_KIND[intent.kind]
+    const fit =
+      context.offenseId === undefined && chatterId && kind
+        ? suggestions.find(
+            (item) =>
+              item.source.chatter.id === chatterId &&
+              item.offense &&
+              item.rung !== null &&
+              item.measure?.kind === kind
+          )
+        : undefined
+
+    actions.act(
+      intent,
+      fit?.offense && fit.rung !== null
+        ? { ...context, offenseId: fit.offense.id, rung: fit.rung }
+        : context
+    )
+  }
 
   // Windows this platform and seat can open
   const seat = profile ?? profileOfPermissions(permissions)

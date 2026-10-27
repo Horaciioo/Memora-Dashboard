@@ -3,6 +3,7 @@
 import { useReread } from '@/composites/lives/LiveGate'
 import { ModView } from '@/composites/modview/ModView'
 import type { ModViewLiveTools } from '@/composites/modview/ModView'
+import { useLivePanel } from '@/core/hooks/data/lives/useLivePanel'
 import { useLiveModView } from '@/core/hooks/data/lives/useLiveModView'
 import { useModViewPresence } from '@/core/hooks/interaction/scenes/useModViewPresence'
 import type { IconName } from '@/declarations/ui/icons'
@@ -20,13 +21,19 @@ export interface LiveModViewProps {
 /**
  * Mod View of one real live
  * @param {LiveView} live - Live
- * @param {SanctionPanelView | null} panel - Creator panel at the level in force
+ * @param {SanctionPanelView | null} panel - Creator panel at the level in force, kept fresh
  * @param {ModViewLiveTools} tools - History
  * @param {{ name: string, icon: IconName | null } | null} fallbackLevel - Creator level
  * @return {JSX.Element}
  */
 
-export const LiveModView = ({ live, panel, tools, fallbackLevel }: LiveModViewProps) => {
+export const LiveModView = ({
+  live,
+  panel: initialPanel,
+  tools,
+  fallbackLevel,
+}: LiveModViewProps) => {
+  const panel = useLivePanel(initialPanel)
   const driver = useLiveModView(live)
   useModViewPresence(live.id)
   const reread = useReread()

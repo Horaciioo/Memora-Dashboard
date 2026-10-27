@@ -24,6 +24,12 @@ export const useFocusTrap = (
 ): RefObject<HTMLDivElement | null> => {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const restoreRef = useRef<HTMLElement | null>(null)
+  // Latest handler, so a new callback never re-runs the trap
+  const dismissRef = useRef(onDismiss)
+
+  useEffect(() => {
+    dismissRef.current = onDismiss
+  })
 
   useEffect(() => {
     if (!active) return
@@ -48,7 +54,7 @@ export const useFocusTrap = (
 
       if (event.key === 'Escape') {
         event.stopPropagation()
-        onDismiss()
+        dismissRef.current()
         return
       }
 
@@ -72,7 +78,7 @@ export const useFocusTrap = (
       opened.splice(opened.indexOf(token), 1)
       restoreRef.current?.focus()
     }
-  }, [active, onDismiss])
+  }, [active])
 
   return containerRef
 }

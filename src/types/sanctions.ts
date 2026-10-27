@@ -52,6 +52,7 @@ export interface SanctionRungView {
  * @property {number} rungCount - Steps of the ladder
  * @property {SanctionRungView[]} rungs - Every step at that level
  * @property {string[]} examples - Messages it covers
+ * @property {string[]} keywords - Words the suggestion looks for
  */
 
 export interface SanctionOffenseCard {
@@ -62,6 +63,7 @@ export interface SanctionOffenseCard {
   rungCount: number
   rungs: SanctionRungView[]
   examples: string[]
+  keywords: string[]
 }
 
 /**
@@ -74,6 +76,7 @@ export interface SanctionOffenseCard {
  * @property {string[]} examples - Messages to moderate
  * @property {string[]} tolerated - Close messages left alone
  * @property {string | null} warningExample - Reason a moderator can paste
+ * @property {string | null} keywords - Detection words, one per line
  * @property {Record<string, SanctionGravityName>} gravities - Weight per level identifier
  * @property {Record<string, SanctionRungView[]>} ladders - Steps per level identifier
  */
@@ -86,6 +89,7 @@ export interface SanctionOffenseDetail {
   examples: string[]
   tolerated: string[]
   warningExample: string | null
+  keywords: string | null
   gravities: Record<string, SanctionGravityName>
   ladders: Record<string, SanctionRungView[]>
 }

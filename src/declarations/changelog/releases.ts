@@ -127,6 +127,54 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.8.1',
+    date: '2026-10-27',
+    title: 'Les suggestions visent plus juste !',
+    intro:
+      'La « Mod View » propose désormais la bonne infraction du « Panel de sanctions » plus souvent, et les Responsables peuvent la guider avec leurs propres mots.',
+    description:
+      'Jusqu’ici, la suggestion se fiait surtout à la catégorie d’AutoMod, ce qui menait souvent à une infraction approximative. Cette version la fait lire le message lui-même : les mots de détection que les Responsables ajoutent à chaque infraction passent en premier, puis les mots de son nom et de ses exemples. Une sanction donnée à la main compte aussi sur le bon palier.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.sanctions,
+        permission: Permissions.SanctionManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de renseigner des « Mots de détection » sur chaque infraction du « Panel de sanctions », un par ligne, pour guider la suggestion de la « Mod View ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Amélioration des suggestions de la « Mod View » : l’infraction proposée se choisit d’après les mots du message, les mots de détection de l’infraction d’abord, puis ceux de son nom et de ses exemples.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Amélioration de la « Mod View » : une sanction donnée à la main compte sur le palier que la suggestion proposait pour ce viewer.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Amélioration de la « Mod View » : une modification du « Panel de sanctions » atteint les suggestions d’un live en cours sans recharger la page.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Amélioration de la « Mod View » : la colonne latérale peut s’élargir bien plus qu’avant.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveRead,
+        text: 'Correction d’un bug qui renvoyait le curseur au début d’une fenêtre ouverte de la « Mod View » à chaque rafraîchissement du live.',
+      },
+    ],
+  },
+  {
     version: '0.8.0',
     date: '2026-10-26',
     title: 'Memora Play est là !',
