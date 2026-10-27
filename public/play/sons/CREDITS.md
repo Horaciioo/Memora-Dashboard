@@ -28,6 +28,8 @@ https://kenney.nl/assets/interface-sounds
 `ton-tour.mp3` (deux notes douces qui montent) et `etoile.mp3` (un « ding » rond) : synthétisés, timbre
 de marimba.
 `lancer-1..3.mp3` : dé dur qui cogne sur une table en bois, trois prises synthétisées (claquement, résonance, rebonds amortis).
+`pas-1..3.mp3` : pion posé sur une table, trois prises (« Casino Audio » de Kenney, chip-lay-1..3, CC0).
+`six.mp3` (maximize_006) et `sortie.mp3` (maximize_008) : « Interface Sounds » de Kenney, CC0.
 
 Échantillons CC0 de Kenney, convertis en mp3 mono, début de silence coupé, volume normalisé :
 
