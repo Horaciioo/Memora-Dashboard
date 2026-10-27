@@ -46,12 +46,7 @@ export const LudoPlate = ({ face, colour, isRight, turn, die }: LudoPlateProps) 
 
   return (
     <div
-      className={cn(
-        LUDO_PLATE.plate,
-        isRight && LUDO_PLATE.plateRight,
-        turn && LUDO_PLATE.turn,
-        hasLeft && LUDO_PLATE.off
-      )}
+      className={cn(LUDO_PLATE.plate, isRight && LUDO_PLATE.plateRight, hasLeft && LUDO_PLATE.off)}
       style={{ '--pawn-tone': `var(--play-ludo-${colour})` } as CSSProperties}
     >
       <div className={cn(LUDO_PLATE.row, isRight && LUDO_PLATE.rowRight)}>

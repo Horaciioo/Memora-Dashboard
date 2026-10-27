@@ -252,21 +252,6 @@
   }
 }
 
-/* Player on turn */
-.ludo-plate-turn {
-  animation: ludo-plate 1.6s ease-in-out infinite;
-}
-
-@keyframes ludo-plate {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: 0 -0.2rem;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .ludo-pawn {
     transition: none;
@@ -278,7 +263,6 @@
   .ludo-trail,
   .ludo-ghost,
   .ludo-ghost .ludo-pawn-art,
-  .ludo-plate-turn,
   .ludo-ring-alert {
     animation: none;
   }
