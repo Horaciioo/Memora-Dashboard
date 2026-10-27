@@ -74,7 +74,7 @@ export const GolfBumper = ({
     const age = hitAt === undefined ? Infinity : performance.now() - hitAt
     // Fading bounce, wide then squashed
     const fade = age < bumper.pulseMs ? 1 - age / bumper.pulseMs : 0
-    const bounce = Math.cos((age / bumper.pulseMs) * Math.PI * bumper.bounces) * fade
+    const bounce = fade ? Math.cos((age / bumper.pulseMs) * Math.PI * bumper.bounces) * fade : 0
     const swell = 1 + bumper.pulse * bounce
     body.current?.scale.set(swell, 1 - bumper.pulse * bumper.squash * bounce, swell)
     for (const glow of glows.current) if (glow) glow.emissiveIntensity = bumper.glow * fade
