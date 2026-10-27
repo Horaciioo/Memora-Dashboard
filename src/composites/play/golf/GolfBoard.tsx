@@ -17,6 +17,7 @@ import type { GolfFace } from '@/composites/play/golf/types'
 import { playGolfSound } from '@/composites/play/golf/sound'
 import { useGolfSounds } from '@/composites/play/golf/useGolfSounds'
 import { useGolfTable } from '@/composites/play/golf/useGolfTable'
+import { usePlayStageStore } from '@/core/store/playStage'
 import { useGolfBoard } from '@/core/hooks/data/play/useGolfBoard'
 import { useGolfStroke } from '@/core/hooks/data/play/useGolfStroke'
 import { useGolfPowerCue } from '@/core/hooks/interaction/golf/useGolfPowerCue'
@@ -38,6 +39,7 @@ import { GOLF_POWER_SOUNDS } from '@/declarations/play/golf/sounds'
 import { GOLF_BOARD } from '@/declarations/ui/variants'
 import { GolfPhases } from '@/utils/constants/play'
 import type { GolfPowerName } from '@/utils/constants/play'
+import { cn } from '@/utils/classnames'
 
 // Three loaded only on a golf table
 const GolfScene = dynamic(() => import('@/composites/play/golf/scene/GolfScene'), {
@@ -67,6 +69,7 @@ export const GolfBoard = ({
   isSeated,
 }: GolfBoardProps) => {
   const board = useGolfBoard(sessionId, initial)
+  const isFullscreen = usePlayStageStore((state) => state.isFullscreen)
   const phase = useGolfPhase(board)
   const layouts = holesOf(board.settings)
   const layout = layouts[Math.min(board.hole, layouts.length - 1)]
@@ -114,8 +117,11 @@ export const GolfBoard = ({
       : (board.players.find((player) => !player.isDone && !player.hasLeft)?.accountId ?? viewerId)
 
   return (
-    <div className={GOLF_BOARD.board}>
-      <div className={GOLF_BOARD.stage} style={golfHudTones(course.paint) as CSSProperties}>
+    <div className={cn(GOLF_BOARD.board, isFullscreen && GOLF_BOARD.boardFull)}>
+      <div
+        className={cn(GOLF_BOARD.stage, isFullscreen && GOLF_BOARD.stageFull)}
+        style={golfHudTones(course.paint) as CSSProperties}
+      >
         <GolfScene
           board={board}
           hole={hole}

@@ -5,6 +5,7 @@ export {
   settleSession,
   startSession,
 } from '@/core/services/play/GameService'
+export { voteInLobby } from '@/core/services/play/golf/GolfVoteService'
 export {
   cancelSession,
   createSession,

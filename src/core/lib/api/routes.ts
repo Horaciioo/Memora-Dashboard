@@ -45,6 +45,7 @@ export const API_ROUTES = {
   playJoin: (id: string) => `/api/play/parties/${id}/rejoindre`,
   playLeave: (id: string) => `/api/play/parties/${id}/quitter`,
   playStart: (id: string) => `/api/play/parties/${id}/lancer`,
+  playVote: (id: string) => `/api/play/parties/${id}/vote`,
   playCancel: (id: string) => `/api/play/parties/${id}/annuler`,
   playRematch: (id: string) => `/api/play/parties/${id}/revanche`,
   playAct: (id: string) => `/api/play/parties/${id}/actions`,

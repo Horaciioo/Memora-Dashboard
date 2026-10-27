@@ -27,7 +27,10 @@ export default async function PlayPage() {
       <PlaySignal topic={PLAY_TOPICS.lobbies} />
       <PlayCallouts isBanned={Boolean(profile.ban)} />
 
-      <section className={PLAY_CROSS.stage} aria-label={PLAY_HUB_COPY.sectionGames}>
+      <section className={PLAY_CROSS.stage} aria-labelledby="play-games">
+        <h1 id="play-games" className={PLAY_CROSS.heading}>
+          {PLAY_HUB_COPY.sectionGames}
+        </h1>
         <PlayGameGrid games={games} />
       </section>
     </>

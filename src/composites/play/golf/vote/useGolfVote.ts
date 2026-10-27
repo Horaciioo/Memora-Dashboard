@@ -3,14 +3,11 @@
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { playGolfSound } from '@/composites/play/golf/sound'
-import { holeRange } from '@/core/lib/play/golf'
-import type { GolfGameSettings } from '@/core/lib/play/golf'
+import { winningCard } from '@/core/lib/play/golf'
+import type { GolfGameSettings, GolfVoteState } from '@/core/lib/play/golf'
 import { preloadSounds } from '@/core/lib/play/sounds'
 import { GOLF_SOUNDS } from '@/declarations/play/golf/sounds'
-import { GOLF_VOTE_TIMING, GolfVoteSteps } from '@/declarations/play/golf/vote'
-import type { GolfVoteStep } from '@/declarations/play/golf/vote'
-import { GolfModes } from '@/utils/constants/play'
-import type { GolfModeName } from '@/utils/constants/play'
+import { GOLF_VOTE_TIMING, GolfVoteActions } from '@/declarations/play/golf/vote'
 
 // Sounds of the vote, fetched on open
 const VOTE_SOUNDS = [
@@ -21,47 +18,35 @@ const VOTE_SOUNDS = [
   GOLF_SOUNDS.voteSwitch,
 ]
 
-/**
- * Steps a format goes through
- * @param {GolfModeName} mode - Format
- * @return {GolfVoteStep[]} - Steps in order
- */
+export interface GolfVoteInput {
+  vote: GolfVoteState
+  settings: GolfGameSettings
+  viewerId: string
+  hostId: string
+  isHost: boolean
+  // Sends one action to the vote route
+  onSend: (payload: Record<string, unknown>) => void
+}
 
-const stepsOf = (mode: GolfModeName): GolfVoteStep[] =>
-  mode === GolfModes.Tournament
-    ? [GolfVoteSteps.Mode, GolfVoteSteps.Rounds, GolfVoteSteps.Course]
-    : [GolfVoteSteps.Mode, GolfVoteSteps.Course]
-
 /**
- * Vote after the rules: format, tournament length, course, each pick and move with its sound
- * @param {Object} input - Vote
- * @param {GolfGameSettings} input.settings - Rules chosen so far
- * @param {() => void} input.onBack - Leave toward the rules
- * @param {(settings: GolfGameSettings) => void} input.onConfirm - Final settings
- * @return {Object} - Step, picks and gestures
+ * Vote of the lobby: own pick shown at once, card most picked, gestures with their sounds
+ * @param {GolfVoteInput} input - Vote and sender
+ * @return {Object} - Picks, leading card and gestures
  */
 
 export const useGolfVote = ({
+  vote,
   settings,
-  onBack,
-  onConfirm,
-}: {
-  settings: GolfGameSettings
-  onBack: () => void
-  onConfirm: (settings: GolfGameSettings) => void
-}) => {
-  const [step, setStep] = useState<GolfVoteStep>(GolfVoteSteps.Mode)
-  const [isLeaving, setLeaving] = useState(false)
-  const [choice, setChoice] = useState({
-    mode: settings.mode,
-    maps: settings.maps,
-    course: settings.course,
-  })
+  viewerId,
+  hostId,
+  isHost,
+  onSend,
+}: GolfVoteInput) => {
+  // Own pick, shown before the server answers
+  const [mine, setMine] = useState<{ step: string; key: string } | null>(null)
   const timers = useRef<number[]>([])
-  const steps = stepsOf(choice.mode)
-  const later = useCallback((action: () => void, ms: number) => {
-    timers.current.push(window.setTimeout(action, ms))
-  }, [])
+  const picks = mine?.step === vote.step ? { ...vote.picks, [viewerId]: mine.key } : vote.picks
+  const leader = winningCard(vote.step, picks, hostId, settings)
 
   // Files ready, timers cleared on leave
   useEffect(() => {
@@ -71,53 +56,36 @@ export const useGolfVote = ({
     return () => pending.forEach((timer) => window.clearTimeout(timer))
   }, [])
 
-  // Cards leave, then the next step comes in
-  const go = (target: GolfVoteStep) => {
-    later(() => {
-      playGolfSound('voteSwitch')
-      setLeaving(true)
-    }, GOLF_VOTE_TIMING.confirm)
-    later(() => {
-      setStep(target)
-      setLeaving(false)
-    }, GOLF_VOTE_TIMING.confirm + GOLF_VOTE_TIMING.exit)
-  }
+  useEffect(() => playGolfSound('voteSwitch'), [vote.step])
 
-  const pick = (key: string) => {
-    if (isLeaving) return
-    playGolfSound('voteChoice')
-    // The avatar lands a moment later
-    later(() => playGolfSound('voteHop'), GOLF_VOTE_TIMING.land)
-    if (step === GolfVoteSteps.Mode)
-      setChoice((current) => ({ ...current, mode: key as GolfModeName }))
-    else if (step === GolfVoteSteps.Rounds)
-      setChoice((current) => ({ ...current, maps: Number(key) }))
-    else setChoice((current) => ({ ...current, course: key }))
-  }
+  const pick = useCallback(
+    (key: string) => {
+      playGolfSound('voteChoice')
+      // The avatar lands a moment later
+      timers.current.push(window.setTimeout(() => playGolfSound('voteHop'), GOLF_VOTE_TIMING.land))
+      setMine({ step: vote.step, key })
+      onSend({ action: GolfVoteActions.Pick, key })
+    },
+    [vote.step, onSend]
+  )
 
-  const confirm = () => {
-    if (isLeaving) return
+  const close = useCallback(
+    () => onSend({ action: GolfVoteActions.Close, step: vote.step }),
+    [vote.step, onSend]
+  )
+
+  const validate = () => {
     playGolfSound('voteConfirm')
-    const next = steps[steps.indexOf(step) + 1]
-    if (next) return go(next)
-    // Last step starts the game
-    onConfirm({
-      ...settings,
-      ...choice,
-      holes: Math.min(settings.holes, holeRange(choice.course).max),
-    })
+    close()
   }
 
   const back = () => {
-    if (isLeaving) return
     playGolfSound('voteBack')
-    const previous = steps[steps.indexOf(step) - 1]
-    if (previous) return go(previous)
-    onBack()
+    onSend({ action: GolfVoteActions.Cancel })
   }
 
-  // Escape goes back one step
-  const onEscape = useEffectEvent(back)
+  // Escape drops the vote, the host's call
+  const onEscape = useEffectEvent(() => isHost && back())
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => event.key === 'Escape' && onEscape()
     window.addEventListener('keydown', onKeyDown)
@@ -125,5 +93,5 @@ export const useGolfVote = ({
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  return { step, steps, choice, isLeaving, pick, confirm, back }
+  return { picks, leader, pick, close, validate, back }
 }

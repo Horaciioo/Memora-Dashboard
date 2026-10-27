@@ -6,7 +6,7 @@ import type { GolfHoleLayout } from '@/core/lib/play/golf/types'
  */
 
 export const TROPICAL_HOLES: GolfHoleLayout[] = [
-  // Pontoon in a crosswind
+  // Pontoon and a narrow bridge
   {
     tee: [0, 0],
     cup: [-15, 2.5],
@@ -15,7 +15,6 @@ export const TROPICAL_HOLES: GolfHoleLayout[] = [
       { at: [-12, -0.6], size: [6, 1.2], open: 'ns' },
       { at: [-17, -3], size: [5, 7] },
     ],
-    fans: [{ at: [-10, -0.6], size: [2, 1.2], push: [0, 1] }],
     bumpers: [{ at: [-14, 0.5], radius: 0.35 }],
     orbs: [[-3, 0]],
   },

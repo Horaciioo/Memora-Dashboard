@@ -184,7 +184,8 @@ const onMove = (context: PointerContext, event: PointerEvent): void => {
   if (!last) return
   if (context.mode === 'aim') pull(context, event)
   if (context.mode === 'turn') {
-    rig.yaw += (event.clientX - last.x) * camera.dragTurn
+    // The ground follows the finger
+    rig.yaw -= (event.clientX - last.x) * camera.dragTurn
     rig.pitch = clampPitch(rig.pitch + (event.clientY - last.y) * camera.dragPitch)
   }
   last.set(event.clientX, event.clientY)

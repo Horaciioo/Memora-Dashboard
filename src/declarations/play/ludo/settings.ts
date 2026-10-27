@@ -78,7 +78,6 @@ const RULES = {
     path: 'play/ludo.rules.forcedCapture',
     fallback: false,
   }),
-  barriers: readBoolean(rules.barriers, { path: 'play/ludo.rules.barriers', fallback: false }),
   safeSquares: readBoolean(rules.safeSquares, {
     path: 'play/ludo.rules.safeSquares',
     fallback: true,
@@ -134,7 +133,7 @@ export const LUDO_SETTINGS = {
     fallback: 1,
     min: 0,
   }),
-  stepMs: readInteger(ludo.stepMs, { path: 'play/ludo.stepMs', fallback: 170, min: 40 }),
+  stepMs: readInteger(ludo.stepMs, { path: 'play/ludo.stepMs', fallback: 280, min: 40 }),
   rollMs: readInteger(ludo.rollMs, { path: 'play/ludo.rollMs', fallback: 700, min: 100 }),
   shuffleMs: readInteger(ludo.shuffleMs, { path: 'play/ludo.shuffleMs', fallback: 80, min: 20 }),
   alertSeconds: readInteger(ludo.alertSeconds, {

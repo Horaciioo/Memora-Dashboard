@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import type { RefObject } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Vector3 } from 'three'
+import { MathUtils, Vector3 } from 'three'
 
 import { cameraSpot, clampDistance, clampPitch, overviewOf } from '@/composites/play/golf/scene/rig'
 import type { GolfRig } from '@/composites/play/golf/scene/rig'
@@ -49,7 +49,8 @@ export const GolfCameraRig = ({
   }, [map, origin])
   const overview = useMemo(() => overviewOf(hole), [hole])
   const tee = useMemo(() => new Vector3(hole.tee[0], 0, hole.tee[1]), [hole])
-  const spot = useRef(new Vector3())
+  // Share of the overview framing, eased so only the switch glides
+  const overviewMix = useRef(0)
 
   useFrame(({ camera: view }, delta) => {
     const rig = rigRef.current
@@ -70,9 +71,15 @@ export const GolfCameraRig = ({
     const focus = rig.isOverview ? overview.center : (followed ?? tee)
     const blend = 1 - Math.exp(-camera.follow * delta)
     rig.target.lerp(focus, blend)
-    const distance = rig.isOverview ? overview.reach * camera.overviewReach : rig.distance
-    const pitch = rig.isOverview ? camera.overviewPitch : rig.pitch
-    view.position.lerp(cameraSpot(rig.target, rig.yaw, distance, pitch, spot.current), blend)
+    overviewMix.current += ((rig.isOverview ? 1 : 0) - overviewMix.current) * blend
+    const distance = MathUtils.lerp(
+      rig.distance,
+      overview.reach * camera.overviewReach,
+      overviewMix.current
+    )
+    const pitch = MathUtils.lerp(rig.pitch, camera.overviewPitch, overviewMix.current)
+    // Turns and drags land on the very frame, only the followed point eases
+    cameraSpot(rig.target, rig.yaw, distance, pitch, view.position)
     view.lookAt(rig.target)
   })
 

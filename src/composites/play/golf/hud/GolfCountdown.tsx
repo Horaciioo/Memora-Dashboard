@@ -5,6 +5,7 @@ import { secondsTo } from '@/composites/play/baccalaureat/types'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
+import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GOLF_BOARD } from '@/declarations/ui/variants'
 
 /**
@@ -37,6 +38,7 @@ export const GolfCountdown = ({
     return (
       <PlayCountdown
         seconds={seconds}
+        total={GOLF_SETTINGS.countdownSeconds}
         lead={`${course} - ${title}`}
         figureClassName={GOLF_BOARD.figureCountdown}
       />

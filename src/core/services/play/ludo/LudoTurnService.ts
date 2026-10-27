@@ -4,7 +4,7 @@ import type { LudoGame, LudoMoveKind, LudoPlayer, Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { conflict, notFound } from '@/core/lib/errors'
-import { after } from '@/core/lib/play/clock'
+import { after, countdownEnd } from '@/core/lib/play/clock'
 import {
   autoMove,
   isBoardOver,
@@ -108,7 +108,7 @@ export const openBoard = async (session: EngineSession): Promise<EngineStep> => 
   const settings = ludoSettingsOf(session.settings)
   const order = session.players.toSorted(() => Math.random() - 0.5)
   const corners = LUDO_SEATING[order.length] ?? LUDO_SEATING[LUDO_SETTINGS.maxPlayers]
-  const startsAt = after(new Date(), LUDO_SETTINGS.countdownSeconds)
+  const startsAt = countdownEnd(new Date(), LUDO_SETTINGS.countdownSeconds)
   const turnEndsAt = after(startsAt, settings.turnSeconds)
 
   await prisma.$transaction([

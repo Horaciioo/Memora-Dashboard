@@ -4,8 +4,8 @@ import type { LudoMove } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { isBoardOver, legalMoves, ludoSettingsOf, progressOf } from '@/core/lib/play/ludo'
-import { LUDO_CORNERS } from '@/declarations/play/ludo/board'
-import { LUDO_CORNER_COPY, ludoPlaceLabel } from '@/declarations/play/ludo/copy'
+import { YARD_STEP } from '@/core/lib/play/ludo/track'
+import { ludoPlaceLabel } from '@/declarations/play/ludo/copy'
 import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import type { EngineSession } from '@/types/play'
 
@@ -15,24 +15,20 @@ const FEED_KINDS = ['CAPTURE', 'HOME', 'SKIP', 'PENALTY', 'FINISH'] as const
 /**
  * Feed line of a board line
  * @param {LudoMove} move - Line
- * @param {Map<string, number>} corners - Corner per player
  * @return {object} - Feed line
  */
 
-const feedLineOf = (move: LudoMove, corners: Map<string, number>) => {
-  const corner = LUDO_CORNERS[corners.get(move.victimId ?? '') ?? 0]
-
-  return {
-    id: move.id,
-    kind: move.kind,
-    accountId: move.accountId,
-    at: move.createdAt,
-    values: {
-      colour: LUDO_CORNER_COPY[corner].toLowerCase(),
-      place: move.to ? ludoPlaceLabel(move.to) : '',
-    },
-  }
-}
+const feedLineOf = (move: LudoMove) => ({
+  id: move.id,
+  // A move out of the yard is an exit
+  kind: move.kind === 'MOVE' ? 'EXIT' : move.kind,
+  accountId: move.accountId,
+  at: move.createdAt,
+  values: {
+    victimId: move.victimId ?? '',
+    place: move.to ? ludoPlaceLabel(move.to) : '',
+  },
+})
 
 /**
  * Board of a Ludo game
@@ -48,7 +44,13 @@ export const ludoView = async (session: EngineSession, viewerId: string) => {
     prisma.ludoGame.findUnique({ where }),
     prisma.ludoPlayer.findMany({ where, orderBy: { corner: 'asc' } }),
     prisma.ludoMove.findMany({ where, ...newest }),
-    prisma.ludoMove.findMany({ where: { ...where, kind: { in: [...FEED_KINDS] } }, ...newest }),
+    prisma.ludoMove.findMany({
+      where: {
+        ...where,
+        OR: [{ kind: { in: [...FEED_KINDS] } }, { kind: 'MOVE', from: { lte: YARD_STEP } }],
+      },
+      ...newest,
+    }),
   ])
   const settings = ludoSettingsOf(session.settings)
   const present = new Set(session.players)
@@ -56,7 +58,6 @@ export const ludoView = async (session: EngineSession, viewerId: string) => {
     .filter((seat) => present.has(seat.accountId))
     .map(({ accountId, corner, pawns }) => ({ accountId, corner, pawns }))
   const isMyTurn = table?.turnId === viewerId
-  const corners = new Map(seats.map((seat) => [seat.accountId, seat.corner]))
 
   return {
     settings,
@@ -92,7 +93,7 @@ export const ludoView = async (session: EngineSession, viewerId: string) => {
       to,
       victimId,
     })),
-    feed: feed.map((line) => feedLineOf(line, corners)),
+    feed: feed.map(feedLineOf),
     serverTime: new Date(),
   }
 }

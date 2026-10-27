@@ -15,6 +15,9 @@ export const LUDO_BOARD = {
   figure: 'play-figure text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
   status:
     'justify-self-center text-center text-sm font-extrabold text-[var(--play-ink)] [grid-area:status]',
+  // The viewer's turn: a solid plate, set apart from the board
+  statusCall:
+    'mt-5 rounded-2xl bg-[var(--play-ludo)] px-6 py-3 text-lg text-[var(--play-on-art)] shadow-[0_0.2rem_0_var(--play-ludo-deep)]',
   frame: 'ludo-frame w-full [grid-area:board] lg:w-[min(36rem,calc(100dvh-13rem))]',
   surface: 'ludo-board',
   grid: 'absolute inset-0 size-full',

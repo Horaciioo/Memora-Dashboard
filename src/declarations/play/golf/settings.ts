@@ -211,9 +211,9 @@ export const GOLF_SETTINGS = {
     ),
   },
   camera: readNumbers(golf.camera, 'play/golf.camera', {
-    distance: 5.6,
+    distance: 9.8,
     minDistance: 2.6,
-    maxDistance: 11,
+    maxDistance: 14,
     pitch: 1,
     minPitch: 0.3,
     maxPitch: 1.45,

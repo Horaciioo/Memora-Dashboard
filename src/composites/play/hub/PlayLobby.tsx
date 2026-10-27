@@ -4,7 +4,11 @@ import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { Avatar } from '@/components/elements/display/Avatar'
-import { PLAY_RULES_DRAWERS, PLAY_SETUP_DRAWERS } from '@/composites/play/registry'
+import {
+  PLAY_RULES_DRAWERS,
+  PLAY_SETUP_DRAWERS,
+  PLAY_START_VOTES,
+} from '@/composites/play/registry'
 import type { PlayRulesValue } from '@/composites/play/registry'
 import { PlayInviteSlot } from '@/composites/play/session/PlayInviteSlot'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
@@ -43,6 +47,8 @@ export interface PlayLobbyProps {
   me: { isSeated: boolean; isHost: boolean; isSpectator: boolean }
   game: PlayGameName
   rules: PlayRulesValue
+  // Server ms at the page render, clock of the vote
+  serverTime: number
 }
 
 /**
@@ -63,6 +69,7 @@ export const PlayLobby = ({
   me,
   game,
   rules,
+  serverTime,
 }: PlayLobbyProps) => {
   const moves = usePlayMoves()
   const [isRulesOpen, setRulesOpen] = useState(false)
@@ -77,6 +84,7 @@ export const PlayLobby = ({
   const isLobby = status === PlayStatuses.Lobby
   const Rules = PLAY_RULES_DRAWERS[game]
   const Setup = PLAY_SETUP_DRAWERS[game]
+  const Vote = PLAY_START_VOTES[game]
   // The host edits, the others read
   const canEdit = isLobby && me.isHost && Boolean(Setup)
   const closeRules = () => setRulesOpen(false)
@@ -101,13 +109,17 @@ export const PlayLobby = ({
                   seat.name
                 )}
               >
-                <Avatar name={seat.name} src={seat.avatarUrl} />
+                <Avatar name={seat.name} src={seat.avatarUrl} size="lg" />
                 <div className={PLAY_HUB.seatText}>
                   <p className={PLAY_HUB.seatName} style={{ color: `var(--play-${seat.color})` }}>
                     {seat.name}
                   </p>
                   <p className={PLAY_HUB.seatNote}>
-                    {seat.hasLeft ? PLAY_HUB_COPY.left : seat.isHost ? PLAY_HUB_COPY.host : ' '}
+                    {seat.hasLeft
+                      ? PLAY_HUB_COPY.left
+                      : seat.isHost
+                        ? PLAY_HUB_COPY.host
+                        : PLAY_HUB_COPY.player}
                   </p>
                 </div>
               </div>
@@ -124,7 +136,7 @@ export const PlayLobby = ({
               variant="arcadeHero"
               disabled={present.length < minPlayers}
               isLoading={moves.isSaving}
-              onClick={() => void moves.start(id)}
+              onClick={() => void (Vote ? moves.openVote(id) : moves.start(id))}
             >
               {PLAY_HUB_COPY.start}
             </Button>
@@ -174,12 +186,24 @@ export const PlayLobby = ({
         {!isLobby && me.isSpectator && <p className={PLAY_ROOM.note}>{PLAY_HUB_COPY.spectating}</p>}
       </section>
 
+      {isLobby && Vote && (
+        <Vote
+          sessionId={id}
+          settings={rules.settings}
+          serverTime={serverTime}
+          viewerId={viewerId}
+          hostId={seats.find((seat) => seat.isHost)?.accountId ?? ''}
+          faces={Object.fromEntries(
+            seats.map(({ accountId, name, avatarUrl }) => [accountId, { name, avatarUrl }])
+          )}
+        />
+      )}
+
       {canEdit && Setup && isRulesOpen ? (
         <Setup
           open
           isSaving={moves.isSaving}
           current={rules}
-          player={seats.find((seat) => seat.accountId === viewerId)}
           onClose={closeRules}
           onSubmit={(setup) =>
             void moves.rules(id, setup).then((isSaved) => isSaved && closeRules())

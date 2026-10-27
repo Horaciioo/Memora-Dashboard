@@ -32,6 +32,10 @@ export const GOLF_BOARD_COPY = {
   switchOn: 'Oui',
   ranking: 'Classement',
   closeStats: 'Fermer',
+  fullscreen: 'Plein écran',
+  windowed: 'Quitter le plein écran',
+  showChat: 'Afficher le chat',
+  hideChat: 'Masquer le chat',
   collapse: 'Réduire la carte',
   expand: 'Déplier la carte',
   holeColumn: 'Trou',
@@ -101,7 +105,6 @@ export const GOLF_SETUP_COPY = {
   randomHint: 'Un parcours tiré au hasard à chaque lancement, revanche comprise.',
   holes: 'Nombre de trous',
   holesHint: 'En Tournoi, chaque parcours compte six trous.',
-  next: 'Choisir le format',
   holeSeconds: 'Temps par trou',
   holeSecondsHint:
     'Quand le temps est écoulé, ceux qui n’ont pas fini prennent le maximum de coups.',

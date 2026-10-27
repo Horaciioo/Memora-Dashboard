@@ -9,6 +9,9 @@ import { formatClock } from '@/utils/format/modview'
 // Preposition left out of the coloured verb
 const TRAILING_WORD = /\s+(sur|de|à)\s*$/
 
+// Verb marked with stars in a template
+const MARKED_VERB = /\*([^*]+)\*/
+
 /**
  * One line of a game feed
  * @typedef {Object} PlayFeedLine
@@ -21,6 +24,16 @@ export interface PlayFeedLine {
   at: Date | string
   values: Record<string, number | string>
 }
+
+/**
+ * Name of a player, empty when unknown
+ * @param {PlayFace[]} players - Faces by account
+ * @param {number | string | undefined} id - Account
+ * @return {string} - Name
+ */
+
+const nameOf = (players: PlayFace[], id: number | string | undefined): string =>
+  players.find((player) => player.id === id)?.name ?? ''
 
 /**
  * What happened in the game, newest first
@@ -49,7 +62,10 @@ export const PlaySessionFeed = ({
       <ol className={BAC_SESSION.feed}>
         {feed.map((entry) => {
           const face = players.find((player) => player.id === entry.accountId)
-          const line = fillPlayMessage(copy[entry.kind], entry.values)
+          const values = { ...entry.values, victim: nameOf(players, entry.values.victimId) }
+          const marked = MARKED_VERB.exec(copy[entry.kind])
+          const [before, after] = copy[entry.kind].split(MARKED_VERB).filter((_, i) => i !== 1)
+          const line = fillPlayMessage(copy[entry.kind].replace(MARKED_VERB, '$1'), values)
           const head = copy[entry.kind].split('{')[0].replace(TRAILING_WORD, '')
           const verb = face && PLAY_FEED_VERBS[entry.kind] && line.startsWith(head)
 
@@ -64,7 +80,15 @@ export const PlaySessionFeed = ({
               )}
               <span className={BAC_SESSION.feedText}>
                 {face && <span className={BAC_SESSION.feedName}>{face.name} </span>}
-                {verb ? (
+                {face && marked ? (
+                  <>
+                    {fillPlayMessage(before, values)}
+                    <span className={cn('font-bold', PLAY_FEED_VERBS[entry.kind])}>
+                      {marked[1]}
+                    </span>
+                    {fillPlayMessage(after, values)}
+                  </>
+                ) : verb ? (
                   <>
                     <span className={cn('font-bold', PLAY_FEED_VERBS[entry.kind])}>{head}</span>
                     {line.slice(head.length)}

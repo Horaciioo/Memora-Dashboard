@@ -16,7 +16,7 @@ import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
 import { BaccalaureatPhases } from '@/core/lib/play/baccalaureat/phase'
-import { BAC_BOARD_COPY, fillPlayMessage } from '@/declarations/play'
+import { BAC_BOARD_COPY, BACCALAUREAT_SETTINGS, fillPlayMessage } from '@/declarations/play'
 import { BAC_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -113,6 +113,7 @@ export const BaccalaureatBoard = ({
         {header}
         <PlayCountdown
           seconds={left ?? 0}
+          total={BACCALAUREAT_SETTINGS.countdownSeconds}
           lead={BAC_BOARD_COPY.getReady}
           className={BAC_BOARD.inline}
         >

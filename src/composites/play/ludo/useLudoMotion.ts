@@ -205,7 +205,6 @@ const playLine = async ({
     playLudoTake('roll', LUDO_MIX.roll)
     await wait(rollMs)
     setMotion((current) => ({ ...current, isRolling: false }))
-    if (line.dice === 6) playLudoSound('six')
     const isStuck = next ? !['MOVE', 'PENALTY'].includes(next.kind) : board.dice === null
     if (isStuck) playLudoSound('blocked')
     return
@@ -220,7 +219,6 @@ const playLine = async ({
         ...current,
         hop: { accountId: line.accountId, pawn, key: line.rev },
       }))
-      playLudoSound('exit')
       await wait(stepMs * BEATS.exit)
     } else {
       for (let step = from + 1; step <= to; step += 1) {
@@ -230,7 +228,6 @@ const playLine = async ({
           hop: { accountId: line.accountId, pawn, key: step },
           walking: step < to ? { accountId: line.accountId, pawn } : null,
         }))
-        playLudoTake('step', LUDO_MIX.step)
         await wait(stepMs)
       }
     }
@@ -241,8 +238,6 @@ const playLine = async ({
       SAFE_SQUARES.has(squareOf(corner, to))
     )
       playLudoSound('star')
-    else if (board.settings.rules.barriers && isPaired(board, line.accountId, to))
-      playLudoSound('barrier')
     return
   }
 
@@ -266,17 +261,3 @@ const playLine = async ({
     await wait(stepMs * BEATS.penalty)
   }
 }
-
-/**
- * Two pawns of a colour on one square
- * @param {LudoBoardState} board - Board
- * @param {string} accountId - Colour
- * @param {number} step - Square step
- * @return {boolean} - Wall formed
- */
-
-const isPaired = (board: LudoBoardState, accountId: string, step: number): boolean =>
-  isOnTrack(step) &&
-  (board.players.find((player) => player.accountId === accountId)?.pawns ?? []).filter(
-    (other) => other === step
-  ).length > 1

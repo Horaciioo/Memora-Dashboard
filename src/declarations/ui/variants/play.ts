@@ -168,16 +168,16 @@ export const PLAY_HUB = {
   leaderTabOn: 'bg-[var(--play-panel-strong)] text-[var(--play-ink)] shadow-[var(--shadow-sm)]',
   // Lobby
   seats: 'grid gap-3 sm:grid-cols-2',
-  seat: `${PANEL} flex h-16 items-center gap-3 px-3`,
+  seat: `${PANEL} flex h-20 items-center gap-4 px-4`,
   // Empty seat inviting, dashed
   inviteSlot:
-    'flex h-16 w-full items-center gap-3 rounded-2xl border-2 border-dashed border-[var(--play-line)] px-3 text-left text-[var(--play-ink-soft)] transition-colors hover:border-[var(--play-ink-faint)] hover:text-[var(--play-ink)]',
+    'flex h-20 w-full items-center gap-4 rounded-2xl border-2 border-dashed border-[var(--play-line)] px-4 text-left text-[var(--play-ink-soft)] transition-colors hover:border-[var(--play-ink-faint)] hover:text-[var(--play-ink)]',
   inviteSlotIcon:
-    'grid size-10 shrink-0 place-items-center rounded-full bg-[var(--play-chip)] text-[var(--play-ink-soft)]',
+    'grid size-14 shrink-0 place-items-center rounded-full bg-[var(--play-chip)] text-[var(--play-ink-soft)]',
   rowLogo: 'size-10',
   seatOff: 'opacity-50',
-  seatName: 'truncate text-sm font-extrabold',
-  seatNote: NOTE,
+  seatName: 'truncate text-base font-extrabold',
+  seatNote: 'text-xs font-extrabold tracking-wider text-[var(--play-ink-faint)] uppercase',
   seatText: 'min-w-0',
   actions: 'flex flex-wrap items-center gap-3',
 } as const
@@ -193,40 +193,45 @@ export const PLAY_STATS = {
   playerFrame: '@container',
   section: 'flex flex-col gap-3',
   heading: HEADING,
-  player: `${PANEL} ${LIFT} flex flex-col items-center gap-5 rounded-[2rem] p-5 text-center @md:flex-row @md:text-left sm:p-6`,
+  player: `${PANEL} ${LIFT} flex flex-col items-center gap-6 rounded-[2rem] p-6 text-center @md:flex-row @md:text-left sm:p-8`,
   face: 'relative flex shrink-0',
   faceLevel:
     'absolute -right-1 -bottom-1 flex h-9 min-w-9 items-center justify-center rounded-full bg-[var(--play-gold)] px-1.5 text-sm font-extrabold tabular-nums text-[var(--play-night)] ring-4 ring-[var(--play-panel-strong)]',
   playerText: 'flex min-w-0 flex-1 flex-col gap-2.5',
   playerHead: 'flex flex-wrap items-center justify-center gap-2 @md:justify-start',
-  playerName: 'mr-1 text-2xl font-extrabold tracking-tight',
-  tier: 'inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-extrabold tracking-wider text-[var(--play-night)] uppercase',
-  chip: 'rounded-full bg-[var(--play-chip)] px-2.5 py-1 text-xs font-extrabold tabular-nums',
-  bar: 'block h-3 w-full overflow-hidden rounded-full bg-[var(--play-track)]',
+  playerName: 'mr-1 text-3xl font-extrabold tracking-tight',
+  tier: 'inline-flex w-fit items-center rounded-lg px-3 py-1 text-xs font-extrabold tracking-wider text-[var(--play-night)] uppercase',
+  chip: 'rounded-lg bg-[var(--play-chip)] px-2.5 py-1 text-xs font-extrabold tabular-nums',
+  bar: 'block h-4 w-full overflow-hidden rounded-full bg-[var(--play-track)]',
   barThin: 'block h-2 w-full overflow-hidden rounded-full bg-[var(--play-track)]',
-  barFill: 'block h-full rounded-full bg-linear-to-r from-[var(--play-key)] to-[var(--play-gold)]',
+  barFill: 'block h-full rounded-full bg-[var(--play-gold)]',
   caption: NOTE,
   tiles: 'grid grid-cols-2 gap-3 sm:grid-cols-3',
-  tile: `${PANEL} flex flex-col gap-1 p-4`,
+  tile: `${PANEL} flex items-center gap-4 p-4`,
+  tileIcon:
+    'grid size-12 shrink-0 place-items-center rounded-xl bg-[var(--play-chip)] text-[var(--play-gold-ink)]',
+  tileText: 'flex min-w-0 flex-col gap-0.5',
   tileValue: 'text-2xl font-extrabold tabular-nums',
   tileLabel: 'text-xs font-bold tracking-wide text-[var(--play-ink-faint)] uppercase',
   games: 'grid gap-3 sm:grid-cols-2',
-  game: `${PANEL} flex items-center gap-3 p-3`,
-  gameLogo: 'size-12',
+  // Panel tinted by its game
+  game: 'flex items-center gap-4 rounded-2xl bg-[color-mix(in_srgb,var(--game)_26%,var(--play-panel))] p-4 ring-1 ring-[var(--play-line)] backdrop-blur-xl',
+  gameLogo: 'size-14',
   gameText: 'flex min-w-0 flex-1 flex-col gap-1.5',
   gameHead: 'flex items-baseline justify-between gap-2',
-  gameName: 'truncate font-extrabold',
+  gameName: 'truncate text-lg font-extrabold',
   gameLevel: 'text-sm font-extrabold tabular-nums text-[var(--play-accent)]',
   trophies: 'grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3',
-  trophy: `${PANEL} flex items-center gap-3 p-3`,
-  trophyOn: 'bg-linear-to-br from-[var(--play-gold)]/25 to-transparent ring-[var(--play-gold)]/60',
+  trophy: `${PANEL} flex items-center gap-4 p-4`,
+  trophyOn:
+    'bg-[color-mix(in_srgb,var(--play-gold)_16%,var(--play-panel))] ring-[var(--play-gold)]/60',
   trophyIcon:
-    'grid size-11 shrink-0 place-items-center rounded-xl bg-[var(--play-chip)] text-[var(--play-ink-faint)]',
+    'grid size-14 shrink-0 place-items-center rounded-full bg-[var(--play-chip)] text-[var(--play-ink-faint)]',
   trophyIconOn:
     'bg-[var(--play-gold)] text-[var(--play-night)] shadow-[0_0.2rem_0_var(--play-gold-deep)]',
-  glyph: 'size-5',
+  glyph: 'size-6',
   trophyText: 'flex min-w-0 flex-1 flex-col gap-1',
-  trophyName: 'truncate text-sm font-extrabold',
+  trophyName: 'truncate text-base font-extrabold',
   trophyGoal: 'truncate text-xs text-[var(--play-ink-soft)]',
 } as const
 
@@ -293,8 +298,11 @@ export const PLAY_NOTICE = {
  */
 
 export const PLAY_CROSS = {
-  stage: 'flex min-h-[calc(100dvh-14rem)] items-center justify-center',
-  cross: 'mx-auto grid w-full max-w-7xl gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6',
+  stage: 'flex min-h-[calc(100dvh-11rem)] flex-col items-center justify-center gap-8',
+  heading: `${HEADING} text-center sm:text-3xl`,
+  // Posters as tall as the screen leaves room for
+  cross:
+    'mx-auto grid w-full gap-5 sm:grid-cols-2 lg:max-w-[min(100%,calc((100dvh-19rem)*3/4*4+4.5rem))] lg:grid-cols-4 lg:gap-6',
   card: '',
 } as const
 
@@ -357,9 +365,9 @@ export const PLAY_ROOM = {
   game: NOTE,
   back: 'inline-flex shrink-0 items-center gap-1.5 text-xs font-extrabold tracking-wider text-[var(--play-ink-soft)] uppercase hover:text-[var(--play-ink)]',
   // Players and gestures, centred
-  middle: 'mx-auto flex w-full max-w-xl flex-col items-center gap-6',
+  middle: 'mx-auto flex w-full max-w-2xl flex-col items-center gap-6',
   playersTitle: `${HEADING} text-center`,
-  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-5 p-5`,
+  box: `${PANEL} ${LIFT} flex w-full flex-col items-center gap-6 rounded-[2rem] p-6 sm:p-8`,
   seatsBox: 'h-[17.5rem] w-full overflow-y-auto p-1',
   actions: 'flex w-full max-w-sm flex-col gap-4',
   divider: 'h-px w-full bg-[var(--play-line)]',
@@ -515,7 +523,7 @@ export const BOMB_BOARD = {
   letterOn:
     'bg-[var(--play-bomb)] text-[var(--play-on-art)] shadow-[0_0.15rem_0_var(--play-bomb-deep)]',
   // Clear of the dock at the bottom
-  stage: 'flex min-w-0 flex-col items-center gap-4 pb-16',
+  stage: 'flex min-w-0 flex-col items-center gap-4 pb-16 in-[.play-boxfull]:pb-0',
   // Square table, seats on an orbit
   table: 'play-bomb-table relative aspect-square w-full max-w-[min(34rem,60dvh)]',
   center: 'absolute top-1/2 left-1/2 w-[44%] -translate-x-1/2 -translate-y-1/2',
@@ -584,7 +592,10 @@ export const BAC_SESSION = {
   page: 'relative w-full pb-6 transition-[padding] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
   pageOpen: 'lg:pr-[calc(var(--play-side-open)+1.5rem)]',
   pageFolded: 'lg:pr-[calc(var(--play-side-folded)+1.5rem)]',
+  // Table alone on the screen, the side column slides over it from the right
+  pageFull: 'play-room fixed inset-0 z-50 overflow-hidden p-0',
   main: 'flex min-w-0 flex-col gap-4',
+  mainFull: 'h-full gap-0',
   // Way out on the left, game identity on the right
   top: 'flex items-center justify-between gap-3',
   exits: 'flex flex-wrap items-center gap-2',
@@ -594,11 +605,27 @@ export const BAC_SESSION = {
   titles: 'flex min-w-0 flex-col items-end',
   title: 'truncate text-lg font-extrabold tracking-tight text-[var(--play-ink)]',
   logo: 'size-14',
+  // Full screen table scrolls when taller than the screen
+  boxFull: 'play-boxfull flex min-h-0 flex-1 flex-col overflow-y-auto',
+  // Same panel as the page so the ink stays readable, content centred as one group, dock margin dropped
+  boxFullPad: `${PANEL} ${LIFT} m-4 gap-5 p-5 sm:m-6 sm:p-6 *:first:mt-auto *:last:mb-auto *:pb-0!`,
+  // Stage keys: in the top bar, then floating over the table, shifted by the open chat
+  keys: 'flex items-center gap-2',
+  keysFull:
+    'fixed top-3 right-3 z-50 transition-[right] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  keysShifted: 'right-[calc(min(var(--play-side-open),100vw)+0.75rem)]',
+  keysIcon: 'size-5',
+  keyButton: 'px-3! py-2!',
   box: `${PANEL} ${LIFT} flex flex-col gap-5 p-5 sm:p-6`,
   // Column flush against the right edge, under the shell bar
   side: 'mt-4 flex min-w-0 flex-col gap-3 lg:fixed lg:top-[var(--play-bar-h)] lg:right-0 lg:bottom-0 lg:z-40 lg:mt-0 lg:pb-28',
   sideOpen: 'lg:w-[var(--play-side-open)]',
   sideFolded: 'lg:w-[var(--play-side-folded)]',
+  // Full screen: flush right over the table, slides in and out
+  sideFull:
+    'fixed top-0 right-0 bottom-0 z-40 mt-0 w-[min(var(--play-side-open),100vw)] pb-6 transition-transform duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  sideShown: 'translate-x-0',
+  sideHidden: 'pointer-events-none translate-x-full',
   // Crowd window: players, then spectators when there are some
   crowd: `${PANEL} ${LIFT} flex shrink-0 flex-col gap-3 p-4 lg:rounded-r-none`,
   group: 'flex min-w-0 flex-col gap-2',
@@ -734,4 +761,10 @@ export const PLAY_FEED_VERBS: Record<string, string> = {
   ACE: 'text-[var(--play-gold-ink)]',
   POWER: 'text-[var(--play-blue-ink)]',
   FALL: 'text-[var(--play-heart)]',
+  CAPTURE: 'text-[var(--play-heart)]',
+  EXIT: 'text-[var(--play-blue-ink)]',
+  HOME: 'text-[var(--play-gold-ink)]',
+  SKIP: 'text-[var(--play-blue-ink)]',
+  PENALTY: 'text-[var(--play-heart)]',
+  FINISH: 'text-[var(--play-gold-ink)]',
 }

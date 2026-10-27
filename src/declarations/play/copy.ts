@@ -19,6 +19,7 @@ export const PLAY_ERRORS = {
   tooFewPlayers: 'Il manque des joueurs pour lancer la partie.',
   selfKick: 'Utilise « Quitter » pour sortir toi-même.',
   unknownAction: 'Action inconnue.',
+  noVote: 'Aucun vote en cours.',
   invalidSettings: 'Réglages invalides.',
   categoryCount: 'Choisis entre {min} et {max} catégories.',
   customCount: 'Tu peux ajouter {max} catégories personnalisées au plus.',

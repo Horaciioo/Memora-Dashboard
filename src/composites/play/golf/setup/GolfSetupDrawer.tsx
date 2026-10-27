@@ -3,7 +3,6 @@
 import { useState } from 'react'
 
 import { GolfPowerPicker } from '@/composites/play/golf/setup/GolfPowerPicker'
-import { GolfVote } from '@/composites/play/golf/vote/GolfVote'
 import type { PlaySetupProps } from '@/composites/play/registry'
 import { PlaySetupDrawer } from '@/composites/play/setup/PlaySetupDrawer'
 import { SetupChips, SetupSection, SetupStepper } from '@/composites/play/setup/PlaySetupFields'
@@ -41,19 +40,12 @@ const CEILINGS = [
 ]
 
 /**
- * Rules and powers of a golf game, then the vote for its format and course
+ * Rules and powers of a golf game, format and course are voted at launch
  * @param {PlaySetupProps} props - Drawer state and handlers
  * @return {JSX.Element}
  */
 
-export const GolfSetupDrawer = ({
-  open,
-  isSaving,
-  onClose,
-  onSubmit,
-  current,
-  player,
-}: PlaySetupProps) => {
+export const GolfSetupDrawer = ({ open, isSaving, onClose, onSubmit, current }: PlaySetupProps) => {
   const [settings, setSettings] = useState<GolfGameSettings>(() =>
     golfSettingsOf(current?.settings ?? null)
   )
@@ -62,11 +54,6 @@ export const GolfSetupDrawer = ({
     (value: GolfGameSettings[K]) =>
       setSettings((current) => ({ ...current, [key]: value }))
   const steps = { less: GOLF_SETUP_COPY.less, more: GOLF_SETUP_COPY.more }
-  const [isVoting, setVoting] = useState(false)
-  const close = () => {
-    setVoting(false)
-    onClose()
-  }
 
   return (
     <>
@@ -75,11 +62,10 @@ export const GolfSetupDrawer = ({
         isSaving={isSaving}
         isEditing={Boolean(current)}
         canSubmit
-        submitLabel={GOLF_SETUP_COPY.next}
         copy={GOLF_SETUP_COPY}
         tabs={TABS}
-        onClose={close}
-        onSubmit={() => setVoting(true)}
+        onClose={onClose}
+        onSubmit={() => onSubmit({ settings })}
       >
         {(tab) => (
           <div className={GOLF_SETUP.body}>
@@ -192,16 +178,6 @@ export const GolfSetupDrawer = ({
           </div>
         )}
       </PlaySetupDrawer>
-      {open && isVoting && (
-        <GolfVote
-          settings={settings}
-          player={player}
-          isSaving={isSaving}
-          isEditing={Boolean(current)}
-          onBack={() => setVoting(false)}
-          onConfirm={(final) => onSubmit({ settings: final })}
-        />
-      )}
     </>
   )
 }

@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
+import { GolfVoteAvatar } from '@/composites/play/golf/vote/GolfVoteAvatar'
+import type { GolfVoter } from '@/composites/play/golf/vote/GolfVoteAvatar'
 import { GOLF_VOTE } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -19,25 +20,17 @@ export interface GolfVoteCard {
   face: ReactNode
 }
 
-export interface GolfVotePlayer {
-  name: string
-  avatarUrl: string | null
-}
-
 export interface GolfVoteDeckProps {
   cards: GolfVoteCard[]
   value: string
-  player?: GolfVotePlayer
-  // Cards on their way out
-  isLeaving: boolean
+  voters: GolfVoter[]
   // White frame on the picture, name on a green strip
   isCourse?: boolean
   onPick: (key: string) => void
-  onConfirm: () => void
 }
 
 /**
- * Row of cards on a dark band, the player's avatar hopping onto the picked one
+ * Row of cards on a dark band, each voter's avatar hopping onto the card picked, the leading card framed
  * @param {GolfVoteDeckProps} props - Cards and picks
  * @return {JSX.Element}
  */
@@ -45,30 +38,37 @@ export interface GolfVoteDeckProps {
 export const GolfVoteDeck = ({
   cards,
   value,
-  player,
-  isLeaving,
+  voters,
   isCourse = false,
   onPick,
-  onConfirm,
 }: GolfVoteDeckProps) => {
-  const index = Math.max(
-    0,
-    cards.findIndex((card) => card.key === value)
+  const positions = Object.fromEntries(
+    voters.map((voter) => [voter.id, cards.findIndex((card) => card.key === voter.key)])
   )
-  // Cards between the old pick and the new one
-  const [seen, setSeen] = useState(index)
-  const [hops, setHops] = useState(0)
-  if (seen !== index) {
-    setSeen(index)
-    setHops(seen - index)
+  // Cards crossed by each voter since the last pick
+  const [seen, setSeen] = useState(positions)
+  const [hops, setHops] = useState<Record<string, number>>({})
+  const moved = voters.filter((voter) => seen[voter.id] !== positions[voter.id])
+  if (moved.length) {
+    setSeen(positions)
+    setHops((known) => ({
+      ...known,
+      ...Object.fromEntries(
+        moved.map((voter) => [
+          voter.id,
+          (seen[voter.id] ?? positions[voter.id]) - positions[voter.id],
+        ])
+      ),
+    }))
   }
 
   return (
     <div className={GOLF_VOTE.deck}>
       <span className={GOLF_VOTE.band} />
-      <div className={cn(GOLF_VOTE.row, isLeaving && 'golf-vote-leave')} role="radiogroup">
+      <div className={GOLF_VOTE.row} role="radiogroup">
         {cards.map((card, position) => {
           const isOn = card.key === value
+          const here = voters.filter((voter) => voter.key === card.key)
 
           return (
             <button
@@ -80,22 +80,13 @@ export const GolfVoteDeck = ({
               className={GOLF_VOTE.card}
               data-picked={isOn}
               style={{ '--i': position } as CSSProperties}
-              onClick={() => (isOn ? onConfirm() : onPick(card.key))}
+              onClick={() => onPick(card.key)}
             >
-              {isOn && player && (
+              {here.length > 0 && (
                 <span className={GOLF_VOTE.avatarBox}>
-                  <span className="golf-vote-slide" style={{ '--hops': hops } as CSSProperties}>
-                    <span className="golf-vote-arc">
-                      <span className="golf-vote-float block">
-                        <Avatar
-                          name={player.name}
-                          src={player.avatarUrl}
-                          size="lg"
-                          className={GOLF_VOTE.avatarRing}
-                        />
-                      </span>
-                    </span>
-                  </span>
+                  {here.map((voter) => (
+                    <GolfVoteAvatar key={voter.id} voter={voter} hops={hops[voter.id] ?? 0} />
+                  ))}
                 </span>
               )}
               <span

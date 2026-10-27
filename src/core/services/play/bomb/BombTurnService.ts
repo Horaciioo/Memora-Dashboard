@@ -17,7 +17,7 @@ import {
 import type { BombGameSettings } from '@/core/lib/play/bomb'
 import { drawPrompt } from '@/core/lib/play/bomb/prompts'
 import { normalizeWord } from '@/core/lib/play/baccalaureat/words'
-import { after } from '@/core/lib/play/clock'
+import { after, countdownEnd } from '@/core/lib/play/clock'
 import { frenchWords } from '@/core/lib/play/dictionary'
 import { IDLE_STEP } from '@/core/engines/play/steps'
 import { holdSession } from '@/core/services/play/PlaySessionService'
@@ -78,7 +78,7 @@ const withTable = (
 export const openTable = async (session: EngineSession): Promise<EngineStep> => {
   const settings = bombSettingsOf(session.settings)
   const prompt = await drawPrompt(wordsNeeded(settings))
-  const startsAt = after(new Date(), BOMB_SETTINGS.countdownSeconds)
+  const startsAt = countdownEnd(new Date(), BOMB_SETTINGS.countdownSeconds)
   const explodesAt = after(startsAt, fuseSeconds(BOMB_SETTINGS.fuseSeconds))
 
   // Random seating around the bomb
