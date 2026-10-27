@@ -413,6 +413,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Correction d’un bug qui faisait vibrer un bumper du « Golf » après la fin de son rebond.',
       },
       {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui empêchait de quitter le plein écran sur le podium du « Golf ».',
+      },
+      {
         tag: ChangelogTags.Added,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
