@@ -1,5 +1,6 @@
 import { padUnder } from '@/core/lib/play/golf/terrain'
 import type { GolfHole } from '@/core/lib/play/golf/types'
+import { GOLF_POWERS } from '@/declarations/play/golf/powers'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GolfPhases, GolfPowers, GolfSurfaces } from '@/utils/constants/play'
 import type { GolfPhaseName, GolfPowerName } from '@/utils/constants/play'
@@ -56,6 +57,16 @@ export const isHoleDone = (
 ): boolean => Boolean(player.holedAt) || player.strokes >= maxStrokes
 
 /**
+ * Power playable from the hand, a finished player keeps the malus
+ * @param {GolfPowerName} power - Power
+ * @param {boolean} isDone - Hole finished
+ * @return {boolean} - Playable
+ */
+
+export const canPlayPower = (power: GolfPowerName, isDone: boolean): boolean =>
+  !isDone || !GOLF_POWERS.get(power).isBonus
+
+/**
  * Strokes written on the card
  * @param {{ holedAt: Date | string | null, strokes: number }} player - Player
  * @param {number} maxStrokes - Stroke ceiling
@@ -99,11 +110,12 @@ export const canPlaceAt = (hole: GolfHole, x: number, z: number): boolean => {
  * Hand after a pickup, nothing taken once full
  * @param {string[]} hand - Powers in hand
  * @param {string} power - Power picked
+ * @param {number} [size] - Hand size
  * @return {string[]} - Hand
  */
 
-export const addToHand = (hand: string[], power: string): string[] =>
-  hand.length >= GOLF_SETTINGS.hand ? hand : [...hand, power]
+export const addToHand = (hand: string[], power: string, size = GOLF_SETTINGS.hand): string[] =>
+  hand.length >= size ? hand : [...hand, power]
 
 /**
  * Free spot near a ball on its slab, for a push at random

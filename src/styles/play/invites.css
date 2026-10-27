@@ -1,0 +1,72 @@
+/* Invitation popups, arcade night in the game colour */
+.play-invite {
+  background:
+    radial-gradient(
+      22rem 12rem at 0% 0%,
+      color-mix(in srgb, var(--play-key) 42%, transparent),
+      transparent 70%
+    ),
+    var(--play-night);
+  color: var(--play-ink);
+  box-shadow:
+    0 0 0 1px var(--play-line),
+    0 1.2rem 2.6rem rgb(0 0 0 / 0.38);
+}
+
+/* Springs out of its anchor */
+.play-invite-pop {
+  animation: play-invite-pop 0.42s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  transform-origin: var(--origin, 50% 100%);
+}
+
+@keyframes play-invite-pop {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem) scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Tail pointing at the bell */
+.play-invite-tail {
+  position: absolute;
+  left: var(--tail);
+  width: 1rem;
+  height: 1rem;
+  translate: -50% 0;
+  rotate: 45deg;
+  background: var(--play-night);
+  box-shadow: 1px 1px 0 var(--play-line);
+}
+
+/* Logo nudging for attention */
+.play-invite-logo {
+  animation: play-invite-wiggle 2.4s ease-in-out 0.5s infinite;
+}
+
+@keyframes play-invite-wiggle {
+  0%,
+  80%,
+  100% {
+    rotate: 0deg;
+  }
+  85% {
+    rotate: -8deg;
+  }
+  90% {
+    rotate: 7deg;
+  }
+  95% {
+    rotate: -4deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-invite-pop,
+  .play-invite-logo {
+    animation: none;
+  }
+}

@@ -8,7 +8,7 @@ import { PlaySignal } from '@/composites/play/hub/PlaySignal'
 import { PlayChatBubble } from '@/composites/play/session/PlayChatBubble'
 import { PlaySessionRoom } from '@/composites/play/session/PlaySessionRoom'
 import { PLAY_SESSION_TABLES } from '@/composites/play/session/sessionTables'
-import { API_ROUTES } from '@/core/lib/api/routes'
+import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { inviteCandidates, listMessages, listSpectators, readSession } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { ROUTES } from '@/declarations/navigation'
@@ -73,11 +73,18 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
   // Started game with its own table
   const drawTable = PLAY_SESSION_TABLES[game.game]
   if (!isLobby && game.board !== null && drawTable) {
-    const faceOf = ({ accountId, name, avatarUrl, color }: (typeof game.seats)[number]) => ({
+    const faceOf = ({
+      accountId,
+      name,
+      avatarUrl,
+      color,
+      isHost,
+    }: (typeof game.seats)[number]) => ({
       id: accountId,
       name,
       avatarUrl,
       color,
+      isHost,
     })
     const players = game.seats.filter((seat) => !seat.hasLeft).map(faceOf)
     const spectators = (
@@ -102,7 +109,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
 
     return (
       <div className={meta.ground ?? undefined} style={playKeysOf(game.game)}>
-        <PlaySignal url={API_ROUTES.playSessionStream(id)} />
+        <PlaySignal topic={PLAY_TOPICS.session(id)} />
         <PlaySessionRoom
           game={game.game}
           gameLabel={meta.label}
@@ -123,7 +130,7 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
 
   return (
     <div className={meta.ground ?? undefined} style={playKeysOf(game.game)}>
-      <PlaySignal url={API_ROUTES.playSessionStream(id)} />
+      <PlaySignal topic={PLAY_TOPICS.session(id)} />
 
       <div className={BAC_SESSION.page}>
         <div className={PLAY_ROOM.main}>

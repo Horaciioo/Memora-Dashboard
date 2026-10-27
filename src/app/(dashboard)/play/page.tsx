@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { PlayCallouts } from '@/composites/play/hub/PlayCallouts'
 import { PlayGameGrid } from '@/composites/play/hub/PlayGameGrid'
 import { PlaySignal } from '@/composites/play/hub/PlaySignal'
-import { API_ROUTES } from '@/core/lib/api/routes'
+import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { readCatalog, readPlayProfile } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { PLAY_HUB_COPY } from '@/declarations/play'
@@ -24,7 +24,7 @@ export default async function PlayPage() {
 
   return (
     <>
-      <PlaySignal url={API_ROUTES.playSessionsStream} />
+      <PlaySignal topic={PLAY_TOPICS.lobbies} />
       <PlayCallouts isBanned={Boolean(profile.ban)} />
 
       <section className={PLAY_CROSS.stage} aria-label={PLAY_HUB_COPY.sectionGames}>

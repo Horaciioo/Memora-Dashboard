@@ -107,10 +107,11 @@ export const isEveryoneDone = (table: GolfTable): boolean =>
  * Ball the player may hit now
  * @param {GolfTable} table - Locked course
  * @param {string} accountId - Player
+ * @param {boolean} [canBeDone] - Finished player allowed
  * @return {GolfPlayer} - Ball
  */
 
-export const requireBall = (table: GolfTable, accountId: string): GolfPlayer => {
+export const requireBall = (table: GolfTable, accountId: string, canBeDone = false): GolfPlayer => {
   const { game, now, settings } = table
   const isOpen =
     golfPhase(game, now.getTime(), table.holes) === GolfPhases.Playing &&
@@ -120,7 +121,9 @@ export const requireBall = (table: GolfTable, accountId: string): GolfPlayer => 
     throw conflict(PLAY_ERRORS.holeClosed)
   }
   const player = presentPlayers(table).find((entry) => entry.accountId === accountId)
-  if (!player || isHoleDone(player, strokeCeiling(settings))) throw conflict(PLAY_ERRORS.holeDone)
+  if (!player || (!canBeDone && isHoleDone(player, strokeCeiling(settings)))) {
+    throw conflict(PLAY_ERRORS.holeDone)
+  }
 
   return player
 }

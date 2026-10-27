@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { LudoBoardArt } from '@/composites/play/brand/LudoBoardArt'
 import { PLAY_GAMES } from '@/declarations/play'
 import { PLAY_BRAND } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -132,15 +133,11 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
     </>
   ),
   board: (tone) => (
-    <g transform="translate(40 120) rotate(-8 140 140)">
-      <rect x="14" y="20" width="260" height="260" rx="40" {...tint(`${tone}-deep`)} />
-      <rect x="4" y="6" width="260" height="260" rx="40" fill="white" />
-      <rect x="4" y="6" width="130" height="130" rx="40" {...tint('--play-ludo')} />
-      <rect x="134" y="6" width="130" height="130" rx="40" {...tint('--play-baccalaureat')} />
-      <rect x="134" y="136" width="130" height="130" rx="40" {...tint('--play-gold')} />
-      <rect x="4" y="136" width="130" height="130" rx="40" {...tint('--play-golf')} />
-      <rect x="94" y="96" width="80" height="80" rx="20" fill="white" />
-    </g>
+    <LudoBoardArt
+      tone={tone}
+      board={{ x: 176, y: 196, size: 250, angle: -10 }}
+      die={{ x: 286, y: 78, size: 62, angle: 16 }}
+    />
   ),
 }
 

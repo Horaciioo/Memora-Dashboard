@@ -94,7 +94,7 @@
     "lob": { "shots": 1, "lift": 0.55 },
     "swap": {}
   },
-  "chaos": { "orbs": 3, "malus": 2 },
+  "chaos": { "orbs": 4, "malus": 2, "hand": 5 },
   "hand": 3,
   "obstacles": {
     "portalRadius": 0.3,

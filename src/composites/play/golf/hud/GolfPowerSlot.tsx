@@ -2,19 +2,22 @@
 
 import { GolfEmptyOrb, GolfPowerOrb } from '@/composites/play/golf/GolfPowerOrb'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
-import { activePowers } from '@/core/lib/play/golf'
+import { activePowers, canPlayPower, handSize } from '@/core/lib/play/golf'
+import type { GolfGameSettings } from '@/core/lib/play/golf/settings'
 import type { GolfPlayerState } from '@/core/lib/play/golf'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { GOLF_POWERS } from '@/declarations/play/golf/powers'
-import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 import { GOLF_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 import type { GolfPowerName } from '@/utils/constants/play'
 
 export interface GolfPowerSlotProps {
   me: GolfPlayerState
+  // Format, sets the hand size
+  settings: Pick<GolfGameSettings, 'mode'>
   // Server ms of the board
   serverTime: number
+  // Hole in play, malus only once finished
   canUse: boolean
   isSaving: boolean
   onUse: (power: GolfPowerName, slot: number) => void
@@ -30,11 +33,13 @@ const GolfHandCase = ({
   power,
   slot,
   canUse,
+  isDone,
   isSaving,
   onUse,
-}: Omit<GolfPowerSlotProps, 'me' | 'serverTime'> & {
+}: Omit<GolfPowerSlotProps, 'me' | 'serverTime' | 'settings'> & {
   power: GolfPowerName | null
   slot: number
+  isDone: boolean
 }) => {
   const meta = power ? GOLF_POWERS.get(power) : null
 
@@ -50,7 +55,7 @@ const GolfHandCase = ({
     <button
       type="button"
       className={GOLF_BOARD.slot}
-      disabled={!canUse || isSaving}
+      disabled={!canUse || !canPlayPower(power, isDone) || isSaving}
       aria-label={`${GOLF_BOARD_COPY.use} ${meta.label}`}
       onClick={() => onUse(power, slot)}
     >
@@ -69,14 +74,21 @@ const GolfHandCase = ({
 }
 
 /**
- * Hand of three cases, effects worn
+ * Hand of cases, effects worn
  * @param {GolfPowerSlotProps} props - Player and gesture
  * @return {JSX.Element}
  */
 
-export const GolfPowerSlot = ({ me, serverTime, canUse, isSaving, onUse }: GolfPowerSlotProps) => {
+export const GolfPowerSlot = ({
+  me,
+  settings,
+  serverTime,
+  canUse,
+  isSaving,
+  onUse,
+}: GolfPowerSlotProps) => {
   const serverNow = useServerNow(new Date(serverTime))
-  const cases = Array.from({ length: GOLF_SETTINGS.hand }, (_, slot) => me.hand[slot] ?? null)
+  const cases = Array.from({ length: handSize(settings) }, (_, slot) => me.hand[slot] ?? null)
   const worn = [...activePowers(me.effects, serverNow)]
 
   return (
@@ -97,6 +109,7 @@ export const GolfPowerSlot = ({ me, serverTime, canUse, isSaving, onUse }: GolfP
             power={power}
             slot={slot}
             canUse={canUse}
+            isDone={me.isDone}
             isSaving={isSaving}
             onUse={onUse}
           />

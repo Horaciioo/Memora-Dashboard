@@ -7,6 +7,8 @@ import { BombLetters } from '@/composites/play/bomb/BombLetters'
 import { BombResult } from '@/composites/play/bomb/BombResult'
 import { BombTable } from '@/composites/play/bomb/BombTable'
 import type { BombBoardView, BombFace } from '@/composites/play/bomb/types'
+import { useBombSounds } from '@/composites/play/bomb/useBombSounds'
+import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
 import { BOMB_BOARD_COPY, BOMB_SETTINGS, fillPlayMessage } from '@/declarations/play'
 import { BOMB_BOARD } from '@/declarations/ui/variants'
@@ -21,12 +23,19 @@ export interface BombBoardProps {
 }
 
 /**
- * Bomb Party screen: bonus letters on the left, the bomb and its players in the middle
+ * Bomb Party screen: bonus letters on the left, the bomb and its players in the middle, live
  * @param {BombBoardProps} props - Board and table
  * @return {JSX.Element}
  */
 
-export const BombBoard = ({ sessionId, board, faces, viewerId, isSeated }: BombBoardProps) => {
+export const BombBoard = ({
+  sessionId,
+  board: initial,
+  faces,
+  viewerId,
+  isSeated,
+}: BombBoardProps) => {
+  const board = usePlainBoard(sessionId, initial)
   const now = useServerNow(board.serverTime)
   const seats: BombFace[] = board.players.map((player) => {
     const face = faces.find((entry) => entry.accountId === player.accountId)
@@ -34,9 +43,11 @@ export const BombBoard = ({ sessionId, board, faces, viewerId, isSeated }: BombB
     return { ...player, name: face?.name ?? '', avatarUrl: face?.avatarUrl ?? null }
   })
 
+  const countdown = secondsTo(board.startsAt, now)
+  useBombSounds(board, countdown)
+
   if (board.isOver) return <BombResult seats={seats} />
 
-  const countdown = secondsTo(board.startsAt, now)
   const holder = seats.find((seat) => seat.accountId === board.turnId)
   // Viewer's letters, the holder's when watching
   const reader = seats.find((seat) => seat.accountId === viewerId) ?? holder
@@ -70,7 +81,8 @@ export const BombBoard = ({ sessionId, board, faces, viewerId, isSeated }: BombB
 
         {isMyTurn && (
           <BombInput
-            key={`${board.prompt}:${board.blast?.at ?? ''}`}
+            // Same key whether the board came as a page or a push
+            key={`${board.prompt}:${board.blast ? new Date(board.blast.at).getTime() : ''}`}
             sessionId={sessionId}
             initial={board.draft}
           />

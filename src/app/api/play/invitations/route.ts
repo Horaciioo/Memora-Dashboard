@@ -1,9 +1,9 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { readBoard } from '@/core/services/play'
+import { listInvites } from '@/core/services/play'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const GET = createProtectedRoute({
   permission: Permissions.PlayAccess,
-  descriptor: { summary: 'Read the board of a running game', tags: ['play'] },
-  handler: async ({ params, session }) => readBoard(params.id, session.id),
+  descriptor: { summary: 'List the game invitations waiting for me', tags: ['play'] },
+  handler: async ({ session }) => listInvites(session.id),
 })

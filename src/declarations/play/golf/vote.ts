@@ -57,7 +57,7 @@ export const GOLF_VOTE_COPY = {
   courseLeadTournament: 'Choisis le premier parcours, les autres sont tirés au sort.',
   casualHint: 'Un seul parcours, le moins de coups gagne.',
   tournamentHint: 'Les parcours s’enchaînent et les scores s’additionnent.',
-  chaosHint: 'Trois fois plus d’orbes et deux fois plus de malus.',
+  chaosHint: '{orbs} fois plus d’orbes, {malus} fois plus de malus et {hand} pouvoirs en main.',
   confirm: 'Valider',
   back: 'Retour',
   you: 'Toi',

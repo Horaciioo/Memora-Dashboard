@@ -1,0 +1,15 @@
+{
+  "path": "/api/temps-reel",
+  "ticketSeconds": 30,
+  "maxPayloadKilobytes": 64,
+  "pingSeconds": 20,
+  "deadSeconds": 45,
+  "reconnectBaseMs": 200,
+  "reconnectMaxMs": 5000,
+  "idleCloseSeconds": 20,
+  "sessionMaxMinutes": 30,
+  "slowKilobytes": 1024,
+  "messagesPerSecond": 40,
+  "requestTimeoutSeconds": 10,
+  "refreshCoalesceMs": 120
+}

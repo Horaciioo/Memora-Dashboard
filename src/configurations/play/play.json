@@ -22,6 +22,11 @@
   "lobbyIdleMinutes": 30,
   "seatColors": 15,
   "leaderboardSize": 20,
+  "invites": {
+    "pollSeconds": 60,
+    "gapPx": 14,
+    "edgePx": 12
+  },
   "admin": {
     "maxXpChange": 10000,
     "maxCounter": 100000

@@ -164,7 +164,8 @@ export const baccalaureatView = async (session: EngineSession, viewerId: string)
   const answers = shown.map(({ votes, ...answer }) => ({
     ...answer,
     inDictionary: hints.get(answer.word) ?? null,
-    rejects: votes.filter((vote) => !vote.accepted).length,
+    acceptedBy: votes.filter((vote) => vote.accepted).map((vote) => vote.voterId),
+    rejectedBy: votes.filter((vote) => !vote.accepted).map((vote) => vote.voterId),
     myVote: votes.find((vote) => vote.voterId === viewerId)?.accepted ?? null,
   }))
 

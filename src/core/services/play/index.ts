@@ -1,7 +1,6 @@
 export { openGameOfSlug, readCatalog } from '@/core/services/play/CatalogService'
 export {
   actInSession,
-  readBoard,
   readSession,
   settleSession,
   startSession,

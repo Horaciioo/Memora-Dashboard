@@ -1,0 +1,32 @@
+{
+  "minPlayers": 1,
+  "maxPlayers": 4,
+  "countdownSeconds": 3,
+  "pawns": { "default": 4, "min": 1, "max": 4 },
+  "turnSeconds": { "default": 20, "min": 10, "max": 60 },
+  "turnStep": 5,
+  "exits": {
+    "six": [6],
+    "oneOrSix": [1, 6],
+    "fiveOrSix": [5, 6]
+  },
+  "exit": "six",
+  "ending": "podium",
+  "rules": {
+    "sixReplay": true,
+    "threeSixes": true,
+    "captureReplay": true,
+    "homeReplay": true,
+    "forcedCapture": false,
+    "barriers": false,
+    "safeSquares": true,
+    "exactFinish": true
+  },
+  "maxSixes": 3,
+  "graceSeconds": 1,
+  "stepMs": 170,
+  "rollMs": 700,
+  "shuffleMs": 80,
+  "alertSeconds": 5,
+  "feedSize": 40
+}

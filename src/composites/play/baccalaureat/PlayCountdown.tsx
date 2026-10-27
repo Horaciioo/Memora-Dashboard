@@ -9,6 +9,7 @@ import { BAC_BOARD } from '@/declarations/ui/variants'
  * @param {string} [props.lead] - Line above
  * @param {ReactNode} [props.children] - Gestures under the number
  * @param {string} [props.figureClassName] - Figure in the game colour
+ * @param {string} [props.className] - Frame, the blurred overlay by default
  * @return {JSX.Element}
  */
 
@@ -17,13 +18,15 @@ export const PlayCountdown = ({
   lead,
   children,
   figureClassName = BAC_BOARD.figure,
+  className = BAC_BOARD.overlay,
 }: {
   seconds: number
   lead?: string
   children?: ReactNode
   figureClassName?: string
+  className?: string
 }) => (
-  <div className={BAC_BOARD.overlay} aria-live="polite">
+  <div className={className} aria-live="polite">
     <div className={BAC_BOARD.stage}>
       {lead && <span className={BAC_BOARD.stageLead}>{lead}</span>}
       <span key={seconds} className={`play-tick ${figureClassName}`}>

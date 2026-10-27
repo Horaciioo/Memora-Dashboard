@@ -51,6 +51,9 @@ export const PLAY_ERRORS = {
   noPower: 'Tu n’as aucun pouvoir en main.',
   badSpot: 'Pose-le sur le parcours, loin du départ et du trou.',
   badTarget: 'Choisis un joueur encore en jeu, balle arrêtée.',
+  alreadyRolled: 'Tu as déjà lancé le dé, choisis un pion.',
+  rollFirst: 'Lance le dé d’abord.',
+  badPawn: 'Ce pion ne peut pas bouger.',
 } as const
 
 /**

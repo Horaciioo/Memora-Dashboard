@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
-import { useRouter } from 'next/navigation'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { PlayInviteAnchor } from '@/composites/play/session/PlayInviteAnchor'
+import { usePlayChatLines } from '@/core/hooks/data/play/usePlayChatLines'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { usePlayPeopleMenu } from '@/core/hooks/interaction/state/usePlayPeopleMenu'
 import type { PlayPeopleTable } from '@/core/hooks/interaction/state/usePlayPeopleMenu'
@@ -71,14 +71,14 @@ const follows = (message: PlayMessageView, previous?: PlayMessageView): boolean 
 
 export const PlayChat = ({
   sessionId,
-  messages,
+  messages: rendered,
   seats,
   table,
   isSide,
   invite,
   onFold,
 }: PlayChatProps) => {
-  const router = useRouter()
+  const { lines: messages, add } = usePlayChatLines(sessionId, rendered)
   const { isSaving, run } = useMutation()
   const [draft, setDraft] = useState('')
   const list = useRef<HTMLDivElement>(null)
@@ -108,10 +108,12 @@ export const PlayChat = ({
   const send = async () => {
     const body = draft.trim()
     if (!body || isSaving) return
-    const done = await run(() => apiPost(API_ROUTES.playMessages(sessionId), { body }))
-    if (done === null) return
+    const sent = await run(() =>
+      apiPost<PlayMessageView>(API_ROUTES.playMessages(sessionId), { body })
+    )
+    if (sent === null) return
     setDraft('')
-    router.refresh()
+    add(sent)
   }
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key !== 'Enter' || event.shiftKey) return

@@ -9,6 +9,9 @@ export const LOADING_SELECTOR = '.skeleton-shimmer'
 // Attribution reads
 export const HOP_ATTRIBUTE = 'data-beacon-hop'
 
+// Bell of the rail, invitations point at it
+export const NOTIFICATIONS_BEACON = 'notifications-bell'
+
 /**
  * Attributes making an element a beacon
  * @param {string} name - Beacon name

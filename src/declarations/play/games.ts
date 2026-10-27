@@ -3,6 +3,8 @@ import { BOMB_EMBERS } from '@/declarations/play/bomb/copy'
 import { BOMB_SETTINGS } from '@/declarations/play/bomb/settings'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
+import { LUDO_FELT } from '@/declarations/play/ludo/copy'
+import { LUDO_SETTINGS } from '@/declarations/play/ludo/settings'
 import { PLAY_PAPER } from '@/declarations/play/paper'
 import { BACCALAUREAT_SETTINGS } from '@/declarations/play/settings'
 import { PlayGames } from '@/utils/constants/play'
@@ -85,10 +87,10 @@ export const PLAY_GAMES = createRegistry<PlayGameName, PlayGameMeta>({
     tone: '--play-ludo',
     logo: 'playLudo',
     backdrop: 'board',
-    ground: null,
-    minPlayers: 2,
-    maxPlayers: 4,
-    playable: false,
+    ground: LUDO_FELT.ground,
+    minPlayers: LUDO_SETTINGS.minPlayers,
+    maxPlayers: LUDO_SETTINGS.maxPlayers,
+    playable: true,
   },
 })
 

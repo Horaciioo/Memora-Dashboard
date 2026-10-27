@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { LudoBoardArt } from '@/composites/play/brand/LudoBoardArt'
 import { PLAY_GAMES } from '@/declarations/play'
 import { PLAY_BRAND } from '@/declarations/ui/variants'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -30,14 +31,6 @@ const SPARKS = [
   [584, 40, 6],
   [628, 46, 5],
   [566, 64, 4],
-]
-
-// Pawns on the board
-const PAWNS = [
-  { x: 420, y: 150, tone: '--play-ludo' },
-  { x: 500, y: 110, tone: '--play-baccalaureat' },
-  { x: 560, y: 190, tone: '--play-gold' },
-  { x: 460, y: 230, tone: '--play-golf' },
 ]
 
 // Scene of each backdrop key, drawn on a 640 × 320 canvas
@@ -125,24 +118,11 @@ const SCENES: Record<string, (tone: string) => ReactNode> = {
     </>
   ),
   board: (tone) => (
-    <g transform="translate(330 30) rotate(-10 150 130)">
-      <rect x="20" y="20" width="280" height="240" rx="34" {...tint(`${tone}-deep`)} />
-      <rect x="10" y="10" width="280" height="240" rx="34" fill="white" />
-      <rect x="10" y="10" width="140" height="120" rx="34" {...tint('--play-ludo')} />
-      <rect x="150" y="10" width="140" height="120" rx="34" {...tint('--play-baccalaureat')} />
-      <rect x="150" y="130" width="140" height="120" rx="34" {...tint('--play-gold')} />
-      <rect x="10" y="130" width="140" height="120" rx="34" {...tint('--play-golf')} />
-      <rect x="110" y="90" width="80" height="80" rx="18" fill="white" />
-      {PAWNS.map((pawn) => (
-        <g key={pawn.tone} transform={`translate(${pawn.x - 330} ${pawn.y - 30})`}>
-          <ellipse cx="0" cy="28" rx="14" ry="5" fill="black" opacity="0.2" />
-          <path d="M-12 26 -6 2h12l6 24z" fill="white" />
-          <circle cx="0" cy="-4" r="10" fill="white" />
-          <path d="M-9 24 -4 4h8l5 20z" {...tint(pawn.tone)} />
-          <circle cx="0" cy="-4" r="7" {...tint(pawn.tone)} />
-        </g>
-      ))}
-    </g>
+    <LudoBoardArt
+      tone={tone}
+      board={{ x: 486, y: 168, size: 230, angle: -10 }}
+      die={{ x: 340, y: 96, size: 56, angle: -14 }}
+    />
   ),
 }
 

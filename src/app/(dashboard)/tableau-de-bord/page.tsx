@@ -8,6 +8,7 @@ import { HomeNews } from '@/composites/personal/HomeNews'
 import { HomeQueue } from '@/composites/personal/HomeQueue'
 import { CourseUnlockBubble } from '@/composites/academy/course/catalog/CourseUnlockBubble'
 import { HomeLiveCall } from '@/composites/lives/HomeLiveCall'
+import { HomePlayInvite } from '@/composites/play/invites/HomePlayInvite'
 import { myCoordinationRequests } from '@/core/services/lives/CoordinationService'
 import { readBeacon } from '@/core/services/lives/LiveService'
 import { hasNewSpecialisations } from '@/core/services/academy/training/CurriculumService'
@@ -58,6 +59,7 @@ export default async function DashboardPage() {
   return (
     <div className={HOME_FLOW.page}>
       {hasUnlock && <CourseUnlockBubble />}
+      {access.can(Permissions.PlayAccess) && <HomePlayInvite />}
       <PageHeader title={PERSONAL_COPY.title} heroDescription={PERSONAL_COPY.heroDescription} />
       <div {...beaconProps(TOUR_BEACONS.homeHeader)}>
         <HomeHeader name={session.displayName} />

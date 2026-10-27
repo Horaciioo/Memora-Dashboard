@@ -389,6 +389,8 @@ model Account {
   bombMoves             BombMove[]
   golfPlayers           GolfPlayer[]
   golfMoves             GolfMove[]
+  ludoPlayers           LudoPlayer[]
+  ludoMoves             LudoMove[]
   playMessages          PlayMessage[]
   playInvitesSent       PlayInvite[]             @relation("PlayInviteFrom")
   playInvitesReceived   PlayInvite[]             @relation("PlayInviteTo")
@@ -2666,6 +2668,9 @@ model PlaySession {
   golfGame    GolfGame?
   golfPlayers GolfPlayer[]
   golfMoves   GolfMove[]
+  ludoGame    LudoGame?
+  ludoPlayers LudoPlayer[]
+  ludoMoves   LudoMove[]
   messages    PlayMessage[]
   invites     PlayInvite[]
 
@@ -2989,4 +2994,76 @@ model GolfMove {
   @@index([sessionId, createdAt])
   @@index([sessionId, kind])
   @@map("play_golf_moves")
+}
+
+// Ludo table: whose turn, the die on the table and the turn clock
+model LudoGame {
+  sessionId  String   @id
+  turnId     String
+  // Die waiting for a pawn, null before the roll
+  dice       Int?
+  // Sixes in a row this turn
+  sixes      Int      @default(0)
+  startsAt   DateTime
+  turnEndsAt DateTime
+  // Bumped on every move, the newest board wins
+  rev        Int      @default(0)
+  updatedAt  DateTime @updatedAt
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("play_ludo_games")
+}
+
+// A colour at the table and its pawns
+model LudoPlayer {
+  id         String    @id @default(cuid())
+  sessionId  String
+  accountId  String
+  // Board corner, clockwise from top left
+  corner     Int
+  // Steps of each pawn, -1 in the yard
+  pawns      Int[]
+  finishedAt DateTime?
+  place      Int?
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, accountId])
+  @@map("play_ludo_players")
+}
+
+// What happened on the board
+enum LudoMoveKind {
+  ROLL
+  MOVE
+  CAPTURE
+  HOME
+  SKIP
+  PENALTY
+  FINISH
+}
+
+// One roll, one pawn moved or one pawn sent back
+model LudoMove {
+  id        String       @id @default(cuid())
+  sessionId String
+  accountId String
+  kind      LudoMoveKind
+  // Board revision it belongs to
+  rev       Int
+  dice      Int?
+  pawn      Int?
+  from      Int?
+  to        Int?
+  // Player whose pawn was taken
+  victimId  String?
+  createdAt DateTime     @default(now())
+
+  session PlaySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  account Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, rev])
+  @@map("play_ludo_moves")
 }

@@ -19,7 +19,8 @@ ENV APP_ENV=$APP_ENV \
     DATABASE_URL=postgresql://build:build@127.0.0.1:1/build?schema=public
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN yarn build
+# Type check outgrew the default heap on the 4 GB server
+RUN NODE_OPTIONS=--max-old-space-size=3072 yarn build
 
 # Runtime
 FROM base AS run
