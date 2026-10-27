@@ -4,7 +4,7 @@ import { prisma } from '@/core/lib/db'
 import { conflict, forbidden, invalidInput, notFound } from '@/core/lib/errors'
 import { readBodyList } from '@/core/lib/play'
 import { isPresent } from '@/core/lib/play/session'
-import { signalPlay } from '@/core/lib/play/signal'
+import { signalInvites, signalPlay } from '@/core/lib/play/signal'
 import { joinSession } from '@/core/services/play/LobbyService'
 import { loadSession, requireSeat } from '@/core/services/play/PlaySessionService'
 import { PLAY_ERRORS } from '@/declarations/play'
@@ -45,10 +45,13 @@ export const inviteToSession = async (
     throw conflict(PLAY_ERRORS.notInLobby)
   }
 
-  if (raw.everyone === true) {
+  const ids =
+    raw.everyone === true
+      ? null
+      : (readBodyList(raw, 'accountIds') ?? []).filter((id) => id && id !== inviterId)
+  if (!ids) {
     await prisma.playInvite.create({ data: { sessionId, inviterId, role } })
   } else {
-    const ids = (readBodyList(raw, 'accountIds') ?? []).filter((id) => id && id !== inviterId)
     await prisma.$transaction(
       ids.map((inviteeId) =>
         prisma.playInvite.upsert({
@@ -60,6 +63,7 @@ export const inviteToSession = async (
     )
   }
   await signalPlay(sessionId, true)
+  await signalInvites(ids)
 }
 
 /**
@@ -134,6 +138,7 @@ export const answerInvite = async (inviteId: string, accountId: string, accept: 
   if (accept && invite.role === PlayInviteRoles.Player) {
     await joinSession(invite.sessionId, accountId)
   }
+  await signalInvites([accountId])
 
   return { sessionId: invite.sessionId }
 }

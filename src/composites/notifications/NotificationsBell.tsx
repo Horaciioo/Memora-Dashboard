@@ -7,6 +7,7 @@ import { useNotificationFeed } from '@/core/hooks/data/system/useNotificationFee
 import { useNotificationsStore } from '@/core/store/notifications'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
+import { beaconProps, NOTIFICATIONS_BEACON } from '@/declarations/ui/beacons'
 import { RAIL_POPOVER } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 import { BUTTON_STYLES, NOTIFICATION_STYLES } from '@/declarations/ui/variants'
@@ -90,6 +91,7 @@ export const NotificationsBell = ({ initialUnread, iconClassName }: Notification
         title={NOTIFICATION_COPY.title}
         onClick={toggle}
         className={cn(BUTTON_STYLES.base, BUTTON_STYLES.icon, NOTIFICATION_STYLES.trigger)}
+        {...beaconProps(NOTIFICATIONS_BEACON)}
       >
         <span
           className={cn('inline-flex', isRinging && 'bell-ring')}
