@@ -9,11 +9,12 @@ import { PlayHubMenu } from '@/composites/play/hub/PlayHubMenu'
 import { PlayLeaderboard } from '@/composites/play/hub/PlayLeaderboard'
 import { PlayLobbyList } from '@/composites/play/hub/PlayLobbyList'
 import { PlayEmbers } from '@/composites/play/hub/PlayEmbers'
+import { LudoHopField } from '@/composites/play/ludo/LudoHopField'
 import { PlayPaperWords } from '@/composites/play/hub/PlayPaperWords'
 import { PlaySignal } from '@/composites/play/hub/PlaySignal'
 import { PlayPlayerCard } from '@/composites/play/member/stats/PlayPlayerCard'
 import { PlayStatTiles } from '@/composites/play/member/stats/PlayStatTiles'
-import { API_ROUTES } from '@/core/lib/api/routes'
+import { PLAY_TOPICS } from '@/declarations/play/topics'
 import {
   listLobbies,
   openGameOfSlug,
@@ -23,6 +24,7 @@ import {
 } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
+import { LUDO_FELT } from '@/declarations/play/ludo/copy'
 import {
   BOMB_EMBERS,
   fillPlayMessage,
@@ -40,6 +42,7 @@ const GROUND_LAYERS: Record<string, ComponentType> = {
   [PLAY_PAPER.ground]: PlayPaperWords,
   [BOMB_EMBERS.ground]: PlayEmbers,
   [GOLF_TURF.ground]: GolfPanorama,
+  [LUDO_FELT.ground]: LudoHopField,
 }
 
 interface PlayGamePageProps {
@@ -85,7 +88,7 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
   return (
     <div className={cn(PLAY_HUB.page, meta.ground)} style={playKeysOf(game)}>
       {GroundLayer && <GroundLayer />}
-      <PlaySignal url={API_ROUTES.playSessionsStream} />
+      <PlaySignal topic={PLAY_TOPICS.lobbies} />
       <PlayCallouts isBanned={Boolean(profile.ban)} />
 
       <PlayHubMenu

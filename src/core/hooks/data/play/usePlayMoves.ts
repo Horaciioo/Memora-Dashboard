@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 
 import { apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { queuePlayRefresh } from '@/core/hooks/data/play/usePlayRefresh'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_HUB_COPY } from '@/declarations/play/hub'
@@ -18,7 +19,7 @@ export const usePlayMoves = () => {
   const router = useRouter()
   const { isSaving, run } = useMutation()
 
-  // Each gesture lands on a page, or refreshes this one
+  // Each gesture lands on a page, or refreshes this one with the signal it raised
   const go = async <T>(
     action: () => Promise<T>,
     done: string,
@@ -27,7 +28,7 @@ export const usePlayMoves = () => {
     const result = await run(action, done)
     if (result === null) return false
     if (to) router.push(to(result))
-    else router.refresh()
+    else queuePlayRefresh(() => router.refresh())
 
     return true
   }

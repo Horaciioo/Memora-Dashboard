@@ -30,6 +30,10 @@ export const register = async (): Promise<void> => {
     // A failed boot must not take the server down on a non strict branch
     console.error('[instrumentation] infrastructure failed to start', error)
   }
+
+  // Sockets work without Redis, signals then stay in this process
+  const { wireRealtime } = await import('@/core/lib/realtime/server')
+  wireRealtime()
 }
 
 /**

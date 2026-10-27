@@ -262,7 +262,7 @@ export const removeFromPlay = async (actor: AdminActor, accountId: string) => {
     where: { id: sessionId },
     select: { game: true },
   })
-  await leaveSession(sessionId, accountId, { quiet: true })
+  await leaveSession(sessionId, accountId)
   await journalPlay({
     eventType: 'PlayKicked',
     subjectId: accountId,
@@ -347,7 +347,7 @@ export const setPlayBan = async (
   })
   // A banned player leaves the table
   const sessionId = reason ? await currentSessionId(accountId) : null
-  if (sessionId) await leaveSession(sessionId, accountId, { quiet: true })
+  if (sessionId) await leaveSession(sessionId, accountId)
   await journalPlay({
     eventType: 'PlayAdjusted',
     subjectId: accountId,

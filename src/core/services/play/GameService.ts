@@ -35,9 +35,8 @@ const applyStep = async (sessionId: string, step: EngineStep): Promise<void> => 
     scheduleDeadline(sessionId, step.deadline, () => settleSession(sessionId))
   }
 
-  if (step.changed || step.finished) {
-    await signalPlay(sessionId, step.finished, Boolean(step.isBoardOnly) && !step.finished)
-  }
+  // A running table draws from its board alone, the page moves at the end
+  if (step.changed || step.finished) await signalPlay(sessionId, step.finished, !step.finished)
 }
 
 /**
@@ -95,20 +94,6 @@ export const readSession = async (sessionId: string, viewerId: string) => {
   const view = toSessionView(session, viewerId, board)
 
   return { ...view, tournament: view.tournament && { ...view.tournament, standings, nextId } }
-}
-
-/**
- * Board of a started game alone, for live boards
- * @param {string} sessionId - Game
- * @param {string} viewerId - Reader
- * @return {Promise<unknown>} - Board, null in the lobby
- */
-
-export const readBoard = async (sessionId: string, viewerId: string): Promise<unknown> => {
-  const session = await settleSession(sessionId)
-  if (session.status === PlayStatuses.Lobby) return null
-
-  return engineOf(session.game).view(toEngineSession(session), viewerId)
 }
 
 /**

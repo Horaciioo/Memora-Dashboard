@@ -1,7 +1,7 @@
 'use client'
 
 import { usePlayAct } from '@/core/hooks/data/play/usePlayAct'
-import { dropLocal, playLocal, simulateShot, strokeBalls } from '@/core/lib/play/golf'
+import { dropLocal, handSize, playLocal, simulateShot, strokeBalls } from '@/core/lib/play/golf'
 import type { RefObject } from 'react'
 
 import type { GolfBoardState, GolfHole, GolfMotion } from '@/core/lib/play/golf'
@@ -46,17 +46,22 @@ export const useGolfStroke = ({
         shooterId: viewerId,
         angle,
         power,
-        balls: strokeBalls(present, viewerId, at, board.settings.powers.length > 0),
+        balls: strokeBalls(
+          present,
+          viewerId,
+          at,
+          board.settings.powers.length ? handSize(board.settings) : 0
+        ),
         hazards: board.hazards,
         orbs: board.orbs,
         collisions: board.settings.collisions,
       })
       playLocal(motionRef.current, result, at, viewerId)
-      void act({ type: 'shot', angle, power }, { quiet: true }).then((isDone) => {
+      void act({ type: 'shot', angle, power }).then((isDone) => {
         if (!isDone) dropLocal(motionRef.current)
       })
     },
     power: (play: { slot: number; x?: number; z?: number; targetId?: string }) =>
-      act({ type: 'power', ...play }, { quiet: true }),
+      act({ type: 'power', ...play }),
   }
 }
