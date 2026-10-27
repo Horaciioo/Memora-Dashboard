@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { after } from '@/core/lib/play/clock'
+import { after, countdownEnd } from '@/core/lib/play/clock'
 import {
   cardTotal,
   drawCourse,
@@ -54,7 +54,7 @@ export const openCourse = async (session: EngineSession): Promise<EngineStep> =>
   const settings = drawCourse(golfSettingsOf(session.settings))
   const [first] = holesOf(settings)
   const now = new Date()
-  const startsAt = after(now, GOLF_SETTINGS.countdownSeconds)
+  const startsAt = countdownEnd(now, GOLF_SETTINGS.countdownSeconds)
   const endsAt = after(startsAt, settings.holeSeconds)
 
   await prisma.$transaction([

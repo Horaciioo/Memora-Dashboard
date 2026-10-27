@@ -1,7 +1,7 @@
 {
   "minPlayers": 1,
   "maxPlayers": 15,
-  "countdownSeconds": 4,
+  "countdownSeconds": 5,
   "holeIntroSeconds": 2,
   "intermissionSeconds": 3,
   "resultDelaySeconds": 3,
@@ -106,9 +106,9 @@
   "tournament": { "holesPerMap": 6, "maps": [3, 6, 9] },
   "placementGap": 1.2,
   "camera": {
-    "distance": 5.6,
+    "distance": 9.8,
     "minDistance": 2.6,
-    "maxDistance": 11,
+    "maxDistance": 14,
     "pitch": 1,
     "minPitch": 0.3,
     "maxPitch": 1.45,
