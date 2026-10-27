@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react'
+
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { PlayLevelBar } from '@/composites/play/member/stats/PlayLevelBar'
 import { recordOf } from '@/composites/play/member/stats/PlayStatTiles'
@@ -20,7 +22,11 @@ export const PlayGameLevels = ({ games }: { games: PlayProfileView['games'] }) =
       {games
         .filter((entry) => PLAY_GAMES.has(entry.game) && PLAY_GAMES.get(entry.game).playable)
         .map((entry) => (
-          <div key={entry.game} className={PLAY_STATS.game}>
+          <div
+            key={entry.game}
+            className={PLAY_STATS.game}
+            style={{ '--game': `var(${PLAY_GAMES.get(entry.game).tone})` } as CSSProperties}
+          >
             <PlayGameLogo game={entry.game} className={PLAY_STATS.gameLogo} />
             <div className={PLAY_STATS.gameText}>
               <span className={PLAY_STATS.gameHead}>

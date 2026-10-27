@@ -21,6 +21,8 @@ export const toSessionView = (session: LoadedSession, viewerId: string, board: u
     status: session.status,
     hostId: session.hostId,
     settings: session.settings,
+    // Clock of the vote
+    serverTime: Date.now(),
     maxPlayers: meta.maxPlayers,
     minPlayers: meta.minPlayers,
     startedAt: session.startedAt,
