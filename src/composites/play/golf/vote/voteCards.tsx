@@ -20,7 +20,7 @@ const MODE_LABELS: Record<GolfModeName, string> = {
 export const MODE_HINTS: Record<GolfModeName, string> = {
   [GolfModes.Casual]: GOLF_VOTE_COPY.casualHint,
   [GolfModes.Tournament]: GOLF_VOTE_COPY.tournamentHint,
-  [GolfModes.Chaos]: GOLF_VOTE_COPY.chaosHint,
+  [GolfModes.Chaos]: fillPlayMessage(GOLF_VOTE_COPY.chaosHint, GOLF_SETTINGS.chaos),
 }
 
 /**

@@ -189,8 +189,8 @@ export const GOLF_SETTINGS = {
     lob: readNumbers(powers.lob, 'play/golf.powers.lob', { shots: 1, lift: 0.55 }),
     swap: readNumbers(powers.swap, 'play/golf.powers.swap', {}),
   },
-  // Chaos format, orbs and malus multipliers
-  chaos: readNumbers(golf.chaos, 'play/golf.chaos', { orbs: 3, malus: 2 }),
+  // Chaos format, orbs and malus multipliers, powers held
+  chaos: readNumbers(golf.chaos, 'play/golf.chaos', { orbs: 4, malus: 2, hand: 5 }),
   // Powers held at once
   hand: readInteger(golf.hand, { path: 'play/golf.hand', fallback: 3, min: 1 }),
   obstacles: readNumbers(golf.obstacles, 'play/golf.obstacles', {

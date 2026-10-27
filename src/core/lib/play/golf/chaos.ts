@@ -38,6 +38,15 @@ export const malusWeight = (settings: Pick<GolfGameSettings, 'mode'>): number =>
   isChaos(settings) ? GOLF_SETTINGS.chaos.malus : 1
 
 /**
+ * Powers held at once
+ * @param {Pick<GolfGameSettings, 'mode'>} settings - Game settings
+ * @return {number} - Hand size
+ */
+
+export const handSize = (settings: Pick<GolfGameSettings, 'mode'>): number =>
+  isChaos(settings) ? GOLF_SETTINGS.chaos.hand : GOLF_SETTINGS.hand
+
+/**
  * Random source that gives the same run everywhere
  * @param {number} seed - Start
  * @return {() => number} - Random in [0, 1[

@@ -1,5 +1,4 @@
 import type { GolfBallInput, GolfEffect } from '@/core/lib/play/golf/types'
-import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 
 /**
  * Ball as both the server and the screens know it
@@ -24,7 +23,7 @@ export interface GolfStrokeBall {
  * @param {GolfStrokeBall[]} balls - Present balls
  * @param {string} shooterId - Player hitting
  * @param {number} at - Server ms
- * @param {boolean} hasOrbs - Orbs give powers
+ * @param {number} handRoom - Hand size, none without orbs
  * @return {GolfBallInput[]} - Simulation balls
  */
 
@@ -32,7 +31,7 @@ export const strokeBalls = (
   balls: GolfStrokeBall[],
   shooterId: string,
   at: number,
-  hasOrbs: boolean
+  handRoom: number
 ): GolfBallInput[] =>
   balls
     .filter(
@@ -44,5 +43,5 @@ export const strokeBalls = (
       x: ball.x,
       z: ball.z,
       effects: ball.effects,
-      canPick: hasOrbs && ball.hand.length < GOLF_SETTINGS.hand,
+      canPick: ball.hand.length < handRoom,
     }))

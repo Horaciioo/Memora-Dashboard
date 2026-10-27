@@ -152,8 +152,9 @@ export const GolfBoard = ({
             me
               ? {
                   me,
+                  settings: board.settings,
                   serverTime: board.serverTime,
-                  canUse: isOpen,
+                  canUse: phase === GolfPhases.Playing,
                   isSaving: stroke.isSaving,
                   onUse: playPower,
                 }

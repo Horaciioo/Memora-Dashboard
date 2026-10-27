@@ -8,7 +8,9 @@ import { conflict, invalidInput } from '@/core/lib/errors'
 import {
   addToHand,
   canPlaceAt,
+  canPlayPower,
   drawPower,
+  handSize,
   standingShare,
   isEffectActive,
   isHoleDone,
@@ -87,7 +89,8 @@ export const grantPickups = async (
                   standingShare(totals, totalOf(player)),
                   Math.random(),
                   malusWeight(table.settings)
-                )
+                ),
+                handSize(table.settings)
               ),
             },
           })
@@ -271,9 +274,12 @@ export const playPower = (
   raw: Record<string, unknown>
 ): Promise<EngineStep> =>
   withGolf(session, async (table) => {
-    const player = requireBall(table, accountId)
+    const player = requireBall(table, accountId, true)
     const slot = slotOf(player, raw)
     const power = player.powers[slot] as GolfPowerName
+    if (!canPlayPower(power, isHoleDone(player, strokeCeiling(table.settings)))) {
+      throw conflict(PLAY_ERRORS.holeDone)
+    }
     const { target } = GOLF_POWERS.get(power)
     const { until, shots } = lastingOf(power, table.now.getTime())
     const effect = { power, from: accountId, until, shots }

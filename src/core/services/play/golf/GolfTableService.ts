@@ -26,7 +26,6 @@ export const boardStep = (deadline: Date | null): EngineStep => ({
   changed: true,
   finished: false,
   deadline,
-  isBoardOnly: true,
 })
 
 /**

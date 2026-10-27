@@ -1,5 +1,4 @@
 import type { GolfHoleLayout } from '@/core/lib/play/golf/types'
-import { GolfSurfaces } from '@/utils/constants/play'
 
 /**
  * Les Tropiques, six holes of fans and bridges
@@ -39,20 +38,14 @@ export const TROPICAL_HOLES: GolfHoleLayout[] = [
     ],
     orbs: [[0, 6.5]],
   },
-  // Boost up the falls, drop to the basin
+  // Up the falls, drop to the basin
   {
     tee: [0, 0],
     cup: [13.5, 7.5],
     pads: [
       { at: [-2, -1.5], size: [4, 5.5] },
-      {
-        at: [-2, 4],
-        size: [4, 4],
-        rise: { axis: 'z', to: 1 },
-        surface: GolfSurfaces.Boost,
-        push: [0, 1],
-      },
-      { at: [-4, 8], size: [8, 4], height: 1, open: 'n' },
+      { at: [-2, 4], size: [4, 4], rise: { axis: 'z', to: 1 } },
+      { at: [-4, 8], size: [8, 4], height: 1 },
       { at: [4, 9], size: [6, 3], height: 1 },
       { at: [10, 6], size: [5, 9] },
     ],
@@ -94,7 +87,6 @@ export const TROPICAL_HOLES: GolfHoleLayout[] = [
       { at: [11.4, -0.6], size: [1.2, 10.6], open: 'ew' },
       { at: [-3, 10], size: [17, 6] },
     ],
-    fans: [{ at: [-0.6, 5], size: [1.2, 2], push: [1, 0] }],
     blocks: [{ at: [2.5, 10.8], size: [0.4, 3.6] }],
     orbs: [
       [0, 6.5],

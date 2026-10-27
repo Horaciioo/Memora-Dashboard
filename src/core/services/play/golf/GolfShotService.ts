@@ -5,6 +5,7 @@ import type { GolfPlayer } from '@prisma/client'
 import { conflict, invalidInput } from '@/core/lib/errors'
 import {
   activePowers,
+  handSize,
   isEffectActive,
   isHoleDone,
   shotDuration,
@@ -66,7 +67,7 @@ const ballsOf = (table: GolfTable, shooter: GolfPlayer): GolfShotInput['balls'] 
     })),
     shooter.accountId,
     table.now.getTime(),
-    table.settings.powers.length > 0
+    table.settings.powers.length ? handSize(table.settings) : 0
   )
 
 /**
