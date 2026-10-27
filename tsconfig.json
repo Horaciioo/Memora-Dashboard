@@ -39,7 +39,9 @@
     ".next-qa3213/types/**/*.ts",
     ".next-qa3213/dev/types/**/*.ts",
     ".next/validate/types/**/*.ts",
-    ".next/validate/dev/types/**/*.ts"
+    ".next/validate/dev/types/**/*.ts",
+    ".next-ws/types/**/*.ts",
+    ".next-ws/dev/types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }
