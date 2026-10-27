@@ -1,15 +1,18 @@
 import type { ReactNode } from 'react'
 
+import { BacLiveProgress } from '@/composites/play/baccalaureat/BacLiveProgress'
 import { BaccalaureatBoard } from '@/composites/play/baccalaureat/BaccalaureatBoard'
 import type { BacBoardView } from '@/composites/play/baccalaureat/types'
 import { BombBoard } from '@/composites/play/bomb/BombBoard'
 import type { BombBoardView } from '@/composites/play/bomb/types'
 import { GolfBoard } from '@/composites/play/golf/GolfBoard'
 import { GolfFeed } from '@/composites/play/golf/GolfFeed'
+import { LudoBoard } from '@/composites/play/ludo/LudoBoard'
+import { LudoFeed } from '@/composites/play/ludo/LudoFeed'
+import type { LudoBoardView } from '@/core/lib/play/ludo/state'
 import type { GolfBoardView } from '@/core/lib/play/golf'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
-import { BacSessionProgress } from '@/composites/play/session/BacSessionProgress'
-import { PlaySessionFeed } from '@/composites/play/session/PlaySessionFeed'
+import { PlainLiveFeed } from '@/composites/play/session/live/PlainLiveFeed'
 import { BAC_FEED_COPY, BOMB_FEED_COPY } from '@/declarations/play'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
@@ -70,12 +73,13 @@ export const PLAY_SESSION_TABLES: Partial<
             viewerId={viewerId}
             me={me}
           />
-          {!bac.recap && <BacSessionProgress players={players} done={bac.done} />}
+          <BacLiveProgress sessionId={sessionId} board={bac} players={players} />
         </>
       ),
       feed: (
-        <PlaySessionFeed
-          feed={bac.feed}
+        <PlainLiveFeed
+          sessionId={sessionId}
+          board={bac}
           copy={BAC_FEED_COPY}
           players={[...players, ...spectators]}
         />
@@ -96,8 +100,9 @@ export const PLAY_SESSION_TABLES: Partial<
         />
       ),
       feed: (
-        <PlaySessionFeed
-          feed={bomb.feed}
+        <PlainLiveFeed
+          sessionId={sessionId}
+          board={bomb}
           copy={BOMB_FEED_COPY}
           players={[...seats, ...spectators]}
         />
@@ -131,6 +136,27 @@ export const PLAY_SESSION_TABLES: Partial<
           players={[...seats, ...spectators]}
         />
       ),
+    }
+  },
+  [PlayGames.Ludo]: ({ sessionId, board, seats, spectators, viewerId, me }) => {
+    const ludo = board as LudoBoardView
+
+    return {
+      board: (
+        <LudoBoard
+          sessionId={sessionId}
+          board={ludo}
+          faces={seats.map(({ id, name, avatarUrl, isHost }) => ({
+            accountId: id,
+            name,
+            avatarUrl,
+            isHost: Boolean(isHost),
+          }))}
+          viewerId={viewerId}
+          isSeated={me.isSeated}
+        />
+      ),
+      feed: <LudoFeed sessionId={sessionId} board={ludo} players={[...seats, ...spectators]} />,
     }
   },
 }

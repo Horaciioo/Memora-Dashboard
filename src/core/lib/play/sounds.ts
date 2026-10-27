@@ -155,3 +155,52 @@ export const playSweep = (
   tone.start(start)
   tone.stop(start + seconds)
 }
+
+/**
+ * Looping sound driven from outside
+ * @typedef {Object} SoundLoop
+ * @property {(volume: number, rate: number) => void} set - Level and speed
+ * @property {() => void} stop - Cut for good
+ */
+
+export interface SoundLoop {
+  set: (volume: number, rate: number) => void
+  stop: () => void
+}
+
+// Glide of a level change, in seconds
+const LOOP_GLIDE = 0.08
+
+/**
+ * Play a sound in a loop, silent until set
+ * @param {string} path - Public path
+ * @return {SoundLoop} - Handle
+ */
+
+export const loopSound = (path: string): SoundLoop => {
+  const context = contextOf()
+  let voice: ReturnType<typeof voiceOf> | null = null
+  let level = { volume: 0, rate: 1 }
+  let isStopped = false
+  if (context)
+    void bufferOf(context, path).then((buffer) => {
+      if (!buffer || isStopped) return
+      voice = voiceOf(context, buffer, level.volume)
+      voice.source.loop = true
+      voice.source.playbackRate.value = level.rate
+      voice.source.start()
+    })
+
+  return {
+    set: (volume, rate) => {
+      level = { volume, rate }
+      if (!voice || !context) return
+      voice.gain.gain.setTargetAtTime(volume, context.currentTime, LOOP_GLIDE)
+      voice.source.playbackRate.setTargetAtTime(rate, context.currentTime, LOOP_GLIDE)
+    },
+    stop: () => {
+      isStopped = true
+      voice?.source.stop()
+    },
+  }
+}

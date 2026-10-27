@@ -16,3 +16,38 @@ Deux effets viennent d'échantillons CC0 d'OpenGameArt, découpés, assemblés e
 - `eau.mp3` : « bloup bloup bloup », les trois bulles de « Bubble Sound Effects » par BMacZero,
   https://opengameart.org/content/bubble-sound-effects
 
+
+`invitation.mp3` : « confirmation_002 » du pack « Interface Sounds » de Kenney (CC0),
+https://kenney.nl/assets/interface-sounds
+
+## Ludo (`ludo/`)
+
+Échantillons CC0 de Kenney, convertis en mp3 mono, début de silence coupé, volume normalisé :
+
+- « Casino Audio », https://kenney.nl/assets/casino-audio : `lancer-1..3.mp3` (die-throw-1..3),
+  `pas-1..3.mp3` (chip-lay-1..3), `barriere.mp3` (chips-stack-1).
+- « Interface Sounds », https://kenney.nl/assets/interface-sounds : `sortie.mp3` (maximize_008),
+  `six.mp3` (maximize_006), `ton-tour.mp3` (confirmation_001), `etoile.mp3` (glass_001),
+  `bloque.mp3` (error_006), `penalite.mp3` (error_003), `chrono.mp3` (tick_001).
+- « Music Jingles », https://kenney.nl/assets/music-jingles : `arrivee.mp3` (jingles_PIZZI02),
+  `victoire.mp3` (jingles_STEEL02).
+- `capture.mp3` : chips-collide-1 (« Casino Audio »), impactPunch_medium_000 (« Impact Sounds »,
+  https://kenney.nl/assets/impact-sounds) et question_002 (« Interface Sounds ») mêlés.
+- `miam.mp3` (le pion qui mange) et `aie.mp3` (le pion mangé) : synthétisés pour Memora, bruit filtré
+  et notes descendantes, versés au domaine public (CC0 1.0).
+- `parcours.mp3` (tous les pions arrivés) : jingles_NES03 (« Music Jingles »).
+
+## Bomb Party (`bomb/`)
+
+Échantillons CC0 de Kenney, convertis en mp3 mono, début de silence coupé, crête normalisée :
+
+- `explosion.mp3` : explosionCrunch_000 et lowFrequency_explosion_000 (« Sci-fi Sounds »,
+  https://kenney.nl/assets/sci-fi-sounds) mêlés.
+- « Interface Sounds », https://kenney.nl/assets/interface-sounds : `mot.mp3` (confirmation_003),
+  `rate.mp3` (error_004), `ton-tour.mp3` (bong_001), `chrono.mp3` (tick_002),
+  `frappe-1..3.mp3` (click_001..003).
+- « Digital Audio », https://kenney.nl/assets/digital-audio : `partez.mp3` (threeTone1),
+  `vie.mp3` (powerUp2), `elimine.mp3` (lowDown).
+- `victoire.mp3` : copie de celle du Ludo (jingles_STEEL02, « Music Jingles »).
+- `meche.mp3` (la mèche qui crépite, jouée en boucle) : synthétisée pour Memora, souffle filtré et
+  crépitements aléatoires, versée au domaine public (CC0 1.0).

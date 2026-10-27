@@ -9,9 +9,12 @@ import { BombRulesDrawer } from '@/composites/play/bomb/BombRulesDrawer'
 import { BombSetupDrawer } from '@/composites/play/bomb/BombSetupDrawer'
 import { GolfRulesDrawer } from '@/composites/play/golf/setup/GolfRulesDrawer'
 import { GolfSetupDrawer } from '@/composites/play/golf/setup/GolfSetupDrawer'
+import { LudoRulesDrawer } from '@/composites/play/ludo/LudoRulesDrawer'
+import { LudoSetupDrawer } from '@/composites/play/ludo/LudoSetupDrawer'
 import { baccalaureatSettingsOf } from '@/core/lib/play/baccalaureat/settings'
 import { bombSettingsOf } from '@/core/lib/play/bomb/settings'
 import { golfSettingsOf } from '@/core/lib/play/golf/settings'
+import { ludoSettingsOf } from '@/core/lib/play/ludo/settings'
 import { PlayGames } from '@/utils/constants/play'
 import type { PlayGameName } from '@/utils/constants/play'
 
@@ -61,6 +64,7 @@ export const PLAY_SETUP_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   [PlayGames.Baccalaureat]: BacSetupDrawer,
   [PlayGames.Bomb]: BombSetupDrawer,
   [PlayGames.Golf]: GolfSetupDrawer,
+  [PlayGames.Ludo]: LudoSetupDrawer,
 }
 
 /**
@@ -77,5 +81,8 @@ export const PLAY_RULES_DRAWERS: Partial<Record<PlayGameName, ComponentType<Play
   ),
   [PlayGames.Golf]: ({ open, onClose, settings }) => (
     <GolfRulesDrawer open={open} onClose={onClose} settings={golfSettingsOf(settings)} />
+  ),
+  [PlayGames.Ludo]: ({ open, onClose, settings }) => (
+    <LudoRulesDrawer open={open} onClose={onClose} settings={ludoSettingsOf(settings)} />
   ),
 }

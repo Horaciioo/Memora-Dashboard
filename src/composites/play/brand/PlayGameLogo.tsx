@@ -97,21 +97,51 @@ const MARKS: Record<string, ReactNode> = {
   ),
   playLudo: (
     <>
-      <rect x="12" y="12" width="40" height="40" rx="9" fill="white" />
-      <path d="M12 21a9 9 0 0 1 9-9h11v20H12z" {...tint('--play-ludo')} />
-      <path d="M32 12h11a9 9 0 0 1 9 9v11H32z" {...tint('--play-baccalaureat')} />
-      <path d="M32 32h20v11a9 9 0 0 1-9 9H32z" {...tint('--play-gold')} />
-      <path d="M12 32h20v20H21a9 9 0 0 1-9-9z" {...tint('--play-golf')} />
-      <rect x="24" y="24" width="16" height="16" rx="4" fill="white" />
-      <circle cx="28.5" cy="28.5" r="1.8" {...tint('--play-night')} />
-      <circle cx="35.5" cy="35.5" r="1.8" {...tint('--play-night')} />
-      <circle cx="32" cy="32" r="1.8" {...tint('--play-night')} />
+      <defs>
+        <linearGradient id="play-ludo-trail" x1="0.1" y1="0" x2="0.8" y2="1">
+          <stop offset="0" stopColor="white" stopOpacity="0" />
+          <stop offset="1" stopColor="white" stopOpacity="0.9" />
+        </linearGradient>
+      </defs>
+      {/* Shadow waiting on the ground */}
+      <ellipse cx="43" cy="58" rx="12" ry="2.6" fill="black" opacity="0.28" />
+      {/* Bounce coming down from the top, widening as it falls */}
+      <path d="M3 5Q30 0 44 36L34 40Q26 5 3 5Z" fill="url(#play-ludo-trail)" />
+      {/* Speed lines along the fall */}
+      <path
+        d="M22 24l5 10M47 15l4 9"
+        stroke="white"
+        strokeOpacity="0.7"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M18 31l3 6"
+        stroke="white"
+        strokeOpacity="0.45"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      {/* Pawn tipped by the fall */}
+      <g transform="rotate(22 41 42)">
+        <path d="M28 39v6a13 9.5 0 0 0 26 0v-6z" {...tint('--play-ludo-pawn-side')} />
+        <path
+          d="M28 39v6a13 9.5 0 0 0 26 0v-6"
+          fill="none"
+          stroke="var(--play-ludo-pawn-rim)"
+          strokeWidth="0.8"
+        />
+        <ellipse cx="41" cy="39" rx="13" ry="9.5" {...tint('--play-ludo-pawn')} />
+        <ellipse cx="41" cy="39" rx="7" ry="5.1" {...tint('--play-ludo-red-deep')} />
+        <ellipse cx="41" cy="38.4" rx="6.3" ry="4.5" {...tint('--play-ludo-red')} />
+        <ellipse cx="37.6" cy="36.6" rx="2.3" ry="1.2" fill="white" opacity="0.55" />
+      </g>
     </>
   ),
 }
 
 // Logos drawn bare, without their tile
-const BARE = new Set(['playBaccalaureat', 'playBomb', 'playGolf'])
+const BARE = new Set(['playBaccalaureat', 'playBomb', 'playGolf', 'playLudo'])
 
 // Game not announced yet
 const MYSTERY = {

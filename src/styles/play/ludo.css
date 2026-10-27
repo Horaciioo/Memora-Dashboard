@@ -1,0 +1,426 @@
+/* Ludo ground: charcoal felt, no stars */
+.play-room:has(.play-ludo) {
+  background:
+    radial-gradient(
+      60rem 30rem at 50% -12%,
+      color-mix(in srgb, var(--play-ludo-board) 8%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--play-ludo-felt) 0%, var(--play-ludo-felt-deep) 100%);
+}
+
+.play-room:has(.play-ludo)::before,
+.play-room:has(.play-ludo) .play-floor {
+  display: none;
+}
+
+/* White board, rounded, lifted off the felt */
+.ludo-frame {
+  background: var(--play-ludo-board);
+  border-radius: 1.1rem;
+  padding: 2.6%;
+  box-shadow:
+    0 0.35rem 0 color-mix(in srgb, var(--play-ludo-board) 70%, var(--play-ludo-felt)),
+    0 1.4rem 2.8rem rgb(0 0 0 / 0.4);
+}
+
+.ludo-board {
+  position: relative;
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+
+/* Pawn: placed in cell units, glides square to square */
+.ludo-pawn {
+  position: absolute;
+  left: calc((var(--x) + var(--dx, 0)) / var(--cells) * 100%);
+  top: calc((var(--y) + var(--dy, 0)) / var(--cells) * 100%);
+  width: calc(100cqi / var(--cells) * 0.66 * var(--scale, 1));
+  translate: -50% -58%;
+  z-index: calc(10 + var(--z, 0));
+  transition:
+    left var(--glide) cubic-bezier(0.3, 0.7, 0.4, 1),
+    top var(--glide) cubic-bezier(0.3, 0.7, 0.4, 1),
+    width var(--glide) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ludo-pawn-art {
+  display: block;
+  height: auto;
+  filter: drop-shadow(0 0.08rem 0 var(--play-ludo-shadow));
+}
+
+/* On the board the pawn fills its spot */
+.ludo-pawn .ludo-pawn-art {
+  width: 100%;
+}
+
+/* A hop on each square */
+.ludo-pawn-hop {
+  animation: ludo-hop var(--glide) ease-out;
+}
+
+@keyframes ludo-hop {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  45% {
+    transform: translateY(-38%) scale(1.08);
+  }
+  80% {
+    transform: translateY(0) scale(0.96, 1.04);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Pawns the player may move bounce and glow */
+.ludo-pawn-pick {
+  cursor: pointer;
+  z-index: 40;
+}
+
+.ludo-pawn-pick .ludo-pawn-art {
+  animation: ludo-bob 0.9s ease-in-out infinite;
+  filter: drop-shadow(0 0 0.35rem var(--play-ludo-board)) drop-shadow(0 0 0.6rem var(--pawn-tone));
+}
+
+.ludo-pawn-pick:hover .ludo-pawn-art,
+.ludo-pawn-pick:focus-visible .ludo-pawn-art {
+  animation-play-state: paused;
+  transform: translateY(-14%) scale(1.1);
+}
+
+@keyframes ludo-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16%);
+  }
+}
+
+/* Star square, gilded while a pawn rests on it */
+.ludo-star-cell {
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+
+.ludo-star-lit {
+  opacity: 1;
+}
+
+/* Way of the pawn under the pointer: a dot on each square, a ghost pawn where it lands */
+.ludo-trail,
+.ludo-ghost {
+  position: absolute;
+  left: calc(var(--x) / var(--cells) * 100%);
+  top: calc(var(--y) / var(--cells) * 100%);
+  translate: -50% -50%;
+  pointer-events: none;
+  z-index: 35;
+  animation: ludo-trail 0.26s cubic-bezier(0.3, 1.6, 0.5, 1) calc(var(--rank) * 55ms) both;
+}
+
+.ludo-trail {
+  width: calc(100% / var(--cells) * 0.3);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background: var(--pawn-tone);
+  box-shadow:
+    0 0 0 0.14rem var(--play-ludo-board),
+    0 0.12rem 0.25rem var(--play-ludo-shadow);
+}
+
+.ludo-ghost {
+  width: calc(100% / var(--cells) * 0.66);
+  translate: -50% -58%;
+  opacity: 0.6;
+}
+
+.ludo-ghost .ludo-pawn-art {
+  width: 100%;
+  animation: ludo-bob 0.9s ease-in-out infinite;
+}
+
+@keyframes ludo-trail {
+  from {
+    opacity: 0;
+    scale: 0.2;
+  }
+}
+
+/* Die: a flat white square seen from above, its thickness under it like the pawns */
+.ludo-die {
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  width: var(--die, 3.25rem);
+  height: var(--die, 3.25rem);
+  padding: 16%;
+  border-radius: 22%;
+  background: var(--play-ludo-die);
+  box-shadow:
+    0 0.28rem 0 var(--play-ludo-die-side),
+    0 0.3rem 0 0.06rem var(--play-ludo-pawn-rim),
+    0 0.7rem 0.9rem var(--play-ludo-shadow);
+}
+
+.ludo-pip {
+  width: 74%;
+  aspect-ratio: 1;
+  place-self: center;
+  border-radius: 9999px;
+  background: var(--play-ludo-pip);
+}
+
+/* The die is thrown in: high and spinning, it lands, bounces twice and settles */
+.ludo-die-rolling {
+  animation: ludo-toss var(--roll) cubic-bezier(0.25, 0.7, 0.35, 1) both;
+}
+
+@keyframes ludo-toss {
+  0% {
+    translate: var(--throw-x, -2.5rem) -3.2rem;
+    rotate: -540deg;
+    scale: 0.7;
+    box-shadow: 0 2.2rem 1.2rem rgb(0 0 0 / 0.08);
+  }
+  42% {
+    translate: 0 0;
+    rotate: -40deg;
+    scale: 1.08 0.9;
+  }
+  58% {
+    translate: 0.35rem -1rem;
+    rotate: -12deg;
+    scale: 1;
+  }
+  72% {
+    translate: 0.15rem 0;
+    rotate: 6deg;
+    scale: 1.05 0.95;
+  }
+  84% {
+    translate: 0 -0.3rem;
+    rotate: -2deg;
+    scale: 1;
+  }
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+    scale: 1;
+  }
+}
+
+/* Thrown from the side of its plate */
+.ludo-plate-right {
+  --throw-x: 2.5rem;
+}
+
+/* Waiting for the player to roll */
+.ludo-die-ready {
+  cursor: pointer;
+  border-radius: 24%;
+  animation: ludo-call 1.2s ease-in-out infinite;
+}
+
+@keyframes ludo-call {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--pawn-tone) 70%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 0.55rem transparent;
+  }
+}
+
+/* Turn clock around the avatar */
+.ludo-ring {
+  background: conic-gradient(var(--pawn-tone) calc(var(--left) * 1turn), transparent 0);
+}
+
+.ludo-ring-alert {
+  animation: ludo-alert 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes ludo-alert {
+  to {
+    filter: brightness(1.35);
+  }
+}
+
+/* Player on turn */
+.ludo-plate-turn {
+  animation: ludo-plate 1.6s ease-in-out infinite;
+}
+
+@keyframes ludo-plate {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -0.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ludo-pawn {
+    transition: none;
+  }
+  .ludo-pawn-hop,
+  .ludo-pawn-pick .ludo-pawn-art,
+  .ludo-die-rolling,
+  .ludo-die-ready,
+  .ludo-trail,
+  .ludo-ghost,
+  .ludo-ghost .ludo-pawn-art,
+  .ludo-plate-turn,
+  .ludo-ring-alert {
+    animation: none;
+  }
+}
+
+/* Hub ground: tiny companions peeking in from an edge, startled, then gone again */
+.ludo-walker {
+  position: absolute;
+  width: var(--size);
+  margin: 1.2rem;
+  animation: ludo-peek var(--cycle) var(--delay) infinite;
+}
+
+.ludo-hopper {
+  display: block;
+  transform-origin: center bottom;
+  animation: ludo-hop-loop var(--hop) var(--delay) infinite;
+}
+
+/* Shadow on the felt, smaller while the pawn is up */
+.ludo-walker-shadow {
+  position: absolute;
+  left: 8%;
+  right: -2%;
+  bottom: -6%;
+  height: 34%;
+  border-radius: 9999px;
+  background: var(--play-ludo-shadow);
+  filter: blur(0.1rem);
+  animation: ludo-hop-shadow var(--hop) var(--delay) infinite;
+}
+
+/* Mark popping over the pawn when it notices you */
+.ludo-surprise {
+  position: absolute;
+  left: 50%;
+  bottom: 115%;
+  translate: -50% 0;
+  display: grid;
+  place-items: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 9999px;
+  background: var(--play-ludo-board);
+  color: var(--play-ludo-felt);
+  font-size: 0.75rem;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0;
+  animation: ludo-surprise var(--cycle) var(--delay) infinite;
+}
+
+/* Hidden, hops in, freezes, jumps, rushes back out, stays hidden */
+@keyframes ludo-peek {
+  0%,
+  6% {
+    transform: translate(var(--from-x), var(--from-y));
+    animation-timing-function: cubic-bezier(0.3, 0.1, 0.4, 1);
+  }
+  16% {
+    transform: translate(0, 0);
+  }
+  21% {
+    transform: translate(0, 0) scale(1);
+  }
+  22.5% {
+    transform: translate(0, -45%) scale(1.25);
+  }
+  24% {
+    transform: translate(0, 0) scale(1);
+  }
+  27% {
+    transform: translate(0, 0);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5);
+  }
+  31%,
+  100% {
+    transform: translate(var(--from-x), var(--from-y));
+  }
+}
+
+@keyframes ludo-surprise {
+  0%,
+  21% {
+    opacity: 0;
+    scale: 0.3;
+  }
+  22.5% {
+    opacity: 1;
+    scale: 1.2;
+  }
+  24%,
+  27% {
+    opacity: 1;
+    scale: 1;
+  }
+  29%,
+  100% {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+/* Squash on landing, stretch on the way up, soft at the top */
+@keyframes ludo-hop-loop {
+  0% {
+    transform: translateY(0) scale(1.12, 0.86);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  12% {
+    transform: translateY(-10%) scale(0.94, 1.08);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  50% {
+    transform: translateY(-75%) scale(1);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.3);
+  }
+  92% {
+    transform: translateY(-4%) scale(0.96, 1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1.12, 0.86);
+  }
+}
+
+@keyframes ludo-hop-shadow {
+  0%,
+  100% {
+    scale: 1;
+    opacity: 1;
+  }
+  50% {
+    scale: 0.55;
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ludo-walker,
+  .ludo-hopper,
+  .ludo-walker-shadow,
+  .ludo-surprise {
+    animation: none;
+  }
+}

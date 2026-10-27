@@ -439,6 +439,8 @@ export const BAC_BOARD = {
   round: NOTE,
   clock: 'text-2xl font-extrabold tabular-nums text-[var(--play-ink)]',
   clockLow: 'text-[var(--color-danger)]',
+  // Countdown in place of the board, no veil behind
+  inline: 'grid min-h-[50vh] place-items-center',
   // Countdown, a big blue 3D figure in the middle of the page over a blurred room
   overlay: 'fixed inset-0 z-30 grid place-items-center bg-[var(--play-night)]/45 backdrop-blur-xl',
   stage: 'flex flex-col items-center justify-center gap-6 text-center',
@@ -459,7 +461,7 @@ export const BAC_BOARD = {
   field: 'flex flex-col gap-1.5',
   fieldLabel: 'text-xs font-extrabold tracking-wide text-[var(--play-ink-soft)] uppercase',
   input:
-    'rounded-xl bg-[var(--play-chip)] px-3 py-2.5 text-base font-bold text-[var(--play-ink)] placeholder:font-normal placeholder:text-[var(--play-ink-faint)] focus:bg-[var(--play-panel-strong)] focus:outline-none',
+    'rounded-xl bg-[var(--play-chip)] px-3 py-2.5 text-base font-bold text-[var(--play-ink)] placeholder:font-normal placeholder:text-[var(--play-ink-faint)] focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--play-baccalaureat)]!',
   actions: 'flex flex-wrap items-center gap-3',
   // Review and scores
   lead: 'text-sm text-[var(--play-ink-soft)]',
@@ -475,6 +477,9 @@ export const BAC_BOARD = {
   answerNote: NOTE,
   vote: 'rounded-lg px-2.5 py-1 text-xs font-extrabold text-[var(--play-ink-soft)] hover:bg-[var(--play-panel-strong)]',
   voteOn: 'bg-[var(--play-panel-strong)] text-[var(--play-ink)]',
+  // Vote side with the faces of its voters
+  voteSide: 'flex shrink-0 items-center gap-1.5',
+  voteLabel: 'px-1 text-xs font-extrabold text-[var(--play-ink-faint)]',
   // Ranking
   ranks: 'flex flex-col gap-2',
   rank: `${PANEL} flex items-center gap-3 px-3 py-2.5`,
