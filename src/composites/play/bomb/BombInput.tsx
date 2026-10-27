@@ -41,7 +41,7 @@ export const BombInput = ({ sessionId, initial }: { sessionId: string; initial: 
     if (pending.current) return
     pending.current = window.setTimeout(() => {
       pending.current = null
-      void typing.act({ type: 'type', text: field.current?.value ?? next }, { quiet: true })
+      void typing.act({ type: 'type', text: field.current?.value ?? next })
     }, BOMB_SETTINGS.typingPaceMs)
   }
 
