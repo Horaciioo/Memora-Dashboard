@@ -131,9 +131,9 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: '2026-10-26',
     title: 'Memora Play est là !',
     intro:
-      'Memora ouvre sa salle de jeux : retrouve les autres membres pour une partie de Golf, de Baccalauréat ou de Bomb Party.',
+      'Memora ouvre sa salle de jeux : retrouve les autres membres pour une partie de Golf, de Baccalauréat, de Bomb Party ou de Ludo.',
     description:
-      'Memora n’offrait aucun moment de détente entre deux lives, et rien ne rapprochait les équipes en dehors du travail. Cette version ajoute « Memora Play », avec trois jeux, un chat de partie, des niveaux, un classement et des trophées, puis fait du « Golf » un vrai jeu de société en 3D. Elle précise aussi les « Recrutements » : recruteurs d’une session, étapes validées dans l’ordre et annonce copiée en deux temps.',
+      'Memora n’offrait aucun moment de détente entre deux lives, et rien ne rapprochait les équipes en dehors du travail. Cette version ajoute « Memora Play », avec quatre jeux, un chat de partie, des niveaux, un classement et des trophées, puis fait du « Golf » un vrai jeu de société en 3D. Elle précise aussi les « Recrutements » : recruteurs d’une session, étapes validées dans l’ordre et annonce copiée en deux temps.',
     items: [
       {
         tag: ChangelogTags.Added,
@@ -157,13 +157,31 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
+        text: 'Ajout du jeu « Ludo » : de un à quatre joueurs lancent le dé chacun leur tour et ramènent leurs pions à la maison, en mangeant ceux des autres sur le chemin.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout de la possibilité de régler une partie de « Ludo » : nombre de pions, temps par tour, faces du dé qui sortent un pion, fin au premier arrivé ou au podium, et règles comme le rejeu sur un six.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout, pendant une partie de « Ludo », d’un dé lancé sur le plateau, de pions qui avancent case par case, d’un journal des derniers événements et de bruitages à chaque lancer, capture et arrivée.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
         text: 'Ajout du jeu « Golf » : un parcours en 3D où jusqu’à quinze joueurs jouent en même temps, on tire la balle vers l’arrière pour viser et le moins de coups gagne.',
       },
       {
         tag: ChangelogTags.Added,
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
-        text: 'Ajout de trois formats dans le « Golf », choisis au lancement : « Casual » sur un parcours, « Tournoi » sur plusieurs parcours aux scores additionnés, et « Chaos jubilatoire » avec trois fois plus d’orbes et deux fois plus de malus.',
+        text: 'Ajout de trois formats dans le « Golf », choisis au lancement : « Casual » sur un parcours, « Tournoi » sur plusieurs parcours aux scores additionnés, et « Chaos jubilatoire » avec quatre fois plus d’orbes, deux fois plus de malus et cinq pouvoirs en main.',
       },
       {
         tag: ChangelogTags.Added,
@@ -212,6 +230,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
         text: 'Ajout d’un chat dans chaque partie et d’invitations, comme joueur ou comme spectateur, qui apparaissent en bas de l’écran.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.home,
+        permission: Permissions.PlayAccess,
+        text: 'Ajout d’une bulle d’invitation près de la cloche : quand un membre t’invite à jouer ou à regarder sa partie, tu peux l’accepter ou la refuser sans quitter ta page.',
       },
       {
         tag: ChangelogTags.Added,
@@ -277,6 +301,30 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.play,
         permission: Permissions.PlayAccess,
         text: 'Amélioration de « Bomb Party » : le dernier mot proposé par chaque joueur reste affiché sous son nom.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de « Bomb Party » : des bruitages accompagnent la mèche, la frappe, le mot trouvé, l’explosion et la victoire.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du « Baccalauréat » : les votes sur les réponses affichent le visage de chaque joueur qui a accepté ou refusé, et la progression des joueurs se met à jour en direct.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration de « Memora Play » : les parties, les messages du chat et les invitations arrivent tout de suite, sans recharger la page.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Amélioration du « Golf » : une fois ton trou fini, tu peux encore jouer tes malus contre les autres, mais plus tes bonus.',
       },
       {
         tag: ChangelogTags.Improved,
