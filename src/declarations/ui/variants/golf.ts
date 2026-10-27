@@ -16,6 +16,8 @@ export const GOLF_BOARD = {
   board: 'flex flex-col gap-4 pb-16',
   stage:
     'golf-hud-theme relative h-[min(72dvh,46rem)] min-h-[24rem] w-full overflow-hidden rounded-[0.7rem_1.1rem_0.8rem_1rem] border-b-[0.4rem] border-[var(--play-golf-deep)] bg-[var(--play-golf-deep)] ring-1 ring-[var(--play-line)] select-none',
+  stageFull: 'h-full! min-h-0! rounded-none! border-b-0! ring-0!',
+  boardFull: 'min-h-0 flex-1 pb-0!',
   loading: 'absolute inset-0 grid place-items-center text-sm font-bold text-[var(--play-ink-soft)]',
   // Top row: hole card, players, view keys
   top: 'golf-block-drop pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-3',
@@ -282,7 +284,7 @@ export const GOLF_SETUP = {
 export const GOLF_VOTE = {
   root: 'golf-vote-root fixed inset-0 z-[80] overflow-y-auto bg-[var(--play-night)] text-white select-none',
   stage:
-    'relative z-10 flex min-h-dvh flex-col items-center justify-center gap-8 px-4 py-8 sm:gap-12',
+    'relative z-10 flex min-h-dvh flex-col items-center justify-center gap-16 px-4 pt-4 pb-8 sm:gap-28',
   head: 'flex flex-col items-center',
   title:
     'golf-plate golf-vote-title px-8 pt-2 pb-1 text-5xl leading-tight font-black tracking-tight text-[var(--play-golf-gold-light)] uppercase [text-shadow:0_3px_0_rgb(0_0_0/0.4)] sm:text-6xl',
@@ -305,10 +307,14 @@ export const GOLF_VOTE = {
   strip:
     'w-full bg-[var(--play-golf-vote-strip)] px-2 py-1 text-center text-xs font-black tracking-wide text-white uppercase sm:text-base',
   // Avatar standing over the picked card
-  avatarBox: 'pointer-events-none absolute inset-x-0 bottom-full mb-2 flex justify-center',
-  avatarRing: 'rounded-full ring-4 ring-white shadow-[0_0.3rem_0_rgb(0_0_0/0.3)]',
+  avatarBox:
+    'pointer-events-none absolute inset-x-0 bottom-full mb-2 flex flex-wrap items-end justify-center -space-x-1.5',
+  avatarRing: 'shadow-[0_0.25rem_0_rgb(0_0_0/0.3)]',
   avatarName:
     'absolute top-full mt-1 text-xs font-black tracking-wide text-[var(--play-golf-gold-light)] uppercase [text-shadow:0_2px_0_rgb(0_0_0/0.5)]',
+  timer:
+    'golf-plate grid min-w-20 place-items-center px-5 py-1 text-4xl leading-none font-black tabular-nums text-[var(--play-golf-gold-light)]',
+  timerLow: 'animate-pulse text-white',
   hint: 'golf-plate max-w-xl px-6 py-2 text-center text-sm font-bold text-white/90 sm:text-base',
   actions: 'flex flex-wrap items-center justify-center gap-3',
   button:

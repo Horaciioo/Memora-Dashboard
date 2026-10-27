@@ -106,6 +106,10 @@ export const PLAY_HUB_COPY = {
   started: 'Partie lancée',
   leftDone: 'Partie quittée',
   backToHub: 'Retourner au Hub',
+  fullscreen: 'Plein écran',
+  windowed: 'Quitter le plein écran',
+  showChat: 'Afficher le chat',
+  hideChat: 'Masquer le chat',
   // Bottom dock
   dockStats: 'Stats de jeux',
   dockTrophies: 'Trophées',

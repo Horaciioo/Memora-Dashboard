@@ -400,14 +400,6 @@
   animation: golf-vote-in 460ms cubic-bezier(0.3, 1.4, 0.5, 1) calc(var(--i, 0) * 70ms) both;
 }
 
-.golf-vote-leave .golf-vote-card {
-  animation: golf-vote-out 380ms ease-in both;
-}
-
-.golf-vote-leave .golf-vote-card[data-picked='true'] {
-  animation-name: golf-vote-pick;
-}
-
 .golf-vote-band {
   transform-origin: center;
   animation: golf-vote-band 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -418,12 +410,13 @@
 }
 
 .golf-vote-slide {
-  animation: golf-vote-slide 520ms cubic-bezier(0.3, 0.6, 0.35, 1) both;
+  animation: golf-vote-slide 520ms linear both;
 }
 
 .golf-vote-arc {
+  display: block;
   transform-origin: bottom center;
-  animation: golf-vote-arc 520ms ease-out both;
+  animation: golf-vote-arc 520ms linear both;
 }
 
 .golf-vote-float {
@@ -440,25 +433,6 @@
     opacity: 1;
     translate: 0 0;
     scale: 1;
-  }
-}
-
-@keyframes golf-vote-out {
-  to {
-    opacity: 0;
-    translate: 0 2rem;
-    scale: 0.6;
-  }
-}
-
-@keyframes golf-vote-pick {
-  30% {
-    scale: 1.12;
-  }
-  to {
-    opacity: 0;
-    translate: 0 -1rem;
-    scale: 1.5;
   }
 }
 
@@ -495,26 +469,18 @@
   }
 }
 
+/* Half circle: slow at the top, quick at both ends */
 @keyframes golf-vote-arc {
   0% {
     translate: 0 0;
-    scale: 1 1;
+    animation-timing-function: cubic-bezier(0.3, 0.6, 0.5, 1);
   }
-  38% {
-    translate: 0 -3.4rem;
-    scale: 0.94 1.08;
-  }
-  68% {
-    translate: 0 0;
-    scale: 1.14 0.84;
-  }
-  82% {
-    translate: 0 -0.7rem;
-    scale: 1 1;
+  50% {
+    translate: 0 calc(-3rem - var(--lift, 0) * 1.25rem);
+    animation-timing-function: cubic-bezier(0.5, 0, 0.7, 0.4);
   }
   100% {
     translate: 0 0;
-    scale: 1 1;
   }
 }
 
@@ -1378,4 +1344,22 @@
   .play-bomb-spark-glow {
     animation: none;
   }
+}
+
+/* Room grows or shrinks as one piece, new frame scaled over the old, no cross-fade */
+::view-transition-group(play-room) {
+  animation-duration: 340ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+::view-transition-old(play-room),
+::view-transition-new(play-room) {
+  height: 100%;
+  object-fit: cover;
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(play-room) {
+  display: none;
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 import { GolfSettings } from '@/composites/play/golf/hud/GolfSettings'
+import { usePlayStageStore } from '@/core/store/playStage'
 import { GOLF_BOARD_COPY } from '@/declarations/play/golf/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { GOLF_BOARD } from '@/declarations/ui/variants'
@@ -26,6 +27,9 @@ export const GolfViewKeys = ({
   const [isOpen, setOpen] = useState(false)
   const ViewIcon = isOverview ? ICONS.golfFollow : ICONS.golfOverview
   const SettingsIcon = ICONS.settingsLine
+  const { isFullscreen, isChatOpen, toggleFullscreen, toggleChat } = usePlayStageStore()
+  const FullscreenIcon = isFullscreen ? ICONS.playWindowed : ICONS.playFullscreen
+  const ChatIcon = ICONS.playChat
 
   useEffect(() => {
     if (!isOpen) return
@@ -56,6 +60,26 @@ export const GolfViewKeys = ({
         >
           <SettingsIcon className={GOLF_BOARD.viewIcon} aria-hidden="true" />
         </button>
+        <button
+          type="button"
+          className={cn(GOLF_BOARD.view, isFullscreen && GOLF_BOARD.viewOn)}
+          aria-label={isFullscreen ? GOLF_BOARD_COPY.windowed : GOLF_BOARD_COPY.fullscreen}
+          aria-pressed={isFullscreen}
+          onClick={toggleFullscreen}
+        >
+          <FullscreenIcon className={GOLF_BOARD.viewIcon} aria-hidden="true" />
+        </button>
+        {isFullscreen && (
+          <button
+            type="button"
+            className={cn(GOLF_BOARD.view, isChatOpen && GOLF_BOARD.viewOn)}
+            aria-label={isChatOpen ? GOLF_BOARD_COPY.hideChat : GOLF_BOARD_COPY.showChat}
+            aria-pressed={isChatOpen}
+            onClick={toggleChat}
+          >
+            <ChatIcon className={GOLF_BOARD.viewIcon} aria-hidden="true" />
+          </button>
+        )}
       </div>
       {isOpen && <GolfSettings />}
     </div>
