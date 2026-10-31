@@ -667,3 +667,45 @@ export const ModerationIllustration: FC<EmptyStateIllustrationProps> = ({ classN
     )}
   />
 )
+
+/**
+ * Bar chart with a rising line
+ * @param {string} [className] - Classes merged onto the svg
+ * @return {JSX.Element}
+ */
+
+export const StatsIllustration: FC<EmptyStateIllustrationProps> = ({ className }) => (
+  <Scene
+    className={className}
+    render={({ fill, lift, deep }) => (
+      <>
+        <Sheet x={30} y={34} width={140} height={130} />
+        <rect x="52" y="108" width="20" height="38" rx="6" fill={lift} />
+        <rect x="82" y="84" width="20" height="62" rx="6" fill={fill} />
+        <rect x="112" y="64" width="20" height="82" rx="6" fill={deep} />
+        <path
+          d="M48 152h104"
+          stroke="var(--color-brand-200)"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+        <path
+          d="m54 96 32-22 28-12 34-14"
+          fill="none"
+          stroke={deep}
+          strokeWidth="4.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx="148" cy="48" r="7" fill={fill} />
+        <Sparks
+          paint={lift}
+          items={[
+            { x: 24, y: 70, size: 8 },
+            { x: 180, y: 112, size: 5, soft: true },
+          ]}
+        />
+      </>
+    )}
+  />
+)

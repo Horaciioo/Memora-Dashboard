@@ -11,6 +11,7 @@ import {
   NotificationsIllustration,
   ProjectsIllustration,
   SettingsIllustration,
+  StatsIllustration,
   TasksIllustration,
   TeamsIllustration,
 } from '@/components/elements/feedback/EmptyStateIllustration'
@@ -37,6 +38,7 @@ export const ILLUSTRATIONS = {
   notifications: NotificationsIllustration,
   settings: SettingsIllustration,
   moderation: ModerationIllustration,
+  stats: StatsIllustration,
 } as const satisfies Record<string, FC<EmptyStateIllustrationProps>>
 
 export type IllustrationName = keyof typeof ILLUSTRATIONS
