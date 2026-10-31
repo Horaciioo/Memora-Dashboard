@@ -374,6 +374,7 @@ export const AVATAR_STYLES = {
   xl: 'h-24 w-24 text-2xl',
   hero: 'h-36 w-36 text-5xl sm:h-44 sm:w-44',
   stack: 'flex items-center -space-x-2',
+  stackWrapped: 'flex flex-wrap items-center gap-y-0.5 pr-2 [&>*]:-mr-2',
   ring: 'ring-2 ring-[var(--color-surface-raised)]',
 } as const
 

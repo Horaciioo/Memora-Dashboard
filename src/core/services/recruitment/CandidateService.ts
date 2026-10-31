@@ -272,3 +272,18 @@ export const recruiterIdsOf = async (id: string): Promise<string[]> => {
 
   return rows.map((row) => row.accountId)
 }
+
+/**
+ * Read who observes the interview of a candidate
+ * @param {string} id - Candidate identifier
+ * @return {Promise<string[]>} - Observer identifiers
+ */
+
+export const observerIdsOf = async (id: string): Promise<string[]> => {
+  const rows = await prisma.recruitmentSeat.findMany({
+    where: { candidateId: id },
+    select: { accountId: true },
+  })
+
+  return rows.map((row) => row.accountId)
+}

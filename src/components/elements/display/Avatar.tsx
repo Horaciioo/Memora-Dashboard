@@ -66,6 +66,7 @@ export interface AvatarStackProps {
   people: { id: string; name: string; src?: string | null }[]
   size?: AvatarSize
   max?: number
+  wrap?: boolean
 }
 
 /**
@@ -73,15 +74,16 @@ export interface AvatarStackProps {
  * @param {{ id: string, name: string, src?: string | null }[]} people - People to show
  * @param {AvatarSize} [size] - Size token
  * @param {number} [max] - Portraits shown before collapsing
+ * @param {boolean} [wrap] - Drops to the next line at the edge of the box
  * @return {JSX.Element}
  */
 
-export const AvatarStack = ({ people, size = 'xs', max = 4 }: AvatarStackProps) => {
+export const AvatarStack = ({ people, size = 'xs', max = 4, wrap }: AvatarStackProps) => {
   const shown = people.slice(0, max)
   const hidden = people.length - shown.length
 
   return (
-    <span className={AVATAR_STYLES.stack}>
+    <span className={wrap ? AVATAR_STYLES.stackWrapped : AVATAR_STYLES.stack}>
       {shown.map((person) => (
         <Avatar
           key={person.id}

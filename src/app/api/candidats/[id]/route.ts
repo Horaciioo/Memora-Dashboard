@@ -5,6 +5,7 @@ import { signalCandidate, signalCandidateRemoved } from '@/core/lib/recruitment/
 import {
   candidateFields,
   candidateSession,
+  observerIdsOf,
   recruiterIdsOf,
   removeCandidate,
   updateCandidate,
@@ -38,7 +39,11 @@ export const PATCH = createProtectedRoute({
   descriptor: { summary: 'Edit a candidate', tags: ['recruitment'] },
   handler: async ({ params, raw, session, scope, access }) => {
     const perimeter = await scope()
-    const parsed = parseFormValues(await candidateFields(), raw, { fillMissing: true })
+    const parsed = parseFormValues(
+      await candidateFields(undefined, await observerIdsOf(params.id)),
+      raw,
+      { fillMissing: true }
+    )
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     const before = await recruiterIdsOf(params.id)

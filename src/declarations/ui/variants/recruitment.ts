@@ -103,9 +103,9 @@ export const CANDIDATE_FILE = {
  */
 
 export const INTERVIEW_AGENDA = {
-  root: 'flex flex-col gap-4',
+  root: 'flex flex-col gap-8',
   bar: 'flex flex-wrap items-end justify-between gap-3',
-  periodField: 'flex flex-col gap-1.5',
+  periodField: 'flex flex-col gap-3',
   periodNav: 'flex items-center gap-1.5',
   periodPicker: 'w-72 max-w-full',
   picture: 'overflow-x-auto rounded-[var(--radius-md)] border border-[var(--color-border)]',
@@ -213,6 +213,7 @@ export const MY_STATS = {
 export const MY_DAY = {
   list: 'flex flex-col divide-y divide-[var(--color-border)]',
   slot: 'flex w-full cursor-pointer items-center gap-3 rounded-[var(--radius-md)] px-2 py-3 text-left transition-colors hover:bg-[var(--color-hover)]',
+  done: 'text-[var(--color-ink-subtle)] line-through',
   clock: 'w-12 shrink-0 text-sm font-bold tabular-nums',
   name: 'min-w-0 flex-1 truncate font-semibold',
   empty: 'text-sm italic text-[var(--color-ink-subtle)]',
@@ -220,7 +221,7 @@ export const MY_DAY = {
   // Spacer takes the height of a title
   ringsColumn: 'flex flex-col gap-3',
   ringsSpacer: 'invisible hidden text-2xl font-bold tracking-tight select-none lg:block',
-  ringsBody: 'flex flex-1 items-center justify-end',
+  ringsBody: 'flex flex-1 items-center justify-center',
 } as const
 
 /**

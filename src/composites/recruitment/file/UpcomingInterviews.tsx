@@ -30,7 +30,7 @@ export const UpcomingInterviews = ({ serverTime }: UpcomingInterviewsProps) => {
   if (coming.length === 0) return null
 
   return (
-    <Section title={RECRUITMENT_COPY.upcomingTitle} bare>
+    <Section title={RECRUITMENT_COPY.upcomingTitle} padded>
       <RowList
         groups={[
           {

@@ -62,7 +62,9 @@ const PERSON = { select: { id: true, displayName: true, avatarUrl: true } } as c
 
 // Relations every live view needs
 const LIVE_SHAPE = {
-  youtuber: { select: { id: true, name: true, avatarUrl: true, bannerUrl: true, fadeBannerUrl: true } },
+  youtuber: {
+    select: { id: true, name: true, avatarUrl: true, bannerUrl: true, fadeBannerUrl: true },
+  },
   announcedBy: PERSON,
   coordinations: { include: { account: PERSON }, orderBy: { askedAt: 'asc' } },
   calendarEvent: {

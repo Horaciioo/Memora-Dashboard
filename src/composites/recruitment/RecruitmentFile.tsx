@@ -91,7 +91,7 @@ export const RecruitmentFile = ({
               value: 'overview',
               label: SESSION_FILE_COPY.tabOverview,
               icon: 'sheet',
-              render: () => <OverviewTab serverTime={serverTime} />,
+              render: () => <OverviewTab />,
             },
             {
               value: 'instructions',
@@ -109,7 +109,7 @@ export const RecruitmentFile = ({
               value: 'calendar',
               label: RECRUITMENT_COPY.tabCalendar,
               icon: 'meetings',
-              render: () => <CalendarTab />,
+              render: () => <CalendarTab serverTime={serverTime} />,
             },
             {
               value: 'results',

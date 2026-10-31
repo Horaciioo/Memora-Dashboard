@@ -65,10 +65,16 @@ export const loadRecruitment = async (
 
   const seated = await isObserver(id, session.id)
 
+  // Anyone already seated stays valid and shown, whatever their function now
+  const keptObservers = [
+    ...(detail.summary.values.observerIds as string[]),
+    ...detail.candidates.flatMap((candidate) => candidate.observers.map((seat) => seat.id)),
+  ]
+
   const [candidate, step, sessionForm, activity] = await Promise.all([
-    candidateFields(String(detail.summary.values.youtuberId)),
+    candidateFields(String(detail.summary.values.youtuberId), keptObservers),
     stepFields(),
-    sessionFields(perimeter, String(detail.summary.values.youtuberId)),
+    sessionFields(perimeter, String(detail.summary.values.youtuberId), keptObservers),
     canReadLogs
       ? readRecordTreeActivity(
           JOURNAL_FILES.Recruitment,

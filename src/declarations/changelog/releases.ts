@@ -259,6 +259,25 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         permission: Permissions.LiveModerate,
         text: 'Correction d’un bug qui proposait des suggestions vides dans la « Mod View ».',
       },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Correction d’un bug de « Recrutements » qui proposait n’importe quel membre comme observateur : seuls les membres de l’équipe « Observateurs » sont proposés, et ceux déjà placés restent en place.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Correction d’un bug de « Recrutements » qui retirait des observateurs de leurs entretiens à chaque modification de la session.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentObserve,
+        text: 'Correction d’un bug de « Recrutements » qui empêchait de quitter un entretien où l’on avait été placé comme observateur, et laissait le bouton « Observer » sur l’ancien état.',
+      },
     ],
   },
   {

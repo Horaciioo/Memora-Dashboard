@@ -388,6 +388,21 @@ export const VERDICT_OUTCOMES: readonly string[] = [
 ]
 
 /**
+ * Outcomes reached once the interview is over
+ * @type {readonly string[]}
+ */
+
+export const PAST_INTERVIEW_OUTCOMES: readonly string[] = [
+  OutcomeNames.Deliberating,
+  OutcomeNames.Favorable,
+  OutcomeNames.Unfavorable,
+  OutcomeNames.Mixed,
+  OutcomeNames.Accepted,
+  OutcomeNames.Refused,
+  OutcomeNames.Withdrawn,
+]
+
+/**
  * Recruitment outcomes
  * @type {readonly FixedRecruitmentOutcome[]}
  */

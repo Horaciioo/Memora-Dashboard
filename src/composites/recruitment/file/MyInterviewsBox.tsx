@@ -67,7 +67,8 @@ export const MyInterviewsBox = ({ title, empty, seat, candidates, now }: MyInter
       return {
         id: candidate.id,
         title: candidate.name,
-        meta: stage && RECRUITMENT_COPY.timelineStage(CANDIDATE_STAGE_COPY[stage]),
+        meta: stage && CANDIDATE_STAGE_COPY[stage],
+        metaEmpty: true,
         lead: <Avatar name={candidate.name} src={candidate.avatarUrl} size="md" />,
         trail: (
           <span className="flex items-center gap-3">
