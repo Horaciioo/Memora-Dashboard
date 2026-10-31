@@ -8,6 +8,7 @@ export {
   createCandidate,
   findCandidateFile,
   moveCandidate,
+  observerIdsOf,
   recruiterIdsOf,
   removeCandidate,
   saveReview,

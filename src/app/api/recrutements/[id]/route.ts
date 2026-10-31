@@ -22,11 +22,11 @@ export const PATCH = createProtectedRoute({
   descriptor: { summary: 'Edit a recruitment session', tags: ['recruitment'] },
   handler: async ({ params, raw, session, scope }) => {
     const perimeter = await scope()
-    const fields = await sessionFields(perimeter)
+    const before = await readSession(params.id, perimeter)
+    const kept = before.summary.values.observerIds as string[]
+    const fields = await sessionFields(perimeter, undefined, kept)
     const parsed = parseFormValues(fields, raw, { fillMissing: true, enforceRequired: false })
     if (!parsed.ok) throw invalidInput(parsed.issues)
-
-    const before = await readSession(params.id, perimeter)
 
     // Closing goes through its own route
     if (isHandClosure(readText(parsed.values, 'status') ?? undefined, before.summary.status)) {

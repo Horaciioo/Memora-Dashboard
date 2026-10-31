@@ -3,7 +3,11 @@ import { activeFunctions } from '@/core/services/reference/lookups'
 import { functionOptions, toOptions } from '@/core/lib/forms/options'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { memberOptions, teamOptions, youtuberOptions } from '@/core/services/work/shared'
-import { JUNIOR_FUNCTION_OF, RECRUITER_FUNCTION } from '@/declarations/reference/fixed'
+import {
+  JUNIOR_FUNCTION_OF,
+  OBSERVER_FUNCTION,
+  RECRUITER_FUNCTION,
+} from '@/declarations/reference/fixed'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
 import { OUTCOME_GROUPS } from '@/declarations/recruitment/outcomes'
@@ -21,22 +25,53 @@ const { shortTextMaxLength, longTextMaxLength, markdownMaxLength, noteMaxLength 
 import 'server-only'
 
 /**
+ * Members holding the Observateurs function, plus those already seated who stay valid
+ * @param {string[]} kept - Observers already in the file
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+const observerOptions = async (kept: string[]): Promise<FieldOption[]> => {
+  const options = await teamOptions({ functionName: OBSERVER_FUNCTION })
+  const known = new Set(options.map((option) => option.value))
+  const missing = [...new Set(kept)].filter((id) => !known.has(id))
+  if (missing.length === 0) return options
+
+  const rows = await prisma.account.findMany({
+    where: { id: { in: missing } },
+    select: { id: true, displayName: true, avatarUrl: true },
+  })
+
+  // Seated before they lost the function, they can leave but nobody new joins
+  return [
+    ...options,
+    ...rows.map((row) => ({
+      value: row.id,
+      label: row.displayName,
+      image: row.avatarUrl ?? undefined,
+      disabled: true,
+    })),
+  ]
+}
+
+/**
  * Declarations of the session form
  * @param {AccessScope} scope - Perimeter
  * @param {string} [youtuberId] - Creator of an existing session, narrowing the team pickers
+ * @param {string[]} [keptObservers] - Observers already seated, kept valid
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
 export const sessionFields = async (
   scope: AccessScope,
-  youtuberId?: string
+  youtuberId?: string,
+  keptObservers: string[] = []
 ): Promise<FieldDefinition[]> => {
   const [creators, functions, responsables, recruiters, observers, links] = await Promise.all([
     youtuberOptions(scope),
     activeFunctions(),
     teamOptions({ role: MemberRoles.Responsable, youtuberId, withGlobal: true }),
     teamOptions({ functionName: RECRUITER_FUNCTION, youtuberId, withGlobal: true }),
-    memberOptions(),
+    observerOptions(keptObservers),
     prisma.youtuberFunction.findMany({ select: { youtuberId: true, functionId: true } }),
   ])
 
@@ -154,12 +189,17 @@ const sessionRecruiterOptions = async (youtuberId: string): Promise<FieldOption[
 /**
  * Declarations of the candidate form
  * @param {string} [youtuberId] - Creator of the session, narrowing the recruiters to its team
+ * @param {string[]} [keptObservers] - Observers already seated, kept valid
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const candidateFields = async (youtuberId?: string): Promise<FieldDefinition[]> => {
-  const [members, outcomes, recruiters] = await Promise.all([
+export const candidateFields = async (
+  youtuberId?: string,
+  keptObservers: string[] = []
+): Promise<FieldDefinition[]> => {
+  const [members, observers, outcomes, recruiters] = await Promise.all([
     memberOptions(),
+    observerOptions(keptObservers),
     prisma.recruitmentOutcome.findMany({
       where: { archived: false },
       orderBy: { position: 'asc' },
@@ -168,7 +208,7 @@ export const candidateFields = async (youtuberId?: string): Promise<FieldDefinit
   ])
 
   // Observers may sit in even while absent
-  const seats: FieldOption[] = members.map((option) => ({
+  const seats: FieldOption[] = observers.map((option) => ({
     value: option.value,
     label: option.label,
     image: option.image,

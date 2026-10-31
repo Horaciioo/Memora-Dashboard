@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import { AvatarStack } from '@/components/elements/display/Avatar'
@@ -35,7 +34,8 @@ export const CandidateTeam = ({ candidate, record }: CandidateTeamProps) => {
   const { detail, fields, can } = useRecruitmentState()
   const startInterview = useStartInterview()
   const observe = useObserving()
-  const [joined, setJoined] = useState(candidate.observers.some((seat) => seat.id === can.viewerId))
+  // Read from the card, a seat given in the picker counts too
+  const joined = candidate.observers.some((seat) => seat.id === can.viewerId)
 
   // Once the verdict is given, only a manager or its recruiter moves the seats
   const isLocked = isInterviewLocked(
@@ -50,6 +50,7 @@ export const CandidateTeam = ({ candidate, record }: CandidateTeamProps) => {
 
     return picked.length > 0 ? (
       <AvatarStack
+        wrap
         size="sm"
         max={picked.length}
         people={picked.map((option) => ({
@@ -88,7 +89,7 @@ export const CandidateTeam = ({ candidate, record }: CandidateTeamProps) => {
         }
 
   const toggle = async () => {
-    if (await observe(candidate.id, !joined)) setJoined(!joined)
+    if (await observe(candidate.id, !joined)) router.refresh()
   }
 
   return (

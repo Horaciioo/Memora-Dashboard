@@ -24,18 +24,18 @@ export const setObserving = async (
   })
   if (!candidate) throw notFound()
 
-  // A named seat of the session, or the Observateurs function which opens every session
-  const seat = await prisma.recruitmentObserver.findUnique({
-    where: { sessionId_accountId: { sessionId: candidate.sessionId, accountId } },
-  })
-  if (!seat && !canObserve) throw forbidden()
-
-  // Leaving always works
+  // Leaving always works, a seat given by a manager included
   if (!joined) {
     await prisma.recruitmentSeat.deleteMany({ where: { candidateId, accountId } })
 
     return candidate.sessionId
   }
+
+  // A named seat of the session, or the Observateurs function which opens every session
+  const seat = await prisma.recruitmentObserver.findUnique({
+    where: { sessionId_accountId: { sessionId: candidate.sessionId, accountId } },
+  })
+  if (!seat && !canObserve) throw forbidden()
 
   // The recruiter of a candidate never observes the same interview
   const leads = await prisma.candidateRecruiter.findUnique({
