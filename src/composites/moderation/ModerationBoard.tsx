@@ -1,6 +1,7 @@
 'use client'
 
 import Link from '@/components/elements/navigation/AppLink'
+import { usePathname, useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
@@ -9,6 +10,7 @@ import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { Skeleton } from '@/components/elements/feedback/Skeleton'
 import { Input } from '@/components/elements/forms/inputs/Input'
+import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { PageOptions, type PageOption } from '@/components/structures/page/PageOptions'
 import { Drawer } from '@/components/structures/overlays/Drawer'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
@@ -32,7 +34,7 @@ import { measureSeed } from '@/declarations/sanctions/measures'
 import { SANCTION_TEMPLATES } from '@/declarations/sanctions/template'
 import { accentVars } from '@/declarations/ui/theme'
 import { LIVECON_TITLE, SANCTION_PANEL } from '@/declarations/ui/variants'
-import type { FieldDefinition } from '@/types/forms'
+import type { FieldDefinition, FieldOption } from '@/types/forms'
 import type { LiveconLevelView, LiveconStateView } from '@/types/livecon'
 import type { SanctionMeasureView, SanctionOffenseCard, SanctionPanelView } from '@/types/sanctions'
 import { SanctionPanels } from '@/utils/constants/moderation'
@@ -41,6 +43,8 @@ import { foldText } from '@/utils/format/strings'
 
 export interface ModerationBoardProps {
   creatorId: string
+  // Creators the member may switch between
+  creators: FieldOption[]
   levels: LiveconLevelView[]
   initialState: LiveconStateView[]
   panels: SanctionPanelName[]
@@ -155,6 +159,7 @@ const OffenseBox = ({
 
 export const ModerationBoard = ({
   creatorId,
+  creators,
   levels,
   initialState,
   panels,
@@ -164,6 +169,8 @@ export const ModerationBoard = ({
   canUpdateLivecon,
   canManageSanctions,
 }: ModerationBoardProps) => {
+  const router = useRouter()
+  const pathname = usePathname()
   const sanctions = useSanctions(initialPanel)
   const [search, setSearch] = useState('')
   const [showLegend, setShowLegend] = useState(false)
@@ -337,17 +344,28 @@ export const ModerationBoard = ({
         )}
       </div>
 
-      {panels.length > 1 && (
+      {(panels.length > 1 || creators.length > 1) && (
         <div className={SANCTION_PANEL.toolbar}>
-          <SegmentedControl
-            label={SANCTION_COPY.panelTitle.replace('{panel}', '')}
-            options={panels.map((key) => ({
-              value: key,
-              label: SANCTION_PANEL_REGISTRY.label(key),
-            }))}
-            value={panel}
-            onChange={(next) => void sanctions.select(next, level?.id ?? null)}
-          />
+          {creators.length > 1 && (
+            <SelectMenu
+              options={creators}
+              value={creatorId}
+              mark="avatar"
+              label={SANCTION_COPY.creatorPick}
+              onChange={(next) => router.replace(`${pathname}?youtuber=${next}`)}
+            />
+          )}
+          {panels.length > 1 && (
+            <SegmentedControl
+              label={SANCTION_COPY.panelTitle.replace('{panel}', '')}
+              options={panels.map((key) => ({
+                value: key,
+                label: SANCTION_PANEL_REGISTRY.label(key),
+              }))}
+              value={panel}
+              onChange={(next) => void sanctions.select(next, level?.id ?? null)}
+            />
+          )}
         </div>
       )}
 

@@ -85,9 +85,7 @@ export const SuggestionList = ({
                   {stepLabel && <p className={MODVIEW_SUGGEST.step}>{stepLabel}</p>}
                 </div>
 
-                <p className={offense ? MODVIEW_SUGGEST.why : MODVIEW_SUGGEST.none}>
-                  {offense?.name ?? COPY.noOffense}
-                </p>
+                {offense && <p className={MODVIEW_SUGGEST.why}>{offense.name}</p>}
 
                 <p className={MODVIEW_SUGGEST.quote}>
                   <FlaggedText text={source.text} flagged={source.flagged} />

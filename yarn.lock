@@ -1081,6 +1081,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@phosphor-icons/react@npm:^2.1.10":
+  version: 2.1.10
+  resolution: "@phosphor-icons/react@npm:2.1.10"
+  peerDependencies:
+    react: ">= 16.8"
+    react-dom: ">= 16.8"
+  checksum: 10c0/9a469e1bdcabcd3db02eda13142d57be250847ebbeb82b33c8900580a6a23ed4f411dbb9b9deacef726ff3fa8ffc960c8868b518e448bd2cee654cedf3fa4bda
+  languageName: node
+  linkType: hard
+
 "@prisma/adapter-pg@npm:^7.9.1":
   version: 7.9.1
   resolution: "@prisma/adapter-pg@npm:7.9.1"
@@ -6233,6 +6243,7 @@ __metadata:
   resolution: "memora-dashboard@workspace:."
   dependencies:
     "@logtail/node": "npm:^0.5.8"
+    "@phosphor-icons/react": "npm:^2.1.10"
     "@prisma/adapter-pg": "npm:^7.9.1"
     "@prisma/client": "npm:^7.9.1"
     "@react-three/drei": "npm:^10.7.9"

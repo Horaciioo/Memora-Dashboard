@@ -179,6 +179,7 @@ export const readPanel = async (
       rungCount: tiers.length,
       rungs: tiers.map(toRung),
       examples: toLines(row.example),
+      tolerated: toLines(row.toleratedExample),
       keywords: toLines(row.keywords),
     }
   })

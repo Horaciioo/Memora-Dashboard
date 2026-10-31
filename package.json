@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@logtail/node": "^0.5.8",
+    "@phosphor-icons/react": "^2.1.10",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@react-three/drei": "^10.7.9",

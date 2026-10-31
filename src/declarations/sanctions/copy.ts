@@ -8,6 +8,7 @@ export const SANCTION_COPY = {
   discordTitle: 'Panel Discord',
   lead: "Le livecon en vigueur influe sur le panel. Les sanctions affichées sont celles qui s’appliquent à ce livecon. Attention, le panel de sanctions n'est qu'une référence, il ne remplace pas ton jugement humain.",
   panelTitle: 'Panel {panel}',
+  creatorPick: 'YouTubeur',
   legendTitle: 'Légende des sanctions',
   search: 'Chercher une infraction',
   opening: 'Ouverture de la fiche…',

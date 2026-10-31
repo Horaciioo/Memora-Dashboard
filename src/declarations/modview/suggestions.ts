@@ -45,6 +45,9 @@ export const WORD_STEM = 5
 // Weight of a word of the offence name against one of its examples
 export const NAME_WEIGHT = 2
 
+// Shortest case compared as a phrase
+export const MIN_PHRASE = 4
+
 // Weight of a whole example said again
 export const PHRASE_WEIGHT = 4
 
@@ -68,7 +71,6 @@ export const MODVIEW_SUGGESTION_COPY = {
   delete: 'Supprimer le message',
   deny: 'Refuser le message',
   dismiss: 'Écarter',
-  noOffense: 'Aucune infraction du panel ne correspond. Choisis-la à la main.',
   noCommand: 'Ce palier se règle sans commande : supprime le message.',
   fromAutomod: 'AutoMod',
   fromChat: 'Chat',

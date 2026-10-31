@@ -6,9 +6,16 @@ export const metadata: Metadata = { title: SANCTION_COPY.title }
 
 /**
  * Twitch sanction panel
+ * @param {Object} props - Address params
  * @return {Promise<JSX.Element>} - Moderation page
  */
 
-export default async function SanctionsPage() {
-  return <SanctionsScreen />
+export default async function SanctionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ youtuber?: string }>
+}) {
+  const { youtuber } = await searchParams
+
+  return <SanctionsScreen youtuberId={youtuber} />
 }
