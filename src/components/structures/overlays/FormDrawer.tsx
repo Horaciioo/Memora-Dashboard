@@ -24,6 +24,7 @@ import type { PresetContext } from '@/core/lib/forms'
 import { ACTION_COPY, DRAWER_COPY, FORM_COPY } from '@/declarations/ui/copy'
 import type { FormSubject } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
+import { useTabSlide } from '@/core/hooks/interaction/layout/useTabSlide'
 import { DRAWER_ACTIONS, DRAWER_STYLES, FIELD_STYLES } from '@/declarations/ui/variants'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { FieldDefinition, FieldIssue, FieldValue, FormValues } from '@/types/forms'
@@ -190,6 +191,7 @@ export const FormDrawer = ({
     0
   )
   const current = groups[index]
+  const slide = useTabSlide(index)
   const next = groups[index + 1]
   const previous = index > 0 ? groups[index - 1] : undefined
 
@@ -226,7 +228,10 @@ export const FormDrawer = ({
   const BackIcon = ICONS.back
 
   const section = (
-    <div key={current?.name} className={cn(DRAWER_STYLES.section, aside && 'flex flex-1 flex-col')}>
+    <div
+      key={current?.name}
+      className={cn(DRAWER_STYLES.section, slide, aside && 'flex flex-1 flex-col')}
+    >
       {note && <p className={DRAWER_ACTIONS.note}>{note}</p>}
       <FormRenderer
         fields={current?.fields ?? []}

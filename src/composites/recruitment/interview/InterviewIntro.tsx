@@ -1,4 +1,3 @@
-import { totalMinutes } from '@/core/lib/recruitment/questionnaire'
 import type { ResolvedQuestion } from '@/core/lib/recruitment/questionnaire'
 import type { QuestionPartKey } from '@/declarations/recruitment/questionnaire'
 import { QUESTIONNAIRE_COPY } from '@/declarations/recruitment/questionnaireCopy'
@@ -27,7 +26,6 @@ const DEMO_GLYPHS = [
  */
 
 export const InterviewIntro = ({ candidateName, parts }: InterviewIntroProps) => {
-  const minutes = totalMinutes(parts.flatMap((group) => group.questions))
   const Cross = ICONS.close
 
   return (
@@ -37,11 +35,6 @@ export const InterviewIntro = ({ candidateName, parts }: InterviewIntroProps) =>
         <p className={INTERVIEW.introText}>
           {QUESTIONNAIRE_COPY.introText.replace('{name}', candidateName)}
         </p>
-        {minutes > 0 && (
-          <span className={INTERVIEW.introTag}>
-            {QUESTIONNAIRE_COPY.minutes.replace('{minutes}', String(minutes))}
-          </span>
-        )}
       </div>
 
       <div className={INTERVIEW.guide}>
@@ -62,11 +55,11 @@ export const InterviewIntro = ({ candidateName, parts }: InterviewIntroProps) =>
 
         <section className={INTERVIEW.guideBox}>
           <div className={INTERVIEW.guideDemo} aria-hidden="true">
-            <span className={INTERVIEW.guideNote}>{QUESTIONNAIRE_COPY.noteAdd}</span>
+            <span className={INTERVIEW.guideNote}>{QUESTIONNAIRE_COPY.commentAdd}</span>
             <Cross className="size-4 text-[var(--color-ink-subtle)]" />
           </div>
-          <h3 className={INTERVIEW.guideTitle}>{QUESTIONNAIRE_COPY.guideNoteTitle}</h3>
-          <p className={INTERVIEW.guideText}>{QUESTIONNAIRE_COPY.guideNoteText}</p>
+          <h3 className={INTERVIEW.guideTitle}>{QUESTIONNAIRE_COPY.guideCommentTitle}</h3>
+          <p className={INTERVIEW.guideText}>{QUESTIONNAIRE_COPY.guideCommentText}</p>
         </section>
 
         <section className={INTERVIEW.guideBox}>

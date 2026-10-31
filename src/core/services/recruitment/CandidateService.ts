@@ -9,7 +9,8 @@ import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { readPortraits } from '@/core/services/recruitment/CandidatePortraits'
 import type { FormValues } from '@/types/forms'
 import type { CandidateView } from '@/types/recruitment'
-import { rethrow, toCandidate, CANDIDATE_INCLUDE } from '@/core/services/recruitment/shape'
+import { assertNotBanned } from '@/core/services/recruitment/BanService'
+import { rethrowCandidate, toCandidate, CANDIDATE_INCLUDE } from '@/core/services/recruitment/shape'
 import {
   sessionScope,
   reachableSession,
@@ -57,6 +58,16 @@ export const defaultOutcome = async (): Promise<string | null> => {
 }
 
 /**
+ * Observers without the recruiters, nobody sits on both sides of an interview
+ * @param {string[]} observerIds - Wanted observers
+ * @param {string[]} recruiterIds - Recruiters of the candidate
+ * @return {string[]} - Observers left
+ */
+
+const apartFrom = (observerIds: string[], recruiterIds: string[]): string[] =>
+  observerIds.filter((id) => !recruiterIds.includes(id))
+
+/**
  * Add a candidate to a session
  * @param {string} sessionId - Session identifier
  * @param {FormValues} values - Parsed body
@@ -70,8 +81,11 @@ export const createCandidate = async (
   scope: AccessScope
 ): Promise<CandidateView> => {
   await reachableSession(sessionId, scope)
+  // A barred identifier never joins a new session
+  await assertNotBanned(readText(values, 'discordId') ?? '')
 
-  const observerIds = readList(values, 'observerIds')
+  const recruiterIds = readList(values, 'recruiterIds')
+  const observerIds = apartFrom(readList(values, 'observerIds'), recruiterIds)
   const last = await prisma.recruitmentCandidate.findFirst({
     where: { sessionId },
     orderBy: { position: 'desc' },
@@ -85,15 +99,17 @@ export const createCandidate = async (
         discordId: readText(values, 'discordId') ?? '',
         displayName: readText(values, 'displayName'),
         formId: readText(values, 'formId'),
-        recruiterId: readText(values, 'recruiterId'),
         outcomeId: readText(values, 'outcomeId') ?? (await defaultOutcome()),
         interviewAt: readDate(values, 'interviewAt'),
         attended: readFlag(values, 'attended'),
         position: (last?.position ?? 0) + FORM_SETTINGS.positionStep,
+        recruiters: {
+          create: recruiterIds.map((accountId) => ({ accountId })),
+        },
         observers: { create: observerIds.map((accountId) => ({ accountId })) },
       },
     })
-    .catch(rethrow)
+    .catch(rethrowCandidate)
 
   await syncAdmission(row.id)
 
@@ -115,7 +131,16 @@ export const updateCandidate = async (
 ): Promise<CandidateView> => {
   await reachableCandidate(id, scope)
 
-  const observerIds = readList(values, 'observerIds')
+  // Only a changed identifier is checked
+  const discordId = readText(values, 'discordId')
+  const current = await prisma.recruitmentCandidate.findUniqueOrThrow({
+    where: { id },
+    select: { discordId: true },
+  })
+  if (discordId && discordId !== current.discordId) await assertNotBanned(discordId)
+
+  const recruiterIds = readList(values, 'recruiterIds')
+  const observerIds = apartFrom(readList(values, 'observerIds'), recruiterIds)
 
   await prisma.recruitmentCandidate
     .update({
@@ -124,18 +149,21 @@ export const updateCandidate = async (
         discordId: readText(values, 'discordId') ?? undefined,
         displayName: readText(values, 'displayName'),
         formId: readText(values, 'formId'),
-        recruiterId: readText(values, 'recruiterId'),
         outcomeId: readText(values, 'outcomeId'),
         interviewAt: readDate(values, 'interviewAt'),
         attended: readFlag(values, 'attended'),
         // The seats are replaced wholesale
+        recruiters: {
+          deleteMany: {},
+          create: recruiterIds.map((accountId) => ({ accountId })),
+        },
         observers: {
           deleteMany: {},
           create: observerIds.map((accountId) => ({ accountId })),
         },
       },
     })
-    .catch(rethrow)
+    .catch(rethrowCandidate)
 
   await syncAdmission(id)
 
@@ -228,4 +256,19 @@ export const findCandidateFile = async (
   })
 
   return row ? { sessionId: row.sessionId, candidateId: row.id } : null
+}
+
+/**
+ * Read who leads the interview of a candidate
+ * @param {string} id - Candidate identifier
+ * @return {Promise<string[]>} - Recruiter identifiers
+ */
+
+export const recruiterIdsOf = async (id: string): Promise<string[]> => {
+  const rows = await prisma.candidateRecruiter.findMany({
+    where: { candidateId: id },
+    select: { accountId: true },
+  })
+
+  return rows.map((row) => row.accountId)
 }

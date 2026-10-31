@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react'
 
 import { apiDelete, apiPatch, apiPost, apiPut } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
+import { useRecruitmentLive } from '@/core/hooks/data/recruitment/useRecruitmentLive'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { INTEGRATION_LINK_COPY } from '@/declarations/onboarding/copy'
 import { entityFeedback } from '@/declarations/ui/copy'
@@ -17,6 +18,7 @@ import type {
   RecruitmentStepView,
 } from '@/types/recruitment'
 import { BLANK_ANSWER } from '@/core/lib/recruitment/questionnaire'
+import type { InterviewPatch } from '@/types/recruitment'
 
 /**
  * One recruitment session file
@@ -28,6 +30,7 @@ import { BLANK_ANSWER } from '@/core/lib/recruitment/questionnaire'
  * @property {string[]} questionKeys - Questions picked for the interviews
  * @property {(id: string, key: string, patch: Partial<AnswerState>) => Promise<void>} saveAnswer - Note one question
  * @property {(id: string, stage: string, done: boolean) => Promise<void>} markStage - Tick a timeline moment
+ * @property {(id: string, patch: InterviewPatch) => Promise<boolean>} setInterview - Set register, start or verdict
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {() => void} clearIssues - Forget the rejections
@@ -38,6 +41,7 @@ import { BLANK_ANSWER } from '@/core/lib/recruitment/questionnaire'
  * @property {(id: string, review: string) => Promise<boolean>} saveReview - Write a bilan
  * @property {(id: string, values: FormValues) => Promise<boolean>} addComment - Leave a remark
  * @property {(id: string) => Promise<void>} removeComment - Drop a remark
+ * @property {(id: string, pinned: boolean) => Promise<void>} pinComment - Pin a remark
  * @property {CommentView[]} comments - Remarks left on the session
  * @property {(values: FormValues) => Promise<boolean>} addSessionComment - Leave a remark on the session
  * @property {(id: string) => Promise<void>} removeSessionComment - Drop a session remark
@@ -58,6 +62,7 @@ export interface RecruitmentFile {
   questionKeys: string[]
   saveAnswer: (id: string, key: string, patch: Partial<AnswerState>) => Promise<void>
   markStage: (id: string, stage: string, done: boolean) => Promise<void>
+  setInterview: (id: string, patch: InterviewPatch) => Promise<boolean>
   isSaving: boolean
   issues: FieldIssue[]
   clearIssues: () => void
@@ -68,6 +73,7 @@ export interface RecruitmentFile {
   saveReview: (id: string, review: string) => Promise<boolean>
   addComment: (id: string, values: FormValues) => Promise<boolean>
   removeComment: (id: string) => Promise<void>
+  pinComment: (id: string, pinned: boolean) => Promise<void>
   comments: CommentView[]
   addSessionComment: (values: FormValues) => Promise<boolean>
   removeSessionComment: (id: string) => Promise<void>
@@ -94,6 +100,17 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
   const [comments, setComments] = useState(detail.comments)
   const [link, setLink] = useState(detail.link)
   const questionKeys = detail.questionKeys
+
+  // A page read again hands over the fresh state
+  const [seen, setSeen] = useState(detail)
+  if (seen !== detail) {
+    setSeen(detail)
+    setInstructions(detail.instructions)
+    setCandidates(detail.candidates)
+    setSteps(detail.steps)
+    setComments(detail.comments)
+    setLink(detail.link)
+  }
   const { isSaving, issues, clearIssues, run } = useMutation()
 
   // Every candidate mutation answers with the whole card
@@ -104,6 +121,12 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
         : [...current, saved]
     )
   }, [])
+
+  const dropCandidate = useCallback((id: string) => {
+    setCandidates((current) => current.filter((entry) => entry.id !== id))
+  }, [])
+
+  useRecruitmentLive(sessionId, mergeCandidate, dropCandidate)
 
   const mergeStep = useCallback((saved: RecruitmentStepView) => {
     setSteps((current) =>
@@ -198,6 +221,17 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
       const saved = await run(
         () => apiDelete<CandidateView>(API_ROUTES.candidateComment(id)),
         entityFeedback('comment', 'deleted')
+      )
+
+      if (saved) mergeCandidate(saved)
+    },
+    [run, mergeCandidate]
+  )
+
+  const pinComment = useCallback(
+    async (id: string, pinned: boolean) => {
+      const saved = await run(() =>
+        apiPatch<CandidateView>(API_ROUTES.candidateComment(id), { pinned })
       )
 
       if (saved) mergeCandidate(saved)
@@ -333,6 +367,18 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     [run]
   )
 
+  // The server answers with the whole card
+  const setInterview = useCallback(
+    async (id: string, patch: InterviewPatch) => {
+      const saved = await run(() => apiPut<CandidateView>(API_ROUTES.candidateInterview(id), patch))
+
+      if (saved) mergeCandidate(saved)
+
+      return saved !== null
+    },
+    [run, mergeCandidate]
+  )
+
   // Handing out the form also clears the step that carries it
   const emitLink = useCallback(
     async (values: FormValues) => {
@@ -369,6 +415,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     questionKeys,
     saveAnswer,
     markStage,
+    setInterview,
     isSaving,
     issues,
     clearIssues,
@@ -379,6 +426,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     saveReview,
     addComment,
     removeComment,
+    pinComment,
     comments,
     addSessionComment,
     removeSessionComment,

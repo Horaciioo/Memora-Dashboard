@@ -146,27 +146,6 @@ body {
   background: var(--color-hover);
 }
 
-/* Hint bubble bobbing up and down */
-.hint-float {
-  animation: hint-float 1.3s ease-in-out infinite;
-}
-
-@keyframes hint-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hint-float {
-    animation: none;
-  }
-}
-
 /* A board column revealed grows in and the others make room, its content shows once there */
 .board-column-grow {
   animation: board-column-grow-down 520ms cubic-bezier(0.32, 0.72, 0, 1) both;
@@ -310,6 +289,70 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .filter-arrive {
+    animation: none;
+  }
+}
+
+/* Folded lines of a question glide open and shut */
+.question-fold {
+  interpolate-size: allow-keywords;
+}
+
+.question-fold::details-content {
+  height: 0;
+  opacity: 0;
+  overflow: clip;
+  transition:
+    height var(--motion-duration-panel) var(--motion-ease-out),
+    opacity var(--motion-duration-panel) var(--motion-ease-out),
+    content-visibility var(--motion-duration-panel) allow-discrete;
+}
+
+.question-fold[open]::details-content {
+  height: auto;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .question-fold::details-content {
+    transition: none;
+  }
+}
+
+/* Panel gliding in from the side of the tab just opened */
+.tab-slide-next {
+  animation: tab-slide-next var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+.tab-slide-prev {
+  animation: tab-slide-prev var(--motion-duration-panel) var(--motion-ease-out);
+}
+
+@keyframes tab-slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes tab-slide-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-slide-next,
+  .tab-slide-prev {
     animation: none;
   }
 }

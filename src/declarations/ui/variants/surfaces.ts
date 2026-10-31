@@ -58,7 +58,7 @@ export const PAGE_STYLES = {
   // Very small line under the title
   bannerNote: 'flex text-xs font-medium',
   // Tab strip centred under the photograph, empty on most pages
-  tabsHost: 'flex w-full justify-center empty:hidden',
+  tabsHost: 'relative flex w-full justify-center empty:hidden',
   // Eyebrow left
   headerRow: 'flex flex-wrap items-center justify-between gap-4',
   eyebrow:
@@ -108,6 +108,14 @@ export const STATUS_STYLES = {
   // Done or past
   muted: 'opacity-70',
 } as const
+
+/**
+ * Pastel fill of the accent, ink text
+ * @type {string}
+ */
+
+export const PASTEL_TAG =
+  'inline-flex w-fit items-center rounded-md bg-[color-mix(in_srgb,var(--accent)_58%,var(--color-surface))] px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-[var(--color-ink)]'
 
 /**
  * Creator and project labels
@@ -313,6 +321,10 @@ export const TABS_STYLES = {
   active:
     'font-semibold text-[var(--color-ink)] hover:bg-transparent hover:text-[var(--color-ink)]',
   flagged: 'text-[var(--color-danger)]',
+  // Administration tab
+  danger: 'text-[var(--color-danger)] hover:text-[var(--color-danger)]',
+  activeDanger:
+    'font-semibold text-[var(--color-danger)] hover:bg-transparent hover:text-[var(--color-danger)]',
   // White pill gliding under the open tab
   indicator:
     'tab-indicator pointer-events-none absolute top-1 bottom-1 left-0 rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
@@ -320,7 +332,7 @@ export const TABS_STYLES = {
   arrive: 'tab-arrive',
   panel: 'pt-4',
   content: 'flex items-center',
-  icon: 'h-5 w-5 shrink-0 md:h-4 md:w-4',
+  icon: 'h-5 w-5 shrink-0 opacity-60 md:h-4 md:w-4',
   label: 'whitespace-nowrap',
   // A tab with a glyph shows no words on a phone, the name stays on its aria-label
   labelBeside: 'hidden pl-1.5 md:inline',

@@ -308,9 +308,12 @@ export const MODVIEW_USER = {
   glyph: 'h-9 w-9',
   name: 'max-w-full truncate text-2xl font-bold tracking-tight',
   watch: 'mt-1',
-  tabs: 'flex flex-nowrap items-center justify-center gap-0.5 px-2 pb-3',
-  tab: 'rounded-full px-2.5 py-1 text-xs font-bold whitespace-nowrap text-[var(--twitch-muted)] transition-colors hover:text-[var(--color-ink)]',
-  tabOn: 'bg-[var(--twitch-head)] text-[var(--color-ink)]',
+  tabs: 'relative flex flex-nowrap items-center justify-center gap-0.5 px-2 pb-3',
+  // Box gliding under the open tab
+  tabBox:
+    'pointer-events-none absolute top-0 left-0 rounded-full bg-[var(--twitch-head)] opacity-0',
+  tab: 'relative rounded-full px-2.5 py-1 text-xs font-bold whitespace-nowrap text-[var(--twitch-muted)] transition-colors hover:text-[var(--color-ink)]',
+  tabOn: 'text-[var(--color-ink)]',
   stats:
     'mx-4 grid auto-cols-fr grid-flow-col divide-x divide-[color-mix(in_oklab,var(--color-ink)_22%,transparent)] rounded-[var(--radius-md)] bg-[var(--twitch-head)] py-3',
   stat: 'flex min-w-0 flex-col items-center gap-1 px-2 text-center',

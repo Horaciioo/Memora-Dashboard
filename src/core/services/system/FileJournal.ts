@@ -11,6 +11,7 @@ import type { EventTypeName } from '@/utils/constants/events'
 export const JOURNAL_FILES = {
   Recruitment: 'recruitment',
   Academy: 'academy',
+  Candidate: 'candidate',
 } as const
 
 export type JournalFileName = (typeof JOURNAL_FILES)[keyof typeof JOURNAL_FILES]
@@ -23,6 +24,7 @@ export type JournalFileName = (typeof JOURNAL_FILES)[keyof typeof JOURNAL_FILES]
  * @property {string} fileId - File identifier
  * @property {string} actorId - Who did it
  * @property {string} summary - One line description
+ * @property {string} [candidateId] - Candidate it also belongs to
  */
 
 export interface FileEvent {
@@ -31,6 +33,7 @@ export interface FileEvent {
   fileId: string
   actorId: string
   summary: string
+  candidateId?: string
 }
 
 /**
@@ -39,11 +42,24 @@ export interface FileEvent {
  * @return {Promise<void>} - Recorded
  */
 
-export const recordFileEvent = ({
+export const recordFileEvent = async ({
   eventType,
   file,
   fileId,
   actorId,
   summary,
-}: FileEvent): Promise<void> =>
-  recordEvent({ eventType, actorId, targetType: file, targetId: fileId, summary })
+  candidateId,
+}: FileEvent): Promise<void> => {
+  await recordEvent({ eventType, actorId, targetType: file, targetId: fileId, summary })
+
+  // The candidate keeps its own line
+  if (candidateId) {
+    await recordEvent({
+      eventType,
+      actorId,
+      targetType: JOURNAL_FILES.Candidate,
+      targetId: candidateId,
+      summary,
+    })
+  }
+}

@@ -2,7 +2,9 @@
 
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
+import { BanDrawer } from '@/composites/recruitment/history/BanDrawer'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
+import { CANDIDATE_CREATION_SKIPPED } from '@/declarations/recruitment/candidateForm'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 
@@ -21,14 +23,18 @@ export const RecruitmentDrawers = () => {
         subject={FORM_SUBJECTS.candidate}
         open={dialog === 'candidate'}
         title={editingCandidate ? RECRUITMENT_COPY.candidateEdit : RECRUITMENT_COPY.candidateAdd}
-        fields={fields.candidate}
+        fields={
+          editingCandidate
+            ? fields.candidate
+            : fields.candidate.filter((field) => !CANDIDATE_CREATION_SKIPPED.includes(field.name))
+        }
         initialValues={
           editingCandidate
             ? {
                 discordId: editingCandidate.discordId,
                 displayName: editingCandidate.displayName,
                 formId: editingCandidate.formId,
-                recruiterId: editingCandidate.recruiter?.id ?? null,
+                recruiterIds: editingCandidate.recruiters.map((seat) => seat.id),
                 interviewAt: editingCandidate.interviewAt,
                 observerIds: editingCandidate.observers.map((seat) => seat.id),
                 outcomeId: editingCandidate.outcomeId,
@@ -69,6 +75,14 @@ export const RecruitmentDrawers = () => {
           editingStep ? file.updateStep(editingStep.id, values) : file.addStep(values)
         }
         onClose={closeDialog}
+      />
+
+      <BanDrawer
+        target={state.banning}
+        isBanned={
+          state.banning !== null && state.detail.bannedIds.includes(state.banning.discordId)
+        }
+        onClose={() => state.setBanning(null)}
       />
 
       <ConfirmDialog

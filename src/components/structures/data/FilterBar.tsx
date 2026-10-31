@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import { FiltersGlyph } from '@/components/elements/display/glyphs/FiltersGlyph'
 import { Field } from '@/components/elements/forms/Field'
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { ACTION_COPY } from '@/declarations/ui/copy'
@@ -19,6 +18,7 @@ import { cn } from '@/utils/classnames'
  * @property {string} name - Filter key
  * @property {string} label - Accessible label
  * @property {string} allLabel - Label of the unfiltered option
+ * @property {string} [allIcon] - Glyph of the unfiltered option
  * @property {FieldOption[]} options - Selectable values
  * @property {OptionMark} [mark] - Glyph drawn beside every option
  * @property {MaturityName} [maturity] - Lifecycle tag drawn beside the label
@@ -28,6 +28,7 @@ export interface FilterDefinition {
   name: string
   label: string
   allLabel: string
+  allIcon?: string
   options: FieldOption[]
   mark?: OptionMark
   maturity?: MaturityName
@@ -96,7 +97,7 @@ export const FilterBar = ({
             onClick={() => setPanelOpen((open) => !open)}
             className={cn(FILTER_STYLES.iconButton, tally > 0 && FILTER_STYLES.iconButtonActive)}
           >
-            <FiltersGlyph className={FILTER_STYLES.glyph} />
+            <ICONS.filter className={FILTER_STYLES.glyph} />
             {tally > 0 && <span className={FILTER_STYLES.tally}>{tally}</span>}
           </button>
         )}
@@ -148,6 +149,7 @@ export const FilterBar = ({
                       options={filter.options}
                       value={values[filter.name] ?? ''}
                       emptyLabel={filter.allLabel}
+                      emptyIcon={filter.allIcon}
                       mark={filter.mark}
                       onChange={(value) => onFilter(filter.name, value)}
                     />

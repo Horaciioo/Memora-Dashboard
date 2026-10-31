@@ -2,9 +2,9 @@ import 'server-only'
 
 import { decryptField } from '@/core/lib/crypto'
 import { prisma } from '@/core/lib/db'
-import { conflict } from '@/core/lib/errors'
+import { conflict, invalidInput } from '@/core/lib/errors'
+import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import type { CommentView } from '@/types/comments'
-import { toPerson } from '@/core/services/work/shared'
 import type {
   AnswerState,
   CandidateView,
@@ -14,6 +14,7 @@ import type {
 } from '@/types/recruitment'
 import { sessionTitle } from '@/utils/format/academy'
 import type { RecruitmentOwnerName } from '@/utils/constants/recruitment'
+import { PART_BANNER_SLOTS } from '@/declarations/reference/design'
 
 /**
  * Reject a duplicate session name or a candidate already held
@@ -24,6 +25,22 @@ import type { RecruitmentOwnerName } from '@/utils/constants/recruitment'
 export const rethrow = (error: unknown): never => {
   if (typeof error === 'object' && error !== null && 'code' in error) {
     if ((error as { code: unknown }).code === 'P2002') throw conflict()
+  }
+
+  throw error
+}
+
+/**
+ * Reject a candidate whose identifier the session already holds
+ * @param {unknown} error - Caught value
+ * @return {never} - Always throws
+ */
+
+export const rethrowCandidate = (error: unknown): never => {
+  if (typeof error === 'object' && error !== null && 'code' in error) {
+    if ((error as { code: unknown }).code === 'P2002') {
+      throw invalidInput([{ field: 'discordId', message: RECRUITMENT_COPY.duplicateCandidate }])
+    }
   }
 
   throw error
@@ -51,7 +68,14 @@ export const toRef = (row: {
 
 // Relations every session summary reads
 export const SUMMARY_INCLUDE = {
-  youtuber: true,
+  youtuber: {
+    include: {
+      banners: {
+        where: { slot: { in: Object.values(PART_BANNER_SLOTS) } },
+        select: { url: true, slot: true },
+      },
+    },
+  },
   jobFunction: true,
   academySession: { include: { jobFunction: true } },
   responsables: { include: { account: true } },
@@ -119,6 +143,10 @@ export const toSummary = (
         })
       : null,
     youtuberBanner: row.youtuber.bannerUrl,
+    youtuberPartBanners: Object.fromEntries(
+      row.youtuber.banners.flatMap(({ slot, url }) => (slot ? [[slot, url]] : []))
+    ),
+    youtuberLogo: row.youtuber.logoUrl,
     announcement: row.announcement,
     opensAt: row.opensAt?.toISOString() ?? null,
     closesAt: row.closesAt?.toISOString() ?? null,
@@ -155,21 +183,27 @@ export const toCandidate = (
     formId: string | null
     interviewAt: Date | null
     attended: boolean
+    formal: boolean
+    interviewStartedAt: Date | null
+    interviewEndedAt: Date | null
+    verdictAt: Date | null
     outcomeId: string | null
     review: string
     stageMarks: unknown
     position: number
-    recruiter: { id: string; displayName: string; avatarUrl: string | null } | null
+    recruiters: { account: { id: string; displayName: string; avatarUrl: string | null } }[]
     observers: { account: { id: string; displayName: string; avatarUrl: string | null } }[]
     comments: {
       id: string
       body: string
       createdAt: Date
-      author: { displayName: string } | null
+      questionKey: string | null
+      pinnedAt: Date | null
+      author: { displayName: string; avatarUrl: string | null } | null
     }[]
     answers: {
       questionKey: string
-      notes: string
+      branch: string | null
       appreciation: AnswerState['appreciation']
       skipped: boolean
     }[]
@@ -178,13 +212,15 @@ export const toCandidate = (
   portraits: Map<string, string>
 ): CandidateView => {
   const member = members.get(row.discordId) ?? null
-  const recruiter = toPerson(row.recruiter)
 
   const comments: CommentView[] = row.comments.map((comment) => ({
     id: comment.id,
     authorName: comment.author?.displayName ?? null,
+    authorAvatar: comment.author?.avatarUrl ?? null,
     body: decryptField(comment.body) ?? '',
     createdAt: comment.createdAt.toISOString(),
+    questionKey: comment.questionKey,
+    pinned: comment.pinnedAt !== null,
   }))
 
   return {
@@ -194,9 +230,7 @@ export const toCandidate = (
     // The member file wins
     name: member?.displayName ?? row.displayName ?? row.discordId,
     formId: row.formId,
-    recruiter: recruiter
-      ? { id: recruiter.id, label: recruiter.name, accent: null, image: recruiter.src }
-      : null,
+    recruiters: row.recruiters.map(({ account }) => toPersonRef(account)),
     observers: row.observers.map(({ account }) => ({
       id: account.id,
       label: account.displayName,
@@ -205,6 +239,10 @@ export const toCandidate = (
     })),
     interviewAt: row.interviewAt?.toISOString() ?? null,
     attended: row.attended,
+    formal: row.formal,
+    interviewStartedAt: row.interviewStartedAt?.toISOString() ?? null,
+    interviewEndedAt: row.interviewEndedAt?.toISOString() ?? null,
+    verdictAt: row.verdictAt?.toISOString() ?? null,
     outcomeId: row.outcomeId,
     review: row.review,
     position: row.position,
@@ -217,7 +255,7 @@ export const toCandidate = (
       row.answers.map((answer) => [
         answer.questionKey,
         {
-          notes: decryptField(answer.notes) ?? '',
+          branch: answer.branch,
           appreciation: answer.appreciation,
           skipped: answer.skipped,
         },
@@ -228,7 +266,7 @@ export const toCandidate = (
 
 // Relations every candidate read carries
 export const CANDIDATE_INCLUDE = {
-  recruiter: true,
+  recruiters: { include: { account: true } },
   observers: { include: { account: true } },
   comments: { orderBy: { createdAt: 'desc' }, include: { author: true } },
   answers: true,

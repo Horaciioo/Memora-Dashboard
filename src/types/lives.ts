@@ -334,6 +334,7 @@ export interface ViewerSanction {
  * @property {string} id - Comment identifier
  * @property {string} body - Text
  * @property {string | null} authorName - Member who wrote it
+ * @property {string | null} authorAvatar - Portrait of who wrote it
  * @property {string} createdAt - ISO moment
  */
 
@@ -341,6 +342,7 @@ export interface ViewerComment {
   id: string
   body: string
   authorName: string | null
+  authorAvatar: string | null
   createdAt: string
 }
 

@@ -10,6 +10,7 @@ export interface ConfirmDialogProps {
   title: string
   description: string
   confirmLabel?: string
+  cancelLabel?: string
   // Weight of the gesture
   tone?: Tone
   pending?: boolean
@@ -23,6 +24,7 @@ export interface ConfirmDialogProps {
  * @param {string} title - What is about to happen
  * @param {string} description - Consequence of confirming
  * @param {string} [confirmLabel] - Accessible name of the confirming button
+ * @param {string} [cancelLabel] - Name of the dismissing button
  * @param {Tone} [tone] - Weight of the gesture
  * @param {boolean} [pending] - Blocks both buttons while the action runs
  * @param {() => void} onConfirm - Confirm handler
@@ -35,6 +37,7 @@ export const ConfirmDialog = ({
   title,
   description,
   confirmLabel,
+  cancelLabel,
   tone = 'danger',
   pending,
   onConfirm,
@@ -57,7 +60,7 @@ export const ConfirmDialog = ({
       footer={
         <>
           <Button onClick={onCancel} disabled={pending}>
-            {ACTION_COPY.cancel}
+            {cancelLabel ?? ACTION_COPY.cancel}
           </Button>
           <Button
             variant={isDestructive ? 'danger' : 'primary'}

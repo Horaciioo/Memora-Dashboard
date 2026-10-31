@@ -16,6 +16,7 @@ import { DAY_MS } from '@/utils/constants/time'
  * @property {number} notifications - Read notifications dropped
  * @property {number} activityLogs - Journal entries dropped
  * @property {number} candidates - Rejected candidacies dropped
+ * @property {number} bans - Lapsed blacklist entries dropped
  * @property {number} files - Orphan files dropped
  * @property {number} storedBytes - Weight the binaries add to every backup
  */
@@ -26,6 +27,7 @@ export interface MaintenanceReport {
   activityLogs: number
   moderationLogs: number
   candidates: number
+  bans: number
   files: number
   storedBytes: number
 }
@@ -84,6 +86,19 @@ const pruneRejectedCandidates = async (): Promise<number> => {
 }
 
 /**
+ * Drop the blacklist entries past their window
+ * @return {Promise<number>} - Removed count
+ */
+
+const pruneBans = async (): Promise<number> => {
+  const { count } = await prisma.recruitmentBan.deleteMany({
+    where: { createdAt: { lt: horizon(RETENTION_POLICIES.bannedCandidates) } },
+  })
+
+  return count
+}
+
+/**
  * Weigh what the stored binaries add to the database
  * @return {Promise<number>} - Bytes held
  */
@@ -102,7 +117,7 @@ const storedBytes = async (): Promise<number> => {
  */
 
 export const runMaintenance = async (): Promise<MaintenanceReport> => {
-  const [sessions, notifications, activityLogs, moderationLogs, candidates, files] =
+  const [sessions, notifications, activityLogs, moderationLogs, candidates, bans, files] =
     await Promise.all([
       pruneSessions(RETENTION_POLICIES.expiredSessions),
       pruneNotifications(),
@@ -110,6 +125,7 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
       // A table not migrated yet keeps nothing to purge
       purgeModerationLog().catch(() => 0),
       pruneRejectedCandidates(),
+      pruneBans(),
       pruneOrphanFiles(RETENTION_SETTINGS.orphanFileHours),
     ])
 
@@ -119,6 +135,7 @@ export const runMaintenance = async (): Promise<MaintenanceReport> => {
     activityLogs,
     moderationLogs,
     candidates,
+    bans,
     files,
     // Weighed after the sweep
     storedBytes: await storedBytes(),

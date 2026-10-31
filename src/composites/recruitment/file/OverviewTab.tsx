@@ -1,5 +1,8 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
 import { CommentThread } from '@/components/structures/data/CommentThread'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
@@ -7,7 +10,8 @@ import { RecordId } from '@/components/elements/display/RecordId'
 import { Status } from '@/components/elements/display/Status'
 import type { EditableEntry } from '@/components/structures/inline/EditableDetailGrid'
 import { FileOverview, type FileOverviewGroup } from '@/components/structures/page/FileOverview'
-import { InstructionsCard } from '@/composites/recruitment/file/InstructionsCard'
+import { CloseRecruitmentDialog } from '@/composites/recruitment/CloseRecruitmentDialog'
+import { UpcomingInterviews } from '@/composites/recruitment/file/UpcomingInterviews'
 import { SessionTimelineCard } from '@/composites/recruitment/file/SessionTimelineCard'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { useRecordFile } from '@/core/hooks/data/work/useRecordFile'
@@ -18,7 +22,12 @@ import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registri
 import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
 import { FILE_BOX } from '@/declarations/ui/variants'
 import { ICONS, isIconName } from '@/declarations/ui/icons'
+import { RecruitmentStatuses } from '@/utils/constants/recruitment'
 import { formatDayTime } from '@/utils/format/dates'
+
+export interface OverviewTabProps {
+  serverTime: string
+}
 
 // Portraits drawn side by side
 const portraits = (list: { id: string; name: string; src?: string | null }[]) =>
@@ -26,10 +35,13 @@ const portraits = (list: { id: string; name: string; src?: string | null }[]) =>
 
 /**
  * Overview of a recruitment session: boxes of what it is, who carries it
+ * @param {OverviewTabProps} props - Server time at load
  * @return {JSX.Element}
  */
 
-export const OverviewTab = () => {
+export const OverviewTab = ({ serverTime }: OverviewTabProps) => {
+  const router = useRouter()
+  const [isClosing, setClosing] = useState(false)
   const { detail, file, fields, can } = useRecruitmentState()
   const { summary } = detail
   const record = useRecordFile({
@@ -103,7 +115,7 @@ export const OverviewTab = () => {
       entries: session,
       side: <SessionTimelineCard />,
     },
-    { id: 'team', title: SESSION_FILE_COPY.team, entries: team, side: <InstructionsCard /> },
+    { id: 'team', title: SESSION_FILE_COPY.team, entries: team },
   ]
 
   return (
@@ -112,7 +124,19 @@ export const OverviewTab = () => {
       values={record.values}
       issues={record.issues}
       disabled={!can.manage}
-      onCommit={record.saveField}
+      onCommit={(name, value) => {
+        // Closing asks first
+        if (
+          name === 'status' &&
+          value === RecruitmentStatuses.Closed &&
+          summary.status !== RecruitmentStatuses.Closed
+        ) {
+          setClosing(true)
+          return Promise.resolve(false)
+        }
+
+        return record.saveField(name, value)
+      }}
       description={{
         id: 'recruitment-summary',
         value: text('summary'),
@@ -121,6 +145,7 @@ export const OverviewTab = () => {
       }}
     >
       <div className={FILE_BOX.stack}>
+        <UpcomingInterviews serverTime={serverTime} />
         <CommentThread
           comments={file.comments}
           fields={fields.comment}
@@ -133,6 +158,11 @@ export const OverviewTab = () => {
           onRemove={file.removeSessionComment}
         />
       </div>
+      <CloseRecruitmentDialog
+        sessionId={isClosing ? summary.id : null}
+        onClose={() => setClosing(false)}
+        onClosed={() => router.refresh()}
+      />
     </FileOverview>
   )
 }

@@ -1,11 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import {
-  createSession,
-  listSessions,
-  sessionFields,
-} from '@/core/services/recruitment'
+import { createSession, listSessions, sessionFields } from '@/core/services/recruitment'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { notify } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'

@@ -1,30 +1,33 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { Toggle } from '@/components/elements/forms/inputs/Toggle'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { ExercisePicker } from '@/composites/recruitment/exercise/ExercisePicker'
 import { ExerciseReveal } from '@/composites/recruitment/exercise/ExerciseReveal'
 import { ExerciseStage } from '@/composites/recruitment/exercise/ExerciseStage'
-import { FinishDrawer } from '@/composites/recruitment/interview/FinishDrawer'
 import { InterviewCrumbs } from '@/composites/recruitment/interview/InterviewCrumbs'
 import { InterviewFrame } from '@/composites/recruitment/interview/InterviewFrame'
 import { InterviewIntro } from '@/composites/recruitment/interview/InterviewIntro'
-import { InterviewQuestion } from '@/composites/recruitment/questionnaire/InterviewQuestion'
+import { InterviewPart } from '@/composites/recruitment/questionnaire/InterviewPart'
 import {
   RecruitmentFileProvider,
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { useCandidateRecord } from '@/core/hooks/data/recruitment/useCandidateRecord'
+import { useQuestionnaire } from '@/core/hooks/data/recruitment/useQuestionnaire'
+import { useInterviewStep } from '@/core/hooks/interaction/state/useInterviewStep'
 import { useExercisePick } from '@/core/hooks/interaction/scenes/useExercisePick'
 import { isInterviewLocked } from '@/core/lib/recruitment/interviewLock'
 import { offeredExercises } from '@/core/lib/recruitment/exercises'
-import { groupByPart, playedSibling } from '@/core/lib/recruitment/questionnaire'
+import { groupByPart } from '@/core/lib/recruitment/questionnaire'
 import { ROUTES } from '@/declarations/navigation'
 import { EXERCISES } from '@/declarations/recruitment/exercises'
 import { QUESTION_PARTS } from '@/declarations/recruitment/questionnaire'
+import { InterviewMinutes } from '@/composites/recruitment/interview/InterviewMinutes'
+import { PART_BANNER_SLOTS } from '@/declarations/reference/design'
 import { QUESTIONNAIRE_COPY } from '@/declarations/recruitment/questionnaireCopy'
 import { cn } from '@/utils/classnames'
 import { INTERVIEW, QUESTION_BODY, TOUR_CHAT } from '@/declarations/ui/variants'
@@ -46,18 +49,37 @@ const InterviewBody = ({
   showsDevExercises: boolean
 }) => {
   const router = useRouter()
-  const { detail, file, can, questionnaire } = useRecruitmentState()
+  const { detail, file, can } = useRecruitmentState()
   const candidate = file.candidates.find((entry) => entry.id === candidateId)!
-  const record = useCandidateRecord(candidate)
+  const { youtuber, youtuberBanner, youtuberPartBanners, youtuberLogo, platform } = detail.summary
+  // Read in the register the recruiters chose
+  const questionnaire = useQuestionnaire(
+    platform,
+    youtuber.label,
+    file.questionKeys,
+    candidate.formal
+  )
   // A finished interview only opens to a manager or its recruiter
-  const isLocked = isInterviewLocked(candidate.attended, candidate.recruiter?.id ?? null, can)
+  const isLocked = isInterviewLocked(
+    candidate.verdictAt !== null,
+    candidate.recruiters.map((seat) => seat.id),
+    can
+  )
   const isReadOnly = isLocked || !can.writeCandidates
+
+  // Opening the page opens the interview
+  const { interviewStartedAt } = candidate
+  useEffect(() => {
+    if (can.writeCandidates && !interviewStartedAt) {
+      void file.setInterview(candidate.id, { started: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candidate.id, interviewStartedAt])
   const parts = groupByPart(questionnaire.picked)
-  const { youtuber, youtuberBanner } = detail.summary
 
   // Zero is the introduction, then one step per part
-  const [step, setStep] = useState(0)
-  const [isFinishing, setFinishing] = useState(false)
+  const [storedStep, setStep] = useInterviewStep(candidateId)
+  const step = Math.min(Math.max(storedStep, 0), parts.length)
   // Contexts picked and not started yet
   const [isHeld, setHeld] = useState(false)
   const group = parts[step - 1]
@@ -69,11 +91,10 @@ const InterviewBody = ({
   }
   const leave = () => router.push(ROUTES.candidate(detail.summary.id, candidate.id))
   const isLast = step === parts.length
-
-  const finish = async (outcomeId: string | null, review: string) => {
-    const saved = await record.saveFields({ attended: true, outcomeId })
-    if (saved && review !== candidate.review) await file.saveReview(candidate.id, review)
-    if (saved) leave()
+  // The bilan and the verdict live on the candidate file
+  const finish = async () => {
+    if (can.writeCandidates && !isLocked) await file.setInterview(candidate.id, { ended: true })
+    router.push(ROUTES.candidateBilan(detail.summary.id, candidate.id))
   }
 
   const upcoming = parts[step]
@@ -82,6 +103,10 @@ const InterviewBody = ({
         .replace('{number}', String(step + 1))
         .replace('{name}', QUESTION_PARTS[upcoming.part].label)
     : QUESTIONNAIRE_COPY.finish
+
+  const partKicker = QUESTIONNAIRE_COPY.partKicker
+    .replace('{number}', String(step))
+    .replace('{total}', String(parts.length))
 
   // Trail above the title: session, candidate, interview, part, exercise
   const partCrumb = {
@@ -98,8 +123,20 @@ const InterviewBody = ({
 
   return (
     <InterviewFrame
-      portrait={youtuberBanner ?? youtuber.image ?? null}
+      portrait={
+        youtuberPartBanners[PART_BANNER_SLOTS[step]] ?? youtuberBanner ?? youtuber.image ?? null
+      }
       caption={youtuber.label}
+      logo={youtuberLogo}
+      header={
+        group && (
+          <>
+            <span className={INTERVIEW.figureKicker}>{partKicker}</span>
+            <h2 className={INTERVIEW.figureTitle}>{QUESTION_PARTS[group.part].label}</h2>
+            <p className={INTERVIEW.figureLead}>{QUESTION_PARTS[group.part].lead}</p>
+          </>
+        )
+      }
       isPortraitShown={step === 0}
     >
       {parts.length === 0 ? (
@@ -115,15 +152,27 @@ const InterviewBody = ({
         <>
           <div className={cn(TOUR_CHAT.scroll, INTERVIEW.scrollPad)}>
             <div className={cn(INTERVIEW.content, step === 0 && INTERVIEW.contentWide)}>
-              <InterviewCrumbs crumbs={crumbs} />
+              <div className={INTERVIEW.crumbsRow}>
+                <InterviewMinutes questions={parts.flatMap((entry) => entry.questions)} />
+                <div className={INTERVIEW.crumbsTrail}>
+                  <InterviewCrumbs crumbs={crumbs} />
+                </div>
+                <span className={INTERVIEW.formalSwitch}>
+                  {QUESTIONNAIRE_COPY.formal}
+                  <Toggle
+                    bare
+                    checked={candidate.formal}
+                    disabled={!can.writeCandidates || picker.chosen !== null}
+                    label={QUESTIONNAIRE_COPY.formal}
+                    onChange={(formal) => void file.setInterview(candidate.id, { formal })}
+                  />
+                </span>
+              </div>
               {group ? (
                 <>
-                  <header className="flex flex-col gap-2">
-                    <span className={QUESTION_BODY.label}>
-                      {QUESTIONNAIRE_COPY.partKicker
-                        .replace('{number}', String(step))
-                        .replace('{total}', String(parts.length))}
-                    </span>
+                  <header className="flex flex-col gap-2 lg:hidden">
+                    {' '}
+                    <span className={QUESTION_BODY.label}>{partKicker}</span>
                     <h2 className={INTERVIEW.partTitle}>{QUESTION_PARTS[group.part].label}</h2>
                     <p className="text-[var(--color-ink-subtle)]">
                       {QUESTION_PARTS[group.part].lead}
@@ -151,22 +200,12 @@ const InterviewBody = ({
                       />
                     )
                   ) : (
-                    <div className={INTERVIEW.part}>
-                      {group.questions.map((question) => (
-                        <InterviewQuestion
-                          key={question.key}
-                          question={question}
-                          answer={candidate.answers[question.key]}
-                          answers={candidate.answers}
-                          sibling={playedSibling(question, group.questions, candidate.answers)}
-                          disabled={isReadOnly}
-                          onChange={(patch) =>
-                            void file.saveAnswer(candidate.id, question.key, patch)
-                          }
-                          onAnswer={(key, patch) => void file.saveAnswer(candidate.id, key, patch)}
-                        />
-                      ))}
-                    </div>
+                    <InterviewPart
+                      questions={group.questions}
+                      candidate={candidate}
+                      disabled={isReadOnly}
+                      onAnswer={(key, patch) => void file.saveAnswer(candidate.id, key, patch)}
+                    />
                   )}
                 </>
               ) : (
@@ -187,7 +226,7 @@ const InterviewBody = ({
               <Button
                 variant="primary"
                 disabled={isHeld || (isLast && !can.writeCandidates)}
-                onClick={() => (isLast ? setFinishing(true) : go(step + 1))}
+                onClick={() => (isLast ? void finish() : go(step + 1))}
               >
                 {forward}
               </Button>
@@ -204,21 +243,6 @@ const InterviewBody = ({
           onDone={picker.endReveal}
         />
       )}
-
-      <FinishDrawer
-        open={isFinishing}
-        questions={questionnaire.picked}
-        answers={candidate.answers}
-        outcomes={detail.outcomes}
-        review={candidate.review}
-        outcomeId={candidate.outcomeId}
-        isSaving={record.isSaving}
-        isReadOnly={isReadOnly}
-        canVerdict={can.writeCandidates}
-        onVerdict={(outcomeId) => void record.saveFields({ outcomeId })}
-        onClose={() => setFinishing(false)}
-        onConfirm={(outcomeId, review) => void finish(outcomeId, review)}
-      />
     </InterviewFrame>
   )
 }

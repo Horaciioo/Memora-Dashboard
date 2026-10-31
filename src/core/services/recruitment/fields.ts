@@ -131,17 +131,40 @@ export const sessionFields = async (
 }
 
 /**
+ * Members who may lead an interview of a session: its recruiters and its responsables
+ * @param {string} youtuberId - Creator of the session
+ * @return {Promise<FieldOption[]>} - Select options
+ */
+
+const sessionRecruiterOptions = async (youtuberId: string): Promise<FieldOption[]> => {
+  const [recruiters, responsables] = await Promise.all([
+    teamOptions({ functionName: RECRUITER_FUNCTION, youtuberId, withGlobal: true }),
+    teamOptions({ role: MemberRoles.Responsable, youtuberId }),
+  ])
+
+  const seen = new Set<string>()
+
+  return [...recruiters, ...responsables].filter((option) => {
+    if (seen.has(option.value)) return false
+    seen.add(option.value)
+    return true
+  })
+}
+
+/**
  * Declarations of the candidate form
+ * @param {string} [youtuberId] - Creator of the session, narrowing the recruiters to its team
  * @return {Promise<FieldDefinition[]>} - Field declarations
  */
 
-export const candidateFields = async (): Promise<FieldDefinition[]> => {
-  const [members, outcomes] = await Promise.all([
+export const candidateFields = async (youtuberId?: string): Promise<FieldDefinition[]> => {
+  const [members, outcomes, recruiters] = await Promise.all([
     memberOptions(),
     prisma.recruitmentOutcome.findMany({
       where: { archived: false },
       orderBy: { position: 'asc' },
     }),
+    youtuberId ? sessionRecruiterOptions(youtuberId) : null,
   ])
 
   // Observers may sit in even while absent
@@ -175,12 +198,12 @@ export const candidateFields = async (): Promise<FieldDefinition[]> => {
       span: 'half',
     },
     {
-      name: 'recruiterId',
-      kind: 'select',
-      label: RECRUITMENT_FIELD_COPY.recruiter,
-      options: members,
+      name: 'recruiterIds',
+      kind: 'multiselect',
+      label: RECRUITMENT_FIELD_COPY.recruiters,
+      // Anyone already in the file stays valid when the team moves on
+      options: recruiters ?? members,
       mark: 'avatar',
-      span: 'half',
     },
     {
       name: 'interviewAt',
@@ -204,7 +227,9 @@ export const candidateFields = async (): Promise<FieldDefinition[]> => {
         label: row.name,
         accent: row.accent ?? undefined,
         group: row.isTerminal ? OUTCOME_GROUPS.final : OUTCOME_GROUPS.ongoing,
+        isDefault: row.isDefault,
       })),
+      preset: 'default',
       mark: 'dot',
       span: 'half',
     },
@@ -212,6 +237,7 @@ export const candidateFields = async (): Promise<FieldDefinition[]> => {
       name: 'attended',
       kind: 'toggle',
       label: RECRUITMENT_FIELD_COPY.attended,
+      initial: true,
       span: 'half',
     },
   ]

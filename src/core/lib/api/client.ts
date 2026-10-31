@@ -1,3 +1,4 @@
+import { TAB_HEADER, TAB_ID } from '@/core/lib/api/tab'
 import type { ApiEnvelope } from '@/core/lib/http/response'
 import { TIMEOUT_SETTINGS } from '@/declarations/configurations/settings'
 import { FEEDBACK_COPY } from '@/declarations/ui/copy/feedback'
@@ -55,8 +56,8 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
       ...init,
       signal: init?.signal ?? AbortSignal.timeout(limit),
       headers: isFormData
-        ? init?.headers
-        : { 'content-type': 'application/json', ...init?.headers },
+        ? { [TAB_HEADER]: TAB_ID, ...init?.headers }
+        : { 'content-type': 'application/json', [TAB_HEADER]: TAB_ID, ...init?.headers },
     })
   } catch (error) {
     // Timeout becomes a readable error

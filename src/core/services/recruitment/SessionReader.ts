@@ -4,6 +4,8 @@ import { identifiersForCreator } from '@/core/services/discord/DiscordIdentifier
 import { prisma } from '@/core/lib/db'
 import { sessionNumbers } from '@/core/services/academy/AcademyService'
 import { notFound } from '@/core/lib/errors'
+import { logger } from '@/core/lib/logger'
+import { VERDICT_OUTCOMES } from '@/declarations/reference/fixed'
 import { STEP_ORDER } from '@/core/lib/recruitment/stepState'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readPortraits } from '@/core/services/recruitment/CandidatePortraits'
@@ -37,13 +39,27 @@ export const listSessions = async (scope: AccessScope): Promise<RecruitmentSumma
   // One grouped count rather than one query per session
   const attended = await prisma.recruitmentCandidate.groupBy({
     by: ['sessionId'],
-    where: { sessionId: { in: rows.map((row) => row.id) }, attended: true },
+    where: { sessionId: { in: rows.map((row) => row.id) }, verdictAt: { not: null } },
     _count: { _all: true },
   })
 
   const attendedBySession = new Map(attended.map((row) => [row.sessionId, row._count._all]))
 
   return rows.map((row) => toSummary(row, numbers, attendedBySession.get(row.id) ?? 0))
+}
+
+/**
+ * Warn when a verdict has no outcome to land in
+ * @param {RecruitmentOutcomeView[]} outcomes - Issues of the session
+ * @return {void}
+ */
+
+const warnMissingVerdicts = (outcomes: RecruitmentOutcomeView[]): void => {
+  for (const name of VERDICT_OUTCOMES) {
+    if (!outcomes.some((outcome) => outcome.name === name)) {
+      logger.warn(`Recruitment outcome « ${name} » is missing, its verdict stays hidden`)
+    }
+  }
 }
 
 /**
@@ -64,7 +80,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
       candidates: {
         orderBy: [{ position: 'asc' }, { createdAt: 'asc' }],
         include: {
-          recruiter: true,
+          recruiters: { include: { account: true } },
           observers: { include: { account: true } },
           comments: { orderBy: { createdAt: 'desc' }, include: { author: true } },
           answers: true,
@@ -89,7 +105,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
 
   const byDiscordId = new Map(members.map((member) => [member.discordId, member]))
   const portraits = await readPortraits(row.candidates.map((candidate) => candidate.discordId))
-  const attendedCount = row.candidates.filter((candidate) => candidate.attended).length
+  const attendedCount = row.candidates.filter((candidate) => candidate.verdictAt !== null).length
 
   const steps: RecruitmentStepView[] = row.steps.map((step) => ({
     id: step.id,
@@ -106,10 +122,13 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
 
   const outcomeViews: RecruitmentOutcomeView[] = outcomes.map((outcome) => ({
     id: outcome.id,
+    name: outcome.name,
     label: outcome.name,
     accent: outcome.accent,
     isTerminal: outcome.isTerminal,
   }))
+
+  warnMissingVerdicts(outcomeViews)
 
   return {
     summary: toSummary(row, await sessionNumbers(), attendedCount),
@@ -122,5 +141,6 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     outcomes: outcomeViews,
     link: row.invite ? toLinkView(row.invite) : null,
     identifiers: await identifiersForCreator(row.youtuberId),
+    bannedIds: [],
   }
 }

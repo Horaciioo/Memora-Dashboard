@@ -48,7 +48,6 @@ export const COURSE_JUDGEMENT = {
   panelHead: `flex items-center gap-2 ${PROPERTY_LABEL}`,
   panelHeadIcon: 'size-5 text-[var(--color-ink-accent)]',
   level: 'flex items-center gap-3',
-  levelIcon: 'size-10 shrink-0',
   levelName: 'text-3xl font-bold tracking-tight',
   offense: 'text-lg font-bold tracking-tight',
   recommended: 'text-xs font-bold tracking-wide text-[var(--color-danger)] uppercase',

@@ -637,7 +637,7 @@ const writeCandidates = async (input: {
         discordId,
         displayName: isJunior ? null : pick(CANDIDATE_NAMES),
         formId: `FORM-${String(between(100, 999))}`,
-        recruiterId: recruiter?.id ?? null,
+        recruiters: { create: recruiter ? [{ accountId: recruiter.id }] : [] },
         outcomeId: outcome(name),
         interviewAt,
         attended: interviewAt !== null && interviewAt < new Date() && name !== 'Désisté',

@@ -1,20 +1,20 @@
 'use client'
 
 import { InlineMarkdown } from '@/components/structures/inline/InlineMarkdown'
-import { ScrollCard } from '@/components/structures/data/ScrollCard'
+import { Section } from '@/components/structures/page/Section'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 
 /**
- * Consignes of the session, written in place under the timeline
+ * Consignes of the session, written in place
  * @return {JSX.Element}
  */
 
-export const InstructionsCard = () => {
+export const InstructionsTab = () => {
   const { file, fields, can } = useRecruitmentState()
 
   return (
-    <ScrollCard title={RECRUITMENT_COPY.instructionsTitle}>
+    <Section title={RECRUITMENT_COPY.instructionsTitle} padded>
       <InlineMarkdown
         id="recruitment-instructions"
         value={file.instructions}
@@ -27,6 +27,6 @@ export const InstructionsCard = () => {
         maxLength={fields.instruction[0]?.maxLength}
         onCommit={file.saveInstructions}
       />
-    </ScrollCard>
+    </Section>
   )
 }

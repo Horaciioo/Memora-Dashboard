@@ -6,7 +6,7 @@ import { Markdown } from '@/components/elements/display/Markdown'
 import { ExerciseBrief } from '@/composites/recruitment/exercise/ExerciseBrief'
 import { ExerciseSteps } from '@/composites/recruitment/exercise/ExerciseSteps'
 import { AppreciationButtons } from '@/composites/recruitment/questionnaire/AppreciationButtons'
-import { NoteField } from '@/composites/recruitment/questionnaire/NoteField'
+import { QuestionComments } from '@/composites/recruitment/questionnaire/QuestionComments'
 import { BLANK_ANSWER } from '@/core/lib/recruitment/questionnaire'
 import type { ResolvedQuestion } from '@/core/lib/recruitment/questionnaire'
 import { EXERCISES } from '@/declarations/recruitment/exercises'
@@ -27,6 +27,7 @@ const ACTIONS: Record<Phase, string | null> = {
 
 export interface RunExerciseProps {
   question: ResolvedQuestion
+  candidateId: string
   answers: Record<string, AnswerState>
   disabled?: boolean
   onAnswer: (key: string, patch: Partial<AnswerState>) => void
@@ -38,7 +39,13 @@ export interface RunExerciseProps {
  * @return {JSX.Element}
  */
 
-export const RunExercise = ({ question, answers, disabled, onAnswer }: RunExerciseProps) => {
+export const RunExercise = ({
+  question,
+  candidateId,
+  answers,
+  disabled,
+  onAnswer,
+}: RunExerciseProps) => {
   const [phase, setPhase] = useState<Phase>('brief')
   const state = answers[question.key] ?? BLANK_ANSWER
   const cutsOff = question.exercise ? EXERCISES[question.exercise].cutsOff : false
@@ -82,11 +89,7 @@ export const RunExercise = ({ question, answers, disabled, onAnswer }: RunExerci
         </div>
       )}
 
-      <NoteField
-        value={state.notes}
-        disabled={disabled}
-        onSave={(notes) => onAnswer(question.key, { notes })}
-      />
+      <QuestionComments candidateId={candidateId} questionKey={question.key} disabled={disabled} />
     </div>
   )
 }

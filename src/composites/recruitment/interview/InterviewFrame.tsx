@@ -15,6 +15,10 @@ const FRAME_VARS = {
 export interface InterviewFrameProps {
   portrait: string | null
   caption: string
+  // Mark of the creator, the name stands in without it
+  logo?: string | null
+  // Wording of the part, at the foot of the banner
+  header?: ReactNode
   // Phones keep the portrait for the introduction only
   isPortraitShown?: boolean
   children: ReactNode
@@ -24,6 +28,8 @@ export interface InterviewFrameProps {
  * Creator portrait on the left, title on the tab between, the content in the window
  * @param {string | null} portrait - Banner or logo of the creator
  * @param {string} caption - Creator name over the portrait
+ * @param {string | null} [logo] - Creator mark, top left
+ * @param {ReactNode} [header] - Part wording over the foot of the banner
  * @param {boolean} [isPortraitShown] - Keeps the portrait on phones
  * @param {ReactNode} children - Window content
  * @return {JSX.Element}
@@ -32,6 +38,8 @@ export interface InterviewFrameProps {
 export const InterviewFrame = ({
   portrait,
   caption,
+  logo,
+  header,
   isPortraitShown = true,
   children,
 }: InterviewFrameProps) => (
@@ -41,14 +49,21 @@ export const InterviewFrame = ({
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={portrait} alt="" className={TOUR_CHAT.figureImage} />
-          <span className={TOUR_CHAT.figureShade} aria-hidden="true" />
+          <span className={INTERVIEW.figureTop} aria-hidden="true" />
         </>
       ) : (
         <span className={TOUR_CHAT.figureFallback} aria-hidden="true">
           <MemoraMark className={TOUR_CHAT.figureGlyph} />
         </span>
       )}
-      <figcaption className={TOUR_CHAT.figureName}>{caption}</figcaption>
+      {header && <span className={INTERVIEW.figureFade} aria-hidden="true" />}
+      {logo ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={logo} alt={caption} className={INTERVIEW.figureMark} />
+      ) : (
+        <figcaption className={INTERVIEW.figureName}>{caption}</figcaption>
+      )}
+      {header && <div className={INTERVIEW.figureHead}>{header}</div>}
     </figure>
 
     <div className={TOUR_CHAT.tabRail} aria-hidden="true">

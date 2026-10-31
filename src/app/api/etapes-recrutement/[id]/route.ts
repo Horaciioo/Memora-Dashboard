@@ -1,12 +1,8 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import {
-  removeStep,
-  stepFields,
-  stepSession,
-  updateStep,
-} from '@/core/services/recruitment'
+import { signalSession } from '@/core/lib/recruitment/signal'
+import { removeStep, stepFields, stepSession, updateStep } from '@/core/services/recruitment'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { Permissions } from '@/utils/constants/permissions'
@@ -20,14 +16,16 @@ export const PATCH = createProtectedRoute({
 
     const perimeter = await scope()
     const step = await updateStep(params.id, parsed.values, perimeter)
+    const sessionId = await stepSession(params.id, perimeter)
 
     await recordFileEvent({
       eventType: 'RecruitmentStepMoved',
       file: JOURNAL_FILES.Recruitment,
-      fileId: await stepSession(params.id, perimeter),
+      fileId: sessionId,
       actorId: session.id,
       summary: step.title,
     })
+    await signalSession(sessionId)
 
     return step
   },
@@ -48,5 +46,6 @@ export const DELETE = createProtectedRoute({
       actorId: session.id,
       summary: RECRUITMENT_COPY.logStepRemoved,
     })
+    await signalSession(sessionId)
   },
 })

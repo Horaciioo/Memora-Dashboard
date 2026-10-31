@@ -5,13 +5,17 @@ import type { RecruitmentOutcomeView } from '@/types/recruitment'
  * What the timeline reads from a candidate
  * @typedef {Object} CandidateProgress
  * @property {string | null} interviewAt - Slot fixed for the interview
- * @property {boolean} attended - Interview taken
+ * @property {string | null} interviewStartedAt - When the interview was opened
+ * @property {string | null} interviewEndedAt - When its recruiter closed it
+ * @property {string | null} verdictAt - When the verdict was given
  * @property {string | null} outcomeId - Column reached
  */
 
 export interface CandidateProgress {
   interviewAt: string | null
-  attended: boolean
+  interviewStartedAt: string | null
+  interviewEndedAt: string | null
+  verdictAt: string | null
   outcomeId: string | null
 }
 
@@ -21,7 +25,6 @@ export const CANDIDATE_STAGES = [
   'availabilities',
   'waiting',
   'interviewing',
-  'passed',
   'results',
 ] as const
 
@@ -40,31 +43,22 @@ export const candidateStates = (
   outcomes: RecruitmentOutcomeView[],
   marks: Record<string, boolean> = {}
 ): Record<CandidateStage, TimelineState> => {
-  const slotted = progress.interviewAt !== null
+  const isSlotted = progress.interviewAt !== null
+  const isStarted = progress.interviewStartedAt !== null
+  // Closed by its recruiter, or judged
+  const isJudged = progress.interviewEndedAt !== null || progress.verdictAt !== null
+  const isDecided =
+    outcomes.find((outcome) => outcome.id === progress.outcomeId)?.isTerminal ?? false
 
-  // Set by the interview page or a tick, only a clear removes it
-  const started = marks.interviewing === true
-  const decided = outcomes.find((outcome) => outcome.id === progress.outcomeId)?.isTerminal ?? false
+  // A hand mark only stands in for a moment with no data of its own
+  const hasSlot = isSlotted || marks.availabilities === true
 
-  const derived: Record<CandidateStage, TimelineState> = {
+  return {
     // A candidate exists through their Discord identifier
     joined: 'done',
-    availabilities: slotted || progress.attended ? 'done' : 'current',
-    waiting: started || progress.attended ? 'done' : slotted ? 'current' : 'upcoming',
-    interviewing: progress.attended ? 'done' : started ? 'current' : 'upcoming',
-    passed: progress.attended ? 'done' : 'upcoming',
-    results: decided ? 'done' : progress.attended ? 'current' : 'upcoming',
+    availabilities: hasSlot ? 'done' : 'current',
+    waiting: isStarted ? 'done' : isSlotted ? 'current' : 'upcoming',
+    interviewing: isJudged ? 'done' : isStarted ? 'current' : 'upcoming',
+    results: isDecided ? 'done' : isJudged ? 'current' : 'upcoming',
   }
-
-  // A hand mark wins over what is known
-  return Object.fromEntries(
-    CANDIDATE_STAGES.map((stage) => [
-      stage,
-      marks[stage] === true && stage !== 'interviewing'
-        ? 'done'
-        : marks[stage] === false && derived[stage] !== 'upcoming'
-          ? 'upcoming'
-          : derived[stage],
-    ])
-  ) as Record<CandidateStage, TimelineState>
 }

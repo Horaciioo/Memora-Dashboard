@@ -7,6 +7,7 @@ import type { ResolvedQuestion } from '@/core/lib/recruitment/questionnaire'
 import { QUESTIONNAIRE_COPY } from '@/declarations/recruitment/questionnaireCopy'
 import { ICONS } from '@/declarations/ui/icons'
 import { INTERVIEW } from '@/declarations/ui/variants'
+import type { CommentView } from '@/types/comments'
 import type { AnswerState } from '@/types/recruitment'
 import { cn } from '@/utils/classnames'
 import { AnswerAppreciations } from '@/utils/constants/recruitment'
@@ -15,6 +16,8 @@ import type { AnswerAppreciationName } from '@/utils/constants/recruitment'
 export interface InterviewTallyProps {
   questions: ResolvedQuestion[]
   answers: Record<string, AnswerState>
+  // Remarks of the candidate, shown under their question
+  comments: CommentView[]
 }
 
 // Order, wording, glyph, colour and wash of each reaction
@@ -46,21 +49,16 @@ const GROUPS = [
  * Questions of the interview counted by reaction, each group unfolding in place
  * @param {ResolvedQuestion[]} questions - Questions played
  * @param {Record<string, AnswerState>} answers - What was written, by key
+ * @param {CommentView[]} comments - Remarks of the candidate
  * @return {JSX.Element}
  */
 
-export const InterviewTally = ({ questions, answers }: InterviewTallyProps) => {
+export const InterviewTally = ({ questions, answers, comments }: InterviewTallyProps) => {
   const tally = tallyAppreciations(questions, answers)
   const [open, setOpen] = useState<AnswerAppreciationName | null>(null)
 
   return (
     <div className={INTERVIEW.tally}>
-      {open === null && (
-        <p role="note" className={INTERVIEW.tallyHint}>
-          <span className={INTERVIEW.tallyHintTail} aria-hidden="true" />
-          {QUESTIONNAIRE_COPY.tallyHint}
-        </p>
-      )}
       {GROUPS.map((group) => {
         const rows = tally[group.appreciation]
         const plural = rows.length > 1 ? 'other' : 'one'
@@ -91,9 +89,13 @@ export const InterviewTally = ({ questions, answers }: InterviewTallyProps) => {
                   <div key={entry.key} className={cn(INTERVIEW.reviewRow, group.wash)}>
                     <div className="flex min-w-0 flex-col gap-0.5">
                       <p className="font-semibold">{entry.prompt}</p>
-                      {answers[entry.key].notes.trim() && (
-                        <p className={INTERVIEW.reviewNote}>{answers[entry.key].notes}</p>
-                      )}
+                      {comments
+                        .filter((comment) => comment.questionKey === entry.key)
+                        .map((comment) => (
+                          <p key={comment.id} className={INTERVIEW.reviewNote}>
+                            {comment.body}
+                          </p>
+                        ))}
                     </div>
                   </div>
                 ))}

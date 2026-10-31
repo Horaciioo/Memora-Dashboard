@@ -1,6 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
+import { signalSession } from '@/core/lib/recruitment/signal'
 import { emitLink, linkFields, revokeLink } from '@/core/services/onboarding/IntegrationLinkService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { INTEGRATION_LINK_COPY } from '@/declarations/onboarding/copy'
@@ -24,6 +25,8 @@ export const POST = createProtectedRoute({
       summary: INTEGRATION_LINK_COPY.emitted,
     })
 
+    await signalSession(params.id)
+
     return link
   },
 })
@@ -33,6 +36,7 @@ export const DELETE = createProtectedRoute({
   descriptor: { summary: 'Close the integration link of a campaign', tags: ['integration'] },
   handler: async ({ params, scope }) => {
     await revokeLink(params.id, await scope())
+    await signalSession(params.id)
 
     return { ok: true }
   },

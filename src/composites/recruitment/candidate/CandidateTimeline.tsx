@@ -1,30 +1,39 @@
 'use client'
 
 import { Button } from '@/components/elements/actions/Button'
-import { ScrollCard } from '@/components/structures/data/ScrollCard'
+import { Section } from '@/components/structures/page/Section'
 import { Timeline } from '@/components/structures/data/Timeline'
-import type { TimelineItem, TimelineState } from '@/components/structures/data/Timeline'
+import type { TimelineState } from '@/components/structures/data/Timeline'
 import { CANDIDATE_STAGES } from '@/core/lib/recruitment/candidateTimeline'
 import type { CandidateStage } from '@/core/lib/recruitment/candidateTimeline'
 import { CANDIDATE_COPY, CANDIDATE_STAGE_COPY } from '@/declarations/recruitment/candidateCopy'
+import { MEMBER_FILE } from '@/declarations/ui/blocks'
 
 export interface CandidateTimelineProps {
   states: Record<CandidateStage, TimelineState>
   canPass: boolean
+  // Opens the interview for the first time or again
   onPass: () => void
   // Opens the finished interview
   onReview: () => void
-  // Ticks or unticks a moment
+  // Ticks or unticks the availabilities
   onToggle?: (stage: CandidateStage) => void
 }
 
+// Button each moment offers, only while it is the current one
+const STAGE_BUTTONS: Partial<Record<CandidateStage, string>> = {
+  waiting: CANDIDATE_COPY.pass,
+  interviewing: CANDIDATE_COPY.resume,
+  results: CANDIDATE_COPY.review,
+}
+
 /**
- * Where a candidate stands, small and quiet in a corner
+ * Where a candidate stands, every moment drawn on a vertical thread
  * @param {Record<CandidateStage, TimelineState>} states - State per moment
  * @param {boolean} canPass - Viewer may start the interview
- * @param {() => void} onPass - Starts the interview
+ * @param {() => void} onPass - Starts or resumes the interview
  * @param {() => void} onReview - Opens the finished interview
- * @param {(stage: CandidateStage) => void} [onToggle] - Ticks a moment
+ * @param {(stage: CandidateStage) => void} [onToggle] - Ticks the availabilities
  * @return {JSX.Element}
  */
 
@@ -34,28 +43,36 @@ export const CandidateTimeline = ({
   onPass,
   onReview,
   onToggle,
-}: CandidateTimelineProps) => {
-  const items: TimelineItem[] = CANDIDATE_STAGES.map((stage) => ({
-    id: stage,
-    state: states[stage],
-    title: CANDIDATE_STAGE_COPY[stage],
-    onSelect: onToggle ? () => onToggle(stage) : undefined,
-    children:
-      stage === 'interviewing' && states.interviewing === 'done' ? (
-        <Button onClick={onReview} className="self-start">
-          {CANDIDATE_COPY.review}
-        </Button>
-      ) : (stage === 'waiting' && states.waiting !== 'done') ||
-        (stage === 'interviewing' && states.interviewing === 'current') ? (
-        <Button disabled={!canPass} onClick={onPass} className="self-start">
-          {stage === 'waiting' ? CANDIDATE_COPY.pass : CANDIDATE_COPY.resume}
-        </Button>
-      ) : null,
-  }))
+}: CandidateTimelineProps) => (
+  <Section title={CANDIDATE_COPY.timeline} bare className="mt-4">
+    <div className={MEMBER_FILE.rail}>
+      <div className="p-4 md:p-5">
+        <Timeline
+          struckDone
+          label={CANDIDATE_COPY.timeline}
+          items={CANDIDATE_STAGES.map((stage) => {
+            const label = STAGE_BUTTONS[stage]
 
-  return (
-    <ScrollCard title={CANDIDATE_COPY.timeline}>
-      <Timeline compact fill label={CANDIDATE_COPY.timeline} items={items} />
-    </ScrollCard>
-  )
-}
+            return {
+              id: stage,
+              state: states[stage],
+              title: CANDIDATE_STAGE_COPY[stage],
+              onSelect: stage === 'availabilities' && onToggle ? () => onToggle(stage) : undefined,
+              children:
+                label && states[stage] === 'current' ? (
+                  <Button
+                    variant="primary"
+                    disabled={stage !== 'results' && !canPass}
+                    onClick={stage === 'results' ? onReview : onPass}
+                    className="mt-2 self-start"
+                  >
+                    {label}
+                  </Button>
+                ) : undefined,
+            }
+          })}
+        />
+      </div>
+    </div>
+  </Section>
+)

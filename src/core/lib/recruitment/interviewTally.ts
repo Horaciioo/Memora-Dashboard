@@ -1,4 +1,4 @@
-import { askEntries } from '@/core/lib/recruitment/questionnaire'
+import { askEntries, struckKeys } from '@/core/lib/recruitment/questionnaire'
 import type { AskEntry, ResolvedQuestion } from '@/core/lib/recruitment/questionnaire'
 import type { AnswerState } from '@/types/recruitment'
 import { AnswerAppreciations } from '@/utils/constants/recruitment'
@@ -21,9 +21,16 @@ export const tallyAppreciations = (
     [AnswerAppreciations.Dislike]: [],
   }
 
+  // Branches left aside count as passed
+  const struck = new Set(
+    questions.flatMap((question) => struckKeys(question, answers[question.key]))
+  )
+
   for (const entry of askEntries(questions)) {
     const answer = answers[entry.key]
-    if (answer?.appreciation && !answer.skipped) tally[answer.appreciation].push(entry)
+    if (answer?.appreciation && !answer.skipped && !struck.has(entry.key)) {
+      tally[answer.appreciation].push(entry)
+    }
   }
 
   return tally

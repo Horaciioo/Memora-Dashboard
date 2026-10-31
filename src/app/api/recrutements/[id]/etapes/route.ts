@@ -1,6 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
+import { signalSession } from '@/core/lib/recruitment/signal'
 import { createStep, stepFields } from '@/core/services/recruitment'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { Permissions } from '@/utils/constants/permissions'
@@ -22,6 +23,8 @@ export const POST = createProtectedRoute({
       actorId: session.id,
       summary: step.title,
     })
+
+    await signalSession(params.id)
 
     return step
   },

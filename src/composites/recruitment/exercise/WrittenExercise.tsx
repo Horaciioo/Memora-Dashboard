@@ -6,7 +6,7 @@ import { ContextPicker } from '@/composites/recruitment/exercise/ContextPicker'
 import { ExerciseBrief } from '@/composites/recruitment/exercise/ExerciseBrief'
 import { LinkList } from '@/composites/recruitment/exercise/LinkList'
 import { AppreciationButtons } from '@/composites/recruitment/questionnaire/AppreciationButtons'
-import { NoteField } from '@/composites/recruitment/questionnaire/NoteField'
+import { QuestionComments } from '@/composites/recruitment/questionnaire/QuestionComments'
 import { useExerciseLinks } from '@/core/hooks/data/recruitment/useExerciseLinks'
 import { BLANK_ANSWER } from '@/core/lib/recruitment/questionnaire'
 import type { ResolvedQuestion } from '@/core/lib/recruitment/questionnaire'
@@ -114,11 +114,7 @@ export const WrittenExercise = ({
         )
       )}
 
-      <NoteField
-        value={state.notes}
-        disabled={disabled}
-        onSave={(notes) => onAnswer(question.key, { notes })}
-      />
+      <QuestionComments candidateId={candidateId} questionKey={question.key} disabled={disabled} />
     </div>
   )
 }

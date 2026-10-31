@@ -8,10 +8,10 @@ import { Textarea } from '@/components/elements/forms/inputs/Textarea'
 import { Drawer } from '@/components/structures/overlays/Drawer'
 import { NewIdentifierRow } from '@/composites/recruitment/file/NewIdentifierRow'
 import { LIVE_PALETTE, renderPlanningPng } from '@/composites/recruitment/file/planningImage'
-import { WeekPlanning } from '@/composites/recruitment/file/WeekPlanning'
+import { RangePlanning } from '@/composites/recruitment/file/RangePlanning'
 import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { unknownTokens } from '@/core/lib/discord/identifiers'
-import type { WeekPlan } from '@/core/lib/recruitment/weekPlanning'
+import type { RangePlan } from '@/core/lib/recruitment/rangePlanning'
 import { PLANNING_COPY } from '@/declarations/recruitment/copy'
 import { ANNOUNCEMENT_DRAWER } from '@/declarations/ui/variants'
 import { ANNOUNCEMENT_COPY } from '@/declarations/work/announcements'
@@ -27,7 +27,7 @@ export interface AnnouncementDrawerProps {
   text: string
   isModified: boolean
   withImage: boolean
-  plan: WeekPlan
+  plan: RangePlan
   entries: MentionEntry[]
   isSaving: boolean
   canManage: boolean
@@ -150,7 +150,7 @@ export const AnnouncementDrawer = ({
             />
             {withImage && (
               <div className={ANNOUNCEMENT_DRAWER.picture}>
-                <WeekPlanning plan={plan} palette={LIVE_PALETTE} />
+                <RangePlanning plan={plan} palette={LIVE_PALETTE} className="h-auto w-full" />
               </div>
             )}
           </div>

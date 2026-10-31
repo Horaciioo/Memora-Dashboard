@@ -12,6 +12,9 @@ html[data-color-vision='deuteranopia'],
 [data-vision-preview='deuteranopia'] {
   --color-success: #0058a0;
   --color-success-soft: #dfe9f3;
+  --color-ring-success: var(--color-success);
+  --color-ring-caution: var(--color-caution);
+  --color-ring-danger: var(--color-danger);
   --color-info: #00667f;
   --color-info-soft: #dfebef;
   --color-caution: #7a6200;
@@ -43,6 +46,9 @@ html[data-color-vision='deuteranopia'],
 :root.dark [data-vision-preview='deuteranopia'] {
   --color-success: #56a8f0;
   --color-success-soft: #253241;
+  --color-ring-success: var(--color-success);
+  --color-ring-caution: var(--color-caution);
+  --color-ring-danger: var(--color-danger);
   --color-info: #4fd0e0;
   --color-info-soft: #24393f;
   --color-caution: #f0e442;

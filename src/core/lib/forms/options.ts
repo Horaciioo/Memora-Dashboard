@@ -38,6 +38,7 @@ export const rowsToOptions = (
     accent?: string | null
     avatarUrl?: string | null
     bannerUrl?: string | null
+    fadeBannerUrl?: string | null
     icon?: string | null
   }[]
 ): FieldOption[] =>
@@ -46,7 +47,7 @@ export const rowsToOptions = (
     label: row.name,
     accent: row.accent ?? undefined,
     image: row.avatarUrl ?? undefined,
-    banner: row.bannerUrl ?? undefined,
+    banner: row.fadeBannerUrl ?? row.bannerUrl ?? undefined,
     icon: row.icon ?? undefined,
   }))
 

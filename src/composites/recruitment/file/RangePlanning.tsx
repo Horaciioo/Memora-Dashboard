@@ -1,3 +1,4 @@
+import { PlanningBlock } from '@/composites/recruitment/file/PlanningBlock'
 import {
   PLANNING_FONT,
   PLANNING_LAYOUT,
@@ -5,34 +6,40 @@ import {
 } from '@/declarations/recruitment/planning'
 import type { PlanningPalette } from '@/declarations/recruitment/planning'
 import { WEEKDAY_LABELS } from '@/declarations/calendar/copy'
-import type { WeekPlan } from '@/core/lib/recruitment/weekPlanning'
-import { minuteLabel } from '@/utils/format/calendar'
+import type { RangePlan } from '@/core/lib/recruitment/rangePlanning'
+import { minuteLabel, weekdayOf } from '@/utils/format/calendar'
 import { placeInLanes } from '@/utils/lanes'
 
-export interface WeekPlanningProps {
-  plan: WeekPlan
+export interface RangePlanningProps {
+  plan: RangePlan
   palette: PlanningPalette
+  // Page of a candidate, names stay plain text without it
+  hrefOf?: (candidateId: string) => string
+  // Replaces the scrolling width, the picture then fits its box
+  className?: string
 }
 
 /**
- * Size of the picture of a week
- * @param {WeekPlan} plan - Week laid out
+ * Size of the picture of a period
+ * @param {RangePlan} plan - Period laid out
  * @return {{ width: number, height: number }} - Picture size
  */
 
-export const planningSize = (plan: WeekPlan): { width: number; height: number } => ({
-  width: PLANNING_LAYOUT.width,
+export const planningSize = (plan: RangePlan): { width: number; height: number } => ({
+  width: Math.max(
+    PLANNING_LAYOUT.width,
+    PLANNING_LAYOUT.gutter + plan.days.length * PLANNING_LAYOUT.minColumn
+  ),
   height: PLANNING_LAYOUT.headerHeight + (plan.toHour - plan.fromHour) * PLANNING_LAYOUT.hourHeight,
 })
 
 /**
- * Week of interviews, drawn as a picture
- * @param {WeekPlan} plan - Week laid out
- * @param {PlanningPalette} palette - Paint per role
+ * Period of interviews, drawn as a picture
+ * @param {RangePlanningProps} props - Plan, paint, candidate links and size
  * @return {JSX.Element}
  */
 
-export const WeekPlanning = ({ plan, palette }: WeekPlanningProps) => {
+export const RangePlanning = ({ plan, palette, hrefOf, className }: RangePlanningProps) => {
   const { width, height } = planningSize(plan)
   const { gutter, headerHeight, hourHeight, eventInset, eventGap } = PLANNING_LAYOUT
   const columnWidth = (width - gutter) / plan.days.length
@@ -47,7 +54,7 @@ export const WeekPlanning = ({ plan, palette }: WeekPlanningProps) => {
       width={width}
       height={height}
       fontFamily={PLANNING_FONT}
-      className="h-auto w-full"
+      className={className ?? 'h-auto w-full min-w-[56rem]'}
     >
       <rect width={width} height={height} fill={palette.surface} />
 
@@ -59,6 +66,7 @@ export const WeekPlanning = ({ plan, palette }: WeekPlanningProps) => {
             y1={yOf(hour * 60)}
             y2={yOf(hour * 60)}
             stroke={palette.line}
+            strokeOpacity={0.55}
           />
           {hour < plan.toHour && (
             <text
@@ -88,8 +96,17 @@ export const WeekPlanning = ({ plan, palette }: WeekPlanningProps) => {
               fontSize={PLANNING_LAYOUT.dayNameSize}
               fill={palette.subtle}
             >
-              {WEEKDAY_LABELS[index]}
+              {WEEKDAY_LABELS[weekdayOf(day.key)]}
             </text>
+            {day.isToday && (
+              <circle
+                cx={left + columnWidth / 2}
+                cy={headerHeight - 14 - PLANNING_LAYOUT.dayNumberSize / 3}
+                r={PLANNING_LAYOUT.dayNumberSize * 0.85}
+                fill={palette.accent}
+                fillOpacity={0.18}
+              />
+            )}
             <text
               x={left + columnWidth / 2}
               y={headerHeight - 14}
@@ -103,40 +120,18 @@ export const WeekPlanning = ({ plan, palette }: WeekPlanningProps) => {
 
             {placed.map(({ item, lane, lanes }) => {
               const laneWidth = (columnWidth - eventInset * 2) / lanes
-              const x = left + eventInset + lane * laneWidth
-              const y = yOf(item.startMinute) + eventGap
-              const eventHeight = (item.endMinute - item.startMinute) * minuteHeight - eventGap * 2
-              const room = Math.floor(
-                (laneWidth - PLANNING_LAYOUT.timeWidth - eventInset * 3) /
-                  PLANNING_LAYOUT.glyphWidth
-              )
-              const name = item.name.length > room ? `${item.name.slice(0, room - 1)}…` : item.name
 
               return (
-                <g key={item.id}>
-                  <rect
-                    x={x}
-                    y={y}
-                    width={laneWidth - eventGap}
-                    height={eventHeight}
-                    rx={8}
-                    fill={palette.accent}
-                    fillOpacity={0.14}
-                  />
-                  <text
-                    x={x + eventInset}
-                    y={y + eventHeight / 2}
-                    dominantBaseline="central"
-                    fontSize={PLANNING_LAYOUT.eventSize}
-                  >
-                    <tspan fontWeight={700} fill={palette.accent}>
-                      {minuteLabel(item.startMinute)}
-                    </tspan>
-                    <tspan dx={eventInset} fontWeight={600} fill={palette.ink}>
-                      {name}
-                    </tspan>
-                  </text>
-                </g>
+                <PlanningBlock
+                  key={item.startMinute}
+                  block={item}
+                  x={left + eventInset + lane * laneWidth}
+                  y={yOf(item.startMinute) + eventGap}
+                  width={laneWidth - eventGap}
+                  height={(item.endMinute - item.startMinute) * minuteHeight - eventGap * 2}
+                  palette={palette}
+                  hrefOf={hrefOf}
+                />
               )
             })}
           </g>

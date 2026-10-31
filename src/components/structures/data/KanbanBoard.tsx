@@ -21,6 +21,7 @@ import { cn } from '@/utils/classnames'
  * @property {string} id - Column identifier
  * @property {string} label - Column label
  * @property {string | null} accent - Colour token
+ * @property {number} [count] - Cards held, drawn after the label
  * @property {WorkflowPhaseName} [phase] - Lifecycle bucket
  * @property {boolean} [entering] - Just revealed, grows in and pushes the others
  * @property {boolean} [leaving] - Being folded away, shrinks and lets the others spread
@@ -30,6 +31,7 @@ export interface BoardColumn {
   id: string
   label: string
   accent: string | null
+  count?: number
   phase?: WorkflowPhaseName
   leaving?: boolean
   entering?: boolean
@@ -188,7 +190,12 @@ export const KanbanBoard = <T extends BoardItem>({
                 onClick={() => toggleColumn(column.id)}
                 className={BOARD_STYLES.columnToggle}
               >
-                <span className={BOARD_STYLES.columnTitle}>{column.label}</span>
+                <span className={BOARD_STYLES.columnTitle}>
+                  {column.label}
+                  {column.count !== undefined && (
+                    <span className={BOARD_STYLES.columnCount}>{column.count}</span>
+                  )}
+                </span>
                 <ChevronIcon
                   className={cn(BOARD_STYLES.columnChevron, !isOpen && '-rotate-90')}
                   aria-hidden="true"

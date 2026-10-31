@@ -7,7 +7,7 @@ import { PAGE_TABS_HOST_ID } from '@/declarations/ui/banners'
 import { TABS_STYLES } from '@/declarations/ui/variants'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
-import { easeOut, panelDurationMs, prefersReducedMotion } from '@/utils/motion'
+import { panelDurationMs, prefersReducedMotion } from '@/utils/motion'
 
 export interface TabItem {
   value: string
@@ -15,6 +15,8 @@ export interface TabItem {
   icon?: IconName
   // Holds at least one rejection
   flagged?: boolean
+  // Administration tab, painted red
+  danger?: boolean
 }
 
 export interface TabsProps {
@@ -29,6 +31,9 @@ export interface TabsProps {
   // Longer glide and a pulse on arrival
   emphasis?: boolean
 }
+
+// Last box drawn per strip, survives a remount
+const LAST_DRAWN = new Map<string, { left: number; width: number }>()
 
 // Glide length factor
 const EMPHASIS_FACTOR = 2.5
@@ -58,79 +63,66 @@ export const Tabs = ({
   const tabsRef = useRef(new Map<string, HTMLButtonElement>())
   const listRef = useRef<HTMLDivElement | null>(null)
   const ruleRef = useRef<HTMLSpanElement | null>(null)
-  const drawn = useRef<{ left: number; width: number } | null>(null)
 
-  // Written on the node
-  const draw = (left: number, width: number) => {
+  // The rule glides toward the open tab, from where this strip last drew it
+  useLayoutEffect(() => {
     const rule = ruleRef.current
     if (!rule) return
 
-    drawn.current = { left, width }
-    rule.style.width = `${width}px`
-    rule.style.transform = `translateX(${left}px)`
-  }
-
-  // The rule glides toward the open tab
-  useLayoutEffect(() => {
     const target = () => {
       const tab = tabsRef.current.get(value)
       return tab ? { left: tab.offsetLeft, width: tab.offsetWidth } : null
     }
 
-    const from = drawn.current
-    const duration = panelDurationMs() * (emphasis ? EMPHASIS_FACTOR : 1)
-    let frame = 0
-    let gliding = false
+    // Written on the node
+    const place = (box: { left: number; width: number }, duration: number) => {
+      rule.style.transition =
+        duration > 0
+          ? [
+              `transform ${duration}ms var(--motion-ease-out)`,
+              `width ${duration}ms var(--motion-ease-out)`,
+            ].join(', ')
+          : 'none'
+      rule.style.width = `${box.width}px`
+      rule.style.transform = `translateX(${box.left}px)`
+    }
 
-    // First paint or calm mode
-    if (!from || prefersReducedMotion()) {
-      const end = target()
-      if (end) draw(end.left, end.width)
-    } else {
-      const startedAt = performance.now()
-      gliding = true
+    const end = target()
+    if (!end) return
+
+    const from = LAST_DRAWN.get(label)
+    const duration = panelDurationMs() * (emphasis ? EMPHASIS_FACTOR : 1)
+
+    if (!from || prefersReducedMotion()) place(end, 0)
+    else {
+      // Start where the strip left off, then move once that is painted
+      place(from, 0)
+      void rule.offsetWidth
+      place(end, duration)
 
       // Pulse restarts on each arrival
-      const rule = ruleRef.current
-      if (emphasis && rule) {
+      if (emphasis) {
         rule.classList.remove(TABS_STYLES.arrive)
         void rule.offsetWidth
         rule.classList.add(TABS_STYLES.arrive)
       }
-
-      const step = (now: number) => {
-        const end = target()
-        if (!end) return
-
-        const progress = Math.min((now - startedAt) / duration, 1)
-        const eased = easeOut(progress)
-        draw(
-          from.left + (end.left - from.left) * eased,
-          from.width + (end.width - from.width) * eased
-        )
-
-        if (progress < 1) frame = requestAnimationFrame(step)
-        else gliding = false
-      }
-
-      frame = requestAnimationFrame(step)
     }
+    LAST_DRAWN.set(label, end)
 
     // Later layout changes snap the rule back on its tab
     const observer = new ResizeObserver(() => {
-      if (gliding) return
+      const next = target()
+      const last = LAST_DRAWN.get(label)
+      if (!next || (last && last.left === next.left && last.width === next.width)) return
 
-      const end = target()
-      if (end) draw(end.left, end.width)
+      place(next, 0)
+      LAST_DRAWN.set(label, next)
     })
     if (listRef.current) observer.observe(listRef.current)
     tabsRef.current.forEach((node) => observer.observe(node))
 
-    return () => {
-      cancelAnimationFrame(frame)
-      observer.disconnect()
-    }
-  }, [value, items.length, emphasis])
+    return () => observer.disconnect()
+  }, [value, items.length, emphasis, label])
 
   // A tab opened from off screen scrolls the strip, never the page
   useEffect(() => {
@@ -169,8 +161,9 @@ export const Tabs = ({
             onClick={() => onChange(item.value)}
             className={cn(
               TABS_STYLES.tab,
-              isActive && TABS_STYLES.active,
-              item.flagged && !isActive && TABS_STYLES.flagged
+              isActive && (item.danger ? TABS_STYLES.activeDanger : TABS_STYLES.active),
+              item.danger && !isActive && TABS_STYLES.danger,
+              item.flagged && !isActive && !item.danger && TABS_STYLES.flagged
             )}
           >
             <span className={TABS_STYLES.content}>

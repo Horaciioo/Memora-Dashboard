@@ -16,23 +16,49 @@ export type ExerciseKey = 'sixty' | 'written' | 'cases' | 'documents'
 
 /**
  * How a question is played
- * @typedef {'open' | 'choice' | 'exercise'} QuestionKind
+ * @typedef {'open' | 'choice' | 'exercise' | 'speech'} QuestionKind
  */
 
-export type QuestionKind = 'open' | 'choice' | 'exercise'
+export type QuestionKind = 'open' | 'choice' | 'exercise' | 'speech'
+
+/**
+ * Paragraph of a speech read out loud
+ * @typedef {Object} SpeechLine
+ * @property {string} text - What is said or done
+ * @property {boolean} [aside] - Stage direction, not spoken
+ */
+
+export interface SpeechLine {
+  text: string
+  aside?: boolean
+}
+
+/**
+ * Sub-question with a key that survives edits and reordering
+ * @typedef {Object} QuestionAsk
+ * @property {string} key - Stable identifier inside its question
+ * @property {string} text - What is asked
+ */
+
+export interface QuestionAsk {
+  key: string
+  text: string
+}
 
 /**
  * Follow-up asked only on one answer
  * @typedef {Object} QuestionBranch
+ * @property {string} key - Stable identifier inside its question
  * @property {string} when - Answer that triggers it
  * @property {string} [say] - Line read out loud
- * @property {string[]} asks - What to ask next
+ * @property {QuestionAsk[]} asks - What to ask next
  */
 
 export interface QuestionBranch {
+  key: string
   when: string
   say?: string
-  asks: string[]
+  asks: QuestionAsk[]
 }
 
 /**
@@ -71,14 +97,16 @@ export interface QuestionDocument {
  * @property {boolean} [mandatory] - Cannot be left out
  * @property {boolean} [recommended] - Part of the suggested pick
  * @property {string} [say] - Line read out loud
+ * @property {SpeechLine[]} [speech] - Paragraphs of a speech, no answer expected
  * @property {string} [hint] - Indication for the recruiter
- * @property {string[]} [digs] - Ways to go deeper
+ * @property {QuestionAsk[]} [digs] - Ways to go deeper
  * @property {QuestionBranch[]} [branches] - Answers and their follow-ups
  * @property {QuestionStep[]} [steps] - Timed asks of an exercise
  * @property {string} [scenario] - Text read or shared
  * @property {QuestionDocument[]} [documents] - Documents handed out
  * @property {ExerciseKey} [exercise] - Exercise it is played in
  * @property {string} [family] - Questions sharing a turn of phrase
+ * @property {'fold'} [display] - Family drawn as folds, one chosen and the others struck
  * @property {number} [minutes] - Time it takes
  * @property {RecruitmentPlatformName[]} [platforms] - Platforms it fits, both when absent
  */
@@ -93,14 +121,16 @@ export interface QuestionDefinition {
   mandatory?: boolean
   recommended?: boolean
   say?: string
+  speech?: SpeechLine[]
   hint?: string
-  digs?: string[]
+  digs?: QuestionAsk[]
   branches?: QuestionBranch[]
   steps?: QuestionStep[]
   scenario?: string
   documents?: QuestionDocument[]
   exercise?: ExerciseKey
   family?: string
+  display?: 'fold'
   minutes?: number
   platforms?: RecruitmentPlatformName[]
 }

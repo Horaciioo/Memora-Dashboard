@@ -41,10 +41,12 @@ export interface RecruitmentRef {
  * @property {string | null} academySessionId - Promotion this campaign feeds
  * @property {string | null} promotionTitle - Name of that promotion
  * @property {string | null} youtuberBanner - Banner of the creator
+ * @property {Record<string, string>} youtuberPartBanners - Banner of each interview part, by slot
+ * @property {string | null} youtuberLogo - Logo of the creator
  * @property {string | null} opensAt - Announcement day
  * @property {string | null} closesAt - Closing day
  * @property {number} candidateCount - Applicants held
- * @property {number} interviewedCount - Applicants who attended
+ * @property {number} interviewedCount - Applicants given a verdict
  * @property {FormValues} values - Values feeding the edit form
  */
 
@@ -60,6 +62,8 @@ export interface RecruitmentSummary {
   academySessionId: string | null
   promotionTitle: string | null
   youtuberBanner: string | null
+  youtuberPartBanners: Record<string, string>
+  youtuberLogo: string | null
   // Discord wording once announced
   announcement: string | null
   opensAt: string | null
@@ -70,15 +74,31 @@ export interface RecruitmentSummary {
 }
 
 /**
+ * Part of the interview state a recruiter changes
+ * @typedef {Object} InterviewPatch
+ * @property {boolean} [formal] - Questions read with « vous »
+ * @property {boolean} [started] - Interview opened
+ * @property {boolean} [ended] - Interview closed
+ * @property {string | null} [verdictOutcomeId] - Verdict given, null takes it back
+ */
+
+export interface InterviewPatch {
+  formal?: boolean
+  started?: boolean
+  ended?: boolean
+  verdictOutcomeId?: string | null
+}
+
+/**
  * What the recruiter wrote on one question
  * @typedef {Object} AnswerState
- * @property {string} notes - Free notes
+ * @property {string | null} branch - Branch unfolded
  * @property {AnswerAppreciationName | null} appreciation - Reaction
  * @property {boolean} skipped - Left out
  */
 
 export interface AnswerState {
-  notes: string
+  branch: string | null
   appreciation: AnswerAppreciationName | null
   skipped: boolean
 }
@@ -91,10 +111,14 @@ export interface AnswerState {
  * @property {string | null} displayName - Pseudonym given at application
  * @property {string} name - Best known name
  * @property {string | null} formId - Meltdown Forms identifier
- * @property {RecruitmentRef | null} recruiter - Moderator leading the interview
+ * @property {RecruitmentRef[]} recruiters - Moderators leading the interview
  * @property {RecruitmentRef[]} observers - Moderators sitting in
  * @property {string | null} interviewAt - When the interview is held
  * @property {boolean} attended - Showed up
+ * @property {boolean} formal - Questions read with « vous »
+ * @property {string | null} interviewStartedAt - When a recruiter opened the interview
+ * @property {string | null} interviewEndedAt - When its recruiter closed it
+ * @property {string | null} verdictAt - When the verdict was given
  * @property {string | null} outcomeId - Column of the results board
  * @property {string} review - Written outcome of the application
  * @property {number} position - Order inside its column
@@ -103,7 +127,7 @@ export interface AnswerState {
  * @property {string | null} avatarUrl - Discord portrait once known
  * @property {Record<string, boolean>} stageMarks - Timeline moments ticked by hand
  * @property {CommentView[]} comments - Remarks left on the application
- * @property {Record<string, AnswerState>} answers - Interview notes by question key
+ * @property {Record<string, AnswerState>} answers - Interview reactions by question key
  */
 
 export interface CandidateView {
@@ -112,10 +136,14 @@ export interface CandidateView {
   displayName: string | null
   name: string
   formId: string | null
-  recruiter: RecruitmentRef | null
+  recruiters: RecruitmentRef[]
   observers: RecruitmentRef[]
   interviewAt: string | null
   attended: boolean
+  formal: boolean
+  interviewStartedAt: string | null
+  interviewEndedAt: string | null
+  verdictAt: string | null
   outcomeId: string | null
   review: string
   position: number
@@ -159,6 +187,7 @@ export interface RecruitmentStepView {
  * One column of the results board
  * @typedef {Object} RecruitmentOutcomeView
  * @property {string} id - Outcome identifier
+ * @property {string} name - Stable name, what code looks an outcome up by
  * @property {string} label - Display label
  * @property {string | null} accent - Colour token
  * @property {boolean} isTerminal - Closes the application
@@ -166,6 +195,7 @@ export interface RecruitmentStepView {
 
 export interface RecruitmentOutcomeView {
   id: string
+  name: string
   label: string
   accent: string | null
   isTerminal: boolean
@@ -180,6 +210,7 @@ export interface RecruitmentOutcomeView {
  * @property {CandidateView[]} candidates - Applicants held
  * @property {RecruitmentStepView[]} steps - Timeline moments
  * @property {string[]} questionKeys - Questions picked for the interviews
+ * @property {string[]} bannedIds - Barred identifiers, for those who manage
  * @property {RecruitmentOutcomeView[]} outcomes - Columns of the results board
  * @property {IntegrationLinkView | null} link - Integration form handed out
  */
@@ -194,6 +225,8 @@ export interface RecruitmentDetail {
   outcomes: RecruitmentOutcomeView[]
   link: IntegrationLinkView | null
   identifiers: DiscordIdentifierView[]
+  // Identifiers barred from new sessions, filled for those who manage
+  bannedIds: string[]
 }
 
 /**
@@ -224,6 +257,10 @@ export interface RecruitmentRights {
   readLogs: boolean
   // Reads as an observer, nothing writes
   observing: boolean
+  // May sit in on an interview
+  canObserve: boolean
+  // Holds an observer seat of this session
+  isObserver: boolean
   viewerId: string
 }
 
@@ -247,4 +284,74 @@ export interface ExerciseLinkView {
   isClaimed: boolean
   expiresAt: string
   isExpired: boolean
+}
+
+/**
+ * Identifier barred from the new sessions
+ * @typedef {Object} BanView
+ * @property {string} discordId - Barred identifier
+ * @property {string | null} name - Name known when barred
+ * @property {string | null} reason - Why it was barred
+ * @property {string | null} sessionId - Session the decision was taken on
+ * @property {string | null} sessionName - Name of that session
+ * @property {string} createdAt - ISO moment
+ */
+
+export interface BanView {
+  discordId: string
+  name: string | null
+  reason: string | null
+  sessionId: string | null
+  sessionName: string | null
+  createdAt: string
+}
+
+/**
+ * One passage of a person through a session
+ * @typedef {Object} HistoryPassage
+ * @property {string} candidateId - Candidate row
+ * @property {string} sessionId - Session identifier
+ * @property {string} sessionName - Session name
+ * @property {{ label: string, accent: string | null } | null} outcome - Issue of the passage
+ * @property {string} at - ISO moment, interview else arrival
+ * @property {RecruitmentRef[]} recruiters - Who led the interview
+ */
+
+export interface HistoryPassage {
+  candidateId: string
+  sessionId: string
+  sessionName: string
+  outcome: { label: string; accent: string | null } | null
+  at: string
+  recruiters: RecruitmentRef[]
+}
+
+/**
+ * One Discord identity and every session it went through
+ * @typedef {Object} HistoryEntry
+ * @property {string} discordId - Identity
+ * @property {string} name - Last known name
+ * @property {string | null} avatarUrl - Portrait
+ * @property {HistoryPassage[]} passages - Sessions, newest first
+ * @property {BanView | null} ban - Blacklist state
+ */
+
+export interface HistoryEntry {
+  discordId: string
+  name: string
+  avatarUrl: string | null
+  passages: HistoryPassage[]
+  ban: BanView | null
+}
+
+/**
+ * One page of the history
+ * @typedef {Object} HistoryPage
+ * @property {HistoryEntry[]} entries - Identities of the page
+ * @property {boolean} hasMore - Another page follows
+ */
+
+export interface HistoryPage {
+  entries: HistoryEntry[]
+  hasMore: boolean
 }

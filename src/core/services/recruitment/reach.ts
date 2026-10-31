@@ -14,6 +14,23 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 export const sessionScope = (scope: AccessScope) => scopedWhere('recruitmentSession', scope)
 
 /**
+ * Read the session a candidate belongs to, whoever asks
+ * @param {string} candidateId - Candidate identifier
+ * @return {Promise<string>} - Session identifier
+ */
+
+export const candidateSessionId = async (candidateId: string): Promise<string> => {
+  const row = await prisma.recruitmentCandidate.findUnique({
+    where: { id: candidateId },
+    select: { sessionId: true },
+  })
+
+  if (!row) throw notFound()
+
+  return row.sessionId
+}
+
+/**
  * Read the session a candidate belongs to
  * @param {string} candidateId - Candidate identifier
  * @param {AccessScope} scope - Perimeter

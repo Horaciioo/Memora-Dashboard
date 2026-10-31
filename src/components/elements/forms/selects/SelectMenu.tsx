@@ -29,6 +29,8 @@ export interface SelectMenuProps {
   label: string
   // First entry of the list
   emptyLabel?: string
+  // Glyph of the clearing entry
+  emptyIcon?: string
   placeholder?: string
   mark?: OptionMarkKind
   // Trigger shows the glyph alone
@@ -56,6 +58,7 @@ const SEARCH_THRESHOLD = 8
  * @param {(value: string) => void} onChange - Selection handler
  * @param {string} label - Accessible name of the control
  * @param {string} [emptyLabel] - Label of the clearing entry
+ * @param {string} [emptyIcon] - Glyph of the clearing entry
  * @param {string} [placeholder] - Text shown while nothing is chosen
  * @param {OptionMarkKind} [mark] - Glyph drawn beside every option
  * @param {boolean} [isMarkOnly] - Trigger shows the glyph alone
@@ -75,6 +78,7 @@ export const SelectMenu = ({
   onChange,
   label,
   emptyLabel,
+  emptyIcon,
   placeholder,
   mark,
   isMarkOnly,
@@ -111,9 +115,9 @@ export const SelectMenu = ({
       : options
 
     return emptyLabel !== undefined
-      ? [{ value: '', label: emptyLabel } satisfies FieldOption, ...matching]
+      ? [{ value: '', label: emptyLabel, icon: emptyIcon } satisfies FieldOption, ...matching]
       : matching
-  }, [options, query, emptyLabel])
+  }, [options, query, emptyLabel, emptyIcon])
 
   // Reopening always lands on the current choice
   const open = () => {

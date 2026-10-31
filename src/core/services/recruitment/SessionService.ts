@@ -185,7 +185,7 @@ export const updateSession = async (
 
   const { opensAt, closesAt } = readPeriod(values)
 
-  // Observer seats kept keep their quota, dropped ones leave their interviews
+  // Observer seats kept stay in place, dropped ones leave their interviews
   const observerIds = readList(values, 'observerIds')
   const dropped = { sessionId: id, accountId: { notIn: observerIds } }
   const kept = await prisma.recruitmentObserver.findMany({
@@ -230,7 +230,7 @@ export const updateSession = async (
   await syncProgramProject(id)
 
   const attended = await prisma.recruitmentCandidate.count({
-    where: { sessionId: id, attended: true },
+    where: { sessionId: id, verdictAt: { not: null } },
   })
 
   return toSummary(row, await sessionNumbers(), attended)

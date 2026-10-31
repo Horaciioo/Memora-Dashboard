@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { forbidden, notFound } from '@/core/lib/errors'
+import { conflict, forbidden, notFound } from '@/core/lib/errors'
 
 /**
  * Observer sits in on, or leaves, one interview
@@ -36,6 +36,12 @@ export const setObserving = async (
 
     return candidate.sessionId
   }
+
+  // The recruiter of a candidate never observes the same interview
+  const leads = await prisma.candidateRecruiter.findUnique({
+    where: { candidateId_accountId: { candidateId, accountId } },
+  })
+  if (leads) throw conflict()
 
   await prisma.recruitmentSeat.upsert({
     where: { candidateId_accountId: { candidateId, accountId } },

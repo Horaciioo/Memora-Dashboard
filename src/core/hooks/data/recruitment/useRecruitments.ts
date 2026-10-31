@@ -19,6 +19,7 @@ import type { RecruitmentSummary } from '@/types/recruitment'
  * @property {(values: FormValues) => Promise<boolean>} create - Open a session
  * @property {(id: string, values: FormValues) => Promise<boolean>} update - Edit a session
  * @property {(id: string) => Promise<void>} remove - Drop a session
+ * @property {(summary: RecruitmentSummary) => void} replace - Swap in a session
  */
 
 export interface RecruitmentCollection {
@@ -29,6 +30,7 @@ export interface RecruitmentCollection {
   create: (values: FormValues) => Promise<boolean>
   update: (id: string, values: FormValues) => Promise<boolean>
   remove: (id: string) => Promise<void>
+  replace: (summary: RecruitmentSummary) => void
 }
 
 /**
@@ -87,5 +89,11 @@ export const useRecruitments = (initialSessions: RecruitmentSummary[]): Recruitm
     [run]
   )
 
-  return { sessions, isSaving, issues, clearIssues, create, update, remove }
+  const replace = useCallback(
+    (summary: RecruitmentSummary) =>
+      setSessions((current) => current.map((entry) => (entry.id === summary.id ? summary : entry))),
+    []
+  )
+
+  return { sessions, isSaving, issues, clearIssues, create, update, remove, replace }
 }
