@@ -6,7 +6,7 @@ import {
   removeSession,
   sessionFields,
   updateSession,
-} from '@/core/services/recruitment/RecruitmentService'
+} from '@/core/services/recruitment'
 import { afterRecruitmentClosed } from '@/core/services/academy/parkour/ParkourService'
 import { summariseChange } from '@/core/services/system/changes'
 import { recordEvent } from '@/core/services/system/ActivityService'

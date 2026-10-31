@@ -1,7 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { proseFields, saveReview } from '@/core/services/recruitment/RecruitmentService'
+import { proseFields, saveReview } from '@/core/services/recruitment'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PUT = createProtectedRoute({

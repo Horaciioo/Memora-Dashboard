@@ -1,7 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { createStep, stepFields } from '@/core/services/recruitment/RecruitmentService'
+import { createStep, stepFields } from '@/core/services/recruitment'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { Permissions } from '@/utils/constants/permissions'
 

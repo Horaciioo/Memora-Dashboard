@@ -10,7 +10,7 @@ import {
   readSession,
   sessionFields,
   stepFields,
-} from '@/core/services/recruitment/RecruitmentService'
+} from '@/core/services/recruitment'
 import { readRecordActivity } from '@/core/services/system/ActivityService'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import { JOURNAL_FILES } from '@/core/services/system/FileJournal'

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { PageHeader } from '@/components/structures/page/PageHeader'
 import { RecruitmentsPanel } from '@/composites/recruitment/RecruitmentsPanel'
-import { listSessions, sessionFields } from '@/core/services/recruitment/RecruitmentService'
+import { listSessions, sessionFields } from '@/core/services/recruitment'
 import { OBSERVER_SCOPE } from '@/core/wrappers/requireRecruitment'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'

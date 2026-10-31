@@ -2,7 +2,7 @@ import 'server-only'
 
 import { readRequiredText, readText } from '@/core/lib/forms/values'
 import { createIdentifier } from '@/core/services/discord/DiscordIdentifierService'
-import { reachableSession } from '@/core/services/recruitment/RecruitmentService'
+import { reachableSession } from '@/core/services/recruitment'
 import { DISCORD_ID_COPY } from '@/declarations/discord/copy'
 import { DISCORD_ID_KIND_REGISTRY } from '@/declarations/discord/registries'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'

@@ -1,7 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { commentFields, parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { addComment, candidateSession } from '@/core/services/recruitment/RecruitmentService'
+import { addComment, candidateSession } from '@/core/services/recruitment'
 import { notifyMentions } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
 

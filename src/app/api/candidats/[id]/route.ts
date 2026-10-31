@@ -6,7 +6,7 @@ import {
   candidateSession,
   removeCandidate,
   updateCandidate,
-} from '@/core/services/recruitment/RecruitmentService'
+} from '@/core/services/recruitment'
 import { assertInterviewOpen } from '@/core/services/recruitment/InterviewService'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { notify } from '@/core/services/system/NotificationService'

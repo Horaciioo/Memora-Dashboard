@@ -6,7 +6,7 @@ import {
   stepFields,
   stepSession,
   updateStep,
-} from '@/core/services/recruitment/RecruitmentService'
+} from '@/core/services/recruitment'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { Permissions } from '@/utils/constants/permissions'

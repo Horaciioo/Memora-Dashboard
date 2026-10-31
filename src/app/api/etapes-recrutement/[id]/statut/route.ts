@@ -1,5 +1,5 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { setStepDone, stepSession } from '@/core/services/recruitment/RecruitmentService'
+import { setStepDone, stepSession } from '@/core/services/recruitment'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { Permissions } from '@/utils/constants/permissions'
 

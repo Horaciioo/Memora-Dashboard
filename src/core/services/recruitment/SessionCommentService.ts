@@ -6,7 +6,7 @@ import { notFound } from '@/core/lib/errors'
 import { readText } from '@/core/lib/forms/values'
 import { COMMENT_SHAPE, toComment } from '@/core/services/academy/juniors/CommentService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { reachableSession } from '@/core/services/recruitment/RecruitmentService'
+import { reachableSession } from '@/core/services/recruitment'
 import type { CommentView } from '@/types/comments'
 import type { FormValues } from '@/types/forms'
 

@@ -1,5 +1,5 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { removeComment } from '@/core/services/recruitment/RecruitmentService'
+import { removeComment } from '@/core/services/recruitment'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const DELETE = createProtectedRoute({

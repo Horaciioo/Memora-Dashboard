@@ -5,7 +5,7 @@ import {
   createSession,
   listSessions,
   sessionFields,
-} from '@/core/services/recruitment/RecruitmentService'
+} from '@/core/services/recruitment'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { notify } from '@/core/services/system/NotificationService'
 import { Permissions } from '@/utils/constants/permissions'
