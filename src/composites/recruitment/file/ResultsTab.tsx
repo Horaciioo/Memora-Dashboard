@@ -8,10 +8,9 @@ import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFi
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { CANDIDATE_CARD } from '@/declarations/ui/variants'
 import type { CandidateView } from '@/types/recruitment'
-import { formatDayTime } from '@/utils/format/dates'
 
 /**
- * One candidate in the results board: a name, when they meet
+ * One candidate in the results board: a name, a hint while unscheduled
  * @param {CandidateView} candidate - Applicant rendered
  * @return {JSX.Element}
  */
@@ -19,9 +18,9 @@ import { formatDayTime } from '@/utils/format/dates'
 const candidateCard = (candidate: CandidateView) => (
   <span className={CANDIDATE_CARD.body}>
     <span className={CANDIDATE_CARD.name}>{candidate.name}</span>
-    <span className={candidate.interviewAt ? CANDIDATE_CARD.meta : CANDIDATE_CARD.metaEmpty}>
-      {candidate.interviewAt ? formatDayTime(candidate.interviewAt) : RECRUITMENT_COPY.toSchedule}
-    </span>
+    {!candidate.interviewAt && (
+      <span className={CANDIDATE_CARD.metaEmpty}>{RECRUITMENT_COPY.toSchedule}</span>
+    )}
   </span>
 )
 

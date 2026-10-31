@@ -12,6 +12,7 @@ import { Section } from '@/components/structures/page/Section'
 import { AnnouncementDrawer } from '@/composites/recruitment/file/AnnouncementDrawer'
 import { LIVE_PALETTE } from '@/composites/recruitment/file/planningImage'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
+import { UpcomingInterviews } from '@/composites/recruitment/file/UpcomingInterviews'
 import { RangePlanning } from '@/composites/recruitment/file/RangePlanning'
 import { useRecruitmentAnnouncement } from '@/core/hooks/data/recruitment/useRecruitmentAnnouncement'
 import { useDiscordIdentifiers } from '@/core/hooks/data/recruitment/useDiscordIdentifiers'
@@ -20,16 +21,21 @@ import { genericAnnouncement } from '@/core/lib/recruitment/announcement'
 import { openingRange, planRange, rangeEnd, shiftRange } from '@/core/lib/recruitment/rangePlanning'
 import { PLANNING_COPY, RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { ROUTES } from '@/declarations/navigation'
-import { INTERVIEW_AGENDA, PROPERTY_LABEL } from '@/declarations/ui/variants'
+import { INTERVIEW_AGENDA, SECTION_STYLES } from '@/declarations/ui/variants'
 import type { FormValues } from '@/types/forms'
 import { toDisplay } from '@/utils/format/discord'
 
+export interface CalendarTabProps {
+  serverTime: string
+}
+
 /**
- * Calendar of the session: the period asked, ready to post on Discord
+ * Calendar of the session: next interviews, the period asked, ready to post on Discord
+ * @param {CalendarTabProps} props - Server time at load
  * @return {JSX.Element}
  */
 
-export const CalendarTab = () => {
+export const CalendarTab = ({ serverTime }: CalendarTabProps) => {
   const { detail, file, can } = useRecruitmentState()
   const { identifiers, isSaving, store } = useDiscordIdentifiers(
     detail.summary.id,
@@ -68,7 +74,7 @@ export const CalendarTab = () => {
   const hasInterviews = file.candidates.some((candidate) => candidate.interviewAt !== null)
 
   return (
-    <Section title={RECRUITMENT_COPY.tabCalendar} bare>
+    <Section bare>
       {!hasInterviews ? (
         <EmptyState
           figure="meetings"
@@ -78,9 +84,10 @@ export const CalendarTab = () => {
         />
       ) : (
         <div className={INTERVIEW_AGENDA.root}>
+          <UpcomingInterviews serverTime={serverTime} />
           <div className={INTERVIEW_AGENDA.bar}>
             <div className={INTERVIEW_AGENDA.periodField}>
-              <span className={PROPERTY_LABEL}>{PLANNING_COPY.period}</span>
+              <h2 className={SECTION_STYLES.title}>{PLANNING_COPY.period}</h2>
               <div className={INTERVIEW_AGENDA.periodNav}>
                 <Button
                   icon="previous"

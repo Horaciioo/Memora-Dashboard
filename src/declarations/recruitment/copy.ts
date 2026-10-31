@@ -93,7 +93,6 @@ export const RECRUITMENT_COPY = {
   attachedAcademy: 'Academy rattachée',
   instructionsPlaceholder: 'Écris ce que les recruteurs doivent savoir avant les entretiens.',
   timelineTitle: 'Timeline de la session',
-  timelineStage: (stage: string) => `Timeline : ${stage}`,
   timelineLead: 'Posée depuis la trame déclarée en configuration, puis tenue à la main.',
   stepAdd: 'Ajouter une étape',
   stepEdit: 'Modifier l’étape',
@@ -145,6 +144,7 @@ export const RECRUITMENT_FIELD_COPY = {
   period: 'Période',
   instructions: 'Consignes',
 
+  // Candidate fields
   discordId: 'Identifiant Discord',
   displayName: 'Pseudonyme',
   displayNameInfo:
@@ -157,9 +157,11 @@ export const RECRUITMENT_FIELD_COPY = {
   outcome: 'Statut',
   review: 'Bilan',
 
+  // Step fields
   prompt: 'Question',
   hint: 'Précision',
 
+  // Timeline step fields
   title: 'Titre',
   description: 'Description',
   offset: 'Jour',

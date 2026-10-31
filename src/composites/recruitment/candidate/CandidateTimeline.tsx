@@ -22,7 +22,6 @@ export interface CandidateTimelineProps {
 
 // Button each moment offers, only while it is the current one
 const STAGE_BUTTONS: Partial<Record<CandidateStage, string>> = {
-  waiting: CANDIDATE_COPY.pass,
   interviewing: CANDIDATE_COPY.resume,
   results: CANDIDATE_COPY.review,
 }

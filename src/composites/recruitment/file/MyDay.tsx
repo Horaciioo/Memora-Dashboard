@@ -3,9 +3,11 @@
 import { Avatar, AvatarStack } from '@/components/elements/display/Avatar'
 import { Section } from '@/components/structures/page/Section'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
+import { PAST_INTERVIEW_OUTCOMES } from '@/declarations/reference/fixed'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { MY_DAY } from '@/declarations/ui/variants'
 import type { CandidateView } from '@/types/recruitment'
+import { cn } from '@/utils/classnames'
 import { formatClock } from '@/utils/format/dates'
 import { formatDayKey } from '@/utils/format/days'
 
@@ -21,13 +23,19 @@ export interface MyDayProps {
  */
 
 export const MyDay = ({ candidates, now }: MyDayProps) => {
-  const { openCandidate } = useRecruitmentState()
+  const { detail, openCandidate } = useRecruitmentState()
   const today = formatDayKey(new Date(now))
 
   // Planned today only
   const slots = candidates
     .filter((candidate) => candidate.interviewAt && formatDayKey(candidate.interviewAt) === today)
     .sort((first, second) => first.interviewAt!.localeCompare(second.interviewAt!))
+
+  // Interview already over
+  const isDone = (candidate: CandidateView) =>
+    PAST_INTERVIEW_OUTCOMES.includes(
+      detail.outcomes.find((outcome) => outcome.id === candidate.outcomeId)?.name ?? ''
+    )
 
   return (
     <Section title={RECRUITMENT_COPY.dayToday} padded>
@@ -39,7 +47,7 @@ export const MyDay = ({ candidates, now }: MyDayProps) => {
             <li key={candidate.id}>
               <button
                 type="button"
-                className={MY_DAY.slot}
+                className={cn(MY_DAY.slot, isDone(candidate) && MY_DAY.done)}
                 onClick={() => openCandidate(candidate.id)}
               >
                 <span className={MY_DAY.clock}>{formatClock(candidate.interviewAt!)}</span>

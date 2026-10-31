@@ -11,7 +11,6 @@ import { Status } from '@/components/elements/display/Status'
 import type { EditableEntry } from '@/components/structures/inline/EditableDetailGrid'
 import { FileOverview, type FileOverviewGroup } from '@/components/structures/page/FileOverview'
 import { CloseRecruitmentDialog } from '@/composites/recruitment/CloseRecruitmentDialog'
-import { UpcomingInterviews } from '@/composites/recruitment/file/UpcomingInterviews'
 import { SessionTimelineCard } from '@/composites/recruitment/file/SessionTimelineCard'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { useRecordFile } from '@/core/hooks/data/work/useRecordFile'
@@ -25,21 +24,16 @@ import { ICONS, isIconName } from '@/declarations/ui/icons'
 import { RecruitmentStatuses } from '@/utils/constants/recruitment'
 import { formatDayTime } from '@/utils/format/dates'
 
-export interface OverviewTabProps {
-  serverTime: string
-}
-
 // Portraits drawn side by side
 const portraits = (list: { id: string; name: string; src?: string | null }[]) =>
-  list.length > 0 ? <AvatarStack size="sm" people={list} max={list.length} /> : null
+  list.length > 0 ? <AvatarStack wrap size="sm" people={list} max={list.length} /> : null
 
 /**
  * Overview of a recruitment session: boxes of what it is, who carries it
- * @param {OverviewTabProps} props - Server time at load
  * @return {JSX.Element}
  */
 
-export const OverviewTab = ({ serverTime }: OverviewTabProps) => {
+export const OverviewTab = () => {
   const router = useRouter()
   const [isClosing, setClosing] = useState(false)
   const { detail, file, fields, can } = useRecruitmentState()
@@ -145,7 +139,6 @@ export const OverviewTab = ({ serverTime }: OverviewTabProps) => {
       }}
     >
       <div className={FILE_BOX.stack}>
-        <UpcomingInterviews serverTime={serverTime} />
         <CommentThread
           comments={file.comments}
           fields={fields.comment}
