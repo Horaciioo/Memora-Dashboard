@@ -4,7 +4,8 @@ import { Status } from '@/components/elements/display/Status'
 import { PageHeader } from '@/components/structures/page/PageHeader'
 import { CreatorFile } from '@/composites/reference/CreatorFile'
 import { prisma } from '@/core/lib/db'
-import { readAnchors } from '@/core/services/auth/LeadService'
+import { readAdministration } from '@/core/services/auth/LeadService'
+import { readDesign } from '@/core/services/reference/CreatorDesignService'
 import { readChannels } from '@/core/services/platforms/ChannelService'
 import { readCreatorTeams } from '@/core/services/teams/CreatorTeamService'
 import { requirePermission } from '@/core/wrappers/requireUser'
@@ -56,10 +57,11 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
   const youtuber = await readYoutuber(id)
   if (!youtuber) notFound()
 
-  const [teams, anchors, channels] = await Promise.all([
+  const [teams, anchors, channels, design] = await Promise.all([
     readCreatorTeams(id, await scope()),
-    readAnchors(id),
+    readAdministration(id),
     readChannels(id),
+    readDesign(id),
   ])
 
   return (
@@ -81,6 +83,7 @@ export default async function YoutuberPage({ params }: { params: Promise<{ id: s
         channels={channels}
         anchors={anchors}
         teams={teams}
+        design={design}
         canManageTeams={session.isRoot && access.can(Permissions.TeamManage)}
         canManageCreator={access.isAdmin}
       />

@@ -27,12 +27,20 @@ export const MEDIA_HEADERS = {
 }
 
 /**
+ * WebP quality of a compressed picture
+ * @type {number}
+ */
+
+export const IMAGE_QUALITY = 82
+
+/**
  * Storage bucket metadata
  * @typedef {Object} StorageBucketOption
  * @property {string} label - Display name
  * @property {boolean} unique - One object per key
  * @property {MediaVisibility} visibility - Reachable without a session
  * @property {number} maxBytes - Upload ceiling
+ * @property {number} [maxEdge] - Longest side kept when a picture is compressed
  * @property {PermissionName} [readPermission] - Permission needed when private
  * @property {PermissionName} [writePermission] - Permission needed to upload
  */
@@ -42,6 +50,7 @@ interface StorageBucketOption {
   unique: boolean
   visibility: MediaVisibility
   maxBytes: number
+  maxEdge?: number
   readPermission?: PermissionName
   writePermission?: PermissionName
 }
@@ -65,12 +74,21 @@ const STORAGE_BUCKET_MAP = {
     unique: false,
     visibility: MEDIA_VISIBILITIES.Public,
     maxBytes: FILE_SETTINGS.maxBytes,
+    maxEdge: 640,
   },
   banners: {
     label: 'Banners',
     unique: false,
     visibility: MEDIA_VISIBILITIES.Public,
     maxBytes: FILE_SETTINGS.maxBytes,
+    maxEdge: 1920,
+  },
+  logos: {
+    label: 'Logos',
+    unique: false,
+    visibility: MEDIA_VISIBILITIES.Public,
+    maxBytes: FILE_SETTINGS.maxBytes,
+    maxEdge: 320,
   },
 } satisfies Record<string, StorageBucketOption>
 

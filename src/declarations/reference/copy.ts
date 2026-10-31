@@ -16,6 +16,8 @@ export const REFERENCE_FIELD_COPY = {
   handle: 'Chaîne',
   accent: 'Couleur',
   avatarUrl: 'Image',
+  youtuberAvatar: 'Avatar',
+  logoUrl: 'Logo',
   bannerUrl: 'Bannière',
   bannerUrlHint: 'Format horizontal, affichée sur le formulaire d’intégration.',
   archived: 'Archivé',

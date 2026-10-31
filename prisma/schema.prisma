@@ -399,7 +399,9 @@ model Account {
   notificationsReceived Notification[]           @relation("NotificationRecipient")
   notificationsCaused   Notification[]           @relation("NotificationActor")
   recruitmentInterviews RecruitmentCandidate[]   @relation("RecruitmentRecruiter")
+  candidateRecruiters   CandidateRecruiter[]     @relation("CandidateRecruiter")
   recruitmentSeats      RecruitmentSeat[]        @relation("RecruitmentSeat")
+  recruitmentBans       RecruitmentBan[]         @relation("RecruitmentBanAuthor")
   recruitmentLeads      RecruitmentResponsable[] @relation("RecruitmentResponsable")
   recruitmentLed        RecruitmentRecruiter[]   @relation("RecruitmentRecruiter")
   recruitmentWatches    RecruitmentObserver[]    @relation("RecruitmentObserver")
@@ -599,18 +601,24 @@ model FunctionPermission {
 
 // Creator whose community the work is done for
 model Youtuber {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  handle    String?
-  accent    String?
-  avatarUrl String?
-  bannerUrl String?
-  position  Int      @default(0)
-  archived  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String   @unique
+  handle        String?
+  accent        String?
+  avatarUrl     String?
+  // Small mark, apart from the portrait
+  logoUrl       String?
+  // First banner of the bank, kept for the readers of a single banner
+  bannerUrl     String?
+  // Faded banner of the moderators and live views
+  fadeBannerUrl String?
+  position      Int      @default(0)
+  archived      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   accounts            Account[]
+  banners             YoutuberBanner[]
   leads               YoutuberLead[]
   functions           YoutuberFunction[]
   rolePermissions     RolePermission[]
@@ -635,6 +643,23 @@ model Youtuber {
 
   @@index([archived])
   @@map("youtubers")
+}
+
+// Banner collected in the bank of one creator
+model YoutuberBanner {
+  id         String   @id @default(cuid())
+  youtuberId String
+  url        String
+  // Place using it, one banner per place
+  slot       String?
+  position   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  youtuber Youtuber @relation(fields: [youtuberId], references: [id], onDelete: Cascade)
+
+  @@unique([youtuberId, slot])
+  @@index([youtuberId, position])
+  @@map("youtuber_banners")
 }
 
 // Function one creator opens, the catalogue itself staying global
@@ -2264,6 +2289,7 @@ model RecruitmentSession {
   jobFunction    JobFunction              @relation(fields: [functionId], references: [id], onDelete: Restrict)
   academySession AcademySession?          @relation(fields: [academySessionId], references: [id], onDelete: SetNull)
   candidates     RecruitmentCandidate[]
+  bans           RecruitmentBan[]
   comments       RecruitmentComment[]
   steps          RecruitmentStep[]
   responsables   RecruitmentResponsable[]
@@ -2313,8 +2339,6 @@ model RecruitmentObserver {
   id        String   @id @default(cuid())
   sessionId String
   accountId String
-  // Interviews this observer may sit in on
-  quota     Int      @default(1)
   createdAt DateTime @default(now())
 
   session RecruitmentSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
@@ -2327,36 +2351,78 @@ model RecruitmentObserver {
 
 // Applicant of one campaign, held by their Discord identifier and never given an account
 model RecruitmentCandidate {
-  id          String    @id @default(cuid())
-  sessionId   String
-  discordId   String
+  id                 String    @id @default(cuid())
+  sessionId          String
+  discordId          String
   // Pseudonym known at application time, seeds the pre-generated file
-  displayName String?
-  formId      String?
-  recruiterId String?
-  outcomeId   String?
-  interviewAt DateTime?
-  attended    Boolean   @default(false)
-  review      String    @default("")
+  displayName        String?
+  formId             String?
+  recruiterId        String?
+  outcomeId          String?
+  interviewAt        DateTime?
+  attended           Boolean   @default(false)
+  // Questions read with « vous », switched by the recruiter during the interview
+  formal             Boolean   @default(true)
+  // Interview opened by a recruiter
+  interviewStartedAt DateTime?
+  // Interview closed by its recruiter
+  interviewEndedAt   DateTime?
+  // Verdict given, the interview is over
+  verdictAt          DateTime?
+  review             String    @default("")
   // Timeline moments ticked or unticked by hand, by moment key
-  stageMarks  Json      @default("{}")
-  position    Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  stageMarks         Json      @default("{}")
+  position           Int       @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
-  session   RecruitmentSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  recruiter Account?             @relation("RecruitmentRecruiter", fields: [recruiterId], references: [id], onDelete: SetNull)
-  outcome   RecruitmentOutcome?  @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
-  observers RecruitmentSeat[]
-  comments  RecruitmentComment[]
-  exercises ExerciseLink[]
-  answers   RecruitmentAnswer[]
-  admission AcademyJunior?
+  session    RecruitmentSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  recruiter  Account?             @relation("RecruitmentRecruiter", fields: [recruiterId], references: [id], onDelete: SetNull)
+  outcome    RecruitmentOutcome?  @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
+  recruiters CandidateRecruiter[]
+  observers  RecruitmentSeat[]
+  comments   RecruitmentComment[]
+  exercises  ExerciseLink[]
+  answers    RecruitmentAnswer[]
+  admission  AcademyJunior?
 
   @@unique([sessionId, discordId])
   @@index([discordId])
   @@index([outcomeId, position])
   @@map("recruitment_candidates")
+}
+
+// Discord identity barred from every future recruitment session
+model RecruitmentBan {
+  id          String   @id @default(cuid())
+  discordId   String   @unique
+  // Session the ban was decided on, kept when the session goes
+  sessionId   String?
+  // Name known when banned, the candidacy itself may be purged
+  displayName String?
+  reason      String?
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  session   RecruitmentSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  createdBy Account?            @relation("RecruitmentBanAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([sessionId])
+  @@map("recruitment_bans")
+}
+
+// Moderator leading the interview of one candidate, several may share it
+model CandidateRecruiter {
+  candidateId String
+  accountId   String
+  createdAt   DateTime @default(now())
+
+  candidate RecruitmentCandidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  account   Account              @relation("CandidateRecruiter", fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@id([candidateId, accountId])
+  @@index([accountId])
+  @@map("candidate_recruiters")
 }
 
 // Moderator sitting in on one interview without leading it
@@ -2402,7 +2468,8 @@ model RecruitmentAnswer {
   candidateId  String
   // Key of the question in the code-declared bank
   questionKey  String
-  notes        String              @default("")
+  // Branch the recruiter unfolded, the others read as skipped
+  branch       String?
   appreciation AnswerAppreciation?
   skipped      Boolean             @default(false)
   createdAt    DateTime            @default(now())
@@ -2440,19 +2507,24 @@ model WorkComment {
 
 // Remark left on a candidate while their application is being weighed
 model RecruitmentComment {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   // Either an application, or a whole session when none
   candidateId String?
   sessionId   String?
   authorId    String?
   body        String
-  createdAt   DateTime @default(now())
+  // Question of the bank the remark was left under, none for a free remark
+  questionKey String?
+  // Pinned on the candidate rail
+  pinnedAt    DateTime?
+  createdAt   DateTime  @default(now())
 
   candidate RecruitmentCandidate? @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   session   RecruitmentSession?   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   author    Account?              @relation("RecruitmentCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
 
   @@index([candidateId, createdAt])
+  @@index([candidateId, questionKey])
   @@index([sessionId, createdAt])
   @@map("recruitment_comments")
 }
