@@ -57,3 +57,13 @@ export const DELIBERATION_VERDICTS: readonly { label: string; tone: AnswerApprec
   { label: 'Mitigé', tone: AnswerAppreciations.Neutral },
   { label: 'Défavorable', tone: AnswerAppreciations.Dislike },
 ]
+
+/**
+ * Headings the issues are sorted under
+ * @type {Record<string, string>}
+ */
+
+export const OUTCOME_GROUPS = {
+  ongoing: 'En cours',
+  final: 'Décision finale',
+} as const

@@ -1,9 +1,6 @@
 'use client'
 
 import { CommentThread } from '@/components/structures/data/CommentThread'
-import { Section } from '@/components/structures/page/Section'
-import { ObserversBox } from '@/composites/recruitment/file/ObserversBox'
-import { OBSERVER_COPY } from '@/declarations/recruitment/candidateCopy'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
 import { RecordId } from '@/components/elements/display/RecordId'
@@ -124,12 +121,6 @@ export const OverviewTab = () => {
       }}
     >
       <div className={FILE_BOX.stack}>
-        {/* Seats and quotas, an observer never reads who else sits in */}
-        {!can.observing && (
-          <Section title={OBSERVER_COPY.title} padded>
-            <ObserversBox />
-          </Section>
-        )}
         <CommentThread
           comments={file.comments}
           fields={fields.comment}

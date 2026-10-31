@@ -17,7 +17,7 @@ import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { BoardColumn } from '@/components/structures/data/KanbanBoard'
 import type { FieldOption, FormValues } from '@/types/forms'
 import type { WorkAuthorship, WorkPerson, WorkTag } from '@/types/work'
-import { GONE_MEMBER_STATUSES, LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
+import { GLOBAL_ROLES, GONE_MEMBER_STATUSES, LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { WorkflowPhases } from '@/utils/constants/workflow'
 import type { WorkflowPhaseName, WorkflowScopeName } from '@/utils/constants/workflow'
@@ -278,6 +278,7 @@ export const memberOptions = async (scope?: AccessScope): Promise<FieldOption[]>
  * @param {MemberRoleName} [filter.role] - Role held
  * @param {string} [filter.functionName] - Function held
  * @param {string} [filter.youtuberId] - Creator whose team narrows the list, else each option names its creators
+ * @param {boolean} [filter.withGlobal] - Employees and administrators qualify too, whatever their creators
  * @return {Promise<FieldOption[]>} - Select options
  */
 
@@ -285,17 +286,23 @@ export const teamOptions = async ({
   role,
   functionName,
   youtuberId,
+  withGlobal,
 }: {
   role?: MemberRoleName
   functionName?: string
   youtuberId?: string
+  withGlobal?: boolean
 }): Promise<FieldOption[]> => {
+  const team: Prisma.AccountWhereInput = {
+    ...(role && { role }),
+    ...(functionName && { functions: { some: { jobFunction: { name: functionName } } } }),
+    ...(youtuberId && { youtubers: { some: { id: youtuberId } } }),
+  }
+
   const rows = await prisma.account.findMany({
     where: {
       status: { notIn: GONE_MEMBER_STATUSES },
-      ...(role && { role }),
-      ...(functionName && { functions: { some: { jobFunction: { name: functionName } } } }),
-      ...(youtuberId && { youtubers: { some: { id: youtuberId } } }),
+      ...(withGlobal ? { OR: [team, { role: { in: GLOBAL_ROLES } }] } : team),
     },
     orderBy: { displayName: 'asc' },
     include: {
@@ -307,7 +314,10 @@ export const teamOptions = async ({
 
   return roleGroupedOptions(rows, (row) => ({
     disabled: row._count.absences > 0,
-    owners: row.youtubers.map((youtuber) => youtuber.id),
+    // Global roles reach every creator
+    owners: GLOBAL_ROLES.includes(row.role)
+      ? undefined
+      : row.youtubers.map((youtuber) => youtuber.id),
     hint:
       row._count.absences > 0
         ? MEMBER_COPY.absentHint.replace('{name}', row.displayName)

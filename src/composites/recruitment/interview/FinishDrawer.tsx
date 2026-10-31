@@ -23,6 +23,9 @@ export interface FinishDrawerProps {
   outcomeId: string | null
   isSaving: boolean
   isReadOnly: boolean
+  // Verdict stays open to whoever writes candidates
+  canVerdict: boolean
+  onVerdict: (outcomeId: string | null) => void
   onClose: () => void
   onConfirm: (outcomeId: string | null, review: string) => void
 }
@@ -37,6 +40,8 @@ export interface FinishDrawerProps {
  * @param {string | null} outcomeId - Issue already reached
  * @param {boolean} isSaving - Locks the confirmation
  * @param {boolean} isReadOnly - Shows without letting anything change
+ * @param {boolean} canVerdict - Verdict may be given
+ * @param {(outcomeId: string | null) => void} onVerdict - Records the issue
  * @param {() => void} onClose - Dismiss handler
  * @param {(outcomeId: string | null, review: string) => void} onConfirm - Ends the interview
  * @return {JSX.Element}
@@ -51,6 +56,8 @@ export const FinishDrawer = ({
   outcomeId,
   isSaving,
   isReadOnly,
+  canVerdict,
+  onVerdict,
   onClose,
   onConfirm,
 }: FinishDrawerProps) => {
@@ -97,8 +104,13 @@ export const FinishDrawer = ({
                   key={verdict.label}
                   type="button"
                   aria-pressed={isOn}
-                  disabled={isReadOnly || !outcome}
-                  onClick={() => outcome && setPicked(isOn ? null : outcome.id)}
+                  disabled={!canVerdict || !outcome}
+                  onClick={() => {
+                    if (!outcome) return
+                    const next = isOn ? null : outcome.id
+                    setPicked(next)
+                    onVerdict(next)
+                  }}
                   className={cn(INTERVIEW.verdict, isOn && INTERVIEW.verdictOn[verdict.tone])}
                 >
                   {verdict.label}

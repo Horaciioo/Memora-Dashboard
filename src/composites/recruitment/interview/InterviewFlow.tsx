@@ -214,6 +214,8 @@ const InterviewBody = ({
         outcomeId={candidate.outcomeId}
         isSaving={record.isSaving}
         isReadOnly={isReadOnly}
+        canVerdict={can.writeCandidates}
+        onVerdict={(outcomeId) => void record.saveFields({ outcomeId })}
         onClose={() => setFinishing(false)}
         onConfirm={(outcomeId, review) => void finish(outcomeId, review)}
       />

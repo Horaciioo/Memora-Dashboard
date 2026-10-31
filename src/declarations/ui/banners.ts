@@ -80,7 +80,7 @@ export const BANNER_SCENES: Record<string, BannerScene> = {
     image: '/banners/people.jpg',
     author: 'Tim Marshall',
     photo: 'Wa-gS5R58gA',
-    hero: 'La liste de toute ton équipe',
+    hero: 'La liste de tous les candidats',
   },
   comfort: {
     image: '/banners/comfort.jpg',

@@ -44,7 +44,7 @@ const CandidateBody = ({ candidateId }: { candidateId: string }) => {
   return (
     <div className="flex flex-col gap-8">
       <FileHead
-        lead={<Avatar name={candidate.name} size="xl" />}
+        lead={<Avatar name={candidate.name} src={candidate.avatarUrl} size="xl" />}
         title={candidate.name}
         meta={
           <Link href={ROUTES.recruitment(detail.summary.id)} className="underline">

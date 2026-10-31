@@ -125,7 +125,6 @@ export const FEEDBACK_ENTITIES = {
   member: { label: 'Modérateur', gender: 'masculine' },
   network: { label: 'Réseau', gender: 'masculine' },
   note: { label: 'Note', gender: 'feminine' },
-  observer: { label: 'Observateur', gender: 'masculine' },
   permissions: { label: 'Permissions', gender: 'feminine' },
   profile: { label: 'Profil', gender: 'masculine' },
   recruitment: { label: 'Session de recrutement', gender: 'feminine' },

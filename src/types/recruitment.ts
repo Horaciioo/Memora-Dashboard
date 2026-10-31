@@ -100,6 +100,7 @@ export interface AnswerState {
  * @property {number} position - Order inside its column
  * @property {string | null} memberId - Existing moderator holding that Discord identifier
  * @property {string | null} memberName - Display name of that moderator
+ * @property {string | null} avatarUrl - Discord portrait once known
  * @property {Record<string, boolean>} stageMarks - Timeline moments ticked by hand
  * @property {CommentView[]} comments - Remarks left on the application
  * @property {Record<string, AnswerState>} answers - Interview notes by question key
@@ -120,6 +121,7 @@ export interface CandidateView {
   position: number
   memberId: string | null
   memberName: string | null
+  avatarUrl: string | null
   stageMarks: Record<string, boolean>
   comments: CommentView[]
   answers: Record<string, AnswerState>
@@ -170,22 +172,6 @@ export interface RecruitmentOutcomeView {
 }
 
 /**
- * Temporary member sitting in on interviews
- * @typedef {Object} ObserverView
- * @property {string} id - Observer row identifier
- * @property {RecruitmentRef} person - Member observing
- * @property {number} quota - Interviews they may sit in on
- * @property {number} used - Interviews they already joined
- */
-
-export interface ObserverView {
-  id: string
-  person: RecruitmentRef
-  quota: number
-  used: number
-}
-
-/**
  * Everything one session page renders
  * @typedef {Object} RecruitmentDetail
  * @property {RecruitmentSummary} summary - Session header
@@ -195,7 +181,6 @@ export interface ObserverView {
  * @property {RecruitmentStepView[]} steps - Timeline moments
  * @property {string[]} questionKeys - Questions picked for the interviews
  * @property {RecruitmentOutcomeView[]} outcomes - Columns of the results board
- * @property {ObserverView[]} observers - Members sitting in on interviews
  * @property {IntegrationLinkView | null} link - Integration form handed out
  */
 
@@ -207,7 +192,6 @@ export interface RecruitmentDetail {
   steps: RecruitmentStepView[]
   questionKeys: string[]
   outcomes: RecruitmentOutcomeView[]
-  observers: ObserverView[]
   link: IntegrationLinkView | null
   identifiers: DiscordIdentifierView[]
 }
@@ -225,7 +209,6 @@ export interface RecruitmentFields {
   review: FieldDefinition[]
   instruction: FieldDefinition[]
   link: FieldDefinition[]
-  observer: FieldDefinition[]
 }
 
 /**

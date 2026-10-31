@@ -4,7 +4,6 @@ import { syncProgramProject } from '@/core/services/work/ProgramProjectService'
 import { decryptField, encryptField } from '@/core/lib/crypto'
 import { identifiersForCreator } from '@/core/services/discord/DiscordIdentifierService'
 import { prisma } from '@/core/lib/db'
-import { readObservers } from '@/core/services/recruitment/ObserverReader'
 import { activeFunctions } from '@/core/services/reference/lookups'
 import { sessionNumbers } from '@/core/services/academy/AcademyService'
 import { syncAdmission } from '@/core/services/academy/AdmissionService'
@@ -29,15 +28,12 @@ import {
   toPerson,
   youtuberOptions,
 } from '@/core/services/work/shared'
-import {
-  JUNIOR_FUNCTION_OF,
-  OBSERVER_FUNCTION,
-  RECRUITER_FUNCTION,
-} from '@/declarations/reference/fixed'
+import { JUNIOR_FUNCTION_OF, RECRUITER_FUNCTION } from '@/declarations/reference/fixed'
 import { ACADEMY_SETTINGS, FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
+import { readPortraits } from '@/core/services/recruitment/CandidatePortraits'
 import { toLinkView } from '@/core/services/onboarding/IntegrationLinkService'
-import { INTEGRATION_STEP } from '@/declarations/recruitment/outcomes'
+import { INTEGRATION_STEP, OUTCOME_GROUPS } from '@/declarations/recruitment/outcomes'
 import {
   PLATFORM_OF_TRADE,
   RECRUITMENT_PERIOD_TIMES,
@@ -277,9 +273,9 @@ export const sessionFields = async (
   const [creators, functions, responsables, recruiters, observers, links] = await Promise.all([
     youtuberOptions(scope),
     activeFunctions(),
-    teamOptions({ role: MemberRoles.Responsable, youtuberId }),
-    teamOptions({ functionName: RECRUITER_FUNCTION, youtuberId }),
-    teamOptions({ functionName: OBSERVER_FUNCTION, youtuberId }),
+    teamOptions({ role: MemberRoles.Responsable, youtuberId, withGlobal: true }),
+    teamOptions({ functionName: RECRUITER_FUNCTION, youtuberId, withGlobal: true }),
+    memberOptions(),
     prisma.youtuberFunction.findMany({ select: { youtuberId: true, functionId: true } }),
   ])
 
@@ -362,7 +358,6 @@ export const sessionFields = async (
       kind: 'multiselect',
       label: RECRUITMENT_FIELD_COPY.observers,
       options: observers,
-      ownerField: 'youtuberId',
       mark: 'avatar',
     },
     {
@@ -447,6 +442,7 @@ export const candidateFields = async (): Promise<FieldDefinition[]> => {
         value: row.id,
         label: row.name,
         accent: row.accent ?? undefined,
+        group: row.isTerminal ? OUTCOME_GROUPS.final : OUTCOME_GROUPS.ongoing,
       })),
       mark: 'dot',
       span: 'half',
@@ -557,6 +553,7 @@ export const listSessions = async (scope: AccessScope): Promise<RecruitmentSumma
  * Map a candidate row to the shape the board renders
  * @param {object} row - Candidate row with its relations
  * @param {Map<string, { id: string, displayName: string }>} members - Moderators by Discord identifier
+ * @param {Map<string, string>} portraits - Discord portraits by identifier
  * @return {CandidateView} - Candidate card
  */
 
@@ -587,7 +584,8 @@ const toCandidate = (
       skipped: boolean
     }[]
   },
-  members: Map<string, { id: string; displayName: string }>
+  members: Map<string, { id: string; displayName: string }>,
+  portraits: Map<string, string>
 ): CandidateView => {
   const member = members.get(row.discordId) ?? null
   const recruiter = toPerson(row.recruiter)
@@ -622,6 +620,7 @@ const toCandidate = (
     position: row.position,
     memberId: member?.id ?? null,
     memberName: member?.displayName ?? null,
+    avatarUrl: portraits.get(row.discordId) ?? null,
     stageMarks: row.stageMarks as Record<string, boolean>,
     comments,
     answers: Object.fromEntries(
@@ -679,6 +678,7 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
   ])
 
   const byDiscordId = new Map(members.map((member) => [member.discordId, member]))
+  const portraits = await readPortraits(row.candidates.map((candidate) => candidate.discordId))
   const attendedCount = row.candidates.filter((candidate) => candidate.attended).length
 
   const steps: RecruitmentStepView[] = row.steps.map((step) => ({
@@ -705,12 +705,11 @@ export const readSession = async (id: string, scope: AccessScope): Promise<Recru
     summary: toSummary(row, await sessionNumbers(), attendedCount),
     instructions: row.instructions,
     comments: row.comments.map(toComment),
-    candidates: row.candidates.map((candidate) => toCandidate(candidate, byDiscordId)),
+    candidates: row.candidates.map((candidate) => toCandidate(candidate, byDiscordId, portraits)),
     steps,
     // A session nobody configured asks the suggested pick
     questionKeys: row.questionKeys.length > 0 ? row.questionKeys : recommendedKeys(row.platform),
     outcomes: outcomeViews,
-    observers: await readObservers(row.id),
     link: row.invite ? toLinkView(row.invite) : null,
     identifiers: await identifiersForCreator(row.youtuberId),
   }
@@ -975,7 +974,11 @@ const readCandidate = async (id: string): Promise<CandidateView> => {
     select: { id: true, discordId: true, displayName: true },
   })
 
-  return toCandidate(row, new Map(member ? [[member.discordId, member]] : []))
+  return toCandidate(
+    row,
+    new Map(member ? [[member.discordId, member]] : []),
+    await readPortraits([row.discordId])
+  )
 }
 
 /**

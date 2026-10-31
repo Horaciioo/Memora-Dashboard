@@ -112,18 +112,6 @@ export const INTERVIEW_AGENDA = {
 } as const
 
 /**
- * Observers box of a session
- * @type {Record<string, string>}
- */
-
-export const OBSERVER_BOX = {
-  row: 'flex items-center gap-3 border-b border-[var(--color-border)] py-2.5 last:border-b-0',
-  name: 'min-w-0 flex-1 truncate font-semibold',
-  usage: 'font-mono text-sm text-[var(--color-ink-subtle)]',
-  empty: 'py-2 text-sm text-[var(--color-ink-subtle)] italic',
-} as const
-
-/**
  * Card scrolling inside the height of its box
  * @type {Record<string, string>}
  */

@@ -1,6 +1,5 @@
 'use client'
 
-import { INTERVIEW_OBSERVERS_MAX } from '@/utils/constants/recruitment'
 import { CopyValue } from '@/components/elements/actions/CopyValue'
 import { AvatarStack } from '@/components/elements/display/Avatar'
 import { CreatorLabel } from '@/components/elements/display/RecordLabel'
@@ -10,7 +9,7 @@ import type { EditableEntry } from '@/components/structures/inline/EditableDetai
 import { FileOverview } from '@/components/structures/page/FileOverview'
 import { ObserveCheck } from '@/composites/recruitment/candidate/ObserveCheck'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { useObservers } from '@/core/hooks/data/recruitment/useObservers'
+import { useObserving } from '@/core/hooks/data/recruitment/useObserving'
 import type { RecordFile } from '@/core/hooks/data/work/useRecordFile'
 import { isInterviewLocked } from '@/core/lib/recruitment/interviewLock'
 import { pickedOptions } from '@/core/lib/forms/options'
@@ -46,9 +45,8 @@ export const CandidateOverview = ({
   children,
 }: CandidateOverviewProps) => {
   const { detail, fields, file, can } = useRecruitmentState()
-  const { observers, observe } = useObservers(detail.summary.id, detail.observers)
+  const observe = useObserving()
   const [joined, setJoined] = useState(candidate.observers.some((seat) => seat.id === can.viewerId))
-  const seat = observers.find((entry) => entry.person.id === can.viewerId)
 
   // Once the interview is taken, only a manager or its recruiter moves the seats
   const isLocked = isInterviewLocked(candidate.attended, candidate.recruiter?.id ?? null, can)
@@ -64,12 +62,6 @@ export const CandidateOverview = ({
       : undefined)
   const outcome = detail.outcomes.find((entry) => entry.id === text('outcomeId'))
   const sitting = pickedOptions(fieldFor('observerIds'), record.values.observerIds)
-
-  // Quota counts the interviews already joined elsewhere, an interview welcomes three observers
-  const sittingElsewhere =
-    (seat?.used ?? 0) - (candidate.observers.some((s) => s.id === can.viewerId) ? 1 : 0)
-  const isCrowded = candidate.observers.length >= INTERVIEW_OBSERVERS_MAX && !joined
-  const isFull = (seat !== undefined && sittingElsewhere >= seat.quota && !joined) || isCrowded
 
   const toggle = async (next: boolean) => {
     if (await observe(candidate.id, next)) setJoined(next)
@@ -117,14 +109,7 @@ export const CandidateOverview = ({
           display: (
             <ObserveCheck
               joined={joined}
-              label={
-                isCrowded
-                  ? CANDIDATE_COPY.observeCrowded
-                  : isFull
-                    ? CANDIDATE_COPY.observeFull
-                    : CANDIDATE_COPY.observe
-              }
-              disabled={isFull}
+              label={CANDIDATE_COPY.observe}
               onChange={(next) => void toggle(next)}
             />
           ),

@@ -4,7 +4,6 @@ import 'server-only'
 import { commentFields } from '@/core/lib/forms/commentFields'
 
 import { linkFields } from '@/core/services/onboarding/IntegrationLinkService'
-import { observerFields } from '@/core/services/recruitment/ObserverService'
 import {
   candidateFields,
   proseFields,
@@ -66,11 +65,10 @@ export const loadRecruitment = async (
     !observing && access.can(permission)
   const canReadLogs = allowed(Permissions.WorkLogRead)
 
-  const [candidate, step, sessionForm, observer, activity] = await Promise.all([
+  const [candidate, step, sessionForm, activity] = await Promise.all([
     candidateFields(),
     stepFields(),
     sessionFields(perimeter, String(detail.summary.values.youtuberId)),
-    observerFields(),
     canReadLogs ? readRecordActivity(JOURNAL_FILES.Recruitment, id) : Promise.resolve([]),
   ])
 
@@ -85,7 +83,6 @@ export const loadRecruitment = async (
       review: proseFields('review'),
       instruction: proseFields('instructions'),
       link: linkFields(),
-      observer,
     },
     can: {
       manage: allowed(Permissions.RecruitmentManage),

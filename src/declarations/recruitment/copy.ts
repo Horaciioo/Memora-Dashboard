@@ -124,7 +124,6 @@ export const RECRUITMENT_FIELD_COPY = {
   formId: 'Identifiant du formulaire',
   recruiter: 'Recruteur',
   observer: 'Observateur',
-  observerQuota: 'Entretiens observables',
   interviewAt: 'Date de l’entretien',
   attended: 'Présence',
   outcome: 'Issue',
