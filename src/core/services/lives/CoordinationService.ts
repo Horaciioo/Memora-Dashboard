@@ -69,7 +69,9 @@ export const myCoordinationRequests = async (accountId: string): Promise<Coordin
           title: true,
           plannedStartAt: true,
           plannedEndAt: true,
-          youtuber: { select: { name: true, bannerUrl: true, avatarUrl: true } },
+          youtuber: {
+            select: { name: true, bannerUrl: true, fadeBannerUrl: true, avatarUrl: true },
+          },
           announcedBy: { select: { displayName: true } },
         },
       },
@@ -83,7 +85,7 @@ export const myCoordinationRequests = async (accountId: string): Promise<Coordin
     creator: live.youtuber.name,
     startsAt: live.plannedStartAt.toISOString(),
     endsAt: live.plannedEndAt?.toISOString() ?? null,
-    banner: live.youtuber.bannerUrl ?? live.youtuber.avatarUrl,
+    banner: live.youtuber.fadeBannerUrl ?? live.youtuber.bannerUrl ?? live.youtuber.avatarUrl,
     avatar: live.youtuber.avatarUrl,
     askedBy: live.announcedBy?.displayName ?? null,
   }))

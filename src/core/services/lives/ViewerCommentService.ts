@@ -56,11 +56,12 @@ const toComment = (row: {
   id: string
   body: string
   createdAt: Date
-  author: { displayName: string } | null
+  author: { displayName: string; avatarUrl: string | null } | null
 }): ViewerComment => ({
   id: row.id,
   body: decryptField(row.body) ?? '',
   authorName: row.author?.displayName ?? null,
+  authorAvatar: row.author?.avatarUrl ?? null,
   createdAt: row.createdAt.toISOString(),
 })
 
@@ -81,7 +82,7 @@ export const viewerComments = async (
 
   const rows = await prisma.viewerComment.findMany({
     where: { ...channel, platformUserId: viewerId },
-    include: { author: { select: { displayName: true } } },
+    include: { author: { select: { displayName: true, avatarUrl: true } } },
     orderBy: { createdAt: 'desc' },
     take: LIVE_SETTINGS.viewerCommentsSize,
   })
@@ -122,7 +123,7 @@ export const addViewerComment = async (input: {
       authorAccountId: input.authorId,
       body: encryptField(readRequiredText(input.values, 'body')) ?? '',
     },
-    include: { author: { select: { displayName: true } } },
+    include: { author: { select: { displayName: true, avatarUrl: true } } },
   })
 
   return toComment(row)
@@ -150,7 +151,7 @@ export const liveNotes = async (live: {
       platform: live.platform,
       createdAt: { gte: live.start, lte: live.end },
     },
-    include: { author: { select: { displayName: true } } },
+    include: { author: { select: { displayName: true, avatarUrl: true } } },
     orderBy: { createdAt: 'asc' },
     take: LIVE_SETTINGS.logLines,
   })

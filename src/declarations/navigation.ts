@@ -48,6 +48,8 @@ export const ROUTES = {
   recruitment: (id: string) => `/recrutements/${id}`,
   candidate: (sessionId: string, candidateId: string) =>
     `/recrutements/${sessionId}/${candidateId}`,
+  candidateBilan: (sessionId: string, candidateId: string) =>
+    `/recrutements/${sessionId}/${candidateId}?onglet=bilan`,
   interview: (sessionId: string, candidateId: string) =>
     `/recrutements/${sessionId}/${candidateId}/entretien`,
   sanctions: '/moderation/sanctions',
@@ -388,7 +390,7 @@ export const NAVIGATION: NavigationGroup[] = [
       },
       {
         href: ROUTES.sanctions,
-        label: 'Panel de sanctions',
+        label: 'Panel Twitch',
         icon: 'liveconCrisis',
         permission: Permissions.SanctionRead,
       },
@@ -465,7 +467,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   legacy: 'Legacy',
   recrutements: 'Recrutements',
   moderation: 'Modération',
-  sanctions: 'Panel de sanctions',
+  sanctions: 'Panel Twitch',
   discord: 'Panel Discord',
   marsha: 'Marsha Bots',
   notifications: 'Notifications',

@@ -232,7 +232,6 @@ export const CalendarTimeGrid = ({
     if (!isMobile) return
 
     openingRef.current?.scrollIntoView({ block: 'start' })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile, firstDay, days.length])
 
   const startOf = (dayKey: string) => (byDay.get(dayKey) ?? []).map((item) => item.startMinute)

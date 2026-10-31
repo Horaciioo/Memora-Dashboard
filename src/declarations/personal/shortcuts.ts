@@ -62,7 +62,7 @@ export const HOME_SHORTCUTS: HomeShortcut[] = [
 
 const SANCTIONS_CARD: HomeShortcut = {
   key: 'sanctions',
-  title: 'Panel de sanctions',
+  title: 'Panel Twitch',
   href: ROUTES.sanctions,
   icon: 'sanctionsPanel',
   image: '/courses/twitch.jpg',

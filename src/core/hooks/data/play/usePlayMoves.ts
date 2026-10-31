@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 
 import { apiPatch, apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { queuePlayRefresh } from '@/core/hooks/data/play/usePlayRefresh'
+import { queueRefresh } from '@/core/lib/realtime/refresh'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_HUB_COPY } from '@/declarations/play/hub'
@@ -29,7 +29,7 @@ export const usePlayMoves = () => {
     const result = await run(action, done)
     if (result === null) return false
     if (to) router.push(to(result))
-    else queuePlayRefresh(() => router.refresh())
+    else queueRefresh(() => router.refresh())
 
     return true
   }

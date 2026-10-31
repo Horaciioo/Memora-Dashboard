@@ -25,7 +25,7 @@ export interface CreatorSwitchProps {
 export const CreatorSwitch = ({ creators, activeYoutuberId }: CreatorSwitchProps) => {
   const [isOpen, setOpen] = useState(false)
   const boundary = useRef<HTMLDivElement>(null)
-  const OffIcon = ICONS.youtuberNone
+  const OffIcon = ICONS.youtuberOff
 
   const shut = useCallback(() => setOpen(false), [])
   useOutsideDismiss(isOpen, boundary, shut)

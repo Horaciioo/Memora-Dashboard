@@ -3,7 +3,7 @@
 import { useViewSwitch } from '@/core/hooks/interaction/layout/useViewSwitch'
 import { SlideSwitch } from '@/components/elements/actions/SlideSwitch'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
-import { VIEW_ROLES, VIEW_TINTS } from '@/declarations/access/views'
+import { VIEW_TINTS } from '@/declarations/access/views'
 import { ROLE_EMBLEMS } from '@/declarations/members/profiles'
 import type { NavigationViewName } from '@/declarations/navigation'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
@@ -21,15 +21,15 @@ export interface RoleSwitchProps {
  */
 
 export const RoleSwitch = ({ viewContext }: RoleSwitchProps) => {
-  const { view, available, switchable } = viewContext
-  const { shown, switchTo } = useViewSwitch(view)
+  const { view, available, roles, switchable } = viewContext
+  const { shown, switchTo } = useViewSwitch(view, roles)
 
   if (!switchable) return null
 
   const options = available.map((entry) => ({
     value: entry,
-    label: ROLE_REGISTRY.label(VIEW_ROLES[entry]),
-    glyph: ROLE_EMBLEMS[VIEW_ROLES[entry]].glyph,
+    label: ROLE_REGISTRY.label(roles[entry]),
+    glyph: ROLE_EMBLEMS[roles[entry]].glyph,
     tint: VIEW_TINTS[entry],
   }))
 

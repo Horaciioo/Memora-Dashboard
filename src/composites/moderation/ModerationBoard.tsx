@@ -1,16 +1,15 @@
 'use client'
 
 import Link from '@/components/elements/navigation/AppLink'
-import { usePathname, useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
+import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { Skeleton } from '@/components/elements/feedback/Skeleton'
 import { Input } from '@/components/elements/forms/inputs/Input'
-import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { PageOptions, type PageOption } from '@/components/structures/page/PageOptions'
 import { Drawer } from '@/components/structures/overlays/Drawer'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
@@ -169,8 +168,7 @@ export const ModerationBoard = ({
   canUpdateLivecon,
   canManageSanctions,
 }: ModerationBoardProps) => {
-  const router = useRouter()
-  const pathname = usePathname()
+  const creator = creators.find((option) => option.value === creatorId)
   const sanctions = useSanctions(initialPanel)
   const [search, setSearch] = useState('')
   const [showLegend, setShowLegend] = useState(false)
@@ -324,14 +322,17 @@ export const ModerationBoard = ({
     <div className={SANCTION_PANEL.wrapper}>
       <PageOptions options={pageOptions} />
       <div className={LIVECON_TITLE.row} {...beaconProps(TOUR_BEACONS.sanctionsLivecon)}>
-        <LiveconTitle
-          creatorId={creatorId}
-          levels={levels}
-          initialState={initialState}
-          fields={liveconFields}
-          canUpdate={canUpdateLivecon}
-          onLevelChange={(next) => void sanctions.select(panel, next.id)}
-        />
+        <div className={LIVECON_TITLE.heading}>
+          {creator && <Avatar name={creator.label} src={creator.image} size="lg" />}
+          <LiveconTitle
+            creatorId={creatorId}
+            levels={levels}
+            initialState={initialState}
+            fields={liveconFields}
+            canUpdate={canUpdateLivecon}
+            onLevelChange={(next) => void sanctions.select(panel, next.id)}
+          />
+        </div>
         {!isEmpty && (
           <Input
             className={LIVECON_TITLE.search}
@@ -344,17 +345,8 @@ export const ModerationBoard = ({
         )}
       </div>
 
-      {(panels.length > 1 || creators.length > 1) && (
+      {panels.length > 1 && (
         <div className={SANCTION_PANEL.toolbar}>
-          {creators.length > 1 && (
-            <SelectMenu
-              options={creators}
-              value={creatorId}
-              mark="avatar"
-              label={SANCTION_COPY.creatorPick}
-              onChange={(next) => router.replace(`${pathname}?youtuber=${next}`)}
-            />
-          )}
           {panels.length > 1 && (
             <SegmentedControl
               label={SANCTION_COPY.panelTitle.replace('{panel}', '')}

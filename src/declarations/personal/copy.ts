@@ -42,7 +42,7 @@ export const PERSONAL_COPY = {
   attendanceLead: 'Les évènements à venir où ta présence est demandée.',
   attendanceEmpty: 'Aucun appel de présence en attente.',
   attendanceOpen: 'Répondre sur le calendrier',
-  birthdaysTitle: 'Anniversaires à venir',
+  birthdaysTitle: 'Anniversaires dans le mois',
   birthdaysOpen: 'Voir les anniversaires dans le calendrier',
   birthdaysEmpty: 'Aucun anniversaire dans les semaines à venir.',
   birthdayToday: 'Aujourd’hui',
@@ -61,6 +61,9 @@ export const PERSONAL_TASK_COPY = {
   firstGameTitle: 'Joue à ta 1ère partie de Bac',
   firstGameDescription:
     'Lance ou rejoins une partie de Baccalauréat dans Memora Play. Victoire, égalité ou défaite : ton XP est doublée pour cette première partie.',
+  candidateReviewTitle: 'Tu dois remplir le bilan candidat de {name}',
+  candidateReviewDescription:
+    'L’entretien est terminé, il manque ton bilan. Écris ce qu’il faut retenir pour la délibération.',
   mentionTitle: '{name} t’a mentionné',
   mentionSomeone: 'Quelqu’un',
   liveReportTitle: 'Voir le bilan du live « {title} »',

@@ -128,6 +128,33 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     target: 'le questionnaire',
   },
   InterviewNoted: { label: 'Entretien', tone: 'info', verb: 'noté', target: 'un entretien' },
+  InterviewStarted: { label: 'Entretien', tone: 'info', verb: 'commencé', target: 'un entretien' },
+  VerdictGiven: { label: 'Avis', tone: 'info', verb: 'rendu', target: 'un avis' },
+  QuestionCommented: {
+    label: 'Commentaire',
+    tone: 'info',
+    verb: 'ajouté',
+    target: 'une question',
+  },
+  RegisterSwitched: { label: 'Registre', tone: 'info', verb: 'changé', target: 'le registre' },
+  RecruitmentClosed: {
+    label: 'Clôture',
+    tone: 'info',
+    verb: 'clôturé',
+    target: 'cette session de recrutement',
+  },
+  RecruitmentBanned: {
+    label: 'Blacklist',
+    tone: 'danger',
+    verb: 'blacklisté',
+    target: 'un identifiant',
+  },
+  RecruitmentUnbanned: {
+    label: 'Blacklist',
+    tone: 'success',
+    verb: 'levé',
+    target: 'une blacklist',
+  },
   AcademyEdited: {
     label: 'Modification',
     tone: 'info',

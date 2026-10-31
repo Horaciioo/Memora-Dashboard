@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { Tabs } from '@/components/elements/navigation/Tabs'
+import { useTabSlide } from '@/core/hooks/interaction/layout/useTabSlide'
 import type { TabItem } from '@/components/elements/navigation/Tabs'
 import { Drawer } from '@/components/structures/overlays/Drawer'
 import { PLAY_HUB_COPY } from '@/declarations/play'
@@ -95,6 +96,7 @@ export const PlaySetupDrawer = ({
   const SaveIcon = ICONS.playTick
   const CancelIcon = ICONS.playClose
   const index = tabs.findIndex((entry) => entry.value === tab)
+  const slide = useTabSlide(index)
   const steps = [
     { entry: tabs[index - 1], tone: DRAWER_ACTIONS.stepBack, Icon: BackIcon },
     { entry: tabs[index + 1], tone: DRAWER_ACTIONS.stepNext, Icon: NextIcon },
@@ -168,7 +170,9 @@ export const PlaySetupDrawer = ({
         </div>
       }
     >
-      {children(tab)}
+      <div key={tab} className={slide}>
+        {children(tab)}
+      </div>
     </Drawer>
   )
 }

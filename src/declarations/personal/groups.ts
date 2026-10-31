@@ -125,6 +125,12 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     icon: 'tasks',
     pim: true,
   },
+  candidateReview: {
+    one: 'Tu as {n} bilan candidat à remplir',
+    other: 'Tu as {n} bilans candidats à remplir',
+    title: 'Bilans candidats',
+    icon: 'note',
+  },
   mention: {
     one: 'On t’a mentionné dans {n} commentaire',
     other: 'On t’a mentionné dans {n} commentaires',
@@ -164,6 +170,7 @@ export const SYSTEM_TASK_KINDS: readonly HomeTaskKind[] = [
   'secondPeriod',
   'pimReview',
   'training',
+  'candidateReview',
 ]
 
 /**

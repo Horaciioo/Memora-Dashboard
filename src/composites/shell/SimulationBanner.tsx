@@ -7,7 +7,7 @@ import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { useViewSwitch } from '@/core/hooks/interaction/layout/useViewSwitch'
 import { isSimulated } from '@/core/lib/auth/simulation'
 import { VIEW_COPY } from '@/declarations/access/copy'
-import { NAVIGATION_VIEW_REGISTRY, VIEW_ROLES, VIEW_TINTS } from '@/declarations/access/views'
+import { NAVIGATION_VIEW_REGISTRY, VIEW_TINTS } from '@/declarations/access/views'
 import { ROLE_REGISTRY } from '@/declarations/access/roles'
 import { SIMULATION_BLOCK } from '@/declarations/ui/blocks'
 import type { ViewContext } from '@/types/access'
@@ -24,8 +24,8 @@ export interface SimulationBannerProps {
 
 export const SimulationBanner = ({ viewContext }: SimulationBannerProps) => {
   const { session } = useAuthContext()
-  const { view, available } = viewContext
-  const { isSwitching, switchTo } = useViewSwitch(view)
+  const { view, available, roles } = viewContext
+  const { isSwitching, switchTo } = useViewSwitch(view, roles)
   const [shown, setShown] = useState(view)
 
   if (!session || !viewContext.switchable) return null
@@ -50,7 +50,7 @@ export const SimulationBanner = ({ viewContext }: SimulationBannerProps) => {
           title={NAVIGATION_VIEW_REGISTRY.get(shown).summary}
         >
           <span className={SIMULATION_BLOCK.text}>
-            {VIEW_COPY.simulatedBanner(ROLE_REGISTRY.label(VIEW_ROLES[shown]))}
+            {VIEW_COPY.simulatedBanner(ROLE_REGISTRY.label(roles[shown]))}
           </span>
           <button
             type="button"

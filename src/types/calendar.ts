@@ -87,6 +87,7 @@ export interface AttendanceRoster {
  * @property {string | null} body - Markdown content of that record
  * @property {{ emoji: string | null, title: string }[]} [topics] - Meeting subject titles
  * @property {string | null} [minutes] - Meeting write-up
+ * @property {boolean} [mine] - Viewer sits in this interview
  * @property {boolean} readOnly - Projected from another domain
  * @property {boolean} rollCall - Asks its convened members to confirm presence
  * @property {AttendanceRoster | null} attendance - Roll-call standings
@@ -120,6 +121,7 @@ export interface CalendarEntry {
   body: string | null
   topics?: { emoji: string | null; title: string }[]
   minutes?: string | null
+  mine?: boolean
   readOnly: boolean
   rollCall: boolean
   attendance: AttendanceRoster | null

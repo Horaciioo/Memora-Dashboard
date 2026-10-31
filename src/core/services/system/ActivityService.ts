@@ -270,6 +270,28 @@ export const readRecordActivity = (
 ): Promise<ActivityEntry[]> => readActivityWhere({ targetType, targetId }, take)
 
 /**
+ * Read the journal of one record together with the one of its children
+ * @param {string} targetType - Target resource kind
+ * @param {string} targetId - Target resource identifier
+ * @param {string} childType - Kind of the children
+ * @param {string[]} childIds - Children identifiers
+ * @return {Promise<ActivityEntry[]>} - Journal entries
+ */
+
+export const readRecordTreeActivity = (
+  targetType: string,
+  targetId: string,
+  childType: string,
+  childIds: string[]
+): Promise<ActivityEntry[]> =>
+  readActivityWhere({
+    OR: [
+      { targetType, targetId },
+      { targetType: childType, targetId: { in: childIds } },
+    ],
+  })
+
+/**
  * Read the latest journal entries
  * @param {number} [take] - Entry count
  * @return {Promise<ActivityEntry[]>} - Journal entries

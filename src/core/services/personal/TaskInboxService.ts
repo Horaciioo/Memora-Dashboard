@@ -13,6 +13,7 @@ import {
 } from '@/declarations/academy/guides'
 import type { PimDestinationName } from '@/declarations/academy/guides'
 import { ROUTES } from '@/declarations/navigation'
+import { isReviewMissing } from '@/core/lib/recruitment/review'
 import { PERSONAL_TASK_COPY } from '@/declarations/personal/copy'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
 import type { IconName } from '@/declarations/ui/icons'
@@ -305,6 +306,52 @@ const trainingTasks = async (accountId: string): Promise<HomeTask[]> => {
 }
 
 /**
+ * Candidates the member interviewed and still owes a bilan for
+ * @param {string} accountId - Recruiter
+ * @return {Promise<HomeTask[]>} - One task per bilan missing
+ */
+
+const candidateReviewTasks = async (accountId: string): Promise<HomeTask[]> => {
+  // One read for every candidate of the recruiter
+  const rows = await prisma.recruitmentCandidate.findMany({
+    where: { verdictAt: { not: null }, recruiters: { some: { accountId } } },
+    select: {
+      id: true,
+      sessionId: true,
+      discordId: true,
+      displayName: true,
+      review: true,
+      verdictAt: true,
+    },
+    orderBy: { verdictAt: 'asc' },
+  })
+  const missing = rows.filter(isReviewMissing)
+  if (missing.length === 0) return []
+
+  const members = await prisma.account.findMany({
+    where: { discordId: { in: missing.map((row) => row.discordId) } },
+    select: { discordId: true, displayName: true },
+  })
+  const names = new Map(members.map((member) => [member.discordId, member.displayName]))
+
+  return missing.map((row) => ({
+    key: `candidateReview:${row.id}`,
+    kind: 'candidateReview' as const,
+    title: PERSONAL_TASK_COPY.candidateReviewTitle.replace(
+      '{name}',
+      names.get(row.discordId) ?? row.displayName ?? row.discordId
+    ),
+    context: '',
+    icon: 'note' as const,
+    href: ROUTES.candidateBilan(row.sessionId, row.id),
+    description: PERSONAL_TASK_COPY.candidateReviewDescription,
+    guide: null,
+    destinationLabel: null,
+    dueAt: null,
+  }))
+}
+
+/**
  * Comments of a recruitment session that named the member
  * @param {string} accountId - Member
  * @return {Promise<HomeTask[]>} - One task per unseen mention
@@ -469,16 +516,17 @@ export const myTasks = async (
   viewer: SessionUser,
   access: PermissionHelpers
 ): Promise<HomeTask[]> => {
-  const [preparation, reviews, trainings, mentions, reports, play] = await Promise.all([
+  const [preparation, reviews, trainings, interviews, mentions, reports, play] = await Promise.all([
     access.can(Permissions.AcademyManage) ? managerTasks(viewer, access) : Promise.resolve([]),
     reviewTasks(viewer.id),
     trainingTasks(viewer.id),
+    candidateReviewTasks(viewer.id),
     mentionTasks(viewer.id),
     reportTasks(viewer, access),
     playTasks(viewer.id, access),
   ])
 
-  const timeline = [...preparation, ...reviews, ...trainings]
+  const timeline = [...preparation, ...reviews, ...trainings, ...interviews]
   if (!access.can(Permissions.TaskRead)) return [...mentions, ...reports, ...timeline, ...play]
 
   // The timeline opens its tasks on the board, ticking one there takes it off the home

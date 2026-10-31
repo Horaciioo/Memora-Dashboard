@@ -5,7 +5,7 @@ import { Tip } from '@/components/elements/feedback/Tip'
 import { useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
 import { BottomSheet } from '@/components/structures/overlays/BottomSheet'
-import { RailSearchGlyph } from '@/components/elements/display/glyphs/RailGlyphs'
+import { ICONS } from '@/declarations/ui/icons'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { CalendarMiniMonth } from '@/composites/calendar/CalendarMiniMonth'
 import { CALENDAR_COPY } from '@/declarations/calendar/copy'
@@ -273,7 +273,7 @@ export const CalendarSearchBar = ({
 }) => {
   return (
     <label className={CALENDAR_SIDEBAR.searchBar}>
-      <RailSearchGlyph className="size-4 shrink-0" aria-hidden="true" />
+      <ICONS.search className="size-4 shrink-0" aria-hidden="true" />
       <input
         type="search"
         value={value}

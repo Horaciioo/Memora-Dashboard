@@ -11,6 +11,7 @@ import { periodZones, promotionPeriods, toPeriodInput } from '@/core/lib/academy
 import { sessionNumbers } from '@/core/services/academy/AcademyService'
 import { PIM_PERIOD_REGISTRY } from '@/declarations/academy/timeline'
 import { CALENDAR_PROJECTION_COPY } from '@/declarations/calendar/copy'
+import { CANDIDATE_COPY } from '@/declarations/recruitment/candidateCopy'
 import { CALENDAR_SOURCE_REGISTRY } from '@/declarations/calendar/registries'
 import { ROUTES } from '@/declarations/navigation'
 import type { PermissionHelpers } from '@/types/auth'
@@ -156,6 +157,7 @@ export const projected = ({
   body,
   topics,
   minutes,
+  mine,
 }: {
   source: CalendarSourceName
   id: string
@@ -174,6 +176,7 @@ export const projected = ({
   body?: string
   topics?: { emoji: string | null; title: string }[]
   minutes?: string | null
+  mine?: boolean
 }): CalendarEntry => {
   const meta = CALENDAR_SOURCE_REGISTRY.get(source)
 
@@ -200,6 +203,7 @@ export const projected = ({
     body: body ?? null,
     topics,
     minutes,
+    mine,
     readOnly: true,
     rollCall: false,
     attendance: null,
@@ -495,25 +499,38 @@ export const recruitmentEntries = async ({
   to,
   access,
   scope,
+  viewer,
 }: ProjectionContext): Promise<CalendarEntry[]> => {
-  if (!access.can(Permissions.RecruitmentRead)) return []
+  const canRead = access.can(Permissions.RecruitmentRead)
+  const seated = {
+    OR: [
+      { recruiters: { some: { accountId: viewer.id } } },
+      { observers: { some: { accountId: viewer.id } } },
+    ],
+  }
 
   const [sessions, candidates] = await Promise.all([
-    prisma.recruitmentSession.findMany({
-      where: scopedWhere('recruitmentSession', scope, {
-        opensAt: { not: null, lte: to },
-        OR: [{ closesAt: { gte: from } }, { closesAt: null, opensAt: { gte: from } }],
-      }),
-      include: { youtuber: { select: { accent: true } } },
-      orderBy: { opensAt: 'asc' },
-    }),
+    // Campaigns are for readers
+    !canRead
+      ? []
+      : prisma.recruitmentSession.findMany({
+          where: scopedWhere('recruitmentSession', scope, {
+            opensAt: { not: null, lte: to },
+            OR: [{ closesAt: { gte: from } }, { closesAt: null, opensAt: { gte: from } }],
+          }),
+          include: { youtuber: { select: { accent: true } } },
+          orderBy: { opensAt: 'asc' },
+        }),
     prisma.recruitmentCandidate.findMany({
       where: {
         interviewAt: { gte: from, lte: to },
-        session: scopedWhere('recruitmentSession', scope),
+        // Anyone else sees the interviews they sit in
+        ...(canRead ? { session: scopedWhere('recruitmentSession', scope) } : seated),
       },
       include: {
         session: { select: { id: true, youtuberId: true, youtuber: { select: { accent: true } } } },
+        recruiters: { select: { accountId: true } },
+        observers: { select: { accountId: true } },
       },
       orderBy: { interviewAt: 'asc' },
     }),
@@ -560,21 +577,27 @@ export const recruitmentEntries = async ({
     ]
   })
 
-  const interviews = candidates.map((row) =>
-    projected({
+  const interviews = candidates.map((row) => {
+    // A reader's own interviews are told apart, an observer never sees who it is
+    const name = canRead
+      ? (row.displayName ?? row.discordId)
+      : (row.displayName ?? CANDIDATE_COPY.anonymous)
+
+    return projected({
       source: CalendarSources.RecruitmentInterview,
       id: row.id,
-      title: `${CALENDAR_PROJECTION_COPY.interview}, ${row.displayName ?? row.discordId}`,
+      title: `${CALENDAR_PROJECTION_COPY.interview}, ${name}`,
       startsAt: row.interviewAt as Date,
       endsAt: null,
       allDay: false,
       accent: row.session.youtuber.accent,
       youtuberId: row.session.youtuberId,
       description: null,
-      subjectName: row.displayName,
-      href: ROUTES.recruitment(row.session.id),
+      subjectName: canRead ? row.displayName : null,
+      href: ROUTES.candidate(row.session.id, row.id),
+      mine: [...row.recruiters, ...row.observers].some((seat) => seat.accountId === viewer.id),
     })
-  )
+  })
 
   return [...campaigns, ...interviews]
 }

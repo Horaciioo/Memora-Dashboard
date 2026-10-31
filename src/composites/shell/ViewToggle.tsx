@@ -1,7 +1,7 @@
 'use client'
 
 import { useViewSwitch } from '@/core/hooks/interaction/layout/useViewSwitch'
-import { NAVIGATION_VIEW_REGISTRY, VIEW_ROLES } from '@/declarations/access/views'
+import { NAVIGATION_VIEW_REGISTRY } from '@/declarations/access/views'
 import { ROLE_EMBLEMS } from '@/declarations/members/profiles'
 import { nextNavigationView } from '@/declarations/navigation'
 import { TONE_VARS } from '@/declarations/ui/theme'
@@ -24,14 +24,14 @@ export interface ViewToggleProps {
  */
 
 export const ViewToggle = ({ viewContext, className, iconClassName }: ViewToggleProps) => {
-  const { view, available, switchable } = viewContext
-  const { isSwitching, switchTo } = useViewSwitch(view)
+  const { view, available, roles, switchable } = viewContext
+  const { isSwitching, switchTo } = useViewSwitch(view, roles)
 
   if (!switchable) return null
 
   const meta = NAVIGATION_VIEW_REGISTRY.get(view)
   // The glyph is the level in force: Moderator
-  const Glyph = ROLE_EMBLEMS[VIEW_ROLES[view]].glyph
+  const Glyph = ROLE_EMBLEMS[roles[view]].glyph
   const target = nextNavigationView(view, available)
   const targetMeta = NAVIGATION_VIEW_REGISTRY.get(target)
 

@@ -33,7 +33,7 @@ export const CreatorAccountMenu = ({ viewContext, isCompact }: CreatorAccountMen
   const [isPicking, startPicking] = useTransition()
   const boundary = useRef<HTMLDivElement>(null)
   const Chevron = ICONS.expand
-  const OffIcon = ICONS.youtuberNone
+  const OffIcon = ICONS.youtuberOff
 
   const { creators, activeYoutuberId } = viewContext
   const hasChoice = creators.length > 1
