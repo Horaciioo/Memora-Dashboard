@@ -102,6 +102,7 @@ export interface MemberSummary {
  * @property {boolean} pinned - Kept on top
  * @property {boolean} system - Written by Memora itself
  * @property {string | null} authorName - Who wrote it
+ * @property {string | null} authorAvatar - Portrait of who wrote it
  * @property {string} createdAt - ISO timestamp
  */
 
@@ -111,6 +112,7 @@ export interface MemberNote {
   pinned: boolean
   system: boolean
   authorName: string | null
+  authorAvatar: string | null
   createdAt: string
 }
 
@@ -238,4 +240,57 @@ export interface MemberAdminState {
   suspension: MemberSuspension | null
   departure: MemberDeparture | null
   isGone: boolean
+}
+
+/**
+ * Part a member played in one session
+ * @typedef {'responsable' | 'recruiter' | 'observer' | 'trainer'} ParticipationRole
+ */
+
+export type ParticipationRole = 'responsable' | 'recruiter' | 'observer' | 'trainer'
+
+/**
+ * Session a member took part in, whatever their roles
+ * @typedef {Object} MemberParticipation
+ * @property {string} id - Session identifier
+ * @property {'recruitment' | 'academy'} kind - Session family
+ * @property {string} title - Session or promotion name
+ * @property {string} startsAt - First day, ISO
+ * @property {string | null} endsAt - Last day, ISO
+ * @property {ParticipationRole[]} roles - Parts played
+ * @property {number} led - Interviews led
+ * @property {number} observed - Interviews sat in on
+ * @property {boolean} canOpen - Viewer may open the session
+ */
+
+export interface MemberParticipation {
+  id: string
+  kind: 'recruitment' | 'academy'
+  title: string
+  startsAt: string
+  endsAt: string | null
+  roles: ParticipationRole[]
+  led: number
+  observed: number
+  canOpen: boolean
+}
+
+/**
+ * Candidate accepted, not a member yet
+ * @typedef {Object} AcceptedCandidate
+ * @property {string} id - Candidate identifier
+ * @property {string} sessionId - Recruitment session
+ * @property {string} youtuberId - Creator recruiting
+ * @property {string} name - Pseudonym
+ * @property {string | null} avatarUrl - Discord portrait
+ * @property {string} functionName - Function aimed at
+ */
+
+export interface AcceptedCandidate {
+  id: string
+  sessionId: string
+  youtuberId: string
+  name: string
+  avatarUrl: string | null
+  functionName: string
 }

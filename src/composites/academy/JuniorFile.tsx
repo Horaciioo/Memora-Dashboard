@@ -3,7 +3,6 @@
 import Link from '@/components/elements/navigation/AppLink'
 
 import { Avatar } from '@/components/elements/display/Avatar'
-import { Status } from '@/components/elements/display/Status'
 import { ActivityPanel } from '@/components/structures/data/ActivityPanel'
 import { FileHead } from '@/components/structures/page/FileHead'
 import { FileTabs } from '@/components/structures/page/FileTabs'
@@ -29,8 +28,6 @@ import { ReviewFlow } from '@/composites/academy/review/ReviewFlow'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import { FSI_TABS, GUIDE_BEACONS } from '@/declarations/academy/guides'
-import { PARKOUR_PHASES } from '@/declarations/academy/parkour'
-import { ACADEMY_JUNIOR_STATUS_REGISTRY } from '@/declarations/academy/registries'
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
 
@@ -42,9 +39,8 @@ import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
  */
 
 const JuniorBody = ({ activity }: { activity: ActivityEntry[] }) => {
-  const { file, can, fields, recruitmentPath, tab, setTab, flow, setFlow } = useJuniorState()
+  const { file, can, fields, recruitment, tab, setTab, flow, setFlow } = useJuniorState()
   const { junior } = file
-  const status = ACADEMY_JUNIOR_STATUS_REGISTRY.get(junior.status)
   const closeFlow = () => setFlow(null)
 
   return (
@@ -53,15 +49,14 @@ const JuniorBody = ({ activity }: { activity: ActivityEntry[] }) => {
         lead={<Avatar name={junior.displayName} src={junior.avatarUrl} size="xl" />}
         title={junior.displayName}
         meta={
-          <>
-            <Status label={status.label} accent={status.accent} icon="statusDot" />
-            <span>{PARKOUR_PHASES[junior.phase].label}</span>
-            {recruitmentPath && (
-              <Link href={recruitmentPath} className="font-semibold underline">
-                {ACADEMY_COPY.recruitmentFile}
+          recruitment && (
+            <span>
+              {ACADEMY_COPY.recruitmentAttached} :{' '}
+              <Link href={recruitment.path} className="font-semibold underline">
+                {recruitment.name}
               </Link>
-            )}
-          </>
+            </span>
+          )
         }
         actions={<ResignButton />}
       />

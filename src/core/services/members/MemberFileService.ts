@@ -56,6 +56,7 @@ export const toMemberNote = (note: NoteRow): MemberNote => ({
   pinned: note.pinned,
   system: note.system,
   authorName: note.author?.displayName ?? null,
+  authorAvatar: note.author?.avatarUrl ?? null,
   createdAt: note.createdAt.toISOString(),
 })
 

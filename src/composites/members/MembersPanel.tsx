@@ -11,6 +11,7 @@ import { FormDrawer } from '@/components/structures/overlays/FormDrawer'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { Section } from '@/components/structures/page/Section'
 import { useMembers } from '@/core/hooks/data/people/useMembers'
+import { foldText } from '@/utils/format/strings'
 import { toOptions } from '@/core/lib/forms/options'
 import { arrangeMembers, isListedRole } from '@/core/lib/members/arrange'
 import { ROLE_REGISTRY, MEMBER_STATUS_REGISTRY } from '@/declarations/access/roles'
@@ -20,16 +21,19 @@ import { ACTION_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { CREATOR_GROUP } from '@/declarations/ui/blocks'
 import { GROUP_STYLES, LIST_STYLES } from '@/declarations/ui/variants'
+import { AcceptedCandidates } from '@/composites/members/AcceptedCandidates'
 import { CreatorGroupBanner } from '@/composites/members/CreatorGroupBanner'
 import { MemberCard } from '@/composites/members/MemberCard'
 import { RoleGlyph } from '@/composites/members/MemberBadges'
 import type { FieldDefinition, FieldOption } from '@/types/forms'
-import type { MemberSummary } from '@/types/members'
+import type { AcceptedCandidate, MemberSummary } from '@/types/members'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { cn } from '@/utils/classnames'
 
 export interface MembersPanelProps {
   initialMembers: MemberSummary[]
+  // Accepted, not admitted yet
+  accepted: AcceptedCandidate[]
   fields: FieldDefinition[]
   divisions: FieldOption[]
   youtubers: FieldOption[]
@@ -72,6 +76,7 @@ interface MemberGroup {
 /**
  * Moderator boxes
  * @param {MemberSummary[]} initialMembers - Rows resolved server-side
+ * @param {AcceptedCandidate[]} accepted - Candidates accepted
  * @param {FieldDefinition[]} fields - Field declarations of the moderator form
  * @param {FieldOption[]} divisions - Division filter options
  * @param {FieldOption[]} youtubers - YouTuber filter options and group order
@@ -85,6 +90,7 @@ interface MemberGroup {
 
 export const MembersPanel = ({
   initialMembers,
+  accepted,
   fields,
   divisions,
   youtubers,
@@ -119,7 +125,7 @@ export const MembersPanel = ({
     search.trim().length > 0 || Object.values(filters).some((value) => value.length > 0)
 
   const visibleMembers = useMemo(() => {
-    const term = search.trim().toLowerCase()
+    const term = foldText(search.trim())
 
     return members.filter((member) => {
       // The employees hold every access without sitting in the list
@@ -128,7 +134,7 @@ export const MembersPanel = ({
       // Free text runs on the name and on the Discord identifier
       if (
         term.length > 0 &&
-        !member.displayName.toLowerCase().includes(term) &&
+        !foldText(member.displayName).includes(term) &&
         !member.discordId.includes(term)
       ) {
         return false
@@ -342,6 +348,9 @@ export const MembersPanel = ({
                     </div>
                   ))}
                   {moderators.length === 0 && renderCards([], true)}
+                  <AcceptedCandidates
+                    candidates={accepted.filter((entry) => entry.youtuberId === group.youtuberId)}
+                  />
                 </div>
               )
 
@@ -393,6 +402,11 @@ export const MembersPanel = ({
                 </div>
               )
             })}
+            {creatorId && (
+              <AcceptedCandidates
+                candidates={accepted.filter((entry) => entry.youtuberId === creatorId)}
+              />
+            )}
           </div>
         )}
       </Section>

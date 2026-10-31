@@ -1,12 +1,11 @@
 import { AbsenceReason } from '@/components/elements/display/AbsenceReason'
+import { MemberParticipation } from '@/composites/members/MemberParticipation'
 import { Section } from '@/components/structures/page/Section'
-import { ActivityTimeline } from '@/components/structures/data/ActivityTimeline'
-import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import { MEMBER_FILE } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 import { HOME_STYLES, TASK_LIST } from '@/declarations/ui/variants'
-import type { MemberAbsence } from '@/types/members'
+import type { MemberAbsence, MemberParticipation as Participation } from '@/types/members'
 import { playPresenceLabel } from '@/core/lib/play/presence'
 import type { PlayPresence } from '@/types/play'
 import { cn } from '@/utils/classnames'
@@ -14,13 +13,9 @@ import { absenceReasonText } from '@/utils/format/absences'
 import { AbsenceStatuses } from '@/utils/constants/workflow'
 import { formatDay, formatDayRange } from '@/utils/format/dates'
 
-// Journal lines previewed before sending to the full tab
-const PREVIEW_ACTIVITY = 4
-
 export interface MemberOverviewProps {
   absences: MemberAbsence[]
-  activity: ActivityEntry[]
-  canReadLogs: boolean
+  participations: Participation[]
   playPresence: PlayPresence | null
   onNavigate: (tab: string) => void
 }
@@ -29,8 +24,7 @@ export interface MemberOverviewProps {
  * Where a moderator stands right now: available or away, what
  * they did last. Everything links to the tab holding the whole story
  * @param {MemberAbsence[]} absences - Time off
- * @param {ActivityEntry[]} activity - Journal entries
- * @param {boolean} canReadLogs - Viewer may read the journal
+ * @param {Participation[]} participations - Sessions joined
  * @param {PlayPresence | null} playPresence - Game they sit in
  * @param {(tab: string) => void} onNavigate - Opens another tab
  * @return {JSX.Element}
@@ -38,8 +32,7 @@ export interface MemberOverviewProps {
 
 export const MemberOverview = ({
   absences,
-  activity,
-  canReadLogs,
+  participations,
   playPresence,
   onNavigate,
 }: MemberOverviewProps) => {
@@ -106,19 +99,7 @@ export const MemberOverview = ({
         )}
       </Section>
 
-      {canReadLogs && activity.length > 0 && (
-        <Section
-          title={MEMBER_COPY.recentTitle}
-          action={
-            <button type="button" className={MEMBER_FILE.more} onClick={() => onNavigate('logs')}>
-              {MEMBER_COPY.seeMore}
-            </button>
-          }
-          raised
-        >
-          <ActivityTimeline entries={activity.slice(0, PREVIEW_ACTIVITY)} />
-        </Section>
-      )}
+      <MemberParticipation participations={participations} onNavigate={onNavigate} />
     </div>
   )
 }

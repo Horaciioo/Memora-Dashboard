@@ -110,6 +110,13 @@ export const ENCADREMENT_ROLES: MemberRoleName[] = ROLE_REGISTRY.keys
   .sort((left, right) => ROLE_MAP[left].rank - ROLE_MAP[right].rank)
 
 /**
+ * Levels sitting in a creator's Administration, highest first, the Employés left out
+ * @type {MemberRoleName[]}
+ */
+
+export const ADMINISTRATION_ROLES: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Responsable]
+
+/**
  * Check the encadrement
  * @param {MemberRoleName} role - Hierarchy level
  * @return {boolean} - Sits at responsable level or above
@@ -131,7 +138,7 @@ interface MemberStatusOption {
 
 const MEMBER_STATUS_MAP: Record<MemberStatusName, MemberStatusOption> = {
   [MemberStatuses.Pending]: { label: 'En attente', accent: 'caution' },
-  [MemberStatuses.Academy]: { label: 'Academy', accent: 'info' },
+  [MemberStatuses.Academy]: { label: 'En formation', accent: 'info' },
   [MemberStatuses.Active]: { label: 'Actif', accent: 'success' },
   [MemberStatuses.Paused]: { label: 'En pause', accent: 'warning' },
   [MemberStatuses.Left]: { label: 'Parti', accent: 'neutral' },

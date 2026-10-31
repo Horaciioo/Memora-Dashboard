@@ -15,6 +15,7 @@ import { readInheritedGrants } from '@/core/services/auth/GrantsService'
 import { assertAccountInScope } from '@/core/services/auth/ScopeService'
 import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
 import { BELOW_LEAD_ROLES, memberFields, readMember } from '@/core/services/members/MemberService'
+import { readMemberParticipation } from '@/core/services/members/ParticipationService'
 import { readAdminState } from '@/core/services/members/admin'
 import { findCandidateFile } from '@/core/services/recruitment'
 import { readMemberActivity } from '@/core/services/system/ActivityService'
@@ -121,6 +122,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     playPresence,
     playActivity,
     playAdmin,
+    participations,
   ] = await Promise.all([
     memberFields(access.isAdmin),
     canReadLogs ? readMemberActivity(id, undefined, [PLAY_TARGET]) : Promise.resolve([]),
@@ -139,6 +141,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
     readPlayPresence(id),
     canReadLogs ? readPlayActivity(id) : Promise.resolve([]),
     canLead && access.can(Permissions.PlayManage) ? readPlayAdmin(id) : Promise.resolve(null),
+    readMemberParticipation(id, access),
   ])
 
   // Sensitive values never leave the server while the window is shut
@@ -170,6 +173,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
         canOpenReports={access.can(Permissions.LiveLogRead)}
         adminState={adminState}
         canDelete={access.can(Permissions.MemberDelete)}
+        participations={participations}
         playPresence={playPresence}
         playActivity={playActivity}
         playAdmin={playAdmin}

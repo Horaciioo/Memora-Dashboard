@@ -19,7 +19,6 @@ export interface JudgementPanelProps {
 
 export const JudgementPanel = ({ panel }: JudgementPanelProps) => {
   const level = useLevelLook()(panel.level)
-  const LevelIcon = ICONS[level.icon]
   const PanelIcon = ICONS.liveconCrisis
 
   return (
@@ -29,7 +28,6 @@ export const JudgementPanel = ({ panel }: JudgementPanelProps) => {
         {COURSE_COPY.judgementPanel}
       </p>
       <div className={COURSE_JUDGEMENT.level} style={accentVars(panel.levelAccent)}>
-        <LevelIcon className={COURSE_JUDGEMENT.levelIcon} aria-hidden="true" />
         <span className={COURSE_JUDGEMENT.levelName}>{level.name}</span>
       </div>
       <p className={COURSE_JUDGEMENT.offense}>{panel.offense}</p>

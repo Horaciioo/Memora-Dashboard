@@ -13,7 +13,7 @@ import { sessionTitle } from '@/utils/format/academy'
 import type { Prisma } from '@prisma/client'
 
 // Author name the view reads
-export const COMMENT_SHAPE = { author: { select: { displayName: true } } } as const
+export const COMMENT_SHAPE = { author: { select: { displayName: true, avatarUrl: true } } } as const
 
 /**
  * Shape one remark
@@ -25,10 +25,11 @@ export const toComment = (row: {
   id: string
   body: string
   createdAt: Date
-  author: { displayName: string } | null
+  author: { displayName: string; avatarUrl: string | null } | null
 }): CommentView => ({
   id: row.id,
   authorName: row.author?.displayName ?? null,
+  authorAvatar: row.author?.avatarUrl ?? null,
   body: decryptField(row.body) ?? '',
   createdAt: row.createdAt.toISOString(),
 })

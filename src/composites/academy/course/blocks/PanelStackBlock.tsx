@@ -36,7 +36,6 @@ export const PanelStackBlock = ({ block }: PanelStackBlockProps) => {
   const { panel, factors, page } = block
   const PageIcon = ICONS[page.icon]
   const level = useLevelLook()(panel.level)
-  const LevelIcon = ICONS[level.icon]
 
   // The lit tier walks down the panel
   useEffect(() => {
@@ -73,7 +72,6 @@ export const PanelStackBlock = ({ block }: PanelStackBlockProps) => {
           </div>
           <div className={COURSE_PANELSTACK.page}>
             <div className={LIVECON_TITLE.base} style={accentVars(panel.levelAccent)}>
-              <LevelIcon className={COURSE_PANELSTACK.levelIcon} aria-hidden="true" />
               <span className={COURSE_PANELSTACK.levelName}>{level.name}</span>
             </div>
             <div className={COURSE_PANELSTACK.groups}>

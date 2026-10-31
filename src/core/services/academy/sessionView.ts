@@ -42,8 +42,11 @@ export const CAMPAIGN_SHAPE = {
       select: { account: { select: { id: true, displayName: true, avatarUrl: true } } },
     },
     candidates: {
-      where: { recruiterId: { not: null } },
-      select: { recruiter: { select: { id: true, displayName: true, avatarUrl: true } } },
+      select: {
+        recruiters: {
+          select: { account: { select: { id: true, displayName: true, avatarUrl: true } } },
+        },
+      },
     },
   },
 } as const
@@ -62,7 +65,7 @@ export const toCampaign = (row: CampaignRow | null): SessionRecruitment | null =
   // Every recruiter once
   const recruiters = new Map(
     row.candidates.flatMap((candidate) =>
-      candidate.recruiter ? [[candidate.recruiter.id, candidate.recruiter] as const] : []
+      candidate.recruiters.map(({ account }) => [account.id, account] as const)
     )
   )
 

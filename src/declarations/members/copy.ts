@@ -1,3 +1,6 @@
+import { RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
+import type { ParticipationRole } from '@/types/members'
+
 /**
  * Copy of the moderator surfaces
  * @type {Record<string, string>}
@@ -86,19 +89,23 @@ export const MEMBER_COPY = {
   nowFree: 'Aucune activité d’enregistrée pour le moment.',
   nowAbsent: 'En absence jusqu’au {date}',
   nowNext: 'Prochaine absence : {range}',
-  recentTitle: 'Ses dernières logs',
   seeMore: 'Tout voir',
+  participationTitle: 'Participation',
+  participationEmpty: 'Ce modérateur n’a pas participé à des Sessions particulières',
+  participationLed: 'Entretiens menés : {count}',
+  participationObserved: 'Entretiens observés : {count}',
   journeyTitle: 'Son parcours',
   journeyLead: 'Du recrutement au rôle de Responsable, ce qu’il a traversé et où il en est.',
   stageRecruitment: 'Recrutement',
   stageAcademy: 'Academy',
-  boxInformation: 'Informations',
+  boxAccess: 'Accès',
   boxPresence: 'Ancienneté et langues',
   railPinned: 'Note épinglée',
   noFunction: 'Aucune fonction',
   unofficial: 'Non officiel',
   administration: 'Administration',
   moderators: 'Modérateurs',
+  acceptedCandidates: 'Candidat accepté',
   absentHint: '{name} est actuellement en absence.',
 } as const
 
@@ -181,3 +188,15 @@ export const HANDLE_LOOKUP_COPY = {
   missing: 'Aucun compte à ce nom',
   unknown: 'Ce réseau ne laisse pas vérifier le compte',
 } as const
+
+/**
+ * Labels of the parts played in a session
+ * @type {Record<ParticipationRole, string>}
+ */
+
+export const PARTICIPATION_ROLE_COPY: Record<ParticipationRole, string> = {
+  responsable: 'Responsable de session',
+  recruiter: RECRUITMENT_FIELD_COPY.recruiter,
+  observer: RECRUITMENT_FIELD_COPY.observer,
+  trainer: 'Formateur',
+}

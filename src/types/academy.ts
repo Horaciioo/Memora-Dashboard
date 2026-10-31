@@ -218,6 +218,7 @@ export interface JuniorSkillView {
  * @property {NoteKindName} kind - Positive or negative
  * @property {string} body - Written trace
  * @property {string | null} authorName - Who wrote it
+ * @property {string | null} authorAvatar - Portrait of who wrote it
  * @property {string} createdAt - ISO date
  * @property {FormValues} values - Values feeding the edit form
  */
@@ -228,6 +229,7 @@ export interface JuniorNoteView {
   kind: NoteKindName
   body: string
   authorName: string | null
+  authorAvatar: string | null
   createdAt: string
   values: FormValues
 }
@@ -242,6 +244,7 @@ export interface JuniorNoteView {
  * @property {ObjectiveStatusName} status - Outcome so far
  * @property {number} position - Display order
  * @property {string | null} authorName - Who set it
+ * @property {string | null} authorAvatar - Portrait of who wrote it
  * @property {FormValues} values - Values feeding the edit form
  */
 
@@ -253,6 +256,7 @@ export interface JuniorObjectiveView {
   status: ObjectiveStatusName
   position: number
   authorName: string | null
+  authorAvatar: string | null
   values: FormValues
 }
 
@@ -264,6 +268,7 @@ export interface JuniorObjectiveView {
  * @property {string} heldAt - ISO date
  * @property {number | null} durationMinutes - How long the call lasted
  * @property {string | null} authorName - Who held it
+ * @property {string | null} authorAvatar - Portrait of who wrote it
  * @property {string | null} feeling - Overall feeling
  * @property {string} summary - What moves
  * @property {ReviewAdviceName} advice - Outcome proposed by the Formateur
@@ -280,6 +285,7 @@ export interface AcademyReviewView {
   heldAt: string
   durationMinutes: number | null
   authorName: string | null
+  authorAvatar: string | null
   feeling: string | null
   summary: string
   advice: ReviewAdviceName

@@ -37,7 +37,7 @@ import { MEMBER_ADMIN_COPY } from '@/declarations/members/admin'
 import { MEMBER_COPY, MEMBER_FIELD_COPY } from '@/declarations/members/copy'
 import { ABSENCE_STATUS_REGISTRY } from '@/declarations/reference/registries'
 import { ACTION_COPY, FIELD_COPY } from '@/declarations/ui/copy'
-import { DETAIL_BLOCK, MEMBER_BLOCK, MEMBER_FILE } from '@/declarations/ui/blocks'
+import { MEMBER_BLOCK, MEMBER_FILE } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
 import { HOME_STYLES, RECORD_ROW } from '@/declarations/ui/variants'
 import { MemberJourney } from '@/composites/members/MemberJourney'
@@ -53,7 +53,8 @@ import { DepartureMessageDialog } from '@/composites/members/admin/DepartureMess
 import { SanctionDrawer } from '@/composites/members/admin/SanctionDrawer'
 import type { SanctionInput } from '@/composites/members/admin/SanctionDrawer'
 import { useMemberAdmin } from '@/core/hooks/data/people/useMemberAdmin'
-import { DepartureKinds, LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
+import { ADMINISTRATION_ROLES } from '@/declarations/access/roles'
+import { DepartureKinds } from '@/utils/constants/hierarchy'
 import type { DepartureKindName } from '@/utils/constants/hierarchy'
 import { MemberAccessPanel } from '@/composites/members/MemberAccessPanel'
 import { MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
@@ -71,7 +72,13 @@ import type {
   OptionMark as OptionMarkKind,
 } from '@/types/forms'
 import { ErasedValue } from '@/composites/members/ErasedValue'
-import type { MemberAbsence, MemberAdminState, MemberDetail, MemberSocial } from '@/types/members'
+import type {
+  MemberAbsence,
+  MemberAdminState,
+  MemberDetail,
+  MemberParticipation,
+  MemberSocial,
+} from '@/types/members'
 import type { PermissionName } from '@/utils/constants/permissions'
 import { absenceReasonText, isFinishedAbsence } from '@/utils/format/absences'
 import { formatDay, formatDayRange } from '@/utils/format/dates'
@@ -100,6 +107,7 @@ export interface MemberFileTabsProps {
   adminState: MemberAdminState | null
   canDelete: boolean
   // Memora Play
+  participations: MemberParticipation[]
   playPresence: PlayPresence | null
   playActivity: ActivityEntry[]
   playAdmin: PlayAdminState | null
@@ -137,7 +145,7 @@ const ExternalIcon = ICONS.forward
 const CalendarIcon = ICONS.meetings
 
 // Roles that sit in the Administration
-const LEAD_ROLES: string[] = LEADERSHIP_ROLES
+const LEAD_ROLES: string[] = ADMINISTRATION_ROLES
 
 const CONTACT_FIELD_NAMES = ['discordId', 'birthday', 'languages', 'timezone']
 
@@ -307,6 +315,7 @@ export const MemberFileTabs = ({
   canOpenReports,
   adminState,
   canDelete,
+  participations,
   playPresence,
   playActivity,
   playAdmin,
@@ -523,8 +532,9 @@ export const MemberFileTabs = ({
   // Boxes of the file tab, each answering one question
   const boxes: { title: string; labels: string[] }[] = [
     {
-      title: MEMBER_COPY.boxInformation,
+      title: MEMBER_COPY.boxAccess,
       labels: [
+        MEMBER_FIELD_COPY.memoraId,
         MEMBER_FIELD_COPY.primaryFunctions,
         MEMBER_FIELD_COPY.secondaryFunctions,
         FIELD_COPY.division,
@@ -540,7 +550,11 @@ export const MemberFileTabs = ({
       ],
     },
   ]
-  const pool = [...assignmentEntries, ...fileContactEntries]
+  const memoraIdEntry: EditableEntry = {
+    label: MEMBER_FIELD_COPY.memoraId,
+    display: <span className={MEMBER_FILE.memoraId}>{summary.id}</span>,
+  }
+  const pool = [memoraIdEntry, ...assignmentEntries, ...fileContactEntries]
 
   const identityTab = () => (
     <div className={MEMBER_FILE.main}>
@@ -598,8 +612,7 @@ export const MemberFileTabs = ({
   const overviewTab = () => (
     <MemberOverview
       absences={file.absences}
-      activity={activity}
-      canReadLogs={canReadLogs}
+      participations={participations}
       playPresence={playPresence}
       onNavigate={setTab}
     />
@@ -840,6 +853,7 @@ export const MemberFileTabs = ({
         admin={admin}
         onDepart={depart}
         onShowMessage={setDepartureMessage}
+        onSanction={() => setIsSanctioning(true)}
         canDelete={canDelete}
         roleSection={
           isAdmin ? (
@@ -847,17 +861,6 @@ export const MemberFileTabs = ({
               <EditableDetailGrid
                 stacked
                 entries={[
-                  {
-                    label: '',
-                    display: (
-                      <span className="inline-flex items-center gap-3">
-                        <span className={DETAIL_BLOCK.label}>{MEMBER_FIELD_COPY.memoraId}</span>
-                        <span className="font-[family-name:var(--font-mono)] text-xs">
-                          {summary.id}
-                        </span>
-                      </span>
-                    ),
-                  },
                   {
                     label: '',
                     field: fieldFor('role'),
@@ -946,18 +949,6 @@ export const MemberFileTabs = ({
       {/* On a phone the identity box belongs to the overview alone */}
       <div className={cn(MEMBER_FILE.railStack, tab !== 'overview' && 'hidden md:flex')}>
         {rail}
-        {adminState && !admin.state.isGone && (
-          <Button
-            variant={admin.state.suspension ? 'primary' : 'danger'}
-            className="w-full"
-            isLoading={admin.state.suspension ? admin.isSaving : undefined}
-            onClick={() => (admin.state.suspension ? void admin.lift() : setIsSanctioning(true))}
-          >
-            {admin.state.suspension
-              ? MEMBER_ADMIN_COPY.liftAction
-              : MEMBER_ADMIN_COPY.sanctionAction}
-          </Button>
-        )}
       </div>
 
       <div className={MEMBER_FILE.main}>
@@ -1000,20 +991,21 @@ export const MemberFileTabs = ({
             {
               value: 'access',
               label: MEMBER_COPY.tabAccess,
-              icon: 'shield',
+              icon: 'key',
               visible: canManageAccess && ACCESS_EDITABLE,
               render: accessTab,
             },
             {
               value: 'path',
               label: MEMBER_COPY.tabPath,
-              icon: 'recruitment',
+              icon: 'path',
               render: pathTab,
             },
             {
               value: 'admin',
               label: MEMBER_ADMIN_COPY.tab,
-              icon: 'shield',
+              icon: 'alert',
+              danger: true,
               visible: adminState !== null || playAdmin !== null,
               render: adminTab,
             },
