@@ -19,7 +19,6 @@ export const COURSE_PANELSTACK = {
     'relative z-10 overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-float)] md:absolute md:inset-x-[26%] md:top-[3%] md:bottom-[3%]',
   bar: 'flex h-12 shrink-0 items-center gap-3 border-b border-[var(--color-border)] px-5 font-bold tracking-tight',
   barIcon: 'size-6 text-[var(--color-ink-accent)]',
-  levelIcon: 'size-10 shrink-0',
   levelName: 'text-3xl font-bold tracking-tight',
   // The page itself: its title, then offences by gravity
   page: 'flex flex-col gap-6 p-5',

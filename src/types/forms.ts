@@ -241,7 +241,7 @@ export interface FieldNeed {
  * @property {string} [hint] - Helper line
  * @property {string} [info] - Explanation behind the info glyph
  * @property {FieldPreset} [preset] - Blank form start value
- * @property {string} [initial] - Fixed start value of a blank form
+ * @property {string | boolean} [initial] - Fixed start value of a blank form
  * @property {FieldAction} [action] - Link above the options
  * @property {boolean} [required] - Must be filled
  * @property {boolean} [readOnly] - Rendered disabled
@@ -291,7 +291,7 @@ export interface FieldDefinition {
   hint?: string
   info?: string
   preset?: FieldPreset
-  initial?: string
+  initial?: string | boolean
   action?: FieldAction
   required?: boolean
   readOnly?: boolean

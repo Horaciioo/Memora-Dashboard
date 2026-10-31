@@ -5,7 +5,7 @@ import { forbidden, notFound } from '@/core/lib/errors'
 import { readRequiredText, readText } from '@/core/lib/forms/values'
 import { scopedWhere } from '@/core/services/auth/ScopeService'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { reachableSession } from '@/core/services/recruitment/RecruitmentService'
+import { reachableSession } from '@/core/services/recruitment'
 import {
   addCommunication,
   communicationData,

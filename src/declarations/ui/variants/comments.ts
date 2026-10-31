@@ -11,6 +11,8 @@ export const COMMENT_THREAD = {
     'absolute top-3 right-3 rounded-full p-1 text-[var(--color-ink-subtle)] opacity-30 transition-opacity group-hover:opacity-100 hover:text-[var(--color-ink)] focus-visible:opacity-100',
   // Mentions the viewer, pastel until hovered
   hot: 'bg-[var(--color-brand-soft)]',
+  // Held on the rail
+  pinned: 'bg-[var(--color-brand-50)]',
   meta: 'text-xs text-[var(--color-ink-subtle)]',
   body: 'text-sm',
   mention:

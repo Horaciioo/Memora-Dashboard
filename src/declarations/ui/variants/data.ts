@@ -287,6 +287,7 @@ export const BOARD_STYLES = {
     'flex min-h-11 w-full items-center justify-between gap-2 text-left md:min-h-0 md:cursor-default',
   columnChevron: 'size-4 shrink-0 text-[var(--color-ink-subtle)] transition-transform md:hidden',
   columnTitle: 'text-sm font-bold tracking-wide text-[var(--color-ink)] uppercase',
+  columnCount: 'ml-1.5 text-xs font-normal tracking-normal text-[var(--color-ink-subtle)] italic',
   count:
     'rounded-[var(--radius-sm)] bg-[var(--color-surface-raised)] px-2 py-0.5 text-xs text-[var(--color-ink-subtle)]',
   body: 'flex min-h-24 flex-col gap-2 rounded-[var(--radius-md)] p-1',
@@ -619,7 +620,7 @@ export const FILTER_STYLES = {
   panel: 'mt-3 flex flex-wrap items-start gap-3 border-t border-[var(--color-border)] pt-4',
   options: 'flex flex-1 flex-wrap items-start gap-3',
   reset: 'shrink-0',
-  optionField: 'w-full sm:w-52',
+  optionField: 'w-full sm:w-72',
 } as const
 
 /**

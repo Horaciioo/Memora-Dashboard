@@ -80,6 +80,13 @@ export const EVENT_TYPES = createEnumeration({
   PlayKicked: { id: 71, label: 'Retiré d’une partie Play' },
   PlayFinished: { id: 72, label: 'Partie Play terminée' },
   PlayAdjusted: { id: 73, label: 'Progression Play modifiée' },
+  InterviewStarted: { id: 74, label: 'Entretien commencé' },
+  VerdictGiven: { id: 75, label: 'Avis rendu' },
+  QuestionCommented: { id: 76, label: 'Question commentée' },
+  RegisterSwitched: { id: 77, label: 'Registre changé' },
+  RecruitmentBanned: { id: 78, label: 'Identifiant blacklisté' },
+  RecruitmentUnbanned: { id: 79, label: 'Blacklist levée' },
+  RecruitmentClosed: { id: 80, label: 'Recrutement clôturé' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

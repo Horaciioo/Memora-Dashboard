@@ -4,7 +4,7 @@ import crypto from 'crypto'
 
 import { prisma } from '@/core/lib/db'
 import { forbidden, notFound } from '@/core/lib/errors'
-import { candidateSession } from '@/core/services/recruitment/RecruitmentService'
+import { candidateSession } from '@/core/services/recruitment'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
 import type { DiscordIdentity } from '@/core/services/auth/DiscordService'
 import { EXERCISE_SETTINGS } from '@/declarations/configurations/settings'

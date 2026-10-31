@@ -37,7 +37,10 @@ export const OptionLead = ({ option, mark, isSelected, size = 'xs' }: OptionLead
       {isSelected ? (
         <CheckIcon className={SELECT_MENU_STYLES.check} />
       ) : (
-        mark && option.value !== '' && <OptionMark mark={mark} option={option} size={size} />
+        mark &&
+        (option.value !== '' || option.icon) && (
+          <OptionMark mark={mark} option={option} size={size} />
+        )
       )}
     </span>
   )

@@ -39,6 +39,13 @@ export const upcomingPlans = async (
   return (
     entries
       .filter((entry) => !LEFT_OUT.includes(entry.source))
+      // Interviews are the viewer's own unless they manage the session
+      .filter(
+        (entry) =>
+          entry.source !== CalendarSources.RecruitmentInterview ||
+          access.can(Permissions.RecruitmentManage) ||
+          entry.mine
+      )
       // A declined presence leaves the plan
       .filter((entry) => entry.attendance?.mine !== AttendanceStatuses.Absent)
       // What ended earlier today stays, struck through

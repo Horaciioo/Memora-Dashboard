@@ -22,13 +22,14 @@ const toJuniorNote = (row: {
   kind: NoteKindName
   body: string
   createdAt: Date
-  author: { displayName: string } | null
+  author: { displayName: string; avatarUrl: string | null } | null
 }): JuniorNoteView => ({
   id: row.id,
   stage: row.stage,
   kind: row.kind,
   body: decryptField(row.body) ?? '',
   authorName: row.author?.displayName ?? null,
+  authorAvatar: row.author?.avatarUrl ?? null,
   createdAt: row.createdAt.toISOString(),
   values: { stage: row.stage, kind: row.kind, body: row.body },
 })

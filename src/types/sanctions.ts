@@ -52,6 +52,7 @@ export interface SanctionRungView {
  * @property {number} rungCount - Steps of the ladder
  * @property {SanctionRungView[]} rungs - Every step at that level
  * @property {string[]} examples - Messages it covers
+ * @property {string[]} tolerated - Close messages left alone
  * @property {string[]} keywords - Words the suggestion looks for
  */
 
@@ -63,6 +64,7 @@ export interface SanctionOffenseCard {
   rungCount: number
   rungs: SanctionRungView[]
   examples: string[]
+  tolerated: string[]
   keywords: string[]
 }
 

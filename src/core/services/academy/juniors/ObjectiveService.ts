@@ -22,7 +22,7 @@ const toJuniorObjective = (row: {
   dueAt: Date | null
   status: ObjectiveStatusName
   position: number
-  author: { displayName: string } | null
+  author: { displayName: string; avatarUrl: string | null } | null
 }): JuniorObjectiveView => ({
   id: row.id,
   title: row.title,
@@ -31,6 +31,7 @@ const toJuniorObjective = (row: {
   status: row.status,
   position: row.position,
   authorName: row.author?.displayName ?? null,
+  authorAvatar: row.author?.avatarUrl ?? null,
   values: {
     title: row.title,
     description: row.description,

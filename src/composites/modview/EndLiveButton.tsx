@@ -11,7 +11,8 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { LIVE_COPY } from '@/declarations/lives/copy'
 import { ROUTES } from '@/declarations/navigation'
 import { entityFeedback } from '@/declarations/ui/copy'
-import { LockGlyph } from '@/components/elements/display/glyphs/BrandGlyphs'
+import { ICONS } from '@/declarations/ui/icons'
+import { cn } from '@/utils/classnames'
 import { MODVIEW_SIDEBAR } from '@/declarations/ui/variants'
 import type { LiveView } from '@/types/lives'
 import { LiveStatuses } from '@/utils/constants/lives'
@@ -50,7 +51,7 @@ export const EndLiveButton = ({ liveId }: EndLiveButtonProps) => {
         title={LIVE_COPY.end}
         onClick={() => setConfirming(true)}
       >
-        <LockGlyph tone="danger" className={MODVIEW_SIDEBAR.icon} />
+        <ICONS.lock className={cn(MODVIEW_SIDEBAR.icon, 'text-[var(--color-danger)]')} />
       </button>
       <ConfirmDialog
         open={isConfirming}

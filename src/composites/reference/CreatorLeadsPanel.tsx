@@ -7,14 +7,14 @@ import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
 import { apiPatch } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
-import { ENCADREMENT_ROLES, ROLE_REGISTRY } from '@/declarations/access/roles'
+import { ADMINISTRATION_ROLES, ROLE_REGISTRY } from '@/declarations/access/roles'
 import { REFERENCE_FIELD_COPY } from '@/declarations/reference/copy'
 import { CREATOR_FILE, LEAD_BLOCK } from '@/declarations/ui/blocks'
 import type { LeadAnchor } from '@/types/access'
 import type { FieldOption } from '@/types/forms'
 
 // Levels an anchor can sit at
-const ROLE_OPTIONS: FieldOption[] = ENCADREMENT_ROLES.map((role) => ({
+const ROLE_OPTIONS: FieldOption[] = ADMINISTRATION_ROLES.map((role) => ({
   value: role,
   label: ROLE_REGISTRY.get(role).label,
 }))

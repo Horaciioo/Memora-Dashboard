@@ -1,3 +1,4 @@
+import { ADMINISTRATION_ROLES } from '@/declarations/access/roles'
 import { MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import type { MemberFunction, MemberSummary } from '@/types/members'
@@ -16,9 +17,6 @@ export interface ArrangedMembers {
 
 // Roles drawn from the list, their access stays whole
 export const UNLISTED_ROLES: MemberRoleName[] = [MemberRoles.Employe]
-
-// Roles sitting in the Administration, highest first
-const ADMINISTRATION_ROLES: MemberRoleName[] = [MemberRoles.Admin, MemberRoles.Responsable]
 
 /**
  * Check a role the list shows

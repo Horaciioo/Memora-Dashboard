@@ -1,4 +1,5 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
+import { signalCandidate } from '@/core/lib/recruitment/signal'
 import {
   assertInterviewOpen,
   readAnswerPatch,
@@ -25,10 +26,13 @@ export const PUT = createProtectedRoute({
         eventType: 'InterviewNoted',
         file: JOURNAL_FILES.Recruitment,
         fileId: sessionId,
+        candidateId: params.id,
         actorId: session.id,
         summary: RECRUITMENT_COPY.logNoted,
       })
     }
+
+    await signalCandidate(params.id, sessionId)
 
     return { ok: true }
   },

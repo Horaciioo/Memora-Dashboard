@@ -2,6 +2,7 @@ import { syncFunctionTeams } from '@/core/services/teams/FunctionTeamService'
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { isAdmissionOpen } from '@/core/lib/recruitment/closure'
 import { JUNIOR_FUNCTION_OF } from '@/declarations/reference/fixed'
 import { AcademyJuniorStatuses, MemberRoles, MemberStatuses } from '@/utils/constants/hierarchy'
 
@@ -103,12 +104,13 @@ const withdrawAdmission = async (junior: { id: string; accountId: string }): Pro
 }
 
 /**
- * Keep the promotion in step with one application
+ * Keep the promotion in step with one application, nothing is stored before the closure
  * @param {string} candidateId - Application identifier
+ * @param {boolean} [isClosing] - Session is closing right now
  * @return {Promise<void>} - Synced
  */
 
-export const syncAdmission = async (candidateId: string): Promise<void> => {
+export const syncAdmission = async (candidateId: string, isClosing = false): Promise<void> => {
   const candidate = await prisma.recruitmentCandidate.findUnique({
     where: { id: candidateId },
     include: {
@@ -116,6 +118,7 @@ export const syncAdmission = async (candidateId: string): Promise<void> => {
       admission: { select: { id: true, accountId: true, confirmedAt: true } },
       session: {
         select: {
+          status: true,
           youtuberId: true,
           functionId: true,
           academySession: { select: { id: true, functionId: true, startsAt: true } },
@@ -126,7 +129,9 @@ export const syncAdmission = async (candidateId: string): Promise<void> => {
   if (!candidate) return
 
   const promotion = candidate.session.academySession
-  const admitted = candidate.outcome?.admits === true && promotion !== null
+  // A session that closed admits at once the ones accepted later
+  const isClosed = isAdmissionOpen(candidate.session.status, isClosing)
+  const admitted = candidate.outcome?.admits === true && promotion !== null && isClosed
 
   // A confirmed seat belongs to the junior now
   if (candidate.admission?.confirmedAt) return
@@ -165,6 +170,29 @@ export const syncAdmission = async (candidateId: string): Promise<void> => {
       status: AcademyJuniorStatuses.Active,
     },
   })
+}
+
+/**
+ * Admit every accepted candidate of a closing session
+ * @param {string} sessionId - Recruitment session identifier
+ * @return {Promise<string[]>} - Candidates that failed
+ */
+
+export const admitSession = async (sessionId: string): Promise<string[]> => {
+  const accepted = await prisma.recruitmentCandidate.findMany({
+    where: { sessionId, outcome: { admits: true } },
+    select: { id: true, discordId: true, displayName: true },
+  })
+  const failed: string[] = []
+
+  // One failure never stops the others
+  for (const candidate of accepted) {
+    await syncAdmission(candidate.id, true).catch(() =>
+      failed.push(candidate.displayName ?? candidate.discordId)
+    )
+  }
+
+  return failed
 }
 
 /**

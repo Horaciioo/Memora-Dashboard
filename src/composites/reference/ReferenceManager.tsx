@@ -41,6 +41,9 @@ export interface ReferenceManagerProps {
   canErase?: boolean
 }
 
+// Big creator card
+const CREATOR_CARD = 'min-h-48 flex-col justify-center gap-4 text-center'
+
 // Single drop container
 const CONTAINER = 'reference'
 
@@ -169,6 +172,36 @@ export const ReferenceManager = ({
         }}
         onCreate={openCreate}
       />
+    ) : section.key === 'youtubeurs' ? (
+      <div
+        className={cn(
+          'grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3',
+          over === CONTAINER && 'is-drop-target rounded-[var(--radius-lg)]'
+        )}
+        {...(section.reorderable && canManage ? containerProps(CONTAINER) : {})}
+      >
+        {rows.map((row, index) => (
+          <div
+            key={row.id}
+            data-drop-index={index}
+            className={cn(LIST_STYLES.item, LIST_STYLES.itemClickable, CREATOR_CARD)}
+            onClick={() => openRow(row)}
+            onContextMenu={contextMenu(rowMenu(row), row.label)}
+            {...(section.reorderable && canManage
+              ? itemProps({ id: row.id, from: CONTAINER })
+              : {})}
+          >
+            <Avatar name={row.label} src={row.image} size="xl" />
+            <span className="text-lg font-semibold">{row.label}</span>
+          </div>
+        ))}
+        <AddRow
+          label={`${ACTION_COPY.add} ${section.singular.toLowerCase()}`}
+          disabled={!canManage}
+          onClick={openCreate}
+          className="min-h-48"
+        />
+      </div>
     ) : (
       <div
         className={cn(

@@ -4,6 +4,7 @@ import { AsyncLocalStorage } from 'node:async_hooks'
 
 import type { NextRequest } from 'next/server'
 
+import { TAB_HEADER } from '@/core/lib/api/tab'
 import { readAddress } from '@/core/lib/http/rateLimit'
 import { runInRequestZone } from '@/core/lib/http/requestZone'
 
@@ -13,12 +14,14 @@ import { runInRequestZone } from '@/core/lib/http/requestZone'
  * @property {string | null} route - Method and path
  * @property {string | null} ip - Client address
  * @property {string | null} userAgent - Client software
+ * @property {string | null} tab - Browser tab that wrote
  */
 
 export interface RequestOrigin {
   route: string | null
   ip: string | null
   userAgent: string | null
+  tab: string | null
 }
 
 // Longest header value kept
@@ -43,6 +46,7 @@ export const runWithOrigin = <T>(request: NextRequest, run: () => Promise<T>): P
       route: `${request.method} ${request.nextUrl.pathname}`,
       ip: clip(readAddress(request.headers)),
       userAgent: clip(request.headers.get('user-agent')),
+      tab: clip(request.headers.get(TAB_HEADER)),
     },
     () => runInRequestZone(run)
   )
@@ -66,8 +70,9 @@ export const readOrigin = async (): Promise<RequestOrigin> => {
       route: null,
       ip: clip(readAddress(store)),
       userAgent: clip(store.get('user-agent')),
+      tab: clip(store.get(TAB_HEADER)),
     }
   } catch {
-    return { route: null, ip: null, userAgent: null }
+    return { route: null, ip: null, userAgent: null, tab: null }
   }
 }

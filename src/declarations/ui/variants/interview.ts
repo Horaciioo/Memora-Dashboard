@@ -41,7 +41,7 @@ export const QUESTION_PLAN = {
 
 export const QUESTION_BODY = {
   root: 'flex flex-col gap-1 text-sm',
-  fold: 'group border-t border-[var(--color-border)] py-2 first:border-t-0',
+  fold: 'question-fold group border-t border-[var(--color-border)] py-2 first:border-t-0',
   foldHead:
     'flex cursor-pointer list-none items-center justify-between gap-3 text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase marker:hidden hover:text-[var(--color-ink)] [&::-webkit-details-marker]:hidden',
   foldChevron: 'h-4 w-4 transition-transform group-open:rotate-90',
@@ -69,7 +69,27 @@ export const QUESTION_BODY = {
  */
 
 export const INTERVIEW = {
+  // Creator mark top left, part wording over a dark fade at the bottom of the banner
+  figureTop: 'absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-black/35 to-transparent',
+  figureMark: 'absolute top-6 left-6 h-12 w-auto max-w-[45%] object-contain object-left',
+  figureName: 'absolute top-6 right-6 left-6 text-section font-bold text-white',
+  figureFade:
+    'absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 via-black/60 to-transparent',
+  figureHead: 'absolute inset-x-0 bottom-0 flex flex-col gap-2 p-6 text-white',
+  figureKicker: 'text-xs font-bold tracking-wide text-white/70 uppercase',
+  figureTitle: 'text-3xl font-bold tracking-tight',
+  figureLead: 'text-sm leading-relaxed text-white/85',
   part: 'flex flex-col gap-4 pt-2',
+  crumbsRow: 'grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4',
+  crumbsTrail: 'col-start-2 min-w-0 justify-self-center',
+  minutes:
+    'flex items-center gap-2 justify-self-start text-sm font-semibold text-[var(--color-ink-subtle)]',
+  formalSwitch:
+    'col-start-3 flex items-center gap-2.5 justify-self-end text-sm font-semibold text-[var(--color-ink-subtle)]',
+  speech: 'flex flex-col gap-3 text-base leading-relaxed',
+  speechAside: 'text-sm text-[var(--color-ink-subtle)] italic',
+  folds: `flex flex-col ${COURSE_PANEL} px-5 py-1`,
+  foldChosen: 'flex flex-col gap-4 py-3',
   card: `flex flex-col gap-4 ${COURSE_PANEL} p-5`,
   promptMandatory: 'text-[var(--color-danger)]',
   cardSkipped: 'opacity-55',
@@ -106,7 +126,7 @@ export const INTERVIEW = {
   content: 'relative mx-auto flex w-full max-w-3xl flex-col gap-8',
   // Small trail above the title, out of the flow so nothing moves
   crumbs:
-    'absolute -top-6 left-0 flex max-w-full items-center gap-1.5 truncate text-xs text-[var(--color-ink-subtle)]',
+    'flex max-w-full items-center justify-center gap-1.5 text-sm text-[var(--color-ink-subtle)]',
   crumb: 'truncate transition-colors hover:text-[var(--color-ink)]',
   crumbCurrent: 'font-semibold text-[var(--color-ink)]',
   crumbSeparator: 'shrink-0 opacity-60',
@@ -122,8 +142,6 @@ export const INTERVIEW = {
   guideText: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
   guideNote:
     'flex-1 rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] px-3 py-2 text-sm text-[var(--color-ink-subtle)]',
-  introTag:
-    'inline-flex items-center rounded-full bg-[var(--color-brand-600)] px-3 py-1 text-xs font-bold text-[var(--color-on-brand)]',
   // Scrolled content slips under a blurred strip holding the buttons
   scrollPad: 'pb-32',
   footerZone: 'pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col justify-end',
@@ -133,20 +151,12 @@ export const INTERVIEW = {
     'pointer-events-auto relative mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-5 pt-8 pb-5 sm:px-10 lg:px-14',
   reviewRow: 'flex items-start gap-3 rounded-[var(--radius-md)] px-3 py-2 text-sm',
   reviewNote: 'text-xs text-[var(--color-ink-subtle)]',
-  // Tally on the left, bilan on the right, the box never grows
-  finishBody: 'grid h-full min-h-0 gap-8 md:grid-cols-2',
   tally: 'flex min-h-0 flex-col gap-1',
   tallyItem: 'flex min-h-0 shrink-0 flex-col',
   tallyItemOpen: 'flex-1 shrink',
   tallyHead:
     'flex w-full cursor-pointer items-center justify-between gap-3 rounded-[var(--radius-md)] px-3 py-2.5 text-left text-sm font-bold transition-colors hover:bg-[var(--color-surface-sunken)]',
-  // Blue bubble above the tally, tail down toward the three lines
-  tallyHint:
-    'hint-float relative mb-3 self-start rounded-[var(--radius-lg)] bg-linear-to-b from-[color-mix(in_srgb,white_14%,var(--color-info))] to-[var(--color-info)] px-4 py-2.5 text-sm font-semibold text-white shadow-[var(--shadow-sm)]',
-  tallyHintTail: 'absolute -bottom-1 left-8 size-3 rotate-45 rounded-[2px] bg-[var(--color-info)]',
   tallyList: 'flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto py-1',
-  bilan: 'flex min-h-0 flex-col gap-3',
-  bilanField: 'min-h-40 flex-1 resize-none',
   verdicts: 'grid shrink-0 grid-cols-3 gap-2',
   verdict:
     'flex cursor-pointer items-center justify-center rounded-[var(--radius-lg)] border border-[var(--color-border)] px-2 py-3 text-sm font-bold transition-[border-color,box-shadow] hover:border-[var(--color-border-strong)] disabled:cursor-not-allowed',
@@ -160,12 +170,26 @@ export const INTERVIEW = {
 
   partTitle: 'text-3xl font-bold tracking-tight',
   covered: 'text-sm text-[var(--color-ink-subtle)] italic',
-  notes: 'relative flex flex-col gap-2',
-  noteField:
-    'min-h-20 w-full resize-y rounded-[var(--radius-md)] bg-[var(--color-surface-sunken)] p-3 pr-9 text-sm outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)]',
-  noteClose:
-    'absolute top-2 right-2 inline-flex size-6 cursor-pointer items-center justify-center rounded-full text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)] disabled:hidden',
-  noteAdd:
-    'self-start cursor-pointer text-sm font-semibold text-[var(--color-ink-subtle)] underline-offset-4 hover:underline',
   empty: 'py-10 text-center text-sm text-[var(--color-ink-subtle)] italic',
+} as const
+
+/**
+ * Bilan tab of a candidate: tally, verdict and the commented questions
+ * @type {Record<string, string>}
+ */
+
+export const BILAN = {
+  stack: 'flex flex-col gap-8',
+  verdictBox: 'flex flex-col gap-5',
+  tally: 'max-w-xl',
+  groups: 'flex flex-col gap-6',
+  empty: 'flex flex-col items-center gap-2 py-6 text-sm italic text-[var(--color-ink-subtle)]',
+  groupTitle: 'text-lg font-bold tracking-tight',
+  grid: 'grid grid-cols-1 gap-3 md:grid-cols-2',
+  card: `flex min-w-0 flex-col gap-3 ${COURSE_PANEL} p-4`,
+  cardHead: 'flex items-start justify-between gap-3',
+  cardPrompt: 'min-w-0 flex-1 text-sm font-bold leading-snug',
+  cardMore: 'cursor-pointer text-xs font-semibold text-[var(--color-ink-subtle)] hover:underline',
+  comment: 'flex flex-col gap-0.5 border-t border-[var(--color-border)] pt-2 text-sm',
+  meta: 'text-xs text-[var(--color-ink-subtle)]',
 } as const

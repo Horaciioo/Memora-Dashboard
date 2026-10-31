@@ -39,14 +39,14 @@ export const ExerciseStage = ({
   const first = played[0]
   if (!first) return <h3 className={EXERCISE_STYLES.title}>{EXERCISES[exercise].label}</h3>
 
-  const shared = { answers, disabled, onAnswer }
+  const shared = { candidateId, answers, disabled, onAnswer }
 
   return (
     <div className={EXERCISE_STYLES.arrive}>
       {exercise === 'cases' ? (
         <CasesExercise cases={played} {...shared} />
       ) : exercise === 'written' ? (
-        <WrittenExercise question={first} candidateId={candidateId} onHold={onHold} {...shared} />
+        <WrittenExercise question={first} onHold={onHold} {...shared} />
       ) : (
         <RunExercise question={first} {...shared} />
       )}

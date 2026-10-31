@@ -23,17 +23,19 @@ export interface Questionnaire {
  * @param {RecruitmentPlatformName} platform - Platform of the session
  * @param {string} creator - Creator recruited for
  * @param {string[]} keys - Keys picked
+ * @param {boolean} [formal] - Read with « vous »
  * @return {Questionnaire} - Bank and pick
  */
 
 export const useQuestionnaire = (
   platform: RecruitmentPlatformName,
   creator: string,
-  keys: string[]
+  keys: string[],
+  formal = true
 ): Questionnaire =>
   useMemo(() => {
-    const bank = bankFor(platform, creator)
+    const bank = bankFor(platform, creator, formal)
     const wanted = new Set(keys)
 
     return { bank, picked: bank.filter((question) => wanted.has(question.key)) }
-  }, [platform, creator, keys])
+  }, [platform, creator, keys, formal])

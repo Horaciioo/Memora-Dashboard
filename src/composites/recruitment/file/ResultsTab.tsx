@@ -37,6 +37,7 @@ export const ResultsTab = () => {
     id: outcome.id,
     label: outcome.label,
     accent: outcome.accent,
+    count: file.candidates.filter((candidate) => candidate.outcomeId === outcome.id).length,
   }))
 
   return (
@@ -62,7 +63,7 @@ export const ResultsTab = () => {
           addLabel={RECRUITMENT_COPY.candidateAdd}
           canCreate={can.manage}
           onCreate={() => candidateForm(null)}
-          canMove={can.manage}
+          canMove={can.writeCandidates}
           tintByColumn
         />
       )}

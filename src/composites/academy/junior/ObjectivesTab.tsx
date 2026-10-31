@@ -1,6 +1,6 @@
 'use client'
 
-import { Dotted } from '@/components/elements/display/Dotted'
+import { Byline } from '@/components/elements/display/Byline'
 import { Button } from '@/components/elements/actions/Button'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -106,11 +106,10 @@ export const ObjectivesTab = () => {
                       </span>
                     )}
                     <span className="text-xs text-[var(--color-ink-subtle)]">
-                      <Dotted
-                        items={[
-                          objective.dueAt ? formatDay(objective.dueAt) : null,
-                          objective.authorName,
-                        ]}
+                      <Byline
+                        name={objective.authorName}
+                        avatar={objective.authorAvatar}
+                        items={[objective.dueAt ? formatDay(objective.dueAt) : null]}
                       />
                     </span>
                   </span>

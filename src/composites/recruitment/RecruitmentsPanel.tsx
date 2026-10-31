@@ -17,6 +17,7 @@ import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { RECRUITMENT_STATUS_REGISTRY } from '@/declarations/recruitment/registries'
 import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import { GROUP_STYLES } from '@/declarations/ui/variants'
+import { CloseRecruitmentDialog } from '@/composites/recruitment/CloseRecruitmentDialog'
 import type { MenuItem } from '@/managers/front-end'
 import type { FieldDefinition } from '@/types/forms'
 import type { RecruitmentSummary } from '@/types/recruitment'
@@ -67,11 +68,12 @@ export const RecruitmentsPanel = ({
   canManage,
 }: RecruitmentsPanelProps) => {
   const router = useRouter()
-  const { sessions, isSaving, issues, clearIssues, create, update, remove } =
+  const { sessions, isSaving, issues, clearIssues, create, update, remove, replace } =
     useRecruitments(initialSessions)
   const [isCreating, setCreating] = useState(false)
   const [showFinished, setShowFinished] = useState(false)
   const [editing, setEditing] = useState<RecruitmentSummary | null>(null)
+  const [closingId, setClosingId] = useState<string | null>(null)
   const [pendingDeletion, setPendingDeletion] = useState<RecruitmentSummary | null>(null)
 
   const openCreate = () => {
@@ -172,8 +174,26 @@ export const RecruitmentsPanel = ({
         initialValues={editing?.values}
         issues={issues}
         isSaving={isSaving}
-        onSubmit={(values) => update(editing!.id, values)}
+        onSubmit={async (values) => {
+          // Closing asks first, the rest saves as it is
+          const isClosing =
+            values.status === RecruitmentStatuses.Closed &&
+            editing!.status !== RecruitmentStatuses.Closed
+          const saved = await update(
+            editing!.id,
+            isClosing ? { ...values, status: editing!.status } : values
+          )
+          if (saved && isClosing) setClosingId(editing!.id)
+
+          return saved
+        }}
         onClose={() => setEditing(null)}
+      />
+
+      <CloseRecruitmentDialog
+        sessionId={closingId}
+        onClose={() => setClosingId(null)}
+        onClosed={replace}
       />
 
       <ConfirmDialog

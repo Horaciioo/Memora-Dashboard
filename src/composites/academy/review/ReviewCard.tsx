@@ -1,5 +1,6 @@
 'use client'
 
+import { Byline } from '@/components/elements/display/Byline'
 import { Dotted } from '@/components/elements/display/Dotted'
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
@@ -120,7 +121,11 @@ export const ReviewCard = ({ review }: ReviewCardProps) => {
       <header className={REVIEW_CARD.head}>
         <h3 className={REVIEW_CARD.title}>{ACADEMY_STAGE_REGISTRY.label(review.stage)}</h3>
         <span className={REVIEW_CARD.meta}>
-          <Dotted items={[review.authorName, formatDay(review.heldAt)]} />
+          <Byline
+            name={review.authorName}
+            avatar={review.authorAvatar}
+            date={formatDay(review.heldAt)}
+          />
         </span>
         <span className={REVIEW_CARD.tags}>
           <Status label={status.label} accent={status.accent} />

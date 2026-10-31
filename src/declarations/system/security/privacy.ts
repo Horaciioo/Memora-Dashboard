@@ -27,7 +27,7 @@ export const AGE_POLICY = {
  * @return {string} - Display sentence
  */
 
-const inDays = (days: number): string => {
+export const inDays = (days: number): string => {
   if (days % 365 === 0) return `${days / 365} an${days > 365 ? 's' : ''}`
   if (days % 30 === 0) return `${days / 30} mois`
 
@@ -45,6 +45,7 @@ export const RETENTION_POLICIES = {
   activityLogs: RETENTION_SETTINGS.activityLogDays,
   moderationLogs: RETENTION_SETTINGS.moderationLogDays,
   rejectedCandidates: RETENTION_SETTINGS.rejectedCandidateDays,
+  bannedCandidates: RETENTION_SETTINGS.bannedCandidateDays,
 }
 
 /**
@@ -123,6 +124,12 @@ const PROCESSING_MAP = {
     categories: 'Identifiant Discord, commentaires d’entretien, décision',
     legalBasis: 'Intérêt légitime à recruter',
     retention: inDays(RETENTION_POLICIES.rejectedCandidates),
+  },
+  blacklist: {
+    label: 'Écarter un candidat ayant enfreint la confidentialité du recrutement',
+    categories: 'Identifiant Discord, pseudonyme, motif',
+    legalBasis: 'Intérêt légitime à protéger la confidentialité du recrutement',
+    retention: inDays(RETENTION_POLICIES.bannedCandidates),
   },
   platforms: {
     label: 'Modérer les lives avec ton propre compte de plateforme',

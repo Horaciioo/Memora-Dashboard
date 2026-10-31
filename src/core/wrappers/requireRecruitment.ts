@@ -2,11 +2,10 @@ import 'server-only'
 
 import { forbidden } from 'next/navigation'
 
-import { isObserver } from '@/core/services/recruitment/ObserverReader'
+import { recruitmentModeOf } from '@/core/services/recruitment/access'
 import { requireUser } from '@/core/wrappers/requireUser'
 import type { GuardedSession } from '@/core/wrappers/requireUser'
 import type { AccessScope } from '@/core/services/auth/ScopeService'
-import { Permissions } from '@/utils/constants/permissions'
 
 // Perimeter of an observer, the session id narrows it
 export const OBSERVER_SCOPE: AccessScope = {
@@ -35,14 +34,11 @@ export interface RecruitmentGuard extends GuardedSession {
 
 export const requireRecruitment = async (sessionId: string): Promise<RecruitmentGuard> => {
   const guarded = await requireUser()
-  const canRead = guarded.access.can(Permissions.RecruitmentRead)
-  // The Observateurs function opens every session, a named seat opens one
-  const observing =
-    !canRead &&
-    (guarded.access.can(Permissions.RecruitmentObserve) ||
-      (await isObserver(sessionId, guarded.session.id)))
+  const mode = await recruitmentModeOf(guarded.access, guarded.session.id, sessionId)
 
-  if (!canRead && !observing) forbidden()
+  if (!mode) forbidden()
+
+  const observing = mode === 'observe'
 
   return { ...guarded, perimeter: observing ? OBSERVER_SCOPE : await guarded.scope(), observing }
 }

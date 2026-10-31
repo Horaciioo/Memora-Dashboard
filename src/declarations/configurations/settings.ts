@@ -1159,7 +1159,7 @@ export const readRateLimitWindow = (name: string, fallback: RateLimitWindow): Ra
 
 /**
  * How long each family of personal data is kept
- * @type {{ expiredSessionDays: number, readNotificationDays: number, activityLogDays: number, moderationLogDays: number, rejectedCandidateDays: number, orphanFileHours: number, consentVersion: number }}
+ * @type {{ expiredSessionDays: number, readNotificationDays: number, activityLogDays: number, moderationLogDays: number, rejectedCandidateDays: number, bannedCandidateDays: number, orphanFileHours: number, consentVersion: number }}
  */
 
 export const RETENTION_SETTINGS = {
@@ -1186,6 +1186,11 @@ export const RETENTION_SETTINGS = {
   rejectedCandidateDays: readInteger(retention.rejectedCandidateDays, {
     path: 'system/conservation.rejectedCandidateDays',
     fallback: 180,
+    min: 1,
+  }),
+  bannedCandidateDays: readInteger(retention.bannedCandidateDays, {
+    path: 'system/conservation.bannedCandidateDays',
+    fallback: 730,
     min: 1,
   }),
   orphanFileHours: readInteger(retention.orphanFileHours, {

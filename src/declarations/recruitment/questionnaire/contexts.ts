@@ -11,7 +11,7 @@ export const WRITTEN_CONTEXTS: readonly WrittenContext[] = [
     level: 'moderate',
     title: 'Deux membres se disputent',
     brief:
-      'deux membres se disputent dans l’espace de discussion, tu les prends dans {privateTalk} pour leur demander de cesser leur comportement nocif.',
+      'deux membres se disputent dans l’espace de discussion, [tu les prends|vous les prenez] dans {privateTalk} pour leur demander de cesser leur comportement nocif.',
     lines: [
       { author: 'Lyna', text: 'tu as rien compris au jeu, arrête de parler' },
       { author: 'Marco', text: 'au moins moi je sais lire, toi tu inventes des trucs' },
@@ -95,7 +95,7 @@ export const WRITTEN_CONTEXTS: readonly WrittenContext[] = [
     level: 'complex',
     title: 'Un modérateur est accusé d’abus',
     brief:
-      'un membre accuse publiquement un modérateur d’abus de pouvoir et incite à la révolte. Ton responsable ne peut pas gérer tout de suite et te demande d’établir le premier échange.',
+      'un membre accuse publiquement un modérateur d’abus de pouvoir et incite à la révolte. [Ton|Votre] responsable ne peut pas gérer tout de suite et [te|vous] demande d’établir le premier échange.',
     lines: [
       { author: 'Rayan', text: 'encore un ban injustifié, merci les modos' },
       { author: 'Rayan', text: 'ça fait 3 fois ce mois-ci, ils s’amusent avec le pouvoir' },

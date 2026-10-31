@@ -1,16 +1,20 @@
 'use client'
 
 import { Avatar } from '@/components/elements/display/Avatar'
+import { FileTabs } from '@/components/structures/page/FileTabs'
 import { Section } from '@/components/structures/page/Section'
+import { CreatorDesignPanel } from '@/composites/reference/CreatorDesignPanel'
 import { CreatorChannelsPanel } from '@/composites/reference/CreatorChannelsPanel'
 import { CreatorLeadsPanel } from '@/composites/reference/CreatorLeadsPanel'
 import { CreatorTeamsPanel } from '@/composites/reference/CreatorTeamsPanel'
 import { CHANNEL_COPY } from '@/declarations/platforms/copy'
+import { DESIGN_COPY } from '@/declarations/reference/design'
 import { REFERENCE_FIELD_COPY } from '@/declarations/reference/copy'
 import { TEAM_COPY } from '@/declarations/teams/copy'
 import { CREATOR_FILE, MEMBER_FILE } from '@/declarations/ui/blocks'
 import { LIVE_STAGE } from '@/declarations/ui/variants'
 import type { LeadAnchor } from '@/types/access'
+import type { CreatorDesign } from '@/types/design'
 import type { CreatorChannelView } from '@/types/platforms'
 import type { CreatorTeamData } from '@/types/teams'
 
@@ -22,6 +26,7 @@ export interface CreatorFileProps {
   channels: CreatorChannelView[]
   anchors: LeadAnchor[]
   teams: CreatorTeamData
+  design: CreatorDesign
   canManageTeams: boolean
   canManageCreator: boolean
 }
@@ -40,6 +45,7 @@ export const CreatorFile = ({
   channels,
   anchors,
   teams,
+  design,
   canManageTeams,
   canManageCreator,
 }: CreatorFileProps) => (
@@ -79,9 +85,39 @@ export const CreatorFile = ({
       </aside>
     </div>
     <div className={MEMBER_FILE.main}>
-      <Section title={TEAM_COPY.title} description={TEAM_COPY.lead} padded>
-        <CreatorTeamsPanel youtuberId={youtuberId} initial={teams} canManage={canManageTeams} />
-      </Section>
+      <FileTabs
+        label={name}
+        tabs={[
+          {
+            value: 'teams',
+            label: TEAM_COPY.title,
+            icon: 'teams',
+            render: () => (
+              <Section title={TEAM_COPY.title} description={TEAM_COPY.lead} padded>
+                <CreatorTeamsPanel
+                  youtuberId={youtuberId}
+                  initial={teams}
+                  canManage={canManageTeams}
+                />
+              </Section>
+            ),
+          },
+          {
+            value: 'design',
+            label: DESIGN_COPY.tab,
+            icon: 'spark',
+            render: () => (
+              <Section padded>
+                <CreatorDesignPanel
+                  youtuberId={youtuberId}
+                  initial={design}
+                  canManage={canManageCreator}
+                />
+              </Section>
+            ),
+          },
+        ]}
+      />
     </div>
   </div>
 )

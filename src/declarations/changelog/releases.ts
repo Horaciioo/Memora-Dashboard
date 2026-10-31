@@ -127,6 +127,141 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.8.2',
+    date: '2026-10-31',
+    title: 'Correctifs & Amélioration - Recrutement',
+    intro:
+      'Le recrutement change de visage : une fiche candidat en onglets, un entretien plus fluide, un historique et une page « Moi » pour suivre ton activité.',
+    description:
+      'Mener un entretien, écrire un bilan ou retrouver un ancien candidat demandait trop de clics et laissait peu de traces. Cette version range la fiche candidat par onglets, laisse commenter chaque question pendant l’entretien, garde l’historique de tous les candidats et permet d’écarter un identifiant en cas d’abus de confidentialité. Les logos et bannières des créateurs ont aussi leurs emplacements dédiés.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentManage,
+        text: 'Ajout d’un onglet « Historique » dans « Recrutements » : les candidats de toutes les sessions s’y retrouvent par leur identifiant Discord ou leur nom.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de blacklister un identifiant Discord, avec un motif visible des Responsables : il ne peut plus être ajouté à une nouvelle session, et la blacklist se lève à tout moment.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de clôturer une session de recrutement depuis sa page, après confirmation, ce qui lance la procédure académique des candidats acceptés.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Ajout d’un onglet « Moi » dans une session : les entretiens du jour et du lendemain, « Mes entretiens », « Mes observations », ainsi que « Mes chiffres » (entretiens, observations, présence, décisions et duo préféré).',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Ajout de la possibilité de commenter chaque question pendant un entretien, d’épingler un commentaire et de choisir entre vouvoiement et tutoiement pour lire les questions.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Ajout de la possibilité de plusieurs recruteurs sur un même candidat, et de rendre un avis « favorable », « mitigé » ou « défavorable » en fin d’entretien.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.tasks,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Ajout d’une tâche « Tu dois remplir le bilan candidat de… » dès qu’un entretien est terminé.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        permission: Permissions.RecruitmentRead,
+        text: 'Ajout des candidats acceptés dans « Modérateurs », avec un lien vers leur fiche de recrutement.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.members,
+        text: 'Ajout d’un bloc « Participation » sur la fiche d’un modérateur : les entretiens menés et observés pendant les sessions de recrutement.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.teams,
+        permission: Permissions.ReferenceManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de définir le logo, la bannière principale et la bannière estompée de chaque créateur depuis sa fiche.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration de la fiche candidat de « Recrutements » : elle se range en onglets « Aperçu », « Bilan », « Exercices » et « Timeline », avec un retour vers la liste des candidats.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration de la liste des candidats de « Recrutements » : filtres par statut et par recruteur, et tri par ordre alphabétique, par entretien ou par identifiant Discord.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration du planning des entretiens de « Recrutements » : il s’affiche sur la période choisie, et non plus sur la semaine seule.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration du questionnaire d’entretien de « Recrutements » : questions reformulées, sous-questions repliables et durée réelle de l’entretien affichée.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration de « Recrutements » : les « Issues » deviennent des « Statuts », et la fiche d’une session se met à jour en direct pour tous ceux qui l’ouvrent.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.sanctions,
+        permission: Permissions.SanctionRead,
+        text: 'Amélioration de la page « Panel de sanctions » : elle devient « Panel Twitch » et suit le créateur choisi dans la navigation.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        text: 'Amélioration de « Modérateurs » : le statut « Academy » devient « En formation », et la recherche ignore désormais les accents.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.home,
+        text: 'Amélioration de l’accueil : le bloc des anniversaires couvre le mois entier.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des images envoyées sur Memora : elles sont compressées pour s’afficher plus vite.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.sanctions,
+        permission: Permissions.SanctionRead,
+        text: 'Correction d’un bug qui laissait la page « Panel Twitch » sur un autre créateur que celui choisi.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.lives,
+        permission: Permissions.LiveModerate,
+        text: 'Correction d’un bug qui proposait des suggestions vides dans la « Mod View ».',
+      },
+    ],
+  },
+  {
     version: '0.8.1',
     date: '2026-10-27',
     title: 'Les suggestions visent plus juste !',

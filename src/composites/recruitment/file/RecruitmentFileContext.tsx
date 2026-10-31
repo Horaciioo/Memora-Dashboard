@@ -12,9 +12,11 @@ import {
   useRecruitmentFile,
   type RecruitmentFile,
 } from '@/core/hooks/data/recruitment/useRecruitmentFile'
+import type { BanTarget } from '@/composites/recruitment/history/BanDrawer'
 import { canMoveStep } from '@/core/lib/recruitment/stepState'
 import { ROUTES } from '@/declarations/navigation'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
+import { HISTORY_COPY } from '@/declarations/recruitment/historyCopy'
 import { QUESTIONNAIRE_COPY } from '@/declarations/recruitment/questionnaireCopy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import type { MenuItem } from '@/managers/front-end'
@@ -50,6 +52,8 @@ export interface RecruitmentFileState {
   editingStep: RecruitmentStepView | null
   pendingCandidate: CandidateView | null
   pendingStep: RecruitmentStepView | null
+  banning: BanTarget | null
+  setBanning: (target: BanTarget | null) => void
   advancingStep: RecruitmentStepView | null
   setAdvancingStep: (step: RecruitmentStepView | null) => void
   setPendingCandidate: (candidate: CandidateView | null) => void
@@ -109,6 +113,7 @@ export const RecruitmentFileProvider = ({
   const [editingStep, setEditingStep] = useState<RecruitmentStepView | null>(null)
   const [pendingCandidate, setPendingCandidate] = useState<CandidateView | null>(null)
   const [pendingStep, setPendingStep] = useState<RecruitmentStepView | null>(null)
+  const [banning, setBanning] = useState<BanTarget | null>(null)
   const [advancingStep, setAdvancingStep] = useState<RecruitmentStepView | null>(null)
 
   const openCandidate = (id: string) => router.push(ROUTES.candidate(detail.summary.id, id))
@@ -165,12 +170,30 @@ export const RecruitmentFileProvider = ({
       disabled: candidate.memberId === null,
       onSelect: () => router.push(ROUTES.member(candidate.memberId!)),
     },
+    // Responsables and above only
+    ...(can.manage
+      ? [
+          {
+            id: 'ban',
+            label: detail.bannedIds.includes(candidate.discordId)
+              ? HISTORY_COPY.unban
+              : HISTORY_COPY.ban,
+            icon: 'remove' as const,
+            separatorBefore: true,
+            onSelect: () =>
+              setBanning({
+                discordId: candidate.discordId,
+                sessionId: detail.summary.id,
+                candidateId: candidate.id,
+              }),
+          },
+        ]
+      : []),
     {
       id: 'delete',
       label: ACTION_COPY.delete,
       icon: 'remove',
       danger: true,
-      separatorBefore: true,
       disabled: !can.manage,
       onSelect: () => setPendingCandidate(candidate),
     },
@@ -214,6 +237,8 @@ export const RecruitmentFileProvider = ({
     editingStep,
     pendingCandidate,
     pendingStep,
+    banning,
+    setBanning,
     advancingStep,
     setAdvancingStep,
     setPendingCandidate,

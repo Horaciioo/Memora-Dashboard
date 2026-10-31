@@ -6,7 +6,7 @@ import { useCourseContext } from '@/composites/academy/course/player/CourseConte
 import { COURSE_COPY } from '@/declarations/academy/copy'
 import type { ReadBlock } from '@/declarations/academy/curriculum/types'
 import { ACADEMY_SETTINGS } from '@/declarations/configurations/settings'
-import { ICONS, isIconName } from '@/declarations/ui/icons'
+import { ICONS } from '@/declarations/ui/icons'
 import { COURSE_LIVECON } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -58,7 +58,6 @@ export const LiveconBlock = ({ block }: LiveconBlockProps) => {
     <div className={COURSE_LIVECON.root}>
       <div className={COURSE_LIVECON.levels}>
         {stops.map(({ stop, level }, index) => {
-          const Icon = ICONS[level?.icon && isIconName(level.icon) ? level.icon : 'livecon']
           const tone = SHADES[Math.min(index, SHADES.length - 1)]!
 
           return (
@@ -75,7 +74,6 @@ export const LiveconBlock = ({ block }: LiveconBlockProps) => {
                 setActive(index)
               }}
             >
-              <Icon className={COURSE_LIVECON.levelIcon} aria-hidden="true" />
               <span className={COURSE_LIVECON.levelBody}>
                 <span className={COURSE_LIVECON.levelName}>
                   {level?.name ?? COURSE_COPY.liveconLevel(stop.level)}

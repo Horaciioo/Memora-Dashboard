@@ -39,6 +39,8 @@ export interface TimelineProps {
   compact?: boolean
   // Moments spread over the height given
   fill?: boolean
+  // A cleared moment is struck and greyed
+  struckDone?: boolean
 }
 
 // Glyph carried by each state
@@ -89,10 +91,11 @@ const Pick = ({
  * @param {string} label - Accessible name
  * @param {boolean} [compact] - Corner size
  * @param {boolean} [fill] - Spread over the height
+ * @param {boolean} [struckDone] - Cleared moments struck and greyed
  * @return {JSX.Element}
  */
 
-export const Timeline = ({ items, label, compact, fill }: TimelineProps) => (
+export const Timeline = ({ items, label, compact, fill, struckDone }: TimelineProps) => (
   <ol
     aria-label={label}
     className={cn(compact && STAGE_COMPACT.root, fill && 'flex flex-1 flex-col')}
@@ -143,6 +146,9 @@ export const Timeline = ({ items, label, compact, fill }: TimelineProps) => (
                 item={item}
                 className={cn(
                   STAGE_LIST.stageTitle,
+                  struckDone &&
+                    item.state === 'done' &&
+                    'text-[var(--color-ink-subtle)] line-through',
                   item.onSelect && 'cursor-pointer text-left hover:underline',
                   compact && STAGE_COMPACT.stageTitle,
                   compact && item.state === 'done' && STAGE_COMPACT.stageTitleDone,

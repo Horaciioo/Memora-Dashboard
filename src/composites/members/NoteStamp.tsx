@@ -1,5 +1,5 @@
+import { Byline } from '@/components/elements/display/Byline'
 import { Status } from '@/components/elements/display/Status'
-import { Dotted } from '@/components/elements/display/Dotted'
 import { MEMBER_COPY } from '@/declarations/members/copy'
 import type { MemberNote } from '@/types/members'
 import { formatDayTime } from '@/utils/format/dates'
@@ -16,7 +16,11 @@ export interface NoteStampProps {
 
 export const NoteStamp = ({ note }: NoteStampProps) => (
   <>
-    <Dotted items={[note.authorName, formatDayTime(note.createdAt)]} />
+    <Byline
+      name={note.authorName}
+      avatar={note.authorAvatar}
+      date={formatDayTime(note.createdAt)}
+    />
     {note.system && (
       <span title={MEMBER_COPY.noteSystemHint} className="ml-2 inline-flex cursor-help">
         <Status label={MEMBER_COPY.noteSystem} tone="danger" />

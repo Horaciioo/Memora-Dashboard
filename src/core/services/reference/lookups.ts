@@ -3,7 +3,7 @@ import 'server-only'
 import { cache } from 'react'
 
 import { prisma } from '@/core/lib/db'
-import { ENCADREMENT_ROLES } from '@/declarations/access/roles'
+import { ADMINISTRATION_ROLES } from '@/declarations/access/roles'
 import { GONE_MEMBER_STATUSES } from '@/utils/constants/hierarchy'
 import type { Account, Division, JobFunction, Priority, Youtuber } from '@prisma/client'
 
@@ -32,7 +32,7 @@ export const activeYoutubers = cache(async (): Promise<Youtuber[]> =>
 
 export const encadrementAccounts = cache(async (): Promise<Account[]> =>
   prisma.account.findMany({
-    where: { role: { in: ENCADREMENT_ROLES }, status: { notIn: GONE_MEMBER_STATUSES } },
+    where: { role: { in: ADMINISTRATION_ROLES }, status: { notIn: GONE_MEMBER_STATUSES } },
     orderBy: { displayName: 'asc' },
   })
 )

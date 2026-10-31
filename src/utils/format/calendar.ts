@@ -154,6 +154,24 @@ export const agendaGrid = (anchor: string): CalendarDay[] => {
 }
 
 /**
+ * Build the days between two days
+ * @param {string} from - First ISO day
+ * @param {number} length - Days drawn
+ * @return {CalendarDay[]} - Days in display order
+ */
+
+export const rangeGrid = (from: string, length: number): CalendarDay[] => {
+  const start = parseDay(from)
+  const today = new Date()
+
+  return Array.from({ length }, (_, index) => {
+    const day = addDays(start, index)
+
+    return { ...toCalendarDay(day, day.getMonth(), today), isCurrentMonth: true }
+  })
+}
+
+/**
  * Build the grid of one span
  * @param {string} anchor - ISO day on screen
  * @param {CalendarUnit} unit - Span being browsed

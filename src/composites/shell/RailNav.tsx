@@ -94,7 +94,7 @@ export const RailNav = ({ groups, isCompact, isTouring, live, mentions }: RailNa
                 {group.items.map((item) => {
                   // A creator is on air: the glyph turns into the live dot
                   const isOnAir = Boolean(item.onLive) && live?.status === LiveStatuses.Live
-                  const Icon = isOnAir ? ICONS.liveDot : railIcon(item.icon)
+                  const Icon = railIcon(isOnAir ? 'liveDot' : item.icon)
                   // A destination hands the light to its open sub page
                   const isActive = isFavorite
                     ? !current && reaches(item.href)

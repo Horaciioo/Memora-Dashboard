@@ -11,7 +11,7 @@ export const candidateRecordValues = (candidate: CandidateView): FormValues => (
   discordId: candidate.discordId,
   displayName: candidate.displayName,
   formId: candidate.formId,
-  recruiterId: candidate.recruiter?.id ?? null,
+  recruiterIds: candidate.recruiters.map((seat) => seat.id),
   interviewAt: candidate.interviewAt,
   observerIds: candidate.observers.map((seat) => seat.id),
   outcomeId: candidate.outcomeId,

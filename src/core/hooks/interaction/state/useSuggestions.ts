@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 
 import type { PanelMemory } from '@/core/lib/modview/commands'
-import { suggestFor } from '@/core/lib/modview/suggest'
+import { isActionable, suggestFor } from '@/core/lib/modview/suggest'
 import type { SuggestionSource } from '@/core/lib/modview/suggest'
 import { CHAT_FLAG_CATEGORY } from '@/declarations/modview/suggestions'
 import type { ModActKind, ModViewState } from '@/types/modview'
@@ -89,11 +89,15 @@ export const useSuggestions = (
       return keys.some((key) => (settledAt.get(key) ?? 0) >= sentAt)
     }
 
-    return [...held, ...flagged]
-      .filter((source) => !dismissed.has(source.id) && !isSettled(source))
-      .sort((left, right) => right.at.localeCompare(left.at))
-      .slice(0, MAX_SUGGESTIONS)
-      .map((source) => suggestFor(source, panel, memory, state.acts))
+    return (
+      [...held, ...flagged]
+        .filter((source) => !dismissed.has(source.id) && !isSettled(source))
+        .sort((left, right) => right.at.localeCompare(left.at))
+        .slice(0, MAX_SUGGESTIONS)
+        .map((source) => suggestFor(source, panel, memory, state.acts))
+        // Nothing to do, nothing proposed
+        .filter(isActionable)
+    )
   }, [state, panel, memory, dismissed, acted])
 
   const dismiss = (id: string) => setDismissed((current) => new Set([...current, id]))

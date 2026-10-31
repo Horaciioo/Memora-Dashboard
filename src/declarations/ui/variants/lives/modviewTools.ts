@@ -4,11 +4,13 @@
  */
 
 export const MODVIEW_TABS = {
-  list: 'flex min-w-0 flex-1 items-center gap-0.5',
-  tab: 'flex min-w-0 items-center gap-1.5 rounded-[var(--radius-md)] px-2 py-1 text-xs font-bold tracking-tight text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  list: 'relative flex min-w-0 flex-1 items-center gap-0.5',
+  // Box gliding under the open tab
+  box: 'pointer-events-none absolute top-0 left-0 rounded-[var(--radius-md)] bg-[var(--color-hover)] opacity-0',
+  tab: 'relative flex min-w-0 items-center gap-1.5 rounded-[var(--radius-md)] px-2 py-1 text-xs font-bold tracking-tight text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)]',
   // Keeps its words whole when the window narrows
   tabFixed: 'shrink-0',
-  tabOn: 'bg-[var(--color-hover)] text-[var(--color-ink)]',
+  tabOn: 'text-[var(--color-ink)]',
   tabLabel: 'truncate',
   badge:
     'min-w-5 shrink-0 rounded-full bg-[var(--color-danger)] px-1.5 text-center text-micro font-bold text-[var(--color-on-solid)] tabular-nums',

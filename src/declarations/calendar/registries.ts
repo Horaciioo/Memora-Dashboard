@@ -203,7 +203,8 @@ const CALENDAR_LAYER_MAP: Record<CalendarLayerName, CalendarLayerOption> = {
     label: 'Recrutements',
     icon: 'recruitment',
     sources: [CalendarSources.Recruitment, CalendarSources.RecruitmentInterview],
-    permission: Permissions.RecruitmentRead,
+    // Open to all, observers read their own interviews there
+    permission: null,
     mobileTone: 'success',
   },
 }

@@ -8,6 +8,7 @@ import { FlaggedText } from '@/composites/modview/FlaggedText'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
 import { WatchPanel } from '@/composites/modview/WatchPanel'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
+import { useGlideBox } from '@/core/hooks/interaction/layout/useGlideBox'
 import { useModPreferences } from '@/core/hooks/interaction/state/useModPreferences'
 import type { Watchlist } from '@/core/hooks/interaction/state/useWatchlist'
 import { MODVIEW_COPY } from '@/declarations/modview/copy'
@@ -94,6 +95,8 @@ export const AutoModWindow = ({
     ...resolved.map((act) => ({ key: act.id, at: act.at, held: null, act })),
   ].sort((left, right) => Date.parse(right.at) - Date.parse(left.at))
 
+  const { listRef, boxRef } = useGlideBox<HTMLSpanElement>(`${tab}:${tabs.length}`)
+
   const keepToggle = tab === 'queue' && (
     <button
       type="button"
@@ -115,7 +118,13 @@ export const AutoModWindow = ({
         tabs.length === 1 ? (
           tabs[0]!.label
         ) : (
-          <span className={MODVIEW_TABS.list} role="tablist" aria-label={MODVIEW_WATCH_COPY.tabs}>
+          <span
+            ref={listRef}
+            className={MODVIEW_TABS.list}
+            role="tablist"
+            aria-label={MODVIEW_WATCH_COPY.tabs}
+          >
+            <span ref={boxRef} className={MODVIEW_TABS.box} aria-hidden="true" />
             {tabs.map((entry) => (
               <button
                 key={entry.key}

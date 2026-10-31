@@ -1,5 +1,6 @@
 import Link from '@/components/elements/navigation/AppLink'
 import { ICONS } from '@/declarations/ui/icons'
+import { RAIL_ICONS } from '@/declarations/ui/railIcons'
 import type { IconName } from '@/declarations/ui/icons'
 import { HOME_STYLES } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -11,7 +12,7 @@ export interface ConsoleRowProps {
 }
 
 /**
- * Row opening one console destination: its glyph, its name, nothing else
+ * Row opening one console destination: its icon, its name, nothing else
  * @param {string} href - Destination
  * @param {IconName} icon - Icon key
  * @param {string} label - Row title
@@ -19,7 +20,7 @@ export interface ConsoleRowProps {
  */
 
 export const ConsoleRow = ({ href, icon, label }: ConsoleRowProps) => {
-  const Icon = ICONS[icon]
+  const Icon = RAIL_ICONS[icon] ?? ICONS[icon]
   const Chevron = ICONS.next
 
   return (

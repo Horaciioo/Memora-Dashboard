@@ -8,11 +8,11 @@ import { SECTION_STYLES } from '@/declarations/ui/variants/surfaces'
 
 export const LIVECON_TITLE = {
   row: 'flex flex-wrap items-center justify-between gap-x-6 gap-y-4',
+  heading: 'flex min-w-0 items-center gap-4',
   base: 'group flex min-w-0 items-center gap-4 rounded-[var(--radius-lg)] text-left',
   // Only a member allowed to change it feels it as a control
   interactive:
     'cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-focus)]',
-  icon: 'h-14 w-14 shrink-0 transition-transform duration-[var(--motion-duration-moderate)] group-hover:-rotate-6 group-hover:scale-110',
   name: 'text-4xl font-bold tracking-tight sm:text-5xl',
   search: 'w-full sm:w-72',
 } as const

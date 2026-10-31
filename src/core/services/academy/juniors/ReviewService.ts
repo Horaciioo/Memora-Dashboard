@@ -35,7 +35,7 @@ const toReview = (row: {
   status: ReviewStatusName
   decidedAt: Date | null
   decisionNote: string | null
-  author: { displayName: string } | null
+  author: { displayName: string; avatarUrl: string | null } | null
   decidedBy: { displayName: string } | null
 }): AcademyReviewView => ({
   id: row.id,
@@ -43,6 +43,7 @@ const toReview = (row: {
   heldAt: row.heldAt.toISOString(),
   durationMinutes: row.durationMinutes,
   authorName: row.author?.displayName ?? null,
+  authorAvatar: row.author?.avatarUrl ?? null,
   feeling: row.feeling,
   summary: row.summary,
   advice: row.advice,

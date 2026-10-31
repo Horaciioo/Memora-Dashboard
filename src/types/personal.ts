@@ -50,6 +50,7 @@ export type HomeTaskKind =
   | 'pimReview'
   | 'pimDecision'
   | 'secondPeriod'
+  | 'candidateReview'
   | 'departure'
   | 'mention'
   | 'liveReport'

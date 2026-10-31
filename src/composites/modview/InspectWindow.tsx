@@ -8,6 +8,7 @@ import { InspectCard } from '@/composites/modview/InspectCard'
 import { ModWindow, WindowEmpty } from '@/composites/modview/ModWindow'
 import { SanctionHistory } from '@/composites/modview/SanctionHistory'
 import type { SanctionHistoryProps } from '@/composites/modview/SanctionHistory'
+import { useGlideBox } from '@/core/hooks/interaction/layout/useGlideBox'
 import { useLiveRoster } from '@/core/hooks/data/lives/useLiveRoster'
 import { MODVIEW_HISTORY_COPY, MODVIEW_INSPECT_COPY } from '@/declarations/modview/copy'
 import { MODVIEW_WINDOWS } from '@/declarations/modview/registries'
@@ -46,6 +47,7 @@ export const InspectWindow = ({
   const online = new Set(roster?.connectedIds ?? [])
   const people = members.filter((member) => member.id !== viewerId && online.has(member.id))
   const NextIcon = ICONS.next
+  const { listRef, boxRef } = useGlideBox<HTMLSpanElement>(tab)
 
   const tabs: { key: InspectTab; label: string }[] = [
     { key: 'team', label: MODVIEW_INSPECT_COPY.tabTeam },
@@ -56,10 +58,12 @@ export const InspectWindow = ({
     <ModWindow
       title={
         <span
+          ref={listRef}
           className={MODVIEW_TABS.list}
           role="tablist"
           aria-label={MODVIEW_WINDOWS.label('inspect')}
         >
+          <span ref={boxRef} className={MODVIEW_TABS.box} aria-hidden="true" />
           {tabs.map((entry) => (
             <button
               key={entry.key}

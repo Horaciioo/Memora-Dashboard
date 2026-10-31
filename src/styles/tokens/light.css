@@ -69,6 +69,10 @@
   --color-info: #2f6496;
   --color-neutral: #636368;
   --color-success-soft: #e8f3ec;
+  /* Fills drawn as graphics, brighter than the tones that carry text */
+  --color-ring-success: #4cae7a;
+  --color-ring-caution: var(--color-gold-400);
+  --color-ring-danger: var(--color-live-400);
   /* Angelic gold, same in both modes, ink stays black */
   --color-gold-100: #fff3c4;
   --color-gold-300: #fbd45a;

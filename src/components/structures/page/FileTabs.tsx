@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 
+import { useTabSlide } from '@/core/hooks/interaction/layout/useTabSlide'
 import { Tabs, type TabItem } from '@/components/elements/navigation/Tabs'
 
 /**
@@ -50,14 +51,16 @@ export const FileTabs = ({ label, tabs, initial, value, onChange, centered }: Fi
 
   // A tab losing its permission mid-session falls back rather than showing nothing
   const current = visible.find((entry) => entry.value === tab) ?? visible[0]
+  const slide = useTabSlide(current ? visible.indexOf(current) : 0)
 
   return (
     <>
       <Tabs
-        items={visible.map(({ value, label: tabLabel, icon }) => ({
+        items={visible.map(({ value, label: tabLabel, icon, danger }) => ({
           value,
           label: tabLabel,
           icon,
+          danger,
         }))}
         value={current?.value ?? ''}
         onChange={setTab}
@@ -65,7 +68,9 @@ export const FileTabs = ({ label, tabs, initial, value, onChange, centered }: Fi
         centered={centered}
         inBanner
       />
-      {current?.render()}
+      <div key={current?.value} className={slide}>
+        {current?.render()}
+      </div>
     </>
   )
 }

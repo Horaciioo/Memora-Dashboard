@@ -1,5 +1,6 @@
 'use client'
 
+import { Byline } from '@/components/elements/display/Byline'
 import { useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
@@ -9,6 +10,7 @@ import { WarnDialog } from '@/composites/modview/WarnDialog'
 import { ViewerDossier } from '@/composites/modview/ViewerDossier'
 import type { ViewerDossierProps } from '@/composites/modview/ViewerDossier'
 import type { ActRunner, GateCheck } from '@/composites/modview/types'
+import { useGlideBox } from '@/core/hooks/interaction/layout/useGlideBox'
 import { useViewerComments } from '@/core/hooks/data/lives/useViewerComments'
 import { useViewerDossier } from '@/core/hooks/data/lives/useViewerDossier'
 import { parseDuration } from '@/core/lib/modview/commands'
@@ -98,6 +100,8 @@ export const ViewerCard = ({
     { key: 'sanctions', label: MODVIEW_USER_COPY.tabSanctions },
   ]
 
+  const { listRef, boxRef } = useGlideBox<HTMLDivElement>(`${tab}:${tabs.length}`)
+
   const send = async () => {
     const text = draft.trim()
     if (!text) return
@@ -141,7 +145,8 @@ export const ViewerCard = ({
         />
       </header>
 
-      <div className={MODVIEW_USER.tabs} role="tablist">
+      <div ref={listRef} className={MODVIEW_USER.tabs} role="tablist">
+        <span ref={boxRef} className={MODVIEW_USER.tabBox} aria-hidden="true" />
         {tabs.map((entry) => (
           <button
             key={entry.key}
@@ -268,10 +273,13 @@ export const ViewerCard = ({
                 {(comments ?? []).map((comment) => (
                   <article key={comment.id} className={MODVIEW_USER.message}>
                     <div className={MODVIEW_USER.commentHead}>
-                      <span className={MODVIEW_USER.commentAuthor}>{comment.authorName ?? ''}</span>
-                      <time className={MODVIEW_USER.commentDate} dateTime={comment.createdAt}>
-                        {formatDayTime(comment.createdAt)}
-                      </time>
+                      <span className={MODVIEW_USER.commentAuthor}>
+                        <Byline
+                          name={comment.authorName}
+                          avatar={comment.authorAvatar}
+                          date={formatDayTime(comment.createdAt)}
+                        />
+                      </span>
                     </div>
                     <p className={MODVIEW_USER.commentBody}>{comment.body}</p>
                   </article>

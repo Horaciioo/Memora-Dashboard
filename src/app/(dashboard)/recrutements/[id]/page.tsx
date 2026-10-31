@@ -5,7 +5,7 @@ import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { MentionMarks } from '@/composites/notifications/MentionMarks'
 import { RecruitmentFile } from '@/composites/recruitment/RecruitmentFile'
 import { loadRecruitment } from '@/core/services/recruitment/FileLoader'
-import { readSession } from '@/core/services/recruitment/RecruitmentService'
+import { readSession } from '@/core/services/recruitment'
 import { requireRecruitment } from '@/core/wrappers/requireRecruitment'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -46,14 +46,20 @@ export default async function RecruitmentPage({ params }: { params: Promise<{ id
   const loaded = await loadRecruitment(id, await requireRecruitment(id))
   if (!loaded) notFound()
 
-  const { detail, fields, can, activity } = loaded
+  const { detail, fields, can, activity, serverTime } = loaded
 
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageBanner title={RECRUITMENT_COPY.title} isLabel image={detail.summary.youtuberBanner} />
       <BreadcrumbLabel label={detail.summary.name} />
       <MentionMarks target="recruitment" targetId={id} />
-      <RecruitmentFile detail={detail} activity={activity} fields={fields} can={can} />
+      <RecruitmentFile
+        detail={detail}
+        activity={activity}
+        fields={fields}
+        can={can}
+        serverTime={serverTime}
+      />
     </div>
   )
 }

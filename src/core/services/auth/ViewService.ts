@@ -4,9 +4,10 @@ import { readActiveCreator, readNavigationView } from '@/core/lib/auth/activeCre
 import { isActualGlobal } from '@/core/lib/auth/simulation'
 import { readLedCreators } from '@/core/services/auth/LeadService'
 import { ROLE_REGISTRY, isEncadrement } from '@/declarations/access/roles'
+import { VIEW_ROLES } from '@/declarations/access/views'
 import { NAVIGATION_VIEW_ORDER, NavigationViews, viewDepth } from '@/declarations/navigation'
 import type { NavigationViewName } from '@/declarations/navigation'
-import { ADMIN_ROLES } from '@/utils/constants/hierarchy'
+import { ADMIN_ROLES, MemberRoles } from '@/utils/constants/hierarchy'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { MENTION_PAGES } from '@/declarations/notifications/targets'
 import type { CreatorLead, MentionBubble, ViewContext } from '@/types/access'
@@ -51,9 +52,28 @@ const ceilingFor = (role: MemberRoleName, isRoot: boolean): NavigationViewName =
 
 export const reachableViews = (viewer: SessionUser): NavigationViewName[] => {
   const ceiling = ceilingFor(viewer.actual.role, viewer.actual.isRoot)
+  // The employee stands level with the Responsable
+  const skipsLead = !viewer.actual.isRoot && viewer.actual.role === MemberRoles.Employe
 
-  return NAVIGATION_VIEW_ORDER.filter((view) => viewDepth(view) <= viewDepth(ceiling))
+  return NAVIGATION_VIEW_ORDER.filter(
+    (view) => viewDepth(view) <= viewDepth(ceiling) && !(skipsLead && view === NavigationViews.Lead)
+  )
 }
+
+/**
+ * Role standing for each view, the own view wearing the real level
+ * @param {SessionUser} viewer - Signed-in member
+ * @param {NavigationViewName} own - View of the real level
+ * @return {Record<NavigationViewName, MemberRoleName>} - Role per view
+ */
+
+const viewRolesFor = (
+  viewer: SessionUser,
+  own: NavigationViewName
+): Record<NavigationViewName, MemberRoleName> => ({
+  ...VIEW_ROLES,
+  [own]: viewer.actual.isRoot ? MemberRoles.Admin : viewer.actual.role,
+})
 
 /**
  * Pickable creators
@@ -138,6 +158,7 @@ export const readViewContext = async (
   return {
     view,
     available,
+    roles: viewRolesFor(viewer, own),
     // Lightning is a responsable-and-above affordance
     switchable: available.length > 1 && (viewer.actual.isRoot || isEncadrement(viewer.actual.role)),
     creators,

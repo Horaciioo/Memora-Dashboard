@@ -24,10 +24,12 @@ export const CandidateComments = ({ candidate }: CandidateCommentsProps) => {
       issues={file.issues}
       isSaving={file.isSaving}
       canWrite={can.writeCandidates}
+      isCompact
       label={candidate.name}
       onOpen={file.clearIssues}
       onAdd={(values) => file.addComment(candidate.id, values)}
       onRemove={file.removeComment}
+      onPin={file.pinComment}
     />
   )
 }

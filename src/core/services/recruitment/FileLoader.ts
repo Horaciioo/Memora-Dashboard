@@ -1,22 +1,24 @@
-import { CANDIDATE_COPY } from '@/declarations/recruitment/candidateCopy'
 import 'server-only'
 
 import { commentFields } from '@/core/lib/forms/commentFields'
 
+import { bannedIdentifiers } from '@/core/services/recruitment/BanService'
+import { isObserver } from '@/core/services/recruitment/ObserverReader'
+import { maskForObserver } from '@/core/services/recruitment/ObserverMask'
 import { linkFields } from '@/core/services/onboarding/IntegrationLinkService'
-import { observerFields } from '@/core/services/recruitment/ObserverService'
 import {
   candidateFields,
   proseFields,
   readSession,
   sessionFields,
   stepFields,
-} from '@/core/services/recruitment/RecruitmentService'
-import { readRecordActivity } from '@/core/services/system/ActivityService'
+} from '@/core/services/recruitment'
+import { readRecordTreeActivity } from '@/core/services/system/ActivityService'
 import type { ActivityEntry } from '@/core/services/system/ActivityService'
 import { JOURNAL_FILES } from '@/core/services/system/FileJournal'
 import type { RecruitmentGuard } from '@/core/wrappers/requireRecruitment'
 import type { RecruitmentDetail, RecruitmentFields, RecruitmentRights } from '@/types/recruitment'
+import { LEADERSHIP_ROLES } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
 
 /**
@@ -26,6 +28,7 @@ import { Permissions } from '@/utils/constants/permissions'
  * @property {RecruitmentFields} fields - Declarations of the forms
  * @property {RecruitmentRights} can - What the viewer may do
  * @property {ActivityEntry[]} activity - Journal entries
+ * @property {string} serverTime - Server clock at load
  */
 
 export interface LoadedRecruitment {
@@ -33,6 +36,7 @@ export interface LoadedRecruitment {
   fields: RecruitmentFields
   can: RecruitmentRights
   activity: ActivityEntry[]
+  serverTime: string
 }
 
 /**
@@ -50,33 +54,38 @@ export const loadRecruitment = async (
   if (!read) return null
 
   // An observer never gets a way to reach a candidate
-  const detail = observing
-    ? {
-        ...read,
-        candidates: read.candidates.map((candidate) => ({
-          ...candidate,
-          discordId: '',
-          name: candidate.memberName ?? candidate.displayName ?? CANDIDATE_COPY.anonymous,
-        })),
-      }
-    : read
+  const detail = observing ? { ...read, candidates: read.candidates.map(maskForObserver) } : read
 
   // An observer never writes nor reads the journal
   const allowed = (permission: Parameters<typeof access.can>[0]) =>
     !observing && access.can(permission)
-  const canReadLogs = allowed(Permissions.WorkLogRead)
+  // Responsables and above only
+  const canReadLogs =
+    allowed(Permissions.WorkLogRead) && (session.isRoot || LEADERSHIP_ROLES.includes(session.role))
 
-  const [candidate, step, sessionForm, observer, activity] = await Promise.all([
-    candidateFields(),
+  const seated = await isObserver(id, session.id)
+
+  const [candidate, step, sessionForm, activity] = await Promise.all([
+    candidateFields(String(detail.summary.values.youtuberId)),
     stepFields(),
     sessionFields(perimeter, String(detail.summary.values.youtuberId)),
-    observerFields(),
-    canReadLogs ? readRecordActivity(JOURNAL_FILES.Recruitment, id) : Promise.resolve([]),
+    canReadLogs
+      ? readRecordTreeActivity(
+          JOURNAL_FILES.Recruitment,
+          id,
+          JOURNAL_FILES.Candidate,
+          detail.candidates.map((candidate) => candidate.id)
+        )
+      : Promise.resolve([]),
   ])
 
   return {
-    detail,
+    // Only those who manage read who is barred
+    detail: allowed(Permissions.RecruitmentManage)
+      ? { ...detail, bannedIds: await bannedIdentifiers() }
+      : detail,
     activity,
+    serverTime: new Date().toISOString(),
     fields: {
       session: sessionForm,
       candidate,
@@ -85,7 +94,6 @@ export const loadRecruitment = async (
       review: proseFields('review'),
       instruction: proseFields('instructions'),
       link: linkFields(),
-      observer,
     },
     can: {
       manage: allowed(Permissions.RecruitmentManage),
@@ -94,6 +102,8 @@ export const loadRecruitment = async (
       manageLinks: allowed(Permissions.IntegrationManage),
       readLogs: canReadLogs,
       observing,
+      canObserve: observing || access.can(Permissions.RecruitmentObserve) || seated,
+      isObserver: seated,
       viewerId: session.id,
     },
   }

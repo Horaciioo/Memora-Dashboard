@@ -149,7 +149,9 @@ export default async function JuniorPage({
           parkour,
           lives,
           courses,
-          recruitmentPath: candidate ? ROUTES.candidate(candidate.sessionId, candidate.id) : null,
+          recruitment: candidate
+            ? { path: ROUTES.recruitment(candidate.sessionId), name: candidate.sessionName }
+            : null,
         }}
         fields={{
           junior: fields,

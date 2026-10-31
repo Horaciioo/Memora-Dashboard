@@ -14,15 +14,18 @@ import { Permissions } from '@/utils/constants/permissions'
 
 export interface SanctionsScreenProps {
   discord?: boolean
+  // Creator asked for in the address
+  youtuberId?: string
 }
 
 /**
  * Livecon and sanction panel of the creator the member works for, on Twitch or on Discord
  * @param {boolean} [discord] - Discord panel in place of the live platforms
+ * @param {string} [youtuberId] - Creator asked for
  * @return {Promise<JSX.Element>} - Moderation screen
  */
 
-export const SanctionsScreen = async ({ discord = false }: SanctionsScreenProps) => {
+export const SanctionsScreen = async ({ discord = false, youtuberId }: SanctionsScreenProps) => {
   const { session, access, scope } = await requirePermission(Permissions.SanctionRead)
   const perimeter = await scope()
 
@@ -38,8 +41,9 @@ export const SanctionsScreen = async ({ discord = false }: SanctionsScreenProps)
   const panels =
     surfaces.length > 0 ? surfaces : [discord ? SanctionPanels.Discord : SanctionPanels.Twitch]
 
-  // Only the creator in perimeter is ever shown
-  const creatorId = perimeter.activeYoutuberId ?? creators[0]?.value ?? null
+  // Only a creator in perimeter is ever shown, the one asked for first
+  const asked = creators.some((creator) => creator.value === youtuberId) ? youtuberId : null
+  const creatorId = asked ?? perimeter.activeYoutuberId ?? creators[0]?.value ?? null
 
   const heading = discord ? SANCTION_COPY.discordTitle : SANCTION_COPY.title
 
@@ -74,7 +78,9 @@ export const SanctionsScreen = async ({ discord = false }: SanctionsScreenProps)
     <div className={PAGE_STYLES.wrapper}>
       <PageHeader title={heading} />
       <ModerationBoard
+        key={`${creatorId}:${panels[0]}`}
         creatorId={creatorId}
+        creators={creators}
         levels={levels}
         initialState={state}
         panels={panels}

@@ -478,7 +478,10 @@ export const seedJournal = async (cast: Cast) => {
   // Recruitment
   const campaigns = await prisma.recruitmentSession.findMany({
     where: OWN,
-    include: { candidates: { include: { outcome: true } }, responsables: true },
+    include: {
+      candidates: { include: { outcome: true, recruiters: true } },
+      responsables: true,
+    },
   })
   for (const campaign of campaigns) {
     logs.push({
@@ -502,10 +505,10 @@ export const seedJournal = async (cast: Cast) => {
     }
 
     for (const candidate of campaign.candidates) {
-      if (candidate.recruiterId) {
+      for (const { accountId } of candidate.recruiters) {
         notices.push({
           kind: 'CandidateAssigned',
-          recipientId: candidate.recruiterId,
+          recipientId: accountId,
           actorId: campaign.responsables[0]?.accountId,
           targetType: 'recruitment',
           targetId: campaign.id,

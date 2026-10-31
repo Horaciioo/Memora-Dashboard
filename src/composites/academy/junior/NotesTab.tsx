@@ -1,6 +1,6 @@
 'use client'
 
-import { Dotted } from '@/components/elements/display/Dotted'
+import { Byline } from '@/components/elements/display/Byline'
 import { Button } from '@/components/elements/actions/Button'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
@@ -14,7 +14,7 @@ import { ACADEMY_STAGE_REGISTRY, NOTE_KIND_REGISTRY } from '@/declarations/acade
 import { BEACON_ATTRIBUTE } from '@/declarations/ui/beacons'
 import { MEMBER_FILE } from '@/declarations/ui/blocks'
 import { cn } from '@/utils/classnames'
-import { formatDay } from '@/utils/format/dates'
+import { formatDayTime } from '@/utils/format/dates'
 
 /**
  * Confidential notes written on the junior
@@ -78,12 +78,11 @@ export const NotesTab = () => {
                   <header className="flex flex-wrap items-center gap-2">
                     <Status label={kind.label} accent={kind.accent} />
                     <span className="text-xs text-[var(--color-ink-subtle)]">
-                      <Dotted
-                        items={[
-                          ACADEMY_STAGE_REGISTRY.label(note.stage),
-                          note.authorName,
-                          formatDay(note.createdAt),
-                        ]}
+                      <Byline
+                        name={note.authorName}
+                        avatar={note.authorAvatar}
+                        items={[ACADEMY_STAGE_REGISTRY.label(note.stage)]}
+                        date={formatDayTime(note.createdAt)}
                       />
                     </span>
                   </header>

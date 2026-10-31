@@ -2,6 +2,7 @@ import { commandMeasure, nextRung, writeRungCommand } from '@/core/lib/modview/c
 import type { PanelMemory } from '@/core/lib/modview/commands'
 import {
   COMMON_WORDS,
+  MIN_PHRASE,
   NAME_WEIGHT,
   PHRASE_WEIGHT,
   WORD_STEM,
@@ -48,6 +49,7 @@ export interface SuggestionSource {
  * @property {number | null} rung - Rung proposed
  * @property {number} rungCount - Rungs of the ladder
  * @property {SanctionMeasureView | null} measure - Heaviest command measure
+ * @property {boolean} hasAction - The rung asks for a moderation act
  * @property {string | null} command - Line to paste
  */
 
@@ -57,6 +59,7 @@ export interface Suggestion {
   rung: number | null
   rungCount: number
   measure: SanctionMeasureView | null
+  hasAction: boolean
   command: string | null
 }
 
@@ -67,6 +70,14 @@ const plain = (name: string): string =>
     .replace(/\p{Diacritic}/gu, '')
     .toLowerCase()
     .trim()
+
+// A message that holds a close case the panel leaves alone
+const isTolerated = (offense: SanctionOffenseCard, text: string): boolean =>
+  offense.tolerated.some((case_) => {
+    const phrase = plain(case_)
+
+    return phrase.length >= MIN_PHRASE && text.includes(phrase)
+  })
 
 const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -99,6 +110,8 @@ export const offenseByKeywords = (
   let best: { offense: SanctionOffenseCard; hits: number } | null = null
 
   for (const offense of panel.offenses) {
+    if (isTolerated(offense, text)) continue
+
     const hits = offense.keywords.filter((keyword) => {
       const word = plain(keyword)
       if (!word) return false
@@ -148,13 +161,15 @@ export const offenseByText = (
   let best: { offense: SanctionOffenseCard; score: number } | null = null
 
   for (const entry of vocabulary) {
+    if (isTolerated(entry.offense, text)) continue
+
     let score = 0
     for (const word of message) {
       if (entry.name.some((other) => isSame(other, word))) score += NAME_WEIGHT / spread(word)
       if (entry.examples.some((other) => isSame(other, word))) score += 1 / spread(word)
     }
     for (const example of entry.offense.examples.map(plain)) {
-      if (example.length >= 4 && text.includes(example)) score += PHRASE_WEIGHT
+      if (example.length >= MIN_PHRASE && text.includes(example)) score += PHRASE_WEIGHT
     }
     if (score > 0 && (!best || score > best.score)) best = { offense: entry.offense, score }
   }
@@ -259,7 +274,15 @@ export const suggestFor = (
 ): Suggestion => {
   const offense = offenseByKeywords(panel, source) ?? offenseByText(panel, source)
   if (!offense)
-    return { source, offense: null, rung: null, rungCount: 0, measure: null, command: null }
+    return {
+      source,
+      offense: null,
+      rung: null,
+      rungCount: 0,
+      measure: null,
+      hasAction: false,
+      command: null,
+    }
 
   // The rung after the ones already applied
   const applied = memory[source.chatter.id]?.[offense.id] ?? []
@@ -274,6 +297,16 @@ export const suggestFor = (
     rung,
     rungCount: offense.rungs.length,
     measure: step ? commandMeasure(step) : null,
+    hasAction: (step?.measures.length ?? 0) > 0,
     command: step ? writeRungCommand(step, source.chatter.login, offense.name) : null,
   }
 }
+
+/**
+ * Whether a suggestion carries something to do: an offence, a rung, a measure
+ * @param {Suggestion} suggestion - Suggestion written
+ * @return {boolean} - False when nothing should be proposed
+ */
+
+export const isActionable = (suggestion: Suggestion): boolean =>
+  suggestion.offense !== null && suggestion.rung !== null && suggestion.hasAction

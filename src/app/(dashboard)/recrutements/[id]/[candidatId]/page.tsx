@@ -5,7 +5,9 @@ import { BreadcrumbLabel } from '@/components/tools/BreadcrumbLabel'
 import { MentionMarks } from '@/composites/notifications/MentionMarks'
 import { CandidateFile } from '@/composites/recruitment/candidate/CandidateFile'
 import { loadRecruitment } from '@/core/services/recruitment/FileLoader'
-import { readSession } from '@/core/services/recruitment/RecruitmentService'
+import { readSession } from '@/core/services/recruitment'
+import { readRecordActivity } from '@/core/services/system/ActivityService'
+import { JOURNAL_FILES } from '@/core/services/system/FileJournal'
 import { requireRecruitment } from '@/core/wrappers/requireRecruitment'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { PAGE_STYLES } from '@/declarations/ui/variants'
@@ -47,13 +49,20 @@ export default async function CandidatePage({ params }: { params: CandidateParam
   if (!loaded || !candidate) notFound()
 
   const { detail, fields, can } = loaded
+  const activity = can.readLogs ? await readRecordActivity(JOURNAL_FILES.Candidate, candidatId) : []
 
   return (
     <div className={PAGE_STYLES.wrapper}>
       <PageBanner title={RECRUITMENT_COPY.title} isLabel image={detail.summary.youtuberBanner} />
       <BreadcrumbLabel label={candidate.name} />
       <MentionMarks target="recruitment" targetId={id} />
-      <CandidateFile detail={detail} fields={fields} can={can} candidateId={candidatId} />
+      <CandidateFile
+        detail={detail}
+        fields={fields}
+        can={can}
+        candidateId={candidatId}
+        activity={activity}
+      />
     </div>
   )
 }

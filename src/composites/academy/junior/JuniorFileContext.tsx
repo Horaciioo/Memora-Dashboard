@@ -76,7 +76,8 @@ export interface JuniorSurroundings {
   parkour: ParkourView | null
   lives: JuniorLiveView[]
   courses: CourseCard[]
-  recruitmentPath: string | null
+  // Recruitment session the junior came from
+  recruitment: { path: string; name: string } | null
 }
 
 /**

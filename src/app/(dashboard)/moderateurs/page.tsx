@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/structures/page/PageHeader'
 import { MembersPanel } from '@/composites/members/MembersPanel'
 import { rowsToOptions } from '@/core/lib/forms/options'
 import { listMembers, memberFields } from '@/core/services/members/MemberService'
+import { listAcceptedCandidates } from '@/core/services/recruitment'
 import { activeFunctions, activeYoutubers, allDivisions } from '@/core/services/reference/lookups'
 import { requirePermission } from '@/core/wrappers/requireUser'
 import { MEMBER_COPY } from '@/declarations/members/copy'
@@ -31,12 +32,14 @@ export default async function MembersPage() {
     perimeter.activeYoutuberId ??
     (!perimeter.isGlobal && perimeter.youtuberIds.length === 1 ? perimeter.youtuberIds[0] : null)
 
-  const [members, fields, divisions, youtubers, functions] = await Promise.all([
+  const [members, fields, divisions, youtubers, functions, accepted] = await Promise.all([
     listMembers(perimeter, access.isAdmin),
     memberFields(access.isAdmin),
     allDivisions(),
     activeYoutubers(),
     activeFunctions(),
+    // A card leads to a recruitment file
+    access.can(Permissions.RecruitmentRead) ? listAcceptedCandidates(perimeter) : [],
   ])
 
   return (
@@ -44,6 +47,7 @@ export default async function MembersPage() {
       <PageHeader title={MEMBER_COPY.title} />
       <MembersPanel
         initialMembers={members}
+        accepted={accepted}
         fields={fields}
         divisions={rowsToOptions(divisions)}
         youtubers={rowsToOptions(youtubers)}

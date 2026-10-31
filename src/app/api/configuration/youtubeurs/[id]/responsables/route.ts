@@ -1,6 +1,6 @@
 import { forbidden } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { readAnchors, replaceAnchors, setLeadRole } from '@/core/services/auth/LeadService'
+import { readAdministration, replaceAnchors, setLeadRole } from '@/core/services/auth/LeadService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import type { MemberRoleName } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
@@ -25,7 +25,7 @@ const readTeams = (value: unknown): Record<string, string | null> => {
 export const GET = createProtectedRoute({
   permission: Permissions.ReferenceRead,
   descriptor: { summary: 'Read the responsables anchored on a creator', tags: ['reference'] },
-  handler: ({ params }) => readAnchors(params.id),
+  handler: ({ params }) => readAdministration(params.id),
 })
 
 export const PUT = createProtectedRoute({
@@ -66,6 +66,6 @@ export const PATCH = createProtectedRoute({
       summary: String(raw.role),
     })
 
-    return readAnchors(params.id)
+    return readAdministration(params.id)
   },
 })

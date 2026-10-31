@@ -62,7 +62,7 @@ const PERSON = { select: { id: true, displayName: true, avatarUrl: true } } as c
 
 // Relations every live view needs
 const LIVE_SHAPE = {
-  youtuber: { select: { id: true, name: true, avatarUrl: true, bannerUrl: true } },
+  youtuber: { select: { id: true, name: true, avatarUrl: true, bannerUrl: true, fadeBannerUrl: true } },
   announcedBy: PERSON,
   coordinations: { include: { account: PERSON }, orderBy: { askedAt: 'asc' } },
   calendarEvent: {
@@ -137,7 +137,7 @@ const toView = (row: LiveRow, viewerId: string, held: PermissionName[]): LiveVie
       id: row.youtuber.id,
       name: row.youtuber.name,
       avatar: row.youtuber.avatarUrl,
-      banner: row.youtuber.bannerUrl,
+      banner: row.youtuber.fadeBannerUrl ?? row.youtuber.bannerUrl,
     },
     plannedStartAt: row.plannedStartAt.toISOString(),
     plannedEndAt: row.plannedEndAt?.toISOString() ?? null,

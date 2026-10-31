@@ -24,6 +24,8 @@ export interface MemberAdminTabProps {
   // Departure and its message
   onDepart: (kind: DepartureKindName) => Promise<boolean>
   onShowMessage: (body: string) => void
+  // Open the sanction drawer
+  onSanction: () => void
   canDelete: boolean
   // Role box beside the state
   roleSection?: ReactNode
@@ -51,6 +53,7 @@ const CONFIRMS: Record<Gesture, { title: string; description: string }> = {
  * @param {MemberAdmin} admin - Gestures and state
  * @param {(kind: DepartureKindName) => Promise<boolean>} onDepart - Let them go
  * @param {(body: string) => void} onShowMessage - Open the departure message
+ * @param {() => void} onSanction - Open the sanction drawer
  * @param {boolean} canDelete - Viewer may erase the file
  * @param {ReactNode} [roleSection] - Role box beside the state
  * @return {JSX.Element}
@@ -60,6 +63,7 @@ export const MemberAdminTab = ({
   admin,
   onDepart,
   onShowMessage,
+  onSanction,
   canDelete,
   roleSection,
 }: MemberAdminTabProps) => {
@@ -87,6 +91,17 @@ export const MemberAdminTab = ({
         {roleSection}
         <Section title={MEMBER_ADMIN_COPY.sectionState} raised>
           <MemberStateList state={state} />
+          {!state.isGone && (
+            <div className={MEMBER_ADMIN.stateActions}>
+              <Button
+                variant={state.suspension ? 'primary' : 'danger'}
+                isLoading={state.suspension ? admin.isSaving : undefined}
+                onClick={() => (state.suspension ? void admin.lift() : onSanction())}
+              >
+                {state.suspension ? MEMBER_ADMIN_COPY.liftAction : MEMBER_ADMIN_COPY.sanctionAction}
+              </Button>
+            </div>
+          )}
         </Section>
       </div>
 

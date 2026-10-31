@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 
-import { WeekPlanning, planningSize } from '@/composites/recruitment/file/WeekPlanning'
-import type { WeekPlan } from '@/core/lib/recruitment/weekPlanning'
+import { RangePlanning, planningSize } from '@/composites/recruitment/file/RangePlanning'
+import type { RangePlan } from '@/core/lib/recruitment/rangePlanning'
 import { PLANNING_LAYOUT, PLANNING_TOKENS } from '@/declarations/recruitment/planning'
 import type { PlanningPalette } from '@/declarations/recruitment/planning'
 
@@ -45,16 +45,16 @@ const loadImage = (source: string): Promise<HTMLImageElement> =>
   })
 
 /**
- * Render a week as a PNG
- * @param {WeekPlan} plan - Week laid out
+ * Render a period as a PNG
+ * @param {RangePlan} plan - Period laid out
  * @return {Promise<Blob>} - PNG file
  */
 
-export const renderPlanningPng = async (plan: WeekPlan): Promise<Blob> => {
+export const renderPlanningPng = async (plan: RangePlan): Promise<Blob> => {
   // Markup with resolved paint
   const { renderToStaticMarkup } = await import('react-dom/server')
   const markup = renderToStaticMarkup(
-    createElement(WeekPlanning, { plan, palette: resolvedPalette() })
+    createElement(RangePlanning, { plan, palette: resolvedPalette() })
   )
 
   // Vector drawn onto a canvas

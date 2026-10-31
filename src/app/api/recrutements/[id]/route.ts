@@ -1,16 +1,20 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
+import { readText } from '@/core/lib/forms/values'
+import { isHandClosure } from '@/core/lib/recruitment/closure'
 import { createProtectedRoute } from '@/core/lib/http/route'
+import { signalSession } from '@/core/lib/recruitment/signal'
 import {
   readSession,
   removeSession,
   sessionFields,
   updateSession,
-} from '@/core/services/recruitment/RecruitmentService'
+} from '@/core/services/recruitment'
 import { afterRecruitmentClosed } from '@/core/services/academy/parkour/ParkourService'
 import { summariseChange } from '@/core/services/system/changes'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { JOURNAL_FILES } from '@/core/services/system/FileJournal'
+import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { Permissions } from '@/utils/constants/permissions'
 
 export const PATCH = createProtectedRoute({
@@ -23,6 +27,11 @@ export const PATCH = createProtectedRoute({
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
     const before = await readSession(params.id, perimeter)
+
+    // Closing goes through its own route
+    if (isHandClosure(readText(parsed.values, 'status') ?? undefined, before.summary.status)) {
+      throw invalidInput([{ field: 'status', message: RECRUITMENT_COPY.closeRefused }])
+    }
     const updated = await updateSession(params.id, parsed.values, perimeter)
 
     await recordEvent({
@@ -36,6 +45,8 @@ export const PATCH = createProtectedRoute({
 
     // A campaign that ends frees the promotion it feeds
     if (updated.status !== before.summary.status) await afterRecruitmentClosed(updated.id)
+
+    await signalSession(params.id)
 
     return updated
   },

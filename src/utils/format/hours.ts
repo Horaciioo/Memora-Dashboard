@@ -38,3 +38,22 @@ export const hoursPayload = (hours: HoursInput): { from: string; to: string } | 
   hours.from && hours.to
     ? { from: wallToInstant(hours.from).toISOString(), to: wallToInstant(hours.to).toISOString() }
     : undefined
+
+// Length rounded to the nearest quarter hour
+const QUARTER_HOUR = 15
+
+/**
+ * Length said roughly, to the nearest quarter hour
+ * @param {number} minutes - Length in minutes
+ * @return {string} - Like 45 min, 1h or 1h15
+ */
+
+export const roughDuration = (minutes: number): string => {
+  const rounded = Math.max(QUARTER_HOUR, Math.round(minutes / QUARTER_HOUR) * QUARTER_HOUR)
+  const hours = Math.floor(rounded / 60)
+  const rest = rounded % 60
+
+  if (hours === 0) return `${rest} min`
+
+  return rest === 0 ? `${hours}h` : `${hours}h${String(rest).padStart(2, '0')}`
+}

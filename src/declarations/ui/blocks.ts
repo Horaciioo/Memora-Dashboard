@@ -162,7 +162,7 @@ export const LEFT_SIDEBAR = {
   footerRow: 'flex min-w-0 items-center gap-1',
   footerName: 'min-w-0 flex-1 truncate text-base font-semibold',
   footerActions: 'flex shrink-0 items-center gap-0.5',
-  footerIcon: 'size-6 shrink-0',
+  footerIcon: 'size-5 shrink-0',
   // Version under the nav
   version:
     'rail-fold mx-4 mt-2 mb-1 shrink-0 self-start rounded-[var(--radius-sm)] px-2 py-1 font-[family-name:var(--font-mono)] text-micro tracking-wide text-[var(--color-ink-subtle)] uppercase transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
@@ -357,6 +357,7 @@ export const MEMBER_FILE = {
   body: 'mt-3 flex flex-col gap-5 border-t border-[var(--color-border)] p-4 md:mt-5 md:p-5',
   groupTitle: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   lock: 'px-5 pt-3 text-center',
+  memoraId: 'font-[family-name:var(--font-mono)] text-xs',
   // Property list of a rail
   railList: 'flex flex-col gap-5',
   railItem: 'flex flex-col gap-1.5',
@@ -898,6 +899,25 @@ export const SIMULATION_BLOCK = {
 
 export const CREATOR_FILE = {
   root: 'flex flex-col gap-6',
+  designStack: 'flex flex-col divide-y divide-[var(--color-border)]',
+  designTitle: 'text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  designTop: 'flex flex-wrap items-start divide-x divide-[var(--color-border)] pb-6',
+  designCell: 'flex flex-col gap-3 px-6 first:pl-0 last:pr-0',
+  designGallery: 'flex flex-col gap-3 pt-6',
+  bannerGrid: 'grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5',
+  designCard:
+    'group relative flex cursor-pointer items-center justify-center overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-sunken)] shadow-[var(--shadow-sm)] transition-[transform,box-shadow] duration-[var(--motion-duration-base)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)] disabled:cursor-default disabled:hover:translate-y-0',
+  designBanner: 'aspect-[3/1] w-full',
+  designBannerTall: 'aspect-[3/4] w-full',
+  designCaption:
+    'absolute inset-x-0 bottom-0 bg-[var(--color-media-shade)] px-3 py-2 text-xs font-semibold text-[var(--color-on-media)]',
+  designAvatar: 'size-24',
+  designLogo: 'aspect-[2/1] h-24',
+  designImage: 'h-full w-full object-cover',
+  designLogoImage: 'h-full w-full object-contain p-3',
+  designAvatarImage: 'h-full w-full object-cover',
+  designEmpty:
+    'flex-col gap-2 border-dashed text-sm text-[var(--color-ink-subtle)] shadow-none hover:translate-y-0 hover:bg-[var(--color-hover)]',
   grid: 'grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-3',
   column: 'flex flex-col gap-3',
   railHead:

@@ -1,7 +1,8 @@
 import { invalidInput } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { candidateFields, createCandidate } from '@/core/services/recruitment/RecruitmentService'
+import { signalCandidate } from '@/core/lib/recruitment/signal'
+import { candidateFields, createCandidate } from '@/core/services/recruitment'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -22,6 +23,8 @@ export const POST = createProtectedRoute({
       actorId: session.id,
       summary: candidate.name,
     })
+
+    await signalCandidate(candidate.id, params.id)
 
     return candidate
   },

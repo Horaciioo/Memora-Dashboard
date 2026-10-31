@@ -7,6 +7,7 @@ import {
   PLAY_REALTIME_REQUESTS,
   PLAY_REALTIME_TOPICS,
 } from '@/core/services/play/live/PlayRealtimeService'
+import { RECRUITMENT_REALTIME_TOPICS } from '@/core/services/recruitment/RecruitmentRealtimeService'
 
 export { issueTicket } from '@/core/lib/realtime/server/tickets'
 export type { RealtimeHub } from '@/core/lib/realtime/server/hub'
@@ -22,7 +23,7 @@ const globalForHub = globalThis as unknown as { memoraRealtime?: RealtimeHub }
 export const wireRealtime = (): void => {
   globalForHub.memoraRealtime?.close()
   globalForHub.memoraRealtime = createHub({
-    topics: [...PLAY_REALTIME_TOPICS],
+    topics: [...PLAY_REALTIME_TOPICS, ...RECRUITMENT_REALTIME_TOPICS],
     requests: { ...PLAY_REALTIME_REQUESTS },
   })
   logger.info('[realtime] socket hub ready')

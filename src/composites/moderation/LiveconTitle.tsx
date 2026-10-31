@@ -8,7 +8,6 @@ import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
 import { useLivecon } from '@/core/hooks/data/lives/useLivecon'
 import { levelOfCreator } from '@/declarations/livecon/levels'
 import { LIVECON_COPY } from '@/declarations/livecon/copy'
-import { ICONS } from '@/declarations/ui/icons'
 import { FORM_SUBJECTS } from '@/declarations/ui/subjects'
 import { accentVars } from '@/declarations/ui/theme'
 import { LIVECON_TITLE } from '@/declarations/ui/variants'
@@ -42,7 +41,6 @@ export const LiveconTitle = ({
   const livecon = useLivecon(initialState)
   const [target, setTarget] = useState<LiveconLevelView | null>(null)
   const inForce = levelOfCreator(livecon.state, creatorId)?.level ?? levels[0]
-  const Icon = ICONS[inForce?.icon ?? 'livecon']
 
   // Every other level
   const menu = useActionMenu(
@@ -51,7 +49,6 @@ export const LiveconTitle = ({
       .map((level) => ({
         id: level.id,
         label: LIVECON_COPY.switchTo.replace('{level}', level.name),
-        icon: level.icon ?? 'livecon',
         onSelect: () => {
           livecon.clearIssues()
           setTarget(level)
@@ -63,7 +60,6 @@ export const LiveconTitle = ({
 
   const content = (
     <>
-      <Icon className={LIVECON_TITLE.icon} aria-hidden="true" />
       <span className={LIVECON_TITLE.name}>{inForce.name}</span>
       <MaturityTag maturity="new" interactive={false} compact />
     </>

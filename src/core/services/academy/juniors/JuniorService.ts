@@ -352,18 +352,23 @@ export const resolveOwnJunior = async (
   })
 
 /**
- * Candidate file a junior came from
+ * Recruitment session a junior came from
  * @param {string} id - Junior identifier
- * @return {Promise<{ id: string, sessionId: string } | null>} - Candidate, none when unlinked
+ * @return {Promise<{ id: string, sessionId: string, sessionName: string } | null>} - Candidate, none when unlinked
  */
 
 export const juniorCandidate = async (
   id: string
-): Promise<{ id: string; sessionId: string } | null> => {
+): Promise<{ id: string; sessionId: string; sessionName: string } | null> => {
   const row = await prisma.academyJunior.findUnique({
     where: { id },
-    select: { candidate: { select: { id: true, sessionId: true } } },
+    select: {
+      candidate: { select: { id: true, sessionId: true, session: { select: { name: true } } } },
+    },
   })
+  if (!row?.candidate) return null
 
-  return row?.candidate ?? null
+  const { id: candidateId, sessionId, session } = row.candidate
+
+  return { id: candidateId, sessionId, sessionName: session.name }
 }

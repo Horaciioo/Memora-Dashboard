@@ -4,6 +4,7 @@ import crypto from 'crypto'
 
 import { prisma } from '@/core/lib/db'
 import { invalidInput, notFound } from '@/core/lib/errors'
+import { compressImage } from '@/core/services/system/imageCompression'
 import { FILE_SETTINGS } from '@/declarations/configurations/settings'
 import { FILE_COPY } from '@/declarations/ui/copy'
 import { sniffMimeType } from '@/declarations/system/security/signatures'
@@ -70,13 +71,15 @@ export const storeFile = async (bucket: StorageBucket, file: File): Promise<Stor
     throw invalidInput([{ field: 'file', message: FILE_COPY.wrongType }])
   }
 
+  const packed = await compressImage(data, mimeType, destination.maxEdge)
+
   const entry = await prisma.storageEntry.create({
     data: {
       bucket,
       key: crypto.randomUUID(),
-      mimeType,
-      byteSize: data.byteLength,
-      data,
+      mimeType: packed.mimeType,
+      byteSize: packed.data.byteLength,
+      data: new Uint8Array(packed.data),
       metadata: { name: file.name },
     },
     select: { id: true, mimeType: true, byteSize: true },
@@ -186,6 +189,27 @@ const FILE_REFERENCE_LOOKUPS = [
         select: { bannerUrl: true },
       })
     ).map((row) => row.bannerUrl),
+  async (urls: string[]) =>
+    (
+      await prisma.youtuber.findMany({
+        where: { fadeBannerUrl: { in: urls } },
+        select: { fadeBannerUrl: true },
+      })
+    ).map((row) => row.fadeBannerUrl),
+  async (urls: string[]) =>
+    (
+      await prisma.youtuber.findMany({
+        where: { logoUrl: { in: urls } },
+        select: { logoUrl: true },
+      })
+    ).map((row) => row.logoUrl),
+  async (urls: string[]) =>
+    (
+      await prisma.youtuberBanner.findMany({
+        where: { url: { in: urls } },
+        select: { url: true },
+      })
+    ).map((row) => row.url),
   async (urls: string[]) =>
     (
       await prisma.division.findMany({

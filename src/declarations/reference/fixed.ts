@@ -360,26 +360,102 @@ export interface FixedRecruitmentOutcome {
 }
 
 /**
+ * Stable names of the recruitment outcomes, read wherever one is looked up
+ * @type {Record<string, string>}
+ */
+
+export const OutcomeNames = {
+  ToProcess: 'À traiter',
+  Scheduled: 'Entretien posé',
+  Deliberating: 'En délibération',
+  Favorable: 'Favorable',
+  Unfavorable: 'Défavorable',
+  Mixed: 'Mitigé',
+  Accepted: 'Accepté',
+  Refused: 'Refusé',
+  Withdrawn: 'Désisté',
+} as const
+
+/**
+ * Outcomes closing an interview with a verdict
+ * @type {readonly string[]}
+ */
+
+export const VERDICT_OUTCOMES: readonly string[] = [
+  OutcomeNames.Favorable,
+  OutcomeNames.Mixed,
+  OutcomeNames.Unfavorable,
+]
+
+/**
  * Recruitment outcomes
  * @type {readonly FixedRecruitmentOutcome[]}
  */
 
 export const FIXED_RECRUITMENT_OUTCOMES: readonly FixedRecruitmentOutcome[] = [
-  { name: 'À traiter', accent: 'neutral', isDefault: true, isTerminal: false, admits: false },
-  { name: 'Entretien posé', accent: 'info', isDefault: false, isTerminal: false, admits: false },
   {
-    name: 'En délibération',
+    name: OutcomeNames.ToProcess,
+    accent: 'neutral',
+    isDefault: true,
+    isTerminal: false,
+    admits: false,
+  },
+  {
+    name: OutcomeNames.Scheduled,
+    accent: 'info',
+    isDefault: false,
+    isTerminal: false,
+    admits: false,
+  },
+  {
+    name: OutcomeNames.Deliberating,
     accent: 'caution',
     isDefault: false,
     isTerminal: false,
     admits: false,
   },
-  { name: 'Favorable', accent: 'success', isDefault: false, isTerminal: false, admits: false },
-  { name: 'Défavorable', accent: 'danger', isDefault: false, isTerminal: false, admits: false },
-  { name: 'Mitigé', accent: 'caution', isDefault: false, isTerminal: false, admits: false },
-  { name: 'Accepté', accent: 'success', isDefault: false, isTerminal: true, admits: true },
-  { name: 'Refusé', accent: 'danger', isDefault: false, isTerminal: true, admits: false },
-  { name: 'Désisté', accent: 'neutral', isDefault: false, isTerminal: true, admits: false },
+  {
+    name: OutcomeNames.Favorable,
+    accent: 'success',
+    isDefault: false,
+    isTerminal: false,
+    admits: false,
+  },
+  {
+    name: OutcomeNames.Unfavorable,
+    accent: 'danger',
+    isDefault: false,
+    isTerminal: false,
+    admits: false,
+  },
+  {
+    name: OutcomeNames.Mixed,
+    accent: 'caution',
+    isDefault: false,
+    isTerminal: false,
+    admits: false,
+  },
+  {
+    name: OutcomeNames.Accepted,
+    accent: 'success',
+    isDefault: false,
+    isTerminal: true,
+    admits: true,
+  },
+  {
+    name: OutcomeNames.Refused,
+    accent: 'danger',
+    isDefault: false,
+    isTerminal: true,
+    admits: false,
+  },
+  {
+    name: OutcomeNames.Withdrawn,
+    accent: 'neutral',
+    isDefault: false,
+    isTerminal: true,
+    admits: false,
+  },
 ]
 
 /**
@@ -437,6 +513,13 @@ export const FIXED_RECRUITMENT_STEPS: readonly FixedRecruitmentStep[] = [
   {
     title: 'Réunion d’information collective',
     description: 'Les candidats validés découvrent l’équipe et son fonctionnement.',
+    offset: 17,
+    owner: 'RESPONSABLE',
+    required: false,
+  },
+  {
+    title: 'Clear des salons sur le Discord - Staff',
+    description: 'Les salons de la session sont vidés et archivés côté staff.',
     offset: 17,
     owner: 'RESPONSABLE',
     required: false,

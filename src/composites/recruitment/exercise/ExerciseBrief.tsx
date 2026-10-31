@@ -41,7 +41,7 @@ export const ExerciseBrief = ({
         <span className={EXERCISE_STYLES.label}>{EXERCISE_COPY.digTitle}</span>
         <ul className={EXERCISE_STYLES.digs}>
           {question.digs.map((dig) => (
-            <li key={dig}>{dig}</li>
+            <li key={dig.key}>{dig.text}</li>
           ))}
         </ul>
       </div>

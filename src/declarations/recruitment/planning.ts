@@ -6,9 +6,9 @@
 export const PLANNING_LAYOUT = {
   width: 1400,
   gutter: 64,
+  minColumn: 120,
   headerHeight: 76,
   hourHeight: 64,
-  interviewMinutes: 30,
   padHours: 1,
   emptyFromHour: 18,
   emptyToHour: 23,
@@ -19,6 +19,7 @@ export const PLANNING_LAYOUT = {
   eventSize: 13,
   eventInset: 6,
   eventGap: 2,
+  lineHeight: 16,
   glyphWidth: 7,
   timeWidth: 42,
   exportScale: 2,

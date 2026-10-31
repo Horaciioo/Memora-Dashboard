@@ -195,6 +195,7 @@ export interface MentionBubble {
  * @typedef {Object} ViewContext
  * @property {NavigationViewName} view - View on screen
  * @property {NavigationViewName[]} available - Views the member may switch between
+ * @property {Record<NavigationViewName, MemberRoleName>} roles - Role standing for each view
  * @property {boolean} switchable - Lightning shows
  * @property {CreatorLead[]} creators - Creators the member may pick between
  * @property {string | null} activeYoutuberId - Creator the view is narrowed to
@@ -203,6 +204,7 @@ export interface MentionBubble {
 export interface ViewContext {
   view: NavigationViewName
   available: NavigationViewName[]
+  roles: Record<NavigationViewName, MemberRoleName>
   switchable: boolean
   creators: CreatorLead[]
   activeYoutuberId: string | null

@@ -1,6 +1,7 @@
 import { invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { candidateSession, moveCandidate } from '@/core/services/recruitment/RecruitmentService'
+import { signalCandidate } from '@/core/lib/recruitment/signal'
+import { candidateSession, moveCandidate } from '@/core/services/recruitment'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
@@ -10,7 +11,7 @@ const OUTCOME_FIELD = 'outcomeId'
 const INDEX_FIELD = 'index'
 
 export const PATCH = createProtectedRoute({
-  permission: Permissions.RecruitmentManage,
+  permission: Permissions.RecruitmentCandidateWrite,
   descriptor: { summary: 'Move a candidate into an outcome column', tags: ['recruitment'] },
   handler: async ({ params, raw, session, scope }) => {
     const outcomeId = raw[OUTCOME_FIELD]
@@ -29,6 +30,8 @@ export const PATCH = createProtectedRoute({
       targetId: await candidateSession(params.id, perimeter),
       summary: moved.name,
     })
+
+    await signalCandidate(params.id)
 
     return moved
   },

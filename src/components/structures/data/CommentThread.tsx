@@ -1,6 +1,6 @@
 'use client'
 
-import { Dotted } from '@/components/elements/display/Dotted'
+import { Byline } from '@/components/elements/display/Byline'
 import { useState } from 'react'
 
 import { useHotComments } from '@/core/hooks/interaction/state/useHotComments'
@@ -27,9 +27,13 @@ export interface CommentThreadProps {
   canWrite: boolean
   // Name shown in the context menu
   label: string
+  // No heading, for a thread under a field
+  isCompact?: boolean
   onOpen: () => void
   onAdd: (values: FormValues) => Promise<boolean>
   onRemove: (id: string) => Promise<void>
+  // Adds the pin choice
+  onPin?: (id: string, pinned: boolean) => Promise<void>
 }
 
 /**
@@ -45,9 +49,11 @@ export const CommentThread = ({
   isSaving,
   canWrite,
   label,
+  isCompact,
   onOpen,
   onAdd,
   onRemove,
+  onPin,
 }: CommentThreadProps) => {
   const { contextMenu } = useMenu()
   const BellIcon = ICONS.bell
@@ -56,45 +62,66 @@ export const CommentThread = ({
   const { hot, calm, names, restore } = useHotComments(comments)
 
   return (
-    <Section title={COMMENT_COPY.title} bare>
-      <div>
-        {comments.map((comment) => (
-          <article
-            key={comment.id}
-            className={cn(COMMENT_THREAD.comment, hot.has(comment.id) && COMMENT_THREAD.hot)}
-            onMouseEnter={() => calm(comment.id)}
-            onContextMenu={contextMenu(
-              [
-                {
-                  id: 'delete',
-                  label: ACTION_COPY.delete,
-                  icon: 'remove',
-                  danger: true,
-                  disabled: !canWrite,
-                  onSelect: () => setPending(comment.id),
-                },
-              ],
-              label
-            )}
-          >
-            <span className={COMMENT_THREAD.meta}>
-              <Dotted items={[comment.authorName, formatDayTime(comment.createdAt)]} />
-            </span>
-            <Markdown source={comment.body} mentions className={COMMENT_THREAD.body} />
-            {/* Brings the alert back */}
-            {names(comment) && !hot.has(comment.id) && (
-              <button
-                type="button"
-                title={COMMENT_COPY.markUnread}
-                aria-label={COMMENT_COPY.markUnread}
-                className={COMMENT_THREAD.unread}
-                onClick={() => void restore(comment.id)}
-              >
-                <BellIcon className="size-4" aria-hidden="true" />
-              </button>
-            )}
-          </article>
-        ))}
+    <Section title={isCompact ? undefined : COMMENT_COPY.title} bare>
+      <div className="flex flex-col gap-3">
+        <div>
+          {comments.map((comment) => (
+            <article
+              key={comment.id}
+              className={cn(
+                COMMENT_THREAD.comment,
+                hot.has(comment.id) && COMMENT_THREAD.hot,
+                comment.pinned && COMMENT_THREAD.pinned
+              )}
+              onMouseEnter={() => calm(comment.id)}
+              onContextMenu={contextMenu(
+                [
+                  ...(onPin
+                    ? [
+                        {
+                          id: 'pin',
+                          label: comment.pinned ? COMMENT_COPY.unpin : COMMENT_COPY.pin,
+                          icon: 'star' as const,
+                          disabled: !canWrite,
+                          onSelect: () => void onPin(comment.id, !comment.pinned),
+                        },
+                      ]
+                    : []),
+                  {
+                    id: 'delete',
+                    label: ACTION_COPY.delete,
+                    icon: 'remove',
+                    danger: true,
+                    disabled: !canWrite,
+                    onSelect: () => setPending(comment.id),
+                  },
+                ],
+                label
+              )}
+            >
+              <span className={COMMENT_THREAD.meta}>
+                <Byline
+                  name={comment.authorName}
+                  avatar={comment.authorAvatar}
+                  date={formatDayTime(comment.createdAt)}
+                />
+              </span>
+              <Markdown source={comment.body} mentions className={COMMENT_THREAD.body} />
+              {/* Brings the alert back */}
+              {names(comment) && !hot.has(comment.id) && (
+                <button
+                  type="button"
+                  title={COMMENT_COPY.markUnread}
+                  aria-label={COMMENT_COPY.markUnread}
+                  className={COMMENT_THREAD.unread}
+                  onClick={() => void restore(comment.id)}
+                >
+                  <BellIcon className="size-4" aria-hidden="true" />
+                </button>
+              )}
+            </article>
+          ))}
+        </div>
         {isAdding ? (
           <CommentComposer
             maxLength={fields.find((field) => field.name === 'body')?.maxLength}

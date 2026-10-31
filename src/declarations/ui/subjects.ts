@@ -15,7 +15,7 @@ export const FORM_SUBJECTS = {
   comment: { label: 'Commentaire', gender: 'masculine', icon: 'note' },
   review: { label: 'Bilan', gender: 'masculine', icon: 'objective' },
   candidate: { label: 'Candidat', gender: 'masculine', icon: 'recruitment' },
-  observer: { label: 'Observateur', gender: 'masculine', icon: 'members' },
+  ban: { label: 'Identifiant', gender: 'masculine', icon: 'remove' },
   recruitmentStep: { label: 'Étape', gender: 'feminine', icon: 'clock' },
   instructions: { label: 'Consigne', gender: 'feminine', icon: 'note' },
   recruitment: { label: 'Recrutement', gender: 'masculine', icon: 'recruitment' },

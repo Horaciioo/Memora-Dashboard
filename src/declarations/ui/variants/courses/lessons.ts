@@ -81,7 +81,6 @@ export const COURSE_LIVECON = {
   level:
     'flex items-start gap-3 rounded-[var(--radius-xl)] border-2 border-transparent bg-[var(--color-surface-raised)] p-4 text-left shadow-[var(--shadow-sm)] transition-[border-color,transform,box-shadow] duration-[var(--motion-duration-panel)]',
   levelActive: 'translate-x-1 shadow-[var(--shadow-md)]',
-  levelIcon: 'h-9 w-9 shrink-0',
   levelBody: 'flex min-w-0 flex-col gap-1',
   levelName: 'text-base font-bold tracking-tight',
   levelText: 'text-sm leading-relaxed',

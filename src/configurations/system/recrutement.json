@@ -1,0 +1,8 @@
+{
+  "questionnaireLeadMinutes": 10,
+  "reviewMinCharacters": 5,
+  "interviewMinutes": 30,
+  "upcomingInterviews": 5,
+  "planningMaxDays": 14,
+  "historyPageSize": 25
+}
