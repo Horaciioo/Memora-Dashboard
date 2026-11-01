@@ -5,7 +5,10 @@ import { APP_DESCRIPTION } from '@/declarations/app'
 import { ROUTES, SEGMENT_LABELS } from '@/declarations/navigation'
 import { INSTALL_COPY } from '@/declarations/pwa/copy'
 import { DOCK_HOME_PATH } from '@/declarations/pwa/dock'
+import { APP_ENVIRONMENT } from '@/declarations/system/environments'
 import { PWA_ICONS, PWA_ICON_SIZES, PWA_SHORTCUTS } from '@/declarations/pwa/manifest'
+
+const IS_DEV = APP_ENVIRONMENT === 'dev'
 
 // Square picture of each size
 const icon = (src: string, size: number, purpose: 'any' | 'maskable') => ({
@@ -23,15 +26,13 @@ const icon = (src: string, size: number, purpose: 'any' | 'maskable') => ({
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: ROUTES.home,
-    name: INSTALL_COPY.name,
-    short_name: INSTALL_COPY.shortName,
+    name: IS_DEV ? INSTALL_COPY.devName : INSTALL_COPY.name,
+    short_name: IS_DEV ? INSTALL_COPY.devName : INSTALL_COPY.shortName,
     description: APP_DESCRIPTION,
     lang: 'fr',
     start_url: DOCK_HOME_PATH,
     scope: ROUTES.home,
     display: 'standalone',
-    // Own title bar: the window buttons sit over the rail
-    display_override: ['window-controls-overlay', 'standalone'],
     orientation: 'portrait',
     background_color: INSTALL_PALETTE.background,
     theme_color: INSTALL_PALETTE.background,
