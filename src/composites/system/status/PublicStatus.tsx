@@ -1,12 +1,12 @@
 import Image from 'next/image'
 import { Status } from '@/components/elements/display/Status'
+import { StatusBars } from '@/composites/system/status/StatusBars'
 import type { StatusReport } from '@/core/services/system/StatusService'
 import { APP_ASSETS, APP_VERSION_LABEL } from '@/declarations/app'
 import { STATUS_COPY } from '@/declarations/system/monitoring/status'
 import {
   PUBLIC_STATUS_BANNERS,
   PUBLIC_STATUS_STYLES,
-  STATUS_BAR_COLOURS,
   STATUS_HISTORY_STYLES,
 } from '@/declarations/ui/variants'
 import type { Tone } from '@/declarations/ui/theme'
@@ -81,21 +81,7 @@ export const PublicStatus = ({
                     tone={service.health ? HEALTH_TONES[service.health] : 'neutral'}
                   />
                 </div>
-                <div className={STATUS_HISTORY_STYLES.bars} aria-hidden="true">
-                  {service.days.map((day, index) => (
-                    <span
-                      key={index}
-                      className={cn(STATUS_HISTORY_STYLES.bar, STATUS_BAR_COLOURS[day ?? 'none'])}
-                    />
-                  ))}
-                </div>
-                <div className={PUBLIC_STATUS_STYLES.axis}>
-                  <span>{STATUS_COPY.ago}</span>
-                  {service.uptime !== null && (
-                    <span>{`${service.uptime.toFixed(2)} % ${STATUS_COPY.uptime}`}</span>
-                  )}
-                  <span>{STATUS_COPY.today}</span>
-                </div>
+                <StatusBars days={service.days} uptime={service.uptime} />
               </div>
             ))}
           </div>
