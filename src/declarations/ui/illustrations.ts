@@ -15,6 +15,11 @@ import {
   TasksIllustration,
   TeamsIllustration,
 } from '@/components/elements/feedback/EmptyStateIllustration'
+import {
+  DevicesFigure,
+  ShieldLockFigure,
+  VaultFigure,
+} from '@/components/elements/feedback/SettingsIllustrations'
 import type { EmptyStateIllustrationProps } from '@/components/elements/feedback/EmptyStateIllustration'
 import type { FC } from 'react'
 
@@ -39,6 +44,9 @@ export const ILLUSTRATIONS = {
   settings: SettingsIllustration,
   moderation: ModerationIllustration,
   stats: StatsIllustration,
+  shieldLock: ShieldLockFigure,
+  devices: DevicesFigure,
+  vault: VaultFigure,
 } as const satisfies Record<string, FC<EmptyStateIllustrationProps>>
 
 export type IllustrationName = keyof typeof ILLUSTRATIONS

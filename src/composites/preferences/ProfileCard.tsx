@@ -9,7 +9,7 @@ import { PROFILE_CARD } from '@/declarations/ui/variants'
 import type { ProfileDetail } from '@/types/preferences'
 import { cn } from '@/utils/classnames'
 import { MemberRoles } from '@/utils/constants/hierarchy'
-import { formatDay } from '@/utils/format/dates'
+import { formatDay, formatSince } from '@/utils/format/dates'
 
 export interface ProfileCardProps {
   profile: ProfileDetail
@@ -24,6 +24,10 @@ export interface ProfileCardProps {
 export const ProfileCard = ({ profile }: ProfileCardProps) => {
   const facts = [
     {
+      label: PREFERENCES_COPY.discordHandle,
+      value: profile.discordUsername ? `@${profile.discordUsername}` : null,
+    },
+    {
       label: FIELD_COPY.division,
       // A junior sits in no division yet
       value:
@@ -35,7 +39,10 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
     },
     { label: FIELD_COPY.mainFunction, value: profile.primaryFunctions },
     { label: FIELD_COPY.secondFunction, value: profile.secondaryFunctions },
-    { label: FIELD_COPY.joinedAt, value: formatDay(profile.joinedAt) },
+    {
+      label: FIELD_COPY.joinedAt,
+      value: `${formatDay(profile.joinedAt)} (${formatSince(profile.joinedAt).toLowerCase()})`,
+    },
     { label: PREFERENCES_COPY.academyDispositif, value: profile.academyDispositif },
   ]
 

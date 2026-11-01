@@ -15,6 +15,7 @@ export const PREFERENCES_COPY = {
   fileTitle: 'Mon profil',
   fileLead: 'Ta photo, et les champs tenus par les responsables.',
   academyDispositif: 'Dispositif Academy',
+  discordHandle: 'Discord',
   displayTitle: 'Affichage',
   themeTitle: 'Thème',
   textSizeTitle: 'Taille du texte',
