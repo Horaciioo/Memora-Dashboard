@@ -22,7 +22,7 @@ import type { SanctionGravityName, SanctionPanelName } from '@/utils/constants/m
  * @property {(panel: SanctionPanelName, levelId: string | null) => Promise<void>} select - Read another panel
  * @property {(id: string) => Promise<void>} openOffense - Read one offence in full
  * @property {() => void} closeOffense - Close the sheet
- * @property {(id: string, values: FormValues) => Promise<boolean>} saveOffense - Edit the wording
+ * @property {(id: string, values: FormValues, quiet?: boolean) => Promise<boolean>} saveOffense - Edit the wording
  * @property {(id: string, levelId: string, gravity: SanctionGravityName, steps: SanctionRungInput[]) => Promise<boolean>} saveLadder - Replace a ladder
  * @property {(replace: boolean) => Promise<void>} generate - Clone the reference panel
  * @property {(name: string) => Promise<boolean>} createOffense - Add a blank offence and open it
@@ -39,7 +39,7 @@ export interface SanctionCollection {
   select: (panel: SanctionPanelName, levelId: string | null) => Promise<void>
   openOffense: (id: string) => Promise<void>
   closeOffense: () => void
-  saveOffense: (id: string, values: FormValues) => Promise<boolean>
+  saveOffense: (id: string, values: FormValues, quiet?: boolean) => Promise<boolean>
   saveLadder: (
     id: string,
     levelId: string,
@@ -93,10 +93,10 @@ export const useSanctions = (initialPanel: SanctionPanelView): SanctionCollectio
   }, [])
 
   const saveOffense = useCallback(
-    async (id: string, values: FormValues) => {
+    async (id: string, values: FormValues, quiet = false) => {
       const next = await run(
         () => apiPatch<SanctionOffenseDetail>(API_ROUTES.sanctionOffense(id), values),
-        SANCTION_COPY.offenseSaved
+        quiet ? undefined : SANCTION_COPY.offenseSaved
       )
       if (!next) return false
 

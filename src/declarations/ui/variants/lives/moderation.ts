@@ -23,17 +23,23 @@ export const LIVECON_TITLE = {
  */
 
 export const SANCTION_PANEL = {
-  wrapper: 'mx-auto flex w-full max-w-6xl flex-col gap-14',
+  wrapper: 'mx-auto flex w-full max-w-6xl flex-col gap-10',
   toolbar: 'flex flex-wrap items-center justify-center gap-3',
   // One gravity
-  group: 'flex flex-col gap-5',
+  group: 'flex flex-col gap-4',
+  groupHead: 'flex items-center gap-4',
   groupTitle: `${PROPERTY_LABEL} text-[var(--accent)]`,
-  grid: 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
-  // Raised box
-  card: 'group relative flex min-h-16 w-full items-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-3 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
-  cardName: 'text-sm leading-snug font-bold tracking-tight text-balance',
+  groupRule: 'h-px flex-1 bg-[var(--color-border)]',
+  grid: 'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4',
+  // Raised box with a gravity edge
+  card: 'group relative flex min-h-24 w-full sm:min-h-28 flex-col items-start justify-between gap-4 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] py-4 pr-4 pl-5 text-left shadow-[var(--shadow-sm)] transition-[transform,box-shadow,border-color] duration-[var(--motion-duration-moderate)] before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-[var(--accent)] hover:-translate-y-0.5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)] motion-reduce:transition-none',
+  cardName: 'text-body leading-snug font-bold tracking-tight text-balance',
   cardInput:
-    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2 py-1 text-sm font-bold tracking-tight outline-none ring-2 ring-[var(--color-pick)]',
+    'w-full rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2 py-1 text-body font-bold tracking-tight outline-none ring-2 ring-[var(--color-pick)]',
+  cardFoot: 'flex w-full flex-col gap-1',
+  cardStep: 'flex flex-wrap items-center gap-x-2 text-xs font-semibold',
+  cardMuted: 'flex items-center gap-1.5 text-xs text-[var(--color-ink-subtle)] italic',
+  cardIcon: 'h-3.5 w-3.5 shrink-0',
   empty: 'text-center text-sm text-[var(--color-ink-subtle)] italic',
 } as const
 
@@ -55,30 +61,18 @@ export const SANCTION_LEGEND = {
  */
 
 export const OFFENSE_SHEET = {
-  body: 'flex flex-col gap-8 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1.4fr)] md:gap-x-8',
+  body: 'drawer-section-enter flex flex-col gap-8',
   column: 'flex min-w-0 flex-col gap-8',
-  // Short of both edges
-  divider: 'hidden w-px self-stretch bg-[var(--color-border)] md:my-6 md:block',
-  properties: 'flex flex-col gap-5',
-  property: 'flex items-center gap-2',
-  propertyDot: 'h-3 w-3 shrink-0',
-  propertyValue: 'text-xs font-bold tracking-wide uppercase',
+  properties: 'grid grid-cols-2 gap-5',
+  property: 'flex flex-col gap-1.5',
+  propertyValue: 'text-sm font-bold',
   // Same well as a task description
   summary: SECTION_STYLES.well,
   block: 'flex flex-col gap-3',
   label: PROPERTY_LABEL,
-  gravity: `flex items-center gap-2 text-left ${PROPERTY_LABEL}`,
-  gravityLabel: 'text-[var(--accent)]',
-  // A label a manager can open is underlined on hover
-  gravityLabelLive: 'cursor-pointer underline-offset-4 hover:underline',
   ladderLive:
     '-mx-2 -my-1 cursor-pointer rounded-[var(--radius-md)] px-2 py-1 transition-colors hover:bg-[var(--color-surface)]',
   placeholder: 'text-sm text-[var(--color-ink-subtle)] italic',
-  // A chat line
-  message:
-    'border-l-4 bg-[var(--color-surface)] px-3 py-2 font-[family-name:var(--font-mono)] text-xs break-words',
-  moderate: 'border-[var(--color-danger)]',
-  tolerate: 'border-[var(--color-success)]',
   ladder: 'flex flex-col',
   rung: 'relative flex gap-3 pb-4 pl-7 last:pb-0',
   rungRail: 'absolute top-2 bottom-0 left-[9px] w-0.5 bg-[var(--color-border)]',
@@ -100,6 +94,33 @@ export const OFFENSE_SHEET = {
     'flex flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] p-3',
   editorRow: 'flex items-center gap-2',
   actions: 'flex flex-wrap items-center gap-2',
+} as const
+
+/**
+ * Detection tab of an offence
+ * @type {Record<string, string>}
+ */
+
+export const DETECTION_PANEL = {
+  lead: 'text-sm leading-relaxed text-[var(--color-ink-subtle)]',
+  chips: 'flex flex-wrap gap-2',
+  chip: 'inline-flex min-h-11 items-center gap-1 rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] bg-[var(--color-surface)] pl-3 text-sm font-semibold md:min-h-8 md:pl-2.5',
+  chipPlain: 'pr-3 md:pr-2.5',
+  chipRemove:
+    'flex min-h-11 min-w-11 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] md:min-h-8 md:min-w-8',
+  chipIcon: 'h-3.5 w-3.5',
+  entry: 'flex items-center gap-2',
+  entryField: 'min-w-0 flex-1',
+  // A chat line
+  lines: 'flex flex-col gap-2',
+  line: 'flex items-start justify-between gap-2 border-l-4 bg-[var(--color-surface)] py-1 pl-3 font-[family-name:var(--font-mono)] text-xs break-words',
+  lineText: 'min-w-0 flex-1 py-1.5',
+  moderate: 'border-[var(--color-danger)]',
+  tolerate: 'border-[var(--color-border-strong)]',
+  tester:
+    'flex flex-col gap-4 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4',
+  verdict: 'flex flex-col gap-2',
+  verdictNote: 'text-xs text-[var(--color-ink-subtle)]',
 } as const
 
 /**
