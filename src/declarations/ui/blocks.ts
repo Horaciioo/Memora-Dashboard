@@ -234,7 +234,7 @@ export const MOBILE_DOCK = {
  */
 
 export const TOP_BAR = {
-  bar: 'mist sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 border-b px-3 md:hidden print:hidden',
+  bar: 'mist sticky top-0 z-40 flex h-[calc(var(--shell-top-bar-h)+env(safe-area-inset-top))] items-center gap-2 border-b px-3 pt-[env(safe-area-inset-top)] md:hidden print:hidden',
   // Where the page trail lands
   crumbsHost: 'flex min-w-0 flex-1 items-center',
   crumbs: 'flex min-w-0 flex-1 items-center gap-1 text-sm font-medium',
@@ -244,7 +244,7 @@ export const TOP_BAR = {
     'flex size-7 shrink-0 items-center justify-center rounded-full text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)]',
   // Pages behind the fold, in a box under the bar
   crumbList:
-    'fixed inset-x-3 top-[calc(var(--shell-top-bar-h)+0.25rem)] z-40 flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
+    'fixed inset-x-3 top-[calc(var(--shell-top-bar-h)+env(safe-area-inset-top)+0.25rem)] z-40 flex flex-col divide-y divide-[var(--color-border)] rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] shadow-[var(--shadow-lg)]',
   crumbRow:
     'flex min-h-11 items-center gap-2 px-4 text-sm font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
   crumbRowStatic: 'flex min-h-11 items-center gap-2 px-4 text-sm text-[var(--color-ink-subtle)]',
