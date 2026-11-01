@@ -30,6 +30,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: DOCK_HOME_PATH,
     scope: ROUTES.home,
     display: 'standalone',
+    // Own title bar: the window buttons sit over the rail
+    display_override: ['window-controls-overlay', 'standalone'],
     orientation: 'portrait',
     background_color: INSTALL_PALETTE.background,
     theme_color: INSTALL_PALETTE.background,
