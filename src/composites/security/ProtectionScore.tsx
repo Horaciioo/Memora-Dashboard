@@ -41,8 +41,6 @@ export const ProtectionScore = ({ checks }: ProtectionScoreProps) => {
   return (
     <SettingsGroup
       title={SECURITY_COPY.scoreTitle}
-      lead={SECURITY_COPY.scoreLead}
-      figure="shieldLock"
     >
       <div className={SECURITY_SCORE.root}>
         <div

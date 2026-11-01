@@ -4,9 +4,6 @@
  */
 
 export const SETTINGS_GROUP = {
-  lead: 'text-sm text-[var(--color-ink-subtle)]',
-  head: 'mb-5 flex items-center justify-between gap-5',
-  figure: 'hidden size-24 shrink-0 sm:block',
   tile: 'flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--gradient-soft)] text-[var(--color-ink)]',
   tileGlyph: 'size-5',
   text: 'flex min-w-0 flex-1 basis-56 flex-col gap-0.5',

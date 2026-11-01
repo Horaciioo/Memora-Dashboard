@@ -24,7 +24,7 @@ export interface ConnectionsTabProps extends Omit<AccountsSectionProps, 'discord
 
 export const ConnectionsTab = ({ profile, ...accounts }: ConnectionsTabProps) => (
   <div className={PREFERENCE_STYLES.stack}>
-    <SettingsGroup title={PREFERENCES_COPY.signInTitle} lead={PREFERENCES_COPY.signInLead}>
+    <SettingsGroup title={PREFERENCES_COPY.signInTitle}>
       <DetailGrid
         entries={[
           { label: MEMBER_FIELD_COPY.memoraId, value: <CopyValue value={profile.id} /> },

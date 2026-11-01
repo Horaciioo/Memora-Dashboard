@@ -28,7 +28,7 @@ export const PrivacyActions = ({ isBusy, onExport, onErase }: PrivacyActionsProp
   const [isAsking, setAsking] = useState(false)
 
   return (
-    <SettingsGroup title={PREFERENCES_COPY.dataTitle} figure="vault">
+    <SettingsGroup title={PREFERENCES_COPY.dataTitle}>
       <div className={PREFERENCE_STYLES.rows}>
         <SettingRow
           icon="install"

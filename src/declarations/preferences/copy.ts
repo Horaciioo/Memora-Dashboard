@@ -30,7 +30,6 @@ export const PREFERENCES_COPY = {
   storageNotice:
     'Ces réglages sont liés à ton compte : tu les retrouves sur n’importe quel navigateur.',
   signInTitle: 'Connexion',
-  signInLead: 'Memora te reconnaît à ton identifiant Discord, il n’y a pas de mot de passe.',
   sessionsTitle: 'Appareils connectés',
   sessionsLead: 'Ferme les sessions que tu ne reconnais pas.',
   currentSession: 'Cet appareil',

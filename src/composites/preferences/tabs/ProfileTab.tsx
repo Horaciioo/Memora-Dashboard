@@ -51,7 +51,6 @@ export const ProfileTab = ({ state, fields, initialValues }: ProfileTabProps) =>
       {sealedNames.length > 0 && (
         <SettingsGroup
           title={SETTINGS_GROUP_COPY.sealedTitle}
-          lead={SETTINGS_GROUP_COPY.sealedLead}
         >
           <dl className={DETAIL_BLOCK.grid}>
             {sealedNames.map((name) => (
@@ -66,7 +65,7 @@ export const ProfileTab = ({ state, fields, initialValues }: ProfileTabProps) =>
         </SettingsGroup>
       )}
       {PROFILE_SECTIONS.map((section) => (
-        <SettingsGroup key={section.title} title={section.title} lead={section.lead}>
+        <SettingsGroup key={section.title} title={section.title}>
           <FormRenderer
             fields={ownedFields.filter((field) =>
               (section.fields as readonly string[]).includes(field.name)

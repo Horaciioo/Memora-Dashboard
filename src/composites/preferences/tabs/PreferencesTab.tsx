@@ -32,7 +32,7 @@ export const PreferencesTab = ({ dock }: PreferencesTabProps) => {
 
   return (
     <div className={PREFERENCE_STYLES.stack}>
-      <SettingsGroup title={SETTINGS_GROUP_COPY.reading} lead={SETTINGS_GROUP_COPY.readingLead}>
+      <SettingsGroup title={SETTINGS_GROUP_COPY.reading}>
         <div className={PREFERENCE_STYLES.stack}>
           <TextSizePicker />
           <ComfortRows keys={COMFORT_GROUPS.reading} />
@@ -40,11 +40,10 @@ export const PreferencesTab = ({ dock }: PreferencesTabProps) => {
       </SettingsGroup>
       <SettingsGroup
         title={SETTINGS_GROUP_COPY.accessibility}
-        lead={SETTINGS_GROUP_COPY.accessibilityLead}
       >
         <ComfortRows keys={COMFORT_GROUPS.accessibility} />
         <div className={SETTINGS_GROUP.footer}>
-          <p className={PICKER_CARD.note}>{SETTINGS_GROUP_COPY.browserNotice}</p>
+          <p className={PICKER_CARD.noteInline}>{SETTINGS_GROUP_COPY.browserNotice}</p>
           <Button
             variant="ghost"
             icon="refresh"

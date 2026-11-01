@@ -26,8 +26,6 @@ export const SessionsSection = ({ state }: SessionsSectionProps) => {
   return (
     <SettingsGroup
       title={SECURITY_COPY.sessionsSectionTitle}
-      lead={SECURITY_COPY.sessionsSectionLead}
-      figure="devices"
     >
       <ul className={SESSION_LIST.list}>
         {sessions.map((session) => {

@@ -15,23 +15,22 @@ import { PICKER_CARD, PREFERENCE_STYLES } from '@/declarations/ui/variants'
 
 export const AppearanceTab = () => (
   <div className={PREFERENCE_STYLES.stack}>
-    <SettingsGroup title={SETTINGS_GROUP_COPY.theme} lead={SETTINGS_GROUP_COPY.themeLead}>
+    <SettingsGroup title={SETTINGS_GROUP_COPY.theme}>
       <ThemePicker />
       <p className={PICKER_CARD.note}>{PREFERENCES_COPY.storageNotice}</p>
     </SettingsGroup>
-    <SettingsGroup title={SETTINGS_GROUP_COPY.frame} lead={SETTINGS_GROUP_COPY.frameLead}>
+    <SettingsGroup title={SETTINGS_GROUP_COPY.frame}>
       <div className={PICKER_CARD.pair}>
         <ComfortCards settingKey="frame" />
         <ComfortCards settingKey="glass" />
       </div>
       <p className={PICKER_CARD.note}>{SETTINGS_GROUP_COPY.browserNotice}</p>
     </SettingsGroup>
-    <SettingsGroup title={SETTINGS_GROUP_COPY.shape} lead={SETTINGS_GROUP_COPY.shapeLead}>
+    <SettingsGroup title={SETTINGS_GROUP_COPY.shape}>
       <ComfortCards settingKey="radius" />
     </SettingsGroup>
     <SettingsGroup
       title={PREFERENCES_COPY.colorVisionTitle}
-      lead={PREFERENCES_COPY.colorVisionLead}
       maturity="beta"
     >
       <ColorVisionPreferences />

@@ -75,16 +75,11 @@ export const PROFILE_SECTIONS = [
 
 export const SETTINGS_GROUP_COPY = {
   theme: 'Thème',
-  themeLead: 'Clair, sombre, ou celui de ton appareil.',
   frame: 'Cadre et cartes',
-  frameLead: 'Le fond de l’application et la matière de ses cartes.',
   shape: 'Formes',
-  shapeLead: 'La rondeur de tout ce qui se touche et se lit.',
   vision: 'Vision des couleurs',
   reading: 'Lecture',
-  readingLead: 'Taille, espacement et liens des textes.',
   accessibility: 'Accessibilité',
-  accessibilityLead: 'Moins de mouvement, un repère plus net au clavier.',
   device: 'Sur cet appareil',
   deviceLead: 'Installation et barre du bas sur mobile.',
   help: 'Aide',
@@ -93,7 +88,6 @@ export const SETTINGS_GROUP_COPY = {
   browserNotice:
     'Ces réglages restent dans ce navigateur. Le thème, la taille du texte et la vision des couleurs te suivent partout.',
   sealedTitle: 'Informations protégées',
-  sealedLead: 'Débloque-les pour les lire.',
   save: 'Enregistrer mon profil',
   sample: 'Aperçu',
 } as const
@@ -105,7 +99,6 @@ export const SETTINGS_GROUP_COPY = {
 
 export const SECURITY_COPY = {
   scoreTitle: 'Niveau de protection',
-  scoreLead: 'Quatre points qui disent si ton compte est bien gardé.',
   scoreOf: 'sur',
   discordTitle: 'Connexion par Discord',
   discordOk: 'Pas de mot de passe à voler : Discord garde ta connexion.',
@@ -121,7 +114,6 @@ export const SECURITY_COPY = {
   sealWarn: 'Tes coordonnées sont déverrouillées en ce moment.',
   identityTitle: 'Identité de connexion',
   sessionsSectionTitle: 'Appareils connectés',
-  sessionsSectionLead: 'Ferme les sessions que tu ne reconnais pas.',
   thisDevice: 'Cet appareil',
   unknownDevice: 'Appareil inconnu',
   lastUsed: 'Vue',
