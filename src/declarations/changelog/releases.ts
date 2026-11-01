@@ -127,6 +127,111 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
+    version: '0.9.0',
+    date: '2026-11-01',
+    title: 'Memora devient une App !',
+    intro:
+      'Memora s’installe sur ton téléphone ou ton ordinateur comme une vraie application, avec ses notifications et une barre du bas pensée pour le pouce.',
+    description:
+      'Ouvrir Memora demandait de passer par le navigateur et de revenir voir la cloche pour ne rien rater. Cette version la rend installable, lui donne une icône sur ton écran d’accueil et t’envoie tes notifications directement sur ton appareil, même quand elle est fermée. Le logo, l’écran de chargement et le menu du téléphone se refont une beauté au passage.',
+    items: [
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.preferences,
+        text: 'Ajout de la possibilité d’installer Memora comme une application sur ton téléphone ou ton ordinateur, avec son icône et en plein écran.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.preferences,
+        text: 'Ajout de la possibilité de recevoir les notifications sur ton appareil, même quand Memora est fermée, avec le choix des familles reçues, la liste des appareils abonnés et un bouton d’essai.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.home,
+        text: 'Ajout d’une invitation sur l’accueil pour activer les notifications sur ton appareil.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.preferences,
+        text: 'Ajout de la possibilité de choisir les pages de la barre du bas sur téléphone, avec un aperçu et un retour aux pages proposées.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’un message quand la connexion est perdue, et d’une bannière qui propose de recharger quand une nouvelle version de Memora est disponible.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration visuelle de Memora : nouveau logo, nouvelles icônes d’application et écran de chargement avec le cerveau de Memora.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration de la barre du bas sur téléphone : un verre transparent qui laisse voir la page, et un point rouge sur « Menu » quand une notification attend.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration du menu « Compte » sur téléphone : il monte depuis le bas de l’écran avec le créateur affiché, le thème, « Paramètres » et la déconnexion.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        text: 'Amélioration des bulles de notification : elles n’apparaissent plus sur téléphone, où elles ne pointaient vers rien.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.calendar,
+        text: 'Amélioration du « Calendrier » sur téléphone : le titre du mois s’affiche en entier.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.sanctions,
+        permission: Permissions.SanctionRead,
+        text: 'Amélioration du « Panel Twitch » : la fiche d’une infraction se range en onglets, avec un onglet « Détection » pour ses mots-clés, ses exemples modérés ou tolérés et un test de message.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentObserve,
+        text: 'Amélioration de « Recrutements » : un observateur ne lit plus les remarques de l’équipe, les conseils des questions ni les liens d’exercice.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Amélioration de « Recrutements » : les recruteurs d’un entretien terminé peuvent toujours être changés, seuls les observateurs restent verrouillés.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration du « Calendrier » de « Recrutements » : l’encart « Prochains entretiens » disparaît, le planning par période suffit.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.members,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration de « Modérateurs » : un candidat accepté reste avec les candidats jusqu’au début de sa procédure académique.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentObserve,
+        text: 'Correction d’un bug de « Recrutements » qui obligeait à recharger la page pour voir qu’on avait rejoint ou quitté un entretien comme observateur.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentCandidateWrite,
+        text: 'Correction d’un bug de « Recrutements » où les avis « favorable », « mitigé » et « défavorable » manquaient sur certains environnements.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.teams,
+        permission: Permissions.ReferenceManage,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Correction d’un bug qui privait certains créateurs des équipes « Observateurs » et « Coordinateur de Live ».',
+      },
+    ],
+  },
+  {
     version: '0.8.2',
     date: '2026-10-31',
     title: 'Correctifs & Amélioration - Recrutement',
