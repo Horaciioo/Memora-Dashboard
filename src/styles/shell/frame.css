@@ -19,8 +19,8 @@
   }
 }
 
-/* Room the floating mobile dock takes from the bottom edge */
-:root {
+/* Room the floating mobile dock takes from the bottom edge, on body where its height is set */
+body {
   --shell-dock-gap: 0.75rem;
   --shell-dock-clearance: calc(
     var(--shell-dock-h) + var(--shell-dock-gap) * 2 + env(safe-area-inset-bottom)

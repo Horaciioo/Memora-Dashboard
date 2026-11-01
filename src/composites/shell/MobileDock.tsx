@@ -9,7 +9,6 @@ import { NavSheet } from '@/composites/shell/NavSheet'
 import { useNotificationFeed } from '@/core/hooks/data/system/useNotificationFeed'
 import { useDockEntries, useKeyboardOpen } from '@/core/hooks/pwa'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
-import { ROUTES } from '@/declarations/navigation'
 import type { NavigationItem } from '@/declarations/navigation'
 import { DOCK_COPY } from '@/declarations/pwa/copy'
 import { DOCK_HOME_PATH } from '@/declarations/pwa/dock'
@@ -100,7 +99,7 @@ export const MobileDock = ({ session, viewContext, unreadCount, held }: MobileDo
         item.onLive && viewContext.live?.status === LiveStatuses.Live ? 'liveDot' : item.icon
       )}
       isActive={reaches(item.href)}
-      hasDot={item.href === ROUTES.notifications && unread > 0}
+      hasDot={false}
     />
   )
 
@@ -128,6 +127,7 @@ export const MobileDock = ({ session, viewContext, unreadCount, held }: MobileDo
           >
             <MenuIcon className={MOBILE_DOCK.icon} aria-hidden="true" />
             <span className={MOBILE_DOCK.label}>{DOCK_COPY.menu}</span>
+            {unread > 0 && <span className={MOBILE_DOCK.dot} aria-hidden="true" />}
           </button>
         </nav>
       )}
@@ -143,6 +143,7 @@ export const MobileDock = ({ session, viewContext, unreadCount, held }: MobileDo
       <AccountSheet
         open={sheet === 'account'}
         viewContext={viewContext}
+        displayName={session.displayName}
         onClose={() => setSheet(null)}
       />
     </>

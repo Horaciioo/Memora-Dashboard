@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { NudgeBubble } from '@/composites/notifications/NudgeBubble'
 import { useBeaconSpot } from '@/core/hooks/interaction/layout/useBeaconSpot'
 import { useNotificationNudges } from '@/core/hooks/data/system/useNotificationNudges'
@@ -21,15 +22,17 @@ import { ICONS } from '@/declarations/ui/icons'
 
 export const NudgeHost = () => {
   const router = useRouter()
-  const { queue, shift } = useNotificationNudges(true)
+  // Bubbles point at rail entries, a phone has none
+  const isMobile = useIsMobileShell()
+  const { queue, shift } = useNotificationNudges(!isMobile)
   const CloseIcon = ICONS.close
 
   const entry = queue[0] ?? null
   const href = entry ? notificationHref(entry) : null
   const label = entry ? notificationText(entry) : null
-  const spot = useBeaconSpot(entry !== null, beaconOf(href))
+  const spot = useBeaconSpot(entry !== null && !isMobile, beaconOf(href))
 
-  if (!entry || !label || !spot) return null
+  if (isMobile || !entry || !label || !spot) return null
 
   return (
     <div

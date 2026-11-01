@@ -17,6 +17,8 @@ export interface CreatorPickerProps {
   labelled?: boolean
   // Sits beside the heading
   labelSlot?: ReactNode
+  // Heading and portraits on the middle axis
+  isCentered?: boolean
   onPicked?: () => void
 }
 
@@ -26,6 +28,7 @@ export interface CreatorPickerProps {
  * @param {string | null} activeYoutuberId - Creator the view is narrowed to
  * @param {boolean} [labelled] - Renders the heading above the portraits
  * @param {ReactNode} [labelSlot] - Node placed next to the heading
+ * @param {boolean} [isCentered] - Heading and portraits on the middle axis
  * @param {() => void} [onPicked] - Called once a choice is made
  * @return {JSX.Element}
  */
@@ -35,6 +38,7 @@ export const CreatorPicker = ({
   activeYoutuberId,
   labelled,
   labelSlot,
+  isCentered,
   onPicked,
 }: CreatorPickerProps) => {
   const [isPicking, startPicking] = useTransition()
@@ -46,15 +50,15 @@ export const CreatorPicker = ({
   }
 
   return (
-    <div className={CREATOR_PICKER.wrapper}>
+    <div className={cn(CREATOR_PICKER.wrapper, isCentered && CREATOR_PICKER.centered)}>
       {labelled && (
-        <div className={CREATOR_PICKER.head}>
+        <div className={cn(CREATOR_PICKER.head, isCentered && CREATOR_PICKER.headCentered)}>
           <p className={CREATOR_PICKER.label}>{VIEW_COPY.activeCreator}</p>
           {labelSlot}
         </div>
       )}
 
-      <div className={CREATOR_PICKER.list}>
+      <div className={cn(CREATOR_PICKER.list, isCentered && CREATOR_PICKER.listCentered)}>
         <button
           type="button"
           disabled={isPicking}
