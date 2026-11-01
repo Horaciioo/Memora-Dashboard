@@ -18,7 +18,7 @@ export interface RailShortcut {
 }
 
 /**
- * Glyph boxes under the search, Play and an unread note shine gold
+ * Glyph boxes under the search, an unread note shines gold
  * @param {Object} props - Shortcuts
  * @param {RailShortcut[]} props.items - Destinations
  * @param {boolean} [props.isUnlocking] - The first visit is adding them one by one
@@ -52,8 +52,7 @@ export const RailShortcuts = ({
             className={cn(
               LEFT_SIDEBAR.shortcut,
               isActive && LEFT_SIDEBAR.shortcutActive,
-              ((isFresh && item.href === ROUTES.changelog) || item.href === ROUTES.play) &&
-                LEFT_SIDEBAR.shortcutFresh,
+              isFresh && item.href === ROUTES.changelog && LEFT_SIDEBAR.shortcutFresh,
               isUnlocking && TOUR_RAIL.unlock
             )}
           >
