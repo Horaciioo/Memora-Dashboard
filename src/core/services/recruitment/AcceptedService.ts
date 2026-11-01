@@ -5,10 +5,9 @@ import type { AccessScope } from '@/core/services/auth/ScopeService'
 import { readPortraits } from '@/core/services/recruitment/CandidatePortraits'
 import { sessionScope } from '@/core/services/recruitment/reach'
 import type { AcceptedCandidate } from '@/types/members'
-import { FINISHED_RECRUITMENT_STATUSES } from '@/utils/constants/recruitment'
 
 /**
- * Accepted candidates waiting for their session to close
+ * Accepted candidates waiting for their PIM
  * @param {AccessScope} scope - Perimeter
  * @return {Promise<AcceptedCandidate[]>} - Cards by creator
  */
@@ -17,7 +16,9 @@ export const listAcceptedCandidates = async (scope: AccessScope): Promise<Accept
   const rows = await prisma.recruitmentCandidate.findMany({
     where: {
       outcome: { admits: true },
-      session: { AND: [sessionScope(scope), { status: { notIn: FINISHED_RECRUITMENT_STATUSES } }] },
+      session: sessionScope(scope),
+      // Moderators from the PIM start on
+      NOT: { admission: { kickoffAt: { not: null } } },
     },
     orderBy: { createdAt: 'asc' },
     select: {

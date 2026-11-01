@@ -30,10 +30,11 @@ export interface ExerciseLinks {
 /**
  * Drive the links of one candidate, status refreshed while the page is open
  * @param {string} candidateId - Candidate identifier
+ * @param {boolean} [isEnabled] - Reads the links, false for an observer
  * @return {ExerciseLinks} - State and mutations
  */
 
-export const useExerciseLinks = (candidateId: string): ExerciseLinks => {
+export const useExerciseLinks = (candidateId: string, isEnabled = true): ExerciseLinks => {
   const queryClient = useQueryClient()
   const queryKey = QUERY_KEYS.exerciseLinks(candidateId)
   const { isSaving, run } = useMutation()
@@ -41,6 +42,7 @@ export const useExerciseLinks = (candidateId: string): ExerciseLinks => {
   const { data: links = [] } = useQuery({
     queryKey,
     queryFn: () => apiGet<ExerciseLinkView[]>(API_ROUTES.candidateExercises(candidateId)),
+    enabled: isEnabled,
     refetchInterval: EXERCISE_SETTINGS.pollSeconds * 1000,
   })
 

@@ -72,7 +72,8 @@ export const CandidateOverview = ({ record, comments }: CandidateOverviewProps) 
     <FileOverview
       groups={[
         { id: 'interview', title: CANDIDATE_COPY.informations, entries },
-        { id: 'comments', title: COMMENT_COPY.title, node: comments },
+        // An observer never reads the remarks
+        ...(can.observing ? [] : [{ id: 'comments', title: COMMENT_COPY.title, node: comments }]),
       ]}
       values={record.values}
       issues={record.issues}

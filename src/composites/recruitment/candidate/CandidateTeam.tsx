@@ -31,13 +31,13 @@ export interface CandidateTeamProps {
 
 export const CandidateTeam = ({ candidate, record }: CandidateTeamProps) => {
   const router = useRouter()
-  const { detail, fields, can } = useRecruitmentState()
+  const { detail, file, fields, can } = useRecruitmentState()
   const startInterview = useStartInterview()
   const observe = useObserving()
   // Read from the card, a seat given in the picker counts too
   const joined = candidate.observers.some((seat) => seat.id === can.viewerId)
 
-  // Once the verdict is given, only a manager or its recruiter moves the seats
+  // Once the verdict is given, only a manager or its recruiter moves the observers
   const isLocked = isInterviewLocked(
     candidate.verdictAt !== null,
     candidate.recruiters.map((seat) => seat.id),
@@ -65,7 +65,7 @@ export const CandidateTeam = ({ candidate, record }: CandidateTeamProps) => {
   const entries: EditableEntry[] = [
     {
       label: RECRUITMENT_FIELD_COPY.recruiters,
-      field: { ...fieldFor('recruiterIds'), readOnly: isLocked },
+      field: fieldFor('recruiterIds'),
       display: stack('recruiterIds'),
     },
     {
@@ -89,7 +89,8 @@ export const CandidateTeam = ({ candidate, record }: CandidateTeamProps) => {
         }
 
   const toggle = async () => {
-    if (await observe(candidate.id, !joined)) router.refresh()
+    const saved = await observe(candidate.id, !joined)
+    if (saved) file.mergeCandidate(saved)
   }
 
   return (

@@ -138,19 +138,22 @@ export const OverviewTab = () => {
         onCommit: (next) => record.saveField('summary', next.trim() === '' ? null : next),
       }}
     >
-      <div className={FILE_BOX.stack}>
-        <CommentThread
-          comments={file.comments}
-          fields={fields.comment}
-          issues={file.issues}
-          isSaving={file.isSaving}
-          canWrite={can.writeCandidates}
-          label={summary.name}
-          onOpen={file.clearIssues}
-          onAdd={file.addSessionComment}
-          onRemove={file.removeSessionComment}
-        />
-      </div>
+      {/* An observer never reads the remarks */}
+      {!can.observing && (
+        <div className={FILE_BOX.stack}>
+          <CommentThread
+            comments={file.comments}
+            fields={fields.comment}
+            issues={file.issues}
+            isSaving={file.isSaving}
+            canWrite={can.writeCandidates}
+            label={summary.name}
+            onOpen={file.clearIssues}
+            onAdd={file.addSessionComment}
+            onRemove={file.removeSessionComment}
+          />
+        </div>
+      )}
       <CloseRecruitmentDialog
         sessionId={isClosing ? summary.id : null}
         onClose={() => setClosing(false)}

@@ -75,7 +75,12 @@ const InterviewBody = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [candidate.id, interviewStartedAt])
-  const parts = groupByPart(questionnaire.picked)
+  // An observer reads the questions, never the tips
+  const parts = groupByPart(
+    can.observing
+      ? questionnaire.picked.map((question) => ({ ...question, hint: undefined }))
+      : questionnaire.picked
+  )
 
   // Zero is the introduction, then one step per part
   const [storedStep, setStep] = useInterviewStep(candidateId)

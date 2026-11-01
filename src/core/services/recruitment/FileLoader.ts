@@ -53,8 +53,10 @@ export const loadRecruitment = async (
   const read = await readSession(id, perimeter).catch(() => null)
   if (!read) return null
 
-  // An observer never gets a way to reach a candidate
-  const detail = observing ? { ...read, candidates: read.candidates.map(maskForObserver) } : read
+  // An observer never gets a way to reach a candidate, nor reads the remarks
+  const detail = observing
+    ? { ...read, comments: [], candidates: read.candidates.map(maskForObserver) }
+    : read
 
   // An observer never writes nor reads the journal
   const allowed = (permission: Parameters<typeof access.can>[0]) =>

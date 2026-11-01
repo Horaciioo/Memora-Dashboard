@@ -7,6 +7,7 @@ import { ExerciseBrief } from '@/composites/recruitment/exercise/ExerciseBrief'
 import { LinkList } from '@/composites/recruitment/exercise/LinkList'
 import { AppreciationButtons } from '@/composites/recruitment/questionnaire/AppreciationButtons'
 import { QuestionComments } from '@/composites/recruitment/questionnaire/QuestionComments'
+import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { useExerciseLinks } from '@/core/hooks/data/recruitment/useExerciseLinks'
 import { BLANK_ANSWER } from '@/core/lib/recruitment/questionnaire'
 import type { ResolvedQuestion } from '@/core/lib/recruitment/questionnaire'
@@ -44,7 +45,8 @@ export const WrittenExercise = ({
 }: WrittenExerciseProps) => {
   const [isPicking, setPicking] = useState(false)
   const [picks, setPicks] = useState<Partial<Record<ContextLevel, string>>>({})
-  const { links, isSaving, generate, expire } = useExerciseLinks(candidateId)
+  const { can } = useRecruitmentState()
+  const { links, isSaving, generate, expire } = useExerciseLinks(candidateId, !can.observing)
   const state = answers[question.key] ?? BLANK_ANSWER
 
   const isHeld = isPicking && Object.keys(picks).length > 0

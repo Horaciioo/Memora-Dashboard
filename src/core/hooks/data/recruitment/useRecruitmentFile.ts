@@ -57,6 +57,7 @@ import type { InterviewPatch } from '@/types/recruitment'
 export interface RecruitmentFile {
   instructions: string
   candidates: CandidateView[]
+  mergeCandidate: (saved: CandidateView) => void
   steps: RecruitmentStepView[]
   link: IntegrationLinkView | null
   questionKeys: string[]
@@ -410,6 +411,7 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
   return {
     instructions,
     candidates,
+    mergeCandidate,
     steps,
     link,
     questionKeys,

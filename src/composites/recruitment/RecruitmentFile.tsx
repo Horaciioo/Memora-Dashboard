@@ -109,7 +109,7 @@ export const RecruitmentFile = ({
               value: 'calendar',
               label: RECRUITMENT_COPY.tabCalendar,
               icon: 'meetings',
-              render: () => <CalendarTab serverTime={serverTime} />,
+              render: () => <CalendarTab />,
             },
             {
               value: 'results',

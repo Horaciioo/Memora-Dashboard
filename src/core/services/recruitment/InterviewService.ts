@@ -207,7 +207,7 @@ export const markStage = async (
  * Refuse a change to a finished interview unless the viewer may reopen it
  * @param {string} candidateId - Candidate identifier
  * @param {Pick<RecruitmentRights, 'manage' | 'viewerId'>} viewer - Who writes
- * @param {FormValues} [seats] - New recruiters and observers, when only those are guarded
+ * @param {FormValues} [seats] - New observers, recruiters may always move
  * @return {Promise<void>} - Resolves when allowed
  */
 
@@ -235,11 +235,9 @@ export const assertInterviewOpen = async (
       current.length === wanted.length && [...current].sort().every((id, i) => id === wanted[i])
     )
   }
-  const isSame =
-    sameSeats(leading, readList(seats, 'recruiterIds')) &&
-    sameSeats(
-      row.observers.map((seat) => seat.accountId),
-      readList(seats, 'observerIds')
-    )
+  const isSame = sameSeats(
+    row.observers.map((seat) => seat.accountId),
+    readList(seats, 'observerIds')
+  )
   if (!isSame) throw forbidden()
 }
