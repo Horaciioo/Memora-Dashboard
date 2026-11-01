@@ -404,6 +404,7 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Panel Twitch',
         icon: 'liveconCrisis',
         permission: Permissions.SanctionRead,
+        maturity: 'new',
       },
     ],
   },
@@ -525,6 +526,15 @@ export const RECORD_LABELS: Record<string, string> = {
 }
 
 /**
+ * Stage of pages the sidebar does not list
+ * @type {Record<string, MaturityName>}
+ */
+
+const OFF_NAVIGATION_MATURITY: Record<string, MaturityName> = {
+  [ROUTES.pages]: 'alpha',
+}
+
+/**
  * Lifecycle stage declared for the page a path belongs to
  * @param {string} pathname - Current path
  * @return {MaturityName | null} - Stage of the closest declared entry
@@ -535,7 +545,13 @@ export const maturityOfPath = (pathname: string): MaturityName | null => {
     .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
     .sort((left, right) => right.href.length - left.href.length)[0]
 
-  return match?.maturity ?? null
+  if (match) return match.maturity ?? null
+
+  const own = Object.keys(OFF_NAVIGATION_MATURITY).find(
+    (href) => pathname === href || pathname.startsWith(`${href}/`)
+  )
+
+  return own ? OFF_NAVIGATION_MATURITY[own] : null
 }
 
 /**
