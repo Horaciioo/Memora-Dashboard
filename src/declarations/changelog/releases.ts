@@ -165,6 +165,27 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         text: 'Ajout d’un message quand la connexion est perdue, et d’un écran plein cadre qui propose de recharger quand une nouvelle version de Memora est disponible.',
       },
       {
+        tag: ChangelogTags.Added,
+        page: ROUTES.pages,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Pages privées » : des pages de notes à toi, avec un éditeur en blocs (menu « / » et barre de mise en forme), le partage avec d’autres membres et une corbeille.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Assistant Memora » : depuis la recherche et le bouton flottant, Memora te guide pas à pas pour déclarer une absence ou mettre à jour un candidat, un Junior, un entretien ou une tâche, selon tes accès.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.lives,
+        permission: Permissions.LiveLogRead,
+        audience: ChangelogAudiences.Responsables,
+        text: 'Ajout de la possibilité de corriger un live terminé : renommer le live, modifier ou retirer un geste de modération et ajuster le temps d’un modérateur.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.preferences,
+        text: 'Ajout de réglages de confort dans « Paramètres » : fond du cadre, cartes, arrondis (francs par défaut), interligne, liens soulignés, animations et repère du clavier.',
+      },
+      {
         tag: ChangelogTags.Improved,
         text: 'Amélioration visuelle de Memora : nouveau logo, nouvelles icônes d’application et écran de chargement avec le cerveau de Memora.',
       },
@@ -220,6 +241,17 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.members,
         permission: Permissions.RecruitmentRead,
         text: 'Amélioration de « Modérateurs » : un candidat accepté reste avec les candidats jusqu’au début de sa procédure académique.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.preferences,
+        text: 'Amélioration de « Paramètres » : les onglets sont repensés, regroupés par réglage et illustrés. Le bouton « Récupérer mes données » quitte l’onglet « Confidentialité ».',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.sanctions,
+        permission: Permissions.SanctionRead,
+        text: 'Amélioration du « Panel Twitch » : l’échelle de sanctions d’une infraction se lit et se modifie plus clairement, avec la gravité choisie parmi des barres de priorité.',
       },
       {
         tag: ChangelogTags.Fixed,
