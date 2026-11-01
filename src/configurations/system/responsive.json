@@ -9,6 +9,7 @@
   "mobileUntil": "md",
   "shell": {
     "topBarHeight": 52,
+    "dockHeight": 64,
     "sidebarWidth": 270,
     "sidebarCompactWidth": 80,
     "bannerHeight": 260,

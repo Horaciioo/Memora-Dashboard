@@ -1,0 +1,8 @@
+{
+  "installHintVisits": 3,
+  "updateCheckMs": 1800000,
+  "dockSlots": 3,
+  "pushTtlSeconds": 86400,
+  "pushRecipientsPerJob": 200,
+  "journalPageSize": 50
+}

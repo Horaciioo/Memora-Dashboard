@@ -335,6 +335,15 @@ const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption
     verb: 'convié',
     trail: 'à confirmer ta présence',
   },
+  PushTrial: {
+    label: 'Essai',
+    tone: 'success',
+    icon: 'bell',
+    lead: 'Tes notifications Memora arrivent',
+    verb: 'sur cet appareil',
+    trail: '',
+    addressed: true,
+  },
 }
 
 export const NOTIFICATION_KIND_REGISTRY = createRegistry(NOTIFICATION_KIND_MAP)

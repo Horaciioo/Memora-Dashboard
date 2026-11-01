@@ -515,7 +515,7 @@ export const CALENDAR_STYLES = {
   legendDot: 'h-2 w-2 shrink-0 rounded-full',
   legendCount: 'tabular-nums opacity-60',
   // Add button floating over a phone
-  fab: 'fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 size-14 rounded-2xl shadow-[var(--shadow-lg)] md:hidden',
+  fab: 'fixed right-4 bottom-[var(--shell-dock-clearance)] z-30 size-14 rounded-2xl shadow-[var(--shadow-lg)] md:hidden',
   selectionBar: SELECTION_BAR,
   selectionCount: 'font-semibold tabular-nums',
   // Detail modal

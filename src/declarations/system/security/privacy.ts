@@ -42,6 +42,7 @@ export const inDays = (days: number): string => {
 export const RETENTION_POLICIES = {
   expiredSessions: RETENTION_SETTINGS.expiredSessionDays,
   readNotifications: RETENTION_SETTINGS.readNotificationDays,
+  pushDeliveries: RETENTION_SETTINGS.pushDeliveryDays,
   activityLogs: RETENTION_SETTINGS.activityLogDays,
   moderationLogs: RETENTION_SETTINGS.moderationLogDays,
   rejectedCandidates: RETENTION_SETTINGS.rejectedCandidateDays,
@@ -112,6 +113,12 @@ const PROCESSING_MAP = {
     categories: 'Jeton de session, navigateur, adresse, dates',
     legalBasis: 'Nécessaire au fonctionnement du service',
     retention: inDays(RETENTION_POLICIES.expiredSessions),
+  },
+  pushes: {
+    label: 'Envoyer les notifications sur l’appareil',
+    categories: 'Adresse d’abonnement du navigateur, appareil, journal des envois',
+    legalBasis: 'Consentement, retiré à tout moment depuis les paramètres',
+    retention: `Abonnement effacé à la déconnexion, journal gardé ${inDays(RETENTION_POLICIES.pushDeliveries)}`,
   },
   constraints: {
     label: 'Tenir compte des contraintes déclarées',

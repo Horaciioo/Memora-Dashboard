@@ -39,3 +39,16 @@ export const readDevice = (userAgent: string | null): DeviceReading => {
     icon: isMobile ? DEVICE_ICONS.mobile : DEVICE_ICONS.desktop,
   }
 }
+
+/**
+ * Name a device the way a member recognises it
+ * @param {string | null} userAgent - Raw header
+ * @param {string} fallback - Name of an unreadable agent
+ * @return {string} - Browser and system
+ */
+
+export const deviceLabel = (userAgent: string | null, fallback: string): string => {
+  const { browser, system } = readDevice(userAgent)
+
+  return [browser, system].filter(Boolean).join(' · ') || fallback
+}

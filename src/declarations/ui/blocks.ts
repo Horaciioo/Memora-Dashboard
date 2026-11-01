@@ -209,16 +209,33 @@ export const NAV_SHEET = {
 } as const
 
 /**
+ * Phone dock, Home in the middle and the menu closing the row
+ * @type {Record<string, string>}
+ */
+
+export const MOBILE_DOCK = {
+  bar: 'glass-panel fixed inset-x-3 bottom-[calc(var(--shell-dock-gap)+env(safe-area-inset-bottom))] z-40 flex h-[var(--shell-dock-h)] items-center justify-around rounded-full px-1.5 shadow-[var(--shadow-lg)] md:hidden print:hidden',
+  item: 'relative flex h-full min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full transition-colors active:bg-[var(--color-hover)] motion-reduce:transition-none',
+  itemRest: 'text-[var(--color-ink-subtle)]',
+  itemActive: 'text-[var(--color-ink-accent)]',
+  icon: 'size-6 shrink-0',
+  label: 'max-w-full truncate px-1 text-micro leading-none font-semibold',
+  // Home sits raised in the middle
+  home: 'relative flex size-12 shrink-0 items-center justify-center rounded-full shadow-[var(--shadow-md)] transition-transform active:scale-95 motion-reduce:transition-none',
+  homeRest: 'bg-[var(--color-surface-raised)] text-[var(--color-ink)]',
+  homeActive: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
+  homeIcon: 'size-6',
+  dot: 'absolute top-2 left-[calc(50%+0.4rem)] size-2 rounded-full bg-[var(--color-danger)]',
+} as const
+
+/**
  * Mobile top bar classes
  * @type {Record<string, string>}
  */
 
 export const TOP_BAR = {
   bar: 'mist sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 border-b px-3 md:hidden print:hidden',
-  menuButton:
-    'flex size-11 items-center justify-center rounded-full text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
-  menuIcon: 'size-6',
-  // Where the page trail lands, beside the menu
+  // Where the page trail lands
   crumbsHost: 'flex min-w-0 flex-1 items-center',
   crumbs: 'flex min-w-0 flex-1 items-center gap-1 text-sm font-medium',
   // Page options and star, at the right of the bar

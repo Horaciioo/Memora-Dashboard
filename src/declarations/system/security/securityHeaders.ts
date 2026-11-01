@@ -26,3 +26,13 @@ export const STATIC_SECURITY_HEADERS = [
   },
   { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
 ]
+
+/**
+ * Headers of the service worker script, never kept by a browser or a proxy
+ * @type {{ key: string, value: string }[]}
+ */
+
+export const WORKER_HEADERS = [
+  { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+  { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+]

@@ -1,4 +1,6 @@
 import type { MaturityName } from '@/declarations/maturity/registries'
+import { PUSH_CONSOLE_COPY } from '@/declarations/pwa/copy'
+import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import type { IconName } from '@/declarations/ui/icons'
 import type { MemberRoleName, MemberStatusName } from '@/utils/constants/hierarchy'
 import { Permissions } from '@/utils/constants/permissions'
@@ -13,6 +15,7 @@ export const ROUTES = {
   home: '/',
   login: '/connexion',
   privacy: '/confidentialite',
+  offline: '/hors-ligne',
   integration: (token: string) => `/integration/${token}`,
   exercise: (token: string) => `/exercice/${token}`,
   dashboard: '/tableau-de-bord',
@@ -75,6 +78,7 @@ export const ROUTES = {
   storage: '/systeme/stockage',
   journal: '/systeme/logs',
   queues: '/systeme/files',
+  push: '/systeme/push',
   probes: '/systeme/sondes',
   analytics: '/systeme/activite',
   health: '/systeme/sante',
@@ -260,7 +264,7 @@ export const NAVIGATION: NavigationGroup[] = [
     items: [
       {
         href: ROUTES.dashboard,
-        label: 'Accueil',
+        label: NAV_COPY.home,
         icon: 'dashboard',
         maturity: 'alpha',
         quick: true,
@@ -452,7 +456,7 @@ export interface Crumb {
  */
 
 export const SEGMENT_LABELS: Record<string, string> = {
-  'tableau-de-bord': 'Accueil',
+  'tableau-de-bord': NAV_COPY.home,
   moderateurs: 'Modérateurs',
   equipes: 'Équipes',
   projets: 'Projets',
@@ -482,6 +486,7 @@ export const SEGMENT_LABELS: Record<string, string> = {
   logs: 'Logs',
   files: 'Files de jobs',
   sondes: 'Sondes',
+  push: PUSH_CONSOLE_COPY.title,
   activite: 'Activité',
   sante: 'Santé',
   employes: 'Employés',

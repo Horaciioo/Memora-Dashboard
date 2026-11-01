@@ -66,6 +66,7 @@ export const toSessionUser = async (account: SessionAccount): Promise<SessionUse
     historyConsentVersion: account.historyConsentVersion,
     seenReleaseVersion: account.seenReleaseVersion,
     favorites: toFavorites(account.favorites),
+    mobileDock: account.mobileDock,
     permissions: await resolveAccountPermissions(held, activeYoutuberId, !wearing),
   }
 }

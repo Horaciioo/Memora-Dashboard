@@ -26,6 +26,8 @@ const JOB_MAP = {
   maintenance: { label: 'Maintenance', schedule: '17 4 * * *' },
   // Roll-call reminders are due to the minute
   reminders: { label: 'Rappels de présence', schedule: '*/5 * * * *' },
+  // Push services ask to come back after a busy spell
+  push: { label: 'Notifications sur appareil', attempts: 6 },
 } satisfies Record<string, JobOption>
 
 export const JOB_REGISTRY = createRegistry<keyof typeof JOB_MAP, JobOption>(JOB_MAP)

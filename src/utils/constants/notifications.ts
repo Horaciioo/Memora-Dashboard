@@ -43,6 +43,8 @@ export const NOTIFICATION_KINDS = createEnumeration({
   AnnualSlotTaken: { id: 34, label: 'Créneau de bilan annuel pris' },
   AnnualReviewReminder: { id: 35, label: 'Bilan annuel à programmer' },
   AnnualSlotCancelled: { id: 36, label: 'Créneau de bilan annuel annulé' },
+  // Push sent from the settings, never stored as a notification
+  PushTrial: { id: 37, label: 'Essai de notification' },
 })
 
 export type NotificationKindName = keyof typeof NOTIFICATION_KINDS.ids

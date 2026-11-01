@@ -11,7 +11,10 @@ import { LiveSignalListener } from '@/composites/lives/LiveSignalListener'
 import { SealDialog } from '@/composites/security/SealDialog'
 import { TourHost } from '@/composites/tour/TourHost'
 import { LeftSidebar } from '@/composites/shell/LeftSidebar'
+import { MobileDock } from '@/composites/shell/MobileDock'
 import { MobileTopBar } from '@/composites/shell/MobileTopBar'
+import { OfflineBanner } from '@/composites/pwa/OfflineBanner'
+import { PwaHost } from '@/composites/pwa/PwaHost'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { frameToneOf } from '@/declarations/access/views'
@@ -34,6 +37,7 @@ export interface AppShellProps {
   seal: SealState
   tour: TourState | null
   heldRoutes: HeldRoutes
+  isPushReady: boolean
   children: ReactNode
 }
 
@@ -45,6 +49,7 @@ export interface AppShellProps {
  * @param {SealState} seal - Unlock window resolved server-side
  * @param {TourState | null} tour - First visit resolved server-side
  * @param {HeldRoutes} heldRoutes - Areas held back on small screens
+ * @param {boolean} isPushReady - Pushes configured on the server
  * @param {ReactNode} children - Routed page content
  * @return {JSX.Element}
  */
@@ -56,6 +61,7 @@ export const AppShell = ({
   seal,
   tour,
   heldRoutes,
+  isPushReady,
   children,
 }: AppShellProps) => {
   return (
@@ -69,6 +75,7 @@ export const AppShell = ({
           twoFactor={twoFactor}
           seal={seal}
           heldRoutes={heldRoutes}
+          isPushReady={isPushReady}
         >
           {children}
         </AppShellFrame>
@@ -89,6 +96,7 @@ const AppShellFrame = ({
   twoFactor,
   seal,
   heldRoutes,
+  isPushReady,
   children,
 }: Omit<AppShellProps, 'tour'>) => {
   const { session, can } = useAuthContext()
@@ -112,15 +120,23 @@ const AppShellFrame = ({
         {!isBare && <WindowFrame />}
 
         <div className={APP_SHELL.main}>
-          {session && (
-            <MobileTopBar session={session} viewContext={viewContext} unreadCount={unreadCount} />
-          )}
+          <OfflineBanner />
+          {session && <MobileTopBar />}
           <main className={APP_SHELL.content} {...beaconProps(TOUR_BEACONS.page)}>
             <MobileHold routes={heldRoutes}>{children}</MobileHold>
           </main>
         </div>
 
         <SealDialog />
+        {session && (
+          <MobileDock
+            session={session}
+            viewContext={viewContext}
+            unreadCount={unreadCount}
+            held={heldRoutes.phone}
+          />
+        )}
+        {session && <PwaHost isPushReady={isPushReady} />}
         {session && <NudgeHost />}
         {session && !isBare && can(Permissions.PlayAccess) && <PlayInviteHost />}
         {session && <TourHost />}

@@ -1,4 +1,8 @@
+import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
+import { NOTIFICATION_KIND_REGISTRY } from '@/declarations/notifications/registries'
 import type { NotificationKindOption } from '@/declarations/notifications/registries'
+import { NOTIFICATION_TARGETS } from '@/declarations/notifications/targets'
+import type { NotificationEntry } from '@/types/notifications'
 
 /**
  * One notification sentence
@@ -36,3 +40,33 @@ export const notificationSentence = (
 
   return { before: `${actor} ${kind.lead} `, verb: kind.verb, after }
 }
+
+/**
+ * Read a notification as one plain sentence
+ * @param {NotificationEntry} entry - Notification
+ * @return {string | null} - Sentence or nothing for an unknown kind
+ */
+
+export const notificationText = (entry: NotificationEntry): string | null => {
+  const kind = entry.kind ? NOTIFICATION_KIND_REGISTRY.get(entry.kind) : null
+  if (!kind) return null
+
+  const { before, verb, after } = notificationSentence(
+    kind,
+    entry.actorName ?? NOTIFICATION_COPY.system,
+    entry.subject
+  )
+
+  return `${before}${verb}${after}`
+}
+
+/**
+ * Page a notification leads to
+ * @param {Pick<NotificationEntry, 'target' | 'targetId'>} entry - Notification
+ * @return {string | null} - Destination or nothing
+ */
+
+export const notificationHref = (
+  entry: Pick<NotificationEntry, 'target' | 'targetId'>
+): string | null =>
+  entry.target ? (NOTIFICATION_TARGETS.get(entry.target).route(entry.targetId) ?? null) : null

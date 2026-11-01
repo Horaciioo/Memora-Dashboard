@@ -22,6 +22,9 @@ export const generateMetadata = async (): Promise<Metadata> => ({
   title: { default: APP_NAME, template: `%s | ${APP_NAME}` },
   description: APP_DESCRIPTION,
   applicationName: APP_NAME,
+  // Home screen application on iOS
+  appleWebApp: { capable: true, title: APP_NAME, statusBarStyle: 'default' },
+  formatDetection: { telephone: false },
   authors: [{ name: APP_COMPANY }],
   openGraph: { type: 'website', siteName: APP_NAME, title: APP_NAME, description: APP_DESCRIPTION },
   twitter: { card: 'summary_large_image', title: APP_NAME, description: APP_DESCRIPTION },
@@ -44,6 +47,7 @@ export const generateViewport = async (): Promise<Viewport> => {
 // Chrome dimensions
 const SHELL_VARS = {
   '--shell-top-bar-h': `${SHELL_DIMENSIONS.topBar}px`,
+  '--shell-dock-h': `${SHELL_DIMENSIONS.dock}px`,
   '--shell-sidebar-w': `${SHELL_DIMENSIONS.sidebar}px`,
   '--shell-banner-h': `${SHELL_DIMENSIONS.banner}px`,
   '--shell-banner-h-mobile': `${SHELL_DIMENSIONS.bannerMobile}px`,

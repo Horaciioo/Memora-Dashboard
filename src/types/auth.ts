@@ -50,6 +50,7 @@ export interface SessionUser {
   historyConsentVersion: number | null
   seenReleaseVersion: string | null
   favorites: FavoritePage[]
+  mobileDock: string[]
   display: DisplayPreferences
   timezone: string | null
   permissions: Permission[]
