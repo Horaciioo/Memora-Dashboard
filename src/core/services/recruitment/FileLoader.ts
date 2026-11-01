@@ -110,7 +110,11 @@ export const loadRecruitment = async (
       manageLinks: allowed(Permissions.IntegrationManage),
       readLogs: canReadLogs,
       observing,
-      canObserve: observing || access.can(Permissions.RecruitmentObserve) || seated,
+      canObserve:
+        observing ||
+        access.can(Permissions.RecruitmentObserve) ||
+        access.can(Permissions.RecruitmentRead) ||
+        seated,
       isObserver: seated,
       viewerId: session.id,
     },

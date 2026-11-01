@@ -147,7 +147,7 @@ export const LEFT_SIDEBAR = {
   // Account footer
   footer: 'flex shrink-0 px-4 pt-3',
   // Bare glyph row above the search
-  toolbar: 'rail-toolbar flex shrink-0 items-center gap-1 px-4 pb-3',
+  toolbar: 'flex shrink-0 items-center gap-1 px-4 pb-3',
   toolbarButton:
     'flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] active:scale-95',
   toolbarIcon: 'size-[1.125rem] shrink-0',
@@ -898,7 +898,6 @@ export const SPLASH = {
   ground: 'splash-ground pointer-events-none absolute inset-0 overflow-hidden',
   stage: 'splash-stage absolute inset-0 grid place-items-center',
   halo: 'splash-halo pointer-events-none',
-  ring: 'splash-ring pointer-events-none',
   brain: 'splash-brain relative',
   piece: 'splash-piece absolute',
 } as const

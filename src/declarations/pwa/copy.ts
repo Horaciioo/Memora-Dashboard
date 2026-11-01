@@ -8,6 +8,8 @@ import type { InstallRoute } from '@/types/pwa'
 export const INSTALL_COPY = {
   name: 'Memora',
   shortName: 'Memora',
+  // Dev build, told apart in the dock
+  devName: 'Memora - Dev',
   title: 'Application',
   lead: 'Ouvre Memora comme une application : plein écran, icône sur ton écran d’accueil et notifications sur ton téléphone.',
   action: 'Installer Memora',
@@ -41,7 +43,8 @@ export const INSTALL_ROUTE_COPY: Record<Exclude<InstallRoute, null>, string> = {
  */
 
 export const LIFECYCLE_COPY = {
-  updateTitle: 'Nouvelle version de Memora',
+  updateWord: 'Hop !',
+  updateTitle: 'Memora a une nouvelle version',
   updateLead: 'Recharge pour en profiter.',
   updateAction: 'Recharger',
   offlineBanner: 'Tu es hors ligne. Ce que tu modifies ne partira qu’au retour de la connexion.',

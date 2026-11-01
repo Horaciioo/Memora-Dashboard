@@ -179,27 +179,3 @@
     left: 130%;
   }
 }
-
-/* Installed app without title bar: window buttons float over the rail, arrows follow them */
-@media (display-mode: window-controls-overlay) {
-  .rail-toolbar {
-    min-height: env(titlebar-area-height, 2.75rem);
-    padding-left: calc(env(titlebar-area-x, 0px) + 0.5rem);
-    padding-bottom: 0.75rem;
-    box-sizing: content-box;
-    app-region: drag;
-    -webkit-app-region: drag;
-  }
-
-  .rail-toolbar button {
-    app-region: no-drag;
-    -webkit-app-region: no-drag;
-  }
-
-  /* Folded rail is too narrow for both: glyph drops under the buttons */
-  .rail-ground[data-compact] .rail-toolbar {
-    padding-top: env(titlebar-area-height, 2.75rem);
-    padding-left: 1rem;
-    min-height: 0;
-  }
-}

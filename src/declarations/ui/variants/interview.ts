@@ -70,6 +70,10 @@ export const QUESTION_BODY = {
 
 export const INTERVIEW = {
   // Creator mark top left, part wording over a dark fade at the bottom of the banner
+  // Phones drop the banner, the mark stands alone and centred
+  mobileMark: 'flex shrink-0 justify-center pt-2 lg:hidden',
+  mobileMarkImage: 'h-12 w-auto max-w-[60%] object-contain',
+  mobileName: 'text-section font-bold',
   figureTop: 'absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-black/35 to-transparent',
   figureMark: 'absolute top-6 left-6 h-12 w-auto max-w-[45%] object-contain object-left',
   figureName: 'absolute top-6 right-6 left-6 text-section font-bold text-white',
@@ -80,12 +84,13 @@ export const INTERVIEW = {
   figureTitle: 'text-3xl font-bold tracking-tight',
   figureLead: 'text-sm leading-relaxed text-white/85',
   part: 'flex flex-col gap-4 pt-2',
-  crumbsRow: 'grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4',
-  crumbsTrail: 'col-start-2 min-w-0 justify-self-center',
+  crumbsRow:
+    'flex justify-center lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:items-center lg:gap-4',
+  crumbsTrail: 'col-start-2 hidden min-w-0 justify-self-center lg:block',
   minutes:
-    'flex items-center gap-2 justify-self-start text-sm font-semibold text-[var(--color-ink-subtle)]',
+    'hidden items-center gap-2 justify-self-start text-sm lg:flex font-semibold text-[var(--color-ink-subtle)]',
   formalSwitch:
-    'col-start-3 flex items-center gap-2.5 justify-self-end text-sm font-semibold text-[var(--color-ink-subtle)]',
+    'flex items-center gap-2.5 lg:col-start-3 lg:justify-self-end text-sm font-semibold text-[var(--color-ink-subtle)]',
   speech: 'flex flex-col gap-3 text-base leading-relaxed',
   speechAside: 'text-sm text-[var(--color-ink-subtle)] italic',
   folds: `flex flex-col ${COURSE_PANEL} px-5 py-1`,

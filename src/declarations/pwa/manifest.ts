@@ -1,4 +1,8 @@
 import { ROUTES } from '@/declarations/navigation'
+import { APP_ENVIRONMENT } from '@/declarations/system/environments'
+
+// Dev wears a black and white logo, told apart from the real app
+const ICONS_DIR = APP_ENVIRONMENT === 'dev' ? '/icons/dev' : '/icons'
 
 /**
  * Address Next serves app/manifest.ts on
@@ -13,8 +17,8 @@ export const MANIFEST_PATH = '/manifest.webmanifest'
  */
 
 export const PWA_ICONS = {
-  small: '/icons/icon-192.png',
-  large: '/icons/icon-512.png',
+  small: `${ICONS_DIR}/icon-192.png`,
+  large: `${ICONS_DIR}/icon-512.png`,
   // White glyph, tinted by the system
   badge: '/icons/badge-96.png',
 } as const

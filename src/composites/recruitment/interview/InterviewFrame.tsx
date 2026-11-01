@@ -19,8 +19,6 @@ export interface InterviewFrameProps {
   logo?: string | null
   // Wording of the part, at the foot of the banner
   header?: ReactNode
-  // Phones keep the portrait for the introduction only
-  isPortraitShown?: boolean
   children: ReactNode
 }
 
@@ -30,7 +28,6 @@ export interface InterviewFrameProps {
  * @param {string} caption - Creator name over the portrait
  * @param {string | null} [logo] - Creator mark, top left
  * @param {ReactNode} [header] - Part wording over the foot of the banner
- * @param {boolean} [isPortraitShown] - Keeps the portrait on phones
  * @param {ReactNode} children - Window content
  * @return {JSX.Element}
  */
@@ -40,11 +37,19 @@ export const InterviewFrame = ({
   caption,
   logo,
   header,
-  isPortraitShown = true,
   children,
 }: InterviewFrameProps) => (
   <div className={INTERVIEW.frame} style={FRAME_VARS}>
-    <figure className={cn(TOUR_CHAT.figure, !isPortraitShown && 'max-lg:hidden')}>
+    <div className={INTERVIEW.mobileMark}>
+      {logo ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={logo} alt={caption} className={INTERVIEW.mobileMarkImage} />
+      ) : (
+        <span className={INTERVIEW.mobileName}>{caption}</span>
+      )}
+    </div>
+
+    <figure className={cn(TOUR_CHAT.figure, 'max-lg:hidden')}>
       {portrait ? (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}

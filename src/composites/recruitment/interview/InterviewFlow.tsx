@@ -142,7 +142,6 @@ const InterviewBody = ({
           </>
         )
       }
-      isPortraitShown={step === 0}
     >
       {parts.length === 0 ? (
         <div className={TOUR_CHAT.scroll}>

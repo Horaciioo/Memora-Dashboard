@@ -4,12 +4,8 @@
  */
 
 export const PWA_STYLES = {
-  // New version, floats under the top edge
-  update:
-    'toast-enter glass-toast fixed inset-x-4 top-3 z-[61] flex items-center gap-3 rounded-[var(--radius-xl)] px-4 py-3 text-sm md:inset-x-auto md:right-6 md:w-[min(26rem,calc(100vw-2rem))] print:hidden',
-  updateBody: 'flex min-w-0 flex-1 flex-col gap-0.5',
-  updateTitle: 'font-semibold',
-  updateLead: 'text-xs text-[var(--color-ink-subtle)]',
+  // New version, covers the whole screen
+  update: 'fixed inset-0 z-[61] overflow-y-auto bg-[var(--color-page)] print:hidden',
   // Lost network, a strip above the page
   offline:
     'flex items-center justify-center gap-2 bg-[var(--color-ink)] px-4 py-2 text-center text-xs font-medium text-[var(--color-page)] print:hidden',
