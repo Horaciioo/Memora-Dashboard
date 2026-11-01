@@ -4,6 +4,7 @@ import { create } from 'zustand'
 
 import { ASSISTANT_GREETINGS } from '@/declarations/assistant/copy'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
+import type { ScenarioId } from '@/types/scenario'
 import type { AssistantOffer } from '@/declarations/assistant/offers'
 
 /**
@@ -30,6 +31,20 @@ export interface DockAction {
  * @property {Handoff | null} handoff - Creation asked from another page
  */
 
+/**
+ * Talk Memora opens by herself on the open page
+ * @typedef {Object} DockFocus
+ * @property {ScenarioId} scenario - Guided talk
+ * @property {string} entry - Way in
+ * @property {Record<string, string>} data - What the page already knows
+ */
+
+export interface DockFocus {
+  scenario: ScenarioId
+  entry: string
+  data: Record<string, string>
+}
+
 interface Handoff {
   offer: AssistantOffer
   at: number
@@ -37,8 +52,11 @@ interface Handoff {
 
 interface AssistantDockStore {
   action: DockAction | null
+  focus: DockFocus | null
   greeting: string | null
   handoff: Handoff | null
+  focusOn: (focus: DockFocus) => void
+  focusOff: (focus: DockFocus) => void
   place: (action: DockAction) => void
   clear: (action: DockAction) => void
   open: () => void
@@ -54,8 +72,12 @@ const pickGreeting = () =>
 
 export const useAssistantDock = create<AssistantDockStore>()((set, get) => ({
   action: null,
+  focus: null,
   greeting: null,
   handoff: null,
+  focusOn: (focus) => set({ focus }),
+  // Only the page that placed it
+  focusOff: (focus) => set((state) => (state.focus === focus ? { focus: null } : state)),
   place: (action) => set({ action }),
   // Only the page that placed it
   clear: (action) => set((state) => (state.action === action ? { action: null } : state)),

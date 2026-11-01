@@ -62,3 +62,14 @@ export function foldText(text: string): string {
     .replace(/\u0153/g, 'oe')
     .replace(/\u00e6/g, 'ae')
 }
+
+/**
+ * Fill the {slots} of a sentence
+ * @param {string} template - Sentence with slots
+ * @param {Record<string, string>} values - Slot values
+ * @return {string} - Sentence, unknown slots untouched
+ */
+
+export function fillTemplate(template: string, values: Record<string, string>): string {
+  return template.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match)
+}

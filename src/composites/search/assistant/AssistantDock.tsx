@@ -6,6 +6,7 @@ import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
 import { useNudgeCycle } from '@/core/hooks/interaction/state/useNudgeCycle'
 import { useAssistantDock } from '@/core/store/assistantDock'
 import { ASSISTANT_DOCK_COPY, ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
+import type { AssistantOffer } from '@/declarations/assistant/offers'
 import { ASSISTANT_SETTINGS } from '@/declarations/assistant/settings'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import type { ViewContext } from '@/types/access'
@@ -31,10 +32,11 @@ export const AssistantDock = ({ viewContext }: AssistantDockProps) => {
   const reached = new Map(
     [...shortcuts, ...groups.flatMap((group) => group.items)].map((item) => [item.href, item.icon])
   )
-  const picks = Object.values(ASSISTANT_OFFERS).flatMap((offer) => {
+  const picks = Object.values<AssistantOffer>(ASSISTANT_OFFERS).flatMap((offer) => {
     const icon = reached.get(offer.href)
 
-    return icon && offer !== action?.offer ? [{ offer, icon }] : []
+    // The page's own creation stays its chip, unless a guided talk exists for it
+    return icon && (offer !== action?.offer || offer.scenario) ? [{ offer, icon }] : []
   })
 
   const nudge = useNudgeCycle(action?.offer.nudges ?? ASSISTANT_DOCK_COPY.nudges, !isOpen)

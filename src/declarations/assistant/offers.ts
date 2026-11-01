@@ -1,4 +1,5 @@
 import { ROUTES } from '@/declarations/navigation'
+import type { ScenarioId } from '@/types/scenario'
 import { WorkflowScopes } from '@/utils/constants/workflow'
 import type { WorkflowScopeName } from '@/utils/constants/workflow'
 
@@ -8,12 +9,14 @@ import type { WorkflowScopeName } from '@/utils/constants/workflow'
  * @property {string} ask - Button question
  * @property {string} href - Page holding the creation
  * @property {string[]} nudges - Lines dropped now and then
+ * @property {ScenarioId} [scenario] - Guided talk the chat opens instead of the page
  */
 
 export interface AssistantOffer {
   ask: string
   href: string
   nudges: readonly string[]
+  scenario?: ScenarioId
 }
 
 /**
@@ -25,6 +28,7 @@ export const ASSISTANT_OFFERS = {
   absence: {
     ask: 'On te déclare une absence ?',
     href: ROUTES.absences,
+    scenario: 'absence',
     nudges: [
       'On te pose une petite absence ?',
       'Tu pars bientôt ? Je te note ça.',
@@ -39,7 +43,26 @@ export const ASSISTANT_OFFERS = {
   candidate: {
     ask: 'On recrute des p’tits nouveaux ?',
     href: ROUTES.recruitments,
+    scenario: 'recruitment',
     nudges: ['Un nouveau candidat en vue ?', 'Quelqu’un a postulé ? On l’ajoute.'],
+  },
+  candidateUpdate: {
+    ask: 'On met à jour un candidat ?',
+    href: ROUTES.recruitments,
+    scenario: 'candidate',
+    nudges: ['Un candidat à mettre à jour ?', 'Un entretien à caler ? Dis-moi qui.'],
+  },
+  junior: {
+    ask: 'On s’occupe d’un Junior ?',
+    href: ROUTES.academy,
+    scenario: 'junior',
+    nudges: ['Un Junior à suivre ?', 'Tes étapes de formateur ? Je te les rappelle.'],
+  },
+  taskUpdate: {
+    ask: 'On met à jour une tâche ?',
+    href: ROUTES.tasks,
+    scenario: 'task',
+    nudges: ['Une tâche à mettre à jour ?', 'Une échéance à décaler ? Dis-moi laquelle.'],
   },
   task: {
     ask: 'Des tâches supplémentaires à faire ?',

@@ -5,6 +5,8 @@
 
 export const ASSISTANT_COPY = {
   name: 'Memora',
+  // Stage of the chat itself
+  maturity: 'alpha',
   launcher: 'Demande à Memora…',
   launcherTitle: 'Memora, recherche et actions',
   placeholder: 'Cherche, ou demande : « crée une tâche pour Procy »',

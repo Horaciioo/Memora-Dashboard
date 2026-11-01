@@ -70,9 +70,9 @@ export const SKELETON_BASE = 'skeleton-shimmer rounded-[var(--radius-md)] bg-[va
 
 export const EMPTY_STATE_STYLES = {
   frame:
-    'flex flex-col items-center justify-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-16 text-center',
+    'card-surface flex flex-col items-center justify-center gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] px-6 py-16 text-center',
   frameCompact:
-    'flex flex-col items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface)] px-6 py-10 text-center',
+    'card-surface flex flex-col items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] px-6 py-10 text-center',
   start: { illustration: 'course-pop h-32 w-32' },
   filter: { illustration: 'course-pop h-28 w-28' },
   compact: { illustration: 'course-pop h-20 w-20' },
@@ -159,6 +159,7 @@ export const FLOATING_ADD_STYLES = {
     'glass-sunset flex h-11 w-11 shrink-0 items-center justify-center rounded-full border',
   chatHeadGlyph: 'brain-mark-white h-6',
   chatHeadText: 'flex min-w-0 flex-1 flex-col',
+  chatHeadTitle: 'flex items-center gap-2',
   chatHeadName: 'text-body font-bold',
   chatHeadStatus: 'text-caption text-[var(--color-ink-subtle)]',
   // Scrolls, the newest line kept in sight

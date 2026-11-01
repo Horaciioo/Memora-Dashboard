@@ -54,7 +54,7 @@ const nextWeekday = (today: string, weekday: number): string =>
  * @return {string | null} - Next such day
  */
 
-const dayOfMonth = (today: string, day: number, month?: number): string | null => {
+export const dayOfMonth = (today: string, day: number, month?: number): string | null => {
   const [year, current] = today.split('-').map(Number)
   const pick = (y: number, m: number) => {
     const date = new Date(Date.UTC(y, m - 1, day))
@@ -82,7 +82,7 @@ const readSlashed = (token: string, today: string): string | null => {
 }
 
 // Number written or spelled
-const readNumber = (word: string | undefined): number | null => {
+export const readNumber = (word: string | undefined): number | null => {
   if (!word) return null
   if (/^\d+$/.test(word)) return Number(word)
 
@@ -97,7 +97,7 @@ const readNumber = (word: string | undefined): number | null => {
  * @return {DueMatch | null} - Date found
  */
 
-const readAt = (tokens: AssistantToken[], index: number, today: string): DueMatch | null => {
+export const readAt = (tokens: AssistantToken[], index: number, today: string): DueMatch | null => {
   const word = tokens[index].folded
   const next = tokens[index + 1]?.folded
 

@@ -1,5 +1,10 @@
 'use client'
 
+import { Button } from '@/components/elements/actions/Button'
+import { ScenarioPercent } from '@/composites/search/assistant/ScenarioPercent'
+import { ScenarioMulti } from '@/composites/search/assistant/ScenarioMulti'
+import { ScenarioSearch } from '@/composites/search/assistant/ScenarioSearch'
+import { ScenarioPeriod } from '@/composites/search/assistant/ScenarioPeriod'
 import type { AssistantChat } from '@/core/hooks/data/system/useAssistantChat'
 import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { ASSISTANT_STYLES, BUTTON_STYLES } from '@/declarations/ui/variants'
@@ -17,6 +22,81 @@ export interface AssistantAnswersProps {
 
 export const AssistantAnswers = ({ chat }: AssistantAnswersProps) => {
   const { current } = chat
+  const { ask } = chat.scenario
+
+  // A guided talk waits for its own answer
+  if (ask?.kind === 'period') {
+    return (
+      <ScenarioPeriod
+        booked={ask.booked}
+        focus={ask.focus}
+        onPick={(value, label) => chat.scenario.answer({ value, label })}
+      />
+    )
+  }
+
+  if (ask?.kind === 'percent') {
+    return (
+      <ScenarioPercent
+        value={ask.value}
+        max={ask.max}
+        onPick={(percent) =>
+          chat.scenario.answer({ value: String(percent), label: `${percent} %` })
+        }
+      />
+    )
+  }
+
+  if (ask?.kind === 'multi') {
+    return (
+      <ScenarioMulti
+        choices={ask.choices}
+        onPick={(value, label) => chat.scenario.answer({ value, label })}
+      />
+    )
+  }
+
+  if (ask?.kind === 'search') {
+    return (
+      <ScenarioSearch
+        placeholder={ask.placeholder}
+        onSearch={(text) => chat.scenario.answer({ value: text, label: text })}
+      />
+    )
+  }
+
+  if (ask?.kind === 'choices') {
+    // Short answers are pills, answers with a detail are rows
+    const isPlain = ask.choices.every((choice) => !choice.hint)
+
+    return (
+      <div className={isPlain ? ASSISTANT_STYLES.answers : ASSISTANT_STYLES.choices} role="group">
+        {ask.choices.map((choice, index) =>
+          isPlain ? (
+            <Button
+              key={choice.value}
+              variant={index === 0 ? 'primary' : 'secondary'}
+              className={ASSISTANT_STYLES.answer}
+              onClick={() => chat.scenario.answer({ value: choice.value, label: choice.label })}
+            >
+              {choice.label}
+            </Button>
+          ) : (
+            <button
+              key={choice.value}
+              type="button"
+              onClick={() => chat.scenario.answer({ value: choice.value, label: choice.label })}
+              className={ASSISTANT_STYLES.choice}
+            >
+              <span className="min-w-0 truncate">{choice.label}</span>
+              <span className={ASSISTANT_STYLES.choiceHint}>{choice.hint}</span>
+            </button>
+          )
+        )}
+      </div>
+    )
+  }
+
   if (!current) return null
 
   // Pick one of the offered answers

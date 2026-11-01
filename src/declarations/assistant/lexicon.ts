@@ -38,12 +38,84 @@ const CREATE_VERBS = [
 const TASK_NOUNS = ['tache', 'taches', 'todo', 'task'] as const
 
 /**
+ * Words that steer an absence talk, per way in
+ * @type {Record<'edit' | 'delete' | 'list', string[]>}
+ */
+
+export const ASSISTANT_ABSENCE_MODES = {
+  edit: [
+    'modifie',
+    'modifier',
+    'modifies',
+    'change',
+    'changer',
+    'decale',
+    'decaler',
+    'deplace',
+    'deplacer',
+    'prolonge',
+    'prolonger',
+    'rallonge',
+    'rallonger',
+    'raccourcis',
+    'raccourcir',
+    'corrige',
+    'corriger',
+  ],
+  delete: [
+    'supprime',
+    'supprimer',
+    'supprimes',
+    'retire',
+    'retirer',
+    'annule',
+    'annuler',
+    'efface',
+    'effacer',
+    'enleve',
+    'enlever',
+  ],
+  list: ['liste', 'lister', 'montre', 'affiche', 'consulte', 'consulter', 'quelles', 'combien'],
+} as const
+
+// Verbs that start an absence
+const ABSENCE_VERBS = [
+  ...CREATE_VERBS,
+  'pose',
+  'poser',
+  'poses',
+  'declare',
+  'declarer',
+  'prends',
+  'prendre',
+  'mets',
+  'mettre',
+  'signale',
+  'signaler',
+  'pars',
+  'part',
+  'partir',
+  'suis',
+  'serai',
+  'vais',
+  'absente',
+  ...ASSISTANT_ABSENCE_MODES.edit,
+  ...ASSISTANT_ABSENCE_MODES.delete,
+  ...ASSISTANT_ABSENCE_MODES.list,
+] as const
+
+/**
  * Intent rules, read in order
  * @type {Record<string, IntentRule>}
  */
 
 export const ASSISTANT_INTENTS = {
   createTask: { verbs: CREATE_VERBS, nouns: TASK_NOUNS, needs: 'both' },
+  absence: {
+    verbs: ABSENCE_VERBS,
+    nouns: ['absence', 'absences', 'conge', 'conges', 'vacances', 'absent', 'indisponible'],
+    needs: 'both',
+  },
   filterLogs: {
     nouns: ['log', 'logs', 'journal', 'journaux', 'erreur', 'erreurs'],
     needs: 'noun',
@@ -249,6 +321,56 @@ export const ASSISTANT_DAY_UNITS: Record<string, number> = {
   semaine: 7,
   semaines: 7,
 }
+
+/**
+ * Lengths a period is spoken in
+ * @type {Record<string, number>}
+ */
+
+export const ASSISTANT_PERIOD_UNITS: Record<string, number> = {
+  ...ASSISTANT_DAY_UNITS,
+  quinzaine: 15,
+  mois: 30,
+}
+
+/**
+ * Month names and their short forms
+ * @type {Record<string, number>}
+ */
+
+export const ASSISTANT_MONTHS: Record<string, number> = {
+  janvier: 1,
+  janv: 1,
+  fevrier: 2,
+  fevr: 2,
+  mars: 3,
+  avril: 4,
+  avr: 4,
+  mai: 5,
+  juin: 6,
+  juillet: 7,
+  juil: 7,
+  aout: 8,
+  septembre: 9,
+  sept: 9,
+  octobre: 10,
+  oct: 10,
+  novembre: 11,
+  nov: 11,
+  decembre: 12,
+  dec: 12,
+}
+
+/**
+ * Answers read as yes, no or a stop
+ * @type {{ yes: string[], no: string[], stop: string[] }}
+ */
+
+export const ASSISTANT_ANSWERS = {
+  yes: ['oui', 'ouais', 'yes', 'yep', 'ok', 'okay', 'accord', 'carrement', 'bien', 'volontiers'],
+  no: ['non', 'nan', 'nope', 'no', 'pas', 'aucune', 'aucun', 'rien'],
+  stop: ['stop', 'annule', 'annuler', 'laisse', 'tomber', 'oublie', 'quitte'],
+} as const
 
 /**
  * Spelled numbers

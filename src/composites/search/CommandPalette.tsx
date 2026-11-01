@@ -111,7 +111,6 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
   }
 
   const isTooShort = term.trim().length < SEARCH_SETTINGS.minLength
-  const question = chat.current?.question
 
   return createPortal(
     <div
@@ -139,9 +138,7 @@ export const CommandPalette = ({ onClose }: CommandPaletteProps) => {
             onChange={(event) => setTerm(event.target.value)}
             onKeyDown={onKeyDown}
             placeholder={
-              question && question.kind !== 'choice'
-                ? ASSISTANT_COPY.answerPlaceholder
-                : ASSISTANT_COPY.placeholder
+              chat.isAnswering ? ASSISTANT_COPY.answerPlaceholder : ASSISTANT_COPY.placeholder
             }
             aria-label={ASSISTANT_COPY.launcherTitle}
             className={PALETTE_STYLES.input}

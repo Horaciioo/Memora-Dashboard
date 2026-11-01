@@ -2,6 +2,7 @@ import 'server-only'
 
 import { readPageContext } from '@/core/lib/assistant/context'
 import { parseCommand } from '@/core/lib/assistant/parse'
+import { resolveAbsence } from '@/core/services/assistant/absences'
 import { resolveLive } from '@/core/services/assistant/lives'
 import { resolveLogs } from '@/core/services/assistant/logs'
 import { resolveNavigation } from '@/core/services/assistant/navigation'
@@ -16,6 +17,7 @@ import { instantToWall } from '@/utils/format/zone'
 // One resolver per intent
 const RESOLVERS: Record<AssistantIntentName, Resolver> = {
   createTask: resolveCreateTask,
+  absence: resolveAbsence,
   filterLogs: resolveLogs,
   liveReport: resolveLive,
   openLive: resolveLive,

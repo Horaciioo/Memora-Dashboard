@@ -270,6 +270,35 @@ const readSpan = (values: FormValues): { startDate: Date; endDate: Date; dayCoun
 }
 
 /**
+ * Refuse a span that crosses an absence still counting
+ * @param {string} accountId - Owner of the absence
+ * @param {Date} startDate - First day
+ * @param {Date} endDate - Last day
+ * @param {string} [exceptId] - Absence being edited
+ * @return {Promise<void>}
+ */
+
+const assertFree = async (
+  accountId: string,
+  startDate: Date,
+  endDate: Date,
+  exceptId?: string
+): Promise<void> => {
+  const clash = await prisma.absence.findFirst({
+    where: {
+      accountId,
+      id: exceptId ? { not: exceptId } : undefined,
+      status: { in: [AbsenceStatuses.Pending, AbsenceStatuses.Approved] },
+      startDate: { lte: endDate },
+      endDate: { gte: startDate },
+    },
+    select: { id: true },
+  })
+
+  if (clash) throw invalidInput([{ field: 'dates', message: ABSENCE_COPY.overlap }])
+}
+
+/**
  * Responsable posting on someone's behalf
  * @typedef {Object} AbsenceApproval
  * @property {string} reviewerId - Responsable identifier
@@ -300,6 +329,7 @@ export const createAbsence = async (
   }
 
   const { startDate, endDate, dayCount } = readSpan(values)
+  await assertFree(accountId, startDate, endDate)
 
   const row = await prisma.absence.create({
     data: {
@@ -323,9 +353,9 @@ export const createAbsence = async (
 }
 
 /**
- * Edit the dates and the reason of a current absence
+ * Edit the dates and the reason of a current absence, by its owner or a responsable
  * @param {string} id - Absence identifier
- * @param {string} reviewerId - Editing responsable identifier
+ * @param {string} reviewerId - Editing member identifier
  * @param {boolean} isAdmin - Editor holds the admin level
  * @param {FormValues} values - Parsed body
  * @return {Promise<MemberAbsence>} - Edited absence
@@ -340,7 +370,11 @@ export const updateAbsence = async (
   const current = await prisma.absence.findUnique({ where: { id } })
   if (!current) throw notFound()
 
-  if (!(await canReviewAbsence(reviewerId, current.accountId, isAdmin))) throw forbidden()
+  // The owner moves their own, anyone else needs a review right
+  const isOwner = current.accountId === reviewerId
+  if (!isOwner && !(await canReviewAbsence(reviewerId, current.accountId, isAdmin))) {
+    throw forbidden()
+  }
 
   // Only a current absence can move
   const today = absenceDay()
@@ -354,6 +388,7 @@ export const updateAbsence = async (
   }
 
   const { startDate, endDate, dayCount } = readSpan(values)
+  await assertFree(current.accountId, startDate, endDate, id)
 
   const row = await prisma.absence.update({
     where: { id },
@@ -363,6 +398,15 @@ export const updateAbsence = async (
       dayCount,
       // Unsent reason stays
       ...('reason' in values ? { reason: encryptField(readText(values, 'reason')) } : {}),
+      // New dates need a new look from the responsables
+      ...(isOwner && !isAdmin && current.status === AbsenceStatuses.Approved
+        ? {
+            status: AbsenceStatuses.Pending,
+            reviewerId: null,
+            reviewedAt: null,
+            reviewNote: null,
+          }
+        : {}),
     },
     include: ABSENCE_INCLUDE,
   })

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { useMemoraIntro } from '@/core/hooks/interaction/scenes/useMemoraIntro'
@@ -33,6 +33,8 @@ export interface MemoraIntroProps {
   showPicks: boolean
   onAction: (action: DockAction) => void
   onPick: (offer: AssistantOffer) => void
+  // Every line is written
+  onDone?: () => void
 }
 
 /**
@@ -49,12 +51,23 @@ export const MemoraIntro = ({
   showPicks,
   onAction,
   onPick,
+  onDone,
 }: MemoraIntroProps) => {
   const script = useMemo(
     () => [ASSISTANT_INTRO_COPY.hello.replace('{name}', name), greeting],
     [name, greeting]
   )
   const intro = useMemoraIntro(script)
+  const { isDone } = intro
+  const latestDone = useRef(onDone)
+
+  useEffect(() => {
+    latestDone.current = onDone
+  })
+
+  useEffect(() => {
+    if (isDone) latestDone.current?.()
+  }, [isDone])
   // Question of the icon pointed
   const [pointed, setPointed] = useState<string | null>(null)
 

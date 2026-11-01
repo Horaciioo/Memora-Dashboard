@@ -6,6 +6,7 @@ import type { AssistantSlotKey } from '@/declarations/assistant/copy'
 import { ASSISTANT_EXAMPLES } from '@/declarations/assistant/lexicon'
 import type { AssistantIntentName } from '@/declarations/assistant/lexicon'
 import type { PermissionHelpers, SessionUser } from '@/types/auth'
+import { fillTemplate } from '@/utils/format/strings'
 import type {
   AssistantChoice,
   AssistantProposal,
@@ -40,15 +41,8 @@ export interface ResolverContext {
 
 export type Resolver = (context: ResolverContext) => Promise<AssistantProposal>
 
-/**
- * Fill a sentence
- * @param {string} template - Sentence with slots
- * @param {Record<string, string>} values - Slot values
- * @return {string} - Sentence
- */
-
-export const fill = (template: string, values: Record<string, string>): string =>
-  template.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match)
+// Slots of a sentence filled
+export const fill = fillTemplate
 
 /**
  * Build a proposal

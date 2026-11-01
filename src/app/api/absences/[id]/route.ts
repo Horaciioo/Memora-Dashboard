@@ -1,4 +1,4 @@
-import { invalidInput } from '@/core/lib/errors'
+import { forbidden, invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import {
   ABSENCE_FIELDS,
@@ -17,12 +17,11 @@ import { absenceSentence } from '@/utils/format/absences'
 import { formatDayRange } from '@/utils/format/dates'
 
 export const PATCH = createProtectedRoute({
-  permission: Permissions.AbsenceReview,
   fields: [...REVIEW_FIELDS, ...ABSENCE_FIELDS],
   partial: true,
   descriptor: { summary: 'Settle or edit an absence', tags: ['absences'] },
   handler: async ({ params, raw, body, session, access }) => {
-    // Without an outcome the request edits dates and reason
+    // Without an outcome the request edits dates and reason, the owner's included
     if (raw.status === undefined) {
       const edited = await updateAbsence(params.id, session.id, access.isAdmin, body)
 
@@ -37,6 +36,9 @@ export const PATCH = createProtectedRoute({
 
       return edited
     }
+
+    // Settling an absence is a responsable's gesture
+    if (!access.can(Permissions.AbsenceReview)) throw forbidden()
 
     const status = String(raw.status)
     if (!ABSENCE_STATUS_REGISTRY.has(status)) {

@@ -3,7 +3,7 @@ import { readInteger } from '@/declarations/configurations/readers'
 
 /**
  * Assistant behaviour
- * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, handoffSeconds: number, maxPicks: number, pickStaggerMs: number }}
+ * @type {{ debounceMs: number, maxChoices: number, idempotencyMinutes: number, nudgeFirstSeconds: number, nudgeEverySeconds: number, nudgeShowSeconds: number, typingMsPerChar: number, typingMinMs: number, typingMaxMs: number, handoffSeconds: number, maxPicks: number, pickStaggerMs: number, thinkingMs: number }}
  */
 
 export const ASSISTANT_SETTINGS = {
@@ -68,6 +68,12 @@ export const ASSISTANT_SETTINGS = {
   pickStaggerMs: readInteger(assistant.pickStaggerMs, {
     path: 'system/assistant.pickStaggerMs',
     fallback: 90,
+    min: 0,
+  }),
+  // Memora thinks before she acts
+  thinkingMs: readInteger(assistant.thinkingMs, {
+    path: 'system/assistant.thinkingMs',
+    fallback: 900,
     min: 0,
   }),
 }

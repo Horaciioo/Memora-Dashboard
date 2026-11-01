@@ -1,3 +1,4 @@
+import { readAbsenceMode } from '@/core/lib/assistant/absence'
 import { extractDue } from '@/core/lib/assistant/dates'
 import { detectIntent, findPage } from '@/core/lib/assistant/intents'
 import { isSimilar, tokenize } from '@/core/lib/assistant/normalize'
@@ -21,6 +22,7 @@ import {
 } from '@/declarations/assistant/lexicon'
 import type { AssistantIntentName, AssistantPage } from '@/declarations/assistant/lexicon'
 import type { JournalPeriod } from '@/declarations/system/monitoring/journal'
+import type { AssistantAbsenceMode } from '@/types/assistant'
 import type { LogLevelName } from '@/utils/constants/events'
 
 /**
@@ -40,6 +42,7 @@ import type { LogLevelName } from '@/utils/constants/events'
  * @property {'member' | 'demonstrative' | null} reference - Pointing word
  * @property {boolean} latest - Latest asked
  * @property {boolean} current - Running asked
+ * @property {AssistantAbsenceMode | null} absenceMode - Way into the absence talk
  */
 
 export interface ParsedCommand {
@@ -57,6 +60,7 @@ export interface ParsedCommand {
   reference: 'member' | 'demonstrative' | null
   latest: boolean
   current: boolean
+  absenceMode: AssistantAbsenceMode | null
 }
 
 // Leading words a title sheds
@@ -226,6 +230,7 @@ export const parseCommand = (text: string, today: string): ParsedCommand => {
     reference: extractReference(tokens),
     latest: asksLatest(tokens),
     current: asksCurrent(tokens),
+    absenceMode: match?.intent === 'absence' ? readAbsenceMode(tokens) : null,
   }
 }
 

@@ -87,12 +87,35 @@ export interface AssistantQuestion {
 }
 
 /**
+ * Way into the absence talk
+ * @type {'create' | 'edit' | 'delete' | 'list'}
+ */
+
+export type AssistantAbsenceMode = 'create' | 'edit' | 'delete' | 'list'
+
+/**
+ * Talk Memora leads on her own, once the sentence opened it
+ * @typedef {Object} AssistantScenarioStart
+ * @property {'scenario'} kind - Action kind
+ * @property {'absence'} scenario - Talk to open
+ * @property {AssistantAbsenceMode} entry - Way in
+ */
+
+export interface AssistantScenarioStart {
+  kind: 'scenario'
+  scenario: 'absence'
+  entry: AssistantAbsenceMode
+}
+
+/**
  * Action ready to run
- * @type {{ kind: 'navigate', href: string } | { kind: 'createTask', values: Record<string, string> }}
+ * @type {{ kind: 'navigate', href: string } | { kind: 'createTask', values: Record<string, string> } | AssistantScenarioStart}
  */
 
 export type AssistantAction =
-  { kind: 'navigate'; href: string } | { kind: 'createTask'; values: Record<string, string> }
+  | { kind: 'navigate'; href: string }
+  | { kind: 'createTask'; values: Record<string, string> }
+  | AssistantScenarioStart
 
 /**
  * Outcome of an interpretation

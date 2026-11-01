@@ -10,5 +10,6 @@
   "typingMaxMs": 1200,
   "handoffSeconds": 10,
   "maxPicks": 6,
-  "pickStaggerMs": 90
+  "pickStaggerMs": 90,
+  "thinkingMs": 900
 }

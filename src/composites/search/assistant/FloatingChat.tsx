@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { MaturityTag } from '@/components/elements/display/MaturityTag'
 import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { AssistantThread } from '@/composites/search/assistant/AssistantThread'
 import { MemoraIntro } from '@/composites/search/assistant/MemoraIntro'
@@ -34,6 +35,8 @@ export interface FloatingChatProps {
 export const FloatingChat = ({ name, greeting, action, picks, onClose }: FloatingChatProps) => {
   const router = useRouter()
   const handOff = useAssistantDock((state) => state.handOff)
+  const focus = useAssistantDock((state) => state.focus)
+  const hasFocused = useRef(false)
   const [term, setTerm] = useState('')
   const thread = useRef<HTMLDivElement>(null)
   const chat = useAssistantChat((href) => {
@@ -59,8 +62,6 @@ export const FloatingChat = ({ name, greeting, action, picks, onClose }: Floatin
     setTerm('')
   }
 
-  const question = chat.current?.question
-
   return (
     <div className={FLOATING_ADD_STYLES.chat} role="dialog" aria-label={ASSISTANT_COPY.name}>
       <div className={FLOATING_ADD_STYLES.chatHead}>
@@ -68,7 +69,10 @@ export const FloatingChat = ({ name, greeting, action, picks, onClose }: Floatin
           <BrainMark className={FLOATING_ADD_STYLES.chatHeadGlyph} />
         </span>
         <div className={FLOATING_ADD_STYLES.chatHeadText}>
-          <span className={FLOATING_ADD_STYLES.chatHeadName}>{ASSISTANT_COPY.name}</span>
+          <span className={FLOATING_ADD_STYLES.chatHeadTitle}>
+            <span className={FLOATING_ADD_STYLES.chatHeadName}>{ASSISTANT_COPY.name}</span>
+            <MaturityTag maturity={ASSISTANT_COPY.maturity} compact interactive={false} />
+          </span>
           <span className={FLOATING_ADD_STYLES.chatHeadStatus}>{ASSISTANT_INTRO_COPY.status}</span>
         </div>
         <Button
@@ -89,12 +93,24 @@ export const FloatingChat = ({ name, greeting, action, picks, onClose }: Floatin
                 greeting={greeting}
                 action={action}
                 picks={picks}
-                showPicks={chat.turns.length === 0}
+                showPicks={chat.turns.length === 0 && !chat.scenario.isActive && !focus}
+                onDone={() => {
+                  // The page knows what the member is on, Memora starts from there
+                  if (!focus || hasFocused.current) return
+                  hasFocused.current = true
+                  chat.guide(focus.scenario, focus.entry, focus.data)
+                }}
                 onAction={(create) => {
                   onClose()
                   create.run()
                 }}
                 onPick={(offer) => {
+                  // A creation with a guided talk opens it right here
+                  if (offer.scenario) {
+                    chat.guide(offer.scenario, 'offer')
+                    return
+                  }
+
                   handOff(offer)
                   router.push(offer.href)
                 }}
@@ -115,9 +131,7 @@ export const FloatingChat = ({ name, greeting, action, picks, onClose }: Floatin
           value={term}
           onChange={(event) => setTerm(event.target.value)}
           placeholder={
-            question && question.kind !== 'choice'
-              ? ASSISTANT_COPY.answerPlaceholder
-              : ASSISTANT_DOCK_COPY.placeholder
+            chat.isAnswering ? ASSISTANT_COPY.answerPlaceholder : ASSISTANT_DOCK_COPY.placeholder
           }
           aria-label={ASSISTANT_COPY.launcherTitle}
           className={FLOATING_ADD_STYLES.chatInput}

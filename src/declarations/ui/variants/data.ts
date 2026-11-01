@@ -219,6 +219,8 @@ export const ABSENCE_PAGE = {
   weekday:
     'pb-2 text-center text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   day: 'relative flex h-14 w-full items-center justify-center text-xl font-bold tabular-nums transition-colors',
+  dayCompact:
+    'relative flex h-9 w-full items-center justify-center text-sm font-bold tabular-nums transition-colors',
   dayFree: 'cursor-pointer rounded-[var(--radius-md)] hover:bg-[var(--color-hover)]',
   dayPast: 'cursor-not-allowed text-[var(--color-ink-subtle)]/50',
   dayToday: 'rounded-[var(--radius-md)] ring-2 ring-[var(--color-ink)] ring-inset',
