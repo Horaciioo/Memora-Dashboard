@@ -40,6 +40,8 @@ export default async function LiveReportPage({ params }: { params: Promise<{ id:
         insights={detail.insights}
         baseline={detail.baseline}
         stem={`${live.youtuber.name}-${live.id}`}
+        liveId={live.id}
+        canEdit={access.isResponsable}
         log={detail.log}
         team={detail.team}
         notes={detail.notes}
