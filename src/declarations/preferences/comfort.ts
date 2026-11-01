@@ -42,7 +42,7 @@ export const COMFORT_SETTINGS = {
     label: 'Arrondis',
     description: 'La rondeur des cartes, des champs et des volets.',
     icon: 'platform',
-    default: 'soft',
+    default: 'sharp',
     options: { sharp: 'Nets', soft: 'Doux', round: 'Ronds' },
   },
   leading: {

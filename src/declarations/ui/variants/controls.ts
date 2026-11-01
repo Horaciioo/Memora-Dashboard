@@ -67,9 +67,9 @@ export const isArcadeVariant = (variant: ButtonVariant): boolean => variant.star
 
 export const SEGMENTED_STYLES = {
   group:
-    'flex max-w-full items-center gap-1 overflow-x-auto rounded-[var(--radius-md)] glass-soft p-1 md:rounded-full',
+    'flex max-w-full items-center gap-1 overflow-x-auto rounded-[var(--radius-lg)] glass-soft p-1',
   option:
-    'min-h-11 shrink-0 rounded-[var(--radius-sm)] px-2.5 py-1.5 text-xs font-semibold md:min-h-0 md:rounded-full md:px-3 whitespace-nowrap transition-colors',
+    'min-h-11 shrink-0 rounded-[calc(var(--radius-lg)-0.25rem)] px-2.5 py-1.5 text-xs font-semibold md:min-h-0 md:px-3 whitespace-nowrap transition-colors',
   full: 'w-full',
   optionFull: 'flex-1 text-center',
   selected: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',

@@ -16,22 +16,25 @@ const FONT_SAMPLE = { sm: 'text-lg', md: 'text-2xl', lg: 'text-3xl' } as const
 interface PickerProps {
   title: string
   beta?: boolean
+  untitled?: boolean
   columns: 'two' | 'three' | 'wide'
   children: ReactNode
 }
 
 /**
- * Titled group of pickable cards
+ * Group of pickable cards, titled unless its section already is
  * @param {PickerProps} props - Title and cards
  * @return {JSX.Element}
  */
 
-export const Picker = ({ title, beta, columns, children }: PickerProps) => (
+export const Picker = ({ title, beta, untitled, columns, children }: PickerProps) => (
   <div className={PICKER_CARD.group}>
-    <p className={PICKER_CARD.title}>
-      {title}
-      {beta && <MaturityTag maturity="beta" />}
-    </p>
+    {!untitled && (
+      <p className={PICKER_CARD.title}>
+        {title}
+        {beta && <MaturityTag maturity="beta" />}
+      </p>
+    )}
     <div className={PICKER_CARD[columns]} role="group" aria-label={title}>
       {children}
     </div>
@@ -48,7 +51,7 @@ export const ThemePicker = () => {
   const setTheme = useThemeStore((state) => state.setTheme)
 
   return (
-    <Picker title={PREFERENCES_COPY.themeTitle} columns="three">
+    <Picker title={PREFERENCES_COPY.themeTitle} untitled columns="three">
       {THEME_REGISTRY.keys.map((key) => {
         const option = THEME_REGISTRY.get(key)
         const Glyph = option.icon ? ICONS[option.icon] : null

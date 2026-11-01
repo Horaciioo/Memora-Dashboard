@@ -319,10 +319,10 @@ export const SELECTION_MENU_STYLES = {
  */
 
 export const TABS_STYLES = {
-  list: 'relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-full glass-soft p-1',
+  list: 'relative flex w-fit max-w-full gap-1 overflow-x-auto rounded-[var(--radius-lg)] glass-soft p-1',
   // Strip centred over its panel from sm
   listCentered: 'sm:mx-auto',
-  tab: 'relative z-10 min-h-11 shrink-0 rounded-full px-3 py-1.5 text-sm font-medium sm:px-3.5 md:min-h-0 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+  tab: 'relative z-10 min-h-11 shrink-0 rounded-[calc(var(--radius-lg)-0.25rem)] px-3 py-1.5 text-sm font-medium sm:px-3.5 md:min-h-0 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
   // Open tab sits on the glass pill
   active:
     'font-semibold text-[var(--color-ink)] hover:bg-transparent hover:text-[var(--color-ink)]',
@@ -333,7 +333,7 @@ export const TABS_STYLES = {
     'font-semibold text-[var(--color-danger)] hover:bg-transparent hover:text-[var(--color-danger)]',
   // Glass pill gliding under the open tab
   indicator:
-    'tab-indicator glass-pill pointer-events-none absolute top-1 bottom-1 left-0 rounded-full',
+    'tab-indicator glass-pill pointer-events-none absolute top-1 bottom-1 left-0 rounded-[calc(var(--radius-lg)-0.25rem)]',
   // Pulse ringing the open tab
   arrive: 'tab-arrive',
   panel: 'pt-4',
@@ -621,7 +621,8 @@ export const PAGE_OPTIONS = {
   actionDanger: 'text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
   actionIcon: 'size-4 shrink-0 opacity-70',
   // Group heading and the rule above it
-  heading: 'px-2.5 pt-1 pb-0.5 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  heading:
+    'px-2.5 pt-1 pb-0.5 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   divider: 'mx-1 my-1 border-0 border-t border-[var(--color-border)]',
   // Many choices take the line under their label
   rowStacked:

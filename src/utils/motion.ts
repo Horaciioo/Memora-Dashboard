@@ -7,7 +7,7 @@ export const prefersReducedMotion = (): boolean =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 // Fallback glide duration
-const GLIDE_FALLBACK_MS = 600
+const GLIDE_FALLBACK_MS = 260
 
 /**
  * Glide duration from the motion token
@@ -17,10 +17,14 @@ const GLIDE_FALLBACK_MS = 600
 export const glideDurationMs = (): number => {
   if (typeof window === 'undefined') return GLIDE_FALLBACK_MS
 
-  const raw = getComputedStyle(document.documentElement).getPropertyValue('--motion-duration-glide')
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue('--motion-duration-glide')
+    .trim()
   const parsed = Number.parseFloat(raw)
+  if (!Number.isFinite(parsed)) return GLIDE_FALLBACK_MS
 
-  return Number.isFinite(parsed) ? parsed : GLIDE_FALLBACK_MS
+  // The build may rewrite 260ms as .26s
+  return raw.endsWith('ms') ? parsed : parsed * 1000
 }
 
 /**
