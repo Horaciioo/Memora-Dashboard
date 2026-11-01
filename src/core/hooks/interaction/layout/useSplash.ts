@@ -3,12 +3,7 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
 import { useIsFetching } from '@tanstack/react-query'
 
-import {
-  SPLASH_FLAGS,
-  SPLASH_PROGRESS,
-  SPLASH_STORAGE_KEY,
-  SPLASH_TIMING,
-} from '@/declarations/ui/splash'
+import { SPLASH_FLAGS, SPLASH_STORAGE_KEY, SPLASH_TIMING } from '@/declarations/ui/splash'
 
 // SplashPhase
 export type SplashPhase = 'intro' | 'exit' | 'done'
@@ -51,7 +46,7 @@ const readArmed = () => document.documentElement.dataset.splash !== undefined
 
 /**
  * Splash lifecycle
- * @return {{ phase: SplashPhase, progress: number, skip: () => void }} - State and skip
+ * @return {{ phase: SplashPhase, skip: () => void }} - State and skip
  */
 
 export const useSplash = () => {
@@ -60,7 +55,6 @@ export const useSplash = () => {
   const [isHeld, setHeld] = useState(true)
   const [isForced, setForced] = useState(false)
   const [isReleased, setReleased] = useState(false)
-  const [step, setStep] = useState(0)
   const isDue = !isHeld && (isSettled || isForced)
 
   // Phase follows the loading
@@ -68,7 +62,7 @@ export const useSplash = () => {
   if (!isArmed || isReleased) phase = 'done'
   else if (isDue) phase = 'exit'
 
-  // Minimum, maximum and bar steps
+  // Minimum and maximum
   useEffect(() => {
     if (phase !== 'intro') return
 
@@ -79,9 +73,6 @@ export const useSplash = () => {
         isReduced ? SPLASH_TIMING.reducedMinMs : SPLASH_TIMING.minMs
       ),
       window.setTimeout(() => setForced(true), SPLASH_TIMING.maxMs),
-      ...SPLASH_PROGRESS.map((barStep, index) =>
-        window.setTimeout(() => setStep(index + 1), barStep.atMs)
-      ),
     ]
 
     return () => timers.forEach(window.clearTimeout)
@@ -114,8 +105,5 @@ export const useSplash = () => {
     setForced(true)
   }, [])
 
-  // Bar fill, full on exit
-  const progress = phase === 'intro' ? (SPLASH_PROGRESS[step - 1]?.to ?? 0) : 1
-
-  return { phase, progress, skip }
+  return { phase, skip }
 }

@@ -38,7 +38,7 @@ export const APP_DESCRIPTION =
 
 export const APP_ASSETS = {
   wordmark: '/marsha-logo.png',
-  loader: '/Loader.gif',
+  brain: '/memora-brain.png',
 } as const
 
 /**

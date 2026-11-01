@@ -22,15 +22,15 @@ export type SkeletonShape = keyof typeof SKELETON_SHAPES
 export const BRAND_LOADER = {
   // Bare mark, no box
   tile: 'inline-flex shrink-0 items-center justify-center',
-  tileMark: 'loader-gif h-10 w-auto',
+  tileMark: 'h-10',
   // Centred in a panel waiting on its data
   block: 'flex min-h-48 w-full flex-col items-center justify-center gap-3 py-10',
   blockTile: 'inline-flex items-center justify-center',
-  blockMark: 'loader-gif h-16 w-auto',
+  blockMark: 'h-16',
   // Inside a pink button
-  inline: 'loader-gif-brand h-4 w-auto shrink-0',
+  inline: 'brain-mark-white h-4 shrink-0',
   // On a light surface
-  ink: 'loader-gif h-6 w-auto shrink-0',
+  ink: 'h-6 shrink-0',
   caption: 'text-sm text-[var(--color-ink-subtle)]',
 } as const
 

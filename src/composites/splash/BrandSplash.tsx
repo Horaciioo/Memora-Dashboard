@@ -1,67 +1,51 @@
 'use client'
 
-import { useLayoutEffect, useRef } from 'react'
+import Image from 'next/image'
 import type { CSSProperties } from 'react'
 
-import { SplashWord } from '@/composites/splash/SplashWord'
 import { useSplash } from '@/core/hooks/interaction/layout/useSplash'
+import { BRAIN_PIECES, BRAIN_RATIO, BRAIN_REACH } from '@/declarations/ui/brain'
 import { SPLASH } from '@/declarations/ui/blocks'
-import { SPLASH_COPY } from '@/declarations/ui/copy/feedback'
-import { SPLASH_EYE } from '@/declarations/ui/splash'
 
 /**
- * Brand screen over the first load
+ * Brand screen over the first load: the lobes fly in and lock, the membranes stretch while it loads, then they burst and an iris opens on the app
  * @return {JSX.Element | null}
  */
 
 export const BrandSplash = () => {
-  const { phase, progress, skip } = useSplash()
-  const overlayRef = useRef<HTMLDivElement>(null)
-
-  // Aim the dive at the hole of the e
-  useLayoutEffect(() => {
-    const overlay = overlayRef.current
-    const letter = overlay?.querySelectorAll<HTMLElement>('.splash-letter')[SPLASH_EYE.letter]
-
-    if (phase !== 'exit' || !overlay || !letter) return
-
-    const box = letter.getBoundingClientRect()
-    const size = parseFloat(getComputedStyle(letter).fontSize)
-    const measures = {
-      '--splash-eye-x': box.left + SPLASH_EYE.x * size,
-      '--splash-eye-y': box.top + SPLASH_EYE.y * size,
-      '--splash-rx': SPLASH_EYE.rx * size * SPLASH_EYE.fit,
-      '--splash-ry': SPLASH_EYE.ry * size * SPLASH_EYE.fit,
-    }
-
-    Object.entries(measures).forEach(([name, value]) =>
-      overlay.style.setProperty(name, `${value}px`)
-    )
-  }, [phase])
+  const { phase, skip } = useSplash()
 
   if (phase === 'done') return null
 
   return (
-    <div
-      ref={overlayRef}
-      className={SPLASH.overlay}
-      data-phase={phase}
-      style={{ '--splash-progress': progress } as CSSProperties}
-      aria-hidden="true"
-      onClick={skip}
-    >
+    <div className={SPLASH.overlay} data-phase={phase} aria-hidden="true" onClick={skip}>
       <div className={SPLASH.ground}>
         <span />
         <span />
       </div>
-      <div className={SPLASH.camera}>
-        <i />
-        <i />
-        <i />
-        <i />
-        <div className={SPLASH.body}>
-          <SplashWord />
-          <span className={SPLASH.label}>{SPLASH_COPY.status}</span>
+      <div className={SPLASH.stage}>
+        <span className={SPLASH.halo} />
+        <span className={SPLASH.ring} />
+        <div className={SPLASH.brain} style={{ aspectRatio: BRAIN_RATIO }}>
+          {BRAIN_PIECES.map((piece, index) => (
+            <span
+              key={piece.src}
+              className={SPLASH.piece}
+              style={
+                {
+                  '--x': BRAIN_REACH[index].x,
+                  '--y': BRAIN_REACH[index].y,
+                  '--o': BRAIN_REACH[index].order,
+                  left: `${piece.left}%`,
+                  top: `${piece.top}%`,
+                  width: `${piece.width}%`,
+                  height: `${piece.height}%`,
+                } as CSSProperties
+              }
+            >
+              <Image src={piece.src} alt="" fill unoptimized priority sizes="50vw" />
+            </span>
+          ))}
         </div>
       </div>
     </div>
