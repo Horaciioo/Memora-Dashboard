@@ -49,3 +49,6 @@ vitest.config.mts
 # reference captures (Discord Putt Party, Ludo), never shipped
 /public/examples-putt-party
 /public/examples-ludo
+
+# service worker bundle, built by yarn worker:build
+/public/sw.js

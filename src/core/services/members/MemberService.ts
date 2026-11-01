@@ -391,6 +391,13 @@ export const memberFields = async (isAdmin = false): Promise<FieldDefinition[]> 
   ]
 }
 
+// Accepted juniors stay with the candidates until their PIM starts
+const AWAITING_PIM = {
+  role: MemberRoles.Junior,
+  status: MemberStatuses.Pending,
+  academyJuniors: { some: { candidateId: { not: null }, kickoffAt: null } },
+}
+
 /**
  * Read every moderator, a Responsable only reads those below them
  * @param {AccessScope} scope - Perimeter
@@ -406,7 +413,10 @@ export const listMembers = async (
 ): Promise<MemberSummary[]> => {
   const levels = roles ?? (isAdmin ? null : BELOW_LEAD_ROLES)
   const rows = await prisma.account.findMany({
-    where: scopedWhere('account', scope, levels ? { role: { in: levels } } : {}),
+    where: scopedWhere('account', scope, {
+      ...(levels ? { role: { in: levels } } : {}),
+      ...(roles ? {} : { NOT: AWAITING_PIM }),
+    }),
     include: {
       ...SUMMARY_INCLUDE,
       _count: { select: { notesReceived: true, absences: { where: activeAbsenceFilter() } } },

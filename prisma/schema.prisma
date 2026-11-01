@@ -297,6 +297,10 @@ model Account {
   seenGuides            String[]     @default([])
   // Pages starred from the banner, by path
   favorites             Json         @default("[]")
+  // Pages beside Home in the phone dock, by path
+  mobileDock            String[]     @default([])
+  // Push categories the member silenced
+  pushMutedCategories   String[]     @default([])
   anonymisedAt          DateTime?
   // Access shut until lifted
   frozenAt              DateTime?
@@ -318,6 +322,8 @@ model Account {
   functions AccountFunction[]
 
   sessions              Session[]
+  pushSubscriptions     PushSubscription[]
+  pushDeliveries        PushDelivery[]
   discordToken          DiscordToken?
   twoFactor             TwoFactorCredential?
   ledYoutubers          YoutuberLead[]           @relation("YoutuberLead")
@@ -464,11 +470,58 @@ model Session {
   expiresAt  DateTime
   unsealedAt DateTime?
 
-  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account           Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  pushSubscriptions PushSubscription[]
 
   @@index([accountId])
   @@index([expiresAt])
   @@map("sessions")
+}
+
+// Browser able to show system notifications, dropped with the session that opened it
+model PushSubscription {
+  id         String    @id @default(cuid())
+  accountId  String
+  sessionId  String
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  device     String?
+  createdAt  DateTime  @default(now())
+  lastSentAt DateTime?
+
+  account    Account        @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  session    Session        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  deliveries PushDelivery[]
+
+  @@index([accountId])
+  @@index([sessionId])
+  @@map("push_subscriptions")
+}
+
+// One push handed to a push service, read back by the journal
+model PushDelivery {
+  id             String    @id @default(cuid())
+  accountId      String
+  notificationId String?
+  subscriptionId String?
+  kind           Int
+  status         Int
+  statusCode     Int?
+  device         String?
+  isTest         Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  sentAt         DateTime?
+
+  account      Account           @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  notification Notification?     @relation(fields: [notificationId], references: [id], onDelete: SetNull)
+  subscription PushSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@unique([notificationId, subscriptionId])
+  @@index([createdAt])
+  @@index([accountId, createdAt])
+  @@index([subscriptionId])
+  @@map("push_deliveries")
 }
 
 // Second factor of one member, its secret encrypted at rest like every other stored secret
@@ -2089,8 +2142,9 @@ model Notification {
   readAt      DateTime?
   createdAt   DateTime  @default(now())
 
-  recipient Account  @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
-  actor     Account? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  recipient  Account        @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor      Account?       @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  deliveries PushDelivery[]
 
   @@index([recipientId, createdAt])
   @@index([recipientId, readAt])

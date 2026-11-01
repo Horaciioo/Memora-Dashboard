@@ -25,7 +25,7 @@ export const MEDIA: Record<BreakpointName, string> = {
 }
 
 /**
- * True while the mobile shell (top bar, nav pill) is the one on screen
+ * True while the mobile shell (top bar, dock) is the one on screen
  * @type {string}
  */
 
@@ -33,11 +33,12 @@ export const MOBILE_SHELL_QUERY = `(width < ${BREAKPOINTS[RESPONSIVE_SETTINGS.mo
 
 /**
  * Fixed chrome dimensions of the shell
- * @type {{ topBar: number, sidebar: number, sidebarCompact: number, banner: number, bannerMobile: number }}
+ * @type {{ topBar: number, dock: number, sidebar: number, sidebarCompact: number, banner: number, bannerMobile: number }}
  */
 
 export const SHELL_DIMENSIONS = {
   topBar: RESPONSIVE_SETTINGS.topBarHeight,
+  dock: RESPONSIVE_SETTINGS.dockHeight,
   sidebar: RESPONSIVE_SETTINGS.sidebarWidth,
   sidebarCompact: RESPONSIVE_SETTINGS.sidebarCompactWidth,
   banner: RESPONSIVE_SETTINGS.bannerHeight,

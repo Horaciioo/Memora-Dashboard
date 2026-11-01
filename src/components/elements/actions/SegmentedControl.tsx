@@ -6,6 +6,8 @@ import { cn } from '@/utils/classnames'
 export interface SegmentedOption<TValue extends string> {
   value: TValue
   label: string
+  // Spans the row, options sharing it evenly
+  isFull?: boolean
 }
 
 export interface SegmentedControlProps<TValue extends string> {
@@ -14,6 +16,8 @@ export interface SegmentedControlProps<TValue extends string> {
   onChange: (value: TValue) => void
   // Names the group for assistive technology
   label: string
+  // Spans the row, options sharing it evenly
+  isFull?: boolean
 }
 
 /**
@@ -22,6 +26,7 @@ export interface SegmentedControlProps<TValue extends string> {
  * @param {TValue} value - Selected value
  * @param {(value: TValue) => void} onChange - Selection handler
  * @param {string} label - Accessible group name
+ * @param {boolean} [isFull] - Spans the row
  * @return {JSX.Element}
  */
 
@@ -30,8 +35,13 @@ export const SegmentedControl = <TValue extends string>({
   value,
   onChange,
   label,
+  isFull,
 }: SegmentedControlProps<TValue>) => (
-  <div className={SEGMENTED_STYLES.group} role="group" aria-label={label}>
+  <div
+    className={cn(SEGMENTED_STYLES.group, isFull && SEGMENTED_STYLES.full)}
+    role="group"
+    aria-label={label}
+  >
     {options.map((option) => {
       const isSelected = option.value === value
 
@@ -43,6 +53,7 @@ export const SegmentedControl = <TValue extends string>({
           onClick={() => onChange(option.value)}
           className={cn(
             SEGMENTED_STYLES.option,
+            isFull && SEGMENTED_STYLES.optionFull,
             isSelected ? SEGMENTED_STYLES.selected : SEGMENTED_STYLES.idle
           )}
         >

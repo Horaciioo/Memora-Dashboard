@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { findVisibleBeacon } from '@/core/lib/beacons'
 import { routeBeacon } from '@/declarations/ui/beacons'
 import { DEADLINE_BUBBLE } from '@/declarations/ui/variants'
@@ -87,6 +88,8 @@ export interface RailDeadlineBubblesProps {
 
 export const RailDeadlineBubbles = ({ bubbles }: RailDeadlineBubblesProps) => {
   const pathname = usePathname()
+  // Pills point at rail entries, a phone has none
+  const isMobile = useIsMobileShell()
   const [, setTick] = useState(0)
 
   // The portal needs the document
@@ -104,7 +107,7 @@ export const RailDeadlineBubbles = ({ bubbles }: RailDeadlineBubblesProps) => {
   }
 
   // A pill leaves once its page is open
-  const shown = bubbles.filter(
+  const shown = (isMobile ? [] : bubbles).filter(
     ({ href }) => !dismissedHrefs.has(href) && pathname !== href && !pathname.startsWith(`${href}/`)
   )
   const anchors = useAnchors(shown.map(({ href }) => href))

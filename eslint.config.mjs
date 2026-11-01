@@ -42,6 +42,8 @@ const eslintConfig = defineConfig([
     'build/**',
     'next-env.d.ts',
     'src/generated/**',
+    // Built by yarn worker:build
+    'public/sw.js',
   ]),
 ])
 

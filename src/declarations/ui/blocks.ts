@@ -209,16 +209,33 @@ export const NAV_SHEET = {
 } as const
 
 /**
+ * Phone dock, Home in the middle and the menu closing the row
+ * @type {Record<string, string>}
+ */
+
+export const MOBILE_DOCK = {
+  bar: 'dock-glass fixed inset-x-3 bottom-[calc(var(--shell-dock-gap)+env(safe-area-inset-bottom))] z-40 flex h-[var(--shell-dock-h)] items-center justify-around rounded-full border px-1.5 md:hidden print:hidden',
+  item: 'relative flex h-full min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full transition-colors active:bg-[var(--color-hover)] motion-reduce:transition-none',
+  itemRest: 'text-[var(--color-ink-subtle)]',
+  itemActive: 'text-[var(--color-ink-accent)]',
+  icon: 'size-6 shrink-0',
+  label: 'max-w-full truncate px-1 text-micro leading-none font-semibold',
+  // Home sits raised in the middle
+  home: 'relative flex size-12 shrink-0 items-center justify-center rounded-full shadow-[var(--shadow-md)] transition-transform active:scale-95 motion-reduce:transition-none',
+  homeRest: 'bg-[var(--color-surface-raised)] text-[var(--color-ink)]',
+  homeActive: 'bg-[var(--color-brand-600)] text-[var(--color-on-brand)]',
+  homeIcon: 'size-6',
+  dot: 'absolute top-2 left-[calc(50%+0.4rem)] size-2 rounded-full bg-[var(--color-danger)]',
+} as const
+
+/**
  * Mobile top bar classes
  * @type {Record<string, string>}
  */
 
 export const TOP_BAR = {
   bar: 'mist sticky top-0 z-40 flex h-[var(--shell-top-bar-h)] items-center gap-2 border-b px-3 md:hidden print:hidden',
-  menuButton:
-    'flex size-11 items-center justify-center rounded-full text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)]',
-  menuIcon: 'size-6',
-  // Where the page trail lands, beside the menu
+  // Where the page trail lands
   crumbsHost: 'flex min-w-0 flex-1 items-center',
   crumbs: 'flex min-w-0 flex-1 items-center gap-1 text-sm font-medium',
   // Page options and star, at the right of the bar
@@ -254,6 +271,15 @@ export const ACCOUNT_SHEET = {
   iconDivider: 'w-px shrink-0 bg-[var(--color-border)]',
   dot: 'absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-surface-raised)]',
   signOutForm: 'flex flex-1',
+  // Bottom sheet version, every block on the middle axis
+  sheet: 'flex flex-col items-stretch gap-6',
+  sheetBlock: 'flex flex-col items-center gap-3',
+  sheetLabel: PROPERTY_LABEL,
+  sheetActions: 'grid grid-cols-2 gap-3',
+  sheetAction:
+    'flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm font-semibold transition-colors active:bg-[var(--color-hover)]',
+  sheetActionDanger: 'text-[var(--color-danger)]',
+  sheetActionIcon: 'size-5 shrink-0',
 } as const
 
 /**
@@ -600,6 +626,9 @@ export const CREATOR_PICKER = {
   head: 'flex flex-wrap items-center gap-2',
   label: `px-0.5 ${PROPERTY_LABEL}`,
   list: 'flex flex-wrap items-center gap-1.5',
+  centered: 'items-center',
+  headCentered: 'justify-center',
+  listCentered: 'justify-center gap-2.5',
   option:
     'flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-2 transition-[opacity,box-shadow] hover:opacity-100 disabled:pointer-events-none disabled:opacity-40',
   optionIdle: 'opacity-50 ring-transparent',
@@ -867,13 +896,11 @@ export const AUTH_SHELL = {
 export const SPLASH = {
   overlay: 'splash cursor-pointer select-none',
   ground: 'splash-ground pointer-events-none absolute inset-0 overflow-hidden',
-  camera: 'splash-camera',
-  body: 'splash-body absolute top-1/2 left-1/2 flex w-max -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-5',
-  word: 'splash-word relative flex justify-center',
-  wordFill: 'splash-word-fill absolute inset-0 flex justify-center',
-  letter: 'splash-letter block',
-  label:
-    'splash-label text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  stage: 'splash-stage absolute inset-0 grid place-items-center',
+  halo: 'splash-halo pointer-events-none',
+  ring: 'splash-ring pointer-events-none',
+  brain: 'splash-brain relative',
+  piece: 'splash-piece absolute',
 } as const
 
 /**

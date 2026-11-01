@@ -117,7 +117,7 @@ export const CALENDAR_MOBILE = {
   bar: 'flex flex-col gap-3 pb-3 md:hidden',
   row: 'flex items-center gap-2',
   title:
-    'flex min-h-11 min-w-0 items-center gap-1.5 text-left text-2xl font-bold tracking-tight first-letter:uppercase',
+    'flex min-h-11 w-full min-w-0 items-center gap-1.5 text-left text-xl font-bold tracking-tight first-letter:uppercase sm:text-2xl',
   caret: 'size-5 shrink-0 text-[var(--color-ink-subtle)] transition-transform',
   caretOpen: 'rotate-180',
   views:
@@ -127,7 +127,7 @@ export const CALENDAR_MOBILE = {
   scrim: 'fixed inset-0 z-30',
   today:
     'touch-target flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border-2 border-[var(--color-ink)] text-sm font-bold tabular-nums',
-  creator: 'w-auto shrink-0 rounded-full border-0 p-0.5',
+  creator: '!w-auto shrink-0 rounded-full border-0 p-0.5',
   // Months to jump to, scrolled sideways
   strip:
     '-mx-4 flex snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden items-center gap-2 overflow-x-auto px-4 sm:-mx-6 sm:px-6',
@@ -515,7 +515,7 @@ export const CALENDAR_STYLES = {
   legendDot: 'h-2 w-2 shrink-0 rounded-full',
   legendCount: 'tabular-nums opacity-60',
   // Add button floating over a phone
-  fab: 'fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-30 size-14 rounded-2xl shadow-[var(--shadow-lg)] md:hidden',
+  fab: 'fixed right-4 bottom-[var(--shell-dock-clearance)] z-30 size-14 rounded-2xl shadow-[var(--shadow-lg)] md:hidden',
   selectionBar: SELECTION_BAR,
   selectionCount: 'font-semibold tabular-nums',
   // Detail modal

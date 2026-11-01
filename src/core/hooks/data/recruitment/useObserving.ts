@@ -5,10 +5,11 @@ import { useCallback } from 'react'
 import { apiPut } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
+import type { CandidateView } from '@/types/recruitment'
 
 /**
  * Sit in on an interview
- * @return {(candidateId: string, joined: boolean) => Promise<boolean>} - Sit in or leave
+ * @return {(candidateId: string, joined: boolean) => Promise<CandidateView | null>} - Sit in or leave
  */
 
 export const useObserving = () => {
@@ -16,11 +17,9 @@ export const useObserving = () => {
 
   return useCallback(
     async (candidateId: string, joined: boolean) => {
-      const saved = await run(() =>
-        apiPut<{ joined: boolean }>(API_ROUTES.candidateObservation(candidateId), { joined })
+      return run(() =>
+        apiPut<CandidateView>(API_ROUTES.candidateObservation(candidateId), { joined })
       )
-
-      return saved !== null
     },
     [run]
   )

@@ -70,6 +70,8 @@ export const buildContentSecurityPolicy = (nonce: string, isDevelopment: boolean
     ['form-action', "'self'"],
     ['object-src', "'none'"],
     ['manifest-src', "'self'"],
+    // The service worker, never governed by the script nonce
+    ['worker-src', "'self'"],
   ]
 
   const policy = directives.map((parts) => parts.join(' ')).join('; ')

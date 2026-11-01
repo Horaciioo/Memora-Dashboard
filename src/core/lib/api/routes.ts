@@ -1,4 +1,5 @@
 import { SANCTION_PARAMS } from '@/declarations/sanctions/params'
+import { PUSH_JOURNAL_CURSOR } from '@/declarations/pwa/push'
 
 /**
  * Single source of every API path
@@ -210,6 +211,14 @@ export const API_ROUTES = {
   notificationsStream: '/api/notifications/flux',
   notification: (id: string) => `/api/notifications/${id}`,
   notificationUnread: (id: string) => `/api/notifications/${id}/non-lu`,
+  push: '/api/push',
+  pushSubscription: '/api/push/abonnement',
+  pushDevice: (id: string) => `/api/push/appareils/${id}`,
+  pushTrial: '/api/push/essai',
+  pushJournal: (after?: string) =>
+    after ? `/api/systeme/push?${PUSH_JOURNAL_CURSOR}=${after}` : '/api/systeme/push',
+  pushSample: (kind: string) => `/api/systeme/push/${kind}`,
+  mobileDock: '/api/parametres/barre',
   access: '/api/acces',
   accessStream: '/api/acces/flux',
   accessFunctions: '/api/acces/fonctions',

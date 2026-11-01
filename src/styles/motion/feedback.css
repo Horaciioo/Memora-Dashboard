@@ -12,14 +12,39 @@
   animation: skeleton-shimmer-sweep var(--motion-duration-moderate) linear infinite;
 }
 
-/* Loader mark: inked on light, plain on brand */
-.loader-gif {
-  filter: brightness(0);
+/* Loader mark: the lobes stretch away from the centre and fold back, a wave of light runs left to right */
+.brain-mark {
+  position: relative;
+  display: inline-block;
+  aspect-ratio: 420 / 471;
 }
 
-.loader-gif-brand,
-:root.dark .loader-gif {
-  filter: none;
+.brain-lobe {
+  position: absolute;
+  background: center / 100% 100% no-repeat;
+  will-change: transform, filter;
+  animation: brain-lobe-stretch 1.9s cubic-bezier(0.45, 0, 0.25, 1) calc(var(--o) * -0.7s) infinite;
+}
+
+/* Inside a filled button: white silhouette */
+.brain-mark-white {
+  filter: brightness(0) invert(1);
+}
+
+@keyframes brain-lobe-stretch {
+  0%,
+  100% {
+    transform: none;
+    filter: brightness(1) saturate(1);
+  }
+  42% {
+    transform: translate(calc(var(--x) * 1%), calc(var(--y) * 1%)) scale(1.07);
+    filter: brightness(1.14) saturate(1.3);
+  }
+  68% {
+    transform: translate(calc(var(--x) * 0.12%), calc(var(--y) * 0.12%)) scale(0.985);
+    filter: brightness(1.04) saturate(1);
+  }
 }
 
 @keyframes skeleton-shimmer-sweep {
@@ -474,5 +499,80 @@
   .glyph-flicker,
   .glyph-ember {
     animation: none;
+  }
+}
+
+/* Push invite: rings leave the bell, the bell rings now and then */
+.push-orb-ring {
+  animation: push-orb-ring 2.4s ease-out infinite;
+}
+
+.push-orb-ring:nth-of-type(2) {
+  animation-delay: 1.2s;
+}
+
+.push-orb-bell {
+  transform-origin: 50% 15%;
+  animation: push-orb-bell 4.8s ease-in-out infinite;
+}
+
+.push-cta-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.push-cta-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 40%;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.45), transparent);
+  animation: push-cta-sheen 4.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes push-orb-ring {
+  from {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+@keyframes push-orb-bell {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  66% {
+    transform: rotate(14deg);
+  }
+  72% {
+    transform: rotate(-12deg);
+  }
+  78% {
+    transform: rotate(8deg);
+  }
+  84% {
+    transform: rotate(-5deg);
+  }
+  90% {
+    transform: rotate(0);
+  }
+}
+
+@keyframes push-cta-sheen {
+  0%,
+  55% {
+    left: -60%;
+  }
+  85%,
+  100% {
+    left: 130%;
   }
 }

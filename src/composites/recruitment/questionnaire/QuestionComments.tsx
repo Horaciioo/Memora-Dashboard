@@ -22,7 +22,8 @@ export const QuestionComments = ({ candidateId, questionKey, disabled }: Questio
   const candidate = file.candidates.find((entry) => entry.id === candidateId)
   const comments = (candidate?.comments ?? []).filter((entry) => entry.questionKey === questionKey)
   const canWrite = can.writeCandidates && !disabled
-  if (comments.length === 0 && !canWrite) return null
+  // An observer never reads the remarks
+  if (can.observing || (comments.length === 0 && !canWrite)) return null
 
   return (
     <CommentThread

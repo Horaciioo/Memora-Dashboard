@@ -8,6 +8,7 @@ import { HomeNews } from '@/composites/personal/HomeNews'
 import { HomeQueue } from '@/composites/personal/HomeQueue'
 import { CourseUnlockBubble } from '@/composites/academy/course/catalog/CourseUnlockBubble'
 import { HomeLiveCall } from '@/composites/lives/HomeLiveCall'
+import { HomePushInvite } from '@/composites/personal/HomePushInvite'
 import { HomePlayInvite } from '@/composites/play/invites/HomePlayInvite'
 import { myCoordinationRequests } from '@/core/services/lives/CoordinationService'
 import { readBeacon } from '@/core/services/lives/LiveService'
@@ -18,6 +19,7 @@ import { moderatorTrade, upcomingBirthdays } from '@/core/services/personal/Home
 import { upcomingPlans } from '@/core/services/personal/HomePlanService'
 import { myTasks } from '@/core/services/personal/TaskInboxService'
 import { requireUser } from '@/core/wrappers/requireUser'
+import { isPushConfigured, VAPID_KEYS } from '@/declarations/pwa/vapid'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { beaconProps } from '@/declarations/ui/beacons'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
@@ -67,6 +69,7 @@ export default async function DashboardPage() {
       <div {...beaconProps(TOUR_BEACONS.homeNews)}>
         <HomeNews />
       </div>
+      <HomePushInvite publicKey={isPushConfigured() ? VAPID_KEYS.publicKey : null} />
       <HomeLiveCall beacon={beacon} />
       <div className={HOME_BOARD.card}>
         <div className={HOME_BOARD.col} {...beaconProps(TOUR_BEACONS.homeQueue)}>

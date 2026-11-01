@@ -43,5 +43,5 @@
     ".next-ws/types/**/*.ts",
     ".next-ws/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "src/worker/sw.ts"]
 }

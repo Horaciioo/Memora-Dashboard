@@ -8,9 +8,17 @@ import { buildContentSecurityPolicy } from '@/declarations/system/security/conte
 import { NONCE_HEADER } from '@/declarations/system/security/securityHeaders'
 import { DEMO_EVENT_ID, EVENT_ID_PATTERN } from '@/core/lib/share/sharedEvent'
 import { ROUTES } from '@/declarations/navigation'
+import { MANIFEST_PATH } from '@/declarations/pwa/manifest'
+import { WORKER_FILE } from '@/declarations/pwa/worker'
 
-// Paths reachable
-const PUBLIC_PATHS: string[] = [ROUTES.login, ROUTES.privacy]
+// Paths reachable, the worker and its fallback page included so they update signed out
+const PUBLIC_PATHS: string[] = [
+  ROUTES.login,
+  ROUTES.privacy,
+  ROUTES.offline,
+  WORKER_FILE.script,
+  MANIFEST_PATH,
+]
 
 // Short address of an event and its card picture, read by robots that never sign in
 const SHARE_PATH = new RegExp(

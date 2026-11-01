@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 
+import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
 import { NudgeBubble } from '@/composites/notifications/NudgeBubble'
 import { useBeaconSpot } from '@/core/hooks/interaction/layout/useBeaconSpot'
 import { useNotificationNudges } from '@/core/hooks/data/system/useNotificationNudges'
@@ -9,30 +10,10 @@ import { apiPatch } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { NUDGE_SETTINGS } from '@/declarations/configurations/settings'
 import { NOTIFICATION_COPY } from '@/declarations/notifications/copy'
-import { notificationSentence } from '@/utils/format/notifications'
-import { NOTIFICATION_KIND_REGISTRY } from '@/declarations/notifications/registries'
-import { NOTIFICATION_TARGETS } from '@/declarations/notifications/targets'
+import { notificationHref, notificationText } from '@/utils/format/notifications'
 import { beaconOf } from '@/declarations/ui/beacons'
 import { NUDGE } from '@/declarations/ui/blocks'
 import { ICONS } from '@/declarations/ui/icons'
-import type { NotificationEntry } from '@/types/notifications'
-
-/**
- * Bubble sentence
- * @param {NotificationEntry} entry - Notification
- * @return {string | null} - Sentence or null
- */
-
-const sentenceOf = (entry: NotificationEntry): string | null => {
-  const kind = entry.kind ? NOTIFICATION_KIND_REGISTRY.get(entry.kind) : null
-  if (!kind) return null
-
-  const actor = entry.actorName ?? NOTIFICATION_COPY.system
-
-  const { before, verb, after } = notificationSentence(kind, actor, entry.subject)
-
-  return `${before}${verb}${after}`
-}
 
 /**
  * Live notification bubbles
@@ -41,16 +22,17 @@ const sentenceOf = (entry: NotificationEntry): string | null => {
 
 export const NudgeHost = () => {
   const router = useRouter()
-  const { queue, shift } = useNotificationNudges(true)
+  // Bubbles point at rail entries, a phone has none
+  const isMobile = useIsMobileShell()
+  const { queue, shift } = useNotificationNudges(!isMobile)
   const CloseIcon = ICONS.close
 
   const entry = queue[0] ?? null
-  const target = entry?.target ? NOTIFICATION_TARGETS.get(entry.target) : null
-  const href = target?.route(entry?.targetId ?? null) ?? null
-  const label = entry ? sentenceOf(entry) : null
-  const spot = useBeaconSpot(entry !== null, beaconOf(href))
+  const href = entry ? notificationHref(entry) : null
+  const label = entry ? notificationText(entry) : null
+  const spot = useBeaconSpot(entry !== null && !isMobile, beaconOf(href))
 
-  if (!entry || !label || !spot) return null
+  if (isMobile || !entry || !label || !spot) return null
 
   return (
     <div

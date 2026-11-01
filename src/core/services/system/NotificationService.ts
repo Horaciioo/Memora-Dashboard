@@ -2,12 +2,14 @@ import 'server-only'
 
 import { prisma } from '@/core/lib/db'
 import { publishLive } from '@/core/lib/lives/bus'
+import { logger } from '@/core/lib/logger'
+import { queuePushes } from '@/core/services/push'
 import { NOTIFICATION_TOPICS } from '@/declarations/notifications/topics'
 import { NOTIFICATION_SETTINGS } from '@/declarations/configurations/settings'
-import { NOTIFICATION_TARGETS } from '@/declarations/notifications/targets'
 import type { NotificationTargetName } from '@/declarations/notifications/targets'
 import { NOTIFICATION_KINDS } from '@/utils/constants/notifications'
 import type { NotificationKindName } from '@/utils/constants/notifications'
+import { toEntry } from '@/core/lib/notifications/entry'
 import type { NotificationEntry, NotificationFeed } from '@/types/notifications'
 import type { Prisma } from '@prisma/client'
 import type { MentionMark } from '@/types/mentions'
@@ -86,7 +88,7 @@ export const notify = async (input: NotificationInput): Promise<void> => {
 }
 
 /**
- * Hand fresh rows to whoever is connected, a lost push never fails the write that raised it
+ * Hand fresh rows to open pages and devices, a lost push never fails the write that raised it
  * @param {Prisma.NotificationGetPayload<object>[]} rows - Rows just written
  * @param {string | null} actorId - Who caused them
  * @return {Promise<void>} - Pushed
@@ -110,6 +112,11 @@ const pushNotifications = async (
         entry: toEntry({ ...row, actor }),
       }).catch(() => undefined)
     )
+  )
+
+  // Phones and closed tabs hear it through their push service
+  await queuePushes(rows.map((row) => row.id)).catch((error: unknown) =>
+    logger.warn('[push] queueing failed', error)
   )
 }
 
@@ -147,34 +154,6 @@ export const notifyMentions = async (
     kind: 'Mentioned',
     recipients: accounts.map((account) => account.id),
   })
-}
-
-// Row shape every reader maps from
-type NotificationRow = Prisma.NotificationGetPayload<object> & {
-  actor: { displayName: string; avatarUrl: string | null } | null
-}
-
-/**
- * Map a notification row to its display shape
- * @param {NotificationRow} row - Notification row with its actor
- * @return {NotificationEntry} - Display entry
- */
-
-export const toEntry = (row: NotificationRow): NotificationEntry => {
-  // An unknown target kind simply loses its link
-  const target = row.targetType ?? ''
-
-  return {
-    id: row.id,
-    kind: NOTIFICATION_KINDS.byId(row.kind)?.name ?? null,
-    actorName: row.actor?.displayName ?? null,
-    actorAvatar: row.actor?.avatarUrl ?? null,
-    target: NOTIFICATION_TARGETS.has(target) ? target : null,
-    targetId: row.targetId,
-    subject: row.subject,
-    isRead: row.readAt !== null,
-    createdAt: row.createdAt.toISOString(),
-  }
 }
 
 /**

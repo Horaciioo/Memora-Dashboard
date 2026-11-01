@@ -1,4 +1,5 @@
 import twoFactor from '@/configurations/system/a2f.json'
+import application from '@/configurations/system/application.json'
 import absences from '@/configurations/system/absences.json'
 import agenda from '@/configurations/system/agenda.json'
 import home from '@/configurations/system/accueil.json'
@@ -900,7 +901,7 @@ const responsiveToastVisible = readNode(
 
 /**
  * Breakpoint and shell chrome bounds
- * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl' | '2xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, sidebarWidth: number, sidebarCompactWidth: number, bannerHeight: number, bannerHeightMobile: number, breadcrumbFullChars: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, longPressMs: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
+ * @type {{ breakpoints: Record<'sm' | 'md' | 'lg' | 'xl' | '2xl', number>, mobileUntil: 'sm' | 'md' | 'lg' | 'xl', topBarHeight: number, dockHeight: number, sidebarWidth: number, sidebarCompactWidth: number, bannerHeight: number, bannerHeightMobile: number, breadcrumbFullChars: number, toastVisibleMobile: number, toastVisibleDesktop: number, touchTargetMin: number, longPressMs: number, drawerWidth: number, drawerHeightShare: number, drawerMinHeight: number, drawerGap: number }}
  */
 
 export const RESPONSIVE_SETTINGS = {
@@ -920,6 +921,11 @@ export const RESPONSIVE_SETTINGS = {
     path: 'system/responsive.shell.topBarHeight',
     fallback: 52,
     min: 32,
+  }),
+  dockHeight: readInteger(responsiveShell.dockHeight, {
+    path: 'system/responsive.shell.dockHeight',
+    fallback: 64,
+    min: 48,
   }),
   sidebarWidth: readInteger(responsiveShell.sidebarWidth, {
     path: 'system/responsive.shell.sidebarWidth',
@@ -1171,6 +1177,11 @@ export const RETENTION_SETTINGS = {
   readNotificationDays: readInteger(retention.readNotificationDays, {
     path: 'system/conservation.readNotificationDays',
     fallback: 90,
+    min: 1,
+  }),
+  pushDeliveryDays: readInteger(retention.pushDeliveryDays, {
+    path: 'system/conservation.pushDeliveryDays',
+    fallback: 30,
     min: 1,
   }),
   activityLogDays: readInteger(retention.activityLogDays, {
@@ -1604,3 +1615,48 @@ export const EXERCISE_SETTINGS = {
     min: 2,
   }),
 } as const
+
+/**
+ * Installed application, pushes and phone dock
+ * @type {{ installHintVisits: number, updateCheckMs: number, dockSlots: number, pushTtlSeconds: number, pushRecipientsPerJob: number, journalPageSize: number }}
+ */
+
+export const APPLICATION_SETTINGS = {
+  // Visits before the install hint shows up
+  installHintVisits: readInteger(application.installHintVisits, {
+    path: 'system/application.installHintVisits',
+    fallback: 3,
+    min: 1,
+  }),
+  // Gap between two update checks
+  updateCheckMs: readInteger(application.updateCheckMs, {
+    path: 'system/application.updateCheckMs',
+    fallback: 1_800_000,
+    min: 60_000,
+  }),
+  // Pages beside Home, the menu closing the row
+  dockSlots: readInteger(application.dockSlots, {
+    path: 'system/application.dockSlots',
+    fallback: 3,
+    min: 1,
+    max: 4,
+  }),
+  // How long a push service keeps an undelivered push
+  pushTtlSeconds: readInteger(application.pushTtlSeconds, {
+    path: 'system/application.pushTtlSeconds',
+    fallback: 86_400,
+    min: 60,
+    max: 2_419_200,
+  }),
+  pushRecipientsPerJob: readInteger(application.pushRecipientsPerJob, {
+    path: 'system/application.pushRecipientsPerJob',
+    fallback: 200,
+    min: 1,
+  }),
+  journalPageSize: readInteger(application.journalPageSize, {
+    path: 'system/application.journalPageSize',
+    fallback: 50,
+    min: 1,
+    max: maxPerPage,
+  }),
+}

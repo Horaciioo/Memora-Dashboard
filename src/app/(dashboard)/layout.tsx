@@ -16,6 +16,7 @@ import { openRoutes } from '@/core/lib/tour/progress'
 import { NavigationViews, visibleNavGroups } from '@/declarations/navigation'
 import { APP_ENVIRONMENT } from '@/declarations/system/environments'
 import { heldRoutes } from '@/declarations/ui/responsive'
+import { isPushConfigured } from '@/declarations/pwa/vapid'
 import { PENDING_ACCOUNT_COPY } from '@/declarations/onboarding/copy'
 import { CONSENT_COPY } from '@/declarations/ui/copy/privacy'
 import { MemberStatuses } from '@/utils/constants/hierarchy'
@@ -70,6 +71,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       seal={seal}
       tour={tour}
       heldRoutes={heldRoutes(APP_ENVIRONMENT)}
+      isPushReady={isPushConfigured()}
     >
       {children}
       <Suspense fallback={null}>

@@ -15,6 +15,9 @@ import { AccountsSection } from '@/composites/preferences/AccountsSection'
 import { ProfileCard } from '@/composites/preferences/ProfileCard'
 import { ColorVisionPreferences } from '@/composites/preferences/ColorVisionPreferences'
 import { DisplayPreferences } from '@/composites/preferences/DisplayPreferences'
+import { DockPreferences } from '@/composites/preferences/DockPreferences'
+import { InstallSection } from '@/composites/preferences/InstallSection'
+import { PushPreferences } from '@/composites/preferences/push/PushPreferences'
 import { useProfile } from '@/core/hooks/data/people/useProfile'
 import { replayGuides } from '@/app/(dashboard)/parametres/actions'
 import { SENSITIVE_FIELD_REGISTRY, isSensitiveField } from '@/declarations/access/sensitive'
@@ -30,6 +33,9 @@ import { GUIDES_CARD, PREFERENCE_STYLES, TABS_STYLES } from '@/declarations/ui/v
 import type { FieldDefinition, FieldValue, FormValues } from '@/types/forms'
 import type { PlatformLinkView } from '@/types/platforms'
 import type { PlayProfileView } from '@/types/play'
+import type { NavigationItem } from '@/declarations/navigation'
+import { PUSH_COPY } from '@/declarations/pwa/copy'
+import type { PushSettingsView } from '@/types/push'
 import type { ProfileDetail } from '@/types/preferences'
 import type { LivePlatformName } from '@/utils/constants/lives'
 
@@ -41,6 +47,8 @@ export interface PreferencesPanelProps {
   returned: { platform: LivePlatformName; result: string } | null
   // Memora Play stats, for members it opens to
   play: PlayProfileView | null
+  push: { publicKey: string | null; settings: PushSettingsView }
+  dock: { candidates: NavigationItem[]; saved: string[] }
 }
 
 /**
@@ -51,6 +59,8 @@ export interface PreferencesPanelProps {
  * @param {Record<LivePlatformName, boolean>} available - Platforms that can be linked here
  * @param {{ platform: LivePlatformName, result: string } | null} returned - Link just ended
  * @param {PlayProfileView | null} play - Memora Play stats
+ * @param {Object} push - Server key and push settings
+ * @param {Object} dock - Pages offered and picked for the phone dock
  * @return {JSX.Element}
  */
 
@@ -61,6 +71,8 @@ export const PreferencesPanel = ({
   available,
   returned,
   play,
+  push,
+  dock,
 }: PreferencesPanelProps) => {
   const { profile, isSaving, issues, save } = useProfile(initialProfile)
   const { factor } = useSeal()
@@ -127,6 +139,8 @@ export const PreferencesPanel = ({
     <div className={TABS_STYLES.panel}>
       <div className={PREFERENCE_STYLES.stack}>
         <DisplayPreferences />
+        <InstallSection />
+        <DockPreferences candidates={dock.candidates} saved={dock.saved} />
         <ColorVisionPreferences />
         <Section title={PREFERENCES_COPY.guidesSection} padded>
           <div className={GUIDES_CARD.card}>
@@ -197,8 +211,18 @@ export const PreferencesPanel = ({
           {
             value: 'display',
             label: PREFERENCES_COPY.tabDisplay,
-            icon: 'light',
+            icon: 'settingsLine',
             render: displayTab,
+          },
+          {
+            value: 'notifications',
+            label: PUSH_COPY.tab,
+            icon: 'bell',
+            render: () => (
+              <div className={TABS_STYLES.panel}>
+                <PushPreferences publicKey={push.publicKey} initial={push.settings} />
+              </div>
+            ),
           },
           {
             value: 'security',

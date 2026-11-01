@@ -19,9 +19,17 @@
   }
 }
 
-/* Clearance under the routed page for the floating mobile nav */
+/* Room the floating mobile dock takes from the bottom edge, on body where its height is set */
+body {
+  --shell-dock-gap: 0.75rem;
+  --shell-dock-clearance: calc(
+    var(--shell-dock-h) + var(--shell-dock-gap) * 2 + env(safe-area-inset-bottom)
+  );
+}
+
+/* Clearance under the routed page for the floating mobile dock */
 .shell-page {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);
+  padding-bottom: calc(var(--shell-dock-clearance) + 1rem);
 }
 
 /* md */

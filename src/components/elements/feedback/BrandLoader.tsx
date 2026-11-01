@@ -1,6 +1,6 @@
-import Image from 'next/image'
+import type { CSSProperties } from 'react'
 
-import { APP_ASSETS } from '@/declarations/app'
+import { BRAIN_PIECES, BRAIN_REACH } from '@/declarations/ui/brain'
 import { FEEDBACK_COPY } from '@/declarations/ui/copy/feedback'
 import { BRAND_LOADER } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -14,12 +14,8 @@ export interface BrandLoaderProps {
   className?: string
 }
 
-// Natural size of the animation
-const MARK_WIDTH = 619
-const MARK_HEIGHT = 370
-
 /**
- * Animated Memora mark shown while something loads. The tile sits beside a title
+ * Memora brain whose membranes stretch and fold back, shown while something loads. The tile sits beside a title
  * @param {BrandLoaderVariant} [variant] - Where it is drawn
  * @param {string} [caption] - Line under the mark
  * @param {string} [className] - Extra classes merged onto the wrapper
@@ -28,15 +24,26 @@ const MARK_HEIGHT = 370
 
 export const BrandLoader = ({ variant = 'tile', caption, className }: BrandLoaderProps) => {
   const mark = (markClass: string) => (
-    <Image
-      src={APP_ASSETS.loader}
-      alt=""
-      width={MARK_WIDTH}
-      height={MARK_HEIGHT}
-      unoptimized
-      priority
-      className={markClass}
-    />
+    <span className={cn('brain-mark', markClass)}>
+      {BRAIN_PIECES.map((piece, index) => (
+        <span
+          key={piece.src}
+          className="brain-lobe"
+          style={
+            {
+              left: `${piece.left}%`,
+              top: `${piece.top}%`,
+              width: `${piece.width}%`,
+              height: `${piece.height}%`,
+              backgroundImage: `url(${piece.src})`,
+              '--x': BRAIN_REACH[index].x,
+              '--y': BRAIN_REACH[index].y,
+              '--o': BRAIN_REACH[index].order,
+            } as CSSProperties
+          }
+        />
+      ))}
+    </span>
   )
 
   if (variant === 'inline') {

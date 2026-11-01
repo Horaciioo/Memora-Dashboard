@@ -1,17 +1,19 @@
 import { VIEW_COPY } from '@/declarations/access/copy'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
+import { PUSH_CONSOLE_COPY } from '@/declarations/pwa/copy'
 import type { MaturityName } from '@/declarations/maturity/registries'
 import type { IconName } from '@/declarations/ui/icons'
 
 /**
  * Route key one system screen answers on
- * @type {'storage' | 'journal' | 'queues' | 'probes' | 'analytics' | 'health' | 'privileged' | 'administration'}
+ * @type {'storage' | 'journal' | 'queues' | 'push' | 'probes' | 'analytics' | 'health' | 'privileged' | 'administration'}
  */
 
 export type SystemRouteKey =
   | 'storage'
   | 'journal'
   | 'queues'
+  | 'push'
   | 'probes'
   | 'analytics'
   | 'health'
@@ -82,6 +84,13 @@ export const SYSTEM_SCREENS: SystemScreen[] = [
     label: SYSTEM_COPY.queuesTitle,
     description: SYSTEM_COPY.queuesLead,
     icon: 'queue',
+  },
+  {
+    route: 'push',
+    group: 'monitoring',
+    label: PUSH_CONSOLE_COPY.title,
+    description: PUSH_CONSOLE_COPY.lead,
+    icon: 'bell',
   },
   {
     route: 'probes',

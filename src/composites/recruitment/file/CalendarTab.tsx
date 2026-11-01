@@ -12,7 +12,6 @@ import { Section } from '@/components/structures/page/Section'
 import { AnnouncementDrawer } from '@/composites/recruitment/file/AnnouncementDrawer'
 import { LIVE_PALETTE } from '@/composites/recruitment/file/planningImage'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
-import { UpcomingInterviews } from '@/composites/recruitment/file/UpcomingInterviews'
 import { RangePlanning } from '@/composites/recruitment/file/RangePlanning'
 import { useRecruitmentAnnouncement } from '@/core/hooks/data/recruitment/useRecruitmentAnnouncement'
 import { useDiscordIdentifiers } from '@/core/hooks/data/recruitment/useDiscordIdentifiers'
@@ -25,17 +24,12 @@ import { INTERVIEW_AGENDA, SECTION_STYLES } from '@/declarations/ui/variants'
 import type { FormValues } from '@/types/forms'
 import { toDisplay } from '@/utils/format/discord'
 
-export interface CalendarTabProps {
-  serverTime: string
-}
-
 /**
- * Calendar of the session: next interviews, the period asked, ready to post on Discord
- * @param {CalendarTabProps} props - Server time at load
+ * Calendar of the session: the period asked, ready to post on Discord
  * @return {JSX.Element}
  */
 
-export const CalendarTab = ({ serverTime }: CalendarTabProps) => {
+export const CalendarTab = () => {
   const { detail, file, can } = useRecruitmentState()
   const { identifiers, isSaving, store } = useDiscordIdentifiers(
     detail.summary.id,
@@ -84,7 +78,6 @@ export const CalendarTab = ({ serverTime }: CalendarTabProps) => {
         />
       ) : (
         <div className={INTERVIEW_AGENDA.root}>
-          <UpcomingInterviews serverTime={serverTime} />
           <div className={INTERVIEW_AGENDA.bar}>
             <div className={INTERVIEW_AGENDA.periodField}>
               <h2 className={SECTION_STYLES.title}>{PLANNING_COPY.period}</h2>

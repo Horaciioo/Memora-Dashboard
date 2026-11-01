@@ -14,6 +14,7 @@ import { DAY_MS } from '@/utils/constants/time'
  * @typedef {Object} MaintenanceReport
  * @property {number} sessions - Expired sessions dropped
  * @property {number} notifications - Read notifications dropped
+ * @property {number} pushDeliveries - Push journal lines dropped
  * @property {number} activityLogs - Journal entries dropped
  * @property {number} candidates - Rejected candidacies dropped
  * @property {number} bans - Lapsed blacklist entries dropped
@@ -24,6 +25,7 @@ import { DAY_MS } from '@/utils/constants/time'
 export interface MaintenanceReport {
   sessions: number
   notifications: number
+  pushDeliveries: number
   activityLogs: number
   moderationLogs: number
   candidates: number
@@ -48,6 +50,19 @@ const horizon = (days: number): Date => new Date(Date.now() - days * DAY_MS)
 const pruneNotifications = async (): Promise<number> => {
   const { count } = await prisma.notification.deleteMany({
     where: { readAt: { not: null, lt: horizon(RETENTION_POLICIES.readNotifications) } },
+  })
+
+  return count
+}
+
+/**
+ * Drop push journal lines past their window
+ * @return {Promise<number>} - Removed count
+ */
+
+const prunePushDeliveries = async (): Promise<number> => {
+  const { count } = await prisma.pushDelivery.deleteMany({
+    where: { createdAt: { lt: horizon(RETENTION_POLICIES.pushDeliveries) } },
   })
 
   return count
@@ -117,21 +132,31 @@ const storedBytes = async (): Promise<number> => {
  */
 
 export const runMaintenance = async (): Promise<MaintenanceReport> => {
-  const [sessions, notifications, activityLogs, moderationLogs, candidates, bans, files] =
-    await Promise.all([
-      pruneSessions(RETENTION_POLICIES.expiredSessions),
-      pruneNotifications(),
-      pruneActivityLogs(),
-      // A table not migrated yet keeps nothing to purge
-      purgeModerationLog().catch(() => 0),
-      pruneRejectedCandidates(),
-      pruneBans(),
-      pruneOrphanFiles(RETENTION_SETTINGS.orphanFileHours),
-    ])
+  const [
+    sessions,
+    notifications,
+    pushDeliveries,
+    activityLogs,
+    moderationLogs,
+    candidates,
+    bans,
+    files,
+  ] = await Promise.all([
+    pruneSessions(RETENTION_POLICIES.expiredSessions),
+    pruneNotifications(),
+    prunePushDeliveries(),
+    pruneActivityLogs(),
+    // A table not migrated yet keeps nothing to purge
+    purgeModerationLog().catch(() => 0),
+    pruneRejectedCandidates(),
+    pruneBans(),
+    pruneOrphanFiles(RETENTION_SETTINGS.orphanFileHours),
+  ])
 
   const report: MaintenanceReport = {
     sessions,
     notifications,
+    pushDeliveries,
     activityLogs,
     moderationLogs,
     candidates,

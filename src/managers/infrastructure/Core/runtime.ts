@@ -6,7 +6,10 @@ import { logger } from '@/core/lib/logger'
 import { bindLiveTransport, deliverLive } from '@/core/lib/lives/bus'
 import type { LiveEnvelope } from '@/core/lib/lives/bus'
 import { LIVE_TOPICS } from '@/declarations/lives/topics'
+import { readPushIds } from '@/core/lib/push'
 import { markRemindersScheduled, runReminderSweep } from '@/core/services/calendar/attendance'
+// Satellite on purpose, the push central reaches back into this file
+import { deliverPushes, PushRetryError } from '@/core/services/push/DeliveryService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { runMaintenance } from '@/core/services/system/MaintenanceService'
 import { startLiveWatcher } from '@/core/services/lives/LiveWatcher'
@@ -131,6 +134,23 @@ const journalFailure = async (name: string, run: () => Promise<unknown>): Promis
 }
 
 /**
+ * Push one batch, a busy push service retried without filling the journal
+ * @param {Record<string, unknown>} payload - Job payload
+ * @return {Promise<void>} - Delivered
+ */
+
+const runPushJob = async (payload: Record<string, unknown>): Promise<void> => {
+  try {
+    await deliverPushes(readPushIds(payload))
+  } catch (error) {
+    // A busy push service is worth a retry, not a journal line
+    if (error instanceof PushRetryError) throw error
+
+    await journalFailure('push', () => Promise.reject(error))
+  }
+}
+
+/**
  * Declare what each queue runs. Handlers are registered before the queues load
  * @param {Sharding} container - Infrastructure container
  * @return {void} - Registered
@@ -145,6 +165,11 @@ const registerJobs = (container: Sharding): void => {
   container.queues.register({
     queueName: 'reminders',
     process: () => journalFailure('reminders', runReminderSweep),
+  })
+
+  container.queues.register({
+    queueName: 'push',
+    process: ({ payload }) => runPushJob(payload),
   })
 }
 

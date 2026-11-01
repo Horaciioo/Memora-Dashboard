@@ -16,14 +16,21 @@ const OPTIONS: SegmentedOption<ThemePreference>[] = THEME_REGISTRY.keys.map((key
 
 /**
  * Three-way switch for the light/dark/system preference
+ * @param {boolean} [isFull] - Spans the row
  * @return {JSX.Element}
  */
 
-export const ThemeToggle = () => {
+export const ThemeToggle = ({ isFull }: { isFull?: boolean }) => {
   const theme = useThemeStore((state) => state.theme)
   const setTheme = useThemeStore((state) => state.setTheme)
 
   return (
-    <SegmentedControl options={OPTIONS} value={theme} onChange={setTheme} label={NAV_COPY.theme} />
+    <SegmentedControl
+      options={OPTIONS}
+      value={theme}
+      onChange={setTheme}
+      label={NAV_COPY.theme}
+      isFull={isFull}
+    />
   )
 }

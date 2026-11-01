@@ -54,7 +54,6 @@ export const RECRUITMENT_COPY = {
 
   tabMe: 'Moi',
   tabInstructions: 'Consignes',
-  upcomingTitle: 'Prochains entretiens',
   myInterviews: 'Mes entretiens',
   myObservations: 'Mes observations',
   myInterviewsEmpty: 'Pour le moment, tu ne disposes d\aucun entretien dans cette session.',

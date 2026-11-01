@@ -1,6 +1,7 @@
 {
   "expiredSessionDays": 7,
   "readNotificationDays": 90,
+  "pushDeliveryDays": 30,
   "activityLogDays": 365,
   "moderationLogDays": 180,
   "rejectedCandidateDays": 180,
