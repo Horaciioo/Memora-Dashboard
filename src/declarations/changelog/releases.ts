@@ -127,30 +127,6 @@ export interface ChangelogRelease {
 
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: '0.10.0',
-    date: '2026-11-01',
-    title: 'Memora Status',
-    intro: 'Un clic suffit désormais pour voir si Memora fonctionne.',
-    description:
-      'Quand Memora ne répondait plus, il fallait deviner si le problème venait de ton appareil ou du site. Cette version ajoute une page de statut ouverte à tous, avec l’état de chaque service sur les 90 derniers jours, accessible depuis le menu comme depuis son propre lien.',
-    items: [
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.status,
-        text: 'Ajout d’une nouvelle fonctionnalité nommée « Memora Status » : l’état de l’application, de l’API, des données et des notifications, avec l’historique des 90 derniers jours.',
-      },
-      {
-        tag: ChangelogTags.Added,
-        page: ROUTES.status,
-        text: 'Ajout de la possibilité de consulter « Memora Status » sans être connecté, par exemple quand Memora ne répond plus.',
-      },
-      {
-        tag: ChangelogTags.Improved,
-        text: 'Amélioration de la barre du haut du menu : un bouton « Statut » ouvre « Memora Status » à côté du bouton qui replie le menu.',
-      },
-    ],
-  },
-  {
     version: '0.9.0',
     date: '2026-11-01',
     title: 'Memora devient une App !',
@@ -173,6 +149,11 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         tag: ChangelogTags.Added,
         page: ROUTES.home,
         text: 'Ajout d’une invitation sur l’accueil pour activer les notifications sur ton appareil.',
+      },
+      {
+        tag: ChangelogTags.Added,
+        page: ROUTES.status,
+        text: 'Ajout d’une nouvelle fonctionnalité nommée « Memora Status » : l’état de Memora et de ses services sur les 90 derniers jours, ouvert à tous, même sans être connecté.',
       },
       {
         tag: ChangelogTags.Added,
