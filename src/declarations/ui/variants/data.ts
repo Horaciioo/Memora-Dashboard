@@ -857,3 +857,39 @@ export const MEETING_CALENDAR = {
   dayToday: 'ring-2 ring-[var(--color-pick)] ring-inset',
   dayCount: 'text-[0.625rem] leading-none font-bold text-[var(--color-ink-subtle)]',
 }
+
+/**
+ * Public status page styles
+ * @type {Record<string, string>}
+ */
+
+export const PUBLIC_STATUS_STYLES = {
+  page: 'mx-auto flex w-full max-w-3xl flex-col gap-6',
+  // Alone on the screen, outside the app shell
+  bare: 'px-4 pt-8 pb-10 sm:px-6 sm:pt-12',
+  // In the app shell, takes back the room kept for a banner
+  embedded: 'md:-mt-[calc(var(--banner-h)-0.5rem)]',
+  brand: 'mb-4 flex items-center gap-3',
+  logo: 'size-10 shrink-0 object-contain',
+  brandName: 'text-section font-bold tracking-tight sm:text-page',
+  version: 'ml-auto shrink-0 text-xs tabular-nums text-[var(--color-ink-subtle)]',
+  banner:
+    'mb-7 flex flex-col gap-1 rounded-[var(--radius-xl)] px-6 py-5 text-white dark:text-[var(--color-page)]',
+  bannerTitle: 'text-section font-bold',
+  bannerLead: 'text-sm opacity-90',
+  card: 'rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5',
+  cardTitle: 'mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--color-ink-subtle)]',
+  axis: 'flex justify-between text-xs text-[var(--color-ink-subtle)]',
+} as const
+
+/**
+ * Banner colour per overall health
+ * @type {Record<'up' | 'degraded' | 'down', string>}
+ */
+
+export const PUBLIC_STATUS_BANNERS = {
+  up: 'bg-[var(--color-success)]',
+  degraded:
+    'border-[var(--color-warning)] bg-[color-mix(in_srgb,var(--color-warning)_14%,transparent)]',
+  down: 'bg-[var(--color-danger)]',
+} as const

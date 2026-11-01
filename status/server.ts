@@ -1,7 +1,6 @@
 import { createServer } from 'node:http'
 
 import { COMPONENTS, SETTINGS } from './declarations.ts'
-import { renderPage } from './page.ts'
 import { probe } from './probes.ts'
 import { recordCheck } from './history.ts'
 import { loadState, saveState } from './store.ts'
@@ -39,11 +38,7 @@ const server = createServer((request, response) => {
     return
   }
 
-  response.writeHead(200, {
-    'content-type': 'text/html; charset=utf-8',
-    'cache-control': 'no-store',
-  })
-  response.end(renderPage(state))
+  response.writeHead(404).end()
 })
 
 server.listen(SETTINGS.port)
