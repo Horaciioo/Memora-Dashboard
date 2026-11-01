@@ -165,6 +165,10 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Improved,
+        text: 'Amélioration de l’application installée sur ordinateur : la barre blanche du haut disparaît et les boutons de la fenêtre se posent sur le menu, à côté des flèches de navigation.',
+      },
+      {
+        tag: ChangelogTags.Improved,
         text: 'Amélioration de la barre du bas sur téléphone : un verre transparent qui laisse voir la page, et un point rouge sur « Menu » quand une notification attend.',
       },
       {
