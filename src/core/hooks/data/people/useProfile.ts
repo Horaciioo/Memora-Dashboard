@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 
-import { apiDelete, apiGet, apiPatch } from '@/core/lib/api/client'
+import { apiDelete, apiPatch } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
@@ -18,7 +18,6 @@ import type { ProfileDetail } from '@/types/preferences'
  * @property {FieldIssue[]} issues - Rejections of the last mutation
  * @property {(values: FormValues) => Promise<boolean>} save - Write the editable fields
  * @property {() => Promise<boolean>} eraseDetails - Drop the volunteered details
- * @property {() => Promise<void>} download - Save the whole dossier to a file
  */
 
 export interface ProfileState {
@@ -27,7 +26,6 @@ export interface ProfileState {
   issues: FieldIssue[]
   save: (values: FormValues) => Promise<boolean>
   eraseDetails: () => Promise<boolean>
-  download: () => Promise<void>
 }
 
 /**
@@ -65,21 +63,5 @@ export const useProfile = (initialProfile: ProfileDetail): ProfileState => {
     return next !== null
   }, [run])
 
-  const download = useCallback(async () => {
-    const dossier = await run(() => apiGet<unknown>(API_ROUTES.personalExport))
-    if (!dossier) return
-
-    // The file is built in the page
-    const url = URL.createObjectURL(
-      new Blob([JSON.stringify(dossier, null, 2)], { type: 'application/json' })
-    )
-    const link = document.createElement('a')
-    link.href = url
-    link.download = PREFERENCES_COPY.exportFileName
-    link.click()
-
-    URL.revokeObjectURL(url)
-  }, [run])
-
-  return { profile, isSaving, issues, save, eraseDetails, download }
+  return { profile, isSaving, issues, save, eraseDetails }
 }

@@ -24,7 +24,6 @@ export const PrivacyTab = ({ state }: PrivacyTabProps) => (
     </SettingsGroup>
     <PrivacyActions
       isBusy={state.isSaving}
-      onExport={() => void state.download()}
       onErase={state.eraseDetails}
     />
   </div>

@@ -12,33 +12,22 @@ import { PREFERENCE_STYLES } from '@/declarations/ui/variants'
 
 export interface PrivacyActionsProps {
   isBusy: boolean
-  onExport: () => void
   onErase: () => Promise<boolean>
 }
 
 /**
- * Take the data away, or erase the private part of it
+ * Erase the private part of the data
  * @param {boolean} isBusy - A request is in flight
- * @param {() => void} onExport - Download handler
  * @param {() => Promise<boolean>} onErase - Erase handler
  * @return {JSX.Element}
  */
 
-export const PrivacyActions = ({ isBusy, onExport, onErase }: PrivacyActionsProps) => {
+export const PrivacyActions = ({ isBusy, onErase }: PrivacyActionsProps) => {
   const [isAsking, setAsking] = useState(false)
 
   return (
     <SettingsGroup title={PREFERENCES_COPY.dataTitle}>
       <div className={PREFERENCE_STYLES.rows}>
-        <SettingRow
-          icon="install"
-          name={PRIVACY_COPY.exportTitle}
-          description={PRIVACY_COPY.exportLead}
-        >
-          <Button variant="secondary" disabled={isBusy} onClick={onExport}>
-            {isBusy ? PREFERENCES_COPY.exportPending : PREFERENCES_COPY.exportAction}
-          </Button>
-        </SettingRow>
         <SettingRow
           icon="remove"
           name={PRIVACY_COPY.eraseTitle}

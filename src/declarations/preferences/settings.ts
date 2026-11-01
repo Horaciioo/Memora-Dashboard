@@ -136,8 +136,6 @@ export const SECURITY_COPY = {
  */
 
 export const PRIVACY_COPY = {
-  exportTitle: 'Récupérer mes données',
-  exportLead: 'Un fichier lisible avec tout ce que Memora garde sur toi.',
   keepTitle: 'Ce que Memora garde',
   keeps: [
     'Ton pseudo, ton portrait et ton historique dans l’équipe.',

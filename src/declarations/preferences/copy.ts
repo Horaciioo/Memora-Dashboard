@@ -50,11 +50,6 @@ export const PREFERENCES_COPY = {
     'Ton adresse e-mail, ton téléphone, ta date de naissance et tes réseaux sont supprimés. Ton pseudo, ton portrait et ton historique ne bougent pas.',
   eraseDone: 'Informations privées effacées',
   detailsErased: 'Effacement des informations privées',
-  exportTitle: 'Récupérer mes données',
-  exportLead: 'Télécharge l’intégralité de ton dossier, dans un fichier lisible.',
-  exportAction: 'Télécharger mes données',
-  exportPending: 'Préparation…',
-  exportFileName: 'memora-mes-donnees.json',
   guidesTitle: 'Explications des pages',
   guidesLead:
     'Une petite bulle t’explique chaque page la première fois que tu l’ouvres, puis elle disparaît.',
