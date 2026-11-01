@@ -214,7 +214,7 @@ export const NAV_SHEET = {
  */
 
 export const MOBILE_DOCK = {
-  bar: 'glass-panel fixed inset-x-3 bottom-[calc(var(--shell-dock-gap)+env(safe-area-inset-bottom))] z-40 flex h-[var(--shell-dock-h)] items-center justify-around rounded-full px-1.5 shadow-[var(--shadow-lg)] md:hidden print:hidden',
+  bar: 'dock-glass fixed inset-x-3 bottom-[calc(var(--shell-dock-gap)+env(safe-area-inset-bottom))] z-40 flex h-[var(--shell-dock-h)] items-center justify-around rounded-full border px-1.5 md:hidden print:hidden',
   item: 'relative flex h-full min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full transition-colors active:bg-[var(--color-hover)] motion-reduce:transition-none',
   itemRest: 'text-[var(--color-ink-subtle)]',
   itemActive: 'text-[var(--color-ink-accent)]',
@@ -271,6 +271,15 @@ export const ACCOUNT_SHEET = {
   iconDivider: 'w-px shrink-0 bg-[var(--color-border)]',
   dot: 'absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-danger)] ring-2 ring-[var(--color-surface-raised)]',
   signOutForm: 'flex flex-1',
+  // Bottom sheet version, every block on the middle axis
+  sheet: 'flex flex-col items-stretch gap-6',
+  sheetBlock: 'flex flex-col items-center gap-3',
+  sheetLabel: PROPERTY_LABEL,
+  sheetActions: 'grid grid-cols-2 gap-3',
+  sheetAction:
+    'flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm font-semibold transition-colors active:bg-[var(--color-hover)]',
+  sheetActionDanger: 'text-[var(--color-danger)]',
+  sheetActionIcon: 'size-5 shrink-0',
 } as const
 
 /**
@@ -617,6 +626,9 @@ export const CREATOR_PICKER = {
   head: 'flex flex-wrap items-center gap-2',
   label: `px-0.5 ${PROPERTY_LABEL}`,
   list: 'flex flex-wrap items-center gap-1.5',
+  centered: 'items-center',
+  headCentered: 'justify-center',
+  listCentered: 'justify-center gap-2.5',
   option:
     'flex h-10 w-10 shrink-0 items-center justify-center rounded-full ring-2 transition-[opacity,box-shadow] hover:opacity-100 disabled:pointer-events-none disabled:opacity-40',
   optionIdle: 'opacity-50 ring-transparent',
@@ -884,13 +896,11 @@ export const AUTH_SHELL = {
 export const SPLASH = {
   overlay: 'splash cursor-pointer select-none',
   ground: 'splash-ground pointer-events-none absolute inset-0 overflow-hidden',
-  camera: 'splash-camera',
-  body: 'splash-body absolute top-1/2 left-1/2 flex w-max -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-5',
-  word: 'splash-word relative flex justify-center',
-  wordFill: 'splash-word-fill absolute inset-0 flex justify-center',
-  letter: 'splash-letter block',
-  label:
-    'splash-label text-micro font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  stage: 'splash-stage absolute inset-0 grid place-items-center',
+  halo: 'splash-halo pointer-events-none',
+  ring: 'splash-ring pointer-events-none',
+  brain: 'splash-brain relative',
+  piece: 'splash-piece absolute',
 } as const
 
 /**
