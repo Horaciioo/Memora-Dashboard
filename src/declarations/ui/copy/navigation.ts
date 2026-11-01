@@ -13,6 +13,9 @@ export const NAV_COPY = {
   railViewSwitch: 'Menu du calendrier ou menu des pages',
   railViewCalendarShort: 'Calendrier',
   railViewClassicShort: 'Menu',
+  railSectionSwitch: 'Pages privées ou pages normales',
+  railSectionPrivate: 'Privées',
+  railSectionNormal: 'Normales',
   expandRail: 'Agrandir le menu',
   status: 'Statut',
   historyBack: 'Page précédente',
@@ -49,6 +52,7 @@ export const SEARCH_GROUPS = {
   tasks: 'Tâches',
   meetings: 'Réunions',
   teams: 'Équipes',
+  pages: 'Pages privées',
 } as const
 
 export type SearchGroup = keyof typeof SEARCH_GROUPS

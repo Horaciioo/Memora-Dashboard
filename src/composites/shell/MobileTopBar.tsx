@@ -1,3 +1,4 @@
+import { SearchLauncher } from '@/composites/search/SearchLauncher'
 import { TOP_BAR_CRUMBS_HOST_ID, TOP_BAR_TOOLS_HOST_ID } from '@/declarations/ui/banners'
 import { TOP_BAR } from '@/declarations/ui/blocks'
 
@@ -11,5 +12,7 @@ export const MobileTopBar = () => (
     {/* The page trail lands here, carried by the page banner */}
     <div id={TOP_BAR_CRUMBS_HOST_ID} className={TOP_BAR.crumbsHost} />
     <div id={TOP_BAR_TOOLS_HOST_ID} className={TOP_BAR.toolsHost} />
+    {/* Memora always in reach */}
+    <SearchLauncher shortcut={false} className={TOP_BAR.assistant} />
   </header>
 )

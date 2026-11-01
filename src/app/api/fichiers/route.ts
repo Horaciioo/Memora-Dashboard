@@ -17,8 +17,8 @@ export const POST = createProtectedRoute({
     if (!STORAGE_BUCKETS.has(bucket)) throw invalidInput([], FILE_COPY.unknownBucket)
 
     // A bucket may demand a permission on top of a session
-    const { writePermission } = STORAGE_BUCKETS.get(bucket)
-    if (writePermission && !access.can(writePermission)) throw forbidden()
+    const { writePermission, ownRoute } = STORAGE_BUCKETS.get(bucket)
+    if (ownRoute || (writePermission && !access.can(writePermission))) throw forbidden()
 
     return storeFile(bucket as StorageBucket, file)
   },

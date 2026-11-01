@@ -1,0 +1,194 @@
+/* Block document of a private page */
+.page-editor .ProseMirror {
+  min-height: 40vh;
+  outline: none;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+  color: var(--color-ink);
+  padding-bottom: 30vh;
+}
+
+.page-editor .ProseMirror > * + * {
+  margin-top: 0.35em;
+}
+
+.page-editor h1,
+.page-editor h2,
+.page-editor h3,
+.page-editor h4,
+.page-editor h5 {
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.page-editor .ProseMirror > :is(h1, h2, h3, h4, h5) {
+  margin-top: 1.1em;
+}
+
+.page-editor h1 {
+  font-size: 1.85em;
+}
+
+.page-editor h2 {
+  font-size: 1.5em;
+}
+
+.page-editor h3 {
+  font-size: 1.25em;
+}
+
+.page-editor h4 {
+  font-size: 1.1em;
+}
+
+.page-editor h5 {
+  font-size: 1em;
+  color: var(--color-ink-subtle);
+}
+
+.page-editor a {
+  color: var(--color-ink-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.page-editor ul,
+.page-editor ol {
+  padding-left: 1.5em;
+}
+
+.page-editor ul {
+  list-style: disc;
+}
+
+.page-editor ol {
+  list-style: decimal;
+}
+
+.page-editor li > p {
+  margin: 0;
+}
+
+.page-editor ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0.2em;
+}
+
+.page-editor li[data-type='taskItem'] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6em;
+}
+
+.page-editor li[data-type='taskItem'] > label {
+  flex: none;
+  margin-top: 0.3em;
+  user-select: none;
+}
+
+.page-editor li[data-type='taskItem'] > label input {
+  width: 1.05em;
+  height: 1.05em;
+  accent-color: var(--color-brand-600);
+  cursor: pointer;
+}
+
+.page-editor li[data-type='taskItem'] > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.page-editor li[data-checked='true'] > div {
+  color: var(--color-ink-subtle);
+  text-decoration: line-through;
+}
+
+.page-editor blockquote {
+  border-left: 3px solid var(--color-brand-400);
+  padding-left: 0.9em;
+  color: var(--color-ink-subtle);
+}
+
+.page-editor code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--color-surface-sunken);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+}
+
+.page-editor pre {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  line-height: 1.6;
+  background: var(--color-surface-sunken);
+  padding: 0.9em 1.1em;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.page-editor pre code {
+  background: none;
+  padding: 0;
+}
+
+/* Padded for an easy click */
+.page-editor hr {
+  height: 1px;
+  border: 0;
+  padding: 0.5em 0;
+  margin: 0.5em 0;
+  background: var(--color-border-strong) content-box;
+  cursor: pointer;
+}
+
+.page-editor hr.ProseMirror-selectednode {
+  background-color: var(--color-brand-600);
+}
+
+.page-editor img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+.page-editor img.ProseMirror-selectednode,
+.page-editor [data-subpage].ProseMirror-selectednode {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Empty line hint */
+.page-editor .is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--color-ink-subtle);
+  opacity: 0.7;
+}
+
+.page-editor .ProseMirror-gapcursor::after {
+  border-top-color: var(--color-ink);
+}
+
+/* Block reached by a deep link */
+.page-editor [data-id].block-target {
+  border-radius: var(--radius-sm);
+  background: var(--color-brand-soft);
+  transition: background var(--motion-duration-slow) var(--motion-ease-out);
+}
+
+.page-editor ::selection {
+  background: var(--color-brand-soft);
+}
+
+@media (pointer: coarse) {
+  .page-editor .ProseMirror {
+    padding-bottom: 45vh;
+  }
+}

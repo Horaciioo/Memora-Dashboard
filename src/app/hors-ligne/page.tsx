@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
+import { OfflinePages } from '@/composites/pages/offline/OfflinePages'
 import { OfflineRetry } from '@/composites/pwa/OfflineRetry'
 import { LIFECYCLE_COPY } from '@/declarations/pwa/copy'
 import { PWA_STYLES } from '@/declarations/ui/variants'
@@ -21,6 +22,7 @@ export default function OfflinePage() {
         description={LIFECYCLE_COPY.offlineLead}
         action={<OfflineRetry />}
       />
+      <OfflinePages />
     </main>
   )
 }

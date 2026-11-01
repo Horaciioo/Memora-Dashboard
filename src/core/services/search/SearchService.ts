@@ -13,6 +13,8 @@ import {
   taskVisibility,
   workViewer,
 } from '@/core/services/work/visibility'
+import { searchPages, viewerOf } from '@/core/services/pages'
+import { PAGES_COPY } from '@/declarations/pages/copy'
 import { formatDay } from '@/utils/format/dates'
 import type { SessionUser } from '@/types/auth'
 import type { SearchHit, SearchSection } from '@/types/search'
@@ -170,6 +172,20 @@ export const search = async (term: string, session: SessionUser): Promise<Search
       })),
     })
   }
+
+  // Pages the member may open, nothing else
+  const pages = await searchPages(viewerOf(session), query)
+  sections.push({
+    group: 'pages',
+    label: SEARCH_GROUPS.pages,
+    hits: pages.slice(0, take).map<SearchHit>((hit) => ({
+      id: hit.id,
+      group: 'pages',
+      label: `${hit.icon ? `${hit.icon} ` : ''}${hit.title || PAGES_COPY.untitled}`,
+      hint: hit.trail.join(' › ') || undefined,
+      href: ROUTES.page(hit.id),
+    })),
+  })
 
   return sections.filter((section) => section.hits.length > 0)
 }

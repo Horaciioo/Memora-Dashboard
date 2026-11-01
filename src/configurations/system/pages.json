@@ -1,0 +1,15 @@
+{
+  "titleMaxLength": 200,
+  "documentMaxBytes": 1048576,
+  "documentMaxNodes": 20000,
+  "documentMaxDepth": 12,
+  "treeMaxDepth": 16,
+  "autosaveMs": 800,
+  "revisionEveryMinutes": 10,
+  "revisionsKept": 50,
+  "searchResults": 20,
+  "commentMaxLength": 2000,
+  "offlinePages": 20,
+  "offlineDays": 7,
+  "autosaveMaxWaitMs": 5000
+}

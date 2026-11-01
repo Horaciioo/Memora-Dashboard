@@ -45,6 +45,7 @@ export const EVENT_TYPES = createEnumeration({
   LegacyChanged: { id: 36, label: 'Parcours Legacy modifié' },
   LiveAnnounced: { id: 37, label: 'Live annoncé' },
   LiveMoved: { id: 38, label: 'Live changé de statut' },
+  LiveDeleted: { id: 81, label: 'Live supprimé' },
   PlatformLinked: { id: 39, label: 'Compte de plateforme lié' },
   ModerationActed: { id: 40, label: 'Action de Mod.' },
   LiveRosterMoved: { id: 41, label: 'Appel d’un live corrigé' },
@@ -87,6 +88,14 @@ export const EVENT_TYPES = createEnumeration({
   RecruitmentBanned: { id: 78, label: 'Identifiant blacklisté' },
   RecruitmentUnbanned: { id: 79, label: 'Blacklist levée' },
   RecruitmentClosed: { id: 80, label: 'Recrutement clôturé' },
+  PageCreated: { id: 82, label: 'Page privée créée' },
+  PageShared: { id: 83, label: 'Page partagée' },
+  PageUnshared: { id: 84, label: 'Partage de page retiré' },
+  PageTrashed: { id: 85, label: 'Page mise à la corbeille' },
+  PageRestored: { id: 86, label: 'Page restaurée' },
+  PagePurged: { id: 87, label: 'Page supprimée définitivement' },
+  PageMoved: { id: 88, label: 'Page déplacée' },
+  PageInheritanceChanged: { id: 89, label: 'Héritage des accès changé' },
 })
 
 export type EventTypeName = keyof typeof EVENT_TYPES.ids

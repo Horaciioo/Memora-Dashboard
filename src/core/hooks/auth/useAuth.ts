@@ -3,6 +3,7 @@
 import { useCallback, useTransition } from 'react'
 
 import { logout } from '@/app/connexion/actions'
+import { wipeOfflinePages } from '@/core/lib/pages/offline/store'
 
 /**
  * Auth actions
@@ -25,8 +26,10 @@ export const useAuth = (): AuthActions => {
   const [isPending, startTransition] = useTransition()
 
   const signOut = useCallback(() => {
-    startTransition(() => {
-      void logout()
+    startTransition(async () => {
+      // Private pages never outlive the session
+      await wipeOfflinePages()
+      await logout()
     })
   }, [])
 
