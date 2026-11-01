@@ -16,6 +16,7 @@ const PUBLIC_PATHS: string[] = [
   ROUTES.login,
   ROUTES.privacy,
   ROUTES.offline,
+  ROUTES.status,
   WORKER_FILE.script,
   MANIFEST_PATH,
 ]

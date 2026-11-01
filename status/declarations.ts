@@ -43,20 +43,27 @@ export const COMPONENTS: ProbeTarget[] = [
   {
     id: 'app',
     label: 'Application',
-    lead: 'Le site Memora et son API',
+    lead: 'Le site Memora',
     kind: 'http',
-    target: read('STATUS_APP_URL', 'http://app:3000/api/sante'),
+    target: read('STATUS_APP_URL', 'http://app:3000/connexion'),
+  },
+  {
+    id: 'api',
+    label: 'API',
+    lead: 'Les échanges de données de Memora',
+    kind: 'http',
+    target: read('STATUS_API_URL', 'http://app:3000/api/sante'),
   },
   {
     id: 'database',
-    label: 'Base de données',
+    label: 'Données',
     lead: 'Tes modérateurs, tâches et réunions',
     kind: 'tcp',
     target: read('STATUS_DATABASE_ADDRESS', 'db:5432'),
   },
   {
     id: 'cache',
-    label: 'Cache et files',
+    label: 'Rappels et notifications',
     lead: 'Rappels, notifications et tâches de fond',
     kind: 'tcp',
     target: read('STATUS_CACHE_ADDRESS', 'redis:6379'),
@@ -88,34 +95,4 @@ export const SETTINGS = {
   // Down checks that colour a whole day red
   redDayChecks: 3,
   timeZone: 'Europe/Paris',
-} as const
-
-/**
- * Displayed texts
- * @type {Object}
- */
-
-export const COPY = {
-  title: 'Memora Statut',
-  lead: 'Ici, tu vois si Memora fonctionne, même quand le site ne répond plus.',
-  overall: {
-    up: 'Tout fonctionne',
-    degraded: 'Fonctionnement dégradé',
-    down: 'Panne en cours',
-  },
-  health: { up: 'Opérationnel', degraded: 'Dégradé', down: 'Hors service' },
-  noData: 'Pas de mesure ce jour-là',
-  components: 'Services',
-  incidents: 'Incidents passés',
-  noIncident: 'Aucun incident enregistré.',
-  ongoing: 'En cours',
-  resolved: 'Résolu',
-  duration: 'Durée',
-  uptime: 'de disponibilité',
-  daysAgo: (days: number) => `Il y a ${days} jours`,
-  today: "Aujourd'hui",
-  refreshed: 'Mis à jour',
-  waiting: 'Première mesure en cours, reviens dans une minute.',
-  incidentTitle: (label: string, health: Health) =>
-    `${label} : ${health === 'down' ? 'hors service' : 'fonctionnement dégradé'}`,
 } as const

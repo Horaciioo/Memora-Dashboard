@@ -14,6 +14,7 @@ export const NAV_COPY = {
   railViewCalendarShort: 'Calendrier',
   railViewClassicShort: 'Menu',
   expandRail: 'Agrandir le menu',
+  status: 'Statut',
   historyBack: 'Page précédente',
   historyForward: 'Page suivante',
   home: 'Accueil',

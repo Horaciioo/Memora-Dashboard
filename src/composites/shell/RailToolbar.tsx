@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { ROUTES } from '@/declarations/navigation'
 import { LEFT_SIDEBAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import type { IconName } from '@/declarations/ui/icons'
@@ -31,13 +32,14 @@ export const RailToolbar = ({ isCompact, onToggle }: RailToolbarProps) => {
       onClick: router.forward,
       className: 'rail-fold',
     },
-    // Fold sits at the far end, centred once the rail is folded
+    // Status and fold sit at the far end, centred once the rail is folded
     {
-      icon: 'sidebar',
-      label: foldLabel,
-      onClick: onToggle,
+      icon: 'metrics',
+      label: NAV_COPY.status,
+      onClick: () => router.push(ROUTES.status),
       className: isCompact ? undefined : 'ml-auto',
     },
+    { icon: 'sidebar', label: foldLabel, onClick: onToggle },
   ]
 
   return (
