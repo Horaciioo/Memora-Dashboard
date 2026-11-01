@@ -1,5 +1,8 @@
 import { execFile } from 'node:child_process'
+import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 
 import next from 'next'
@@ -17,7 +20,9 @@ const { values } = parseArgs({
 })
 const dev = process.env.NODE_ENV !== 'production'
 const port = Number(values.port ?? process.env.PORT ?? 3000)
-const hostname = values.hostname ?? process.env.HOSTNAME ?? (dev ? 'localhost' : '0.0.0.0')
+// Dev answers this Mac only, whatever the flags say
+const hostname = dev ? 'localhost' : (values.hostname ?? process.env.HOSTNAME ?? '0.0.0.0')
+const LOOPBACK_ADDRESSES = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1'])
 
 const app = next({ dev, hostname, port })
 await app.prepare()
@@ -48,6 +53,13 @@ const hubOf = async () => {
 
 const server = createServer((request, response) => handle(request, response))
 
+// Dev drops any connection that does not come from this Mac
+if (dev) {
+  server.on('connection', (socket) => {
+    if (!LOOPBACK_ADDRESSES.has(socket.remoteAddress ?? '')) socket.destroy()
+  })
+}
+
 server.on('upgrade', (request, socket, head) => {
   const { pathname } = new URL(request.url ?? '/', 'http://memora')
   if (pathname !== realtime.path) return void upgradeNext(request, socket, head)
@@ -59,6 +71,34 @@ server.on('upgrade', (request, socket, head) => {
   })
 })
 
+// Where Chrome keeps the shortcuts of installed apps
+const INSTALLED_APPS_DIR = join(homedir(), 'Applications', 'Chrome Apps.localized')
+const APP_URL_KEY = /<key>CrAppModeShortcutURL<\/key>\s*<string>([^<]+)<\/string>/
+
+/**
+ * Installed app shortcut that opens this origin
+ * @param {string} url - Dev address
+ * @return {string | undefined} - App bundle path
+ */
+
+const findInstalledApp = (url) => {
+  try {
+    const { origin } = new URL(url)
+
+    return readdirSync(INSTALLED_APPS_DIR)
+      .filter((name) => name.endsWith('.app'))
+      .map((name) => join(INSTALLED_APPS_DIR, name))
+      .find((app) => {
+        const plist = readFileSync(join(app, 'Contents', 'Info.plist'), 'utf8')
+        const shortcut = APP_URL_KEY.exec(plist)?.[1]
+
+        return shortcut !== undefined && new URL(shortcut).origin === origin
+      })
+  } catch {
+    return undefined
+  }
+}
+
 server.listen(port, hostname, () => {
   const url = `http://${hostname}:${port}`
   console.log(`> Memora on ${url} (${dev ? 'dev' : 'production'})`)
@@ -67,7 +107,9 @@ server.listen(port, hostname, () => {
     const copy = execFile('pbcopy')
     copy.on('error', () => {})
     copy.stdin?.end(url)
-    execFile('open', ['-a', 'Google Chrome', url], () => {})
+    // The installed dev app when there is one, else a Chrome tab
+    const app = findInstalledApp(url)
+    execFile('open', app ? [app] : ['-a', 'Google Chrome', url], () => {})
   }
 })
 
