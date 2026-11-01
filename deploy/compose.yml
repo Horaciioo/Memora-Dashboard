@@ -96,7 +96,6 @@ services:
       - '443:443'
     environment:
       DOMAIN: ${DOMAIN}
-      STATUS_DOMAIN: ${STATUS_DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data

@@ -16,9 +16,3 @@
 
 	header -Server
 }
-
-# Independent of the app, answers while it is down
-{$STATUS_DOMAIN} {
-	encode zstd gzip
-	reverse_proxy status:3001
-}
