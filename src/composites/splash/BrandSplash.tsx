@@ -25,7 +25,6 @@ export const BrandSplash = () => {
       </div>
       <div className={SPLASH.stage}>
         <span className={SPLASH.halo} />
-        <span className={SPLASH.ring} />
         <div className={SPLASH.brain} style={{ aspectRatio: BRAIN_RATIO }}>
           {BRAIN_PIECES.map((piece, index) => (
             <span
