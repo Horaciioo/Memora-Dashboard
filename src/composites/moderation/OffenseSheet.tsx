@@ -25,6 +25,7 @@ export interface OffenseSheetProps {
   offense: SanctionOffenseDetail
   panel: SanctionPanelView
   level: LiveconLevelView
+  levels: LiveconLevelView[]
   measures: SanctionMeasureView[]
   canManage: boolean
   isSaving: boolean
@@ -54,7 +55,8 @@ const TABS: TabItem[] = [
 export const OffenseSheet = ({
   offense,
   panel,
-  level,
+  level: startLevel,
+  levels,
   measures,
   canManage,
   isSaving,
@@ -63,6 +65,9 @@ export const OffenseSheet = ({
   onClose,
 }: OffenseSheetProps) => {
   const [tab, setTab] = useState('profile')
+  const [levelId, setLevelId] = useState(startLevel.id)
+  // Livecon the sheet reads, any of them
+  const level = levels.find((entry) => entry.id === levelId) ?? startLevel
 
   const saveField = (name: string) => (value: string) =>
     onSaveOffense(offense.id, { [name]: value })
@@ -96,7 +101,10 @@ export const OffenseSheet = ({
         <OffenseProfile
           offense={offense}
           level={level}
+          levels={levels}
           canManage={canManage}
+          onLevelChange={setLevelId}
+          onSaveLadder={onSaveLadder}
           onSaveField={saveField}
         />
       )}

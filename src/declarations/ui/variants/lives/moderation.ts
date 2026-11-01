@@ -70,8 +70,6 @@ export const OFFENSE_SHEET = {
   summary: SECTION_STYLES.well,
   block: 'flex flex-col gap-3',
   label: PROPERTY_LABEL,
-  ladderLive:
-    '-mx-2 -my-1 cursor-pointer rounded-[var(--radius-md)] px-2 py-1 transition-colors hover:bg-[var(--color-surface)]',
   placeholder: 'text-sm text-[var(--color-ink-subtle)] italic',
   ladder: 'flex flex-col',
   rung: 'relative flex gap-3 pb-4 pl-7 last:pb-0',
@@ -89,10 +87,6 @@ export const OFFENSE_SHEET = {
   how: 'text-xs text-[var(--color-ink-subtle)]',
   warning:
     'flex items-start justify-between gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-3 text-sm',
-  editor: 'flex flex-col gap-3',
-  editorRung:
-    'flex flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] p-3',
-  editorRow: 'flex items-center gap-2',
   actions: 'flex flex-wrap items-center gap-2',
 } as const
 

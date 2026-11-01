@@ -227,6 +227,7 @@ export const ModerationBoard = ({
           offense={sanctions.open}
           panel={sanctions.panel}
           level={level}
+          levels={levels}
           measures={panelMeasures}
           canManage={canManageSanctions}
           isSaving={sanctions.isSaving}
