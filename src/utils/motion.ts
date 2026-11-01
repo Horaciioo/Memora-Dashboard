@@ -6,21 +6,21 @@
 export const prefersReducedMotion = (): boolean =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-// Fallback panel duration
-const PANEL_FALLBACK_MS = 220
+// Fallback glide duration
+const GLIDE_FALLBACK_MS = 600
 
 /**
- * Panel duration from the motion token
+ * Glide duration from the motion token
  * @return {number} - Milliseconds
  */
 
-export const panelDurationMs = (): number => {
-  if (typeof window === 'undefined') return PANEL_FALLBACK_MS
+export const glideDurationMs = (): number => {
+  if (typeof window === 'undefined') return GLIDE_FALLBACK_MS
 
-  const raw = getComputedStyle(document.documentElement).getPropertyValue('--motion-duration-panel')
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--motion-duration-glide')
   const parsed = Number.parseFloat(raw)
 
-  return Number.isFinite(parsed) ? parsed : PANEL_FALLBACK_MS
+  return Number.isFinite(parsed) ? parsed : GLIDE_FALLBACK_MS
 }
 
 /**

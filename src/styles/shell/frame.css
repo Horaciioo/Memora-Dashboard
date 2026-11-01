@@ -72,6 +72,8 @@ html:has(.modview-bleed) {
   --page-ink: var(--color-ink);
   --page-ink-subtle: var(--color-ink-subtle);
   --page-border: var(--color-border);
+  --page-shadow-sm: var(--shadow-sm);
+  --page-shadow-md: var(--shadow-md);
   --page-border-strong: var(--color-border-strong);
   --page-surface: var(--color-surface);
   --page-surface-raised: var(--color-surface-raised);

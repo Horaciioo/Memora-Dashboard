@@ -85,6 +85,8 @@ export interface FieldOption {
   emoji?: string | null
   flag?: string
   icon?: string | null
+  // Bars lit by the priority mark, read from the label otherwise
+  weight?: number
   prefix?: string
   group?: string
   // A line is drawn under it

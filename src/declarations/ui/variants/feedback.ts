@@ -142,6 +142,58 @@ export const ADD_ROW_STYLES = {
 } as const
 
 /**
+ * Glass creation button floating at the bottom right of the page
+ * @type {Record<string, string>}
+ */
+
+export const FLOATING_ADD_STYLES = {
+  // Pinned corner holding the button and its words
+  dock: 'fixed right-5 bottom-[calc(var(--shell-dock-clearance)+1rem)] z-30 flex flex-col items-end md:right-12 md:bottom-16 print:hidden',
+  root: 'group glass-sunset flex h-14 min-w-14 cursor-pointer items-center justify-center rounded-full border px-4 text-[var(--color-on-sunset)] transition-transform duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-spring)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  // Chat above the button, one size, never grows
+  chat: 'speech-bubble speech-tail-down surface-enter absolute right-1 bottom-[calc(100%+1.75rem)] flex h-[min(34rem,calc(100dvh-12rem))] w-[26rem] max-w-[calc(100vw-2.5rem)] flex-col rounded-[var(--radius-xl)]',
+  // Memora's card, a soft sunset wash
+  chatHead:
+    'flex shrink-0 items-center gap-3 rounded-t-[var(--radius-xl)] border-b border-[var(--color-border)] bg-[linear-gradient(115deg,color-mix(in_srgb,var(--color-sunset-pink)_24%,transparent),color-mix(in_srgb,var(--color-sunset-amber)_18%,transparent))] py-3 pr-2 pl-4',
+  chatHeadMark:
+    'glass-sunset flex h-11 w-11 shrink-0 items-center justify-center rounded-full border',
+  chatHeadGlyph: 'brain-mark-white h-6',
+  chatHeadText: 'flex min-w-0 flex-1 flex-col',
+  chatHeadName: 'text-body font-bold',
+  chatHeadStatus: 'text-caption text-[var(--color-ink-subtle)]',
+  // Scrolls, the newest line kept in sight
+  chatThread: 'flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain',
+  chatThreadInner: 'mt-auto',
+  chatCaret: 'ml-px inline-block h-4 w-px translate-y-0.5 animate-pulse bg-[var(--color-ink)]',
+  chatTyping: 'flex h-6 w-fit items-center gap-1',
+  chatTypingDot: 'replica-typing-dot h-1.5 w-1.5 rounded-full bg-[var(--color-ink-subtle)]',
+  // Questions dropped one after the other
+  chatPicks: 'mt-2 flex flex-col items-start gap-2',
+  chatAction:
+    'replica-message-in glass-sunset cursor-pointer rounded-full border px-4 py-2 text-left text-sm font-semibold text-[var(--color-on-sunset)] transition-transform duration-150 hover:-translate-y-0.5',
+  chatIcons: 'flex flex-wrap gap-2',
+  // Round icon, its question written under the row
+  chatPick:
+    'replica-message-in flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)] transition-[transform,background-color] duration-150 hover:-translate-y-0.5 hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  chatPickGlyph: 'h-5 w-5 text-[var(--color-ink-accent)]',
+  chatPickHint: 'min-h-5 text-caption text-[var(--color-ink-subtle)]',
+  chatBar: 'flex shrink-0 items-center gap-2 border-t border-[var(--color-border)] p-3',
+  chatInput:
+    'min-w-0 flex-1 rounded-full bg-[var(--color-surface-sunken)] px-4 py-2.5 text-sm outline-none placeholder:text-[var(--color-ink-subtle)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  chatSend:
+    'glass-sunset flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border text-[var(--color-on-sunset)] transition-transform duration-150 hover:-translate-y-0.5 disabled:cursor-default disabled:opacity-50 disabled:hover:translate-y-0',
+  chatSendGlyph: 'h-4 w-4',
+  // Label, or Memora's line in its place
+  label:
+    'overflow-hidden text-sm font-semibold whitespace-nowrap transition-[max-width,opacity,margin] duration-[var(--motion-duration-slow)] ease-[var(--motion-ease-out)]',
+  // Folded to nothing, unfolds slowly to the left
+  labelFolded:
+    'max-w-0 opacity-0 group-hover:mr-3 group-hover:ml-2 group-hover:max-w-80 group-hover:opacity-100 group-focus-visible:mr-3 group-focus-visible:ml-2 group-focus-visible:max-w-80 group-focus-visible:opacity-100',
+  labelOpen: 'mr-3 ml-2 max-w-80 opacity-100',
+  icon: 'h-7 shrink-0',
+} as const
+
+/**
  * Maturity tag styles
  * @type {Record<string, string>}
  */

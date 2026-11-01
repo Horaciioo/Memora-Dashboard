@@ -7,7 +7,7 @@ import { PAGE_TABS_HOST_ID } from '@/declarations/ui/banners'
 import { TABS_STYLES } from '@/declarations/ui/variants'
 import { ICONS, type IconName } from '@/declarations/ui/icons'
 import { cn } from '@/utils/classnames'
-import { panelDurationMs, prefersReducedMotion } from '@/utils/motion'
+import { glideDurationMs, prefersReducedMotion } from '@/utils/motion'
 
 export interface TabItem {
   value: string
@@ -36,7 +36,7 @@ export interface TabsProps {
 const LAST_DRAWN = new Map<string, { left: number; width: number }>()
 
 // Glide length factor
-const EMPHASIS_FACTOR = 2.5
+const EMPHASIS_FACTOR = 1.5
 
 /**
  * Horizontal tab strip driving a single panel below it
@@ -79,8 +79,8 @@ export const Tabs = ({
       rule.style.transition =
         duration > 0
           ? [
-              `transform ${duration}ms var(--motion-ease-out)`,
-              `width ${duration}ms var(--motion-ease-out)`,
+              `transform ${duration}ms var(--motion-ease-glide)`,
+              `width ${duration}ms var(--motion-ease-glide)`,
             ].join(', ')
           : 'none'
       rule.style.width = `${box.width}px`
@@ -91,7 +91,7 @@ export const Tabs = ({
     if (!end) return
 
     const from = LAST_DRAWN.get(label)
-    const duration = panelDurationMs() * (emphasis ? EMPHASIS_FACTOR : 1)
+    const duration = glideDurationMs() * (emphasis ? EMPHASIS_FACTOR : 1)
 
     if (!from || prefersReducedMotion()) place(end, 0)
     else {
@@ -167,7 +167,15 @@ export const Tabs = ({
             )}
           >
             <span className={TABS_STYLES.content}>
-              {Icon && <Icon className={TABS_STYLES.icon} aria-hidden="true" />}
+              {Icon && (
+                <Icon
+                  className={cn(
+                    TABS_STYLES.icon,
+                    !item.danger && !(item.flagged && !isActive) && TABS_STYLES.iconTone
+                  )}
+                  aria-hidden="true"
+                />
+              )}
               <span className={cn(TABS_STYLES.label, Icon && TABS_STYLES.labelBeside)}>
                 {item.label}
               </span>

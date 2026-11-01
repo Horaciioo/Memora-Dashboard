@@ -285,6 +285,12 @@ export const MENU_STYLES = {
   separator: 'my-1 h-px bg-[var(--color-border)]',
   label: 'px-3 py-1 text-xs font-semibold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   shortcut: 'ml-auto text-xs text-[var(--color-ink-subtle)]',
+  search:
+    'mx-2 mt-1 mb-1.5 w-[calc(100%-1rem)] rounded-[var(--radius-sm)] border border-[var(--color-pick)] bg-[var(--color-field)] px-2.5 py-1.5 text-sm outline-none placeholder:text-[var(--color-ink-subtle)]',
+  heading: 'px-3 pt-1.5 pb-1 text-xs font-semibold text-[var(--color-ink-subtle)]',
+  chevron: 'ml-auto h-4 w-4 shrink-0 opacity-60',
+  empty: 'px-3 py-2 text-sm text-[var(--color-ink-subtle)]',
+  scroll: 'max-h-[min(70vh,28rem)] overflow-y-auto',
 } as const
 
 /**
@@ -317,7 +323,7 @@ export const TABS_STYLES = {
   // Strip centred over its panel from sm
   listCentered: 'sm:mx-auto',
   tab: 'relative z-10 min-h-11 shrink-0 rounded-full px-3 py-1.5 text-sm font-medium sm:px-3.5 md:min-h-0 text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
-  // Open tab sits on the white pill
+  // Open tab sits on the glass pill
   active:
     'font-semibold text-[var(--color-ink)] hover:bg-transparent hover:text-[var(--color-ink)]',
   flagged: 'text-[var(--color-danger)]',
@@ -325,14 +331,16 @@ export const TABS_STYLES = {
   danger: 'text-[var(--color-danger)] hover:text-[var(--color-danger)]',
   activeDanger:
     'font-semibold text-[var(--color-danger)] hover:bg-transparent hover:text-[var(--color-danger)]',
-  // White pill gliding under the open tab
+  // Glass pill gliding under the open tab
   indicator:
-    'tab-indicator pointer-events-none absolute top-1 bottom-1 left-0 rounded-full bg-[var(--color-surface-raised)] shadow-[var(--shadow-sm)]',
+    'tab-indicator glass-pill pointer-events-none absolute top-1 bottom-1 left-0 rounded-full',
   // Pulse ringing the open tab
   arrive: 'tab-arrive',
   panel: 'pt-4',
   content: 'flex items-center',
-  icon: 'h-5 w-5 shrink-0 opacity-60 md:h-4 md:w-4',
+  icon: 'h-5 w-5 shrink-0 md:h-4 md:w-4',
+  // Dark grey glyph, red tabs keep their tone
+  iconTone: 'text-[var(--color-ink)]/80',
   label: 'whitespace-nowrap',
   // A tab with a glyph shows no words on a phone, the name stays on its aria-label
   labelBeside: 'hidden pl-1.5 md:inline',
@@ -601,9 +609,20 @@ export const PAGE_OPTIONS = {
   // Block drawn on a phone only, scrolls inside the panel
   content: 'flex max-h-[60dvh] flex-col gap-2 overflow-y-auto px-2.5 py-2 md:hidden',
   contentTitle: 'text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  // Read-only line on every screen
+  note: 'flex flex-col gap-1 px-2.5 py-2 text-caption leading-snug text-[var(--color-ink-subtle)]',
+  // Person with avatar and small lines
+  profile: 'flex items-center gap-2.5 px-2.5 py-2',
+  profileText: 'flex min-w-0 flex-col text-xs text-[var(--color-ink-subtle)] italic',
+  profileName: 'text-sm font-semibold text-[var(--color-ink)] not-italic',
   // One gesture on its own line
   action:
-    'mt-1 rounded-[var(--radius-md)] border-t border-[var(--color-border)] px-2.5 py-2 text-left font-semibold text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)]',
+    'flex items-center gap-2.5 rounded-[var(--radius-md)] px-2.5 py-2 text-left font-medium transition-colors hover:bg-[var(--color-hover)]',
+  actionDanger: 'text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)]',
+  actionIcon: 'size-4 shrink-0 opacity-70',
+  // Group heading and the rule above it
+  heading: 'px-2.5 pt-1 pb-0.5 text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+  divider: 'mx-1 my-1 border-0 border-t border-[var(--color-border)]',
   // Many choices take the line under their label
   rowStacked:
     'flex-col items-stretch gap-2 [&_[role=group]]:w-full [&_[role=group]>button]:flex-1 [&_[role=group]>button]:px-2',

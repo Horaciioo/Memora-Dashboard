@@ -92,6 +92,16 @@ export const WIP_COPY = {
 } as const
 
 /**
+ * Floating menu
+ * @type {Record<string, string>}
+ */
+
+export const MENU_COPY = {
+  search: 'Rechercher des actions…',
+  empty: 'Aucune action',
+} as const
+
+/**
  * Page options menu
  * @type {Record<string, string>}
  */

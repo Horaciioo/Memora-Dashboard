@@ -145,7 +145,7 @@ export const OptionMark = ({ mark, option, size = 'xs' }: OptionMarkProps) => {
       style={picked ? accentVars(option.accent, 'warning') : undefined}
       aria-hidden="true"
     >
-      <PriorityBars lit={litBars(option.label)} />
+      <PriorityBars lit={option.weight ?? litBars(option.label)} />
     </span>
   )
 }

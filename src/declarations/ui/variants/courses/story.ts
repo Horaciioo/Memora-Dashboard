@@ -91,5 +91,6 @@ export const PICKER_CARD = {
   frameStrip:
     'h-6 w-full rounded-[var(--radius-md)] bg-[linear-gradient(90deg,var(--color-frame-mauve),var(--color-frame-blue),var(--color-frame-pink))]',
   lead: 'text-sm text-[var(--color-ink-subtle)]',
-  note: 'text-xs text-[var(--color-ink-subtle)]',
+  note: 'mt-4 text-xs text-[var(--color-ink-subtle)] italic',
+  noteInline: 'text-xs text-[var(--color-ink-subtle)] italic',
 } as const

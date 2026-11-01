@@ -121,8 +121,7 @@ body {
   }
 }
 
-/* Sliding underline of the tab strip — measured by Tabs (src/components/elements/navigation/Tabs.tsx) */
-/* Tab rule, moved frame by frame by Tabs, so no CSS transition */
+/* Pill gliding under the open tab, transition written by Tabs (src/components/elements/navigation/Tabs.tsx) */
 .tab-indicator {
   will-change: transform, width;
 }
