@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ICONS } from '@/declarations/ui/icons'
+import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { CommandPalette } from '@/composites/search/CommandPalette'
+import { useAssistantDock } from '@/core/store/assistantDock'
+import { ASSISTANT_COPY } from '@/declarations/assistant/copy'
 import { SEARCH_LAUNCHER } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { BUTTON_STYLES } from '@/declarations/ui/variants'
@@ -14,13 +16,19 @@ export interface SearchLauncherProps {
   iconClassName?: string
   // Full bar variant
   expanded?: boolean
+  // Answers Cmd K
+  shortcut?: boolean
+  // After the chat opens
+  onOpen?: () => void
 }
 
 /**
- * Glyph opening the command palette
+ * Memora bar opening the chat, Cmd K opens the palette
  * @param {string} [className] - Classes overriding the standard glyph button
  * @param {string} [iconClassName] - Classes overriding the standard glyph size
  * @param {boolean} [expanded] - Renders the full bar
+ * @param {boolean} [shortcut] - Answers Cmd K
+ * @param {() => void} [onOpen] - After the chat opens
  * @return {JSX.Element}
  */
 
@@ -28,10 +36,15 @@ export const SearchLauncher = ({
   className,
   iconClassName,
   expanded,
+  shortcut = true,
+  onOpen,
 }: SearchLauncherProps = {}) => {
   const [isOpen, setOpen] = useState(false)
+  const openChat = useAssistantDock((state) => state.open)
 
   useEffect(() => {
+    if (!shortcut) return
+
     const onKeyDown = (event: KeyboardEvent) => {
       // Cmd or Ctrl plus K opens the palette from anywhere
       if (event.key?.toLowerCase() !== 'k' || !(event.metaKey || event.ctrlKey)) return
@@ -43,26 +56,25 @@ export const SearchLauncher = ({
     document.addEventListener('keydown', onKeyDown)
 
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [])
+  }, [shortcut])
 
   return (
     <>
       <button
         type="button"
-        aria-label={NAV_COPY.searchTitle}
-        title={`${NAV_COPY.searchTitle}, ${NAV_COPY.searchShortcut}`}
-        onClick={() => setOpen(true)}
-        className={
+        aria-label={ASSISTANT_COPY.launcherTitle}
+        title={`${ASSISTANT_COPY.launcherTitle}, ${NAV_COPY.searchShortcut}`}
+        onClick={() => {
+          openChat()
+          onOpen?.()
+        }}
+        className={cn(
+          'brain-wake',
           className ?? cn(BUTTON_STYLES.base, expanded ? SEARCH_LAUNCHER.bar : BUTTON_STYLES.icon)
-        }
-      >
-        <ICONS.search className={iconClassName ?? 'h-4 w-4 shrink-0'} aria-hidden="true" />
-        {expanded && (
-          <>
-            <span className={SEARCH_LAUNCHER.barLabel}>{NAV_COPY.searchPlaceholder}</span>
-            <kbd className={SEARCH_LAUNCHER.barShortcut}>{NAV_COPY.searchShortcut}</kbd>
-          </>
         )}
+      >
+        <BrainMark motion="idle" className={iconClassName ?? SEARCH_LAUNCHER.brain} />
+        {expanded && <span className={SEARCH_LAUNCHER.barLabel}>{ASSISTANT_COPY.launcher}</span>}
       </button>
       {isOpen && <CommandPalette onClose={() => setOpen(false)} />}
     </>

@@ -1,0 +1,14 @@
+{
+  "debounceMs": 220,
+  "maxChoices": 5,
+  "idempotencyMinutes": 10,
+  "nudgeFirstSeconds": 8,
+  "nudgeEverySeconds": 75,
+  "nudgeShowSeconds": 6,
+  "typingMsPerChar": 22,
+  "typingMinMs": 500,
+  "typingMaxMs": 1200,
+  "handoffSeconds": 10,
+  "maxPicks": 6,
+  "pickStaggerMs": 90
+}

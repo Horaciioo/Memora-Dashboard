@@ -17,6 +17,7 @@ export const GET = createProtectedRoute({
 
 export const POST = createProtectedRoute({
   permission: Permissions.TaskCreate,
+  idempotent: true,
   status: 201,
   descriptor: { summary: 'Add a task', tags: ['tasks'] },
   handler: async ({ raw, session, scope, access }) => {

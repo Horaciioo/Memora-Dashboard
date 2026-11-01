@@ -3,6 +3,8 @@
 import { useMemo, useState } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
+import { FloatingAdd } from '@/composites/search/assistant/FloatingAdd'
+import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { PageOptions, type PageOption } from '@/components/structures/page/PageOptions'
@@ -14,7 +16,7 @@ import { ABSENCE_DEMO_SCRIPT } from '@/declarations/absences/demo'
 import { TOUR_BEACONS } from '@/declarations/tour/beacons'
 import { beaconProps } from '@/declarations/ui/beacons'
 import { ACTION_COPY, PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
-import { ABSENCE_PAGE, ABSENCE_WIZARD } from '@/declarations/ui/variants'
+import { ABSENCE_PAGE } from '@/declarations/ui/variants'
 import { useTour } from '@/managers/front-end/TourManager'
 import type { FieldDefinition } from '@/types/forms'
 import type { MemberAbsence } from '@/types/members'
@@ -146,13 +148,11 @@ export const AbsencesPanel = ({ mine, thresholdDays, canCreate }: AbsencesPanelP
       {visible.length > 0 && (
         <>
           {!isDeclaring && canCreate && (
-            <div className={ABSENCE_WIZARD.header}>
-              <span {...beaconProps(TOUR_BEACONS.absencesDeclare)}>
-                <Button variant="primary" icon="add" onClick={openDeclaration}>
-                  {ABSENCE_COPY.declare}
-                </Button>
-              </span>
-            </div>
+            <FloatingAdd
+              {...beaconProps(TOUR_BEACONS.absencesDeclare)}
+              offer={ASSISTANT_OFFERS.absence}
+              onClick={openDeclaration}
+            />
           )}
           <AbsenceList absences={visible} onRemove={setPendingDeletion} />
         </>

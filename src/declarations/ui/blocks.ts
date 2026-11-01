@@ -115,13 +115,13 @@ export const LEFT_SIDEBAR = {
   nav: 'rail-nav flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto px-4 pt-5 pb-4',
   navGroup: 'flex flex-col gap-2',
   navGroupLabel:
-    'rail-fold group flex w-full items-center gap-1 px-3 pb-1 text-caption font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
+    'rail-fold group flex w-full items-center gap-1 px-3 pb-1 text-xs font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   navGroupChevron:
     'h-4 w-4 shrink-0 opacity-70 transition-[transform,opacity] group-hover:opacity-100 group-focus-visible:opacity-100 md:h-3.5 md:w-3.5 md:opacity-0',
   navGroupChevronCollapsed: '-rotate-90',
   navGroupItems: 'flex flex-col gap-px',
   navLink:
-    'group flex items-center gap-3 rounded-[var(--radius-lg)] px-3 py-1.5 text-body font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
+    'group flex items-center gap-2.5 rounded-[var(--radius-lg)] px-3 py-1 text-sm font-medium text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface)]',
   navLinkActive: 'font-semibold text-[var(--color-ink)]',
   navLabel: 'rail-fold relative',
   // A creator is on air: red text breathing a soft glow
@@ -134,7 +134,7 @@ export const LEFT_SIDEBAR = {
   subLink:
     'flex h-8 items-center rounded-[var(--radius-md)] px-2 text-caption font-medium text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-ink)]',
   subLinkActive: 'font-semibold text-[var(--color-ink)]',
-  navIcon: 'size-5 shrink-0 transition-colors',
+  navIcon: 'size-[1.125rem] shrink-0 transition-colors',
   navIconActive: 'text-[var(--color-ink)]',
   // Pulse on the live entry, bubble anchored beside it
   livePulse: 'rail-fold relative ml-auto flex size-2.5 shrink-0',
@@ -182,8 +182,8 @@ export const SEARCH_LAUNCHER = {
   sheetBar:
     'glass-panel flex min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-lg)] px-3 py-2 text-left text-sm text-[var(--color-ink-subtle)]',
   barLabel: 'flex-1 truncate text-body',
-  barShortcut:
-    'hidden shrink-0 rounded-[var(--radius-sm)] bg-[var(--color-hover)] px-1.5 py-0.5 font-[family-name:var(--font-mono)] text-micro font-medium text-[var(--color-ink-subtle)] md:inline',
+  // Memora brain in the bar
+  brain: 'h-5 shrink-0',
 } as const
 
 /**
@@ -240,6 +240,9 @@ export const TOP_BAR = {
   crumbs: 'flex min-w-0 flex-1 items-center gap-1 text-sm font-medium',
   // Page options and star, at the right of the bar
   toolsHost: 'flex shrink-0 items-center',
+  // Memora button
+  assistant:
+    'glass-panel flex size-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[var(--color-hover)]',
   crumbFold:
     'flex size-7 shrink-0 items-center justify-center rounded-full text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)]',
   // Pages behind the fold, in a box under the bar
