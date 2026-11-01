@@ -100,7 +100,7 @@ export const PROGRESS_STYLES = {
 export const TOAST_STYLES = {
   // Top right, under the top bar on mobile
   stack:
-    'toast-pile pointer-events-auto fixed inset-x-4 top-[calc(var(--shell-top-bar-h)_+_0.75rem)] z-[60] md:inset-x-auto md:top-6 md:right-6 md:w-[min(26rem,calc(100vw-2rem))] print:hidden',
+    'toast-pile pointer-events-auto fixed inset-x-4 top-[calc(var(--shell-top-bar-h)_+_env(safe-area-inset-top)_+_0.75rem)] z-[60] md:inset-x-auto md:top-6 md:right-6 md:w-[min(26rem,calc(100vw-2rem))] print:hidden',
   stackSpread: 'toast-pile-spread',
   // Placed by .toast-pile
   item: 'absolute inset-x-0',

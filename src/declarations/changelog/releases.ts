@@ -218,6 +218,10 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug sur téléphone qui faisait passer la barre du haut sous l’heure et la batterie dans l’application installée.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
         page: ROUTES.recruitments,
         permission: Permissions.RecruitmentRead,
         text: 'Correction d’un bug de « Recrutements » qui empêchait un recruteur de s’installer comme observateur dans un entretien.',
