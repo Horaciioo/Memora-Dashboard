@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
-import { dockCandidatesOf, resolveDock } from '@/core/lib/pwa/dock'
+import { dockCandidatesOf, resolveDock, splitDock } from '@/core/lib/pwa/dock'
 import { APPLICATION_SETTINGS } from '@/declarations/configurations/settings'
 import type { NavigationItem } from '@/declarations/navigation'
 import { FAVORITE_COPY } from '@/declarations/ui/favorites'
@@ -31,15 +31,9 @@ export const useDockEntries = (
       { label: '', from: viewContext.view, items: shortcuts },
       ...groups.filter((group) => group.label !== FAVORITE_COPY.group),
     ]
-    const slots = resolveDock(
-      saved ?? [],
-      dockCandidatesOf(rail, held),
-      APPLICATION_SETTINGS.dockSlots
+
+    return splitDock(
+      resolveDock(saved ?? [], dockCandidatesOf(rail, held), APPLICATION_SETTINGS.dockSlots)
     )
-
-    // The menu closes the right side, Home stays centred
-    const leftCount = Math.ceil((slots.length + 1) / 2)
-
-    return { left: slots.slice(0, leftCount), right: slots.slice(leftCount) }
   }, [shortcuts, groups, saved, held, viewContext.view])
 }

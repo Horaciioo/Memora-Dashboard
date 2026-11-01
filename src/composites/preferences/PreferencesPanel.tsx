@@ -211,7 +211,7 @@ export const PreferencesPanel = ({
           {
             value: 'display',
             label: PREFERENCES_COPY.tabDisplay,
-            icon: 'light',
+            icon: 'settingsLine',
             render: displayTab,
           },
           {

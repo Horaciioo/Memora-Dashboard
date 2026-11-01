@@ -1,5 +1,5 @@
 import type { NavigationGroup, NavigationItem } from '@/declarations/navigation'
-import { DOCK_DEFAULTS, DOCK_EXTRAS, DOCK_FALLBACKS, DOCK_HOME_PATH } from '@/declarations/pwa/dock'
+import { DOCK_DEFAULTS, DOCK_FALLBACKS, DOCK_HOME_PATH } from '@/declarations/pwa/dock'
 
 /**
  * Pages a member may put in the dock
@@ -14,13 +14,15 @@ export const dockCandidatesOf = (
 ): NavigationItem[] => {
   const seen = new Set<string>([DOCK_HOME_PATH, ...held])
 
-  return [...groups.flatMap((group) => group.items), ...DOCK_EXTRAS].filter((item) => {
-    if (seen.has(item.href)) return false
+  return groups
+    .flatMap((group) => group.items)
+    .filter((item) => {
+      if (seen.has(item.href)) return false
 
-    seen.add(item.href)
+      seen.add(item.href)
 
-    return true
-  })
+      return true
+    })
 }
 
 /**
@@ -69,4 +71,18 @@ export const resolveDock = (
 
 export const isDockPath = (path: string, navigation: NavigationGroup[]): boolean =>
   path !== DOCK_HOME_PATH &&
-  [...navigation.flatMap((group) => group.items), ...DOCK_EXTRAS].some((item) => item.href === path)
+  navigation.flatMap((group) => group.items).some((item) => item.href === path)
+
+/**
+ * Dock pages split around Home, the menu closing the right side
+ * @param {NavigationItem[]} slots - Pages in slot order
+ * @return {{ left: NavigationItem[], right: NavigationItem[] }} - Pages left and right of Home
+ */
+
+export const splitDock = (
+  slots: NavigationItem[]
+): { left: NavigationItem[]; right: NavigationItem[] } => {
+  const leftCount = Math.ceil((slots.length + 1) / 2)
+
+  return { left: slots.slice(0, leftCount), right: slots.slice(leftCount) }
+}

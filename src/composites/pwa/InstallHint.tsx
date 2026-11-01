@@ -24,6 +24,7 @@ export const InstallHint = () => {
 
   return (
     <aside className={PWA_STYLES.hint} aria-label={INSTALL_COPY.hintTitle}>
+      <span className={PWA_STYLES.hintWash} aria-hidden="true" />
       <div className={PWA_STYLES.hintHead}>
         <Image
           src={PWA_ICONS.small}
@@ -40,17 +41,24 @@ export const InstallHint = () => {
         </div>
       </div>
       <div className={PWA_STYLES.hintActions}>
-        <Button variant="ghost" onClick={dismiss}>
-          {INSTALL_COPY.hintNever}
-        </Button>
-        <Button variant={route === 'prompt' ? 'ghost' : 'secondary'} onClick={snooze}>
-          {INSTALL_COPY.hintLater}
-        </Button>
         {route === 'prompt' && (
-          <Button variant="primary" icon="install" onClick={() => void install()}>
+          <Button
+            variant="primary"
+            icon="install"
+            className="w-full justify-center"
+            onClick={() => void install()}
+          >
             {INSTALL_COPY.action}
           </Button>
         )}
+        <div className={PWA_STYLES.hintSecondary}>
+          <Button variant="ghost" onClick={dismiss}>
+            {INSTALL_COPY.hintNever}
+          </Button>
+          <Button variant={route === 'prompt' ? 'ghost' : 'secondary'} onClick={snooze}>
+            {INSTALL_COPY.hintLater}
+          </Button>
+        </div>
       </div>
     </aside>
   )

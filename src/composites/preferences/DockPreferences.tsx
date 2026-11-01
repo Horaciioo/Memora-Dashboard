@@ -4,16 +4,18 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
+import { DockPhone } from '@/composites/preferences/DockPhone'
 import { Section } from '@/components/structures/page/Section'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { apiPatch } from '@/core/lib/api/client'
-import { resolveDock } from '@/core/lib/pwa/dock'
+import { resolveDock, splitDock } from '@/core/lib/pwa/dock'
 import { API_ROUTES } from '@/core/lib/api/routes'
 import { APPLICATION_SETTINGS } from '@/declarations/configurations/settings'
 import type { NavigationItem } from '@/declarations/navigation'
 import { DOCK_COPY } from '@/declarations/pwa/copy'
 import { ACTION_COPY } from '@/declarations/ui/copy'
 import { PREFERENCE_STYLES } from '@/declarations/ui/variants'
+import { cn } from '@/utils/classnames'
 
 export interface DockPreferencesProps {
   candidates: NavigationItem[]
@@ -40,6 +42,9 @@ export const DockPreferences = ({ candidates, saved }: DockPreferencesProps) => 
     )
   })
 
+  // Phone follows the picks, saved or not
+  const { left, right } = splitDock(resolveDock(picks, candidates, APPLICATION_SETTINGS.dockSlots))
+
   const options = candidates.map((item) => ({ value: item.href, label: item.label }))
 
   // A page picked twice leaves its first slot
@@ -55,23 +60,26 @@ export const DockPreferences = ({ candidates, saved }: DockPreferencesProps) => 
 
   return (
     <Section title={DOCK_COPY.title} description={DOCK_COPY.lead} padded>
-      <div className={PREFERENCE_STYLES.rows}>
-        {picks.map((href, slot) => (
-          <div key={slot} className={PREFERENCE_STYLES.row}>
-            <span className={PREFERENCE_STYLES.label}>
-              {DOCK_COPY.slot.replace('{position}', String(slot + 1))}
-            </span>
-            <SelectMenu
-              options={options}
-              value={href}
-              onChange={(next) => void pick(slot, next)}
-              label={DOCK_COPY.slot.replace('{position}', String(slot + 1))}
-              emptyLabel={ACTION_COPY.none}
-              disabled={isSaving}
-              size="compact"
-            />
-          </div>
-        ))}
+      <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+        <div className={cn(PREFERENCE_STYLES.rows, 'min-w-0 flex-1')}>
+          {picks.map((href, slot) => (
+            <div key={slot} className={PREFERENCE_STYLES.row}>
+              <span className={PREFERENCE_STYLES.label}>
+                {DOCK_COPY.slot.replace('{position}', String(slot + 1))}
+              </span>
+              <SelectMenu
+                options={options}
+                value={href}
+                onChange={(next) => void pick(slot, next)}
+                label={DOCK_COPY.slot.replace('{position}', String(slot + 1))}
+                emptyLabel={ACTION_COPY.none}
+                disabled={isSaving}
+                size="compact"
+              />
+            </div>
+          ))}
+        </div>
+        <DockPhone left={left} right={right} />
       </div>
     </Section>
   )

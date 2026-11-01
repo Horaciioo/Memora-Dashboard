@@ -37,7 +37,7 @@ const PUSH_CATEGORY_MAP: Record<PushCategoryName, PushCategoryOption> = {
   mentions: {
     label: 'Mentions',
     description: 'Quand quelqu’un te cite avec @.',
-    icon: 'discord',
+    icon: 'discordLogo',
     urgent: true,
   },
   work: {
@@ -58,7 +58,7 @@ const PUSH_CATEGORY_MAP: Record<PushCategoryName, PushCategoryOption> = {
   lives: {
     label: 'Lives',
     description: 'Convocations, lancements, coordination et bilans de live.',
-    icon: 'liveDot',
+    icon: 'stream',
     urgent: true,
   },
   recruitment: {

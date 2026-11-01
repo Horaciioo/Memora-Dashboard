@@ -59,8 +59,10 @@ export const LIFECYCLE_COPY = {
 export const PUSH_COPY = {
   tab: 'Notifications',
   deviceTitle: 'Sur cet appareil',
+  inviteTitle: 'Memora débarque en App',
+  enabledTitle: 'Tu es branché',
   deviceLead:
-    'Reçois tes notifications Memora sur ce téléphone ou cet ordinateur, même quand Memora est fermée.',
+    'Reçois désormais tes notifications directement sur ton téléphone, ou sur ton ordinateur, même quand Memora est fermée.',
   enable: 'Activer sur cet appareil',
   disable: 'Couper sur cet appareil',
   enabled: 'Activées sur cet appareil.',
@@ -96,6 +98,7 @@ export const DOCK_COPY = {
   title: 'Barre du bas',
   lead: 'Sur téléphone, l’Accueil reste au centre et le Menu à droite. Choisis les pages des autres cases.',
   slot: 'Case {position}',
+  preview: 'Aperçu de la barre du bas sur un iPhone',
   menu: 'Menu',
   reset: 'Revenir aux pages proposées',
   saved: 'Barre du bas enregistrée',
