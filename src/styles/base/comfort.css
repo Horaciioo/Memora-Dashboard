@@ -1,0 +1,73 @@
+/* Interface settings of the member, each set as a data attribute on the page */
+
+/* Radius: the whole scale moves together */
+:root[data-radius='sharp'],
+[data-radius-preview='sharp'] {
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+}
+
+:root[data-radius='round'],
+[data-radius-preview='round'] {
+  --radius-xs: 0.5rem;
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+}
+
+/* Cards: solid instead of glass */
+:root[data-glass='solid'] .card-surface,
+:root[data-glass='solid'] .glass-thick {
+  background: var(--color-surface);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Frame: one flat ground instead of the gradient */
+:root[data-frame='calm'],
+:root[data-frame='calm'] .app-tone,
+[data-frame-preview='calm'] {
+  --gradient-page: linear-gradient(var(--page-base), var(--page-base));
+}
+
+/* Leading: longer lines breathe */
+:root[data-leading='relaxed'] :where(body, .markdown-body) {
+  line-height: 1.8;
+}
+
+/* Links read without their colour */
+:root[data-links='underlined'] :where(main p, main li, .markdown-body) a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Motion: every animation collapses to its end state */
+:root[data-motion='reduced'] *,
+:root[data-motion='reduced'] ::before,
+:root[data-motion='reduced'] ::after {
+  animation-duration: 1ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+  transition-delay: 0ms !important;
+}
+
+:root[data-motion='reduced'] .confetti-piece {
+  display: none;
+}
+
+/* Keyboard focus: a thicker ring */
+:root[data-focus='strong']
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+:root[data-focus='strong'] :where(input, select, textarea):focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 1px;
+}
