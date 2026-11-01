@@ -1,12 +1,6 @@
 import { commandMeasure, nextRung, writeRungCommand } from '@/core/lib/modview/commands'
 import type { PanelMemory } from '@/core/lib/modview/commands'
-import {
-  COMMON_WORDS,
-  MIN_PHRASE,
-  NAME_WEIGHT,
-  PHRASE_WEIGHT,
-  WORD_STEM,
-} from '@/declarations/modview/suggestions'
+import { offenseByKeywords, offenseByText } from '@/core/lib/modview/detection'
 import type { Chatter, ModAct } from '@/types/modview'
 import type {
   SanctionMeasureView,
@@ -63,119 +57,7 @@ export interface Suggestion {
   command: string | null
 }
 
-// Name without accents or case
-const plain = (name: string): string =>
-  name
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase()
-    .trim()
-
-// A message that holds a close case the panel leaves alone
-const isTolerated = (offense: SanctionOffenseCard, text: string): boolean =>
-  offense.tolerated.some((case_) => {
-    const phrase = plain(case_)
-
-    return phrase.length >= MIN_PHRASE && text.includes(phrase)
-  })
-
-const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
-// Words of a text, the common ones dropped
-const wordsOf = (text: string): string[] =>
-  plain(text)
-    .split(/[^\p{L}\p{N}]+/u)
-    .filter((word) => word.length >= 3 && !COMMON_WORDS.has(word))
-
-// Same word, or same start for the long ones
-const isSame = (left: string, right: string): boolean =>
-  left === right ||
-  (Math.min(left.length, right.length) >= WORD_STEM &&
-    left.slice(0, WORD_STEM) === right.slice(0, WORD_STEM))
-
-/**
- * Offence whose detection words the message holds, the one with the most words first
- * @param {SanctionPanelView | null} panel - Panel at the level in force
- * @param {SuggestionSource} source - What triggered it
- * @return {SanctionOffenseCard | null} - Offence, none when no detection word appears
- */
-
-export const offenseByKeywords = (
-  panel: SanctionPanelView | null,
-  source: SuggestionSource
-): SanctionOffenseCard | null => {
-  if (!panel) return null
-
-  const text = plain(`${source.text} ${source.flagged.join(' ')}`)
-  let best: { offense: SanctionOffenseCard; hits: number } | null = null
-
-  for (const offense of panel.offenses) {
-    if (isTolerated(offense, text)) continue
-
-    const hits = offense.keywords.filter((keyword) => {
-      const word = plain(keyword)
-      if (!word) return false
-
-      // A whole word or phrase, plural tolerated
-      const edge = '[^\\p{L}\\p{N}]'
-      return new RegExp(`(^|${edge})${escapeRegex(word)}s?(${edge}|$)`, 'u').test(text)
-    }).length
-
-    if (hits > 0 && (!best || hits > best.hits)) best = { offense, hits }
-  }
-
-  return best?.offense ?? null
-}
-
-/**
- * Offence of the panel the message reads like, from the names and examples written in it, for offences without detection words
- * A word only one offence uses weighs more than one they share
- * @param {SanctionPanelView | null} panel - Panel at the level in force
- * @param {SuggestionSource} source - What triggered it
- * @return {SanctionOffenseCard | null} - Offence, none when nothing in the panel resembles it
- */
-
-export const offenseByText = (
-  panel: SanctionPanelView | null,
-  source: SuggestionSource
-): SanctionOffenseCard | null => {
-  if (!panel) return null
-
-  const message = [...wordsOf(source.text), ...source.flagged.flatMap(wordsOf)]
-  const text = plain(source.text)
-  const vocabulary = panel.offenses.map((offense) => ({
-    offense,
-    name: wordsOf(offense.name),
-    examples: offense.examples.flatMap(wordsOf),
-  }))
-
-  // Offences that use a word, to weigh it
-  const spread = (word: string): number =>
-    Math.max(
-      1,
-      vocabulary.filter((entry) =>
-        [...entry.name, ...entry.examples].some((other) => isSame(other, word))
-      ).length
-    )
-
-  let best: { offense: SanctionOffenseCard; score: number } | null = null
-
-  for (const entry of vocabulary) {
-    if (isTolerated(entry.offense, text)) continue
-
-    let score = 0
-    for (const word of message) {
-      if (entry.name.some((other) => isSame(other, word))) score += NAME_WEIGHT / spread(word)
-      if (entry.examples.some((other) => isSame(other, word))) score += 1 / spread(word)
-    }
-    for (const example of entry.offense.examples.map(plain)) {
-      if (example.length >= MIN_PHRASE && text.includes(example)) score += PHRASE_WEIGHT
-    }
-    if (score > 0 && (!best || score > best.score)) best = { offense: entry.offense, score }
-  }
-
-  return best?.offense ?? null
-}
+export { offenseByKeywords, offenseByText }
 
 // Weight of the lightest gesture each gravity deserves: warning, then timeout
 const GRAVITY_FLOOR: Record<SanctionGravityName, number> = {
