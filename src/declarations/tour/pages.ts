@@ -109,7 +109,7 @@ export const TOUR_PAGES: TourPage[] = [
       {
         beacon: TOUR_BEACONS.absencesDeclare,
         title: 'Déclarer une absence',
-        body: '« Déclarer une absence » ouvre la déclaration. Une absence posée apparaît ensuite dans ta liste avec son état : envoyée, prise en compte, refusée ou annulée.',
+        body: 'Le bouton + en bas à droite ouvre la déclaration. Une absence posée apparaît ensuite dans ta liste avec son état : envoyée, prise en compte, refusée ou annulée.',
         permission: Permissions.AbsenceCreate,
       },
       {
@@ -138,7 +138,7 @@ export const TOUR_PAGES: TourPage[] = [
       {
         beacon: GUIDE_BEACONS.calendarAdd,
         title: 'Poser un évènement',
-        body: 'Ce bouton pose un évènement dans le calendrier. Sur ordinateur, avec le mode « Tracer » de la grille à la minute, tu peux aussi tirer sur une colonne pour en créer un.',
+        body: 'Le bouton + en bas à droite pose un évènement dans le calendrier. Sur ordinateur, avec le mode « Tracer » de la grille à la minute, tu peux aussi tirer sur une colonne pour en créer un.',
         permission: Permissions.CalendarManage,
       },
     ],

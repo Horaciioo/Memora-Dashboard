@@ -27,6 +27,8 @@ export interface AbsenceCalendarProps {
   onChange: (start: string | null, end: string | null) => void
   // Day whose month opens first, today's month when missing
   focusDay?: string
+  // Small cells, for a narrow panel
+  isCompact?: boolean
 }
 
 /**
@@ -36,6 +38,7 @@ export interface AbsenceCalendarProps {
  * @param {AbsenceSpan[]} booked - Absences already declared
  * @param {(start: string | null, end: string | null) => void} onChange - Selection handler
  * @param {string} [focusDay] - Day whose month opens first
+ * @param {boolean} [isCompact] - Small cells
  * @return {JSX.Element}
  */
 
@@ -45,6 +48,7 @@ export const AbsenceCalendar = ({
   booked,
   onChange,
   focusDay,
+  isCompact = false,
 }: AbsenceCalendarProps) => {
   const [cursor, setCursor] = useState(() =>
     toDayKey(startOfMonth(focusDay ? parseDay(focusDay) : new Date()))
@@ -123,7 +127,7 @@ export const AbsenceCalendar = ({
                 onClick={() => pick(cell.key)}
                 onPointerEnter={() => setPreview(cell.key)}
                 className={cn(
-                  ABSENCE_PAGE.day,
+                  isCompact ? ABSENCE_PAGE.dayCompact : ABSENCE_PAGE.day,
                   past
                     ? ABSENCE_PAGE.dayPast
                     : taken

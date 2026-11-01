@@ -219,6 +219,8 @@ export const ABSENCE_PAGE = {
   weekday:
     'pb-2 text-center text-micro font-bold tracking-wide text-[var(--color-ink-subtle)] uppercase',
   day: 'relative flex h-14 w-full items-center justify-center text-xl font-bold tabular-nums transition-colors',
+  dayCompact:
+    'relative flex h-9 w-full items-center justify-center text-sm font-bold tabular-nums transition-colors',
   dayFree: 'cursor-pointer rounded-[var(--radius-md)] hover:bg-[var(--color-hover)]',
   dayPast: 'cursor-not-allowed text-[var(--color-ink-subtle)]/50',
   dayToday: 'rounded-[var(--radius-md)] ring-2 ring-[var(--color-ink)] ring-inset',
@@ -514,8 +516,6 @@ export const CALENDAR_STYLES = {
   legendRowMuted: 'opacity-40',
   legendDot: 'h-2 w-2 shrink-0 rounded-full',
   legendCount: 'tabular-nums opacity-60',
-  // Add button floating over a phone
-  fab: 'fixed right-4 bottom-[var(--shell-dock-clearance)] z-30 size-14 rounded-2xl shadow-[var(--shadow-lg)] md:hidden',
   selectionBar: SELECTION_BAR,
   selectionCount: 'font-semibold tabular-nums',
   // Detail modal
@@ -718,7 +718,6 @@ export const ABSENCE_WIZARD = {
   reasonLabel: 'text-micro font-bold tracking-wide uppercase',
   reasonBox:
     'rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-body leading-relaxed break-words whitespace-pre-wrap',
-  header: 'flex justify-end',
 } as const
 
 /**
@@ -798,8 +797,16 @@ export const STATUS_HISTORY_STYLES = {
   meta: 'flex items-center gap-3',
   mono: 'font-[family-name:var(--font-mono)] text-xs text-[var(--color-ink-subtle)]',
   bars: 'flex h-7 gap-px',
-  bar: 'min-w-px flex-1 rounded-[2px]',
-  foot: 'flex justify-between text-xs text-[var(--color-ink-subtle)]',
+  column: 'group/bar relative flex min-w-px flex-1',
+  bar: 'w-full rounded-[2px] transition-opacity group-hover/bar:opacity-70',
+  pop: 'invisible absolute bottom-[calc(100%+0.5rem)] z-[60] w-max max-w-64 rounded-[var(--radius-md)] border border-[var(--color-border)] glass-panel px-3.5 py-2.5 text-left opacity-0 shadow-[var(--shadow-md)] transition-[opacity,visibility] duration-[var(--motion-duration-fast)] group-hover/bar:visible group-hover/bar:opacity-100',
+  popStart: 'left-0',
+  popCenter: 'left-1/2 -translate-x-1/2',
+  popEnd: 'right-0',
+  popDay: 'text-sm font-semibold',
+  popText: 'mt-1 text-xs text-[var(--color-ink-subtle)]',
+  axis: 'flex items-center gap-3 text-xs text-[var(--color-ink-subtle)]',
+  rule: 'h-px flex-1 bg-[var(--color-border-strong)]',
   incident: 'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-2 text-sm',
   incidentWhen: 'text-xs tabular-nums text-[var(--color-ink-subtle)]',
 } as const
@@ -879,7 +886,6 @@ export const PUBLIC_STATUS_STYLES = {
   bannerLead: 'text-sm opacity-90',
   card: 'rounded-[var(--radius-xl)] border border-[var(--color-border)] card-surface p-5',
   cardTitle: 'mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--color-ink-subtle)]',
-  axis: 'flex justify-between text-xs text-[var(--color-ink-subtle)]',
 } as const
 
 /**

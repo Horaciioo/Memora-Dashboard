@@ -290,3 +290,67 @@ export const academyFields = async (
     },
   ]
 }
+
+/**
+ * What a member may plan for one junior
+ * @typedef {Object} PlanOption
+ * @property {string} templateId - Template identifier
+ * @property {string} name - Template name
+ * @property {EventPurposeName} purpose - What the template stands for
+ * @property {number | null} defaultMinutes - Usual length
+ * @property {boolean} isOpen - Can be planned now
+ * @property {string} hint - Why it cannot, empty when it can
+ */
+
+export interface PlanOption {
+  templateId: string
+  name: string
+  purpose: EventPurposeName
+  defaultMinutes: number | null
+  isOpen: boolean
+  hint: string
+}
+
+/**
+ * Academy templates for one junior, each open or shut with its reason
+ * @param {AcademyScope} scope - Visibility fragment
+ * @param {string} juniorId - Junior identifier
+ * @return {Promise<PlanOption[]>} - One option per template
+ */
+
+export const planOptionsFor = async (
+  scope: AcademyScope,
+  juniorId: string
+): Promise<PlanOption[]> => {
+  const [context, templates] = await Promise.all([
+    readAcademyForm(scope),
+    prisma.eventTemplate.findMany({
+      where: { purpose: { not: null }, archived: false },
+      select: { id: true, name: true, purpose: true, defaultMinutes: true },
+      orderBy: { name: 'asc' },
+    }),
+  ])
+  const junior = context.juniors.find((entry) => entry.id === juniorId)
+
+  return templates.map((template) => {
+    const purpose = template.purpose as EventPurposeName
+    const base = {
+      templateId: template.id,
+      name: template.name,
+      purpose,
+      defaultMinutes: template.defaultMinutes,
+    }
+    if (!junior) return { ...base, isOpen: false, hint: ACADEMY_EVENT_COPY.reviewDone }
+
+    const isEarly = REVIEW_PURPOSES.includes(purpose) && isBeforeWindow(purpose, junior)
+    const isOpen = isReviewOpen(purpose, junior) && !isEarly
+    const opensAt = reviewOpensAt(purpose, junior)
+    const hint = isOpen
+      ? ''
+      : isEarly && opensAt
+        ? ACADEMY_EVENT_COPY.reviewOpensOn.replace('{date}', formatDay(opensAt))
+        : closedHint(purpose, junior)
+
+    return { ...base, isOpen, hint }
+  })
+}

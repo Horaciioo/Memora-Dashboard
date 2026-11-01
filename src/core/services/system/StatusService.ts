@@ -8,6 +8,18 @@ import { STATUS_LINK } from '@/declarations/system/monitoring/status'
 import { DAY_MS } from '@/utils/constants/time'
 
 /**
+ * One day of history
+ * @typedef {Object} StatusDay
+ * @property {string} day - Day key
+ * @property {Health | null} health - Day level
+ */
+
+export interface StatusDay {
+  day: string
+  health: Health | null
+}
+
+/**
  * One watched service
  * @typedef {Object} StatusService
  * @property {string} id - Component key
@@ -16,7 +28,7 @@ import { DAY_MS } from '@/utils/constants/time'
  * @property {Health | null} health - Last result
  * @property {number | null} ms - Last answer time
  * @property {number | null} uptime - Percent over the history
- * @property {(Health | null)[]} days - Oldest first, one per day
+ * @property {StatusDay[]} days - Oldest first, one per day
  */
 
 export interface StatusService {
@@ -26,7 +38,7 @@ export interface StatusService {
   health: Health | null
   ms: number | null
   uptime: number | null
-  days: (Health | null)[]
+  days: StatusDay[]
 }
 
 /**
@@ -90,7 +102,7 @@ export const readStatusReport = async (): Promise<StatusReport> => {
         health: state?.health ?? null,
         ms: state?.ms ?? null,
         uptime: state ? uptimePercent(state) : null,
-        days: days.map((day) => dayHealth(state?.days[day])),
+        days: days.map((day) => ({ day, health: dayHealth(state?.days[day]) })),
       }
     })
 

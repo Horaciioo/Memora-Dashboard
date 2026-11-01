@@ -1184,3 +1184,29 @@ export const saveInstructions = async ({
 
   return readLive(id, scope, viewerId, held)
 }
+
+/**
+ * Erase a finished live with everything tied to it: gestures, presences, samples, level changes and its calendar entry
+ * @param {string} id - Live
+ * @return {Promise<void>}
+ */
+
+export const deleteLive = async (id: string): Promise<void> => {
+  const live = await prisma.live.findUnique({
+    where: { id },
+    select: { status: true, calendarEventId: true },
+  })
+  if (!live) throw notFound()
+  // Only a closed live is erased
+  if (live.status !== LiveStatuses.Ended && live.status !== LiveStatuses.Cancelled) {
+    throw conflict()
+  }
+
+  await prisma.$transaction([
+    prisma.liveconEntry.deleteMany({ where: { liveId: id } }),
+    prisma.live.delete({ where: { id } }),
+    ...(live.calendarEventId
+      ? [prisma.calendarEvent.deleteMany({ where: { id: live.calendarEventId } })]
+      : []),
+  ])
+}

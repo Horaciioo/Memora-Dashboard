@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import { PageHeader } from '@/components/structures/page/PageHeader'
 import { PreferencesPanel } from '@/composites/preferences/PreferencesPanel'
+import { SESSION_COOKIE } from '@/core/lib/auth/session'
+import { readSessions } from '@/core/services/auth/SessionService'
 import { readSealState, sealFields, sealValues } from '@/core/services/auth/SealService'
 import { profileFields, readProfile } from '@/core/services/preferences/ProfileService'
 import { listPlatformLinks } from '@/core/services/platforms/PlatformAccountService'
@@ -55,12 +58,15 @@ export default async function PreferencesPage({ searchParams }: PreferencesPageP
   const { session, access } = await requireUser()
   const query = await searchParams
 
-  const [profile, seal, links, play, push] = await Promise.all([
+  const token = (await cookies()).get(SESSION_COOKIE)?.value
+
+  const [profile, seal, links, play, push, sessions] = await Promise.all([
     readProfile(session.id),
     readSealState(),
     listPlatformLinks(session.id),
     access.can(Permissions.PlayAccess) ? readPlayProfile(session.id) : null,
     readPushSettings(session.id),
+    readSessions(session.id, token),
   ])
 
   // Every page the member opens in any view they reach
@@ -87,6 +93,7 @@ export default async function PreferencesPage({ searchParams }: PreferencesPageP
         play={play}
         push={{ publicKey: isPushConfigured() ? VAPID_KEYS.publicKey : null, settings: push }}
         dock={{ candidates, saved: session.mobileDock }}
+        sessions={sessions}
       />
     </div>
   )

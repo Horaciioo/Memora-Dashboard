@@ -1,4 +1,5 @@
 import type { MaturityName } from '@/declarations/maturity/registries'
+import { BLOCK_HASH_PREFIX } from '@/declarations/pages/editor'
 import { PUSH_CONSOLE_COPY } from '@/declarations/pwa/copy'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import type { IconName } from '@/declarations/ui/icons'
@@ -84,6 +85,11 @@ export const ROUTES = {
   analytics: '/systeme/activite',
   health: '/systeme/sante',
   privileged: '/systeme/employes',
+  systemPages: '/systeme/pages',
+  pages: '/pages',
+  page: (id: string) => `/pages/${id}`,
+  pageBlock: (id: string, blockId: string) => `/pages/${id}${BLOCK_HASH_PREFIX}${blockId}`,
+  pagesTrash: '/pages/corbeille',
 } as const
 
 // The four faces of the rail
@@ -398,6 +404,7 @@ export const NAVIGATION: NavigationGroup[] = [
         label: 'Panel Twitch',
         icon: 'liveconCrisis',
         permission: Permissions.SanctionRead,
+        maturity: 'new',
       },
     ],
   },
@@ -492,6 +499,8 @@ export const SEGMENT_LABELS: Record<string, string> = {
   activite: 'Activité',
   sante: 'Santé',
   employes: 'Employés',
+  pages: 'Pages privées',
+  corbeille: 'Corbeille',
   apercu: 'Aperçu',
   bilan: 'Bilan',
   'bilan-createur': 'Bilan',
@@ -513,6 +522,16 @@ export const RECORD_LABELS: Record<string, string> = {
   recrutements: 'Session',
   youtubeurs: 'YouTubeur',
   lives: 'Live',
+  pages: 'Page',
+}
+
+/**
+ * Stage of pages the sidebar does not list
+ * @type {Record<string, MaturityName>}
+ */
+
+const OFF_NAVIGATION_MATURITY: Record<string, MaturityName> = {
+  [ROUTES.pages]: 'alpha',
 }
 
 /**
@@ -526,7 +545,13 @@ export const maturityOfPath = (pathname: string): MaturityName | null => {
     .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
     .sort((left, right) => right.href.length - left.href.length)[0]
 
-  return match?.maturity ?? null
+  if (match) return match.maturity ?? null
+
+  const own = Object.keys(OFF_NAVIGATION_MATURITY).find(
+    (href) => pathname === href || pathname.startsWith(`${href}/`)
+  )
+
+  return own ? OFF_NAVIGATION_MATURITY[own] : null
 }
 
 /**

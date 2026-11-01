@@ -41,12 +41,19 @@ const watchWaiting = (registration: ServiceWorkerRegistration): void => {
   // Only an update waits, a first install takes over at once
   const flag = () => {
     if (registration.waiting && navigator.serviceWorker.controller) setWaiting(registration.waiting)
+    // A newer deploy replaced the one on offer, the banner would answer nothing
+    else if (usePwaStore.getState().waiting?.state === 'redundant') setWaiting(null)
   }
 
   flag()
   registration.addEventListener('updatefound', () => {
     registration.installing?.addEventListener('statechange', flag)
   })
+
+  // A manual reload keeps the old worker in charge, so it asks for the new one at once
+  const { waiting } = usePwaStore.getState()
+  const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
+  if (waiting && navigation?.type === 'reload') applyUpdate()
 }
 
 /**
@@ -58,7 +65,9 @@ export const applyUpdate = (): void => {
   const { waiting } = usePwaStore.getState()
 
   // Another tab already let it in
-  if (!waiting || waiting.state === 'activated') return window.location.reload()
+  if (!waiting || waiting.state === 'activated' || waiting.state === 'redundant') {
+    return window.location.reload()
+  }
 
   isRequested = true
   waiting.postMessage(WORKER_MESSAGES.skipWaiting)

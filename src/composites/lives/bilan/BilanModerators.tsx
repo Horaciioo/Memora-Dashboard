@@ -1,6 +1,9 @@
 import type { KeyboardEvent } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
+import { useLiveEdit } from '@/composites/lives/LiveEditContext'
+import { useLiveData } from '@/core/hooks/data/lives/useLiveData'
+import { InlineText } from '@/components/structures/inline/InlineText'
 import { Section } from '@/components/structures/page/Section'
 import { ModSpan } from '@/composites/lives/ModSpan'
 import { ReinforcementTag } from '@/composites/lives/ReinforcementTag'
@@ -42,6 +45,8 @@ const place = (moment: string, from: number, span: number): number =>
  */
 
 export const BilanModerators = ({ team, start, end, onPick, title }: BilanModeratorsProps) => {
+  const { liveId, canEdit } = useLiveEdit()
+  const data = useLiveData()
   const from = Date.parse(start)
   const span = Math.max(1, Date.parse(end) - from)
   const ticks = timeTicks(from, Date.parse(end))
@@ -136,6 +141,18 @@ export const BilanModerators = ({ team, start, end, onPick, title }: BilanModera
                         </span>
                       )}
                       <ModSpan span={member} />
+                      {canEdit && (
+                        <span className={LIVE_REPORT.teamNote}>
+                          <InlineText
+                            id={`time-${member.accountId}`}
+                            value={String(Math.round(member.seconds / 60))}
+                            onCommit={(minutes) =>
+                              data.editTime(liveId, member.accountId, Number(minutes) * 60)
+                            }
+                          />
+                          {LIVE_REPORT_COPY.activeMinutes}
+                        </span>
+                      )}
                     </div>
                   </div>
 

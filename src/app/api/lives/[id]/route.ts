@@ -1,6 +1,7 @@
 import { forbidden, invalidInput } from '@/core/lib/errors'
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { moveLive, readLive } from '@/core/services/lives/LiveService'
+import { renameLive } from '@/core/services/lives/LiveDataService'
+import { deleteLive, moveLive, readLive } from '@/core/services/lives/LiveService'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { LIVE_STATUS_REGISTRY } from '@/declarations/lives/registries'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
@@ -19,6 +20,15 @@ export const PATCH = createProtectedRoute({
   permission: Permissions.LiveRead,
   descriptor: { summary: 'Start, end or cancel a live', tags: ['lives'] },
   handler: async ({ params, raw, session, access, scope }) => {
+    // A title alone renames a finished live
+    if (typeof raw.title === 'string' && raw.status === undefined) {
+      if (!access.isResponsable) throw forbidden()
+      await readLive(params.id, await scope(), session.id, session.permissions)
+      await renameLive(params.id, raw.title)
+
+      return readLive(params.id, await scope(), session.id, session.permissions)
+    }
+
     const status = String(raw.status ?? '')
     if (!LIVE_STATUS_REGISTRY.has(status)) {
       throw invalidInput([{ field: 'status', message: FORM_COPY.notAnOption }])
@@ -43,5 +53,24 @@ export const PATCH = createProtectedRoute({
     })
 
     return readLive(params.id, perimeter, session.id, session.permissions)
+  },
+})
+
+export const DELETE = createProtectedRoute({
+  permission: Permissions.LiveRead,
+  descriptor: { summary: 'Erase a finished live and its data', tags: ['lives'] },
+  handler: async ({ params, session, access }) => {
+    if (!access.isResponsable) throw forbidden()
+
+    await deleteLive(params.id)
+    await recordEvent({
+      eventType: 'LiveDeleted',
+      actorId: session.id,
+      targetType: 'live',
+      targetId: params.id,
+      summary: 'Live supprimé',
+    })
+
+    return { id: params.id }
   },
 })

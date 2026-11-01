@@ -1,12 +1,13 @@
 import { VIEW_COPY } from '@/declarations/access/copy'
 import { SYSTEM_COPY } from '@/declarations/system/copy'
+import { PAGE_REGISTRY_COPY } from '@/declarations/pages/copy'
 import { PUSH_CONSOLE_COPY } from '@/declarations/pwa/copy'
 import type { MaturityName } from '@/declarations/maturity/registries'
 import type { IconName } from '@/declarations/ui/icons'
 
 /**
  * Route key one system screen answers on
- * @type {'storage' | 'journal' | 'queues' | 'push' | 'probes' | 'analytics' | 'health' | 'privileged' | 'administration'}
+ * @type {'storage' | 'journal' | 'queues' | 'push' | 'probes' | 'analytics' | 'health' | 'privileged' | 'administration' | 'systemPages'}
  */
 
 export type SystemRouteKey =
@@ -19,6 +20,7 @@ export type SystemRouteKey =
   | 'health'
   | 'privileged'
   | 'administration'
+  | 'systemPages'
 
 /**
  * Hub groups
@@ -77,6 +79,13 @@ export const SYSTEM_SCREENS: SystemScreen[] = [
     label: SYSTEM_COPY.journalTitle,
     description: SYSTEM_COPY.journalLead,
     icon: 'journal',
+  },
+  {
+    route: 'systemPages',
+    group: 'data',
+    label: PAGE_REGISTRY_COPY.title,
+    description: PAGE_REGISTRY_COPY.lead,
+    icon: 'page',
   },
   {
     route: 'queues',

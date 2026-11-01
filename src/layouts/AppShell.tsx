@@ -15,6 +15,7 @@ import { MobileDock } from '@/composites/shell/MobileDock'
 import { MobileTopBar } from '@/composites/shell/MobileTopBar'
 import { OfflineBanner } from '@/composites/pwa/OfflineBanner'
 import { PwaHost } from '@/composites/pwa/PwaHost'
+import { AssistantDock } from '@/composites/search/assistant/AssistantDock'
 import { SealProvider } from '@/managers/infrastructure/Security/SealManager'
 import { useAuthContext } from '@/managers/infrastructure/Security/AuthManager'
 import { frameToneOf } from '@/declarations/access/views'
@@ -138,6 +139,7 @@ const AppShellFrame = ({
         )}
         {session && <PwaHost isPushReady={isPushReady} />}
         {session && <NudgeHost />}
+        {session && !isBare && <AssistantDock viewContext={viewContext} />}
         {session && !isBare && can(Permissions.PlayAccess) && <PlayInviteHost />}
         {session && <TourHost />}
         {session && <AccessSignalListener />}

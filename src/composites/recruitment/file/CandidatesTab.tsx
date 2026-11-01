@@ -4,10 +4,11 @@ import { useState } from 'react'
 
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Button } from '@/components/elements/actions/Button'
+import { FloatingAdd } from '@/composites/search/assistant/FloatingAdd'
+import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FilterBar, type FilterDefinition } from '@/components/structures/data/FilterBar'
-import { AddRow } from '@/components/structures/inline/AddRow'
 import { accentVars } from '@/declarations/ui/theme'
 import { PASTEL_TAG } from '@/declarations/ui/variants'
 import { ACTION_COPY } from '@/declarations/ui/copy'
@@ -164,7 +165,7 @@ export const CandidatesTab = () => {
             <Button
               variant="primary"
               icon="add"
-              disabled={!can.manage}
+              disabled={!can.writeCandidates}
               onClick={() => candidateForm(null)}
             >
               {RECRUITMENT_COPY.candidateAdd}
@@ -198,11 +199,9 @@ export const CandidatesTab = () => {
           ) : (
             <RowList groups={groups} isFoldable />
           )}
-          <AddRow
-            label={RECRUITMENT_COPY.candidateAdd}
-            disabled={!can.manage}
-            onClick={() => candidateForm(null)}
-          />
+          {can.writeCandidates && (
+            <FloatingAdd offer={ASSISTANT_OFFERS.candidate} onClick={() => candidateForm(null)} />
+          )}
         </div>
       )}
     </Section>

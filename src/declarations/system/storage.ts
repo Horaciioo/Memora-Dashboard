@@ -43,6 +43,7 @@ export const IMAGE_QUALITY = 82
  * @property {number} [maxEdge] - Longest side kept when a picture is compressed
  * @property {PermissionName} [readPermission] - Permission needed when private
  * @property {PermissionName} [writePermission] - Permission needed to upload
+ * @property {boolean} [ownRoute] - Served by its own guarded route only
  */
 
 interface StorageBucketOption {
@@ -53,6 +54,7 @@ interface StorageBucketOption {
   maxEdge?: number
   readPermission?: PermissionName
   writePermission?: PermissionName
+  ownRoute?: boolean
 }
 
 /**
@@ -82,6 +84,14 @@ const STORAGE_BUCKET_MAP = {
     visibility: MEDIA_VISIBILITIES.Public,
     maxBytes: FILE_SETTINGS.maxBytes,
     maxEdge: 1920,
+  },
+  pages: {
+    label: 'Pages',
+    unique: false,
+    visibility: MEDIA_VISIBILITIES.Private,
+    maxBytes: FILE_SETTINGS.maxBytes,
+    maxEdge: 2400,
+    ownRoute: true,
   },
   logos: {
     label: 'Logos',

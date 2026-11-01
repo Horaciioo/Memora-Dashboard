@@ -4,6 +4,8 @@ import Link from '@/components/elements/navigation/AppLink'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { BrandLoader } from '@/components/elements/feedback/BrandLoader'
 import { Button } from '@/components/elements/actions/Button'
+import { FloatingAdd } from '@/composites/search/assistant/FloatingAdd'
+import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
 import { PageOptions, type PageOption } from '@/components/structures/page/PageOptions'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
@@ -633,13 +635,6 @@ export const CalendarBoard = ({
                   />
                 )}
                 {!canManage && <MeetingRequest />}
-                {canManage && (
-                  <span {...(isMobile ? {} : { [BEACON_ATTRIBUTE]: GUIDE_BEACONS.calendarAdd })}>
-                    <Button variant="primary" onClick={() => openForm(null)}>
-                      {CALENDAR_COPY.add}
-                    </Button>
-                  </span>
-                )}
               </div>
             </div>
 
@@ -904,17 +899,12 @@ export const CalendarBoard = ({
         </div>
       </Section>
 
-      {/* A phone adds from a button floating over the grid */}
       {canManage && (
-        <span {...(isMobile ? { [BEACON_ATTRIBUTE]: GUIDE_BEACONS.calendarAdd } : {})}>
-          <Button
-            variant="primary"
-            icon="add"
-            aria-label={CALENDAR_COPY.add}
-            className={CALENDAR_STYLES.fab}
-            onClick={() => openForm(null)}
-          />
-        </span>
+        <FloatingAdd
+          {...{ [BEACON_ATTRIBUTE]: GUIDE_BEACONS.calendarAdd }}
+          offer={ASSISTANT_OFFERS.event}
+          onClick={() => openForm(null)}
+        />
       )}
 
       <FormDrawer

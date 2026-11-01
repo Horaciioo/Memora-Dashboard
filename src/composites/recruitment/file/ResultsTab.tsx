@@ -60,7 +60,7 @@ export const ResultsTab = () => {
           onOpen={(item) => openCandidate(item.id)}
           cardMenu={candidateMenu}
           addLabel={RECRUITMENT_COPY.candidateAdd}
-          canCreate={can.manage}
+          canCreate={can.writeCandidates}
           onCreate={() => candidateForm(null)}
           canMove={can.writeCandidates}
           tintByColumn

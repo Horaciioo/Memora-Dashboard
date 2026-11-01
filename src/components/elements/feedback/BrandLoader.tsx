@@ -1,6 +1,4 @@
-import type { CSSProperties } from 'react'
-
-import { BRAIN_PIECES, BRAIN_REACH } from '@/declarations/ui/brain'
+import { BrainMark } from '@/components/elements/display/marks/BrainMark'
 import { FEEDBACK_COPY } from '@/declarations/ui/copy/feedback'
 import { BRAND_LOADER } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -23,28 +21,7 @@ export interface BrandLoaderProps {
  */
 
 export const BrandLoader = ({ variant = 'tile', caption, className }: BrandLoaderProps) => {
-  const mark = (markClass: string) => (
-    <span className={cn('brain-mark', markClass)}>
-      {BRAIN_PIECES.map((piece, index) => (
-        <span
-          key={piece.src}
-          className="brain-lobe"
-          style={
-            {
-              left: `${piece.left}%`,
-              top: `${piece.top}%`,
-              width: `${piece.width}%`,
-              height: `${piece.height}%`,
-              backgroundImage: `url(${piece.src})`,
-              '--x': BRAIN_REACH[index].x,
-              '--y': BRAIN_REACH[index].y,
-              '--o': BRAIN_REACH[index].order,
-            } as CSSProperties
-          }
-        />
-      ))}
-    </span>
-  )
+  const mark = (markClass: string) => <BrainMark className={markClass} />
 
   if (variant === 'inline') {
     return (

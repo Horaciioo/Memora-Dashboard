@@ -12,6 +12,7 @@
 @import './play/invites.css';
 @import './base/root.css';
 @import './base/motion.css';
+@import './base/comfort.css';
 @import './base/theme.css';
 @import './shell/tones.css';
 @import './shell/frame.css';
@@ -29,6 +30,7 @@
 @import './motion/tour.css';
 @import './motion/exercise.css';
 @import './content/markdown.css';
+@import './content/page-editor.css';
 @import './content/inline-edit.css';
 @import './content/accents.css';
 

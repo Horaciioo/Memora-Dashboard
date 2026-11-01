@@ -15,6 +15,7 @@ export const PREFERENCES_COPY = {
   fileTitle: 'Mon profil',
   fileLead: 'Ta photo, et les champs tenus par les responsables.',
   academyDispositif: 'Dispositif Academy',
+  discordHandle: 'Discord',
   displayTitle: 'Affichage',
   themeTitle: 'Thème',
   textSizeTitle: 'Taille du texte',
@@ -29,7 +30,6 @@ export const PREFERENCES_COPY = {
   storageNotice:
     'Ces réglages sont liés à ton compte : tu les retrouves sur n’importe quel navigateur.',
   signInTitle: 'Connexion',
-  signInLead: 'Memora te reconnaît à ton identifiant Discord, il n’y a pas de mot de passe.',
   sessionsTitle: 'Appareils connectés',
   sessionsLead: 'Ferme les sessions que tu ne reconnais pas.',
   currentSession: 'Cet appareil',
@@ -50,11 +50,6 @@ export const PREFERENCES_COPY = {
     'Ton adresse e-mail, ton téléphone, ta date de naissance et tes réseaux sont supprimés. Ton pseudo, ton portrait et ton historique ne bougent pas.',
   eraseDone: 'Informations privées effacées',
   detailsErased: 'Effacement des informations privées',
-  exportTitle: 'Récupérer mes données',
-  exportLead: 'Télécharge l’intégralité de ton dossier, dans un fichier lisible.',
-  exportAction: 'Télécharger mes données',
-  exportPending: 'Préparation…',
-  exportFileName: 'memora-mes-donnees.json',
   guidesTitle: 'Explications des pages',
   guidesLead:
     'Une petite bulle t’explique chaque page la première fois que tu l’ouvres, puis elle disparaît.',

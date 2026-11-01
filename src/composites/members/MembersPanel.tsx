@@ -3,7 +3,8 @@
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import { AddRow } from '@/components/structures/inline/AddRow'
+import { FloatingAdd } from '@/composites/search/assistant/FloatingAdd'
+import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { FilterBar, type FilterDefinition } from '@/components/structures/data/FilterBar'
@@ -312,7 +313,7 @@ export const MembersPanel = ({
               const key = group.key
               const isOpen = flipped.has(key) !== Boolean(group.role)
 
-              const renderCards = (list: MemberSummary[], withAdd: boolean) => (
+              const renderCards = (list: MemberSummary[]) => (
                 <div className={LIST_STYLES.grid}>
                   {list.map((member) => (
                     <MemberCard
@@ -324,9 +325,6 @@ export const MembersPanel = ({
                       onDelete={() => setPendingDeletion(member)}
                     />
                   ))}
-                  {withAdd && canCreate && (
-                    <AddRow label={MEMBER_COPY.add} onClick={() => openCreate(group.youtuberId)} />
-                  )}
                 </div>
               )
 
@@ -338,16 +336,15 @@ export const MembersPanel = ({
               ].filter((section) => section.list.length > 0)
 
               const cards = group.role ? (
-                renderCards(group.members, true)
+                renderCards(group.members)
               ) : (
                 <div className={CREATOR_GROUP.sections}>
                   {sections.map((section) => (
                     <div key={section.key} className={CREATOR_GROUP.section}>
                       <h3 className={CREATOR_GROUP.sectionHeading}>{section.label}</h3>
-                      {renderCards(section.list, section.key === 'moderators')}
+                      {renderCards(section.list)}
                     </div>
                   ))}
-                  {moderators.length === 0 && renderCards([], true)}
                   <AcceptedCandidates
                     candidates={accepted.filter((entry) => entry.youtuberId === group.youtuberId)}
                   />
@@ -410,6 +407,13 @@ export const MembersPanel = ({
           </div>
         )}
       </Section>
+
+      {canCreate && groups.length > 0 && (
+        <FloatingAdd
+          offer={ASSISTANT_OFFERS.member}
+          onClick={() => openCreate(creatorId ?? undefined)}
+        />
+      )}
 
       <FormDrawer
         subject={FORM_SUBJECTS.member}

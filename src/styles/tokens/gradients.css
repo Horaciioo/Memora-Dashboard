@@ -19,8 +19,25 @@
   --color-on-frame-blush: #2a2733;
   --color-on-frame-deep: #2a2733;
   /* Share of the frame colours the page ground keeps, the rest is a pale neutral, same in both modes */
-  --page-wash: 22%;
+  --page-wash: 9%;
   --page-base: #f4f2f7;
+
+  /* Vice City sunset: hot pink, coral, amber */
+  --color-sunset-pink: #ff4f9a;
+  --color-sunset-coral: #ff7a63;
+  --color-sunset-amber: #ffb259;
+  --color-on-sunset: #2b1020;
+  --shadow-sunset: 0 6px 18px -6px rgb(255 79 154 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.45);
+  --gradient-sunset: linear-gradient(
+    115deg,
+    var(--color-sunset-pink) 0%,
+    var(--color-sunset-coral) 52%,
+    var(--color-sunset-amber) 100%
+  );
+}
+
+:root.dark {
+  --shadow-sunset: 0 6px 20px -6px rgb(255 79 154 / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.35);
 }
 
 /* Rebuilt on .app-tone so a tone change follows the animated colours */

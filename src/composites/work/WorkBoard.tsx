@@ -3,7 +3,8 @@
 import { useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/elements/actions/Button'
-import { AddRow } from '@/components/structures/inline/AddRow'
+import { FloatingAdd } from '@/composites/search/assistant/FloatingAdd'
+import { ASSISTANT_OFFERS, WORK_OFFERS } from '@/declarations/assistant/offers'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { ConfirmDialog } from '@/components/structures/overlays/ConfirmDialog'
 import { DataTable, type DataTableColumn } from '@/components/structures/data/DataTable'
@@ -453,10 +454,14 @@ export const WorkBoard = <T extends BoardItem>({
             rowMenu={cardMenu}
           />
         )}
-        {view === 'list' && visibleCards.length > 0 && canCreate && (
-          <AddRow label={copy.add} onClick={() => openCreate()} />
-        )}
       </Section>
+
+      {!showEmptyState && canCreate && (
+        <FloatingAdd
+          offer={scope ? WORK_OFFERS[scope] : ASSISTANT_OFFERS.announcement}
+          onClick={() => openCreate()}
+        />
+      )}
 
       <FormDrawer
         subject={subject ?? WORK_SUBJECTS[scope!]}

@@ -1,3 +1,4 @@
+import type { FieldOption } from '@/types/forms'
 import { FunctionNames } from '@/declarations/reference/fixed'
 import { createRegistry } from '@/core/lib/registry'
 import type { IconName } from '@/declarations/ui/icons'
@@ -182,3 +183,17 @@ const SANCTION_GRAVITY_MAP: Record<SanctionGravityName, SanctionGravityOption> =
 }
 
 export const SANCTION_GRAVITY_REGISTRY = createRegistry(SANCTION_GRAVITY_MAP)
+
+/**
+ * Gravities as select options, drawn with the priority bars
+ * @type {FieldOption[]}
+ */
+
+export const SANCTION_GRAVITY_OPTIONS: FieldOption[] = SANCTION_GRAVITY_REGISTRY.keys.map(
+  (key) => ({
+    value: key,
+    label: SANCTION_GRAVITY_REGISTRY.label(key),
+    accent: SANCTION_GRAVITY_REGISTRY.get(key).accent,
+    weight: SANCTION_GRAVITY_REGISTRY.get(key).rank,
+  })
+)

@@ -2,23 +2,36 @@
 
 import { Button } from '@/components/elements/actions/Button'
 import { Markdown } from '@/components/elements/display/Markdown'
+import { EditableDetailGrid } from '@/components/structures/inline/EditableDetailGrid'
 import { InlineArea } from '@/components/structures/inline/InlineArea'
 import { InlineMarkdown } from '@/components/structures/inline/InlineMarkdown'
 import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { FORM_SETTINGS } from '@/declarations/configurations/settings'
 import { SANCTION_COPY } from '@/declarations/sanctions/copy'
-import { SANCTION_GRAVITY_REGISTRY } from '@/declarations/sanctions/registries'
+import {
+  SANCTION_GRAVITY_OPTIONS,
+  SANCTION_GRAVITY_REGISTRY,
+} from '@/declarations/sanctions/registries'
 import { accentPaint } from '@/declarations/ui/theme'
 import { OFFENSE_SHEET } from '@/declarations/ui/variants'
 import type { LiveconLevelView } from '@/types/livecon'
-import type { SanctionOffenseDetail } from '@/types/sanctions'
+import type { SanctionOffenseDetail, SanctionRungInput } from '@/types/sanctions'
 import { SanctionGravities } from '@/utils/constants/moderation'
+import type { SanctionGravityName } from '@/utils/constants/moderation'
 import { cn } from '@/utils/classnames'
 
 export interface OffenseProfileProps {
   offense: SanctionOffenseDetail
   level: LiveconLevelView
   canManage: boolean
+  levels: LiveconLevelView[]
+  onLevelChange: (levelId: string) => void
+  onSaveLadder: (
+    id: string,
+    levelId: string,
+    gravity: SanctionGravityName,
+    steps: SanctionRungInput[]
+  ) => Promise<boolean>
   onSaveField: (name: string) => (value: string) => Promise<boolean>
 }
 
@@ -28,36 +41,80 @@ export interface OffenseProfileProps {
  * @return {JSX.Element}
  */
 
-export const OffenseProfile = ({ offense, level, canManage, onSaveField }: OffenseProfileProps) => {
+export const OffenseProfile = ({
+  offense,
+  level,
+  levels,
+  canManage,
+  onLevelChange,
+  onSaveLadder,
+  onSaveField,
+}: OffenseProfileProps) => {
   const copy = useCopy(SANCTION_COPY.copied)
   const tone = SANCTION_GRAVITY_REGISTRY.get(offense.gravities[level.id] ?? SanctionGravities.Low)
 
-  const properties = [
-    { key: 'gravity', title: SANCTION_COPY.gravityTitle, text: tone.short, accent: tone.accent },
-    {
-      key: 'livecon',
-      title: SANCTION_COPY.liveconTitle,
-      text: String(level.level),
-      accent: level.accent,
-    },
-  ]
+  const steps = (offense.ladders[level.id] ?? []).map((rung) => ({
+    condition: rung.condition,
+    measureIds: rung.measures.map((measure) => measure.id),
+  }))
+  const gravity = offense.gravities[level.id] ?? SanctionGravities.Low
+
+  const tinted = (text: string, accent: string | null) => {
+    const paint = accentPaint(accent)
+
+    return (
+      <span className={cn(OFFENSE_SHEET.propertyValue, paint.text)} style={paint.style}>
+        {text}
+      </span>
+    )
+  }
 
   return (
     <div className={OFFENSE_SHEET.body}>
-      <div className={OFFENSE_SHEET.properties}>
-        {properties.map((entry) => {
-          const paint = accentPaint(entry.accent)
+      <EditableDetailGrid
+        values={{ gravity, livecon: level.id }}
+        issues={[]}
+        disabled={!canManage}
+        entries={[
+          {
+            label: SANCTION_COPY.gravityTitle,
+            display: tinted(tone.short, tone.accent),
+            field: {
+              name: 'gravity',
+              label: SANCTION_COPY.gravityTitle,
+              kind: 'select',
+              mark: 'priority',
+              options: SANCTION_GRAVITY_OPTIONS,
+            },
+          },
+          {
+            label: SANCTION_COPY.liveconTitle,
+            display: tinted(String(level.level), level.accent),
+            field: {
+              name: 'livecon',
+              label: SANCTION_COPY.liveconTitle,
+              kind: 'select',
+              mark: 'glyph',
+              options: levels.map((entry) => ({
+                value: entry.id,
+                label: entry.name,
+                icon: entry.icon,
+                accent: entry.accent ?? undefined,
+              })),
+            },
+          },
+        ]}
+        onCommit={async (name, next) => {
+          if (typeof next !== 'string') return false
+          if (name === 'livecon') {
+            onLevelChange(next)
 
-          return (
-            <div key={entry.key} className={OFFENSE_SHEET.property}>
-              <span className={OFFENSE_SHEET.label}>{entry.title}</span>
-              <span className={cn(OFFENSE_SHEET.propertyValue, paint.text)} style={paint.style}>
-                {entry.text}
-              </span>
-            </div>
-          )
-        })}
-      </div>
+            return true
+          }
+
+          return onSaveLadder(offense.id, level.id, next as SanctionGravityName, steps)
+        }}
+      />
 
       {(offense.summary || canManage) && (
         <div className={OFFENSE_SHEET.block}>

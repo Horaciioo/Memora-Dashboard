@@ -5,6 +5,8 @@ import { useState } from 'react'
 
 import { Pagination } from '@/components/elements/navigation/Pagination'
 import { SelectMenu } from '@/components/elements/forms/selects/SelectMenu'
+import { GestureFields, GestureItem } from '@/composites/lives/EditableGesture'
+import { useLiveEdit } from '@/composites/lives/LiveEditContext'
 import { Section } from '@/components/structures/page/Section'
 import type { LiveReport } from '@/core/lib/lives/report'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
@@ -30,6 +32,7 @@ const EVERYONE = ''
  */
 
 export const BilanLog = ({ log, moderators }: BilanLogProps) => {
+  const { liveId, canEdit } = useLiveEdit()
   const [actor, setActor] = useState(EVERYONE)
   const [page, setPage] = useState(1)
   const filtered = actor === EVERYONE ? log : log.filter((line) => line.actorKey === actor)
@@ -77,7 +80,7 @@ export const BilanLog = ({ log, moderators }: BilanLogProps) => {
             ].filter(Boolean)
 
             return (
-              <li key={line.id} className={LIVE_REPORT.line}>
+              <GestureItem key={line.id} liveId={liveId} line={line} canEdit={canEdit}>
                 <time className={LIVE_REPORT.lineTime}>{formatClock(line.occurredAt)}</time>
                 <span className={line.isMember ? LIVE_REPORT.lineActor : LIVE_REPORT.rowNameMuted}>
                   {line.actorName}
@@ -93,13 +96,17 @@ export const BilanLog = ({ log, moderators }: BilanLogProps) => {
                       <span className={LIVE_REPORT.lineDetail}>{LIVE_REPORT_COPY.pending}</span>
                     )}
                   </span>
-                  {details.length > 0 && (
-                    <span className={LIVE_REPORT.lineDetail}>
-                      <Dotted items={details} />
-                    </span>
+                  {canEdit ? (
+                    <GestureFields liveId={liveId} line={line} />
+                  ) : (
+                    details.length > 0 && (
+                      <span className={LIVE_REPORT.lineDetail}>
+                        <Dotted items={details} />
+                      </span>
+                    )
                   )}
                 </span>
-              </li>
+              </GestureItem>
             )
           })}
         </ol>

@@ -6,6 +6,8 @@ import { Fragment, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { LiveStartedBubble } from '@/composites/lives/LiveStartedBubble'
 import { useIsMobileShell } from '@/core/hooks/interaction/layout/useBreakpoint'
+import { RailPrivatePages } from '@/composites/shell/RailPrivatePages'
+import type { RailSection } from '@/composites/shell/RailSectionSwitch'
 import { RailSubPages } from '@/composites/shell/RailSubPages'
 import { FAVORITE_COPY } from '@/declarations/ui/favorites'
 import { visibleNavGroups } from '@/declarations/navigation'
@@ -24,6 +26,8 @@ export interface RailNavProps {
   isTouring: boolean
   live: ViewContext['live']
   mentions: ViewContext['mentions']
+  // One section only, both when absent
+  section?: RailSection
 }
 
 /**
@@ -33,10 +37,18 @@ export interface RailNavProps {
  * @param {boolean} isTouring - First visit tour is running
  * @param {ViewContext['live']} live - Open live, lights its entry
  * @param {ViewContext['mentions']} mentions - Unseen mentions, counted on their page
+ * @param {RailSection} [section] - One section only
  * @return {JSX.Element}
  */
 
-export const RailNav = ({ groups, isCompact, isTouring, live, mentions }: RailNavProps) => {
+export const RailNav = ({
+  groups,
+  isCompact,
+  isTouring,
+  live,
+  mentions,
+  section,
+}: RailNavProps) => {
   const pathname = usePathname()
   // Bubbles beside the pages never open on a phone
   const isMobile = useIsMobileShell()
@@ -67,94 +79,98 @@ export const RailNav = ({ groups, isCompact, isTouring, live, mentions }: RailNa
 
   return (
     <nav className={LEFT_SIDEBAR.nav}>
-      {groups.map((group) => {
-        const isFavorite = group.label === FAVORITE_COPY.group
-        const isGroupCollapsed = collapsedGroups.has(group.label) && !isCompact
+      {/* Private space leads the rail */}
+      {!isCompact && section !== 'normal' && <RailPrivatePages />}
 
-        return (
-          <div key={group.label} className={LEFT_SIDEBAR.navGroup}>
-            <button
-              type="button"
-              onClick={() => toggleGroup(group.label)}
-              aria-expanded={!isGroupCollapsed}
-              className={LEFT_SIDEBAR.navGroupLabel}
-            >
-              {group.label}
-              <ChevronIcon
-                className={cn(
-                  LEFT_SIDEBAR.navGroupChevron,
-                  isGroupCollapsed && LEFT_SIDEBAR.navGroupChevronCollapsed
-                )}
-                aria-hidden="true"
-              />
-            </button>
+      {section !== 'private' &&
+        groups.map((group) => {
+          const isFavorite = group.label === FAVORITE_COPY.group
+          const isGroupCollapsed = collapsedGroups.has(group.label) && !isCompact
 
-            <div className="fold" data-open={!isGroupCollapsed} inert={isGroupCollapsed}>
-              <div className={LEFT_SIDEBAR.navGroupItems}>
-                {group.items.map((item) => {
-                  // A creator is on air: the glyph turns into the live dot
-                  const isOnAir = Boolean(item.onLive) && live?.status === LiveStatuses.Live
-                  const Icon = railIcon(isOnAir ? 'liveDot' : item.icon)
-                  // A destination hands the light to its open sub page
-                  const isActive = isFavorite
-                    ? !current && reaches(item.href)
-                    : item.href === current && (pathname === item.href || isCompact)
-                  const isLit = Boolean(item.onLive && live) && !openedLive && !isActive
+          return (
+            <div key={group.label} className={LEFT_SIDEBAR.navGroup}>
+              <button
+                type="button"
+                onClick={() => toggleGroup(group.label)}
+                aria-expanded={!isGroupCollapsed}
+                className={LEFT_SIDEBAR.navGroupLabel}
+              >
+                {group.label}
+                <ChevronIcon
+                  className={cn(
+                    LEFT_SIDEBAR.navGroupChevron,
+                    isGroupCollapsed && LEFT_SIDEBAR.navGroupChevronCollapsed
+                  )}
+                  aria-hidden="true"
+                />
+              </button>
 
-                  return (
-                    <Fragment key={item.href}>
-                      <Link
-                        href={item.href}
-                        ref={item.onLive ? setLiveAnchor : undefined}
-                        onClick={item.onLive ? () => setOpenedLive(true) : undefined}
-                        title={isCompact ? item.label : undefined}
-                        aria-label={isCompact ? item.label : undefined}
-                        aria-current={isActive ? 'page' : undefined}
-                        {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
-                        className={cn(
-                          LEFT_SIDEBAR.navLink,
-                          isActive && LEFT_SIDEBAR.navLinkActive,
-                          isTouring && TOUR_RAIL.unlock
-                        )}
-                      >
-                        <Icon
+              <div className="fold" data-open={!isGroupCollapsed} inert={isGroupCollapsed}>
+                <div className={LEFT_SIDEBAR.navGroupItems}>
+                  {group.items.map((item) => {
+                    // A creator is on air: the glyph turns into the live dot
+                    const isOnAir = Boolean(item.onLive) && live?.status === LiveStatuses.Live
+                    const Icon = railIcon(isOnAir ? 'liveDot' : item.icon)
+                    // A destination hands the light to its open sub page
+                    const isActive = isFavorite
+                      ? !current && reaches(item.href)
+                      : item.href === current && (pathname === item.href || isCompact)
+                    const isLit = Boolean(item.onLive && live) && !openedLive && !isActive
+
+                    return (
+                      <Fragment key={item.href}>
+                        <Link
+                          href={item.href}
+                          ref={item.onLive ? setLiveAnchor : undefined}
+                          onClick={item.onLive ? () => setOpenedLive(true) : undefined}
+                          title={isCompact ? item.label : undefined}
+                          aria-label={isCompact ? item.label : undefined}
+                          aria-current={isActive ? 'page' : undefined}
+                          {...{ [BEACON_ATTRIBUTE]: routeBeacon(item.href) }}
                           className={cn(
-                            LEFT_SIDEBAR.navIcon,
-                            isActive && LEFT_SIDEBAR.navIconActive,
-                            isOnAir && 'live-pulse'
-                          )}
-                          aria-hidden="true"
-                        />
-                        <span
-                          className={cn(
-                            LEFT_SIDEBAR.navLabel,
-                            isOnAir && LEFT_SIDEBAR.navLabelLive
+                            LEFT_SIDEBAR.navLink,
+                            isActive && LEFT_SIDEBAR.navLinkActive,
+                            isTouring && TOUR_RAIL.unlock
                           )}
                         >
-                          {item.label}
-                        </span>
-                        {mentions.some((mention) => mention.href === item.href) && (
-                          <span className={LEFT_SIDEBAR.navBadge} aria-hidden="true">
-                            {mentions.find((mention) => mention.href === item.href)?.count}
+                          <Icon
+                            className={cn(
+                              LEFT_SIDEBAR.navIcon,
+                              isActive && LEFT_SIDEBAR.navIconActive,
+                              isOnAir && 'live-pulse'
+                            )}
+                            aria-hidden="true"
+                          />
+                          <span
+                            className={cn(
+                              LEFT_SIDEBAR.navLabel,
+                              isOnAir && LEFT_SIDEBAR.navLabelLive
+                            )}
+                          >
+                            {item.label}
                           </span>
-                        )}
-                        {isLit && !isOnAir && (
-                          <span className={LEFT_SIDEBAR.livePulse} aria-hidden="true">
-                            <span className={LEFT_SIDEBAR.livePulseRing} />
-                            <span className={LEFT_SIDEBAR.livePulseDot} />
-                          </span>
-                        )}
-                      </Link>
-                      {/* Starred pages repeat destinations, one trail is enough */}
-                      {!isCompact && !isFavorite && <RailSubPages base={item.href} />}
-                    </Fragment>
-                  )
-                })}
+                          {mentions.some((mention) => mention.href === item.href) && (
+                            <span className={LEFT_SIDEBAR.navBadge} aria-hidden="true">
+                              {mentions.find((mention) => mention.href === item.href)?.count}
+                            </span>
+                          )}
+                          {isLit && !isOnAir && (
+                            <span className={LEFT_SIDEBAR.livePulse} aria-hidden="true">
+                              <span className={LEFT_SIDEBAR.livePulseRing} />
+                              <span className={LEFT_SIDEBAR.livePulseDot} />
+                            </span>
+                          )}
+                        </Link>
+                        {/* Starred pages repeat destinations, one trail is enough */}
+                        {!isCompact && !isFavorite && <RailSubPages base={item.href} />}
+                      </Fragment>
+                    )
+                  })}
+                </div>
               </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
 
       {/* Out of the folds, which clip */}
       {!isMobile &&

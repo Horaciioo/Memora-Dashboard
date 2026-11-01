@@ -9,6 +9,7 @@ import { useBannerHost } from '@/core/hooks/interaction/layout/useBannerHost'
 import { PAGE_OPTIONS_HOST_ID } from '@/declarations/ui/banners'
 import { PAGE_OPTIONS_COPY } from '@/declarations/ui/copy'
 import { ICONS } from '@/declarations/ui/icons'
+import type { IconName } from '@/declarations/ui/icons'
 import { PAGE_OPTIONS } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
 
@@ -34,26 +35,55 @@ export interface PageContent {
   render: () => ReactNode
 }
 
+export interface PageNote {
+  id: string
+  label: string
+  // Read-only line, every screen
+  text: string
+}
+
+export interface PageProfile {
+  id: string
+  // Person shown with their avatar
+  name: string
+  image: string | null
+  // Small lines under the name
+  lines: string[]
+}
+
 export interface PageAction {
   id: string
   label: string
+  icon?: IconName
+  danger?: boolean
   onSelect: () => void
 }
 
-// A yes/no switch, one pick among a few, a whole block, or a single gesture
-export type PageOption = PageToggle | PageChoice | PageContent | PageAction
+// Heading shared by the options that follow it, a divider alone when it carries no heading
+export interface PageSectioned {
+  section?: string
+  // Rule between two groups, no heading
+  group?: string
+}
+
+// A yes/no switch, one pick among a few, a whole block, a note, a profile, or a single gesture
+export type PageOption = (PageToggle | PageChoice | PageContent | PageNote | PageProfile | PageAction) &
+  PageSectioned
 
 export interface PageOptionsProps {
   options: PageOption[]
+  // Panel heading, the display one by default
+  title?: string
 }
 
 /**
  * Round button in the top right of the page banner
  * @param {PageOption[]} options - One switch per row
+ * @param {string} [title] - Panel heading
  * @return {JSX.Element | null}
  */
 
-export const PageOptions = ({ options }: PageOptionsProps) => {
+export const PageOptions = ({ options, title = PAGE_OPTIONS_COPY.title }: PageOptionsProps) => {
   const host = useBannerHost(PAGE_OPTIONS_HOST_ID)
   const [isOpen, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
@@ -97,8 +127,8 @@ export const PageOptions = ({ options }: PageOptionsProps) => {
       )}
 
       {isOpen && (
-        <div role="group" aria-label={PAGE_OPTIONS_COPY.title} className={PAGE_OPTIONS.panel}>
-          <p className={PAGE_OPTIONS.title}>{PAGE_OPTIONS_COPY.title}</p>
+        <div role="group" aria-label={title} className={PAGE_OPTIONS.panel}>
+          <p className={PAGE_OPTIONS.title}>{title}</p>
           <PageOptionsList options={options} onDone={() => setOpen(false)} />
         </div>
       )}

@@ -25,6 +25,7 @@ export const GET = createProtectedRoute({
 
 export const POST = createProtectedRoute({
   permission: Permissions.AbsenceCreate,
+  idempotent: true,
   status: 201,
   fields: ABSENCE_FIELDS,
   descriptor: { summary: 'Declare an absence', tags: ['absences'] },

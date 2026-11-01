@@ -14,6 +14,7 @@ export const GET = createProtectedRoute({
 
 export const POST = createProtectedRoute({
   permission: Permissions.RecruitmentManage,
+  idempotent: true,
   status: 201,
   descriptor: { summary: 'Open a recruitment session', tags: ['recruitment'] },
   handler: async ({ raw, session, scope }) => {

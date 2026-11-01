@@ -34,7 +34,7 @@ export const PROFILE_QUESTIONS: readonly QuestionDefinition[] = [
     family: 'situation',
     display: 'fold',
     kind: 'open',
-    when: 'Si le candidat est salarié',
+    when: 'Candidat salarié',
     minutes: 3,
     prompt:
       'Quels atouts développés par [ton|votre] travail [utilises-tu|utilisez-vous] au quotidien ?',
@@ -56,7 +56,7 @@ export const PROFILE_QUESTIONS: readonly QuestionDefinition[] = [
     family: 'situation',
     display: 'fold',
     kind: 'open',
-    when: 'Si le candidat est au chômage',
+    when: 'Au chômage',
     minutes: 3,
     prompt:
       'Sans indiscrétion, [peux-tu|pouvez-vous] me donner la raison de [ta|votre] situation ?',
@@ -83,7 +83,7 @@ export const PROFILE_QUESTIONS: readonly QuestionDefinition[] = [
     family: 'situation',
     display: 'fold',
     kind: 'open',
-    when: 'Si le candidat est étudiant',
+    when: 'En étude',
     minutes: 3,
     prompt: 'Quelles sont les matières que [tu étudies|vous étudiez] ?',
     say: '[Tu dis|Vous dites] être étudiant(e)… Mais du coup :',

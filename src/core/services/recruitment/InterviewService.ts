@@ -166,6 +166,14 @@ export const saveInterview = async (
     },
   })
 
+  // Ending the interview kills every link handed out
+  if (patch.ended) {
+    await prisma.exerciseLink.updateMany({
+      where: { candidateId, expiredAt: null },
+      data: { expiredAt: now },
+    })
+  }
+
   if (isVerdict) await syncAdmission(candidateId)
 
   return { sessionId }

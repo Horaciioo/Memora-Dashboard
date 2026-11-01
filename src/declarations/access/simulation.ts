@@ -10,4 +10,9 @@ export const SIMULATION_SAFE_METHODS: string[] = ['GET', 'HEAD', 'OPTIONS']
  * @type {string[]}
  */
 
-export const SIMULATION_OPEN_PATHS: string[] = ['/api/parametres', '/api/notifications']
+export const SIMULATION_OPEN_PATHS: string[] = [
+  '/api/parametres',
+  '/api/notifications',
+  // Reads a sentence, writes nothing
+  '/api/assistant',
+]

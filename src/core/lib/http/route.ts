@@ -14,6 +14,7 @@ import {
 import type { AppError } from '@/core/lib/errors'
 import { parseFormValues } from '@/core/lib/forms'
 import { readPublicOrigin } from '@/core/lib/http/origin'
+import { runOnce } from '@/core/lib/http/idempotency'
 import { consume, readIdentity } from '@/core/lib/http/rateLimit'
 import { fail, succeed } from '@/core/lib/http/response'
 import { logger } from '@/core/lib/logger'
@@ -112,11 +113,13 @@ interface RouteOptions {
  * Protected route options
  * @typedef {Object} ProtectedRouteOptions
  * @property {PermissionName | PermissionName[]} [permission] - Permission needed
+ * @property {boolean} [idempotent] - Replays a keyed retry
  * @property {(context: ProtectedRouteContext) => Promise<T>} handler - Route body
  */
 
 interface ProtectedRouteOptions<T> extends RouteOptions {
   permission?: PermissionName | PermissionName[]
+  idempotent?: boolean
   handler: (context: ProtectedRouteContext) => Promise<T>
 }
 
@@ -361,16 +364,24 @@ export const createProtectedRoute = <T>(options: ProtectedRouteOptions<T>): Rout
         const { session, access } = await authenticate(request, options, options.permission)
         actorId = session.id
         const routeContext = await buildContext(request, context, options)
-
-        return succeed(
-          await options.handler({
+        const run = () =>
+          options.handler({
             ...routeContext,
             session,
             access,
             scope: () => readScope(session, access),
-          }),
-          options.status ?? 200
-        )
+          })
+
+        // A keyed retry replays
+        const data = options.idempotent
+          ? await runOnce({
+              headers: request.headers,
+              scope: `${session.id}:${request.method}:${request.nextUrl.pathname}`,
+              run,
+            })
+          : await run()
+
+        return succeed(data, options.status ?? 200)
       } catch (error) {
         await reportFailure(request, actorId, error)
         await reportRefusal(request, actorId, error)
@@ -460,11 +471,13 @@ export interface MediaDescriptor {
  * @typedef {Object} MediaRouteOptions
  * @property {(params: Record<string, string>) => Promise<MediaDescriptor>} describe - Metadata only
  * @property {(params: Record<string, string>) => Promise<Uint8Array>} read - Stored bytes
+ * @property {(params: Record<string, string>, session: SessionUser) => Promise<void>} [authorize] - Record level check
  */
 
 interface MediaRouteOptions {
   describe: (params: Record<string, string>) => Promise<MediaDescriptor>
   read: (params: Record<string, string>) => Promise<Uint8Array>
+  authorize?: (params: Record<string, string>, session: SessionUser) => Promise<void>
   rateLimit?: RateLimitName | false
   descriptor?: RouteDescriptor
 }
@@ -494,7 +507,8 @@ export const createMediaRoute = (options: MediaRouteOptions): RouteHandler => {
 
       // A private object still costs a session
       if (media.visibility === MEDIA_VISIBILITIES.Private) {
-        await authenticate(request, { rateLimit: options.rateLimit }, media.permission)
+        const { session } = await authenticate(request, { rateLimit: options.rateLimit }, media.permission)
+        await options.authorize?.(params, session)
       } else {
         await guard(request, options.rateLimit)
       }

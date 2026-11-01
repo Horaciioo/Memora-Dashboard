@@ -5,6 +5,7 @@
 
 export const QUERY_KEYS = {
   search: (term: string) => ['search', term] as const,
+  assistant: (term: string, pathname: string) => ['assistant', term, pathname] as const,
   mentionable: (term: string) => ['mentionable', term] as const,
   notifications: (size: number) => ['notifications', size] as const,
   calendar: (from: string, to: string, sessionId?: string) =>
@@ -32,4 +33,10 @@ export const QUERY_KEYS = {
   liveFocus: (liveId: string) => ['lives', 'focus', liveId] as const,
   livePanel: (youtuberId: string, panel: string, levelId: string | null) =>
     ['lives', 'panel', youtuberId, panel, levelId] as const,
+  pages: ['pages'] as const,
+  page: (id: string) => ['pages', 'detail', id] as const,
+  pageSharing: (id: string) => ['pages', 'sharing', id] as const,
+  pageComments: (id: string) => ['pages', 'comments', id] as const,
+  pageSearch: (term: string) => ['pages', 'search', term] as const,
+  pageTrash: ['pages', 'trash'] as const,
 } as const

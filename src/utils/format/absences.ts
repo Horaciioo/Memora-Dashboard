@@ -67,6 +67,16 @@ export const absenceSentence = (start: string, end: string): string => {
 }
 
 /**
+ * A range spoken in a sentence: "du lundi 26 au vendredi 30 octobre", "le lundi 26 octobre"
+ * @param {string} start - First day
+ * @param {string} end - Last day
+ * @return {string} - Range with its article
+ */
+
+export const absenceRange = (start: string, end: string): string =>
+  `${start === end ? 'le' : 'du'} ${absenceSentence(start, end)}`
+
+/**
  * Whether an absence is closed: refused, withdrawn, or its last day already behind
  * @param {MemberAbsence} absence - Absence to read
  * @param {number} today - Start of today

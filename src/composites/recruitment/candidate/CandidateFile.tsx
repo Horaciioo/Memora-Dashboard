@@ -16,6 +16,7 @@ import {
   RecruitmentFileProvider,
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
+import { FloatingFocus } from '@/composites/search/assistant/FloatingFocus'
 import { useCandidateRecord } from '@/core/hooks/data/recruitment/useCandidateRecord'
 import { candidateStates } from '@/core/lib/recruitment/candidateTimeline'
 import { ROUTES } from '@/declarations/navigation'
@@ -67,6 +68,14 @@ const CandidateBody = ({
 
   return (
     <div className={MEMBER_FILE.layout}>
+      {/* Memora offers to update this candidate when the chat opens */}
+      {can.writeCandidates && (
+        <FloatingFocus
+          scenario="candidate"
+          entry="onFile"
+          data={{ candidateId: candidate.id, name: candidate.name }}
+        />
+      )}
       <CandidateBack label={CANDIDATE_COPY.back} href={back} />
       {/* On a phone the rail belongs to the overview alone */}
       <div

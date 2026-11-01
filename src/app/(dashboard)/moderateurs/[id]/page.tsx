@@ -171,6 +171,7 @@ export default async function MemberPage({ params }: { params: Promise<{ id: str
         canPostAbsence={canPostAbsence}
         moderation={moderation}
         canOpenReports={access.can(Permissions.LiveLogRead)}
+        canDeleteLives={access.isResponsable}
         adminState={adminState}
         canDelete={access.can(Permissions.MemberDelete)}
         participations={participations}

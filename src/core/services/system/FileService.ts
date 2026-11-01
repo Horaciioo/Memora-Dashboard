@@ -118,7 +118,9 @@ export const describeFile = async (id: string): Promise<FileDescriptor> => {
 
   if (!entry || !STORAGE_BUCKETS.has(entry.bucket)) throw notFound()
 
+  // Guarded buckets never answer here
   const destination = STORAGE_BUCKETS.get(entry.bucket)
+  if (destination.ownRoute) throw notFound()
 
   return {
     visibility: destination.visibility,
@@ -217,6 +219,14 @@ const FILE_REFERENCE_LOOKUPS = [
         select: { imagePath: true },
       })
     ).map((row) => row.imagePath),
+  // Page pictures point by entry id
+  async (urls: string[]) =>
+    (
+      await prisma.pageMedia.findMany({
+        where: { storageEntryId: { in: urls.map((url) => url.split('/').at(-1) ?? '') } },
+        select: { storageEntryId: true },
+      })
+    ).map((row) => fileUrl(row.storageEntryId)),
 ]
 
 /**

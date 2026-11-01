@@ -115,24 +115,36 @@
   padding: 0.625rem 0;
 }
 
-/* The rail shows the page ground as is, no veil, so both read as one; its boxes are frosted */
+/* Apple frost: milky tint over a strong blur, lit edge, the rail ground glows through */
 .rail-ground .glass-panel:not(.fixed, .shortcut-fresh, [aria-current='page']) {
-  background: var(--mist-fill);
-  -webkit-backdrop-filter: blur(var(--mist-blur)) saturate(var(--mist-saturate));
-  backdrop-filter: blur(var(--mist-blur)) saturate(var(--mist-saturate));
-  border-color: transparent;
-  box-shadow: none;
+  background: var(--frost-fill);
+  -webkit-backdrop-filter: blur(var(--frost-blur)) saturate(var(--frost-saturate));
+  backdrop-filter: blur(var(--frost-blur)) saturate(var(--frost-saturate));
+  border-color: var(--frost-line);
+  box-shadow: var(--frost-shadow);
 }
 
-.rail-ground .glass-panel:not(.fixed, .shortcut-fresh, [aria-current='page']):hover {
-  background: color-mix(in srgb, var(--mist-fill), var(--color-on-frame) 8%);
+.rail-ground .glass-panel:not(.fixed, .shortcut-fresh, .rail-footer-box, [aria-current='page']):hover {
+  background: linear-gradient(rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.14)), var(--frost-fill);
 }
 
 @media (prefers-reduced-transparency: reduce) {
   .rail-ground .glass-panel:not(.fixed, .shortcut-fresh, [aria-current='page']) {
+    background: var(--color-surface-raised);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+}
+
+/* Main box carries the role colour over the frost */
+.rail-ground .rail-footer-box.glass-panel {
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--color-frame-pink) 46%, transparent),
+      color-mix(in srgb, var(--color-frame-mauve) 38%, transparent)
+    ),
+    var(--frost-fill);
 }
 
 /* Unread note: gold box, white glyph, a band of light crossing it on its own */

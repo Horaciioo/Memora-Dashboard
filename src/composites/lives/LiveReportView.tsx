@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { SegmentedControl } from '@/components/elements/actions/SegmentedControl'
+import { LiveEditProvider } from '@/composites/lives/LiveEditContext'
 import { CreatorBilan } from '@/composites/lives/CreatorBilan'
 import { BilanActivity } from '@/composites/lives/bilan/BilanActivity'
 import { BilanBreakdown } from '@/composites/lives/bilan/BilanBreakdown'
@@ -34,6 +35,9 @@ export interface LiveReportViewProps {
   creator: { name: string; avatar: string | null; banner: string | null }
   // File name stem
   stem: string
+  liveId: string
+  // Responsables correct the data
+  canEdit: boolean
 }
 
 /**
@@ -55,66 +59,70 @@ export const LiveReportView = ({
   showCreator,
   creator,
   stem,
+  liveId,
+  canEdit,
 }: LiveReportViewProps) => {
   const durationSeconds = Math.max(0, Math.round((Date.parse(end) - Date.parse(start)) / 1000))
   const figures = bilanFigures(report, insights, durationSeconds)
   const [view, setView] = useState<'general' | 'moderation' | 'creator'>('general')
 
   return (
-    <div className={LIVE_REPORT.wrapper}>
-      {!available && <p className={LIVE_REPORT.notice}>{LIVE_REPORT_COPY.unavailable}</p>}
+    <LiveEditProvider value={{ liveId, canEdit }}>
+      <div className={LIVE_REPORT.wrapper}>
+        {!available && <p className={LIVE_REPORT.notice}>{LIVE_REPORT_COPY.unavailable}</p>}
 
-      <div className={LIVE_REPORT.tabs}>
-        <SegmentedControl
-          label={BILAN_COPY.tabsLabel}
-          value={view}
-          onChange={setView}
-          options={[
-            { value: 'general', label: BILAN_COPY.tabGeneral },
-            { value: 'moderation', label: BILAN_COPY.tabModeration },
-            ...(showCreator ? [{ value: 'creator' as const, label: BILAN_COPY.tabCreator }] : []),
-          ]}
-        />
-      </div>
-
-      {view === 'general' ? (
-        <>
-          <BilanFigures figures={figures} />
-          <BilanActivity insights={insights} levels={report.levels} start={start} end={end} />
-          <BilanVersus
-            insights={insights}
-            baseline={baseline}
-            actions={report.actions}
-            durationSeconds={durationSeconds}
+        <div className={LIVE_REPORT.tabs}>
+          <SegmentedControl
+            label={BILAN_COPY.tabsLabel}
+            value={view}
+            onChange={setView}
+            options={[
+              { value: 'general', label: BILAN_COPY.tabGeneral },
+              { value: 'moderation', label: BILAN_COPY.tabModeration },
+              ...(showCreator ? [{ value: 'creator' as const, label: BILAN_COPY.tabCreator }] : []),
+            ]}
           />
-          <BilanBreakdown insights={insights} byKind={report.byKind} withDetail />
-          {/* Only a change of level in the live is worth a section */}
-          {report.levels.length > 1 && <BilanLevels levels={insights.levels} />}
-          <BilanExports stem={stem} figures={figures} insights={insights} log={log} />
-        </>
-      ) : view === 'creator' && showCreator ? (
-        <>
-          <CreatorBilan
+        </div>
+
+        {view === 'general' ? (
+          <>
+            <BilanFigures figures={figures} />
+            <BilanActivity insights={insights} levels={report.levels} start={start} end={end} />
+            <BilanVersus
+              insights={insights}
+              baseline={baseline}
+              actions={report.actions}
+              durationSeconds={durationSeconds}
+            />
+            <BilanBreakdown insights={insights} byKind={report.byKind} withDetail />
+            {/* Only a change of level in the live is worth a section */}
+            {report.levels.length > 1 && <BilanLevels levels={insights.levels} />}
+            <BilanExports stem={stem} figures={figures} insights={insights} log={log} />
+          </>
+        ) : view === 'creator' && showCreator ? (
+          <>
+            <CreatorBilan
+              report={report}
+              insights={insights}
+              baseline={baseline}
+              start={start}
+              end={end}
+              stem={stem}
+              creator={creator}
+            />
+          </>
+        ) : (
+          <BilanModeration
+            team={team}
+            notes={notes}
             report={report}
-            insights={insights}
-            baseline={baseline}
+            log={log}
             start={start}
             end={end}
-            stem={stem}
-            creator={creator}
+            bucketMinutes={insights.bucketMinutes}
           />
-        </>
-      ) : (
-        <BilanModeration
-          team={team}
-          notes={notes}
-          report={report}
-          log={log}
-          start={start}
-          end={end}
-          bucketMinutes={insights.bucketMinutes}
-        />
-      )}
-    </div>
+        )}
+      </div>
+    </LiveEditProvider>
   )
 }

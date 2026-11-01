@@ -103,6 +103,7 @@ export interface MemberFileTabsProps {
   // Moderation history
   moderation?: MemberModerationViewData | null
   canOpenReports: boolean
+  canDeleteLives: boolean
   // Heavy gestures, Responsables only
   adminState: MemberAdminState | null
   canDelete: boolean
@@ -313,6 +314,7 @@ export const MemberFileTabs = ({
   canPostAbsence,
   moderation,
   canOpenReports,
+  canDeleteLives,
   adminState,
   canDelete,
   participations,
@@ -898,7 +900,12 @@ export const MemberFileTabs = ({
   const logContent: Record<LogView, () => ReactNode> = {
     moderation: () =>
       moderation !== undefined && (
-        <MemberModerationView view={moderation} canOpenReports={canOpenReports} />
+        <MemberModerationView
+          view={moderation}
+          canOpenReports={canOpenReports}
+          canDelete={canDeleteLives}
+          accountId={detail.summary.id}
+        />
       ),
     activity: () => activityLog(),
     play: () => activityLog(playActivity, PLAY_LOG_EMPTY),

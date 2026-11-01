@@ -1,6 +1,9 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
+import { conflict } from '@/core/lib/errors'
+import { objectivesUnlocked } from '@/core/lib/academy/objectives'
+import { ACADEMY_COPY } from '@/declarations/academy/copy'
 import type { AcademyScope } from '@/core/services/academy/AcademyScope'
 import { readDate, readText } from '@/core/lib/forms/values'
 import type { JuniorObjectiveView } from '@/types/academy'
@@ -105,7 +108,11 @@ export const createJuniorObjective = async (
   authorId: string,
   values: FormValues
 ): Promise<JuniorObjectiveView[]> => {
-  await juniorInScope(juniorId, scope)
+  const junior = await juniorInScope(juniorId, scope)
+  // The objectives open with the second period, whatever the way in
+  if (!objectivesUnlocked(junior.status, junior.stage)) {
+    throw conflict(ACADEMY_COPY.objectiveLockedDescription)
+  }
   const position = await nextObjectivePosition(juniorId)
 
   await prisma.juniorObjective.create({

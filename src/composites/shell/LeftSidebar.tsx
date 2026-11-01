@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { CourseRail } from '@/composites/academy/course/player/CourseRail'
 import { CalendarRailPanel, CalendarSearchBar } from '@/composites/calendar/CalendarSidebar'
 import { CalendarRailSwitch } from '@/composites/calendar/CalendarRailSwitch'
@@ -11,6 +11,8 @@ import { CreatorAccountMenu } from '@/composites/shell/CreatorAccountMenu'
 import { CreatorSwitch } from '@/composites/shell/CreatorSwitch'
 import { RailDeadlineBubbles } from '@/composites/shell/RailDeadlineBubbles'
 import { RailNav } from '@/composites/shell/RailNav'
+import { RailSectionSwitch } from '@/composites/shell/RailSectionSwitch'
+import type { RailSection } from '@/composites/shell/RailSectionSwitch'
 import { RailSlides } from '@/composites/shell/RailSlides'
 import { RoleSwitch } from '@/composites/shell/RoleSwitch'
 import { SimulationBanner } from '@/composites/shell/SimulationBanner'
@@ -22,6 +24,7 @@ import { usePlayNotice } from '@/core/hooks/interaction/layout/usePlayNotice'
 import { useCalendarRail } from '@/core/hooks/interaction/calendar/useCalendarRail'
 import { useCalendarRailView } from '@/core/hooks/interaction/calendar/useCalendarRailView'
 import { useRailEntries } from '@/core/hooks/interaction/layout/useRailEntries'
+import { canOwnPages } from '@/core/lib/pages'
 import { useCourseRail } from '@/core/hooks/interaction/scenes/useCourseRail'
 import { useRailCompact } from '@/core/hooks/interaction/layout/useRailCompact'
 import { SHELL_DIMENSIONS } from '@/declarations/ui/responsive'
@@ -64,6 +67,10 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   const calendarRail = useCalendarRail()
   const [calendarView, chooseCalendarView] = useCalendarRailView()
   const [isRailCompact, toggleRailCompact] = useRailCompact()
+  // A private page opens on its own tab
+  const [section, setSection] = useState<RailSection>(
+    pathname.startsWith(ROUTES.pages) ? 'private' : 'normal'
+  )
 
   // A lone creator sits on top
   const hasCreators = viewContext.creators.length === 1
@@ -74,6 +81,10 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
   // The calendar menu wears the page's own search, a folded rail keeps the classic glyphs
   const isCalendarMenu =
     Boolean(calendarRail) && calendarView === 'calendar' && !isPointing && !isCompact
+
+  // Members without pages and the visit keep both, shared pages on top
+  const hasSections =
+    canOwnPages(session) && !isCompact && !courseRail && !isCalendarMenu && !isTouring
 
   // Windows and panels read the rail width from the body
   useEffect(() => {
@@ -106,6 +117,7 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
       isTouring={isTouring}
       live={viewContext.live}
       mentions={viewContext.mentions}
+      section={hasSections ? section : undefined}
     />
   )
 
@@ -142,6 +154,8 @@ export const LeftSidebar = ({ viewContext, unreadCount }: LeftSidebarProps) => {
           />
         </div>
       )}
+
+      {hasSections && <RailSectionSwitch value={section} onChange={setSection} />}
 
       <div className={LEFT_SIDEBAR.searchRow}>
         {isCalendarMenu && calendarRail ? (

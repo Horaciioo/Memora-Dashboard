@@ -43,6 +43,7 @@ export const ABSENCE_COPY = {
   reviewNote: 'Mot pour le membre',
   tooShort: 'Une absence se déclare à partir de {min} jours.',
   tooLong: 'Une absence ne peut pas dépasser {max} jours.',
+  overlap: 'Tu as déjà une absence sur ces jours.',
   days: 'jours',
   dayOne: 'jour',
   pendingCount: 'en attente',

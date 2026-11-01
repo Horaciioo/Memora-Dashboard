@@ -73,6 +73,7 @@ export const PICKER_CARD = {
   pair: 'grid grid-cols-1 gap-8 lg:grid-cols-2',
   group: 'flex flex-col gap-4',
   title: 'flex items-center gap-2 text-sm font-semibold',
+  two: 'grid grid-cols-2 gap-2',
   three: 'grid grid-cols-3 gap-2',
   wide: 'grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3',
   option:
@@ -90,5 +91,6 @@ export const PICKER_CARD = {
   frameStrip:
     'h-6 w-full rounded-[var(--radius-md)] bg-[linear-gradient(90deg,var(--color-frame-mauve),var(--color-frame-blue),var(--color-frame-pink))]',
   lead: 'text-sm text-[var(--color-ink-subtle)]',
-  note: 'text-xs text-[var(--color-ink-subtle)]',
+  note: 'mt-4 text-xs text-[var(--color-ink-subtle)] italic',
+  noteInline: 'text-xs text-[var(--color-ink-subtle)] italic',
 } as const

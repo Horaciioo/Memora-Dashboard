@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from '@/components/elements/navigation/AppLink'
 import { LoginForm } from '@/composites/auth/LoginForm'
 import { DiscordSignInButton } from '@/composites/auth/DiscordSignInButton'
+import { OfflineWipe } from '@/composites/pages/offline/OfflineWipe'
 import { AuthShell } from '@/layouts/AuthShell'
 import { isDiscordConfigured } from '@/declarations/access/discord'
 import {
@@ -36,6 +37,7 @@ export default async function LoginPage({
   return (
     <AuthShell title={AUTH_COPY.title} subtitle={AUTH_COPY.subtitle}>
       <div className={SIGN_IN_STYLES.stack}>
+        <OfflineWipe />
         {failure && (
           <p className={SIGN_IN_STYLES.alert} role="alert">
             {failure}

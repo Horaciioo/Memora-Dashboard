@@ -415,6 +415,13 @@ model Account {
   academyComments       AcademyComment[]         @relation("AcademyCommentAuthor")
   workComments          WorkComment[]            @relation("WorkCommentAuthor")
   exerciseLinks         ExerciseLink[]           @relation("ExerciseLinkCreatedBy")
+  pagesOwned            Page[]                   @relation("PageOwner")
+  pagesEdited           Page[]                   @relation("PageEditor")
+  pageGrants            PageGrant[]              @relation("PageGrantAccount")
+  pageGrantsGiven       PageGrant[]              @relation("PageGrantAuthor")
+  pageMedia             PageMedia[]              @relation("PageMediaUploader")
+  pageRevisions         PageRevision[]           @relation("PageRevisionAuthor")
+  pageComments          PageComment[]            @relation("PageCommentAuthor")
 
   @@index([role])
   @@index([status])
@@ -3194,4 +3201,137 @@ model LudoMove {
 
   @@index([sessionId, rev])
   @@map("play_ludo_moves")
+}
+
+// Level a share hands out, the owner stands above all of them
+enum PageAccessLevel {
+  FULL
+  EDIT
+  COMMENT
+  VIEW
+}
+
+// Who a share reaches: every member, one hierarchy level, or one account
+enum PageShareScope {
+  WORKSPACE
+  ROLE
+  ACCOUNT
+}
+
+// Private page of the block editor, readable by its owner and its shares only
+model Page {
+  // Random v4, never guessable from another id
+  id            String    @id @default(uuid())
+  ownerId       String
+  parentId      String?
+  title         String    @default("")
+  // One emoji
+  icon          String?
+  coverMediaId  String?
+  // Validated block document, see src/core/lib/pages/document.ts
+  content       Json
+  // Plain text of the content, read by search only
+  searchText    String    @default("")
+  // Bumped on every content save, the base of conflict detection
+  version       Int       @default(1)
+  // Order among siblings
+  position      Int       @default(0)
+  // Shares of the parent page reach this one
+  inheritAccess Boolean   @default(true)
+  trashedAt     DateTime?
+  trashedById   String?
+  // Page whose removal swept this one along, restored together
+  trashRootId   String?
+  editedById    String?
+  contentAt     DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  owner     Account        @relation("PageOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  editor    Account?       @relation("PageEditor", fields: [editedById], references: [id], onDelete: SetNull)
+  parent    Page?          @relation("PageTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Page[]         @relation("PageTree")
+  grants    PageGrant[]
+  media     PageMedia[]
+  revisions PageRevision[]
+  comments  PageComment[]
+
+  @@index([ownerId, trashedAt])
+  @@index([parentId, position])
+  @@index([trashRootId])
+  @@map("pages")
+}
+
+// One share of a page; targetKey keeps a single row per audience
+model PageGrant {
+  id          String          @id @default(cuid())
+  pageId      String
+  scope       PageShareScope
+  accountId   String?
+  role        MemberRole?
+  level       PageAccessLevel
+  // workspace, role:<ROLE> or account:<id>
+  targetKey   String
+  grantedById String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  account   Account? @relation("PageGrantAccount", fields: [accountId], references: [id], onDelete: Cascade)
+  grantedBy Account? @relation("PageGrantAuthor", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@unique([pageId, targetKey])
+  @@index([accountId])
+  @@index([scope, role])
+  @@map("page_grants")
+}
+
+// Picture held by a page, served only to who may read the page
+model PageMedia {
+  id             String   @id @default(uuid())
+  pageId         String
+  storageEntryId String   @unique
+  uploadedById   String?
+  createdAt      DateTime @default(now())
+
+  page       Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  uploadedBy Account? @relation("PageMediaUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([pageId])
+  @@map("page_media")
+}
+
+// Snapshot kept for the coming history view
+model PageRevision {
+  id        String   @id @default(cuid())
+  pageId    String
+  version   Int
+  title     String
+  content   Json
+  authorId  String?
+  createdAt DateTime @default(now())
+
+  page   Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  author Account? @relation("PageRevisionAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([pageId, createdAt])
+  @@map("page_revisions")
+}
+
+// Remark on a page, optionally pinned to one block
+model PageComment {
+  id         String    @id @default(cuid())
+  pageId     String
+  blockId    String?
+  authorId   String?
+  body       String
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  page   Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  author Account? @relation("PageCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([pageId, createdAt])
+  @@map("page_comments")
 }

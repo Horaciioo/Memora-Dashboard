@@ -1,11 +1,20 @@
+import { useState } from 'react'
+
 import { Button } from '@/components/elements/actions/Button'
+import { RungMeasures } from '@/composites/moderation/offense/RungMeasures'
+import { AddRow } from '@/components/structures/inline/AddRow'
+import { InlineText } from '@/components/structures/inline/InlineText'
+import { useActionMenu } from '@/core/hooks/interaction/layout/useActionMenu'
 import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { SANCTION_COPY } from '@/declarations/sanctions/copy'
 import { SANCTION_PANEL_REGISTRY } from '@/declarations/sanctions/registries'
-import { accentPaint } from '@/declarations/ui/theme'
 import { OFFENSE_SHEET } from '@/declarations/ui/variants'
-import type { SanctionOffenseDetail, SanctionRungView } from '@/types/sanctions'
-import { cn } from '@/utils/classnames'
+import type {
+  SanctionMeasureView,
+  SanctionOffenseDetail,
+  SanctionRungInput,
+  SanctionRungView,
+} from '@/types/sanctions'
 import { fillCommand, writeDuration } from '@/utils/format/sanctions'
 
 /**
@@ -71,47 +80,151 @@ const RungCommands = ({
 }
 
 /**
+ * Handlers turning the staircase into its own editor
+ * @typedef {Object} LadderEdit
+ * @property {SanctionMeasureView[]} measures - Measures a step picks from
+ * @property {(steps: SanctionRungInput[]) => Promise<boolean>} onSave - Persists the whole ladder
+ */
+
+export interface LadderEdit {
+  measures: SanctionMeasureView[]
+  onSave: (steps: SanctionRungInput[]) => Promise<boolean>
+}
+
+const toSteps = (rungs: SanctionRungView[]): SanctionRungInput[] =>
+  rungs.map((rung) => ({ condition: rung.condition, measureIds: rung.measures.map((m) => m.id) }))
+
+/**
+ * One step of the staircase, read as is and edited where it stands
+ * @param {Object} props - Step, its place and editing handlers
+ * @return {JSX.Element}
+ */
+
+const Rung = ({
+  rung,
+  index,
+  last,
+  rungs,
+  offense,
+  edit,
+}: {
+  rung: SanctionRungView
+  index: number
+  last: boolean
+  rungs: SanctionRungView[]
+  offense: SanctionOffenseDetail
+  edit?: LadderEdit
+}) => {
+  const steps = toSteps(rungs)
+  const replace = (next: Partial<SanctionRungInput>) =>
+    edit!.onSave(steps.map((step, at) => (at === index ? { ...step, ...next } : step)))
+
+  const menu = useActionMenu(
+    edit
+      ? [
+          {
+            id: 'remove',
+            label: SANCTION_COPY.removeRung,
+            icon: 'remove',
+            onSelect: () => void edit.onSave(steps.filter((_, at) => at !== index)),
+          },
+        ]
+      : []
+  )
+
+  return (
+    <li className={OFFENSE_SHEET.rung} onContextMenu={edit ? menu.onContextMenu : undefined}>
+      {!last && <span className={OFFENSE_SHEET.rungRail} aria-hidden="true" />}
+      <span className={OFFENSE_SHEET.rungDot} aria-hidden="true">
+        {index + 1}
+      </span>
+      <div className={OFFENSE_SHEET.rungBody}>
+        <InlineText
+          id={`condition-${rung.id}`}
+          value={rung.condition ?? ''}
+          disabled={!edit}
+          className={OFFENSE_SHEET.rungCondition}
+          placeholder={SANCTION_COPY.conditionPlaceholder}
+          onCommit={(condition) => replace({ condition })}
+        />
+        <RungMeasures
+          measures={rung.measures}
+          choices={edit?.measures ?? []}
+          disabled={!edit}
+          onCommit={(measureIds) => replace({ measureIds })}
+        />
+        <RungCommands rung={rung} offense={offense} />
+      </div>
+    </li>
+  )
+}
+
+/**
  * The ladder of one level as a staircase
- * @param {Object} props - Steps and their offence
+ * @param {Object} props - Steps, their offence and, when editable, the handlers
  * @return {JSX.Element}
  */
 
 export const LadderView = ({
   rungs,
   offense,
+  edit,
 }: {
   rungs: SanctionRungView[]
   offense: SanctionOffenseDetail
+  edit?: LadderEdit
 }) => {
-  if (rungs.length === 0) return <p className={OFFENSE_SHEET.how}>{SANCTION_COPY.noLadder}</p>
+  const [adding, setAdding] = useState(false)
+
+  if (rungs.length === 0 && !adding) {
+    return (
+      <>
+        <p className={OFFENSE_SHEET.how}>{SANCTION_COPY.noLadder}</p>
+        {edit && <AddRow label={SANCTION_COPY.addRung} onClick={() => setAdding(true)} />}
+      </>
+    )
+  }
 
   return (
-    <ol className={OFFENSE_SHEET.ladder}>
-      {rungs.map((rung, index) => (
-        <li key={rung.id} className={OFFENSE_SHEET.rung}>
-          {index < rungs.length - 1 && (
-            <span className={OFFENSE_SHEET.rungRail} aria-hidden="true" />
-          )}
-          <span className={OFFENSE_SHEET.rungDot} aria-hidden="true">
-            {index + 1}
-          </span>
-          <div className={OFFENSE_SHEET.rungBody}>
-            <span className={OFFENSE_SHEET.rungCondition}>{rung.condition}</span>
-            <span className={OFFENSE_SHEET.measures}>
-              {rung.measures.map((measure) => (
-                <span
-                  key={measure.id}
-                  className={cn(OFFENSE_SHEET.measure, accentPaint(measure.accent).soft)}
-                  style={accentPaint(measure.accent).style}
-                >
-                  {measure.name}
-                </span>
-              ))}
+    <>
+      <ol className={OFFENSE_SHEET.ladder}>
+        {rungs.map((rung, index) => (
+          <Rung
+            key={rung.id}
+            rung={rung}
+            index={index}
+            last={index === rungs.length - 1 && !adding}
+            rungs={rungs}
+            offense={offense}
+            edit={edit}
+          />
+        ))}
+        {adding && edit && (
+          <li className={OFFENSE_SHEET.rung}>
+            <span className={OFFENSE_SHEET.rungDot} aria-hidden="true">
+              {rungs.length + 1}
             </span>
-            <RungCommands rung={rung} offense={offense} />
-          </div>
-        </li>
-      ))}
-    </ol>
+            <div className={OFFENSE_SHEET.rungBody}>
+              <RungMeasures
+                startOpen
+                measures={[]}
+                choices={edit.measures}
+                onDismiss={() => setAdding(false)}
+                onCommit={async (measureIds) => {
+                  const done = await edit.onSave([
+                    ...toSteps(rungs),
+                    { condition: null, measureIds },
+                  ])
+                  if (done) setAdding(false)
+
+                  return done
+                }}
+              />
+            </div>
+          </li>
+        )}
+      </ol>
+      {edit && !adding && <AddRow label={SANCTION_COPY.addRung} onClick={() => setAdding(true)} />}
+    </>
   )
 }

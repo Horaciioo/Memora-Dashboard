@@ -1,9 +1,9 @@
 import { Status } from '@/components/elements/display/Status'
+import { StatusBars } from '@/composites/system/status/StatusBars'
 import type { StatusReport } from '@/core/services/system/StatusService'
 import { STATUS_COPY } from '@/declarations/system/monitoring/status'
-import { STATUS_BAR_COLOURS, STATUS_HISTORY_STYLES } from '@/declarations/ui/variants'
+import { STATUS_HISTORY_STYLES } from '@/declarations/ui/variants'
 import type { Tone } from '@/declarations/ui/theme'
-import { cn } from '@/utils/classnames'
 import { formatDayTime } from '@/utils/format/dates'
 
 export interface StatusPanelProps {
@@ -59,20 +59,7 @@ export const StatusPanel = ({ report, show = ['services'] }: StatusPanelProps) =
                   />
                 </span>
               </div>
-              <div className={STATUS_HISTORY_STYLES.bars} aria-hidden="true">
-                {service.days.map((day, index) => (
-                  <span
-                    key={index}
-                    className={cn(STATUS_HISTORY_STYLES.bar, STATUS_BAR_COLOURS[day ?? 'none'])}
-                  />
-                ))}
-              </div>
-              <div className={STATUS_HISTORY_STYLES.foot}>
-                <span>{STATUS_COPY.history}</span>
-                {service.uptime !== null && (
-                  <span>{`${service.uptime.toFixed(2)} % ${STATUS_COPY.uptime}`}</span>
-                )}
-              </div>
+              <StatusBars days={service.days} uptime={service.uptime} />
             </div>
           ))}
         </div>

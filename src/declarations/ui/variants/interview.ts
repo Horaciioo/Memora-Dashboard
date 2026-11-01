@@ -126,7 +126,7 @@ export const INTERVIEW = {
     'bg-linear-to-r from-[color-mix(in_srgb,var(--color-ink-subtle)_22%,var(--color-surface-raised))] via-[color-mix(in_srgb,var(--color-ink-subtle)_7%,var(--color-surface-raised))] to-[var(--color-surface-raised)]',
   // Same frame as the welcome chat, under the drawer layer
   frame:
-    'overlay-enter fixed inset-0 z-40 flex flex-col gap-3 overflow-hidden bg-[image:var(--gradient-page)] p-[var(--tour-inset)] lg:block lg:p-0',
+    'overlay-enter fixed inset-0 z-40 flex flex-col gap-3 overflow-hidden bg-[image:var(--gradient-page)] p-[var(--tour-inset)] max-md:pb-[calc(var(--shell-dock-clearance)+var(--tour-inset))] lg:block lg:p-0',
   contentWide: 'max-w-5xl',
   content: 'relative mx-auto flex w-full max-w-3xl flex-col gap-8',
   // Small trail above the title, out of the flow so nothing moves

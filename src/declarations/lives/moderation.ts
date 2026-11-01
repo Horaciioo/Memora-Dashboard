@@ -29,6 +29,17 @@ export const MODERATION_KINDS: Record<ModerationKind, { label: string; icon: Ico
  */
 
 export const LIVE_REPORT_COPY = {
+  removeLive: 'Supprimer ce live',
+  removeGesture: 'Supprimer ce geste',
+  changeKind: 'Passer en « {kind} »',
+  gestureTarget: 'viewer',
+  gestureDuration: 'durée (s)',
+  gestureReason: 'raison',
+  activeMinutes: ' min de veille',
+  titlePlaceholder: 'Titre du live',
+  removeTitle: 'Souhaites-tu supprimer ce live ?',
+  removeDescription:
+    'Le live disparaît avec toutes ses données : gestes de modération, temps de veille, relevés et changements de Livecon. Cette action est définitive.',
   title: 'Bilan',
   creatorTitle: 'Bilan',
   storyWhenTitle: 'Le live',

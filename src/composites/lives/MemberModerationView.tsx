@@ -7,6 +7,11 @@ import { useState } from 'react'
 
 import { Pagination } from '@/components/elements/navigation/Pagination'
 import { Section } from '@/components/structures/page/Section'
+import { LiveRemovalDialog, RemovableLive } from '@/composites/lives/RemovableLive'
+import { GestureFields, GestureItem } from '@/composites/lives/EditableGesture'
+import { InlineText } from '@/components/structures/inline/InlineText'
+import { useLiveData } from '@/core/hooks/data/lives/useLiveData'
+import { useLiveRemoval } from '@/core/hooks/data/lives/useLiveRemoval'
 import { ReinforcementTag } from '@/composites/lives/ReinforcementTag'
 import { ModSpan } from '@/composites/lives/ModSpan'
 import { LIVE_SETTINGS } from '@/declarations/configurations/settings'
@@ -30,16 +35,29 @@ export interface MemberModerationViewProps {
   view: View | null
   // Viewer may open a live's report
   canOpenReports: boolean
+  // Viewer erases a live
+  canDelete: boolean
+  // Member whose file it is
+  accountId: string
 }
 
 /**
  * Moderation of one member: time spent, then live by live, the detail on click
  * @param {View | null} view - History
  * @param {boolean} canOpenReports - Report links shown
+ * @param {boolean} canDelete - Lives erased and their data corrected
+ * @param {string} accountId - Member
  * @return {JSX.Element}
  */
 
-export const MemberModerationView = ({ view, canOpenReports }: MemberModerationViewProps) => {
+export const MemberModerationView = ({
+  view,
+  canOpenReports,
+  canDelete,
+  accountId,
+}: MemberModerationViewProps) => {
+  const removal = useLiveRemoval()
+  const data = useLiveData()
   const [open, setOpen] = useState<string | null>(null)
   const [page, setPage] = useState(1)
 
@@ -83,7 +101,13 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
               const isOpen = open === live.liveId
 
               return (
-                <li key={live.liveId} className={MEMBER_MODERATION.item}>
+                <RemovableLive
+                  key={live.liveId}
+                  liveId={live.liveId}
+                  removal={removal}
+                  enabled={canDelete}
+                  className={MEMBER_MODERATION.item}
+                >
                   <button
                     type="button"
                     className={MEMBER_MODERATION.row}
@@ -129,7 +153,12 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
                             ].filter(Boolean)
 
                             return (
-                              <li key={line.id} className={LIVE_REPORT.line}>
+                              <GestureItem
+                                key={line.id}
+                                liveId={live.liveId}
+                                line={line}
+                                canEdit={canDelete}
+                              >
                                 <time className={LIVE_REPORT.lineTime}>
                                   {formatClock(line.occurredAt)}
                                 </time>
@@ -142,13 +171,29 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
                                     </span>
                                   )}
                                 </span>
-                                <span className={LIVE_REPORT.lineDetail}>
-                                  <Dotted items={details} />
-                                </span>
-                              </li>
+                                {canDelete ? (
+                                  <GestureFields liveId={live.liveId} line={line} />
+                                ) : (
+                                  <span className={LIVE_REPORT.lineDetail}>
+                                    <Dotted items={details} />
+                                  </span>
+                                )}
+                              </GestureItem>
                             )
                           })}
                         </ol>
+                      )}
+                      {canDelete && (
+                        <span className={LIVE_REPORT.lineDetail}>
+                          <InlineText
+                            id={`time-${live.liveId}`}
+                            value={String(Math.round(live.activeSeconds / 60))}
+                            onCommit={(minutes) =>
+                              data.editTime(live.liveId, accountId, Number(minutes) * 60)
+                            }
+                          />
+                          {LIVE_REPORT_COPY.activeMinutes}
+                        </span>
                       )}
                       {canOpenReports && (
                         <Link
@@ -160,7 +205,7 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
                       )}
                     </div>
                   )}
-                </li>
+                </RemovableLive>
               )
             })}
           </ul>
@@ -173,6 +218,7 @@ export const MemberModerationView = ({ view, canOpenReports }: MemberModerationV
             setOpen(null)
           }}
         />
+        <LiveRemovalDialog removal={removal} />
       </Section>
     </div>
   )

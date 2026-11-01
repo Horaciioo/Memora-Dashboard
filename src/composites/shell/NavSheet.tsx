@@ -89,7 +89,7 @@ export const NavSheet = ({
           </div>
         )}
         <div className={NAV_SHEET.searchRow}>
-          <SearchLauncher expanded className={SEARCH_LAUNCHER.sheetBar} />
+          <SearchLauncher expanded className={SEARCH_LAUNCHER.sheetBar} onOpen={onClose} />
           <Link
             href={ROUTES.notifications}
             aria-label={NAV_COPY.notifications}

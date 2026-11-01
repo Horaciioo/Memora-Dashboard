@@ -41,7 +41,7 @@ const LINE = { fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' } a
  * @return {JSX.Element}
  */
 
-const Scene = ({
+export const Scene = ({
   className,
   render,
 }: EmptyStateIllustrationProps & { render: (paints: ScenePaints) => ReactNode }) => {
@@ -103,7 +103,7 @@ const Scene = ({
  * @return {JSX.Element}
  */
 
-const Sparks = ({
+export const Sparks = ({
   paint,
   items,
 }: {

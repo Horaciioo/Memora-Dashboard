@@ -7,7 +7,7 @@ import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJourn
 import { Permissions } from '@/utils/constants/permissions'
 
 export const POST = createProtectedRoute({
-  permission: Permissions.RecruitmentManage,
+  permission: Permissions.RecruitmentCandidateWrite,
   status: 201,
   descriptor: { summary: 'Add a candidate to a session', tags: ['recruitment'] },
   handler: async ({ params, raw, session, scope }) => {

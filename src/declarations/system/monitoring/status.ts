@@ -32,10 +32,14 @@ export const STATUS_COPY = {
   },
   pending: 'Première mesure en cours',
   uptime: 'de disponibilité',
-  history: '90 jours',
   incidents: 'Incidents',
   noIncident: 'Aucun incident enregistré.',
   ongoing: 'En cours',
   resolved: 'Résolu',
-  noData: 'Pas de mesure ce jour-là',
+  noData: 'Pas de mesure ce jour-là.',
+  dayLevel: {
+    up: 'Aucune panne enregistrée ce jour-là.',
+    degraded: 'Fonctionnement dégradé ce jour-là.',
+    down: 'Panne enregistrée ce jour-là.',
+  },
 } as const

@@ -1,8 +1,11 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import AppLink from '@/components/elements/navigation/AppLink'
+import { FloatingAdd } from '@/composites/search/assistant/FloatingAdd'
+import { ASSISTANT_OFFERS } from '@/declarations/assistant/offers'
 import { Status } from '@/components/elements/display/Status'
 import { EmptyState } from '@/components/elements/feedback/EmptyState'
 import { PageOptions } from '@/components/structures/page/PageOptions'
@@ -28,8 +31,8 @@ export interface LivesBoardProps {
   canAnnounce: boolean
   past: LiveView[]
   canReport: boolean
+  canDelete: boolean
   canCreatorReport: boolean
-  // Dev only: simulated live controls
 }
 
 /**
@@ -39,6 +42,7 @@ export interface LivesBoardProps {
  * @param {boolean} canAnnounce - Viewer may announce
  * @param {LiveView[]} past - Finished lives
  * @param {boolean} canReport - Viewer reads the Bilan
+ * @param {boolean} canDelete - Viewer erases past lives
  * @param {boolean} canCreatorReport - Viewer reads the creator Bilan
  * @return {JSX.Element}
  */
@@ -49,12 +53,14 @@ export const LivesBoard = ({
   canAnnounce,
   past,
   canReport,
+  canDelete,
   canCreatorReport,
 }: LivesBoardProps) => {
   const { lives, recent, isSaving, endedId, dismissEnded, move, reopen } = useLives(
     initialLives,
     initialRecent
   )
+  const router = useRouter()
   const [showPast, setShowPast] = useState(false)
   const onAir = lives.filter((live) => live.status === LiveStatuses.Live)
   const upcoming = lives.filter((live) => live.status === LiveStatuses.Announced)
@@ -145,7 +151,19 @@ export const LivesBoard = ({
       )}
 
       {showPast && (
-        <PastLives lives={past} canReport={canReport} canCreatorReport={canCreatorReport} />
+        <PastLives
+          lives={past}
+          canReport={canReport}
+          canCreatorReport={canCreatorReport}
+          canDelete={canDelete}
+        />
+      )}
+
+      {canAnnounce && (lives.length > 0 || recent.length > 0) && (
+        <FloatingAdd
+          offer={ASSISTANT_OFFERS.live}
+          onClick={() => router.push(ROUTES.calendarNew(LIVE_PRESET))}
+        />
       )}
 
       <LiveEndedDialog liveId={canReport ? endedId : null} onClose={dismissEnded} />

@@ -43,6 +43,7 @@ export default async function LivesPage() {
         canAnnounce={canAnnounce}
         past={past}
         canReport={canReadLogs}
+        canDelete={access.isResponsable}
         canCreatorReport={access.can(Permissions.LiveCreatorReport)}
       />
     </div>

@@ -56,6 +56,7 @@ export const GET = createProtectedRoute({
 
 export const POST = createProtectedRoute({
   permission: Permissions.CalendarManage,
+  idempotent: true,
   status: 201,
   descriptor: { summary: 'Post an entry on the calendar', tags: ['calendar'] },
   handler: async ({ raw, session, access }) => {

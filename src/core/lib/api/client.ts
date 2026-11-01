@@ -91,11 +91,15 @@ export const apiGet = <T>(path: string, signal?: AbortSignal): Promise<T> =>
  * Create a resource
  * @param {string} path - API path
  * @param {unknown} body - Payload to send
+ * @param {Record<string, string>} [headers] - Extra headers
  * @return {Promise<T>} - Payload
  */
 
-export const apiPost = <T>(path: string, body: unknown): Promise<T> =>
-  request<T>(path, { method: 'POST', body: JSON.stringify(body) })
+export const apiPost = <T>(
+  path: string,
+  body: unknown,
+  headers?: Record<string, string>
+): Promise<T> => request<T>(path, { method: 'POST', body: JSON.stringify(body), headers })
 
 /**
  * Update part of a resource

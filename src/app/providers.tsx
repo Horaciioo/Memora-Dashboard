@@ -12,6 +12,7 @@ import {
   AppearanceManager,
   BreadcrumbProvider,
   ColorVisionManager,
+  ComfortManager,
   DisplayPreferencesManager,
   HintsProvider,
   MenuProvider,
@@ -51,6 +52,7 @@ export const Providers = ({ initialSession, children }: ProvidersProps) => {
           <ThemeManager />
           <AppearanceManager />
           <ColorVisionManager />
+          <ComfortManager />
           <DisplayPreferencesManager preferences={initialSession?.display ?? null} />
           <BreadcrumbProvider>
             <MenuProvider>

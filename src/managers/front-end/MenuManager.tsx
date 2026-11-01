@@ -5,18 +5,15 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
 
+import { MenuLayer } from '@/managers/front-end/MenuLayer'
 import { useLongPress } from '@/core/hooks/interaction/gestures/useLongPress'
 import { isKeyboardShift } from '@/core/lib/ui/keyboard'
-import { ICONS, type IconName } from '@/declarations/ui/icons'
-import { MENU_STYLES } from '@/declarations/ui/variants'
-import { cn } from '@/utils/classnames'
+import type { IconName } from '@/declarations/ui/icons'
 
 /**
  * Entry of a floating menu
@@ -28,7 +25,9 @@ import { cn } from '@/utils/classnames'
  * @property {string} [shortcut] - Keyboard hint
  * @property {boolean} [disabled] - Blocks selection
  * @property {boolean} [separatorBefore] - Draws a rule above
- * @property {() => void} onSelect - Selection handler
+ * @property {string} [section] - Heading above the entry
+ * @property {MenuItem[]} [submenu] - Entries of a flyout
+ * @property {() => void} [onSelect] - Selection handler
  */
 
 export interface MenuItem {
@@ -39,13 +38,16 @@ export interface MenuItem {
   shortcut?: string
   disabled?: boolean
   separatorBefore?: boolean
-  onSelect: () => void
+  section?: string
+  submenu?: MenuItem[]
+  onSelect?: () => void
 }
 
 /**
  * Open menu state
  * @typedef {Object} OpenMenu
  * @property {string} [title] - Section label above the entries
+ * @property {boolean} [searchable] - Shows a search field
  * @property {MenuItem[]} items - Entries
  * @property {number} x - Screen x coordinate
  * @property {number} y - Screen y coordinate
@@ -53,6 +55,7 @@ export interface MenuItem {
 
 interface OpenMenu {
   title?: string
+  searchable?: boolean
   items: MenuItem[]
   x: number
   y: number
@@ -61,13 +64,13 @@ interface OpenMenu {
 /**
  * Menu context
  * @typedef {Object} MenuContextValue
- * @property {(items: MenuItem[], origin: {x: number, y: number}, title?: string) => void} openMenu - Raise a menu
+ * @property {(items: MenuItem[], origin: {x: number, y: number}, title?: string, searchable?: boolean) => void} openMenu - Raise a menu
  * @property {(items: MenuItem[], title?: string) => (event: MouseEvent) => void} contextMenu - Right click handler
  * @property {() => void} closeMenu - Dismiss the menu
  */
 
 interface MenuContextValue {
-  openMenu: (items: MenuItem[], origin: { x: number; y: number }, title?: string) => void
+  openMenu: (items: MenuItem[], origin: { x: number; y: number }, title?: string, searchable?: boolean) => void
   contextMenu: (items: MenuItem[], title?: string) => (event: MouseEvent) => void
   closeMenu: () => void
 }
@@ -94,7 +97,7 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
   useLongPress()
 
   const openMenu = useCallback(
-    (items: MenuItem[], origin: { x: number; y: number }, title?: string) => {
+    (items: MenuItem[], origin: { x: number; y: number }, title?: string, searchable?: boolean) => {
       if (items.length === 0) return
 
       // Flip the panel back inside the viewport when it would overflow
@@ -102,7 +105,7 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
       const x = Math.min(origin.x, window.innerWidth - ESTIMATED_WIDTH - EDGE_MARGIN)
       const y = Math.min(origin.y, window.innerHeight - height - EDGE_MARGIN)
 
-      setMenu({ items, title, x: Math.max(EDGE_MARGIN, x), y: Math.max(EDGE_MARGIN, y) })
+      setMenu({ items, title, searchable, x: Math.max(EDGE_MARGIN, x), y: Math.max(EDGE_MARGIN, y) })
     },
     []
   )
@@ -151,65 +154,6 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
       {children}
       {menu && <MenuLayer menu={menu} onClose={closeMenu} />}
     </MenuContext.Provider>
-  )
-}
-
-/**
- * Menu layer
- * @param {Object} props - Layer config
- * @param {OpenMenu} props.menu - Menu to render
- * @param {() => void} props.onClose - Dismiss handler
- * @return {JSX.Element} - Menu overlay
- */
-
-const MenuLayer = ({ menu, onClose }: { menu: OpenMenu; onClose: () => void }) => {
-  const panel = useRef<HTMLDivElement>(null)
-
-  // Rows are taller on touch, measure rather than guess
-  useLayoutEffect(() => {
-    const node = panel.current
-    if (!node) return
-
-    const overflow = node.getBoundingClientRect().bottom - (window.innerHeight - EDGE_MARGIN)
-    if (overflow > 0) node.style.top = `${Math.max(EDGE_MARGIN, menu.y - overflow)}px`
-  }, [menu])
-
-  return (
-    <>
-      <div className="fixed inset-0 z-[65]" role="presentation" onMouseDown={onClose} />
-      <div
-        ref={panel}
-        role="menu"
-        aria-label={menu.title}
-        className={MENU_STYLES.panel}
-        style={{ left: menu.x, top: menu.y }}
-      >
-        {menu.title && <p className={MENU_STYLES.label}>{menu.title}</p>}
-        {menu.items.map((item) => {
-          const Icon = item.icon ? ICONS[item.icon] : null
-
-          return (
-            <div key={item.id}>
-              {item.separatorBefore && <div className={MENU_STYLES.separator} />}
-              <button
-                type="button"
-                role="menuitem"
-                disabled={item.disabled}
-                onClick={() => {
-                  onClose()
-                  item.onSelect()
-                }}
-                className={cn(MENU_STYLES.item, item.danger && MENU_STYLES.danger)}
-              >
-                {Icon && <Icon className={MENU_STYLES.icon} aria-hidden="true" />}
-                {item.label}
-                {item.shortcut && <span className={MENU_STYLES.shortcut}>{item.shortcut}</span>}
-              </button>
-            </div>
-          )
-        })}
-      </div>
-    </>
   )
 }
 

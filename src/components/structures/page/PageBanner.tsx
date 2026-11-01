@@ -11,6 +11,8 @@ export interface PageBannerProps {
   title: string
   // The page already carries its own h1
   isLabel?: boolean
+  // Photograph and trail only, the page edits its own title
+  isBare?: boolean
   // Two to six words under the title, the area's own when absent
   heroDescription?: string
   // Picture replacing the area's own
@@ -26,6 +28,7 @@ export interface PageBannerProps {
  * and the tab strip right under it
  * @param {string} title - Title over the photograph
  * @param {boolean} [isLabel] - The title names the area
+ * @param {boolean} [isBare] - Trail only, no title nor line
  * @param {string} [heroDescription] - Faint line under the title
  * @param {string | null} [image] - Picture replacing the area's own
  * @param {ReactNode} [lead] - Portrait before the title
@@ -36,6 +39,7 @@ export interface PageBannerProps {
 export const PageBanner = ({
   title,
   isLabel,
+  isBare,
   heroDescription,
   image,
   lead,
@@ -51,17 +55,19 @@ export const PageBanner = ({
           <Breadcrumbs current={title} />
           <BannerTools title={title} />
         </div>
-        <div className={PAGE_STYLES.bannerFoot}>
-          <div className={PAGE_STYLES.bannerTitleRow}>
-            {lead}
-            <Title className={PAGE_STYLES.bannerTitle} title={title}>
-              <span className={PAGE_STYLES.bannerTitleText}>{title}</span>
-            </Title>
-            <RouteMaturity />
+        {!isBare && (
+          <div className={PAGE_STYLES.bannerFoot}>
+            <div className={PAGE_STYLES.bannerTitleRow}>
+              {lead}
+              <Title className={PAGE_STYLES.bannerTitle} title={title}>
+                <span className={PAGE_STYLES.bannerTitleText}>{title}</span>
+              </Title>
+              <RouteMaturity />
+            </div>
+            <BannerHero text={heroDescription} />
+            {children}
           </div>
-          <BannerHero text={heroDescription} />
-          {children}
-        </div>
+        )}
       </div>
       <div id={PAGE_TABS_HOST_ID} className={PAGE_STYLES.tabsHost} />
     </>
