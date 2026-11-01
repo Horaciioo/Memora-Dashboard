@@ -157,15 +157,11 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
-        text: 'Ajout d’un message quand la connexion est perdue, et d’une bannière qui propose de recharger quand une nouvelle version de Memora est disponible.',
+        text: 'Ajout d’un message quand la connexion est perdue, et d’un écran plein cadre qui propose de recharger quand une nouvelle version de Memora est disponible.',
       },
       {
         tag: ChangelogTags.Improved,
         text: 'Amélioration visuelle de Memora : nouveau logo, nouvelles icônes d’application et écran de chargement avec le cerveau de Memora.',
-      },
-      {
-        tag: ChangelogTags.Improved,
-        text: 'Amélioration de l’application installée sur ordinateur : la barre blanche du haut disparaît et les boutons de la fenêtre se posent sur le menu, à côté des flèches de navigation.',
       },
       {
         tag: ChangelogTags.Improved,
@@ -199,6 +195,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         tag: ChangelogTags.Improved,
         page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Amélioration de l’entretien de « Recrutements » sur téléphone : la bannière laisse place au logo du créateur, centré en haut, pour garder la place aux questions.',
+      },
+      {
+        tag: ChangelogTags.Improved,
+        page: ROUTES.recruitments,
         permission: Permissions.RecruitmentCandidateWrite,
         text: 'Amélioration de « Recrutements » : les recruteurs d’un entretien terminé peuvent toujours être changés, seuls les observateurs restent verrouillés.',
       },
@@ -213,6 +215,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         page: ROUTES.members,
         permission: Permissions.RecruitmentRead,
         text: 'Amélioration de « Modérateurs » : un candidat accepté reste avec les candidats jusqu’au début de sa procédure académique.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Correction d’un bug de « Recrutements » qui empêchait un recruteur de s’installer comme observateur dans un entretien.',
       },
       {
         tag: ChangelogTags.Fixed,
