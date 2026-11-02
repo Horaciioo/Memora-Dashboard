@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 import { useNotificationFeed } from '@/core/hooks/data/system/useNotificationFeed'
 import { useNotificationsStore } from '@/core/store/notifications'
@@ -102,19 +103,22 @@ export const NotificationsBell = ({ initialUnread, iconClassName }: Notification
         {feed.unread > 0 && <span className={NOTIFICATION_STYLES.pastille} aria-hidden="true" />}
       </button>
 
-      {isOpen && (
-        <>
-          <div className={RAIL_POPOVER.scrim} role="presentation" onMouseDown={close} />
-          <NotificationsPanel
-            entries={feed.entries.slice(0, NOTIFICATION_SETTINGS.panelSize)}
-            unread={feed.unread}
-            isLoading={feed.isLoading}
-            onOpen={feed.open}
-            onReadAll={feed.readAll}
-            onLeave={close}
-          />
-        </>
-      )}
+      {/* Out of the rail, whose glass would clip the scrim */}
+      {isOpen &&
+        createPortal(
+          <>
+            <div className={RAIL_POPOVER.scrim} role="presentation" onMouseDown={close} />
+            <NotificationsPanel
+              entries={feed.entries.slice(0, NOTIFICATION_SETTINGS.panelSize)}
+              unread={feed.unread}
+              isLoading={feed.isLoading}
+              onOpen={feed.open}
+              onReadAll={feed.readAll}
+              onLeave={close}
+            />
+          </>,
+          document.body
+        )}
     </>
   )
 }
