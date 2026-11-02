@@ -183,8 +183,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
       {
         tag: ChangelogTags.Added,
-        page: ROUTES.changelog,
-        text: 'Ajout d’une courte visite animée en haut de la note de cette version : le chat de l’assistant, une page privée qui se remplit, puis l’invitation de membres.',
+        text: 'Ajout d’une présentation animée au milieu de l’écran après une mise à jour : le chat de l’assistant, une page privée qui se remplit puis l’invitation de membres, avec la possibilité de la rejouer.',
       },
       {
         tag: ChangelogTags.Added,
