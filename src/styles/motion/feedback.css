@@ -637,3 +637,25 @@
     animation: none;
   }
 }
+
+/* Burst of sparks leaving the avatars */
+.showcase-burst {
+  animation: showcase-burst 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes showcase-burst {
+  from {
+    transform: rotate(var(--angle)) translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(var(--angle)) translateY(-3.5rem) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showcase-burst {
+    display: none;
+  }
+}
