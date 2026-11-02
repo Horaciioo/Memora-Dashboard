@@ -1,7 +1,8 @@
 import { playSound, preloadSounds } from '@/core/lib/play/sounds'
-import { usePlaySoundStore } from '@/core/store/playSound'
+import { playLevelOf } from '@/core/store/playSound'
 import { BOMB_SOUNDS, BOMB_TAKES } from '@/declarations/play/bomb/sounds'
 import type { BombSoundName, BombTakeName } from '@/declarations/play/bomb/sounds'
+import { PlayGames } from '@/utils/constants/play'
 
 /**
  * Bomb Party sound at the player's level
@@ -11,8 +12,7 @@ import type { BombSoundName, BombTakeName } from '@/declarations/play/bomb/sound
  */
 
 export const playBombSound = (sound: BombSoundName, level = 1): void => {
-  const { isMuted, volume } = usePlaySoundStore.getState()
-  if (!isMuted) playSound(BOMB_SOUNDS[sound], volume * level)
+  playSound(BOMB_SOUNDS[sound], playLevelOf(PlayGames.Bomb) * level)
 }
 
 /**
@@ -23,9 +23,8 @@ export const playBombSound = (sound: BombSoundName, level = 1): void => {
  */
 
 export const playBombTake = (take: BombTakeName, level = 1): void => {
-  const { isMuted, volume } = usePlaySoundStore.getState()
   const files = BOMB_TAKES[take]
-  if (!isMuted) playSound(files[Math.floor(Math.random() * files.length)], volume * level)
+  playSound(files[Math.floor(Math.random() * files.length)], playLevelOf(PlayGames.Bomb) * level)
 }
 
 /**

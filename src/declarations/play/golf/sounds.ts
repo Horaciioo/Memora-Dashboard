@@ -53,14 +53,3 @@ export const GOLF_POWER_SOUNDS: Partial<Record<GolfPowerName, GolfSoundName>> = 
   fart: 'fart',
   ice: 'ice',
 }
-
-/**
- * Sound levels, zero to one
- * @type {Object}
- */
-
-export const GOLF_MIX = {
-  // Starting master volume
-  volume: 0.8,
-  volumeStep: 0.05,
-}

@@ -23,14 +23,14 @@ export interface PlayLobbyCard {
   hostName: string | null
   hostAvatarUrl: string | null
   players: number
+  faces: { id: string; name: string; avatarUrl: string | null }[]
+  status: string
   maxPlayers: number
   gamesCount: number | null
 }
 
 export interface PlayLobbyListProps {
   lobbies: PlayLobbyCard[]
-  // Running games are watched, not joined
-  isRunning?: boolean
   isLocked: boolean
   empty: string
   // Game the reader sits in, listed first like in the feed
@@ -38,18 +38,12 @@ export interface PlayLobbyListProps {
 }
 
 /**
- * Open or running tables
+ * Open tables
  * @param {PlayLobbyListProps} props - Tables
  * @return {JSX.Element}
  */
 
-export const PlayLobbyList = ({
-  lobbies,
-  isRunning,
-  isLocked,
-  empty,
-  presence,
-}: PlayLobbyListProps) => {
+export const PlayLobbyList = ({ lobbies, isLocked, empty, presence }: PlayLobbyListProps) => {
   const router = useRouter()
   const moves = usePlayMoves()
 
@@ -101,20 +95,14 @@ export const PlayLobbyList = ({
                 ` - ${fillPlayMessage(PLAY_HUB_COPY.tournament, { games: lobby.gamesCount })}`}
             </span>
           </div>
-          {isRunning ? (
-            <Button variant="arcadeGhost" onClick={() => router.push(ROUTES.playSession(lobby.id))}>
-              {PLAY_HUB_COPY.watch}
-            </Button>
-          ) : (
-            <Button
-              variant="arcade"
-              disabled={isLocked || lobby.players >= lobby.maxPlayers}
-              isLoading={moves.isSaving}
-              onClick={() => void moves.join(lobby.id)}
-            >
-              {PLAY_HUB_COPY.join}
-            </Button>
-          )}
+          <Button
+            variant="arcade"
+            disabled={isLocked || lobby.players >= lobby.maxPlayers}
+            isLoading={moves.isSaving}
+            onClick={() => void moves.join(lobby.id)}
+          >
+            {PLAY_HUB_COPY.join}
+          </Button>
         </div>
       ))}
     </div>

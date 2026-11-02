@@ -30,7 +30,6 @@ export const PLAY_HUB_COPY = {
   create: 'Créer une partie',
   // Hub menu
   menuLobbies: 'Rejoindre une partie',
-  menuRunning: 'Regarder une partie',
   menuLeaders: 'Classement',
   menuStats: 'Voir mes stats',
   soon: 'Bientôt',
@@ -39,7 +38,14 @@ export const PLAY_HUB_COPY = {
   resume: 'Reprendre',
   current: 'Tu es dans une partie de {game}',
   noLobby: 'Aucune partie ouverte, crée la tienne.',
-  noRunning: 'Aucune partie en cours.',
+  // Tables being played
+  liveTitle: 'En ce moment',
+  liveEmpty: 'Personne ne joue pour l’instant. Lance la première partie !',
+  inGameTitle: 'En jeu',
+  inGameEmpty: 'Personne ne joue à ce jeu pour l’instant.',
+  liveWaiting: 'Salle d’attente',
+  liveRunning: 'Partie en cours',
+  liveMine: 'Ta partie',
   noLeader: 'Personne n’a encore joué, prends la première place.',
   banned: 'L’Administration t’a retiré l’accès à Play.',
   // Player card
@@ -140,6 +146,11 @@ export const PLAY_HUB_COPY = {
   chatEmpty: 'Personne n’a encore écrit, lance la discussion.',
   chatPlaceholder: 'Écrire dans la partie',
   chatInvite: 'Inviter',
+  // Tabs of the chat box
+  chatTabFeed: 'Feed',
+  chatTabChat: 'Chat',
+  chatTabAll: 'Tout',
+  chatTabs: 'Afficher',
   // Rail invitation
   noticeTitle: 'Memora Play débarque !',
   noticeLead: 'On se fait une petite partie ?',

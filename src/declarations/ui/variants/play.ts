@@ -107,14 +107,15 @@ export const PLAY_HUB = {
   // Game hub, centred and fitted to the room: logo | divider | actions, never scrolling
   page: 'relative flex min-h-0 flex-1 flex-col',
   hub: 'relative flex min-h-0 flex-1 items-center justify-center max-sm:overflow-y-auto',
-  hubSplit: 'flex flex-col items-center gap-8 sm:flex-row sm:gap-20',
+  hubSplit: 'flex flex-col items-center gap-8 lg:flex-row lg:gap-14 xl:gap-20',
+  hubLive: 'w-full max-w-sm shrink-0 lg:max-h-[min(34rem,calc(100dvh-14rem))] lg:w-80',
   hubIdentity: 'flex flex-col items-center gap-4 text-center',
   hubLogo: 'size-40 sm:size-52',
   hubLogoLarge: 'size-44 sm:size-72',
   srOnly: 'sr-only',
   hubName: 'text-3xl font-extrabold tracking-tight text-[var(--play-ink)]',
   hubTagline: 'max-w-64 text-sm text-[var(--play-ink-soft)]',
-  hubDivider: 'h-px w-48 rounded-full bg-[var(--play-ink-faint)] sm:h-80 sm:w-px',
+  hubDivider: 'h-px w-48 shrink-0 rounded-full bg-[var(--play-ink-faint)] lg:h-80 lg:w-px',
   hubMenu: 'flex w-full max-w-sm flex-col gap-6',
   // Buttons of one family, the families spaced apart
   hubGroup: 'flex flex-col gap-3',
@@ -193,7 +194,8 @@ export const PLAY_STATS = {
   playerFrame: '@container',
   section: 'flex flex-col gap-3',
   heading: HEADING,
-  player: `${PANEL} ${LIFT} flex flex-col items-center gap-6 rounded-[2rem] p-6 text-center @md:flex-row @md:text-left sm:p-8`,
+  // Banner of the player, a soft sweep of the key behind
+  player: `${PANEL} ${LIFT} relative flex flex-col items-center gap-6 overflow-hidden rounded-[2rem] bg-[linear-gradient(110deg,color-mix(in_srgb,var(--play-key)_22%,var(--play-panel-strong))_0%,var(--play-panel-strong)_55%)] p-6 text-center @md:flex-row @md:text-left sm:p-8`,
   face: 'relative flex shrink-0',
   faceLevel:
     'absolute -right-1 -bottom-1 flex h-9 min-w-9 items-center justify-center rounded-full bg-[var(--play-gold)] px-1.5 text-sm font-extrabold tabular-nums text-[var(--play-night)] ring-4 ring-[var(--play-panel-strong)]',
@@ -206,18 +208,21 @@ export const PLAY_STATS = {
   barThin: 'block h-2 w-full overflow-hidden rounded-full bg-[var(--play-track)]',
   barFill: 'block h-full rounded-full bg-[var(--play-gold)]',
   caption: NOTE,
-  tiles: 'grid grid-cols-2 gap-3 sm:grid-cols-3',
-  tile: `${PANEL} flex items-center gap-4 p-4`,
+  // One board split in cells, no loose cards
+  tiles: `${LIFT} grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-[var(--play-line)] ring-1 ring-[var(--play-line)] sm:grid-cols-3`,
+  tile: 'flex flex-col gap-3 bg-[var(--play-panel-strong)] p-5',
   tileIcon:
-    'grid size-12 shrink-0 place-items-center rounded-xl bg-[var(--play-chip)] text-[var(--play-gold-ink)]',
+    'grid size-10 shrink-0 place-items-center rounded-xl bg-[color-mix(in_srgb,var(--tile)_16%,transparent)] text-[var(--tile)]',
   tileText: 'flex min-w-0 flex-col gap-0.5',
-  tileValue: 'text-2xl font-extrabold tabular-nums',
+  tileValue: 'text-3xl font-extrabold tracking-tight tabular-nums',
   tileLabel: 'text-xs font-bold tracking-wide text-[var(--play-ink-faint)] uppercase',
-  games: 'grid gap-3 sm:grid-cols-2',
-  // Panel tinted by its game
-  game: 'flex items-center gap-4 rounded-2xl bg-[color-mix(in_srgb,var(--game)_26%,var(--play-panel))] p-4 ring-1 ring-[var(--play-line)] backdrop-blur-xl',
-  gameLogo: 'size-14',
-  gameText: 'flex min-w-0 flex-1 flex-col gap-1.5',
+  games: 'grid gap-4 sm:grid-cols-2 xl:grid-cols-4',
+  // Card topped by a band in its game colour
+  game: `${LIFT} flex flex-col overflow-hidden rounded-2xl bg-[var(--play-panel-strong)] ring-1 ring-[var(--play-line)]`,
+  gameBand:
+    'flex h-24 items-center justify-center bg-[linear-gradient(135deg,var(--game),color-mix(in_srgb,var(--game)_60%,black))]',
+  gameLogo: 'size-16 drop-shadow-[0_4px_0_rgb(0_0_0/0.2)]',
+  gameText: 'flex min-w-0 flex-1 flex-col gap-2 p-4',
   gameHead: 'flex items-baseline justify-between gap-2',
   gameName: 'truncate text-lg font-extrabold',
   gameLevel: 'text-sm font-extrabold tabular-nums text-[var(--play-accent)]',
@@ -298,12 +303,16 @@ export const PLAY_NOTICE = {
  */
 
 export const PLAY_CROSS = {
-  stage: 'flex min-h-[calc(100dvh-11rem)] flex-col items-center justify-center gap-8',
+  // Games left, the live column right
+  stage:
+    'mx-auto grid w-full max-w-[96rem] items-start gap-8 pb-28 lg:min-h-[calc(100dvh-11rem)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-center xl:grid-cols-[minmax(0,1fr)_27rem]',
+  games: 'flex min-w-0 flex-col items-center gap-6',
   heading: `${HEADING} text-center sm:text-3xl`,
-  // Posters as tall as the screen leaves room for
+  // Two by two, posters as tall as the screen leaves room for
   cross:
-    'mx-auto grid w-full gap-5 sm:grid-cols-2 lg:max-w-[min(100%,calc((100dvh-19rem)*3/4*4+4.5rem))] lg:grid-cols-4 lg:gap-6',
-  card: '',
+    'grid w-full gap-5 sm:grid-cols-2 lg:mx-auto lg:max-w-[min(100%,calc((100dvh-16rem)/2*3/4*2+1.25rem))]',
+  card: 'min-h-0! aspect-[4/3]! lg:aspect-[3/4]!',
+  live: 'lg:max-h-[calc(100dvh-11rem)]',
 } as const
 
 // Bubble opened by the dock
@@ -387,6 +396,18 @@ export const PLAY_CHAT_UI = {
   panelSide: `${PANEL} ${LIFT} flex min-h-0 flex-1 flex-col overflow-hidden max-lg:h-[28rem] lg:rounded-r-none`,
   head: 'flex items-center justify-between gap-3 border-b border-[var(--play-line)] px-4 py-3',
   title: 'text-sm font-extrabold tracking-wide uppercase',
+  // Feed, Chat, Tout as one segmented key
+  tabs: 'flex flex-1 items-center gap-1 rounded-xl bg-[var(--play-chip)] p-1',
+  tab: 'flex-1 rounded-lg px-2 py-1.5 text-xs font-extrabold tracking-wide text-[var(--play-ink-soft)] uppercase transition-colors hover:text-[var(--play-ink)]',
+  tabOn: 'bg-[var(--play-panel-strong)] text-[var(--play-ink)] shadow-[var(--shadow-sm)]',
+  // Who is there, one compact row
+  people: 'flex items-center gap-3 border-b border-[var(--play-line)] px-4 py-2.5',
+  peopleGroup: 'flex min-w-0 items-center gap-2',
+  peopleLabel:
+    'text-[0.65rem] font-extrabold tracking-widest text-[var(--play-ink-faint)] uppercase',
+  peopleStack: 'flex min-w-0 items-center -space-x-2',
+  peopleFace: 'rounded-full ring-2 ring-[var(--play-ring)]',
+  peopleSplit: 'h-5 w-px shrink-0 bg-[var(--play-line)]',
   list: 'flex flex-1 flex-col overflow-y-auto px-2 py-3',
   empty: 'm-auto px-6 text-center text-sm italic text-[var(--play-ink-faint)]',
   message: 'flex gap-3 rounded-lg px-2 pt-2 pb-0.5 hover:bg-[var(--play-chip)]',
@@ -399,7 +420,11 @@ export const PLAY_CHAT_UI = {
   author: 'truncate text-sm font-extrabold',
   time: 'text-[0.7rem] font-semibold tabular-nums text-[var(--play-ink-faint)]',
   text: 'text-sm break-words whitespace-pre-wrap text-[var(--play-ink)]',
-  composer: 'border-t border-[var(--play-line)] p-3',
+  composer: 'flex items-end gap-2 border-t border-[var(--play-line)] p-3',
+  invite:
+    'grid size-11 shrink-0 place-items-center rounded-xl bg-[var(--play-chip)] text-[var(--play-ink-soft)] transition-colors hover:bg-[var(--play-key)] hover:text-[var(--play-key-ink)]',
+  inviteOn: 'bg-[var(--play-key)] text-[var(--play-key-ink)]',
+  inviteIcon: 'size-5',
   input:
     'block max-h-32 min-h-11 w-full resize-none rounded-xl bg-[var(--play-chip)] px-3 py-2.5 text-sm text-[var(--play-ink)] placeholder:text-[var(--play-ink-faint)] focus:outline-none',
 } as const
@@ -413,6 +438,7 @@ export const PLAY_INVITE = {
   anchor: 'relative',
   panel: `${BUBBLE} absolute top-full left-0 z-30 mt-2 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-3 p-3 text-[var(--play-ink)]`,
   panelEnd: 'right-0 left-auto',
+  panelAbove: 'top-auto bottom-full mt-0 mb-2',
   // Opens in the seats grid, never clipped
   anchorInline: 'contents',
   panelInline: `${PANEL} relative col-span-full mx-auto mt-2 flex w-full max-w-md flex-col gap-3 p-3 text-[var(--play-ink)]`,
@@ -449,10 +475,13 @@ export const BAC_BOARD = {
   clockLow: 'text-[var(--color-danger)]',
   // Countdown in place of the board, no veil behind
   inline: 'grid min-h-[50vh] place-items-center',
-  // Countdown, a big blue 3D figure in the middle of the page over a blurred room
-  overlay: 'fixed inset-0 z-30 grid place-items-center bg-[var(--play-night)]/45 backdrop-blur-xl',
-  stage: 'flex flex-col items-center justify-center gap-6 text-center',
-  stageLead: 'text-sm font-extrabold tracking-[0.3em] text-[var(--play-ink-soft)] uppercase',
+  // Countdown over the whole screen, chat and keys included, the veil fading in
+  overlay: 'play-count fixed inset-0 z-[60] grid place-items-center',
+  stage: 'relative flex flex-col items-center justify-center gap-6 text-center',
+  // Glow ring pulsing behind each number
+  halo: 'play-halo pointer-events-none absolute top-1/2 left-1/2 size-[min(70vw,24rem)] -translate-x-1/2 -translate-y-1/2 rounded-full',
+  stageLead:
+    'relative rounded-full bg-[rgb(0_0_0/0.35)] px-5 py-2 text-sm font-extrabold tracking-[0.3em] text-white uppercase',
   figure:
     'play-figure play-figure-blue text-[11rem] leading-none font-black tabular-nums sm:text-[14rem]',
   // Someone called stop: their face, then the word, in place of the clock
@@ -593,9 +622,14 @@ export const BAC_SESSION = {
   pageOpen: 'lg:pr-[calc(var(--play-side-open)+1.5rem)]',
   pageFolded: 'lg:pr-[calc(var(--play-side-folded)+1.5rem)]',
   // Table alone on the screen, the side column slides over it from the right
-  pageFull: 'play-room fixed inset-0 z-50 overflow-hidden p-0',
+  pageFull: 'play-room fixed inset-0 z-50 overflow-hidden p-0!',
   main: 'flex min-w-0 flex-col gap-4',
   mainFull: 'h-full gap-0',
+  // Empty marker carrying the game ground into the full screen room
+  groundMark: 'hidden',
+  // Chat open beside the table, never over it on wide screens
+  mainBeside:
+    'transition-[padding] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] lg:pr-[min(var(--play-side-open),100vw)] motion-reduce:transition-none',
   // Way out on the left, game identity on the right
   top: 'flex items-center justify-between gap-3',
   exits: 'flex flex-wrap items-center gap-2',
@@ -612,18 +646,30 @@ export const BAC_SESSION = {
   // Stage keys: in the top bar, then floating over the table, shifted by the open chat
   keys: 'flex items-center gap-2',
   keysFull:
-    'fixed top-3 right-3 z-50 transition-[right] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
-  keysShifted: 'right-[calc(min(var(--play-side-open),100vw)+0.75rem)]',
+    'fixed top-8 right-8 z-50 sm:top-10 sm:right-10 transition-[right] duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  // Inside the table's top corner, left of the open chat
+  keysShifted:
+    'right-[calc(min(var(--play-side-open),100vw)+2rem)] sm:right-[calc(min(var(--play-side-open),100vw)+2.5rem)]',
   keysIcon: 'size-5',
   keyButton: 'px-3! py-2!',
+  // Sound card hanging under the sound key
+  keyHolder: 'relative',
+  volumeCard:
+    'absolute top-full right-0 z-10 mt-2 flex w-64 flex-col gap-1 rounded-[var(--radius-md)] bg-[var(--play-panel,var(--color-surface))] p-3 shadow-lg ring-1 ring-[var(--play-line,var(--color-border))]',
   box: `${PANEL} ${LIFT} flex flex-col gap-5 p-5 sm:p-6`,
   // Column flush against the right edge, under the shell bar
   side: 'mt-4 flex min-w-0 flex-col gap-3 lg:fixed lg:top-[var(--play-bar-h)] lg:right-0 lg:bottom-0 lg:z-40 lg:mt-0 lg:pb-28',
   sideOpen: 'lg:w-[var(--play-side-open)]',
+  // Level with the table, its height and no dock room
+  sideSpan: 'lg:pb-0!',
   sideFolded: 'lg:w-[var(--play-side-folded)]',
   // Full screen: flush right over the table, slides in and out
   sideFull:
-    'fixed top-0 right-0 bottom-0 z-40 mt-0 w-[min(var(--play-side-open),100vw)] pb-6 transition-transform duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+    'fixed right-0 z-40 mt-0 w-[min(var(--play-side-open),100vw)]! transition-transform duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-out)] motion-reduce:transition-none',
+  // Same top and foot as the padded table
+  sideFullPad: 'top-4! bottom-4! pb-0! sm:top-6! sm:bottom-6!',
+  // Golf course edge to edge, the column too
+  sideFullBleed: 'top-0! bottom-0! pb-6!',
   sideShown: 'translate-x-0',
   sideHidden: 'pointer-events-none translate-x-full',
   // Crowd window: players, then spectators when there are some
@@ -768,4 +814,19 @@ export const PLAY_FEED_VERBS: Record<string, string> = {
   SKIP: 'text-[var(--play-blue-ink)]',
   PENALTY: 'text-[var(--play-heart)]',
   FINISH: 'text-[var(--play-gold-ink)]',
+}
+
+/**
+ * Volume slider of a game or of the settings
+ * @type {Record<string, string>}
+ */
+
+export const PLAY_VOLUME_UI = {
+  row: 'flex items-center gap-3',
+  mute: 'shrink-0 text-[var(--play-ink,var(--color-ink))]',
+  icon: 'size-5',
+  slider: 'min-w-0 flex-1 cursor-pointer accent-[var(--play-accent,var(--color-ink-accent))]',
+  follow:
+    'self-start px-1 text-xs font-bold text-[var(--play-ink-soft,var(--color-ink-subtle))] underline underline-offset-2',
+  followed: 'px-1 text-xs text-[var(--play-ink-soft,var(--color-ink-subtle))]',
 }

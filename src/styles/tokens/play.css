@@ -254,4 +254,14 @@
   --play-medal-first: #ffcf4a;
   --play-medal-second: #c7d0dc;
   --play-medal-third: #d08a52;
+  /* Cartoon sky of the room */
+  --play-sky-top: #6ec3ff;
+  --play-sky-mid: #b5e2ff;
+  --play-sky-low: #ffe1ec;
+  --play-sky-peach: #ffc4d8;
+  --play-sky-confetti-a: #ffcf4a;
+  --play-sky-confetti-b: #ff7ab0;
+  --play-sky-confetti-c: #5fd38a;
+  /* Live tables */
+  --play-live: #ff4f7b;
 }

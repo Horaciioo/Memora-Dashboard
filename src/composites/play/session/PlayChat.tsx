@@ -1,28 +1,26 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import type { KeyboardEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { KeyboardEvent, ReactNode } from 'react'
 
-import { Avatar } from '@/components/elements/display/Avatar'
-import { Button } from '@/components/elements/actions/Button'
+import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlayInviteAnchor } from '@/composites/play/session/PlayInviteAnchor'
+import { PlayFeedRow } from '@/composites/play/session/PlaySessionFeed'
+import { PlayFeedBridge } from '@/composites/play/session/chat/feedBridge'
+import type { PlayFeedSource } from '@/composites/play/session/chat/feedBridge'
+import { PlayChatLine } from '@/composites/play/session/chat/PlayChatLine'
+import { PlayChatPeople } from '@/composites/play/session/chat/PlayChatPeople'
 import { usePlayChatLines } from '@/core/hooks/data/play/usePlayChatLines'
 import { useMutation } from '@/core/hooks/data/system/useMutation'
 import { usePlayPeopleMenu } from '@/core/hooks/interaction/state/usePlayPeopleMenu'
 import type { PlayPeopleTable } from '@/core/hooks/interaction/state/usePlayPeopleMenu'
 import { apiPost } from '@/core/lib/api/client'
 import { API_ROUTES } from '@/core/lib/api/routes'
-import { BAC_SESSION_COPY, PLAY_CHAT, PLAY_CHAT_EVENTS, PLAY_HUB_COPY } from '@/declarations/play'
+import { BAC_SESSION_COPY, PLAY_CHAT, PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
-import { BAC_SESSION, PLAY_CHAT_UI, PLAY_CHAT_VERBS } from '@/declarations/ui/variants'
+import { BAC_SESSION, PLAY_CHAT_UI } from '@/declarations/ui/variants'
 import type { PlayCandidate, PlayMessageView } from '@/types/play'
-import { PlayMessageKinds } from '@/utils/constants/play'
 import { cn } from '@/utils/classnames'
-import { MINUTE_MS } from '@/utils/constants/time'
-import { formatClock } from '@/utils/format/modview'
-
-// Lines from one author within this gap share a header
-const GROUP_GAP_MS = 5 * MINUTE_MS
 
 /**
  * Seat the right-click menu reads
@@ -47,24 +45,32 @@ export interface PlayChatProps {
   invite: { candidates: PlayCandidate[]; canSeat: boolean } | null
   // Session page folds it away
   onFold?: () => void
+  // Players and spectators drawn under the tabs
+  crowd?: { players: PlayFace[]; spectators: PlayFace[] }
+  // Game feed, mixed in by the tabs
+  feed?: ReactNode
 }
 
+// Tabs of a box with a feed
+const TABS = [
+  { key: 'feed', label: PLAY_HUB_COPY.chatTabFeed },
+  { key: 'chat', label: PLAY_HUB_COPY.chatTabChat },
+  { key: 'all', label: PLAY_HUB_COPY.chatTabAll },
+] as const
+
+type PlayChatTab = (typeof TABS)[number]['key']
+
 /**
- * Same author shortly after, drawn without header
- * @param {PlayMessageView} message - Line
- * @param {PlayMessageView} [previous] - Line before
- * @return {boolean} - Follows
+ * Chat line or feed line, on one clock
+ * @typedef {Object} PlayChatItem
  */
 
-const follows = (message: PlayMessageView, previous?: PlayMessageView): boolean =>
-  Boolean(previous) &&
-  previous?.kind === PlayMessageKinds.Text &&
-  message.kind === PlayMessageKinds.Text &&
-  previous?.author.id === message.author.id &&
-  Date.parse(message.createdAt) - Date.parse(previous.createdAt) < GROUP_GAP_MS
+type PlayChatItem =
+  | { id: string; at: number; message: PlayMessageView }
+  | { id: string; at: number; entry: PlayFeedSource['feed'][number] }
 
 /**
- * Discord-like chat of a game, plain text only
+ * Discord-like chat of a game, its feed and its crowd in the same box
  * @param {PlayChatProps} props - Game, lines and invite rights
  * @return {JSX.Element}
  */
@@ -77,14 +83,47 @@ export const PlayChat = ({
   isSide,
   invite,
   onFold,
+  crowd,
+  feed,
 }: PlayChatProps) => {
   const { lines: messages, add } = usePlayChatLines(sessionId, rendered)
   const { run } = useMutation()
   const isSending = useRef(false)
   const [draft, setDraft] = useState('')
-  const list = useRef<HTMLDivElement>(null)
+  const [tab, setTab] = useState<PlayChatTab>('all')
+  const [source, setSource] = useState<PlayFeedSource | null>(null)
+  const list = useRef<HTMLUListElement>(null)
   const FoldIcon = ICONS.playFold
+  const AddIcon = ICONS.playAdd
   const menuOf = usePlayPeopleMenu({ ...table, sessionId })
+  const hasFeed = Boolean(feed)
+  const shown = hasFeed ? tab : 'chat'
+
+  // Same lines twice keep the box still
+  const publish = useCallback(
+    (next: PlayFeedSource) =>
+      setSource((current) =>
+        current?.feed === next.feed && current.players === next.players ? current : next
+      ),
+    []
+  )
+
+  const items = useMemo<PlayChatItem[]>(() => {
+    const said =
+      shown === 'feed'
+        ? []
+        : messages.map((message) => ({
+            id: message.id,
+            at: Date.parse(message.createdAt),
+            message,
+          }))
+    const told =
+      shown === 'chat' || !source
+        ? []
+        : source.feed.map((entry) => ({ id: entry.id, at: new Date(entry.at).getTime(), entry }))
+
+    return [...said, ...told].sort((left, right) => left.at - right.at)
+  }, [shown, messages, source])
 
   // Menu of a name, from its seat
   const menuOn = (author: PlayMessageView['author']) => {
@@ -104,7 +143,7 @@ export const PlayChat = ({
   // Newest line stays in view
   useEffect(() => {
     list.current?.scrollTo({ top: list.current.scrollHeight })
-  }, [messages.length])
+  }, [items.length])
 
   const send = async () => {
     const body = draft.trim()
@@ -129,95 +168,104 @@ export const PlayChat = ({
   return (
     <aside className={isSide ? PLAY_CHAT_UI.panelSide : PLAY_CHAT_UI.panel}>
       <header className={PLAY_CHAT_UI.head}>
-        <h2 className={PLAY_CHAT_UI.title}>{PLAY_HUB_COPY.chatTitle}</h2>
-        <div className={PLAY_CHAT_UI.headActions}>
+        {hasFeed ? (
+          <div className={PLAY_CHAT_UI.tabs} role="tablist" aria-label={PLAY_HUB_COPY.chatTabs}>
+            {TABS.map((entry) => (
+              <button
+                key={entry.key}
+                type="button"
+                role="tab"
+                aria-selected={tab === entry.key}
+                className={cn(PLAY_CHAT_UI.tab, tab === entry.key && PLAY_CHAT_UI.tabOn)}
+                onClick={() => setTab(entry.key)}
+              >
+                {entry.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <h2 className={PLAY_CHAT_UI.title}>{PLAY_HUB_COPY.chatTitle}</h2>
+        )}
+        {onFold && (
+          <button
+            type="button"
+            className={BAC_SESSION.fold}
+            aria-label={BAC_SESSION_COPY.foldSide}
+            onClick={onFold}
+          >
+            <FoldIcon className={BAC_SESSION.foldIcon} aria-hidden="true" />
+          </button>
+        )}
+      </header>
+
+      {crowd && <PlayChatPeople {...crowd} />}
+      {/* Feeds hand their lines up and draw nothing */}
+      {feed && <PlayFeedBridge.Provider value={publish}>{feed}</PlayFeedBridge.Provider>}
+
+      <ul ref={list} className={PLAY_CHAT_UI.list}>
+        {items.length === 0 && (
+          <li className={PLAY_CHAT_UI.empty}>
+            {shown === 'feed' ? BAC_SESSION_COPY.feedEmpty : PLAY_HUB_COPY.chatEmpty}
+          </li>
+        )}
+        {items.map((item, index) => {
+          if ('entry' in item) {
+            return (
+              <PlayFeedRow
+                key={item.id}
+                entry={item.entry}
+                copy={source?.copy ?? {}}
+                players={source?.players ?? []}
+              />
+            )
+          }
+          const before = items[index - 1]
+
+          return (
+            <li key={item.id}>
+              <PlayChatLine
+                message={item.message}
+                previous={before && 'message' in before ? before.message : undefined}
+                onMenu={menuOn(item.message.author)}
+              />
+            </li>
+          )
+        })}
+      </ul>
+
+      {shown !== 'feed' && (
+        <div className={PLAY_CHAT_UI.composer}>
           {invite && (
             <PlayInviteAnchor
               sessionId={sessionId}
               {...invite}
-              alignEnd
-              trigger={(toggle) => (
-                <Button variant="arcade" onClick={toggle}>
-                  {PLAY_HUB_COPY.chatInvite}
-                </Button>
+              above
+              trigger={(toggle, isOpen) => (
+                <button
+                  type="button"
+                  className={cn(PLAY_CHAT_UI.invite, isOpen && PLAY_CHAT_UI.inviteOn)}
+                  aria-label={PLAY_HUB_COPY.chatInvite}
+                  title={PLAY_HUB_COPY.chatInvite}
+                  aria-expanded={isOpen}
+                  onClick={toggle}
+                >
+                  <AddIcon className={PLAY_CHAT_UI.inviteIcon} aria-hidden="true" />
+                </button>
               )}
             />
           )}
-          {onFold && (
-            <button
-              type="button"
-              className={BAC_SESSION.fold}
-              aria-label={BAC_SESSION_COPY.foldSide}
-              onClick={onFold}
-            >
-              <FoldIcon className={BAC_SESSION.foldIcon} aria-hidden="true" />
-            </button>
-          )}
+          <textarea
+            rows={1}
+            value={draft}
+            maxLength={PLAY_CHAT.maxLength}
+            placeholder={PLAY_HUB_COPY.chatPlaceholder}
+            aria-label={PLAY_HUB_COPY.chatPlaceholder}
+            className={PLAY_CHAT_UI.input}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={onKeyDown}
+          />
         </div>
-      </header>
-
-      <div ref={list} className={PLAY_CHAT_UI.list}>
-        {messages.length === 0 && <p className={PLAY_CHAT_UI.empty}>{PLAY_HUB_COPY.chatEmpty}</p>}
-        {messages.map((message, index) => {
-          // Table event: who, and what happened
-          if (message.kind !== PlayMessageKinds.Text) {
-            return (
-              <div
-                key={message.id}
-                className={PLAY_CHAT_UI.event}
-                onContextMenu={menuOn(message.author)}
-              >
-                <Avatar name={message.author.name} src={message.author.avatarUrl} size="xs" />
-                <span>
-                  <span className={PLAY_CHAT_UI.eventName}>{message.author.name}</span>{' '}
-                  <span className={cn(PLAY_CHAT_UI.eventVerb, PLAY_CHAT_VERBS[message.kind])}>
-                    {PLAY_CHAT_EVENTS[message.kind].verb}
-                  </span>{' '}
-                  {PLAY_CHAT_EVENTS[message.kind].rest}
-                </span>
-              </div>
-            )
-          }
-
-          return follows(message, messages[index - 1]) ? (
-            <p
-              key={message.id}
-              className={cn(PLAY_CHAT_UI.follow, PLAY_CHAT_UI.text)}
-              onContextMenu={menuOn(message.author)}
-            >
-              {message.body}
-            </p>
-          ) : (
-            <div
-              key={message.id}
-              className={PLAY_CHAT_UI.message}
-              onContextMenu={menuOn(message.author)}
-            >
-              <Avatar name={message.author.name} src={message.author.avatarUrl} size="xs" />
-              <div className={PLAY_CHAT_UI.body}>
-                <span className={PLAY_CHAT_UI.meta}>
-                  <span className={PLAY_CHAT_UI.author}>{message.author.name}</span>
-                  <span className={PLAY_CHAT_UI.time}>{formatClock(message.createdAt)}</span>
-                </span>
-                <p className={PLAY_CHAT_UI.text}>{message.body}</p>
-              </div>
-            </div>
-          )
-        })}
-      </div>
-
-      <div className={PLAY_CHAT_UI.composer}>
-        <textarea
-          rows={1}
-          value={draft}
-          maxLength={PLAY_CHAT.maxLength}
-          placeholder={PLAY_HUB_COPY.chatPlaceholder}
-          aria-label={PLAY_HUB_COPY.chatPlaceholder}
-          className={PLAY_CHAT_UI.input}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={onKeyDown}
-        />
-      </div>
+      )}
     </aside>
   )
 }

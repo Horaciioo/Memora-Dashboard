@@ -1,12 +1,11 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/elements/actions/Button'
 import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
-import { BacSessionCrowd } from '@/composites/play/session/BacSessionCrowd'
 import type { PlayFace } from '@/composites/play/session/BacSessionCrowd'
 import { PlayStageKeys } from '@/composites/play/session/PlayStageKeys'
 import { PlayChat } from '@/composites/play/session/PlayChat'
@@ -15,10 +14,11 @@ import { PlayReplay } from '@/composites/play/session/PlayReplay'
 import type { PlayReplayState } from '@/composites/play/session/PlayReplay'
 import { usePlayCrowd } from '@/core/hooks/data/play/usePlayCrowd'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
+import { useBoxSpan } from '@/core/hooks/interaction/layout/useBoxSpan'
 import { usePlayFullscreen } from '@/core/hooks/interaction/state/usePlayFullscreen'
 import { usePlayStageStore } from '@/core/store/playStage'
 import { ROUTES } from '@/declarations/navigation'
-import { BAC_SESSION_COPY, PLAY_HUB_COPY } from '@/declarations/play'
+import { BAC_SESSION_COPY, PLAY_GAMES, PLAY_HUB_COPY } from '@/declarations/play'
 import { ICONS } from '@/declarations/ui/icons'
 import { BAC_SESSION, BUTTON_STYLES, PLAY_ROOM } from '@/declarations/ui/variants'
 import { PlayGames } from '@/utils/constants/play'
@@ -69,16 +69,23 @@ export const PlaySessionRoom = ({
   const LeaveIcon = ICONS.playLeave
   const UnfoldIcon = ICONS.playUnfold
   const rootRef = useRef<HTMLDivElement>(null)
+  const boxRef = useRef<HTMLElement>(null)
   const { isFullscreen, isChatOpen, toggleChat } = usePlayStageStore()
   usePlayFullscreen(rootRef)
+  // Windowed: the column stands level with the table
+  const span = useBoxSpan(boxRef, !isFullscreen)
+  // Every game opens full screen
+  useEffect(() => usePlayStageStore.getState().enter(), [])
   // Full screen: column slides over the table, never folded to a rail
   const isColumn = isFullscreen || isSideOpen
   // Golf keeps its own keys in the course HUD
   const hasKeys = game !== PlayGames.Golf
+  const { ground } = PLAY_GAMES.get(game)
 
   return (
     <div
       ref={rootRef}
+      data-play-stage
       style={{ viewTransitionName: 'play-room' }}
       className={cn(
         BAC_SESSION.page,
@@ -89,7 +96,16 @@ export const PlaySessionRoom = ({
             : BAC_SESSION.pageFolded
       )}
     >
-      <div className={cn(BAC_SESSION.main, isFullscreen && BAC_SESSION.mainFull)}>
+      {/* Full screen is its own room, the game ground marked inside it */}
+      {isFullscreen && ground && (
+        <i className={cn(ground, BAC_SESSION.groundMark)} aria-hidden="true" />
+      )}
+      <div
+        className={cn(
+          BAC_SESSION.main,
+          isFullscreen && [BAC_SESSION.mainFull, isChatOpen && BAC_SESSION.mainBeside]
+        )}
+      >
         <div className={cn(BAC_SESSION.top, isFullscreen && 'hidden')}>
           <div className={BAC_SESSION.exits}>
             <AppLink
@@ -115,7 +131,7 @@ export const PlaySessionRoom = ({
             )}
           </div>
           <div className={BAC_SESSION.identity}>
-            {hasKeys && !isFullscreen && <PlayStageKeys />}
+            {hasKeys && !isFullscreen && <PlayStageKeys game={game} />}
             <div className={BAC_SESSION.titles}>
               <h1 className={BAC_SESSION.title}>{title}</h1>
               <p className={PLAY_ROOM.game}>{gameLabel}</p>
@@ -124,8 +140,9 @@ export const PlaySessionRoom = ({
           </div>
         </div>
 
-        {hasKeys && isFullscreen && <PlayStageKeys />}
+        {hasKeys && isFullscreen && <PlayStageKeys game={game} />}
         <section
+          ref={boxRef}
           className={
             isFullscreen
               ? cn(BAC_SESSION.boxFull, hasKeys && BAC_SESSION.boxFullPad)
@@ -139,23 +156,29 @@ export const PlaySessionRoom = ({
       <aside
         className={cn(
           BAC_SESSION.side,
+          span && BAC_SESSION.sideSpan,
           isFullscreen
-            ? [BAC_SESSION.sideFull, isChatOpen ? BAC_SESSION.sideShown : BAC_SESSION.sideHidden]
+            ? [
+                BAC_SESSION.sideFull,
+                hasKeys ? BAC_SESSION.sideFullPad : BAC_SESSION.sideFullBleed,
+                isChatOpen ? BAC_SESSION.sideShown : BAC_SESSION.sideHidden,
+              ]
             : isSideOpen
               ? BAC_SESSION.sideOpen
               : BAC_SESSION.sideFolded
         )}
+        style={span}
         inert={isFullscreen && !isChatOpen}
       >
         {isColumn ? (
           <>
-            <BacSessionCrowd players={players} spectators={crowd} />
             <PlayChat
               {...chat}
               isSide
+              crowd={{ players, spectators: crowd }}
+              feed={feed}
               onFold={isFullscreen ? toggleChat : () => setSideOpen(false)}
             />
-            {feed}
           </>
         ) : (
           <div className={BAC_SESSION.rail}>

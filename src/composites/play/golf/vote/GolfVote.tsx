@@ -14,6 +14,7 @@ import {
   roundCards,
 } from '@/composites/play/golf/vote/voteCards'
 import { useGolfVote } from '@/composites/play/golf/vote/useGolfVote'
+import { winningCard } from '@/core/lib/play/golf'
 import type { GolfGameSettings, GolfVoteState } from '@/core/lib/play/golf'
 import { fillPlayMessage } from '@/declarations/play/copy'
 import { GOLF_SETUP_COPY } from '@/declarations/play/golf/copy'
@@ -66,9 +67,8 @@ export const GolfVote = ({
   const isHost = viewerId === hostId
   const { picks, leader, pick, close, validate, back } = useGolfVote({
     vote,
-    settings,
+    winner: (picked) => winningCard(vote.step, picked, hostId, settings),
     viewerId,
-    hostId,
     isHost,
     onSend,
   })

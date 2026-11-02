@@ -5,8 +5,10 @@ import { notFound } from 'next/navigation'
 import { PlayGameLogo } from '@/composites/play/brand/PlayGameLogo'
 import { GolfPanorama } from '@/composites/play/golf/panorama/GolfPanorama'
 import { PlayCallouts } from '@/composites/play/hub/PlayCallouts'
+import { PlayConcept } from '@/composites/play/hub/concept/PlayConcept'
 import { PlayHubMenu } from '@/composites/play/hub/PlayHubMenu'
 import { PlayLeaderboard } from '@/composites/play/hub/PlayLeaderboard'
+import { PlayLiveTables } from '@/composites/play/hub/PlayLiveTables'
 import { PlayLobbyList } from '@/composites/play/hub/PlayLobbyList'
 import { PlayEmbers } from '@/composites/play/hub/PlayEmbers'
 import { LudoHopField } from '@/composites/play/ludo/LudoHopField'
@@ -23,6 +25,7 @@ import {
   readPlayProfile,
 } from '@/core/services/play'
 import { requirePermission } from '@/core/wrappers/requireUser'
+import { PLAY_CONCEPT_COPY } from '@/declarations/play/concept'
 import { GOLF_TURF } from '@/declarations/play/golf/copy'
 import { LUDO_FELT } from '@/declarations/play/ludo/copy'
 import {
@@ -101,7 +104,20 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
             <PlayGameLogo game={game} className={PLAY_HUB.hubLogoLarge} />
           </div>
         }
-        titles={{ stats: fillPlayMessage(PLAY_HUB_COPY.hubStatsTitle, { game: meta.label }) }}
+        titles={{
+          stats: fillPlayMessage(PLAY_HUB_COPY.hubStatsTitle, { game: meta.label }),
+          concept: fillPlayMessage(PLAY_CONCEPT_COPY.title, { game: meta.label }),
+        }}
+        live={
+          <PlayLiveTables
+            title={PLAY_HUB_COPY.inGameTitle}
+            empty={PLAY_HUB_COPY.inGameEmpty}
+            tables={tables.running}
+            mineId={presence?.sessionId}
+            isLocked={isLocked}
+            className={PLAY_HUB.hubLive}
+          />
+        }
         panels={{
           lobbies: (
             <PlayLobbyList
@@ -111,14 +127,7 @@ export default async function PlayGamePage({ params }: PlayGamePageProps) {
               empty={PLAY_HUB_COPY.noLobby}
             />
           ),
-          running: (
-            <PlayLobbyList
-              lobbies={tables.running}
-              isRunning
-              isLocked={isLocked}
-              empty={PLAY_HUB_COPY.noRunning}
-            />
-          ),
+          concept: <PlayConcept game={game} />,
           leaders: <PlayLeaderboard leaders={leaders} meId={session.id} />,
           stats: (
             <>

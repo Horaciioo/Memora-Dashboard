@@ -7,9 +7,11 @@ import { DockPreferences } from '@/composites/preferences/DockPreferences'
 import { InstallSection } from '@/composites/preferences/InstallSection'
 import { SettingRow } from '@/composites/preferences/SettingRow'
 import { SettingsGroup } from '@/composites/preferences/SettingsGroup'
+import { PlayVolume } from '@/composites/play/session/PlayVolume'
 import { replayGuides } from '@/app/(dashboard)/parametres/actions'
 import { useComfortStore } from '@/core/store/comfort'
 import { COMFORT_GROUPS } from '@/declarations/preferences/comfort'
+import { PLAY_SOUND_COPY } from '@/declarations/play/sounds'
 import { PREFERENCES_COPY } from '@/declarations/preferences/copy'
 import { SETTINGS_GROUP_COPY } from '@/declarations/preferences/settings'
 import { useNotifications } from '@/managers/infrastructure/Network/NotificationsManager'
@@ -53,6 +55,15 @@ export const PreferencesTab = ({ dock }: PreferencesTabProps) => {
             {SETTINGS_GROUP_COPY.reset}
           </Button>
         </div>
+      </SettingsGroup>
+      <SettingsGroup title={PLAY_SOUND_COPY.title}>
+        <SettingRow
+          icon="golfSound"
+          name={PLAY_SOUND_COPY.name}
+          description={PLAY_SOUND_COPY.description}
+        >
+          <PlayVolume />
+        </SettingRow>
       </SettingsGroup>
       <InstallSection />
       <DockPreferences candidates={dock.candidates} saved={dock.saved} />

@@ -19,6 +19,7 @@ import { BaccalaureatPhases } from '@/core/lib/play/baccalaureat/phase'
 import { BAC_BOARD_COPY, BACCALAUREAT_SETTINGS, fillPlayMessage } from '@/declarations/play'
 import { BAC_BOARD } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
+import { PlayGames } from '@/utils/constants/play'
 
 // Clock turns red under this
 const LOW_SECONDS = 10
@@ -112,6 +113,7 @@ export const BaccalaureatBoard = ({
       <div className={BAC_BOARD.board}>
         {header}
         <PlayCountdown
+          game={PlayGames.Baccalaureat}
           seconds={left ?? 0}
           total={BACCALAUREAT_SETTINGS.countdownSeconds}
           lead={BAC_BOARD_COPY.getReady}

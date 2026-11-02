@@ -77,6 +77,13 @@ export const toLobbyCard = (session: LoadedSession) => {
     hostName: host?.account.displayName ?? null,
     hostAvatarUrl: host?.account.avatarUrl ?? null,
     players: session.seats.filter(isPresent).length,
+    // Faces of the seated players, host first
+    faces: session.seats.filter(isPresent).map(({ account }) => ({
+      id: account.id,
+      name: account.displayName,
+      avatarUrl: account.avatarUrl,
+    })),
+    status: session.status,
     maxPlayers: PLAY_GAMES.get(session.game).maxPlayers,
     gamesCount: session.tournament?.gamesCount ?? null,
     createdAt: session.createdAt,

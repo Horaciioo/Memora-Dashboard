@@ -8,6 +8,7 @@ import AppLink from '@/components/elements/navigation/AppLink'
 import { PlayCreateButton } from '@/composites/play/hub/PlayCreateButton'
 import { ROUTES } from '@/declarations/navigation'
 import { PLAY_HUB_COPY } from '@/declarations/play'
+import { PLAY_CONCEPT_COPY } from '@/declarations/play/concept'
 import { ICONS } from '@/declarations/ui/icons'
 import { BUTTON_STYLES, PLAY_HUB } from '@/declarations/ui/variants'
 import { cn } from '@/utils/classnames'
@@ -16,7 +17,7 @@ import type { PlayGameName } from '@/utils/constants/play'
 // Panels the menu opens: games first, then the player's side
 const GAME_VIEWS = [
   { key: 'lobbies', label: PLAY_HUB_COPY.menuLobbies },
-  { key: 'running', label: PLAY_HUB_COPY.menuRunning },
+  { key: 'concept', label: PLAY_CONCEPT_COPY.menu },
 ] as const
 const PLAYER_VIEWS = [
   { key: 'leaders', label: PLAY_HUB_COPY.menuLeaders },
@@ -35,7 +36,8 @@ export interface PlayHubMenuProps {
   titles?: Partial<Record<PlayHubView, string>>
   // Logo side of the divider
   identity: ReactNode
-  // Who creates games
+  // Players in game, right of the menu
+  live: ReactNode
 }
 
 /**
@@ -51,6 +53,7 @@ export const PlayHubMenu = ({
   panels,
   titles,
   identity,
+  live,
 }: PlayHubMenuProps) => {
   const [view, setView] = useState<PlayHubView | null>(null)
   const CloseIcon = ICONS.playClose
@@ -99,6 +102,8 @@ export const PlayHubMenu = ({
             {PLAY_HUB_COPY.backToMainHub}
           </AppLink>
         </nav>
+        <span className={PLAY_HUB.hubDivider} aria-hidden="true" />
+        {live}
       </div>
 
       {open && view && (

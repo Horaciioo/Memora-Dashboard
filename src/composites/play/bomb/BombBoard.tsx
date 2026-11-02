@@ -12,6 +12,7 @@ import { usePlainBoard } from '@/core/hooks/data/play/usePlainBoard'
 import { useServerNow } from '@/core/hooks/interaction/state/useServerNow'
 import { BOMB_BOARD_COPY, BOMB_SETTINGS, fillPlayMessage } from '@/declarations/play'
 import { BOMB_BOARD } from '@/declarations/ui/variants'
+import { PlayGames } from '@/utils/constants/play'
 
 export interface BombBoardProps {
   sessionId: string
@@ -59,6 +60,7 @@ export const BombBoard = ({
     <div className={BOMB_BOARD.board}>
       {countdown > 0 && (
         <PlayCountdown
+          game={PlayGames.Bomb}
           seconds={countdown}
           total={BOMB_SETTINGS.countdownSeconds}
           figureClassName={BOMB_BOARD.figure}

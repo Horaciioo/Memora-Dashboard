@@ -3,6 +3,8 @@
 import { flushSync } from 'react-dom'
 import { create } from 'zustand'
 
+import { MEDIA } from '@/declarations/ui/responsive'
+
 /**
  * Play stage store, a table taking the whole screen with its chat laid over it
  * @typedef {Object} PlayStageStore
@@ -10,6 +12,7 @@ import { create } from 'zustand'
  * @property {boolean} isChatOpen - Chat column shown while full screen
  * @property {() => void} toggleFullscreen - Enter or leave
  * @property {() => void} toggleChat - Show or hide the chat
+ * @property {() => void} enter - Game starts full screen, the chat beside it on wide screens
  * @property {() => void} leave - Back to the page
  */
 
@@ -51,6 +54,7 @@ interface PlayStageStore {
   isChatOpen: boolean
   toggleFullscreen: () => void
   toggleChat: () => void
+  enter: () => void
   leave: () => void
 }
 
@@ -60,5 +64,6 @@ export const usePlayStageStore = create<PlayStageStore>()((set) => ({
   toggleFullscreen: () =>
     morphStage(() => set((state) => ({ isFullscreen: !state.isFullscreen, isChatOpen: false }))),
   toggleChat: () => set((state) => ({ isChatOpen: !state.isChatOpen })),
+  enter: () => set({ isFullscreen: true, isChatOpen: window.matchMedia(MEDIA.lg).matches }),
   leave: () => set({ isFullscreen: false, isChatOpen: false }),
 }))

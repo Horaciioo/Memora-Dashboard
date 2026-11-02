@@ -22,6 +22,8 @@ export interface PlayInvitePickerProps {
   canSeat: boolean
   onDone: () => void
   alignEnd?: boolean
+  // Opens over its trigger, at the foot of a column
+  above?: boolean
   // Sits in the flow instead of floating
   inline?: boolean
 }
@@ -38,6 +40,7 @@ export const PlayInvitePicker = ({
   canSeat,
   onDone,
   alignEnd,
+  above,
   inline,
 }: PlayInvitePickerProps) => {
   const { isSaving, invite } = usePlayInvites()
@@ -78,7 +81,9 @@ export const PlayInvitePicker = ({
         node.scrollIntoView({ block: 'nearest' })
       }}
       className={
-        inline ? PLAY_INVITE.panelInline : cn(PLAY_INVITE.panel, alignEnd && PLAY_INVITE.panelEnd)
+        inline
+          ? PLAY_INVITE.panelInline
+          : cn(PLAY_INVITE.panel, alignEnd && PLAY_INVITE.panelEnd, above && PLAY_INVITE.panelAbove)
       }
     >
       {inline && <span aria-hidden="true" className={PLAY_INVITE.arrow} />}

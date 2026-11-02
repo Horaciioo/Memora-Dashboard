@@ -1,7 +1,8 @@
 import { playSound, preloadSounds } from '@/core/lib/play/sounds'
-import { usePlaySoundStore } from '@/core/store/playSound'
+import { playLevelOf } from '@/core/store/playSound'
 import { LUDO_SOUNDS, LUDO_TAKES } from '@/declarations/play/ludo/sounds'
 import type { LudoSoundName, LudoTakeName } from '@/declarations/play/ludo/sounds'
+import { PlayGames } from '@/utils/constants/play'
 
 /**
  * Ludo sound at the player's level
@@ -11,8 +12,7 @@ import type { LudoSoundName, LudoTakeName } from '@/declarations/play/ludo/sound
  */
 
 export const playLudoSound = (sound: LudoSoundName, level = 1): void => {
-  const { isMuted, volume } = usePlaySoundStore.getState()
-  if (!isMuted) playSound(LUDO_SOUNDS[sound], volume * level)
+  playSound(LUDO_SOUNDS[sound], playLevelOf(PlayGames.Ludo) * level)
 }
 
 /**
@@ -23,9 +23,8 @@ export const playLudoSound = (sound: LudoSoundName, level = 1): void => {
  */
 
 export const playLudoTake = (take: LudoTakeName, level = 1): void => {
-  const { isMuted, volume } = usePlaySoundStore.getState()
   const files = LUDO_TAKES[take]
-  if (!isMuted) playSound(files[Math.floor(Math.random() * files.length)], volume * level)
+  playSound(files[Math.floor(Math.random() * files.length)], playLevelOf(PlayGames.Ludo) * level)
 }
 
 /**

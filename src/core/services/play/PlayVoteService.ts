@@ -4,25 +4,21 @@ import type { Prisma } from '@prisma/client'
 
 import { prisma } from '@/core/lib/db'
 import { conflict } from '@/core/lib/errors'
-import {
-  golfSettingsOf,
-  golfVoteAt,
-  golfVoteOf,
-  golfVoteOptions,
-  golfVoteSettings,
-  golfVoteSteps,
-  readGolfSettings,
-  winningCard,
-} from '@/core/lib/play/golf'
-import type { GolfVoteState } from '@/core/lib/play/golf'
 import { isPresent } from '@/core/lib/play/session'
 import type { LoadedSession } from '@/core/lib/play/session'
 import { signalPlay } from '@/core/lib/play/signal'
+import { voteAt, voteOf, voteRulesOf } from '@/core/lib/play/vote'
+import type { PlayVoteRules, PlayVoteState } from '@/core/lib/play/vote'
 import { PLAY_ERRORS, PLAY_GAMES } from '@/declarations/play'
-import { GolfVoteActions, GolfVoteSteps } from '@/declarations/play/golf/vote'
+import { GolfVoteActions } from '@/declarations/play/golf/vote'
 import type { GolfVoteAction } from '@/declarations/play/golf/vote'
 import { startSession } from '@/core/services/play/GameService'
-import { lockSession, requireHost, requireSeat } from '@/core/services/play/PlaySessionService'
+import {
+  engineOf,
+  lockSession,
+  requireHost,
+  requireSeat,
+} from '@/core/services/play/PlaySessionService'
 import { PlayStatuses } from '@/utils/constants/play'
 
 // Clock slack between a player's screen and the server
@@ -31,11 +27,11 @@ const CLOCK_SLACK_MS = 1000
 /**
  * Settings with the vote written or removed
  * @param {Prisma.JsonValue} settings - Stored settings
- * @param {GolfVoteState | null} vote - Vote, none to close it
+ * @param {PlayVoteState | null} vote - Vote, none to close it
  * @return {Prisma.InputJsonObject} - Settings to store
  */
 
-const withVote = (settings: Prisma.JsonValue, vote: GolfVoteState | null) => {
+const withVote = (settings: Prisma.JsonValue, vote: PlayVoteState | null) => {
   const next = { ...(settings as Record<string, unknown>) }
   if (vote) next.vote = vote
   else delete next.vote
@@ -52,7 +48,8 @@ interface VoteContext {
   tx: Prisma.TransactionClient
   session: LoadedSession
   accountId: string
-  vote: GolfVoteState | null
+  vote: PlayVoteState | null
+  rules: PlayVoteRules
   raw: Record<string, unknown>
 }
 
@@ -77,14 +74,14 @@ const store = async ({ tx, session }: VoteContext, settings: Prisma.InputJsonObj
  */
 
 const open = async (context: VoteContext): Promise<VoteOutcome> => {
-  const { session, vote, accountId } = context
+  const { session, vote, accountId, rules } = context
   requireHost(session, accountId)
   if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
   if (session.seats.filter(isPresent).length < PLAY_GAMES.get(session.game).minPlayers) {
     throw conflict(PLAY_ERRORS.tooFewPlayers)
   }
   if (!vote)
-    await store(context, withVote(session.settings, golfVoteAt(GolfVoteSteps.Mode, Date.now())))
+    await store(context, withVote(session.settings, voteAt(rules.steps({})[0], Date.now())))
 
   return { isStarting: false }
 }
@@ -96,10 +93,10 @@ const open = async (context: VoteContext): Promise<VoteOutcome> => {
  */
 
 const pick = async (context: VoteContext): Promise<VoteOutcome> => {
-  const { session, vote, accountId, raw } = context
+  const { session, vote, accountId, raw, rules } = context
   requireSeat(session, accountId)
   if (!vote) throw conflict(PLAY_ERRORS.noVote)
-  if (!golfVoteOptions(vote.step).includes(String(raw.key))) {
+  if (!rules.options(vote.step).includes(String(raw.key))) {
     throw conflict(PLAY_ERRORS.invalidSettings)
   }
   const picks = { ...vote.picks, [accountId]: String(raw.key) }
@@ -115,32 +112,32 @@ const pick = async (context: VoteContext): Promise<VoteOutcome> => {
  */
 
 const close = async (context: VoteContext): Promise<VoteOutcome> => {
-  const { session, vote, accountId, raw } = context
+  const { session, vote, accountId, raw, rules } = context
   requireSeat(session, accountId)
   const isStale = !vote || raw.step !== vote.step
   const isOver = vote && Date.now() >= vote.endsAt - CLOCK_SLACK_MS
   if (isStale || !(session.hostId === accountId || isOver)) return { isStarting: false }
 
-  const settings = golfSettingsOf(session.settings)
   const present = new Set(session.seats.filter(isPresent).map((seat) => seat.accountId))
   const picks = Object.fromEntries(
     Object.entries(vote.picks).filter(([voter]) => present.has(voter))
   )
   const chosen = {
     ...vote.chosen,
-    [vote.step]: winningCard(vote.step, picks, session.hostId, settings),
+    [vote.step]: rules.winner(vote.step, picks, session.hostId, session.settings),
   }
-  const steps = golfVoteSteps(chosen.mode)
+  const steps = rules.steps(chosen)
   const next = steps[steps.indexOf(vote.step) + 1]
   if (next) {
-    await store(context, withVote(session.settings, golfVoteAt(next, Date.now(), chosen)))
+    await store(context, withVote(session.settings, voteAt(next, Date.now(), chosen)))
 
     return { isStarting: false }
   }
 
   // Last step: the winners become the rules, the game starts
-  const rules = readGolfSettings(golfVoteSettings(chosen, settings), session.settings)
-  await store(context, withVote(rules as Prisma.JsonValue, null))
+  const asked = rules.settings(chosen, session.settings)
+  const settled = engineOf(session.game).readSettings(asked, session.settings)
+  await store(context, withVote(settled as Prisma.JsonValue, null))
 
   return { isStarting: true }
 }
@@ -167,7 +164,7 @@ const ACTIONS: Record<GolfVoteAction, (context: VoteContext) => Promise<VoteOutc
 }
 
 /**
- * Play one action of the launch vote of a golf lobby
+ * Play one action of the launch vote of a lobby
  * @param {string} sessionId - Game
  * @param {string} accountId - Player
  * @param {Record<string, unknown>} raw - Body with action, key and step
@@ -185,9 +182,11 @@ export const voteInLobby = async (
   const { outcome, hostId } = await prisma.$transaction(async (tx) => {
     const session = await lockSession(tx, sessionId)
     if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
+    const rules = voteRulesOf(session.game)
+    if (!rules) throw conflict(PLAY_ERRORS.noVote)
 
     return {
-      outcome: await action({ tx, session, accountId, raw, vote: golfVoteOf(session.settings) }),
+      outcome: await action({ tx, session, accountId, raw, rules, vote: voteOf(session.settings) }),
       hostId: session.hostId,
     }
   })
