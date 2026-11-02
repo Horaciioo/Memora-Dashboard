@@ -39,7 +39,12 @@ export const LevelMatrix = () => {
 
                 return (
                   <td key={level} className={SHARE_PANEL_STYLES.matrixCell}>
-                    {allowed ? <CheckIcon className={SHARE_PANEL_STYLES.matrixCheck} aria-label={PAGE_CAPABILITY_LABELS[capability].label} /> : null}
+                    {allowed ? (
+                      <CheckIcon
+                        className={SHARE_PANEL_STYLES.matrixCheck}
+                        aria-label={PAGE_CAPABILITY_LABELS[capability].label}
+                      />
+                    ) : null}
                   </td>
                 )
               })}

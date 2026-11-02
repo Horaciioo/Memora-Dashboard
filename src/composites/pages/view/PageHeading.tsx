@@ -47,7 +47,6 @@ export const PageHeading = ({ page }: PageHeadingProps) => {
         onCommit={rename}
         onGlyphCommit={canWrite ? setIcon : undefined}
       />
-
     </div>
   )
 }

@@ -1,13 +1,6 @@
 'use client'
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
 
 import { MenuLayer } from '@/managers/front-end/MenuLayer'
@@ -70,7 +63,12 @@ interface OpenMenu {
  */
 
 interface MenuContextValue {
-  openMenu: (items: MenuItem[], origin: { x: number; y: number }, title?: string, searchable?: boolean) => void
+  openMenu: (
+    items: MenuItem[],
+    origin: { x: number; y: number },
+    title?: string,
+    searchable?: boolean
+  ) => void
   contextMenu: (items: MenuItem[], title?: string) => (event: MouseEvent) => void
   closeMenu: () => void
 }
@@ -105,7 +103,13 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
       const x = Math.min(origin.x, window.innerWidth - ESTIMATED_WIDTH - EDGE_MARGIN)
       const y = Math.min(origin.y, window.innerHeight - height - EDGE_MARGIN)
 
-      setMenu({ items, title, searchable, x: Math.max(EDGE_MARGIN, x), y: Math.max(EDGE_MARGIN, y) })
+      setMenu({
+        items,
+        title,
+        searchable,
+        x: Math.max(EDGE_MARGIN, x),
+        y: Math.max(EDGE_MARGIN, y),
+      })
     },
     []
   )

@@ -15,7 +15,8 @@ export const PLAY_CHAT = {
  */
 
 export const PLAY_CHAT_EVENTS = {
-  JOINED: { verb: 'a rejoint', rest: 'la partie.' },
+  JOINED: { verb: 'est entré', rest: 'dans la partie.' },
   LEFT: { verb: 'a quitté', rest: 'la partie.' },
   KICKED: { verb: 'a été exclu', rest: 'de la partie.' },
+  REQUESTED: { verb: 'a demandé', rest: 'à rejoindre la partie.' },
 } as const

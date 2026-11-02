@@ -42,6 +42,8 @@ export const QUESTIONNAIRE_COPY = {
   show: 'Voir le détail',
   hide: 'Replier',
   partLabel: 'Partie {number}',
+  presenceIntro: 'Sur l’introduction',
+  presenceQuestion: '{part} · « {prompt} »',
   start: 'Mener l’entretien',
   pick: 'Choisir les questions',
   interviewTitle: 'Entretien de {name}',

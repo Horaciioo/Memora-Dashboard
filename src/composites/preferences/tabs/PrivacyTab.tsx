@@ -22,9 +22,6 @@ export const PrivacyTab = ({ state }: PrivacyTabProps) => (
     <SettingsGroup title={PRIVACY_COPY.keepTitle}>
       <TipList items={PRIVACY_COPY.keeps} />
     </SettingsGroup>
-    <PrivacyActions
-      isBusy={state.isSaving}
-      onErase={state.eraseDetails}
-    />
+    <PrivacyActions isBusy={state.isSaving} onErase={state.eraseDetails} />
   </div>
 )

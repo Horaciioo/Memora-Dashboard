@@ -1,5 +1,7 @@
 import type { AnyExtension, Editor } from '@tiptap/core'
 import { Extension } from '@tiptap/core'
+import Collaboration from '@tiptap/extension-collaboration'
+import CollaborationCaret from '@tiptap/extension-collaboration-caret'
 import { Placeholder } from '@tiptap/extensions'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
@@ -7,7 +9,9 @@ import { CalloutView } from '@/composites/pages/editor/nodes/CalloutView'
 import { SubpageView } from '@/composites/pages/editor/nodes/SubpageView'
 import { findBlock, moveBlock } from '@/core/lib/pages/operations'
 import { looksLikeMarkdown, markdownToBlocks } from '@/core/lib/pages/markdownPaste'
-import { Callout, Subpage, pageSchemaExtensions } from '@/core/lib/pages/schema'
+import { Callout, PAGE_DOC_FIELD, Subpage, pageSchemaExtensions } from '@/core/lib/pages/schema'
+import type { SharedDoc } from '@/core/lib/realtime/sharedDoc'
+import { tintColor } from '@/core/lib/realtime/tint'
 import { PAGE_EDITOR_COPY } from '@/declarations/pages/copy'
 
 /**
@@ -33,6 +37,9 @@ export const moveCaretBlock = (editor: Editor, direction: -1 | 1): boolean => {
 
   return false
 }
+
+// Colour variable of a caret
+const CARET_TINT = '--caret-tint'
 
 // Keyboard moves and markdown paste
 const PageKeys = Extension.create({
@@ -66,15 +73,35 @@ export const pasteMarkdown = (editor: Editor, event: ClipboardEvent): boolean =>
   return true
 }
 
+// Empty but laid out, PeerCarets reads its place
+const caretAnchor = (): HTMLElement => document.createElement('span')
+
 /**
- * Browser extensions of the page editor
+ * Browser extensions of the page editor, bound to its shared document
+ * @param {SharedDoc} shared - Document and carets
+ * @param {{ name: string, image: string | null, tint: number }} user - Who types here
  * @return {AnyExtension[]} - Extensions
  */
 
-export const pageEditorExtensions = (): AnyExtension[] => [
+export const pageEditorExtensions = (
+  shared: SharedDoc,
+  user: { name: string; image: string | null; tint: number }
+): AnyExtension[] => [
+  Collaboration.configure({ document: shared.doc, field: PAGE_DOC_FIELD }),
+  CollaborationCaret.configure({
+    provider: shared.provider,
+    user,
+    render: caretAnchor,
+    selectionRender: (peer) => ({
+      class: 'collaboration-carets__selection',
+      style: `${CARET_TINT}: ${tintColor(peer.tint)}`,
+    }),
+  }),
   ...pageSchemaExtensions().map((extension) => {
-    if (extension.name === Callout.name) return Callout.extend({ addNodeView: () => ReactNodeViewRenderer(CalloutView) })
-    if (extension.name === Subpage.name) return Subpage.extend({ addNodeView: () => ReactNodeViewRenderer(SubpageView) })
+    if (extension.name === Callout.name)
+      return Callout.extend({ addNodeView: () => ReactNodeViewRenderer(CalloutView) })
+    if (extension.name === Subpage.name)
+      return Subpage.extend({ addNodeView: () => ReactNodeViewRenderer(SubpageView) })
 
     return extension
   }),

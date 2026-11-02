@@ -49,9 +49,7 @@ export const ProfileTab = ({ state, fields, initialValues }: ProfileTabProps) =>
   return (
     <div className={PREFERENCE_STYLES.stack}>
       {sealedNames.length > 0 && (
-        <SettingsGroup
-          title={SETTINGS_GROUP_COPY.sealedTitle}
-        >
+        <SettingsGroup title={SETTINGS_GROUP_COPY.sealedTitle}>
           <dl className={DETAIL_BLOCK.grid}>
             {sealedNames.map((name) => (
               <div key={name} className={DETAIL_BLOCK.entry}>

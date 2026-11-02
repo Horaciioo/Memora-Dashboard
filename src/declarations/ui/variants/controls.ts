@@ -245,6 +245,9 @@ export const OPTION_MARK_STYLES = {
 export const SELECT_MENU_STYLES = {
   trigger:
     'flex min-w-0 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-field-border)] bg-[var(--color-field)] px-3 py-2 text-left text-sm text-[var(--color-on-field)] transition-colors hover:border-[var(--color-field-border-strong)] disabled:pointer-events-none disabled:opacity-60',
+  // No field box, a hover wash only
+  triggerBare:
+    'flex min-w-0 items-center gap-2 rounded-[var(--radius-lg)] px-2 py-1.5 text-left text-sm text-[var(--color-ink)] transition-colors hover:bg-[var(--color-hover)] disabled:pointer-events-none disabled:opacity-60',
   invalid: 'border-[var(--color-danger)]',
   // Chevron trails the text
   value: 'flex min-w-0 items-center gap-2 truncate',

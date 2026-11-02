@@ -3,6 +3,7 @@ export {
   canHandOut,
   grantReaches,
   levelAllows,
+  reachesOthers,
   resolvePageLevel,
   shareTargetKey,
   strongerLevel,

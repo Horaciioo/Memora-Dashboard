@@ -30,9 +30,8 @@ const bySiblingOrder = (left: PageSummary, right: PageSummary): number =>
 
 export const buildPageTree = (pages: PageSummary[]): PageTreeNode[] => {
   const known = new Set(pages.map((page) => page.id))
-  const byParent = Map.groupBy(
-    pages.toSorted(bySiblingOrder),
-    (page) => (page.parentId && known.has(page.parentId) ? page.parentId : null)
+  const byParent = Map.groupBy(pages.toSorted(bySiblingOrder), (page) =>
+    page.parentId && known.has(page.parentId) ? page.parentId : null
   )
 
   // Guards a corrupt cycle
@@ -53,12 +52,17 @@ export const buildPageTree = (pages: PageSummary[]): PageTreeNode[] => {
  * @return {Set<string>} - Descendant ids
  */
 
-export const descendantIds = (pages: { id: string; parentId: string | null }[], rootId: string): Set<string> => {
+export const descendantIds = (
+  pages: { id: string; parentId: string | null }[],
+  rootId: string
+): Set<string> => {
   const found = new Set<string>()
   let frontier = [rootId]
 
   while (frontier.length > 0) {
-    const next = pages.filter((page) => page.parentId && frontier.includes(page.parentId) && !found.has(page.id))
+    const next = pages.filter(
+      (page) => page.parentId && frontier.includes(page.parentId) && !found.has(page.id)
+    )
     next.forEach((page) => found.add(page.id))
     frontier = next.map((page) => page.id)
   }

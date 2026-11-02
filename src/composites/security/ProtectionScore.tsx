@@ -39,9 +39,7 @@ export const ProtectionScore = ({ checks }: ProtectionScoreProps) => {
   const Warn = ICONS.warning
 
   return (
-    <SettingsGroup
-      title={SECURITY_COPY.scoreTitle}
-    >
+    <SettingsGroup title={SECURITY_COPY.scoreTitle}>
       <div className={SECURITY_SCORE.root}>
         <div
           className={SECURITY_SCORE.ring}

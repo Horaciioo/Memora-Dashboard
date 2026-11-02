@@ -29,10 +29,18 @@ export const TrashedBanner = ({ pageId }: TrashedBannerProps) => {
     <section role="status" className={PAGE_VIEW_STYLES.banner}>
       <p className={PAGE_VIEW_STYLES.bannerTitle}>{PAGES_COPY.trashedBanner}</p>
       <div className={PAGE_VIEW_STYLES.bannerActions}>
-        <button type="button" className={cn(BUTTON_STYLES.base, BUTTON_STYLES.secondary)} onClick={() => setConfirming(true)}>
+        <button
+          type="button"
+          className={cn(BUTTON_STYLES.base, BUTTON_STYLES.secondary)}
+          onClick={() => setConfirming(true)}
+        >
           {PAGES_COPY.trashPurge}
         </button>
-        <button type="button" className={cn(BUTTON_STYLES.base, BUTTON_STYLES.primary)} onClick={() => void restore(pageId).then(() => router.refresh())}>
+        <button
+          type="button"
+          className={cn(BUTTON_STYLES.base, BUTTON_STYLES.primary)}
+          onClick={() => void restore(pageId).then(() => router.refresh())}
+        >
           {PAGES_COPY.trashRestore}
         </button>
       </div>

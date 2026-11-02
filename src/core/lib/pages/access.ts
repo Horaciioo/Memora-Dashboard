@@ -110,6 +110,24 @@ export const resolvePageLevel = (chain: AccessNode[], viewer: PageViewer): PageL
 }
 
 /**
+ * Someone besides the page owner may open it
+ * @param {AccessNode[]} chain - Page then its ancestors
+ * @return {boolean} - Shared one way or another
+ */
+
+export const reachesOthers = (chain: AccessNode[]): boolean => {
+  const ownerId = chain[0]?.ownerId
+
+  for (const node of chain) {
+    // Grant or another owner up the climb
+    if (node.grants.length > 0 || node.ownerId !== ownerId) return true
+    if (!node.inheritAccess) break
+  }
+
+  return false
+}
+
+/**
  * Level allows a gesture
  * @param {PageLevelName | null} level - Effective level
  * @param {PageCapability} capability - Gesture

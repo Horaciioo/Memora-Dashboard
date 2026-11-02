@@ -30,6 +30,14 @@ export interface NotificationKindOption {
  */
 
 const NOTIFICATION_KIND_MAP: Record<NotificationKindName, NotificationKindOption> = {
+  CommentReplied: {
+    label: 'Réponse',
+    tone: 'brand',
+    icon: 'chat',
+    lead: 't’a',
+    verb: 'répondu',
+    trail: '',
+  },
   Mentioned: {
     label: 'Mention',
     tone: 'brand',

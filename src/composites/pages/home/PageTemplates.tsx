@@ -19,7 +19,11 @@ export const PageTemplates = () => {
 
         return (
           <li key={name}>
-            <button type="button" className={PAGES_HOME_STYLES.template} onClick={() => void create({ template: name })}>
+            <button
+              type="button"
+              className={PAGES_HOME_STYLES.template}
+              onClick={() => void create({ template: name })}
+            >
               <span className={PAGES_HOME_STYLES.templateIcon} aria-hidden="true">
                 {template.icon}
               </span>

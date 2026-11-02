@@ -12,6 +12,7 @@ import { ExerciseStage } from '@/composites/recruitment/exercise/ExerciseStage'
 import { InterviewCrumbs } from '@/composites/recruitment/interview/InterviewCrumbs'
 import { InterviewFrame } from '@/composites/recruitment/interview/InterviewFrame'
 import { InterviewIntro } from '@/composites/recruitment/interview/InterviewIntro'
+import { InterviewPresence } from '@/composites/recruitment/interview/InterviewPresence'
 import { InterviewPart } from '@/composites/recruitment/questionnaire/InterviewPart'
 import {
   RecruitmentFileProvider,
@@ -162,6 +163,13 @@ const InterviewBody = ({
                   <InterviewCrumbs crumbs={crumbs} />
                 </div>
                 <span className={INTERVIEW.formalSwitch}>
+                  <InterviewPresence
+                    sessionId={detail.summary.id}
+                    candidateId={candidate.id}
+                    step={step}
+                    parts={parts}
+                    onGo={go}
+                  />
                   {QUESTIONNAIRE_COPY.formal}
                   <Toggle
                     bare

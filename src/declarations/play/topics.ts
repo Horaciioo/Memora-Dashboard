@@ -22,7 +22,7 @@ export const PLAY_TOPICS = {
  */
 
 export const PLAY_STREAM_EVENTS = {
-  // Seats, stage or crowd moved, read the page again
+  // Seats or stage moved, read the page again
   changed: 'changed',
   // Only the board moved, pushed to each reader
   moved: 'moved',

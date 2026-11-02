@@ -16,7 +16,8 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
  * @return {boolean} - Well formed
  */
 
-export const isPageId = (id: unknown): id is string => typeof id === 'string' && UUID_PATTERN.test(id)
+export const isPageId = (id: unknown): id is string =>
+  typeof id === 'string' && UUID_PATTERN.test(id)
 
 /**
  * Member reading pages
@@ -24,7 +25,10 @@ export const isPageId = (id: unknown): id is string => typeof id === 'string' &&
  * @return {PageViewer} - Viewer
  */
 
-export const viewerOf = (session: SessionUser): PageViewer => ({ id: session.id, role: session.role })
+export const viewerOf = (session: SessionUser): PageViewer => ({
+  id: session.id,
+  role: session.role,
+})
 
 /**
  * Columns the access check reads
@@ -56,7 +60,10 @@ export const loadChain = async (pageId: string): Promise<ChainRow[]> => {
 
   // Bounded climb, a cycle never loops
   while (nextId && chain.length < PAGE_SETTINGS.treeMaxDepth) {
-    const row: ChainRow | null = await prisma.page.findUnique({ where: { id: nextId }, select: ACCESS_SELECT })
+    const row: ChainRow | null = await prisma.page.findUnique({
+      where: { id: nextId },
+      select: ACCESS_SELECT,
+    })
     if (!row || chain.some((entry) => entry.id === row.id)) break
 
     chain.push(row)

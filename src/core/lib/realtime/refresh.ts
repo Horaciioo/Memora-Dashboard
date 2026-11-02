@@ -1,9 +1,13 @@
 import { startTransition } from 'react'
 
+import { coalesce } from '@/core/lib/realtime/coalesce'
 import { REALTIME_SETTINGS } from '@/declarations/system/realtime'
 
-// One refresh for a burst of signals
-let pending = 0
+// Latest page read handed in
+let latest: () => void = () => undefined
+
+// First signal reads at once, a burst once more
+const refresher = coalesce(() => startTransition(latest), REALTIME_SETTINGS.refreshCoalesceMs)
 
 /**
  * Read the page again, signals close together merged into one read
@@ -12,9 +16,6 @@ let pending = 0
  */
 
 export const queueRefresh = (refresh: () => void): void => {
-  if (pending) return
-  pending = window.setTimeout(() => {
-    pending = 0
-    startTransition(refresh)
-  }, REALTIME_SETTINGS.refreshCoalesceMs)
+  latest = refresh
+  refresher.request()
 }

@@ -155,6 +155,12 @@ const ACTIVITY_EVENT_MAP: Record<EventTypeName, ActivityEventOption> = {
     verb: 'changé',
     target: 'l’héritage des accès',
   },
+  PageVersionRestored: {
+    label: 'Page',
+    tone: 'info',
+    verb: 'restauré',
+    target: 'une version de page',
+  },
   RecruitmentClosed: {
     label: 'Clôture',
     tone: 'info',

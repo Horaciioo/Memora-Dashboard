@@ -38,10 +38,16 @@ export const OfflinePages = () => {
         <button type="button" className={PAGE_OFFLINE_STYLES.back} onClick={() => setOpenId(null)}>
           {PAGE_OFFLINE_COPY.back}
         </button>
-        <h1 className={PAGE_OFFLINE_STYLES.title}>{`${open.page.icon ?? ''} ${open.page.title || PAGES_COPY.untitled}`.trim()}</h1>
-        <p className={PAGE_OFFLINE_STYLES.lead}>{PAGE_SYNC_COPY.offlineCopy.replace('{date}', formatDayTime(open.savedAt))}</p>
-        {open.draft && <p className={PAGE_OFFLINE_STYLES.draft}>{PAGE_OFFLINE_COPY.pendingDraft}</p>}
-        <PageDocumentView content={open.draft?.content ?? open.page.content} />
+        <h1 className={PAGE_OFFLINE_STYLES.title}>
+          {`${open.page.icon ?? ''} ${open.page.title || PAGES_COPY.untitled}`.trim()}
+        </h1>
+        <p className={PAGE_OFFLINE_STYLES.lead}>
+          {PAGE_SYNC_COPY.offlineCopy.replace('{date}', formatDayTime(open.savedAt))}
+        </p>
+        {open.isPending && (
+          <p className={PAGE_OFFLINE_STYLES.draft}>{PAGE_OFFLINE_COPY.pendingDraft}</p>
+        )}
+        <PageDocumentView content={open.page.content} />
       </article>
     )
   }
@@ -49,12 +55,16 @@ export const OfflinePages = () => {
   return (
     <section className={PAGE_OFFLINE_STYLES.column}>
       <h2 className={PAGE_OFFLINE_STYLES.title}>{PAGE_OFFLINE_COPY.title}</h2>
-      <p className={PAGE_OFFLINE_STYLES.lead}>{entries.length > 0 ? PAGE_OFFLINE_COPY.lead : PAGE_OFFLINE_COPY.empty}</p>
+      <p className={PAGE_OFFLINE_STYLES.lead}>
+        {entries.length > 0 ? PAGE_OFFLINE_COPY.lead : PAGE_OFFLINE_COPY.empty}
+      </p>
       <div
         onClickCapture={(event) => {
           // Links stay on this page while offline
           const link = (event.target as HTMLElement).closest('a')
-          const entry = entries.find((item) => link?.getAttribute('href') === ROUTES.page(item.page.id))
+          const entry = entries.find(
+            (item) => link?.getAttribute('href') === ROUTES.page(item.page.id)
+          )
           if (!entry) return
           event.preventDefault()
           setOpenId(entry.page.id)

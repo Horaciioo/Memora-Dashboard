@@ -96,9 +96,15 @@ const findIssue = (tree: ProseNode, context: DocumentContext): DocumentIssue | n
     if (count > PAGE_SETTINGS.documentMaxNodes) issue = 'count'
     else if (tree.resolve(pos).depth >= PAGE_SETTINGS.documentMaxDepth) issue = 'depth'
     // Targets a block may point at
-    else if (node.marks.some((mark) => mark.type.name === 'link' && !isSafeHref(String(mark.attrs.href ?? '')))) issue = 'link'
+    else if (
+      node.marks.some(
+        (mark) => mark.type.name === 'link' && !isSafeHref(String(mark.attrs.href ?? ''))
+      )
+    )
+      issue = 'link'
     else if (node.type.name === 'image' && !isOwnImage(node, context)) issue = 'image'
-    else if (node.type.name === 'subpage' && !UUID_PATTERN.test(String(node.attrs.pageId ?? ''))) issue = 'subpage'
+    else if (node.type.name === 'subpage' && !UUID_PATTERN.test(String(node.attrs.pageId ?? '')))
+      issue = 'subpage'
 
     return !issue
   })
@@ -138,7 +144,11 @@ const assignIds = (json: PageDocument, newId: () => string): PageDocument => {
     const id = typeof current === 'string' && current && !seen.has(current) ? current : newId()
     seen.add(id)
 
-    return { ...node, attrs: { ...node.attrs, [BLOCK_ID_ATTRIBUTE]: id }, ...(children ? { content: children } : {}) }
+    return {
+      ...node,
+      attrs: { ...node.attrs, [BLOCK_ID_ATTRIBUTE]: id },
+      ...(children ? { content: children } : {}),
+    }
   }
 
   return visit(json)
@@ -152,7 +162,11 @@ const assignIds = (json: PageDocument, newId: () => string): PageDocument => {
  * @return {string[]} - Distinct values
  */
 
-const collect = (tree: ProseNode, type: string, read: (node: ProseNode) => string | null): string[] => {
+const collect = (
+  tree: ProseNode,
+  type: string,
+  read: (node: ProseNode) => string | null
+): string[] => {
   const values = new Set<string>()
 
   tree.descendants((node) => {
@@ -170,7 +184,10 @@ const collect = (tree: ProseNode, type: string, read: (node: ProseNode) => strin
  */
 
 export const documentText = (tree: ProseNode): string =>
-  tree.textBetween(0, tree.content.size, '\n', ' ').replace(/\n{2,}/g, '\n').trim()
+  tree
+    .textBetween(0, tree.content.size, '\n', ' ')
+    .replace(/\n{2,}/g, '\n')
+    .trim()
 
 /**
  * Check and normalise an untrusted document
@@ -180,7 +197,8 @@ export const documentText = (tree: ProseNode): string =>
  */
 
 export const validateDocument = (raw: unknown, context: DocumentContext): DocumentCheck => {
-  if (JSON.stringify(raw ?? null).length > PAGE_SETTINGS.documentMaxBytes) return { ok: false, issue: 'size' }
+  if (JSON.stringify(raw ?? null).length > PAGE_SETTINGS.documentMaxBytes)
+    return { ok: false, issue: 'size' }
 
   const tree = parseTree(raw)
   if (!tree) return { ok: false, issue: 'shape' }

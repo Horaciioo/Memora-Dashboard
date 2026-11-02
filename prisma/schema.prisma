@@ -2843,6 +2843,7 @@ enum PlayMessageKind {
   JOINED
   LEFT
   KICKED
+  REQUESTED
 }
 
 // Line of a game chat, written by a player or posted by the table
@@ -3235,7 +3236,9 @@ model Page {
   content       Json
   // Plain text of the content, read by search only
   searchText    String    @default("")
-  // Bumped on every content save, the base of conflict detection
+  // Shared editing state (Yjs), content is derived from it
+  yState        Bytes?
+  // Bumped on every content save
   version       Int       @default(1)
   // Order among siblings
   position      Int       @default(0)
@@ -3343,6 +3346,8 @@ model PageRevision {
 model PageComment {
   id         String    @id @default(cuid())
   pageId     String
+  // Root comment of a reply
+  parentId   String?
   blockId    String?
   authorId   String?
   body       String
@@ -3350,9 +3355,12 @@ model PageComment {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  page   Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  author Account? @relation("PageCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  page    Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  author  Account?      @relation("PageCommentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  parent  PageComment?  @relation("PageCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies PageComment[] @relation("PageCommentReplies")
 
   @@index([pageId, createdAt])
+  @@index([parentId])
   @@map("page_comments")
 }

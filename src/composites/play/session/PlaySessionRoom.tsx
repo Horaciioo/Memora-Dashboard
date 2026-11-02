@@ -13,6 +13,7 @@ import { PlayChat } from '@/composites/play/session/PlayChat'
 import type { PlayChatProps } from '@/composites/play/session/PlayChat'
 import { PlayReplay } from '@/composites/play/session/PlayReplay'
 import type { PlayReplayState } from '@/composites/play/session/PlayReplay'
+import { usePlayCrowd } from '@/core/hooks/data/play/usePlayCrowd'
 import { usePlayMoves } from '@/core/hooks/data/play/usePlayMoves'
 import { usePlayFullscreen } from '@/core/hooks/interaction/state/usePlayFullscreen'
 import { usePlayStageStore } from '@/core/store/playStage'
@@ -61,6 +62,7 @@ export const PlaySessionRoom = ({
   children,
 }: PlaySessionRoomProps) => {
   const moves = usePlayMoves()
+  const crowd = usePlayCrowd(chat.sessionId, players, spectators)
   // Chat and feed fold together
   const [isSideOpen, setSideOpen] = useState(true)
   const BackIcon = ICONS.playBack
@@ -147,7 +149,7 @@ export const PlaySessionRoom = ({
       >
         {isColumn ? (
           <>
-            <BacSessionCrowd players={players} spectators={spectators} />
+            <BacSessionCrowd players={players} spectators={crowd} />
             <PlayChat
               {...chat}
               isSide

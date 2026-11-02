@@ -16,11 +16,13 @@ const PANEL_GAP = 4
  * @typedef {Object} AnchoredPanelOptions
  * @property {boolean} [matchTriggerWidth] - Stretch the panel to the trigger
  * @property {number} [minWidth] - Narrowest matched width
+ * @property {boolean} [prefersAbove] - Open upward whenever it fits
  */
 
 export interface AnchoredPanelOptions {
   matchTriggerWidth?: boolean
   minWidth?: number
+  prefersAbove?: boolean
 }
 
 /**
@@ -50,7 +52,7 @@ export interface AnchoredPanel {
  */
 
 export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPanel => {
-  const { matchTriggerWidth = false, minWidth = 0 } = options
+  const { matchTriggerWidth = false, minWidth = 0, prefersAbove = false } = options
   const [isOpen, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const panelRef = useRef<HTMLDivElement | null>(null)
@@ -78,7 +80,7 @@ export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPa
       const height = panel.offsetHeight
       const room = window.innerHeight - trigger.bottom - EDGE_MARGIN
       const above = trigger.top - EDGE_MARGIN
-      const flip = height > room && above > room
+      const flip = prefersAbove ? height <= above || above > room : height > room && above > room
 
       // Panel shrinks to the side it sits on
       const space = (flip ? above : room) - PANEL_GAP
@@ -96,7 +98,7 @@ export const useAnchoredPanel = (options: AnchoredPanelOptions = {}): AnchoredPa
     if (panelRef.current) observer.observe(panelRef.current)
 
     return () => observer.disconnect()
-  }, [isOpen, matchTriggerWidth, minWidth])
+  }, [isOpen, matchTriggerWidth, minWidth, prefersAbove])
 
   // A scroll outside the panel
   useEffect(() => {

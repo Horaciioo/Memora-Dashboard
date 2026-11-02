@@ -1,5 +1,5 @@
 import { createProtectedRoute } from '@/core/lib/http/route'
-import { signalCandidate } from '@/core/lib/recruitment/signal'
+import { signalAnswer } from '@/core/lib/recruitment/signal'
 import {
   assertInterviewOpen,
   readAnswerPatch,
@@ -18,7 +18,14 @@ export const PUT = createProtectedRoute({
       viewerId: session.id,
     })
     const patch = readAnswerPatch(raw)
-    const { sessionId, created } = await saveAnswer(params.id, params.key, patch, await scope())
+    const { sessionId, created, answer } = await saveAnswer(
+      params.id,
+      params.key,
+      patch,
+      await scope()
+    )
+    // Readers first, the journal can wait
+    await signalAnswer({ sessionId, candidateId: params.id, key: params.key, answer })
 
     // Only the first note of a question reaches the journal
     if (created) {
@@ -31,8 +38,6 @@ export const PUT = createProtectedRoute({
         summary: RECRUITMENT_COPY.logNoted,
       })
     }
-
-    await signalCandidate(params.id, sessionId)
 
     return { ok: true }
   },

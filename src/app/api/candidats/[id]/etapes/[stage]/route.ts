@@ -5,9 +5,9 @@ import { Permissions } from '@/utils/constants/permissions'
 
 export const PUT = createProtectedRoute({
   permission: Permissions.RecruitmentCandidateWrite,
-  descriptor: { summary: 'Tick a moment of a candidate timeline', tags: ['recruitment'] },
-  handler: async ({ params, raw, scope }) => {
-    const marks = await markStage(params.id, params.stage, raw.done === true, await scope())
+  descriptor: { summary: 'Put a candidate on a moment of their timeline', tags: ['recruitment'] },
+  handler: async ({ params, scope }) => {
+    const marks = await markStage(params.id, params.stage, await scope())
     await signalCandidate(params.id)
 
     return { marks }

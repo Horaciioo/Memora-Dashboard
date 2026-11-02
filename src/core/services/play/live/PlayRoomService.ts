@@ -3,8 +3,8 @@ import 'server-only'
 import { subscribeLive } from '@/core/lib/lives/bus'
 import { logger } from '@/core/lib/logger'
 import { toEngineSession } from '@/core/lib/play/session'
-import { watchSession } from '@/core/lib/play/watchers'
 import { eventFrame, eventOf, signalFrame } from '@/core/lib/realtime/server/frames'
+import { joinPresence } from '@/core/lib/realtime/server/presence'
 import type { RealtimeConnection } from '@/core/lib/realtime/server/types'
 import { engineOf, loadSession } from '@/core/services/play/PlaySessionService'
 import { PLAY_STREAM_EVENTS, PLAY_TOPICS } from '@/declarations/play/topics'
@@ -113,7 +113,7 @@ const openRoom = (sessionId: string): PlayRoom => {
 }
 
 /**
- * Follow a game: boards pushed on each move, the reader counted in the stands
+ * Follow a game: boards pushed on each move, the reader seated in the room's presence
  * @param {string} sessionId - Game
  * @param {RealtimeConnection} connection - Socket
  * @return {Promise<() => void>} - Leave
@@ -127,13 +127,13 @@ export const joinPlayRoom = async (
   await loadSession(sessionId)
   const room = rooms.get(sessionId) ?? openRoom(sessionId)
   room.members.add(connection)
-  const watch = new AbortController()
-  watchSession(sessionId, connection.session.id, watch.signal)
+  // The stands move through presence, no page read
+  const leavePresence = joinPresence(PLAY_TOPICS.session(sessionId), connection)
   // The newcomer's board, missed moves included
   void pushBoards(sessionId, room)
 
   return () => {
-    watch.abort()
+    leavePresence()
     room.members.delete(connection)
     if (room.members.size > 0 || rooms.get(sessionId) !== room) return
     room.stopBus()

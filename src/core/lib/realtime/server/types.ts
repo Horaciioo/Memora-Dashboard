@@ -29,4 +29,8 @@ export interface RealtimeTopic {
  * @typedef {Function} RealtimeRequest
  */
 
-export type RealtimeRequest = (session: SessionUser, data: unknown) => Promise<unknown>
+export type RealtimeRequest = (
+  session: SessionUser,
+  data: unknown,
+  connection: RealtimeConnection
+) => Promise<unknown>

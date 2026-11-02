@@ -12,21 +12,28 @@ import { useCopy } from '@/core/hooks/interaction/state/useCopy'
 import { levelAllows } from '@/core/lib/pages'
 import { ROUTES } from '@/declarations/navigation'
 import { PAGE_LEVELS } from '@/declarations/pages/access'
-import { PAGE_MENU_COPY, PAGES_COPY, PAGE_SHARE_COPY } from '@/declarations/pages/copy'
+import {
+  PAGE_MENU_COPY,
+  PAGES_COPY,
+  PAGE_SHARE_COPY,
+  PAGE_HISTORY_COPY,
+} from '@/declarations/pages/copy'
 import type { PageDetail } from '@/types/pages'
 import { formatDay } from '@/utils/format/dates'
 
 export interface PageMenuProps {
   page: PageDetail
+  onHistory: () => void
 }
 
 /**
  * Page options behind the three dots
  * @param {PageDetail} page - Page
+ * @param {() => void} onHistory - Opens the versions
  * @return {JSX.Element}
  */
 
-export const PageMenu = ({ page }: PageMenuProps) => {
+export const PageMenu = ({ page, onHistory }: PageMenuProps) => {
   const router = useRouter()
   const { trash } = usePageActions()
   const { setCover, upload } = usePageMeta(page.id)
@@ -74,6 +81,13 @@ export const PageMenu = ({ page }: PageMenuProps) => {
       icon: 'link',
       group: 'actions',
       onSelect: () => void copy(`${window.location.origin}${ROUTES.page(page.id)}`),
+    },
+    {
+      id: 'history',
+      label: PAGE_HISTORY_COPY.open,
+      icon: 'history',
+      group: 'actions',
+      onSelect: onHistory,
     },
     ...(canWrite
       ? [

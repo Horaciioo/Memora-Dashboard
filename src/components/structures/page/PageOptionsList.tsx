@@ -107,7 +107,8 @@ export const PageOptionsList = ({ options, onDone }: PageOptionsListProps) => (
   <>
     {options.map((option, index) => (
       <Fragment key={option.id}>
-        {(option.group ?? option.section) !== (options[index - 1]?.group ?? options[index - 1]?.section) &&
+        {(option.group ?? option.section) !==
+          (options[index - 1]?.group ?? options[index - 1]?.section) &&
           index > 0 && <hr className={PAGE_OPTIONS.divider} />}
         {option.section && option.section !== options[index - 1]?.section && (
           <p className={PAGE_OPTIONS.heading}>{option.section}</p>

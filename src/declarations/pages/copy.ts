@@ -157,13 +157,8 @@ export const PAGE_SYNC_COPY = {
   saving: 'Enregistrement…',
   pending: 'Modifications en attente',
   offline: 'Hors ligne, gardé sur cet appareil',
-  failed: 'Échec de l’enregistrement',
-  retry: 'Réessayer',
-  conflictTitle: 'Cette page a changé ailleurs',
-  conflictLead:
-    'Quelqu’un a enregistré une autre version pendant que tu écrivais. Choisis la version à garder.',
-  keepMine: 'Garder ma version',
-  keepTheirs: 'Reprendre la leur',
+  failed: 'Modification refusée, recharge la page',
+  retry: 'Recharger',
   draftRestored: 'Brouillon hors ligne repris',
   offlineCopy: 'Copie hors ligne du {date}',
 } as const
@@ -223,11 +218,11 @@ export const PAGE_COMMENT_COPY = {
   open: 'Ouvrir les commentaires',
   close: 'Fermer les commentaires',
   placeholder: 'Ajouter un commentaire',
-  send: 'Envoyer',
   resolve: 'Résoudre',
   reopen: 'Rouvrir',
   remove: 'Supprimer',
   empty: 'Aucun commentaire.',
+  reply: 'Répondre',
   failed: 'Le commentaire n’a pas pu être enregistré.',
 } as const
 
@@ -289,7 +284,6 @@ export const PAGE_DOCUMENT_COPY = {
   title: 'Le titre est trop long.',
   icon: 'L’icône doit être un seul emoji.',
   cover: 'La couverture doit être une image de cette page.',
-  conflict: 'Cette page a été modifiée ailleurs entre-temps.',
   moveLoop: 'Une page ne peut pas aller sous l’une de ses sous-pages.',
   shareSelf: 'Le propriétaire a déjà tous les droits.',
   shareLevel: 'Tu ne peux pas donner plus de droits que les tiens.',
@@ -299,4 +293,23 @@ export const PAGE_DOCUMENT_COPY = {
   categoryName: 'Donne un nom court à la catégorie.',
   categoryLimit: 'Tu as atteint le nombre maximal de catégories.',
   categoryTarget: 'Cette catégorie n’existe pas.',
+} as const
+
+/**
+ * Version history copy
+ * @type {Record<string, string>}
+ */
+
+export const PAGE_HISTORY_COPY = {
+  open: 'Historique des versions',
+  title: 'Historique',
+  empty: 'Aucune version gardée pour l’instant.',
+  pick: 'Choisis une version pour la lire.',
+  byline: '{date}, par {name}',
+  bylineAnonymous: '{date}',
+  compare: '{changed} modifiés, {removed} retirés et {added} ajoutés depuis',
+  same: 'Identique à la page actuelle',
+  restore: 'Restaurer cette version',
+  restored: 'Version restaurée',
+  loading: 'Chargement…',
 } as const

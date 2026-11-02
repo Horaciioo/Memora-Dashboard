@@ -61,12 +61,18 @@ const cloneWithIds = (node: ProseNode, newId: () => string): ProseNode => {
   const json = node.toJSON() as { attrs?: Record<string, unknown>; content?: unknown[] }
 
   // Every nested block gets its own id
-  const renew = (entry: { type?: string; attrs?: Record<string, unknown>; content?: unknown[] }): unknown => ({
+  const renew = (entry: {
+    type?: string
+    attrs?: Record<string, unknown>
+    content?: unknown[]
+  }): unknown => ({
     ...entry,
     ...(entry.type && BLOCK_TYPES.has(entry.type)
       ? { attrs: { ...entry.attrs, [BLOCK_ID_ATTRIBUTE]: newId() } }
       : {}),
-    ...(entry.content ? { content: entry.content.map((child) => renew(child as typeof entry)) } : {}),
+    ...(entry.content
+      ? { content: entry.content.map((child) => renew(child as typeof entry)) }
+      : {}),
   })
 
   return node.type.schema.nodeFromJSON(renew(json as Parameters<typeof renew>[0]))
@@ -80,7 +86,11 @@ const cloneWithIds = (node: ProseNode, newId: () => string): ProseNode => {
  * @return {Transaction | null} - Change
  */
 
-export const duplicateBlock = (state: EditorState, pos: number, newId: () => string): Transaction | null => {
+export const duplicateBlock = (
+  state: EditorState,
+  pos: number,
+  newId: () => string
+): Transaction | null => {
   const block = blockAt(state.doc, pos)
   if (!block) return null
 
@@ -101,7 +111,11 @@ export const removeBlock = (state: EditorState, pos: number): Transaction | null
   const parent = state.doc.resolve(pos).parent
   // An only child leaves an empty paragraph behind
   if (parent.childCount === 1 && parent.type.name === 'doc') {
-    return state.tr.replaceWith(pos, pos + block.node.nodeSize, state.schema.nodes.paragraph!.create())
+    return state.tr.replaceWith(
+      pos,
+      pos + block.node.nodeSize,
+      state.schema.nodes.paragraph!.create()
+    )
   }
 
   return state.tr.delete(pos, pos + block.node.nodeSize)
@@ -115,7 +129,11 @@ export const removeBlock = (state: EditorState, pos: number): Transaction | null
  * @return {Transaction | null} - Change, null at an edge
  */
 
-export const moveBlock = (state: EditorState, pos: number, direction: -1 | 1): Transaction | null => {
+export const moveBlock = (
+  state: EditorState,
+  pos: number,
+  direction: -1 | 1
+): Transaction | null => {
   const block = blockAt(state.doc, pos)
   if (!block) return null
 

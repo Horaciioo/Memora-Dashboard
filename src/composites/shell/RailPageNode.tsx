@@ -45,11 +45,21 @@ export const RailPageNode = ({ node, depth, onAddChild, dnd, dropIndex }: RailPa
     if (isActive) router.push(ROUTES.pages)
   }
   const menu = node.page.isOwn
-    ? [{ id: 'trash', label: PAGE_MENU_COPY.trash, icon: 'remove' as const, danger: true, onSelect: () => void trashPage() }]
+    ? [
+        {
+          id: 'trash',
+          label: PAGE_MENU_COPY.trash,
+          icon: 'remove' as const,
+          danger: true,
+          onSelect: () => void trashPage(),
+        },
+      ]
     : []
   // Only the owner moves a page
   const dragProps =
-    dnd && node.page.isOwn ? dnd.itemProps({ id: node.page.id, from: node.page.categoryId ?? LOOSE_CONTAINER }) : {}
+    dnd && node.page.isOwn
+      ? dnd.itemProps({ id: node.page.id, from: node.page.categoryId ?? LOOSE_CONTAINER })
+      : {}
   const isDragged = dnd?.dragged?.id === node.page.id
   const Chevron = ICONS.expand
   const AddIcon = ICONS.add
@@ -59,9 +69,14 @@ export const RailPageNode = ({ node, depth, onAddChild, dnd, dropIndex }: RailPa
     <li data-drop-index={dropIndex}>
       <div
         {...dragProps}
-        className={cn(PAGE_RAIL_STYLES.row, isActive && PAGE_RAIL_STYLES.rowActive, isDragged && PAGE_RAIL_STYLES.dragged)}
+        className={cn(
+          PAGE_RAIL_STYLES.row,
+          isActive && PAGE_RAIL_STYLES.rowActive,
+          isDragged && PAGE_RAIL_STYLES.dragged
+        )}
         onContextMenu={menu.length > 0 ? contextMenu(menu) : undefined}
-        style={{ paddingLeft: `${depth * 0.75}rem` }}>
+        style={{ paddingLeft: `${depth * 0.75}rem` }}
+      >
         <button
           type="button"
           aria-label={PAGES_COPY.railExpand}
@@ -69,9 +84,20 @@ export const RailPageNode = ({ node, depth, onAddChild, dnd, dropIndex }: RailPa
           className={PAGE_RAIL_STYLES.toggle}
           onClick={() => setOpen(!isOpen)}
         >
-          <Chevron className={cn(PAGE_RAIL_STYLES.chevron, !isOpen && LEFT_SIDEBAR.navGroupChevronCollapsed)} aria-hidden="true" />
+          <Chevron
+            className={cn(
+              PAGE_RAIL_STYLES.chevron,
+              !isOpen && LEFT_SIDEBAR.navGroupChevronCollapsed
+            )}
+            aria-hidden="true"
+          />
         </button>
-        <Link href={href} draggable={false} aria-current={isActive ? 'page' : undefined} className={PAGE_RAIL_STYLES.link}>
+        <Link
+          href={href}
+          draggable={false}
+          aria-current={isActive ? 'page' : undefined}
+          className={PAGE_RAIL_STYLES.link}
+        >
           {node.page.icon ? (
             <span className={PAGE_RAIL_STYLES.emoji} aria-hidden="true">
               {node.page.icon}
@@ -98,11 +124,20 @@ export const RailPageNode = ({ node, depth, onAddChild, dnd, dropIndex }: RailPa
         (node.children.length > 0 ? (
           <ul className={PAGE_RAIL_STYLES.children}>
             {node.children.map((child) => (
-              <RailPageNode key={child.page.id} node={child} depth={depth + 1} onAddChild={onAddChild} dnd={dnd} />
+              <RailPageNode
+                key={child.page.id}
+                node={child}
+                depth={depth + 1}
+                onAddChild={onAddChild}
+                dnd={dnd}
+              />
             ))}
           </ul>
         ) : (
-          <p className={PAGE_RAIL_STYLES.empty} style={{ paddingLeft: `${(depth + 1) * 0.75 + 1.75}rem` }}>
+          <p
+            className={PAGE_RAIL_STYLES.empty}
+            style={{ paddingLeft: `${(depth + 1) * 0.75 + 1.75}rem` }}
+          >
             {PAGES_COPY.railEmpty}
           </p>
         ))}

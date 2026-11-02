@@ -27,7 +27,10 @@ export const useBlockTarget = (editor: Editor | null): void => {
       element.scrollIntoView({ block: 'center', behavior: 'smooth' })
       element.classList.add('block-target')
       clearTimeout(timer)
-      timer = setTimeout(() => element.classList.remove('block-target'), PAGE_TARGET_SETTINGS.highlightMs)
+      timer = setTimeout(
+        () => element.classList.remove('block-target'),
+        PAGE_TARGET_SETTINGS.highlightMs
+      )
     }
 
     reach()

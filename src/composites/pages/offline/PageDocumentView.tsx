@@ -6,7 +6,13 @@ import { PAGE_EDITOR_COPY, PAGES_COPY } from '@/declarations/pages/copy'
 import type { PageDocument } from '@/types/pages'
 
 // Mark to wrapping tag
-const MARK_TAGS: Record<string, string> = { bold: 'strong', italic: 'em', underline: 'u', strike: 's', code: 'code' }
+const MARK_TAGS: Record<string, string> = {
+  bold: 'strong',
+  italic: 'em',
+  underline: 'u',
+  strike: 's',
+  code: 'code',
+}
 
 /**
  * Text node with its marks
@@ -19,7 +25,9 @@ const renderText = (node: PageDocument, key: string): ReactNode =>
   (node.marks ?? []).reduce<ReactNode>((inner, mark, index) => {
     if (mark.type === 'link') {
       const href = String(mark.attrs?.href ?? '')
-      return isSafeHref(href) ? createElement('a', { key: `${key}-${index}`, href, rel: 'noopener noreferrer' }, inner) : inner
+      return isSafeHref(href)
+        ? createElement('a', { key: `${key}-${index}`, href, rel: 'noopener noreferrer' }, inner)
+        : inner
     }
     const tag = MARK_TAGS[mark.type]
 
@@ -39,15 +47,26 @@ const BLOCKS: Record<string, (node: PageDocument, children: ReactNode) => ReactN
     createElement(
       'li',
       { 'data-type': 'taskItem', 'data-checked': String(Boolean(node.attrs?.checked)) },
-      createElement('label', null, createElement('input', { type: 'checkbox', checked: Boolean(node.attrs?.checked), readOnly: true, disabled: true })),
+      createElement(
+        'label',
+        null,
+        createElement('input', {
+          type: 'checkbox',
+          checked: Boolean(node.attrs?.checked),
+          readOnly: true,
+          disabled: true,
+        })
+      ),
       createElement('div', null, children)
     ),
   blockquote: (_node, children) => createElement('blockquote', null, children),
   codeBlock: (_node, children) => createElement('pre', null, createElement('code', null, children)),
   horizontalRule: () => createElement('hr'),
   hardBreak: () => createElement('br'),
-  image: (node) => createElement('img', { src: String(node.attrs?.src ?? ''), alt: PAGE_EDITOR_COPY.imageAlt }),
-  callout: (node, children) => createElement('aside', { 'data-callout': '' }, `${String(node.attrs?.icon ?? '')} `, children),
+  image: (node) =>
+    createElement('img', { src: String(node.attrs?.src ?? ''), alt: PAGE_EDITOR_COPY.imageAlt }),
+  callout: (node, children) =>
+    createElement('aside', { 'data-callout': '' }, `${String(node.attrs?.icon ?? '')} `, children),
   subpage: () => createElement('p', null, createElement('em', null, PAGES_COPY.subpagesTitle)),
 }
 

@@ -10,6 +10,7 @@ import {
 import { QuestionComments } from '@/composites/recruitment/questionnaire/QuestionComments'
 import { QuestionBody } from '@/composites/recruitment/questionnaire/QuestionBody'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
+import { questionMark } from '@/core/lib/recruitment/interviewPlace'
 import { BLANK_ANSWER, isHandled } from '@/core/lib/recruitment/questionnaire'
 import type { ResolvedQuestion } from '@/core/lib/recruitment/questionnaire'
 import { QUESTIONNAIRE_COPY } from '@/declarations/recruitment/questionnaireCopy'
@@ -78,7 +79,10 @@ export const InterviewQuestion = ({
   // Left aside, one line is enough
   if (!isBare && (state.skipped || covered)) {
     return (
-      <article className={cn(INTERVIEW.card, INTERVIEW.cardSkipped)}>
+      <article
+        className={cn(INTERVIEW.card, INTERVIEW.cardSkipped)}
+        {...questionMark(question.key)}
+      >
         <div className={INTERVIEW.head}>
           <div className={INTERVIEW.headBody}>
             <p className={cn(INTERVIEW.prompt, INTERVIEW.promptSkipped)}>{question.prompt}</p>
@@ -100,7 +104,10 @@ export const InterviewQuestion = ({
   }
 
   return (
-    <article className={isBare ? INTERVIEW.foldChosen : INTERVIEW.card}>
+    <article
+      className={isBare ? INTERVIEW.foldChosen : INTERVIEW.card}
+      {...questionMark(question.key)}
+    >
       <div className={cn(INTERVIEW.ask, TINTS[state.appreciation ?? ''])}>
         <div className={INTERVIEW.askBody}>
           {!isBare && question.when && <span className={INTERVIEW.when}>{question.when}</span>}

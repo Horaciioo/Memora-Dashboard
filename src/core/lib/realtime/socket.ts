@@ -43,6 +43,12 @@ const state = {
   beatTimer: 0,
   topics: new Map<string, Set<RealtimeHandler>>(),
   pending: new Map<number, PendingRequest>(),
+  watchers: new Set<() => void>(),
+}
+
+// Open state moved
+const notify = (): void => {
+  for (const watcher of [...state.watchers]) watcher()
 }
 
 /**
@@ -120,8 +126,10 @@ const backoff = (): number => {
 
 const drop = (isNow = false): void => {
   const { socket } = state
+  const wasOpen = state.isOpen
   state.socket = null
   state.isOpen = false
+  if (wasOpen) notify()
   state.isConnecting = false
   window.clearInterval(state.beatTimer)
   if (socket) {
@@ -162,6 +170,7 @@ const onOpen = (): void => {
   state.heardAt = Date.now()
   state.beatTimer = window.setInterval(beat, REALTIME_SETTINGS.pingSeconds * SECOND_MS)
   for (const topic of state.topics.keys()) write({ k: REALTIME_KINDS.subscribe, t: topic })
+  notify()
   if (isBack) for (const topic of state.topics.keys()) emit(topic, REALTIME_EVENTS.resync, null)
 }
 
@@ -239,6 +248,20 @@ export const listenRealtime = (topic: string, handler: RealtimeHandler): (() => 
  */
 
 export const isRealtimeOpen = (): boolean => state.isOpen
+
+/**
+ * Watch the socket open and close
+ * @param {() => void} watcher - Called on change
+ * @return {() => void} - Stop watching
+ */
+
+export const watchRealtime = (watcher: () => void): (() => void) => {
+  state.watchers.add(watcher)
+
+  return () => {
+    state.watchers.delete(watcher)
+  }
+}
 
 /**
  * Ask the server over the socket

@@ -26,16 +26,25 @@ export const SubpageView = ({ node }: ReactNodeViewProps) => {
   return (
     <NodeViewWrapper data-subpage="" data-page-id={pageId} className={PAGE_BLOCK_STYLES.subpage}>
       {page ? (
-        <Link href={ROUTES.page(page.id)} className={PAGE_BLOCK_STYLES.subpageLink} contentEditable={false}>
+        <Link
+          href={ROUTES.page(page.id)}
+          className={PAGE_BLOCK_STYLES.subpageLink}
+          contentEditable={false}
+        >
           {page.icon ? (
             <span className={PAGE_BLOCK_STYLES.subpageEmoji}>{page.icon}</span>
           ) : (
             <PageIcon className={PAGE_BLOCK_STYLES.subpageGlyph} aria-hidden="true" />
           )}
-          <span className={PAGE_BLOCK_STYLES.subpageTitle}>{page.title || PAGES_COPY.untitled}</span>
+          <span className={PAGE_BLOCK_STYLES.subpageTitle}>
+            {page.title || PAGES_COPY.untitled}
+          </span>
         </Link>
       ) : (
-        <span className={cn(PAGE_BLOCK_STYLES.subpageLink, PAGE_BLOCK_STYLES.subpageMissing)} contentEditable={false}>
+        <span
+          className={cn(PAGE_BLOCK_STYLES.subpageLink, PAGE_BLOCK_STYLES.subpageMissing)}
+          contentEditable={false}
+        >
           <PageIcon className={PAGE_BLOCK_STYLES.subpageGlyph} aria-hidden="true" />
           {PAGE_EDITOR_COPY.subpageMissing}
         </span>

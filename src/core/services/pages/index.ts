@@ -1,11 +1,32 @@
 export { reachablePageIds, requirePage } from '@/core/services/pages/AccessService'
-export { createCategory, deleteCategory, listCategories, updateCategory } from '@/core/services/pages/CategoryService'
-export { addComment, deleteComment, listComments, resolveComment } from '@/core/services/pages/CommentService'
+export {
+  createCategory,
+  deleteCategory,
+  listCategories,
+  updateCategory,
+} from '@/core/services/pages/CategoryService'
+export {
+  addComment,
+  deleteComment,
+  listComments,
+  resolveComment,
+} from '@/core/services/pages/CommentService'
 export { viewerOf } from '@/core/services/pages/lookups'
-export { authorizePageMedia, describePageMedia, readPageMedia, uploadPageMedia } from '@/core/services/pages/MediaService'
-export { createPage, listPages, readPage, savePageContent, updatePageMeta } from '@/core/services/pages/PageService'
+export {
+  authorizePageMedia,
+  describePageMedia,
+  readPageMedia,
+  uploadPageMedia,
+} from '@/core/services/pages/MediaService'
+export { createPage, listPages, readPage, updatePageMeta } from '@/core/services/pages/PageService'
 export { listPageRegistry } from '@/core/services/pages/RegistryService'
+export { listRevisions, readRevision, restoreRevision } from '@/core/services/pages/RevisionService'
 export { searchPages } from '@/core/services/pages/SearchService'
-export { readSharing, removeShare, setInheritance, upsertShare } from '@/core/services/pages/ShareService'
+export {
+  readSharing,
+  removeShare,
+  setInheritance,
+  upsertShare,
+} from '@/core/services/pages/ShareService'
 export { movePage } from '@/core/services/pages/TreeService'
 export { listTrash, purgePage, restorePage, trashPage } from '@/core/services/pages/TrashService'

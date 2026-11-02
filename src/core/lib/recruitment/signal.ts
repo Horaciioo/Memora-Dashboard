@@ -4,6 +4,7 @@ import { prisma } from '@/core/lib/db'
 import { readOrigin } from '@/core/lib/http/requestOrigin'
 import { publishLive } from '@/core/lib/lives/bus'
 import { RECRUITMENT_STREAM_EVENTS, RECRUITMENT_TOPICS } from '@/declarations/recruitment/topics'
+import type { AnswerState } from '@/types/recruitment'
 
 /**
  * Tell a session's readers something moved, carrying identifiers only
@@ -13,15 +14,14 @@ import { RECRUITMENT_STREAM_EVENTS, RECRUITMENT_TOPICS } from '@/declarations/re
  * @return {Promise<void>} - Sent
  */
 
-const signal = async (sessionId: string, type: string, candidateId?: string): Promise<void> => {
+const signal = async (
+  sessionId: string,
+  type: string,
+  detail: Record<string, unknown> = {}
+): Promise<void> => {
   const { tab } = await readOrigin()
 
-  await publishLive(RECRUITMENT_TOPICS.session(sessionId), {
-    type,
-    candidateId,
-    tab,
-    at: Date.now(),
-  })
+  await publishLive(RECRUITMENT_TOPICS.session(sessionId), { ...detail, type, tab, at: Date.now() })
 }
 
 /**
@@ -41,7 +41,7 @@ export const signalCandidate = async (candidateId: string, sessionId?: string): 
       })
     )?.sessionId
 
-  if (owner) await signal(owner, RECRUITMENT_STREAM_EVENTS.candidate, candidateId)
+  if (owner) await signal(owner, RECRUITMENT_STREAM_EVENTS.candidate, { candidateId })
 }
 
 /**
@@ -52,7 +52,7 @@ export const signalCandidate = async (candidateId: string, sessionId?: string): 
  */
 
 export const signalCandidateRemoved = (sessionId: string, candidateId: string): Promise<void> =>
-  signal(sessionId, RECRUITMENT_STREAM_EVENTS.removed, candidateId)
+  signal(sessionId, RECRUITMENT_STREAM_EVENTS.removed, { candidateId })
 
 /**
  * Tell a session's readers the session itself changed
@@ -62,3 +62,26 @@ export const signalCandidateRemoved = (sessionId: string, candidateId: string): 
 
 export const signalSession = (sessionId: string): Promise<void> =>
   signal(sessionId, RECRUITMENT_STREAM_EVENTS.session)
+
+/**
+ * Hand a noted answer to the session's readers, no read back needed
+ * @param {Object} input - Answer
+ * @param {string} input.sessionId - Session
+ * @param {string} input.candidateId - Candidate
+ * @param {string} input.key - Question
+ * @param {AnswerState} input.answer - Stored state
+ * @return {Promise<void>} - Sent
+ */
+
+export const signalAnswer = ({
+  sessionId,
+  candidateId,
+  key,
+  answer,
+}: {
+  sessionId: string
+  candidateId: string
+  key: string
+  answer: AnswerState
+}): Promise<void> =>
+  signal(sessionId, RECRUITMENT_STREAM_EVENTS.answer, { candidateId, key, answer })

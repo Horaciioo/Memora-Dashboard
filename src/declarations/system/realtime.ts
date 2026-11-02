@@ -4,6 +4,10 @@ import { readInteger, readString } from '@/declarations/configurations/readers'
 // Config path of a key
 const at = (key: string) => `system/temps-reel.${key}`
 
+// Positive integer setting
+const integer = (key: keyof typeof realtime, fallback: number, min = 1) =>
+  readInteger(realtime[key], { path: at(key), fallback, min })
+
 /**
  * Socket pacing and limits, read by the browser and the server
  * @type {Record<string, number | string>}
@@ -73,6 +77,28 @@ export const REALTIME_SETTINGS = {
     fallback: 120,
     min: 0,
   }),
+  // Presence kept fresh past dozing tabs
+  presenceBeatSeconds: integer('presenceBeatSeconds', 25, 5),
+  presenceStaleSeconds: integer('presenceStaleSeconds', 150, 30),
+  // Departed members shown faded
+  presenceLingerSeconds: integer('presenceLingerSeconds', 30, 0),
+  presenceSweepSeconds: integer('presenceSweepSeconds', 10, 1),
+  presenceFlushMs: integer('presenceFlushMs', 150, 0),
+  presenceIdleSeconds: integer('presenceIdleSeconds', 60, 5),
+  presenceShown: integer('presenceShown', 4, 1),
+  presencePreviewLength: integer('presencePreviewLength', 32, 8),
+  presenceFlashMs: integer('presenceFlashMs', 1600, 100),
+  // Keystrokes merged per frame sent
+  docBatchMs: integer('docBatchMs', 30, 0),
+  docAwareMs: integer('docAwareMs', 80, 0),
+  // Database writes of a shared document
+  docPersistMs: integer('docPersistMs', 1500, 100),
+  docPersistMaxMs: integer('docPersistMaxMs', 8000, 500),
+  docDeviceMs: integer('docDeviceMs', 800, 100),
+  docUpdateMaxKilobytes: integer('docUpdateMaxKilobytes', 384, 16),
+  // Logged past these
+  slowRequestMs: integer('slowRequestMs', 250, 1),
+  slowSaveMs: integer('slowSaveMs', 500, 1),
 }
 
 /**
@@ -98,6 +124,14 @@ export const REALTIME_KINDS = {
 export const REALTIME_EVENTS = {
   // Socket back after a drop, missed signals to catch up
   resync: 'resync',
+  // Who stands in a room
+  presence: 'presence',
+  // Seated on a shared document
+  docReady: 'doc:ready',
+  // Shared document change
+  doc: 'doc',
+  // Carets of a shared document
+  aware: 'aware',
 } as const
 
 /**
@@ -120,6 +154,10 @@ export const REALTIME_CLOSE = {
 
 export const REALTIME_OPS = {
   playAct: 'play:act',
+  presenceSet: 'presence:set',
+  docSync: 'doc:sync',
+  docUpdate: 'doc:update',
+  docAware: 'doc:aware',
 } as const
 
 export type RealtimeOp = (typeof REALTIME_OPS)[keyof typeof REALTIME_OPS]

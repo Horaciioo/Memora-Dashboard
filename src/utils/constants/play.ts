@@ -71,6 +71,7 @@ export const PlayMessageKinds = {
   Joined: 'JOINED',
   Left: 'LEFT',
   Kicked: 'KICKED',
+  Requested: 'REQUESTED',
 } as const
 
 export type PlayMessageKindName = (typeof PlayMessageKinds)[keyof typeof PlayMessageKinds]

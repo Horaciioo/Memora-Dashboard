@@ -20,18 +20,19 @@ export const PLAY_INVITE_CALL = {
 } as const
 
 /**
- * Invitation popup of the home page, the game logo beside the sentence
+ * Invitation box of the home page, one line like the latest note
  * @type {Record<string, string>}
  */
 
 export const HOME_PLAY_INVITE = {
-  anchor: 'fixed top-5 left-1/2 z-[75] w-[34rem] max-w-[calc(100vw-1.5rem)] -translate-x-1/2',
-  card: `${CARD} gap-5 p-5`,
-  logo: 'play-invite-logo size-24 shrink-0 max-sm:size-16',
-  body: 'flex min-w-0 flex-1 flex-col gap-3',
-  eyebrow: 'text-xs font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
-  text: 'text-lg leading-snug font-semibold text-[var(--play-ink-soft)]',
+  box: 'play-invite flex items-center gap-4 rounded-[var(--radius-lg)] px-4 py-3',
+  logo: 'play-invite-logo size-10 shrink-0',
+  body: 'flex min-w-0 flex-1 flex-col',
+  eyebrow: 'text-micro font-extrabold tracking-widest text-[var(--play-ink-soft)] uppercase',
+  text: 'truncate text-base leading-tight font-semibold text-[var(--play-ink-soft)]',
   name: 'font-extrabold text-[var(--play-ink)]',
-  inviter: 'mr-2 inline-flex items-center align-middle',
-  actions: 'flex flex-wrap items-center gap-2',
+  decline:
+    'shrink-0 text-xs font-bold text-[var(--play-ink-soft)] transition-colors hover:text-[var(--play-ink)] disabled:opacity-50',
+  join: 'flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--play-key)] text-white transition-transform hover:scale-105 disabled:opacity-50',
+  joinIcon: 'size-5',
 } as const

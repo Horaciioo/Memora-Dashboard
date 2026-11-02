@@ -23,7 +23,12 @@ export const listPageRegistry = async (): Promise<PageRegistryRow[]> => {
       owner: { select: { displayName: true, avatarUrl: true } },
       parent: { select: { title: true } },
       grants: {
-        select: { scope: true, role: true, level: true, account: { select: { displayName: true } } },
+        select: {
+          scope: true,
+          role: true,
+          level: true,
+          account: { select: { displayName: true } },
+        },
         orderBy: { createdAt: 'asc' },
       },
     },

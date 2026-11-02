@@ -23,7 +23,8 @@ export interface PageFormatBarProps {
 
 export const PageFormatBar = ({ editor, onLink }: PageFormatBarProps) => {
   const { from, to, empty } = editor.state.selection
-  if (empty || editor.isActive('codeBlock') || editor.state.selection instanceof NodeSelection) return null
+  if (empty || editor.isActive('codeBlock') || editor.state.selection instanceof NodeSelection)
+    return null
 
   const start = editor.view.coordsAtPos(from)
   const end = editor.view.coordsAtPos(to)
@@ -50,7 +51,10 @@ export const PageFormatBar = ({ editor, onLink }: PageFormatBarProps) => {
             aria-label={mark.label}
             aria-pressed={editor.isActive(mark.name)}
             title={mark.label}
-            className={cn(BLOCK_EDITOR.formatButton, editor.isActive(mark.name) && PAGE_EDITOR_UI.formatActive)}
+            className={cn(
+              BLOCK_EDITOR.formatButton,
+              editor.isActive(mark.name) && PAGE_EDITOR_UI.formatActive
+            )}
             onClick={() => editor.chain().focus().toggleMark(mark.name).run()}
           >
             <Glyph className={BLOCK_EDITOR.formatGlyph} aria-hidden="true" />
@@ -62,7 +66,10 @@ export const PageFormatBar = ({ editor, onLink }: PageFormatBarProps) => {
         aria-label={PAGE_EDITOR_COPY.linkLabel}
         aria-pressed={editor.isActive('link')}
         title={PAGE_EDITOR_COPY.linkLabel}
-        className={cn(BLOCK_EDITOR.formatButton, editor.isActive('link') && PAGE_EDITOR_UI.formatActive)}
+        className={cn(
+          BLOCK_EDITOR.formatButton,
+          editor.isActive('link') && PAGE_EDITOR_UI.formatActive
+        )}
         onClick={onLink}
       >
         <LinkIcon className={BLOCK_EDITOR.formatGlyph} aria-hidden="true" />

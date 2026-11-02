@@ -34,7 +34,7 @@ export type CandidateStage = (typeof CANDIDATE_STAGES)[number]
  * Where each moment of a candidate stands
  * @param {CandidateProgress} progress - What is known of them
  * @param {RecruitmentOutcomeView[]} outcomes - Columns of the results board
- * @param {Record<string, boolean>} [marks] - Moments ticked by hand
+ * @param {Record<string, boolean>} [marks] - Position set by hand, one entry per moment
  * @return {Record<CandidateStage, TimelineState>} - State per moment
  */
 
@@ -50,15 +50,43 @@ export const candidateStates = (
   const isDecided =
     outcomes.find((outcome) => outcome.id === progress.outcomeId)?.isTerminal ?? false
 
-  // A hand mark only stands in for a moment with no data of its own
-  const hasSlot = isSlotted || marks.availabilities === true
-
-  return {
+  const computed: Record<CandidateStage, TimelineState> = {
     // A candidate exists through their Discord identifier
     joined: 'done',
-    availabilities: hasSlot ? 'done' : 'current',
+    availabilities: isSlotted ? 'done' : 'current',
     waiting: isStarted ? 'done' : isSlotted ? 'current' : 'upcoming',
     interviewing: isJudged ? 'done' : isStarted ? 'current' : 'upcoming',
     results: isDecided ? 'done' : isJudged ? 'current' : 'upcoming',
   }
+
+  return CANDIDATE_STAGES.some((stage) => stage in marks) ? positioned(marks) : computed
 }
+
+/**
+ * Timeline placed by hand: ticked moments done, the first other one current
+ * @param {Record<string, boolean>} marks - Ticked moments
+ * @return {Record<CandidateStage, TimelineState>} - State per moment
+ */
+
+const positioned = (marks: Record<string, boolean>): Record<CandidateStage, TimelineState> => {
+  const current = CANDIDATE_STAGES.find((stage) => stage !== 'joined' && marks[stage] !== true)
+  const reached = current ? CANDIDATE_STAGES.indexOf(current) : CANDIDATE_STAGES.length
+
+  return Object.fromEntries(
+    CANDIDATE_STAGES.map((stage, index) => [
+      stage,
+      index < reached ? 'done' : index === reached ? 'current' : 'upcoming',
+    ])
+  ) as Record<CandidateStage, TimelineState>
+}
+
+/**
+ * Marks putting a candidate on a moment: earlier ones ticked, the rest not
+ * @param {CandidateStage} stage - Moment wanted as current
+ * @return {Record<CandidateStage, boolean>} - Mark per moment
+ */
+
+export const marksAt = (stage: CandidateStage): Record<CandidateStage, boolean> =>
+  Object.fromEntries(
+    CANDIDATE_STAGES.map((entry, index) => [entry, index < CANDIDATE_STAGES.indexOf(stage)])
+  ) as Record<CandidateStage, boolean>

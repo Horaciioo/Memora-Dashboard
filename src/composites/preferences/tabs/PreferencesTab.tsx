@@ -38,9 +38,7 @@ export const PreferencesTab = ({ dock }: PreferencesTabProps) => {
           <ComfortRows keys={COMFORT_GROUPS.reading} />
         </div>
       </SettingsGroup>
-      <SettingsGroup
-        title={SETTINGS_GROUP_COPY.accessibility}
-      >
+      <SettingsGroup title={SETTINGS_GROUP_COPY.accessibility}>
         <ComfortRows keys={COMFORT_GROUPS.accessibility} />
         <div className={SETTINGS_GROUP.footer}>
           <p className={PICKER_CARD.noteInline}>{SETTINGS_GROUP_COPY.browserNotice}</p>

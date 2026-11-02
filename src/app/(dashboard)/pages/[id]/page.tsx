@@ -17,9 +17,15 @@ import { cn } from '@/utils/classnames'
  * @return {Promise<Metadata>} - Page metadata
  */
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
   const session = await optionalUser()
-  const page = session ? await readPage((await params).id, viewerOf(session)).catch(() => null) : null
+  const page = session
+    ? await readPage((await params).id, viewerOf(session)).catch(() => null)
+    : null
 
   return { title: page ? page.title || PAGES_COPY.untitled : PAGES_COPY.title }
 }
@@ -39,7 +45,13 @@ export default async function PrivatePage({ params }: { params: Promise<{ id: st
     <div className={PAGE_STYLES.wrapper}>
       <PageBanner title={PAGES_COPY.title} isLabel isBare image={page?.coverUrl ?? null} />
       {page ? (
-        <PageView key={page.id} page={page} accountId={session.id} />
+        <PageView
+          key={page.id}
+          page={page}
+          accountId={session.id}
+          accountName={session.displayName}
+          accountImage={session.avatarUrl}
+        />
       ) : (
         <EmptyState
           title={PAGES_COPY.notFoundTitle}

@@ -52,7 +52,9 @@ export const BlockHandle = ({ editor, frame, onMenu, onInsertBelow }: BlockHandl
       const id = element?.dataset.id
       if (!element || !id) return
       const top = element.getBoundingClientRect().top - frame.getBoundingClientRect().top
-      setBlock((current) => (current && current.id === id && current.top === top ? current : { id, top }))
+      setBlock((current) =>
+        current && current.id === id && current.top === top ? current : { id, top }
+      )
     }
     const leave = () => setBlock(null)
 

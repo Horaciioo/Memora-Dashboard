@@ -108,7 +108,7 @@ export const MyDecisions = ({ outcomes, verdicts }: MyDecisionsProps) => {
         <FloatingLayer>
           <span
             role="tooltip"
-            className={TIP.floating}
+            className={`${TIP.floating} ${TIP.floatingAbove}`}
             style={{
               left: hover.x,
               top: hover.y - 12,

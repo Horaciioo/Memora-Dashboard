@@ -56,8 +56,11 @@ const follow = (live: LiveConnection, topic: string, registry: RealtimeRegistry)
       if (live.topics.get(topic) === placeholder) live.topics.set(topic, stop)
       else stop()
     },
-    () => {
+    (error: unknown) => {
       if (live.topics.get(topic) === placeholder) live.topics.delete(topic)
+      // Refusals stay silent, breakage does not
+      if (toAppError(error).code === ErrorCodes.SystemFailure)
+        logger.error('[realtime] topic failed', error)
     }
   )
 }
@@ -90,15 +93,22 @@ const answer = async (
   const reply = (body: Partial<RealtimeFrame>) =>
     live.send(JSON.stringify({ k: REALTIME_KINDS.answer, id: frame.id, ...body }))
   const request = registry.requests[frame.op ?? '']
+  const startedAt = performance.now()
 
   try {
     if (!request) throw notFound()
-    reply({ d: (await request(live.session, frame.d)) ?? null })
+    reply({ d: (await request(live.session, frame.d, live)) ?? null })
   } catch (error) {
     const failure = toAppError(error)
-    if (failure.code === ErrorCodes.SystemFailure) logger.error('[realtime]', error)
+    if (failure.code === ErrorCodes.SystemFailure)
+      logger.error(`[realtime] ${frame.op} failed`, error)
     reply({ err: { message: failure.message, code: failure.code, issues: failure.issues } })
   }
+
+  // Slow answers named, never their content
+  const elapsed = Math.round(performance.now() - startedAt)
+  if (elapsed > REALTIME_SETTINGS.slowRequestMs)
+    logger.warn(`[realtime] ${frame.op} took ${elapsed}ms`)
 }
 
 /**

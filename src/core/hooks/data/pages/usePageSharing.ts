@@ -69,9 +69,13 @@ export const usePageSharing = (pageId: string, enabled: boolean): PageSharingSta
   return {
     sharing: data ?? null,
     isLoading,
-    share: (target, level) => apply(() => apiPut<PageSharing>(API_ROUTES.pageSharing(pageId), { ...target, level })),
-    unshare: (shareId) => apply(() => apiDelete<PageSharing>(API_ROUTES.pageShare(pageId, shareId))),
+    share: (target, level) =>
+      apply(() => apiPut<PageSharing>(API_ROUTES.pageSharing(pageId), { ...target, level })),
+    unshare: (shareId) =>
+      apply(() => apiDelete<PageSharing>(API_ROUTES.pageShare(pageId, shareId))),
     setInherit: (inherit) =>
-      apply(() => apiPatch<PageSharing>(API_ROUTES.pageSharing(pageId), { inheritAccess: inherit })),
+      apply(() =>
+        apiPatch<PageSharing>(API_ROUTES.pageSharing(pageId), { inheritAccess: inherit })
+      ),
   }
 }

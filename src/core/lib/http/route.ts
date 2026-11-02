@@ -507,7 +507,11 @@ export const createMediaRoute = (options: MediaRouteOptions): RouteHandler => {
 
       // A private object still costs a session
       if (media.visibility === MEDIA_VISIBILITIES.Private) {
-        const { session } = await authenticate(request, { rateLimit: options.rateLimit }, media.permission)
+        const { session } = await authenticate(
+          request,
+          { rateLimit: options.rateLimit },
+          media.permission
+        )
         await options.authorize?.(params, session)
       } else {
         await guard(request, options.rateLimit)

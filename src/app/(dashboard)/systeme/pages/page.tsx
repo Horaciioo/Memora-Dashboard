@@ -18,7 +18,10 @@ export default async function SystemPagesRegistry() {
 
   return (
     <div className={PAGE_STYLES.wrapper}>
-      <PageHeader title={PAGE_REGISTRY_COPY.title} heroDescription={PAGE_REGISTRY_COPY.heroDescription} />
+      <PageHeader
+        title={PAGE_REGISTRY_COPY.title}
+        heroDescription={PAGE_REGISTRY_COPY.heroDescription}
+      />
       <PageRegistry rows={await listPageRegistry()} />
     </div>
   )

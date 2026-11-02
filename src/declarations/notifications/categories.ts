@@ -89,6 +89,7 @@ export const PUSH_CATEGORY_REGISTRY = createRegistry<PushCategoryName, PushCateg
 
 export const PUSH_CATEGORY_OF_KIND: Record<NotificationKindName, PushCategoryName> = {
   Mentioned: 'mentions',
+  CommentReplied: 'mentions',
   TaskAssigned: 'work',
   ProjectAssigned: 'work',
   TeamAssigned: 'work',

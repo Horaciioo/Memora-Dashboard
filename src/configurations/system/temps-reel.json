@@ -1,7 +1,7 @@
 {
   "path": "/api/temps-reel",
   "ticketSeconds": 30,
-  "maxPayloadKilobytes": 64,
+  "maxPayloadKilobytes": 512,
   "pingSeconds": 20,
   "deadSeconds": 45,
   "reconnectBaseMs": 200,
@@ -11,5 +11,22 @@
   "slowKilobytes": 1024,
   "messagesPerSecond": 40,
   "requestTimeoutSeconds": 10,
-  "refreshCoalesceMs": 120
+  "refreshCoalesceMs": 120,
+  "presenceBeatSeconds": 25,
+  "presenceStaleSeconds": 150,
+  "presenceLingerSeconds": 30,
+  "presenceSweepSeconds": 10,
+  "presenceFlushMs": 150,
+  "presenceIdleSeconds": 60,
+  "presenceShown": 4,
+  "presencePreviewLength": 32,
+  "presenceFlashMs": 1600,
+  "docBatchMs": 30,
+  "docAwareMs": 80,
+  "docPersistMs": 1500,
+  "docPersistMaxMs": 8000,
+  "docDeviceMs": 800,
+  "docUpdateMaxKilobytes": 384,
+  "slowRequestMs": 250,
+  "slowSaveMs": 500
 }

@@ -124,7 +124,8 @@
   box-shadow: var(--frost-shadow);
 }
 
-.rail-ground .glass-panel:not(.fixed, .shortcut-fresh, .rail-footer-box, [aria-current='page']):hover {
+.rail-ground
+  .glass-panel:not(.fixed, .shortcut-fresh, .rail-footer-box, [aria-current='page']):hover {
   background: linear-gradient(rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.14)), var(--frost-fill);
 }
 
@@ -141,8 +142,8 @@
   background:
     linear-gradient(
       165deg,
-      color-mix(in srgb, var(--color-frame-pink) 46%, transparent),
-      color-mix(in srgb, var(--color-frame-mauve) 38%, transparent)
+      color-mix(in srgb, var(--color-frame-pink) var(--footer-wash-start, 46%), transparent),
+      color-mix(in srgb, var(--color-frame-mauve) var(--footer-wash-end, 38%), transparent)
     ),
     var(--frost-fill);
 }

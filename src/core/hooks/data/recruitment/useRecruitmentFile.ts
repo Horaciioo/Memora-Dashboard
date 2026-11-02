@@ -17,6 +17,8 @@ import type {
   RecruitmentDetail,
   RecruitmentStepView,
 } from '@/types/recruitment'
+import { marksAt } from '@/core/lib/recruitment/candidateTimeline'
+import type { CandidateStage } from '@/core/lib/recruitment/candidateTimeline'
 import { BLANK_ANSWER } from '@/core/lib/recruitment/questionnaire'
 import type { InterviewPatch } from '@/types/recruitment'
 
@@ -29,7 +31,7 @@ import type { InterviewPatch } from '@/types/recruitment'
  * @property {IntegrationLinkView | null} link - Integration form handed out
  * @property {string[]} questionKeys - Questions picked for the interviews
  * @property {(id: string, key: string, patch: Partial<AnswerState>) => Promise<void>} saveAnswer - Note one question
- * @property {(id: string, stage: string, done: boolean) => Promise<void>} markStage - Tick a timeline moment
+ * @property {(id: string, stage: CandidateStage) => Promise<void>} markStage - Place a candidate on a timeline moment
  * @property {(id: string, patch: InterviewPatch) => Promise<boolean>} setInterview - Set register, start or verdict
  * @property {boolean} isSaving - Mutation in flight
  * @property {FieldIssue[]} issues - Rejections of the last mutation
@@ -62,7 +64,7 @@ export interface RecruitmentFile {
   link: IntegrationLinkView | null
   questionKeys: string[]
   saveAnswer: (id: string, key: string, patch: Partial<AnswerState>) => Promise<void>
-  markStage: (id: string, stage: string, done: boolean) => Promise<void>
+  markStage: (id: string, stage: CandidateStage) => Promise<void>
   setInterview: (id: string, patch: InterviewPatch) => Promise<boolean>
   isSaving: boolean
   issues: FieldIssue[]
@@ -127,7 +129,20 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     setCandidates((current) => current.filter((entry) => entry.id !== id))
   }, [])
 
-  useRecruitmentLive(sessionId, mergeCandidate, dropCandidate)
+  // Another member's note lands as is
+  const mergeAnswer = useCallback((id: string, key: string, answer: AnswerState) => {
+    setCandidates((current) =>
+      current.map((entry) =>
+        entry.id === id ? { ...entry, answers: { ...entry.answers, [key]: answer } } : entry
+      )
+    )
+  }, [])
+
+  useRecruitmentLive(sessionId, {
+    onCandidate: mergeCandidate,
+    onRemoved: dropCandidate,
+    onAnswer: mergeAnswer,
+  })
 
   const mergeStep = useCallback((saved: RecruitmentStepView) => {
     setSteps((current) =>
@@ -354,16 +369,14 @@ export const useRecruitmentFile = (detail: RecruitmentDetail): RecruitmentFile =
     [run]
   )
 
-  // The moment flips at once, the server follows
+  // The position moves at once, the server follows
   const markStage = useCallback(
-    async (id: string, stage: string, done: boolean) => {
+    async (id: string, stage: CandidateStage) => {
       setCandidates((current) =>
-        current.map((entry) =>
-          entry.id === id ? { ...entry, stageMarks: { ...entry.stageMarks, [stage]: done } } : entry
-        )
+        current.map((entry) => (entry.id === id ? { ...entry, stageMarks: marksAt(stage) } : entry))
       )
 
-      await run(() => apiPut(API_ROUTES.candidateStage(id, stage), { done }))
+      await run(() => apiPut(API_ROUTES.candidateStage(id, stage), {}))
     },
     [run]
   )

@@ -36,6 +36,17 @@ export const useQuestionnaire = (
   useMemo(() => {
     const bank = bankFor(platform, creator, formal)
     const wanted = new Set(keys)
+    // A fold family comes whole, whichever of its members was kept
+    const families = new Set(
+      bank.flatMap((question) =>
+        wanted.has(question.key) && question.family ? [question.family] : []
+      )
+    )
 
-    return { bank, picked: bank.filter((question) => wanted.has(question.key)) }
+    return {
+      bank,
+      picked: bank.filter(
+        (question) => wanted.has(question.key) || (question.family && families.has(question.family))
+      ),
+    }
   }, [platform, creator, keys, formal])

@@ -107,8 +107,23 @@ export const PAGE_VIEW_STYLES = {
   commentAction:
     'inline-flex size-6 cursor-pointer items-center justify-center rounded-[var(--radius-xs)] text-[var(--color-ink-subtle)] transition-colors hover:bg-[var(--color-hover)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   commentActionGlyph: 'size-3.5',
-  commentForm: 'flex flex-col items-end gap-2',
-  commentInput: `${FIELD} min-h-20 resize-y leading-relaxed`,
+  // One thread, replies stepped in
+  thread: 'flex flex-col gap-2',
+  replies: 'ml-8 flex flex-col gap-2 border-l border-[var(--color-border)] pl-3',
+  replyLink:
+    'ml-8 self-start cursor-pointer text-xs font-semibold text-[var(--color-ink-subtle)] hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  // Version history drawer
+  history: 'flex flex-col gap-4',
+  historyList: 'flex flex-col gap-1',
+  historyItem:
+    'flex cursor-pointer flex-col items-start rounded-[var(--radius-md)] px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  historyItemActive: 'bg-[var(--color-hover)]',
+  historyMeta: 'text-xs text-[var(--color-ink-subtle)]',
+  historyPreview:
+    'rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4',
+  historyNote: 'text-sm text-[var(--color-ink-subtle)] italic',
+  composerOpen:
+    'cursor-pointer rounded-[var(--radius-md)] border border-dashed border-[var(--color-border-strong)] px-3 py-2 text-left text-sm text-[var(--color-ink-subtle)] hover:bg-[var(--color-hover)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
 } as const
 
 /**
