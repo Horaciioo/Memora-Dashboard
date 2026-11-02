@@ -8,11 +8,13 @@ import {
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { Permissions } from '@/utils/constants/permissions'
+import { assertFileOpen } from '@/core/services/recruitment/BanService'
 
 export const PUT = createProtectedRoute({
   permission: Permissions.RecruitmentCandidateWrite,
   descriptor: { summary: 'Note a question of a candidate interview', tags: ['recruitment'] },
   handler: async ({ params, raw, session, scope, access }) => {
+    await assertFileOpen(params.id, access.can(Permissions.RecruitmentManage))
     await assertInterviewOpen(params.id, {
       manage: access.can(Permissions.RecruitmentManage),
       viewerId: session.id,

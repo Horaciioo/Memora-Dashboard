@@ -88,10 +88,17 @@ export const loadRecruitment = async (
   ])
 
   return {
-    // Only those who manage read who is barred
+    // Those who manage read every barred identifier, recruiters the ones of this session
     detail: allowed(Permissions.RecruitmentManage)
       ? { ...detail, bannedIds: await bannedIdentifiers() }
-      : detail,
+      : allowed(Permissions.RecruitmentCandidateWrite)
+        ? {
+            ...detail,
+            bannedIds: (await bannedIdentifiers()).filter((discordId) =>
+              detail.candidates.some((candidate) => candidate.discordId === discordId)
+            ),
+          }
+        : detail,
     activity,
     serverTime: new Date().toISOString(),
     fields: {

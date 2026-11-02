@@ -4,11 +4,13 @@ import { createProtectedRoute } from '@/core/lib/http/route'
 import { signalCandidate } from '@/core/lib/recruitment/signal'
 import { proseFields, saveReview } from '@/core/services/recruitment'
 import { Permissions } from '@/utils/constants/permissions'
+import { assertFileOpen } from '@/core/services/recruitment/BanService'
 
 export const PUT = createProtectedRoute({
   permission: Permissions.RecruitmentCandidateWrite,
   descriptor: { summary: 'Write the bilan of a candidate', tags: ['recruitment'] },
-  handler: async ({ params, raw, scope }) => {
+  handler: async ({ params, raw, scope, access }) => {
+    await assertFileOpen(params.id, access.can(Permissions.RecruitmentManage))
     const parsed = parseFormValues(proseFields('review'), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 

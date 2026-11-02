@@ -3,6 +3,7 @@ import { parseFormValues } from '@/core/lib/forms'
 import { createProtectedRoute } from '@/core/lib/http/route'
 import { signalCandidate } from '@/core/lib/recruitment/signal'
 import { candidateFields, createCandidate } from '@/core/services/recruitment'
+import { applyFirstSlot } from '@/core/services/recruitment/SlotRules'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { Permissions } from '@/utils/constants/permissions'
 
@@ -14,7 +15,8 @@ export const POST = createProtectedRoute({
     const parsed = parseFormValues(await candidateFields(), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
 
-    const candidate = await createCandidate(params.id, parsed.values, await scope())
+    const values = await applyFirstSlot(parsed.values, session.id, null)
+    const candidate = await createCandidate(params.id, values, await scope())
 
     await recordFileEvent({
       eventType: 'CandidateAdded',

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 import { ActivityPanel } from '@/components/structures/data/ActivityPanel'
@@ -9,16 +9,20 @@ import { CandidateBilanTab } from '@/composites/recruitment/candidate/CandidateB
 import { CandidateComments } from '@/composites/recruitment/candidate/CandidateComments'
 import { CandidateBack } from '@/composites/recruitment/candidate/CandidateBack'
 import { CandidateRail } from '@/composites/recruitment/candidate/CandidateRail'
+import { CandidateManagementTab } from '@/composites/recruitment/candidate/CandidateManagementTab'
 import { CandidateOverview } from '@/composites/recruitment/candidate/CandidateOverview'
-import { useStartInterview } from '@/composites/recruitment/file/useStartInterview'
-import { CandidateTimeline } from '@/composites/recruitment/candidate/CandidateTimeline'
+import {
+  CandidateTimeline,
+  CandidateTimelineBody,
+} from '@/composites/recruitment/candidate/CandidateTimeline'
 import {
   RecruitmentFileProvider,
   useRecruitmentState,
 } from '@/composites/recruitment/file/RecruitmentFileContext'
 import { FloatingFocus } from '@/composites/search/assistant/FloatingFocus'
 import { useCandidateRecord } from '@/core/hooks/data/recruitment/useCandidateRecord'
-import { candidateStates } from '@/core/lib/recruitment/candidateTimeline'
+import type { CandidateStage } from '@/core/lib/recruitment/candidateTimeline'
+import { candidateStates, progressOf } from '@/core/lib/recruitment/candidateTimeline'
 import { ROUTES } from '@/declarations/navigation'
 import { CANDIDATE_COPY, CANDIDATE_TAB_PARAM } from '@/declarations/recruitment/candidateCopy'
 import { SESSION_FILE_COPY } from '@/declarations/ui/copy'
@@ -33,38 +37,37 @@ import type { RecruitmentDetail, RecruitmentFields, RecruitmentRights } from '@/
  * @param {Object} props - Component props
  * @param {string} props.candidateId - Candidate identifier
  * @param {ActivityEntry[]} props.activity - Journal of the candidate
+ * @param {boolean} props.canManageFile - Reaches the management tab
  * @return {JSX.Element}
  */
 
 const CandidateBody = ({
   candidateId,
   activity,
+  canManageFile,
 }: {
   candidateId: string
   activity: ActivityEntry[]
+  // Viewer is a recruiter or above, whatever the file allows now
+  canManageFile: boolean
 }) => {
-  const router = useRouter()
   const [tab, setTab] = useState(useSearchParams().get(CANDIDATE_TAB_PARAM) ?? 'overview')
   const { detail, file, can, candidateMenu } = useRecruitmentState()
   const { contextMenu } = useMenu()
   const candidate = file.candidates.find((entry) => entry.id === candidateId)!
   const record = useCandidateRecord(candidate)
 
-  const states = candidateStates(
-    {
-      interviewAt: typeof record.values.interviewAt === 'string' ? record.values.interviewAt : null,
-      interviewStartedAt: candidate.interviewStartedAt,
-      interviewEndedAt: candidate.interviewEndedAt,
-      verdictAt: candidate.verdictAt,
-      outcomeId: typeof record.values.outcomeId === 'string' ? record.values.outcomeId : null,
-    },
-    detail.outcomes,
-    candidate.stageMarks
-  )
+  const progress = progressOf(candidate, record.values)
+  const states = candidateStates(progress, detail.outcomes, candidate.stageMarks)
 
-  const interview = ROUTES.interview(detail.summary.id, candidate.id)
   const back = `${ROUTES.recruitment(detail.summary.id)}?${CANDIDATE_TAB_PARAM}=candidates`
-  const startInterview = useStartInterview()
+
+  const timelineProps = {
+    states,
+    onToggle: can.writeCandidates
+      ? (stage: CandidateStage) => void file.markStage(candidate.id, stage)
+      : undefined,
+  }
 
   return (
     <div className={MEMBER_FILE.layout}>
@@ -88,17 +91,9 @@ const CandidateBody = ({
           candidate={candidate}
           record={record}
           footer={
-            <CandidateTimeline
-              states={states}
-              canPass={can.writeCandidates}
-              onReview={() => router.push(interview)}
-              onPass={() => startInterview(candidate.id)}
-              onToggle={
-                can.writeCandidates
-                  ? (stage) => void file.markStage(candidate.id, stage)
-                  : undefined
-              }
-            />
+            <div className={MEMBER_FILE.railTimeline}>
+              <CandidateTimeline {...timelineProps} />
+            </div>
           }
         />
       </div>
@@ -117,8 +112,16 @@ const CandidateBody = ({
                 <CandidateOverview
                   record={record}
                   comments={<CandidateComments candidate={candidate} />}
+                  timeline={<CandidateTimelineBody {...timelineProps} />}
                 />
               ),
+            },
+            {
+              value: 'management',
+              label: CANDIDATE_COPY.tabManagement,
+              icon: 'settings',
+              visible: canManageFile,
+              render: () => <CandidateManagementTab candidate={candidate} record={record} />,
             },
             {
               value: 'bilan',
@@ -164,8 +167,20 @@ export const CandidateFile = ({
   can,
   candidateId,
   activity,
-}: CandidateFileProps) => (
-  <RecruitmentFileProvider detail={detail} fields={fields} can={can}>
-    <CandidateBody candidateId={candidateId} activity={activity} />
-  </RecruitmentFileProvider>
-)
+}: CandidateFileProps) => {
+  const candidate = detail.candidates.find((entry) => entry.id === candidateId)
+  const isLocked = !can.manage && detail.bannedIds.includes(candidate?.discordId ?? '')
+
+  // A barred file is changed by the responsables and above alone
+  const rights = isLocked ? { ...can, writeCandidates: false, canObserve: false } : can
+
+  return (
+    <RecruitmentFileProvider detail={detail} fields={fields} can={rights}>
+      <CandidateBody
+        candidateId={candidateId}
+        activity={activity}
+        canManageFile={can.writeCandidates}
+      />
+    </RecruitmentFileProvider>
+  )
+}

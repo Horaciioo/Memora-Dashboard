@@ -7,12 +7,14 @@ import { notifyMentions } from '@/core/services/system/NotificationService'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { Permissions } from '@/utils/constants/permissions'
+import { assertFileOpen } from '@/core/services/recruitment/BanService'
 
 export const POST = createProtectedRoute({
   permission: Permissions.RecruitmentCandidateWrite,
   status: 201,
   descriptor: { summary: 'Leave a remark on a candidate', tags: ['recruitment'] },
-  handler: async ({ params, raw, session, scope }) => {
+  handler: async ({ params, raw, session, scope, access }) => {
+    await assertFileOpen(params.id, access.can(Permissions.RecruitmentManage))
     const perimeter = await scope()
     const parsed = parseFormValues(commentFields(), raw, { fillMissing: true })
     if (!parsed.ok) throw invalidInput(parsed.issues)
