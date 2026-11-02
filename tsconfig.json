@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -20,7 +24,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
@@ -41,7 +47,12 @@
     ".next/validate/types/**/*.ts",
     ".next/validate/dev/types/**/*.ts",
     ".next-ws/types/**/*.ts",
-    ".next-ws/dev/types/**/*.ts"
+    ".next-ws/dev/types/**/*.ts",
+    ".next-validate/types/**/*.ts",
+    ".next-validate/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "src/worker/sw.ts"]
+  "exclude": [
+    "node_modules",
+    "src/worker/sw.ts"
+  ]
 }
