@@ -7,24 +7,24 @@ import { GOLF_SETTINGS } from '@/declarations/play/golf/settings'
 const compiled = new WeakMap<GolfHoleLayout, GolfHole>()
 
 /**
- * Four sides of a box obstacle
+ * Four sides of a box obstacle, each following the ground under it
  * @param {GolfHole['blocks'][number]} block - Box
  * @return {GolfWall[]} - Sides
  */
 
-const blockWalls = ({ x0, x1, z0, z1, floor }: GolfHole['blocks'][number]): GolfWall[] =>
+const blockWalls = ({ x0, x1, z0, z1, corners }: GolfHole['blocks'][number]): GolfWall[] =>
   [
     [x0, z0, x1, z0],
     [x1, z0, x1, z1],
     [x1, z1, x0, z1],
     [x0, z1, x0, z0],
-  ].map(([ax, az, bx, bz]) => ({
+  ].map(([ax, az, bx, bz], index) => ({
     ax,
     az,
     bx,
     bz,
-    fa: floor,
-    fb: floor,
+    fa: corners[index],
+    fb: corners[(index + 1) % corners.length],
     top: GOLF_SETTINGS.render.blockHeight,
     kind: 'block' as const,
     nx: 0,
@@ -47,13 +47,33 @@ export const compileHole = (layout: GolfHoleLayout): GolfHole => {
 
     return pad ? padHeight(pad, x, z) : 0
   }
-  const blocks = (layout.blocks ?? []).map(({ at, size }) => ({
-    x0: at[0],
-    x1: at[0] + size[0],
-    z0: at[1],
-    z1: at[1] + size[1],
-    floor: floorAt([at[0] + size[0] / 2, at[1] + size[1] / 2]),
-  }))
+  const blocks = (layout.blocks ?? []).map(({ at, size }) => {
+    const [x0, z0] = at
+    const x1 = x0 + size[0]
+    const z1 = z0 + size[1]
+    const floor = floorAt([x0 + size[0] / 2, z0 + size[1] / 2])
+
+    return {
+      x0,
+      x1,
+      z0,
+      z1,
+      floor,
+      // Corners read on the centre's slab, never a neighbour's
+      corners: (
+        [
+          [x0, z0],
+          [x1, z0],
+          [x1, z1],
+          [x0, z1],
+        ] as GolfPoint[]
+      ).map(([x, z]) => {
+        const pad = padUnder(pads, x0 + size[0] / 2, z0 + size[1] / 2)
+
+        return pad ? padHeight(pad, x, z) : floor
+      }),
+    }
+  })
   const margin = GOLF_SETTINGS.physics.worldMargin
   const hole: GolfHole = {
     tee: layout.tee,

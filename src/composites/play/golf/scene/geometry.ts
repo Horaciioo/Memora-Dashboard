@@ -220,8 +220,8 @@ export const courseGeometry = (hole: GolfHole) => {
         [block.x1, block.z1],
         [block.x0, block.z1],
       ],
-      [0, 1, 2, 3].map(() => block.floor + render.blockHeight),
-      [0, 1, 2, 3].map(() => block.floor)
+      block.corners.map((corner) => corner + render.blockHeight),
+      block.corners
     )
   )
 
