@@ -10,6 +10,7 @@ import { API_ROUTES } from '@/core/lib/api/routes'
 import { emptyDocument, mediaIdOf, validateDocument } from '@/core/lib/pages/document'
 import { canOwnPages } from '@/core/lib/pages'
 import type { PageViewer } from '@/core/lib/pages'
+import { requireCategory } from '@/core/services/pages/CategoryService'
 import { reachablePageIds, requirePage } from '@/core/services/pages/AccessService'
 import { journalPage } from '@/core/services/pages/journal'
 import { SUMMARY_SELECT, nextPosition, toCrumb, toSummary } from '@/core/services/pages/lookups'
@@ -44,19 +45,23 @@ export const listPages = async (viewer: PageViewer): Promise<PageSummary[]> => {
  * @param {PageViewer} viewer - Member creating
  * @param {Object} input - Page start
  * @param {unknown} [input.parentId] - Parent page
+ * @param {unknown} [input.categoryId] - Category of a root page
  * @param {unknown} [input.template] - Template key
  * @return {Promise<PageSummary>} - New page
  */
 
 export const createPage = async (
   viewer: PageViewer,
-  input: { parentId?: unknown; template?: unknown }
+  input: { parentId?: unknown; categoryId?: unknown; template?: unknown }
 ): Promise<PageSummary> => {
   // Guests only add under a page they may write
   if (!input.parentId && !canOwnPages(viewer)) throw forbidden()
 
   // A sub page needs write access on its parent
   const parentId = input.parentId ? (await requirePage(input.parentId, viewer, 'write')).page.id : null
+
+  // Only a root page sits in a category
+  const categoryId = !parentId && input.categoryId ? (await requireCategory(input.categoryId, viewer)).id : null
 
   const template = typeof input.template === 'string' && input.template ? input.template : null
   if (template && !PAGE_TEMPLATES.has(template)) {
@@ -74,11 +79,12 @@ export const createPage = async (
     data: {
       ownerId: viewer.id,
       parentId,
+      categoryId,
       title: preset?.title ?? '',
       icon: preset?.icon ?? null,
       content: check.document as unknown as Prisma.InputJsonValue,
       searchText: check.text,
-      position: await nextPosition(parentId, viewer.id),
+      position: await nextPosition(parentId, viewer.id, categoryId),
       editedById: viewer.id,
     },
     select: SUMMARY_SELECT,

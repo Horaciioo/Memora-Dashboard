@@ -21,16 +21,28 @@ interface PageTemplateOption {
 
 const text = (value: string): PageDocument[] => (value ? [{ type: 'text', text: value }] : [])
 const line = (value = ''): PageDocument => ({ type: 'paragraph', content: text(value) })
-const heading = (level: number, value: string): PageDocument => ({ type: 'heading', attrs: { level }, content: text(value) })
+const heading = (level: number, value: string): PageDocument => ({
+  type: 'heading',
+  attrs: { level },
+  content: text(value),
+})
 const tasks = (...items: string[]): PageDocument => ({
   type: 'taskList',
-  content: items.map((item) => ({ type: 'taskItem', attrs: { checked: false }, content: [line(item)] })),
+  content: items.map((item) => ({
+    type: 'taskItem',
+    attrs: { checked: false },
+    content: [line(item)],
+  })),
 })
 const bullets = (...items: string[]): PageDocument => ({
   type: 'bulletList',
   content: items.map((item) => ({ type: 'listItem', content: [line(item)] })),
 })
-const callout = (icon: string, value: string): PageDocument => ({ type: 'callout', attrs: { icon }, content: [line(value)] })
+const callout = (icon: string, value: string): PageDocument => ({
+  type: 'callout',
+  attrs: { icon },
+  content: [line(value)],
+})
 
 const PAGE_TEMPLATE_MAP = {
   note: {
@@ -60,7 +72,12 @@ const PAGE_TEMPLATE_MAP = {
     description: 'Cocher au fur et à mesure.',
     icon: '✅',
     title: 'À faire',
-    blocks: [heading(2, 'Aujourd’hui'), tasks('Première tâche'), heading(2, 'Plus tard'), tasks('')],
+    blocks: [
+      heading(2, 'Aujourd’hui'),
+      tasks('Première tâche'),
+      heading(2, 'Plus tard'),
+      tasks(''),
+    ],
   },
   minutes: {
     label: 'Compte rendu',
@@ -82,7 +99,9 @@ const PAGE_TEMPLATE_MAP = {
 
 export type PageTemplateName = keyof typeof PAGE_TEMPLATE_MAP
 
-export const PAGE_TEMPLATES = createRegistry<PageTemplateName, PageTemplateOption>(PAGE_TEMPLATE_MAP)
+export const PAGE_TEMPLATES = createRegistry<PageTemplateName, PageTemplateOption>(
+  PAGE_TEMPLATE_MAP
+)
 
 /**
  * Document of a template

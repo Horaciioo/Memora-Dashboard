@@ -8,4 +8,3 @@ export const PAGE_OFFLINE_STORE = {
   version: 1,
   table: 'pages',
 } as const
-

@@ -19,7 +19,12 @@ export const PAGE_FORMAT_MARKS: { name: string; label: string; icon: IconName }[
  * @type {PageBlockKind[]}
  */
 
-export const MOBILE_TOOLBAR_BLOCKS: PageBlockKind[] = ['heading2', 'bulletList', 'taskList', 'blockquote']
+export const MOBILE_TOOLBAR_BLOCKS: PageBlockKind[] = [
+  'heading2',
+  'bulletList',
+  'taskList',
+  'blockquote',
+]
 
 /**
  * Blocks offered by "Turn into"

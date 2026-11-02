@@ -14,13 +14,32 @@ import { useNotifications } from '@/managers/infrastructure/Network/Notification
 import type { PageSummary } from '@/types/pages'
 
 /**
+ * Where a page lands
+ * @typedef {Object} PageMoveTarget
+ * @property {string | null} parentId - New parent, null for the root
+ * @property {string | null} categoryId - Category of a root page
+ * @property {number} position - Index among the new siblings
+ */
+
+export interface PageMoveTarget {
+  parentId: string | null
+  categoryId: string | null
+  position: number
+}
+
+/**
  * Tree gestures
  * @typedef {Object} PageActions
  */
 
 export interface PageActions {
-  create: (input?: { parentId?: string | null; template?: PageTemplateName; open?: boolean }) => Promise<PageSummary | null>
-  move: (pageId: string, parentId: string | null, position: number) => Promise<void>
+  create: (input?: {
+    parentId?: string | null
+    categoryId?: string | null
+    template?: PageTemplateName
+    open?: boolean
+  }) => Promise<PageSummary | null>
+  move: (pageId: string, target: PageMoveTarget) => Promise<void>
   trash: (pageId: string) => Promise<void>
   restore: (pageId: string) => Promise<void>
   purge: (pageId: string) => Promise<void>
@@ -59,7 +78,11 @@ export const usePageActions = (): PageActions => {
   const create: PageActions['create'] = useCallback(
     async (input = {}) => {
       const page = await attempt(() =>
-        apiPost<PageSummary>(API_ROUTES.pages, { parentId: input.parentId ?? null, template: input.template ?? null })
+        apiPost<PageSummary>(API_ROUTES.pages, {
+          parentId: input.parentId ?? null,
+          categoryId: input.categoryId ?? null,
+          template: input.template ?? null,
+        })
       )
       if (page && input.open !== false) router.push(ROUTES.page(page.id))
 
@@ -69,8 +92,8 @@ export const usePageActions = (): PageActions => {
   )
 
   const move: PageActions['move'] = useCallback(
-    async (pageId, parentId, position) => {
-      await attempt(() => apiPost(API_ROUTES.pageMove(pageId), { parentId, position }))
+    async (pageId, target) => {
+      await attempt(() => apiPost(API_ROUTES.pageMove(pageId), target))
     },
     [attempt]
   )

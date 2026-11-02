@@ -9,6 +9,12 @@ export const PAGES_COPY = {
   railGroup: 'Privé',
   railShared: 'Partagées avec toi',
   railNew: 'Créer une page',
+  railNewCategory: 'Créer une catégorie',
+  railCategoryName: 'Nouvelle catégorie',
+  railCategoryRename: 'Nom de la catégorie',
+  railCategoryAdd: 'Ajouter une page ici',
+  railCategoryEmpty: 'Dépose une page ici',
+  railDropRoot: 'Dépose ici pour sortir d’une catégorie',
   railAddChild: 'Ajouter une sous-page',
   railExpand: 'Déplier',
   railEmpty: 'Aucune page',
@@ -121,6 +127,7 @@ export const PAGE_SHARE_COPY = {
  */
 
 export const PAGE_MENU_COPY = {
+  removeCategory: 'Supprimer la catégorie',
   privacyTitle: 'Confidentialité',
   privacyNote:
     'Les développeurs de Memora voient le titre de cette page et qui y a accès, jamais son contenu tant qu’ils n’y ont pas été invités.',
@@ -289,4 +296,7 @@ export const PAGE_DOCUMENT_COPY = {
   shareTarget: 'Choisis une personne, un rôle ou tout Memora.',
   comment: 'Le commentaire est vide ou trop long.',
   template: 'Ce modèle n’existe pas.',
+  categoryName: 'Donne un nom court à la catégorie.',
+  categoryLimit: 'Tu as atteint le nombre maximal de catégories.',
+  categoryTarget: 'Cette catégorie n’existe pas.',
 } as const

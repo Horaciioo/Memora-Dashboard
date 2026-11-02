@@ -199,6 +199,7 @@ import {
   CloudCheck,
   CloudSlash,
   CloudArrowUp,
+  FolderSimplePlus,
 } from '@phosphor-icons/react/ssr'
 import type { Icon, IconWeight } from '@phosphor-icons/react'
 import {
@@ -550,6 +551,7 @@ export const ICONS = {
   image: phosphor(Image),
   callout: phosphor(Lightbulb),
   page: phosphor(FileText),
+  pageCategoryAdd: phosphor(FolderSimplePlus),
   undo: phosphor(ArrowUUpLeft),
   redo: phosphor(ArrowUUpRight),
   indent: phosphor(TextIndent),

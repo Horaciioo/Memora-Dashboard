@@ -24,6 +24,7 @@ export interface PageDocument {
  * @typedef {Object} PageSummary
  * @property {string} id - Page id
  * @property {string | null} parentId - Parent page
+ * @property {string | null} categoryId - Category of a root page
  * @property {string} title - Title
  * @property {string | null} icon - Emoji
  * @property {number} position - Order among siblings
@@ -35,6 +36,7 @@ export interface PageDocument {
 export interface PageSummary {
   id: string
   parentId: string | null
+  categoryId: string | null
   title: string
   icon: string | null
   position: number
@@ -175,4 +177,18 @@ export interface PageRegistryRow {
   createdAt: string
   contentAt: string
   trashedAt: string | null
+}
+
+/**
+ * Folder of the private rail
+ * @typedef {Object} PageCategoryView
+ * @property {string} id - Category id
+ * @property {string} name - Name
+ * @property {number} position - Order among categories
+ */
+
+export interface PageCategoryView {
+  id: string
+  name: string
+  position: number
 }
