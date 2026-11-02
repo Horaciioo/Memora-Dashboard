@@ -22,6 +22,8 @@ export const RECRUITMENT_STREAM_EVENTS = {
   candidate: 'candidate',
   // One candidate dropped
   removed: 'removed',
+  // One answer noted, carried whole
+  answer: 'answer',
   // The session itself moved, read the page again
   session: 'session',
 } as const

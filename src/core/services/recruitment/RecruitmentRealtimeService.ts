@@ -2,9 +2,10 @@ import 'server-only'
 
 import { forbidden } from '@/core/lib/errors'
 import { forwardTopic } from '@/core/lib/realtime/server/frames'
+import { joinPresence } from '@/core/lib/realtime/server/presence'
 import type { RealtimeTopic } from '@/core/lib/realtime/server/types'
 import { resolvePermissions } from '@/core/services/auth/PermissionsService'
-import { readScope } from '@/core/services/auth/ScopeService'
+import { readFullScope } from '@/core/services/auth/ScopeService'
 import { recruitmentModeOf } from '@/core/services/recruitment/access'
 import { reachableSession } from '@/core/services/recruitment/reach'
 import { RECRUITMENT_TOPICS } from '@/declarations/recruitment/topics'
@@ -26,12 +27,18 @@ export const RECRUITMENT_REALTIME_TOPICS: RealtimeTopic[] = [
       if (!mode) throw forbidden()
       // A reader stays inside the creators of their perimeter
       if (mode === 'read') {
-        await reachableSession(sessionId, await readScope(session, access)).catch(() => {
+        await reachableSession(sessionId, await readFullScope(session, access)).catch(() => {
           throw forbidden()
         })
       }
 
-      return forwardTopic(topic, connection)
+      const stopSignals = forwardTopic(topic, connection)
+      const leave = joinPresence(topic, connection)
+
+      return () => {
+        stopSignals()
+        leave()
+      }
     },
   },
 ]

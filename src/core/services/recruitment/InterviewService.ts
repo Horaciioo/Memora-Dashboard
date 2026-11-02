@@ -4,7 +4,8 @@ import { prisma } from '@/core/lib/db'
 import { forbidden, notFound } from '@/core/lib/errors'
 import { readList } from '@/core/lib/forms/values'
 import { isInterviewLocked } from '@/core/lib/recruitment/interviewLock'
-import { CANDIDATE_STAGES } from '@/core/lib/recruitment/candidateTimeline'
+import { CANDIDATE_STAGES, marksAt } from '@/core/lib/recruitment/candidateTimeline'
+import type { CandidateStage } from '@/core/lib/recruitment/candidateTimeline'
 import { stepKey } from '@/core/lib/recruitment/exercises'
 import { secondaryKeys } from '@/core/lib/recruitment/questionnaire'
 import { candidateSession } from '@/core/services/recruitment'
@@ -81,7 +82,7 @@ export const saveAnswer = async (
   questionKey: string,
   patch: AnswerPatch,
   scope: AccessScope
-): Promise<{ sessionId: string; created: boolean }> => {
+): Promise<{ sessionId: string; created: boolean; answer: AnswerState }> => {
   if (!QUESTION_KEYS.has(questionKey)) throw notFound()
 
   const sessionId = await candidateSession(candidateId, scope)
@@ -94,13 +95,14 @@ export const saveAnswer = async (
     ...(patch.skipped !== undefined ? { skipped: patch.skipped } : {}),
   }
 
-  await prisma.recruitmentAnswer.upsert({
+  const answer = await prisma.recruitmentAnswer.upsert({
     where: key,
     create: { candidateId, questionKey, ...data },
     update: data,
+    select: { branch: true, appreciation: true, skipped: true },
   })
 
-  return { sessionId, created: existing === null }
+  return { sessionId, created: existing === null, answer }
 }
 
 /**
@@ -180,10 +182,9 @@ export const saveInterview = async (
 }
 
 /**
- * Tick or untick one moment of a candidate timeline
+ * Put a candidate on one moment of their timeline
  * @param {string} candidateId - Candidate identifier
  * @param {string} stage - Moment key
- * @param {boolean} done - Wanted state
  * @param {AccessScope} scope - Perimeter
  * @return {Promise<Record<string, boolean>>} - Marks after the change
  */
@@ -191,18 +192,12 @@ export const saveInterview = async (
 export const markStage = async (
   candidateId: string,
   stage: string,
-  done: boolean,
   scope: AccessScope
 ): Promise<Record<string, boolean>> => {
   if (!(CANDIDATE_STAGES as readonly string[]).includes(stage)) throw notFound()
 
   await candidateSession(candidateId, scope)
-  const row = await prisma.recruitmentCandidate.findUniqueOrThrow({
-    where: { id: candidateId },
-    select: { stageMarks: true },
-  })
-
-  const marks = { ...(row.stageMarks as Record<string, boolean>), [stage]: done }
+  const marks = marksAt(stage as CandidateStage)
   await prisma.recruitmentCandidate.update({
     where: { id: candidateId },
     data: { stageMarks: marks },

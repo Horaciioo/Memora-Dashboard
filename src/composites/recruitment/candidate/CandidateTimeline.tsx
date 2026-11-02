@@ -16,7 +16,7 @@ export interface CandidateTimelineProps {
   onPass: () => void
   // Opens the finished interview
   onReview: () => void
-  // Ticks or unticks the availabilities
+  // Puts the candidate on this moment
   onToggle?: (stage: CandidateStage) => void
 }
 
@@ -32,7 +32,7 @@ const STAGE_BUTTONS: Partial<Record<CandidateStage, string>> = {
  * @param {boolean} canPass - Viewer may start the interview
  * @param {() => void} onPass - Starts or resumes the interview
  * @param {() => void} onReview - Opens the finished interview
- * @param {(stage: CandidateStage) => void} [onToggle] - Ticks the availabilities
+ * @param {(stage: CandidateStage) => void} [onToggle] - Places the candidate on a moment
  * @return {JSX.Element}
  */
 
@@ -56,7 +56,7 @@ export const CandidateTimeline = ({
               id: stage,
               state: states[stage],
               title: CANDIDATE_STAGE_COPY[stage],
-              onSelect: stage === 'availabilities' && onToggle ? () => onToggle(stage) : undefined,
+              onSelect: stage !== 'joined' && onToggle ? () => onToggle(stage) : undefined,
               children:
                 label && states[stage] === 'current' ? (
                   <Button

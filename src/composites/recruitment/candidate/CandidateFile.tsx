@@ -95,7 +95,7 @@ const CandidateBody = ({
               onPass={() => startInterview(candidate.id)}
               onToggle={
                 can.writeCandidates
-                  ? (stage) => void file.markStage(candidate.id, stage, states[stage] !== 'done')
+                  ? (stage) => void file.markStage(candidate.id, stage)
                   : undefined
               }
             />
