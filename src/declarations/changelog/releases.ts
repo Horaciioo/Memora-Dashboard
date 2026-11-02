@@ -448,6 +448,58 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         permission: Permissions.PlayAccess,
         text: 'Correction d’un bug qui envoyait deux fois la même ligne dans le chat d’une partie.',
       },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Golf » qui validait un trou dès le coup frappé, avant que la balle ne s’arrête.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Ludo » qui annonçait un déplacement dans le journal avant que le pion n’ait fini de bouger.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug dans « Ludo » qui faisait bouger le plateau à chaque tour, le message du tour garde maintenant sa place.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui laissait un vote de lancement attendre indéfiniment quand son temps était écoulé : la partie démarre maintenant seule.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui laissait voir le salon à travers l’écran de vote, et d’affichages mal alignés sur les votes de Baccalauréat, de Bombe et de Ludo.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui laissait des parties ouvertes ou fermées à l’affichage dans « Memora Play » : la liste se met maintenant à jour toute seule, et les parties ouvertes rejoignent la liste « En ce moment ».',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.play,
+        permission: Permissions.PlayAccess,
+        text: 'Correction d’un bug qui coupait la fenêtre d’invitation de joueurs dans le chat d’une partie.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        page: ROUTES.recruitments,
+        permission: Permissions.RecruitmentRead,
+        text: 'Correction d’un bug dans « Recrutements » qui gardait « En attente de son entretien » une fois l’heure du créneau passée, et affichait « Revoir l’entretien » avant qu’il ait eu lieu.',
+      },
+      {
+        tag: ChangelogTags.Fixed,
+        text: 'Correction d’un bug qui gardait l’ancienne version de Memora après avoir rechargé la page suite à une mise à jour.',
+      },
     ],
   },
   {
