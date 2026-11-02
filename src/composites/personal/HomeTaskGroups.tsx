@@ -51,22 +51,11 @@ export const HomeTaskGroups = ({ entries, doneKeys, onWalk }: HomeTaskGroupsProp
           pending.length === 1 && pending[0]?.actions.length === 1 ? pending[0].actions[0] : null
         const href = direct?.href
 
-        const isUrgent = option.urgent && !isDone
-
         const body = (
           <>
-            <Icon
-              className={cn(HOME_TASKS.glyph, isUrgent && HOME_TASKS.urgent)}
-              aria-hidden="true"
-            />
+            <Icon className={HOME_TASKS.glyph} aria-hidden="true" />
             <span className={HOME_TASKS.body}>
-              <span
-                className={cn(
-                  HOME_TASKS.sentence,
-                  isDone && HOME_TASKS.sentenceDone,
-                  isUrgent && HOME_TASKS.urgent
-                )}
-              >
+              <span className={cn(HOME_TASKS.sentence, isDone && HOME_TASKS.sentenceDone)}>
                 {sentence[0]}
                 <strong className={HOME_TASKS.number}>{count}</strong>
                 {sentence[1]}

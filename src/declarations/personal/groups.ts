@@ -10,7 +10,6 @@ import type { HomeTaskKind } from '@/types/personal'
  * @property {IconName} icon - Glyph
  * @property {boolean} [pim] - A step of the PIM: its context reads as a list of facts
  * @property {boolean} [solo] - Walked alone: no counter, no timeline, no previous or next
- * @property {boolean} [urgent] - Reads in red, the most pressing kind
  */
 
 export interface TaskGroupOption {
@@ -20,7 +19,6 @@ export interface TaskGroupOption {
   icon: IconName
   pim?: boolean
   solo?: boolean
-  urgent?: boolean
 }
 
 /**
@@ -68,7 +66,6 @@ export const TASK_GROUPS: Record<string, TaskGroupOption> = {
     other: 'Tu dois répondre à {n} appels de présence',
     title: 'Appels de présence',
     icon: 'meetings',
-    urgent: true,
   },
   pimStep: {
     one: 'Tu as {n} étape de PIM à valider',

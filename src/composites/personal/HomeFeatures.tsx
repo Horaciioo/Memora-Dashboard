@@ -2,34 +2,30 @@
 import Link from '@/components/elements/navigation/AppLink'
 
 import { Section } from '@/components/structures/page/Section'
-import { HOME_SHORTCUTS, TRADE_SHORTCUTS } from '@/declarations/personal/shortcuts'
+import { HOME_FEATURES } from '@/declarations/personal/shortcuts'
 import { PERSONAL_COPY } from '@/declarations/personal/copy'
 import { ICONS } from '@/declarations/ui/icons'
 import { HOME_CARDS as STYLES } from '@/declarations/ui/variants'
 import type { PermissionName } from '@/utils/constants/permissions'
 
-export interface HomeShortcutsProps {
+export interface HomeFeaturesProps {
   can: (permission: PermissionName) => boolean
-  // Trade of a moderator, none for everyone else
-  trade: string | null
 }
 
 /**
- * Big cards leading to the main areas, a moderator gets the ones of their trade
+ * Big cards leading to the latest features
  * @param {(permission: PermissionName) => boolean} can - Permission check
- * @param {string | null} trade - Moderator trade
  * @return {JSX.Element | null}
  */
 
-export const HomeShortcuts = ({ can, trade }: HomeShortcutsProps) => {
-  const source = (trade && TRADE_SHORTCUTS[trade]) || HOME_SHORTCUTS
-  const cards = source.filter((card) => !card.permission || can(card.permission))
+export const HomeFeatures = ({ can }: HomeFeaturesProps) => {
+  const cards = HOME_FEATURES.filter((card) => !card.permission || can(card.permission))
   const GoIcon = ICONS.next
 
   if (cards.length === 0) return null
 
   return (
-    <Section title={PERSONAL_COPY.shortcutsTitle} bare>
+    <Section title={PERSONAL_COPY.featuresTitle} bare>
       <div className={STYLES.grid}>
         {cards.map((card) => {
           const Icon = ICONS[card.icon]

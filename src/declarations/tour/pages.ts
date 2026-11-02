@@ -97,9 +97,9 @@ export const TOUR_PAGES: TourPage[] = [
         body: 'Les anniversaires des semaines qui arrivent dans ton équipe.',
       },
       {
-        beacon: TOUR_BEACONS.homeShortcuts,
-        title: 'Raccourcis',
-        body: 'De grandes cartes qui ouvrent les espaces auxquels tu as accès, en un clic.',
+        beacon: TOUR_BEACONS.homeFeatures,
+        title: 'Les nouveautés',
+        body: 'De grandes cartes qui ouvrent les dernières nouveautés de Memora, en un clic.',
       },
     ],
   },

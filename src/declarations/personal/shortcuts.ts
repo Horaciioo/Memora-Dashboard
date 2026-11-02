@@ -4,10 +4,10 @@ import { Permissions } from '@/utils/constants/permissions'
 import type { PermissionName } from '@/utils/constants/permissions'
 
 /**
- * Big card of the home leading to one area
- * @typedef {Object} HomeShortcut
+ * Big card of the home leading to one new feature
+ * @typedef {Object} HomeFeature
  * @property {string} key - Identifier
- * @property {string} title - Area name
+ * @property {string} title - Feature name
  * @property {string} href - Destination
  * @property {IconName} icon - Glyph on the card
  * @property {string} image - Photograph in the mood of the course covers
@@ -15,7 +15,7 @@ import type { PermissionName } from '@/utils/constants/permissions'
  * @property {PermissionName} [permission] - Needed to see the card
  */
 
-export interface HomeShortcut {
+export interface HomeFeature {
   key: string
   title: string
   href: string
@@ -26,32 +26,31 @@ export interface HomeShortcut {
 }
 
 /**
- * Cards under "Raccourcis"
- * @type {HomeShortcut[]}
+ * Cards under "Les nouveautés"
+ * @type {HomeFeature[]}
  */
 
-export const HOME_SHORTCUTS: HomeShortcut[] = [
+export const HOME_FEATURES: HomeFeature[] = [
   {
-    key: 'lives',
-    title: 'Lives',
-    href: ROUTES.lives,
-    icon: 'liveDot',
-    image: '/courses/twitch.jpg',
-    position: '60% 60%',
-    permission: Permissions.LiveRead,
-  },
-  {
-    key: 'academy',
-    title: 'Marsha Academy',
-    href: ROUTES.academy,
-    icon: 'academy',
+    key: 'pages',
+    title: 'Pages privées',
+    href: ROUTES.pages,
+    icon: 'page',
     image: '/courses/general.jpg',
     position: '50% 65%',
-    permission: Permissions.AcademyRead,
+  },
+  {
+    key: 'play',
+    title: 'Memora Play',
+    href: ROUTES.play,
+    icon: 'play',
+    image: '/courses/twitch.jpg',
+    position: '60% 60%',
+    permission: Permissions.PlayAccess,
   },
   {
     key: 'recruitments',
-    title: 'Recrutements',
+    title: 'Recrutement',
     href: ROUTES.recruitments,
     icon: 'recruitment',
     image: '/courses/discord.jpg',
@@ -59,61 +58,3 @@ export const HOME_SHORTCUTS: HomeShortcut[] = [
     permission: Permissions.RecruitmentRead,
   },
 ]
-
-const SANCTIONS_CARD: HomeShortcut = {
-  key: 'sanctions',
-  title: 'Panel Twitch',
-  href: ROUTES.sanctions,
-  icon: 'sanctionsPanel',
-  image: '/courses/twitch.jpg',
-  position: '60% 60%',
-  permission: Permissions.SanctionRead,
-}
-
-const DISCORD_SANCTIONS_CARD: HomeShortcut = {
-  ...SANCTIONS_CARD,
-  key: 'discordSanctions',
-  title: 'Panel Discord',
-  href: ROUTES.discordSanctions,
-  image: '/courses/discord.jpg',
-  position: '60% 40%',
-}
-
-const ABSENCES_CARD: HomeShortcut = {
-  key: 'absences',
-  title: 'Absences',
-  href: ROUTES.absences,
-  icon: 'absences',
-  image: '/courses/youtube.jpg',
-  position: '50% 50%',
-  permission: Permissions.AbsenceCreate,
-}
-
-const CALENDAR_CARD: HomeShortcut = {
-  key: 'calendar',
-  title: 'Calendrier',
-  href: ROUTES.calendar,
-  icon: 'meetings',
-  image: '/courses/general.jpg',
-  position: '50% 65%',
-  permission: Permissions.CalendarRead,
-}
-
-const MARSHA_CARD: HomeShortcut = {
-  key: 'marsha',
-  title: 'Marsha Bots',
-  href: ROUTES.marsha,
-  icon: 'discord',
-  image: '/courses/discord.jpg',
-  position: '60% 40%',
-}
-
-/**
- * Cards a moderator sees, by trade
- * @type {Record<string, HomeShortcut[]>}
- */
-
-export const TRADE_SHORTCUTS: Record<string, HomeShortcut[]> = {
-  Lives: [SANCTIONS_CARD, ABSENCES_CARD, CALENDAR_CARD],
-  Discord: [MARSHA_CARD, DISCORD_SANCTIONS_CARD, ABSENCES_CARD],
-}
