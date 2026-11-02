@@ -149,7 +149,8 @@ export const ADD_ROW_STYLES = {
 export const FLOATING_ADD_STYLES = {
   // Pinned corner holding the button and its words
   dock: 'fixed right-5 bottom-[calc(var(--shell-dock-clearance)+1rem)] z-30 flex flex-col items-end md:right-12 md:bottom-16 print:hidden',
-  root: 'group glass-sunset flex h-14 min-w-14 cursor-pointer items-center justify-center rounded-full border px-4 text-[var(--color-on-sunset)] transition-transform duration-[var(--motion-duration-panel)] ease-[var(--motion-ease-spring)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  // Hidden on a phone, the top bar holds Memora there
+  root: 'group glass-sunset hidden h-14 min-w-14 cursor-pointer items-center justify-center rounded-full border px-4 text-[var(--color-on-sunset)] transition-transform duration-[var(--motion-duration-panel)] md:flex ease-[var(--motion-ease-spring)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
   // Chat above the button, one size, never grows
   chat: 'speech-bubble speech-tail-down surface-enter absolute right-1 bottom-[calc(100%+1.75rem)] flex h-[min(34rem,calc(100dvh-12rem))] w-[26rem] max-w-[calc(100vw-2.5rem)] flex-col rounded-[var(--radius-xl)]',
   // Memora's card, a soft sunset wash

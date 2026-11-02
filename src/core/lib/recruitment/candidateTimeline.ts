@@ -31,6 +31,24 @@ export const CANDIDATE_STAGES = [
 export type CandidateStage = (typeof CANDIDATE_STAGES)[number]
 
 /**
+ * Progress of a candidate as the timeline reads it
+ * @param {CandidateProgress} candidate - Dates and column of the card
+ * @param {Record<string, unknown>} values - Inline values, fresher than the card
+ * @return {CandidateProgress}
+ */
+
+export const progressOf = (
+  candidate: Omit<CandidateProgress, 'interviewAt' | 'outcomeId'>,
+  values: Record<string, unknown>
+): CandidateProgress => ({
+  interviewStartedAt: candidate.interviewStartedAt,
+  interviewEndedAt: candidate.interviewEndedAt,
+  verdictAt: candidate.verdictAt,
+  interviewAt: typeof values.interviewAt === 'string' ? values.interviewAt : null,
+  outcomeId: typeof values.outcomeId === 'string' ? values.outcomeId : null,
+})
+
+/**
  * Where each moment of a candidate stands
  * @param {CandidateProgress} progress - What is known of them
  * @param {RecruitmentOutcomeView[]} outcomes - Columns of the results board

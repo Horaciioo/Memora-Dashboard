@@ -1036,3 +1036,42 @@ export const EmployeGlyph = ({ className, tone = 'EMPLOYE' }: TintedGlyphProps) 
     )}
   />
 )
+
+/**
+ * Heavy check of a task done: a short dark stroke falling into a long lit one, no box around it
+ * @param {GlyphProps} props - Sizing class
+ * @return {JSX.Element}
+ */
+
+export const CheckGlyph = ({ className }: GlyphProps) => (
+  <Frame
+    className={className}
+    tone="success"
+    render={({ fill, lift, deep, cut }) => (
+      <>
+        <path
+          d="M4.4 12.6 9.4 17.6"
+          fill="none"
+          stroke={deep}
+          strokeWidth="3.6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M9.4 17.6 19.8 5.6"
+          fill="none"
+          stroke={fill}
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+        <path
+          d="M14.3 10.6 17.9 6.5"
+          fill="none"
+          stroke={lift}
+          strokeWidth="1.1"
+          strokeLinecap="round"
+        />
+        <circle cx="19.4" cy="5.9" r="0.6" fill={cut} opacity="0.8" />
+      </>
+    )}
+  />
+)

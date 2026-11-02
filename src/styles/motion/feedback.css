@@ -681,3 +681,50 @@
     display: none;
   }
 }
+
+/* Observing: the check pops, then the words unroll */
+.observe-pop {
+  animation: observe-pop var(--motion-duration-slow) var(--motion-ease-spring) both;
+}
+
+.observe-reveal {
+  animation: observe-reveal var(--motion-duration-slow) var(--motion-ease-out) 300ms both;
+}
+
+@keyframes observe-pop {
+  from {
+    opacity: 0;
+    transform: rotate(-35deg) scale(0.3);
+  }
+
+  60% {
+    opacity: 1;
+    transform: rotate(6deg) scale(1.18);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes observe-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+    transform: translateX(-0.25rem);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .observe-pop,
+  .observe-reveal {
+    animation: none;
+  }
+}

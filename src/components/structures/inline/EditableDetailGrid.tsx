@@ -36,6 +36,10 @@ export interface EditableDetailGridProps {
   disabled?: boolean
   // One column
   stacked?: boolean
+  // Stacked from md, two columns before
+  paired?: boolean
+  // Three properties on one line from md
+  inline?: boolean
   onCommit: (name: string, value: FieldValue) => Promise<boolean>
 }
 
@@ -59,6 +63,8 @@ const STAY_OPEN_KINDS = ['multiselect', 'tags']
  * @param {FieldIssue[]} issues - Rejections returned by the server
  * @param {boolean} [disabled] - Blocks every entry
  * @param {boolean} [stacked] - One column layout
+ * @param {boolean} [paired] - Two columns on a phone, one from md
+ * @param {boolean} [inline] - Three columns from md
  * @param {(name: string, value: FieldValue) => Promise<boolean>} onCommit - Persists one field
  * @return {JSX.Element}
  */
@@ -69,6 +75,8 @@ export const EditableDetailGrid = ({
   issues,
   disabled,
   stacked,
+  paired,
+  inline,
   onCommit,
 }: EditableDetailGridProps) => {
   const [editing, setEditing] = useState<string | null>(null)
@@ -141,7 +149,17 @@ export const EditableDetailGrid = ({
   }
 
   return (
-    <dl className={stacked ? DETAIL_BLOCK.stack : DETAIL_BLOCK.grid}>
+    <dl
+      className={
+        paired
+          ? DETAIL_BLOCK.stackPaired
+          : stacked
+            ? DETAIL_BLOCK.stack
+            : inline
+              ? DETAIL_BLOCK.gridInline
+              : DETAIL_BLOCK.grid
+      }
+    >
       {entries.map(({ label, field, display, wide }) => {
         const entryClass =
           wide || (field && WIDE_KINDS.includes(field.kind))

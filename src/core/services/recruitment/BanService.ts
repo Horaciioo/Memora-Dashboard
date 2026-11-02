@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { prisma } from '@/core/lib/db'
-import { invalidInput } from '@/core/lib/errors'
+import { forbidden, invalidInput } from '@/core/lib/errors'
 import { HISTORY_COPY } from '@/declarations/recruitment/historyCopy'
 import type { BanView } from '@/types/recruitment'
 
@@ -126,3 +126,22 @@ export const banIdentifier = async ({
 
 export const liftBan = async (discordId: string): Promise<BanView> =>
   toBan(await prisma.recruitmentBan.delete({ where: { discordId }, include: BAN_INCLUDE }))
+
+/**
+ * Keep the file of a barred candidate to the responsables and above
+ * @param {string} candidateId - Candidate identifier
+ * @param {boolean} canManage - Viewer is a responsable or above
+ * @return {Promise<void>} - Resolves when the file may be changed
+ */
+
+export const assertFileOpen = async (candidateId: string, canManage: boolean): Promise<void> => {
+  if (canManage) return
+
+  const row = await prisma.recruitmentCandidate.findUniqueOrThrow({
+    where: { id: candidateId },
+    select: { discordId: true },
+  })
+  if ((await prisma.recruitmentBan.count({ where: { discordId: row.discordId } })) > 0) {
+    throw forbidden()
+  }
+}

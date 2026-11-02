@@ -14,11 +14,13 @@ import { recruitmentModeOf } from '@/core/services/recruitment/access'
 import { readCandidate } from '@/core/services/recruitment/CandidateService'
 import { maskForObserver } from '@/core/services/recruitment/ObserverMask'
 import { candidateSessionId } from '@/core/services/recruitment/reach'
+import { applyFirstSlot } from '@/core/services/recruitment/SlotRules'
 import { assertInterviewOpen } from '@/core/services/recruitment/InterviewService'
 import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJournal'
 import { notify } from '@/core/services/system/NotificationService'
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import { Permissions } from '@/utils/constants/permissions'
+import { assertFileOpen } from '@/core/services/recruitment/BanService'
 
 export const GET = createProtectedRoute({
   descriptor: { summary: 'Read a candidate as the session shows it', tags: ['recruitment'] },
@@ -38,6 +40,7 @@ export const PATCH = createProtectedRoute({
   permission: Permissions.RecruitmentCandidateWrite,
   descriptor: { summary: 'Edit a candidate', tags: ['recruitment'] },
   handler: async ({ params, raw, session, scope, access }) => {
+    await assertFileOpen(params.id, access.can(Permissions.RecruitmentManage))
     const perimeter = await scope()
     const parsed = parseFormValues(
       await candidateFields(undefined, await observerIdsOf(params.id)),
@@ -51,7 +54,8 @@ export const PATCH = createProtectedRoute({
     const viewer = { manage: access.can(Permissions.RecruitmentManage), viewerId: session.id }
     await assertInterviewOpen(params.id, viewer, parsed.values)
 
-    const candidate = await updateCandidate(params.id, parsed.values, perimeter)
+    const values = await applyFirstSlot(parsed.values, session.id, params.id)
+    const candidate = await updateCandidate(params.id, values, perimeter)
     const sessionId = await candidateSession(params.id, perimeter)
 
     await recordFileEvent({

@@ -5,6 +5,7 @@ import { candidateSession, moveCandidate } from '@/core/services/recruitment'
 import { recordEvent } from '@/core/services/system/ActivityService'
 import { FORM_COPY } from '@/declarations/ui/copy/forms'
 import { Permissions } from '@/utils/constants/permissions'
+import { assertFileOpen } from '@/core/services/recruitment/BanService'
 
 // Where the card was dropped
 const OUTCOME_FIELD = 'outcomeId'
@@ -13,7 +14,8 @@ const INDEX_FIELD = 'index'
 export const PATCH = createProtectedRoute({
   permission: Permissions.RecruitmentCandidateWrite,
   descriptor: { summary: 'Move a candidate into an outcome column', tags: ['recruitment'] },
-  handler: async ({ params, raw, session, scope }) => {
+  handler: async ({ params, raw, session, scope, access }) => {
+    await assertFileOpen(params.id, access.can(Permissions.RecruitmentManage))
     const outcomeId = raw[OUTCOME_FIELD]
     if (typeof outcomeId !== 'string' || outcomeId === '') {
       throw invalidInput([{ field: OUTCOME_FIELD, message: FORM_COPY.required }])

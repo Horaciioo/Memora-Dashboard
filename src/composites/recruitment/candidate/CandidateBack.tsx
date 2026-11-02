@@ -14,9 +14,9 @@ export interface CandidateBackProps {
 }
 
 /**
- * Way back, level with the tabs
+ * Way back, level with the tabs from md, under them on a phone
  * @param {CandidateBackProps} props - Label and target
- * @return {JSX.Element | null}
+ * @return {JSX.Element}
  */
 
 export const CandidateBack = ({ label, href }: CandidateBackProps) => {
@@ -24,13 +24,17 @@ export const CandidateBack = ({ label, href }: CandidateBackProps) => {
   const host = useBannerHost(PAGE_TABS_HOST_ID)
   const Arrow = ICONS.back
 
-  if (!host) return null
-
-  return createPortal(
-    <button type="button" onClick={() => router.push(href)} className={CANDIDATE_RAIL.back}>
+  const button = (className: string) => (
+    <button type="button" onClick={() => router.push(href)} className={className}>
       <Arrow className="size-4" aria-hidden="true" />
       {label}
-    </button>,
-    host
+    </button>
+  )
+
+  return (
+    <>
+      {button(CANDIDATE_RAIL.backInline)}
+      {host && createPortal(button(CANDIDATE_RAIL.back), host)}
+    </>
   )
 }

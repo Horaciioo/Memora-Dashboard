@@ -6,7 +6,6 @@ import type { ReactNode } from 'react'
 import { CopyValue } from '@/components/elements/actions/CopyValue'
 import { Avatar } from '@/components/elements/display/Avatar'
 import { Markdown } from '@/components/elements/display/Markdown'
-import { Status } from '@/components/elements/display/Status'
 import { InlineText } from '@/components/structures/inline/InlineText'
 import { CandidateTeam } from '@/composites/recruitment/candidate/CandidateTeam'
 import { useRecruitmentState } from '@/composites/recruitment/file/RecruitmentFileContext'
@@ -15,9 +14,11 @@ import { formatDayTime } from '@/utils/format/dates'
 import { CANDIDATE_COPY } from '@/declarations/recruitment/candidateCopy'
 import { HISTORY_COPY } from '@/declarations/recruitment/historyCopy'
 import { RECRUITMENT_FIELD_COPY } from '@/declarations/recruitment/copy'
+import { ICONS } from '@/declarations/ui/icons'
 import { MEMBER_FILE } from '@/declarations/ui/blocks'
 import { CANDIDATE_RAIL } from '@/declarations/ui/variants'
 import type { CandidateView } from '@/types/recruitment'
+import { cn } from '@/utils/classnames'
 
 export interface CandidateRailProps {
   candidate: CandidateView
@@ -37,6 +38,8 @@ export interface CandidateRailProps {
 export const CandidateRail = ({ candidate, record, footer }: CandidateRailProps) => {
   const { detail, can } = useRecruitmentState()
   const pinned = candidate.comments.filter((comment) => comment.pinned)
+  const isBanned = detail.bannedIds.includes(candidate.discordId)
+  const Alert = ICONS.alert
 
   return (
     <>
@@ -48,26 +51,36 @@ export const CandidateRail = ({ candidate, record, footer }: CandidateRailProps)
             size="lg"
             className="md:h-24 md:w-24 md:text-2xl"
           />
-          <InlineText
-            id="candidate-display-name"
-            value={candidate.name}
-            disabled={!can.writeCandidates}
-            maxLength={80}
-            placeholder={RECRUITMENT_FIELD_COPY.displayName}
-            className={CANDIDATE_RAIL.name}
-            onCommit={(next) => record.saveField('displayName', next)}
-          />
-          {/* An observer never reads how to reach a candidate */}
-          {!can.observing && (
-            <span className="flex items-center gap-3">
-              <CopyValue value={candidate.discordId} />
-              {detail.bannedIds.includes(candidate.discordId) && (
-                <Status label={HISTORY_COPY.banned} tone="danger" />
+          <div className={CANDIDATE_RAIL.identity}>
+            <span className={CANDIDATE_RAIL.nameLine}>
+              <InlineText
+                id="candidate-display-name"
+                value={candidate.name}
+                disabled={!can.writeCandidates}
+                maxLength={80}
+                placeholder={RECRUITMENT_FIELD_COPY.displayName}
+                className={cn(CANDIDATE_RAIL.name, isBanned && CANDIDATE_RAIL.nameBanned)}
+                onCommit={(next) => record.saveField('displayName', next)}
+              />
+              {isBanned && (
+                <Alert className={CANDIDATE_RAIL.alert} aria-label={HISTORY_COPY.banned} />
               )}
             </span>
-          )}
+            {/* An observer never reads how to reach a candidate */}
+            {!can.observing && (
+              <span className="flex items-center gap-3">
+                <CopyValue value={candidate.discordId} />
+              </span>
+            )}
+          </div>
         </div>
         <div className={MEMBER_FILE.body}>
+          {isBanned && (
+            <p role="alert" className={CANDIDATE_RAIL.notice}>
+              <Alert className={CANDIDATE_RAIL.noticeGlyph} aria-hidden="true" />
+              {CANDIDATE_COPY.blacklistedNotice}
+            </p>
+          )}
           <CandidateTeam candidate={candidate} record={record} />
           {pinned.length > 0 && (
             <div className={MEMBER_FILE.pinned}>

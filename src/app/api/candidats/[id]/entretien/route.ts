@@ -6,6 +6,7 @@ import { JOURNAL_FILES, recordFileEvent } from '@/core/services/system/FileJourn
 import { RECRUITMENT_COPY } from '@/declarations/recruitment/copy'
 import type { EventTypeName } from '@/utils/constants/events'
 import { Permissions } from '@/utils/constants/permissions'
+import { assertFileOpen } from '@/core/services/recruitment/BanService'
 
 export const PUT = createProtectedRoute({
   permission: Permissions.RecruitmentCandidateWrite,
@@ -13,7 +14,8 @@ export const PUT = createProtectedRoute({
     summary: 'Set the register, the start or the verdict of an interview',
     tags: ['recruitment'],
   },
-  handler: async ({ params, raw, scope, session }) => {
+  handler: async ({ params, raw, scope, session, access }) => {
+    await assertFileOpen(params.id, access.can(Permissions.RecruitmentManage))
     const patch = readInterviewPatch(raw)
     const { sessionId } = await saveInterview(params.id, patch, await scope())
 

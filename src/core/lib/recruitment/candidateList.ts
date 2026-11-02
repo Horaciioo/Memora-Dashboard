@@ -28,8 +28,8 @@ export const CANDIDATE_SORTS = {
 
 export type CandidateSort = keyof typeof CANDIDATE_SORTS
 
-// Sort applied without a choice
-export const DEFAULT_CANDIDATE_SORT: CandidateSort = 'alphabetical'
+// Sort applied without a choice, planned interviews first
+export const DEFAULT_CANDIDATE_SORT: CandidateSort = 'dateAscending'
 
 export const isCandidateSort = (value: string): value is CandidateSort => value in CANDIDATE_SORTS
 

@@ -11,6 +11,7 @@ import { CalendarTab } from '@/composites/recruitment/file/CalendarTab'
 import { CandidatesTab } from '@/composites/recruitment/file/CandidatesTab'
 import { MeTab } from '@/composites/recruitment/file/MeTab'
 import { InstructionsTab } from '@/composites/recruitment/file/InstructionsTab'
+import { AdminTab } from '@/composites/recruitment/file/AdminTab'
 import { OverviewTab } from '@/composites/recruitment/file/OverviewTab'
 import { RecruitmentDrawers } from '@/composites/recruitment/file/RecruitmentDrawers'
 import { RecruitmentFileProvider } from '@/composites/recruitment/file/RecruitmentFileContext'
@@ -116,6 +117,13 @@ export const RecruitmentFile = ({
               label: RECRUITMENT_COPY.tabResults,
               icon: 'projects',
               render: () => <ResultsTab />,
+            },
+            {
+              value: 'admin',
+              label: RECRUITMENT_COPY.tabAdmin,
+              icon: 'settings',
+              visible: can.manage,
+              render: () => <AdminTab />,
             },
             {
               value: 'logs',

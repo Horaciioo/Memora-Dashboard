@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { APP_SHELL, TOP_BAR } from '@/declarations/ui/blocks'
 import { NAV_COPY } from '@/declarations/ui/copy/navigation'
 import { ICONS } from '@/declarations/ui/icons'
+import { useCrumbLead } from '@/core/store/crumbLead'
 import { BREADCRUMB_FULL_CHARS } from '@/declarations/ui/responsive'
 import { cn } from '@/utils/classnames'
 
@@ -31,6 +32,7 @@ const CrumbTrail = ({ trail }: MobileCrumbsProps) => {
   const Separator = ICONS.next
   const FoldIcon = ICONS.more
   const BackIcon = ICONS.back
+  const lead = useCrumbLead((state) => state.lead)
 
   const current = trail[trail.length - 1]
   const earlier = trail.slice(0, -1)
@@ -66,6 +68,7 @@ const CrumbTrail = ({ trail }: MobileCrumbsProps) => {
           </span>
         ))
       )}
+      {lead && <span className={TOP_BAR.crumbLead}>{lead}</span>}
       <span className={cn(APP_SHELL.crumbCurrent, 'min-w-0')} aria-current="page">
         {current.label}
       </span>

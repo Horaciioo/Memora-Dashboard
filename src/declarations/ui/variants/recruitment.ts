@@ -28,9 +28,12 @@ export const FILE_HEAD = {
   root: 'flex flex-wrap items-start justify-between gap-x-6 gap-y-4',
   lead: 'flex min-w-0 items-center gap-4',
   glyph: 'size-12 shrink-0',
+  // Portrait stays in the top bar on a phone
+  leadDesktop: 'hidden md:contents',
   body: 'flex min-w-0 flex-col gap-1.5',
-  title: 'text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl',
-  meta: 'flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--color-ink-subtle)]',
+  title: 'hidden text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl md:block',
+  // Left out on a phone, it only takes room
+  meta: 'hidden flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--color-ink-subtle)] md:flex',
   actions: 'flex flex-wrap items-center gap-2',
 } as const
 
@@ -202,7 +205,8 @@ export const MY_STATS = {
   duoStack: 'flex items-center -space-x-1.5',
   duoColumn: 'w-6 rounded-t-full bg-[var(--color-brand-500)]',
   duoSessions: 'text-xs text-[var(--color-ink-subtle)]/80',
-  ringsSvg: 'size-64 shrink-0 rotate-90',
+  // Small beside the day on a phone
+  ringsSvg: 'size-24 shrink-0 rotate-90 md:size-40 lg:size-64',
 } as const
 
 /**
@@ -217,7 +221,7 @@ export const MY_DAY = {
   clock: 'w-12 shrink-0 text-sm font-bold tabular-nums',
   name: 'min-w-0 flex-1 truncate font-semibold',
   empty: 'text-sm italic text-[var(--color-ink-subtle)]',
-  row: 'grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]',
+  row: 'grid grid-cols-[minmax(0,1fr)_auto] items-stretch gap-3 md:gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]',
   // Spacer takes the height of a title
   ringsColumn: 'flex flex-col gap-3',
   ringsSpacer: 'invisible hidden text-2xl font-bold tracking-tight select-none lg:block',
@@ -232,6 +236,19 @@ export const MY_DAY = {
 export const CANDIDATE_RAIL = {
   head: 'flex items-center gap-3 px-4 pt-3 text-left md:flex-col md:gap-1 md:pt-3 md:text-center',
   portrait: 'md:h-14 md:w-14 md:text-lg',
+  // Name over its identifier
+  identity: 'flex min-w-0 flex-col items-start gap-1 md:items-center',
   name: 'text-lg font-bold tracking-tight break-words',
-  back: 'absolute top-1/2 left-0 flex -translate-y-1/2 cursor-pointer items-center gap-2 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  // Barred candidate, the name turns red with a small alert raised beside it
+  nameBanned: 'text-[var(--color-danger)]',
+  nameLine: 'flex items-start gap-1',
+  alert: 'size-3.5 shrink-0 text-[var(--color-danger)]',
+  // Red box, no outline
+  notice:
+    'flex items-start gap-3 rounded-[var(--radius-md)] bg-[var(--color-danger-soft)] p-3 text-sm font-semibold text-[var(--color-danger)]',
+  noticeGlyph: 'mt-0.5 size-4 shrink-0',
+  back: 'absolute top-1/2 left-0 hidden -translate-y-1/2 cursor-pointer items-center md:flex gap-2 py-2 text-sm font-semibold text-[var(--color-ink-subtle)] transition-colors hover:text-[var(--color-ink)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus)]',
+  // Under the tabs on a phone
+  backInline:
+    '-mb-4 flex cursor-pointer items-center gap-2 self-center py-1 text-sm font-semibold text-[var(--color-ink-subtle)] md:hidden',
 } as const
