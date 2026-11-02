@@ -87,11 +87,9 @@ export default async function PlaySessionPage({ params }: PlaySessionPageProps) 
       isHost,
     })
     const players = game.seats.filter((seat) => !seat.hasLeft).map(faceOf)
-    const spectators = (
-      await listSpectators(
-        id,
-        players.map((player) => player.id)
-      )
+    const spectators = listSpectators(
+      id,
+      players.map((player) => player.id)
     ).map(({ id: accountId, displayName, avatarUrl }) => ({
       id: accountId,
       name: displayName,

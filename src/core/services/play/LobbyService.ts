@@ -144,6 +144,9 @@ export const listLobbies = async (accountId: string, game?: string | null) => {
   }
 }
 
+// Marker of a seat asked for while the game runs
+const REQUESTED = 'REQUESTED'
+
 /**
  * Take a seat in a lobby
  * @param {string} sessionId - Game
@@ -157,7 +160,7 @@ export const joinSession = async (sessionId: string, accountId: string): Promise
     const seat = session.seats.find((entry) => entry.accountId === accountId)
     if (seat?.kickedAt) throw forbidden(PLAY_ERRORS.kicked)
     if (seat && isPresent(seat)) return null
-    if (session.status !== PlayStatuses.Lobby) throw conflict(PLAY_ERRORS.notInLobby)
+    if (session.status !== PlayStatuses.Lobby) return REQUESTED
 
     const present = session.seats.filter(isPresent)
     if (present.length >= PLAY_GAMES.get(session.game).maxPlayers) throw conflict(PLAY_ERRORS.full)
@@ -175,6 +178,12 @@ export const joinSession = async (sessionId: string, accountId: string): Promise
     return session.game
   })
   if (!joined) return
+
+  // Game already running: the table is told, the seat stays shut
+  if (joined === REQUESTED) {
+    await announceInChat(sessionId, accountId, PlayMessageKinds.Requested)
+    throw conflict(PLAY_ERRORS.notInLobby)
+  }
 
   await closeOtherTables(accountId, joined, sessionId)
   await announceInChat(sessionId, accountId, PlayMessageKinds.Joined)

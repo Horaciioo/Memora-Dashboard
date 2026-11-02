@@ -744,6 +744,7 @@ export const PLAY_CHAT_VERBS: Record<string, string> = {
   JOINED: 'text-[var(--play-golf-glow)]',
   LEFT: 'text-[var(--play-bomb-glow)]',
   KICKED: 'text-[var(--play-heart)]',
+  REQUESTED: 'text-[var(--play-golf-glow)]',
 }
 
 /**

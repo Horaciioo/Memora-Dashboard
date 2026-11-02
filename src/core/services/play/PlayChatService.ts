@@ -96,5 +96,9 @@ export const announceInChat = async (
   accountId: string,
   kind: Exclude<PlayMessageKindName, typeof PlayMessageKinds.Text>
 ): Promise<void> => {
-  await prisma.playMessage.create({ data: { sessionId, accountId, kind, body: '' } })
+  const row = await prisma.playMessage.create({
+    data: { sessionId, accountId, kind, body: '' },
+    include: MESSAGE_INCLUDE,
+  })
+  await signalChat(sessionId, toMessageView(row))
 }

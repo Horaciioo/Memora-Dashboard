@@ -5,7 +5,7 @@ import { conflict, forbidden } from '@/core/lib/errors'
 import { pickSeatColor, readBodyText } from '@/core/lib/play'
 import { isPresent } from '@/core/lib/play/session'
 import { signalPlay } from '@/core/lib/play/signal'
-import { watchersOf } from '@/core/lib/play/watchers'
+import { presenceOf } from '@/core/lib/realtime/server/presence'
 import { closeOtherTables } from '@/core/services/play/LobbyService'
 import {
   ensureAllowed,
@@ -14,6 +14,7 @@ import {
   requireSeat,
 } from '@/core/services/play/PlaySessionService'
 import { PLAY_ERRORS, PLAY_GAMES } from '@/declarations/play'
+import { PLAY_TOPICS } from '@/declarations/play/topics'
 import { PlayInviteRoles, PlayStatuses } from '@/utils/constants/play'
 import type { PlayCandidate } from '@/types/play'
 
@@ -67,22 +68,14 @@ export const setSeatRole = async (
 }
 
 /**
- * People watching a game without a seat
+ * People watching a game without a seat, read from its presence room
  * @param {string} sessionId - Game
  * @param {string[]} seated - Players at the table
- * @return {Promise<PlayCandidate[]>} - Spectators
+ * @return {PlayCandidate[]} - Spectators
  */
 
-export const listSpectators = async (
-  sessionId: string,
-  seated: string[]
-): Promise<PlayCandidate[]> => {
-  const ids = watchersOf(sessionId).filter((id) => !seated.includes(id))
-  if (!ids.length) return []
-
-  return prisma.account.findMany({
-    where: { id: { in: ids } },
-    orderBy: { displayName: 'asc' },
-    select: { id: true, displayName: true, avatarUrl: true },
-  })
-}
+export const listSpectators = (sessionId: string, seated: string[]): PlayCandidate[] =>
+  presenceOf(PLAY_TOPICS.session(sessionId))
+    .filter((member) => member.status !== 'left' && !seated.includes(member.accountId))
+    .map(({ accountId, name, image }) => ({ id: accountId, displayName: name, avatarUrl: image }))
+    .toSorted((left, right) => left.displayName.localeCompare(right.displayName))
