@@ -78,7 +78,8 @@ export const ACADEMY_COPY = {
   tabObjectives: 'Objectifs',
   tabReviews: 'Bilans',
   skillStarsLabel: 'maîtrise en étoiles',
-  skillsLead: 'Le niveau de maîtrise, en étoiles, de chaque compétence de la fonction et du dispositif.',
+  skillsLead:
+    'Le niveau de maîtrise, en étoiles, de chaque compétence de la fonction et du dispositif.',
   noteAdd: 'Poser une note',
   noteEmptyTitle: 'Aucune note',
   noteEmptyDescription: 'Remarque, observation, avertissement ou compliment, au fil de l’eau.',

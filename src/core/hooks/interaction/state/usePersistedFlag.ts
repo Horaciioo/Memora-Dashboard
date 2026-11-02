@@ -21,7 +21,10 @@ const subscribe = (listener: () => void): (() => void) => {
  * @return {[boolean, (value: boolean) => void]} - Value and setter
  */
 
-export const usePersistedFlag = (key: string, fallback: boolean): [boolean, (value: boolean) => void] => {
+export const usePersistedFlag = (
+  key: string,
+  fallback: boolean
+): [boolean, (value: boolean) => void] => {
   const snapshot = useCallback((): boolean => {
     try {
       const saved = window.localStorage.getItem(key)
